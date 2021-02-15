@@ -1,6 +1,6 @@
 use barrel::types;
 use indoc::indoc;
-use introspection_engine_tests::{assert_eq_datamodels, test_api::*};
+use introspection_engine_tests::test_api::*;
 use quaint::prelude::{Queryable, SqlFamily};
 use test_macros::test_each_connector;
 
@@ -61,7 +61,7 @@ async fn a_table_with_enums(api: &TestApi) -> crate::TestResult {
     );
 
     for _ in 0..4 {
-        assert_eq_datamodels!(&dm, &api.introspect().await?);
+        api.assert_eq_datamodels(&dm, &api.introspect().await?);
     }
 
     Ok(())
@@ -110,7 +110,7 @@ async fn a_table_with_an_enum_default_value_that_is_an_empty_string(api: &TestAp
         color
     );
 
-    assert_eq_datamodels!(&dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -171,7 +171,7 @@ async fn a_table_enums_should_return_alphabetically_even_when_in_different_order
     );
 
     for _ in 0..4 {
-        assert_eq_datamodels!(&dm, &api.introspect().await?);
+        api.assert_eq_datamodels(&dm, &api.introspect().await?);
     }
 
     Ok(())
@@ -220,7 +220,7 @@ async fn a_table_with_enum_default_values(api: &TestApi) -> crate::TestResult {
         enum_name
     );
 
-    assert_eq_datamodels!(&dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -276,7 +276,7 @@ async fn a_table_enums_array(api: &TestApi) -> crate::TestResult {
         api.introspect().await?
     );
 
-    assert_eq_datamodels!(&dm, &result);
+    api.assert_eq_datamodels(&dm, &result);
 
     Ok(())
 }
@@ -329,7 +329,7 @@ async fn a_table_with_enum_default_values_that_look_like_booleans(api: &TestApi)
         enum_name
     );
 
-    assert_eq_datamodels!(&dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }

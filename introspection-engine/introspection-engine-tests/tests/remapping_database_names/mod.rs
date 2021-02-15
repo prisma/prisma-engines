@@ -1,6 +1,6 @@
 use barrel::types;
 use indoc::indoc;
-use introspection_engine_tests::{assert_eq_datamodels, test_api::*};
+use introspection_engine_tests::test_api::*;
 use quaint::prelude::Queryable;
 use test_macros::test_each_connector;
 
@@ -38,7 +38,7 @@ async fn remapping_fields_with_invalid_characters(api: &TestApi) -> crate::TestR
         }
     "#};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -71,7 +71,7 @@ async fn remapping_tables_with_invalid_characters(api: &TestApi) -> crate::TestR
         }
     "#};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -116,7 +116,7 @@ async fn remapping_models_in_relations(api: &TestApi) -> crate::TestResult {
     "#
     };
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -156,7 +156,7 @@ async fn remapping_models_in_relations_should_not_map_virtual_fields(api: &TestA
         }
     "#};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -222,7 +222,7 @@ async fn remapping_models_in_compound_relations(api: &TestApi) -> crate::TestRes
         post_constraint, user_constraint
     );
 
-    assert_eq_datamodels!(&dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -290,7 +290,7 @@ async fn remapping_fields_in_compound_relations(api: &TestApi) -> crate::TestRes
         user_post_constraint, user_constraint
     );
 
-    assert_eq_datamodels!(&dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -346,7 +346,7 @@ async fn remapping_enum_names(api: &TestApi) -> crate::TestResult {
         enum_name, renamed_enum
     );
 
-    assert_eq_datamodels!(&dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -394,7 +394,7 @@ async fn remapping_enum_values(api: &TestApi) -> crate::TestResult {
         enum_name
     );
 
-    assert_eq_datamodels!(&dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -442,7 +442,7 @@ async fn remapping_enum_default_values(api: &TestApi) -> crate::TestResult {
         enum_name
     );
 
-    assert_eq_datamodels!(&dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -468,7 +468,7 @@ async fn remapping_compound_primary_keys(api: &TestApi) -> crate::TestResult {
         }
     "#};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }

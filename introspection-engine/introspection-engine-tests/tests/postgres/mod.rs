@@ -1,5 +1,5 @@
 use indoc::indoc;
-use introspection_engine_tests::{assert_eq_datamodels, test_api::*};
+use introspection_engine_tests::test_api::*;
 use test_macros::test_each_connector;
 
 #[test_each_connector(tags("postgres"))]
@@ -45,6 +45,6 @@ async fn sequences_should_work(api: &TestApi) -> crate::TestResult {
     println!("EXPECTATION: \n {:#}", dm);
     println!("RESULT: \n {:#}", result);
 
-    assert_eq_datamodels!(&result, &dm);
+    api.assert_eq_datamodels(&result, &dm);
     Ok(())
 }

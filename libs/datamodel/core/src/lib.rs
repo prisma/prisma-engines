@@ -131,8 +131,12 @@ fn parse_datamodel_internal(
     datamodel_string: &str,
     ignore_datasource_urls: bool,
 ) -> Result<ValidatedDatamodel, diagnostics::Diagnostics> {
+    println!("Input String: \n {}", datamodel_string);
     let mut diagnostics = diagnostics::Diagnostics::new();
     let ast = ast::parser::parse_schema(datamodel_string)?;
+    println!("AST: \n {:#?}", ast);
+
+    //todo this also does not contain sources
     let sources = load_sources(&ast, ignore_datasource_urls, vec![])?;
     let generators = GeneratorLoader::load_generators_from_ast(&ast)?;
     let validator = ValidationPipeline::new(&sources.subject);
@@ -143,30 +147,8 @@ fn parse_datamodel_internal(
     match validator.validate(&ast) {
         Ok(mut src) => {
             src.warnings.append(&mut diagnostics.warnings);
-            Ok(src)
-        }
-        Err(mut err) => {
-            diagnostics.append(&mut err);
-            Err(diagnostics)
-        }
-    }
-}
 
-/// Validates a [Schema AST](/ast/struct.SchemaAst.html) and returns its
-/// [Datamodel](/struct.Datamodel.html).
-pub fn lift_ast_to_datamodel(ast: &ast::SchemaAst) -> Result<ValidatedDatamodel, diagnostics::Diagnostics> {
-    let mut diagnostics = diagnostics::Diagnostics::new();
-    // we are not interested in the sources in this case. Hence we can ignore the datasource urls.
-    let sources = load_sources(ast, true, vec![])?;
-    let generators = GeneratorLoader::load_generators_from_ast(&ast)?;
-    let validator = ValidationPipeline::new(&sources.subject);
-
-    diagnostics.append_warning_vec(sources.warnings);
-    diagnostics.append_warning_vec(generators.warnings);
-
-    match validator.validate(&ast) {
-        Ok(mut src) => {
-            src.warnings.append(&mut diagnostics.warnings);
+            println!("Datamodel: \n {:#?}", src.subject);
             Ok(src)
         }
         Err(mut err) => {
@@ -257,7 +239,17 @@ fn load_sources(
 /// Renders to a return string.
 pub fn render_datamodel_to_string(datamodel: &dml::Datamodel) -> String {
     let mut writable_string = common::WritableString::new();
-    render_datamodel_to(&mut writable_string, datamodel);
+    render_datamodel_to(&mut writable_string, datamodel, None);
+    writable_string.into()
+}
+
+/// Renders to a return string.
+pub fn render_datamodel_to_string_with_data_source(
+    datamodel: &dml::Datamodel,
+    datasource: Option<&Datasource>,
+) -> String {
+    let mut writable_string = common::WritableString::new();
+    render_datamodel_to(&mut writable_string, datamodel, datasource);
     writable_string.into()
 }
 
@@ -269,8 +261,12 @@ pub fn render_schema_ast_to_string(schema: &SchemaAst) -> String {
 }
 
 /// Renders as a string into the stream.
-pub fn render_datamodel_to(stream: &mut dyn std::io::Write, datamodel: &dml::Datamodel) {
-    let lowered = LowerDmlToAst::new(None).lower(datamodel);
+pub fn render_datamodel_to(
+    stream: &mut dyn std::io::Write,
+    datamodel: &dml::Datamodel,
+    datasource: Option<&Datasource>,
+) {
+    let lowered = LowerDmlToAst::new(datasource).lower(datamodel);
     render_schema_ast_to(stream, &lowered, 2);
 }
 

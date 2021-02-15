@@ -1,6 +1,6 @@
 use barrel::types;
 use indoc::indoc;
-use introspection_engine_tests::{assert_eq_datamodels, test_api::*};
+use introspection_engine_tests::test_api::*;
 use test_macros::test_each_connector;
 
 #[test_each_connector]
@@ -54,7 +54,7 @@ async fn compound_foreign_keys_for_one_to_one_relations(api: &TestApi) -> crate:
         constraint_name
     );
 
-    assert_eq_datamodels!(&dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -110,7 +110,7 @@ async fn compound_foreign_keys_for_required_one_to_one_relations(api: &TestApi) 
         constraint_name
     );
 
-    assert_eq_datamodels!(&dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -163,7 +163,7 @@ async fn compound_foreign_keys_for_one_to_many_relations(api: &TestApi) -> crate
         extra_index
     );
 
-    assert_eq_datamodels!(&dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -216,7 +216,7 @@ async fn compound_foreign_keys_for_required_one_to_many_relations(api: &TestApi)
         extra_index
     );
 
-    assert_eq_datamodels!(&dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -266,7 +266,7 @@ async fn compound_foreign_keys_for_required_self_relations(api: &TestApi) -> cra
         constraint_name, extra_index,
     );
 
-    assert_eq_datamodels!(&dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -316,7 +316,7 @@ async fn compound_foreign_keys_for_self_relations(api: &TestApi) -> crate::TestR
         constraint_name, extra_index
     );
 
-    assert_eq_datamodels!(&dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -366,7 +366,7 @@ async fn compound_foreign_keys_with_defaults(api: &TestApi) -> crate::TestResult
         constraint_name, extra_index
     );
 
-    assert_eq_datamodels!(&dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -425,7 +425,7 @@ async fn compound_foreign_keys_for_one_to_many_relations_with_non_unique_index(a
         extra_index, constraint_name
     );
 
-    assert_eq_datamodels!(&dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -477,7 +477,7 @@ async fn repro_matt_references_on_wrong_side(api: &TestApi) -> crate::TestResult
         extra_index
     );
 
-    assert_eq_datamodels!(&dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -532,7 +532,7 @@ async fn a_compound_fk_pk_with_overlapping_primary_key(api: &TestApi) -> crate::
         extra_index
     );
 
-    assert_eq_datamodels!(&dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -601,7 +601,7 @@ async fn compound_foreign_keys_for_duplicate_one_to_many_relations(api: &TestApi
         extra_index, constraint_name
     );
 
-    assert_eq_datamodels!(&dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }

@@ -1,6 +1,6 @@
 use barrel::types;
 use indoc::indoc;
-use introspection_engine_tests::{assert_eq_datamodels, assert_eq_json, test_api::*};
+use introspection_engine_tests::{assert_eq_json, test_api::*};
 use serde_json::json;
 use test_macros::test_each_connector;
 
@@ -28,7 +28,7 @@ async fn add_cuid_default(api: &TestApi) -> crate::TestResult {
         }
     "#};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     let expected = json!([{
         "code": 5,
@@ -70,7 +70,7 @@ async fn add_uuid_default(api: &TestApi) -> crate::TestResult {
         }
     "#};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     let expected = json!([{
         "code": 6,

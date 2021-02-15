@@ -1,6 +1,6 @@
 use barrel::{functions, types};
 use indoc::indoc;
-use introspection_engine_tests::{assert_eq_datamodels, test_api::*};
+use introspection_engine_tests::test_api::*;
 use quaint::prelude::Queryable;
 use test_macros::test_each_connector;
 
@@ -33,7 +33,7 @@ async fn a_simple_table_with_gql_types(api: &TestApi) -> crate::TestResult {
         }
     "##};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -87,7 +87,7 @@ async fn should_ignore_prisma_helper_tables(api: &TestApi) -> crate::TestResult 
         }
     "##};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -115,7 +115,7 @@ async fn a_table_with_compound_primary_keys(api: &TestApi) -> crate::TestResult 
         }
     "##};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -142,7 +142,7 @@ async fn a_table_with_unique_index(api: &TestApi) -> crate::TestResult {
         }
     "##};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -172,7 +172,7 @@ async fn a_table_with_multi_column_unique_index(api: &TestApi) -> crate::TestRes
         }
     "##};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -200,7 +200,7 @@ async fn a_table_with_required_and_optional_columns(api: &TestApi) -> crate::Tes
         }
     "##};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -236,7 +236,7 @@ async fn a_table_with_default_values(api: &TestApi) -> crate::TestResult {
         }
     "##};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -264,7 +264,7 @@ async fn a_table_with_a_non_unique_index(api: &TestApi) -> crate::TestResult {
         }
     "##};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -294,7 +294,7 @@ async fn a_table_with_a_multi_column_non_unique_index(api: &TestApi) -> crate::T
         }
     "##};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -321,7 +321,7 @@ async fn a_table_with_non_id_autoincrement(api: &TestApi) -> crate::TestResult {
         }
     "#};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -371,7 +371,7 @@ async fn default_values(api: &TestApi) -> crate::TestResult {
         }
     "#};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -407,7 +407,7 @@ async fn pg_default_value_as_dbgenerated(api: &TestApi) -> crate::TestResult {
           }
     "#};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -435,7 +435,7 @@ async fn my_default_value_as_dbgenerated(api: &TestApi) -> crate::TestResult {
         }
     "#};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -464,7 +464,7 @@ async fn a_table_with_an_index_that_contains_expressions_should_be_ignored(api: 
         }
     "#};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -506,7 +506,7 @@ async fn default_values_on_lists_should_be_ignored(api: &TestApi) -> crate::Test
         api.introspect().await?
     );
 
-    assert_eq_datamodels!(dm, &result);
+    api.assert_eq_datamodels(dm, &result);
 
     Ok(())
 }
@@ -536,7 +536,7 @@ async fn a_table_with_partial_indexes_should_ignore_them(api: &TestApi) -> crate
         }
     "#};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -576,7 +576,7 @@ async fn introspecting_a_table_with_json_type_must_work(api: &TestApi) -> crate:
         api.introspect().await?
     );
 
-    assert_eq_datamodels!(dm, &expected);
+    api.assert_eq_datamodels(dm, &expected);
 
     Ok(())
 }
@@ -616,7 +616,7 @@ async fn different_default_values_should_work(api: &TestApi) -> crate::TestResul
         }
     "##};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -652,7 +652,40 @@ async fn negative_default_values_should_work(api: &TestApi) -> crate::TestResult
         }
     "##};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
+    Ok(())
+}
+
+#[test_each_connector(tags("mysql"))]
+async fn partial_indexes_should_be_ignored(api: &TestApi) -> crate::TestResult {
+    api.barrel()
+        .execute_with_schema(
+            |migration| {
+                migration.create_table("Blog", move |t| {
+                    t.add_column("id", types::primary());
+                    t.inject_custom("other_blob_col mediumblob");
+                    t.inject_custom("var_char_column Varchar(20)");
+                    t.inject_custom("Index `partial_blob_col_index` (other_blob_col(10))");
+                });
+            },
+            api.schema_name(),
+        )
+        .await?;
+
+    let dm = indoc! {r##"
+        model Blog {
+          id                Int     @id @default(autoincrement())
+          var_char_column   String  
+          blob_col          Bytes?
+            
+          @@index([blob_col], name: "partial_blob_col_index")
+        }
+    "##};
+
+    let result = &api.introspect().await?;
+    api.assert_eq_datamodels(dm, result);
+
+    assert_eq!(true, false);
     Ok(())
 }
