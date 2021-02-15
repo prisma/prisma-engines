@@ -71,7 +71,7 @@ pub enum DatamodelError {
   #[error("Datasource provider not known: \"{}\".", source_name)]
   DatasourceProviderNotKnownError { source_name: String, span: Span },
 
-  #[error("shadowDatabase is the same as url for datasource \"{}\". Please specify a different database as shadow database.", source_name)]
+  #[error("shadowDatabaseUrl is the same as url for datasource \"{}\". Please specify a different database as shadow database.", source_name)]
   ShadowDatabaseUrlIsSameAsMainUrl { source_name: String, span: Span },
 
   #[error("The preview feature \"{}\" is not known. Expected one of: {}", preview_feature, expected_preview_features)]
