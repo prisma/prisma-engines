@@ -16,7 +16,6 @@ pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRe
                 vec.push(group_by_aggregation_field(ctx, &model));
             }
 
-            append_opt(&mut vec, find_one_field(ctx, &model));
             append_opt(&mut vec, find_unique_field(ctx, &model));
             vec
         })
@@ -27,29 +26,6 @@ pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRe
     let strong_ref = Arc::new(object_type(ident, fields, None));
 
     (OutputType::Object(Arc::downgrade(&strong_ref)), strong_ref)
-}
-
-/// Deprecated field. Semantics are identical to `findUnique`.
-fn find_one_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<OutputField> {
-    arguments::where_unique_argument(ctx, model).map(|arg| {
-        let field_name = ctx.pluralize_internal(camel_case(&model.name), format!("findOne{}", model.name));
-
-        field(
-            field_name,
-            vec![arg],
-            OutputType::object(output_objects::map_model_object_type(ctx, &model)),
-            Some(QueryInfo {
-                model: Some(Arc::clone(&model)),
-                tag: QueryTag::FindOne,
-            }),
-        )
-        .nullable()
-        .deprecate(
-            "The `findOne` query has been deprecated and replaced with `findUnique`.",
-            "2.14",
-            Some("2.15".to_owned()),
-        )
-    })
 }
 
 /// Builds a "single" query arity item field (e.g. "user", "post" ...) for given model.

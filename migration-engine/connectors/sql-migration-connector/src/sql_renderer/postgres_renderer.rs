@@ -47,7 +47,7 @@ impl SqlRenderer for PostgresFlavour {
 
     fn render_alter_enum(&self, alter_enum: &AlterEnum, schemas: &Pair<&SqlSchema>) -> Vec<String> {
         if alter_enum.dropped_variants.is_empty() {
-            let stmts: Vec<String> = alter_enum
+            let mut stmts: Vec<String> = alter_enum
                 .created_variants
                 .iter()
                 .map(|created_value| {
@@ -58,6 +58,20 @@ impl SqlRenderer for PostgresFlavour {
                     )
                 })
                 .collect();
+
+            if stmts.len() > 1 {
+                let warning = indoc::indoc! {
+                    r#"
+                    -- This migration adds more than one value to an enum.
+                    -- With PostgreSQL versions 11 and earlier, this is not possible
+                    -- in a single migration. This can be worked around by creating
+                    -- multiple migrations, each migration adding only one value to
+                    -- the enum.
+                    "#
+                };
+
+                stmts[0] = format!("{}\n\n{}", warning, stmts[0]);
+            }
 
             return stmts;
         }

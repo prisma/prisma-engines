@@ -60,6 +60,45 @@ async fn a_table_without_uniques_should_ignore(api: &TestApi) -> crate::TestResu
     Ok(())
 }
 
+#[test_each_connector(tags("postgres"))]
+async fn relations_between_ignored_models_should_not_have_field_level_ignores(api: &TestApi) -> crate::TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.inject_custom("id macaddr primary key not null");
+            });
+            migration.create_table("Post", |t| {
+                t.inject_custom("id macaddr primary key not null");
+                t.inject_custom("user_id macaddr not null");
+                t.add_foreign_key(&["user_id"], "User", &["id"]);
+            });
+        })
+        .await?;
+
+    let dm = indoc! {r#"
+            /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+            model Post {
+              id      Unsupported("macaddr") @id
+              user_id Unsupported("macaddr")
+              User    User                   @relation(fields: [user_id], references: [id])
+            
+              @@ignore
+            }
+            
+            /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+            model User {
+              id   Unsupported("macaddr") @id
+              Post Post[]
+            
+              @@ignore
+            }
+        "#};
+
+    assert_eq!(dm, &api.introspect().await?);
+
+    Ok(())
+}
+
 #[test_each_connector]
 async fn a_table_without_required_uniques(api: &TestApi) -> crate::TestResult {
     api.barrel()

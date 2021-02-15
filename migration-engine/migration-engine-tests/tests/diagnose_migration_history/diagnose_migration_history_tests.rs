@@ -819,7 +819,7 @@ async fn shadow_database_creation_error_is_special_cased_mysql(api: &TestApi) ->
         ))
         .await?;
 
-    let (host, port) = db_host_and_port_mysql_8_0();
+    let (host, port) = test_setup::db_host_and_port_mysql_8_0();
 
     let datamodel = format!(
         r#"
@@ -870,7 +870,7 @@ async fn shadow_database_creation_error_is_special_cased_postgres(api: &TestApi)
         )
         .await?;
 
-    let (host, port) = db_host_and_port_postgres_12();
+    let (host, port) = test_setup::db_host_and_port_postgres_12();
 
     let datamodel = format!(
         r#"
@@ -912,28 +912,21 @@ async fn shadow_database_creation_error_is_special_cased_mssql(api: &TestApi) ->
 
     api.create_migration("initial", dm1, &directory).send().await?;
 
-    api.database().raw_cmd("DROP LOGIN prismashadowdbtestuser;").await.ok();
-    api.database()
-        .raw_cmd("DROP USER IF EXISTS prismashadowdbtestuser;")
-        .await
-        .ok();
-
-    tokio::time::sleep(std::time::Duration::from_millis(200)).await;
-
     api.database()
         .raw_cmd(
             "
             CREATE LOGIN prismashadowdbtestuser
                 WITH PASSWORD = '1234batmanZ';
 
-            CREATE USER prismashadowdbtestuser FOR LOGIN prismashadowdbtestuser;
+            CREATE USER prismashadowdbuser FOR LOGIN prismashadowdbtestuser;
 
-            GRANT SELECT TO prismashadowdbtestuser;
+            GRANT SELECT TO prismashadowdbuser;
             ",
         )
-        .await?;
+        .await
+        .ok();
 
-    let (host, port) = db_host_and_port_mssql_2019();
+    let (host, port) = test_setup::db_host_and_port_mssql_2019();
 
     let datamodel = format!(
         r#"

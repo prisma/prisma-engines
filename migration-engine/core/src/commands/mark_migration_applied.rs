@@ -1,5 +1,5 @@
 use super::MigrationCommand;
-use crate::{api::MigrationApi, CoreError, CoreResult};
+use crate::{CoreError, CoreResult};
 use migration_connector::{MigrationConnector, MigrationDirectory};
 use serde::Deserialize;
 use std::{collections::HashMap, path::Path};
@@ -26,15 +26,12 @@ impl MigrationCommand for MarkMigrationAppliedCommand {
     type Input = MarkMigrationAppliedInput;
     type Output = MarkMigrationAppliedOutput;
 
-    async fn execute<C: MigrationConnector>(input: &Self::Input, engine: &MigrationApi<C>) -> CoreResult<Self::Output> {
-        // We should take a lock on the migrations table.
+    async fn execute<C: MigrationConnector>(input: &Self::Input, connector: &C) -> CoreResult<Self::Output> {
+        let persistence = connector.migration_persistence();
 
-        //Validate Provider
-        migration_connector::error_on_changed_provider(
-            &input.migrations_directory_path,
-            engine.connector().connector_type(),
-        )?;
-        let persistence = engine.connector().migration_persistence();
+        migration_connector::error_on_changed_provider(&input.migrations_directory_path, connector.connector_type())?;
+
+        connector.acquire_lock().await?;
 
         let migration_directory =
             MigrationDirectory::new(Path::new(&input.migrations_directory_path).join(&input.migration_name));

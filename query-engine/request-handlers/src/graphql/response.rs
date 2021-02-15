@@ -1,7 +1,5 @@
-// use crate::{CoreError, ExpressionResult, OutputType, OutputTypeRef, QueryResult, QueryValue};
+use crate::HandlerError;
 use indexmap::IndexMap;
-// use internal::*;
-use crate::PrismaError;
 use query_core::{
     response_ir::{Item, Map, ResponseData},
     CoreError,
@@ -15,6 +13,7 @@ pub struct GQLResponse {
     #[serde(skip_serializing_if = "Vec::is_empty")]
     errors: Vec<GQLError>,
 }
+
 #[derive(Debug, serde::Serialize, Default, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct GQLBatchResponse {
@@ -30,8 +29,6 @@ pub struct GQLError {
     error: String,
     user_facing_error: user_facing_errors::Error,
 }
-
-/// GQLResponse converters
 
 impl GQLResponse {
     pub fn with_capacity(capacity: usize) -> Self {
@@ -54,8 +51,8 @@ impl GQLResponse {
     }
 }
 
-impl From<PrismaError> for GQLResponse {
-    fn from(err: PrismaError) -> Self {
+impl From<HandlerError> for GQLResponse {
+    fn from(err: HandlerError) -> Self {
         let mut responses = Self::default();
         responses.insert_error(err);
         responses
@@ -67,6 +64,12 @@ impl From<GQLError> for GQLResponse {
         let mut responses = Self::default();
         responses.insert_error(err);
         responses
+    }
+}
+
+impl From<HandlerError> for GQLError {
+    fn from(other: HandlerError) -> Self {
+        GQLError::from(user_facing_errors::Error::from_dyn_error(&other))
     }
 }
 
@@ -92,15 +95,6 @@ impl From<CoreError> for GQLError {
         GQLError {
             error: format!("{}", err),
             user_facing_error: err.into(),
-        }
-    }
-}
-
-impl From<PrismaError> for GQLError {
-    fn from(other: PrismaError) -> Self {
-        match other {
-            PrismaError::CoreError(core_error) => GQLError::from(*core_error),
-            err => GQLError::from(user_facing_errors::Error::from_dyn_error(&err)),
         }
     }
 }
@@ -154,8 +148,8 @@ impl From<CoreError> for GQLBatchResponse {
     }
 }
 
-impl From<PrismaError> for GQLBatchResponse {
-    fn from(err: PrismaError) -> Self {
+impl From<HandlerError> for GQLBatchResponse {
+    fn from(err: HandlerError) -> Self {
         let mut responses = Self::default();
         responses.insert_error(err);
         responses

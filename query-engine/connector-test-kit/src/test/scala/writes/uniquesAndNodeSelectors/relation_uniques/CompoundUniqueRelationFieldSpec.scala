@@ -1181,7 +1181,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
     val res1 = server.query(
       """
         |{
-        | findOneModelA(where: {
+        | findUniqueModelA(where: {
         |   fieldA_fieldB: {
         |     fieldA: "a",
         |     fieldB: "b"
@@ -1194,12 +1194,12 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
       false
     )
 
-    res1.toString() should be("{\"data\":{\"findOneModelA\":{\"fieldA\":\"a\",\"fieldB\":\"b\"}}}")
+    res1.toString() should be("{\"data\":{\"findUniqueModelA\":{\"fieldA\":\"a\",\"fieldB\":\"b\"}}}")
 
     val res2 = server.query(
       """
         |{
-        | findOneModelB(where: {
+        | findUniqueModelB(where: {
         |   fieldA_fieldB: {
         |     fieldA: 1,
         |     fieldB: 2
@@ -1212,6 +1212,6 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
       false
     )
 
-    res2.toString() should be("{\"data\":{\"findOneModelB\":{\"fieldA\":1,\"fieldB\":2}}}")
+    res2.toString() should be("{\"data\":{\"findUniqueModelB\":{\"fieldA\":1,\"fieldB\":2}}}")
   }
 }

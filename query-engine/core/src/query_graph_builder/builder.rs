@@ -79,8 +79,7 @@ impl QueryGraphBuilder {
         let parsed_field = field_pair.parsed_field;
 
         let mut graph = match (&query_info.tag, query_info.model.clone()) {
-            (QueryTag::FindOne, Some(m)) => read::find_one(parsed_field, m).map(Into::into),
-            (QueryTag::FindUnique, Some(m)) => read::find_one(parsed_field, m).map(Into::into),
+            (QueryTag::FindUnique, Some(m)) => read::find_unique(parsed_field, m).map(Into::into),
             (QueryTag::FindFirst, Some(m)) => read::find_first(parsed_field, m).map(Into::into),
             (QueryTag::FindMany, Some(m)) => read::find_many(parsed_field, m).map(Into::into),
             (QueryTag::Aggregate, Some(m)) => read::aggregate(parsed_field, m).map(Into::into),

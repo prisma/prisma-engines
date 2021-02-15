@@ -85,12 +85,12 @@ fn invalid_file_path_error(file_path: &str, connection_info: &ConnectionInfo) ->
 
 #[async_trait]
 impl Connector for Sqlite {
-    async fn get_connection<'a>(&'a self) -> connector::Result<Box<dyn Connection + 'static>> {
+    async fn get_connection<'a>(&'a self) -> connector::Result<Box<dyn Connection + Send + Sync + 'static>> {
         super::catch(&self.connection_info(), async move {
             let conn = self.pool.check_out().await.map_err(SqlError::from)?;
             let conn = SqlConnection::new(conn, self.connection_info());
 
-            Ok(Box::new(conn) as Box<dyn Connection>)
+            Ok(Box::new(conn) as Box<dyn Connection + Send + Sync + 'static>)
         })
         .await
     }

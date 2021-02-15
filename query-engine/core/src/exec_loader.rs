@@ -1,4 +1,7 @@
-use crate::{PrismaError, PrismaResult};
+use crate::{
+    executor::{InterpretingExecutor, QueryExecutor},
+    CoreError,
+};
 use connection_string::JdbcString;
 use connector::Connector;
 use mongodb_connector::MongoDb;
@@ -10,41 +13,32 @@ use datamodel::{
     },
     Datasource,
 };
-use query_core::executor::{InterpretingExecutor, QueryExecutor};
 use std::{collections::HashMap, path::PathBuf};
 use url::Url;
 
-#[cfg(feature = "sql")]
 use sql_connector::*;
 
-pub async fn load(source: &Datasource) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
+pub async fn load(source: &Datasource) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
     match source.active_provider.as_str() {
-        #[cfg(feature = "sql")]
         SQLITE_SOURCE_NAME => sqlite(source).await,
-
-        #[cfg(feature = "sql")]
         MYSQL_SOURCE_NAME => mysql(source).await,
-
-        #[cfg(feature = "sql")]
         POSTGRES_SOURCE_NAME => postgres(source).await,
 
-        #[cfg(feature = "sql")]
         MSSQL_SOURCE_NAME => {
             if !feature_flags::get().microsoftSqlServer {
-                let error = query_core::CoreError::UnsupportedFeatureError(
+                let error = CoreError::UnsupportedFeatureError(
                     "Microsoft SQL Server (experimental feature, needs to be enabled)".into(),
                 );
 
-                return Err(error.into());
+                return Err(error);
             }
 
             mssql(source).await
         }
 
-        #[cfg(feature = "mongodb")]
         MONGODB_SOURCE_NAME => {
             if !feature_flags::get().mongoDb {
-                let error = query_core::CoreError::UnsupportedFeatureError(
+                let error = CoreError::UnsupportedFeatureError(
                     "MongoDB query connector (experimental feature, needs to be enabled)".into(),
                 );
 
@@ -54,15 +48,14 @@ pub async fn load(source: &Datasource) -> PrismaResult<(String, Box<dyn QueryExe
             mongodb(source).await
         }
 
-        x => Err(PrismaError::ConfigurationError(format!(
+        x => Err(CoreError::ConfigurationError(format!(
             "Unsupported connector type: {}",
             x
         ))),
     }
 }
 
-#[cfg(feature = "sql")]
-async fn sqlite(source: &Datasource) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
+async fn sqlite(source: &Datasource) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
     trace!("Loading SQLite query connector...");
 
     let sqlite = Sqlite::from_source(source).await?;
@@ -73,8 +66,7 @@ async fn sqlite(source: &Datasource) -> PrismaResult<(String, Box<dyn QueryExecu
     Ok((db_name, sql_executor(sqlite, false)))
 }
 
-#[cfg(feature = "sql")]
-async fn postgres(source: &Datasource) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
+async fn postgres(source: &Datasource) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
     trace!("Loading Postgres query connector...");
 
     let database_str = &source.url().value;
@@ -97,8 +89,7 @@ async fn postgres(source: &Datasource) -> PrismaResult<(String, Box<dyn QueryExe
     Ok((db_name, sql_executor(psql, force_transactions)))
 }
 
-#[cfg(feature = "sql")]
-async fn mysql(source: &Datasource) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
+async fn mysql(source: &Datasource) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
     trace!("Loading MySQL query connector...");
 
     let mysql = Mysql::from_source(source).await?;
@@ -109,7 +100,7 @@ async fn mysql(source: &Datasource) -> PrismaResult<(String, Box<dyn QueryExecut
 
     let mut db_name = url
         .path_segments()
-        .ok_or_else(|| PrismaError::ConfigurationError(err_str.into()))?;
+        .ok_or_else(|| CoreError::ConfigurationError(err_str.into()))?;
 
     let db_name = db_name.next().expect(err_str).to_owned();
 
@@ -117,8 +108,7 @@ async fn mysql(source: &Datasource) -> PrismaResult<(String, Box<dyn QueryExecut
     Ok((db_name, sql_executor(mysql, false)))
 }
 
-#[cfg(feature = "sql")]
-async fn mssql(source: &Datasource) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
+async fn mssql(source: &Datasource) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
     trace!("Loading SQL Server query connector...");
 
     let mssql = Mssql::from_source(source).await?;
@@ -133,16 +123,14 @@ async fn mssql(source: &Datasource) -> PrismaResult<(String, Box<dyn QueryExecut
     Ok((db_name, sql_executor(mssql, false)))
 }
 
-#[cfg(feature = "sql")]
-fn sql_executor<T>(connector: T, force_transactions: bool) -> Box<dyn QueryExecutor + Send + Sync + 'static>
+fn sql_executor<T>(connector: T, force_transactions: bool) -> Box<dyn QueryExecutor + Send + Sync>
 where
     T: Connector + Send + Sync + 'static,
 {
     Box::new(InterpretingExecutor::new(connector, force_transactions))
 }
 
-#[cfg(feature = "mongodb")]
-async fn mongodb(source: &Datasource) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
+async fn mongodb(source: &Datasource) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
     trace!("Loading MongoDB query connector...");
 
     let mongo = MongoDb::new(source).await?;

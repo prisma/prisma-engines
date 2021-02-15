@@ -1342,6 +1342,5 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
       errorCode = 2016,
       errorContains = """Query interpretation error"""
     )
-
   }
 }

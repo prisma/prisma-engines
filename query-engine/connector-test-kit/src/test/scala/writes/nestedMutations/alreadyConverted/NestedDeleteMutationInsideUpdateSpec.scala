@@ -180,8 +180,9 @@ class NestedDeleteMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |}
       """,
         project,
-        errorCode = 2016,
-        errorContains = """[Query Graph] Expected a valid parent ID to be present for a nested delete on a one-to-many relation."""
+        errorCode = 2025,
+        errorContains =
+          """An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested delete on relation 'ChildToParent'."""
       )
     }
   }

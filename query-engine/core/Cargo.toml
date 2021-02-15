@@ -9,14 +9,17 @@ async-trait = "0.1"
 base64 = "0.12"
 bigdecimal = "0.2"
 chrono = "0.4"
+connection-string = "0.1"
 connector = {path = "../connectors/query-connector", package = "query-connector"}
 crossbeam-queue = "0.2"
+datamodel = {path = "../../libs/datamodel/core"}
 datamodel-connector = {path = "../../libs/datamodel/connectors/datamodel-connector"}
 feature-flags = {path = "../../libs/feature-flags"}
 futures = "0.3"
 im = "13.0"
 indexmap = {version = "1.0", features = ["serde-1"]}
 itertools = "0.8"
+mongodb-connector = {path = "../connectors/mongodb-query-connector", package = "mongodb-query-connector"}
 once_cell = "1.3"
 petgraph = "0.4"
 prisma-inflector = {path = "../../libs/prisma-inflector"}
@@ -24,9 +27,11 @@ prisma-models = {path = "../../libs/prisma-models"}
 prisma-value = {path = "../../libs/prisma-value"}
 serde = {version = "1", features = ["derive"]}
 serde_json = "1"
+sql-connector = {path = "../connectors/sql-query-connector", package = "sql-query-connector"}
 thiserror = "1.0"
+tokio = {version = "1.0"}
 tracing = {version = "0.1", features = ["attributes"]}
 tracing-futures = "0.2.4"
-tokio = {version = "1.0"}
+url = "1"
 user-facing-errors = {path = "../../libs/user-facing-errors"}
 uuid = "0.8"

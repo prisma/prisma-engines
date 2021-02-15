@@ -2,17 +2,16 @@
 
 //! The top-level library crate for the migration engine.
 
-#[allow(missing_docs)]
 pub mod api;
 pub mod commands;
 
 mod core_error;
 
-use anyhow::anyhow;
 pub use api::GenericApi;
-use api::MigrationApi;
 pub use commands::SchemaPushInput;
 pub use core_error::{CoreError, CoreResult};
+
+use anyhow::anyhow;
 use datamodel::{
     common::provider_names::{
         MONGODB_SOURCE_NAME, MSSQL_SOURCE_NAME, MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME,
@@ -23,11 +22,10 @@ use datamodel::{
 use migration_connector::{features, ConnectorError};
 use mongodb_migration_connector::MongoDbMigrationConnector;
 use sql_migration_connector::SqlMigrationConnector;
-use std::sync::Arc;
 use user_facing_errors::{common::InvalidDatabaseString, migration_engine::DeprecatedProviderArray, KnownError};
 
 /// Top-level constructor for the migration engine API.
-pub async fn migration_api(datamodel: &str) -> CoreResult<Arc<dyn api::GenericApi>> {
+pub async fn migration_api(datamodel: &str) -> CoreResult<Box<dyn api::GenericApi>> {
     let config = parse_configuration(datamodel)?;
     let features = features::from_config(&config);
 
@@ -71,18 +69,30 @@ pub async fn migration_api(datamodel: &str) -> CoreResult<Arc<dyn api::GenericAp
                 u.query_pairs_mut().append_pair("statement_cache_size", "0");
             }
 
-            let connector = SqlMigrationConnector::new(u.as_str(), features).await?;
-            Ok(Arc::new(api::MigrationApi::new(connector)))
+            let connector = SqlMigrationConnector::new(
+                u.as_str(),
+                features,
+                source.shadow_database_url.as_ref().map(|url| url.value.clone()),
+            )
+            .await?;
+
+            Ok(Box::new(connector))
         }
         #[cfg(feature = "sql")]
         provider if [MYSQL_SOURCE_NAME, SQLITE_SOURCE_NAME, MSSQL_SOURCE_NAME].contains(&provider.as_str()) => {
-            let connector = SqlMigrationConnector::new(&source.url().value, features).await?;
-            Ok(Arc::new(api::MigrationApi::new(connector)))
+            let connector = SqlMigrationConnector::new(
+                &source.url().value,
+                features,
+                source.shadow_database_url.as_ref().map(|url| url.value.clone()),
+            )
+            .await?;
+
+            Ok(Box::new(connector))
         }
         #[cfg(feature = "mongodb")]
         provider if provider.as_str() == MONGODB_SOURCE_NAME => {
             let connector = MongoDbMigrationConnector::new(&source.url().value, features).await?;
-            Ok(Arc::new(api::MigrationApi::new(connector)))
+            Ok(Box::new(connector))
         }
         x => unimplemented!("Connector {} is not supported yet", x),
     }
@@ -160,14 +170,12 @@ pub async fn qe_setup(prisma_schema: &str) -> CoreResult<()> {
         {
             // 1. creates schema & database
             SqlMigrationConnector::qe_setup(&source.url().value).await?;
-
-            let connector = SqlMigrationConnector::new(&source.url().value, features).await?;
-            Box::new(MigrationApi::new(connector))
+            Box::new(SqlMigrationConnector::new(&source.url().value, features, None).await?)
         }
         provider if provider == MONGODB_SOURCE_NAME => {
             MongoDbMigrationConnector::qe_setup(&source.url().value).await?;
             let connector = MongoDbMigrationConnector::new(&source.url().value, features).await?;
-            Box::new(MigrationApi::new(connector))
+            Box::new(connector)
         }
         x => unimplemented!("Connector {} is not supported yet", x),
     };
@@ -180,7 +188,6 @@ pub async fn qe_setup(prisma_schema: &str) -> CoreResult<()> {
     };
 
     api.schema_push(&schema_push_input).await?;
-
     Ok(())
 }
 

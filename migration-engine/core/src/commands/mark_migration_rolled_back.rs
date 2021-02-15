@@ -1,5 +1,5 @@
 use super::MigrationCommand;
-use crate::{api::MigrationApi, CoreError, CoreResult};
+use crate::{CoreError, CoreResult};
 use migration_connector::MigrationConnector;
 use serde::Deserialize;
 use std::collections::HashMap;
@@ -24,12 +24,12 @@ impl MigrationCommand for MarkMigrationRolledBackCommand {
     type Input = MarkMigrationRolledBackInput;
     type Output = MarkMigrationRolledBackOutput;
 
-    async fn execute<C: MigrationConnector>(input: &Self::Input, engine: &MigrationApi<C>) -> CoreResult<Self::Output> {
-        // We should take a lock on the migrations table.
-        let persistence = engine.connector().migration_persistence();
-
-        //todo the input currently does not take the migration directory as input. therefore no error atm, but I think the behaviour
+    async fn execute<C: MigrationConnector>(input: &Self::Input, connector: &C) -> CoreResult<Self::Output> {
+        // todo the input currently does not take the migration directory as input. therefore no error atm, but I think the behaviour
         // should be consistent between mark applied and mark rolled back
+        let persistence = connector.migration_persistence();
+
+        connector.acquire_lock().await?;
 
         let all_migrations = persistence.list_migrations().await?.map_err(|_err| {
             CoreError::Generic(anyhow::anyhow!(

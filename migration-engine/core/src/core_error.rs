@@ -2,13 +2,13 @@ use migration_connector::{ConnectorError, ListMigrationsError};
 use std::{error::Error as StdError, fmt::Display};
 use user_facing_errors::{KnownError, UserFacingError};
 
-/// The result type for migration engine commands.
+/// The result type for migration engine commands
 pub type CoreResult<T> = Result<T, CoreError>;
 
-/// The top-level error type for migration engine commands.
+/// The top-level error type for migration engine commands
 #[derive(Debug)]
 pub enum CoreError {
-    /// When there was a bad datamodel as part of the input.
+    /// When there was a bad datamodel as part of the input
     ReceivedBadDatamodel(String),
 
     /// Errors from the connector.
@@ -17,25 +17,17 @@ pub enum CoreError {
     /// User facing errors
     UserFacing(user_facing_errors::Error),
 
-    /// Using gated preview features.
-    GatedPreviewFeatures(Vec<String>),
-
-    /// Generic unspecified errors.
+    /// Generic unspecified errors
     Generic(anyhow::Error),
 }
 
 impl Display for CoreError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            CoreError::ReceivedBadDatamodel(err) => write!(f, "{}", err),
+            CoreError::ReceivedBadDatamodel(err) => err.fmt(f),
             CoreError::ConnectorError(err) => write!(f, "Connector error: {:#}", err),
-            CoreError::GatedPreviewFeatures(features) => {
-                let feats: Vec<_> = features.iter().map(|f| format!("`{}`", f)).collect();
-
-                write!(f, "Blocked preview features: {}", feats.join(", "))
-            }
-            CoreError::Generic(src) => write!(f, "{}", src),
-            CoreError::UserFacing(src) => write!(f, "{}", src.message()),
+            CoreError::Generic(src) => src.fmt(f),
+            CoreError::UserFacing(src) => f.write_str(src.message()),
         }
     }
 }
@@ -44,7 +36,6 @@ impl StdError for CoreError {
     fn source(&self) -> Option<&(dyn StdError + 'static)> {
         match self {
             CoreError::ReceivedBadDatamodel(_) => None,
-            CoreError::GatedPreviewFeatures(_) => None,
             CoreError::UserFacing(_) => None,
             CoreError::ConnectorError(err) => Some(err),
             CoreError::Generic(err) => Some(err.as_ref()),
@@ -60,9 +51,6 @@ impl CoreError {
             CoreError::UserFacing(err) => err,
             CoreError::ReceivedBadDatamodel(full_error) => {
                 KnownError::new(user_facing_errors::common::SchemaParserError { full_error }).into()
-            }
-            CoreError::GatedPreviewFeatures(features) => {
-                KnownError::new(user_facing_errors::migration_engine::PreviewFeaturesBlocked { features }).into()
             }
             crate_error => user_facing_errors::Error::from_dyn_error(&crate_error),
         }

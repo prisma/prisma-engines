@@ -88,7 +88,6 @@ pub struct QueryInfo {
 /// A `QueryTag` designates a top level query possible with Prisma.
 #[derive(Debug, Clone, PartialEq)]
 pub enum QueryTag {
-    FindOne,
     FindUnique,
     FindFirst,
     FindMany,
@@ -108,7 +107,6 @@ pub enum QueryTag {
 impl fmt::Display for QueryTag {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let s = match self {
-            Self::FindOne => "findOne",
             Self::FindUnique => "findUnique",
             Self::FindFirst => "findFirst",
             Self::FindMany => "findMany",

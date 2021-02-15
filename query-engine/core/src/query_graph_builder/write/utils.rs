@@ -231,6 +231,8 @@ pub fn insert_existing_1to1_related_model_checks(
         ),
     )?;
 
+    let relation_name = parent_relation_field.relation().name.clone();
+
     graph.create_edge(&if_node, &update_existing_child, QueryGraphDependency::Then)?;
     graph.create_edge(
         &read_existing_children,
@@ -239,7 +241,10 @@ pub fn insert_existing_1to1_related_model_checks(
             // This has to succeed or the if-then node wouldn't trigger.
             let child_id = match child_ids.pop() {
                 Some(pid) => Ok(pid),
-                None => Err(QueryGraphBuilderError::AssertionError("[Query Graph] Expected a valid parent ID to be present for a nested connect on a one-to-one relation, updating previous parent.".to_string())),
+                None => Err(QueryGraphBuilderError::RecordNotFound(format!(
+                    "No parent record (needed to update the previous parent) was found for a nested connect on relation '{}' .",
+                    relation_name
+                ))),
             }?;
 
             if let Node::Query(Query::Write(ref mut wq)) = update_existing_child {

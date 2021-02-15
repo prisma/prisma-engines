@@ -22,26 +22,36 @@ use enumflags2::BitFlags;
 use error::quaint_error_to_connector_error;
 use flavour::SqlFlavour;
 use migration_connector::*;
+use pair::Pair;
 use quaint::{prelude::ConnectionInfo, single::Quaint};
 use sql_migration::SqlMigration;
-use sql_schema_describer::SqlSchema;
+use sql_schema_describer::{walkers::SqlSchemaExt, SqlSchema};
 use user_facing_errors::{common::InvalidDatabaseString, KnownError};
 
 /// The top-level SQL migration connector.
 pub struct SqlMigrationConnector {
     connection: Connection,
     flavour: Box<dyn SqlFlavour + Send + Sync + 'static>,
+    shadow_database_connection_string: Option<String>,
 }
 
 impl SqlMigrationConnector {
     /// Construct and initialize the SQL migration connector.
-    pub async fn new(database_str: &str, features: BitFlags<MigrationFeature>) -> ConnectorResult<Self> {
-        let connection = connect(database_str).await?;
+    pub async fn new(
+        connection_string: &str,
+        features: BitFlags<MigrationFeature>,
+        shadow_database_connection_string: Option<String>,
+    ) -> ConnectorResult<Self> {
+        let connection = connect(connection_string).await?;
         let flavour = flavour::from_connection_info(connection.connection_info(), features);
 
         flavour.ensure_connection_validity(&connection).await?;
 
-        Ok(Self { flavour, connection })
+        Ok(Self {
+            flavour,
+            connection,
+            shadow_database_connection_string,
+        })
     }
 
     /// Create the database corresponding to the connection string, without initializing the connector.
@@ -79,7 +89,7 @@ impl SqlMigrationConnector {
         self.flavour.as_ref()
     }
 
-    /// For tests.
+    /// Made public for tests.
     pub fn quaint(&self) -> &Quaint {
         self.connection.quaint()
     }
@@ -87,6 +97,42 @@ impl SqlMigrationConnector {
     /// Made public for tests.
     pub async fn describe_schema(&self) -> ConnectorResult<SqlSchema> {
         self.flavour.describe_schema(&self.connection).await
+    }
+
+    /// Try to reset the database to an empty state. This should only be used
+    /// when we don't have the permissions to do a full reset.
+    #[tracing::instrument(skip(self))]
+    async fn best_effort_reset(&self, connection: &Connection) -> ConnectorResult<()> {
+        tracing::info!("Attempting best_effort_reset");
+
+        let source_schema = self.flavour.describe_schema(connection).await?;
+        let target_schema = SqlSchema::empty();
+
+        let steps =
+            sql_schema_differ::calculate_steps(Pair::new(&source_schema, &target_schema), self.flavour.as_ref());
+
+        let migration = SqlMigration {
+            before: source_schema,
+            after: target_schema,
+            steps,
+        };
+
+        self.apply_migration(&migration).await?;
+
+        if migration.before.table_walker("_prisma_migrations").is_some() {
+            self.flavour.drop_migrations_table(self.conn()).await?;
+        }
+
+        Ok(())
+    }
+
+    /// Generate a name for a temporary (shadow) database, _if_ there is no user-configured shadow database url.
+    fn temporary_database_name(&self) -> Option<String> {
+        if self.shadow_database_connection_string.is_some() {
+            return None;
+        }
+
+        Some(format!("prisma_migrate_shadow_db_{}", uuid::Uuid::new_v4()))
     }
 }
 
@@ -96,6 +142,10 @@ impl MigrationConnector for SqlMigrationConnector {
 
     fn connector_type(&self) -> &'static str {
         self.connection.connection_info().sql_family().as_str()
+    }
+
+    async fn acquire_lock(&self) -> ConnectorResult<()> {
+        self.flavour().acquire_lock(self.conn()).await
     }
 
     async fn version(&self) -> ConnectorResult<String> {
@@ -111,7 +161,11 @@ impl MigrationConnector for SqlMigrationConnector {
     }
 
     async fn reset(&self) -> ConnectorResult<()> {
-        self.flavour.reset(self.conn()).await
+        if self.flavour.reset(self.conn()).await.is_err() {
+            self.best_effort_reset(self.conn()).await?;
+        }
+
+        Ok(())
     }
 
     /// Optionally check that the features implied by the provided datamodel are all compatible with

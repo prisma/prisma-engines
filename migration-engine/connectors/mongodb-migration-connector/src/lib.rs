@@ -11,7 +11,6 @@ use enumflags2::BitFlags;
 use error::IntoConnectorResult;
 use migration_connector::{ConnectorError, ConnectorResult, MigrationConnector, MigrationFeature};
 use mongodb::{
-    bson::doc,
     options::{ClientOptions, WriteConcern},
     Client,
 };
@@ -103,5 +102,9 @@ impl MigrationConnector for MongoDbMigrationConnector {
         &self,
     ) -> &dyn migration_connector::DestructiveChangeChecker<Self::DatabaseMigration> {
         self
+    }
+
+    async fn acquire_lock(&self) -> ConnectorResult<()> {
+        todo!()
     }
 }

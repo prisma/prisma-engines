@@ -105,8 +105,9 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel, family: &SqlFamily) 
     // remove their backrelations
     for model_without_identifier in &models_without_identifiers {
         for model in datamodel.models_mut() {
+            let model_is_ignored = model.is_ignored;
             for field in model.relation_fields_mut() {
-                if field.points_to_model(&model_without_identifier.model) {
+                if field.points_to_model(&model_without_identifier.model) && !model_is_ignored {
                     field.is_ignored = true;
                 }
             }
@@ -116,6 +117,7 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel, family: &SqlFamily) 
     let mut warnings = vec![];
 
     //extra warning about missing columns
+    //todo instead of commenting out use @@ignore here
     if !models_without_columns.is_empty() {
         warnings.push(warning_models_without_columns(&models_without_columns))
     }

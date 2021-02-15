@@ -179,10 +179,28 @@ pub fn warning_enriched_with_updated_at(affected: &[ModelAndField]) -> Warning {
     }
 }
 
+//todo maybe we can get rid of this alltogether due to @@ignore
+//but maybe we should have warnings for ignored fields and models
 pub fn warning_models_without_columns(affected: &[Model]) -> Warning {
     Warning {
         code: 14,
         message: "The following models were commented out as we could not retrieve columns for them. Please check your privileges.".into(),
+        affected: serde_json::to_value(&affected).unwrap(),
+    }
+}
+
+pub fn warning_enriched_models_with_ignore(affected: &[Model]) -> Warning {
+    Warning {
+        code: 15,
+        message: "The following models were enriched with an @@ignore taken from your previous datamodel".into(),
+        affected: serde_json::to_value(&affected).unwrap(),
+    }
+}
+
+pub fn warning_enriched_fields_with_ignore(affected: &[ModelAndField]) -> Warning {
+    Warning {
+        code: 16,
+        message: "The following fields were enriched with an @ignore taken from your previous datamodel".into(),
         affected: serde_json::to_value(&affected).unwrap(),
     }
 }

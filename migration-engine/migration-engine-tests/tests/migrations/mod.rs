@@ -1,3 +1,4 @@
+mod advisory_locking;
 mod apply_script_tests;
 mod dev_diagnostic_tests;
 mod enums;
@@ -9,6 +10,10 @@ mod mark_migration_rolled_back_tests;
 mod migration_persistence_tests;
 mod mysql;
 mod postgres;
+mod relations;
+mod reset_tests;
+mod shadow_database_url_configuration;
+mod soft_resets;
 mod sql;
 mod sqlite;
 mod squashing_tests;

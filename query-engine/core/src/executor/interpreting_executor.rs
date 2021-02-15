@@ -130,7 +130,7 @@ where
         Self::execute_single_operation(operation, conn, self.force_transactions, query_schema.clone()).await
     }
 
-    fn primary_connector(&self) -> &dyn Connector {
+    fn primary_connector(&self) -> &(dyn Connector + Send + Sync) {
         &self.connector
     }
 }

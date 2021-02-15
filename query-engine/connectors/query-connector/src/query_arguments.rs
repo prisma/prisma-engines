@@ -94,8 +94,12 @@ impl QueryArguments {
         self.take.clone().map(|t| if t < 0 { -t } else { t })
     }
 
-    pub fn can_batch(&self) -> bool {
-        self.filter.as_ref().map(|filter| filter.can_batch()).unwrap_or(false) && self.cursor.is_none()
+    pub fn should_batch(&self) -> bool {
+        self.filter
+            .as_ref()
+            .map(|filter| filter.should_batch())
+            .unwrap_or(false)
+            && self.cursor.is_none()
     }
 
     pub fn batched(self) -> Vec<Self> {

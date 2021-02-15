@@ -225,15 +225,14 @@ fn test_each_connector_async_wrapper_functions(
 
     for connector in args.connectors_to_test() {
         let connector_test_fn_name = Ident::new(connector.name(), Span::call_site());
-        let connector_api_factory = Ident::new(connector.test_api(), Span::call_site());
         let tags = connector.tags.bits();
         let features = args.features.0.bits();
 
         let test = quote! {
             #[test]
             fn #connector_test_fn_name() {
-                let test_api_args = test_setup::TestAPIArgs::new(#test_fn_name_str, #tags, #features);
-                run(Box::pin(super::#connector_api_factory(test_api_args)))
+                let test_api_args = test_setup::TestApiArgs::#connector_test_fn_name(#test_fn_name_str, #tags, #features);
+                run(Box::pin(super::TestApi::new(test_api_args)))
             }
         };
 

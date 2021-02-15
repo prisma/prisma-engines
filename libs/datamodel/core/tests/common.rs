@@ -26,6 +26,7 @@ pub trait ScalarFieldAsserts {
     fn assert_is_id(&self) -> &Self;
     fn assert_is_unique(&self, b: bool) -> &Self;
     fn assert_is_updated_at(&self, b: bool) -> &Self;
+    fn assert_ignored(&self, state: bool) -> &Self;
 }
 
 pub trait RelationFieldAsserts {
@@ -34,6 +35,7 @@ pub trait RelationFieldAsserts {
     fn assert_relation_delete_strategy(&self, t: dml::OnDeleteStrategy) -> &Self;
     fn assert_relation_referenced_fields(&self, t: &[&str]) -> &Self;
     fn assert_relation_base_fields(&self, t: &[&str]) -> &Self;
+    fn assert_ignored(&self, state: bool) -> &Self;
 }
 
 pub trait ModelAsserts {
@@ -44,6 +46,7 @@ pub trait ModelAsserts {
     fn assert_with_documentation(&self, t: &str) -> &Self;
     fn assert_has_index(&self, def: IndexDefinition) -> &Self;
     fn assert_has_id_fields(&self, fields: &[&str]) -> &Self;
+    fn assert_ignored(&self, state: bool) -> &Self;
 }
 
 pub trait EnumAsserts {
@@ -162,6 +165,11 @@ impl ScalarFieldAsserts for dml::ScalarField {
         assert_eq!(self.is_updated_at, b);
         self
     }
+
+    fn assert_ignored(&self, state: bool) -> &Self {
+        assert_eq!(self.is_ignored, state);
+        self
+    }
 }
 
 impl FieldAsserts for dml::RelationField {
@@ -204,6 +212,11 @@ impl RelationFieldAsserts for dml::RelationField {
 
     fn assert_relation_base_fields(&self, t: &[&str]) -> &Self {
         assert_eq!(self.relation_info.fields, t);
+        self
+    }
+
+    fn assert_ignored(&self, state: bool) -> &Self {
+        assert_eq!(self.is_ignored, state);
         self
     }
 }
@@ -260,6 +273,11 @@ impl ModelAsserts for dml::Model {
 
     fn assert_has_id_fields(&self, fields: &[&str]) -> &Self {
         assert_eq!(self.id_fields, fields);
+        self
+    }
+
+    fn assert_ignored(&self, state: bool) -> &Self {
+        assert_eq!(self.is_ignored, state);
         self
     }
 }

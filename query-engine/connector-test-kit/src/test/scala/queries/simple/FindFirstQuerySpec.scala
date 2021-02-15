@@ -31,7 +31,7 @@ class FindFirstQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     findFirst("{ field: { not: null } }", cursor = Some("{ id: 1 }"), take = Some("1"), skip = Some("1"), orderBy = Some("{ id: asc }")) should be(2)
   }
 
-  "FindOne record with no results" should "return null" in {
+  "findUnique record with no results" should "return null" in {
     val result = server.query(
       s"""{
          |  findFirstTestModel {

@@ -17,93 +17,127 @@ pub use mark_migration_applied::MarkMigrationApplied;
 pub use reset::Reset;
 pub use schema_push::SchemaPush;
 
-use self::{dev_diagnostic::DevDiagnostic, mark_migration_rolled_back::MarkMigrationRolledBack};
-use super::{
-    assertions::SchemaAssertion,
-    misc_helpers::{mysql_migration_connector, postgres_migration_connector, sqlite_migration_connector},
-    sql::barrel_migration_executor::BarrelMigrationExecutor,
+use crate::{
+    assertions::SchemaAssertion, connectors::Tags, sql::barrel_migration_executor::BarrelMigrationExecutor,
+    test_api::list_migration_directories::ListMigrationDirectories, AssertionResult,
 };
-use crate::{connectors::Tags, test_api::list_migration_directories::ListMigrationDirectories, AssertionResult};
+use dev_diagnostic::DevDiagnostic;
 use enumflags2::BitFlags;
+use mark_migration_rolled_back::MarkMigrationRolledBack;
 use migration_connector::{MigrationFeature, MigrationPersistence, MigrationRecord};
-use migration_core::{
-    api::{GenericApi, MigrationApi},
-    commands::ApplyScriptInput,
-};
+use migration_core::{api::GenericApi, commands::ApplyScriptInput};
 use quaint::{
     prelude::{ConnectionInfo, Queryable, SqlFamily},
     single::Quaint,
 };
 use sql_migration_connector::SqlMigrationConnector;
-use sql_schema_describer::*;
-use std::fmt::Write;
+use sql_schema_describer::SqlSchema;
+use std::fmt::Write as _;
 use tempfile::TempDir;
-use test_setup::*;
+use test_setup::{create_mysql_database, create_postgres_database, Features, TestApiArgs};
 
 /// A handle to all the context needed for end-to-end testing of the migration engine across
 /// connectors.
 pub struct TestApi {
-    database: Quaint,
-    api: MigrationApi<SqlMigrationConnector>,
-    tags: BitFlags<Tags>,
+    api: SqlMigrationConnector,
+    args: TestApiArgs,
+    connection_string: String,
 }
 
 impl TestApi {
+    pub async fn new(args: TestApiArgs) -> Self {
+        let features = preview_features(args.test_features);
+        let tags = args.connector_tags;
+
+        let db_name = if tags.contains(Tags::Mysql) {
+            test_setup::mysql_safe_identifier(args.test_function_name)
+        } else {
+            args.test_function_name
+        };
+
+        let connection_string = (args.url_fn)(db_name);
+
+        if tags.contains(Tags::Mysql) {
+            create_mysql_database(&connection_string.parse().unwrap())
+                .await
+                .unwrap();
+        } else if tags.contains(Tags::Postgres) {
+            create_postgres_database(&connection_string.parse().unwrap())
+                .await
+                .unwrap();
+        } else if tags.contains(Tags::Mssql) {
+            let conn = Quaint::new(&connection_string).await.unwrap();
+
+            test_setup::connectors::mssql::reset_schema(&conn, db_name)
+                .await
+                .unwrap();
+        };
+
+        let api = SqlMigrationConnector::new(&connection_string, features, None)
+            .await
+            .unwrap();
+
+        TestApi {
+            api,
+            args,
+            connection_string,
+        }
+    }
+
     pub fn schema_name(&self) -> &str {
         self.connection_info().schema_name()
     }
 
     pub fn database(&self) -> &Quaint {
-        &self.database
+        &self.api.quaint()
     }
 
     pub fn is_sqlite(&self) -> bool {
-        self.tags.contains(Tags::Sqlite)
+        self.tags().contains(Tags::Sqlite)
     }
 
     pub fn is_mssql(&self) -> bool {
-        self.tags.contains(Tags::Mssql)
+        self.tags().contains(Tags::Mssql)
     }
 
     pub fn is_mysql(&self) -> bool {
-        self.tags.contains(Tags::Mysql)
+        self.tags().contains(Tags::Mysql)
     }
 
     pub fn is_mysql_8(&self) -> bool {
-        self.tags.contains(Tags::Mysql8)
+        self.tags().contains(Tags::Mysql8)
     }
 
     pub fn is_mariadb(&self) -> bool {
-        self.tags.contains(Tags::Mariadb)
+        self.tags().contains(Tags::Mariadb)
     }
 
     pub fn is_mysql_5_6(&self) -> bool {
-        self.tags.contains(Tags::Mysql56)
+        self.tags().contains(Tags::Mysql56)
     }
 
     pub fn is_postgres(&self) -> bool {
-        self.tags.contains(Tags::Postgres)
+        self.tags().contains(Tags::Postgres)
     }
 
     pub fn migration_persistence<'a>(&'a self) -> &(dyn MigrationPersistence + 'a) {
-        self.api.connector()
+        &self.api
     }
 
     pub fn connection_info(&self) -> &ConnectionInfo {
-        &self.database.connection_info()
+        &self.database().connection_info()
     }
 
     pub fn sql_family(&self) -> SqlFamily {
         self.connection_info().sql_family()
     }
 
+    fn tags(&self) -> BitFlags<Tags> {
+        self.args.connector_tags
+    }
+
     pub fn datasource(&self) -> String {
-        match self.sql_family() {
-            SqlFamily::Mysql => mysql_test_config("unreachable"),
-            SqlFamily::Postgres => postgres_12_test_config("unreachable"),
-            SqlFamily::Sqlite => sqlite_test_config("unreachable"),
-            SqlFamily::Mssql => mssql_2019_test_config("unreachable"),
-        }
+        self.args.datasource_block(&self.connection_string)
     }
 
     /// Render a table name with the required prefixing for use with quaint query building.
@@ -132,13 +166,11 @@ impl TestApi {
                     }
 
                     let s = std::fs::read_to_string(entry.path())?;
-                    dbg!(entry.path());
-                    dbg!(s);
+                    tracing::info!(path = ?entry.path(), contents = ?s);
                 }
             } else {
                 let s = std::fs::read_to_string(entry.path())?;
-                dbg!(entry.path());
-                dbg!(s);
+                tracing::info!(path = ?entry.path(), contents = ?s);
             }
         }
 
@@ -222,7 +254,7 @@ impl TestApi {
     }
 
     pub async fn describe_database(&self) -> Result<SqlSchema, anyhow::Error> {
-        let result = self.api.connector().describe_schema().await?;
+        let result = self.api.describe_schema().await?;
         Ok(result)
     }
 
@@ -236,7 +268,7 @@ impl TestApi {
         let select_star =
             quaint::ast::Select::from_table(self.render_table_name(table_name)).value(quaint::ast::asterisk());
 
-        self.database.query(select_star.into()).await
+        self.database().query(select_star.into()).await
     }
 
     pub fn insert<'a>(&'a self, table_name: &'a str) -> SingleRowInsert<'a> {
@@ -254,13 +286,6 @@ impl TestApi {
     }
 
     pub fn write_native_types_datamodel_header(&self, buf: &mut String) {
-        let provider = match self.sql_family() {
-            SqlFamily::Mssql => "sqlserver",
-            SqlFamily::Mysql => "mysql",
-            SqlFamily::Postgres => "postgresql",
-            SqlFamily::Sqlite => "sqlite",
-        };
-
         indoc::writedoc!(
             buf,
             r#"
@@ -274,7 +299,7 @@ impl TestApi {
                 previewFeatures = ["nativeTypes"]
               }}
             "#,
-            provider = provider
+            provider = self.args.provider
         )
         .unwrap();
     }
@@ -335,162 +360,9 @@ impl<'a> TestApiSelect<'a> {
     }
 }
 
-pub async fn mysql_8_test_api(args: TestAPIArgs) -> TestApi {
-    let db_name = args.test_function_name;
-    let url = mysql_8_url(db_name);
-    let features = preview_features(args.test_features);
-    let connector = mysql_migration_connector(&url, features).await;
-
-    TestApi {
-        database: connector.quaint().clone(),
-        api: MigrationApi::new(connector),
-        tags: args.test_tag,
-    }
-}
-
-pub async fn mysql_5_6_test_api(args: TestAPIArgs) -> TestApi {
-    let db_name = args.test_function_name;
-    let url = mysql_5_6_url(db_name);
-    let features = preview_features(args.test_features);
-    let connector = mysql_migration_connector(&url, features).await;
-
-    TestApi {
-        database: connector.quaint().clone(),
-        api: MigrationApi::new(connector),
-        tags: args.test_tag,
-    }
-}
-
-pub async fn mysql_test_api(args: TestAPIArgs) -> TestApi {
-    let db_name = args.test_function_name;
-    let url = mysql_url(db_name);
-    let features = preview_features(args.test_features);
-    let connector = mysql_migration_connector(&url, features).await;
-
-    TestApi {
-        database: connector.quaint().clone(),
-        api: MigrationApi::new(connector),
-        tags: args.test_tag,
-    }
-}
-
-pub async fn mysql_mariadb_test_api(args: TestAPIArgs) -> TestApi {
-    let db_name = args.test_function_name;
-    let url = mariadb_url(db_name);
-    let features = preview_features(args.test_features);
-    let connector = mysql_migration_connector(&url, features).await;
-
-    TestApi {
-        database: connector.quaint().clone(),
-        api: MigrationApi::new(connector),
-        tags: args.test_tag,
-    }
-}
-
-pub async fn postgres9_test_api(args: TestAPIArgs) -> TestApi {
-    let db_name = args.test_function_name;
-    let url = postgres_9_url(db_name);
-    let features = preview_features(args.test_features);
-    let connector = postgres_migration_connector(&url, features).await;
-
-    TestApi {
-        database: connector.quaint().clone(),
-        api: MigrationApi::new(connector),
-        tags: args.test_tag,
-    }
-}
-
-pub async fn postgres_test_api(args: TestAPIArgs) -> TestApi {
-    let db_name = args.test_function_name;
-    let url = postgres_10_url(db_name);
-    let features = preview_features(args.test_features);
-    let connector = postgres_migration_connector(&url, features).await;
-
-    TestApi {
-        database: connector.quaint().clone(),
-        api: MigrationApi::new(connector),
-        tags: args.test_tag,
-    }
-}
-
-pub async fn postgres11_test_api(args: TestAPIArgs) -> TestApi {
-    let db_name = args.test_function_name;
-    let url = postgres_11_url(db_name);
-    let features = preview_features(args.test_features);
-    let connector = postgres_migration_connector(&url, features).await;
-
-    TestApi {
-        database: connector.quaint().clone(),
-        api: MigrationApi::new(connector),
-        tags: args.test_tag,
-    }
-}
-
-pub async fn postgres12_test_api(args: TestAPIArgs) -> TestApi {
-    let url = postgres_12_url(args.test_function_name);
-    let features = preview_features(args.test_features);
-    let connector = postgres_migration_connector(&url, features).await;
-
-    TestApi {
-        database: connector.quaint().clone(),
-        api: MigrationApi::new(connector),
-        tags: args.test_tag,
-    }
-}
-
-pub async fn postgres13_test_api(args: TestAPIArgs) -> TestApi {
-    let url = postgres_13_url(args.test_function_name);
-    let features = preview_features(args.test_features);
-    let connector = postgres_migration_connector(&url, features).await;
-
-    TestApi {
-        database: connector.quaint().clone(),
-        api: MigrationApi::new(connector),
-        tags: args.test_tag,
-    }
-}
-
-pub async fn sqlite_test_api(args: TestAPIArgs) -> TestApi {
-    let db_name = args.test_function_name;
-    let features = preview_features(args.test_features);
-    let connector = sqlite_migration_connector(db_name, features).await;
-
-    TestApi {
-        database: connector.quaint().clone(),
-        api: MigrationApi::new(connector),
-        tags: args.test_tag,
-    }
-}
-
-pub async fn mssql_2017_test_api(args: TestAPIArgs) -> TestApi {
-    mssql_test_api(mssql_2017_url("master"), args).await
-}
-
-pub async fn mssql_2019_test_api(args: TestAPIArgs) -> TestApi {
-    mssql_test_api(mssql_2019_url("master"), args).await
-}
-
-async fn mssql_test_api(connection_string: String, args: TestAPIArgs) -> TestApi {
-    let schema = args.test_function_name;
-    let connection_string = format!("{};schema={}", connection_string, schema);
-    let features = preview_features(args.test_features);
-
-    let database = Quaint::new(&connection_string).await.unwrap();
-    connectors::mssql::reset_schema(&database, schema).await.unwrap();
-    let connector = SqlMigrationConnector::new(&connection_string, features).await.unwrap();
-
-    TestApi {
-        database: connector.quaint().clone(),
-        api: MigrationApi::new(connector),
-        tags: args.test_tag,
-    }
-}
-
 fn preview_features(features: BitFlags<Features>) -> BitFlags<MigrationFeature> {
-    features.iter().fold(BitFlags::empty(), |acc, feature| {
-        match feature {
-            Features::Other => return acc,
-        };
+    features.iter().fold(BitFlags::empty(), |acc, feature| match feature {
+        Features::Other => acc,
     })
 }
 

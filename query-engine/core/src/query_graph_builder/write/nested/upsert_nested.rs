@@ -139,21 +139,30 @@ pub fn nested_upsert(
             ),
         )?;
 
+        let relation_name = parent_relation_field.relation().name.clone();
+        let child_model_name = child_model.name.clone();
+
         graph.create_edge(
             &read_children_node,
             &update_node,
-            QueryGraphDependency::ParentProjection(child_model_identifier.clone(), Box::new(move |mut update_node, mut child_ids| {
-                if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut wq))) = update_node {
-                    let child_id = match child_ids.pop() {
-                        Some(id) => Ok(id),
-                        None => Err(QueryGraphBuilderError::AssertionError("[Query Graph] Expected a valid parent ID to be present for a nested update in a nested upsert.".to_string())),
-                    }?;
+            QueryGraphDependency::ParentProjection(
+                child_model_identifier.clone(),
+                Box::new(move |mut update_node, mut child_ids| {
+                    if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut wq))) = update_node {
+                        let child_id = match child_ids.pop() {
+                            Some(id) => Ok(id),
+                            None => Err(QueryGraphBuilderError::RecordNotFound(format!(
+                                "No '{}' record (needed for nested update `where` on exists) was found for a nested upsert on relation '{}'.",
+                                child_model_name, relation_name
+                            ))),
+                        }?;
 
-                    wq.add_filter(child_id.filter());
-                }
+                        wq.add_filter(child_id.filter());
+                    }
 
-                Ok(update_node)
-            })),
+                    Ok(update_node)
+                }),
+            ),
         )?;
 
         graph.create_edge(&if_node, &update_node, QueryGraphDependency::Then)?;
@@ -165,6 +174,8 @@ pub fn nested_upsert(
             connect::connect_records_node(graph, &parent_node, &create_node, &parent_relation_field, 1)?;
         } else if parent_relation_field.is_inlined_on_enclosing_model() {
             let parent_model = parent_relation_field.model();
+            let parent_model_name = parent_model.name.clone();
+            let relation_name = parent_relation_field.relation().name.clone();
             let parent_model_id = parent_model.primary_identifier();
             let update_node = utils::update_records_node_placeholder(graph, Filter::empty(), parent_model);
 
@@ -175,7 +186,10 @@ pub fn nested_upsert(
                 QueryGraphDependency::ParentProjection(parent_model_id, Box::new(move |mut update_node, mut parent_ids| {
                     let parent_id = match parent_ids.pop() {
                         Some(pid) => Ok(pid),
-                        None => Err(QueryGraphBuilderError::AssertionError("[Query Graph] Expected a valid parent ID to be present to retrieve the finder for a parent update in a nested upsert.".to_string())),
+                        None => Err(QueryGraphBuilderError::RecordNotFound(format!(
+                            "No '{}' record (needed to update inlined relation on '{}') was found for a nested upsert on relation '{}'.",
+                            &parent_model_name, parent_model_name, relation_name
+                        ))),
                     }?;
 
                     if let Node::Query(Query::Write(ref mut wq)) = update_node {
@@ -186,6 +200,10 @@ pub fn nested_upsert(
                 })),
             )?;
 
+            let parent_model_name = parent_relation_field.model().name.clone();
+            let child_model_name = parent_relation_field.related_model().name.clone();
+            let relation_name = parent_relation_field.relation().name.clone();
+
             // Edge to retrieve the child ID to inject
             graph.create_edge(
                 &create_node,
@@ -193,7 +211,10 @@ pub fn nested_upsert(
                 QueryGraphDependency::ParentProjection(child_link.clone(), Box::new(move |mut update_node, mut child_links| {
                     let child_link = match child_links.pop() {
                         Some(link) => Ok(link),
-                        None => Err(QueryGraphBuilderError::AssertionError("[Query Graph] Expected a valid parent ID to be present to retrieve the ID to inject for a parent update in a nested upsert.".to_string())),
+                        None => Err(QueryGraphBuilderError::RecordNotFound(format!(
+                            "No '{}' record (needed to update inlined relation on '{}') was found for a nested upsert on relation '{}'.",
+                            child_model_name, parent_model_name, relation_name
+                        ))),
                     }?;
 
                     if let Node::Query(Query::Write(ref mut wq)) = update_node {
@@ -204,6 +225,10 @@ pub fn nested_upsert(
                 })),
             )?;
         } else {
+            let parent_model_name = parent_relation_field.model().name.clone();
+            let child_model_name = parent_relation_field.related_model().name.clone();
+            let relation_name = parent_relation_field.relation().name.clone();
+
             // Inlined on child
             // Edge to retrieve the child ID to inject (inject into the create)
             graph.create_edge(
@@ -212,7 +237,10 @@ pub fn nested_upsert(
                 QueryGraphDependency::ParentProjection(parent_link, Box::new(move |mut create_node, mut parent_links| {
                     let parent_link = match parent_links.pop() {
                         Some(link) => Ok(link),
-                        None => Err(QueryGraphBuilderError::AssertionError("[Query Graph] Expected a valid parent ID to be present to retrieve the ID to inject into the child create in a nested upsert.".to_string())),
+                        None => Err(QueryGraphBuilderError::RecordNotFound(format!(
+                            "No '{}' record (needed to update inlined relation on '{}') was found for a nested upsert on relation '{}'.",
+                            parent_model_name, child_model_name, relation_name
+                        ))),
                     }?;
 
                     if let Node::Query(Query::Write(ref mut wq)) = create_node {

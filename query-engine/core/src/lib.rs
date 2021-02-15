@@ -1,10 +1,11 @@
-#![allow(clippy::module_inception)]
+#![allow(clippy::module_inception, clippy::wrong_self_convention)]
 #![warn(warnings)] // Todo deny warnings once done
 
 #[macro_use]
 extern crate tracing;
 
 pub mod error;
+pub mod exec_loader;
 pub mod executor;
 pub mod interpreter;
 pub mod query_ast;

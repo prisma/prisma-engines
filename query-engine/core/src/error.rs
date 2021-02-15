@@ -35,6 +35,9 @@ pub enum CoreError {
 
     #[error("{}", _0)]
     InterpreterError(InterpreterError),
+
+    #[error("{}", _0)]
+    ConfigurationError(String),
 }
 
 impl From<QueryGraphBuilderError> for CoreError {
@@ -70,6 +73,18 @@ impl From<QueryParserError> for CoreError {
 impl From<InterpreterError> for CoreError {
     fn from(e: InterpreterError) -> CoreError {
         CoreError::InterpreterError(e)
+    }
+}
+
+impl From<url::ParseError> for CoreError {
+    fn from(e: url::ParseError) -> Self {
+        Self::ConfigurationError(format!("Error parsing connection string: {}", e))
+    }
+}
+
+impl From<connection_string::Error> for CoreError {
+    fn from(e: connection_string::Error) -> Self {
+        Self::ConfigurationError(format!("Error parsing connection string: {}", e))
     }
 }
 
@@ -139,6 +154,12 @@ impl From<CoreError> for user_facing_errors::Error {
             }
             CoreError::InterpreterError(InterpreterError::InterpretationError(msg, Some(cause))) => {
                 match cause.as_ref() {
+                    InterpreterError::QueryGraphBuilderError(QueryGraphBuilderError::RecordNotFound(cause)) => {
+                        user_facing_errors::KnownError::new(
+                            user_facing_errors::query_engine::RecordRequiredButNotFound { cause: cause.clone() },
+                        )
+                        .into()
+                    }
                     InterpreterError::QueryGraphBuilderError(QueryGraphBuilderError::RelationViolation(
                         RelationViolation {
                             model_a_name,

@@ -71,6 +71,9 @@ pub enum DatamodelError {
   #[error("Datasource provider not known: \"{}\".", source_name)]
   DatasourceProviderNotKnownError { source_name: String, span: Span },
 
+  #[error("shadowDatabaseUrl is the same as url for datasource \"{}\". Please specify a different database as shadow database.", source_name)]
+  ShadowDatabaseUrlIsSameAsMainUrl { source_name: String, span: Span },
+
   #[error("The preview feature \"{}\" is not known. Expected one of: {}", preview_feature, expected_preview_features)]
   PreviewFeatureNotKnownError { preview_feature: String, expected_preview_features: String,  span: Span },
 
@@ -316,27 +319,37 @@ impl DatamodelError {
   pub fn new_parser_error(expected: &[&'static str], span: Span) -> DatamodelError {
     DatamodelError::ParserError { expected: expected.to_owned(), expected_str: expected.join(", "), span }
   }
+
   pub fn new_functional_evaluation_error(message: &str, span: Span) -> DatamodelError {
     DatamodelError::FunctionalEvaluationError { message: String::from(message), span }
   }
+
   pub fn new_environment_functional_evaluation_error(var_name: &str, span: Span) -> DatamodelError {
     DatamodelError::EnvironmentFunctionalEvaluationError { var_name: String::from(var_name), span }
   }
+
   pub fn new_type_not_found_error(type_name: &str, span: Span) -> DatamodelError {
     DatamodelError::TypeNotFoundError { type_name: String::from(type_name), span }
   }
+
   pub fn new_scalar_type_not_found_error(type_name: &str, span: Span) -> DatamodelError {
     DatamodelError::ScalarTypeNotFoundError { type_name: String::from(type_name), span }
   }
+
   pub fn new_attribute_not_known_error(attribute_name: &str, span: Span) -> DatamodelError {
     DatamodelError::AttributeNotKnownError { attribute_name: String::from(attribute_name), span }
   }
+
   pub fn new_function_not_known_error(function_name: &str, span: Span) -> DatamodelError {
     DatamodelError::FunctionNotKnownError { function_name: String::from(function_name), span }
   }
 
   pub fn new_datasource_provider_not_known_error(source_name: &str, span: Span) -> DatamodelError {
     DatamodelError::DatasourceProviderNotKnownError { source_name: String::from(source_name), span }
+  }
+
+  pub fn new_shadow_database_is_same_as_main_url_error(source_name: String, span: Span) -> DatamodelError {
+    DatamodelError::ShadowDatabaseUrlIsSameAsMainUrl { source_name, span }
   }
 
   pub fn new_preview_feature_not_known_error(preview_feature: &str, expected_preview_features: Vec<&str>, span: Span) -> DatamodelError {
@@ -399,6 +412,7 @@ impl DatamodelError {
       DatamodelError::EnumValidationError {span, ..} => *span,
       DatamodelError::ConnectorError { span, .. } => *span,
       DatamodelError::PreviewFeatureNotKnownError {span, ..} => *span,
+      DatamodelError::ShadowDatabaseUrlIsSameAsMainUrl { span, .. } => *span,
     }
   }
   pub fn description(&self) -> String {

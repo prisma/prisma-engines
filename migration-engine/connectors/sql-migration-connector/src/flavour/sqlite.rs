@@ -1,8 +1,11 @@
-use crate::{connect, connection_wrapper::Connection, error::quaint_error_to_connector_error, flavour::SqlFlavour};
+use crate::{
+    connect, connection_wrapper::Connection, error::quaint_error_to_connector_error, flavour::SqlFlavour,
+    SqlMigrationConnector,
+};
 use enumflags2::BitFlags;
 use indoc::indoc;
 use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory, MigrationFeature};
-use quaint::prelude::{ConnectionInfo, SqlFamily};
+use quaint::prelude::ConnectionInfo;
 use sql_schema_describer::{DescriberErrorKind, SqlSchema, SqlSchemaDescriberBackend};
 use std::path::Path;
 
@@ -15,6 +18,12 @@ pub(crate) struct SqliteFlavour {
 
 #[async_trait::async_trait]
 impl SqlFlavour for SqliteFlavour {
+    async fn acquire_lock(&self, connection: &Connection) -> ConnectorResult<()> {
+        connection.raw_cmd("PRAGMA main.locking_mode=EXCLUSIVE").await?;
+
+        Ok(())
+    }
+
     async fn create_database(&self, database_str: &str) -> ConnectorResult<String> {
         use anyhow::Context;
 
@@ -36,7 +45,7 @@ impl SqlFlavour for SqliteFlavour {
         Ok(self.file_path.clone())
     }
 
-    async fn create_imperative_migrations_table(&self, connection: &Connection) -> ConnectorResult<()> {
+    async fn create_migrations_table(&self, connection: &Connection) -> ConnectorResult<()> {
         let sql = indoc! {r#"
             CREATE TABLE "_prisma_migrations" (
                 "id"                    TEXT PRIMARY KEY NOT NULL,
@@ -83,6 +92,12 @@ impl SqlFlavour for SqliteFlavour {
         Ok(())
     }
 
+    async fn drop_migrations_table(&self, connection: &Connection) -> ConnectorResult<()> {
+        connection.raw_cmd("DROP TABLE _prisma_migrations").await?;
+
+        Ok(())
+    }
+
     async fn ensure_connection_validity(&self, _connection: &Connection) -> ConnectorResult<()> {
         Ok(())
     }
@@ -96,20 +111,23 @@ impl SqlFlavour for SqliteFlavour {
     async fn reset(&self, connection: &Connection) -> ConnectorResult<()> {
         let file_path = connection.connection_info().file_path().unwrap();
 
+        connection.raw_cmd("PRAGMA main.locking_mode=NORMAL").await?;
+        connection.raw_cmd("PRAGMA main.quick_check").await?;
+
+        tracing::debug!("Truncating {:?}", file_path);
         std::fs::File::create(file_path).expect("failed to truncate sqlite file");
+
+        self.acquire_lock(connection).await?;
 
         Ok(())
     }
 
-    fn sql_family(&self) -> SqlFamily {
-        SqlFamily::Sqlite
-    }
-
-    #[tracing::instrument(skip(self, migrations, _connection))]
+    #[tracing::instrument(skip(self, migrations, _connection, _connector))]
     async fn sql_schema_from_migration_history(
         &self,
         migrations: &[MigrationDirectory],
         _connection: &Connection,
+        _connector: &SqlMigrationConnector,
     ) -> ConnectorResult<SqlSchema> {
         tracing::debug!("Applying migrations to temporary in-memory SQLite database.");
         let quaint = quaint::single::Quaint::new_in_memory(Some(self.attached_name.clone())).map_err(|err| {

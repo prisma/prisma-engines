@@ -5,7 +5,7 @@ use tracing::debug;
 
 #[allow(dead_code)]
 pub async fn get_mssql_describer_for_schema(sql: &str, schema: &'static str) -> mssql::SqlSchemaDescriber {
-    let connection_string = format!("{};schema={}", mssql_2019_url("master"), schema);
+    let connection_string = mssql_2019_url(schema);
     let conn = Quaint::new(&connection_string).await.unwrap();
 
     test_setup::connectors::mssql::reset_schema(&conn, schema)

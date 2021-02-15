@@ -63,8 +63,8 @@ impl BatchDocument {
     fn can_compact(&self) -> bool {
         match self {
             Self::Multi(operations, _) => match operations.split_first() {
-                Some((first, rest)) if first.is_find_one() => rest.iter().all(|op| {
-                    op.is_find_one()
+                Some((first, rest)) if first.is_find_unique() => rest.iter().all(|op| {
+                    op.is_find_unique()
                         && first.name() == op.name()
                         && first.nested_selections().len() == op.nested_selections().len()
                         && first
@@ -97,7 +97,7 @@ pub struct CompactedDocument {
 
 impl CompactedDocument {
     pub fn single_name(&self) -> String {
-        format!("findOne{}", self.name)
+        format!("findUnique{}", self.name)
     }
 
     pub fn plural_name(&self) -> String {
@@ -115,12 +115,12 @@ impl From<Vec<Operation>> for CompactedDocument {
             .map(|op| op.into_read().expect("Trying to compact a write operation."))
             .collect();
 
-        // This block creates the findMany query from the separate findOne queries.
+        // This block creates the findMany query from the separate findUnique queries.
         let selection = {
             // The name of the query should be findManyX if the first query
-            // here is findOneX. We took care earlier the queries are all the
+            // here is findUniqueX. We took care earlier the queries are all the
             // same. Otherwise we fail hard here.
-            let mut builder = Selection::builder(selections[0].name().replacen("findOne", "findMany", 1));
+            let mut builder = Selection::builder(selections[0].name().replacen("findUnique", "findMany", 1));
 
             // Take the nested selection set from the first query. We took care
             // earlier that all the nested selections are the same in every
@@ -130,8 +130,7 @@ impl From<Vec<Operation>> for CompactedDocument {
             // The query arguments are extracted here. Combine all query
             // arguments from the different queries into a one large argument.
             let selection_set = selections.iter().fold(SelectionSet::new(), |acc, selection| {
-                // findOne always has only one argument. We know it must be an
-                // object, otherwise this will panic.
+                // findUnique always has only one argument. We know it must be an object, otherwise this will panic.
                 let obj = selection.arguments()[0]
                     .1
                     .clone()
@@ -179,7 +178,7 @@ impl From<Vec<Operation>> for CompactedDocument {
             .collect();
 
         // Saving the stub of the query name for later use.
-        let name = selections[0].name().replacen("findOne", "", 1);
+        let name = selections[0].name().replacen("findUnique", "", 1);
 
         // Convert the selections into a vector of arguments. This defines the
         // response order and how we fetch the right data from the response set.

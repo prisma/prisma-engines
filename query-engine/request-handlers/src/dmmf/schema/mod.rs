@@ -40,6 +40,7 @@ impl QuerySchemaRenderer<(DmmfSchema, DmmfOperationMappings)> for DmmfQuerySchem
     }
 }
 
+#[derive(Default)]
 pub struct RenderContext {
     /// Aggregator for query schema
     schema: DmmfSchema,
@@ -58,12 +59,7 @@ pub struct RenderContext {
 
 impl RenderContext {
     pub fn new() -> Self {
-        RenderContext {
-            schema: DmmfSchema::default(),
-            mappings: Default::default(),
-            rendered: HashSet::new(),
-            next_pass: Vec::new(),
-        }
+        Self::default()
     }
 
     pub fn finalize(self) -> (DmmfSchema, DmmfOperationMappings) {
@@ -158,6 +154,7 @@ pub trait Renderer {
 }
 
 trait IntoRenderer {
+    #[allow(clippy::wrong_self_convention)]
     fn into_renderer(&self) -> Box<dyn Renderer>;
 
     /// Returns whether the item still needs to be rendered.
@@ -165,6 +162,7 @@ trait IntoRenderer {
 }
 
 impl IntoRenderer for QuerySchemaRef {
+    #[allow(clippy::wrong_self_convention)]
     fn into_renderer(&self) -> Box<dyn Renderer> {
         Box::new(DmmfSchemaRenderer::new(Arc::clone(self)))
     }
@@ -175,6 +173,7 @@ impl IntoRenderer for QuerySchemaRef {
 }
 
 impl<'a> IntoRenderer for &'a EnumType {
+    #[allow(clippy::wrong_self_convention)]
     fn into_renderer(&self) -> Box<dyn Renderer> {
         Box::new(DmmfEnumRenderer::new(self))
     }

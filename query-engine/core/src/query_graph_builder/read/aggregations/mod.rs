@@ -12,6 +12,7 @@ use itertools::Itertools;
 use prisma_models::{ModelRef, ScalarFieldRef};
 
 /// Resolves the given field as a aggregation query.
+#[allow(clippy::unnecessary_wraps)]
 fn resolve_query(mut field: FieldPair, model: &ModelRef) -> QueryGraphBuilderResult<AggregationSelection> {
     let query = match field.parsed_field.name.as_str() {
         fields::COUNT => {

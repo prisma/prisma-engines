@@ -37,8 +37,8 @@ class DeleteMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
     server.queryThatMustFail(
       s"""mutation {deleteScalarModel(where: {id: "5beea4aa6183dd734b2dbd9b"}){id}}""",
       project = project,
-      errorCode = 2016, // 3039,
-      errorContains = """Query interpretation error. Error for binding '0': RecordNotFound(\"Record to delete does not exist."""
+      errorCode = 2025,
+      errorContains = """An operation failed because it depends on one or more records that were required but not found. Record to delete does not exist."""
     )
     server.query(s"""query {scalarModels{string}}""", project = project, dataContains = s"""{"scalarModels":[{"string":"test"}]}""")
   }
@@ -59,8 +59,8 @@ class DeleteMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
     server.queryThatMustFail(
       s"""mutation {deleteScalarModel(where: {unicorn: "c"}){unicorn}}""",
       project = project,
-      errorCode = 2016, // 3039,
-      errorContains = """Query interpretation error. Error for binding '0': RecordNotFound(\"Record to delete does not exist.\")"""
+      errorCode = 2025, // 3039,
+      errorContains = """An operation failed because it depends on one or more records that were required but not found. Record to delete does not exist."""
     )
     server.query(s"""query {scalarModels{unicorn}}""", project = project, dataContains = s"""{"scalarModels":[{"unicorn":"a"}]}""")
   }

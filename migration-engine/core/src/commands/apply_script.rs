@@ -1,5 +1,5 @@
 use super::MigrationCommand;
-use crate::{api::MigrationApi, CoreResult};
+use crate::CoreResult;
 use serde::Deserialize;
 use std::collections::HashMap;
 
@@ -25,11 +25,11 @@ impl MigrationCommand for ApplyScriptCommand {
 
     type Output = ApplyScriptOutput;
 
-    async fn execute<C>(input: &Self::Input, engine: &MigrationApi<C>) -> CoreResult<Self::Output>
+    async fn execute<C>(input: &Self::Input, connector: &C) -> CoreResult<Self::Output>
     where
         C: migration_connector::MigrationConnector,
     {
-        let applier = engine.connector().database_migration_step_applier();
+        let applier = connector.database_migration_step_applier();
 
         applier.apply_script(&input.script).await?;
 

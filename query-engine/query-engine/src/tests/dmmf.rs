@@ -1,11 +1,33 @@
-use super::helpers::*;
 use crate::{
     cli::CliCommand,
     opt::{CliOpt, PrismaOpt, Subcommand},
     PrismaResult,
 };
+use datamodel_connector::ConnectorCapabilities;
+use prisma_models::DatamodelConverter;
+use query_core::{schema_builder, BuildMode, QuerySchema};
 use serial_test::serial;
 use std::sync::Arc;
+
+pub fn get_query_schema(datamodel_string: &str) -> (QuerySchema, datamodel::dml::Datamodel) {
+    feature_flags::initialize(&[String::from("all")]).unwrap();
+
+    let dm = datamodel::parse_datamodel_and_ignore_datasource_urls(datamodel_string)
+        .unwrap()
+        .subject;
+    let config = datamodel::parse_configuration_and_ignore_datasource_urls(datamodel_string).unwrap();
+    let capabilities = match config.subject.datasources.first() {
+        Some(ds) => ds.capabilities(),
+        None => ConnectorCapabilities::empty(),
+    };
+    let internal_dm_template = DatamodelConverter::convert(&dm);
+    let internal_ref = internal_dm_template.build("db".to_owned());
+
+    (
+        schema_builder::build(internal_ref, BuildMode::Modern, false, capabilities),
+        dm,
+    )
+}
 
 // Tests in this file run serially because the function `get_query_schema` depends on setting an env var.
 
@@ -23,7 +45,7 @@ fn must_not_fail_on_missing_env_vars_in_a_datasource() {
         }
     "#;
     let (query_schema, datamodel) = get_query_schema(dm);
-    let dmmf = crate::dmmf::render_dmmf(&datamodel, Arc::new(query_schema));
+    let dmmf = request_handlers::dmmf::render_dmmf(&datamodel, Arc::new(query_schema));
     let inputs = &dmmf.schema.input_object_types;
 
     assert!(!inputs.is_empty());

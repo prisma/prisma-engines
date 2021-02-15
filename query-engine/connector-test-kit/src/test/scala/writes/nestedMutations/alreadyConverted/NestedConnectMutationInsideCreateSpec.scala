@@ -863,8 +863,8 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
          |}
       """.stripMargin,
       project,
-      errorCode = 2018, // 3039,
-      errorContains = """RecordNotFound(\"Expected 1 records to be connected, found 0.\")"""
+      errorCode = 2018,
+      errorContains = """The required connected records were not found. Expected 1 records to be connected after connect operation on one-to-many relation 'CommentToTodo', found 0."""
     )
   }
 
@@ -900,8 +900,8 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
          |}
       """.stripMargin,
       project,
-      errorCode = 2016, // 3039,
-      errorContains = """Query interpretation error. Error for binding '1': AssertionError(\"[Query Graph] Expected a valid parent ID to be present for a nested connect on a one-to-many relation.\""""
+      errorCode = 2025,
+      errorContains = """An operation failed because it depends on one or more records that were required but not found. No 'Todo' record(s) (needed to inline the relation on 'Comment' record(s)) was found for a nested connect on one-to-many relation 'CommentToTodo'"""
     )
   }
 

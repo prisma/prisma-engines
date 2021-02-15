@@ -9,11 +9,10 @@ use crate::{
 
 #[async_trait::async_trait]
 impl DatabaseMigrationStepApplier<MongoDbMigration> for MongoDbMigrationConnector {
-    async fn apply_step(
+    async fn apply_migration(
         &self,
         database_migration: &MongoDbMigration,
-        _step: usize,
-    ) -> migration_connector::ConnectorResult<bool> {
+    ) -> migration_connector::ConnectorResult<u32> {
         let db = self.client.database(&self.db_name);
 
         dbg!(&database_migration);
@@ -26,8 +25,16 @@ impl DatabaseMigrationStepApplier<MongoDbMigration> for MongoDbMigrationConnecto
             }
         }
 
-        Ok(true)
+        Ok(database_migration.steps.len() as u32)
     }
+
+    // async fn apply_step(
+    //     &self,
+    //     database_migration: &MongoDbMigration,
+    //     _step: usize,
+    // ) -> migration_connector::ConnectorResult<bool> {
+    //
+    // }
 
     fn render_steps_pretty(
         &self,

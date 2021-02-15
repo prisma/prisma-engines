@@ -54,7 +54,9 @@ impl MongoDb {
 
 #[async_trait]
 impl Connector for MongoDb {
-    async fn get_connection(&self) -> connector_interface::Result<Box<dyn connector_interface::Connection>> {
+    async fn get_connection(
+        &self,
+    ) -> connector_interface::Result<Box<dyn connector_interface::Connection + Send + Sync>> {
         Ok(Box::new(MongoDbConnection {
             database: self.client.database(&self.database),
         }))

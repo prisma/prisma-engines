@@ -4,6 +4,9 @@ edition = "2018"
 name = "sql-query-connector"
 version = "0.1.0"
 
+[features]
+vendored-openssl = ["quaint/vendored-openssl"]
+
 [dependencies]
 anyhow = "1.0"
 async-trait = "0.1"
@@ -30,6 +33,7 @@ features = [
   "mssql",
   "tracing-log",
   "bigdecimal",
+  "serde-support"
 ]
 git = "https://github.com/prisma/quaint"
 

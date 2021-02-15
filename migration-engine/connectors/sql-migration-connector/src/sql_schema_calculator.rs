@@ -140,6 +140,13 @@ fn push_one_to_one_relation_unique_index(column_names: &[String], table: &mut sq
         return;
     }
 
+    //Don't add if there is a @@id or @id covering
+    if let Some(pk) = &table.primary_key {
+        if pk.columns == column_names {
+            return;
+        }
+    }
+
     let columns_suffix = column_names.join("_");
 
     let index = sql::Index {

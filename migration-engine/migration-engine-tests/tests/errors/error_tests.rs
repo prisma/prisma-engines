@@ -4,6 +4,7 @@ use migration_engine_tests::sql::*;
 use pretty_assertions::assert_eq;
 use quaint::prelude::{Queryable, SqlFamily};
 use serde_json::json;
+use test_setup::*;
 use url::Url;
 
 #[tokio::test]

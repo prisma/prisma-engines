@@ -535,7 +535,7 @@ async fn drift_can_be_detected_without_migrations_table(api: &TestApi) -> TestRe
     Ok(())
 }
 
-#[test_each_connector(tags("mysql_8"))]
+#[test_each_connector(tags("mysql_8"), log = "debug")]
 async fn dev_diagnostic_shadow_database_creation_error_is_special_cased_mysql(api: &TestApi) -> TestResult {
     let directory = api.create_migrations_directory()?;
 
@@ -558,7 +558,7 @@ async fn dev_diagnostic_shadow_database_creation_error_is_special_cased_mysql(ap
         ))
         .await?;
 
-    let (host, port) = db_host_and_port_mysql_8_0();
+    let (host, port) = test_setup::db_host_and_port_mysql_8_0();
 
     let datamodel = format!(
         r#"
@@ -588,7 +588,7 @@ async fn dev_diagnostic_shadow_database_creation_error_is_special_cased_mysql(ap
     Ok(())
 }
 
-#[test_each_connector(tags("postgres_12"), log = "debug")]
+#[test_each_connector(tags("postgres_12"))]
 async fn dev_diagnostic_shadow_database_creation_error_is_special_cased_postgres(api: &TestApi) -> TestResult {
     let directory = api.create_migrations_directory()?;
 
@@ -609,7 +609,7 @@ async fn dev_diagnostic_shadow_database_creation_error_is_special_cased_postgres
         )
         .await?;
 
-    let (host, port) = db_host_and_port_postgres_12();
+    let (host, port) = test_setup::db_host_and_port_postgres_12();
 
     let datamodel = format!(
         r#"
@@ -651,24 +651,21 @@ async fn dev_diagnostic_shadow_database_creation_error_is_special_cased_mssql(ap
 
     api.create_migration("initial", dm1, &directory).send().await?;
 
-    api.database().raw_cmd("DROP LOGIN prismashadowdbtestuser2;").await.ok();
-
     api.database()
         .raw_cmd(
             "
-            DROP USER IF EXISTS prismashadowdbtestuser2;
-
             CREATE LOGIN prismashadowdbtestuser2
                 WITH PASSWORD = '1234batmanZ';
 
-            CREATE USER prismashadowdbtestuser2 FOR LOGIN prismashadowdbtestuser2;
+            CREATE USER prismashadowdbuser2 FOR LOGIN prismashadowdbtestuser2;
 
-            GRANT SELECT TO prismashadowdbtestuser2;
+            GRANT SELECT TO prismashadowdbuser2;
             ",
         )
-        .await?;
+        .await
+        .ok();
 
-    let (host, port) = db_host_and_port_mssql_2019();
+    let (host, port) = test_setup::db_host_and_port_mssql_2019();
 
     let datamodel = format!(
         r#"

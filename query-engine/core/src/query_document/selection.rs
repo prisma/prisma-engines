@@ -99,8 +99,8 @@ impl Selection {
         self
     }
 
-    pub fn is_find_one(&self) -> bool {
-        self.name.starts_with("findOne")
+    pub fn is_find_unique(&self) -> bool {
+        self.name.starts_with("findUnique")
     }
 
     pub fn arguments(&self) -> &[(String, QueryValue)] {

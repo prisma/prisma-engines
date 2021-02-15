@@ -1,10 +1,11 @@
+#![allow(clippy::wrong_self_convention)]
+
 #[macro_use]
 extern crate tracing;
 
 use cli::CliCommand;
 use error::PrismaError;
 use opt::PrismaOpt;
-use request_handlers::PrismaResponse;
 use std::{error::Error, process};
 use structopt::StructOpt;
 use tracing::subscriber;
@@ -15,11 +16,8 @@ use tracing_subscriber::layer::SubscriberExt;
 
 mod cli;
 mod context;
-mod dmmf;
 mod error;
-mod exec_loader;
 mod opt;
-mod request_handlers;
 mod server;
 
 #[cfg(test)]

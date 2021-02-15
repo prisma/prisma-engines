@@ -18,6 +18,8 @@ members = [
   "query-engine/connectors/mongodb-query-connector",
   "query-engine/core",
   "query-engine/query-engine",
+  "query-engine/query-engine-napi",
+  "query-engine/request-handlers",
   "prisma-fmt",
   "libs/datamodel/core",
   "libs/feature-flags",
