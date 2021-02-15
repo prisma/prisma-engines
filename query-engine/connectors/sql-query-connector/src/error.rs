@@ -5,25 +5,44 @@ use std::{any::Any, string::FromUtf8Error};
 use thiserror::Error;
 use user_facing_errors::query_engine::DatabaseConstraint;
 
-pub struct RawError {
-    code: Option<String>,
-    message: Option<String>,
+pub enum RawError {
+    IncorrectNumberOfParameters {
+        expected: usize,
+        actual: usize,
+    },
+    Database {
+        code: Option<String>,
+        message: Option<String>,
+    },
 }
 
 impl From<RawError> for SqlError {
     fn from(re: RawError) -> SqlError {
-        Self::RawError {
-            code: re.code.unwrap_or_else(|| String::from("N/A")),
-            message: re.message.unwrap_or_else(|| String::from("N/A")),
+        match re {
+            RawError::IncorrectNumberOfParameters { expected, actual } => {
+                Self::IncorrectNumberOfParameters { expected, actual }
+            }
+            RawError::Database { code, message } => Self::RawError {
+                code: code.unwrap_or_else(|| String::from("N/A")),
+                message: message.unwrap_or_else(|| String::from("N/A")),
+            },
         }
     }
 }
 
 impl From<quaint::error::Error> for RawError {
     fn from(e: quaint::error::Error) -> Self {
-        Self {
-            code: e.original_code().map(ToString::to_string),
-            message: e.original_message().map(ToString::to_string),
+        match e.kind() {
+            quaint::error::ErrorKind::IncorrectNumberOfParameters { expected, actual } => {
+                Self::IncorrectNumberOfParameters {
+                    expected: *expected,
+                    actual: *actual,
+                }
+            }
+            _ => Self::Database {
+                code: e.original_code().map(ToString::to_string),
+                message: e.original_message().map(ToString::to_string),
+            },
         }
     }
 }
@@ -31,7 +50,7 @@ impl From<quaint::error::Error> for RawError {
 // Catching the panics from the database driver for better error messages.
 impl From<Box<dyn Any + Send>> for RawError {
     fn from(e: Box<dyn Any + Send>) -> Self {
-        Self {
+        Self::Database {
             code: None,
             message: Some(*e.downcast::<String>().unwrap()),
         }
@@ -107,6 +126,13 @@ pub enum SqlError {
 
     #[error("Database error. error code: {}, error message: {}", code, message)]
     RawError { code: String, message: String },
+
+    #[error(
+        "Incorrect number of parameters given to a statement. Expected {}: got: {}.",
+        expected,
+        actual
+    )]
+    IncorrectNumberOfParameters { expected: usize, actual: usize },
 }
 
 impl SqlError {
@@ -158,6 +184,9 @@ impl SqlError {
                 child_name,
             }),
             SqlError::ConversionError(e) => ConnectorError::from_kind(ErrorKind::ConversionError(e)),
+            SqlError::IncorrectNumberOfParameters { expected, actual } => {
+                ConnectorError::from_kind(ErrorKind::IncorrectNumberOfParameters { expected, actual })
+            }
             SqlError::QueryError(e) => {
                 let quaint_error: Option<&QuaintKind> = e.downcast_ref();
                 match quaint_error {
@@ -213,6 +242,7 @@ impl From<quaint::error::Error> for SqlError {
             QuaintKind::ColumnReadFailure(e) => Self::ColumnReadFailure(e),
             QuaintKind::ColumnNotFound { column } => SqlError::ColumnDoesNotExist(format!("{}", column)),
             QuaintKind::TableDoesNotExist { table } => SqlError::TableDoesNotExist(format!("{}", table)),
+            e @ QuaintKind::IncorrectNumberOfParameters { .. } => SqlError::QueryError(e.into()),
             e @ QuaintKind::ConversionError(_) => SqlError::ConversionError(e.into()),
             e @ QuaintKind::ResultIndexOutOfBounds { .. } => SqlError::QueryError(e.into()),
             e @ QuaintKind::ResultTypeMismatch { .. } => SqlError::QueryError(e.into()),
