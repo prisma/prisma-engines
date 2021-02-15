@@ -1,10 +1,8 @@
-use std::unimplemented;
-
-use connector_interface::{Filter, QueryMode, ScalarCondition, ScalarFilter};
+use crate::IntoBson;
+use connector_interface::{Filter, QueryMode, ScalarCondition, ScalarFilter, ScalarListFilter};
 use mongodb::bson::{doc, Bson, Document, Regex};
 use prisma_models::{PrismaValue, ScalarFieldRef};
-
-use crate::IntoBson;
+use std::unimplemented;
 
 // Mongo filters are a BSON document.
 impl IntoBson for Filter {
@@ -39,7 +37,7 @@ impl IntoBson for Filter {
 
             Filter::Scalar(sf) => sf.into_bson(),
             Filter::Empty => Ok(Document::new().into()),
-            // Filter::ScalarList(slf) => {}
+            Filter::ScalarList(slf) => slf.into_bson(),
             // Filter::OneRelationIsNull(_) => {}
             // Filter::Relation(_) => {}
             // Filter::BoolFilter(b) => {} // Potentially not doable.
@@ -150,6 +148,33 @@ fn insensitive_scalar_filter(field: &ScalarFieldRef, condition: ScalarCondition)
             doc! { "$nin": to_regex_list(field, vals)? }
         }
     })
+}
+
+impl IntoBson for ScalarListFilter {
+    fn into_bson(self) -> crate::Result<Bson> {
+        let field = self.field;
+
+        let filter_doc = match self.condition {
+            connector_interface::ScalarListCondition::Contains(val) => {
+                doc! { field.db_name(): val.into_bson()? }
+            }
+            connector_interface::ScalarListCondition::ContainsEvery(vals) => {
+                doc! { field.db_name(): { "$all": PrismaValue::List(vals).into_bson()? }}
+            }
+            connector_interface::ScalarListCondition::ContainsSome(vals) => {
+                doc! { "$or": vals.into_iter().map(|val| Ok(doc! { field.db_name(): val.into_bson()? }) ).collect::<crate::Result<Vec<_>>>()?}
+            }
+            connector_interface::ScalarListCondition::IsEmpty(empty) => {
+                if empty {
+                    doc! { field.db_name(): { "$size": 0 }}
+                } else {
+                    doc! { field.db_name(): { "$not": { "$size": 0 }}}
+                }
+            }
+        };
+
+        Ok(filter_doc.into())
+    }
 }
 
 fn to_regex_list(field: &ScalarFieldRef, vals: Vec<PrismaValue>) -> crate::Result<Vec<Bson>> {

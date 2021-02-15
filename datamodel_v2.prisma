@@ -4,9 +4,10 @@ datasource chinook {
 }
 
 model User {
-  id    String @id @default(dbgenerated()) @map("_id")
+  id    String   @id @default(dbgenerated()) @map("_id")
   name  String
   age   Int?
+  roles String[]
   posts Post[]
 }
 
