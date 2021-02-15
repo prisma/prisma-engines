@@ -171,6 +171,16 @@ pub struct DatabaseVersionIncompatibility {
     pub errors: String,
 }
 
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P1016",
+    message = "Your raw query had an incorrect number of parameters. Expected: `{expected}`, actual: `{actual}`."
+)]
+pub struct IncorrectNumberOfParameters {
+    pub expected: usize,
+    pub actual: usize,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
