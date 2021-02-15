@@ -15,26 +15,17 @@ impl DatabaseMigrationStepApplier<MongoDbMigration> for MongoDbMigrationConnecto
     ) -> migration_connector::ConnectorResult<u32> {
         let db = self.client.database(&self.db_name);
 
-        dbg!(&database_migration);
-
         for step in database_migration.steps.iter() {
             match step {
-                MongoDbMigrationStep::CreateCollection(name) => {
-                    dbg!(db.create_collection(name.as_str(), None).await.into_connector_result())?
-                }
+                MongoDbMigrationStep::CreateCollection(name) => db
+                    .create_collection(name.as_str(), None)
+                    .await
+                    .into_connector_result()?,
             }
         }
 
         Ok(database_migration.steps.len() as u32)
     }
-
-    // async fn apply_step(
-    //     &self,
-    //     database_migration: &MongoDbMigration,
-    //     _step: usize,
-    // ) -> migration_connector::ConnectorResult<bool> {
-    //
-    // }
 
     fn render_steps_pretty(
         &self,
