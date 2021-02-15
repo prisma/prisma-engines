@@ -196,14 +196,15 @@ impl DatasourceLoader {
 
             validate_datasource_url(&shadow_database_url, source_name, &url_arg)?;
 
-            if url.value == shadow_database_url.value {
-                return Err(
-                    diagnostics.merge_error(DatamodelError::new_shadow_database_is_same_as_main_url_error(
-                        source_name.clone(),
-                        shadow_database_url_arg.span(),
-                    )),
-                );
-            }
+            // Temporarily disabled because of processing/hacks on URLs that make comparing the two URLs unreliable.
+            // if url.value == shadow_database_url.value {
+            //     return Err(
+            //         diagnostics.merge_error(DatamodelError::new_shadow_database_is_same_as_main_url_error(
+            //             source_name.clone(),
+            //             shadow_database_url_arg.span(),
+            //         )),
+            //     );
+            // }
 
             Some(shadow_database_url)
         } else {
