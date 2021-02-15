@@ -1322,7 +1322,7 @@ async fn updated_at_with_native_types_on(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", move |t| {
-                t.add_column("id", types::varchar(30).primary(true));
+                t.add_column("id", types::integer().primary(true));
                 t.add_column("lastupdated", types::datetime().nullable(true));
                 t.inject_custom("lastupdated2 DATETIME");
             });
@@ -1334,36 +1334,16 @@ async fn updated_at_with_native_types_on(api: &TestApi) -> crate::TestResult {
         .await?;
 
     let input_dm = indoc! {r#"
-        datasource db {
-            provider = "sqlserver"
-            url = "sqlserver://"
-        }
-
-        generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["nativeTypes", "microsoftSqlServer"]
-        }
-
         model User {
-            id           String    @id
+            id           Int    @id
             lastupdated  DateTime? @updatedAt
             lastupdated2 DateTime? @db.DateTime @updatedAt
         }
     "#};
 
     let final_dm = indoc! {r#"
-        datasource db {
-            provider = "sqlserver"
-            url = "sqlserver://"
-        }
-
-        generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["nativeTypes", "microsoftSqlServer"]
-        }
-
         model User {
-            id           String    @id
+            id           Int    @id
             lastupdated  DateTime? @updatedAt
             lastupdated2 DateTime? @db.DateTime @updatedAt
         }

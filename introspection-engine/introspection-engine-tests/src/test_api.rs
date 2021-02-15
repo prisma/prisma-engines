@@ -121,7 +121,7 @@ impl TestApi {
 
     #[tracing::instrument(skip(self, data_model_string))]
     pub async fn re_introspect(&self, data_model_string: &str) -> Result<String> {
-        let config = parse_configuration(data_model_string).context("parsing configuration")?;
+        let config = self.configuration();
         let data_model = parse_datamodel(data_model_string).context("parsing datamodel")?;
 
         let introspection_result = self
@@ -234,12 +234,5 @@ fn parse_datamodel(dm: &str) -> Result<Datamodel> {
     match RpcImpl::parse_datamodel(dm) {
         Ok(dm) => Ok(dm),
         Err(e) => Err(Report::msg(serde_json::to_string_pretty(&e.data).unwrap())),
-    }
-}
-
-fn parse_configuration(dm: &str) -> Result<Configuration> {
-    match datamodel::parse_configuration(dm) {
-        Ok(dm) => Ok(dm.subject),
-        Err(e) => Err(Report::msg(e.to_pretty_string("schema.prisma", dm))),
     }
 }
