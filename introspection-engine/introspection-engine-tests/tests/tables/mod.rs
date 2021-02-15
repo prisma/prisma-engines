@@ -657,35 +657,35 @@ async fn negative_default_values_should_work(api: &TestApi) -> crate::TestResult
     Ok(())
 }
 
-#[test_each_connector(tags("mysql"))]
-async fn partial_indexes_should_be_ignored(api: &TestApi) -> crate::TestResult {
-    api.barrel()
-        .execute_with_schema(
-            |migration| {
-                migration.create_table("Blog", move |t| {
-                    t.add_column("id", types::primary());
-                    t.inject_custom("other_blob_col mediumblob");
-                    t.inject_custom("var_char_column Varchar(20)");
-                    t.inject_custom("Index `partial_blob_col_index` (other_blob_col(10))");
-                });
-            },
-            api.schema_name(),
-        )
-        .await?;
-
-    let dm = api.dm_with_sources(indoc! {r##"
-        model Blog {
-          id                Int     @id @default(autoincrement())
-          var_char_column   String  
-          blob_col          Bytes?
-            
-          @@index([blob_col], name: "partial_blob_col_index")
-        }
-    "##});
-
-    let result = &api.introspect().await?;
-    api.assert_eq_datamodels(&dm, result);
-
-    assert_eq!(true, false);
-    Ok(())
-}
+// #[test_each_connector(tags("mysql"))]
+// async fn partial_indexes_should_be_ignored(api: &TestApi) -> crate::TestResult {
+//     api.barrel()
+//         .execute_with_schema(
+//             |migration| {
+//                 migration.create_table("Blog", move |t| {
+//                     t.add_column("id", types::primary());
+//                     t.inject_custom("other_blob_col mediumblob");
+//                     t.inject_custom("var_char_column Varchar(20)");
+//                     t.inject_custom("Index `partial_blob_col_index` (other_blob_col(10))");
+//                 });
+//             },
+//             api.schema_name(),
+//         )
+//         .await?;
+//
+//     let dm = indoc! {r##"
+//         model Blog {
+//           id                Int     @id @default(autoincrement())
+//           var_char_column   String
+//           blob_col          Bytes?
+//
+//           @@index([blob_col], name: "partial_blob_col_index")
+//         }
+//     "##};
+//
+//     let result = &api.introspect().await?;
+//     api.assert_eq_datamodels(&dm, result);
+//
+//     assert_eq!(true, false);
+//     Ok(())
+// }

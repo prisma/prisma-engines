@@ -206,9 +206,11 @@ impl TestApi {
             .subject
     }
 
-    pub fn assert_eq_datamodels(&self, left: &str, right: &str) -> () {
-        let parsed_expected = datamodel::parse_datamodel(left).unwrap().subject;
-        let parsed_result = datamodel::parse_datamodel(right).unwrap().subject;
+    pub fn assert_eq_datamodels(&self, expected_without_header: &str, result_with_header: &str) -> () {
+        let parsed_expected = datamodel::parse_datamodel(&self.dm_with_sources(expected_without_header))
+            .unwrap()
+            .subject;
+        let parsed_result = datamodel::parse_datamodel(result_with_header).unwrap().subject;
 
         let reformatted_expected =
             datamodel::render_datamodel_and_config_to_string(&parsed_expected, &self.configuration());
