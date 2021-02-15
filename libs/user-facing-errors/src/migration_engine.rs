@@ -31,7 +31,7 @@ struct MigrationRollback {
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
     code = "P3003",
-    message = "The format of migrations changed, the saved migrations are no longer valid. To solve this problem, please follow the steps at: https://pris.ly/d/migrate"
+    message = "The format of migrations changed, the saved migrations are no longer valid.\nTo solve this problem, please follow the steps at: https://pris.ly/d/migrate"
 )]
 pub struct DatabaseMigrationFormatChanged;
 
@@ -47,7 +47,7 @@ pub struct MigrateSystemDatabase {
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
     code = "P3005",
-    message = "The database schema for `{database_name}` is not empty. Read more about how to baseline an existing production database: https://pris.ly/d/migrate-baseline"
+    message = "The database schema for `{database_name}` is not empty.\nRead more about how to baseline an existing production database: https://pris.ly/d/migrate-baseline"
 )]
 pub struct DatabaseSchemaNotEmpty {
     pub database_name: String,
@@ -72,7 +72,7 @@ impl crate::UserFacingError for MigrationDoesNotApplyCleanly {
             crate::ErrorType::Unknown(_) => String::new(),
         };
 
-        format!("Migration `{migration_name}` failed to apply cleanly to a temporary database. \n{error_code}Error:\n{inner_error}", migration_name = self.migration_name, inner_error = self.inner_error.message(), error_code = error_code)
+        format!("Migration `{migration_name}` failed to apply cleanly to a temporary database.\n{error_code}Error:\n{inner_error}", migration_name = self.migration_name, inner_error = self.inner_error.message(), error_code = error_code)
     }
 }
 
@@ -88,7 +88,7 @@ impl crate::UserFacingError for PreviewFeaturesBlocked {
         let blocked: Vec<_> = self.features.iter().map(|s| format!("`{}`", s)).collect();
 
         format!(
-            "Some of the requested preview features are not yet allowed in migration engine. Please remove them from your data model before using migrations. (blocked: {})",
+            "Some of the requested preview features are not yet allowed in migration engine.\nPlease remove them from your data model before using migrations. (blocked: {})",
             blocked.join(", "),
         )
     }
@@ -107,7 +107,7 @@ pub struct MigrationAlreadyApplied {
 #[derive(Debug, Serialize, UserFacingError)]
 #[user_facing(
     code = "P3009",
-    message = "migrate found failed migrations in the target database, new migrations will not be applied. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve\n{details}"
+    message = "migrate found failed migrations in the target database, new migrations will not be applied.\nRead more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve\n{details}"
 )]
 pub struct FoundFailedMigrations {
     /// The details about each failed migration.
@@ -144,7 +144,7 @@ pub struct CannotRollBackSucceededMigration {
 #[derive(Debug, Serialize, UserFacingError)]
 #[user_facing(
     code = "P3013",
-    message = "Datasource provider arrays are no longer supported in migrate. Please change your datasource to use a single provider. Read more at https://pris.ly/multi-provider-deprecation"
+    message = "Datasource provider arrays are no longer supported in migrate.\nPlease change your datasource to use a single provider.\nRead more at https://pris.ly/multi-provider-deprecation"
 )]
 pub struct DeprecatedProviderArray;
 
@@ -156,7 +156,7 @@ pub struct ShadowDbCreationError {
 #[derive(Debug, Serialize, UserFacingError)]
 #[user_facing(
     code = "P3014",
-    message = "The datasource provider `{provider}` specified in your schema does not match the one specified in the migration_lock.toml. You will encounter errors when you try to apply migrations generated for a different provider. Please archive your current migration directory at a different location and start a new migration history with `prisma migrate dev`."
+    message = "The datasource provider `{provider}` specified in your schema does not match the one specified in the migration_lock.toml.\nYou will encounter errors when you try to apply migrations generated for a different provider.\nPlease archive your current migration directory at a different location and start a new migration history with `prisma migrate dev`."
 )]
 pub struct ProviderSwitchedError {
     ///The provider specified in the schema.
@@ -176,7 +176,7 @@ impl crate::UserFacingError for ShadowDbCreationError {
         };
 
         format!(
-            "Prisma Migrate could not create the shadow database. Please make sure the database user has permission to create databases.  More info: https://pris.ly/d/migrate-shadow. Original error: {error_code}\n{inner_error}",
+            "Prisma Migrate could not create the shadow database.\nPlease make sure the database user has permission to create databases.\nMore info: https://pris.ly/d/migrate-shadow.\nOriginal error: {error_code}\n{inner_error}",
             inner_error = self.inner_error.message(),
             error_code = error_code
         )
@@ -186,7 +186,7 @@ impl crate::UserFacingError for ShadowDbCreationError {
 #[derive(Debug, Serialize, UserFacingError)]
 #[user_facing(
     code = "P3015",
-    message = "Could not find the migration file at {migration_file_path}. Please delete the directory or restore the migration file."
+    message = "Could not find the migration file at {migration_file_path}.\nPlease delete the directory or restore the migration file."
 )]
 pub struct MigrationFileNotFound {
     pub migration_file_path: String,
