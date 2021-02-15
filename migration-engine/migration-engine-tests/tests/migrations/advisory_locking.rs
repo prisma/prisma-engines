@@ -59,7 +59,7 @@ async fn advisory_locking_works(api: &TestApi) -> TestResult {
         .filter(|result| {
             let applied_migration_names = &result.as_ref().unwrap().applied_migration_names;
 
-            applied_migration_names.len() == 1 && &applied_migration_names[0] == &migration_name
+            applied_migration_names.len() == 1 && applied_migration_names[0] == migration_name
         })
         .count();
 

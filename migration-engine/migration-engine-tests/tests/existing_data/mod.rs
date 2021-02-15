@@ -140,7 +140,7 @@ async fn altering_a_column_with_non_null_values_should_warn(api: &TestApi) -> Te
 
     api.schema_push(dm2).send().await?.assert_warnings(&[
         match api.sql_family() {
-            SqlFamily::Postgres => "The `age` column on the `Test` table would be dropped and recreated. This will lead to data loss.".into(),
+            SqlFamily::Postgres => "The `age` column on the `Test` table would be dropped and recreated. This will lead to data loss.",
             SqlFamily::Mssql => "You are about to alter the column `age` on the `Test` table, which contains 2 non-null values. The data in that column will be cast from `NVarChar(1000)` to `Int`.",
             SqlFamily::Mysql => "You are about to alter the column `age` on the `Test` table, which contains 2 non-null values. The data in that column will be cast from `VarChar(191)` to `Int`.",
             _ => "You are about to alter the column `age` on the `Test` table, which contains 2 non-null values. The data in that column will be cast from `String` to `Int`.",
