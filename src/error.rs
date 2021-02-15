@@ -217,6 +217,13 @@ pub enum ErrorKind {
     #[cfg_attr(feature = "docs", doc(cfg(feature = "serde-support")))]
     #[error("Deserializing a ResultRow {:?}", _0)]
     FromRowError(serde::de::value::Error),
+
+    #[error(
+        "Incorrect number of parameters given to a statement. Expected {}: got: {}.",
+        expected,
+        actual
+    )]
+    IncorrectNumberOfParameters { expected: usize, actual: usize },
 }
 
 impl ErrorKind {

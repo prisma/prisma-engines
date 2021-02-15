@@ -561,6 +561,15 @@ impl Queryable for PostgreSql {
         metrics::query("postgres.query_raw", sql, params, move || async move {
             let stmt = self.fetch_cached(sql).await?;
 
+            if stmt.params().len() != params.len() {
+                let kind = ErrorKind::IncorrectNumberOfParameters {
+                    expected: stmt.params().len(),
+                    actual: params.len(),
+                };
+
+                return Err(Error::builder(kind).build());
+            }
+
             let rows = super::timeout::socket(
                 self.socket_timeout,
                 self.client.0.query(&stmt, conversion::conv_params(params).as_slice()),
@@ -581,6 +590,15 @@ impl Queryable for PostgreSql {
     async fn execute_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<u64> {
         metrics::query("postgres.execute_raw", sql, params, move || async move {
             let stmt = self.fetch_cached(sql).await?;
+
+            if stmt.params().len() != params.len() {
+                let kind = ErrorKind::IncorrectNumberOfParameters {
+                    expected: stmt.params().len(),
+                    actual: params.len(),
+                };
+
+                return Err(Error::builder(kind).build());
+            }
 
             let changes = super::timeout::socket(
                 self.socket_timeout,
@@ -732,6 +750,29 @@ mod tests {
             Ok(_) => unreachable!(),
             Err(e) => match e.kind() {
                 ErrorKind::TlsError { .. } => (),
+                other => panic!("{:#?}", other),
+            },
+        }
+    }
+
+    #[tokio::test]
+    async fn should_map_incorrect_parameters_error() {
+        let url = Url::parse(&CONN_STR).unwrap();
+        let conn = Quaint::new(url.as_str()).await.unwrap();
+
+        let res = conn
+            .query_raw("SELECT $1", &[Value::integer(1), Value::integer(2)])
+            .await;
+
+        assert!(res.is_err());
+
+        match res {
+            Ok(_) => unreachable!(),
+            Err(e) => match e.kind() {
+                ErrorKind::IncorrectNumberOfParameters { expected, actual } => {
+                    assert_eq!(1, *expected);
+                    assert_eq!(2, *actual);
+                }
                 other => panic!("{:#?}", other),
             },
         }
