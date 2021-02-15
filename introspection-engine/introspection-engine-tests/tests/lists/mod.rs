@@ -18,31 +18,16 @@ async fn scalar_list_types(api: &TestApi) -> crate::TestResult {
         .await?;
 
     let dm = indoc! {r#"
-        datasource pg {
-            provider = "postgres"
-            url = "postgresql://localhost:5432"
-        }
-
-        model Post {
+         model Post {
             id      Int @id @default(autoincrement())
             ints     Int []
             bools    Boolean []
             strings  String []
             floats   Float []
-            }
+         }
     "#};
 
-    let result = format!(
-        r#"
-        datasource pg {{
-            provider = "postgres"
-            url = "postgresql://localhost:5432"
-        }}
-
-        {}
-    "#,
-        api.introspect().await?
-    );
+    let result = api.introspect().await?;
 
     api.assert_eq_datamodels(dm, &result);
 

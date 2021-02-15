@@ -248,11 +248,6 @@ async fn a_table_enums_array(api: &TestApi) -> crate::TestResult {
         .await?;
 
     let dm = indoc! {r#"
-        datasource pg {
-            provider = "postgres"
-            url = "postgresql://localhost:5432"
-        }
-
         model Book {
             id      Int     @id @default(autoincrement())
             color   color[]
@@ -264,17 +259,7 @@ async fn a_table_enums_array(api: &TestApi) -> crate::TestResult {
         }
     "#};
 
-    let result = format!(
-        r#"
-        datasource pg {{
-            provider = "postgres"
-            url = "postgresql://localhost:5432"
-        }}
-
-        {}
-    "#,
-        api.introspect().await?
-    );
+    let result = api.introspect().await?;
 
     api.assert_eq_datamodels(&dm, &result);
 

@@ -1,7 +1,6 @@
 use barrel::types;
 use indoc::indoc;
 use introspection_engine_tests::test_api::*;
-use pretty_assertions::assert_eq;
 use test_macros::test_each_connector;
 
 #[test_each_connector]
@@ -23,7 +22,7 @@ async fn a_table_with_reserved_name(api: &TestApi) -> crate::TestResult {
         }
     "#};
 
-    assert_eq!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -44,7 +43,7 @@ async fn reserved_names_case_sensitivity(api: &TestApi) -> crate::TestResult {
         }
     "#};
 
-    assert_eq!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }

@@ -131,12 +131,9 @@ fn parse_datamodel_internal(
     datamodel_string: &str,
     ignore_datasource_urls: bool,
 ) -> Result<ValidatedDatamodel, diagnostics::Diagnostics> {
-    println!("Input String: \n {}", datamodel_string);
     let mut diagnostics = diagnostics::Diagnostics::new();
     let ast = ast::parser::parse_schema(datamodel_string)?;
-    println!("AST: \n {:#?}", ast);
 
-    //todo this also does not contain sources
     let sources = load_sources(&ast, ignore_datasource_urls, vec![])?;
     let generators = GeneratorLoader::load_generators_from_ast(&ast)?;
     let validator = ValidationPipeline::new(&sources.subject);
@@ -147,8 +144,6 @@ fn parse_datamodel_internal(
     match validator.validate(&ast) {
         Ok(mut src) => {
             src.warnings.append(&mut diagnostics.warnings);
-
-            println!("Datamodel: \n {:#?}", src.subject);
             Ok(src)
         }
         Err(mut err) => {

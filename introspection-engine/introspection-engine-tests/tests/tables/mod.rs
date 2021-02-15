@@ -402,8 +402,8 @@ async fn pg_default_value_as_dbgenerated(api: &TestApi) -> crate::TestResult {
           int_serial      Int       @default(autoincrement())
           int_function    Int?      @default(dbgenerated("date_part('year'::text, '2001-02-16 20:38:40'::timestamp without time zone)"))
           int_sequence    Int?      @default(autoincrement())
-          datetime_now    DateTime? @default(now())
-          datetime_now_lc DateTime? @default(now())
+          datetime_now    DateTime? @default(now()) @db.Timestamp(6)
+          datetime_now_lc DateTime? @default(now()) @db.Timestamp(6)
           }
     "#};
 
@@ -482,11 +482,6 @@ async fn default_values_on_lists_should_be_ignored(api: &TestApi) -> crate::Test
         .await?;
 
     let dm = indoc! {r#"
-        datasource pg {
-            provider = "postgres"
-            url = "postgresql://localhost:5432"
-        }
-
         model User {
             id      Int @id @default(autoincrement())
             ints    Int[]
@@ -494,19 +489,9 @@ async fn default_values_on_lists_should_be_ignored(api: &TestApi) -> crate::Test
         }
     "#};
 
-    let result = format!(
-        r#"
-        datasource pg {{
-            provider = "postgres"
-            url = "postgresql://localhost:5432"
-        }}
+    let result = api.introspect().await?;
 
-        {}
-    "#,
-        api.introspect().await?
-    );
-
-    api.assert_eq_datamodels(dm, &result);
+    api.assert_eq_datamodels(&dm, &result);
 
     Ok(())
 }
@@ -553,30 +538,15 @@ async fn introspecting_a_table_with_json_type_must_work(api: &TestApi) -> crate:
         .await?;
 
     let dm = indoc! {r#"
-        datasource postgres {
-            provider = "postgres"
-            url = "postgresql://asdlj"
-        }
-
         model Blog {
             id      Int @id @default(autoincrement())
-            json    Json
+            json    Json @db.Json
         }
     "#};
 
-    let expected = format!(
-        r#"
-        datasource postgres {{
-            provider = "postgres"
-            url = "postgresql://asdlj"
-        }}
+    let result = api.introspect().await?;
 
-        {}
-    "#,
-        api.introspect().await?
-    );
-
-    api.assert_eq_datamodels(dm, &expected);
+    api.assert_eq_datamodels(&dm, &result);
 
     Ok(())
 }

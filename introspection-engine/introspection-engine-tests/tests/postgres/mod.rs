@@ -21,15 +21,6 @@ async fn sequences_should_work(api: &TestApi) -> crate::TestResult {
         .await?;
 
     let dm = indoc! {r#"
-        generator client {
-          provider = "prisma-client-js"
-        }
-
-        datasource postgres {
-            provider        = "postgres"
-            url             = "postgres://localhost/test"
-        }
-
         model Test {
           id     Int        @id
           serial Int        @default(autoincrement())
@@ -45,6 +36,6 @@ async fn sequences_should_work(api: &TestApi) -> crate::TestResult {
     println!("EXPECTATION: \n {:#}", dm);
     println!("RESULT: \n {:#}", result);
 
-    api.assert_eq_datamodels(&result, &dm);
+    api.assert_eq_datamodels(&dm, &result);
     Ok(())
 }
