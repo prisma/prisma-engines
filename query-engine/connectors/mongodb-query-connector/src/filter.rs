@@ -67,6 +67,7 @@ impl IntoBson for ScalarFilter {
     }
 }
 
+// Note contains / startsWith / endsWith are only applicable to String types in the schema.
 fn default_scalar_filter(field: &ScalarFieldRef, condition: ScalarCondition) -> crate::Result<Document> {
     Ok(match condition {
         ScalarCondition::Equals(val) => doc! { "$eq": (field, val).into_bson()? },
@@ -109,6 +110,7 @@ fn default_scalar_filter(field: &ScalarFieldRef, condition: ScalarCondition) -> 
     })
 }
 
+/// Insensitive filters are only reachable with TypeIdentifier::String (or UUID, which is string as well for us).
 fn insensitive_scalar_filter(field: &ScalarFieldRef, condition: ScalarCondition) -> crate::Result<Document> {
     Ok(match condition {
         ScalarCondition::Equals(val) => doc! { "$regex": format!("{}", (field, val).into_bson()?), "$options": "i" },
@@ -135,28 +137,34 @@ fn insensitive_scalar_filter(field: &ScalarFieldRef, condition: ScalarCondition)
 
                 for pv in vals {
                     if let PrismaValue::List(inner) = pv {
-                        bson_values.extend(
-                            inner
-                                .into_iter()
-                                .map(|val| {
-                                    Ok(Bson::RegularExpression(Regex {
-                                        pattern: format!("{}", (field, val).into_bson()?),
-                                        options: "i".to_owned(),
-                                    }))
-                                })
-                                .collect::<crate::Result<Vec<_>>>()?,
-                        )
+                        bson_values.extend(to_regex_list(field, inner)?)
                     }
                 }
 
                 doc! { "$in": bson_values }
             }
 
-            _ => doc! { "$in": PrismaValue::List(vals).into_bson()? }, // todo
+            _ => doc! { "$in": to_regex_list(field, vals)? },
         },
         ScalarCondition::NotIn(vals) => {
-            // todo
-            doc! { "$nin": vals.into_iter().map(|val| (field, val).into_bson()).collect::<crate::Result<Vec<_>>>()? }
+            doc! { "$nin": to_regex_list(field, vals)? }
         }
     })
+}
+
+fn to_regex_list(field: &ScalarFieldRef, vals: Vec<PrismaValue>) -> crate::Result<Vec<Bson>> {
+    vals.into_iter()
+        .map(|val| {
+            Ok(Bson::RegularExpression(Regex {
+                pattern: format!(
+                    "^{}$",
+                    (field, val)
+                        .into_bson()?
+                        .as_str()
+                        .expect("Only reachable with String types.")
+                ),
+                options: "i".to_owned(),
+            }))
+        })
+        .collect::<crate::Result<Vec<_>>>()
 }
