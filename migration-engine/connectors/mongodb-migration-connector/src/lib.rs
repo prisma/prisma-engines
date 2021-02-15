@@ -10,7 +10,11 @@ mod mongodb_migration_step_inferrer;
 use enumflags2::BitFlags;
 use error::IntoConnectorResult;
 use migration_connector::{ConnectorError, ConnectorResult, MigrationConnector, MigrationFeature};
-use mongodb::{options::ClientOptions, Client};
+use mongodb::{
+    bson::doc,
+    options::{ClientOptions, WriteConcern},
+    Client,
+};
 use mongodb_migration::*;
 use url::Url;
 
@@ -23,27 +27,35 @@ pub struct MongoDbMigrationConnector {
 impl MongoDbMigrationConnector {
     /// Construct and initialize the SQL migration connector.
     pub async fn new(database_str: &str, _features: BitFlags<MigrationFeature>) -> ConnectorResult<Self> {
-        let url = Url::parse(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
-        let db_name = url.path().trim_start_matches("/").to_string();
-
-        let client_options = ClientOptions::parse(database_str).await.into_connector_result()?;
-        let client = Client::with_options(client_options).into_connector_result()?;
+        let (client, db_name) = Self::create_client(database_str).await?;
 
         Ok(Self { client, db_name })
     }
 
     /// Set up the database for connector-test-kit, without initializing the connector.
     pub async fn qe_setup(database_str: &str) -> ConnectorResult<()> {
-        let url = Url::parse(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
-        let db_name = url.path();
-
-        let client_options = ClientOptions::parse(database_str).await.into_connector_result()?;
-        let client = Client::with_options(client_options).into_connector_result()?;
+        let (client, db_name) = Self::create_client(database_str).await?;
 
         // Drop database. Creation is automatically done when collections are created.
-        client.database(db_name).drop(None).await.into_connector_result()?;
+        client
+            .database(&db_name)
+            .drop(Some(
+                mongodb::options::DropDatabaseOptions::builder()
+                    .write_concern(WriteConcern::builder().journal(Some(true)).build())
+                    .build(),
+            ))
+            .await
+            .into_connector_result()?;
 
         Ok(())
+    }
+
+    async fn create_client(database_str: &str) -> ConnectorResult<(Client, String)> {
+        let url = Url::parse(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
+        let db_name = url.path().trim_start_matches("/").to_string();
+
+        let client_options = ClientOptions::parse(database_str).await.into_connector_result()?;
+        Ok((Client::with_options(client_options).into_connector_result()?, db_name))
     }
 }
 
@@ -64,7 +76,6 @@ impl MigrationConnector for MongoDbMigrationConnector {
     }
 
     async fn reset(&self) -> migration_connector::ConnectorResult<()> {
-        println!("Dropping");
         self.client
             .database(&self.db_name)
             .drop(None)
