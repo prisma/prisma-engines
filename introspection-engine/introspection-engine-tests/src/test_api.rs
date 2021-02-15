@@ -206,7 +206,7 @@ impl TestApi {
             .subject
     }
 
-    pub fn assert_eq_datamodels(&self, expected_without_header: &str, result_with_header: &str) -> () {
+    pub fn assert_eq_datamodels(&self, expected_without_header: &str, result_with_header: &str) {
         let parsed_expected = datamodel::parse_datamodel(&self.dm_with_sources(expected_without_header))
             .unwrap()
             .subject;
