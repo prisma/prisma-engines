@@ -673,7 +673,7 @@ async fn partial_indexes_should_be_ignored(api: &TestApi) -> crate::TestResult {
         )
         .await?;
 
-    let dm = indoc! {r##"
+    let dm = api.dm_with_sources(indoc! {r##"
         model Blog {
           id                Int     @id @default(autoincrement())
           var_char_column   String  
@@ -681,10 +681,10 @@ async fn partial_indexes_should_be_ignored(api: &TestApi) -> crate::TestResult {
             
           @@index([blob_col], name: "partial_blob_col_index")
         }
-    "##};
+    "##});
 
     let result = &api.introspect().await?;
-    api.assert_eq_datamodels(dm, result);
+    api.assert_eq_datamodels(&dm, result);
 
     assert_eq!(true, false);
     Ok(())

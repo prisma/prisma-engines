@@ -243,16 +243,6 @@ pub fn render_datamodel_to_string(datamodel: &dml::Datamodel) -> String {
     writable_string.into()
 }
 
-/// Renders to a return string.
-pub fn render_datamodel_to_string_with_data_source(
-    datamodel: &dml::Datamodel,
-    datasource: Option<&Datasource>,
-) -> String {
-    let mut writable_string = common::WritableString::new();
-    render_datamodel_to(&mut writable_string, datamodel, datasource);
-    writable_string.into()
-}
-
 /// Renders an AST to a string.
 pub fn render_schema_ast_to_string(schema: &SchemaAst) -> String {
     let mut writable_string = common::WritableString::new();

@@ -113,10 +113,9 @@ impl TestApi {
 
     pub async fn introspect(&self) -> Result<String> {
         let introspection_result = self.api.introspect(&Datamodel::new()).await?;
-
-        Ok(datamodel::render_datamodel_to_string_with_data_source(
+        Ok(datamodel::render_datamodel_and_config_to_string(
             &introspection_result.data_model,
-            self.configuration().datasources.first(),
+            &self.configuration(),
         ))
     }
 
@@ -197,12 +196,12 @@ impl TestApi {
         self.args.connector_tags
     }
 
-    pub fn datasource_string(&self) -> String {
+    pub fn datasource_block(&self) -> String {
         self.args.datasource_block(&self.connection_string)
     }
 
     pub fn configuration(&self) -> Configuration {
-        datamodel::parse_configuration(&self.datasource_string())
+        datamodel::parse_configuration(&self.datasource_block())
             .unwrap()
             .subject
     }
@@ -211,16 +210,21 @@ impl TestApi {
         let parsed_expected = datamodel::parse_datamodel(left).unwrap().subject;
         let parsed_result = datamodel::parse_datamodel(right).unwrap().subject;
 
-        let reformatted_expected = datamodel::render_datamodel_to_string_with_data_source(
-            &parsed_expected,
-            self.configuration().datasources.first(),
-        );
-        let reformatted_result = datamodel::render_datamodel_to_string_with_data_source(
-            &parsed_result,
-            self.configuration().datasources.first(),
-        );
+        let reformatted_expected =
+            datamodel::render_datamodel_and_config_to_string(&parsed_expected, &self.configuration());
+        let reformatted_result =
+            datamodel::render_datamodel_and_config_to_string(&parsed_result, &self.configuration());
 
         pretty_assertions::assert_eq!(reformatted_expected, reformatted_result);
+    }
+
+    pub fn dm_with_sources(&self, schema: &str) -> String {
+        let mut out = String::with_capacity(320 + schema.len());
+
+        out.push_str(&self.datasource_block());
+        out.push_str(schema);
+
+        out
     }
 }
 
