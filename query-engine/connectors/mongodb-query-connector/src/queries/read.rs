@@ -1,4 +1,5 @@
 use super::*;
+use crate::query_arguments::build_mongo_options;
 use crate::{BsonTransform, IntoBson};
 use connector_interface::{Filter, QueryArguments};
 use mongodb::Database;
@@ -34,10 +35,11 @@ pub async fn get_single_record(
 }
 
 // Checklist:
-// - [ ] OrderBy scalar.
+// - [x] OrderBy scalar.
 // - [ ] OrderBy relation.
-// - [ ] Cursors (skip, take, cursor).
-// - [ ] Distinct select.
+// - [x] Skip, take
+// - [ ] Cursor
+// - [x] Distinct select (inherently given).
 pub async fn get_many_records(
     database: &Database,
     model: &ModelRef,
@@ -45,7 +47,7 @@ pub async fn get_many_records(
     selected_fields: &ModelProjection,
 ) -> crate::Result<ManyRecords> {
     let coll = database.collection(model.db_name());
-    // let reversed = query_arguments.take.map(|t| t < 0).unwrap_or(false);
+    let reverse_order = query_arguments.take.map(|t| t < 0).unwrap_or(false);
     let field_names: Vec<_> = selected_fields.db_names().collect();
     let mut records = ManyRecords::new(field_names.clone());
 
@@ -53,21 +55,17 @@ pub async fn get_many_records(
         return Ok(records);
     };
 
-    let filter = match query_arguments.filter {
-        Some(filter) => Some(filter.into_bson()?.into_document()?),
-        None => None,
-    };
-
-    let find_options = FindOptions::builder()
-        .projection(selected_fields.clone().into_bson()?.into_document()?)
-        .build();
-
-    let cursor = coll.find(filter, Some(find_options)).await?;
+    let (filter, options) = build_mongo_options(query_arguments, selected_fields)?;
+    let cursor = coll.find(filter, options).await?;
     let docs = vacuum_cursor(cursor).await?;
 
     for doc in docs {
         let record = document_to_record(doc, &field_names)?;
         records.push(record)
+    }
+
+    if reverse_order {
+        records.reverse();
     }
 
     Ok(records)
