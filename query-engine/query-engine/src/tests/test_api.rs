@@ -107,7 +107,9 @@ impl TestApi {
 
 pub(super) async fn mysql_migration_connector(url_str: &str) -> SqlMigrationConnector {
     create_mysql_database(&url_str.parse().unwrap()).await.unwrap();
-    SqlMigrationConnector::new(url_str, BitFlags::all()).await.unwrap()
+    SqlMigrationConnector::new(url_str, BitFlags::all(), None)
+        .await
+        .unwrap()
 }
 
 pub(super) async fn mssql_migration_connector(url_str: &str, args: &TestApiArgs) -> SqlMigrationConnector {
@@ -115,16 +117,20 @@ pub(super) async fn mssql_migration_connector(url_str: &str, args: &TestApiArgs)
     test_setup::connectors::mssql::reset_schema(&conn, args.test_function_name)
         .await
         .unwrap();
-    SqlMigrationConnector::new(url_str, BitFlags::all()).await.unwrap()
+    SqlMigrationConnector::new(url_str, BitFlags::all(), None)
+        .await
+        .unwrap()
 }
 
 pub(super) async fn postgres_migration_connector(url_str: &str) -> SqlMigrationConnector {
     create_postgres_database(&url_str.parse().unwrap()).await.unwrap();
-    SqlMigrationConnector::new(url_str, BitFlags::all()).await.unwrap()
+    SqlMigrationConnector::new(url_str, BitFlags::all(), None)
+        .await
+        .unwrap()
 }
 
 pub(super) async fn sqlite_migration_connector(db_name: &str) -> SqlMigrationConnector {
-    SqlMigrationConnector::new(&sqlite_test_url(db_name), BitFlags::all())
+    SqlMigrationConnector::new(&sqlite_test_url(db_name), BitFlags::all(), None)
         .await
         .unwrap()
 }

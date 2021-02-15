@@ -1,4 +1,6 @@
-use crate::{connect, connection_wrapper::Connection, error::quaint_error_to_connector_error, SqlFlavour};
+use crate::{
+    connect, connection_wrapper::Connection, error::quaint_error_to_connector_error, SqlFlavour, SqlMigrationConnector,
+};
 use connection_string::JdbcString;
 use enumflags2::BitFlags;
 use indoc::formatdoc;
@@ -31,6 +33,58 @@ impl MssqlFlavour {
 
         let db_name = params.remove("database").unwrap_or_else(|| String::from("master"));
         Ok((db_name, conn.to_string()))
+    }
+
+    async fn clean_up_shadow_database(&self, main_connection: &Connection, database_name: &str) -> ConnectorResult<()> {
+        let drop_database = format!("DROP DATABASE [{}]", database = database_name);
+        main_connection.raw_cmd(&drop_database).await?;
+
+        Ok(())
+    }
+
+    /// Returns a connection, and maybe a database name to clean up.
+    async fn shadow_database_connection(
+        &self,
+        main_connection: &Connection,
+        connector: &SqlMigrationConnector,
+        temporary_database_name: Option<&str>,
+    ) -> ConnectorResult<Connection> {
+        if let Some(shadow_database_connection_string) = &connector.shadow_database_connection_string {
+            let conn = crate::connect(shadow_database_connection_string).await?;
+
+            let shadow_conninfo = conn.connection_info();
+            let main_conninfo = main_connection.connection_info();
+
+            if shadow_conninfo.host() == main_conninfo.host() && shadow_conninfo.dbname() == main_conninfo.dbname() {
+                return Err(ConnectorError::generic(anyhow::anyhow!("The shadow database you configured appears to be the same as as the main database. Please specify another shadow database.")));
+            }
+
+            if self.reset(&conn).await.is_err() {
+                connector.best_effort_reset(&conn).await?;
+            }
+
+            return Ok(conn);
+        }
+
+        let database_name = temporary_database_name.unwrap();
+        let create_database = format!("CREATE DATABASE [{}]", database_name);
+
+        main_connection
+            .raw_cmd(&create_database)
+            .await
+            .map_err(ConnectorError::from)
+            .map_err(|err| err.into_shadow_db_creation_error())?;
+
+        let mut jdbc_string: JdbcString = self.url.connection_string().parse().unwrap();
+        jdbc_string
+            .properties_mut()
+            .insert("database".into(), database_name.into());
+
+        let jdbc_string = jdbc_string.to_string();
+
+        tracing::debug!("Connecting to shadow database at `{}`", jdbc_string);
+
+        Ok(crate::connect(&jdbc_string).await?)
     }
 }
 
@@ -200,33 +254,21 @@ impl SqlFlavour for MssqlFlavour {
         &self,
         migrations: &[MigrationDirectory],
         connection: &Connection,
+        connector: &SqlMigrationConnector,
     ) -> ConnectorResult<SqlSchema> {
-        let database_name = format!("prisma_shadow_db{}", uuid::Uuid::new_v4());
-        let create_database = format!("CREATE DATABASE [{}]", database_name);
+        let temporary_database_name = connector.temporary_database_name();
 
-        connection
-            .raw_cmd(&create_database)
-            .await
-            .map_err(ConnectorError::from)
-            .map_err(|err| err.into_shadow_db_creation_error())?;
-
-        let mut jdbc_string: JdbcString = self.url.connection_string().parse().unwrap();
-        jdbc_string
-            .properties_mut()
-            .insert("database".into(), database_name.clone());
-        let temporary_database_url = jdbc_string.to_string();
-
-        tracing::debug!("Connecting to temporary database at `{}`", temporary_database_url);
-
-        // We must create a connection in a block, closing it before dropping
+        // We must create the connection in a block, closing it before dropping
         // the database.
         let sql_schema_result = {
-            let temp_database = crate::connect(&temporary_database_url).await?;
-
             // We go through the whole process without early return, then clean up
             // the temporary database, and only then return the result. This avoids
             // leaving shadow databases behind in case of e.g. faulty
             // migrations.
+
+            let temp_database = self
+                .shadow_database_connection(connection, connector, temporary_database_name.as_deref())
+                .await?;
 
             if self.schema_name() != "dbo" {
                 let create_schema = format!("CREATE SCHEMA [{schema}]", schema = self.schema_name());
@@ -257,8 +299,10 @@ impl SqlFlavour for MssqlFlavour {
             .await
         };
 
-        let drop_database = format!("DROP DATABASE [{}]", database = database_name);
-        connection.raw_cmd(&drop_database).await?;
+        if let Some(temporary_database_name) = temporary_database_name {
+            self.clean_up_shadow_database(connection, &temporary_database_name)
+                .await?;
+        }
 
         sql_schema_result
     }

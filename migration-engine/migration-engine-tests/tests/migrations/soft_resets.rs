@@ -7,23 +7,21 @@ async fn soft_resets_work_on_postgres(api: &TestApi) -> TestResult {
     let migrations_directory = api.create_migrations_directory()?;
     let mut url: url::Url = api.connection_string().parse()?;
 
+    let dm = r#"
+        model Cat {
+            id Int @id
+            litterConsumption Int
+            hungry Boolean @default(true)
+        }
+    "#;
+
     // Create the database, a first migration and the test user.
     {
         let admin_connection = api.initialize().await?;
 
         api.new_engine()
             .await?
-            .create_migration(
-                "01init",
-                r#"
-                model Cat {
-                    id Int @id
-                    litterConsumption Int
-                    hungry Boolean @default(true)
-                }
-            "#,
-                &migrations_directory,
-            )
+            .create_migration("01init", dm, &migrations_directory)
             .send()
             .await?;
 
@@ -54,10 +52,10 @@ async fn soft_resets_work_on_postgres(api: &TestApi) -> TestResult {
         assert_eq!(err.original_code().unwrap(), "42501"); // insufficient_privilege (https://www.postgresql.org/docs/current/errcodes-appendix.html)
     }
 
-    // Check that the soft reset works.
+    // Check that the soft reset works with migrations, then with schema push.
     {
         let engine = api
-            .new_engine_with_connection_string(&test_user_connection_string)
+            .new_engine_with_connection_strings(&test_user_connection_string, None)
             .await?;
 
         engine
@@ -71,6 +69,23 @@ async fn soft_resets_work_on_postgres(api: &TestApi) -> TestResult {
             .await?
             .assert_tables_count(2)?
             .assert_has_table("_prisma_migrations")?
+            .assert_has_table("Cat")?;
+
+        engine.reset().send().await?;
+
+        engine.assert_schema().await?.assert_tables_count(0)?;
+
+        engine
+            .schema_push(dm)
+            .send()
+            .await?
+            .assert_has_executed_steps()?
+            .assert_green()?;
+
+        engine
+            .assert_schema()
+            .await?
+            .assert_tables_count(1)?
             .assert_has_table("Cat")?;
 
         engine.reset().send().await?;

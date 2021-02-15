@@ -15,7 +15,7 @@ pub(crate) use sqlite::SqliteFlavour;
 use crate::{
     connection_wrapper::Connection, sql_destructive_change_checker::DestructiveChangeCheckerFlavour,
     sql_renderer::SqlRenderer, sql_schema_calculator::SqlSchemaCalculatorFlavour,
-    sql_schema_differ::SqlSchemaDifferFlavour,
+    sql_schema_differ::SqlSchemaDifferFlavour, SqlMigrationConnector,
 };
 use datamodel::Datamodel;
 use enumflags2::BitFlags;
@@ -95,6 +95,7 @@ pub(crate) trait SqlFlavour:
         &self,
         migrations: &[MigrationDirectory],
         connection: &Connection,
+        connector: &SqlMigrationConnector,
     ) -> ConnectorResult<SqlSchema>;
 
     /// Table to store applied migrations, the name part.
