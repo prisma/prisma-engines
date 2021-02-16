@@ -973,6 +973,7 @@ async fn shadow_database_creation_error_is_special_cased_mssql(api: &TestApi) ->
     Ok(())
 }
 
+#[allow(clippy::redundant_closure)]
 #[test_each_connector(tags("sqlite"))]
 async fn empty_migration_directories_should_cause_known_errors(api: &TestApi) -> TestResult {
     let migrations_directory = api.create_migrations_directory()?;

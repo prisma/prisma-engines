@@ -61,10 +61,13 @@ impl SqlRenderer for PostgresFlavour {
 
             if stmts.len() > 1 {
                 let warning = indoc::indoc! {
-                    r#"-- This migration adds more than one variant into an enum.
-                       -- With PostgreSQL versions 11 and earlier, this is not possible
-                       -- in one migration. Either split them into separate files, or run
-                       -- them manually in SQL console."#
+                    r#"
+                    -- This migration adds more than one value to an enum.
+                    -- With PostgreSQL versions 11 and earlier, this is not possible
+                    -- in a single migration. This can be worked around by creating
+                    -- multiple migrations, each migration adding only one value to
+                    -- the enum.
+                    "#
                 };
 
                 stmts[0] = format!("{}\n\n{}", warning, stmts[0]);

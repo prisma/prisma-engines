@@ -40,12 +40,18 @@ impl TestApi {
 
     /// Instantiate a new migration engine for the current database.
     pub async fn new_engine(&self) -> anyhow::Result<EngineTestApi> {
-        self.new_engine_with_connection_string(&self.connection_string).await
+        self.new_engine_with_connection_strings(&self.connection_string, None)
+            .await
     }
 
     /// Instantiate a new migration with the provided connection string.
-    pub async fn new_engine_with_connection_string(&self, connection_string: &str) -> anyhow::Result<EngineTestApi> {
-        let connector = SqlMigrationConnector::new(&connection_string, BitFlags::empty()).await?;
+    pub async fn new_engine_with_connection_strings(
+        &self,
+        connection_string: &str,
+        shadow_db_connection_string: Option<String>,
+    ) -> anyhow::Result<EngineTestApi> {
+        let connector =
+            SqlMigrationConnector::new(&connection_string, BitFlags::empty(), shadow_db_connection_string).await?;
 
         Ok(EngineTestApi(connector))
     }

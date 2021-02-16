@@ -67,11 +67,21 @@ pub async fn migration_api(datamodel: &str) -> CoreResult<Box<dyn api::GenericAp
                 u.query_pairs_mut().append_pair("statement_cache_size", "0");
             }
 
-            SqlMigrationConnector::new(u.as_str(), features).await?
+            SqlMigrationConnector::new(
+                u.as_str(),
+                features,
+                source.shadow_database_url.as_ref().map(|url| url.value.clone()),
+            )
+            .await?
         }
         #[cfg(feature = "sql")]
         provider if [MYSQL_SOURCE_NAME, SQLITE_SOURCE_NAME, MSSQL_SOURCE_NAME].contains(&provider.as_str()) => {
-            SqlMigrationConnector::new(&source.url().value, features).await?
+            SqlMigrationConnector::new(
+                &source.url().value,
+                features,
+                source.shadow_database_url.as_ref().map(|url| url.value.clone()),
+            )
+            .await?
         }
         x => unimplemented!("Connector {} is not supported yet", x),
     };
@@ -151,7 +161,7 @@ pub async fn qe_setup(prisma_schema: &str) -> CoreResult<()> {
         {
             // 1. creates schema & database
             SqlMigrationConnector::qe_setup(&source.url().value).await?;
-            SqlMigrationConnector::new(&source.url().value, features).await?
+            SqlMigrationConnector::new(&source.url().value, features, None).await?
         }
         x => unimplemented!("Connector {} is not supported yet", x),
     };

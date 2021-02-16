@@ -703,9 +703,8 @@ async fn partial_indexes_should_be_ignored(api: &TestApi) -> crate::TestResult {
             |migration| {
                 migration.create_table("Blog", move |t| {
                     t.add_column("id", types::primary());
-                    t.inject_custom("other_blob_col mediumblob");
-                    t.inject_custom("var_char_column Varchar(20)");
-                    t.inject_custom("Index `partial_blob_col_index` (other_blob_col(10))");
+                    t.inject_custom("blob_col mediumblob");
+                    t.inject_custom("Index `partial_blob_col_index` (blob_col(10))");
                 });
             },
             api.schema_name(),
@@ -715,8 +714,7 @@ async fn partial_indexes_should_be_ignored(api: &TestApi) -> crate::TestResult {
     let dm = indoc! {r##"
         model Blog {
           id                Int     @id @default(autoincrement())
-          var_char_column   String
-          blob_col          Bytes?
+          blob_col          Bytes?  @db.MediumBlob
         }
     "##};
 

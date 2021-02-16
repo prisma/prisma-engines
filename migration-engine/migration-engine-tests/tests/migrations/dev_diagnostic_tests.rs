@@ -535,7 +535,7 @@ async fn drift_can_be_detected_without_migrations_table(api: &TestApi) -> TestRe
     Ok(())
 }
 
-#[test_each_connector(tags("mysql_8"))]
+#[test_each_connector(tags("mysql_8"), log = "debug")]
 async fn dev_diagnostic_shadow_database_creation_error_is_special_cased_mysql(api: &TestApi) -> TestResult {
     let directory = api.create_migrations_directory()?;
 

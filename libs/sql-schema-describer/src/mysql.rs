@@ -345,7 +345,7 @@ impl SqlSchemaDescriber {
             trace!("Got index row: {:#?}", row);
             let table_name = row.get_expect_string("table_name");
             let index_name = row.get_expect_string("index_name");
-            if row.get("partial").is_some() {
+            if row.get_u32("partial").is_some() {
                 continue;
             };
             match row.get_string("column_name") {

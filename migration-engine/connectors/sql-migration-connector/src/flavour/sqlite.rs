@@ -1,4 +1,7 @@
-use crate::{connect, connection_wrapper::Connection, error::quaint_error_to_connector_error, flavour::SqlFlavour};
+use crate::{
+    connect, connection_wrapper::Connection, error::quaint_error_to_connector_error, flavour::SqlFlavour,
+    SqlMigrationConnector,
+};
 use enumflags2::BitFlags;
 use indoc::indoc;
 use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory, MigrationFeature};
@@ -119,11 +122,12 @@ impl SqlFlavour for SqliteFlavour {
         Ok(())
     }
 
-    #[tracing::instrument(skip(self, migrations, _connection))]
+    #[tracing::instrument(skip(self, migrations, _connection, _connector))]
     async fn sql_schema_from_migration_history(
         &self,
         migrations: &[MigrationDirectory],
         _connection: &Connection,
+        _connector: &SqlMigrationConnector,
     ) -> ConnectorResult<SqlSchema> {
         tracing::debug!("Applying migrations to temporary in-memory SQLite database.");
         let quaint = quaint::single::Quaint::new_in_memory(Some(self.attached_name.clone())).map_err(|err| {

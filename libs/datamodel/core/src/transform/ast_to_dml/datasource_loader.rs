@@ -11,6 +11,8 @@ use crate::{ast, Datasource};
 use datamodel_connector::{CombinedConnector, Connector};
 
 const PREVIEW_FEATURES_KEY: &str = "previewFeatures";
+const SHADOW_DATABASE_URL_KEY: &str = "shadowDatabaseUrl";
+const URL_KEY: &str = "url";
 
 /// Is responsible for loading and validating Datasources defined in an AST.
 pub struct DatasourceLoader {
@@ -119,7 +121,7 @@ impl DatasourceLoader {
             )));
         }
 
-        let url_arg = args.arg("url")?;
+        let url_arg = args.arg(URL_KEY)?;
         let override_url = datasource_url_overrides
             .iter()
             .find(|x| &x.0 == source_name)
@@ -155,6 +157,60 @@ impl DatasourceLoader {
         };
 
         validate_datasource_url(&url, source_name, &url_arg)?;
+
+        let shadow_database_url_arg = args.optional_arg(SHADOW_DATABASE_URL_KEY);
+
+        let shadow_database_url = if let Some(shadow_database_url_arg) = shadow_database_url_arg {
+            let shadow_database_url = match (shadow_database_url_arg.as_str_from_env(), override_url) {
+                (Err(err), _)
+                    if ignore_datasource_urls
+                        && err.description().contains("Expected a String value, but received") =>
+                {
+                    return Err(diagnostics.merge_error(err));
+                }
+                (_, _) if ignore_datasource_urls => {
+                    // glorious hack. ask marcus
+                    StringFromEnvVar {
+                        from_env_var: None,
+                        value: format!("{}://", providers.first().unwrap()),
+                    }
+                }
+                (_, Some(url)) => {
+                    debug!(
+                        "overwriting datasource `{}` shadow database url with url '{}'",
+                        &source_name, &url
+                    );
+                    StringFromEnvVar {
+                        from_env_var: None,
+                        value: url.to_owned(),
+                    }
+                }
+                (Ok((env_var, url)), _) => StringFromEnvVar {
+                    from_env_var: env_var,
+                    value: url.trim().to_owned(),
+                },
+                (Err(err), _) => {
+                    return Err(diagnostics.merge_error(err));
+                }
+            };
+
+            validate_datasource_url(&shadow_database_url, source_name, &url_arg)?;
+
+            // Temporarily disabled because of processing/hacks on URLs that make comparing the two URLs unreliable.
+            // if url.value == shadow_database_url.value {
+            //     return Err(
+            //         diagnostics.merge_error(DatamodelError::new_shadow_database_is_same_as_main_url_error(
+            //             source_name.clone(),
+            //             shadow_database_url_arg.span(),
+            //         )),
+            //     );
+            // }
+
+            Some(shadow_database_url)
+        } else {
+            None
+        };
+
         preview_features_guardrail(&mut args)?;
 
         let documentation = ast_source.documentation.as_ref().map(|comment| comment.text.clone());
@@ -204,6 +260,7 @@ impl DatasourceLoader {
                     documentation,
                     combined_connector,
                     active_connector: first_successful_provider.connector(),
+                    shadow_database_url,
                 },
                 warnings: diagnostics.warnings,
             })
