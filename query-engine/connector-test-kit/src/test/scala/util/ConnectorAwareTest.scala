@@ -71,7 +71,7 @@ trait ConnectorAwareTest extends SuiteMixin { self: Suite with ApiSpecBase =>
   }
 
   def capabilities: ConnectorCapabilities               = connectorConfig.capabilities
-  def runOnlyForConnectors: Set[ConnectorTag]           = ConnectorTag.values.toSet
+  def runOnlyForConnectors: Set[ConnectorTag]           = ConnectorTag.values.toSet - ConnectorTag.MongoConnectorTag
   def doNotRunForConnectors: Set[ConnectorTag]          = Set.empty
   def runOnlyForCapabilities: Set[ConnectorCapability]  = Set.empty
   def doNotRunForCapabilities: Set[ConnectorCapability] = Set.empty
