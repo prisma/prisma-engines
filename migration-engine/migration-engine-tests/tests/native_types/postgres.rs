@@ -9,20 +9,6 @@ use quaint::{
 use sql_datamodel_connector::SqlDatamodelConnectors;
 use std::{collections::HashMap, str::FromStr};
 
-// do not castable ✓
-// split castable into safe and risky ✓
-// split seeds into risky succeeds ✓
-// enable force in risky succeeds ✓
-// adjust the differ ✓
-// get this testfile to pass ✓
-// cleanup
-// think about removed/ignored aliases -> serial, decimal...
-// get everything else to pass
-// review
-// merge / review without list->scalar / scalar -> list on monday
-// setup separate test case for risky fails
-// work on list/scalar scalar/list separately
-
 static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
     vec![
         ("Oid", Value::integer(u8::MAX), &["VarChar(100)", "Integer", "BigInt"]),

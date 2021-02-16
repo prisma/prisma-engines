@@ -1,7 +1,6 @@
 use barrel::types;
 use indoc::indoc;
 use introspection_engine_tests::{assert_eq_json, test_api::*};
-use pretty_assertions::assert_eq;
 use serde_json::json;
 use test_macros::test_each_connector;
 
@@ -55,7 +54,7 @@ async fn a_table_without_uniques_should_ignore(api: &TestApi) -> crate::TestResu
         "#}
     };
 
-    assert_eq!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -94,7 +93,7 @@ async fn relations_between_ignored_models_should_not_have_field_level_ignores(ap
             }
         "#};
 
-    assert_eq!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -120,7 +119,7 @@ async fn a_table_without_required_uniques(api: &TestApi) -> crate::TestResult {
         }
     "#};
 
-    assert_eq!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -154,7 +153,7 @@ async fn a_table_without_fully_required_compound_unique(api: &TestApi) -> crate:
         }
     "#};
 
-    assert_eq!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -200,7 +199,7 @@ async fn unsupported_type_keeps_its_usages(api: &TestApi) -> crate::TestResult {
         }
     "#};
 
-    assert_eq!(dm.replace(" ", ""), api.introspect().await?.replace(" ", ""));
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -250,7 +249,7 @@ async fn a_table_with_only_an_unsupported_id(api: &TestApi) -> crate::TestResult
         }
     "#};
 
-    assert_eq!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -285,7 +284,7 @@ async fn a_table_with_unsupported_types_in_a_relation(api: &TestApi) -> crate::T
             }
         "#};
 
-    assert_eq!(dm.replace(" ", ""), api.introspect().await?.replace(" ", ""));
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -309,7 +308,7 @@ async fn remapping_field_names_to_empty(api: &TestApi) -> crate::TestResult {
         }
     "#};
 
-    assert_eq!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -339,7 +338,7 @@ async fn db_generated_values_should_add_comments(api: &TestApi) -> crate::TestRe
         }
     "##};
 
-    assert_eq!(dm.replace(" ", ""), api.introspect().await?.replace(" ", ""));
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -370,7 +369,7 @@ async fn commenting_out_a_table_without_columns(api: &TestApi) -> crate::TestRes
         // }
     "#};
 
-    assert_eq!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -408,7 +407,7 @@ async fn ignore_on_back_relation_field_if_pointing_to_ignored_model(api: &TestAp
             }
         "#};
 
-    assert_eq!(dm.replace(" ", ""), api.introspect().await?.replace(" ", ""));
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }

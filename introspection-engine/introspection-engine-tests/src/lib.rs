@@ -14,19 +14,6 @@ macro_rules! assert_eq_schema {
     };
 }
 
-#[macro_export]
-macro_rules! assert_eq_datamodels {
-    ($left:expr, $right:expr) => {
-        let parsed_expected = datamodel::parse_datamodel($left).unwrap().subject;
-        let parsed_result = datamodel::parse_datamodel($right).unwrap().subject;
-
-        let reformatted_expected = datamodel::render_datamodel_to_string(&parsed_expected);
-        let reformatted_result = datamodel::render_datamodel_to_string(&parsed_result);
-
-        pretty_assertions::assert_eq!(reformatted_expected, reformatted_result);
-    };
-}
-
 /// Left side should be `serde_json::Value` and the right side a string that can
 /// be converted to JSON.
 #[macro_export]

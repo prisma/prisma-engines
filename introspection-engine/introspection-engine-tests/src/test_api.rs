@@ -14,53 +14,60 @@ use test_setup::{connectors::Tags, *};
 use tracing::Instrument;
 
 pub struct TestApi {
-    pub db_name: &'static str,
+    api: SqlIntrospectionConnector,
+    args: TestApiArgs,
+    connection_string: String,
+    db_name: &'static str,
     database: Quaint,
-    introspection_connector: SqlIntrospectionConnector,
-    pub tags: BitFlags<Tags>,
 }
 
 impl TestApi {
     pub async fn new(args: TestApiArgs) -> Self {
         let tags = args.connector_tags;
+
         let db_name = if args.connector_tags.contains(Tags::Mysql) {
             test_setup::mysql_safe_identifier(args.test_function_name)
         } else {
             args.test_function_name
         };
 
-        let url = (args.url_fn)(db_name);
+        let connection_string = (args.url_fn)(db_name);
 
-        let conn = if tags.contains(Tags::Mysql) {
-            create_mysql_database(&url.parse().unwrap()).await.unwrap()
+        let database = if tags.contains(Tags::Mysql) {
+            create_mysql_database(&connection_string.parse().unwrap())
+                .await
+                .unwrap()
         } else if tags.contains(Tags::Postgres) {
-            create_postgres_database(&url.parse().unwrap()).await.unwrap()
+            create_postgres_database(&connection_string.parse().unwrap())
+                .await
+                .unwrap()
         } else if tags.contains(Tags::Mssql) {
-            let conn = Quaint::new(&url).await.unwrap();
+            let conn = Quaint::new(&connection_string).await.unwrap();
 
-            test_setup::connectors::mssql::reset_schema(&conn, args.test_function_name)
+            test_setup::connectors::mssql::reset_schema(&conn, db_name)
                 .await
                 .unwrap();
 
             conn
         } else if tags.contains(Tags::Sqlite) {
-            Quaint::new(&url).await.unwrap()
+            Quaint::new(&connection_string).await.unwrap()
         } else {
             unreachable!()
         };
 
-        let introspection_connector = SqlIntrospectionConnector::new(&url).await.unwrap();
+        let api = SqlIntrospectionConnector::new(&connection_string).await.unwrap();
 
         TestApi {
+            api,
+            args,
+            connection_string,
+            database,
             db_name,
-            tags: args.connector_tags,
-            database: conn,
-            introspection_connector,
         }
     }
 
     pub async fn list_databases(&self) -> Result<Vec<String>> {
-        Ok(self.introspection_connector.list_databases().await?)
+        Ok(self.api.list_databases().await?)
     }
 
     pub fn database(&self) -> &Quaint {
@@ -105,18 +112,20 @@ impl TestApi {
     }
 
     pub async fn introspect(&self) -> Result<String> {
-        let introspection_result = self.introspection_connector.introspect(&Datamodel::new()).await?;
-
-        Ok(datamodel::render_datamodel_to_string(&introspection_result.data_model))
+        let introspection_result = self.api.introspect(&Datamodel::new()).await?;
+        Ok(datamodel::render_datamodel_and_config_to_string(
+            &introspection_result.data_model,
+            &self.configuration(),
+        ))
     }
 
     #[tracing::instrument(skip(self, data_model_string))]
     pub async fn re_introspect(&self, data_model_string: &str) -> Result<String> {
-        let config = parse_configuration(data_model_string).context("parsing configuration")?;
+        let config = self.configuration();
         let data_model = parse_datamodel(data_model_string).context("parsing datamodel")?;
 
         let introspection_result = self
-            .introspection_connector
+            .api
             .introspect(&data_model)
             .instrument(tracing::info_span!("introspect"))
             .await?;
@@ -130,33 +139,33 @@ impl TestApi {
 
     pub async fn re_introspect_warnings(&self, data_model_string: &str) -> Result<String> {
         let data_model = parse_datamodel(data_model_string)?;
-        let introspection_result = self.introspection_connector.introspect(&data_model).await?;
+        let introspection_result = self.api.introspect(&data_model).await?;
 
         Ok(serde_json::to_string(&introspection_result.warnings)?)
     }
 
     pub async fn introspect_version(&self) -> Result<Version> {
-        let introspection_result = self.introspection_connector.introspect(&Datamodel::new()).await?;
+        let introspection_result = self.api.introspect(&Datamodel::new()).await?;
 
         Ok(introspection_result.version)
     }
 
     pub async fn introspection_warnings(&self) -> Result<String> {
-        let introspection_result = self.introspection_connector.introspect(&Datamodel::new()).await?;
+        let introspection_result = self.api.introspect(&Datamodel::new()).await?;
 
         Ok(serde_json::to_string(&introspection_result.warnings)?)
     }
 
     pub async fn get_metadata(&self) -> Result<DatabaseMetadata> {
-        Ok(self.introspection_connector.get_metadata().await?)
+        Ok(self.api.get_metadata().await?)
     }
 
     pub async fn get_database_description(&self) -> Result<String> {
-        Ok(self.introspection_connector.get_database_description().await?)
+        Ok(self.api.get_database_description().await?)
     }
 
     pub async fn get_database_version(&self) -> Result<String> {
-        Ok(self.introspection_connector.get_database_version().await?)
+        Ok(self.api.get_database_version().await?)
     }
 
     pub fn sql_family(&self) -> SqlFamily {
@@ -183,18 +192,47 @@ impl TestApi {
     pub fn db_name(&self) -> &str {
         self.db_name
     }
+    pub fn tags(&self) -> BitFlags<Tags> {
+        self.args.connector_tags
+    }
+
+    pub fn datasource_block(&self) -> String {
+        self.args.datasource_block(&self.connection_string)
+    }
+
+    pub fn configuration(&self) -> Configuration {
+        datamodel::parse_configuration(&self.datasource_block())
+            .unwrap()
+            .subject
+    }
+
+    pub fn assert_eq_datamodels(&self, expected_without_header: &str, result_with_header: &str) {
+        let parsed_expected = datamodel::parse_datamodel(&self.dm_with_sources(expected_without_header))
+            .unwrap()
+            .subject;
+        let parsed_result = datamodel::parse_datamodel(result_with_header).unwrap().subject;
+
+        let reformatted_expected =
+            datamodel::render_datamodel_and_config_to_string(&parsed_expected, &self.configuration());
+        let reformatted_result =
+            datamodel::render_datamodel_and_config_to_string(&parsed_result, &self.configuration());
+
+        pretty_assertions::assert_eq!(reformatted_expected, reformatted_result);
+    }
+
+    pub fn dm_with_sources(&self, schema: &str) -> String {
+        let mut out = String::with_capacity(320 + schema.len());
+
+        out.push_str(&self.datasource_block());
+        out.push_str(schema);
+
+        out
+    }
 }
 
 fn parse_datamodel(dm: &str) -> Result<Datamodel> {
     match RpcImpl::parse_datamodel(dm) {
         Ok(dm) => Ok(dm),
         Err(e) => Err(Report::msg(serde_json::to_string_pretty(&e.data).unwrap())),
-    }
-}
-
-fn parse_configuration(dm: &str) -> Result<Configuration> {
-    match datamodel::parse_configuration(dm) {
-        Ok(dm) => Ok(dm.subject),
-        Err(e) => Err(Report::msg(e.to_pretty_string("schema.prisma", dm))),
     }
 }

@@ -1,6 +1,6 @@
 use barrel::types;
 use indoc::indoc;
-use introspection_engine_tests::{assert_eq_datamodels, test_api::*};
+use introspection_engine_tests::test_api::*;
 use test_macros::test_each_connector;
 
 #[test_each_connector(capabilities("scalar_lists"))]
@@ -18,33 +18,18 @@ async fn scalar_list_types(api: &TestApi) -> crate::TestResult {
         .await?;
 
     let dm = indoc! {r#"
-        datasource pg {
-            provider = "postgres"
-            url = "postgresql://localhost:5432"
-        }
-
-        model Post {
+         model Post {
             id      Int @id @default(autoincrement())
             ints     Int []
             bools    Boolean []
             strings  String []
             floats   Float []
-            }
+         }
     "#};
 
-    let result = format!(
-        r#"
-        datasource pg {{
-            provider = "postgres"
-            url = "postgresql://localhost:5432"
-        }}
+    let result = api.introspect().await?;
 
-        {}
-    "#,
-        api.introspect().await?
-    );
-
-    assert_eq_datamodels!(dm, &result);
+    api.assert_eq_datamodels(dm, &result);
 
     Ok(())
 }

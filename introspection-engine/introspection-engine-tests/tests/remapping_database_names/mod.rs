@@ -1,6 +1,7 @@
 use barrel::types;
+use indoc::formatdoc;
 use indoc::indoc;
-use introspection_engine_tests::{assert_eq_datamodels, test_api::*};
+use introspection_engine_tests::test_api::*;
 use quaint::prelude::Queryable;
 use test_macros::test_each_connector;
 
@@ -23,22 +24,30 @@ async fn remapping_fields_with_invalid_characters(api: &TestApi) -> crate::TestR
         })
         .await?;
 
-    let dm = indoc! {r#"
-        model User {
-            id     Int @id @default(autoincrement())
-            a      String @map("_a")
-            b      String @map("*b")
-            c      String @map("?c")
-            d      String @map("(d")
-            e      String @map(")e")
-            f      String @map("/f")
-            g_a    String @map("g a")
-            h_a    String @map("h-a")
-            h1     String
-        }
-    "#};
+    let native_string = if api.sql_family().is_mssql() {
+        "@db.Text"
+    } else if api.sql_family().is_mysql() {
+        "@db.Text"
+    } else {
+        ""
+    };
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    let dm = formatdoc! {r#"
+        model User {{
+            id     Int @id @default(autoincrement())
+            a      String @map("_a") {native_string}
+            b      String @map("*b") {native_string}
+            c      String @map("?c") {native_string}
+            d      String @map("(d") {native_string}
+            e      String @map(")e") {native_string}
+            f      String @map("/f") {native_string}
+            g_a    String @map("g a") {native_string}
+            h_a    String @map("h-a") {native_string}
+            h1     String {native_string}
+        }}
+    "#, native_string = native_string};
+
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -71,7 +80,7 @@ async fn remapping_tables_with_invalid_characters(api: &TestApi) -> crate::TestR
         }
     "#};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -82,7 +91,6 @@ async fn remapping_models_in_relations(api: &TestApi) -> crate::TestResult {
         .execute(|migration| {
             migration.create_table("User with Space", |t| {
                 t.add_column("id", types::primary());
-                t.add_column("name", types::text());
             });
 
             migration.create_table("Post", |t| {
@@ -108,7 +116,6 @@ async fn remapping_models_in_relations(api: &TestApi) -> crate::TestResult {
 
         model User_with_Space {
             id   Int    @id @default(autoincrement())
-            name String
             Post Post?
 
             @@map("User with Space")
@@ -116,7 +123,7 @@ async fn remapping_models_in_relations(api: &TestApi) -> crate::TestResult {
     "#
     };
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -127,7 +134,6 @@ async fn remapping_models_in_relations_should_not_map_virtual_fields(api: &TestA
         .execute(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::primary());
-                t.add_column("name", types::text());
             });
 
             migration.create_table("Post With Space", |t| {
@@ -151,12 +157,11 @@ async fn remapping_models_in_relations_should_not_map_virtual_fields(api: &TestA
 
         model User {
             id              Int              @id @default(autoincrement())
-            name            String
             Post_With_Space Post_With_Space?
         }
     "#};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -222,7 +227,7 @@ async fn remapping_models_in_compound_relations(api: &TestApi) -> crate::TestRes
         post_constraint, user_constraint
     );
 
-    assert_eq_datamodels!(&dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -290,7 +295,7 @@ async fn remapping_fields_in_compound_relations(api: &TestApi) -> crate::TestRes
         user_post_constraint, user_constraint
     );
 
-    assert_eq_datamodels!(&dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -346,7 +351,7 @@ async fn remapping_enum_names(api: &TestApi) -> crate::TestResult {
         enum_name, renamed_enum
     );
 
-    assert_eq_datamodels!(&dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -394,7 +399,7 @@ async fn remapping_enum_values(api: &TestApi) -> crate::TestResult {
         enum_name
     );
 
-    assert_eq_datamodels!(&dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -442,7 +447,7 @@ async fn remapping_enum_default_values(api: &TestApi) -> crate::TestResult {
         enum_name
     );
 
-    assert_eq_datamodels!(&dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -452,8 +457,8 @@ async fn remapping_compound_primary_keys(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
-                t.add_column("first_name", types::varchar(255));
-                t.add_column("last@name", types::varchar(255));
+                t.add_column("first_name", types::integer());
+                t.add_column("last@name", types::integer());
                 t.set_primary_key(&["first_name", "last@name"]);
             });
         })
@@ -461,14 +466,14 @@ async fn remapping_compound_primary_keys(api: &TestApi) -> crate::TestResult {
 
     let dm = indoc! {r#"
         model User {
-            first_name  String
-            last_name   String @map("last@name")
+            first_name  Int
+            last_name   Int @map("last@name")
 
             @@id([first_name, last_name])
         }
     "#};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }

@@ -1,6 +1,6 @@
 use barrel::types;
-use indoc::indoc;
-use introspection_engine_tests::{assert_eq_datamodels, assert_eq_json, test_api::*};
+use indoc::formatdoc;
+use introspection_engine_tests::{assert_eq_json, test_api::*};
 use serde_json::json;
 use test_macros::test_each_connector;
 
@@ -22,13 +22,19 @@ async fn add_cuid_default(api: &TestApi) -> crate::TestResult {
         })
         .await?;
 
-    let dm = indoc! {r#"
-        model Book {
-            id  String @id @default(cuid())
-        }
-    "#};
+    let native_type = if sql_family.is_postgres() {
+        "@db.VarChar(25)"
+    } else {
+        "@db.Char(25)"
+    };
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    let dm = formatdoc! {r#"
+        model Book {{
+            id  String @id @default(cuid()) {}
+        }}
+    "#, native_type};
+
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     let expected = json!([{
         "code": 5,
@@ -64,13 +70,19 @@ async fn add_uuid_default(api: &TestApi) -> crate::TestResult {
         })
         .await?;
 
-    let dm = indoc! {r#"
-        model Book {
-            id  String @default(uuid()) @id
-        }
-    "#};
+    let native_type = if sql_family.is_postgres() {
+        "@db.VarChar(36)"
+    } else {
+        "@db.Char(36)"
+    };
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    let dm = formatdoc! {r#"
+        model Book {{
+            id  String @default(uuid()) @id {}
+        }}
+    "#, native_type};
+
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     let expected = json!([{
         "code": 6,

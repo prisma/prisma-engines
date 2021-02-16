@@ -1,5 +1,4 @@
 use indoc::formatdoc;
-use indoc::indoc;
 use introspection_engine_tests::test_api::*;
 use test_macros::test_each_connector;
 use test_setup::connectors::Tags;
@@ -67,62 +66,50 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
         .await?;
 
     let (json, default) = match api {
-        _ if api.tags.contains(Tags::Mysql8) => ("Json", ""),
-        _ if api.tags.contains(Tags::Mariadb) => ("String   @mysql.LongText", "@default(now())"),
+        _ if api.tags().contains(Tags::Mysql8) => ("Json", ""),
+        _ if api.tags().contains(Tags::Mariadb) => ("String   @db.LongText", "@default(now())"),
         _ => unreachable!(),
     };
-
-    let mut dm = String::from(indoc! {r#"
-        datasource mysql {
-            provider        = "mysql"
-            url             = "mysql://localhost/test"
-        }
-
-        generator client {
-          provider = "prisma-client-js"
-          previewFeatures = ["nativeTypes"]
-        }
-    "#});
 
     let types = formatdoc! {r#"
         model Blog {{
             int                            Int
-            unsignedint                    Int      @mysql.UnsignedInt
-            smallint                       Int      @mysql.SmallInt
-            unsignedsmallint               Int      @mysql.UnsignedSmallInt
-            tinyint                        Int      @mysql.TinyInt
-            unsignedtinyint                Int      @mysql.UnsignedTinyInt
+            unsignedint                    Int      @db.UnsignedInt
+            smallint                       Int      @db.SmallInt
+            unsignedsmallint               Int      @db.UnsignedSmallInt
+            tinyint                        Int      @db.TinyInt
+            unsignedtinyint                Int      @db.UnsignedTinyInt
             tinyint_bool                   Boolean
-            mediumint                      Int      @mysql.MediumInt
-            unsignedmediumint              Int      @mysql.UnsignedMediumInt
+            mediumint                      Int      @db.MediumInt
+            unsignedmediumint              Int      @db.UnsignedMediumInt
             bigint                         BigInt
             bigint_autoincrement           BigInt   @id  @default(autoincrement())
-            unsignedbigint                 BigInt   @mysql.UnsignedBigInt
-            decimal                        Decimal  @mysql.Decimal(5, 3)
-            decimal_2                      Decimal  @mysql.Decimal(10, 0)
-            numeric                        Decimal  @mysql.Decimal(4, 1)
-            float                          Float    @mysql.Float
+            unsignedbigint                 BigInt   @db.UnsignedBigInt
+            decimal                        Decimal  @db.Decimal(5, 3)
+            decimal_2                      Decimal  @db.Decimal(10, 0)
+            numeric                        Decimal  @db.Decimal(4, 1)
+            float                          Float    @db.Float
             double                         Float
-            bits                           Bytes    @mysql.Bit(64)
-            bit_bool                       Boolean  @mysql.Bit(1)
-            chars                          String   @mysql.Char(10)
-            varchars                       String   @mysql.VarChar(500)
-            binary                         Bytes    @mysql.Binary(230)
-            varbinary                      Bytes    @mysql.VarBinary(150)
-            tinyBlob                       Bytes    @mysql.TinyBlob
-            blob                           Bytes    @mysql.Blob
-            mediumBlob                     Bytes    @mysql.MediumBlob
+            bits                           Bytes    @db.Bit(64)
+            bit_bool                       Boolean  @db.Bit(1)
+            chars                          String   @db.Char(10)
+            varchars                       String   @db.VarChar(500)
+            binary                         Bytes    @db.Binary(230)
+            varbinary                      Bytes    @db.VarBinary(150)
+            tinyBlob                       Bytes    @db.TinyBlob
+            blob                           Bytes    @db.Blob
+            mediumBlob                     Bytes    @db.MediumBlob
             longBlob                       Bytes
-            tinytext                       String   @mysql.TinyText
-            text                           String   @mysql.Text
-            mediumText                     String   @mysql.MediumText
-            longText                       String   @mysql.LongText
-            date                           DateTime @mysql.Date
-            timeWithPrecision              DateTime @mysql.Time(3)
-            timeWithPrecision_no_precision DateTime @mysql.DateTime(0)
+            tinytext                       String   @db.TinyText
+            text                           String   @db.Text
+            mediumText                     String   @db.MediumText
+            longText                       String   @db.LongText
+            date                           DateTime @db.Date
+            timeWithPrecision              DateTime @db.Time(3)
+            timeWithPrecision_no_precision DateTime @db.DateTime(0)
             dateTimeWithPrecision          DateTime
-            timestampWithPrecision         DateTime {default} @mysql.Timestamp(3)
-            year                           Int      @mysql.Year
+            timestampWithPrecision         DateTime {default} @db.Timestamp(3)
+            year                           Int      @db.Year
             json                           {json}
         }}
     "#,
@@ -130,14 +117,12 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
     json = json
     };
 
-    let result = api.re_introspect(&dm).await?;
-
-    dm.push_str(&types);
+    let result = api.introspect().await?;
 
     println!("EXPECTATION: \n {:#}", types);
     println!("RESULT: \n {:#}", result);
 
-    assert!(result.replace(" ", "").contains(&types.replace(" ", "")));
+    api.assert_eq_datamodels(&types, &result);
 
     Ok(())
 }
