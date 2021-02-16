@@ -70,12 +70,12 @@ fn default_scalar_filter(field: &ScalarFieldRef, condition: ScalarCondition) -> 
     Ok(match condition {
         ScalarCondition::Equals(val) => doc! { "$eq": (field, val).into_bson()? },
         ScalarCondition::NotEquals(val) => doc! { "$ne": (field, val).into_bson()? },
-        ScalarCondition::Contains(val) => doc! { "$regex": format!(".*{}.*", val) },
-        ScalarCondition::NotContains(val) => doc! { "$not": { "$regex": format!(".*{}.*", val) }},
-        ScalarCondition::StartsWith(val) => doc! { "$regex": format!("^{}", val) },
-        ScalarCondition::NotStartsWith(val) => doc! { "$not": { "$regex": format!("^{}", val) }},
-        ScalarCondition::EndsWith(val) => doc! { "$regex": format!("{}$", val) },
-        ScalarCondition::NotEndsWith(val) => doc! { "$not": { "$regex": format!("{}$", val) }},
+        ScalarCondition::Contains(val) => doc! { "$regex": to_regex(field, ".*", val, ".*", false)? },
+        ScalarCondition::NotContains(val) => doc! { "$not": { "$regex": to_regex(field, ".*", val, ".*", false)? }},
+        ScalarCondition::StartsWith(val) => doc! { "$regex": to_regex(field, "^", val, "", false)? },
+        ScalarCondition::NotStartsWith(val) => doc! { "$not": { "$regex": to_regex(field, "^", val, "", false)? }},
+        ScalarCondition::EndsWith(val) => doc! { "$regex": to_regex(field, "", val, "$", false)? },
+        ScalarCondition::NotEndsWith(val) => doc! { "$not": { "$regex": to_regex(field, "", val, "$", false)? }},
         ScalarCondition::LessThan(val) => doc! { "$lt": (field, val).into_bson()? },
         ScalarCondition::LessThanOrEquals(val) => doc! { "$lte": (field, val).into_bson()? },
         ScalarCondition::GreaterThan(val) => doc! { "$gt": (field, val).into_bson()? },
@@ -111,17 +111,17 @@ fn default_scalar_filter(field: &ScalarFieldRef, condition: ScalarCondition) -> 
 /// Insensitive filters are only reachable with TypeIdentifier::String (or UUID, which is string as well for us).
 fn insensitive_scalar_filter(field: &ScalarFieldRef, condition: ScalarCondition) -> crate::Result<Document> {
     Ok(match condition {
-        ScalarCondition::Equals(val) => doc! { "$regex": format!("{}", (field, val).into_bson()?), "$options": "i" },
+        ScalarCondition::Equals(val) => doc! { "$regex": to_regex(field, "^", val, "$", true)? },
         ScalarCondition::NotEquals(val) => {
-            doc! { "$not": { "$regex": format!("{}", (field, val).into_bson()?), "$options": "i" }}
+            doc! { "$not": { "$regex": to_regex(field, "^", val, "$", true)? }}
         }
 
-        ScalarCondition::Contains(val) => doc! { "$regex": format!(".*{}.*", val), "$options": "i" },
-        ScalarCondition::NotContains(val) => doc! { "$not": { "$regex": format!(".*{}.*", val), "$options": "i" }},
-        ScalarCondition::StartsWith(val) => doc! { "$regex": format!("^{}", val), "$options": "i" },
-        ScalarCondition::NotStartsWith(val) => doc! { "$not": { "$regex": format!("^{}", val), "$options": "i" }},
-        ScalarCondition::EndsWith(val) => doc! { "$regex": format!("{}$", val), "$options": "i" },
-        ScalarCondition::NotEndsWith(val) => doc! { "$not": { "$regex": format!("{}$", val), "$options": "i" }},
+        ScalarCondition::Contains(val) => doc! { "$regex": to_regex(field, ".*", val, ".*", true)? },
+        ScalarCondition::NotContains(val) => doc! { "$not": { "$regex": to_regex(field, ".*", val, ".*", true)? }},
+        ScalarCondition::StartsWith(val) => doc! { "$regex": to_regex(field, "^", val, "", true)?  },
+        ScalarCondition::NotStartsWith(val) => doc! { "$not": { "$regex": to_regex(field, "^", val, "", true)? }},
+        ScalarCondition::EndsWith(val) => doc! { "$regex": to_regex(field, "", val, "$", true)? },
+        ScalarCondition::NotEndsWith(val) => doc! { "$not": { "$regex": to_regex(field, "", val, "$", true)? }},
         ScalarCondition::LessThan(val) => doc! { "$lt": (field, val).into_bson()? },
         ScalarCondition::LessThanOrEquals(val) => doc! { "$lte": (field, val).into_bson()? },
         ScalarCondition::GreaterThan(val) => doc! { "$gt": (field, val).into_bson()? },
@@ -135,17 +135,17 @@ fn insensitive_scalar_filter(field: &ScalarFieldRef, condition: ScalarCondition)
 
                 for pv in vals {
                     if let PrismaValue::List(inner) = pv {
-                        bson_values.extend(to_regex_list(field, inner)?)
+                        bson_values.extend(to_regex_list(field, "^", inner, "$", true)?)
                     }
                 }
 
                 doc! { "$in": bson_values }
             }
 
-            _ => doc! { "$in": to_regex_list(field, vals)? },
+            _ => doc! { "$in": to_regex_list(field, "^", vals, "$", true)? },
         },
         ScalarCondition::NotIn(vals) => {
-            doc! { "$nin": to_regex_list(field, vals)? }
+            doc! { "$nin": to_regex_list(field, "^", vals, "$", true)? }
         }
     })
 }
@@ -177,19 +177,37 @@ impl IntoBson for ScalarListFilter {
     }
 }
 
-fn to_regex_list(field: &ScalarFieldRef, vals: Vec<PrismaValue>) -> crate::Result<Vec<Bson>> {
+fn to_regex_list(
+    field: &ScalarFieldRef,
+    prefix: &str,
+    vals: Vec<PrismaValue>,
+    suffix: &str,
+    insensitive: bool,
+) -> crate::Result<Vec<Bson>> {
     vals.into_iter()
-        .map(|val| {
-            Ok(Bson::RegularExpression(Regex {
-                pattern: format!(
-                    "^{}$",
-                    (field, val)
-                        .into_bson()?
-                        .as_str()
-                        .expect("Only reachable with String types.")
-                ),
-                options: "i".to_owned(),
-            }))
-        })
+        .map(|val| to_regex(field, prefix, val, suffix, insensitive))
         .collect::<crate::Result<Vec<_>>>()
+}
+
+fn to_regex(
+    field: &ScalarFieldRef,
+    prefix: &str,
+    val: PrismaValue,
+    suffix: &str,
+    insensitive: bool,
+) -> crate::Result<Bson> {
+    let options = if insensitive { "i" } else { "" }.to_owned();
+
+    Ok(Bson::RegularExpression(Regex {
+        pattern: format!(
+            "{}{}{}",
+            prefix,
+            (field, val)
+                .into_bson()?
+                .as_str()
+                .expect("Only reachable with String types."),
+            suffix
+        ),
+        options,
+    }))
 }
