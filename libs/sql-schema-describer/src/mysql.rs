@@ -332,7 +332,8 @@ impl SqlSchemaDescriber {
                 non_unique AS non_unique,
                 column_name AS column_name,
                 seq_in_index AS seq_in_index,
-                table_name AS table_name
+                table_name AS table_name,
+                sub_part AS partial
             FROM INFORMATION_SCHEMA.STATISTICS
             WHERE table_schema = ?
             ORDER BY index_name, seq_in_index
@@ -340,9 +341,13 @@ impl SqlSchemaDescriber {
         let rows = conn.query_raw(sql, &[schema_name.into()]).await?;
 
         for row in rows {
+            println!("{:?}", row);
             trace!("Got index row: {:#?}", row);
             let table_name = row.get_expect_string("table_name");
             let index_name = row.get_expect_string("index_name");
+            if row.get("partial").is_some() {
+                continue;
+            };
             match row.get_string("column_name") {
                 Some(column_name) => {
                     let seq_in_index = row.get_expect_i64("seq_in_index");
