@@ -20,7 +20,6 @@ pub fn calculate_datamodel(
 ) -> SqlIntrospectionResult<IntrospectionResult> {
     debug!("Calculating data model.");
 
-    println!("{:#?}", schema);
     let mut version_check = VersionChecker::new(*family, schema);
     let mut data_model = Datamodel::new();
 

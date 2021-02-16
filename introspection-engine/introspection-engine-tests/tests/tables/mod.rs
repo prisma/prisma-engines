@@ -697,7 +697,7 @@ async fn negative_default_values_should_work(api: &TestApi) -> crate::TestResult
 }
 
 #[test_each_connector(tags("mysql"))]
-async fn partial_indexes_should_be_ignored(api: &TestApi) -> crate::TestResult {
+async fn partial_indexes_should_be_ignored_on_mysql(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute_with_schema(
             |migration| {
