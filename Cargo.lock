@@ -2333,6 +2333,7 @@ dependencies = [
  "prisma-value",
  "query-connector",
  "rand 0.7.3",
+ "regex",
  "serde",
  "serde_json",
  "thiserror",

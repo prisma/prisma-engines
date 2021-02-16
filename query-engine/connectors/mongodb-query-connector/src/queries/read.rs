@@ -39,7 +39,7 @@ pub async fn get_single_record(
 // - [ ] OrderBy relation.
 // - [x] Skip, take
 // - [ ] Cursor
-// - [x] Distinct select (inherently given).
+// - [x] Distinct select (inherently given from core).
 pub async fn get_many_records(
     database: &Database,
     model: &ModelRef,
