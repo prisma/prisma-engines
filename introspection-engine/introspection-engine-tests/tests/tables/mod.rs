@@ -38,9 +38,7 @@ async fn a_simple_table_with_gql_types(api: &TestApi) -> crate::TestResult {
         ""
     };
 
-    let text_native = if api.sql_family().is_mssql() {
-        "@db.Text"
-    } else if api.sql_family().is_mysql() {
+    let text_native = if api.sql_family().is_mssql() || api.sql_family().is_mysql() {
         "@db.Text"
     } else {
         ""

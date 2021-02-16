@@ -24,9 +24,7 @@ async fn remapping_fields_with_invalid_characters(api: &TestApi) -> crate::TestR
         })
         .await?;
 
-    let native_string = if api.sql_family().is_mssql() {
-        "@db.Text"
-    } else if api.sql_family().is_mysql() {
+    let native_string = if api.sql_family().is_mssql() || api.sql_family().is_mysql() {
         "@db.Text"
     } else {
         ""
