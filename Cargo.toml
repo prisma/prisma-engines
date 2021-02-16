@@ -78,7 +78,7 @@ base64 = { version = "0.12.3", optional = true }
 chrono = { version = "0.4", optional = true }
 lru-cache = { version = "0.1", optional = true }
 serde_json = { version = "1.0.48", optional = true }
-rusqlite = { version = "0.24", features = ["chrono", "bundled", "column_decltype"], optional = true }
+rusqlite = { version = "0.23", features = ["chrono", "bundled"], optional = true }
 native-tls = { version = "0.2", optional = true }
 mysql_async = { version = "0.27.0", optional = true }
 log = { version = "0.4", features = ["release_max_level_trace"] }
@@ -134,7 +134,7 @@ branch = "pgbouncer-mode"
 optional = true
 
 [dependencies.libsqlite3-sys]
-version = "0.20"
+version = "0.18"
 default-features = false
 features = ["bundled"]
 optional = true
