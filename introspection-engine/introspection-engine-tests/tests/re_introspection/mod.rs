@@ -1,4 +1,5 @@
 use barrel::types;
+use indoc::formatdoc;
 use indoc::indoc;
 use introspection_engine_tests::{assert_eq_json, test_api::*};
 use quaint::prelude::Queryable;
@@ -39,7 +40,7 @@ async fn mapped_model_name(api: &TestApi) -> crate::TestResult {
         }
     "#};
 
-    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
+    api.assert_eq_datamodels(&final_dm, &api.re_introspect(input_dm).await?);
 
     let expected = json!([{
         "code": 7,
@@ -1171,7 +1172,7 @@ async fn virtual_cuid_default(api: &TestApi) -> crate::TestResult {
             });
 
             migration.create_table("User2", |t| {
-                t.add_column("id", types::varchar(30).primary(true));
+                t.add_column("id", types::varchar(36).primary(true));
             });
 
             migration.create_table("Unrelated", |t| {
@@ -1182,23 +1183,23 @@ async fn virtual_cuid_default(api: &TestApi) -> crate::TestResult {
 
     let input_dm = indoc! {r#"
         model User {
-            id        String    @id @default(cuid())
-            non_id    String    @default(cuid())
+            id        String    @id @default(cuid()) @db.VarChar(30)
+            non_id    String    @default(cuid()) @db.VarChar(30)
         }
 
         model User2 {
-            id        String    @id @default(uuid())
+            id        String    @id @default(uuid()) @db.VarChar(36)
         }
     "#};
 
     let final_dm = indoc! {r#"
         model User {
-            id        String    @id @default(cuid())
-            non_id    String    @default(cuid())
+            id        String    @id @default(cuid()) @db.VarChar(30)
+            non_id    String    @default(cuid()) @db.VarChar(30)
         }
 
         model User2 {
-            id        String    @id @default(uuid())
+            id        String    @id @default(uuid()) @db.VarChar(36)
         }
 
         model Unrelated {
@@ -1212,18 +1213,18 @@ async fn virtual_cuid_default(api: &TestApi) -> crate::TestResult {
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn comments(api: &TestApi) -> crate::TestResult {
+async fn comments_should_be_kept(api: &TestApi) -> crate::TestResult {
     let sql = "CREATE Type a as ENUM (\'A\')".to_string();
     api.database().execute_raw(&sql, &[]).await?;
 
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
-                t.add_column("id", types::varchar(30).primary(true));
+                t.add_column("id", types::primary());
             });
 
             migration.create_table("User2", |t| {
-                t.add_column("id", types::varchar(30).primary(true));
+                t.add_column("id", types::primary());
             });
 
             migration.create_table("Unrelated", |t| {
@@ -1236,11 +1237,11 @@ async fn comments(api: &TestApi) -> crate::TestResult {
         /// A really helpful comment about the model
         model User {
             /// A really helpful comment about the field
-            id        String    @id @default(cuid())
+            id         Int @id @default(autoincrement())
         }
 
         model User2 {
-            id        String    @id @default(uuid())
+            id         Int @id @default(autoincrement())
         }
 
         /// A really helpful comment about the enum
@@ -1255,11 +1256,11 @@ async fn comments(api: &TestApi) -> crate::TestResult {
         /// A really helpful comment about the model
         model User {
             /// A really helpful comment about the field
-            id        String    @id @default(cuid())
+            id         Int @id @default(autoincrement())
         }
 
         model User2 {
-            id        String    @id @default(uuid())
+            id         Int @id @default(autoincrement())
         }
 
         model Unrelated {
@@ -1284,7 +1285,7 @@ async fn updated_at(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", move |t| {
-                t.add_column("id", types::varchar(30).primary(true));
+                t.add_column("id", types::primary());
                 t.add_column("lastupdated", types::datetime().nullable(true));
             });
 
@@ -1294,25 +1295,32 @@ async fn updated_at(api: &TestApi) -> crate::TestResult {
         })
         .await?;
 
-    let input_dm = indoc! {r#"
-        model User {
-            id           String    @id
-            lastupdated  DateTime? @updatedAt
-        }
-    "#};
+    let native_datetime = if api.sql_family().is_postgres() {
+        "@db.Timestamp(6)"
+    } else if api.sql_family().is_mysql() {
+        "@db.DateTime(0)"
+    } else {
+        ""
+    };
+    let input_dm = formatdoc! {r#"
+        model User {{
+            id           Int       @id @default(autoincrement())
+            lastupdated  DateTime? @updatedAt {}
+        }}
+    "#, native_datetime};
 
-    let final_dm = indoc! {r#"
-        model User {
-            id           String    @id
-            lastupdated  DateTime? @updatedAt
-        }
+    let final_dm = formatdoc! {r#"
+        model User {{
+            id           Int       @id @default(autoincrement())
+            lastupdated  DateTime? @updatedAt {}
+        }}
 
-        model Unrelated {
+        model Unrelated {{
             id               Int @id @default(autoincrement())
-        }
-    "#};
+        }}
+    "#, native_datetime};
 
-    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
+    api.assert_eq_datamodels(&final_dm, &api.re_introspect(&input_dm).await?);
 
     Ok(())
 }
@@ -1615,12 +1623,12 @@ async fn re_introspecting_ignore(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", move |t| {
-                t.add_column("id", types::varchar(30).primary(true));
+                t.add_column("id", types::primary());
                 t.add_column("test", types::integer().nullable(true));
             });
 
             migration.create_table("Ignored", move |t| {
-                t.add_column("id", types::varchar(30).primary(true));
+                t.add_column("id", types::primary());
                 t.add_column("test", types::integer().nullable(true));
             });
 
@@ -1632,12 +1640,12 @@ async fn re_introspecting_ignore(api: &TestApi) -> crate::TestResult {
 
     let input_dm = indoc! {r#"
         model User {
-            id           String    @id
+            id           Int @id @default(autoincrement())
             test         Int?      @ignore
         }
         
         model Ignored {
-            id           String    @id
+            id           Int @id @default(autoincrement())
             test         Int?
         
             @@ignore
@@ -1646,12 +1654,12 @@ async fn re_introspecting_ignore(api: &TestApi) -> crate::TestResult {
 
     let final_dm = indoc! {r#"
         model User {
-            id           String    @id
+            id           Int @id @default(autoincrement())
             test         Int?      @ignore
         }
         
         model Ignored {
-            id           String    @id
+            id           Int @id @default(autoincrement())
             test         Int?
         
             @@ignore

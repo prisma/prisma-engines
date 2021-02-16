@@ -82,7 +82,6 @@ async fn remapping_models_in_relations(api: &TestApi) -> crate::TestResult {
         .execute(|migration| {
             migration.create_table("User with Space", |t| {
                 t.add_column("id", types::primary());
-                t.add_column("name", types::text());
             });
 
             migration.create_table("Post", |t| {
@@ -108,7 +107,6 @@ async fn remapping_models_in_relations(api: &TestApi) -> crate::TestResult {
 
         model User_with_Space {
             id   Int    @id @default(autoincrement())
-            name String
             Post Post?
 
             @@map("User with Space")
@@ -127,7 +125,6 @@ async fn remapping_models_in_relations_should_not_map_virtual_fields(api: &TestA
         .execute(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::primary());
-                t.add_column("name", types::text());
             });
 
             migration.create_table("Post With Space", |t| {
@@ -151,7 +148,6 @@ async fn remapping_models_in_relations_should_not_map_virtual_fields(api: &TestA
 
         model User {
             id              Int              @id @default(autoincrement())
-            name            String
             Post_With_Space Post_With_Space?
         }
     "#};
@@ -452,8 +448,8 @@ async fn remapping_compound_primary_keys(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
-                t.add_column("first_name", types::varchar(255));
-                t.add_column("last@name", types::varchar(255));
+                t.add_column("first_name", types::integer());
+                t.add_column("last@name", types::integer());
                 t.set_primary_key(&["first_name", "last@name"]);
             });
         })
@@ -461,8 +457,8 @@ async fn remapping_compound_primary_keys(api: &TestApi) -> crate::TestResult {
 
     let dm = indoc! {r#"
         model User {
-            first_name  String
-            last_name   String @map("last@name")
+            first_name  Int
+            last_name   Int @map("last@name")
 
             @@id([first_name, last_name])
         }

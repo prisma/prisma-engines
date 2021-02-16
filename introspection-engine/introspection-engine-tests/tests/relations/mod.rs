@@ -1,4 +1,5 @@
 use barrel::types;
+use indoc::formatdoc;
 use indoc::indoc;
 use introspection_engine_tests::test_api::*;
 use quaint::prelude::SqlFamily;
@@ -192,21 +193,27 @@ async fn a_one_to_one_relation_referencing_non_id(api: &TestApi) -> crate::TestR
         )
         .await?;
 
-    let dm = indoc! {r##"
-        model Post {
+    let native_type = if api.sql_family().is_sqlite() {
+        ""
+    } else {
+        "@db.VarChar(10)"
+    };
+
+    let dm = formatdoc! {r##"
+        model Post {{
             id         Int     @id @default(autoincrement())
-            user_email String? @unique
+            user_email String? @unique {}
             User       User?   @relation(fields: [user_email], references: [email])
-        }
+        }}
 
-        model User {
+        model User {{
             id    Int     @id @default(autoincrement())
-            email String? @unique
+            email String? @unique {}
             Post  Post?
-        }
-    "##};
+        }}
+    "##, native_type, native_type};
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -656,19 +663,25 @@ async fn prisma_1_0_relations(api: &TestApi) -> crate::TestResult {
         })
         .await?;
 
-    let dm = indoc! {r##"
-        model Book {
-            id        String      @id
+    let native_string = if !api.sql_family().is_sqlite() {
+        "@db.Char(25)"
+    } else {
+        ""
+    };
+
+    let dm = formatdoc! {r##"
+        model Book {{
+            id        String      @id {}
             Royalty   Royalty[]   @relation("BookRoyalty")
-        }
+        }}
 
-        model Royalty {
-            id        String      @id
+        model Royalty {{
+            id        String      @id {}
             Book      Book[]      @relation("BookRoyalty")
-        }
-    "##};
+        }}
+    "##, native_string, native_string};
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
