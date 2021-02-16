@@ -1,4 +1,5 @@
 use barrel::types;
+use indoc::formatdoc;
 use indoc::indoc;
 use introspection_engine_tests::test_api::*;
 use quaint::prelude::Queryable;
@@ -23,22 +24,30 @@ async fn remapping_fields_with_invalid_characters(api: &TestApi) -> crate::TestR
         })
         .await?;
 
-    let dm = indoc! {r#"
-        model User {
-            id     Int @id @default(autoincrement())
-            a      String @map("_a")
-            b      String @map("*b")
-            c      String @map("?c")
-            d      String @map("(d")
-            e      String @map(")e")
-            f      String @map("/f")
-            g_a    String @map("g a")
-            h_a    String @map("h-a")
-            h1     String
-        }
-    "#};
+    let native_string = if api.sql_family().is_mssql() {
+        "@db.Text"
+    } else if api.sql_family().is_mysql() {
+        "@db.Text"
+    } else {
+        ""
+    };
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    let dm = formatdoc! {r#"
+        model User {{
+            id     Int @id @default(autoincrement())
+            a      String @map("_a") {native_string}
+            b      String @map("*b") {native_string}
+            c      String @map("?c") {native_string}
+            d      String @map("(d") {native_string}
+            e      String @map(")e") {native_string}
+            f      String @map("/f") {native_string}
+            g_a    String @map("g a") {native_string}
+            h_a    String @map("h-a") {native_string}
+            h1     String {native_string}
+        }}
+    "#, native_string = native_string};
+
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }

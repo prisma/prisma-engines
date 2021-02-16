@@ -23,18 +23,41 @@ async fn a_simple_table_with_gql_types(api: &TestApi) -> crate::TestResult {
         )
         .await?;
 
-    let dm = indoc! {r##"
-        model Blog {
+    let float_native = if api.sql_family().is_mssql() {
+        "@db.Real"
+    } else if api.sql_family().is_mysql() {
+        "@db.Float"
+    } else {
+        ""
+    };
+    let timestamp_native = if api.sql_family().is_postgres() {
+        "@db.Timestamp(6)"
+    } else if api.sql_family().is_mysql() {
+        "@db.DateTime(0)"
+    } else {
+        ""
+    };
+
+    let text_native = if api.sql_family().is_mssql() {
+        "@db.Text"
+    } else if api.sql_family().is_mysql() {
+        "@db.Text"
+    } else {
+        ""
+    };
+
+    let dm = formatdoc! {r##"
+        model Blog {{
             bool    Boolean
-            float   Float
-            date    DateTime
+            float   Float {}
+            date    DateTime {}
             id      Int @id @default(autoincrement())
             int     Int
-            string  String
-        }
-    "##};
+            string  String {}
+        }}
+    "##, float_native, timestamp_native, text_native};
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -498,7 +521,7 @@ async fn a_table_with_an_index_that_contains_expressions_should_be_ignored(api: 
         model Test {
             id       Int     @id
             parentId Int?
-            name     String?
+            name     String? @db.VarChar(45)
         }
     "#};
 
