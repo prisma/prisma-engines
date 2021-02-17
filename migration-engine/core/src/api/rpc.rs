@@ -132,7 +132,7 @@ impl RpcApi {
             RpcCommand::MarkMigrationApplied => render(executor.mark_migration_applied(&params.parse()?).await?),
             RpcCommand::MarkMigrationRolledBack => render(executor.mark_migration_rolled_back(&params.parse()?).await?),
             RpcCommand::PlanMigration => render(executor.plan_migration(&params.parse()?).await?),
-            RpcCommand::Reset => render(executor.reset(&()).await?),
+            RpcCommand::Reset => render(executor.reset().await?),
             RpcCommand::SchemaPush => render(executor.schema_push(&params.parse()?).await?),
         })
     }
