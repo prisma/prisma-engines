@@ -100,7 +100,7 @@ fn default_scalar_filter(field: &ScalarFieldRef, condition: ScalarCondition) -> 
 
                 doc! { "$in": bson_values }
             }
-            _ => doc! { "$in": PrismaValue::List(vals).into_bson()? },
+            _ => doc! { "$in": (field, PrismaValue::List(vals)).into_bson()? },
         },
         ScalarCondition::NotIn(vals) => {
             doc! { "$nin": vals.into_iter().map(|val| (field, val).into_bson()).collect::<crate::Result<Vec<_>>>()? }
@@ -156,14 +156,17 @@ impl IntoBson for ScalarListFilter {
 
         let filter_doc = match self.condition {
             connector_interface::ScalarListCondition::Contains(val) => {
-                doc! { field.db_name(): val.into_bson()? }
+                doc! { field.db_name(): (&field, val).into_bson()? }
             }
+
             connector_interface::ScalarListCondition::ContainsEvery(vals) => {
-                doc! { field.db_name(): { "$all": PrismaValue::List(vals).into_bson()? }}
+                doc! { field.db_name(): { "$all": (&field, PrismaValue::List(vals)).into_bson()? }}
             }
+
             connector_interface::ScalarListCondition::ContainsSome(vals) => {
-                doc! { "$or": vals.into_iter().map(|val| Ok(doc! { field.db_name(): val.into_bson()? }) ).collect::<crate::Result<Vec<_>>>()?}
+                doc! { "$or": vals.into_iter().map(|val| Ok(doc! { field.db_name(): (&field, val).into_bson()? }) ).collect::<crate::Result<Vec<_>>>()?}
             }
+
             connector_interface::ScalarListCondition::IsEmpty(empty) => {
                 if empty {
                     doc! { field.db_name(): { "$size": 0 }}

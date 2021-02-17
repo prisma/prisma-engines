@@ -25,6 +25,9 @@ uuid = "0.8"
 [dependencies.prisma-models]
 path = "../../../libs/prisma-models"
 
+[dependencies.native-types]
+path = "../../../libs/native-types"
+
 [dependencies.connector-interface]
 package = "query-connector"
 path = "../query-connector"

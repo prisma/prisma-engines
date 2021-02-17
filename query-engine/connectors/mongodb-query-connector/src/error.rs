@@ -1,6 +1,6 @@
 use connector_interface::error::{ConnectorError, ErrorKind, MultiError};
 use itertools::Itertools;
-use mongodb::error::Error as DriverError;
+use mongodb::{bson::oid, error::Error as DriverError};
 use regex::Regex;
 use thiserror::Error;
 use user_facing_errors::query_engine::DatabaseConstraint;
@@ -24,9 +24,11 @@ impl MongoError {
 
         let mapped_err = match self {
             MongoError::Unsupported(feature) => ConnectorError::from_kind(ErrorKind::UnsupportedFeature(feature)),
+
             err @ MongoError::ConversionError { .. } => {
                 ConnectorError::from_kind(ErrorKind::ConversionError(err.into()))
             }
+
             MongoError::DriverError(err) => match err.kind.as_ref() {
                 mongodb::error::ErrorKind::AddrParse(_) => todo!(),
                 mongodb::error::ErrorKind::ArgumentError { .. } => todo!(),
@@ -89,9 +91,13 @@ impl MongoError {
                     ConnectorError::from_kind(ErrorKind::MultiError(MultiError { errors }))
                 }
 
+                mongodb::error::ErrorKind::BsonDecode(_err) => {
+                    // ConnectorError::from_kind(ErrorKind::ConversionError(err.into()))
+                    todo!()
+                }
+                mongodb::error::ErrorKind::BsonEncode(_err) => todo!(),
+
                 // Currently unhandled errors
-                mongodb::error::ErrorKind::BsonDecode(_) => todo!(),
-                mongodb::error::ErrorKind::BsonEncode(_) => todo!(),
                 mongodb::error::ErrorKind::CommandError(_) => todo!(),
                 mongodb::error::ErrorKind::DnsResolve(_) => todo!(),
                 mongodb::error::ErrorKind::InternalError { .. } => todo!(),
@@ -134,5 +140,19 @@ fn parse_unique_index_violation(message: &str) -> Option<String> {
     match re.captures(message) {
         Some(caps) => caps.get(1).map(|cap| cap.as_str().to_owned()),
         None => None,
+    }
+}
+
+// Todo
+impl From<mongodb::bson::oid::Error> for MongoError {
+    fn from(err: mongodb::bson::oid::Error) -> Self {
+        match err {
+            oid::Error::ArgumentError { message } => MongoError::ConversionError {
+                from: "".to_owned(),
+                to: "".to_owned(),
+            },
+            oid::Error::FromHexError(err) => todo!(),
+            err => unimplemented!("Unhandled MongoDB ObjectID error {}.", err),
+        }
     }
 }
