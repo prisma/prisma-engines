@@ -158,7 +158,7 @@ fn must_error_if_wrong_protocol_is_used_for_mysql_shadow_database_url() {
     let diagnostics = config.err().expect("This must error");
 
     diagnostics.assert_is(DatamodelError::new_source_validation_error(
-        "The URL for datasource `myds` must start with the protocol `mysql://`.",
+        "The shadow database URL for datasource `myds` must start with the protocol `mysql://`.",
         "myds",
         Span::new(119, 134),
     ));
@@ -195,7 +195,7 @@ fn must_error_if_wrong_protocol_is_used_for_postgresql_shadow_database_url() {
     assert!(config.is_err());
     let diagnostics = config.err().expect("This must error");
     diagnostics.assert_is(DatamodelError::new_source_validation_error(
-        "The URL for datasource `myds` must start with the protocol `postgresql://`.",
+        "The shadow database URL for datasource `myds` must start with the protocol `postgresql://`.",
         "myds",
         Span::new(129, 139),
     ));

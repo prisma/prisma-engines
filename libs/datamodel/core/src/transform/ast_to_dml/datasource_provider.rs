@@ -7,7 +7,9 @@ pub trait DatasourceProvider {
 
     fn canonical_name(&self) -> &str;
 
-    fn can_handle_url(&self, name: &str, url: &StringFromEnvVar) -> Result<(), String>;
+    fn validate_url(&self, name: &str, url: &StringFromEnvVar) -> Result<(), String>;
+
+    fn validate_shadow_database_url(&self, name: &str, url: &StringFromEnvVar) -> Result<(), String>;
 
     fn connector(&self) -> Box<dyn Connector>;
 }

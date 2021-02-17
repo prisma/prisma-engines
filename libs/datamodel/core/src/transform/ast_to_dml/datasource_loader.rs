@@ -233,7 +233,7 @@ impl DatasourceLoader {
             .iter()
             .map(|provider| {
                 // Validate the URL
-                provider.can_handle_url(source_name, &url).map_err(|err_msg| {
+                provider.validate_url(source_name, &url).map_err(|err_msg| {
                     DatamodelError::new_source_validation_error(&err_msg, source_name, url_arg.span())
                 })?;
 
@@ -242,7 +242,7 @@ impl DatasourceLoader {
                     (shadow_database_url.as_ref(), shadow_database_url_arg.as_ref())
                 {
                     provider
-                        .can_handle_url(source_name, shadow_database_url)
+                        .validate_shadow_database_url(source_name, shadow_database_url)
                         .map_err(|err_msg| {
                             DatamodelError::new_source_validation_error(
                                 &err_msg,
