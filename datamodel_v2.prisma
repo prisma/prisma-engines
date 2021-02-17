@@ -1,4 +1,4 @@
-datasource chinook {
+datasource db {
   provider = "mongodb"
   url      = "mongodb://prisma:prisma@127.0.0.1:27017/testdb?authSource=admin"
 }
@@ -13,7 +13,7 @@ model User {
 }
 
 model Address {
-  id      String @id @default(dbgenerated()) @map("_id")
+  id      String @id @default(dbgenerated()) @map("_id") @db.ObjectId
   zip     Int
   user_id String
   user    User   @relation(fields: [user_id], references: [id])
@@ -24,7 +24,7 @@ model Post {
   title        String
   author_id    String
   author       User       @relation(fields: [author_id], references: [id])
-  category_ids String[]
+  category_ids String[]   @db.Array(String)
   categories   Category[] @relation(fields: [category_ids])
   createdAt    DateTime   @default(now())
 }

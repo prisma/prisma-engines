@@ -2284,6 +2284,7 @@ version = "0.1.0"
 dependencies = [
  "datamodel-connector",
  "dml",
+ "lazy_static",
  "native-types",
  "once_cell",
  "serde_json",

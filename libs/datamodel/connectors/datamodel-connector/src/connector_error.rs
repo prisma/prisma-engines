@@ -237,4 +237,7 @@ pub enum ErrorKind {
         connector_name: String,
         message: String,
     },
+
+    #[error("Error validating field '{}': {}", field, message)]
+    FieldValidationError { field: String, message: String },
 }

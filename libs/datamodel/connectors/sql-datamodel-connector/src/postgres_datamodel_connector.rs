@@ -162,6 +162,7 @@ impl Connector for PostgresDatamodelConnector {
             .iter()
             .any(|(st, nt)| scalar_type == st && &native_type == nt)
     }
+
     fn validate_field(&self, field: &Field) -> Result<(), ConnectorError> {
         match field.field_type() {
             FieldType::NativeType(_scalar_type, native_type_instance) => {
