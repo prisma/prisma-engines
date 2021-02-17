@@ -4,7 +4,7 @@ datasource db {
 }
 
 model User {
-  id      String   @id @default(dbgenerated()) @map("_id")
+  id      String   @id @default(dbgenerated()) @map("_id") @db.ObjectId
   name    String
   age     Int?
   address Address?
@@ -20,19 +20,19 @@ model Address {
 }
 
 model Post {
-  id           String     @id @default(dbgenerated()) @map("_id")
+  id           String     @id @default(dbgenerated()) @map("_id") @db.ObjectId
   title        String
-  author_id    String
+  author_id    String     @db.ObjectId
   author       User       @relation(fields: [author_id], references: [id])
-  category_ids String[]   @db.Array(String)
+  category_ids String[]   @db.Array(ObjectId)
   categories   Category[] @relation(fields: [category_ids])
   createdAt    DateTime   @default(now())
 }
 
 model Category {
-  id       String   @id @default(dbgenerated()) @map("_id")
+  id       String   @id @default(dbgenerated()) @map("_id") @db.ObjectId
   name     String
-  post_ids String[]
+  post_ids String[] @db.Array(ObjectId)
   posts    Post[]   @relation(fields: [post_ids])
 }
 

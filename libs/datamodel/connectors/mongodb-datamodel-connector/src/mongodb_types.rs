@@ -114,5 +114,5 @@ fn parse_array_type(args: &[String]) -> crate::Result<MongoDbType> {
     let type_arg = args.iter().next().unwrap();
     let inner_type = mongo_type_from_input(type_arg.as_str(), &[])?;
 
-    Ok(MongoDbType::Array(Box::new(inner_type)))
+    Ok(dbg!(MongoDbType::Array(Box::new(inner_type))))
 }
