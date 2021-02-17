@@ -38,9 +38,7 @@ async fn a_simple_table_with_gql_types(api: &TestApi) -> crate::TestResult {
         ""
     };
 
-    let text_native = if api.sql_family().is_mssql() {
-        "@db.Text"
-    } else if api.sql_family().is_mysql() {
+    let text_native = if api.sql_family().is_mssql() || api.sql_family().is_mysql() {
         "@db.Text"
     } else {
         ""
@@ -696,35 +694,30 @@ async fn negative_default_values_should_work(api: &TestApi) -> crate::TestResult
     Ok(())
 }
 
-// #[test_each_connector(tags("mysql"))]
-// async fn partial_indexes_should_be_ignored(api: &TestApi) -> crate::TestResult {
-//     api.barrel()
-//         .execute_with_schema(
-//             |migration| {
-//                 migration.create_table("Blog", move |t| {
-//                     t.add_column("id", types::primary());
-//                     t.inject_custom("other_blob_col mediumblob");
-//                     t.inject_custom("var_char_column Varchar(20)");
-//                     t.inject_custom("Index `partial_blob_col_index` (other_blob_col(10))");
-//                 });
-//             },
-//             api.schema_name(),
-//         )
-//         .await?;
-//
-//     let dm = indoc! {r##"
-//         model Blog {
-//           id                Int     @id @default(autoincrement())
-//           var_char_column   String
-//           blob_col          Bytes?
-//
-//           @@index([blob_col], name: "partial_blob_col_index")
-//         }
-//     "##};
-//
-//     let result = &api.introspect().await?;
-//     api.assert_eq_datamodels(&dm, result);
-//
-//     assert_eq!(true, false);
-//     Ok(())
-// }
+#[test_each_connector(tags("mysql"))]
+async fn partial_indexes_should_be_ignored_on_mysql(api: &TestApi) -> crate::TestResult {
+    api.barrel()
+        .execute_with_schema(
+            |migration| {
+                migration.create_table("Blog", move |t| {
+                    t.add_column("id", types::primary());
+                    t.inject_custom("blob_col mediumblob");
+                    t.inject_custom("Index `partial_blob_col_index` (blob_col(10))");
+                });
+            },
+            api.schema_name(),
+        )
+        .await?;
+
+    let dm = indoc! {r##"
+        model Blog {
+          id                Int     @id @default(autoincrement())
+          blob_col          Bytes?  @db.MediumBlob
+        }
+    "##};
+
+    let result = &api.introspect().await?;
+    api.assert_eq_datamodels(&dm, result);
+
+    Ok(())
+}
