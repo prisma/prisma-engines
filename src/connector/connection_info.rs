@@ -34,7 +34,7 @@ pub enum ConnectionInfo {
     Sqlite {
         /// The filesystem path of the SQLite database.
         file_path: String,
-        /// The name the database is bound to (with `ATTACH DATABASE`), if available.
+        /// The name the database is bound to - Always "main"
         db_name: String,
     },
     #[cfg(feature = "sqlite")]
