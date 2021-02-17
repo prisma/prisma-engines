@@ -144,6 +144,27 @@ fn must_error_if_wrong_protocol_is_used_for_mysql() {
 }
 
 #[test]
+fn must_error_if_wrong_protocol_is_used_for_mysql_shadow_database_url() {
+    let schema = r#"
+        datasource myds {
+            provider = "mysql"
+            url = "mysql://"
+            shadowDatabaseUrl = "postgresql://"
+        }
+    "#;
+
+    let config = datamodel::parse_configuration(schema);
+
+    let diagnostics = config.err().expect("This must error");
+
+    diagnostics.assert_is(DatamodelError::new_source_validation_error(
+        "The URL for datasource `myds` must start with the protocol `mysql://`.",
+        "myds",
+        Span::new(119, 134),
+    ));
+}
+
+#[test]
 fn must_error_if_wrong_protocol_is_used_for_postgresql() {
     let schema = r#"
         datasource myds {
@@ -158,6 +179,25 @@ fn must_error_if_wrong_protocol_is_used_for_postgresql() {
         "The URL for datasource `myds` must start with the protocol `postgresql://`.",
         "myds",
         Span::new(81, 91),
+    ));
+}
+
+#[test]
+fn must_error_if_wrong_protocol_is_used_for_postgresql_shadow_database_url() {
+    let schema = r#"
+        datasource myds {
+            provider = "postgresql"
+            url = "postgresql://"
+            shadowDatabaseUrl = "mysql://"
+        }
+    "#;
+    let config = datamodel::parse_configuration(schema);
+    assert!(config.is_err());
+    let diagnostics = config.err().expect("This must error");
+    diagnostics.assert_is(DatamodelError::new_source_validation_error(
+        "The URL for datasource `myds` must start with the protocol `postgresql://`.",
+        "myds",
+        Span::new(129, 139),
     ));
 }
 
