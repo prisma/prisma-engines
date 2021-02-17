@@ -21,14 +21,20 @@ impl DatasourceProvider for SqliteDatasourceProvider {
         SQLITE_SOURCE_NAME
     }
 
-    fn can_handle_url(&self, name: &str, url: &StringFromEnvVar) -> Result<(), String> {
+    fn connector(&self) -> Box<dyn Connector> {
+        Box::new(SqlDatamodelConnectors::sqlite())
+    }
+
+    fn validate_url(&self, name: &str, url: &StringFromEnvVar) -> Result<(), String> {
         let high_prio_validation = validate_url(name, "file:", url);
         let low_prio_validation = validate_url(name, "sqlite:", url);
         low_prio_validation.or(high_prio_validation)
     }
 
-    fn connector(&self) -> Box<dyn Connector> {
-        Box::new(SqlDatamodelConnectors::sqlite())
+    fn validate_shadow_database_url(&self, name: &str, url: &StringFromEnvVar) -> Result<(), String> {
+        let high_prio_validation = validate_url(name, "file:", url);
+        let low_prio_validation = validate_url(name, "sqlite:", url);
+        low_prio_validation.or(high_prio_validation)
     }
 }
 
@@ -49,14 +55,20 @@ impl DatasourceProvider for PostgresDatasourceProvider {
         POSTGRES_SOURCE_NAME
     }
 
-    fn can_handle_url(&self, name: &str, url: &StringFromEnvVar) -> Result<(), String> {
-        let high_prio_validation = validate_url(name, "postgresql://", url);
-        let low_prio_validation = validate_url(name, "postgres://", url); // for postgres urls on heroku -> https://devcenter.heroku.com/articles/heroku-postgresql#spring-java
+    fn connector(&self) -> Box<dyn Connector> {
+        Box::new(SqlDatamodelConnectors::postgres())
+    }
+
+    fn validate_shadow_database_url(&self, name: &str, url: &StringFromEnvVar) -> Result<(), String> {
+        let high_prio_validation = validate_shadow_database_url(name, "postgresql://", url);
+        let low_prio_validation = validate_shadow_database_url(name, "postgres://", url); // for postgres urls on heroku -> https://devcenter.heroku.com/articles/heroku-postgresql#spring-java
         low_prio_validation.or(high_prio_validation)
     }
 
-    fn connector(&self) -> Box<dyn Connector> {
-        Box::new(SqlDatamodelConnectors::postgres())
+    fn validate_url(&self, name: &str, url: &StringFromEnvVar) -> Result<(), String> {
+        let high_prio_validation = validate_url(name, "postgresql://", url);
+        let low_prio_validation = validate_url(name, "postgres://", url); // for postgres urls on heroku -> https://devcenter.heroku.com/articles/heroku-postgresql#spring-java
+        low_prio_validation.or(high_prio_validation)
     }
 }
 
@@ -77,12 +89,16 @@ impl DatasourceProvider for MySqlDatasourceProvider {
         MYSQL_SOURCE_NAME
     }
 
-    fn can_handle_url(&self, name: &str, url: &StringFromEnvVar) -> Result<(), String> {
-        validate_url(name, "mysql://", url)
-    }
-
     fn connector(&self) -> Box<dyn Connector> {
         Box::new(SqlDatamodelConnectors::mysql())
+    }
+
+    fn validate_shadow_database_url(&self, name: &str, url: &StringFromEnvVar) -> Result<(), String> {
+        validate_shadow_database_url(name, "mysql://", url)
+    }
+
+    fn validate_url(&self, name: &str, url: &StringFromEnvVar) -> Result<(), String> {
+        validate_url(name, "mysql://", url)
     }
 }
 
@@ -103,12 +119,16 @@ impl DatasourceProvider for MsSqlDatasourceProvider {
         MSSQL_SOURCE_NAME
     }
 
-    fn can_handle_url(&self, name: &str, url: &StringFromEnvVar) -> Result<(), String> {
-        validate_url(name, "sqlserver://", url)
-    }
-
     fn connector(&self) -> Box<dyn Connector> {
         Box::new(SqlDatamodelConnectors::mssql())
+    }
+
+    fn validate_shadow_database_url(&self, name: &str, url: &StringFromEnvVar) -> Result<(), String> {
+        validate_shadow_database_url(name, "sqlserver://", url)
+    }
+
+    fn validate_url(&self, name: &str, url: &StringFromEnvVar) -> Result<(), String> {
+        validate_url(name, "sqlserver://", url)
     }
 }
 
@@ -121,4 +141,15 @@ fn validate_url(name: &str, expected_protocol: &str, url: &StringFromEnvVar) -> 
             name, expected_protocol
         ))
     }
+}
+
+fn validate_shadow_database_url(name: &str, expected_protocol: &str, url: &StringFromEnvVar) -> Result<(), String> {
+    if url.value.starts_with(expected_protocol) {
+        return Ok(());
+    }
+
+    Err(format!(
+        "The shadow database URL for datasource `{}` must start with the protocol `{}`.",
+        name, expected_protocol
+    ))
 }

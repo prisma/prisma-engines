@@ -160,7 +160,7 @@ impl DatasourceLoader {
 
         let shadow_database_url_arg = args.optional_arg(SHADOW_DATABASE_URL_KEY);
 
-        let shadow_database_url = if let Some(shadow_database_url_arg) = shadow_database_url_arg {
+        let shadow_database_url = if let Some(shadow_database_url_arg) = shadow_database_url_arg.as_ref() {
             let shadow_database_url = match (shadow_database_url_arg.as_str_from_env(), override_url) {
                 (Err(err), _)
                     if ignore_datasource_urls
@@ -232,10 +232,27 @@ impl DatasourceLoader {
         let validated_providers: Vec<_> = all_datasource_providers
             .iter()
             .map(|provider| {
-                let url_check_result = provider.can_handle_url(source_name, &url).map_err(|err_msg| {
+                // Validate the URL
+                provider.validate_url(source_name, &url).map_err(|err_msg| {
                     DatamodelError::new_source_validation_error(&err_msg, source_name, url_arg.span())
-                });
-                url_check_result.map(|_| provider)
+                })?;
+
+                // Validate the shadow database URL
+                if let (Some(shadow_database_url), Some(shadow_database_url_arg)) =
+                    (shadow_database_url.as_ref(), shadow_database_url_arg.as_ref())
+                {
+                    provider
+                        .validate_shadow_database_url(source_name, shadow_database_url)
+                        .map_err(|err_msg| {
+                            DatamodelError::new_source_validation_error(
+                                &err_msg,
+                                source_name,
+                                shadow_database_url_arg.span(),
+                            )
+                        })?;
+                }
+
+                Ok(provider)
             })
             .collect();
 
