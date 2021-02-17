@@ -583,7 +583,7 @@ async fn dev_diagnostic_shadow_database_creation_error_is_special_cased_mysql(ap
         .render_user_facing()
         .unwrap_known();
 
-    assert!(err.message.starts_with("Prisma Migrate could not create the shadow database. Please make sure the database user has permission to create databases.  More info: https://pris.ly/d/migrate-shadow."));
+    assert!(err.message.starts_with("Prisma Migrate could not create the shadow database. Please make sure the database user has permission to create databases. More info: https://pris.ly/d/migrate-shadow."), "{:?}", err);
 
     Ok(())
 }
@@ -634,7 +634,7 @@ async fn dev_diagnostic_shadow_database_creation_error_is_special_cased_postgres
         .render_user_facing()
         .unwrap_known();
 
-    assert!(err.message.starts_with("Prisma Migrate could not create the shadow database. Please make sure the database user has permission to create databases.  More info: https://pris.ly/d/migrate-shadow."));
+    assert!(err.message.starts_with("Prisma Migrate could not create the shadow database. Please make sure the database user has permission to create databases. More info: https://pris.ly/d/migrate-shadow."));
 
     Ok(())
 }
@@ -708,7 +708,7 @@ async fn dev_diagnostic_shadow_database_creation_error_is_special_cased_mssql(ap
         .unwrap_known();
 
     assert_eq!(err.error_code, ShadowDbCreationError::ERROR_CODE);
-    assert!(err.message.starts_with("Prisma Migrate could not create the shadow database. Please make sure the database user has permission to create databases.  More info: https://pris.ly/d/migrate-shadow."));
+    assert!(err.message.starts_with("Prisma Migrate could not create the shadow database. Please make sure the database user has permission to create databases. More info: https://pris.ly/d/migrate-shadow."));
 
     Ok(())
 }

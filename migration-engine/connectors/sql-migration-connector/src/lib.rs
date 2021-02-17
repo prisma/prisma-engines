@@ -103,6 +103,12 @@ impl SqlMigrationConnector {
     /// when we don't have the permissions to do a full reset.
     #[tracing::instrument(skip(self))]
     async fn best_effort_reset(&self, connection: &Connection) -> ConnectorResult<()> {
+        self.best_effort_reset_impl(connection)
+            .await
+            .map_err(|err| err.into_soft_reset_failed_error())
+    }
+
+    async fn best_effort_reset_impl(&self, connection: &Connection) -> ConnectorResult<()> {
         tracing::info!("Attempting best_effort_reset");
 
         let source_schema = self.flavour.describe_schema(connection).await?;
