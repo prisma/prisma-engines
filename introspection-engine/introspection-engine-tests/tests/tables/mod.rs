@@ -701,8 +701,10 @@ async fn partial_indexes_should_be_ignored_on_mysql(api: &TestApi) -> crate::Tes
             |migration| {
                 migration.create_table("Blog", move |t| {
                     t.add_column("id", types::primary());
+                    t.add_column("int_col", types::integer());
                     t.inject_custom("blob_col mediumblob");
                     t.inject_custom("Index `partial_blob_col_index` (blob_col(10))");
+                    t.inject_custom("Index `partial_compound` (blob_col(10), int_col)");
                 });
             },
             api.schema_name(),
@@ -712,6 +714,7 @@ async fn partial_indexes_should_be_ignored_on_mysql(api: &TestApi) -> crate::Tes
     let dm = indoc! {r##"
         model Blog {
           id                Int     @id @default(autoincrement())
+          int_col           Int
           blob_col          Bytes?  @db.MediumBlob
         }
     "##};

@@ -322,6 +322,7 @@ impl SqlSchemaDescriber {
     ) -> DescriberResult<HashMap<String, (BTreeMap<String, Index>, Option<PrimaryKey>)>> {
         let mut map = HashMap::new();
         let mut indexes_with_expressions: HashSet<(String, String)> = HashSet::new();
+        let mut indexes_with_partially_covered_columns: HashSet<(String, String)> = HashSet::new();
 
         // We alias all the columns because MySQL column names are case-insensitive in queries, but the
         // information schema column names became upper-case in MySQL 8, causing the code fetching
@@ -345,7 +346,7 @@ impl SqlSchemaDescriber {
             let table_name = row.get_expect_string("table_name");
             let index_name = row.get_expect_string("index_name");
             if row.get_u32("partial").is_some() {
-                continue;
+                indexes_with_partially_covered_columns.insert((table_name.clone(), index_name.clone()));
             };
             match row.get_string("column_name") {
                 Some(column_name) => {
@@ -409,6 +410,11 @@ impl SqlSchemaDescriber {
 
         for (table, (index_map, _)) in &mut map {
             for (tble, index_name) in &indexes_with_expressions {
+                if tble == table {
+                    index_map.remove(index_name);
+                }
+            }
+            for (tble, index_name) in &indexes_with_partially_covered_columns {
                 if tble == table {
                     index_map.remove(index_name);
                 }
