@@ -7,34 +7,6 @@ use mongodb::bson::{oid::ObjectId, spec::BinarySubtype, Binary, Bson, Timestamp}
 use native_types::MongoDbType;
 use prisma_models::{PrismaValue, ScalarFieldRef, TypeIdentifier};
 
-// Straight value mapping without using any type information.
-// impl IntoBson for PrismaValue {
-//     fn into_bson(self) -> crate::Result<Bson> {
-//         match self {
-//             PrismaValue::String(s) => Ok(Bson::String(s)),
-//             PrismaValue::Boolean(b) => Ok(Bson::Boolean(b)),
-//             PrismaValue::Enum(_) => Err(MongoError::Unsupported("Enums".to_owned())),
-//             PrismaValue::Int(i) => Ok(Bson::Int64(i)),
-//             PrismaValue::Uuid(u) => Ok(Bson::String(u.to_string())),
-//             PrismaValue::List(list) => Ok(Bson::Array(
-//                 list.into_iter()
-//                     .map(|e| e.into_bson())
-//                     .collect::<crate::Result<Vec<_>>>()?,
-//             )),
-//             PrismaValue::Json(_) => unimplemented!("Figure out JSON => BSON conversion."),
-//             PrismaValue::Xml(_) => Err(MongoError::Unsupported("Mongo doesn't support XML.".to_owned())),
-//             PrismaValue::Null => Ok(Bson::Null),
-//             PrismaValue::DateTime(dt) => Ok(Bson::DateTime(dt.with_timezone(&Utc))),
-//             PrismaValue::Float(dec) => Ok(Bson::Double(dec.to_f64().unwrap())),
-//             PrismaValue::BigInt(i) => Ok(Bson::Int64(i)),
-//             PrismaValue::Bytes(b) => Ok(Bson::Binary(Binary {
-//                 subtype: BinarySubtype::Generic,
-//                 bytes: b,
-//             })),
-//         }
-//     }
-// }
-
 /// Transforms a `PrismaValue` of a specific field into the BSON mapping as prescribed by the native types
 /// or as defined by the default `TypeIdentifier` to BSON mapping.
 impl IntoBson for (&ScalarFieldRef, PrismaValue) {
@@ -134,7 +106,75 @@ impl IntoBson for (MongoDbType, PrismaValue) {
 impl IntoBson for (&TypeIdentifier, PrismaValue) {
     fn into_bson(self) -> crate::Result<Bson> {
         Ok(match self {
+            // String & UUID
             (TypeIdentifier::String, PrismaValue::String(s)) => Bson::String(s),
+            (TypeIdentifier::String, PrismaValue::Uuid(s)) => Bson::String(s.to_string()),
+            (TypeIdentifier::UUID, PrismaValue::Uuid(s)) => Bson::String(s.to_string()),
+            (TypeIdentifier::UUID, PrismaValue::String(s)) => Bson::String(s),
+
+            // Bool
+            (TypeIdentifier::Boolean, PrismaValue::Boolean(b)) => Bson::Boolean(b),
+
+            // DateTime
+            (TypeIdentifier::DateTime, PrismaValue::DateTime(dt)) => Bson::DateTime(dt.into()),
+
+            // Int
+            (TypeIdentifier::Int, PrismaValue::Int(i)) => Bson::Int64(i),
+            (TypeIdentifier::Int, PrismaValue::BigInt(i)) => Bson::Int64(i),
+            (TypeIdentifier::Int, PrismaValue::Float(dec)) => Bson::Int64(
+                dec.to_i64()
+                    .expect("Prisma Float can't be represented as Mongo Long (64 bit)"),
+            ),
+
+            // BigInt
+            (TypeIdentifier::BigInt, PrismaValue::BigInt(i)) => Bson::Int64(i),
+            (TypeIdentifier::BigInt, PrismaValue::Int(i)) => Bson::Int64(i),
+            (TypeIdentifier::BigInt, PrismaValue::Float(dec)) => Bson::Int64(
+                dec.to_i64()
+                    .expect("Prisma Float can't be represented as Mongo Long (64 bit)"),
+            ),
+
+            // Float
+            (TypeIdentifier::Float, PrismaValue::Float(dec)) => Bson::Double(
+                dec.to_f64()
+                    .expect("Prisma Float can't be represented as Mongo Double (64 bit)"),
+            ),
+            (TypeIdentifier::Float, PrismaValue::Int(i)) => Bson::Double(
+                i.to_f64()
+                    .expect("Prisma Int can't be represented as Mongo Double (64 bit)"),
+            ),
+            (TypeIdentifier::Float, PrismaValue::BigInt(i)) => Bson::Double(
+                i.to_f64()
+                    .expect("Prisma BigInt can't be represented as Mongo Double (64 bit)"),
+            ),
+
+            // Decimal (todo properly when the driver supports dec128)
+            (TypeIdentifier::Decimal, PrismaValue::Float(dec)) => Bson::Double(
+                dec.to_f64()
+                    .expect("Prisma Float can't be represented as Mongo Double (64 bit)"),
+            ),
+            (TypeIdentifier::Decimal, PrismaValue::Int(i)) => Bson::Double(
+                i.to_f64()
+                    .expect("Prisma Int can't be represented as Mongo Double (64 bit)"),
+            ),
+            (TypeIdentifier::Decimal, PrismaValue::BigInt(i)) => Bson::Double(
+                i.to_f64()
+                    .expect("Prisma BigInt can't be represented as Mongo Double (64 bit)"),
+            ),
+
+            // Bytes
+            (TypeIdentifier::Bytes, PrismaValue::Bytes(bytes)) => Bson::Binary(Binary {
+                subtype: BinarySubtype::Generic,
+                bytes,
+            }),
+
+            // Unhandled
+            (TypeIdentifier::Unsupported, _) => unreachable!("Unsupported types should never hit the connector."),
+            (TypeIdentifier::Xml, _) => Err(MongoError::Unsupported("Mongo doesn't support XML.".to_owned()))?,
+
+            // Todo?
+            // Enum(String),
+            // Json,
             mapping => todo!("{:?}", mapping),
         })
     }
