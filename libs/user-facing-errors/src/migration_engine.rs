@@ -180,7 +180,7 @@ impl crate::UserFacingError for ShadowDbCreationError {
     message = "The datasource provider `{provider}` specified in your schema does not match the one specified in the migration_lock.toml. You will encounter errors when you try to apply migrations generated for a different provider. Please archive your current migration directory at a different location and start a new migration history with `prisma migrate dev`."
 )]
 pub struct ProviderSwitchedError {
-    ///The provider specified in the schema.
+    /// The provider specified in the schema.
     pub provider: String,
 }
 
@@ -217,6 +217,16 @@ impl crate::UserFacingError for SoftResetFailed {
             error_code = error_code
         )
     }
+}
+
+#[derive(Debug, Serialize, UserFacingError)]
+#[user_facing(
+    code = "P3017",
+    message = "The migration {migration_name} could not be found. Please make sure that the migration exists, and that you included the whole name of the directory. (example: \"20201207184859_initial_migration\")"
+)]
+pub struct MigrationToMarkAppliedNotFound {
+    /// The migration name that was provided, and not found.
+    pub migration_name: String,
 }
 
 #[cfg(test)]
