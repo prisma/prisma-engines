@@ -168,6 +168,13 @@ impl IntoBson for (&TypeIdentifier, PrismaValue) {
                 bytes,
             }),
 
+            // List values
+            (typ, PrismaValue::List(vals)) => Bson::Array(
+                vals.into_iter()
+                    .map(|val| (typ, val).into_bson())
+                    .collect::<crate::Result<Vec<_>>>()?,
+            ),
+
             // Unhandled
             (TypeIdentifier::Unsupported, _) => unreachable!("Unsupported types should never hit the connector."),
             (TypeIdentifier::Xml, _) => Err(MongoError::Unsupported("Mongo doesn't support XML.".to_owned()))?,

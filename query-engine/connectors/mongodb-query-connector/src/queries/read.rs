@@ -1,5 +1,5 @@
 use super::*;
-use crate::query_arguments::build_mongo_options;
+use crate::{filter::convert_filter, query_arguments::build_mongo_args};
 use crate::{BsonTransform, IntoBson};
 use connector_interface::{Filter, QueryArguments};
 use mongodb::Database;
@@ -14,8 +14,8 @@ pub async fn get_single_record(
 ) -> crate::Result<Option<SingleRecord>> {
     let coll = database.collection(model.db_name());
 
-    // Todo look at interfaces (req clones).
-    let filter = filter.clone().into_bson()?.into_document()?;
+    // Todo joins
+    let (filter, _) = convert_filter(filter.clone())?;
     let find_options = FindOptions::builder()
         .projection(selected_fields.clone().into_bson()?.into_document()?)
         .build();
@@ -55,8 +55,8 @@ pub async fn get_many_records(
         return Ok(records);
     };
 
-    let (filter, options) = build_mongo_options(query_arguments, selected_fields)?;
-    let cursor = coll.find(filter, options).await?;
+    let mongo_args = build_mongo_args(query_arguments, selected_fields.clone())?;
+    let cursor = mongo_args.execute_find(coll).await?;
     let docs = vacuum_cursor(cursor).await?;
 
     for doc in docs {

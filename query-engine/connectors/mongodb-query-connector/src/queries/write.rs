@@ -1,5 +1,5 @@
 use super::*;
-use crate::{BsonTransform, IntoBson};
+use crate::{filter::convert_filter, IntoBson};
 use connector_interface::*;
 use mongodb::{
     bson::{doc, Document},
@@ -124,7 +124,7 @@ pub async fn update_records(
             .map(|p| (&id_field, p.values().next().unwrap()).into_bson())
             .collect::<crate::Result<Vec<_>>>()?
     } else {
-        let filter = record_filter.filter.into_bson()?.into_document()?;
+        let (filter, _joins) = convert_filter(record_filter.filter)?;
         let find_options = FindOptions::builder()
             .projection(doc! { id_field.db_name(): 1 })
             .build();
@@ -175,6 +175,7 @@ pub async fn update_records(
     Ok(ids)
 }
 
+// todo joins
 pub async fn delete_records(
     database: &Database,
     model: &ModelRef,
@@ -191,7 +192,8 @@ pub async fn delete_records(
 
         doc! { id_field.db_name(): { "$in": ids.clone() } }
     } else {
-        record_filter.filter.into_bson()?.into_document()?
+        let (filter, _joins) = convert_filter(record_filter.filter)?;
+        filter
     };
 
     let delete_result = coll.delete_many(filter, None).await?;

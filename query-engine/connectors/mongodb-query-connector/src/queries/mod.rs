@@ -1,3 +1,4 @@
+pub mod aggregate;
 pub mod read;
 pub mod write;
 
@@ -21,6 +22,7 @@ fn document_to_record(mut doc: Document, fields: &[String]) -> crate::Result<Rec
     Ok(Record::new(values))
 }
 
+/// Consumes a cursor stream until exhausted.
 async fn vacuum_cursor(mut cursor: Cursor) -> crate::Result<Vec<Document>> {
     let mut docs = vec![];
 

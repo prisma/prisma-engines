@@ -4,65 +4,61 @@ use mongodb::bson::{doc, Bson, Document, Regex};
 use prisma_models::{PrismaValue, ScalarFieldRef};
 use std::unimplemented;
 
-// Mongo filters are a BSON document.
-impl IntoBson for Filter {
-    fn into_bson(self) -> crate::Result<Bson> {
-        match self {
-            Filter::And(filters) => {
-                let filters = filters
-                    .into_iter()
-                    .map(|f| f.into_bson())
-                    .collect::<crate::Result<Vec<_>>>()?;
+/// Builds a MongoDB query document from a Prisma filter.
+/// Returns the query document and a number of join documents
+/// if required, e.g. for relation filters.
+pub fn convert_filter(filter: Filter) -> crate::Result<(Document, Vec<Document>)> {
+    let filter_pair = match filter {
+        Filter::And(filters) => filter_list("$and", filters)?,
+        Filter::Or(filters) => filter_list("$or", filters)?,
+        Filter::Not(filters) => filter_list("$not", filters)?,
+        Filter::Scalar(sf) => (scalar_filter(sf)?, vec![]),
+        Filter::Empty => (Document::new(), vec![]),
+        Filter::ScalarList(slf) => (scalar_list_filter(slf)?, vec![]),
+        // Filter::OneRelationIsNull(_) => {}
+        // Filter::Relation(_) => {}
+        // Filter::BoolFilter(b) => {} // Potentially not doable.
+        // Filter::Aggregation(_) => {}
+        _ => todo!("Incomplete filter implementation."),
+    };
 
-                Ok(doc! { "$and": Bson::Array(filters) }.into())
-            }
-
-            Filter::Or(filters) => {
-                let filters = filters
-                    .into_iter()
-                    .map(|f| f.into_bson())
-                    .collect::<crate::Result<Vec<_>>>()?;
-
-                Ok(doc! { "$or": Bson::Array(filters) }.into())
-            }
-
-            Filter::Not(filters) => {
-                let filters = filters
-                    .into_iter()
-                    .map(|f| f.into_bson())
-                    .collect::<crate::Result<Vec<_>>>()?;
-
-                Ok(doc! { "$not": Bson::Array(filters) }.into())
-            }
-
-            Filter::Scalar(sf) => sf.into_bson(),
-            Filter::Empty => Ok(Document::new().into()),
-            Filter::ScalarList(slf) => slf.into_bson(),
-            // Filter::OneRelationIsNull(_) => {}
-            // Filter::Relation(_) => {}
-            // Filter::BoolFilter(b) => {} // Potentially not doable.
-            // Filter::Aggregation(_) => {}
-            _ => todo!("Incomplete filter implementation."),
-        }
-    }
+    Ok(filter_pair)
 }
 
-impl IntoBson for ScalarFilter {
-    fn into_bson(self) -> crate::Result<Bson> {
-        // Todo: Find out what Compound cases are really. (Guess: Relation fields with multi-field FK?)
-        let field = match self.projection {
-            connector_interface::ScalarProjection::Single(sf) => sf,
-            connector_interface::ScalarProjection::Compound(mut c) if c.len() == 1 => c.pop().unwrap(),
-            connector_interface::ScalarProjection::Compound(_) => unimplemented!("Compound filter case."),
-        };
+fn filter_list(operation: &str, filters: Vec<Filter>) -> crate::Result<(Document, Vec<Document>)> {
+    let filters = filters
+        .into_iter()
+        .map(|f| convert_filter(f))
+        .collect::<crate::Result<Vec<_>>>()?;
 
-        let filter = match self.mode {
-            QueryMode::Default => default_scalar_filter(&field, self.condition)?,
-            QueryMode::Insensitive => insensitive_scalar_filter(&field, self.condition)?,
-        };
+    let (filters, joins) = fold_nested(filters);
 
-        Ok(doc! { field.db_name(): filter }.into())
-    }
+    Ok((doc! { operation: filters }, joins))
+}
+
+// Todo we should really only join each relation once.
+fn fold_nested(nested: Vec<(Document, Vec<Document>)>) -> (Vec<Document>, Vec<Document>) {
+    nested.into_iter().fold((vec![], vec![]), |mut acc, next| {
+        acc.0.push(next.0);
+        acc.1.extend(next.1);
+        acc
+    })
+}
+
+fn scalar_filter(filter: ScalarFilter) -> crate::Result<Document> {
+    // Todo: Find out what Compound cases are really. (Guess: Relation fields with multi-field FK?)
+    let field = match filter.projection {
+        connector_interface::ScalarProjection::Single(sf) => sf,
+        connector_interface::ScalarProjection::Compound(mut c) if c.len() == 1 => c.pop().unwrap(),
+        connector_interface::ScalarProjection::Compound(_) => unimplemented!("Compound filter case."),
+    };
+
+    let filter = match filter.mode {
+        QueryMode::Default => default_scalar_filter(&field, filter.condition)?,
+        QueryMode::Insensitive => insensitive_scalar_filter(&field, filter.condition)?,
+    };
+
+    Ok(doc! { field.db_name(): filter })
 }
 
 // Note contains / startsWith / endsWith are only applicable to String types in the schema.
@@ -150,34 +146,32 @@ fn insensitive_scalar_filter(field: &ScalarFieldRef, condition: ScalarCondition)
     })
 }
 
-impl IntoBson for ScalarListFilter {
-    fn into_bson(self) -> crate::Result<Bson> {
-        let field = self.field;
+fn scalar_list_filter(filter: ScalarListFilter) -> crate::Result<Document> {
+    let field = filter.field;
 
-        let filter_doc = match self.condition {
-            connector_interface::ScalarListCondition::Contains(val) => {
-                doc! { field.db_name(): (&field, val).into_bson()? }
+    let filter_doc = match filter.condition {
+        connector_interface::ScalarListCondition::Contains(val) => {
+            doc! { field.db_name(): (&field, val).into_bson()? }
+        }
+
+        connector_interface::ScalarListCondition::ContainsEvery(vals) => {
+            doc! { field.db_name(): { "$all": (&field, PrismaValue::List(vals)).into_bson()? }}
+        }
+
+        connector_interface::ScalarListCondition::ContainsSome(vals) => {
+            doc! { "$or": vals.into_iter().map(|val| Ok(doc! { field.db_name(): (&field, val).into_bson()? }) ).collect::<crate::Result<Vec<_>>>()?}
+        }
+
+        connector_interface::ScalarListCondition::IsEmpty(empty) => {
+            if empty {
+                doc! { field.db_name(): { "$size": 0 }}
+            } else {
+                doc! { field.db_name(): { "$not": { "$size": 0 }}}
             }
+        }
+    };
 
-            connector_interface::ScalarListCondition::ContainsEvery(vals) => {
-                doc! { field.db_name(): { "$all": (&field, PrismaValue::List(vals)).into_bson()? }}
-            }
-
-            connector_interface::ScalarListCondition::ContainsSome(vals) => {
-                doc! { "$or": vals.into_iter().map(|val| Ok(doc! { field.db_name(): (&field, val).into_bson()? }) ).collect::<crate::Result<Vec<_>>>()?}
-            }
-
-            connector_interface::ScalarListCondition::IsEmpty(empty) => {
-                if empty {
-                    doc! { field.db_name(): { "$size": 0 }}
-                } else {
-                    doc! { field.db_name(): { "$not": { "$size": 0 }}}
-                }
-            }
-        };
-
-        Ok(filter_doc.into())
-    }
+    Ok(filter_doc)
 }
 
 fn to_regex_list(

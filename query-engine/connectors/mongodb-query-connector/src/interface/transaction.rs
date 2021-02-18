@@ -1,7 +1,7 @@
 use super::*;
 use crate::{
     error::MongoError,
-    queries::{read, write},
+    queries::{aggregate, read, write},
 };
 use connector_interface::{ReadOperations, Transaction, WriteOperations};
 use futures::Future;
@@ -153,12 +153,15 @@ impl ReadOperations for MongoDbTransaction {
 
     async fn aggregate_records(
         &self,
-        _model: &ModelRef,
-        _query_arguments: connector_interface::QueryArguments,
-        _selections: Vec<connector_interface::AggregationSelection>,
-        _group_by: Vec<ScalarFieldRef>,
-        _having: Option<connector_interface::Filter>,
+        model: &ModelRef,
+        query_arguments: connector_interface::QueryArguments,
+        selections: Vec<connector_interface::AggregationSelection>,
+        group_by: Vec<ScalarFieldRef>,
+        having: Option<connector_interface::Filter>,
     ) -> connector_interface::Result<Vec<connector_interface::AggregationRow>> {
-        Err(MongoError::Unsupported("Aggregations".to_owned()).into_connector_error())
+        self.catch(async move {
+            aggregate::aggregate(&self.database, model, query_arguments, selections, group_by, having).await
+        })
+        .await
     }
 }
