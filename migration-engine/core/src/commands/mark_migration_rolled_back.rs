@@ -17,7 +17,7 @@ pub type MarkMigrationRolledBackOutput = HashMap<(), ()>;
 
 /// Mark a migration as rolled back.
 pub(crate) async fn mark_migration_rolled_back<
-    M: DatabaseMigrationMarker,
+    M: DatabaseMigrationMarker + 'static,
     C: MigrationConnector<DatabaseMigration = M>,
 >(
     input: &MarkMigrationRolledBackInput,

@@ -124,7 +124,7 @@ pub struct MigrationNameTooLong;
 #[derive(Debug, Serialize, UserFacingError)]
 #[user_facing(
     code = "P3011",
-    message = "Migration `{migration_name}` cannot be rolled back because it was never applied to the database."
+    message = "Migration `{migration_name}` cannot be rolled back because it was never applied to the database. Hint: did you pass in the whole migration name? (example: \"20201207184859_initial_migration\")"
 )]
 pub struct CannotRollBackUnappliedMigration {
     /// The name of the migration.
