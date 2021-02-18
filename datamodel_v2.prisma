@@ -15,7 +15,7 @@ model User {
 model Address {
   id      String @id @default(dbgenerated()) @map("_id") @db.ObjectId
   zip     Int
-  user_id String
+  user_id String @db.ObjectId
   user    User   @relation(fields: [user_id], references: [id])
 }
 

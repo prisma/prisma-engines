@@ -54,16 +54,7 @@ impl IntoBson for (&ScalarFieldRef, PrismaValue) {
     }
 }
 
-// PrismaValue::String(s) if is_object_id => {
-//     Ok(Bson::ObjectId(ObjectId::with_string(&s).map_err(|_err| {
-//         MongoError::ConversionError {
-//             from: s,
-//             to: "ObjectID".to_owned(),
-//         }
-//     })?))
-// }
-// val => val.into_bson(),
-
+/// Conversion using an explicit native type.
 impl IntoBson for (MongoDbType, PrismaValue) {
     fn into_bson(self) -> crate::Result<Bson> {
         Ok(match self {
@@ -139,12 +130,17 @@ impl IntoBson for (MongoDbType, PrismaValue) {
     }
 }
 
+/// Conversion using the type identifier of the field.
 impl IntoBson for (&TypeIdentifier, PrismaValue) {
     fn into_bson(self) -> crate::Result<Bson> {
-        todo!()
+        Ok(match self {
+            (TypeIdentifier::String, PrismaValue::String(s)) => Bson::String(s),
+            mapping => todo!("{:?}", mapping),
+        })
     }
 }
 
+/// Parsing of values coming from MongoDB back to the connector / core.
 pub(crate) fn value_from_bson(bson: Bson) -> crate::Result<PrismaValue> {
     match bson {
         Bson::Double(d) => match BigDecimal::from_f64(d) {

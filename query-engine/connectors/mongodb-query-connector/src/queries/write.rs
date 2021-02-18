@@ -44,7 +44,7 @@ pub async fn create_record(
             .try_into()
             .expect("Create calls can only use PrismaValue write expressions (right now).");
 
-        let bson = value.into_bson()?;
+        let bson = (&field, value).into_bson()?;
         doc.insert(field.db_name().to_owned(), bson);
     }
 
@@ -62,19 +62,22 @@ pub async fn create_records(
 ) -> crate::Result<usize> {
     let coll = database.collection(model.db_name());
     let num_records = args.len();
+    let fields = model.fields().scalar();
 
     let docs = args
         .into_iter()
         .map(|arg| {
             let mut doc = Document::new();
 
-            for (field, value) in arg.args {
+            for (field_name, value) in arg.args {
+                // Todo: This is nice and inefficient.
+                let field = fields.iter().find(|f| f.db_name() == &*field_name).unwrap();
                 let value: PrismaValue = value
                     .try_into()
                     .expect("Create calls can only use PrismaValue write expressions (right now).");
 
-                let bson = value.into_bson()?;
-                doc.insert(field.to_string(), bson);
+                let bson = (field, value).into_bson()?;
+                doc.insert(field_name.to_string(), bson);
             }
 
             Ok(doc)
@@ -140,17 +143,19 @@ pub async fn update_records(
 
     let filter = doc! { id_field.db_name(): { "$in": ids.clone() } };
     let mut update_doc = Document::new();
+    let fields = model.fields().scalar();
 
     for (field_name, write_expr) in args.args {
         let DatasourceFieldName(name) = field_name;
+        let field = fields.iter().find(|f| f.db_name() == &name).unwrap();
 
         let (op_key, val) = match write_expr {
             WriteExpression::Field(_) => unimplemented!(),
-            WriteExpression::Value(rhs) => ("$set", rhs.into_bson()?),
-            WriteExpression::Add(rhs) => ("$inc", rhs.into_bson()?),
-            WriteExpression::Substract(rhs) => ("$inc", (rhs * PrismaValue::Int(-1)).into_bson()?),
-            WriteExpression::Multiply(rhs) => ("$mul", rhs.into_bson()?),
-            WriteExpression::Divide(rhs) => ("$mul", (PrismaValue::new_float(1.0) / rhs).into_bson()?),
+            WriteExpression::Value(rhs) => ("$set", (field, rhs).into_bson()?),
+            WriteExpression::Add(rhs) => ("$inc", (field, rhs).into_bson()?),
+            WriteExpression::Substract(rhs) => ("$inc", (field, (rhs * PrismaValue::Int(-1))).into_bson()?),
+            WriteExpression::Multiply(rhs) => ("$mul", (field, rhs).into_bson()?),
+            WriteExpression::Divide(rhs) => ("$mul", (field, (PrismaValue::new_float(1.0) / rhs)).into_bson()?),
         };
 
         let entry = update_doc.entry(op_key.to_owned()).or_insert(Document::new().into());
