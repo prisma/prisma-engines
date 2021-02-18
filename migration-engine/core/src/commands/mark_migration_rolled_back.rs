@@ -1,6 +1,5 @@
-use super::MigrationCommand;
 use crate::{CoreError, CoreResult};
-use migration_connector::MigrationConnector;
+use migration_connector::{DatabaseMigrationMarker, MigrationConnector};
 use serde::Deserialize;
 use std::collections::HashMap;
 use user_facing_errors::migration_engine::{CannotRollBackSucceededMigration, CannotRollBackUnappliedMigration};
@@ -17,59 +16,71 @@ pub struct MarkMigrationRolledBackInput {
 pub type MarkMigrationRolledBackOutput = HashMap<(), ()>;
 
 /// Mark a migration as rolled back.
-pub struct MarkMigrationRolledBackCommand;
+pub(crate) async fn mark_migration_rolled_back<
+    M: DatabaseMigrationMarker,
+    C: MigrationConnector<DatabaseMigration = M>,
+>(
+    input: &MarkMigrationRolledBackInput,
+    connector: &C,
+) -> CoreResult<MarkMigrationRolledBackOutput> {
+    let persistence = connector.migration_persistence();
 
-#[async_trait::async_trait]
-impl MigrationCommand for MarkMigrationRolledBackCommand {
-    type Input = MarkMigrationRolledBackInput;
-    type Output = MarkMigrationRolledBackOutput;
+    connector.acquire_lock().await?;
 
-    async fn execute<C: MigrationConnector>(input: &Self::Input, connector: &C) -> CoreResult<Self::Output> {
-        // todo the input currently does not take the migration directory as input. therefore no error atm, but I think the behaviour
-        // should be consistent between mark applied and mark rolled back
-        let persistence = connector.migration_persistence();
+    let all_migrations = persistence.list_migrations().await?.map_err(|_err| {
+        CoreError::Generic(anyhow::anyhow!(
+            "Invariant violation: called markMigrationRolledBack on a database without migrations table."
+        ))
+    })?;
 
-        connector.acquire_lock().await?;
+    let relevant_migrations: Vec<_> = all_migrations
+        .into_iter()
+        .filter(|migration| migration.migration_name == input.migration_name)
+        .collect();
 
-        let all_migrations = persistence.list_migrations().await?.map_err(|_err| {
-            CoreError::Generic(anyhow::anyhow!(
-                "Invariant violation: called markMigrationRolledBack on a database without migrations table."
-            ))
-        })?;
+    if relevant_migrations.is_empty() {
+        return Err(CoreError::user_facing(CannotRollBackUnappliedMigration {
+            migration_name: input.migration_name.clone(),
+        }));
+    }
 
-        let relevant_migrations: Vec<_> = all_migrations
-            .into_iter()
-            .filter(|migration| migration.migration_name == input.migration_name)
-            .collect();
+    if relevant_migrations
+        .iter()
+        .all(|migration| migration.finished_at.is_some())
+    {
+        return Err(CoreError::user_facing(CannotRollBackSucceededMigration {
+            migration_name: input.migration_name.clone(),
+        }));
+    }
 
-        if relevant_migrations.is_empty() {
-            return Err(CoreError::user_facing(CannotRollBackUnappliedMigration {
-                migration_name: input.migration_name.clone(),
-            }));
-        }
+    let migrations_to_roll_back = relevant_migrations
+        .iter()
+        .filter(|migration| migration.finished_at.is_none() && migration.rolled_back_at.is_none());
 
-        if relevant_migrations
-            .iter()
-            .all(|migration| migration.finished_at.is_some())
-        {
-            return Err(CoreError::user_facing(CannotRollBackSucceededMigration {
-                migration_name: input.migration_name.clone(),
-            }));
-        }
+    for migration in migrations_to_roll_back {
+        tracing::info!(
+            migration_id = migration.id.as_str(),
+            migration_name = migration.migration_name.as_str(),
+            "Marking migration as rolled back."
+        );
+        persistence.mark_migration_rolled_back_by_id(&migration.id).await?;
+    }
 
-        let migrations_to_roll_back = relevant_migrations
-            .iter()
-            .filter(|migration| migration.finished_at.is_none() && migration.rolled_back_at.is_none());
+    Ok(Default::default())
+}
 
-        for migration in migrations_to_roll_back {
-            tracing::info!(
-                migration_id = migration.id.as_str(),
-                migration_name = migration.migration_name.as_str(),
-                "Marking migration as rolled back."
-            );
-            persistence.mark_migration_rolled_back_by_id(&migration.id).await?;
-        }
+#[cfg(test)]
+mod tests {
+    use super::MarkMigrationRolledBackOutput;
+    use std::collections::HashMap;
 
-        Ok(Default::default())
+    #[test]
+    fn mark_migration_rolled_back_output_serializes_as_expected() {
+        let output: MarkMigrationRolledBackOutput = HashMap::new();
+
+        let expected = serde_json::json!({});
+        let actual = serde_json::to_value(output).unwrap();
+
+        assert_eq!(actual, expected);
     }
 }
