@@ -833,7 +833,6 @@ dependencies = [
  "chrono",
  "clap",
  "colored",
- "cuid",
  "datamodel-connector",
  "dml",
  "indoc",
