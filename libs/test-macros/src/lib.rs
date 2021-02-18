@@ -10,6 +10,11 @@ pub fn test_each_connector(attr: TokenStream, input: TokenStream) -> TokenStream
     test_each_connector::test_each_connector_impl(attr, input)
 }
 
+#[proc_macro_attribute]
+pub fn test_connectors(attr: TokenStream, input: TokenStream) -> TokenStream {
+    test_each_connector::test_connectors_impl(attr, input)
+}
+
 fn function_returns_result(func: &ItemFn) -> bool {
     match func.sig.output {
         syn::ReturnType::Default => false,
