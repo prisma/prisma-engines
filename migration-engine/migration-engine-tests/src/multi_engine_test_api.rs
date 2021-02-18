@@ -19,7 +19,7 @@ pub struct TestApi {
 
 impl TestApi {
     /// Initializer, called by the test macros.
-    pub async fn new(args: TestApiArgs) -> Self {
+    pub fn new(args: TestApiArgs) -> Self {
         let connection_string = (args.url_fn)(args.test_function_name);
 
         TestApi {
