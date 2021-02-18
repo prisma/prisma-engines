@@ -10,8 +10,13 @@ pub enum MongoError {
     #[error("Unsupported MongoDB feature: {0}.")]
     Unsupported(String),
 
+    // Generic conversion error.
     #[error("Failed to convert '{}' to '{}'.", from, to)]
     ConversionError { from: String, to: String },
+
+    // ObjectID specific conversion error.
+    #[error("Malformed ObjectID: {0}.")]
+    MalformedObjectId(String),
 
     #[error("{0}")]
     DriverError(#[from] DriverError),
@@ -28,6 +33,8 @@ impl MongoError {
             err @ MongoError::ConversionError { .. } => {
                 ConnectorError::from_kind(ErrorKind::ConversionError(err.into()))
             }
+
+            err @ MongoError::MalformedObjectId(_) => ConnectorError::from_kind(ErrorKind::ConversionError(err.into())),
 
             MongoError::DriverError(err) => match err.kind.as_ref() {
                 mongodb::error::ErrorKind::AddrParse(_) => todo!(),
@@ -143,15 +150,11 @@ fn parse_unique_index_violation(message: &str) -> Option<String> {
     }
 }
 
-// Todo
 impl From<mongodb::bson::oid::Error> for MongoError {
     fn from(err: mongodb::bson::oid::Error) -> Self {
         match err {
-            oid::Error::ArgumentError { message } => MongoError::ConversionError {
-                from: "".to_owned(),
-                to: "".to_owned(),
-            },
-            oid::Error::FromHexError(err) => todo!(),
+            oid::Error::ArgumentError { message } => MongoError::MalformedObjectId(message),
+            oid::Error::FromHexError(err) => MongoError::MalformedObjectId(format!("{}", err)),
             err => unimplemented!("Unhandled MongoDB ObjectID error {}.", err),
         }
     }

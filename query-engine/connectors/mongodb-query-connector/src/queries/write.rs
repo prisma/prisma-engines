@@ -70,7 +70,7 @@ pub async fn create_records(
             let mut doc = Document::new();
 
             for (field_name, value) in arg.args {
-                // Todo: This is nice and inefficient.
+                // Todo: This is inefficient.
                 let field = fields.iter().find(|f| f.db_name() == &*field_name).unwrap();
                 let value: PrismaValue = value
                     .try_into()
@@ -147,6 +147,7 @@ pub async fn update_records(
 
     for (field_name, write_expr) in args.args {
         let DatasourceFieldName(name) = field_name;
+        // Todo: This is inefficient.
         let field = fields.iter().find(|f| f.db_name() == &name).unwrap();
 
         let (op_key, val) = match write_expr {
