@@ -2864,7 +2864,6 @@ dependencies = [
  "thiserror",
  "tokio",
  "tracing",
- "tracing-attributes",
  "tracing-futures",
  "tracing-subscriber",
  "url 2.2.0",

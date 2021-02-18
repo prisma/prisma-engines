@@ -109,6 +109,21 @@ fn server_info(ctx: CallContext) -> napi::Result<JsObject> {
     )
 }
 
+#[js_function(0)]
+fn next_log_event(ctx: CallContext) -> napi::Result<JsObject> {
+    let this: JsObject = ctx.this_unchecked();
+    let engine: &QueryEngine = ctx.env.unwrap(&this)?;
+    let engine: QueryEngine = engine.clone();
+
+    ctx.env.execute_tokio_future(
+        async move { Ok(engine.next_log_event().await?) },
+        |&mut env, event| match event {
+            Some(event) => env.create_string(&event),
+            None => env.get_null().and_then(|nil| nil.coerce_to_string()),
+        },
+    )
+}
+
 #[module_exports]
 pub fn init(mut exports: JsObject, env: Env) -> napi::Result<()> {
     let query_engine = env.define_class(
@@ -122,6 +137,7 @@ pub fn init(mut exports: JsObject, env: Env) -> napi::Result<()> {
             Property::new(&env, "dmmf")?.with_method(dmmf),
             Property::new(&env, "getConfig")?.with_method(get_config),
             Property::new(&env, "serverInfo")?.with_method(server_info),
+            Property::new(&env, "nextLogEvent")?.with_method(next_log_event),
         ],
     )?;
 

@@ -1,15 +1,15 @@
-use crate::error::ApiError;
+use crate::{error::ApiError, logger::ChannelLogger};
 use datamodel::{diagnostics::ValidatedConfiguration, Datamodel};
 use prisma_models::DatamodelConverter;
-use query_core::exec_loader;
-use query_core::{schema_builder, BuildMode, QueryExecutor, QuerySchema, QuerySchemaRenderer};
+use query_core::{exec_loader, schema_builder, BuildMode, QueryExecutor, QuerySchema, QuerySchemaRenderer};
 use request_handlers::{
     dmmf::{self, DataModelMetaFormat},
     GraphQLSchemaRenderer, GraphQlBody, GraphQlHandler, PrismaResponse,
 };
-use serde::{Deserialize, Serialize};
-use std::{collections::BTreeMap, sync::Arc};
+use serde::{Deserialize, Deserializer, Serialize};
+use std::{collections::BTreeMap, str::FromStr, sync::Arc};
 use tokio::sync::RwLock;
+use tracing::metadata::LevelFilter;
 
 /// The main engine, that can be cloned between threads when using JavaScript
 /// promises.
@@ -37,6 +37,7 @@ struct EngineDatamodel {
 
 /// Everything needed to connect to the database and have the core running.
 pub struct EngineBuilder {
+    log_level: LevelFilter,
     datamodel: EngineDatamodel,
     config: ValidatedConfiguration,
 }
@@ -47,6 +48,7 @@ pub struct ConnectedEngine {
     config: serde_json::Value,
     query_schema: Arc<QuerySchema>,
     executor: crate::Executor,
+    logger: ChannelLogger,
 }
 
 /// Returned from the `serverInfo` method in javascript.
@@ -75,16 +77,25 @@ impl ConnectedEngine {
 #[serde(rename_all = "camelCase")]
 pub struct ConstructorOptions {
     datamodel: String,
+    #[serde(deserialize_with = "deserialize_log_level")]
+    log_level: LevelFilter,
     datasource_overrides: BTreeMap<String, String>,
+}
+
+fn deserialize_log_level<'de, D>(deserializer: D) -> Result<LevelFilter, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let buf = String::deserialize(deserializer)?;
+    LevelFilter::from_str(&buf).map_err(serde::de::Error::custom)
 }
 
 impl QueryEngine {
     /// Parse a validated datamodel and configuration to allow connecting later on.
     pub fn new(opts: ConstructorOptions) -> crate::Result<Self> {
-        crate::logger::init();
-
         let ConstructorOptions {
             datamodel,
+            log_level,
             datasource_overrides,
         } = opts;
 
@@ -113,7 +124,11 @@ impl QueryEngine {
             datasource_overrides: overrides,
         };
 
-        let builder = EngineBuilder { config, datamodel };
+        let builder = EngineBuilder {
+            config,
+            datamodel,
+            log_level,
+        };
 
         Ok(Self {
             inner: Arc::new(RwLock::new(Inner::Builder(builder))),
@@ -126,38 +141,46 @@ impl QueryEngine {
 
         match *inner {
             Inner::Builder(ref builder) => {
-                let template = DatamodelConverter::convert(&builder.datamodel.ast);
+                let logger = ChannelLogger::new(builder.log_level);
 
-                // We only support one data source at the moment, so take the first one (default not exposed yet).
-                let data_source = builder
-                    .config
-                    .subject
-                    .datasources
-                    .first()
-                    .ok_or_else(|| ApiError::configuration("No valid data source found"))?;
+                let engine = logger
+                    .clone()
+                    .with_logging(|| async move {
+                        let template = DatamodelConverter::convert(&builder.datamodel.ast);
 
-                let (db_name, executor) = exec_loader::load(&data_source).await?;
-                let connector = executor.primary_connector();
-                connector.get_connection().await?;
+                        // We only support one data source at the moment, so take the first one (default not exposed yet).
+                        let data_source = builder
+                            .config
+                            .subject
+                            .datasources
+                            .first()
+                            .ok_or_else(|| ApiError::configuration("No valid data source found"))?;
 
-                // Build internal data model
-                let internal_data_model = template.build(db_name);
+                        let (db_name, executor) = exec_loader::load(&data_source).await?;
+                        let connector = executor.primary_connector();
+                        connector.get_connection().await?;
 
-                let query_schema = schema_builder::build(
-                    internal_data_model,
-                    BuildMode::Modern,
-                    true, // enable raw queries
-                    data_source.capabilities(),
-                );
+                        // Build internal data model
+                        let internal_data_model = template.build(db_name);
 
-                let config = datamodel::json::mcf::config_to_mcf_json_value(&builder.config);
+                        let query_schema = schema_builder::build(
+                            internal_data_model,
+                            BuildMode::Modern,
+                            true, // enable raw queries
+                            data_source.capabilities(),
+                        );
 
-                let engine = ConnectedEngine {
-                    datamodel: builder.datamodel.clone(),
-                    query_schema: Arc::new(query_schema),
-                    executor,
-                    config,
-                };
+                        let config = datamodel::json::mcf::config_to_mcf_json_value(&builder.config);
+
+                        Ok(ConnectedEngine {
+                            datamodel: builder.datamodel.clone(),
+                            query_schema: Arc::new(query_schema),
+                            logger,
+                            executor,
+                            config,
+                        })
+                    })
+                    .await?;
 
                 *inner = Inner::Connected(engine);
 
@@ -181,6 +204,7 @@ impl QueryEngine {
 
                 let builder = EngineBuilder {
                     datamodel: engine.datamodel.clone(),
+                    log_level: engine.logger.log_level(),
                     config,
                 };
 
@@ -196,9 +220,13 @@ impl QueryEngine {
     pub async fn query(&self, query: GraphQlBody) -> crate::Result<PrismaResponse> {
         match *self.inner.read().await {
             Inner::Connected(ref engine) => {
-                let handler = GraphQlHandler::new(engine.executor(), engine.query_schema());
-
-                Ok(handler.handle(query).await)
+                engine
+                    .logger
+                    .with_logging(|| async move {
+                        let handler = GraphQlHandler::new(engine.executor(), engine.query_schema());
+                        Ok(handler.handle(query).await)
+                    })
+                    .await
             }
             Inner::Builder(_) => Err(ApiError::NotConnected),
         }
@@ -248,6 +276,17 @@ impl QueryEngine {
                 version: env!("CARGO_PKG_VERSION").into(),
                 primary_connector: None,
             }),
+        }
+    }
+
+    /// Returns the next log event from the system, if any. Pauses the task if
+    /// the channel is empty. Engine should be connected before calling.
+    ///
+    /// Returns `None` when the logger is dropped.
+    pub async fn next_log_event(&self) -> crate::Result<Option<String>> {
+        match *self.inner.read().await {
+            Inner::Connected(ref engine) => Ok(engine.logger.next_event().await),
+            Inner::Builder(_) => Err(ApiError::NotConnected),
         }
     }
 }
