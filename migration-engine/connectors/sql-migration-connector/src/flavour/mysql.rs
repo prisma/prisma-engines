@@ -225,17 +225,12 @@ impl SqlFlavour for MysqlFlavour {
 
         let result_set = connection.query_raw("SELECT @@lower_case_table_names", &[]).await?;
 
-        if let Some((setting_name, setting_value)) = result_set.into_single().ok().and_then(|row| {
-            let setting_name = row.at(0).and_then(|row| row.to_string())?;
-            let setting_value = row.at(1).and_then(|row| row.to_string())?;
-            Some((setting_name, setting_value))
+        if let Some(1) = result_set.into_single().ok().and_then(|row| {
+            row.at(0)
+                .and_then(|row| row.to_string().and_then(|s| s.parse().ok()).or_else(|| row.as_i64()))
         }) {
-            assert_eq!(setting_name, "lower_case_table_names");
-
             // https://dev.mysql.com/doc/refman/8.0/en/identifier-case-sensitivity.html
-            if setting_value == "1" {
-                circumstances |= Circumstances::LowerCasesTableNames;
-            }
+            circumstances |= Circumstances::LowerCasesTableNames;
         }
 
         self.circumstances.store(circumstances.bits(), Ordering::Relaxed);
