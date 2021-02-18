@@ -39,6 +39,7 @@ pub trait RelationFieldAsserts {
 }
 
 pub trait ModelAsserts {
+    fn assert_field_count(&self, count: usize) -> &Self;
     fn assert_has_scalar_field(&self, t: &str) -> &dml::ScalarField;
     fn assert_has_relation_field(&self, t: &str) -> &dml::RelationField;
     fn assert_is_embedded(&self, t: bool) -> &Self;
@@ -278,6 +279,12 @@ impl ModelAsserts for dml::Model {
 
     fn assert_ignored(&self, state: bool) -> &Self {
         assert_eq!(self.is_ignored, state);
+        self
+    }
+
+    fn assert_field_count(&self, count: usize) -> &Self {
+        println!("{}", self.name);
+        assert_eq!(self.fields.len(), count);
         self
     }
 }
