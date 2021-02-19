@@ -115,7 +115,7 @@ impl QueryEngine {
         let flags: Vec<_> = config.subject.preview_features().map(|s| s.to_string()).collect();
 
         if feature_flags::initialize(&flags).is_err() {
-            panic!("How feature flags are currently implemented, you must start a new node process to re-initialize a new Query Engine. Sorry Tim!");
+            eprintln!("We currently cannot change the feature flags more than once per process.");
         }
 
         let datamodel = EngineDatamodel {

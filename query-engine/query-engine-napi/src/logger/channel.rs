@@ -63,14 +63,6 @@ where
         object.insert("level".to_string(), format!("{}", event.metadata().level()).into());
 
         let metadata = event.metadata();
-        if let Some(file) = metadata.file() {
-            object.insert("file".to_string(), file.into());
-        }
-
-        if let Some(line) = metadata.line() {
-            object.insert("line".to_string(), line.into());
-        }
-
         if let Some(module_path) = metadata.module_path() {
             object.insert("module_path".to_string(), module_path.into());
         }
