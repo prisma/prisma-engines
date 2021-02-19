@@ -2,76 +2,8 @@ use crate::common::*;
 use datamodel::ast::Span;
 use datamodel::diagnostics::DatamodelError;
 use datamodel::dml::ScalarType;
-use datamodel::{render_datamodel_to_string, FieldArity, FieldType, ScalarField};
+use datamodel::{render_datamodel_to_string, FieldType, ScalarField};
 use pretty_assertions::assert_eq;
-
-//todo this should now be a formatter test
-#[test]
-fn must_add_back_relation_fields_for_given_list_field() {
-    let dml = r#"
-    model User {
-        id Int @id
-        posts Post[]
-    }
-
-    model Post {
-        post_id Int @id
-    }
-    "#;
-
-    let schema = parse(dml);
-
-    let user_model = schema.assert_has_model("User");
-    user_model
-        .assert_has_relation_field("posts")
-        .assert_relation_to("Post")
-        .assert_relation_referenced_fields(&[])
-        .assert_arity(&datamodel::dml::FieldArity::List);
-
-    let post_model = schema.assert_has_model("Post");
-    post_model
-        .assert_has_relation_field("User")
-        .assert_relation_to("User")
-        .assert_relation_base_fields(&["userId"])
-        .assert_relation_referenced_fields(&["id"])
-        .assert_arity(&datamodel::dml::FieldArity::Optional);
-    post_model
-        .assert_has_scalar_field("userId")
-        .assert_base_type(&datamodel::dml::ScalarType::Int);
-}
-
-#[test]
-fn must_add_back_relation_fields_for_given_singular_field() {
-    let dml = r#"
-    model User {
-        id     Int @id
-        postId Int 
-        
-        post   Post @relation(fields: [postId], references: [post_id]) 
-    }
-
-    model Post {
-        post_id Int @id
-    }
-    "#;
-
-    let schema = parse(dml);
-
-    let user_model = schema.assert_has_model("User");
-    user_model
-        .assert_has_relation_field("post")
-        .assert_relation_to("Post")
-        .assert_relation_referenced_fields(&["post_id"])
-        .assert_arity(&datamodel::dml::FieldArity::Required);
-
-    let post_model = schema.assert_has_model("Post");
-    post_model
-        .assert_has_relation_field("User")
-        .assert_relation_to("User")
-        .assert_relation_base_fields(&[])
-        .assert_relation_referenced_fields(&[])
-        .assert_arity(&datamodel::dml::FieldArity::List);
-}
 
 //todo formatter test
 #[test]
@@ -502,32 +434,6 @@ fn should_camel_case_back_relation_field_name() {
         .assert_has_model("Post")
         .assert_has_relation_field("OhWhatAUser")
         .assert_relation_to("OhWhatAUser");
-}
-
-#[test]
-fn must_add_back_relation_fields_for_self_relations() {
-    let dml = r#"
-    model Human {
-        id    Int @id
-        sonId Int?
-        
-        son   Human? @relation(fields: [sonId], references: [id]) 
-    }
-    "#;
-
-    let schema = parse(dml);
-    let model = schema.assert_has_model("Human");
-    model
-        .assert_has_relation_field("son")
-        .assert_relation_to("Human")
-        .assert_arity(&FieldArity::Optional)
-        .assert_relation_referenced_fields(&["id"]);
-
-    model
-        .assert_has_relation_field("Human")
-        .assert_relation_to("Human")
-        .assert_arity(&FieldArity::List)
-        .assert_relation_referenced_fields(&[]);
 }
 
 #[test]
