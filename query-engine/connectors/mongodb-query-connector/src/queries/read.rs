@@ -15,7 +15,7 @@ pub async fn get_single_record(
     let coll = database.collection(model.db_name());
 
     // Todo joins
-    let (filter, _) = convert_filter(filter.clone())?;
+    let (filter, _) = convert_filter(filter.clone(), false)?;
     let find_options = FindOptions::builder()
         .projection(selected_fields.clone().into_bson()?.into_document()?)
         .build();
@@ -56,7 +56,7 @@ pub async fn get_many_records(
     };
 
     let mongo_args = build_mongo_args(query_arguments, selected_fields.clone())?;
-    let cursor = mongo_args.execute_find(coll).await?;
+    let cursor = mongo_args.find_documents(coll).await?;
     let docs = vacuum_cursor(cursor).await?;
 
     for doc in docs {

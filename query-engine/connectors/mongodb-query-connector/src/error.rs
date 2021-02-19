@@ -98,13 +98,9 @@ impl MongoError {
                     ConnectorError::from_kind(ErrorKind::MultiError(MultiError { errors }))
                 }
 
-                mongodb::error::ErrorKind::BsonDecode(_err) => {
-                    // ConnectorError::from_kind(ErrorKind::ConversionError(err.into()))
-                    todo!()
-                }
-                mongodb::error::ErrorKind::BsonEncode(_err) => todo!(),
-
                 // Currently unhandled errors
+                mongodb::error::ErrorKind::BsonDecode(_err) => todo!(),
+                mongodb::error::ErrorKind::BsonEncode(_err) => todo!(),
                 mongodb::error::ErrorKind::CommandError(_) => todo!(),
                 mongodb::error::ErrorKind::DnsResolve(_) => todo!(),
                 mongodb::error::ErrorKind::InternalError { .. } => todo!(),

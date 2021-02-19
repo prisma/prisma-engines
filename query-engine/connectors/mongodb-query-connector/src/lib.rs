@@ -9,6 +9,8 @@ mod value;
 use error::MongoError;
 pub use interface::*;
 use mongodb::bson::{Bson, Document};
+use prisma_models::RelationFieldRef;
+use tracing::log::kv::source;
 
 type Result<T> = std::result::Result<T, MongoError>;
 
@@ -30,5 +32,17 @@ impl BsonTransform for Bson {
                 to: "Bson::Document".to_string(),
             })
         }
+    }
+}
+
+#[derive(Debug)]
+pub(crate) struct JoinStage {
+    pub(crate) source_field: RelationFieldRef,
+    pub(crate) document: Document,
+}
+
+impl JoinStage {
+    pub(crate) fn new(source_field: RelationFieldRef, document: Document) -> Self {
+        Self { source_field, document }
     }
 }

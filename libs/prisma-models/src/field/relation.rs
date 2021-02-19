@@ -260,6 +260,30 @@ impl RelationField {
             .collect()
     }
 
+    // Scalar fields on the left (source) side of the relation if starting traversal from `self`.
+    // Todo This is provisionary.
+    pub fn left_scalars(&self) -> Vec<ScalarFieldRef> {
+        if self.relation().is_many_to_many() {
+            self.model().primary_identifier().scalar_fields().collect()
+        } else if self.is_inlined_on_enclosing_model() {
+            self.scalar_fields()
+        } else {
+            self.related_field().referenced_fields()
+        }
+    }
+
+    // Scalar fields on the right (target) side of the relation if starting traversal from `self`.
+    // Todo This is provisionary.
+    pub fn right_scalars(&self) -> Vec<ScalarFieldRef> {
+        if self.relation().is_many_to_many() {
+            self.model().primary_identifier().scalar_fields().collect()
+        } else if self.is_inlined_on_enclosing_model() {
+            self.referenced_fields()
+        } else {
+            self.related_field().scalar_fields()
+        }
+    }
+
     pub fn db_names(&self) -> impl Iterator<Item = String> {
         self.scalar_fields().into_iter().map(|f| f.db_name().to_owned())
     }

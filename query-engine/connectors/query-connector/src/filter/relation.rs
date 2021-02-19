@@ -18,7 +18,7 @@ pub struct RelationFilter {
 }
 
 /// Filter that is solely responsible for checking if
-/// a to-one related record is null or not null.
+/// a to-one related record is null.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct OneRelationIsNullFilter {
     pub field: Arc<RelationField>,

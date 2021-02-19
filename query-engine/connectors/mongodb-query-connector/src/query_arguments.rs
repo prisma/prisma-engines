@@ -1,13 +1,18 @@
-use crate::{filter::convert_filter, BsonTransform, IntoBson};
+use crate::{filter::convert_filter, BsonTransform, IntoBson, JoinStage};
 use connector_interface::QueryArguments;
-use mongodb::{bson::Document, options::FindOptions, Collection, Cursor};
+use mongodb::{
+    bson::{doc, Document},
+    options::{AggregateOptions, FindOptions},
+    Collection, Cursor,
+};
 use prisma_models::{ModelProjection, OrderBy, SortOrder};
 
 /// Translated query arguments ready to use in mongo find or aggregation queries.
 #[derive(Debug)]
 pub(crate) struct MongoQueryArgs {
     pub(crate) query: Option<Document>,
-    pub(crate) joins: Vec<Document>,
+    pub(crate) post_filters: Vec<Document>,
+    pub(crate) joins: Vec<JoinStage>,
     pub(crate) projection: Document,
     pub(crate) order: Option<Document>,
     pub(crate) skip: Option<i64>,
@@ -17,7 +22,15 @@ pub(crate) struct MongoQueryArgs {
 impl MongoQueryArgs {
     /// Turns the query args into a find operation on the collection.
     /// Depending on the arguments, either an aggregation pipeline or a plain query is build and run.
-    pub(crate) async fn execute_find(self, coll: Collection) -> crate::Result<Cursor> {
+    pub(crate) async fn find_documents(self, coll: Collection) -> crate::Result<Cursor> {
+        if self.joins.is_empty() {
+            self.execute_find_query(coll).await
+        } else {
+            self.execute_pipeline_query(coll).await
+        }
+    }
+
+    async fn execute_find_query(self, coll: Collection) -> crate::Result<Cursor> {
         let find_options = FindOptions::builder()
             .projection(self.projection)
             .limit(self.limit)
@@ -26,6 +39,44 @@ impl MongoQueryArgs {
             .build();
 
         Ok(coll.find(self.query, find_options).await?)
+    }
+
+    async fn execute_pipeline_query(self, coll: Collection) -> crate::Result<Cursor> {
+        let opts = AggregateOptions::builder().allow_disk_use(true).build();
+        let mut stages = vec![];
+
+        // Initial $matches
+        if let Some(query) = self.query {
+            stages.push(doc! { "$match": query })
+        };
+
+        // Joins ($lookup)
+        stages.extend(self.joins.into_iter().map(|stage| doc! { "$lookup": stage.document }));
+
+        // Post-join $matches
+        stages.extend(self.post_filters.into_iter().map(|filter| doc! { "$match": filter }));
+
+        // $sort
+        if let Some(order) = self.order {
+            stages.push(doc! { "$sort": order })
+        };
+
+        // $skip
+        if let Some(skip) = self.skip {
+            stages.push(doc! { "$skip": skip });
+        };
+
+        // $limit
+        if let Some(limit) = self.limit {
+            stages.push(doc! { "$limit": limit });
+        };
+
+        // $project
+        stages.push(doc! { "$project": self.projection });
+
+        dbg!(&stages);
+
+        Ok(coll.aggregate(stages, opts).await?)
     }
 }
 
@@ -37,33 +88,36 @@ pub(crate) fn build_mongo_args(
     let reverse_order = args.take.map(|t| t < 0).unwrap_or(false);
     let (order, mut joins) = build_order_by(args.order_by, reverse_order);
     let projection = selected_fields.into_bson()?.into_document()?;
+    let mut post_filters = vec![];
+
     let query = match args.filter {
         Some(filter) => {
-            let (filter, filter_joins) = convert_filter(filter)?;
-            joins.extend(filter_joins);
+            // If a filter comes with joins, it needs to be run _after_ the initial filter query / $matches.
+            let (filter, filter_joins) = convert_filter(filter, false)?;
+            if !filter_joins.is_empty() {
+                joins.extend(filter_joins);
+                post_filters.push(filter);
 
-            Some(filter)
+                None
+            } else {
+                Some(filter)
+            }
         }
         None => None,
     };
 
     Ok(MongoQueryArgs {
         query,
+        post_filters,
         joins,
         projection,
         order,
         skip: skip(args.skip, args.ignore_skip),
         limit: take(args.take, args.ignore_take),
     })
-
-    // let builder = FindOptions::builder()
-    //     .projection()
-    //     .sort()
-    //     .skip()
-    //     .limit(take(args.take, args.ignore_take));
 }
 
-fn build_order_by(orderings: Vec<OrderBy>, reverse: bool) -> (Option<Document>, Vec<Document>) {
+fn build_order_by(orderings: Vec<OrderBy>, reverse: bool) -> (Option<Document>, Vec<JoinStage>) {
     if orderings.is_empty() {
         return (None, vec![]);
     }

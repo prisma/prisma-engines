@@ -1,5 +1,7 @@
-use crate::IntoBson;
-use connector_interface::{Filter, QueryMode, ScalarCondition, ScalarFilter, ScalarListFilter};
+use crate::{IntoBson, JoinStage};
+use connector_interface::{
+    Filter, OneRelationIsNullFilter, QueryMode, ScalarCondition, ScalarFilter, ScalarListFilter,
+};
 use mongodb::bson::{doc, Bson, Document, Regex};
 use prisma_models::{PrismaValue, ScalarFieldRef};
 use std::unimplemented;
@@ -7,15 +9,21 @@ use std::unimplemented;
 /// Builds a MongoDB query document from a Prisma filter.
 /// Returns the query document and a number of join documents
 /// if required, e.g. for relation filters.
-pub fn convert_filter(filter: Filter) -> crate::Result<(Document, Vec<Document>)> {
+pub(crate) fn convert_filter(filter: Filter, invert: bool) -> crate::Result<(Document, Vec<JoinStage>)> {
     let filter_pair = match filter {
-        Filter::And(filters) => filter_list("$and", filters)?,
-        Filter::Or(filters) => filter_list("$or", filters)?,
-        Filter::Not(filters) => filter_list("$not", filters)?,
-        Filter::Scalar(sf) => (scalar_filter(sf)?, vec![]),
+        Filter::And(filters) if invert => filter_list("$or", filters, invert)?,
+        Filter::And(filters) => filter_list("$and", filters, invert)?,
+
+        Filter::Or(filters) if invert => filter_list("$and", filters, invert)?,
+        Filter::Or(filters) => filter_list("$or", filters, invert)?,
+
+        // todo requires some more testing
+        Filter::Not(filters) => filter_list("$and", filters, !invert)?,
+
+        Filter::Scalar(sf) => (scalar_filter(sf, invert)?, vec![]),
         Filter::Empty => (Document::new(), vec![]),
-        Filter::ScalarList(slf) => (scalar_list_filter(slf)?, vec![]),
-        // Filter::OneRelationIsNull(_) => {}
+        Filter::ScalarList(slf) => (scalar_list_filter(slf, invert)?, vec![]),
+        Filter::OneRelationIsNull(filter) => one_is_null(filter, invert)?,
         // Filter::Relation(_) => {}
         // Filter::BoolFilter(b) => {} // Potentially not doable.
         // Filter::Aggregation(_) => {}
@@ -25,10 +33,10 @@ pub fn convert_filter(filter: Filter) -> crate::Result<(Document, Vec<Document>)
     Ok(filter_pair)
 }
 
-fn filter_list(operation: &str, filters: Vec<Filter>) -> crate::Result<(Document, Vec<Document>)> {
+fn filter_list(operation: &str, filters: Vec<Filter>, invert: bool) -> crate::Result<(Document, Vec<JoinStage>)> {
     let filters = filters
         .into_iter()
-        .map(|f| convert_filter(f))
+        .map(|f| convert_filter(f, invert))
         .collect::<crate::Result<Vec<_>>>()?;
 
     let (filters, joins) = fold_nested(filters);
@@ -37,7 +45,7 @@ fn filter_list(operation: &str, filters: Vec<Filter>) -> crate::Result<(Document
 }
 
 // Todo we should really only join each relation once.
-fn fold_nested(nested: Vec<(Document, Vec<Document>)>) -> (Vec<Document>, Vec<Document>) {
+fn fold_nested(nested: Vec<(Document, Vec<JoinStage>)>) -> (Vec<Document>, Vec<JoinStage>) {
     nested.into_iter().fold((vec![], vec![]), |mut acc, next| {
         acc.0.push(next.0);
         acc.1.extend(next.1);
@@ -45,7 +53,7 @@ fn fold_nested(nested: Vec<(Document, Vec<Document>)>) -> (Vec<Document>, Vec<Do
     })
 }
 
-fn scalar_filter(filter: ScalarFilter) -> crate::Result<Document> {
+fn scalar_filter(filter: ScalarFilter, invert: bool) -> crate::Result<Document> {
     // Todo: Find out what Compound cases are really. (Guess: Relation fields with multi-field FK?)
     let field = match filter.projection {
         connector_interface::ScalarProjection::Single(sf) => sf,
@@ -54,8 +62,8 @@ fn scalar_filter(filter: ScalarFilter) -> crate::Result<Document> {
     };
 
     let filter = match filter.mode {
-        QueryMode::Default => default_scalar_filter(&field, filter.condition)?,
-        QueryMode::Insensitive => insensitive_scalar_filter(&field, filter.condition)?,
+        QueryMode::Default => default_scalar_filter(&field, filter.condition.invert(invert))?,
+        QueryMode::Insensitive => insensitive_scalar_filter(&field, filter.condition.invert(invert))?,
     };
 
     Ok(doc! { field.db_name(): filter })
@@ -146,32 +154,87 @@ fn insensitive_scalar_filter(field: &ScalarFieldRef, condition: ScalarCondition)
     })
 }
 
-fn scalar_list_filter(filter: ScalarListFilter) -> crate::Result<Document> {
+fn scalar_list_filter(filter: ScalarListFilter, invert: bool) -> crate::Result<Document> {
     let field = filter.field;
 
-    let filter_doc = match filter.condition {
-        connector_interface::ScalarListCondition::Contains(val) => {
-            doc! { field.db_name(): (&field, val).into_bson()? }
-        }
+    // Of course Mongo needs special filters for the inverted case, everything else would be too easy.
+    let filter_doc = if invert {
+        match filter.condition {
+            // "Contains element" -> "Does not contain element"
+            connector_interface::ScalarListCondition::Contains(val) => {
+                doc! { field.db_name(): { "$elemMatch": { "$not": { "$eq": (&field, val).into_bson()? }}}}
+            }
 
-        connector_interface::ScalarListCondition::ContainsEvery(vals) => {
-            doc! { field.db_name(): { "$all": (&field, PrismaValue::List(vals)).into_bson()? }}
-        }
+            // "Contains all elements" -> "Does not contain any of the elements"
+            connector_interface::ScalarListCondition::ContainsEvery(vals) => {
+                doc! { field.db_name(): { "$nin": (&field, PrismaValue::List(vals)).into_bson()? }}
+            }
 
-        connector_interface::ScalarListCondition::ContainsSome(vals) => {
-            doc! { "$or": vals.into_iter().map(|val| Ok(doc! { field.db_name(): (&field, val).into_bson()? }) ).collect::<crate::Result<Vec<_>>>()?}
-        }
+            // "Contains some of the elements" -> "Does not contain some of the elements"
+            connector_interface::ScalarListCondition::ContainsSome(vals) => {
+                doc! { field.db_name(): { "$elemMatch": { "$not": { "$in": (&field, PrismaValue::List(vals)).into_bson()? }}}}
+            }
 
-        connector_interface::ScalarListCondition::IsEmpty(empty) => {
-            if empty {
-                doc! { field.db_name(): { "$size": 0 }}
-            } else {
-                doc! { field.db_name(): { "$not": { "$size": 0 }}}
+            // Empty -> not empty and vice versa
+            connector_interface::ScalarListCondition::IsEmpty(check_for_empty) => {
+                if check_for_empty && !invert {
+                    doc! { field.db_name(): { "$size": 0 }}
+                } else {
+                    doc! { field.db_name(): { "$not": { "$size": 0 }}}
+                }
+            }
+        }
+    } else {
+        match filter.condition {
+            connector_interface::ScalarListCondition::Contains(val) => {
+                doc! { field.db_name(): (&field, val).into_bson()? }
+            }
+
+            connector_interface::ScalarListCondition::ContainsEvery(vals) => {
+                doc! { field.db_name(): { "$all": (&field, PrismaValue::List(vals)).into_bson()? }}
+            }
+
+            connector_interface::ScalarListCondition::ContainsSome(vals) => {
+                doc! { "$or": vals.into_iter().map(|val| Ok(doc! { field.db_name(): (&field, val).into_bson()? }) ).collect::<crate::Result<Vec<_>>>()?}
+            }
+
+            connector_interface::ScalarListCondition::IsEmpty(empty) => {
+                if empty {
+                    doc! { field.db_name(): { "$size": 0 }}
+                } else {
+                    doc! { field.db_name(): { "$not": { "$size": 0 }}}
+                }
             }
         }
     };
 
     Ok(filter_doc)
+}
+
+// Can be optimized by checking inlined fields on the left side instead of always joining.
+fn one_is_null(filter: OneRelationIsNullFilter, invert: bool) -> crate::Result<(Document, Vec<JoinStage>)> {
+    let rf = filter.field;
+
+    let right_model = rf.related_model();
+    let right_model_name = right_model.db_name();
+    let mut left_scalars = rf.left_scalars();
+    let mut right_scalars = rf.right_scalars();
+    let relation_name = &rf.relation().name;
+
+    let filter_doc = if invert {
+        doc! { relation_name: { "$not": { "$size": 0 }}}
+    } else {
+        doc! { relation_name: { "$size": 0 }}
+    };
+
+    let join_doc = doc! {
+        "from": right_model_name,
+        "localField": left_scalars.pop().unwrap().db_name(),
+        "foreignField": right_scalars.pop().unwrap().db_name(),
+        "as": relation_name
+    };
+
+    Ok((filter_doc, vec![JoinStage::new(rf, join_doc)]))
 }
 
 fn to_regex_list(
