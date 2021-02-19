@@ -256,6 +256,50 @@ async fn removing_an_inline_relation_must_work(api: &TestApi) -> TestResult {
 }
 
 #[test_each_connector]
+async fn compound_foreign_keys_should_work_in_correct_order(api: &TestApi) -> TestResult {
+    let dm1 = r#"
+        model A {
+            id Int @id
+            b Int
+            a Int
+            d Int
+            bb B @relation(fields: [a, b, d], references: [a_id, b_id, d_id])
+        }
+
+        model B {
+            b_id Int
+            a_id Int
+            d_id Int
+            @@id([a_id, b_id, d_id])
+        }
+    "#;
+
+    api.schema_push(dm1).send().await?.assert_green()?;
+
+    let result = api.describe_database().await?;
+    let table = result.table_bang("A");
+
+    assert_eq!(
+        table.foreign_keys,
+        &[ForeignKey {
+            constraint_name: match api.sql_family() {
+                SqlFamily::Postgres => Some("A_a_b_d_fkey".to_owned()),
+                SqlFamily::Sqlite => None,
+                SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
+                SqlFamily::Mssql => Some("A_a_b_d_fkey".to_owned()),
+            },
+            columns: vec!["a".to_string(), "b".to_string(), "d".to_string()],
+            referenced_table: "B".to_string(),
+            referenced_columns: vec!["a_id".to_string(), "b_id".to_string(), "d_id".to_string()],
+            on_delete_action: ForeignKeyAction::Cascade,
+            on_update_action: ForeignKeyAction::NoAction,
+        }]
+    );
+
+    Ok(())
+}
+
+#[test_each_connector]
 async fn moving_an_inline_relation_to_the_other_side_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model A {
