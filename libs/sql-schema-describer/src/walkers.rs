@@ -306,12 +306,10 @@ impl<'schema> ForeignKeyWalker<'schema> {
 
     /// The foreign key columns on the referencing table.
     pub fn constrained_columns<'b>(&'b self) -> impl Iterator<Item = ColumnWalker<'schema>> + 'b {
-        self.table().columns().filter(move |column| {
-            self.foreign_key()
-                .columns
-                .iter()
-                .any(|colname| colname == column.name())
-        })
+        self.foreign_key()
+            .columns
+            .iter()
+            .filter_map(move |colname| self.table().columns().find(|column| colname == column.name()))
     }
 
     /// The name of the foreign key constraint.
