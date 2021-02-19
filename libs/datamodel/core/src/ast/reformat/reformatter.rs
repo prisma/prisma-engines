@@ -16,6 +16,7 @@ impl<'a> Reformatter<'a> {
     pub fn new(input: &'a str) -> Self {
         let missing_fields = Self::find_all_missing_fields(&input);
         let missing_field_attributes = Self::find_all_missing_attributes(&input);
+        // let missing_attribute_args = Self::find_all_missing_attribute_args(&input);
 
         Reformatter {
             input,
@@ -29,6 +30,8 @@ impl<'a> Reformatter<'a> {
         let mut diagnostics = crate::diagnostics::Diagnostics::new();
         let schema_ast = crate::parse_schema_ast(&schema_string)?;
         let validated_datamodel = crate::parse_datamodel_and_ignore_datasource_urls_for_formatter(&schema_string)?;
+
+        println!("Reformatter: \n{:#?}", validated_datamodel.subject);
         let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(None);
         let mut result = Vec::new();
 
@@ -93,6 +96,43 @@ impl<'a> Reformatter<'a> {
     }
 
     //add missing attribute args
+    //start with @relation -> fields, references
+    // fn find_all_missing_attribute_args(
+    //     schema_string: &str,
+    // ) -> Result<Vec<MissingFieldAttribute>, crate::diagnostics::Diagnostics> {
+    //     let mut diagnostics = crate::diagnostics::Diagnostics::new();
+    //     let schema_ast = crate::parse_schema_ast(&schema_string)?;
+    //     let validated_datamodel = crate::parse_datamodel_and_ignore_datasource_urls_for_formatter(&schema_string)?;
+    //     diagnostics.append_warning_vec(validated_datamodel.warnings);
+    //     let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(None);
+    //     let mut missing_field_attributes = Vec::new();
+    //     for model in validated_datamodel.subject.models() {
+    //         let ast_model = schema_ast.find_model(&model.name).unwrap();
+    //         for field in model.fields() {
+    //             let original_ast_field = ast_model.fields.iter().find(|f| f.name.name == field.name());
+    //             let new_ast_field = lowerer.lower_field(&field, &validated_datamodel.subject);
+    //             if original_ast_field.is_some() {
+    //                 for attribute in new_ast_field.attributes {
+    //                     if let Some(original_field) = original_ast_field {
+    //                         if original_field
+    //                             .attributes
+    //                             .iter()
+    //                             .find(|d| d.name.name == attribute.name.name)
+    //                             .is_none()
+    //                         {
+    //                             missing_field_attributes.push(MissingFieldAttribute {
+    //                                 model: model.name.clone(),
+    //                                 field: field.name().to_string(),
+    //                                 attribute,
+    //                             })
+    //                         }
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     Ok(missing_field_attributes)
+    // }
 
     pub fn reformat_to(&self, output: &mut dyn std::io::Write, ident_width: usize) {
         let result = self.reformat_internal(ident_width);

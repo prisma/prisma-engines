@@ -1,6 +1,6 @@
+use datamodel::parse_datamodel;
+use indoc::indoc;
 use pretty_assertions::assert_eq;
-
-// add validation at the end
 
 #[test]
 fn back_relation_fields_must_be_added() {
@@ -397,9 +397,229 @@ model Post {
     assert_reformat(input, expected);
 }
 
+// scalar above corresponding relationfield?
+
+#[test]
+fn forward_relation_fields_must_be_added() {
+    let input = indoc! {r#"
+        model PostableEntity {
+            id String @id
+        }
+         
+        model Post {
+            id        String   @id
+            postableEntities PostableEntity[]
+        }
+"#};
+
+    let expected = indoc! {r#"
+         model PostableEntity {
+           id     String  @id
+           Post   Post?   @relation(fields: [postId], references: [id])
+           postId String?
+         }
+         
+         model Post {
+           id               String           @id
+           postableEntities PostableEntity[]
+         }
+         
+"#};
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn must_add_back_relation_fields_for_given_list_field() {
+    let input = indoc! {r#"
+    model User {
+        id Int @id
+        posts Post[]
+    }
+
+    model Post {
+        post_id Int @id
+    }
+    "#};
+
+    let expected = indoc! {r#"
+    model User {
+      id    Int    @id
+      posts Post[]
+    }
+
+    model Post {
+      post_id Int   @id
+      User    User? @relation(fields: [userId], references: [id])
+      userId  Int?
+    }
+    "#};
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn must_add_back_relation_fields_for_given_singular_field() {
+    let input = indoc! {r#"
+    model User {
+        id     Int @id
+        postId Int     
+        post   Post @relation(fields: [postId], references: [post_id]) 
+    }
+
+    model Post {
+        post_id Int @id
+    }
+    "#};
+
+    let expected = indoc! {r#"
+    model User {
+      id     Int  @id
+      postId Int
+      post   Post @relation(fields: [postId], references: [post_id])
+    }
+    
+    model Post {
+      post_id Int    @id
+      User    User[]
+    }
+    "#};
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn must_add_back_relation_fields_for_self_relations() {
+    let input = indoc! {r#"
+    model Human {
+        id    Int @id
+        sonId Int?
+        son   Human? @relation(fields: [sonId], references: [id]) 
+    }
+    "#};
+
+    let expected = indoc! {r#"
+    model Human {
+      id    Int     @id
+      sonId Int?
+      son   Human?  @relation(fields: [sonId], references: [id])
+      Human Human[] @relation("HumanToHuman")
+    }
+    "#};
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn should_camel_case_back_relation_field_name() {
+    let input = indoc! {r#"
+    model OhWhatAUser {
+        id Int @id
+        posts Post[]
+    }
+
+    model Post {
+        post_id Int @id
+    }
+    "#};
+
+    let expected = indoc! {r#"
+    model OhWhatAUser {
+      id    Int    @id
+      posts Post[]
+    }
+    
+    model Post {
+      post_id       Int          @id
+      OhWhatAUser   OhWhatAUser? @relation(fields: [ohWhatAUserId], references: [id])
+      ohWhatAUserId Int?
+    }
+    "#};
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+//todo I dont like that mother and User field are both the same relation but only one side prints its relationname
+fn add_backrelation_for_unambiguous_self_relations_in_presence_of_unrelated_other_relations() {
+    let input = indoc! {r#"
+        model User {
+            id          Int @id
+            motherId    Int
+            mother      User @relation(fields: motherId, references: id)      
+            subscribers Follower[]
+        }
+
+        model Follower {
+            id        Int   @id
+            following User[]
+        }
+    "#};
+
+    let expected = indoc! {r#"
+    model User {
+      id          Int        @id
+      motherId    Int
+      mother      User       @relation(fields: motherId, references: id)
+      subscribers Follower[]
+      User        User[]     @relation("UserToUser")
+    }
+    
+    model Follower {
+      id        Int    @id
+      following User[]
+    }
+    "#};
+
+    assert_reformat(input, expected);
+    assert_eq!(true, false);
+}
+
+#[test]
+fn must_succeed_when_fields_argument_is_missing_for_one_to_many() {
+    let input = indoc! {r#"
+    model User {
+        id        Int @id
+        firstName String
+        posts     Post[]
+    }
+
+    model Post {
+        id     Int     @id
+        userId Int
+        user   User    @relation(references: [id])
+    }
+    "#};
+
+    let expected = indoc! {r#"
+    model User {
+      id          Int        @id
+      motherId    Int
+      mother      User       @relation(fields: motherId, references: id)
+      subscribers Follower[]
+      User        User[]     @relation("UserToUser")
+    }
+    
+    model Follower {
+      id        Int    @id
+      following User[]
+    }
+    "#};
+
+    assert_reformat(input, expected);
+}
+
 fn assert_reformat(schema: &str, expected_result: &str) {
-    println!("schema: {:?}", schema);
+    println!("Input:\n{:?}", schema);
+    //make sure expecation is valid
+    parse_datamodel(expected_result).unwrap();
+
+    //reformat input
     let result = datamodel::ast::reformat::Reformatter::new(&schema).reformat_to_string();
-    println!("result: {}", result);
+    //make sure reformatted input is valid
+    println!("Reformatted:\n {}", result);
+    let dm = parse_datamodel(&result).unwrap();
+    println!("Parsed:\n{:#?}", dm.subject);
+
     assert_eq!(result, expected_result);
 }

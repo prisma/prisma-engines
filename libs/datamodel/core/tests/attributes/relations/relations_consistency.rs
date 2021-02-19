@@ -5,7 +5,7 @@ use datamodel::dml::ScalarType;
 use datamodel::{render_datamodel_to_string, FieldType, ScalarField};
 use pretty_assertions::assert_eq;
 
-//todo formatter test
+//todo most of these tests can probably be duplicated: once as a failing validation test and once as a reformatter test case
 #[test]
 fn must_render_generated_back_relation_fields() {
     let dml = r#"
@@ -38,7 +38,6 @@ model Post {
 }
 
 #[test]
-#[ignore]
 fn must_add_referenced_fields_on_the_right_side_for_one_to_one_relations() {
     // the to fields are always added to model with the lower name in lexicographic order
     let dml = r#"
@@ -87,7 +86,6 @@ fn must_add_referenced_fields_on_the_right_side_for_one_to_one_relations() {
 }
 
 #[test]
-#[ignore]
 fn must_add_referenced_fields_correctly_for_one_to_one_relations() {
     // Post is lower that User. So the references should be stored in Post.
     let dml = r#"
@@ -141,7 +139,6 @@ fn must_add_referenced_fields_on_both_sides_for_many_to_many_relations() {
 }
 
 #[test]
-#[ignore]
 fn must_add_referenced_fields_on_both_sides_for_one_to_many_relations() {
     let dml = r#"
     model User {
@@ -359,7 +356,6 @@ fn should_add_back_relations_for_more_complex_cases() {
 }
 
 #[test]
-#[ignore]
 fn should_add_referenced_fields_on_the_correct_side_tie_breaker() {
     let dml = r#"
     model User {
@@ -388,7 +384,6 @@ fn should_add_referenced_fields_on_the_correct_side_tie_breaker() {
 }
 
 #[test]
-#[ignore]
 fn should_add_referenced_fields_on_the_correct_side_list() {
     let dml = r#"
     model User {
@@ -417,27 +412,6 @@ fn should_add_referenced_fields_on_the_correct_side_list() {
 }
 
 #[test]
-fn should_camel_case_back_relation_field_name() {
-    let dml = r#"
-    model OhWhatAUser {
-        id Int @id
-        posts Post[]
-    }
-
-    model Post {
-        post_id Int @id
-    }
-    "#;
-
-    let schema = parse(dml);
-    schema
-        .assert_has_model("Post")
-        .assert_has_relation_field("OhWhatAUser")
-        .assert_relation_to("OhWhatAUser");
-}
-
-#[test]
-#[ignore]
 fn should_add_embed_ids_on_self_relations() {
     let dml = r#"
     model Human {

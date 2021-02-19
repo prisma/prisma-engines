@@ -397,31 +397,6 @@ fn relation_must_succeed_when_type_alias_is_used_for_referenced_field() {
 }
 
 #[test]
-fn must_succeed_when_fields_argument_is_missing_for_one_to_many() {
-    let dml = r#"
-    model User {
-        id        Int @id
-        firstName String
-        posts     Post[]
-    }
-
-    model Post {
-        id     Int     @id
-        userId Int
-        user   User    @relation(references: [id])
-    }
-    "#;
-
-    let result = parse(dml);
-    result
-        .assert_has_model("Post")
-        .assert_has_relation_field("user")
-        .assert_relation_base_fields(&["userId"]);
-    result.assert_has_model("User");
-}
-
-#[test]
-#[ignore] //todo reactivate this again
 fn must_error_when_references_argument_is_missing_for_one_to_many() {
     let dml = r#"
     model User {
@@ -476,7 +451,6 @@ fn must_error_fields_or_references_argument_is_placed_on_wrong_side_for_one_to_m
 }
 
 #[test]
-#[ignore]
 fn must_error_when_both_arguments_are_missing_for_one_to_many() {
     let dml = r#"
     model User {
@@ -524,15 +498,12 @@ fn must_error_when_fields_argument_is_missing_for_one_to_one() {
     }
     "#;
 
-    let result = parse(dml);
-    result
-        .assert_has_model("Post")
-        .assert_has_relation_field("user")
-        .assert_relation_base_fields(&["userId"]);
-    result
-        .assert_has_model("User")
-        .assert_has_relation_field("post")
-        .assert_relation_base_fields(&[]);
+    let errors = parse_error(dml);
+
+    errors.assert_are(
+        &[DatamodelError::new_attribute_validation_error("The relation fields `post` on Model `User` and `user` on Model `Post` do not provide the `fields` argument in the @relation attribute. You have to provide it on one of the two fields.", "relation",Span::new(77, 93)), 
+            DatamodelError::new_attribute_validation_error("The relation fields `user` on Model `Post` and `post` on Model `User` do not provide the `fields` argument in the @relation attribute. You have to provide it on one of the two fields.", "relation",Span::new(171, 214))],
+    );
 }
 
 #[test]
