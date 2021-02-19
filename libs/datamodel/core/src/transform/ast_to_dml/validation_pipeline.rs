@@ -27,7 +27,7 @@ impl<'a, 'b> ValidationPipeline<'a> {
     /// * Perform string interpolation
     /// * Resolve and check default values
     /// * Resolve and check all field types
-    pub fn validate(&self, ast_schema: &ast::SchemaAst) -> Result<ValidatedDatamodel, Diagnostics> {
+    pub fn validate(&self, ast_schema: &ast::SchemaAst, transform: bool) -> Result<ValidatedDatamodel, Diagnostics> {
         let mut diagnostics = Diagnostics::new();
 
         // Phase 0 is parsing.
@@ -65,9 +65,19 @@ impl<'a, 'b> ValidationPipeline<'a> {
 
         // TODO: Move consistency stuff into different module.
         // Phase 5: Consistency fixes. These don't fail.
-        if let Err(mut err) = self.standardiser.standardise(ast_schema, &mut schema) {
+        if let Err(mut err) = self.standardiser.standardise(ast_schema, &mut schema, transform) {
             diagnostics.append(&mut err);
         }
+
+        //todo step that always runs (formatting and parsing)
+        // relationname addition
+        // m2m references addition
+
+        //todo step only for formatter
+        // and the formatter part
+        // adding backrelation fields
+        // adding references
+        // adding scalar fields
 
         // Early return so that the post validation does not have to deal with invalid schemas
         if diagnostics.has_errors() {

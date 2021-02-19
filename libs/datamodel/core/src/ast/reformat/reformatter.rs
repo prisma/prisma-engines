@@ -16,6 +16,7 @@ impl<'a> Reformatter<'a> {
     pub fn new(input: &'a str) -> Self {
         let missing_fields = Self::find_all_missing_fields(&input);
         let missing_field_attributes = Self::find_all_missing_attributes(&input);
+
         Reformatter {
             input,
             missing_fields,
@@ -27,7 +28,7 @@ impl<'a> Reformatter<'a> {
     fn find_all_missing_fields(schema_string: &str) -> Result<ValidatedMissingFields, crate::diagnostics::Diagnostics> {
         let mut diagnostics = crate::diagnostics::Diagnostics::new();
         let schema_ast = crate::parse_schema_ast(&schema_string)?;
-        let validated_datamodel = crate::parse_datamodel_and_ignore_datasource_urls(&schema_string)?;
+        let validated_datamodel = crate::parse_datamodel_and_ignore_datasource_urls_for_formatter(&schema_string)?;
         let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(None);
         let mut result = Vec::new();
 
@@ -59,7 +60,7 @@ impl<'a> Reformatter<'a> {
     ) -> Result<Vec<MissingFieldAttribute>, crate::diagnostics::Diagnostics> {
         let mut diagnostics = crate::diagnostics::Diagnostics::new();
         let schema_ast = crate::parse_schema_ast(&schema_string)?;
-        let validated_datamodel = crate::parse_datamodel_and_ignore_datasource_urls(&schema_string)?;
+        let validated_datamodel = crate::parse_datamodel_and_ignore_datasource_urls_for_formatter(&schema_string)?;
         diagnostics.append_warning_vec(validated_datamodel.warnings);
         let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(None);
         let mut missing_field_attributes = Vec::new();

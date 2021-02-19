@@ -1,30 +1,34 @@
+use indoc::indoc;
 use pretty_assertions::assert_eq;
 
 // add validation at the end
 
 #[test]
 fn forward_relation_fields_must_be_added() {
-    let input = r#"model PostableEntity {
-          id String @id
-         }
+    let input = indoc! {r#"
+        model PostableEntity {
+            id String @id
+        }
          
-         model Post {
+        model Post {
             id        String   @id
             postableEntities PostableEntity[]
-         }
-"#;
+        }
+"#};
 
-    let expected = r#"model PostableEntity {
-            id        String @id
-            postId    String @relation(fields: postId, references: id)      
-            Post      Post?
+    let expected = indoc! {r#"
+         model PostableEntity {
+           id     String  @id
+           Post   Post?   @relation(fields: [postId], references: [id])
+           postId String?
          }
          
          model Post {
-            id                  String   @id
-            postableEntities    PostableEntity[]
+           id               String           @id
+           postableEntities PostableEntity[]
          }
-"#;
+         
+"#};
 
     assert_reformat(input, expected);
 }

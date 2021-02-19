@@ -98,19 +98,25 @@ use transform::{
 
 /// Parses and validates a datamodel string, using core attributes only.
 pub fn parse_datamodel(datamodel_string: &str) -> Result<ValidatedDatamodel, diagnostics::Diagnostics> {
-    parse_datamodel_internal(datamodel_string, false)
+    parse_datamodel_internal(datamodel_string, false, false)
 }
 
 pub fn parse_datamodel_and_ignore_datasource_urls(
     datamodel_string: &str,
 ) -> Result<ValidatedDatamodel, diagnostics::Diagnostics> {
-    parse_datamodel_internal(datamodel_string, true)
+    parse_datamodel_internal(datamodel_string, true, false)
+}
+
+pub fn parse_datamodel_and_ignore_datasource_urls_for_formatter(
+    datamodel_string: &str,
+) -> Result<ValidatedDatamodel, diagnostics::Diagnostics> {
+    parse_datamodel_internal(datamodel_string, true, true)
 }
 
 /// Parses and validates a datamodel string, using core attributes only.
 /// In case of an error, a pretty, colorful string is returned.
 pub fn parse_datamodel_or_pretty_error(datamodel_string: &str, file_name: &str) -> Result<ValidatedDatamodel, String> {
-    match parse_datamodel_internal(datamodel_string, false) {
+    match parse_datamodel_internal(datamodel_string, false, false) {
         Ok(dml) => Ok(dml),
         Err(errs) => {
             let mut buffer = std::io::Cursor::new(Vec::<u8>::new());
@@ -130,6 +136,7 @@ pub fn parse_datamodel_or_pretty_error(datamodel_string: &str, file_name: &str) 
 fn parse_datamodel_internal(
     datamodel_string: &str,
     ignore_datasource_urls: bool,
+    transform: bool,
 ) -> Result<ValidatedDatamodel, diagnostics::Diagnostics> {
     let mut diagnostics = diagnostics::Diagnostics::new();
     let ast = ast::parser::parse_schema(datamodel_string)?;
@@ -141,7 +148,7 @@ fn parse_datamodel_internal(
     diagnostics.append_warning_vec(sources.warnings);
     diagnostics.append_warning_vec(generators.warnings);
 
-    match validator.validate(&ast) {
+    match validator.validate(&ast, transform) {
         Ok(mut src) => {
             src.warnings.append(&mut diagnostics.warnings);
             Ok(src)
