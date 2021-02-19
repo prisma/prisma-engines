@@ -1,4 +1,6 @@
 use crate::common::*;
+use datamodel::ast::Span;
+use datamodel::diagnostics::DatamodelError;
 use datamodel::{dml, ScalarType};
 
 #[test]
@@ -99,10 +101,14 @@ fn allow_unambiguous_self_relations_in_presence_of_unrelated_other_relations() {
 
     parse(dml);
 }
+//todo decide if and where to move these
+
+//reformat implicit relations test files
 
 //todo this talked about adding backrelation fields but was adding forward field + scalarfield
 #[test]
 fn must_generate_forward_relation_fields_for_named_relation_fields() {
+    //reject, hint to prisma format, add scalar field and relation field, validate again
     let dml = r#"
     model Todo {
         id Int @id
@@ -114,22 +120,18 @@ fn must_generate_forward_relation_fields_for_named_relation_fields() {
     }
     "#;
 
-    let datamodel = parse(dml);
+    let errors = parse_error(dml);
 
-    println!("{:#?}", datamodel);
-    datamodel
-        .assert_has_model("User")
-        .assert_has_relation_field("Todo")
-        .assert_relation_name("AssignedTodos")
-        .assert_relation_to("Todo");
-
-    assert_eq!(true, false);
+    errors.assert_is(
+        DatamodelError::new_field_validation_error("The relation field `assignees` on Model `Todo` is missing an opposite relation field on the model `User`. Either run `prisma format` or add it manually.", "Todo", "assignees",Span::new(45, 95)),
+    );
 }
 
 // todo this is also accepted and adds a postId scalar field under the hood on PostableEntity
 // is almost the exact same case as the one above (minus the relationname), but reported as a bug and also understood by harshit as such
 #[test]
 fn issue4850() {
+    //reject, hint to prisma format, add scalar field and relation field, validate again
     let dml = r#"
          model PostableEntity {
           id String @id
@@ -141,22 +143,18 @@ fn issue4850() {
          }
     "#;
 
-    let datamodel = parse(dml);
+    let errors = parse_error(dml);
 
-    println!("{:#?}", datamodel);
-    datamodel
-        .assert_has_model("User")
-        .assert_has_relation_field("Todo")
-        .assert_relation_name("AssignedTodos")
-        .assert_relation_to("Todo");
-
-    assert_eq!(true, false);
+    errors.assert_is(
+        DatamodelError::new_field_validation_error("The relation field `postableEntities` on Model `Post` is missing an opposite relation field on the model `PostableEntity`. Either run `prisma format` or add it manually.", "Post", "postableEntities",Span::new(147, 181)),
+    );
 }
 
 //todo I think this should be fine and just add the @relation and relationname to the backrelation field
 // but this interprets the dm as containing two relations.
 #[test]
 fn issue4822() {
+    //reject, ask to name custom_Post relation
     let dml = r#"
          model Post {
            id          Int    @id 
@@ -170,44 +168,36 @@ fn issue4822() {
          }
     "#;
 
-    let datamodel = parse(dml);
-
-    println!("{:#?}", datamodel);
-    datamodel
-        .assert_has_model("User")
-        .assert_has_relation_field("Todo")
-        .assert_relation_name("AssignedTodos")
-        .assert_relation_to("Todo");
-
-    assert_eq!(true, false);
+    let errors = parse_error(dml);
+    errors.assert_are(
+        &[DatamodelError::new_field_validation_error("The relation field `custom_User` on Model `Post` is missing an opposite relation field on the model `User`. Either run `prisma format` or add it manually.", "Post", "custom_User",Span::new(107, 187)), 
+            DatamodelError::new_field_validation_error("The relation field `custom_Post` on Model `User` is missing an opposite relation field on the model `Post`. Either run `prisma format` or add it manually.", "User", "custom_Post",Span::new(284, 304))
+        ],
+    );
 }
 
 //todo this is also accepted and adds a organizationId scalar field under the hood
 #[test]
 fn issue5216() {
+    //reject,
     let dml = r#"
          model user {
-            id             String        @id @default(uuid()) @db.Uuid()
+            id             String        @id 
             email          String        @unique
             organization   organization? @relation(references: [id])
          }
          
          model organization {
-            id        String   @id @default(uuid()) @db.Uuid()
+            id        String   @id
             users     user[]
          }
     "#;
 
-    let datamodel = parse(dml);
+    let errors = parse_error(dml);
 
-    println!("{:#?}", datamodel);
-    datamodel
-        .assert_has_model("User")
-        .assert_has_relation_field("Todo")
-        .assert_relation_name("AssignedTodos")
-        .assert_relation_to("Todo");
-
-    assert_eq!(true, false);
+    errors.assert_is(
+        DatamodelError::new_attribute_validation_error("The relation field `organization` on Model `user` must specify the `fields` argument in the @relation attribute. You can run `prisma format` to fix this automatically.", "relation",Span::new(130, 187)),
+    );
 }
 
 //todo this is also accepted but will under the hood point the createdBy relationfield to the same userId scalar
@@ -219,13 +209,14 @@ fn issue5216() {
 // If the formatter is unable to correctly add @relation because of an ambiguity (e.g. user & createdBy), it shouldn't try. The validator will just tell you that you're missing @relation and need to add them in by hand to resolve the issue.
 #[test]
 fn issue5069() {
+    // reject
     let dml = r#"
          model Code {
           id          String        @id
-         
-          userId      String?
           createdById String?
-          createdBy   User?         
+          createdBy   User?
+                   
+          userId      String?
           user        User?         @relation("code", fields: [userId], references: [id])
         
         }
@@ -236,16 +227,11 @@ fn issue5069() {
         }
     "#;
 
-    let datamodel = parse(dml);
+    let errors = parse_error(dml);
 
-    println!("{:#?}", datamodel);
-    datamodel
-        .assert_has_model("User")
-        .assert_has_relation_field("Todo")
-        .assert_relation_name("AssignedTodos")
-        .assert_relation_to("Todo");
-
-    assert_eq!(true, false);
+    errors.assert_is(
+        DatamodelError::new_field_validation_error("The relation field `createdBy` on Model `Code` is missing an opposite relation field on the model `User`. Either run `prisma format` or add it manually.", "Code", "createdBy",Span::new(103, 121)),
+    );
 }
 
 //todo this does not error currently and seems to correctly add the backrelations.
@@ -368,6 +354,4 @@ model ServiceFulfillment{
     datamodel.assert_has_model("Account").assert_field_count(10);
     datamodel.assert_has_model("ServiceAgreement").assert_field_count(10);
     datamodel.assert_has_model("ServiceFulfillment").assert_field_count(9);
-
-    assert_eq!(true, false);
 }

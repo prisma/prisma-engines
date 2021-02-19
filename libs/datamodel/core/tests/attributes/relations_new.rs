@@ -421,7 +421,7 @@ fn must_succeed_when_fields_argument_is_missing_for_one_to_many() {
 }
 
 #[test]
-#[ignore]
+#[ignore] //todo reactivate this again
 fn must_error_when_references_argument_is_missing_for_one_to_many() {
     let dml = r#"
     model User {
@@ -536,7 +536,6 @@ fn must_error_when_fields_argument_is_missing_for_one_to_one() {
 }
 
 #[test]
-#[ignore]
 fn must_error_when_references_argument_is_missing_for_one_to_one() {
     let dml = r#"
     model User {
@@ -557,14 +556,14 @@ fn must_error_when_references_argument_is_missing_for_one_to_one() {
         0,
         DatamodelError::new_attribute_validation_error(
             "The relation fields `post` on Model `User` and `user` on Model `Post` do not provide the `references` argument in the @relation attribute. You have to provide it on one of the two fields.",
-            "relation", Span::new(77, 91)
+            "relation", Span::new(77, 92)
         ),
     );
     errors.assert_is_at(
         1,
         DatamodelError::new_attribute_validation_error(
             "The relation fields `user` on Model `Post` and `post` on Model `User` do not provide the `references` argument in the @relation attribute. You have to provide it on one of the two fields.",
-            "relation", Span::new(170, 212)
+            "relation", Span::new(170, 213)
         ),
     );
 }
@@ -755,13 +754,8 @@ fn must_allow_relations_with_default_native_types_with_annotation_on_one_side() 
     let dm1 = indoc! {
         r#"
         datasource db {
-        provider = "mysql"
-        url      = "mysql://"
-        }
-
-        generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["nativeTypes"]
+            provider = "mysql"
+            url      = "mysql://"
         }
 
         model Blog {
@@ -771,7 +765,8 @@ fn must_allow_relations_with_default_native_types_with_annotation_on_one_side() 
         }
 
         model User {
-            id Int @id
+            id        Int @id
+            blogs     Blog[]
         }
         "#
     };
@@ -779,13 +774,8 @@ fn must_allow_relations_with_default_native_types_with_annotation_on_one_side() 
     let dm2 = indoc! {
         r#"
         datasource db {
-        provider = "mysql"
-        url      = "mysql://"
-        }
-
-        generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["nativeTypes"]
+            provider = "mysql"
+            url      = "mysql://"
         }
 
         model Blog {
@@ -795,7 +785,9 @@ fn must_allow_relations_with_default_native_types_with_annotation_on_one_side() 
         }
 
         model User {
-            id Int @id @db.Int
+            id        Int @id @db.Int
+            blogs     Blog[]
+
         }
         "#
     };
@@ -803,13 +795,8 @@ fn must_allow_relations_with_default_native_types_with_annotation_on_one_side() 
     let dm3 = indoc! {
         r#"
         datasource db {
-        provider = "mysql"
-        url      = "mysql://"
-        }
-
-        generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["nativeTypes"]
+            provider = "mysql"
+            url      = "mysql://"
         }
 
         model Blog {
@@ -819,7 +806,8 @@ fn must_allow_relations_with_default_native_types_with_annotation_on_one_side() 
         }
 
         model User {
-            id Int @id @db.Int
+            id        Int @id @db.Int
+            blogs     Blog[]
         }
         "#
     };

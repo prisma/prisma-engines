@@ -91,6 +91,8 @@ impl<'a> Reformatter<'a> {
         Ok(missing_field_attributes)
     }
 
+    //add missing attribute args
+
     pub fn reformat_to(&self, output: &mut dyn std::io::Write, ident_width: usize) {
         let result = self.reformat_internal(ident_width);
         write!(output, "{}", result).unwrap()

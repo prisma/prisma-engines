@@ -67,6 +67,7 @@ pub trait DatamodelAsserts {
 
 pub trait ErrorAsserts {
     fn assert_is(&self, error: DatamodelError) -> &Self;
+    fn assert_are(&self, error: &[DatamodelError]) -> &Self;
     fn assert_is_message(&self, msg: &str) -> &Self;
     fn assert_is_at(&self, index: usize, error: DatamodelError) -> &Self;
     fn assert_length(&self, length: usize) -> &Self;
@@ -334,6 +335,12 @@ impl ErrorAsserts for Diagnostics {
             &self
         );
         assert_eq!(self.errors[0], error);
+
+        self
+    }
+
+    fn assert_are(&self, errors: &[DatamodelError]) -> &Self {
+        assert_eq!(self.errors, errors);
 
         self
     }

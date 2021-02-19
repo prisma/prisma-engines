@@ -5,6 +5,7 @@ use datamodel::dml::ScalarType;
 use datamodel::{render_datamodel_to_string, FieldArity, FieldType, ScalarField};
 use pretty_assertions::assert_eq;
 
+//todo this should now be a formatter test
 #[test]
 fn must_add_back_relation_fields_for_given_list_field() {
     let dml = r#"
@@ -72,6 +73,7 @@ fn must_add_back_relation_fields_for_given_singular_field() {
         .assert_arity(&datamodel::dml::FieldArity::List);
 }
 
+//todo formatter test
 #[test]
 fn must_render_generated_back_relation_fields() {
     let dml = r#"
@@ -298,6 +300,7 @@ model Author {
     assert_eq!(blog_model.fields().count(), 2);
 }
 
+//todo formatter test case
 #[test]
 fn should_add_back_relations_for_more_complex_cases() {
     let dml = r#"
@@ -610,6 +613,7 @@ fn should_not_get_confused_with_complicated_self_relations() {
         .assert_relation_referenced_fields(&["id"]);
 }
 
+//todo formatter test
 #[test]
 fn must_handle_conflicts_with_existing_fields_if_types_are_compatible() {
     let dml = r#"
@@ -633,6 +637,7 @@ fn must_handle_conflicts_with_existing_fields_if_types_are_compatible() {
         .assert_relation_base_fields(&["blogId"]);
 }
 
+//todo formatter
 #[test]
 fn must_handle_conflicts_with_existing_fields_if_types_are_incompatible() {
     let dml = r#"
@@ -658,6 +663,7 @@ fn must_handle_conflicts_with_existing_fields_if_types_are_incompatible() {
     field.assert_relation_base_fields(&["blogId_BlogToPost"]);
 }
 
+//todo formatter failure??
 #[test]
 fn must_handle_conflicts_with_existing_fields_if_types_are_incompatible_and_name_generation_breaks_down() {
     let dml = r#"

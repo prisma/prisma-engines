@@ -1,5 +1,7 @@
 use pretty_assertions::assert_eq;
 
+// add validation at the end
+
 #[test]
 fn back_relation_fields_must_be_added() {
     let input = r#"model Blog {

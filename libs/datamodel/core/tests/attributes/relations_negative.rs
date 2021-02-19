@@ -38,11 +38,36 @@ fn should_fail_on_colliding_implicit_self_relations() {
 "#;
 
     let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_model_validation_error(
-        "Colliding implicit relations. Please add scalar types husbandId, and teacherId.",
-        "User",
-        Span::new(5, 342),
-    ));
+    errors.assert_are(&[DatamodelError::new_attribute_validation_error(
+        "The relation fields `husband` on Model `User` and `wife` on Model `User` do not provide the `fields` argument in the @relation attribute. You have to provide it on one of the two fields.",
+        "relation",
+        Span::new(114, 165),
+    ),
+        DatamodelError::new_attribute_validation_error(
+            "The relation fields `husband` on Model `User` and `wife` on Model `User` do not provide the `references` argument in the @relation attribute. You have to provide it on one of the two fields.",
+            "relation",
+            Span::new(114, 165),
+        ),
+        DatamodelError::new_attribute_validation_error(
+            "The relation fields `wife` on Model `User` and `husband` on Model `User` do not provide the `fields` argument in the @relation attribute. You have to provide it on one of the two fields.",
+            "relation",
+            Span::new(173, 224),
+        ),
+        DatamodelError::new_attribute_validation_error(
+            "The relation fields `wife` on Model `User` and `husband` on Model `User` do not provide the `references` argument in the @relation attribute. You have to provide it on one of the two fields.",
+            "relation",
+            Span::new(173, 224),
+        ),
+        DatamodelError::new_attribute_validation_error(
+            "The relation field `teacher` on Model `User` must specify the `fields` argument in the @relation attribute. You can run `prisma format` to fix this automatically.",
+            "relation",
+            Span::new(233, 283),
+        ),
+        DatamodelError::new_attribute_validation_error(
+            "The relation field `teacher` on Model `User` must specify the `references` argument in the @relation attribute.",
+            "relation",
+            Span::new(233, 283),
+        )]);
 }
 
 #[test]
@@ -177,6 +202,7 @@ fn should_fail_on_ambiguous_named_self_relation() {
     ));
 }
 
+//todo formatter error
 #[test]
 fn should_fail_on_conflicting_back_relation_field_name() {
     let dml = r#"

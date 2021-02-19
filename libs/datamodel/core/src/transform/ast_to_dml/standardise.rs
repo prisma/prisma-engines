@@ -24,12 +24,14 @@ impl Standardiser {
     pub fn standardise(&self, ast_schema: &ast::SchemaAst, schema: &mut dml::Datamodel) -> Result<(), Diagnostics> {
         self.name_unnamed_relations(schema);
 
-        self.add_missing_back_relations(ast_schema, schema)?;
+        // self.add_missing_back_relations(ast_schema, schema)?;
 
         // This is intentionally disabled for now, since the generated types would surface in the
         // client schema.
         // self.add_missing_relation_tables(ast_schema, schema)?;
-        self.set_relation_to_field_to_id_if_missing(ast_schema, schema)?;
+
+        //todo keep doing this for m2m but not for others?
+        // self.set_relation_to_field_to_id_if_missing(ast_schema, schema)?;
 
         Ok(())
     }
