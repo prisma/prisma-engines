@@ -53,6 +53,8 @@ pub struct SqlSchema {
     pub sequences: Vec<Sequence>,
     /// The schema's views,
     pub views: Vec<View>,
+    /// The stored procedures.
+    pub procedures: Vec<Procedure>,
 }
 
 impl SqlSchema {
@@ -71,6 +73,11 @@ impl SqlSchema {
         self.enums.iter().find(|x| x.name == name)
     }
 
+    /// Get a procedure.
+    pub fn get_procedure(&self, name: &str) -> Option<&Procedure> {
+        self.procedures.iter().find(|x| x.name == name)
+    }
+
     /// Is this schema empty?
     pub fn is_empty(&self) -> bool {
         matches!(
@@ -80,7 +87,8 @@ impl SqlSchema {
                 enums,
                 sequences,
                 views,
-            } if tables.is_empty() && enums.is_empty() && sequences.is_empty() && views.is_empty()
+                procedures,
+            } if tables.is_empty() && enums.is_empty() && sequences.is_empty() && views.is_empty() && procedures.is_empty()
         )
     }
 
@@ -106,6 +114,7 @@ impl SqlSchema {
             enums: Vec::new(),
             sequences: Vec::new(),
             views: Vec::new(),
+            procedures: Vec::new(),
         }
     }
 
@@ -189,6 +198,7 @@ impl Table {
         }
     }
 }
+
 /// The type of an index.
 #[derive(PartialEq, Debug, Clone)]
 pub enum IndexType {
@@ -219,6 +229,15 @@ impl Index {
     pub fn is_unique(&self) -> bool {
         self.tpe == IndexType::Unique
     }
+}
+
+/// A stored procedure (like, the function inside your database).
+#[derive(PartialEq, Debug, Clone)]
+pub struct Procedure {
+    /// Procedure name.
+    pub name: String,
+    /// The definition of the procedure.
+    pub definition: String,
 }
 
 /// The primary key of a table.

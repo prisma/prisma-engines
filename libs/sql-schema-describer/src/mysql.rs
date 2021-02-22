@@ -72,11 +72,13 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
         }
 
         let views = self.get_views(schema).await?;
+        let procedures = self.get_procedures(schema).await?;
 
         Ok(SqlSchema {
             tables,
             enums,
             views,
+            procedures,
             sequences: vec![],
         })
     }
@@ -128,6 +130,29 @@ impl SqlSchemaDescriber {
         }
 
         Ok(views)
+    }
+
+    #[tracing::instrument(skip(self))]
+    async fn get_procedures(&self, schema: &str) -> DescriberResult<Vec<Procedure>> {
+        let sql = r#"
+            SELECT routine_name AS name,
+                routine_definition AS definition
+            FROM information_schema.routines
+            WHERE ROUTINE_SCHEMA = ?
+            AND ROUTINE_TYPE = 'PROCEDURE'
+        "#;
+
+        let rows = self.conn.query_raw(sql, &[schema.into()]).await?;
+        let mut procedures = Vec::with_capacity(rows.len());
+
+        for row in rows.into_iter() {
+            procedures.push(Procedure {
+                name: row.get_expect_string("name"),
+                definition: row.get_expect_string("definition"),
+            });
+        }
+
+        Ok(procedures)
     }
 
     #[tracing::instrument(skip(self))]
