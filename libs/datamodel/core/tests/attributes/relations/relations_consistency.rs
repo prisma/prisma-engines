@@ -86,33 +86,6 @@ fn must_add_referenced_fields_on_the_right_side_for_one_to_one_relations() {
 }
 
 #[test]
-fn must_add_referenced_fields_correctly_for_one_to_one_relations() {
-    // Post is lower that User. So the references should be stored in Post.
-    let dml = r#"
-    model User {
-        user_id Int  @id
-        post    Post
-    }
-
-    model Post {
-        post_id Int  @id
-        user    User
-    }
-    "#;
-
-    let schema = parse(dml);
-
-    schema
-        .assert_has_model("User")
-        .assert_has_relation_field("post")
-        .assert_relation_referenced_fields(&[]);
-    schema
-        .assert_has_model("Post")
-        .assert_has_relation_field("user")
-        .assert_relation_referenced_fields(&["user_id"]);
-}
-
-#[test]
 fn must_add_referenced_fields_on_both_sides_for_many_to_many_relations() {
     let dml = r#"
     model User {

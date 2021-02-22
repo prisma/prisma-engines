@@ -1,4 +1,5 @@
 use super::*;
+use crate::transform::ast_to_dml::standardise_parsing::StandardiserForParsing;
 use crate::{ast, configuration, diagnostics::Diagnostics, ValidatedDatamodel};
 
 /// Is responsible for loading and validating the Datamodel defined in an AST.
@@ -6,7 +7,8 @@ use crate::{ast, configuration, diagnostics::Diagnostics, ValidatedDatamodel};
 pub struct ValidationPipeline<'a> {
     lifter: LiftAstToDml<'a>,
     validator: Validator<'a>,
-    standardiser: Standardiser,
+    standardiser_for_parsing: StandardiserForParsing,
+    standardiser_for_formatting: StandardiserForFormatting,
 }
 
 impl<'a, 'b> ValidationPipeline<'a> {
@@ -15,7 +17,8 @@ impl<'a, 'b> ValidationPipeline<'a> {
         ValidationPipeline {
             lifter: LiftAstToDml::new(source),
             validator: Validator::new(source),
-            standardiser: Standardiser::new(),
+            standardiser_for_formatting: StandardiserForFormatting::new(),
+            standardiser_for_parsing: StandardiserForParsing::new(),
         }
     }
 
@@ -64,21 +67,20 @@ impl<'a, 'b> ValidationPipeline<'a> {
         }
 
         // TODO: Move consistency stuff into different module.
-        // Phase 5: Consistency fixes. These don't fail.
-        if let Err(mut err) = self.standardiser.standardise(ast_schema, &mut schema, transform) {
+        // Phase 5: Consistency fixes. These don't fail and always run, during parsing AND formatting
+        if let Err(mut err) = self.standardiser_for_parsing.standardise(&mut schema) {
             diagnostics.append(&mut err);
         }
 
-        //todo step that always runs (formatting and parsing)
-        // relationname addition
-        // m2m references addition
+        println!("Standardised schema during parsing: \n{:#?}", schema);
 
-        //todo step only for formatter
-        // and the formatter part
-        // adding backrelation fields
-        // adding references
-        // adding scalar fields
-
+        // Phase 6: Consistency fixes. These only run during formatting.
+        if transform {
+            if let Err(mut err) = self.standardiser_for_formatting.standardise(ast_schema, &mut schema) {
+                diagnostics.append(&mut err);
+            }
+            println!("Standardised schema during formatting: \n{:#?}", schema);
+        }
         // Early return so that the post validation does not have to deal with invalid schemas
         if diagnostics.has_errors() {
             return Err(diagnostics);

@@ -1,10 +1,7 @@
 use super::common::*;
 use crate::diagnostics::DatamodelError;
 use crate::{
-    ast,
-    common::{NameNormalizer, RelationNames},
-    diagnostics::Diagnostics,
-    dml, Field, OnDeleteStrategy, ScalarField, UniqueCriteria,
+    ast, common::NameNormalizer, diagnostics::Diagnostics, dml, Field, OnDeleteStrategy, ScalarField, UniqueCriteria,
 };
 use itertools::Itertools;
 use std::collections::HashMap;
@@ -13,35 +10,16 @@ use std::collections::HashMap;
 ///
 /// When standardsing, datamodel will be made consistent.
 /// Implicit back relation fields, relation names and `references` will be generated.
-pub struct Standardiser {}
-
-impl Standardiser {
+pub struct StandardiserForFormatting {}
+impl StandardiserForFormatting {
     /// Creates a new instance, with all builtin attributes registered.
     pub fn new() -> Self {
-        Standardiser {}
+        StandardiserForFormatting {}
     }
 
-    pub fn standardise(
-        &self,
-        ast_schema: &ast::SchemaAst,
-        schema: &mut dml::Datamodel,
-        transform: bool,
-    ) -> Result<(), Diagnostics> {
-        self.name_unnamed_relations(schema);
-
-        if transform {
-            //todo move this to the formatter
-            self.add_missing_back_relations(ast_schema, schema)?;
-
-            //todo move this to the formatter
-            //todo keep doing this for m2m but not for others?
-            self.set_relation_to_field_to_id_if_missing(ast_schema, schema)?;
-        }
-
-        // This is intentionally disabled for now, since the generated types would surface in the
-        // client schema.
-        // self.add_missing_relation_tables(ast_schema, schema)?;
-
+    pub fn standardise(&self, ast_schema: &ast::SchemaAst, schema: &mut dml::Datamodel) -> Result<(), Diagnostics> {
+        self.add_missing_back_relations(ast_schema, schema)?;
+        self.set_relation_to_field_to_id_if_missing(ast_schema, schema)?;
         Ok(())
     }
 
@@ -67,13 +45,12 @@ impl Standardiser {
                     let related_model = schema_copy.find_model(&field.relation_info.to).expect(STATE_ERROR);
                     let related_field = schema_copy.find_related_field_bang(field);
                     let related_model_name = &related_model.name;
-                    let is_m2m = field.is_list() && related_field.is_list();
                     let rel_info = &mut field.relation_info;
                     let related_field_rel_info = &related_field.relation_info;
 
                     let embed_here = match (field.arity, related_field.arity) {
                         // many to many
-                        (dml::FieldArity::List, dml::FieldArity::List) => true,
+                        (dml::FieldArity::List, dml::FieldArity::List) => false, //handled during parsing
                         // one to many
                         (_, dml::FieldArity::List) => true,
                         // many to one
@@ -98,7 +75,7 @@ impl Standardiser {
                         }
 
                         // user input has precedence
-                        if !is_m2m && (rel_info.fields.is_empty() && related_field_rel_info.fields.is_empty()) {
+                        if rel_info.fields.is_empty() && related_field_rel_info.fields.is_empty() {
                             let unique_criteria = self.unique_criteria(&related_model);
                             let underlying_fields = self.underlying_fields_for_unique_criteria(
                                 &unique_criteria,
@@ -349,31 +326,6 @@ impl Standardiser {
                 )
             })
             .collect()
-    }
-
-    fn name_unnamed_relations(&self, datamodel: &mut dml::Datamodel) {
-        let unnamed_relations = self.find_unnamed_relations(&datamodel);
-
-        for (model_name, field_name, rel_info) in unnamed_relations {
-            // Embedding side.
-            let field = datamodel.find_relation_field_mut(&model_name, &field_name);
-            field.relation_info.name = RelationNames::name_for_unambiguous_relation(&model_name, &rel_info.to);
-        }
-    }
-
-    // Returns list of model name, field name and relation info.
-    fn find_unnamed_relations(&self, datamodel: &dml::Datamodel) -> Vec<(String, String, dml::RelationInfo)> {
-        let mut rels = Vec::new();
-
-        for model in datamodel.models() {
-            for field in model.relation_fields() {
-                if field.relation_info.name.is_empty() {
-                    rels.push((model.name.clone(), field.name.clone(), field.relation_info.clone()))
-                }
-            }
-        }
-
-        rels
     }
 }
 

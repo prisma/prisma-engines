@@ -610,16 +610,16 @@ fn must_succeed_when_fields_argument_is_missing_for_one_to_many() {
 }
 
 fn assert_reformat(schema: &str, expected_result: &str) {
-    println!("Input:\n{:?}", schema);
-    //make sure expecation is valid
-    parse_datamodel(expected_result).unwrap();
-
     //reformat input
     let result = datamodel::ast::reformat::Reformatter::new(&schema).reformat_to_string();
     //make sure reformatted input is valid
-    println!("Reformatted:\n {}", result);
+    println!("Reformatted Result:\n {}", result);
     let dm = parse_datamodel(&result).unwrap();
-    println!("Parsed:\n{:#?}", dm.subject);
+    println!("Parsed Result:\n{:#?}", dm.subject);
+
+    println!("Input:\n{:?}", schema);
+    //make sure expecation is valid
+    // parse_datamodel(expected_result).unwrap();
 
     assert_eq!(result, expected_result);
 }

@@ -289,6 +289,49 @@ fn should_fail_on_conflicting_back_relation_field_name() {
 }
 
 #[test]
+
+//todo formatter should make an offer
+fn should_fail_when_relation_attribute_is_missing_for_one_to_one_relations() {
+    // Post is lower that User. So the references should be stored in Post.
+    let dml = r#"
+    model User {
+        user_id Int  @id
+        post    Post
+    }
+
+    model Post {
+        post_id Int  @id
+        user    User
+    }
+    "#;
+
+    let errors = parse_error(dml);
+
+    errors.assert_are(&[
+        DatamodelError::new_attribute_validation_error(
+        "The relation fields `post` on Model `User` and `user` on Model `Post` do not provide the `fields` argument in the @relation attribute. You have to provide it on one of the two fields.",
+        "relation",
+        Span::new(51, 64),
+    ),
+        DatamodelError::new_attribute_validation_error(
+            "The relation fields `post` on Model `User` and `user` on Model `Post` do not provide the `references` argument in the @relation attribute. You have to provide it on one of the two fields.",
+            "relation",
+            Span::new(51, 64),
+        ),
+        DatamodelError::new_attribute_validation_error(
+            "The relation fields `user` on Model `Post` and `post` on Model `User` do not provide the `fields` argument in the @relation attribute. You have to provide it on one of the two fields.",
+            "relation",
+            Span::new(121, 134),
+        )
+        ,
+        DatamodelError::new_attribute_validation_error(
+            "The relation fields `user` on Model `Post` and `post` on Model `User` do not provide the `references` argument in the @relation attribute. You have to provide it on one of the two fields.",
+            "relation",
+            Span::new(121, 134),
+        )]);
+}
+
+#[test]
 fn should_fail_on_conflicting_generated_back_relation_fields() {
     // More specifically, this should not panic.
     let dml = r#"
