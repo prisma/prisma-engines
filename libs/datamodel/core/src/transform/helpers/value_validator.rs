@@ -92,11 +92,11 @@ impl ValueValidator {
         match &self.value {
             ast::Expression::Function(name, _, _) if name == "env" => {
                 let env_function = self.as_env_function()?;
-                let var_name = Some(env_function.var_name().to_string());
+                let var_name = Some(env_function.var_name().to_owned());
                 let value = env_function.evaluate().and_then(|x| x.as_str())?;
                 Ok((var_name, value))
             }
-            ast::Expression::StringValue(value, _) => Ok((None, value.to_string())),
+            ast::Expression::StringValue(value, _) => Ok((None, value.clone())),
             _ => Err(self.construct_type_mismatch_error("String")),
         }
     }

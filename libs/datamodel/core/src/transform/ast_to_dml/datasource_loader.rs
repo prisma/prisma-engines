@@ -160,56 +160,51 @@ impl DatasourceLoader {
 
         let shadow_database_url_arg = args.optional_arg(SHADOW_DATABASE_URL_KEY);
 
-        let shadow_database_url = if let Some(shadow_database_url_arg) = shadow_database_url_arg.as_ref() {
-            let shadow_database_url = match (shadow_database_url_arg.as_str_from_env(), override_url) {
-                (Err(err), _)
-                    if ignore_datasource_urls
-                        && err.description().contains("Expected a String value, but received") =>
-                {
-                    return Err(diagnostics.merge_error(err));
-                }
-                (_, _) if ignore_datasource_urls => {
-                    // glorious hack. ask marcus
-                    StringFromEnvVar {
-                        from_env_var: None,
-                        value: format!("{}://", providers.first().unwrap()),
+        let shadow_database_url: Option<StringFromEnvVar> =
+            if let Some(shadow_database_url_arg) = shadow_database_url_arg.as_ref() {
+                let shadow_database_url = match shadow_database_url_arg.as_str_from_env() {
+                    Err(err)
+                        if ignore_datasource_urls
+                            && err.description().contains("Expected a String value, but received") =>
+                    {
+                        return Err(diagnostics.merge_error(err));
                     }
-                }
-                (_, Some(url)) => {
-                    debug!(
-                        "overwriting datasource `{}` shadow database url with url '{}'",
-                        &source_name, &url
-                    );
-                    StringFromEnvVar {
-                        from_env_var: None,
-                        value: url.to_owned(),
+                    _ if ignore_datasource_urls => {
+                        // glorious hack. ask marcus
+                        Some(StringFromEnvVar {
+                            from_env_var: None,
+                            value: format!("{}://", providers.first().unwrap()),
+                        })
                     }
-                }
-                (Ok((env_var, url)), _) => StringFromEnvVar {
-                    from_env_var: env_var,
-                    value: url.trim().to_owned(),
-                },
-                (Err(err), _) => {
-                    return Err(diagnostics.merge_error(err));
-                }
+
+                    Ok((env_var, url)) => Some(StringFromEnvVar {
+                        from_env_var: env_var,
+                        value: url.trim().to_owned(),
+                    })
+                    .filter(|s| !s.value.is_empty()),
+
+                    // We intentionally ignore the shadow database URL if it is defined in an env var that is missing.
+                    Err(DatamodelError::EnvironmentFunctionalEvaluationError { .. }) => None,
+
+                    Err(err) => {
+                        return Err(diagnostics.merge_error(err));
+                    }
+                };
+
+                // Temporarily disabled because of processing/hacks on URLs that make comparing the two URLs unreliable.
+                // if url.value == shadow_database_url.value {
+                //     return Err(
+                //         diagnostics.merge_error(DatamodelError::new_shadow_database_is_same_as_main_url_error(
+                //             source_name.clone(),
+                //             shadow_database_url_arg.span(),
+                //         )),
+                //     );
+                // }
+
+                shadow_database_url
+            } else {
+                None
             };
-
-            validate_datasource_url(&shadow_database_url, source_name, &url_arg)?;
-
-            // Temporarily disabled because of processing/hacks on URLs that make comparing the two URLs unreliable.
-            // if url.value == shadow_database_url.value {
-            //     return Err(
-            //         diagnostics.merge_error(DatamodelError::new_shadow_database_is_same_as_main_url_error(
-            //             source_name.clone(),
-            //             shadow_database_url_arg.span(),
-            //         )),
-            //     );
-            // }
-
-            Some(shadow_database_url)
-        } else {
-            None
-        };
 
         preview_features_guardrail(&mut args)?;
 
@@ -320,6 +315,7 @@ fn preview_features_guardrail(args: &mut Arguments) -> Result<(), DatamodelError
     ))
 }
 
+/// Validate that the `url` argument in the datasource block is not empty.
 fn validate_datasource_url(
     url: &StringFromEnvVar,
     source_name: &str,

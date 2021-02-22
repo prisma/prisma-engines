@@ -165,6 +165,39 @@ fn must_error_if_wrong_protocol_is_used_for_mysql_shadow_database_url() {
 }
 
 #[test]
+#[serial]
+fn must_not_error_for_empty_shadow_database_urls_derived_from_env_vars() {
+    std::env::set_var("DB_URL", "  ");
+
+    let schema = r#"
+        datasource myds {
+            provider = "postgres"
+            url = "postgres://"
+            shadowDatabaseUrl = env("DB_URL")
+        }
+    "#;
+
+    let config = datamodel::parse_configuration(schema).unwrap();
+
+    assert!(config.subject.datasources[0].shadow_database_url.is_none());
+}
+
+#[test]
+fn must_not_error_for_shadow_database_urls_derived_from_missing_env_vars() {
+    let schema = r#"
+        datasource myds {
+            provider = "postgres"
+            url = "postgres://"
+            shadowDatabaseUrl = env("SHADOW_DATABASE_URL_NOT_SET_21357")
+        }
+    "#;
+
+    let config = datamodel::parse_configuration(schema).unwrap();
+
+    assert!(config.subject.datasources[0].shadow_database_url.is_none());
+}
+
+#[test]
 fn must_error_if_wrong_protocol_is_used_for_postgresql() {
     let schema = r#"
         datasource myds {
