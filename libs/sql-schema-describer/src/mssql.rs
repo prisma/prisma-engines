@@ -49,6 +49,15 @@ static DEFAULT_STRING: Lazy<Regex> = Lazy::new(|| Regex::new(r"\('([\S\s]*)'\)")
 /// ```
 static DEFAULT_DB_GEN: Lazy<Regex> = Lazy::new(|| Regex::new(r"\((.*)\)").unwrap());
 
+/// Matches a shared default constraint (which we will skip).
+///
+/// example:
+///
+/// ```ignore
+/// CREATE DEFAULT catcat AS 'musti';
+/// ```
+static DEFAULT_SHARED_CONSTRAINT: Lazy<Regex> = Lazy::new(|| Regex::new(r"^CREATE DEFAULT (.*)").unwrap());
+
 #[derive(Debug)]
 pub struct SqlSchemaDescriber {
     conn: Quaint,
@@ -211,7 +220,6 @@ impl SqlSchemaDescriber {
                     INNER JOIN sys.tables t ON c.object_id = t.object_id
             WHERE OBJECT_SCHEMA_NAME(c.object_id) = @P1
             AND t.is_ms_shipped = 0
-
             ORDER BY COLUMNPROPERTY(c.object_id, c.name, 'ordinal');
         "#};
 
@@ -253,6 +261,7 @@ impl SqlSchemaDescriber {
                 Some(param_value) => match param_value.to_string() {
                     None => None,
                     Some(x) if x == "(NULL)" => None,
+                    Some(x) if DEFAULT_SHARED_CONSTRAINT.is_match(&x) => None,
                     Some(default_string) => {
                         let default_string = DEFAULT_NON_STRING
                             .captures_iter(&default_string)
