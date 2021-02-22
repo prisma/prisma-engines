@@ -460,13 +460,13 @@ async fn no_additional_unique_created(api: &TestApi) -> TestResult {
             id      Int @id
             collar  Collar?
         }
-        
+
         model Collar {
             id      Int @id
             cat     Cat @relation(fields:[id], references: [id])
         }
-        
-        
+
+
     "#;
 
     let dir = api.create_migrations_directory()?;
@@ -483,17 +483,17 @@ async fn no_additional_unique_created(api: &TestApi) -> TestResult {
                         -- CreateTable
                         CREATE TABLE "Cat" (
                             "id" INTEGER NOT NULL,
-                        
+
                             PRIMARY KEY ("id")
                         );
-                        
+
                         -- CreateTable
                         CREATE TABLE "Collar" (
                             "id" INTEGER NOT NULL,
-                        
+
                             PRIMARY KEY ("id")
                         );
-                        
+
                         -- AddForeignKey
                         ALTER TABLE "Collar" ADD FOREIGN KEY ("id") REFERENCES "Cat"("id") ON DELETE CASCADE ON UPDATE CASCADE;
                         "#

@@ -68,15 +68,21 @@ impl<'a> CreateMigrationAssertion<'a> {
     pub fn assert_migration_directories_count(self, expected_count: usize) -> AssertionResult<Self> {
         let mut count = 0;
 
-        for _ in std::fs::read_dir(self.migrations_directory.path())
+        for entry in std::fs::read_dir(self.migrations_directory.path())
             .context("Counting directories in migrations directory.")?
         {
+            let entry = entry?;
+
+            if entry.path().file_name().and_then(|s| s.to_str()) == Some("migration_lock.toml") {
+                continue;
+            }
+
             count += 1;
         }
 
         anyhow::ensure!(
             // the lock file is counted as an entry
-            expected_count == count - 1,
+            expected_count == count,
             "Assertion failed. Expected {expected} migrations in the migrations directory, found {actual}.",
             expected = expected_count,
             actual = count
