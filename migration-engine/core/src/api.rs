@@ -147,7 +147,7 @@ impl<C: MigrationConnector> GenericApi for C {
         &self,
         input: &MarkMigrationRolledBackInput,
     ) -> CoreResult<MarkMigrationRolledBackOutput> {
-        MarkMigrationRolledBackCommand::execute(input, self)
+        mark_migration_rolled_back(input, self)
             .instrument(tracing::info_span!(
                 "MarkMigrationRolledBack",
                 migration_name = input.migration_name.as_str()
@@ -162,9 +162,11 @@ impl<C: MigrationConnector> GenericApi for C {
     }
 
     async fn reset(&self) -> CoreResult<()> {
-        ResetCommand::execute(&(), self)
+        tracing::debug!("Resetting the database.");
+
+        Ok(MigrationConnector::reset(self)
             .instrument(tracing::info_span!("Reset"))
-            .await
+            .await?)
     }
 
     async fn schema_push(&self, input: &SchemaPushInput) -> CoreResult<SchemaPushOutput> {

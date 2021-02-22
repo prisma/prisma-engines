@@ -3,7 +3,7 @@ use crate::{CoreError, CoreResult};
 use migration_connector::{MigrationConnector, MigrationDirectory};
 use serde::Deserialize;
 use std::{collections::HashMap, path::Path};
-use user_facing_errors::migration_engine::MigrationAlreadyApplied;
+use user_facing_errors::migration_engine::{MigrationAlreadyApplied, MigrationToMarkAppliedNotFound};
 
 /// The input to the `markMigrationApplied` command.
 #[derive(Debug, Deserialize)]
@@ -35,9 +35,12 @@ impl MigrationCommand for MarkMigrationAppliedCommand {
 
         let migration_directory =
             MigrationDirectory::new(Path::new(&input.migrations_directory_path).join(&input.migration_name));
-        let script = migration_directory
-            .read_migration_script()
-            .map_err(|err| CoreError::Generic(err.into()))?;
+
+        let script = migration_directory.read_migration_script().map_err(|_err| {
+            CoreError::user_facing(MigrationToMarkAppliedNotFound {
+                migration_name: input.migration_name.clone(),
+            })
+        })?;
 
         let relevant_migrations = match persistence.list_migrations().await? {
             Ok(migrations) => migrations

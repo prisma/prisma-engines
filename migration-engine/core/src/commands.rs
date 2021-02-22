@@ -14,7 +14,6 @@ mod list_migration_directories;
 mod mark_migration_applied;
 mod mark_migration_rolled_back;
 mod plan_migration;
-mod reset;
 mod schema_push;
 
 pub use apply_migrations::{ApplyMigrationsCommand, ApplyMigrationsInput, ApplyMigrationsOutput};
@@ -31,9 +30,8 @@ pub use evaluate_data_loss::*;
 pub use get_database_version::*;
 pub use list_migration_directories::*;
 pub use mark_migration_applied::{MarkMigrationAppliedCommand, MarkMigrationAppliedInput, MarkMigrationAppliedOutput};
-pub use mark_migration_rolled_back::{
-    MarkMigrationRolledBackCommand, MarkMigrationRolledBackInput, MarkMigrationRolledBackOutput,
-};
+pub use mark_migration_rolled_back::{MarkMigrationRolledBackInput, MarkMigrationRolledBackOutput};
 pub use plan_migration::{PlanMigrationCommand, PlanMigrationInput, PlanMigrationOutput};
-pub use reset::ResetCommand;
 pub use schema_push::{SchemaPushCommand, SchemaPushInput, SchemaPushOutput};
+
+pub(crate) use mark_migration_rolled_back::mark_migration_rolled_back;
