@@ -12,6 +12,24 @@ use test_api::{TestApi, TestResult};
 use test_macros::test_each_connector;
 
 #[tokio::test]
+async fn views_can_be_described() {
+    let full_sql = r#"
+        CREATE TABLE a (a_id int);
+        CREATE TABLE b (b_id int);
+        CREATE VIEW ab AS SELECT a_id FROM a UNION ALL SELECT b_id FROM b;
+        "#;
+
+    let inspector = get_sqlite_describer(&full_sql).await;
+    let result = inspector.describe(SCHEMA).await.expect("describing");
+    let view = result.get_view("ab").expect("couldn't get ab view").to_owned();
+
+    let expected_sql = "CREATE VIEW ab AS SELECT a_id FROM a UNION ALL SELECT b_id FROM b";
+
+    assert_eq!("ab", &view.name);
+    assert_eq!(expected_sql, &view.definition);
+}
+
+#[tokio::test]
 async fn sqlite_column_types_must_work() {
     let mut migration = Migration::new();
     migration.create_table("User", move |t| {

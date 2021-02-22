@@ -1,11 +1,10 @@
 //! Postgres schema description.
 
 use super::*;
-use crate::getters::Getter;
-use crate::parsers::Parser;
+use crate::{getters::Getter, parsers::Parser};
+use indoc::indoc;
 use native_types::{NativeType, PostgresType};
-use quaint::connector::ResultRow;
-use quaint::{prelude::Queryable, single::Quaint};
+use quaint::{connector::ResultRow, prelude::Queryable, single::Quaint};
 use regex::Regex;
 use serde_json::from_str;
 use std::{borrow::Cow, collections::HashMap, convert::TryInto};
@@ -47,10 +46,13 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
             tables.push(self.get_table(&table_name, &mut columns, &mut foreign_keys, &mut indexes));
         }
 
+        let views = self.get_views(schema).await?;
+
         Ok(SqlSchema {
             enums,
             sequences,
             tables,
+            views,
         })
     }
 
@@ -144,6 +146,27 @@ impl SqlSchemaDescriber {
             indices,
             primary_key,
         }
+    }
+
+    #[tracing::instrument]
+    async fn get_views(&self, schema: &str) -> DescriberResult<Vec<View>> {
+        let sql = indoc! {r#"
+            SELECT viewname AS view_name, definition AS view_sql
+            FROM pg_catalog.pg_views
+            WHERE schemaname = $1
+        "#};
+
+        let result_set = self.conn.query_raw(sql, &[schema.into()]).await?;
+        let mut views = Vec::with_capacity(result_set.len());
+
+        for row in result_set.into_iter() {
+            views.push(View {
+                name: row.get_expect_string("view_name"),
+                definition: row.get_expect_string("view_sql"),
+            })
+        }
+
+        Ok(views)
     }
 
     async fn get_columns(

@@ -51,12 +51,19 @@ pub struct SqlSchema {
     pub enums: Vec<Enum>,
     /// The schema's sequences, unique to Postgres.
     pub sequences: Vec<Sequence>,
+    /// The schema's views,
+    pub views: Vec<View>,
 }
 
 impl SqlSchema {
     /// Get a table.
     pub fn get_table(&self, name: &str) -> Option<&Table> {
         self.tables.iter().find(|x| x.name == name)
+    }
+
+    /// Get a view.
+    pub fn get_view(&self, name: &str) -> Option<&View> {
+        self.views.iter().find(|v| v.name == name)
     }
 
     /// Get an enum.
@@ -72,7 +79,8 @@ impl SqlSchema {
                 tables,
                 enums,
                 sequences,
-            } if tables.is_empty() && enums.is_empty() && sequences.is_empty()
+                views,
+            } if tables.is_empty() && enums.is_empty() && sequences.is_empty() && views.is_empty()
         )
     }
 
@@ -97,6 +105,7 @@ impl SqlSchema {
             tables: Vec::new(),
             enums: Vec::new(),
             sequences: Vec::new(),
+            views: Vec::new(),
         }
     }
 
@@ -444,6 +453,15 @@ pub struct Enum {
 pub struct Sequence {
     /// Sequence name.
     pub name: String,
+}
+
+/// An SQL view.
+#[derive(PartialEq, Debug, Clone)]
+pub struct View {
+    /// Name of the view.
+    pub name: String,
+    /// The SQL definition of the view.
+    pub definition: String,
 }
 
 #[derive(PartialEq, Debug, Clone)]

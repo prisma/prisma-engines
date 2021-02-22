@@ -39,6 +39,23 @@ pub async fn reset_schema(conn: &dyn Queryable, schema_name: &str) -> Result<(),
         schema_name
     );
 
+    let drop_views = format!(
+        r#"
+        DECLARE @stmt NVARCHAR(max)
+        DECLARE @n CHAR(1)
+
+        SET @n = CHAR(10)
+
+        SELECT @stmt = ISNULL(@stmt + @n, '') +
+            'DROP VIEW [' + SCHEMA_NAME(schema_id) + '].[' + name + ']'
+        FROM sys.views
+        WHERE SCHEMA_NAME(schema_id) = '{0}'
+
+        EXEC SP_EXECUTESQL @stmt
+        "#,
+        schema_name
+    );
+
     let drop_tables = format!(
         r#"
         DECLARE @stmt NVARCHAR(max)
@@ -56,6 +73,7 @@ pub async fn reset_schema(conn: &dyn Queryable, schema_name: &str) -> Result<(),
         schema_name
     );
 
+    conn.raw_cmd(&drop_views).await?;
     conn.raw_cmd(&drop_fks).await?;
     conn.raw_cmd(&drop_tables).await?;
     conn.raw_cmd(&drop_shared_defaults).await?;
