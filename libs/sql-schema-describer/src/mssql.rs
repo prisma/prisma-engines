@@ -84,8 +84,11 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
             tables.push(table);
         }
 
+        let views = self.get_views(schema).await?;
+
         Ok(SqlSchema {
             tables,
+            views,
             enums: vec![],
             sequences: vec![],
         })
@@ -429,6 +432,28 @@ impl SqlSchemaDescriber {
         }
 
         Ok(map)
+    }
+
+    #[tracing::instrument]
+    async fn get_views(&self, schema: &str) -> DescriberResult<Vec<View>> {
+        let sql = indoc! {r#"
+            SELECT name AS view_name, OBJECT_DEFINITION(object_id) AS view_sql
+            FROM sys.views
+            WHERE is_ms_shipped = 0
+            AND SCHEMA_NAME(schema_id) = @P1
+        "#};
+
+        let result_set = self.conn.query_raw(sql, &[schema.into()]).await?;
+        let mut views = Vec::with_capacity(result_set.len());
+
+        for row in result_set.into_iter() {
+            views.push(View {
+                name: row.get_expect_string("view_name"),
+                definition: row.get_expect_string("view_sql"),
+            })
+        }
+
+        Ok(views)
     }
 
     async fn get_foreign_keys(&self, schema: &str) -> DescriberResult<HashMap<String, Vec<ForeignKey>>> {
