@@ -8,6 +8,7 @@ mod mariadb;
 mod mark_migration_applied_tests;
 mod mark_migration_rolled_back_tests;
 mod migration_persistence_tests;
+mod mssql;
 mod mysql;
 mod postgres;
 mod relations;
