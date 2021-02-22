@@ -487,3 +487,65 @@ fn issue5069() {
         DatamodelError::new_field_validation_error("The relation field `createdBy` on Model `Code` is missing an opposite relation field on the model `User`. Either run `prisma format` or add it manually.", "Code", "createdBy",Span::new(103, 121)),
     );
 }
+
+#[test]
+fn must_add_referenced_fields_on_both_sides_for_one_to_many_relations() {
+    let dml = r#"
+    model User {
+        user_id Int    @id
+        posts   Post[]
+    }
+
+    model Post {
+        post_id Int    @id
+        user    User
+    }
+    "#;
+
+    let errors = parse_error(dml);
+    errors.assert_are(
+        &[DatamodelError::new_attribute_validation_error("The relation field `user` on Model `Post` must specify the `fields` argument in the @relation attribute. You can run `prisma format` to fix this automatically.", "relation",Span::new(127, 140)),
+            DatamodelError::new_attribute_validation_error("The relation field `user` on Model `Post` must specify the `references` argument in the @relation attribute.", "relation",Span::new(127, 140))
+        ],
+    );
+
+    // prove that lexicographic order does not have an influence.
+    let dml = r#"
+    model User {
+        user_id Int    @id
+        post    Post
+    }
+
+    model Post {
+        post_id Int    @id
+        users   User[]
+    }
+    "#;
+
+    let errors = parse_error(dml);
+    errors.assert_are(
+        &[DatamodelError::new_attribute_validation_error("The relation field `post` on Model `User` must specify the `fields` argument in the @relation attribute. You can run `prisma format` to fix this automatically.", "relation",Span::new(53, 66)),
+            DatamodelError::new_attribute_validation_error("The relation field `post` on Model `User` must specify the `references` argument in the @relation attribute.", "relation",Span::new(53, 66))
+        ],
+    );
+}
+
+#[test]
+fn should_fail_on_missing_embed_ids_on_self_relations() {
+    let dml = r#"
+    model Human {
+        id Int @id
+        father Human? @relation("paternity")
+        son Human? @relation("paternity")
+    }
+    "#;
+
+    let errors = parse_error(dml);
+    errors.assert_are(
+        &[DatamodelError::new_attribute_validation_error("The relation fields `father` on Model `Human` and `son` on Model `Human` do not provide the `fields` argument in the @relation attribute. You have to provide it on one of the two fields.", "relation",Span::new(46, 83)),
+            DatamodelError::new_attribute_validation_error("The relation fields `father` on Model `Human` and `son` on Model `Human` do not provide the `references` argument in the @relation attribute. You have to provide it on one of the two fields.", "relation",Span::new(46, 83)),
+            DatamodelError::new_attribute_validation_error("The relation fields `son` on Model `Human` and `father` on Model `Human` do not provide the `fields` argument in the @relation attribute. You have to provide it on one of the two fields.", "relation",Span::new(91, 125)),
+            DatamodelError::new_attribute_validation_error("The relation fields `son` on Model `Human` and `father` on Model `Human` do not provide the `references` argument in the @relation attribute. You have to provide it on one of the two fields.", "relation",Span::new(91, 125)),
+        ],
+    );
+}

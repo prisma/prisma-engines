@@ -2,6 +2,32 @@ use crate::common::*;
 use datamodel::{dml, ScalarType};
 
 #[test]
+fn must_add_referenced_fields_on_both_sides_for_many_to_many_relations() {
+    let dml = r#"
+    model User {
+        user_id Int    @id
+        posts   Post[]
+    }
+
+    model Post {
+        post_id Int    @id
+        users   User[]
+    }
+    "#;
+
+    let schema = parse(dml);
+
+    schema
+        .assert_has_model("User")
+        .assert_has_relation_field("posts")
+        .assert_relation_referenced_fields(&["post_id"]);
+    schema
+        .assert_has_model("Post")
+        .assert_has_relation_field("users")
+        .assert_relation_referenced_fields(&["user_id"]);
+}
+
+#[test]
 fn settings_must_be_deteced() {
     let dml = r#"
     model Todo {

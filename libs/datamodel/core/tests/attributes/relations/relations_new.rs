@@ -416,7 +416,7 @@ fn must_error_when_references_argument_is_missing_for_one_to_many() {
     errors.assert_is(DatamodelError::new_attribute_validation_error(
         "The relation field `user` on Model `Post` must specify the `references` argument in the @relation attribute.",
         "relation",
-        Span::new(172, 214),
+        Span::new(172, 215),
     ));
 }
 
@@ -470,15 +470,15 @@ fn must_error_when_both_arguments_are_missing_for_one_to_many() {
     errors.assert_is_at(
         0,
         DatamodelError::new_attribute_validation_error(
-            "The relation field `user` on Model `Post` must specify the `fields` argument in the @relation attribute.",
+            "The relation field `user` on Model `Post` must specify the `fields` argument in the @relation attribute. You can run `prisma format` to fix this automatically.",
             "relation",
-            Span::new(172, 183),
+            Span::new(172, 184),
         ),
     );
     errors.assert_is_at(1, DatamodelError::new_attribute_validation_error(
         "The relation field `user` on Model `Post` must specify the `references` argument in the @relation attribute.",
         "relation",
-        Span::new(172, 183),
+        Span::new(172, 184),
     ));
 }
 

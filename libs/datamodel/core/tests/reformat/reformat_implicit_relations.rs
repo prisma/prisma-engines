@@ -609,16 +609,434 @@ fn must_succeed_when_fields_argument_is_missing_for_one_to_many() {
     assert_reformat(input, expected);
 }
 
+#[test]
+fn must_add_referenced_fields_on_both_sides_for_one_to_many_relations() {
+    let input = indoc! {r#"
+    model User {
+        user_id Int    @id
+        posts   Post[]
+    }
+
+    model Post {
+        post_id Int    @id
+        user    User
+    }
+    "#};
+
+    let expected = indoc! {r#"
+    model User {
+      user_id Int    @id
+      posts   Post[]
+    }
+    
+    model Post {
+      post_id     Int  @id
+      user        User @relation(fields: [userUser_id], references: [user_id])
+      userUser_id Int
+    }
+    "#};
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn must_add_referenced_fields_on_both_sides_for_one_to_many_relations_reverse() {
+    let input = indoc! {r#"
+    model User {
+      user_id Int    @id
+      post    Post
+    }
+    
+    model Post {
+      post_id Int    @id
+      users   User[]
+    }
+    "#};
+
+    let expected = indoc! {r#"
+    model User {
+      user_id     Int  @id
+      post        Post @relation(fields: [postPost_id], references: [post_id])
+      postPost_id Int
+    }
+    
+    model Post {
+      post_id Int    @id
+      users   User[]
+    }
+    "#};
+
+    assert_reformat(input, expected);
+}
+
+// fn must_render_generated_back_relation_fields() {
+//     let dml = r#"
+//     model User {
+//         id Int @id
+//         posts Post[]
+//     }
+//
+//     model Post {
+//         post_id Int @id
+//     }"#;
+//
+//     let expected = r#"model User {
+//   id    Int    @id
+//   posts Post[]
+// }
+//
+// model Post {
+//   post_id Int   @id
+//   User    User? @relation(fields: [userId], references: [id])
+//   userId  Int?
+// }
+// "#;
+//
+//     let schema = parse(dml);
+//
+//     let rendered = render_datamodel_to_string(&schema);
+//
+//     assert_eq!(rendered, expected);
+// }
+
+#[test]
+fn must_add_referenced_fields_on_the_right_side_for_one_to_one_relations() {
+    // the to fields are always added to model with the lower name in lexicographic order
+
+    let input = indoc! {r#"
+    model User1 {
+      id         String @id @default(cuid())
+      referenceA User2?
+    }
+
+    model User2 {
+      id         String @id @default(cuid()) 
+      referenceB User1?
+    }
+
+    model User3 {
+      id         String @id @default(cuid()) 
+      referenceB User4?
+    }
+
+    model User4 {
+      id         String @id @default(cuid())
+      referenceA User3?
+    }
+    "#};
+
+    let expected = indoc! {r#"
+    model User1 {
+      id         String  @id @default(cuid())
+      referenceA User2?  @relation(fields: [user2Id], references: [id])
+      user2Id    String?
+    }
+    
+    model User2 {
+      id         String @id @default(cuid())
+      referenceB User1?
+    }
+    
+    model User3 {
+      id         String  @id @default(cuid())
+      referenceB User4?  @relation(fields: [user4Id], references: [id])
+      user4Id    String?
+    }
+    
+    model User4 {
+      id         String @id @default(cuid())
+      referenceA User3?
+    }
+    "#};
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn must_handle_conflicts_with_existing_fields_if_types_are_compatible() {
+    let input = indoc! {r#"
+    model Blog {
+      id    String @id
+      posts Post[]
+    }
+    
+    model Post {
+      id     String   @id      
+      blogId String?
+    }
+    "#};
+
+    let expected = indoc! {r#"
+    model Blog {
+      id    String @id
+      posts Post[]
+    }
+    
+    model Post {
+      id     String  @id
+      blogId String?
+      Blog   Blog?   @relation(fields: [blogId], references: [id])
+    }
+    "#};
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn must_handle_conflicts_with_existing_fields_if_types_are_incompatible() {
+    let input = indoc! {r#"
+    model Blog {
+      id    String @id
+      posts Post[]
+    }
+    
+    model Post {
+      id     String   @id      
+      blogId Int?     // this is not compatible with Blog.id  
+    }
+    "#};
+
+    let expected = indoc! {r#"
+    model Blog {
+      id    String @id
+      posts Post[]
+    }
+    
+    model Post {
+      id                String  @id
+      blogId            Int? // this is not compatible with Blog.id  
+      Blog              Blog?   @relation(fields: [blogId_BlogToPost], references: [id])
+      blogId_BlogToPost String?
+    }
+    "#};
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn should_add_back_relations_for_more_complex_cases() {
+    let input = indoc! {r#"
+    model User {
+        id Int @id
+        posts Post[]
+    }
+
+    model Post {
+        post_id Int @id
+        comments Comment[]
+        categories PostToCategory[]
+    }
+
+    model Comment {
+        comment_id Int @id
+    }
+
+    model Category {
+        category_id Int @id
+        posts PostToCategory[]
+    }
+
+    model PostToCategory {
+        id          Int @id
+        postId      Int
+        categoryId  Int
+        
+        post     Post     @relation(fields: [postId], references: [post_id])
+        category Category @relation(fields: [categoryId], references: [category_id])
+        @@map("post_to_category")
+    }
+    "#};
+
+    let expected = indoc! {r#"
+    model User {
+      id    Int    @id
+      posts Post[]
+    }
+    
+    model Post {
+      post_id    Int              @id
+      comments   Comment[]
+      categories PostToCategory[]
+      User       User?            @relation(fields: [userId], references: [id])
+      userId     Int?
+    }
+    
+    model Comment {
+      comment_id  Int   @id
+      Post        Post? @relation(fields: [postPost_id], references: [post_id])
+      postPost_id Int?
+    }
+    
+    model Category {
+      category_id Int              @id
+      posts       PostToCategory[]
+    }
+    
+    model PostToCategory {
+      id         Int @id
+      postId     Int
+      categoryId Int
+    
+      post     Post     @relation(fields: [postId], references: [post_id])
+      category Category @relation(fields: [categoryId], references: [category_id])
+      @@map("post_to_category")
+    }
+    "#};
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn should_add_missing_embed_ids_on_self_relations() {
+    let input = indoc! {r#"
+    model Human {
+        id Int @id
+        father Human? @relation("paternity")
+        son Human? @relation("paternity")
+    }
+    "#};
+
+    let expected = indoc! {r#"
+    
+    "#};
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn should_add_referenced_fields_on_the_correct_side_list() {
+    let input = indoc! {r#"
+    model User {
+        id Int @id
+        post Post[]
+    }
+
+    model Post {
+        post_id Int @id
+        user User
+    }
+    "#};
+
+    let expected = indoc! {r#"
+    model User {
+      id   Int    @id
+      post Post[]
+    }
+    
+    model Post {
+      post_id Int  @id
+      user    User @relation(fields: [userId], references: [id])
+      userId  Int
+    }
+    "#};
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn no_changes_for_many_to_many_relations() {
+    let input = indoc! {r#"
+    model User {
+      user_id Int    @id
+      posts   Post[]
+    }
+
+    model Post {
+      post_id Int    @id
+      users   User[]
+    }
+    "#};
+
+    assert_reformat(input, input);
+}
+
+#[test]
+fn should_add_referenced_fields_on_the_correct_side_tie_breaker() {
+    let input = indoc! {r#"
+    model User {
+        user_id Int @id
+        post Post?
+    }
+
+    model Post {
+        post_id Int @id
+        user User?
+    }
+    "#};
+
+    let expected = indoc! {r#"
+    model User {
+      user_id Int   @id
+      post    Post?
+    }
+    
+    model Post {
+      post_id     Int   @id
+      user        User? @relation(fields: [userUser_id], references: [user_id])
+      userUser_id Int?
+    }
+    "#};
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn should_not_get_confused_with_complicated_self_relations() {
+    let input = indoc! {r#"
+    model Human {
+      id        Int  @id
+      husbandId Int?
+      fatherId  Int?
+      parentId  Int?
+    
+      wife    Human? @relation("Marrige")
+      husband Human? @relation("Marrige", fields: husbandId, references: id)
+    
+      father Human? @relation("Paternity", fields: fatherId, references: id)
+      son    Human? @relation("Paternity")
+    
+      children Human[] @relation("Offspring")
+      parent   Human?  @relation("Offspring", fields: parentId, references: id)
+    }
+    "#};
+
+    assert_reformat(input, input);
+}
+
+//todo formatter failure??
+//currently panics
+#[test]
+fn must_handle_conflicts_with_existing_fields_if_types_are_incompatible_and_name_generation_breaks_down() {
+    let input = indoc! {r#"
+    model Blog {
+      id    String @id
+      posts Post[]
+    }
+    
+    model Post {
+      id                String   @id      
+      blogId            Int?     // this is not compatible with Blog.id
+      blogId_BlogToPost Int?     // clashes with the auto generated name
+    }
+    "#};
+
+    let expected = indoc! {r#"
+   
+    "#};
+
+    assert_reformat(input, expected);
+}
+
 fn assert_reformat(schema: &str, expected_result: &str) {
     //reformat input
     let result = datamodel::ast::reformat::Reformatter::new(&schema).reformat_to_string();
     //make sure reformatted input is valid
-    println!("Reformatted Result:\n {}", result);
+    println!("Reformatted Result:\n{}", result);
     let dm = parse_datamodel(&result).unwrap();
     println!("Parsed Result:\n{:#?}", dm.subject);
 
     println!("Input:\n{:?}", schema);
-    //make sure expecation is valid
+    //make sure expectation is valid
     // parse_datamodel(expected_result).unwrap();
 
     assert_eq!(result, expected_result);

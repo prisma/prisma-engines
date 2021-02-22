@@ -18,6 +18,9 @@ impl<'a> Reformatter<'a> {
         let missing_field_attributes = Self::find_all_missing_attributes(&input);
         // let missing_attribute_args = Self::find_all_missing_attribute_args(&input);
 
+        println!("{:?}", missing_fields);
+        println!("{:?}", missing_field_attributes);
+
         Reformatter {
             input,
             missing_fields,
