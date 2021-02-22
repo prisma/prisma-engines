@@ -1,10 +1,35 @@
 use crate::{IntoBson, JoinStage};
 use connector_interface::{
-    Filter, OneRelationIsNullFilter, QueryMode, ScalarCondition, ScalarFilter, ScalarListFilter,
+    Filter, OneRelationIsNullFilter, QueryMode, RelationFilter, ScalarCondition, ScalarFilter, ScalarListFilter,
 };
 use mongodb::bson::{doc, Bson, Document, Regex};
-use prisma_models::{PrismaValue, ScalarFieldRef};
-use std::unimplemented;
+use prisma_models::{PrismaValue, RelationFieldRef, ScalarFieldRef};
+
+#[derive(Debug)]
+pub(crate) enum MongoFilter {
+    Flat(Document),
+    Nested(NestedMongoFilter),
+}
+
+impl MongoFilter {
+    pub(crate) fn render(self) -> (Document, Vec<JoinStage>) {
+        match self {
+            Self::Flat(document) => (document, vec![]),
+            Self::Nested(nested) => todo!(),
+        }
+    }
+}
+
+// impl From<>
+
+#[derive(Debug)]
+pub(crate) struct NestedMongoFilter {
+    /// The filter that has to be applied to this layer of nesting (after all joins on this layer are done).
+    filter: Box<MongoFilter>,
+
+    /// The joins required to make the filter above happen.
+    joins: Vec<JoinStage>,
+}
 
 /// Builds a MongoDB query document from a Prisma filter.
 /// Returns the query document and a number of join documents
@@ -24,7 +49,7 @@ pub(crate) fn convert_filter(filter: Filter, invert: bool) -> crate::Result<(Doc
         Filter::Empty => (Document::new(), vec![]),
         Filter::ScalarList(slf) => (scalar_list_filter(slf, invert)?, vec![]),
         Filter::OneRelationIsNull(filter) => one_is_null(filter, invert)?,
-        // Filter::Relation(_) => {}
+        Filter::Relation(rfilter) => relation_filter(rfilter, invert)?,
         // Filter::BoolFilter(b) => {} // Potentially not doable.
         // Filter::Aggregation(_) => {}
         _ => todo!("Incomplete filter implementation."),
@@ -214,18 +239,63 @@ fn scalar_list_filter(filter: ScalarListFilter, invert: bool) -> crate::Result<D
 // Can be optimized by checking inlined fields on the left side instead of always joining.
 fn one_is_null(filter: OneRelationIsNullFilter, invert: bool) -> crate::Result<(Document, Vec<JoinStage>)> {
     let rf = filter.field;
-
-    let right_model = rf.related_model();
-    let right_model_name = right_model.db_name();
-    let mut left_scalars = rf.left_scalars();
-    let mut right_scalars = rf.right_scalars();
     let relation_name = &rf.relation().name;
+    let join_stage = join_collections(rf)?;
 
     let filter_doc = if invert {
         doc! { relation_name: { "$not": { "$size": 0 }}}
     } else {
         doc! { relation_name: { "$size": 0 }}
     };
+
+    Ok((filter_doc, vec![join_stage]))
+}
+
+fn relation_filter(filter: RelationFilter, invert: bool) -> crate::Result<(Document, Vec<JoinStage>)> {
+    let from_field = filter.field;
+    let nested_filter = *filter.nested_filter;
+    let nested_filter = convert_filter(nested_filter, invert)?;
+
+    let join_stage = join_collections(from_field)?;
+
+    let filter_doc = if invert {
+        match filter.condition {
+            // "Every related record" -> "No related record"
+            connector_interface::RelationCondition::EveryRelatedRecord => todo!(),
+
+            // "At least one related fulfills x" -> "At least does NOT fulfill x"
+            connector_interface::RelationCondition::AtLeastOneRelatedRecord => todo!(),
+
+            // "No related fulfills x" -> "All related fulfill x"
+            connector_interface::RelationCondition::NoRelatedRecord => todo!(),
+
+            // "The related record has to fulfill x" -> "The related record must not fulfill x"
+            connector_interface::RelationCondition::ToOneRelatedRecord => todo!(),
+        }
+    } else {
+        match filter.condition {
+            connector_interface::RelationCondition::EveryRelatedRecord => todo!(),
+            connector_interface::RelationCondition::AtLeastOneRelatedRecord => todo!(),
+            connector_interface::RelationCondition::NoRelatedRecord => todo!(),
+            connector_interface::RelationCondition::ToOneRelatedRecord => todo!(),
+        }
+    };
+
+    Ok((filter_doc, vec![join_stage]))
+}
+
+// Todo multi-field-joins.
+/// Returns a join stage for the join between the source collection of `from_field` (the model it's defined on)
+/// and the target collection (the model that is related over the relation).
+/// The joined documents will reside on the source document side as a field named after the relation name.
+fn join_collections(from_field: RelationFieldRef) -> crate::Result<JoinStage> {
+    let relation_name = &from_field.relation().name;
+
+    let right_model = from_field.related_model();
+    let right_model_name = right_model.db_name();
+
+    let mut left_scalars = from_field.left_scalars();
+    let mut right_scalars = from_field.right_scalars();
 
     let join_doc = doc! {
         "from": right_model_name,
@@ -234,7 +304,8 @@ fn one_is_null(filter: OneRelationIsNullFilter, invert: bool) -> crate::Result<(
         "as": relation_name
     };
 
-    Ok((filter_doc, vec![JoinStage::new(rf, join_doc)]))
+    // Ok(JoinStage::new(from_field, join_doc))
+    todo!()
 }
 
 fn to_regex_list(

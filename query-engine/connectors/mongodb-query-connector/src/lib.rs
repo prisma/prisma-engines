@@ -10,7 +10,6 @@ use error::MongoError;
 pub use interface::*;
 use mongodb::bson::{Bson, Document};
 use prisma_models::RelationFieldRef;
-use tracing::log::kv::source;
 
 type Result<T> = std::result::Result<T, MongoError>;
 
@@ -35,14 +34,27 @@ impl BsonTransform for Bson {
     }
 }
 
+/// A Mongo Join stage can in itself contain joins that traverse relations.
+/// Every hop made (in left-to-right order) is contained here as the respective source relation field.
 #[derive(Debug)]
 pub(crate) struct JoinStage {
-    pub(crate) source_field: RelationFieldRef,
-    pub(crate) document: Document,
+    /// The starting point of the traversal (left model of the join).
+    pub(crate) source: RelationFieldRef,
+
+    /// Nested joins
+    pub(crate) nested: Vec<JoinStage>,
 }
 
 impl JoinStage {
-    pub(crate) fn new(source_field: RelationFieldRef, document: Document) -> Self {
-        Self { source_field, document }
+    pub(crate) fn new(source: RelationFieldRef) -> Self {
+        Self { source, nested: vec![] }
+    }
+
+    pub(crate) fn add_nested(&mut self, stage: JoinStage) {
+        self.nested.push(stage);
+    }
+
+    pub(crate) fn build(self) -> Document {
+        todo!()
     }
 }

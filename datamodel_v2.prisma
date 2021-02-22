@@ -35,8 +35,3 @@ model Category {
   post_ids String[] @db.Array(ObjectId)
   posts    Post[]   @relation(fields: [post_ids])
 }
-
-model Test {
-  id    Int    @id @map("_id")
-  field String
-}

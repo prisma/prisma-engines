@@ -51,7 +51,7 @@ impl MongoQueryArgs {
         };
 
         // Joins ($lookup)
-        stages.extend(self.joins.into_iter().map(|stage| doc! { "$lookup": stage.document }));
+        // stages.extend(self.joins.into_iter().map(|stage| doc! { "$lookup": stage.document }));
 
         // Post-join $matches
         stages.extend(self.post_filters.into_iter().map(|filter| doc! { "$match": filter }));

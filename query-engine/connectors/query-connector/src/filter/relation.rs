@@ -19,6 +19,7 @@ pub struct RelationFilter {
 
 /// Filter that is solely responsible for checking if
 /// a to-one related record is null.
+/// Todo there's no good, obvious reason why this is a separate filter.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct OneRelationIsNullFilter {
     pub field: Arc<RelationField>,
@@ -26,9 +27,16 @@ pub struct OneRelationIsNullFilter {
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub enum RelationCondition {
+    /// Every single related record needs to fulfill a condition.
     EveryRelatedRecord,
+
+    /// At least one related record needs to fulfill a condition.
     AtLeastOneRelatedRecord,
+
+    /// No related record must to fulfill a condition.
     NoRelatedRecord,
+
+    /// To-one relation only - the related record must fulfill a condition.
     ToOneRelatedRecord,
 }
 
