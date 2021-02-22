@@ -1,5 +1,7 @@
 #![allow(clippy::print_literal)] // it is just wrong in this case
 
+mod diagnose_migration_history;
+
 use anyhow::Context;
 use colored::Colorize;
 use migration_core::commands::SchemaPushInput;
@@ -22,6 +24,8 @@ enum Command {
     Dmmf(DmmfCommand),
     /// Push a prisma schema directly to the database, without interacting with migrations.
     SchemaPush(SchemaPush),
+    /// DiagnoseMigrationHistory wrapper
+    DiagnoseMigrationHistory(DiagnoseMigrationHistory),
 }
 
 #[derive(StructOpt)]
@@ -45,11 +49,18 @@ struct SchemaPush {
     force: bool,
 }
 
+#[derive(StructOpt)]
+struct DiagnoseMigrationHistory {
+    schema_path: String,
+    migrations_directory_path: String,
+}
+
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     init_logger();
 
     match Command::from_args() {
+        Command::DiagnoseMigrationHistory(cmd) => cmd.execute().await?,
         Command::Dmmf(cmd) => generate_dmmf(&cmd).await?,
         Command::SchemaPush(cmd) => schema_push(&cmd).await?,
         Command::Introspect { url, file_path } => {

@@ -3,7 +3,7 @@
 //! A TestApi that is initialized without IO or async code and can instantiate
 //! multiple migration engines.
 
-use crate::{ApplyMigrations, CreateMigration, Reset, SchemaAssertion, SchemaPush};
+use crate::{ApplyMigrations, CreateMigration, DiagnoseMigrationHistory, Reset, SchemaAssertion, SchemaPush};
 use enumflags2::BitFlags;
 use migration_core::GenericApi;
 use quaint::single::Quaint;
@@ -99,6 +99,11 @@ impl EngineTestApi {
         migrations_directory: &'a TempDir,
     ) -> CreateMigration<'a> {
         CreateMigration::new(&self.0, name, schema, migrations_directory)
+    }
+
+    /// Builder and assertions to call the DiagnoseMigrationHistory command.
+    pub fn diagnose_migration_history<'a>(&'a self, migrations_directory: &'a TempDir) -> DiagnoseMigrationHistory<'a> {
+        DiagnoseMigrationHistory::new(&self.0, migrations_directory)
     }
 
     /// Assert facts about the database schema
