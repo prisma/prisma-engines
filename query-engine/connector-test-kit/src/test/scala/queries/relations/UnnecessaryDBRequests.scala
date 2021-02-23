@@ -22,7 +22,7 @@ class UnnecessaryDBRequests extends FlatSpec with Matchers with ApiSpecBase {
          |
          |model Bottom {
          |  id            String  @id
-         |  bottom        Bottom[]
+         |  bottom        Middle[]
          |}
        """.stripMargin
     }
