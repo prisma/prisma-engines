@@ -314,10 +314,10 @@ fn test_parser_renderer_with_ignore() {
           id      Int
           user_ip Int
           User    User @relation(fields: [user_ip], references: [ip])
-        
+
           @@ignore
         }
-        
+
         model User {
           id   Int    @id @default(autoincrement())
           ip   Int    @unique
@@ -331,17 +331,10 @@ fn test_parser_renderer_with_ignore() {
 
 fn assert_rendered(input: &str, expected: &str) {
     let ast = parse_to_ast(&input).expect("failed to parse");
-    let rendered = render_schema_ast_to_string(&ast);
+    let rendered = datamodel::render_schema_ast_to_string(&ast);
     assert_eq!(rendered, expected);
 }
 
-fn render_schema_ast_to_string(schema: &datamodel::ast::SchemaAst) -> String {
-    let mut writable_string = datamodel::common::WritableString::new();
-    let mut renderer = datamodel::ast::renderer::Renderer::new(&mut writable_string, 2);
-    renderer.render(schema);
-    writable_string.into()
-}
-
 fn parse_to_ast(datamodel_string: &str) -> Result<datamodel::ast::SchemaAst, datamodel::diagnostics::Diagnostics> {
-    datamodel::ast::parser::parse_schema(datamodel_string)
+    datamodel::parse_schema_ast(datamodel_string)
 }

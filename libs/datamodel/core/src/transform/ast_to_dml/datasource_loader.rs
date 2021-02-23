@@ -141,7 +141,7 @@ impl DatasourceLoader {
                 }
             }
             (_, Some(url)) => {
-                debug!("overwriting datasource `{}` with url '{}'", &source_name, &url);
+                tracing::debug!("overwriting datasource `{}` with url '{}'", &source_name, &url);
                 StringFromEnvVar {
                     from_env_var: None,
                     value: url.to_owned(),
