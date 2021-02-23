@@ -15,7 +15,8 @@ class InlineRelationSpec extends FlatSpec with Matchers with ApiSpecBase {
          |}
          |
          |model ModelB {
-         |  id  String @id
+         |  id    String   @id
+         |  model ModelA[]
          |}
        """.stripMargin
     }

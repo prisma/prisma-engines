@@ -13,6 +13,7 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
         |model Parent{
         |    id String @id @default(cuid())
         |    p  String @unique
+        |    c  Child[]
         |}
         |
         |model Child{
