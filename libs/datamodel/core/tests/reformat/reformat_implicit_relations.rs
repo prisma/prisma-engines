@@ -1,4 +1,3 @@
-use datamodel::parse_datamodel;
 use indoc::indoc;
 use pretty_assertions::assert_eq;
 

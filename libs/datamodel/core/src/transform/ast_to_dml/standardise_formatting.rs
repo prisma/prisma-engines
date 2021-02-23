@@ -147,7 +147,7 @@ impl StandardiserForFormatting {
 
         let mut missing_back_relation_fields = Vec::new();
         for model in schema.models() {
-            let mut missing_for_model = self.find_missing_back_relation_fields(&model, schema, ast_schema)?;
+            let mut missing_for_model = self.find_missing_back_relation_fields(&model, schema)?;
             missing_back_relation_fields.append(&mut missing_for_model);
         }
 
@@ -194,12 +194,9 @@ impl StandardiserForFormatting {
         &self,
         model: &dml::Model,
         schema: &dml::Datamodel,
-        schema_ast: &ast::SchemaAst,
     ) -> Result<Vec<AddMissingBackRelationField>, Diagnostics> {
-        let mut errors = Diagnostics::new();
-
         let mut result = Vec::new();
-        'back_relations: for field in model.relation_fields() {
+        for field in model.relation_fields() {
             let rel_info = &field.relation_info;
             let related_model = schema.find_model(&rel_info.to).expect(STATE_ERROR);
 
@@ -293,11 +290,7 @@ impl StandardiserForFormatting {
             }
         }
 
-        if errors.has_errors() {
-            Err(errors)
-        } else {
-            Ok(result)
-        }
+        Ok(result)
     }
 
     fn unique_criteria<'a>(&self, model: &'a dml::Model) -> UniqueCriteria<'a> {
