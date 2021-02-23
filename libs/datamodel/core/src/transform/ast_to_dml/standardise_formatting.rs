@@ -199,7 +199,7 @@ impl StandardiserForFormatting {
         let mut errors = Diagnostics::new();
 
         let mut result = Vec::new();
-        for field in model.relation_fields() {
+        'back_relations: for field in model.relation_fields() {
             let rel_info = &field.relation_info;
             let related_model = schema.find_model(&rel_info.to).expect(STATE_ERROR);
 
@@ -244,38 +244,34 @@ impl StandardiserForFormatting {
                         .collect();
 
                     let underlying_field_names = underlying_fields.iter().map(|f| f.name.clone()).collect();
+
+                    let mut cont = false;
                     let underlying_fields_to_add = underlying_fields
-                            .into_iter()
-                            .filter(|f| {
-                                match related_model.find_field(&f.name) {
-                                    None => {
-                                        // field with name does not exist yet
-                                        true
-                                    }
-                                    Some(other) if other.field_type().is_compatible_with(&f.field_type) => {
-                                        // field with name exists and its type is compatible. We must not add it since we would have a duplicate.
-                                        false
-                                    }
-                                    _ => {
-                                        // field with name exists and the type is incompatible.
-                                        errors.push_error(DatamodelError::new_model_validation_error(
-                                            &format!(
-                                                "Automatic underlying field generation tried to add the field `{}` in model `{}` for the back relation field of `{}` in `{}`. A field with that name exists already and has an incompatible type for the relation. Please add the back relation manually.",
-                                                &f.name,
-                                                &related_model.name,
-                                                &field.name,
-                                                &model.name,
-                                            ),
-                                            &related_model.name,
-                                            schema_ast.find_model(&related_model.name)
-                                                .expect(ERROR_GEN_STATE_ERROR)
-                                                .span,
-                                        ));
-                                        false
-                                    }
+                        .into_iter()
+                        .filter(|f| {
+                            match related_model.find_field(&f.name) {
+                                None => {
+                                    // field with name does not exist yet
+                                    true
                                 }
-                            })
-                            .collect();
+                                Some(other) if other.field_type().is_compatible_with(&f.field_type) => {
+                                    // field with name exists and its type is compatible. We must not add it since we would have a duplicate.
+                                    false
+                                }
+                                _ => {
+                                    // field with name exists and its type is incompatible. We should not add a backrelation at all.
+                                    // todo but then we would fail the postvalidation
+                                    // maybe we shold not have that one for format since we can't always be right?
+                                    cont = true;
+                                    false
+                                }
+                            }
+                        })
+                        .collect();
+
+                    if cont {
+                        continue;
+                    }
 
                     let relation_info = dml::RelationInfo {
                         to: model.name.clone(),

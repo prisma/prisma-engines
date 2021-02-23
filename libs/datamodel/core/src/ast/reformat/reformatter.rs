@@ -1,8 +1,9 @@
 use super::helpers::*;
 use crate::ast::helper::get_sort_index_of_attribute;
+use crate::ast::WithName;
 use crate::common::WritableString;
 use crate::diagnostics::ValidatedMissingFields;
-use crate::{ast::parser::*, ast::renderer::*};
+use crate::{ast, ast::parser::*, ast::renderer::*};
 use pest::iterators::Pair;
 use pest::Parser;
 
@@ -10,21 +11,20 @@ pub struct Reformatter<'a> {
     input: &'a str,
     missing_fields: Result<ValidatedMissingFields, crate::diagnostics::Diagnostics>,
     missing_field_attributes: Result<Vec<MissingFieldAttribute>, crate::diagnostics::Diagnostics>,
+    missing_field_attribute_args: Result<Vec<MissingFieldAttributeArg>, crate::diagnostics::Diagnostics>,
 }
 
 impl<'a> Reformatter<'a> {
     pub fn new(input: &'a str) -> Self {
         let missing_fields = Self::find_all_missing_fields(&input);
         let missing_field_attributes = Self::find_all_missing_attributes(&input);
-        // let missing_attribute_args = Self::find_all_missing_attribute_args(&input);
-
-        println!("{:?}", missing_fields);
-        println!("{:?}", missing_field_attributes);
+        let missing_field_attribute_args = Self::find_all_missing_attribute_args(&input);
 
         Reformatter {
             input,
             missing_fields,
             missing_field_attributes,
+            missing_field_attribute_args,
         }
     }
 
@@ -34,7 +34,6 @@ impl<'a> Reformatter<'a> {
         let schema_ast = crate::parse_schema_ast(&schema_string)?;
         let validated_datamodel = crate::parse_datamodel_and_ignore_datasource_urls_for_formatter(&schema_string)?;
 
-        println!("Reformatter: \n{:#?}", validated_datamodel.subject);
         let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(None);
         let mut result = Vec::new();
 
@@ -67,29 +66,29 @@ impl<'a> Reformatter<'a> {
         let mut diagnostics = crate::diagnostics::Diagnostics::new();
         let schema_ast = crate::parse_schema_ast(&schema_string)?;
         let validated_datamodel = crate::parse_datamodel_and_ignore_datasource_urls_for_formatter(&schema_string)?;
+
         diagnostics.append_warning_vec(validated_datamodel.warnings);
         let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(None);
+
         let mut missing_field_attributes = Vec::new();
         for model in validated_datamodel.subject.models() {
             let ast_model = schema_ast.find_model(&model.name).unwrap();
             for field in model.fields() {
-                let original_ast_field = ast_model.fields.iter().find(|f| f.name.name == field.name());
                 let new_ast_field = lowerer.lower_field(&field, &validated_datamodel.subject);
-                if original_ast_field.is_some() {
+
+                if let Some(original_field) = ast_model.fields.iter().find(|f| f.name.name == field.name()) {
                     for attribute in new_ast_field.attributes {
-                        if let Some(original_field) = original_ast_field {
-                            if original_field
-                                .attributes
-                                .iter()
-                                .find(|d| d.name.name == attribute.name.name)
-                                .is_none()
-                            {
-                                missing_field_attributes.push(MissingFieldAttribute {
-                                    model: model.name.clone(),
-                                    field: field.name().to_string(),
-                                    attribute,
-                                })
-                            }
+                        if original_field
+                            .attributes
+                            .iter()
+                            .find(|d| d.name.name == attribute.name.name)
+                            .is_none()
+                        {
+                            missing_field_attributes.push(MissingFieldAttribute {
+                                model: model.name.clone(),
+                                field: field.name().to_string(),
+                                attribute,
+                            })
                         }
                     }
                 }
@@ -98,44 +97,51 @@ impl<'a> Reformatter<'a> {
         Ok(missing_field_attributes)
     }
 
-    //add missing attribute args
-    //start with @relation -> fields, references
-    // fn find_all_missing_attribute_args(
-    //     schema_string: &str,
-    // ) -> Result<Vec<MissingFieldAttribute>, crate::diagnostics::Diagnostics> {
-    //     let mut diagnostics = crate::diagnostics::Diagnostics::new();
-    //     let schema_ast = crate::parse_schema_ast(&schema_string)?;
-    //     let validated_datamodel = crate::parse_datamodel_and_ignore_datasource_urls_for_formatter(&schema_string)?;
-    //     diagnostics.append_warning_vec(validated_datamodel.warnings);
-    //     let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(None);
-    //     let mut missing_field_attributes = Vec::new();
-    //     for model in validated_datamodel.subject.models() {
-    //         let ast_model = schema_ast.find_model(&model.name).unwrap();
-    //         for field in model.fields() {
-    //             let original_ast_field = ast_model.fields.iter().find(|f| f.name.name == field.name());
-    //             let new_ast_field = lowerer.lower_field(&field, &validated_datamodel.subject);
-    //             if original_ast_field.is_some() {
-    //                 for attribute in new_ast_field.attributes {
-    //                     if let Some(original_field) = original_ast_field {
-    //                         if original_field
-    //                             .attributes
-    //                             .iter()
-    //                             .find(|d| d.name.name == attribute.name.name)
-    //                             .is_none()
-    //                         {
-    //                             missing_field_attributes.push(MissingFieldAttribute {
-    //                                 model: model.name.clone(),
-    //                                 field: field.name().to_string(),
-    //                                 attribute,
-    //                             })
-    //                         }
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //     }
-    //     Ok(missing_field_attributes)
-    // }
+    fn find_all_missing_attribute_args(
+        schema_string: &str,
+    ) -> Result<Vec<MissingFieldAttributeArg>, crate::diagnostics::Diagnostics> {
+        let mut diagnostics = crate::diagnostics::Diagnostics::new();
+        let schema_ast = crate::parse_schema_ast(&schema_string)?;
+        let validated_datamodel = crate::parse_datamodel_and_ignore_datasource_urls_for_formatter(&schema_string)?;
+
+        diagnostics.append_warning_vec(validated_datamodel.warnings);
+        let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(None);
+
+        let mut missing_field_attribute_args = Vec::new();
+        for model in validated_datamodel.subject.models() {
+            let ast_model = schema_ast.find_model(&model.name).unwrap();
+            for field in model.fields() {
+                let new_ast_field = lowerer.lower_field(&field, &validated_datamodel.subject);
+
+                if let Some(original_field) = ast_model.fields.iter().find(|f| f.name.name == field.name()) {
+                    for attribute in new_ast_field.attributes {
+                        if let Some(original_attribute) = original_field
+                            .attributes
+                            .iter()
+                            .find(|d| d.name.name == attribute.name.name)
+                        {
+                            for arg in &attribute.arguments {
+                                if original_attribute
+                                    .arguments
+                                    .iter()
+                                    .find(|d| d.name.name == arg.name.name)
+                                    .is_none()
+                                {
+                                    missing_field_attribute_args.push(MissingFieldAttributeArg {
+                                        model: model.name.clone(),
+                                        field: field.name().to_string(),
+                                        attribute: attribute.name().to_string(),
+                                        arg: arg.to_owned(),
+                                    })
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        Ok(missing_field_attribute_args)
+    }
 
     pub fn reformat_to(&self, output: &mut dyn std::io::Write, ident_width: usize) {
         let result = self.reformat_internal(ident_width);
@@ -189,7 +195,6 @@ impl<'a> Reformatter<'a> {
             if current.is_top_level_element() {
                 // separate top level elements with new lines
                 if seen_at_least_one_top_level_element {
-                    //                    println!("rendering newline");
                     target.write("\n");
                 }
                 seen_at_least_one_top_level_element = true;
@@ -283,7 +288,7 @@ impl<'a> Reformatter<'a> {
                     Rule::block_level_attribute => {
                         // model level attributes reset the table. -> .render() does that
                         table.render(renderer);
-                        Self::reformat_attribute(renderer, &token, "@@");
+                        Self::reformat_attribute(renderer, &token, "@@", vec![]);
                     }
                     Rule::field_declaration => self.reformat_field(table, &token, model_name),
                     _ => Self::reformat_generic_token(table, &token),
@@ -334,7 +339,6 @@ impl<'a> Reformatter<'a> {
         let mut last_line_was_empty = false;
 
         for current in token.clone().into_inner() {
-            // println!("block: {:?} |{:?}|", current.as_rule(), current.as_str());
             match current.as_rule() {
                 Rule::BLOCK_OPEN => {
                     block_has_opened = true;
@@ -419,7 +423,7 @@ impl<'a> Reformatter<'a> {
                 match token.as_rule() {
                     Rule::block_level_attribute => {
                         table.render(target);
-                        Self::reformat_attribute(target, token, "@@");
+                        Self::reformat_attribute(target, token, "@@", vec![]);
                         table.end_line();
                     }
                     Rule::enum_value_declaration => Self::reformat_enum_entry(table, token),
@@ -433,7 +437,9 @@ impl<'a> Reformatter<'a> {
         for current in token.clone().into_inner() {
             match current.as_rule() {
                 Rule::non_empty_identifier => target.write(current.as_str()),
-                Rule::attribute => Self::reformat_attribute(&mut target.column_locked_writer_for(2), &current, "@"),
+                Rule::attribute => {
+                    Self::reformat_attribute(&mut target.column_locked_writer_for(2), &current, "@", vec![])
+                }
                 Rule::doc_comment | Rule::comment => target.append_suffix_to_current_row(current.as_str()),
                 _ => Self::reformat_generic_token(target, &current),
             }
@@ -487,7 +493,24 @@ impl<'a> Reformatter<'a> {
                 Rule::field_type => {
                     target.write(&Self::reformat_field_type(&current));
                 }
-                Rule::attribute => Self::reformat_attribute(&mut target.column_locked_writer_for(2), &current, "@"),
+                //todo special case field attribute to pass model and field name and probably attribute name  and down to the args
+                Rule::attribute => {
+                    if let Ok(missing_field_attribute_args) = self.missing_field_attribute_args.as_ref() {
+                        let missing_relation_args: Vec<&MissingFieldAttributeArg> = missing_field_attribute_args
+                            .iter()
+                            .filter(|arg| arg.model == model_name && arg.field == *field_name)
+                            .collect();
+
+                        Self::reformat_attribute(
+                            &mut target.column_locked_writer_for(2),
+                            &current,
+                            "@",
+                            missing_relation_args,
+                        )
+                    } else {
+                        Self::reformat_attribute(&mut target.column_locked_writer_for(2), &current, "@", vec![])
+                    }
+                }
                 // This is a comment at the end of a field.
                 Rule::doc_comment | Rule::comment => target.append_suffix_to_current_row(current.as_str()),
                 // This is a comment before the field declaration. Hence it must be interlevaed.
@@ -496,6 +519,7 @@ impl<'a> Reformatter<'a> {
                 _ => Self::reformat_generic_token(target, &current),
             }
         }
+
         if let Ok(missing_field_attributes) = self.missing_field_attributes.as_ref() {
             for missing_field_attribute in missing_field_attributes.iter() {
                 if &missing_field_attribute.field == field_name && missing_field_attribute.model.as_str() == model_name
@@ -527,7 +551,7 @@ impl<'a> Reformatter<'a> {
                     target.write(&Self::get_identifier(&current));
                 }
                 Rule::attribute => {
-                    Self::reformat_attribute(&mut target.column_locked_writer_for(4), &current, "@");
+                    Self::reformat_attribute(&mut target.column_locked_writer_for(4), &current, "@", vec![]);
                 }
                 Rule::doc_comment | Rule::doc_comment_and_new_line => {
                     comment(&mut target.interleave_writer(), current.as_str())
@@ -576,8 +600,14 @@ impl<'a> Reformatter<'a> {
         panic!("No identifier found.")
     }
 
-    fn reformat_attribute(target: &mut dyn LineWriteable, token: &Token, owl: &str) {
+    fn reformat_attribute(
+        target: &mut dyn LineWriteable,
+        token: &Token,
+        owl: &str,
+        missing_args: Vec<&MissingFieldAttributeArg>,
+    ) {
         let token = Self::unpack_token_to_find_matching_rule(token.clone(), Rule::attribute);
+        let mut is_relation = false;
         for current in token.clone().into_inner() {
             match current.as_rule() {
                 Rule::attribute_name => {
@@ -585,12 +615,21 @@ impl<'a> Reformatter<'a> {
                         target.write(" ");
                     }
                     target.write(owl);
+                    if current.as_str() == "relation" {
+                        is_relation = true;
+                    }
                     target.write(current.as_str());
                 }
                 Rule::doc_comment | Rule::doc_comment_and_new_line => {
                     panic!("Comments inside attributes not supported yet.")
                 }
-                Rule::attribute_arguments => Self::reformat_attribute_args(target, &current),
+                Rule::attribute_arguments => {
+                    if is_relation {
+                        Self::reformat_attribute_args(target, &current, missing_args.clone())
+                    } else {
+                        Self::reformat_attribute_args(target, &current, vec![])
+                    }
+                }
                 Rule::NEWLINE => {}
                 _ => Self::reformat_generic_token(target, &current),
             }
@@ -611,7 +650,11 @@ impl<'a> Reformatter<'a> {
         }
     }
 
-    fn reformat_attribute_args(target: &mut dyn LineWriteable, token: &Token) {
+    fn reformat_attribute_args(
+        target: &mut dyn LineWriteable,
+        token: &Token,
+        missing_args: Vec<&MissingFieldAttributeArg>,
+    ) {
         let mut builder = StringBuilder::new();
 
         for current in token.clone().into_inner() {
@@ -637,12 +680,72 @@ impl<'a> Reformatter<'a> {
             };
         }
 
+        //todo order them rel name, fields, references
+        //do not print rel name if it matches the default
+        if !missing_args.is_empty() {
+            for arg in missing_args {
+                if !builder.line_empty() {
+                    builder.write(", ");
+                }
+                builder.write(&arg.arg.name.name);
+                builder.write(&": ");
+                Self::render_value(&mut builder, &arg.arg.value);
+            }
+        }
+
         if !builder.line_empty() {
             target.write("(");
             target.write(&builder.to_string());
             target.write(")");
         }
     }
+
+    //duplicated from renderer -.-
+    fn render_value(target: &mut StringBuilder, val: &ast::Expression) {
+        match val {
+            ast::Expression::Array(vals, _) => Self::render_array(target, &vals),
+            ast::Expression::BooleanValue(val, _) => target.write(&val),
+            ast::Expression::ConstantValue(val, _) => target.write(&val),
+            ast::Expression::NumericValue(val, _) => target.write(&val),
+            ast::Expression::StringValue(val, _) => Self::render_str(target, &val),
+            ast::Expression::Function(name, args, _) => Self::render_func(target, &name, &args),
+            ast::Expression::Any(_, _) => unimplemented!("Value of 'Any' type cannot be rendered."),
+        };
+    }
+    fn render_array(target: &mut StringBuilder, vals: &[ast::Expression]) {
+        target.write(&"[");
+        for (idx, arg) in vals.iter().enumerate() {
+            if idx > 0 {
+                target.write(&", ");
+            }
+            Self::render_value(target, arg);
+        }
+        target.write(&"]");
+    }
+    fn render_func(target: &mut StringBuilder, name: &str, vals: &[ast::Expression]) {
+        target.write(name);
+        target.write("(");
+        for (idx, val) in vals.iter().enumerate() {
+            if idx > 0 {
+                target.write(", ");
+            }
+
+            Self::render_value(target, val);
+        }
+        target.write(")");
+    }
+
+    fn render_str(target: &mut StringBuilder, param: &str) {
+        target.write("\"");
+        target.write(
+            &param
+                .replace(r#"\"#, r#"\\"#)
+                .replace(r#"""#, r#"\""#)
+                .replace("\n", "\\n"),
+        );
+        target.write("\"");
+    }
+    //duplicated from renderer -.-
 
     fn reformat_attribute_arg(target: &mut dyn LineWriteable, token: &Token) {
         for current in token.clone().into_inner() {
@@ -774,4 +877,12 @@ pub struct MissingFieldAttribute {
     pub model: String,
     pub field: String,
     pub attribute: crate::ast::Attribute,
+}
+
+#[derive(Debug)]
+pub struct MissingFieldAttributeArg {
+    pub model: String,
+    pub field: String,
+    pub attribute: String,
+    pub arg: crate::ast::Argument,
 }

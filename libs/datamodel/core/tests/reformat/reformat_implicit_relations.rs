@@ -328,46 +328,6 @@ model Post {
 }
 
 #[test]
-fn back_relations_must_be_added_even_when_env_vars_are_missing() {
-    // missing env vars led to errors in datamodel validation. A successful validation is prerequisite to find missing back relation fields though.
-    // I changed the Reformatter to ignore env var errors.
-    let input = r#"
-datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
-}
-
-model Blog {
-  id    Int    @id
-  posts Post[]
-}
-
-model Post {
-  id Int   @id
-}
-"#;
-
-    let expected = r#"datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
-}
-
-model Blog {
-  id    Int    @id
-  posts Post[]
-}
-
-model Post {
-  id     Int   @id
-  Blog   Blog? @relation(fields: [blogId], references: [id])
-  blogId Int?
-}
-"#;
-
-    assert_reformat(input, expected);
-}
-
-#[test]
 #[ignore]
 fn must_add_relation_attribute_to_an_existing_field() {
     let input = r#"
@@ -572,7 +532,6 @@ fn add_backrelation_for_unambiguous_self_relations_in_presence_of_unrelated_othe
     "#};
 
     assert_reformat(input, expected);
-    assert_eq!(true, false);
 }
 
 #[test]
@@ -593,16 +552,15 @@ fn must_succeed_when_fields_argument_is_missing_for_one_to_many() {
 
     let expected = indoc! {r#"
     model User {
-      id          Int        @id
-      motherId    Int
-      mother      User       @relation(fields: motherId, references: id)
-      subscribers Follower[]
-      User        User[]     @relation("UserToUser")
+      id        Int    @id
+      firstName String
+      posts     Post[]
     }
     
-    model Follower {
-      id        Int    @id
-      following User[]
+    model Post {
+      id     Int  @id
+      userId Int
+      user   User @relation(references: [id], fields: [userId])
     }
     "#};
 
@@ -668,36 +626,6 @@ fn must_add_referenced_fields_on_both_sides_for_one_to_many_relations_reverse() 
 
     assert_reformat(input, expected);
 }
-
-// fn must_render_generated_back_relation_fields() {
-//     let dml = r#"
-//     model User {
-//         id Int @id
-//         posts Post[]
-//     }
-//
-//     model Post {
-//         post_id Int @id
-//     }"#;
-//
-//     let expected = r#"model User {
-//   id    Int    @id
-//   posts Post[]
-// }
-//
-// model Post {
-//   post_id Int   @id
-//   User    User? @relation(fields: [userId], references: [id])
-//   userId  Int?
-// }
-// "#;
-//
-//     let schema = parse(dml);
-//
-//     let rendered = render_datamodel_to_string(&schema);
-//
-//     assert_eq!(rendered, expected);
-// }
 
 #[test]
 fn must_add_referenced_fields_on_the_right_side_for_one_to_one_relations() {
@@ -897,7 +825,12 @@ fn should_add_missing_embed_ids_on_self_relations() {
     "#};
 
     let expected = indoc! {r#"
-    
+    model Human {
+      id      Int    @id
+      father  Human? @relation("paternity", fields: [humanId], references: [id])
+      son     Human? @relation("paternity")
+      humanId Int?
+    }
     "#};
 
     assert_reformat(input, expected);
@@ -1003,8 +936,49 @@ fn should_not_get_confused_with_complicated_self_relations() {
     assert_reformat(input, input);
 }
 
+#[test]
+fn back_relations_must_be_added_even_when_env_vars_are_missing() {
+    // missing env vars led to errors in datamodel validation. A successful validation is prerequisite to find missing back relation fields though.
+    // I changed the Reformatter to ignore env var errors.
+    let input = r#"
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Blog {
+  id    Int    @id
+  posts Post[]
+}
+
+model Post {
+  id Int   @id
+}
+"#;
+
+    let expected = r#"datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Blog {
+  id    Int    @id
+  posts Post[]
+}
+
+model Post {
+  id     Int   @id
+  Blog   Blog? @relation(fields: [blogId], references: [id])
+  blogId Int?
+}
+"#;
+
+    let result = datamodel::ast::reformat::Reformatter::new(&input).reformat_to_string();
+
+    assert_eq!(result, expected);
+}
+
 //todo formatter failure??
-//currently panics
 #[test]
 fn must_handle_conflicts_with_existing_fields_if_types_are_incompatible_and_name_generation_breaks_down() {
     let input = indoc! {r#"
@@ -1014,30 +988,18 @@ fn must_handle_conflicts_with_existing_fields_if_types_are_incompatible_and_name
     }
     
     model Post {
-      id                String   @id      
-      blogId            Int?     // this is not compatible with Blog.id
-      blogId_BlogToPost Int?     // clashes with the auto generated name
+      id                String @id      
+      blogId            Int?   // this is not compatible with Blog.id
+      blogId_BlogToPost Int?   // clashes with the auto generated name
     }
     "#};
 
-    let expected = indoc! {r#"
-   
-    "#};
+    let result = datamodel::ast::reformat::Reformatter::new(&input).reformat_to_string();
 
-    assert_reformat(input, expected);
+    assert_eq!(input, result);
 }
 
 fn assert_reformat(schema: &str, expected_result: &str) {
-    //reformat input
     let result = datamodel::ast::reformat::Reformatter::new(&schema).reformat_to_string();
-    //make sure reformatted input is valid
-    println!("Reformatted Result:\n{}", result);
-    let dm = parse_datamodel(&result).unwrap();
-    println!("Parsed Result:\n{:#?}", dm.subject);
-
-    println!("Input:\n{:?}", schema);
-    //make sure expectation is valid
-    // parse_datamodel(expected_result).unwrap();
-
     assert_eq!(result, expected_result);
 }

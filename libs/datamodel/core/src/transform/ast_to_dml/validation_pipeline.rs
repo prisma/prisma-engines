@@ -72,14 +72,14 @@ impl<'a, 'b> ValidationPipeline<'a> {
             diagnostics.append(&mut err);
         }
 
-        println!("Standardised schema during parsing: \n{:#?}", schema);
+        // println!("Standardised schema during parsing: \n{:#?}", schema);
 
         // Phase 6: Consistency fixes. These only run during formatting.
         if transform {
             if let Err(mut err) = self.standardiser_for_formatting.standardise(ast_schema, &mut schema) {
                 diagnostics.append(&mut err);
             }
-            println!("Standardised schema during formatting: \n{:#?}", schema);
+            // println!("Standardised schema during formatting: \n{:#?}", schema);
         }
         // Early return so that the post validation does not have to deal with invalid schemas
         if diagnostics.has_errors() {
