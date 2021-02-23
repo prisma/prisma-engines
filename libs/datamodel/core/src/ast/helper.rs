@@ -1,16 +1,14 @@
-pub fn get_sort_index_of_attribute(is_field_attribute: bool, attribute_name: &str) -> usize {
+/// Get the sort order for an attribute, in the canonical sorting order.
+pub(crate) fn get_sort_index_of_attribute(is_field_attribute: bool, attribute_name: &str) -> usize {
     // this must match the order defined for rendering in libs/datamodel/core/src/transform/attributes/mod.rs
-    let correct_order = if is_field_attribute {
-        vec!["id", "unique", "default", "updatedAt", "map", "relation"]
+    let correct_order: &[&str] = if is_field_attribute {
+        &["id", "unique", "default", "updatedAt", "map", "relation"]
     } else {
-        vec!["id", "unique", "index", "map"]
+        &["id", "unique", "index", "map"]
     };
-    if let Some(sort_index) = correct_order
+
+    correct_order
         .iter()
-        .position(|p| attribute_name.starts_with(p) || attribute_name.starts_with(&format!("@@{}", p)))
-    {
-        sort_index
-    } else {
-        usize::MAX
-    }
+        .position(|p| attribute_name.trim_start_matches('@').starts_with(p))
+        .unwrap_or(usize::MAX)
 }

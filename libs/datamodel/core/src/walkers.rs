@@ -115,7 +115,7 @@ impl<'a> ModelWalker<'a> {
     }
 
     pub fn id_fields(&self) -> impl Iterator<Item = ScalarFieldWalker<'a>> + 'a {
-        let walker = self.clone();
+        let walker = *self;
         let model_idx = self.model_idx;
         let datamodel = self.datamodel;
 
