@@ -8,7 +8,6 @@ const SQL_SERVER: &str = "microsoftSqlServer";
 const GROUP_BY: &str = "groupBy";
 const CREATE_MANY: &str = "createMany";
 const ORDER_BY_RELATION: &str = "orderByRelation";
-const NAPI: &str = "napi";
 
 // deprecated preview features
 const ATOMIC_NUMBER_OPERATIONS: &str = "atomicNumberOperations";
@@ -19,7 +18,7 @@ const UNCHECKED_SCALAR_INPUTS: &str = "uncheckedScalarInputs";
 
 pub const DATASOURCE_PREVIEW_FEATURES: &[&str] = &[];
 
-pub const GENERATOR_PREVIEW_FEATURES: &[&str] = &[SQL_SERVER, GROUP_BY, CREATE_MANY, ORDER_BY_RELATION, NAPI];
+pub const GENERATOR_PREVIEW_FEATURES: &[&str] = &[SQL_SERVER, GROUP_BY, CREATE_MANY, ORDER_BY_RELATION];
 
 pub const DEPRECATED_GENERATOR_PREVIEW_FEATURES: &[&str] = &[
     ATOMIC_NUMBER_OPERATIONS,
