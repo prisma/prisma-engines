@@ -14,12 +14,12 @@ impl StandardiserForParsing {
 
     pub fn standardise(&self, schema: &mut dml::Datamodel) -> Result<(), Diagnostics> {
         self.name_unnamed_relations(schema);
-        self.set_relation_to_field_to_id_if_missing(schema)?;
+        self.set_relation_to_field_to_id_if_missing(schema);
         Ok(())
     }
 
     /// For M2M relations set the references to the @id fields of the foreign model.
-    fn set_relation_to_field_to_id_if_missing(&self, schema: &mut dml::Datamodel) -> Result<(), Diagnostics> {
+    fn set_relation_to_field_to_id_if_missing(&self, schema: &mut dml::Datamodel) {
         let schema_copy = schema.clone();
 
         // Iterate and mutate models.
@@ -31,21 +31,21 @@ impl StandardiserForParsing {
                         let rel_info = &mut field.relation_info;
                         let related_field_rel_info = &related_field.relation_info;
 
-                        if field.arity.is_list() && related_field.arity.is_list() {
-                            if rel_info.references.is_empty() && related_field_rel_info.references.is_empty() {
-                                rel_info.references = related_model
-                                    .first_unique_criterion()
-                                    .iter()
-                                    .map(|f| f.name.to_owned())
-                                    .collect();
-                            }
+                        if field.arity.is_list()
+                            && related_field.arity.is_list()
+                            && rel_info.references.is_empty()
+                            && related_field_rel_info.references.is_empty()
+                        {
+                            rel_info.references = related_model
+                                .first_unique_criterion()
+                                .iter()
+                                .map(|f| f.name.to_owned())
+                                .collect();
                         }
                     }
                 }
             }
         }
-
-        Ok(())
     }
 
     fn name_unnamed_relations(&self, datamodel: &mut dml::Datamodel) {
