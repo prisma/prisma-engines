@@ -38,43 +38,6 @@ impl SqlRenderer for SqliteFlavour {
         )
     }
 
-    fn render_column(&self, column: &ColumnWalker<'_>) -> String {
-        render_column(column).to_string()
-    }
-
-    fn render_references(&self, foreign_key: &ForeignKeyWalker<'_>) -> String {
-        let referenced_fields = foreign_key
-            .referenced_column_names()
-            .iter()
-            .map(Quoted::sqlite_ident)
-            .join(",");
-
-        format!(
-            "REFERENCES {referenced_table}({referenced_fields}) {on_delete_action} ON UPDATE CASCADE",
-            referenced_table = self.quote(foreign_key.referenced_table().name()),
-            referenced_fields = referenced_fields,
-            on_delete_action = render_on_delete(foreign_key.on_delete_action())
-        )
-    }
-
-    fn render_default<'a>(&self, default: &'a DefaultValue, family: &ColumnTypeFamily) -> Cow<'a, str> {
-        match (default.kind(), family) {
-            (DefaultKind::DBGENERATED(val), _) => val.as_str().into(),
-            (DefaultKind::VALUE(PrismaValue::String(val)), ColumnTypeFamily::String)
-            | (DefaultKind::VALUE(PrismaValue::Enum(val)), ColumnTypeFamily::Enum(_)) => {
-                format!("'{}'", escape_quotes(&val)).into()
-            }
-            (DefaultKind::VALUE(PrismaValue::Bytes(b)), ColumnTypeFamily::Binary) => {
-                format!("'{}'", format_hex(b)).into()
-            }
-            (DefaultKind::NOW, ColumnTypeFamily::DateTime) => "CURRENT_TIMESTAMP".into(),
-            (DefaultKind::NOW, _) => unreachable!("NOW default on non-datetime column"),
-            (DefaultKind::VALUE(val), ColumnTypeFamily::DateTime) => format!("'{}'", val).into(),
-            (DefaultKind::VALUE(val), _) => format!("{}", val).into(),
-            (DefaultKind::SEQUENCE(_), _) => "".into(),
-        }
-    }
-
     fn render_add_foreign_key(&self, _foreign_key: &ForeignKeyWalker<'_>) -> String {
         unreachable!("AddForeignKey on SQLite")
     }
@@ -93,7 +56,7 @@ impl SqlRenderer for SqliteFlavour {
             match change {
                 TableChange::AddColumn(AddColumn { column_index }) => {
                     let column = tables.next().column_at(*column_index);
-                    let col_sql = self.render_column(&column);
+                    let col_sql = render_column(&column);
 
                     statements.push(format!(
                         "ALTER TABLE {table_name} ADD COLUMN {column_definition}",
@@ -187,7 +150,7 @@ impl SqlRenderer for SqliteFlavour {
 
             result.push(self.render_create_table_as(tables.next(), &temporary_table_name));
 
-            copy_current_table_into_new_table(&mut result, redefine_table, &tables, &temporary_table_name, self);
+            copy_current_table_into_new_table(&mut result, redefine_table, &tables, &temporary_table_name);
 
             result.push(format!(r#"DROP TABLE "{}""#, tables.previous().name()));
 
@@ -250,7 +213,6 @@ fn copy_current_table_into_new_table(
     redefine_table: &RedefineTable,
     tables: &Pair<TableWalker<'_>>,
     temporary_table_name: &str,
-    flavour: &SqliteFlavour,
 ) {
     if redefine_table.column_pairs.is_empty() {
         return;
@@ -271,7 +233,7 @@ fn copy_current_table_into_new_table(
             format!(
                 "coalesce({column_name}, {default_value}) AS {column_name}",
                 column_name = Quoted::sqlite_ident(columns.previous().name()),
-                default_value = flavour.render_default(
+                default_value = render_default(
                     columns
                         .next()
                         .default()

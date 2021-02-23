@@ -13,6 +13,44 @@ use sql_ddl::postgres::{self as ddl, CreateEnum, CreateIndex};
 use sql_schema_describer::{walkers::*, *};
 use std::borrow::Cow;
 
+impl PostgresFlavour {
+    fn render_column(&self, column: &ColumnWalker<'_>) -> String {
+        let column_name = self.quote(column.name());
+        let tpe_str = render_column_type(column);
+        let nullability_str = render_nullability(&column);
+        let default_str = column
+            .default()
+            .map(|default| self.render_default(default, column.column_type_family()))
+            .filter(|default| !default.is_empty())
+            .map(|default| format!(" DEFAULT {}", default))
+            .unwrap_or_else(String::new);
+
+        format!(
+            "{}{} {}{}{}",
+            SQL_INDENTATION, column_name, tpe_str, nullability_str, default_str
+        )
+    }
+
+    fn render_default<'a>(&self, default: &'a DefaultValue, family: &ColumnTypeFamily) -> Cow<'a, str> {
+        match (default.kind(), family) {
+            (DefaultKind::DBGENERATED(val), _) => val.as_str().into(),
+            (DefaultKind::VALUE(PrismaValue::String(val)), ColumnTypeFamily::String)
+            | (DefaultKind::VALUE(PrismaValue::Enum(val)), ColumnTypeFamily::Enum(_)) => {
+                format!("E'{}'", escape_string_literal(&val)).into()
+            }
+            (DefaultKind::VALUE(PrismaValue::Bytes(b)), ColumnTypeFamily::Binary) => {
+                format!("'{}'", format_hex(b)).into()
+            }
+            (DefaultKind::NOW, ColumnTypeFamily::DateTime) => "CURRENT_TIMESTAMP".into(),
+            (DefaultKind::NOW, _) => unreachable!("NOW default on non-datetime column"),
+            (DefaultKind::VALUE(val), ColumnTypeFamily::DateTime) => format!("'{}'", val).into(),
+            (DefaultKind::VALUE(PrismaValue::String(val)), ColumnTypeFamily::Json) => format!("'{}'", val).into(),
+            (DefaultKind::VALUE(val), _) => val.to_string().into(),
+            (DefaultKind::SEQUENCE(_), _) => "".into(),
+        }
+    }
+}
+
 impl SqlRenderer for PostgresFlavour {
     fn quote<'a>(&self, name: &'a str) -> Quoted<&'a str> {
         Quoted::postgres_ident(name)
@@ -241,57 +279,6 @@ impl SqlRenderer for PostgresFlavour {
             .chain(std::iter::once(alter_table))
             .chain(after_statements.into_iter())
             .collect()
-    }
-
-    fn render_column(&self, column: &ColumnWalker<'_>) -> String {
-        let column_name = self.quote(column.name());
-        let tpe_str = render_column_type(column);
-        let nullability_str = render_nullability(&column);
-        let default_str = column
-            .default()
-            .map(|default| self.render_default(default, column.column_type_family()))
-            .filter(|default| !default.is_empty())
-            .map(|default| format!(" DEFAULT {}", default))
-            .unwrap_or_else(String::new);
-
-        format!(
-            "{}{} {}{}{}",
-            SQL_INDENTATION, column_name, tpe_str, nullability_str, default_str
-        )
-    }
-
-    fn render_references(&self, foreign_key: &ForeignKeyWalker<'_>) -> String {
-        let referenced_columns = foreign_key
-            .referenced_column_names()
-            .iter()
-            .map(Quoted::postgres_ident)
-            .join(",");
-
-        format!(
-            "REFERENCES {}({}) {} ON UPDATE CASCADE",
-            self.quote(&foreign_key.referenced_table().name()),
-            referenced_columns,
-            render_on_delete(&foreign_key.on_delete_action())
-        )
-    }
-
-    fn render_default<'a>(&self, default: &'a DefaultValue, family: &ColumnTypeFamily) -> Cow<'a, str> {
-        match (default.kind(), family) {
-            (DefaultKind::DBGENERATED(val), _) => val.as_str().into(),
-            (DefaultKind::VALUE(PrismaValue::String(val)), ColumnTypeFamily::String)
-            | (DefaultKind::VALUE(PrismaValue::Enum(val)), ColumnTypeFamily::Enum(_)) => {
-                format!("E'{}'", escape_string_literal(&val)).into()
-            }
-            (DefaultKind::VALUE(PrismaValue::Bytes(b)), ColumnTypeFamily::Binary) => {
-                format!("'{}'", format_hex(b)).into()
-            }
-            (DefaultKind::NOW, ColumnTypeFamily::DateTime) => "CURRENT_TIMESTAMP".into(),
-            (DefaultKind::NOW, _) => unreachable!("NOW default on non-datetime column"),
-            (DefaultKind::VALUE(val), ColumnTypeFamily::DateTime) => format!("'{}'", val).into(),
-            (DefaultKind::VALUE(PrismaValue::String(val)), ColumnTypeFamily::Json) => format!("'{}'", val).into(),
-            (DefaultKind::VALUE(val), _) => val.to_string().into(),
-            (DefaultKind::SEQUENCE(_), _) => "".into(),
-        }
     }
 
     fn render_create_enum(&self, enm: &EnumWalker<'_>) -> Vec<String> {

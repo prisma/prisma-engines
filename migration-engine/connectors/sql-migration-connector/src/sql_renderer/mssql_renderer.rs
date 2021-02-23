@@ -38,23 +38,6 @@ impl MssqlFlavour {
             name,
         }
     }
-}
-
-impl SqlRenderer for MssqlFlavour {
-    fn quote<'a>(&self, name: &'a str) -> Quoted<&'a str> {
-        Quoted::mssql_ident(name)
-    }
-
-    fn render_alter_table(&self, alter_table: &AlterTable, schemas: &Pair<&SqlSchema>) -> Vec<String> {
-        let AlterTable { table_index, changes } = alter_table;
-        let tables = schemas.tables(table_index);
-
-        alter_table::create_statements(&self, tables, changes)
-    }
-
-    fn render_alter_enum(&self, _: &AlterEnum, _: &Pair<&SqlSchema>) -> Vec<String> {
-        unreachable!("render_alter_enum on Microsoft SQL Server")
-    }
 
     fn render_column(&self, column: &ColumnWalker<'_>) -> String {
         let column_name = self.quote(column.name());
@@ -82,21 +65,6 @@ impl SqlRenderer for MssqlFlavour {
         format!("{} {}{}{}", column_name, r#type, nullability, default)
     }
 
-    fn render_references(&self, foreign_key: &ForeignKeyWalker<'_>) -> String {
-        let cols = foreign_key
-            .referenced_column_names()
-            .iter()
-            .map(Quoted::mssql_ident)
-            .join(",");
-
-        format!(
-            " REFERENCES {}({}) {} ON UPDATE CASCADE",
-            self.quote_with_schema(&foreign_key.referenced_table().name()),
-            cols,
-            render_on_delete(&foreign_key.on_delete_action()),
-        )
-    }
-
     fn render_default<'a>(&self, default: &'a DefaultValue, family: &ColumnTypeFamily) -> Cow<'a, str> {
         match (default.kind(), family) {
             (DefaultKind::DBGENERATED(val), _) => val.as_str().into(),
@@ -117,6 +85,38 @@ impl SqlRenderer for MssqlFlavour {
             (DefaultKind::VALUE(val), _) => val.to_string().into(),
             (DefaultKind::SEQUENCE(_), _) => "".into(),
         }
+    }
+
+    fn render_references(&self, foreign_key: &ForeignKeyWalker<'_>) -> String {
+        let cols = foreign_key
+            .referenced_column_names()
+            .iter()
+            .map(Quoted::mssql_ident)
+            .join(",");
+
+        format!(
+            " REFERENCES {}({}) {} ON UPDATE CASCADE",
+            self.quote_with_schema(&foreign_key.referenced_table().name()),
+            cols,
+            render_on_delete(&foreign_key.on_delete_action()),
+        )
+    }
+}
+
+impl SqlRenderer for MssqlFlavour {
+    fn quote<'a>(&self, name: &'a str) -> Quoted<&'a str> {
+        Quoted::mssql_ident(name)
+    }
+
+    fn render_alter_table(&self, alter_table: &AlterTable, schemas: &Pair<&SqlSchema>) -> Vec<String> {
+        let AlterTable { table_index, changes } = alter_table;
+        let tables = schemas.tables(table_index);
+
+        alter_table::create_statements(&self, tables, changes)
+    }
+
+    fn render_alter_enum(&self, _: &AlterEnum, _: &Pair<&SqlSchema>) -> Vec<String> {
+        unreachable!("render_alter_enum on Microsoft SQL Server")
     }
 
     fn render_alter_index(&self, indexes: Pair<&IndexWalker<'_>>) -> Vec<String> {
