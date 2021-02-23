@@ -4,8 +4,7 @@
 //! Database description. This crate is used heavily in the introspection and migration engines.
 use once_cell::sync::Lazy;
 use regex::Regex;
-use std::fmt::{self, Debug};
-use tracing::debug;
+use std::fmt::Debug;
 
 pub use error::{DescriberError, DescriberErrorKind, DescriberResult};
 use prisma_value::PrismaValue;
