@@ -980,6 +980,7 @@ model Post {
 //todo formatter failure??
 #[test]
 fn must_handle_conflicts_with_existing_fields_if_types_are_incompatible_and_name_generation_breaks_down() {
+    //just dont add anything
     let input = indoc! {r#"
     model Blog {
       id    String @id
@@ -987,9 +988,9 @@ fn must_handle_conflicts_with_existing_fields_if_types_are_incompatible_and_name
     }
     
     model Post {
-      id                String @id      
-      blogId            Int?   // this is not compatible with Blog.id
-      blogId_BlogToPost Int?   // clashes with the auto generated name
+      id                String @id
+      blogId            Int? // this is not compatible with Blog.id
+      blogId_BlogToPost Int? // clashes with the auto generated name
     }
     "#};
 
