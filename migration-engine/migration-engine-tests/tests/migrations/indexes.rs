@@ -8,6 +8,7 @@ async fn index_on_compound_relation_fields_must_work(api: &TestApi) -> TestResul
             id String @id
             email String
             name String
+            p    Post[]
 
             @@unique([email, name])
         }
@@ -144,14 +145,17 @@ async fn model_with_multiple_indexes_works(api: &TestApi) -> TestResult {
     let dm = r#"
     model User {
       id         Int       @id
+      l          Like[]
     }
 
     model Post {
       id        Int       @id
+      l         Like[]    
     }
 
     model Comment {
       id        Int       @id
+      l         Like[]
     }
 
     model Like {
@@ -489,7 +493,7 @@ async fn new_index_with_same_name_as_index_from_dropped_table_works(api: &TestAp
         model Cat {
             id Int @id
             ownerid String
-            owner Owner @relation(fields: [ownerid])
+            owner Owner @relation(fields: [ownerid], references: id)
 
             @@index([ownerid])
         }
@@ -503,6 +507,7 @@ async fn new_index_with_same_name_as_index_from_dropped_table_works(api: &TestAp
 
         model Owner {
             id String @id
+            c  Cat[]
         }
     "#;
 
@@ -516,13 +521,14 @@ async fn new_index_with_same_name_as_index_from_dropped_table_works(api: &TestAp
         model Owner {
             id Int @id
             ownerid String
-            owner Cat @relation(fields: [ownerid])
+            owner Owner @relation(fields: [ownerid], references: id)
 
             @@index([ownerid], name: "ownerid")
         }
 
         model Cat {
             id String @id
+            c  Cat[]
         }
     "#;
 

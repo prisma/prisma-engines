@@ -36,6 +36,7 @@ async fn an_enum_can_be_turned_into_a_model(api: &TestApi) -> TestResult {
             id Int @id
             description String
             biteRisk Int
+            c        Cat[]
         }
     "#;
 

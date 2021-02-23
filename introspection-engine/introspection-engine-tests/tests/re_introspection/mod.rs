@@ -1580,7 +1580,7 @@ async fn custom_repro(api: &TestApi) -> crate::TestResult {
         model Post{
           id        Int       @id @default(autoincrement())
           tag_id    Int
-          tag       Tag       @relation("post_to_tag", fields:[tag_id])
+          tag       Tag       @relation("post_to_tag", fields:[tag_id], references: id)
         }
 
         model Tag {
@@ -1595,7 +1595,7 @@ async fn custom_repro(api: &TestApi) -> crate::TestResult {
         model Post{
           id        Int       @id @default(autoincrement())
           tag_id    Int
-          tag       Tag       @relation("post_to_tag", fields:[tag_id])
+          tag       Tag       @relation("post_to_tag", fields:[tag_id], references: id)
         }
 
         model Tag {

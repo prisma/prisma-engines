@@ -361,6 +361,8 @@ async fn dropping_mutually_referencing_tables_works(api: &TestApi) -> TestResult
         ab B @relation("AtoB", fields: [b_id], references: [id])
         c_id Int
         ac C @relation("AtoC", fields: [c_id], references: [id])
+        b  B[] @relation("BtoA")
+        c  C[] @relation("CtoA")
     }
 
     model B {
@@ -369,6 +371,8 @@ async fn dropping_mutually_referencing_tables_works(api: &TestApi) -> TestResult
         ba A @relation("BtoA", fields: [a_id], references: [id])
         c_id Int
         bc C @relation("BtoC", fields: [c_id], references: [id])
+        a  A[] @relation("AtoB")
+        c  C[] @relation("CtoB")  
     }
 
     model C {
@@ -377,8 +381,9 @@ async fn dropping_mutually_referencing_tables_works(api: &TestApi) -> TestResult
         ca A @relation("CtoA", fields: [a_id], references: [id])
         b_id Int
         cb B @relation("CtoB", fields: [b_id], references: [id])
+        b  B[] @relation("BtoC")
+        a  A[] @relation("AtoC")
     }
-
     "#;
 
     api.schema_push(dm1).send().await?.assert_green()?;
