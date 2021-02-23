@@ -15,7 +15,7 @@ use prisma_value::PrismaValue;
 use regex::Regex;
 use sql_ddl::mysql as ddl;
 use sql_schema_describer::{
-    walkers::{ColumnWalker, EnumWalker, ForeignKeyWalker, IndexWalker, TableWalker},
+    walkers::{ColumnWalker, EnumWalker, ForeignKeyWalker, IndexWalker, TableWalker, ViewWalker},
     ColumnTypeFamily, DefaultKind, DefaultValue, ForeignKeyAction, SqlSchema,
 };
 use std::borrow::Cow;
@@ -338,6 +338,10 @@ impl SqlRenderer for MysqlFlavour {
 
     fn render_create_table(&self, table: &TableWalker<'_>) -> String {
         self.render_create_table_as(table, table.name())
+    }
+
+    fn render_drop_view(&self, view: &ViewWalker<'_>) -> String {
+        format!("DROP VIEW {}", Quoted::mysql_ident(view.name()))
     }
 }
 

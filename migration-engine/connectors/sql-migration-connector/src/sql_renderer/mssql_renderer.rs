@@ -11,7 +11,7 @@ use indoc::formatdoc;
 use native_types::{MsSqlType, MsSqlTypeParameter};
 use prisma_value::PrismaValue;
 use sql_schema_describer::{
-    walkers::{ColumnWalker, EnumWalker, ForeignKeyWalker, IndexWalker, TableWalker},
+    walkers::{ColumnWalker, EnumWalker, ForeignKeyWalker, IndexWalker, TableWalker, ViewWalker},
     ColumnTypeFamily, DefaultKind, DefaultValue, IndexType, SqlSchema,
 };
 use std::{
@@ -404,6 +404,10 @@ impl SqlRenderer for MssqlFlavour {
 
     fn render_drop_table(&self, table_name: &str) -> Vec<String> {
         vec![format!("DROP TABLE {}", self.quote_with_schema(&table_name))]
+    }
+
+    fn render_drop_view(&self, view: &ViewWalker<'_>) -> String {
+        format!("DROP VIEW {}", self.quote_with_schema(view.name()))
     }
 }
 

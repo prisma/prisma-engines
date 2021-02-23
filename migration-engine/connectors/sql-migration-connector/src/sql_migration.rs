@@ -39,6 +39,7 @@ pub(crate) enum SqlMigrationStep {
     CreateEnum(CreateEnum),
     DropEnum(DropEnum),
     AlterEnum(AlterEnum),
+    DropView(DropView),
 }
 
 impl SqlMigrationStep {
@@ -57,6 +58,7 @@ impl SqlMigrationStep {
             SqlMigrationStep::CreateEnum(_) => "CreateEnum",
             SqlMigrationStep::DropEnum(_) => "DropEnum",
             SqlMigrationStep::AlterEnum(_) => "AlterEnum",
+            SqlMigrationStep::DropView(_) => "DropView",
         }
     }
 }
@@ -101,6 +103,17 @@ impl TableChange {
             TableChange::AlterColumn(col) => Some(col),
             _ => None,
         }
+    }
+}
+
+#[derive(Debug, Copy, Clone)]
+pub(crate) struct DropView {
+    pub view_index: usize,
+}
+
+impl DropView {
+    pub fn new(view_index: usize) -> Self {
+        Self { view_index }
     }
 }
 

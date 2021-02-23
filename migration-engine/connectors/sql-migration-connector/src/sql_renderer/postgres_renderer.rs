@@ -371,6 +371,10 @@ impl SqlRenderer for PostgresFlavour {
             new_name = self.quote(new_name),
         )
     }
+
+    fn render_drop_view(&self, view: &ViewWalker<'_>) -> String {
+        format!("DROP VIEW {}", self.quote(view.name()))
+    }
 }
 
 pub(crate) fn render_column_type(col: &ColumnWalker<'_>) -> Cow<'static, str> {

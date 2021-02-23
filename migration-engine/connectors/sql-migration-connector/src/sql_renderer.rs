@@ -22,10 +22,7 @@ use crate::{
 };
 use common::Quoted;
 use sql_schema_describer::{
-    walkers::EnumWalker,
-    walkers::ForeignKeyWalker,
-    walkers::IndexWalker,
-    walkers::{ColumnWalker, TableWalker},
+    walkers::{ColumnWalker, EnumWalker, ForeignKeyWalker, IndexWalker, TableWalker, ViewWalker},
     ColumnTypeFamily, DefaultValue, SqlSchema,
 };
 use std::borrow::Cow;
@@ -85,4 +82,6 @@ pub(crate) trait SqlRenderer {
 
     /// Render a table renaming step.
     fn render_rename_table(&self, name: &str, new_name: &str) -> String;
+
+    fn render_drop_view(&self, view: &ViewWalker<'_>) -> String;
 }
