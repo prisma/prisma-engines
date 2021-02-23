@@ -8,7 +8,7 @@ use std::fmt::Debug;
 
 pub use error::{DescriberError, DescriberErrorKind, DescriberResult};
 use prisma_value::PrismaValue;
-use walkers::{EnumWalker, TableWalker};
+use walkers::{EnumWalker, TableWalker, ViewWalker};
 
 pub mod getters;
 pub mod mssql;
@@ -119,6 +119,10 @@ impl SqlSchema {
 
     pub fn table_walkers(&self) -> impl Iterator<Item = TableWalker<'_>> {
         (0..self.tables.len()).map(move |table_index| TableWalker::new(self, table_index))
+    }
+
+    pub fn view_walkers(&self) -> impl Iterator<Item = ViewWalker<'_>> {
+        (0..self.views.len()).map(move |view_index| ViewWalker::new(self, view_index))
     }
 
     pub fn enum_walkers(&self) -> impl Iterator<Item = EnumWalker<'_>> {

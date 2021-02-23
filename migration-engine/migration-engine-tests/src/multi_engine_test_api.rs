@@ -6,7 +6,7 @@
 use crate::{ApplyMigrations, CreateMigration, DiagnoseMigrationHistory, Reset, SchemaAssertion, SchemaPush};
 use enumflags2::BitFlags;
 use migration_core::GenericApi;
-use quaint::single::Quaint;
+use quaint::{prelude::Queryable, single::Quaint};
 use sql_migration_connector::SqlMigrationConnector;
 use tempfile::TempDir;
 use test_setup::{connectors::Tags, TestApiArgs};
@@ -126,5 +126,15 @@ impl EngineTestApi {
     /// Plan a `schemaPush` command
     pub fn schema_push(&self, dm: impl Into<String>) -> SchemaPush<'_> {
         SchemaPush::new(&self.0, dm.into())
+    }
+
+    /// The schema name of the current connected database.
+    pub fn schema_name(&self) -> &str {
+        self.0.quaint().connection_info().schema_name()
+    }
+
+    /// Execute a raw SQL command.
+    pub async fn raw_cmd(&self, cmd: &str) -> Result<(), quaint::error::Error> {
+        self.0.quaint().raw_cmd(cmd).await
     }
 }

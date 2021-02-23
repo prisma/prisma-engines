@@ -24,7 +24,7 @@ use flavour::SqlFlavour;
 use migration_connector::*;
 use pair::Pair;
 use quaint::{prelude::ConnectionInfo, single::Quaint};
-use sql_migration::SqlMigration;
+use sql_migration::{DropView, SqlMigration, SqlMigrationStep};
 use sql_schema_describer::{walkers::SqlSchemaExt, SqlSchema};
 use user_facing_errors::{common::InvalidDatabaseString, KnownError};
 
@@ -114,8 +114,22 @@ impl SqlMigrationConnector {
         let source_schema = self.flavour.describe_schema(connection).await?;
         let target_schema = SqlSchema::empty();
 
-        let steps =
-            sql_schema_differ::calculate_steps(Pair::new(&source_schema, &target_schema), self.flavour.as_ref());
+        let mut steps = Vec::new();
+
+        // We drop views here, not in the normal migration process to not
+        // accidentally drop something we can't describe in the data model.
+        let drop_views = source_schema
+            .view_walkers()
+            .map(|vw| vw.view_index())
+            .map(DropView::new)
+            .map(SqlMigrationStep::DropView);
+
+        steps.extend(drop_views);
+
+        steps.extend(sql_schema_differ::calculate_steps(
+            Pair::new(&source_schema, &target_schema),
+            self.flavour.as_ref(),
+        ));
 
         let migration = SqlMigration {
             before: source_schema,
