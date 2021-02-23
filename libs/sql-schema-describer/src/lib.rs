@@ -354,6 +354,10 @@ impl ColumnTypeFamily {
         matches!(self, ColumnTypeFamily::Boolean)
     }
 
+    pub fn is_datetime(&self) -> bool {
+        matches!(self, ColumnTypeFamily::DateTime)
+    }
+
     pub fn is_enum(&self) -> bool {
         matches!(self, ColumnTypeFamily::Enum(_))
     }

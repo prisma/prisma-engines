@@ -33,12 +33,7 @@ impl MysqlFlavour {
                     // We do not want to render binary defaults because they are not supported by MySQL.
                     && !matches!(column.column_type_family(), ColumnTypeFamily::Binary)
             })
-            .map(|default| {
-                format!(
-                    " DEFAULT {}",
-                    self.render_default(default, &column.column_type_family())
-                )
-            })
+            .map(|default| format!(" DEFAULT {}", render_default(column, default)))
             .unwrap_or_else(String::new);
         let foreign_key = column.table().foreign_key_for_column(column.name());
         let auto_increment_str = if column.is_autoincrement() {
@@ -56,21 +51,6 @@ impl MysqlFlavour {
                 "{}{} {}{}{}{}",
                 SQL_INDENTATION, column_name, tpe_str, nullability_str, default_str, auto_increment_str
             ),
-        }
-    }
-
-    fn render_default<'a>(&self, default: &'a DefaultValue, family: &ColumnTypeFamily) -> Cow<'a, str> {
-        match (default.kind(), family) {
-            (DefaultKind::DBGENERATED(val), _) => val.as_str().into(),
-            (DefaultKind::VALUE(PrismaValue::String(val)), ColumnTypeFamily::String)
-            | (DefaultKind::VALUE(PrismaValue::Enum(val)), ColumnTypeFamily::Enum(_)) => {
-                format!("'{}'", escape_string_literal(&val)).into()
-            }
-            (DefaultKind::NOW, ColumnTypeFamily::DateTime) => "CURRENT_TIMESTAMP(3)".into(),
-            (DefaultKind::NOW, _) => unreachable!("NOW default on non-datetime column"),
-            (DefaultKind::VALUE(val), ColumnTypeFamily::DateTime) => format!("'{}'", val).into(),
-            (DefaultKind::VALUE(val), _) => format!("{}", val).into(),
-            (DefaultKind::SEQUENCE(_), _) => "".into(),
         }
     }
 }
@@ -170,12 +150,9 @@ impl SqlRenderer for MysqlFlavour {
                             "ALTER COLUMN {column} DROP DEFAULT",
                             column = Quoted::mysql_ident(columns.previous().name())
                         )),
-                        MysqlAlterColumn::Modify { new_default, changes } => lines.push(render_mysql_modify(
-                            &changes,
-                            new_default.as_ref(),
-                            columns.next(),
-                            self,
-                        )),
+                        MysqlAlterColumn::Modify { new_default, changes } => {
+                            lines.push(render_mysql_modify(&changes, new_default.as_ref(), columns.next()))
+                        }
                     };
                 }
                 TableChange::DropAndRecreateColumn {
@@ -335,7 +312,6 @@ fn render_mysql_modify(
     changes: &ColumnChanges,
     new_default: Option<&sql_schema_describer::DefaultValue>,
     next_column: &ColumnWalker<'_>,
-    renderer: &MysqlFlavour,
 ) -> String {
     let column_type: Option<String> = if changes.type_changed() {
         Some(next_column.column_type().full_data_type.clone()).filter(|r| !r.is_empty() || r.contains("datetime"))
@@ -349,7 +325,7 @@ fn render_mysql_modify(
         .unwrap_or_else(|| render_column_type(&next_column));
 
     let default = new_default
-        .map(|default| renderer.render_default(&default, &next_column.column_type().family))
+        .map(|default| render_default(&next_column, &default))
         .filter(|expr| !expr.is_empty())
         .map(|expression| format!(" DEFAULT {}", expression))
         .unwrap_or_else(String::new);
@@ -492,5 +468,28 @@ impl MysqlAlterColumn {
             changes: *changes,
             new_default,
         }
+    }
+}
+
+fn render_default<'a>(column: &ColumnWalker<'a>, default: &'a DefaultValue) -> Cow<'a, str> {
+    match default.kind() {
+        DefaultKind::DBGENERATED(val) => val.as_str().into(),
+        DefaultKind::VALUE(PrismaValue::String(val)) | DefaultKind::VALUE(PrismaValue::Enum(val)) => {
+            Quoted::mysql_string(escape_string_literal(&val)).to_string().into()
+        }
+        DefaultKind::NOW => {
+            let precision = column
+                .column_native_type()
+                .as_ref()
+                .and_then(MySqlType::timestamp_precision)
+                .unwrap_or(3);
+
+            format!("CURRENT_TIMESTAMP({})", precision).into()
+        }
+        DefaultKind::VALUE(val) if column.column_type_family().is_datetime() => {
+            Quoted::mysql_string(val).to_string().into()
+        }
+        DefaultKind::VALUE(val) => val.to_string().into(),
+        DefaultKind::SEQUENCE(_) => Default::default(),
     }
 }
