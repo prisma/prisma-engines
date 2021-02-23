@@ -73,9 +73,6 @@
 
 #![allow(clippy::module_inception, clippy::suspicious_operation_groupings)]
 
-#[macro_use]
-extern crate tracing;
-
 pub mod ast;
 pub mod common;
 pub mod configuration;
