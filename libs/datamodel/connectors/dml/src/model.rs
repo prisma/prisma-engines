@@ -92,18 +92,12 @@ impl Model {
 
     /// Gets an iterator over all scalar fields.
     pub fn scalar_fields(&self) -> impl Iterator<Item = &ScalarField> {
-        self.fields().filter_map(|fw| match fw {
-            Field::RelationField(_) => None,
-            Field::ScalarField(sf) => Some(sf),
-        })
+        self.fields.iter().filter_map(|f| f.as_scalar_field())
     }
 
     /// Gets an iterator over all relation fields.
     pub fn relation_fields(&self) -> impl Iterator<Item = &RelationField> {
-        self.fields().filter_map(|fw| match fw {
-            Field::RelationField(rf) => Some(rf),
-            Field::ScalarField(_) => None,
-        })
+        self.fields.iter().filter_map(|f| f.as_relation_field())
     }
 
     /// Gets a mutable iterator over all scalar fields.

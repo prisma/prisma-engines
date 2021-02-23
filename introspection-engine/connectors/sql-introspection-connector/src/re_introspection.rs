@@ -108,8 +108,8 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family
             for field in model.relation_fields() {
                 if let Some(old_model) = old_data_model.find_model(&model.name) {
                     for old_field in old_model.relation_fields() {
-                        let related_field = &new_data_model.find_related_field_bang(&field);
-                        let old_related_field = &old_data_model.find_related_field_bang(&old_field);
+                        let (_, related_field) = &new_data_model.find_related_field_bang(&field);
+                        let (_, old_related_field) = &old_data_model.find_related_field_bang(&old_field);
                         //the relationinfos of both sides need to be compared since the relationinfo of the
                         // non-fk side does not contain enough information to uniquely identify the correct relationfield
 
@@ -148,8 +148,8 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family
             for field in model.relation_fields() {
                 if let Some(old_model) = old_data_model.find_model(&model.name) {
                     for old_field in old_model.relation_fields() {
-                        let related_field = &new_data_model.find_related_field_bang(&field);
-                        let old_related_field = &old_data_model.find_related_field_bang(&old_field);
+                        let (_, related_field) = &new_data_model.find_related_field_bang(&field);
+                        let (_, old_related_field) = &old_data_model.find_related_field_bang(&old_field);
                         //the relationinfos of both sides need to be compared since the relationinfo of the
                         // non-fk side does not contain enough information to uniquely identify the correct relationfield
 
