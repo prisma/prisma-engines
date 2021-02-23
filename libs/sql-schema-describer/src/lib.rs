@@ -345,26 +345,6 @@ impl ColumnTypeFamily {
     }
 }
 
-impl fmt::Display for ColumnTypeFamily {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let str = match self {
-            Self::Int => "int".to_string(),
-            Self::BigInt => "bigint".to_string(),
-            Self::Float => "float".to_string(),
-            Self::Decimal => "decimal".to_string(),
-            Self::Boolean => "boolean".to_string(),
-            Self::String => "string".to_string(),
-            Self::DateTime => "dateTime".to_string(),
-            Self::Binary => "binary".to_string(),
-            Self::Json => "json".to_string(),
-            Self::Uuid => "uuid".to_string(),
-            Self::Enum(x) => format!("Enum({})", &x),
-            Self::Unsupported(x) => x.to_string(),
-        };
-        write!(f, "{}", str)
-    }
-}
-
 /// A column's arity.
 #[derive(PartialEq, Clone, Debug)]
 pub enum ColumnArity {
