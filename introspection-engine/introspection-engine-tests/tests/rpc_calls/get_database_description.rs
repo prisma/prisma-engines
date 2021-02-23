@@ -72,6 +72,7 @@ async fn database_description_for_mysql_should_work(api: &TestApi) -> crate::Tes
     enums: [],
     sequences: [],
     views: [],
+    procedures: [],
 }"#;
 
     assert_eq_schema!(expected, api.get_database_description().await?);
@@ -136,6 +137,7 @@ async fn database_description_for_mysql_8_should_work(api: &TestApi) -> crate::T
     enums: [],
     sequences: [],
     views: [],
+    procedures: [],
 }"#;
 
     assert_eq_schema!(expected, api.get_database_description().await?);
@@ -217,6 +219,7 @@ async fn database_description_for_postgres_should_work(api: &TestApi) -> crate::
         },
     ],
     views: [],
+    procedures: [],
 }"#;
 
     assert_eq_schema!(expected, api.get_database_description().await?);
@@ -273,6 +276,7 @@ async fn database_description_for_sqlite_should_work(api: &TestApi) -> crate::Te
     enums: [],
     sequences: [],
     views: [],
+    procedures: [],
 }"#;
 
     assert_eq_schema!(expected, api.get_database_description().await?);

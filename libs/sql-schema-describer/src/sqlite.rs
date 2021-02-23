@@ -59,6 +59,8 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
             enums: vec![],
             // There are no sequences in SQLite.
             sequences: vec![],
+            // There are no procedures in SQLite (phew).
+            procedures: vec![],
             tables,
             views,
         })

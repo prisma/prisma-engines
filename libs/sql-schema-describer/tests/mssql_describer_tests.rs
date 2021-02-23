@@ -50,6 +50,23 @@ async fn views_can_be_described() {
 }
 
 #[tokio::test]
+async fn procedures_can_be_described() {
+    let db_name = "procedures_can_be_described";
+
+    let sql = format!(
+        "CREATE PROCEDURE [{}].foo @ID INT AS SELECT DB_NAME(@ID) AS bar",
+        db_name
+    );
+
+    let inspector = get_mssql_describer_for_schema(&sql, db_name).await;
+    let result = inspector.describe(db_name).await.expect("describing");
+    let procedure = result.get_procedure("foo").unwrap();
+
+    assert_eq!("foo", &procedure.name);
+    assert_eq!(sql, procedure.definition);
+}
+
+#[tokio::test]
 async fn all_mssql_column_types_must_work() {
     let db_name = "all_mssql_column_types_must_work";
 

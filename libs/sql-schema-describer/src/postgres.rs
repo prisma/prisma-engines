@@ -47,12 +47,14 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
         }
 
         let views = self.get_views(schema).await?;
+        let procedures = self.get_procedures(schema).await?;
 
         Ok(SqlSchema {
             enums,
             sequences,
             tables,
             views,
+            procedures,
         })
     }
 
@@ -93,6 +95,32 @@ impl SqlSchemaDescriber {
         trace!("Found schema names: {:?}", names);
 
         Ok(names)
+    }
+
+    #[tracing::instrument]
+    async fn get_procedures(&self, schema: &str) -> DescriberResult<Vec<Procedure>> {
+        let sql = r#"
+            SELECT p.proname AS name,
+                CASE WHEN l.lanname = 'internal' THEN p.prosrc
+                     ELSE pg_get_functiondef(p.oid)
+                     END as definition
+            FROM pg_proc p
+            LEFT JOIN pg_namespace n ON p.pronamespace = n.oid
+            LEFT JOIN pg_language l ON p.prolang = l.oid
+            WHERE n.nspname = $1
+        "#;
+
+        let rows = self.conn.query_raw(sql, &[schema.into()]).await?;
+        let mut procedures = Vec::with_capacity(rows.len());
+
+        for row in rows.into_iter() {
+            procedures.push(Procedure {
+                name: row.get_expect_string("name"),
+                definition: row.get_expect_string("definition"),
+            });
+        }
+
+        Ok(procedures)
     }
 
     #[tracing::instrument]

@@ -5,6 +5,23 @@ pub async fn reset_schema(conn: &dyn Queryable, schema_name: &str) -> Result<(),
     // delete first the foreign keys, then all the tables from the test schema
     // to allow a clean slate for the next test.
 
+    let drop_procedures = format!(
+        r#"
+        DECLARE @stmt NVARCHAR(max)
+        DECLARE @n CHAR(1)
+
+        SET @n = CHAR(10)
+
+        SELECT @stmt = ISNULL(@stmt + @n, '') +
+            'DROP PROCEDURE [' + SCHEMA_NAME(schema_id) + '].[' + OBJECT_NAME(object_id) + ']'
+        FROM sys.objects
+        WHERE SCHEMA_NAME(schema_id) = '{0}' AND type = 'P'
+
+        EXEC SP_EXECUTESQL @stmt
+        "#,
+        schema_name
+    );
+
     let drop_shared_defaults = format!(
         r#"
         DECLARE @stmt NVARCHAR(max)
@@ -15,7 +32,7 @@ pub async fn reset_schema(conn: &dyn Queryable, schema_name: &str) -> Result<(),
         SELECT @stmt = ISNULL(@stmt + @n, '') +
             'DROP DEFAULT [' + SCHEMA_NAME(schema_id) + '].[' + OBJECT_NAME(object_id) + ']'
         FROM sys.objects
-        WHERE SCHEMA_NAME(schema_id) = '{0}'
+        WHERE SCHEMA_NAME(schema_id) = '{0}' AND type = 'D'
 
         EXEC SP_EXECUTESQL @stmt
         "#,
@@ -73,6 +90,7 @@ pub async fn reset_schema(conn: &dyn Queryable, schema_name: &str) -> Result<(),
         schema_name
     );
 
+    conn.raw_cmd(&drop_procedures).await?;
     conn.raw_cmd(&drop_views).await?;
     conn.raw_cmd(&drop_fks).await?;
     conn.raw_cmd(&drop_tables).await?;

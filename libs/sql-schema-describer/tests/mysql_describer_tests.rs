@@ -53,6 +53,25 @@ async fn views_can_be_described() {
 }
 
 #[tokio::test]
+async fn procedures_can_be_described() {
+    let db_name = "procedures_can_be_described";
+
+    let sql = format!(
+        r#"
+        CREATE PROCEDURE {}.foo (OUT res INT) SELECT 1 INTO res
+        "#,
+        db_name
+    );
+
+    let inspector = get_mysql_describer_for_schema(&sql, db_name).await;
+    let result = inspector.describe(db_name).await.expect("describing");
+    let procedure = result.get_procedure("foo").unwrap();
+
+    assert_eq!("foo", &procedure.name);
+    assert_eq!("SELECT 1 INTO res", &procedure.definition);
+}
+
+#[tokio::test]
 async fn all_mysql_column_types_must_work() {
     let db_name = "all_mysql_column_types_must_work";
 
