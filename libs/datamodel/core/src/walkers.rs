@@ -12,25 +12,19 @@ use itertools::Itertools;
 
 /// Iterator over all the models in the schema.
 pub fn walk_models(datamodel: &Datamodel) -> impl Iterator<Item = ModelWalker<'_>> + '_ {
-    datamodel.models().map(move |model| ModelWalker { datamodel, model })
+    (0..datamodel.models.len()).map(move |model_idx| ModelWalker { datamodel, model_idx })
 }
 
 /// Iterator to walk all the scalar fields in the schema, associating them with their parent model.
 pub fn walk_scalar_fields(datamodel: &Datamodel) -> impl Iterator<Item = ScalarFieldWalker<'_>> + '_ {
-    datamodel.models().flat_map(move |model| {
-        model.scalar_fields().map(move |field| ScalarFieldWalker {
-            datamodel,
-            model,
-            field,
-        })
-    })
+    walk_models(datamodel).flat_map(|model| model.scalar_fields())
 }
 
 /// Iterator over all the relations in the schema. Each relation will only occur
 /// once.
 pub fn walk_relations(datamodel: &Datamodel) -> impl Iterator<Item = RelationWalker<'_>> {
     walk_models(datamodel)
-        .flat_map(move |model| model.into_relation_fields())
+        .flat_map(move |model| model.relation_fields())
         .unique_by(|walker| walker.relation_name())
         .map(|relation_field| {
             let field_b = relation_field.opposite_side();
@@ -45,91 +39,105 @@ pub fn walk_relations(datamodel: &Datamodel) -> impl Iterator<Item = RelationWal
 /// Find the model mapping to the passed in database name.
 pub fn find_model_by_db_name<'a>(datamodel: &'a Datamodel, db_name: &str) -> Option<ModelWalker<'a>> {
     datamodel
-        .models()
-        .find(|model| model.database_name() == Some(db_name) || model.name == db_name)
-        .map(|model| ModelWalker { datamodel, model })
+        .models
+        .iter()
+        .enumerate()
+        .find(|(_, model)| model.database_name() == Some(db_name) || model.name == db_name)
+        .map(|(model_idx, _model)| ModelWalker { datamodel, model_idx })
 }
 
 #[derive(Debug, Copy, Clone)]
 pub struct ModelWalker<'a> {
     datamodel: &'a Datamodel,
-    model: &'a Model,
+    model_idx: usize,
 }
 
 impl<'a> ModelWalker<'a> {
-    pub fn new(model: &'a Model, datamodel: &'a Datamodel) -> Self {
-        ModelWalker { datamodel, model }
-    }
-
     pub fn database_name(&self) -> &'a str {
-        self.model.database_name.as_ref().unwrap_or(&self.model.name)
+        self.get().database_name.as_ref().unwrap_or(&self.get().name)
     }
 
     pub fn db_name(&self) -> &str {
-        self.model.final_database_name()
+        self.get().final_database_name()
     }
 
-    pub fn into_relation_fields(self) -> impl Iterator<Item = RelationFieldWalker<'a>> + 'a {
-        self.model.relation_fields().map(move |field| RelationFieldWalker {
-            datamodel: self.datamodel,
-            model: self.model,
-            field,
-        })
+    fn get(&self) -> &'a Model {
+        &self.datamodel.models[self.model_idx]
     }
 
-    pub fn relation_fields<'b>(&'b self) -> impl Iterator<Item = RelationFieldWalker<'a>> + 'b {
-        self.model.relation_fields().map(move |field| RelationFieldWalker {
-            datamodel: self.datamodel,
-            model: self.model,
-            field,
-        })
+    /// Return the position of the scalar field with the provided name, if any.
+    pub fn index_of_scalar_field(&self, name: &str) -> Option<usize> {
+        self.scalar_fields().position(|sf| sf.name() == name)
     }
 
-    pub fn scalar_fields<'b>(&'b self) -> impl Iterator<Item = ScalarFieldWalker<'a>> + 'b {
-        self.model.scalar_fields().map(move |field| ScalarFieldWalker {
-            datamodel: self.datamodel,
-            model: self.model,
-            field,
-        })
+    pub fn relation_fields(&self) -> impl Iterator<Item = RelationFieldWalker<'a>> + 'a {
+        let datamodel = self.datamodel;
+        let model_idx = self.model_idx;
+
+        self.get()
+            .fields
+            .iter()
+            .enumerate()
+            .filter(|(_idx, field)| field.is_relation())
+            .map(move |(field_idx, _)| RelationFieldWalker {
+                datamodel,
+                model_idx,
+                field_idx,
+            })
+    }
+
+    pub fn scalar_fields(&self) -> impl Iterator<Item = ScalarFieldWalker<'a>> + 'a {
+        let datamodel = self.datamodel;
+        let model_idx = self.model_idx;
+
+        self.get()
+            .fields
+            .iter()
+            .enumerate()
+            .filter(|(_idx, field)| field.is_scalar_field())
+            .map(move |(field_idx, _)| ScalarFieldWalker {
+                datamodel,
+                model_idx,
+                field_idx,
+            })
     }
 
     pub fn find_scalar_field(&self, name: &str) -> Option<ScalarFieldWalker<'a>> {
-        self.model.find_scalar_field(name).map(|field| ScalarFieldWalker {
-            datamodel: self.datamodel,
-            field,
-            model: self.model,
-        })
+        self.scalar_fields().find(|sf| sf.name() == name)
     }
 
     pub fn indexes<'b>(&'b self) -> impl Iterator<Item = &'a IndexDefinition> + 'b {
-        self.model.indices.iter()
+        self.get().indices.iter()
     }
 
     pub fn name(&self) -> &'a str {
-        &self.model.name
+        &self.get().name
     }
 
-    pub fn id_fields<'b>(&'b self) -> impl Iterator<Item = ScalarFieldWalker<'a>> + 'b {
-        // Single-id models
-        self.model
-            .scalar_fields()
-            .filter(|field| field.is_id)
+    pub fn id_fields(&self) -> impl Iterator<Item = ScalarFieldWalker<'a>> + 'a {
+        let walker = self.clone();
+        let model_idx = self.model_idx;
+        let datamodel = self.datamodel;
+
+        self.scalar_fields()
+            // Single-id models
+            .filter(|field| field.is_id())
             // Compound id models
             .chain(
-                self.model
+                self.get()
                     .id_fields
                     .iter()
-                    .filter_map(move |field_name| self.model.find_scalar_field(field_name)),
+                    .filter_map(move |field_name| walker.find_scalar_field(field_name)),
             )
             .map(move |field| ScalarFieldWalker {
-                datamodel: self.datamodel,
-                model: self.model,
-                field,
+                datamodel,
+                model_idx,
+                field_idx: field.field_idx,
             })
     }
 
     pub fn unique_indexes<'b>(&'b self) -> impl Iterator<Item = IndexWalker<'a>> + 'b {
-        self.model
+        self.get()
             .indices
             .iter()
             .filter(|index| index.is_unique())
@@ -144,25 +152,25 @@ impl<'a> ModelWalker<'a> {
 #[derive(Debug, Clone, Copy)]
 pub struct ScalarFieldWalker<'a> {
     datamodel: &'a Datamodel,
-    model: &'a Model,
-    field: &'a ScalarField,
+    model_idx: usize,
+    field_idx: usize,
 }
 
 impl<'a> ScalarFieldWalker<'a> {
     pub fn arity(&self) -> FieldArity {
-        self.field.arity
+        self.get().arity
     }
 
     pub fn db_name(&self) -> &'a str {
-        self.field.final_database_name()
+        self.get().final_database_name()
     }
 
     pub fn default_value(&self) -> Option<&'a DefaultValue> {
-        self.field.default_value.as_ref()
+        self.get().default_value.as_ref()
     }
 
     pub fn field_type(&self) -> TypeWalker<'a> {
-        match &self.field.field_type {
+        match &self.get().field_type {
             FieldType::Enum(name) => TypeWalker::Enum(EnumWalker {
                 datamodel: self.datamodel,
                 r#enum: self.datamodel.find_enum(name).unwrap(),
@@ -174,27 +182,33 @@ impl<'a> ScalarFieldWalker<'a> {
         }
     }
 
+    fn get(&self) -> &'a ScalarField {
+        self.datamodel.models[self.model_idx].fields[self.field_idx]
+            .as_scalar_field()
+            .unwrap()
+    }
+
     pub fn is_id(&self) -> bool {
-        self.field.is_id
+        self.get().is_id
     }
 
     pub fn is_required(&self) -> bool {
-        self.field.is_required()
+        self.get().is_required()
     }
 
     pub fn is_unique(&self) -> bool {
-        self.field.is_unique
+        self.get().is_unique
     }
 
     pub fn model(&self) -> ModelWalker<'a> {
         ModelWalker {
-            model: self.model,
+            model_idx: self.model_idx,
             datamodel: self.datamodel,
         }
     }
 
     pub fn name(&self) -> &'a str {
-        &self.field.name
+        &self.get().name
     }
 }
 
@@ -226,47 +240,53 @@ impl<'a> TypeWalker<'a> {
 #[derive(Debug, Clone)]
 pub struct RelationFieldWalker<'a> {
     datamodel: &'a Datamodel,
-    model: &'a Model,
-    field: &'a RelationField,
+    model_idx: usize,
+    field_idx: usize,
 }
 
 impl<'a> RelationFieldWalker<'a> {
     pub fn arity(&self) -> FieldArity {
-        self.field.arity
+        self.get().arity
+    }
+
+    fn get(&self) -> &'a RelationField {
+        self.datamodel.models[self.model_idx].fields[self.field_idx]
+            .as_relation_field()
+            .unwrap()
     }
 
     pub fn is_one_to_one(&self) -> bool {
-        self.field.is_singular() && self.opposite_side().field.is_singular()
+        self.get().is_singular() && self.opposite_side().get().is_singular()
     }
 
     pub fn is_virtual(&self) -> bool {
-        self.field.relation_info.fields.is_empty()
+        self.get().relation_info.fields.is_empty()
     }
 
     pub fn model(&self) -> ModelWalker<'a> {
         ModelWalker {
             datamodel: self.datamodel,
-            model: self.model,
+            model_idx: self.model_idx,
         }
     }
 
     pub fn opposite_side(&self) -> RelationFieldWalker<'a> {
         RelationFieldWalker {
             datamodel: self.datamodel,
-            model: self.referenced_model().model,
-            field: self.datamodel.find_related_field_bang(self.field),
+            model_idx: self.referenced_model().model_idx,
+            field_idx: self.datamodel.find_related_field_bang(self.get()).0,
         }
     }
 
     pub fn referencing_columns<'b>(&'b self) -> impl Iterator<Item = &'a str> + 'b {
         self
-            .field
+            .get()
             .relation_info
             .fields
             .iter()
             .map(move |field| {
-                let field = self.model.find_scalar_field(field.as_str())
-                .unwrap_or_else(|| panic!("Unable to resolve field {} on {}, Expected relation `fields` to point to fields on the enclosing model.", field, self.model.name));
+                let field = self.model().find_scalar_field(field.as_str())
+                .unwrap_or_else(|| panic!("Unable to resolve field {} on {}, Expected relation `fields` to point to fields on the enclosing model.", field, self.model().name()));
 
                 field.db_name()
             })
@@ -274,7 +294,7 @@ impl<'a> RelationFieldWalker<'a> {
 
     pub fn referenced_columns<'b>(&'b self) -> impl Iterator<Item = &'a str> + 'b {
         self
-            .field
+            .get()
             .relation_info
             .references
             .iter()
@@ -288,19 +308,21 @@ impl<'a> RelationFieldWalker<'a> {
     }
 
     pub fn relation_name(&self) -> &'a str {
-        self.field.relation_info.name.as_ref()
+        self.get().relation_info.name.as_ref()
     }
 
     pub fn referenced_model(&self) -> ModelWalker<'a> {
         ModelWalker {
             datamodel: &self.datamodel,
-            model: self
+            model_idx: self
                 .datamodel
-                .find_model(&self.field.relation_info.to)
+                .models
+                .iter()
+                .position(|model| model.name == self.get().relation_info.to)
                 .unwrap_or_else(|| {
                     panic!(
                         "Invariant violation: could not find model {} referenced in relation info.",
-                        self.field.relation_info.to
+                        self.get().relation_info.to
                     )
                 }),
         }

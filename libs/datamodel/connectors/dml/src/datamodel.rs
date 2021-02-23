@@ -69,7 +69,7 @@ impl Datamodel {
 
     /// Finds parent  model for a field reference.
     pub fn find_model_by_relation_field_ref(&self, field: &RelationField) -> Option<&Model> {
-        self.find_model(&self.find_related_field_bang(&field).relation_info.to)
+        self.find_model(&self.find_related_field_bang(&field).1.relation_info.to)
     }
 
     /// Finds a mutable field reference by a model and field name.
@@ -138,12 +138,15 @@ impl Datamodel {
         fields
     }
 
-    /// Finds a relation field related to a relation info
-    pub fn find_related_field_for_info(&self, info: &RelationInfo, exclude: &str) -> Option<&RelationField> {
+    /// Finds a relation field related to a relation info. Returns a tuple (index_of_relation_field_in_model, relation_field).
+    pub fn find_related_field_for_info(&self, info: &RelationInfo, exclude: &str) -> Option<(usize, &RelationField)> {
         self.find_model(&info.to)
             .expect("The model referred to by a RelationInfo should always exist.")
-            .relation_fields()
-            .find(|f| {
+            .fields
+            .iter()
+            .enumerate()
+            .filter_map(|(idx, field)| field.as_relation_field().map(|f| (idx, f)))
+            .find(|(_idx, f)| {
                 f.relation_info.name == info.name
                     && (f.relation_info.to != info.to ||
           // This is to differentiate the opposite field from self in the self relation case.
@@ -152,12 +155,12 @@ impl Datamodel {
     }
 
     /// This finds the related field for a relationfield if available
-    pub fn find_related_field(&self, rf: &RelationField) -> Option<&RelationField> {
+    pub fn find_related_field(&self, rf: &RelationField) -> Option<(usize, &RelationField)> {
         self.find_related_field_for_info(&rf.relation_info, &rf.name)
     }
 
     /// This is used once we assume the datamodel to be internally valid
-    pub fn find_related_field_bang(&self, rf: &RelationField) -> &RelationField {
+    pub fn find_related_field_bang(&self, rf: &RelationField) -> (usize, &RelationField) {
         self.find_related_field(rf)
             .expect("Every RelationInfo should have a complementary RelationInfo on the opposite relation field.")
     }
