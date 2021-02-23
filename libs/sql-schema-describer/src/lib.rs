@@ -4,8 +4,7 @@
 //! Database description. This crate is used heavily in the introspection and migration engines.
 use once_cell::sync::Lazy;
 use regex::Regex;
-use std::fmt::{self, Debug};
-use tracing::debug;
+use std::fmt::Debug;
 
 pub use error::{DescriberError, DescriberErrorKind, DescriberResult};
 use prisma_value::PrismaValue;
@@ -361,26 +360,6 @@ impl ColumnTypeFamily {
 
     pub fn is_json(&self) -> bool {
         matches!(self, ColumnTypeFamily::Json)
-    }
-}
-
-impl fmt::Display for ColumnTypeFamily {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let str = match self {
-            Self::Int => "int".to_string(),
-            Self::BigInt => "bigint".to_string(),
-            Self::Float => "float".to_string(),
-            Self::Decimal => "decimal".to_string(),
-            Self::Boolean => "boolean".to_string(),
-            Self::String => "string".to_string(),
-            Self::DateTime => "dateTime".to_string(),
-            Self::Binary => "binary".to_string(),
-            Self::Json => "json".to_string(),
-            Self::Uuid => "uuid".to_string(),
-            Self::Enum(x) => format!("Enum({})", &x),
-            Self::Unsupported(x) => x.to_string(),
-        };
-        write!(f, "{}", str)
     }
 }
 
