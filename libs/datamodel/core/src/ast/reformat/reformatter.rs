@@ -680,16 +680,16 @@ impl<'a> Reformatter<'a> {
             };
         }
 
-        //todo order them rel name, fields, references
-        //do not print rel name if it matches the default
         if !missing_args.is_empty() {
             for arg in missing_args {
-                if !builder.line_empty() {
-                    builder.write(", ");
+                if !arg.arg.name.name.is_empty() {
+                    if !builder.line_empty() {
+                        builder.write(", ");
+                    }
+                    builder.write(&arg.arg.name.name);
+                    builder.write(&": ");
+                    Self::render_value(&mut builder, &arg.arg.value);
                 }
-                builder.write(&arg.arg.name.name);
-                builder.write(&": ");
-                Self::render_value(&mut builder, &arg.arg.value);
             }
         }
 
