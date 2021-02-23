@@ -169,6 +169,10 @@ impl<'a> ScalarFieldWalker<'a> {
         self.get().default_value.as_ref()
     }
 
+    pub fn field_index(&self) -> usize {
+        self.field_idx
+    }
+
     pub fn field_type(&self) -> TypeWalker<'a> {
         match &self.get().field_type {
             FieldType::Enum(name) => TypeWalker::Enum(EnumWalker {
@@ -278,17 +282,22 @@ impl<'a> RelationFieldWalker<'a> {
         }
     }
 
-    pub fn referencing_columns<'b>(&'b self) -> impl Iterator<Item = &'a str> + 'b {
+    pub fn constrained_field_names(&self) -> &'a [String] {
+        &self.get().relation_info.fields
+    }
+
+    pub fn constrained_fields(&self) -> impl Iterator<Item = ScalarFieldWalker<'a>> + 'a {
+        let model_walker = self.model();
+
         self
             .get()
             .relation_info
             .fields
             .iter()
             .map(move |field| {
-                let field = self.model().find_scalar_field(field.as_str())
-                .unwrap_or_else(|| panic!("Unable to resolve field {} on {}, Expected relation `fields` to point to fields on the enclosing model.", field, self.model().name()));
-
-                field.db_name()
+                model_walker
+                    .find_scalar_field(field.as_str())
+                    .unwrap_or_else(|| panic!("Unable to resolve field {} on {}, Expected relation `fields` to point to fields on the enclosing model.", field, model_walker.name()))
             })
     }
 

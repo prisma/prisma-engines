@@ -61,7 +61,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
         let table_names = self.get_table_names(schema).await?;
         let mut tables = Vec::with_capacity(table_names.len());
         let mut columns = Self::get_all_columns(&self.conn, schema, &flavour).await?;
-        let mut indexes = Self::get_all_indexes(&self.conn, schema).await?;
+        let mut indexes = Self::get_all_indexes(&self.conn, schema, &columns).await?;
         let mut fks = Self::get_foreign_keys(&self.conn, schema).await?;
 
         let mut enums = vec![];
@@ -368,6 +368,7 @@ impl SqlSchemaDescriber {
     async fn get_all_indexes(
         conn: &dyn Queryable,
         schema_name: &str,
+        columns: &HashMap<String, (Vec<Column>, Vec<Enum>)>,
     ) -> DescriberResult<HashMap<String, (BTreeMap<String, Index>, Option<PrimaryKey>)>> {
         let mut map = HashMap::new();
         let mut indexes_with_expressions: HashSet<(String, String)> = HashSet::new();
@@ -394,14 +395,28 @@ impl SqlSchemaDescriber {
             trace!("Got index row: {:#?}", row);
             let table_name = row.get_expect_string("table_name");
             let index_name = row.get_expect_string("index_name");
+
             if row.get_u32("partial").is_some() {
                 indexes_with_partially_covered_columns.insert((table_name.clone(), index_name.clone()));
             };
+
+            let table = columns
+                .get(&table_name)
+                .ok_or_else(|| format!("Index {} belongs to an unknown table ({})", index_name, table_name))
+                .unwrap();
+
             match row.get_string("column_name") {
                 Some(column_name) => {
                     let seq_in_index = row.get_expect_i64("seq_in_index");
                     let pos = seq_in_index - 1;
                     let is_unique = !row.get_expect_bool("non_unique");
+
+                    let column_idx_in_table = table
+                        .0
+                        .iter()
+                        .position(|col| col.name == column_name)
+                        .ok_or_else(|| format!("Index {} refers to unknown column {}", index_name, column_name))
+                        .unwrap();
 
                     // Multi-column indices will return more than one row (with different column_name values).
                     // We cannot assume that one row corresponds to one index.
@@ -409,7 +424,8 @@ impl SqlSchemaDescriber {
                         .entry(table_name)
                         .or_insert((BTreeMap::<String, Index>::new(), None));
 
-                    let is_pk = index_name.to_lowercase() == "primary";
+                    let is_pk = index_name.eq_ignore_ascii_case("primary");
+
                     if is_pk {
                         trace!("Column '{}' is part of the primary key", column_name);
                         match primary_key {
@@ -435,14 +451,14 @@ impl SqlSchemaDescriber {
                         };
                     } else if indexes_map.contains_key(&index_name) {
                         if let Some(index) = indexes_map.get_mut(&index_name) {
-                            index.columns.push(column_name);
+                            index.columns.push(column_idx_in_table);
                         }
                     } else {
                         indexes_map.insert(
                             index_name.clone(),
                             Index {
                                 name: index_name,
-                                columns: vec![column_name],
+                                columns: vec![column_idx_in_table],
                                 tpe: match is_unique {
                                     true => IndexType::Unique,
                                     false => IndexType::Normal,

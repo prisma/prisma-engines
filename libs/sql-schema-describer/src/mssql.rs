@@ -84,7 +84,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
     #[tracing::instrument]
     async fn describe(&self, schema: &str) -> DescriberResult<SqlSchema> {
         let mut columns = self.get_all_columns(schema).await?;
-        let mut indexes = self.get_all_indices(schema).await?;
+        let mut indexes = self.get_all_indices(schema, &columns).await?;
         let mut foreign_keys = self.get_foreign_keys(schema).await?;
 
         let table_names = self.get_table_names(schema).await?;
@@ -360,6 +360,7 @@ impl SqlSchemaDescriber {
     async fn get_all_indices(
         &self,
         schema: &str,
+        columns: &HashMap<String, Vec<Column>>,
     ) -> DescriberResult<HashMap<String, (BTreeMap<String, Index>, Option<PrimaryKey>)>> {
         let mut map = HashMap::new();
         let mut indexes_with_expressions: HashSet<(String, String)> = HashSet::new();
@@ -394,9 +395,18 @@ impl SqlSchemaDescriber {
 
             let table_name = row.get_expect_string("table_name");
             let index_name = row.get_expect_string("index_name");
+            let table = columns
+                .get(&table_name)
+                .ok_or_else(|| format!("Index {} belongs to an unknown table ({})", index_name, table_name))
+                .unwrap();
 
             match row.get("column_name").and_then(|x| x.to_string()) {
                 Some(column_name) => {
+                    let column_idx_in_table = table
+                        .iter()
+                        .position(|col| col.name == column_name)
+                        .ok_or_else(|| format!("Index {} refers to unknown column {}", index_name, column_name))
+                        .unwrap();
                     let seq_in_index = row.get_expect_i64("seq_in_index");
                     let pos = seq_in_index - 1;
                     let is_unique = row.get_expect_bool("is_unique");
@@ -437,14 +447,14 @@ impl SqlSchemaDescriber {
                         };
                     } else if indexes_map.contains_key(&index_name) {
                         if let Some(index) = indexes_map.get_mut(&index_name) {
-                            index.columns.push(column_name);
+                            index.columns.push(column_idx_in_table);
                         }
                     } else {
                         indexes_map.insert(
                             index_name.clone(),
                             Index {
                                 name: index_name,
-                                columns: vec![column_name],
+                                columns: vec![column_idx_in_table],
                                 tpe: match is_unique {
                                     true => IndexType::Unique,
                                     false => IndexType::Normal,

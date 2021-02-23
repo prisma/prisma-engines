@@ -50,7 +50,7 @@ pub fn introspect(
             .iter()
             .filter(|i| !(i.columns.len() == 1 && i.is_unique()))
         {
-            model.add_index(calculate_index(index));
+            model.add_index(calculate_index(index, &table));
         }
 
         if table.primary_key_columns().len() > 1 {

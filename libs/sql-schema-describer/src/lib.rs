@@ -152,6 +152,10 @@ impl Table {
         self.columns.iter().find(|c| c.name == name)
     }
 
+    pub fn column_index_for_bang(&self, name: &str) -> usize {
+        self.columns.iter().position(|col| col.name == name).unwrap()
+    }
+
     pub fn has_column(&self, name: &str) -> bool {
         self.column(name).is_some()
     }
@@ -181,11 +185,11 @@ impl Table {
     }
 
     pub fn is_column_unique(&self, column_name: &str) -> bool {
-        self.indices.iter().any(|index| {
-            index.tpe == IndexType::Unique
-                && index.columns.len() == 1
-                && index.columns.contains(&column_name.to_owned())
-        })
+        let colidx = self.column_index_for_bang(column_name);
+
+        self.indices
+            .iter()
+            .any(|index| index.tpe == IndexType::Unique && index.columns.len() == 1 && index.columns.contains(&colidx))
     }
 
     pub fn is_column_primary_key(&self, column_name: &str) -> bool {
@@ -217,7 +221,7 @@ pub struct Index {
     /// Index name.
     pub name: String,
     /// Index columns.
-    pub columns: Vec<String>,
+    pub columns: Vec<usize>,
     /// Type of index.
     pub tpe: IndexType,
 }

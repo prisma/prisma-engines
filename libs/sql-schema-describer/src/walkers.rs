@@ -343,6 +343,15 @@ impl<'schema> ForeignKeyWalker<'schema> {
         &self.foreign_key().columns
     }
 
+    /// Returns whether the constrained columns match the passed in column indexes.
+    pub fn constrained_columns_match(&self, constrained_columns: &[usize]) -> bool {
+        self.foreign_key().columns.len() == constrained_columns.len()
+            && self
+                .constrained_columns()
+                .zip(constrained_columns.iter())
+                .all(|(a, b)| a.column_index == *b)
+    }
+
     /// The foreign key columns on the referencing table.
     pub fn constrained_columns<'b>(&'b self) -> impl Iterator<Item = ColumnWalker<'schema>> + 'b {
         self.foreign_key()
@@ -438,23 +447,33 @@ impl<'a> fmt::Debug for IndexWalker<'a> {
 }
 
 impl<'a> IndexWalker<'a> {
-    /// The names of the indexed columns.
-    pub fn column_names(&self) -> &[String] {
+    /// The indexes of the indexed columns in the table.
+    pub fn column_indexes(&self) -> &'a [usize] {
         &self.get().columns
+    }
+
+    /// Returns whether the indexed column's names are the same between `self` and `other`.
+    pub fn columns_match(&self, other: &IndexWalker<'_>) -> bool {
+        self.get().columns.len() == other.get().columns.len()
+            && self.columns().zip(other.columns()).all(|(a, b)| a.name() == b.name())
+    }
+
+    /// Returns whether the indexed columns' names match the provided names.
+    pub fn column_names_match(&self, names: &[String]) -> bool {
+        self.get().columns.len() == names.len() && self.columns().zip(names.iter()).all(|(a, b)| a.name() == b)
     }
 
     /// Traverse the indexed columns.
     pub fn columns<'b>(&'b self) -> impl Iterator<Item = ColumnWalker<'a>> + 'b {
-        self.get().columns.iter().map(move |column_name| {
-            self.table()
-                .column(column_name)
-                .expect("Failed to find column referenced in index")
-        })
+        self.get()
+            .columns
+            .iter()
+            .map(move |colidx| self.table().column_at(*colidx))
     }
 
     /// True if index contains the given column.
     pub fn contains_column(&self, column_name: &str) -> bool {
-        self.get().columns.iter().any(|column| column == column_name)
+        self.columns().any(|col| col.name() == column_name)
     }
 
     fn get(&self) -> &'a Index {

@@ -162,7 +162,7 @@ pub(crate) fn columns_match(a: &ColumnWalker<'_>, b: &ColumnWalker<'_>) -> bool 
     a.name() == b.name()
 }
 
-/// Compare two SQL indexes and return whether they only differ by name.
+/// Compare two SQL indexes on the same table and return whether they only differ by name.
 fn indexes_match(first: &IndexWalker<'_>, second: &IndexWalker<'_>) -> bool {
-    first.column_names() == second.column_names() && first.index_type() == second.index_type()
+    first.columns_match(second) && first.index_type() == second.index_type()
 }

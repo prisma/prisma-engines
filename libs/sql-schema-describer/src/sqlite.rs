@@ -36,8 +36,9 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
             tables.push(self.get_table(schema, table_name).await?)
         }
 
-        //sqlite allows foreign key definitions without specifying the referenced columns, it then assumes the pk is used
+        // sqlite allows foreign key definitions without specifying the referenced columns, it then assumes the pk is used
         let mut foreign_keys_without_referenced_columns = vec![];
+
         for (table_index, table) in tables.iter().enumerate() {
             for (fk_index, foreign_key) in table.foreign_keys.iter().enumerate() {
                 if foreign_key.referenced_columns.is_empty() {
@@ -132,7 +133,7 @@ impl SqlSchemaDescriber {
     async fn get_table(&self, schema: &str, name: &str) -> DescriberResult<Table> {
         let (columns, primary_key) = self.get_columns(name).await?;
         let foreign_keys = self.get_foreign_keys(name).await?;
-        let indices = self.get_indices(name).await?;
+        let indices = self.get_indices(name, &columns).await?;
 
         Ok(Table {
             name: name.to_string(),
@@ -412,7 +413,7 @@ impl SqlSchemaDescriber {
         Ok(fks)
     }
 
-    async fn get_indices(&self, table: &str) -> DescriberResult<Vec<Index>> {
+    async fn get_indices(&self, table: &str, columns: &[Column]) -> DescriberResult<Vec<Index>> {
         let sql = format!(r#"PRAGMA index_list("{}");"#, table);
         let result_set = self.conn.query_raw(&sql, &[]).await?;
         trace!("Got indices description results: {:?}", result_set);
@@ -443,10 +444,17 @@ impl SqlSchemaDescriber {
             for row in result_set.into_iter() {
                 let pos = row.get("seqno").and_then(|x| x.as_i64()).expect("get seqno") as usize;
                 let col_name = row.get("name").and_then(|x| x.to_string()).expect("get name");
+                let column_idx_in_table = columns
+                    .iter()
+                    .position(|col| col.name == col_name)
+                    .ok_or_else(|| format!("Index {} refers to unknown column {}", name, col_name))
+                    .unwrap();
+
                 if index.columns.len() <= pos {
-                    index.columns.resize(pos + 1, "".to_string());
+                    index.columns.resize(pos + 1, 0);
                 }
-                index.columns[pos] = col_name;
+
+                index.columns[pos] = column_idx_in_table;
             }
 
             indices.push(index)

@@ -4,7 +4,7 @@ pub(super) use sql_schema_calculator_flavour::SqlSchemaCalculatorFlavour;
 
 use crate::{flavour::SqlFlavour, sql_renderer::IteratorJoin};
 use datamodel::{
-    walkers::{walk_models, walk_relations, ModelWalker, ScalarFieldWalker, TypeWalker},
+    walkers::{walk_models, walk_relations, ModelWalker, RelationFieldWalker, ScalarFieldWalker, TypeWalker},
     Datamodel, DefaultValue, FieldArity, IndexDefinition, IndexType, ScalarType,
 };
 use prisma_value::PrismaValue;
@@ -29,10 +29,15 @@ fn calculate_model_tables<'a>(
     flavour: &'a dyn SqlFlavour,
 ) -> impl Iterator<Item = sql::Table> + 'a {
     walk_models(datamodel).map(move |model| {
-        let columns = model
+        // Throughout this function, we reloy on the following invariant: the
+        // columns in the SQL table match 1:1 with the scalar fields in the model, and they are
+        // in the same order.
+        let columns: Vec<_> = model
             .scalar_fields()
             .map(|field| column_for_scalar_field(&field, flavour))
             .collect();
+
+        let mut indexes = Vec::new();
 
         let primary_key = Some(sql::PrimaryKey {
             columns: model.id_fields().map(|field| field.db_name().to_owned()).collect(),
@@ -41,19 +46,23 @@ fn calculate_model_tables<'a>(
         })
         .filter(|pk| !pk.columns.is_empty());
 
-        let single_field_indexes = model.scalar_fields().filter(|f| f.is_unique()).map(|f| sql::Index {
-            name: flavour.single_field_index_name(model.db_name(), f.db_name()),
-            columns: vec![f.db_name().to_owned()],
-            tpe: sql::IndexType::Unique,
-        });
+        let single_field_indexes = model
+            .scalar_fields()
+            .enumerate()
+            .filter(|(_, f)| f.is_unique())
+            .map(|(idx, f)| sql::Index {
+                name: flavour.single_field_index_name(model.db_name(), f.db_name()),
+                columns: vec![idx],
+                tpe: sql::IndexType::Unique,
+            });
 
         let multiple_field_indexes = model.indexes().map(|index_definition: &IndexDefinition| {
-            let referenced_fields: Vec<ScalarFieldWalker<'_>> = index_definition
+            let index_columns: Vec<usize> = index_definition
                 .fields
                 .iter()
                 .map(|field_name| {
                     model
-                        .find_scalar_field(field_name)
+                        .index_of_scalar_field(field_name)
                         .expect("Unknown field in index directive.")
                 })
                 .collect();
@@ -67,7 +76,7 @@ fn calculate_model_tables<'a>(
                 format!(
                     "{table}.{fields}_{qualifier}",
                     table = &model.db_name(),
-                    fields = referenced_fields.iter().map(|field| field.db_name()).join("_"),
+                    fields = index_columns.iter().map(|idx| columns[*idx].name.as_str()).join("_"),
                     qualifier = if index_type.is_unique() { "unique" } else { "index" },
                 )
             });
@@ -76,18 +85,17 @@ fn calculate_model_tables<'a>(
                 name: index_name,
                 // The model index definition uses the model field names, but the SQL Index
                 // wants the column names.
-                columns: referenced_fields
-                    .iter()
-                    .map(|field| field.db_name().to_owned())
-                    .collect(),
+                columns: index_columns,
                 tpe: index_type,
             }
         });
 
+        indexes.extend(single_field_indexes.chain(multiple_field_indexes));
+
         let mut table = sql::Table {
             name: model.database_name().to_owned(),
             columns,
-            indices: single_field_indexes.chain(multiple_field_indexes).collect(),
+            indices: indexes, // -.-
             primary_key,
             foreign_keys: Vec::new(),
         };
@@ -104,54 +112,64 @@ fn push_inline_relations(model: ModelWalker<'_>, table: &mut sql::Table) {
         .filter(|relation_field| !relation_field.is_virtual());
 
     for relation_field in relation_fields {
-        let fk_columns: Vec<String> = relation_field.referencing_columns().map(String::from).collect();
-
         // Optional unique index for 1:1 relations.
         if relation_field.is_one_to_one() {
-            push_one_to_one_relation_unique_index(&fk_columns, table);
+            push_one_to_one_relation_unique_index(&relation_field, table);
         }
 
         // Foreign key
-        {
-            let fk = sql::ForeignKey {
-                constraint_name: None,
-                columns: fk_columns,
-                referenced_table: relation_field.referenced_model().database_name().to_owned(),
-                referenced_columns: relation_field.referenced_columns().map(String::from).collect(),
-                on_update_action: sql::ForeignKeyAction::Cascade,
-                on_delete_action: match column_arity(relation_field.arity()) {
-                    sql::ColumnArity::Required => sql::ForeignKeyAction::Cascade,
-                    _ => sql::ForeignKeyAction::SetNull,
-                },
-            };
+        let fk = sql::ForeignKey {
+            constraint_name: None,
+            columns: relation_field
+                .constrained_fields()
+                .map(|field| field.db_name().to_owned())
+                .collect(),
+            referenced_table: relation_field.referenced_model().database_name().to_owned(),
+            referenced_columns: relation_field.referenced_columns().map(String::from).collect(),
+            on_update_action: sql::ForeignKeyAction::Cascade,
+            on_delete_action: match column_arity(relation_field.arity()) {
+                sql::ColumnArity::Required => sql::ForeignKeyAction::Cascade,
+                _ => sql::ForeignKeyAction::SetNull,
+            },
+        };
 
-            table.foreign_keys.push(fk);
-        }
+        table.foreign_keys.push(fk);
     }
 }
 
-fn push_one_to_one_relation_unique_index(column_names: &[String], table: &mut sql::Table) {
+fn push_one_to_one_relation_unique_index(relation_field: &RelationFieldWalker<'_>, table: &mut sql::Table) {
+    let column_indexes = relation_field
+        .constrained_fields()
+        .map(|field| {
+            relation_field
+                .model()
+                .scalar_fields()
+                .position(|f| f.field_index() == field.field_index())
+                .expect("Invariant violation: relation field cannot find constrained fields on parent model.")
+        })
+        .collect();
+
     // Don't add a duplicate index.
     if table
         .indices
         .iter()
-        .any(|index| index.columns == column_names && index.tpe.is_unique())
+        .any(|index| index.columns == column_indexes && index.tpe.is_unique())
     {
         return;
     }
 
-    //Don't add if there is a @@id or @id covering
+    // Don't add if there is a @@id or @id covering
     if let Some(pk) = &table.primary_key {
-        if pk.columns == column_names {
+        if pk.columns == relation_field.constrained_field_names() {
             return;
         }
     }
 
-    let columns_suffix = column_names.join("_");
+    let columns_suffix = relation_field.constrained_field_names().join("_");
 
     let index = sql::Index {
         name: format!("{}_{}_unique", table.name, columns_suffix),
-        columns: column_names.to_owned(),
+        columns: column_indexes,
         tpe: sql::IndexType::Unique,
     };
 
@@ -194,12 +212,12 @@ fn calculate_relation_tables<'a>(
             let indexes = vec![
                 sql::Index {
                     name: format!("{}_AB_unique", &table_name),
-                    columns: vec![m2m.model_a_column().into(), m2m.model_b_column().into()],
+                    columns: vec![0, 1],
                     tpe: sql::IndexType::Unique,
                 },
                 sql::Index {
                     name: format!("{}_B_index", &table_name),
-                    columns: vec![m2m.model_b_column().into()],
+                    columns: vec![1],
                     tpe: sql::IndexType::Normal,
                 },
             ];

@@ -7,7 +7,7 @@ use datamodel::{
 use datamodel_connector::Connector;
 use quaint::connector::SqlFamily;
 use sql_datamodel_connector::SqlDatamodelConnectors;
-use sql_schema_describer::DefaultKind;
+use sql_schema_describer::{walkers::SqlSchemaExt, DefaultKind};
 use sql_schema_describer::{Column, ColumnArity, ColumnTypeFamily, ForeignKey, Index, IndexType, SqlSchema, Table};
 use tracing::debug;
 
@@ -76,15 +76,15 @@ fn common_prisma_m_to_n_relation_conditions(table: &Table) -> bool {
         //UNIQUE INDEX [A,B]
         && table.indices.iter().any(|i| {
             i.columns.len() == 2
-                && is_a(&i.columns[0])
-                && is_b(&i.columns[1])
+                && is_a(&table.columns[i.columns[0]].name)
+                && is_b(&table.columns[i.columns[1]].name)
                 && i.tpe == IndexType::Unique
         })
         //INDEX [B]
         && table
             .indices
             .iter()
-            .any(|i| i.columns.len() == 1 && is_b(&i.columns[0]) && i.tpe == IndexType::Normal)
+            .any(|i| i.columns.len() == 1 && is_b(&table.columns[i.columns[0]].name) && i.tpe == IndexType::Normal)
         // 2 FKs
         && table.foreign_keys.len() == 2
         // Lexicographically lower model referenced by A
@@ -120,7 +120,7 @@ pub fn calculate_many_to_many_field(
     RelationField::new(&name, FieldArity::List, relation_info)
 }
 
-pub(crate) fn calculate_index(index: &Index) -> IndexDefinition {
+pub(crate) fn calculate_index(index: &Index, table: &Table) -> IndexDefinition {
     debug!("Handling index  {:?}", index);
     let tpe = match index.tpe {
         IndexType::Unique => datamodel::dml::IndexType::Unique,
@@ -129,7 +129,11 @@ pub(crate) fn calculate_index(index: &Index) -> IndexDefinition {
 
     IndexDefinition {
         name: Some(index.name.clone()),
-        fields: index.columns.clone(),
+        fields: index
+            .columns
+            .iter()
+            .map(|idx| table.columns[*idx].name.clone())
+            .collect(),
         tpe,
     }
 }
@@ -203,11 +207,11 @@ pub(crate) fn calculate_backrelation_field(
     relation_field: &RelationField,
     relation_info: &RelationInfo,
 ) -> Result<RelationField, SqlError> {
-    match schema.table(&model.name) {
-        Err(table_name) => Err(SqlError::SchemaInconsistent {
-            explanation: format!("Table {} not found.", table_name),
+    match schema.table_walker(&model.name) {
+        None => Err(SqlError::SchemaInconsistent {
+            explanation: format!("Table {} not found.", &model.name),
         }),
-        Ok(table) => {
+        Some(table) => {
             let new_relation_info = RelationInfo {
                 name: relation_info.name.clone(),
                 to: model.name.clone(),
@@ -218,10 +222,10 @@ pub(crate) fn calculate_backrelation_field(
 
             // unique or id
             let other_is_unique = table
-                .indices
-                .iter()
-                .any(|i| columns_match(&i.columns, &relation_info.fields) && i.tpe == IndexType::Unique)
-                || columns_match(&table.primary_key_columns(), &relation_info.fields);
+                .indexes()
+                .filter(|idx| idx.index_type().is_unique())
+                .any(|i| i.column_names_match(&relation_info.fields))
+                || columns_match(&table.primary_key_column_names().unwrap_or(&[]), &relation_info.fields);
 
             let arity = match relation_field.arity {
                 FieldArity::Required | FieldArity::Optional if other_is_unique => FieldArity::Optional,
@@ -382,6 +386,7 @@ pub fn deduplicate_relation_field_names(datamodel: &mut Datamodel) {
             field.name = format!("{}_{}", field.name, &relation_name);
         });
 }
+
 /// Returns whether the elements of the two slices match, regardless of ordering.
 pub fn columns_match(a_cols: &[String], b_cols: &[String]) -> bool {
     a_cols.len() == b_cols.len() && a_cols.iter().all(|a_col| b_cols.iter().any(|b_col| a_col == b_col))

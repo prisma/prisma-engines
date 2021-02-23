@@ -131,18 +131,11 @@ async fn creating_a_field_for_an_existing_column_and_changing_its_type_must_work
 
     api.schema_push(dm).force(true).send().await?;
 
-    let result = api.describe_database().await?;
-
-    let table = result.table_bang("Blog");
-    let column = table.column_bang("title");
-
-    assert_eq!(column.tpe.family, ColumnTypeFamily::String);
-    assert!(column.is_required());
-
-    let index = table.indices.iter().find(|i| i.columns == ["title"]);
-
-    assert!(index.is_some());
-    assert_eq!(index.unwrap().tpe, IndexType::Unique);
+    api.assert_schema().await?.assert_table("Blog", |table| {
+        table
+            .assert_column("title", |col| col.assert_type_is_string()?.assert_is_required())?
+            .assert_index_on_columns(&["title"], |idx| idx.assert_is_unique())
+    })?;
 
     Ok(())
 }
@@ -346,16 +339,11 @@ async fn updating_a_field_for_a_non_existent_column(api: &TestApi) -> TestResult
 
     api.schema_push(dm2).force(true).send().await?;
 
-    let final_result = api.describe_database().await?;
-    let final_column = final_result.table_bang("Blog").column_bang("title");
-    assert_eq!(final_column.tpe.family, ColumnTypeFamily::Int);
-    let index = final_result
-        .table_bang("Blog")
-        .indices
-        .iter()
-        .find(|i| i.columns == vec!["title"]);
-    assert_eq!(index.is_some(), true);
-    assert_eq!(index.unwrap().tpe, IndexType::Unique);
+    api.assert_schema().await?.assert_table("Blog", |table| {
+        table
+            .assert_column("title", |column| column.assert_type_is_int())?
+            .assert_index_on_columns(&["title"], |idx| idx.assert_is_unique())
+    })?;
 
     Ok(())
 }

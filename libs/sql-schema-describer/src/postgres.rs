@@ -37,7 +37,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
         let enums = self.get_enums(schema).await?;
         let mut columns = self.get_columns(schema, &enums, &sequences).await?;
         let mut foreign_keys = self.get_foreign_keys(schema).await?;
-        let mut indexes = self.get_indices(schema, &sequences).await?;
+        let mut indexes = self.get_indices(schema, &sequences, &columns).await?;
 
         let table_names = self.get_table_names(schema).await?;
         let mut tables = Vec::with_capacity(table_names.len());
@@ -460,6 +460,7 @@ impl SqlSchemaDescriber {
         &self,
         schema: &str,
         sequences: &[Sequence],
+        columns: &HashMap<String, Vec<Column>>,
     ) -> DescriberResult<HashMap<String, (Vec<Index>, Option<PrimaryKey>)>> {
         let mut indexes_map = HashMap::new();
 
@@ -516,12 +517,22 @@ impl SqlSchemaDescriber {
 
         for row in rows {
             trace!("Got index: {:?}", row);
-            let name = row.get_expect_string("name");
+            let index_name = row.get_expect_string("name");
             let column_name = row.get_expect_string("column_name");
             let is_unique = row.get_expect_bool("is_unique");
             let is_primary_key = row.get_expect_bool("is_primary_key");
             let table_name = row.get_expect_string("table_name");
             let sequence_name = row.get_string("sequence_name");
+
+            let table = columns
+                .get(&table_name)
+                .ok_or_else(|| format!("Index {} belongs to an unknown table ({})", index_name, table_name))
+                .unwrap();
+            let column_idx_in_table = table
+                .iter()
+                .position(|col| col.name == column_name)
+                .ok_or_else(|| format!("Index {} refers to unknown column {}", index_name, column_name))
+                .unwrap();
 
             if is_primary_key {
                 let entry: &mut (Vec<_>, Option<PrimaryKey>) =
@@ -544,19 +555,19 @@ impl SqlSchemaDescriber {
                         entry.1 = Some(PrimaryKey {
                             columns: vec![column_name],
                             sequence,
-                            constraint_name: Some(name.clone()),
+                            constraint_name: Some(index_name.clone()),
                         });
                     }
                 }
             } else {
                 let entry: &mut (Vec<Index>, _) = indexes_map.entry(table_name).or_insert_with(|| (Vec::new(), None));
 
-                if let Some(existing_index) = entry.0.iter_mut().find(|idx| idx.name == name) {
-                    existing_index.columns.push(column_name);
+                if let Some(existing_index) = entry.0.iter_mut().find(|idx| idx.name == index_name) {
+                    existing_index.columns.push(column_idx_in_table);
                 } else {
                     entry.0.push(Index {
-                        name,
-                        columns: vec![column_name],
+                        name: index_name,
+                        columns: vec![column_idx_in_table],
                         tpe: match is_unique {
                             true => IndexType::Unique,
                             false => IndexType::Normal,

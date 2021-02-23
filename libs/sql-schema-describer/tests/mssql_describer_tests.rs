@@ -625,7 +625,7 @@ async fn mssql_multi_field_indexes_must_be_inferred() {
         table.indices,
         &[Index {
             name: "age_and_name_index".into(),
-            columns: vec!["name".to_owned(), "age".to_owned()],
+            columns: vec![table.column_index_for_bang("name"), table.column_index_for_bang("age")],
             tpe: IndexType::Unique
         }]
     );
@@ -663,7 +663,7 @@ async fn mssql_join_table_unique_indexes_must_be_inferred() {
         table.indices,
         &[Index {
             name: "cat_and_human_index".into(),
-            columns: vec!["cat".to_owned(), "human".to_owned()],
+            columns: vec![table.column_index_for_bang("cat"), table.column_index_for_bang("human")],
             tpe: IndexType::Unique,
         }]
     );

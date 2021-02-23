@@ -1,5 +1,4 @@
 use migration_engine_tests::sql::*;
-use sql_schema_describer::IndexType;
 
 #[test_each_connector]
 async fn index_on_compound_relation_fields_must_work(api: &TestApi) -> TestResult {
@@ -195,15 +194,9 @@ async fn removing_multi_field_unique_index_must_work(api: &TestApi) -> TestResul
 
     api.schema_push(dm1).send().await?.assert_green()?;
 
-    let result = api.assert_schema().await?.into_schema();
-
-    let index = result
-        .table_bang("A")
-        .indices
-        .iter()
-        .find(|i| i.columns == ["field", "secondField"]);
-    assert!(index.is_some());
-    assert_eq!(index.unwrap().tpe, IndexType::Unique);
+    api.assert_schema().await?.assert_table("A", |table| {
+        table.assert_index_on_columns(&["field", "secondField"], |idx| idx.assert_is_unique())
+    })?;
 
     let dm2 = r#"
         model A {
@@ -214,13 +207,10 @@ async fn removing_multi_field_unique_index_must_work(api: &TestApi) -> TestResul
     "#;
 
     api.schema_push(dm2).send().await?.assert_green()?;
-    let result = api.assert_schema().await?.into_schema();
-    let index = result
-        .table_bang("A")
-        .indices
-        .iter()
-        .find(|i| i.columns == ["field", "secondField"]);
-    assert!(index.is_none());
+
+    api.assert_schema()
+        .await?
+        .assert_table("A", |table| table.assert_indexes_count(0))?;
 
     Ok(())
 }
@@ -291,15 +281,11 @@ async fn index_renaming_must_work_when_renaming_to_default(api: &TestApi) -> Tes
 
     api.schema_push(dm1).send().await?.assert_green()?;
 
-    let result = api.describe_database().await?;
-
-    let index = result
-        .table_bang("A")
-        .indices
-        .iter()
-        .find(|i| i.columns == ["field", "secondField"]);
-    assert!(index.is_some());
-    assert_eq!(index.unwrap().tpe, IndexType::Unique);
+    api.assert_schema().await?.assert_table("A", |table| {
+        table.assert_index_on_columns(&["field", "secondField"], |idx| {
+            idx.assert_name("customName")?.assert_is_unique()
+        })
+    })?;
 
     let dm2 = r#"
         model A {
@@ -313,14 +299,11 @@ async fn index_renaming_must_work_when_renaming_to_default(api: &TestApi) -> Tes
 
     api.schema_push(dm2).send().await?;
 
-    let sql_schema = api.describe_database().await?;
-
-    let indexes = sql_schema
-        .table_bang("A")
-        .indices
-        .iter()
-        .filter(|i| i.columns == ["field", "secondField"] && i.name == "A.field_secondField_unique");
-    assert_eq!(indexes.count(), 1);
+    api.assert_schema().await?.assert_table("A", |table| {
+        table.assert_index_on_columns(&["field", "secondField"], |idx| {
+            idx.assert_name("A.field_secondField_unique")?.assert_is_unique()
+        })
+    })?;
 
     Ok(())
 }
@@ -382,15 +365,11 @@ async fn index_updates_with_rename_must_work(api: &TestApi) -> TestResult {
 
     api.schema_push(dm1).send().await?.assert_green()?;
 
-    let sql_schema = api.describe_database().await?;
-
-    let index = sql_schema
-        .table_bang("A")
-        .indices
-        .iter()
-        .find(|i| i.name == "customName" && i.columns == ["field", "secondField"]);
-    assert!(index.is_some());
-    assert_eq!(index.unwrap().tpe, IndexType::Unique);
+    api.assert_schema().await?.assert_table("A", |table| {
+        table.assert_index_on_columns(&["field", "secondField"], |idx| {
+            idx.assert_name("customName")?.assert_is_unique()
+        })
+    })?;
 
     let dm2 = r#"
         model A {
@@ -404,14 +383,9 @@ async fn index_updates_with_rename_must_work(api: &TestApi) -> TestResult {
 
     api.schema_push(dm2).force(true).send().await?.assert_executable()?;
 
-    let result = api.describe_database().await?;
-
-    let indexes = result
-        .table_bang("A")
-        .indices
-        .iter()
-        .filter(|i| i.columns == ["field", "id"] && i.name == "customNameA");
-    assert_eq!(indexes.count(), 1);
+    api.assert_schema().await?.assert_table("A", |table| {
+        table.assert_index_on_columns(&["field", "id"], |idx| idx.assert_name("customNameA"))
+    })?;
 
     Ok(())
 }
@@ -430,16 +404,11 @@ async fn dropping_a_model_with_a_multi_field_unique_index_must_work(api: &TestAp
 
     api.schema_push(dm1).send().await?.assert_green()?;
 
-    let result = api.describe_database().await?;
-
-    let index = result
-        .table_bang("A")
-        .indices
-        .iter()
-        .find(|i| i.name == "customName" && i.columns == ["field", "secondField"]);
-
-    assert!(index.is_some());
-    assert_eq!(index.unwrap().tpe, IndexType::Unique);
+    api.assert_schema().await?.assert_table("A", |table| {
+        table.assert_index_on_columns(&["field", "secondField"], |idx| {
+            idx.assert_name("customName")?.assert_is_unique()
+        })
+    })?;
 
     api.schema_push("").send().await?.assert_green()?;
 

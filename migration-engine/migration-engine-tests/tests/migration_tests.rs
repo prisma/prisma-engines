@@ -1085,15 +1085,9 @@ async fn adding_new_fields_with_multi_column_unique_must_work(api: &TestApi) -> 
 
     api.schema_push(dm1).send().await?.assert_green()?;
 
-    let result = api.describe_database().await?;
-
-    let index = result
-        .table_bang("A")
-        .indices
-        .iter()
-        .find(|i| i.columns == vec!["field", "secondField"]);
-    assert!(index.is_some());
-    assert_eq!(index.unwrap().tpe, IndexType::Unique);
+    api.assert_schema().await?.assert_table("A", |table| {
+        table.assert_index_on_columns(&["field", "secondField"], |idx| idx.assert_is_unique())
+    })?;
 
     Ok(())
 }
@@ -1109,16 +1103,9 @@ async fn unique_in_conjunction_with_custom_column_name_must_work(api: &TestApi) 
 
     api.schema_push(dm1).send().await?.assert_green()?;
 
-    let result = api.describe_database().await?;
-
-    let index = result
-        .table_bang("A")
-        .indices
-        .iter()
-        .find(|i| i.columns == ["custom_field_name"]);
-
-    assert!(index.is_some());
-    assert_eq!(index.unwrap().tpe, IndexType::Unique);
+    api.assert_schema().await?.assert_table("A", |table| {
+        table.assert_index_on_columns(&["custom_field_name"], |idx| idx.assert_is_unique())
+    })?;
 
     Ok(())
 }
@@ -1137,15 +1124,11 @@ async fn multi_column_unique_in_conjunction_with_custom_column_name_must_work(ap
 
     api.schema_push(dm1).send().await?.assert_green()?;
 
-    let result = api.describe_database().await?;
-
-    let index = result
-        .table_bang("A")
-        .indices
-        .iter()
-        .find(|i| i.columns == ["custom_field_name", "second_custom_field_name"]);
-    assert!(index.is_some());
-    assert_eq!(index.unwrap().tpe, IndexType::Unique);
+    api.assert_schema().await?.assert_table("A", |table| {
+        table.assert_index_on_columns(&["custom_field_name", "second_custom_field_name"], |idx| {
+            idx.assert_is_unique()
+        })
+    })?;
 
     Ok(())
 }
@@ -1161,15 +1144,12 @@ async fn removing_an_existing_unique_field_must_work(api: &TestApi) -> TestResul
 
     api.schema_push(dm1).send().await?.assert_green()?;
 
-    let result = api.describe_database().await?;
-
-    let index = result
-        .table_bang("A")
-        .indices
-        .iter()
-        .find(|i| i.columns == vec!["field"]);
-    assert!(index.is_some());
-    assert_eq!(index.unwrap().tpe, IndexType::Unique);
+    api.assert_schema().await?.assert_table("A", |table| {
+        table
+            .assert_indexes_count(1)?
+            .assert_index_on_columns(&["field"], |idx| idx.assert_is_unique())?
+            .assert_column_count(2)
+    })?;
 
     let dm2 = r#"
         model A {
@@ -1179,15 +1159,9 @@ async fn removing_an_existing_unique_field_must_work(api: &TestApi) -> TestResul
 
     api.schema_push(dm2).send().await?.assert_green()?;
 
-    let result = api.describe_database().await?;
-
-    let index = result
-        .table_bang("A")
-        .indices
-        .iter()
-        .find(|i| i.columns == vec!["field"]);
-
-    assert!(index.is_none());
+    api.assert_schema()
+        .await?
+        .assert_table("A", |table| table.assert_indexes_count(0)?.assert_column_count(1))?;
 
     Ok(())
 }
@@ -1242,11 +1216,11 @@ async fn removing_unique_from_an_existing_field_must_work(api: &TestApi) -> Test
 
     api.schema_push(dm1).send().await?.assert_green()?;
 
-    let result = api.describe_database().await?;
-
-    let index = result.table_bang("A").indices.iter().find(|i| i.columns == ["field"]);
-    assert!(index.is_some());
-    assert_eq!(index.unwrap().tpe, IndexType::Unique);
+    api.assert_schema().await?.assert_table("A", |table| {
+        table
+            .assert_indexes_count(1)?
+            .assert_index_on_columns(&["field"], |idx| idx.assert_is_unique())
+    })?;
 
     let dm2 = r#"
         model A {
@@ -1257,10 +1231,9 @@ async fn removing_unique_from_an_existing_field_must_work(api: &TestApi) -> Test
 
     api.schema_push(dm2).send().await?.assert_green()?;
 
-    let result = api.describe_database().await?;
-
-    let index = result.table_bang("A").indices.iter().find(|i| i.columns == ["field"]);
-    assert!(index.is_none());
+    api.assert_schema()
+        .await?
+        .assert_table("A", |table| table.assert_indexes_count(0))?;
 
     Ok(())
 }
@@ -1436,7 +1409,7 @@ async fn foreign_keys_of_inline_one_to_one_relations_have_a_unique_constraint(ap
 
     let expected_indexes = &[Index {
         name: "Box_cat_id_unique".into(),
-        columns: vec!["cat_id".into()],
+        columns: vec![box_table.column_index_for_bang("cat_id")],
         tpe: IndexType::Unique,
     }];
 

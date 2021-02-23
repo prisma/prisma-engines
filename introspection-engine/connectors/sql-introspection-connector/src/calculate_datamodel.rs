@@ -395,7 +395,7 @@ mod tests {
                 ],
                 indices: vec![Index {
                     name: "unique".to_string(),
-                    columns: vec!["unique".to_string()],
+                    columns: vec![1],
                     tpe: IndexType::Unique,
                 }],
                 primary_key: None,
@@ -772,8 +772,8 @@ mod tests {
                     },
                 ],
                 indices: vec![Index {
-                    name: "name_last_name_unique".to_string(),
-                    columns: vec!["name".to_string(), "lastname".to_string()],
+                    name: "name_last_name_unique".into(),
+                    columns: vec![1, 2],
                     tpe: IndexType::Unique,
                 }],
                 primary_key: Some(PrimaryKey {

@@ -140,7 +140,7 @@ async fn foreign_keys_must_work(api: &TestApi) {
     let expected_indexes = if sql_family.is_mysql() {
         vec![Index {
             name: "city".to_owned(),
-            columns: vec!["city".to_owned()],
+            columns: vec![user_table.column_index_for_bang("city")],
             tpe: IndexType::Normal,
         }]
     } else {
@@ -240,7 +240,10 @@ async fn multi_column_foreign_keys_must_work(api: &TestApi) {
     let expected_indexes = if sql_family.is_mysql() {
         vec![Index {
             name: "city_name".to_owned(),
-            columns: vec!["city_name".to_owned(), "city".to_owned()],
+            columns: vec![
+                user_table.column_index_for_bang("city_name"),
+                user_table.column_index_for_bang("city"),
+            ],
             tpe: IndexType::Normal,
         }]
     } else {
@@ -437,7 +440,7 @@ async fn indices_must_work(api: &TestApi) {
     assert_eq!(
         vec![Index {
             name: "count".to_string(),
-            columns: vec!["count".to_string()],
+            columns: vec![1],
             tpe: IndexType::Normal,
         }],
         user_table.indices
@@ -503,33 +506,33 @@ async fn column_uniqueness_must_be_detected(api: &TestApi) {
     ];
     let mut expected_indices = vec![Index {
         name: "uniq".to_string(),
-        columns: vec!["uniq2".to_string()],
+        columns: vec![user_table.column_index_for_bang("uniq2")],
         tpe: IndexType::Unique,
     }];
     match api.sql_family() {
         SqlFamily::Mysql => expected_indices.push(Index {
             name: "uniq1".to_string(),
-            columns: vec!["uniq1".to_string()],
+            columns: vec![user_table.column_index_for_bang("uniq1")],
             tpe: IndexType::Unique,
         }),
         SqlFamily::Postgres => expected_indices.insert(
             0,
             Index {
                 name: "User_uniq1_key".to_string(),
-                columns: vec!["uniq1".to_string()],
+                columns: vec![user_table.column_index_for_bang("uniq1")],
                 tpe: IndexType::Unique,
             },
         ),
         SqlFamily::Sqlite => expected_indices.push(Index {
             name: "sqlite_autoindex_User_1".to_string(),
-            columns: vec!["uniq1".to_string()],
+            columns: vec![user_table.column_index_for_bang("uniq1")],
             tpe: IndexType::Unique,
         }),
         SqlFamily::Mssql => expected_indices.insert(
             0,
             Index {
                 name: "UQ__User__CD572100A176666B".to_string(),
-                columns: vec!["uniq1".to_string()],
+                columns: vec![user_table.column_index_for_bang("uniq1")],
                 tpe: IndexType::Unique,
             },
         ),
