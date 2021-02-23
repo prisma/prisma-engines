@@ -124,7 +124,7 @@ pub async fn update_records(
             .map(|p| (&id_field, p.values().next().unwrap()).into_bson())
             .collect::<crate::Result<Vec<_>>>()?
     } else {
-        let (filter, _joins) = convert_filter(record_filter.filter, false)?;
+        let (filter, _joins) = convert_filter(record_filter.filter, false)?.render();
         let find_options = FindOptions::builder()
             .projection(doc! { id_field.db_name(): 1 })
             .build();
@@ -192,7 +192,7 @@ pub async fn delete_records(
 
         doc! { id_field.db_name(): { "$in": ids.clone() } }
     } else {
-        let (filter, _joins) = convert_filter(record_filter.filter, false)?;
+        let (filter, _joins) = convert_filter(record_filter.filter, false)?.render();
         filter
     };
 

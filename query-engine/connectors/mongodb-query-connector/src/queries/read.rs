@@ -13,9 +13,7 @@ pub async fn get_single_record(
     selected_fields: &ModelProjection,
 ) -> crate::Result<Option<SingleRecord>> {
     let coll = database.collection(model.db_name());
-
-    // Todo joins
-    let (filter, _) = convert_filter(filter.clone(), false)?;
+    let (filter, _) = convert_filter(filter.clone(), false)?.render();
     let find_options = FindOptions::builder()
         .projection(selected_fields.clone().into_bson()?.into_document()?)
         .build();

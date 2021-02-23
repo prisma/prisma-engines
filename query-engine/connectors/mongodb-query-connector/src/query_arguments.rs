@@ -1,4 +1,4 @@
-use crate::{filter::convert_filter, BsonTransform, IntoBson, JoinStage};
+use crate::{filter::convert_filter, join::JoinStage, BsonTransform, IntoBson};
 use connector_interface::QueryArguments;
 use mongodb::{
     bson::{doc, Document},
@@ -51,7 +51,7 @@ impl MongoQueryArgs {
         };
 
         // Joins ($lookup)
-        // stages.extend(self.joins.into_iter().map(|stage| doc! { "$lookup": stage.document }));
+        stages.extend(self.joins.into_iter().map(|stage| doc! { "$lookup": stage.build() }));
 
         // Post-join $matches
         stages.extend(self.post_filters.into_iter().map(|filter| doc! { "$match": filter }));
@@ -93,7 +93,7 @@ pub(crate) fn build_mongo_args(
     let query = match args.filter {
         Some(filter) => {
             // If a filter comes with joins, it needs to be run _after_ the initial filter query / $matches.
-            let (filter, filter_joins) = convert_filter(filter, false)?;
+            let (filter, filter_joins) = convert_filter(filter, false)?.render();
             if !filter_joins.is_empty() {
                 joins.extend(filter_joins);
                 post_filters.push(filter);

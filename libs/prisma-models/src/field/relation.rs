@@ -264,7 +264,15 @@ impl RelationField {
     // Todo This is provisionary.
     pub fn left_scalars(&self) -> Vec<ScalarFieldRef> {
         if self.relation().is_many_to_many() {
+            // if self.relation_info.fields.is_empty() {
             self.model().primary_identifier().scalar_fields().collect()
+            // } else {
+            //     self.relation_info
+            //         .fields
+            //         .iter()
+            //         .map(|f| self.model().fields().find_from_scalar(f.as_str()).unwrap())
+            //         .collect()
+            // }
         } else if self.is_inlined_on_enclosing_model() {
             self.scalar_fields()
         } else {
@@ -276,7 +284,19 @@ impl RelationField {
     // Todo This is provisionary.
     pub fn right_scalars(&self) -> Vec<ScalarFieldRef> {
         if self.relation().is_many_to_many() {
-            self.model().primary_identifier().scalar_fields().collect()
+            let related_field = self.related_field();
+            let related_model = self.related_model();
+
+            if related_field.relation_info.fields.is_empty() {
+                related_model.primary_identifier().scalar_fields().collect()
+            } else {
+                related_field
+                    .relation_info
+                    .fields
+                    .iter()
+                    .map(|f| related_model.fields().find_from_scalar(f.as_str()).unwrap())
+                    .collect()
+            }
         } else if self.is_inlined_on_enclosing_model() {
             self.referenced_fields()
         } else {

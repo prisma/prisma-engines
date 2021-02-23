@@ -1,53 +1,57 @@
-use crate::{IntoBson, JoinStage};
+use crate::{join::JoinStage, IntoBson};
 use connector_interface::{
     Filter, OneRelationIsNullFilter, QueryMode, RelationFilter, ScalarCondition, ScalarFilter, ScalarListFilter,
 };
 use mongodb::bson::{doc, Bson, Document, Regex};
-use prisma_models::{PrismaValue, RelationFieldRef, ScalarFieldRef};
+use prisma_models::{PrismaValue, ScalarFieldRef};
 
 #[derive(Debug)]
 pub(crate) enum MongoFilter {
-    Flat(Document),
-    Nested(NestedMongoFilter),
+    Scalar(Document),
+    Relation(MongoRelationFilter),
 }
 
 impl MongoFilter {
     pub(crate) fn render(self) -> (Document, Vec<JoinStage>) {
         match self {
-            Self::Flat(document) => (document, vec![]),
-            Self::Nested(nested) => todo!(),
+            Self::Scalar(document) => (document, vec![]),
+            Self::Relation(rf) => (rf.filter, rf.joins),
         }
+    }
+
+    pub(crate) fn relation(filter: Document, joins: Vec<JoinStage>) -> Self {
+        Self::Relation(MongoRelationFilter { filter: filter, joins })
+    }
+
+    pub(crate) fn merge(&mut self, other: Self) -> Self {
+        todo!()
     }
 }
 
-// impl From<>
-
 #[derive(Debug)]
-pub(crate) struct NestedMongoFilter {
+pub(crate) struct MongoRelationFilter {
     /// The filter that has to be applied to this layer of nesting (after all joins on this layer are done).
-    filter: Box<MongoFilter>,
+    pub filter: Document,
 
-    /// The joins required to make the filter above happen.
-    joins: Vec<JoinStage>,
+    /// All join trees required on this level to make the above filter work.
+    pub joins: Vec<JoinStage>, // todo this is confusing, because in the "merged" state this will always be len = 1.
 }
 
-/// Builds a MongoDB query document from a Prisma filter.
-/// Returns the query document and a number of join documents
-/// if required, e.g. for relation filters.
-pub(crate) fn convert_filter(filter: Filter, invert: bool) -> crate::Result<(Document, Vec<JoinStage>)> {
+/// Builds a MongoDB query filter from a Prisma filter.
+pub(crate) fn convert_filter(filter: Filter, invert: bool) -> crate::Result<MongoFilter> {
     let filter_pair = match filter {
-        Filter::And(filters) if invert => filter_list("$or", filters, invert)?,
-        Filter::And(filters) => filter_list("$and", filters, invert)?,
+        Filter::And(filters) if invert => compound_filter("$or", filters, invert)?,
+        Filter::And(filters) => compound_filter("$and", filters, invert)?,
 
-        Filter::Or(filters) if invert => filter_list("$and", filters, invert)?,
-        Filter::Or(filters) => filter_list("$or", filters, invert)?,
+        Filter::Or(filters) if invert => compound_filter("$and", filters, invert)?,
+        Filter::Or(filters) => compound_filter("$or", filters, invert)?,
 
         // todo requires some more testing
-        Filter::Not(filters) => filter_list("$and", filters, !invert)?,
+        Filter::Not(filters) => compound_filter("$and", filters, !invert)?,
 
-        Filter::Scalar(sf) => (scalar_filter(sf, invert)?, vec![]),
-        Filter::Empty => (Document::new(), vec![]),
-        Filter::ScalarList(slf) => (scalar_list_filter(slf, invert)?, vec![]),
+        Filter::Scalar(sf) => scalar_filter(sf, invert)?,
+        Filter::Empty => MongoFilter::Scalar(doc! {}),
+        Filter::ScalarList(slf) => scalar_list_filter(slf, invert)?,
         Filter::OneRelationIsNull(filter) => one_is_null(filter, invert)?,
         Filter::Relation(rfilter) => relation_filter(rfilter, invert)?,
         // Filter::BoolFilter(b) => {} // Potentially not doable.
@@ -58,15 +62,16 @@ pub(crate) fn convert_filter(filter: Filter, invert: bool) -> crate::Result<(Doc
     Ok(filter_pair)
 }
 
-fn filter_list(operation: &str, filters: Vec<Filter>, invert: bool) -> crate::Result<(Document, Vec<JoinStage>)> {
+fn compound_filter(operation: &str, filters: Vec<Filter>, invert: bool) -> crate::Result<MongoFilter> {
     let filters = filters
         .into_iter()
-        .map(|f| convert_filter(f, invert))
+        .map(|f| Ok(convert_filter(f, invert)?.render()))
         .collect::<crate::Result<Vec<_>>>()?;
 
     let (filters, joins) = fold_nested(filters);
+    let filter_doc = doc! { operation: filters };
 
-    Ok((doc! { operation: filters }, joins))
+    Ok(MongoFilter::relation(filter_doc, joins))
 }
 
 // Todo we should really only join each relation once.
@@ -78,7 +83,7 @@ fn fold_nested(nested: Vec<(Document, Vec<JoinStage>)>) -> (Vec<Document>, Vec<J
     })
 }
 
-fn scalar_filter(filter: ScalarFilter, invert: bool) -> crate::Result<Document> {
+fn scalar_filter(filter: ScalarFilter, invert: bool) -> crate::Result<MongoFilter> {
     // Todo: Find out what Compound cases are really. (Guess: Relation fields with multi-field FK?)
     let field = match filter.projection {
         connector_interface::ScalarProjection::Single(sf) => sf,
@@ -91,7 +96,7 @@ fn scalar_filter(filter: ScalarFilter, invert: bool) -> crate::Result<Document> 
         QueryMode::Insensitive => insensitive_scalar_filter(&field, filter.condition.invert(invert))?,
     };
 
-    Ok(doc! { field.db_name(): filter })
+    Ok(MongoFilter::Scalar(doc! { field.db_name(): filter }))
 }
 
 // Note contains / startsWith / endsWith are only applicable to String types in the schema.
@@ -179,7 +184,8 @@ fn insensitive_scalar_filter(field: &ScalarFieldRef, condition: ScalarCondition)
     })
 }
 
-fn scalar_list_filter(filter: ScalarListFilter, invert: bool) -> crate::Result<Document> {
+/// Filters available on list fields.
+fn scalar_list_filter(filter: ScalarListFilter, invert: bool) -> crate::Result<MongoFilter> {
     let field = filter.field;
 
     // Of course Mongo needs special filters for the inverted case, everything else would be too easy.
@@ -233,14 +239,14 @@ fn scalar_list_filter(filter: ScalarListFilter, invert: bool) -> crate::Result<D
         }
     };
 
-    Ok(filter_doc)
+    Ok(MongoFilter::Scalar(filter_doc))
 }
 
 // Can be optimized by checking inlined fields on the left side instead of always joining.
-fn one_is_null(filter: OneRelationIsNullFilter, invert: bool) -> crate::Result<(Document, Vec<JoinStage>)> {
+fn one_is_null(filter: OneRelationIsNullFilter, invert: bool) -> crate::Result<MongoFilter> {
     let rf = filter.field;
     let relation_name = &rf.relation().name;
-    let join_stage = join_collections(rf)?;
+    let join_stage = JoinStage::new(rf);
 
     let filter_doc = if invert {
         doc! { relation_name: { "$not": { "$size": 0 }}}
@@ -248,64 +254,60 @@ fn one_is_null(filter: OneRelationIsNullFilter, invert: bool) -> crate::Result<(
         doc! { relation_name: { "$size": 0 }}
     };
 
-    Ok((filter_doc, vec![join_stage]))
+    Ok(MongoFilter::relation(filter_doc, vec![join_stage]))
 }
 
-fn relation_filter(filter: RelationFilter, invert: bool) -> crate::Result<(Document, Vec<JoinStage>)> {
+/// Builds a Mongo relation filter depth-first.
+fn relation_filter(filter: RelationFilter, invert: bool) -> crate::Result<MongoFilter> {
     let from_field = filter.field;
-    let nested_filter = *filter.nested_filter;
-    let nested_filter = convert_filter(nested_filter, invert)?;
-
-    let join_stage = join_collections(from_field)?;
+    let relation_name = &from_field.relation().name;
+    let (nested_filter, nested_joins) = convert_filter(*filter.nested_filter, invert)?.render();
+    let mut join_stage = JoinStage::new(from_field);
+    join_stage.add_all_nested(nested_joins);
 
     let filter_doc = if invert {
         match filter.condition {
             // "Every related record" -> "No related record"
-            connector_interface::RelationCondition::EveryRelatedRecord => todo!(),
+            connector_interface::RelationCondition::EveryRelatedRecord => {
+                doc! { "$all": [{ "$elemMatch": { "$not": nested_filter }}]}
+            }
 
-            // "At least one related fulfills x" -> "At least does NOT fulfill x"
-            connector_interface::RelationCondition::AtLeastOneRelatedRecord => todo!(),
+            // "At least one related fulfills x" -> "At least one does NOT fulfill x"
+            connector_interface::RelationCondition::AtLeastOneRelatedRecord => {
+                doc! { "$elemMatch": { "$not": nested_filter }}
+            }
 
             // "No related fulfills x" -> "All related fulfill x"
-            connector_interface::RelationCondition::NoRelatedRecord => todo!(),
+            connector_interface::RelationCondition::NoRelatedRecord => {
+                doc! { "$all": [{ "$elemMatch": nested_filter }]}
+            }
 
             // "The related record has to fulfill x" -> "The related record must not fulfill x"
-            connector_interface::RelationCondition::ToOneRelatedRecord => todo!(),
+            connector_interface::RelationCondition::ToOneRelatedRecord => {
+                doc! { "$all": [{ "$elemMatch": { "$not": nested_filter }}]}
+            }
         }
     } else {
         match filter.condition {
-            connector_interface::RelationCondition::EveryRelatedRecord => todo!(),
-            connector_interface::RelationCondition::AtLeastOneRelatedRecord => todo!(),
-            connector_interface::RelationCondition::NoRelatedRecord => todo!(),
-            connector_interface::RelationCondition::ToOneRelatedRecord => todo!(),
+            connector_interface::RelationCondition::EveryRelatedRecord => {
+                doc! { "$all": [{ "$elemMatch": nested_filter }]}
+            }
+            connector_interface::RelationCondition::AtLeastOneRelatedRecord => {
+                doc! { "$elemMatch": nested_filter }
+            }
+            connector_interface::RelationCondition::NoRelatedRecord => {
+                doc! { "$all": [{ "$elemMatch": { "$not": nested_filter }}]}
+            }
+            connector_interface::RelationCondition::ToOneRelatedRecord => {
+                doc! { "$all": [{ "$elemMatch": nested_filter }]}
+            }
         }
     };
 
-    Ok((filter_doc, vec![join_stage]))
-}
-
-// Todo multi-field-joins.
-/// Returns a join stage for the join between the source collection of `from_field` (the model it's defined on)
-/// and the target collection (the model that is related over the relation).
-/// The joined documents will reside on the source document side as a field named after the relation name.
-fn join_collections(from_field: RelationFieldRef) -> crate::Result<JoinStage> {
-    let relation_name = &from_field.relation().name;
-
-    let right_model = from_field.related_model();
-    let right_model_name = right_model.db_name();
-
-    let mut left_scalars = from_field.left_scalars();
-    let mut right_scalars = from_field.right_scalars();
-
-    let join_doc = doc! {
-        "from": right_model_name,
-        "localField": left_scalars.pop().unwrap().db_name(),
-        "foreignField": right_scalars.pop().unwrap().db_name(),
-        "as": relation_name
-    };
-
-    // Ok(JoinStage::new(from_field, join_doc))
-    todo!()
+    Ok(MongoFilter::relation(
+        doc! { relation_name: filter_doc },
+        vec![join_stage],
+    ))
 }
 
 fn to_regex_list(
