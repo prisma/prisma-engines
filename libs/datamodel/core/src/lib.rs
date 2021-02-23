@@ -87,7 +87,6 @@ pub use configuration::*;
 
 use crate::ast::SchemaAst;
 use crate::diagnostics::{ValidatedConfiguration, ValidatedDatamodel, ValidatedDatasources};
-use std::io::Write;
 use transform::{
     ast_to_dml::{DatasourceLoader, GeneratorLoader, ValidationPipeline},
     dml_to_ast::{DatasourceSerializer, GeneratorSerializer, LowerDmlToAst},
@@ -107,21 +106,7 @@ pub fn parse_datamodel_and_ignore_datasource_urls(
 /// Parses and validates a datamodel string, using core attributes only.
 /// In case of an error, a pretty, colorful string is returned.
 pub fn parse_datamodel_or_pretty_error(datamodel_string: &str, file_name: &str) -> Result<ValidatedDatamodel, String> {
-    match parse_datamodel_internal(datamodel_string, false) {
-        Ok(dml) => Ok(dml),
-        Err(errs) => {
-            let mut buffer = std::io::Cursor::new(Vec::<u8>::new());
-
-            for error in errs.to_error_iter() {
-                writeln!(&mut buffer).expect("Failed to render error.");
-                error
-                    .pretty_print(&mut buffer, file_name, datamodel_string)
-                    .expect("Failed to render error.");
-            }
-
-            Err(String::from_utf8(buffer.into_inner()).expect("Failed to convert error buffer."))
-        }
-    }
+    parse_datamodel_internal(datamodel_string, false).map_err(|err| err.to_pretty_string(file_name, datamodel_string))
 }
 
 fn parse_datamodel_internal(
