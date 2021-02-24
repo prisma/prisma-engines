@@ -242,6 +242,7 @@ fn no_nested_create_upsert_exist_with_unsupported_field_without_default_value() 
         id Int @id
         title String
         unsupported Unsupported("X")
+        users User[]
     }
 "#;
     let (query_schema, datamodel) = get_query_schema(dm);

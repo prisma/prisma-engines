@@ -236,6 +236,7 @@ fn no_nested_create_upsert_exist_with_ignored_field_without_default_value() {
         id Int @id
         title String
         unsupported String @ignore
+        users User[]
     }
 "#;
     let (query_schema, datamodel) = get_query_schema(dm);
