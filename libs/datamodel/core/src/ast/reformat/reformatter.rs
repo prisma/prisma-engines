@@ -1,6 +1,5 @@
 use super::helpers::*;
 use crate::ast::helper::get_sort_index_of_attribute;
-use crate::ast::WithName;
 use crate::common::WritableString;
 use crate::diagnostics::ValidatedMissingFields;
 use crate::{ast, ast::parser::*, ast::renderer::*};
@@ -11,20 +10,21 @@ pub struct Reformatter<'a> {
     input: &'a str,
     missing_fields: Result<ValidatedMissingFields, crate::diagnostics::Diagnostics>,
     missing_field_attributes: Result<Vec<MissingFieldAttribute>, crate::diagnostics::Diagnostics>,
-    missing_field_attribute_args: Result<Vec<MissingFieldAttributeArg>, crate::diagnostics::Diagnostics>,
+    missing_field_attribute_args: Result<Vec<MissingRelationAttributeArg>, crate::diagnostics::Diagnostics>,
 }
 
 impl<'a> Reformatter<'a> {
     pub fn new(input: &'a str) -> Self {
+        //todo don't run parsing and validating of the string in every step
         let missing_fields = Self::find_all_missing_fields(&input);
         let missing_field_attributes = Self::find_all_missing_attributes(&input);
-        let missing_field_attribute_args = Self::find_all_missing_attribute_args(&input);
+        let missing_relation_attribute_args = Self::find_all_missing_relation_attribute_args(&input);
 
         Reformatter {
             input,
             missing_fields,
             missing_field_attributes,
-            missing_field_attribute_args,
+            missing_field_attribute_args: missing_relation_attribute_args,
         }
     }
 
@@ -97,9 +97,9 @@ impl<'a> Reformatter<'a> {
         Ok(missing_field_attributes)
     }
 
-    fn find_all_missing_attribute_args(
+    fn find_all_missing_relation_attribute_args(
         schema_string: &str,
-    ) -> Result<Vec<MissingFieldAttributeArg>, crate::diagnostics::Diagnostics> {
+    ) -> Result<Vec<MissingRelationAttributeArg>, crate::diagnostics::Diagnostics> {
         let mut diagnostics = crate::diagnostics::Diagnostics::new();
         let schema_ast = crate::parse_schema_ast(&schema_string)?;
         let validated_datamodel = crate::parse_datamodel_and_ignore_datasource_urls_for_formatter(&schema_string)?;
@@ -107,30 +107,30 @@ impl<'a> Reformatter<'a> {
         diagnostics.append_warning_vec(validated_datamodel.warnings);
         let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(None);
 
-        let mut missing_field_attribute_args = Vec::new();
+        let mut missing_relation_attribute_args = Vec::new();
         for model in validated_datamodel.subject.models() {
             let ast_model = schema_ast.find_model(&model.name).unwrap();
             for field in model.fields() {
                 let new_ast_field = lowerer.lower_field(&field, &validated_datamodel.subject);
 
                 if let Some(original_field) = ast_model.fields.iter().find(|f| f.name.name == field.name()) {
-                    for attribute in new_ast_field.attributes {
+                    for attribute in new_ast_field.attributes.iter().filter(|a| a.name.name == "relation") {
                         if let Some(original_attribute) = original_field
                             .attributes
                             .iter()
                             .find(|d| d.name.name == attribute.name.name)
                         {
                             for arg in &attribute.arguments {
-                                if original_attribute
-                                    .arguments
-                                    .iter()
-                                    .find(|d| d.name.name == arg.name.name)
-                                    .is_none()
+                                if !arg.name.name.is_empty()
+                                    && original_attribute
+                                        .arguments
+                                        .iter()
+                                        .find(|d| d.name.name == arg.name.name)
+                                        .is_none()
                                 {
-                                    missing_field_attribute_args.push(MissingFieldAttributeArg {
+                                    missing_relation_attribute_args.push(MissingRelationAttributeArg {
                                         model: model.name.clone(),
                                         field: field.name().to_string(),
-                                        attribute: attribute.name().to_string(),
                                         arg: arg.to_owned(),
                                     })
                                 }
@@ -140,7 +140,7 @@ impl<'a> Reformatter<'a> {
                 }
             }
         }
-        Ok(missing_field_attribute_args)
+        Ok(missing_relation_attribute_args)
     }
 
     pub fn reformat_to(&self, output: &mut dyn std::io::Write, ident_width: usize) {
@@ -496,7 +496,7 @@ impl<'a> Reformatter<'a> {
                 //todo special case field attribute to pass model and field name and probably attribute name  and down to the args
                 Rule::attribute => {
                     if let Ok(missing_field_attribute_args) = self.missing_field_attribute_args.as_ref() {
-                        let missing_relation_args: Vec<&MissingFieldAttributeArg> = missing_field_attribute_args
+                        let missing_relation_args: Vec<&MissingRelationAttributeArg> = missing_field_attribute_args
                             .iter()
                             .filter(|arg| arg.model == model_name && arg.field == *field_name)
                             .collect();
@@ -604,7 +604,7 @@ impl<'a> Reformatter<'a> {
         target: &mut dyn LineWriteable,
         token: &Token,
         owl: &str,
-        missing_args: Vec<&MissingFieldAttributeArg>,
+        missing_args: Vec<&MissingRelationAttributeArg>,
     ) {
         let token = Self::unpack_token_to_find_matching_rule(token.clone(), Rule::attribute);
         let mut is_relation = false;
@@ -653,7 +653,7 @@ impl<'a> Reformatter<'a> {
     fn reformat_attribute_args(
         target: &mut dyn LineWriteable,
         token: &Token,
-        missing_args: Vec<&MissingFieldAttributeArg>,
+        missing_args: Vec<&MissingRelationAttributeArg>,
     ) {
         let mut builder = StringBuilder::new();
 
@@ -880,9 +880,8 @@ pub struct MissingFieldAttribute {
 }
 
 #[derive(Debug)]
-pub struct MissingFieldAttributeArg {
+pub struct MissingRelationAttributeArg {
     pub model: String,
     pub field: String,
-    pub attribute: String,
     pub arg: crate::ast::Argument,
 }

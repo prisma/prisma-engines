@@ -247,19 +247,16 @@ impl ModelAsserts for dml::Model {
 
     fn assert_is_embedded(&self, t: bool) -> &Self {
         assert_eq!(self.is_embedded, t);
-
         self
     }
 
     fn assert_with_db_name(&self, t: &str) -> &Self {
         assert_eq!(self.database_name, Some(t.to_owned()));
-
         self
     }
 
     fn assert_with_documentation(&self, t: &str) -> &Self {
         assert_eq!(self.documentation, Some(t.to_owned()));
-
         self
     }
 
@@ -284,7 +281,6 @@ impl ModelAsserts for dml::Model {
     }
 
     fn assert_field_count(&self, count: usize) -> &Self {
-        println!("{}", self.name);
         assert_eq!(self.fields.len(), count);
         self
     }
@@ -299,7 +295,6 @@ impl EnumAsserts for dml::Enum {
 
     fn assert_with_documentation(&self, t: &str) -> &Self {
         assert_eq!(self.documentation, Some(t.to_owned()));
-
         self
     }
 }
@@ -307,7 +302,6 @@ impl EnumAsserts for dml::Enum {
 impl EnumValueAsserts for dml::EnumValue {
     fn assert_with_documentation(&self, t: &str) -> &Self {
         assert_eq!(self.documentation, Some(t.to_owned()));
-
         self
     }
 }
@@ -321,7 +315,6 @@ impl WarningAsserts for Vec<DatamodelWarning> {
             &self
         );
         assert_eq!(self[0], warning);
-
         self
     }
 }
@@ -335,13 +328,11 @@ impl ErrorAsserts for Diagnostics {
             &self
         );
         assert_eq!(self.errors[0], error);
-
         self
     }
 
     fn assert_are(&self, errors: &[DatamodelError]) -> &Self {
         assert_eq!(self.errors, errors);
-
         self
     }
 
@@ -353,7 +344,6 @@ impl ErrorAsserts for Diagnostics {
             &self
         );
         assert_eq!(self.errors[0].description(), msg);
-
         self
     }
 
