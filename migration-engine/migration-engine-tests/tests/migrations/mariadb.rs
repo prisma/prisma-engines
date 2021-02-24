@@ -7,6 +7,7 @@ async fn foreign_keys_to_indexes_being_renamed_must_work(api: &TestApi) -> TestR
         model User {
             id String @id
             name String
+            posts Post[]
 
             @@unique([name], name: "idxname")
         }
@@ -45,6 +46,7 @@ async fn foreign_keys_to_indexes_being_renamed_must_work(api: &TestApi) -> TestR
         model User {
             id String @id
             name String
+            posts Post[]
 
             @@unique([name], name: "idxrenamed")
         }

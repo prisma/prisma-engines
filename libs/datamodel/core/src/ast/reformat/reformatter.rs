@@ -682,14 +682,12 @@ impl<'a> Reformatter<'a> {
 
         if !missing_args.is_empty() {
             for arg in missing_args {
-                if !arg.arg.name.name.is_empty() {
-                    if !builder.line_empty() {
-                        builder.write(", ");
-                    }
-                    builder.write(&arg.arg.name.name);
-                    builder.write(&": ");
-                    Self::render_value(&mut builder, &arg.arg.value);
+                if !builder.line_empty() {
+                    builder.write(", ");
                 }
+                builder.write(&arg.arg.name.name);
+                builder.write(&": ");
+                Self::render_value(&mut builder, &arg.arg.value);
             }
         }
 

@@ -519,16 +519,16 @@ async fn new_index_with_same_name_as_index_from_dropped_table_works(api: &TestAp
 
     let dm2 = r#"
         model Owner {
-            id Int @id
+            id      Int @id
             ownerid String
-            owner Owner @relation(fields: [ownerid], references: id)
+            owner   Cat @relation(fields: [ownerid], references: id)
 
             @@index([ownerid], name: "ownerid")
         }
 
         model Cat {
-            id String @id
-            c  Cat[]
+            id      String @id
+            owners  Owner[]
         }
     "#;
 
