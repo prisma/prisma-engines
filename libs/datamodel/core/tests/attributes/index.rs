@@ -32,7 +32,7 @@ fn indexes_on_enum_fields_must_work() {
 
         @@index([role])
     }
-    
+
     enum Role {
         Admin
         Member
@@ -54,12 +54,12 @@ fn indexes_on_relation_fields_must_error() {
     model User {
         id               Int @id
         identificationId Int
-        
+
         identification   Identification @relation(fields: [identificationId], references:[id])
 
         @@index([identification])
     }
-    
+
     model Identification {
         id Int @id
     }
@@ -69,7 +69,7 @@ fn indexes_on_relation_fields_must_error() {
     errors.assert_is(DatamodelError::new_model_validation_error(
         "The index definition refers to the relation fields identification. Index definitions must reference only scalar fields. Did you mean `@@index([identificationId])`?",
         "User",
-        Span::new(195,218),
+        Span::new(187,210),
     ));
 }
 
@@ -91,6 +91,48 @@ fn the_name_argument_must_work() {
         name: Some("MyIndexName".to_string()),
         fields: vec!["firstName".to_string(), "lastName".to_string()],
         tpe: IndexType::Normal,
+    });
+}
+
+#[test]
+fn empty_index_names_are_rejected() {
+    let dml = r#"
+    model User {
+        id        Int    @id
+        firstName String
+        lastName  String
+
+        @@index([firstName,lastName], name: "")
+    }
+    "#;
+
+    let err = datamodel::parse_datamodel(dml).unwrap_err();
+
+    err.assert_is(DatamodelError::AttributeValidationError {
+        message: "The `name` argument cannot be an empty string.".into(),
+        attribute_name: "index".into(),
+        span: Span::new(142, 144),
+    });
+}
+
+#[test]
+fn empty_unique_index_names_are_rejected() {
+    let dml = r#"
+    model User {
+        id        Int    @id
+        firstName String
+        lastName  String
+
+        @@unique([firstName,lastName], name: "")
+    }
+    "#;
+
+    let err = datamodel::parse_datamodel(dml).unwrap_err();
+
+    err.assert_is(DatamodelError::AttributeValidationError {
+        message: "The `name` argument cannot be an empty string.".into(),
+        attribute_name: "unique".into(),
+        span: Span::new(143, 145),
     });
 }
 
