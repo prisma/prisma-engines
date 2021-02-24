@@ -1943,6 +1943,7 @@ dependencies = [
  "barrel",
  "bigdecimal",
  "chrono",
+ "connection-string",
  "datamodel",
  "datamodel-connector",
  "enumflags2",

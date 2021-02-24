@@ -42,7 +42,7 @@ pub struct SQLMetadata {
 }
 
 /// The result of describing a database schema.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Default)]
 pub struct SqlSchema {
     /// The schema's tables.
     pub tables: Vec<Table>,
@@ -108,13 +108,7 @@ impl SqlSchema {
     }
 
     pub fn empty() -> SqlSchema {
-        SqlSchema {
-            tables: Vec::new(),
-            enums: Vec::new(),
-            sequences: Vec::new(),
-            views: Vec::new(),
-            procedures: Vec::new(),
-        }
+        SqlSchema::default()
     }
 
     pub fn table_walkers(&self) -> impl Iterator<Item = TableWalker<'_>> {
