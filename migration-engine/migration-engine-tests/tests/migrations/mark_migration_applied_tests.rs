@@ -1,20 +1,22 @@
-use crate::*;
 use barrel::types;
+use migration_engine_tests::sql::*;
 use pretty_assertions::assert_eq;
+use test_macros::test_each_connector;
+use user_facing_errors::{migration_engine::MigrationToMarkAppliedNotFound, UserFacingError};
+
+const BASE_DM: &str = r#"
+    model Test {
+        id Int @id
+    }
+"#;
 
 #[test_each_connector]
 async fn mark_migration_applied_on_an_empty_database_works(api: &TestApi) -> TestResult {
     let migrations_directory = api.create_migrations_directory()?;
     let persistence = api.migration_persistence();
 
-    let dm = r#"
-        model Test {
-            id Int @id
-        }
-    "#;
-
     let output = api
-        .create_migration("01init", dm, &migrations_directory)
+        .create_migration("01init", BASE_DM, &migrations_directory)
         .send()
         .await?
         .into_output();
@@ -57,14 +59,8 @@ async fn mark_migration_applied_on_a_non_empty_database_works(api: &TestApi) -> 
 
     // Create and apply a first migration
     let initial_migration_name = {
-        let dm1 = r#"
-            model Test {
-                id Int @id
-            }
-        "#;
-
         let output_initial_migration = api
-            .create_migration("01init", dm1, &migrations_directory)
+            .create_migration("01init", BASE_DM, &migrations_directory)
             .send()
             .await?
             .into_output();
@@ -130,14 +126,8 @@ async fn mark_migration_applied_when_the_migration_is_already_applied_errors(api
 
     // Create and apply a first migration
     let initial_migration_name = {
-        let dm1 = r#"
-            model Test {
-                id Int @id
-            }
-        "#;
-
         let output_initial_migration = api
-            .create_migration("01init", dm1, &migrations_directory)
+            .create_migration("01init", BASE_DM, &migrations_directory)
             .send()
             .await?
             .into_output();
@@ -210,14 +200,8 @@ async fn mark_migration_applied_when_the_migration_is_failed(api: &TestApi) -> T
 
     // Create and apply a first migration
     let initial_migration_name = {
-        let dm1 = r#"
-            model Test {
-                id Int @id
-            }
-        "#;
-
         let output_initial_migration = api
-            .create_migration("01init", dm1, &migrations_directory)
+            .create_migration("01init", BASE_DM, &migrations_directory)
             .send()
             .await?
             .into_output();
@@ -340,6 +324,36 @@ async fn baselining_should_work(api: &TestApi) -> TestResult {
         .assert_tables_count(2)?
         .assert_has_table("_prisma_migrations")?
         .assert_has_table("test")?;
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn must_return_helpful_error_on_migration_not_found(api: &TestApi) -> TestResult {
+    let migrations_directory = api.create_migrations_directory()?;
+
+    let output = api
+        .create_migration("01init", BASE_DM, &migrations_directory)
+        .send()
+        .await?
+        .assert_migration_directories_count(1)?
+        .into_output();
+
+    let migration_name = output.generated_migration_name.unwrap();
+
+    let err = api
+        .mark_migration_applied("01init", &migrations_directory)
+        .send()
+        .await
+        .unwrap_err()
+        .render_user_facing()
+        .unwrap_known();
+
+    assert_eq!(err.error_code, MigrationToMarkAppliedNotFound::ERROR_CODE);
+
+    api.mark_migration_applied(migration_name, &migrations_directory)
+        .send()
+        .await?;
 
     Ok(())
 }

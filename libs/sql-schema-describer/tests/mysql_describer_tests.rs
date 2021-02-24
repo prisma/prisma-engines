@@ -6,9 +6,70 @@ use barrel::{types, Migration};
 use native_types::{MySqlType, NativeType};
 use pretty_assertions::assert_eq;
 use quaint::prelude::Queryable;
-use sql_schema_describer::*;
+use sql_schema_describer::{mysql::SqlSchemaDescriber, SqlSchemaDescriberBackend, *};
 use test_api::*;
 use test_macros::*;
+use test_setup::mysql_url;
+
+#[tokio::test]
+async fn views_can_be_described() {
+    let db_name = "views_can_be_described";
+
+    let url = mysql_url(db_name);
+    let conn = test_setup::create_mysql_database(&url.parse().unwrap()).await.unwrap();
+
+    conn.raw_cmd(&format!("CREATE TABLE {}.a (a_id int)", db_name))
+        .await
+        .unwrap();
+
+    conn.raw_cmd(&format!("CREATE TABLE {}.b (b_id int)", db_name))
+        .await
+        .unwrap();
+
+    let create_view = format!(
+        r#"
+            CREATE VIEW {0}.ab AS
+            SELECT a_id
+            FROM {0}.a
+            UNION ALL
+            SELECT b_id
+            FROM {0}.b"#,
+        db_name
+    );
+
+    conn.raw_cmd(&create_view).await.unwrap();
+
+    let inspector = SqlSchemaDescriber::new(conn);
+    let result = inspector.describe(db_name).await.expect("describing");
+    let view = result.get_view("ab").expect("couldn't get ab view").to_owned();
+
+    let expected_sql = format!(
+        "select `{0}`.`a`.`a_id` AS `a_id` from `{0}`.`a` union all select `{0}`.`b`.`b_id` AS `b_id` from `{0}`.`b`",
+        db_name
+    );
+
+    assert_eq!("ab", &view.name);
+    assert_eq!(expected_sql, view.definition);
+}
+
+#[tokio::test]
+async fn procedures_can_be_described() {
+    let db_name = "procedures_can_be_described";
+
+    let sql = format!(
+        r#"
+        CREATE PROCEDURE {}.foo (OUT res INT) SELECT 1 INTO res
+        "#,
+        db_name
+    );
+
+    let inspector = get_mysql_describer_for_schema(&sql, db_name).await;
+    let result = inspector.describe(db_name).await.expect("describing");
+    let procedure = result.get_procedure("foo").unwrap();
+
+    assert_eq!("foo", &procedure.name);
+    assert_eq!("SELECT 1 INTO res", &procedure.definition);
+}
 
 #[tokio::test]
 async fn all_mysql_column_types_must_work() {

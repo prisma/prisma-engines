@@ -4,12 +4,11 @@
 //! Database description. This crate is used heavily in the introspection and migration engines.
 use once_cell::sync::Lazy;
 use regex::Regex;
-use std::fmt::{self, Debug};
-use tracing::debug;
+use std::fmt::Debug;
 
 pub use error::{DescriberError, DescriberErrorKind, DescriberResult};
 use prisma_value::PrismaValue;
-use walkers::{EnumWalker, TableWalker};
+use walkers::{EnumWalker, TableWalker, ViewWalker};
 
 pub mod getters;
 pub mod mssql;
@@ -51,6 +50,10 @@ pub struct SqlSchema {
     pub enums: Vec<Enum>,
     /// The schema's sequences, unique to Postgres.
     pub sequences: Vec<Sequence>,
+    /// The schema's views,
+    pub views: Vec<View>,
+    /// The stored procedures.
+    pub procedures: Vec<Procedure>,
 }
 
 impl SqlSchema {
@@ -59,9 +62,19 @@ impl SqlSchema {
         self.tables.iter().find(|x| x.name == name)
     }
 
+    /// Get a view.
+    pub fn get_view(&self, name: &str) -> Option<&View> {
+        self.views.iter().find(|v| v.name == name)
+    }
+
     /// Get an enum.
     pub fn get_enum(&self, name: &str) -> Option<&Enum> {
         self.enums.iter().find(|x| x.name == name)
+    }
+
+    /// Get a procedure.
+    pub fn get_procedure(&self, name: &str) -> Option<&Procedure> {
+        self.procedures.iter().find(|x| x.name == name)
     }
 
     /// Is this schema empty?
@@ -72,7 +85,9 @@ impl SqlSchema {
                 tables,
                 enums,
                 sequences,
-            } if tables.is_empty() && enums.is_empty() && sequences.is_empty()
+                views,
+                procedures,
+            } if tables.is_empty() && enums.is_empty() && sequences.is_empty() && views.is_empty() && procedures.is_empty()
         )
     }
 
@@ -97,11 +112,17 @@ impl SqlSchema {
             tables: Vec::new(),
             enums: Vec::new(),
             sequences: Vec::new(),
+            views: Vec::new(),
+            procedures: Vec::new(),
         }
     }
 
     pub fn table_walkers(&self) -> impl Iterator<Item = TableWalker<'_>> {
         (0..self.tables.len()).map(move |table_index| TableWalker::new(self, table_index))
+    }
+
+    pub fn view_walkers(&self) -> impl Iterator<Item = ViewWalker<'_>> {
+        (0..self.views.len()).map(move |view_index| ViewWalker::new(self, view_index))
     }
 
     pub fn enum_walkers(&self) -> impl Iterator<Item = EnumWalker<'_>> {
@@ -180,6 +201,7 @@ impl Table {
         }
     }
 }
+
 /// The type of an index.
 #[derive(PartialEq, Debug, Clone)]
 pub enum IndexType {
@@ -210,6 +232,15 @@ impl Index {
     pub fn is_unique(&self) -> bool {
         self.tpe == IndexType::Unique
     }
+}
+
+/// A stored procedure (like, the function inside your database).
+#[derive(PartialEq, Debug, Clone)]
+pub struct Procedure {
+    /// Procedure name.
+    pub name: String,
+    /// The definition of the procedure.
+    pub definition: String,
 }
 
 /// The primary key of a table.
@@ -323,6 +354,10 @@ impl ColumnTypeFamily {
         matches!(self, ColumnTypeFamily::Boolean)
     }
 
+    pub fn is_datetime(&self) -> bool {
+        matches!(self, ColumnTypeFamily::DateTime)
+    }
+
     pub fn is_enum(&self) -> bool {
         matches!(self, ColumnTypeFamily::Enum(_))
     }
@@ -333,26 +368,6 @@ impl ColumnTypeFamily {
 
     pub fn is_json(&self) -> bool {
         matches!(self, ColumnTypeFamily::Json)
-    }
-}
-
-impl fmt::Display for ColumnTypeFamily {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let str = match self {
-            Self::Int => "int".to_string(),
-            Self::BigInt => "bigint".to_string(),
-            Self::Float => "float".to_string(),
-            Self::Decimal => "decimal".to_string(),
-            Self::Boolean => "boolean".to_string(),
-            Self::String => "string".to_string(),
-            Self::DateTime => "dateTime".to_string(),
-            Self::Binary => "binary".to_string(),
-            Self::Json => "json".to_string(),
-            Self::Uuid => "uuid".to_string(),
-            Self::Enum(x) => format!("Enum({})", &x),
-            Self::Unsupported(x) => x.to_string(),
-        };
-        write!(f, "{}", str)
     }
 }
 
@@ -444,6 +459,15 @@ pub struct Enum {
 pub struct Sequence {
     /// Sequence name.
     pub name: String,
+}
+
+/// An SQL view.
+#[derive(PartialEq, Debug, Clone)]
+pub struct View {
+    /// Name of the view.
+    pub name: String,
+    /// The SQL definition of the view.
+    pub definition: String,
 }
 
 #[derive(PartialEq, Debug, Clone)]

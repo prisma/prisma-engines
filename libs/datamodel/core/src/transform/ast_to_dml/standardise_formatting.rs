@@ -43,7 +43,8 @@ impl StandardiserForFormatting {
             for field in model.fields_mut() {
                 if let Field::RelationField(field) = field {
                     let related_model = schema_copy.find_model(&field.relation_info.to).expect(STATE_ERROR);
-                    if let Some(related_field) = schema_copy.find_related_field(field) {
+
+                    if let Some((_related_field_idx, related_field)) = schema_copy.find_related_field(field) {
                         let related_model_name = &related_model.name;
                         let rel_info = &mut field.relation_info;
                         let related_field_rel_info = &related_field.relation_info;

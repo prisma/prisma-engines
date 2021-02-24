@@ -1,18 +1,20 @@
-use super::*;
-use crate::getters::Getter;
-use crate::parsers::Parser;
+use crate::{
+    getters::Getter, parsers::Parser, Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue, DescriberError,
+    DescriberErrorKind, DescriberResult, ForeignKey, ForeignKeyAction, Index, IndexType, PrimaryKey, Procedure,
+    SQLMetadata, SqlSchema, Table, View,
+};
 use indoc::indoc;
-use native_types::NativeType;
-use native_types::{MsSqlType, MsSqlTypeParameter};
+use native_types::{MsSqlType, MsSqlTypeParameter, NativeType};
 use once_cell::sync::Lazy;
+use prisma_value::PrismaValue;
 use quaint::{prelude::Queryable, single::Quaint};
 use regex::Regex;
-use std::borrow::Cow;
 use std::{
+    borrow::Cow,
     collections::{BTreeMap, HashMap, HashSet},
     convert::TryInto,
 };
-use tracing::trace;
+use tracing::{debug, trace};
 
 /// Matches a default value in the schema, that is not a string.
 ///
@@ -49,6 +51,15 @@ static DEFAULT_STRING: Lazy<Regex> = Lazy::new(|| Regex::new(r"\('([\S\s]*)'\)")
 /// ```
 static DEFAULT_DB_GEN: Lazy<Regex> = Lazy::new(|| Regex::new(r"\((.*)\)").unwrap());
 
+/// Matches a shared default constraint (which we will skip).
+///
+/// example:
+///
+/// ```ignore
+/// CREATE DEFAULT catcat AS 'musti';
+/// ```
+static DEFAULT_SHARED_CONSTRAINT: Lazy<Regex> = Lazy::new(|| Regex::new(r"^CREATE DEFAULT (.*)").unwrap());
+
 #[derive(Debug)]
 pub struct SqlSchemaDescriber {
     conn: Quaint,
@@ -84,8 +95,13 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
             tables.push(table);
         }
 
+        let views = self.get_views(schema).await?;
+        let procedures = self.get_procedures(schema).await?;
+
         Ok(SqlSchema {
             tables,
+            views,
+            procedures,
             enums: vec![],
             sequences: vec![],
         })
@@ -114,6 +130,29 @@ impl SqlSchemaDescriber {
         trace!("Found schema names: {:?}", names);
 
         Ok(names)
+    }
+
+    #[tracing::instrument]
+    async fn get_procedures(&self, schema: &str) -> DescriberResult<Vec<Procedure>> {
+        let sql = r#"
+            SELECT name, OBJECT_DEFINITION(object_id) AS definition
+            FROM sys.objects
+            WHERE SCHEMA_NAME(schema_id) = @P1
+                AND is_ms_shipped = 0
+                AND type = 'P';
+        "#;
+
+        let rows = self.conn.query_raw(sql, &[schema.into()]).await?;
+        let mut procedures = Vec::with_capacity(rows.len());
+
+        for row in rows.into_iter() {
+            procedures.push(Procedure {
+                name: row.get_expect_string("name"),
+                definition: row.get_expect_string("definition"),
+            });
+        }
+
+        Ok(procedures)
     }
 
     #[tracing::instrument]
@@ -211,7 +250,6 @@ impl SqlSchemaDescriber {
                     INNER JOIN sys.tables t ON c.object_id = t.object_id
             WHERE OBJECT_SCHEMA_NAME(c.object_id) = @P1
             AND t.is_ms_shipped = 0
-
             ORDER BY COLUMNPROPERTY(c.object_id, c.name, 'ordinal');
         "#};
 
@@ -253,6 +291,7 @@ impl SqlSchemaDescriber {
                 Some(param_value) => match param_value.to_string() {
                     None => None,
                     Some(x) if x == "(NULL)" => None,
+                    Some(x) if DEFAULT_SHARED_CONSTRAINT.is_match(&x) => None,
                     Some(default_string) => {
                         let default_string = DEFAULT_NON_STRING
                             .captures_iter(&default_string)
@@ -429,6 +468,28 @@ impl SqlSchemaDescriber {
         }
 
         Ok(map)
+    }
+
+    #[tracing::instrument]
+    async fn get_views(&self, schema: &str) -> DescriberResult<Vec<View>> {
+        let sql = indoc! {r#"
+            SELECT name AS view_name, OBJECT_DEFINITION(object_id) AS view_sql
+            FROM sys.views
+            WHERE is_ms_shipped = 0
+            AND SCHEMA_NAME(schema_id) = @P1
+        "#};
+
+        let result_set = self.conn.query_raw(sql, &[schema.into()]).await?;
+        let mut views = Vec::with_capacity(result_set.len());
+
+        for row in result_set.into_iter() {
+            views.push(View {
+                name: row.get_expect_string("view_name"),
+                definition: row.get_expect_string("view_sql"),
+            })
+        }
+
+        Ok(views)
     }
 
     async fn get_foreign_keys(&self, schema: &str) -> DescriberResult<HashMap<String, Vec<ForeignKey>>> {

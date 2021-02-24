@@ -109,6 +109,7 @@ mod tests {
         };
 
         let schema = SqlSchema {
+            procedures: vec![],
             tables: vec![Table {
                 name: "Table1".to_string(),
                 columns: vec![
@@ -141,6 +142,7 @@ mod tests {
             }],
             enums: vec![],
             sequences: vec![],
+            views: vec![],
         };
         let introspection_result =
             calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new()).expect("calculate data model");
@@ -256,6 +258,7 @@ mod tests {
         };
 
         let schema = SqlSchema {
+            procedures: vec![],
             tables: vec![
                 Table {
                     name: "Table1".to_string(),
@@ -325,6 +328,7 @@ mod tests {
             ],
             enums: vec![],
             sequences: vec![],
+            views: vec![],
         };
         let introspection_result =
             calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new()).expect("calculate data model");
@@ -371,6 +375,8 @@ mod tests {
         };
 
         let schema = SqlSchema {
+            views: vec![],
+            procedures: vec![],
             tables: vec![Table {
                 name: "Table1".to_string(),
                 columns: vec![
@@ -557,6 +563,8 @@ mod tests {
         };
 
         let schema = SqlSchema {
+            views: vec![],
+            procedures: vec![],
             tables: vec![
                 Table {
                     name: "City".to_string(),
@@ -724,6 +732,8 @@ mod tests {
         };
 
         let schema = SqlSchema {
+            views: vec![],
+            procedures: vec![],
             tables: vec![Table {
                 name: "User".to_string(),
                 columns: vec![
@@ -905,6 +915,8 @@ mod tests {
         };
 
         let schema = SqlSchema {
+            views: vec![],
+            procedures: vec![],
             tables: vec![
                 Table {
                     name: "City".to_string(),
@@ -1019,6 +1031,8 @@ mod tests {
 
         let enum_values = vec!["a".to_string(), "b".to_string()];
         let schema = SqlSchema {
+            views: vec![],
+            procedures: vec![],
             tables: vec![],
             enums: vec![Enum {
                 name: "Enum".to_string(),

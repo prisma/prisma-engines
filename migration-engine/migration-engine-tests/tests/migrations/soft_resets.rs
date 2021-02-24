@@ -1,9 +1,9 @@
 use migration_engine_tests::{multi_engine_test_api::TestApi, TestResult};
 use quaint::{prelude::Queryable, single::Quaint};
-use test_macros::test_each_connector;
+use test_macros::test_connectors;
 
-#[test_each_connector(tags("postgres"), log = "debug")]
-async fn soft_resets_work_on_postgres(api: &TestApi) -> TestResult {
+#[test_connectors(tags("postgres"), log = "debug")]
+async fn soft_resets_work_on_postgres(api: TestApi) -> TestResult {
     let migrations_directory = api.create_migrations_directory()?;
     let mut url: url::Url = api.connection_string().parse()?;
 
@@ -64,6 +64,13 @@ async fn soft_resets_work_on_postgres(api: &TestApi) -> TestResult {
             .await?
             .assert_applied_migrations(&["01init"])?;
 
+        let add_view = format!(
+            r#"CREATE VIEW "{0}"."catcat" AS SELECT * FROM "{0}"."Cat" LIMIT 2"#,
+            engine.schema_name(),
+        );
+
+        engine.raw_cmd(&add_view).await?;
+
         engine
             .assert_schema()
             .await?
@@ -72,7 +79,6 @@ async fn soft_resets_work_on_postgres(api: &TestApi) -> TestResult {
             .assert_has_table("Cat")?;
 
         engine.reset().send().await?;
-
         engine.assert_schema().await?.assert_tables_count(0)?;
 
         engine
@@ -89,7 +95,6 @@ async fn soft_resets_work_on_postgres(api: &TestApi) -> TestResult {
             .assert_has_table("Cat")?;
 
         engine.reset().send().await?;
-
         engine.assert_schema().await?.assert_tables_count(0)?;
     }
 

@@ -9,32 +9,59 @@ use crate::{commands::*, CoreResult};
 use migration_connector::MigrationConnector;
 use tracing_futures::Instrument;
 
-#[allow(missing_docs)]
+/// The programmatic, generic, fantastic migration engine API.
 #[async_trait::async_trait]
 pub trait GenericApi: Send + Sync + 'static {
+    /// Return the database version as a string.
     async fn version(&self, input: &serde_json::Value) -> CoreResult<String>;
+
+    /// Apply all the unapplied migrations from the migrations folder.
     async fn apply_migrations(&self, input: &ApplyMigrationsInput) -> CoreResult<ApplyMigrationsOutput>;
+
+    /// Apply a raw database script.
     async fn apply_script(&self, input: &ApplyScriptInput) -> CoreResult<ApplyScriptOutput>;
+
+    /// Generate a new migration, based on the provided schema and existing migrations history.
     async fn create_migration(&self, input: &CreateMigrationInput) -> CoreResult<CreateMigrationOutput>;
+
+    /// Debugging method that only panics, for CLI tests.
     async fn debug_panic(&self, input: &()) -> CoreResult<()>;
+
+    /// Tells the CLI what to do in `migrate dev`.
     async fn dev_diagnostic(&self, input: &DevDiagnosticInput) -> CoreResult<DevDiagnosticOutput>;
+
+    /// Looks at the migrations folder and the database, and returns a bunch of useful information.
     async fn diagnose_migration_history(
         &self,
         input: &DiagnoseMigrationHistoryInput,
     ) -> CoreResult<DiagnoseMigrationHistoryOutput>;
+
+    /// Evaluate the consequences of running the next migration we would generate, given the current state of a Prisma schema.
     async fn evaluate_data_loss(&self, input: &EvaluateDataLossInput) -> CoreResult<EvaluateDataLossOutput>;
+
+    /// List the migration directories.
     async fn list_migration_directories(
         &self,
         input: &ListMigrationDirectoriesInput,
     ) -> CoreResult<ListMigrationDirectoriesOutput>;
+
+    /// Mark a migration from the migrations folder as applied, without actually applying it.
     async fn mark_migration_applied(&self, input: &MarkMigrationAppliedInput)
         -> CoreResult<MarkMigrationAppliedOutput>;
+
+    /// Mark a migration as rolled back.
     async fn mark_migration_rolled_back(
         &self,
         input: &MarkMigrationRolledBackInput,
     ) -> CoreResult<MarkMigrationRolledBackOutput>;
+
+    /// Prepare to create a migration.
     async fn plan_migration(&self, input: &PlanMigrationInput) -> CoreResult<PlanMigrationOutput>;
-    async fn reset(&self, input: &()) -> CoreResult<()>;
+
+    /// Reset a database to an empty state (no data, no schema).
+    async fn reset(&self) -> CoreResult<()>;
+
+    /// The command behind `prisma db push`.
     async fn schema_push(&self, input: &SchemaPushInput) -> CoreResult<SchemaPushOutput>;
 }
 
@@ -120,7 +147,7 @@ impl<C: MigrationConnector> GenericApi for C {
         &self,
         input: &MarkMigrationRolledBackInput,
     ) -> CoreResult<MarkMigrationRolledBackOutput> {
-        MarkMigrationRolledBackCommand::execute(input, self)
+        mark_migration_rolled_back(input, self)
             .instrument(tracing::info_span!(
                 "MarkMigrationRolledBack",
                 migration_name = input.migration_name.as_str()
@@ -134,10 +161,12 @@ impl<C: MigrationConnector> GenericApi for C {
             .await
     }
 
-    async fn reset(&self, input: &()) -> CoreResult<()> {
-        ResetCommand::execute(input, self)
+    async fn reset(&self) -> CoreResult<()> {
+        tracing::debug!("Resetting the database.");
+
+        Ok(MigrationConnector::reset(self)
             .instrument(tracing::info_span!("Reset"))
-            .await
+            .await?)
     }
 
     async fn schema_push(&self, input: &SchemaPushInput) -> CoreResult<SchemaPushOutput> {

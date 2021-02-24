@@ -1,3 +1,4 @@
+use indoc::indoc;
 use migration_engine_tests::sql::*;
 use std::fmt::Write as _;
 
@@ -292,6 +293,39 @@ async fn native_type_columns_can_be_created(api: &TestApi) -> TestResult {
 
     // Check that the migration is idempotent
     api.schema_push(dm).send().await?.assert_green()?.assert_no_steps()?;
+
+    Ok(())
+}
+
+#[test_each_connector(tags("mysql"))]
+async fn default_current_timestamp_precision_follows_column_precision(api: &TestApi) -> TestResult {
+    let migrations_directory = api.create_migrations_directory()?;
+
+    let dm = api.native_types_datamodel(
+        r#"
+            model A {
+                id Int @id
+                createdAt DateTime @test_db.DateTime(7) @default(now())
+            }
+        "#,
+    );
+
+    let expected_migration = indoc!(
+        r#"
+        -- CreateTable
+        CREATE TABLE `A` (
+            `id` INTEGER NOT NULL,
+            `createdAt` DATETIME(7) NOT NULL DEFAULT CURRENT_TIMESTAMP(7),
+
+            PRIMARY KEY (`id`)
+        ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+        "#
+    );
+
+    api.create_migration("01init", &dm, &migrations_directory)
+        .send()
+        .await?
+        .assert_migration("01init", |migration| migration.assert_contents(expected_migration))?;
 
     Ok(())
 }

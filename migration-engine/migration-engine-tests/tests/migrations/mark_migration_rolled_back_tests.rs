@@ -1,5 +1,7 @@
-use crate::*;
+use migration_engine_tests::sql::*;
 use pretty_assertions::assert_eq;
+use test_macros::test_each_connector;
+use user_facing_errors::UserFacingError;
 
 #[test_each_connector]
 async fn mark_migration_rolled_back_on_an_empty_database_errors(api: &TestApi) -> TestResult {
@@ -17,11 +19,22 @@ async fn mark_migration_rolled_back_on_an_empty_database_errors(api: &TestApi) -
 async fn mark_migration_rolled_back_on_a_database_with_migrations_table_errors(api: &TestApi) -> TestResult {
     api.migration_persistence().initialize().await?;
 
-    let err = api.mark_migration_rolled_back("anything").send().await.unwrap_err();
+    let err = api
+        .mark_migration_rolled_back("anything")
+        .send()
+        .await
+        .unwrap_err()
+        .render_user_facing()
+        .unwrap_known();
 
     assert_eq!(
-        err.to_string(),
-        "Migration `anything` cannot be rolled back because it was never applied to the database."
+        err.error_code,
+        user_facing_errors::migration_engine::CannotRollBackUnappliedMigration::ERROR_CODE
+    );
+
+    assert_eq!(
+        err.message,
+        "Migration `anything` cannot be rolled back because it was never applied to the database. Hint: did you pass in the whole migration name? (example: \"20201207184859_initial_migration\")"
     );
 
     Ok(())

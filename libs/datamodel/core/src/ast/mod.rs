@@ -10,17 +10,17 @@ mod r#enum;
 mod expression;
 mod field;
 mod generator_config;
+mod helper;
 mod identifier;
 mod model;
+mod parser;
+mod renderer;
 mod source_config;
 mod span;
 mod top;
 mod traits;
 
-mod helper;
-pub mod parser;
 pub mod reformat;
-pub mod renderer;
 
 pub use argument::Argument;
 pub use attribute::Attribute;
@@ -35,6 +35,9 @@ pub use source_config::SourceConfig;
 pub use span::Span;
 pub use top::Top;
 pub use traits::{ArgumentContainer, WithAttributes, WithDocumentation, WithIdentifier, WithName, WithSpan};
+
+pub(crate) use parser::parse_schema;
+pub(crate) use renderer::Renderer;
 
 /// AST representation of a prisma schema.
 ///

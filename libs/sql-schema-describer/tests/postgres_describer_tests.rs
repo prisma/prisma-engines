@@ -12,6 +12,32 @@ use test_api::*;
 use test_macros::test_each_connector;
 
 #[tokio::test]
+async fn views_can_be_described() {
+    let db_name = "views_can_be_described";
+
+    let full_sql = format!(
+        r#"
+        CREATE TABLE "{0}".a (a_id int);
+        CREATE TABLE "{0}".b (b_id int);
+        CREATE VIEW "{0}".ab AS SELECT a_id FROM "{0}".a UNION ALL SELECT b_id FROM "{0}".b;
+        "#,
+        SCHEMA,
+    );
+
+    let inspector = get_postgres_describer(&full_sql, db_name).await;
+    let result = inspector.describe(SCHEMA).await.expect("describing");
+    let view = result.get_view("ab").expect("couldn't get ab view").to_owned();
+
+    let expected_sql = format!(
+        " SELECT a.a_id\n   FROM \"{0}\".a\nUNION ALL\n SELECT b.b_id AS a_id\n   FROM \"{0}\".b;",
+        SCHEMA
+    );
+
+    assert_eq!("ab", &view.name);
+    assert_eq!(expected_sql, view.definition);
+}
+
+#[tokio::test]
 async fn all_postgres_column_types_must_work() {
     let mut migration = Migration::new().schema(SCHEMA);
     migration.create_table("User", move |t| {

@@ -375,12 +375,10 @@ pub fn parse(datamodel_string: &str) -> Datamodel {
     match datamodel::parse_datamodel(datamodel_string) {
         Ok(s) => s.subject,
         Err(errs) => {
-            for err in errs.to_error_iter() {
-                err.pretty_print(&mut std::io::stderr().lock(), "", datamodel_string)
-                    .unwrap();
-            }
-
-            panic!("Datamodel parsing failed. Please see error above.")
+            panic!(
+                "Datamodel parsing failed\n\n{}",
+                errs.to_pretty_string("", datamodel_string)
+            )
         }
     }
 }
@@ -389,12 +387,10 @@ pub fn parse_configuration(datamodel_string: &str) -> Configuration {
     match datamodel::parse_configuration(datamodel_string) {
         Ok(c) => c.subject,
         Err(errs) => {
-            for err in errs.to_error_iter() {
-                err.pretty_print(&mut std::io::stderr().lock(), "", datamodel_string)
-                    .unwrap()
-            }
-
-            panic!("Configuration parsing failed. Please see error above.")
+            panic!(
+                "Configuration parsing failed\n\n{}",
+                errs.to_pretty_string("", datamodel_string)
+            )
         }
     }
 }

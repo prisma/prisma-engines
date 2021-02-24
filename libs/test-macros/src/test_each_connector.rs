@@ -160,6 +160,74 @@ impl TestEachConnectorArgs {
     }
 }
 
+pub fn test_connectors_impl(attr: TokenStream, input: TokenStream) -> TokenStream {
+    let attributes_meta: syn::AttributeArgs = parse_macro_input!(attr as AttributeArgs);
+    let args = TestEachConnectorArgs::from_list(&attributes_meta);
+
+    let test_function = parse_macro_input!(input as ItemFn);
+
+    if test_function.sig.asyncness.is_none() {
+        return syn::Error::new_spanned(test_function.sig, "test_connectors test functions must be async")
+            .to_compile_error()
+            .into();
+    }
+
+    let test_name = &test_function.sig.ident;
+    let test_fn_name_str = test_name.to_string();
+
+    let args = match args {
+        Ok(args) => args,
+        Err(err) => return err.write_errors().into(),
+    };
+
+    let optional_logging_import = args.log.as_ref().map(|_| {
+        quote!(
+            use tracing_futures::WithSubscriber;
+        )
+    });
+
+    let optional_logging = args.log.as_ref().map(|log_config| {
+        quote! { .with_subscriber(test_setup::logging::test_tracing_subscriber(#log_config)) }
+    });
+
+    let mut tests = Vec::with_capacity(CONNECTORS.len());
+
+    for connector in args.connectors_to_test() {
+        let connector_test_fn_name = Ident::new(connector.name(), Span::call_site());
+        let tags = connector.tags.bits();
+        let features = args.features.0.bits();
+
+        let test = quote! {
+            #[test]
+            fn #connector_test_fn_name() {
+                #optional_logging_import
+                let test_api_args = test_setup::TestApiArgs::#connector_test_fn_name(#test_fn_name_str, #tags, #features);
+                let test_api = super::TestApi::new(test_api_args);
+                let fut = super::#test_name(test_api)#optional_logging;
+                test_setup::runtime::run_with_tokio(fut).unwrap();
+            }
+        };
+
+        tests.push(test);
+    }
+
+    if tests.is_empty() && TAGS_FILTER.is_empty() {
+        return syn::Error::new_spanned(test_function, "All connectors were filtered out for this test.")
+            .to_compile_error()
+            .into();
+    }
+
+    let output = quote! {
+        mod #test_name {
+            #(#tests)*
+        }
+
+        #test_function
+    };
+
+    output.into()
+}
+
 pub fn test_each_connector_impl(attr: TokenStream, input: TokenStream) -> TokenStream {
     let attributes_meta: syn::AttributeArgs = parse_macro_input!(attr as AttributeArgs);
     let args = TestEachConnectorArgs::from_list(&attributes_meta);

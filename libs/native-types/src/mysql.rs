@@ -1,7 +1,11 @@
+#![deny(missing_docs)]
+
 use serde::*;
 use serde_json::Value;
 
+/// The MySQL native type enum.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[allow(missing_docs)]
 pub enum MySqlType {
     Int,
     UnsignedInt,
@@ -35,6 +39,16 @@ pub enum MySqlType {
     Timestamp(Option<u32>),
     Year,
     Json,
+}
+
+impl MySqlType {
+    /// The user-defined precision for timestamp columns, where applicable.
+    pub fn timestamp_precision(&self) -> Option<u32> {
+        match self {
+            MySqlType::Time(n) | MySqlType::DateTime(n) | MySqlType::Timestamp(n) => *n,
+            _ => None,
+        }
+    }
 }
 
 impl super::NativeType for MySqlType {

@@ -77,6 +77,20 @@ impl ConnectorError {
         }
     }
 
+    /// Turn the error into a nested, user-facing SoftResetFailed error.
+    pub fn into_soft_reset_failed_error(self) -> Self {
+        let context = self.context.clone();
+        let user_facing_error = user_facing_errors::migration_engine::SoftResetFailed {
+            inner_error: self.to_user_facing(),
+        };
+
+        ConnectorError {
+            user_facing_error: Some(KnownError::new(user_facing_error)),
+            report: self.into(),
+            context,
+        }
+    }
+
     /// Access the inner `user_facing_error::KnownError`.
     pub fn known_error(&self) -> Option<&KnownError> {
         self.user_facing_error.as_ref()

@@ -24,7 +24,7 @@ use flavour::SqlFlavour;
 use migration_connector::*;
 use pair::Pair;
 use quaint::{prelude::ConnectionInfo, single::Quaint};
-use sql_migration::SqlMigration;
+use sql_migration::{DropView, SqlMigration, SqlMigrationStep};
 use sql_schema_describer::{walkers::SqlSchemaExt, SqlSchema};
 use user_facing_errors::{common::InvalidDatabaseString, KnownError};
 
@@ -103,13 +103,33 @@ impl SqlMigrationConnector {
     /// when we don't have the permissions to do a full reset.
     #[tracing::instrument(skip(self))]
     async fn best_effort_reset(&self, connection: &Connection) -> ConnectorResult<()> {
+        self.best_effort_reset_impl(connection)
+            .await
+            .map_err(|err| err.into_soft_reset_failed_error())
+    }
+
+    async fn best_effort_reset_impl(&self, connection: &Connection) -> ConnectorResult<()> {
         tracing::info!("Attempting best_effort_reset");
 
         let source_schema = self.flavour.describe_schema(connection).await?;
         let target_schema = SqlSchema::empty();
 
-        let steps =
-            sql_schema_differ::calculate_steps(Pair::new(&source_schema, &target_schema), self.flavour.as_ref());
+        let mut steps = Vec::new();
+
+        // We drop views here, not in the normal migration process to not
+        // accidentally drop something we can't describe in the data model.
+        let drop_views = source_schema
+            .view_walkers()
+            .map(|vw| vw.view_index())
+            .map(DropView::new)
+            .map(SqlMigrationStep::DropView);
+
+        steps.extend(drop_views);
+
+        steps.extend(sql_schema_differ::calculate_steps(
+            Pair::new(&source_schema, &target_schema),
+            self.flavour.as_ref(),
+        ));
 
         let migration = SqlMigration {
             before: source_schema,

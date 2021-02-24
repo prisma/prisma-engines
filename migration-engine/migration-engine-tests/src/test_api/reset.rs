@@ -11,7 +11,7 @@ impl<'a> Reset<'a> {
     }
 
     pub async fn send(self) -> anyhow::Result<ResetAssertion<'a>> {
-        self.api.reset(&()).await?;
+        self.api.reset().await?;
 
         Ok(ResetAssertion { _api: self.api })
     }

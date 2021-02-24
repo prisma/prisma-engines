@@ -3,10 +3,10 @@
 //! A TestApi that is initialized without IO or async code and can instantiate
 //! multiple migration engines.
 
-use crate::{ApplyMigrations, CreateMigration, Reset, SchemaAssertion, SchemaPush};
+use crate::{ApplyMigrations, CreateMigration, DiagnoseMigrationHistory, Reset, SchemaAssertion, SchemaPush};
 use enumflags2::BitFlags;
 use migration_core::GenericApi;
-use quaint::single::Quaint;
+use quaint::{prelude::Queryable, single::Quaint};
 use sql_migration_connector::SqlMigrationConnector;
 use tempfile::TempDir;
 use test_setup::{connectors::Tags, TestApiArgs};
@@ -19,7 +19,7 @@ pub struct TestApi {
 
 impl TestApi {
     /// Initializer, called by the test macros.
-    pub async fn new(args: TestApiArgs) -> Self {
+    pub fn new(args: TestApiArgs) -> Self {
         let connection_string = (args.url_fn)(args.test_function_name);
 
         TestApi {
@@ -101,6 +101,11 @@ impl EngineTestApi {
         CreateMigration::new(&self.0, name, schema, migrations_directory)
     }
 
+    /// Builder and assertions to call the DiagnoseMigrationHistory command.
+    pub fn diagnose_migration_history<'a>(&'a self, migrations_directory: &'a TempDir) -> DiagnoseMigrationHistory<'a> {
+        DiagnoseMigrationHistory::new(&self.0, migrations_directory)
+    }
+
     /// Assert facts about the database schema
     pub async fn assert_schema(&self) -> Result<SchemaAssertion, anyhow::Error> {
         let schema = self.0.describe_schema().await?;
@@ -121,5 +126,15 @@ impl EngineTestApi {
     /// Plan a `schemaPush` command
     pub fn schema_push(&self, dm: impl Into<String>) -> SchemaPush<'_> {
         SchemaPush::new(&self.0, dm.into())
+    }
+
+    /// The schema name of the current connected database.
+    pub fn schema_name(&self) -> &str {
+        self.0.quaint().connection_info().schema_name()
+    }
+
+    /// Execute a raw SQL command.
+    pub async fn raw_cmd(&self, cmd: &str) -> Result<(), quaint::error::Error> {
+        self.0.quaint().raw_cmd(cmd).await
     }
 }
