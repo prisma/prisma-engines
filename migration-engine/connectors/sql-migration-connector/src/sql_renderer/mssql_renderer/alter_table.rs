@@ -1,3 +1,4 @@
+use super::render_default;
 use crate::{
     flavour::MssqlFlavour,
     pair::Pair,
@@ -175,9 +176,7 @@ impl<'a> AlterTableConstructor<'a> {
                     self.drop_constraints.insert(escaped);
                 }
                 MsSqlAlterColumn::SetDefault(default) => {
-                    let default = self
-                        .renderer
-                        .render_default(&default, &columns.next().column_type().family);
+                    let default = render_default(&default);
 
                     self.add_constraints.insert(format!(
                         "CONSTRAINT [DF__{table}__{column}] DEFAULT {default} FOR [{column}]",

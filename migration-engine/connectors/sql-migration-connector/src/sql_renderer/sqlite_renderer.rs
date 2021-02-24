@@ -238,7 +238,6 @@ fn copy_current_table_into_new_table(
                         .next()
                         .default()
                         .expect("default on required column with default"),
-                    &columns.next().column_type_family()
                 )
             )
         } else {
@@ -263,7 +262,7 @@ fn render_column<'a>(column: &ColumnWalker<'a>) -> ddl::Column<'a> {
         default: column
             .default()
             .filter(|default| !matches!(default.kind(), DefaultKind::SEQUENCE(_)))
-            .map(|default| render_default(default, column.column_type_family())),
+            .map(|default| render_default(default)),
         name: column.name().into(),
         not_null: !column.arity().is_nullable(),
         primary_key: column.is_single_primary_key(),
@@ -271,18 +270,16 @@ fn render_column<'a>(column: &ColumnWalker<'a>) -> ddl::Column<'a> {
     }
 }
 
-fn render_default<'a>(default: &'a DefaultValue, family: &ColumnTypeFamily) -> Cow<'a, str> {
-    match (default.kind(), family) {
-        (DefaultKind::DBGENERATED(val), _) => val.as_str().into(),
-        (DefaultKind::VALUE(PrismaValue::String(val)), ColumnTypeFamily::String)
-        | (DefaultKind::VALUE(PrismaValue::Enum(val)), ColumnTypeFamily::Enum(_)) => {
-            format!("'{}'", escape_quotes(&val)).into()
+fn render_default(default: &DefaultValue) -> Cow<'_, str> {
+    match default.kind() {
+        DefaultKind::DBGENERATED(val) => val.as_str().into(),
+        DefaultKind::VALUE(PrismaValue::String(val)) | DefaultKind::VALUE(PrismaValue::Enum(val)) => {
+            Quoted::sqlite_string(escape_quotes(&val)).to_string().into()
         }
-        (DefaultKind::VALUE(PrismaValue::Bytes(b)), ColumnTypeFamily::Binary) => format!("'{}'", format_hex(b)).into(),
-        (DefaultKind::NOW, ColumnTypeFamily::DateTime) => "CURRENT_TIMESTAMP".into(),
-        (DefaultKind::NOW, _) => unreachable!("NOW default on non-datetime column"),
-        (DefaultKind::VALUE(val), ColumnTypeFamily::DateTime) => format!("'{}'", val).into(),
-        (DefaultKind::VALUE(val), _) => format!("{}", val).into(),
-        (DefaultKind::SEQUENCE(_), _) => "".into(),
+        DefaultKind::VALUE(PrismaValue::Bytes(b)) => Quoted::sqlite_string(format_hex(b)).to_string().into(),
+        DefaultKind::NOW => "CURRENT_TIMESTAMP".into(),
+        DefaultKind::VALUE(PrismaValue::DateTime(val)) => Quoted::sqlite_string(val).to_string().into(),
+        DefaultKind::VALUE(val) => format!("{}", val).into(),
+        DefaultKind::SEQUENCE(_) => "".into(),
     }
 }

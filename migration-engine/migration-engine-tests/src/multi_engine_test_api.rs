@@ -38,6 +38,36 @@ impl TestApi {
         Ok(tempfile::tempdir()?)
     }
 
+    /// Returns true only when testing on MSSQL.
+    pub fn is_mssql(&self) -> bool {
+        self.args.connector_tags.contains(Tags::Mssql)
+    }
+
+    /// Returns true only when testing on MySQL.
+    pub fn is_mysql(&self) -> bool {
+        self.args.connector_tags.contains(Tags::Mysql)
+    }
+
+    /// Returns true only when testing on MariaDB.
+    pub fn is_mysql_mariadb(&self) -> bool {
+        self.args.connector_tags.contains(Tags::Mariadb)
+    }
+
+    /// Returns true only when testing on MySQL 5.6.
+    pub fn is_mysql_5_6(&self) -> bool {
+        self.args.connector_tags.contains(Tags::Mysql56)
+    }
+
+    /// Returns true only when testing on MySQL 8.
+    pub fn is_mysql_8(&self) -> bool {
+        self.args.connector_tags.contains(Tags::Mysql8)
+    }
+
+    /// Returns true only when testing on postgres.
+    pub fn is_postgres(&self) -> bool {
+        self.args.connector_tags.contains(Tags::Postgres)
+    }
+
     /// Instantiate a new migration engine for the current database.
     pub async fn new_engine(&self) -> anyhow::Result<EngineTestApi> {
         self.new_engine_with_connection_strings(&self.connection_string, None)
