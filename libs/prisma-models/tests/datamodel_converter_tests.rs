@@ -363,36 +363,6 @@ fn many_to_many_relations() {
 }
 
 #[test]
-fn implicit_relation_fields() {
-    let datamodel = convert(
-        r#"
-            model Blog {
-                id Int @id
-                posts Post[]
-            }
-
-            model Post {
-                id Int @id
-            }
-        "#,
-    );
-
-    let relation_name = "BlogToPost";
-    let post = datamodel.assert_model("Post");
-    let relation = datamodel.assert_relation(relation_name);
-
-    post.assert_relation_field("Blog").assert_optional();
-
-    relation
-        .assert_name(relation_name)
-        .assert_model_a("Blog")
-        .assert_model_b("Post")
-        .assert_manifestation(RelationLinkManifestation::Inline(InlineRelation {
-            in_table_of_model_name: "Post".to_string(),
-        }));
-}
-
-#[test]
 fn explicit_relation_names() {
     let datamodel = convert(
         r#"
