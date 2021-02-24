@@ -6,10 +6,11 @@ use crate::{
 use itertools::Itertools;
 use std::collections::HashMap;
 
-/// Helper for standardsing a datamodel.
+/// Helper for formatting a datamodel.
 ///
-/// When standardsing, datamodel will be made consistent.
-/// Implicit back relation fields, relation names and `references` will be generated.
+/// When formatting, datamodel will be made consistent.
+/// Implicit back relation fields, `references` and `fields` attributes in @relation will be generated.
+/// Scalar fields to back relations will be added if necessary.
 pub struct StandardiserForFormatting {}
 impl StandardiserForFormatting {
     /// Creates a new instance, with all builtin attributes registered.
@@ -19,14 +20,14 @@ impl StandardiserForFormatting {
 
     pub fn standardise(&self, ast_schema: &ast::SchemaAst, schema: &mut dml::Datamodel) -> Result<(), Diagnostics> {
         self.add_missing_back_relations(ast_schema, schema)?;
-        self.set_relation_to_field_to_id_if_missing(ast_schema, schema)?;
+        self.set_relation_to_field_to_id_if_missing_for_non_m2m_relations(ast_schema, schema)?;
         Ok(())
     }
 
     /// For any relations which are missing references, sets them to the @id fields
     /// of the foreign model.
     /// Also adds missing underlying scalar fields.
-    fn set_relation_to_field_to_id_if_missing(
+    fn set_relation_to_field_to_id_if_missing_for_non_m2m_relations(
         &self,
         ast_schema: &ast::SchemaAst,
         schema: &mut dml::Datamodel,
@@ -149,7 +150,7 @@ impl StandardiserForFormatting {
 
         let mut missing_back_relation_fields = Vec::new();
         for model in schema.models() {
-            let mut missing_for_model = self.find_missing_back_relation_fields(&model, schema);
+            let mut missing_for_model = self.find_missing_back_relation_fields(&model, schema, ast_schema)?;
             missing_back_relation_fields.append(&mut missing_for_model);
         }
 
@@ -196,7 +197,9 @@ impl StandardiserForFormatting {
         &self,
         model: &dml::Model,
         schema: &dml::Datamodel,
-    ) -> Vec<AddMissingBackRelationField> {
+        schema_ast: &ast::SchemaAst,
+    ) -> Result<Vec<AddMissingBackRelationField>, Diagnostics> {
+        let mut errors = Diagnostics::new();
         let mut result = Vec::new();
         for field in model.relation_fields() {
             let rel_info = &field.relation_info;
@@ -244,7 +247,6 @@ impl StandardiserForFormatting {
 
                     let underlying_field_names = underlying_fields.iter().map(|f| f.name.clone()).collect();
 
-                    let mut cont = false;
                     let underlying_fields_to_add = underlying_fields
                         .into_iter()
                         .filter(|f| {
@@ -259,18 +261,24 @@ impl StandardiserForFormatting {
                                 }
                                 _ => {
                                     // field with name exists and its type is incompatible. We should not add a backrelation at all.
-                                    // todo but then we would fail the postvalidation
-                                    // maybe we shold not have that one for format since we can't always be right?
-                                    cont = true;
+                                    errors.push_error(DatamodelError::new_model_validation_error(
+                                        &format!(
+                                            "Automatic underlying field generation tried to add the field `{}` in model `{}` for the back relation field of `{}` in `{}`. A field with that name exists already and has an incompatible type for the relation. Please add the back relation manually.",
+                                            &f.name,
+                                            &related_model.name,
+                                            &field.name,
+                                            &model.name,
+                                        ),
+                                        &related_model.name,
+                                        schema_ast.find_model(&related_model.name)
+                                            .expect(ERROR_GEN_STATE_ERROR)
+                                            .span,
+                                    ));
                                     false
                                 }
                             }
                         })
                         .collect();
-
-                    if cont {
-                        continue;
-                    }
 
                     let relation_info = dml::RelationInfo {
                         to: model.name.clone(),
@@ -292,7 +300,11 @@ impl StandardiserForFormatting {
             }
         }
 
-        result
+        if errors.has_errors() {
+            Err(errors)
+        } else {
+            Ok(result)
+        }
     }
 
     fn unique_criteria<'a>(&self, model: &'a dml::Model) -> UniqueCriteria<'a> {

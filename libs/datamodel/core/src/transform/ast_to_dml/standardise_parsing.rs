@@ -14,12 +14,12 @@ impl StandardiserForParsing {
 
     pub fn standardise(&self, schema: &mut dml::Datamodel) -> Result<(), Diagnostics> {
         self.name_unnamed_relations(schema);
-        self.set_relation_to_field_to_id_if_missing(schema);
+        self.set_relation_to_field_to_id_if_missing_for_m2m_relations(schema);
         Ok(())
     }
 
     /// For M2M relations set the references to the @id fields of the foreign model.
-    fn set_relation_to_field_to_id_if_missing(&self, schema: &mut dml::Datamodel) {
+    fn set_relation_to_field_to_id_if_missing_for_m2m_relations(&self, schema: &mut dml::Datamodel) {
         let schema_copy = schema.clone();
 
         // Iterate and mutate models.

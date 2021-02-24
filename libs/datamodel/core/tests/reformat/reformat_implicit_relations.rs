@@ -1,3 +1,4 @@
+use datamodel::parse_datamodel;
 use indoc::indoc;
 use pretty_assertions::assert_eq;
 
@@ -327,7 +328,6 @@ model Post {
 }
 
 #[test]
-#[ignore]
 fn must_add_relation_attribute_to_an_existing_field() {
     let input = r#"
     model Blog {
@@ -355,8 +355,6 @@ model Post {
 "#;
     assert_reformat(input, expected);
 }
-
-// scalar above corresponding relationfield?
 
 #[test]
 fn forward_relation_fields_must_be_added() {
@@ -567,7 +565,7 @@ fn must_succeed_when_fields_argument_is_missing_for_one_to_many() {
 }
 
 #[test]
-fn must_add_referenced_fields_on_both_sides_for_one_to_many_relations() {
+fn must_add_referenced_fields_for_one_to_many_relations() {
     let input = indoc! {r#"
     model User {
         user_id Int    @id
@@ -597,7 +595,7 @@ fn must_add_referenced_fields_on_both_sides_for_one_to_many_relations() {
 }
 
 #[test]
-fn must_add_referenced_fields_on_both_sides_for_one_to_many_relations_reverse() {
+fn must_add_referenced_fields_for_one_to_many_relations_reverse() {
     let input = indoc! {r#"
     model User {
       user_id Int    @id
@@ -1001,5 +999,6 @@ fn must_handle_conflicts_with_existing_fields_if_types_are_incompatible_and_name
 
 fn assert_reformat(schema: &str, expected_result: &str) {
     let result = datamodel::ast::reformat::Reformatter::new(&schema).reformat_to_string();
+    parse_datamodel(&result).unwrap();
     assert_eq!(result, expected_result);
 }

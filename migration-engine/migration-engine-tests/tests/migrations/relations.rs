@@ -275,6 +275,7 @@ async fn compound_foreign_keys_should_work_in_correct_order(api: &TestApi) -> Te
             b_id Int
             a_id Int
             d_id Int
+            a    A[]
             @@id([a_id, b_id, d_id])
         }
     "#;

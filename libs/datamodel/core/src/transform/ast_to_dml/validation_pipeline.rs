@@ -30,7 +30,11 @@ impl<'a, 'b> ValidationPipeline<'a> {
     /// * Perform string interpolation
     /// * Resolve and check default values
     /// * Resolve and check all field types
-    pub fn validate(&self, ast_schema: &ast::SchemaAst, transform: bool) -> Result<ValidatedDatamodel, Diagnostics> {
+    pub fn validate(
+        &self,
+        ast_schema: &ast::SchemaAst,
+        relation_transformation_enabled: bool,
+    ) -> Result<ValidatedDatamodel, Diagnostics> {
         let mut diagnostics = Diagnostics::new();
 
         // Phase 0 is parsing.
@@ -72,8 +76,8 @@ impl<'a, 'b> ValidationPipeline<'a> {
             diagnostics.append(&mut err);
         }
 
-        // Phase 5 formatting: Consistency fixes. These only run during formatting.
-        if transform {
+        // Transform phase: These only run during formatting.
+        if relation_transformation_enabled {
             if let Err(mut err) = self.standardiser_for_formatting.standardise(ast_schema, &mut schema) {
                 diagnostics.append(&mut err);
             }
