@@ -1,4 +1,5 @@
 use super::*;
+use crate::transform::ast_to_dml::standardise_parsing::StandardiserForParsing;
 use crate::{ast, configuration, diagnostics::Diagnostics, ValidatedDatamodel};
 
 /// Is responsible for loading and validating the Datamodel defined in an AST.
@@ -6,7 +7,8 @@ use crate::{ast, configuration, diagnostics::Diagnostics, ValidatedDatamodel};
 pub struct ValidationPipeline<'a> {
     lifter: LiftAstToDml<'a>,
     validator: Validator<'a>,
-    standardiser: Standardiser,
+    standardiser_for_parsing: StandardiserForParsing,
+    standardiser_for_formatting: StandardiserForFormatting,
 }
 
 impl<'a, 'b> ValidationPipeline<'a> {
@@ -15,7 +17,8 @@ impl<'a, 'b> ValidationPipeline<'a> {
         ValidationPipeline {
             lifter: LiftAstToDml::new(source),
             validator: Validator::new(source),
-            standardiser: Standardiser::new(),
+            standardiser_for_formatting: StandardiserForFormatting::new(),
+            standardiser_for_parsing: StandardiserForParsing::new(),
         }
     }
 
@@ -27,7 +30,11 @@ impl<'a, 'b> ValidationPipeline<'a> {
     /// * Perform string interpolation
     /// * Resolve and check default values
     /// * Resolve and check all field types
-    pub fn validate(&self, ast_schema: &ast::SchemaAst) -> Result<ValidatedDatamodel, Diagnostics> {
+    pub fn validate(
+        &self,
+        ast_schema: &ast::SchemaAst,
+        relation_transformation_enabled: bool,
+    ) -> Result<ValidatedDatamodel, Diagnostics> {
         let mut diagnostics = Diagnostics::new();
 
         // Phase 0 is parsing.
@@ -64,11 +71,17 @@ impl<'a, 'b> ValidationPipeline<'a> {
         }
 
         // TODO: Move consistency stuff into different module.
-        // Phase 5: Consistency fixes. These don't fail.
-        if let Err(mut err) = self.standardiser.standardise(ast_schema, &mut schema) {
+        // Phase 5: Consistency fixes. These don't fail and always run, during parsing AND formatting
+        if let Err(mut err) = self.standardiser_for_parsing.standardise(&mut schema) {
             diagnostics.append(&mut err);
         }
 
+        // Transform phase: These only run during formatting.
+        if relation_transformation_enabled {
+            if let Err(mut err) = self.standardiser_for_formatting.standardise(ast_schema, &mut schema) {
+                diagnostics.append(&mut err);
+            }
+        }
         // Early return so that the post validation does not have to deal with invalid schemas
         if diagnostics.has_errors() {
             return Err(diagnostics);

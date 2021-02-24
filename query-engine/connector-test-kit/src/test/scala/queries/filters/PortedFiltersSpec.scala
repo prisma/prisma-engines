@@ -21,13 +21,13 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
     |  optDateTime DateTime?
     |  optEnum     Enum?
     |  b_id        String?
-    |
     |  b B? @relation(fields: [b_id], references: [id])
     |}
     |
     |model B {
     | id  String @id @default(cuid())
     | int Int?   @unique
+    | m   ScalarModel []
     |}
     |
     |enum Enum{

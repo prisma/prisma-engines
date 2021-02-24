@@ -95,7 +95,7 @@ fn disallow_ignore_on_models_with_relations_pointing_to_them() {
     model ModelValidC {
       id Int @id
       d  Int
-      rel_d  ModelValidD @relation(fields:[d]) //ignore here is missing
+      rel_d  ModelValidD @relation(fields: d, references: id) //ignore here is missing
     }
     
     model ModelValidD {
@@ -111,7 +111,7 @@ fn disallow_ignore_on_models_with_relations_pointing_to_them() {
     errors.assert_is(DatamodelError::new_attribute_validation_error(
         "The relation field `rel_d` on Model `ModelValidC` must specify the `@ignore` attribute, because the model ModelValidD it is pointing to is marked ignored.",
         "ignore",
-        Span::new(64, 130),
+        Span::new(64, 145),
     ));
 }
 
@@ -121,7 +121,7 @@ fn disallow_ignore_on_models_with_back_relations_pointing_to_them() {
     model ModelValidA {
       id Int @id
       b  Int
-      rel_b  ModelValidB @relation(fields:[b]) 
+      rel_b  ModelValidB @relation(fields: b, references: id) 
      
       @@ignore
     }
@@ -137,7 +137,7 @@ fn disallow_ignore_on_models_with_back_relations_pointing_to_them() {
     errors.assert_is(DatamodelError::new_attribute_validation_error(
         "The relation field `rel_a` on Model `ModelValidB` must specify the `@ignore` attribute, because the model ModelValidA it is pointing to is marked ignored.",
         "ignore",
-        Span::new(182, 228),
+        Span::new(197, 243),
     ));
 }
 

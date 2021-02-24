@@ -109,6 +109,7 @@ class NestedAtomicNumberOperationsSpec extends FlatSpec with Matchers with ApiSp
         |model RelatedModel {
         | id    Int       @id
         | field String
+        | test  TestModel[]
         |}
       """.stripMargin
     }

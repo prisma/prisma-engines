@@ -90,7 +90,7 @@ fn allow_ignore_on_valid_models_in_relations() {
     model ModelValidA {
       id Int @id
       b  Int
-      rel_b  ModelValidB @relation(fields:[b]) 
+      rel_b  ModelValidB @relation(fields:b, references: id) 
      
       @@ignore
     }
@@ -103,7 +103,7 @@ fn allow_ignore_on_valid_models_in_relations() {
     model ModelValidC {
       id Int @id
       d  Int
-      rel_d  ModelValidD @relation(fields:[d]) @ignore
+      rel_d  ModelValidD @relation(fields:d, references: id) @ignore
     }
     
     model ModelValidD {
@@ -143,7 +143,7 @@ fn allow_ignore_on_invalid_models_in_relations() {
     model ModelInvalidA {
       id Unsupported("something") @id
       b  Int
-      rel_b  ModelValidB @relation(fields:[b]) 
+      rel_b  ModelValidB @relation(fields:b, references: id) 
      
       @@ignore
     }
@@ -156,7 +156,7 @@ fn allow_ignore_on_invalid_models_in_relations() {
     model ModelInvalidC {
       id Unsupported("something") @id
       d  Int
-      rel_d  ModelValidD @relation(fields:[d])
+      rel_d  ModelValidD @relation(fields:d, references: id)
       
       @@ignore
     }
@@ -246,7 +246,7 @@ fn allow_ignore_on_relation_fields_on_valid_models() {
     model ModelValidA {
       id Int @id
       b  Int
-      rel_b  ModelValidB @relation(fields:[b]) 
+      rel_b  ModelValidB @relation(fields:b, references: id) 
     }
     
     model ModelValidB {
@@ -257,7 +257,7 @@ fn allow_ignore_on_relation_fields_on_valid_models() {
     model ModelValidC {
       id Int @id
       d  Int
-      rel_d  ModelValidD @relation(fields:[d]) @ignore
+      rel_d  ModelValidD @relation(fields:d, references: id) @ignore
     }
     
     model ModelValidD {
@@ -268,7 +268,7 @@ fn allow_ignore_on_relation_fields_on_valid_models() {
     model ModelValidE {
       id Int @id
       e  Int
-      rel_f  ModelValidF @relation(fields:[e]) @ignore
+      rel_f  ModelValidF @relation(fields:e, references: id) @ignore
     }
     
     model ModelValidF {

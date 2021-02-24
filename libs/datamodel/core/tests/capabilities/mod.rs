@@ -168,6 +168,7 @@ fn test_relations_over_non_unique_criteria_support(providers: &[&str], must_erro
     model User {
       id   Int    @id
       name String
+      todos Todo[]
     }
     "#;
 
@@ -196,9 +197,10 @@ fn auto_increment_on_non_primary_columns_must_only_be_supported_if_all_specified
 #[test]
 fn enforcing_key_order() {
     let dml = indoc! {r#"
-        model Todo {
-          id1 Int
-          id2 Int
+        model  Todo {
+          id1  Int
+          id2  Int
+          cats Cat[]
 
           @@id([id1, id2])
         }

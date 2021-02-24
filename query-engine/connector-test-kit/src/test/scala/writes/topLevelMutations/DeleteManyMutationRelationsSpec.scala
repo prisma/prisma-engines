@@ -7,12 +7,13 @@ import util._
 class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpecBase with SchemaBaseV11 {
   override def runOnlyForCapabilities = Set(JoinRelationLinksCapability)
 
-  "a P0 to C1! relation " should "error when deleting the parent" in {
+  "a PM to C1! relation " should "error when deleting the parent" in {
     val schema =
       """
         |model Parent{
         |    id String @id @default(cuid())
         |    p  String @unique
+        |    c  Child[]
         |}
         |
         |model Child{
@@ -58,10 +59,11 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
 
   }
 
-  "a P0 to C1! relation " should "error when deleting the parent with empty filter" in {
+  "a PM to C1! relation " should "error when deleting the parent with empty filter" in {
     val schema = """model Parent{
                             id String @id @default(cuid())
                             p  String @unique
+                            c Child[]
                         }
 
                         model Child{

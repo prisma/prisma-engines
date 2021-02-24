@@ -1,43 +1,33 @@
 use super::common::*;
 use crate::diagnostics::DatamodelError;
 use crate::{
-    ast,
-    common::{NameNormalizer, RelationNames},
-    diagnostics::Diagnostics,
-    dml, Field, OnDeleteStrategy, ScalarField, UniqueCriteria,
+    ast, common::NameNormalizer, diagnostics::Diagnostics, dml, Field, OnDeleteStrategy, ScalarField, UniqueCriteria,
 };
 use itertools::Itertools;
 use std::collections::HashMap;
 
-/// Helper for standardsing a datamodel.
+/// Helper for formatting a datamodel.
 ///
-/// When standardsing, datamodel will be made consistent.
-/// Implicit back relation fields, relation names and `references` will be generated.
-pub struct Standardiser {}
-
-impl Standardiser {
+/// When formatting, datamodel will be made consistent.
+/// Implicit back relation fields, `references` and `fields` attributes in @relation will be generated.
+/// Scalar fields to back relations will be added if necessary.
+pub struct StandardiserForFormatting {}
+impl StandardiserForFormatting {
     /// Creates a new instance, with all builtin attributes registered.
     pub fn new() -> Self {
-        Standardiser {}
+        StandardiserForFormatting {}
     }
 
     pub fn standardise(&self, ast_schema: &ast::SchemaAst, schema: &mut dml::Datamodel) -> Result<(), Diagnostics> {
-        self.name_unnamed_relations(schema);
-
         self.add_missing_back_relations(ast_schema, schema)?;
-
-        // This is intentionally disabled for now, since the generated types would surface in the
-        // client schema.
-        // self.add_missing_relation_tables(ast_schema, schema)?;
-        self.set_relation_to_field_to_id_if_missing(ast_schema, schema)?;
-
+        self.set_relation_to_field_to_id_if_missing_for_non_m2m_relations(ast_schema, schema)?;
         Ok(())
     }
 
     /// For any relations which are missing references, sets them to the @id fields
     /// of the foreign model.
     /// Also adds missing underlying scalar fields.
-    fn set_relation_to_field_to_id_if_missing(
+    fn set_relation_to_field_to_id_if_missing_for_non_m2m_relations(
         &self,
         ast_schema: &ast::SchemaAst,
         schema: &mut dml::Datamodel,
@@ -54,57 +44,58 @@ impl Standardiser {
             for field in model.fields_mut() {
                 if let Field::RelationField(field) = field {
                     let related_model = schema_copy.find_model(&field.relation_info.to).expect(STATE_ERROR);
-                    let (_related_field_idx, related_field) = schema_copy.find_related_field_bang(field);
-                    let related_model_name = &related_model.name;
-                    let is_m2m = field.is_list() && related_field.is_list();
-                    let rel_info = &mut field.relation_info;
-                    let related_field_rel_info = &related_field.relation_info;
 
-                    let embed_here = match (field.arity, related_field.arity) {
-                        // many to many
-                        (dml::FieldArity::List, dml::FieldArity::List) => true,
-                        // one to many
-                        (_, dml::FieldArity::List) => true,
-                        // many to one
-                        (dml::FieldArity::List, _) => false,
-                        // one to one
-                        (_, _) => match (&cloned_model.name, related_model_name) {
-                            (x, y) if x < y => true,
-                            (x, y) if x > y => false,
-                            // SELF RELATIONS
-                            _ => field.name < related_field.name,
-                        },
-                    };
+                    if let Some((_related_field_idx, related_field)) = schema_copy.find_related_field(field) {
+                        let related_model_name = &related_model.name;
+                        let rel_info = &mut field.relation_info;
+                        let related_field_rel_info = &related_field.relation_info;
 
-                    if embed_here {
-                        // user input has precedence
-                        if rel_info.references.is_empty() && related_field_rel_info.references.is_empty() {
-                            rel_info.references = related_model
-                                .first_unique_criterion()
-                                .iter()
-                                .map(|f| f.name.to_owned())
-                                .collect();
-                        }
+                        let embed_here = match (field.arity, related_field.arity) {
+                            // many to many
+                            (dml::FieldArity::List, dml::FieldArity::List) => false, //handled during parsing
+                            // one to many
+                            (_, dml::FieldArity::List) => true,
+                            // many to one
+                            (dml::FieldArity::List, _) => false,
+                            // one to one
+                            (_, _) => match (&cloned_model.name, related_model_name) {
+                                (x, y) if x < y => true,
+                                (x, y) if x > y => false,
+                                // SELF RELATIONS
+                                _ => field.name < related_field.name,
+                            },
+                        };
 
-                        // user input has precedence
-                        if !is_m2m && (rel_info.fields.is_empty() && related_field_rel_info.fields.is_empty()) {
-                            let unique_criteria = self.unique_criteria(&related_model);
-                            let underlying_fields = self.underlying_fields_for_unique_criteria(
-                                &unique_criteria,
-                                &related_model.name,
-                                field.arity,
-                            );
-                            rel_info.fields = underlying_fields.iter().map(|f| f.name.clone()).collect();
+                        if embed_here {
+                            // user input has precedence
+                            if rel_info.references.is_empty() && related_field_rel_info.references.is_empty() {
+                                rel_info.references = related_model
+                                    .first_unique_criterion()
+                                    .iter()
+                                    .map(|f| f.name.to_owned())
+                                    .collect();
+                            }
 
-                            for underlying_field in underlying_fields {
-                                let t = missing_field_names_to_field_names
-                                    .entry(underlying_field.clone().name)
-                                    .or_insert_with(Vec::new);
+                            // user input has precedence
+                            if rel_info.fields.is_empty() && related_field_rel_info.fields.is_empty() {
+                                let unique_criteria = self.unique_criteria(&related_model);
+                                let underlying_fields = self.underlying_fields_for_unique_criteria(
+                                    &unique_criteria,
+                                    &related_model.name,
+                                    field.arity,
+                                );
+                                rel_info.fields = underlying_fields.iter().map(|f| f.name.clone()).collect();
 
-                                t.push(field.name.clone());
-                                let scalar_field = Field::ScalarField(underlying_field);
-                                if !fields_to_add.contains(&scalar_field) {
-                                    fields_to_add.push(scalar_field);
+                                for underlying_field in underlying_fields {
+                                    let t = missing_field_names_to_field_names
+                                        .entry(underlying_field.clone().name)
+                                        .or_insert_with(Vec::new);
+
+                                    t.push(field.name.clone());
+                                    let scalar_field = Field::ScalarField(underlying_field);
+                                    if !fields_to_add.contains(&scalar_field) {
+                                        fields_to_add.push(scalar_field);
+                                    }
                                 }
                             }
                         }
@@ -209,7 +200,6 @@ impl Standardiser {
         schema_ast: &ast::SchemaAst,
     ) -> Result<Vec<AddMissingBackRelationField>, Diagnostics> {
         let mut errors = Diagnostics::new();
-
         let mut result = Vec::new();
         for field in model.relation_fields() {
             let rel_info = &field.relation_info;
@@ -256,38 +246,39 @@ impl Standardiser {
                         .collect();
 
                     let underlying_field_names = underlying_fields.iter().map(|f| f.name.clone()).collect();
+
                     let underlying_fields_to_add = underlying_fields
-                            .into_iter()
-                            .filter(|f| {
-                                match related_model.find_field(&f.name) {
-                                    None => {
-                                        // field with name does not exist yet
-                                        true
-                                    }
-                                    Some(other) if other.field_type().is_compatible_with(&f.field_type) => {
-                                        // field with name exists and its type is compatible. We must not add it since we would have a duplicate.
-                                        false
-                                    }
-                                    _ => {
-                                        // field with name exists and the type is incompatible.
-                                        errors.push_error(DatamodelError::new_model_validation_error(
-                                            &format!(
-                                                "Automatic underlying field generation tried to add the field `{}` in model `{}` for the back relation field of `{}` in `{}`. A field with that name exists already and has an incompatible type for the relation. Please add the back relation manually.",
-                                                &f.name,
-                                                &related_model.name,
-                                                &field.name,
-                                                &model.name,
-                                            ),
-                                            &related_model.name,
-                                            schema_ast.find_model(&related_model.name)
-                                                .expect(ERROR_GEN_STATE_ERROR)
-                                                .span,
-                                        ));
-                                        false
-                                    }
+                        .into_iter()
+                        .filter(|f| {
+                            match related_model.find_field(&f.name) {
+                                None => {
+                                    // field with name does not exist yet
+                                    true
                                 }
-                            })
-                            .collect();
+                                Some(other) if other.field_type().is_compatible_with(&f.field_type) => {
+                                    // field with name exists and its type is compatible. We must not add it since we would have a duplicate.
+                                    false
+                                }
+                                _ => {
+                                    // field with name exists and its type is incompatible. We should not add a backrelation at all.
+                                    errors.push_error(DatamodelError::new_model_validation_error(
+                                        &format!(
+                                            "Automatic underlying field generation tried to add the field `{}` in model `{}` for the back relation field of `{}` in `{}`. A field with that name exists already and has an incompatible type for the relation. Please add the back relation manually.",
+                                            &f.name,
+                                            &related_model.name,
+                                            &field.name,
+                                            &model.name,
+                                        ),
+                                        &related_model.name,
+                                        schema_ast.find_model(&related_model.name)
+                                            .expect(ERROR_GEN_STATE_ERROR)
+                                            .span,
+                                    ));
+                                    false
+                                }
+                            }
+                        })
+                        .collect();
 
                     let relation_info = dml::RelationInfo {
                         to: model.name.clone(),
@@ -338,31 +329,6 @@ impl Standardiser {
                 )
             })
             .collect()
-    }
-
-    fn name_unnamed_relations(&self, datamodel: &mut dml::Datamodel) {
-        let unnamed_relations = self.find_unnamed_relations(&datamodel);
-
-        for (model_name, field_name, rel_info) in unnamed_relations {
-            // Embedding side.
-            let field = datamodel.find_relation_field_mut(&model_name, &field_name);
-            field.relation_info.name = RelationNames::name_for_unambiguous_relation(&model_name, &rel_info.to);
-        }
-    }
-
-    // Returns list of model name, field name and relation info.
-    fn find_unnamed_relations(&self, datamodel: &dml::Datamodel) -> Vec<(String, String, dml::RelationInfo)> {
-        let mut rels = Vec::new();
-
-        for model in datamodel.models() {
-            for field in model.relation_fields() {
-                if field.relation_info.name.is_empty() {
-                    rels.push((model.name.clone(), field.name.clone(), field.relation_info.clone()))
-                }
-            }
-        }
-
-        rels
     }
 }
 

@@ -5,14 +5,15 @@ mod datasource_provider;
 mod generator_loader;
 mod lift;
 mod precheck;
-mod standardise;
+mod standardise_formatting;
 mod validate;
 mod validation_pipeline;
 
 pub mod reserved_model_names;
+mod standardise_parsing;
 
 use lift::*;
-use standardise::*;
+use standardise_formatting::*;
 use validate::*;
 
 pub use datasource_loader::DatasourceLoader;

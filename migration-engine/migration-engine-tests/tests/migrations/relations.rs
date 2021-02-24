@@ -75,10 +75,12 @@ async fn adding_an_inline_relation_must_result_in_a_foreign_key_in_the_model_tab
 
         model B {
             id Int @id
+            a  A[]
         }
 
         model C {
             id Int @id
+            a  A[]
         }
     "#;
 
@@ -142,6 +144,7 @@ async fn specifying_a_db_name_for_an_inline_relation_must_work(api: &TestApi) ->
 
         model B {
             id Int @id
+            a  A[]
         }
     "#;
 
@@ -183,6 +186,7 @@ async fn adding_an_inline_relation_to_a_model_with_an_exotic_id_type(api: &TestA
 
         model B {
             id String @id @default(cuid())
+            a  A[]
         }
     "#;
 
@@ -224,6 +228,7 @@ async fn removing_an_inline_relation_must_work(api: &TestApi) -> TestResult {
 
             model B {
                 id Int @id
+                a  A[]
             }
         "#;
 
@@ -270,6 +275,7 @@ async fn compound_foreign_keys_should_work_in_correct_order(api: &TestApi) -> Te
             b_id Int
             a_id Int
             d_id Int
+            a    A[]
             @@id([a_id, b_id, d_id])
         }
     "#;
@@ -310,6 +316,7 @@ async fn moving_an_inline_relation_to_the_other_side_must_work(api: &TestApi) ->
 
         model B {
             id Int @id
+            a  A[]
         }
     "#;
 
@@ -338,6 +345,7 @@ async fn moving_an_inline_relation_to_the_other_side_must_work(api: &TestApi) ->
     let dm2 = r#"
         model A {
             id Int @id
+            b  B[]
         }
 
         model B {

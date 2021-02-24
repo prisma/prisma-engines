@@ -397,31 +397,6 @@ fn relation_must_succeed_when_type_alias_is_used_for_referenced_field() {
 }
 
 #[test]
-fn must_succeed_when_fields_argument_is_missing_for_one_to_many() {
-    let dml = r#"
-    model User {
-        id        Int @id
-        firstName String
-        posts     Post[]
-    }
-
-    model Post {
-        id     Int     @id
-        userId Int
-        user   User    @relation(references: [id])
-    }
-    "#;
-
-    let result = parse(dml);
-    result
-        .assert_has_model("Post")
-        .assert_has_relation_field("user")
-        .assert_relation_base_fields(&["userId"]);
-    result.assert_has_model("User");
-}
-
-#[test]
-#[ignore]
 fn must_error_when_references_argument_is_missing_for_one_to_many() {
     let dml = r#"
     model User {
@@ -441,7 +416,7 @@ fn must_error_when_references_argument_is_missing_for_one_to_many() {
     errors.assert_is(DatamodelError::new_attribute_validation_error(
         "The relation field `user` on Model `Post` must specify the `references` argument in the @relation attribute.",
         "relation",
-        Span::new(172, 214),
+        Span::new(172, 215),
     ));
 }
 
@@ -476,7 +451,6 @@ fn must_error_fields_or_references_argument_is_placed_on_wrong_side_for_one_to_m
 }
 
 #[test]
-#[ignore]
 fn must_error_when_both_arguments_are_missing_for_one_to_many() {
     let dml = r#"
     model User {
@@ -496,15 +470,15 @@ fn must_error_when_both_arguments_are_missing_for_one_to_many() {
     errors.assert_is_at(
         0,
         DatamodelError::new_attribute_validation_error(
-            "The relation field `user` on Model `Post` must specify the `fields` argument in the @relation attribute.",
+            "The relation field `user` on Model `Post` must specify the `fields` argument in the @relation attribute. You can run `prisma format` to fix this automatically.",
             "relation",
-            Span::new(172, 183),
+            Span::new(172, 184),
         ),
     );
     errors.assert_is_at(1, DatamodelError::new_attribute_validation_error(
         "The relation field `user` on Model `Post` must specify the `references` argument in the @relation attribute.",
         "relation",
-        Span::new(172, 183),
+        Span::new(172, 184),
     ));
 }
 
@@ -524,19 +498,15 @@ fn must_error_when_fields_argument_is_missing_for_one_to_one() {
     }
     "#;
 
-    let result = parse(dml);
-    result
-        .assert_has_model("Post")
-        .assert_has_relation_field("user")
-        .assert_relation_base_fields(&["userId"]);
-    result
-        .assert_has_model("User")
-        .assert_has_relation_field("post")
-        .assert_relation_base_fields(&[]);
+    let errors = parse_error(dml);
+
+    errors.assert_are(
+        &[DatamodelError::new_attribute_validation_error("The relation fields `post` on Model `User` and `user` on Model `Post` do not provide the `fields` argument in the @relation attribute. You have to provide it on one of the two fields.", "relation",Span::new(77, 93)), 
+            DatamodelError::new_attribute_validation_error("The relation fields `user` on Model `Post` and `post` on Model `User` do not provide the `fields` argument in the @relation attribute. You have to provide it on one of the two fields.", "relation",Span::new(171, 214))],
+    );
 }
 
 #[test]
-#[ignore]
 fn must_error_when_references_argument_is_missing_for_one_to_one() {
     let dml = r#"
     model User {
@@ -557,14 +527,14 @@ fn must_error_when_references_argument_is_missing_for_one_to_one() {
         0,
         DatamodelError::new_attribute_validation_error(
             "The relation fields `post` on Model `User` and `user` on Model `Post` do not provide the `references` argument in the @relation attribute. You have to provide it on one of the two fields.",
-            "relation", Span::new(77, 91)
+            "relation", Span::new(77, 92)
         ),
     );
     errors.assert_is_at(
         1,
         DatamodelError::new_attribute_validation_error(
             "The relation fields `user` on Model `Post` and `post` on Model `User` do not provide the `references` argument in the @relation attribute. You have to provide it on one of the two fields.",
-            "relation", Span::new(170, 212)
+            "relation", Span::new(170, 213)
         ),
     );
 }
@@ -664,13 +634,9 @@ fn must_error_for_required_one_to_one_self_relations() {
         }
     "#;
     let errors = parse_error(dml);
-    errors.assert_is_at(
-        0,
-        DatamodelError::new_field_validation_error("The relation fields `friend` and `friendOf` on Model `User` are both required. This is not allowed for a self relation because it would not be possible to create a record.", "User", "friend", Span::new(83, 152)),
-    );
-    errors.assert_is_at(
-        1,
-        DatamodelError::new_field_validation_error("The relation fields `friendOf` and `friend` on Model `User` are both required. This is not allowed for a self relation because it would not be possible to create a record.", "User", "friendOf", Span::new(162, 197)),
+    errors.assert_is(
+
+        DatamodelError::new_attribute_validation_error("The relation field `friendOf` on Model `User` is required. This is no longer valid because it\'s not possible to enforce this constraint on the database level. Please change the field type from `User` to `User?` to fix this.", "relation",  Span::new(162, 197)),
     );
 }
 
@@ -755,13 +721,8 @@ fn must_allow_relations_with_default_native_types_with_annotation_on_one_side() 
     let dm1 = indoc! {
         r#"
         datasource db {
-        provider = "mysql"
-        url      = "mysql://"
-        }
-
-        generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["nativeTypes"]
+            provider = "mysql"
+            url      = "mysql://"
         }
 
         model Blog {
@@ -771,7 +732,8 @@ fn must_allow_relations_with_default_native_types_with_annotation_on_one_side() 
         }
 
         model User {
-            id Int @id
+            id        Int @id
+            blogs     Blog[]
         }
         "#
     };
@@ -779,13 +741,8 @@ fn must_allow_relations_with_default_native_types_with_annotation_on_one_side() 
     let dm2 = indoc! {
         r#"
         datasource db {
-        provider = "mysql"
-        url      = "mysql://"
-        }
-
-        generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["nativeTypes"]
+            provider = "mysql"
+            url      = "mysql://"
         }
 
         model Blog {
@@ -795,7 +752,9 @@ fn must_allow_relations_with_default_native_types_with_annotation_on_one_side() 
         }
 
         model User {
-            id Int @id @db.Int
+            id        Int @id @db.Int
+            blogs     Blog[]
+
         }
         "#
     };
@@ -803,13 +762,8 @@ fn must_allow_relations_with_default_native_types_with_annotation_on_one_side() 
     let dm3 = indoc! {
         r#"
         datasource db {
-        provider = "mysql"
-        url      = "mysql://"
-        }
-
-        generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["nativeTypes"]
+            provider = "mysql"
+            url      = "mysql://"
         }
 
         model Blog {
@@ -819,7 +773,8 @@ fn must_allow_relations_with_default_native_types_with_annotation_on_one_side() 
         }
 
         model User {
-            id Int @id @db.Int
+            id        Int @id @db.Int
+            blogs     Blog[]
         }
         "#
     };
