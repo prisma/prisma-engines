@@ -1,5 +1,5 @@
 use super::*;
-use crate::{filter::convert_filter, query_arguments::build_mongo_args};
+use crate::{filter::convert_filter, query_arguments::MongoQueryArgs};
 use crate::{BsonTransform, IntoBson};
 use connector_interface::{Filter, QueryArguments};
 use mongodb::Database;
@@ -53,7 +53,7 @@ pub async fn get_many_records(
         return Ok(records);
     };
 
-    let mongo_args = build_mongo_args(query_arguments, selected_fields.clone())?;
+    let mongo_args = MongoQueryArgs::new(query_arguments)?.with_model_projection(selected_fields.clone())?;
     let cursor = mongo_args.find_documents(coll).await?;
     let docs = vacuum_cursor(cursor).await?;
 

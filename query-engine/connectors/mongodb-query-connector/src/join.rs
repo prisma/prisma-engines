@@ -25,7 +25,7 @@ impl JoinStage {
         Self { source, nested: vec![] }
     }
 
-    pub(crate) fn add_all_nested(&mut self, stages: Vec<JoinStage>) {
+    pub(crate) fn add_nested(&mut self, stages: Vec<JoinStage>) {
         self.nested.extend(stages);
     }
 
@@ -38,7 +38,7 @@ impl JoinStage {
         let nested_stages: Vec<Document> = self
             .nested
             .into_iter()
-            .map(|nested_stage| doc! { "$lookup": nested_stage.build() })
+            .map(|nested_stage| nested_stage.build())
             .collect();
 
         let from_field = self.source;
@@ -75,18 +75,13 @@ impl JoinStage {
         pipeline.push(doc! { "$match": { "$expr": op }});
         pipeline.extend(nested_stages);
 
-        dbg!(doc! {
-            "from": right_coll_name,
-            "let": { "left": format!("${}", left_name) },
-            "pipeline": pipeline,
-            "as": relation_name,
-        })
-
-        // let join_doc = doc! {
-        //     "from": right_coll_name,
-        //     "localField": left_scalars.pop().unwrap().db_name(),
-        //     "foreignField": right_scalars.pop().unwrap().db_name(),
-        //     "as": relation_name
-        // };
+        doc! {
+            "$lookup": {
+                "from": right_coll_name,
+                "let": { "left": format!("${}", left_name) },
+                "pipeline": pipeline,
+                "as": relation_name,
+            }
+        }
     }
 }

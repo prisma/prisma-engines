@@ -264,7 +264,7 @@ fn relation_filter(filter: RelationFilter, invert: bool) -> crate::Result<MongoF
         convert_filter(*filter.nested_filter, invert ^ requires_invert(&filter.condition))?.render();
 
     let mut join_stage = JoinStage::new(from_field);
-    join_stage.add_all_nested(nested_joins);
+    join_stage.add_nested(nested_joins);
 
     let filter_doc = match filter.condition {
         connector_interface::RelationCondition::EveryRelatedRecord => {
