@@ -1,6 +1,7 @@
-use super::{super::helpers::*, AttributeValidator};
-use crate::diagnostics::DatamodelError;
-use crate::{ast, dml, IndexDefinition, IndexType};
+#![deny(missing_docs)]
+
+use super::{super::helpers::Arguments, AttributeValidator};
+use crate::{ast, diagnostics::DatamodelError, dml, transform::helpers::ValueValidator, IndexDefinition, IndexType};
 use std::cmp::Ordering;
 use std::collections::HashMap;
 
@@ -46,6 +47,7 @@ impl AttributeValidator<dml::Field> for FieldLevelUniqueAttributeValidator {
                 sf.is_unique = true;
             }
         }
+
         Ok(())
     }
 
@@ -55,6 +57,7 @@ impl AttributeValidator<dml::Field> for FieldLevelUniqueAttributeValidator {
                 return vec![ast::Attribute::new(self.attribute_name(), vec![])];
             }
         }
+
         vec![]
     }
 }
@@ -122,11 +125,22 @@ trait IndexAttributeBase<T>: AttributeValidator<T> {
             fields: vec![],
             tpe: index_type,
         };
-        let name = match args.optional_arg("name") {
-            Some(name_arg) => Some(name_arg.as_str()?),
-            None => None,
+
+        match args
+            .optional_arg("name")
+            .as_ref()
+            .and_then(ValueValidator::as_string_literal)
+        {
+            Some(("", span)) => {
+                return Err(DatamodelError::new_attribute_validation_error(
+                    "The `name` argument cannot be an empty string.",
+                    self.attribute_name(),
+                    span,
+                ))
+            }
+            Some((name, _)) => index_def.name = Some(name.to_owned()),
+            None => (),
         };
-        index_def.name = name;
 
         let fields = args
             .default_arg("fields")?

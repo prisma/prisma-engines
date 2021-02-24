@@ -1,5 +1,5 @@
 use super::env_function::EnvFunction;
-use crate::ast::Expression;
+use crate::ast::{Expression, Span};
 use crate::diagnostics::DatamodelError;
 use crate::ValueGenerator;
 use crate::{ast, DefaultValue};
@@ -212,6 +212,11 @@ impl ValueValidator {
                 Ok(DefaultValue::Single(x))
             }
         }
+    }
+
+    /// Try to interpret the expression as a string literal.
+    pub fn as_string_literal(&self) -> Option<(&str, Span)> {
+        self.value.as_string_value()
     }
 
     pub fn as_value_generator(&self) -> Result<ValueGenerator, DatamodelError> {
