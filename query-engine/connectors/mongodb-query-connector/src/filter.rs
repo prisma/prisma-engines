@@ -1,6 +1,7 @@
 use crate::{join::JoinStage, IntoBson};
 use connector_interface::{
-    Filter, OneRelationIsNullFilter, QueryMode, RelationFilter, ScalarCondition, ScalarFilter, ScalarListFilter,
+    Filter, OneRelationIsNullFilter, QueryMode, RelationCondition, RelationFilter, ScalarCondition, ScalarFilter,
+    ScalarListFilter,
 };
 use mongodb::bson::{doc, Bson, Document, Regex};
 use prisma_models::{PrismaValue, ScalarFieldRef};
@@ -21,10 +22,6 @@ impl MongoFilter {
 
     pub(crate) fn relation(filter: Document, joins: Vec<JoinStage>) -> Self {
         Self::Relation(MongoRelationFilter { filter: filter, joins })
-    }
-
-    pub(crate) fn merge(&mut self, other: Self) -> Self {
-        todo!()
     }
 }
 
@@ -261,46 +258,26 @@ fn one_is_null(filter: OneRelationIsNullFilter, invert: bool) -> crate::Result<M
 fn relation_filter(filter: RelationFilter, invert: bool) -> crate::Result<MongoFilter> {
     let from_field = filter.field;
     let relation_name = &from_field.relation().name;
-    let (nested_filter, nested_joins) = convert_filter(*filter.nested_filter, invert)?.render();
+
+    // `invert` xor `filter requires invert`
+    let (nested_filter, nested_joins) =
+        convert_filter(*filter.nested_filter, invert ^ requires_invert(&filter.condition))?.render();
+
     let mut join_stage = JoinStage::new(from_field);
     join_stage.add_all_nested(nested_joins);
 
-    let filter_doc = if invert {
-        match filter.condition {
-            // "Every related record" -> "No related record"
-            connector_interface::RelationCondition::EveryRelatedRecord => {
-                doc! { "$all": [{ "$elemMatch": { "$not": nested_filter }}]}
-            }
-
-            // "At least one related fulfills x" -> "At least one does NOT fulfill x"
-            connector_interface::RelationCondition::AtLeastOneRelatedRecord => {
-                doc! { "$elemMatch": { "$not": nested_filter }}
-            }
-
-            // "No related fulfills x" -> "All related fulfill x"
-            connector_interface::RelationCondition::NoRelatedRecord => {
-                doc! { "$all": [{ "$elemMatch": nested_filter }]}
-            }
-
-            // "The related record has to fulfill x" -> "The related record must not fulfill x"
-            connector_interface::RelationCondition::ToOneRelatedRecord => {
-                doc! { "$all": [{ "$elemMatch": { "$not": nested_filter }}]}
-            }
+    let filter_doc = match filter.condition {
+        connector_interface::RelationCondition::EveryRelatedRecord => {
+            doc! { "$all": [{ "$elemMatch": nested_filter }]}
         }
-    } else {
-        match filter.condition {
-            connector_interface::RelationCondition::EveryRelatedRecord => {
-                doc! { "$all": [{ "$elemMatch": nested_filter }]}
-            }
-            connector_interface::RelationCondition::AtLeastOneRelatedRecord => {
-                doc! { "$elemMatch": nested_filter }
-            }
-            connector_interface::RelationCondition::NoRelatedRecord => {
-                doc! { "$all": [{ "$elemMatch": { "$not": nested_filter }}]}
-            }
-            connector_interface::RelationCondition::ToOneRelatedRecord => {
-                doc! { "$all": [{ "$elemMatch": nested_filter }]}
-            }
+        connector_interface::RelationCondition::AtLeastOneRelatedRecord => {
+            doc! { "$elemMatch": nested_filter }
+        }
+        connector_interface::RelationCondition::NoRelatedRecord => {
+            doc! { "$all": [{ "$elemMatch": nested_filter }]}
+        }
+        connector_interface::RelationCondition::ToOneRelatedRecord => {
+            doc! { "$all": [{ "$elemMatch": nested_filter }]}
         }
     };
 
@@ -308,6 +285,14 @@ fn relation_filter(filter: RelationFilter, invert: bool) -> crate::Result<MongoF
         doc! { relation_name: filter_doc },
         vec![join_stage],
     ))
+}
+
+/// Checks if the given relation filter condition needs an inherent invert for MongoDB.
+fn requires_invert(rf: &RelationCondition) -> bool {
+    match rf {
+        RelationCondition::NoRelatedRecord => true,
+        _ => false,
+    }
 }
 
 fn to_regex_list(

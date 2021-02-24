@@ -5,12 +5,12 @@ use prisma_models::prelude::*;
 pub async fn aggregate(
     database: &Database,
     model: &ModelRef,
-    query_arguments: QueryArguments,
-    selections: Vec<AggregationSelection>,
-    group_by: Vec<ScalarFieldRef>,
-    having: Option<Filter>,
+    _query_arguments: QueryArguments,
+    _selections: Vec<AggregationSelection>,
+    _group_by: Vec<ScalarFieldRef>,
+    _having: Option<Filter>,
 ) -> crate::Result<Vec<AggregationRow>> {
-    let coll = database.collection(&model.db_name());
+    let _coll = database.collection(&model.db_name());
 
     // if !group_by.is_empty() {
     //     group_by_aggregate(conn, model, query_arguments, selections, group_by, having).await
