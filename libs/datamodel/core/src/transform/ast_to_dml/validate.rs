@@ -871,22 +871,6 @@ impl<'a> Validator<'a> {
                         ));
                 }
 
-                //todo what about other required 1:1 those are invalid now as well?
-                // this is probably already caught somewhere else and now unnecessary
-                // required ONE TO ONE SELF RELATION
-                let is_self_relation = model.name == related_model.name;
-                if is_self_relation && field.is_required() && related_field.is_required() {
-                    errors.push_error(DatamodelError::new_field_validation_error(
-                        &format!(
-                            "The relation fields `{}` and `{}` on Model `{}` are both required. This is not allowed for a self relation because it would not be possible to create a record.",
-                            &field.name, &related_field.name, &model.name,
-                        ),
-                        &model.name,
-                        &field.name,
-                        field_span,
-                    ));
-                }
-
                 // ONE TO ONE
                 if field.is_singular() && related_field.is_singular() {
                     if rel_info.fields.is_empty() && related_field_rel_info.fields.is_empty() {

@@ -634,13 +634,9 @@ fn must_error_for_required_one_to_one_self_relations() {
         }
     "#;
     let errors = parse_error(dml);
-    errors.assert_is_at(
-        0,
-        DatamodelError::new_field_validation_error("The relation fields `friend` and `friendOf` on Model `User` are both required. This is not allowed for a self relation because it would not be possible to create a record.", "User", "friend", Span::new(83, 152)),
-    );
-    errors.assert_is_at(
-        1,
-        DatamodelError::new_field_validation_error("The relation fields `friendOf` and `friend` on Model `User` are both required. This is not allowed for a self relation because it would not be possible to create a record.", "User", "friendOf", Span::new(162, 197)),
+    errors.assert_is(
+
+        DatamodelError::new_attribute_validation_error("The relation field `friendOf` on Model `User` is required. This is no longer valid because it\'s not possible to enforce this constraint on the database level. Please change the field type from `User` to `User?` to fix this.", "relation",  Span::new(162, 197)),
     );
 }
 
