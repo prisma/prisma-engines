@@ -11,6 +11,7 @@ model Cat {
 model Box {
     id Int @id
     material String
+    cats     Cat[]
 }
 "#;
 
@@ -42,6 +43,7 @@ async fn schema_push_happy_path(api: &TestApi) -> TestResult {
         id Int @id
         texture String
         waterProof Boolean
+        cats       Cat[]
     }
     "#;
 
@@ -128,6 +130,7 @@ async fn schema_push_with_an_unexecutable_migration_returns_a_message_and_aborts
             id Int @id
             material String
             volumeCm3 Int
+            cats      Cat[]
         }
     "#;
 

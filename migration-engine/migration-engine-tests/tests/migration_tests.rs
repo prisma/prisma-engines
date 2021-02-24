@@ -506,6 +506,7 @@ async fn making_an_existing_id_field_autoincrement_works_with_foreign_keys(api: 
             updatedAt DateTime    @default(now())
             author_id Int
             author    Author      @relation(fields: [author_id], references: [id])
+            trackings Tracking[]
         }
 
         model Tracking {
@@ -516,6 +517,7 @@ async fn making_an_existing_id_field_autoincrement_works_with_foreign_keys(api: 
 
         model Author {
             id        Int         @id @default(autoincrement())
+            posts     Post[]
         }
     "#;
 
@@ -568,6 +570,7 @@ async fn making_an_existing_id_field_autoincrement_works_with_foreign_keys(api: 
             updatedAt DateTime    @default(now())
             author_id Int
             author    Author      @relation(fields: [author_id], references: [id])
+            trackings Tracking[]
         }
 
         model Tracking {
@@ -578,6 +581,7 @@ async fn making_an_existing_id_field_autoincrement_works_with_foreign_keys(api: 
 
         model Author {
             id        Int         @id @default(autoincrement())
+            posts     Post[]
         }
     "#;
 
@@ -1289,6 +1293,7 @@ async fn migrations_with_many_to_many_related_models_must_not_recreate_indexes(a
     let dm_1 = r#"
         model User {
             id        String  @id @default(cuid())
+            p         Profile[]
         }
 
         model Profile {
@@ -1320,6 +1325,7 @@ async fn migrations_with_many_to_many_related_models_must_not_recreate_indexes(a
         model User {
             id        String  @id @default(cuid())
             someField String?
+            p         Profile[]
         }
 
         model Profile {
@@ -1362,6 +1368,7 @@ async fn removing_a_relation_field_must_work(api: &TestApi) -> TestResult {
         model Address {
             id        String  @id @default(cuid())
             street    String
+            u         User[]
         }
     "#;
 
@@ -1635,6 +1642,7 @@ async fn relations_can_reference_arbitrary_unique_fields(api: &TestApi) -> TestR
         model User {
             id Int @id
             email String @unique
+            a     Account[]
         }
 
         model Account {
@@ -1697,6 +1705,7 @@ async fn relations_can_reference_multiple_fields(api: &TestApi) -> TestResult {
             id Int @id
             email  String
             age    Int
+            a      Account[]
 
             @@unique([email, age])
         }
@@ -1764,6 +1773,7 @@ async fn relations_with_mappings_on_referenced_side_can_reference_multiple_field
             id Int @id
             email  String @map("emergency-mail")
             age    Int    @map("birthdays-count")
+            a      Account[]
 
             @@unique([email, age])
             @@map("users")
@@ -1797,6 +1807,7 @@ async fn relations_with_mappings_on_referencing_side_can_reference_multiple_fiel
             id Int @id
             email  String
             age    Int
+            a      Account[]
 
             @@unique([email, age])
             @@map("users")
@@ -2366,6 +2377,7 @@ async fn reordering_and_altering_models_at_the_same_time_works(api: &TestApi) ->
             id Int @id
             name Int @unique
             c C @relation(name: "atoc", fields: [name], references: [name])
+            cs C[] @relation(name: "ctoa")
         }
 
         model B {
@@ -2378,6 +2390,8 @@ async fn reordering_and_altering_models_at_the_same_time_works(api: &TestApi) ->
             id Int @id
             name Int @unique
             a A @relation(name: "ctoa", fields: [name], references: [name])
+            as A[] @relation(name: "atoc")
+            bs B[] @relation(name: "btoc")
         }
     "#;
 
@@ -2388,20 +2402,22 @@ async fn reordering_and_altering_models_at_the_same_time_works(api: &TestApi) ->
             id Int @id
             a A @relation(name: "ctoa2", fields: [name], references: [name])
             name Int @unique
+            bs B[] @relation(name: "btoc2")
+            as A[] @relation(name: "atoc2")
         }
 
         model A {
             id Int @id
             name Int @unique
             c C @relation(name: "atoc2", fields: [name], references: [name])
+            cs C[] @relation(name: "ctoa2")
         }
 
         model B {
             c C @relation(name: "btoc2", fields: [name], references: [name])
-            id Int @id
             name Int @unique
+            id Int @id           
         }
-
     "#;
 
     api.schema_push(dm2).send().await?.assert_green()?;

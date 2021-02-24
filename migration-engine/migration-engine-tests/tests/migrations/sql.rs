@@ -32,6 +32,7 @@ async fn relations_to_models_without_a_primary_key_work(api: &TestApi) -> TestRe
             index Int
             name String
             weight Float
+            pm     PairMetadata[]
 
             @@unique([index, name])
         }
@@ -67,6 +68,7 @@ async fn relations_to_models_with_no_pk_and_a_single_unique_required_field_work(
             index Int
             name String
             weight Float @unique
+            pm     PairMetadata[]
         }
 
         model PairMetadata {
@@ -212,7 +214,8 @@ async fn id_as_part_of_relation_must_work(api: &TestApi) -> TestResult {
         }
 
         model Dog {
-            id String @id
+            id    String @id
+            cats  Cat[]
         }
     "##;
 
@@ -242,6 +245,7 @@ async fn multi_field_id_as_part_of_relation_must_work(api: &TestApi) -> TestResu
         model Dog {
             name String
             weight Int
+            cats    Cat[]
 
             @@id([name, weight])
         }
@@ -274,6 +278,7 @@ async fn remapped_multi_field_id_as_part_of_relation_must_work(api: &TestApi) ->
         model Dog {
             name String
             weight Int
+            cats   Cat[]
 
             @@id([name, weight])
         }
@@ -308,6 +313,7 @@ async fn unique_constraints_on_composite_relation_fields(api: &TestApi) -> TestR
         model Child {
             id        Int    @id
             c         String
+            p         Parent[]
 
             @@unique([id, c])
         }
@@ -329,6 +335,7 @@ async fn indexes_on_composite_relation_fields(api: &TestApi) -> TestResult {
           id                  Int       @id
           firstName           String
           lastName            String
+          s                   SpamList[]
 
           @@unique([firstName, lastName])
         }
