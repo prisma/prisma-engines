@@ -256,12 +256,7 @@ fn order_definitions(
         let (mut computed_joins, order_by_column) = ordering::compute_joins(order_by, model, index);
 
         joins.append(&mut computed_joins);
-
-        // This is the final column identifier to be used for the scalar field to order by.
-        // - If it's on the base model with no hops, it's for example `modelTable.field`.
-        // - If it is with several hops, it's the alias used for the last join, e.g.
-        //   `orderby_{modelname}_{index}.field`
-
+        
         orderings.push((order_by.field.clone(), order_by_column, order_by.sort_order))
     }
 
