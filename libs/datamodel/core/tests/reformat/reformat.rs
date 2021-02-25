@@ -532,11 +532,6 @@ fn reformatting_a_model_with_native_type_definitions_must_work() {
   url      = "postgresql://"
 }
 
-generator js {
-  provider        = "prisma-client-js"
-  previewFeatures = ["nativeTypes"]
-}
-
 model Blog {
   id     Int    @id
   bigInt Int    @pg.Integer

@@ -250,11 +250,6 @@ fn test_parser_renderer_native_types_via_dml() {
     // Here BigInt is not rendered because it is the default.
     let input = indoc!(
         r#"
-        generator client {
-          provider        = "prisma-client-js"
-          previewFeatures = ["nativeTypes"]
-        }
-
         datasource pg {
           provider = "postgresql"
           url      = "postgresql://"
@@ -283,11 +278,6 @@ fn test_parser_renderer_native_types_via_dml() {
 fn test_parser_renderer_native_types_with_default_mappings() {
     let dm1 = indoc!(
         r#"
-        generator client {
-          provider        = "prisma-client-js"
-          previewFeatures = ["nativeTypes"]
-        }
-
         datasource pg {
           provider = "postgresql"
           url      = "postgresql://"
@@ -306,11 +296,6 @@ fn test_parser_renderer_native_types_with_default_mappings() {
 
     let dm2 = indoc!(
         r#"
-        generator client {
-          provider        = "prisma-client-js"
-          previewFeatures = ["nativeTypes"]
-        }
-
         datasource pg {
           provider = "postgresql"
           url      = "postgresql://"
@@ -339,11 +324,6 @@ fn test_parser_renderer_native_types_with_default_mappings() {
 fn test_parser_renderer_native_types_with_default_mappings_mysql() {
     let dm1 = indoc!(
         r#"
-        generator client {
-          provider        = "prisma-client-js"
-          previewFeatures = ["nativeTypes"]
-        }
-
         datasource dolphin {
           provider = "mysql"
           url      = "mysql://"
@@ -362,11 +342,6 @@ fn test_parser_renderer_native_types_with_default_mappings_mysql() {
 
     let dm2 = indoc!(
         r#"
-        generator client {
-          provider        = "prisma-client-js"
-          previewFeatures = ["nativeTypes"]
-        }
-
         datasource dolphin {
           provider = "mysql"
           url      = "mysql://"
@@ -436,11 +411,6 @@ datasource db {
 fn test_parser_renderer_ignored_via_dml() {
     let input = indoc!(
         r#"
-        generator client {
-          provider        = "prisma-client-js"
-          previewFeatures = ["nativeTypes"]
-        }
-
         datasource pg {
           provider = "postgresql"
           url      = "postgresql://"

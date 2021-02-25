@@ -144,11 +144,6 @@ async fn native_type_columns_can_be_created(api: &TestApi) -> TestResult {
             url = "postgresql://localhost/test"
         }
 
-        generator client {
-          provider = "prisma-client-js"
-          previewFeatures = ["nativeTypes"]
-        }
-
         model A {
             id Int @id
     "#
