@@ -5,6 +5,7 @@ mod lower;
 mod maximum;
 mod minimum;
 mod row_number;
+mod row_to_json;
 mod sum;
 mod upper;
 
@@ -15,6 +16,8 @@ pub use lower::*;
 pub use maximum::*;
 pub use minimum::*;
 pub use row_number::*;
+#[cfg(all(feature = "json", feature = "postgresql"))]
+pub use row_to_json::*;
 pub use sum::*;
 pub use upper::*;
 
@@ -31,6 +34,8 @@ pub struct Function<'a> {
 /// A database function type
 #[derive(Debug, Clone, PartialEq)]
 pub(crate) enum FunctionType<'a> {
+    #[cfg(all(feature = "json", feature = "postgresql"))]
+    RowToJson(RowToJson<'a>),
     RowNumber(RowNumber<'a>),
     Count(Count<'a>),
     AggregateToString(AggregateToString<'a>),
@@ -53,6 +58,9 @@ impl<'a> Aliasable<'a> for Function<'a> {
         self
     }
 }
+
+#[cfg(all(feature = "json", feature = "postgresql"))]
+function!(RowToJson);
 
 function!(
     RowNumber,

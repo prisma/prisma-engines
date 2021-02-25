@@ -1,4 +1,7 @@
 # Changelog
+## Unreleased
+
+- Added support for `ROW_TO_JSON` function in postgresql
 
 ## v0.2.0-alpha.13
 

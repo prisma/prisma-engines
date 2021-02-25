@@ -921,6 +921,11 @@ pub trait Visitor<'a> {
             FunctionType::AggregateToString(agg) => {
                 self.visit_aggregate_to_string(agg.value.as_ref().clone())?;
             }
+            #[cfg(all(feature = "json", feature = "postgresql"))]
+            FunctionType::RowToJson(row_to_json) => {
+                self.write("ROW_TO_JSON")?;
+                self.surround_with("(", ")", |ref mut s| s.visit_table(row_to_json.expr, false))?
+            }
             FunctionType::Average(avg) => {
                 self.visit_average(avg)?;
             }
