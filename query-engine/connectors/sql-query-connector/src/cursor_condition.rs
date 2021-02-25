@@ -256,7 +256,7 @@ fn order_definitions(
         let (mut computed_joins, order_by_column) = ordering::compute_joins(order_by, model, index);
 
         joins.append(&mut computed_joins);
-        
+
         orderings.push((order_by.field.clone(), order_by_column, order_by.sort_order))
     }
 
