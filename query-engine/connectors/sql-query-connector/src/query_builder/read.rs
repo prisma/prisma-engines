@@ -46,7 +46,11 @@ impl SelectDefinition for QueryArguments {
             (filter, cursor) => ConditionTree::and(filter, cursor),
         };
 
-        let select_ast = Select::from_table(model.as_table())
+        let table_joins = joins
+            .into_iter()
+            .fold(model.as_table(), |acc, join| acc.left_join(join));
+
+        let select_ast = Select::from_table(table_joins)
             .so_that(conditions)
             .offset(skip as usize);
 
@@ -57,7 +61,6 @@ impl SelectDefinition for QueryArguments {
         };
 
         let select_ast = orderings.into_iter().fold(select_ast, |acc, ord| acc.order_by(ord));
-        let select_ast = joins.into_iter().fold(select_ast, |acc, join| acc.left_join(join));
 
         match limit {
             Some(limit) => select_ast.limit(limit as usize),
