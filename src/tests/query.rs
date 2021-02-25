@@ -351,6 +351,59 @@ async fn inner_join(api: &mut dyn TestApi) -> crate::Result<()> {
 }
 
 #[test_each_connector]
+async fn table_inner_join(api: &mut dyn TestApi) -> crate::Result<()> {
+    let table1 = api.create_table("id int, name varchar(255)").await?;
+    let table2 = api.create_table("t1_id int, is_cat int").await?;
+    let table3 = api.create_table("id int, foo int").await?;
+
+    let insert = Insert::multi_into(&table1, vec!["id", "name"])
+        .values(vec![Value::integer(1), Value::text("Musti")])
+        .values(vec![Value::integer(2), Value::text("Belka")]);
+
+    api.conn().insert(insert.into()).await?;
+
+    let insert = Insert::multi_into(&table2, vec!["t1_id", "is_cat"])
+        .values(vec![Value::integer(1), Value::integer(1)])
+        .values(vec![Value::integer(2), Value::integer(0)]);
+
+    api.conn().insert(insert.into()).await?;
+
+    let insert = Insert::multi_into(&table3, vec!["id", "foo"]).values(vec![Value::integer(1), Value::integer(1)]);
+
+    api.conn().insert(insert.into()).await?;
+
+    let joined_table = Table::from(&table1).inner_join(
+        table2
+            .as_str()
+            .on((table1.as_str(), "id").equals(Column::from((&table2, "t1_id")))),
+    );
+
+    let query = Select::from_table(joined_table)
+        // Select from a third table to ensure that the JOIN is specifically applied on the table1
+        .and_from(&table3)
+        .column((&table1, "name"))
+        .column((&table2, "is_cat"))
+        .column((&table3, "foo"))
+        .order_by(Column::from((&table1, "id")).ascend());
+
+    let res = api.conn().select(query).await?;
+
+    assert_eq!(2, res.len());
+
+    let row = res.get(0).unwrap();
+    assert_eq!(Some("Musti"), row["name"].as_str());
+    assert_eq!(Some(true), row["is_cat"].as_bool());
+    assert_eq!(Some(true), row["foo"].as_bool());
+
+    let row = res.get(1).unwrap();
+    assert_eq!(Some("Belka"), row["name"].as_str());
+    assert_eq!(Some(false), row["is_cat"].as_bool());
+    assert_eq!(Some(true), row["foo"].as_bool());
+
+    Ok(())
+}
+
+#[test_each_connector]
 async fn left_join(api: &mut dyn TestApi) -> crate::Result<()> {
     let table1 = api.create_table("id int, name varchar(255)").await?;
     let table2 = api.create_table("t1_id int, is_cat int").await?;
@@ -387,6 +440,60 @@ async fn left_join(api: &mut dyn TestApi) -> crate::Result<()> {
     let row = res.get(1).unwrap();
     assert_eq!(Some("Belka"), row["name"].as_str());
     assert_eq!(None, row["is_cat"].as_bool());
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn table_left_join(api: &mut dyn TestApi) -> crate::Result<()> {
+    let table1 = api.create_table("id int, name varchar(255)").await?;
+    let table2 = api.create_table("t1_id int, is_cat int").await?;
+    let table3 = api.create_table("id int, foo int").await?;
+
+    let insert = Insert::multi_into(&table1, vec!["id", "name"])
+        .values(vec![Value::integer(1), Value::text("Musti")])
+        .values(vec![Value::integer(2), Value::text("Belka")]);
+
+    api.conn().insert(insert.into()).await?;
+
+    let insert =
+        Insert::multi_into(&table2, vec!["t1_id", "is_cat"]).values(vec![Value::integer(1), Value::integer(1)]);
+
+    api.conn().insert(insert.into()).await?;
+
+    let insert = Insert::multi_into(&table3, vec!["id", "foo"]).values(vec![Value::integer(1), Value::integer(1)]);
+
+    api.conn().insert(insert.into()).await?;
+
+    let joined_table = Table::from(&table1).left_join(
+        table2
+            .as_str()
+            .on((&table1, "id").equals(Column::from((&table2, "t1_id")))),
+    );
+
+    let query = Select::from_table(joined_table)
+        // Select from a third table to ensure that the JOIN is specifically applied on the table1
+        .and_from(&table3)
+        .column((&table1, "name"))
+        .column((&table2, "is_cat"))
+        .column((&table3, "foo"))
+        .order_by(Column::from((&table1, "id")).ascend());
+
+    let res = api.conn().select(query).await?;
+
+    println!("{:?}", &res);
+
+    assert_eq!(2, res.len());
+
+    let row = res.get(0).unwrap();
+    assert_eq!(Some("Musti"), row["name"].as_str());
+    assert_eq!(Some(true), row["is_cat"].as_bool());
+    assert_eq!(Some(true), row["foo"].as_bool());
+
+    let row = res.get(1).unwrap();
+    assert_eq!(Some("Belka"), row["name"].as_str());
+    assert_eq!(None, row["is_cat"].as_bool());
+    assert_eq!(Some(true), row["foo"].as_bool());
 
     Ok(())
 }

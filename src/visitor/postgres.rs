@@ -618,4 +618,17 @@ mod tests {
 
         assert_eq!("INSERT INTO \"foo\" (\"foo\",\"baz\") VALUES ($1,DEFAULT)", sql);
     }
+
+    #[test]
+    fn join_is_inserted_positionally() {
+        let joined_table = Table::from("User").left_join(
+            "Post"
+                .alias("p")
+                .on(("p", "userId").equals(Column::from(("User", "id")))),
+        );
+        let q = Select::from_table(joined_table).and_from("Toto");
+        let (sql, _) = Postgres::build(q).unwrap();
+
+        assert_eq!("SELECT \"User\".*, \"Toto\".* FROM \"User\" LEFT JOIN \"Post\" AS \"p\" ON \"p\".\"userId\" = \"User\".\"id\", \"Toto\"", sql);
+    }
 }

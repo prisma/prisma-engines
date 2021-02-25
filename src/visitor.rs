@@ -171,7 +171,7 @@ pub trait Visitor<'a> {
                         self.write(", ")?;
                     }
 
-                    match table.typ {
+                    match &table.typ {
                         TableType::Query(_) | TableType::Values(_) => match table.alias {
                             Some(ref alias) => {
                                 self.surround_with(Self::C_BACKTICK_OPEN, Self::C_BACKTICK_CLOSE, |ref mut s| {
@@ -190,6 +190,23 @@ pub trait Visitor<'a> {
                             }
                             None => {
                                 self.visit_table(table.clone(), false)?;
+                                self.write(".*")?;
+                            }
+                        },
+                        TableType::JoinedTable((table_name, _)) => match table.alias.clone() {
+                            Some(ref alias) => {
+                                self.surround_with(Self::C_BACKTICK_OPEN, Self::C_BACKTICK_CLOSE, |ref mut s| {
+                                    s.write(alias)
+                                })?;
+                                self.write(".*")?;
+                            }
+                            None => {
+                                let mut unjoined_table = table.clone();
+                                // Convert the table typ to a `TableType::Table` for the SELECT statement print
+                                // We only want the join to appear in the FROM clause
+                                unjoined_table.typ = TableType::Table(table_name.to_owned());
+
+                                self.visit_table(unjoined_table, false)?;
                                 self.write(".*")?;
                             }
                         },
@@ -472,6 +489,13 @@ pub trait Visitor<'a> {
             },
             TableType::Values(values) => self.visit_values(values)?,
             TableType::Query(select) => self.surround_with("(", ")", |ref mut s| s.visit_select(select))?,
+            TableType::JoinedTable((table_name, joins)) => {
+                match table.database {
+                    Some(database) => self.delimited_identifiers(&[&*database, &*table_name])?,
+                    None => self.delimited_identifiers(&[&*table_name])?,
+                }
+                self.visit_joins(joins)?
+            }
         };
 
         if include_alias {
