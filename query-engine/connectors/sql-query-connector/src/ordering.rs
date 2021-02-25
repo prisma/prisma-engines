@@ -52,17 +52,13 @@ pub fn compute_joins(
     // - If it's on the base model with no hops, it's for example `modelTable.field`.
     // - If it is with several hops, it's the alias used for the last join, e.g.
     //   `{join_alias}.field`
-    let order_by_column = build_order_by_column(order_by, last_join_alias);
-
-    (joins, order_by_column)
-}
-
-fn build_order_by_column(order_by: &OrderBy, join_alias: Option<String>) -> Column<'static> {
-    if join_alias.is_some() {
-        Column::from((join_alias.unwrap().to_owned(), order_by.field.db_name().to_owned()))
+    let order_by_column = if last_join_alias.is_some() {
+        Column::from((last_join_alias.unwrap().to_owned(), order_by.field.db_name().to_owned()))
     } else {
         order_by.field.as_column()
-    }
+    };
+
+    (joins, order_by_column)
 }
 
 fn compute_join(base_model: &ModelRef, rf: &RelationFieldRef, join_prefix: &str) -> (String, JoinData<'static>) {
