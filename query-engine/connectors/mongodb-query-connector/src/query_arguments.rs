@@ -1,11 +1,11 @@
 use crate::{filter::convert_filter, join::JoinStage, BsonTransform, IntoBson};
-use connector_interface::QueryArguments;
+use connector_interface::{AggregationSelection, Filter, QueryArguments};
 use mongodb::{
-    bson::{doc, Document},
+    bson::{doc, Bson, Document},
     options::{AggregateOptions, FindOptions},
     Collection, Cursor,
 };
-use prisma_models::{ModelProjection, OrderBy, SortOrder};
+use prisma_models::{ModelProjection, OrderBy, ScalarFieldRef, SortOrder};
 
 /// Translated query arguments ready to use in mongo find or aggregation queries.
 #[derive(Debug, Default)]
@@ -16,12 +16,16 @@ pub(crate) struct MongoQueryArgs {
     /// Join stages.
     pub(crate) joins: Vec<JoinStage>,
 
+    /// Filters that can only be applied after the joins
+    /// or aggregations added the required data to execute them.
+    pub(crate) join_filters: Vec<Document>,
+
     /// Aggregation stages.
     pub(crate) aggregations: Vec<Document>,
 
-    /// Filters that can only be applied after the joins
-    /// or aggregations added the required data to execute them.
-    pub(crate) post_filters: Vec<Document>,
+    /// Filters that can only be applied after the aggregations
+    /// transformed the documents.
+    pub(crate) aggregation_filters: Vec<Document>,
 
     /// Order by expression document.
     pub(crate) order: Option<Document>,
@@ -68,10 +72,20 @@ impl MongoQueryArgs {
         };
 
         // Joins ($lookup)
-        stages.extend(self.joins.into_iter().map(|stage| doc! { "$lookup": stage.build() }));
+        stages.extend(self.joins.into_iter().map(|stage| stage.build()));
 
         // Post-join $matches
-        stages.extend(self.post_filters.into_iter().map(|filter| doc! { "$match": filter }));
+        stages.extend(self.join_filters.into_iter().map(|filter| doc! { "$match": filter }));
+
+        // Aggregates
+        stages.extend(self.aggregations);
+
+        // Aggregation filters
+        stages.extend(
+            self.aggregation_filters
+                .into_iter()
+                .map(|filter| doc! { "$match": filter }),
+        );
 
         // $sort
         if let Some(order) = self.order {
@@ -98,7 +112,6 @@ impl MongoQueryArgs {
         Ok(coll.aggregate(stages, opts).await?)
     }
 
-    /// Builds filter and find options for mongo based on selected fields and query arguments.
     pub(crate) fn new(args: QueryArguments) -> crate::Result<MongoQueryArgs> {
         let reverse_order = args.take.map(|t| t < 0).unwrap_or(false);
         let (order, mut joins) = build_order_by(args.order_by, reverse_order);
@@ -123,7 +136,7 @@ impl MongoQueryArgs {
 
         Ok(MongoQueryArgs {
             query,
-            post_filters,
+            join_filters: post_filters,
             joins,
             order,
             skip: skip(args.skip, args.ignore_skip),
@@ -139,6 +152,78 @@ impl MongoQueryArgs {
 
         Ok(self)
     }
+
+    /// Adds group-by fields with their aggregations to this query.
+    pub fn with_groupings(mut self, by_fields: Vec<ScalarFieldRef>, aggregations: &[AggregationSelection]) -> Self {
+        let grouping = if by_fields.is_empty() {
+            Bson::Null // Null => group over the entire collection.
+        } else {
+            let mut group_doc = Document::new();
+
+            for field in by_fields {
+                group_doc.insert(field.db_name(), format!("${}", field.db_name()));
+            }
+
+            group_doc.into()
+        };
+
+        let mut grouping_stage = doc! { "_id": grouping };
+
+        for selection in aggregations {
+            match selection {
+                AggregationSelection::Field(_) => (),
+                AggregationSelection::Count { all, fields } => {
+                    if *all {
+                        grouping_stage.insert("count_all", doc! { "$sum": 1 });
+                    }
+
+                    let pairs = aggregation_pairs("count", fields);
+                    grouping_stage.extend(pairs);
+                }
+                AggregationSelection::Average(fields) => {
+                    let pairs = aggregation_pairs("avg", fields);
+                    grouping_stage.extend(pairs);
+                }
+                AggregationSelection::Sum(fields) => {
+                    let pairs = aggregation_pairs("sum", fields);
+                    grouping_stage.extend(pairs);
+                }
+                AggregationSelection::Min(fields) => {
+                    let pairs = aggregation_pairs("min", fields);
+                    grouping_stage.extend(pairs);
+                }
+                AggregationSelection::Max(fields) => {
+                    let pairs = aggregation_pairs("max", fields);
+                    grouping_stage.extend(pairs);
+                }
+            }
+        }
+
+        self.aggregations.push(doc! { "$group": grouping_stage });
+        self
+    }
+
+    /// Adds aggregation filters based on a having scalar filter.
+    pub fn with_having(mut self, having: Option<Filter>) -> crate::Result<Self> {
+        if let Some(filter) = having {
+            let (filter_doc, _) = convert_filter(filter, false)?.render();
+            self.aggregation_filters.push(filter_doc);
+        }
+
+        Ok(self)
+    }
+}
+
+fn aggregation_pairs(op: &str, fields: &[ScalarFieldRef]) -> Vec<(String, Bson)> {
+    fields
+        .into_iter()
+        .map(|field| {
+            (
+                format!("{}_{}", op, field.db_name()),
+                doc! { format!("${}", op): format!("${}", field.db_name()) }.into(),
+            )
+        })
+        .collect()
 }
 
 fn build_order_by(orderings: Vec<OrderBy>, reverse: bool) -> (Option<Document>, Vec<JoinStage>) {

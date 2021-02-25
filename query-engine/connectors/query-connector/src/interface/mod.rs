@@ -204,6 +204,7 @@ pub trait ReadOperations {
     /// Whether or not the aggregations can be executed in a single query or
     /// requires multiple roundtrips to the underlying data source is at the
     /// discretion of the implementing connector.
+    /// `having` can only be a scalar filter. Relation elements can be safely ignored.
     async fn aggregate_records(
         &self,
         model: &ModelRef,

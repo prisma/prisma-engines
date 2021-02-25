@@ -1,7 +1,7 @@
 use crate::{join::JoinStage, IntoBson};
 use connector_interface::{
-    Filter, OneRelationIsNullFilter, QueryMode, RelationCondition, RelationFilter, ScalarCondition, ScalarFilter,
-    ScalarListFilter,
+    AggregationFilter, Filter, OneRelationIsNullFilter, QueryMode, RelationCondition, RelationFilter, ScalarCondition,
+    ScalarFilter, ScalarListFilter, ScalarProjection,
 };
 use mongodb::bson::{doc, Bson, Document, Regex};
 use prisma_models::{PrismaValue, ScalarFieldRef};
@@ -46,13 +46,13 @@ pub(crate) fn convert_filter(filter: Filter, invert: bool) -> crate::Result<Mong
         // todo requires some more testing
         Filter::Not(filters) => compound_filter("$and", filters, !invert)?,
 
-        Filter::Scalar(sf) => scalar_filter(sf, invert)?,
+        Filter::Scalar(sf) => scalar_filter(sf, invert, true)?,
         Filter::Empty => MongoFilter::Scalar(doc! {}),
         Filter::ScalarList(slf) => scalar_list_filter(slf, invert)?,
         Filter::OneRelationIsNull(filter) => one_is_null(filter, invert)?,
         Filter::Relation(rfilter) => relation_filter(rfilter, invert)?,
         // Filter::BoolFilter(b) => {} // Potentially not doable.
-        // Filter::Aggregation(_) => {}
+        Filter::Aggregation(filter) => aggregation_filter(filter, invert)?,
         _ => todo!("Incomplete filter implementation."),
     };
 
@@ -80,7 +80,7 @@ fn fold_nested(nested: Vec<(Document, Vec<JoinStage>)>) -> (Vec<Document>, Vec<J
     })
 }
 
-fn scalar_filter(filter: ScalarFilter, invert: bool) -> crate::Result<MongoFilter> {
+fn scalar_filter(filter: ScalarFilter, invert: bool, include_field_wrapper: bool) -> crate::Result<MongoFilter> {
     // Todo: Find out what Compound cases are really. (Guess: Relation fields with multi-field FK?)
     let field = match filter.projection {
         connector_interface::ScalarProjection::Single(sf) => sf,
@@ -93,7 +93,11 @@ fn scalar_filter(filter: ScalarFilter, invert: bool) -> crate::Result<MongoFilte
         QueryMode::Insensitive => insensitive_scalar_filter(&field, filter.condition.invert(invert))?,
     };
 
-    Ok(MongoFilter::Scalar(doc! { field.db_name(): filter }))
+    if include_field_wrapper {
+        Ok(MongoFilter::Scalar(doc! { field.db_name(): filter }))
+    } else {
+        Ok(MongoFilter::Scalar(filter))
+    }
 }
 
 // Note contains / startsWith / endsWith are only applicable to String types in the schema.
@@ -293,6 +297,36 @@ fn requires_invert(rf: &RelationCondition) -> bool {
         RelationCondition::NoRelatedRecord => true,
         _ => false,
     }
+}
+
+fn aggregation_filter(filter: AggregationFilter, invert: bool) -> crate::Result<MongoFilter> {
+    match filter {
+        AggregationFilter::Count(filter) => aggregate_conditions("count", *filter, invert),
+        AggregationFilter::Average(filter) => aggregate_conditions("avg", *filter, invert),
+        AggregationFilter::Sum(filter) => aggregate_conditions("sum", *filter, invert),
+        AggregationFilter::Min(filter) => aggregate_conditions("min", *filter, invert),
+        AggregationFilter::Max(filter) => aggregate_conditions("max", *filter, invert),
+    }
+}
+
+fn aggregate_conditions(op: &str, filter: Filter, invert: bool) -> crate::Result<MongoFilter> {
+    let sf = match filter {
+        Filter::Scalar(sf) => sf,
+        _ => unimplemented!(),
+    };
+
+    let field = match &sf.projection {
+        ScalarProjection::Compound(_) => {
+            unimplemented!("Compound aggregate projections are unsupported.")
+        }
+        ScalarProjection::Single(field) => field.clone(),
+    };
+
+    let (filter, _) = scalar_filter(sf, invert, false)?.render();
+
+    Ok(MongoFilter::Scalar(
+        doc! { format!("{}_{}", op, field.db_name()): filter },
+    ))
 }
 
 fn to_regex_list(
