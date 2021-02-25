@@ -1,5 +1,6 @@
 use crate::{filter::convert_filter, join::JoinStage, BsonTransform, IntoBson};
 use connector_interface::{AggregationSelection, Filter, QueryArguments};
+use itertools::Itertools;
 use mongodb::{
     bson::{doc, Bson, Document},
     options::{AggregateOptions, FindOptions},
@@ -87,10 +88,9 @@ impl MongoQueryArgs {
         // Post-join $matches
         stages.extend(self.join_filters.into_iter().map(|filter| doc! { "$match": filter }));
 
-        // If the query is a group by, skip, take, sort all apply to the _groups_, not the documents
+        // If the query is a group by, then skip, take, sort all apply to the _groups_, not the documents
         // before. If it is a plain aggregation, then the aggregate stages need to be _after_ these, because
         // they apply to the documents to be aggregated, not the aggregations (legacy meh).
-
         if self.is_group_by_query {
             // Aggregates
             stages.extend(self.aggregations.clone());
@@ -275,15 +275,47 @@ impl OrderByBuilder {
         }
 
         let mut order_doc = Document::new();
+        let mut joins = vec![];
 
-        for order_by in self.order_bys {
+        for (index, order_by) in self.order_bys.into_iter().enumerate() {
+            let prefix = if !order_by.path.is_empty() {
+                let mut prefix = order_by.path.iter().map(|rf| rf.relation().name.clone()).collect_vec();
+                let mut stages = order_by.path.into_iter().map(|rf| JoinStage::new(rf)).collect_vec();
+
+                // We fold from right to left because the right hand side needs to be always contained
+                // in the left hand side here (JoinStage<A, JoinStage<B, JoinStage<C>>>).
+                stages.reverse();
+
+                let mut final_stage = stages
+                    .into_iter()
+                    .fold1(|right, mut left| {
+                        left.push_nested(right);
+                        left
+                    })
+                    .unwrap();
+
+                let alias = format!("orderby_{}_{}", prefix[0], index);
+
+                final_stage.set_alias(alias.clone());
+                joins.push(final_stage);
+                prefix[0] = alias;
+
+                Some(prefix.join("."))
+            } else {
+                None
+            };
+
             let field = if is_group_by {
                 // Explanation: All group by fields go into the _id key of the result document.
                 // As it is the only point where the flat scalars are contained for the group,
                 // we beed to refer to the object
                 format!("_id.{}", order_by.field.db_name())
             } else {
-                order_by.field.db_name().to_owned()
+                if let Some(prefix) = prefix {
+                    format!("{}.{}", prefix, order_by.field.db_name())
+                } else {
+                    order_by.field.db_name().to_owned()
+                }
             };
 
             // Mongo: -1 -> DESC, 1 -> ASC
@@ -295,8 +327,7 @@ impl OrderByBuilder {
             };
         }
 
-        // todo joins
-        (Some(order_doc), vec![])
+        (Some(order_doc), joins)
     }
 }
 

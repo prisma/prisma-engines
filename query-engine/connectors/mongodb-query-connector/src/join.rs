@@ -16,24 +16,42 @@ pub(crate) struct JoinStage {
     /// The starting point of the traversal (left model of the join).
     pub(crate) source: RelationFieldRef,
 
+    /// By default, the name of the relation is used as join field name.
+    /// Can be overwritten with an alias here.
+    pub(crate) alias: Option<String>,
+
     /// Nested joins
     pub(crate) nested: Vec<JoinStage>,
 }
 
 impl JoinStage {
     pub(crate) fn new(source: RelationFieldRef) -> Self {
-        Self { source, nested: vec![] }
+        Self {
+            source,
+            alias: None,
+            nested: vec![],
+        }
     }
 
-    pub(crate) fn add_nested(&mut self, stages: Vec<JoinStage>) {
+    pub(crate) fn set_alias(&mut self, alias: String) {
+        self.alias = Some(alias);
+    }
+
+    pub(crate) fn push_nested(&mut self, stage: JoinStage) {
+        self.nested.push(stage);
+    }
+
+    pub(crate) fn extend_nested(&mut self, stages: Vec<JoinStage>) {
         self.nested.extend(stages);
     }
 
     /// Returns a join stage for the join between the source collection of `from_field` (the model it's defined on)
     /// and the target collection (the model that is related over the relation).
-    /// The joined documents will reside on the source document side as a field **named after the relation name**.
-    /// This means that if you have a document `{ _id: 1, field: "a" }` and join relation "aToB", the resulting document
-    /// will have the shape: `{ _id: 1, field: "a", aToB: [{...}, {...}, ...] }`.
+    /// The joined documents will reside on the source document side as a field **named after the relation name** if
+    /// there's no `alias` defined. Else the alias is the name.
+    /// Example: If you have a document `{ _id: 1, field: "a" }` and join relation "aToB", the resulting document
+    /// will have the shape: `{ _id: 1, field: "a", aToB: [{...}, {...}, ...] }` without alias and
+    /// `{ _id: 1, field: "a", alisHere: [{...}, {...}, ...] }` with alias `"aliasHere"`.
     pub(crate) fn build(self) -> Document {
         let nested_stages: Vec<Document> = self
             .nested
@@ -43,13 +61,17 @@ impl JoinStage {
 
         let from_field = self.source;
         let relation = from_field.relation();
-        let relation_name = &relation.name;
+        let as_name = if let Some(alias) = self.alias {
+            alias
+        } else {
+            relation.name.clone()
+        };
 
         let right_model = from_field.related_model();
         let right_coll_name = right_model.db_name();
 
-        let mut left_scalars = dbg!(from_field.left_scalars());
-        let mut right_scalars = dbg!(from_field.right_scalars());
+        let mut left_scalars = from_field.left_scalars();
+        let mut right_scalars = from_field.right_scalars();
 
         let mut pipeline = Vec::with_capacity(1 + nested_stages.len());
 
@@ -80,7 +102,7 @@ impl JoinStage {
                 "from": right_coll_name,
                 "let": { "left": format!("${}", left_name) },
                 "pipeline": pipeline,
-                "as": relation_name,
+                "as": as_name,
             }
         }
     }

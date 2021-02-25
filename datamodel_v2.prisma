@@ -17,6 +17,14 @@ model Address {
   zip     Int
   user_id String @db.ObjectId
   user    User   @relation(fields: [user_id], references: [id])
+  test    Test?
+}
+
+model Test {
+  id   String   @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  gql  String?
+  a_id String?  @db.ObjectId
+  a    Address? @relation(fields: [a_id], references: [id])
 }
 
 model Post {
