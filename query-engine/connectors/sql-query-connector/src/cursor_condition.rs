@@ -1,4 +1,4 @@
-use crate::query_arguments_ext::QueryArgumentsExt;
+use crate::{ordering, query_arguments_ext::QueryArgumentsExt};
 use connector_interface::QueryArguments;
 use prisma_models::*;
 use quaint::ast::*;
@@ -78,15 +78,17 @@ pub fn build(query_arguments: &QueryArguments, model: &ModelRef) -> (Option<Tabl
             let cursor_condition = cursor_row.clone().equals(cursor_values.clone());
 
             // Orderings for this query. Influences which fields we need to fetch for comparing order fields.
-            let mut order_definitions = order_definitions(query_arguments, model);
+            let (mut order_definitions, joins) = order_definitions(query_arguments, model);
 
             // Subquery to find the value of the order field(s) that we need for comparison. Builds part #1 of the query example in the docs.
             let order_subquery = order_definitions
                 .iter()
-                .fold(Select::from_table(model.as_table()), |select, (field, _)| {
-                    select.column(field.as_column())
+                .fold(Select::from_table(model.as_table()), |select, (_, column, _)| {
+                    select.column(column.to_owned())
                 })
                 .so_that(cursor_condition);
+
+            let order_subquery = joins.into_iter().fold(order_subquery, |acc, join| acc.left_join(join));
 
             let subquery_table = Table::from(order_subquery).alias(ORDER_TABLE_ALIAS);
             let len = order_definitions.len();
@@ -95,15 +97,15 @@ pub fn build(query_arguments: &QueryArguments, model: &ModelRef) -> (Option<Tabl
             // Builds part #2 of the example query.
             // If we only have one ordering, we only want a single, slightly different, condition of (orderField [<= / >=] cmp_field).
             let condition_tree = if len == 1 {
-                let (field, order) = order_definitions.pop().unwrap();
-                ConditionTree::Single(Box::new(map_orderby_condition(&field, &order, reverse, true)))
+                let (field, column, order) = order_definitions.pop().unwrap();
+                ConditionTree::Single(Box::new(map_orderby_condition(&field, column, &order, reverse, true)))
             } else {
                 let or_conditions = (0..len).fold(Vec::with_capacity(len), |mut conditions_acc, n| {
                     let (head, tail) = order_definitions.split_at(len - n - 1);
                     let mut and_conditions = Vec::with_capacity(head.len() + 1);
 
-                    for (field, _) in head {
-                        and_conditions.push(map_equality_condition(field));
+                    for (field, order_column, _) in head {
+                        and_conditions.push(map_equality_condition(field, order_column.to_owned()));
                     }
 
                     if head.len() == len - 1 {
@@ -131,12 +133,24 @@ pub fn build(query_arguments: &QueryArguments, model: &ModelRef) -> (Option<Tabl
                         //
                         // Said differently, we handle all the cases in which the prefixes are equal to len - 1 to account for possible identical comparators,
                         // but everything else must come strictly "after" the cursor.
-                        let (field, order) = tail.first().unwrap();
+                        let (field, order_column, order) = tail.first().unwrap();
 
-                        and_conditions.push(map_orderby_condition(field, order, reverse, true));
+                        and_conditions.push(map_orderby_condition(
+                            field,
+                            order_column.to_owned(),
+                            order,
+                            reverse,
+                            true,
+                        ));
                     } else {
-                        let (field, order) = tail.first().unwrap();
-                        and_conditions.push(map_orderby_condition(field, order, reverse, false));
+                        let (field, order_column, order) = tail.first().unwrap();
+                        and_conditions.push(map_orderby_condition(
+                            field,
+                            order_column.to_owned(),
+                            order,
+                            reverse,
+                            false,
+                        ));
                     }
 
                     conditions_acc.push(ConditionTree::And(and_conditions));
@@ -152,14 +166,14 @@ pub fn build(query_arguments: &QueryArguments, model: &ModelRef) -> (Option<Tabl
 }
 
 // A negative `take` value signifies that values should be taken before the cursor,
-// requiring the correct comarison operator to be used to fit the reversed order.
+// requiring the correct comparison operator to be used to fit the reversed order.
 fn map_orderby_condition(
     field: &ScalarFieldRef,
+    order_column: Column<'static>,
     order: &SortOrder,
     reverse: bool,
     include_eq: bool,
 ) -> Expression<'static> {
-    let order_column = field.as_column();
     let cmp_column = Column::from((ORDER_TABLE_ALIAS, field.db_name().to_owned()));
 
     let order_expr: Expression<'static> = match order {
@@ -211,8 +225,7 @@ fn map_orderby_condition(
     }
 }
 
-fn map_equality_condition(field: &ScalarFieldRef) -> Expression<'static> {
-    let order_column = field.as_column();
+fn map_equality_condition(field: &ScalarFieldRef, order_column: Column<'static>) -> Expression<'static> {
     let cmp_column = Column::from((ORDER_TABLE_ALIAS, field.db_name().to_owned()));
 
     // If we have null values in the ordering or comparison row, those are automatically included because we can't make a
@@ -229,20 +242,39 @@ fn map_equality_condition(field: &ScalarFieldRef) -> Expression<'static> {
     }
 }
 
-fn order_definitions(query_arguments: &QueryArguments, model: &ModelRef) -> Vec<(ScalarFieldRef, SortOrder)> {
-    let defined_ordering: Vec<_> = query_arguments
-        .order_by
-        .iter()
-        .map(|o| (o.field.clone(), o.sort_order))
-        .collect();
+fn order_definitions(
+    query_arguments: &QueryArguments,
+    model: &ModelRef,
+) -> (
+    Vec<(ScalarFieldRef, Column<'static>, SortOrder)>,
+    Vec<JoinData<'static>>,
+) {
+    let mut joins = vec![];
+    let mut orderings = vec![];
 
-    if defined_ordering.is_empty() {
-        model
-            .primary_identifier()
-            .scalar_fields()
-            .map(|f| (f, SortOrder::Ascending))
-            .collect()
-    } else {
-        defined_ordering
+    for (index, order_by) in query_arguments.order_by.iter().enumerate() {
+        let (mut computed_joins, order_by_column) = ordering::compute_joins(order_by, model, index);
+
+        joins.append(&mut computed_joins);
+
+        // This is the final column identifier to be used for the scalar field to order by.
+        // - If it's on the base model with no hops, it's for example `modelTable.field`.
+        // - If it is with several hops, it's the alias used for the last join, e.g.
+        //   `orderby_{modelname}_{index}.field`
+
+        orderings.push((order_by.field.clone(), order_by_column, order_by.sort_order))
     }
+
+    if orderings.is_empty() {
+        return (
+            model
+                .primary_identifier()
+                .scalar_fields()
+                .map(|f| (f.clone(), f.as_column(), SortOrder::Ascending))
+                .collect(),
+            joins,
+        );
+    }
+
+    (orderings, joins)
 }
