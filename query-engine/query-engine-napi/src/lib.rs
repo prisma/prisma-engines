@@ -116,7 +116,7 @@ fn next_log_event(ctx: CallContext) -> napi::Result<JsObject> {
     let engine: QueryEngine = engine.clone();
 
     ctx.env.execute_tokio_future(
-        async move { Ok(engine.next_log_event().await?) },
+        async move { Ok(engine.next_log_event().await) },
         |&mut env, event| match event {
             Some(event) => env.create_string(&event),
             None => env.get_null().and_then(|nil| nil.coerce_to_string()),

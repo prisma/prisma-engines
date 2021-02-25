@@ -37,9 +37,9 @@ struct EngineDatamodel {
 
 /// Everything needed to connect to the database and have the core running.
 pub struct EngineBuilder {
-    log_level: LevelFilter,
     datamodel: EngineDatamodel,
     config: ValidatedConfiguration,
+    logger: ChannelLogger,
 }
 
 /// Internal structure for querying and reconnecting with the engine.
@@ -124,10 +124,12 @@ impl QueryEngine {
             datasource_overrides: overrides,
         };
 
+        let logger = ChannelLogger::new(log_level);
+
         let builder = EngineBuilder {
             config,
             datamodel,
-            log_level,
+            logger,
         };
 
         Ok(Self {
@@ -141,9 +143,8 @@ impl QueryEngine {
 
         match *inner {
             Inner::Builder(ref builder) => {
-                let logger = ChannelLogger::new(builder.log_level);
-
-                let engine = logger
+                let engine = builder
+                    .logger
                     .clone()
                     .with_logging(|| async move {
                         let template = DatamodelConverter::convert(&builder.datamodel.ast);
@@ -175,7 +176,7 @@ impl QueryEngine {
                         Ok(ConnectedEngine {
                             datamodel: builder.datamodel.clone(),
                             query_schema: Arc::new(query_schema),
-                            logger,
+                            logger: builder.logger.clone(),
                             executor,
                             config,
                         })
@@ -196,6 +197,8 @@ impl QueryEngine {
 
         match *inner {
             Inner::Connected(ref engine) => {
+                engine.logger.disconnect_listeners().await?;
+
                 let config = datamodel::parse_configuration_with_url_overrides(
                     &engine.datamodel.raw,
                     engine.datamodel.datasource_overrides.clone(),
@@ -204,7 +207,7 @@ impl QueryEngine {
 
                 let builder = EngineBuilder {
                     datamodel: engine.datamodel.clone(),
-                    log_level: engine.logger.log_level(),
+                    logger: engine.logger.clone(),
                     config,
                 };
 
@@ -283,10 +286,10 @@ impl QueryEngine {
     /// the channel is empty. Engine should be connected before calling.
     ///
     /// Returns `None` when the logger is dropped.
-    pub async fn next_log_event(&self) -> crate::Result<Option<String>> {
+    pub async fn next_log_event(&self) -> Option<String> {
         match *self.inner.read().await {
-            Inner::Connected(ref engine) => Ok(engine.logger.next_event().await),
-            Inner::Builder(_) => Err(ApiError::NotConnected),
+            Inner::Connected(ref engine) => engine.logger.next_event().await,
+            Inner::Builder(ref builder) => builder.logger.next_event().await,
         }
     }
 }

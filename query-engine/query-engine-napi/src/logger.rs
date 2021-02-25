@@ -39,11 +39,6 @@ impl ChannelLogger {
         }
     }
 
-    /// The current log level of the logger.
-    pub fn log_level(&self) -> LevelFilter {
-        self.level
-    }
-
     /// Wraps a future to a logger, storing all events in the pipeline to
     /// the channel.
     pub async fn with_logging<F, U, T>(&self, f: F) -> crate::Result<T>
@@ -58,5 +53,16 @@ impl ChannelLogger {
     /// closed.
     pub async fn next_event(&self) -> Option<String> {
         self.receiver.lock().await.recv().await
+    }
+
+    /// A special event to notify the JavaScript listener to stop listening,
+    /// helping us to get around of the problem of not having streams on
+    /// JavaScript.
+    pub async fn disconnect_listeners(&self) -> crate::Result<()> {
+        self.with_logging(|| async {
+            tracing::info!("disconnected");
+            Ok(())
+        })
+        .await
     }
 }
