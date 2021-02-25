@@ -173,7 +173,9 @@ async fn soft_resets_work_on_sql_server(api: TestApi) -> TestResult {
             .await
             .unwrap_err();
 
-        assert_eq!(err.original_code().unwrap(), "3701"); // insufficient_privilege (https://www.postgresql.org/docs/current/errcodes-appendix.html)
+        // insofficient privilege
+        // https://docs.microsoft.com/en-us/sql/relational-databases/errors-events/database-engine-events-and-errors
+        assert_eq!(err.original_code().unwrap(), "3701");
     }
 
     // Check that the soft reset works with migrations, then with schema push.
