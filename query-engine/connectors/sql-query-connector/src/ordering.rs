@@ -52,8 +52,8 @@ pub fn compute_joins(
     // - If it's on the base model with no hops, it's for example `modelTable.field`.
     // - If it is with several hops, it's the alias used for the last join, e.g.
     //   `{join_alias}.field`
-    let order_by_column = if last_join_alias.is_some() {
-        Column::from((last_join_alias.unwrap().to_owned(), order_by.field.db_name().to_owned()))
+    let order_by_column = if let Some(alias) = last_join_alias {
+        Column::from((alias, order_by.field.db_name().to_owned()))
     } else {
         order_by.field.as_column()
     };
