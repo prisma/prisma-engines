@@ -20,8 +20,6 @@ pub async fn aggregate(
     let cursor = mongo_args.find_documents(coll).await?;
     let docs = vacuum_cursor(cursor).await?;
 
-    dbg!(&docs);
-
     to_aggregation_rows(docs, selections)
 }
 
