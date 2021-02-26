@@ -143,6 +143,39 @@ impl Connector for PostgresDatamodelConnector {
         &self.capabilities
     }
 
+    fn scalar_type_for_native_type(&self, native_type: serde_json::Value) -> ScalarType {
+        let native_type: PostgresType = serde_json::from_value(native_type).unwrap();
+
+        match native_type {
+            SmallInt => ScalarType::Int,
+            Integer => ScalarType::Int,
+            BigInt => ScalarType::BigInt,
+            Money => ScalarType::Float,
+            Inet => ScalarType::String,
+            Oid => ScalarType::String,
+            Citext => ScalarType::String,
+            Real => ScalarType::Float,
+            DoublePrecision => ScalarType::Float,
+            Decimal(_) => ScalarType::Decimal,
+            VarChar(_) => ScalarType::String,
+            Char(_) => ScalarType::String,
+            Text => ScalarType::String,
+            ByteA => ScalarType::Bytes,
+            Timestamp(_) => ScalarType::DateTime,
+            Timestamptz(_) => ScalarType::DateTime,
+            Date => ScalarType::DateTime,
+            Time(_) => ScalarType::DateTime,
+            Timetz(_) => ScalarType::DateTime,
+            Boolean => ScalarType::Boolean,
+            Bit(_) => ScalarType::Bytes,
+            VarBit(_) => ScalarType::Bytes,
+            UUID => ScalarType::String,
+            Xml => ScalarType::String,
+            JSON => ScalarType::Json,
+            JSONB => ScalarType::Json,
+        }
+    }
+
     fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> serde_json::Value {
         let native_type = SCALAR_TYPE_DEFAULTS
             .iter()

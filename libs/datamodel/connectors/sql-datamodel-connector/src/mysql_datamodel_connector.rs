@@ -172,6 +172,45 @@ impl Connector for MySqlDatamodelConnector {
         &self.capabilities
     }
 
+    fn scalar_type_for_native_type(&self, native_type: serde_json::Value) -> ScalarType {
+        let native_type: MySqlType = serde_json::from_value(native_type).unwrap();
+
+        match native_type {
+            Int => ScalarType::Int,
+            UnsignedInt => ScalarType::Int,
+            SmallInt => ScalarType::Int,
+            UnsignedSmallInt => ScalarType::Int,
+            TinyInt => ScalarType::Int,
+            UnsignedTinyInt => ScalarType::Int,
+            MediumInt => ScalarType::Int,
+            UnsignedMediumInt => ScalarType::Int,
+            BigInt => ScalarType::BigInt,
+            UnsignedBigInt => ScalarType::BigInt,
+            Float => ScalarType::Float,
+            Decimal(_) => ScalarType::Decimal,
+            Double => ScalarType::Float,
+            Bit(_) => ScalarType::Bytes,
+            Char(_) => ScalarType::String,
+            VarChar(_) => ScalarType::String,
+            Binary(_) => ScalarType::Bytes,
+            VarBinary(_) => ScalarType::Bytes,
+            TinyBlob => ScalarType::Bytes,
+            Blob => ScalarType::Bytes,
+            MediumBlob => ScalarType::Bytes,
+            LongBlob => ScalarType::Bytes,
+            TinyText => ScalarType::String,
+            Text => ScalarType::String,
+            MediumText => ScalarType::String,
+            LongText => ScalarType::String,
+            Date => ScalarType::DateTime,
+            Time(_) => ScalarType::DateTime,
+            DateTime(_) => ScalarType::DateTime,
+            Timestamp(_) => ScalarType::DateTime,
+            Year => ScalarType::Int,
+            Json => ScalarType::Json,
+        }
+    }
+
     fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> serde_json::Value {
         let native_type = SCALAR_TYPE_DEFAULTS
             .iter()

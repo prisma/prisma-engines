@@ -371,7 +371,24 @@ impl<'a> LiftAstToDml<'a> {
             let captures = UNSUPPORTED_REGEX.captures(type_name).unwrap();
             let type_definition = captures.get(1).expect("get type definition").as_str();
 
-            //todo check these against the native types for the connector, also try to be lenient with args / capitalization
+            //todo check these against the native types for the connector, try to be lenient with:
+            // name capitalization
+            // args spacing
+            // Unsupported("Decimal(10,2)")
+            //                "name:str(args:vec<String>)"
+            if let Some(source) = self.source {
+                let connector = &source.active_connector;
+
+                if let Ok(native_type) = connector.parse_native_type("Decimal", vec!["10".into(), "2".into()]) {
+                    //use source and native type and Prisma type to give a hint about correct definition.
+                    return Err(DatamodelError::new_validation_error(
+                    &format!("The type `{}` you specified in the type definition for the field `{}` is a supported as a native type by Prisma. Please use the native type notation `{} @{}.{}` for full support.",
+                    type_name, ast_field.name.name, "Decimal", &source.name, native_type.render()),
+                    ast_field.field_type.span,
+                ));
+                }
+            }
+
             Ok((dml::FieldType::Unsupported(type_definition.into()), vec![]))
         } else {
             Err(DatamodelError::new_type_not_found_error(

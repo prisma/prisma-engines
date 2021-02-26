@@ -119,6 +119,40 @@ impl Connector for MsSqlDatamodelConnector {
         &self.capabilities
     }
 
+    fn scalar_type_for_native_type(&self, native_type: serde_json::Value) -> ScalarType {
+        let native_type: MsSqlType = serde_json::from_value(native_type).unwrap();
+
+        match native_type {
+            TinyInt => ScalarType::Int,
+            SmallInt => ScalarType::Int,
+            Int => ScalarType::Int,
+            BigInt => ScalarType::Int,
+            Money => ScalarType::Float,
+            SmallMoney => ScalarType::Float,
+            Bit => ScalarType::Bytes,
+            Float(_) => ScalarType::Float,
+            Real => ScalarType::Float,
+            Decimal(_) => ScalarType::Decimal,
+            Date => ScalarType::DateTime,
+            Time => ScalarType::DateTime,
+            DateTime => ScalarType::DateTime,
+            DateTime2 => ScalarType::DateTime,
+            DateTimeOffset => ScalarType::DateTime,
+            SmallDateTime => ScalarType::DateTime,
+            Char(_) => ScalarType::String,
+            NChar(_) => ScalarType::String,
+            VarChar(_) => ScalarType::String,
+            Text => ScalarType::String,
+            NVarChar(_) => ScalarType::String,
+            NText => ScalarType::String,
+            Binary(_) => ScalarType::Bytes,
+            VarBinary(_) => ScalarType::Bytes,
+            Image => ScalarType::Bytes,
+            Xml => ScalarType::String,
+            UniqueIdentifier => ScalarType::String,
+        }
+    }
+
     fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> serde_json::Value {
         let native_type = SCALAR_TYPE_DEFAULTS
             .iter()

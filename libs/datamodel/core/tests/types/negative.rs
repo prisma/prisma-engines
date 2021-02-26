@@ -236,7 +236,7 @@ fn should_fail_on_native_type_with_invalid_arguments() {
 }
 
 #[test]
-fn should_fail_on_native_type_in_unsupported() {
+fn should_fail_on_native_type_in_unsupported_postgres() {
     let dml = r#"
         datasource pg {
           provider = "postgres"
@@ -244,15 +244,80 @@ fn should_fail_on_native_type_in_unsupported() {
         }
 
         model Blog {
-            id     Int    @id
-            foobar Unsupported("Text") 
+            id          Int    @id
+            text        Unsupported("Text") 
+            decimal     Unsupported("Decimal(10,2)") 
         }
     "#;
 
     let error = parse_error(dml);
 
-    error.assert_is(DatamodelError::new_duplicate_attribute_error(
-        "id",
-        ast::Span::new(23, 25),
-    ));
+    error.assert_are(&[
+        DatamodelError::new_validation_error(
+        "The type `Unsupported(\"Text\")` you specified in the type definition for the field `text` is a supported as a native type by Prisma. Please use the native type notation `Decimal @pg.Decimal(10,2)` for full support.",
+        ast::Span::new(180, 199),
+    ),
+        DatamodelError::new_validation_error(
+            "The type `Unsupported(\"Decimal(10,2)\")` you specified in the type definition for the field `decimal` is a supported as a native type by Prisma. Please use the native type notation `Decimal @pg.Decimal(10,2)` for full support.",
+            ast::Span::new(225, 253),
+        )
+    ]);
+}
+
+#[test]
+fn should_fail_on_native_type_in_unsupported_mysql() {
+    let dml = r#"
+        datasource pg {
+          provider = "mysql"
+          url = "mysql://"
+        }
+
+        model Blog {
+            id          Int    @id
+            text        Unsupported("Text") 
+            decimal     Unsupported("Float") 
+        }
+    "#;
+
+    let error = parse_error(dml);
+
+    error.assert_are(&[
+        DatamodelError::new_validation_error(
+            "The type `Unsupported(\"Text\")` you specified in the type definition for the field `text` is a supported as a native type by Prisma. Please use the native type notation `Decimal @pg.Decimal(10,2)` for full support.",
+            ast::Span::new(172, 191),
+        ),
+        DatamodelError::new_validation_error(
+            "The type `Unsupported(\"Float\")` you specified in the type definition for the field `decimal` is a supported as a native type by Prisma. Please use the native type notation `Decimal @pg.Decimal(10,2)` for full support.",
+            ast::Span::new(217, 237),
+        )
+    ]);
+}
+
+#[test]
+fn should_fail_on_native_type_in_unsupported_sqlserver() {
+    let dml = r#"
+        datasource pg {
+          provider = "sqlserver"
+          url = "sqlserver://"
+        }
+
+        model Blog {
+            id          Int    @id
+            text        Unsupported("Text") 
+            decimal     Unsupported("Real") 
+        }
+    "#;
+
+    let error = parse_error(dml);
+
+    error.assert_are(&[
+        DatamodelError::new_validation_error(
+            "The type `Unsupported(\"Text\")` you specified in the type definition for the field `text` is a supported as a native type by Prisma. Please use the native type notation `Decimal @pg.Decimal(10,2)` for full support.",
+            ast::Span::new(180, 199),
+        ),
+        DatamodelError::new_validation_error(
+            "The type `Unsupported(\"Real\")` you specified in the type definition for the field `decimal` is a supported as a native type by Prisma. Please use the native type notation `Decimal @pg.Decimal(10,2)` for full support.",
+            ast::Span::new(225, 244),
+        )
+    ]);
 }

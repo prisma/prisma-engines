@@ -28,6 +28,9 @@ pub trait Connector: Send + Sync {
     /// Powers the auto completion of the vs code plugin.
     fn available_native_type_constructors(&self) -> &[NativeTypeConstructor];
 
+    /// Returns the Scalar Type for the given native type
+    fn scalar_type_for_native_type(&self, native_type: serde_json::Value) -> ScalarType;
+
     /// On each connector, each built-in Prisma scalar type (`Boolean`,
     /// `String`, `Float`, etc.) has a corresponding native type.
     fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> serde_json::Value;
