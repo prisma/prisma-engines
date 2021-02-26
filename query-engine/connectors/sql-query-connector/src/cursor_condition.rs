@@ -239,6 +239,7 @@ fn map_orderby_condition(order_definition: &OrderDefinition, reverse: bool, incl
         order_expr
     };
 
+    // Add OR statements for the foreign key fields too if they are nullable
     let order_expr = if let Some(fks) = &order_definition.fks {
         fks.iter()
             .filter(|(fk, _)| !fk.is_required)
