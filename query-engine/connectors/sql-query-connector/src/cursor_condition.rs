@@ -83,9 +83,10 @@ pub fn build(query_arguments: &QueryArguments, model: &ModelRef) -> (Option<Tabl
             // Subquery to find the value of the order field(s) that we need for comparison. Builds part #1 of the query example in the docs.
             let order_subquery = order_definitions
                 .iter()
-                .fold(Select::from_table(model.as_table()), |select, (_, _, column, _)| {
-                    select.column(column.to_owned())
-                })
+                .fold(
+                    Select::from_table(model.as_table()),
+                    |select, ((_, alias), _, column, _)| select.column(column.to_owned().alias(alias.to_owned())),
+                )
                 .so_that(cursor_condition);
 
             let order_subquery = joins.into_iter().fold(order_subquery, |acc, join| acc.left_join(join));
@@ -98,7 +99,6 @@ pub fn build(query_arguments: &QueryArguments, model: &ModelRef) -> (Option<Tabl
             // If we only have one ordering, we only want a single, slightly different, condition of (orderField [<= / >=] cmp_field).
             let condition_tree = if len == 1 {
                 let (field, order, order_column, fks) = order_definitions.pop().unwrap();
-                dbg!(&field);
                 ConditionTree::Single(Box::new(map_orderby_condition(
                     &field,
                     &order,
@@ -178,14 +178,15 @@ pub fn build(query_arguments: &QueryArguments, model: &ModelRef) -> (Option<Tabl
 // A negative `take` value signifies that values should be taken before the cursor,
 // requiring the correct comparison operator to be used to fit the reversed order.
 fn map_orderby_condition(
-    field: &ScalarFieldRef,
+    field: &(ScalarFieldRef, String),
     order: &SortOrder,
     order_column: Column<'static>,
     maybe_fks: &Option<Vec<(ScalarFieldRef, Option<String>)>>,
     reverse: bool,
     include_eq: bool,
 ) -> Expression<'static> {
-    let cmp_column = Column::from((ORDER_TABLE_ALIAS, field.db_name().to_owned()));
+    let (field, field_alias) = field;
+    let cmp_column = Column::from((ORDER_TABLE_ALIAS, field_alias.to_owned()));
     let cloned_order_column = order_column.clone();
 
     let order_expr: Expression<'static> = match order {
@@ -256,8 +257,9 @@ fn map_orderby_condition(
     order_expr
 }
 
-fn map_equality_condition(field: &ScalarFieldRef, order_column: Column<'static>) -> Expression<'static> {
-    let cmp_column = Column::from((ORDER_TABLE_ALIAS, field.db_name().to_owned()));
+fn map_equality_condition(field: &(ScalarFieldRef, String), order_column: Column<'static>) -> Expression<'static> {
+    let (field, field_alias) = field;
+    let cmp_column = Column::from((ORDER_TABLE_ALIAS, field_alias.to_owned()));
 
     // If we have null values in the ordering or comparison row, those are automatically included because we can't make a
     // statement over their order relative to the cursor.
@@ -278,7 +280,7 @@ fn order_definitions(
     model: &ModelRef,
 ) -> (
     Vec<(
-        ScalarFieldRef,
+        (ScalarFieldRef, String),
         SortOrder,
         Column<'static>,
         Option<Vec<(ScalarFieldRef, Option<String>)>>,
@@ -316,7 +318,12 @@ fn order_definitions(
                 .collect()
         });
 
-        orderings.push((order_by.field.clone(), order_by.sort_order, order_by_column, fks))
+        let field_with_alias = (
+            order_by.field.clone(),
+            format!("{}_{}_{}", order_by.field.model().name, order_by.field.name, index).to_owned(),
+        );
+
+        orderings.push((field_with_alias, order_by.sort_order, order_by_column, fks))
     }
 
     if orderings.is_empty() {
@@ -324,7 +331,10 @@ fn order_definitions(
             model
                 .primary_identifier()
                 .scalar_fields()
-                .map(|f| (f.clone(), SortOrder::Ascending, f.as_column(), None))
+                .map(|f| {
+                    let field_with_alias = (f.clone(), f.db_name().to_owned());
+                    (field_with_alias, SortOrder::Ascending, f.as_column(), None)
+                })
                 .collect(),
             joins,
         );
