@@ -329,6 +329,10 @@ impl<'a> fmt::Debug for ForeignKeyWalker<'a> {
         f.debug_struct("ForeignKeyWalker")
             .field("foreign_key_index", &self.foreign_key_index)
             .field("table_index", &self.table_index)
+            .field("__table_name", &self.table().name())
+            .field("__referenced_table", &self.foreign_key().referenced_table)
+            .field("__constrained_columns", &self.foreign_key().columns)
+            .field("__referenced_columns", &self.foreign_key().referenced_columns)
             .finish()
     }
 }
@@ -394,7 +398,8 @@ impl<'schema> ForeignKeyWalker<'schema> {
             table_index: self
                 .schema
                 .table_walker(&self.foreign_key().referenced_table)
-                .expect("foreign key references unknown table")
+                .ok_or_else(|| format!("Foreign key references unknown table. {:?}", self))
+                .unwrap()
                 .table_index,
         }
     }
