@@ -229,14 +229,13 @@ pub fn postgres_13_url(db_name: &str) -> String {
 
 pub fn mysql_5_7_url(db_name: &str) -> String {
     url_from_env("MYSQL_5_7_TEST_URL", TestDb::Database(db_name)).unwrap_or_else(|| {
-        let db_name = mysql_safe_identifier(db_name);
+        let _db_name = mysql_safe_identifier(db_name);
         let (host, port) = db_host_and_port_mysql_5_7();
 
         format!(
-            "mysql://root:prisma@{host}:{port}/{db_name}?connect_timeout=20&socket_timeout=60",
+            "mysql://{host}:{port}/test?connect_timeout=20&socket_timeout=60",
             host = host,
             port = port,
-            db_name = db_name,
         )
     })
 }
@@ -498,7 +497,7 @@ pub fn db_host_and_port_mysql_5_7() -> (Cow<'static, str>, usize) {
 
     match std::env::var("IS_BUILDKITE") {
         Ok(_) => ("test-db-mysql-5-7".into(), 3306),
-        Err(_) => ("127.0.0.1".into(), 3306),
+        Err(_) => ("127.0.0.1".into(), 15306),
     }
 }
 
@@ -581,38 +580,6 @@ fn fetch_db_name<'a>(url: &'a Url, default: &'static str) -> &'a str {
 }
 
 pub async fn create_mysql_database(original_url: &Url) -> Result<Quaint, AnyError> {
-    let mut mysql_db_url = original_url.clone();
-    mysql_db_url.set_path("/mysql");
-
-    let db_name = fetch_db_name(&original_url, "mysql");
-
-    debug_assert!(!db_name.is_empty());
-    debug_assert!(
-        db_name.len() < 64,
-        "db_name should be less than 64 characters, got {:?}",
-        db_name.len()
-    );
-
-    let conn = Quaint::new(&mysql_db_url.to_string()).await?;
-
-    let drop = format!(
-        r#"
-        DROP DATABASE IF EXISTS `{db_name}`;
-        "#,
-        db_name = db_name,
-    );
-
-    let recreate = format!(
-        r#"
-        CREATE DATABASE `{db_name}`;
-        "#,
-        db_name = db_name,
-    );
-
-    // The two commands have to be run separately on mariadb.
-    conn.raw_cmd(&drop).await?;
-    conn.raw_cmd(&recreate).await?;
-
     Ok(Quaint::new(&original_url.to_string()).await?)
 }
 

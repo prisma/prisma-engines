@@ -7,7 +7,6 @@ import util._
 import scala.concurrent.Future
 
 class VeryManyMutationsSpec extends FlatSpec with Matchers with ApiSpecBase with AwaitUtils {
-
   override def runOnlyForCapabilities = Set(JoinRelationLinksCapability)
 
   //Postgres has a limit of 32678 parameters to a query
@@ -29,8 +28,7 @@ class VeryManyMutationsSpec extends FlatSpec with Matchers with ApiSpecBase with
   """
   }
 
-  override protected def beforeAll(): Unit = {
-    super.beforeAll()
+  override protected def beforeEach(): Unit = {
     database.setup(project)
 
     def createTop(int: Int): Unit = {
@@ -94,7 +92,7 @@ class VeryManyMutationsSpec extends FlatSpec with Matchers with ApiSpecBase with
     server.query("""query {tops { middles { int } }}""", project)
   }
 
-  "Expanding relations for 32768 records" should "work" in {
+  "Expanding relations for 32768 records" should "work"  in {
     // The Postgres communication protocol uses a signed 16 bit integer to identify the number of query parameters.
     // so you can't execute a query that contains more than 32.768 of them.
     // source: https://github.com/sfackler/rust-postgres/issues/356#issuecomment-391415848

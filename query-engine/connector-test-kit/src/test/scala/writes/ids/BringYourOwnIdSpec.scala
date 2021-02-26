@@ -6,7 +6,7 @@ import util._
 
 class BringYourOwnIdSpec extends FlatSpec with Matchers with ApiSpecBase with SchemaBaseV11 {
 
-  override def runOnlyForConnectors: Set[ConnectorTag] = Set(MySqlConnectorTag, PostgresConnectorTag, SQLiteConnectorTag)
+  override def runOnlyForConnectors: Set[ConnectorTag] = Set(VitessConnectorTag, MySqlConnectorTag, PostgresConnectorTag, SQLiteConnectorTag)
 
   "A Create Mutation" should "create and return item with own Id" in {
     schemaP1optToC1opt.test { dataModel =>
@@ -24,6 +24,7 @@ class BringYourOwnIdSpec extends FlatSpec with Matchers with ApiSpecBase with Sc
 
       val errorTarget = () match {
         case _ if connectorTag == ConnectorTag.MySqlConnectorTag => "constraint: `PRIMARY`"
+        case _ if connectorTag == ConnectorTag.VitessConnectorTag => "(not available)"
         case _                                                   => "fields: (`id`)"
       }
 
@@ -102,6 +103,7 @@ class BringYourOwnIdSpec extends FlatSpec with Matchers with ApiSpecBase with Sc
 
       val constraintTarget = () match {
         case _ if connectorTag == ConnectorTag.MySqlConnectorTag => "constraint: `PRIMARY`"
+        case _ if connectorTag == ConnectorTag.VitessConnectorTag => "(not available)"
         case _                                                   => "fields: (`id`)"
       }
 

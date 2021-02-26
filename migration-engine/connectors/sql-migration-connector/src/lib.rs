@@ -73,12 +73,9 @@ impl SqlMigrationConnector {
 
     /// Set up the database for connector-test-kit, without initializing the connector.
     pub async fn qe_setup(database_str: &str) -> ConnectorResult<()> {
-        let connection_info =
-            ConnectionInfo::from_url(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
-
-        let flavour = flavour::from_connection_info(&connection_info, BitFlags::empty());
-
-        flavour.qe_setup(database_str).await
+        let this = Self::new(database_str, BitFlags::empty(), None).await?;
+        this.reset().await?;
+        Ok(())
     }
 
     fn conn(&self) -> &Connection {

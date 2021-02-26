@@ -10,7 +10,7 @@ use pretty_assertions::assert_eq;
 use quaint::prelude::Queryable;
 use user_facing_errors::{migration_engine::ShadowDbCreationError, UserFacingError};
 
-#[test_each_connector]
+#[test_each_connector(log = "trace")]
 async fn diagnose_migrations_history_on_an_empty_database_without_migration_returns_nothing(
     api: &TestApi,
 ) -> TestResult {
@@ -197,8 +197,12 @@ async fn diagnose_migration_history_calculates_drift_in_presence_of_failed_migra
             migration.push_str("\nSELECT YOLO;");
         })?;
 
-    let err = api.apply_migrations(&directory).send().await.unwrap_err().to_string();
-    assert!(err.contains("yolo") || err.contains("YOLO"), "{}", err);
+    let err = dbg!(api.apply_migrations(&directory).send().await.unwrap_err().to_string());
+    assert!(
+        err.contains("yolo") || err.contains("YOLO") || err.contains("(not available)"),
+        "{}",
+        err
+    );
 
     migration_two.modify_migration(|migration| migration.truncate(migration.len() - "SELECT YOLO;".len()))?;
 

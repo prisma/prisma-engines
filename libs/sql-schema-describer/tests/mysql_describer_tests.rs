@@ -917,7 +917,7 @@ async fn mysql_introspected_default_strings_should_be_unescaped() {
     assert_eq!(actual_default, &expected_default);
 }
 
-#[test_each_connector(tags("mysql"))]
+#[test_each_connector(tags("mysql_5_7"))]
 async fn escaped_quotes_in_string_defaults_must_be_unescaped(api: &TestApi) -> TestResult {
     let create_table = format!(
         r#"

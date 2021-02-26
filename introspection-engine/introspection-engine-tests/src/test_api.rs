@@ -4,11 +4,13 @@ use enumflags2::BitFlags;
 use eyre::{Context, Report, Result};
 use introspection_connector::{DatabaseMetadata, IntrospectionConnector, Version};
 use introspection_core::rpc::RpcImpl;
+use migration_connector::MigrationConnector;
 use quaint::{
     prelude::{ConnectionInfo, SqlFamily},
     single::Quaint,
 };
 use sql_introspection_connector::SqlIntrospectionConnector;
+use sql_migration_connector::SqlMigrationConnector;
 use sql_schema_describer::{mssql, mysql, postgres, sqlite, SqlSchema, SqlSchemaDescriberBackend};
 use test_setup::{connectors::Tags, *};
 use tracing::Instrument;
@@ -32,6 +34,12 @@ impl TestApi {
         };
 
         let connection_string = (args.url_fn)(db_name);
+
+        let me = SqlMigrationConnector::new(&connection_string, BitFlags::empty(), None)
+            .await
+            .unwrap();
+
+        me.reset().await.unwrap();
 
         let database = if tags.contains(Tags::Mysql) {
             create_mysql_database(&connection_string.parse().unwrap())
@@ -178,7 +186,7 @@ impl TestApi {
 
     pub fn barrel(&self) -> BarrelMigrationExecutor {
         BarrelMigrationExecutor {
-            schema_name: self.schema_name().to_owned(),
+            schema_name: format!("vt_{}", self.schema_name()),
             database: self.database.clone(),
             sql_variant: match self.sql_family() {
                 SqlFamily::Mysql => barrel::SqlVariant::Mysql,

@@ -36,7 +36,7 @@ impl MongoError {
 
             err @ MongoError::MalformedObjectId(_) => ConnectorError::from_kind(ErrorKind::ConversionError(err.into())),
 
-            MongoError::DriverError(err) => match err.kind.as_ref() {
+            MongoError::DriverError(err) => match err.kind {
                 mongodb::error::ErrorKind::AddrParse(_) => todo!(),
                 mongodb::error::ErrorKind::ArgumentError { .. } => todo!(),
                 mongodb::error::ErrorKind::AuthenticationError { message, .. } => {
@@ -114,7 +114,6 @@ impl MongoError {
                 mongodb::error::ErrorKind::ResponseError { .. } => todo!(),
                 mongodb::error::ErrorKind::ServerSelectionError { .. } => todo!(),
                 mongodb::error::ErrorKind::SrvLookupError { .. } => todo!(),
-                mongodb::error::ErrorKind::TokioTimeoutElapsed(_) => todo!(),
                 mongodb::error::ErrorKind::RustlsConfig(_) => todo!(),
                 mongodb::error::ErrorKind::TxtLookupError { .. } => todo!(),
                 mongodb::error::ErrorKind::WaitQueueTimeoutError { .. } => todo!(),

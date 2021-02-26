@@ -42,11 +42,11 @@ impl BarrelMigrationExecutor {
         Ok(())
     }
 
-    pub async fn execute_with_schema<F>(&self, migration_fn: F, schema_name: &str) -> Result<()>
+    pub async fn execute_with_schema<F>(&self, migration_fn: F, _: &str) -> Result<()>
     where
         F: FnOnce(&mut Migration),
     {
-        let mut migration = Migration::new().schema(schema_name);
+        let mut migration = Migration::new();
         migration_fn(&mut migration);
 
         let full_sql = migration.make_from(self.sql_variant);

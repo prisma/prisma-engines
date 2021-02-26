@@ -20,7 +20,7 @@ pub struct TestApi {
 impl TestApi {
     /// Initializer, called by the test macros.
     pub fn new(args: TestApiArgs) -> Self {
-        let connection_string = (args.url_fn)(args.test_function_name);
+        let connection_string = String::from("mysql://127.0.0.1:15306/test");
 
         TestApi {
             args,
@@ -90,10 +90,6 @@ impl TestApi {
     pub async fn initialize(&self) -> anyhow::Result<Quaint> {
         if self.args.connector_tags.contains(Tags::Postgres) {
             Ok(test_setup::create_postgres_database(&self.connection_string.parse()?)
-                .await
-                .unwrap())
-        } else if self.args.connector_tags.contains(Tags::Mysql) {
-            Ok(test_setup::create_mysql_database(&self.connection_string.parse()?)
                 .await
                 .unwrap())
         } else if self.args.connector_tags.contains(Tags::Mssql) {

@@ -117,7 +117,7 @@ services:
       MYSQL_ROOT_PASSWORD: prisma
       MYSQL_DATABASE: prisma
     ports:
-      - "3307:3306"
+      - "3309:3306"
     networks:
       - databases
     tmpfs: /var/lib/mysql8

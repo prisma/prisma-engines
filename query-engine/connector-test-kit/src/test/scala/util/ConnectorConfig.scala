@@ -1,8 +1,9 @@
 package util
 
+import shapeless.syntax.std.tuple.productTupleOps
+
 import java.nio.charset.Charset
 import java.nio.file.{Files, Paths}
-
 import scala.util.Try
 
 case class ConnectorConfig(
@@ -18,6 +19,7 @@ case class ConnectorConfig(
       case "mysql56"    => ConnectorCapabilities.mysql
       case "sqlserver"  => ConnectorCapabilities.mssql
       case "mongodb"    => ConnectorCapabilities.mongo
+      case "vitess"     => ConnectorCapabilities.vitess
     }
   }
 }
@@ -53,12 +55,10 @@ object ConnectorConfig {
         ConnectorConfig("postgresql",
                         s"postgresql://postgres:prisma@$pgbouncer_host:$pgbouncer_port/db?schema=$$DB&connection_limit=1&pgbouncer=true",
                         "pgbouncer")
-
-      case "mysql"   => ConnectorConfig("mysql", s"mysql://root:prisma@$mysql_5_7_Host:3306/$$DB?connection_limit=1", "mysql")
-      case "mysql8"  => ConnectorConfig("mysql", s"mysql://root:prisma@$mysql_8_0_Host:$mysql_8_0_Port/$$DB?connection_limit=1", "mysql8")
-      case "mysql56" => ConnectorConfig("mysql56", s"mysql://root:prisma@$mysql_5_6_Host:$mysql_5_6_Port/$$DB?connection_limit=1", "mysql56")
-      case "mariadb" => ConnectorConfig("mysql", s"mysql://root:prisma@$mariadb_Host:$mariadb_Port/$$DB?connection_limit=1", "mariadb")
-
+      case "mysql"   => ConnectorConfig("mysql", s"mysql://root:prisma@$mysql_5_7_Host:3306/$$DB?connection_limit=1", false, "mysql")
+      case "mysql8"   => ConnectorConfig("mysql", s"mysql://root:prisma@$mysql_8_0_Host:$mysql_8_0_Port/$$DB?connection_limit=1", false, "mysql")
+      case "mysql56" => ConnectorConfig("mysql56", s"mysql://root:prisma@$mysql_5_6_Host:$mysql_5_6_Port/$$DB?connection_limit=1", false, "mysql56")
+      case "mariadb" => ConnectorConfig("mysql", s"mysql://root:prisma@$mariadb_Host:$mariadb_Port/$$DB?connection_limit=1", false, "mariadb")
       case "mssql2017" =>
         ConnectorConfig(
           "sqlserver",
@@ -72,9 +72,17 @@ object ConnectorConfig {
           s"sqlserver://$mssql_2019_Host:$mssql_2019_Port;database=master;schema=$$DB;user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel=READ UNCOMMITTED",
           "mssql2019"
         )
-
-      case "mongodb" => ConnectorConfig("mongodb", s"mongodb://prisma:prisma@$mongo_host:$mongo_port/$$DB?authSource=admin", "mongodb")
+      case "mongodb" => ConnectorConfig("mongodb", s"mongodb://prisma:prisma@$mongo_host:$mongo_port/$$DB?authSource=admin", false, "mongodb")
+      case "vitess" => ConnectorConfig("vitess", s"mysql://$vitess_Host:15306/test?connection_limit=1", false, "vitess")
       case x         => sys.error(s"Connector $x is not supported yet.")
+    }
+  }
+
+  lazy val vitess_Host = {
+    if (EnvVars.isBuildkite) {
+      "vtgate"
+    } else {
+      "127.0.0.1"
     }
   }
 

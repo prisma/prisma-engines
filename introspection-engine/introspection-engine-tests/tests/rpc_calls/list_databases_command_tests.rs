@@ -4,10 +4,10 @@ use test_macros::test_each_connector;
 
 #[test_each_connector(tags("mysql"))]
 async fn databases_for_mysql_should_work(api: &TestApi) -> crate::TestResult {
-    setup(&api.barrel(), api.db_name()).await?;
+    setup(&api.barrel(), "test").await?;
 
     let result = api.list_databases().await?;
-    assert!(result.contains(&api.db_name().to_string()));
+    assert!(result.contains(&"vt_test".to_string()));
 
     Ok(())
 }

@@ -118,7 +118,7 @@ case class TestServer() extends PlayJsonExtensions with LogSupport {
       request: JsValue,
       encodedDataModel: String, // Base64 encoded full data model string
       legacy: Boolean = true,
-      batchSize: Int = 5000,
+      batchSize: Int = 500,
       log_requests: Boolean = false,
       env_overrides: Map[String, String] = Map() // Overrides existing env keys, else additive.
   ): (JsValue, Vector[String]) = {

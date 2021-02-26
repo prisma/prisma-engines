@@ -2585,7 +2585,7 @@ async fn a_model_can_be_removed(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_each_connector(log = "trace")]
 async fn a_default_can_be_dropped(api: &TestApi) -> TestResult {
     let directory = api.create_migrations_directory()?;
 

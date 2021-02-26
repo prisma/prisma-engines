@@ -474,7 +474,7 @@ async fn pg_default_value_as_dbgenerated(api: &TestApi) -> crate::TestResult {
 //todo maybe need to split due to
 // no function default values on mysql 5.7 and 8.0 -.-
 // maria db allows this
-#[test_each_connector(tags("mysql"))]
+#[test_each_connector(tags("mysql"), log = "trace", ignore("mysql_5_7"))]
 async fn my_default_value_as_dbgenerated(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
