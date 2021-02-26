@@ -5,6 +5,22 @@ use quaint::ast::*;
 
 static ORDER_TABLE_ALIAS: &str = "order_cmp";
 
+type AliasedScalar = (ScalarFieldRef, String);
+type MaybeAliasedScalar = (ScalarFieldRef, Option<String>);
+#[derive(Debug)]
+struct OrderDefinition {
+    pub(crate) field_aliased: AliasedScalar,
+    pub(crate) sort_order: SortOrder,
+    pub(crate) order_column: Column<'static>,
+    pub(crate) fks: Option<Vec<MaybeAliasedScalar>>,
+}
+
+#[derive(Debug)]
+struct OrderDefinitions {
+    pub(crate) definitions: Vec<OrderDefinition>,
+    pub(crate) joins: Vec<JoinData<'static>>,
+}
+
 /// Builds a cursor query condition based on the cursor arguments and if necessary a table that the condition depends on.
 ///
 /// An example query for 4 order-by fields is:
@@ -78,42 +94,42 @@ pub fn build(query_arguments: &QueryArguments, model: &ModelRef) -> (Option<Tabl
             let cursor_condition = cursor_row.clone().equals(cursor_values.clone());
 
             // Orderings for this query. Influences which fields we need to fetch for comparing order fields.
-            let (mut order_definitions, joins) = order_definitions(query_arguments, model);
+            let OrderDefinitions { mut definitions, joins } = order_definitions(query_arguments, model);
 
             // Subquery to find the value of the order field(s) that we need for comparison. Builds part #1 of the query example in the docs.
-            let order_subquery = order_definitions
+            let order_subquery = definitions
                 .iter()
-                .fold(
-                    Select::from_table(model.as_table()),
-                    |select, ((_, alias), _, column, _)| select.column(column.to_owned().alias(alias.to_owned())),
-                )
+                .fold(Select::from_table(model.as_table()), |select, definition| {
+                    select.column(
+                        definition
+                            .order_column
+                            .to_owned()
+                            .alias(definition.field_aliased.1.to_owned()),
+                    )
+                })
                 .so_that(cursor_condition);
 
             let order_subquery = joins.into_iter().fold(order_subquery, |acc, join| acc.left_join(join));
 
             let subquery_table = Table::from(order_subquery).alias(ORDER_TABLE_ALIAS);
-            let len = order_definitions.len();
+            let len = definitions.len();
             let reverse = query_arguments.needs_reversed_order();
 
             // Builds part #2 of the example query.
             // If we only have one ordering, we only want a single, slightly different, condition of (orderField [<= / >=] cmp_field).
             let condition_tree = if len == 1 {
-                let (field, order, order_column, fks) = order_definitions.pop().unwrap();
-                ConditionTree::Single(Box::new(map_orderby_condition(
-                    &field,
-                    &order,
-                    order_column,
-                    &fks,
-                    reverse,
-                    true,
-                )))
+                let order_definition = definitions.pop().unwrap();
+                ConditionTree::Single(Box::new(map_orderby_condition(&order_definition, reverse, true)))
             } else {
                 let or_conditions = (0..len).fold(Vec::with_capacity(len), |mut conditions_acc, n| {
-                    let (head, tail) = order_definitions.split_at(len - n - 1);
+                    let (head, tail) = definitions.split_at(len - n - 1);
                     let mut and_conditions = Vec::with_capacity(head.len() + 1);
 
-                    for (field, _, order_column, _) in head {
-                        and_conditions.push(map_equality_condition(field, order_column.to_owned()));
+                    for order_definition in head {
+                        and_conditions.push(map_equality_condition(
+                            &order_definition.field_aliased,
+                            order_definition.order_column.to_owned(),
+                        ));
                     }
 
                     if head.len() == len - 1 {
@@ -141,26 +157,12 @@ pub fn build(query_arguments: &QueryArguments, model: &ModelRef) -> (Option<Tabl
                         //
                         // Said differently, we handle all the cases in which the prefixes are equal to len - 1 to account for possible identical comparators,
                         // but everything else must come strictly "after" the cursor.
-                        let (field, order, order_column, fks) = tail.first().unwrap();
+                        let order_definition = tail.first().unwrap();
 
-                        and_conditions.push(map_orderby_condition(
-                            field,
-                            order,
-                            order_column.to_owned(),
-                            fks,
-                            reverse,
-                            true,
-                        ));
+                        and_conditions.push(map_orderby_condition(order_definition, reverse, true));
                     } else {
-                        let (field, order, order_column, fks) = tail.first().unwrap();
-                        and_conditions.push(map_orderby_condition(
-                            field,
-                            order,
-                            order_column.to_owned(),
-                            fks,
-                            reverse,
-                            false,
-                        ));
+                        let order_definition = tail.first().unwrap();
+                        and_conditions.push(map_orderby_condition(order_definition, reverse, false));
                     }
 
                     conditions_acc.push(ConditionTree::And(and_conditions));
@@ -177,19 +179,14 @@ pub fn build(query_arguments: &QueryArguments, model: &ModelRef) -> (Option<Tabl
 
 // A negative `take` value signifies that values should be taken before the cursor,
 // requiring the correct comparison operator to be used to fit the reversed order.
-fn map_orderby_condition(
-    field: &(ScalarFieldRef, String),
-    order: &SortOrder,
-    order_column: Column<'static>,
-    maybe_fks: &Option<Vec<(ScalarFieldRef, Option<String>)>>,
-    reverse: bool,
-    include_eq: bool,
-) -> Expression<'static> {
-    let (field, field_alias) = field;
+fn map_orderby_condition(order_definition: &OrderDefinition, reverse: bool, include_eq: bool) -> Expression<'static> {
+    let (field, field_alias) = &order_definition.field_aliased;
     let cmp_column = Column::from((ORDER_TABLE_ALIAS, field_alias.to_owned()));
+    // TODO: can we not clone..?
+    let order_column = order_definition.order_column.clone();
     let cloned_order_column = order_column.clone();
 
-    let order_expr: Expression<'static> = match order {
+    let order_expr: Expression<'static> = match order_definition.sort_order {
         // If it's ASC but we want to take from the back, the ORDER BY will be DESC, meaning that comparisons done need to be lt(e).
         SortOrder::Ascending if reverse => {
             if include_eq {
@@ -237,7 +234,7 @@ fn map_orderby_condition(
         order_expr
     };
 
-    let order_expr = if let Some(fks) = maybe_fks {
+    let order_expr = if let Some(fks) = &order_definition.fks {
         fks.iter()
             .filter(|(fk, _)| !fk.is_required)
             .fold(order_expr, |acc, (fk, alias)| {
@@ -257,7 +254,7 @@ fn map_orderby_condition(
     order_expr
 }
 
-fn map_equality_condition(field: &(ScalarFieldRef, String), order_column: Column<'static>) -> Expression<'static> {
+fn map_equality_condition(field: &AliasedScalar, order_column: Column<'static>) -> Expression<'static> {
     let (field, field_alias) = field;
     let cmp_column = Column::from((ORDER_TABLE_ALIAS, field_alias.to_owned()));
 
@@ -275,23 +272,12 @@ fn map_equality_condition(field: &(ScalarFieldRef, String), order_column: Column
     }
 }
 
-fn order_definitions(
-    query_arguments: &QueryArguments,
-    model: &ModelRef,
-) -> (
-    Vec<(
-        (ScalarFieldRef, String),
-        SortOrder,
-        Column<'static>,
-        Option<Vec<(ScalarFieldRef, Option<String>)>>,
-    )>,
-    Vec<JoinData<'static>>,
-) {
+fn order_definitions(query_arguments: &QueryArguments, model: &ModelRef) -> OrderDefinitions {
     let mut joins = vec![];
-    let mut orderings = vec![];
+    let mut orderings: Vec<OrderDefinition> = vec![];
 
     for (index, order_by) in query_arguments.order_by.iter().enumerate() {
-        let (mut computed_joins, join_aliases, order_by_column) = ordering::compute_joins(order_by, index, model);
+        let (mut computed_joins, join_aliases, order_column) = ordering::compute_joins(order_by, index, model);
 
         joins.append(&mut computed_joins);
 
@@ -318,27 +304,40 @@ fn order_definitions(
                 .collect()
         });
 
-        let field_with_alias = (
+        let field_aliased = (
             order_by.field.clone(),
             format!("{}_{}_{}", order_by.field.model().name, order_by.field.name, index).to_owned(),
         );
 
-        orderings.push((field_with_alias, order_by.sort_order, order_by_column, fks))
+        orderings.push(OrderDefinition {
+            field_aliased,
+            sort_order: order_by.sort_order,
+            order_column,
+            fks,
+        });
     }
 
     if orderings.is_empty() {
-        return (
-            model
-                .primary_identifier()
-                .scalar_fields()
-                .map(|f| {
-                    let field_with_alias = (f.clone(), f.db_name().to_owned());
-                    (field_with_alias, SortOrder::Ascending, f.as_column(), None)
-                })
-                .collect(),
-            joins,
-        );
+        let definitions = model
+            .primary_identifier()
+            .scalar_fields()
+            .map(|f| {
+                let field_aliased = (f.clone(), f.db_name().to_owned());
+
+                OrderDefinition {
+                    field_aliased,
+                    sort_order: SortOrder::Ascending,
+                    order_column: f.as_column(),
+                    fks: None,
+                }
+            })
+            .collect();
+
+        return OrderDefinitions { definitions, joins };
     }
 
-    (orderings, joins)
+    OrderDefinitions {
+        definitions: orderings,
+        joins,
+    }
 }
