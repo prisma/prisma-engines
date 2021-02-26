@@ -5,7 +5,7 @@ use mongodb::{
     bson::{doc, Document},
     error::ErrorKind,
     options::{FindOptions, InsertManyOptions},
-    Database,
+    Collection, Database,
 };
 use prisma_models::{ModelRef, PrismaValue, RecordProjection};
 use std::convert::TryInto;
@@ -90,7 +90,7 @@ pub async fn create_records(
 
     match coll.insert_many(docs, options).await {
         Ok(insert_result) => Ok(insert_result.inserted_ids.len()),
-        Err(err) if skip_duplicates => match err.kind.as_ref() {
+        Err(err) if skip_duplicates => match err.kind {
             ErrorKind::BulkWriteError(ref failure) => match failure.write_errors {
                 Some(ref errs) if !errs.iter().any(|err| err.code != 11000) => Ok(num_records - errs.len()),
                 _ => Err(err.into()),
@@ -181,7 +181,7 @@ pub async fn delete_records(
     model: &ModelRef,
     record_filter: RecordFilter,
 ) -> crate::Result<usize> {
-    let coll = database.collection(model.db_name());
+    let coll: Collection<Document> = database.collection(model.db_name());
 
     let filter = if let Some(selectors) = record_filter.selectors {
         let id_field = model.primary_identifier().scalar_fields().next().unwrap();
@@ -211,8 +211,8 @@ pub async fn m2m_connect(
     let parent_model = field.model();
     let child_model = field.related_model();
 
-    let parent_coll = database.collection(parent_model.db_name());
-    let child_coll = database.collection(child_model.db_name());
+    let parent_coll: Collection<Document> = database.collection(parent_model.db_name());
+    let child_coll: Collection<Document> = database.collection(child_model.db_name());
 
     let parent_id = parent_id.values().next().unwrap();
     let parent_id_field = parent_model.primary_identifier().scalar_fields().next().unwrap();
@@ -251,8 +251,8 @@ pub async fn m2m_disconnect(
     let parent_model = field.model();
     let child_model = field.related_model();
 
-    let parent_coll = database.collection(parent_model.db_name());
-    let child_coll = database.collection(child_model.db_name());
+    let parent_coll: Collection<Document> = database.collection(parent_model.db_name());
+    let child_coll: Collection<Document> = database.collection(child_model.db_name());
 
     let parent_id = parent_id.values().next().unwrap();
     let parent_id_field = parent_model.primary_identifier().scalar_fields().next().unwrap();

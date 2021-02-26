@@ -2,7 +2,7 @@ use migration_core::commands::{ApplyMigrationsInput, CreateMigrationInput};
 use migration_engine_tests::{multi_engine_test_api::*, TestResult};
 use test_macros::test_connectors;
 
-#[test_connectors]
+#[test_connectors(log = "trace", ignore("mysql_5_7"))]
 async fn advisory_locking_works(api: TestApi) -> TestResult {
     api.initialize().await?;
 

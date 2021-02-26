@@ -106,7 +106,7 @@ impl MongoQueryArgs {
 
     /// Turns the query args into a find operation on the collection.
     /// Depending on the arguments, either an aggregation pipeline or a plain query is build and run.
-    pub(crate) async fn find_documents(mut self, coll: Collection) -> crate::Result<Cursor> {
+    pub(crate) async fn find_documents(mut self, coll: Collection) -> crate::Result<Cursor<Document>> {
         self.finalize()?;
 
         if self.joins.is_empty()
@@ -122,7 +122,7 @@ impl MongoQueryArgs {
 
     /// Simplest form of find-documents query.
     /// Todo: Find out if always using aggregation pipeline is a good idea.
-    async fn execute_find_query(self, coll: Collection) -> crate::Result<Cursor> {
+    async fn execute_find_query(self, coll: Collection) -> crate::Result<Cursor<Document>> {
         let find_options = FindOptions::builder()
             .projection(self.projection)
             .limit(self.limit)
@@ -133,7 +133,7 @@ impl MongoQueryArgs {
         Ok(coll.find(self.query, find_options).await?)
     }
 
-    async fn execute_pipeline_query(self, coll: Collection) -> crate::Result<Cursor> {
+    async fn execute_pipeline_query(self, coll: Collection) -> crate::Result<Cursor<Document>> {
         if self.cursor_data.is_none() {
             self.execute_pipeline_internal(coll).await
         } else {
@@ -142,7 +142,7 @@ impl MongoQueryArgs {
     }
 
     /// Pipeline not requiring a cursor.
-    async fn execute_pipeline_internal(self, coll: Collection) -> crate::Result<Cursor> {
+    async fn execute_pipeline_internal(self, coll: Collection) -> crate::Result<Cursor<Document>> {
         let opts = AggregateOptions::builder().allow_disk_use(true).build();
         let stages = self.into_pipeline_stages();
 
@@ -247,7 +247,7 @@ impl MongoQueryArgs {
     /// actually join anything.
     ///
     /// Todo concrete example
-    async fn execute_cursored_internal(mut self, coll: Collection) -> crate::Result<Cursor> {
+    async fn execute_cursored_internal(mut self, coll: Collection) -> crate::Result<Cursor<Document>> {
         let opts = AggregateOptions::builder().allow_disk_use(true).build();
         let cursor_data = self.cursor_data.take().unwrap();
 

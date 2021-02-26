@@ -12,7 +12,11 @@ class DateTimeSpec extends FlatSpec with Matchers with ApiSpecBase {
        | born DateTime
        |}"""
   }
-  database.setup(project)
+
+  override def beforeEach(): Unit = {
+    database.setup(project)
+  }
+
 
   // FIXME: this panics the rust code. Let's fix that at some point.
   "Using a date before 1970" should "work" taggedAs IgnoreSQLite in {

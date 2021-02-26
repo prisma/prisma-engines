@@ -203,32 +203,12 @@ async fn arity_is_preserved_by_alter_enum(api: &TestApi) -> TestResult {
 #[test_each_connector(tags("mysql"))]
 async fn native_type_columns_can_be_created(api: &TestApi) -> TestResult {
     let types = &[
-        ("int", "Int", "Int", if api.is_mysql_8() { "int" } else { "int(11)" }),
-        (
-            "smallint",
-            "Int",
-            "SmallInt",
-            if api.is_mysql_8() { "smallint" } else { "smallint(6)" },
-        ),
+        ("int", "Int", "Int", "int"),
+        ("smallint", "Int", "SmallInt", "smallint"),
         ("tinyint", "Boolean", "TinyInt", "tinyint(1)"),
-        (
-            "tinyintInt",
-            "Int",
-            "TinyInt",
-            if api.is_mysql_8() { "tinyint" } else { "tinyint(4)" },
-        ),
-        (
-            "mediumint",
-            "Int",
-            "MediumInt",
-            if api.is_mysql_8() { "mediumint" } else { "mediumint(9)" },
-        ),
-        (
-            "bigint",
-            "BigInt",
-            "BigInt",
-            if api.is_mysql_8() { "bigint" } else { "bigint(20)" },
-        ),
+        ("tinyintInt", "Int", "TinyInt", "tinyint"),
+        ("mediumint", "Int", "MediumInt", "mediumint"),
+        ("bigint", "BigInt", "BigInt", "bigint"),
         ("decimal", "Decimal", "Decimal(5, 3)", "decimal(5,3)"),
         ("float", "Float", "Float", "float"),
         ("double", "Float", "Double", "double"),
@@ -255,7 +235,7 @@ async fn native_type_columns_can_be_created(api: &TestApi) -> TestResult {
             "Timestamp(3)",
             "timestamp(3)",
         ),
-        ("year", "Int", "Year", if api.is_mysql_8() { "year" } else { "year(4)" }),
+        ("year", "Int", "Year", "year"),
     ];
 
     let mut dm = r#"

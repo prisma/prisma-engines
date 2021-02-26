@@ -364,13 +364,13 @@ async fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: &
     let json_error = serde_json::to_value(&res).unwrap();
 
     let expected_msg = match api.sql_family() {
-        SqlFamily::Mysql => "Unique constraint failed on the constraint: `name_unique`",
+        SqlFamily::Mysql => "Unique constraint failed on the (not available)",
         SqlFamily::Mssql => "Unique constraint failed on the constraint: `Fruit_name_unique`",
         _ => "Unique constraint failed on the fields: (`name`)",
     };
 
     let expected_target = match api.sql_family() {
-        SqlFamily::Mysql => json!("name_unique"),
+        SqlFamily::Mysql => serde_json::Value::Null,
         SqlFamily::Mssql => json!("Fruit_name_unique"),
         _ => json!(["name"]),
     };

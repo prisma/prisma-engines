@@ -243,7 +243,7 @@ async fn soft_resets_work_on_sql_server(api: TestApi) -> TestResult {
 }
 
 /// MySQL 5.6 doesn't have `DROP USER IF EXISTS`...
-#[test_connectors(tags("mysql"), ignore("mysql_5_6"))]
+#[test_connectors(tags("mysql"), ignore("mysql_5_6", "mysql_5_7"))]
 async fn soft_resets_work_on_mysql(api: TestApi) -> TestResult {
     let migrations_directory = api.create_migrations_directory()?;
     let mut url: url::Url = api.connection_string().parse()?;

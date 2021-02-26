@@ -23,7 +23,7 @@ fn document_to_record(mut doc: Document, fields: &[String]) -> crate::Result<Rec
 }
 
 /// Consumes a cursor stream until exhausted.
-async fn vacuum_cursor(mut cursor: Cursor) -> crate::Result<Vec<Document>> {
+async fn vacuum_cursor(mut cursor: Cursor<Document>) -> crate::Result<Vec<Document>> {
     let mut docs = vec![];
 
     while let Some(result) = cursor.next().await {

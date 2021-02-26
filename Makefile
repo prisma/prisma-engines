@@ -96,6 +96,12 @@ dev-mariadb: start-mysql_mariadb
 	echo 'mariadb' > current_connector
 	cp $(CONFIG_PATH)/mariadb $(CONFIG_FILE)
 
+start-vitess:
+	docker-compose -f vitess/docker-compose.yml up -d --remove-orphans
+
+dev-vitess: start-vitess
+	echo 'vitess' > current_connector
+
 start-mssql_2019:
 	docker-compose -f docker-compose.yml up -d --remove-orphans mssql-2019
 

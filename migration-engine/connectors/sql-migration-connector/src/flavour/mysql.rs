@@ -275,7 +275,12 @@ impl SqlFlavour for MysqlFlavour {
         let db_name = connection.connection_info().dbname().unwrap();
 
         connection.raw_cmd(&format!("DROP DATABASE `{}`", db_name)).await?;
-        connection.raw_cmd(&format!("CREATE DATABASE `{}`", db_name)).await?;
+        connection
+            .raw_cmd(&format!(
+                "CREATE DATABASE `{}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci",
+                db_name
+            ))
+            .await?;
         connection.raw_cmd(&format!("USE `{}`", db_name)).await?;
 
         Ok(())

@@ -26,6 +26,9 @@ tracing = "0.1.10"
 eyre = "0.6.1"
 indoc = "1"
 
+migration-connector = { path = "../../migration-engine/connectors/migration-connector" }
+sql-migration-connector = { path = "../../migration-engine/connectors/sql-migration-connector" }
+
 [dependencies.barrel]
 git = "https://github.com/prisma/barrel.git"
 features = ["sqlite3", "mysql", "pg", "mssql"]

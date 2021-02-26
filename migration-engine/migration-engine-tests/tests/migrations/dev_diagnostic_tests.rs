@@ -123,7 +123,11 @@ async fn dev_diagnostic_calculates_drift_in_presence_of_failed_migrations(api: &
         })?;
 
     let err = api.apply_migrations(&directory).send().await.unwrap_err().to_string();
-    assert!(err.contains("yolo") || err.contains("YOLO"), "{}", err);
+    assert!(
+        err.contains("yolo") || err.contains("YOLO") || err.contains("(not available)"),
+        "{}",
+        err
+    );
 
     let migration_two =
         migration_two.modify_migration(|migration| migration.truncate(migration.len() - "SELECT YOLO;".len()))?;
