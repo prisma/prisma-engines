@@ -9,9 +9,13 @@ type AliasedScalar = (ScalarFieldRef, String);
 type MaybeAliasedScalar = (ScalarFieldRef, Option<String>);
 #[derive(Debug)]
 struct OrderDefinition {
+    // Field on which to perform the ordering
     pub(crate) field_aliased: AliasedScalar,
+    // Direction of the sort
     pub(crate) sort_order: SortOrder,
+    // Final column identifier to be used for the scalar field to order by
     pub(crate) order_column: Column<'static>,
+    // Foreign keys of the relations on which the order is performed
     pub(crate) fks: Option<Vec<MaybeAliasedScalar>>,
 }
 
@@ -182,6 +186,7 @@ pub fn build(query_arguments: &QueryArguments, model: &ModelRef) -> (Option<Tabl
 fn map_orderby_condition(order_definition: &OrderDefinition, reverse: bool, include_eq: bool) -> Expression<'static> {
     let (field, field_alias) = &order_definition.field_aliased;
     let cmp_column = Column::from((ORDER_TABLE_ALIAS, field_alias.to_owned()));
+    let cloned_cmp_column = cmp_column.clone();
     // TODO: can we not clone..?
     let order_column = order_definition.order_column.clone();
     let cloned_order_column = order_column.clone();
@@ -228,7 +233,7 @@ fn map_orderby_condition(order_definition: &OrderDefinition, reverse: bool, incl
     let order_expr = if !field.is_required {
         order_expr
             .or(cloned_order_column.is_null())
-            .or(Column::from((ORDER_TABLE_ALIAS, field.db_name().to_owned())).is_null())
+            .or(cloned_cmp_column.is_null())
             .into()
     } else {
         order_expr
