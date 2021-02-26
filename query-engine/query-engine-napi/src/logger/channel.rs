@@ -4,20 +4,10 @@ use serde_json::{Map, Value};
 use tracing::{metadata::LevelFilter, span::Record, Event, Id, Subscriber};
 use tracing_subscriber::{layer::Context, registry::LookupSpan, Layer};
 
+#[derive(Clone)]
 pub struct EventChannel {
     callback: ThreadsafeFunction<String>,
     level_filter: LevelFilter,
-}
-
-impl Clone for EventChannel {
-    fn clone(&self) -> Self {
-        Self {
-            level_filter: self.level_filter,
-            // we crash if javascript aborts the callback, but continues using
-            // the engine.
-            callback: self.callback.try_clone().unwrap(),
-        }
-    }
 }
 
 impl EventChannel {
