@@ -290,6 +290,9 @@ fn order_definitions(query_arguments: &QueryArguments, model: &ModelRef) -> Orde
         let maybe_last_hop = last_hops.get(0);
         let maybe_before_last_hop = last_hops.get(1);
 
+        // If there are any ordering hop, this finds the foreign key fields for the _last_ hop (we look for the last one because the ordering is done the last one).
+        // These fk fields are needed to check whether they are nullable
+        // cf: part #2 of the SQL query above, when a field is nullable.
         let fks = maybe_last_hop.map(|rf| {
             rf.relation_info
                 .fields
@@ -297,18 +300,40 @@ fn order_definitions(query_arguments: &QueryArguments, model: &ModelRef) -> Orde
                 .map(|fk_name| {
                     let fk_field = rf.model().fields().find_from_scalar(fk_name).unwrap();
 
+                    // If there are _more than one_ hop, we need to refer to the fk fields using the
+                    // join alias of the hop _before_ the last hop. eg:
+                    //
+                    // ```sql
+                    // SELECT ...
+                    // FROM
+                    //  "public"."ModelA"
+                    //   LEFT JOIN "public"."ModelB" AS "orderby_0_ModelB" ON (
+                    //     "public"."ModelA"."b_id" = "orderby_0_ModelB"."id"
+                    //   )
+                    //   LEFT JOIN "public"."ModelC" AS "orderby_0_ModelC" ON (
+                    //     "orderby_0_ModelB"."c_id" = "orderby_0_ModelC"."id"
+                    //   )
+                    // WHERE
+                    // ( ... OR <before_last_join_alias>.<foreign_key_db_name> IS NULL )
+                    // ```
+                    // In the example above, <before_last_join_alias> == "orderby_0_ModelB"
+                    //                          <foreign_key_db_name> == "c_id"
                     if maybe_before_last_hop.is_some() {
                         let last_two_joins: Vec<_> = join_aliases.iter().rev().take(2).collect();
                         let before_last_join_alias = *last_two_joins.get(1).unwrap();
 
                         (fk_field, Some(before_last_join_alias.to_owned()))
                     } else {
+                        // If there is not more than one hop, then there's no need to alias the fk field
                         (fk_field, None)
                     }
                 })
                 .collect()
         });
 
+        // Selected fields needs to be aliased in case there there two order bys on two different tables, pointing to a field of the same name.
+        // eg: orderBy: [{ id: asc }, { b: { id: asc } }]
+        // Without these aliases, selecting from the <ORDER_TABLE_ALIAS> tmp table would result in ambiguous field name
         let field_aliased = (
             order_by.field.clone(),
             format!("{}_{}_{}", order_by.field.model().name, order_by.field.name, index).to_owned(),
