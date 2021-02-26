@@ -73,7 +73,8 @@ where
         let js_object = Value::Object(object);
         let json_str = serde_json::to_string(&js_object).unwrap();
 
-        self.callback.call(Ok(json_str), ThreadsafeFunctionCallMode::Blocking);
+        self.callback
+            .call(Ok(json_str), ThreadsafeFunctionCallMode::NonBlocking);
     }
 
     fn enabled(&self, metadata: &tracing::Metadata<'_>, ctx: Context<'_, S>) -> bool {
