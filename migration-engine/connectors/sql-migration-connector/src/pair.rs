@@ -25,6 +25,7 @@ impl<T> Pair<T> {
         (&self.previous, &self.next)
     }
 
+    /// Map each element to an iterator, and zip the two iterators into an iterator over pairs.
     pub(crate) fn interleave<F, I, O>(&self, f: F) -> impl Iterator<Item = Pair<O>>
     where
         I: IntoIterator<Item = O>,
