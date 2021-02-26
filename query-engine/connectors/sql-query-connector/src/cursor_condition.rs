@@ -181,7 +181,7 @@ fn map_orderby_condition(
     field: &ScalarFieldRef,
     order: &SortOrder,
     order_column: Column<'static>,
-    maybe_fks: &Option<Vec<ScalarFieldRef>>,
+    maybe_fks: &Option<Vec<(ScalarFieldRef, Option<String>)>>,
     reverse: bool,
     include_eq: bool,
 ) -> Expression<'static> {
@@ -238,8 +238,17 @@ fn map_orderby_condition(
 
     let order_expr = if let Some(fks) = maybe_fks {
         fks.iter()
-            .filter(|fk| !fk.is_required)
-            .fold(order_expr, |acc, fk| acc.or(fk.as_column().is_null()).into())
+            .filter(|(fk, _)| !fk.is_required)
+            .fold(order_expr, |acc, (fk, alias)| {
+                let col = if let Some(alias) = alias {
+                    Column::from((alias.to_owned(), fk.db_name().to_owned()))
+                } else {
+                    fk.as_column()
+                }
+                .is_null();
+                acc.or(col).into()
+            })
+            .into()
     } else {
         order_expr
     };
@@ -268,22 +277,42 @@ fn order_definitions(
     query_arguments: &QueryArguments,
     model: &ModelRef,
 ) -> (
-    Vec<(ScalarFieldRef, SortOrder, Column<'static>, Option<Vec<ScalarFieldRef>>)>,
+    Vec<(
+        ScalarFieldRef,
+        SortOrder,
+        Column<'static>,
+        Option<Vec<(ScalarFieldRef, Option<String>)>>,
+    )>,
     Vec<JoinData<'static>>,
 ) {
     let mut joins = vec![];
     let mut orderings = vec![];
 
     for (index, order_by) in query_arguments.order_by.iter().enumerate() {
-        let (mut computed_joins, order_by_column) = ordering::compute_joins(order_by, model, index);
+        let (mut computed_joins, join_aliases, order_by_column) = ordering::compute_joins(order_by, index, model);
 
         joins.append(&mut computed_joins);
 
-        let fks = order_by.path.last().map(|rf| {
+        let last_hops: Vec<_> = order_by.path.iter().rev().take(2).collect();
+        let maybe_last_hop = last_hops.get(0);
+        let maybe_before_last_hop = last_hops.get(1);
+
+        let fks = maybe_last_hop.map(|rf| {
             rf.relation_info
                 .fields
                 .iter()
-                .map(|fk_name| rf.model().fields().find_from_scalar(fk_name).unwrap())
+                .map(|fk_name| {
+                    let fk_field = rf.model().fields().find_from_scalar(fk_name).unwrap();
+
+                    if maybe_before_last_hop.is_some() {
+                        let last_two_joins: Vec<_> = join_aliases.iter().rev().take(2).collect();
+                        let before_last_join_alias = *last_two_joins.get(1).unwrap();
+
+                        (fk_field, Some(before_last_join_alias.to_owned()))
+                    } else {
+                        (fk_field, None)
+                    }
+                })
                 .collect()
         });
 

@@ -17,7 +17,7 @@ pub fn build(
 
     // The index is used to differentiate potentially separate relations to the same model.
     for (index, order_by) in query_arguments.order_by.iter().enumerate() {
-        let (mut computed_joins, order_by_column) = compute_joins(order_by, base_model, index);
+        let (mut computed_joins, _, order_by_column) = compute_joins(order_by, index, base_model);
 
         joins.append(&mut computed_joins);
 
@@ -34,17 +34,17 @@ pub fn build(
 
 pub fn compute_joins(
     order_by: &OrderBy,
-    base_model: &ModelRef,
     order_by_index: usize,
-) -> (Vec<JoinData<'static>>, Column<'static>) {
+    base_model: &ModelRef,
+) -> (Vec<JoinData<'static>>, Vec<String>, Column<'static>) {
     let join_prefix = format!("{}{}", ORDER_JOIN_PREFIX, order_by_index);
     let mut joins = vec![];
-    let mut last_join_alias: Option<String> = None;
+    let mut join_aliases = vec![];
 
     for rf in order_by.path.iter() {
         let (join_alias, join) = compute_join(base_model, rf, join_prefix.as_str());
 
-        last_join_alias = Some(join_alias);
+        join_aliases.push(join_alias);
         joins.push(join);
     }
 
@@ -52,13 +52,13 @@ pub fn compute_joins(
     // - If it's on the base model with no hops, it's for example `modelTable.field`.
     // - If it is with several hops, it's the alias used for the last join, e.g.
     //   `{join_alias}.field`
-    let order_by_column = if let Some(alias) = last_join_alias {
-        Column::from((alias, order_by.field.db_name().to_owned()))
+    let order_by_column = if let Some(alias) = join_aliases.last() {
+        Column::from((alias.to_owned(), order_by.field.db_name().to_owned()))
     } else {
         order_by.field.as_column()
     };
 
-    (joins, order_by_column)
+    (joins, join_aliases, order_by_column)
 }
 
 fn compute_join(base_model: &ModelRef, rf: &RelationFieldRef, join_prefix: &str) -> (String, JoinData<'static>) {
