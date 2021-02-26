@@ -249,9 +249,9 @@ fn map_orderby_condition(order_definition: &OrderDefinition, reverse: bool, incl
                     fk.as_column()
                 }
                 .is_null();
+
                 acc.or(col).into()
             })
-            .into()
     } else {
         order_expr
     };
