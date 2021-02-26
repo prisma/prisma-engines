@@ -1,5 +1,6 @@
 use crate::{error::ApiError, logger::ChannelLogger};
 use datamodel::{diagnostics::ValidatedConfiguration, Datamodel};
+use napi::threadsafe_function::ThreadsafeFunction;
 use prisma_models::DatamodelConverter;
 use query_core::{exec_loader, schema_builder, BuildMode, QueryExecutor, QuerySchema, QuerySchemaRenderer};
 use request_handlers::{
@@ -92,7 +93,7 @@ where
 
 impl QueryEngine {
     /// Parse a validated datamodel and configuration to allow connecting later on.
-    pub fn new(opts: ConstructorOptions) -> crate::Result<Self> {
+    pub fn new(opts: ConstructorOptions, log_callback: ThreadsafeFunction<String>) -> crate::Result<Self> {
         let ConstructorOptions {
             datamodel,
             log_level,
@@ -124,7 +125,7 @@ impl QueryEngine {
             datasource_overrides: overrides,
         };
 
-        let logger = ChannelLogger::new(log_level);
+        let logger = ChannelLogger::new(log_level, log_callback);
 
         let builder = EngineBuilder {
             config,
@@ -197,8 +198,6 @@ impl QueryEngine {
 
         match *inner {
             Inner::Connected(ref engine) => {
-                engine.logger.disconnect_listeners().await?;
-
                 let config = datamodel::parse_configuration_with_url_overrides(
                     &engine.datamodel.raw,
                     engine.datamodel.datasource_overrides.clone(),
@@ -279,17 +278,6 @@ impl QueryEngine {
                 version: env!("CARGO_PKG_VERSION").into(),
                 primary_connector: None,
             }),
-        }
-    }
-
-    /// Returns the next log event from the system, if any. Pauses the task if
-    /// the channel is empty. Engine should be connected before calling.
-    ///
-    /// Returns `None` when the logger is dropped.
-    pub async fn next_log_event(&self) -> Option<String> {
-        match *self.inner.read().await {
-            Inner::Connected(ref engine) => engine.logger.next_event().await,
-            Inner::Builder(ref builder) => builder.logger.next_event().await,
         }
     }
 }
