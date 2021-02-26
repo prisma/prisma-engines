@@ -40,15 +40,4 @@ impl ChannelLogger {
     {
         f().with_subscriber(self.subscriber.clone()).await
     }
-
-    /// A special event to notify the JavaScript listener to stop listening,
-    /// helping us to get around of the problem of not having streams on
-    /// JavaScript.
-    pub async fn disconnect_listeners(&self) -> crate::Result<()> {
-        self.with_logging(|| async {
-            tracing::info!("disconnected");
-            Ok(())
-        })
-        .await
-    }
 }

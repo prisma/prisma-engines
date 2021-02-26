@@ -198,8 +198,6 @@ impl QueryEngine {
 
         match *inner {
             Inner::Connected(ref engine) => {
-                engine.logger.disconnect_listeners().await?;
-
                 let config = datamodel::parse_configuration_with_url_overrides(
                     &engine.datamodel.raw,
                     engine.datamodel.datasource_overrides.clone(),
