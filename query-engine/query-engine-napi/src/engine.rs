@@ -193,12 +193,11 @@ impl QueryEngine {
 
     /// Disconnect and drop the core. Can be reconnected later with `#connect`.
     pub async fn disconnect(&self) -> crate::Result<()> {
+        self.disconnect_listeners().await?;
         let mut inner = self.inner.write().await;
 
         match *inner {
             Inner::Connected(ref engine) => {
-                engine.logger.disconnect_listeners().await?;
-
                 let config = datamodel::parse_configuration_with_url_overrides(
                     &engine.datamodel.raw,
                     engine.datamodel.datasource_overrides.clone(),
@@ -291,5 +290,21 @@ impl QueryEngine {
             Inner::Connected(ref engine) => engine.logger.next_event().await,
             Inner::Builder(ref builder) => builder.logger.next_event().await,
         }
+    }
+
+    /// Kicks everybody who's listening the log stream out.
+    async fn disconnect_listeners(&self) -> crate::Result<()> {
+        let inner = self.inner.read().await;
+
+        match *inner {
+            Inner::Connected(ref engine) => {
+                engine.logger.disconnect_listeners().await?;
+            }
+            Inner::Builder(ref builder) => {
+                builder.logger.disconnect_listeners().await?;
+            }
+        }
+
+        Ok(())
     }
 }
