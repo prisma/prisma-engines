@@ -1,12 +1,14 @@
-use crate::{filter::convert_filter, join::JoinStage, BsonTransform, IntoBson};
+use crate::{
+    cursor::CursorBuilder, error::MongoError, filter::convert_filter, join::JoinStage, orderby::OrderByBuilder,
+    BsonTransform, IntoBson,
+};
 use connector_interface::{AggregationSelection, Filter, QueryArguments};
-use itertools::Itertools;
 use mongodb::{
     bson::{doc, Bson, Document},
     options::{AggregateOptions, FindOptions},
     Collection, Cursor,
 };
-use prisma_models::{ModelProjection, OrderBy, ScalarFieldRef, SortOrder};
+use prisma_models::{ModelProjection, ScalarFieldRef};
 
 /// Translated query arguments ready to use in mongo find or aggregation queries.
 #[derive(Debug, Default)]
@@ -28,11 +30,18 @@ pub(crate) struct MongoQueryArgs {
     /// transformed the documents.
     pub(crate) aggregation_filters: Vec<Document>,
 
-    /// Order by builder.
-    pub(crate) order_builder: Option<OrderByBuilder>,
+    /// Order by builder for deferred processing.
+    order_builder: Option<OrderByBuilder>,
 
     /// Finalized ordering.
     pub(crate) order: Option<Document>,
+
+    /// Cursor builder for deferred processing.
+    cursor_builder: Option<CursorBuilder>,
+
+    /// A mongo filter document containing cursor-related conditions.
+    /// These are applied after sort operations but before skip or takes.
+    pub(crate) cursor: Option<Document>,
 
     /// Skip a number of documents at the start of the result.
     pub(crate) skip: Option<i64>,
@@ -53,15 +62,19 @@ impl MongoQueryArgs {
     /// Turns the query args into a find operation on the collection.
     /// Depending on the arguments, either an aggregation pipeline or a plain query is build and run.
     pub(crate) async fn find_documents(mut self, coll: Collection) -> crate::Result<Cursor> {
-        self.finalize();
+        self.finalize()?;
 
-        if self.joins.is_empty() && self.aggregations.is_empty() {
+        // Technically the cursor filter doesn't need to trigger an AP query,
+        // but it's more convenient for now from a query building perspective.
+        if self.joins.is_empty() && self.aggregations.is_empty() && self.cursor.is_none() {
             self.execute_find_query(coll).await
         } else {
             self.execute_pipeline_query(coll).await
         }
     }
 
+    /// Simplest form of find-documents query.
+    /// Todo: Find out if always using aggregation pipeline is a good idea.
     async fn execute_find_query(self, coll: Collection) -> crate::Result<Cursor> {
         let find_options = FindOptions::builder()
             .projection(self.projection)
@@ -109,6 +122,11 @@ impl MongoQueryArgs {
             stages.push(doc! { "$sort": order })
         };
 
+        // Cursor
+        if let Some(cursor_filter) = self.cursor {
+            stages.push(doc! { "$match": cursor_filter })
+        };
+
         // $skip
         if let Some(skip) = self.skip {
             stages.push(doc! { "$skip": skip });
@@ -142,8 +160,11 @@ impl MongoQueryArgs {
     }
 
     pub(crate) fn new(args: QueryArguments) -> crate::Result<MongoQueryArgs> {
+        check_unsupported(&args)?;
+
         let reverse_order = args.take.map(|t| t < 0).unwrap_or(false);
         let order_builder = Some(OrderByBuilder::new(args.order_by, reverse_order));
+
         let mut post_filters = vec![];
         let mut joins = vec![];
 
@@ -163,11 +184,14 @@ impl MongoQueryArgs {
             None => None,
         };
 
+        let cursor_builder = args.cursor.map(|c| CursorBuilder::new(c));
+
         Ok(MongoQueryArgs {
             query,
             join_filters: post_filters,
             joins,
             order_builder,
+            cursor_builder,
             skip: skip(args.skip, args.ignore_skip),
             limit: take(args.take, args.ignore_take),
             ..Default::default()
@@ -243,91 +267,21 @@ impl MongoQueryArgs {
         Ok(self)
     }
 
-    fn finalize(&mut self) {
-        let builder = self.order_builder.take().expect("Mongo args already finalized.");
-        let (order, joins) = builder.build(self.is_group_by_query);
+    fn finalize(&mut self) -> crate::Result<()> {
+        if let Some(order_builder) = self.order_builder.take() {
+            let (order, joins) = order_builder.build(self.is_group_by_query);
 
-        self.joins.extend(joins);
-        self.order = order;
-    }
-}
-
-/// Builder for `sort` mongo documents.
-/// Building of orderBy needs to be deferred until all other args are complete
-/// to have all information necessary to build the correct sort arguments.
-#[derive(Debug, Default)]
-pub(crate) struct OrderByBuilder {
-    order_bys: Vec<OrderBy>,
-    reverse: bool,
-}
-
-impl OrderByBuilder {
-    pub fn new(order_bys: Vec<OrderBy>, reverse: bool) -> Self {
-        Self { order_bys, reverse }
-    }
-
-    /// Builds and renders a Mongo sort document.
-    /// `is_group_by` signals that the ordering is for a grouping,
-    /// requiring a prefix to refer to the correct document nesting.
-    fn build(self, is_group_by: bool) -> (Option<Document>, Vec<JoinStage>) {
-        if self.order_bys.is_empty() {
-            return (None, vec![]);
+            self.joins.extend(joins);
+            self.order = order;
         }
 
-        let mut order_doc = Document::new();
-        let mut joins = vec![];
+        if let Some(cursor_builder) = self.cursor_builder.take() {
+            let doc = cursor_builder.build()?;
 
-        for (index, order_by) in self.order_bys.into_iter().enumerate() {
-            let prefix = if !order_by.path.is_empty() {
-                let mut prefix = order_by.path.iter().map(|rf| rf.relation().name.clone()).collect_vec();
-                let mut stages = order_by.path.into_iter().map(|rf| JoinStage::new(rf)).collect_vec();
-
-                // We fold from right to left because the right hand side needs to be always contained
-                // in the left hand side here (JoinStage<A, JoinStage<B, JoinStage<C>>>).
-                stages.reverse();
-
-                let mut final_stage = stages
-                    .into_iter()
-                    .fold1(|right, mut left| {
-                        left.push_nested(right);
-                        left
-                    })
-                    .unwrap();
-
-                let alias = format!("orderby_{}_{}", prefix[0], index);
-
-                final_stage.set_alias(alias.clone());
-                joins.push(final_stage);
-                prefix[0] = alias;
-
-                Some(prefix.join("."))
-            } else {
-                None
-            };
-
-            let field = if is_group_by {
-                // Explanation: All group by fields go into the _id key of the result document.
-                // As it is the only point where the flat scalars are contained for the group,
-                // we beed to refer to the object
-                format!("_id.{}", order_by.field.db_name())
-            } else {
-                if let Some(prefix) = prefix {
-                    format!("{}.{}", prefix, order_by.field.db_name())
-                } else {
-                    order_by.field.db_name().to_owned()
-                }
-            };
-
-            // Mongo: -1 -> DESC, 1 -> ASC
-            match (order_by.sort_order, self.reverse) {
-                (SortOrder::Ascending, true) => order_doc.insert(field, -1),
-                (SortOrder::Descending, true) => order_doc.insert(field, 1),
-                (SortOrder::Ascending, false) => order_doc.insert(field, 1),
-                (SortOrder::Descending, false) => order_doc.insert(field, -1),
-            };
+            self.cursor = Some(doc);
         }
 
-        (Some(order_doc), joins)
+        Ok(())
     }
 }
 
@@ -359,4 +313,23 @@ fn take(take: Option<i64>, ignore: bool) -> Option<i64> {
     } else {
         take.map(|t| if t < 0 { -t } else { t })
     }
+}
+
+/// Temporarily unsupported features that can not be restricted on the schema level of query arguments get rejected at runtime.
+fn check_unsupported(args: &QueryArguments) -> crate::Result<()> {
+    // Cursors with order-by relations is currently unsupported.
+    if args.cursor.is_some() && args.order_by.iter().any(|o| !o.path.is_empty()) {
+        return Err(MongoError::Unsupported(
+            "OrderBy a relation in conjunction with a cursor query is currently unsupported.".to_owned(),
+        ));
+    }
+
+    // Cursors with unstable ordering are currently unsupported.
+    if args.contains_unstable_cursor() {
+        return Err(MongoError::Unsupported(
+            "Cursors in conjunction with an unstable orderBy (no single field or combination is unique) are currently unsupported.".to_owned(),
+        ));
+    }
+
+    Ok(())
 }
