@@ -557,30 +557,26 @@ fn push_foreign_keys_from_created_tables<'a>(
 
 /// Compare two [ForeignKey](/sql-schema-describer/struct.ForeignKey.html)s and return whether they
 /// should be considered equivalent for schema diffing purposes.
-fn foreign_keys_match(previous: &ForeignKeyWalker<'_>, next: &ForeignKeyWalker<'_>) -> bool {
-    let references_same_table = previous.referenced_table().name() == next.referenced_table().name();
-    let references_same_column_count = previous.referenced_columns_count() == next.referenced_columns_count();
-    let constrains_same_column_count = previous.constrained_columns().count() == next.constrained_columns().count();
-    let constrains_same_columns =
-        previous
-            .constrained_columns()
-            .zip(next.constrained_columns())
-            .all(|(previous, next)| {
-                let families_match = match (previous.column_type_family(), next.column_type_family()) {
-                    (ColumnTypeFamily::Uuid, ColumnTypeFamily::String) => true,
-                    (ColumnTypeFamily::String, ColumnTypeFamily::Uuid) => true,
-                    (x, y) => x == y,
-                };
+fn foreign_keys_match(fks: Pair<&ForeignKeyWalker<'_>>, flavour: &dyn SqlFlavour) -> bool {
+    let references_same_table = flavour.table_names_match(fks.map(|fk| fk.referenced_table().name()));
+    let references_same_column_count =
+        fks.previous().referenced_columns_count() == fks.next().referenced_columns_count();
+    let constrains_same_column_count =
+        fks.previous().constrained_columns().count() == fks.next().constrained_columns().count();
+    let constrains_same_columns = fks.interleave(|fk| fk.constrained_columns()).all(|fks| {
+        let families_match = match fks.map(|fk| fk.column_type_family()).as_tuple() {
+            (ColumnTypeFamily::Uuid, ColumnTypeFamily::String) => true,
+            (ColumnTypeFamily::String, ColumnTypeFamily::Uuid) => true,
+            (x, y) => x == y,
+        };
 
-                previous.name() == next.name() && families_match
-            });
+        fks.previous().name() == fks.next().name() && families_match
+    });
 
     // Foreign key references different columns or the same columns in a different order.
-    let references_same_columns = previous
-        .referenced_column_names()
-        .iter()
-        .zip(next.referenced_column_names())
-        .all(|(previous, next)| previous == next);
+    let references_same_columns = fks
+        .interleave(|fk| fk.referenced_column_names())
+        .all(|pair| pair.previous() == pair.next());
 
     references_same_table
         && references_same_column_count

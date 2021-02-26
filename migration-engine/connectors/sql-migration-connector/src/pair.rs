@@ -25,6 +25,17 @@ impl<T> Pair<T> {
         (&self.previous, &self.next)
     }
 
+    pub(crate) fn interleave<F, I, O>(&self, f: F) -> impl Iterator<Item = Pair<O>>
+    where
+        I: IntoIterator<Item = O>,
+        F: Fn(&T) -> I,
+    {
+        f(&self.previous)
+            .into_iter()
+            .zip(f(&self.next).into_iter())
+            .map(Pair::from)
+    }
+
     pub(crate) fn into_tuple(self) -> (T, T) {
         (self.previous, self.next)
     }
@@ -84,5 +95,11 @@ impl<'a> Pair<TableWalker<'a>> {
 
     pub(crate) fn indexes(&self, index_indexes: &Pair<usize>) -> Pair<IndexWalker<'a>> {
         self.as_ref().zip(index_indexes.as_ref()).map(|(t, i)| t.index_at(*i))
+    }
+}
+
+impl<T> From<(T, T)> for Pair<T> {
+    fn from((previous, next): (T, T)) -> Self {
+        Pair { previous, next }
     }
 }
