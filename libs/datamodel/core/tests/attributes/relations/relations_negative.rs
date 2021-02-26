@@ -2,14 +2,14 @@ use crate::common::*;
 use datamodel::{ast::Span, diagnostics::DatamodelError};
 
 #[test]
-fn fail_if_ambigous_relation_fields_do_not_specify_a_name() {
+fn fail_if_ambiguous_relation_fields_do_not_specify_a_name() {
     let dml = r#"
     model Todo {
       id Int @id
       comments Comment[]
       comments2 Comment[]
     }
-    
+
     model Comment {
       id Int @id
       text String
@@ -32,7 +32,7 @@ fn must_error_when_non_existing_fields_are_used() {
         firstName String
         lastName String
         posts Post[]
-        
+
         @@unique([firstName, lastName])
     }
 
@@ -47,7 +47,7 @@ fn must_error_when_non_existing_fields_are_used() {
     errors.assert_is(
         DatamodelError::new_validation_error(
             "The argument fields must refer only to existing fields. The following fields do not exist in this model: authorFirstName, authorLastName",
-            Span::new(232, 332)
+            Span::new(224, 324)
         )
     );
 }
@@ -162,8 +162,8 @@ fn should_fail_on_ambiguous_relations_with_manual_names_1() {
 
     errors.assert_is(
         DatamodelError::new_model_validation_error(
-            "Wrongly named relation detected. The fields `posts` and `more_posts` in model `User` both use the same relation name. Please provide different relation names for them through `@relation(<name>).", 
-            "User", 
+            "Wrongly named relation detected. The fields `posts` and `more_posts` in model `User` both use the same relation name. Please provide different relation names for them through `@relation(<name>).",
+            "User",
             Span::new(45, 82)
         ),
     );
@@ -390,7 +390,7 @@ fn issue4850() {
          model PostableEntity {
           id String @id
          }
-         
+
          model Post {
             id        String   @id
             postableEntities PostableEntity[]
@@ -400,7 +400,7 @@ fn issue4850() {
     let errors = parse_error(dml);
 
     errors.assert_is(
-        DatamodelError::new_field_validation_error("The relation field `postableEntities` on Model `Post` is missing an opposite relation field on the model `PostableEntity`. Either run `prisma format` or add it manually.", "Post", "postableEntities",Span::new(147, 181)),
+        DatamodelError::new_field_validation_error("The relation field `postableEntities` on Model `Post` is missing an opposite relation field on the model `PostableEntity`. Either run `prisma format` or add it manually.", "Post", "postableEntities",Span::new(138, 172)),
     );
 }
 
@@ -411,21 +411,21 @@ fn issue4822() {
     //reject, ask to name custom_Post relation
     let dml = r#"
          model Post {
-           id          Int    @id 
+           id          Int    @id
            user_id     Int    @unique
            custom_User User   @relation("CustomName", fields: [user_id], references: [id])
          }
-                 
+
          model User {
-           id          Int    @id 
-           custom_Post Post?  
+           id          Int    @id
+           custom_Post Post?
          }
     "#;
 
     let errors = parse_error(dml);
     errors.assert_are(
-        &[DatamodelError::new_field_validation_error("The relation field `custom_User` on Model `Post` is missing an opposite relation field on the model `User`. Either run `prisma format` or add it manually.", "Post", "custom_User",Span::new(107, 187)),
-            DatamodelError::new_field_validation_error("The relation field `custom_Post` on Model `User` is missing an opposite relation field on the model `Post`. Either run `prisma format` or add it manually.", "User", "custom_Post",Span::new(284, 304))
+        &[DatamodelError::new_field_validation_error("The relation field `custom_User` on Model `Post` is missing an opposite relation field on the model `User`. Either run `prisma format` or add it manually.", "Post", "custom_User",Span::new(106, 186)),
+            DatamodelError::new_field_validation_error("The relation field `custom_Post` on Model `User` is missing an opposite relation field on the model `Post`. Either run `prisma format` or add it manually.", "User", "custom_Post",Span::new(265, 283))
         ],
     );
 }
@@ -436,11 +436,11 @@ fn issue5216() {
     //reject,
     let dml = r#"
          model user {
-            id             String        @id 
+            id             String        @id
             email          String        @unique
             organization   organization? @relation(references: [id])
          }
-         
+
          model organization {
             id        String   @id
             users     user[]
@@ -450,7 +450,7 @@ fn issue5216() {
     let errors = parse_error(dml);
 
     errors.assert_is(
-        DatamodelError::new_attribute_validation_error("The relation field `organization` on Model `user` must specify the `fields` argument in the @relation attribute. You can run `prisma format` to fix this automatically.", "relation",Span::new(130, 187)),
+        DatamodelError::new_attribute_validation_error("The relation field `organization` on Model `user` must specify the `fields` argument in the @relation attribute. You can run `prisma format` to fix this automatically.", "relation",Span::new(129, 186)),
     );
 }
 
@@ -469,12 +469,12 @@ fn issue5069() {
           id          String        @id
           createdById String?
           createdBy   User?
-                   
+
           userId      String?
           user        User?         @relation("code", fields: [userId], references: [id])
-        
+
         }
-        
+
         model User {
           id         String         @id
           codes      Code[]         @relation("code")
