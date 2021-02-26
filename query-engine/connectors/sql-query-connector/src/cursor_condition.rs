@@ -83,7 +83,7 @@ pub fn build(query_arguments: &QueryArguments, model: &ModelRef) -> (Option<Tabl
             // Subquery to find the value of the order field(s) that we need for comparison. Builds part #1 of the query example in the docs.
             let order_subquery = order_definitions
                 .iter()
-                .fold(Select::from_table(model.as_table()), |select, (_, column, _)| {
+                .fold(Select::from_table(model.as_table()), |select, (_, _, column, _)| {
                     select.column(column.to_owned())
                 })
                 .so_that(cursor_condition);
@@ -97,14 +97,22 @@ pub fn build(query_arguments: &QueryArguments, model: &ModelRef) -> (Option<Tabl
             // Builds part #2 of the example query.
             // If we only have one ordering, we only want a single, slightly different, condition of (orderField [<= / >=] cmp_field).
             let condition_tree = if len == 1 {
-                let (field, column, order) = order_definitions.pop().unwrap();
-                ConditionTree::Single(Box::new(map_orderby_condition(&field, column, &order, reverse, true)))
+                let (field, order, order_column, fks) = order_definitions.pop().unwrap();
+                dbg!(&field);
+                ConditionTree::Single(Box::new(map_orderby_condition(
+                    &field,
+                    &order,
+                    order_column,
+                    &fks,
+                    reverse,
+                    true,
+                )))
             } else {
                 let or_conditions = (0..len).fold(Vec::with_capacity(len), |mut conditions_acc, n| {
                     let (head, tail) = order_definitions.split_at(len - n - 1);
                     let mut and_conditions = Vec::with_capacity(head.len() + 1);
 
-                    for (field, order_column, _) in head {
+                    for (field, _, order_column, _) in head {
                         and_conditions.push(map_equality_condition(field, order_column.to_owned()));
                     }
 
@@ -133,21 +141,23 @@ pub fn build(query_arguments: &QueryArguments, model: &ModelRef) -> (Option<Tabl
                         //
                         // Said differently, we handle all the cases in which the prefixes are equal to len - 1 to account for possible identical comparators,
                         // but everything else must come strictly "after" the cursor.
-                        let (field, order_column, order) = tail.first().unwrap();
+                        let (field, order, order_column, fks) = tail.first().unwrap();
 
                         and_conditions.push(map_orderby_condition(
                             field,
-                            order_column.to_owned(),
                             order,
+                            order_column.to_owned(),
+                            fks,
                             reverse,
                             true,
                         ));
                     } else {
-                        let (field, order_column, order) = tail.first().unwrap();
+                        let (field, order, order_column, fks) = tail.first().unwrap();
                         and_conditions.push(map_orderby_condition(
                             field,
-                            order_column.to_owned(),
                             order,
+                            order_column.to_owned(),
+                            fks,
                             reverse,
                             false,
                         ));
@@ -169,12 +179,14 @@ pub fn build(query_arguments: &QueryArguments, model: &ModelRef) -> (Option<Tabl
 // requiring the correct comparison operator to be used to fit the reversed order.
 fn map_orderby_condition(
     field: &ScalarFieldRef,
-    order_column: Column<'static>,
     order: &SortOrder,
+    order_column: Column<'static>,
+    maybe_fks: &Option<Vec<ScalarFieldRef>>,
     reverse: bool,
     include_eq: bool,
 ) -> Expression<'static> {
     let cmp_column = Column::from((ORDER_TABLE_ALIAS, field.db_name().to_owned()));
+    let cloned_order_column = order_column.clone();
 
     let order_expr: Expression<'static> = match order {
         // If it's ASC but we want to take from the back, the ORDER BY will be DESC, meaning that comparisons done need to be lt(e).
@@ -215,14 +227,24 @@ fn map_orderby_condition(
 
     // If we have null values in the ordering or comparison row, those are automatically included because we can't make a
     // statement over their order relative to the cursor.
-    if !field.is_required {
+    let order_expr = if !field.is_required {
         order_expr
-            .or(field.as_column().is_null())
+            .or(cloned_order_column.is_null())
             .or(Column::from((ORDER_TABLE_ALIAS, field.db_name().to_owned())).is_null())
             .into()
     } else {
         order_expr
-    }
+    };
+
+    let order_expr = if let Some(fks) = maybe_fks {
+        fks.iter()
+            .filter(|fk| !fk.is_required)
+            .fold(order_expr, |acc, fk| acc.or(fk.as_column().is_null()).into())
+    } else {
+        order_expr
+    };
+
+    order_expr
 }
 
 fn map_equality_condition(field: &ScalarFieldRef, order_column: Column<'static>) -> Expression<'static> {
@@ -246,7 +268,7 @@ fn order_definitions(
     query_arguments: &QueryArguments,
     model: &ModelRef,
 ) -> (
-    Vec<(ScalarFieldRef, Column<'static>, SortOrder)>,
+    Vec<(ScalarFieldRef, SortOrder, Column<'static>, Option<Vec<ScalarFieldRef>>)>,
     Vec<JoinData<'static>>,
 ) {
     let mut joins = vec![];
@@ -257,7 +279,15 @@ fn order_definitions(
 
         joins.append(&mut computed_joins);
 
-        orderings.push((order_by.field.clone(), order_by_column, order_by.sort_order))
+        let fks = order_by.path.last().map(|rf| {
+            rf.relation_info
+                .fields
+                .iter()
+                .map(|fk_name| rf.model().fields().find_from_scalar(fk_name).unwrap())
+                .collect()
+        });
+
+        orderings.push((order_by.field.clone(), order_by.sort_order, order_by_column, fks))
     }
 
     if orderings.is_empty() {
@@ -265,7 +295,7 @@ fn order_definitions(
             model
                 .primary_identifier()
                 .scalar_fields()
-                .map(|f| (f.clone(), f.as_column(), SortOrder::Ascending))
+                .map(|f| (f.clone(), SortOrder::Ascending, f.as_column(), None))
                 .collect(),
             joins,
         );
