@@ -2,11 +2,10 @@ mod channel;
 mod registry;
 mod visitor;
 
-use std::{future::Future, sync::Arc};
-
 use channel::EventChannel;
+use napi::threadsafe_function::ThreadsafeFunction;
 use registry::EventRegistry;
-use tokio::sync::{mpsc, Mutex};
+use std::future::Future;
 use tracing::level_filters::LevelFilter;
 use tracing_futures::WithSubscriber;
 use tracing_subscriber::layer::{Layered, SubscriberExt};
@@ -16,24 +15,17 @@ use tracing_subscriber::layer::{Layered, SubscriberExt};
 /// point, further log lines will just be dropped.
 #[derive(Clone)]
 pub struct ChannelLogger {
-    receiver: Arc<Mutex<mpsc::Receiver<String>>>,
     subscriber: Layered<EventChannel, EventRegistry>,
     level: LevelFilter,
 }
 
 impl ChannelLogger {
     /// Creates a new instance of a logger with the minimum log level.
-    pub fn new(level: LevelFilter) -> Self {
-        // We store 10_000 events, after that we drop until we have
-        // space again. We might want this to be user-configurable
-        // in the future.
-        let (sender, receiver) = mpsc::channel(10000);
-
-        let mut layer = EventChannel::new(sender);
+    pub fn new(level: LevelFilter, callback: ThreadsafeFunction<String>) -> Self {
+        let mut layer = EventChannel::new(callback);
         layer.filter_level(level);
 
         Self {
-            receiver: Arc::new(Mutex::new(receiver)),
             subscriber: EventRegistry::new().with(layer),
             level,
         }
@@ -47,12 +39,6 @@ impl ChannelLogger {
         F: FnOnce() -> U,
     {
         f().with_subscriber(self.subscriber.clone()).await
-    }
-
-    /// Takes the oldest log event from the channel. None, if channel is
-    /// closed.
-    pub async fn next_event(&self) -> Option<String> {
-        self.receiver.lock().await.recv().await
     }
 
     /// A special event to notify the JavaScript listener to stop listening,

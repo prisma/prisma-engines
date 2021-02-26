@@ -1,5 +1,8 @@
 use engine::{ConstructorOptions, QueryEngine};
-use napi::{CallContext, Env, JsObject, JsUndefined, JsUnknown, Property};
+use napi::{
+    threadsafe_function::ThreadSafeCallContext, CallContext, Env, JsFunction, JsObject, JsUndefined, JsUnknown,
+    Property,
+};
 use napi_derive::{js_function, module_exports};
 use query_core::QueryExecutor;
 
@@ -10,13 +13,25 @@ mod logger;
 pub(crate) type Result<T> = std::result::Result<T, error::ApiError>;
 pub(crate) type Executor = Box<dyn QueryExecutor + Send + Sync>;
 
-#[js_function(1)]
+#[js_function(2)]
 fn constructor(ctx: CallContext) -> napi::Result<JsUndefined> {
-    let arg0 = ctx.get::<JsUnknown>(0)?;
-    let params: ConstructorOptions = ctx.env.from_js_value(arg0)?;
+    let options = ctx.get::<JsUnknown>(0)?;
+    let callback = ctx.get::<JsFunction>(1)?;
+
+    let params: ConstructorOptions = ctx.env.from_js_value(options)?;
+
+    let mut log_callback = ctx
+        .env
+        .create_threadsafe_function(&callback, 0, |ctx: ThreadSafeCallContext<String>| {
+            ctx.env
+                .create_string_from_std(ctx.value)
+                .map(|js_string| vec![js_string])
+        })?;
+
+    log_callback.unref(&ctx.env)?;
 
     let mut this: JsObject = ctx.this_unchecked();
-    let engine = QueryEngine::new(params)?;
+    let engine = QueryEngine::new(params, log_callback)?;
 
     ctx.env.wrap(&mut this, engine)?;
     ctx.env.get_undefined()
@@ -109,21 +124,6 @@ fn server_info(ctx: CallContext) -> napi::Result<JsObject> {
     )
 }
 
-#[js_function(0)]
-fn next_log_event(ctx: CallContext) -> napi::Result<JsObject> {
-    let this: JsObject = ctx.this_unchecked();
-    let engine: &QueryEngine = ctx.env.unwrap(&this)?;
-    let engine: QueryEngine = engine.clone();
-
-    ctx.env.execute_tokio_future(
-        async move { Ok(engine.next_log_event().await) },
-        |&mut env, event| match event {
-            Some(event) => env.create_string(&event),
-            None => env.get_null().and_then(|nil| nil.coerce_to_string()),
-        },
-    )
-}
-
 #[module_exports]
 pub fn init(mut exports: JsObject, env: Env) -> napi::Result<()> {
     let query_engine = env.define_class(
@@ -137,7 +137,6 @@ pub fn init(mut exports: JsObject, env: Env) -> napi::Result<()> {
             Property::new(&env, "dmmf")?.with_method(dmmf),
             Property::new(&env, "getConfig")?.with_method(get_config),
             Property::new(&env, "serverInfo")?.with_method(server_info),
-            Property::new(&env, "nextLogEvent")?.with_method(next_log_event),
         ],
     )?;
 
