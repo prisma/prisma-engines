@@ -61,16 +61,19 @@ pub(crate) fn calculate_steps(schemas: Pair<&SqlSchema>, flavour: &dyn SqlFlavou
         .chain(drop_foreign_keys.into_iter().map(SqlMigrationStep::DropForeignKey))
         .chain(drop_indexes.into_iter().map(SqlMigrationStep::DropIndex))
         .chain(alter_tables.into_iter().map(SqlMigrationStep::AlterTable))
-        // Order matters: we must drop enums before we create tables,
-        // because the new tables might be named the same as the dropped
-        // enum, and that conflicts on postgres.
-        .chain(differ.drop_enums().map(SqlMigrationStep::DropEnum))
-        .chain(differ.create_tables().map(SqlMigrationStep::CreateTable))
-        .chain(redefine_tables)
         // Order matters: we must drop tables before we create indexes,
         // because on Postgres and SQLite, we may create indexes whose names
         // clash with the names of indexes on the dropped tables.
         .chain(drop_tables.into_iter().map(SqlMigrationStep::DropTable))
+        // Order matters:
+        // - We must drop enums before we create tables, because the new tables
+        //   might be named the same as the dropped enum, and that conflicts on
+        //   postgres.
+        // - We must drop enums after we drop tables, or dropping the enum will
+        //   fail on postgres because objects (=tables) still depend on them.
+        .chain(differ.drop_enums().map(SqlMigrationStep::DropEnum))
+        .chain(differ.create_tables().map(SqlMigrationStep::CreateTable))
+        .chain(redefine_tables)
         // Order matters: we must create indexes after ALTER TABLEs because the indexes can be
         // on fields that are dropped/created there.
         .chain(create_indexes.into_iter().map(SqlMigrationStep::CreateIndex))
