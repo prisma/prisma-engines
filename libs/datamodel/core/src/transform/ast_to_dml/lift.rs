@@ -388,15 +388,9 @@ impl<'a> LiftAstToDml<'a> {
                     let prefix = captures.name("prefix").unwrap().as_str().trim();
 
                     let params = captures.name("params");
-                    let args = if params.is_none() {
-                        vec![]
-                    } else {
-                        params
-                            .unwrap()
-                            .as_str()
-                            .split(",")
-                            .map(|s| s.trim().to_string())
-                            .collect()
+                    let args = match params {
+                        None => vec![],
+                        Some(params) => params.as_str().split(',').map(|s| s.trim().to_string()).collect(),
                     };
 
                     if let Ok(native_type) = connector.parse_native_type(prefix, args) {
