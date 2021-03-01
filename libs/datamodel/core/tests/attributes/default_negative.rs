@@ -233,7 +233,7 @@ fn must_error_if_scalar_default_on_unsupported() {
 
     model Model {
         id      Int @id
-        balance Unsupported("money") @default(12)
+        balance Unsupported("some random stuff") @default(12)
     }
     "#;
 

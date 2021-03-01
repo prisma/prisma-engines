@@ -244,9 +244,11 @@ fn should_fail_on_native_type_in_unsupported_postgres() {
         }
 
         model Blog {
-            id          Int    @id
-            text        Unsupported("Text") 
-            decimal     Unsupported("Decimal(10,2)") 
+            id              Int    @id
+            decimal         Unsupported("Decimal(10,2)") 
+            text            Unsupported("Text") 
+            unsupported     Unsupported("Some random stuff") 
+            unsupportes2    Unsupported("Some random (2,5) do something") 
         }
     "#;
 
@@ -254,12 +256,12 @@ fn should_fail_on_native_type_in_unsupported_postgres() {
 
     error.assert_are(&[
         DatamodelError::new_validation_error(
-        "The type `Unsupported(\"Text\")` you specified in the type definition for the field `text` is a supported as a native type by Prisma. Please use the native type notation `Decimal @pg.Decimal(10,2)` for full support.",
-        ast::Span::new(180, 199),
+        "The type `Unsupported(\"Decimal(10,2)\")` you specified in the type definition for the field `decimal` is supported as a native type by Prisma. Please use the native type notation `Decimal @pg.Decimal(10,2)` for full support.",
+        ast::Span::new(188, 216),
     ),
         DatamodelError::new_validation_error(
-            "The type `Unsupported(\"Decimal(10,2)\")` you specified in the type definition for the field `decimal` is a supported as a native type by Prisma. Please use the native type notation `Decimal @pg.Decimal(10,2)` for full support.",
-            ast::Span::new(225, 253),
+            "The type `Unsupported(\"Text\")` you specified in the type definition for the field `text` is supported as a native type by Prisma. Please use the native type notation `String @pg.Text` for full support.",
+            ast::Span::new(246, 265),
         )
     ]);
 }
@@ -283,11 +285,11 @@ fn should_fail_on_native_type_in_unsupported_mysql() {
 
     error.assert_are(&[
         DatamodelError::new_validation_error(
-            "The type `Unsupported(\"Text\")` you specified in the type definition for the field `text` is a supported as a native type by Prisma. Please use the native type notation `Decimal @pg.Decimal(10,2)` for full support.",
+            "The type `Unsupported(\"Text\")` you specified in the type definition for the field `text` is supported as a native type by Prisma. Please use the native type notation `String @pg.Text` for full support.",
             ast::Span::new(172, 191),
         ),
         DatamodelError::new_validation_error(
-            "The type `Unsupported(\"Float\")` you specified in the type definition for the field `decimal` is a supported as a native type by Prisma. Please use the native type notation `Decimal @pg.Decimal(10,2)` for full support.",
+            "The type `Unsupported(\"Float\")` you specified in the type definition for the field `decimal` is supported as a native type by Prisma. Please use the native type notation `Float @pg.Float` for full support.",
             ast::Span::new(217, 237),
         )
     ]);
@@ -312,11 +314,11 @@ fn should_fail_on_native_type_in_unsupported_sqlserver() {
 
     error.assert_are(&[
         DatamodelError::new_validation_error(
-            "The type `Unsupported(\"Text\")` you specified in the type definition for the field `text` is a supported as a native type by Prisma. Please use the native type notation `Decimal @pg.Decimal(10,2)` for full support.",
+            "The type `Unsupported(\"Decimal(10,2)\")` you specified in the type definition for the field `decimal` is supported as a native type by Prisma. Please use the native type notation `Decimal @pg.Decimal(10,2)` for full support.",
             ast::Span::new(180, 199),
         ),
         DatamodelError::new_validation_error(
-            "The type `Unsupported(\"Real\")` you specified in the type definition for the field `decimal` is a supported as a native type by Prisma. Please use the native type notation `Decimal @pg.Decimal(10,2)` for full support.",
+            "The type `Unsupported(\"Text\")` you specified in the type definition for the field `text` is supported as a native type by Prisma. Please use the native type notation `String @pg.Text` for full support.",
             ast::Span::new(225, 244),
         )
     ]);

@@ -343,10 +343,7 @@ impl Connector for MySqlDatamodelConnector {
             TIMESTAMP_TYPE_NAME => Timestamp(parse_one_opt_u32(args, TIMESTAMP_TYPE_NAME)?),
             YEAR_TYPE_NAME => Year,
             JSON_TYPE_NAME => Json,
-            x => unreachable!(format!(
-                "This code is unreachable as the core must guarantee to just call with known names. {}",
-                x
-            )),
+            _ => return Err(ConnectorError::new_native_type_parser_error(name)),
         };
 
         Ok(NativeTypeInstance::new(name, cloned_args, &native_type))

@@ -257,7 +257,7 @@ impl Connector for PostgresDatamodelConnector {
             XML_TYPE_NAME => Xml,
             JSON_TYPE_NAME => JSON,
             JSON_B_TYPE_NAME => JSONB,
-            _ => unreachable!("This code is unreachable as the core must guarantee to just call with known names."),
+            _ => return Err(ConnectorError::new_native_type_parser_error(name)),
         };
 
         Ok(NativeTypeInstance::new(name, cloned_args, &native_type))

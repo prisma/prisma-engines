@@ -353,6 +353,16 @@ impl<'a> LiftAstToDml<'a> {
         static UNSUPPORTED_REGEX: Lazy<Regex> =
             Lazy::new(|| Regex::new(r#"Unsupported\("(.*)"\)(\?|\[\])?$"#).unwrap());
 
+        static TYPE_REGEX: Lazy<Regex> = Lazy::new(|| {
+            Regex::new(r#"(?x)
+        ^                           # beginning of the string
+        (?P<prefix>[^(]+)           # a required prefix that is any character until the first opening brace
+        (?:\((?P<params>.*?)\))?    # (optional) an opening parenthesis, a closing parenthesis and captured params in-between
+        (?P<suffix>.+)?             # (optional) captured suffix after the params until the end of the string
+        $                           # end of the string
+        "#).unwrap()
+        });
+
         if let Some(custom_type) = ast_schema.find_type_alias(&type_name) {
             checked_types.push(custom_type.name.name.clone());
             let (field_type, mut attrs) =
@@ -370,22 +380,35 @@ impl<'a> LiftAstToDml<'a> {
         } else if UNSUPPORTED_REGEX.is_match(type_name) {
             let captures = UNSUPPORTED_REGEX.captures(type_name).unwrap();
             let type_definition = captures.get(1).expect("get type definition").as_str();
-
-            //todo check these against the native types for the connector, try to be lenient with:
-            // name capitalization
-            // args spacing
-            // Unsupported("Decimal(10,2)")
-            //                "name:str(args:vec<String>)"
             if let Some(source) = self.source {
-                let connector = &source.active_connector;
+                if captures.name("suffix").is_none() {
+                    let connector = &source.active_connector;
+                    let captures = TYPE_REGEX.captures(type_definition).unwrap();
 
-                if let Ok(native_type) = connector.parse_native_type("Decimal", vec!["10".into(), "2".into()]) {
-                    //use source and native type and Prisma type to give a hint about correct definition.
-                    return Err(DatamodelError::new_validation_error(
-                    &format!("The type `{}` you specified in the type definition for the field `{}` is a supported as a native type by Prisma. Please use the native type notation `{} @{}.{}` for full support.",
-                    type_name, ast_field.name.name, "Decimal", &source.name, native_type.render()),
-                    ast_field.field_type.span,
-                ));
+                    let prefix = captures.name("prefix").unwrap().as_str().trim();
+
+                    let params = captures.name("params");
+                    let args = if params.is_none() {
+                        vec![]
+                    } else {
+                        params
+                            .unwrap()
+                            .as_str()
+                            .split(",")
+                            .map(|s| s.trim().to_string())
+                            .collect()
+                    };
+
+                    if let Ok(native_type) = connector.parse_native_type(prefix, args) {
+                        let prisma_type =
+                            connector.scalar_type_for_native_type(native_type.serialized_native_type.clone());
+
+                        return Err(DatamodelError::new_validation_error(
+                    &format!("The type `{}` you specified in the type definition for the field `{}` is supported as a native type by Prisma. Please use the native type notation `{} @{}.{}` for full support.",
+                            type_name, ast_field.name.name, prisma_type.to_string(), &source.name, native_type.render()),
+                            ast_field.field_type.span,
+                            ));
+                    }
                 }
             }
 

@@ -288,7 +288,7 @@ impl Connector for MsSqlDatamodelConnector {
             IMAGE_TYPE_NAME => Image,
             XML_TYPE_NAME => Xml,
             UNIQUE_IDENTIFIER_TYPE_NAME => UniqueIdentifier,
-            _ => panic!(),
+            _ => return Err(ConnectorError::new_native_type_parser_error(name)),
         };
 
         Ok(NativeTypeInstance::new(name, cloned_args, &native_type))

@@ -911,50 +911,6 @@ fn should_add_referenced_fields_on_the_correct_side_tie_breaker() {
 }
 
 #[test]
-fn tim_should_work() {
-    let input = indoc! {r#"
-    model User {
-        id    String  @id @default(cuid())
-        email String  @unique
-        name  String?
-    }
-        
-    model Post {
-        id        String   @id @default(cuid())
-        createdAt DateTime @default(now())
-        updatedAt DateTime @updatedAt
-        published Boolean  @default(true)
-        title     String
-        content   String?
-        author    User?    @relation(fields: [authorId], references: [id])
-        authorId  String?
-    }
-    "#};
-
-    let expected = indoc! {r#"
-    model User {
-        id    String  @id @default(cuid())
-        email String  @unique
-        name  String?
-        posts Post[]
-    }
-        
-    model Post {
-        id        String   @id @default(cuid())
-        createdAt DateTime @default(now())
-        updatedAt DateTime @updatedAt
-        published Boolean  @default(true)
-        title     String
-        content   String?
-        author    User?    @relation(fields: [authorId], references: [id])
-        authorId  String?
-    }
-    "#};
-
-    assert_reformat(input, expected);
-}
-
-#[test]
 fn should_not_get_confused_with_complicated_self_relations() {
     let input = indoc! {r#"
     model Human {
