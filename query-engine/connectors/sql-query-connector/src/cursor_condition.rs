@@ -22,41 +22,59 @@ struct CursorOrderDefinition {
 
 /// Builds a cursor query condition based on the cursor arguments and if necessary a table that the condition depends on.
 ///
-/// An example query for 4 order-by fields is:
+/// An example query for 4 order-by fields (where the last field is one2m relation) is:
+///
 /// ```sql
 /// SELECT
-///   `TestModel`.`id`
-///      LEFT JOIN
+///   `ModelA`.`id`
 /// FROM
-///   `TestModel`,
+///   `ModelA`
+///   LEFT JOIN `ModelB` AS `orderby_3_ModelB` ON (
+///     `ModelA`.`modelB_id` = `orderby_3_ModelB`.`fieldD`
+///   ),
 ///   -- >>> Begin Part #1
 ///   (
-///       SELECT
-///           `TestModel`.`fieldA` AS ,
-///           `TestModel`.`fieldB` AS,
-///           `TestModel`.`fieldC` AS,
-///           `TestModel`.`fieldD` AS
-///       FROM
-///           `TestModel`
-///       WHERE
-///           (`TestModel`.`id`) = (4)
-///   ) AS `order_cmp`
-///   -- <<< End Part #1
+///     SELECT
+///       `ModelA`.`fieldA` AS `ModelA_fieldA_0`,
+///       `ModelA`.`fieldB` AS `ModelA_fieldB_1`,
+///       `ModelA`.`fieldC` AS `ModelA_fieldC_2`,
+///       `orderby_3_ModelB`.`fieldD` AS `ModelB_fieldD_3`
+///     FROM
+///       `ModelA`
+///       LEFT JOIN `ModelB` AS `orderby_3_ModelB` ON (
+///         `ModelA`.`modelB_id` = `orderby_3_ModelB`.`fieldD`
+///       )
+///     WHERE
+///       (`ModelA`.`id`) = (?)
+///   ) AS `order_cmp` -- <<< End Part #1
 /// WHERE
 ///   -- >>> Begin Part #2
-///   (`TestModel`.`fieldA` = `order_cmp`.`fieldA` AND `TestModel`.`fieldB` = `order_cmp`.`fieldB` AND `TestModel`.`fieldC` = `order_cmp`.`fieldC` AND `TestModel`.`fieldD` <= `order_cmp`.`fieldD`)
-///   OR
-///   (`TestModel`.`fieldA` = `order_cmp`.`fieldA` AND `TestModel`.`fieldB` = `order_cmp`.`fieldB` AND `TestModel`.`fieldC` > `order_cmp`.`fieldC`)
-///   OR
-///   (`TestModel`.`fieldA` = `order_cmp`.`fieldA` AND `TestModel`.`fieldB` > `order_cmp`.`fieldB`)
-///   OR
-///   (`TestModel`.`fieldA` < `order_cmp`.`fieldA`)
+///   (
+///     (
+///       `ModelA`.`fieldA` = `order_cmp`.`ModelA_fieldA_0`
+///       AND `ModelA`.`fieldB` = `order_cmp`.`ModelA_fieldB_1`
+///       AND `ModelA`.`fieldC` = `order_cmp`.`ModelA_fieldC_2`
+///       AND `orderby_3_ModelB`.`fieldD` <= `order_cmp`.`ModelB_fieldD_3`
+///     )
+///     OR (
+///       `ModelA`.`fieldA` = `order_cmp`.`ModelA_fieldA_0`
+///       AND `ModelA`.`fieldB` = `order_cmp`.`ModelA_fieldB_1`
+///       AND `ModelA`.`fieldC` > `order_cmp`.`ModelA_fieldC_2`
+///     )
+///     OR (
+///       `ModelA`.`fieldA` = `order_cmp`.`ModelA_fieldA_0`
+///       AND `ModelA`.`fieldB` > `order_cmp`.`ModelA_fieldB_1`
+///     )
+///     OR (
+///       `ModelA`.`fieldA` < `order_cmp`.`ModelA_fieldA_0`
+///     )
+///   )
 ///   -- <<< End Part #2
 /// ORDER BY
-///   `TestModel`.`fieldA` DESC,
-///   `TestModel`.`fieldB` ASC,
-///   `TestModel`.`fieldC` ASC,
-///   `TestModel`.`fieldD` DESC;
+///   `ModelA`.`fieldA` DESC,
+///   `ModelA`.`fieldB` ASC,
+///   `ModelA`.`fieldC` ASC,
+///   `orderby_3_ModelB`.`fieldD` DESC
 /// ```
 ///
 /// The above assumes that all field are non-nullable. If a field is nullable, #2 conditions slighty change:
@@ -77,6 +95,15 @@ struct CursorOrderDefinition {
 ///     OR `TestModel`.`fieldA` IS NULL
 ///   )
 ///   -- ...
+/// ```
+/// When the ordering is performed on a nullable _relation_,
+/// the conditions change in the same way as above, with the addition that foreign keys are also compared to NULL:
+/// ```sql
+///   -- ... The first (4 - condition) block:
+///   AND (
+///     `orderby_3_ModelB`.`id` <= `order_cmp`.`ModelB_fieldD_3`
+///     OR `main`.`ModelA`.`modelB_id` IS NULL -- >>> Additional check for the nullable foreign key
+///   )
 /// ```
 pub fn build(
     query_arguments: &QueryArguments,
@@ -186,7 +213,11 @@ pub fn build(
 
 // A negative `take` value signifies that values should be taken before the cursor,
 // requiring the correct comparison operator to be used to fit the reversed order.
-fn map_orderby_condition(order_definition: &CursorOrderDefinition, reverse: bool, include_eq: bool) -> Expression<'static> {
+fn map_orderby_condition(
+    order_definition: &CursorOrderDefinition,
+    reverse: bool,
+    include_eq: bool,
+) -> Expression<'static> {
     let (field, field_alias) = &order_definition.field_aliased;
     let cmp_column = Column::from((ORDER_TABLE_ALIAS, field_alias.to_owned()));
     let cloned_cmp_column = cmp_column.clone();
@@ -373,12 +404,12 @@ fn order_definitions(
 }
 
 // Returns (last_elem, before_last_elem)
-fn take_last_two_elem<T>(vec: &Vec<T>) -> (Option<&T>, Option<&T>) {
-    let len = vec.len();
+fn take_last_two_elem<T>(slice: &[T]) -> (Option<&T>, Option<&T>) {
+    let len = slice.len();
 
     match len {
         0 => (None, None),
-        1 => (vec.get(0), None),
-        _ => (vec.get(len - 1), vec.get(len - 2)),
+        1 => (slice.get(0), None),
+        _ => (slice.get(len - 1), slice.get(len - 2)),
     }
 }
