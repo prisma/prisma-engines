@@ -11,7 +11,7 @@ use prisma_models::RelationFieldRef;
 ///        -> D
 /// ```
 /// Translates to: `JoinStage(A, nested: Vec<JoinStage(B), JoinStage(C)>)`.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub(crate) struct JoinStage {
     /// The starting point of the traversal (left model of the join).
     pub(crate) source: RelationFieldRef,

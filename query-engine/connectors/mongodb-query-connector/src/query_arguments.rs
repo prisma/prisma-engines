@@ -1,8 +1,13 @@
 use crate::{
-    cursor::CursorBuilder, error::MongoError, filter::convert_filter, join::JoinStage, orderby::OrderByBuilder,
+    cursor::{CursorBuilder, CursorData},
+    error::MongoError,
+    filter::convert_filter,
+    join::JoinStage,
+    orderby::OrderByBuilder,
     BsonTransform, IntoBson,
 };
 use connector_interface::{AggregationSelection, Filter, QueryArguments};
+use itertools::Itertools;
 use mongodb::{
     bson::{doc, Bson, Document},
     options::{AggregateOptions, FindOptions},
@@ -33,15 +38,18 @@ pub(crate) struct MongoQueryArgs {
     /// Order by builder for deferred processing.
     order_builder: Option<OrderByBuilder>,
 
-    /// Finalized ordering.
+    /// Finalized ordering: Order document.
     pub(crate) order: Option<Document>,
+
+    /// Finalized ordering: Necessary Joins
+    /// Kept separate as cursor building needs to consider them seperately.
+    pub(crate) order_joins: Vec<JoinStage>,
 
     /// Cursor builder for deferred processing.
     cursor_builder: Option<CursorBuilder>,
 
-    /// A mongo filter document containing cursor-related conditions.
-    /// These are applied after sort operations but before skip or takes.
-    pub(crate) cursor: Option<Document>,
+    /// Struct containing data required to build cursor queries.
+    pub(crate) cursor_data: Option<CursorData>,
 
     /// Skip a number of documents at the start of the result.
     pub(crate) skip: Option<i64>,
@@ -59,14 +67,52 @@ pub(crate) struct MongoQueryArgs {
 }
 
 impl MongoQueryArgs {
+    pub(crate) fn new(args: QueryArguments) -> crate::Result<MongoQueryArgs> {
+        check_unsupported(&args)?;
+
+        let reverse_order = args.take.map(|t| t < 0).unwrap_or(false);
+        let order_by = args.order_by;
+
+        let order_builder = Some(OrderByBuilder::new(order_by.clone(), reverse_order));
+        let cursor_builder = args.cursor.map(|c| CursorBuilder::new(c, order_by, reverse_order));
+
+        let mut post_filters = vec![];
+        let mut joins = vec![];
+
+        let query = match args.filter {
+            Some(filter) => {
+                // If a filter comes with joins, it needs to be run _after_ the initial filter query / $matches.
+                let (filter, filter_joins) = convert_filter(filter, false)?.render();
+                if !filter_joins.is_empty() {
+                    joins.extend(filter_joins);
+                    post_filters.push(filter);
+
+                    None
+                } else {
+                    Some(filter)
+                }
+            }
+            None => None,
+        };
+
+        Ok(MongoQueryArgs {
+            query,
+            join_filters: post_filters,
+            joins,
+            order_builder,
+            cursor_builder,
+            skip: skip(args.skip, args.ignore_skip),
+            limit: take(args.take, args.ignore_take),
+            ..Default::default()
+        })
+    }
+
     /// Turns the query args into a find operation on the collection.
     /// Depending on the arguments, either an aggregation pipeline or a plain query is build and run.
     pub(crate) async fn find_documents(mut self, coll: Collection) -> crate::Result<Cursor> {
         self.finalize()?;
 
-        // Technically the cursor filter doesn't need to trigger an AP query,
-        // but it's more convenient for now from a query building perspective.
-        if self.joins.is_empty() && self.aggregations.is_empty() && self.cursor.is_none() {
+        if self.joins.is_empty() && self.aggregations.is_empty() && self.cursor_data.is_none() {
             self.execute_find_query(coll).await
         } else {
             self.execute_pipeline_query(coll).await
@@ -87,7 +133,24 @@ impl MongoQueryArgs {
     }
 
     async fn execute_pipeline_query(self, coll: Collection) -> crate::Result<Cursor> {
+        if self.cursor_data.is_none() {
+            self.execute_pipeline_internal(coll).await
+        } else {
+            self.execute_cursored_internal(coll).await
+        }
+    }
+
+    /// Pipeline not requiring a cursor.
+    async fn execute_pipeline_internal(self, coll: Collection) -> crate::Result<Cursor> {
         let opts = AggregateOptions::builder().allow_disk_use(true).build();
+        let stages = self.into_pipeline_stages();
+
+        dbg!(&stages);
+
+        Ok(coll.aggregate(stages, opts).await?)
+    }
+
+    fn into_pipeline_stages(self) -> Vec<Document> {
         let mut stages = vec![];
 
         // Initial $matches
@@ -97,6 +160,7 @@ impl MongoQueryArgs {
 
         // Joins ($lookup)
         stages.extend(self.joins.into_iter().map(|stage| stage.build()));
+        stages.extend(self.order_joins.into_iter().map(|stage| stage.build()));
 
         // Post-join $matches
         stages.extend(self.join_filters.into_iter().map(|filter| doc! { "$match": filter }));
@@ -120,11 +184,6 @@ impl MongoQueryArgs {
         // $sort
         if let Some(order) = self.order {
             stages.push(doc! { "$sort": order })
-        };
-
-        // Cursor
-        if let Some(cursor_filter) = self.cursor {
-            stages.push(doc! { "$match": cursor_filter })
         };
 
         // $skip
@@ -154,48 +213,67 @@ impl MongoQueryArgs {
             );
         }
 
-        dbg!(&stages);
-
-        Ok(coll.aggregate(stages, opts).await?)
+        stages
     }
 
-    pub(crate) fn new(args: QueryArguments) -> crate::Result<MongoQueryArgs> {
-        check_unsupported(&args)?;
+    /// Pipeline query with a cursor. Requires special building to form a query that first
+    /// pins a cursor and then builds cursor conditions based on that cursor document
+    /// and the orderings that the query defined.
+    /// The query has the form:
+    /// ```text
+    /// testModel.aggregate([
+    ///     { $match: { <filter finding exactly one document (cursor doc)> }},
+    ///     { $lookup: { <if present, join that are required for orderBy relations> }}
+    ///     { ... more joins if necessary ... }
+    ///     {
+    ///         $lookup: <"self join" testModel and execute non-cursor query with cursor filter here.>
+    ///     }
+    /// ])
+    /// ```
+    /// Expressed in words, this query first makes the cursor document (that defines all values
+    /// to make cursor comparators work) available for the inner pipeline to build the filters.
+    /// The inner pipeline is basically what an non-cursor query would look like with added cursor
+    /// conditions. The inner join stage is refered to as a self-join here because it joins the cursor document
+    /// to it's collection again to pull in all documents for filtering, but technically it doesn't
+    /// actually join anything.
+    ///
+    /// Todo concrete example
+    async fn execute_cursored_internal(mut self, coll: Collection) -> crate::Result<Cursor> {
+        let opts = AggregateOptions::builder().allow_disk_use(true).build();
+        let cursor_data = self.cursor_data.take().unwrap();
 
-        let reverse_order = args.take.map(|t| t < 0).unwrap_or(false);
-        let order_builder = Some(OrderByBuilder::new(args.order_by, reverse_order));
+        // For now we assume that simply putting the cursor condition into the join conditions is enough
+        // to let them run in the correct place.
+        self.join_filters.push(cursor_data.cursor_condition);
 
-        let mut post_filters = vec![];
-        let mut joins = vec![];
+        let order_join_stages = self
+            .order_joins
+            .clone()
+            .into_iter()
+            .map(|stage| stage.build())
+            .collect_vec();
 
-        let query = match args.filter {
-            Some(filter) => {
-                // If a filter comes with joins, it needs to be run _after_ the initial filter query / $matches.
-                let (filter, filter_joins) = convert_filter(filter, false)?.render();
-                if !filter_joins.is_empty() {
-                    joins.extend(filter_joins);
-                    post_filters.push(filter);
+        // Outer query to pin the cursor document.
+        let mut outer_stages = vec![];
 
-                    None
-                } else {
-                    Some(filter)
-                }
-            }
-            None => None,
-        };
+        // First match the cursor, then add required ordering joins.
+        outer_stages.push(doc! { "$match": cursor_data.cursor_filter });
+        outer_stages.extend(order_join_stages);
 
-        let cursor_builder = args.cursor.map(|c| CursorBuilder::new(c));
+        // Self-"join" collection
+        let inner_stages = self.into_pipeline_stages();
 
-        Ok(MongoQueryArgs {
-            query,
-            join_filters: post_filters,
-            joins,
-            order_builder,
-            cursor_builder,
-            skip: skip(args.skip, args.ignore_skip),
-            limit: take(args.take, args.ignore_take),
-            ..Default::default()
-        })
+        outer_stages.push(doc! {
+            "from": coll.name(),
+            "let": cursor_data.bindings,
+            "pipeline": inner_stages,
+            "as": "cursor_inner",
+        });
+
+        dbg!(&outer_stages);
+
+        // Todo we need to unwrap (unwind?) the result.
+        Ok(coll.aggregate(outer_stages, opts).await?)
     }
 
     /// Adds a final projection onto the fields specified by the `ModelProjection`.
@@ -268,17 +346,18 @@ impl MongoQueryArgs {
     }
 
     fn finalize(&mut self) -> crate::Result<()> {
+        // Cursor building depends on the ordering, so it must come first.
         if let Some(order_builder) = self.order_builder.take() {
             let (order, joins) = order_builder.build(self.is_group_by_query);
 
-            self.joins.extend(joins);
+            self.order_joins.extend(joins);
             self.order = order;
         }
 
         if let Some(cursor_builder) = self.cursor_builder.take() {
-            let doc = cursor_builder.build()?;
+            let cursor_data = cursor_builder.build()?;
 
-            self.cursor = Some(doc);
+            self.cursor_data = Some(cursor_data);
         }
 
         Ok(())
