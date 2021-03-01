@@ -1,4 +1,4 @@
-use crate::{ordering, query_arguments_ext::QueryArgumentsExt};
+use crate::{ordering::OrderingJoins, query_arguments_ext::QueryArgumentsExt};
 use connector_interface::QueryArguments;
 use prisma_models::*;
 use quaint::ast::*;
@@ -9,7 +9,7 @@ type AliasedScalar = (ScalarFieldRef, String);
 type MaybeAliasedScalar = (ScalarFieldRef, Option<String>);
 
 #[derive(Debug)]
-struct OrderDefinition {
+struct CursorOrderDefinition {
     // Field on which to perform the ordering
     pub(crate) field_aliased: AliasedScalar,
     // Direction of the sort
@@ -20,27 +20,22 @@ struct OrderDefinition {
     pub(crate) fks: Option<Vec<MaybeAliasedScalar>>,
 }
 
-#[derive(Debug)]
-struct OrderDefinitions {
-    pub(crate) definitions: Vec<OrderDefinition>,
-    pub(crate) joins: Vec<JoinData<'static>>,
-}
-
 /// Builds a cursor query condition based on the cursor arguments and if necessary a table that the condition depends on.
 ///
 /// An example query for 4 order-by fields is:
 /// ```sql
 /// SELECT
 ///   `TestModel`.`id`
+///      LEFT JOIN
 /// FROM
 ///   `TestModel`,
 ///   -- >>> Begin Part #1
 ///   (
 ///       SELECT
-///           `TestModel`.`fieldA`,
-///           `TestModel`.`fieldB`,
-///           `TestModel`.`fieldC`,
-///           `TestModel`.`fieldD`
+///           `TestModel`.`fieldA` AS ,
+///           `TestModel`.`fieldB` AS,
+///           `TestModel`.`fieldC` AS,
+///           `TestModel`.`fieldD` AS
 ///       FROM
 ///           `TestModel`
 ///       WHERE
@@ -83,7 +78,11 @@ struct OrderDefinitions {
 ///   )
 ///   -- ...
 /// ```
-pub fn build(query_arguments: &QueryArguments, model: &ModelRef) -> (Option<Table<'static>>, ConditionTree<'static>) {
+pub fn build(
+    query_arguments: &QueryArguments,
+    model: &ModelRef,
+    ordering_joins: &Vec<OrderingJoins>,
+) -> (Option<Table<'static>>, ConditionTree<'static>) {
     match query_arguments.cursor {
         None => (None, ConditionTree::NoCondition),
         Some(ref cursor) => {
@@ -99,7 +98,7 @@ pub fn build(query_arguments: &QueryArguments, model: &ModelRef) -> (Option<Tabl
             let cursor_condition = cursor_row.clone().equals(cursor_values.clone());
 
             // Orderings for this query. Influences which fields we need to fetch for comparing order fields.
-            let OrderDefinitions { mut definitions, joins } = order_definitions(query_arguments, model);
+            let mut definitions = order_definitions(query_arguments, model, &ordering_joins);
 
             // Subquery to find the value of the order field(s) that we need for comparison. Builds part #1 of the query example in the docs.
             let order_subquery = definitions
@@ -108,13 +107,16 @@ pub fn build(query_arguments: &QueryArguments, model: &ModelRef) -> (Option<Tabl
                     select.column(
                         definition
                             .order_column
-                            .to_owned()
+                            .clone()
                             .alias(definition.field_aliased.1.to_owned()),
                     )
                 })
                 .so_that(cursor_condition);
 
-            let order_subquery = joins.into_iter().fold(order_subquery, |acc, join| acc.left_join(join));
+            let order_subquery = ordering_joins
+                .iter()
+                .flat_map(|j| &j.joins)
+                .fold(order_subquery, |acc, join| acc.left_join(join.data.clone()));
 
             let subquery_table = Table::from(order_subquery).alias(ORDER_TABLE_ALIAS);
             let len = definitions.len();
@@ -133,7 +135,7 @@ pub fn build(query_arguments: &QueryArguments, model: &ModelRef) -> (Option<Tabl
                     for order_definition in head {
                         and_conditions.push(map_equality_condition(
                             &order_definition.field_aliased,
-                            order_definition.order_column.to_owned(),
+                            order_definition.order_column.clone(),
                         ));
                     }
 
@@ -184,11 +186,10 @@ pub fn build(query_arguments: &QueryArguments, model: &ModelRef) -> (Option<Tabl
 
 // A negative `take` value signifies that values should be taken before the cursor,
 // requiring the correct comparison operator to be used to fit the reversed order.
-fn map_orderby_condition(order_definition: &OrderDefinition, reverse: bool, include_eq: bool) -> Expression<'static> {
+fn map_orderby_condition(order_definition: &CursorOrderDefinition, reverse: bool, include_eq: bool) -> Expression<'static> {
     let (field, field_alias) = &order_definition.field_aliased;
     let cmp_column = Column::from((ORDER_TABLE_ALIAS, field_alias.to_owned()));
     let cloned_cmp_column = cmp_column.clone();
-    // TODO: can we not clone..?
     let order_column = order_definition.order_column.clone();
     let cloned_order_column = order_column.clone();
 
@@ -279,16 +280,16 @@ fn map_equality_condition(field: &AliasedScalar, order_column: Column<'static>) 
     }
 }
 
-fn order_definitions(query_arguments: &QueryArguments, model: &ModelRef) -> OrderDefinitions {
-    let mut joins = vec![];
-    let mut orderings: Vec<OrderDefinition> = vec![];
+fn order_definitions(
+    query_arguments: &QueryArguments,
+    model: &ModelRef,
+    ordering_joins: &Vec<OrderingJoins>,
+) -> Vec<CursorOrderDefinition> {
+    let mut orderings: Vec<CursorOrderDefinition> = vec![];
 
     for (index, order_by) in query_arguments.order_by.iter().enumerate() {
-        let (mut computed_joins, join_aliases, order_column) = ordering::compute_joins(order_by, index, model);
-
-        joins.append(&mut computed_joins);
-
         let (last_hop, before_last_hop) = take_last_two_elem(&order_by.path);
+        let joins_for_hop = ordering_joins.get(index).unwrap();
 
         // If there are any ordering hop, this finds the foreign key fields for the _last_ hop (we look for the last one because the ordering is done the last one).
         // These fk fields are needed to check whether they are nullable
@@ -320,11 +321,11 @@ fn order_definitions(query_arguments: &QueryArguments, model: &ModelRef) -> Orde
                     //                          <foreign_key_db_name> == "c_id"
                     match before_last_hop {
                         Some(_) => {
-                            let (_, before_last_join_alias) = take_last_two_elem(&join_aliases);
-                            let before_last_join_alias = before_last_join_alias
-                                .expect("There should be an equal amount of order by hops and joins");
+                            let (_, before_last_join) = take_last_two_elem(&joins_for_hop.joins);
+                            let before_last_join =
+                                before_last_join.expect("There should be an equal amount of order by hops and joins");
 
-                            (fk_field, Some(before_last_join_alias.to_owned()))
+                            (fk_field, Some(before_last_join.alias.to_owned()))
                         }
                         None => {
                             // If there is not more than one hop, then there's no need to alias the fk field
@@ -335,7 +336,7 @@ fn order_definitions(query_arguments: &QueryArguments, model: &ModelRef) -> Orde
                 .collect()
         });
 
-        // Selected fields needs to be aliased in case there there two order bys on two different tables, pointing to a field of the same name.
+        // Selected fields needs to be aliased in case there are two order bys on two different tables, pointing to a field of the same name.
         // eg: orderBy: [{ id: asc }, { b: { id: asc } }]
         // Without these aliases, selecting from the <ORDER_TABLE_ALIAS> tmp table would result in ambiguous field name
         let field_aliased = (
@@ -343,22 +344,22 @@ fn order_definitions(query_arguments: &QueryArguments, model: &ModelRef) -> Orde
             format!("{}_{}_{}", order_by.field.model().name, order_by.field.name, index).to_owned(),
         );
 
-        orderings.push(OrderDefinition {
+        orderings.push(CursorOrderDefinition {
             field_aliased,
             sort_order: order_by.sort_order,
-            order_column,
+            order_column: joins_for_hop.order_column.clone(),
             fks,
         });
     }
 
     if orderings.is_empty() {
-        let definitions = model
+        return model
             .primary_identifier()
             .scalar_fields()
             .map(|f| {
                 let field_aliased = (f.clone(), f.db_name().to_owned());
 
-                OrderDefinition {
+                CursorOrderDefinition {
                     field_aliased,
                     sort_order: SortOrder::Ascending,
                     order_column: f.as_column(),
@@ -366,16 +367,12 @@ fn order_definitions(query_arguments: &QueryArguments, model: &ModelRef) -> Orde
                 }
             })
             .collect();
-
-        return OrderDefinitions { definitions, joins };
     }
 
-    OrderDefinitions {
-        definitions: orderings,
-        joins,
-    }
+    orderings
 }
 
+// Returns (last_elem, before_last_elem)
 fn take_last_two_elem<T>(vec: &Vec<T>) -> (Option<&T>, Option<&T>) {
     let len = vec.len();
 

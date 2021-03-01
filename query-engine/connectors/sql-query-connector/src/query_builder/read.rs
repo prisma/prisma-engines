@@ -29,8 +29,8 @@ impl SelectDefinition for Select<'static> {
 
 impl SelectDefinition for QueryArguments {
     fn into_select(self, model: &ModelRef) -> Select<'static> {
-        let (table_opt, cursor_condition) = cursor_condition::build(&self, &model);
-        let (orderings, joins) = ordering::build(&self, &model);
+        let (orderings, ordering_joins) = ordering::build(&self, &model);
+        let (table_opt, cursor_condition) = cursor_condition::build(&self, &model, &ordering_joins);
 
         let limit = if self.ignore_take { None } else { self.take_abs() };
         let skip = if self.ignore_skip { 0 } else { self.skip.unwrap_or(0) };
@@ -46,11 +46,12 @@ impl SelectDefinition for QueryArguments {
             (filter, cursor) => ConditionTree::and(filter, cursor),
         };
 
-        let table_joins = joins
+        let joined_table = ordering_joins
             .into_iter()
-            .fold(model.as_table(), |acc, join| acc.left_join(join));
+            .flat_map(|j| j.joins)
+            .fold(model.as_table(), |acc, join| acc.left_join(join.data));
 
-        let select_ast = Select::from_table(table_joins)
+        let select_ast = Select::from_table(joined_table)
             .so_that(conditions)
             .offset(skip as usize);
 
