@@ -7,6 +7,7 @@ static ORDER_TABLE_ALIAS: &str = "order_cmp";
 
 type AliasedScalar = (ScalarFieldRef, String);
 type MaybeAliasedScalar = (ScalarFieldRef, Option<String>);
+
 #[derive(Debug)]
 struct OrderDefinition {
     // Field on which to perform the ordering
@@ -287,14 +288,12 @@ fn order_definitions(query_arguments: &QueryArguments, model: &ModelRef) -> Orde
 
         joins.append(&mut computed_joins);
 
-        let last_hops: Vec<_> = order_by.path.iter().rev().take(2).collect();
-        let maybe_last_hop = last_hops.get(0);
-        let maybe_before_last_hop = last_hops.get(1);
+        let (last_hop, before_last_hop) = take_last_two_elem(&order_by.path);
 
         // If there are any ordering hop, this finds the foreign key fields for the _last_ hop (we look for the last one because the ordering is done the last one).
         // These fk fields are needed to check whether they are nullable
         // cf: part #2 of the SQL query above, when a field is nullable.
-        let fks = maybe_last_hop.map(|rf| {
+        let fks = last_hop.map(|rf| {
             rf.relation_info
                 .fields
                 .iter()
@@ -319,14 +318,18 @@ fn order_definitions(query_arguments: &QueryArguments, model: &ModelRef) -> Orde
                     // ```
                     // In the example above, <before_last_join_alias> == "orderby_0_ModelB"
                     //                          <foreign_key_db_name> == "c_id"
-                    if maybe_before_last_hop.is_some() {
-                        let last_two_joins: Vec<_> = join_aliases.iter().rev().take(2).collect();
-                        let before_last_join_alias = *last_two_joins.get(1).unwrap();
+                    match before_last_hop {
+                        Some(_) => {
+                            let (_, before_last_join_alias) = take_last_two_elem(&join_aliases);
+                            let before_last_join_alias = before_last_join_alias
+                                .expect("There should be an equal amount of order by hops and joins");
 
-                        (fk_field, Some(before_last_join_alias.to_owned()))
-                    } else {
-                        // If there is not more than one hop, then there's no need to alias the fk field
-                        (fk_field, None)
+                            (fk_field, Some(before_last_join_alias.to_owned()))
+                        }
+                        None => {
+                            // If there is not more than one hop, then there's no need to alias the fk field
+                            (fk_field, None)
+                        }
                     }
                 })
                 .collect()
@@ -370,5 +373,15 @@ fn order_definitions(query_arguments: &QueryArguments, model: &ModelRef) -> Orde
     OrderDefinitions {
         definitions: orderings,
         joins,
+    }
+}
+
+fn take_last_two_elem<T>(vec: &Vec<T>) -> (Option<&T>, Option<&T>) {
+    let len = vec.len();
+
+    match len {
+        0 => (None, None),
+        1 => (vec.get(0), None),
+        _ => (vec.get(len - 1), vec.get(len - 2)),
     }
 }
