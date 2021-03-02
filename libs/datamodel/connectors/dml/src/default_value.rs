@@ -35,6 +35,11 @@ impl DefaultValue {
         matches!(self, DefaultValue::Expression(generator) if generator.name == "autoincrement")
     }
 
+    /// Does this match @default(cuid(_))?
+    pub fn is_cuid(&self) -> bool {
+        matches!(self, DefaultValue::Expression(generator) if generator.name == "cuid")
+    }
+
     /// Does this match @default(dbgenerated(_))?
     pub fn is_dbgenerated(&self) -> bool {
         matches!(self, DefaultValue::Expression(generator) if generator.name == "dbgenerated")
@@ -43,6 +48,11 @@ impl DefaultValue {
     /// Does this match @default(now())?
     pub fn is_now(&self) -> bool {
         matches!(self, DefaultValue::Expression(generator) if generator.name == "now")
+    }
+
+    /// Does this match @default(uuid(_))?
+    pub fn is_uuid(&self) -> bool {
+        matches!(self, DefaultValue::Expression(generator) if generator.name == "uuid")
     }
 
     pub fn new_db_generated(description: String) -> Self {
@@ -213,6 +223,22 @@ mod tests {
 
         assert!(auto_increment_default.is_now());
         assert!(!auto_increment_default.is_autoincrement());
+    }
+
+    #[test]
+    fn default_value_is_uuid() {
+        let auto_increment_default = DefaultValue::Expression(ValueGenerator::new_uuid());
+
+        assert!(auto_increment_default.is_uuid());
+        assert!(!auto_increment_default.is_autoincrement());
+    }
+
+    #[test]
+    fn default_value_is_cuid() {
+        let auto_increment_default = DefaultValue::Expression(ValueGenerator::new_cuid());
+
+        assert!(auto_increment_default.is_cuid());
+        assert!(!auto_increment_default.is_now());
     }
 
     #[test]

@@ -7,6 +7,10 @@ use sql_schema_describer::SqlSchema;
 pub struct SqlMigration {
     pub(crate) before: SqlSchema,
     pub(crate) after: SqlSchema,
+    /// (table_index, column_index) for columns with a prisma-level default
+    /// (cuid() or uuid()) in the `after` schema that aren't present in the
+    /// `before` schema.
+    pub(crate) added_columns_with_virtual_defaults: Vec<(usize, usize)>,
     pub(crate) steps: Vec<SqlMigrationStep>,
 }
 
@@ -43,6 +47,20 @@ pub(crate) enum SqlMigrationStep {
 }
 
 impl SqlMigrationStep {
+    pub(crate) fn as_alter_table(&self) -> Option<&AlterTable> {
+        match self {
+            SqlMigrationStep::AlterTable(alter_table) => Some(alter_table),
+            _ => None,
+        }
+    }
+
+    pub(crate) fn as_redefine_tables(&self) -> Option<&[RedefineTable]> {
+        match self {
+            SqlMigrationStep::RedefineTables(redefines) => Some(redefines),
+            _ => None,
+        }
+    }
+
     pub(crate) fn description(&self) -> &'static str {
         match self {
             SqlMigrationStep::AddForeignKey(_) => "AddForeignKey",
@@ -98,6 +116,13 @@ pub(crate) enum TableChange {
 }
 
 impl TableChange {
+    pub(crate) fn as_add_column(&self) -> Option<&AddColumn> {
+        match self {
+            TableChange::AddColumn(col) => Some(col),
+            _ => None,
+        }
+    }
+
     pub(crate) fn as_alter_column(&self) -> Option<&AlterColumn> {
         match self {
             TableChange::AlterColumn(col) => Some(col),
