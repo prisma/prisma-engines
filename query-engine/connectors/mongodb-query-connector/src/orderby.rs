@@ -1,7 +1,7 @@
 use crate::join::JoinStage;
 use itertools::Itertools;
 use mongodb::bson::Document;
-use prisma_models::{OrderBy, SortOrder};
+use prisma_models::{OrderBy, RelationFieldRef, SortOrder};
 
 /// Builder for `sort` mongo documents.
 /// Building of orderBy needs to be deferred until all other args are complete
@@ -29,8 +29,9 @@ impl OrderByBuilder {
         let mut joins = vec![];
 
         for (index, order_by) in self.order_bys.into_iter().enumerate() {
-            let prefix = if !order_by.path.is_empty() {
-                let mut prefix = order_by.path.iter().map(|rf| rf.relation().name.clone()).collect_vec();
+            let prefix = order_by_relation_prefix(index, &order_by.path);
+
+            if let Some(ref prefix) = prefix {
                 let mut stages = order_by.path.into_iter().map(|rf| JoinStage::new(rf)).collect_vec();
 
                 // We fold from right to left because the right hand side needs to be always contained
@@ -45,16 +46,9 @@ impl OrderByBuilder {
                     })
                     .unwrap();
 
-                let alias = format!("orderby_{}_{}", prefix[0], index);
-
-                final_stage.set_alias(alias.clone());
+                final_stage.set_alias(prefix.first().unwrap().to_string());
                 joins.push(final_stage);
-                prefix[0] = alias;
-
-                Some(prefix.join("."))
-            } else {
-                None
-            };
+            }
 
             let field = if is_group_by {
                 // Explanation: All group by fields go into the _id key of the result document.
@@ -63,7 +57,7 @@ impl OrderByBuilder {
                 format!("_id.{}", order_by.field.db_name())
             } else {
                 if let Some(prefix) = prefix {
-                    format!("{}.{}", prefix, order_by.field.db_name())
+                    format!("{}.{}", prefix.to_string(), order_by.field.db_name())
                 } else {
                     order_by.field.db_name().to_owned()
                 }
@@ -79,5 +73,38 @@ impl OrderByBuilder {
         }
 
         (Some(order_doc), joins)
+    }
+}
+
+pub(crate) struct OrderByPrefix {
+    parts: Vec<String>,
+}
+
+impl ToString for OrderByPrefix {
+    fn to_string(&self) -> String {
+        self.parts.join(".")
+    }
+}
+
+impl OrderByPrefix {
+    pub(crate) fn new(parts: Vec<String>) -> Self {
+        Self { parts }
+    }
+
+    pub(crate) fn first(&self) -> Option<&String> {
+        self.parts.iter().next()
+    }
+}
+
+pub(crate) fn order_by_relation_prefix(index: usize, path: &[RelationFieldRef]) -> Option<OrderByPrefix> {
+    if path.is_empty() {
+        None
+    } else {
+        let mut parts = path.iter().map(|rf| rf.relation().name.clone()).collect_vec();
+
+        let alias = format!("orderby_{}_{}", parts[0], index);
+        parts[0] = alias;
+
+        Some(OrderByPrefix::new(parts))
     }
 }
