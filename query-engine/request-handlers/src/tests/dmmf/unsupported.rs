@@ -24,7 +24,6 @@ fn unsupported_fields_should_be_filtered_from_input_and_output_types() {
     "#;
     let (query_schema, datamodel) = get_query_schema(dm);
     let dmmf = crate::dmmf::render_dmmf(&datamodel, Arc::new(query_schema));
-    dbg!(&dmmf);
     let output_types = dmmf.schema.output_object_types.get(PRISMA_NAMESPACE).unwrap();
     let input_types = dmmf.schema.input_object_types.get(PRISMA_NAMESPACE).unwrap();
 
