@@ -3,6 +3,7 @@ use prisma_models::ModelRef;
 use super::*;
 use crate::ParsedField;
 
+#[tracing::instrument(skip(field, model))]
 pub fn find_first(field: ParsedField, model: ModelRef) -> QueryGraphBuilderResult<ReadQuery> {
     let mut many_query = many::find_many(field, model)?;
 

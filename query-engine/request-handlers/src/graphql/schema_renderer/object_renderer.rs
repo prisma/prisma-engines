@@ -7,6 +7,7 @@ pub enum GqlObjectRenderer {
 }
 
 impl Renderer for GqlObjectRenderer {
+    #[tracing::instrument(name = "render_graphql_object", skip(self, ctx))]
     fn render(&self, ctx: &mut RenderContext) -> String {
         match &self {
             GqlObjectRenderer::Input(input) => self.render_input_object(input, ctx),

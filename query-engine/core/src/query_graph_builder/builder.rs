@@ -1,3 +1,5 @@
+use std::fmt;
+
 use super::*;
 use crate::{constants::inputs::args, query_document::*, query_graph::*, schema::*, IrSerializer};
 use prisma_value::PrismaValue;
@@ -6,6 +8,12 @@ use prisma_value::PrismaValue;
 // the query_document module, possibly already as part of the parser.
 pub struct QueryGraphBuilder {
     pub query_schema: QuerySchemaRef,
+}
+
+impl fmt::Debug for QueryGraphBuilder {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("QueryGraphBuilder").finish()
+    }
 }
 
 #[derive(Default)]
@@ -43,6 +51,7 @@ impl QueryGraphBuilder {
     }
 
     /// Maps an operation to a query.
+    #[tracing::instrument(skip(self, operation))]
     pub fn build(self, operation: Operation) -> QueryGraphBuilderResult<(QueryGraph, IrSerializer)> {
         match operation {
             Operation::Read(selection) => self.build_internal(selection, &self.query_schema.query()),
@@ -50,6 +59,7 @@ impl QueryGraphBuilder {
         }
     }
 
+    #[tracing::instrument(skip(self, selection, root_object))]
     fn build_internal(
         &self,
         selection: Selection,
@@ -74,6 +84,7 @@ impl QueryGraphBuilder {
         }
     }
 
+    #[tracing::instrument(skip(self, field_pair))]
     fn dispatch_build(&self, field_pair: FieldPair) -> QueryGraphBuilderResult<QueryGraph> {
         let query_info = field_pair.schema_field.query_info.as_ref().unwrap();
         let parsed_field = field_pair.parsed_field;

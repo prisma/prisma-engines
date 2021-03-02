@@ -1,6 +1,7 @@
 use super::*;
 use prisma_models::dml::DefaultValue;
 
+#[tracing::instrument(skip(ctx, model, parent_field))]
 pub(crate) fn create_one_input_types(
     ctx: &mut BuilderContext,
     model: &ModelRef,
@@ -21,6 +22,7 @@ pub(crate) fn create_one_input_types(
 /// Also valid for nested inputs. A nested input is constructed if the `parent_field` is provided.
 /// "Checked" input refers to disallowing writing relation scalars directly, as it can lead to unintended
 /// data integrity violations if used incorrectly.
+#[tracing::instrument(skip(ctx, model, parent_field))]
 fn checked_create_input_type(
     ctx: &mut BuilderContext,
     model: &ModelRef,
@@ -73,6 +75,7 @@ fn checked_create_input_type(
 }
 
 /// For checked create input types only. Compute input fields for relational fields.
+#[tracing::instrument(skip(ctx, model, parent_field))]
 fn relation_input_fields_for_checked_create(
     ctx: &mut BuilderContext,
     model: &ModelRef,
@@ -142,6 +145,7 @@ fn field_should_be_kept_for_checked_create_input_type(field: &ScalarFieldRef) ->
 /// Also valid for nested inputs. A nested input is constructed if the `parent_field` is provided.
 /// "Unchecked" input refers to allowing to write _all_ scalars on a model directly, which can
 /// lead to unintended data integrity violations if used incorrectly.
+#[tracing::instrument(skip(ctx, model, parent_field))]
 fn unchecked_create_input_type(
     ctx: &mut BuilderContext,
     model: &ModelRef,
@@ -208,6 +212,7 @@ fn unchecked_create_input_type(
 }
 
 /// For unchecked create input types only. Compute input fields for relational fields.
+#[tracing::instrument(skip(ctx, model, parent_field))]
 fn relation_input_fields_for_unchecked_create(
     ctx: &mut BuilderContext,
     model: &ModelRef,

@@ -37,11 +37,13 @@ impl<'tx> SqlConnectorTransaction<'tx> {
 
 #[async_trait]
 impl<'tx> Transaction for SqlConnectorTransaction<'tx> {
+    #[tracing::instrument(skip(self))]
     async fn commit(&self) -> connector::Result<()> {
         self.catch(async move { Ok(self.inner.commit().await.map_err(SqlError::from)?) })
             .await
     }
 
+    #[tracing::instrument(skip(self))]
     async fn rollback(&self) -> connector::Result<()> {
         self.catch(async move { Ok(self.inner.rollback().await.map_err(SqlError::from)?) })
             .await

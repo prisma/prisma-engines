@@ -13,6 +13,7 @@ use prisma_models::{Field, ModelRef, PrismaValue, RelationFieldRef, ScalarFieldR
 use std::{convert::TryInto, str::FromStr};
 
 /// Extracts a filter for a unique selector, i.e. a filter that selects exactly one record.
+#[tracing::instrument(skip(value_map, model))]
 pub fn extract_unique_filter(value_map: ParsedInputMap, model: &ModelRef) -> QueryGraphBuilderResult<Filter> {
     let filters = value_map
         .into_iter()
@@ -64,6 +65,7 @@ fn handle_compound_field(fields: Vec<ScalarFieldRef>, value: ParsedInputValue) -
 /// | OR   | return empty list | validate single filter | validate all filters |
 /// | AND  | return all items  | validate single filter | validate all filters |
 /// | NOT  | return all items  | validate single filter | validate all filters |
+#[tracing::instrument(skip(value_map, model))]
 pub fn extract_filter(value_map: ParsedInputMap, model: &ModelRef) -> QueryGraphBuilderResult<Filter> {
     // We define an internal function so we can track the recursion depth. Empty
     // filters at the root layer can not always be removed.

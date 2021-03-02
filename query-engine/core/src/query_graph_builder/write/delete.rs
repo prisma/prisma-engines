@@ -10,6 +10,7 @@ use prisma_models::ModelRef;
 use std::{convert::TryInto, sync::Arc};
 
 /// Creates a top level delete record query and adds it to the query graph.
+#[tracing::instrument(skip(graph, model, field))]
 pub fn delete_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedField) -> QueryGraphBuilderResult<()> {
     graph.flag_transactional();
 
@@ -51,6 +52,7 @@ pub fn delete_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
 }
 
 /// Creates a top level delete many records query and adds it to the query graph.
+#[tracing::instrument(skip(graph, model, field))]
 pub fn delete_many_records(
     graph: &mut QueryGraph,
     model: ModelRef,

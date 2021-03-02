@@ -5,6 +5,7 @@ use prisma_models::{ManyRecords, ModelProjection, Record, RecordProjection, Rela
 use prisma_value::PrismaValue;
 use std::collections::HashMap;
 
+#[tracing::instrument(skip(tx, query, parent_result, processor))]
 pub async fn m2m<'a, 'b>(
     tx: &'a ConnectionLike<'a, 'b>,
     query: &RelatedRecordsQuery,
@@ -107,6 +108,15 @@ pub async fn m2m<'a, 'b>(
 }
 
 // [DTODO] This is implemented in an inefficient fashion, e.g. too much Arc cloning going on.
+#[tracing::instrument(skip(
+    tx,
+    parent_field,
+    parent_projections,
+    parent_result,
+    query_args,
+    selected_fields,
+    processor
+))]
 pub async fn one2m<'a, 'b>(
     tx: &'a ConnectionLike<'a, 'b>,
     parent_field: &RelationFieldRef,

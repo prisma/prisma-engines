@@ -1,3 +1,5 @@
+use std::fmt;
+
 use super::{
     expression::*,
     query_interpreters::{read, write},
@@ -34,6 +36,7 @@ pub struct DiffResult {
 
 impl ExpressionResult {
     /// Attempts to transform the result into a vector of record projections.
+    #[tracing::instrument(skip(self, model_projection))]
     pub fn as_projections(&self, model_projection: &ModelProjection) -> InterpretationResult<Vec<RecordProjection>> {
         let converted = match self {
             Self::Query(ref result) => match result {
@@ -73,6 +76,7 @@ impl ExpressionResult {
         })
     }
 
+    #[tracing::instrument(skip(self))]
     pub fn as_query_result(&self) -> InterpretationResult<&QueryResult> {
         let converted = match self {
             Self::Query(ref q) => Some(q),
@@ -84,6 +88,7 @@ impl ExpressionResult {
         })
     }
 
+    #[tracing::instrument(skip(self))]
     pub fn as_diff_result(&self) -> InterpretationResult<&DiffResult> {
         let converted = match self {
             Self::Computation(ComputationResult::Diff(ref d)) => Some(d),
@@ -117,9 +122,16 @@ impl Env {
         }
     }
 }
+
 pub struct QueryInterpreter<'conn, 'tx> {
     pub(crate) conn: ConnectionLike<'conn, 'tx>,
     log: SegQueue<String>,
+}
+
+impl<'conn, 'tx> fmt::Debug for QueryInterpreter<'conn, 'tx> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("QueryInterpreter").finish()
+    }
 }
 
 impl<'conn, 'tx> QueryInterpreter<'conn, 'tx>
@@ -140,6 +152,7 @@ where
         Self { conn, log }
     }
 
+    #[tracing::instrument(skip(self, exp, env, level))]
     pub fn interpret(
         &'conn self,
         exp: Expression,
@@ -250,6 +263,7 @@ where
         }
     }
 
+    #[tracing::instrument(skip(self))]
     pub fn log_output(&self) -> String {
         let mut output = String::with_capacity(self.log.len() * 30);
 

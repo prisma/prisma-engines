@@ -1,6 +1,7 @@
 use crate::{error::ApiError, logger::ChannelLogger};
 use datamodel::{diagnostics::ValidatedConfiguration, Datamodel};
 use napi::threadsafe_function::ThreadsafeFunction;
+use opentelemetry::global;
 use prisma_models::DatamodelConverter;
 use query_core::{exec_loader, schema_builder, BuildMode, QueryExecutor, QuerySchema, QuerySchemaRenderer};
 use request_handlers::{
@@ -8,9 +9,14 @@ use request_handlers::{
     GraphQLSchemaRenderer, GraphQlBody, GraphQlHandler, PrismaResponse,
 };
 use serde::{Deserialize, Deserializer, Serialize};
-use std::{collections::BTreeMap, str::FromStr, sync::Arc};
+use std::{
+    collections::{BTreeMap, HashMap},
+    str::FromStr,
+    sync::Arc,
+};
 use tokio::sync::RwLock;
-use tracing::metadata::LevelFilter;
+use tracing::{metadata::LevelFilter, Level};
+use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 /// The main engine, that can be cloned between threads when using JavaScript
 /// promises.
@@ -80,8 +86,19 @@ pub struct ConstructorOptions {
     datamodel: String,
     #[serde(deserialize_with = "deserialize_log_level")]
     log_level: LevelFilter,
+    #[serde(default)]
     datasource_overrides: BTreeMap<String, String>,
+    #[serde(default)]
     feature_flags_overrides: Option<Vec<String>>,
+    #[serde(default)]
+    telemetry: TelemetryOptions,
+}
+
+#[derive(Debug, Deserialize, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct TelemetryOptions {
+    enabled: bool,
+    endpoint: Option<String>,
 }
 
 fn deserialize_log_level<'de, D>(deserializer: D) -> Result<LevelFilter, D::Error>
@@ -102,6 +119,7 @@ impl QueryEngine {
             log_level,
             datasource_overrides,
             feature_flags_overrides,
+            telemetry,
         } = opts;
 
         let overrides: Vec<(_, _)> = datasource_overrides.into_iter().collect();
@@ -132,7 +150,11 @@ impl QueryEngine {
             datasource_overrides: overrides,
         };
 
-        let logger = ChannelLogger::new(log_level, log_callback);
+        let logger = if telemetry.enabled {
+            ChannelLogger::new_with_telemetry(log_callback, telemetry.endpoint)
+        } else {
+            ChannelLogger::new(log_level, log_callback)
+        };
 
         let builder = EngineBuilder {
             config,
@@ -226,12 +248,17 @@ impl QueryEngine {
     }
 
     /// If connected, sends a query to the core and returns the response.
-    pub async fn query(&self, query: GraphQlBody) -> crate::Result<PrismaResponse> {
+    pub async fn query(&self, query: GraphQlBody, trace: HashMap<String, String>) -> crate::Result<PrismaResponse> {
         match *self.inner.read().await {
             Inner::Connected(ref engine) => {
                 engine
                     .logger
                     .with_logging(|| async move {
+                        let cx = global::get_text_map_propagator(|propagator| propagator.extract(&trace));
+                        let span = tracing::span!(Level::TRACE, "query");
+
+                        span.set_parent(cx);
+
                         let handler = GraphQlHandler::new(engine.executor(), engine.query_schema());
                         Ok(handler.handle(query).await)
                     })

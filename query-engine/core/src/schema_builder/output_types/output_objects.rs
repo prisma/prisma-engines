@@ -8,6 +8,7 @@ use prisma_models::ScalarFieldRef;
 /// This is a critical first step to ensure that all model output object types are present
 /// and that subsequent schema computation has a base to rely on.
 /// Called only once at the very beginning of schema building.
+#[tracing::instrument(skip(ctx))]
 pub(crate) fn initialize_model_object_type_cache(ctx: &mut BuilderContext) {
     // Compute initial cache. No fields are computed because we first
     // need all models to be present, then we can compute fields in a second pass.

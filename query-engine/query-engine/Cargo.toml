@@ -41,11 +41,16 @@ tide-server-timing = "0.15.0"
 url = "2.1"
 
 tracing = "0.1"
+tracing-opentelemetry = "0.11"
 tracing-attributes = "0.1"
 tracing-subscriber = { version = "0.2", features = ["json"] }
-
 tracing-futures = "0.2.3"
-user-facing-errors = { path = "../../libs/user-facing-errors" }
+opentelemetry = { version = "0.12", features = ["async-std"] }
+opentelemetry-otlp = { version = "0.5", features = ["tls", "tls-roots"] }
+rand = "0.8"
+tonic = { version = "0.4", default-features = false }
+
+user-facing-errors = {path = "../../libs/user-facing-errors"}
 
 [build-dependencies]
 rustc_version = "0.2.3"

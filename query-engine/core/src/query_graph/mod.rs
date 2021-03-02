@@ -14,7 +14,7 @@ use connector::{IdFilter, QueryArguments};
 use guard::*;
 use petgraph::{graph::*, visit::EdgeRef as PEdgeRef, *};
 use prisma_models::{ModelProjection, ModelRef, RecordProjection};
-use std::{borrow::Borrow, collections::HashSet};
+use std::{borrow::Borrow, collections::HashSet, fmt};
 
 pub type QueryGraphResult<T> = std::result::Result<T, QueryGraphError>;
 
@@ -182,6 +182,19 @@ pub struct QueryGraph {
     visited: Vec<NodeIndex>,
 }
 
+impl fmt::Debug for QueryGraph {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("QueryGraph")
+            .field("graph", &"InnerGraph")
+            .field("result_nodes", &self.result_nodes)
+            .field("marked_node_pairs", &self.marked_node_pairs)
+            .field("finalized", &self.finalized)
+            .field("needs_transaction", &self.needs_transaction)
+            .field("visited", &self.visited)
+            .finish()
+    }
+}
+
 /// Implementation detail of the QueryGraph.
 type InnerGraph = Graph<Guard<Node>, Guard<QueryGraphDependency>>;
 
@@ -202,6 +215,7 @@ impl QueryGraph {
         Ok(graph)
     }
 
+    #[tracing::instrument(skip(self))]
     pub fn finalize(&mut self) -> QueryGraphResult<()> {
         if !self.finalized {
             self.swap_marked()?;
@@ -503,6 +517,7 @@ impl QueryGraph {
     ///                                                                                                         └───┘
     /// ```
     /// [DTODO] put if flow exception illustration here.
+    #[tracing::instrument(skip(self))]
     fn swap_marked(&mut self) -> QueryGraphResult<()> {
         if !self.marked_node_pairs.is_empty() {
             trace!("[Graph][Swap] Before shape: {}", self);
@@ -599,6 +614,7 @@ impl QueryGraph {
     ///         sibling   │                                ─ ─ ─ ─ ─ ─ ┘
     ///      └ ─ ─ ─ ─ ─ ─
     /// ```
+    #[tracing::instrument(skip(self))]
     fn normalize_if_nodes(&mut self) -> QueryGraphResult<()> {
         for node_ix in self.graph.node_indices() {
             let node = NodeRef { node_ix };
@@ -684,6 +700,7 @@ impl QueryGraph {
     ///
     /// The `Reload` node is always a find many query.
     /// Unwraps are safe because we're operating on the unprocessed state of the graph (`Expressionista` changes that).
+    #[tracing::instrument(skip(self))]
     fn insert_reloads(&mut self) -> QueryGraphResult<()> {
         let reloads: Vec<(NodeRef, ModelRef, Vec<ModelProjection>)> = self
             .graph

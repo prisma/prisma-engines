@@ -105,6 +105,7 @@ struct CursorOrderDefinition {
 ///     OR `main`.`ModelA`.`modelB_id` IS NULL -- >>> Additional check for the nullable foreign key
 ///   )
 /// ```
+#[tracing::instrument(name = "build_cursor_condition", skip(query_arguments, model, ordering_joins))]
 pub fn build(
     query_arguments: &QueryArguments,
     model: &ModelRef,
@@ -119,7 +120,7 @@ pub fn build(
             let cursor_row = Row::from(cursor_columns);
 
             // Invariant: Cursors are unique. This means we can create a subquery to find at most one row
-            // that contains all the values required for the odering row comparison (order_subquery).
+            // that contains all the values required for the ordering row comparison (order_subquery).
             // That does _not_ mean that this retrieved row has an ordering unique across all records, because
             // that can only be true if the orderBy contains a combination of fields that are unique, or a single unique field.
             let cursor_condition = cursor_row.clone().equals(cursor_values.clone());

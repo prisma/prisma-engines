@@ -4,6 +4,7 @@ use datamodel_connector::ConnectorCapability;
 use prisma_models::{dml::DefaultValue, PrismaValue};
 
 /// Builds filter types for the given model field.
+#[tracing::instrument(skip(ctx, field, include_aggregates))]
 pub(crate) fn get_field_filter_types(
     ctx: &mut BuilderContext,
     field: &ModelField,
@@ -41,6 +42,7 @@ pub(crate) fn get_field_filter_types(
 
 /// Builds shorthand relation equality (`is`) filter for to-one: `where: { relation_field: { ... } }` (no `is` in between).
 /// If the field is also not required, null is also added as possible type.
+#[tracing::instrument(skip(ctx, rf))]
 fn mto1_relation_filter_shorthand_types(ctx: &mut BuilderContext, rf: &RelationFieldRef) -> Vec<InputType> {
     let mut types = vec![];
 
@@ -57,6 +59,7 @@ fn mto1_relation_filter_shorthand_types(ctx: &mut BuilderContext, rf: &RelationF
     types
 }
 
+#[tracing::instrument(skip(ctx, rf))]
 fn full_relation_filter(ctx: &mut BuilderContext, rf: &RelationFieldRef) -> InputObjectTypeWeakRef {
     let related_model = rf.related_model();
     let related_input_type = filter_objects::where_object_type(ctx, &related_model);
@@ -91,6 +94,7 @@ fn full_relation_filter(ctx: &mut BuilderContext, rf: &RelationFieldRef) -> Inpu
     Arc::downgrade(&object)
 }
 
+#[tracing::instrument(skip(ctx, sf))]
 fn scalar_list_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> InputObjectTypeWeakRef {
     let ident = Identifier::new(
         scalar_filter_name(&sf.type_identifier, true, !sf.is_required, false, false),
@@ -122,6 +126,7 @@ fn scalar_list_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> Inp
     Arc::downgrade(&object)
 }
 
+#[tracing::instrument(skip(ctx, typ, list, nullable, nested, include_aggregates))]
 fn full_scalar_filter_type(
     ctx: &mut BuilderContext,
     typ: &TypeIdentifier,

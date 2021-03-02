@@ -2,6 +2,7 @@ use super::*;
 use crate::{query_document::ParsedField, ManyRecordsQuery, ReadQuery};
 use prisma_models::ModelRef;
 
+#[tracing::instrument(skip(field, model))]
 pub fn find_many(field: ParsedField, model: ModelRef) -> QueryGraphBuilderResult<ReadQuery> {
     let args = extractors::extract_query_args(field.arguments, &model)?;
     let name = field.name;

@@ -6,6 +6,7 @@ use prisma_models::dml::DefaultValue;
 /// Input type allows to write all scalar fields except if in a nested case,
 /// where we don't allow the parent scalar to be written (ie. when the relation
 /// is inlined on the child).
+#[tracing::instrument(skip(ctx, model, parent_field))]
 pub(crate) fn create_many_object_type(
     ctx: &mut BuilderContext,
     model: &ModelRef,

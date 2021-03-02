@@ -3,6 +3,7 @@ use constants::inputs::{args, operations};
 use datamodel_connector::ConnectorCapability;
 use prisma_models::{dml::DefaultValue, ModelProjection};
 
+#[tracing::instrument(skip(ctx, model, parent_field))]
 pub(crate) fn update_one_input_types(
     ctx: &mut BuilderContext,
     model: &ModelRef,
@@ -20,6 +21,7 @@ pub(crate) fn update_one_input_types(
 }
 
 /// Builds "<x>UpdateInput" input object type.
+#[tracing::instrument(skip(ctx, model, parent_field))]
 fn checked_update_one_input_type(
     ctx: &mut BuilderContext,
     model: &ModelRef,
@@ -48,6 +50,7 @@ fn checked_update_one_input_type(
 }
 
 /// Builds "<x>UncheckedUpdateInput" input object type.
+#[tracing::instrument(skip(ctx, model, parent_field))]
 fn unchecked_update_one_input_type(
     ctx: &mut BuilderContext,
     model: &ModelRef,
@@ -79,6 +82,7 @@ fn unchecked_update_one_input_type(
     Arc::downgrade(&input_object)
 }
 
+#[tracing::instrument(skip(ctx, model))]
 pub(super) fn scalar_input_fields_for_checked_update(ctx: &mut BuilderContext, model: &ModelRef) -> Vec<InputField> {
     input_fields::scalar_input_fields(
         ctx,
@@ -94,6 +98,7 @@ pub(super) fn scalar_input_fields_for_checked_update(ctx: &mut BuilderContext, m
     )
 }
 
+#[tracing::instrument(skip(ctx, model, parent_field))]
 pub(super) fn scalar_input_fields_for_unchecked_update(
     ctx: &mut BuilderContext,
     model: &ModelRef,
@@ -127,6 +132,7 @@ pub(super) fn scalar_input_fields_for_unchecked_update(
     )
 }
 
+#[tracing::instrument(skip(ctx, field, default))]
 fn non_list_scalar_update_field_mapper(
     ctx: &mut BuilderContext,
     field: &ScalarFieldRef,
@@ -158,6 +164,7 @@ fn non_list_scalar_update_field_mapper(
     input_field.optional().nullable_if(!field.is_required)
 }
 
+#[tracing::instrument(skip(ctx, prefix, field, with_number_operators))]
 fn operations_object_type(
     ctx: &mut BuilderContext,
     prefix: &str,
@@ -197,6 +204,7 @@ fn operations_object_type(
 }
 
 /// For update input types only. Compute input fields for checked relational fields.
+#[tracing::instrument(skip(ctx, model, parent_field))]
 fn relation_input_fields_for_checked_update_one(
     ctx: &mut BuilderContext,
     model: &ModelRef,
@@ -253,6 +261,7 @@ fn relation_input_fields_for_checked_update_one(
 }
 
 /// For unchecked update input types only. Compute input fields for checked relational fields.
+#[tracing::instrument(skip(ctx, model, parent_field))]
 fn relation_input_fields_for_unchecked_update_one(
     ctx: &mut BuilderContext,
     model: &ModelRef,
@@ -315,6 +324,7 @@ fn relation_input_fields_for_unchecked_update_one(
 
 /// Builds "<x>UpdateWithWhereUniqueNestedInput" / "<x>UpdateWithWhereUniqueWithout<y>Input" input object types.
 /// Simple combination object of "where" and "data".
+#[tracing::instrument(skip(ctx, update_types, parent_field))]
 pub(crate) fn update_one_where_combination_object(
     ctx: &mut BuilderContext,
     update_types: Vec<InputType>,
