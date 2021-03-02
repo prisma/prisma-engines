@@ -134,6 +134,8 @@ impl SqlRenderer for PostgresFlavour {
             stmts.push(create_new_enum);
         }
 
+        //todo find all usages as a default and drop them
+
         // alter type of the current columns to new, with a cast
         {
             let affected_columns = walk_columns(schemas.next()).filter(|column| matches!(&column.column_type().family, ColumnTypeFamily::Enum(name) if name.as_str() == enums.next().name()));
@@ -152,6 +154,8 @@ impl SqlRenderer for PostgresFlavour {
                 stmts.push(sql);
             }
         }
+
+        // todo reestablish all defaults
 
         // rename old enum
         {

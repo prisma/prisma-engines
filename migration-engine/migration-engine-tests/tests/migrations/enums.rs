@@ -186,3 +186,45 @@ async fn models_with_enum_values_can_be_dropped(api: &TestApi) -> TestResult {
 
     Ok(())
 }
+
+#[test_each_connector(log = "debug", capabilities("enums"))]
+async fn enums_used_in_default_can_be_changed(api: &TestApi) -> TestResult {
+    let dm1 = r#"
+        model Cat {
+            id Int @id
+            mood CatMood @default(HAPPY)
+        }
+
+        enum CatMood {
+            HAPPY
+            HUNGRY
+        }
+    "#;
+
+    api.schema_push(dm1).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_tables_count(1)?;
+
+    let dm2 = r#"
+        model Cat {
+            id Int @id
+            mood CatMood @default(HAPPY)
+        }
+
+        enum CatMood {
+            HAPPY
+            ANGRY
+        }
+    "#;
+
+    api.schema_push(dm2)
+        .force(true)
+        .send()
+        .await?
+        .assert_executable()?
+        .assert_warnings(&["The migration will remove the values [HUNGRY] on the enum `Cat_mood`. If these variants are still used in the database, the migration will fail.".into()])?;
+
+    api.assert_schema().await?.assert_tables_count(1)?;
+
+    Ok(())
+}
