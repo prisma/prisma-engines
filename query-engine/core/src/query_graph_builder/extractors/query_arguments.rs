@@ -1,6 +1,7 @@
 use super::*;
 use crate::{
     constants::inputs::args,
+    constants::inputs::filters,
     constants::inputs::ordering,
     query_document::{ParsedArgument, ParsedInputMap},
     QueryGraphBuilderError, QueryGraphBuilderResult,
@@ -8,7 +9,7 @@ use crate::{
 use connector::QueryArguments;
 use prisma_models::{
     Field, ModelProjection, ModelRef, OrderBy, PrismaValue, RecordProjection, RelationFieldRef, ScalarFieldRef,
-    SortOrder,
+    SortAggregation, SortOrder,
 };
 use std::convert::{identity, TryInto};
 
@@ -75,12 +76,12 @@ fn extract_order_by(model: &ModelRef, value: ParsedInputValue) -> QueryGraphBuil
             .into_iter()
             .map(|list_value| {
                 let object: ParsedInputMap = list_value.try_into()?;
-                Ok(process_order_object(model, object, vec![])?)
+                Ok(process_order_object(model, object, vec![], None)?)
             })
             .collect::<QueryGraphBuilderResult<Vec<_>>>()
             .map(|results| results.into_iter().filter_map(identity).collect()),
 
-        ParsedInputValue::Map(map) => Ok(match process_order_object(model, map, vec![])? {
+        ParsedInputValue::Map(map) => Ok(match process_order_object(model, map, vec![], None)? {
             Some(order) => vec![order],
             None => vec![],
         }),
@@ -93,17 +94,31 @@ fn process_order_object(
     model: &ModelRef,
     object: ParsedInputMap,
     mut path: Vec<RelationFieldRef>,
+    sort_aggregation: Option<SortAggregation>,
 ) -> QueryGraphBuilderResult<Option<OrderBy>> {
     match object.into_iter().next() {
         None => Ok(None),
         Some((field_name, field_value)) => {
             let field = model.fields().find_from_all(&field_name)?;
             match field {
+                Field::Relation(rf) if rf.is_list => {
+                    path.push(rf.clone());
+
+                    let object: ParsedInputMap = field_value.try_into()?;
+                    let (sort_aggregation, inner_object) = sort_aggregation_from_order_object(object)?;
+
+                    process_order_object(
+                        &rf.related_model(),
+                        inner_object.to_owned(),
+                        path,
+                        Some(sort_aggregation),
+                    )
+                }
                 Field::Relation(rf) => {
                     path.push(rf.clone());
 
                     let object: ParsedInputMap = field_value.try_into()?;
-                    process_order_object(&rf.related_model(), object, path)
+                    process_order_object(&rf.related_model(), object, path, sort_aggregation)
                 }
                 Field::Scalar(sf) => {
                     let value: PrismaValue = field_value.try_into()?;
@@ -113,11 +128,24 @@ fn process_order_object(
                         _ => unreachable!(),
                     };
 
-                    Ok(Some(OrderBy::new(sf.clone(), path, sort_order)))
+                    Ok(Some(OrderBy::new(sf.clone(), path, sort_order, sort_aggregation)))
                 }
             }
         }
     }
+}
+
+fn sort_aggregation_from_order_object(
+    object: ParsedInputMap,
+) -> QueryGraphBuilderResult<(SortAggregation, ParsedInputMap)> {
+    let (field_name, field_value) = object.into_iter().next().unwrap();
+    let inner_object: ParsedInputMap = field_value.try_into()?;
+    let sort_aggregation = match field_name.as_str() {
+        filters::COUNT => Some(SortAggregation::Count),
+        _ => None,
+    };
+
+    Ok((sort_aggregation.unwrap(), inner_object))
 }
 
 fn extract_distinct(value: ParsedInputValue) -> QueryGraphBuilderResult<ModelProjection> {
