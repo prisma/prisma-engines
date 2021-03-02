@@ -264,15 +264,19 @@ impl MongoQueryArgs {
         let inner_stages = self.into_pipeline_stages();
 
         outer_stages.push(doc! {
-            "from": coll.name(),
-            "let": cursor_data.bindings,
-            "pipeline": inner_stages,
-            "as": "cursor_inner",
+            "$lookup": {
+                "from": coll.name(),
+                "let": cursor_data.bindings,
+                "pipeline": inner_stages,
+                "as": "cursor_inner",
+            }
         });
+
+        outer_stages.push(doc! { "$unwind": "$cursor_inner" });
+        outer_stages.push(doc! { "$replaceRoot": { "newRoot": "$cursor_inner" } });
 
         dbg!(&outer_stages);
 
-        // Todo we need to unwrap (unwind?) the result.
         Ok(coll.aggregate(outer_stages, opts).await?)
     }
 
@@ -397,11 +401,11 @@ fn take(take: Option<i64>, ignore: bool) -> Option<i64> {
 /// Temporarily unsupported features that can not be restricted on the schema level of query arguments get rejected at runtime.
 fn check_unsupported(args: &QueryArguments) -> crate::Result<()> {
     // Cursors with order-by relations is currently unsupported.
-    if args.cursor.is_some() && args.order_by.iter().any(|o| !o.path.is_empty()) {
-        return Err(MongoError::Unsupported(
-            "OrderBy a relation in conjunction with a cursor query is currently unsupported.".to_owned(),
-        ));
-    }
+    // if args.cursor.is_some() && args.order_by.iter().any(|o| !o.path.is_empty()) {
+    //     return Err(MongoError::Unsupported(
+    //         "OrderBy a relation in conjunction with a cursor query is currently unsupported.".to_owned(),
+    //     ));
+    // }
 
     // Cursors with unstable ordering are currently unsupported.
     if args.contains_unstable_cursor() {
