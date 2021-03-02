@@ -1,6 +1,7 @@
 use barrel::types;
+use indoc::formatdoc;
 use indoc::indoc;
-use introspection_engine_tests::{assert_eq_datamodels, assert_eq_json, test_api::*};
+use introspection_engine_tests::{assert_eq_json, test_api::*};
 use quaint::prelude::Queryable;
 use serde_json::json;
 use test_macros::test_each_connector;
@@ -39,7 +40,7 @@ async fn mapped_model_name(api: &TestApi) -> crate::TestResult {
         }
     "#};
 
-    assert_eq_datamodels!(final_dm, &api.re_introspect(input_dm).await?);
+    api.assert_eq_datamodels(&final_dm, &api.re_introspect(input_dm).await?);
 
     let expected = json!([{
         "code": 7,
@@ -87,7 +88,7 @@ async fn manually_overwritten_mapped_field_name(api: &TestApi) -> crate::TestRes
         }
     "#};
 
-    assert_eq_datamodels!(final_dm, &api.re_introspect(input_dm).await?);
+    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
 
     let expected = json!([{
         "code": 8,
@@ -171,7 +172,7 @@ async fn mapped_model_and_field_name(api: &TestApi) -> crate::TestResult {
         extra_index
     );
 
-    assert_eq_datamodels!(&final_dm, &api.re_introspect(&input_dm).await?);
+    api.assert_eq_datamodels(&final_dm, &api.re_introspect(&input_dm).await?);
 
     let expected = json!([
         {
@@ -272,7 +273,7 @@ async fn manually_mapped_model_and_field_name(api: &TestApi) -> crate::TestResul
         extra_index
     );
 
-    assert_eq_datamodels!(&final_dm, &api.re_introspect(&input_dm).await?);
+    api.assert_eq_datamodels(&final_dm, &api.re_introspect(&input_dm).await?);
 
     let expected = json!([
         {
@@ -362,7 +363,7 @@ async fn mapped_field_name(api: &TestApi) -> crate::TestResult {
         }
     "#};
 
-    assert_eq_datamodels!(final_dm, &api.re_introspect(input_dm).await?);
+    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
 
     let expected = json!([{
         "code": 8,
@@ -460,7 +461,7 @@ async fn mapped_enum_name(api: &TestApi) -> crate::TestResult {
         enum_name
     );
 
-    assert_eq_datamodels!(&final_dm, &api.re_introspect(&input_dm).await?);
+    api.assert_eq_datamodels(&final_dm, &api.re_introspect(&input_dm).await?);
 
     let expected = json!([{
         "code": 9,
@@ -544,7 +545,7 @@ async fn mapped_enum_value_name(api: &TestApi) -> crate::TestResult {
         enum_name
     );
 
-    assert_eq_datamodels!(&final_dm, &api.re_introspect(&input_dm).await?);
+    api.assert_eq_datamodels(&final_dm, &api.re_introspect(&input_dm).await?);
 
     let expected = json!([{
         "code": 10,
@@ -607,7 +608,7 @@ async fn manually_remapped_enum_value_name(api: &TestApi) -> crate::TestResult {
         }
     "#};
 
-    assert_eq_datamodels!(final_dm, &api.re_introspect(input_dm).await?);
+    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
 
     let expected = json!([{
         "code": 10,
@@ -673,7 +674,7 @@ async fn manually_re_mapped_enum_name(api: &TestApi) -> crate::TestResult {
         }
     "#};
 
-    assert_eq_datamodels!(final_dm, &api.re_introspect(input_dm).await?);
+    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
 
     let expected = json!([{
         "code": 9,
@@ -757,7 +758,7 @@ async fn manually_re_mapped_invalid_enum_values(api: &TestApi) -> crate::TestRes
         enum_name
     );
 
-    assert_eq_datamodels!(&final_dm, &api.re_introspect(&input_dm).await?);
+    api.assert_eq_datamodels(&final_dm, &api.re_introspect(&input_dm).await?);
 
     let expected = json!([{
         "code": 10,
@@ -851,7 +852,7 @@ async fn multiple_changed_relation_names(api: &TestApi) -> crate::TestResult {
         idx1, idx2
     );
 
-    assert_eq_datamodels!(&final_dm, &api.re_introspect(&input_dm).await?);
+    api.assert_eq_datamodels(&final_dm, &api.re_introspect(&input_dm).await?);
 
     Ok(())
 }
@@ -907,7 +908,7 @@ async fn custom_virtual_relation_field_names(api: &TestApi) -> crate::TestResult
 
     "#};
 
-    assert_eq_datamodels!(final_dm, &api.re_introspect(input_dm).await?);
+    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
 
     Ok(())
 }
@@ -1000,7 +1001,7 @@ async fn custom_model_order(api: &TestApi) -> crate::TestResult {
         }
     "#};
 
-    assert_eq_datamodels!(final_dm, &api.re_introspect(input_dm).await?);
+    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
 
     Ok(())
 }
@@ -1088,7 +1089,7 @@ async fn custom_enum_order(api: &TestApi) -> crate::TestResult {
         }
     "#};
 
-    assert_eq_datamodels!(final_dm, &api.re_introspect(input_dm).await?);
+    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
 
     Ok(())
 }
@@ -1156,7 +1157,7 @@ async fn multiple_changed_relation_names_due_to_mapped_models(api: &TestApi) -> 
         }
     "#};
 
-    assert_eq_datamodels!(final_dm, &api.re_introspect(&input_dm).await?);
+    api.assert_eq_datamodels(final_dm, &api.re_introspect(&input_dm).await?);
 
     Ok(())
 }
@@ -1171,7 +1172,7 @@ async fn virtual_cuid_default(api: &TestApi) -> crate::TestResult {
             });
 
             migration.create_table("User2", |t| {
-                t.add_column("id", types::varchar(30).primary(true));
+                t.add_column("id", types::varchar(36).primary(true));
             });
 
             migration.create_table("Unrelated", |t| {
@@ -1182,23 +1183,23 @@ async fn virtual_cuid_default(api: &TestApi) -> crate::TestResult {
 
     let input_dm = indoc! {r#"
         model User {
-            id        String    @id @default(cuid())
-            non_id    String    @default(cuid())
+            id        String    @id @default(cuid()) @db.VarChar(30)
+            non_id    String    @default(cuid()) @db.VarChar(30)
         }
 
         model User2 {
-            id        String    @id @default(uuid())
+            id        String    @id @default(uuid()) @db.VarChar(36)
         }
     "#};
 
     let final_dm = indoc! {r#"
         model User {
-            id        String    @id @default(cuid())
-            non_id    String    @default(cuid())
+            id        String    @id @default(cuid()) @db.VarChar(30)
+            non_id    String    @default(cuid()) @db.VarChar(30)
         }
 
         model User2 {
-            id        String    @id @default(uuid())
+            id        String    @id @default(uuid()) @db.VarChar(36)
         }
 
         model Unrelated {
@@ -1206,24 +1207,24 @@ async fn virtual_cuid_default(api: &TestApi) -> crate::TestResult {
         }
     "#};
 
-    assert_eq_datamodels!(final_dm, &api.re_introspect(input_dm).await?);
+    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
 
     Ok(())
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn comments(api: &TestApi) -> crate::TestResult {
+async fn comments_should_be_kept(api: &TestApi) -> crate::TestResult {
     let sql = "CREATE Type a as ENUM (\'A\')".to_string();
     api.database().execute_raw(&sql, &[]).await?;
 
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
-                t.add_column("id", types::varchar(30).primary(true));
+                t.add_column("id", types::primary());
             });
 
             migration.create_table("User2", |t| {
-                t.add_column("id", types::varchar(30).primary(true));
+                t.add_column("id", types::primary());
             });
 
             migration.create_table("Unrelated", |t| {
@@ -1236,11 +1237,11 @@ async fn comments(api: &TestApi) -> crate::TestResult {
         /// A really helpful comment about the model
         model User {
             /// A really helpful comment about the field
-            id        String    @id @default(cuid())
+            id         Int @id @default(autoincrement())
         }
 
         model User2 {
-            id        String    @id @default(uuid())
+            id         Int @id @default(autoincrement())
         }
 
         /// A really helpful comment about the enum
@@ -1255,11 +1256,11 @@ async fn comments(api: &TestApi) -> crate::TestResult {
         /// A really helpful comment about the model
         model User {
             /// A really helpful comment about the field
-            id        String    @id @default(cuid())
+            id         Int @id @default(autoincrement())
         }
 
         model User2 {
-            id        String    @id @default(uuid())
+            id         Int @id @default(autoincrement())
         }
 
         model Unrelated {
@@ -1274,7 +1275,7 @@ async fn comments(api: &TestApi) -> crate::TestResult {
         /// just floating around here
     "#};
 
-    assert_eq_datamodels!(final_dm, &api.re_introspect(input_dm).await?);
+    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
 
     Ok(())
 }
@@ -1284,7 +1285,7 @@ async fn updated_at(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", move |t| {
-                t.add_column("id", types::varchar(30).primary(true));
+                t.add_column("id", types::primary());
                 t.add_column("lastupdated", types::datetime().nullable(true));
             });
 
@@ -1294,25 +1295,32 @@ async fn updated_at(api: &TestApi) -> crate::TestResult {
         })
         .await?;
 
-    let input_dm = indoc! {r#"
-        model User {
-            id           String    @id
-            lastupdated  DateTime? @updatedAt
-        }
-    "#};
+    let native_datetime = if api.sql_family().is_postgres() {
+        "@db.Timestamp(6)"
+    } else if api.sql_family().is_mysql() {
+        "@db.DateTime(0)"
+    } else {
+        ""
+    };
+    let input_dm = formatdoc! {r#"
+        model User {{
+            id           Int       @id @default(autoincrement())
+            lastupdated  DateTime? @updatedAt {}
+        }}
+    "#, native_datetime};
 
-    let final_dm = indoc! {r#"
-        model User {
-            id           String    @id
-            lastupdated  DateTime? @updatedAt
-        }
+    let final_dm = formatdoc! {r#"
+        model User {{
+            id           Int       @id @default(autoincrement())
+            lastupdated  DateTime? @updatedAt {}
+        }}
 
-        model Unrelated {
+        model Unrelated {{
             id               Int @id @default(autoincrement())
-        }
-    "#};
+        }}
+    "#, native_datetime};
 
-    assert_eq_datamodels!(final_dm, &api.re_introspect(input_dm).await?);
+    api.assert_eq_datamodels(&final_dm, &api.re_introspect(&input_dm).await?);
 
     Ok(())
 }
@@ -1322,7 +1330,7 @@ async fn updated_at_with_native_types_on(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", move |t| {
-                t.add_column("id", types::varchar(30).primary(true));
+                t.add_column("id", types::integer().primary(true));
                 t.add_column("lastupdated", types::datetime().nullable(true));
                 t.inject_custom("lastupdated2 DATETIME");
             });
@@ -1334,36 +1342,16 @@ async fn updated_at_with_native_types_on(api: &TestApi) -> crate::TestResult {
         .await?;
 
     let input_dm = indoc! {r#"
-        datasource db {
-            provider = "sqlserver"
-            url = "sqlserver://"
-        }
-
-        generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["nativeTypes", "microsoftSqlServer"]
-        }
-
         model User {
-            id           String    @id
+            id           Int    @id
             lastupdated  DateTime? @updatedAt
             lastupdated2 DateTime? @db.DateTime @updatedAt
         }
     "#};
 
     let final_dm = indoc! {r#"
-        datasource db {
-            provider = "sqlserver"
-            url = "sqlserver://"
-        }
-
-        generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["nativeTypes", "microsoftSqlServer"]
-        }
-
         model User {
-            id           String    @id
+            id           Int    @id
             lastupdated  DateTime? @updatedAt
             lastupdated2 DateTime? @db.DateTime @updatedAt
         }
@@ -1373,7 +1361,7 @@ async fn updated_at_with_native_types_on(api: &TestApi) -> crate::TestResult {
         }
     "#};
 
-    assert_eq_datamodels!(final_dm, &api.re_introspect(input_dm).await?);
+    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
 
     Ok(())
 }
@@ -1450,7 +1438,7 @@ async fn multiple_many_to_many_on_same_model(api: &TestApi) -> crate::TestResult
         }
     "#};
 
-    assert_eq_datamodels!(&final_dm, &api.re_introspect(&input_dm).await?);
+    api.assert_eq_datamodels(&final_dm, &api.re_introspect(&input_dm).await?);
 
     Ok(())
 }
@@ -1498,7 +1486,7 @@ async fn re_introspecting_mysql_enum_names(api: &TestApi) -> crate::TestResult {
                 white
             }
         "#;
-    assert_eq_datamodels!(final_dm, &api.re_introspect(input_dm).await?);
+    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
     assert_eq_json!(
         serde_json::Value::Array(vec![]),
         &api.re_introspect_warnings(input_dm).await?
@@ -1558,7 +1546,7 @@ async fn re_introspecting_mysql_enum_names_if_enum_is_reused(api: &TestApi) -> c
                 white
             }
         "#;
-    assert_eq_datamodels!(final_dm, &api.re_introspect(input_dm).await?);
+    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
     assert_eq_json!(
         serde_json::Value::Array(vec![]),
         &api.re_introspect_warnings(input_dm).await?
@@ -1592,7 +1580,7 @@ async fn custom_repro(api: &TestApi) -> crate::TestResult {
         model Post{
           id        Int       @id @default(autoincrement())
           tag_id    Int
-          tag       Tag       @relation("post_to_tag", fields:[tag_id])
+          tag       Tag       @relation("post_to_tag", fields:[tag_id], references: id)
         }
 
         model Tag {
@@ -1607,7 +1595,7 @@ async fn custom_repro(api: &TestApi) -> crate::TestResult {
         model Post{
           id        Int       @id @default(autoincrement())
           tag_id    Int
-          tag       Tag       @relation("post_to_tag", fields:[tag_id])
+          tag       Tag       @relation("post_to_tag", fields:[tag_id], references: id)
         }
 
         model Tag {
@@ -1625,7 +1613,7 @@ async fn custom_repro(api: &TestApi) -> crate::TestResult {
 
     let result = api.re_introspect(input_dm).await?;
 
-    assert_eq_datamodels!(final_dm, &result);
+    api.assert_eq_datamodels(final_dm, &result);
 
     Ok(())
 }
@@ -1635,12 +1623,12 @@ async fn re_introspecting_ignore(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", move |t| {
-                t.add_column("id", types::varchar(30).primary(true));
+                t.add_column("id", types::primary());
                 t.add_column("test", types::integer().nullable(true));
             });
 
             migration.create_table("Ignored", move |t| {
-                t.add_column("id", types::varchar(30).primary(true));
+                t.add_column("id", types::primary());
                 t.add_column("test", types::integer().nullable(true));
             });
 
@@ -1652,12 +1640,12 @@ async fn re_introspecting_ignore(api: &TestApi) -> crate::TestResult {
 
     let input_dm = indoc! {r#"
         model User {
-            id           String    @id
+            id           Int @id @default(autoincrement())
             test         Int?      @ignore
         }
         
         model Ignored {
-            id           String    @id
+            id           Int @id @default(autoincrement())
             test         Int?
         
             @@ignore
@@ -1666,12 +1654,12 @@ async fn re_introspecting_ignore(api: &TestApi) -> crate::TestResult {
 
     let final_dm = indoc! {r#"
         model User {
-            id           String    @id
+            id           Int @id @default(autoincrement())
             test         Int?      @ignore
         }
         
         model Ignored {
-            id           String    @id
+            id           Int @id @default(autoincrement())
             test         Int?
         
             @@ignore
@@ -1682,7 +1670,7 @@ async fn re_introspecting_ignore(api: &TestApi) -> crate::TestResult {
         }
     "#};
 
-    assert_eq_datamodels!(final_dm, &api.re_introspect(input_dm).await?);
+    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
 
     Ok(())
 }

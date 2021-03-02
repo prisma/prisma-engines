@@ -735,7 +735,7 @@ impl<'a> Validator<'a> {
                 let is_many_to_many = {
                     // Back relation fields have not been added yet. So we must calculate this on our own.
                     match datamodel.find_related_field(&field) {
-                        Some(related_field) => field.is_list() && related_field.is_list(),
+                        Some((_, related_field)) => field.is_list() && related_field.is_list(),
                         None => false,
                     }
                 };
@@ -817,11 +817,11 @@ impl<'a> Validator<'a> {
 
             let rel_info = &field.relation_info;
             let related_model = datamodel.find_model(&rel_info.to).expect(STATE_ERROR);
-            let related_field = datamodel.find_related_field_bang(&field);
-            let related_field_rel_info = &related_field.relation_info;
+            if let Some((_rel_field_idx, related_field)) = datamodel.find_related_field(&field) {
+                let related_field_rel_info = &related_field.relation_info;
 
-            if related_model.is_ignored && !field.is_ignored && !model.is_ignored {
-                errors.push_error(DatamodelError::new_attribute_validation_error(
+                if related_model.is_ignored && !field.is_ignored && !model.is_ignored {
+                    errors.push_error(DatamodelError::new_attribute_validation_error(
                     &format!(
                         "The relation field `{}` on Model `{}` must specify the `@ignore` attribute, because the model {} it is pointing to is marked ignored.",
                         &field.name, &model.name, &related_model.name
@@ -829,12 +829,12 @@ impl<'a> Validator<'a> {
                     "ignore",
                     field_span,
                 ));
-            }
+                }
 
-            // ONE TO MANY
-            if field.is_singular() && related_field.is_list() {
-                if rel_info.fields.is_empty() {
-                    errors.push_error(DatamodelError::new_attribute_validation_error(
+                // ONE TO MANY
+                if field.is_singular() && related_field.is_list() {
+                    if rel_info.fields.is_empty() {
+                        errors.push_error(DatamodelError::new_attribute_validation_error(
                         &format!(
                             "The relation field `{}` on Model `{}` must specify the `fields` argument in the {} attribute. {}",
                             &field.name, &model.name, RELATION_ATTRIBUTE_NAME_WITH_AT, PRISMA_FORMAT_HINT
@@ -842,10 +842,10 @@ impl<'a> Validator<'a> {
                         RELATION_ATTRIBUTE_NAME,
                         field_span,
                         ));
-                }
+                    }
 
-                if rel_info.references.is_empty() {
-                    errors.push_error(DatamodelError::new_attribute_validation_error(
+                    if rel_info.references.is_empty() {
+                        errors.push_error(DatamodelError::new_attribute_validation_error(
                         &format!(
                             "The relation field `{}` on Model `{}` must specify the `references` argument in the {} attribute.",
                             &field.name, &model.name, RELATION_ATTRIBUTE_NAME_WITH_AT
@@ -853,14 +853,14 @@ impl<'a> Validator<'a> {
                         RELATION_ATTRIBUTE_NAME,
                         field_span,
                         ));
+                    }
                 }
-            }
 
-            if field.is_list()
-                && !related_field.is_list()
-                && (!rel_info.fields.is_empty() || !rel_info.references.is_empty())
-            {
-                errors.push_error(DatamodelError::new_attribute_validation_error(
+                if field.is_list()
+                    && !related_field.is_list()
+                    && (!rel_info.fields.is_empty() || !rel_info.references.is_empty())
+                {
+                    errors.push_error(DatamodelError::new_attribute_validation_error(
                     &format!(
                         "The relation field `{}` on Model `{}` must not specify the `fields` or `references` argument in the {} attribute. You must only specify it on the opposite field `{}` on model `{}`.",
                         &field.name, &model.name, RELATION_ATTRIBUTE_NAME_WITH_AT, &related_field.name, &related_model.name
@@ -868,26 +868,12 @@ impl<'a> Validator<'a> {
                     RELATION_ATTRIBUTE_NAME,
                     field_span,
                         ));
-            }
+                }
 
-            // required ONE TO ONE SELF RELATION
-            let is_self_relation = model.name == related_model.name;
-            if is_self_relation && field.is_required() && related_field.is_required() {
-                errors.push_error(DatamodelError::new_field_validation_error(
-                        &format!(
-                            "The relation fields `{}` and `{}` on Model `{}` are both required. This is not allowed for a self relation because it would not be possible to create a record.",
-                            &field.name, &related_field.name, &model.name,
-                        ),
-                        &model.name,
-                        &field.name,
-                        field_span,
-                    ));
-            }
-
-            // ONE TO ONE
-            if field.is_singular() && related_field.is_singular() {
-                if rel_info.fields.is_empty() && related_field_rel_info.fields.is_empty() {
-                    errors.push_error(DatamodelError::new_attribute_validation_error(
+                // ONE TO ONE
+                if field.is_singular() && related_field.is_singular() {
+                    if rel_info.fields.is_empty() && related_field_rel_info.fields.is_empty() {
+                        errors.push_error(DatamodelError::new_attribute_validation_error(
                         &format!(
                             "The relation fields `{}` on Model `{}` and `{}` on Model `{}` do not provide the `fields` argument in the {} attribute. You have to provide it on one of the two fields.",
                             &field.name, &model.name, &related_field.name, &related_model.name, RELATION_ATTRIBUTE_NAME_WITH_AT
@@ -895,10 +881,10 @@ impl<'a> Validator<'a> {
                         RELATION_ATTRIBUTE_NAME,
                         field_span,
                         ));
-                }
+                    }
 
-                if rel_info.references.is_empty() && related_field_rel_info.references.is_empty() {
-                    errors.push_error(DatamodelError::new_attribute_validation_error(
+                    if rel_info.references.is_empty() && related_field_rel_info.references.is_empty() {
+                        errors.push_error(DatamodelError::new_attribute_validation_error(
                         &format!(
                             "The relation fields `{}` on Model `{}` and `{}` on Model `{}` do not provide the `references` argument in the {} attribute. You have to provide it on one of the two fields.",
                             &field.name, &model.name, &related_field.name, &related_model.name, RELATION_ATTRIBUTE_NAME_WITH_AT
@@ -906,10 +892,10 @@ impl<'a> Validator<'a> {
                         RELATION_ATTRIBUTE_NAME,
                         field_span,
                         ));
-                }
+                    }
 
-                if !rel_info.references.is_empty() && !related_field_rel_info.references.is_empty() {
-                    errors.push_error(DatamodelError::new_attribute_validation_error(
+                    if !rel_info.references.is_empty() && !related_field_rel_info.references.is_empty() {
+                        errors.push_error(DatamodelError::new_attribute_validation_error(
                         &format!(
                             "The relation fields `{}` on Model `{}` and `{}` on Model `{}` both provide the `references` argument in the {} attribute. You have to provide it only on one of the two fields.",
                             &field.name, &model.name, &related_field.name, &related_model.name, RELATION_ATTRIBUTE_NAME_WITH_AT
@@ -917,10 +903,10 @@ impl<'a> Validator<'a> {
                         RELATION_ATTRIBUTE_NAME,
                         field_span,
                         ));
-                }
+                    }
 
-                if !rel_info.fields.is_empty() && !related_field_rel_info.fields.is_empty() {
-                    errors.push_error(DatamodelError::new_attribute_validation_error(
+                    if !rel_info.fields.is_empty() && !related_field_rel_info.fields.is_empty() {
+                        errors.push_error(DatamodelError::new_attribute_validation_error(
                         &format!(
                             "The relation fields `{}` on Model `{}` and `{}` on Model `{}` both provide the `fields` argument in the {} attribute. You have to provide it only on one of the two fields.",
                             &field.name, &model.name, &related_field.name, &related_model.name, RELATION_ATTRIBUTE_NAME_WITH_AT
@@ -928,11 +914,11 @@ impl<'a> Validator<'a> {
                         RELATION_ATTRIBUTE_NAME,
                         field_span,
                         ));
-                }
+                    }
 
-                if !errors.has_errors() {
-                    if !rel_info.fields.is_empty() && !related_field_rel_info.references.is_empty() {
-                        errors.push_error(DatamodelError::new_attribute_validation_error(
+                    if !errors.has_errors() {
+                        if !rel_info.fields.is_empty() && !related_field_rel_info.references.is_empty() {
+                            errors.push_error(DatamodelError::new_attribute_validation_error(
                             &format!(
                                 "The relation field `{}` on Model `{}` provides the `fields` argument in the {} attribute. And the related field `{}` on Model `{}` provides the `references` argument. You must provide both arguments on the same side.",
                                 &field.name, &model.name, RELATION_ATTRIBUTE_NAME_WITH_AT, &related_field.name, &related_model.name,
@@ -940,10 +926,10 @@ impl<'a> Validator<'a> {
                             RELATION_ATTRIBUTE_NAME,
                             field_span,
                             ));
-                    }
+                        }
 
-                    if !rel_info.references.is_empty() && !related_field_rel_info.fields.is_empty() {
-                        errors.push_error(DatamodelError::new_attribute_validation_error(
+                        if !rel_info.references.is_empty() && !related_field_rel_info.fields.is_empty() {
+                            errors.push_error(DatamodelError::new_attribute_validation_error(
                             &format!(
                                 "The relation field `{}` on Model `{}` provides the `references` argument in the {} attribute. And the related field `{}` on Model `{}` provides the `fields` argument. You must provide both arguments on the same side.",
                                 &field.name, &model.name, RELATION_ATTRIBUTE_NAME_WITH_AT, &related_field.name, &related_model.name,
@@ -951,11 +937,11 @@ impl<'a> Validator<'a> {
                             RELATION_ATTRIBUTE_NAME,
                             field_span,
                             ));
+                        }
                     }
-                }
 
-                if !errors.has_errors() && field.is_required() && !related_field_rel_info.references.is_empty() {
-                    errors.push_error(DatamodelError::new_attribute_validation_error(
+                    if !errors.has_errors() && field.is_required() && !related_field_rel_info.references.is_empty() {
+                        errors.push_error(DatamodelError::new_attribute_validation_error(
                             &format!(
                                 "The relation field `{}` on Model `{}` is required. This is no longer valid because it's not possible to enforce this constraint on the database level. Please change the field type from `{}` to `{}?` to fix this.",
                                 &field.name, &model.name, &related_model.name, &related_model.name,
@@ -963,12 +949,12 @@ impl<'a> Validator<'a> {
                             RELATION_ATTRIBUTE_NAME,
                             field_span,
                         ));
+                    }
                 }
-            }
 
-            // MANY TO MANY
-            if field.is_list() && related_field.is_list() && !related_model.has_single_id_field() {
-                errors.push_error(DatamodelError::new_field_validation_error(
+                // MANY TO MANY
+                if field.is_list() && related_field.is_list() && !related_model.has_single_id_field() {
+                    errors.push_error(DatamodelError::new_field_validation_error(
                             &format!(
                                 "The relation field `{}` on Model `{}` references `{}` which does not have an `@id` field. Models without `@id` can not be part of a many to many relation. Use an explicit intermediate Model to represent this relationship.",
                                 &field.name,
@@ -979,6 +965,19 @@ impl<'a> Validator<'a> {
                             &field.name,
                             field_span,
                         ));
+                }
+            } else {
+                errors.push_error(DatamodelError::new_field_validation_error(
+                    &format!(
+                        "The relation field `{}` on Model `{}` is missing an opposite relation field on the model `{}`. Either run `prisma format` or add it manually.",
+                        &field.name,
+                        &model.name,
+                        &related_model.name,
+                    ),
+                    &model.name,
+                    &field.name,
+                    field_span,
+                ));
             }
         }
 

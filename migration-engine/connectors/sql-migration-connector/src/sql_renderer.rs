@@ -22,13 +22,9 @@ use crate::{
 };
 use common::Quoted;
 use sql_schema_describer::{
-    walkers::EnumWalker,
-    walkers::ForeignKeyWalker,
-    walkers::IndexWalker,
-    walkers::{ColumnWalker, TableWalker},
-    ColumnTypeFamily, DefaultValue, SqlSchema,
+    walkers::{EnumWalker, ForeignKeyWalker, IndexWalker, TableWalker, ViewWalker},
+    SqlSchema,
 };
-use std::borrow::Cow;
 
 pub(crate) trait SqlRenderer {
     fn quote<'a>(&self, name: &'a str) -> Quoted<&'a str>;
@@ -36,12 +32,6 @@ pub(crate) trait SqlRenderer {
     fn render_add_foreign_key(&self, foreign_key: &ForeignKeyWalker<'_>) -> String;
 
     fn render_alter_enum(&self, alter_enum: &AlterEnum, schemas: &Pair<&SqlSchema>) -> Vec<String>;
-
-    fn render_column(&self, column: &ColumnWalker<'_>) -> String;
-
-    fn render_references(&self, foreign_key: &ForeignKeyWalker<'_>) -> String;
-
-    fn render_default<'a>(&self, default: &'a DefaultValue, family: &ColumnTypeFamily) -> Cow<'a, str>;
 
     fn render_alter_index(&self, _indexes: Pair<&IndexWalker<'_>>) -> Vec<String> {
         unreachable!("unreachable render_alter_index")
@@ -85,4 +75,6 @@ pub(crate) trait SqlRenderer {
 
     /// Render a table renaming step.
     fn render_rename_table(&self, name: &str, new_name: &str) -> String;
+
+    fn render_drop_view(&self, view: &ViewWalker<'_>) -> String;
 }

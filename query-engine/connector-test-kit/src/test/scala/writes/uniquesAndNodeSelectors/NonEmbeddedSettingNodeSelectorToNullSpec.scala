@@ -22,6 +22,7 @@ class NonEmbeddedSettingNodeSelectorToNullSpec extends FlatSpec with Matchers wi
         |model C {
         |  id String  @id @default(cuid())
         |  c  String?
+        |  a  A[]
         |}
       """
     }

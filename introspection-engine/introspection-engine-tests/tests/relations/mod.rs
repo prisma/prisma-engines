@@ -1,6 +1,7 @@
 use barrel::types;
+use indoc::formatdoc;
 use indoc::indoc;
-use introspection_engine_tests::{assert_eq_datamodels, test_api::*};
+use introspection_engine_tests::test_api::*;
 use quaint::prelude::SqlFamily;
 use test_macros::test_each_connector;
 
@@ -36,7 +37,7 @@ async fn one_to_one_req_relation(api: &TestApi) -> crate::TestResult {
         }
     "##};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -71,7 +72,7 @@ async fn one_to_one_relation_on_a_singular_primary_key(api: &TestApi) -> crate::
         }
     "##};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -130,7 +131,7 @@ async fn two_one_to_one_relations_between_the_same_models(api: &TestApi) -> crat
         }
     "##};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -167,7 +168,7 @@ async fn a_one_to_one_relation(api: &TestApi) -> crate::TestResult {
         }
     "##};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -192,21 +193,27 @@ async fn a_one_to_one_relation_referencing_non_id(api: &TestApi) -> crate::TestR
         )
         .await?;
 
-    let dm = indoc! {r##"
-        model Post {
+    let native_type = if api.sql_family().is_sqlite() {
+        ""
+    } else {
+        "@db.VarChar(10)"
+    };
+
+    let dm = formatdoc! {r##"
+        model Post {{
             id         Int     @id @default(autoincrement())
-            user_email String? @unique
+            user_email String? @unique {}
             User       User?   @relation(fields: [user_email], references: [email])
-        }
+        }}
 
-        model User {
+        model User {{
             id    Int     @id @default(autoincrement())
-            email String? @unique
+            email String? @unique {}
             Post  Post?
-        }
-    "##};
+        }}
+    "##, native_type, native_type};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -262,7 +269,7 @@ async fn a_one_to_many_relation(api: &TestApi) -> crate::TestResult {
         }
     };
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -318,7 +325,7 @@ async fn a_one_req_to_many_relation(api: &TestApi) -> crate::TestResult {
         }
     };
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -363,7 +370,7 @@ async fn a_prisma_many_to_many_relation(api: &TestApi) -> crate::TestResult {
         }
     "##};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -441,7 +448,7 @@ async fn a_many_to_many_relation_with_an_id(api: &TestApi) -> crate::TestResult 
         }
     };
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -495,7 +502,7 @@ async fn a_self_relation(api: &TestApi) -> crate::TestResult {
         }
     };
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -531,7 +538,7 @@ async fn id_fields_with_foreign_key(api: &TestApi) -> crate::TestResult {
         }
     "##};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -592,7 +599,7 @@ async fn duplicate_fks_should_ignore_one_of_them(api: &TestApi) -> crate::TestRe
         }
     };
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -625,7 +632,7 @@ async fn default_values_on_relations(api: &TestApi) -> crate::TestResult {
         }
     "##};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -656,19 +663,25 @@ async fn prisma_1_0_relations(api: &TestApi) -> crate::TestResult {
         })
         .await?;
 
-    let dm = indoc! {r##"
-        model Book {
-            id        String      @id
+    let native_string = if !api.sql_family().is_sqlite() {
+        "@db.Char(25)"
+    } else {
+        ""
+    };
+
+    let dm = formatdoc! {r##"
+        model Book {{
+            id        String      @id {}
             Royalty   Royalty[]   @relation("BookRoyalty")
-        }
+        }}
 
-        model Royalty {
-            id        String      @id
+        model Royalty {{
+            id        String      @id {}
             Book      Book[]      @relation("BookRoyalty")
-        }
-    "##};
+        }}
+    "##, native_string, native_string};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -739,7 +752,7 @@ async fn relations_should_avoid_name_clashes(api: &TestApi) -> crate::TestResult
         }
     };
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -830,7 +843,7 @@ async fn relations_should_avoid_name_clashes_2(api: &TestApi) -> crate::TestResu
         }
     };
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -896,7 +909,7 @@ async fn one_to_many_relation_field_names_do_not_conflict_with_many_to_many_rela
         extra_index
     );
 
-    assert_eq_datamodels!(&expected_dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&expected_dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -949,7 +962,7 @@ async fn many_to_many_relation_field_names_do_not_conflict_with_themselves(api: 
         }
     "#};
 
-    assert_eq_datamodels!(expected_dm, &api.introspect().await?);
+    api.assert_eq_datamodels(expected_dm, &api.introspect().await?);
 
     Ok(())
 }

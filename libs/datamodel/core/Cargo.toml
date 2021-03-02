@@ -8,7 +8,6 @@ version = "0.1.0"
 bigdecimal = "0.2"
 chrono = {version = "0.4.6", features = ["serde"]}
 colored = "1.8.0"
-cuid = {git = "https://github.com/prisma/cuid-rust"}
 datamodel-connector = {path = "../connectors/datamodel-connector"}
 dml = {path = "../connectors/dml"}
 itertools = "0.8"
@@ -29,6 +28,7 @@ tracing = "0.1"
 clap = "2.33"
 indoc = "1"
 native-types = {path = "../../native-types"}
+paste = "1.0"
 pretty_assertions = "0.6.1"
 serial_test = "*"
 

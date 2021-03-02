@@ -1,9 +1,9 @@
 use migration_core::commands::{ApplyMigrationsInput, CreateMigrationInput};
 use migration_engine_tests::{multi_engine_test_api::*, TestResult};
-use test_macros::test_each_connector;
+use test_macros::test_connectors;
 
-#[test_each_connector]
-async fn advisory_locking_works(api: &TestApi) -> TestResult {
+#[test_connectors]
+async fn advisory_locking_works(api: TestApi) -> TestResult {
     api.initialize().await?;
 
     let first_me = api.new_engine().await?;
@@ -59,7 +59,7 @@ async fn advisory_locking_works(api: &TestApi) -> TestResult {
         .filter(|result| {
             let applied_migration_names = &result.as_ref().unwrap().applied_migration_names;
 
-            applied_migration_names.len() == 1 && &applied_migration_names[0] == &migration_name
+            applied_migration_names.len() == 1 && applied_migration_names[0] == migration_name
         })
         .count();
 

@@ -38,30 +38,13 @@ impl FromSource for Sqlite {
             .map_err(|sql_error| sql_error.into_connector_error(&connection_info))?;
 
         let file_path = params.file_path;
+        let url = database_str.split('?').next();
 
-        let url_with_db = {
-            let db_name = std::path::Path::new(&file_path)
-                .file_stem()
-                .and_then(|stem| stem.to_str())
-                .ok_or_else(|| invalid_file_path_error(&file_path, &connection_info))?
-                .to_owned();
+        if url.is_none() || std::path::Path::new(url.unwrap()).file_stem().is_none() {
+            return Err(invalid_file_path_error(&file_path, &connection_info));
+        }
 
-            let mut splitted = database_str.split('?');
-            let url = splitted.next().unwrap();
-            let params = splitted.next();
-
-            let mut params: Vec<&str> = match params {
-                Some(params) => params.split('&').collect(),
-                None => Vec::with_capacity(1),
-            };
-
-            let db_name_param = format!("db_name={}", db_name);
-            params.push(&db_name_param);
-
-            format!("{}?{}", url, params.join("&"))
-        };
-
-        let mut builder = Quaint::builder(url_with_db.as_str())
+        let mut builder = Quaint::builder(database_str.as_str())
             .map_err(SqlError::from)
             .map_err(|sql_error| sql_error.into_connector_error(&connection_info))?;
 

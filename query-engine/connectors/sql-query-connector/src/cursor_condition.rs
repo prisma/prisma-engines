@@ -1,46 +1,80 @@
-use crate::query_arguments_ext::QueryArgumentsExt;
+use crate::{ordering::OrderingJoins, query_arguments_ext::QueryArgumentsExt};
 use connector_interface::QueryArguments;
 use prisma_models::*;
 use quaint::ast::*;
 
 static ORDER_TABLE_ALIAS: &str = "order_cmp";
 
+type AliasedScalar = (ScalarFieldRef, String);
+type MaybeAliasedScalar = (ScalarFieldRef, Option<String>);
+
+#[derive(Debug)]
+struct CursorOrderDefinition {
+    // Field on which to perform the ordering
+    pub(crate) field_aliased: AliasedScalar,
+    // Direction of the sort
+    pub(crate) sort_order: SortOrder,
+    // Final column identifier to be used for the scalar field to order by
+    pub(crate) order_column: Column<'static>,
+    // Foreign keys of the relations on which the order is performed
+    pub(crate) fks: Option<Vec<MaybeAliasedScalar>>,
+}
+
 /// Builds a cursor query condition based on the cursor arguments and if necessary a table that the condition depends on.
 ///
-/// An example query for 4 order-by fields is:
+/// An example query for 4 order-by fields (where the last field is one2m relation) is:
+///
 /// ```sql
 /// SELECT
-///   `TestModel`.`id`
+///   `ModelA`.`id`
 /// FROM
-///   `TestModel`,
+///   `ModelA`
+///   LEFT JOIN `ModelB` AS `orderby_3_ModelB` ON (
+///     `ModelA`.`modelB_id` = `orderby_3_ModelB`.`fieldD`
+///   ),
 ///   -- >>> Begin Part #1
 ///   (
-///       SELECT
-///           `TestModel`.`fieldA`,
-///           `TestModel`.`fieldB`,
-///           `TestModel`.`fieldC`,
-///           `TestModel`.`fieldD`
-///       FROM
-///           `TestModel`
-///       WHERE
-///           (`TestModel`.`id`) = (4)
-///   ) AS `order_cmp`
-///   -- <<< End Part #1
+///     SELECT
+///       `ModelA`.`fieldA` AS `ModelA_fieldA_0`,
+///       `ModelA`.`fieldB` AS `ModelA_fieldB_1`,
+///       `ModelA`.`fieldC` AS `ModelA_fieldC_2`,
+///       `orderby_3_ModelB`.`fieldD` AS `ModelB_fieldD_3`
+///     FROM
+///       `ModelA`
+///       LEFT JOIN `ModelB` AS `orderby_3_ModelB` ON (
+///         `ModelA`.`modelB_id` = `orderby_3_ModelB`.`fieldD`
+///       )
+///     WHERE
+///       (`ModelA`.`id`) = (?)
+///   ) AS `order_cmp` -- <<< End Part #1
 /// WHERE
 ///   -- >>> Begin Part #2
-///   (`TestModel`.`fieldA` = `order_cmp`.`fieldA` AND `TestModel`.`fieldB` = `order_cmp`.`fieldB` AND `TestModel`.`fieldC` = `order_cmp`.`fieldC` AND `TestModel`.`fieldD` <= `order_cmp`.`fieldD`)
-///   OR
-///   (`TestModel`.`fieldA` = `order_cmp`.`fieldA` AND `TestModel`.`fieldB` = `order_cmp`.`fieldB` AND `TestModel`.`fieldC` > `order_cmp`.`fieldC`)
-///   OR
-///   (`TestModel`.`fieldA` = `order_cmp`.`fieldA` AND `TestModel`.`fieldB` > `order_cmp`.`fieldB`)
-///   OR
-///   (`TestModel`.`fieldA` < `order_cmp`.`fieldA`)
+///   (
+///     (
+///       `ModelA`.`fieldA` = `order_cmp`.`ModelA_fieldA_0`
+///       AND `ModelA`.`fieldB` = `order_cmp`.`ModelA_fieldB_1`
+///       AND `ModelA`.`fieldC` = `order_cmp`.`ModelA_fieldC_2`
+///       AND `orderby_3_ModelB`.`fieldD` <= `order_cmp`.`ModelB_fieldD_3`
+///     )
+///     OR (
+///       `ModelA`.`fieldA` = `order_cmp`.`ModelA_fieldA_0`
+///       AND `ModelA`.`fieldB` = `order_cmp`.`ModelA_fieldB_1`
+///       AND `ModelA`.`fieldC` > `order_cmp`.`ModelA_fieldC_2`
+///     )
+///     OR (
+///       `ModelA`.`fieldA` = `order_cmp`.`ModelA_fieldA_0`
+///       AND `ModelA`.`fieldB` > `order_cmp`.`ModelA_fieldB_1`
+///     )
+///     OR (
+///       `ModelA`.`fieldA` < `order_cmp`.`ModelA_fieldA_0`
+///     )
+///   )
 ///   -- <<< End Part #2
 /// ORDER BY
-///   `TestModel`.`fieldA` DESC,
-///   `TestModel`.`fieldB` ASC,
-///   `TestModel`.`fieldC` ASC,
-///   `TestModel`.`fieldD` DESC;
+///   `ModelA`.`fieldA` DESC,
+///   `ModelA`.`fieldB` ASC,
+///   `ModelA`.`fieldC` ASC,
+///   `orderby_3_ModelB`.`fieldD` DESC
 /// ```
 ///
 /// The above assumes that all field are non-nullable. If a field is nullable, #2 conditions slighty change:
@@ -62,7 +96,20 @@ static ORDER_TABLE_ALIAS: &str = "order_cmp";
 ///   )
 ///   -- ...
 /// ```
-pub fn build(query_arguments: &QueryArguments, model: &ModelRef) -> (Option<Table<'static>>, ConditionTree<'static>) {
+/// When the ordering is performed on a nullable _relation_,
+/// the conditions change in the same way as above, with the addition that foreign keys are also compared to NULL:
+/// ```sql
+///   -- ... The first (4 - condition) block:
+///   AND (
+///     `orderby_3_ModelB`.`id` <= `order_cmp`.`ModelB_fieldD_3`
+///     OR `main`.`ModelA`.`modelB_id` IS NULL -- >>> Additional check for the nullable foreign key
+///   )
+/// ```
+pub fn build(
+    query_arguments: &QueryArguments,
+    model: &ModelRef,
+    ordering_joins: &[OrderingJoins],
+) -> (Option<Table<'static>>, ConditionTree<'static>) {
     match query_arguments.cursor {
         None => (None, ConditionTree::NoCondition),
         Some(ref cursor) => {
@@ -78,32 +125,45 @@ pub fn build(query_arguments: &QueryArguments, model: &ModelRef) -> (Option<Tabl
             let cursor_condition = cursor_row.clone().equals(cursor_values.clone());
 
             // Orderings for this query. Influences which fields we need to fetch for comparing order fields.
-            let mut order_definitions = order_definitions(query_arguments, model);
+            let mut definitions = order_definitions(query_arguments, model, &ordering_joins);
 
             // Subquery to find the value of the order field(s) that we need for comparison. Builds part #1 of the query example in the docs.
-            let order_subquery = order_definitions
+            let order_subquery = definitions
                 .iter()
-                .fold(Select::from_table(model.as_table()), |select, (field, _)| {
-                    select.column(field.as_column())
+                .fold(Select::from_table(model.as_table()), |select, definition| {
+                    select.column(
+                        definition
+                            .order_column
+                            .clone()
+                            .alias(definition.field_aliased.1.to_owned()),
+                    )
                 })
                 .so_that(cursor_condition);
 
+            let order_subquery = ordering_joins
+                .iter()
+                .flat_map(|j| &j.joins)
+                .fold(order_subquery, |acc, join| acc.left_join(join.data.clone()));
+
             let subquery_table = Table::from(order_subquery).alias(ORDER_TABLE_ALIAS);
-            let len = order_definitions.len();
+            let len = definitions.len();
             let reverse = query_arguments.needs_reversed_order();
 
             // Builds part #2 of the example query.
             // If we only have one ordering, we only want a single, slightly different, condition of (orderField [<= / >=] cmp_field).
             let condition_tree = if len == 1 {
-                let (field, order) = order_definitions.pop().unwrap();
-                ConditionTree::Single(Box::new(map_orderby_condition(&field, &order, reverse, true)))
+                let order_definition = definitions.pop().unwrap();
+                ConditionTree::Single(Box::new(map_orderby_condition(&order_definition, reverse, true)))
             } else {
                 let or_conditions = (0..len).fold(Vec::with_capacity(len), |mut conditions_acc, n| {
-                    let (head, tail) = order_definitions.split_at(len - n - 1);
+                    let (head, tail) = definitions.split_at(len - n - 1);
                     let mut and_conditions = Vec::with_capacity(head.len() + 1);
 
-                    for (field, _) in head {
-                        and_conditions.push(map_equality_condition(field));
+                    for order_definition in head {
+                        and_conditions.push(map_equality_condition(
+                            &order_definition.field_aliased,
+                            order_definition.order_column.clone(),
+                        ));
                     }
 
                     if head.len() == len - 1 {
@@ -131,12 +191,12 @@ pub fn build(query_arguments: &QueryArguments, model: &ModelRef) -> (Option<Tabl
                         //
                         // Said differently, we handle all the cases in which the prefixes are equal to len - 1 to account for possible identical comparators,
                         // but everything else must come strictly "after" the cursor.
-                        let (field, order) = tail.first().unwrap();
+                        let order_definition = tail.first().unwrap();
 
-                        and_conditions.push(map_orderby_condition(field, order, reverse, true));
+                        and_conditions.push(map_orderby_condition(order_definition, reverse, true));
                     } else {
-                        let (field, order) = tail.first().unwrap();
-                        and_conditions.push(map_orderby_condition(field, order, reverse, false));
+                        let order_definition = tail.first().unwrap();
+                        and_conditions.push(map_orderby_condition(order_definition, reverse, false));
                     }
 
                     conditions_acc.push(ConditionTree::And(and_conditions));
@@ -152,17 +212,19 @@ pub fn build(query_arguments: &QueryArguments, model: &ModelRef) -> (Option<Tabl
 }
 
 // A negative `take` value signifies that values should be taken before the cursor,
-// requiring the correct comarison operator to be used to fit the reversed order.
+// requiring the correct comparison operator to be used to fit the reversed order.
 fn map_orderby_condition(
-    field: &ScalarFieldRef,
-    order: &SortOrder,
+    order_definition: &CursorOrderDefinition,
     reverse: bool,
     include_eq: bool,
 ) -> Expression<'static> {
-    let order_column = field.as_column();
-    let cmp_column = Column::from((ORDER_TABLE_ALIAS, field.db_name().to_owned()));
+    let (field, field_alias) = &order_definition.field_aliased;
+    let cmp_column = Column::from((ORDER_TABLE_ALIAS, field_alias.to_owned()));
+    let cloned_cmp_column = cmp_column.clone();
+    let order_column = order_definition.order_column.clone();
+    let cloned_order_column = order_column.clone();
 
-    let order_expr: Expression<'static> = match order {
+    let order_expr: Expression<'static> = match order_definition.sort_order {
         // If it's ASC but we want to take from the back, the ORDER BY will be DESC, meaning that comparisons done need to be lt(e).
         SortOrder::Ascending if reverse => {
             if include_eq {
@@ -201,19 +263,39 @@ fn map_orderby_condition(
 
     // If we have null values in the ordering or comparison row, those are automatically included because we can't make a
     // statement over their order relative to the cursor.
-    if !field.is_required {
+    let order_expr = if !field.is_required {
         order_expr
-            .or(field.as_column().is_null())
-            .or(Column::from((ORDER_TABLE_ALIAS, field.db_name().to_owned())).is_null())
+            .or(cloned_order_column.is_null())
+            .or(cloned_cmp_column.is_null())
             .into()
     } else {
         order_expr
-    }
+    };
+
+    // Add OR statements for the foreign key fields too if they are nullable
+    let order_expr = if let Some(fks) = &order_definition.fks {
+        fks.iter()
+            .filter(|(fk, _)| !fk.is_required)
+            .fold(order_expr, |acc, (fk, alias)| {
+                let col = if let Some(alias) = alias {
+                    Column::from((alias.to_owned(), fk.db_name().to_owned()))
+                } else {
+                    fk.as_column()
+                }
+                .is_null();
+
+                acc.or(col).into()
+            })
+    } else {
+        order_expr
+    };
+
+    order_expr
 }
 
-fn map_equality_condition(field: &ScalarFieldRef) -> Expression<'static> {
-    let order_column = field.as_column();
-    let cmp_column = Column::from((ORDER_TABLE_ALIAS, field.db_name().to_owned()));
+fn map_equality_condition(field: &AliasedScalar, order_column: Column<'static>) -> Expression<'static> {
+    let (field, field_alias) = field;
+    let cmp_column = Column::from((ORDER_TABLE_ALIAS, field_alias.to_owned()));
 
     // If we have null values in the ordering or comparison row, those are automatically included because we can't make a
     // statement over their order relative to the cursor.
@@ -229,20 +311,105 @@ fn map_equality_condition(field: &ScalarFieldRef) -> Expression<'static> {
     }
 }
 
-fn order_definitions(query_arguments: &QueryArguments, model: &ModelRef) -> Vec<(ScalarFieldRef, SortOrder)> {
-    let defined_ordering: Vec<_> = query_arguments
-        .order_by
-        .iter()
-        .map(|o| (o.field.clone(), o.sort_order))
-        .collect();
+fn order_definitions(
+    query_arguments: &QueryArguments,
+    model: &ModelRef,
+    ordering_joins: &[OrderingJoins],
+) -> Vec<CursorOrderDefinition> {
+    let mut orderings: Vec<CursorOrderDefinition> = vec![];
 
-    if defined_ordering.is_empty() {
-        model
+    for (index, order_by) in query_arguments.order_by.iter().enumerate() {
+        let (last_hop, before_last_hop) = take_last_two_elem(&order_by.path);
+        let joins_for_hop = ordering_joins.get(index).unwrap();
+
+        // If there are any ordering hop, this finds the foreign key fields for the _last_ hop (we look for the last one because the ordering is done the last one).
+        // These fk fields are needed to check whether they are nullable
+        // cf: part #2 of the SQL query above, when a field is nullable.
+        let fks = last_hop.map(|rf| {
+            rf.relation_info
+                .fields
+                .iter()
+                .map(|fk_name| {
+                    let fk_field = rf.model().fields().find_from_scalar(fk_name).unwrap();
+
+                    // If there are _more than one_ hop, we need to refer to the fk fields using the
+                    // join alias of the hop _before_ the last hop. eg:
+                    //
+                    // ```sql
+                    // SELECT ...
+                    // FROM
+                    //  "public"."ModelA"
+                    //   LEFT JOIN "public"."ModelB" AS "orderby_0_ModelB" ON (
+                    //     "public"."ModelA"."b_id" = "orderby_0_ModelB"."id"
+                    //   )
+                    //   LEFT JOIN "public"."ModelC" AS "orderby_0_ModelC" ON (
+                    //     "orderby_0_ModelB"."c_id" = "orderby_0_ModelC"."id"
+                    //   )
+                    // WHERE
+                    // ( ... OR <before_last_join_alias>.<foreign_key_db_name> IS NULL )
+                    // ```
+                    // In the example above, <before_last_join_alias> == "orderby_0_ModelB"
+                    //                          <foreign_key_db_name> == "c_id"
+                    match before_last_hop {
+                        Some(_) => {
+                            let (_, before_last_join) = take_last_two_elem(&joins_for_hop.joins);
+                            let before_last_join =
+                                before_last_join.expect("There should be an equal amount of order by hops and joins");
+
+                            (fk_field, Some(before_last_join.alias.to_owned()))
+                        }
+                        None => {
+                            // If there is not more than one hop, then there's no need to alias the fk field
+                            (fk_field, None)
+                        }
+                    }
+                })
+                .collect()
+        });
+
+        // Selected fields needs to be aliased in case there are two order bys on two different tables, pointing to a field of the same name.
+        // eg: orderBy: [{ id: asc }, { b: { id: asc } }]
+        // Without these aliases, selecting from the <ORDER_TABLE_ALIAS> tmp table would result in ambiguous field name
+        let field_aliased = (
+            order_by.field.clone(),
+            format!("{}_{}_{}", order_by.field.model().name, order_by.field.name, index).to_owned(),
+        );
+
+        orderings.push(CursorOrderDefinition {
+            field_aliased,
+            sort_order: order_by.sort_order,
+            order_column: joins_for_hop.order_column.clone(),
+            fks,
+        });
+    }
+
+    if orderings.is_empty() {
+        return model
             .primary_identifier()
             .scalar_fields()
-            .map(|f| (f, SortOrder::Ascending))
-            .collect()
-    } else {
-        defined_ordering
+            .map(|f| {
+                let field_aliased = (f.clone(), f.db_name().to_owned());
+
+                CursorOrderDefinition {
+                    field_aliased,
+                    sort_order: SortOrder::Ascending,
+                    order_column: f.as_column(),
+                    fks: None,
+                }
+            })
+            .collect();
+    }
+
+    orderings
+}
+
+// Returns (last_elem, before_last_elem)
+fn take_last_two_elem<T>(slice: &[T]) -> (Option<&T>, Option<&T>) {
+    let len = slice.len();
+
+    match len {
+        0 => (None, None),
+        1 => (slice.get(0), None),
+        _ => (slice.get(len - 1), slice.get(len - 2)),
     }
 }

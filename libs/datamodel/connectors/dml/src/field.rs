@@ -98,6 +98,13 @@ pub enum Field {
 }
 
 impl Field {
+    pub fn as_relation_field(&self) -> Option<&RelationField> {
+        match self {
+            Field::RelationField(sf) => Some(sf),
+            _ => None,
+        }
+    }
+
     pub fn as_scalar_field(&self) -> Option<&ScalarField> {
         match self {
             Field::ScalarField(sf) => Some(sf),
@@ -106,10 +113,11 @@ impl Field {
     }
 
     pub fn is_relation(&self) -> bool {
-        match self {
-            Field::ScalarField(_) => false,
-            Field::RelationField(_) => true,
-        }
+        matches!(self, Field::RelationField(_))
+    }
+
+    pub fn is_scalar_field(&self) -> bool {
+        matches!(self, Field::ScalarField(_))
     }
 
     pub fn name(&self) -> &str {

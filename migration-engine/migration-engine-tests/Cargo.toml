@@ -38,6 +38,7 @@ tokio = { version = "1.0" }
 tracing = "0.1.12"
 tracing-futures = "0.2.1"
 url = "2.1.1"
+connection-string = "0.1.13"
 
 [dependencies.quaint]
 git = "https://github.com/prisma/quaint"

@@ -190,6 +190,7 @@ async fn uuids_do_not_generate_drift_issue_5282(api: &TestApi) -> TestResult {
         r#"
         model a {
             id String @id @default(dbgenerated("uuid_generate_v4()")) @test_db.Uuid
+            b  b[]
         }
 
         model b {

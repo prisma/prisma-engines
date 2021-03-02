@@ -24,7 +24,6 @@ fn ignored_fields_should_be_filtered_from_input_and_output_types() {
     "#;
     let (query_schema, datamodel) = get_query_schema(dm);
     let dmmf = crate::dmmf::render_dmmf(&datamodel, Arc::new(query_schema));
-    dbg!(&dmmf);
     let output_types = dmmf.schema.output_object_types.get(PRISMA_NAMESPACE).unwrap();
     let input_types = dmmf.schema.input_object_types.get(PRISMA_NAMESPACE).unwrap();
 
@@ -165,9 +164,9 @@ fn no_find_unique_when_model_only_has_ignored_index_or_compound() {
         .unwrap();
     let field_names: Vec<&str> = query_type.fields.iter().map(|f| f.name.as_str()).collect();
 
-    assert!(field_names.contains(&"findUniqueItemA") == false);
-    assert!(field_names.contains(&"findUniqueItemB") == false);
-    assert!(field_names.contains(&"findUniqueItemC") == false);
+    assert!(!field_names.contains(&"findUniqueItemA"));
+    assert!(!field_names.contains(&"findUniqueItemB"));
+    assert!(!field_names.contains(&"findUniqueItemC"));
 }
 
 // Write
@@ -203,7 +202,7 @@ fn no_create_or_upsert_should_exist_with_ignored_field_without_default_value() {
     let ignored_ops: [&str; 3] = ["createOne", "createMany", "upsertOne"];
     ignored_ops.iter().for_each(|op| {
         assert!(
-            field_names.contains(&format!("{}Item", *op).as_str()) == false,
+            !field_names.contains(&format!("{}Item", *op).as_str()),
             format!("operation '{}' should not be supported", op)
         );
     });
@@ -236,6 +235,7 @@ fn no_nested_create_upsert_exist_with_ignored_field_without_default_value() {
         id Int @id
         title String
         unsupported String @ignore
+        users User[]
     }
 "#;
     let (query_schema, datamodel) = get_query_schema(dm);

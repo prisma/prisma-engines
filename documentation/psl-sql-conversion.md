@@ -16,7 +16,7 @@
   - [Mapping a one to one relation](#mapping-a-one-to-one-relation)
   - [Mapping a one to many relation](#mapping-a-one-to-many-relation)
   - [Mapping a many to many relation](#mapping-a-many-to-many-relation)
-  - [Mapping Self Relations and Ambigous Relations](#mapping-self-relations-and-ambigous-relations)
+  - [Mapping Self Relations and Ambigous Relations](#mapping-self-relations-and-ambiguous-relations)
   - [Mapping Compound Foreign Keys](#mapping-compound-foreign-keys)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -72,7 +72,7 @@ CREATE TABLE "test"."Blog" (
 );
 ```
 
-🚨 The `cuid()` and `uuid()` expressions have no manifestation in the database, and therefore can later not be inferred. 
+🚨 The `cuid()` and `uuid()` expressions have no manifestation in the database, and therefore can later not be inferred.
 
 ### Mapping a model with a compound Id field
 Prisma Schema Example:
@@ -128,7 +128,7 @@ model User {
 }
 ```
 
-A scalar list field in PSL is mapped to a separate table for the values. The name follows the `Model_fieldname` convention. The important columns contained are nodeId for the specific node a value is associated with and value for the actual value. Position is generated and should allow fancy operations like ordered inserts, but is not used. 
+A scalar list field in PSL is mapped to a separate table for the values. The name follows the `Model_fieldname` convention. The important columns contained are nodeId for the specific node a value is associated with and value for the actual value. Position is generated and should allow fancy operations like ordered inserts, but is not used.
 
 Resulting SQL Example (Postgres):
 ```sql
@@ -209,7 +209,7 @@ enum TestEnum{
 }
 ```
 
-We handle the validation of Enum values in the core, and place no constraints on the db column.  
+We handle the validation of Enum values in the core, and place no constraints on the db column.
 
 ```sql
 CREATE TABLE "test"."User" (
@@ -219,11 +219,11 @@ CREATE TABLE "test"."User" (
 );
 ```
 
-🚨 We do not use any DB capabilities for enums, therefore when introspecting again, this is just a String field for us. 
+🚨 We do not use any DB capabilities for enums, therefore when introspecting again, this is just a String field for us.
 
 
 
-## Mapping Default Values 
+## Mapping Default Values
 
 ```groovy
 model User {
@@ -242,7 +242,7 @@ CREATE TABLE "test"."User" (
 );
 ```
 
-🚨 DateTime default values don't yet work. The `now()` expression should translate to something like `CURRENT_TIMESTAMP`. 
+🚨 DateTime default values don't yet work. The `now()` expression should translate to something like `CURRENT_TIMESTAMP`.
 
 
 
@@ -251,7 +251,7 @@ CREATE TABLE "test"."User" (
 
 ### Mapping a one to one relation
 
-There are four potential cases for 1to1 relations when it comes to fields being required. But two of them are always resulting in the same SQL structure. 
+There are four potential cases for 1to1 relations when it comes to fields being required. But two of them are always resulting in the same SQL structure.
 
 Both sides required:
 ```groovy
@@ -334,7 +334,7 @@ ALTER TABLE "test"."User" ADD COLUMN "address" text   REFERENCES "test"."Address
 For a one to one relation the user must specify the side where the foreign key gets stored by annotating the field with `@relation(references: [id])`. This annotated field is mapped to a column with a foreign key constraint. This foreign key constraint is set to null if the referenced row is deleted.
 
 🚨 In the 1To1 case we should probably put a unique constraint on the address column, otherwise we can't infer that it is a 1To1 when introspecting again.
-We also loose the information which case it is exactly in the SQL structure. 
+We also loose the information which case it is exactly in the SQL structure.
 
 ### Mapping a one to many relation
 ```groovy
@@ -367,7 +367,7 @@ CREATE TABLE "test"."Post" (
 
 ALTER TABLE "test"."Post" ADD COLUMN "blog" text   REFERENCES "test"."Blog"("id") ON DELETE SET NULL;
 ```
- 
+
 
 ### Mapping a many to many relation
 ```groovy
@@ -407,7 +407,7 @@ CREATE TABLE "test"."_BlogToCategory" (
 CREATE UNIQUE INDEX "_BlogToCategory_AB_unique" ON "test"."_BlogToCategory"("A","B")
 ```
 
-### Mapping Self Relations and Ambigous Relations
+### Mapping Self Relations and Ambiguous Relations
 ```groovy
 model Employee {
   employee_id       Int       @id
@@ -428,13 +428,13 @@ ALTER TABLE "test"."Employee" ADD COLUMN "recruited_by" integer   REFERENCES "te
 ADD COLUMN "reporting_to" integer   REFERENCES "test"."Employee"("employee_id") ON DELETE SET NULL;
 ```
 
-🚨 We do not persist names for backrelationfields or relation names. This information is then lost when introspecting. 
+🚨 We do not persist names for backrelationfields or relation names. This information is then lost when introspecting.
 
 ### Mapping Compound Foreign Keys
 ```groovy
  model User {
     id Int @id
-    post Post? 
+    post Post?
     firstname String
     lastname String
 }
@@ -461,7 +461,7 @@ CREATE TABLE "test"."Post" (
 ALTER TABLE "test"."Post" ADD COLUMN "user" integer   REFERENCES "test"."User"("id") ON DELETE SET NULL;
 ```
 
-🚨 The SQL structure here is completely wrong, and PSL atm also does not specify this case. The annotation should look like this: `@relation(from:[User_firstname, User_lastname], references:[firstname, lastname])`, but currently the from field is not specced. 
+🚨 The SQL structure here is completely wrong, and PSL atm also does not specify this case. The annotation should look like this: `@relation(from:[User_firstname, User_lastname], references:[firstname, lastname])`, but currently the from field is not specced.
 
 The correct SQL should probably look like this:
 ```sql

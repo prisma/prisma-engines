@@ -172,5 +172,10 @@ fn render_raw_sql(
         SqlMigrationStep::AlterIndex { table, index } => {
             renderer.render_alter_index(schemas.tables(table).indexes(index).as_ref())
         }
+        SqlMigrationStep::DropView(drop_view) => {
+            let view = schemas.previous().view_walker_at(drop_view.view_index);
+
+            vec![renderer.render_drop_view(&view)]
+        }
     }
 }

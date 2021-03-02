@@ -36,6 +36,7 @@ async fn an_enum_can_be_turned_into_a_model(api: &TestApi) -> TestResult {
             id Int @id
             description String
             biteRisk Int
+            c        Cat[]
         }
     "#;
 
@@ -146,6 +147,42 @@ async fn variants_can_be_removed_from_an_existing_enum(api: &TestApi) -> TestRes
     api.assert_schema()
         .await?
         .assert_enum(enum_name, |enm| enm.assert_values(&["HUNGRY"]))?;
+
+    Ok(())
+}
+
+#[test_each_connector(capabilities("enums"))]
+async fn models_with_enum_values_can_be_dropped(api: &TestApi) -> TestResult {
+    let dm1 = r#"
+        model Cat {
+            id Int @id
+            mood CatMood
+        }
+
+        enum CatMood {
+            HAPPY
+            HUNGRY
+        }
+    "#;
+
+    api.schema_push(dm1).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_tables_count(1)?;
+
+    api.insert("Cat")
+        .value("id", 1)
+        .value("mood", "HAPPY")
+        .result_raw()
+        .await?;
+
+    api.schema_push("")
+        .force(true)
+        .send()
+        .await?
+        .assert_executable()?
+        .assert_warnings(&["You are about to drop the `Cat` table, which is not empty (1 rows).".into()])?;
+
+    api.assert_schema().await?.assert_tables_count(0)?;
 
     Ok(())
 }

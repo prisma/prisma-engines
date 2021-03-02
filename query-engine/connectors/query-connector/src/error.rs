@@ -71,6 +71,13 @@ impl ConnectorError {
                 }))
             }
 
+            ErrorKind::IncorrectNumberOfParameters { expected, actual } => Some(KnownError::new(
+                user_facing_errors::common::IncorrectNumberOfParameters {
+                    expected: *expected,
+                    actual: *actual,
+                },
+            )),
+
             _ => None,
         };
 
@@ -175,6 +182,13 @@ pub enum ErrorKind {
 
     #[error("Multiple errors occurred: {}", 0)]
     MultiError(MultiError),
+
+    #[error(
+        "Incorrect number of parameters given to a statement. Expected {}: got: {}.",
+        expected,
+        actual
+    )]
+    IncorrectNumberOfParameters { expected: usize, actual: usize },
 }
 
 impl From<DomainError> for ConnectorError {

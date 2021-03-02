@@ -22,6 +22,13 @@ pub enum Expression {
 }
 
 impl Expression {
+    pub fn as_string_value(&self) -> Option<(&str, Span)> {
+        match self {
+            Expression::StringValue(s, span) => Some((s, *span)),
+            _ => None,
+        }
+    }
+
     pub fn with_lifted_span(&self, offset: usize) -> Expression {
         match self {
             Expression::NumericValue(v, s) => Expression::NumericValue(v.clone(), s.lift_span(offset)),

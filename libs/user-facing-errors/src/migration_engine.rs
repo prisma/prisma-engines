@@ -124,7 +124,7 @@ pub struct MigrationNameTooLong;
 #[derive(Debug, Serialize, UserFacingError)]
 #[user_facing(
     code = "P3011",
-    message = "Migration `{migration_name}` cannot be rolled back because it was never applied to the database."
+    message = "Migration `{migration_name}` cannot be rolled back because it was never applied to the database. Hint: did you pass in the whole migration name? (example: \"20201207184859_initial_migration\")"
 )]
 pub struct CannotRollBackUnappliedMigration {
     /// The name of the migration.
@@ -153,15 +153,6 @@ pub struct ShadowDbCreationError {
     pub inner_error: crate::Error,
 }
 
-#[derive(Debug, Serialize, UserFacingError)]
-#[user_facing(
-    code = "P3014",
-    message = "The datasource provider `{provider}` specified in your schema does not match the one specified in the migration_lock.toml. You will encounter errors when you try to apply migrations generated for a different provider. Please archive your current migration directory at a different location and start a new migration history with `prisma migrate dev`."
-)]
-pub struct ProviderSwitchedError {
-    ///The provider specified in the schema.
-    pub provider: String,
-}
 impl crate::UserFacingError for ShadowDbCreationError {
     const ERROR_CODE: &'static str = "P3014";
 
@@ -176,11 +167,21 @@ impl crate::UserFacingError for ShadowDbCreationError {
         };
 
         format!(
-            "Prisma Migrate could not create the shadow database. Please make sure the database user has permission to create databases.  More info: https://pris.ly/d/migrate-shadow. Original error: {error_code}\n{inner_error}",
+            "Prisma Migrate could not create the shadow database. Please make sure the database user has permission to create databases. More info: https://pris.ly/d/migrate-shadow. Original error: {error_code}\n{inner_error}",
             inner_error = self.inner_error.message(),
             error_code = error_code
         )
     }
+}
+
+#[derive(Debug, Serialize, UserFacingError)]
+#[user_facing(
+    code = "P3014",
+    message = "The datasource provider `{provider}` specified in your schema does not match the one specified in the migration_lock.toml. You will encounter errors when you try to apply migrations generated for a different provider. Please archive your current migration directory at a different location and start a new migration history with `prisma migrate dev`."
+)]
+pub struct ProviderSwitchedError {
+    /// The provider specified in the schema.
+    pub provider: String,
 }
 
 #[derive(Debug, Serialize, UserFacingError)]
@@ -190,6 +191,42 @@ impl crate::UserFacingError for ShadowDbCreationError {
 )]
 pub struct MigrationFileNotFound {
     pub migration_file_path: String,
+}
+
+#[derive(Debug, Serialize)]
+pub struct SoftResetFailed {
+    pub inner_error: crate::Error,
+}
+
+impl crate::UserFacingError for SoftResetFailed {
+    const ERROR_CODE: &'static str = "P3016";
+
+    fn message(&self) -> String {
+        let error_code = match &self.inner_error.inner {
+            crate::ErrorType::Known(crate::KnownError {
+                message: _,
+                meta: _,
+                error_code,
+            }) => format!("Error code: {}\n", &error_code),
+            crate::ErrorType::Unknown(_) => String::new(),
+        };
+
+        format!(
+            "The fallback method for database resets failed, meaning Migrate could not clean up the database entirely. Original error: {error_code}\n{inner_error}",
+            inner_error = self.inner_error.message(),
+            error_code = error_code
+        )
+    }
+}
+
+#[derive(Debug, Serialize, UserFacingError)]
+#[user_facing(
+    code = "P3017",
+    message = "The migration {migration_name} could not be found. Please make sure that the migration exists, and that you included the whole name of the directory. (example: \"20201207184859_initial_migration\")"
+)]
+pub struct MigrationToMarkAppliedNotFound {
+    /// The migration name that was provided, and not found.
+    pub migration_name: String,
 }
 
 #[cfg(test)]

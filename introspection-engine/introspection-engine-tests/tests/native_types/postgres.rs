@@ -54,63 +54,48 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
         })
         .await?;
 
-    let mut dm = indoc! {r#"
-        datasource postgres {
-            provider        = "postgres"
-            url             = "postgres://localhost/test"
-        }
-
-        generator client {
-          provider = "prisma-client-js"
-          previewFeatures = ["nativeTypes"]
-        }
-    "#}
-    .to_string();
-
     let types = indoc! {r#"
         model Blog {
             id              Int      @id
-            smallint        Int      @postgres.SmallInt
+            smallint        Int      @db.SmallInt
             int             Int
             bigint          BigInt
-            decimal         Decimal  @postgres.Decimal(4, 2)
-            numeric         Decimal  @postgres.Decimal(4, 2)
-            real            Float    @postgres.Real
+            decimal         Decimal  @db.Decimal(4, 2)
+            numeric         Decimal  @db.Decimal(4, 2)
+            real            Float    @db.Real
             doublePrecision Float
-            smallSerial     Int      @default(autoincrement()) @postgres.SmallInt
+            smallSerial     Int      @default(autoincrement()) @db.SmallInt
             serial          Int      @default(autoincrement())
             bigSerial       BigInt   @default(autoincrement())
-            varChar         String   @postgres.VarChar(200)
-            char            String   @postgres.Char(200)
+            varChar         String   @db.VarChar(200)
+            char            String   @db.Char(200)
             text            String
             bytea           Bytes
-            ts              DateTime @postgres.Timestamp(0)
-            tstz            DateTime @postgres.Timestamptz(2)
-            date            DateTime @postgres.Date
-            time            DateTime @postgres.Time(2)
-            time_2          DateTime @postgres.Time(6)
-            timetz          DateTime @postgres.Timetz(2)
+            ts              DateTime @db.Timestamp(0)
+            tstz            DateTime @db.Timestamptz(2)
+            date            DateTime @db.Date
+            time            DateTime @db.Time(2)
+            time_2          DateTime @db.Time(6)
+            timetz          DateTime @db.Timetz(2)
             bool            Boolean
-            bit             String   @postgres.Bit(1)
-            varbit          String   @postgres.VarBit(1)
-            uuid            String   @postgres.Uuid
-            xml             String   @postgres.Xml
-            json            Json     @postgres.Json
+            bit             String   @db.Bit(1)
+            varbit          String   @db.VarBit(1)
+            uuid            String   @db.Uuid
+            xml             String   @db.Xml
+            json            Json     @db.Json
             jsonb           Json
-            money           Decimal  @postgres.Money
-            oid             Int      @postgres.Oid
-            inet            String   @postgres.Inet
+            money           Decimal  @db.Money
+            oid             Int      @db.Oid
+            inet            String   @db.Inet
           }
     "#};
 
-    let result = api.re_introspect(&dm).await?;
+    let result = api.introspect().await?;
 
-    dm.push_str(types);
-
-    println!("EXPECTATION: \n {:#}", dm);
+    println!("EXPECTATION: \n {:#}", types);
     println!("RESULT: \n {:#}", result);
 
-    assert!(result.replace(" ", "").contains(&types.replace(" ", "")));
+    api.assert_eq_datamodels(&types, &result);
 
     Ok(())
 }
@@ -139,43 +124,33 @@ async fn native_type_array_columns_feature_on(api: &TestApi) -> crate::TestResul
         })
         .await?;
 
-    let dm = indoc! {r#"
-         generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["nativeTypes"]
-         }
-
-         datasource postgres {
-            provider        = "postgresql"
-            url             = "postgres://localhost/test"
-         }
-
+    let types = indoc! {r#"
          model Blog {
           id                Int        @id
-          decimal_array     Decimal[]  @postgres.Decimal(42, 0)
-          decimal_array_2   Decimal[]  @postgres.Decimal
-          numeric_array     Decimal[]  @postgres.Decimal(4, 2)
-          numeric_array_2   Decimal[]  @postgres.Decimal
-          varchar_array     String[]   @postgres.VarChar(42)
-          varchar_array_2   String[]   @postgres.VarChar
-          char_array        String[]   @postgres.Char(200)
-          char_array_2      String[]   @postgres.Char(1)
-          bit_array         String[]   @postgres.Bit(20)
-          bit_array_2       String[]   @postgres.Bit(1)
-          varbit_array      String[]   @postgres.VarBit(2)
-          varbit_array_2    String[]   @postgres.VarBit
-          timestamp_array   DateTime[] @postgres.Timestamp(4)
-          time_array        DateTime[] @postgres.Time(4)
+          decimal_array     Decimal[]  @db.Decimal(42, 0)
+          decimal_array_2   Decimal[]  @db.Decimal
+          numeric_array     Decimal[]  @db.Decimal(4, 2)
+          numeric_array_2   Decimal[]  @db.Decimal
+          varchar_array     String[]   @db.VarChar(42)
+          varchar_array_2   String[]   @db.VarChar
+          char_array        String[]   @db.Char(200)
+          char_array_2      String[]   @db.Char(1)
+          bit_array         String[]   @db.Bit(20)
+          bit_array_2       String[]   @db.Bit(1)
+          varbit_array      String[]   @db.VarBit(2)
+          varbit_array_2    String[]   @db.VarBit
+          timestamp_array   DateTime[] @db.Timestamp(4)
+          time_array        DateTime[] @db.Time(4)
         }
     "#}
     .to_string();
 
-    let result = api.re_introspect(&dm).await?;
+    let result = api.introspect().await?;
 
-    println!("EXPECTATION: \n {:#}", dm);
+    println!("EXPECTATION: \n {:#}", types);
     println!("RESULT: \n {:#}", result);
 
-    assert!(result.replace(" ", "").contains(&dm.replace(" ", "")));
+    api.assert_eq_datamodels(&types, &result);
 
     Ok(())
 }

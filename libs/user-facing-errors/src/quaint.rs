@@ -231,6 +231,13 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
             }))
         }
 
+        (ErrorKind::IncorrectNumberOfParameters { expected, actual }, ConnectionInfo::Mssql(_)) => {
+            Some(KnownError::new(common::IncorrectNumberOfParameters {
+                expected: *expected,
+                actual: *actual,
+            }))
+        }
+
         _ => None,
     }
 }

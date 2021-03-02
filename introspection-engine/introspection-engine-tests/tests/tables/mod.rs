@@ -1,6 +1,7 @@
 use barrel::{functions, types};
+use indoc::formatdoc;
 use indoc::indoc;
-use introspection_engine_tests::{assert_eq_datamodels, test_api::*};
+use introspection_engine_tests::test_api::*;
 use quaint::prelude::Queryable;
 use test_macros::test_each_connector;
 
@@ -22,18 +23,39 @@ async fn a_simple_table_with_gql_types(api: &TestApi) -> crate::TestResult {
         )
         .await?;
 
-    let dm = indoc! {r##"
-        model Blog {
+    let float_native = if api.sql_family().is_mssql() {
+        "@db.Real"
+    } else if api.sql_family().is_mysql() {
+        "@db.Float"
+    } else {
+        ""
+    };
+    let timestamp_native = if api.sql_family().is_postgres() {
+        "@db.Timestamp(6)"
+    } else if api.sql_family().is_mysql() {
+        "@db.DateTime(0)"
+    } else {
+        ""
+    };
+
+    let text_native = if api.sql_family().is_mssql() || api.sql_family().is_mysql() {
+        "@db.Text"
+    } else {
+        ""
+    };
+
+    let dm = formatdoc! {r##"
+        model Blog {{
             bool    Boolean
-            float   Float
-            date    DateTime
+            float   Float {}
+            date    DateTime {}
             id      Int @id @default(autoincrement())
             int     Int
-            string  String
-        }
-    "##};
+            string  String {}
+        }}
+    "##, float_native, timestamp_native, text_native};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -87,7 +109,7 @@ async fn should_ignore_prisma_helper_tables(api: &TestApi) -> crate::TestResult 
         }
     "##};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -99,7 +121,7 @@ async fn a_table_with_compound_primary_keys(api: &TestApi) -> crate::TestResult 
             |migration| {
                 migration.create_table("Blog", |t| {
                     t.add_column("id", types::integer());
-                    t.add_column("authorId", types::varchar(10));
+                    t.add_column("authorId", types::integer());
                     t.set_primary_key(&["id", "authorId"]);
                 });
             },
@@ -110,12 +132,12 @@ async fn a_table_with_compound_primary_keys(api: &TestApi) -> crate::TestResult 
     let dm = indoc! {r##"
         model Blog {
             id Int
-            authorId String
+            authorId Int
             @@id([id, authorId])
         }
     "##};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -127,7 +149,7 @@ async fn a_table_with_unique_index(api: &TestApi) -> crate::TestResult {
             |migration| {
                 migration.create_table("Blog", |t| {
                     t.add_column("id", types::primary());
-                    t.add_column("authorId", types::r#char(10));
+                    t.add_column("authorId", types::integer());
                     t.add_index("test", types::index(vec!["authorId"]).unique(true));
                 });
             },
@@ -137,12 +159,12 @@ async fn a_table_with_unique_index(api: &TestApi) -> crate::TestResult {
 
     let dm = indoc! {r##"
         model Blog {
-            id      Int @id @default(autoincrement())
-            authorId String @unique
+            id       Int @id @default(autoincrement())
+            authorId Int @unique
         }
     "##};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -154,8 +176,8 @@ async fn a_table_with_multi_column_unique_index(api: &TestApi) -> crate::TestRes
             |migration| {
                 migration.create_table("User", |t| {
                     t.add_column("id", types::primary());
-                    t.add_column("firstname", types::varchar(10));
-                    t.add_column("lastname", types::varchar(10));
+                    t.add_column("firstname", types::integer());
+                    t.add_column("lastname", types::integer());
                     t.add_index("test", types::index(vec!["firstname", "lastname"]).unique(true));
                 });
             },
@@ -166,13 +188,13 @@ async fn a_table_with_multi_column_unique_index(api: &TestApi) -> crate::TestRes
     let dm = indoc! {r##"
         model User {
             id      Int @id @default(autoincrement())
-            firstname String
-            lastname String
+            firstname Int
+            lastname Int
             @@unique([firstname, lastname], name: "test")
         }
     "##};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -184,8 +206,8 @@ async fn a_table_with_required_and_optional_columns(api: &TestApi) -> crate::Tes
             |migration| {
                 migration.create_table("User", |t| {
                     t.add_column("id", types::primary());
-                    t.add_column("requiredname", types::varchar(255).nullable(false));
-                    t.add_column("optionalname", types::varchar(255).nullable(true));
+                    t.add_column("requiredname", types::integer().nullable(false));
+                    t.add_column("optionalname", types::integer().nullable(true));
                 });
             },
             api.schema_name(),
@@ -195,12 +217,12 @@ async fn a_table_with_required_and_optional_columns(api: &TestApi) -> crate::Tes
     let dm = indoc! {r##"
         model User {
             id      Int @id @default(autoincrement())
-            requiredname String
-            optionalname String?
+            requiredname Int
+            optionalname Int?
         }
     "##};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -211,32 +233,43 @@ async fn a_table_with_default_values(api: &TestApi) -> crate::TestResult {
         .execute_with_schema(
             |migration| {
                 migration.create_table("User", |t| {
-                    t.add_column("a", types::text());
                     t.add_column("id", types::primary());
-                    t.add_column("bool", types::boolean().default(false).nullable(false));
-                    t.add_column("bool2", types::boolean().default(true).nullable(false));
-                    t.add_column("float", types::float().default(5.3).nullable(false));
-                    t.add_column("int", types::integer().default(5).nullable(false));
-                    t.add_column("string", types::varchar(4).default("Test").nullable(false));
+                    t.add_column("bool", types::boolean().default(false));
+                    t.add_column("bool2", types::boolean().default(true));
+                    t.add_column("float", types::float().default(5.3));
+                    t.add_column("int", types::integer().default(5));
+                    t.add_column("string", types::char(4).default("Test"));
                 });
             },
             api.schema_name(),
         )
         .await?;
 
-    let dm = indoc! {r##"
-        model User {
-            a String
+    let native_string = if !api.sql_family().is_sqlite() {
+        "@db.Char(4)"
+    } else {
+        ""
+    };
+    let float_string = if api.sql_family().is_mysql() {
+        "@db.Float"
+    } else if api.sql_family().is_mssql() {
+        "@db.Real"
+    } else {
+        ""
+    };
+
+    let dm = formatdoc! {r##"
+        model User {{
             id     Int     @id @default(autoincrement())
             bool   Boolean @default(false)
             bool2  Boolean @default(true)
-            float  Float   @default(5.3)
+            float  Float   @default(5.3) {}
             int    Int     @default(5)
-            string String  @default("Test")
-        }
-    "##};
+            string String  @default("Test") {}
+        }}
+    "##, float_string, native_string};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -247,7 +280,7 @@ async fn a_table_with_a_non_unique_index(api: &TestApi) -> crate::TestResult {
         .execute_with_schema(
             |migration| {
                 migration.create_table("User", |t| {
-                    t.add_column("a", types::varchar(10));
+                    t.add_column("a", types::integer());
                     t.add_column("id", types::primary());
                     t.add_index("test", types::index(vec!["a"]));
                 });
@@ -258,13 +291,13 @@ async fn a_table_with_a_non_unique_index(api: &TestApi) -> crate::TestResult {
 
     let dm = indoc! {r##"
         model User {
-            a String
+            a       Int
             id      Int @id @default(autoincrement())
             @@index([a], name: "test")
         }
     "##};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -275,8 +308,8 @@ async fn a_table_with_a_multi_column_non_unique_index(api: &TestApi) -> crate::T
         .execute_with_schema(
             |migration| {
                 migration.create_table("User", |t| {
-                    t.add_column("a", types::varchar(10));
-                    t.add_column("b", types::varchar(10));
+                    t.add_column("a", types::integer());
+                    t.add_column("b", types::integer());
                     t.add_column("id", types::primary());
                     t.add_index("test", types::index(vec!["a", "b"]));
                 });
@@ -287,14 +320,14 @@ async fn a_table_with_a_multi_column_non_unique_index(api: &TestApi) -> crate::T
 
     let dm = indoc! { r##"
         model User {
-            a  String
-            b  String
+            a  Int
+            b  Int
             id Int @id @default(autoincrement())
             @@index([a,b], name: "test")
         }
     "##};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -321,7 +354,7 @@ async fn a_table_with_non_id_autoincrement(api: &TestApi) -> crate::TestResult {
         }
     "#};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -358,20 +391,46 @@ async fn default_values(api: &TestApi) -> crate::TestResult {
         )
         .await?;
 
-    let dm = indoc! { r#"
-        model Test {
-            id                      Int       @id @default(autoincrement())
-            string_static_char      String?   @default("test")
-            string_static_char_null String?
-            string_static_varchar   String?   @default("test")
-            int_static              Int?      @default(2)
-            float_static            Float?    @default(1.43)
-            boolean_static          Boolean?  @default(true)
-            datetime_now            DateTime? @default(now())
-        }
-    "#};
+    let char_native = if !api.sql_family().is_sqlite() {
+        "@db.Char(5)"
+    } else {
+        ""
+    };
+    let varchar_native = if !api.sql_family().is_sqlite() {
+        "@db.VarChar(5)"
+    } else {
+        ""
+    };
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    let float_native = if api.sql_family().is_mssql() {
+        "@db.Real"
+    } else if api.sql_family().is_mysql() {
+        "@db.Float"
+    } else {
+        ""
+    };
+    let timestamp_native = if api.sql_family().is_postgres() {
+        "@db.Timestamp(6)"
+    } else if api.sql_family().is_mysql() {
+        "@db.DateTime(0)"
+    } else {
+        ""
+    };
+
+    let dm = formatdoc! { r#"
+        model Test {{
+            id                      Int       @id @default(autoincrement())
+            string_static_char      String?   @default("test") {}
+            string_static_char_null String? {}
+            string_static_varchar   String?   @default("test") {}
+            int_static              Int?      @default(2)
+            float_static            Float?    @default(1.43) {}
+            boolean_static          Boolean?  @default(true)
+            datetime_now            DateTime? @default(now()) {}
+        }}
+    "#, char_native, char_native, varchar_native, float_native,  timestamp_native};
+
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -402,12 +461,12 @@ async fn pg_default_value_as_dbgenerated(api: &TestApi) -> crate::TestResult {
           int_serial      Int       @default(autoincrement())
           int_function    Int?      @default(dbgenerated("date_part('year'::text, '2001-02-16 20:38:40'::timestamp without time zone)"))
           int_sequence    Int?      @default(autoincrement())
-          datetime_now    DateTime? @default(now())
-          datetime_now_lc DateTime? @default(now())
+          datetime_now    DateTime? @default(now()) @db.Timestamp(6)
+          datetime_now_lc DateTime? @default(now()) @db.Timestamp(6)
           }
     "#};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -430,12 +489,12 @@ async fn my_default_value_as_dbgenerated(api: &TestApi) -> crate::TestResult {
     let dm = indoc! {r#"
         model Test {
             id                      Int                 @id @default(autoincrement())
-            datetime_now            DateTime?           @default(now())
-            datetime_now_lc         DateTime?           @default(now())
+            datetime_now            DateTime?           @default(now()) @db.Timestamp(0)
+            datetime_now_lc         DateTime?           @default(now()) @db.Timestamp(0)
         }
     "#};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -460,11 +519,11 @@ async fn a_table_with_an_index_that_contains_expressions_should_be_ignored(api: 
         model Test {
             id       Int     @id
             parentId Int?
-            name     String?
+            name     String? @db.VarChar(45)
         }
     "#};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -482,11 +541,6 @@ async fn default_values_on_lists_should_be_ignored(api: &TestApi) -> crate::Test
         .await?;
 
     let dm = indoc! {r#"
-        datasource pg {
-            provider = "postgres"
-            url = "postgresql://localhost:5432"
-        }
-
         model User {
             id      Int @id @default(autoincrement())
             ints    Int[]
@@ -494,19 +548,9 @@ async fn default_values_on_lists_should_be_ignored(api: &TestApi) -> crate::Test
         }
     "#};
 
-    let result = format!(
-        r#"
-        datasource pg {{
-            provider = "postgres"
-            url = "postgresql://localhost:5432"
-        }}
+    let result = api.introspect().await?;
 
-        {}
-    "#,
-        api.introspect().await?
-    );
-
-    assert_eq_datamodels!(dm, &result);
+    api.assert_eq_datamodels(&dm, &result);
 
     Ok(())
 }
@@ -536,7 +580,7 @@ async fn a_table_with_partial_indexes_should_ignore_them(api: &TestApi) -> crate
         }
     "#};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -553,30 +597,15 @@ async fn introspecting_a_table_with_json_type_must_work(api: &TestApi) -> crate:
         .await?;
 
     let dm = indoc! {r#"
-        datasource postgres {
-            provider = "postgres"
-            url = "postgresql://asdlj"
-        }
-
         model Blog {
             id      Int @id @default(autoincrement())
-            json    Json
+            json    Json @db.Json
         }
     "#};
 
-    let expected = format!(
-        r#"
-        datasource postgres {{
-            provider = "postgres"
-            url = "postgresql://asdlj"
-        }}
+    let result = api.introspect().await?;
 
-        {}
-    "#,
-        api.introspect().await?
-    );
-
-    assert_eq_datamodels!(dm, &expected);
+    api.assert_eq_datamodels(&dm, &result);
 
     Ok(())
 }
@@ -607,16 +636,16 @@ async fn different_default_values_should_work(api: &TestApi) -> crate::TestResul
     let dm = indoc! {r##"
         model Blog {
           id                     Int     @id @default(autoincrement())
-          text                   String? @default("one")
-          tinytext_string        String  @default("twelve")
-          tinytext_number_string String  @default("1")
-          tinytext_number        String  @default("10")
-          tinytext_float         String  @default("1.0")
-          tinytext_short         String  @default("1")
+          text                   String? @default("one") @db.Text
+          tinytext_string        String  @default("twelve") @db.TinyText
+          tinytext_number_string String  @default("1") @db.TinyText
+          tinytext_number        String  @default("10") @db.TinyText
+          tinytext_float         String  @default("1.0") @db.TinyText
+          tinytext_short         String  @default("1") @db.TinyText
         }
     "##};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -640,19 +669,58 @@ async fn negative_default_values_should_work(api: &TestApi) -> crate::TestResult
         )
         .await?;
 
-    let dm = indoc! {r##"
-        model Blog {
+    let float_native = if api.sql_family().is_mysql() {
+        "@db.Float"
+    } else if api.sql_family().is_mssql() {
+        "@db.Real"
+    } else {
+        ""
+    };
+
+    let dm = formatdoc! {r##"
+        model Blog {{
           id                     Int     @id @default(autoincrement())
           int                    Int     @default(1)
           neg_int                Int     @default(-1)
-          float                  Float   @default(2.1)
-          neg_float              Float   @default(-2.1)
+          float                  Float   @default(2.1) {}
+          neg_float              Float   @default(-2.1) {}
           big_int                BigInt  @default(3)
           neg_big_int            BigInt  @default(-3)
+        }}
+    "##, float_native, float_native};
+
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
+
+    Ok(())
+}
+
+#[test_each_connector(tags("mysql"))]
+async fn partial_indexes_should_be_ignored_on_mysql(api: &TestApi) -> crate::TestResult {
+    api.barrel()
+        .execute_with_schema(
+            |migration| {
+                migration.create_table("Blog", move |t| {
+                    t.add_column("id", types::primary());
+                    t.add_column("int_col", types::integer());
+                    t.inject_custom("blob_col mediumblob");
+                    t.inject_custom("Index `partial_blob_col_index` (blob_col(10))");
+                    t.inject_custom("Index `partial_compound` (blob_col(10), int_col)");
+                });
+            },
+            api.schema_name(),
+        )
+        .await?;
+
+    let dm = indoc! {r##"
+        model Blog {
+          id                Int     @id @default(autoincrement())
+          int_col           Int
+          blob_col          Bytes?  @db.MediumBlob
         }
     "##};
 
-    assert_eq_datamodels!(dm, &api.introspect().await?);
+    let result = &api.introspect().await?;
+    api.assert_eq_datamodels(&dm, result);
 
     Ok(())
 }

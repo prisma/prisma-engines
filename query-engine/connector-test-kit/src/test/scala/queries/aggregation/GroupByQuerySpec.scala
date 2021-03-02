@@ -6,17 +6,19 @@ import util._
 class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
   val project = SchemaDsl.fromStringV11() {
     """model Model {
-      |  id    String  @id @default(cuid())
-      |  float Float   @map("db_float")
-      |  int   Int     @map("db_int")
-      |  dec   Decimal @map("db_dec")
-      |  s     String  @map("db_s")
-      |  other Other?
+      |  id       String  @id @default(cuid())
+      |  float    Float   @map("db_float")
+      |  int      Int     @map("db_int")
+      |  dec      Decimal @map("db_dec")
+      |  s        String  @map("db_s")
+      |  otherId  Int?
+      |  other    Other?  @relation(fields: otherId, references: id)
       |}
       |
       |model Other {
-      |  id    Int    @id
-      |  field String
+      |  id       Int     @id
+      |  field    String
+      |  model    Model[]
       |}
     """.stripMargin
   }

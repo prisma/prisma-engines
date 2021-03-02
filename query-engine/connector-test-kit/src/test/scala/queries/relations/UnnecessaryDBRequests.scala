@@ -17,10 +17,12 @@ class UnnecessaryDBRequests extends FlatSpec with Matchers with ApiSpecBase {
          |  id            String  @id
          |  bottom_id     String?
          |  bottom        Bottom? @relation(fields: [bottom_id], references: [id])
+         |  top           Top[]
          |}
          |
          |model Bottom {
          |  id            String  @id
+         |  bottom        Middle[]
          |}
        """.stripMargin
     }

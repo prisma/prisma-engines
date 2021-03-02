@@ -1,7 +1,7 @@
 use super::*;
-use crate::getters::Getter;
-use crate::parsers::Parser;
+use crate::{getters::Getter, parsers::Parser};
 use bigdecimal::ToPrimitive;
+use indoc::indoc;
 use native_types::{MySqlType, NativeType};
 use quaint::{prelude::Queryable, single::Quaint, Value};
 use serde_json::from_str;
@@ -71,9 +71,14 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
             enums.extend(enms.iter().cloned());
         }
 
+        let views = self.get_views(schema).await?;
+        let procedures = self.get_procedures(schema).await?;
+
         Ok(SqlSchema {
             tables,
             enums,
+            views,
+            procedures,
             sequences: vec![],
         })
     }
@@ -104,6 +109,50 @@ impl SqlSchemaDescriber {
         trace!("Found schema names: {:?}", names);
 
         Ok(names)
+    }
+
+    #[tracing::instrument(skip(self))]
+    async fn get_views(&self, schema: &str) -> DescriberResult<Vec<View>> {
+        let sql = indoc! {r#"
+            SELECT TABLE_NAME AS view_name, VIEW_DEFINITION AS view_sql
+            FROM INFORMATION_SCHEMA.VIEWS
+            WHERE TABLE_SCHEMA = ?;
+        "#};
+
+        let result_set = self.conn.query_raw(sql, &[schema.into()]).await?;
+        let mut views = Vec::with_capacity(result_set.len());
+
+        for row in result_set.into_iter() {
+            views.push(View {
+                name: row.get_expect_string("view_name"),
+                definition: row.get_expect_string("view_sql"),
+            })
+        }
+
+        Ok(views)
+    }
+
+    #[tracing::instrument(skip(self))]
+    async fn get_procedures(&self, schema: &str) -> DescriberResult<Vec<Procedure>> {
+        let sql = r#"
+            SELECT routine_name AS name,
+                routine_definition AS definition
+            FROM information_schema.routines
+            WHERE ROUTINE_SCHEMA = ?
+            AND ROUTINE_TYPE = 'PROCEDURE'
+        "#;
+
+        let rows = self.conn.query_raw(sql, &[schema.into()]).await?;
+        let mut procedures = Vec::with_capacity(rows.len());
+
+        for row in rows.into_iter() {
+            procedures.push(Procedure {
+                name: row.get_expect_string("name"),
+                definition: row.get_expect_string("definition"),
+            });
+        }
+
+        Ok(procedures)
     }
 
     #[tracing::instrument(skip(self))]
@@ -322,6 +371,7 @@ impl SqlSchemaDescriber {
     ) -> DescriberResult<HashMap<String, (BTreeMap<String, Index>, Option<PrimaryKey>)>> {
         let mut map = HashMap::new();
         let mut indexes_with_expressions: HashSet<(String, String)> = HashSet::new();
+        let mut indexes_with_partially_covered_columns: HashSet<(String, String)> = HashSet::new();
 
         // We alias all the columns because MySQL column names are case-insensitive in queries, but the
         // information schema column names became upper-case in MySQL 8, causing the code fetching
@@ -332,7 +382,8 @@ impl SqlSchemaDescriber {
                 non_unique AS non_unique,
                 column_name AS column_name,
                 seq_in_index AS seq_in_index,
-                table_name AS table_name
+                table_name AS table_name,
+                sub_part AS partial
             FROM INFORMATION_SCHEMA.STATISTICS
             WHERE table_schema = ?
             ORDER BY index_name, seq_in_index
@@ -343,6 +394,9 @@ impl SqlSchemaDescriber {
             trace!("Got index row: {:#?}", row);
             let table_name = row.get_expect_string("table_name");
             let index_name = row.get_expect_string("index_name");
+            if row.get_u32("partial").is_some() {
+                indexes_with_partially_covered_columns.insert((table_name.clone(), index_name.clone()));
+            };
             match row.get_string("column_name") {
                 Some(column_name) => {
                     let seq_in_index = row.get_expect_i64("seq_in_index");
@@ -409,6 +463,11 @@ impl SqlSchemaDescriber {
                     index_map.remove(index_name);
                 }
             }
+            for (tble, index_name) in &indexes_with_partially_covered_columns {
+                if tble == table {
+                    index_map.remove(index_name);
+                }
+            }
         }
 
         Ok(map)
@@ -431,24 +490,24 @@ impl SqlSchemaDescriber {
         // information schema column names became upper-case in MySQL 8, causing the code fetching
         // the result values by column name below to fail.
         let sql = "
-        SELECT
-            kcu.constraint_name constraint_name,
-            kcu.column_name column_name,
-            kcu.referenced_table_name referenced_table_name,
-            kcu.referenced_column_name referenced_column_name,
-            kcu.ordinal_position ordinal_position,
-            kcu.table_name table_name,
-            rc.delete_rule delete_rule,
-            rc.update_rule update_rule
-        FROM information_schema.key_column_usage AS kcu
-        INNER JOIN information_schema.referential_constraints AS rc ON
-        kcu.constraint_name = rc.constraint_name
-        WHERE
-            kcu.table_schema = ?
-            AND rc.constraint_schema = ?
-            AND kcu.referenced_column_name IS NOT NULL
-        ORDER BY ordinal_position
-    ";
+            SELECT
+                kcu.constraint_name constraint_name,
+                kcu.column_name column_name,
+                kcu.referenced_table_name referenced_table_name,
+                kcu.referenced_column_name referenced_column_name,
+                kcu.ordinal_position ordinal_position,
+                kcu.table_name table_name,
+                rc.delete_rule delete_rule,
+                rc.update_rule update_rule
+            FROM information_schema.key_column_usage AS kcu
+            INNER JOIN information_schema.referential_constraints AS rc ON
+            kcu.constraint_name = rc.constraint_name
+            WHERE
+                kcu.table_schema = ?
+                AND rc.constraint_schema = ?
+                AND kcu.referenced_column_name IS NOT NULL
+            ORDER BY ordinal_position
+        ";
 
         let result_set = conn.query_raw(sql, &[schema_name.into(), schema_name.into()]).await?;
 

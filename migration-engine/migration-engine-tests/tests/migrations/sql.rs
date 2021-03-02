@@ -32,6 +32,7 @@ async fn relations_to_models_without_a_primary_key_work(api: &TestApi) -> TestRe
             index Int
             name String
             weight Float
+            pm     PairMetadata[]
 
             @@unique([index, name])
         }
@@ -67,6 +68,7 @@ async fn relations_to_models_with_no_pk_and_a_single_unique_required_field_work(
             index Int
             name String
             weight Float @unique
+            pm     PairMetadata[]
         }
 
         model PairMetadata {
@@ -212,7 +214,8 @@ async fn id_as_part_of_relation_must_work(api: &TestApi) -> TestResult {
         }
 
         model Dog {
-            id String @id
+            id    String @id
+            cats  Cat[]
         }
     "##;
 
@@ -242,6 +245,7 @@ async fn multi_field_id_as_part_of_relation_must_work(api: &TestApi) -> TestResu
         model Dog {
             name String
             weight Int
+            cats    Cat[]
 
             @@id([name, weight])
         }
@@ -274,6 +278,7 @@ async fn remapped_multi_field_id_as_part_of_relation_must_work(api: &TestApi) ->
         model Dog {
             name String
             weight Int
+            cats   Cat[]
 
             @@id([name, weight])
         }
@@ -308,6 +313,7 @@ async fn unique_constraints_on_composite_relation_fields(api: &TestApi) -> TestR
         model Child {
             id        Int    @id
             c         String
+            p         Parent[]
 
             @@unique([id, c])
         }
@@ -329,6 +335,7 @@ async fn indexes_on_composite_relation_fields(api: &TestApi) -> TestResult {
           id                  Int       @id
           firstName           String
           lastName            String
+          s                   SpamList[]
 
           @@unique([firstName, lastName])
         }
@@ -361,6 +368,8 @@ async fn dropping_mutually_referencing_tables_works(api: &TestApi) -> TestResult
         ab B @relation("AtoB", fields: [b_id], references: [id])
         c_id Int
         ac C @relation("AtoC", fields: [c_id], references: [id])
+        b  B[] @relation("BtoA")
+        c  C[] @relation("CtoA")
     }
 
     model B {
@@ -369,6 +378,8 @@ async fn dropping_mutually_referencing_tables_works(api: &TestApi) -> TestResult
         ba A @relation("BtoA", fields: [a_id], references: [id])
         c_id Int
         bc C @relation("BtoC", fields: [c_id], references: [id])
+        a  A[] @relation("AtoB")
+        c  C[] @relation("CtoB")  
     }
 
     model C {
@@ -377,8 +388,9 @@ async fn dropping_mutually_referencing_tables_works(api: &TestApi) -> TestResult
         ca A @relation("CtoA", fields: [a_id], references: [id])
         b_id Int
         cb B @relation("CtoB", fields: [b_id], references: [id])
+        b  B[] @relation("BtoC")
+        a  A[] @relation("AtoC")
     }
-
     "#;
 
     api.schema_push(dm1).send().await?.assert_green()?;

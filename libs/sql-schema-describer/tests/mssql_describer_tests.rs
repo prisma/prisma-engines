@@ -5,9 +5,66 @@ use crate::mssql::*;
 use barrel::{types, Migration};
 use native_types::{MsSqlType, MsSqlTypeParameter::*, NativeType};
 use pretty_assertions::assert_eq;
-use quaint::single::Quaint;
-use sql_schema_describer::*;
+use quaint::{prelude::Queryable, single::Quaint};
+use sql_schema_describer::{mssql::SqlSchemaDescriber, *};
 use test_setup::mssql_2019_url;
+
+#[tokio::test]
+async fn views_can_be_described() {
+    let db_name = "views_can_be_described";
+
+    let connection_string = mssql_2019_url(db_name);
+    let conn = Quaint::new(&connection_string).await.unwrap();
+
+    test_setup::connectors::mssql::reset_schema(&conn, db_name)
+        .await
+        .unwrap();
+
+    conn.raw_cmd(&format!("CREATE TABLE {}.a (a_id int)", db_name))
+        .await
+        .unwrap();
+
+    conn.raw_cmd(&format!("CREATE TABLE {}.b (b_id int)", db_name))
+        .await
+        .unwrap();
+
+    let create_view = format!(
+        r#"
+            CREATE VIEW {0}.ab AS
+            SELECT a_id
+            FROM {0}.a
+            UNION ALL
+            SELECT b_id
+            FROM {0}.b"#,
+        db_name
+    );
+
+    conn.raw_cmd(&create_view).await.unwrap();
+
+    let inspector = SqlSchemaDescriber::new(conn);
+    let result = inspector.describe(db_name).await.expect("describing");
+    let view = result.get_view("ab").expect("couldn't get ab view").to_owned();
+
+    assert_eq!("ab", &view.name);
+    assert_eq!(create_view, view.definition);
+}
+
+#[tokio::test]
+async fn procedures_can_be_described() {
+    let db_name = "procedures_can_be_described";
+
+    let sql = format!(
+        "CREATE PROCEDURE [{}].foo @ID INT AS SELECT DB_NAME(@ID) AS bar",
+        db_name
+    );
+
+    let inspector = get_mssql_describer_for_schema(&sql, db_name).await;
+    let result = inspector.describe(db_name).await.expect("describing");
+    let procedure = result.get_procedure("foo").unwrap();
+
+    assert_eq!("foo", &procedure.name);
+    assert_eq!(sql, procedure.definition);
+}
 
 #[tokio::test]
 async fn all_mssql_column_types_must_work() {
@@ -445,7 +502,7 @@ async fn mssql_cross_schema_references_are_not_allowed() {
         db_name, secondary
     );
 
-    let inspector = get_mssql_describer_for_schema(dbg!(&sql), db_name).await;
+    let inspector = get_mssql_describer_for_schema(&sql, db_name).await;
     let err = inspector.describe(db_name).await.unwrap_err();
 
     assert_eq!(

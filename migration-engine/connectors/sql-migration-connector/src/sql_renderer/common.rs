@@ -1,5 +1,4 @@
-use sql_schema_describer::walkers::*;
-use sql_schema_describer::*;
+use sql_schema_describer::{walkers::ColumnWalker, *};
 use std::fmt::{Display, Write as _};
 
 pub(super) const SQL_INDENTATION: &str = "    ";

@@ -1,5 +1,7 @@
 #![allow(clippy::print_literal)] // it is just wrong in this case
 
+mod diagnose_migration_history;
+
 use anyhow::Context;
 use colored::Colorize;
 use migration_core::commands::SchemaPushInput;
@@ -22,6 +24,8 @@ enum Command {
     Dmmf(DmmfCommand),
     /// Push a prisma schema directly to the database, without interacting with migrations.
     SchemaPush(SchemaPush),
+    /// DiagnoseMigrationHistory wrapper
+    DiagnoseMigrationHistory(DiagnoseMigrationHistory),
 }
 
 #[derive(Debug, StructOpt)]
@@ -47,11 +51,18 @@ struct SchemaPush {
     recreate: bool,
 }
 
+#[derive(StructOpt, Debug)]
+struct DiagnoseMigrationHistory {
+    schema_path: String,
+    migrations_directory_path: String,
+}
+
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     init_logger();
 
     match Command::from_args() {
+        Command::DiagnoseMigrationHistory(cmd) => cmd.execute().await?,
         Command::Dmmf(cmd) => generate_dmmf(&cmd).await?,
         Command::SchemaPush(cmd) => schema_push(&cmd).await?,
         Command::Introspect { url, file_path } => {
@@ -166,10 +177,6 @@ async fn generate_dmmf(cmd: &DmmfCommand) -> anyhow::Result<()> {
 async fn schema_push(cmd: &SchemaPush) -> anyhow::Result<()> {
     let schema = read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
     let api = migration_core::migration_api(&schema).await?;
-
-    if cmd.recreate {
-        api.reset(&()).await?;
-    }
 
     let response = api
         .schema_push(&SchemaPushInput {

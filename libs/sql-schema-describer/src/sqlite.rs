@@ -1,6 +1,6 @@
 //! SQLite description.
 use super::*;
-use crate::parsers::Parser;
+use crate::{getters::Getter, parsers::Parser};
 use quaint::{ast::Value, prelude::Queryable, single::Quaint};
 use std::{borrow::Cow, collections::HashMap, convert::TryInto};
 use tracing::trace;
@@ -52,12 +52,17 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
             tables[table_index].foreign_keys[fk_index].referenced_columns = columns
         }
 
+        let views = self.get_views().await?;
+
         Ok(SqlSchema {
             // There's no enum type in SQLite.
             enums: vec![],
             // There are no sequences in SQLite.
             sequences: vec![],
+            // There are no procedures in SQLite (phew).
+            procedures: vec![],
             tables,
+            views,
         })
     }
 
@@ -136,6 +141,22 @@ impl SqlSchemaDescriber {
             primary_key,
             foreign_keys,
         })
+    }
+
+    #[tracing::instrument]
+    async fn get_views(&self) -> DescriberResult<Vec<View>> {
+        let sql = "SELECT name AS view_name, sql AS view_sql FROM sqlite_master WHERE type = 'view'";
+        let result_set = self.conn.query_raw(sql, &[]).await?;
+        let mut views = Vec::with_capacity(result_set.len());
+
+        for row in result_set.into_iter() {
+            views.push(View {
+                name: row.get_expect_string("view_name"),
+                definition: row.get_expect_string("view_sql"),
+            })
+        }
+
+        Ok(views)
     }
 
     #[tracing::instrument]

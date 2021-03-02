@@ -1,6 +1,5 @@
 use indoc::indoc;
 use introspection_engine_tests::test_api::*;
-use pretty_assertions::assert_eq;
 use test_macros::test_each_connector;
 
 const TYPES: &[(&str, &str)] = &[
@@ -59,63 +58,48 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
         )
         .await?;
 
-    let mut dm = String::from(indoc! {r#"
-        generator client {
-          provider        = "prisma-client-js"
-          previewFeatures = ["nativeTypes"]
-        }
-
-        datasource sqlserver {
-          provider = "sqlserver"
-          url      = "sqlserver://localhost:1433"
-        }
-
-    "#});
-
     let types = indoc! {r#"
         model Blog {
           id          Int      @id @default(autoincrement())
           int         Int
-          smallint    Int      @sqlserver.SmallInt
-          tinyint     Int      @sqlserver.TinyInt
+          smallint    Int      @db.SmallInt
+          tinyint     Int      @db.TinyInt
           bigint      BigInt
-          decimal     Decimal  @sqlserver.Decimal(5, 3)
-          decimal_2   Decimal  @sqlserver.Decimal(18, 0)
-          numeric     Decimal  @sqlserver.Decimal(4, 1)
-          numeric_2   Decimal  @sqlserver.Decimal(18, 0)
-          money       Float    @sqlserver.Money
-          smallmoney  Float    @sqlserver.SmallMoney
-          float       Float    @sqlserver.Real
+          decimal     Decimal  @db.Decimal(5, 3)
+          decimal_2   Decimal  @db.Decimal(18, 0)
+          numeric     Decimal  @db.Decimal(4, 1)
+          numeric_2   Decimal  @db.Decimal(18, 0)
+          money       Float    @db.Money
+          smallmoney  Float    @db.SmallMoney
+          float       Float    @db.Real
           double      Float
           bit         Boolean
-          chars       String   @sqlserver.Char(10)
-          nchars      String   @sqlserver.NChar(10)
-          varchars    String   @sqlserver.VarChar(500)
-          varchars_2  String   @sqlserver.VarChar(Max)
-          nvarchars   String   @sqlserver.NVarChar(500)
-          nvarchars_2 String   @sqlserver.NVarChar(Max)
-          binary      Bytes    @sqlserver.Binary(230)
-          varbinary   Bytes    @sqlserver.VarBinary(150)
+          chars       String   @db.Char(10)
+          nchars      String   @db.NChar(10)
+          varchars    String   @db.VarChar(500)
+          varchars_2  String   @db.VarChar(Max)
+          nvarchars   String   @db.NVarChar(500)
+          nvarchars_2 String   @db.NVarChar(Max)
+          binary      Bytes    @db.Binary(230)
+          varbinary   Bytes    @db.VarBinary(150)
           varbinary_2 Bytes
-          date        DateTime @sqlserver.Date
-          time        DateTime @sqlserver.Time
-          datetime    DateTime @sqlserver.DateTime
+          date        DateTime @db.Date
+          time        DateTime @db.Time
+          datetime    DateTime @db.DateTime
           datetime2   DateTime
-          xml         String   @sqlserver.Xml
-          image       Bytes    @sqlserver.Image
-          text        String   @sqlserver.Text
-          ntext       String   @sqlserver.NText
+          xml         String   @db.Xml
+          image       Bytes    @db.Image
+          text        String   @db.Text
+          ntext       String   @db.NText
         }
     "#};
 
-    let result = api.re_introspect(&dm).await?;
+    let result = api.introspect().await?;
 
-    dm.push_str(&types);
-
-    println!("EXPECTATION: \n {:#}", dm);
+    println!("EXPECTATION: \n {:#}", types);
     println!("RESULT: \n {:#}", result);
 
-    assert_eq!(result, dm);
+    api.assert_eq_datamodels(types, &result);
 
     Ok(())
 }

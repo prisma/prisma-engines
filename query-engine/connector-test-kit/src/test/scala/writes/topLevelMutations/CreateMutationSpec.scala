@@ -27,6 +27,7 @@ class CreateMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
     |
     |model RelatedModel {
     |    id String @id @default(cuid())
+    |    m  ScalarModel[]
     |}
     |
     |enum MyEnum {

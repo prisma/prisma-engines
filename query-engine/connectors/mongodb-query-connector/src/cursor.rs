@@ -71,7 +71,7 @@ impl CursorBuilder {
             bindings.insert(bind_field_name.clone(), format!("${}", bind_field_name));
         }
 
-        // let cursor_condition = ;
+        // let cursor_condition = self.cursor_conditions();
 
         Ok(CursorData {
             cursor_filter,

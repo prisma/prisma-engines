@@ -39,6 +39,7 @@ pub trait RelationFieldAsserts {
 }
 
 pub trait ModelAsserts {
+    fn assert_field_count(&self, count: usize) -> &Self;
     fn assert_has_scalar_field(&self, t: &str) -> &dml::ScalarField;
     fn assert_has_relation_field(&self, t: &str) -> &dml::RelationField;
     fn assert_is_embedded(&self, t: bool) -> &Self;
@@ -66,6 +67,7 @@ pub trait DatamodelAsserts {
 
 pub trait ErrorAsserts {
     fn assert_is(&self, error: DatamodelError) -> &Self;
+    fn assert_are(&self, error: &[DatamodelError]) -> &Self;
     fn assert_is_message(&self, msg: &str) -> &Self;
     fn assert_is_at(&self, index: usize, error: DatamodelError) -> &Self;
     fn assert_length(&self, length: usize) -> &Self;
@@ -245,19 +247,16 @@ impl ModelAsserts for dml::Model {
 
     fn assert_is_embedded(&self, t: bool) -> &Self {
         assert_eq!(self.is_embedded, t);
-
         self
     }
 
     fn assert_with_db_name(&self, t: &str) -> &Self {
         assert_eq!(self.database_name, Some(t.to_owned()));
-
         self
     }
 
     fn assert_with_documentation(&self, t: &str) -> &Self {
         assert_eq!(self.documentation, Some(t.to_owned()));
-
         self
     }
 
@@ -280,6 +279,11 @@ impl ModelAsserts for dml::Model {
         assert_eq!(self.is_ignored, state);
         self
     }
+
+    fn assert_field_count(&self, count: usize) -> &Self {
+        assert_eq!(self.fields.len(), count);
+        self
+    }
 }
 
 impl EnumAsserts for dml::Enum {
@@ -291,7 +295,6 @@ impl EnumAsserts for dml::Enum {
 
     fn assert_with_documentation(&self, t: &str) -> &Self {
         assert_eq!(self.documentation, Some(t.to_owned()));
-
         self
     }
 }
@@ -299,7 +302,6 @@ impl EnumAsserts for dml::Enum {
 impl EnumValueAsserts for dml::EnumValue {
     fn assert_with_documentation(&self, t: &str) -> &Self {
         assert_eq!(self.documentation, Some(t.to_owned()));
-
         self
     }
 }
@@ -313,7 +315,6 @@ impl WarningAsserts for Vec<DatamodelWarning> {
             &self
         );
         assert_eq!(self[0], warning);
-
         self
     }
 }
@@ -327,7 +328,11 @@ impl ErrorAsserts for Diagnostics {
             &self
         );
         assert_eq!(self.errors[0], error);
+        self
+    }
 
+    fn assert_are(&self, errors: &[DatamodelError]) -> &Self {
+        assert_eq!(self.errors, errors);
         self
     }
 
@@ -339,7 +344,6 @@ impl ErrorAsserts for Diagnostics {
             &self
         );
         assert_eq!(self.errors[0].description(), msg);
-
         self
     }
 
@@ -371,12 +375,10 @@ pub fn parse(datamodel_string: &str) -> Datamodel {
     match datamodel::parse_datamodel(datamodel_string) {
         Ok(s) => s.subject,
         Err(errs) => {
-            for err in errs.to_error_iter() {
-                err.pretty_print(&mut std::io::stderr().lock(), "", datamodel_string)
-                    .unwrap();
-            }
-
-            panic!("Datamodel parsing failed. Please see error above.")
+            panic!(
+                "Datamodel parsing failed\n\n{}",
+                errs.to_pretty_string("", datamodel_string)
+            )
         }
     }
 }
@@ -385,12 +387,10 @@ pub fn parse_configuration(datamodel_string: &str) -> Configuration {
     match datamodel::parse_configuration(datamodel_string) {
         Ok(c) => c.subject,
         Err(errs) => {
-            for err in errs.to_error_iter() {
-                err.pretty_print(&mut std::io::stderr().lock(), "", datamodel_string)
-                    .unwrap()
-            }
-
-            panic!("Configuration parsing failed. Please see error above.")
+            panic!(
+                "Configuration parsing failed\n\n{}",
+                errs.to_pretty_string("", datamodel_string)
+            )
         }
     }
 }

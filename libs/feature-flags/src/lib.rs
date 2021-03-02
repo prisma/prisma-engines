@@ -57,7 +57,7 @@ macro_rules! flags {
 // `createMany`: Create many (bulk insert) API operation.
 // `orderByRelation`: Allows ordering by to-one relation in the QE API.
 // `mongoDb`: Support for MongoDB.
-flags!(microsoftSqlServer, groupBy, createMany, orderByRelation, mongoDb);
+flags!(microsoftSqlServer, groupBy, createMany, orderByRelation, napi, mongoDb);
 
 /// Initializes the feature flags with given flags.
 /// Noop if already initialized.

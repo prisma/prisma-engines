@@ -140,7 +140,7 @@ async fn altering_a_column_with_non_null_values_should_warn(api: &TestApi) -> Te
 
     api.schema_push(dm2).send().await?.assert_warnings(&[
         match api.sql_family() {
-            SqlFamily::Postgres => "The `age` column on the `Test` table would be dropped and recreated. This will lead to data loss.".into(),
+            SqlFamily::Postgres => "The `age` column on the `Test` table would be dropped and recreated. This will lead to data loss.",
             SqlFamily::Mssql => "You are about to alter the column `age` on the `Test` table, which contains 2 non-null values. The data in that column will be cast from `NVarChar(1000)` to `Int`.",
             SqlFamily::Mysql => "You are about to alter the column `age` on the `Test` table, which contains 2 non-null values. The data in that column will be cast from `VarChar(191)` to `Int`.",
             _ => "You are about to alter the column `age` on the `Test` table, which contains 2 non-null values. The data in that column will be cast from `String` to `Int`.",
@@ -391,6 +391,7 @@ async fn dropping_a_table_referenced_by_foreign_keys_must_work(api: &TestApi) ->
         model Category {
             id Int @id
             name String
+            r    Recipe[]
         }
 
         model Recipe {
@@ -811,8 +812,9 @@ async fn set_default_current_timestamp_on_existing_column_works(api: &TestApi) -
 async fn primary_key_migrations_do_not_cause_data_loss(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Dog {
-            name String
-            passportNumber Int
+            name            String
+            passportNumber  Int
+            p               Puppy[]
 
             @@id([name, passportNumber])
         }
@@ -843,8 +845,10 @@ async fn primary_key_migrations_do_not_cause_data_loss(api: &TestApi) -> TestRes
     // Make Dog#passportNumber a String.
     let dm2 = r#"
         model Dog {
-            name String
+            name           String
             passportNumber String
+            p              Puppy[]
+
 
             @@id([name, passportNumber])
         }

@@ -4,7 +4,7 @@
 
 use crate::{
     Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue, Enum, ForeignKey, ForeignKeyAction, Index,
-    IndexType, PrimaryKey, SqlSchema, Table,
+    IndexType, PrimaryKey, SqlSchema, Table, View,
 };
 use serde::de::DeserializeOwned;
 use std::fmt;
@@ -140,10 +140,45 @@ impl<'a> ColumnWalker<'a> {
     }
 }
 
+/// Traverse a view
+#[derive(Clone, Copy)]
+pub struct ViewWalker<'a> {
+    /// The schema the view is contained in.
+    schema: &'a SqlSchema,
+    /// The index of the view in the schema.
+    view_index: usize,
+}
+
+impl<'a> ViewWalker<'a> {
+    /// Create a ViewWalker from a schema and a reference to one of its views.
+    pub fn new(schema: &'a SqlSchema, view_index: usize) -> Self {
+        Self { schema, view_index }
+    }
+
+    /// The name of the view
+    pub fn name(&self) -> &'a str {
+        &self.view().name
+    }
+
+    /// The SQL definition of the view
+    pub fn definition(&self) -> &'a str {
+        &self.view().definition
+    }
+
+    /// The index of the view in the schema.
+    pub fn view_index(&self) -> usize {
+        self.view_index
+    }
+
+    fn view(&self) -> &'a View {
+        &self.schema.views[self.view_index]
+    }
+}
+
 /// Traverse a table.
 #[derive(Clone, Copy)]
 pub struct TableWalker<'a> {
-    /// The schema the column is contained in.
+    /// The schema the table is contained in.
     schema: &'a SqlSchema,
     /// The index of the table in the schema.
     table_index: usize,
@@ -294,6 +329,10 @@ impl<'a> fmt::Debug for ForeignKeyWalker<'a> {
         f.debug_struct("ForeignKeyWalker")
             .field("foreign_key_index", &self.foreign_key_index)
             .field("table_index", &self.table_index)
+            .field("__table_name", &self.table().name())
+            .field("__referenced_table", &self.foreign_key().referenced_table)
+            .field("__constrained_columns", &self.foreign_key().columns)
+            .field("__referenced_columns", &self.foreign_key().referenced_columns)
             .finish()
     }
 }
@@ -306,12 +345,10 @@ impl<'schema> ForeignKeyWalker<'schema> {
 
     /// The foreign key columns on the referencing table.
     pub fn constrained_columns<'b>(&'b self) -> impl Iterator<Item = ColumnWalker<'schema>> + 'b {
-        self.table().columns().filter(move |column| {
-            self.foreign_key()
-                .columns
-                .iter()
-                .any(|colname| colname == column.name())
-        })
+        self.foreign_key()
+            .columns
+            .iter()
+            .filter_map(move |colname| self.table().columns().find(|column| colname == column.name()))
     }
 
     /// The name of the foreign key constraint.
@@ -361,7 +398,8 @@ impl<'schema> ForeignKeyWalker<'schema> {
             table_index: self
                 .schema
                 .table_walker(&self.foreign_key().referenced_table)
-                .expect("foreign key references unknown table")
+                .ok_or_else(|| format!("Foreign key references unknown table. {:?}", self))
+                .unwrap()
                 .table_index,
         }
     }
@@ -493,6 +531,9 @@ pub trait SqlSchemaExt {
 
     /// Find a table by index.
     fn table_walker_at(&self, index: usize) -> TableWalker<'_>;
+
+    /// Find a view by index.
+    fn view_walker_at(&self, index: usize) -> ViewWalker<'_>;
 }
 
 impl SqlSchemaExt for SqlSchema {
@@ -513,6 +554,13 @@ impl SqlSchemaExt for SqlSchema {
     fn table_walker_at(&self, index: usize) -> TableWalker<'_> {
         TableWalker {
             table_index: index,
+            schema: self,
+        }
+    }
+
+    fn view_walker_at(&self, index: usize) -> ViewWalker<'_> {
+        ViewWalker {
+            view_index: index,
             schema: self,
         }
     }
