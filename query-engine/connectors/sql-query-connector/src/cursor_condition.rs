@@ -108,7 +108,7 @@ struct CursorOrderDefinition {
 pub fn build(
     query_arguments: &QueryArguments,
     model: &ModelRef,
-    ordering_joins: &Vec<OrderingJoins>,
+    ordering_joins: &[OrderingJoins],
 ) -> (Option<Table<'static>>, ConditionTree<'static>) {
     match query_arguments.cursor {
         None => (None, ConditionTree::NoCondition),
@@ -314,7 +314,7 @@ fn map_equality_condition(field: &AliasedScalar, order_column: Column<'static>) 
 fn order_definitions(
     query_arguments: &QueryArguments,
     model: &ModelRef,
-    ordering_joins: &Vec<OrderingJoins>,
+    ordering_joins: &[OrderingJoins],
 ) -> Vec<CursorOrderDefinition> {
     let mut orderings: Vec<CursorOrderDefinition> = vec![];
 
