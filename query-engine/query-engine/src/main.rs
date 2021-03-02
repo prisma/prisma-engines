@@ -5,18 +5,15 @@ extern crate tracing;
 
 use cli::CliCommand;
 use error::PrismaError;
+use logger::Logger;
 use opt::PrismaOpt;
 use std::{error::Error, process};
 use structopt::StructOpt;
-use tracing::subscriber;
-use tracing_subscriber::{EnvFilter, FmtSubscriber};
-
-use tide_server_timing::TimingLayer;
-use tracing_subscriber::layer::SubscriberExt;
 
 mod cli;
 mod context;
 mod error;
+mod logger;
 mod opt;
 mod server;
 
@@ -43,7 +40,14 @@ async fn main() -> Result<(), AnyError> {
     async fn main() -> Result<(), PrismaError> {
         let opts = PrismaOpt::from_args();
 
-        init_logger(opts.log_format());
+        let mut logger = Logger::new("query-engine-http");
+        logger.log_format(opts.log_format());
+        logger.enable_telemetry(opts.open_telemetry);
+        logger.telemetry_endpoint(&opts.open_telemetry_endpoint);
+
+        // The guard needs to be in scope for the whole lifetime of the service.
+        let _guard = logger.install().unwrap();
+
         feature_flags::initialize(opts.raw_feature_flags.as_slice())?;
 
         match CliCommand::from_opt(&opts)? {
@@ -55,30 +59,6 @@ async fn main() -> Result<(), AnyError> {
         }
 
         Ok(())
-    }
-}
-
-fn init_logger(log_format: LogFormat) {
-    // Enable `tide` logs to be captured.
-    let filter = EnvFilter::from_default_env().add_directive("tide=info".parse().unwrap());
-
-    match log_format {
-        LogFormat::Text => {
-            let subscriber = FmtSubscriber::builder()
-                .with_max_level(tracing::Level::TRACE)
-                .finish()
-                .with(TimingLayer::new());
-
-            subscriber::set_global_default(subscriber).expect("Could not initialize logger");
-        }
-        LogFormat::Json => {
-            let subscriber = FmtSubscriber::builder()
-                .json()
-                .with_env_filter(filter)
-                .finish()
-                .with(TimingLayer::new());
-            subscriber::set_global_default(subscriber).expect("Could not initialize logger");
-        }
     }
 }
 

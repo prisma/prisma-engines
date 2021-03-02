@@ -14,6 +14,7 @@ use std::sync::Arc;
 ///
 /// The resulting graph can take multiple forms, based on the relation type to the parent model.
 /// Information on the graph shapes can be found on the individual handlers.
+#[tracing::instrument(skip(graph, parent_node, parent_relation_field, value, child_model))]
 pub fn nested_connect(
     graph: &mut QueryGraph,
     parent_node: NodeRef,
@@ -73,6 +74,7 @@ pub fn nested_connect(
 /// └─▶│     Connect     │
 ///    └─────────────────┘
 /// ```
+#[tracing::instrument(skip(graph, parent_node, parent_relation_field, filter, child_model))]
 fn handle_many_to_many(
     graph: &mut QueryGraph,
     parent_node: NodeRef,
@@ -151,6 +153,7 @@ fn handle_many_to_many(
 ///
 /// We do not need to do relation requirement checks because the many side of the relation can't be required,
 /// and if the one side is required it's automatically satisfied because the record to connect has to exist.
+#[tracing::instrument(skip(graph, parent_node, parent_relation_field, child_filter, child_model))]
 fn handle_one_to_many(
     graph: &mut QueryGraph,
     parent_node: NodeRef,
@@ -335,6 +338,7 @@ fn handle_one_to_many(
 /// ... because we just updated the relation.
 ///
 /// This is why we need to have an extra update at the end if it's inlined on the parent and a non-create.
+#[tracing::instrument(skip(graph, parent_node, parent_relation_field, filter, child_model))]
 fn handle_one_to_one(
     graph: &mut QueryGraph,
     parent_node: NodeRef,

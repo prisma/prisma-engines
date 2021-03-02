@@ -21,6 +21,7 @@ impl QueryExt for PooledConnection {}
 #[async_trait]
 pub trait QueryExt: Queryable + Send + Sync {
     /// Filter and map the resulting types with the given identifiers.
+    #[tracing::instrument(skip(self, q, idents))]
     async fn filter(&self, q: Query<'_>, idents: &[ColumnMetadata<'_>]) -> crate::Result<Vec<SqlRow>> {
         let result_set = self
             .query(q)
@@ -38,6 +39,7 @@ pub trait QueryExt: Queryable + Send + Sync {
 
     /// Execute a singular SQL query in the database, returning an arbitrary
     /// JSON `Value` as a result.
+    #[tracing::instrument(skip(self, q, params))]
     async fn raw_json<'a>(
         &'a self,
         q: String,
@@ -65,6 +67,7 @@ pub trait QueryExt: Queryable + Send + Sync {
 
     /// Execute a singular SQL query in the database, returning the number of
     /// affected rows.
+    #[tracing::instrument(skip(self, q, params))]
     async fn raw_count<'a>(
         &'a self,
         q: String,
@@ -77,6 +80,7 @@ pub trait QueryExt: Queryable + Send + Sync {
     }
 
     /// Select one row from the database.
+    #[tracing::instrument(skip(self, q, meta))]
     async fn find(&self, q: Select<'_>, meta: &[ColumnMetadata<'_>]) -> crate::Result<SqlRow> {
         self.filter(q.limit(1).into(), meta)
             .await?
@@ -87,6 +91,7 @@ pub trait QueryExt: Queryable + Send + Sync {
 
     /// Process the record filter and either return directly with precomputed values,
     /// or fetch IDs from the database.
+    #[tracing::instrument(skip(self, model, record_filter))]
     async fn filter_selectors(
         &self,
         model: &ModelRef,
@@ -100,6 +105,7 @@ pub trait QueryExt: Queryable + Send + Sync {
     }
 
     /// Read the all columns as a (primary) identifier.
+    #[tracing::instrument(skip(self, model, filter))]
     async fn filter_ids(&self, model: &ModelRef, filter: Filter) -> crate::Result<Vec<RecordProjection>> {
         let model_id = model.primary_identifier();
         let id_cols: Vec<Column<'static>> = model_id.as_columns().collect();
@@ -111,6 +117,7 @@ pub trait QueryExt: Queryable + Send + Sync {
         self.select_ids(select, model_id).await
     }
 
+    #[tracing::instrument(skip(self, select, model_id))]
     async fn select_ids(&self, select: Select<'_>, model_id: ModelProjection) -> crate::Result<Vec<RecordProjection>> {
         let idents: Vec<_> = model_id
             .fields()

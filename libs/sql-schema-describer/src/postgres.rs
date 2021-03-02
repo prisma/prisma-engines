@@ -59,7 +59,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
     }
 
     #[tracing::instrument]
-    async fn version(&self, schema: &str) -> crate::DescriberResult<Option<String>> {
+    async fn version(&self, _schema: &str) -> crate::DescriberResult<Option<String>> {
         Ok(self.conn.version().await?)
     }
 }

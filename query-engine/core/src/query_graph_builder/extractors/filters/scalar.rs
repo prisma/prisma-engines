@@ -5,6 +5,7 @@ use connector::{Filter, ScalarCompare, ScalarListCompare};
 use prisma_models::{PrismaValue, ScalarFieldRef};
 use std::convert::TryInto;
 
+#[tracing::instrument(name = "parse_scalar_field", skip(filter_key, field, input, reverse))]
 pub fn parse(
     filter_key: &str,
     field: &ScalarFieldRef,

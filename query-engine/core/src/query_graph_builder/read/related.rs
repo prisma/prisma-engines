@@ -2,6 +2,7 @@ use super::*;
 use crate::{query_document::ParsedField, ReadQuery, RelatedRecordsQuery};
 use prisma_models::{ModelRef, RelationFieldRef};
 
+#[tracing::instrument(skip(field, parent, model))]
 pub fn find_related(
     field: ParsedField,
     parent: RelationFieldRef,

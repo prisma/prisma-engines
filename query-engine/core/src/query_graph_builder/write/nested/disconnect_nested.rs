@@ -12,6 +12,7 @@ use std::convert::TryInto;
 ///
 /// The resulting graph can take multiple forms, based on the relation type to the parent model.
 /// Information on the graph shapes can be found on the individual handlers.
+#[tracing::instrument(skip(graph, parent_node, parent_relation_field, value, child_model))]
 pub fn nested_disconnect(
     graph: &mut QueryGraph,
     parent_node: NodeRef,
@@ -98,6 +99,7 @@ pub fn nested_disconnect(
 /// └─▶│   Disconnect    │
 ///    └─────────────────┘
 /// ```
+#[tracing::instrument(skip(graph, parent_node, parent_relation_field, filter))]
 fn handle_many_to_many(
     graph: &mut QueryGraph,
     parent_node: &NodeRef,
@@ -154,6 +156,7 @@ fn handle_many_to_many(
 /// regardless of which ID is used in the end to perform the update.
 ///
 /// Todo pretty sure it's better do redo this code with separate handlers.
+#[tracing::instrument(skip(graph, parent_node, parent_relation_field, filter))]
 fn handle_one_to_x(
     graph: &mut QueryGraph,
     parent_node: &NodeRef,

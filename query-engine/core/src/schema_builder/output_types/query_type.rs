@@ -1,6 +1,7 @@
 use super::*;
 
 /// Builds the root `Query` type.
+#[tracing::instrument(name = "build_query_type", skip(ctx))]
 pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRef) {
     let non_embedded_models = ctx.internal_data_model.non_embedded_models();
     let fields = non_embedded_models

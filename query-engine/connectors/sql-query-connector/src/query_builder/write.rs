@@ -5,6 +5,7 @@ use std::convert::TryInto;
 
 /// `INSERT` a new record to the database. Resulting an `INSERT` ast and an
 /// optional `RecordProjection` if available from the arguments or model.
+#[tracing::instrument(skip(model, args))]
 pub fn create_record(model: &ModelRef, mut args: WriteArgs) -> (Insert<'static>, Option<RecordProjection>) {
     let return_id = args.as_record_projection(model.primary_identifier());
 
@@ -35,6 +36,7 @@ pub fn create_record(model: &ModelRef, mut args: WriteArgs) -> (Insert<'static>,
 
 /// `INSERT` new records into the database based on the given write arguments,
 /// where each `WriteArg` in the Vec is one row.
+#[tracing::instrument(skip(model, args, skip_duplicates))]
 pub fn create_records(model: &ModelRef, args: Vec<WriteArgs>, skip_duplicates: bool) -> Insert<'static> {
     // We need to bring all write args into a uniform shape.
     // The easiest way to do this is to take go over all fields of the batch and apply the following:
@@ -76,6 +78,7 @@ pub fn create_records(model: &ModelRef, args: Vec<WriteArgs>, skip_duplicates: b
     }
 }
 
+#[tracing::instrument(skip(model, ids, args))]
 pub fn update_many(model: &ModelRef, ids: &[&RecordProjection], args: WriteArgs) -> crate::Result<Vec<Query<'static>>> {
     if args.args.is_empty() || ids.is_empty() {
         return Ok(Vec::new());
@@ -126,6 +129,7 @@ pub fn update_many(model: &ModelRef, ids: &[&RecordProjection], args: WriteArgs)
     Ok(result)
 }
 
+#[tracing::instrument(skip(model, ids))]
 pub fn delete_many(model: &ModelRef, ids: &[&RecordProjection]) -> Vec<Query<'static>> {
     let columns: Vec<_> = model.primary_identifier().as_columns().collect();
 
@@ -134,6 +138,7 @@ pub fn delete_many(model: &ModelRef, ids: &[&RecordProjection]) -> Vec<Query<'st
     })
 }
 
+#[tracing::instrument(skip(field, parent_id, child_ids))]
 pub fn create_relation_table_records(
     field: &RelationFieldRef,
     parent_id: &RecordProjection,
@@ -156,6 +161,7 @@ pub fn create_relation_table_records(
     insert.build().on_conflict(OnConflict::DoNothing).into()
 }
 
+#[tracing::instrument(skip(parent_field, parent_id, child_ids))]
 pub fn delete_relation_table_records(
     parent_field: &RelationFieldRef,
     parent_id: &RecordProjection,

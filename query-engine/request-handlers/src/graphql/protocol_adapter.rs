@@ -23,6 +23,7 @@ use query_core::query_document::*;
 pub struct GraphQLProtocolAdapter;
 
 impl GraphQLProtocolAdapter {
+    #[tracing::instrument(name = "graphql_to_query_document", skip(gql_doc, operation))]
     pub fn convert(gql_doc: Document<String>, operation: Option<String>) -> crate::Result<Operation> {
         let mut operations: Vec<Operation> = match operation {
             Some(ref op) => gql_doc

@@ -84,6 +84,7 @@ use std::{convert::TryInto, sync::Arc};
 ///                          └─────────────────┘
 /// ```
 /// Todo split this mess up and clean up the code.
+#[tracing::instrument(skip(graph, parent_node, parent_relation_field, value))]
 pub fn nested_upsert(
     graph: &mut QueryGraph,
     parent_node: NodeRef,

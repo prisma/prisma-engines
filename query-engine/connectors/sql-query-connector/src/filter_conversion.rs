@@ -74,6 +74,7 @@ trait AliasedSelect {
 
 impl AliasedCondition for Filter {
     /// Conversion from a `Filter` to a query condition tree. Aliased when in a nested `SELECT`.
+    #[tracing::instrument(skip(self, alias))]
     fn aliased_cond(self, alias: Option<Alias>) -> ConditionTree<'static> {
         match self {
             Filter::And(mut filters) => match filters.len() {

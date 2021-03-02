@@ -107,6 +107,7 @@ impl CompactedDocument {
 
 /// Here be the dragons. Ay caramba!
 impl From<Vec<Operation>> for CompactedDocument {
+    #[tracing::instrument(name = "find_one_optimization", skip(ops))]
     fn from(ops: Vec<Operation>) -> Self {
         // Unpack all read queries (an enum) into a collection of selections.
         // We already took care earlier that all operations here must be reads.

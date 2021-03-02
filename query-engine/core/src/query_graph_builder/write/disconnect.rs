@@ -33,6 +33,7 @@ use std::sync::Arc;
 /// └─▶│   Disconnect    │
 ///    └─────────────────┘
 /// ```
+#[tracing::instrument(skip(graph, parent_node, child_node, parent_relation_field, expected_disconnects))]
 pub fn disconnect_records_node(
     graph: &mut QueryGraph,
     parent_node: &NodeRef,

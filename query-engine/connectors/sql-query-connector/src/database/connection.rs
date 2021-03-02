@@ -41,6 +41,7 @@ impl<C> Connection for SqlConnection<C>
 where
     C: QueryExt + TransactionCapable + Send + Sync + 'static,
 {
+    #[tracing::instrument(skip(self))]
     async fn start_transaction<'a>(&'a self) -> connector::Result<Box<dyn Transaction + 'a>> {
         let fut_tx = self.inner.start_transaction();
         let connection_info = &self.connection_info;

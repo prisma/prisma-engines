@@ -5,14 +5,18 @@ use crate::opt::PrismaOpt;
 use crate::PrismaResult;
 
 use elapsed_middleware::ElapsedMiddleware;
+use opentelemetry::{global, Context};
 use query_core::schema::QuerySchemaRenderer;
 use request_handlers::{dmmf, GraphQLSchemaRenderer, GraphQlBody, GraphQlHandler};
 use serde_json::json;
 use tide::http::{mime, StatusCode};
 use tide::{prelude::*, Body, Request, Response};
 use tide_server_timing::TimingMiddleware;
+use tracing::Level;
+use tracing_futures::Instrument;
+use tracing_opentelemetry::OpenTelemetrySpanExt;
 
-use std::sync::Arc;
+use std::{collections::HashMap, sync::Arc};
 
 mod elapsed_middleware;
 
@@ -45,6 +49,7 @@ impl Clone for State {
 }
 
 /// Create a new server and listen.
+#[tracing::instrument(skip(opts))]
 pub async fn listen(opts: PrismaOpt) -> PrismaResult<()> {
     let config = opts
         .configuration(false)?
@@ -78,6 +83,7 @@ pub async fn listen(opts: PrismaOpt) -> PrismaResult<()> {
         Some(path) => app.bind(format!("http+unix://{}", path)).await?,
         None => app.bind(format!("{}:{}", opts.host.as_str(), opts.port)).await?,
     };
+
     info!("Started http server on {}", listener);
     listener.accept().await?;
     Ok(())
@@ -93,16 +99,24 @@ async fn graphql_handler(mut req: Request<State>) -> tide::Result {
         }
     }
 
-    let body: GraphQlBody = req.body_json().await?;
-    let cx = req.state().cx.clone();
+    let cx = get_parent_span_context(&req);
+    let span = tracing::span!(Level::TRACE, "graphql_handler");
+    span.set_parent(cx);
 
-    let handler = GraphQlHandler::new(&*cx.executor, cx.query_schema());
-    let result = handler.handle(body).await;
+    let work = async move {
+        let body: GraphQlBody = req.body_json().await?;
+        let cx = req.state().cx.clone();
 
-    let mut res = Response::new(StatusCode::Ok);
-    res.set_body(Body::from_json(&result)?);
+        let handler = GraphQlHandler::new(&*cx.executor, cx.query_schema());
+        let result = handler.handle(body).await;
 
-    Ok(res)
+        let mut res = Response::new(StatusCode::Ok);
+        res.set_body(Body::from_json(&result)?);
+
+        Ok(res)
+    };
+
+    work.instrument(span).await
 }
 
 /// Expose the GraphQL playground if enabled.
@@ -166,4 +180,15 @@ async fn handle_debug_headers(req: &Request<State>) -> tide::Result<Option<impl 
     } else {
         Ok(None)
     }
+}
+
+/// If the client sends us a trace and span id, extracting a new context if the
+/// headers are set. If not, returns current context.
+fn get_parent_span_context(req: &Request<State>) -> Context {
+    let headers: HashMap<String, String> = req
+        .iter()
+        .filter_map(|(hn, hvs)| hvs.get(0).map(|hv| (hn.as_str().into(), hv.as_str().into())))
+        .collect();
+
+    global::get_text_map_propagator(|propagator| propagator.extract(&headers))
 }

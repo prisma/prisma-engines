@@ -8,6 +8,7 @@ use crate::{
 use connector::Filter;
 use prisma_models::{ModelRef, OrderBy, ScalarFieldRef};
 
+#[tracing::instrument(skip(field, model))]
 pub fn group_by(mut field: ParsedField, model: ModelRef) -> QueryGraphBuilderResult<ReadQuery> {
     let name = field.name;
     let alias = field.alias;

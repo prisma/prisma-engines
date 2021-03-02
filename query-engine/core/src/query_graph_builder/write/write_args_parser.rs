@@ -16,6 +16,7 @@ pub struct WriteArgsParser {
 impl WriteArgsParser {
     /// Creates a new set of WriteArgsParser. Expects the parsed input map from the respective data key, not the enclosing map.
     /// E.g.: { data: { THIS MAP } } from the `data` argument of a write query.
+    #[tracing::instrument(name = "write_args_parser_from", skip(model, data_map))]
     pub fn from(model: &ModelRef, data_map: ParsedInputMap) -> QueryGraphBuilderResult<Self> {
         data_map.into_iter().try_fold(
             WriteArgsParser::default(),

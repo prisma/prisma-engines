@@ -34,6 +34,7 @@ type UncheckedItemsWithParents = IndexMap<Option<RecordProjection>, Vec<Item>>;
 /// // todo more here
 ///
 /// Returns a map of pairs of (parent ID, response)
+#[tracing::instrument(skip(result, field, is_list))]
 pub fn serialize_internal(
     result: QueryResult,
     field: &OutputFieldRef,
@@ -74,6 +75,7 @@ pub fn serialize_internal(
     }
 }
 
+#[tracing::instrument(skip(output_field, record_aggregations))]
 fn serialize_aggregations(
     output_field: &OutputFieldRef,
     record_aggregations: RecordAggregations,
@@ -232,6 +234,7 @@ fn coerce_non_numeric(value: PrismaValue, output: &OutputType) -> PrismaValue {
     }
 }
 
+#[tracing::instrument(skip(record_selection, field, typ, is_list))]
 fn serialize_record_selection(
     record_selection: RecordSelection,
     field: &OutputFieldRef,
@@ -303,6 +306,7 @@ fn serialize_record_selection(
 /// Serializes the given result into objects of given type.
 /// Doesn't validate the shape of the result set ("unchecked" result).
 /// Returns a vector of serialized objects (as Item::Map), grouped into a map by parent, if present.
+#[tracing::instrument(skip(result, typ))]
 fn serialize_objects(
     mut result: RecordSelection,
     typ: ObjectTypeStrongRef,
@@ -375,6 +379,7 @@ fn serialize_objects(
 }
 
 /// Unwraps are safe due to query validation.
+#[tracing::instrument(skip(record_id, items_with_parent, into, enclosing_type))]
 fn write_nested_items(
     record_id: &Option<RecordProjection>,
     items_with_parent: &mut HashMap<String, CheckedItemsWithParents>,
@@ -409,6 +414,7 @@ fn write_nested_items(
 }
 
 /// Processes nested results into a more ergonomic structure of { <nested field name> -> { parent ID -> item (list, map, ...) } }.
+#[tracing::instrument(skip(nested, enclosing_type))]
 fn process_nested_results(
     nested: Vec<QueryResult>,
     enclosing_type: &ObjectTypeStrongRef,
