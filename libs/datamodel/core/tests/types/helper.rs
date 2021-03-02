@@ -5,11 +5,6 @@ pub fn test_native_types_compatibility(datamodel: &str, error_msg: &str, datasou
         r#"
     {datasource}
 
-    generator js {{
-            provider = "prisma-client-js"
-            previewFeatures = ["nativeTypes"]
-        }}
-
     {datamodel}
     "#,
         datasource = datasource,

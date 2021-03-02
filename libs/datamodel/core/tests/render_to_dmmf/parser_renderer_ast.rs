@@ -121,11 +121,6 @@ fn test_parser_renderer_native_types_via_ast() {
   url      = "postgresql://"
 }
 
-generator js {
-  provider        = "prisma-client-js"
-  previewFeatures = ["nativeTypes"]
-}
-
 model Blog {
   id     Int    @id
   bigInt Int    @pg.BigInt
@@ -300,11 +295,6 @@ model Author {
 fn test_parser_renderer_with_ignore() {
     let input = indoc!(
         r#"
-        generator client {
-          provider        = "prisma-client-js"
-          previewFeatures = ["nativeTypes"]
-        }
-
         datasource pg {
           provider = "postgresql"
           url      = "postgresql://"

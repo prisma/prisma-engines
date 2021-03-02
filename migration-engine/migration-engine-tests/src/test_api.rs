@@ -294,10 +294,6 @@ impl TestApi {
                 url      = "{provider}://localhost:666"
               }}
 
-              generator client {{
-                provider        = "prisma-client-js"
-                previewFeatures = ["nativeTypes"]
-              }}
             "#,
             provider = self.args.provider
         )

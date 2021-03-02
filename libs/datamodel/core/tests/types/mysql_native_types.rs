@@ -159,11 +159,6 @@ fn should_fail_on_native_type_decimal_when_scale_is_bigger_than_precision() {
           url      = "mysql://"
         }
 
-        generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["nativeTypes"]
-        }
-
         model Blog {
             id     Int  @id
             dec Decimal @db.Decimal(2, 4)
@@ -175,7 +170,7 @@ fn should_fail_on_native_type_decimal_when_scale_is_bigger_than_precision() {
 
     error.assert_is(DatamodelError::new_connector_error(
         "The scale must not be larger than the precision for the Decimal(2,4) native type in MySQL.",
-        ast::Span::new(191, 221),
+        ast::Span::new(101, 131),
     ));
 }
 
@@ -185,11 +180,6 @@ fn should_fail_on_incompatible_scalar_type_with_tiny_int() {
         datasource db {
           provider = "mysql"
           url = "mysql://"
-        }
-
-        generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["nativeTypes"]
         }
 
         model Blog {
@@ -202,6 +192,6 @@ fn should_fail_on_incompatible_scalar_type_with_tiny_int() {
 
     error.assert_is(DatamodelError::new_connector_error(
         "Native type TinyInt is not compatible with declared field type DateTime, expected field type Boolean or Int.",
-        ast::Span::new(294, 304),
+        ast::Span::new(172, 182),
     ));
 }
