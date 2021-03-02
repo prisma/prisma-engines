@@ -185,7 +185,6 @@ impl Connector for MySqlDatamodelConnector {
             LongText => ScalarType::String,
             //Boolean
             Bit(1) => ScalarType::Bytes,
-            //technically also TinyInt(1), but we don't have that info here
             //Int
             Int => ScalarType::Int,
             SmallInt => ScalarType::Int,

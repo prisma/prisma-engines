@@ -382,6 +382,7 @@ impl<'a> LiftAstToDml<'a> {
             let type_definition = captures.get(1).expect("get type definition").as_str();
             if let Some(source) = self.source {
                 if captures.name("suffix").is_none() {
+                    // anything after a closing brace means its not just a supported native type
                     let connector = &source.active_connector;
                     let captures = TYPE_REGEX.captures(type_definition).unwrap();
 

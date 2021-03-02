@@ -307,6 +307,7 @@ fn should_fail_on_native_type_in_unsupported_sqlserver() {
             id          Int    @id
             text        Unsupported("Text") 
             decimal     Unsupported("Real") 
+            TEXT        Unsupported("TEXT") 
         }
     "#;
 
