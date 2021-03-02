@@ -176,38 +176,50 @@ impl Connector for MySqlDatamodelConnector {
         let native_type: MySqlType = serde_json::from_value(native_type).unwrap();
 
         match native_type {
-            Int => ScalarType::Int,
-            UnsignedInt => ScalarType::Int,
-            SmallInt => ScalarType::Int,
-            UnsignedSmallInt => ScalarType::Int,
-            TinyInt => ScalarType::Int,
-            UnsignedTinyInt => ScalarType::Int,
-            MediumInt => ScalarType::Int,
-            UnsignedMediumInt => ScalarType::Int,
-            BigInt => ScalarType::BigInt,
-            UnsignedBigInt => ScalarType::BigInt,
-            Float => ScalarType::Float,
-            Decimal(_) => ScalarType::Decimal,
-            Double => ScalarType::Float,
-            Bit(_) => ScalarType::Bytes,
-            Char(_) => ScalarType::String,
+            //String
             VarChar(_) => ScalarType::String,
+            Text => ScalarType::String,
+            Char(_) => ScalarType::String,
+            TinyText => ScalarType::String,
+            MediumText => ScalarType::String,
+            LongText => ScalarType::String,
+            //Boolean
+            Bit(1) => ScalarType::Bytes,
+            //technically also TinyInt(1), but we don't have that info here
+            //Int
+            Int => ScalarType::Int,
+            SmallInt => ScalarType::Int,
+            MediumInt => ScalarType::Int,
+            Year => ScalarType::Int,
+            TinyInt => ScalarType::Int,
+            //BigInt
+            BigInt => ScalarType::BigInt,
+            //Float
+            Float => ScalarType::Float,
+            Double => ScalarType::Float,
+            //Decimal
+            Decimal(_) => ScalarType::Decimal,
+            //DateTime
+            DateTime(_) => ScalarType::DateTime,
+            Date => ScalarType::DateTime,
+            Time(_) => ScalarType::DateTime,
+            Timestamp(_) => ScalarType::DateTime,
+            //Json
+            Json => ScalarType::Json,
+            //Bytes
+            LongBlob => ScalarType::Bytes,
             Binary(_) => ScalarType::Bytes,
             VarBinary(_) => ScalarType::Bytes,
             TinyBlob => ScalarType::Bytes,
             Blob => ScalarType::Bytes,
             MediumBlob => ScalarType::Bytes,
-            LongBlob => ScalarType::Bytes,
-            TinyText => ScalarType::String,
-            Text => ScalarType::String,
-            MediumText => ScalarType::String,
-            LongText => ScalarType::String,
-            Date => ScalarType::DateTime,
-            Time(_) => ScalarType::DateTime,
-            DateTime(_) => ScalarType::DateTime,
-            Timestamp(_) => ScalarType::DateTime,
-            Year => ScalarType::Int,
-            Json => ScalarType::Json,
+            Bit(_) => ScalarType::Bytes,
+            //Missing from docs
+            UnsignedInt => ScalarType::Int,
+            UnsignedSmallInt => ScalarType::Int,
+            UnsignedTinyInt => ScalarType::Int,
+            UnsignedMediumInt => ScalarType::Int,
+            UnsignedBigInt => ScalarType::BigInt,
         }
     }
 

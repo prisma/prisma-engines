@@ -123,33 +123,42 @@ impl Connector for MsSqlDatamodelConnector {
         let native_type: MsSqlType = serde_json::from_value(native_type).unwrap();
 
         match native_type {
+            //String
+            Char(_) => ScalarType::String,
+            NChar(_) => ScalarType::String,
+            VarChar(_) => ScalarType::String,
+            NVarChar(_) => ScalarType::String,
+            Text => ScalarType::String,
+            NText => ScalarType::String,
+            Xml => ScalarType::String,
+            UniqueIdentifier => ScalarType::String,
+            //Boolean
+            //Int
             TinyInt => ScalarType::Int,
             SmallInt => ScalarType::Int,
             Int => ScalarType::Int,
+            //BigInt
             BigInt => ScalarType::Int,
-            Money => ScalarType::Float,
-            SmallMoney => ScalarType::Float,
-            Bit => ScalarType::Bytes,
+            //Float
             Float(_) => ScalarType::Float,
+            SmallMoney => ScalarType::Float,
+            Money => ScalarType::Float,
             Real => ScalarType::Float,
+            //Decimal
             Decimal(_) => ScalarType::Decimal,
+            //DateTime
             Date => ScalarType::DateTime,
             Time => ScalarType::DateTime,
             DateTime => ScalarType::DateTime,
             DateTime2 => ScalarType::DateTime,
-            DateTimeOffset => ScalarType::DateTime,
             SmallDateTime => ScalarType::DateTime,
-            Char(_) => ScalarType::String,
-            NChar(_) => ScalarType::String,
-            VarChar(_) => ScalarType::String,
-            Text => ScalarType::String,
-            NVarChar(_) => ScalarType::String,
-            NText => ScalarType::String,
+            DateTimeOffset => ScalarType::DateTime,
+            //Json -> does not really exist
+            //Bytes
             Binary(_) => ScalarType::Bytes,
             VarBinary(_) => ScalarType::Bytes,
             Image => ScalarType::Bytes,
-            Xml => ScalarType::String,
-            UniqueIdentifier => ScalarType::String,
+            Bit => ScalarType::Bytes,
         }
     }
 

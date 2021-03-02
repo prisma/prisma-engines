@@ -147,32 +147,41 @@ impl Connector for PostgresDatamodelConnector {
         let native_type: PostgresType = serde_json::from_value(native_type).unwrap();
 
         match native_type {
+            //String
+            Text => ScalarType::String,
+            Char(_) => ScalarType::String,
+            VarChar(_) => ScalarType::String,
+            Bit(_) => ScalarType::String,
+            VarBit(_) => ScalarType::String,
+            UUID => ScalarType::String,
+            Xml => ScalarType::String,
+            Inet => ScalarType::String,
+            Citext => ScalarType::String,
+            //Boolean
+            Boolean => ScalarType::Boolean,
+            //Int
             SmallInt => ScalarType::Int,
             Integer => ScalarType::Int,
+            Oid => ScalarType::Int,
+            //BigInt
             BigInt => ScalarType::BigInt,
-            Money => ScalarType::Float,
-            Inet => ScalarType::String,
-            Oid => ScalarType::String,
-            Citext => ScalarType::String,
+            //Float
             Real => ScalarType::Float,
             DoublePrecision => ScalarType::Float,
+            //Decimal
             Decimal(_) => ScalarType::Decimal,
-            VarChar(_) => ScalarType::String,
-            Char(_) => ScalarType::String,
-            Text => ScalarType::String,
-            ByteA => ScalarType::Bytes,
+            Money => ScalarType::Float,
+            //DateTime
             Timestamp(_) => ScalarType::DateTime,
             Timestamptz(_) => ScalarType::DateTime,
             Date => ScalarType::DateTime,
             Time(_) => ScalarType::DateTime,
             Timetz(_) => ScalarType::DateTime,
-            Boolean => ScalarType::Boolean,
-            Bit(_) => ScalarType::Bytes,
-            VarBit(_) => ScalarType::Bytes,
-            UUID => ScalarType::String,
-            Xml => ScalarType::String,
+            //Json
             JSON => ScalarType::Json,
             JSONB => ScalarType::Json,
+            //Bytes
+            ByteA => ScalarType::Bytes,
         }
     }
 
