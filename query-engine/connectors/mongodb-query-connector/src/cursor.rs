@@ -58,10 +58,12 @@ impl CursorBuilder {
         let mut bindings = Document::new();
 
         for order_data in self.order_data.iter() {
-            let bind_field_name = order_data.binding_name();
+            let (left_bind_field_name, right_binding_field_name) = order_data.binding_names();
+            dbg!(&left_bind_field_name);
+            dbg!(&right_binding_field_name);
 
             // For: `"let": { fieldName: "$fieldName" }` bindings for the outer pipeline.
-            bindings.insert(bind_field_name.clone(), format!("${}", bind_field_name));
+            bindings.insert(left_bind_field_name, format!("${}", right_binding_field_name));
         }
 
         let cursor_condition = cursor_conditions(self.order_data, self.reverse);
@@ -110,40 +112,41 @@ fn cursor_conditions(mut order_data: Vec<OrderByData>, reverse: bool) -> Documen
 }
 
 fn map_orderby_condition(order_data: &OrderByData, reverse: bool, include_eq: bool) -> Document {
-    let order_field_reference = order_data.full_reference_path();
+    let bound_order_field_reference = order_data.full_reference_path(true);
+    let unbound_order_field_reference = order_data.full_reference_path(false);
 
     let order_doc: Document = match order_data.sort_order() {
         // If it's ASC but we want to take from the back, the ORDER BY will be DESC, meaning that comparisons done need to be lt(e).
         SortOrder::Ascending if reverse => {
             if include_eq {
-                doc! { "$lte": [format!("${}", &order_field_reference), format!("$${}", &order_field_reference)] }
+                doc! { "$lte": [format!("${}", &unbound_order_field_reference), format!("$${}", &bound_order_field_reference)] }
             } else {
-                doc! { "$lt": [format!("${}", &order_field_reference), format!("$${}", &order_field_reference)] }
+                doc! { "$lt": [format!("${}", &unbound_order_field_reference), format!("$${}", &bound_order_field_reference)] }
             }
         }
 
         // If it's DESC but we want to take from the back, the ORDER BY will be ASC, meaning that comparisons done need to be gt(e).
         SortOrder::Descending if reverse => {
             if include_eq {
-                doc! { "$gte": [format!("${}", &order_field_reference), format!("$${}", &order_field_reference)] }
+                doc! { "$gte": [format!("${}", &unbound_order_field_reference), format!("$${}", &bound_order_field_reference)] }
             } else {
-                doc! { "$gt": [format!("${}", &order_field_reference), format!("$${}", &order_field_reference)] }
+                doc! { "$gt": [format!("${}", &unbound_order_field_reference), format!("$${}", &bound_order_field_reference)] }
             }
         }
 
         SortOrder::Ascending => {
             if include_eq {
-                doc! { "$gte": [format!("${}", &order_field_reference), format!("$${}", &order_field_reference)] }
+                doc! { "$gte": [format!("${}", &unbound_order_field_reference), format!("$${}", &bound_order_field_reference)] }
             } else {
-                doc! { "$gt": [format!("${}", &order_field_reference), format!("$${}", &order_field_reference)] }
+                doc! { "$gt": [format!("${}", &unbound_order_field_reference), format!("$${}", &bound_order_field_reference)] }
             }
         }
 
         SortOrder::Descending => {
             if include_eq {
-                doc! { "$lte": [format!("${}", &order_field_reference), format!("$${}", &order_field_reference)] }
+                doc! { "$lte": [format!("${}", &unbound_order_field_reference), format!("$${}", &bound_order_field_reference)] }
             } else {
-                doc! { "$lt": [format!("${}", &order_field_reference), format!("$${}", &order_field_reference)] }
+                doc! { "$lt": [format!("${}", &unbound_order_field_reference), format!("$${}", &bound_order_field_reference)] }
             }
         }
     }
@@ -185,7 +188,7 @@ fn map_orderby_condition(order_data: &OrderByData, reverse: bool, include_eq: bo
 }
 
 fn map_equality_condition(order_data: &OrderByData) -> Document {
-    let order_field_reference = order_data.full_reference_path();
+    let order_field_reference = order_data.full_reference_path(true);
 
     // // If we have null values in the ordering or comparison row, those are automatically
     // // included because we can't make a statement over their order relative to the cursor.

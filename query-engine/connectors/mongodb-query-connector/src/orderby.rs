@@ -63,11 +63,23 @@ impl OrderByData {
 
     /// The Mongo binding name of this orderBy, required for cursor conditions.
     /// For a relation field, this is only the first item of the path (e.g. orderby_TestModel_1)
-    pub(crate) fn binding_name(&self) -> String {
+    /// Returns 2 forms, one for the left one and one for the right one. The left one is
+    /// escaped for usage in user-defined variables.
+    pub(crate) fn binding_names(&self) -> (String, String) {
         if let Some(ref prefix) = self.prefix {
-            prefix.first().unwrap().to_string()
+            let first = prefix.first().unwrap().to_string();
+
+            (first.clone(), first)
         } else {
-            self.order_by.field.db_name().to_owned()
+            let right = self.order_by.field.db_name().to_owned();
+
+            let left = if right.starts_with("_") {
+                right.strip_prefix("_").unwrap().to_owned()
+            } else {
+                right.to_owned()
+            };
+
+            (left, right)
         }
     }
 
@@ -78,11 +90,15 @@ impl OrderByData {
 
     /// Computes the full query path that would be required to traverse from the top-most
     /// document all the way to the scalar to order through all hops.
-    pub(crate) fn full_reference_path(&self) -> String {
+    pub(crate) fn full_reference_path(&self, use_bindings: bool) -> String {
         if let Some(ref prefix) = self.prefix {
             format!("{}.{}", prefix.to_string(), self.scalar_field_name())
         } else {
-            self.scalar_field_name().to_string()
+            if use_bindings {
+                self.binding_names().0
+            } else {
+                self.scalar_field_name().to_string()
+            }
         }
     }
 
@@ -150,7 +166,7 @@ impl OrderByBuilder {
                 // we beed to refer to the object
                 format!("_id.{}", data.scalar_field_name())
             } else {
-                data.full_reference_path()
+                data.full_reference_path(false)
             };
 
             // Mongo: -1 -> DESC, 1 -> ASC
