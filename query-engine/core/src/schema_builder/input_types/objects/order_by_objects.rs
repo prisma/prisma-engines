@@ -56,47 +56,21 @@ fn order_by_object_type_aggregate(
 
     return_cached_input!(ctx, &ident);
 
-    let input_object = init_input_object_type(ident.clone());
+    let mut input_object = init_input_object_type(ident.clone());
 
-    //TODO: add exactly one constraint
+    input_object.require_exactly_one_field();
 
     let input_object = Arc::new(input_object);
 
     ctx.cache_input_type(ident, input_object.clone());
 
-    let inner_aggregate_object = build_inner_aggregate_order_by(ctx, model, ordering_enum);
-
-    let fields = vec![input_field(filters::COUNT, InputType::object(inner_aggregate_object), None).optional()];
+    let fields = vec![input_field(
+        filters::COUNT,
+        InputType::Enum(ordering_enum.clone()),
+        None,
+    )];
 
     input_object.set_fields(fields);
-
-    Arc::downgrade(&input_object)
-}
-
-// { count: { id, name: ASC: DEC } }
-
-fn build_inner_aggregate_order_by(
-    ctx: &mut BuilderContext,
-    model: &ModelRef,
-    ordering_enum: &Arc<EnumType>,
-) -> InputObjectTypeWeakRef {
-    let ident = Identifier::new(format!("{}OrderByInnerAggregateInput", model.name), PRISMA_NAMESPACE);
-
-    return_cached_input!(ctx, &ident);
-
-    let input_object = init_input_object_type(ident.clone());
-        //TODO: add exactly one constraint
-    let input_object = Arc::new(input_object);
-    ctx.cache_input_type(ident, input_object.clone());
-
-    let scalar_fields = model
-        .fields()
-        .scalar()
-        .iter()
-        .map(|s| input_field(s.name.clone(), InputType::Enum(ordering_enum.clone()), None).optional())
-        .collect();
-
-    input_object.set_fields(scalar_fields);
 
     Arc::downgrade(&input_object)
 }

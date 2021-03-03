@@ -76,12 +76,12 @@ fn extract_order_by(model: &ModelRef, value: ParsedInputValue) -> QueryGraphBuil
             .into_iter()
             .map(|list_value| {
                 let object: ParsedInputMap = list_value.try_into()?;
-                Ok(process_order_object(model, object, vec![], None)?)
+                Ok(process_order_object(model, object, vec![])?)
             })
             .collect::<QueryGraphBuilderResult<Vec<_>>>()
             .map(|results| results.into_iter().filter_map(identity).collect()),
 
-        ParsedInputValue::Map(map) => Ok(match process_order_object(model, map, vec![], None)? {
+        ParsedInputValue::Map(map) => Ok(match process_order_object(model, map, vec![])? {
             Some(order) => vec![order],
             None => vec![],
         }),
@@ -94,7 +94,6 @@ fn process_order_object(
     model: &ModelRef,
     object: ParsedInputMap,
     mut path: Vec<RelationFieldRef>,
-    sort_aggregation: Option<SortAggregation>,
 ) -> QueryGraphBuilderResult<Option<OrderBy>> {
     match object.into_iter().next() {
         None => Ok(None),
@@ -105,20 +104,18 @@ fn process_order_object(
                     path.push(rf.clone());
 
                     let object: ParsedInputMap = field_value.try_into()?;
-                    let (sort_aggregation, inner_object) = sort_aggregation_from_order_object(object)?;
+                    let (sort_aggregation, sort_order) = sort_aggregation_from_order_object(object)?;
+                    let sf: Vec<_> = rf.related_model().primary_identifier().scalar_fields().collect();
+                    // TODO: Return a better error?
+                    let id = sf.first().unwrap();
 
-                    process_order_object(
-                        &rf.related_model(),
-                        inner_object.to_owned(),
-                        path,
-                        Some(sort_aggregation),
-                    )
+                    Ok(Some(OrderBy::new(id.clone(), path, sort_order, Some(sort_aggregation))))
                 }
                 Field::Relation(rf) => {
                     path.push(rf.clone());
 
                     let object: ParsedInputMap = field_value.try_into()?;
-                    process_order_object(&rf.related_model(), object, path, sort_aggregation)
+                    process_order_object(&rf.related_model(), object, path)
                 }
                 Field::Scalar(sf) => {
                     let value: PrismaValue = field_value.try_into()?;
@@ -128,24 +125,27 @@ fn process_order_object(
                         _ => unreachable!(),
                     };
 
-                    Ok(Some(OrderBy::new(sf.clone(), path, sort_order, sort_aggregation)))
+                    Ok(Some(OrderBy::new(sf.clone(), path, sort_order, None)))
                 }
             }
         }
     }
 }
 
-fn sort_aggregation_from_order_object(
-    object: ParsedInputMap,
-) -> QueryGraphBuilderResult<(SortAggregation, ParsedInputMap)> {
+fn sort_aggregation_from_order_object(object: ParsedInputMap) -> QueryGraphBuilderResult<(SortAggregation, SortOrder)> {
     let (field_name, field_value) = object.into_iter().next().unwrap();
-    let inner_object: ParsedInputMap = field_value.try_into()?;
+    let value: PrismaValue = field_value.try_into()?;
+    let sort_order = match value.into_string().unwrap().to_lowercase().as_str() {
+        ordering::ASC => SortOrder::Ascending,
+        ordering::DESC => SortOrder::Descending,
+        _ => unreachable!(),
+    };
     let sort_aggregation = match field_name.as_str() {
         filters::COUNT => Some(SortAggregation::Count),
-        _ => None,
+        _ => unreachable!("No aggregation operation could be found. This should not happen"),
     };
 
-    Ok((sort_aggregation.unwrap(), inner_object))
+    Ok((sort_aggregation.unwrap(), sort_order))
 }
 
 fn extract_distinct(value: ParsedInputValue) -> QueryGraphBuilderResult<ModelProjection> {
