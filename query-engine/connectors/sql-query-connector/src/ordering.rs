@@ -58,13 +58,19 @@ pub fn compute_joins(
     let join_prefix = format!("{}{}", ORDER_JOIN_PREFIX, order_by_index);
     let mut joins = vec![];
 
-    for rf in order_by.path.iter() {
-        let (join_alias, join_data) = compute_join(base_model, rf, join_prefix.as_str());
+    if order_by.sort_aggregation.is_some() {
+        let (alias, join_data) = compute_aggr_join(order_by, join_prefix.as_str());
 
-        joins.push(AliasedJoin {
-            data: join_data,
-            alias: join_alias,
-        });
+        joins.push(AliasedJoin { data: join_data, alias });
+    } else {
+        for rf in order_by.path.iter() {
+            let (join_alias, join_data) = compute_join(base_model, rf, join_prefix.as_str());
+
+            joins.push(AliasedJoin {
+                data: join_data,
+                alias: join_alias,
+            });
+        }
     }
 
     // This is the final column identifier to be used for the scalar field to order by.
@@ -123,4 +129,45 @@ fn compute_join(base_model: &ModelRef, rf: &RelationFieldRef, join_prefix: &str)
             .alias(right_table_alias)
             .on(ConditionTree::single(on_conditions)),
     )
+}
+
+fn compute_aggr_join(order_by: &OrderBy, join_prefix: &str) -> (String, JoinData<'static>) {
+    let rf = order_by
+        .path
+        .last()
+        .expect("An order by relation aggregate should be guaranteed to have exactly one path");
+    let (left_fields, right_fields) = if rf.is_inlined_on_enclosing_model() {
+        (rf.scalar_fields(), rf.referenced_fields())
+    } else {
+        (
+            rf.related_field().referenced_fields(),
+            rf.related_field().scalar_fields(),
+        )
+    };
+
+    let select_columns = right_fields.iter().map(|f| f.as_column());
+    let query = Select::from_table(rf.related_model().as_table()).columns(select_columns);
+    let query = match order_by.sort_aggregation {
+        Some(SortAggregation::Count) => {
+            query.value(count(order_by.field.as_column()).alias(order_by.field.db_name().to_owned()))
+        }
+        None => query,
+    };
+    let query = right_fields.iter().fold(query, |acc, f| acc.group_by(f.as_column()));
+
+    let pairs = left_fields.into_iter().zip(right_fields.into_iter());
+    let on_conditions = pairs
+        .map(|(a, b)| {
+            let col_a = a.as_column();
+            let col_b = Column::from((join_prefix.to_owned(), b.db_name().to_owned()));
+
+            col_a.equals(col_b)
+        })
+        .collect::<Vec<_>>();
+
+    let join = Table::from(query)
+        .alias(join_prefix.to_owned())
+        .on(ConditionTree::single(on_conditions));
+
+    (join_prefix.to_owned(), join)
 }
