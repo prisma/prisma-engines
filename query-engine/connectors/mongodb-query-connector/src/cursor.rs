@@ -1,5 +1,4 @@
-use super::orderby::order_by_relation_prefix;
-use crate::{orderby, IntoBson};
+use crate::{orderby::OrderByData, IntoBson};
 use mongodb::bson::{doc, Bson, Document};
 use prisma_models::{OrderBy, RecordProjection, ScalarFieldRef, SortOrder};
 
@@ -25,7 +24,7 @@ pub(crate) struct CursorBuilder {
     /// Relies on the `OrderByBuilder` to compute the joins and prepare
     /// the documents for cursor conditions so this builder can focus on
     /// conditionals only.
-    order: Vec<OrderBy>,
+    order_data: Vec<OrderByData>,
 
     /// Order needs reversal
     reverse: bool,
@@ -33,7 +32,13 @@ pub(crate) struct CursorBuilder {
 
 impl CursorBuilder {
     pub fn new(cursor: RecordProjection, order: Vec<OrderBy>, reverse: bool) -> Self {
-        Self { cursor, order, reverse }
+        let order_data = OrderByData::from_list(order);
+
+        Self {
+            cursor,
+            order_data,
+            reverse,
+        }
     }
 
     /// Returns a filter document for the cursor and a filter document for the cursor condition.
@@ -52,20 +57,14 @@ impl CursorBuilder {
         let cursor_filter = doc! { "$and": cursor_filters };
         let mut bindings = Document::new();
 
-        for (index, order_by) in self.order.iter().enumerate() {
-            let prefix = order_by_relation_prefix(index, &order_by.path);
-
-            let bind_field_name = if let Some(prefix) = prefix {
-                prefix.first().unwrap().to_string()
-            } else {
-                order_by.field.db_name().to_owned()
-            };
+        for order_data in self.order_data.iter() {
+            let bind_field_name = order_data.binding_name();
 
             // For: `"let": { fieldName: "$fieldName" }` bindings for the outer pipeline.
             bindings.insert(bind_field_name.clone(), format!("${}", bind_field_name));
         }
 
-        let cursor_condition = cursor_conditions(self.order, self.reverse);
+        let cursor_condition = cursor_conditions(self.order_data, self.reverse);
 
         Ok(CursorData {
             cursor_filter,
@@ -75,73 +74,76 @@ impl CursorBuilder {
     }
 }
 
-fn cursor_conditions(mut order_bys: Vec<OrderBy>, reverse: bool) -> Document {
+fn cursor_conditions(mut order_data: Vec<OrderByData>, reverse: bool) -> Document {
     // let mut conditions = vec![];
-    let num_orderings = order_bys.len();
+    let num_orderings = order_data.len();
 
     let doc = if num_orderings == 1 {
-        let order_by = order_bys.pop().unwrap();
-        map_orderby_condition(0, &order_by, reverse, true)
+        let order_data = order_data.pop().unwrap();
+        map_orderby_condition(&order_data, reverse, true)
     } else {
-        todo!()
+        let mut or_conditions = vec![];
+
+        for n in 0..num_orderings {
+            let (head, tail) = order_data.split_at(num_orderings - n - 1);
+            let mut and_conditions = Vec::with_capacity(head.len() + 1);
+
+            for order_data in head.into_iter() {
+                and_conditions.push(map_equality_condition(order_data));
+            }
+
+            if head.len() == num_orderings - 1 {
+                let order_data = tail.first().unwrap();
+                and_conditions.push(map_orderby_condition(order_data, reverse, true));
+            } else {
+                let order_data = tail.first().unwrap();
+                and_conditions.push(map_orderby_condition(order_data, reverse, false));
+            }
+
+            or_conditions.push(doc! { "$and": and_conditions });
+        }
+
+        doc! { "$or": or_conditions }
     };
 
     doc
 }
 
-fn map_orderby_condition(index: usize, order_by: &OrderBy, reverse: bool, include_eq: bool) -> Document {
-    let prefix = order_by_relation_prefix(index, &order_by.path);
+fn map_orderby_condition(order_data: &OrderByData, reverse: bool, include_eq: bool) -> Document {
+    let order_field_reference = order_data.full_reference_path();
 
-    let order_field = if let Some(prefix) = prefix {
-        format!("{}.{}", prefix.to_string(), order_by.field.db_name())
-    } else {
-        order_by.field.db_name().to_owned()
-    };
-
-    // let (field, field_alias) = &order_definition.field_aliased;
-    // let cmp_column = Column::from((ORDER_TABLE_ALIAS, field_alias.to_owned()));
-    // let cloned_cmp_column = cmp_column.clone();
-    // let order_column = order_definition.order_column.clone();
-    // let cloned_order_column = order_column.clone();
-
-    let order_doc: Document = match order_by.sort_order {
+    let order_doc: Document = match order_data.sort_order() {
         // If it's ASC but we want to take from the back, the ORDER BY will be DESC, meaning that comparisons done need to be lt(e).
         SortOrder::Ascending if reverse => {
             if include_eq {
-                doc! { "$lte": [format!("${}", &order_field), format!("$${}", &order_field)] }
+                doc! { "$lte": [format!("${}", &order_field_reference), format!("$${}", &order_field_reference)] }
             } else {
-                doc! { "$lt": [format!("${}", &order_field), format!("$${}", &order_field)] }
+                doc! { "$lt": [format!("${}", &order_field_reference), format!("$${}", &order_field_reference)] }
             }
         }
 
         // If it's DESC but we want to take from the back, the ORDER BY will be ASC, meaning that comparisons done need to be gt(e).
         SortOrder::Descending if reverse => {
             if include_eq {
-                doc! { "$gte": [format!("${}", &order_field), format!("$${}", &order_field)] }
-                // order_column.greater_than_or_equals(cmp_column)
+                doc! { "$gte": [format!("${}", &order_field_reference), format!("$${}", &order_field_reference)] }
             } else {
-                doc! { "$gt": [format!("${}", &order_field), format!("$${}", &order_field)] }
-                // order_column.greater_than(cmp_column)
+                doc! { "$gt": [format!("${}", &order_field_reference), format!("$${}", &order_field_reference)] }
             }
         }
 
         SortOrder::Ascending => {
             if include_eq {
-                doc! { "$gte": [format!("${}", &order_field), format!("$${}", &order_field)] }
-                // order_column.greater_than_or_equals(cmp_column)
+                doc! { "$gte": [format!("${}", &order_field_reference), format!("$${}", &order_field_reference)] }
             } else {
-                doc! { "$gt": [format!("${}", &order_field), format!("$${}", &order_field)] }
-                // order_column.greater_than(cmp_column)
+                doc! { "$gt": [format!("${}", &order_field_reference), format!("$${}", &order_field_reference)] }
             }
         }
 
         SortOrder::Descending => {
             if include_eq {
-                doc! { "$lte": [format!("${}", &order_field), format!("$${}", &order_field)] }
-                // order_column.less_than_or_equals(cmp_column)
+                doc! { "$lte": [format!("${}", &order_field_reference), format!("$${}", &order_field_reference)] }
             } else {
-                doc! { "$lt": [format!("${}", &order_field), format!("$${}", &order_field)] }
-                // order_column.less_than(cmp_column)
+                doc! { "$lt": [format!("${}", &order_field_reference), format!("$${}", &order_field_reference)] }
             }
         }
     }
@@ -182,20 +184,29 @@ fn map_orderby_condition(index: usize, order_by: &OrderBy, reverse: bool, includ
     doc! { "$expr": order_doc }
 }
 
-// fn map_equality_condition(field: &AliasedScalar, order_column: Column<'static>) -> Expression<'static> {
-//     let (field, field_alias) = field;
-//     let cmp_column = Column::from((ORDER_TABLE_ALIAS, field_alias.to_owned()));
+fn map_equality_condition(order_data: &OrderByData) -> Document {
+    let order_field_reference = order_data.full_reference_path();
 
-//     // If we have null values in the ordering or comparison row, those are automatically included because we can't make a
-//     // statement over their order relative to the cursor.
-//     if !field.is_required {
-//         order_column
-//             .clone()
-//             .equals(cmp_column.clone())
-//             .or(cmp_column.is_null())
-//             .or(order_column.is_null())
-//             .into()
-//     } else {
-//         order_column.equals(cmp_column).into()
-//     }
-// }
+    // // If we have null values in the ordering or comparison row, those are automatically
+    // // included because we can't make a statement over their order relative to the cursor.
+    // if !field.is_required {
+    //     order_column
+    //         .clone()
+    //         .equals(cmp_column.clone())
+    //         .or(cmp_column.is_null())
+    //         .or(order_column.is_null())
+    //         .into()
+
+    //     doc! {
+    //         "$or": [
+    //             { "$expr": { "$eq": [format!("${}", &order_field_reference), format!("$${}", &order_field_reference)] }},
+    //             { "$expr": { "$eq": [format!("${}", &order_field_reference), format!("$${}", &order_field_reference)] }},
+    //             { "$expr": { "$eq": [format!("${}", &order_field_reference), format!("$${}", &order_field_reference)] }}
+    //         ]
+    //     }
+    // } else {
+
+    // Todo: Verify this actually does everything we want already.
+    doc! { "$expr": { "$eq": [format!("${}", &order_field_reference), format!("$${}", &order_field_reference)] } }
+    // }
+}

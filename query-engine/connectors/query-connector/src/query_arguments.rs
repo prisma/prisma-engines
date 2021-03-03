@@ -74,20 +74,57 @@ impl QueryArguments {
         self.cursor.is_some() && self.order_by.iter().any(|o| !o.field.is_required)
     }
 
-    /// Checks if the orderBy provided is guaranteeing a stable ordering of records for the model. Assumes that `model`
-    /// is the same as the model used
-    /// `true` if at least one unique field is present, or contains a combination of fields that is marked as unique.
-    /// `false` otherwise.
+    /// Checks if the orderBy provided is guaranteeing a stable ordering of records for the model.
+    /// For that purpose we need to distinguish orderings on the source model, i.e. the model that
+    /// we're sorting on the top level (where orderBys are located that are done without relations)
+    /// and orderings that require a relation hop. Scalar orderings that require a relation hop are
+    /// only guarantee stable ordering if they are strictly over 1:1 relations. As soon as there's
+    /// a m:1 (or m:n for later implementations) relation involved a unique on the to-one side can't
+    /// be considered unique anymore for the purpose of ordering records, as many left hand records
+    /// (the many side) can have the one side. A simple example would be a User <> Post relation
+    /// where a post can have only one author but an author (User) can have many posts. If posts
+    /// are ordered by related author id, then we can't reliably order posts, as the following can happen:
+    /// ```
+    /// post_id, post_title, author_id
+    /// 1        post1       1
+    /// 2        post2       1
+    /// 3        post3       2
+    /// ```
+    /// So even though the id is unique, it's not guaranteeing a stable ordering in the context of orderBy here.
+    ///
+    /// Returns:
+    /// - `true`, if:
+    ///      * no orderings are done, or ...
+    ///      * at least one unique field is present on the source model `orderBy`, or ...
+    ///      * source model contains a combination of fields that is marked as unique, or ...
+    ///      * a relation orderBy contains a unique and is done solely over 1:1 relations.
+    /// - `false` otherwise.
     pub fn is_stable_ordering(&self) -> bool {
-        let order_fields: Vec<_> = self.order_by.iter().map(|o| &o.field).collect();
+        if self.order_by.is_empty() {
+            return true;
+        }
 
-        !self.order_by.is_empty()
-            && (self.order_by.iter().any(|o| o.field.unique())
-                || self
-                    .model
-                    .unique_indexes()
-                    .into_iter()
-                    .any(|index| index.fields().into_iter().all(|f| order_fields.contains(&&f))))
+        // let order_fields: Vec<_> = self.order_by.iter().map(|o| &o.field).collect();
+
+        // Partition into orderings on the same model and ones that require relation hops.
+        // Note: One ordering is always on one scalar in the end.
+        let (on_model, on_relation): (Vec<&OrderBy>, Vec<&OrderBy>) =
+            self.order_by.iter().partition(|o| o.path.is_empty());
+
+        // Indicates whether or not a combination of contained fields is on the source model (we don't check for relations for now).
+        let order_by_contains_unique_index = self.model.unique_indexes().into_iter().any(|index| {
+            index
+                .fields()
+                .into_iter()
+                .all(|f| on_model.iter().find(|o| o.field == f).is_some())
+        });
+
+        let source_contains_unique = on_model.iter().any(|o| o.field.unique());
+        let relations_contain_1to1_unique = on_relation
+            .iter()
+            .any(|o| o.field.unique() && o.path.iter().all(|r| r.relation().is_one_to_one()));
+
+        source_contains_unique || order_by_contains_unique_index || relations_contain_1to1_unique
     }
 
     pub fn take_abs(&self) -> Option<i64> {

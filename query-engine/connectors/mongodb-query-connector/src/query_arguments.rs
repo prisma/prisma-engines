@@ -112,7 +112,11 @@ impl MongoQueryArgs {
     pub(crate) async fn find_documents(mut self, coll: Collection) -> crate::Result<Cursor> {
         self.finalize()?;
 
-        if self.joins.is_empty() && self.aggregations.is_empty() && self.cursor_data.is_none() {
+        if self.joins.is_empty()
+            && self.order_joins.is_empty()
+            && self.aggregations.is_empty()
+            && self.cursor_data.is_none()
+        {
             self.execute_find_query(coll).await
         } else {
             self.execute_pipeline_query(coll).await
@@ -408,11 +412,11 @@ fn check_unsupported(args: &QueryArguments) -> crate::Result<()> {
     // }
 
     // Cursors with unstable ordering are currently unsupported.
-    if args.contains_unstable_cursor() {
-        return Err(MongoError::Unsupported(
-            "Cursors in conjunction with an unstable orderBy (no single field or combination is unique) are currently unsupported.".to_owned(),
-        ));
-    }
+    // if args.contains_unstable_cursor() {
+    //     return Err(MongoError::Unsupported(
+    //         "Cursors in conjunction with an unstable orderBy (no single field or combination is unique) are currently unsupported.".to_owned(),
+    //     ));
+    // }
 
     Ok(())
 }
