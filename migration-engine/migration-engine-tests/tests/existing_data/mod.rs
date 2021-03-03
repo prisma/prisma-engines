@@ -728,8 +728,8 @@ async fn enum_variants_can_be_dropped_without_data_loss(api: &TestApi) -> TestRe
         let cat_data: Vec<Vec<quaint::ast::Value>> =
             cat_data.into_iter().map(|row| row.into_iter().collect()).collect();
 
-        let expected_cat_data = vec![
-            vec![
+        let expected_cat_data = &[
+            &[
                 Value::text("felix"),
                 if api.is_mysql() {
                     Value::text("HUNGRY")
@@ -737,7 +737,7 @@ async fn enum_variants_can_be_dropped_without_data_loss(api: &TestApi) -> TestRe
                     Value::enum_variant("HUNGRY")
                 },
             ],
-            vec![
+            &[
                 Value::text("mittens"),
                 if api.is_mysql() {
                     Value::text("HAPPY")

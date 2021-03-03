@@ -132,6 +132,7 @@ impl SqlMigrationConnector {
         ));
 
         let migration = SqlMigration {
+            added_columns_with_virtual_defaults: Vec::new(),
             before: source_schema,
             after: target_schema,
             steps,
