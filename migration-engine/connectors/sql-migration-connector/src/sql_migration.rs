@@ -185,6 +185,7 @@ pub(crate) struct AlterEnum {
     pub index: Pair<usize>,
     pub created_variants: Vec<String>,
     pub dropped_variants: Vec<String>,
+    pub previous_usages_as_default: Vec<(usize, usize)>,
 }
 
 impl AlterEnum {

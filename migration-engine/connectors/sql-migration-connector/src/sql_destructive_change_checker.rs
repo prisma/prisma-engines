@@ -236,6 +236,7 @@ impl SqlMigrationConnector {
                     index,
                     created_variants: _,
                     dropped_variants,
+                    previous_usages_as_default: _,
                 }) if !dropped_variants.is_empty() => plan.push_warning(
                     SqlMigrationWarningCheck::EnumValueRemoval {
                         enm: schemas.next().enum_walker_at(*index.next()).name().to_owned(),

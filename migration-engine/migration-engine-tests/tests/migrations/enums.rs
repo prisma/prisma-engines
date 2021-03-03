@@ -190,9 +190,24 @@ async fn models_with_enum_values_can_be_dropped(api: &TestApi) -> TestResult {
 #[test_each_connector(log = "debug", capabilities("enums"))]
 async fn enums_used_in_default_can_be_changed(api: &TestApi) -> TestResult {
     let dm1 = r#"
-        model Cat {
+        model Panther {
             id Int @id
             mood CatMood @default(HAPPY)
+        }
+
+        model Tiger {
+            id Int @id
+            mood CatMood @default(HAPPY)
+        }
+        
+         model Leopard {
+            id Int @id
+            mood CatMood @default(HAPPY)
+        }
+        
+        model Lion {
+            id Int @id
+            mood CatMood
         }
 
         enum CatMood {
@@ -203,28 +218,57 @@ async fn enums_used_in_default_can_be_changed(api: &TestApi) -> TestResult {
 
     api.schema_push(dm1).send().await?.assert_green()?;
 
-    api.assert_schema().await?.assert_tables_count(1)?;
+    api.assert_schema().await?.assert_tables_count(4)?;
 
     let dm2 = r#"
-        model Cat {
+        model Panther {
             id Int @id
             mood CatMood @default(HAPPY)
         }
 
+        model Tiger {
+            id Int @id
+            mood CatMood @default(HAPPY)
+        }
+        
+         model Leopard {
+            id Int @id
+            mood CatMood 
+        }
+        
+        model Lion {
+            id Int @id
+            mood CatMood @default(HAPPY)
+        }
+        
         enum CatMood {
             HAPPY
             ANGRY
         }
     "#;
 
-    api.schema_push(dm2)
-        .force(true)
-        .send()
-        .await?
-        .assert_executable()?
-        .assert_warnings(&["The migration will remove the values [HUNGRY] on the enum `Cat_mood`. If these variants are still used in the database, the migration will fail.".into()])?;
+    if api.is_postgres() {
+        api.schema_push(dm2)
+            .force(true)
+            .send()
+            .await?
+            .assert_executable()?
+            .assert_warnings(&        ["The migration will remove the values [HUNGRY] on the enum `CatMood`. If these variants are still used in the database, the migration will fail.".into()]
+            )?;
+    } else {
+        api.schema_push(dm2)
+            .force(true)
+            .send()
+            .await?
+            .assert_executable()?
+            .assert_warnings(& [ "The migration will remove the values [HUNGRY] on the enum `Panther_mood`. If these variants are still used in the database, the migration will fail.".into(),
+                "The migration will remove the values [HUNGRY] on the enum `Tiger_mood`. If these variants are still used in the database, the migration will fail.".into(),]
+            )?;
+    };
 
-    api.assert_schema().await?.assert_tables_count(1)?;
+    api.assert_schema().await?.assert_tables_count(4)?;
 
     Ok(())
 }
+//mysql enum behavious is weird / missing schema validation
+//test that postgres only does the drop / set dance for removed values not for added ones
