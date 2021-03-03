@@ -1,6 +1,8 @@
 use crate::{
-    flavour::SqlFlavour, pair::Pair, sql_migration::SqlMigration, sql_schema_calculator, sql_schema_differ,
-    SqlMigrationConnector,
+    flavour::SqlFlavour,
+    pair::Pair,
+    sql_migration::{SqlMigration, SqlMigrationStep},
+    sql_schema_calculator, sql_schema_differ, SqlMigrationConnector,
 };
 use datamodel::{walkers::walk_models, Datamodel};
 use migration_connector::{ConnectorResult, DatabaseMigrationInferrer, MigrationConnector, MigrationDirectory};
@@ -103,28 +105,7 @@ fn infer(
         sql_schema_differ::calculate_steps(Pair::new(&current_database_schema, &expected_database_schema), flavour);
     let next_schema = &expected_database_schema;
 
-    let added_columns_with_virtual_defaults: Vec<(usize, usize)> = steps
-        .iter()
-        .filter_map(|step| step.as_alter_table())
-        .flat_map(move |alter_table| {
-            alter_table
-                .changes
-                .iter()
-                .filter_map(|change| change.as_add_column())
-                .map(move |column| -> (usize, usize) { (*alter_table.table_index.next(), column.column_index) })
-        })
-        .chain(
-            steps
-                .iter()
-                .filter_map(|step| step.as_redefine_tables())
-                .flat_map(|redefine_tables| redefine_tables)
-                .flat_map(move |table| {
-                    table
-                        .added_columns
-                        .iter()
-                        .map(move |column_index| (*table.table_index.next(), *column_index))
-                }),
-        )
+    let added_columns_with_virtual_defaults: Vec<(usize, usize)> = walk_added_columns(&steps)
         .map(|(table_index, column_index)| {
             let table = next_schema.table_walker_at(table_index);
             let column = table.column_at(column_index);
@@ -152,4 +133,34 @@ fn infer(
         after: expected_database_schema,
         steps,
     }
+}
+
+/// List all the columns added in the migration, either by alter table steps or
+/// redefine table steps.
+///
+/// The return value should be interpreted as an iterator over `(table_index,
+/// column_index)` in the `next` schema.
+fn walk_added_columns(steps: &[SqlMigrationStep]) -> impl Iterator<Item = (usize, usize)> + '_ {
+    steps
+        .iter()
+        .filter_map(|step| step.as_alter_table())
+        .flat_map(move |alter_table| {
+            alter_table
+                .changes
+                .iter()
+                .filter_map(|change| change.as_add_column())
+                .map(move |column| -> (usize, usize) { (*alter_table.table_index.next(), column.column_index) })
+        })
+        .chain(
+            steps
+                .iter()
+                .filter_map(|step| step.as_redefine_tables())
+                .flat_map(|redefine_tables| redefine_tables)
+                .flat_map(move |table| {
+                    table
+                        .added_columns
+                        .iter()
+                        .map(move |column_index| (*table.table_index.next(), *column_index))
+                }),
+        )
 }
