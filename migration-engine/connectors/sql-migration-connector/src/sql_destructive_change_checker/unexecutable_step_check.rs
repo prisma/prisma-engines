@@ -56,7 +56,7 @@ impl Check for UnexecutableStepCheck {
             UnexecutableStepCheck::AddedRequiredFieldToTableWithPrismaLevelDefault { table, column } => {
                 let message = |details| {
                     format!(
-                        "The required column `{column}` was added to the `{table}` table with a prisma-level default value. {details}. Please create add this column as optional, then populate it before making it required.",
+                        "The required column `{column}` was added to the `{table}` table with a prisma-level default value. {details} Please add this column as optional, then populate it before making it required.",
                         table = table,
                         column = column,
                         details = details,

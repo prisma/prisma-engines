@@ -71,7 +71,7 @@ async fn adding_a_required_field_with_prisma_level_default_works(api: &TestApi) 
         .send()
         .await?
         .assert_no_warning()?
-        .assert_unexecutable(&["The required column `name` was added to the `Test` table with a prisma-level default value. There are 1 rows in this table, it is not possible to execute this migration.. Please create add this column as optional, then populate it before making it required.".into()])?;
+        .assert_unexecutable(&["The required column `name` was added to the `Test` table with a prisma-level default value. There are 1 rows in this table, it is not possible to execute this migration. Please add this column as optional, then populate it before making it required.".into()])?;
 
     let rows = api.select("Test").column("id").column("age").send().await?;
 

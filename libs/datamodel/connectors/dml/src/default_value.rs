@@ -219,26 +219,26 @@ mod tests {
 
     #[test]
     fn default_value_is_now() {
-        let auto_increment_default = DefaultValue::Expression(ValueGenerator::new_now());
+        let now_default = DefaultValue::Expression(ValueGenerator::new_now());
 
-        assert!(auto_increment_default.is_now());
-        assert!(!auto_increment_default.is_autoincrement());
+        assert!(now_default.is_now());
+        assert!(!now_default.is_autoincrement());
     }
 
     #[test]
     fn default_value_is_uuid() {
-        let auto_increment_default = DefaultValue::Expression(ValueGenerator::new_uuid());
+        let uuid_default = DefaultValue::Expression(ValueGenerator::new_uuid());
 
-        assert!(auto_increment_default.is_uuid());
-        assert!(!auto_increment_default.is_autoincrement());
+        assert!(uuid_default.is_uuid());
+        assert!(!uuid_default.is_autoincrement());
     }
 
     #[test]
     fn default_value_is_cuid() {
-        let auto_increment_default = DefaultValue::Expression(ValueGenerator::new_cuid());
+        let cuid_default = DefaultValue::Expression(ValueGenerator::new_cuid());
 
-        assert!(auto_increment_default.is_cuid());
-        assert!(!auto_increment_default.is_now());
+        assert!(cuid_default.is_cuid());
+        assert!(!cuid_default.is_now());
     }
 
     #[test]
