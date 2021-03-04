@@ -186,3 +186,108 @@ async fn models_with_enum_values_can_be_dropped(api: &TestApi) -> TestResult {
 
     Ok(())
 }
+
+#[test_each_connector(log = "debug", capabilities("enums"))]
+async fn enums_used_in_default_can_be_changed(api: &TestApi) -> TestResult {
+    let dm1 = r#"
+        model Panther {
+            id Int @id
+            mood CatMood @default(HAPPY)
+        }
+
+        model Tiger {
+            id Int @id
+            mood CatMood @default(HAPPY)
+        }
+        
+         model Leopard {
+            id Int @id
+            mood CatMood @default(HAPPY)
+        }
+        
+        model Lion {
+            id Int @id
+            mood CatMood
+        }
+        
+        model GoodDog {
+            id Int @id
+            mood DogMood @default(HAPPY)
+        }
+
+        enum CatMood {
+            HAPPY
+            HUNGRY
+        }
+        
+        enum DogMood {
+            HAPPY
+            HUNGRY
+        }
+    "#;
+
+    api.schema_push(dm1).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_tables_count(5)?;
+
+    let dm2 = r#"
+        model Panther {
+            id Int @id
+            mood CatMood @default(HAPPY)
+        }
+
+        model Tiger {
+            id Int @id
+            mood CatMood @default(HAPPY)
+        }
+        
+         model Leopard {
+            id Int @id
+            mood CatMood 
+        }
+        
+        model Lion {
+            id Int @id
+            mood CatMood @default(HAPPY)
+        }
+        
+        model GoodDog {
+            id Int @id
+            mood DogMood @default(HAPPY)
+        }
+
+        enum CatMood {
+            HAPPY
+            ANGRY
+        }
+        
+        enum DogMood {
+            HAPPY
+            HUNGRY
+            SLEEPY
+        }
+    "#;
+
+    if api.is_postgres() {
+        api.schema_push(dm2)
+            .force(true)
+            .send()
+            .await?
+            .assert_executable()?
+            .assert_warnings(&["The migration will remove the values [HUNGRY] on the enum `CatMood`. If these variants are still used in the database, the migration will fail.".into()]
+            )?;
+    } else {
+        api.schema_push(dm2)
+            .force(true)
+            .send()
+            .await?
+            .assert_executable()?
+            .assert_warnings(& ["The migration will remove the values [HUNGRY] on the enum `Panther_mood`. If these variants are still used in the database, the migration will fail.".into(),
+                "The migration will remove the values [HUNGRY] on the enum `Tiger_mood`. If these variants are still used in the database, the migration will fail.".into(),]
+            )?;
+    };
+
+    api.assert_schema().await?.assert_tables_count(5)?;
+
+    Ok(())
+}

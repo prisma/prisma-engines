@@ -22,11 +22,32 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
     fn alter_enums(&self, differ: &SqlSchemaDiffer<'_>) -> Vec<AlterEnum> {
         differ
             .enum_pairs()
-            .filter_map(|differ| {
+            .filter_map(|enum_differ| {
+                let dropped_variants: Vec<String> = enum_differ.dropped_values().map(String::from).collect();
+                let names = enum_differ.enums.as_ref().map(|e| e.name());
+                let previous_usages_as_default: Vec<(usize, usize)> = if !dropped_variants.is_empty() {
+                    differ
+                        .table_pairs()
+                        .flat_map(move |table| {
+                            table
+                                .previous()
+                                .columns()
+                                .filter(move |c| {
+                                    c.column().default.is_some()
+                                        && matches!(c.column().tpe.family.as_enum(), Some(name) if name == *names.previous())
+                                })
+                                .map(move |c| (table.previous().table_index(), c.column_index()))
+                        })
+                        .collect()
+                } else {
+                    vec![]
+                };
+
                 let step = AlterEnum {
-                    index: differ.enums.as_ref().map(|e| e.enum_index()),
-                    created_variants: differ.created_values().map(String::from).collect(),
-                    dropped_variants: differ.dropped_values().map(String::from).collect(),
+                    index: enum_differ.enums.as_ref().map(|e| e.enum_index()),
+                    created_variants: enum_differ.created_values().map(String::from).collect(),
+                    dropped_variants,
+                    previous_usages_as_default,
                 };
 
                 if step.is_empty() {
