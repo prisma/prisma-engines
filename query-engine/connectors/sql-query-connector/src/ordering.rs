@@ -12,8 +12,6 @@ pub struct OrderingJoin {
     pub(crate) data: JoinData<'static>,
     // Alias used for the join. eg: LEFT JOIN ... AS <alias>
     pub(crate) alias: String,
-    // Final column name to be used for the scalar field to order by
-    pub(crate) order_by_column_name: String,
 }
 #[derive(Debug, Clone)]
 pub struct OrderingJoins {
@@ -60,14 +58,16 @@ pub fn compute_joins(
 ) -> (Vec<OrderingJoin>, Column<'static>) {
     let join_prefix = format!("{}{}", ORDER_JOIN_PREFIX, order_by_index);
     let mut joins = vec![];
+    let mut order_by_column_alias: Option<String> = None;
 
     if order_by.sort_aggregation.is_some() {
-        let ordering_join = compute_aggr_join(order_by, join_prefix.as_str());
+        let (aggr_column_alias, ordering_join) = compute_aggr_join(order_by, join_prefix.as_str());
 
+        order_by_column_alias = Some(aggr_column_alias);
         joins.push(ordering_join);
     } else {
         for rf in order_by.path.iter() {
-            let ordering_join = compute_join(order_by, base_model, rf, join_prefix.as_str());
+            let ordering_join = compute_join(base_model, rf, join_prefix.as_str());
 
             joins.push(ordering_join);
         }
@@ -77,8 +77,13 @@ pub fn compute_joins(
     // - If it's on the base model with no hops, it's for example `modelTable.field`.
     // - If it is with several hops, it's the alias used for the last join, e.g.
     //   `{join_alias}.field`
+    // - If it's with an order by aggregation, it's the alias used for the join + alias used for the aggregated column. eg:
+    //   `{join_alias}.{aggr_column_alias}`
     let order_by_column = if let Some(join) = joins.last() {
-        Column::from((join.alias.to_owned(), join.order_by_column_name.to_owned()))
+        Column::from((
+            join.alias.to_owned(),
+            order_by_column_alias.unwrap_or_else(|| order_by.field.db_name().to_owned()),
+        ))
     } else {
         order_by.field.as_column()
     };
@@ -86,7 +91,7 @@ pub fn compute_joins(
     (joins, order_by_column)
 }
 
-fn compute_join(order_by: &OrderBy, base_model: &ModelRef, rf: &RelationFieldRef, join_prefix: &str) -> OrderingJoin {
+fn compute_join(base_model: &ModelRef, rf: &RelationFieldRef, join_prefix: &str) -> OrderingJoin {
     let (left_fields, right_fields) = if rf.is_inlined_on_enclosing_model() {
         (rf.scalar_fields(), rf.referenced_fields())
     } else {
@@ -128,11 +133,10 @@ fn compute_join(order_by: &OrderBy, base_model: &ModelRef, rf: &RelationFieldRef
             .as_table()
             .alias(right_table_alias)
             .on(ConditionTree::single(on_conditions)),
-        order_by_column_name: order_by.field.db_name().to_owned(),
     }
 }
 
-fn compute_aggr_join(order_by: &OrderBy, join_prefix: &str) -> OrderingJoin {
+fn compute_aggr_join(order_by: &OrderBy, join_prefix: &str) -> (String, OrderingJoin) {
     let rf = order_by
         .path
         .last()
@@ -145,7 +149,7 @@ fn compute_aggr_join(order_by: &OrderBy, join_prefix: &str) -> OrderingJoin {
     }
 }
 
-fn compute_aggr_join_one2m(order_by: &OrderBy, rf: &RelationFieldRef, join_prefix: &str) -> OrderingJoin {
+fn compute_aggr_join_one2m(order_by: &OrderBy, rf: &RelationFieldRef, join_prefix: &str) -> (String, OrderingJoin) {
     let (left_fields, right_fields) = if rf.is_inlined_on_enclosing_model() {
         (rf.scalar_fields(), rf.referenced_fields())
     } else {
@@ -192,14 +196,16 @@ fn compute_aggr_join_one2m(order_by: &OrderBy, rf: &RelationFieldRef, join_prefi
         .alias(join_prefix.to_owned())
         .on(ConditionTree::single(on_conditions));
 
-    OrderingJoin {
-        data: join,
-        alias: join_prefix.to_owned(),
-        order_by_column_name: ORDER_AGGR_FIELD_NAME.to_owned(),
-    }
+    (
+        ORDER_AGGR_FIELD_NAME.to_owned(),
+        OrderingJoin {
+            data: join,
+            alias: join_prefix.to_owned(),
+        },
+    )
 }
 
-fn compute_aggr_join_m2m(order_by: &OrderBy, rf: &RelationFieldRef, join_prefix: &str) -> OrderingJoin {
+fn compute_aggr_join_m2m(order_by: &OrderBy, rf: &RelationFieldRef, join_prefix: &str) -> (String, OrderingJoin) {
     let relation_table = rf.as_table();
     let a_ids = rf.model().primary_identifier();
     let b_ids = rf.related_model().primary_identifier();
@@ -261,9 +267,11 @@ fn compute_aggr_join_m2m(order_by: &OrderBy, rf: &RelationFieldRef, join_prefix:
         .alias(join_prefix.to_owned())
         .on(ConditionTree::single(on_conditions));
 
-    OrderingJoin {
-        alias: join_prefix.to_owned(),
-        data: join,
-        order_by_column_name: ORDER_AGGR_FIELD_NAME.to_owned(),
-    }
+    (
+        ORDER_AGGR_FIELD_NAME.to_owned(),
+        OrderingJoin {
+            alias: join_prefix.to_owned(),
+            data: join,
+        },
+    )
 }
