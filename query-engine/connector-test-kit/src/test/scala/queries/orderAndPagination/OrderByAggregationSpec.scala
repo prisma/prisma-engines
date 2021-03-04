@@ -184,6 +184,168 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     )
   }
 
+
+
+
+
+
+
+
+  "[With Pagination] Ordering by one2m count asc" should "work" in {
+    val result = server.query(
+      """
+        |{
+        |  findManyUser(orderBy: { posts: { count: asc } }, cursor: { id: 2 }) {
+        |    id
+        |    posts {
+        |      title
+        |    }
+        |  }
+        |}
+      """,
+      project,
+      legacy = false,
+    )
+
+    result.toString should be(
+      """{"data":{"findManyUser":[{"id":2,"posts":[{"title":"bob_post_1"},{"title":"bob_post_2"}]}]}}"""
+    )
+  }
+
+  "[Multiple][With Pagination] Ordering by one2m count asc + simple order asc" should "work" in {
+    val result = server.query(
+      """
+        |{
+        |  findManyUser(orderBy: [{ posts: { count: asc } }, { name: asc }], cursor: { id: 2 }) {
+        |    id
+        |    name
+        |    posts {
+        |      title
+        |    }
+        |  }
+        |}
+      """,
+      project,
+      legacy = false,
+    )
+
+    result.toString should be(
+      """{"data":{"findManyUser":[{"id":2,"name":"Bob","posts":[{"title":"bob_post_1"},{"title":"bob_post_2"}]}]}}"""
+    )
+  }
+
+  "[With Pagination] Ordering by one2m count desc" should "work" in {
+    val result = server.query(
+      """
+        |{
+        |  findManyUser(orderBy: { posts: { count: desc } }, cursor: { id: 1 }) {
+        |    id
+        |    posts {
+        |      title
+        |    }
+        |  }
+        |}
+      """,
+      project,
+      legacy = false,
+    )
+
+    result.toString should be(
+      """{"data":{"findManyUser":[{"id":1,"posts":[{"title":"alice_post_1"}]}]}}"""
+    )
+  }
+
+  "[Multiple][With Pagination] Ordering by one2m count asc + simple order desc" should "work" in {
+    val result = server.query(
+      """
+        |{
+        |  findManyUser(orderBy: [{ name: desc }, { posts: { count: asc } }], cursor: { id: 2 }) {
+        |    id
+        |    name
+        |    posts {
+        |      title
+        |    }
+        |  }
+        |}
+      """,
+      project,
+      legacy = false,
+    )
+
+    result.toString should be(
+      """{"data":{"findManyUser":[{"id":2,"name":"Bob","posts":[{"title":"bob_post_1"},{"title":"bob_post_2"}]}]}}"""
+    )
+  }
+
+  "[With Pagination] Ordering by m2m count asc" should "work" in {
+    val result = server.query(
+      """
+        |{
+        |  findManyPost(orderBy: { categories: { count: asc } }, cursor: { id: 2 }, take: 2) {
+        |    id
+        |    title
+        |    categories {
+        |      name
+        |    }
+        |  }
+        |}
+      """,
+      project,
+      legacy = false,
+    )
+
+    result.toString should be(
+      """{"data":{"findManyPost":[{"id":2,"title":"bob_post_1","categories":[{"name":"Finance"}]},{"id":3,"title":"bob_post_2","categories":[{"name":"History"}]}]}}"""
+    )
+  }
+
+  "[With Pagination] Ordering by m2m count desc" should "work" in {
+    val result = server.query(
+      """
+        |{
+        |  findManyPost(orderBy: { categories: { count: desc } }, cursor: { id: 1 }, take: 2) {
+        |    id
+        |    title
+        |    categories {
+        |      name
+        |    }
+        |  }
+        |}
+      """,
+      project,
+      legacy = false,
+    )
+
+    result.toString should be(
+      """{"data":{"findManyPost":[{"id":1,"title":"alice_post_1","categories":[{"name":"News"},{"name":"Society"}]},{"id":2,"title":"bob_post_1","categories":[{"name":"Finance"}]}]}}"""
+    )
+  }
+
+  "[Multiple][With Pagination] Ordering by m2m count asc + simple order desc" should "work" in {
+    val result = server.query(
+      """
+        |{
+        |  findManyPost(orderBy: [{ categories: { count: asc } }, { title: asc }], cursor: { id: 2 }, take: 2) {
+        |    id
+        |    title
+        |    categories {
+        |      name
+        |    }
+        |  }
+        |}
+      """,
+      project,
+      legacy = false,
+    )
+
+    result.toString should be(
+      """{"data":{"findManyPost":[{"id":2,"title":"bob_post_1","categories":[{"name":"Finance"}]},{"id":3,"title":"bob_post_2","categories":[{"name":"History"}]}]}}"""
+    )
+  }
+
+
+
+
   private def createTestData(): Unit = {
     server.query("""mutation { createOneUser(data: { name: "Alice", posts: { create: { title: "alice_post_1", categories: { create: [{ name: "News" }, { name: "Society" }] }} } }){ id }}""".stripMargin, project, legacy = false)
     server.query("""mutation { createOneUser(data: { name: "Bob", posts: { create: [{ title: "bob_post_1", categories: { create: [{ name: "Finance" }] } }, { title: "bob_post_2", categories: { create: [{ name: "History" }] } }] } }){ id }}""".stripMargin, project, legacy = false)
