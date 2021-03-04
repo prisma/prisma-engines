@@ -46,17 +46,26 @@ impl JoinStage {
     }
 
     /// Returns a join stage for the join between the source collection of `from_field` (the model it's defined on)
-    /// and the target collection (the model that is related over the relation).
+    /// and the target collection (the model that is related over the relation), as well as an optional unwind stage.
     /// The joined documents will reside on the source document side as a field **named after the relation name** if
     /// there's no `alias` defined. Else the alias is the name.
     /// Example: If you have a document `{ _id: 1, field: "a" }` and join relation "aToB", the resulting document
     /// will have the shape: `{ _id: 1, field: "a", aToB: [{...}, {...}, ...] }` without alias and
     /// `{ _id: 1, field: "a", alisHere: [{...}, {...}, ...] }` with alias `"aliasHere"`.
-    pub(crate) fn build(self) -> Document {
+    ///
+    /// Returns: `(Join document, Unwind document)`
+    pub(crate) fn build(self) -> (Document, Option<Document>) {
         let nested_stages: Vec<Document> = self
             .nested
             .into_iter()
-            .map(|nested_stage| nested_stage.build())
+            .flat_map(|nested_stage| {
+                let (join, unwind) = nested_stage.build();
+
+                match unwind {
+                    Some(unwind) => vec![join, unwind],
+                    None => vec![join],
+                }
+            })
             .collect();
 
         let from_field = self.source;
@@ -73,6 +82,7 @@ impl JoinStage {
         let mut left_scalars = from_field.left_scalars();
         let mut right_scalars = from_field.right_scalars();
 
+        // +1 for the required match stage, the rest is from the joins.
         let mut pipeline = Vec::with_capacity(1 + nested_stages.len());
 
         // todo: multi-field joins
@@ -97,13 +107,24 @@ impl JoinStage {
         pipeline.push(doc! { "$match": { "$expr": op }});
         pipeline.extend(nested_stages);
 
-        doc! {
+        // If the field is a to-one, add and unwind stage.
+        let unwind_stage = if !from_field.is_list {
+            Some(doc! {
+                "$unwind": { "path": format!("${}", as_name), "preserveNullAndEmptyArrays": true }
+            })
+        } else {
+            None
+        };
+
+        let join_stage = doc! {
             "$lookup": {
                 "from": right_coll_name,
                 "let": { "left": format!("${}", left_name) },
                 "pipeline": pipeline,
                 "as": as_name,
             }
-        }
+        };
+
+        (join_stage, unwind_stage)
     }
 }

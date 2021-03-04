@@ -1,6 +1,5 @@
 use crate::{
     cursor::{CursorBuilder, CursorData},
-    error::MongoError,
     filter::convert_filter,
     join::JoinStage,
     orderby::OrderByBuilder,
@@ -163,8 +162,16 @@ impl MongoQueryArgs {
         };
 
         // Joins ($lookup)
-        stages.extend(self.joins.into_iter().map(|stage| stage.build()));
-        stages.extend(self.order_joins.into_iter().map(|stage| stage.build()));
+        let joins = self.joins.into_iter().chain(self.order_joins);
+
+        stages.extend(joins.flat_map(|nested_stage| {
+            let (join, unwind) = nested_stage.build();
+
+            match unwind {
+                Some(unwind) => vec![join, unwind],
+                None => vec![join],
+            }
+        }));
 
         // Post-join $matches
         stages.extend(self.join_filters.into_iter().map(|filter| doc! { "$match": filter }));
@@ -254,7 +261,14 @@ impl MongoQueryArgs {
             .order_joins
             .clone()
             .into_iter()
-            .map(|stage| stage.build())
+            .flat_map(|nested_stage| {
+                let (join, unwind) = nested_stage.build();
+
+                match unwind {
+                    Some(unwind) => vec![join, unwind],
+                    None => vec![join],
+                }
+            })
             .collect_vec();
 
         // Outer query to pin the cursor document.
@@ -403,7 +417,7 @@ fn take(take: Option<i64>, ignore: bool) -> Option<i64> {
 }
 
 /// Temporarily unsupported features that can not be restricted on the schema level of query arguments get rejected at runtime.
-fn check_unsupported(args: &QueryArguments) -> crate::Result<()> {
+fn check_unsupported(_args: &QueryArguments) -> crate::Result<()> {
     // Cursors with order-by relations is currently unsupported.
     // if args.cursor.is_some() && args.order_by.iter().any(|o| !o.path.is_empty()) {
     //     return Err(MongoError::Unsupported(
