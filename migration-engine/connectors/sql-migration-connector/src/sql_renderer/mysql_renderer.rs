@@ -486,8 +486,8 @@ fn render_default<'a>(column: &ColumnWalker<'a>, default: &'a DefaultValue) -> C
 
             format!("CURRENT_TIMESTAMP({})", precision).into()
         }
-        DefaultKind::VALUE(val) if column.column_type_family().is_datetime() => {
-            Quoted::mysql_string(val).to_string().into()
+        DefaultKind::VALUE(PrismaValue::DateTime(dt)) if column.column_type_family().is_datetime() => {
+            Quoted::mysql_string(dt.to_rfc3339()).to_string().into()
         }
         DefaultKind::VALUE(val) => val.to_string().into(),
         DefaultKind::SEQUENCE(_) => Default::default(),

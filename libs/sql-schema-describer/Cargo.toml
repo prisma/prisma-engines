@@ -37,8 +37,8 @@ features = [
 
 [dev-dependencies]
 anyhow = "1.0.28"
-barrel = {git = "https://github.com/prisma/barrel.git", features = ["sqlite3", "mysql", "pg", "mssql"], branch = "mssql-support"}
+barrel = { git = "https://github.com/prisma/barrel.git", features = ["sqlite3", "mysql", "pg", "mssql"], branch = "mssql-support" }
 pretty_assertions = "0.6"
 test-macros = { path = "../test-macros" }
 test-setup = { path = "../test-setup" }
-tokio = {version = "1.0", default_features = false, features = ["rt", "macros"]}
+tokio = { version = "1.0", default_features = false, features = ["rt", "macros"] }
