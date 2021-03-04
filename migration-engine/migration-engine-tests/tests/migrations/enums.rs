@@ -250,7 +250,15 @@ async fn string_field_to_enum_field_works(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.schema_push(dm2).force(true).send().await?.assert_executable()?;
+    api.schema_push(dm2)
+        .force(true)
+        .send()
+        .await?
+        .assert_executable()?
+        .assert_warnings(&[if api.is_postgres() {
+
+            "The `mood` column on the `Cat` table would be dropped and recreated. This will lead to data loss.".into()
+        } else {"You are about to alter the column `mood` on the `Cat` table, which contains 1 non-null values. The data in that column will be cast from `VarChar(191)` to `Enum(\"Cat_mood\")`.".into() }])?;
 
     api.assert_schema().await?.assert_table("Cat", |table| {
         table.assert_column("mood", |col| col.assert_type_is_enum())

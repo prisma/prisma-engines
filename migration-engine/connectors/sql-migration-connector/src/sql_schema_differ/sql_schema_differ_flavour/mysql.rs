@@ -27,24 +27,28 @@ impl SqlSchemaDifferFlavour for MysqlFlavour {
             }
         }
 
-        if let (Some(previous_enum), Some(next_enum)) = (
+        match (
             differ.previous.column_type_family_as_enum(),
             differ.next.column_type_family_as_enum(),
         ) {
-            if previous_enum.values == next_enum.values {
-                return None;
-            }
+            (Some(previous_enum), Some(next_enum)) => {
+                if previous_enum.values == next_enum.values {
+                    return None;
+                }
 
-            return if previous_enum
-                .values
-                .iter()
-                .all(|previous_value| next_enum.values.iter().any(|next_value| previous_value == next_value))
-            {
-                Some(ColumnTypeChange::SafeCast)
-            } else {
-                Some(ColumnTypeChange::RiskyCast)
-            };
-        }
+                return if previous_enum
+                    .values
+                    .iter()
+                    .all(|previous_value| next_enum.values.iter().any(|next_value| previous_value == next_value))
+                {
+                    Some(ColumnTypeChange::SafeCast)
+                } else {
+                    Some(ColumnTypeChange::RiskyCast)
+                };
+            }
+            (Some(_), None) | (None, Some(_)) => return Some(ColumnTypeChange::RiskyCast),
+            (None, None) => (),
+        };
 
         if let Some(change) = differ
             .as_pair()
