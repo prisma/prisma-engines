@@ -117,7 +117,7 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     result.toString should be(
-      """{"data":{"findManyUser":[{"id":1,"name":"Alice","posts":[{"title":"alice_post_1"}]},{"id":2,"name":"Bob","posts":[{"title":"bob_post_1"},{"title":"bob_post_2"}]}]}}"""
+      """{"data":{"findManyUser":[{"id":2,"name":"Bob","posts":[{"title":"bob_post_1"},{"title":"bob_post_2"}]},{"id":1,"name":"Alice","posts":[{"title":"alice_post_1"}]}]}}"""
     )
   }
 
@@ -254,7 +254,7 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       """
         |{
-        |  findManyUser(orderBy: [{ name: desc }, { posts: { count: asc } }], cursor: { id: 2 }) {
+        |  findManyUser(orderBy: [{ name: desc }, { posts: { count: asc } }], cursor: { id: 2 }, take: 1) {
         |    id
         |    name
         |    posts {
