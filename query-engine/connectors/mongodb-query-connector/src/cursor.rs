@@ -1,6 +1,6 @@
 use crate::{orderby::OrderByData, IntoBson};
-use mongodb::bson::{doc, Bson, Document};
-use prisma_models::{OrderBy, RecordProjection, ScalarFieldRef, SortOrder};
+use mongodb::bson::{doc, Document};
+use prisma_models::{OrderBy, RecordProjection, SortOrder};
 
 #[derive(Debug, Clone)]
 pub(crate) struct CursorData {
@@ -59,8 +59,6 @@ impl CursorBuilder {
 
         for order_data in self.order_data.iter() {
             let (left_bind_field_name, right_binding_field_name) = order_data.binding_names();
-            dbg!(&left_bind_field_name);
-            dbg!(&right_binding_field_name);
 
             // For: `"let": { fieldName: "$fieldName" }` bindings for the outer pipeline.
             bindings.insert(left_bind_field_name, format!("${}", right_binding_field_name));
