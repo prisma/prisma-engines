@@ -49,7 +49,7 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
                 let step = AlterEnum {
                     index: enum_differ.enums.as_ref().map(|e| e.enum_index()),
                     created_variants: enum_differ.created_values().map(String::from).collect(),
-                    dropped_variants: enum_differ.dropped_values().map(String::from).collect(),
+                    dropped_variants,
                     previous_usages_as_default,
                 };
 

@@ -209,8 +209,18 @@ async fn enums_used_in_default_can_be_changed(api: &TestApi) -> TestResult {
             id Int @id
             mood CatMood
         }
+        
+        model GoodDog {
+            id Int @id
+            mood DogMood @default(HAPPY)
+        }
 
         enum CatMood {
+            HAPPY
+            HUNGRY
+        }
+        
+        enum DogMood {
             HAPPY
             HUNGRY
         }
@@ -218,7 +228,7 @@ async fn enums_used_in_default_can_be_changed(api: &TestApi) -> TestResult {
 
     api.schema_push(dm1).send().await?.assert_green()?;
 
-    api.assert_schema().await?.assert_tables_count(4)?;
+    api.assert_schema().await?.assert_tables_count(5)?;
 
     let dm2 = r#"
         model Panther {
@@ -241,9 +251,20 @@ async fn enums_used_in_default_can_be_changed(api: &TestApi) -> TestResult {
             mood CatMood @default(HAPPY)
         }
         
+        model GoodDog {
+            id Int @id
+            mood DogMood @default(HAPPY)
+        }
+
         enum CatMood {
             HAPPY
             ANGRY
+        }
+        
+        enum DogMood {
+            HAPPY
+            HUNGRY
+            SLEEPY
         }
     "#;
 
