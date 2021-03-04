@@ -12,7 +12,11 @@ pub(crate) fn order_by_object_type(
         vec![ordering::ASC.to_owned(), ordering::DESC.to_owned()],
     ));
 
-    let ident = Identifier::new(format!("{}OrderByInput", model.name), PRISMA_NAMESPACE);
+    let with_relation_ident = if include_relations { "WithRelation" } else { "" };
+    let ident = Identifier::new(
+        format!("{}OrderBy{}Input", model.name, with_relation_ident),
+        PRISMA_NAMESPACE,
+    );
     return_cached_input!(ctx, &ident);
 
     let mut input_object = init_input_object_type(ident.clone());
