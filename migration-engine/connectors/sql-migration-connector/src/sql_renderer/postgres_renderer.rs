@@ -165,7 +165,7 @@ impl SqlRenderer for PostgresFlavour {
                 let column_name = column.name();
                 let default_str = column
                     .default()
-                    .map(|default| self.render_default(default, column.column_type_family()))
+                    .map(|default| render_default(default))
                     .filter(|default| !default.is_empty())
                     .map(|default| format!(" DEFAULT {}", default))
                     .expect("We should only be setting a changed default if there was one on the previous schema.");
