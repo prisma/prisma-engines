@@ -334,11 +334,14 @@ fn strip_schema_param_from_url(url: &mut Url) {
 /// Try to connect as an admin to a postgres database. We try to pick a default database from which
 /// we can create another database.
 async fn create_postgres_admin_conn(mut url: Url) -> ConnectorResult<Connection> {
-    let candidate_default_databases = &["postgres", "template1"];
+    // "postgres" is the default database on most postgres installations,
+    // "template1" is guaranteed to exist, and "defaultdb" is the only working
+    // option on DigitalOcean managed postgres databases.
+    const CANDIDATE_DEFAULT_DATABASES: &[&str] = &["postgres", "template1", "defaultdb"];
 
     let mut conn = None;
 
-    for database_name in candidate_default_databases {
+    for database_name in CANDIDATE_DEFAULT_DATABASES {
         url.set_path(&format!("/{}", database_name));
         match connect(url.as_str()).await {
             // If the database does not exist, try the next one.
