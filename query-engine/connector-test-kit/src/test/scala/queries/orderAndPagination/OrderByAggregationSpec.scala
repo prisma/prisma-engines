@@ -338,9 +338,6 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     )
   }
 
-
-
-
   private def createTestData(): Unit = {
     server.query("""mutation { createOneUser(data: { name: "Alice", posts: { create: { title: "alice_post_1", categories: { create: [{ name: "News" }, { name: "Society" }] }} } }){ id }}""".stripMargin, project, legacy = false)
     server.query("""mutation { createOneUser(data: { name: "Bob", posts: { create: [{ title: "bob_post_1", categories: { create: [{ name: "Finance" }] } }, { title: "bob_post_2", categories: { create: [{ name: "History" }] } }] } }){ id }}""".stripMargin, project, legacy = false)
