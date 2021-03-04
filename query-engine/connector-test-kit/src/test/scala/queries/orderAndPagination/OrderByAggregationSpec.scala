@@ -184,12 +184,7 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     )
   }
 
-
-
-
-
-
-
+  // With pagination tests
 
   "[With Pagination] Ordering by one2m count asc" should "work" in {
     val result = server.query(
