@@ -21,25 +21,27 @@ pub(crate) fn order_by_object_type(
     let input_object = Arc::new(input_object);
     ctx.cache_input_type(ident, input_object.clone());
 
-    // TODO: check if seen relations is needed
     let fields = model
         .fields()
         .all
         .iter()
-        .map(|field| match field {
-            ModelField::Relation(rf) if rf.is_list => {
+        .filter_map(|field| match field {
+            ModelField::Relation(rf) if rf.is_list && include_relations => {
                 let related_model = rf.related_model();
                 let related_object_type = order_by_object_type_aggregate(ctx, &related_model, &enum_type);
 
-                input_field(rf.name.clone(), InputType::object(related_object_type), None).optional()
+                Some(input_field(rf.name.clone(), InputType::object(related_object_type), None).optional())
             }
-            ModelField::Relation(rf) => {
+            ModelField::Relation(rf) if include_relations => {
                 let related_model = rf.related_model();
                 let related_object_type = order_by_object_type(ctx, &related_model, include_relations);
 
-                input_field(rf.name.clone(), InputType::object(related_object_type), None).optional()
+                Some(input_field(rf.name.clone(), InputType::object(related_object_type), None).optional())
             }
-            ModelField::Scalar(sf) => input_field(sf.name.clone(), InputType::Enum(enum_type.clone()), None).optional(),
+            ModelField::Scalar(sf) => {
+                Some(input_field(sf.name.clone(), InputType::Enum(enum_type.clone()), None).optional())
+            }
+            _ => None,
         })
         .collect();
 
