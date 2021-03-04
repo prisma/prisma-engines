@@ -163,7 +163,7 @@ impl DatasourceProvider for MongoDbDatasourceProvider {
         Box::new(MongoDbDatamodelConnector::new())
     }
 
-    fn validate_shadow_database_url(&self, name: &str, url: &StringFromEnvVar) -> Result<(), String> {
+    fn validate_shadow_database_url(&self, _name: &str, _url: &StringFromEnvVar) -> Result<(), String> {
         Ok(())
     }
 }
