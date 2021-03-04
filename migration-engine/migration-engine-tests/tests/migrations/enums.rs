@@ -287,9 +287,8 @@ async fn enums_used_in_default_can_be_changed(api: &TestApi) -> TestResult {
             )?;
     };
 
-    api.assert_schema().await?.assert_tables_count(4)?;
+    api.assert_schema().await?.assert_tables_count(5)?;
 
     Ok(())
 }
 //mysql enum behavious is weird / missing schema validation
-//test that postgres only does the drop / set dance for removed values not for added ones
