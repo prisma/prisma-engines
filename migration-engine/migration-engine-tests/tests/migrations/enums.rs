@@ -274,7 +274,7 @@ async fn enums_used_in_default_can_be_changed(api: &TestApi) -> TestResult {
             .send()
             .await?
             .assert_executable()?
-            .assert_warnings(&        ["The migration will remove the values [HUNGRY] on the enum `CatMood`. If these variants are still used in the database, the migration will fail.".into()]
+            .assert_warnings(&["The migration will remove the values [HUNGRY] on the enum `CatMood`. If these variants are still used in the database, the migration will fail.".into()]
             )?;
     } else {
         api.schema_push(dm2)
@@ -282,7 +282,7 @@ async fn enums_used_in_default_can_be_changed(api: &TestApi) -> TestResult {
             .send()
             .await?
             .assert_executable()?
-            .assert_warnings(& [ "The migration will remove the values [HUNGRY] on the enum `Panther_mood`. If these variants are still used in the database, the migration will fail.".into(),
+            .assert_warnings(& ["The migration will remove the values [HUNGRY] on the enum `Panther_mood`. If these variants are still used in the database, the migration will fail.".into(),
                 "The migration will remove the values [HUNGRY] on the enum `Tiger_mood`. If these variants are still used in the database, the migration will fail.".into(),]
             )?;
     };
@@ -291,4 +291,3 @@ async fn enums_used_in_default_can_be_changed(api: &TestApi) -> TestResult {
 
     Ok(())
 }
-//mysql enum behavious is weird / missing schema validation

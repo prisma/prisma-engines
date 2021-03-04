@@ -29,17 +29,14 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
                     differ
                         .table_pairs()
                         .flat_map(move |table| {
-                            table.previous().columns().filter_map(move |c| {
-                                if let Some(name) = c.column().tpe.family.as_enum() {
-                                    if name == *names.previous() && c.column().default.is_some() {
-                                        Some((table.previous().table_index(), c.column_index()))
-                                    } else {
-                                        None
-                                    }
-                                } else {
-                                    None
-                                }
-                            })
+                            table
+                                .previous()
+                                .columns()
+                                .filter(move |c| {
+                                    c.column().default.is_some()
+                                        && matches!(c.column().tpe.family.as_enum(), Some(name) if name == *names.previous())
+                                })
+                                .map(move |c| (table.previous().table_index(), c.column_index()))
                         })
                         .collect()
                 } else {
