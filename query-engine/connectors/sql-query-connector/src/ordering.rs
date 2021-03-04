@@ -205,7 +205,7 @@ fn compute_aggr_join_m2m(order_by: &OrderBy, rf: &RelationFieldRef, join_prefix:
     let b_ids = rf.related_model().primary_identifier();
 
     // + SELECT A.id FROM _AtoB
-    let query = Select::from_table(relation_table).columns(a_ids.clone().as_columns());
+    let query = Select::from_table(relation_table).columns(a_ids.as_columns());
 
     let aggr_expr = match order_by
         .sort_aggregation
@@ -219,7 +219,6 @@ fn compute_aggr_join_m2m(order_by: &OrderBy, rf: &RelationFieldRef, join_prefix:
     let query = query.value(aggr_expr.alias(ORDER_AGGR_FIELD_NAME.to_owned()));
 
     let conditions_a: Vec<_> = a_ids
-        .clone()
         .as_columns()
         .map(|c| c.equals(rf.related_field().m2m_columns()))
         .collect();
@@ -236,11 +235,11 @@ fn compute_aggr_join_m2m(order_by: &OrderBy, rf: &RelationFieldRef, join_prefix:
     // INNER JOIN A ON A.id = _AtoB.A
     // INNER JOIN B ON B.id = _AtoB.B
     // + GROUP BY A.id
-    let query = a_ids.clone().as_columns().fold(query, |acc, f| acc.group_by(f.clone()));
+    let query = a_ids.as_columns().fold(query, |acc, f| acc.group_by(f.clone()));
 
     let (left_fields, right_fields) = (
-        a_ids.clone().scalar_fields().collect::<Vec<_>>(),
-        b_ids.clone().scalar_fields().collect::<Vec<_>>(),
+        a_ids.scalar_fields().collect::<Vec<_>>(),
+        b_ids.scalar_fields().collect::<Vec<_>>(),
     );
     let pairs = left_fields.into_iter().zip(right_fields.into_iter());
     let on_conditions = pairs
