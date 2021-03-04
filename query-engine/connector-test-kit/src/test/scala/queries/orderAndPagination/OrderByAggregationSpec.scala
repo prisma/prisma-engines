@@ -18,6 +18,13 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
       |  title  String
       |  user   User   @relation(fields: [userId], references: [id])
       |  userId Int
+      |  categories Category[]
+      |}
+      |
+      |model Category {
+      |  id     Int    @id @default(autoincrement())
+      |  name   String
+      |  posts  Post[]
       |}
       """.stripMargin
   }
@@ -28,7 +35,7 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     createTestData()
   }
 
-  "Ordering by m2m count asc" should "work" in {
+  "Ordering by one2m count asc" should "work" in {
     val result = server.query(
       """
         |{
@@ -49,7 +56,29 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     )
   }
 
-  "Ordering by m2m count desc" should "work" in {
+  "[Multiple] Ordering by one2m count asc + simple order asc" should "work" in {
+    val result = server.query(
+      """
+        |{
+        |  findManyUser(orderBy: [{ posts: { count: asc } }, { name: asc }]) {
+        |    id
+        |    name
+        |    posts {
+        |      title
+        |    }
+        |  }
+        |}
+      """,
+      project,
+      legacy = false,
+    )
+
+    result.toString should be(
+      """{"data":{"findManyUser":[{"id":1,"name":"Alice","posts":[{"title":"alice_post_1"}]},{"id":2,"name":"Bob","posts":[{"title":"bob_post_1"},{"title":"bob_post_2"}]}]}}"""
+    )
+  }
+
+  "Ordering by one2m count desc" should "work" in {
     val result = server.query(
       """
         |{
@@ -70,8 +99,93 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     )
   }
 
+  "[Multiple] Ordering by one2m count asc + simple order desc" should "work" in {
+    val result = server.query(
+      """
+        |{
+        |  findManyUser(orderBy: [{ name: desc }, { posts: { count: asc } }]) {
+        |    id
+        |    name
+        |    posts {
+        |      title
+        |    }
+        |  }
+        |}
+      """,
+      project,
+      legacy = false,
+    )
+
+    result.toString should be(
+      """{"data":{"findManyUser":[{"id":1,"name":"Alice","posts":[{"title":"alice_post_1"}]},{"id":2,"name":"Bob","posts":[{"title":"bob_post_1"},{"title":"bob_post_2"}]}]}}"""
+    )
+  }
+
+  "Ordering by m2m count asc" should "work" in {
+    val result = server.query(
+      """
+        |{
+        |  findManyPost(orderBy: { categories: { count: asc } }) {
+        |    title
+        |    categories {
+        |      name
+        |    }
+        |  }
+        |}
+      """,
+      project,
+      legacy = false,
+    )
+
+    result.toString should be(
+      """{"data":{"findManyPost":[{"title":"bob_post_1","categories":[{"name":"Finance"}]},{"title":"bob_post_2","categories":[{"name":"History"}]},{"title":"alice_post_1","categories":[{"name":"News"},{"name":"Society"}]}]}}"""
+    )
+  }
+
+  "Ordering by m2m count desc" should "work" in {
+    val result = server.query(
+      """
+        |{
+        |  findManyPost(orderBy: { categories: { count: desc } }) {
+        |    title
+        |    categories {
+        |      name
+        |    }
+        |  }
+        |}
+      """,
+      project,
+      legacy = false,
+    )
+
+    result.toString should be(
+      """{"data":{"findManyPost":[{"title":"alice_post_1","categories":[{"name":"News"},{"name":"Society"}]},{"title":"bob_post_1","categories":[{"name":"Finance"}]},{"title":"bob_post_2","categories":[{"name":"History"}]}]}}"""
+    )
+  }
+
+  "[Multiple] Ordering by m2m count asc + simple order desc" should "work" in {
+    val result = server.query(
+      """
+        |{
+        |  findManyPost(orderBy: [{ categories: { count: asc } }, { title: asc }]) {
+        |    title
+        |    categories {
+        |      name
+        |    }
+        |  }
+        |}
+      """,
+      project,
+      legacy = false,
+    )
+
+    result.toString should be(
+      """{"data":{"findManyPost":[{"title":"bob_post_1","categories":[{"name":"Finance"}]},{"title":"bob_post_2","categories":[{"name":"History"}]},{"title":"alice_post_1","categories":[{"name":"News"},{"name":"Society"}]}]}}"""
+    )
+  }
+
   private def createTestData(): Unit = {
-    server.query("""mutation {createOneUser(data: { name: "Alice", posts: { create:  { title: "alice_post_1" } } }){ id }}""".stripMargin, project, legacy = false)
-    server.query("""mutation {createOneUser(data: { name: "Bob",   posts: { create: [{ title: "bob_post_1" }, { title: "bob_post_2" }] } }){ id }}""".stripMargin, project, legacy = false)
+    server.query("""mutation { createOneUser(data: { name: "Alice", posts: { create: { title: "alice_post_1", categories: { create: [{ name: "News" }, { name: "Society" }] }} } }){ id }}""".stripMargin, project, legacy = false)
+    server.query("""mutation { createOneUser(data: { name: "Bob", posts: { create: [{ title: "bob_post_1", categories: { create: [{ name: "Finance" }] } }, { title: "bob_post_2", categories: { create: [{ name: "History" }] } }] } }){ id }}""".stripMargin, project, legacy = false)
   }
 }
