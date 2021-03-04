@@ -121,7 +121,11 @@ impl<'a> SchemaPushAssertion<'a> {
     }
 
     pub fn assert_executable(self) -> AssertionResult<Self> {
-        assert!(self.result.unexecutable.is_empty());
+        assert!(
+            self.result.unexecutable.is_empty(),
+            "Expected an executable migration, got following: {:?}",
+            self.result.unexecutable
+        );
 
         Ok(self)
     }

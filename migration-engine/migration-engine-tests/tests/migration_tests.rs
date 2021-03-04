@@ -1579,18 +1579,15 @@ async fn created_at_does_not_get_arbitrarily_migrated(api: &TestApi) -> TestResu
     let insert = Insert::single_into(api.render_table_name("Fruit")).value("name", "banana");
     api.database().query(insert.into()).await.unwrap();
 
-    anyhow::ensure!(
-        matches!(
-            schema
-                .table_bang("Fruit")
-                .column_bang("createdAt")
-                .default
-                .as_ref()
-                .map(|d| d.kind()),
-            Some(DefaultKind::NOW)
-        ),
-        "createdAt default is set"
-    );
+    assert!(matches!(
+        schema
+            .table_bang("Fruit")
+            .column_bang("createdAt")
+            .default
+            .as_ref()
+            .map(|d| d.kind()),
+        Some(DefaultKind::NOW)
+    ),);
 
     let dm2 = r#"
         model Fruit {
@@ -2416,7 +2413,7 @@ async fn reordering_and_altering_models_at_the_same_time_works(api: &TestApi) ->
         model B {
             c C @relation(name: "btoc2", fields: [name], references: [name])
             name Int @unique
-            id Int @id           
+            id Int @id
         }
     "#;
 
