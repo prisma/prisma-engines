@@ -4,7 +4,7 @@ use prisma_models::*;
 use quaint::ast::*;
 
 static ORDER_JOIN_PREFIX: &str = "orderby_";
-static ORDER_AGGR_FIELD_NAME: &str = "<ORDER_AGGR_FIELD_NAME>";
+static ORDER_AGGR_FIELD_NAME: &str = "orderby_aggregator";
 
 #[derive(Debug, Clone)]
 pub struct OrderingJoin {
@@ -59,14 +59,15 @@ pub fn compute_joins(
     let join_prefix = format!("{}{}", ORDER_JOIN_PREFIX, order_by_index);
     let mut joins = vec![];
     let mut order_by_column_alias: Option<String> = None;
+    let last_path = order_by.path.last();
 
-    if order_by.sort_aggregation.is_some() {
-        let (aggr_column_alias, ordering_join) = compute_aggr_join(order_by, join_prefix.as_str());
+    for rf in order_by.path.iter() {
+        if order_by.sort_aggregation.is_some() && Some(rf) == last_path {
+            let (aggr_alias, ordering_join) = compute_aggr_join(order_by, rf, join_prefix.as_str(), joins.last());
 
-        order_by_column_alias = Some(aggr_column_alias);
-        joins.push(ordering_join);
-    } else {
-        for rf in order_by.path.iter() {
+            order_by_column_alias = Some(aggr_alias);
+            joins.push(ordering_join);
+        } else {
             let ordering_join = compute_join(base_model, rf, join_prefix.as_str());
 
             joins.push(ordering_join);
@@ -136,20 +137,27 @@ fn compute_join(base_model: &ModelRef, rf: &RelationFieldRef, join_prefix: &str)
     }
 }
 
-fn compute_aggr_join(order_by: &OrderBy, join_prefix: &str) -> (String, OrderingJoin) {
-    let rf = order_by
-        .path
-        .last()
-        .expect("An order by relation aggregate should be guaranteed to have exactly one path");
+fn compute_aggr_join(
+    order_by: &OrderBy,
+    rf: &RelationFieldRef,
+    join_alias: &str,
+    previous_join: Option<&OrderingJoin>,
+) -> (String, OrderingJoin) {
+    let join_alias = format!("{}_{}", join_alias, &rf.related_model().name);
 
     if rf.relation().is_many_to_many() {
-        compute_aggr_join_m2m(order_by, rf, join_prefix)
+        compute_aggr_join_m2m(order_by, rf, join_alias.as_str(), previous_join)
     } else {
-        compute_aggr_join_one2m(order_by, rf, join_prefix)
+        compute_aggr_join_one2m(order_by, rf, join_alias.as_str(), previous_join)
     }
 }
 
-fn compute_aggr_join_one2m(order_by: &OrderBy, rf: &RelationFieldRef, join_prefix: &str) -> (String, OrderingJoin) {
+fn compute_aggr_join_one2m(
+    order_by: &OrderBy,
+    rf: &RelationFieldRef,
+    join_alias: &str,
+    previous_join: Option<&OrderingJoin>,
+) -> (String, OrderingJoin) {
     let (left_fields, right_fields) = if rf.is_inlined_on_enclosing_model() {
         (rf.scalar_fields(), rf.referenced_fields())
     } else {
@@ -181,8 +189,11 @@ fn compute_aggr_join_one2m(order_by: &OrderBy, rf: &RelationFieldRef, join_prefi
     let pairs = left_fields.into_iter().zip(right_fields.into_iter());
     let on_conditions = pairs
         .map(|(a, b)| {
-            let col_a = a.as_column();
-            let col_b = Column::from((join_prefix.to_owned(), b.db_name().to_owned()));
+            let col_a = match previous_join {
+                Some(prev_join) => Column::from((prev_join.alias.to_owned(), a.db_name().to_owned())),
+                None => a.as_column(),
+            };
+            let col_b = Column::from((join_alias.to_owned(), b.db_name().to_owned()));
 
             col_a.equals(col_b)
         })
@@ -191,21 +202,26 @@ fn compute_aggr_join_one2m(order_by: &OrderBy, rf: &RelationFieldRef, join_prefi
     // + LEFT JOIN (
     //     SELECT A.<fk>, COUNT(*) AS <ORDER_AGGR_FIELD_NAME> FROM A
     //     GROUP BY A.<fk>
-    // + ) AS <ORDER_JOIN_PREFIX> ON (A.<fk> = <ORDER_JOIN_PREFIX>.<fk>)
+    // + ) AS <ORDER_JOIN_PREFIX> ON (<A | previous_join_alias>.<fk> = <ORDER_JOIN_PREFIX>.<fk>)
     let join = Table::from(query)
-        .alias(join_prefix.to_owned())
+        .alias(join_alias.to_owned())
         .on(ConditionTree::single(on_conditions));
 
     (
         ORDER_AGGR_FIELD_NAME.to_owned(),
         OrderingJoin {
             data: join,
-            alias: join_prefix.to_owned(),
+            alias: join_alias.to_owned(),
         },
     )
 }
 
-fn compute_aggr_join_m2m(order_by: &OrderBy, rf: &RelationFieldRef, join_prefix: &str) -> (String, OrderingJoin) {
+fn compute_aggr_join_m2m(
+    order_by: &OrderBy,
+    rf: &RelationFieldRef,
+    join_alias: &str,
+    previous_join: Option<&OrderingJoin>,
+) -> (String, OrderingJoin) {
     let relation_table = rf.as_table();
     let a_ids = rf.model().primary_identifier();
     let b_ids = rf.related_model().primary_identifier();
@@ -250,8 +266,11 @@ fn compute_aggr_join_m2m(order_by: &OrderBy, rf: &RelationFieldRef, join_prefix:
     let pairs = left_fields.into_iter().zip(right_fields.into_iter());
     let on_conditions = pairs
         .map(|(a, b)| {
-            let col_a = a.as_column();
-            let col_b = Column::from((join_prefix.to_owned(), b.db_name().to_owned()));
+            let col_a = match previous_join {
+                Some(prev_join) => Column::from((prev_join.alias.to_owned(), a.db_name().to_owned())),
+                None => a.as_column(),
+            };
+            let col_b = Column::from((join_alias.to_owned(), b.db_name().to_owned()));
 
             col_a.equals(col_b)
         })
@@ -262,15 +281,15 @@ fn compute_aggr_join_m2m(order_by: &OrderBy, rf: &RelationFieldRef, join_prefix:
     //       INNER JOIN A ON (A.id = _AtoB.A)
     //       INNER JOIN B ON (B.id = _AtoB.B)
     //     GROUP BY A.id
-    // + ) AS <ORDER_JOIN_PREFIX> ON (A.id = <ORDER_JOIN_PREFIX>.id)
+    // + ) AS <ORDER_JOIN_PREFIX> ON (<A | previous_join_alias >.id = <ORDER_JOIN_PREFIX>.id)
     let join = Table::from(query)
-        .alias(join_prefix.to_owned())
+        .alias(join_alias.to_owned())
         .on(ConditionTree::single(on_conditions));
 
     (
         ORDER_AGGR_FIELD_NAME.to_owned(),
         OrderingJoin {
-            alias: join_prefix.to_owned(),
+            alias: join_alias.to_owned(),
             data: join,
         },
     )
