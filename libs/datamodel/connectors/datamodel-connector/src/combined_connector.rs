@@ -45,6 +45,10 @@ impl Connector for CombinedConnector {
         Ok(())
     }
 
+    fn scalar_type_for_native_type(&self, _native_type: serde_json::Value) -> ScalarType {
+        unimplemented!("A combined connector must not be used for native types")
+    }
+
     fn native_type_is_default_for_scalar_type(
         &self,
         _native_type: serde_json::Value,

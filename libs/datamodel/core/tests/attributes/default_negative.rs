@@ -233,7 +233,7 @@ fn must_error_if_scalar_default_on_unsupported() {
 
     model Model {
         id      Int @id
-        balance Unsupported("money") @default(12)
+        balance Unsupported("some random stuff") @default(12)
     }
     "#;
 
@@ -242,7 +242,7 @@ fn must_error_if_scalar_default_on_unsupported() {
     errors.assert_is(DatamodelError::new_attribute_validation_error(
         "Expected a function value, but received numeric value \"12\".",
         "default",
-        Span::new(179, 181),
+        Span::new(191, 193),
     ));
 }
 

@@ -144,6 +144,48 @@ impl Connector for PostgresDatamodelConnector {
         &self.capabilities
     }
 
+    fn scalar_type_for_native_type(&self, native_type: serde_json::Value) -> ScalarType {
+        let native_type: PostgresType = serde_json::from_value(native_type).unwrap();
+
+        match native_type {
+            //String
+            Text => ScalarType::String,
+            Char(_) => ScalarType::String,
+            VarChar(_) => ScalarType::String,
+            Bit(_) => ScalarType::String,
+            VarBit(_) => ScalarType::String,
+            UUID => ScalarType::String,
+            Xml => ScalarType::String,
+            Inet => ScalarType::String,
+            Citext => ScalarType::String,
+            //Boolean
+            Boolean => ScalarType::Boolean,
+            //Int
+            SmallInt => ScalarType::Int,
+            Integer => ScalarType::Int,
+            Oid => ScalarType::Int,
+            //BigInt
+            BigInt => ScalarType::BigInt,
+            //Float
+            Real => ScalarType::Float,
+            DoublePrecision => ScalarType::Float,
+            //Decimal
+            Decimal(_) => ScalarType::Decimal,
+            Money => ScalarType::Float,
+            //DateTime
+            Timestamp(_) => ScalarType::DateTime,
+            Timestamptz(_) => ScalarType::DateTime,
+            Date => ScalarType::DateTime,
+            Time(_) => ScalarType::DateTime,
+            Timetz(_) => ScalarType::DateTime,
+            //Json
+            JSON => ScalarType::Json,
+            JSONB => ScalarType::Json,
+            //Bytes
+            ByteA => ScalarType::Bytes,
+        }
+    }
+
     fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> serde_json::Value {
         let native_type = SCALAR_TYPE_DEFAULTS
             .iter()
@@ -226,7 +268,7 @@ impl Connector for PostgresDatamodelConnector {
             XML_TYPE_NAME => Xml,
             JSON_TYPE_NAME => JSON,
             JSON_B_TYPE_NAME => JSONB,
-            _ => unreachable!("This code is unreachable as the core must guarantee to just call with known names."),
+            _ => return Err(ConnectorError::new_native_type_parser_error(name)),
         };
 
         Ok(NativeTypeInstance::new(name, cloned_args, &native_type))

@@ -1,7 +1,9 @@
 mod alter_table;
 
-use super::common::render_on_delete;
-use super::{common, IteratorJoin, Quoted, SqlRenderer};
+use super::{
+    common::{self, render_on_delete},
+    IteratorJoin, Quoted, SqlRenderer,
+};
 use crate::{
     flavour::MssqlFlavour,
     pair::Pair,
@@ -56,35 +58,13 @@ impl MssqlFlavour {
                     Cow::Owned(format!(
                         " CONSTRAINT {} DEFAULT {}",
                         self.quote(&constraint_name),
-                        self.render_default(default, &column.column_type_family())
+                        render_default(default)
                     ))
                 })
                 .unwrap_or_default()
         };
 
         format!("{} {}{}{}", column_name, r#type, nullability, default)
-    }
-
-    fn render_default<'a>(&self, default: &'a DefaultValue, family: &ColumnTypeFamily) -> Cow<'a, str> {
-        match (default.kind(), family) {
-            (DefaultKind::DBGENERATED(val), _) => val.as_str().into(),
-            (DefaultKind::VALUE(PrismaValue::String(val)), ColumnTypeFamily::String)
-            | (DefaultKind::VALUE(PrismaValue::Enum(val)), ColumnTypeFamily::Enum(_)) => {
-                format!("'{}'", escape_string_literal(&val)).into()
-            }
-            (DefaultKind::VALUE(PrismaValue::Bytes(b)), ColumnTypeFamily::Binary) => {
-                format!("0x{}", common::format_hex(b)).into()
-            }
-            (DefaultKind::NOW, ColumnTypeFamily::DateTime) => "CURRENT_TIMESTAMP".into(),
-            (DefaultKind::NOW, _) => unreachable!("NOW default on non-datetime column"),
-            (DefaultKind::VALUE(val), ColumnTypeFamily::DateTime) => format!("'{}'", val).into(),
-            (DefaultKind::VALUE(PrismaValue::String(val)), ColumnTypeFamily::Json) => format!("'{}'", val).into(),
-            (DefaultKind::VALUE(PrismaValue::Boolean(val)), ColumnTypeFamily::Boolean) => {
-                Cow::from(if *val { "1" } else { "0" })
-            }
-            (DefaultKind::VALUE(val), _) => val.to_string().into(),
-            (DefaultKind::SEQUENCE(_), _) => "".into(),
-        }
     }
 
     fn render_references(&self, foreign_key: &ForeignKeyWalker<'_>) -> String {
@@ -469,4 +449,19 @@ fn render_column_type(column: &ColumnWalker<'_>) -> Cow<'static, str> {
 
 fn escape_string_literal(s: &str) -> String {
     s.replace('\'', r#"''"#)
+}
+
+fn render_default(default: &DefaultValue) -> Cow<'_, str> {
+    match default.kind() {
+        DefaultKind::DBGENERATED(val) => val.as_str().into(),
+        DefaultKind::VALUE(PrismaValue::String(val)) | DefaultKind::VALUE(PrismaValue::Enum(val)) => {
+            Quoted::mssql_string(escape_string_literal(&val)).to_string().into()
+        }
+        DefaultKind::VALUE(PrismaValue::Bytes(b)) => format!("0x{}", common::format_hex(b)).into(),
+        DefaultKind::NOW => "CURRENT_TIMESTAMP".into(),
+        DefaultKind::VALUE(PrismaValue::DateTime(val)) => Quoted::mssql_string(val).to_string().into(),
+        DefaultKind::VALUE(PrismaValue::Boolean(val)) => Cow::from(if *val { "1" } else { "0" }),
+        DefaultKind::VALUE(val) => val.to_string().into(),
+        DefaultKind::SEQUENCE(_) => "".into(),
+    }
 }

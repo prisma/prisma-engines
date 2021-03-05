@@ -3,6 +3,7 @@ use super::{check::Check, database_inspection_results::DatabaseInspectionResults
 #[derive(Debug)]
 pub(crate) enum UnexecutableStepCheck {
     AddedRequiredFieldToTable { table: String, column: String },
+    AddedRequiredFieldToTableWithPrismaLevelDefault { table: String, column: String },
     MadeOptionalFieldRequired { table: String, column: String },
     MadeScalarFieldIntoArrayField { table: String, column: String },
     DropAndRecreateRequiredColumn { table: String, column: String },
@@ -11,7 +12,8 @@ pub(crate) enum UnexecutableStepCheck {
 impl Check for UnexecutableStepCheck {
     fn needed_table_row_count(&self) -> Option<&str> {
         match self {
-            UnexecutableStepCheck::MadeOptionalFieldRequired { table, column: _ }
+            UnexecutableStepCheck::AddedRequiredFieldToTableWithPrismaLevelDefault { table, column: _ }
+            | UnexecutableStepCheck::MadeOptionalFieldRequired { table, column: _ }
             | UnexecutableStepCheck::MadeScalarFieldIntoArrayField { table, column: _ }
             | UnexecutableStepCheck::AddedRequiredFieldToTable { table, column: _ }
             | UnexecutableStepCheck::DropAndRecreateRequiredColumn { table, column: _ } => Some(table),
@@ -23,6 +25,7 @@ impl Check for UnexecutableStepCheck {
             UnexecutableStepCheck::MadeOptionalFieldRequired { table, column }
             | UnexecutableStepCheck::MadeScalarFieldIntoArrayField { table, column } => Some((table, column)),
             UnexecutableStepCheck::AddedRequiredFieldToTable { .. }
+            | UnexecutableStepCheck::AddedRequiredFieldToTableWithPrismaLevelDefault { .. }
             | UnexecutableStepCheck::DropAndRecreateRequiredColumn { .. } => None,
         }
     }
@@ -33,6 +36,27 @@ impl Check for UnexecutableStepCheck {
                 let message = |details| {
                     format!(
                         "Added the required column `{column}` to the `{table}` table without a default value. {details}",
+                        table = table,
+                        column = column,
+                        details = details,
+                    )
+                };
+
+                let message = match database_checks.get_row_count(table) {
+                    Some(0) => return None, // Adding a required column is possible if there is no data
+                    Some(row_count) => message(format_args!(
+                        "There are {row_count} rows in this table, it is not possible to execute this migration.",
+                        row_count = row_count
+                    )),
+                    None => message(format_args!("This is not possible if the table is not empty.")),
+                };
+
+                Some(message)
+            }
+            UnexecutableStepCheck::AddedRequiredFieldToTableWithPrismaLevelDefault { table, column } => {
+                let message = |details| {
+                    format!(
+                        "The required column `{column}` was added to the `{table}` table with a prisma-level default value. {details} Please add this column as optional, then populate it before making it required.",
                         table = table,
                         column = column,
                         details = details,

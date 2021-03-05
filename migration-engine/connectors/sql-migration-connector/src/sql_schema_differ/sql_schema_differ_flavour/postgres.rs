@@ -22,11 +22,32 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
     fn alter_enums(&self, differ: &SqlSchemaDiffer<'_>) -> Vec<AlterEnum> {
         differ
             .enum_pairs()
-            .filter_map(|differ| {
+            .filter_map(|enum_differ| {
+                let dropped_variants: Vec<String> = enum_differ.dropped_values().map(String::from).collect();
+                let names = enum_differ.enums.as_ref().map(|e| e.name());
+                let previous_usages_as_default: Vec<(usize, usize)> = if !dropped_variants.is_empty() {
+                    differ
+                        .table_pairs()
+                        .flat_map(move |table| {
+                            table
+                                .previous()
+                                .columns()
+                                .filter(move |c| {
+                                    c.column().default.is_some()
+                                        && matches!(c.column().tpe.family.as_enum(), Some(name) if name == *names.previous())
+                                })
+                                .map(move |c| (table.previous().table_index(), c.column_index()))
+                        })
+                        .collect()
+                } else {
+                    vec![]
+                };
+
                 let step = AlterEnum {
-                    index: differ.enums.as_ref().map(|e| e.enum_index()),
-                    created_variants: differ.created_values().map(String::from).collect(),
-                    dropped_variants: differ.dropped_values().map(String::from).collect(),
+                    index: enum_differ.enums.as_ref().map(|e| e.enum_index()),
+                    created_variants: enum_differ.created_values().map(String::from).collect(),
+                    dropped_variants,
+                    previous_usages_as_default,
                 };
 
                 if step.is_empty() {
@@ -67,15 +88,17 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
         let from_list_to_scalar = differ.previous.arity().is_list() && !differ.next.arity().is_list();
         let from_scalar_to_list = !differ.previous.arity().is_list() && differ.next.arity().is_list();
 
-        if let (Some(previous_enum), Some(next_enum)) = differ
+        // Handle the enum cases first.
+        match differ
             .as_pair()
-            .map(|column| column.column_type_family_as_enum())
+            .map(|col| col.column_type_family().as_enum())
             .as_tuple()
         {
-            if previous_enum.name == next_enum.name {
-                return None;
-            }
-        }
+            (Some(previous_enum), Some(next_enum)) if previous_enum == next_enum => return None,
+            (Some(_), Some(_)) => return Some(ColumnTypeChange::NotCastable),
+            (None, Some(_)) | (Some(_), None) => return Some(ColumnTypeChange::NotCastable),
+            (None, None) => (),
+        };
 
         let previous_type: Option<PostgresType> = differ.previous.column_native_type();
         let next_type: Option<PostgresType> = differ.next.column_native_type();

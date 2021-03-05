@@ -16,7 +16,7 @@ fn connector_names() -> Vec<(&'static str, BitFlags<Tags>)> {
         ("mssql_2017", (Tags::Mssql | Tags::Mssql2017)),
         ("mssql_2019", (Tags::Mssql | Tags::Mssql2019)),
         ("mysql_8", Tags::Mysql | Tags::Mysql8),
-        ("mysql", Tags::Mysql.into()),
+        ("mysql", Tags::Mysql | Tags::Mysql57),
         ("mysql_5_6", Tags::Mysql | Tags::Mysql56),
         ("postgres9", Tags::Postgres.into()),
         ("postgres", Tags::Postgres.into()),

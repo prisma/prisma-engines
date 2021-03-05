@@ -435,6 +435,18 @@ impl<'a> ColumnAssertion<'a> {
         Ok(self)
     }
 
+    pub fn assert_type_is_enum(self) -> AssertionResult<Self> {
+        let found = &self.0.tpe.family;
+
+        assert!(
+            matches!(found, sql_schema_describer::ColumnTypeFamily::Enum(_)),
+            "Assertion failed. Expected an enum column, got {:?}.",
+            found
+        );
+
+        Ok(self)
+    }
+
     pub fn assert_type_is_string(self) -> AssertionResult<Self> {
         let found = &self.0.tpe.family;
 

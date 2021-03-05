@@ -104,6 +104,12 @@ impl ConnectorError {
             raw: String::from(raw),
         })
     }
+
+    pub fn new_native_type_parser_error(native_type: &str) -> ConnectorError {
+        ConnectorError::from_kind(ErrorKind::InvalidNativeType {
+            native_type: String::from(native_type),
+        })
+    }
 }
 
 #[derive(Debug, Error, Clone)]
@@ -240,4 +246,7 @@ pub enum ErrorKind {
 
     #[error("Error validating field '{}': {}", field, message)]
     FieldValidationError { field: String, message: String },
+
+    #[error("Invalid Native type {}.", native_type)]
+    InvalidNativeType { native_type: String },
 }

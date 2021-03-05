@@ -173,6 +173,56 @@ impl Connector for MySqlDatamodelConnector {
         &self.capabilities
     }
 
+    fn scalar_type_for_native_type(&self, native_type: serde_json::Value) -> ScalarType {
+        let native_type: MySqlType = serde_json::from_value(native_type).unwrap();
+
+        match native_type {
+            //String
+            VarChar(_) => ScalarType::String,
+            Text => ScalarType::String,
+            Char(_) => ScalarType::String,
+            TinyText => ScalarType::String,
+            MediumText => ScalarType::String,
+            LongText => ScalarType::String,
+            //Boolean
+            Bit(1) => ScalarType::Bytes,
+            //Int
+            Int => ScalarType::Int,
+            SmallInt => ScalarType::Int,
+            MediumInt => ScalarType::Int,
+            Year => ScalarType::Int,
+            TinyInt => ScalarType::Int,
+            //BigInt
+            BigInt => ScalarType::BigInt,
+            //Float
+            Float => ScalarType::Float,
+            Double => ScalarType::Float,
+            //Decimal
+            Decimal(_) => ScalarType::Decimal,
+            //DateTime
+            DateTime(_) => ScalarType::DateTime,
+            Date => ScalarType::DateTime,
+            Time(_) => ScalarType::DateTime,
+            Timestamp(_) => ScalarType::DateTime,
+            //Json
+            Json => ScalarType::Json,
+            //Bytes
+            LongBlob => ScalarType::Bytes,
+            Binary(_) => ScalarType::Bytes,
+            VarBinary(_) => ScalarType::Bytes,
+            TinyBlob => ScalarType::Bytes,
+            Blob => ScalarType::Bytes,
+            MediumBlob => ScalarType::Bytes,
+            Bit(_) => ScalarType::Bytes,
+            //Missing from docs
+            UnsignedInt => ScalarType::Int,
+            UnsignedSmallInt => ScalarType::Int,
+            UnsignedTinyInt => ScalarType::Int,
+            UnsignedMediumInt => ScalarType::Int,
+            UnsignedBigInt => ScalarType::BigInt,
+        }
+    }
+
     fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> serde_json::Value {
         let native_type = SCALAR_TYPE_DEFAULTS
             .iter()
@@ -305,10 +355,7 @@ impl Connector for MySqlDatamodelConnector {
             TIMESTAMP_TYPE_NAME => Timestamp(parse_one_opt_u32(args, TIMESTAMP_TYPE_NAME)?),
             YEAR_TYPE_NAME => Year,
             JSON_TYPE_NAME => Json,
-            x => unreachable!(format!(
-                "This code is unreachable as the core must guarantee to just call with known names. {}",
-                x
-            )),
+            _ => return Err(ConnectorError::new_native_type_parser_error(name)),
         };
 
         Ok(NativeTypeInstance::new(name, cloned_args, &native_type))

@@ -101,11 +101,6 @@ fn should_fail_on_native_type_decimal_when_scale_is_bigger_than_precision() {
             url      = "sqlserver://"
         }
 
-        generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["nativeTypes"]
-        }
-
         model Blog {
             id  Int     @id
             dec Decimal @db.Decimal(2,4)
@@ -117,7 +112,7 @@ fn should_fail_on_native_type_decimal_when_scale_is_bigger_than_precision() {
 
     error.assert_is(DatamodelError::new_connector_error(
         "The scale must not be larger than the precision for the Decimal(2,4) native type in SQL Server.",
-        ast::Span::new(203, 232),
+        ast::Span::new(113, 142),
     ));
 }
 
@@ -174,11 +169,6 @@ fn should_fail_on_incompatible_scalar_type_with_tiny_int() {
           url = "sqlserver://"
         }
 
-        generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["nativeTypes"]
-        }
-
         model Blog {
             id     Int    @id
             bigInt DateTime @db.Bit
@@ -189,7 +179,7 @@ fn should_fail_on_incompatible_scalar_type_with_tiny_int() {
 
     error.assert_is(DatamodelError::new_connector_error(
         "Native type Bit is not compatible with declared field type DateTime, expected field type Boolean or Int.",
-        ast::Span::new(302, 308),
+        ast::Span::new(180, 186),
     ));
 }
 
@@ -203,11 +193,6 @@ macro_rules! test_type {
                         datasource db {{
                             provider = "sqlserver"
                             url = "sqlserver://"
-                        }}
-
-                        generator js {{
-                            provider = "prisma-client-js"
-                            previewFeatures = ["nativeTypes"]
                         }}
 
                         model Blog {{

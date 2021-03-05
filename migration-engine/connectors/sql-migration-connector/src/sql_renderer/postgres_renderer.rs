@@ -20,7 +20,7 @@ impl PostgresFlavour {
         let nullability_str = render_nullability(&column);
         let default_str = column
             .default()
-            .map(|default| self.render_default(default, column.column_type_family()))
+            .map(|default| render_default(default))
             .filter(|default| !default.is_empty())
             .map(|default| format!(" DEFAULT {}", default))
             .unwrap_or_else(String::new);
@@ -29,25 +29,6 @@ impl PostgresFlavour {
             "{}{} {}{}{}",
             SQL_INDENTATION, column_name, tpe_str, nullability_str, default_str
         )
-    }
-
-    fn render_default<'a>(&self, default: &'a DefaultValue, family: &ColumnTypeFamily) -> Cow<'a, str> {
-        match (default.kind(), family) {
-            (DefaultKind::DBGENERATED(val), _) => val.as_str().into(),
-            (DefaultKind::VALUE(PrismaValue::String(val)), ColumnTypeFamily::String)
-            | (DefaultKind::VALUE(PrismaValue::Enum(val)), ColumnTypeFamily::Enum(_)) => {
-                format!("E'{}'", escape_string_literal(&val)).into()
-            }
-            (DefaultKind::VALUE(PrismaValue::Bytes(b)), ColumnTypeFamily::Binary) => {
-                format!("'{}'", format_hex(b)).into()
-            }
-            (DefaultKind::NOW, ColumnTypeFamily::DateTime) => "CURRENT_TIMESTAMP".into(),
-            (DefaultKind::NOW, _) => unreachable!("NOW default on non-datetime column"),
-            (DefaultKind::VALUE(val), ColumnTypeFamily::DateTime) => format!("'{}'", val).into(),
-            (DefaultKind::VALUE(PrismaValue::String(val)), ColumnTypeFamily::Json) => format!("'{}'", val).into(),
-            (DefaultKind::VALUE(val), _) => val.to_string().into(),
-            (DefaultKind::SEQUENCE(_), _) => "".into(),
-        }
     }
 }
 
@@ -134,22 +115,69 @@ impl SqlRenderer for PostgresFlavour {
             stmts.push(create_new_enum);
         }
 
+        // find all usages as a default and drop them
+        {
+            for (table_index, column_index) in &alter_enum.previous_usages_as_default {
+                let table_name = schemas.previous().table_walker_at(*table_index).name();
+                let column_name = schemas
+                    .previous()
+                    .table_walker_at(*table_index)
+                    .column_at(*column_index)
+                    .name();
+
+                let drop_default = format!(
+                    "ALTER TABLE {table_name} ALTER COLUMN {column_name} DROP DEFAULT",
+                    table_name = Quoted::postgres_ident(&table_name),
+                    column_name = Quoted::postgres_ident(&column_name),
+                );
+
+                stmts.push(drop_default);
+            }
+        }
+
         // alter type of the current columns to new, with a cast
         {
             let affected_columns = walk_columns(schemas.next()).filter(|column| matches!(&column.column_type().family, ColumnTypeFamily::Enum(name) if name.as_str() == enums.next().name()));
 
             for column in affected_columns {
                 let sql = format!(
-                    "ALTER TABLE {schema_name}.{table_name} \
+                    "ALTER TABLE {table_name} \
                             ALTER COLUMN {column_name} TYPE {tmp_name} \
                                 USING ({column_name}::text::{tmp_name})",
-                    schema_name = Quoted::postgres_ident(self.schema_name()),
                     table_name = Quoted::postgres_ident(column.table().name()),
                     column_name = Quoted::postgres_ident(column.name()),
                     tmp_name = Quoted::postgres_ident(&tmp_name),
                 );
 
                 stmts.push(sql);
+            }
+        }
+
+        // reestablish dropped defaults
+        {
+            for (table_index, column_index) in &alter_enum.previous_usages_as_default {
+                let table_name = schemas.previous().table_walker_at(*table_index).name();
+                let column = schemas
+                    .previous()
+                    .table_walker_at(*table_index)
+                    .column_at(*column_index);
+
+                let column_name = column.name();
+                let default_str = column
+                    .default()
+                    .map(|default| render_default(default))
+                    .filter(|default| !default.is_empty())
+                    .map(|default| format!(" DEFAULT {}", default))
+                    .expect("We should only be setting a changed default if there was one on the previous schema.");
+
+                let set_default = format!(
+                    "ALTER TABLE {table_name} ALTER COLUMN {column_name} SET {default}",
+                    table_name = Quoted::postgres_ident(&table_name),
+                    column_name = Quoted::postgres_ident(&column_name),
+                    default = default_str,
+                );
+
+                stmts.push(set_default);
             }
         }
 
@@ -469,7 +497,7 @@ fn render_alter_column(
             PostgresAlterColumn::SetDefault(new_default) => clauses.push(format!(
                 "{} SET DEFAULT {}",
                 &alter_column_prefix,
-                renderer.render_default(&new_default, columns.next().column_type_family())
+                render_default(&new_default)
             )),
             PostgresAlterColumn::DropNotNull => clauses.push(format!("{} DROP NOT NULL", &alter_column_prefix)),
             PostgresAlterColumn::SetNotNull => clauses.push(format!("{} SET NOT NULL", &alter_column_prefix)),
@@ -571,4 +599,18 @@ enum PostgresAlterColumn {
     SetNotNull,
     /// Add an auto-incrementing sequence as a default on the column.
     AddSequence,
+}
+
+fn render_default(default: &DefaultValue) -> Cow<'_, str> {
+    match default.kind() {
+        DefaultKind::DBGENERATED(val) => val.as_str().into(),
+        DefaultKind::VALUE(PrismaValue::String(val)) | DefaultKind::VALUE(PrismaValue::Enum(val)) => {
+            format!("E'{}'", escape_string_literal(&val)).into()
+        }
+        DefaultKind::VALUE(PrismaValue::Bytes(b)) => Quoted::postgres_string(format_hex(b)).to_string().into(),
+        DefaultKind::NOW => "CURRENT_TIMESTAMP".into(),
+        DefaultKind::VALUE(PrismaValue::DateTime(val)) => Quoted::postgres_string(val).to_string().into(),
+        DefaultKind::VALUE(val) => val.to_string().into(),
+        DefaultKind::SEQUENCE(_) => Default::default(),
+    }
 }

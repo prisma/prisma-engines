@@ -117,11 +117,6 @@ fn should_fail_on_native_type_with_invalid_datasource_name() {
           url = "postgresql://"
         }
 
-        generator client {
-          provider = "prisma-client-js"
-          previewFeatures = ["nativeTypes"]
-        }
-
         model Blog {
             id     Int    @id
             bigInt Int    @pg.Integer
@@ -132,7 +127,7 @@ fn should_fail_on_native_type_with_invalid_datasource_name() {
 
     error.assert_is(DatamodelError::new_connector_error(
         "The prefix pg is invalid. It must be equal to the name of an existing datasource e.g. db. Did you mean to use db.Integer?",
-        ast::Span::new(300, 310),
+        ast::Span::new(178, 188),
     ));
 }
 
@@ -142,11 +137,6 @@ fn should_fail_on_native_type_with_invalid_number_of_arguments() {
         datasource pg {
           provider = "postgres"
           url = "postgresql://"
-        }
-
-        generator client {
-          provider = "prisma-client-js"
-          previewFeatures = ["nativeTypes"]
         }
 
         model Blog {
@@ -160,7 +150,7 @@ fn should_fail_on_native_type_with_invalid_number_of_arguments() {
 
     error.assert_is(DatamodelError::new_connector_error(
         "Native type VarChar takes 1 optional arguments, but received 3.",
-        ast::Span::new(338, 357),
+        ast::Span::new(216, 235),
     ));
 }
 
@@ -170,11 +160,6 @@ fn should_fail_on_native_type_with_unknown_type() {
         datasource pg {
           provider = "postgres"
           url = "postgresql://"
-        }
-
-        generator client {
-          provider = "prisma-client-js"
-          previewFeatures = ["nativeTypes"]
         }
 
         model Blog {
@@ -188,7 +173,7 @@ fn should_fail_on_native_type_with_unknown_type() {
 
     error.assert_is(DatamodelError::new_connector_error(
         "Native type Numerical is not supported for postgresql connector.",
-        ast::Span::new(300, 318),
+        ast::Span::new(178, 196),
     ));
 }
 
@@ -198,11 +183,6 @@ fn should_fail_on_native_type_with_incompatible_type() {
         datasource pg {
           provider = "postgres"
           url = "postgresql://"
-        }
-
-        generator client {
-          provider = "prisma-client-js"
-          previewFeatures = ["nativeTypes"]
         }
 
         model Blog {
@@ -220,7 +200,7 @@ fn should_fail_on_native_type_with_incompatible_type() {
         0,
         DatamodelError::new_connector_error(
             "Native type VarChar is not compatible with declared field type Boolean, expected field type String.",
-            ast::Span::new(301, 314),
+            ast::Span::new(179, 192),
         ),
     );
 
@@ -228,7 +208,7 @@ fn should_fail_on_native_type_with_incompatible_type() {
         1,
         DatamodelError::new_connector_error(
             "Native type BigInt is not compatible with declared field type Int, expected field type BigInt.",
-            ast::Span::new(336, 345),
+            ast::Span::new(214, 223),
         ),
     );
 }
@@ -241,11 +221,6 @@ fn should_fail_on_native_type_with_invalid_arguments() {
           url = "postgresql://"
         }
 
-        generator client {
-          provider = "prisma-client-js"
-          previewFeatures = ["nativeTypes"]
-        }
-
         model Blog {
             id     Int    @id
             foobar String @pg.VarChar(a)
@@ -256,6 +231,96 @@ fn should_fail_on_native_type_with_invalid_arguments() {
 
     error.assert_is(DatamodelError::new_connector_error(
         "Expected a numeric value, but failed while parsing \"a\": invalid digit found in string.",
-        ast::Span::new(300, 313),
+        ast::Span::new(178, 191),
     ));
+}
+
+#[test]
+fn should_fail_on_native_type_in_unsupported_postgres() {
+    let dml = r#"
+        datasource pg {
+          provider = "postgres"
+          url = "postgresql://"
+        }
+
+        model Blog {
+            id              Int    @id
+            decimal         Unsupported("Decimal(10,2)") 
+            text            Unsupported("Text") 
+            unsupported     Unsupported("Some random stuff") 
+            unsupportes2    Unsupported("Some random (2,5) do something") 
+        }
+    "#;
+
+    let error = parse_error(dml);
+
+    error.assert_are(&[
+        DatamodelError::new_validation_error(
+        "The type `Unsupported(\"Decimal(10,2)\")` you specified in the type definition for the field `decimal` is supported as a native type by Prisma. Please use the native type notation `Decimal @pg.Decimal(10,2)` for full support.",
+        ast::Span::new(188, 216),
+    ),
+        DatamodelError::new_validation_error(
+            "The type `Unsupported(\"Text\")` you specified in the type definition for the field `text` is supported as a native type by Prisma. Please use the native type notation `String @pg.Text` for full support.",
+            ast::Span::new(246, 265),
+        )
+    ]);
+}
+
+#[test]
+fn should_fail_on_native_type_in_unsupported_mysql() {
+    let dml = r#"
+        datasource pg {
+          provider = "mysql"
+          url = "mysql://"
+        }
+
+        model Blog {
+            id          Int    @id
+            text        Unsupported("Text") 
+            decimal     Unsupported("Float") 
+        }
+    "#;
+
+    let error = parse_error(dml);
+
+    error.assert_are(&[
+        DatamodelError::new_validation_error(
+            "The type `Unsupported(\"Text\")` you specified in the type definition for the field `text` is supported as a native type by Prisma. Please use the native type notation `String @pg.Text` for full support.",
+            ast::Span::new(172, 191),
+        ),
+        DatamodelError::new_validation_error(
+            "The type `Unsupported(\"Float\")` you specified in the type definition for the field `decimal` is supported as a native type by Prisma. Please use the native type notation `Float @pg.Float` for full support.",
+            ast::Span::new(217, 237),
+        )
+    ]);
+}
+
+#[test]
+fn should_fail_on_native_type_in_unsupported_sqlserver() {
+    let dml = r#"
+        datasource pg {
+          provider = "sqlserver"
+          url = "sqlserver://"
+        }
+
+        model Blog {
+            id          Int    @id
+            text        Unsupported("Text") 
+            decimal     Unsupported("Real") 
+            TEXT        Unsupported("TEXT") 
+        }
+    "#;
+
+    let error = parse_error(dml);
+
+    error.assert_are(&[
+        DatamodelError::new_validation_error(
+            "The type `Unsupported(\"Text\")` you specified in the type definition for the field `text` is supported as a native type by Prisma. Please use the native type notation `String @pg.Text` for full support.",
+            ast::Span::new(180, 199),
+        ),
+        DatamodelError::new_validation_error(
+            "The type `Unsupported(\"Real\")` you specified in the type definition for the field `decimal` is supported as a native type by Prisma. Please use the native type notation `Float @pg.Real` for full support.",
+            ast::Span::new(225, 244),
+        )
+    ]);
 }

@@ -120,6 +120,49 @@ impl Connector for MsSqlDatamodelConnector {
         &self.capabilities
     }
 
+    fn scalar_type_for_native_type(&self, native_type: serde_json::Value) -> ScalarType {
+        let native_type: MsSqlType = serde_json::from_value(native_type).unwrap();
+
+        match native_type {
+            //String
+            Char(_) => ScalarType::String,
+            NChar(_) => ScalarType::String,
+            VarChar(_) => ScalarType::String,
+            NVarChar(_) => ScalarType::String,
+            Text => ScalarType::String,
+            NText => ScalarType::String,
+            Xml => ScalarType::String,
+            UniqueIdentifier => ScalarType::String,
+            //Boolean
+            //Int
+            TinyInt => ScalarType::Int,
+            SmallInt => ScalarType::Int,
+            Int => ScalarType::Int,
+            //BigInt
+            BigInt => ScalarType::Int,
+            //Float
+            Float(_) => ScalarType::Float,
+            SmallMoney => ScalarType::Float,
+            Money => ScalarType::Float,
+            Real => ScalarType::Float,
+            //Decimal
+            Decimal(_) => ScalarType::Decimal,
+            //DateTime
+            Date => ScalarType::DateTime,
+            Time => ScalarType::DateTime,
+            DateTime => ScalarType::DateTime,
+            DateTime2 => ScalarType::DateTime,
+            SmallDateTime => ScalarType::DateTime,
+            DateTimeOffset => ScalarType::DateTime,
+            //Json -> does not really exist
+            //Bytes
+            Binary(_) => ScalarType::Bytes,
+            VarBinary(_) => ScalarType::Bytes,
+            Image => ScalarType::Bytes,
+            Bit => ScalarType::Bytes,
+        }
+    }
+
     fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> serde_json::Value {
         let native_type = SCALAR_TYPE_DEFAULTS
             .iter()
@@ -255,7 +298,7 @@ impl Connector for MsSqlDatamodelConnector {
             IMAGE_TYPE_NAME => Image,
             XML_TYPE_NAME => Xml,
             UNIQUE_IDENTIFIER_TYPE_NAME => UniqueIdentifier,
-            _ => panic!(),
+            _ => return Err(ConnectorError::new_native_type_parser_error(name)),
         };
 
         Ok(NativeTypeInstance::new(name, cloned_args, &native_type))

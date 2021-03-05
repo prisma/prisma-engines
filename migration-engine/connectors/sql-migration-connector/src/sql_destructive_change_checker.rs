@@ -24,16 +24,14 @@ mod warning_check;
 pub(crate) use destructive_change_checker_flavour::DestructiveChangeCheckerFlavour;
 
 use crate::{
-    pair::Pair,
-    sql_migration::ColumnTypeChange,
-    sql_migration::{AlterEnum, AlterTable, CreateIndex, DropTable, SqlMigrationStep, TableChange},
+    sql_migration::{AlterEnum, AlterTable, ColumnTypeChange, CreateIndex, DropTable, SqlMigrationStep, TableChange},
     SqlMigration, SqlMigrationConnector,
 };
 use destructive_check_plan::DestructiveCheckPlan;
 use migration_connector::{ConnectorResult, DestructiveChangeChecker, DestructiveChangeDiagnostics};
 use sql_schema_describer::{
     walkers::{ColumnWalker, SqlSchemaExt},
-    ColumnArity, SqlSchema,
+    ColumnArity,
 };
 use unexecutable_step_check::UnexecutableStepCheck;
 use warning_check::SqlMigrationWarningCheck;
@@ -64,7 +62,13 @@ impl SqlMigrationConnector {
     /// - There are existing rows
     /// - The new column is required
     /// - There is no default value for the new column
-    fn check_add_column(&self, column: &ColumnWalker<'_>, plan: &mut DestructiveCheckPlan, step_index: usize) {
+    fn check_add_column(
+        &self,
+        column: &ColumnWalker<'_>,
+        plan: &mut DestructiveCheckPlan,
+        step_index: usize,
+        migration: &SqlMigration,
+    ) {
         let column_is_required_without_default = column.arity().is_required() && column.default().is_none();
 
         // Optional columns and columns with a default can safely be added.
@@ -72,15 +76,32 @@ impl SqlMigrationConnector {
             return;
         }
 
-        let typed_unexecutable = UnexecutableStepCheck::AddedRequiredFieldToTable {
-            column: column.name().to_owned(),
-            table: column.table().name().to_owned(),
+        let has_virtual_default =
+            migration
+                .added_columns_with_virtual_defaults
+                .iter()
+                .any(|(table_idx, column_idx)| {
+                    *table_idx == column.table().table_index() && *column_idx == column.column_index()
+                });
+
+        let typed_unexecutable = if has_virtual_default {
+            UnexecutableStepCheck::AddedRequiredFieldToTableWithPrismaLevelDefault {
+                table: column.table().name().to_owned(),
+                column: column.name().to_owned(),
+            }
+        } else {
+            UnexecutableStepCheck::AddedRequiredFieldToTable {
+                column: column.name().to_owned(),
+                table: column.table().name().to_owned(),
+            }
         };
 
         plan.push_unexecutable(typed_unexecutable, step_index);
     }
 
-    fn plan(&self, steps: &[SqlMigrationStep], schemas: &Pair<&SqlSchema>) -> DestructiveCheckPlan {
+    fn plan(&self, migration: &SqlMigration) -> DestructiveCheckPlan {
+        let steps = &migration.steps;
+        let schemas = migration.schemas();
         let mut plan = DestructiveCheckPlan::new();
 
         for (step_index, step) in steps.iter().enumerate() {
@@ -106,7 +127,7 @@ impl SqlMigrationConnector {
                             TableChange::AddColumn(ref add_column) => {
                                 let column = tables.next().column_at(add_column.column_index);
 
-                                self.check_add_column(&column, &mut plan, step_index)
+                                self.check_add_column(&column, &mut plan, step_index, migration)
                             }
                             TableChange::DropPrimaryKey { .. } => plan.push_warning(
                                 SqlMigrationWarningCheck::PrimaryKeyChange {
@@ -139,7 +160,7 @@ impl SqlMigrationConnector {
 
                         for added_column_idx in &redefine_table.added_columns {
                             let column = tables.next().column_at(*added_column_idx);
-                            self.check_add_column(&column, &mut plan, step_index);
+                            self.check_add_column(&column, &mut plan, step_index, migration);
                         }
 
                         for dropped_column_idx in &redefine_table.dropped_columns {
@@ -236,6 +257,7 @@ impl SqlMigrationConnector {
                     index,
                     created_variants: _,
                     dropped_variants,
+                    previous_usages_as_default: _,
                 }) if !dropped_variants.is_empty() => plan.push_warning(
                     SqlMigrationWarningCheck::EnumValueRemoval {
                         enm: schemas.next().enum_walker_at(*index.next()).name().to_owned(),
@@ -250,13 +272,9 @@ impl SqlMigrationConnector {
         plan
     }
 
-    #[tracing::instrument(skip(self, steps, schemas), target = "SqlDestructiveChangeChecker::check")]
-    async fn check_impl(
-        &self,
-        steps: &[SqlMigrationStep],
-        schemas: &Pair<&SqlSchema>,
-    ) -> ConnectorResult<DestructiveChangeDiagnostics> {
-        let plan = self.plan(steps, schemas);
+    #[tracing::instrument(skip(self, migration), target = "SqlDestructiveChangeChecker::check")]
+    async fn check_impl(&self, migration: &SqlMigration) -> ConnectorResult<DestructiveChangeDiagnostics> {
+        let plan = self.plan(migration);
 
         plan.execute(self.conn()).await
     }
@@ -265,13 +283,13 @@ impl SqlMigrationConnector {
 #[async_trait::async_trait]
 impl DestructiveChangeChecker<SqlMigration> for SqlMigrationConnector {
     async fn check(&self, database_migration: &SqlMigration) -> ConnectorResult<DestructiveChangeDiagnostics> {
-        let plan = self.plan(&database_migration.steps, &database_migration.schemas());
+        let plan = self.plan(&database_migration);
 
         plan.execute(self.conn()).await
     }
 
     fn pure_check(&self, database_migration: &SqlMigration) -> DestructiveChangeDiagnostics {
-        let plan = self.plan(&database_migration.steps, &database_migration.schemas());
+        let plan = self.plan(&database_migration);
 
         plan.pure_check()
     }

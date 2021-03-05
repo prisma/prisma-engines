@@ -11,7 +11,7 @@ use crate::{
 };
 use datamodel_connector::Connector;
 use sql_datamodel_connector::SqlDatamodelConnectors;
-use sql_schema_describer::{walkers::ColumnWalker, DefaultKind, DefaultValue};
+use sql_schema_describer::walkers::ColumnWalker;
 
 impl DestructiveChangeCheckerFlavour for MysqlFlavour {
     fn check_alter_column(
@@ -100,7 +100,7 @@ impl DestructiveChangeCheckerFlavour for MysqlFlavour {
         if changes.arity_changed()
             && columns.previous().arity().is_nullable()
             && columns.next().arity().is_required()
-            && !default_can_be_rendered(columns.next().default())
+            && columns.next().default().is_none()
         {
             plan.push_unexecutable(
                 UnexecutableStepCheck::AddedRequiredFieldToTable {
@@ -162,14 +162,4 @@ fn is_safe_enum_change(columns: &Pair<ColumnWalker<'_>>, plan: &mut DestructiveC
     }
 
     false
-}
-
-fn default_can_be_rendered(default: Option<&DefaultValue>) -> bool {
-    match default.as_ref().map(|d| d.kind()) {
-        None => false,
-        Some(DefaultKind::VALUE(_)) => true,
-        Some(DefaultKind::DBGENERATED(expr)) => !expr.is_empty(),
-        Some(DefaultKind::NOW) => true,
-        Some(DefaultKind::SEQUENCE(_)) => false,
-    }
 }

@@ -56,11 +56,6 @@ fn should_fail_on_native_type_decimal_when_scale_is_bigger_than_precision() {
           url      = "postgresql://"
         }
 
-        generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["nativeTypes"]
-        }
-
         model Blog {
             id     Int   @id
             dec Decimal @db.Decimal(2, 4)
@@ -71,7 +66,7 @@ fn should_fail_on_native_type_decimal_when_scale_is_bigger_than_precision() {
 
     error.assert_is(DatamodelError::new_connector_error(
         "The scale must not be larger than the precision for the Decimal(2,4) native type in Postgres.",
-        ast::Span::new(289, 319),
+        ast::Span::new(167, 197),
     ));
 }
 
@@ -80,11 +75,6 @@ fn xml_should_work_with_string_scalar_type() {
     let dml = format!(
         r#"
         {datasource}
-
-        generator js {{
-            provider = "prisma-client-js"
-            previewFeatures = ["nativeTypes"]
-        }}
 
         model Blog {{
             id  Int    @id
