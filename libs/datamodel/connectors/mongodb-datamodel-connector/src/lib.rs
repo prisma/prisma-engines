@@ -117,4 +117,9 @@ impl Connector for MongoDbDatamodelConnector {
         // Out of scope for MVP
         todo!()
     }
+
+    fn scalar_type_for_native_type(&self, _native_type: serde_json::Value) -> dml::scalars::ScalarType {
+        // Out of scope for MVP
+        todo!()
+    }
 }
