@@ -37,7 +37,7 @@ pub enum SortOrder {
 
 #[derive(Clone, Copy, PartialEq, Debug, Eq, Hash)]
 pub enum SortAggregation {
-    Count,
+    Count { _all: bool },
 }
 
 impl ToString for SortOrder {

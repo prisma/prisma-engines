@@ -77,7 +77,7 @@ pub fn compute_joins(
     // - If it's on the base model with no hops, it's for example `modelTable.field`.
     // - If it is with several hops, it's the alias used for the last join, e.g.
     //   `{join_alias}.field`
-    // - If it's with an order by aggregation, it's the alias used for the join + alias used for the aggregated column. eg:
+    // - If it's with an order by aggregation, it's the alias used for the join + alias used for the aggregator. eg:
     //   `{join_alias}.{aggr_column_alias}`
     let order_by_column = if let Some(join) = joins.last() {
         Column::from((
@@ -166,15 +166,15 @@ fn compute_aggr_join_one2m(order_by: &OrderBy, rf: &RelationFieldRef, join_prefi
         .sort_aggregation
         .expect("This function should be guaranteed to be passed a sort_aggregation")
     {
-        SortAggregation::Count => count(order_by.field.as_column()),
+        SortAggregation::Count { _all } => count(asterisk()),
     };
 
     // SELECT A.fk,
-    // + COUNT(A.<order_by.field>) AS <ORDER_AGGR_FIELD_NAME>
+    // + COUNT(*) AS <ORDER_AGGR_FIELD_NAME>
     // FROM A
     let query = query.value(aggr_expr.alias(ORDER_AGGR_FIELD_NAME.to_owned()));
 
-    // SELECT A.<fk>, COUNT(A.<order_by.field>) AS <ORDER_AGGR_FIELD_NAME> FROM A
+    // SELECT A.<fk>, COUNT(*) AS <ORDER_AGGR_FIELD_NAME> FROM A
     // + GROUP BY A.<fk>
     let query = right_fields.iter().fold(query, |acc, f| acc.group_by(f.as_column()));
 
@@ -189,7 +189,7 @@ fn compute_aggr_join_one2m(order_by: &OrderBy, rf: &RelationFieldRef, join_prefi
         .collect::<Vec<_>>();
 
     // + LEFT JOIN (
-    //     SELECT A.<fk>, COUNT(A.<order_by.field>) AS <ORDER_AGGR_FIELD_NAME> FROM A
+    //     SELECT A.<fk>, COUNT(*) AS <ORDER_AGGR_FIELD_NAME> FROM A
     //     GROUP BY A.<fk>
     // + ) AS <ORDER_JOIN_PREFIX> ON (A.<fk> = <ORDER_JOIN_PREFIX>.<fk>)
     let join = Table::from(query)
@@ -217,10 +217,10 @@ fn compute_aggr_join_m2m(order_by: &OrderBy, rf: &RelationFieldRef, join_prefix:
         .sort_aggregation
         .expect("This function should be guaranteed to be passed a sort_aggregation")
     {
-        SortAggregation::Count => count(order_by.field.as_column()),
+        SortAggregation::Count { _all } => count(asterisk()),
     };
     // SELECT A.id,
-    // + COUNT(B.<order_by.field>) AS <ORDER_AGGR_FIELD_NAME>
+    // + COUNT(*) AS <ORDER_AGGR_FIELD_NAME>
     // FROM _AtoB
     let query = query.value(aggr_expr.alias(ORDER_AGGR_FIELD_NAME.to_owned()));
 
@@ -230,14 +230,14 @@ fn compute_aggr_join_m2m(order_by: &OrderBy, rf: &RelationFieldRef, join_prefix:
         .collect();
     let conditions_b: Vec<_> = b_ids.as_columns().map(|c| c.equals(rf.m2m_columns())).collect();
 
-    // SELECT A.id, COUNT(B.<order_by.field>) AS <ORDER_AGGR_FIELD_NAME> FROM _AtoB
+    // SELECT A.id, COUNT(*) AS <ORDER_AGGR_FIELD_NAME> FROM _AtoB
     // + INNER JOIN A ON A.id = _AtoB.A
     // + INNER JOIN B ON B.id = _AtoB.B
     let query = query
         .inner_join(rf.model().as_table().on(ConditionTree::single(conditions_a)))
         .inner_join(rf.related_model().as_table().on(ConditionTree::single(conditions_b)));
 
-    // SELECT A.id, COUNT(B.<order_by.field>) AS <ORDER_AGGR_FIELD_NAME> FROM _AtoB
+    // SELECT A.id, COUNT(*) AS <ORDER_AGGR_FIELD_NAME> FROM _AtoB
     // INNER JOIN A ON A.id = _AtoB.A
     // INNER JOIN B ON B.id = _AtoB.B
     // + GROUP BY A.id
@@ -258,7 +258,7 @@ fn compute_aggr_join_m2m(order_by: &OrderBy, rf: &RelationFieldRef, join_prefix:
         .collect::<Vec<_>>();
 
     // + LEFT JOIN (
-    //     SELECT A.id, COUNT(B.<order_by.field>) AS <ORDER_AGGR_FIELD_NAME> FROM _AtoB
+    //     SELECT A.id, COUNT(*) AS <ORDER_AGGR_FIELD_NAME> FROM _AtoB
     //       INNER JOIN A ON (A.id = _AtoB.A)
     //       INNER JOIN B ON (B.id = _AtoB.B)
     //     GROUP BY A.id

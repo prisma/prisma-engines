@@ -63,11 +63,9 @@ fn order_by_object_type_aggregate(
     return_cached_input!(ctx, &ident);
 
     let mut input_object = init_input_object_type(ident.clone());
-
     input_object.require_exactly_one_field();
 
     let input_object = Arc::new(input_object);
-
     ctx.cache_input_type(ident, input_object.clone());
 
     let fields = vec![input_field(
@@ -75,7 +73,6 @@ fn order_by_object_type_aggregate(
         InputType::Enum(ordering_enum.clone()),
         None,
     )];
-
     input_object.set_fields(fields);
 
     Arc::downgrade(&input_object)
