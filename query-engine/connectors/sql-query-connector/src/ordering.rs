@@ -4,7 +4,7 @@ use prisma_models::*;
 use quaint::ast::*;
 
 static ORDER_JOIN_PREFIX: &str = "orderby_";
-static ORDER_AGGR_FIELD_NAME: &str = "orderby_aggregator";
+static ORDER_AGGREGATOR_ALIAS: &str = "orderby_aggregator";
 
 #[derive(Debug, Clone)]
 pub struct OrderingJoin {
@@ -58,14 +58,12 @@ pub fn compute_joins(
 ) -> (Vec<OrderingJoin>, Column<'static>) {
     let join_prefix = format!("{}{}", ORDER_JOIN_PREFIX, order_by_index);
     let mut joins = vec![];
-    let mut order_by_column_alias: Option<String> = None;
     let last_path = order_by.path.last();
 
     for rf in order_by.path.iter() {
         if order_by.sort_aggregation.is_some() && Some(rf) == last_path {
-            let (aggr_alias, ordering_join) = compute_aggr_join(order_by, rf, join_prefix.as_str(), joins.last());
+            let ordering_join = compute_aggr_join(order_by, rf, join_prefix.as_str(), joins.last());
 
-            order_by_column_alias = Some(aggr_alias);
             joins.push(ordering_join);
         } else {
             let ordering_join = compute_join(base_model, rf, join_prefix.as_str());
@@ -74,6 +72,12 @@ pub fn compute_joins(
         }
     }
 
+    // When doing an order by aggregation, we always alias the aggregator to <ORDER_AGGREGATOR_ALIAS>
+    let order_by_column_alias = if order_by.sort_aggregation.is_some() {
+        ORDER_AGGREGATOR_ALIAS.to_owned()
+    } else {
+        order_by.field.db_name().to_owned()
+    };
     // This is the final column identifier to be used for the scalar field to order by.
     // - If it's on the base model with no hops, it's for example `modelTable.field`.
     // - If it is with several hops, it's the alias used for the last join, e.g.
@@ -81,10 +85,7 @@ pub fn compute_joins(
     // - If it's with an order by aggregation, it's the alias used for the join + alias used for the aggregator. eg:
     //   `{join_alias}.{aggr_column_alias}`
     let order_by_column = if let Some(join) = joins.last() {
-        Column::from((
-            join.alias.to_owned(),
-            order_by_column_alias.unwrap_or_else(|| order_by.field.db_name().to_owned()),
-        ))
+        Column::from((join.alias.to_owned(), order_by_column_alias))
     } else {
         order_by.field.as_column()
     };
@@ -142,7 +143,7 @@ fn compute_aggr_join(
     rf: &RelationFieldRef,
     join_alias: &str,
     previous_join: Option<&OrderingJoin>,
-) -> (String, OrderingJoin) {
+) -> OrderingJoin {
     let join_alias = format!("{}_{}", join_alias, &rf.related_model().name);
 
     if rf.relation().is_many_to_many() {
@@ -157,7 +158,7 @@ fn compute_aggr_join_one2m(
     rf: &RelationFieldRef,
     join_alias: &str,
     previous_join: Option<&OrderingJoin>,
-) -> (String, OrderingJoin) {
+) -> OrderingJoin {
     let (left_fields, right_fields) = if rf.is_inlined_on_enclosing_model() {
         (rf.scalar_fields(), rf.referenced_fields())
     } else {
@@ -178,11 +179,11 @@ fn compute_aggr_join_one2m(
     };
 
     // SELECT A.fk,
-    // + COUNT(*) AS <ORDER_AGGR_FIELD_NAME>
+    // + COUNT(*) AS <ORDER_AGGREGATOR_ALIAS>
     // FROM A
-    let query = query.value(aggr_expr.alias(ORDER_AGGR_FIELD_NAME.to_owned()));
+    let query = query.value(aggr_expr.alias(ORDER_AGGREGATOR_ALIAS.to_owned()));
 
-    // SELECT A.<fk>, COUNT(*) AS <ORDER_AGGR_FIELD_NAME> FROM A
+    // SELECT A.<fk>, COUNT(*) AS <ORDER_AGGREGATOR_ALIAS> FROM A
     // + GROUP BY A.<fk>
     let query = right_fields.iter().fold(query, |acc, f| acc.group_by(f.as_column()));
 
@@ -200,20 +201,17 @@ fn compute_aggr_join_one2m(
         .collect::<Vec<_>>();
 
     // + LEFT JOIN (
-    //     SELECT A.<fk>, COUNT(*) AS <ORDER_AGGR_FIELD_NAME> FROM A
+    //     SELECT A.<fk>, COUNT(*) AS <ORDER_AGGREGATOR_ALIAS> FROM A
     //     GROUP BY A.<fk>
     // + ) AS <ORDER_JOIN_PREFIX> ON (<A | previous_join_alias>.<fk> = <ORDER_JOIN_PREFIX>.<fk>)
     let join = Table::from(query)
         .alias(join_alias.to_owned())
         .on(ConditionTree::single(on_conditions));
 
-    (
-        ORDER_AGGR_FIELD_NAME.to_owned(),
-        OrderingJoin {
-            data: join,
-            alias: join_alias.to_owned(),
-        },
-    )
+    OrderingJoin {
+        data: join,
+        alias: join_alias.to_owned(),
+    }
 }
 
 fn compute_aggr_join_m2m(
@@ -221,7 +219,7 @@ fn compute_aggr_join_m2m(
     rf: &RelationFieldRef,
     join_alias: &str,
     previous_join: Option<&OrderingJoin>,
-) -> (String, OrderingJoin) {
+) -> OrderingJoin {
     let relation_table = rf.as_table();
     let a_ids = rf.model().primary_identifier();
     let b_ids = rf.related_model().primary_identifier();
@@ -236,9 +234,9 @@ fn compute_aggr_join_m2m(
         SortAggregation::Count { _all } => count(asterisk()),
     };
     // SELECT A.id,
-    // + COUNT(*) AS <ORDER_AGGR_FIELD_NAME>
+    // + COUNT(*) AS <ORDER_AGGREGATOR_ALIAS>
     // FROM _AtoB
-    let query = query.value(aggr_expr.alias(ORDER_AGGR_FIELD_NAME.to_owned()));
+    let query = query.value(aggr_expr.alias(ORDER_AGGREGATOR_ALIAS.to_owned()));
 
     let conditions_a: Vec<_> = a_ids
         .as_columns()
@@ -246,14 +244,14 @@ fn compute_aggr_join_m2m(
         .collect();
     let conditions_b: Vec<_> = b_ids.as_columns().map(|c| c.equals(rf.m2m_columns())).collect();
 
-    // SELECT A.id, COUNT(*) AS <ORDER_AGGR_FIELD_NAME> FROM _AtoB
+    // SELECT A.id, COUNT(*) AS <ORDER_AGGREGATOR_ALIAS> FROM _AtoB
     // + INNER JOIN A ON A.id = _AtoB.A
     // + INNER JOIN B ON B.id = _AtoB.B
     let query = query
         .inner_join(rf.model().as_table().on(ConditionTree::single(conditions_a)))
         .inner_join(rf.related_model().as_table().on(ConditionTree::single(conditions_b)));
 
-    // SELECT A.id, COUNT(*) AS <ORDER_AGGR_FIELD_NAME> FROM _AtoB
+    // SELECT A.id, COUNT(*) AS <ORDER_AGGREGATOR_ALIAS> FROM _AtoB
     // INNER JOIN A ON A.id = _AtoB.A
     // INNER JOIN B ON B.id = _AtoB.B
     // + GROUP BY A.id
@@ -277,7 +275,7 @@ fn compute_aggr_join_m2m(
         .collect::<Vec<_>>();
 
     // + LEFT JOIN (
-    //     SELECT A.id, COUNT(*) AS <ORDER_AGGR_FIELD_NAME> FROM _AtoB
+    //     SELECT A.id, COUNT(*) AS <ORDER_AGGREGATOR_ALIAS> FROM _AtoB
     //       INNER JOIN A ON (A.id = _AtoB.A)
     //       INNER JOIN B ON (B.id = _AtoB.B)
     //     GROUP BY A.id
@@ -286,11 +284,8 @@ fn compute_aggr_join_m2m(
         .alias(join_alias.to_owned())
         .on(ConditionTree::single(on_conditions));
 
-    (
-        ORDER_AGGR_FIELD_NAME.to_owned(),
-        OrderingJoin {
-            alias: join_alias.to_owned(),
-            data: join,
-        },
-    )
+    OrderingJoin {
+        alias: join_alias.to_owned(),
+        data: join,
+    }
 }
