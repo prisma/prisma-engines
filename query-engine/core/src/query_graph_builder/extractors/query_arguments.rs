@@ -111,7 +111,12 @@ fn process_order_object(
                     // This needs to be refactored when we add order by aggregations on specific fields
                     let first_id = ids.first().unwrap();
 
-                    Ok(Some(OrderBy::new(first_id.clone(), path, sort_order, Some(sort_aggregation))))
+                    Ok(Some(OrderBy::new(
+                        first_id.clone(),
+                        path,
+                        sort_order,
+                        Some(sort_aggregation),
+                    )))
                 }
                 Field::Relation(rf) => {
                     path.push(rf.clone());
