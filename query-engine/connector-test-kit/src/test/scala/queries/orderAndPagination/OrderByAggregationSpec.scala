@@ -8,14 +8,14 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
   val project = SchemaDsl.fromStringV11() {
     """
       |model User {
-      |  id    Int    @id @default(autoincrement())
+      |  id    Int    @id
       |  name  String
       |  posts Post[]
       |  categories Category[]
       |}
       |
       |model Post {
-      |  id     Int    @id @default(autoincrement())
+      |  id     Int    @id
       |  title  String
       |  user   User   @relation(fields: [userId], references: [id])
       |  userId Int
@@ -23,7 +23,7 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
       |}
       |
       |model Category {
-      |  id     Int    @id @default(autoincrement())
+      |  id     Int    @id
       |  name   String
       |  posts  Post[]
       |  users  User[]
@@ -54,7 +54,7 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     result.toString should be(
-      """{"data":{"findManyUser":[{"id":2,"posts":[{"title":"bob_post_1"},{"title":"bob_post_2"}]},{"id":1,"posts":[{"title":"alice_post_1"}]}]}}"""
+      """{"data":{"findManyUser":[{"id":1,"posts":[{"title":"alice_post_1"}]},{"id":2,"posts":[{"title":"bob_post_1"},{"title":"bob_post_2"}]}]}}"""
     )
   }
 
@@ -96,7 +96,7 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     result.toString should be(
-      """{"data":{"findManyPost":[{"title":"bob_post_1","categories":[{"name":"Finance"}]},{"title":"bob_post_2","categories":[{"name":"History"}]},{"title":"alice_post_1","categories":[{"name":"News"},{"name":"Society"}]}]}}"""
+      """{"data":{"findManyPost":[{"title":"bob_post_1","categories":[{"name":"Finance"}]},{"title":"alice_post_1","categories":[{"name":"News"},{"name":"Society"}]},{"title":"bob_post_2","categories":[{"name":"History"},{"name":"Gaming"},{"name":"Hacking"}]}]}}"""
     )
   }
 
@@ -117,7 +117,7 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     result.toString should be(
-      """{"data":{"findManyPost":[{"title":"alice_post_1","categories":[{"name":"News"},{"name":"Society"}]},{"title":"bob_post_1","categories":[{"name":"Finance"}]},{"title":"bob_post_2","categories":[{"name":"History"}]}]}}"""
+      """{"data":{"findManyPost":[{"title":"bob_post_2","categories":[{"name":"History"},{"name":"Gaming"},{"name":"Hacking"}]},{"title":"alice_post_1","categories":[{"name":"News"},{"name":"Society"}]},{"title":"bob_post_1","categories":[{"name":"Finance"}]}]}}"""
     )
   }
 
@@ -182,7 +182,7 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     result.toString should be(
-      """{"data":{"findManyPost":[{"title":"bob_post_1","categories":[{"name":"Finance"}]},{"title":"bob_post_2","categories":[{"name":"History"}]},{"title":"alice_post_1","categories":[{"name":"News"},{"name":"Society"}]}]}}"""
+      """{"data":{"findManyPost":[{"title":"bob_post_1","categories":[{"name":"Finance"}]},{"title":"alice_post_1","categories":[{"name":"News"},{"name":"Society"}]},{"title":"bob_post_2","categories":[{"name":"History"},{"name":"Gaming"},{"name":"Hacking"}]}]}}"""
     )
   }
 
@@ -191,7 +191,6 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
       """
         |{
         |  findManyPost(orderBy: [{ user: { name: asc }}, { categories: { count: desc }}]) {
-        |    title
         |    user {
         |      name
         |    }
@@ -206,7 +205,7 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     result.toString should be(
-      """{"data":{"findManyPost":[{"title":"bob_post_1","categories":[{"name":"Finance"}]},{"title":"bob_post_2","categories":[{"name":"History"}]},{"title":"alice_post_1","categories":[{"name":"News"},{"name":"Society"}]}]}}"""
+      """{"data":{"findManyPost":[{"user":{"name":"Alice"},"categories":[{"name":"News"},{"name":"Society"}]},{"user":{"name":"Bob"},"categories":[{"name":"History"},{"name":"Gaming"},{"name":"Hacking"}]},{"user":{"name":"Bob"},"categories":[{"name":"Finance"}]}]}}"""
     )
   }
 
@@ -214,7 +213,7 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       """
         |{
-        |  findManyPost(orderBy: { user: { categories: { count: asc } } }) {
+        |  findManyPost(orderBy: [{ user: { categories: { count: asc } } }, { id: asc }]) {
         |    id
         |    user { categories { name } }
         |  }
@@ -243,9 +242,12 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
       legacy = false,
     )
 
-    result.toString should be(
-      """{"data":{"findManyPost":[{"id":2,"user":{"categories":[{"name":"Computer Science"},{"name":"Music"}]}},{"id":3,"user":{"categories":[{"name":"Computer Science"},{"name":"Music"}]}},{"id":1,"user":{"categories":[{"name":"Startup"}]}}]}}"""
+    val possibleResults = Set(
+      """{"data":{"findManyPost":[{"id":2,"user":{"categories":[{"name":"Computer Science"},{"name":"Music"}]}},{"id":3,"user":{"categories":[{"name":"Computer Science"},{"name":"Music"}]}},{"id":1,"user":{"categories":[{"name":"Startup"}]}}]}}""",
+      """{"data":{"findManyPost":[{"id":3,"user":{"categories":[{"name":"Computer Science"},{"name":"Music"}]}},{"id":2,"user":{"categories":[{"name":"Computer Science"},{"name":"Music"}]}},{"id":1,"user":{"categories":[{"name":"Startup"}]}}]}}"""
     )
+
+    possibleResults should contain(result.toString)
   }
 
   "[Combo][2+ Hops] Ordering by m2m count asc + m2one2m count desc" should "work" in {
@@ -253,8 +255,8 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
       """
         |{
         |  findManyPost(orderBy: [{ categories: { count: asc }}, { user: { categories: { count: desc }} }]) {
-        |    title
-        |    categories {
+        |    id
+        |    categories(orderBy: { name: asc }) {
         |      name
         |    }
         |  }
@@ -265,7 +267,7 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     result.toString should be(
-      """"data":{"findManyPost":[{"title":"bob_post_1","categories":[{"name":"Finance"}]},{"title":"bob_post_2","categories":[{"name":"History"}]},{"title":"alice_post_1","categories":[{"name":"News"},{"name":"Society"}]}]}}"""
+      """{"data":{"findManyPost":[{"id":2,"categories":[{"name":"Finance"}]},{"id":1,"categories":[{"name":"News"},{"name":"Society"}]},{"id":3,"categories":[{"name":"Gaming"},{"name":"Hacking"},{"name":"History"}]}]}}"""
     )
   }
 
@@ -286,9 +288,12 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
       legacy = false,
     )
 
-    result.toString should be(
-      """"{"data":{"findManyPost":[{"id":1,"user":{"name":"Alice","categories":[{"name":"Startup"}]}},{"id":2,"user":{"name":"Bob","categories":[{"name":"Computer Science"},{"name":"Music"}]}},{"id":3,"user":{"name":"Bob","categories":[{"name":"Computer Science"},{"name":"Music"}]}}]}}"""
+    val possibleResults = Set(
+      """{"data":{"findManyPost":[{"id":1,"user":{"name":"Alice","categories":[{"name":"Startup"}]}},{"id":2,"user":{"name":"Bob","categories":[{"name":"Computer Science"},{"name":"Music"}]}},{"id":3,"user":{"name":"Bob","categories":[{"name":"Computer Science"},{"name":"Music"}]}}]}}""",
+      """{"data":{"findManyPost":[{"id":1,"user":{"name":"Alice","categories":[{"name":"Startup"}]}},{"id":3,"user":{"name":"Bob","categories":[{"name":"Computer Science"},{"name":"Music"}]}},{"id":2,"user":{"name":"Bob","categories":[{"name":"Computer Science"},{"name":"Music"}]}}]}}"""
     )
+
+    possibleResults should contain(result.toString)
   }
 
   // With pagination tests
@@ -353,7 +358,7 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     result.toString should be(
-      """{"data":{"findManyPost":[{"id":2,"title":"bob_post_1","categories":[{"name":"Finance"}]},{"id":3,"title":"bob_post_2","categories":[{"name":"History"}]}]}}"""
+      """{"data":{"findManyPost":[{"id":2,"title":"bob_post_1","categories":[{"name":"Finance"}]},{"id":1,"title":"alice_post_1","categories":[{"name":"News"},{"name":"Society"}]}]}}"""
     )
   }
 
@@ -441,7 +446,7 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     result.toString should be(
-      """{"data":{"findManyPost":[{"id":2,"title":"bob_post_1","categories":[{"name":"Finance"}]},{"id":3,"title":"bob_post_2","categories":[{"name":"History"}]}]}}"""
+      """{"data":{"findManyPost":[{"id":2,"title":"bob_post_1","categories":[{"name":"Finance"}]},{"id":1,"title":"alice_post_1","categories":[{"name":"News"},{"name":"Society"}]}]}}"""
     )
   }
 
@@ -449,7 +454,7 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       """
         |{
-        |  findManyPost(orderBy: [{ user: { name: asc }}, { categories: { count: desc }}], cursor: { id: 2 }, take: 2) {
+        |  findManyPost(orderBy: [{ user: { name: asc }}, { categories: { count: desc }}], cursor: { id: 1 }, take: 2) {
         |    id
         |    title
         |    user {
@@ -466,7 +471,7 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     result.toString should be(
-      """{"data":{"findManyPost":[{"id":2,"title":"bob_post_1","user":{"name":"Bob"},"categories":[{"name":"Finance"}]},{"id":3,"title":"bob_post_2","user":{"name":"Bob"},"categories":[{"name":"History"}]}]}}"""
+      """{"data":{"findManyPost":[{"id":1,"title":"alice_post_1","user":{"name":"Alice"},"categories":[{"name":"News"},{"name":"Society"}]},{"id":3,"title":"bob_post_2","user":{"name":"Bob"},"categories":[{"name":"History"},{"name":"Gaming"},{"name":"Hacking"}]}]}}"""
     )
   }
 
@@ -474,7 +479,7 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       """
         |{
-        |  findManyPost(orderBy: { user: { categories: { count: asc } } }, cursor: { id: 2 }, take: 1) {
+        |  findManyPost(orderBy: [{ user: { categories: { count: asc } } }, { id: asc }], cursor: { id: 2 }, take: 1) {
         |    id
         |    user { categories { name } }
         |  }
@@ -493,7 +498,7 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       """
         |{
-        |  findManyPost(orderBy: { user: { categories: { count: desc } } }, cursor: { id: 2 }, take: 2) {
+        |  findManyPost(orderBy: [{ user: { categories: { count: desc } } }, { id: asc }], cursor: { id: 2 }, take: 2) {
         |    id
         |    user { categories { name } }
         |  }
@@ -512,7 +517,7 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       """
         |{
-        |  findManyPost(orderBy: [{ categories: { count: asc }}, { user: { categories: { count: desc }} }], cursor: { id: 3 }, take: 2) {
+        |  findManyPost(orderBy: [{ categories: { count: asc }}, { user: { categories: { count: desc }} }], cursor: { id: 2 }, take: 2) {
         |    id
         |    categories { name }
         |    user { categories { name } }
@@ -524,7 +529,7 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     result.toString should be(
-      """"{"data":{"findManyPost":[{"id":2,"categories":[{"name":"Finance"}],"user":{"categories":[{"name":"Computer Science"},{"name":"Music"}]}},{"id":3,"categories":[{"name":"History"}],"user":{"categories":[{"name":"Computer Science"},{"name":"Music"}]}}]}}"""
+      """{"data":{"findManyPost":[{"id":2,"categories":[{"name":"Finance"}],"user":{"categories":[{"name":"Computer Science"},{"name":"Music"}]}},{"id":1,"categories":[{"name":"News"},{"name":"Society"}],"user":{"categories":[{"name":"Startup"}]}}]}}"""
     )
   }
 
@@ -546,12 +551,12 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     result.toString should be(
-      """"{"data":{"findManyPost":[{"id":2,"user":{"name":"Bob","categories":[{"name":"Computer Science"},{"name":"Music"}]}},{"id":3,"user":{"name":"Bob","categories":[{"name":"Computer Science"},{"name":"Music"}]}}]}}"""
+      """{"data":{"findManyPost":[{"id":2,"user":{"name":"Bob","categories":[{"name":"Computer Science"},{"name":"Music"}]}},{"id":3,"user":{"name":"Bob","categories":[{"name":"Computer Science"},{"name":"Music"}]}}]}}"""
     )
   }
 
   private def createTestData(): Unit = {
-    server.query("""mutation { createOneUser(data: { name: "Alice", categories: { create: [{ name: "Startup" }] }, posts: { create: { title: "alice_post_1", categories: { create: [{ name: "News" }, { name: "Society" }] }} } }){ id }}""".stripMargin, project, legacy = false)
-    server.query("""mutation { createOneUser(data: { name: "Bob", categories: { create: [{ name: "Computer Science" }, { name: "Music" }] }, posts: { create: [{ title: "bob_post_1", categories: { create: [{ name: "Finance" }] } }, { title: "bob_post_2", categories: { create: [{ name: "History" }] } }] } }){ id }}""".stripMargin, project, legacy = false)
+    server.query("""mutation { createOneUser(data: { id: 1, name: "Alice", categories: { create: [{ id: 1, name: "Startup" }] }, posts: { create: { id: 1, title: "alice_post_1", categories: { create: [{ id: 2, name: "News" }, { id: 3, name: "Society" }] }} } }){ id }}""".stripMargin, project, legacy = false)
+    server.query("""mutation { createOneUser(data: { id: 2, name: "Bob", categories: { create: [{ id: 4, name: "Computer Science" }, { id: 5, name: "Music" }] }, posts: { create: [{ id: 2, title: "bob_post_1", categories: { create: [{ id: 6, name: "Finance" }] } }, { id: 3, title: "bob_post_2", categories: { create: [{ id: 7, name: "History" }, { id: 8, name: "Gaming" }, { id: 9, name: "Hacking" }] } }] } }){ id }}""".stripMargin, project, legacy = false)
   }
 }
