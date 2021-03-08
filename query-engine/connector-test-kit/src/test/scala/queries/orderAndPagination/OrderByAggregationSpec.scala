@@ -537,7 +537,7 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       """
         |{
-        |  findManyPost(orderBy: [{ user: { name: asc }}, { user: { categories: { count: desc }} }], cursor: { id: 2 }, take: 2) {
+        |  findManyPost(orderBy: [{ user: { name: asc }}, { user: { categories: { count: desc }} }, { id: asc }], cursor: { id: 2 }, take: 2) {
         |    id
         |    user {
         |      name

@@ -61,6 +61,7 @@ pub fn compute_joins(
     let last_path = order_by.path.last();
 
     for rf in order_by.path.iter() {
+        // If it's an order by aggregation, we change the last join to compute the aggregation
         if order_by.sort_aggregation.is_some() && Some(rf) == last_path {
             let ordering_join = compute_aggr_join(order_by, rf, join_prefix.as_str(), joins.last());
 
@@ -83,7 +84,7 @@ pub fn compute_joins(
     // - If it is with several hops, it's the alias used for the last join, e.g.
     //   `{join_alias}.field`
     // - If it's with an order by aggregation, it's the alias used for the join + alias used for the aggregator. eg:
-    //   `{join_alias}.{aggr_column_alias}`
+    //   `{join_alias}.{aggregator_alias}`
     let order_by_column = if let Some(join) = joins.last() {
         Column::from((join.alias.to_owned(), order_by_column_alias))
     } else {
@@ -257,11 +258,8 @@ fn compute_aggr_join_m2m(
     // + GROUP BY A.id
     let query = a_ids.as_columns().fold(query, |acc, f| acc.group_by(f.clone()));
 
-    let (left_fields, right_fields) = (
-        a_ids.scalar_fields().collect::<Vec<_>>(),
-        b_ids.scalar_fields().collect::<Vec<_>>(),
-    );
-    let pairs = left_fields.into_iter().zip(right_fields.into_iter());
+    let (left_fields, right_fields) = (a_ids.scalar_fields(), b_ids.scalar_fields());
+    let pairs = left_fields.zip(right_fields);
     let on_conditions = pairs
         .map(|(a, b)| {
             let col_a = match previous_join {
