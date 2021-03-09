@@ -15,8 +15,8 @@ anyhow = "1.0.26"
 async-trait = "0.1.17"
 chrono = { version = "0.4", features = ["serde"] }
 enumflags2 = "0.6.0"
-futures = { version = "0.3", default-features = false, features = ["compat"] }
-jsonrpc-core = "14.0"
+futures = { version = "0.3", default-features = false }
+jsonrpc-core = "17.0"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = { version = "1.0", features = ["float_roundtrip"] }
 tracing = "0.1.10"

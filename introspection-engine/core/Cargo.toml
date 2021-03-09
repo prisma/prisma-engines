@@ -14,16 +14,14 @@ user-facing-errors = { path = "../../libs/user-facing-errors" }
 introspection-connector = { path = "../connectors/introspection-connector" }
 sql-introspection-connector = { path = "../connectors/sql-introspection-connector" }
 
+futures = { version = "0.3", default-features = false }
 serde = "1.0"
-futures = { version = "0.3", features = ["compat"] }
-futures01 = { package = "futures", version = "0.1" }
-
 serde_json = { version = "1.0", features = ["float_roundtrip"] }
 serde_derive = "1.0"
 async-trait = "0.1.17"
-jsonrpc-core = "14.0"
-jsonrpc-derive = "14.0"
-jsonrpc-core-client = "14.0"
+jsonrpc-core = "17.0"
+jsonrpc-derive = "17.0"
+jsonrpc-core-client = "17.0"
 json-rpc-stdio = { path = "../../libs/json-rpc-stdio" }
 
 tracing = "0.1"
