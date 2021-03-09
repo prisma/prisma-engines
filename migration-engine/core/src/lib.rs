@@ -194,13 +194,13 @@ pub async fn qe_setup(prisma_schema: &str) -> CoreResult<()> {
 fn parse_configuration(datamodel: &str) -> CoreResult<Configuration> {
     datamodel::parse_configuration(&datamodel)
         .map(|validated_config| validated_config.subject)
-        .map_err(|err| CoreError::ReceivedBadDatamodel(err.to_pretty_string("schema.prisma", datamodel)))
+        .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", datamodel)))
 }
 
 fn parse_datamodel(datamodel: &str) -> CoreResult<Datamodel> {
     datamodel::parse_datamodel(&datamodel)
         .map(|d| d.subject)
-        .map_err(|err| CoreError::ReceivedBadDatamodel(err.to_pretty_string("schema.prisma", datamodel)))
+        .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", datamodel)))
 }
 
 #[cfg(test)]
