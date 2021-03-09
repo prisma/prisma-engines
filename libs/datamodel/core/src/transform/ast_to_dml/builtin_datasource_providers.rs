@@ -150,7 +150,7 @@ impl DatasourceProvider for MongoDbDatasourceProvider {
 
     fn validate_url(&self, name: &str, url: &StringFromEnvVar) -> Result<(), String> {
         validate_url(name, "mongodb://", url)
-            .or(validate_url(name, "mongodb+srv://", url))
+            .or_else(|_| validate_url(name, "mongodb+srv://", url))
             .map_err(|_| {
                 format!(
                     "The URL for datasource `{}` must start with either the protocol `mongodb://` or `mongodb+srv://`.",

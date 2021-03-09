@@ -45,7 +45,7 @@ use type_names::*;
 pub(crate) fn default_for(scalar_type: &ScalarType) -> &MongoDbType {
     DEFAULT_MAPPING
         .get(scalar_type)
-        .expect(&format!("MongoDB native type mapping missing for '{:?}'", scalar_type))
+        .unwrap_or_else(|| panic!("MongoDB native type mapping missing for '{:?}'", scalar_type))
 }
 
 pub(crate) fn available_types() -> Vec<NativeTypeConstructor> {
@@ -81,12 +81,14 @@ pub(crate) fn mongo_type_from_input(name: &str, args: &[String]) -> crate::Resul
         DECIMAL => MongoDbType::Decimal,
         MIN_KEY => MongoDbType::MinKey,
         MAX_KEY => MongoDbType::MaxKey,
-        name => Err(ConnectorError {
-            kind: ErrorKind::NativeTypeNameUnknown {
-                connector_name: "MongoDB".to_owned(),
-                native_type: name.to_owned(),
-            },
-        })?,
+        name => {
+            return Err(ConnectorError {
+                kind: ErrorKind::NativeTypeNameUnknown {
+                    connector_name: "MongoDB".to_owned(),
+                    native_type: name.to_owned(),
+                },
+            })
+        }
     };
 
     Ok(mongo_type)

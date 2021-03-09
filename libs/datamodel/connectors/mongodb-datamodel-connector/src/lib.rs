@@ -39,6 +39,12 @@ impl MongoDbDatamodelConnector {
     }
 }
 
+impl Default for MongoDbDatamodelConnector {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Connector for MongoDbDatamodelConnector {
     fn name(&self) -> String {
         "MongoDB".to_owned()

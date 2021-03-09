@@ -44,7 +44,7 @@ pub async fn load(source: &Datasource) -> crate::Result<(String, Box<dyn QueryEx
                     "MongoDB query connector (experimental feature, needs to be enabled)".into(),
                 );
 
-                return Err(error.into());
+                return Err(error);
             }
 
             mongodb(source).await
