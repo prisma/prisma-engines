@@ -1,5 +1,4 @@
-use crate::command_error::CommandError;
-use crate::error::Error;
+use crate::{command_error::CommandError, error::Error};
 use datamodel::{Configuration, Datamodel};
 use futures::{FutureExt, TryFutureExt};
 use introspection_connector::{ConnectorResult, DatabaseMetadata, IntrospectionConnector, IntrospectionResultOutput};
@@ -66,7 +65,8 @@ impl RpcImpl {
     }
 
     async fn load_connector(schema: &str) -> Result<(Configuration, String, Box<dyn IntrospectionConnector>), Error> {
-        let config = datamodel::parse_configuration(&schema)?;
+        let config = datamodel::parse_configuration(&schema)
+            .map_err(|diagnostics| Error::DatamodelError(diagnostics.to_pretty_string("schema.prisma", schema)))?;
 
         let url = config
             .subject
