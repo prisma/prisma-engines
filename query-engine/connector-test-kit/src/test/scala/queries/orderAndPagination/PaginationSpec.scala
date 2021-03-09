@@ -7,7 +7,7 @@ class PaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
   val project = SchemaDsl.fromStringV11() {
     """
       |model TestModel {
-      |  id          Int    @id
+      |  id          Int    @id  @map("_id")
       |  field       String
       |  uniqueField String @unique
       |}
@@ -592,7 +592,7 @@ class PaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
     val project = SchemaDsl.fromStringV11() {
       """
         |model TestModel {
-        |  id     Int    @id
+        |  id     Int    @id @map("_id")
         |  fieldA String
         |  fieldB String
         |  fieldC String
@@ -707,7 +707,7 @@ class PaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
     val project = SchemaDsl.fromStringV11() {
       """
         |model TestModel {
-        |  id     Int    @id
+        |  id     Int    @id @map("_id")
         |  fieldA String
         |  fieldB String
         |  fieldC String

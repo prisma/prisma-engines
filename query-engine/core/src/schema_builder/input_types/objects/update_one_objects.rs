@@ -1,6 +1,7 @@
 use super::*;
 use constants::inputs::{args, operations};
-use prisma_models::dml::DefaultValue;
+use datamodel_connector::ConnectorCapability;
+use prisma_models::{dml::DefaultValue, ModelProjection};
 
 pub(crate) fn update_one_input_types(
     ctx: &mut BuilderContext,
@@ -86,7 +87,7 @@ pub(super) fn scalar_input_fields_for_checked_update(ctx: &mut BuilderContext, m
         model
             .fields()
             .scalar_writable()
-            .filter(field_should_be_kept_for_update_input_type)
+            .filter(|sf| field_should_be_kept_for_checked_update_input_type(ctx, sf))
             .collect(),
         |ctx, f: ScalarFieldRef, default| non_list_scalar_update_field_mapper(ctx, &f, default),
         false,
@@ -344,12 +345,22 @@ pub(crate) fn update_one_where_combination_object(
     Arc::downgrade(&input_object)
 }
 
-fn field_should_be_kept_for_update_input_type(field: &ScalarFieldRef) -> bool {
+fn field_should_be_kept_for_checked_update_input_type(ctx: &BuilderContext, field: &ScalarFieldRef) -> bool {
     // We forbid updating auto-increment integer unique fields as this can create problems with the
     // underlying sequences (checked inputs only).
-    !field.is_auto_generated_int_id
+    let is_not_autoinc = !field.is_auto_generated_int_id
         && !matches!(
             (&field.type_identifier, field.unique(), field.is_autoincrement),
             (TypeIdentifier::Int, true, true)
-        )
+        );
+
+    let model_id: ModelProjection = field.model().primary_identifier();
+    let is_not_disallowed_id = if model_id.contains(field.clone()) {
+        // Is part of the id, connector must allow updating ID fields.
+        ctx.capabilities.contains(ConnectorCapability::UpdateableId)
+    } else {
+        true
+    };
+
+    is_not_autoinc && is_not_disallowed_id
 }

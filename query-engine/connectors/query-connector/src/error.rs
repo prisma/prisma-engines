@@ -1,4 +1,7 @@
+use std::fmt::Display;
+
 use crate::filter::Filter;
+use itertools::Itertools;
 use prisma_models::prelude::DomainError;
 use thiserror::Error;
 use user_facing_errors::{query_engine::DatabaseConstraint, KnownError};
@@ -54,6 +57,19 @@ impl ConnectorError {
                     message: format!("{}", message),
                 },
             )),
+            ErrorKind::UnsupportedFeature(feature) => {
+                Some(KnownError::new(user_facing_errors::query_engine::UnsupportedFeature {
+                    feature: feature.clone(),
+                }))
+            }
+            ErrorKind::MultiError(merror) => Some(KnownError::new(user_facing_errors::query_engine::MultiError {
+                errors: format!("{}", merror),
+            })),
+            ErrorKind::UniqueConstraintViolation { constraint } => {
+                Some(KnownError::new(user_facing_errors::query_engine::UniqueKeyViolation {
+                    constraint: constraint.clone(),
+                }))
+            }
 
             ErrorKind::IncorrectNumberOfParameters { expected, actual } => Some(KnownError::new(
                 user_facing_errors::common::IncorrectNumberOfParameters {
@@ -161,6 +177,12 @@ pub enum ErrorKind {
     #[error("{}", details)]
     InvalidDatabaseUrl { details: String, url: String },
 
+    #[error("Unsupported connector feature: {0}")]
+    UnsupportedFeature(String),
+
+    #[error("Multiple errors occurred: {}", 0)]
+    MultiError(MultiError),
+
     #[error(
         "Incorrect number of parameters given to a statement. Expected {}: got: {}.",
         expected,
@@ -172,5 +194,23 @@ pub enum ErrorKind {
 impl From<DomainError> for ConnectorError {
     fn from(e: DomainError) -> ConnectorError {
         ConnectorError::from_kind(ErrorKind::DomainError(e))
+    }
+}
+
+#[derive(Debug)]
+pub struct MultiError {
+    pub errors: Vec<ErrorKind>,
+}
+
+impl Display for MultiError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let errors = self
+            .errors
+            .iter()
+            .enumerate()
+            .map(|(i, err)| format!("{}) {}", i + 1, err))
+            .collect_vec();
+
+        write!(f, "{}", errors.join("\n"))
     }
 }

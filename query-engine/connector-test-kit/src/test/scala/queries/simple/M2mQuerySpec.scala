@@ -5,8 +5,6 @@ import util.ConnectorCapability.RelationLinkTableCapability
 import util._
 
 class M2mQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
-  override def runOnlyForCapabilities = Set(RelationLinkTableCapability) // Is this correct?
-
   val project: Project = ProjectDsl.fromString { """
                                                    |model Blog {
                                                    |  slug       String @id

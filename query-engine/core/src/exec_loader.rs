@@ -4,10 +4,13 @@ use crate::{
 };
 use connection_string::JdbcString;
 use connector::Connector;
+use mongodb_connector::MongoDb;
 use std::str::FromStr;
 
 use datamodel::{
-    common::provider_names::{MSSQL_SOURCE_NAME, MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME},
+    common::provider_names::{
+        MONGODB_SOURCE_NAME, MSSQL_SOURCE_NAME, MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME,
+    },
     Datasource,
 };
 use std::collections::HashMap;
@@ -35,6 +38,18 @@ pub async fn load(source: &Datasource) -> crate::Result<(String, Box<dyn QueryEx
             mssql(source).await
         }
 
+        MONGODB_SOURCE_NAME => {
+            if !feature_flags::get().mongoDb {
+                let error = CoreError::UnsupportedFeatureError(
+                    "MongoDB query connector (experimental feature, needs to be enabled)".into(),
+                );
+
+                return Err(error);
+            }
+
+            mongodb(source).await
+        }
+
         x => Err(CoreError::ConfigurationError(format!(
             "Unsupported connector type: {}",
             x
@@ -43,17 +58,17 @@ pub async fn load(source: &Datasource) -> crate::Result<(String, Box<dyn QueryEx
 }
 
 async fn sqlite(source: &Datasource) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
-    trace!("Loading SQLite connector...");
+    trace!("Loading SQLite query connector...");
 
     let sqlite = Sqlite::from_source(source).await?;
     let db_name = DEFAULT_SQLITE_DB_NAME.to_owned();
 
-    trace!("Loaded SQLite connector.");
+    trace!("Loaded SQLite query connector.");
     Ok((db_name, sql_executor(sqlite, false)))
 }
 
 async fn postgres(source: &Datasource) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
-    trace!("Loading Postgres connector...");
+    trace!("Loading Postgres query connector...");
 
     let database_str = &source.url().value;
     let psql = PostgreSql::from_source(source).await?;
@@ -71,12 +86,12 @@ async fn postgres(source: &Datasource) -> crate::Result<(String, Box<dyn QueryEx
         .and_then(|flag| flag.parse().ok())
         .unwrap_or(false);
 
-    trace!("Loaded Postgres connector.");
+    trace!("Loaded Postgres query connector.");
     Ok((db_name, sql_executor(psql, force_transactions)))
 }
 
 async fn mysql(source: &Datasource) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
-    trace!("Loading MySQL connector...");
+    trace!("Loading MySQL query connector...");
 
     let mysql = Mysql::from_source(source).await?;
     let database_str = &source.url().value;
@@ -90,12 +105,12 @@ async fn mysql(source: &Datasource) -> crate::Result<(String, Box<dyn QueryExecu
 
     let db_name = db_name.next().expect(err_str).to_owned();
 
-    trace!("Loaded MySQL connector.");
+    trace!("Loaded MySQL query connector.");
     Ok((db_name, sql_executor(mysql, false)))
 }
 
 async fn mssql(source: &Datasource) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
-    trace!("Loading SQL Server connector...");
+    trace!("Loading SQL Server query connector...");
 
     let mssql = Mssql::from_source(source).await?;
 
@@ -105,7 +120,7 @@ async fn mssql(source: &Datasource) -> crate::Result<(String, Box<dyn QueryExecu
         .remove("schema")
         .unwrap_or_else(|| String::from("dbo"));
 
-    trace!("Loaded SQL Server connector.");
+    trace!("Loaded SQL Server query connector.");
     Ok((db_name, sql_executor(mssql, false)))
 }
 
@@ -114,4 +129,14 @@ where
     T: Connector + Send + Sync + 'static,
 {
     Box::new(InterpretingExecutor::new(connector, force_transactions))
+}
+
+async fn mongodb(source: &Datasource) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
+    trace!("Loading MongoDB query connector...");
+
+    let mongo = MongoDb::new(source).await?;
+    let db_name = mongo.db_name();
+
+    trace!("Loaded MongoDB query connector.");
+    Ok((db_name.to_owned(), Box::new(InterpretingExecutor::new(mongo, false))))
 }

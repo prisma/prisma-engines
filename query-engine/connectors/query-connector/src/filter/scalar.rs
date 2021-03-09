@@ -132,6 +132,31 @@ pub enum ScalarCondition {
     NotIn(PrismaListValue),
 }
 
+impl ScalarCondition {
+    pub fn invert(self, condition: bool) -> Self {
+        if condition {
+            match self {
+                Self::Equals(v) => Self::NotEquals(v),
+                Self::NotEquals(v) => Self::Equals(v),
+                Self::Contains(v) => Self::NotContains(v),
+                Self::NotContains(v) => Self::Contains(v),
+                Self::StartsWith(v) => Self::NotStartsWith(v),
+                Self::NotStartsWith(v) => Self::StartsWith(v),
+                Self::EndsWith(v) => Self::NotEndsWith(v),
+                Self::NotEndsWith(v) => Self::EndsWith(v),
+                Self::LessThan(v) => Self::GreaterThanOrEquals(v),
+                Self::LessThanOrEquals(v) => Self::GreaterThan(v),
+                Self::GreaterThan(v) => Self::LessThanOrEquals(v),
+                Self::GreaterThanOrEquals(v) => Self::LessThan(v),
+                Self::In(v) => Self::NotIn(v),
+                Self::NotIn(v) => Self::In(v),
+            }
+        } else {
+            self
+        }
+    }
+}
+
 impl ScalarCompare for ScalarFieldRef {
     /// Field is in a given value
     fn is_in<T>(&self, values: Vec<T>) -> Filter

@@ -5,11 +5,21 @@ use std::sync::Arc;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct RelationFilter {
+    /// Starting field of the relation traversal.
     pub field: Arc<RelationField>,
+
+    /// Filter the related records need to fulfill.
     pub nested_filter: Box<Filter>,
+
+    /// The type of relation condition to use.
+    /// E.g. if all related records or only some need
+    /// to fulfill `nested_filter`.
     pub condition: RelationCondition,
 }
 
+/// Filter that is solely responsible for checking if
+/// a to-one related record is null.
+/// Todo there's no good, obvious reason why this is a separate filter.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct OneRelationIsNullFilter {
     pub field: Arc<RelationField>,
@@ -17,9 +27,16 @@ pub struct OneRelationIsNullFilter {
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub enum RelationCondition {
+    /// Every single related record needs to fulfill a condition.
     EveryRelatedRecord,
+
+    /// At least one related record needs to fulfill a condition.
     AtLeastOneRelatedRecord,
+
+    /// No related record must to fulfill a condition.
     NoRelatedRecord,
+
+    /// To-one relation only - the related record must fulfill a condition.
     ToOneRelatedRecord,
 }
 

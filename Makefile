@@ -64,6 +64,10 @@ dev-mssql2017:
 	docker-compose -f docker-compose.yml up -d --remove-orphans mssql-2017
 	echo 'mssql2017' > current_connector
 
+dev-mongodb:
+	docker-compose -f docker-compose.yml up -d --remove-orphans mongo4
+	echo 'mongodb' > current_connector
+
 dev-down:
 	docker-compose -f docker-compose.yml down -v --remove-orphans
 

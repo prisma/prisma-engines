@@ -12,13 +12,15 @@ pub use commands::SchemaPushInput;
 pub use core_error::{CoreError, CoreResult};
 
 use anyhow::anyhow;
-use commands::{MigrationCommand, SchemaPushCommand};
 use datamodel::{
-    common::provider_names::{MSSQL_SOURCE_NAME, MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME},
+    common::provider_names::{
+        MONGODB_SOURCE_NAME, MSSQL_SOURCE_NAME, MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME,
+    },
     dml::Datamodel,
     Configuration,
 };
 use migration_connector::{features, ConnectorError};
+use mongodb_migration_connector::MongoDbMigrationConnector;
 use sql_migration_connector::SqlMigrationConnector;
 use user_facing_errors::{common::InvalidDatabaseString, migration_engine::DeprecatedProviderArray, KnownError};
 
@@ -37,7 +39,7 @@ pub async fn migration_api(datamodel: &str) -> CoreResult<Box<dyn api::GenericAp
         })
         .unwrap_or_else(|| Err(CoreError::Generic(anyhow!("There is no datasource in the schema."))))?;
 
-    let connector = match &source.active_provider {
+    match &source.active_provider {
         #[cfg(feature = "sql")]
         provider if POSTGRES_SOURCE_NAME == provider => {
             let database_str = &source.url().value;
@@ -67,26 +69,33 @@ pub async fn migration_api(datamodel: &str) -> CoreResult<Box<dyn api::GenericAp
                 u.query_pairs_mut().append_pair("statement_cache_size", "0");
             }
 
-            SqlMigrationConnector::new(
+            let connector = SqlMigrationConnector::new(
                 u.as_str(),
                 features,
                 source.shadow_database_url.as_ref().map(|url| url.value.clone()),
             )
-            .await?
+            .await?;
+
+            Ok(Box::new(connector))
         }
         #[cfg(feature = "sql")]
         provider if [MYSQL_SOURCE_NAME, SQLITE_SOURCE_NAME, MSSQL_SOURCE_NAME].contains(&provider.as_str()) => {
-            SqlMigrationConnector::new(
+            let connector = SqlMigrationConnector::new(
                 &source.url().value,
                 features,
                 source.shadow_database_url.as_ref().map(|url| url.value.clone()),
             )
-            .await?
+            .await?;
+
+            Ok(Box::new(connector))
+        }
+        #[cfg(feature = "mongodb")]
+        provider if provider.as_str() == MONGODB_SOURCE_NAME => {
+            let connector = MongoDbMigrationConnector::new(&source.url().value, features).await?;
+            Ok(Box::new(connector))
         }
         x => unimplemented!("Connector {} is not supported yet", x),
-    };
-
-    Ok(Box::new(connector))
+    }
 }
 
 /// Create the database referenced by the passed in Prisma schema.
@@ -149,7 +158,7 @@ pub async fn qe_setup(prisma_schema: &str) -> CoreResult<()> {
         .first()
         .ok_or_else(|| CoreError::Generic(anyhow!("There is no datasource in the schema.")))?;
 
-    let connector = match &source.active_provider {
+    let api: Box<dyn GenericApi> = match &source.active_provider {
         provider
             if [
                 MYSQL_SOURCE_NAME,
@@ -161,7 +170,12 @@ pub async fn qe_setup(prisma_schema: &str) -> CoreResult<()> {
         {
             // 1. creates schema & database
             SqlMigrationConnector::qe_setup(&source.url().value).await?;
-            SqlMigrationConnector::new(&source.url().value, features, None).await?
+            Box::new(SqlMigrationConnector::new(&source.url().value, features, None).await?)
+        }
+        provider if provider == MONGODB_SOURCE_NAME => {
+            MongoDbMigrationConnector::qe_setup(&source.url().value).await?;
+            let connector = MongoDbMigrationConnector::new(&source.url().value, features).await?;
+            Box::new(connector)
         }
         x => unimplemented!("Connector {} is not supported yet", x),
     };
@@ -173,8 +187,7 @@ pub async fn qe_setup(prisma_schema: &str) -> CoreResult<()> {
         force: true,
     };
 
-    SchemaPushCommand::execute(&schema_push_input, &connector).await?;
-
+    api.schema_push(&schema_push_input).await?;
     Ok(())
 }
 

@@ -244,6 +244,9 @@ pub enum ErrorKind {
         message: String,
     },
 
+    #[error("Error validating field '{}': {}", field, message)]
+    FieldValidationError { field: String, message: String },
+
     #[error("Invalid Native type {}.", native_type)]
     InvalidNativeType { native_type: String },
 }

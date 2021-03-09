@@ -1,12 +1,13 @@
 [package]
-name = "migration-core"
-version = "0.1.0"
 authors = ["Marcus Böhm <boehm@prisma.io>", "Julius de Bruijn <bruijn@prisma.io>"]
 edition = "2018"
+name = "migration-core"
+version = "0.1.0"
 
 [dependencies]
 datamodel = { path = "../../libs/datamodel/core" }
 migration-connector = { path = "../connectors/migration-connector" }
+mongodb-migration-connector = { path = "../connectors/mongodb-migration-connector", optional = true }
 sql-migration-connector = { path = "../connectors/sql-migration-connector", optional = true }
 user-facing-errors = { path = "../../libs/user-facing-errors" }
 
@@ -26,5 +27,6 @@ url = "2.1.1"
 tokio = { version = "1.0", default-features = false, features = ["macros"] }
 
 [features]
-default = ["sql"]
+default = ["sql", "mongodb"]
+mongodb = ["mongodb-migration-connector"]
 sql = ["sql-migration-connector"]

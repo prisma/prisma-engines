@@ -1,5 +1,5 @@
 use crate::*;
-use datamodel::{dml, DefaultValue, Ignorable, WithDatabaseName};
+use datamodel::{dml, DefaultValue, Ignorable, NativeTypeInstance, WithDatabaseName};
 use itertools::Itertools;
 
 pub struct DatamodelConverter<'a> {
@@ -119,6 +119,7 @@ impl<'a> DatamodelConverter<'a> {
                         db_name: sf.database_name.clone(),
                         arity: sf.arity,
                         default_value: sf.default_value.clone(),
+                        native_type: sf.native_type(),
                     }))
                 }
             })
@@ -433,6 +434,7 @@ trait DatamodelFieldExtensions {
     fn behaviour(&self) -> Option<FieldBehaviour>;
     fn internal_enum(&self, datamodel: &dml::Datamodel) -> Option<InternalEnum>;
     fn internal_enum_value(&self, enum_value: &dml::EnumValue) -> InternalEnumValue;
+    fn native_type(&self) -> Option<NativeTypeInstance>;
 }
 
 impl DatamodelFieldExtensions for dml::ScalarField {
@@ -506,6 +508,13 @@ impl DatamodelFieldExtensions for dml::ScalarField {
         InternalEnumValue {
             name: enum_value.name.clone(),
             database_name: enum_value.database_name.clone(),
+        }
+    }
+
+    fn native_type(&self) -> Option<NativeTypeInstance> {
+        match &self.field_type {
+            datamodel::FieldType::NativeType(_, nt) => Some(nt.clone()),
+            _ => None,
         }
     }
 }

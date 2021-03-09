@@ -28,6 +28,10 @@ impl ModelProjection {
         }
     }
 
+    pub fn new_from_scalar(fields: Vec<ScalarFieldRef>) -> Self {
+        Self::new(fields.into_iter().map(Field::Scalar).collect())
+    }
+
     /// Returns all field names (NOT database level column names!) of contained fields.
     pub fn names(&self) -> impl Iterator<Item = &str> {
         self.fields.iter().map(|field| field.name())

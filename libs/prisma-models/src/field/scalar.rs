@@ -1,5 +1,5 @@
 use crate::prelude::*;
-use datamodel::{DefaultValue, FieldArity};
+use datamodel::{DefaultValue, FieldArity, NativeTypeInstance};
 use once_cell::sync::OnceCell;
 use std::{
     fmt::Debug,
@@ -30,6 +30,7 @@ pub struct ScalarFieldTemplate {
     pub arity: FieldArity,
     pub db_name: Option<String>,
     pub default_value: Option<DefaultValue>,
+    pub native_type: Option<NativeTypeInstance>,
 }
 
 pub struct ScalarField {
@@ -45,6 +46,7 @@ pub struct ScalarField {
     pub arity: FieldArity,
     pub db_name: Option<String>,
     pub default_value: Option<DefaultValue>,
+    pub native_type: Option<NativeTypeInstance>,
 
     pub model: ModelWeakRef,
     pub(crate) is_unique: bool,
@@ -140,6 +142,7 @@ impl ScalarFieldTemplate {
             arity: self.arity,
             db_name: self.db_name,
             default_value: self.default_value,
+            native_type: self.native_type,
             model,
         };
 

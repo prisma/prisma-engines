@@ -2,6 +2,7 @@ use super::datasource_provider::DatasourceProvider;
 use crate::common::provider_names::*;
 use crate::StringFromEnvVar;
 use datamodel_connector::Connector;
+use mongodb_datamodel_connector::MongoDbDatamodelConnector;
 use sql_datamodel_connector::SqlDatamodelConnectors;
 
 pub struct SqliteDatasourceProvider {}
@@ -104,7 +105,6 @@ impl DatasourceProvider for MySqlDatasourceProvider {
 
 pub struct MsSqlDatasourceProvider {}
 impl MsSqlDatasourceProvider {
-    #[allow(unused)]
     pub fn new() -> Self {
         Self {}
     }
@@ -129,6 +129,42 @@ impl DatasourceProvider for MsSqlDatasourceProvider {
 
     fn validate_url(&self, name: &str, url: &StringFromEnvVar) -> Result<(), String> {
         validate_url(name, "sqlserver://", url)
+    }
+}
+
+pub struct MongoDbDatasourceProvider {}
+impl MongoDbDatasourceProvider {
+    pub fn new() -> Self {
+        Self {}
+    }
+}
+
+impl DatasourceProvider for MongoDbDatasourceProvider {
+    fn is_provider(&self, provider: &str) -> bool {
+        provider == MONGODB_SOURCE_NAME
+    }
+
+    fn canonical_name(&self) -> &str {
+        MONGODB_SOURCE_NAME
+    }
+
+    fn validate_url(&self, name: &str, url: &StringFromEnvVar) -> Result<(), String> {
+        validate_url(name, "mongodb://", url)
+            .or_else(|_| validate_url(name, "mongodb+srv://", url))
+            .map_err(|_| {
+                format!(
+                    "The URL for datasource `{}` must start with either the protocol `mongodb://` or `mongodb+srv://`.",
+                    name
+                )
+            })
+    }
+
+    fn connector(&self) -> Box<dyn Connector> {
+        Box::new(MongoDbDatamodelConnector::new())
+    }
+
+    fn validate_shadow_database_url(&self, _name: &str, _url: &StringFromEnvVar) -> Result<(), String> {
+        Ok(())
     }
 }
 

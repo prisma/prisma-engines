@@ -16,7 +16,7 @@ object IgnoreMySql extends Tag("ignore.mysql") with AssociatedWithConnectorTags 
 object IgnoreMySql56 extends Tag("ignore.mysql56") with AssociatedWithConnectorTags {
   override def tag = ConnectorTag.Mysql56ConnectorTag
 }
-object IgnoreMongo extends Tag("ignore.mongo") with AssociatedWithConnectorTags {
+object IgnoreMongo extends Tag("ignore.mongodb") with AssociatedWithConnectorTags {
   override def tag = ConnectorTag.MongoConnectorTag
 }
 object IgnoreSQLite extends Tag("ignore.sqlite") with AssociatedWithConnectorTags {
@@ -46,11 +46,13 @@ object ConnectorTag extends Enum[ConnectorTag] {
     override def superTags() = Seq(MySqlConnectorTag)
   }
 
-  object PostgresConnectorTag       extends RelationalConnectorTag
-  object SQLiteConnectorTag         extends RelationalConnectorTag
-  object MsSqlConnectorTag          extends RelationalConnectorTag
+  object PostgresConnectorTag extends RelationalConnectorTag
+  object SQLiteConnectorTag   extends RelationalConnectorTag
+  object MsSqlConnectorTag    extends RelationalConnectorTag
+
   sealed trait DocumentConnectorTag extends ConnectorTag
-  object MongoConnectorTag          extends DocumentConnectorTag
+
+  object MongoConnectorTag extends DocumentConnectorTag
 }
 
 trait ConnectorAwareTest extends SuiteMixin { self: Suite with ApiSpecBase =>
@@ -60,7 +62,7 @@ trait ConnectorAwareTest extends SuiteMixin { self: Suite with ApiSpecBase =>
   lazy val connector       = connectorConfig.provider
 
   lazy val connectorTag = connector match {
-    case "mongo"                   => ConnectorTag.MongoConnectorTag
+    case "mongodb"                 => ConnectorTag.MongoConnectorTag
     case "mysql56"                 => ConnectorTag.Mysql56ConnectorTag
     case "mysql"                   => ConnectorTag.MySqlConnectorTag
     case "postgres" | "postgresql" => ConnectorTag.PostgresConnectorTag
@@ -69,7 +71,7 @@ trait ConnectorAwareTest extends SuiteMixin { self: Suite with ApiSpecBase =>
   }
 
   def capabilities: ConnectorCapabilities               = connectorConfig.capabilities
-  def runOnlyForConnectors: Set[ConnectorTag]           = ConnectorTag.values.toSet
+  def runOnlyForConnectors: Set[ConnectorTag]           = ConnectorTag.values.toSet // - ConnectorTag.MongoConnectorTag
   def doNotRunForConnectors: Set[ConnectorTag]          = Set.empty
   def runOnlyForCapabilities: Set[ConnectorCapability]  = Set.empty
   def doNotRunForCapabilities: Set[ConnectorCapability] = Set.empty
@@ -119,10 +121,6 @@ trait ConnectorAwareTest extends SuiteMixin { self: Suite with ApiSpecBase =>
   def ifConnectorIsNotSQLite[T](assertion: => T): Unit = if (connectorTag != ConnectorTag.SQLiteConnectorTag) assertion
   def ifConnectorIsSQLite[T](assertion: => T): Unit    = if (connectorTag == ConnectorTag.SQLiteConnectorTag) assertion
   def ifConnectorIsNotMongo[T](assertion: => T): Unit  = if (connectorTag != ConnectorTag.MongoConnectorTag) assertion
-  def ifConnectorIsActive[T](assertion: => T): Unit = {
-    // FIXME: check if we need can bring this back, discuss with do4gr
-//    if (connector.active && connectorTag != ConnectorTag.MongoConnectorTag) assertion
-  }
 
   private def ignoredTestsBasedOnIndividualTagging = {
     super.tags.mapValues { tagNames =>

@@ -267,3 +267,21 @@ pub struct PoolTimeout {
 pub struct RecordRequiredButNotFound {
     pub cause: String,
 }
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P2026",
+    message = "The current database provider doesn't support a feature that the query used: {feature}"
+)]
+pub struct UnsupportedFeature {
+    pub feature: String,
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P2027",
+    message = "Multiple errors occurred on the database during query execution: {errors}"
+)]
+pub struct MultiError {
+    pub errors: String, // Might want to change it to collection of user facing errors.
+}

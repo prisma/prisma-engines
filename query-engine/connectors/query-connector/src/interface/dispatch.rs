@@ -100,27 +100,27 @@ impl<'conn, 'tx> WriteOperations for ConnectionLike<'conn, 'tx> {
         }
     }
 
-    async fn connect(
+    async fn m2m_connect(
         &self,
         field: &RelationFieldRef,
         parent_id: &RecordProjection,
         child_ids: &[RecordProjection],
     ) -> crate::Result<()> {
         match self {
-            Self::Connection(c) => c.connect(field, parent_id, child_ids).await,
-            Self::Transaction(tx) => tx.connect(field, parent_id, child_ids).await,
+            Self::Connection(c) => c.m2m_connect(field, parent_id, child_ids).await,
+            Self::Transaction(tx) => tx.m2m_connect(field, parent_id, child_ids).await,
         }
     }
 
-    async fn disconnect(
+    async fn m2m_disconnect(
         &self,
         field: &RelationFieldRef,
         parent_id: &RecordProjection,
         child_ids: &[RecordProjection],
     ) -> crate::Result<()> {
         match self {
-            Self::Connection(c) => c.disconnect(field, parent_id, child_ids).await,
-            Self::Transaction(tx) => tx.disconnect(field, parent_id, child_ids).await,
+            Self::Connection(c) => c.m2m_disconnect(field, parent_id, child_ids).await,
+            Self::Transaction(tx) => tx.m2m_disconnect(field, parent_id, child_ids).await,
         }
     }
 

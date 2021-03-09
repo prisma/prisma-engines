@@ -193,7 +193,6 @@ class ScalarListsQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "full scalar list" should "return full list for GraphQLIds" in {
-
     val fieldName   = "graphqlids"
     val inputValue  = """"5beea4aa6183dd734b2dbd9b""""
     val outputValue = """"5beea4aa6183dd734b2dbd9b""""
@@ -209,7 +208,6 @@ class ScalarListsQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "full scalar list" should "return full list for datetime" in {
-
     val fieldName   = "datetimes"
     val inputValue  = """"2018-01-01T00:00:00.000Z""""
     val outputValue = """"2018-01-01T00:00:00+00:00""""
@@ -225,7 +223,6 @@ class ScalarListsQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "full scalar list" should "return full list for enum" in {
-
     val fieldName   = "enum"
     val inputValue  = "HA"
     val outputValue = """"HA""""
@@ -246,7 +243,6 @@ class ScalarListsQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "Overwriting a full scalar list with an empty list" should "return an empty list" in {
-
     val project = SchemaDsl.fromStringV11() {
       s"""model Model{
          |   id String @id @default(cuid())

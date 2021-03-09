@@ -8,7 +8,7 @@ use migration_core::commands::SchemaPushInput;
 use std::{fs::File, io::Read};
 use structopt::*;
 
-#[derive(StructOpt)]
+#[derive(Debug, StructOpt)]
 #[structopt(version = env!("GIT_HASH"))]
 enum Command {
     /// Introspect a database
@@ -28,7 +28,7 @@ enum Command {
     DiagnoseMigrationHistory(DiagnoseMigrationHistory),
 }
 
-#[derive(StructOpt)]
+#[derive(Debug, StructOpt)]
 struct DmmfCommand {
     /// The path to the `query-engine` binary. Defaults to the value of the `PRISMA_BINARY_PATH`
     /// env var, or just `query-engine`.
@@ -42,14 +42,16 @@ struct DmmfCommand {
     file_path: Option<String>,
 }
 
-#[derive(StructOpt)]
+#[derive(Debug, StructOpt)]
 struct SchemaPush {
     schema_path: String,
     #[structopt(long)]
     force: bool,
+    #[structopt(long)]
+    recreate: bool,
 }
 
-#[derive(StructOpt)]
+#[derive(StructOpt, Debug)]
 struct DiagnoseMigrationHistory {
     schema_path: String,
     migrations_directory_path: String,
@@ -180,7 +182,7 @@ async fn schema_push(cmd: &SchemaPush) -> anyhow::Result<()> {
         .schema_push(&SchemaPushInput {
             schema,
             force: cmd.force,
-            assume_empty: false,
+            assume_empty: cmd.recreate,
         })
         .await?;
 

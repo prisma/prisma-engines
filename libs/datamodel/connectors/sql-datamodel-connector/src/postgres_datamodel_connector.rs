@@ -56,6 +56,7 @@ impl PostgresDatamodelConnector {
             ConnectorCapability::CreateMany,
             ConnectorCapability::WritableAutoincField,
             ConnectorCapability::CreateSkipDuplicates,
+            ConnectorCapability::UpdateableId,
         ];
 
         let small_int = NativeTypeConstructor::without_args(SMALL_INT_TYPE_NAME, vec![ScalarType::Int]);
@@ -203,6 +204,7 @@ impl Connector for PostgresDatamodelConnector {
             .iter()
             .any(|(st, nt)| scalar_type == st && &native_type == nt)
     }
+
     fn validate_field(&self, field: &Field) -> Result<(), ConnectorError> {
         match field.field_type() {
             FieldType::NativeType(_scalar_type, native_type_instance) => {

@@ -99,7 +99,7 @@ async fn delete_many<'a, 'b>(
 }
 
 async fn connect<'a, 'b>(tx: &'a ConnectionLike<'a, 'b>, q: ConnectRecords) -> InterpretationResult<QueryResult> {
-    tx.connect(
+    tx.m2m_connect(
         &q.relation_field,
         &q.parent_id.expect("Expected parent record ID to be set for connect"),
         &q.child_ids,
@@ -110,7 +110,7 @@ async fn connect<'a, 'b>(tx: &'a ConnectionLike<'a, 'b>, q: ConnectRecords) -> I
 }
 
 async fn disconnect<'a, 'b>(tx: &'a ConnectionLike<'a, 'b>, q: DisconnectRecords) -> InterpretationResult<QueryResult> {
-    tx.disconnect(
+    tx.m2m_disconnect(
         &q.relation_field,
         &q.parent_id.expect("Expected parent record ID to be set for disconnect"),
         &q.child_ids,

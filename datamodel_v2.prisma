@@ -1,110 +1,45 @@
-datasource chinook {
-  provider = "sqlite"
-  url      = "file:./db/Chinook.db?connection_limit=1&socket_timeout=20"
+datasource db {
+  provider = "mongodb"
+  url      = "mongodb://prisma:prisma@127.0.0.1:27017/testdb?authSource=admin"
 }
 
-model Album {
-  id       Int     @id @map("AlbumId")
-  Title    String  @default("TestDefaultTitle")
-  ArtistId Int
-  Tracks   Track[]
-  Artist   Artist  @relation(fields: [ArtistId], references: [id])
+model User {
+  id      String   @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  name    String
+  age     Int?
+  address Address?
+  roles   String[]
+  posts   Post[]
 }
 
-model Track {
-  id           Int           @id @map("TrackId")
-  Name         String
-  Composer     String?
-  Milliseconds Int
-  UnitPrice    Float
-  AlbumId      Int?
-  GenreId      Int?
-  MediaTypeId  Int
-  MediaType    MediaType     @relation(fields: [MediaTypeId], references: [id])
-  Genre        Genre?        @relation(fields: [GenreId], references: [id])
-  Album        Album?        @relation(fields: [AlbumId], references: [id])
-  InvoiceLines InvoiceLine[]
+model Address {
+  id      String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  zip     Int
+  user_id String @db.ObjectId
+  user    User   @relation(fields: [user_id], references: [id])
+  test    Test?
 }
 
-model MediaType {
-  id    Int     @id @map("MediaTypeId")
-  Name  String?
-  Track Track[]
+model Test {
+  id   String   @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  gql  String?
+  a_id String?  @db.ObjectId
+  a    Address? @relation(fields: [a_id], references: [id])
 }
 
-model Genre {
-  id     Int     @id @map("GenreId")
-  Name   String?
-  Tracks Track[]
+model Post {
+  id           String     @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  title        String
+  author_id    String     @db.ObjectId
+  author       User       @relation(fields: [author_id], references: [id])
+  category_ids String[]   @db.Array(ObjectId)
+  categories   Category[] @relation(fields: [category_ids])
+  createdAt    DateTime   @default(now())
 }
 
-model Artist {
-  id     Int     @id @map("ArtistId")
-  Name   String?
-  Albums Album[]
-}
-
-model Customer {
-  id           Int       @id @map("CustomerId")
-  FirstName    String
-  LastName     String
-  Company      String?
-  Address      String?
-  City         String?
-  State        String?
-  Country      String?
-  PostalCode   String?
-  Phone        String?
-  Fax          String?
-  Email        String
-  SupportRepId Int?
-  SupportRep   Employee? @relation(fields: [SupportRepId], references: [id])
-  Invoices     Invoice[]
-}
-
-model Employee {
-  id         Int        @id @map("EmployeeId")
-  FirstName  String
-  LastName   String
-  Title      String?
-  BirthDate  DateTime?
-  HireDate   DateTime?
-  Address    String?
-  City       String?
-  State      String?
-  Country    String?
-  PostalCode String?
-  Phone      String?
-  Fax        String?
-  Email      String?
-  Customers  Customer[]
-}
-
-model Invoice {
-  id                Int           @id @map("InvoiceId")
-  InvoiceDate       DateTime
-  BillingAddress    String?
-  BillingCity       String?
-  BillingState      String?
-  BillingCountry    String?
-  BillingPostalCode String?
-  Total             Float
-  CustomerId        Int
-  Customer          Customer      @relation(fields: [CustomerId], references: [id])
-  Lines             InvoiceLine[]
-}
-
-model InvoiceLine {
-  id        Int     @id @map("InvoiceLineId")
-  UnitPrice Float
-  Quantity  Int
-  InvoiceId Int
-  TrackId   Int
-  Invoice   Invoice @relation(fields: [InvoiceId], references: [id])
-  Track     Track   @relation(fields: [TrackId], references: [id])
-}
-
-model Playlist {
-  id   Int     @id @map("PlaylistId")
-  Name String?
+model Category {
+  id       String   @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  name     String
+  post_ids String[] @db.Array(ObjectId)
+  posts    Post[]   @relation(fields: [post_ids])
 }

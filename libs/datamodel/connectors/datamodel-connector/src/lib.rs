@@ -131,11 +131,13 @@ pub enum ConnectorCapability {
     AutoIncrementMultipleAllowed,
     AutoIncrementNonIndexedAllowed,
     RelationFieldsInArbitraryOrder,
+
     // start of Query Engine Capabilities
     InsensitiveFilters,
     CreateMany,
     WritableAutoincField,
     CreateSkipDuplicates,
+    UpdateableId,
 }
 
 /// Contains all capabilities that the connector is able to serve.
