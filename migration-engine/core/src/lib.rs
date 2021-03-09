@@ -11,7 +11,6 @@ pub use api::GenericApi;
 pub use commands::SchemaPushInput;
 pub use core_error::{CoreError, CoreResult};
 
-use anyhow::anyhow;
 use datamodel::{
     common::provider_names::{
         MONGODB_SOURCE_NAME, MSSQL_SOURCE_NAME, MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME,
@@ -34,10 +33,10 @@ pub async fn migration_api(datamodel: &str) -> CoreResult<Box<dyn api::GenericAp
         .first()
         .map(|source| match source.provider.as_slice() {
             [_] => Ok(source),
-            [] => Err(CoreError::Generic(anyhow!("There is no provider in the datasource."))),
+            [] => Err(CoreError::new_unknown("There is no provider in the datasource.".into())),
             _ => Err(CoreError::user_facing(DeprecatedProviderArray)),
         })
-        .unwrap_or_else(|| Err(CoreError::Generic(anyhow!("There is no datasource in the schema."))))?;
+        .unwrap_or_else(|| Err(CoreError::new_unknown("There is no datasource in the schema.".into())))?;
 
     match &source.active_provider {
         #[cfg(feature = "sql")]
@@ -105,7 +104,7 @@ pub async fn create_database(schema: &str) -> CoreResult<String> {
     let source = config
         .datasources
         .first()
-        .ok_or_else(|| CoreError::Generic(anyhow!("There is no datasource in the schema.")))?;
+        .ok_or_else(|| CoreError::new_unknown("There is no datasource in the schema.".into()))?;
 
     match &source.active_provider {
         provider
@@ -130,7 +129,7 @@ pub async fn drop_database(schema: &str) -> CoreResult<()> {
     let source = config
         .datasources
         .first()
-        .ok_or_else(|| CoreError::Generic(anyhow!("There is no datasource in the schema.")))?;
+        .ok_or_else(|| CoreError::new_unknown("There is no datasource in the schema.".into()))?;
 
     match &source.active_provider {
         provider
@@ -156,7 +155,7 @@ pub async fn qe_setup(prisma_schema: &str) -> CoreResult<()> {
     let source = config
         .datasources
         .first()
-        .ok_or_else(|| CoreError::Generic(anyhow!("There is no datasource in the schema.")))?;
+        .ok_or_else(|| CoreError::new_unknown("There is no datasource in the schema.".into()))?;
 
     let api: Box<dyn GenericApi> = match &source.active_provider {
         provider
@@ -194,13 +193,13 @@ pub async fn qe_setup(prisma_schema: &str) -> CoreResult<()> {
 fn parse_configuration(datamodel: &str) -> CoreResult<Configuration> {
     datamodel::parse_configuration(&datamodel)
         .map(|validated_config| validated_config.subject)
-        .map_err(|err| CoreError::ReceivedBadDatamodel(err.to_pretty_string("schema.prisma", datamodel)))
+        .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", datamodel)))
 }
 
 fn parse_datamodel(datamodel: &str) -> CoreResult<Datamodel> {
     datamodel::parse_datamodel(&datamodel)
         .map(|d| d.subject)
-        .map_err(|err| CoreError::ReceivedBadDatamodel(err.to_pretty_string("schema.prisma", datamodel)))
+        .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", datamodel)))
 }
 
 #[cfg(test)]

@@ -7,6 +7,7 @@ mod logger;
 
 use migration_core::{api::RpcApi, CoreError};
 use structopt::StructOpt;
+use user_facing_errors::{common::SchemaParserError, UserFacingError};
 
 /// When no subcommand is specified, the migration engine will default to starting as a JSON-RPC
 /// server over stdio.
@@ -72,13 +73,10 @@ async fn start_engine(datamodel_location: &str) -> ! {
         Ok(api) => json_rpc_stdio::run(api.io_handler()).await.unwrap(),
         Err(err) => {
             let (error, exit_code) = match &err {
-                CoreError::ReceivedBadDatamodel(message) => {
-                    let error = user_facing_errors::UnknownError {
-                        message: message.clone(),
-                        backtrace: Some(format!("{:?}", user_facing_errors::new_backtrace())),
-                    };
-
-                    (user_facing_errors::Error::from(error), 1)
+                CoreError::UserFacing(err)
+                    if err.as_known().map(|e| e.error_code) == Some(SchemaParserError::ERROR_CODE) =>
+                {
+                    (err.clone(), 1)
                 }
                 _ => (err.render_user_facing(), 250),
             };
