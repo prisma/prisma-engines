@@ -28,9 +28,9 @@ pub(crate) async fn mark_migration_rolled_back<
     connector.acquire_lock().await?;
 
     let all_migrations = persistence.list_migrations().await?.map_err(|_err| {
-        CoreError::Generic(anyhow::anyhow!(
-            "Invariant violation: called markMigrationRolledBack on a database without migrations table."
-        ))
+        CoreError::new_unknown(
+            "Invariant violation: called markMigrationRolledBack on a database without migrations table.".into(),
+        )
     })?;
 
     let relevant_migrations: Vec<_> = all_migrations
