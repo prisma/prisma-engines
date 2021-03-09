@@ -5,4 +5,5 @@ name = "query-engine-tests"
 version = "0.1.0"
 
 [dependencies]
-anyhow = { version = "1.0" }
+anyhow = "1.0"
+serde_json = "1.0"
