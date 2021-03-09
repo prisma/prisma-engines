@@ -93,12 +93,10 @@ impl OrderByData {
     pub(crate) fn full_reference_path(&self, use_bindings: bool) -> String {
         if let Some(ref prefix) = self.prefix {
             format!("{}.{}", prefix.to_string(), self.scalar_field_name())
+        } else if use_bindings {
+            self.binding_names().0
         } else {
-            if use_bindings {
-                self.binding_names().0
-            } else {
-                self.scalar_field_name().to_string()
-            }
+            self.scalar_field_name().to_string()
         }
     }
 

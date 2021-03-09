@@ -21,7 +21,7 @@ impl MongoFilter {
     }
 
     pub(crate) fn relation(filter: Document, joins: Vec<JoinStage>) -> Self {
-        Self::Relation(MongoRelationFilter { filter: filter, joins })
+        Self::Relation(MongoRelationFilter { filter, joins })
     }
 }
 
