@@ -140,12 +140,7 @@ pub(crate) fn many_records_arguments(
 
 // Builds "orderBy" argument.
 pub(crate) fn order_by_argument(ctx: &mut BuilderContext, model: &ModelRef, include_relations: bool) -> InputField {
-    let order_object_type = InputType::object(order_by_objects::order_by_object_type(
-        ctx,
-        model,
-        include_relations,
-        &mut vec![],
-    ));
+    let order_object_type = InputType::object(order_by_objects::order_by_object_type(ctx, model, include_relations));
 
     input_field(
         args::ORDER_BY,
