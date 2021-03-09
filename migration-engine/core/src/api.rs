@@ -18,9 +18,6 @@ pub trait GenericApi: Send + Sync + 'static {
     /// Apply all the unapplied migrations from the migrations folder.
     async fn apply_migrations(&self, input: &ApplyMigrationsInput) -> CoreResult<ApplyMigrationsOutput>;
 
-    /// Apply a raw database script.
-    async fn apply_script(&self, input: &ApplyScriptInput) -> CoreResult<ApplyScriptOutput>;
-
     /// Generate a new migration, based on the provided schema and existing migrations history.
     async fn create_migration(&self, input: &CreateMigrationInput) -> CoreResult<CreateMigrationOutput>;
 
@@ -76,12 +73,6 @@ impl<C: MigrationConnector> GenericApi for C {
     async fn apply_migrations(&self, input: &ApplyMigrationsInput) -> CoreResult<ApplyMigrationsOutput> {
         ApplyMigrationsCommand::execute(input, self)
             .instrument(tracing::info_span!("ApplyMigrations"))
-            .await
-    }
-
-    async fn apply_script(&self, input: &ApplyScriptInput) -> CoreResult<ApplyScriptOutput> {
-        ApplyScriptCommand::execute(input, self)
-            .instrument(tracing::info_span!("ApplyScript"))
             .await
     }
 

@@ -514,7 +514,8 @@ async fn with_an_invalid_unapplied_migration_should_report_it(api: &TestApi) -> 
 async fn drift_can_be_detected_without_migrations_table(api: &TestApi) -> TestResult {
     let directory = api.create_migrations_directory()?;
 
-    api.apply_script("CREATE TABLE \"Cat\" (\nid SERIAL PRIMARY KEY\n);")
+    api.database()
+        .raw_cmd("CREATE TABLE \"Cat\" (\nid SERIAL PRIMARY KEY\n);")
         .await?;
 
     let dm1 = r#"
