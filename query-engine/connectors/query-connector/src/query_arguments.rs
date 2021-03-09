@@ -116,7 +116,7 @@ impl QueryArguments {
             index
                 .fields()
                 .into_iter()
-                .all(|f| on_model.iter().find(|o| o.field == f).is_some())
+                .all(|f| on_model.iter().any(|o| o.field == f))
         });
 
         let source_contains_unique = on_model.iter().any(|o| o.field.unique());
