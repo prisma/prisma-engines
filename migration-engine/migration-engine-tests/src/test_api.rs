@@ -25,7 +25,6 @@ use dev_diagnostic::DevDiagnostic;
 use enumflags2::BitFlags;
 use mark_migration_rolled_back::MarkMigrationRolledBack;
 use migration_connector::{MigrationFeature, MigrationPersistence, MigrationRecord};
-use migration_core::{api::GenericApi, commands::ApplyScriptInput};
 use quaint::{
     prelude::{ConnectionInfo, Queryable, SqlFamily},
     single::Quaint,
@@ -183,14 +182,6 @@ impl TestApi {
 
     pub fn list_migration_directories<'a>(&'a self, migrations_directory: &'a TempDir) -> ListMigrationDirectories<'a> {
         ListMigrationDirectories::new(&self.api, migrations_directory)
-    }
-
-    pub async fn apply_script(&self, script: impl Into<String>) -> anyhow::Result<()> {
-        self.api
-            .apply_script(&ApplyScriptInput { script: script.into() })
-            .await?;
-
-        Ok(())
     }
 
     /// Convenient builder and assertions for the CreateMigration command.

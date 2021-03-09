@@ -2,7 +2,6 @@
 //! module.
 
 mod apply_migrations;
-mod apply_script;
 mod command;
 mod create_migration;
 mod debug_panic;
@@ -17,7 +16,6 @@ mod plan_migration;
 mod schema_push;
 
 pub use apply_migrations::{ApplyMigrationsCommand, ApplyMigrationsInput, ApplyMigrationsOutput};
-pub use apply_script::{ApplyScriptCommand, ApplyScriptInput, ApplyScriptOutput};
 pub use command::MigrationCommand;
 pub use create_migration::{CreateMigrationCommand, CreateMigrationInput, CreateMigrationOutput};
 pub use debug_panic::DebugPanicCommand;
