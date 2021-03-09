@@ -16,8 +16,8 @@ request-handlers = { path = "../request-handlers" }
 query-connector = { path = "../connectors/query-connector" }
 user-facing-errors = { path = "../../libs/user-facing-errors" }
 datamodel = { path = "../../libs/datamodel/core" }
-feature-flags = {path = "../../libs/feature-flags"}
-sql-connector = {path = "../connectors/sql-query-connector", package = "sql-query-connector"}
+feature-flags = { path = "../../libs/feature-flags" }
+sql-connector = { path = "../connectors/sql-query-connector", package = "sql-query-connector" }
 prisma-models = { path = "../../libs/prisma-models" }
 napi = { version = "1.2", default-features = false, features = ["napi4", "tokio_rt", "serde-json"] }
 napi-derive = "1"

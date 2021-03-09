@@ -6,28 +6,28 @@ version = "0.1.0"
 
 [dependencies]
 bigdecimal = "0.2"
-chrono = {version = "0.4.6", features = ["serde"]}
+chrono = { version = "0.4.6", features = ["serde"] }
 colored = "1.8.0"
-datamodel-connector = {path = "../connectors/datamodel-connector"}
-dml = {path = "../connectors/dml"}
+datamodel-connector = { path = "../connectors/datamodel-connector" }
+dml = { path = "../connectors/dml" }
 itertools = "0.8"
-mongodb-datamodel-connector = {path = "../connectors/mongodb-datamodel-connector"}
+mongodb-datamodel-connector = { path = "../connectors/mongodb-datamodel-connector" }
 once_cell = "1.3.1"
 paste = "1.0"
 pest = "2.1.3"
 pest_derive = "2.1.0"
-prisma-value = {path = "../../prisma-value"}
+prisma-value = { path = "../../prisma-value" }
 regex = "1.3.7"
-serde = {version = "1.0.90", features = ["derive"]}
-serde_json = {version = "1.0", features = ["preserve_order", "float_roundtrip"]}
-sql-datamodel-connector = {path = "../connectors/sql-datamodel-connector"}
+serde = { version = "1.0.90", features = ["derive"] }
+serde_json = { version = "1.0", features = ["preserve_order", "float_roundtrip"] }
+sql-datamodel-connector = { path = "../connectors/sql-datamodel-connector" }
 thiserror = "1.0"
 tracing = "0.1"
 
 [dev-dependencies]
 clap = "2.33"
 indoc = "1"
-native-types = {path = "../../native-types"}
+native-types = { path = "../../native-types" }
 paste = "1.0"
 pretty_assertions = "0.6.1"
 serial_test = "*"
