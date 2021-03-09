@@ -1,6 +1,5 @@
 use super::error_rendering::render_jsonrpc_error;
 use crate::{CoreError, CoreResult, GenericApi};
-use futures::{FutureExt, TryFutureExt};
 use jsonrpc_core::{types::error::Error as JsonRpcError, IoHandler, Params};
 use std::sync::Arc;
 
@@ -88,7 +87,7 @@ impl RpcApi {
 
         self.io_handler.add_method(cmd.name(), move |params: Params| {
             let executor = Arc::clone(&executor);
-            Self::create_handler(executor, cmd, params).boxed().compat()
+            Box::pin(Self::create_handler(executor, cmd, params))
         });
     }
 

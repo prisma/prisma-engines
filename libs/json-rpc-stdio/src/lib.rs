@@ -1,4 +1,3 @@
-use futures::compat::Future01CompatExt;
 use jsonrpc_core::IoHandler;
 use tokio::io::{AsyncBufReadExt, AsyncRead, AsyncWrite, AsyncWriteExt};
 
@@ -27,12 +26,10 @@ async fn run_with_io(
 
 /// Process a request asynchronously
 async fn handle_request(io: &IoHandler, input: &str) -> String {
-    let response = io.handle_request(input).compat().await;
+    let response = io.handle_request(input).await;
 
-    response
-        .expect("jsonrpc-core returned an empty error")
-        .unwrap_or_else(|| {
-            tracing::info!("JSON RPC request produced no response: {:?}", input);
-            String::from("")
-        })
+    response.unwrap_or_else(|| {
+        tracing::info!("JSON RPC request produced no response: {:?}", input);
+        String::from("")
+    })
 }
