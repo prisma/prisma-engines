@@ -60,10 +60,6 @@ impl Rpc for RpcImpl {
 }
 
 impl RpcImpl {
-    pub fn new() -> Self {
-        RpcImpl
-    }
-
     async fn load_connector(schema: &str) -> Result<(Configuration, String, Box<dyn IntrospectionConnector>), Error> {
         let config = datamodel::parse_configuration(&schema)
             .map_err(|diagnostics| Error::DatamodelError(diagnostics.to_pretty_string("schema.prisma", schema)))?;
@@ -164,10 +160,4 @@ pub struct IntrospectionInput {
 
 fn default_false() -> bool {
     false
-}
-
-impl Default for RpcImpl {
-    fn default() -> Self {
-        Self::new()
-    }
 }

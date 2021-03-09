@@ -22,7 +22,7 @@ async fn main() {
         user_facing_errors::set_panic_hook();
 
         let mut io_handler = IoHandler::new();
-        io_handler.extend_with(RpcImpl::new().to_delegate());
+        io_handler.extend_with(RpcImpl.to_delegate());
 
         json_rpc_stdio::run(&io_handler).await.unwrap();
     };
