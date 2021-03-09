@@ -84,7 +84,7 @@ impl QueryArguments {
     /// (the many side) can have the one side. A simple example would be a User <> Post relation
     /// where a post can have only one author but an author (User) can have many posts. If posts
     /// are ordered by related author id, then we can't reliably order posts, as the following can happen:
-    /// ```
+    /// ```text
     /// post_id, post_title, author_id
     /// 1        post1       1
     /// 2        post2       1
@@ -103,8 +103,6 @@ impl QueryArguments {
         if self.order_by.is_empty() {
             return true;
         }
-
-        // let order_fields: Vec<_> = self.order_by.iter().map(|o| &o.field).collect();
 
         // Partition into orderings on the same model and ones that require relation hops.
         // Note: One ordering is always on one scalar in the end.
