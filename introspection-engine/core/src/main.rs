@@ -1,4 +1,3 @@
-mod command_error;
 mod error;
 mod error_rendering;
 mod rpc;

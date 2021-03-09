@@ -1,9 +1,9 @@
-use crate::command_error::CommandError;
 use crate::error::Error;
 use introspection_connector::ConnectorError;
 use jsonrpc_core::types::Error as JsonRpcError;
-use user_facing_errors::common::SchemaParserError;
-use user_facing_errors::{introspection_engine::IntrospectionResultEmpty, Error as UserFacingError, KnownError};
+use user_facing_errors::{
+    common::SchemaParserError, introspection_engine::IntrospectionResultEmpty, Error as UserFacingError, KnownError,
+};
 
 pub fn render_error(crate_error: Error) -> UserFacingError {
     match crate_error {
@@ -11,12 +11,10 @@ pub fn render_error(crate_error: Error) -> UserFacingError {
             user_facing_error: Some(user_facing_error),
             ..
         }) => user_facing_error.into(),
-        Error::CommandError(CommandError::IntrospectionResultEmpty(connection_string)) => {
+        Error::IntrospectionResultEmpty(connection_string) => {
             KnownError::new(IntrospectionResultEmpty { connection_string }).into()
         }
-        Error::CommandError(CommandError::ReceivedBadDatamodel(full_error)) | Error::DatamodelError(full_error) => {
-            KnownError::new(SchemaParserError { full_error }).into()
-        }
+        Error::DatamodelError(full_error) => KnownError::new(SchemaParserError { full_error }).into(),
         _ => UserFacingError::from_dyn_error(&crate_error),
     }
 }

@@ -15,8 +15,6 @@ introspection-connector = { path = "../connectors/introspection-connector" }
 sql-introspection-connector = { path = "../connectors/sql-introspection-connector" }
 
 serde = "1.0"
-anyhow = "1.0.26"
-thiserror = "1.0.9"
 futures = { version = "0.3", features = ["compat"] }
 futures01 = { package = "futures", version = "0.1" }
 

@@ -1536,7 +1536,6 @@ dependencies = [
 name = "introspection-core"
 version = "0.1.0"
 dependencies = [
- "anyhow",
  "async-trait",
  "datamodel",
  "futures 0.1.31",
@@ -1550,7 +1549,6 @@ dependencies = [
  "serde_derive",
  "serde_json",
  "sql-introspection-connector",
- "thiserror",
  "tokio",
  "tracing",
  "tracing-futures",
