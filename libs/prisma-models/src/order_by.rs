@@ -6,14 +6,21 @@ pub struct OrderBy {
     pub field: ScalarFieldRef,
     pub path: Vec<RelationFieldRef>,
     pub sort_order: SortOrder,
+    pub sort_aggregation: Option<SortAggregation>,
 }
 
 impl OrderBy {
-    pub fn new(field: ScalarFieldRef, path: Vec<RelationFieldRef>, sort_order: SortOrder) -> Self {
+    pub fn new(
+        field: ScalarFieldRef,
+        path: Vec<RelationFieldRef>,
+        sort_order: SortOrder,
+        sort_aggregation: Option<SortAggregation>,
+    ) -> Self {
         Self {
             field,
             path,
             sort_order,
+            sort_aggregation,
         }
     }
 }
@@ -26,6 +33,11 @@ pub trait IntoOrderBy {
 pub enum SortOrder {
     Ascending,
     Descending,
+}
+
+#[derive(Clone, Copy, PartialEq, Debug, Eq, Hash)]
+pub enum SortAggregation {
+    Count { _all: bool },
 }
 
 impl ToString for SortOrder {
@@ -43,6 +55,7 @@ impl From<ScalarFieldRef> for OrderBy {
             field,
             path: vec![],
             sort_order: SortOrder::Ascending,
+            sort_aggregation: None,
         }
     }
 }

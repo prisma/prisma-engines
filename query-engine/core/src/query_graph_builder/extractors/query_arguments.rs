@@ -1,6 +1,7 @@
 use super::*;
 use crate::{
     constants::inputs::args,
+    constants::inputs::filters,
     constants::inputs::ordering,
     query_document::{ParsedArgument, ParsedInputMap},
     QueryGraphBuilderError, QueryGraphBuilderResult,
@@ -8,7 +9,7 @@ use crate::{
 use connector::QueryArguments;
 use prisma_models::{
     Field, ModelProjection, ModelRef, OrderBy, PrismaValue, RecordProjection, RelationFieldRef, ScalarFieldRef,
-    SortOrder,
+    SortAggregation, SortOrder,
 };
 use std::convert::{identity, TryInto};
 
@@ -99,6 +100,24 @@ fn process_order_object(
         Some((field_name, field_value)) => {
             let field = model.fields().find_from_all(&field_name)?;
             match field {
+                Field::Relation(rf) if rf.is_list => {
+                    path.push(rf.clone());
+
+                    let object: ParsedInputMap = field_value.try_into()?;
+                    let (sort_aggregation, sort_order) = extract_sort_aggregation(object)?;
+                    let ids: Vec<_> = rf.related_model().primary_identifier().scalar_fields().collect();
+                    // FIXME: This is a hack to fulfil the requirement of the `OrderBy` struct to have a field to order by
+                    // In the case of aggregations, at least for now, we use AGGR(*), meaning that this field won't ever be used
+                    // This needs to be refactored when we add order by aggregations on specific fields
+                    let first_id = ids.first().unwrap();
+
+                    Ok(Some(OrderBy::new(
+                        first_id.clone(),
+                        path,
+                        sort_order,
+                        Some(sort_aggregation),
+                    )))
+                }
                 Field::Relation(rf) => {
                     path.push(rf.clone());
 
@@ -106,18 +125,35 @@ fn process_order_object(
                     process_order_object(&rf.related_model(), object, path)
                 }
                 Field::Scalar(sf) => {
-                    let value: PrismaValue = field_value.try_into()?;
-                    let sort_order = match value.into_string().unwrap().to_lowercase().as_str() {
-                        ordering::ASC => SortOrder::Ascending,
-                        ordering::DESC => SortOrder::Descending,
-                        _ => unreachable!(),
-                    };
+                    let sort_order = extract_sort_order(field_value)?;
 
-                    Ok(Some(OrderBy::new(sf.clone(), path, sort_order)))
+                    Ok(Some(OrderBy::new(sf.clone(), path, sort_order, None)))
                 }
             }
         }
     }
+}
+
+fn extract_sort_aggregation(object: ParsedInputMap) -> QueryGraphBuilderResult<(SortAggregation, SortOrder)> {
+    let (field_name, field_value) = object.into_iter().next().unwrap();
+    let sort_order = extract_sort_order(field_value)?;
+    let sort_aggregation = match field_name.as_str() {
+        filters::COUNT => Some(SortAggregation::Count { _all: true }),
+        _ => unreachable!("No aggregation operation could be found. This should not happen"),
+    };
+
+    Ok((sort_aggregation.unwrap(), sort_order))
+}
+
+fn extract_sort_order(field_value: ParsedInputValue) -> QueryGraphBuilderResult<SortOrder> {
+    let value: PrismaValue = field_value.try_into()?;
+    let sort_order = match value.into_string().unwrap().to_lowercase().as_str() {
+        ordering::ASC => SortOrder::Ascending,
+        ordering::DESC => SortOrder::Descending,
+        _ => unreachable!(),
+    };
+
+    Ok(sort_order)
 }
 
 fn extract_distinct(value: ParsedInputValue) -> QueryGraphBuilderResult<ModelProjection> {
