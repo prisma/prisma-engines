@@ -1,3 +1,5 @@
+cargo-features = ["strip"]
+
 [workspace]
 members = [
   "introspection-engine/connectors/introspection-connector",
@@ -31,10 +33,12 @@ members = [
   "libs/user-facing-errors",
 ]
 
+[profile.release]
+strip = 'symbols'
+
 [profile.dev.package.backtrace]
 opt-level = 3
 
 [profile.release.package.introspection-core]
-codegen-units = 1 
+codegen-units = 1
 opt-level = 'z' # Optimize for size.
-#strip="symbols"
