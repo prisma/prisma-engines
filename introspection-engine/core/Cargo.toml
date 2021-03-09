@@ -14,7 +14,6 @@ user-facing-errors = { path = "../../libs/user-facing-errors" }
 introspection-connector = { path = "../connectors/introspection-connector" }
 sql-introspection-connector = { path = "../connectors/sql-introspection-connector" }
 
-futures = { version = "0.3", default-features = false }
 serde = "1.0"
 serde_json = { version = "1.0", features = ["float_roundtrip"] }
 serde_derive = "1.0"

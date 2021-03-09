@@ -1,4 +1,5 @@
 pub(crate) mod error;
+
 #[cfg(test)]
 mod tests;
 

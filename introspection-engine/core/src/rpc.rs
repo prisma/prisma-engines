@@ -1,6 +1,5 @@
 use crate::error::Error;
 use datamodel::{Configuration, Datamodel};
-use futures::FutureExt;
 use introspection_connector::{ConnectorResult, DatabaseMetadata, IntrospectionConnector, IntrospectionResultOutput};
 use jsonrpc_core::BoxFuture;
 use jsonrpc_derive::rpc;
@@ -36,27 +35,27 @@ pub struct RpcImpl;
 
 impl Rpc for RpcImpl {
     fn list_databases(&self, input: IntrospectionInput) -> RpcFutureResult<Vec<String>> {
-        Self::list_databases_internal(input.schema).boxed()
+        Box::pin(Self::list_databases_internal(input.schema))
     }
 
     fn get_database_metadata(&self, input: IntrospectionInput) -> RpcFutureResult<DatabaseMetadata> {
-        Self::get_database_metadata_internal(input.schema).boxed()
+        Box::pin(Self::get_database_metadata_internal(input.schema))
     }
 
     fn get_database_description(&self, input: IntrospectionInput) -> RpcFutureResult<String> {
-        Self::get_database_description_internal(input.schema).boxed()
+        Box::pin(Self::get_database_description_internal(input.schema))
     }
 
     fn get_database_version(&self, input: IntrospectionInput) -> RpcFutureResult<String> {
-        Self::get_database_version_internal(input.schema).boxed()
+        Box::pin(Self::get_database_version_internal(input.schema))
     }
 
     fn introspect(&self, input: IntrospectionInput) -> RpcFutureResult<IntrospectionResultOutput> {
-        Self::introspect_internal(input.schema, input.force).boxed()
+        Box::pin(Self::introspect_internal(input.schema, input.force))
     }
 
     fn debug_panic(&self) -> RpcFutureResult<()> {
-        Self::debug_panic().boxed()
+        Box::pin(Self::debug_panic())
     }
 }
 
