@@ -10,7 +10,7 @@ pub enum Error {
     #[error("Failure during an introspection command: {0}")]
     CommandError(CommandError),
 
-    #[error("Error in datamodel: {}", .0)]
+    #[error("Error in datamodel:\n{}", .0)]
     DatamodelError(String),
 
     #[error("{}", _0)]

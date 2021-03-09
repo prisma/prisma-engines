@@ -14,7 +14,7 @@ pub fn render_error(crate_error: Error) -> UserFacingError {
         Error::CommandError(CommandError::IntrospectionResultEmpty(connection_string)) => {
             KnownError::new(IntrospectionResultEmpty { connection_string }).into()
         }
-        Error::CommandError(CommandError::ReceivedBadDatamodel(full_error)) => {
+        Error::CommandError(CommandError::ReceivedBadDatamodel(full_error)) | Error::DatamodelError(full_error) => {
             KnownError::new(SchemaParserError { full_error }).into()
         }
         _ => UserFacingError::from_dyn_error(&crate_error),
