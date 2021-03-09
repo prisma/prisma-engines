@@ -177,7 +177,7 @@ impl IntoBson for (&TypeIdentifier, PrismaValue) {
 
             // Unhandled
             (TypeIdentifier::Unsupported, _) => unreachable!("Unsupported types should never hit the connector."),
-            (TypeIdentifier::Xml, _) => Err(MongoError::Unsupported("Mongo doesn't support XML.".to_owned()))?,
+            (TypeIdentifier::Xml, _) => return Err(MongoError::Unsupported("Mongo doesn't support XML.".to_owned())),
 
             // Todo?
             // Enum(String),
@@ -199,7 +199,7 @@ pub(crate) fn value_from_bson(bson: Bson) -> crate::Result<PrismaValue> {
         },
         Bson::Array(list) => Ok(PrismaValue::List(
             list.into_iter()
-                .map(|bson| value_from_bson(bson))
+                .map(value_from_bson)
                 .collect::<crate::Result<Vec<_>>>()?,
         )),
         Bson::String(s) => Ok(PrismaValue::String(s)),

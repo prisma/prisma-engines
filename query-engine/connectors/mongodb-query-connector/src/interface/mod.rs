@@ -33,7 +33,7 @@ impl MongoDb {
             })
         })?;
 
-        let database = url.path().trim_start_matches("/").to_string();
+        let database = url.path().trim_start_matches('/').to_string();
         let client_options = ClientOptions::parse(database_str).await.map_err(|_err| {
             ConnectorError::from_kind(ErrorKind::InvalidDatabaseUrl {
                 details: "Invalid MongoDB connection string".to_owned(),

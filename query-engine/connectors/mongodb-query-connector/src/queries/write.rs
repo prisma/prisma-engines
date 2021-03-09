@@ -148,7 +148,7 @@ pub async fn update_records(
     for (field_name, write_expr) in args.args {
         let DatasourceFieldName(name) = field_name;
         // Todo: This is inefficient.
-        let field = fields.iter().find(|f| f.db_name() == &name).unwrap();
+        let field = fields.iter().find(|f| f.db_name() == name).unwrap();
 
         let (op_key, val) = match write_expr {
             WriteExpression::Field(_) => unimplemented!(),
@@ -190,7 +190,7 @@ pub async fn delete_records(
             .map(|p| (&id_field, p.values().next().unwrap()).into_bson())
             .collect::<crate::Result<Vec<_>>>()?;
 
-        doc! { id_field.db_name(): { "$in": ids.clone() } }
+        doc! { id_field.db_name(): { "$in": ids } }
     } else {
         let (filter, _joins) = convert_filter(record_filter.filter, false)?.render();
         filter
@@ -216,14 +216,14 @@ pub async fn m2m_connect(
 
     let parent_id = parent_id.values().next().unwrap();
     let parent_id_field = parent_model.primary_identifier().scalar_fields().next().unwrap();
-    let parent_ids_scalar_field_name = field.relation_info.fields.iter().next().unwrap();
+    let parent_ids_scalar_field_name = field.relation_info.fields.get(0).unwrap();
     let parent_id = (&parent_id_field, parent_id).into_bson()?;
 
     let parent_filter = doc! { "_id": { "$eq": parent_id.clone() } };
     let child_ids = child_ids
         .iter()
         .map(|child_id| {
-            let (field, value) = child_id.pairs.iter().next().unwrap();
+            let (field, value) = child_id.pairs.get(0).unwrap();
             (field, value.clone()).into_bson()
         })
         .collect::<crate::Result<Vec<_>>>()?;
@@ -235,18 +235,10 @@ pub async fn m2m_connect(
 
     // Then update all children and add the parent
     let child_filter = doc! { "_id": { "$in": child_ids } };
-    let child_ids_scalar_field_name = field
-        .related_field()
-        .relation_info
-        .fields
-        .iter()
-        .next()
-        .unwrap()
-        .clone();
-
+    let child_ids_scalar_field_name = field.related_field().relation_info.fields.get(0).unwrap().clone();
     let child_update = doc! { "$addToSet": { child_ids_scalar_field_name: parent_id } };
-    child_coll.update_many(child_filter, child_update, None).await?;
 
+    child_coll.update_many(child_filter, child_update, None).await?;
     Ok(())
 }
 
@@ -264,14 +256,14 @@ pub async fn m2m_disconnect(
 
     let parent_id = parent_id.values().next().unwrap();
     let parent_id_field = parent_model.primary_identifier().scalar_fields().next().unwrap();
-    let parent_ids_scalar_field_name = field.relation_info.fields.iter().next().unwrap();
+    let parent_ids_scalar_field_name = field.relation_info.fields.get(0).unwrap();
     let parent_id = (&parent_id_field, parent_id).into_bson()?;
 
     let parent_filter = doc! { "_id": { "$eq": parent_id.clone() } };
     let child_ids = child_ids
         .iter()
         .map(|child_id| {
-            let (field, value) = child_id.pairs.iter().next().unwrap();
+            let (field, value) = child_id.pairs.get(0).unwrap();
             (field, value.clone()).into_bson()
         })
         .collect::<crate::Result<Vec<_>>>()?;
@@ -283,14 +275,7 @@ pub async fn m2m_disconnect(
 
     // Then update all children and add the parent
     let child_filter = doc! { "_id": { "$in": child_ids } };
-    let child_ids_scalar_field_name = field
-        .related_field()
-        .relation_info
-        .fields
-        .iter()
-        .next()
-        .unwrap()
-        .clone();
+    let child_ids_scalar_field_name = field.related_field().relation_info.fields.get(0).unwrap().clone();
 
     let child_update = doc! { "$pull": { child_ids_scalar_field_name: parent_id } };
     child_coll.update_many(child_filter, child_update, None).await?;

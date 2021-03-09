@@ -88,7 +88,7 @@ fn cursor_conditions(mut order_data: Vec<OrderByData>, reverse: bool) -> Documen
             let (head, tail) = order_data.split_at(num_orderings - n - 1);
             let mut and_conditions = Vec::with_capacity(head.len() + 1);
 
-            for order_data in head.into_iter() {
+            for order_data in head {
                 and_conditions.push(map_equality_condition(order_data));
             }
 
@@ -147,8 +147,7 @@ fn map_orderby_condition(order_data: &OrderByData, reverse: bool, include_eq: bo
                 doc! { "$lt": [format!("${}", &unbound_order_field_reference), format!("$${}", &bound_order_field_reference)] }
             }
         }
-    }
-    .into();
+    };
 
     // If we have null values in the ordering or comparison row, those are automatically included because we can't make a
     // statement over their order relative to the cursor.

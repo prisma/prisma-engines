@@ -67,8 +67,6 @@ pub(crate) struct MongoQueryArgs {
 
 impl MongoQueryArgs {
     pub(crate) fn new(args: QueryArguments) -> crate::Result<MongoQueryArgs> {
-        check_unsupported(&args)?;
-
         let reverse_order = args.take.map(|t| t < 0).unwrap_or(false);
         let order_by = args.order_by;
 
@@ -390,7 +388,7 @@ impl MongoQueryArgs {
 
 fn aggregation_pairs(op: &str, fields: &[ScalarFieldRef]) -> Vec<(String, Bson)> {
     fields
-        .into_iter()
+        .iter()
         .map(|field| {
             (
                 format!("{}_{}", op, field.db_name()),
@@ -414,23 +412,4 @@ fn take(take: Option<i64>, ignore: bool) -> Option<i64> {
     } else {
         take.map(|t| if t < 0 { -t } else { t })
     }
-}
-
-/// Temporarily unsupported features that can not be restricted on the schema level of query arguments get rejected at runtime.
-fn check_unsupported(_args: &QueryArguments) -> crate::Result<()> {
-    // Cursors with order-by relations is currently unsupported.
-    // if args.cursor.is_some() && args.order_by.iter().any(|o| !o.path.is_empty()) {
-    //     return Err(MongoError::Unsupported(
-    //         "OrderBy a relation in conjunction with a cursor query is currently unsupported.".to_owned(),
-    //     ));
-    // }
-
-    // Cursors with unstable ordering are currently unsupported.
-    // if args.contains_unstable_cursor() {
-    //     return Err(MongoError::Unsupported(
-    //         "Cursors in conjunction with an unstable orderBy (no single field or combination is unique) are currently unsupported.".to_owned(),
-    //     ));
-    // }
-
-    Ok(())
 }

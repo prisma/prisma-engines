@@ -5,11 +5,11 @@ name = "migration-core"
 version = "0.1.0"
 
 [dependencies]
-datamodel = {path = "../../libs/datamodel/core"}
-migration-connector = {path = "../connectors/migration-connector"}
-mongodb-migration-connector = {path = "../connectors/mongodb-migration-connector", optional = true}
-sql-migration-connector = {path = "../connectors/sql-migration-connector", optional = true}
-user-facing-errors = {path = "../../libs/user-facing-errors"}
+datamodel = { path = "../../libs/datamodel/core" }
+migration-connector = { path = "../connectors/migration-connector" }
+mongodb-migration-connector = { path = "../connectors/mongodb-migration-connector", optional = true }
+sql-migration-connector = { path = "../connectors/sql-migration-connector", optional = true }
+user-facing-errors = { path = "../../libs/user-facing-errors" }
 
 anyhow = "1.0.26"
 async-trait = "0.1.17"

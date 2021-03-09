@@ -49,7 +49,7 @@ pub(crate) fn convert_filter(filter: Filter, invert: bool) -> crate::Result<Mong
         Filter::Scalar(sf) => scalar_filter(sf, invert, true)?,
         Filter::Empty => MongoFilter::Scalar(doc! {}),
         Filter::ScalarList(slf) => scalar_list_filter(slf, invert)?,
-        Filter::OneRelationIsNull(filter) => one_is_null(filter, invert)?,
+        Filter::OneRelationIsNull(filter) => one_is_null(filter, invert),
         Filter::Relation(rfilter) => relation_filter(rfilter, invert)?,
         // Filter::BoolFilter(b) => {} // Potentially not doable.
         Filter::Aggregation(filter) => aggregation_filter(filter, invert)?,
@@ -244,7 +244,7 @@ fn scalar_list_filter(filter: ScalarListFilter, invert: bool) -> crate::Result<M
 }
 
 // Can be optimized by checking inlined fields on the left side instead of always joining.
-fn one_is_null(filter: OneRelationIsNullFilter, invert: bool) -> crate::Result<MongoFilter> {
+fn one_is_null(filter: OneRelationIsNullFilter, invert: bool) -> MongoFilter {
     let rf = filter.field;
     let relation_name = &rf.relation().name;
     let join_stage = JoinStage::new(rf);
@@ -255,7 +255,7 @@ fn one_is_null(filter: OneRelationIsNullFilter, invert: bool) -> crate::Result<M
         doc! { relation_name: { "$size": 0 }}
     };
 
-    Ok(MongoFilter::relation(filter_doc, vec![join_stage]))
+    MongoFilter::relation(filter_doc, vec![join_stage])
 }
 
 /// Builds a Mongo relation filter depth-first.
@@ -293,10 +293,7 @@ fn relation_filter(filter: RelationFilter, invert: bool) -> crate::Result<MongoF
 
 /// Checks if the given relation filter condition needs an inherent invert for MongoDB.
 fn requires_invert(rf: &RelationCondition) -> bool {
-    match rf {
-        RelationCondition::NoRelatedRecord => true,
-        _ => false,
-    }
+    matches!(rf, RelationCondition::NoRelatedRecord)
 }
 
 fn aggregation_filter(filter: AggregationFilter, invert: bool) -> crate::Result<MongoFilter> {

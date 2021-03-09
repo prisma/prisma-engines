@@ -73,8 +73,8 @@ impl OrderByData {
         } else {
             let right = self.order_by.field.db_name().to_owned();
 
-            let left = if right.starts_with("_") {
-                right.strip_prefix("_").unwrap().to_owned()
+            let left = if right.starts_with('_') {
+                right.strip_prefix('_').unwrap().to_owned()
             } else {
                 right.to_owned()
             };
@@ -122,7 +122,7 @@ impl OrderByPrefix {
     }
 
     pub(crate) fn first(&self) -> Option<&String> {
-        self.parts.iter().next()
+        self.parts.get(0)
     }
 }
 

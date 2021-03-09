@@ -21,7 +21,7 @@ pub async fn get_single_record(
     let cursor = coll.find(Some(filter), Some(find_options)).await?;
     let docs = vacuum_cursor(cursor).await?;
 
-    if docs.len() == 0 {
+    if docs.is_empty() {
         Ok(None)
     } else {
         let field_names: Vec<_> = selected_fields.db_names().collect();
@@ -83,14 +83,14 @@ pub async fn get_related_m2m_record_ids(
 
     let id_field = model.primary_identifier().scalar_fields().next().unwrap();
     let ids = from_record_ids
-        .into_iter()
+        .iter()
         .map(|p| (&id_field, p.values().next().unwrap()).into_bson())
         .collect::<crate::Result<Vec<_>>>()?;
 
     let filter = doc! { id_field.db_name(): { "$in": ids } };
 
     // Scalar field name where the relation ids list is on `model`.
-    let relation_ids_field_name = from_field.relation_info.fields.iter().next().unwrap();
+    let relation_ids_field_name = from_field.relation_info.fields.get(0).unwrap();
 
     let find_options = FindOptions::builder()
         .projection(doc! { id_field.db_name(): 1, relation_ids_field_name: 1 })
@@ -109,11 +109,13 @@ pub async fn get_related_m2m_record_ids(
     let mut id_pairs = vec![];
     for mut doc in docs {
         let parent_id = value_from_bson(doc.remove(id_field.db_name()).unwrap())?;
-        let child_ids: Vec<PrismaValue> =
-            match value_from_bson(doc.remove(relation_ids_field_name).unwrap_or(Bson::Array(vec![])))? {
-                PrismaValue::List(vals) => vals,
-                val => vec![val],
-            };
+        let child_ids: Vec<PrismaValue> = match value_from_bson(
+            doc.remove(relation_ids_field_name)
+                .unwrap_or_else(|| Bson::Array(vec![])),
+        )? {
+            PrismaValue::List(vals) => vals,
+            val => vec![val],
+        };
 
         let parent_projection = RecordProjection::from((id_field.clone(), parent_id));
 
