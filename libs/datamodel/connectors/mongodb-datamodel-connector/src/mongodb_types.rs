@@ -62,7 +62,7 @@ pub(crate) fn available_types() -> Vec<NativeTypeConstructor> {
         NativeTypeConstructor::without_args(DECIMAL, vec![ScalarType::Decimal]),
         NativeTypeConstructor::without_args(MIN_KEY, vec![ScalarType::Int]),
         NativeTypeConstructor::without_args(MAX_KEY, vec![ScalarType::Int]),
-        NativeTypeConstructor::with_args(ARRAY, 1, all_types()).list(),
+        NativeTypeConstructor::with_args(ARRAY, 1, all_types()),
     ]
 }
 

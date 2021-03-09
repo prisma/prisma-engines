@@ -14,9 +14,6 @@ pub struct NativeTypeConstructor {
 
     /// The scalar types this native type is compatible with
     pub prisma_types: Vec<ScalarType>,
-
-    /// The native type is referring to a List type
-    pub is_list: bool,
 }
 
 impl NativeTypeConstructor {
@@ -26,7 +23,6 @@ impl NativeTypeConstructor {
             _number_of_args: 0,
             _number_of_optional_args: 0,
             prisma_types,
-            is_list: false,
         }
     }
 
@@ -36,7 +32,6 @@ impl NativeTypeConstructor {
             _number_of_args: number_of_args,
             _number_of_optional_args: 0,
             prisma_types,
-            is_list: false,
         }
     }
 
@@ -50,12 +45,6 @@ impl NativeTypeConstructor {
             _number_of_args: 0,
             _number_of_optional_args: number_of_optional_args,
             prisma_types,
-            is_list: false,
         }
-    }
-
-    pub fn list(mut self) -> Self {
-        self.is_list = true;
-        self
     }
 }
