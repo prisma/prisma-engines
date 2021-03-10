@@ -1677,114 +1677,39 @@ async fn re_introspecting_ignore(api: &TestApi) -> crate::TestResult {
 
 #[test_each_connector]
 async fn dirty_reproduction_13029(api: &TestApi) -> crate::TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("User", move |t| {
+                t.add_column("id", types::primary());
+            });
+
+            migration.create_table("_FollowRelation", |t| {
+                t.add_column("A", types::integer().nullable(false).unique(false));
+                t.add_column("B", types::integer().nullable(false).unique(false));
+
+                t.add_foreign_key(&["A"], "User", &["id"]);
+                t.add_foreign_key(&["B"], "User", &["id"]);
+
+                t.add_index("test", types::index(vec!["A", "B"]).unique(true));
+                t.add_index("test2", types::index(vec!["B"]).unique(false));
+            });
+        })
+        .await?;
+
     let input_dm = indoc! {r#"
-        // This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-datasource db {
-    provider = "mysql"
-    url = "mysql://something"
-}
-
-generator client {
-    provider = "prisma-client-js"
-    previewFeatures = ["connectOrCreate"]
-}
-
-model User {
-    id          Int       @id @default(autoincrement())
-    avatar      String?   @default("")
-    email       String    @unique
-    password    String?    @default("")
-    userName    String    @unique
-    firstName   String?   @default("")
-    lastName    String?   @default("")
-    facebookId  String?   @unique
-    bio         String?   @default("")
-    /// @onDelete(CASCADE)
-    posts       Post[]
-    /// @onDelete(CASCADE)
-    likes       Like[]
-    /// @onDelete(CASCADE)
-    comments    Comment[]
-    /// @onDelete(CASCADE)
-    rooms       Room[]
-    /// @onDelete(CASCADE)
-    messages    Message[]
-    loginSecret String?
-    confirmSecret Boolean @default(false)
-    followers   User[]    @relation("FollowRelation")
-    following   User[]    @relation("FollowRelation")
-    createdAt   DateTime  @default(now())
-    updatedAt   DateTime  @default(now()) @updatedAt
-}
-
-model Post {
-    id        Int       @id @default(autoincrement())
-    location  String?
-    caption   String
-    user      User      @relation(fields: [userId], references: [id])
-    userId    Int
-    /// @onDelete(CASCADE)
-    files     File[]
-    /// @onDelete(CASCADE)
-    likes     Like[]
-    /// @onDelete(CASCADE)
-    comments  Comment[]
-    createdAt DateTime  @default(now())
-    updatedAt DateTime  @default(now()) @updatedAt
-}
-
-model Like {
-    id        Int      @id @default(autoincrement())
-    user      User     @relation(fields: [userId], references: [id])
-    post      Post     @relation(fields: [postId], references: [id])
-    userId    Int       
-    postId    Int
-    createdAt DateTime @default(now())
-    updatedAt DateTime @default(now()) @updatedAt
-}
-
-model Comment {
-    id        Int      @id @default(autoincrement())
-    text      String
-    user      User     @relation(fields: [userId], references: [id])
-    post      Post     @relation(fields: [postId], references: [id])
-    createdAt DateTime @default(now())
-    updatedAt DateTime @default(now()) @updatedAt
-    userId    Int
-    postId    Int
-}
-
-model File {
-    id     Int    @id @default(autoincrement())
-    url    String
-    post   Post   @relation(fields: [postId], references: [id])
-    postId Int
-}
-
-model Room {
-    id           Int       @id @default(autoincrement())
-    /// @onDelete(SET_NULL)
-    participants User[]
-    messages     Message[]
-    createdAt    DateTime  @default(now())
-    updatedAt    DateTime  @default(now()) @updatedAt
-}
-
-model Message {
-    id         Int      @id @default(autoincrement())
-    text       String
-    user       User     @relation(fields: [userId], references: [id])
-    room       Room     @relation(fields: [roomId], references: [id])
-    createdAt  DateTime @default(now())
-    updatedAt  DateTime @default(now()) @updatedAt
-    userId     Int
-    roomId     Int
-}
+        model User {
+            id          Int       @id @default(autoincrement())
+            followers   User[]    @relation("FollowRelation")
+            following   User[]    @relation("FollowRelation")
+        }
     "#};
 
     let final_dm = indoc! {r#"
+        model User {
+            id          Int       @id @default(autoincrement())
+            followers   User[]    @relation("FollowRelation")
+            following   User[]    @relation("FollowRelation")
+        }
     "#};
 
     api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
