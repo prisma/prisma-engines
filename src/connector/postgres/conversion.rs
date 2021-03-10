@@ -26,6 +26,7 @@ use tokio_postgres::{
 #[cfg(feature = "uuid")]
 use uuid::Uuid;
 
+#[tracing::instrument(skip(params))]
 pub fn conv_params<'a>(params: &'a [Value<'a>]) -> Vec<&'a (dyn types::ToSql + Sync)> {
     params.iter().map(|x| x as &(dyn ToSql + Sync)).collect::<Vec<_>>()
 }

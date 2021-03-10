@@ -37,6 +37,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
     const C_BACKTICK_CLOSE: &'static str = "`";
     const C_WILDCARD: &'static str = "%";
 
+    #[tracing::instrument(name = "render_sql", skip(query))]
     fn build<Q>(query: Q) -> crate::Result<(String, Vec<Value<'a>>)>
     where
         Q: Into<Query<'a>>,

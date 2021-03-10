@@ -316,22 +316,13 @@ impl Builder {
     fn log_start(info: &ConnectionInfo, connection_limit: usize) {
         let family = info.sql_family();
         let pg_bouncer = if info.pg_bouncer() { " in PgBouncer mode" } else { "" };
-        #[cfg(not(feature = "tracing-log"))]
-        {
-            info!(
-                "Starting a {} pool with {} connections{}.",
-                family, connection_limit, pg_bouncer
-            );
-        }
-        #[cfg(feature = "tracing-log")]
-        {
-            tracing::info!(
-                "Starting a {} pool with {} connections{}.",
-                family,
-                connection_limit,
-                pg_bouncer
-            );
-        }
+
+        tracing::info!(
+            "Starting a {} pool with {} connections{}.",
+            family,
+            connection_limit,
+            pg_bouncer
+        );
     }
 }
 
@@ -340,6 +331,7 @@ impl Quaint {
     /// connection string. See the [module level documentation] for details.
     ///
     /// [module level documentation]: index.html
+    #[tracing::instrument]
     pub fn builder(url_str: &str) -> crate::Result<Builder> {
         match url_str {
             #[cfg(feature = "sqlite")]
@@ -426,6 +418,7 @@ impl Quaint {
     }
 
     /// Reserve a connection from the pool.
+    #[tracing::instrument(name = "fetch_new_connection_from_pool", skip(self))]
     pub async fn check_out(&self) -> crate::Result<PooledConnection> {
         let res = match self.pool_timeout {
             Some(duration) => crate::connector::metrics::check_out(self.inner.get_timeout(duration)).await,

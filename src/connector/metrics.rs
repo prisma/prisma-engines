@@ -21,26 +21,13 @@ where
             Err(_) => "error",
         };
 
-        #[cfg(not(feature = "tracing-log"))]
-        {
-            info!(
-                "query: \"{}\", params: {} ({} in {}ms)",
-                query,
-                Params(params),
-                result,
-                start.elapsed().as_millis(),
-            );
-        }
-        #[cfg(feature = "tracing-log")]
-        {
-            tracing::info!(
-                query,
-                item_type = "query",
-                params = %Params(params),
-                duration_ms = start.elapsed().as_millis() as u64,
-                result,
-            )
-        }
+        tracing::info!(
+            query,
+            item_type = "query",
+            params = %Params(params),
+            duration_ms = start.elapsed().as_millis() as u64,
+            result,
+        )
     }
 
     timing!(format!("{}.query.time", tag), start, end);
@@ -63,22 +50,11 @@ where
             Err(_) => "error",
         };
 
-        #[cfg(not(feature = "tracing-log"))]
-        {
-            info!(
-                "Fetched a connection from the pool ({} in {}ms)",
-                result,
-                start.elapsed().as_millis(),
-            );
-        }
-        #[cfg(feature = "tracing-log")]
-        {
-            tracing::info!(
-                message = "Fetched a connection from the pool",
-                duration_ms = start.elapsed().as_millis() as u64,
-                result,
-            );
-        }
+        tracing::info!(
+            message = "Fetched a connection from the pool",
+            duration_ms = start.elapsed().as_millis() as u64,
+            result,
+        );
     }
 
     timing!("pool.check_out", start, end);

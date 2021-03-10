@@ -6,6 +6,7 @@ use bigdecimal::BigDecimal;
 use std::{borrow::Cow, convert::TryFrom};
 use tiberius::{ColumnData, FromSql, IntoSql, ToSql};
 
+#[tracing::instrument(skip(params))]
 pub fn conv_params<'a>(params: &'a [Value<'a>]) -> crate::Result<Vec<&'a dyn ToSql>> {
     let mut converted = Vec::with_capacity(params.len());
 

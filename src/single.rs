@@ -186,14 +186,7 @@ impl Quaint {
         let family = info.sql_family();
         let pg_bouncer = if info.pg_bouncer() { " in PgBouncer mode" } else { "" };
 
-        #[cfg(not(feature = "tracing-log"))]
-        {
-            info!("Starting a {} connection{}.", family, pg_bouncer);
-        }
-        #[cfg(feature = "tracing-log")]
-        {
-            tracing::info!("Starting a {} connection{}.", family, pg_bouncer);
-        }
+        tracing::info!("Starting a {} connection{}.", family, pg_bouncer);
     }
 }
 

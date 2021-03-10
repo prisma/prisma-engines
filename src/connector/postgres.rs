@@ -161,9 +161,6 @@ impl PostgresUrl {
         match percent_decode(self.url.username().as_bytes()).decode_utf8() {
             Ok(username) => username,
             Err(_) => {
-                #[cfg(not(feature = "tracing-log"))]
-                warn!("Couldn't decode username to UTF-8, using the non-decoded version.");
-                #[cfg(feature = "tracing-log")]
                 tracing::warn!("Couldn't decode username to UTF-8, using the non-decoded version.");
 
                 self.url.username().into()
@@ -271,9 +268,6 @@ impl PostgresUrl {
                         "prefer" => ssl_mode = SslMode::Prefer,
                         "require" => ssl_mode = SslMode::Require,
                         _ => {
-                            #[cfg(not(feature = "tracing-log"))]
-                            debug!("Unsupported ssl mode {}, defaulting to 'prefer'", v);
-                            #[cfg(feature = "tracing-log")]
                             tracing::debug!(message = "Unsupported SSL mode, defaulting to `prefer`", mode = &*v);
                         }
                     };
@@ -301,9 +295,6 @@ impl PostgresUrl {
                             ssl_accept_mode = SslAcceptMode::AcceptInvalidCerts;
                         }
                         _ => {
-                            #[cfg(not(feature = "tracing-log"))]
-                            debug!("Unsupported SSL accept mode {}, defaulting to `strict`", v);
-                            #[cfg(feature = "tracing-log")]
                             tracing::debug!(
                                 message = "Unsupported SSL accept mode, defaulting to `strict`",
                                 mode = &*v
@@ -354,9 +345,6 @@ impl PostgresUrl {
                     }
                 }
                 _ => {
-                    #[cfg(not(feature = "tracing-log"))]
-                    trace!("Discarding connection string param: {}", k);
-                    #[cfg(feature = "tracing-log")]
                     tracing::trace!(message = "Discarding connection string param", param = &*k);
                 }
             };
@@ -426,6 +414,7 @@ pub(crate) struct PostgresUrlQueryParams {
 
 impl PostgreSql {
     /// Create a new connection to the database.
+    #[tracing::instrument(skip(url))]
     pub async fn new(url: PostgresUrl) -> crate::Result<Self> {
         let config = url.to_config();
 
@@ -452,14 +441,7 @@ impl PostgreSql {
         tokio::spawn(conn.map(|r| match r {
             Ok(_) => (),
             Err(e) => {
-                #[cfg(not(feature = "tracing-log"))]
-                {
-                    error!("Error in PostgreSQL connection: {:?}", e);
-                }
-                #[cfg(feature = "tracing-log")]
-                {
-                    tracing::error!("Error in PostgreSQL connection: {:?}", e);
-                }
+                tracing::error!("Error in PostgreSQL connection: {:?}", e);
             }
         }));
 
@@ -487,6 +469,7 @@ impl PostgreSql {
         })
     }
 
+    #[tracing::instrument(skip(self))]
     async fn fetch_cached(&self, sql: &str) -> crate::Result<Statement> {
         let mut cache = self.statement_cache.lock().await;
         let capacity = cache.capacity();
@@ -494,46 +477,22 @@ impl PostgreSql {
 
         match cache.get_mut(sql) {
             Some(stmt) => {
-                #[cfg(not(feature = "tracing-log"))]
-                {
-                    trace!(
-                        "CACHE HIT! (query: \"{}\", capacity: {}, stored: {})",
-                        sql,
-                        capacity,
-                        stored,
-                    );
-                }
-                #[cfg(feature = "tracing-log")]
-                {
-                    tracing::trace!(
-                        message = "CACHE HIT!",
-                        query = sql,
-                        capacity = capacity,
-                        stored = stored,
-                    );
-                }
+                tracing::trace!(
+                    message = "CACHE HIT!",
+                    query = sql,
+                    capacity = capacity,
+                    stored = stored,
+                );
 
                 Ok(stmt.clone()) // arc'd
             }
             None => {
-                #[cfg(not(feature = "tracing-log"))]
-                {
-                    trace!(
-                        "CACHE MISS! (query: \"{}\", capacity: {}, stored: {}",
-                        sql,
-                        capacity,
-                        stored,
-                    );
-                }
-                #[cfg(feature = "tracing-log")]
-                {
-                    tracing::trace!(
-                        message = "CACHE MISS!",
-                        query = sql,
-                        capacity = capacity,
-                        stored = stored,
-                    );
-                }
+                tracing::trace!(
+                    message = "CACHE MISS!",
+                    query = sql,
+                    capacity = capacity,
+                    stored = stored,
+                );
 
                 let stmt = super::timeout::socket(self.socket_timeout, self.client.0.prepare(sql)).await?;
                 cache.insert(sql.to_string(), stmt.clone());
@@ -557,6 +516,7 @@ impl Queryable for PostgreSql {
         self.execute_raw(sql.as_str(), &params[..]).await
     }
 
+    #[tracing::instrument(skip(self, params))]
     async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet> {
         metrics::query("postgres.query_raw", sql, params, move || async move {
             let stmt = self.fetch_cached(sql).await?;
@@ -587,6 +547,7 @@ impl Queryable for PostgreSql {
         .await
     }
 
+    #[tracing::instrument(skip(self, params))]
     async fn execute_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<u64> {
         metrics::query("postgres.execute_raw", sql, params, move || async move {
             let stmt = self.fetch_cached(sql).await?;
@@ -611,6 +572,7 @@ impl Queryable for PostgreSql {
         .await
     }
 
+    #[tracing::instrument(skip(self))]
     async fn raw_cmd(&self, cmd: &str) -> crate::Result<()> {
         metrics::query("postgres.raw_cmd", cmd, &[], move || async move {
             super::timeout::socket(self.socket_timeout, self.client.0.simple_query(cmd)).await?;
@@ -620,6 +582,7 @@ impl Queryable for PostgreSql {
         .await
     }
 
+    #[tracing::instrument(skip(self))]
     async fn version(&self) -> crate::Result<Option<String>> {
         let query = r#"SELECT version()"#;
         let rows = self.query_raw(query, &[]).await?;
@@ -631,6 +594,7 @@ impl Queryable for PostgreSql {
         Ok(version_string)
     }
 
+    #[tracing::instrument(skip(self, tx))]
     async fn server_reset_query(&self, tx: &Transaction<'_>) -> crate::Result<()> {
         if self.pg_bouncer {
             tx.raw_cmd("DEALLOCATE ALL").await

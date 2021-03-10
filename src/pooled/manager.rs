@@ -105,11 +105,8 @@ impl Manager for QuaintManager {
             }
         };
 
-        #[cfg(feature = "tracing-log")]
-        {
-            conn.iter()
-                .for_each(|_| tracing::debug!("Acquired database connection."));
-        }
+        conn.iter()
+            .for_each(|_| tracing::debug!("Acquired database connection."));
 
         conn
     }

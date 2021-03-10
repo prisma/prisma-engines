@@ -5,6 +5,7 @@ mod lower;
 mod maximum;
 mod minimum;
 mod row_number;
+#[cfg(all(feature = "json", feature = "postgresql"))]
 mod row_to_json;
 mod sum;
 mod upper;

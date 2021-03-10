@@ -112,10 +112,6 @@ compile_error!("one of 'sqlite', 'postgresql', 'mysql' or 'mssql' features must 
 #[macro_use]
 mod macros;
 
-#[cfg(not(feature = "tracing-log"))]
-#[macro_use]
-extern crate log;
-
 #[macro_use]
 extern crate metrics;
 

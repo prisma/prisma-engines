@@ -11,6 +11,7 @@ use mysql_async::{
 };
 use std::convert::TryFrom;
 
+#[tracing::instrument(skip(params))]
 pub fn conv_params<'a>(params: &[Value<'a>]) -> crate::Result<my::Params> {
     if params.is_empty() {
         // If we don't use explicit 'Empty',

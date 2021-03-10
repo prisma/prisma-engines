@@ -112,6 +112,7 @@ impl Iterator for ResultSetIterator {
 #[cfg(feature = "json")]
 #[cfg_attr(feature = "docs", doc(cfg(feature = "json")))]
 impl From<ResultSet> for serde_json::Value {
+    #[tracing::instrument(name = "result_set_json_conv", skip(result_set))]
     fn from(result_set: ResultSet) -> Self {
         let columns: Vec<String> = result_set.columns().iter().map(ToString::to_string).collect();
         let mut result = Vec::new();

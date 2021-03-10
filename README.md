@@ -28,7 +28,6 @@ Quaint is an abstraction over certain SQL databases. It provides:
 - `uuid`: UUID type support with `uuid` crate.
 - `chrono`: DateTime type support with `chrono` crate.
 - `serde-support`: Deserialize support from result set with `serde` crate.
-- `tracing-log`: Logging with `tracing` crate.
 - `bigdecimal`: Numeric values can be read as `BigDecimal`.
 
 ### Goals:
@@ -59,9 +58,7 @@ Then:
 
 The queries can be logged by setting the `LOG_QUERIES` environment variable to any
 value. They'll be logged at the `INFO` level and are visible when having a
-logger in scope. If using [Tracing](https://github.com/tokio-rs/tracing),
-compiling Quaint with the `tracing-log` feature flag will parameterize the
-logged queries into a more suitable format for Tracing.
+logger in scope.
 
 ## Security
 
