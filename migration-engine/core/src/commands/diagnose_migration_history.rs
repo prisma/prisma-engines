@@ -1,11 +1,10 @@
-use std::path::Path;
-
 use super::MigrationCommand;
 use crate::CoreResult;
 use migration_connector::{
     ConnectorError, MigrationConnector, MigrationDirectory, MigrationRecord, PersistenceNotInitializedError,
 };
 use serde::{Deserialize, Serialize};
+use std::path::Path;
 
 /// The input to the `DiagnoseMigrationHistory` command.
 #[derive(Deserialize, Debug)]
@@ -37,7 +36,8 @@ pub struct DiagnoseMigrationHistoryOutput {
     /// An optional error encountered when applying a migration that is not
     /// applied in the main database to the shadow database. We do this to
     /// validate that unapplied migrations are at least minimally valid.
-    pub error_in_unapplied_migration: Option<user_facing_errors::Error>,
+    #[serde(serialize_with = "serialize_error_in_unapplied_migration")]
+    pub error_in_unapplied_migration: Option<ConnectorError>,
     /// Is the migrations table initialized in the database.
     pub has_migrations_table: bool,
 }
@@ -137,9 +137,7 @@ impl<'a> MigrationCommand for DiagnoseMigrationHistoryCommand {
             if input.opt_in_to_shadow_database {
                 let drift = match migration_inferrer.calculate_drift(&applied_migrations).await {
                     Ok(Some(rollback)) => Some(DriftDiagnostic::DriftDetected { rollback }),
-                    Err(error) => Some(DriftDiagnostic::MigrationFailedToApply {
-                        error: error.to_user_facing(),
-                    }),
+                    Err(error) => Some(DriftDiagnostic::MigrationFailedToApply { error }),
                     _ => None,
                 };
 
@@ -149,7 +147,6 @@ impl<'a> MigrationCommand for DiagnoseMigrationHistoryCommand {
                             .validate_migrations(&migrations_from_filesystem)
                             .await
                             .err()
-                            .map(|connector_error| connector_error.to_user_facing())
                     } else {
                         None
                     };
@@ -281,7 +278,7 @@ pub enum HistoryDiagnostic {
 /// A diagnostic returned by `diagnoseMigrationHistory` when trying to determine
 /// whether the development database has the expected schema at its stage in
 /// history.
-#[derive(Debug, PartialEq, Serialize)]
+#[derive(Debug, Serialize)]
 #[serde(tag = "diagnostic", rename_all = "camelCase")]
 pub enum DriftDiagnostic {
     /// The database schema of the current database does not match what would be
@@ -291,11 +288,25 @@ pub enum DriftDiagnostic {
         rollback: String,
     },
     /// When a migration fails to apply cleanly to a temporary database.
-    #[serde(rename_all = "camelCase")]
+    #[serde(serialize_with = "serialize_migration_failed_to_apply")]
     MigrationFailedToApply {
         /// The full error.
-        error: user_facing_errors::Error,
+        error: ConnectorError,
     },
+}
+
+fn serialize_migration_failed_to_apply<S>(error: &ConnectorError, serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: serde::Serializer,
+{
+    error.to_user_facing().serialize(serializer)
+}
+
+fn serialize_error_in_unapplied_migration<S>(error: &Option<ConnectorError>, serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: serde::Serializer,
+{
+    error.as_ref().map(|err| err.to_user_facing()).serialize(serializer)
 }
 
 impl DriftDiagnostic {

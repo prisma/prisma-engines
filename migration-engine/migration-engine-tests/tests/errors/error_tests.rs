@@ -28,7 +28,7 @@ async fn authentication_failure_must_return_a_known_error_on_postgres() {
     let user = url.username();
     let host = url.host().unwrap().to_string();
 
-    let json_error = serde_json::to_value(&error.render_user_facing()).unwrap();
+    let json_error = serde_json::to_value(&error.to_user_facing()).unwrap();
     let expected = json!({
         "is_panic": false,
         "message": format!("Authentication failed against database server at `{host}`, the provided database credentials for `postgres` are not valid.\n\nPlease make sure to provide valid database credentials for the database server at `{host}`.", host = host),
@@ -65,7 +65,7 @@ async fn authentication_failure_must_return_a_known_error_on_mysql() {
     let user = url.username();
     let host = url.host().unwrap().to_string();
 
-    let json_error = serde_json::to_value(&error.render_user_facing()).unwrap();
+    let json_error = serde_json::to_value(&error.to_user_facing()).unwrap();
     let expected = json!({
         "is_panic": false,
         "message": format!("Authentication failed against database server at `{host}`, the provided database credentials for `{user}` are not valid.\n\nPlease make sure to provide valid database credentials for the database server at `{host}`.", host = host, user = user),
@@ -102,7 +102,7 @@ async fn unreachable_database_must_return_a_proper_error_on_mysql() {
     let port = url.port().unwrap();
     let host = url.host().unwrap().to_string();
 
-    let json_error = serde_json::to_value(&error.render_user_facing()).unwrap();
+    let json_error = serde_json::to_value(&error.to_user_facing()).unwrap();
     let expected = json!({
         "is_panic": false,
         "message": format!("Can't reach database server at `{host}`:`{port}`\n\nPlease make sure your database server is running at `{host}`:`{port}`.", host = host, port = port),
@@ -139,7 +139,7 @@ async fn unreachable_database_must_return_a_proper_error_on_postgres() {
     let host = url.host().unwrap().to_string();
     let port = url.port().unwrap();
 
-    let json_error = serde_json::to_value(&error.render_user_facing()).unwrap();
+    let json_error = serde_json::to_value(&error.to_user_facing()).unwrap();
     let expected = json!({
         "is_panic": false,
         "message": format!("Can't reach database server at `{host}`:`{port}`\n\nPlease make sure your database server is running at `{host}`:`{port}`.", host = host, port = port),
@@ -174,7 +174,7 @@ async fn database_does_not_exist_must_return_a_proper_error() {
 
     let error = RpcApi::new(&dm).await.map(|_| ()).unwrap_err();
 
-    let json_error = serde_json::to_value(&error.render_user_facing()).unwrap();
+    let json_error = serde_json::to_value(&error.to_user_facing()).unwrap();
     let expected = json!({
         "is_panic": false,
         "message": format!("Database `{database_name}` does not exist on the database server at `{database_host}:{database_port}`.", database_name = database_name, database_host = url.host().unwrap(), database_port = url.port().unwrap()),
@@ -216,7 +216,7 @@ async fn database_access_denied_must_return_a_proper_error_in_rpc() {
     );
 
     let error = RpcApi::new(&dm).await.map(|_| ()).unwrap_err();
-    let json_error = serde_json::to_value(&error.render_user_facing()).unwrap();
+    let json_error = serde_json::to_value(&error.to_user_facing()).unwrap();
 
     let expected = json!({
         "is_panic": false,
@@ -246,7 +246,7 @@ async fn bad_datasource_url_and_provider_combinations_must_return_a_proper_error
 
     let error = RpcApi::new(&dm).await.map(drop).unwrap_err();
 
-    let json_error = serde_json::to_value(&error.render_user_facing()).unwrap();
+    let json_error = serde_json::to_value(&error.to_user_facing()).unwrap();
 
     let err_message: String = json_error["message"].as_str().unwrap().into();
 
@@ -285,7 +285,7 @@ async fn connections_to_system_databases_must_be_rejected(_api: &TestApi) -> Tes
         let name = if name == &"" { "mysql" } else { name };
 
         let error = RpcApi::new(&dm).await.map(drop).unwrap_err();
-        let json_error = serde_json::to_value(&error.render_user_facing()).unwrap();
+        let json_error = serde_json::to_value(&error.to_user_facing()).unwrap();
 
         let expected = json!({
             "is_panic": false,
@@ -311,7 +311,7 @@ async fn datamodel_parser_errors_must_return_a_known_error(api: &TestApi) {
         }
     "#;
 
-    let error = api.schema_push(bad_dm).send().await.unwrap_err().render_user_facing();
+    let error = api.schema_push(bad_dm).send().await.unwrap_err().to_user_facing();
 
     let expected_msg = "\u{1b}[1;91merror\u{1b}[0m: \u{1b}[1mType \"Post\" is neither a built-in type, nor refers to another model, custom type, or enum.\u{1b}[0m\n  \u{1b}[1;94m-->\u{1b}[0m  \u{1b}[4mschema.prisma:4\u{1b}[0m\n\u{1b}[1;94m   | \u{1b}[0m\n\u{1b}[1;94m 3 | \u{1b}[0m            id Float @id\n\u{1b}[1;94m 4 | \u{1b}[0m            post \u{1b}[1;91mPost[]\u{1b}[0m\n\u{1b}[1;94m   | \u{1b}[0m\n";
 
@@ -358,7 +358,7 @@ async fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: &
         .send()
         .await
         .unwrap_err()
-        .render_user_facing();
+        .to_user_facing();
 
     let json_error = serde_json::to_value(&res).unwrap();
 
@@ -408,7 +408,7 @@ async fn json_fields_must_be_rejected(api: &TestApi) -> TestResult {
         .send()
         .await
         .unwrap_err()
-        .render_user_facing()
+        .to_user_facing()
         .unwrap_known();
 
     assert_eq!(result.error_code, "P1015");
@@ -447,7 +447,7 @@ async fn connection_string_problems_give_a_nice_error() {
 
         let error = RpcApi::new(&dm).await.map(|_| ()).unwrap_err();
 
-        let json_error = serde_json::to_value(&error.render_user_facing()).unwrap();
+        let json_error = serde_json::to_value(&error.to_user_facing()).unwrap();
 
         let details = match provider.0 {
             "sqlserver" => {

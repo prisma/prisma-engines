@@ -346,7 +346,7 @@ async fn must_return_helpful_error_on_migration_not_found(api: &TestApi) -> Test
         .send()
         .await
         .unwrap_err()
-        .render_user_facing()
+        .to_user_facing()
         .unwrap_known();
 
     assert_eq!(err.error_code, MigrationToMarkAppliedNotFound::ERROR_CODE);

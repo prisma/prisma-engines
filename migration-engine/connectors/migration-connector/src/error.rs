@@ -1,6 +1,6 @@
 //! The migration connector ConnectorError type.
 
-use crate::migrations_directory::ReadMigrationScriptError;
+use crate::{migrations_directory::ReadMigrationScriptError, ListMigrationsError};
 use std::{error::Error as StdError, fmt::Display};
 use tracing_error::SpanTrace;
 use user_facing_errors::{migration_engine::MigrationFileNotFound, KnownError, UserFacingError};
@@ -158,5 +158,21 @@ impl From<ReadMigrationScriptError> for ConnectorError {
             subject: Err(Box::new(err)),
             context,
         }
+    }
+}
+
+impl From<ListMigrationsError> for ConnectorError {
+    fn from(err: ListMigrationsError) -> Self {
+        ConnectorError::propagate(Box::new(err))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn connector_error_has_the_right_size() {
+        assert_eq!(std::mem::size_of::<ConnectorError>(), 1000);
     }
 }

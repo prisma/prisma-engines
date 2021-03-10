@@ -37,7 +37,7 @@ impl MigrationCommand for MarkMigrationAppliedCommand {
             MigrationDirectory::new(Path::new(&input.migrations_directory_path).join(&input.migration_name));
 
         let script = migration_directory.read_migration_script().map_err(|_err| {
-            CoreError::user_facing(MigrationToMarkAppliedNotFound {
+            CoreError::user_facing_error(MigrationToMarkAppliedNotFound {
                 migration_name: input.migration_name.clone(),
             })
         })?;
@@ -58,7 +58,7 @@ impl MigrationCommand for MarkMigrationAppliedCommand {
             .iter()
             .any(|migration| migration.finished_at.is_some())
         {
-            return Err(CoreError::user_facing(MigrationAlreadyApplied {
+            return Err(CoreError::user_facing_error(MigrationAlreadyApplied {
                 migration_name: input.migration_name.clone(),
             }));
         }

@@ -383,7 +383,7 @@ async fn dev_diagnostic_reports_migrations_failing_to_apply_cleanly(api: &TestAp
         .send()
         .await
         .unwrap_err()
-        .render_user_facing();
+        .to_user_facing();
 
     let known_err = err.as_known().unwrap();
 
@@ -498,7 +498,7 @@ async fn with_an_invalid_unapplied_migration_should_report_it(api: &TestApi) -> 
         .send()
         .await
         .unwrap_err()
-        .render_user_facing()
+        .to_user_facing()
         .unwrap_known();
 
     assert_eq!(err.error_code, MigrationDoesNotApplyCleanly::ERROR_CODE);
@@ -581,7 +581,7 @@ async fn dev_diagnostic_shadow_database_creation_error_is_special_cased_mysql(ap
         })
         .await
         .unwrap_err()
-        .render_user_facing()
+        .to_user_facing()
         .unwrap_known();
 
     assert!(err.message.starts_with("Prisma Migrate could not create the shadow database. Please make sure the database user has permission to create databases. More info: https://pris.ly/d/migrate-shadow."), "{:?}", err);
@@ -632,7 +632,7 @@ async fn dev_diagnostic_shadow_database_creation_error_is_special_cased_postgres
         })
         .await
         .unwrap_err()
-        .render_user_facing()
+        .to_user_facing()
         .unwrap_known();
 
     assert!(err.message.starts_with("Prisma Migrate could not create the shadow database. Please make sure the database user has permission to create databases. More info: https://pris.ly/d/migrate-shadow."));
@@ -705,7 +705,7 @@ async fn dev_diagnostic_shadow_database_creation_error_is_special_cased_mssql(ap
         })
         .await
         .unwrap_err()
-        .render_user_facing()
+        .to_user_facing()
         .unwrap_known();
 
     assert_eq!(err.error_code, ShadowDbCreationError::ERROR_CODE);

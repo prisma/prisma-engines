@@ -2,7 +2,7 @@ use super::{
     DiagnoseMigrationHistoryCommand, DiagnoseMigrationHistoryInput, DiagnoseMigrationHistoryOutput, DriftDiagnostic,
     HistoryDiagnostic, MigrationCommand,
 };
-use crate::{core_error::CoreResult, CoreError};
+use crate::core_error::CoreResult;
 use migration_connector::MigrationConnector;
 use serde::{Deserialize, Serialize};
 
@@ -38,10 +38,10 @@ impl<'a> MigrationCommand for DevDiagnosticCommand {
             opt_in_to_shadow_database: true,
         };
 
-        let diagnose_migration_history_output =
+        let mut diagnose_migration_history_output =
             DiagnoseMigrationHistoryCommand::execute(&diagnose_input, connector).await?;
 
-        check_for_broken_migrations(&diagnose_migration_history_output)?;
+        check_for_broken_migrations(&mut diagnose_migration_history_output)?;
 
         if let Some(reason) = check_for_reset_conditions(&diagnose_migration_history_output) {
             return Ok(DevDiagnosticOutput {
@@ -55,13 +55,16 @@ impl<'a> MigrationCommand for DevDiagnosticCommand {
     }
 }
 
-fn check_for_broken_migrations(output: &DiagnoseMigrationHistoryOutput) -> CoreResult<()> {
-    if let Some(DriftDiagnostic::MigrationFailedToApply { error }) = &output.drift {
-        return Err(CoreError::UserFacing(error.clone()));
+fn check_for_broken_migrations(output: &mut DiagnoseMigrationHistoryOutput) -> CoreResult<()> {
+    if let Some(drift) = output.drift.take() {
+        match drift {
+            DriftDiagnostic::MigrationFailedToApply { error } => return Err(error),
+            _ => output.drift = Some(drift),
+        }
     }
 
-    if let Some(error) = &output.error_in_unapplied_migration {
-        return Err(CoreError::UserFacing(error.clone()));
+    if let Some(error) = output.error_in_unapplied_migration.take() {
+        return Err(error);
     }
 
     Ok(())

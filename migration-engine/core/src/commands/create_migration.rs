@@ -43,7 +43,7 @@ impl<'a> MigrationCommand for CreateMigrationCommand {
         let connector_type = connector.connector_type();
 
         if input.migration_name.len() > 200 {
-            return Err(CoreError::user_facing(MigrationNameTooLong));
+            return Err(CoreError::user_facing_error(MigrationNameTooLong));
         }
 
         // Check for provider switch
@@ -52,7 +52,7 @@ impl<'a> MigrationCommand for CreateMigrationCommand {
                 migration_connector::match_provider_in_lock_file(&input.migrations_directory_path, connector_type),
                 Some(false)
             ) {
-                return Err(CoreError::user_facing(ProviderSwitchedError {
+                return Err(CoreError::user_facing_error(ProviderSwitchedError {
                     provider: connector_type.into(),
                 }));
             }
@@ -83,12 +83,12 @@ impl<'a> MigrationCommand for CreateMigrationCommand {
             &Path::new(&input.migrations_directory_path),
             &input.migration_name,
         )
-        .map_err(|_| CoreError::new_unknown("Failed to create a new migration directory.".into()))?;
+        .map_err(|_| CoreError::from_message("Failed to create a new migration directory.".into()))?;
 
         directory
             .write_migration_script(&migration_script, C::DatabaseMigration::FILE_EXTENSION)
             .map_err(|err| {
-                CoreError::new_unknown(format!(
+                CoreError::from_message(format!(
                     "Failed to write the migration script to `{:?}`\n{}",
                     directory.path(),
                     err,
@@ -97,7 +97,7 @@ impl<'a> MigrationCommand for CreateMigrationCommand {
 
         migration_connector::write_migration_lock_file(&input.migrations_directory_path, connector_type).map_err(
             |err| {
-                CoreError::new_unknown(format!(
+                CoreError::from_message(format!(
                     "Failed to write the migration lock file to `{:?}`\n{}",
                     &input.migrations_directory_path, err
                 ))

@@ -569,7 +569,7 @@ async fn diagnose_migrations_history_reports_migrations_failing_to_apply_cleanly
 
     match drift {
         Some(DriftDiagnostic::MigrationFailedToApply { error }) => {
-            let known_error = error.unwrap_known();
+            let known_error = error.to_user_facing().unwrap_known();
             assert_eq!(
                 known_error.error_code,
                 user_facing_errors::migration_engine::MigrationDoesNotApplyCleanly::ERROR_CODE
@@ -662,8 +662,9 @@ async fn with_a_failed_migration(api: &TestApi) -> TestResult {
     assert!(has_migrations_table);
     assert_eq!(failed_migration_names, &[generated_migration_name.unwrap()]);
 
-    let error_in_unapplied_migration =
-        error_in_unapplied_migration.expect("No error in unapplied migrations, but we expected one.");
+    let error_in_unapplied_migration = error_in_unapplied_migration
+        .expect("No error in unapplied migrations, but we expected one.")
+        .to_user_facing();
 
     let message = error_in_unapplied_migration.message().to_owned();
 
@@ -738,8 +739,9 @@ async fn with_an_invalid_unapplied_migration_should_report_it(api: &TestApi) -> 
     );
     assert!(drift.is_none());
 
-    let error_in_unapplied_migration =
-        error_in_unapplied_migration.expect("No error in unapplied migrations, but we expected one.");
+    let error_in_unapplied_migration = error_in_unapplied_migration
+        .expect("No error in unapplied migrations, but we expected one.")
+        .to_user_facing();
 
     let message = error_in_unapplied_migration.message().to_owned();
 
@@ -844,7 +846,7 @@ async fn shadow_database_creation_error_is_special_cased_mysql(api: &TestApi) ->
         .await?;
 
     assert!(
-        matches!(output.drift, Some(DriftDiagnostic::MigrationFailedToApply { error }) if error.as_known().unwrap().error_code == ShadowDbCreationError::ERROR_CODE)
+        matches!(output.drift, Some(DriftDiagnostic::MigrationFailedToApply { error }) if error.to_user_facing().as_known().unwrap().error_code == ShadowDbCreationError::ERROR_CODE)
     );
 
     Ok(())
@@ -895,7 +897,7 @@ async fn shadow_database_creation_error_is_special_cased_postgres(api: &TestApi)
         .await?;
 
     assert!(
-        matches!(output.drift, Some(DriftDiagnostic::MigrationFailedToApply { error }) if error.as_known().unwrap().error_code == ShadowDbCreationError::ERROR_CODE)
+        matches!(output.drift, Some(DriftDiagnostic::MigrationFailedToApply { error }) if error.to_user_facing().as_known().unwrap().error_code == ShadowDbCreationError::ERROR_CODE)
     );
 
     Ok(())
@@ -968,7 +970,7 @@ async fn shadow_database_creation_error_is_special_cased_mssql(api: &TestApi) ->
         .await?;
 
     assert!(
-        matches!(output.drift, Some(DriftDiagnostic::MigrationFailedToApply { error }) if error.as_known().unwrap().error_code == ShadowDbCreationError::ERROR_CODE)
+        matches!(output.drift, Some(DriftDiagnostic::MigrationFailedToApply { error }) if error.to_user_facing().as_known().unwrap().error_code == ShadowDbCreationError::ERROR_CODE)
     );
 
     Ok(())
@@ -1014,7 +1016,7 @@ async fn empty_migration_directories_should_cause_known_errors(api: &TestApi) ->
         .send()
         .await
         .unwrap_err()
-        .render_user_facing()
+        .to_user_facing()
         .unwrap_known();
 
     assert_eq!(

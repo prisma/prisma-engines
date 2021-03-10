@@ -79,7 +79,7 @@ fn parse_base64_string(s: &str) -> Result<String, CliError> {
             Ok(s) => Ok(s),
             Err(e) => Err(CliError::Known {
                 error: KnownError::new(SchemaParserError {
-                    full_error: format!("{}", e),
+                    full_error: e.to_string(),
                 }),
                 exit_code: 255,
             }),

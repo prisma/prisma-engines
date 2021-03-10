@@ -1,5 +1,4 @@
 use migration_connector::ConnectorError;
-use migration_core::CoreError;
 use std::fmt::Display;
 use tracing_error::SpanTrace;
 use user_facing_errors::{
@@ -94,19 +93,6 @@ impl From<ConnectorError> for CliError {
                 error: err,
                 exit_code,
                 context,
-            },
-        }
-    }
-}
-
-impl From<CoreError> for CliError {
-    fn from(e: CoreError) -> Self {
-        match e {
-            CoreError::ConnectorError(e) => e.into(),
-            e => CliError::Unknown {
-                error: ConnectorError::propagate(e.into()),
-                context: SpanTrace::capture(),
-                exit_code: 255,
             },
         }
     }

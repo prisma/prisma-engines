@@ -24,7 +24,7 @@ async fn mark_migration_rolled_back_on_a_database_with_migrations_table_errors(a
         .send()
         .await
         .unwrap_err()
-        .render_user_facing()
+        .to_user_facing()
         .unwrap_known();
 
     assert_eq!(

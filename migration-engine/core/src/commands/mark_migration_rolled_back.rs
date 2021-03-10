@@ -28,7 +28,7 @@ pub(crate) async fn mark_migration_rolled_back<
     connector.acquire_lock().await?;
 
     let all_migrations = persistence.list_migrations().await?.map_err(|_err| {
-        CoreError::new_unknown(
+        CoreError::from_message(
             "Invariant violation: called markMigrationRolledBack on a database without migrations table.".into(),
         )
     })?;
@@ -39,7 +39,7 @@ pub(crate) async fn mark_migration_rolled_back<
         .collect();
 
     if relevant_migrations.is_empty() {
-        return Err(CoreError::user_facing(CannotRollBackUnappliedMigration {
+        return Err(CoreError::user_facing_error(CannotRollBackUnappliedMigration {
             migration_name: input.migration_name.clone(),
         }));
     }
@@ -48,7 +48,7 @@ pub(crate) async fn mark_migration_rolled_back<
         .iter()
         .all(|migration| migration.finished_at.is_some())
     {
-        return Err(CoreError::user_facing(CannotRollBackSucceededMigration {
+        return Err(CoreError::user_facing_error(CannotRollBackSucceededMigration {
             migration_name: input.migration_name.clone(),
         }));
     }
