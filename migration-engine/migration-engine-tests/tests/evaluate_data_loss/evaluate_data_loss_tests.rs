@@ -228,7 +228,7 @@ async fn evaluate_data_loss_returns_warnings_for_the_local_database_for_the_next
     Ok(())
 }
 
-#[test_each_connector(capabilities("enums"), log = "debug,sql_schema_describer=info")]
+#[test_each_connector(capabilities("enums"))]
 async fn evaluate_data_loss_maps_warnings_to_the_right_steps(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Cat {
@@ -282,9 +282,9 @@ async fn evaluate_data_loss_maps_warnings_to_the_right_steps(api: &TestApi) -> T
     api.evaluate_data_loss(&directory, dm2)
         .send()
         .await?
-        .assert_warnings_with_indices(&[("You are about to drop the column `name` on the `Cat` table, which still contains 1 non-null values.".into(), 1)])?
+        .assert_warnings_with_indices(&[("You are about to drop the column `name` on the `Cat` table, which still contains 1 non-null values.".into(), if api.is_postgres() { 1 } else { 0 })])?
         .assert_unexecutables_with_indices(&[
-            ("Added the required column `isGoodDog` to the `Dog` table without a default value. There are 1 rows in this table, it is not possible to execute this migration.".into(), 2)
+            ("Added the required column `isGoodDog` to the `Dog` table without a default value. There are 1 rows in this table, it is not possible to execute this migration.".into(), if api.is_postgres() { 2 } else { 1 }),
         ])?;
 
     Ok(())
