@@ -37,6 +37,7 @@ impl<'a> MigrationCommand for DevDiagnosticCommand {
             migrations_directory_path: input.migrations_directory_path.clone(),
             opt_in_to_shadow_database: true,
         };
+
         let diagnose_migration_history_output =
             DiagnoseMigrationHistoryCommand::execute(&diagnose_input, connector).await?;
 
@@ -80,7 +81,9 @@ fn check_for_reset_conditions(output: &DiagnoseMigrationHistoryOutput) -> Option
         ))
     }
 
-    if let Some(DriftDiagnostic::DriftDetected { rollback: _ }) = &output.drift {
+    if let Some(DriftDiagnostic::DriftDetected { rollback }) = &output.drift {
+        tracing::info!(rollback = rollback.as_str(), "DriftDetected diagnostic");
+
         reset_reasons
             .push("Drift detected: Your database schema is not in sync with your migration history.".to_owned())
     }
