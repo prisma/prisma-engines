@@ -103,7 +103,7 @@ impl<'a> MigrationCommand for ApplyMigrationsCommand {
 
                     migration_persistence.record_failed_step(&migration_id, &logs).await?;
 
-                    return Err(err.into());
+                    return Err(err);
                 }
             }
         }

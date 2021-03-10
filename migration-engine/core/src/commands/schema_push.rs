@@ -25,7 +25,7 @@ impl MigrationCommand for SchemaPushCommand {
         };
 
         if let Some(err) = connector.check_database_version_compatibility(&schema) {
-            return Err(ConnectorError::user_facing_error(err).into());
+            return Err(ConnectorError::user_facing_error(err));
         };
 
         let checks = checker.check(&database_migration).await?;

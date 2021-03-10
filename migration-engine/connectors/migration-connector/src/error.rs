@@ -9,7 +9,7 @@ use user_facing_errors::{migration_engine::MigrationFileNotFound, KnownError, Us
 #[derive(Debug)]
 pub struct ConnectorError {
     /// An optional error already rendered for users in case the migration core does not handle it.
-    user_facing_error: Option<KnownError>,
+    user_facing_error: Option<Box<KnownError>>,
     /// The error to be displayed. `Result` here is meant as an `Either` type:
     /// either an error we introduced, or something propagated from a previous error.
     subject: Result<Box<str>, Box<dyn StdError + Sync + Send + 'static>>,
@@ -20,9 +20,11 @@ pub struct ConnectorError {
 impl Display for ConnectorError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match &self.subject {
-            Ok(message) => f.write_str(&message),
-            Err(source) => Display::fmt(&source, f),
-        }
+            Ok(message) => f.write_str(&message)?,
+            Err(source) => Display::fmt(&source, f)?,
+        };
+
+        Display::fmt(&self.context, f)
     }
 }
 
@@ -64,7 +66,7 @@ impl ConnectorError {
         };
 
         ConnectorError {
-            user_facing_error: Some(KnownError::new(user_facing_error)),
+            user_facing_error: Some(Box::new(KnownError::new(user_facing_error))),
             subject: Err(Box::new(self)),
             context,
         }
@@ -78,7 +80,7 @@ impl ConnectorError {
         };
 
         ConnectorError {
-            user_facing_error: Some(KnownError::new(user_facing_error)),
+            user_facing_error: Some(Box::new(KnownError::new(user_facing_error))),
             subject: Err(Box::new(self)),
             context,
         }
@@ -92,7 +94,7 @@ impl ConnectorError {
         };
 
         ConnectorError {
-            user_facing_error: Some(KnownError::new(user_facing_error)),
+            user_facing_error: Some(Box::new(KnownError::new(user_facing_error))),
             subject: Err(Box::new(self)),
             context,
         }
@@ -100,7 +102,7 @@ impl ConnectorError {
 
     /// Access the inner `user_facing_error::KnownError`.
     pub fn known_error(&self) -> Option<&KnownError> {
-        self.user_facing_error.as_ref()
+        self.user_facing_error.as_deref()
     }
 
     /// Build an unknown connector error from an unspecified downstream error.
@@ -117,7 +119,7 @@ impl ConnectorError {
     /// Render to a user_facing_error::Error
     pub fn to_user_facing(&self) -> user_facing_errors::Error {
         match &self.user_facing_error {
-            Some(known_error) => known_error.clone().into(),
+            Some(known_error) => (**known_error).clone().into(),
             None => user_facing_errors::Error::from_dyn_error(self),
         }
     }
@@ -126,7 +128,7 @@ impl ConnectorError {
     pub fn user_facing_error<T: UserFacingError>(err: T) -> Self {
         ConnectorError {
             subject: Ok(err.message().into_boxed_str()),
-            user_facing_error: Some(KnownError::new(err)),
+            user_facing_error: Some(Box::new(KnownError::new(err))),
             context: SpanTrace::capture(),
         }
     }
@@ -141,7 +143,7 @@ impl From<KnownError> for ConnectorError {
     fn from(err: KnownError) -> Self {
         ConnectorError {
             subject: Ok(err.message.clone().into_boxed_str()),
-            user_facing_error: Some(err),
+            user_facing_error: Some(Box::new(err)),
             context: SpanTrace::capture(),
         }
     }
@@ -152,9 +154,9 @@ impl From<ReadMigrationScriptError> for ConnectorError {
         let context = err.1.clone();
 
         ConnectorError {
-            user_facing_error: Some(KnownError::new(MigrationFileNotFound {
+            user_facing_error: Some(Box::new(KnownError::new(MigrationFileNotFound {
                 migration_file_path: err.2.clone(),
-            })),
+            }))),
             subject: Err(Box::new(err)),
             context,
         }
@@ -173,6 +175,8 @@ mod tests {
 
     #[test]
     fn connector_error_has_the_right_size() {
-        assert_eq!(std::mem::size_of::<ConnectorError>(), 1000);
+        assert_eq!(std::mem::size_of::<SpanTrace>(), 32);
+        assert_eq!(std::mem::size_of::<Option<Box<KnownError>>>(), 8);
+        assert_eq!(std::mem::size_of::<ConnectorError>(), 64);
     }
 }
