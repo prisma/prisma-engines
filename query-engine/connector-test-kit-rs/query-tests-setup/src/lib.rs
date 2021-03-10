@@ -30,7 +30,8 @@ pub enum Runner {
 
 impl Runner {
     pub fn load() -> Self {
-        todo!()
+        println!("Totally loaded");
+        Self::Direct(DirectRunner {})
     }
 
     pub fn query<T>(&self, gql: T) -> QueryResult
