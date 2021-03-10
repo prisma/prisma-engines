@@ -363,7 +363,7 @@ async fn escaped_backslashes_in_string_literals_must_be_unescaped(api: &TestApi)
         api.schema_name()
     );
 
-    api.database().query_raw(&create_table, &[]).await?;
+    api.database().raw_cmd(&create_table).await?;
 
     let schema = api.describe().await?;
 
@@ -383,4 +383,25 @@ async fn escaped_backslashes_in_string_literals_must_be_unescaped(api: &TestApi)
     assert_eq!(default, "xyz\\Datasource\\Model");
 
     Ok(())
+}
+
+#[test_each_connector(tags("sqlite"))]
+async fn broken_relations_are_filtered_out(api: &TestApi) {
+    let setup = r#"
+        PRAGMA foreign_keys=OFF;
+
+        CREATE TABLE "dog" (
+            id INTEGER PRIMARY KEY,
+            bestFriendId INTEGER REFERENCES "cat"("id")
+        );
+
+        PRAGMA foreign_keys=ON;
+    "#;
+
+    api.database().raw_cmd(setup).await.unwrap();
+
+    let schema = api.describe().await.unwrap();
+    let table = schema.table_bang("dog");
+
+    assert!(table.foreign_keys.is_empty(), "{:#?}", table.foreign_keys);
 }

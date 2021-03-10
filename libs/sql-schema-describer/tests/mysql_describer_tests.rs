@@ -998,3 +998,24 @@ async fn escaped_backslashes_in_string_literals_must_be_unescaped(api: &TestApi)
 
     Ok(())
 }
+
+#[test_each_connector(tags("mysql"))]
+async fn dangling_foreign_keys_are_filtered_out(api: &TestApi) {
+    let setup = r#"
+    SET FOREIGN_KEY_CHECKS=0;
+
+    CREATE TABLE `dog` (
+        id INTEGER PRIMARY KEY,
+        bestFriendId INTEGER REFERENCES `cat`(`id`)
+    );
+
+    SET FOREIGN_KEY_CHECKS=1;
+    "#;
+
+    api.database().raw_cmd(setup).await.unwrap();
+
+    let schema = api.describe().await.unwrap();
+    let table = schema.table_bang("dog");
+
+    assert!(table.foreign_keys.is_empty(), "{:#?}", table.foreign_keys);
+}

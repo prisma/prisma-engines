@@ -10,7 +10,24 @@ use sql_schema_describer::*;
 use test_setup::connectors::Tags;
 use test_setup::*;
 
-pub type TestResult = anyhow::Result<()>;
+#[derive(Debug)]
+pub struct TestError {
+    inner: Box<dyn std::error::Error>,
+}
+
+impl From<quaint::error::Error> for TestError {
+    fn from(err: quaint::error::Error) -> Self {
+        TestError { inner: err.into() }
+    }
+}
+
+impl From<DescriberError> for TestError {
+    fn from(err: DescriberError) -> Self {
+        TestError { inner: err.into() }
+    }
+}
+
+pub type TestResult = Result<(), TestError>;
 
 pub struct TestApi {
     db_name: &'static str,
@@ -62,7 +79,7 @@ impl TestApi {
         self.tags
     }
 
-    pub(crate) async fn describe(&self) -> Result<SqlSchema, anyhow::Error> {
+    pub(crate) async fn describe(&self) -> Result<SqlSchema, TestError> {
         let db = self.database.clone();
         let describer: Box<dyn sql_schema_describer::SqlSchemaDescriberBackend> = match self.sql_family() {
             SqlFamily::Postgres => Box::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(db)),
