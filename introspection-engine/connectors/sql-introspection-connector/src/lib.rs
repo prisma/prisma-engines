@@ -110,8 +110,1119 @@ impl IntrospectionConnector for SqlIntrospectionConnector {
         Ok(description)
     }
     async fn introspect(&self, previous_data_model: &Datamodel) -> ConnectorResult<IntrospectionResult> {
-        let sql_schema = self.catch(self.describe()).await?;
-        tracing::debug!("SQL Schema Describer is done: {:?}", sql_schema);
+        // let sql_schema = self.catch(self.describe()).await?;
+        // tracing::debug!("SQL Schema Describer is done: {:?}", sql_schema);
+        let dm = r#"{
+    "tables": [{
+            "name": "_FollowRelation",
+            "columns": [{
+                    "name": "A",
+                    "tpe": {
+                        "full_data_type": "int",
+                        "family": "Int",
+                        "arity": "Required",
+                        "native_type": "Int"
+                    },
+                    "default": null,
+                    "auto_increment": false
+                },
+                {
+                    "name": "B",
+                    "tpe": {
+                        "full_data_type": "int",
+                        "family": "Int",
+                        "arity": "Required",
+                        "native_type": "Int"
+                    },
+                    "default": null,
+                    "auto_increment": false
+                }
+            ],
+            "indices": [{
+                    "name": "_FollowRelation_AB_unique",
+                    "columns": [
+                        "A",
+                        "B"
+                    ],
+                    "tpe": "Unique"
+                },
+                {
+                    "name": "_FollowRelation_B_index",
+                    "columns": [
+                        "B"
+                    ],
+                    "tpe": "Normal"
+                }
+            ],
+            "primary_key": null,
+            "foreign_keys": [{
+                    "constraint_name": "_followrelation_ibfk_1",
+                    "columns": [
+                        "A"
+                    ],
+                    "referenced_table": "User",
+                    "referenced_columns": [
+                        "id"
+                    ],
+                    "on_delete_action": "Cascade",
+                    "on_update_action": "Cascade"
+                },
+                {
+                    "constraint_name": "_followrelation_ibfk_2",
+                    "columns": [
+                        "B"
+                    ],
+                    "referenced_table": "User",
+                    "referenced_columns": [
+                        "id"
+                    ],
+                    "on_delete_action": "Cascade",
+                    "on_update_action": "Cascade"
+                }
+            ]
+        },
+        {
+            "name": "_Migration",
+            "columns": [{
+                    "name": "revision",
+                    "tpe": {
+                        "full_data_type": "int",
+                        "family": "Int",
+                        "arity": "Required",
+                        "native_type": "Int"
+                    },
+                    "default": null,
+                    "auto_increment": true
+                },
+                {
+                    "name": "name",
+                    "tpe": {
+                        "full_data_type": "text",
+                        "family": "String",
+                        "arity": "Required",
+                        "native_type": "Text"
+                    },
+                    "default": null,
+                    "auto_increment": false
+                },
+                {
+                    "name": "datamodel",
+                    "tpe": {
+                        "full_data_type": "longtext",
+                        "family": "String",
+                        "arity": "Required",
+                        "native_type": "LongText"
+                    },
+                    "default": null,
+                    "auto_increment": false
+                },
+                {
+                    "name": "status",
+                    "tpe": {
+                        "full_data_type": "text",
+                        "family": "String",
+                        "arity": "Required",
+                        "native_type": "Text"
+                    },
+                    "default": null,
+                    "auto_increment": false
+                },
+                {
+                    "name": "applied",
+                    "tpe": {
+                        "full_data_type": "int",
+                        "family": "Int",
+                        "arity": "Required",
+                        "native_type": "Int"
+                    },
+                    "default": null,
+                    "auto_increment": false
+                },
+                {
+                    "name": "rolled_back",
+                    "tpe": {
+                        "full_data_type": "int",
+                        "family": "Int",
+                        "arity": "Required",
+                        "native_type": "Int"
+                    },
+                    "default": null,
+                    "auto_increment": false
+                },
+                {
+                    "name": "datamodel_steps",
+                    "tpe": {
+                        "full_data_type": "longtext",
+                        "family": "String",
+                        "arity": "Required",
+                        "native_type": "LongText"
+                    },
+                    "default": null,
+                    "auto_increment": false
+                },
+                {
+                    "name": "database_migration",
+                    "tpe": {
+                        "full_data_type": "longtext",
+                        "family": "String",
+                        "arity": "Required",
+                        "native_type": "LongText"
+                    },
+                    "default": null,
+                    "auto_increment": false
+                },
+                {
+                    "name": "errors",
+                    "tpe": {
+                        "full_data_type": "longtext",
+                        "family": "String",
+                        "arity": "Required",
+                        "native_type": "LongText"
+                    },
+                    "default": null,
+                    "auto_increment": false
+                },
+                {
+                    "name": "started_at",
+                    "tpe": {
+                        "full_data_type": "datetime(3)",
+                        "family": "DateTime",
+                        "arity": "Required",
+                        "native_type": {
+                            "DateTime": 3
+                        }
+                    },
+                    "default": null,
+                    "auto_increment": false
+                },
+                {
+                    "name": "finished_at",
+                    "tpe": {
+                        "full_data_type": "datetime(3)",
+                        "family": "DateTime",
+                        "arity": "Nullable",
+                        "native_type": {
+                            "DateTime": 3
+                        }
+                    },
+                    "default": null,
+                    "auto_increment": false
+                }
+            ],
+            "indices": [],
+            "primary_key": {
+                "columns": [
+                    "revision"
+                ],
+                "sequence": null,
+                "constraint_name": null
+            },
+            "foreign_keys": []
+        },
+        {
+            "name": "_RoomToUser",
+            "columns": [{
+                    "name": "A",
+                    "tpe": {
+                        "full_data_type": "int",
+                        "family": "Int",
+                        "arity": "Required",
+                        "native_type": "Int"
+                    },
+                    "default": null,
+                    "auto_increment": false
+                },
+                {
+                    "name": "B",
+                    "tpe": {
+                        "full_data_type": "int",
+                        "family": "Int",
+                        "arity": "Required",
+                        "native_type": "Int"
+                    },
+                    "default": null,
+                    "auto_increment": false
+                }
+            ],
+            "indices": [{
+                    "name": "_RoomToUser_AB_unique",
+                    "columns": [
+                        "A",
+                        "B"
+                    ],
+                    "tpe": "Unique"
+                },
+                {
+                    "name": "_RoomToUser_B_index",
+                    "columns": [
+                        "B"
+                    ],
+                    "tpe": "Normal"
+                }
+            ],
+            "primary_key": null,
+            "foreign_keys": [{
+                    "constraint_name": "_roomtouser_ibfk_1",
+                    "columns": [
+                        "A"
+                    ],
+                    "referenced_table": "Room",
+                    "referenced_columns": [
+                        "id"
+                    ],
+                    "on_delete_action": "Cascade",
+                    "on_update_action": "Cascade"
+                },
+                {
+                    "constraint_name": "_roomtouser_ibfk_2",
+                    "columns": [
+                        "B"
+                    ],
+                    "referenced_table": "User",
+                    "referenced_columns": [
+                        "id"
+                    ],
+                    "on_delete_action": "Cascade",
+                    "on_update_action": "Cascade"
+                }
+            ]
+        },
+        {
+            "name": "Comment",
+            "columns": [{
+                    "name": "id",
+                    "tpe": {
+                        "full_data_type": "int",
+                        "family": "Int",
+                        "arity": "Required",
+                        "native_type": "Int"
+                    },
+                    "default": null,
+                    "auto_increment": true
+                },
+                {
+                    "name": "text",
+                    "tpe": {
+                        "full_data_type": "varchar(191)",
+                        "family": "String",
+                        "arity": "Required",
+                        "native_type": {
+                            "VarChar": 191
+                        }
+                    },
+                    "default": null,
+                    "auto_increment": false
+                },
+                {
+                    "name": "createdAt",
+                    "tpe": {
+                        "full_data_type": "datetime(3)",
+                        "family": "DateTime",
+                        "arity": "Required",
+                        "native_type": {
+                            "DateTime": 3
+                        }
+                    },
+                    "default": {
+                        "kind": "NOW",
+                        "constraint_name": null
+                    },
+                    "auto_increment": false
+                },
+                {
+                    "name": "updatedAt",
+                    "tpe": {
+                        "full_data_type": "datetime(3)",
+                        "family": "DateTime",
+                        "arity": "Required",
+                        "native_type": {
+                            "DateTime": 3
+                        }
+                    },
+                    "default": {
+                        "kind": "NOW",
+                        "constraint_name": null
+                    },
+                    "auto_increment": false
+                },
+                {
+                    "name": "userId",
+                    "tpe": {
+                        "full_data_type": "int",
+                        "family": "Int",
+                        "arity": "Required",
+                        "native_type": "Int"
+                    },
+                    "default": null,
+                    "auto_increment": false
+                },
+                {
+                    "name": "postId",
+                    "tpe": {
+                        "full_data_type": "int",
+                        "family": "Int",
+                        "arity": "Required",
+                        "native_type": "Int"
+                    },
+                    "default": null,
+                    "auto_increment": false
+                }
+            ],
+            "indices": [{
+                    "name": "postId",
+                    "columns": [
+                        "postId"
+                    ],
+                    "tpe": "Normal"
+                },
+                {
+                    "name": "userId",
+                    "columns": [
+                        "userId"
+                    ],
+                    "tpe": "Normal"
+                }
+            ],
+            "primary_key": {
+                "columns": [
+                    "id"
+                ],
+                "sequence": null,
+                "constraint_name": null
+            },
+            "foreign_keys": [{
+                    "constraint_name": "comment_ibfk_2",
+                    "columns": [
+                        "postId"
+                    ],
+                    "referenced_table": "Post",
+                    "referenced_columns": [
+                        "id"
+                    ],
+                    "on_delete_action": "Cascade",
+                    "on_update_action": "Cascade"
+                },
+                {
+                    "constraint_name": "comment_ibfk_1",
+                    "columns": [
+                        "userId"
+                    ],
+                    "referenced_table": "User",
+                    "referenced_columns": [
+                        "id"
+                    ],
+                    "on_delete_action": "Cascade",
+                    "on_update_action": "Cascade"
+                }
+            ]
+        },
+        {
+            "name": "File",
+            "columns": [{
+                    "name": "id",
+                    "tpe": {
+                        "full_data_type": "int",
+                        "family": "Int",
+                        "arity": "Required",
+                        "native_type": "Int"
+                    },
+                    "default": null,
+                    "auto_increment": true
+                },
+                {
+                    "name": "url",
+                    "tpe": {
+                        "full_data_type": "varchar(191)",
+                        "family": "String",
+                        "arity": "Required",
+                        "native_type": {
+                            "VarChar": 191
+                        }
+                    },
+                    "default": null,
+                    "auto_increment": false
+                },
+                {
+                    "name": "postId",
+                    "tpe": {
+                        "full_data_type": "int",
+                        "family": "Int",
+                        "arity": "Required",
+                        "native_type": "Int"
+                    },
+                    "default": null,
+                    "auto_increment": false
+                }
+            ],
+            "indices": [{
+                "name": "postId",
+                "columns": [
+                    "postId"
+                ],
+                "tpe": "Normal"
+            }],
+            "primary_key": {
+                "columns": [
+                    "id"
+                ],
+                "sequence": null,
+                "constraint_name": null
+            },
+            "foreign_keys": [{
+                "constraint_name": "file_ibfk_1",
+                "columns": [
+                    "postId"
+                ],
+                "referenced_table": "Post",
+                "referenced_columns": [
+                    "id"
+                ],
+                "on_delete_action": "Cascade",
+                "on_update_action": "Cascade"
+            }]
+        },
+        {
+            "name": "Like",
+            "columns": [{
+                    "name": "id",
+                    "tpe": {
+                        "full_data_type": "int",
+                        "family": "Int",
+                        "arity": "Required",
+                        "native_type": "Int"
+                    },
+                    "default": null,
+                    "auto_increment": true
+                },
+                {
+                    "name": "userId",
+                    "tpe": {
+                        "full_data_type": "int",
+                        "family": "Int",
+                        "arity": "Required",
+                        "native_type": "Int"
+                    },
+                    "default": null,
+                    "auto_increment": false
+                },
+                {
+                    "name": "postId",
+                    "tpe": {
+                        "full_data_type": "int",
+                        "family": "Int",
+                        "arity": "Required",
+                        "native_type": "Int"
+                    },
+                    "default": null,
+                    "auto_increment": false
+                },
+                {
+                    "name": "createdAt",
+                    "tpe": {
+                        "full_data_type": "datetime(3)",
+                        "family": "DateTime",
+                        "arity": "Required",
+                        "native_type": {
+                            "DateTime": 3
+                        }
+                    },
+                    "default": {
+                        "kind": "NOW",
+                        "constraint_name": null
+                    },
+                    "auto_increment": false
+                },
+                {
+                    "name": "updatedAt",
+                    "tpe": {
+                        "full_data_type": "datetime(3)",
+                        "family": "DateTime",
+                        "arity": "Required",
+                        "native_type": {
+                            "DateTime": 3
+                        }
+                    },
+                    "default": {
+                        "kind": "NOW",
+                        "constraint_name": null
+                    },
+                    "auto_increment": false
+                }
+            ],
+            "indices": [{
+                    "name": "postId",
+                    "columns": [
+                        "postId"
+                    ],
+                    "tpe": "Normal"
+                },
+                {
+                    "name": "userId",
+                    "columns": [
+                        "userId"
+                    ],
+                    "tpe": "Normal"
+                }
+            ],
+            "primary_key": {
+                "columns": [
+                    "id"
+                ],
+                "sequence": null,
+                "constraint_name": null
+            },
+            "foreign_keys": [{
+                    "constraint_name": "like_ibfk_2",
+                    "columns": [
+                        "postId"
+                    ],
+                    "referenced_table": "Post",
+                    "referenced_columns": [
+                        "id"
+                    ],
+                    "on_delete_action": "Cascade",
+                    "on_update_action": "Cascade"
+                },
+                {
+                    "constraint_name": "like_ibfk_1",
+                    "columns": [
+                        "userId"
+                    ],
+                    "referenced_table": "User",
+                    "referenced_columns": [
+                        "id"
+                    ],
+                    "on_delete_action": "Cascade",
+                    "on_update_action": "Cascade"
+                }
+            ]
+        },
+        {
+            "name": "Message",
+            "columns": [{
+                    "name": "id",
+                    "tpe": {
+                        "full_data_type": "int",
+                        "family": "Int",
+                        "arity": "Required",
+                        "native_type": "Int"
+                    },
+                    "default": null,
+                    "auto_increment": true
+                },
+                {
+                    "name": "text",
+                    "tpe": {
+                        "full_data_type": "varchar(191)",
+                        "family": "String",
+                        "arity": "Required",
+                        "native_type": {
+                            "VarChar": 191
+                        }
+                    },
+                    "default": null,
+                    "auto_increment": false
+                },
+                {
+                    "name": "createdAt",
+                    "tpe": {
+                        "full_data_type": "datetime(3)",
+                        "family": "DateTime",
+                        "arity": "Required",
+                        "native_type": {
+                            "DateTime": 3
+                        }
+                    },
+                    "default": {
+                        "kind": "NOW",
+                        "constraint_name": null
+                    },
+                    "auto_increment": false
+                },
+                {
+                    "name": "updatedAt",
+                    "tpe": {
+                        "full_data_type": "datetime(3)",
+                        "family": "DateTime",
+                        "arity": "Required",
+                        "native_type": {
+                            "DateTime": 3
+                        }
+                    },
+                    "default": {
+                        "kind": "NOW",
+                        "constraint_name": null
+                    },
+                    "auto_increment": false
+                },
+                {
+                    "name": "roomId",
+                    "tpe": {
+                        "full_data_type": "int",
+                        "family": "Int",
+                        "arity": "Required",
+                        "native_type": "Int"
+                    },
+                    "default": null,
+                    "auto_increment": false
+                },
+                {
+                    "name": "userId",
+                    "tpe": {
+                        "full_data_type": "int",
+                        "family": "Int",
+                        "arity": "Required",
+                        "native_type": "Int"
+                    },
+                    "default": null,
+                    "auto_increment": false
+                }
+            ],
+            "indices": [{
+                    "name": "roomId",
+                    "columns": [
+                        "roomId"
+                    ],
+                    "tpe": "Normal"
+                },
+                {
+                    "name": "userId",
+                    "columns": [
+                        "userId"
+                    ],
+                    "tpe": "Normal"
+                }
+            ],
+            "primary_key": {
+                "columns": [
+                    "id"
+                ],
+                "sequence": null,
+                "constraint_name": null
+            },
+            "foreign_keys": [{
+                    "constraint_name": "message_ibfk_3",
+                    "columns": [
+                        "roomId"
+                    ],
+                    "referenced_table": "Room",
+                    "referenced_columns": [
+                        "id"
+                    ],
+                    "on_delete_action": "Cascade",
+                    "on_update_action": "Cascade"
+                },
+                {
+                    "constraint_name": "message_ibfk_4",
+                    "columns": [
+                        "userId"
+                    ],
+                    "referenced_table": "User",
+                    "referenced_columns": [
+                        "id"
+                    ],
+                    "on_delete_action": "Cascade",
+                    "on_update_action": "Cascade"
+                }
+            ]
+        },
+        {
+            "name": "Post",
+            "columns": [{
+                    "name": "id",
+                    "tpe": {
+                        "full_data_type": "int",
+                        "family": "Int",
+                        "arity": "Required",
+                        "native_type": "Int"
+                    },
+                    "default": null,
+                    "auto_increment": true
+                },
+                {
+                    "name": "location",
+                    "tpe": {
+                        "full_data_type": "varchar(191)",
+                        "family": "String",
+                        "arity": "Nullable",
+                        "native_type": {
+                            "VarChar": 191
+                        }
+                    },
+                    "default": null,
+                    "auto_increment": false
+                },
+                {
+                    "name": "caption",
+                    "tpe": {
+                        "full_data_type": "varchar(191)",
+                        "family": "String",
+                        "arity": "Required",
+                        "native_type": {
+                            "VarChar": 191
+                        }
+                    },
+                    "default": null,
+                    "auto_increment": false
+                },
+                {
+                    "name": "userId",
+                    "tpe": {
+                        "full_data_type": "int",
+                        "family": "Int",
+                        "arity": "Required",
+                        "native_type": "Int"
+                    },
+                    "default": null,
+                    "auto_increment": false
+                },
+                {
+                    "name": "createdAt",
+                    "tpe": {
+                        "full_data_type": "datetime(3)",
+                        "family": "DateTime",
+                        "arity": "Required",
+                        "native_type": {
+                            "DateTime": 3
+                        }
+                    },
+                    "default": {
+                        "kind": "NOW",
+                        "constraint_name": null
+                    },
+                    "auto_increment": false
+                },
+                {
+                    "name": "updatedAt",
+                    "tpe": {
+                        "full_data_type": "datetime(3)",
+                        "family": "DateTime",
+                        "arity": "Required",
+                        "native_type": {
+                            "DateTime": 3
+                        }
+                    },
+                    "default": {
+                        "kind": "NOW",
+                        "constraint_name": null
+                    },
+                    "auto_increment": false
+                }
+            ],
+            "indices": [{
+                "name": "userId",
+                "columns": [
+                    "userId"
+                ],
+                "tpe": "Normal"
+            }],
+            "primary_key": {
+                "columns": [
+                    "id"
+                ],
+                "sequence": null,
+                "constraint_name": null
+            },
+            "foreign_keys": [{
+                "constraint_name": "post_ibfk_1",
+                "columns": [
+                    "userId"
+                ],
+                "referenced_table": "User",
+                "referenced_columns": [
+                    "id"
+                ],
+                "on_delete_action": "Cascade",
+                "on_update_action": "Cascade"
+            }]
+        },
+        {
+            "name": "Room",
+            "columns": [{
+                    "name": "id",
+                    "tpe": {
+                        "full_data_type": "int",
+                        "family": "Int",
+                        "arity": "Required",
+                        "native_type": "Int"
+                    },
+                    "default": null,
+                    "auto_increment": true
+                },
+                {
+                    "name": "createdAt",
+                    "tpe": {
+                        "full_data_type": "datetime(3)",
+                        "family": "DateTime",
+                        "arity": "Required",
+                        "native_type": {
+                            "DateTime": 3
+                        }
+                    },
+                    "default": {
+                        "kind": "NOW",
+                        "constraint_name": null
+                    },
+                    "auto_increment": false
+                },
+                {
+                    "name": "updatedAt",
+                    "tpe": {
+                        "full_data_type": "datetime(3)",
+                        "family": "DateTime",
+                        "arity": "Required",
+                        "native_type": {
+                            "DateTime": 3
+                        }
+                    },
+                    "default": {
+                        "kind": "NOW",
+                        "constraint_name": null
+                    },
+                    "auto_increment": false
+                }
+            ],
+            "indices": [],
+            "primary_key": {
+                "columns": [
+                    "id"
+                ],
+                "sequence": null,
+                "constraint_name": null
+            },
+            "foreign_keys": []
+        },
+        {
+            "name": "User",
+            "columns": [{
+                    "name": "id",
+                    "tpe": {
+                        "full_data_type": "int",
+                        "family": "Int",
+                        "arity": "Required",
+                        "native_type": "Int"
+                    },
+                    "default": null,
+                    "auto_increment": true
+                },
+                {
+                    "name": "avatar",
+                    "tpe": {
+                        "full_data_type": "varchar(191)",
+                        "family": "String",
+                        "arity": "Nullable",
+                        "native_type": {
+                            "VarChar": 191
+                        }
+                    },
+                    "default": {
+                        "kind": { "VALUE": "" },
+                        "constraint_name": null
+                    },
+                    "auto_increment": false
+                },
+                {
+                    "name": "email",
+                    "tpe": {
+                        "full_data_type": "varchar(191)",
+                        "family": "String",
+                        "arity": "Required",
+                        "native_type": {
+                            "VarChar": 191
+                        }
+                    },
+                    "default": null,
+                    "auto_increment": false
+                },
+                {
+                    "name": "userName",
+                    "tpe": {
+                        "full_data_type": "varchar(191)",
+                        "family": "String",
+                        "arity": "Required",
+                        "native_type": {
+                            "VarChar": 191
+                        }
+                    },
+                    "default": null,
+                    "auto_increment": false
+                },
+                {
+                    "name": "firstName",
+                    "tpe": {
+                        "full_data_type": "varchar(191)",
+                        "family": "String",
+                        "arity": "Nullable",
+                        "native_type": {
+                            "VarChar": 191
+                        }
+                    },
+                    "default": {
+                        "kind": { "VALUE": "" },
+                        "constraint_name": null
+                    },
+                    "auto_increment": false
+                },
+                {
+                    "name": "lastName",
+                    "tpe": {
+                        "full_data_type": "varchar(191)",
+                        "family": "String",
+                        "arity": "Nullable",
+                        "native_type": {
+                            "VarChar": 191
+                        }
+                    },
+                    "default": {
+                        "kind": { "VALUE": "" },
+                        "constraint_name": null
+                    },
+                    "auto_increment": false
+                },
+                {
+                    "name": "bio",
+                    "tpe": {
+                        "full_data_type": "varchar(191)",
+                        "family": "String",
+                        "arity": "Nullable",
+                        "native_type": {
+                            "VarChar": 191
+                        }
+                    },
+                    "default": {
+                        "kind": { "VALUE": "" },
+                        "constraint_name": null
+                    },
+                    "auto_increment": false
+                },
+                {
+                    "name": "loginSecret",
+                    "tpe": {
+                        "full_data_type": "varchar(191)",
+                        "family": "String",
+                        "arity": "Nullable",
+                        "native_type": {
+                            "VarChar": 191
+                        }
+                    },
+                    "default": null,
+                    "auto_increment": false
+                },
+                {
+                    "name": "createdAt",
+                    "tpe": {
+                        "full_data_type": "datetime(3)",
+                        "family": "DateTime",
+                        "arity": "Required",
+                        "native_type": {
+                            "DateTime": 3
+                        }
+                    },
+                    "default": {
+                        "kind": "NOW",
+                        "constraint_name": null
+                    },
+                    "auto_increment": false
+                },
+                {
+                    "name": "updatedAt",
+                    "tpe": {
+                        "full_data_type": "datetime(3)",
+                        "family": "DateTime",
+                        "arity": "Required",
+                        "native_type": {
+                            "DateTime": 3
+                        }
+                    },
+                    "default": {
+                        "kind": "NOW",
+                        "constraint_name": null
+                    },
+                    "auto_increment": false
+                },
+                {
+                    "name": "confirmSecret",
+                    "tpe": {
+                        "full_data_type": "tinyint(1)",
+                        "family": "Boolean",
+                        "arity": "Required",
+                        "native_type": "TinyInt"
+                    },
+                    "default": {
+                        "kind": { "VALUE": false },
+                        "constraint_name": null
+                    },
+                    "auto_increment": false
+                },
+                {
+                    "name": "password",
+                    "tpe": {
+                        "full_data_type": "varchar(191)",
+                        "family": "String",
+                        "arity": "Nullable",
+                        "native_type": {
+                            "VarChar": 191
+                        }
+                    },
+                    "default": {
+                        "kind": { "VALUE": "" },
+                        "constraint_name": null
+                    },
+                    "auto_increment": false
+                },
+                {
+                    "name": "facebookId",
+                    "tpe": {
+                        "full_data_type": "varchar(191)",
+                        "family": "String",
+                        "arity": "Nullable",
+                        "native_type": {
+                            "VarChar": 191
+                        }
+                    },
+                    "default": null,
+                    "auto_increment": false
+                }
+            ],
+            "indices": [{
+                    "name": "User.email_unique",
+                    "columns": [
+                        "email"
+                    ],
+                    "tpe": "Unique"
+                },
+                {
+                    "name": "User.facebookId_unique",
+                    "columns": [
+                        "facebookId"
+                    ],
+                    "tpe": "Unique"
+                },
+                {
+                    "name": "User.userName_unique",
+                    "columns": [
+                        "userName"
+                    ],
+                    "tpe": "Unique"
+                }
+            ],
+            "primary_key": {
+                "columns": [
+                    "id"
+                ],
+                "sequence": null,
+                "constraint_name": null
+            },
+            "foreign_keys": []
+        }
+    ],
+    "enums": [],
+    "sequences": [],
+    "views": [],
+    "procedures": []
+}"#;
+
+        let sql_schema: SqlSchema = serde_json::from_str(dm).unwrap();
 
         let family = self.connection_info.sql_family();
 

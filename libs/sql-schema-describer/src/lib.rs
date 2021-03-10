@@ -16,6 +16,7 @@ pub mod mysql;
 pub mod postgres;
 pub mod sqlite;
 pub mod walkers;
+use serde::{Deserialize, Serialize};
 
 mod error;
 mod parsers;
@@ -42,7 +43,7 @@ pub struct SQLMetadata {
 }
 
 /// The result of describing a database schema.
-#[derive(Debug, Clone, PartialEq, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
 pub struct SqlSchema {
     /// The schema's tables.
     pub tables: Vec<Table>,
@@ -128,7 +129,7 @@ impl SqlSchema {
 }
 
 /// A table found in a schema.
-#[derive(PartialEq, Debug, Clone)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub struct Table {
     /// The table's name.
     pub name: String,
@@ -197,7 +198,7 @@ impl Table {
 }
 
 /// The type of an index.
-#[derive(PartialEq, Debug, Clone)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub enum IndexType {
     /// Unique type.
     Unique,
@@ -212,7 +213,7 @@ impl IndexType {
 }
 
 /// An index of a table.
-#[derive(PartialEq, Debug, Clone)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub struct Index {
     /// Index name.
     pub name: String,
@@ -229,7 +230,7 @@ impl Index {
 }
 
 /// A stored procedure (like, the function inside your database).
-#[derive(PartialEq, Debug, Clone)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub struct Procedure {
     /// Procedure name.
     pub name: String,
@@ -238,7 +239,7 @@ pub struct Procedure {
 }
 
 /// The primary key of a table.
-#[derive(PartialEq, Debug, Clone)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub struct PrimaryKey {
     /// Columns.
     pub columns: Vec<String>,
@@ -255,7 +256,7 @@ impl PrimaryKey {
 }
 
 /// A column of a table.
-#[derive(PartialEq, Clone, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Clone, Debug)]
 pub struct Column {
     /// Column name.
     pub name: String,
@@ -274,7 +275,7 @@ impl Column {
 }
 
 /// The type of a column.
-#[derive(PartialEq, Clone, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Clone, Debug)]
 pub struct ColumnType {
     /// The full SQL data type, the sql string necessary to recreate the column, drawn directly from the db, used when there is no native type.
     pub full_data_type: String,
@@ -307,7 +308,7 @@ impl ColumnType {
 }
 
 /// Enumeration of column type families.
-#[derive(PartialEq, Clone, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Clone, Debug)]
 // TODO: this name feels weird.
 pub enum ColumnTypeFamily {
     /// Integer types.
@@ -366,7 +367,7 @@ impl ColumnTypeFamily {
 }
 
 /// A column's arity.
-#[derive(PartialEq, Clone, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Clone, Debug)]
 pub enum ColumnArity {
     /// Required column.
     Required,
@@ -394,7 +395,7 @@ impl ColumnArity {
 }
 
 /// Foreign key action types (for ON DELETE|ON UPDATE).
-#[derive(PartialEq, Debug, Clone, Copy)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, Copy)]
 pub enum ForeignKeyAction {
     /// Produce an error indicating that the deletion or update would create a foreign key
     /// constraint violation. If the constraint is deferred, this error will be produced at
@@ -415,7 +416,7 @@ pub enum ForeignKeyAction {
 }
 
 /// A foreign key.
-#[derive(Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ForeignKey {
     /// The database name of the foreign key constraint, when available.
     pub constraint_name: Option<String>,
@@ -440,7 +441,7 @@ impl PartialEq for ForeignKey {
 }
 
 /// A SQL enum.
-#[derive(PartialEq, Debug, Clone)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub struct Enum {
     /// Enum name.
     pub name: String,
@@ -449,14 +450,14 @@ pub struct Enum {
 }
 
 /// A SQL sequence.
-#[derive(PartialEq, Debug, Clone)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub struct Sequence {
     /// Sequence name.
     pub name: String,
 }
 
 /// An SQL view.
-#[derive(PartialEq, Debug, Clone)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub struct View {
     /// Name of the view.
     pub name: String,
@@ -464,14 +465,14 @@ pub struct View {
     pub definition: String,
 }
 
-#[derive(PartialEq, Debug, Clone)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub struct DefaultValue {
     kind: DefaultKind,
     constraint_name: Option<String>,
 }
 
 /// A DefaultValue
-#[derive(PartialEq, Debug, Clone)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub enum DefaultKind {
     /// A constant value, parsed as String
     VALUE(PrismaValue),

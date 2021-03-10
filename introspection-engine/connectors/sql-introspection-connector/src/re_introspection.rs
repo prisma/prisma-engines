@@ -128,6 +128,9 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family
             }
         }
 
+        println!("NEW\n{:?}", new_data_model);
+        println!("OLD\n{:?}", old_data_model);
+
         for changed_relation_field_name in changed_relation_field_names {
             new_data_model
                 .find_relation_field_mut(
