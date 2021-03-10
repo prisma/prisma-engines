@@ -123,6 +123,7 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family
 
                         let mf = ModelAndField::new(&new_model.name, &new_field.name);
 
+                        #[allow(clippy::if_same_then_else)]
                         if relation_info_partial_eq && !is_many_to_many {
                             changed_relation_field_names.push((mf.clone(), old_field.name.clone()));
                         } else if relation_info_partial_eq
@@ -135,10 +136,6 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family
                 }
             }
         }
-
-        println!("NEW\n{:#?}", new_data_model);
-        println!("OLD\n{:#?}", old_data_model);
-        println!("{:?}", changed_relation_field_names);
 
         for changed_relation_field_name in changed_relation_field_names {
             new_data_model
