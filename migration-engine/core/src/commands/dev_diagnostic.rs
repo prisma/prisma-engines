@@ -99,9 +99,9 @@ fn check_for_reset_conditions(output: &DiagnoseMigrationHistoryOutput) -> Option
         None | Some(HistoryDiagnostic::DatabaseIsBehind { .. }) => (),
     }
 
-    match reset_reasons.len() {
-        0 => None,
-        1 => Some(reset_reasons.into_iter().next().unwrap()),
+    match reset_reasons.as_slice() {
+        [] => None,
+        [first_reason] => Some(first_reason.clone()),
         _ => {
             let mut message = String::with_capacity(reset_reasons.iter().map(|s| s.len() + 3).sum::<usize>());
 
