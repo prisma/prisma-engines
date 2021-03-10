@@ -3938,7 +3938,6 @@ dependencies = [
 name = "sql-schema-describer"
 version = "0.1.0"
 dependencies = [
- "anyhow",
  "async-trait",
  "barrel",
  "bigdecimal",
