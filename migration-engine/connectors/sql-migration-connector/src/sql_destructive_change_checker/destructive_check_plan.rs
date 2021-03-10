@@ -149,7 +149,7 @@ async fn count_rows_in_table(table_name: &str, conn: &Connection) -> ConnectorRe
     let rows_count = result_set
         .first()
         .ok_or_else(|| {
-            ConnectorError::generic(anyhow::anyhow!(
+            ConnectorError::from_message(format!(
                 "No row was returned when checking for existing rows in the `{}` table.",
                 table_name
             ))
@@ -157,7 +157,7 @@ async fn count_rows_in_table(table_name: &str, conn: &Connection) -> ConnectorRe
         .at(0)
         .and_then(|value| value.as_i64())
         .ok_or_else(|| {
-            ConnectorError::generic(anyhow::anyhow!(
+            ConnectorError::from_message(format!(
                 "No count was returned when checking for existing rows in the `{}` table.",
                 table_name
             ))
@@ -184,9 +184,7 @@ async fn count_values_in_column(column_name: &str, table: &str, conn: &Connectio
                 .and_then(|row| row.at(0))
                 .and_then(|count| count.as_i64())
                 .ok_or_else(|| {
-                    ConnectorError::generic(anyhow::anyhow!(
-                        "Unexpected result set shape when checking dropped columns."
-                    ))
+                    ConnectorError::from_message("Unexpected result set shape when checking dropped columns.".into())
                 })
         })?;
 

@@ -104,7 +104,7 @@ impl From<CoreError> for CliError {
         match e {
             CoreError::ConnectorError(e) => e.into(),
             e => CliError::Unknown {
-                error: ConnectorError::generic(e.into()),
+                error: ConnectorError::propagate(e.into()),
                 context: SpanTrace::capture(),
                 exit_code: 255,
             },

@@ -25,7 +25,8 @@ impl SqlFlavour for SqliteFlavour {
     }
 
     async fn create_database(&self, database_str: &str) -> ConnectorResult<String> {
-        use anyhow::Context;
+        let span = tracing::info_span!("Creating SQLite database parent directory.");
+        let _span = span.enter();
 
         let path = Path::new(&self.file_path);
         if path.exists() {
@@ -35,9 +36,7 @@ impl SqlFlavour for SqliteFlavour {
         let dir = path.parent();
 
         if let Some((dir, false)) = dir.map(|dir| (dir, dir.exists())) {
-            std::fs::create_dir_all(dir)
-                .context("Creating SQLite database parent directory.")
-                .map_err(ConnectorError::generic)?;
+            std::fs::create_dir_all(dir).map_err(|err| ConnectorError::propagate(Box::new(err)))?;
         }
 
         connect(database_str).await?;
@@ -83,11 +82,10 @@ impl SqlFlavour for SqliteFlavour {
             Err(err) => return Err(ConnectorError::url_parse_error(err, database_url)),
         };
 
-        std::fs::remove_file(&file_path).map_err(|err| {
-            ConnectorError::generic(
-                anyhow::Error::new(err).context(format!("Failed to delete SQLite database at `{}`", file_path,)),
-            )
-        })?;
+        let span = tracing::info_span!("Deleting SQLite database", path = ?file_path);
+        let _span = span.enter();
+
+        std::fs::remove_file(&file_path).map_err(|err| ConnectorError::propagate(Box::new(err)))?;
 
         Ok(())
     }
