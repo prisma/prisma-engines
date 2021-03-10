@@ -71,7 +71,7 @@ pub(crate) fn calculate_steps(schemas: Pair<&SqlSchema>, flavour: &dyn SqlFlavou
         //   postgres.
         // - We must drop enums after we drop tables, or dropping the enum will
         //   fail on postgres because objects (=tables) still depend on them.
-        .chain(differ.drop_enums().map(SqlMigrationStep::DropEnum))
+        .chain(differ.drop_enums().into_iter().map(SqlMigrationStep::DropEnum))
         .chain(differ.create_tables().map(SqlMigrationStep::CreateTable))
         .chain(redefine_tables)
         // Order matters: we must create indexes after ALTER TABLEs because the indexes can be
@@ -379,18 +379,12 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         drop_indexes.into_iter().collect()
     }
 
-    #[allow(clippy::needless_lifetimes)] // clippy is wrong here
-    fn create_enums<'a>(&'a self) -> impl Iterator<Item = CreateEnum> + 'a {
-        self.created_enums().map(|r#enum| CreateEnum {
-            enum_index: r#enum.enum_index(),
-        })
+    fn create_enums(&self) -> Vec<CreateEnum> {
+        self.flavour.create_enums(self)
     }
 
-    #[allow(clippy::needless_lifetimes)] // clippy is wrong here
-    fn drop_enums<'a>(&'a self) -> impl Iterator<Item = DropEnum> + 'a {
-        self.dropped_enums().map(|r#enum| DropEnum {
-            enum_index: r#enum.enum_index(),
-        })
+    fn drop_enums(&self) -> Vec<DropEnum> {
+        self.flavour.drop_enums(self)
     }
 
     fn alter_enums(&self) -> Vec<AlterEnum> {

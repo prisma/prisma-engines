@@ -76,7 +76,7 @@ impl SqlRenderer for SqliteFlavour {
     }
 
     fn render_create_enum(&self, _: &EnumWalker<'_>) -> Vec<String> {
-        Vec::new()
+        unreachable!("Unreachable render_create_enum() on SQLite. SQLite does not have enums.")
     }
 
     fn render_create_table_as(&self, table: &TableWalker<'_>, table_name: &str) -> String {
@@ -115,7 +115,7 @@ impl SqlRenderer for SqliteFlavour {
     }
 
     fn render_drop_enum(&self, _: &EnumWalker<'_>) -> Vec<String> {
-        Vec::new()
+        unreachable!("Unreachable render_drop_enum() on SQLite. SQLite does not have enums.")
     }
 
     fn render_drop_foreign_key(&self, _foreign_key: &ForeignKeyWalker<'_>) -> String {
