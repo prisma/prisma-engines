@@ -109,19 +109,26 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family
                 if let Some(old_model) = old_data_model.find_model(&new_model.name) {
                     for old_field in old_model.relation_fields() {
                         let (_, old_related_field) = &old_data_model.find_related_field_bang(&old_field);
-                        let many_to_many = old_field.is_list() && old_related_field.is_list();
+                        let is_many_to_many = old_field.is_list() && old_related_field.is_list();
+                        let is_self_relation = old_field.relation_info.to == old_related_field.relation_info.to;
 
                         let (_, related_field) = &new_data_model.find_related_field_bang(&new_field);
                         //the relationinfos of both sides need to be compared since the relationinfo of the
                         // non-fk side does not contain enough information to uniquely identify the correct relationfield
 
+                        //the relationinfos on m2m and self m2m contain even less useful information
+
                         let relation_info_partial_eq = old_field.relation_info == new_field.relation_info
                             && old_related_field.relation_info == related_field.relation_info;
 
-                        if relation_info_partial_eq
-                            && (!many_to_many || old_field.relation_info.name == new_field.relation_info.name)
+                        let mf = ModelAndField::new(&new_model.name, &new_field.name);
+
+                        if relation_info_partial_eq && !is_many_to_many {
+                            changed_relation_field_names.push((mf.clone(), old_field.name.clone()));
+                        } else if relation_info_partial_eq
+                            && old_field.relation_info.name == new_field.relation_info.name
+                            && !(is_self_relation && is_many_to_many)
                         {
-                            let mf = ModelAndField::new(&new_model.name, &new_field.name);
                             changed_relation_field_names.push((mf.clone(), old_field.name.clone()));
                         }
                     }

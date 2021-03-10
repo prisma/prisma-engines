@@ -1676,7 +1676,13 @@ async fn re_introspecting_ignore(api: &TestApi) -> crate::TestResult {
 }
 
 #[test_each_connector]
-async fn dirty_reproduction_13029(api: &TestApi) -> crate::TestResult {
+async fn do_not_try_to_keep_custom_many_to_many_self_relation_names(api: &TestApi) -> crate::TestResult {
+    //we do not have enough information to correctly assign which field should point to column A in the
+    //join table and which one to B
+    //upon table creation this is dependant on lexicographic order of the names of the fields, but we
+    //cannot be sure that users keep the order the same when renaming. worst case would be we accidentally
+    //switch the directions when reintrospecting.
+    //the generated names are also not helpful though, but at least they don't give a false sense of correctness -.-
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", move |t| {
@@ -1706,9 +1712,9 @@ async fn dirty_reproduction_13029(api: &TestApi) -> crate::TestResult {
 
     let final_dm = indoc! {r#"
         model User {
-            id          Int       @id @default(autoincrement())
-            followers   User[]    @relation("FollowRelation")
-            following   User[]    @relation("FollowRelation")
+          id            Int         @id @default(autoincrement())
+          User_B        User[]      @relation("FollowRelation")
+          User_A        User[]      @relation("FollowRelation")
         }
     "#};
 
