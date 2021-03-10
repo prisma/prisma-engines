@@ -1,6 +1,9 @@
 //! SQLite description.
-use super::*;
-use crate::{getters::Getter, parsers::Parser};
+use crate::{
+    common::purge_dangling_foreign_keys, getters::Getter, parsers::Parser, Column, ColumnArity, ColumnType,
+    ColumnTypeFamily, DefaultValue, DescriberResult, ForeignKey, ForeignKeyAction, Index, IndexType, Lazy, PrimaryKey,
+    PrismaValue, Regex, SQLMetadata, SqlSchema, SqlSchemaDescriberBackend, Table, View,
+};
 use quaint::{ast::Value, prelude::Queryable, single::Quaint};
 use std::{borrow::Cow, collections::HashMap, convert::TryInto};
 use tracing::trace;
@@ -11,7 +14,7 @@ pub struct SqlSchemaDescriber {
 }
 
 #[async_trait::async_trait]
-impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
+impl SqlSchemaDescriberBackend for SqlSchemaDescriber {
     async fn list_databases(&self) -> DescriberResult<Vec<String>> {
         Ok(self.get_databases().await?)
     }
@@ -36,6 +39,8 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
             tables.push(self.get_table(schema, table_name).await?)
         }
 
+        // Since referential integrity is optional on SQLite, we remove foreign keys
+        // not pointing to an existing table ex post.
         purge_dangling_foreign_keys(&mut tables);
 
         // SQLite allows foreign key definitions without specifying the referenced columns, it then assumes the pk is used.
@@ -522,30 +527,6 @@ fn is_system_table(table_name: &str) -> bool {
     SQLITE_SYSTEM_TABLES
         .iter()
         .any(|system_table| table_name == *system_table)
-}
-
-/// Since referential integrity is optional on SQLite, we remove foreign keys
-/// not pointing to an existing table ex post.
-fn purge_dangling_foreign_keys(tables: &mut [Table]) {
-    let dangling_fks: Vec<(usize, usize)> = tables
-        .iter()
-        .enumerate()
-        .flat_map(|(table_idx, table)| {
-            table
-                .foreign_keys
-                .iter()
-                .enumerate()
-                .map(move |(fk_idx, fk)| (table_idx, fk_idx, fk))
-                .filter(|(_table_idx, _fk_idx, fk)| !tables.iter().any(|table| table.name == fk.referenced_table))
-                .map(|(table_idx, fk_idx, _)| (table_idx, fk_idx))
-        })
-        .collect();
-
-    for (table_idx, fk_idx) in dangling_fks {
-        let table = &mut tables[table_idx];
-
-        table.foreign_keys.remove(fk_idx);
-    }
 }
 
 /// See https://www.sqlite.org/fileformat2.html
