@@ -91,7 +91,7 @@ class FindManyCountRelAggregationQuerySpec extends FlatSpec with Matchers with A
     val res = server.query(
       s"""
          |query {
-         |  findManyPost {
+         |  findManyPost(orderBy: { id: asc }) {
          |    _count { comments categories }
          |  }
          |}
@@ -100,7 +100,7 @@ class FindManyCountRelAggregationQuerySpec extends FlatSpec with Matchers with A
       legacy = false
     )
 
-    res.toString() should be("""{"data":{"findManyPost":[{"_count":{"comments":3,"categories":4}},{"_count":{"comments":1,"categories":2}}]}}""")
+    res.toString() should be("""{"data":{"findManyPost":[{"_count":{"comments":1,"categories":2}},{"_count":{"comments":3,"categories":4}}]}}""")
   }
 
   "Counting with some records and filters" should "not affect the count" in {
@@ -110,8 +110,8 @@ class FindManyCountRelAggregationQuerySpec extends FlatSpec with Matchers with A
       s"""
          |query {
          |  findManyPost(where: { id: 1 }) {
-         |    comments(cursor: { id: 1 }, take: 2) { id }
-         |    categories(cursor: { id: 1 }, take: 2) { id }
+         |    comments(cursor: { id: 1 }, take: 1) { id }
+         |    categories(cursor: { id: 1 }, take: 1) { id }
          |    _count { comments categories }
          |  }
          |}
@@ -120,7 +120,7 @@ class FindManyCountRelAggregationQuerySpec extends FlatSpec with Matchers with A
       legacy = false
     )
 
-    res.toString() should be("""{"data":{"findManyPost":[{"comments":[{"id":1},{"id":2}],"categories":[{"id":1},{"id":2}],"_count":{"comments":4,"categories":4}}]}}""")
+    res.toString() should be("""{"data":{"findManyPost":[{"comments":[{"id":1}],"categories":[{"id":1}],"_count":{"comments":4,"categories":4}}]}}""")
   }
 
 }
