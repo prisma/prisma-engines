@@ -14,7 +14,7 @@ The engines and their respective binary crates are:
 ## Building Prisma Engines
 
 **Prerequisites:**
-- Installed the stable Rust toolchain, at least version 1.39.0. You can get the
+- Installed the stable Rust toolchain, at least version 1.48.0. You can get the
   toolchain at [rustup](https://rustup.rs/) or the package manager of your
   choice.
 - Linux only: OpenSSL is required to be installed.
