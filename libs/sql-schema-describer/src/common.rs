@@ -11,10 +11,19 @@ pub(crate) fn purge_dangling_foreign_keys(tables: &mut [Table]) {
             table
                 .foreign_keys
                 .iter()
+                // Reversing the iterator is important, because we are going to
+                // remove foreign keys by index. When there are multiple
+                // dangling foreign keys (we have observed this in the wild),
+                // removing starting from the lower index will invalidate
+                // subsequent indexes, so _must_ start from the end (higher
+                // indexes).
+                .rev()
                 .enumerate()
-                .map(move |(fk_idx, fk)| (table_idx, fk_idx, fk))
-                .filter(|(_table_idx, _fk_idx, fk)| !tables.iter().any(|table| table.name == fk.referenced_table))
-                .map(|(table_idx, fk_idx, _)| (table_idx, fk_idx))
+                .map(move |(reverse_fk_idx, fk)| (table_idx, reverse_fk_idx, fk))
+                .filter(|(_table_idx, _reverse_fk_idx, fk)| {
+                    !tables.iter().any(|table| table.name == fk.referenced_table)
+                })
+                .map(move |(table_idx, reverse_fk_idx, _)| (table_idx, (table.foreign_keys.len() - 1) - reverse_fk_idx))
         })
         .collect();
 
