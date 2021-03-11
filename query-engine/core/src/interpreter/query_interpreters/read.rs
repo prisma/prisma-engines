@@ -1,9 +1,6 @@
 use super::*;
 use crate::{interpreter::InterpretationResult, query_ast::*, result_ast::*};
-use connector::{
-    self, coerce_null_to_zero_value, ConnectionLike, QueryArguments, ReadOperations, RelAggregationResult,
-    RelAggregationRow, RelAggregationSelection,
-};
+use connector::{self, ConnectionLike, QueryArguments, ReadOperations, RelAggregationRow, RelAggregationSelection};
 use futures::future::{BoxFuture, FutureExt};
 use inmemory_record_processor::InMemoryRecordProcessor;
 use prisma_models::ManyRecords;
@@ -227,33 +224,39 @@ fn extract_aggr_results_from_scalars(
         .into_iter()
         .map(|aggr_sel| (aggr_sel.db_alias(), aggr_sel))
         .collect();
+    let indexes_to_remove: Vec<_> = scalars
+        .field_names
+        .iter()
+        .enumerate()
+        .filter_map(|(i, field_name)| {
+            if let Some(aggr_sel) = aggr_field_names.get(field_name) {
+                Some((i, aggr_sel))
+            } else {
+                None
+            }
+        })
+        .collect();
     let mut aggregation_rows: Vec<RelAggregationRow> = vec![];
-    let mut indexes = vec![];
+    let mut n_record_removed = 0;
 
-    for (i, field_name) in scalars.field_names.iter().enumerate() {
-        if let Some(aggr) = aggr_field_names.get(field_name) {
-            indexes.push(i);
-            // Remove all aggr prisma values
-            for (r_index, record) in scalars.records.iter_mut().enumerate() {
-                let val = record.values.remove(i);
-                let aggr_result = match aggr {
-                    RelAggregationSelection::Count(rf) => {
-                        RelAggregationResult::Count(rf.clone(), coerce_null_to_zero_value(val))
-                    }
-                };
+    for (index_to_remove, aggr_sel) in indexes_to_remove.into_iter() {
+        let index_to_remove = index_to_remove - n_record_removed;
 
-                // Group the aggregation results by record
-                match aggregation_rows.get_mut(r_index) {
-                    Some(inner_vec) => inner_vec.push(aggr_result),
-                    None => aggregation_rows.push(vec![aggr_result]),
-                }
+        // Remove all aggr field names
+        scalars.field_names.remove(index_to_remove);
+
+        // Remove and collect all aggr prisma values
+        for (r_index, record) in scalars.records.iter_mut().enumerate() {
+            let val = record.values.remove(index_to_remove);
+            let aggr_result = aggr_sel.into_result(val);
+
+            // Group the aggregation results by record
+            match aggregation_rows.get_mut(r_index) {
+                Some(inner_vec) => inner_vec.push(aggr_result),
+                None => aggregation_rows.push(vec![aggr_result]),
             }
         }
-    }
-
-    // FIXME: Figure out how to remove the field_names in the loop above :facepalm:
-    for i in indexes {
-        scalars.field_names.remove(i);
+        n_record_removed += 1;
     }
 
     (scalars, Some(aggregation_rows))

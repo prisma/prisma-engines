@@ -1,8 +1,7 @@
 mod dispatch;
-pub use dispatch::*;
-
-use crate::{Filter, QueryArguments, WriteArgs};
+use crate::{coerce_null_to_zero_value, Filter, QueryArguments, WriteArgs};
 use async_trait::async_trait;
+pub use dispatch::*;
 use dml::FieldArity;
 use prisma_models::*;
 use prisma_value::PrismaValue;
@@ -190,6 +189,14 @@ impl RelAggregationSelection {
     pub fn type_identifier_with_arity(&self) -> (TypeIdentifier, FieldArity) {
         match self {
             RelAggregationSelection::Count(_) => (TypeIdentifier::Int, FieldArity::Required),
+        }
+    }
+
+    pub fn into_result(&self, val: PrismaValue) -> RelAggregationResult {
+        match self {
+            RelAggregationSelection::Count(rf) => {
+                RelAggregationResult::Count(rf.clone(), coerce_null_to_zero_value(val))
+            }
         }
     }
 }
