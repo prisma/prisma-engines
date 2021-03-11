@@ -113,22 +113,19 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family
                         let is_self_relation = old_field.relation_info.to == old_related_field.relation_info.to;
 
                         let (_, related_field) = &new_data_model.find_related_field_bang(&new_field);
+
                         //the relationinfos of both sides need to be compared since the relationinfo of the
                         // non-fk side does not contain enough information to uniquely identify the correct relationfield
-
-                        //the relationinfos on m2m and self m2m contain even less useful information
-
                         let relation_info_partial_eq = old_field.relation_info == new_field.relation_info
                             && old_related_field.relation_info == related_field.relation_info;
 
                         let mf = ModelAndField::new(&new_model.name, &new_field.name);
 
-                        #[allow(clippy::if_same_then_else)]
-                        if relation_info_partial_eq && !is_many_to_many {
-                            changed_relation_field_names.push((mf.clone(), old_field.name.clone()));
-                        } else if relation_info_partial_eq
-                            && old_field.relation_info.name == new_field.relation_info.name
-                            && !(is_self_relation && is_many_to_many)
+                        if relation_info_partial_eq
+                            && (!is_many_to_many
+                                //For many to many the relation infos always look the same, here we have to look at the relation name,
+                                //which translates to the join table name. But in case of self relations we cannot correctly infer the old name
+                                || (old_field.relation_info.name == new_field.relation_info.name && !is_self_relation))
                         {
                             changed_relation_field_names.push((mf.clone(), old_field.name.clone()));
                         }
