@@ -231,6 +231,7 @@ fn extract_aggr_results_from_scalars(
         .iter()
         .map(|aggr_sel| (aggr_sel.db_alias(), aggr_sel))
         .collect();
+
     let indexes_to_remove: Vec<_> = scalars
         .field_names
         .iter()
@@ -243,6 +244,7 @@ fn extract_aggr_results_from_scalars(
             }
         })
         .collect();
+
     let mut aggregation_rows: Vec<RelAggregationRow> = vec![];
     let mut n_record_removed = 0;
 

@@ -42,7 +42,7 @@ pub fn serialize_internal(
     match result {
         QueryResult::RecordSelection(rs) => {
             if let Some(aggr_rows) = &rs.aggregation_rows {
-                let serialized_aggrs = serialize_rel_aggregations(field, aggr_rows)?;
+                let serialized_aggrs = serialize_rel_aggregations(aggr_rows)?;
                 let mut serialized_rs = serialize_record_selection(*rs, field, &field.field_type, is_list)?;
 
                 let (_, aggr_item) = serialized_aggrs.first().unwrap();
@@ -171,13 +171,10 @@ fn serialize_aggregations(
     Ok(envelope)
 }
 
-fn serialize_rel_aggregations(
-    _output_field: &OutputFieldRef,
-    rel_aggregations: &[RelAggregationRow],
-) -> crate::Result<CheckedItemsWithParents> {
+fn serialize_rel_aggregations(aggregation_rows: &[RelAggregationRow]) -> crate::Result<CheckedItemsWithParents> {
     let mut results = vec![];
 
-    for row in rel_aggregations.into_iter() {
+    for row in aggregation_rows.into_iter() {
         let mut map: Map = IndexMap::with_capacity(row.len());
 
         for result in row {
