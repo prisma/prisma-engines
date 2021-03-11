@@ -15,7 +15,7 @@ pub async fn get_single_record(
     filter: &Filter,
     selected_fields: &ModelProjection,
 ) -> crate::Result<Option<SingleRecord>> {
-    let query = read::get_records(&model, selected_fields.as_columns(), &vec![], filter);
+    let query = read::get_records(&model, selected_fields.as_columns(), &[], filter);
 
     let field_names: Vec<_> = selected_fields.db_names().collect();
     let idents = selected_fields.type_identifiers_with_arities();
@@ -43,10 +43,7 @@ pub async fn get_many_records(
     let reversed = query_arguments.needs_reversed_order();
 
     let mut field_names: Vec<_> = selected_fields.db_names().collect();
-    let mut aggr_field_names: Vec<_> = aggr_selections
-        .into_iter()
-        .map(|aggr_sel| aggr_sel.db_alias())
-        .collect();
+    let mut aggr_field_names: Vec<_> = aggr_selections.iter().map(|aggr_sel| aggr_sel.db_alias()).collect();
 
     field_names.append(&mut aggr_field_names);
 

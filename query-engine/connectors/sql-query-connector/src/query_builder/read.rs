@@ -105,9 +105,8 @@ where
 {
     let (select, aggr_columns) = query.into_select(model, aggr_selections);
     let select = columns.fold(select, |acc, col| acc.column(col));
-    let select_with_aggr_columns = aggr_columns.into_iter().fold(select, |acc, col| acc.column(col));
 
-    select_with_aggr_columns
+    aggr_columns.into_iter().fold(select, |acc, col| acc.column(col))
 }
 
 /// Generates a query of the form:
@@ -138,7 +137,7 @@ where
 /// not absolute - e.g. `SELECT "field" FROM (...)` NOT `SELECT "full"."path"."to"."field" FROM (...)`.
 pub fn aggregate(model: &ModelRef, selections: &[AggregationSelection], args: QueryArguments) -> Select<'static> {
     let columns = extract_columns(model, &selections);
-    let sub_query = get_records(model, columns.into_iter(), &vec![], args);
+    let sub_query = get_records(model, columns.into_iter(), &[], args);
     let sub_table = Table::from(sub_query).alias("sub");
 
     select_aggregates(Select::from_table(sub_table), selections)
@@ -191,7 +190,7 @@ pub fn group_by_aggregate(
     group_by: Vec<ScalarFieldRef>,
     having: Option<Filter>,
 ) -> Select<'static> {
-    let (base_query, _) = args.into_select(model, &vec![]);
+    let (base_query, _) = args.into_select(model, &[]);
 
     let select_query = selections.iter().fold(base_query, |select, next_op| match next_op {
         AggregationSelection::Field(field) => select.column(field.as_column()),
