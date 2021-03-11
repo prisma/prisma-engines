@@ -140,47 +140,39 @@ pub fn aggregate(model: &ModelRef, selections: &[AggregationSelection], args: Qu
     let sub_query = get_records(model, columns.into_iter(), &[], args);
     let sub_table = Table::from(sub_query).alias("sub");
 
-    select_aggregates(Select::from_table(sub_table), selections)
-}
-
-pub fn select_aggregates(select: Select<'static>, selections: &[AggregationSelection]) -> Select<'static> {
     selections
         .iter()
-        .fold(select, |acc, next_op| select_aggregate(acc, next_op))
-}
+        .fold(Select::from_table(sub_table), |select, next_op| match next_op {
+            AggregationSelection::Field(field) => select.column(Column::from(field.db_name().to_owned())),
 
-pub fn select_aggregate(select: Select<'static>, selection: &AggregationSelection) -> Select<'static> {
-    match selection {
-        AggregationSelection::Field(field) => select.column(Column::from(field.db_name().to_owned())),
+            AggregationSelection::Count { all, fields } => {
+                let select = fields.iter().fold(select, |select, next_field| {
+                    select.value(count(Column::from(next_field.db_name().to_owned())))
+                });
 
-        AggregationSelection::Count { all, fields } => {
-            let select = fields.iter().fold(select, |select, next_field| {
-                select.value(count(Column::from(next_field.db_name().to_owned())))
-            });
-
-            if *all {
-                select.value(count(asterisk()))
-            } else {
-                select
+                if *all {
+                    select.value(count(asterisk()))
+                } else {
+                    select
+                }
             }
-        }
 
-        AggregationSelection::Average(fields) => fields.iter().fold(select, |select, next_field| {
-            select.value(avg(Column::from(next_field.db_name().to_owned())))
-        }),
+            AggregationSelection::Average(fields) => fields.iter().fold(select, |select, next_field| {
+                select.value(avg(Column::from(next_field.db_name().to_owned())))
+            }),
 
-        AggregationSelection::Sum(fields) => fields.iter().fold(select, |select, next_field| {
-            select.value(sum(Column::from(next_field.db_name().to_owned())))
-        }),
+            AggregationSelection::Sum(fields) => fields.iter().fold(select, |select, next_field| {
+                select.value(sum(Column::from(next_field.db_name().to_owned())))
+            }),
 
-        AggregationSelection::Min(fields) => fields.iter().fold(select, |select, next_field| {
-            select.value(min(Column::from(next_field.db_name().to_owned())))
-        }),
+            AggregationSelection::Min(fields) => fields.iter().fold(select, |select, next_field| {
+                select.value(min(Column::from(next_field.db_name().to_owned())))
+            }),
 
-        AggregationSelection::Max(fields) => fields.iter().fold(select, |select, next_field| {
-            select.value(max(Column::from(next_field.db_name().to_owned())))
-        }),
-    }
+            AggregationSelection::Max(fields) => fields.iter().fold(select, |select, next_field| {
+                select.value(max(Column::from(next_field.db_name().to_owned())))
+            }),
+        })
 }
 
 pub fn group_by_aggregate(
