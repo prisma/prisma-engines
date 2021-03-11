@@ -3,6 +3,17 @@ use serde_json::Value;
 
 pub type TestResult = anyhow::Result<()>;
 
+pub mod schemas {
+    pub fn some_common_schema() -> String {
+        "model A {
+            #id(id, Int, @id)
+            field String?
+            #relation(bs, B, ...)
+        }"
+        .to_owned()
+    }
+}
+
 // The mod name dictates the db name. If the name is `some_spec`
 // then, for example, the MySQL db should be (similar to) `some_spec` as well.
 #[cfg(test)]
@@ -42,7 +53,7 @@ mod some_spec {
     //     // If none of the two above are specified all connectors are run.
     // )
 
-    #[connector_test]
+    #[connector_test(schema(schema_handler), only(SqlServer, Postgres("test-4", 1), MySql, Wurst))]
     fn ideal_api_test(runner: &Runner) {
         let result = runner.query(
             "

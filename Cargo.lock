@@ -3280,6 +3280,7 @@ version = "0.1.0"
 dependencies = [
  "darling 0.12.2",
  "proc-macro2",
+ "query-tests-setup",
  "quote",
  "syn",
 ]
@@ -3288,7 +3289,10 @@ dependencies = [
 name = "query-tests-setup"
 version = "0.1.0"
 dependencies = [
+ "datamodel-connector",
+ "mongodb-datamodel-connector",
  "serde_json",
+ "sql-datamodel-connector",
 ]
 
 [[package]]
