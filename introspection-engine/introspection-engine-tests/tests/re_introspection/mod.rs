@@ -1674,3 +1674,51 @@ async fn re_introspecting_ignore(api: &TestApi) -> crate::TestResult {
 
     Ok(())
 }
+
+#[test_each_connector]
+async fn do_not_try_to_keep_custom_many_to_many_self_relation_names(api: &TestApi) -> crate::TestResult {
+    //we do not have enough information to correctly assign which field should point to column A in the
+    //join table and which one to B
+    //upon table creation this is dependant on lexicographic order of the names of the fields, but we
+    //cannot be sure that users keep the order the same when renaming. worst case would be we accidentally
+    //switch the directions when reintrospecting.
+    //the generated names are also not helpful though, but at least they don't give a false sense of correctness -.-
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("User", move |t| {
+                t.add_column("id", types::primary());
+            });
+
+            migration.create_table("_FollowRelation", |t| {
+                t.add_column("A", types::integer().nullable(false).unique(false));
+                t.add_column("B", types::integer().nullable(false).unique(false));
+
+                t.add_foreign_key(&["A"], "User", &["id"]);
+                t.add_foreign_key(&["B"], "User", &["id"]);
+
+                t.add_index("test", types::index(vec!["A", "B"]).unique(true));
+                t.add_index("test2", types::index(vec!["B"]).unique(false));
+            });
+        })
+        .await?;
+
+    let input_dm = indoc! {r#"
+        model User {
+            id          Int       @id @default(autoincrement())
+            followers   User[]    @relation("FollowRelation")
+            following   User[]    @relation("FollowRelation")
+        }
+    "#};
+
+    let final_dm = indoc! {r#"
+        model User {
+          id            Int         @id @default(autoincrement())
+          User_B        User[]      @relation("FollowRelation")
+          User_A        User[]      @relation("FollowRelation")
+        }
+    "#};
+
+    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
+
+    Ok(())
+}

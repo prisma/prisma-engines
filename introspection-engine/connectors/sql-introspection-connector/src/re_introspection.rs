@@ -104,23 +104,29 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family
     //always keep old virtual relationfield names
     let mut changed_relation_field_names = vec![];
     {
-        for model in new_data_model.models() {
-            for field in model.relation_fields() {
-                if let Some(old_model) = old_data_model.find_model(&model.name) {
+        for new_model in new_data_model.models() {
+            for new_field in new_model.relation_fields() {
+                if let Some(old_model) = old_data_model.find_model(&new_model.name) {
                     for old_field in old_model.relation_fields() {
-                        let (_, related_field) = &new_data_model.find_related_field_bang(&field);
                         let (_, old_related_field) = &old_data_model.find_related_field_bang(&old_field);
+                        let is_many_to_many = old_field.is_list() && old_related_field.is_list();
+                        let is_self_relation = old_field.relation_info.to == old_related_field.relation_info.to;
+
+                        let (_, related_field) = &new_data_model.find_related_field_bang(&new_field);
+
                         //the relationinfos of both sides need to be compared since the relationinfo of the
                         // non-fk side does not contain enough information to uniquely identify the correct relationfield
-
-                        let relation_info_partial_eq = old_field.relation_info == field.relation_info
+                        let relation_info_partial_eq = old_field.relation_info == new_field.relation_info
                             && old_related_field.relation_info == related_field.relation_info;
-                        let many_to_many = old_field.is_list() && old_related_field.is_list();
+
+                        let mf = ModelAndField::new(&new_model.name, &new_field.name);
 
                         if relation_info_partial_eq
-                            && (!many_to_many || old_field.relation_info.name == field.relation_info.name)
+                            && (!is_many_to_many
+                                //For many to many the relation infos always look the same, here we have to look at the relation name,
+                                //which translates to the join table name. But in case of self relations we cannot correctly infer the old name
+                                || (old_field.relation_info.name == new_field.relation_info.name && !is_self_relation))
                         {
-                            let mf = ModelAndField::new(&model.name, &field.name);
                             changed_relation_field_names.push((mf.clone(), old_field.name.clone()));
                         }
                     }

@@ -148,16 +148,20 @@ impl Model {
 
     /// Finds a field by name and returns a mutable reference.
     pub fn find_scalar_field_mut(&mut self, name: &str) -> &mut ScalarField {
-        self.scalar_fields_mut()
-            .find(|f| f.name == *name)
-            .expect("We assume an internally valid datamodel before mutating.")
+        let model_name = &self.name.clone();
+        self.scalar_fields_mut().find(|rf| rf.name == *name).expect(&*format!(
+            "Could not find scalar field {} on model {}.",
+            name, model_name
+        ))
     }
 
     /// Finds a relation field by name and returns a mutable reference.
     pub fn find_relation_field_mut(&mut self, name: &str) -> &mut RelationField {
-        self.relation_fields_mut()
-            .find(|rf| rf.name == *name)
-            .expect("We assume an internally valid datamodel before mutating.")
+        let model_name = &self.name.clone();
+        self.relation_fields_mut().find(|rf| rf.name == *name).expect(&*format!(
+            "Could not find relation field {} on model {}.",
+            name, model_name
+        ))
     }
 
     /// Finds the name of all id fields

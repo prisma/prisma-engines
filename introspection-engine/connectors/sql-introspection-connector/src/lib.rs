@@ -99,7 +99,7 @@ impl IntrospectionConnector for SqlIntrospectionConnector {
     async fn get_database_description(&self) -> ConnectorResult<String> {
         let sql_schema = self.catch(self.describe()).await?;
         tracing::debug!("SQL Schema Describer is done: {:?}", sql_schema);
-        let description = format!("{:#?}", sql_schema);
+        let description = serde_json::to_string_pretty(&sql_schema).unwrap();
         Ok(description)
     }
 
@@ -112,7 +112,6 @@ impl IntrospectionConnector for SqlIntrospectionConnector {
     async fn introspect(&self, previous_data_model: &Datamodel) -> ConnectorResult<IntrospectionResult> {
         let sql_schema = self.catch(self.describe()).await?;
         tracing::debug!("SQL Schema Describer is done: {:?}", sql_schema);
-
         let family = self.connection_info.sql_family();
 
         let introspection_result = calculate_datamodel::calculate_datamodel(&sql_schema, &family, &previous_data_model)
