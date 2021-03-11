@@ -48,7 +48,7 @@ pub async fn get_many_records(
     field_names.append(&mut aggr_field_names);
 
     let mut aggr_idents = aggr_selections
-        .into_iter()
+        .iter()
         .map(|aggr_sel| aggr_sel.type_identifier_with_arity())
         .collect();
     let mut idents = selected_fields.type_identifiers_with_arities();
