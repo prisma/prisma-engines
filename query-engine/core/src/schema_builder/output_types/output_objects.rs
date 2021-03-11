@@ -203,11 +203,9 @@ where
     let ident = Identifier::new(format!("{}CountOutputType", capitalize(&model.name)), PRISMA_NAMESPACE);
     return_cached_output!(ctx, &ident);
 
-    // Non-numerical fields are always set as nullable
-    // This is because when there's no data, doing aggregation on them will return NULL
     let fields: Vec<OutputField> = fields
         .iter()
-        .map(|sf| field(sf.name.clone(), vec![], type_mapper(ctx, sf), None))
+        .map(|rf| field(rf.name.clone(), vec![], type_mapper(ctx, rf), None))
         .collect();
 
     let object = object_mapper(object_type(ident.clone(), fields, None));
