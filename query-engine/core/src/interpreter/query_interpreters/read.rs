@@ -211,7 +211,14 @@ fn process_nested<'a, 'b>(
     fut.boxed()
 }
 
-// TODO: Add comment explaining what this does
+/// Removes the relation aggregation data from the database result and collect it into some RelAggregationRow
+/// Explanation: Relation aggregations on a findMany are selected from an output object type. eg:
+/// findManyX { _count { rel_1, rel 2 } }
+/// Output object types are typically used for selecting relations, so they're are queried in a different request
+/// In the case of relation aggregations though, we query that data along side the request sent for the base model ("X" in the query above)
+/// This means the SQL result we get back from the database contains additional aggregation data that needs to be remapped according to the shema
+/// This function takes care of removing the aggregation data from the database result and collects it separately
+/// so that it can be serialized separately later according to the schema
 fn extract_aggr_results_from_scalars(
     mut scalars: ManyRecords,
     aggr_selections: Vec<RelAggregationSelection>,
