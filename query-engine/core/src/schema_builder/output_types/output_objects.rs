@@ -1,4 +1,5 @@
 use super::*;
+use std::convert::identity;
 
 use crate::constants::outputs::fields;
 use prisma_models::ScalarFieldRef;
@@ -16,7 +17,12 @@ pub(crate) fn initialize_model_object_type_cache(ctx: &mut BuilderContext) {
         .into_iter()
         .for_each(|model| {
             let ident = Identifier::new(model.name.clone(), MODEL_NAMESPACE);
-            ctx.cache_output_type(ident.clone(), Arc::new(ObjectType::new(ident, Some(model))))
+            let ident_with_aggr = Identifier::new(format!("{}WithAggregations", model.name.clone()), PRISMA_NAMESPACE);
+            ctx.cache_output_type(ident.clone(), Arc::new(ObjectType::new(ident, Some(model.clone()))));
+            ctx.cache_output_type(
+                ident_with_aggr.clone(),
+                Arc::new(ObjectType::new(ident_with_aggr, Some(model))),
+            );
         });
 
     // Compute fields on all cached object types.
@@ -29,6 +35,22 @@ pub(crate) fn initialize_model_object_type_cache(ctx: &mut BuilderContext) {
             let fields = compute_model_object_type_fields(ctx, &model);
 
             obj.into_arc().set_fields(fields);
+
+            let obj_with_aggr: ObjectTypeWeakRef = output_objects::map_model_object_type_with_aggregations(ctx, &model);
+            let mut fields_with_aggr = compute_model_object_type_fields(ctx, &model);
+
+            append_opt(
+                &mut fields_with_aggr,
+                aggregation_relation_field(
+                    ctx,
+                    fields::UNDERSCORE_COUNT,
+                    &model,
+                    model.fields().relation(),
+                    |_, _| OutputType::int(),
+                    identity,
+                ),
+            );
+            obj_with_aggr.into_arc().set_fields(fields_with_aggr);
         });
 }
 
@@ -47,6 +69,14 @@ fn compute_model_object_type_fields(ctx: &mut BuilderContext, model: &ModelRef) 
 /// Relies on the output type cache being initalized.
 pub(crate) fn map_model_object_type(ctx: &mut BuilderContext, model: &ModelRef) -> ObjectTypeWeakRef {
     let ident = Identifier::new(model.name.clone(), MODEL_NAMESPACE);
+    ctx.get_output_type(&ident)
+        .expect("Invariant violation: Initialized output object type for each model.")
+}
+
+/// Returns an output object type with nested aggregations for the given model.
+/// Relies on the output type cache being initalized.
+pub(crate) fn map_model_object_type_with_aggregations(ctx: &mut BuilderContext, model: &ModelRef) -> ObjectTypeWeakRef {
+    let ident = Identifier::new(format!("{}WithAggregations", model.name.clone()), PRISMA_NAMESPACE);
     ctx.get_output_type(&ident)
         .expect("Invariant violation: Initialized output object type for each model.")
 }
@@ -96,10 +126,10 @@ pub(crate) fn map_scalar_output_type(ctx: &mut BuilderContext, typ: &TypeIdentif
     }
 }
 
-pub(crate) fn map_relation_output_type(ctx: &mut BuilderContext, field: &RelationFieldRef) -> OutputType {
-    let related_model_obj = OutputType::object(map_model_object_type(ctx, &field.related_model()));
+pub(crate) fn map_relation_output_type(ctx: &mut BuilderContext, rf: &RelationFieldRef) -> OutputType {
+    let related_model_obj = OutputType::object(map_model_object_type(ctx, &rf.related_model()));
 
-    if field.is_list {
+    if rf.is_list {
         OutputType::list(related_model_obj)
     } else {
         related_model_obj
@@ -127,4 +157,61 @@ pub(crate) fn affected_records_object_type(ctx: &mut BuilderContext) -> ObjectTy
 
     ctx.cache_output_type(ident, object_type.clone());
     Arc::downgrade(&object_type)
+}
+
+/// Returns an aggregation field with given name if the passed fields contains any fields.
+/// Field types inside the object type of the field are determined by the passed mapper fn.
+pub(crate) fn aggregation_relation_field<F, G>(
+    ctx: &mut BuilderContext,
+    name: &str,
+    model: &ModelRef,
+    fields: Vec<RelationFieldRef>,
+    type_mapper: F,
+    object_mapper: G,
+) -> Option<OutputField>
+where
+    F: Fn(&mut BuilderContext, &RelationFieldRef) -> OutputType,
+    G: Fn(ObjectType) -> ObjectType,
+{
+    if fields.is_empty() {
+        None
+    } else {
+        let object_type = OutputType::object(map_field_aggration_relation(
+            ctx,
+            model,
+            &fields,
+            type_mapper,
+            object_mapper,
+        ));
+
+        Some(field(name, vec![], object_type, None).nullable())
+    }
+}
+
+/// Maps the object type for aggregations that operate on a field level.
+fn map_field_aggration_relation<F, G>(
+    ctx: &mut BuilderContext,
+    model: &ModelRef,
+    fields: &[RelationFieldRef],
+    type_mapper: F,
+    object_mapper: G,
+) -> ObjectTypeWeakRef
+where
+    F: Fn(&mut BuilderContext, &RelationFieldRef) -> OutputType,
+    G: Fn(ObjectType) -> ObjectType,
+{
+    let ident = Identifier::new(format!("{}CountOutputType", capitalize(&model.name)), PRISMA_NAMESPACE);
+    return_cached_output!(ctx, &ident);
+
+    let fields: Vec<OutputField> = fields
+        .iter()
+        .map(|rf| field(rf.name.clone(), vec![], type_mapper(ctx, rf), None))
+        .collect();
+
+    let object = object_mapper(object_type(ident.clone(), fields, None));
+    let object = Arc::new(object);
+
+    ctx.cache_output_type(ident, object.clone());
+
+    Arc::downgrade(&object)
 }

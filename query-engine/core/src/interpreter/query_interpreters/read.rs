@@ -1,9 +1,10 @@
 use super::*;
 use crate::{interpreter::InterpretationResult, query_ast::*, result_ast::*};
-use connector::{self, ConnectionLike, QueryArguments, ReadOperations};
+use connector::{self, ConnectionLike, QueryArguments, ReadOperations, RelAggregationRow, RelAggregationSelection};
 use futures::future::{BoxFuture, FutureExt};
 use inmemory_record_processor::InMemoryRecordProcessor;
 use prisma_models::ManyRecords;
+use std::collections::HashMap;
 
 pub fn execute<'a, 'b>(
     tx: &'a ConnectionLike<'a, 'b>,
@@ -45,6 +46,7 @@ fn read_one<'conn, 'tx>(
                     nested,
                     model_id,
                     query_arguments: QueryArguments::new(model),
+                    aggregation_rows: None,
                 }
                 .into())
             }
@@ -56,6 +58,7 @@ fn read_one<'conn, 'tx>(
                 scalars: ManyRecords::default(),
                 nested: vec![],
                 query_arguments: QueryArguments::new(model),
+                aggregation_rows: None,
             }))),
         }
     };
@@ -74,16 +77,33 @@ fn read_many<'a, 'b>(
     mut query: ManyRecordsQuery,
 ) -> BoxFuture<'a, InterpretationResult<QueryResult>> {
     let fut = async move {
-        let scalars = if query.args.requires_inmemory_processing() {
+        let (scalars, aggregation_results) = if query.args.requires_inmemory_processing() {
             let processor = InMemoryRecordProcessor::new_from_query_args(&mut query.args);
             let scalars = tx
-                .get_many_records(&query.model, query.args.clone(), &query.selected_fields)
+                .get_many_records(
+                    &query.model,
+                    query.args.clone(),
+                    &query.selected_fields,
+                    &query.aggregation_selections,
+                )
                 .await?;
+            let (scalars, aggregation_results) =
+                extract_aggr_results_from_scalars(scalars.clone(), query.aggregation_selections);
 
-            processor.apply(scalars)
+            (processor.apply(scalars), aggregation_results)
         } else {
-            tx.get_many_records(&query.model, query.args.clone(), &query.selected_fields)
-                .await?
+            let scalars = tx
+                .get_many_records(
+                    &query.model,
+                    query.args.clone(),
+                    &query.selected_fields,
+                    &query.aggregation_selections,
+                )
+                .await?;
+            let (scalars, aggregation_results) =
+                extract_aggr_results_from_scalars(scalars.clone(), query.aggregation_selections);
+
+            (scalars, aggregation_results)
         };
 
         let model_id = query.model.primary_identifier();
@@ -96,6 +116,7 @@ fn read_many<'a, 'b>(
             model_id,
             scalars,
             nested,
+            aggregation_rows: aggregation_results,
         }
         .into())
     };
@@ -140,6 +161,7 @@ fn read_related<'a, 'b>(
             model_id,
             scalars,
             nested,
+            aggregation_rows: None,
         }
         .into())
     };
@@ -187,4 +209,64 @@ fn process_nested<'a, 'b>(
     };
 
     fut.boxed()
+}
+
+/// Removes the relation aggregation data from the database result and collect it into some RelAggregationRow
+/// Explanation: Relation aggregations on a findMany are selected from an output object type. eg:
+/// findManyX { _count { rel_1, rel 2 } }
+/// Output object types are typically used for selecting relations, so they're are queried in a different request
+/// In the case of relation aggregations though, we query that data along side the request sent for the base model ("X" in the query above)
+/// This means the SQL result we get back from the database contains additional aggregation data that needs to be remapped according to the shema
+/// This function takes care of removing the aggregation data from the database result and collects it separately
+/// so that it can be serialized separately later according to the schema
+fn extract_aggr_results_from_scalars(
+    mut scalars: ManyRecords,
+    aggr_selections: Vec<RelAggregationSelection>,
+) -> (ManyRecords, Option<Vec<RelAggregationRow>>) {
+    if aggr_selections.is_empty() {
+        return (scalars, None);
+    }
+
+    let aggr_field_names: HashMap<String, &RelAggregationSelection> = aggr_selections
+        .iter()
+        .map(|aggr_sel| (aggr_sel.db_alias(), aggr_sel))
+        .collect();
+
+    let indexes_to_remove: Vec<_> = scalars
+        .field_names
+        .iter()
+        .enumerate()
+        .filter_map(|(i, field_name)| {
+            if let Some(aggr_sel) = aggr_field_names.get(field_name) {
+                Some((i, *aggr_sel))
+            } else {
+                None
+            }
+        })
+        .collect();
+
+    let mut aggregation_rows: Vec<RelAggregationRow> = vec![];
+    let mut n_record_removed = 0;
+
+    for (index_to_remove, aggr_sel) in indexes_to_remove.into_iter() {
+        let index_to_remove = index_to_remove - n_record_removed;
+
+        // Remove all aggr field names
+        scalars.field_names.remove(index_to_remove);
+
+        // Remove and collect all aggr prisma values
+        for (r_index, record) in scalars.records.iter_mut().enumerate() {
+            let val = record.values.remove(index_to_remove);
+            let aggr_result = aggr_sel.clone().into_result(val);
+
+            // Group the aggregation results by record
+            match aggregation_rows.get_mut(r_index) {
+                Some(inner_vec) => inner_vec.push(aggr_result),
+                None => aggregation_rows.push(vec![aggr_result]),
+            }
+        }
+        n_record_removed += 1;
+    }
+
+    (scalars, Some(aggregation_rows))
 }

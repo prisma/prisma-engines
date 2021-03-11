@@ -5,7 +5,7 @@ use crate::{
     CoreError, DatabaseEnumType, EnumType, OutputFieldRef, QueryResult, RecordAggregations, RecordSelection,
 };
 use bigdecimal::ToPrimitive;
-use connector::AggregationResult;
+use connector::{AggregationResult, RelAggregationResult, RelAggregationRow};
 use indexmap::IndexMap;
 use prisma_models::{PrismaValue, RecordProjection};
 use std::{borrow::Borrow, collections::HashMap};
@@ -40,9 +40,23 @@ pub fn serialize_internal(
     is_list: bool,
 ) -> crate::Result<CheckedItemsWithParents> {
     match result {
-        QueryResult::RecordSelection(rs) => serialize_record_selection(*rs, field, &field.field_type, is_list),
-        QueryResult::RecordAggregations(ras) => serialize_aggregations(field, ras),
+        QueryResult::RecordSelection(rs) => {
+            if let Some(aggr_rows) = &rs.aggregation_rows {
+                let serialized_aggrs = serialize_rel_aggregations(aggr_rows)?;
+                let mut serialized_rs = serialize_record_selection(*rs, field, &field.field_type, is_list)?;
 
+                let (_, aggr_item) = serialized_aggrs.first().unwrap();
+
+                for (_, rs_item) in serialized_rs.iter_mut() {
+                    *rs_item = rs_item.clone().merge(&aggr_item);
+                }
+
+                Ok(serialized_rs)
+            } else {
+                serialize_record_selection(*rs, field, &field.field_type, is_list)
+            }
+        }
+        QueryResult::RecordAggregations(ras) => serialize_aggregations(field, ras),
         QueryResult::Count(c) => {
             // Todo needs a real implementation or needs to move to RecordAggregation
             let mut map: Map = IndexMap::with_capacity(1);
@@ -153,6 +167,37 @@ fn serialize_aggregations(
         }
         _ => unreachable!(),
     };
+
+    Ok(envelope)
+}
+
+fn serialize_rel_aggregations(aggregation_rows: &[RelAggregationRow]) -> crate::Result<CheckedItemsWithParents> {
+    let mut results = vec![];
+
+    for row in aggregation_rows.into_iter() {
+        let mut map: Map = IndexMap::with_capacity(row.len());
+
+        for result in row {
+            match result {
+                RelAggregationResult::Count(rf, count) => match map.get_mut(fields::UNDERSCORE_COUNT) {
+                    Some(item) => match item {
+                        Item::Map(inner_map) => inner_map.insert(rf.name.clone(), Item::Value(count.clone())),
+                        _ => unreachable!(),
+                    },
+                    None => {
+                        let mut inner_map: Map = Map::new();
+                        inner_map.insert(rf.name.clone(), Item::Value(count.clone()));
+                        map.insert(fields::UNDERSCORE_COUNT.to_owned(), Item::Map(inner_map))
+                    }
+                },
+            };
+        }
+
+        results.push(Item::Map(map));
+    }
+
+    let mut envelope = CheckedItemsWithParents::new();
+    envelope.insert(None, Item::List(results.into()));
 
     Ok(envelope)
 }
