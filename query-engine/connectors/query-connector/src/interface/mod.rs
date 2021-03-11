@@ -192,11 +192,9 @@ impl RelAggregationSelection {
         }
     }
 
-    pub fn into_result(&self, val: PrismaValue) -> RelAggregationResult {
+    pub fn into_result(self, val: PrismaValue) -> RelAggregationResult {
         match self {
-            RelAggregationSelection::Count(rf) => {
-                RelAggregationResult::Count(rf.clone(), coerce_null_to_zero_value(val))
-            }
+            RelAggregationSelection::Count(rf) => RelAggregationResult::Count(rf, coerce_null_to_zero_value(val)),
         }
     }
 }

@@ -220,8 +220,8 @@ fn extract_aggr_results_from_scalars(
         return (scalars, None);
     }
 
-    let aggr_field_names: HashMap<String, RelAggregationSelection> = aggr_selections
-        .into_iter()
+    let aggr_field_names: HashMap<String, &RelAggregationSelection> = aggr_selections
+        .iter()
         .map(|aggr_sel| (aggr_sel.db_alias(), aggr_sel))
         .collect();
     let indexes_to_remove: Vec<_> = scalars
@@ -230,7 +230,7 @@ fn extract_aggr_results_from_scalars(
         .enumerate()
         .filter_map(|(i, field_name)| {
             if let Some(aggr_sel) = aggr_field_names.get(field_name) {
-                Some((i, aggr_sel))
+                Some((i, *aggr_sel))
             } else {
                 None
             }
@@ -248,7 +248,7 @@ fn extract_aggr_results_from_scalars(
         // Remove and collect all aggr prisma values
         for (r_index, record) in scalars.records.iter_mut().enumerate() {
             let val = record.values.remove(index_to_remove);
-            let aggr_result = aggr_sel.into_result(val);
+            let aggr_result = aggr_sel.clone().into_result(val);
 
             // Group the aggregation results by record
             match aggregation_rows.get_mut(r_index) {
