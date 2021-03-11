@@ -72,7 +72,9 @@ fn all_items_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
     field(
         field_name,
         args,
-        OutputType::list(OutputType::object(output_objects::map_model_object_type(ctx, &model))),
+        OutputType::list(OutputType::object(
+            output_objects::map_model_object_type_with_aggregations(ctx, &model),
+        )),
         Some(QueryInfo {
             model: Some(Arc::clone(&model)),
             tag: QueryTag::FindMany,

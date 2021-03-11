@@ -1,7 +1,7 @@
 use crate::{column_metadata::ColumnMetadata, error::SqlError};
 use bigdecimal::{BigDecimal, FromPrimitive};
 use chrono::{DateTime, NaiveDate, Utc};
-use connector_interface::{AggregationResult, AggregationSelection};
+use connector_interface::{coerce_null_to_zero_value, AggregationResult, AggregationSelection};
 use datamodel::FieldArity;
 use prisma_models::{PrismaValue, Record, TypeIdentifier};
 use quaint::{
@@ -79,14 +79,6 @@ impl SqlRow {
                     .collect(),
             })
             .collect()
-    }
-}
-
-fn coerce_null_to_zero_value(value: PrismaValue) -> PrismaValue {
-    if let PrismaValue::Null = value {
-        PrismaValue::Int(0)
-    } else {
-        value
     }
 }
 

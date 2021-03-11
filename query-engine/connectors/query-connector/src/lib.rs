@@ -3,11 +3,13 @@
 pub mod error;
 pub mod filter;
 
+mod coerce;
 mod compare;
 mod interface;
 mod query_arguments;
 mod write_args;
 
+pub use coerce::*;
 pub use compare::*;
 pub use filter::*;
 pub use interface::*;

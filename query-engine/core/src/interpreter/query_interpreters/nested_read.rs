@@ -54,8 +54,13 @@ pub async fn m2m<'a, 'b>(
             Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
             None => Some(filter),
         };
-        tx.get_many_records(&query.parent_field.related_model(), args, &query.selected_fields)
-            .await?
+        tx.get_many_records(
+            &query.parent_field.related_model(),
+            args,
+            &query.selected_fields,
+            &vec![],
+        )
+        .await?
     };
 
     // Child id to parent ids
@@ -175,7 +180,7 @@ pub async fn one2m<'a, 'b>(
             Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
             None => Some(filter),
         };
-        tx.get_many_records(&parent_field.related_model(), args, selected_fields)
+        tx.get_many_records(&parent_field.related_model(), args, selected_fields, &vec![])
             .await?
     };
 

@@ -1,9 +1,13 @@
 use super::*;
 use crate::{interpreter::InterpretationResult, query_ast::*, result_ast::*};
-use connector::{self, ConnectionLike, QueryArguments, ReadOperations};
+use connector::{
+    self, coerce_null_to_zero_value, ConnectionLike, QueryArguments, ReadOperations, RelAggregationResult,
+    RelAggregationRow, RelAggregationSelection,
+};
 use futures::future::{BoxFuture, FutureExt};
 use inmemory_record_processor::InMemoryRecordProcessor;
 use prisma_models::ManyRecords;
+use std::collections::HashMap;
 
 pub fn execute<'a, 'b>(
     tx: &'a ConnectionLike<'a, 'b>,
@@ -45,6 +49,7 @@ fn read_one<'conn, 'tx>(
                     nested,
                     model_id,
                     query_arguments: QueryArguments::new(model),
+                    aggregation_rows: None,
                 }
                 .into())
             }
@@ -56,6 +61,7 @@ fn read_one<'conn, 'tx>(
                 scalars: ManyRecords::default(),
                 nested: vec![],
                 query_arguments: QueryArguments::new(model),
+                aggregation_rows: None,
             }))),
         }
     };
@@ -74,16 +80,33 @@ fn read_many<'a, 'b>(
     mut query: ManyRecordsQuery,
 ) -> BoxFuture<'a, InterpretationResult<QueryResult>> {
     let fut = async move {
-        let scalars = if query.args.requires_inmemory_processing() {
+        let (scalars, aggregation_results) = if query.args.requires_inmemory_processing() {
             let processor = InMemoryRecordProcessor::new_from_query_args(&mut query.args);
             let scalars = tx
-                .get_many_records(&query.model, query.args.clone(), &query.selected_fields)
+                .get_many_records(
+                    &query.model,
+                    query.args.clone(),
+                    &query.selected_fields,
+                    &query.aggregation_selections,
+                )
                 .await?;
+            let (scalars, aggregation_results) =
+                extract_aggr_results_from_scalars(scalars.clone(), query.aggregation_selections);
 
-            processor.apply(scalars)
+            (processor.apply(scalars), aggregation_results)
         } else {
-            tx.get_many_records(&query.model, query.args.clone(), &query.selected_fields)
-                .await?
+            let scalars = tx
+                .get_many_records(
+                    &query.model,
+                    query.args.clone(),
+                    &query.selected_fields,
+                    &query.aggregation_selections,
+                )
+                .await?;
+            let (scalars, aggregation_results) =
+                extract_aggr_results_from_scalars(scalars.clone(), query.aggregation_selections);
+
+            (scalars, aggregation_results)
         };
 
         let model_id = query.model.primary_identifier();
@@ -96,6 +119,7 @@ fn read_many<'a, 'b>(
             model_id,
             scalars,
             nested,
+            aggregation_rows: aggregation_results,
         }
         .into())
     };
@@ -140,6 +164,7 @@ fn read_related<'a, 'b>(
             model_id,
             scalars,
             nested,
+            aggregation_rows: None,
         }
         .into())
     };
@@ -187,4 +212,49 @@ fn process_nested<'a, 'b>(
     };
 
     fut.boxed()
+}
+
+// TODO: Add comment explaining what this does
+fn extract_aggr_results_from_scalars(
+    mut scalars: ManyRecords,
+    aggr_selections: Vec<RelAggregationSelection>,
+) -> (ManyRecords, Option<Vec<RelAggregationRow>>) {
+    if aggr_selections.is_empty() {
+        return (scalars, None);
+    }
+
+    let aggr_field_names: HashMap<String, RelAggregationSelection> = aggr_selections
+        .into_iter()
+        .map(|aggr_sel| (aggr_sel.db_alias(), aggr_sel))
+        .collect();
+    let mut aggregation_rows: Vec<RelAggregationRow> = vec![];
+    let mut indexes = vec![];
+
+    for (i, field_name) in scalars.field_names.iter().enumerate() {
+        if let Some(aggr) = aggr_field_names.get(field_name) {
+            indexes.push(i);
+            // Remove all aggr prisma values
+            for (r_index, record) in scalars.records.iter_mut().enumerate() {
+                let val = record.values.remove(i);
+                let aggr_result = match aggr {
+                    RelAggregationSelection::Count(rf) => {
+                        RelAggregationResult::Count(rf.clone(), coerce_null_to_zero_value(val))
+                    }
+                };
+
+                // Group the aggregation results by record
+                match aggregation_rows.get_mut(r_index) {
+                    Some(inner_vec) => inner_vec.push(aggr_result),
+                    None => aggregation_rows.push(vec![aggr_result]),
+                }
+            }
+        }
+    }
+
+    // FIXME: Figure out how to remove the field_names in the loop above :facepalm:
+    for i in indexes {
+        scalars.field_names.remove(i);
+    }
+
+    (scalars, Some(aggregation_rows))
 }

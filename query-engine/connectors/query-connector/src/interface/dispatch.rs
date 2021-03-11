@@ -21,10 +21,17 @@ impl<'conn, 'tx> ReadOperations for ConnectionLike<'conn, 'tx> {
         model: &ModelRef,
         query_arguments: QueryArguments,
         selected_fields: &ModelProjection,
+        aggregation_selections: &[RelAggregationSelection],
     ) -> crate::Result<ManyRecords> {
         match self {
-            Self::Connection(c) => c.get_many_records(model, query_arguments, selected_fields).await,
-            Self::Transaction(tx) => tx.get_many_records(model, query_arguments, selected_fields).await,
+            Self::Connection(c) => {
+                c.get_many_records(model, query_arguments, selected_fields, aggregation_selections)
+                    .await
+            }
+            Self::Transaction(tx) => {
+                tx.get_many_records(model, query_arguments, selected_fields, aggregation_selections)
+                    .await
+            }
         }
     }
 

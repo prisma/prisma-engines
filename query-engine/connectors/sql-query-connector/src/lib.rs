@@ -5,6 +5,8 @@ mod cursor_condition;
 mod database;
 mod error;
 mod filter_conversion;
+mod join_utils;
+mod nested_aggregations;
 mod ordering;
 mod query_arguments_ext;
 mod query_builder;

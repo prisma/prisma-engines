@@ -159,6 +159,41 @@ pub enum AggregationResult {
     Max(ScalarFieldRef, PrismaValue),
 }
 
+#[derive(Debug, Clone)]
+pub enum RelAggregationSelection {
+    // Always a count(*) for now
+    Count(RelationFieldRef),
+}
+
+pub type RelAggregationRow = Vec<RelAggregationResult>;
+
+#[derive(Debug, Clone)]
+pub enum RelAggregationResult {
+    Count(RelationFieldRef, PrismaValue),
+}
+
+impl RelAggregationSelection {
+    pub fn db_alias(&self) -> String {
+        match self {
+            RelAggregationSelection::Count(rf) => {
+                format!("aggr_{}", rf.name.to_owned())
+            }
+        }
+    }
+
+    pub fn field_name(&self) -> &str {
+        match self {
+            RelAggregationSelection::Count(rf) => rf.name.as_str(),
+        }
+    }
+
+    pub fn type_identifier_with_arity(&self) -> (TypeIdentifier, FieldArity) {
+        match self {
+            RelAggregationSelection::Count(_) => (TypeIdentifier::Int, FieldArity::Required),
+        }
+    }
+}
+
 #[async_trait]
 pub trait ReadOperations {
     /// Gets a single record or `None` back from the database.
@@ -185,6 +220,7 @@ pub trait ReadOperations {
         model: &ModelRef,
         query_arguments: QueryArguments,
         selected_fields: &ModelProjection,
+        aggregation_selections: &[RelAggregationSelection],
     ) -> crate::Result<ManyRecords>;
 
     /// Retrieves pairs of IDs that belong together from a intermediate join
