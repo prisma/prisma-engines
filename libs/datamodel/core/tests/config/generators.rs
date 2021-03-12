@@ -164,6 +164,33 @@ fn nice_error_for_unknown_generator_preview_feature() {
     }
 }
 
+#[test]
+fn retain_env_var_definitions_in_generator_block() {
+    std::env::set_var("PROVIDER", "postgres");
+    std::env::set_var("OUTPUT", "~/home/prisma/");
+
+    let schema1 = r#"
+    generator js1 {
+        provider = env("PROVIDER")
+        output = env("OUTPUT")
+    }
+    "#;
+
+    let expected_dmmf_1 = r#"[
+  {
+    "name": "js1",
+    "provider": "postgres",
+    "output": "~/home/prisma/",
+    "binaryTargets": [],
+    "previewFeatures": [],
+    "config": {}
+  }
+]"#;
+
+    assert_mcf(schema1, expected_dmmf_1);
+    assert_eq!(true, false);
+}
+
 fn assert_mcf(schema: &str, expected_mcf: &str) {
     let config = parse_configuration(schema);
     let rendered = datamodel::json::mcf::generators_to_json(&config.generators);
