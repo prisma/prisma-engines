@@ -142,5 +142,5 @@ async fn mongodb(source: &Datasource) -> crate::Result<(String, Box<dyn QueryExe
     let db_name = mongo.db_name();
 
     trace!("Loaded MongoDB query connector.");
-    Ok((db_name.to_owned(), Box::new(InterpretingExecutor::new(mongo, false)))) 
+    Ok((db_name.to_owned(), Box::new(InterpretingExecutor::new(mongo, false))))
 }
