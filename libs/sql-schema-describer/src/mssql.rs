@@ -485,7 +485,7 @@ impl SqlSchemaDescriber {
         for row in result_set.into_iter() {
             views.push(View {
                 name: row.get_expect_string("view_name"),
-                definition: row.get_expect_string("view_sql"),
+                definition: row.get_string("view_sql"),
             })
         }
 

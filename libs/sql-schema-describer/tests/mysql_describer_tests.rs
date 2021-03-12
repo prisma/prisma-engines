@@ -49,7 +49,7 @@ async fn views_can_be_described() {
     );
 
     assert_eq!("ab", &view.name);
-    assert_eq!(expected_sql, view.definition);
+    assert_eq!(expected_sql, view.definition.unwrap());
 }
 
 #[tokio::test]

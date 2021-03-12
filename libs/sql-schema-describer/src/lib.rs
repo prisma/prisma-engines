@@ -463,7 +463,7 @@ pub struct View {
     /// Name of the view.
     pub name: String,
     /// The SQL definition of the view.
-    pub definition: String,
+    pub definition: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
