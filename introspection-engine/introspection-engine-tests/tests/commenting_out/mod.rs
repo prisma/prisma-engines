@@ -411,3 +411,45 @@ async fn ignore_on_back_relation_field_if_pointing_to_ignored_model(api: &TestAp
 
     Ok(())
 }
+
+#[test_each_connector(tags("sqlite"))]
+async fn ignore_on_model_with_only_optional_id(api: &TestApi) -> crate::TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("OnlyOptionalId", |t| {
+                t.add_column("id", types::integer().primary(true).nullable(true));
+            });
+
+            migration.create_table("OptionalIdAndOptionalUnique", |t| {
+                t.add_column("id", types::integer().primary(true).nullable(true));
+                t.add_column("id", types::integer().unique(true).nullable(true));
+            });
+
+            migration.create_table("OptionalIdAndRequiredUnique", |t| {
+                t.add_column("id", types::integer().primary(true).nullable(true));
+                t.add_column("id", types::integer().unique(true).nullable(false));
+            });
+        })
+        .await?;
+
+    let dm = indoc! {r#"
+            ///The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+            model Post {
+                id      Int
+                user_ip Int
+                User    User @relation(fields: [user_ip], references: [ip])
+
+                @@ignore
+            }
+
+            model User {
+                id      Int  @id @default(autoincrement())
+                ip      Int  @unique
+                Post  Post[] @ignore
+            }
+        "#};
+
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
+
+    Ok(())
+}
