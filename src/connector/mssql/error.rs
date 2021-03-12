@@ -3,6 +3,7 @@ use crate::error::{DatabaseConstraint, Error, ErrorKind};
 impl From<tiberius::error::Error> for Error {
     fn from(e: tiberius::error::Error) -> Error {
         match e {
+            e @ tiberius::error::Error::Io { .. } => Error::builder(ErrorKind::ConnectionError(e.into())).build(),
             tiberius::error::Error::Tls(message) => {
                 let message = format!(
                     "The TLS settings didn't allow the connection to be established. Please review your connection string. (error: {})",
