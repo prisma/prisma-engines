@@ -2,9 +2,10 @@ use super::datasource_provider::DatasourceProvider;
 use crate::common::provider_names::*;
 use crate::StringFromEnvVar;
 use datamodel_connector::Connector;
-use mongodb_datamodel_connector::MongoDbDatamodelConnector;
 use sql_datamodel_connector::SqlDatamodelConnectors;
 
+#[cfg(feature = "mongodb")]
+use mongodb_datamodel_connector::MongoDbDatamodelConnector;
 pub struct SqliteDatasourceProvider {}
 
 impl SqliteDatasourceProvider {
@@ -131,14 +132,17 @@ impl DatasourceProvider for MsSqlDatasourceProvider {
         validate_url(name, "sqlserver://", url)
     }
 }
-
+#[cfg(feature = "mongodb")]
 pub struct MongoDbDatasourceProvider {}
+
+#[cfg(feature = "mongodb")]
 impl MongoDbDatasourceProvider {
     pub fn new() -> Self {
         Self {}
     }
 }
 
+#[cfg(feature = "mongodb")]
 impl DatasourceProvider for MongoDbDatasourceProvider {
     fn is_provider(&self, provider: &str) -> bool {
         provider == MONGODB_SOURCE_NAME

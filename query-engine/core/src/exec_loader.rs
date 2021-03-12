@@ -4,19 +4,21 @@ use crate::{
 };
 use connection_string::JdbcString;
 use connector::Connector;
-use mongodb_connector::MongoDb;
 use std::str::FromStr;
 
 use datamodel::{
-    common::provider_names::{
-        MONGODB_SOURCE_NAME, MSSQL_SOURCE_NAME, MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME,
-    },
+    common::provider_names::{MSSQL_SOURCE_NAME, MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME},
     Datasource,
 };
 use std::collections::HashMap;
 use url::Url;
 
 use sql_connector::*;
+
+#[cfg(feature = "mongodb")]
+use datamodel::common::provider_names::MONGODB_SOURCE_NAME;
+#[cfg(feature = "mongodb")]
+use mongodb_connector::MongoDb;
 
 const DEFAULT_SQLITE_DB_NAME: &str = "main";
 
@@ -38,6 +40,7 @@ pub async fn load(source: &Datasource) -> crate::Result<(String, Box<dyn QueryEx
             mssql(source).await
         }
 
+        #[cfg(feature = "mongodb")]
         MONGODB_SOURCE_NAME => {
             if !feature_flags::get().mongoDb {
                 let error = CoreError::UnsupportedFeatureError(
@@ -131,6 +134,7 @@ where
     Box::new(InterpretingExecutor::new(connector, force_transactions))
 }
 
+#[cfg(feature = "mongodb")]
 async fn mongodb(source: &Datasource) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
     trace!("Loading MongoDB query connector...");
 
@@ -138,5 +142,5 @@ async fn mongodb(source: &Datasource) -> crate::Result<(String, Box<dyn QueryExe
     let db_name = mongo.db_name();
 
     trace!("Loaded MongoDB query connector.");
-    Ok((db_name.to_owned(), Box::new(InterpretingExecutor::new(mongo, false))))
+    Ok((db_name.to_owned(), Box::new(InterpretingExecutor::new(mongo, false)))) 
 }
