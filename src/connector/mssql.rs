@@ -408,17 +408,25 @@ impl MssqlUrl {
         let database = props.remove("database").unwrap_or_else(|| String::from("master"));
         let schema = props.remove("schema").unwrap_or_else(|| String::from("dbo"));
 
-        let connection_limit = props.remove("connectionlimit").map(|param| param.parse()).transpose()?;
+        let connection_limit = props
+            .remove("connectionlimit")
+            .or_else(|| props.remove("connection_limit"))
+            .map(|param| param.parse())
+            .transpose()?;
 
         let transaction_isolation_level = props
             .remove("isolationlevel")
+            .or_else(|| props.remove("isolation_level"))
             .map(|level| IsolationLevel::from_str(&level))
             .transpose()?;
 
         let mut connect_timeout = props
             .remove("logintimeout")
+            .or_else(|| props.remove("login_timeout"))
             .or_else(|| props.remove("connecttimeout"))
+            .or_else(|| props.remove("connect_timeout"))
             .or_else(|| props.remove("connectiontimeout"))
+            .or_else(|| props.remove("connection_timeout"))
             .map(|param| param.parse().map(Duration::from_secs))
             .transpose()?;
 
@@ -430,6 +438,7 @@ impl MssqlUrl {
 
         let mut pool_timeout = props
             .remove("pooltimeout")
+            .or_else(|| props.remove("pool_timeout"))
             .map(|param| param.parse().map(Duration::from_secs))
             .transpose()?;
 
@@ -441,6 +450,7 @@ impl MssqlUrl {
 
         let socket_timeout = props
             .remove("sockettimeout")
+            .or_else(|| props.remove("socket_timeout"))
             .map(|param| param.parse().map(Duration::from_secs))
             .transpose()?;
 
@@ -452,6 +462,7 @@ impl MssqlUrl {
 
         let trust_server_certificate = props
             .remove("trustservercertificate")
+            .or_else(|| props.remove("trust_server_certificate"))
             .map(|param| param.parse())
             .transpose()?
             .unwrap_or(false);
