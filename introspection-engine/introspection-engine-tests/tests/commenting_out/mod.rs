@@ -432,27 +432,24 @@ async fn ignore_on_model_with_only_optional_id(api: &TestApi) -> crate::TestResu
         .await?;
 
     let dm = indoc! {r#"
-            /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
-            model OnlyOptionalId {
-              id     String? @id
-              
-              @@ignore
+
+            ///The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+            model Post {
+                id      Int
+                user_ip Int
+                User    User @relation(fields: [user_ip], references: [ip])
+
+                @@ignore
             }
-            
-            /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
-            model OptionalIdAndOptionalUnique {
-              id     String? @id
-              unique Int? @unique
-                
-              @@ignore
+
+            model User {
+                id      Int  @id @default(autoincrement())
+                ip      Int  @unique
+                Post  Post[] @ignore
             }
-            
-            model ValidId {
-              id     String @id
-            }      
         "#};
 
-    api.assert_eq_datamodels(dm, dbg!(&api.introspect().await?));
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
