@@ -434,7 +434,7 @@ impl MssqlUrl {
             .transpose()?;
 
         match pool_timeout {
-            None => pool_timeout = Some(Duration::from_secs(5)),
+            None => pool_timeout = Some(Duration::from_secs(10)),
             Some(dur) if dur.as_secs() == 0 => pool_timeout = None,
             _ => (),
         }

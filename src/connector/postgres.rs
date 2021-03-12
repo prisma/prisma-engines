@@ -251,7 +251,7 @@ impl PostgresUrl {
         let mut host = None;
         let mut socket_timeout = None;
         let mut connect_timeout = Some(Duration::from_secs(5));
-        let mut pool_timeout = Some(Duration::from_secs(5));
+        let mut pool_timeout = Some(Duration::from_secs(10));
         let mut pg_bouncer = false;
         let mut statement_cache_size = 500;
 
