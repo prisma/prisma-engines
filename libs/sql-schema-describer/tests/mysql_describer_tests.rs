@@ -1004,9 +1004,17 @@ async fn dangling_foreign_keys_are_filtered_out(api: &TestApi) {
     let setup = r#"
     SET FOREIGN_KEY_CHECKS=0;
 
+    CREATE TABLE `platypus` (
+        id INTEGER PRIMARY KEY
+    );
+
     CREATE TABLE `dog` (
         id INTEGER PRIMARY KEY,
-        bestFriendId INTEGER REFERENCES `cat`(`id`)
+        bestFriendId INTEGER,
+
+        FOREIGN KEY (`bestFriendId`) REFERENCES `cat`(`id`),
+        FOREIGN KEY (`bestFriendId`) REFERENCES `platypus`(`id`),
+        FOREIGN KEY (`bestFriendId`) REFERENCES `goat`(`id`)
     );
 
     SET FOREIGN_KEY_CHECKS=1;
@@ -1017,5 +1025,9 @@ async fn dangling_foreign_keys_are_filtered_out(api: &TestApi) {
     let schema = api.describe().await.unwrap();
     let table = schema.table_bang("dog");
 
-    assert!(table.foreign_keys.is_empty(), "{:#?}", table.foreign_keys);
+    assert!(
+        matches!(table.foreign_keys.as_slice(), [fk] if fk.referenced_table == "platypus"),
+        "{:#?}",
+        table.foreign_keys
+    );
 }
