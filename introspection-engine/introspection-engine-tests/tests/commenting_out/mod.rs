@@ -416,40 +416,53 @@ async fn ignore_on_back_relation_field_if_pointing_to_ignored_model(api: &TestAp
 async fn ignore_on_model_with_only_optional_id(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
+            migration.create_table("ValidId", |t| {
+                t.inject_custom("id Text Primary Key Not Null");
+            });
+
             migration.create_table("OnlyOptionalId", |t| {
-                t.add_column("id", types::integer().primary(true).nullable(true));
+                t.inject_custom("id Text Primary Key");
             });
 
             migration.create_table("OptionalIdAndOptionalUnique", |t| {
-                t.add_column("id", types::integer().primary(true).nullable(true));
-                t.add_column("id", types::integer().unique(true).nullable(true));
+                t.inject_custom("id Text Primary Key");
+                t.add_column("unique", types::integer().unique(true).nullable(true));
             });
 
-            migration.create_table("OptionalIdAndRequiredUnique", |t| {
-                t.add_column("id", types::integer().primary(true).nullable(true));
-                t.add_column("id", types::integer().unique(true).nullable(false));
-            });
+            // migration.create_table("OptionalIdAndRequiredUnique", |t| {
+            //     t.inject_custom("id Text Primary Key");
+            //     t.add_column("unique", types::integer().unique(true).nullable(false));
+            // });
         })
         .await?;
 
     let dm = indoc! {r#"
-            ///The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
-            model Post {
-                id      Int
-                user_ip Int
-                User    User @relation(fields: [user_ip], references: [ip])
-
-                @@ignore
+            /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+            model OnlyOptionalId {
+              id     String? @id
+              
+              @@ignore
             }
-
-            model User {
-                id      Int  @id @default(autoincrement())
-                ip      Int  @unique
-                Post  Post[] @ignore
+            
+            /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+            model OptionalIdAndOptionalUnique {
+              id     String? @id
+              unique Int? @unique
+                
+              @@ignore
             }
+            
+            // model OptionalIdAndRequiredUnique {
+            //   id     String? @id
+            //   unique Int @unique
+            // }
+            
+            model ValidId {
+              id     String @id
+            }      
         "#};
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, dbg!(&api.introspect().await?));
 
     Ok(())
 }
