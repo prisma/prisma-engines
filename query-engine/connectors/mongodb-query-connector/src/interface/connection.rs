@@ -4,7 +4,9 @@ use crate::{
     MongoDbTransaction,
 };
 use async_trait::async_trait;
-use connector_interface::{Connection, ReadOperations, Transaction, WriteArgs, WriteOperations};
+use connector_interface::{
+    Connection, ReadOperations, RelAggregationSelection, Transaction, WriteArgs, WriteOperations,
+};
 use mongodb::Database;
 use prisma_models::prelude::*;
 use std::future::Future;
@@ -126,9 +128,19 @@ impl ReadOperations for MongoDbConnection {
         model: &ModelRef,
         query_arguments: connector_interface::QueryArguments,
         selected_fields: &ModelProjection,
+        aggregation_selections: &[RelAggregationSelection],
     ) -> connector_interface::Result<ManyRecords> {
-        self.catch(async move { read::get_many_records(&self.database, model, query_arguments, selected_fields).await })
+        self.catch(async move {
+            read::get_many_records(
+                &self.database,
+                model,
+                query_arguments,
+                selected_fields,
+                aggregation_selections,
+            )
             .await
+        })
+        .await
     }
 
     async fn get_related_m2m_record_ids(
