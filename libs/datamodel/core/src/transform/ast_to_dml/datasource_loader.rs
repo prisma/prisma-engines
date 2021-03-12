@@ -1,7 +1,8 @@
 use super::{
     super::helpers::*,
     builtin_datasource_providers::{
-        MsSqlDatasourceProvider, MySqlDatasourceProvider, PostgresDatasourceProvider, SqliteDatasourceProvider,
+        MongoDbDatasourceProvider, MsSqlDatasourceProvider, MySqlDatasourceProvider, PostgresDatasourceProvider,
+        SqliteDatasourceProvider,
     },
     datasource_provider::DatasourceProvider,
 };
@@ -10,9 +11,6 @@ use crate::configuration::StringFromEnvVar;
 use crate::diagnostics::{DatamodelError, DatamodelWarning, Diagnostics, ValidatedDatasource, ValidatedDatasources};
 use crate::{ast, Datasource};
 use datamodel_connector::{CombinedConnector, Connector};
-
-#[cfg(feature = "mongodb")]
-use super::builtin_datasource_providers::MongoDbDatasourceProvider;
 
 const PREVIEW_FEATURES_KEY: &str = "previewFeatures";
 const SHADOW_DATABASE_URL_KEY: &str = "shadowDatabaseUrl";
@@ -294,18 +292,13 @@ impl DatasourceLoader {
 }
 
 fn get_builtin_datasource_providers() -> Vec<Box<dyn DatasourceProvider>> {
-    #[allow(unused_mut)]
-    let mut providers: Vec<Box<dyn DatasourceProvider>> = vec![
+    vec![
         Box::new(MySqlDatasourceProvider::new()),
         Box::new(PostgresDatasourceProvider::new()),
         Box::new(SqliteDatasourceProvider::new()),
         Box::new(MsSqlDatasourceProvider::new()),
-    ];
-
-    #[cfg(feature = "mongodb")]
-    providers.push(Box::new(MongoDbDatasourceProvider::new()));
-
-    providers
+        Box::new(MongoDbDatasourceProvider::new()),
+    ]
 }
 
 fn preview_features_guardrail(args: &mut Arguments) -> Result<(), DatamodelError> {
