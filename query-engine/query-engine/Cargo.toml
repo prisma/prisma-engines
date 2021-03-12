@@ -72,7 +72,6 @@ features = [
   "postgresql",
   "mysql",
   "mssql",
-  "tracing-log",
   "bigdecimal",
 ]
 git = "https://github.com/prisma/quaint"

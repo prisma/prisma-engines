@@ -3047,7 +3047,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.13"
-source = "git+https://github.com/prisma/quaint#da006120bb411d079a171ac2fb1f38f81e1b8b34"
+source = "git+https://github.com/prisma/quaint#fdb343ff59dfeababee0bb2db4703bf199f4b226"
 dependencies = [
  "async-trait",
  "base64 0.12.3",
@@ -3061,7 +3061,6 @@ dependencies = [
  "futures 0.3.13",
  "hex",
  "libsqlite3-sys",
- "log",
  "lru-cache",
  "metrics",
  "mobc",
@@ -3693,7 +3692,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e0bccbcf40c8938196944a3da0e133e031a33f4d6b72db3bda3cc556e361905d"
 dependencies = [
  "lazy_static",
- "parking_lot 0.11.1",
+ "parking_lot 0.10.2",
  "serial_test_derive",
 ]
 
