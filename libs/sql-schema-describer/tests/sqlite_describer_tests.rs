@@ -26,7 +26,7 @@ async fn views_can_be_described() {
     let expected_sql = "CREATE VIEW ab AS SELECT a_id FROM a UNION ALL SELECT b_id FROM b";
 
     assert_eq!("ab", &view.name);
-    assert_eq!(expected_sql, &view.definition);
+    assert_eq!(expected_sql, &view.definition.unwrap());
 }
 
 #[tokio::test]
