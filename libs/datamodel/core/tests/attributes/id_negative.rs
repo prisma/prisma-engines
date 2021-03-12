@@ -111,3 +111,24 @@ fn must_error_when_multi_field_is_referring_fields_that_are_not_required() {
         Span::new(75, 86),
     ));
 }
+
+#[test]
+fn stringified_field_names_in_id_return_nice_error() {
+    let dm = r#"
+        model User {
+            firstName String
+            lastName  String
+
+            @@id(["firstName", "lastName"])
+        }
+    "#;
+
+    let err = parse_error(dm);
+
+    err.assert_is(DatamodelError::TypeMismatchError {
+        expected_type: "constant literal".into(),
+        received_type: "string".into(),
+        raw: "firstName".into(),
+        span: Span::new(99, 110),
+    });
+}
