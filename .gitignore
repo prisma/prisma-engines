@@ -40,3 +40,6 @@ buildkite-script-*
 
 # VSCode specific
 .vscode/
+
+# Nix specific
+.direnv/
