@@ -215,7 +215,7 @@ impl Model {
         // first candidate: the singular id field
         {
             if let Some(x) = self.singular_id_fields().next() {
-                if !in_eligible(x) {
+                if !in_eligible(x) && (x.is_required() || allow_optional) {
                     result.push(UniqueCriteria::new(vec![x]))
                 }
             }
@@ -229,7 +229,11 @@ impl Model {
                 .map(|f| self.find_scalar_field(&f).unwrap())
                 .collect();
 
-            if !id_fields.is_empty() && !id_fields.iter().any(|f| in_eligible(f)) {
+            if !id_fields.is_empty()
+                && !id_fields
+                    .iter()
+                    .any(|f| in_eligible(f) || (f.is_optional() && !allow_optional))
+            {
                 result.push(UniqueCriteria::new(id_fields));
             }
         }
