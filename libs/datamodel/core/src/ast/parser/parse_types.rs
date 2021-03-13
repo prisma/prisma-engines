@@ -19,7 +19,7 @@ pub fn parse_type_alias(token: &Token) -> Field {
             Rule::non_empty_identifier => name = Some(current.to_id()),
             Rule::base_type => base_type = Some((parse_base_type(&current), Span::from_pest(current.as_span()))),
             Rule::attribute => attributes.push(parse_attribute(&current)),
-            Rule::comment_block => comment = Some(parse_comment_block(&current)),
+            Rule::comment_block => comment = parse_comment_block(&current),
             _ => parsing_catch_all(&current, "custom type"),
         }
     }

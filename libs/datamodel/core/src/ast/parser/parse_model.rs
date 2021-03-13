@@ -27,7 +27,7 @@ pub fn parse_model(token: &Token) -> Result<Model, Diagnostics> {
                 Ok(field) => fields.push(field),
                 Err(err) => errors.push_error(err),
             },
-            Rule::comment_block => comment = Some(parse_comment_block(&current)),
+            Rule::comment_block => comment = parse_comment_block(&current),
             Rule::BLOCK_LEVEL_CATCH_ALL => errors.push_error(DatamodelError::new_validation_error(
                 "This line is not a valid field or attribute definition.",
                 Span::from_pest(current.as_span()),
