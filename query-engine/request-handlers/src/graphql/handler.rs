@@ -39,7 +39,7 @@ impl<'a> GraphQlHandler<'a> {
             Ok(Err(err)) => err.into(),
             Err(err) => {
                 // panicked
-                let error = Error::from_panic_payload(&err);
+                let error = Error::from_panic_payload(err);
                 error.into()
             }
         };
@@ -71,7 +71,7 @@ impl<'a> GraphQlHandler<'a> {
             Ok(Err(err)) => PrismaResponse::Multi(err.into()),
             Err(err) => {
                 // panicked
-                let error = Error::from_panic_payload(&err);
+                let error = Error::from_panic_payload(err);
                 let resp: GQLBatchResponse = error.into();
 
                 PrismaResponse::Multi(resp)
@@ -140,7 +140,7 @@ impl<'a> GraphQlHandler<'a> {
 
             // panicked
             Err(err) => {
-                let error = Error::from_panic_payload(&err);
+                let error = Error::from_panic_payload(err);
                 PrismaResponse::Multi(error.into())
             }
         }
