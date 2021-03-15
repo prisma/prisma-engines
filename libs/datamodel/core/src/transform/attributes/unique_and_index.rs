@@ -146,8 +146,8 @@ trait IndexAttributeBase<T>: AttributeValidator<T> {
             .default_arg("fields")?
             .as_array()
             .iter()
-            .map(|f| f.as_constant_literal().unwrap())
-            .collect();
+            .map(|f| f.as_constant_literal())
+            .collect::<Result<Vec<_>, _>>()?;
         index_def.fields = fields;
 
         let duplicated_fields = find_duplicates(&index_def.fields);
