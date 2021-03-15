@@ -23,7 +23,7 @@ pub fn parse_enum(token: &Token) -> Result<Enum, Diagnostics> {
                 Ok(enum_value) => values.push(enum_value),
                 Err(err) => errors.push_error(err),
             },
-            Rule::comment_block => comment = Some(parse_comment_block(&current)),
+            Rule::comment_block => comment = parse_comment_block(&current),
             Rule::BLOCK_LEVEL_CATCH_ALL => errors.push_error(DatamodelError::new_validation_error(
                 "This line is not a enum value definition.",
                 Span::from_pest(current.as_span()),

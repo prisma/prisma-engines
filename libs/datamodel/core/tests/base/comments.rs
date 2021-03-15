@@ -160,3 +160,16 @@ fn comments_in_a_datasource_must_work() {
     // must not crash
     let _ = parse(dml);
 }
+
+#[test]
+fn two_slash_comments_should_not_lead_to_empty_comments() {
+    let dml = r#"
+    // two slash comment
+    model User2 {
+        id        String    @id @default(uuid())
+    }"#;
+
+    let schema = parse(dml);
+    let user_model = schema.assert_has_model("User2");
+    assert_eq!(user_model.documentation, None);
+}

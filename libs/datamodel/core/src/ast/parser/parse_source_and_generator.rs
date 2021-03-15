@@ -17,7 +17,7 @@ pub fn parse_source(token: &Token) -> Result<SourceConfig, Diagnostics> {
         match current.as_rule() {
             Rule::non_empty_identifier => name = Some(current.to_id()),
             Rule::key_value => properties.push(parse_key_value(&current)),
-            Rule::comment_block => comment = Some(parse_comment_block(&current)),
+            Rule::comment_block => comment = parse_comment_block(&current),
             Rule::BLOCK_LEVEL_CATCH_ALL => errors.push_error(DatamodelError::new_validation_error(
                 "This line is not a valid definition within a datasource.",
                 Span::from_pest(current.as_span()),
