@@ -16,16 +16,8 @@ pub(crate) fn initialize_model_object_type_cache(ctx: &mut BuilderContext) {
         .to_owned()
         .into_iter()
         .for_each(|model| {
-            let ident = Identifier::new(model.name.clone(), MODEL_NAMESPACE);
-            let ident_with_aggr = Identifier::new(format!("{}WithAggregations", model.name.clone()), PRISMA_NAMESPACE);
+            let ident = Identifier::new(model.name.clone(), MODEL_NAMESPACE);            
             ctx.cache_output_type(ident.clone(), Arc::new(ObjectType::new(ident, Some(model.clone()))));
-
-            if feature_flags::get().selectRelationCount {
-                ctx.cache_output_type(
-                    ident_with_aggr.clone(),
-                    Arc::new(ObjectType::new(ident_with_aggr, Some(model))),
-                );
-            }
         });
 
     // Compute fields on all cached object types.
@@ -35,21 +27,14 @@ pub(crate) fn initialize_model_object_type_cache(ctx: &mut BuilderContext) {
         .into_iter()
         .for_each(|model| {
             let obj: ObjectTypeWeakRef = output_objects::map_model_object_type(ctx, &model);
-            let fields = compute_model_object_type_fields(ctx, &model);
-
-            obj.into_arc().set_fields(fields);
+            let mut fields = compute_model_object_type_fields(ctx, &model);
 
             if feature_flags::get().selectRelationCount {
-                let obj_with_aggr: ObjectTypeWeakRef =
-                    output_objects::map_model_object_type_with_aggregations(ctx, &model);
-
-                let mut fields_with_aggr = compute_model_object_type_fields(ctx, &model);
-
                 // Only include to-many fields
                 let relation_fields = model.fields().relation().into_iter().filter(|f| f.is_list).collect();
 
                 append_opt(
-                    &mut fields_with_aggr,
+                    &mut fields,
                     aggregation_relation_field(
                         ctx,
                         fields::UNDERSCORE_COUNT,
@@ -59,9 +44,9 @@ pub(crate) fn initialize_model_object_type_cache(ctx: &mut BuilderContext) {
                         identity,
                     ),
                 );
-
-                obj_with_aggr.into_arc().set_fields(fields_with_aggr);
             }
+
+            obj.into_arc().set_fields(fields);
         });
 }
 
@@ -80,14 +65,6 @@ fn compute_model_object_type_fields(ctx: &mut BuilderContext, model: &ModelRef) 
 /// Relies on the output type cache being initalized.
 pub(crate) fn map_model_object_type(ctx: &mut BuilderContext, model: &ModelRef) -> ObjectTypeWeakRef {
     let ident = Identifier::new(model.name.clone(), MODEL_NAMESPACE);
-    ctx.get_output_type(&ident)
-        .expect("Invariant violation: Initialized output object type for each model.")
-}
-
-/// Returns an output object type with nested aggregations for the given model.
-/// Relies on the output type cache being initalized.
-pub(crate) fn map_model_object_type_with_aggregations(ctx: &mut BuilderContext, model: &ModelRef) -> ObjectTypeWeakRef {
-    let ident = Identifier::new(format!("{}WithAggregations", model.name.clone()), PRISMA_NAMESPACE);
     ctx.get_output_type(&ident)
         .expect("Invariant violation: Initialized output object type for each model.")
 }

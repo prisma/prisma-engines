@@ -68,12 +68,7 @@ fn find_first_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
 fn all_items_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
     let args = arguments::many_records_arguments(ctx, &model, true);
     let field_name = ctx.pluralize_internal(camel_case(pluralize(&model.name)), format!("findMany{}", model.name));
-
-    let object_type = if feature_flags::get().selectRelationCount {
-        output_objects::map_model_object_type_with_aggregations(ctx, &model)
-    } else {
-        output_objects::map_model_object_type(ctx, &model)
-    };
+    let object_type = output_objects::map_model_object_type(ctx, &model);
 
     field(
         field_name,
