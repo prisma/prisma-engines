@@ -318,6 +318,7 @@ fn must_succeed_if_env_var_is_missing_but_override_was_provided() {
 
     data_source.assert_name("ds");
     data_source.assert_url(StringFromEnvVar {
+        name: "url",
         from_env_var: None,
         value: url.to_string(),
     });
@@ -341,6 +342,7 @@ fn must_succeed_if_env_var_exists_and_override_was_provided() {
 
     data_source.assert_name("ds");
     data_source.assert_url(StringFromEnvVar {
+        name: "url",
         from_env_var: None,
         value: url.to_string(),
     });
@@ -366,6 +368,7 @@ fn must_succeed_with_overrides() {
 
     data_source.assert_name("ds");
     data_source.assert_url(StringFromEnvVar {
+        name: "url",
         from_env_var: None,
         value: url.to_string(),
     });
