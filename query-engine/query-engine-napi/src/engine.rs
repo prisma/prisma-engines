@@ -94,6 +94,8 @@ where
 impl QueryEngine {
     /// Parse a validated datamodel and configuration to allow connecting later on.
     pub fn new(opts: ConstructorOptions, log_callback: ThreadsafeFunction<String>) -> crate::Result<Self> {
+        set_panic_hook();
+
         let ConstructorOptions {
             datamodel,
             log_level,
@@ -280,4 +282,34 @@ impl QueryEngine {
             }),
         }
     }
+}
+
+pub fn set_panic_hook() {
+    let original_hook = std::panic::take_hook();
+
+    std::panic::set_hook(Box::new(move |info| {
+        let payload = info
+            .payload()
+            .downcast_ref::<String>()
+            .map(Clone::clone)
+            .unwrap_or_else(|| info.payload().downcast_ref::<&str>().unwrap().to_string());
+
+        match info.location() {
+            Some(location) => {
+                tracing::event!(
+                    tracing::Level::ERROR,
+                    message = "PANIC",
+                    reason = payload.as_str(),
+                    file = location.file(),
+                    line = location.line(),
+                    column = location.column(),
+                );
+            }
+            None => {
+                tracing::event!(tracing::Level::ERROR, message = "PANIC", reason = payload.as_str());
+            }
+        }
+
+        original_hook(info)
+    }));
 }

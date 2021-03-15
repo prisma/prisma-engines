@@ -159,7 +159,7 @@ async fn handle_debug_headers(req: &Request<State>) -> tide::Result<Option<impl 
         info!("Query engine debug fatal error, shutting down.");
         std::process::exit(1)
     } else if req.header(DEBUG_NON_FATAL_HEADER).is_some() {
-        let err = user_facing_errors::Error::from_panic_payload(&String::from("Debug panic"));
+        let err = user_facing_errors::Error::from_panic_payload(Box::new("Debug panic"));
         let mut res = Response::new(200);
         res.set_body(Body::from_json(&err)?);
         Ok(Some(res))
