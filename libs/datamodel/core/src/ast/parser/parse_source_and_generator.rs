@@ -78,6 +78,42 @@ pub fn parse_generator(token: &Token) -> Result<GeneratorConfig, Diagnostics> {
     }
 }
 
+pub fn parse_encryptor(token: &Token) -> Result<EncryptorConfig, Diagnostics> {
+    let mut errors = Diagnostics::new();
+    let mut name: Option<Identifier> = None;
+    let mut properties: Vec<Argument> = vec![];
+    let mut comments: Vec<String> = Vec::new();
+
+    for current in token.relevant_children() {
+        match current.as_rule() {
+            Rule::non_empty_identifier => name = Some(current.to_id()),
+            Rule::key_value => properties.push(parse_key_value(&current)),
+            Rule::doc_comment => comments.push(parse_doc_comment(&current)),
+            Rule::doc_comment_and_new_line => comments.push(parse_doc_comment(&current)),
+            Rule::BLOCK_LEVEL_CATCH_ALL => errors.push_error(DatamodelError::new_validation_error(
+                "This line is not a valid definition within a encryptor.",
+                Span::from_pest(current.as_span()),
+            )),
+            _ => parsing_catch_all(&current, "encryptor"),
+        }
+    }
+
+    errors.to_result()?;
+
+    match name {
+        Some(name) => Ok(EncryptorConfig {
+            name,
+            properties,
+            documentation: doc_comments_to_string(&comments),
+            span: Span::from_pest(token.as_span()),
+        }),
+        _ => panic!(
+            "Encountered impossible generator declaration during parsing, name is missing: {:?}",
+            token.as_str()
+        ),
+    }
+}
+
 fn parse_key_value(token: &Token) -> Argument {
     let mut name: Option<Identifier> = None;
     let mut value: Option<Expression> = None;

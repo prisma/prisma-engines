@@ -4,7 +4,7 @@ use super::{
     helpers::{parsing_catch_all, TokenExtensions},
     parse_enum::parse_enum,
     parse_model::parse_model,
-    parse_source_and_generator::{parse_generator, parse_source},
+    parse_source_and_generator::{parse_generator, parse_source, parse_encryptor},
     parse_types::parse_type_alias,
     PrismaDatamodelParser, Rule,
 };
@@ -36,6 +36,10 @@ pub fn parse_schema(datamodel_string: &str) -> Result<SchemaAst, Diagnostics> {
                     },
                     Rule::generator_block => match parse_generator(&current) {
                         Ok(generator) => top_level_definitions.push(Top::Generator(generator)),
+                        Err(mut err) => errors.append(&mut err),
+                    },
+                    Rule::encryptor_block => match parse_encryptor(&current) {
+                        Ok(encryptor) => top_level_definitions.push(Top::Encryptor(encryptor)),
                         Err(mut err) => errors.append(&mut err),
                     },
                     Rule::type_alias => top_level_definitions.push(Top::Type(parse_type_alias(&current))),
@@ -90,6 +94,7 @@ fn rule_to_string(rule: Rule) -> &'static str {
         Rule::enum_declaration => "enum declaration",
         Rule::source_block => "source definition",
         Rule::generator_block => "generator definition",
+        Rule::encryptor_block => "encryptor definition",
         Rule::arbitrary_block => "arbitrary block",
         Rule::enum_value_declaration => "enum field declaration",
         Rule::block_level_attribute => "block level attribute",
@@ -135,6 +140,7 @@ fn rule_to_string(rule: Rule) -> &'static str {
         Rule::TYPE_KEYWORD => "\"type\" keyword",
         Rule::ENUM_KEYWORD => "\"enum\" keyword",
         Rule::GENERATOR_KEYWORD => "\"generator\" keyword",
+        Rule::ENCRYPTOR_KEYWORD => "\"generator\" keyword",
         Rule::DATASOURCE_KEYWORD => "\"datasource\" keyword",
         Rule::INTERPOLATION_START => "string interpolation start",
         Rule::INTERPOLATION_END => "string interpolation end",

@@ -7,6 +7,7 @@ pub enum Top {
     Model(Model),
     Source(SourceConfig),
     Generator(GeneratorConfig),
+    Encryptor(EncryptorConfig),
     Type(Field),
 }
 
@@ -17,6 +18,7 @@ impl WithIdentifier for Top {
             Top::Model(x) => x.identifier(),
             Top::Source(x) => x.identifier(),
             Top::Generator(x) => x.identifier(),
+            Top::Encryptor(x) => x.identifier(),
             Top::Type(x) => x.identifier(),
         }
     }
@@ -29,6 +31,7 @@ impl WithSpan for Top {
             Top::Model(x) => x.span(),
             Top::Source(x) => x.span(),
             Top::Generator(x) => x.span(),
+            Top::Encryptor(x) => x.span(),
             Top::Type(x) => x.span(),
         }
     }
@@ -41,6 +44,7 @@ impl Top {
             Top::Model(_) => "model",
             Top::Source(_) => "source",
             Top::Generator(_) => "generator",
+            Top::Encryptor(_) => "encryptor",
             Top::Type(_) => "type",
         }
     }
@@ -51,6 +55,7 @@ impl Top {
             Top::Model(x) => &x.name.name,
             Top::Source(x) => &x.name.name,
             Top::Generator(x) => &x.name.name,
+            Top::Encryptor(x) => &x.name.name,
             Top::Type(x) => &x.name.name,
         }
     }

@@ -1,9 +1,10 @@
-use super::{Datasource, Generator};
+use super::{Datasource, Generator, Encryptor};
 use crate::diagnostics::{DatamodelError, Diagnostics};
 use crate::preview_features::PreviewFeatures;
 
 pub struct Configuration {
     pub generators: Vec<Generator>,
+    pub encryptors: Vec<Encryptor>,
     pub datasources: Vec<Datasource>,
 }
 

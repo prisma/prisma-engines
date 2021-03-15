@@ -1,6 +1,6 @@
 use crate::ast::reformat::MissingField;
 use crate::diagnostics::DatamodelWarning;
-use crate::{Configuration, Datamodel, Datasource, Generator};
+use crate::{Configuration, Datamodel, Datasource, Generator, Encryptor};
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct Validated<T> {
@@ -14,4 +14,5 @@ pub type ValidatedDatasource = Validated<Datasource>;
 pub type ValidatedDatasources = Validated<Vec<Datasource>>;
 pub type ValidatedGenerator = Validated<Generator>;
 pub type ValidatedGenerators = Validated<Vec<Generator>>;
+pub type ValidatedEncryptor = Validated<Vec<Encryptor>>;
 pub type ValidatedMissingFields = Validated<Vec<MissingField>>;
