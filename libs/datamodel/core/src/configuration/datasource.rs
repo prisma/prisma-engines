@@ -1,5 +1,5 @@
+use crate::StringFromEnvVar;
 use datamodel_connector::{Connector, ConnectorCapabilities};
-use serde::Serialize;
 
 /// a `datasource` from the prisma schema.
 pub struct Datasource {
@@ -27,6 +27,7 @@ impl std::fmt::Debug for Datasource {
             .field("url", &self.url)
             .field("documentation", &self.documentation)
             .field("active_connector", &&"...")
+            .field("shadow_database_url", &self.shadow_database_url)
             .finish()
     }
 }
@@ -40,12 +41,4 @@ impl Datasource {
         let capabilities = self.active_connector.capabilities().clone();
         ConnectorCapabilities::new(capabilities)
     }
-}
-
-#[serde(rename_all = "camelCase")]
-#[derive(Clone, Debug, Serialize, PartialEq)]
-pub struct StringFromEnvVar {
-    /// contains the name of env var if the value was read from one
-    pub from_env_var: Option<String>,
-    pub value: String,
 }
