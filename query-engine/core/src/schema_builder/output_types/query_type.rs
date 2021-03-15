@@ -69,12 +69,16 @@ fn all_items_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
     let args = arguments::many_records_arguments(ctx, &model, true);
     let field_name = ctx.pluralize_internal(camel_case(pluralize(&model.name)), format!("findMany{}", model.name));
 
+    let object_type = if feature_flags::get().selectRelationCount {
+        output_objects::map_model_object_type_with_aggregations(ctx, &model)
+    } else {
+        output_objects::map_model_object_type(ctx, &model)
+    };
+
     field(
         field_name,
         args,
-        OutputType::list(OutputType::object(
-            output_objects::map_model_object_type_with_aggregations(ctx, &model),
-        )),
+        OutputType::list(OutputType::object(object_type)),
         Some(QueryInfo {
             model: Some(Arc::clone(&model)),
             tag: QueryTag::FindMany,

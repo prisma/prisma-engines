@@ -19,10 +19,13 @@ pub(crate) fn initialize_model_object_type_cache(ctx: &mut BuilderContext) {
             let ident = Identifier::new(model.name.clone(), MODEL_NAMESPACE);
             let ident_with_aggr = Identifier::new(format!("{}WithAggregations", model.name.clone()), PRISMA_NAMESPACE);
             ctx.cache_output_type(ident.clone(), Arc::new(ObjectType::new(ident, Some(model.clone()))));
-            ctx.cache_output_type(
-                ident_with_aggr.clone(),
-                Arc::new(ObjectType::new(ident_with_aggr, Some(model))),
-            );
+
+            if feature_flags::get().selectRelationCount {
+                ctx.cache_output_type(
+                    ident_with_aggr.clone(),
+                    Arc::new(ObjectType::new(ident_with_aggr, Some(model))),
+                );
+            }
         });
 
     // Compute fields on all cached object types.
@@ -36,21 +39,29 @@ pub(crate) fn initialize_model_object_type_cache(ctx: &mut BuilderContext) {
 
             obj.into_arc().set_fields(fields);
 
-            let obj_with_aggr: ObjectTypeWeakRef = output_objects::map_model_object_type_with_aggregations(ctx, &model);
-            let mut fields_with_aggr = compute_model_object_type_fields(ctx, &model);
+            if feature_flags::get().selectRelationCount {
+                let obj_with_aggr: ObjectTypeWeakRef =
+                    output_objects::map_model_object_type_with_aggregations(ctx, &model);
 
-            append_opt(
-                &mut fields_with_aggr,
-                aggregation_relation_field(
-                    ctx,
-                    fields::UNDERSCORE_COUNT,
-                    &model,
-                    model.fields().relation(),
-                    |_, _| OutputType::int(),
-                    identity,
-                ),
-            );
-            obj_with_aggr.into_arc().set_fields(fields_with_aggr);
+                let mut fields_with_aggr = compute_model_object_type_fields(ctx, &model);
+
+                // Only include to-many fields
+                let relation_fields = model.fields().relation().into_iter().filter(|f| f.is_list).collect();
+
+                append_opt(
+                    &mut fields_with_aggr,
+                    aggregation_relation_field(
+                        ctx,
+                        fields::UNDERSCORE_COUNT,
+                        &model,
+                        relation_fields,
+                        |_, _| OutputType::int(),
+                        identity,
+                    ),
+                );
+
+                obj_with_aggr.into_arc().set_fields(fields_with_aggr);
+            }
         });
 }
 
