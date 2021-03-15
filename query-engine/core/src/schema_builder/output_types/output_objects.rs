@@ -16,7 +16,7 @@ pub(crate) fn initialize_model_object_type_cache(ctx: &mut BuilderContext) {
         .to_owned()
         .into_iter()
         .for_each(|model| {
-            let ident = Identifier::new(model.name.clone(), MODEL_NAMESPACE);            
+            let ident = Identifier::new(model.name.clone(), MODEL_NAMESPACE);
             ctx.cache_output_type(ident.clone(), Arc::new(ObjectType::new(ident, Some(model.clone()))));
         });
 
