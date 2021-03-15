@@ -25,6 +25,6 @@ url = "2.1.1"
 tokio = { version = "1.0", default-features = false, features = ["macros"] }
 
 [features]
-default = ["sql", "mongodb"]
+default = ["sql"]
 mongodb = ["mongodb-migration-connector"]
 sql = ["sql-migration-connector"]

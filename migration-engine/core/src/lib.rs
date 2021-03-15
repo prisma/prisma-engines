@@ -12,16 +12,18 @@ pub use commands::SchemaPushInput;
 pub use core_error::{CoreError, CoreResult};
 
 use datamodel::{
-    common::provider_names::{
-        MONGODB_SOURCE_NAME, MSSQL_SOURCE_NAME, MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME,
-    },
+    common::provider_names::{MSSQL_SOURCE_NAME, MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME},
     dml::Datamodel,
     Configuration,
 };
 use migration_connector::{features, ConnectorError};
-use mongodb_migration_connector::MongoDbMigrationConnector;
 use sql_migration_connector::SqlMigrationConnector;
 use user_facing_errors::{common::InvalidDatabaseString, migration_engine::DeprecatedProviderArray, KnownError};
+
+#[cfg(feature = "mongodb")]
+use datamodel::common::provider_names::MONGODB_SOURCE_NAME;
+#[cfg(feature = "mongodb")]
+use mongodb_migration_connector::MongoDbMigrationConnector;
 
 /// Top-level constructor for the migration engine API.
 pub async fn migration_api(datamodel: &str) -> CoreResult<Box<dyn api::GenericApi>> {
@@ -171,6 +173,7 @@ pub async fn qe_setup(prisma_schema: &str) -> CoreResult<()> {
             SqlMigrationConnector::qe_setup(&source.url().value).await?;
             Box::new(SqlMigrationConnector::new(&source.url().value, features, None).await?)
         }
+        #[cfg(feature = "mongodb")]
         provider if provider == MONGODB_SOURCE_NAME => {
             MongoDbMigrationConnector::qe_setup(&source.url().value).await?;
             let connector = MongoDbMigrationConnector::new(&source.url().value, features).await?;
