@@ -1,5 +1,8 @@
-use crate::diagnostics::{DatamodelWarning, Diagnostics};
 use crate::{ast, diagnostics::DatamodelError, dml};
+use crate::{
+    common::preview_features::MONGODB,
+    diagnostics::{DatamodelWarning, Diagnostics},
+};
 
 /// State error message. Seeing this error means something went really wrong internally. It's the datamodel equivalent of a bluescreen.
 pub (crate) const STATE_ERROR: &str = "Failed lookup of model or field during internal processing. This means that the internal representation was mutated incorrectly.";
@@ -44,7 +47,8 @@ pub fn validate_preview_features(
             result.push_warning(DatamodelWarning::new_deprecated_preview_feature_warning(
                 deprecated, span,
             ))
-        } else {
+        } else if unknown_preview_feature != MONGODB {
+            // Temporary, used to hide MongoDB but not fail validation so we can use it.
             result.push_error(DatamodelError::new_preview_feature_not_known_error(
                 unknown_preview_feature,
                 supported_preview_features,
@@ -52,5 +56,6 @@ pub fn validate_preview_features(
             ));
         }
     }
+
     result
 }
