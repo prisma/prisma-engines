@@ -31,7 +31,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        segment: [migrations, native_types, "--skip 'migrations' --skip 'native_types'"]
+        segment: [migrations, native_types, "-- --skip 'migrations' --skip 'native_types'"]
         
     runs-on: ubuntu-latest
     steps:
