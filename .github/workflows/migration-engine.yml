@@ -26,12 +26,12 @@ jobs:
         working-directory: migration-engine/migration-engine-tests
 
   test:
-    name: "Test Migration Engine - ${{ matrix.segment }}"
+    name: "Test Migration Engine - ${{ matrix.database }}"
     
     strategy:
       fail-fast: false
       matrix:
-        segment: [migrations, native_types, "--skip 'migrations' --skip 'native_types'"]
+        database: [mssql_2017, mysql, mysql_5_6, mysql_8, mysql_mariadb, postgres, mssql_2019, postgres12, postgres11, postgres9, sqlite, postgres13, mssql_2017]
         
     runs-on: ubuntu-latest
     steps:
@@ -53,5 +53,5 @@ jobs:
             target
           key: migration-engine-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
-      - run: cargo test ${{ matrix.segment }}
+      - run: cargo test ${{ matrix.database }}
         working-directory: migration-engine/migration-engine-tests
