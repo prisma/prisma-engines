@@ -1,6 +1,6 @@
 extern crate proc_macro;
 
-use std::str::FromStr;
+use std::{convert::TryFrom, str::FromStr};
 
 use darling::FromMeta;
 use proc_macro::TokenStream;
@@ -23,19 +23,31 @@ fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream {
         Err(err) => return err.write_errors().into(),
     };
 
-    let test_function = parse_macro_input!(input as ItemFn);
-    let ident = test_function.sig.ident.clone();
+    if let Err(err) = args.validate() {
+        return err.write_errors().into();
+    };
 
     let handler = args.schema.unwrap().handler_path;
+    // connectors
 
-    let runner_ident = Ident::new(&format!("run_{}", ident.to_string()), Span::call_site());
+    // The shell function retains the name of the original test definition.
+    let mut test_function = parse_macro_input!(input as ItemFn);
+    let test_fn_ident = test_function.sig.ident.clone();
+
+    // Rename original test function.
+    let runner_fn_ident = Ident::new(&format!("run_{}", test_fn_ident.to_string()), Span::call_site());
+    test_function.sig.ident = runner_fn_ident.clone();
+
     let test = quote! {
         #[test]
-        fn #runner_ident() {
+        fn #test_fn_ident() {
             let runner = Runner::load();
             let schema = #handler();
 
-            #ident(&runner)
+            // connectors_to_test
+            //
+
+            #runner_fn_ident(&runner)
         }
 
         #test_function
@@ -54,6 +66,22 @@ struct ConnectorTestArgs {
 
     #[darling(default)]
     exclude: ExcludeConnectorTags,
+}
+
+impl ConnectorTestArgs {
+    pub fn validate(&self) -> Result<(), darling::Error> {
+        if !self.only.is_empty() && !self.exclude.is_empty() {
+            return Err(darling::Error::custom(
+                "Only one of `only` and `exclude` can be speficified for a connector test.",
+            ));
+        }
+
+        Ok(())
+    }
+
+    pub fn connectors_to_test(&self) -> Vec<ConnectorTag> {
+        todo!()
+    }
 }
 
 #[derive(Debug)]
@@ -89,127 +117,104 @@ struct OnlyConnectorTags {
     tags: Vec<ConnectorTag>,
 }
 
+impl OnlyConnectorTags {
+    pub fn is_empty(&self) -> bool {
+        self.tags.is_empty()
+    }
+}
+
 #[derive(Debug, Default)]
 struct ExcludeConnectorTags {
     tags: Vec<ConnectorTag>,
 }
 
-impl darling::FromMeta for OnlyConnectorTags {
-    fn from_list(items: &[syn::NestedMeta]) -> Result<Self, darling::Error> {
-        let mut tags: Vec<ConnectorTag> = vec![];
-
-        for item in items {
-            match item {
-                // syn::NestedMeta::Lit(syn::Lit::Str(s)) => {
-                //     todo!("1 {:?}", s)
-                // }
-                // syn::NestedMeta::Lit(other) => {
-                //     todo!("2 {:?}", other)
-                // }
-                syn::NestedMeta::Meta(meta) => {
-                    match meta {
-                        // A single variant without version, like `Postgres`.
-                        Meta::Path(p) => {
-                            let tag = parse_tag_from_path(p)?;
-                            tags.push(tag);
-                        }
-                        Meta::List(l) => {
-                            let tag = parse_tag_from_path(&l.path)?;
-                            tags.push(tag);
-
-                            let versions = l.nested.iter().filter_map(|meta| match meta {
-                                syn::NestedMeta::Lit(literal) => Some(literal),
-                                syn::NestedMeta::Meta(_) => None,
-                            });
-
-                            for version in versions {
-                                let version_str = match version {
-                                    syn::Lit::Str(s) => s.value(),
-                                    syn::Lit::Char(c) => c.value().to_string(),
-                                    syn::Lit::Int(i) => i.to_string(),
-                                    syn::Lit::Float(f) => f.to_string(),
-                                    x => {
-                                        return Err(darling::Error::unexpected_type(
-                                            "Versions can be string, char, int and float.",
-                                        )
-                                        .with_span(&x.span()))
-                                    }
-                                };
-
-                                let tag = tag.clone();
-                                tag.set_version(&version_str);
-                                // tags.push();
-                            }
-
-                            todo!("{:?}", items);
-                            // List(MetaList {
-                            //     path: Path {
-                            //         leading_colon: None,
-                            //         segments: [
-                            //             PathSegment {
-                            //                 ident: Ident {
-                            //                     ident: "Postgres",
-                            //                     span: #0 bytes(1849..1857)
-                            //                 },
-                            //                 arguments: None
-                            //             }
-                            //         ]
-                            //     },
-                            //     paren_token: Paren,
-                            //     nested: [Lit(Int(LitInt { token: 9 }))]
-                            // })
-                        }
-                        _ => unimplemented!(),
-                    }
-                }
-                x => {
-                    return Err(
-                        darling::Error::custom("Expected `only` to be a list of `ConnectorTag`.").with_span(&x.span()),
-                    )
-                }
-            }
-        }
-
-        Ok(OnlyConnectorTags { tags })
+impl ExcludeConnectorTags {
+    pub fn is_empty(&self) -> bool {
+        self.tags.is_empty()
     }
 }
 
-fn parse_tag_from_path(path: &Path) -> Result<ConnectorTag, darling::Error> {
-    if let Some(ident) = path.get_ident() {
-        let name = ident.to_string().to_lowercase();
-        let tag = ConnectorTag::from_str(&name).into_darling_error(&path.span())?;
-
-        Ok(tag)
-    } else {
-        Err(darling::Error::custom(
-            "Expected `only` to be a list of valid `ConnectorTag` variants.",
-        ))
+impl darling::FromMeta for OnlyConnectorTags {
+    fn from_list(items: &[syn::NestedMeta]) -> Result<Self, darling::Error> {
+        let tags = tags_from_list(items)?;
+        Ok(OnlyConnectorTags { tags })
     }
 }
 
 impl darling::FromMeta for ExcludeConnectorTags {
     fn from_list(items: &[syn::NestedMeta]) -> Result<Self, darling::Error> {
-        // let mut connectors: Vec<ConnectorTag> = vec![];
+        let tags = tags_from_list(items)?;
+        Ok(ExcludeConnectorTags { tags })
+    }
+}
 
-        // for item in items {
-        //     match item {
-        //         // syn::NestedMeta::Lit(syn::Lit::Str(s)) => {
-        //         //     todo!("1 {:?}", s)
-        //         // }
-        //         // syn::NestedMeta::Lit(other) => {
-        //         //     todo!("2 {:?}", other)
-        //         // }
-        //         syn::NestedMeta::Meta(meta) => {
-        //             todo!("3 {:?}", meta)
-        //         }
-        //         x => Err(darling::Error::unsupported_shape(
-        //             "Expected `schema` to be a function pointer to a schema handler function.",
-        //         )
-        //         .with_span(&x.span())),
-        //     }
-        // }
+fn tags_from_list(items: &[syn::NestedMeta]) -> Result<Vec<ConnectorTag>, darling::Error> {
+    let mut tags: Vec<ConnectorTag> = vec![];
 
-        todo!()
+    for item in items {
+        match item {
+            syn::NestedMeta::Meta(meta) => {
+                match meta {
+                    // A single variant without version, like `Postgres`.
+                    Meta::Path(p) => {
+                        let tag = tag_string_from_path(p)?;
+                        tags.push(ConnectorTag::try_from(tag.as_str()).into_darling_error(&p.span())?);
+                    }
+                    Meta::List(l) => {
+                        let tag = tag_string_from_path(&l.path)?;
+                        for meta in l.nested.iter() {
+                            match meta {
+                                syn::NestedMeta::Lit(literal) => {
+                                    let version_str = match literal {
+                                        syn::Lit::Str(s) => s.value(),
+                                        syn::Lit::Char(c) => c.value().to_string(),
+                                        syn::Lit::Int(i) => i.to_string(),
+                                        syn::Lit::Float(f) => f.to_string(),
+                                        x => {
+                                            return Err(darling::Error::unexpected_type(
+                                                "Versions can be string, char, int and float.",
+                                            )
+                                            .with_span(&x.span()))
+                                        }
+                                    };
+
+                                    tags.push(
+                                        ConnectorTag::try_from((tag.as_str(), Some(version_str.as_str())))
+                                            .into_darling_error(&l.span())?,
+                                    );
+                                }
+                                syn::NestedMeta::Meta(meta) => {
+                                    return Err(darling::Error::unexpected_type(
+                                        "Versions can only be literals (string, char, int and float).",
+                                    )
+                                    .with_span(&meta.span()));
+                                }
+                            }
+                        }
+                    }
+                    _ => unimplemented!(),
+                }
+            }
+            x => {
+                return Err(
+                    darling::Error::custom("Expected `only` to be a list of `ConnectorTag`.").with_span(&x.span()),
+                )
+            }
+        }
+    }
+
+    Ok(tags)
+}
+
+fn tag_string_from_path(path: &Path) -> Result<String, darling::Error> {
+    if let Some(ident) = path.get_ident() {
+        let name = ident.to_string();
+
+        Ok(name)
+    } else {
+        Err(darling::Error::custom(
+            "Expected `only` to be a list of idents (ConnectorTag variants), not paths.",
+        ))
     }
 }
 

@@ -6,11 +6,11 @@ use serde_json::Value;
 
 // todo
 pub struct QueryResult {
-    json: Value,
+    _json: Value,
 }
 
 impl QueryResult {
-    pub fn assert_failure(&self, err_code: usize, msg_contains: Option<String>) {
+    pub fn assert_failure(&self, _err_code: usize, _msg_contains: Option<String>) {
         todo!()
     }
 }
@@ -38,14 +38,14 @@ impl Runner {
         Self::Direct(DirectRunner {})
     }
 
-    pub fn query<T>(&self, gql: T) -> QueryResult
+    pub fn query<T>(&self, _gql: T) -> QueryResult
     where
         T: Into<String>,
     {
         todo!()
     }
 
-    pub fn batch<T>(&self, gql: T) -> QueryResult
+    pub fn batch<T>(&self, _gql: T) -> QueryResult
     where
         T: Into<String>,
     {
@@ -57,11 +57,11 @@ pub struct DirectRunner {}
 pub struct NApiRunner {}
 pub struct BinaryRunner {}
 
-/// Wip, just a collection of env vars we might want.
-struct EnvConfig {
-    /// MIGRATION_ENGINE_PATH
-    migration_engine_path: String,
+// /// Wip, just a collection of env vars we might want.
+// struct EnvConfig {
+//     /// MIGRATION_ENGINE_PATH
+//     migration_engine_path: String,
 
-    /// TEST_RUNNER
-    runner: String,
-}
+//     /// TEST_RUNNER
+//     runner: String,
+// }

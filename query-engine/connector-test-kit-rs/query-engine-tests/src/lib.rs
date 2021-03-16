@@ -53,7 +53,7 @@ mod some_spec {
     //     // If none of the two above are specified all connectors are run.
     // )
 
-    #[connector_test(schema(schema_handler), only(SqlServer, Postgres("test-4", 1), MySql, Wurst))]
+    #[connector_test(schema(schema_handler), only(SqlServer(2017)))] // , Postgres("test-4", 1), MySql, Wurst
     fn ideal_api_test(runner: &Runner) {
         let result = runner.query(
             "
