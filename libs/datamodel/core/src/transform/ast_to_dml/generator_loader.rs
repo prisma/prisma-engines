@@ -2,6 +2,7 @@ use super::super::helpers::*;
 use crate::ast::Span;
 use crate::common::preview_features::{DEPRECATED_GENERATOR_PREVIEW_FEATURES, GENERATOR_PREVIEW_FEATURES};
 use crate::transform::ast_to_dml::common::validate_preview_features;
+use crate::StringFromEnvVar;
 use crate::{ast, configuration::Generator, diagnostics::*};
 use std::collections::HashMap;
 
@@ -67,9 +68,22 @@ impl GeneratorLoader {
         let mut args = Arguments::new(&ast_generator.properties, ast_generator.span);
         let mut diagnostics = Diagnostics::new();
 
-        let provider = args.arg(PROVIDER_KEY)?.as_str()?;
+        let (from_env_var, value) = args.arg(PROVIDER_KEY)?.as_str_from_env()?;
+
+        let provider = StringFromEnvVar {
+            name: PROVIDER_KEY,
+            from_env_var,
+            value,
+        };
+
         let output = if let Ok(arg) = args.arg(OUTPUT_KEY) {
-            Some(arg.as_str()?)
+            let (from_env_var, value) = arg.as_str_from_env()?;
+
+            Some(StringFromEnvVar {
+                name: OUTPUT_KEY,
+                from_env_var,
+                value,
+            })
         } else {
             None
         };

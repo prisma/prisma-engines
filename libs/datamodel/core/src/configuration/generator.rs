@@ -1,4 +1,5 @@
 use crate::configuration::preview_features::PreviewFeatures;
+use crate::StringFromEnvVar;
 use serde::Serialize;
 use std::collections::HashMap;
 
@@ -6,8 +7,8 @@ use std::collections::HashMap;
 #[derive(Debug, Serialize, Clone)]
 pub struct Generator {
     pub name: String,
-    pub provider: String,
-    pub output: Option<String>,
+    pub provider: StringFromEnvVar,
+    pub output: Option<StringFromEnvVar>,
     #[serde(default = "Vec::new")]
     pub binary_targets: Vec<String>,
     #[serde(default = "Vec::new")]
