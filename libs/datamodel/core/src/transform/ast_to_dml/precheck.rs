@@ -50,7 +50,7 @@ impl Precheck {
                     generators_checker.check_if_duplicate_exists(top, error_fn);
                     Self::precheck_generator_config(&generator, &mut errors);
                 }
-                ast::Top::Encryptor(encryptor) => {}
+                ast::Top::Encryptor(_) => {}
             }
         }
 

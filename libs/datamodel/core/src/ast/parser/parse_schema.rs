@@ -4,7 +4,7 @@ use super::{
     helpers::{parsing_catch_all, TokenExtensions},
     parse_enum::parse_enum,
     parse_model::parse_model,
-    parse_source_and_generator::{parse_generator, parse_source, parse_encryptor},
+    parse_source_and_generator::{parse_encryptor, parse_generator, parse_source},
     parse_types::parse_type_alias,
     PrismaDatamodelParser, Rule,
 };

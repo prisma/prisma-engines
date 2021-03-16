@@ -1,4 +1,4 @@
-use super::{Datasource, Generator, Encryptor};
+use super::{Encryptor, Datasource, Generator};
 use crate::diagnostics::{DatamodelError, Diagnostics};
 use crate::preview_features::PreviewFeatures;
 
