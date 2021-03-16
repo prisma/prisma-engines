@@ -200,8 +200,6 @@ fn assert_mcf(schema: &str, expected_mcf: &str) {
     let config = parse_configuration(schema);
     let rendered = datamodel::json::mcf::generators_to_json(&config.generators);
 
-    print!("{}", &rendered);
-
     assert_eq_json(&rendered, expected_mcf);
 }
 
