@@ -903,7 +903,7 @@ dependencies = [
  "datamodel-connector",
  "dml",
  "indoc",
- "itertools",
+ "itertools 0.8.2",
  "mongodb-datamodel-connector",
  "native-types",
  "once_cell",
@@ -926,7 +926,7 @@ name = "datamodel-connector"
 version = "0.1.0"
 dependencies = [
  "dml",
- "itertools",
+ "itertools 0.8.2",
  "serde_json",
  "thiserror",
 ]
@@ -1820,6 +1820,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "itertools"
+version = "0.10.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "37d572918e350e82412fe766d24b15e6682fb2ed2bbe018280caa810397cb319"
+dependencies = [
+ "either",
+]
+
+[[package]]
 name = "itoa"
 version = "0.4.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2358,7 +2367,7 @@ dependencies = [
  "cuid",
  "datamodel",
  "futures 0.3.13",
- "itertools",
+ "itertools 0.8.2",
  "mongodb",
  "native-types",
  "prisma-models",
@@ -2997,7 +3006,7 @@ dependencies = [
  "chrono",
  "cuid",
  "datamodel",
- "itertools",
+ "itertools 0.8.2",
  "once_cell",
  "prisma-value",
  "quaint",
@@ -3129,7 +3138,7 @@ dependencies = [
  "async-trait",
  "chrono",
  "futures 0.3.13",
- "itertools",
+ "itertools 0.8.2",
  "once_cell",
  "prisma-models",
  "prisma-value",
@@ -3156,7 +3165,7 @@ dependencies = [
  "futures 0.3.13",
  "im",
  "indexmap",
- "itertools",
+ "itertools 0.8.2",
  "mongodb-query-connector",
  "once_cell",
  "petgraph",
@@ -3194,7 +3203,7 @@ dependencies = [
  "graphql-parser",
  "indexmap",
  "indoc",
- "itertools",
+ "itertools 0.8.2",
  "migration-connector",
  "migration-core",
  "mongodb-query-connector",
@@ -3266,6 +3275,7 @@ name = "query-test-macros"
 version = "0.1.0"
 dependencies = [
  "darling 0.12.2",
+ "itertools 0.10.0",
  "proc-macro2",
  "query-tests-setup",
  "quote",
@@ -3277,6 +3287,7 @@ name = "query-tests-setup"
 version = "0.1.0"
 dependencies = [
  "datamodel-connector",
+ "lazy_static",
  "mongodb-datamodel-connector",
  "serde_json",
  "sql-datamodel-connector",
@@ -3452,7 +3463,7 @@ dependencies = [
  "futures 0.3.13",
  "graphql-parser",
  "indexmap",
- "itertools",
+ "itertools 0.8.2",
  "prisma-models",
  "query-core",
  "serde",
@@ -3758,7 +3769,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e0bccbcf40c8938196944a3da0e133e031a33f4d6b72db3bda3cc556e361905d"
 dependencies = [
  "lazy_static",
- "parking_lot 0.10.2",
+ "parking_lot 0.11.1",
  "serial_test_derive",
 ]
 
@@ -3983,7 +3994,7 @@ dependencies = [
  "cuid",
  "datamodel",
  "futures 0.3.13",
- "itertools",
+ "itertools 0.8.2",
  "prisma-models",
  "prisma-value",
  "quaint",

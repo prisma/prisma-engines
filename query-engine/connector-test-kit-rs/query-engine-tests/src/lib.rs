@@ -1,5 +1,7 @@
 use query_test_macros::connector_test;
+use query_tests_setup::*;
 use serde_json::Value;
+use std::convert::TryFrom;
 
 pub type TestResult = anyhow::Result<()>;
 

@@ -1,13 +1,12 @@
 extern crate proc_macro;
 
-use std::{convert::TryFrom, str::FromStr};
-
 use darling::FromMeta;
+use itertools::Itertools;
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
-
-use query_tests_setup::{ConnectorTag, ConnectorTagInterface, ParseError};
+use query_tests_setup::{ConnectorTag, ConnectorTagInterface, TestError};
 use quote::quote;
+use std::convert::TryFrom;
 use syn::{parse_macro_input, spanned::Spanned, AttributeArgs, ItemFn, Meta, Path};
 
 #[proc_macro_attribute]
@@ -27,25 +26,35 @@ fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream {
         return err.write_errors().into();
     };
 
+    let connectors = args.connectors_to_test();
     let handler = args.schema.unwrap().handler_path;
-    // connectors
+
+    let connectors = connectors.into_iter().map(quote_connector).fold1(|aggr, next| {
+        quote! {
+            #aggr, #next
+        }
+    });
 
     // The shell function retains the name of the original test definition.
     let mut test_function = parse_macro_input!(input as ItemFn);
     let test_fn_ident = test_function.sig.ident.clone();
 
-    // Rename original test function.
+    // Rename original test function to run_<orig_name>.
     let runner_fn_ident = Ident::new(&format!("run_{}", test_fn_ident.to_string()), Span::call_site());
     test_function.sig.ident = runner_fn_ident.clone();
 
     let test = quote! {
         #[test]
         fn #test_fn_ident() {
-            let runner = Runner::load();
+            let config = &query_tests_setup::CONFIG;
             let schema = #handler();
+            let runner = Runner::try_from(config.runner()).unwrap();
 
-            // connectors_to_test
-            //
+            let connectors = vec![
+                #connectors
+            ];
+
+            println!("{:?}", connectors);
 
             #runner_fn_ident(&runner)
         }
@@ -79,8 +88,15 @@ impl ConnectorTestArgs {
         Ok(())
     }
 
+    /// Returns all the connectors that the test is valid for.
     pub fn connectors_to_test(&self) -> Vec<ConnectorTag> {
-        todo!()
+        if !self.only.is_empty() {
+            self.only.tags.clone()
+        } else if !self.exclude.is_empty() {
+            todo!()
+        } else {
+            todo!()
+        }
     }
 }
 
@@ -149,6 +165,10 @@ impl darling::FromMeta for ExcludeConnectorTags {
 }
 
 fn tags_from_list(items: &[syn::NestedMeta]) -> Result<Vec<ConnectorTag>, darling::Error> {
+    if items.is_empty() {
+        return Err(darling::Error::custom("At least one connector tag is required."));
+    }
+
     let mut tags: Vec<ConnectorTag> = vec![];
 
     for item in items {
@@ -218,12 +238,30 @@ fn tag_string_from_path(path: &Path) -> Result<String, darling::Error> {
     }
 }
 
+fn quote_connector(tag: ConnectorTag) -> proc_macro2::TokenStream {
+    let (connector, version) = tag.as_parse_pair();
+
+    match version {
+        Some(version) => quote! {
+            ConnectorTag::try_from((#connector, Some(#version))).unwrap()
+        },
+        None => quote! {
+            ConnectorTag::try_from(#connector).unwrap()
+        },
+    }
+}
+
 trait IntoDarlingError<T> {
     fn into_darling_error(self, span: &Span) -> std::result::Result<T, darling::Error>;
 }
 
-impl<T> IntoDarlingError<T> for std::result::Result<T, ParseError> {
+impl<T> IntoDarlingError<T> for std::result::Result<T, TestError> {
     fn into_darling_error(self, span: &Span) -> std::result::Result<T, darling::Error> {
-        self.map_err(|err| darling::Error::custom(&format!("{}.", err.reason)).with_span(span))
+        self.map_err(|err| match err {
+            TestError::ParseError(msg) => darling::Error::custom(&format!("Parsing error: {}.", msg)).with_span(span),
+            TestError::ConfigError(msg) => {
+                darling::Error::custom(&format!("Configuration error: {}.", msg)).with_span(span)
+            }
+        })
     }
 }

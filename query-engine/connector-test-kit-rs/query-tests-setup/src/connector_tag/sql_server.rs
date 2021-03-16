@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use crate::{TestError, TestResult};
 
 use super::*;
 
@@ -15,6 +15,11 @@ impl ConnectorTagInterface for SqlServerConnectorTag {
     fn capabilities(&self) -> Vec<ConnectorCapability> {
         todo!()
     }
+
+    fn as_parse_pair(&self) -> (String, Option<String>) {
+        let version = self.version.as_ref().map(ToString::to_string);
+        ("sqlserver".to_owned(), version)
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -24,9 +29,9 @@ pub enum SqlServerVersion {
 }
 
 impl SqlServerConnectorTag {
-    pub fn new(version: Option<&str>) -> Result<Self, ParseError> {
+    pub fn new(version: Option<&str>) -> TestResult<Self> {
         let version = match version {
-            Some(v) => Some(v.parse()?),
+            Some(v) => Some(SqlServerVersion::try_from(v)?),
             None => None,
         };
 
@@ -46,16 +51,26 @@ impl SqlServerConnectorTag {
     }
 }
 
-impl FromStr for SqlServerVersion {
-    type Err = ParseError;
+impl TryFrom<&str> for SqlServerVersion {
+    type Error = TestError;
 
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
+    fn try_from(s: &str) -> Result<Self, Self::Error> {
         let version = match s {
             "2017" => Self::V2017,
             "2019" => Self::V2019,
-            _ => return Err(ParseError::new(format!("Unknown SqlServer version `{}`", s))),
+            _ => return Err(TestError::parse_error(format!("Unknown SqlServer version `{}`", s))),
         };
 
         Ok(version)
+    }
+}
+
+impl ToString for SqlServerVersion {
+    fn to_string(&self) -> String {
+        match self {
+            SqlServerVersion::V2017 => "2017",
+            SqlServerVersion::V2019 => "2019",
+        }
+        .to_owned()
     }
 }

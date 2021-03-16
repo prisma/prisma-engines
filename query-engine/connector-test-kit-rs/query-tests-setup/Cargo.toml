@@ -9,3 +9,4 @@ serde_json = "1.0"
 datamodel-connector = { path = "../../../libs/datamodel/connectors/datamodel-connector" }
 mongodb-datamodel-connector = { path = "../../../libs/datamodel/connectors/mongodb-datamodel-connector" }
 sql-datamodel-connector = { path = "../../../libs/datamodel/connectors/sql-datamodel-connector" }
+lazy_static = "1.4"

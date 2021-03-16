@@ -4,18 +4,7 @@ use datamodel_connector::ConnectorCapability;
 use sql_server::*;
 use std::convert::TryFrom;
 
-pub struct ParseError {
-    pub reason: String,
-}
-
-impl ParseError {
-    pub fn new<T>(reason: T) -> Self
-    where
-        T: Into<String>,
-    {
-        Self { reason: reason.into() }
-    }
-}
+use crate::TestError;
 
 pub trait ConnectorTagInterface {
     /// The connection string to use to connect to the test database and version.
@@ -23,6 +12,8 @@ pub trait ConnectorTagInterface {
 
     /// Capabilities of the implementing connector.
     fn capabilities(&self) -> Vec<ConnectorCapability>;
+
+    fn as_parse_pair(&self) -> (String, Option<String>);
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -41,7 +32,7 @@ impl ConnectorTag {
 }
 
 impl TryFrom<&str> for ConnectorTag {
-    type Error = ParseError;
+    type Error = TestError;
 
     fn try_from(tag: &str) -> Result<Self, Self::Error> {
         Self::try_from((tag, None))
@@ -49,7 +40,7 @@ impl TryFrom<&str> for ConnectorTag {
 }
 
 impl TryFrom<(&str, Option<&str>)> for ConnectorTag {
-    type Error = ParseError;
+    type Error = TestError;
 
     fn try_from(value: (&str, Option<&str>)) -> Result<Self, Self::Error> {
         let (connector, version) = value;
@@ -60,10 +51,42 @@ impl TryFrom<(&str, Option<&str>)> for ConnectorTag {
             "postgres" => Self::Postgres,
             "sqlite" => Self::Sqlite,
             "mongodb" => Self::MongoDb,
-            _ => return Err(ParseError::new(format!("Unknown connector tag `{}`", connector))),
+            _ => return Err(TestError::parse_error(format!("Unknown connector tag `{}`", connector))),
         };
 
         Ok(tag)
+    }
+}
+
+impl ConnectorTagInterface for ConnectorTag {
+    fn connection_string(&self) -> String {
+        match self {
+            ConnectorTag::SqlServer(tag) => tag.connection_string(),
+            ConnectorTag::MySql => todo!(),
+            ConnectorTag::Postgres => todo!(),
+            ConnectorTag::Sqlite => todo!(),
+            ConnectorTag::MongoDb => todo!(),
+        }
+    }
+
+    fn capabilities(&self) -> Vec<ConnectorCapability> {
+        match self {
+            ConnectorTag::SqlServer(tag) => tag.capabilities(),
+            ConnectorTag::MySql => todo!(),
+            ConnectorTag::Postgres => todo!(),
+            ConnectorTag::Sqlite => todo!(),
+            ConnectorTag::MongoDb => todo!(),
+        }
+    }
+
+    fn as_parse_pair(&self) -> (String, Option<String>) {
+        match self {
+            ConnectorTag::SqlServer(tag) => tag.as_parse_pair(),
+            ConnectorTag::MySql => todo!(),
+            ConnectorTag::Postgres => todo!(),
+            ConnectorTag::Sqlite => todo!(),
+            ConnectorTag::MongoDb => todo!(),
+        }
     }
 }
 

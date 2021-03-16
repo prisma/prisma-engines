@@ -1,8 +1,21 @@
+mod config;
 mod connector_tag;
+mod error;
+mod runner;
 
+pub use config::*;
 pub use connector_tag::*;
+pub use error::*;
+pub use runner::*;
 
+use lazy_static::lazy_static;
 use serde_json::Value;
+
+pub type TestResult<T> = Result<T, TestError>;
+
+lazy_static! {
+    pub static ref CONFIG: EnvConfig = EnvConfig::load().unwrap();
+}
 
 // todo
 pub struct QueryResult {
@@ -20,48 +33,3 @@ impl ToString for QueryResult {
         todo!()
     }
 }
-
-pub enum Runner {
-    /// Using the QE crate directly for queries.
-    Direct(DirectRunner),
-
-    /// Using a NodeJS runner.
-    NApi(NApiRunner),
-
-    /// Using the HTTP bridge
-    Binary(BinaryRunner),
-}
-
-impl Runner {
-    pub fn load() -> Self {
-        println!("Totally loaded");
-        Self::Direct(DirectRunner {})
-    }
-
-    pub fn query<T>(&self, _gql: T) -> QueryResult
-    where
-        T: Into<String>,
-    {
-        todo!()
-    }
-
-    pub fn batch<T>(&self, _gql: T) -> QueryResult
-    where
-        T: Into<String>,
-    {
-        todo!()
-    }
-}
-
-pub struct DirectRunner {}
-pub struct NApiRunner {}
-pub struct BinaryRunner {}
-
-// /// Wip, just a collection of env vars we might want.
-// struct EnvConfig {
-//     /// MIGRATION_ENGINE_PATH
-//     migration_engine_path: String,
-
-//     /// TEST_RUNNER
-//     runner: String,
-// }
