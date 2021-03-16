@@ -53,5 +53,5 @@ jobs:
             target
           key: migration-engine-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
-      - run: cargo test - ${{ matrix.segment }}
+      - run: cargo test ${{ matrix.segment }}
         working-directory: migration-engine/migration-engine-tests
