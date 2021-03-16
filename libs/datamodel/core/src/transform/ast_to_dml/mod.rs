@@ -2,6 +2,7 @@ mod builtin_datasource_providers;
 mod common;
 mod datasource_loader;
 mod datasource_provider;
+mod encryptor_loader;
 mod generator_loader;
 mod lift;
 mod precheck;
@@ -17,5 +18,6 @@ use standardise_formatting::*;
 use validate::*;
 
 pub use datasource_loader::DatasourceLoader;
+pub use encryptor_loader::EncryptorLoader;
 pub use generator_loader::GeneratorLoader;
 pub use validation_pipeline::ValidationPipeline;

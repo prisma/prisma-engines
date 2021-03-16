@@ -70,6 +70,7 @@ impl<'a> Renderer<'a> {
                         ast::Top::Enum(enm) => self.render_enum(enm),
                         ast::Top::Source(source) => self.render_source_block(source),
                         ast::Top::Generator(generator) => self.render_generator_block(generator),
+                        ast::Top::Encryptor(_) => {}
                         ast::Top::Type(_) => unreachable!(),
                     }
                 }

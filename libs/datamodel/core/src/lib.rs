@@ -88,7 +88,7 @@ pub use configuration::*;
 use crate::ast::SchemaAst;
 use crate::diagnostics::{ValidatedConfiguration, ValidatedDatamodel, ValidatedDatasources};
 use transform::{
-    ast_to_dml::{DatasourceLoader, GeneratorLoader, ValidationPipeline},
+    ast_to_dml::{DatasourceLoader, EncryptorLoader, GeneratorLoader, ValidationPipeline},
     dml_to_ast::{DatasourceSerializer, GeneratorSerializer, LowerDmlToAst},
 };
 
@@ -153,14 +153,17 @@ pub fn parse_configuration(datamodel_string: &str) -> Result<ValidatedConfigurat
     let ast = ast::parse_schema(datamodel_string)?;
     let mut validated_sources = load_sources(&ast, false, vec![])?;
     let mut validated_generators = GeneratorLoader::load_generators_from_ast(&ast)?;
+    let mut validated_encryptors = EncryptorLoader::load_encryptors_from_ast(&ast)?;
 
     warnings.append(&mut validated_generators.warnings);
     warnings.append(&mut validated_sources.warnings);
+    warnings.append(&mut validated_encryptors.warnings);
 
     Ok(ValidatedConfiguration {
         subject: Configuration {
             datasources: validated_sources.subject,
             generators: validated_generators.subject,
+            encryptors: validated_encryptors.subject,
         },
         warnings,
     })
@@ -175,14 +178,17 @@ pub fn parse_configuration_with_url_overrides(
     let ast = ast::parse_schema(schema)?;
     let mut validated_sources = load_sources(&ast, false, datasource_url_overrides)?;
     let mut validated_generators = GeneratorLoader::load_generators_from_ast(&ast)?;
+    let mut validated_encryptors = EncryptorLoader::load_encryptors_from_ast(&ast)?;
 
     warnings.append(&mut validated_generators.warnings);
     warnings.append(&mut validated_sources.warnings);
+    warnings.append(&mut validated_encryptors.warnings);
 
     Ok(ValidatedConfiguration {
         subject: Configuration {
             datasources: validated_sources.subject,
             generators: validated_generators.subject,
+            encryptors: validated_encryptors.subject,
         },
         warnings,
     })
@@ -195,14 +201,17 @@ pub fn parse_configuration_and_ignore_datasource_urls(
     let ast = ast::parse_schema(datamodel_string)?;
     let mut validated_sources = load_sources(&ast, true, vec![])?;
     let mut validated_generators = GeneratorLoader::load_generators_from_ast(&ast)?;
+    let mut validated_encryptors = EncryptorLoader::load_encryptors_from_ast(&ast)?;
 
     warnings.append(&mut validated_generators.warnings);
     warnings.append(&mut validated_sources.warnings);
+    warnings.append(&mut validated_encryptors.warnings);
 
     Ok(ValidatedConfiguration {
         subject: Configuration {
             datasources: validated_sources.subject,
             generators: validated_generators.subject,
+            encryptors: validated_encryptors.subject,
         },
         warnings,
     })

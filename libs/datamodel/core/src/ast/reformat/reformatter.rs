@@ -212,6 +212,7 @@ impl<'a> Reformatter<'a> {
                 Rule::enum_declaration => self.reformat_enum(target, &current),
                 Rule::source_block => self.reformat_datasource(target, &current),
                 Rule::generator_block => self.reformat_generator(target, &current),
+                Rule::encryptor_block => self.reformat_encryptor(target, &current),
                 Rule::type_alias => {
                     if !types_mode {
                         panic!("Renderer not in type mode.");
@@ -248,6 +249,21 @@ impl<'a> Reformatter<'a> {
     fn reformat_generator(&self, target: &mut Renderer, token: &Token) {
         self.reformat_block_element(
             "generator",
+            target,
+            token,
+            Box::new(|table, _, token, _| {
+                //
+                match token.as_rule() {
+                    Rule::key_value => Self::reformat_key_value(table, &token),
+                    _ => Self::reformat_generic_token(table, &token),
+                }
+            }),
+        );
+    }
+
+    fn reformat_encryptor(&self, target: &mut Renderer, token: &Token) {
+        self.reformat_block_element(
+            "encryptor",
             target,
             token,
             Box::new(|table, _, token, _| {

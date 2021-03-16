@@ -47,6 +47,7 @@ impl<'a> LiftAstToDml<'a> {
                 },
                 ast::Top::Source(_) => { /* Source blocks are explicitly ignored by the validator */ }
                 ast::Top::Generator(_) => { /* Generator blocks are explicitly ignored by the validator */ }
+                ast::Top::Encryptor(_) => { /* Encryptor blocks are explicitly ignored by the validator */ }
                 // TODO: For now, type blocks are never checked on their own.
                 ast::Top::Type(_) => { /* Type blocks are inlined */ }
             }

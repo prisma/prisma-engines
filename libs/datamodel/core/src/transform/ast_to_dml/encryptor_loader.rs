@@ -1,20 +1,16 @@
 use super::super::helpers::*;
-use crate::ast::Span;
 use crate::{ast, configuration::Encryptor, diagnostics::*};
 use std::collections::HashMap;
 
 const PROVIDER_KEY: &str = "provider";
 const TOKEN_KEY: &str = "token";
-const FIRST_CLASS_PROPERTIES: &[&str] = &[
-    PROVIDER_KEY,
-    TOKEN_KEY
-];
+const FIRST_CLASS_PROPERTIES: &[&str] = &[PROVIDER_KEY, TOKEN_KEY];
 
 /// Is responsible for loading and validating Generators defined in an AST.
 pub struct EncryptorLoader {}
 
 impl EncryptorLoader {
-    pub fn load_generators_from_ast(ast_schema: &ast::SchemaAst) -> Result<ValidatedEncryptors, Diagnostics> {
+    pub fn load_encryptors_from_ast(ast_schema: &ast::SchemaAst) -> Result<ValidatedEncryptors, Diagnostics> {
         let mut encryptors: Vec<Encryptor> = vec![];
         let mut diagnostics = Diagnostics::new();
 
@@ -55,7 +51,7 @@ impl EncryptorLoader {
         }
     }
 
-    fn lift_encryptor(ast_encryptor: &ast::GeneratorConfig) -> Result<ValidatedEncryptor, Diagnostics> {
+    fn lift_encryptor(ast_encryptor: &ast::EncryptorConfig) -> Result<ValidatedEncryptor, Diagnostics> {
         let mut args = Arguments::new(&ast_encryptor.properties, ast_encryptor.span);
         let mut diagnostics = Diagnostics::new();
 
