@@ -26,82 +26,13 @@ jobs:
         working-directory: migration-engine/migration-engine-tests
 
   test:
-    name: "Test Migration Engine (all)"
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: "Start databases"
-        run: docker-compose up -d
-      
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: 1.48.0
-          default: true
-
-      - uses: actions/cache@v2
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: migration-engine-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-
-      - run: timeout 40m cargo test
-        working-directory: migration-engine/migration-engine-tests
-
-  test-migrations:
-    name: "Test Migration Engine (`migrations` only)"
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: "Start databases"
-        run: docker-compose up -d
-      
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: 1.48.0
-          default: true
-
-      - uses: actions/cache@v2
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: migration-engine-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-
-      - run: "timeout 40m cargo test migrations"
-        working-directory: migration-engine/migration-engine-tests
-
-  test-native:
-    name: "Test Migration Engine (`native_types` only)"
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: "Start databases"
-        run: docker-compose up -d
-      
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: 1.48.0
-          default: true
-
-      - uses: actions/cache@v2
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: migration-engine-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-
-      - run: "timeout 40m cargo test native_types"
-        working-directory: migration-engine/migration-engine-tests
+    name: "Test Migration Engine - ${{ matrix.segment }}"
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        segment: [migrations, native_types, "--skip 'migrations' --skip 'native_types'"]
         
-  test-not-migrations:
-    name: "Test Migration Engine (excluding `migrations` and `native_types`)"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -122,5 +53,5 @@ jobs:
             target
           key: migration-engine-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
-      - run: timeout 40m cargo test -- --skip 'migrations' --skip 'native_types'
-        working-directory: migration-engine/migration-engine-tests  
+      - run: cargo test - ${{ matrix.segment }}
+        working-directory: migration-engine/migration-engine-tests
