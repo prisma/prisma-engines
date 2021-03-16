@@ -51,7 +51,7 @@ jobs:
         working-directory: migration-engine/migration-engine-tests
 
   test-migrations:
-    name: "Test Migration Engine (migrations:: only)"
+    name: "Test Migration Engine (`migrations` only)"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -72,11 +72,11 @@ jobs:
             target
           key: migration-engine-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
-      - run: "timeout 40m cargo test migrations::"
+      - run: "timeout 40m cargo test migrations"
         working-directory: migration-engine/migration-engine-tests
         
   test-not-migrations:
-    name: "Test Migration Engine (excluding migrations::)"
+    name: "Test Migration Engine (excluding `migrations`)"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -97,5 +97,5 @@ jobs:
             target
           key: migration-engine-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
-      - run: timeout 40m cargo test -- --skip 'migrations::'
+      - run: timeout 40m cargo test -- --skip 'migrations'
         working-directory: migration-engine/migration-engine-tests  
