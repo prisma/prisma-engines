@@ -220,6 +220,7 @@ fn retain_env_var_definitions_in_generator_block() {
 fn assert_mcf(schema: &str, expected_mcf: &str) {
     let config = parse_configuration(schema);
     let rendered = datamodel::json::mcf::generators_to_json(&config.generators);
+
     assert_eq_json(&rendered, expected_mcf);
 }
 
