@@ -1,4 +1,4 @@
-# Prisma Migration Engine (preview)
+# Prisma Migration Engine
 
 This directory contains the crates that belong to the migration engine behind
 [prisma-migrate](https://www.prisma.io/docs/concepts/components/prisma-migrate).

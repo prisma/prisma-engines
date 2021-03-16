@@ -735,6 +735,7 @@ impl QueryGraph {
                 selected_fields: ModelProjection::union(identifiers),
                 nested: vec![],
                 selection_order: vec![],
+                aggregation_selections: vec![],
             });
 
             let query = Query::Read(read_query);

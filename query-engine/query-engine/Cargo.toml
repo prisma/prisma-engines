@@ -5,8 +5,8 @@ name = "query-engine"
 version = "0.1.0"
 
 [features]
-default = ["sql", "mongodb"]
-mongodb = ["mongodb-connector"]
+default = ["sql"]
+mongodb = ["mongodb-connector", "query-core/mongodb"]
 sql = ["sql-connector"]
 vendored-openssl = ["quaint/vendored-openssl"]
 
@@ -72,7 +72,6 @@ features = [
   "postgresql",
   "mysql",
   "mssql",
-  "tracing-log",
   "bigdecimal",
 ]
 git = "https://github.com/prisma/quaint"

@@ -1,14 +1,14 @@
 use crate::error::Error;
 use datamodel::{Configuration, Datamodel};
-use futures::{FutureExt, TryFutureExt};
 use introspection_connector::{ConnectorResult, DatabaseMetadata, IntrospectionConnector, IntrospectionResultOutput};
+use jsonrpc_core::BoxFuture;
 use jsonrpc_derive::rpc;
 use serde_derive::*;
 use sql_introspection_connector::SqlIntrospectionConnector;
 
 type RpcError = jsonrpc_core::Error;
 type RpcResult<T> = Result<T, RpcError>;
-type RpcFutureResult<T> = Box<dyn futures01::Future<Item = T, Error = RpcError> + Send + 'static>;
+type RpcFutureResult<T> = BoxFuture<RpcResult<T>>;
 
 #[rpc]
 pub trait Rpc {
@@ -35,27 +35,27 @@ pub struct RpcImpl;
 
 impl Rpc for RpcImpl {
     fn list_databases(&self, input: IntrospectionInput) -> RpcFutureResult<Vec<String>> {
-        Box::new(Self::list_databases_internal(input.schema).boxed().compat())
+        Box::pin(Self::list_databases_internal(input.schema))
     }
 
     fn get_database_metadata(&self, input: IntrospectionInput) -> RpcFutureResult<DatabaseMetadata> {
-        Box::new(Self::get_database_metadata_internal(input.schema).boxed().compat())
+        Box::pin(Self::get_database_metadata_internal(input.schema))
     }
 
     fn get_database_description(&self, input: IntrospectionInput) -> RpcFutureResult<String> {
-        Box::new(Self::get_database_description_internal(input.schema).boxed().compat())
+        Box::pin(Self::get_database_description_internal(input.schema))
     }
 
     fn get_database_version(&self, input: IntrospectionInput) -> RpcFutureResult<String> {
-        Box::new(Self::get_database_version_internal(input.schema).boxed().compat())
+        Box::pin(Self::get_database_version_internal(input.schema))
     }
 
     fn introspect(&self, input: IntrospectionInput) -> RpcFutureResult<IntrospectionResultOutput> {
-        Box::new(Self::introspect_internal(input.schema, input.force).boxed().compat())
+        Box::pin(Self::introspect_internal(input.schema, input.force))
     }
 
     fn debug_panic(&self) -> RpcFutureResult<()> {
-        Box::new(Self::debug_panic().boxed().compat())
+        Box::pin(Self::debug_panic())
     }
 }
 

@@ -1,7 +1,7 @@
 use super::{column::ColumnDiffer, ColumnTypeChange, SqlSchemaDiffer};
 use crate::{
     pair::Pair,
-    sql_migration::{AlterEnum, AlterTable, CreateIndex, DropIndex},
+    sql_migration::{AlterEnum, AlterTable, CreateEnum, CreateIndex, DropEnum, DropIndex},
 };
 use sql_schema_describer::walkers::IndexWalker;
 use std::collections::HashSet;
@@ -32,6 +32,16 @@ pub(crate) trait SqlSchemaDifferFlavour {
         } else {
             None
         }
+    }
+
+    /// Return potential `CreateEnum` steps.
+    fn create_enums(&self, _differ: &SqlSchemaDiffer<'_>) -> Vec<CreateEnum> {
+        Vec::new()
+    }
+
+    /// Return potential `DropEnum` steps.
+    fn drop_enums(&self, _differ: &SqlSchemaDiffer<'_>) -> Vec<DropEnum> {
+        Vec::new()
     }
 
     /// Return whether an index should be renamed by the migration.

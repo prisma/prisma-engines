@@ -83,23 +83,24 @@ impl<'a> MigrationCommand for CreateMigrationCommand {
             &Path::new(&input.migrations_directory_path),
             &input.migration_name,
         )
-        .map_err(|_| CoreError::Generic(anyhow::anyhow!("Failed to create a new migration directory.")))?;
+        .map_err(|_| CoreError::new_unknown("Failed to create a new migration directory.".into()))?;
 
         directory
             .write_migration_script(&migration_script, C::DatabaseMigration::FILE_EXTENSION)
             .map_err(|err| {
-                CoreError::Generic(anyhow::Error::new(err).context(format!(
-                    "Failed to write the migration script to `{:?}`",
+                CoreError::new_unknown(format!(
+                    "Failed to write the migration script to `{:?}`\n{}",
                     directory.path(),
-                )))
+                    err,
+                ))
             })?;
 
         migration_connector::write_migration_lock_file(&input.migrations_directory_path, connector_type).map_err(
             |err| {
-                CoreError::Generic(anyhow::Error::new(err).context(format!(
-                    "Failed to write the migration lock file to `{:?}`",
-                    &input.migrations_directory_path
-                )))
+                CoreError::new_unknown(format!(
+                    "Failed to write the migration lock file to `{:?}`\n{}",
+                    &input.migrations_directory_path, err
+                ))
             },
         )?;
 

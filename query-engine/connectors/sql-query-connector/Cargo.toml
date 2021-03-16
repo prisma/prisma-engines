@@ -31,7 +31,6 @@ features = [
   "postgresql",
   "mysql",
   "mssql",
-  "tracing-log",
   "bigdecimal",
   "serde-support"
 ]

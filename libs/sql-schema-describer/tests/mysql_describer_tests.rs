@@ -49,7 +49,7 @@ async fn views_can_be_described() {
     );
 
     assert_eq!("ab", &view.name);
-    assert_eq!(expected_sql, view.definition);
+    assert_eq!(expected_sql, view.definition.unwrap());
 }
 
 #[tokio::test]
@@ -997,4 +997,37 @@ async fn escaped_backslashes_in_string_literals_must_be_unescaped(api: &TestApi)
     assert_eq!(default, "xyz\\Datasource\\Model");
 
     Ok(())
+}
+
+#[test_each_connector(tags("mysql"))]
+async fn dangling_foreign_keys_are_filtered_out(api: &TestApi) {
+    let setup = r#"
+    SET FOREIGN_KEY_CHECKS=0;
+
+    CREATE TABLE `platypus` (
+        id INTEGER PRIMARY KEY
+    );
+
+    CREATE TABLE `dog` (
+        id INTEGER PRIMARY KEY,
+        bestFriendId INTEGER,
+
+        FOREIGN KEY (`bestFriendId`) REFERENCES `cat`(`id`),
+        FOREIGN KEY (`bestFriendId`) REFERENCES `platypus`(`id`),
+        FOREIGN KEY (`bestFriendId`) REFERENCES `goat`(`id`)
+    );
+
+    SET FOREIGN_KEY_CHECKS=1;
+    "#;
+
+    api.database().raw_cmd(setup).await.unwrap();
+
+    let schema = api.describe().await.unwrap();
+    let table = schema.table_bang("dog");
+
+    assert!(
+        matches!(table.foreign_keys.as_slice(), [fk] if fk.referenced_table == "platypus"),
+        "{:#?}",
+        table.foreign_keys
+    );
 }

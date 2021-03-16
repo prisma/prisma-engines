@@ -178,7 +178,9 @@ impl SqlRenderer for MysqlFlavour {
     }
 
     fn render_create_enum(&self, _create_enum: &EnumWalker<'_>) -> Vec<String> {
-        Vec::new() // enums are defined on each column that uses them on MySQL
+        unreachable!(
+            "Unreachable render_create_enum() on MySQL. enums are defined on each column that uses them on MySQL"
+        )
     }
 
     fn render_create_index(&self, index: &IndexWalker<'_>) -> String {
@@ -259,7 +261,9 @@ impl SqlRenderer for MysqlFlavour {
     }
 
     fn render_drop_enum(&self, _: &EnumWalker<'_>) -> Vec<String> {
-        Vec::new()
+        unreachable!(
+            "Unreachable render_drop_enum() on MySQL. enums are defined on each column that uses them on MySQL"
+        )
     }
 
     fn render_drop_foreign_key(&self, foreign_key: &ForeignKeyWalker<'_>) -> String {

@@ -1,4 +1,4 @@
-use connector::{AggregationRow, QueryArguments};
+use connector::{AggregationRow, QueryArguments, RelAggregationRow};
 use prisma_models::{ManyRecords, ModelProjection, RecordProjection};
 
 #[derive(Debug, Clone)]
@@ -32,6 +32,9 @@ pub struct RecordSelection {
 
     /// Model projection that can be used to retrieve the IDs of the contained records.
     pub model_id: ModelProjection,
+
+    /// Aggregation selections results
+    pub aggregation_rows: Option<Vec<RelAggregationRow>>,
 }
 
 impl From<RecordSelection> for QueryResult {

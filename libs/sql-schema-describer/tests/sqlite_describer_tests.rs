@@ -26,7 +26,7 @@ async fn views_can_be_described() {
     let expected_sql = "CREATE VIEW ab AS SELECT a_id FROM a UNION ALL SELECT b_id FROM b";
 
     assert_eq!("ab", &view.name);
-    assert_eq!(expected_sql, &view.definition);
+    assert_eq!(expected_sql, &view.definition.unwrap());
 }
 
 #[tokio::test]
@@ -363,7 +363,7 @@ async fn escaped_backslashes_in_string_literals_must_be_unescaped(api: &TestApi)
         api.schema_name()
     );
 
-    api.database().query_raw(&create_table, &[]).await?;
+    api.database().raw_cmd(&create_table).await?;
 
     let schema = api.describe().await?;
 
@@ -383,4 +383,35 @@ async fn escaped_backslashes_in_string_literals_must_be_unescaped(api: &TestApi)
     assert_eq!(default, "xyz\\Datasource\\Model");
 
     Ok(())
+}
+
+#[test_each_connector(tags("sqlite"))]
+async fn broken_relations_are_filtered_out(api: &TestApi) {
+    let setup = r#"
+        PRAGMA foreign_keys=OFF;
+
+        CREATE TABLE "platypus" (
+            id INTEGER PRIMARY KEY
+        );
+
+        CREATE TABLE "dog" (
+            id INTEGER PRIMARY KEY,
+            bestFriendId INTEGER REFERENCES "cat"("id"),
+            realBestFriendId INTEGER REFERENCES "platypus"("id"),
+            otherBestFriendId INTEGER REFERENCES "goat"("id")
+        );
+
+        PRAGMA foreign_keys=ON;
+    "#;
+
+    api.database().raw_cmd(setup).await.unwrap();
+
+    let schema = api.describe().await.unwrap();
+    let table = schema.table_bang("dog");
+
+    assert!(
+        matches!(table.foreign_keys.as_slice(), [fk] if fk.referenced_table == "platypus"),
+        "{:#?}",
+        table.foreign_keys
+    );
 }

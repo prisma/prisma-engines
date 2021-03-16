@@ -2,7 +2,7 @@ use super::SqlSchemaDifferFlavour;
 use crate::{
     flavour::PostgresFlavour,
     pair::Pair,
-    sql_migration::AlterEnum,
+    sql_migration::{AlterEnum, CreateEnum, DropEnum},
     sql_schema_differ::{
         column::{ColumnDiffer, ColumnTypeChange},
         SqlSchemaDiffer,
@@ -55,6 +55,26 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
                 } else {
                     Some(step)
                 }
+            })
+            .collect()
+    }
+
+    /// Return potential `CreateEnum` steps.
+    fn create_enums(&self, differ: &SqlSchemaDiffer<'_>) -> Vec<CreateEnum> {
+        differ
+            .created_enums()
+            .map(|r#enum| CreateEnum {
+                enum_index: r#enum.enum_index(),
+            })
+            .collect()
+    }
+
+    /// Return potential `DropEnum` steps.
+    fn drop_enums(&self, differ: &SqlSchemaDiffer<'_>) -> Vec<DropEnum> {
+        differ
+            .dropped_enums()
+            .map(|r#enum| DropEnum {
+                enum_index: r#enum.enum_index(),
             })
             .collect()
     }

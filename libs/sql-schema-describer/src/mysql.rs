@@ -1,6 +1,7 @@
 use super::*;
 use crate::{getters::Getter, parsers::Parser};
 use bigdecimal::ToPrimitive;
+use common::purge_dangling_foreign_keys;
 use indoc::indoc;
 use native_types::{MySqlType, NativeType};
 use quaint::{prelude::Queryable, single::Quaint, Value};
@@ -68,8 +69,10 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
         for table_name in &table_names {
             let (table, enms) = self.get_table(table_name, &mut columns, &mut indexes, &mut fks);
             tables.push(table);
-            enums.extend(enms.iter().cloned());
+            enums.extend(enms.into_iter());
         }
+
+        purge_dangling_foreign_keys(&mut tables);
 
         let views = self.get_views(schema).await?;
         let procedures = self.get_procedures(schema).await?;
@@ -125,7 +128,7 @@ impl SqlSchemaDescriber {
         for row in result_set.into_iter() {
             views.push(View {
                 name: row.get_expect_string("view_name"),
-                definition: row.get_expect_string("view_sql"),
+                definition: row.get_string("view_sql"),
             })
         }
 

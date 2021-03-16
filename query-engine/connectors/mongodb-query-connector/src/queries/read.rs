@@ -1,7 +1,7 @@
 use super::*;
 use crate::{filter::convert_filter, query_arguments::MongoQueryArgs};
 use crate::{BsonTransform, IntoBson};
-use connector_interface::{Filter, QueryArguments};
+use connector_interface::{Filter, QueryArguments, RelAggregationSelection};
 use mongodb::Database;
 use mongodb::{bson::doc, options::FindOptions};
 use prisma_models::*;
@@ -38,11 +38,13 @@ pub async fn get_single_record(
 // - [x] Skip, take
 // - [ ] Cursor
 // - [x] Distinct select (inherently given from core).
+// - [ ] Relation aggregation count
 pub async fn get_many_records(
     database: &Database,
     model: &ModelRef,
     query_arguments: QueryArguments,
     selected_fields: &ModelProjection,
+    _aggregation_selections: &[RelAggregationSelection],
 ) -> crate::Result<ManyRecords> {
     let coll = database.collection(model.db_name());
     let reverse_order = query_arguments.take.map(|t| t < 0).unwrap_or(false);

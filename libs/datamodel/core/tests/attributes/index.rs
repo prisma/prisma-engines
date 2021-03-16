@@ -342,3 +342,25 @@ fn index_attributes_must_serialize_to_valid_dml() {
 
     assert!(datamodel::parse_datamodel(&render_datamodel_to_string(&schema)).is_ok());
 }
+
+#[test]
+fn stringified_field_names_in_index_return_nice_error() {
+    let dm = r#"
+        model User {
+            id        Int    @id
+            firstName String
+            lastName  String
+
+            @@index(["firstName", "lastName"])
+        }
+    "#;
+
+    let err = parse_error(dm);
+
+    err.assert_is(DatamodelError::TypeMismatchError {
+        expected_type: "constant literal".into(),
+        received_type: "string".into(),
+        raw: "firstName".into(),
+        span: Span::new(135, 146),
+    });
+}

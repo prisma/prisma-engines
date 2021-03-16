@@ -1,6 +1,6 @@
 //! Prisma read query AST
 use super::FilteredQuery;
-use connector::{filter::Filter, AggregationSelection, QueryArguments};
+use connector::{filter::Filter, AggregationSelection, QueryArguments, RelAggregationSelection};
 use prisma_models::prelude::*;
 use std::fmt::Display;
 
@@ -112,6 +112,7 @@ pub struct ManyRecordsQuery {
     pub selected_fields: ModelProjection,
     pub nested: Vec<ReadQuery>,
     pub selection_order: Vec<String>,
+    pub aggregation_selections: Vec<RelAggregationSelection>,
 }
 
 #[derive(Debug, Clone)]

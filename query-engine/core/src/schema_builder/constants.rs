@@ -119,5 +119,8 @@ pub mod outputs {
         pub const MIN: &str = "min";
         pub const MAX: &str = "max";
         pub const SUM: &str = "sum";
+
+        // aggregation findMany fields
+        pub const UNDERSCORE_COUNT: &str = "_count";
     }
 }

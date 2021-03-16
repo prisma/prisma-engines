@@ -161,8 +161,8 @@ impl<'a> ViewWalker<'a> {
     }
 
     /// The SQL definition of the view
-    pub fn definition(&self) -> &'a str {
-        &self.view().definition
+    pub fn definition(&self) -> Option<&'a str> {
+        self.view().definition.as_deref()
     }
 
     /// The index of the view in the schema.

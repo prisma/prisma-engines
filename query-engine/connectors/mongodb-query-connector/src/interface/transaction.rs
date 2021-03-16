@@ -3,7 +3,7 @@ use crate::{
     error::MongoError,
     queries::{aggregate, read, write},
 };
-use connector_interface::{ReadOperations, Transaction, WriteOperations};
+use connector_interface::{ReadOperations, RelAggregationSelection, Transaction, WriteOperations};
 use futures::Future;
 use mongodb::Database;
 
@@ -137,9 +137,19 @@ impl ReadOperations for MongoDbTransaction {
         model: &ModelRef,
         query_arguments: connector_interface::QueryArguments,
         selected_fields: &ModelProjection,
+        aggregation_selections: &[RelAggregationSelection],
     ) -> connector_interface::Result<ManyRecords> {
-        self.catch(async move { read::get_many_records(&self.database, model, query_arguments, selected_fields).await })
+        self.catch(async move {
+            read::get_many_records(
+                &self.database,
+                model,
+                query_arguments,
+                selected_fields,
+                aggregation_selections,
+            )
             .await
+        })
+        .await
     }
 
     async fn get_related_m2m_record_ids(

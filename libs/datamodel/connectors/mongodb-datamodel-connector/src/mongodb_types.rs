@@ -62,7 +62,7 @@ pub(crate) fn available_types() -> Vec<NativeTypeConstructor> {
         NativeTypeConstructor::without_args(DECIMAL, vec![ScalarType::Decimal]),
         NativeTypeConstructor::without_args(MIN_KEY, vec![ScalarType::Int]),
         NativeTypeConstructor::without_args(MAX_KEY, vec![ScalarType::Int]),
-        NativeTypeConstructor::with_args(ARRAY, 1, all_types()).list(),
+        NativeTypeConstructor::with_args(ARRAY, 1, all_types()),
     ]
 }
 
@@ -116,5 +116,5 @@ fn parse_array_type(args: &[String]) -> crate::Result<MongoDbType> {
     let type_arg = args.iter().next().unwrap();
     let inner_type = mongo_type_from_input(type_arg.as_str(), &[])?;
 
-    Ok(dbg!(MongoDbType::Array(Box::new(inner_type))))
+    Ok(MongoDbType::Array(Box::new(inner_type)))
 }
