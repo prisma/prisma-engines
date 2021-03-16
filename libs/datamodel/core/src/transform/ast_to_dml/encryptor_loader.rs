@@ -12,7 +12,7 @@ pub struct EncryptorLoader {}
 impl EncryptorLoader {
     pub fn load_encryptors_from_ast(ast_schema: &ast::SchemaAst) -> Result<ValidatedEncryptors, Diagnostics> {
         let mut encryptors: Vec<Encryptor> = vec![];
-        let diagnostics = Diagnostics::new();
+        let mut diagnostics = Diagnostics::new();
 
         for encryptor in &ast_schema.encryptors() {
             match Self::lift_encryptor(&encryptor) {
@@ -53,7 +53,7 @@ impl EncryptorLoader {
 
     fn lift_encryptor(ast_encryptor: &ast::EncryptorConfig) -> Result<ValidatedEncryptor, Diagnostics> {
         let mut args = Arguments::new(&ast_encryptor.properties, ast_encryptor.span);
-        let mut diagnostics = Diagnostics::new();
+        let diagnostics = Diagnostics::new();
 
         let provider = args.arg(PROVIDER_KEY)?.as_str()?;
         let token = if let Ok(arg) = args.arg(TOKEN_KEY) {
