@@ -189,13 +189,11 @@ fn nice_error_for_unknown_generator_preview_feature() {
 fn retain_env_var_definitions_in_generator_block() {
     std::env::set_var("PROVIDER", "postgres");
     std::env::set_var("OUTPUT", "~/home/prisma/");
-    std::env::set_var("CUSTOM", "whatever");
 
     let schema1 = r#"
     generator js1 {
         provider = env("PROVIDER")
         output = env("OUTPUT")
-        custom = env("CUSTOM")
     }
     "#;
 
@@ -212,7 +210,7 @@ fn retain_env_var_definitions_in_generator_block() {
     },
     "binaryTargets": [],
     "previewFeatures": [],
-    "config": {"custom": "env"}
+    "config": {}
   }
 ]"#;
 
@@ -222,7 +220,6 @@ fn retain_env_var_definitions_in_generator_block() {
 fn assert_mcf(schema: &str, expected_mcf: &str) {
     let config = parse_configuration(schema);
     let rendered = datamodel::json::mcf::generators_to_json(&config.generators);
-
     assert_eq_json(&rendered, expected_mcf);
 }
 
