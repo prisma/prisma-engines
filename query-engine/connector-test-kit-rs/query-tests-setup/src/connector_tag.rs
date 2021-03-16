@@ -16,16 +16,14 @@ impl ParseError {
 }
 
 pub trait ConnectorTagInterface {
-    /// Parses and sets version for the implementing connector tag.
-    fn set_version(&mut self, _str: &str) -> Result<(), ParseError> {
-        Err(ParseError::new("Connector doesn't support versions."))
-    }
-
     /// The connection string to use to connect to the test database and version.
     fn connection_string(&self) -> String;
 
     /// Capabilities of the implementing connector.
     fn capabilities(&self) -> Vec<ConnectorCapability>;
+
+    ///
+    fn parse_from(connector_str: &str, version_str: Option<&str>) -> ConnectorTag {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -37,15 +35,19 @@ pub enum ConnectorTag {
     MongoDb,
 }
 
-impl ConnectorTagInterface for ConnectorTag {
-    fn connection_string(&self) -> String {
-        todo!()
-    }
+// impl ConnectorTagInterface for ConnectorTag {
+//     fn connection_string(&self) -> String {
+//         todo!()
+//     }
 
-    fn capabilities(&self) -> Vec<ConnectorCapability> {
-        todo!()
-    }
-}
+//     fn capabilities(&self) -> Vec<ConnectorCapability> {
+//         todo!()
+//     }
+
+//     fn parse_from(connector_str: &str, version_str: Option<&str>) -> ConnectorTag {
+
+//     }
+// }
 
 #[derive(Debug, Default, Clone, Copy, PartialEq)]
 pub struct SqlServerConnectorTag {
@@ -61,11 +63,8 @@ impl ConnectorTagInterface for SqlServerConnectorTag {
         todo!()
     }
 
-    fn set_version(&mut self, str: &str) -> Result<(), ParseError> {
-        let version = Self::Version::from_str(str)?;
-        self.version = Some(version);
-
-        Ok(())
+    fn parse_from(connector_str: &str, version_str: Option<&str>) -> ConnectorTag {
+        todo!()
     }
 }
 
