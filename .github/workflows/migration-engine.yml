@@ -24,5 +24,5 @@ jobs:
             target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
-      - run: timeout 30m cargo test
+      - run: timeout 40m cargo test
         working-directory: migration-engine/migration-engine-tests
