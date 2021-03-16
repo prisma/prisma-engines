@@ -1,0 +1,57 @@
+on:
+  push:
+
+jobs:
+
+  compile:
+    name: "Compile Introspection Engine tests"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: 1.48.0
+          default: true
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: introspection-engine-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - run: timeout 40m cargo test --no-run
+        working-directory: introspection-engine/introspection-engine-tests
+
+  test:
+    name: "Test Introspection Engine - ${{ matrix.segment }}"
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        segment: [""]
+        
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: "Start databases"
+        run: docker-compose up -d
+      
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: 1.48.0
+          default: true
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: introspection-engine-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - run: cargo test ${{ matrix.segment }}
+        working-directory: introspection-engine/introspection-engine-tests
