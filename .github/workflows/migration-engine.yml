@@ -1,3 +1,4 @@
+name: Migration Engine
 on:
   push:
 
