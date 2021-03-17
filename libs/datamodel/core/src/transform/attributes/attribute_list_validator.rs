@@ -49,6 +49,7 @@ impl<T: 'static> AttributeListValidator<T> {
         errors.to_result()?;
 
         for attribute in ast.attributes() {
+            #[allow(clippy::all)]
             match self.known_attributes.get(&attribute.name.name) {
                 Some(validator) => {
                     let mut arguments = Arguments::new(&attribute.arguments, attribute.span);
