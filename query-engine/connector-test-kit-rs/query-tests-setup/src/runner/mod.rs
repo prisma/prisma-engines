@@ -6,8 +6,7 @@ pub use binary::*;
 pub use direct::*;
 pub use napi::*;
 
-use crate::{QueryResult, TestError};
-use std::convert::TryFrom;
+use crate::{QueryResult, TestError, TestResult};
 
 pub trait RunnerInterface {}
 
@@ -23,6 +22,15 @@ pub enum Runner {
 }
 
 impl Runner {
+    pub fn load(ident: &str, datamodel: String) -> TestResult<Self> {
+        match ident {
+            "direct" => Ok(Self::Direct(DirectRunner {})),
+            "napi" => Ok(Self::NApi(NApiRunner {})),
+            "binary" => Ok(Self::Binary(BinaryRunner {})),
+            unknown => Err(TestError::parse_error(format!("Unknown test runner '{}'", unknown))),
+        }
+    }
+
     pub fn query<T>(&self, _gql: T) -> QueryResult
     where
         T: Into<String>,
@@ -35,18 +43,5 @@ impl Runner {
         T: Into<String>,
     {
         todo!()
-    }
-}
-
-impl TryFrom<&str> for Runner {
-    type Error = TestError;
-
-    fn try_from(value: &str) -> Result<Self, Self::Error> {
-        match value {
-            "direct" => Ok(Self::Direct(DirectRunner {})),
-            "napi" => Ok(Self::NApi(NApiRunner {})),
-            "binary" => Ok(Self::Binary(BinaryRunner {})),
-            unknown => Err(TestError::parse_error(format!("Unknown test runner '{}'", unknown))),
-        }
     }
 }

@@ -2,14 +2,22 @@ use crate::{TestError, TestResult};
 
 use super::*;
 
-#[derive(Debug, Default, Clone, Copy, PartialEq)]
+#[derive(Debug, Default, Clone, Copy)]
 pub struct SqlServerConnectorTag {
     version: Option<SqlServerVersion>,
 }
 
 impl ConnectorTagInterface for SqlServerConnectorTag {
-    fn connection_string(&self) -> String {
-        todo!()
+    fn connection_string(&self, database: &str, is_ci: bool) -> String {
+        match self.version {
+            Some(SqlServerVersion::V2017) if is_ci => format!("sqlserver://test-db-mssql-2017:1433;database=master;schema={};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel=READ UNCOMMITTED", database),
+            Some(SqlServerVersion::V2017) => format!("sqlserver://127.0.0.1:1434;database=master;schema={};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel=READ UNCOMMITTED", database),
+
+            Some(SqlServerVersion::V2019) if is_ci => format!("sqlserver://test-db-mssql-2019:1433;database=master;schema={};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel=READ UNCOMMITTED", database),
+            Some(SqlServerVersion::V2019) => format!("sqlserver://127.0.0.1:1433;database=master;schema={};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel=READ UNCOMMITTED", database),
+
+            None => unreachable!(),
+        }.to_string()
     }
 
     fn capabilities(&self) -> Vec<ConnectorCapability> {
@@ -48,6 +56,15 @@ impl SqlServerConnectorTag {
                 version: Some(SqlServerVersion::V2019),
             },
         ]
+    }
+}
+
+impl PartialEq for SqlServerConnectorTag {
+    fn eq(&self, other: &Self) -> bool {
+        match (self.version, other.version) {
+            (None, None) | (Some(_), None) | (None, Some(_)) => true,
+            (Some(v1), Some(v2)) => v1 == v2,
+        }
     }
 }
 

@@ -14,7 +14,7 @@ use serde_json::Value;
 pub type TestResult<T> = Result<T, TestError>;
 
 lazy_static! {
-    pub static ref CONFIG: EnvConfig = EnvConfig::load().unwrap();
+    pub static ref CONFIG: TestConfig = TestConfig::load().unwrap();
 }
 
 // todo

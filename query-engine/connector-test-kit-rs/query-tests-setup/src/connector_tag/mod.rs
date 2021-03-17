@@ -4,15 +4,18 @@ use datamodel_connector::ConnectorCapability;
 use sql_server::*;
 use std::convert::TryFrom;
 
-use crate::TestError;
+use crate::{TestConfig, TestError};
 
 pub trait ConnectorTagInterface {
     /// The connection string to use to connect to the test database and version.
-    fn connection_string(&self) -> String;
+    /// `database` is the database to connect to
+    fn connection_string(&self, database: &str, is_ci: bool) -> String;
 
     /// Capabilities of the implementing connector.
     fn capabilities(&self) -> Vec<ConnectorCapability>;
 
+    /// Serialization of the connector. Expected to return `(tag_name, version)`.
+    /// Todo: Think of something better.
     fn as_parse_pair(&self) -> (String, Option<String>);
 }
 
@@ -26,8 +29,16 @@ pub enum ConnectorTag {
 }
 
 impl ConnectorTag {
+    /// Returns all possible connector tags.
     pub fn all() -> Vec<Self> {
         SqlServerConnectorTag::all().into_iter().map(Self::SqlServer).collect()
+    }
+
+    /// Based on the connector tags that are enabled for a test, check if
+    /// the current configuration allows for this test to run.
+    pub fn should_run(config: &TestConfig, enabled: &[ConnectorTag]) -> bool {
+        let current_connector = ConnectorTag::try_from((config.connector(), config.connector_version())).unwrap();
+        enabled.contains(&current_connector)
     }
 }
 
@@ -59,9 +70,9 @@ impl TryFrom<(&str, Option<&str>)> for ConnectorTag {
 }
 
 impl ConnectorTagInterface for ConnectorTag {
-    fn connection_string(&self) -> String {
+    fn connection_string(&self, database: &str, is_ci: bool) -> String {
         match self {
-            ConnectorTag::SqlServer(tag) => tag.connection_string(),
+            ConnectorTag::SqlServer(tag) => tag.connection_string(database, is_ci),
             ConnectorTag::MySql => todo!(),
             ConnectorTag::Postgres => todo!(),
             ConnectorTag::Sqlite => todo!(),

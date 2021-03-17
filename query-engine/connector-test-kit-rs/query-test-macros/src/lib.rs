@@ -43,18 +43,24 @@ fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream {
     let runner_fn_ident = Ident::new(&format!("run_{}", test_fn_ident.to_string()), Span::call_site());
     test_function.sig.ident = runner_fn_ident.clone();
 
+    let test_name = test_fn_ident.to_string();
     let test = quote! {
         #[test]
         fn #test_fn_ident() {
             let config = &query_tests_setup::CONFIG;
-            let schema = #handler();
-            let runner = Runner::try_from(config.runner()).unwrap();
-
-            let connectors = vec![
+            let enabled_connectors = vec![
                 #connectors
             ];
 
-            println!("{:?}", connectors);
+            if !ConnectorTag::should_run(&config, &enabled_connectors) {
+                println!("Skipping test '{}', current connector not enabled.", #test_name);
+                return
+            }
+
+            let schema = #handler();
+            let runner = Runner::load(config.runner(), schema).unwrap();
+
+            println!("{:?}", enabled_connectors);
 
             #runner_fn_ident(&runner)
         }
