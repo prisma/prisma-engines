@@ -17,7 +17,13 @@
           "type": "Int",
           "hasDefaultValue": false,
           "isGenerated": false,
-          "isUpdatedAt": false
+          "isUpdatedAt": false,
+          "attributes": [
+            {
+              "name": "id",
+              "arguments": []
+            }
+          ]
         },
         {
           "name": "name",
@@ -31,7 +37,8 @@
           "hasDefaultValue": false,
           "isGenerated": false,
           "isUpdatedAt": false,
-          "documentation": "Name of the author."
+          "documentation": "Name of the author.",
+          "attributes": []
         }
       ],
       "isGenerated": false,

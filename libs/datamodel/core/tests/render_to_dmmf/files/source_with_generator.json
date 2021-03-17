@@ -17,7 +17,13 @@
           "type": "Int",
           "hasDefaultValue": false,
           "isGenerated": false,
-          "isUpdatedAt": false
+          "isUpdatedAt": false,
+          "attributes": [
+            {
+              "name": "id",
+              "arguments": []
+            }
+          ]
         },
         {
           "name": "name",
@@ -30,7 +36,8 @@
           "type": "String",
           "hasDefaultValue": false,
           "isGenerated": false,
-          "isUpdatedAt": false
+          "isUpdatedAt": false,
+          "attributes": []
         }
       ],
       "isGenerated": false,

@@ -36,7 +36,13 @@
           "type": "Int",
           "hasDefaultValue": false,
           "isGenerated": false,
-          "isUpdatedAt": false
+          "isUpdatedAt": false,
+          "attributes": [
+            {
+              "name": "id",
+              "arguments": []
+            }
+          ]
         },
         {
           "name": "createdAt",
@@ -49,7 +55,8 @@
           "type": "DateTime",
           "hasDefaultValue": false,
           "isGenerated": false,
-          "isUpdatedAt": false
+          "isUpdatedAt": false,
+          "attributes": []
         },
         {
           "name": "email",
@@ -62,7 +69,13 @@
           "type": "String",
           "hasDefaultValue": false,
           "isGenerated": false,
-          "isUpdatedAt": false
+          "isUpdatedAt": false,
+          "attributes": [
+            {
+              "name": "unique",
+              "arguments": []
+            }
+          ]
         },
         {
           "name": "name",
@@ -75,7 +88,8 @@
           "type": "String",
           "hasDefaultValue": false,
           "isGenerated": false,
-          "isUpdatedAt": false
+          "isUpdatedAt": false,
+          "attributes": []
         },
         {
           "name": "posts",
@@ -92,7 +106,8 @@
           "relationToFields": [],
           "relationOnDelete": "NONE",
           "isGenerated": false,
-          "isUpdatedAt": false
+          "isUpdatedAt": false,
+          "attributes": []
         },
         {
           "name": "profile",
@@ -109,7 +124,8 @@
           "relationToFields": [],
           "relationOnDelete": "NONE",
           "isGenerated": false,
-          "isUpdatedAt": false
+          "isUpdatedAt": false,
+          "attributes": []
         }
       ],
       "isGenerated": false,
@@ -133,7 +149,13 @@
           "type": "Int",
           "hasDefaultValue": false,
           "isGenerated": false,
-          "isUpdatedAt": false
+          "isUpdatedAt": false,
+          "attributes": [
+            {
+              "name": "id",
+              "arguments": []
+            }
+          ]
         },
         {
           "name": "userId",
@@ -146,7 +168,8 @@
           "type": "Int",
           "hasDefaultValue": false,
           "isGenerated": false,
-          "isUpdatedAt": false
+          "isUpdatedAt": false,
+          "attributes": []
         },
         {
           "name": "user",
@@ -159,15 +182,12 @@
           "type": "User",
           "hasDefaultValue": false,
           "relationName": "ProfileToUser",
-          "relationFromFields": [
-            "userId"
-          ],
-          "relationToFields": [
-            "id"
-          ],
+          "relationFromFields": ["userId"],
+          "relationToFields": ["id"],
           "relationOnDelete": "NONE",
           "isGenerated": false,
-          "isUpdatedAt": false
+          "isUpdatedAt": false,
+          "attributes": []
         },
         {
           "name": "bio",
@@ -180,7 +200,8 @@
           "type": "String",
           "hasDefaultValue": false,
           "isGenerated": false,
-          "isUpdatedAt": false
+          "isUpdatedAt": false,
+          "attributes": []
         }
       ],
       "isGenerated": false,
@@ -204,7 +225,8 @@
           "type": "Int",
           "hasDefaultValue": false,
           "isGenerated": false,
-          "isUpdatedAt": false
+          "isUpdatedAt": false,
+          "attributes": []
         },
         {
           "name": "createdAt",
@@ -217,7 +239,8 @@
           "type": "DateTime",
           "hasDefaultValue": false,
           "isGenerated": false,
-          "isUpdatedAt": false
+          "isUpdatedAt": false,
+          "attributes": []
         },
         {
           "name": "updatedAt",
@@ -230,7 +253,8 @@
           "type": "DateTime",
           "hasDefaultValue": false,
           "isGenerated": false,
-          "isUpdatedAt": false
+          "isUpdatedAt": false,
+          "attributes": []
         },
         {
           "name": "title",
@@ -244,7 +268,18 @@
           "hasDefaultValue": true,
           "default": "Default-Title",
           "isGenerated": false,
-          "isUpdatedAt": false
+          "isUpdatedAt": false,
+          "attributes": [
+            {
+              "name": "default",
+              "arguments": [
+                {
+                  "name": "",
+                  "value": "\"Default-Title\""
+                }
+              ]
+            }
+          ]
         },
         {
           "name": "wasLiked",
@@ -258,7 +293,18 @@
           "hasDefaultValue": true,
           "default": false,
           "isGenerated": false,
-          "isUpdatedAt": false
+          "isUpdatedAt": false,
+          "attributes": [
+            {
+              "name": "default",
+              "arguments": [
+                {
+                  "name": "",
+                  "value": "false"
+                }
+              ]
+            }
+          ]
         },
         {
           "name": "published",
@@ -272,7 +318,18 @@
           "hasDefaultValue": true,
           "default": false,
           "isGenerated": false,
-          "isUpdatedAt": false
+          "isUpdatedAt": false,
+          "attributes": [
+            {
+              "name": "default",
+              "arguments": [
+                {
+                  "name": "",
+                  "value": "false"
+                }
+              ]
+            }
+          ]
         },
         {
           "name": "authorId",
@@ -285,7 +342,8 @@
           "type": "Int",
           "hasDefaultValue": false,
           "isGenerated": false,
-          "isUpdatedAt": false
+          "isUpdatedAt": false,
+          "attributes": []
         },
         {
           "name": "author",
@@ -298,15 +356,12 @@
           "type": "User",
           "hasDefaultValue": false,
           "relationName": "author",
-          "relationFromFields": [
-            "authorId"
-          ],
-          "relationToFields": [
-            "id"
-          ],
+          "relationFromFields": ["authorId"],
+          "relationToFields": ["id"],
           "relationOnDelete": "NONE",
           "isGenerated": false,
-          "isUpdatedAt": false
+          "isUpdatedAt": false,
+          "attributes": []
         },
         {
           "name": "categories",
@@ -323,14 +378,12 @@
           "relationToFields": [],
           "relationOnDelete": "NONE",
           "isGenerated": false,
-          "isUpdatedAt": false
+          "isUpdatedAt": false,
+          "attributes": []
         }
       ],
       "isGenerated": false,
-      "idFields": [
-        "title",
-        "createdAt"
-      ],
+      "idFields": ["title", "createdAt"],
       "uniqueFields": [],
       "uniqueIndexes": []
     },
@@ -347,6 +400,7 @@
           "isUnique": false,
           "isId": true,
           "isReadOnly": false,
+          "attributes": [{ "name": "id", "arguments": [] }],
           "type": "Int",
           "hasDefaultValue": false,
           "isGenerated": false,
@@ -363,7 +417,8 @@
           "type": "String",
           "hasDefaultValue": false,
           "isGenerated": false,
-          "isUpdatedAt": false
+          "isUpdatedAt": false,
+          "attributes": []
         },
         {
           "name": "posts",
@@ -380,7 +435,8 @@
           "relationToFields": [],
           "relationOnDelete": "NONE",
           "isGenerated": false,
-          "isUpdatedAt": false
+          "isUpdatedAt": false,
+          "attributes": []
         },
         {
           "name": "cat",
@@ -393,7 +449,8 @@
           "type": "CategoryEnum",
           "hasDefaultValue": false,
           "isGenerated": false,
-          "isUpdatedAt": false
+          "isUpdatedAt": false,
+          "attributes": []
         }
       ],
       "isGenerated": false,
@@ -414,6 +471,7 @@
           "isUnique": false,
           "isId": true,
           "isReadOnly": false,
+          "attributes": [{ "name": "id", "arguments": [] }],
           "type": "Int",
           "hasDefaultValue": false,
           "isGenerated": false,
@@ -427,6 +485,7 @@
           "isUnique": false,
           "isId": false,
           "isReadOnly": true,
+          "attributes": [],
           "type": "String",
           "hasDefaultValue": false,
           "isGenerated": false,
@@ -440,6 +499,7 @@
           "isUnique": false,
           "isId": false,
           "isReadOnly": true,
+          "attributes": [],
           "type": "DateTime",
           "hasDefaultValue": false,
           "isGenerated": false,
@@ -453,6 +513,7 @@
           "isUnique": false,
           "isId": false,
           "isReadOnly": true,
+          "attributes": [],
           "type": "Int",
           "hasDefaultValue": false,
           "isGenerated": false,
@@ -466,17 +527,12 @@
           "isUnique": false,
           "isId": false,
           "isReadOnly": false,
+          "attributes": [],
           "type": "Post",
           "hasDefaultValue": false,
           "relationName": "PostToPostToCategory",
-          "relationFromFields": [
-            "postTitle",
-            "postCreatedAt"
-          ],
-          "relationToFields": [
-            "title",
-            "createdAt"
-          ],
+          "relationFromFields": ["postTitle", "postCreatedAt"],
+          "relationToFields": ["title", "createdAt"],
           "relationOnDelete": "NONE",
           "isGenerated": false,
           "isUpdatedAt": false
@@ -489,15 +545,12 @@
           "isUnique": false,
           "isId": false,
           "isReadOnly": false,
+          "attributes": [],
           "type": "Category",
           "hasDefaultValue": false,
           "relationName": "CategoryToPostToCategory",
-          "relationFromFields": [
-            "categoryId"
-          ],
-          "relationToFields": [
-            "id"
-          ],
+          "relationFromFields": ["categoryId"],
+          "relationToFields": ["id"],
           "relationOnDelete": "NONE",
           "isGenerated": false,
           "isUpdatedAt": false
@@ -506,10 +559,12 @@
       "isGenerated": false,
       "idFields": [],
       "uniqueFields": [["postTitle", "categoryId"]],
-      "uniqueIndexes": [{
-        "name": "MyUniqueIndex",
-        "fields": ["postTitle", "categoryId"]
-      }]
+      "uniqueIndexes": [
+        {
+          "name": "MyUniqueIndex",
+          "fields": ["postTitle", "categoryId"]
+        }
+      ]
     },
     {
       "name": "A",
@@ -524,6 +579,12 @@
           "isUnique": false,
           "isId": true,
           "isReadOnly": false,
+          "attributes": [
+            {
+              "name": "id",
+              "arguments": []
+            }
+          ],
           "type": "Int",
           "hasDefaultValue": false,
           "isGenerated": false,
@@ -537,6 +598,7 @@
           "isUnique": false,
           "isId": false,
           "isReadOnly": true,
+          "attributes": [],
           "type": "Int",
           "hasDefaultValue": false,
           "isGenerated": false,
@@ -550,15 +612,12 @@
           "isUnique": false,
           "isId": false,
           "isReadOnly": false,
+          "attributes": [],
           "type": "B",
           "hasDefaultValue": false,
           "relationName": "AToB",
-          "relationFromFields": [
-            "bId"
-          ],
-          "relationToFields": [
-            "id"
-          ],
+          "relationFromFields": ["bId"],
+          "relationToFields": ["id"],
           "relationOnDelete": "NONE",
           "isGenerated": false,
           "isUpdatedAt": false
@@ -582,6 +641,12 @@
           "isUnique": false,
           "isId": true,
           "isReadOnly": false,
+          "attributes": [
+            {
+              "name": "id",
+              "arguments": []
+            }
+          ],
           "type": "Int",
           "hasDefaultValue": false,
           "isGenerated": false,
@@ -595,6 +660,7 @@
           "isUnique": false,
           "isId": false,
           "isReadOnly": false,
+          "attributes": [],
           "type": "A",
           "hasDefaultValue": false,
           "relationName": "AToB",

@@ -21,7 +21,22 @@
             "args": []
           },
           "isGenerated": false,
-          "isUpdatedAt": false
+          "isUpdatedAt": false,
+          "attributes": [
+            {
+              "name": "id",
+              "arguments": []
+            },
+            {
+              "name": "default",
+              "arguments": [
+                {
+                  "name": "",
+                  "value": "autoincrement()"
+                }
+              ]
+            }
+          ]
         },
         {
           "name": "ip",
@@ -35,12 +50,25 @@
           "hasDefaultValue": true,
           "default": {
             "name": "dbgenerated",
-            "args": [
-              "sqrt(4)"
-            ]
+            "args": ["sqrt(4)"]
           },
           "isGenerated": false,
-          "isUpdatedAt": false
+          "isUpdatedAt": false,
+          "attributes": [
+            {
+              "name": "unique",
+              "arguments": []
+            },
+            {
+              "name": "default",
+              "arguments": [
+                {
+                  "name": "",
+                  "value": "dbgenerated(\"sqrt(4)\")"
+                }
+              ]
+            }
+          ]
         }
       ],
       "isGenerated": false,

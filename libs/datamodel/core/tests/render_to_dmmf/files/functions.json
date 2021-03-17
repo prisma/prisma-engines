@@ -17,7 +17,13 @@
           "type": "Int",
           "hasDefaultValue": false,
           "isGenerated": false,
-          "isUpdatedAt": false
+          "isUpdatedAt": false,
+          "attributes": [
+            {
+              "name": "id",
+              "arguments": []
+            }
+          ]
         },
         {
           "name": "createdAt",
@@ -33,6 +39,17 @@
             "name": "now",
             "args": []
           },
+          "attributes": [
+            {
+              "name": "default",
+              "arguments": [
+                {
+                  "name": "",
+                  "value": "now()"
+                }
+              ]
+            }
+          ],
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -46,6 +63,21 @@
           "isReadOnly": false,
           "type": "String",
           "hasDefaultValue": true,
+          "attributes": [
+            {
+              "name": "default",
+              "arguments": [
+                {
+                  "name": "",
+                  "value": "cuid()"
+                }
+              ]
+            },
+            {
+              "name": "unique",
+              "arguments": []
+            }
+          ],
           "default": {
             "name": "cuid",
             "args": []

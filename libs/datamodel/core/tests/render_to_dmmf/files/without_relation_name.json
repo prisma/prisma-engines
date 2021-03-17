@@ -17,7 +17,13 @@
           "type": "Int",
           "hasDefaultValue": false,
           "isGenerated": false,
-          "isUpdatedAt": false
+          "isUpdatedAt": false,
+          "attributes": [
+            {
+              "name": "id",
+              "arguments": []
+            }
+          ]
         },
         {
           "name": "posts",
@@ -34,7 +40,8 @@
           "relationToFields": [],
           "relationOnDelete": "NONE",
           "isGenerated": false,
-          "isUpdatedAt": false
+          "isUpdatedAt": false,
+          "attributes": []
         }
       ],
       "isGenerated": false,
@@ -58,7 +65,13 @@
           "type": "Int",
           "hasDefaultValue": false,
           "isGenerated": false,
-          "isUpdatedAt": false
+          "isUpdatedAt": false,
+          "attributes": [
+            {
+              "name": "id",
+              "arguments": []
+            }
+          ]
         },
         {
           "name": "userId",
@@ -71,7 +84,8 @@
           "type": "Int",
           "hasDefaultValue": false,
           "isGenerated": false,
-          "isUpdatedAt": false
+          "isUpdatedAt": false,
+          "attributes": []
         },
         {
           "name": "user",
@@ -84,15 +98,12 @@
           "type": "User",
           "hasDefaultValue": false,
           "relationName": "PostToUser",
-          "relationFromFields": [
-            "userId"
-          ],
-          "relationToFields": [
-            "id"
-          ],
+          "relationFromFields": ["userId"],
+          "relationToFields": ["id"],
           "relationOnDelete": "NONE",
           "isGenerated": false,
-          "isUpdatedAt": false
+          "isUpdatedAt": false,
+          "attributes": []
         }
       ],
       "isGenerated": false,
