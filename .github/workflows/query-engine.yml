@@ -24,3 +24,4 @@ jobs:
         env:
           SERVER_ROOT: /root/build
           TEST_CONNECTOR: ${{ matrix.connector }}
+          TEST_MODE: simple
