@@ -639,9 +639,9 @@ async fn different_default_values_should_work(api: &TestApi) -> crate::TestResul
           text                   String? @default("one") @db.Text
           tinytext_string        String  @default("twelve") @db.TinyText
           tinytext_number_string String  @default("1") @db.TinyText
-          tinytext_number        String  @default("10") @db.TinyText
-          tinytext_float         String  @default("1.0") @db.TinyText
-          tinytext_short         String  @default("1") @db.TinyText
+          tinytext_number        String  @default(dbgenerated("10")) @db.TinyText
+          tinytext_float         String  @default(dbgenerated("1.0")) @db.TinyText
+          tinytext_short         String  @default(dbgenerated("1")) @db.TinyText
         }
     "##};
 

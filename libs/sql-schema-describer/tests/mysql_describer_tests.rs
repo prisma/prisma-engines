@@ -977,7 +977,7 @@ async fn escaped_backslashes_in_string_literals_must_be_unescaped(api: &TestApi)
         )
     "#;
 
-    api.database().query_raw(&create_table, &[]).await?;
+    api.database().raw_cmd(&create_table).await?;
 
     let schema = api.describe().await?;
 
@@ -997,6 +997,28 @@ async fn escaped_backslashes_in_string_literals_must_be_unescaped(api: &TestApi)
     assert_eq!(default, "xyz\\Datasource\\Model");
 
     Ok(())
+}
+
+#[test_each_connector(tags("mysql_8", "mariadb"))]
+async fn function_expression_defaults_are_described_as_dbgenerated(api: &TestApi) {
+    let create_table = r#"
+        CREATE TABLE game (
+            id VARCHAR(8) DEFAULT (LEFT(UUID(), 8)),
+            created_at DATETIME DEFAULT current_timestamp(),
+
+            PRIMARY KEY (`id`)
+        );
+    "#;
+
+    api.database().raw_cmd(&create_table).await.unwrap();
+
+    let schema = api.describe().await.unwrap();
+
+    let table = schema.table_bang("game");
+
+    let default = table.column_bang("id").default.as_ref().unwrap();
+
+    assert_eq!(default, &DefaultValue::db_generated("left(uuid(),8)"))
 }
 
 #[test_each_connector(tags("mysql"))]

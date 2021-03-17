@@ -335,9 +335,22 @@ impl SqlSchemaDescriber {
                                 Some(PrismaValue::Int(0)) => DefaultValue::value(false),
                                 _ => DefaultValue::db_generated(default_string),
                             },
-                            ColumnTypeFamily::String => DefaultValue::value(PrismaValue::String(
-                                Self::unescape_and_unquote_default_string(default_string, flavour),
-                            )),
+                            ColumnTypeFamily::String => {
+                                let first_char = default_string.chars().next();
+
+                                // See https://dev.mysql.com/doc/refman/8.0/en/information-schema-columns-table.html
+                                // and https://mariadb.com/kb/en/information-schema-columns-table/
+                                if (extra.as_str() == "default_generated")
+                                    || ((first_char != Some('\'')) && matches!(flavour, Flavour::MariaDb))
+                                {
+                                    DefaultValue::db_generated(default_string)
+                                } else {
+                                    DefaultValue::value(PrismaValue::String(Self::unescape_and_unquote_default_string(
+                                        default_string,
+                                        flavour,
+                                    )))
+                                }
+                            }
                             //todo check other now() definitions
                             ColumnTypeFamily::DateTime => match Self::default_is_current_timestamp(&default_string) {
                                 true => DefaultValue::now(),
