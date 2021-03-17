@@ -5,12 +5,12 @@ on:
 jobs:
 
   test:
-    name: "Test Query Engine - ${{ matrix.segment }}"
+    name: "Test Query Engine - ${{ matrix.connector }}"
     
     strategy:
       fail-fast: false
       matrix:
-        segment: [""]
+        connector: [sqlite, postgresql9, postgresql10, postgresql11, postgresql12, postgresql13, pgbouncer, mysql, mysql56, mysql8, mariadb, mssql2017, mssql2019]
         
     container:
       image: prismagraphql/build:test
@@ -19,7 +19,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - run: sbt test ${{ matrix.segment }}
+      - run: sbt test
         working-directory: query-engine/connector-test-kit
         env:
           SERVER_ROOT: /root/build
+          TEST_CONNECTOR: ${{ matrix.connector }}
