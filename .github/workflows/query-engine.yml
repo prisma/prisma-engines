@@ -19,6 +19,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: "Start databases"
+        run: docker-compose up -d --file docker-compose.qe-tests.yml
+        
       - run: rustup default stable
       - run: sbt test
         working-directory: query-engine/connector-test-kit
