@@ -1,0 +1,26 @@
+name: Query Engine
+on:
+  push:
+
+jobs:
+
+  test:
+    name: "Test Query Engine - ${{ matrix.segment }}"
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        segment: [""]
+        
+    container:
+      image: prismagraphql/build:test
+        
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: "Start databases"
+        run: docker-compose up -d
+
+      - run: sbt test ${{ matrix.segment }}
+        working-directory: query-engine/connector-test-kit
