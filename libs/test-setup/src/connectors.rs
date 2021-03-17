@@ -19,7 +19,7 @@ fn connector_names() -> Vec<(&'static str, BitFlags<Tags>)> {
         ("mysql", Tags::Mysql | Tags::Mysql57),
         ("mysql_5_6", Tags::Mysql | Tags::Mysql56),
         ("postgres9", Tags::Postgres.into()),
-        ("postgres", Tags::Postgres.into()),
+        ("postgres10", Tags::Postgres.into()),
         ("postgres11", Tags::Postgres.into()),
         ("postgres12", Tags::Postgres | Tags::Postgres12),
         ("postgres13", Tags::Postgres.into()),
