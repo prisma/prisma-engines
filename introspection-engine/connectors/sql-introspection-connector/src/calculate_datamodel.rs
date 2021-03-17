@@ -80,6 +80,7 @@ mod tests {
                         "optional",
                         FieldArity::Optional,
                         FieldType::Base(ScalarType::Int, None),
+                        Vec::new(),
                     )),
                     Field::ScalarField(ScalarField {
                         name: "required".to_string(),
@@ -94,11 +95,13 @@ mod tests {
                         is_updated_at: false,
                         is_commented_out: false,
                         is_ignored: false,
+                        attributes: Vec::new(),
                     }),
                     Field::ScalarField(ScalarField::new(
                         "list",
                         FieldArity::List,
                         FieldType::Base(ScalarType::Int, None),
+                        Vec::new(),
                     )),
                 ],
                 is_generated: false,
@@ -182,6 +185,7 @@ mod tests {
                         is_updated_at: false,
                         is_commented_out: false,
                         is_ignored: false,
+                        attributes: Vec::new(),
                     })],
                     is_generated: false,
                     indices: vec![],
@@ -215,6 +219,7 @@ mod tests {
                         is_updated_at: false,
                         is_commented_out: false,
                         is_ignored: false,
+                        attributes: Vec::new(),
                     })],
                     is_generated: false,
                     indices: vec![],
@@ -248,6 +253,7 @@ mod tests {
                         is_updated_at: false,
                         is_commented_out: false,
                         is_ignored: false,
+                        attributes: Vec::new(),
                     })],
                     is_generated: false,
                     indices: vec![],
@@ -351,6 +357,7 @@ mod tests {
                         "non_unique",
                         FieldArity::Optional,
                         FieldType::Base(ScalarType::Int, None),
+                        Vec::new(),
                     )),
                     Field::ScalarField(ScalarField {
                         name: "unique".to_string(),
@@ -365,6 +372,7 @@ mod tests {
                         is_updated_at: false,
                         is_commented_out: false,
                         is_ignored: false,
+                        attributes: Vec::new(),
                     }),
                 ],
                 is_generated: false,
@@ -442,6 +450,7 @@ mod tests {
                             is_updated_at: false,
                             is_commented_out: false,
                             is_ignored: false,
+                            attributes: Vec::new(),
                         }),
                         Field::ScalarField(ScalarField::new(
                             "name",
@@ -454,6 +463,7 @@ mod tests {
                                     serialized_native_type: PostgresType::Text.to_json(),
                                 },
                             ),
+                            Vec::new(),
                         )),
                         Field::RelationField(RelationField::new(
                             "User",
@@ -499,6 +509,7 @@ mod tests {
                             is_updated_at: false,
                             is_commented_out: false,
                             is_ignored: false,
+                            attributes: Vec::new(),
                         }),
                         Field::ScalarField(ScalarField {
                             name: "city_id".to_string(),
@@ -520,6 +531,7 @@ mod tests {
                             is_updated_at: false,
                             is_commented_out: false,
                             is_ignored: false,
+                            attributes: Vec::new(),
                         }),
                         Field::ScalarField(ScalarField {
                             name: "city_name".to_string(),
@@ -541,6 +553,7 @@ mod tests {
                             is_updated_at: false,
                             is_commented_out: false,
                             is_ignored: false,
+                            attributes: Vec::new(),
                         }),
                         Field::RelationField(RelationField::new(
                             "City",
@@ -694,6 +707,7 @@ mod tests {
                         is_updated_at: false,
                         is_commented_out: false,
                         is_ignored: false,
+                        attributes: Vec::new(),
                     }),
                     Field::ScalarField(ScalarField::new(
                         "name",
@@ -706,6 +720,7 @@ mod tests {
                                 serialized_native_type: PostgresType::Text.to_json(),
                             },
                         ),
+                        Vec::new(),
                     )),
                     Field::ScalarField(ScalarField::new(
                         "lastname",
@@ -718,6 +733,7 @@ mod tests {
                                 serialized_native_type: PostgresType::Text.to_json(),
                             },
                         ),
+                        Vec::new(),
                     )),
                 ],
                 is_generated: false,
@@ -824,6 +840,7 @@ mod tests {
                             is_updated_at: false,
                             is_commented_out: false,
                             is_ignored: false,
+                            attributes: Vec::new(),
                         }),
                         Field::ScalarField(ScalarField::new(
                             "name",
@@ -836,6 +853,7 @@ mod tests {
                                     serialized_native_type: PostgresType::Text.to_json(),
                                 },
                             ),
+                            Vec::new(),
                         )),
                         Field::RelationField(RelationField::new(
                             "User",
@@ -881,6 +899,7 @@ mod tests {
                             is_updated_at: false,
                             is_commented_out: false,
                             is_ignored: false,
+                            attributes: Vec::new(),
                         }),
                         Field::ScalarField(ScalarField::new(
                             "city_id",
@@ -893,6 +912,7 @@ mod tests {
                                     args: Vec::new(),
                                 },
                             ),
+                            Vec::new(),
                         )),
                         Field::RelationField(RelationField::new(
                             "City",
