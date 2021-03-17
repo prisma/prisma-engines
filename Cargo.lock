@@ -3301,9 +3301,13 @@ dependencies = [
  "datamodel-connector",
  "enum_dispatch",
  "lazy_static",
+ "migration-core",
  "mongodb-datamodel-connector",
+ "prisma-models",
+ "query-core",
  "serde_json",
  "sql-datamodel-connector",
+ "tokio",
 ]
 
 [[package]]

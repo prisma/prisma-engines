@@ -10,6 +10,7 @@ pub use runner::*;
 
 use lazy_static::lazy_static;
 use serde_json::Value;
+use tokio::runtime::Builder;
 
 pub type TestResult<T> = Result<T, TestError>;
 
@@ -55,4 +56,16 @@ pub fn render_test_datamodel(config: &TestConfig, suite: &str, template: String)
 
     let models = tag.render_datamodel(template);
     format!("{}\n\n{}", datasource_with_generator, models)
+}
+
+pub async fn setup_project(datamodel: &str) {
+    migration_core::qe_setup(datamodel).await.unwrap();
+}
+
+pub fn run_with_tokio<O, F: std::future::Future<Output = O>>(fut: F) -> O {
+    Builder::new_current_thread()
+        .enable_all()
+        .build()
+        .unwrap()
+        .block_on(fut)
 }

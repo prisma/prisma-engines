@@ -36,8 +36,14 @@ fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream {
         }
     });
 
-    // The shell function retains the name of the original test definition.
     let mut test_function = parse_macro_input!(input as ItemFn);
+    if test_function.sig.asyncness.is_none() {
+        return syn::Error::new_spanned(test_function.sig, "connector test functions must be async")
+            .to_compile_error()
+            .into();
+    }
+
+    // The shell function retains the name of the original test definition.
     let test_fn_ident = test_function.sig.ident.clone();
 
     // Rename original test function to run_<orig_name>.
@@ -68,9 +74,12 @@ fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream {
 
             let template = #handler();
             let datamodel = query_tests_setup::render_test_datamodel(config, #suite_name, template);
-            let runner = Runner::load(config.runner(), datamodel).unwrap();
+            let runner = Runner::load(config.runner(), datamodel.clone()).unwrap();
 
-            #runner_fn_ident(&runner)
+            query_tests_setup::run_with_tokio(async move {
+                query_tests_setup::setup_project(&datamodel).await;
+                #runner_fn_ident(&runner).await;
+            })
         }
 
         #test_function

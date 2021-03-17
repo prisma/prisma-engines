@@ -35,15 +35,16 @@ mod some_spec {
     // Template rendering can be bypassed by simply not using the template strings.
     // Common schema handlers to use should be in a central place.
     fn schema_handler() -> String {
+        // #id(id, Int, @id)
         "model A {
-            #id(id, Int, @id)
+            id Int @id
             field String?
         }"
         .to_owned()
     }
 
-    #[connector_test(suite = "some_spec", schema(schema_handler), only(Postgres))]
-    fn ideal_api_test(runner: &Runner) {
+    #[connector_test(suite = "some_spec", schema(schema_handler), only(SqlServer, Postgres))]
+    async fn ideal_api_test(runner: &Runner) {
         let result = runner.query(
             "
             mutation {

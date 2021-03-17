@@ -92,17 +92,9 @@ impl TryFrom<(&str, Option<&str>)> for ConnectorTag {
     }
 }
 
-#[derive(Debug)]
-pub enum MySqlVersion {
-    V5_6,
-    V5_7,
-    V8,
-}
-
-#[derive(Debug)]
-pub enum PostgresVersion {
-    V9,
-    V10,
-    V11,
-    V12,
-}
+// #[derive(Debug)]
+// pub enum MySqlVersion {
+//     V5_6,
+//     V5_7,
+//     V8,
+// }
