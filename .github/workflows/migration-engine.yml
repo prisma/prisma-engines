@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      
+
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: 1.48.0
@@ -28,19 +28,19 @@ jobs:
 
   test:
     name: "Test Migration Engine - ${{ matrix.segment }}"
-    
+
     strategy:
       fail-fast: false
       matrix:
         segment: [migrations, native_types, "-- --skip 'migrations' --skip 'native_types'"]
-        
+
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
 
       - name: "Start databases"
         run: docker-compose up -d
-      
+
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: 1.48.0
@@ -56,3 +56,5 @@ jobs:
 
       - run: cargo test ${{ matrix.segment }}
         working-directory: migration-engine/migration-engine-tests
+        env:
+          CLICOLOR_FORCE: 1
