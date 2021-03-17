@@ -22,6 +22,6 @@ jobs:
       - run: sbt test
         working-directory: query-engine/connector-test-kit
         env:
-          SERVER_ROOT: /root/build
+          SERVER_ROOT: /__w/prisma-engines/prisma-engines
           TEST_CONNECTOR: ${{ matrix.connector }}
           TEST_MODE: simple
