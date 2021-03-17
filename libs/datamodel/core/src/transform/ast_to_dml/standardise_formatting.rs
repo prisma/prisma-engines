@@ -326,6 +326,7 @@ impl StandardiserForFormatting {
                     &format!("{}{}", model_name.camel_case(), f.name.pascal_case()),
                     field_arity,
                     f.field_type.clone(),
+                    Vec::new(),
                 )
             })
             .collect()

@@ -14,6 +14,7 @@ pub struct Field {
     pub is_unique: bool,
     pub is_id: bool,
     pub is_read_only: bool,
+    pub attributes: Vec<Attribute>,
     #[serde(rename = "type")]
     pub field_type: String,
     pub has_default_value: bool,
@@ -33,6 +34,20 @@ pub struct Field {
     pub is_updated_at: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub documentation: Option<String>,
+}
+
+#[serde(rename_all = "camelCase")]
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct Attribute {
+    pub name: String,
+    pub arguments: Vec<Argument>,
+}
+
+#[serde(rename_all = "camelCase")]
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct Argument {
+    pub name: String,
+    pub value: serde_json::Value,
 }
 
 #[serde(rename_all = "camelCase")]

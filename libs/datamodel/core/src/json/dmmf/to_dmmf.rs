@@ -1,4 +1,4 @@
-use super::{Datamodel, Enum, EnumValue, Field, Function, Model, UniqueIndex};
+use super::{Argument, Attribute, Datamodel, Enum, EnumValue, Field, Function, Model, UniqueIndex};
 use crate::{dml, FieldType, Ignorable, IndexType, ScalarType};
 use bigdecimal::ToPrimitive;
 use prisma_value::PrismaValue;
@@ -116,7 +116,25 @@ fn field_to_dmmf(model: &dml::Model, field: &dml::Field) -> Field {
         is_generated: Some(field.is_generated()),
         is_updated_at: Some(field.is_updated_at()),
         documentation: field.documentation().map(|v| v.to_owned()),
+        attributes: convert_attributes(field.attributes()),
     }
+}
+
+fn convert_attributes(attributes: Vec<dml::Attribute>) -> Vec<Attribute> {
+    attributes
+        .iter()
+        .map(|attribute| Attribute {
+            name: attribute.name.clone(),
+            arguments: attribute
+                .arguments
+                .iter()
+                .map(|argument| Argument {
+                    name: argument.name.clone(),
+                    value: argument.value.clone(),
+                })
+                .collect(),
+        })
+        .collect()
 }
 
 fn get_field_kind(field: &dml::Field) -> String {

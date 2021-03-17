@@ -1,14 +1,18 @@
 use std::str::FromStr;
 
 use super::super::attributes::AllAttributes;
-use crate::diagnostics::{DatamodelError, Diagnostics};
 use crate::dml::ScalarType;
 use crate::transform::helpers::ValueValidator;
 use crate::{ast, configuration, dml, Field, FieldType};
+use crate::{
+    ast::WithAttributes,
+    diagnostics::{DatamodelError, Diagnostics},
+};
 use datamodel_connector::connector_error::{ConnectorError, ErrorKind};
 use itertools::Itertools;
 use once_cell::sync::Lazy;
 use regex::Regex;
+use serde_json::json;
 
 /// Helper for lifting a datamodel.
 ///
@@ -160,7 +164,8 @@ impl<'a> LiftAstToDml<'a> {
             }
             x => {
                 let arity = self.lift_field_arity(&ast_field.arity);
-                let mut field = dml::ScalarField::new(&ast_field.name.name, arity, x);
+                let attributes = self.lift_attributes(&ast_field);
+                let mut field = dml::ScalarField::new(&ast_field.name.name, arity, x, attributes);
                 field.documentation = ast_field.documentation.clone().map(|comment| comment.text);
                 Field::ScalarField(field)
             }
@@ -178,6 +183,24 @@ impl<'a> LiftAstToDml<'a> {
         } else {
             Ok(field)
         }
+    }
+
+    fn lift_attributes(&self, ast_field: &ast::Field) -> Vec<dml::Attribute> {
+        ast_field
+            .attributes()
+            .iter()
+            .map(|a| dml::Attribute {
+                name: a.name.name.to_string(),
+                arguments: a
+                    .arguments
+                    .iter()
+                    .map(|ar| dml::Argument {
+                        name: ar.name.name.to_string(),
+                        value: json!(ar.value.render_to_string()),
+                    })
+                    .collect(),
+            })
+            .collect()
     }
 
     /// Internal: Lift a field's arity.

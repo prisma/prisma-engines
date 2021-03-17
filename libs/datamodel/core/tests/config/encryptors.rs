@@ -5,27 +5,33 @@ fn serialize_encryptors_to_cmf() {
     std::env::set_var("HALLO", "secret-vault-token");
 
     let schema: &str = r#"
-encryptor js1 {
+encryptor en1 {
     provider = "vault"
     token = "HALLO"
 }
 
-encryptor js2 {
+encryptor en2 {
     provider = "vault"
     token = env("HALLO")
+}
+
+model User {
+    id Int @id
+    name String
+    ssn String @encrypted(encryptor: en1)
 }
 
 "#;
 
     let expected = r#"[
   {
-    "name": "js1",
+    "name": "en1",
     "provider": "vault",
     "token": "HALLO",
     "config": {}
   },
   {
-    "name": "js2",
+    "name": "en2",
     "provider": "vault",
     "token": "secret-vault-token",
     "config": {}
@@ -35,132 +41,6 @@ encryptor js2 {
     assert_mcf(&schema, &expected);
     std::env::remove_var("HALLO")
 }
-
-// #[test]
-// fn preview_features_setting_must_work() {
-//     // make sure both single value and array syntax work
-//     let schema = r#"
-//         generator js {
-//             provider = "javascript"
-//             previewFeatures = "connectOrCreate"
-//         }
-
-//         generator go {
-//             provider = "go"
-//             previewFeatures = ["connectOrCreate", "transactionApi"]
-//         }
-//     "#;
-
-//     let expected = r#"[
-//   {
-//     "name": "js",
-//     "provider": "javascript",
-//     "output":null,
-//     "binaryTargets": [],
-//     "previewFeatures": ["connectOrCreate"],
-//     "config": {}
-//   },
-//   {
-//     "name": "go",
-//     "provider": "go",
-//     "output":null,
-//     "binaryTargets": [],
-//     "previewFeatures": ["connectOrCreate", "transactionApi"],
-//     "config": {}
-//   }
-// ]"#;
-
-//     assert_mcf(&schema, &expected);
-// }
-
-// #[test]
-// fn back_slashes_in_providers_must_work() {
-//     let schema = r#"
-//         generator mygen {
-//           provider = "../folder\ with\ space/my\ generator.js"
-//         }
-//     "#;
-
-//     let expected = r#"[
-//         {
-//           "name": "mygen",
-//           "provider": "../folder\\ with\\ space/my\\ generator.js",
-//           "output": null,
-//           "binaryTargets": [],
-//           "previewFeatures": [],
-//           "config": {}
-//         }
-//     ]"#;
-
-//     assert_mcf(&schema, &expected);
-// }
-
-// #[test]
-// fn new_lines_in_generator_must_work() {
-//     let schema = r#"
-//         generator go {
-//           provider = "go"
-//           binaryTargets = ["b", "c"]
-
-//         }
-//     "#;
-
-//     let expected = r#"[
-//         {
-//           "name": "go",
-//           "provider": "go",
-//           "output": null,
-//           "binaryTargets": ["b","c"],
-//           "previewFeatures": [],
-//           "config": {}
-//         }
-//     ]"#;
-
-//     assert_mcf(&schema, &expected);
-// }
-
-// #[test]
-// fn fail_to_load_generator_with_options_missing() {
-//     let schema = r#"
-// generator js1 {
-//     no_provider = "javascript"
-//     output = "../../js"
-// }
-//     "#;
-//     let res = datamodel::parse_configuration(schema);
-
-//     if let Err(diagnostics) = res {
-//         diagnostics.assert_is(DatamodelError::GeneratorArgumentNotFound {
-//             argument_name: String::from("provider"),
-//             generator_name: String::from("js1"),
-//             span: datamodel::ast::Span::new(1, 73),
-//         });
-//     } else {
-//         panic!("Expected error.")
-//     }
-// }
-
-// #[test]
-// fn nice_error_for_unknown_generator_preview_feature() {
-//     let schema = r#"
-//     generator client {
-//       provider = "prisma-client-js"
-//       previewFeatures = ["foo"]
-//     }
-//     "#;
-
-//     let res = datamodel::parse_configuration(schema);
-
-//     if let Err(diagnostics) = res {
-//         diagnostics.assert_is(DatamodelError::new_preview_feature_not_known_error(
-//             "foo",
-//             Vec::from(GENERATOR_PREVIEW_FEATURES),
-//             datamodel::ast::Span::new(84, 91),
-//         ));
-//     } else {
-//         panic!("Expected error.")
-//     }
-// }
 
 fn assert_mcf(schema: &str, expected_mcf: &str) {
     let config = parse_configuration(schema);

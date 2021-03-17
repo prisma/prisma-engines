@@ -127,6 +127,13 @@ impl Field {
         }
     }
 
+    pub fn attributes(&self) -> Vec<Attribute> {
+        match self {
+            Field::ScalarField(sf) => sf.attributes.clone(),
+            Field::RelationField(_rf) => Vec::new(),
+        }
+    }
+
     pub fn documentation(&self) -> Option<&str> {
         match self {
             Field::ScalarField(sf) => sf.documentation.as_deref(),
@@ -335,11 +342,27 @@ pub struct ScalarField {
 
     /// Indicates if this field is ignored by the Client.
     pub is_ignored: bool,
+
+    pub attributes: Vec<Attribute>,
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub struct Attribute {
+    pub name: String,
+
+    pub arguments: Vec<Argument>,
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub struct Argument {
+    pub name: String,
+
+    pub value: serde_json::Value,
 }
 
 impl ScalarField {
     /// Creates a new field with the given name and type.
-    pub fn new(name: &str, arity: FieldArity, field_type: FieldType) -> ScalarField {
+    pub fn new(name: &str, arity: FieldArity, field_type: FieldType, attributes: Vec<Attribute>) -> ScalarField {
         ScalarField {
             name: String::from(name),
             arity,
@@ -353,11 +376,12 @@ impl ScalarField {
             is_updated_at: false,
             is_commented_out: false,
             is_ignored: false,
+            attributes,
         }
     }
     /// Creates a new field with the given name and type, marked as generated and optional.
     pub fn new_generated(name: &str, field_type: FieldType) -> ScalarField {
-        let mut field = Self::new(name, FieldArity::Optional, field_type);
+        let mut field = Self::new(name, FieldArity::Optional, field_type, Vec::new());
         field.is_generated = true;
 
         field

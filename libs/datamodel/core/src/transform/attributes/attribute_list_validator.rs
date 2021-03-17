@@ -91,12 +91,12 @@ impl<T: 'static> AttributeListValidator<T> {
                     }
                 }
                 None => {
-                    if !attribute.name.name.is_empty() && !attribute.name.name.contains('.') {
-                        errors.push_error(DatamodelError::new_attribute_not_known_error(
-                            &attribute.name.name,
-                            attribute.name.span,
-                        ))
-                    }
+                    // if !attribute.name.name.is_empty() && !attribute.name.name.contains('.') {
+                    //     errors.push_error(DatamodelError::new_attribute_not_known_error(
+                    //         &attribute.name.name,
+                    //         attribute.name.span,
+                    //     ))
+                    // }
                 }
             };
         }
