@@ -10,3 +10,4 @@ datamodel-connector = { path = "../../../libs/datamodel/connectors/datamodel-con
 mongodb-datamodel-connector = { path = "../../../libs/datamodel/connectors/mongodb-datamodel-connector" }
 sql-datamodel-connector = { path = "../../../libs/datamodel/connectors/sql-datamodel-connector" }
 lazy_static = "1.4"
+enum_dispatch = "0.3"

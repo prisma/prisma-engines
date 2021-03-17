@@ -1088,6 +1088,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "enum_dispatch"
+version = "0.3.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8946e241a7774d5327d92749c50806f275f57d031d2229ecbfd65469a8ad338e"
+dependencies = [
+ "once_cell",
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "enumflags2"
 version = "0.6.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3287,6 +3299,7 @@ name = "query-tests-setup"
 version = "0.1.0"
 dependencies = [
  "datamodel-connector",
+ "enum_dispatch",
  "lazy_static",
  "mongodb-datamodel-connector",
  "serde_json",

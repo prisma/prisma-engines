@@ -1,12 +1,16 @@
+mod postgres;
 mod sql_schema_renderer;
 mod sql_server;
 
 use datamodel_connector::ConnectorCapability;
+use enum_dispatch::enum_dispatch;
+use postgres::*;
 use sql_server::*;
 use std::convert::TryFrom;
 
 use crate::{TestConfig, TestError};
 
+#[enum_dispatch]
 pub trait ConnectorTagInterface {
     /// The name of the datamodel provider for this connector.
     /// Must match valid datamodel provider strings.
@@ -33,19 +37,24 @@ pub trait ConnectorTagInterface {
     fn is_versioned(&self) -> bool;
 }
 
+#[enum_dispatch(ConnectorTagInterface)]
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum ConnectorTag {
     SqlServer(SqlServerConnectorTag),
-    MySql,
-    Postgres,
-    Sqlite,
-    MongoDb,
+    Postgres(PostgresConnectorTag),
+    // MySql,
+    // Sqlite,
+    // MongoDb,
 }
 
 impl ConnectorTag {
     /// Returns all possible connector tags.
     pub fn all() -> Vec<Self> {
-        SqlServerConnectorTag::all().into_iter().map(Self::SqlServer).collect()
+        SqlServerConnectorTag::all()
+            .into_iter()
+            .map(Self::SqlServer)
+            .chain(PostgresConnectorTag::all().into_iter().map(Self::Postgres))
+            .collect()
     }
 
     /// Based on the connector tags that are enabled for a test, check if
@@ -72,76 +81,14 @@ impl TryFrom<(&str, Option<&str>)> for ConnectorTag {
 
         let tag = match connector.to_lowercase().as_str() {
             "sqlserver" => Self::SqlServer(SqlServerConnectorTag::new(version)?),
-            "mysql" => Self::MySql,
-            "postgres" => Self::Postgres,
-            "sqlite" => Self::Sqlite,
-            "mongodb" => Self::MongoDb,
+            "postgres" => Self::Postgres(PostgresConnectorTag::new(version)?),
+            // "mysql" => Self::MySql,
+            // "sqlite" => Self::Sqlite,
+            // "mongodb" => Self::MongoDb,
             _ => return Err(TestError::parse_error(format!("Unknown connector tag `{}`", connector))),
         };
 
         Ok(tag)
-    }
-}
-
-impl ConnectorTagInterface for ConnectorTag {
-    fn datamodel_provider(&self) -> &'static str {
-        match self {
-            ConnectorTag::SqlServer(tag) => tag.datamodel_provider(),
-            ConnectorTag::MySql => todo!(),
-            ConnectorTag::Postgres => todo!(),
-            ConnectorTag::Sqlite => todo!(),
-            ConnectorTag::MongoDb => todo!(),
-        }
-    }
-
-    fn connection_string(&self, database: &str, is_ci: bool) -> String {
-        match self {
-            ConnectorTag::SqlServer(tag) => tag.connection_string(database, is_ci),
-            ConnectorTag::MySql => todo!(),
-            ConnectorTag::Postgres => todo!(),
-            ConnectorTag::Sqlite => todo!(),
-            ConnectorTag::MongoDb => todo!(),
-        }
-    }
-
-    fn capabilities(&self) -> Vec<ConnectorCapability> {
-        match self {
-            ConnectorTag::SqlServer(tag) => tag.capabilities(),
-            ConnectorTag::MySql => todo!(),
-            ConnectorTag::Postgres => todo!(),
-            ConnectorTag::Sqlite => todo!(),
-            ConnectorTag::MongoDb => todo!(),
-        }
-    }
-
-    fn as_parse_pair(&self) -> (String, Option<String>) {
-        match self {
-            ConnectorTag::SqlServer(tag) => tag.as_parse_pair(),
-            ConnectorTag::MySql => todo!(),
-            ConnectorTag::Postgres => todo!(),
-            ConnectorTag::Sqlite => todo!(),
-            ConnectorTag::MongoDb => todo!(),
-        }
-    }
-
-    fn is_versioned(&self) -> bool {
-        match self {
-            ConnectorTag::SqlServer(tag) => tag.is_versioned(),
-            ConnectorTag::MySql => todo!(),
-            ConnectorTag::Postgres => todo!(),
-            ConnectorTag::Sqlite => todo!(),
-            ConnectorTag::MongoDb => todo!(),
-        }
-    }
-
-    fn render_datamodel(&self, template: String) -> String {
-        match self {
-            ConnectorTag::SqlServer(tag) => tag.render_datamodel(template),
-            ConnectorTag::MySql => todo!(),
-            ConnectorTag::Postgres => todo!(),
-            ConnectorTag::Sqlite => todo!(),
-            ConnectorTag::MongoDb => todo!(),
-        }
     }
 }
 

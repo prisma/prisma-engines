@@ -29,6 +29,7 @@ fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream {
     let connectors = args.connectors_to_test();
     let handler = args.schema.unwrap().handler_path;
 
+    // Renders the connectors as list to use in the code.
     let connectors = connectors.into_iter().map(quote_connector).fold1(|aggr, next| {
         quote! {
             #aggr, #next
@@ -43,7 +44,14 @@ fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream {
     let runner_fn_ident = Ident::new(&format!("run_{}", test_fn_ident.to_string()), Span::call_site());
     test_function.sig.ident = runner_fn_ident.clone();
 
+    // Used for logging purposes.
     let test_name = test_fn_ident.to_string();
+
+    // The suite name is the name used as the database for data source rendering.
+    let suite_name = args.suite;
+
+    // The actual test is a shell function that gets the name of the original function,
+    // which is then calling `{orig_name}_run` in the end (see `runner_fn_ident`).
     let test = quote! {
         #[test]
         fn #test_fn_ident() {
@@ -59,7 +67,7 @@ fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream {
             }
 
             let template = #handler();
-            let datamodel = query_tests_setup::render_test_datamodel(config, "test", template);
+            let datamodel = query_tests_setup::render_test_datamodel(config, #suite_name, template);
             let runner = Runner::load(config.runner(), datamodel).unwrap();
 
             #runner_fn_ident(&runner)
@@ -73,6 +81,8 @@ fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream {
 
 #[derive(Debug, FromMeta)]
 struct ConnectorTestArgs {
+    suite: String,
+
     #[darling(default)]
     schema: Option<SchemaHandler>,
 
@@ -87,7 +97,7 @@ impl ConnectorTestArgs {
     pub fn validate(&self) -> Result<(), darling::Error> {
         if !self.only.is_empty() && !self.exclude.is_empty() {
             return Err(darling::Error::custom(
-                "Only one of `only` and `exclude` can be speficified for a connector test.",
+                "Only one of `only` and `exclude` can be specified for a connector test.",
             ));
         }
 
@@ -99,9 +109,12 @@ impl ConnectorTestArgs {
         if !self.only.is_empty() {
             self.only.tags.clone()
         } else if !self.exclude.is_empty() {
-            todo!()
+            let all = ConnectorTag::all();
+            let exclude = self.exclude.tags();
+
+            all.into_iter().filter(|tag| !exclude.contains(tag)).collect()
         } else {
-            todo!()
+            ConnectorTag::all()
         }
     }
 }
@@ -153,6 +166,10 @@ struct ExcludeConnectorTags {
 impl ExcludeConnectorTags {
     pub fn is_empty(&self) -> bool {
         self.tags.is_empty()
+    }
+
+    pub fn tags(&self) -> &[ConnectorTag] {
+        &self.tags
     }
 }
 

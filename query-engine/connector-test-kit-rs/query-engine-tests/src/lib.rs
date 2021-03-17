@@ -22,18 +22,13 @@ pub mod schemas {
 // #[before_each(before_each_handler)] // Hook to run before each test.
 // #[schema(schema_handler)] // Schema for all contained tests. Allows us to cache runners maybe.
 mod some_spec {
-    use query_tests_setup::Runner;
-
     use super::*;
+    use query_tests_setup::Runner;
 
     // fn before_each_handler(runner: &Runner) {
     //     // Maybe we don't need this.
     //     runner.truncate_data(); // Actually, this should always happen for a connector test.
     //     test_data(); // This can also be done in each test manually or by convention.
-    // }
-
-    // fn test_data() {
-    //     todo!()
     // }
 
     // Handler that returns a schema template to use for rendering.
@@ -43,19 +38,11 @@ mod some_spec {
         "model A {
             #id(id, Int, @id)
             field String?
-            #relation(bs, B, ...)
         }"
         .to_owned()
     }
 
-    // (
-    //     schema(schema_handler), // Override or manual set of schema to use.
-    //     only(Postgres), // Only run for certain connectors, xor with `exclude`
-    //     exclude(SqlServer) // Run for all except certain connectors, xor with `only`
-    //     // If none of the two above are specified all connectors are run.
-    // )
-
-    #[connector_test(schema(schema_handler), only(SqlServer(2019)))] // , Postgres("test-4", 1), MySql, Wurst
+    #[connector_test(suite = "some_spec", schema(schema_handler), only(Postgres))]
     fn ideal_api_test(runner: &Runner) {
         let result = runner.query(
             "
