@@ -19,8 +19,5 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: "Start databases"
-        run: docker-compose up -d
-
       - run: sbt test ${{ matrix.segment }}
         working-directory: query-engine/connector-test-kit
