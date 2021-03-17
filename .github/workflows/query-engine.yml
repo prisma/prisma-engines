@@ -19,6 +19,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - run: sudo curl -L "https://github.com/docker/compose/releases/download/1.28.5/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+      - run: sudo chmod +x /usr/local/bin/docker-compose
+      - run: docker-compose --version
+
       - name: "Start databases"
         run: docker-compose up -d --file docker-compose.qe-tests.yml
         
