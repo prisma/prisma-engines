@@ -33,3 +33,26 @@ impl ToString for QueryResult {
         todo!()
     }
 }
+
+/// Render the complete datamodel with all bells and whistles.
+pub fn render_test_datamodel(config: &TestConfig, suite: &str, template: String) -> String {
+    let tag = config.test_connector_tag().unwrap();
+    let datasource_with_generator = format!(
+        r#"
+      datasource test {{
+        provider = "{}"
+        url = "{}"
+      }}
+
+      generator client {{
+        provider = "prisma-client-js"
+        previewFeatures = ["microsoftSqlServer"]
+      }}
+    "#,
+        tag.datamodel_provider(),
+        tag.connection_string(suite, config.is_ci())
+    );
+
+    let models = tag.render_datamodel(template);
+    format!("{}\n\n{}", datasource_with_generator, models)
+}

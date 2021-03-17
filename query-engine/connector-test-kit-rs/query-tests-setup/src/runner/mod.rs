@@ -23,6 +23,7 @@ pub enum Runner {
 
 impl Runner {
     pub fn load(ident: &str, datamodel: String) -> TestResult<Self> {
+        dbg!(datamodel);
         match ident {
             "direct" => Ok(Self::Direct(DirectRunner {})),
             "napi" => Ok(Self::NApi(NApiRunner {})),

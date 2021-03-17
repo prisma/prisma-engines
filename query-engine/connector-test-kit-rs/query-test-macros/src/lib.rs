@@ -51,16 +51,16 @@ fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream {
             let enabled_connectors = vec![
                 #connectors
             ];
+            println!("{:?}", enabled_connectors);
 
             if !ConnectorTag::should_run(&config, &enabled_connectors) {
-                println!("Skipping test '{}', current connector not enabled.", #test_name);
+                println!("Skipping test '{}', current test connector is not enabled.", #test_name);
                 return
             }
 
-            let schema = #handler();
-            let runner = Runner::load(config.runner(), schema).unwrap();
-
-            println!("{:?}", enabled_connectors);
+            let template = #handler();
+            let datamodel = query_tests_setup::render_test_datamodel(config, "test", template);
+            let runner = Runner::load(config.runner(), datamodel).unwrap();
 
             #runner_fn_ident(&runner)
         }

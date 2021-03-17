@@ -8,6 +8,15 @@ pub struct SqlServerConnectorTag {
 }
 
 impl ConnectorTagInterface for SqlServerConnectorTag {
+    fn datamodel_provider(&self) -> &'static str {
+        "sqlserver"
+    }
+
+    fn render_datamodel(&self, template: String) -> String {
+        // Todo, pass through for now
+        template
+    }
+
     fn connection_string(&self, database: &str, is_ci: bool) -> String {
         match self.version {
             Some(SqlServerVersion::V2017) if is_ci => format!("sqlserver://test-db-mssql-2017:1433;database=master;schema={};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel=READ UNCOMMITTED", database),
@@ -16,7 +25,7 @@ impl ConnectorTagInterface for SqlServerConnectorTag {
             Some(SqlServerVersion::V2019) if is_ci => format!("sqlserver://test-db-mssql-2019:1433;database=master;schema={};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel=READ UNCOMMITTED", database),
             Some(SqlServerVersion::V2019) => format!("sqlserver://127.0.0.1:1433;database=master;schema={};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel=READ UNCOMMITTED", database),
 
-            None => unreachable!(),
+            None => unreachable!("A versioned connector must have a concrete version to run."),
         }.to_string()
     }
 
@@ -27,6 +36,10 @@ impl ConnectorTagInterface for SqlServerConnectorTag {
     fn as_parse_pair(&self) -> (String, Option<String>) {
         let version = self.version.as_ref().map(ToString::to_string);
         ("sqlserver".to_owned(), version)
+    }
+
+    fn is_versioned(&self) -> bool {
+        true
     }
 }
 

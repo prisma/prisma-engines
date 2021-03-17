@@ -1,20 +1,26 @@
-use crate::{TestError, TestResult};
+use std::convert::TryFrom;
 
-/// A collection of configuration done via env.
-/// `runner`: The test runner to use for the tests.
-/// `connector`: The connector that tests should run for.
-/// `connector_version`: The connector version tests should run for.
-///                      If no version is given, all tests of that family will be run.
+use crate::{ConnectorTag, ConnectorTagInterface, TestError, TestResult};
+
+/// The central test configuration.
 #[derive(Debug, Default)]
 pub struct TestConfig {
-    /// TEST_RUNNER
+    /// The test runner to use for the tests.
+    /// Env key: `TEST_RUNNER`
     runner: String,
 
-    /// TEST_CONNECTOR
+    /// The connector that tests should run for.
+    /// Env key: `TEST_CONNECTOR`
     connector: String,
 
-    /// TEST_CONNECTOR_VERSION
+    /// The connector version tests should run for.
+    /// If the test connector is versioned, this option is required.
+    /// Env key: `TEST_CONNECTOR_VERSION`
     connector_version: Option<String>,
+
+    /// Indicates whether or not the tests are running in CI context.
+    /// Env key: `BUILDKITE`
+    is_ci: bool,
 }
 
 impl TestConfig {
@@ -31,10 +37,17 @@ impl TestConfig {
         let connector = std::env::var("TEST_CONNECTOR").unwrap_or_else(|_| String::new());
         let connector_version = std::env::var("TEST_CONNECTOR_VERSION").ok();
 
+        // Just care for a set value for now.
+        let is_ci = match std::env::var("BUILDKITE") {
+            Ok(_) => true,
+            Err(_) => false,
+        };
+
         Ok(Self {
             runner,
             connector,
             connector_version,
+            is_ci,
         })
     }
 
@@ -50,6 +63,12 @@ impl TestConfig {
 
         if self.connector.is_empty() {
             return Err(TestError::config_error("A test connector is required but was not set."));
+        }
+
+        if self.test_connector_tag()?.is_versioned() && self.connector_version.is_none() {
+            return Err(TestError::config_error(
+                "The current test connector requires a version to be set to run.",
+            ));
         }
 
         Ok(())
@@ -83,5 +102,13 @@ impl TestConfig {
 
     pub fn connector_version(&self) -> Option<&str> {
         self.connector_version.as_ref().map(AsRef::as_ref)
+    }
+
+    pub fn is_ci(&self) -> bool {
+        self.is_ci
+    }
+
+    pub fn test_connector_tag(&self) -> TestResult<ConnectorTag> {
+        ConnectorTag::try_from((self.connector(), self.connector_version()))
     }
 }
