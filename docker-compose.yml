@@ -81,7 +81,7 @@ services:
     tmpfs: /pgtmpfs12
 
   mysql-5-6:
-    image: mysql:5.6
+    image: mysql:5.6.50
     command: mysqld
     restart: always
     environment:
@@ -95,7 +95,7 @@ services:
     tmpfs: /var/lib/mysql
 
   mysql-5-7:
-    image: mysql:5.7
+    image: mysql:5.7.32
     command: mysqld
     restart: always
     environment:
@@ -109,7 +109,7 @@ services:
     tmpfs: /var/lib/mysql
 
   mysql-8-0:
-    image: mysql:8.0
+    image: mysql:8.0.22
     command: mysqld
     restart: always
     environment:
