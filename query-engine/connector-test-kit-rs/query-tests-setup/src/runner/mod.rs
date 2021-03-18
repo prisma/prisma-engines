@@ -8,7 +8,12 @@ pub use napi::*;
 
 use crate::{QueryResult, TestError, TestResult};
 
-pub trait RunnerInterface {}
+#[async_trait::async_trait]
+pub trait RunnerInterface: Sized {
+    async fn load(datamodel: String) -> TestResult<Self>;
+    async fn query(&self, query: String) -> TestResult<QueryResult>;
+    async fn batch(&self, queries: Vec<String>, transaction: bool) -> TestResult<QueryResult>;
+}
 
 pub enum Runner {
     /// Using the QE crate directly for queries.
@@ -22,26 +27,41 @@ pub enum Runner {
 }
 
 impl Runner {
-    pub fn load(ident: &str, datamodel: String) -> TestResult<Self> {
+    pub async fn load(ident: &str, datamodel: String) -> TestResult<Self> {
         match ident {
-            "direct" => Ok(Self::Direct(DirectRunner {})),
+            "direct" => Self::direct(datamodel).await,
             "napi" => Ok(Self::NApi(NApiRunner {})),
             "binary" => Ok(Self::Binary(BinaryRunner {})),
             unknown => Err(TestError::parse_error(format!("Unknown test runner '{}'", unknown))),
         }
     }
 
-    pub fn query<T>(&self, _gql: T) -> QueryResult
+    pub async fn query<T>(&self, gql_query: T) -> TestResult<QueryResult>
     where
         T: Into<String>,
     {
-        todo!()
+        match self {
+            Runner::Direct(r) => r.query(gql_query.into()).await,
+            Runner::NApi(_) => todo!(),
+            Runner::Binary(_) => todo!(),
+        }
     }
 
-    pub fn batch<T>(&self, _gql: T) -> QueryResult
+    pub async fn batch<T, S>(&self, gql_queries: T, transaction: bool) -> TestResult<QueryResult>
     where
-        T: Into<String>,
+        T: Iterator<Item = S>,
+        S: Into<String>,
     {
-        todo!()
+        match self {
+            Runner::Direct(r) => r.batch(gql_queries.map(Into::into).collect(), transaction).await,
+            Runner::NApi(_) => todo!(),
+            Runner::Binary(_) => todo!(),
+        }
+    }
+
+    async fn direct(datamodel: String) -> TestResult<Self> {
+        let runner = DirectRunner::load(datamodel).await?;
+
+        Ok(Self::Direct(runner))
     }
 }

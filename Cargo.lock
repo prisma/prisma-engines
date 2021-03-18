@@ -3298,15 +3298,20 @@ dependencies = [
 name = "query-tests-setup"
 version = "0.1.0"
 dependencies = [
+ "async-trait",
+ "datamodel",
  "datamodel-connector",
  "enum_dispatch",
+ "feature-flags",
  "lazy_static",
  "migration-core",
  "mongodb-datamodel-connector",
  "prisma-models",
  "query-core",
+ "request-handlers",
  "serde_json",
  "sql-datamodel-connector",
+ "thiserror",
  "tokio",
 ]
 

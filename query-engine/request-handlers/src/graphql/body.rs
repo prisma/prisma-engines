@@ -27,6 +27,12 @@ pub struct MultiQuery {
     transaction: bool,
 }
 
+impl MultiQuery {
+    pub fn new(batch: Vec<SingleQuery>, transaction: bool) -> Self {
+        Self { batch, transaction }
+    }
+}
+
 impl From<String> for SingleQuery {
     fn from(query: String) -> Self {
         SingleQuery {

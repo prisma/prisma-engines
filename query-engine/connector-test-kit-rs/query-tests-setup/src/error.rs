@@ -1,9 +1,19 @@
 use std::env::VarError;
+use thiserror::Error;
 
-#[derive(Debug)]
+#[derive(Debug, Error)]
 pub enum TestError {
+    #[error("Parse error: {0}")]
     ParseError(String),
+
+    #[error("Configuration error: {0}")]
     ConfigError(String),
+
+    #[error("Query core error: {0}")]
+    QueryCoreError(#[from] query_core::CoreError),
+
+    #[error("Migration core error: {0}")]
+    MigrationCoreError(#[from] migration_core::CoreError),
 }
 
 impl TestError {

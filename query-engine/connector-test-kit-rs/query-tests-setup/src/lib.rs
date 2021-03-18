@@ -1,38 +1,22 @@
 mod config;
 mod connector_tag;
 mod error;
+mod query_result;
 mod runner;
 
 pub use config::*;
 pub use connector_tag::*;
 pub use error::*;
+pub use query_result::*;
 pub use runner::*;
 
 use lazy_static::lazy_static;
-use serde_json::Value;
 use tokio::runtime::Builder;
 
 pub type TestResult<T> = Result<T, TestError>;
 
 lazy_static! {
     pub static ref CONFIG: TestConfig = TestConfig::load().unwrap();
-}
-
-// todo
-pub struct QueryResult {
-    _json: Value,
-}
-
-impl QueryResult {
-    pub fn assert_failure(&self, _err_code: usize, _msg_contains: Option<String>) {
-        todo!()
-    }
-}
-
-impl ToString for QueryResult {
-    fn to_string(&self) -> String {
-        todo!()
-    }
 }
 
 /// Render the complete datamodel with all bells and whistles.
@@ -58,8 +42,8 @@ pub fn render_test_datamodel(config: &TestConfig, suite: &str, template: String)
     format!("{}\n\n{}", datasource_with_generator, models)
 }
 
-pub async fn setup_project(datamodel: &str) {
-    migration_core::qe_setup(datamodel).await.unwrap();
+pub async fn setup_project(datamodel: &str) -> TestResult<()> {
+    Ok(migration_core::qe_setup(datamodel).await?)
 }
 
 pub fn run_with_tokio<O, F: std::future::Future<Output = O>>(fut: F) -> O {

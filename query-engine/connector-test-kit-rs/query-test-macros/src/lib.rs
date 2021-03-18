@@ -74,12 +74,12 @@ fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream {
 
             let template = #handler();
             let datamodel = query_tests_setup::render_test_datamodel(config, #suite_name, template);
-            let runner = Runner::load(config.runner(), datamodel.clone()).unwrap();
 
             query_tests_setup::run_with_tokio(async move {
-                query_tests_setup::setup_project(&datamodel).await;
-                #runner_fn_ident(&runner).await;
-            })
+                let runner = Runner::load(config.runner(), datamodel.clone()).await.unwrap();
+                query_tests_setup::setup_project(&datamodel).await.unwrap();
+                #runner_fn_ident(&runner).await.unwrap();
+            });
         }
 
         #test_function
@@ -294,6 +294,7 @@ impl<T> IntoDarlingError<T> for std::result::Result<T, TestError> {
             TestError::ConfigError(msg) => {
                 darling::Error::custom(&format!("Configuration error: {}.", msg)).with_span(span)
             }
+            err => unimplemented!("{:?} not yet handled for test setup compilation", err),
         })
     }
 }

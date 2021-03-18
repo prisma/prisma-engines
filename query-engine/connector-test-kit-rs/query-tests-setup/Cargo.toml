@@ -13,5 +13,10 @@ prisma-models = { path = "../../../libs/prisma-models" }
 lazy_static = "1.4"
 enum_dispatch = "0.3"
 migration-core = { path = "../../../migration-engine/core" }
+request-handlers = { path = "../../request-handlers" }
 tokio = "1.0"
 query-core = { path = "../../core" }
+datamodel = { path = "../../../libs/datamodel/core" }
+feature-flags = { path = "../../../libs/feature-flags" }
+thiserror = "1.0"
+async-trait = "0.1"

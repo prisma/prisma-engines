@@ -1,9 +1,6 @@
 use query_test_macros::connector_test;
 use query_tests_setup::*;
-use serde_json::Value;
 use std::convert::TryFrom;
-
-pub type TestResult = anyhow::Result<()>;
 
 pub mod schemas {
     pub fn some_common_schema() -> String {
@@ -44,15 +41,18 @@ mod some_spec {
     }
 
     #[connector_test(suite = "some_spec", schema(schema_handler), only(SqlServer, Postgres))]
-    async fn ideal_api_test(runner: &Runner) {
-        let result = runner.query(
-            "
+    async fn ideal_api_test(runner: &Runner) -> TestResult<()> {
+        let result = runner
+            .query(
+                r#"
             mutation {
-                createOneA(data: {...}) { id }
+                createOneA(data: { id: 1, field: "1"}) { id }
             }
-        ",
-        );
+        "#,
+            )
+            .await?;
 
-        assert_eq!(result.to_string(), r#"{"data":{"createOneA":[...]}}"#);
+        assert_eq!(result.to_string(), r#"{"data":{"createOneA":{"id":1}}}"#);
+        Ok(())
     }
 }
