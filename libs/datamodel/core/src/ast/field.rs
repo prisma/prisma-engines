@@ -1,5 +1,8 @@
-use super::*;
+#![deny(missing_docs)]
 
+use super::{Attribute, Comment, Identifier, Span, WithAttributes, WithDocumentation, WithIdentifier, WithSpan};
+
+/// One field in a model.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Field {
     /// The field's type.
@@ -16,6 +19,17 @@ pub struct Field {
     pub span: Span,
     /// The location of this field in the text representation.
     pub is_commented_out: bool,
+}
+
+impl Field {
+    /// The value of the `@map` attribute.
+    pub(crate) fn database_name(&self) -> Option<(&str, Span)> {
+        self.attributes
+            .iter()
+            .find(|attr| attr.name.name == "map")
+            .and_then(|attr| attr.arguments.iter().next())
+            .and_then(|args| args.value.as_string_value())
+    }
 }
 
 impl WithIdentifier for Field {
@@ -46,9 +60,13 @@ impl WithDocumentation for Field {
     }
 }
 
+/// Whether a field is required, optional (?), or list ([]).
 #[derive(Copy, Debug, Clone, PartialEq)]
 pub enum FieldArity {
+    /// Default.
     Required,
+    /// ?
     Optional,
+    /// []
     List,
 }

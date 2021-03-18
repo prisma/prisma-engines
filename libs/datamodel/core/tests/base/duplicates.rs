@@ -1,4 +1,4 @@
-use crate::common::*;
+use crate::common::{parse_error, ErrorAsserts};
 use datamodel::{ast::Span, diagnostics::DatamodelError};
 
 #[test]
@@ -125,6 +125,44 @@ fn fail_on_duplicate_field() {
         "User",
         "firstName",
         Span::new(70, 79),
+    ));
+}
+
+#[test]
+fn fail_on_duplicate_field_with_map() {
+    let dml = r#"
+    model User {
+        id Int @id
+        firstName String
+        otherName String @map("firstName")
+    }
+    "#;
+
+    let errors = parse_error(dml);
+
+    errors.assert_is(DatamodelError::new_duplicate_field_error(
+        "User",
+        "otherName",
+        Span::new(92, 103),
+    ));
+}
+
+#[test]
+fn fail_on_duplicate_mapped_field_name() {
+    let dml = r#"
+    model User {
+        id Int @id
+        firstName String @map("thename")
+        lastName String @map("thename")
+    }
+    "#;
+
+    let errors = parse_error(dml);
+
+    errors.assert_is(DatamodelError::new_duplicate_field_error(
+        "User",
+        "lastName",
+        Span::new(107, 116),
     ));
 }
 

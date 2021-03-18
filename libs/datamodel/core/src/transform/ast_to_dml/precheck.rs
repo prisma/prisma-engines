@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use std::{collections::HashMap, str::FromStr};
 
 use crate::{
     ast::{self, WithIdentifier, WithName},
@@ -80,13 +80,32 @@ impl Precheck {
     }
 
     fn precheck_model(model: &ast::Model, errors: &mut Diagnostics) {
-        let mut checker = DuplicateChecker::new();
+        let mut seen: HashMap<&str, &ast::Field> = HashMap::with_capacity(model.fields.len()); // lower bound for the happy path
+
         for field in &model.fields {
-            checker.check_if_duplicate_exists(field, |_| {
-                DatamodelError::new_duplicate_field_error(&model.name.name, &field.name.name, field.identifier().span)
-            });
+            match (seen.contains_key(field.name()), field.database_name()) {
+                (true, _) => errors.push_error(DatamodelError::new_duplicate_field_error(
+                    &model.name.name,
+                    &field.name.name,
+                    field.identifier().span,
+                )),
+                (false, Some((dbname, span))) => {
+                    if seen.contains_key(dbname) {
+                        errors.push_error(DatamodelError::new_duplicate_field_error(
+                            &model.name.name,
+                            &field.name(),
+                            span,
+                        ))
+                    } else {
+                        seen.insert(dbname, field);
+                        seen.insert(field.name(), field);
+                    }
+                }
+                (false, None) => {
+                    seen.insert(field.name(), &field);
+                }
+            }
         }
-        errors.append(&mut checker.errors());
     }
 
     fn precheck_generator_config(config: &ast::GeneratorConfig, errors: &mut Diagnostics) {
