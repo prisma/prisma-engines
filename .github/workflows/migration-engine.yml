@@ -46,13 +46,13 @@ jobs:
           toolchain: 1.48.0
           default: true
 
-      # - uses: actions/cache@v2
-      #   with:
-      #     path: |
-      #       ~/.cargo/registry
-      #       ~/.cargo/git
-      #       target
-      #     key: migration-engine-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: migration-engine-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - run: timeout 40m cargo test ${{ matrix.database }}
         working-directory: migration-engine/migration-engine-tests
