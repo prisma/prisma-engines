@@ -343,7 +343,11 @@ impl SqlSchemaDescriber {
                                 if (extra.as_str() == "default_generated")
                                     || ((first_char != Some('\'')) && matches!(flavour, Flavour::MariaDb))
                                 {
-                                    DefaultValue::db_generated(default_string)
+                                    let mut introspected_default = String::with_capacity(default_string.len());
+                                    introspected_default.push('(');
+                                    introspected_default.push_str(&default_string);
+                                    introspected_default.push(')');
+                                    DefaultValue::db_generated(introspected_default)
                                 } else {
                                     DefaultValue::value(PrismaValue::String(Self::unescape_and_unquote_default_string(
                                         default_string,

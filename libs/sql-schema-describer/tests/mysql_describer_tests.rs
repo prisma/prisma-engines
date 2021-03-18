@@ -1018,7 +1018,7 @@ async fn function_expression_defaults_are_described_as_dbgenerated(api: &TestApi
 
     let default = table.column_bang("id").default.as_ref().unwrap();
 
-    assert_eq!(default, &DefaultValue::db_generated("left(uuid(),8)"))
+    assert_eq!(default, &DefaultValue::db_generated("(left(uuid(),8))"))
 }
 
 #[test_each_connector(tags("mysql"))]
