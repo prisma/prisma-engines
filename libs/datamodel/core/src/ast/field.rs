@@ -27,7 +27,7 @@ impl Field {
         self.attributes
             .iter()
             .find(|attr| attr.name.name == "map")
-            .and_then(|attr| attr.arguments.iter().next())
+            .and_then(|attr| attr.arguments.get(0))
             .and_then(|args| args.value.as_string_value())
     }
 }

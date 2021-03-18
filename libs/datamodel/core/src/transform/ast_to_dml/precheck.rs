@@ -1,4 +1,7 @@
-use std::{collections::HashMap, str::FromStr};
+use std::{
+    collections::{HashMap, HashSet},
+    str::FromStr,
+};
 
 use crate::{
     ast::{self, WithIdentifier, WithName},
@@ -15,6 +18,7 @@ impl Precheck {
         let mut top_level_types_checker = DuplicateChecker::new();
         let mut sources_checker = DuplicateChecker::new();
         let mut generators_checker = DuplicateChecker::new();
+        let mut model_database_names: HashSet<&str> = HashSet::new();
 
         for top in &datamodel.tops {
             let error_fn = |existing: &ast::Top| {
@@ -35,6 +39,12 @@ impl Precheck {
                     Self::assert_is_not_a_reserved_scalar_type(&model.name, &mut errors);
                     top_level_types_checker.check_if_duplicate_exists(top, error_fn);
                     Self::precheck_model(&model, &mut errors);
+
+                    if model_database_names.contains(model.final_database_name()) {
+                        errors.push_error(error_fn(top));
+                    } else if let Some((name, _)) = model.database_name() {
+                        model_database_names.insert(name);
+                    }
                 }
                 ast::Top::Type(custom_type) => {
                     Self::assert_is_not_a_reserved_scalar_type(&custom_type.name, &mut errors);

@@ -4,12 +4,13 @@ use datamodel::{ast::Span, diagnostics::DatamodelError};
 #[test]
 fn fail_on_duplicate_models() {
     let dml = r#"
-    model User {
-        id Int @id
-    }
-    model User {
-        id Int @id
-    }
+        model User {
+            id Int @id
+        }
+
+        model User {
+            id Int @id
+        }
     "#;
 
     let errors = parse_error(dml);
@@ -18,7 +19,31 @@ fn fail_on_duplicate_models() {
         "User",
         "model",
         "model",
-        Span::new(53, 57),
+        Span::new(70, 74),
+    ));
+}
+
+#[test]
+fn fail_on_duplicate_models_with_map() {
+    let dml = r#"
+        model Customer {
+            id Int @id
+
+            @@map("User")
+        }
+
+        model User {
+            id Int @id
+        }
+    "#;
+
+    let errors = parse_error(dml);
+
+    errors.assert_is(DatamodelError::new_duplicate_top_error(
+        "User",
+        "model",
+        "model",
+        Span::new(101, 105),
     ));
 }
 

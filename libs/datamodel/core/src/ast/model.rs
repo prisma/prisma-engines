@@ -18,6 +18,19 @@ pub struct Model {
 }
 
 impl Model {
+    /// The value of the `@@map` attribute.
+    pub fn database_name(&self) -> Option<(&str, Span)> {
+        self.attributes
+            .iter()
+            .find(|attr| attr.name() == "map")
+            .and_then(|attr| attr.arguments.get(0))
+            .and_then(|arg| arg.value.as_string_value())
+    }
+
+    pub fn final_database_name(&self) -> &str {
+        self.database_name().map(|(n, _)| n).unwrap_or(&self.name.name)
+    }
+
     pub fn find_field(&self, name: &str) -> &Field {
         self.fields
             .iter()
