@@ -428,11 +428,6 @@ async fn ignore_on_model_with_only_optional_id(api: &TestApi) -> crate::TestResu
                 t.inject_custom("id Text Primary Key");
                 t.add_column("unique", types::integer().unique(true).nullable(true));
             });
-
-            // migration.create_table("OptionalIdAndRequiredUnique", |t| {
-            //     t.inject_custom("id Text Primary Key");
-            //     t.add_column("unique", types::integer().unique(true).nullable(false));
-            // });
         })
         .await?;
 
@@ -451,11 +446,6 @@ async fn ignore_on_model_with_only_optional_id(api: &TestApi) -> crate::TestResu
                 
               @@ignore
             }
-            
-            // model OptionalIdAndRequiredUnique {
-            //   id     String? @id
-            //   unique Int @unique
-            // }
             
             model ValidId {
               id     String @id
