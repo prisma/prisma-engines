@@ -88,7 +88,6 @@ services:
       MYSQL_USER: root
       MYSQL_ROOT_PASSWORD: prisma
       MYSQL_DATABASE: prisma
-      MYSQL_ALLOW_EMPTY_PASSWORD: true
     ports:
       - "3309:3306"
     networks:
