@@ -94,6 +94,34 @@ class ScalarListsSpec extends FlatSpec with Matchers with ApiSpecBase {
 
     res should be(
       s"""{"data":{"updateScalarModel":{"strings":["updated","now"],"ints":[14],"floats":[1.2345678],"decimals":["1.2345678"],"booleans":[false,false,true],"enums":[],"dateTimes":["2019-07-31T23:59:01+00:00"],"bytes":["dGVzdA=="]}}}""".parseJson)
+
+    res = server.query(
+      s"""mutation {
+         |  updateScalarModel(where: { id: 1 }, data: {
+         |    strings:   { push: "future" }
+         |    ints:      { push: 15 }
+         |    floats:    { push: 2 }
+         |    decimals:  { push: "2" }
+         |    booleans:  { push: true }
+         |    enums:     { push: A }
+         |    dateTimes: { push: "2019-07-31T23:59:01.000Z" }
+         |    bytes:     { push: "dGVzdA==" }
+         |  }) {
+         |    strings
+         |    ints
+         |    floats
+         |    decimals
+         |    booleans
+         |    enums
+         |    dateTimes
+         |    bytes
+         |  }
+         |}""",
+      project = project
+    )
+
+    res should be(
+      s"""{"data":{"updateScalarModel":{"strings":["updated","now","future"],"ints":[14,15],"floats":[1.2345678,2],"decimals":["1.2345678","2"],"booleans":[false,false,true,true],"enums":["A"],"dateTimes":["2019-07-31T23:59:01+00:00","2019-07-31T23:59:01+00:00"],"bytes":["dGVzdA==","dGVzdA=="]}}}""".parseJson)
   }
 
   "A Create Mutation" should "create and return items with list values with shorthand notation" in {
@@ -158,7 +186,7 @@ class ScalarListsSpec extends FlatSpec with Matchers with ApiSpecBase {
       """{"data":{"createScalarModel":{"strings":[],"ints":[],"floats":[],"decimals":[],"booleans":[],"enums":[],"dateTimes":[],"bytes":[]}}}""")
   }
 
-  "A Create Mutation with an empty scalar list update input object" should "return a detailed error" in {
+  "A Create Mutation with an empty scalar list create input object" should "return a detailed error" in {
     server.queryThatMustFail(
       s"""mutation {
          |  createScalarModel(data: {
@@ -168,7 +196,62 @@ class ScalarListsSpec extends FlatSpec with Matchers with ApiSpecBase {
          |}""",
       project = project,
       errorCode = 2009,
-      errorContains = """`Mutation.createScalarModel.data.ScalarModelCreateInput.strings.ScalarModelCreatestringsInput.set`: A value is required but not set."""
+      errorContains = """`Mutation.createScalarModel.data.ScalarModelCreateInput.strings.ScalarModelCreatestringsInput`: Expected exactly one field to be present, got 0."""
     )
+  }
+
+  "An Update Mutation with an empty scalar list update input object" should "return a detailed error" in {
+    server.queryThatMustFail(
+      s"""mutation {
+         |  updateScalarModel(data: {
+         |    id: 1
+         |    strings: {},
+         |  }){ strings, ints, floats, booleans, enums, dateTimes }
+         |}""",
+      project = project,
+      errorCode = 2009,
+      errorContains = """`Mutation.updateScalarModel.data.ScalarModelUpdateInput.strings.ScalarModelUpdatestringsInput`: Expected exactly one field to be present, got 0."""
+    )
+  }
+
+  "An Update Mutation that pushes to some empty scalar lists" should "work" in {
+    server.query(
+      s"""mutation {
+         |  createScalarModel(data: {
+         |    id: 1,
+         |  }) {
+         |    id
+         |  }
+         |}""",
+      project = project
+    )
+
+    val res = server.query(
+      s"""mutation {
+         |  updateScalarModel(where: { id: 1 }, data: {
+         |    strings:   { push: "future" }
+         |    ints:      { push: 15 }
+         |    floats:    { push: 2 }
+         |    decimals:  { push: "2" }
+         |    booleans:  { push: true }
+         |    enums:     { push: A }
+         |    dateTimes: { push: "2019-07-31T23:59:01.000Z" }
+         |    bytes:     { push: "dGVzdA==" }
+         |  }) {
+         |    strings
+         |    ints
+         |    floats
+         |    decimals
+         |    booleans
+         |    enums
+         |    dateTimes
+         |    bytes
+         |  }
+         |}""",
+      project = project
+    )
+
+    res should be(
+      s"""{"data":{"updateScalarModel":{"strings":["future"],"ints":[15],"floats":[2.0],"decimals":["2"],"booleans":[true],"enums":["A"],"dateTimes":["2019-07-31T23:59:01+00:00"],"bytes":["dGVzdA=="]}}}""".parseJson)
   }
 }
