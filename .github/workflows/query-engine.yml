@@ -24,7 +24,7 @@ jobs:
       - run: docker-compose --version
 
       - name: "Start databases"
-        run: docker-compose up -d --file docker-compose.qe-tests.yml
+        run: docker-compose -f docker-compose.qe-tests.yml up -d 
         
       - run: rustup default stable
       - run: sbt test
