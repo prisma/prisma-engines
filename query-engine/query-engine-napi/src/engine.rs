@@ -81,6 +81,7 @@ pub struct ConstructorOptions {
     #[serde(deserialize_with = "deserialize_log_level")]
     log_level: LevelFilter,
     datasource_overrides: BTreeMap<String, String>,
+    feature_flags_overrides: Option<Vec<String>>,
 }
 
 fn deserialize_log_level<'de, D>(deserializer: D) -> Result<LevelFilter, D::Error>
@@ -100,6 +101,7 @@ impl QueryEngine {
             datamodel,
             log_level,
             datasource_overrides,
+            feature_flags_overrides,
         } = opts;
 
         let overrides: Vec<(_, _)> = datasource_overrides.into_iter().collect();
@@ -115,7 +117,10 @@ impl QueryEngine {
             .map_err(|errors| ApiError::conversion(errors, &datamodel))?
             .subject;
 
-        let flags: Vec<_> = config.subject.preview_features().map(|s| s.to_string()).collect();
+        let flags: Vec<_> = match feature_flags_overrides {
+            Some(overrides) => overrides,
+            None => config.subject.preview_features().map(|s| s.to_string()).collect(),
+        };
 
         if feature_flags::initialize(&flags).is_err() {
             eprintln!("We currently cannot change the feature flags more than once per process.");
