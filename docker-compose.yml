@@ -81,13 +81,14 @@ services:
     tmpfs: /pgtmpfs12
 
   mysql-5-6:
-    image: mysql:5.6
+    image: mysql:5.6.50
     command: mysqld
     restart: always
     environment:
       MYSQL_USER: root
       MYSQL_ROOT_PASSWORD: prisma
       MYSQL_DATABASE: prisma
+      MYSQL_ALLOW_EMPTY_PASSWORD: true
     ports:
       - "3309:3306"
     networks:
@@ -95,7 +96,7 @@ services:
     tmpfs: /var/lib/mysql
 
   mysql-5-7:
-    image: mysql:5.7
+    image: mysql:5.7.32
     command: mysqld
     restart: always
     environment:
@@ -109,7 +110,7 @@ services:
     tmpfs: /var/lib/mysql
 
   mysql-8-0:
-    image: mysql:8.0
+    image: mysql:8.0.22
     command: mysqld
     restart: always
     environment:
