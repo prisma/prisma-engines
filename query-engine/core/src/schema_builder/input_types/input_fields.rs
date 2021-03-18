@@ -272,17 +272,25 @@ where
     let input_object = match ctx.get_input_type(&ident) {
         Some(t) => t,
         None => {
-            let mut object_fields = vec![input_field(operations::SET, list_input_type.clone(), None)];
+            let mut object_fields =
+                vec![input_field(operations::SET, list_input_type.clone(), None).optional_if(!include_set_only)];
 
             if !include_set_only {
-                object_fields.push(input_field(
-                    operations::PUSH,
-                    map_scalar_input_type(ctx, &f.type_identifier, false),
-                    None,
-                ))
+                object_fields.push(
+                    input_field(
+                        operations::PUSH,
+                        map_scalar_input_type(ctx, &f.type_identifier, false),
+                        None,
+                    )
+                    .optional(),
+                )
             }
 
-            let input_object = Arc::new(input_object_type(ident.clone(), object_fields));
+            let mut input_object = input_object_type(ident.clone(), object_fields);
+
+            input_object.require_exactly_one_field();
+
+            let input_object = Arc::new(input_object);
 
             ctx.cache_input_type(ident, input_object.clone());
             Arc::downgrade(&input_object)
