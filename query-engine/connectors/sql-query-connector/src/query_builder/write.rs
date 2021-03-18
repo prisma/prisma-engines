@@ -96,6 +96,12 @@ pub fn update_many(model: &ModelRef, ids: &[&RecordProjection], args: WriteArgs)
             let value: Expression = match val {
                 WriteExpression::Field(_) => unimplemented!(),
                 WriteExpression::Value(rhs) => field.value(rhs).into(),
+                WriteExpression::Add(rhs) if field.is_list => {
+                    let e: Expression = Column::from(name.clone()).into();
+
+                    // Postgres only
+                    e.compare_raw("||", Value::array(vec![field.value(rhs)])).into()
+                }
                 WriteExpression::Add(rhs) => {
                     let e: Expression<'_> = Column::from(name.clone()).into();
                     e + field.value(rhs).into()

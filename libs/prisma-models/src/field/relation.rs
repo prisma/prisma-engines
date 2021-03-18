@@ -266,13 +266,13 @@ impl RelationField {
         if self.relation().is_many_to_many() {
             // if self.relation_info.fields.is_empty() {
             self.model().primary_identifier().scalar_fields().collect()
-            // } else {
-            //     self.relation_info
-            //         .fields
-            //         .iter()
-            //         .map(|f| self.model().fields().find_from_scalar(f.as_str()).unwrap())
-            //         .collect()
-            // }
+        // } else {
+        //     self.relation_info
+        //         .fields
+        //         .iter()
+        //         .map(|f| self.model().fields().find_from_scalar(f.as_str()).unwrap())
+        //         .collect()
+        // }
         } else if self.is_inlined_on_enclosing_model() {
             self.scalar_fields()
         } else {

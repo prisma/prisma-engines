@@ -41,9 +41,10 @@ pub mod inputs {
         pub const DELETE: &str = "delete";
         pub const DELETE_MANY: &str = "deleteMany";
         pub const UPSERT: &str = "upsert";
+        pub const SET: &str = "set";
 
         // scalar lists
-        pub const SET: &str = "set";
+        pub const PUSH: &str = "push";
 
         // numbers
         pub const INCREMENT: &str = "increment";

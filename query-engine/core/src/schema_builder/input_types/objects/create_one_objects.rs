@@ -50,8 +50,6 @@ fn checked_create_input_type(
 
     let mut fields = input_fields::scalar_input_fields(
         ctx,
-        model.name.clone(),
-        "Create",
         scalar_fields,
         |ctx, f: ScalarFieldRef, default: Option<DefaultValue>| {
             let typ = map_scalar_input_type_for_field(ctx, &f);
@@ -60,6 +58,7 @@ fn checked_create_input_type(
                 .optional_if(!f.is_required || f.default_value.is_some() || f.is_created_at() || f.is_updated_at())
                 .nullable_if(!f.is_required)
         },
+        |ctx, f, _| input_fields::scalar_list_input_field_mapper(ctx, model.name.clone(), "Create", f, true),
         true,
     );
 
@@ -185,8 +184,6 @@ fn unchecked_create_input_type(
 
     let mut fields = input_fields::scalar_input_fields(
         ctx,
-        model.name.clone(),
-        "Create",
         scalar_fields,
         |ctx, f: ScalarFieldRef, default: Option<DefaultValue>| {
             let typ = map_scalar_input_type_for_field(ctx, &f);
@@ -195,6 +192,7 @@ fn unchecked_create_input_type(
                 .optional_if(!f.is_required || f.default_value.is_some() || f.is_created_at() || f.is_updated_at())
                 .nullable_if(!f.is_required)
         },
+        |ctx, f, _| input_fields::scalar_list_input_field_mapper(ctx, model.name.clone(), "Create", f, true),
         true,
     );
 
