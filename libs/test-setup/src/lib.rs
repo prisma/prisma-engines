@@ -439,7 +439,7 @@ pub async fn create_mysql_database(original_url: &Url) -> Result<Quaint, AnyErro
             r#"
             DROP TABLE `{table}`;
             "#, 
-            table = row[0].unwrap().to_string().unwrap(), 
+            table = row[0].to_string().unwrap(), 
         );
         conn.raw_cmd(&sql3).await?;
     }
