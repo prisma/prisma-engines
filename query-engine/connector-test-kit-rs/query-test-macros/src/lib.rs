@@ -1,13 +1,159 @@
 extern crate proc_macro;
 
-use darling::FromMeta;
+use darling::{FromMeta, ToTokens};
 use itertools::Itertools;
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
 use query_tests_setup::{ConnectorTag, ConnectorTagInterface, TestError};
-use quote::quote;
-use std::convert::TryFrom;
-use syn::{parse_macro_input, spanned::Spanned, AttributeArgs, ItemFn, Meta, Path};
+use quote::{quote, TokenStreamExt};
+use std::{
+    collections::{hash_map, HashMap},
+    convert::TryFrom,
+    ops::{Deref, DerefMut},
+};
+use syn::{
+    parse_macro_input, parse_quote, spanned::Spanned, AttributeArgs, Item, ItemFn, ItemMod, Meta, NestedMeta, Path,
+};
+
+#[derive(Debug, Default)]
+struct NestedAttrMap {
+    inner: HashMap<String, NestedMeta>,
+}
+
+impl Deref for NestedAttrMap {
+    type Target = HashMap<String, NestedMeta>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.inner
+    }
+}
+
+impl DerefMut for NestedAttrMap {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.inner
+    }
+}
+
+impl NestedAttrMap {
+    /// Merges this attr map with the incoming one.
+    /// Rules:
+    /// - If `self` already contains a key, do not overwrite.
+    /// - If `self` contains `"only"` or `"exclude"`, then neither of the incoming
+    ///   `"only"` or `"exclude"` are merged, because the test overwrites the connectors to test.
+    pub fn merge(mut self, other: &Self) -> Self {
+        let self_has_connector = self.contains_key("only") || self.contains_key("exclude");
+
+        for (k, v) in other.iter() {
+            if (k == "only" || k == "exclude") && !self_has_connector {
+                match self.inner.entry(k.clone()) {
+                    hash_map::Entry::Occupied(_) => {}
+                    hash_map::Entry::Vacant(vacant) => {
+                        vacant.insert(v.clone());
+                    }
+                }
+            } else if k != "only" && k != "exclude" {
+                match self.inner.entry(k.clone()) {
+                    hash_map::Entry::Occupied(_) => {}
+                    hash_map::Entry::Vacant(vacant) => {
+                        vacant.insert(v.clone());
+                    }
+                }
+            }
+        }
+
+        self
+    }
+}
+
+impl From<&AttributeArgs> for NestedAttrMap {
+    fn from(args: &AttributeArgs) -> Self {
+        let mut map = HashMap::new();
+
+        for attr in args {
+            match attr {
+                syn::NestedMeta::Meta(ref meta) => {
+                    let ident = meta.path().get_ident().unwrap().to_string();
+                    map.insert(ident, attr.clone());
+                }
+                syn::NestedMeta::Lit(_) => unimplemented!("Unexpected literal encountered in NestedAttrMap parsing."),
+            }
+        }
+
+        Self { inner: map }
+    }
+}
+
+impl ToTokens for NestedAttrMap {
+    fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
+        let metas: Vec<_> = self.inner.iter().map(|(_, meta)| meta).collect();
+        tokens.append_all(quote! { #(#metas),* });
+    }
+}
+
+#[proc_macro_attribute]
+pub fn test_suite(attr: TokenStream, input: TokenStream) -> TokenStream {
+    // Validate input by simply parsing it, which will point out invalid fields and connector names etc.
+    let attributes_meta: syn::AttributeArgs = parse_macro_input!(attr as AttributeArgs);
+    let args = ConnectorTestArgs::from_list(&attributes_meta);
+    let args = match args {
+        Ok(args) => args,
+        Err(err) => return err.write_errors().into(),
+    };
+
+    if let Err(err) = args.validate(true) {
+        return err.write_errors().into();
+    };
+    // end validation
+
+    let mut test_module = parse_macro_input!(input as ItemMod);
+    let module_name = test_module.ident.clone().to_string();
+    let mut module_attrs = NestedAttrMap::from(&attributes_meta);
+
+    let suite_meta: Meta = parse_quote! { suite = #module_name };
+    let suite_nested_meta = NestedMeta::from(suite_meta);
+    module_attrs.insert("suite".to_owned(), suite_nested_meta);
+
+    if let Some((_, ref mut items)) = test_module.content {
+        add_module_imports(items);
+
+        for item in items {
+            if let syn::Item::Fn(ref mut f) = item {
+                // Check if the function is marked as `connector_test`.
+                if let Some(ref mut attr) = f.attrs.iter_mut().find(|attr| match attr.path.get_ident() {
+                    Some(ident) => &ident.to_string() == "connector_test",
+                    None => false,
+                }) {
+                    let meta = attr.parse_meta().expect("Invalid attribute meta.");
+                    let fn_attrs = match meta {
+                        // `connector_test` attribute has no futher attributes.
+                        Meta::Path(_) => NestedAttrMap::default(),
+
+                        // `connector_test` attribute has a list of attributes.
+                        Meta::List(l) => NestedAttrMap::from(&l.nested.clone().into_iter().collect::<Vec<_>>()),
+
+                        // Not supported
+                        Meta::NameValue(_) => unimplemented!("Unexpected NameValue list for function attribute."),
+                    };
+
+                    let final_attrs = fn_attrs.merge(&module_attrs);
+
+                    // Replace attr.tokens
+                    attr.tokens = quote! { (#final_attrs) };
+                }
+            }
+        }
+    }
+
+    test_module.into_token_stream().into()
+}
+
+fn add_module_imports(items: &mut Vec<Item>) {
+    items.reverse();
+    items.push(Item::Use(parse_quote! { use super::*; }));
+    items.push(Item::Use(parse_quote! { use query_tests_setup::*; }));
+    items.push(Item::Use(parse_quote! { use std::convert::TryFrom; }));
+    items.reverse();
+}
 
 #[proc_macro_attribute]
 pub fn connector_test(attr: TokenStream, input: TokenStream) -> TokenStream {
@@ -22,7 +168,7 @@ fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream {
         Err(err) => return err.write_errors().into(),
     };
 
-    if let Err(err) = args.validate() {
+    if let Err(err) = args.validate(false) {
         return err.write_errors().into();
     };
 
@@ -54,7 +200,7 @@ fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream {
     let test_name = test_fn_ident.to_string();
 
     // The suite name is the name used as the database for data source rendering.
-    let suite_name = args.suite;
+    let suite_name = args.suite.expect("A test must have a test suite.");
 
     // The actual test is a shell function that gets the name of the original function,
     // which is then calling `{orig_name}_run` in the end (see `runner_fn_ident`).
@@ -90,7 +236,8 @@ fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream {
 
 #[derive(Debug, FromMeta)]
 struct ConnectorTestArgs {
-    suite: String,
+    #[darling(default)]
+    suite: Option<String>,
 
     #[darling(default)]
     schema: Option<SchemaHandler>,
@@ -103,10 +250,22 @@ struct ConnectorTestArgs {
 }
 
 impl ConnectorTestArgs {
-    pub fn validate(&self) -> Result<(), darling::Error> {
-        if !self.only.is_empty() && !self.exclude.is_empty() {
+    pub fn validate(&self, on_module: bool) -> Result<(), darling::Error> {
+        if !self.only.is_empty() && !self.exclude.is_empty() && !on_module {
             return Err(darling::Error::custom(
                 "Only one of `only` and `exclude` can be specified for a connector test.",
+            ));
+        }
+
+        if self.schema.is_none() && !on_module {
+            return Err(darling::Error::custom(
+                "A schema annotation on either the test mod (#[test_suite(schema(handler))]) or the test (schema(handler)) is required.",
+            ));
+        }
+
+        if self.suite.is_none() && !on_module {
+            return Err(darling::Error::custom(
+                "A test suite name annotation on either the test mod (#[test_suite]) or the test (suite = \"name\") is required.",
             ));
         }
 
@@ -159,6 +318,7 @@ impl darling::FromMeta for SchemaHandler {
 #[derive(Debug, Default)]
 struct OnlyConnectorTags {
     tags: Vec<ConnectorTag>,
+    token_stream: TokenStream,
 }
 
 impl OnlyConnectorTags {
@@ -184,8 +344,10 @@ impl ExcludeConnectorTags {
 
 impl darling::FromMeta for OnlyConnectorTags {
     fn from_list(items: &[syn::NestedMeta]) -> Result<Self, darling::Error> {
+        let token_stream = quote! { #(#items),* }.into();
         let tags = tags_from_list(items)?;
-        Ok(OnlyConnectorTags { tags })
+
+        Ok(OnlyConnectorTags { tags, token_stream })
     }
 }
 
@@ -249,7 +411,8 @@ fn tags_from_list(items: &[syn::NestedMeta]) -> Result<Vec<ConnectorTag>, darlin
             }
             x => {
                 return Err(
-                    darling::Error::custom("Expected `only` to be a list of `ConnectorTag`.").with_span(&x.span()),
+                    darling::Error::custom("Expected `only` or `exclude` to be a list of `ConnectorTag`.")
+                        .with_span(&x.span()),
                 )
             }
         }
