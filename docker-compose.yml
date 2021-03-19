@@ -95,15 +95,16 @@ services:
     tmpfs: /var/lib/mysql
 
   mysql-5-7:
-    image: mysql:5.7.32
+    image: vitess/vttestserver:mysql57
     command: mysqld
     restart: always
     environment:
-      MYSQL_USER: root
-      MYSQL_ROOT_PASSWORD: prisma
-      MYSQL_DATABASE: prisma
+      PORT: 33574
+      KEYSPACES: prisma
+      NUM_SHARDS: "1"
+      MYSQL_BIND_HOST: "0.0.0.0"
     ports:
-      - "3306:3306"
+      - "3306:33577"
     networks:
       - databases
     tmpfs: /var/lib/mysql
