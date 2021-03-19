@@ -7,6 +7,6 @@ pub trait IntoConnectorResult<T> {
 
 impl<T> IntoConnectorResult<T> for std::result::Result<T, MongoError> {
     fn into_connector_result(self) -> ConnectorResult<T> {
-        self.map_err(|err| ConnectorError::generic(err.into()))
+        self.map_err(|err| ConnectorError::from_source(err, "MongoDB error"))
     }
 }
