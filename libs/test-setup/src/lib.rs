@@ -208,7 +208,7 @@ pub fn mysql_5_6_url(db_name: &str) -> String {
     let db_name = mysql_safe_identifier(db_name);
 
     format!(
-        "mysql://test:test@{host}:{port}/{db_name}?connect_timeout=20&socket_timeout=60",
+        "mysql://test:test@{host}:33577/test?connect_timeout=20&socket_timeout=60",
         host = host,
         port = port,
         db_name = db_name,
