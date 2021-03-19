@@ -13,11 +13,8 @@ pub mod runtime;
 
 /// The built-in connectors database.
 pub mod connectors;
-pub mod getters;
-pub mod parsers;
 
 pub use crate::connectors::Features;
-use crate::{getters::Getter, parsers::Parser};
 use crate::connectors::Tags;
 use enumflags2::BitFlags;
 use once_cell::sync::Lazy;
