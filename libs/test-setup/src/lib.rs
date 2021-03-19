@@ -407,13 +407,13 @@ pub async fn create_mysql_database(original_url: &Url) -> Result<Quaint, AnyErro
     }
     */
     
-    let use = format!(
+    let use_db = format!(
         r#"
         USE `{db_name}`;
         "#,
         db_name = db_name,
     );
-    conn.raw_cmd(&use).await?;
+    conn.raw_cmd(&use_db).await?;
    
     let sql_constraints = r#"
         SELECT DISTINCT TABLE_NAME table_name, CONSTRAINT_NAME constraint_name FROM information_schema.KEY_COLUMN_USAGE WHERE REFERENCED_TABLE_NAME IS NOT NULL
