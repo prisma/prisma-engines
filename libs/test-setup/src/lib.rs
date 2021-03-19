@@ -208,7 +208,7 @@ pub fn mysql_5_6_url(db_name: &str) -> String {
     let db_name = mysql_safe_identifier(db_name);
 
     format!(
-        "mysql://test:test@{host}:33577/test?connect_timeout=20&socket_timeout=60",
+        "mysql://test:test@{host}:{port}/test?connect_timeout=20&socket_timeout=60",
         host = host,
         port = port,
         db_name = db_name,
@@ -303,7 +303,7 @@ pub fn db_host_and_port_mysql_8_0() -> (&'static str, usize) {
 fn db_host_and_port_mysql_5_6() -> (&'static str, usize) {
     match std::env::var("IS_BUILDKITE") {
         Ok(_) => ("test-db-mysql-5-6", 3306),
-        Err(_) => ("127.0.0.1", 3309),
+        Err(_) => ("127.0.0.1", 33577),
     }
 }
 
