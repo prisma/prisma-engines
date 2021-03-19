@@ -32,7 +32,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        database: [mysql]
+        database: [mysql_5_6]
         
     runs-on: ubuntu-latest
     steps:
