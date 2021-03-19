@@ -211,7 +211,7 @@ pub fn mysql_5_6_url(db_name: &str) -> String {
         "mysql://test:test@{host}:{port}/test?connect_timeout=20&socket_timeout=60",
         host = host,
         port = port,
-        db_name = db_name,
+        // db_name = db_name,
     )
 }
 
