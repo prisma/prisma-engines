@@ -14,6 +14,7 @@ pub mod runtime;
 /// The built-in connectors database.
 pub mod connectors;
 pub mod getters;
+pub mod parsers;
 
 pub use crate::connectors::Features;
 use crate::{getters::Getter, parsers::Parser};
