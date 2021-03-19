@@ -196,7 +196,7 @@ class ScalarListsSpec extends FlatSpec with Matchers with ApiSpecBase {
          |}""",
       project = project,
       errorCode = 2009,
-      errorContains = """`Mutation.createScalarModel.data.ScalarModelUncheckedCreateInput.strings.ScalarModelCreatestringsInput.set`: A value is required but not set."""
+      errorContains = """`Mutation.createScalarModel.data.ScalarModelCreateInput.strings.ScalarModelCreatestringsInput.set`: A value is required but not set."""
     )
   }
 

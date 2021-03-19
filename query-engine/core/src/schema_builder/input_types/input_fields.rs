@@ -258,7 +258,7 @@ pub(crate) fn scalar_list_input_field_mapper<T>(
     model_name: String,
     input_object_name: T,
     f: ScalarFieldRef,
-    include_set_only: bool,
+    is_create: bool,
 ) -> InputField
 where
     T: Into<String>,
@@ -273,9 +273,9 @@ where
         Some(t) => t,
         None => {
             let mut object_fields =
-                vec![input_field(operations::SET, list_input_type.clone(), None).optional_if(!include_set_only)];
+                vec![input_field(operations::SET, list_input_type.clone(), None).optional_if(!is_create)];
 
-            if !include_set_only {
+            if !is_create {
                 object_fields.push(
                     input_field(
                         operations::PUSH,
