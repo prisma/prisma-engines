@@ -179,7 +179,7 @@ pub fn mysql_url(db_name: &str) -> String {
     let (host, port) = db_host_and_port_mysql_5_7();
 
     format!(
-        "mysql://root:prisma@{host}:{port}/{db_name}?connect_timeout=20&socket_timeout=60",
+        "mysql://test:test@{host}:{port}/{db_name}?connect_timeout=20&socket_timeout=60",
         host = host,
         port = port,
         db_name = db_name,
