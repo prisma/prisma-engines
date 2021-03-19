@@ -20,11 +20,11 @@ pub trait ConnectorTagInterface {
     fn render_datamodel(&self, template: String) -> String;
 
     /// The connection string to use to connect to the test database and version.
-    /// - `database` is the database to connect to, which is an implementation detail of the
+    /// - `test_database` is the database to connect to, which is an implementation detail of the
     ///   implementing connector, like a file or a schema.
     /// - `is_ci` signals whether or not the test run is done on CI or not. May be important if local
     ///   test run connection strings and CI connection strings differ because of networking.
-    fn connection_string(&self, database: &str, is_ci: bool) -> String;
+    fn connection_string(&self, test_database: &str, is_ci: bool) -> String;
 
     /// Capabilities of the implementing connector.
     fn capabilities(&self) -> Vec<ConnectorCapability>;

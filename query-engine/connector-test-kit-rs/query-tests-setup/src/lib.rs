@@ -20,7 +20,7 @@ lazy_static! {
 }
 
 /// Render the complete datamodel with all bells and whistles.
-pub fn render_test_datamodel(config: &TestConfig, suite: &str, template: String) -> String {
+pub fn render_test_datamodel(config: &TestConfig, test_database: &str, template: String) -> String {
     let tag = config.test_connector_tag().unwrap();
     let datasource_with_generator = format!(
         r#"
@@ -35,7 +35,7 @@ pub fn render_test_datamodel(config: &TestConfig, suite: &str, template: String)
       }}
     "#,
         tag.datamodel_provider(),
-        tag.connection_string(suite, config.is_ci())
+        tag.connection_string(test_database, config.is_ci())
     );
 
     let models = tag.render_datamodel(template);
