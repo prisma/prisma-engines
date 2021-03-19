@@ -4,6 +4,36 @@ use proc_macro::TokenStream;
 use quote::quote;
 use syn::{parse_macro_input, parse_quote, AttributeArgs, Item, ItemMod, Meta, NestedMeta};
 
+/// What does this do?
+/// Test attributes (like `schema(handler)`, `only`, ...) can be defined on the test (`connector_test`) or on the module.
+/// Setting them on the module allows to define defaults that apply to all `connector_test`s in the module.
+/// Individual tests can still set their attributes, which will take precedence and overwrite the defaults.
+/// This macro merges the attributes of the module and writes them to the test function.
+/// Example: If the following test suite definition is given:
+/// ```no_run
+/// #[test_suite(schema(handler), exclude(SqlServer))]
+/// mod test_mod {
+///     #[connector_test]
+///     async fn test_a() { ... }
+///
+///     #[connector_test(suite = "other_tests", schema(other_handler), only(Postgres)]
+///     async fn test_b() { ... }
+/// }
+/// ```
+/// Will be rewritten to:
+/// ```
+/// mod test_mod {
+///     #[connector_test(suite = "test_mod", schema(handler), exclude(SqlServer))]
+///     async fn test_a() { ... }
+///
+///     #[connector_test(suite = "other_tests", schema(other_handler), only(Postgres)]
+///     async fn test_b() { ... }
+/// }
+/// ```
+/// As can be seen with the example, there are some rules regarding `only` and `exclude`, but the gist is that
+/// only one connector definition can be present, and since test_b already defines a connector tag rule, this one
+/// takes precedence. Same with the `suite` and `schema` attributes - they overwrite the defaults of the mod.
+/// A notable expansion is that the name of the test mod is added as `suite = <name>` to the tests.
 pub fn test_suite_impl(attr: TokenStream, input: TokenStream) -> TokenStream {
     // Validate input by simply parsing it, which will point out invalid fields and connector names etc.
     let attributes_meta: syn::AttributeArgs = parse_macro_input!(attr as AttributeArgs);
