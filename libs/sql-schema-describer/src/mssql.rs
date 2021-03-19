@@ -148,7 +148,7 @@ impl SqlSchemaDescriber {
         for row in rows.into_iter() {
             procedures.push(Procedure {
                 name: row.get_expect_string("name"),
-                definition: row.get_expect_string("definition"),
+                definition: row.get_string("definition"),
             });
         }
 

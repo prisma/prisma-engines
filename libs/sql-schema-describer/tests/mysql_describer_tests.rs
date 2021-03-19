@@ -68,7 +68,7 @@ async fn procedures_can_be_described() {
     let procedure = result.get_procedure("foo").unwrap();
 
     assert_eq!("foo", &procedure.name);
-    assert_eq!("SELECT 1 INTO res", &procedure.definition);
+    assert_eq!(Some("SELECT 1 INTO res"), procedure.definition.as_deref());
 }
 
 #[tokio::test]
