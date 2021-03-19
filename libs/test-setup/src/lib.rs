@@ -436,7 +436,7 @@ pub async fn create_mysql_database(original_url: &Url) -> Result<Quaint, AnyErro
         "#,
         db_name = db_name,
         );
-    let rows2 = conn.query_raw(sql_tables, &[]).await?;
+    let rows2 = conn.query_raw(&sql_tables, &[]).await?;
     for row in rows2.into_iter() {
         let sql3 = format!(
             r#"
@@ -444,7 +444,7 @@ pub async fn create_mysql_database(original_url: &Url) -> Result<Quaint, AnyErro
             "#, 
             table = row.get_expect_string("table_name"), 
         );
-        conn.raw_cmd(&sql2).await?;
+        conn.raw_cmd(&sql3).await?;
     }
     
     Ok(Quaint::new(&original_url.to_string()).await?)
