@@ -79,9 +79,7 @@ pub struct PersistenceNotInitializedError;
 impl PersistenceNotInitializedError {
     /// Explicit conversion to a ConnectorError.
     pub fn into_connector_error(self) -> ConnectorError {
-        ConnectorError::generic(anyhow::anyhow!(
-            "Invariant violation: migration persistence is not initialized."
-        ))
+        ConnectorError::from_msg("Invariant violation: migration persistence is not initialized.".into())
     }
 }
 

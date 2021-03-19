@@ -42,11 +42,20 @@ impl ConnectorError {
         self.0.user_facing_error.as_ref().map(|err| err.error_code)
     }
 
-    /// Construct a `Generic` connector error.
-    pub fn generic(report: anyhow::Error) -> Self {
+    /// Build a generic unknown error from just an error message.
+    pub fn from_msg(msg: String) -> Self {
         ConnectorError(Box::new(ConnectorErrorImpl {
             user_facing_error: None,
-            report,
+            report: anyhow::Error::msg(msg),
+            context: SpanTrace::capture(),
+        }))
+    }
+
+    /// Build a generic unknown error from a source error, with some additional context.
+    pub fn from_source<E: StdError + Send + Sync + 'static>(source: E, context: &'static str) -> Self {
+        ConnectorError(Box::new(ConnectorErrorImpl {
+            user_facing_error: None,
+            report: anyhow::Error::new(source).context(context),
             context: SpanTrace::capture(),
         }))
     }
@@ -120,7 +129,7 @@ impl ConnectorError {
 
     /// Construct an UrlParseError.
     pub fn url_parse_error(err: impl Display, url: &str) -> Self {
-        Self::generic(anyhow::anyhow!("{} in `{}`", err, url))
+        Self::from_msg(format!("{} in `{}`", err, url))
     }
 }
 

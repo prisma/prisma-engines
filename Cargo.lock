@@ -3880,7 +3880,6 @@ dependencies = [
 name = "sql-migration-connector"
 version = "0.1.0"
 dependencies = [
- "anyhow",
  "async-trait",
  "chrono",
  "connection-string",

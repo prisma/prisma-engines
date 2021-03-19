@@ -235,7 +235,7 @@ fn column_type_for_implicit_relation(id_field: &ScalarFieldWalker<'_>, schema: &
     schema
         .table_walker(referenced_model.database_name())
         .ok_or_else(|| {
-            anyhow::anyhow!(
+            format!(
                 "Invariant violation: M2M relation field referencing unknown table: {}",
                 referenced_model.database_name()
             )
@@ -243,7 +243,7 @@ fn column_type_for_implicit_relation(id_field: &ScalarFieldWalker<'_>, schema: &
         .unwrap()
         .column(id_field.db_name())
         .ok_or_else(|| {
-            anyhow::anyhow!(
+            format!(
                 "Invariant violation: M2M relation field referencing unknown id field: {}.{}",
                 referenced_model.database_name(),
                 id_field.db_name()
