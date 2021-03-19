@@ -28,9 +28,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-
-      - name: "Start databases"
-        run: docker-compose up -d
       
       - uses: actions-rs/toolchain@v1
         with:
