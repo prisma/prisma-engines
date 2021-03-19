@@ -287,12 +287,11 @@ where
             }
 
             let mut input_object = input_object_type(ident.clone(), object_fields);
-
             input_object.require_exactly_one_field();
 
             let input_object = Arc::new(input_object);
-
             ctx.cache_input_type(ident, input_object.clone());
+
             Arc::downgrade(&input_object)
         }
     };
