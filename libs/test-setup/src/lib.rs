@@ -424,8 +424,8 @@ pub async fn create_mysql_database(original_url: &Url) -> Result<Quaint, AnyErro
             r#"
             ALTER TABLE `{table}` DROP FOREIGN KEY `{fk}`;
             "#, 
-            table = row.get("table_name").to_string(), 
-            fk = row.get("constraint_name").to_string(),
+            table = row.get("table_name").unwrap().to_string().unwrap(), 
+            fk = row.get("constraint_name").unwrap().to_string().unwrap(),
         );
         conn.raw_cmd(&sql2).await?;
     }
@@ -442,7 +442,7 @@ pub async fn create_mysql_database(original_url: &Url) -> Result<Quaint, AnyErro
             r#"
             DROP TABLE `{table}`;
             "#, 
-            table = row.get("table_name").to_string(), 
+            table = row.get("table_name").unwrap().to_string().unwrap(), 
         );
         conn.raw_cmd(&sql3).await?;
     }
