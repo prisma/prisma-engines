@@ -430,19 +430,16 @@ pub async fn create_mysql_database(original_url: &Url) -> Result<Quaint, AnyErro
         conn.raw_cmd(&sql2).await?;
     }
 
-    let sql_tables = format!(
-        r#"
-           SELECT TABLE_NAME AS table_name FROM TABLES WHERE TABLE_SCHEMA = "{db_name}"
-        "#,
-        db_name = db_name,
-        );
+    let sql_tables = r#"
+       SHOW TABLES;
+    "#;
     let rows2 = conn.query_raw(&sql_tables, &[]).await?;
     for row in rows2.into_iter() {
         let sql3 = format!(
             r#"
             DROP TABLE `{table}`;
             "#, 
-            table = row.get("table_name").unwrap().to_string().unwrap(), 
+            table = row[0].unwrap().to_string().unwrap(), 
         );
         conn.raw_cmd(&sql3).await?;
     }
