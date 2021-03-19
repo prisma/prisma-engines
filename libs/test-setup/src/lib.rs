@@ -368,6 +368,11 @@ pub async fn create_mysql_database(original_url: &Url) -> Result<Quaint, AnyErro
 
     let conn = Quaint::new(&mysql_db_url.to_string()).await?;
 
+    
+    
+    
+    // original code
+    /*
     let drop = format!(
         r#"
         DROP DATABASE IF EXISTS `{db_name}`;
@@ -381,11 +386,67 @@ pub async fn create_mysql_database(original_url: &Url) -> Result<Quaint, AnyErro
         "#,
         db_name = db_name,
     );
-
+   
     // The two commands have to be run separately on mariadb.
     conn.raw_cmd(&drop).await?;
     conn.raw_cmd(&recreate).await?;
+    */
+    
+    // New code replacing that
+    /* JS variant
+    await db.query("USE " + process.env.VT_DATABASE);
+    
+    const foreign_keys = await db.query({rowsAsArray: true, sql: "SELECT DISTINCT TABLE_NAME, CONSTRAINT_NAME FROM information_schema.KEY_COLUMN_USAGE WHERE REFERENCED_TABLE_NAME IS NOT NULL"});
+    for(let row of foreign_keys) {
+      await db.query("ALTER TABLE `" + row[0] + "` DROP FOREIGN KEY `" + row[1] + "`");
+    }
+    
+    const tables = await db.query({rowsAsArray: true, sql: "SHOW TABLES"});
+    for(let row of tables) {
+      await db.query("DROP TABLE `" + row[0] + "`");
+    }
+    */
+    
+    let use = format!(
+        r#"
+        USE `{db_name}`;
+        "#,
+        db_name = db_name,
+    );
+    conn.raw_cmd(&use).await?;
+   
+    let sql_constraints = r#"
+        SELECT DISTINCT TABLE_NAME table_name, CONSTRAINT_NAME constraint_name FROM information_schema.KEY_COLUMN_USAGE WHERE REFERENCED_TABLE_NAME IS NOT NULL
+    "#;
+    let rows = conn.query_raw(sql_constraints, &[]).await?;
+    for row in rows.into_iter() {
+        let sql2 = format!(
+            r#"
+            ALTER TABLE `{table}` DROP FOREIGN KEY `{fk}`;
+            "#, 
+            table = row.get_expect_string("table_name"), 
+            fk = row.get_expect_string("constraint_name"),
+        );
+        conn.raw_cmd(&sql2).await?;
+    }
 
+    let sql_tables = format!(
+        r#"
+           SELECT TABLE_NAME AS table_name FROM TABLES WHERE TABLE_SCHEMA = "{db_name}"
+        "#,
+        db_name = db_name,
+        );
+    let rows2 = conn.query_raw(sql_tables, &[]).await?;
+    for row in rows2.into_iter() {
+        let sql3 = format!(
+            r#"
+            DROP TABLE `{table}`;
+            "#, 
+            table = row.get_expect_string("table_name"), 
+        );
+        conn.raw_cmd(&sql2).await?;
+    }
+    
     Ok(Quaint::new(&original_url.to_string()).await?)
 }
 
