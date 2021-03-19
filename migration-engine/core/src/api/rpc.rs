@@ -115,12 +115,12 @@ impl RpcApi {
             RpcCommand::ApplyMigrations => render(executor.apply_migrations(&params.parse()?).await?),
             RpcCommand::CreateMigration => render(executor.create_migration(&params.parse()?).await?),
             RpcCommand::DevDiagnostic => render(executor.dev_diagnostic(&params.parse()?).await?),
-            RpcCommand::DebugPanic => render(executor.debug_panic(&()).await?),
+            RpcCommand::DebugPanic => render(executor.debug_panic().await?),
             RpcCommand::DiagnoseMigrationHistory => {
                 render(executor.diagnose_migration_history(&params.parse()?).await?)
             }
             RpcCommand::EvaluateDataLoss => render(executor.evaluate_data_loss(&params.parse()?).await?),
-            RpcCommand::GetDatabaseVersion => render(executor.version(&serde_json::Value::Null).await?),
+            RpcCommand::GetDatabaseVersion => render(executor.version().await?),
             RpcCommand::ListMigrationDirectories => {
                 render(executor.list_migration_directories(&params.parse()?).await?)
             }
