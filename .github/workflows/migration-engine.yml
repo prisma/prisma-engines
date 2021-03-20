@@ -27,14 +27,15 @@ jobs:
         working-directory: migration-engine/migration-engine-tests
 
   test:
-    name: "Test Migration Engine - ${{ matrix.database }}"
+    name: "Test Migration Engine - ${{ matrix.os }} - ${{ matrix.database }}"
     
     strategy:
       fail-fast: false
       matrix:
         database: [mssql_2017, mssql_2019, mysql_5_6, mysql, mysql_8, mysql_mariadb, postgres9, postgres10, postgres11, postgres12, postgres13, sqlite]
+        os: [ubuntu-latest, windows-latest, macos-latest]
         
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
 
