@@ -27,14 +27,15 @@ jobs:
         working-directory: introspection-engine/introspection-engine-tests
 
   test:
-    name: "Test Introspection Engine - ${{ matrix.segment }}"
+    name: "Test Introspection Engine - ${{ matrix.os }} - ${{ matrix.segment }}"
     
     strategy:
       fail-fast: false
       matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
         segment: [""]
         
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
 
