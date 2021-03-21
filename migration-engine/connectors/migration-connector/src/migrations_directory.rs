@@ -39,7 +39,7 @@ pub fn create_migration_directory(
     if directory_path.exists() {
         return Err(io::Error::new(
             io::ErrorKind::AlreadyExists,
-            anyhow::anyhow!(
+            format!(
                 "The migration directory already exists at {}",
                 directory_path.to_string_lossy()
             ),
