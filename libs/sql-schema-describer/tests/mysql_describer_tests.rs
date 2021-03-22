@@ -1011,11 +1011,10 @@ async fn function_expression_defaults_are_described_as_dbgenerated(api: &TestApi
             string_col Varchar(8) DEFAULT (LEFT(UUID(), 8)),
             dt_col DateTime DEFAULT current_timestamp(),
             dt_col2 DateTime DEFAULT (SUBDATE(SYSDATE(), 31)),
-            binary_col Binary(16) NOT NULL DEFAULT (conv(10,10,2))
-            #json_col Json DEFAULT (LEFT(UUID(), 8)),
-            #uuid_col UUID DEFAULT (LEFT(UUID(), 8)),
-            #enum_col VARCHAR(8) DEFAULT (LEFT(UUID(), 8)),
-            #unsupported_col VARCHAR(8) DEFAULT (LEFT(UUID(), 8))
+            binary_col Binary(16) NOT NULL DEFAULT (conv(10,10,2)),
+            json_col Json DEFAULT (Trim('{} ')),
+            enum_col ENUM('x-small') DEFAULT (Trim('x-small   ')),
+            unsupported_col SET('one', 'two') DEFAULT (Trim(' '))
         );
     "#;
 
@@ -1039,7 +1038,7 @@ async fn function_expression_defaults_are_described_as_dbgenerated(api: &TestApi
         &DefaultValue::db_generated("(sysdate() - interval 31 day)")
     );
     assert_eq!(default("binary_col"), &DefaultValue::db_generated("conv(10,10,2)"));
-    // assert_eq!(default("uuid_col"), &DefaultValue::db_generated("(left(uuid(),8))"));
+    // assert_eq!(default("json_col"), &DefaultValue::db_generated("(trim(\'{} \'))"));
     // assert_eq!(default("enum_col"), &DefaultValue::db_generated("(left(uuid(),8))"));
     // assert_eq!(default("unsupported_col"), &DefaultValue::db_generated("(left(uuid(),8))"));
 }
