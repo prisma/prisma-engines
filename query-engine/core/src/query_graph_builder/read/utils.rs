@@ -94,8 +94,8 @@ pub fn merge_cursor_fields(selected_fields: ModelProjection, cursor: &Option<Rec
 }
 
 pub fn collect_relation_aggr_selections(from: &[FieldPair], model: &ModelRef) -> Vec<RelAggregationSelection> {
-    if let Some(pair) = from.get(0) {
-        match pair.parsed_field.name.as_str() {
+    from.iter()
+        .flat_map(|pair| match pair.parsed_field.name.as_str() {
             fields::UNDERSCORE_COUNT => {
                 let nested_fields = pair.parsed_field.nested_fields.as_ref().unwrap();
 
@@ -110,11 +110,9 @@ pub fn collect_relation_aggr_selections(from: &[FieldPair], model: &ModelRef) ->
 
                         RelAggregationSelection::Count(rf)
                     })
-                    .collect()
+                    .collect::<Vec<_>>()
             }
-            _ => panic!("Unknown field name for a relation aggregation"),
-        }
-    } else {
-        vec![]
-    }
+            field_name => panic!("Unknown field name \"{}\" for a relation aggregation", field_name),
+        })
+        .collect::<Vec<_>>()
 }

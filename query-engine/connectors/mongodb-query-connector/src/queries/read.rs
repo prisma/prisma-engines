@@ -11,6 +11,7 @@ pub async fn get_single_record(
     model: &ModelRef,
     filter: &Filter,
     selected_fields: &ModelProjection,
+    _aggr_selections: &[RelAggregationSelection],
 ) -> crate::Result<Option<SingleRecord>> {
     let coll = database.collection(model.db_name());
     let (filter, _) = convert_filter(filter.clone(), false)?.render();

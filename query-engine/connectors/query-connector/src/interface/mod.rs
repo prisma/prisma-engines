@@ -175,7 +175,7 @@ impl RelAggregationSelection {
     pub fn db_alias(&self) -> String {
         match self {
             RelAggregationSelection::Count(rf) => {
-                format!("aggr_{}", rf.name.to_owned())
+                format!("_aggr_count_{}", rf.name.to_owned())
             }
         }
     }
@@ -212,6 +212,7 @@ pub trait ReadOperations {
         model: &ModelRef,
         filter: &Filter,
         selected_fields: &ModelProjection,
+        aggregation_selections: &[RelAggregationSelection],
     ) -> crate::Result<Option<SingleRecord>>;
 
     /// Gets multiple records from the database.

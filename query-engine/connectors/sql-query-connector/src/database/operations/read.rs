@@ -15,11 +15,23 @@ pub async fn get_single_record(
     model: &ModelRef,
     filter: &Filter,
     selected_fields: &ModelProjection,
+    aggr_selections: &[RelAggregationSelection],
 ) -> crate::Result<Option<SingleRecord>> {
-    let query = read::get_records(&model, selected_fields.as_columns(), &[], filter);
+    let query = read::get_records(&model, selected_fields.as_columns(), aggr_selections, filter);
 
-    let field_names: Vec<_> = selected_fields.db_names().collect();
-    let idents = selected_fields.type_identifiers_with_arities();
+    let mut field_names: Vec<_> = selected_fields.db_names().collect();
+    let mut aggr_field_names: Vec<_> = aggr_selections.iter().map(|aggr_sel| aggr_sel.db_alias()).collect();
+
+    field_names.append(&mut aggr_field_names);
+
+    let mut idents = selected_fields.type_identifiers_with_arities();
+    let mut aggr_idents = aggr_selections
+        .iter()
+        .map(|aggr_sel| aggr_sel.type_identifier_with_arity())
+        .collect();
+
+    idents.append(&mut aggr_idents);
+
     let meta = column_metadata::create(field_names.as_slice(), idents.as_slice());
 
     let record = (match conn.find(query, meta.as_slice()).await {
