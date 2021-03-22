@@ -207,19 +207,17 @@ pub(crate) fn nested_update_input_field(ctx: &mut BuilderContext, parent_field: 
 
 /// Builds scalar input fields using the mapper and the given, prefiltered, scalar fields.
 /// The mapper is responsible for mapping the fields to input types.
-pub(crate) fn scalar_input_fields<T, F>(
+pub(crate) fn scalar_input_fields<F, G>(
     ctx: &mut BuilderContext,
-    model_name: String,
-    input_object_name: T,
     prefiltered_fields: Vec<ScalarFieldRef>,
     non_list_field_mapper: F,
+    list_field_mapper: G,
     with_defaults: bool,
 ) -> Vec<InputField>
 where
-    T: Into<String>,
     F: Fn(&mut BuilderContext, ScalarFieldRef, Option<DefaultValue>) -> InputField,
+    G: Fn(&mut BuilderContext, ScalarFieldRef, Option<DefaultValue>) -> InputField,
 {
-    let input_object_name = input_object_name.into();
     let mut non_list_fields: Vec<InputField> = prefiltered_fields
         .iter()
         .filter(|f| !f.is_list)
@@ -233,26 +231,8 @@ where
         .into_iter()
         .filter(|f| f.is_list)
         .map(|f| {
-            let name = f.name.clone();
-            let list_input_type = map_scalar_input_type(ctx, &f.type_identifier, f.is_list);
-            let set_object_ident = Identifier::new(
-                format!("{}{}{}Input", model_name, input_object_name, f.name),
-                PRISMA_NAMESPACE,
-            );
-
-            let input_object = match ctx.get_input_type(&set_object_ident) {
-                Some(t) => t,
-                None => {
-                    let set_fields = vec![input_field(operations::SET, list_input_type.clone(), None)];
-                    let input_object = Arc::new(input_object_type(set_object_ident.clone(), set_fields));
-
-                    ctx.cache_input_type(set_object_ident, input_object.clone());
-                    Arc::downgrade(&input_object)
-                }
-            };
-
-            let set_input_type = InputType::object(input_object);
-            input_field(name, vec![set_input_type, list_input_type], None).optional()
+            let default = if with_defaults { f.default_value.clone() } else { None };
+            list_field_mapper(ctx, f.clone(), default)
         })
         .collect();
 
@@ -271,4 +251,51 @@ where
         None,
     )
     .optional()
+}
+
+pub(crate) fn scalar_list_input_field_mapper<T>(
+    ctx: &mut BuilderContext,
+    model_name: String,
+    input_object_name: T,
+    f: ScalarFieldRef,
+    is_create: bool,
+) -> InputField
+where
+    T: Into<String>,
+{
+    let list_input_type = map_scalar_input_type(ctx, &f.type_identifier, f.is_list);
+    let ident = Identifier::new(
+        format!("{}{}{}Input", model_name, input_object_name.into(), f.name),
+        PRISMA_NAMESPACE,
+    );
+
+    let input_object = match ctx.get_input_type(&ident) {
+        Some(t) => t,
+        None => {
+            let mut object_fields =
+                vec![input_field(operations::SET, list_input_type.clone(), None).optional_if(!is_create)];
+
+            if !is_create {
+                object_fields.push(
+                    input_field(
+                        operations::PUSH,
+                        map_scalar_input_type(ctx, &f.type_identifier, false),
+                        None,
+                    )
+                    .optional(),
+                )
+            }
+
+            let mut input_object = input_object_type(ident.clone(), object_fields);
+            input_object.require_exactly_one_field();
+
+            let input_object = Arc::new(input_object);
+            ctx.cache_input_type(ident, input_object.clone());
+
+            Arc::downgrade(&input_object)
+        }
+    };
+
+    let input_type = InputType::object(input_object);
+    input_field(f.name.clone(), vec![input_type, list_input_type], None).optional()
 }

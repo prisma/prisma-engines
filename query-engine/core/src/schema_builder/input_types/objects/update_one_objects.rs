@@ -86,14 +86,13 @@ fn unchecked_update_one_input_type(
 pub(super) fn scalar_input_fields_for_checked_update(ctx: &mut BuilderContext, model: &ModelRef) -> Vec<InputField> {
     input_fields::scalar_input_fields(
         ctx,
-        model.name.clone(),
-        "Update",
         model
             .fields()
             .scalar_writable()
             .filter(|sf| field_should_be_kept_for_checked_update_input_type(ctx, sf))
             .collect(),
         |ctx, f: ScalarFieldRef, default| non_list_scalar_update_field_mapper(ctx, &f, default),
+        |ctx, f, _| input_fields::scalar_list_input_field_mapper(ctx, model.name.clone(), "Update", f, false),
         false,
     )
 }
@@ -124,10 +123,9 @@ pub(super) fn scalar_input_fields_for_unchecked_update(
 
     input_fields::scalar_input_fields(
         ctx,
-        model.name.clone(),
-        "Update",
         scalar_fields,
         |ctx, f: ScalarFieldRef, default| non_list_scalar_update_field_mapper(ctx, &f, default),
+        |ctx, f, _| input_fields::scalar_list_input_field_mapper(ctx, model.name.clone(), "Update", f, false),
         false,
     )
 }
