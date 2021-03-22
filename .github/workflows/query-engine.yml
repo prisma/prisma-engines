@@ -12,24 +12,19 @@ jobs:
       matrix:
         connector: [postgresql9] #, postgresql10, postgresql11, postgresql12, postgresql13, pgbouncer, mysql, mysql56, mysql8, mariadb, mssql2017, mssql2019, sqlite]
         
-    container:
-      image: prismagraphql/build:test
-        
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
 
-      - run: curl -L "https://github.com/docker/compose/releases/download/1.28.5/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-      - run: chmod +x /usr/local/bin/docker-compose
-      - run: docker-compose --version
-
       - name: "Start databases"
         run: docker-compose -f docker-compose.qe-tests.yml up -d 
         
-      - run: rustup default stable
-      - run: sbt test
-        working-directory: query-engine/connector-test-kit
-        env:
-          SERVER_ROOT: /__w/prisma-engines/prisma-engines
-          TEST_CONNECTOR: ${{ matrix.connector }}
-          TEST_MODE: simple
+      - run: docker-compose -f docker-compose.qe-tests.yml run -e TEST_CONNECTOR=${{ matrix.connector }} -e TEST_MODE=simple -w /root/build/prisma-engines/prisma-engines test-base sbt test
+      
+      #- run: rustup default stable
+      #- run: sbt test
+      #  working-directory: query-engine/connector-test-kit
+      #  env:
+      #    SERVER_ROOT: /__w/prisma-engines/prisma-engines
+      #    TEST_CONNECTOR: ${{ matrix.connector }}
+      #    TEST_MODE: simple
