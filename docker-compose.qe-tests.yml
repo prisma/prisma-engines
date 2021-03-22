@@ -24,8 +24,8 @@ services:
       POSTGRES_PASSWORD: "prisma"
     ports:
       - "5431:5432"
-    networks:
-      - engine-tests
+#    networks:
+#      - engine-tests
 
   test-db-postgres-10:
     image: postgres:10
@@ -35,8 +35,8 @@ services:
       POSTGRES_PASSWORD: "prisma"
     ports:
       - "5432:5432"
-    networks:
-      - engine-tests
+#    networks:
+#      - engine-tests
 
   test-db-postgres-11:
     image: postgres:11
@@ -46,8 +46,8 @@ services:
       POSTGRES_PASSWORD: "prisma"
     ports:
       - "5433:5432"
-    networks:
-      - engine-tests
+#    networks:
+#      - engine-tests
 
   test-db-postgres-12:
     image: postgres:12
@@ -57,8 +57,8 @@ services:
       POSTGRES_PASSWORD: "prisma"
     ports:
       - "5434:5432"
-    networks:
-      - engine-tests
+#    networks:
+#      - engine-tests
 
   test-db-postgres-13:
     image: postgres:13
@@ -68,8 +68,8 @@ services:
       POSTGRES_PASSWORD: "prisma"
     ports:
       - "5435:5432"
-    networks:
-      - engine-tests
+#    networks:
+#      - engine-tests
 
   test-db-pgbouncer:
     image: brainsam/pgbouncer:latest
@@ -83,8 +83,8 @@ services:
       MAX_CLIENT_CONN: "1000"
       SERVER_RESET_QUERY_ALWAYS: "1"
       SERVER_RESET_QUERY: "DEALLOCATE ALL"
-    networks:
-      - engine-tests
+#    networks:
+#      - engine-tests
     ports:
       - "6432:6432"
 
@@ -98,8 +98,8 @@ services:
       MYSQL_DATABASE: prisma
     ports:
       - "3309:3306"
-    networks:
-      - engine-tests
+#    networks:
+#      - engine-tests
 
   test-db-mysql-5-7:
     image: mysql:5.7
@@ -111,8 +111,8 @@ services:
       MYSQL_DATABASE: prisma
     ports:
       - "3306:3306"
-    networks:
-      - engine-tests
+#    networks:
+#      - engine-tests
 
   test-db-mysql-8-0:
     image: mysql:8.0
@@ -124,8 +124,8 @@ services:
       MYSQL_DATABASE: prisma
     ports:
       - "3307:3306"
-    networks:
-      - engine-tests
+#    networks:
+#      - engine-tests
 
   test-db-mariadb:
     image: mariadb:10
@@ -136,8 +136,8 @@ services:
       MYSQL_DATABASE: prisma
     ports:
       - "3308:3306"
-    networks:
-      - engine-tests
+#    networks:
+#      - engine-tests
 
   test-db-mssql-2019:
     image: mcr.microsoft.com/mssql/server:2019-latest
@@ -147,8 +147,8 @@ services:
       SA_PASSWORD: "<YourStrong@Passw0rd>"
     ports:
       - "1433:1433"
-    networks:
-      - engine-tests
+#    networks:
+#      - engine-tests
 
   test-db-mssql-2017:
     image: mcr.microsoft.com/mssql/server:2017-latest
@@ -158,8 +158,8 @@ services:
       SA_PASSWORD: "<YourStrong@Passw0rd>"
     ports:
       - "1434:1433"
-    networks:
-      - engine-tests
+#    networks:
+#      - engine-tests
 
-networks:
-  engine-tests:
+#networks:
+#  engine-tests:
