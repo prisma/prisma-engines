@@ -38,7 +38,11 @@ all = [
   "bigdecimal"
 ]
 
-vendored-openssl = ["tiberius/vendored-openssl"]
+vendored-openssl = [
+  "tiberius/vendored-openssl",
+  "postgres-native-tls/vendored-openssl",
+  "mysql_async/vendored-openssl"
+]
 
 postgresql = [
   "native-tls",
@@ -61,33 +65,29 @@ sqlite = ["rusqlite", "libsqlite3-sys", "tokio/sync"]
 bigdecimal = ["bigdecimal_", "num-bigint"]
 
 [dependencies]
-async-trait = "0.1"
-futures = "0.3"
-hex = "0.4"
-metrics = "0.12"
-num_cpus = "1.12"
-once_cell = "1.3"
+connection-string = "0.1.10"
 percent-encoding = "2"
+tracing-core = "0.1"
+async-trait = "0.1"
 thiserror = "1.0"
+once_cell = "1.3"
+num_cpus = "1.12"
+metrics = "0.12"
+tracing = "0.1"
+futures = "0.3"
 url = "2.1"
+hex = "0.4"
 
 either = { version = "1.6", optional = true }
-byteorder = { default-features = false, optional = true, version = ">1.4.0" }
 base64 = { version = "0.12.3", optional = true }
 chrono = { version = "0.4", optional = true }
 lru-cache = { version = "0.1", optional = true }
 serde_json = { version = "1.0.48", optional = true }
-rusqlite = { version = "0.23", features = ["chrono", "bundled"], optional = true }
 native-tls = { version = "0.2", optional = true }
-mysql_async = { version = "0.27.0", optional = true }
-tracing = { version = "0.1" }
-tracing-core = { version = "0.1" }
 bit-vec = { version = "0.6.1", optional = true }
 bytes = { version = "1.0", optional = true }
 mobc = { version = "0.7.0", optional = true }
 serde = { version = "1.0", optional = true }
-connection-string = "0.1.10"
-tiberius = { version = "0.5.8", optional = true, features = ["sql-browser-tokio", "chrono", "bigdecimal"]}
 
 [dev-dependencies]
 indoc = "0.3"
@@ -98,6 +98,32 @@ test-macros = { path = "test-macros" }
 test-setup = { path = "test-setup" }
 uuid = { version = "0.8", features = ["v4"] }
 tokio = { version = "1.0", features = ["rt-multi-thread", "macros", "time"] }
+
+[dependencies.byteorder]
+default-features = false
+optional = true
+version = ">1.4.0"
+
+[dependencies.mysql_async]
+git = "https://github.com/prisma/mysql_async"
+optional = true
+branch = "vendored-openssl"
+
+[dependencies.rusqlite]
+version = "0.23"
+features = ["chrono", "bundled"]
+optional = true
+
+[dependencies.libsqlite3-sys]
+version = "0.18"
+default-features = false
+features = ["bundled"]
+optional = true
+
+[dependencies.tiberius]
+version = "0.5.8"
+optional = true
+features = ["sql-browser-tokio", "chrono", "bigdecimal"]
 
 [dependencies.bigdecimal_]
 version = "0.2.0"
@@ -129,12 +155,6 @@ optional = true
 [dependencies.postgres-native-tls]
 git = "https://github.com/pimeys/rust-postgres"
 branch = "pgbouncer-mode"
-optional = true
-
-[dependencies.libsqlite3-sys]
-version = "0.18"
-default-features = false
-features = ["bundled"]
 optional = true
 
 [dependencies.tokio]

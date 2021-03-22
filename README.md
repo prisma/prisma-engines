@@ -29,6 +29,8 @@ Quaint is an abstraction over certain SQL databases. It provides:
 - `chrono`: DateTime type support with `chrono` crate.
 - `serde-support`: Deserialize support from result set with `serde` crate.
 - `bigdecimal`: Numeric values can be read as `BigDecimal`.
+- `vendored-openssl`: Statically links against a vendored OpenSSL library on
+  non-Windows or non-Apple platforms.
 
 ### Goals:
 
