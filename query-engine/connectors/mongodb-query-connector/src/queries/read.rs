@@ -6,6 +6,7 @@ use mongodb::Database;
 use mongodb::{bson::doc, options::FindOptions};
 use prisma_models::*;
 
+// TODO: Handle aggregation selections
 pub async fn get_single_record(
     database: &Database,
     model: &ModelRef,
