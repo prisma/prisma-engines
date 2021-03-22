@@ -6,7 +6,7 @@ import util._
 class DistinctQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
   val project = SchemaDsl.fromStringV11() {
     """model ModelA {
-      |  id     String @id @default(cuid())
+      |  id     Int @id @default(autoincrement())
       |  fieldA String
       |  fieldB Int
       |
@@ -14,9 +14,9 @@ class DistinctQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       |}
       |
       |model ModelB {
-      |  id    String @id @default(cuid())
+      |  id     Int @id @default(autoincrement())
       |  field String
-      |  a_id  String
+      |  a_id  Int
       |  a     ModelA @relation(fields: [a_id], references: [id])
       |}
     """.stripMargin
@@ -201,4 +201,23 @@ class DistinctQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     result.toString() should be(
       """{"data":{"findManyModelA":[{"fieldA":"1","fieldB":5,"b":[{"field":"2"},{"field":"3"}]},{"fieldA":"1","fieldB":4,"b":[{"field":"1"}]},{"fieldA":"1","fieldB":3,"b":[]},{"fieldA":"1","fieldB":1,"b":[{"field":"1"},{"field":"2"},{"field":"3"}]}]}}""")
   }
+
+  "Select distinct without explicitly selecting the distinct field" should "not panic" in {
+    createRecord("1", 1)
+    createRecord("2", 2)
+    createRecord("1", 1)
+
+    val result = server.query(
+      s"""{
+         |  findManyModelA(distinct: [fieldA, fieldB]) {
+         |    id
+         |  }
+         |}""".stripMargin,
+      project,
+      legacy = false
+    )
+
+    result.toString() should be("""{"data":{"findManyModelA":[{"id":1},{"id":2}]}}""")
+  }
+
 }
