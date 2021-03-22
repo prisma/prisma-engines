@@ -9,10 +9,17 @@ impl<'conn, 'tx> ReadOperations for ConnectionLike<'conn, 'tx> {
         model: &ModelRef,
         filter: &Filter,
         selected_fields: &ModelProjection,
+        aggr_selections: &[RelAggregationSelection],
     ) -> crate::Result<Option<SingleRecord>> {
         match self {
-            Self::Connection(c) => c.get_single_record(model, filter, selected_fields).await,
-            Self::Transaction(tx) => tx.get_single_record(model, filter, selected_fields).await,
+            Self::Connection(c) => {
+                c.get_single_record(model, filter, selected_fields, aggr_selections)
+                    .await
+            }
+            Self::Transaction(tx) => {
+                tx.get_single_record(model, filter, selected_fields, aggr_selections)
+                    .await
+            }
         }
     }
 

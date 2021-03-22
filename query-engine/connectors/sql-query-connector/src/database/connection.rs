@@ -64,9 +64,12 @@ where
         model: &ModelRef,
         filter: &Filter,
         selected_fields: &ModelProjection,
+        aggr_selections: &[RelAggregationSelection],
     ) -> connector::Result<Option<SingleRecord>> {
-        self.catch(async move { read::get_single_record(&self.inner, model, filter, selected_fields).await })
-            .await
+        self.catch(async move {
+            read::get_single_record(&self.inner, model, filter, selected_fields, aggr_selections).await
+        })
+        .await
     }
 
     async fn get_many_records(

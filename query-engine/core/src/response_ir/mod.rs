@@ -144,49 +144,6 @@ impl Item {
             _ => None,
         }
     }
-
-    pub fn merge(self, other: &Item) -> Item {
-        fn internal_merge(mut a: Item, b: &Item) -> Item {
-            match a {
-                Item::Map(ref mut map_a) => match b {
-                    Item::Map(map_b) => {
-                        for b_entry in map_b.into_iter() {
-                            map_a.insert(b_entry.0.clone(), b_entry.1.clone());
-                        }
-                    }
-                    Item::Ref(inner_b) => {
-                        a = internal_merge(a, &**inner_b);
-                    }
-                    Item::List(_) | Item::Value(_) | Item::Json(_) => panic!("Unexpected types couldn't be merged"),
-                },
-                Item::List(ref mut list_a) => match b {
-                    Item::List(list_b) => {
-                        for (i, item_a) in list_a.inner.iter_mut().enumerate() {
-                            if let Some(item_b) = list_b.inner.get(i) {
-                                *item_a = internal_merge(item_a.clone(), item_b);
-                            }
-                        }
-                    }
-                    Item::Ref(inner_b) => {
-                        a = internal_merge(a, &**inner_b);
-                    }
-                    Item::Map(_) | Item::Value(_) | Item::Json(_) => panic!("Unexpected types couldn't be merged"),
-                },
-                Item::Ref(ref mut inner) => {
-                    let inner_ref = &**inner;
-                    let merged: Item = internal_merge(inner_ref.clone(), b);
-
-                    *inner = Arc::new(merged.clone());
-                }
-                Item::Value(_) => panic!("Values cannot be merged"),
-                Item::Json(_) => panic!("Json cannot be merged"),
-            }
-
-            a
-        }
-
-        internal_merge(self, other)
-    }
 }
 
 impl Serialize for Item {

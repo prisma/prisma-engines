@@ -118,9 +118,12 @@ impl ReadOperations for MongoDbConnection {
         model: &ModelRef,
         filter: &connector_interface::Filter,
         selected_fields: &ModelProjection,
+        aggr_selections: &[RelAggregationSelection],
     ) -> connector_interface::Result<Option<SingleRecord>> {
-        self.catch(async move { read::get_single_record(&self.database, model, filter, selected_fields).await })
-            .await
+        self.catch(async move {
+            read::get_single_record(&self.database, model, filter, selected_fields, aggr_selections).await
+        })
+        .await
     }
 
     async fn get_many_records(

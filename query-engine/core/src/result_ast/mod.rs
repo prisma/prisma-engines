@@ -33,7 +33,7 @@ pub struct RecordSelection {
     /// Model projection that can be used to retrieve the IDs of the contained records.
     pub model_id: ModelProjection,
 
-    /// Aggregation selections results
+    /// Holds an ordered list of aggregation selections results for each contained record
     pub aggregation_rows: Option<Vec<RelAggregationRow>>,
 }
 

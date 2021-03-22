@@ -7,6 +7,7 @@ use crate::{
 use bigdecimal::ToPrimitive;
 use connector::{AggregationResult, RelAggregationResult, RelAggregationRow};
 use indexmap::IndexMap;
+use itertools::Itertools;
 use prisma_models::{PrismaValue, RecordProjection};
 use std::{borrow::Borrow, collections::HashMap};
 
@@ -41,22 +42,7 @@ pub fn serialize_internal(
     is_list: bool,
 ) -> crate::Result<CheckedItemsWithParents> {
     match result {
-        QueryResult::RecordSelection(rs) => {
-            if let Some(aggr_rows) = &rs.aggregation_rows {
-                let serialized_aggrs = serialize_rel_aggregations(aggr_rows)?;
-                let mut serialized_rs = serialize_record_selection(*rs, field, &field.field_type, is_list)?;
-
-                let (_, aggr_item) = serialized_aggrs.first().unwrap();
-
-                for (_, rs_item) in serialized_rs.iter_mut() {
-                    *rs_item = rs_item.clone().merge(&aggr_item);
-                }
-
-                Ok(serialized_rs)
-            } else {
-                serialize_record_selection(*rs, field, &field.field_type, is_list)
-            }
-        }
+        QueryResult::RecordSelection(rs) => serialize_record_selection(*rs, field, &field.field_type, is_list),
         QueryResult::RecordAggregations(ras) => serialize_aggregations(field, ras),
         QueryResult::Count(c) => {
             // Todo needs a real implementation or needs to move to RecordAggregation
@@ -173,35 +159,22 @@ fn serialize_aggregations(
     Ok(envelope)
 }
 
-fn serialize_rel_aggregations(aggregation_rows: &[RelAggregationRow]) -> crate::Result<CheckedItemsWithParents> {
-    let mut results = vec![];
-
-    for row in aggregation_rows.into_iter() {
-        let mut map: Map = IndexMap::with_capacity(row.len());
-
-        for result in row {
-            match result {
-                RelAggregationResult::Count(rf, count) => match map.get_mut(fields::UNDERSCORE_COUNT) {
-                    Some(item) => match item {
-                        Item::Map(inner_map) => inner_map.insert(rf.name.clone(), Item::Value(count.clone())),
-                        _ => unreachable!(),
-                    },
-                    None => {
-                        let mut inner_map: Map = Map::new();
-                        inner_map.insert(rf.name.clone(), Item::Value(count.clone()));
-                        map.insert(fields::UNDERSCORE_COUNT.to_owned(), Item::Map(inner_map))
-                    }
+fn write_rel_aggregation_row(row: &RelAggregationRow, map: &mut HashMap<String, Item>) {
+    for result in row.iter() {
+        match result {
+            RelAggregationResult::Count(rf, count) => match map.get_mut(fields::UNDERSCORE_COUNT) {
+                Some(item) => match item {
+                    Item::Map(inner_map) => inner_map.insert(rf.name.clone(), Item::Value(count.clone())),
+                    _ => unreachable!(),
                 },
-            };
-        }
-
-        results.push(Item::Map(map));
+                None => {
+                    let mut inner_map: Map = Map::new();
+                    inner_map.insert(rf.name.clone(), Item::Value(count.clone()));
+                    map.insert(fields::UNDERSCORE_COUNT.to_owned(), Item::Map(inner_map))
+                }
+            },
+        };
     }
-
-    let mut envelope = CheckedItemsWithParents::new();
-    envelope.insert(None, Item::List(results.into()));
-
-    Ok(envelope)
 }
 
 fn extract_aggregate_object_type(output_type: &OutputType) -> ObjectTypeStrongRef {
@@ -333,7 +306,7 @@ fn serialize_objects(
 
     // Write all fields, nested and list fields unordered into a map, afterwards order all into the final order.
     // If nothing is written to the object, write null instead.
-    for record in result.scalars.records.into_iter() {
+    for (r_index, record) in result.scalars.records.into_iter().enumerate() {
         let record_id = Some(record.projection(&scalar_db_field_names, &result.model_id)?);
 
         if !object_mapping.contains_key(&record.parent_id) {
@@ -355,10 +328,29 @@ fn serialize_objects(
         // Write nested results
         write_nested_items(&record_id, &mut nested_mapping, &mut object, &typ);
 
-        let map = result
-            .fields
+        let aggr_row = result.aggregation_rows.as_ref().map(|rows| rows.get(r_index).unwrap());
+
+        if let Some(aggr_row) = aggr_row {
+            write_rel_aggregation_row(aggr_row, &mut object);
+        }
+
+        let mut aggr_fields = aggr_row
+            .map(|row| {
+                row.iter()
+                    .map(|aggr_result| match aggr_result {
+                        RelAggregationResult::Count(_, _) => fields::UNDERSCORE_COUNT.to_owned(),
+                    })
+                    .unique()
+                    .collect()
+            })
+            .unwrap_or(vec![]);
+        let mut all_fields = result.fields.clone();
+
+        all_fields.append(&mut aggr_fields);
+
+        let map = all_fields
             .iter()
-            .fold(Map::with_capacity(result.fields.len()), |mut acc, field_name| {
+            .fold(Map::with_capacity(all_fields.len()), |mut acc, field_name| {
                 acc.insert(field_name.to_owned(), object.remove(field_name).unwrap());
                 acc
             });

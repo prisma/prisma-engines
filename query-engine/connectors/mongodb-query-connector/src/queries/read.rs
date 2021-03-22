@@ -6,11 +6,13 @@ use mongodb::Database;
 use mongodb::{bson::doc, options::FindOptions};
 use prisma_models::*;
 
+// TODO: Handle aggregation selections
 pub async fn get_single_record(
     database: &Database,
     model: &ModelRef,
     filter: &Filter,
     selected_fields: &ModelProjection,
+    _aggr_selections: &[RelAggregationSelection],
 ) -> crate::Result<Option<SingleRecord>> {
     let coll = database.collection(model.db_name());
     let (filter, _) = convert_filter(filter.clone(), false)?.render();
