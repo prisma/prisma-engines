@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        connector: [postgresql9] #, postgresql10, postgresql11, postgresql12, postgresql13, pgbouncer, mysql, mysql56, mysql8, mariadb, mssql2017, mssql2019, sqlite]
+        connector: [postgresql9, postgresql10, postgresql11, postgresql12, postgresql13, pgbouncer, mysql, mysql56, mysql8, mariadb, mssql2017, mssql2019, sqlite]
         
     runs-on: ubuntu-latest
     steps:
