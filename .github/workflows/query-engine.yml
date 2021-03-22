@@ -19,9 +19,11 @@ jobs:
       - name: "Start databases"
         run: docker-compose -f docker-compose.qe-tests.yml up -d 
         
-      - run: cargo build --all-features --release --bin query-engine --bin migration-engine
+      - name: Build Engines on image
+        run: docker-compose -f docker-compose.qe-tests.yml run test-base cargo build --all-features --release --bin query-engine --bin migration-engine
       
-      - run: docker-compose -f docker-compose.qe-tests.yml run -e TEST_CONNECTOR=${{ matrix.connector }} -e TEST_MODE=simple -w /root/build/query-engine/connector-test-kit test-base sbt test
+      - name: Run tests on image
+        run: docker-compose -f docker-compose.qe-tests.yml run -e TEST_CONNECTOR=${{ matrix.connector }} -e TEST_MODE=simple -w /root/build/query-engine/connector-test-kit test-base sbt test
       
       #- run: rustup default stable
       #- run: sbt test
