@@ -391,7 +391,7 @@ impl SqlSchemaDescriber {
         Ok(map)
     }
 
-    fn db_generated(default_string: &String, default_generated: bool) -> DefaultValue {
+    fn db_generated(default_string: &str, default_generated: bool) -> DefaultValue {
         if default_generated {
             Self::dbgenerated_expression(default_string)
         } else {
@@ -399,7 +399,7 @@ impl SqlSchemaDescriber {
         }
     }
 
-    fn dbgenerated_expression(default_string: &String) -> DefaultValue {
+    fn dbgenerated_expression(default_string: &str) -> DefaultValue {
         if matches!(default_string.chars().next(), Some('(')) {
             DefaultValue::db_generated(default_string)
         } else {
