@@ -28,10 +28,7 @@ jobs:
           key: query-engine-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
           
       - name: Build Engines on image
-        run: docker-compose -f docker-compose.qe-tests.yml run test-base cargo build --all-features --release --bin query-engine --bin migration-engine
-        env:
-          SQLITE_MAX_VARIABLE_NUMBER: 250000
-          SQLITE_MAX_EXPR_DEPTH: 10000
+        run: docker-compose -f docker-compose.qe-tests.yml run -e SQLITE_MAX_VARIABLE_NUMBER=250000 -e SQLITE_MAX_EXPR_DEPTH=10000 test-base cargo build --all-features --release --bin query-engine --bin migration-engine          
       
       - name: Run tests on image
         run: docker-compose -f docker-compose.qe-tests.yml run -e TEST_CONNECTOR=${{ matrix.connector }} -e TEST_MODE=simple -w /root/build/query-engine/connector-test-kit test-base sbt test
