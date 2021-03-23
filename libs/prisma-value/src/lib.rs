@@ -43,7 +43,7 @@ pub enum PrismaValue {
 }
 
 pub fn stringify_date(date: &DateTime<FixedOffset>) -> String {
-    date.to_rfc3339()
+    date.to_rfc3339_opts(SecondsFormat::Millis, true)
 }
 
 pub fn encode_bytes(bytes: &[u8]) -> String {
