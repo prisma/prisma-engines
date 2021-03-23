@@ -18,17 +18,21 @@ jobs:
 
       - name: "Start databases"
         run: docker-compose -f docker-compose.qe-tests.yml up -d 
-        
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: query-engine-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          
       - name: Build Engines on image
         run: docker-compose -f docker-compose.qe-tests.yml run test-base cargo build --all-features --release --bin query-engine --bin migration-engine
+        env:
+          SQLITE_MAX_VARIABLE_NUMBER: 250000
+          SQLITE_MAX_EXPR_DEPTH: 10000
       
       - name: Run tests on image
         run: docker-compose -f docker-compose.qe-tests.yml run -e TEST_CONNECTOR=${{ matrix.connector }} -e TEST_MODE=simple -w /root/build/query-engine/connector-test-kit test-base sbt test
-      
-      #- run: rustup default stable
-      #- run: sbt test
-      #  working-directory: query-engine/connector-test-kit
-      #  env:
-      #    SERVER_ROOT: /__w/prisma-engines/prisma-engines
-      #    TEST_CONNECTOR: ${{ matrix.connector }}
-      #    TEST_MODE: simple
+
