@@ -1,3 +1,4 @@
+use crate::TemplatingError;
 use std::env::VarError;
 use thiserror::Error;
 
@@ -14,6 +15,9 @@ pub enum TestError {
 
     #[error("Migration core error: {0}")]
     MigrationCoreError(#[from] migration_core::CoreError),
+
+    #[error("Error processing schema template: {0}")]
+    TemplatingError(#[from] TemplatingError),
 }
 
 impl TestError {

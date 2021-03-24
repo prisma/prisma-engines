@@ -8,7 +8,7 @@
 // Notes:
 // - Allow dead code should be set?
 // - Tests run in separate units in the data source. For MySQL, this may be a separate database, for postgres a schema, etc. -> These units are named `{mod_name}_{test_name}`
-//
+// - Test logs. We could write the logs for each test into a logs folder with a file named after the test.
 
 use query_test_macros::{connector_test, test_suite};
 
@@ -37,10 +37,10 @@ mod some_spec {
     // Handler that returns a schema template to use for rendering.
     // Template rendering can be bypassed by simply not using the template strings.
     // Common schema handlers to use should be in a central place.
+    // #[template]
     fn schema_handler() -> String {
-        // #id(id, Int, @id)
         "model A {
-            id Int @id
+            #id(id, Int, @id)
             field String?
         }"
         .to_owned()
