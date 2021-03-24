@@ -186,4 +186,27 @@ class CreateMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
 
     res should be("""{"data":{"createScalarModel":{"relId":null}}}""".parseJson)
   }
+
+  "A Create Mutation with datetime as identifier" should "work" in {
+    val project = ProjectDsl.fromString {
+      s"""
+         |model A {
+         |  timestamp DateTime @id @default(now())
+         |}
+    """.stripMargin
+    }
+
+    database.setup(project)
+
+    val res = server.query(
+      """mutation {
+        |  createOneA(data: {}) {
+        |    timestamp
+        |  }}""".stripMargin,
+      project = project,
+      legacy = false
+    )
+
+    res.toString() should be("""{"data":{"createOneA":{"timestamp":"2021-03-25T15:20:31.342+00:00"}}}""")
+  }
 }
