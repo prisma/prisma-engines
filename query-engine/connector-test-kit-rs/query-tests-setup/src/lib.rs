@@ -1,13 +1,14 @@
 mod config;
 mod connector_tag;
+mod datamodel_rendering;
 mod error;
 mod query_result;
 mod runner;
-mod schema_rendering;
 mod templating;
 
 pub use config::*;
 pub use connector_tag::*;
+pub use datamodel_rendering::*;
 pub use error::*;
 pub use query_result::*;
 pub use runner::*;
@@ -21,29 +22,6 @@ pub type TestResult<T> = Result<T, TestError>;
 lazy_static! {
     /// Test configuration, loaded once at runtime.
     pub static ref CONFIG: TestConfig = TestConfig::load().unwrap();
-}
-
-/// Render the complete datamodel with all bells and whistles.
-pub fn render_test_datamodel(config: &TestConfig, test_database: &str, template: String) -> String {
-    let tag = config.test_connector_tag().unwrap();
-    let datasource_with_generator = format!(
-        r#"
-      datasource test {{
-        provider = "{}"
-        url = "{}"
-      }}
-
-      generator client {{
-        provider = "prisma-client-js"
-        previewFeatures = ["microsoftSqlServer"]
-      }}
-    "#,
-        tag.datamodel_provider(),
-        tag.connection_string(test_database, config.is_ci())
-    );
-
-    let models = tag.render_datamodel(template);
-    format!("{}\n\n{}", datasource_with_generator, models)
 }
 
 /// Teardown & setup of everything as defined in the passed datamodel.

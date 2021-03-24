@@ -1,4 +1,4 @@
-use crate::{TestError, TestResult};
+use crate::{datamodel_rendering::SqlDatamodelRenderer, TestError, TestResult};
 
 use super::*;
 
@@ -12,9 +12,8 @@ impl ConnectorTagInterface for PostgresConnectorTag {
         "postgres"
     }
 
-    fn render_datamodel(&self, template: String) -> String {
-        // Todo, pass through for now
-        template
+    fn datamodel_renderer(&self) -> Box<dyn DatamodelRenderer> {
+        Box::new(SqlDatamodelRenderer::new())
     }
 
     fn connection_string(&self, database: &str, is_ci: bool) -> String {

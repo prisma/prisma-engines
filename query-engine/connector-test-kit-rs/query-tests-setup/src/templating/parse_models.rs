@@ -2,13 +2,13 @@ use super::*;
 use itertools::Itertools;
 use std::fmt::Display;
 
-/// A schema fragment is the parsed version of a `#<ident>(...)` template string.
+/// A datamodel fragment is the parsed version of a `#<ident>(...)` template string.
 #[derive(Debug, PartialEq)]
-pub enum SchemaFragment {
+pub enum DatamodelFragment {
     Id(IdFragment),
 }
 
-impl SchemaFragment {
+impl DatamodelFragment {
     pub fn parse(ident: &str, args: Vec<FragmentArgument>) -> TemplatingResult<Self> {
         let fragment = match ident {
             "id" => Self::Id(IdFragment::from_args(args)?),

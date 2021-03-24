@@ -12,7 +12,7 @@ use nom::{
 use parse_hyperlinks::take_until_unbalanced;
 
 /// Main entry point into the template parsing. Parses a schema fragment of the form `#<fragment_ident>...<eol>`.
-pub fn parse(fragment: &str) -> TemplatingResult<SchemaFragment> {
+pub fn parse(fragment: &str) -> TemplatingResult<DatamodelFragment> {
     let (_, fragment) =
         parse_fragment(fragment).map_err(|err| TemplatingError::nom_error("unknown", err.to_string()))?;
 
@@ -20,14 +20,14 @@ pub fn parse(fragment: &str) -> TemplatingResult<SchemaFragment> {
 }
 
 // Todo: Error handling is a mess.
-fn parse_fragment(input: &str) -> IResult<&str, SchemaFragment> {
+fn parse_fragment(input: &str) -> IResult<&str, DatamodelFragment> {
     let (input, _) = tag("#")(input)?;
     let (input, fragment_ident) = take_until("(")(input)?;
 
     // Produces the args string, e.g. "id, Int, @id"
     let (_, args) = unwrap_parenthesis(input)?;
     let (input, parsed_args) = many0(parse_fragment_argument)(args)?;
-    let fragment = SchemaFragment::parse(fragment_ident, parsed_args)
+    let fragment = DatamodelFragment::parse(fragment_ident, parsed_args)
         .expect(&format!("Invalid fragment definition: {}", fragment_ident));
 
     Ok((input, fragment))
@@ -100,7 +100,7 @@ mod parser_tests {
             fragment,
             Ok((
                 "",
-                SchemaFragment::Id(IdFragment {
+                DatamodelFragment::Id(IdFragment {
                     field_name: String::from("id"),
                     field_type: String::from("Int"),
                     directives: vec![
@@ -129,7 +129,7 @@ mod parser_tests {
             fragment,
             Ok((
                 "",
-                SchemaFragment::Id(IdFragment {
+                DatamodelFragment::Id(IdFragment {
                     field_name: String::from("id"),
                     field_type: String::from("Int"),
                     directives: vec![

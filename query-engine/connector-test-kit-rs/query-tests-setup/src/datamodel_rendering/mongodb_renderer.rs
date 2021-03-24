@@ -11,7 +11,7 @@ impl MongoDbSchemaRenderer {
     }
 }
 
-impl SchemaRenderer for MongoDbSchemaRenderer {
+impl DatamodelRenderer for MongoDbSchemaRenderer {
     fn render_id(&self, mut id: IdFragment) -> String {
         // Mongo IDs require an `_id` mapping.
         id.upsert_directive("map", |existing| match existing {

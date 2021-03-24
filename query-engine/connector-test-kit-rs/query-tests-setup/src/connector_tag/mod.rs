@@ -1,5 +1,4 @@
 mod postgres;
-mod sql_schema_renderer;
 mod sql_server;
 
 use datamodel_connector::ConnectorCapability;
@@ -8,7 +7,7 @@ use postgres::*;
 use sql_server::*;
 use std::convert::TryFrom;
 
-use crate::{TestConfig, TestError};
+use crate::{datamodel_rendering::DatamodelRenderer, TestConfig, TestError};
 
 #[enum_dispatch]
 pub trait ConnectorTagInterface {
@@ -16,8 +15,8 @@ pub trait ConnectorTagInterface {
     /// Must match valid datamodel provider strings.
     fn datamodel_provider(&self) -> &'static str;
 
-    /// Renders the test datamodel (the models portion) based on the passed template.
-    fn render_datamodel(&self, template: String) -> String;
+    /// Returns the renderer to be used for templating the datamodel (the models portion).
+    fn datamodel_renderer(&self) -> Box<dyn DatamodelRenderer>;
 
     /// The connection string to use to connect to the test database and version.
     /// - `test_database` is the database to connect to, which is an implementation detail of the
