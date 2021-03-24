@@ -1,9 +1,11 @@
-use std::convert::TryFrom;
-
 use crate::{ConnectorTag, ConnectorTagInterface, TestError, TestResult};
+use serde::Deserialize;
+use std::{convert::TryFrom, env, fs::File, io::Read, path::PathBuf};
+
+static TEST_CONFIG_FILE_NAME: &'static str = ".test_config";
 
 /// The central test configuration.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Deserialize)]
 pub struct TestConfig {
     /// The test runner to use for the tests.
     /// Env key: `TEST_RUNNER`
@@ -16,44 +18,82 @@ pub struct TestConfig {
     /// The connector version tests should run for.
     /// If the test connector is versioned, this option is required.
     /// Env key: `TEST_CONNECTOR_VERSION`
+    #[serde(rename = "version")]
     connector_version: Option<String>,
 
     /// Indicates whether or not the tests are running in CI context.
     /// Env key: `BUILDKITE`
+    #[serde(default)]
     is_ci: bool,
 }
 
 impl TestConfig {
     /// Loads a configuration. File-based config has precedence over env config.
     pub fn load() -> TestResult<Self> {
-        let config = Self::from_file()?.merge_left(Self::from_env()?);
+        let config = Self::from_file().or_else(|| Self::from_env());
 
-        config.validate()?;
-        Ok(config)
+        match config {
+            Some(config) => {
+                config.validate()?;
+                config.log_info();
+
+                Ok(config)
+            }
+            None => Err(TestError::ConfigError(
+                "Unable to load config from file or env.".to_owned(),
+            )),
+        }
     }
 
-    fn from_env() -> TestResult<Self> {
-        let runner = std::env::var("TEST_RUNNER").unwrap_or_else(|_| String::new());
-        let connector = std::env::var("TEST_CONNECTOR").unwrap_or_else(|_| String::new());
+    fn log_info(&self) {
+        println!("******************************");
+        println!("* Test run information:");
+        println!("* Runner: {}", self.runner);
+        println!(
+            "* Connector: {} {}",
+            self.connector,
+            self.connector_version.as_ref().unwrap_or(&"".to_owned())
+        );
+        println!("* CI? {}", self.is_ci);
+        println!("******************************");
+    }
+
+    fn from_env() -> Option<Self> {
+        let runner = std::env::var("TEST_RUNNER").ok();
+        let connector = std::env::var("TEST_CONNECTOR").ok();
         let connector_version = std::env::var("TEST_CONNECTOR_VERSION").ok();
 
         // Just care for a set value for now.
-        let is_ci = match std::env::var("BUILDKITE") {
-            Ok(_) => true,
-            Err(_) => false,
-        };
+        let is_ci = std::env::var("BUILDKITE").is_ok();
 
-        Ok(Self {
-            runner,
-            connector,
-            connector_version,
-            is_ci,
-        })
+        match (runner, connector) {
+            (Some(runner), Some(connector)) => Some(Self {
+                runner,
+                connector,
+                connector_version,
+                is_ci,
+            }),
+            _ => None,
+        }
     }
 
-    fn from_file() -> TestResult<Self> {
-        // todo
-        Ok(Self::default())
+    fn from_file() -> Option<Self> {
+        let current_dir = env::current_dir().ok();
+        let workspace_root = std::env::var("WORKSPACE_ROOT").ok().map(|p| PathBuf::from(p));
+
+        current_dir
+            .and_then(|path| Self::try_path(config_path(path)))
+            .or(workspace_root.and_then(|path| Self::try_path(config_path(path))))
+    }
+
+    fn try_path(path: PathBuf) -> Option<Self> {
+        File::open(path).ok().and_then(|mut f| {
+            let mut config = String::new();
+
+            f.read_to_string(&mut config)
+                .ok()
+                .and_then(|_| serde_json::from_str(&config).ok())
+        })
     }
 
     fn validate(&self) -> TestResult<()> {
@@ -72,24 +112,6 @@ impl TestConfig {
         }
 
         Ok(())
-    }
-
-    /// Merges two configurations, retaining any non-empty value that is already set on `self`.
-    /// Overwrites empty values with values from `other`.
-    fn merge_left(mut self, other: Self) -> Self {
-        if self.runner.is_empty() {
-            self.runner = other.runner;
-        }
-
-        if self.connector.is_empty() {
-            self.connector = other.connector;
-        }
-
-        if self.connector_version.is_none() {
-            self.connector_version = other.connector_version;
-        }
-
-        self
     }
 
     pub fn runner(&self) -> &str {
@@ -111,4 +133,9 @@ impl TestConfig {
     pub fn test_connector_tag(&self) -> TestResult<ConnectorTag> {
         ConnectorTag::try_from((self.connector(), self.connector_version()))
     }
+}
+
+fn config_path(mut path: PathBuf) -> PathBuf {
+    path.push(TEST_CONFIG_FILE_NAME);
+    path
 }

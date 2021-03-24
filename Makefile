@@ -1,3 +1,7 @@
+CONFIG_PATH = ./query-engine/connector-test-kit-rs/test-configs
+CONFIG_FILE = .test_config
+
+
 default: build
 
 build:
@@ -15,26 +19,32 @@ all-dbs:
 
 dev-sqlite:
 	echo 'sqlite' > current_connector
+	cp $(CONFIG_PATH)/sqlite $(CONFIG_FILE)
 
 dev-postgres9:
 	docker-compose -f docker-compose.yml up -d --remove-orphans postgres9
 	echo 'postgres9' > current_connector
+	cp $(CONFIG_PATH)/postgres9 $(CONFIG_FILE)
 
 dev-postgres10:
 	docker-compose -f docker-compose.yml up -d --remove-orphans postgres10
 	echo 'postgres10' > current_connector
+	cp $(CONFIG_PATH)/postgres10 $(CONFIG_FILE)
 
 dev-postgres11:
 	docker-compose -f docker-compose.yml up -d --remove-orphans postgres11
 	echo 'postgres11' > current_connector
+	cp $(CONFIG_PATH)/postgres11 $(CONFIG_FILE)
 
 dev-postgres12:
 	docker-compose -f docker-compose.yml up -d --remove-orphans postgres12
 	echo 'postgres12' > current_connector
+	cp $(CONFIG_PATH)/postgres12 $(CONFIG_FILE)
 
 dev-postgres13:
 	docker-compose -f docker-compose.yml up -d --remove-orphans postgres13
 	echo 'postgres13' > current_connector
+	cp $(CONFIG_PATH)/postgres13 $(CONFIG_FILE)
 
 dev-pgbouncer:
 	docker-compose -f docker-compose.yml up -d --remove-orphans pgbouncer postgres11

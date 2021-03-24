@@ -23,6 +23,7 @@ async-trait = "0.1"
 nom = "6"
 itertools = "0.10"
 regex = "1"
+serde = "1.0"
 
 # Only this version is vetted, upgrade only after going through the code,
 # as this is a small crate with little user base.

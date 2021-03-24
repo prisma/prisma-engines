@@ -50,6 +50,14 @@ impl ConnectorTagInterface for PostgresConnectorTag {
                 "postgresql://postgres:prisma@127.0.0.1:5434/db?schema={}&connection_limit=1",
                 database
             ),
+            Some(PostgresVersion::V13) => format!(
+                "postgresql://postgres:prisma@127.0.0.1:5434/db?schema={}&connection_limit=1",
+                database
+            ),
+            Some(PostgresVersion::PgBouncer) => format!(
+                "postgresql://postgres:prisma@127.0.0.1:5433/db?schema={}&connection_limit=1",
+                database
+            ),
 
             None => unreachable!("A versioned connector must have a concrete version to run."),
         }
@@ -76,6 +84,8 @@ pub enum PostgresVersion {
     V10,
     V11,
     V12,
+    V13,
+    PgBouncer,
 }
 
 impl PostgresConnectorTag {
@@ -103,6 +113,12 @@ impl PostgresConnectorTag {
             Self {
                 version: Some(PostgresVersion::V12),
             },
+            Self {
+                version: Some(PostgresVersion::V13),
+            },
+            Self {
+                version: Some(PostgresVersion::PgBouncer),
+            },
         ]
     }
 }
@@ -125,6 +141,8 @@ impl TryFrom<&str> for PostgresVersion {
             "10" => Self::V10,
             "11" => Self::V11,
             "12" => Self::V12,
+            "13" => Self::V13,
+            "pgbouncer" => Self::PgBouncer,
             _ => return Err(TestError::parse_error(format!("Unknown Postgres version `{}`", s))),
         };
 
@@ -139,6 +157,8 @@ impl ToString for PostgresVersion {
             PostgresVersion::V10 => "10",
             PostgresVersion::V11 => "11",
             PostgresVersion::V12 => "12",
+            PostgresVersion::V13 => "13",
+            PostgresVersion::PgBouncer => "pgbouncer",
         }
         .to_owned()
     }

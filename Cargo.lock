@@ -3365,6 +3365,7 @@ dependencies = [
  "query-core",
  "regex",
  "request-handlers",
+ "serde",
  "serde_json",
  "sql-datamodel-connector",
  "thiserror",

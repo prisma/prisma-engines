@@ -4,7 +4,7 @@ use query_test_macros::{connector_test, test_suite};
 // The mod name dictates the db name. If the name is `some_spec`
 // then, for example, the MySQL db should be (similar to) `some_spec` as well.
 // #[schema(schema_handler)] // Schema for all contained tests. Allows us to cache runners maybe.
-#[test_suite(schema(schemas::some_common_schema))]
+#[test_suite(schema(schemas::some_common_schema), only(Postgres(11)))]
 mod some_spec {
     // These imports are required if no `#[test_suite(...)]` is used
     // use super::*;
