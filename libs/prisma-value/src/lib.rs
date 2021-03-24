@@ -42,7 +42,7 @@ pub enum PrismaValue {
     Bytes(Vec<u8>),
 }
 
-/// Stringify a date to the following shape
+/// Stringify a date to the following format
 /// 1999-05-01T00:00:00.000Z
 pub fn stringify_date(date: &DateTime<FixedOffset>) -> String {
     // Warning: Be careful if you plan on changing the code below
