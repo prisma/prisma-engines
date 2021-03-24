@@ -10,7 +10,7 @@ use syn::{parse_macro_input, parse_quote, AttributeArgs, Item, ItemMod, Meta, Ne
 /// Individual tests can still set their attributes, which will take precedence and overwrite the defaults.
 /// This macro merges the attributes of the module and writes them to the test function.
 /// Example: If the following test suite definition is given:
-/// ```no_run
+/// ```ignore
 /// #[test_suite(schema(handler), exclude(SqlServer))]
 /// mod test_mod {
 ///     #[connector_test]
@@ -21,7 +21,7 @@ use syn::{parse_macro_input, parse_quote, AttributeArgs, Item, ItemMod, Meta, Ne
 /// }
 /// ```
 /// Will be rewritten to:
-/// ```
+/// ```ignore
 /// mod test_mod {
 ///     #[connector_test(suite = "test_mod", schema(handler), exclude(SqlServer))]
 ///     async fn test_a() { ... }
