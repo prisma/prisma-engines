@@ -107,6 +107,7 @@ class SelectOneCompoundIdBatchSpec extends FlatSpec with Matchers with ApiSpecBa
     )
   }
 
+  // https://github.com/prisma/prisma/issues/5941
   "input dates in two queries" should "not return nulls" in {
     val project = ProjectDsl.fromString {
       """model Artist {
