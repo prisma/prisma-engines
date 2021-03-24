@@ -65,7 +65,7 @@ class ScalarListsSpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     res should be(
-      s"""{"data":{"createScalarModel":{"strings":["test${TroubleCharacters.value}"],"ints":[1337,12],"floats":[1.234,1.45],"decimals":["1.234","1.45"],"booleans":[true,false],"enums":["A","A"],"dateTimes":["2016-07-31T23:59:01+00:00","2017-07-31T23:59:01+00:00"],"bytes":["dGVzdA==","dA=="]}}}""".parseJson)
+      s"""{"data":{"createScalarModel":{"strings":["test${TroubleCharacters.value}"],"ints":[1337,12],"floats":[1.234,1.45],"decimals":["1.234","1.45"],"booleans":[true,false],"enums":["A","A"],"dateTimes":["2016-07-31T23:59:01.000Z","2017-07-31T23:59:01.000Z"],"bytes":["dGVzdA==","dA=="]}}}""".parseJson)
 
     res = server.query(
       s"""mutation {
@@ -93,7 +93,7 @@ class ScalarListsSpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     res should be(
-      s"""{"data":{"updateScalarModel":{"strings":["updated","now"],"ints":[14],"floats":[1.2345678],"decimals":["1.2345678"],"booleans":[false,false,true],"enums":[],"dateTimes":["2019-07-31T23:59:01+00:00"],"bytes":["dGVzdA=="]}}}""".parseJson)
+      s"""{"data":{"updateScalarModel":{"strings":["updated","now"],"ints":[14],"floats":[1.2345678],"decimals":["1.2345678"],"booleans":[false,false,true],"enums":[],"dateTimes":["2019-07-31T23:59:01.000Z"],"bytes":["dGVzdA=="]}}}""".parseJson)
 
     res = server.query(
       s"""mutation {
@@ -121,7 +121,7 @@ class ScalarListsSpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     res should be(
-      s"""{"data":{"updateScalarModel":{"strings":["updated","now","future"],"ints":[14,15],"floats":[1.2345678,2],"decimals":["1.2345678","2"],"booleans":[false,false,true,true],"enums":["A"],"dateTimes":["2019-07-31T23:59:01+00:00","2019-07-31T23:59:01+00:00"],"bytes":["dGVzdA==","dGVzdA=="]}}}""".parseJson)
+      s"""{"data":{"updateScalarModel":{"strings":["updated","now","future"],"ints":[14,15],"floats":[1.2345678,2],"decimals":["1.2345678","2"],"booleans":[false,false,true,true],"enums":["A"],"dateTimes":["2019-07-31T23:59:01.000Z","2019-07-31T23:59:01.000Z"],"bytes":["dGVzdA==","dGVzdA=="]}}}""".parseJson)
   }
 
   "A Create Mutation" should "create and return items with list values with shorthand notation" in {
@@ -152,7 +152,7 @@ class ScalarListsSpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     res should be(
-      s"""{"data":{"createScalarModel":{"strings":["test${TroubleCharacters.value}"],"ints":[1337,12],"floats":[1.234,1.45],"decimals":["1.234","1.45"],"booleans":[true,false],"enums":["A","A"],"dateTimes":["2016-07-31T23:59:01+00:00","2017-07-31T23:59:01+00:00"],"bytes":["dGVzdA==","dA=="]}}}""".parseJson)
+      s"""{"data":{"createScalarModel":{"strings":["test${TroubleCharacters.value}"],"ints":[1337,12],"floats":[1.234,1.45],"decimals":["1.234","1.45"],"booleans":[true,false],"enums":["A","A"],"dateTimes":["2016-07-31T23:59:01.000Z","2017-07-31T23:59:01.000Z"],"bytes":["dGVzdA==","dA=="]}}}""".parseJson)
   }
 
   "A Create Mutation" should "create and return items with empty list values" in {
@@ -252,6 +252,6 @@ class ScalarListsSpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     res should be(
-      s"""{"data":{"updateScalarModel":{"strings":["future"],"ints":[15],"floats":[2.0],"decimals":["2"],"booleans":[true],"enums":["A"],"dateTimes":["2019-07-31T23:59:01+00:00"],"bytes":["dGVzdA=="]}}}""".parseJson)
+      s"""{"data":{"updateScalarModel":{"strings":["future"],"ints":[15],"floats":[2.0],"decimals":["2"],"booleans":[true],"enums":["A"],"dateTimes":["2019-07-31T23:59:01.000Z"],"bytes":["dGVzdA=="]}}}""".parseJson)
   }
 }
