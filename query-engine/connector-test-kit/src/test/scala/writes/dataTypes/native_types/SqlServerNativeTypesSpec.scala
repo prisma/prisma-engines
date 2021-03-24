@@ -198,7 +198,7 @@ class SqlServerNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase w
     )
 
     res should be(
-      """{"data":{"createOneModel":{"date":"2016-09-24T00:00:00+00:00","time":"1970-01-01T13:14:15.123+00:00","dtime":"2016-09-24T12:29:32.343333333+00:00","dtime2":"2016-09-24T12:29:32.342+00:00","dtoff":"2016-09-24T12:29:32.342+00:00","small":"2016-09-24T12:30:00+00:00"}}}""".parseJson)
+      """{"data":{"createOneModel":{"date":"2016-09-24T00:00:00.000Z","time":"1970-01-01T13:14:15.123Z","dtime":"2016-09-24T12:29:32.343Z","dtime2":"2016-09-24T12:29:32.342Z","dtoff":"2016-09-24T12:29:32.342Z","small":"2016-09-24T12:30:00.000Z"}}}""".parseJson)
   }
 
   "SQL Server native binary types" should "work" in {

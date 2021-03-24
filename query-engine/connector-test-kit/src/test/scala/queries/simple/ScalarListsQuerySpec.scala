@@ -210,7 +210,7 @@ class ScalarListsQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
   "full scalar list" should "return full list for datetime" in {
     val fieldName   = "datetimes"
     val inputValue  = """"2018-01-01T00:00:00.000Z""""
-    val outputValue = """"2018-01-01T00:00:00+00:00""""
+    val outputValue = """"2018-01-01T00:00:00.000Z""""
 
     val project = SchemaDsl.fromStringV11() {
       s"""model Model{

@@ -106,4 +106,38 @@ class SelectOneCompoundIdBatchSpec extends FlatSpec with Matchers with ApiSpecBa
       """{"batchResult":[{"data":{"findUniqueArtist":{"firstName":"Musti","lastName":"Naukio"}}},{"data":{"findUniqueArtist":null}}]}"""
     )
   }
+
+  // https://github.com/prisma/prisma/issues/5941
+  "input dates in two queries" should "not return nulls" in {
+    val project = ProjectDsl.fromString {
+      """model Artist {
+        |  firstName String
+        |  lastName  String
+        |  birth     DateTime
+        |
+        |  @@unique([firstName, lastName, birth])
+        |}
+        |"""
+    }
+
+    database.setup(project)
+
+    server.query(
+      """mutation artists {createArtist(data:{
+        |                         firstName: "Sponge"
+        |                         lastName: "Bob"
+        |                         birth: "1999-05-01T00:00:00.000Z"
+        |        |}){firstName lastName birth}}""".stripMargin,
+      project = project
+    )
+
+    val queries = Seq(
+      """query {findUniqueArtist(where:{firstName_lastName_birth:{firstName:"Sponge",lastName:"Bob", birth: "1999-05-01T00:00:00.000Z"}}) {firstName lastName birth}}""",
+      """query {findUniqueArtist(where:{firstName_lastName_birth:{firstName:"Sponge",lastName:"Bob", birth: "1999-05-01T00:00:00.000Z"}}) {firstName lastName birth}}""",
+    )
+
+    server.batch(queries, transaction = false, project, legacy = false).toString should be(
+      """{"batchResult":[{"data":{"findUniqueArtist":{"firstName":"Sponge","lastName":"Bob","birth":"1999-05-01T00:00:00.000Z"}}},{"data":{"findUniqueArtist":{"firstName":"Sponge","lastName":"Bob","birth":"1999-05-01T00:00:00.000Z"}}}]}"""
+    )
+  }
 }
