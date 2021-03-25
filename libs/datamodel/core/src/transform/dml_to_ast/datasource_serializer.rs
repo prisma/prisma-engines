@@ -22,7 +22,7 @@ impl DatasourceSerializer {
 
         arguments.push(ast::Argument::new_string("provider", &source.active_provider));
 
-        arguments.push(source.url.to_arg());
+        arguments.push(super::lower_string_from_env_var(&source.url));
 
         ast::SourceConfig {
             name: ast::Identifier::new(&source.name),
