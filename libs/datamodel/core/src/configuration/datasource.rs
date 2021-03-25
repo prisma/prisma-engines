@@ -44,16 +44,9 @@ impl Datasource {
         ConnectorCapabilities::new(capabilities)
     }
 
-    /// JavaScript wants to set the CWD, but can't due to changing it for itself
-    /// too. This method is an ugly hack to convert all relative paths in the
-    /// connection string to include a given config directory as its prefix, but
-    /// only if the path is relative.
-    ///
-    /// The other option would've been to just point in our docs that a path
-    /// in a connection string is relative only from the caller point of view.
-    ///
-    /// Now, there is a promise to change this behavior to follow how everybody
-    /// else is doing it, but I wouldn't hold my breath.
+    /// By default we treat relative paths (in the connection string and
+    /// datasource url value) as relative to the CWD. This does not work in all 
+    /// cases, so we need a way to prefix these relative paths with a config_dir.
     ///
     /// P.S. Don't forget to add new parameters here if needed!
     pub fn set_config_dir(&mut self, config_dir: &Path) {
