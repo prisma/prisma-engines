@@ -10,5 +10,3 @@ pub struct StringFromEnvVar {
     pub from_env_var: Option<String>,
     pub value: String,
 }
-
-
