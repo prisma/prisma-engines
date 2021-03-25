@@ -24,6 +24,10 @@ nom = "6"
 itertools = "0.10"
 regex = "1"
 serde = "1.0"
+tracing = "0.1.12"
+tracing-subscriber = { version = "0.2", features = ["fmt"] }
+tracing-error = "0.1.2"
+colored = "2"
 
 # Only this version is vetted, upgrade only after going through the code,
 # as this is a small crate with little user base.

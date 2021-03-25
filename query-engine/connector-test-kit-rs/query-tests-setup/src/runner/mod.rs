@@ -7,6 +7,7 @@ pub use direct::*;
 pub use napi::*;
 
 use crate::{QueryResult, TestError, TestResult};
+use colored::*;
 
 #[async_trait::async_trait]
 pub trait RunnerInterface: Sized {
@@ -40,11 +41,22 @@ impl Runner {
     where
         T: Into<String>,
     {
-        match self {
-            Runner::Direct(r) => r.query(gql_query.into()).await,
+        let gql_query = gql_query.into();
+        tracing::debug!("Querying: {}", gql_query.clone().green());
+
+        let response = match self {
+            Runner::Direct(r) => r.query(gql_query).await,
             Runner::NApi(_) => todo!(),
             Runner::Binary(_) => todo!(),
+        }?;
+
+        if response.failed() {
+            tracing::debug!("Response: {}", response.to_string().red());
+        } else {
+            tracing::debug!("Response: {}", response.to_string().green());
         }
+
+        Ok(response)
     }
 
     pub async fn batch<T, S>(&self, gql_queries: T, transaction: bool) -> TestResult<QueryResult>

@@ -59,6 +59,9 @@ impl ConnectorTag {
             .into_iter()
             .map(Self::SqlServer)
             .chain(PostgresConnectorTag::all().into_iter().map(Self::Postgres))
+            .chain(MySqlConnectorTag::all().into_iter().map(Self::MySql))
+            .chain(MongoDbConnectorTag::all().into_iter().map(Self::MongoDb))
+            .chain(SqliteConnectorTag::all().into_iter().map(Self::Sqlite))
             .collect()
     }
 

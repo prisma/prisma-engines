@@ -30,6 +30,16 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
     });
 
     let mut test_function = parse_macro_input!(input as ItemFn);
+
+    if test_function.sig.inputs.len() != 1 {
+        return syn::Error::new_spanned(
+            test_function.sig,
+            "connector test functions must take exactly one argument: `runner: &Runner`.",
+        )
+        .to_compile_error()
+        .into();
+    }
+
     if test_function.sig.asyncness.is_none() {
         return syn::Error::new_spanned(test_function.sig, "connector test functions must be async")
             .to_compile_error()
@@ -72,7 +82,7 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
                 let runner = Runner::load(config.runner(), datamodel.clone()).await.unwrap();
                 query_tests_setup::setup_project(&datamodel).await.unwrap();
                 #runner_fn_ident(&runner).await.unwrap();
-            });
+            }.with_subscriber(test_tracing_subscriber(std::env::var("LOG_LEVEL").unwrap_or("info".to_string()))));
         }
 
         #test_function

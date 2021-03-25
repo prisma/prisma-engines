@@ -49,6 +49,10 @@ impl GQLResponse {
     pub fn take_data(&mut self, key: impl AsRef<str>) -> Option<Item> {
         self.data.remove(key.as_ref())
     }
+
+    pub fn errors(&self) -> impl Iterator<Item = &GQLError> {
+        self.errors.iter()
+    }
 }
 
 impl From<HandlerError> for GQLResponse {
@@ -128,6 +132,10 @@ impl GQLBatchResponse {
 
     pub fn insert_error(&mut self, error: impl Into<GQLError>) {
         self.errors.push(error.into());
+    }
+
+    pub fn errors(&self) -> impl Iterator<Item = &GQLError> {
+        self.errors.iter()
     }
 }
 

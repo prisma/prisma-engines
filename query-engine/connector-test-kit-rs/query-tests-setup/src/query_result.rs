@@ -5,6 +5,18 @@ pub struct QueryResult {
 }
 
 impl QueryResult {
+    pub fn failed(&self) -> bool {
+        match self.response {
+            PrismaResponse::Single(ref s) => s.errors().next().is_some(),
+            PrismaResponse::Multi(ref m) => m.errors().next().is_some(),
+        }
+    }
+
+    /// Asserts absence of errors in the result. Panics with assertion error.
+    pub fn assert_success(&self) {
+        assert!(!self.failed())
+    }
+
     pub fn assert_failure(&self, _err_code: usize, _msg_contains: Option<String>) {
         todo!()
     }

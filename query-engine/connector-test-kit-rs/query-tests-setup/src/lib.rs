@@ -2,6 +2,7 @@ mod config;
 mod connector_tag;
 mod datamodel_rendering;
 mod error;
+mod logging;
 mod query_result;
 mod runner;
 mod templating;
@@ -10,6 +11,7 @@ pub use config::*;
 pub use connector_tag::*;
 pub use datamodel_rendering::*;
 pub use error::*;
+pub use logging::*;
 pub use query_result::*;
 pub use runner::*;
 pub use templating::*;
@@ -37,5 +39,3 @@ pub fn run_with_tokio<O, F: std::future::Future<Output = O>>(fut: F) -> O {
         .unwrap()
         .block_on(fut)
 }
-
-// todo: prelude
