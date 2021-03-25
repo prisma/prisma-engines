@@ -1,10 +1,16 @@
+mod mongodb;
+mod mysql;
 mod postgres;
 mod sql_server;
+mod sqlite;
 
 use datamodel_connector::ConnectorCapability;
 use enum_dispatch::enum_dispatch;
+use mongodb::*;
+use mysql::*;
 use postgres::*;
 use sql_server::*;
+use sqlite::*;
 use std::convert::TryFrom;
 
 use crate::{datamodel_rendering::DatamodelRenderer, TestConfig, TestError};
@@ -41,9 +47,9 @@ pub trait ConnectorTagInterface {
 pub enum ConnectorTag {
     SqlServer(SqlServerConnectorTag),
     Postgres(PostgresConnectorTag),
-    // MySql,
-    // Sqlite,
-    // MongoDb,
+    MySql(MySqlConnectorTag),
+    MongoDb(MongoDbConnectorTag),
+    Sqlite(SqliteConnectorTag),
 }
 
 impl ConnectorTag {
@@ -79,21 +85,14 @@ impl TryFrom<(&str, Option<&str>)> for ConnectorTag {
         let (connector, version) = value;
 
         let tag = match connector.to_lowercase().as_str() {
+            "sqlite" => Self::Sqlite(SqliteConnectorTag::new()),
             "sqlserver" => Self::SqlServer(SqlServerConnectorTag::new(version)?),
             "postgres" => Self::Postgres(PostgresConnectorTag::new(version)?),
-            // "mysql" => Self::MySql,
-            // "sqlite" => Self::Sqlite,
-            // "mongodb" => Self::MongoDb,
+            "mysql" => Self::MySql(MySqlConnectorTag::new(version)?),
+            "mongodb" => Self::MongoDb(MongoDbConnectorTag::new(version)?),
             _ => return Err(TestError::parse_error(format!("Unknown connector tag `{}`", connector))),
         };
 
         Ok(tag)
     }
 }
-
-// #[derive(Debug)]
-// pub enum MySqlVersion {
-//     V5_6,
-//     V5_7,
-//     V8,
-// }

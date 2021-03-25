@@ -14,6 +14,12 @@ pedantic:
 release:
 	cargo build --release
 
+test-qe:
+	cargo test --package query-engine-tests
+
+test-qe-verbose:
+	cargo test --package query-engine-tests -- --nocapture
+
 all-dbs:
 	docker-compose -f docker-compose.yml up  -d --remove-orphans
 
