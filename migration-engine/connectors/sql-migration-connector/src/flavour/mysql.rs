@@ -11,7 +11,7 @@ use indoc::indoc;
 use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory, MigrationFeature};
 use once_cell::sync::Lazy;
 use quaint::connector::MysqlUrl;
-use regex::RegexSet;
+use regex::{Regex, RegexSet};
 use sql_schema_describer::{DescriberErrorKind, SqlSchema, SqlSchemaDescriberBackend};
 use std::sync::atomic::{AtomicU8, Ordering};
 use url::Url;
@@ -267,6 +267,21 @@ impl SqlFlavour for MysqlFlavour {
         Ok(())
     }
 
+    fn scan_migration_script(&self, script: &str) {
+        static QUALIFIED_NAME_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"`[]`.``"#).unwrap());
+
+        for capture in QUALIFIED_NAME_RE
+            .captures_iter(script)
+            .filter_map(|captures| captures.get(0))
+        {
+            tracing::warn!(
+                location = ?capture.range(),
+                name = capture.as_str(),
+                "Your migration appears to contain a qualified name. Qualified names like `mydb`.`mytable` interact badly with the shadow database on MySQL. Please change these to unqualified names (just `mytable` in the previous example)."
+            );
+        }
+    }
+
     #[tracing::instrument(skip(self, migrations, connection, connector))]
     async fn sql_schema_from_migration_history(
         &self,
@@ -292,6 +307,8 @@ impl SqlFlavour for MysqlFlavour {
                     "Applying migration `{}` to temporary database.",
                     migration.migration_name()
                 );
+
+                self.scan_migration_script(&script);
 
                 temp_database
                     .raw_cmd(&script)
