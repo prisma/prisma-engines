@@ -953,6 +953,7 @@ dependencies = [
  "sql-datamodel-connector",
  "thiserror",
  "tracing",
+ "url 2.2.1",
 ]
 
 [[package]]
