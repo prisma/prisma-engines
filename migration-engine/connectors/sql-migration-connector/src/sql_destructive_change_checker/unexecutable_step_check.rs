@@ -45,7 +45,7 @@ impl Check for UnexecutableStepCheck {
                 let message = match database_checks.get_row_count(table) {
                     Some(0) => return None, // Adding a required column is possible if there is no data
                     Some(row_count) => message(format_args!(
-                        "There are {row_count} rows in this table, it is not possible to execute this migration.",
+                        "There are {row_count} rows in this table, it is not possible to execute this step.",
                         row_count = row_count
                     )),
                     None => message(format_args!("This is not possible if the table is not empty.")),
@@ -66,7 +66,7 @@ impl Check for UnexecutableStepCheck {
                 let message = match database_checks.get_row_count(table) {
                     Some(0) => return None, // Adding a required column is possible if there is no data
                     Some(row_count) => message(format_args!(
-                        "There are {row_count} rows in this table, it is not possible to execute this migration.",
+                        "There are {row_count} rows in this table, it is not possible to execute this step.",
                         row_count = row_count
                     )),
                     None => message(format_args!("This is not possible if the table is not empty.")),
@@ -92,7 +92,7 @@ impl Check for UnexecutableStepCheck {
                         ))
                     },
                     (_, _) => Some(format!(
-                        "Made the column `{column}` on table `{table}` required. The migration will fail if there are existing NULL values in that column.",
+                        "Made the column `{column}` on table `{table}` required. The step will fail if there are existing NULL values in that column.",
                         column = column,
                         table = table
                     )),
@@ -107,11 +107,11 @@ impl Check for UnexecutableStepCheck {
                     (Some(0), _) => None,
                     (_, Some(0)) => None,
                     (_, Some(value_count)) => Some(message(format_args!(
-                        "There are {} existing non-null values in that column, this migration step cannot be executed.",
+                        "There are {} existing non-null values in that column, this step cannot be executed.",
                         value_count
                     ))),
                     (_, _) => Some(message(format_args!(
-                        "If there are non-null values in that column, this migration step will fail."
+                        "If there are non-null values in that column, this step will fail."
                     ))),
                 }
             }

@@ -96,16 +96,16 @@ impl Check for SqlMigrationWarningCheck {
             SqlMigrationWarningCheck::NotCastable { table, column, previous_type, next_type } => match database_check_results.get_row_and_non_null_value_count(table, column) {
                 (Some(0), _) => None, // it's safe to alter a column on an empty table
                 (_, Some(0)) => None, // it's safe to alter a column if it only contains null values
-                (_, Some(value_count)) => Some(format!("You are about to alter the column `{column_name}` on the `{table_name}` table, which contains {value_count} non-null values. The data in that column will be cast from `{old_type}` to `{new_type}`. This cast may fail and the migration will stop. Please make sure the data in the column can be cast.", column_name = column, table_name = table, value_count = value_count, old_type = previous_type, new_type = next_type)),
-                (_, _) => Some(format!("You are about to alter the column `{column_name}` on the `{table_name}` table. The data in that column will be cast from `{old_type}` to `{new_type}`. This cast may fail and the migration will stop. Please make sure the data in the column can be cast.", column_name = column, table_name = table, old_type = previous_type, new_type = next_type)),
+                (_, Some(value_count)) => Some(format!("You are about to alter the column `{column_name}` on the `{table_name}` table, which contains {value_count} non-null values. The data in that column will be cast from `{old_type}` to `{new_type}`. This cast may fail. Please make sure the data in the column can be cast.", column_name = column, table_name = table, value_count = value_count, old_type = previous_type, new_type = next_type)),
+                (_, _) => Some(format!("You are about to alter the column `{column_name}` on the `{table_name}` table. The data in that column will be cast from `{old_type}` to `{new_type}`. This cast may fail. Please make sure the data in the column can be cast.", column_name = column, table_name = table, old_type = previous_type, new_type = next_type)),
 
             },
             SqlMigrationWarningCheck::PrimaryKeyChange { table } => match database_check_results.get_row_count(table) {
                 Some(0) => None,
-                _ => Some(format!("The migration will change the primary key for the `{table}` table. If it partially fails, the table could be left without primary key constraint.", table = table)),
+                _ => Some(format!("The primary key for the `{table}` table will be changed. If it partially fails, the table could be left without primary key constraint.", table = table)),
             },
-            SqlMigrationWarningCheck::UniqueConstraintAddition { table, columns } =>  Some(format!("The migration will add a unique constraint covering the columns `{columns}` on the table `{table}`. If there are existing duplicate values, the migration will fail.", table = table, columns = format!("[{}]",columns.join(",")))),
-            SqlMigrationWarningCheck::EnumValueRemoval { enm, values } =>  Some(format!("The migration will remove the values {values} on the enum `{enm}`. If these variants are still used in the database, the migration will fail.", enm = enm, values = format!("[{}]",values.join(",")))),
+            SqlMigrationWarningCheck::UniqueConstraintAddition { table, columns } =>  Some(format!("A unique constraint covering the columns `{columns}` on the table `{table}` will be removed. If there are existing duplicate values, this will fail.", table = table, columns = format!("[{}]",columns.join(",")))),
+            SqlMigrationWarningCheck::EnumValueRemoval { enm, values } =>  Some(format!("The values {values} on the enum `{enm}` will be removed. If these variants are still used in the database, this will fail.", enm = enm, values = format!("[{}]",values.join(",")))),
 
         }
     }
