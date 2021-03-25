@@ -1,9 +1,7 @@
-
-use std::{collections::BTreeMap, path::Path};
-use datamodel_connector::{Connector, ConnectorCapabilities};
-use serde::Serialize;
-use url::Url;
 use crate::StringFromEnvVar;
+use datamodel_connector::{Connector, ConnectorCapabilities};
+use std::{collections::BTreeMap, path::Path};
+use url::Url;
 
 /// a `datasource` from the prisma schema.
 pub struct Datasource {
