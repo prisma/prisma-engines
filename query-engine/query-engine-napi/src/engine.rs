@@ -11,6 +11,7 @@ use request_handlers::{
 use serde::{Deserialize, Deserializer, Serialize};
 use std::{
     collections::{BTreeMap, HashMap},
+    path::PathBuf,
     str::FromStr,
     sync::Arc,
 };
@@ -47,6 +48,7 @@ pub struct EngineBuilder {
     datamodel: EngineDatamodel,
     config: ValidatedConfiguration,
     logger: ChannelLogger,
+    config_dir: PathBuf,
 }
 
 /// Internal structure for querying and reconnecting with the engine.
@@ -56,6 +58,7 @@ pub struct ConnectedEngine {
     query_schema: Arc<QuerySchema>,
     executor: crate::Executor,
     logger: ChannelLogger,
+    config_dir: PathBuf,
 }
 
 /// Returned from the `serverInfo` method in javascript.
@@ -92,6 +95,7 @@ pub struct ConstructorOptions {
     feature_flags_overrides: Option<Vec<String>>,
     #[serde(default)]
     telemetry: TelemetryOptions,
+    config_dir: PathBuf,
 }
 
 #[derive(Debug, Deserialize, Default)]
@@ -120,10 +124,11 @@ impl QueryEngine {
             datasource_overrides,
             feature_flags_overrides,
             telemetry,
+            config_dir,
         } = opts;
 
         let overrides: Vec<(_, _)> = datasource_overrides.into_iter().collect();
-        let mut config = datamodel::parse_configuration_with_url_overrides(&datamodel, overrides.clone())
+        let mut config = datamodel::parse_configuration_with_config_dir(&datamodel, overrides.clone(), &config_dir)
             .map_err(|errors| ApiError::conversion(errors, &datamodel))?;
 
         config.subject = config
@@ -160,6 +165,7 @@ impl QueryEngine {
             config,
             datamodel,
             logger,
+            config_dir,
         };
 
         Ok(Self {
@@ -209,6 +215,7 @@ impl QueryEngine {
                             logger: builder.logger.clone(),
                             executor,
                             config,
+                            config_dir: builder.config_dir.clone(),
                         })
                     })
                     .await?;
@@ -227,9 +234,10 @@ impl QueryEngine {
 
         match *inner {
             Inner::Connected(ref engine) => {
-                let config = datamodel::parse_configuration_with_url_overrides(
+                let config = datamodel::parse_configuration_with_config_dir(
                     &engine.datamodel.raw,
                     engine.datamodel.datasource_overrides.clone(),
+                    &engine.config_dir,
                 )
                 .map_err(|errors| ApiError::conversion(errors, &engine.datamodel.raw))?;
 
@@ -237,6 +245,7 @@ impl QueryEngine {
                     datamodel: engine.datamodel.clone(),
                     logger: engine.logger.clone(),
                     config,
+                    config_dir: engine.config_dir.clone(),
                 };
 
                 *inner = Inner::Builder(builder);
