@@ -1,4 +1,3 @@
-use crate::ast;
 use serde::Serialize;
 
 #[serde(rename_all = "camelCase")]
@@ -12,14 +11,4 @@ pub struct StringFromEnvVar {
     pub value: String,
 }
 
-impl StringFromEnvVar {
-    pub fn to_arg(&self) -> ast::Argument {
-        match self.from_env_var {
-            Some(ref env_var) => {
-                let values = vec![ast::Expression::StringValue(env_var.to_string(), ast::Span::empty())];
-                ast::Argument::new_function(self.name, "env", values)
-            }
-            None => ast::Argument::new_string(self.name, &self.value),
-        }
-    }
-}
+
