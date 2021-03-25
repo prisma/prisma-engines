@@ -72,6 +72,7 @@ where
     /// A failing operation does not fail the batch, instead, an error is returned alongside other responses.
     /// Note that individual operations executed in non-transactional mode can still be transactions in themselves
     /// if the query (e.g. a write op) requires it.
+    #[tracing::instrument(skip(self, operations, query_schema))]
     async fn execute_batch(
         &self,
         operations: Vec<Operation>,

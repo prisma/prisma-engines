@@ -16,6 +16,7 @@ pub struct WriteArgsParser {
 impl WriteArgsParser {
     /// Creates a new set of WriteArgsParser. Expects the parsed input map from the respective data key, not the enclosing map.
     /// E.g.: { data: { THIS MAP } } from the `data` argument of a write query.
+    #[tracing::instrument(name = "write_args_parser_from", skip(model, data_map))]
     pub fn from(model: &ModelRef, data_map: ParsedInputMap) -> QueryGraphBuilderResult<Self> {
         data_map.into_iter().try_fold(
             WriteArgsParser::default(),
@@ -23,15 +24,19 @@ impl WriteArgsParser {
                 let field = model.fields().find_from_all(&k).unwrap();
 
                 match field {
-                    Field::Scalar(sf) if sf.is_list => {
-                        let set_value: PrismaValue = match v {
-                            ParsedInputValue::List(_) => v.try_into()?,
-                            ParsedInputValue::Map(mut map) => map.remove(operations::SET).unwrap().try_into()?,
-                            _ => unreachable!(),
-                        };
+                    Field::Scalar(sf) if sf.is_list => match v {
+                        ParsedInputValue::List(_) => {
+                            let set_value: PrismaValue = v.try_into()?;
 
-                        args.args.insert(sf, set_value)
-                    }
+                            args.args.insert(sf, set_value);
+                        }
+                        ParsedInputValue::Map(map) => {
+                            let expr = extract_scalar_list_ops(map)?;
+
+                            args.args.insert(sf, expr)
+                        }
+                        _ => unreachable!(),
+                    },
 
                     Field::Scalar(sf) => {
                         let expr: WriteExpression = match v {
@@ -64,5 +69,15 @@ impl WriteArgsParser {
                 Ok(args)
             },
         )
+    }
+}
+
+fn extract_scalar_list_ops(map: ParsedInputMap) -> QueryGraphBuilderResult<WriteExpression> {
+    let (operation, value) = map.into_iter().next().unwrap();
+
+    match operation.as_str() {
+        operations::SET => Ok(WriteExpression::Value(value.try_into()?)),
+        operations::PUSH => Ok(WriteExpression::Add(value.try_into()?)),
+        _ => unreachable!("Invalid scalar list operation"),
     }
 }

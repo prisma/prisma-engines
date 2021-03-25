@@ -3,6 +3,7 @@ use crate::{constants::inputs::args, query_ast::*, query_graph::QueryGraph, Argu
 use prisma_value::PrismaValue;
 use std::convert::TryInto;
 
+#[tracing::instrument(skip(graph, field))]
 pub fn execute_raw(graph: &mut QueryGraph, field: ParsedField) -> QueryGraphBuilderResult<()> {
     let raw_query = Query::Write(WriteQuery::ExecuteRaw(raw_query(field)?));
 
@@ -10,6 +11,7 @@ pub fn execute_raw(graph: &mut QueryGraph, field: ParsedField) -> QueryGraphBuil
     Ok(())
 }
 
+#[tracing::instrument(skip(graph, field))]
 pub fn query_raw(graph: &mut QueryGraph, field: ParsedField) -> QueryGraphBuilderResult<()> {
     let raw_query = Query::Write(WriteQuery::QueryRaw(raw_query(field)?));
 

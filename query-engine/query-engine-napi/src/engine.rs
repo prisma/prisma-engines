@@ -1,6 +1,7 @@
 use crate::{error::ApiError, logger::ChannelLogger};
 use datamodel::{diagnostics::ValidatedConfiguration, Datamodel};
 use napi::threadsafe_function::ThreadsafeFunction;
+use opentelemetry::global;
 use prisma_models::DatamodelConverter;
 use query_core::{exec_loader, schema_builder, BuildMode, QueryExecutor, QuerySchema, QuerySchemaRenderer};
 use request_handlers::{
@@ -8,9 +9,15 @@ use request_handlers::{
     GraphQLSchemaRenderer, GraphQlBody, GraphQlHandler, PrismaResponse,
 };
 use serde::{Deserialize, Deserializer, Serialize};
-use std::{collections::BTreeMap, str::FromStr, sync::Arc};
+use std::{
+    collections::{BTreeMap, HashMap},
+    path::PathBuf,
+    str::FromStr,
+    sync::Arc,
+};
 use tokio::sync::RwLock;
-use tracing::metadata::LevelFilter;
+use tracing::{metadata::LevelFilter, Level};
+use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 /// The main engine, that can be cloned between threads when using JavaScript
 /// promises.
@@ -41,6 +48,7 @@ pub struct EngineBuilder {
     datamodel: EngineDatamodel,
     config: ValidatedConfiguration,
     logger: ChannelLogger,
+    config_dir: PathBuf,
 }
 
 /// Internal structure for querying and reconnecting with the engine.
@@ -50,6 +58,7 @@ pub struct ConnectedEngine {
     query_schema: Arc<QuerySchema>,
     executor: crate::Executor,
     logger: ChannelLogger,
+    config_dir: PathBuf,
 }
 
 /// Returned from the `serverInfo` method in javascript.
@@ -80,7 +89,20 @@ pub struct ConstructorOptions {
     datamodel: String,
     #[serde(deserialize_with = "deserialize_log_level")]
     log_level: LevelFilter,
+    #[serde(default)]
     datasource_overrides: BTreeMap<String, String>,
+    #[serde(default)]
+    feature_flags_overrides: Option<Vec<String>>,
+    #[serde(default)]
+    telemetry: TelemetryOptions,
+    config_dir: PathBuf,
+}
+
+#[derive(Debug, Deserialize, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct TelemetryOptions {
+    enabled: bool,
+    endpoint: Option<String>,
 }
 
 fn deserialize_log_level<'de, D>(deserializer: D) -> Result<LevelFilter, D::Error>
@@ -94,14 +116,19 @@ where
 impl QueryEngine {
     /// Parse a validated datamodel and configuration to allow connecting later on.
     pub fn new(opts: ConstructorOptions, log_callback: ThreadsafeFunction<String>) -> crate::Result<Self> {
+        set_panic_hook();
+
         let ConstructorOptions {
             datamodel,
             log_level,
             datasource_overrides,
+            feature_flags_overrides,
+            telemetry,
+            config_dir,
         } = opts;
 
         let overrides: Vec<(_, _)> = datasource_overrides.into_iter().collect();
-        let mut config = datamodel::parse_configuration_with_url_overrides(&datamodel, overrides.clone())
+        let mut config = datamodel::parse_configuration_with_config_dir(&datamodel, overrides.clone(), &config_dir)
             .map_err(|errors| ApiError::conversion(errors, &datamodel))?;
 
         config.subject = config
@@ -113,7 +140,10 @@ impl QueryEngine {
             .map_err(|errors| ApiError::conversion(errors, &datamodel))?
             .subject;
 
-        let flags: Vec<_> = config.subject.preview_features().map(|s| s.to_string()).collect();
+        let flags: Vec<_> = match feature_flags_overrides {
+            Some(overrides) => overrides,
+            None => config.subject.preview_features().map(|s| s.to_string()).collect(),
+        };
 
         if feature_flags::initialize(&flags).is_err() {
             eprintln!("We currently cannot change the feature flags more than once per process.");
@@ -125,12 +155,17 @@ impl QueryEngine {
             datasource_overrides: overrides,
         };
 
-        let logger = ChannelLogger::new(log_level, log_callback);
+        let logger = if telemetry.enabled {
+            ChannelLogger::new_with_telemetry(log_callback, telemetry.endpoint)
+        } else {
+            ChannelLogger::new(log_level, log_callback)
+        };
 
         let builder = EngineBuilder {
             config,
             datamodel,
             logger,
+            config_dir,
         };
 
         Ok(Self {
@@ -180,6 +215,7 @@ impl QueryEngine {
                             logger: builder.logger.clone(),
                             executor,
                             config,
+                            config_dir: builder.config_dir.clone(),
                         })
                     })
                     .await?;
@@ -198,9 +234,10 @@ impl QueryEngine {
 
         match *inner {
             Inner::Connected(ref engine) => {
-                let config = datamodel::parse_configuration_with_url_overrides(
+                let config = datamodel::parse_configuration_with_config_dir(
                     &engine.datamodel.raw,
                     engine.datamodel.datasource_overrides.clone(),
+                    &engine.config_dir,
                 )
                 .map_err(|errors| ApiError::conversion(errors, &engine.datamodel.raw))?;
 
@@ -208,6 +245,7 @@ impl QueryEngine {
                     datamodel: engine.datamodel.clone(),
                     logger: engine.logger.clone(),
                     config,
+                    config_dir: engine.config_dir.clone(),
                 };
 
                 *inner = Inner::Builder(builder);
@@ -219,12 +257,17 @@ impl QueryEngine {
     }
 
     /// If connected, sends a query to the core and returns the response.
-    pub async fn query(&self, query: GraphQlBody) -> crate::Result<PrismaResponse> {
+    pub async fn query(&self, query: GraphQlBody, trace: HashMap<String, String>) -> crate::Result<PrismaResponse> {
         match *self.inner.read().await {
             Inner::Connected(ref engine) => {
                 engine
                     .logger
                     .with_logging(|| async move {
+                        let cx = global::get_text_map_propagator(|propagator| propagator.extract(&trace));
+                        let span = tracing::span!(Level::TRACE, "query");
+
+                        span.set_parent(cx);
+
                         let handler = GraphQlHandler::new(engine.executor(), engine.query_schema());
                         Ok(handler.handle(query).await)
                     })
@@ -280,4 +323,34 @@ impl QueryEngine {
             }),
         }
     }
+}
+
+pub fn set_panic_hook() {
+    let original_hook = std::panic::take_hook();
+
+    std::panic::set_hook(Box::new(move |info| {
+        let payload = info
+            .payload()
+            .downcast_ref::<String>()
+            .map(Clone::clone)
+            .unwrap_or_else(|| info.payload().downcast_ref::<&str>().unwrap().to_string());
+
+        match info.location() {
+            Some(location) => {
+                tracing::event!(
+                    tracing::Level::ERROR,
+                    message = "PANIC",
+                    reason = payload.as_str(),
+                    file = location.file(),
+                    line = location.line(),
+                    column = location.column(),
+                );
+            }
+            None => {
+                tracing::event!(tracing::Level::ERROR, message = "PANIC", reason = payload.as_str());
+            }
+        }
+
+        original_hook(info)
+    }));
 }

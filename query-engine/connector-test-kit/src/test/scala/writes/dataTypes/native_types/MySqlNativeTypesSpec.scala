@@ -178,7 +178,7 @@ class MySqlNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase with 
     )
 
     res.toString should be(
-      """{"data":{"createOneModel":{"date":"2016-09-24T00:00:00+00:00","time":"1970-01-01T13:14:15.123+00:00","dtime":"2016-09-24T12:29:32+00:00","ts":"2016-09-24T12:29:32+00:00","year":1973}}}""")
+      """{"data":{"createOneModel":{"date":"2016-09-24T00:00:00.000Z","time":"1970-01-01T13:14:15.123Z","dtime":"2016-09-24T12:29:32.000Z","ts":"2016-09-24T12:29:32.000Z","year":1973}}}""")
   }
 
   "MySQL native binary types" should "work" in {

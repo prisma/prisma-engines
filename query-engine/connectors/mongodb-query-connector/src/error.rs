@@ -109,7 +109,6 @@ impl MongoError {
                 mongodb::error::ErrorKind::Io(_) => todo!(),
                 mongodb::error::ErrorKind::NoDnsResults(_) => todo!(),
                 mongodb::error::ErrorKind::OperationError { .. } => todo!(),
-                mongodb::error::ErrorKind::OutOfRangeError(_) => todo!(),
                 mongodb::error::ErrorKind::ParseError { .. } => todo!(),
                 mongodb::error::ErrorKind::ConnectionPoolClearedError { .. } => todo!(),
                 mongodb::error::ErrorKind::ResponseError { .. } => todo!(),

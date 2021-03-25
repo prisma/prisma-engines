@@ -13,7 +13,7 @@ use tracing_futures::Instrument;
 #[async_trait::async_trait]
 pub trait GenericApi: Send + Sync + 'static {
     /// Return the database version as a string.
-    async fn version(&self, input: &serde_json::Value) -> CoreResult<String>;
+    async fn version(&self) -> CoreResult<String>;
 
     /// Apply all the unapplied migrations from the migrations folder.
     async fn apply_migrations(&self, input: &ApplyMigrationsInput) -> CoreResult<ApplyMigrationsOutput>;
@@ -22,7 +22,7 @@ pub trait GenericApi: Send + Sync + 'static {
     async fn create_migration(&self, input: &CreateMigrationInput) -> CoreResult<CreateMigrationOutput>;
 
     /// Debugging method that only panics, for CLI tests.
-    async fn debug_panic(&self, input: &()) -> CoreResult<()>;
+    async fn debug_panic(&self) -> CoreResult<()>;
 
     /// Tells the CLI what to do in `migrate dev`.
     async fn dev_diagnostic(&self, input: &DevDiagnosticInput) -> CoreResult<DevDiagnosticOutput>;
@@ -64,10 +64,8 @@ pub trait GenericApi: Send + Sync + 'static {
 
 #[async_trait::async_trait]
 impl<C: MigrationConnector> GenericApi for C {
-    async fn version(&self, input: &serde_json::Value) -> CoreResult<String> {
-        VersionCommand::execute(input, self)
-            .instrument(tracing::info_span!("Version"))
-            .await
+    async fn version(&self) -> CoreResult<String> {
+        Ok(self.version().await?)
     }
 
     async fn apply_migrations(&self, input: &ApplyMigrationsInput) -> CoreResult<ApplyMigrationsOutput> {
@@ -86,8 +84,8 @@ impl<C: MigrationConnector> GenericApi for C {
             .await
     }
 
-    async fn debug_panic(&self, input: &()) -> CoreResult<()> {
-        DebugPanicCommand::execute(input, self)
+    async fn debug_panic(&self) -> CoreResult<()> {
+        DebugPanicCommand::execute(&(), self)
             .instrument(tracing::info_span!("DebugPanic"))
             .await
     }

@@ -108,7 +108,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
     }
 
     #[tracing::instrument]
-    async fn version(&self, schema: &str) -> DescriberResult<Option<String>> {
+    async fn version(&self, _schema: &str) -> DescriberResult<Option<String>> {
         Ok(self.conn.version().await?)
     }
 }
@@ -148,7 +148,7 @@ impl SqlSchemaDescriber {
         for row in rows.into_iter() {
             procedures.push(Procedure {
                 name: row.get_expect_string("name"),
-                definition: row.get_expect_string("definition"),
+                definition: row.get_string("definition"),
             });
         }
 
@@ -383,6 +383,7 @@ impl SqlSchemaDescriber {
             WHERE SCHEMA_NAME(t.schema_id) = @P1
                 AND t.is_ms_shipped = 0
                 AND ind.filter_definition IS NULL
+                AND ind.name IS NOT NULL
 
             ORDER BY index_name, seq_in_index
         "#};
@@ -485,7 +486,7 @@ impl SqlSchemaDescriber {
         for row in result_set.into_iter() {
             views.push(View {
                 name: row.get_expect_string("view_name"),
-                definition: row.get_expect_string("view_sql"),
+                definition: row.get_string("view_sql"),
             })
         }
 

@@ -2,6 +2,7 @@ use super::*;
 use crate::{query_document::ParsedField, ReadQuery, RelatedRecordsQuery};
 use prisma_models::{ModelRef, RelationFieldRef};
 
+#[tracing::instrument(skip(field, parent, model))]
 pub fn find_related(
     field: ParsedField,
     parent: RelationFieldRef,
@@ -12,7 +13,7 @@ pub fn find_related(
     let alias = field.alias;
     let sub_selections = field.nested_fields.unwrap().fields;
     let selection_order: Vec<String> = utils::collect_selection_order(&sub_selections);
-    let selected_fields = utils::collect_selected_fields(&sub_selections, &model);
+    let selected_fields = utils::collect_selected_fields(&sub_selections, args.distinct.clone(), &model);
     let nested = utils::collect_nested_queries(sub_selections, &model)?;
     let parent_field = parent;
 

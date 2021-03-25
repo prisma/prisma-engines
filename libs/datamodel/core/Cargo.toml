@@ -23,6 +23,7 @@ serde_json = { version = "1.0", features = ["preserve_order", "float_roundtrip"]
 sql-datamodel-connector = { path = "../connectors/sql-datamodel-connector" }
 thiserror = "1.0"
 tracing = "0.1"
+url = "2"
 
 [dev-dependencies]
 clap = "2.33"

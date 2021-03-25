@@ -25,9 +25,8 @@ impl SqlFlavour for SqliteFlavour {
     }
 
     async fn create_database(&self, database_str: &str) -> ConnectorResult<String> {
-        use anyhow::Context;
-
         let path = Path::new(&self.file_path);
+
         if path.exists() {
             return Ok(self.file_path.clone());
         }
@@ -36,8 +35,7 @@ impl SqlFlavour for SqliteFlavour {
 
         if let Some((dir, false)) = dir.map(|dir| (dir, dir.exists())) {
             std::fs::create_dir_all(dir)
-                .context("Creating SQLite database parent directory.")
-                .map_err(ConnectorError::generic)?;
+                .map_err(|err| ConnectorError::from_source(err, "Creating SQLite database parent directory."))?;
         }
 
         connect(database_str).await?;
@@ -84,9 +82,7 @@ impl SqlFlavour for SqliteFlavour {
         };
 
         std::fs::remove_file(&file_path).map_err(|err| {
-            ConnectorError::generic(
-                anyhow::Error::new(err).context(format!("Failed to delete SQLite database at `{}`", file_path,)),
-            )
+            ConnectorError::from_msg(format!("Failed to delete SQLite database at `{}`.\n{}", file_path, err))
         })?;
 
         Ok(())

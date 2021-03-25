@@ -49,8 +49,9 @@ impl AttributeValidator<dml::Model> for ModelLevelIdAttributeValidator {
             .default_arg("fields")?
             .as_array()
             .iter()
-            .map(|f| f.as_constant_literal().unwrap())
-            .collect();
+            .map(|f| f.as_constant_literal())
+            .collect::<Result<Vec<_>, _>>()?;
+
         obj.id_fields = fields;
 
         let undefined_fields: Vec<String> = obj

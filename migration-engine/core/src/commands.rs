@@ -8,7 +8,6 @@ mod debug_panic;
 mod dev_diagnostic;
 mod diagnose_migration_history;
 mod evaluate_data_loss;
-mod get_database_version;
 mod list_migration_directories;
 mod mark_migration_applied;
 mod mark_migration_rolled_back;
@@ -25,7 +24,6 @@ pub use diagnose_migration_history::{
     HistoryDiagnostic,
 };
 pub use evaluate_data_loss::*;
-pub use get_database_version::*;
 pub use list_migration_directories::*;
 pub use mark_migration_applied::{MarkMigrationAppliedCommand, MarkMigrationAppliedInput, MarkMigrationAppliedOutput};
 pub use mark_migration_rolled_back::{MarkMigrationRolledBackInput, MarkMigrationRolledBackOutput};

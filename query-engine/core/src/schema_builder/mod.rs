@@ -140,6 +140,10 @@ impl TypeCache {
     }
 }
 
+#[tracing::instrument(
+    name = "build_query_schema",
+    skip(internal_data_model, enable_raw_queries, capabilities)
+)]
 pub fn build(
     internal_data_model: InternalDataModelRef,
     mode: BuildMode,

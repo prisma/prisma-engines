@@ -6,11 +6,17 @@ use query_core::{
     BatchDocument, CompactedDocument, Item, Operation, QueryDocument, QueryExecutor, QuerySchemaRef, QueryValue,
     ResponseData,
 };
-use std::panic::AssertUnwindSafe;
+use std::{fmt, panic::AssertUnwindSafe};
 
 pub struct GraphQlHandler<'a> {
     executor: &'a (dyn QueryExecutor + Send + Sync + 'a),
     query_schema: &'a QuerySchemaRef,
+}
+
+impl<'a> fmt::Debug for GraphQlHandler<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("GraphQlHandler").finish()
+    }
 }
 
 impl<'a> GraphQlHandler<'a> {
@@ -39,7 +45,7 @@ impl<'a> GraphQlHandler<'a> {
             Ok(Err(err)) => err.into(),
             Err(err) => {
                 // panicked
-                let error = Error::from_panic_payload(&err);
+                let error = Error::from_panic_payload(err);
                 error.into()
             }
         };
@@ -71,7 +77,7 @@ impl<'a> GraphQlHandler<'a> {
             Ok(Err(err)) => PrismaResponse::Multi(err.into()),
             Err(err) => {
                 // panicked
-                let error = Error::from_panic_payload(&err);
+                let error = Error::from_panic_payload(err);
                 let resp: GQLBatchResponse = error.into();
 
                 PrismaResponse::Multi(resp)
@@ -79,6 +85,7 @@ impl<'a> GraphQlHandler<'a> {
         }
     }
 
+    #[tracing::instrument(skip(self, document))]
     async fn handle_compacted(&self, document: CompactedDocument) -> PrismaResponse {
         use user_facing_errors::Error;
 
@@ -140,7 +147,7 @@ impl<'a> GraphQlHandler<'a> {
 
             // panicked
             Err(err) => {
-                let error = Error::from_panic_payload(&err);
+                let error = Error::from_panic_payload(err);
                 PrismaResponse::Multi(error.into())
             }
         }

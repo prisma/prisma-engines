@@ -2,6 +2,7 @@ use super::*;
 use constants::inputs::filters;
 use std::sync::Arc;
 
+#[tracing::instrument(skip(ctx, model, include_aggregates))]
 pub(crate) fn scalar_filter_object_type(
     ctx: &mut BuilderContext,
     model: &ModelRef,
@@ -42,6 +43,7 @@ pub(crate) fn scalar_filter_object_type(
     weak_ref
 }
 
+#[tracing::instrument(skip(ctx, model))]
 pub(crate) fn where_object_type(ctx: &mut BuilderContext, model: &ModelRef) -> InputObjectTypeWeakRef {
     let ident = Identifier::new(format!("{}WhereInput", model.name), PRISMA_NAMESPACE);
     return_cached_input!(ctx, &ident);
@@ -80,6 +82,7 @@ pub(crate) fn where_object_type(ctx: &mut BuilderContext, model: &ModelRef) -> I
     weak_ref
 }
 
+#[tracing::instrument(skip(ctx, model))]
 pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext, model: &ModelRef) -> InputObjectTypeWeakRef {
     let ident = Identifier::new(format!("{}WhereUniqueInput", model.name), PRISMA_NAMESPACE);
     return_cached_input!(ctx, &ident);

@@ -9,16 +9,29 @@ use futures::stream::{FuturesUnordered, StreamExt};
 use prisma_models::*;
 use quaint::ast::*;
 
+#[tracing::instrument(skip(conn, model, filter, selected_fields))]
 pub async fn get_single_record(
     conn: &dyn QueryExt,
     model: &ModelRef,
     filter: &Filter,
     selected_fields: &ModelProjection,
+    aggr_selections: &[RelAggregationSelection],
 ) -> crate::Result<Option<SingleRecord>> {
-    let query = read::get_records(&model, selected_fields.as_columns(), &[], filter);
+    let query = read::get_records(&model, selected_fields.as_columns(), aggr_selections, filter);
 
-    let field_names: Vec<_> = selected_fields.db_names().collect();
-    let idents = selected_fields.type_identifiers_with_arities();
+    let mut field_names: Vec<_> = selected_fields.db_names().collect();
+    let mut aggr_field_names: Vec<_> = aggr_selections.iter().map(|aggr_sel| aggr_sel.db_alias()).collect();
+
+    field_names.append(&mut aggr_field_names);
+
+    let mut idents = selected_fields.type_identifiers_with_arities();
+    let mut aggr_idents = aggr_selections
+        .iter()
+        .map(|aggr_sel| aggr_sel.type_identifier_with_arity())
+        .collect();
+
+    idents.append(&mut aggr_idents);
+
     let meta = column_metadata::create(field_names.as_slice(), idents.as_slice());
 
     let record = (match conn.find(query, meta.as_slice()).await {
@@ -33,6 +46,7 @@ pub async fn get_single_record(
     Ok(record)
 }
 
+#[tracing::instrument(skip(conn, model, query_arguments, selected_fields))]
 pub async fn get_many_records(
     conn: &dyn QueryExt,
     model: &ModelRef,
@@ -102,6 +116,7 @@ pub async fn get_many_records(
     Ok(records)
 }
 
+#[tracing::instrument(skip(conn, from_field, from_record_ids))]
 pub async fn get_related_m2m_record_ids(
     conn: &dyn QueryExt,
     from_field: &RelationFieldRef,
@@ -169,6 +184,7 @@ pub async fn get_related_m2m_record_ids(
         .collect())
 }
 
+#[tracing::instrument(skip(conn, model, query_arguments, selections, group_by, having))]
 pub async fn aggregate(
     conn: &dyn QueryExt,
     model: &ModelRef,
@@ -186,6 +202,7 @@ pub async fn aggregate(
     }
 }
 
+#[tracing::instrument(skip(conn, model, query_arguments, selections))]
 async fn plain_aggregate(
     conn: &dyn QueryExt,
     model: &ModelRef,
@@ -209,6 +226,7 @@ async fn plain_aggregate(
     Ok(row.into_aggregation_results(&selections))
 }
 
+#[tracing::instrument(skip(conn, model, query_arguments, selections, group_by, having))]
 async fn group_by_aggregate(
     conn: &dyn QueryExt,
     model: &ModelRef,

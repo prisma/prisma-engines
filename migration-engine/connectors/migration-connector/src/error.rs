@@ -1,104 +1,139 @@
 //! The migration connector ConnectorError type.
 
 use crate::migrations_directory::ReadMigrationScriptError;
-use std::{error::Error as StdError, fmt::Display};
+use std::{
+    error::Error as StdError,
+    fmt::{Display, Write},
+};
 use tracing_error::SpanTrace;
 use user_facing_errors::{migration_engine::MigrationFileNotFound, KnownError, UserFacingError};
 
 /// The general error reporting type for migration connectors.
 #[derive(Debug)]
-pub struct ConnectorError {
+pub struct ConnectorError(Box<ConnectorErrorImpl>);
+
+#[derive(Debug)]
+struct ConnectorErrorImpl {
     /// An optional error already rendered for users in case the migration core does not handle it.
     user_facing_error: Option<KnownError>,
-    /// The error information for internal use.
-    report: anyhow::Error,
+    /// Additional context.
+    message: Option<Box<str>>,
+    /// The source of the error.
+    source: Option<Box<(dyn StdError + Send + Sync + 'static)>>,
     /// See the tracing-error docs.
     context: SpanTrace,
 }
 
 impl Display for ConnectorError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{:#}\n{}", self.report, self.context)
+        if let Some(message) = &self.0.message {
+            f.write_str(message)?;
+            f.write_char('\n')?;
+        }
+
+        if let Some(source) = &self.0.source {
+            Display::fmt(source.as_ref(), f)?;
+            f.write_char('\n')?;
+        }
+
+        Display::fmt(&self.0.context, f)
     }
 }
 
 impl StdError for ConnectorError {
     fn source(&self) -> Option<&(dyn StdError + 'static)> {
-        Some(self.report.as_ref())
+        self.0
+            .source
+            .as_ref()
+            .map(|err| -> &(dyn StdError + 'static) { err.as_ref() })
     }
 }
 
 impl ConnectorError {
     /// A reference to the tracing-error context.
     pub fn context(&self) -> &SpanTrace {
-        &self.context
+        &self.0.context
     }
 
     /// The user-facing error code for this error.
     pub fn error_code(&self) -> Option<&'static str> {
-        self.user_facing_error.as_ref().map(|err| err.error_code)
+        self.0.user_facing_error.as_ref().map(|err| err.error_code)
     }
 
-    /// Construct a `Generic` connector error.
-    pub fn generic(report: anyhow::Error) -> Self {
-        ConnectorError {
+    /// Build a generic unknown error from just an error message.
+    pub fn from_msg(msg: String) -> Self {
+        ConnectorError(Box::new(ConnectorErrorImpl {
             user_facing_error: None,
-            report,
             context: SpanTrace::capture(),
-        }
+            message: Some(msg.into_boxed_str()),
+            source: None,
+        }))
+    }
+
+    /// Build a generic unknown error from a source error, with some additional context.
+    pub fn from_source<E: StdError + Send + Sync + 'static>(source: E, context: &'static str) -> Self {
+        ConnectorError(Box::new(ConnectorErrorImpl {
+            user_facing_error: None,
+            message: Some(context.into()),
+            source: Some(Box::new(source)),
+            context: SpanTrace::capture(),
+        }))
     }
 
     /// Turn the error into a nested, user-facing MigrationDoesNotApplyCleanly error.
     pub fn into_migration_does_not_apply_cleanly(self, migration_name: String) -> Self {
-        let context = self.context.clone();
+        let context = self.0.context.clone();
         let user_facing_error = user_facing_errors::migration_engine::MigrationDoesNotApplyCleanly {
             migration_name,
             inner_error: self.to_user_facing(),
         };
 
-        ConnectorError {
+        ConnectorError(Box::new(ConnectorErrorImpl {
             user_facing_error: Some(KnownError::new(user_facing_error)),
-            report: self.into(),
+            source: Some(Box::new(self)),
             context,
-        }
+            message: None,
+        }))
     }
 
     /// Turn the error into a nested, user-facing ShadowDbCreationError.
     pub fn into_shadow_db_creation_error(self) -> Self {
-        let context = self.context.clone();
+        let context = self.0.context.clone();
         let user_facing_error = user_facing_errors::migration_engine::ShadowDbCreationError {
             inner_error: self.to_user_facing(),
         };
 
-        ConnectorError {
+        ConnectorError(Box::new(ConnectorErrorImpl {
             user_facing_error: Some(KnownError::new(user_facing_error)),
-            report: self.into(),
+            message: None,
             context,
-        }
+            source: Some(Box::new(self)),
+        }))
     }
 
     /// Turn the error into a nested, user-facing SoftResetFailed error.
     pub fn into_soft_reset_failed_error(self) -> Self {
-        let context = self.context.clone();
+        let context = self.0.context.clone();
         let user_facing_error = user_facing_errors::migration_engine::SoftResetFailed {
             inner_error: self.to_user_facing(),
         };
 
-        ConnectorError {
+        ConnectorError(Box::new(ConnectorErrorImpl {
             user_facing_error: Some(KnownError::new(user_facing_error)),
-            report: self.into(),
             context,
-        }
+            message: None,
+            source: Some(Box::new(self)),
+        }))
     }
 
     /// Access the inner `user_facing_error::KnownError`.
     pub fn known_error(&self) -> Option<&KnownError> {
-        self.user_facing_error.as_ref()
+        self.0.user_facing_error.as_ref()
     }
 
     /// Render to a user_facing_error::Error
     pub fn to_user_facing(&self) -> user_facing_errors::Error {
-        match &self.user_facing_error {
+        match &self.0.user_facing_error {
             Some(known_error) => known_error.clone().into(),
             None => user_facing_errors::Error::from_dyn_error(self),
         }
@@ -106,29 +141,28 @@ impl ConnectorError {
 
     /// Construct a GenericError with an associated user facing error.
     pub fn user_facing_error<T: UserFacingError>(err: T) -> Self {
-        let report = anyhow::anyhow!("{}", err.message());
-        ConnectorError {
+        ConnectorError(Box::new(ConnectorErrorImpl {
+            message: Some(err.message().into_boxed_str()),
             user_facing_error: Some(KnownError::new(err)),
-            report,
+            source: None,
             context: SpanTrace::capture(),
-        }
+        }))
     }
 
     /// Construct an UrlParseError.
     pub fn url_parse_error(err: impl Display, url: &str) -> Self {
-        Self::generic(anyhow::anyhow!("{} in `{}`", err, url))
+        Self::from_msg(format!("{} in `{}`", err, url))
     }
 }
 
 impl From<KnownError> for ConnectorError {
     fn from(err: KnownError) -> Self {
-        let report = anyhow::anyhow!("{}", err.message);
-
-        ConnectorError {
+        ConnectorError(Box::new(ConnectorErrorImpl {
+            message: Some(err.message.clone().into_boxed_str()),
             user_facing_error: Some(err),
-            report,
+            source: None,
             context: SpanTrace::capture(),
-        }
+        }))
     }
 }
 
@@ -136,12 +170,23 @@ impl From<ReadMigrationScriptError> for ConnectorError {
     fn from(err: ReadMigrationScriptError) -> Self {
         let context = err.1.clone();
 
-        ConnectorError {
+        ConnectorError(Box::new(ConnectorErrorImpl {
             user_facing_error: Some(KnownError::new(MigrationFileNotFound {
                 migration_file_path: err.2.clone(),
             })),
-            report: err.into(),
             context,
-        }
+            message: None,
+            source: Some(Box::new(err)),
+        }))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::ConnectorError;
+
+    #[test]
+    fn connector_error_has_the_expected_size() {
+        assert_eq!(std::mem::size_of::<ConnectorError>(), std::mem::size_of::<*mut ()>());
     }
 }

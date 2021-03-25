@@ -1,5 +1,6 @@
 use crate::{Env, Expressionista, IrSerializer, QueryGraph, QueryInterpreter, ResponseData};
 
+#[derive(Debug)]
 pub struct QueryPipeline<'conn, 'tx> {
     graph: QueryGraph,
     interpreter: QueryInterpreter<'conn, 'tx>,

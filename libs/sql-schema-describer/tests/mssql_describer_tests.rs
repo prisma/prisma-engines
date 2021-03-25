@@ -46,7 +46,7 @@ async fn views_can_be_described() {
     let view = result.get_view("ab").expect("couldn't get ab view").to_owned();
 
     assert_eq!("ab", &view.name);
-    assert_eq!(create_view, view.definition);
+    assert_eq!(create_view, view.definition.unwrap());
 }
 
 #[tokio::test]
@@ -63,7 +63,7 @@ async fn procedures_can_be_described() {
     let procedure = result.get_procedure("foo").unwrap();
 
     assert_eq!("foo", &procedure.name);
-    assert_eq!(sql, procedure.definition);
+    assert_eq!(Some(sql), procedure.definition);
 }
 
 #[tokio::test]

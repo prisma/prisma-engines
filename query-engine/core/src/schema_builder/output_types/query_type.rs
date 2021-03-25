@@ -1,6 +1,7 @@
 use super::*;
 
 /// Builds the root `Query` type.
+#[tracing::instrument(name = "build_query_type", skip(ctx))]
 pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRef) {
     let non_embedded_models = ctx.internal_data_model.non_embedded_models();
     let fields = non_embedded_models
@@ -68,13 +69,12 @@ fn find_first_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
 fn all_items_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
     let args = arguments::many_records_arguments(ctx, &model, true);
     let field_name = ctx.pluralize_internal(camel_case(pluralize(&model.name)), format!("findMany{}", model.name));
+    let object_type = output_objects::map_model_object_type(ctx, &model);
 
     field(
         field_name,
         args,
-        OutputType::list(OutputType::object(
-            output_objects::map_model_object_type_with_aggregations(ctx, &model),
-        )),
+        OutputType::list(OutputType::object(object_type)),
         Some(QueryInfo {
             model: Some(Arc::clone(&model)),
             tag: QueryTag::FindMany,

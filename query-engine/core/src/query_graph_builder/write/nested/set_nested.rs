@@ -11,6 +11,7 @@ use std::sync::Arc;
 /// Handles nested set cases.
 /// The resulting graph can take multiple forms, based on the relation type to the parent model.
 /// Information on the graph shapes can be found on the individual handlers.
+#[tracing::instrument(skip(graph, parent_node, parent_relation_field, value, child_model))]
 pub fn nested_set(
     graph: &mut QueryGraph,
     parent_node: &NodeRef,
@@ -82,6 +83,7 @@ pub fn nested_set(
 ///
 /// Connects only happen if the query specifies at least one record to be connected.
 /// If none are specified, set effectively acts as a "disconnect all".
+#[tracing::instrument(skip(graph, parent_node, parent_relation_field, filter))]
 fn handle_many_to_many(
     graph: &mut QueryGraph,
     parent_node: &NodeRef,
@@ -206,6 +208,7 @@ fn handle_many_to_many(
 /// └─┴─▶│   ("connect")   │     │ ("disconnect")  │◀─┘
 ///      └─────────────────┘     └─────────────────┘
 /// ```
+#[tracing::instrument(skip(graph, parent_node, parent_relation_field, filter))]
 fn handle_one_to_many(
     graph: &mut QueryGraph,
     parent_node: &NodeRef,
