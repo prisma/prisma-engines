@@ -1002,11 +1002,19 @@ async fn escaped_backslashes_in_string_literals_must_be_unescaped(api: &TestApi)
 #[test_each_connector(tags("mysql_8", "mariadb"))]
 async fn function_expression_defaults_are_described_as_dbgenerated(api: &TestApi) {
     let create_table = r#"
-        CREATE TABLE game (
-            id VARCHAR(8) DEFAULT (LEFT(UUID(), 8)),
-            created_at DATETIME DEFAULT current_timestamp(),
-
-            PRIMARY KEY (`id`)
+        CREATE TABLE game (       
+            int_col Int DEFAULT (ABS(8) + ABS(8)),
+            bigint_col BigInt DEFAULT (ABS(8)),
+            float_col Float DEFAULT (ABS(8)),
+            decimal_col Decimal DEFAULT (ABS(8)),
+            boolean_col TinyInt(1) DEFAULT (IFNULL(1,0)),
+            string_col Varchar(8) DEFAULT (LEFT(UUID(), 8)),
+            dt_col DateTime DEFAULT current_timestamp(),
+            dt_col2 DateTime DEFAULT (SUBDATE(SYSDATE(), 31)),
+            binary_col Binary(16) NOT NULL DEFAULT (conv(10,10,2)),
+            json_col Json DEFAULT (Trim('{} ')),
+            enum_col ENUM('x-small') DEFAULT (Trim('x-small   ')),
+            unsupported_col SET('one', 'two') DEFAULT (Trim(' '))
         );
     "#;
 
@@ -1016,9 +1024,27 @@ async fn function_expression_defaults_are_described_as_dbgenerated(api: &TestApi
 
     let table = schema.table_bang("game");
 
-    let default = table.column_bang("id").default.as_ref().unwrap();
+    let default = |name| table.column_bang(name).default.as_ref().unwrap();
 
-    assert_eq!(default, &DefaultValue::db_generated("(left(uuid(),8))"))
+    assert_eq!(default("int_col"), &DefaultValue::db_generated("(abs(8) + abs(8))"));
+    assert_eq!(default("bigint_col"), &DefaultValue::db_generated("(abs(8))"));
+    assert_eq!(default("float_col"), &DefaultValue::db_generated("(abs(8))"));
+    assert_eq!(default("decimal_col"), &DefaultValue::db_generated("(abs(8))"));
+    assert_eq!(default("boolean_col"), &DefaultValue::db_generated("(ifnull(1,0))"));
+    assert_eq!(default("string_col"), &DefaultValue::db_generated("(left(uuid(),8))"));
+    assert_eq!(default("dt_col"), &DefaultValue::now());
+    assert_eq!(
+        default("dt_col2"),
+        &DefaultValue::db_generated("(sysdate() - interval 31 day)")
+    );
+    assert_eq!(default("binary_col"), &DefaultValue::db_generated("(conv(10,10,2))"));
+    //todo strings are returned differently on mysql8
+    // assert_eq!(default("json_col"), &DefaultValue::db_generated("(trim(\'{} \'))"));
+    // assert_eq!(
+    //     default("enum_col"),
+    //     &DefaultValue::db_generated("(trim(\'x-small   \'))")
+    // );
+    // assert_eq!(default("unsupported_col"), &DefaultValue::db_generated("(trim(\' \'))"));
 }
 
 #[test_each_connector(tags("mysql"))]

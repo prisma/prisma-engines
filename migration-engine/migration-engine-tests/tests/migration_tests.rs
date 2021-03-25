@@ -2236,12 +2236,39 @@ async fn schemas_with_dbgenerated_work(api: &TestApi) -> TestResult {
         id          Int       @id @default(autoincrement())
         lastName    String    @default("")
         password    String?
-        updatedAt   DateTime  @default(dbgenerated())
+        updatedAt   DateTime  @default(dbgenerated())      
     }
     "#;
 
     api.schema_push(dm1).send().await?.assert_green()?;
+    Ok(())
+}
 
+#[test_each_connector(tags("mysql_8", "mariadb"), log = "debug")]
+async fn schemas_with_dbgenerated_expressions_work(api: &TestApi) -> TestResult {
+    let dm1 = r#"
+    model User {
+        int_col Int  @default(dbgenerated("(ABS(8) + ABS(8))"))
+        bigint_col BigInt @default(dbgenerated("(ABS(8))"))
+        float_col Float @default(dbgenerated("(ABS(8))"))
+        decimal_col Decimal @default(dbgenerated("(ABS(8))"))
+        boolean_col Boolean @default(dbgenerated("(IFNULL(1,0))"))
+        string_col String @default(dbgenerated("(LEFT(UUID(), 8))"))
+        dt_col DateTime @default(now())
+        dt_col2 DateTime @default(dbgenerated("(SUBDATE(SYSDATE(), 31))"))
+        binary_col Bytes @default(dbgenerated("(conv(10,10,2))"))
+        enum_col Smolness @default(dbgenerated("(Trim('XSMALL   '))"))
+        unsupported_col Unsupported("SET('one', 'two')") @default(dbgenerated("(Trim(' '))"))
+        
+        @@ignore
+    }
+    
+    enum Smolness{
+        XSMALL
+    }
+    "#;
+
+    api.schema_push(dm1).send().await?.assert_green()?;
     Ok(())
 }
 
