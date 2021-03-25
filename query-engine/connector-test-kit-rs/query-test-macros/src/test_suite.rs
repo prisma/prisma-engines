@@ -93,7 +93,5 @@ pub fn test_suite_impl(attr: TokenStream, input: TokenStream) -> TokenStream {
 fn add_module_imports(items: &mut Vec<Item>) {
     items.reverse();
     items.push(Item::Use(parse_quote! { use super::*; }));
-    items.push(Item::Use(parse_quote! { use query_tests_setup::*; }));
-    items.push(Item::Use(parse_quote! { use std::convert::TryFrom; }));
     items.reverse();
 }

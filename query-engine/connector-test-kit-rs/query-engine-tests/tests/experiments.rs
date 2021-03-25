@@ -1,5 +1,4 @@
-use query_engine_tests::*;
-use query_test_macros::{connector_test, test_suite};
+use query_engine_tests::prelude::*;
 
 // The mod name dictates the db name. If the name is `some_spec`
 // then, for example, the MySQL db should be (similar to) `some_spec` as well.
@@ -14,7 +13,6 @@ mod some_spec {
     // Handler that returns a schema template to use for rendering.
     // Template rendering can be bypassed by simply not using the template strings.
     // Common schema handlers to use should be in a central place.
-    // #[template]
     fn schema_handler() -> String {
         "model A {
             #id(id, Int, @id)
@@ -23,16 +21,15 @@ mod some_spec {
         .to_owned()
     }
 
-    #[connector_test(suite = "named_suite", schema(schema_handler), only(Postgres(10)))]
+    #[connector_test(suite = "named_suite", schema(schema_handler), only(Sqlite))]
     async fn ideal_api_test(runner: &Runner) -> TestResult<()> {
         let result = runner
-            .query(
-                r#"
-            mutation {
-                createOneA(data: { id: 1, field: "1"}) { id }
-            }
-        "#,
-            )
+            .query(indoc! {r#"
+                    mutation {
+                        createOneA(data: { id: 1, field: "1"}) { id }
+                    }
+                "#,
+            })
             .await?;
 
         assert_eq!(result.to_string(), r#"{"data":{"createOneA":{"id":1}}}"#);
@@ -42,13 +39,12 @@ mod some_spec {
     #[connector_test]
     async fn other_test(runner: &Runner) -> TestResult<()> {
         let result = runner
-            .query(
-                r#"
-            mutation {
-                createOneC(data: { id: 1, field: "1"}) { id }
-            }
-        "#,
-            )
+            .query(indoc! {r#"
+                mutation {
+                    createOneC(data: { id: 1, field: "1"}) { id }
+                }
+            "#,
+            })
             .await?;
 
         assert_eq!(result.to_string(), r#"{"data":{"createOneC":{"id":1}}}"#);

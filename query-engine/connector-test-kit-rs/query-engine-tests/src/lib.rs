@@ -10,4 +10,5 @@
 // - Tests run in separate units in the data source. For MySQL, this may be a separate database, for postgres a schema, etc. -> These units are named `{mod_name}_{test_name}`
 // - Test logs. We could write the logs for each test into a logs folder with a file named after the test.
 
+pub mod prelude;
 pub mod schemas;

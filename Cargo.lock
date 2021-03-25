@@ -3329,6 +3329,7 @@ name = "query-engine-tests"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "indoc",
  "query-test-macros",
  "query-tests-setup",
  "serde_json",
