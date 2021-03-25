@@ -1,6 +1,5 @@
 use super::StringFromEnvVar;
 use crate::configuration::preview_features::PreviewFeatures;
-use crate::StringFromEnvVar;
 use serde::Serialize;
 use std::collections::HashMap;
 
