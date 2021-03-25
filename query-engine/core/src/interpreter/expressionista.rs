@@ -16,6 +16,7 @@ struct IfNodeAcc {
 }
 
 impl Expressionista {
+    #[tracing::instrument(skip(graph))]
     pub fn translate(mut graph: QueryGraph) -> InterpretationResult<Expression> {
         graph
             .root_nodes()
@@ -25,6 +26,7 @@ impl Expressionista {
             .map(|res| Expression::Sequence { seq: res })
     }
 
+    #[tracing::instrument(skip(graph, node, parent_edges))]
     fn build_expression(
         graph: &mut QueryGraph,
         node: &NodeRef,
@@ -41,6 +43,7 @@ impl Expressionista {
         }
     }
 
+    #[tracing::instrument(skip(graph, node, parent_edges))]
     fn build_query_expression(
         graph: &mut QueryGraph,
         node: &NodeRef,
@@ -86,6 +89,7 @@ impl Expressionista {
         }
     }
 
+    #[tracing::instrument(skip(graph, child_pairs))]
     fn process_children(
         graph: &mut QueryGraph,
         mut child_pairs: Vec<(EdgeRef, NodeRef)>,
@@ -131,6 +135,7 @@ impl Expressionista {
         Ok(expressions)
     }
 
+    #[tracing::instrument(skip(graph, node, parent_edges))]
     fn build_empty_expression(
         graph: &mut QueryGraph,
         node: &NodeRef,
@@ -148,6 +153,7 @@ impl Expressionista {
         Self::transform_node(graph, parent_edges, Node::Empty, into_expr)
     }
 
+    #[tracing::instrument(skip(graph, node, parent_edges))]
     fn build_computation_expression(
         graph: &mut QueryGraph,
         node: &NodeRef,
@@ -200,6 +206,7 @@ impl Expressionista {
         }
     }
 
+    #[tracing::instrument(skip(graph, node, parent_edges))]
     fn build_flow_expression(
         graph: &mut QueryGraph,
         node: &NodeRef,
@@ -214,6 +221,7 @@ impl Expressionista {
         }
     }
 
+    #[tracing::instrument(skip(graph, node, parent_edges))]
     fn translate_if_node(
         graph: &mut QueryGraph,
         node: &NodeRef,
@@ -280,6 +288,7 @@ impl Expressionista {
         Self::transform_node(graph, parent_edges, node, into_expr)
     }
 
+    #[tracing::instrument(skip(graph, node, parent_edges))]
     fn translate_return_node(
         graph: &mut QueryGraph,
         node: &NodeRef,
@@ -306,6 +315,7 @@ impl Expressionista {
 
     /// Runs transformer functions (e.g. `ParentIdsFn`) via `Expression::Func` if necessary, or if none present,
     /// builds an expression directly. `into_expr` does the final expression building based on the node coming in.
+    #[tracing::instrument(skip(graph, parent_edges, node, into_expr))]
     fn transform_node(
         graph: &mut QueryGraph,
         parent_edges: Vec<EdgeRef>,
@@ -364,6 +374,7 @@ impl Expressionista {
     }
 
     /// Collects all edge dependencies that perform a node transformation based on the parent.
+    #[tracing::instrument(skip(graph, parent_edges))]
     fn collect_parent_transformers(
         graph: &mut QueryGraph,
         parent_edges: Vec<EdgeRef>,
@@ -384,6 +395,7 @@ impl Expressionista {
             .collect()
     }
 
+    #[tracing::instrument(skip(graph, result_subgraphs))]
     fn fold_result_scopes(
         graph: &mut QueryGraph,
         result_subgraphs: Vec<(EdgeRef, NodeRef)>,

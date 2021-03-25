@@ -82,6 +82,8 @@ pub mod json;
 pub mod transform;
 pub mod walkers;
 
+use std::path::Path;
+
 pub use crate::dml::*;
 pub use configuration::*;
 
@@ -178,6 +180,32 @@ pub fn parse_configuration_with_url_overrides(
 
     warnings.append(&mut validated_generators.warnings);
     warnings.append(&mut validated_sources.warnings);
+
+    Ok(ValidatedConfiguration {
+        subject: Configuration {
+            datasources: validated_sources.subject,
+            generators: validated_generators.subject,
+        },
+        warnings,
+    })
+}
+
+pub fn parse_configuration_with_config_dir(
+    schema: &str,
+    datasource_url_overrides: Vec<(String, String)>,
+    config_dir: &Path,
+) -> Result<ValidatedConfiguration, diagnostics::Diagnostics> {
+    let mut warnings = Vec::new();
+    let ast = ast::parse_schema(schema)?;
+    let mut validated_sources = load_sources(&ast, false, datasource_url_overrides)?;
+    let mut validated_generators = GeneratorLoader::load_generators_from_ast(&ast)?;
+
+    warnings.append(&mut validated_generators.warnings);
+    warnings.append(&mut validated_sources.warnings);
+
+    for source in validated_sources.subject.iter_mut() {
+        source.set_config_dir(config_dir);
+    }
 
     Ok(ValidatedConfiguration {
         subject: Configuration {

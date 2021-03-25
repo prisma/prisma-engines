@@ -1,6 +1,7 @@
 use super::*;
 use std::fmt::{self, Display};
 
+#[tracing::instrument(name = "debug_query_graph", skip(graph))]
 pub fn format(graph: &QueryGraph) -> String {
     format!(
         "---- Query Graph ----\nResult Nodes: {}\nMarked Nodes: {}\nRoot Nodes: {}\n\n{}\n----------------------",

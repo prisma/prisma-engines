@@ -63,7 +63,7 @@ async fn procedures_can_be_described() {
     let procedure = result.get_procedure("foo").unwrap();
 
     assert_eq!("foo", &procedure.name);
-    assert_eq!(sql, procedure.definition);
+    assert_eq!(Some(sql), procedure.definition);
 }
 
 #[tokio::test]

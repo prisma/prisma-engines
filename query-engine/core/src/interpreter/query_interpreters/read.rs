@@ -32,21 +32,25 @@ fn read_one<'conn, 'tx>(
         let model = query.model;
         let model_id = model.primary_identifier();
         let filter = query.filter.expect("Expected filter to be set for ReadOne query.");
-        let scalars = tx.get_single_record(&model, &filter, &query.selected_fields).await?;
+        let scalars = tx
+            .get_single_record(&model, &filter, &query.selected_fields, &query.aggregation_selections)
+            .await?;
 
         match scalars {
             Some(record) => {
-                let records: ManyRecords = record.into();
-                let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&records)).await?;
+                let scalars: ManyRecords = record.into();
+                let (scalars, aggregation_rows) =
+                    extract_aggregation_rows_from_scalars(scalars.clone(), query.aggregation_selections);
+                let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&scalars)).await?;
 
                 Ok(RecordSelection {
                     name: query.name,
                     fields: query.selection_order,
-                    scalars: records,
+                    scalars,
                     nested,
                     model_id,
                     query_arguments: QueryArguments::new(model),
-                    aggregation_rows: None,
+                    aggregation_rows,
                 }
                 .into())
             }
@@ -77,7 +81,7 @@ fn read_many<'a, 'b>(
     mut query: ManyRecordsQuery,
 ) -> BoxFuture<'a, InterpretationResult<QueryResult>> {
     let fut = async move {
-        let (scalars, aggregation_results) = if query.args.requires_inmemory_processing() {
+        let (scalars, aggregation_rows) = if query.args.requires_inmemory_processing() {
             let processor = InMemoryRecordProcessor::new_from_query_args(&mut query.args);
             let scalars = tx
                 .get_many_records(
@@ -87,10 +91,10 @@ fn read_many<'a, 'b>(
                     &query.aggregation_selections,
                 )
                 .await?;
-            let (scalars, aggregation_results) =
-                extract_aggr_results_from_scalars(scalars.clone(), query.aggregation_selections);
+            let (scalars, aggregation_rows) =
+                extract_aggregation_rows_from_scalars(scalars.clone(), query.aggregation_selections);
 
-            (processor.apply(scalars), aggregation_results)
+            (processor.apply(scalars), aggregation_rows)
         } else {
             let scalars = tx
                 .get_many_records(
@@ -100,10 +104,10 @@ fn read_many<'a, 'b>(
                     &query.aggregation_selections,
                 )
                 .await?;
-            let (scalars, aggregation_results) =
-                extract_aggr_results_from_scalars(scalars.clone(), query.aggregation_selections);
+            let (scalars, aggregation_rows) =
+                extract_aggregation_rows_from_scalars(scalars.clone(), query.aggregation_selections);
 
-            (scalars, aggregation_results)
+            (scalars, aggregation_rows)
         };
 
         let model_id = query.model.primary_identifier();
@@ -116,7 +120,7 @@ fn read_many<'a, 'b>(
             model_id,
             scalars,
             nested,
-            aggregation_rows: aggregation_results,
+            aggregation_rows,
         }
         .into())
     };
@@ -219,7 +223,7 @@ fn process_nested<'a, 'b>(
 /// This means the SQL result we get back from the database contains additional aggregation data that needs to be remapped according to the shema
 /// This function takes care of removing the aggregation data from the database result and collects it separately
 /// so that it can be serialized separately later according to the schema
-fn extract_aggr_results_from_scalars(
+fn extract_aggregation_rows_from_scalars(
     mut scalars: ManyRecords,
     aggr_selections: Vec<RelAggregationSelection>,
 ) -> (ManyRecords, Option<Vec<RelAggregationRow>>) {

@@ -6,6 +6,7 @@ use connector::{Filter, RelationCompare};
 use prisma_models::RelationFieldRef;
 use std::convert::TryInto;
 
+#[tracing::instrument(name = "parse_relation_field", skip(filter_key, field, input))]
 pub fn parse(filter_key: &str, field: &RelationFieldRef, input: ParsedInputValue) -> QueryGraphBuilderResult<Filter> {
     let value: Option<ParsedInputMap> = input.try_into()?;
 

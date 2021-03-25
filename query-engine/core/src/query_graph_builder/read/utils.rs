@@ -18,7 +18,11 @@ pub fn collect_selection_order(from: &[FieldPair]) -> Vec<String> {
 /// Creates SelectedFields from a query selection.
 /// Automatically adds model IDs to the selected fields as well.
 /// Unwraps are safe due to query validation.
-pub fn collect_selected_fields(from: &[FieldPair], model: &ModelRef) -> ModelProjection {
+pub fn collect_selected_fields(
+    from: &[FieldPair],
+    distinct: Option<ModelProjection>,
+    model: &ModelRef,
+) -> ModelProjection {
     let selected_fields = from
         .iter()
         .filter_map(|pair| {
@@ -32,8 +36,14 @@ pub fn collect_selected_fields(from: &[FieldPair], model: &ModelRef) -> ModelPro
 
     let selected_projection = ModelProjection::new(selected_fields);
     let model_id = model.primary_identifier();
+    let selected_fields = model_id.merge(selected_projection);
 
-    model_id.merge(selected_projection)
+    // Distinct fields are always selected because we are processing them in-memory
+    if let Some(distinct) = distinct {
+        selected_fields.merge(distinct)
+    } else {
+        selected_fields
+    }
 }
 
 pub fn collect_nested_queries(from: Vec<FieldPair>, model: &ModelRef) -> QueryGraphBuilderResult<Vec<ReadQuery>> {
@@ -94,8 +104,8 @@ pub fn merge_cursor_fields(selected_fields: ModelProjection, cursor: &Option<Rec
 }
 
 pub fn collect_relation_aggr_selections(from: &[FieldPair], model: &ModelRef) -> Vec<RelAggregationSelection> {
-    if let Some(pair) = from.get(0) {
-        match pair.parsed_field.name.as_str() {
+    from.iter()
+        .flat_map(|pair| match pair.parsed_field.name.as_str() {
             fields::UNDERSCORE_COUNT => {
                 let nested_fields = pair.parsed_field.nested_fields.as_ref().unwrap();
 
@@ -110,11 +120,9 @@ pub fn collect_relation_aggr_selections(from: &[FieldPair], model: &ModelRef) ->
 
                         RelAggregationSelection::Count(rf)
                     })
-                    .collect()
+                    .collect::<Vec<_>>()
             }
-            _ => panic!("Unknown field name for a relation aggregation"),
-        }
-    } else {
-        vec![]
-    }
+            field_name => panic!("Unknown field name \"{}\" for a relation aggregation", field_name),
+        })
+        .collect::<Vec<_>>()
 }

@@ -28,7 +28,7 @@ impl MssqlFlavour {
     /// Get the url as a JDBC string, extract the database name, and re-encode the string.
     fn master_url(input: &str) -> ConnectorResult<(String, String)> {
         let mut conn = JdbcString::from_str(&format!("jdbc:{}", input))
-            .map_err(|e| ConnectorError::generic(anyhow::Error::new(e)))?;
+            .map_err(|e| ConnectorError::from_source(e, "JDBC string parse error"))?;
         let params = conn.properties_mut();
 
         let db_name = params.remove("database").unwrap_or_else(|| String::from("master"));
@@ -56,7 +56,7 @@ impl MssqlFlavour {
             let main_conninfo = main_connection.connection_info();
 
             if shadow_conninfo.host() == main_conninfo.host() && shadow_conninfo.dbname() == main_conninfo.dbname() {
-                return Err(ConnectorError::generic(anyhow::anyhow!("The shadow database you configured appears to be the same as as the main database. Please specify another shadow database.")));
+                return Err(ConnectorError::from_msg("The shadow database you configured appears to be the same as as the main database. Please specify another shadow database.".into()));
             }
 
             if self.reset(&conn).await.is_err() {

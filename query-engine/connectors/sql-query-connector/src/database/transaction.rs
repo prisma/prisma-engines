@@ -37,11 +37,13 @@ impl<'tx> SqlConnectorTransaction<'tx> {
 
 #[async_trait]
 impl<'tx> Transaction for SqlConnectorTransaction<'tx> {
+    #[tracing::instrument(skip(self))]
     async fn commit(&self) -> connector::Result<()> {
         self.catch(async move { Ok(self.inner.commit().await.map_err(SqlError::from)?) })
             .await
     }
 
+    #[tracing::instrument(skip(self))]
     async fn rollback(&self) -> connector::Result<()> {
         self.catch(async move { Ok(self.inner.rollback().await.map_err(SqlError::from)?) })
             .await
@@ -55,9 +57,12 @@ impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
         model: &ModelRef,
         filter: &Filter,
         selected_fields: &ModelProjection,
+        aggr_selections: &[RelAggregationSelection],
     ) -> connector::Result<Option<SingleRecord>> {
-        self.catch(async move { read::get_single_record(&self.inner, model, filter, selected_fields).await })
-            .await
+        self.catch(async move {
+            read::get_single_record(&self.inner, model, filter, selected_fields, aggr_selections).await
+        })
+        .await
     }
 
     async fn get_many_records(

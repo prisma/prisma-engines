@@ -37,11 +37,8 @@ impl Cli {
                 std::process::exit(exit_code)
             }
             Err(panic) => {
-                serde_json::to_writer(
-                    std::io::stdout(),
-                    &user_facing_errors::Error::from_panic_payload(panic.as_ref()),
-                )
-                .expect("failed to write to stdout");
+                serde_json::to_writer(std::io::stdout(), &user_facing_errors::Error::from_panic_payload(panic))
+                    .expect("failed to write to stdout");
                 println!();
                 std::process::exit(255);
             }

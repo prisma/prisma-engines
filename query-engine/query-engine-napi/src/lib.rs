@@ -61,19 +61,22 @@ fn disconnect(ctx: CallContext) -> napi::Result<JsObject> {
         })
 }
 
-#[js_function(1)]
+#[js_function(2)]
 fn query(ctx: CallContext) -> napi::Result<JsObject> {
     let this: JsObject = ctx.this_unchecked();
     let engine: &QueryEngine = ctx.env.unwrap(&this)?;
     let engine: QueryEngine = engine.clone();
 
     let query = ctx.get::<JsObject>(0)?;
-    let body = ctx.env.from_js_value(query)?;
+    let trace = ctx.get::<JsObject>(1)?;
 
-    ctx.env
-        .execute_tokio_future(async move { Ok(engine.query(body).await?) }, |&mut env, response| {
-            env.create_string(&serde_json::to_string(&response).unwrap())
-        })
+    let body = ctx.env.from_js_value(query)?;
+    let trace = ctx.env.from_js_value(trace)?;
+
+    ctx.env.execute_tokio_future(
+        async move { Ok(engine.query(body, trace).await?) },
+        |&mut env, response| env.create_string(&serde_json::to_string(&response).unwrap()),
+    )
 }
 
 #[js_function(0)]

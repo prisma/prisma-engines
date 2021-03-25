@@ -2,6 +2,7 @@ use super::*;
 use crate::{query_document::ParsedField, AggregateRecordsQuery, ReadQuery};
 use prisma_models::ModelRef;
 
+#[tracing::instrument(skip(field, model))]
 pub fn aggregate(field: ParsedField, model: ModelRef) -> QueryGraphBuilderResult<ReadQuery> {
     let name = field.name;
     let alias = field.alias;

@@ -108,7 +108,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
     }
 
     #[tracing::instrument]
-    async fn version(&self, schema: &str) -> DescriberResult<Option<String>> {
+    async fn version(&self, _schema: &str) -> DescriberResult<Option<String>> {
         Ok(self.conn.version().await?)
     }
 }
@@ -148,7 +148,7 @@ impl SqlSchemaDescriber {
         for row in rows.into_iter() {
             procedures.push(Procedure {
                 name: row.get_expect_string("name"),
-                definition: row.get_expect_string("definition"),
+                definition: row.get_string("definition"),
             });
         }
 

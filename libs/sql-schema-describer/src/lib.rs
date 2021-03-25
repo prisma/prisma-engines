@@ -236,7 +236,7 @@ pub struct Procedure {
     /// Procedure name.
     pub name: String,
     /// The definition of the procedure.
-    pub definition: String,
+    pub definition: Option<String>,
 }
 
 /// The primary key of a table.

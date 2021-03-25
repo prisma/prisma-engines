@@ -87,7 +87,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
     }
 
     #[tracing::instrument(skip(self))]
-    async fn version(&self, schema: &str) -> crate::DescriberResult<Option<String>> {
+    async fn version(&self, _schema: &str) -> crate::DescriberResult<Option<String>> {
         Ok(self.conn.version().await?)
     }
 }
@@ -151,7 +151,7 @@ impl SqlSchemaDescriber {
         for row in rows.into_iter() {
             procedures.push(Procedure {
                 name: row.get_expect_string("name"),
-                definition: row.get_expect_string("definition"),
+                definition: row.get_string("definition"),
             });
         }
 
@@ -313,43 +313,66 @@ impl SqlSchemaDescriber {
                     None => None,
                     Some(x) if x == "NULL" => None,
                     Some(default_string) => {
+                        let default_generated = matches!(extra.as_str(), "default_generated");
+                        let maria_db = matches!(flavour, Flavour::MariaDb);
+                        let default_expression = default_generated || maria_db;
+
                         Some(match &tpe.family {
                             ColumnTypeFamily::Int => match Self::parse_int(&default_string) {
                                 Some(int_value) => DefaultValue::value(int_value),
-                                None => DefaultValue::db_generated(default_string),
+                                None => Self::db_generated(&default_string, default_expression),
                             },
                             ColumnTypeFamily::BigInt => match Self::parse_big_int(&default_string) {
                                 Some(int_value) => DefaultValue::value(int_value),
-                                None => DefaultValue::db_generated(default_string),
+                                None => Self::db_generated(&default_string, default_expression),
                             },
                             ColumnTypeFamily::Float => match Self::parse_float(&default_string) {
                                 Some(float_value) => DefaultValue::value(float_value),
-                                None => DefaultValue::db_generated(default_string),
+                                None => Self::db_generated(&default_string, default_expression),
                             },
                             ColumnTypeFamily::Decimal => match Self::parse_float(&default_string) {
                                 Some(float_value) => DefaultValue::value(float_value),
-                                None => DefaultValue::db_generated(default_string),
+                                None => Self::db_generated(&default_string, default_expression),
                             },
                             ColumnTypeFamily::Boolean => match Self::parse_int(&default_string) {
                                 Some(PrismaValue::Int(1)) => DefaultValue::value(true),
                                 Some(PrismaValue::Int(0)) => DefaultValue::value(false),
-                                _ => DefaultValue::db_generated(default_string),
+                                _ => Self::db_generated(&default_string, default_expression),
                             },
-                            ColumnTypeFamily::String => DefaultValue::value(PrismaValue::String(
-                                Self::unescape_and_unquote_default_string(default_string, flavour),
-                            )),
+                            ColumnTypeFamily::String => {
+                                // See https://dev.mysql.com/doc/refman/8.0/en/information-schema-columns-table.html
+                                // and https://mariadb.com/kb/en/information-schema-columns-table/
+                                if default_generated
+                                    || (maria_db && !matches!(default_string.chars().next(), Some('\'')))
+                                {
+                                    Self::dbgenerated_expression(&default_string)
+                                } else {
+                                    DefaultValue::value(PrismaValue::String(Self::unescape_and_unquote_default_string(
+                                        default_string,
+                                        flavour,
+                                    )))
+                                }
+                            }
                             //todo check other now() definitions
                             ColumnTypeFamily::DateTime => match Self::default_is_current_timestamp(&default_string) {
                                 true => DefaultValue::now(),
-                                _ => DefaultValue::db_generated(default_string),
+                                _ => Self::db_generated(&default_string, default_expression),
                             },
-                            ColumnTypeFamily::Binary => DefaultValue::db_generated(default_string),
-                            ColumnTypeFamily::Json => DefaultValue::db_generated(default_string),
-                            ColumnTypeFamily::Uuid => DefaultValue::db_generated(default_string),
-                            ColumnTypeFamily::Enum(_) => DefaultValue::value(PrismaValue::Enum(Self::unquote_string(
-                                &default_string.replace("_utf8mb4", "").replace("\\\'", ""),
-                            ))),
-                            ColumnTypeFamily::Unsupported(_) => DefaultValue::db_generated(default_string),
+                            ColumnTypeFamily::Binary => Self::db_generated(&default_string, default_expression),
+                            ColumnTypeFamily::Json => Self::db_generated(&default_string, default_expression),
+                            ColumnTypeFamily::Uuid => Self::db_generated(&default_string, default_expression),
+                            ColumnTypeFamily::Enum(_) => {
+                                if default_generated
+                                    || (maria_db && !matches!(default_string.chars().next(), Some('\'')))
+                                {
+                                    Self::dbgenerated_expression(&default_string)
+                                } else {
+                                    DefaultValue::value(PrismaValue::Enum(Self::unquote_string(
+                                        &default_string.replace("_utf8mb4", "").replace("\\\'", ""),
+                                    )))
+                                }
+                            }
+                            ColumnTypeFamily::Unsupported(_) => Self::db_generated(&default_string, default_generated),
                         })
                     }
                 },
@@ -366,6 +389,26 @@ impl SqlSchemaDescriber {
         }
 
         Ok(map)
+    }
+
+    fn db_generated(default_string: &str, default_generated: bool) -> DefaultValue {
+        if default_generated {
+            Self::dbgenerated_expression(default_string)
+        } else {
+            DefaultValue::db_generated(default_string)
+        }
+    }
+
+    fn dbgenerated_expression(default_string: &str) -> DefaultValue {
+        if matches!(default_string.chars().next(), Some('(')) {
+            DefaultValue::db_generated(default_string)
+        } else {
+            let mut introspected_default = String::with_capacity(default_string.len());
+            introspected_default.push('(');
+            introspected_default.push_str(&default_string);
+            introspected_default.push(')');
+            DefaultValue::db_generated(introspected_default)
+        }
     }
 
     async fn get_all_indexes(
@@ -760,7 +803,7 @@ impl SqlSchemaDescriber {
     /// Tests whether an introspected default value should be categorized as current_timestamp.
     fn default_is_current_timestamp(default_str: &str) -> bool {
         static MYSQL_CURRENT_TIMESTAMP_RE: Lazy<Regex> =
-            Lazy::new(|| Regex::new(r#"(?i)current_timestamp(\([0-9]*\))?"#).unwrap());
+            Lazy::new(|| Regex::new(r#"(?i)^current_timestamp(\([0-9]*\))?$"#).unwrap());
 
         MYSQL_CURRENT_TIMESTAMP_RE.is_match(default_str)
     }

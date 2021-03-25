@@ -101,6 +101,7 @@ pub struct RecordQuery {
     pub selected_fields: ModelProjection,
     pub nested: Vec<ReadQuery>,
     pub selection_order: Vec<String>,
+    pub aggregation_selections: Vec<RelAggregationSelection>,
 }
 
 #[derive(Debug, Clone)]

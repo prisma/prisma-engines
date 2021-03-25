@@ -1,6 +1,7 @@
 use super::Expression;
 use crate::Query;
 
+#[tracing::instrument(skip(expr, indent))]
 pub fn format_expression(expr: &Expression, indent: usize) -> String {
     match expr {
         Expression::Sequence { seq } => seq

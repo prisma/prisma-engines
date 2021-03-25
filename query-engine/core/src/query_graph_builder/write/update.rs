@@ -10,6 +10,7 @@ use prisma_models::ModelRef;
 use std::{convert::TryInto, sync::Arc};
 
 /// Creates an update record query and adds it to the query graph, together with it's nested queries and companion read query.
+#[tracing::instrument(skip(graph, model, field))]
 pub fn update_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedField) -> QueryGraphBuilderResult<()> {
     // "where"
     let where_arg: ParsedInputMap = field.arguments.lookup(args::WHERE).unwrap().value.try_into()?;
@@ -51,6 +52,7 @@ pub fn update_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
 }
 
 /// Creates an update many record query and adds it to the query graph.
+#[tracing::instrument(skip(graph, model, field))]
 pub fn update_many_records(
     graph: &mut QueryGraph,
     model: ModelRef,
@@ -82,6 +84,7 @@ pub fn update_many_records(
 }
 
 /// Creates an update record query node and adds it to the query graph.
+#[tracing::instrument(skip(graph, filter, model, data_map))]
 pub fn update_record_node<T>(
     graph: &mut QueryGraph,
     filter: T,

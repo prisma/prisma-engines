@@ -13,6 +13,7 @@ use std::{convert::TryInto, sync::Arc};
 /// Handles nested create one cases.
 /// The resulting graph can take multiple forms, based on the relation type to the parent model.
 /// Information on the graph shapes can be found on the individual handlers.
+#[tracing::instrument(skip(graph, parent_node, parent_relation_field, value, child_model))]
 pub fn nested_create(
     graph: &mut QueryGraph,
     parent_node: NodeRef,
@@ -59,6 +60,8 @@ pub fn nested_create(
 /// └─▶│  Connect   │   │  Connect   │◀─┘
 ///    └────────────┘   └────────────┘
 /// ```
+#[tracing::instrument]
+#[tracing::instrument(skip(graph, parent_node, parent_relation_field, create_nodes))]
 fn handle_many_to_many(
     graph: &mut QueryGraph,
     parent_node: NodeRef,
@@ -126,6 +129,7 @@ fn handle_many_to_many(
 /// │Create Child│  │Create Child│      Result   │
 /// └────────────┘  └────────────┘  └ ─ ─ ─ ─ ─ ─
 /// ```
+#[tracing::instrument(skip(graph, parent_node, parent_relation_field, create_nodes))]
 fn handle_one_to_many(
     graph: &mut QueryGraph,
     parent_node: NodeRef,
@@ -282,6 +286,7 @@ fn handle_one_to_many(
 /// ... because we just updated the relation.
 ///
 /// For these reasons, we need to have an extra update at the end if it's inlined on the parent and a non-create.
+#[tracing::instrument(skip(graph, parent_node, parent_relation_field, create_nodes))]
 fn handle_one_to_one(
     graph: &mut QueryGraph,
     parent_node: NodeRef,
@@ -414,6 +419,7 @@ fn handle_one_to_one(
     Ok(())
 }
 
+#[tracing::instrument(skip(graph, parent_node, parent_relation_field, value, child_model))]
 pub fn nested_create_many(
     graph: &mut QueryGraph,
     parent_node: NodeRef,

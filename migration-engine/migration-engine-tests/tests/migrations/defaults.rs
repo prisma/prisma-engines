@@ -37,3 +37,26 @@ async fn datetime_defaults_work(api: TestApi) -> TestResult {
 
     Ok(())
 }
+
+#[test_connectors(tags("mariadb", "mysql_8"))]
+async fn function_expressions_as_dbgenerated_work(api: TestApi) -> TestResult {
+    api.initialize().await?;
+
+    let engine = api.new_engine().await?;
+
+    let dm = r#"
+        model Cat {
+            id String @id @default(dbgenerated("(LEFT(UUID(), 8))"))
+        }
+    "#;
+
+    engine.schema_push(dm).send().await?.assert_green()?;
+
+    engine.assert_schema().await?.assert_table("Cat", |table| {
+        table.assert_column("id", |col| {
+            col.assert_default(Some(DefaultValue::db_generated("(left(uuid(),8))")))
+        })
+    })?;
+
+    Ok(())
+}

@@ -20,6 +20,7 @@ use std::{convert::TryInto, sync::Arc};
 /// - If the relation is inlined but not in the parent, we can directly generate a delete on the record with the parent ID.
 ///
 /// We always need to make sure that the records are connected before deletion.
+#[tracing::instrument(skip(graph, parent_node, parent_relation_field, value, child_model))]
 pub fn nested_delete(
     graph: &mut QueryGraph,
     parent_node: &NodeRef,
@@ -123,6 +124,7 @@ pub fn nested_delete(
     Ok(())
 }
 
+#[tracing::instrument(skip(graph, parent, parent_relation_field, value, child_model))]
 pub fn nested_delete_many(
     graph: &mut QueryGraph,
     parent: &NodeRef,

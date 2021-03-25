@@ -15,6 +15,7 @@ pub struct IrSerializer {
 }
 
 impl IrSerializer {
+    #[tracing::instrument(skip(self, result))]
     pub fn serialize(&self, result: ExpressionResult) -> crate::Result<ResponseData> {
         match result {
             ExpressionResult::Query(QueryResult::Json(json)) => {

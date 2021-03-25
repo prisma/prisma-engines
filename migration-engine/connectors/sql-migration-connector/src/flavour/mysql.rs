@@ -58,7 +58,7 @@ impl MysqlFlavour {
             let main_conninfo = main_connection.connection_info();
 
             if shadow_conninfo.host() == main_conninfo.host() && shadow_conninfo.dbname() == main_conninfo.dbname() {
-                return Err(ConnectorError::generic(anyhow::anyhow!("The shadow database you configured appears to be the same as as the main database. Please specify another shadow database.")));
+                return Err(ConnectorError::from_msg("The shadow database you configured appears to be the same as as the main database. Please specify another shadow database.".into()));
             }
 
             tracing::info!(

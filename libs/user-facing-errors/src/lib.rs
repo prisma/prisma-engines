@@ -95,7 +95,13 @@ impl Error {
     /// Construct a new UnknownError from a `PanicInfo` in a panic hook. `UnknownError`s created
     /// with this constructor will have a proper, useful backtrace.
     pub fn new_in_panic_hook(panic_info: &std::panic::PanicInfo<'_>) -> Self {
-        let message = Self::extract_panic_message(panic_info.payload()).unwrap_or_else(|| "<unknown panic>".to_owned());
+        let message = panic_info
+            .payload()
+            .downcast_ref::<&str>()
+            .map(|s| -> String { (*s).to_owned() })
+            .or_else(|| panic_info.payload().downcast_ref::<String>().map(|s| s.to_owned()))
+            .unwrap_or_else(|| "<unknown panic>".to_owned());
+
         let backtrace = Some(format!("{:?}", backtrace::Backtrace::new()));
         let location = panic_info
             .location()
@@ -119,7 +125,7 @@ impl Error {
         }
     }
 
-    pub fn from_panic_payload(panic_payload: &(dyn std::any::Any + Send + 'static)) -> Self {
+    pub fn from_panic_payload(panic_payload: Box<dyn std::any::Any + Send + 'static>) -> Self {
         let message = Self::extract_panic_message(panic_payload).unwrap_or_else(|| "<unknown panic>".to_owned());
 
         Error {
@@ -131,7 +137,7 @@ impl Error {
         }
     }
 
-    pub fn extract_panic_message(panic_payload: &(dyn std::any::Any + Send + 'static)) -> Option<String> {
+    pub fn extract_panic_message(panic_payload: Box<dyn std::any::Any + Send + 'static>) -> Option<String> {
         panic_payload
             .downcast_ref::<&str>()
             .map(|s| -> String { (*s).to_owned() })

@@ -45,11 +45,18 @@ fn disallow_ignore_missing_from_model_with_optional_id() {
 
     let errors = parse_error(dml);
 
-    errors.assert_is(DatamodelError::new_attribute_validation_error(
-        "Fields that are marked as id must be required.",
-        "id",
-        Span::new(54, 56),
-    ));
+    errors.assert_are(&[
+        DatamodelError::new_attribute_validation_error(
+            "Fields that are marked as id must be required.",
+            "id",
+            Span::new(54, 56),
+        ),
+        DatamodelError::new_model_validation_error(
+            "Each model must have at least one unique criteria that has only required fields. Either mark a single field with `@id`, `@unique` or add a multi field criterion with `@@id([])` or `@@unique([])` to the model. The following unique criterias were not considered as they contain fields that are not required:\n- text",
+            "ModelOptionalId",
+            Span::new(8, 62),
+        ),
+    ]);
 }
 
 #[test]

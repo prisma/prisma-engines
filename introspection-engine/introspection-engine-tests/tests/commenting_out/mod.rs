@@ -411,3 +411,48 @@ async fn ignore_on_back_relation_field_if_pointing_to_ignored_model(api: &TestAp
 
     Ok(())
 }
+
+#[test_each_connector(tags("sqlite"))]
+async fn ignore_on_model_with_only_optional_id(api: &TestApi) -> crate::TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("ValidId", |t| {
+                t.inject_custom("id Text Primary Key Not Null");
+            });
+
+            migration.create_table("OnlyOptionalId", |t| {
+                t.inject_custom("id Text Primary Key");
+            });
+
+            migration.create_table("OptionalIdAndOptionalUnique", |t| {
+                t.inject_custom("id Text Primary Key");
+                t.add_column("unique", types::integer().unique(true).nullable(true));
+            });
+        })
+        .await?;
+
+    let dm = indoc! {r#"
+            /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+            model OnlyOptionalId {
+              id     String? @id
+              
+              @@ignore
+            }
+            
+            /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+            model OptionalIdAndOptionalUnique {
+              id     String? @id
+              unique Int? @unique
+                
+              @@ignore
+            }
+            
+            model ValidId {
+              id     String @id
+            }      
+        "#};
+
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
+
+    Ok(())
+}

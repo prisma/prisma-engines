@@ -42,8 +42,14 @@ pub enum PrismaValue {
     Bytes(Vec<u8>),
 }
 
+/// Stringify a date to the following format
+/// 1999-05-01T00:00:00.000Z
 pub fn stringify_date(date: &DateTime<FixedOffset>) -> String {
-    date.to_rfc3339()
+    // Warning: Be careful if you plan on changing the code below
+    // The findUnique batch optimization expects date inputs to have exactly the same format as date outputs
+    // This works today because clients always send date inputs in the same format as the serialized format below
+    // Updating this without transforming date inputs to the same format WILL break the findUnique batch optimization
+    date.to_rfc3339_opts(SecondsFormat::Millis, true)
 }
 
 pub fn encode_bytes(bytes: &[u8]) -> String {
