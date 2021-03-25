@@ -1,4 +1,5 @@
 [workspace]
+resolver = "2"
 members = [
   "introspection-engine/connectors/introspection-connector",
   "introspection-engine/connectors/sql-introspection-connector",
