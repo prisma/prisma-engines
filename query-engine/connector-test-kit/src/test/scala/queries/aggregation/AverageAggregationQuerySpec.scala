@@ -1,6 +1,7 @@
 package queries.aggregation
 
 import org.scalatest.{FlatSpec, Matchers}
+import play.api.libs.json.JsNull
 import util._
 
 class AverageAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
@@ -36,7 +37,7 @@ class AverageAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBas
     )
   }
 
-  "Averaging with no records in the database" should "return zero" in {
+  "Averaging with no records in the database" should "return null" in {
     val result = server.query(
       s"""{
          |  aggregateItem {
@@ -51,11 +52,11 @@ class AverageAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBas
       project
     )
 
-    result.pathAsFloat("data.aggregateItem.avg.float") should be(0.0)
-    result.pathAsString("data.aggregateItem.avg.dec") should be("0")
+    result.pathAsJsValue("data.aggregateItem.avg.float") should be(JsNull)
+    result.pathAsJsValue("data.aggregateItem.avg.dec") should be(JsNull)
 
-    result.pathAsInt("data.aggregateItem.avg.int") should be(0)
-    result.pathAsDouble("data.aggregateItem.avg.bInt") should be(0)
+    result.pathAsJsValue("data.aggregateItem.avg.int") should be(JsNull)
+    result.pathAsJsValue("data.aggregateItem.avg.bInt") should be(JsNull)
   }
 
   "Averaging with some records in the database" should "return the correct averages" in {

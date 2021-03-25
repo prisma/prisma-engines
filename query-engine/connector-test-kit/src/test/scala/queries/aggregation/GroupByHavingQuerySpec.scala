@@ -246,7 +246,7 @@ class GroupByHavingQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
          |}""".stripMargin,
       project
     )
-    result.toString should be("""{"data":{"groupByModel":[{"s":"group2","avg":{"dec":"5"}},{"s":"group3","avg":{"dec":"0"}}]}}""")
+    result.toString should be("""{"data":{"groupByModel":[{"s":"group2","avg":{"dec":"5"}},{"s":"group3","avg":{"dec":null}}]}}""")
 
     // Group 1 and 2 returned
     result = server.query(

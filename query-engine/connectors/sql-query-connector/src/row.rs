@@ -53,30 +53,22 @@ impl SqlRow {
 
                 AggregationSelection::Average(fields) => fields
                     .iter()
-                    .map(|field| {
-                        AggregationResult::Average(field.clone(), coerce_null_to_zero_value(values.pop().unwrap()))
-                    })
+                    .map(|field| AggregationResult::Average(field.clone(), values.pop().unwrap()))
                     .collect(),
 
                 AggregationSelection::Sum(fields) => fields
                     .iter()
-                    .map(|field| {
-                        AggregationResult::Sum(field.clone(), coerce_null_to_zero_value(values.pop().unwrap()))
-                    })
+                    .map(|field| AggregationResult::Sum(field.clone(), values.pop().unwrap()))
                     .collect(),
 
                 AggregationSelection::Min(fields) => fields
                     .iter()
-                    .map(|field| {
-                        AggregationResult::Min(field.clone(), coerce_null_to_zero_value(values.pop().unwrap()))
-                    })
+                    .map(|field| AggregationResult::Min(field.clone(), values.pop().unwrap()))
                     .collect(),
 
                 AggregationSelection::Max(fields) => fields
                     .iter()
-                    .map(|field| {
-                        AggregationResult::Max(field.clone(), coerce_null_to_zero_value(values.pop().unwrap()))
-                    })
+                    .map(|field| AggregationResult::Max(field.clone(), values.pop().unwrap()))
                     .collect(),
             })
             .collect()
