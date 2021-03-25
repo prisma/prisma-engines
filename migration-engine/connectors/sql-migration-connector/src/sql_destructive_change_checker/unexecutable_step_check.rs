@@ -92,7 +92,7 @@ impl Check for UnexecutableStepCheck {
                         ))
                     },
                     (_, _) => Some(format!(
-                        "Made the column `{column}` on table `{table}` required. The step will fail if there are existing NULL values in that column.",
+                        "Made the column `{column}` on table `{table}` required. This step will fail if there are existing NULL values in that column.",
                         column = column,
                         table = table
                     )),

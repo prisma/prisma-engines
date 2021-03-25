@@ -104,7 +104,7 @@ impl Check for SqlMigrationWarningCheck {
                 Some(0) => None,
                 _ => Some(format!("The primary key for the `{table}` table will be changed. If it partially fails, the table could be left without primary key constraint.", table = table)),
             },
-            SqlMigrationWarningCheck::UniqueConstraintAddition { table, columns } =>  Some(format!("A unique constraint covering the columns `{columns}` on the table `{table}` will be removed. If there are existing duplicate values, this will fail.", table = table, columns = format!("[{}]",columns.join(",")))),
+            SqlMigrationWarningCheck::UniqueConstraintAddition { table, columns } =>  Some(format!("A unique constraint covering the columns `{columns}` on the table `{table}` will be added. If there are existing duplicate values, this will fail.", table = table, columns = format!("[{}]",columns.join(",")))),
             SqlMigrationWarningCheck::EnumValueRemoval { enm, values } =>  Some(format!("The values {values} on the enum `{enm}` will be removed. If these variants are still used in the database, this will fail.", enm = enm, values = format!("[{}]",values.join(",")))),
 
         }
