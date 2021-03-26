@@ -255,7 +255,7 @@ impl SqlSchemaDescriber {
             let default = Self::get_default_value(&col, &tpe, &data_type, sequences);
 
             let auto_increment =
-                is_identity || matches!(default.as_ref().map(|d| d.kind()), Some(DefaultKind::SEQUENCE(_)));
+                is_identity || matches!(default.as_ref().map(|d| d.kind()), Some(DefaultKind::Sequence(_)));
 
             let col = Column {
                 name,

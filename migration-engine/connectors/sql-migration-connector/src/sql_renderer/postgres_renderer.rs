@@ -486,8 +486,8 @@ fn render_alter_column(
                 clauses.push(format!("{} DROP DEFAULT", &alter_column_prefix));
 
                 // We also need to drop the sequence, in case it isn't used by any other column.
-                if let Some(DefaultKind::SEQUENCE(sequence_name)) = columns.previous().default().map(|d| d.kind()) {
-                    let sequence_is_still_used = walk_columns(columns.next().schema()).any(|column| matches!(column.default().map(|d| d.kind()), Some(DefaultKind::SEQUENCE(other_sequence)) if other_sequence == sequence_name) && !column.is_same_column(columns.next()));
+                if let Some(DefaultKind::Sequence(sequence_name)) = columns.previous().default().map(|d| d.kind()) {
+                    let sequence_is_still_used = walk_columns(columns.next().schema()).any(|column| matches!(column.default().map(|d| d.kind()), Some(DefaultKind::Sequence(other_sequence)) if other_sequence == sequence_name) && !column.is_same_column(columns.next()));
 
                     if !sequence_is_still_used {
                         after_statements.push(format!("DROP SEQUENCE {}", Quoted::postgres_ident(sequence_name)));
@@ -603,14 +603,14 @@ enum PostgresAlterColumn {
 
 fn render_default(default: &DefaultValue) -> Cow<'_, str> {
     match default.kind() {
-        DefaultKind::DBGENERATED(val) => val.as_str().into(),
-        DefaultKind::VALUE(PrismaValue::String(val)) | DefaultKind::VALUE(PrismaValue::Enum(val)) => {
+        DefaultKind::DbGenerated(val) => val.as_str().into(),
+        DefaultKind::Value(PrismaValue::String(val)) | DefaultKind::Value(PrismaValue::Enum(val)) => {
             format!("E'{}'", escape_string_literal(&val)).into()
         }
-        DefaultKind::VALUE(PrismaValue::Bytes(b)) => Quoted::postgres_string(format_hex(b)).to_string().into(),
-        DefaultKind::NOW => "CURRENT_TIMESTAMP".into(),
-        DefaultKind::VALUE(PrismaValue::DateTime(val)) => Quoted::postgres_string(val).to_string().into(),
-        DefaultKind::VALUE(val) => val.to_string().into(),
-        DefaultKind::SEQUENCE(_) => Default::default(),
+        DefaultKind::Value(PrismaValue::Bytes(b)) => Quoted::postgres_string(format_hex(b)).to_string().into(),
+        DefaultKind::Now => "CURRENT_TIMESTAMP".into(),
+        DefaultKind::Value(PrismaValue::DateTime(val)) => Quoted::postgres_string(val).to_string().into(),
+        DefaultKind::Value(val) => val.to_string().into(),
+        DefaultKind::Sequence(_) => Default::default(),
     }
 }

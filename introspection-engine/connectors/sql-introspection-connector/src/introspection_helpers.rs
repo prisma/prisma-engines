@@ -250,12 +250,12 @@ pub(crate) fn calculate_default(table: &Table, column: &Column, arity: &FieldAri
         (_, ColumnTypeFamily::BigInt) if is_sequence(column, table) => {
             Some(DMLDef::Expression(VG::new_autoincrement()))
         }
-        (Some(DefaultKind::SEQUENCE(_)), _) => Some(DMLDef::Expression(VG::new_autoincrement())),
-        (Some(DefaultKind::NOW), ColumnTypeFamily::DateTime) => Some(DMLDef::Expression(VG::new_now())),
-        (Some(DefaultKind::DBGENERATED(default_string)), _) => {
+        (Some(DefaultKind::Sequence(_)), _) => Some(DMLDef::Expression(VG::new_autoincrement())),
+        (Some(DefaultKind::Now), ColumnTypeFamily::DateTime) => Some(DMLDef::Expression(VG::new_now())),
+        (Some(DefaultKind::DbGenerated(default_string)), _) => {
             Some(DMLDef::Expression(VG::new_dbgenerated(default_string.clone())))
         }
-        (Some(DefaultKind::VALUE(val)), _) => Some(DMLDef::Single(val.clone())),
+        (Some(DefaultKind::Value(val)), _) => Some(DMLDef::Single(val.clone())),
         _ => None,
     }
 }
