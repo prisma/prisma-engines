@@ -444,15 +444,9 @@ class UpdateMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
     queryNumberOperation(project, 1, "optFloat", "increment", "4.6") should be("""{"optFloat":null}""")
     queryNumberOperation(project, 2, "optFloat", "increment", "4.6") should be("""{"optFloat":10.1}""")
 
-    val floatExpectation = if (connectorConfig.provider.contains("postgres")) {
-      5.500000000000001
-    } else {
-      5.5
-    }
-
     // Decrement
     queryNumberOperation(project, 1, "optFloat", "decrement", "4.6") should be("""{"optFloat":null}""")
-    queryNumberOperation(project, 2, "optFloat", "decrement", "4.6") should be(s"""{"optFloat":$floatExpectation}""")
+    queryNumberOperation(project, 2, "optFloat", "decrement", "4.6") should be(s"""{"optFloat":5.5}""")
 
     // Multiply
     queryNumberOperation(project, 1, "optFloat", "multiply", "2") should be("""{"optFloat":null}""")
@@ -460,17 +454,11 @@ class UpdateMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
 
     // Divide
     queryNumberOperation(project, 1, "optFloat", "divide", "2") should be("""{"optFloat":null}""")
-    queryNumberOperation(project, 2, "optFloat", "divide", "2") should be(s"""{"optFloat":$floatExpectation}""")
-
-    val secondFloatExpectation = if (connectorConfig.provider.contains("postgres")) {
-      5.100000000000001
-    } else {
-      5.1
-    }
+    queryNumberOperation(project, 2, "optFloat", "divide", "2") should be(s"""{"optFloat":5.5}""")
 
     // Set
-    queryNumberOperation(project, 1, "optFloat", "set", "5.1") should be(s"""{"optFloat":$secondFloatExpectation}""")
-    queryNumberOperation(project, 2, "optFloat", "set", "5.1") should be(s"""{"optFloat":$secondFloatExpectation}""")
+    queryNumberOperation(project, 1, "optFloat", "set", "5.1") should be(s"""{"optFloat":5.1}""")
+    queryNumberOperation(project, 2, "optFloat", "set", "5.1") should be(s"""{"optFloat":5.1}""")
 
     // Set null
     queryNumberOperation(project, 1, "optFloat", "set", "null") should be("""{"optFloat":null}""")

@@ -164,13 +164,7 @@ class AverageAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBas
       project
     )
 
-    val floatExpectation = if (connectorConfig.provider.contains("postgres")) {
-      0.7500000000000001
-    } else {
-      0.75
-    }
-
-    result.pathAsDouble("data.aggregateItem.avg.float") should be(floatExpectation)
+    result.pathAsDouble("data.aggregateItem.avg.float") should be(0.75)
     result.pathAsString("data.aggregateItem.avg.dec") should be("0.75")
     result.pathAsDouble("data.aggregateItem.avg.int") should be(1.5)
     result.pathAsDouble("data.aggregateItem.avg.bInt") should be(1.5)
@@ -190,7 +184,7 @@ class AverageAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBas
       project
     )
 
-    result.pathAsDouble("data.aggregateItem.avg.float") should be(floatExpectation)
+    result.pathAsDouble("data.aggregateItem.avg.float") should be(0.75)
     result.pathAsString("data.aggregateItem.avg.dec") should be("0.75")
     result.pathAsDouble("data.aggregateItem.avg.int") should be(1.5)
     result.pathAsDouble("data.aggregateItem.avg.bInt") should be(1.5)
@@ -210,7 +204,7 @@ class AverageAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBas
       project
     )
 
-    result.pathAsDouble("data.aggregateItem.avg.float") should be(floatExpectation)
+    result.pathAsDouble("data.aggregateItem.avg.float") should be(0.75)
     result.pathAsString("data.aggregateItem.avg.dec") should be("0.75")
     result.pathAsDouble("data.aggregateItem.avg.int") should be(1.5)
     result.pathAsDouble("data.aggregateItem.avg.bInt") should be(1.5)
