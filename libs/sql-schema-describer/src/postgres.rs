@@ -404,7 +404,7 @@ impl SqlSchemaDescriber {
                 'c' => ForeignKeyAction::Cascade,
                 'n' => ForeignKeyAction::SetNull,
                 'd' => ForeignKeyAction::SetDefault,
-                _ => panic!(format!("unrecognized foreign key action '{}'", confdeltype)),
+                _ => panic!("unrecognized foreign key action '{}'", confdeltype),
             };
             let on_update_action = match confupdtype {
                 'a' => ForeignKeyAction::NoAction,
@@ -412,7 +412,7 @@ impl SqlSchemaDescriber {
                 'c' => ForeignKeyAction::Cascade,
                 'n' => ForeignKeyAction::SetNull,
                 'd' => ForeignKeyAction::SetDefault,
-                _ => panic!(format!("unrecognized foreign key action '{}'", confdeltype)),
+                _ => panic!("unrecognized foreign key action '{}'", confdeltype),
             };
             match intermediate_fks.get_mut(&id) {
                 Some((_, fk)) => {
@@ -713,7 +713,7 @@ fn get_column_type(row: &ResultRow, enums: &[Enum]) -> ColumnType {
     let is_required = match row.get_expect_string("is_nullable").to_lowercase().as_ref() {
         "no" => true,
         "yes" => false,
-        x => panic!(format!("unrecognized is_nullable variant '{}'", x)),
+        x => panic!("unrecognized is_nullable variant '{}'", x),
     };
 
     let arity = match matches!(data_type.as_str(), "ARRAY") {
