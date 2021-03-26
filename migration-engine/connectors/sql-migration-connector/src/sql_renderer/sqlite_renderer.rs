@@ -140,9 +140,7 @@ impl SqlRenderer for SqliteFlavour {
 
     fn render_redefine_tables(&self, tables: &[RedefineTable], schemas: &Pair<&SqlSchema>) -> Vec<String> {
         // Based on 'Making Other Kinds Of Table Schema Changes' from https://www.sqlite.org/lang_altertable.html
-        let mut result = Vec::new();
-
-        result.push("PRAGMA foreign_keys=OFF".to_string());
+        let mut result = vec!["PRAGMA foreign_keys=OFF".to_string()];
 
         for redefine_table in tables {
             let tables = schemas.tables(&redefine_table.table_index);

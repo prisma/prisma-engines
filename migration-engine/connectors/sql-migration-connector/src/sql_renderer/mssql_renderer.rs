@@ -221,10 +221,8 @@ impl SqlRenderer for MssqlFlavour {
     }
 
     fn render_redefine_tables(&self, tables: &[RedefineTable], schemas: &Pair<&SqlSchema>) -> Vec<String> {
-        let mut result = Vec::new();
-
         // All needs to be inside a transaction.
-        result.push("BEGIN TRANSACTION".to_string());
+        let mut result = vec!["BEGIN TRANSACTION".to_string()];
 
         for redefine_table in tables {
             let tables = schemas.tables(&redefine_table.table_index);

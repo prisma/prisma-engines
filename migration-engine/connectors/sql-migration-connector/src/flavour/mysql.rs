@@ -268,7 +268,7 @@ impl SqlFlavour for MysqlFlavour {
     }
 
     fn scan_migration_script(&self, script: &str) {
-        static QUALIFIED_NAME_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"`[]`.``"#).unwrap());
+        static QUALIFIED_NAME_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"`[^ ]`.``"#).unwrap());
 
         for capture in QUALIFIED_NAME_RE
             .captures_iter(script)
