@@ -414,7 +414,7 @@ fn native_type_change_riskyness(previous: PostgresType, next: PostgresType) -> O
                 Char(_) | VarChar(_) => RiskyCast,
                 _ => NotCastable,
             },
-            UUID => match next {
+            Uuid => match next {
                 Text | VarChar(None) => SafeCast,
                 VarChar(Some(length)) | Char(Some(length)) if length > 31 => SafeCast,
                 _ => NotCastable,
@@ -424,13 +424,13 @@ fn native_type_change_riskyness(previous: PostgresType, next: PostgresType) -> O
                 VarChar(_) | Char(_) => RiskyCast,
                 _ => NotCastable,
             },
-            JSON => match next {
-                Text | JSONB | VarChar(None) => SafeCast,
+            Json => match next {
+                Text | JsonB | VarChar(None) => SafeCast,
                 VarChar(_) | Char(_) => RiskyCast,
                 _ => NotCastable,
             },
-            JSONB => match next {
-                Text | JSON | VarChar(None) => SafeCast,
+            JsonB => match next {
+                Text | Json | VarChar(None) => SafeCast,
                 VarChar(_) | Char(_) => RiskyCast,
                 _ => NotCastable,
             },

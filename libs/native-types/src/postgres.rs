@@ -25,10 +25,10 @@ pub enum PostgresType {
     Boolean,
     Bit(Option<u32>),
     VarBit(Option<u32>),
-    UUID,
+    Uuid,
     Xml,
-    JSON,
-    JSONB,
+    Json,
+    JsonB,
 }
 
 impl super::NativeType for PostgresType {

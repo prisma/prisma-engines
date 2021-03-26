@@ -132,7 +132,7 @@ const SCALAR_TYPE_DEFAULTS: &[(ScalarType, PostgresType)] = &[
     (ScalarType::String, PostgresType::Text),
     (ScalarType::DateTime, PostgresType::Timestamp(Some(3))),
     (ScalarType::Bytes, PostgresType::ByteA),
-    (ScalarType::Json, PostgresType::JSONB),
+    (ScalarType::Json, PostgresType::JsonB),
 ];
 
 impl Connector for PostgresDatamodelConnector {
@@ -154,7 +154,7 @@ impl Connector for PostgresDatamodelConnector {
             VarChar(_) => ScalarType::String,
             Bit(_) => ScalarType::String,
             VarBit(_) => ScalarType::String,
-            UUID => ScalarType::String,
+            Uuid => ScalarType::String,
             Xml => ScalarType::String,
             Inet => ScalarType::String,
             Citext => ScalarType::String,
@@ -179,8 +179,8 @@ impl Connector for PostgresDatamodelConnector {
             Time(_) => ScalarType::DateTime,
             Timetz(_) => ScalarType::DateTime,
             //Json
-            JSON => ScalarType::Json,
-            JSONB => ScalarType::Json,
+            Json => ScalarType::Json,
+            JsonB => ScalarType::Json,
             //Bytes
             ByteA => ScalarType::Bytes,
         }
@@ -264,10 +264,10 @@ impl Connector for PostgresDatamodelConnector {
             BOOLEAN_TYPE_NAME => Boolean,
             BIT_TYPE_NAME => Bit(parse_one_opt_u32(args, BIT_TYPE_NAME)?),
             VAR_BIT_TYPE_NAME => VarBit(parse_one_opt_u32(args, VAR_BIT_TYPE_NAME)?),
-            UUID_TYPE_NAME => UUID,
+            UUID_TYPE_NAME => Uuid,
             XML_TYPE_NAME => Xml,
-            JSON_TYPE_NAME => JSON,
-            JSON_B_TYPE_NAME => JSONB,
+            JSON_TYPE_NAME => Json,
+            JSON_B_TYPE_NAME => JsonB,
             _ => return Err(ConnectorError::new_native_type_parser_error(name)),
         };
 
@@ -295,10 +295,10 @@ impl Connector for PostgresDatamodelConnector {
             Boolean => (BOOLEAN_TYPE_NAME, vec![]),
             Bit(x) => (BIT_TYPE_NAME, arg_vec_from_opt(x)),
             VarBit(x) => (VAR_BIT_TYPE_NAME, arg_vec_from_opt(x)),
-            UUID => (UUID_TYPE_NAME, vec![]),
+            Uuid => (UUID_TYPE_NAME, vec![]),
             Xml => (XML_TYPE_NAME, vec![]),
-            JSON => (JSON_TYPE_NAME, vec![]),
-            JSONB => (JSON_B_TYPE_NAME, vec![]),
+            Json => (JSON_TYPE_NAME, vec![]),
+            JsonB => (JSON_B_TYPE_NAME, vec![]),
             Money => (MONEY_TYPE_NAME, vec![]),
             Inet => (INET_TYPE_NAME, vec![]),
             Citext => (CITEXT_TYPE_NAME, vec![]),

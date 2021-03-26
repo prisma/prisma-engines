@@ -447,10 +447,10 @@ pub(crate) fn render_column_type(col: &ColumnWalker<'_>) -> Cow<'static, str> {
         PostgresType::Boolean => "BOOLEAN".into(),
         PostgresType::Bit(length) => format!("BIT{}", render(length)).into(),
         PostgresType::VarBit(length) => format!("VARBIT{}", render(length)).into(),
-        PostgresType::UUID => "UUID".into(),
+        PostgresType::Uuid => "UUID".into(),
         PostgresType::Xml => "XML".into(),
-        PostgresType::JSON => "JSON".into(),
-        PostgresType::JSONB => "JSONB".into(),
+        PostgresType::Json => "JSON".into(),
+        PostgresType::JsonB => "JSONB".into(),
     };
 
     if t.arity.is_list() {
