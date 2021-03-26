@@ -5,9 +5,9 @@ pub use mongodb_renderer::*;
 pub use sql_renderer::*;
 
 use crate::{templating, ConnectorTagInterface, DatamodelFragment, IdFragment, TestConfig};
+use indoc::indoc;
 use lazy_static::lazy_static;
 use regex::Regex;
-use indoc::indoc;
 
 lazy_static! {
     /// Test configuration, loaded once at runtime.
