@@ -1,3 +1,5 @@
+#![allow(clippy::upper_case_acronyms)]
+
 //! This crate is responsible for parsing, rendering and formatting a Prisma Schema.
 //! A Prisma Schema consists out of two parts:
 //! 1. The `Datamodel` part refers to the model and enum definitions.
