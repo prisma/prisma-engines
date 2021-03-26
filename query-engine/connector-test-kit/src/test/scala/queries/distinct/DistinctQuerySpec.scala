@@ -182,7 +182,7 @@ class DistinctQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
 
     val result = server.query(
       s"""{
-         |  findManyModelA(distinct: [fieldA, fieldB], orderBy: { fieldB: desc}) {
+         |  findManyModelA(distinct: [fieldA, fieldB], orderBy: { fieldB: desc }) {
          |    fieldA
          |    fieldB
          |    b(distinct: [field], orderBy: { id: desc }) {
