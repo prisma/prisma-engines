@@ -40,10 +40,10 @@ impl<T: Debug> TypeRefCache<T> {
     /// not required in the context of the schema builders.
     pub fn insert(&mut self, ident: Identifier, value: Arc<T>) {
         if let Some(old) = self.cache.insert(ident.clone(), value) {
-            panic!(format!(
+            panic!(
                 "Invariant violation: Inserted identifier {:?} twice, this is a bug and invalidates weak arc references. {:?}",
                 ident, old
-            ))
+            )
         }
     }
 }

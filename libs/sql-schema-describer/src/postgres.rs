@@ -21,11 +21,11 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
         Ok(self.get_databases().await?)
     }
 
-    async fn get_metadata(&self, schema: &str) -> DescriberResult<SQLMetadata> {
+    async fn get_metadata(&self, schema: &str) -> DescriberResult<SqlMetadata> {
         let table_count = self.get_table_names(&schema).await?.len();
         let size_in_bytes = self.get_size(&schema).await?;
 
-        Ok(SQLMetadata {
+        Ok(SqlMetadata {
             table_count,
             size_in_bytes,
         })

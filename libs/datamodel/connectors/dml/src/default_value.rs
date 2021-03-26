@@ -136,8 +136,8 @@ impl ValueGenerator {
 
 #[derive(Clone, Copy, PartialEq)]
 pub enum ValueGeneratorFn {
-    UUID,
-    CUID,
+    Uuid,
+    Cuid,
     Now,
     Autoincrement,
     DbGenerated,
@@ -146,8 +146,8 @@ pub enum ValueGeneratorFn {
 impl ValueGeneratorFn {
     fn new(name: &str) -> std::result::Result<Self, String> {
         match name {
-            "cuid" => Ok(Self::CUID),
-            "uuid" => Ok(Self::UUID),
+            "cuid" => Ok(Self::Cuid),
+            "uuid" => Ok(Self::Uuid),
             "now" => Ok(Self::Now),
             "autoincrement" => Ok(Self::Autoincrement),
             "dbgenerated" => Ok(Self::DbGenerated),
@@ -157,8 +157,8 @@ impl ValueGeneratorFn {
 
     fn invoke(&self) -> Option<PrismaValue> {
         match self {
-            Self::UUID => Some(Self::generate_uuid()),
-            Self::CUID => Some(Self::generate_cuid()),
+            Self::Uuid => Some(Self::generate_uuid()),
+            Self::Cuid => Some(Self::generate_cuid()),
             Self::Now => Some(Self::generate_now()),
             Self::Autoincrement => None,
             Self::DbGenerated => None,
@@ -168,8 +168,8 @@ impl ValueGeneratorFn {
     fn can_handle(&self, scalar_type: ScalarType) -> bool {
         #[allow(clippy::match_like_matches_macro)]
         match (self, scalar_type) {
-            (Self::UUID, ScalarType::String) => true,
-            (Self::CUID, ScalarType::String) => true,
+            (Self::Uuid, ScalarType::String) => true,
+            (Self::Cuid, ScalarType::String) => true,
             (Self::Now, ScalarType::DateTime) => true,
             (Self::Autoincrement, ScalarType::Int) => true,
             (Self::Autoincrement, ScalarType::BigInt) => true,

@@ -2,7 +2,7 @@
 use crate::{
     common::purge_dangling_foreign_keys, getters::Getter, parsers::Parser, Column, ColumnArity, ColumnType,
     ColumnTypeFamily, DefaultValue, DescriberResult, ForeignKey, ForeignKeyAction, Index, IndexType, Lazy, PrimaryKey,
-    PrismaValue, Regex, SQLMetadata, SqlSchema, SqlSchemaDescriberBackend, Table, View,
+    PrismaValue, Regex, SqlMetadata, SqlSchema, SqlSchemaDescriberBackend, Table, View,
 };
 use quaint::{ast::Value, prelude::Queryable, single::Quaint};
 use std::{borrow::Cow, collections::HashMap, convert::TryInto};
@@ -19,11 +19,11 @@ impl SqlSchemaDescriberBackend for SqlSchemaDescriber {
         Ok(self.get_databases().await?)
     }
 
-    async fn get_metadata(&self, schema: &str) -> DescriberResult<SQLMetadata> {
+    async fn get_metadata(&self, schema: &str) -> DescriberResult<SqlMetadata> {
         let table_count = self.get_table_names(&schema).await?.len();
         let size_in_bytes = self.get_size().await?;
 
-        Ok(SQLMetadata {
+        Ok(SqlMetadata {
             table_count,
             size_in_bytes,
         })

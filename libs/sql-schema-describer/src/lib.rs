@@ -29,7 +29,7 @@ pub trait SqlSchemaDescriberBackend: Send + Sync + 'static {
     async fn list_databases(&self) -> DescriberResult<Vec<String>>;
 
     /// Get the databases metadata.
-    async fn get_metadata(&self, schema: &str) -> DescriberResult<SQLMetadata>;
+    async fn get_metadata(&self, schema: &str) -> DescriberResult<SqlMetadata>;
 
     /// Describe a database schema.
     async fn describe(&self, schema: &str) -> DescriberResult<SqlSchema>;
@@ -38,7 +38,7 @@ pub trait SqlSchemaDescriberBackend: Send + Sync + 'static {
     async fn version(&self, schema: &str) -> DescriberResult<Option<String>>;
 }
 
-pub struct SQLMetadata {
+pub struct SqlMetadata {
     pub table_count: usize,
     pub size_in_bytes: usize,
 }
