@@ -27,7 +27,7 @@ impl MysqlFlavour {
         let default_str = column
             .default()
             .filter(|default| {
-                !matches!(default.kind(),  DefaultKind::SEQUENCE(_))
+                !matches!(default.kind(),  DefaultKind::Sequence(_))
                     // We do not want to render JSON defaults because they are not supported by MySQL.
                     && !matches!(column.column_type_family(), ColumnTypeFamily::Json)
                     // We do not want to render binary defaults because they are not supported by MySQL.
@@ -460,7 +460,7 @@ impl MysqlAlterColumn {
         // @default(dbgenerated()) does not give us the information in the prisma schema, so we have to
         // transfer it from the introspected current state of the database.
         let new_default = match defaults {
-            (Some(DefaultKind::DBGENERATED(previous)), Some(DefaultKind::DBGENERATED(next)))
+            (Some(DefaultKind::DbGenerated(previous)), Some(DefaultKind::DbGenerated(next)))
                 if next.is_empty() && !previous.is_empty() =>
             {
                 Some(DefaultValue::db_generated(previous.clone()))
@@ -477,11 +477,11 @@ impl MysqlAlterColumn {
 
 fn render_default<'a>(column: &ColumnWalker<'a>, default: &'a DefaultValue) -> Cow<'a, str> {
     match default.kind() {
-        DefaultKind::DBGENERATED(val) => val.as_str().into(),
-        DefaultKind::VALUE(PrismaValue::String(val)) | DefaultKind::VALUE(PrismaValue::Enum(val)) => {
+        DefaultKind::DbGenerated(val) => val.as_str().into(),
+        DefaultKind::Value(PrismaValue::String(val)) | DefaultKind::Value(PrismaValue::Enum(val)) => {
             Quoted::mysql_string(escape_string_literal(&val)).to_string().into()
         }
-        DefaultKind::NOW => {
+        DefaultKind::Now => {
             let precision = column
                 .column_native_type()
                 .as_ref()
@@ -490,10 +490,10 @@ fn render_default<'a>(column: &ColumnWalker<'a>, default: &'a DefaultValue) -> C
 
             format!("CURRENT_TIMESTAMP({})", precision).into()
         }
-        DefaultKind::VALUE(PrismaValue::DateTime(dt)) if column.column_type_family().is_datetime() => {
+        DefaultKind::Value(PrismaValue::DateTime(dt)) if column.column_type_family().is_datetime() => {
             Quoted::mysql_string(dt.to_rfc3339()).to_string().into()
         }
-        DefaultKind::VALUE(val) => val.to_string().into(),
-        DefaultKind::SEQUENCE(_) => Default::default(),
+        DefaultKind::Value(val) => val.to_string().into(),
+        DefaultKind::Sequence(_) => Default::default(),
     }
 }

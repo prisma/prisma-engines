@@ -221,10 +221,8 @@ impl SqlRenderer for MssqlFlavour {
     }
 
     fn render_redefine_tables(&self, tables: &[RedefineTable], schemas: &Pair<&SqlSchema>) -> Vec<String> {
-        let mut result = Vec::new();
-
         // All needs to be inside a transaction.
-        result.push("BEGIN TRANSACTION".to_string());
+        let mut result = vec!["BEGIN TRANSACTION".to_string()];
 
         for redefine_table in tables {
             let tables = schemas.tables(&redefine_table.table_index);
@@ -453,15 +451,15 @@ fn escape_string_literal(s: &str) -> String {
 
 fn render_default(default: &DefaultValue) -> Cow<'_, str> {
     match default.kind() {
-        DefaultKind::DBGENERATED(val) => val.as_str().into(),
-        DefaultKind::VALUE(PrismaValue::String(val)) | DefaultKind::VALUE(PrismaValue::Enum(val)) => {
+        DefaultKind::DbGenerated(val) => val.as_str().into(),
+        DefaultKind::Value(PrismaValue::String(val)) | DefaultKind::Value(PrismaValue::Enum(val)) => {
             Quoted::mssql_string(escape_string_literal(&val)).to_string().into()
         }
-        DefaultKind::VALUE(PrismaValue::Bytes(b)) => format!("0x{}", common::format_hex(b)).into(),
-        DefaultKind::NOW => "CURRENT_TIMESTAMP".into(),
-        DefaultKind::VALUE(PrismaValue::DateTime(val)) => Quoted::mssql_string(val).to_string().into(),
-        DefaultKind::VALUE(PrismaValue::Boolean(val)) => Cow::from(if *val { "1" } else { "0" }),
-        DefaultKind::VALUE(val) => val.to_string().into(),
-        DefaultKind::SEQUENCE(_) => "".into(),
+        DefaultKind::Value(PrismaValue::Bytes(b)) => format!("0x{}", common::format_hex(b)).into(),
+        DefaultKind::Now => "CURRENT_TIMESTAMP".into(),
+        DefaultKind::Value(PrismaValue::DateTime(val)) => Quoted::mssql_string(val).to_string().into(),
+        DefaultKind::Value(PrismaValue::Boolean(val)) => Cow::from(if *val { "1" } else { "0" }),
+        DefaultKind::Value(val) => val.to_string().into(),
+        DefaultKind::Sequence(_) => "".into(),
     }
 }

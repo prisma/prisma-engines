@@ -228,11 +228,11 @@ pub async fn one2m<'a, 'b>(
             }
         }
     } else {
-        panic!(format!(
+        panic!(
             "parent result: {:?}, relation: {:?}",
             &parent_result,
             &parent_field.relation()
-        ));
+        );
     }
 
     Ok(processor.apply(scalars))

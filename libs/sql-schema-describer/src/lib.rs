@@ -29,7 +29,7 @@ pub trait SqlSchemaDescriberBackend: Send + Sync + 'static {
     async fn list_databases(&self) -> DescriberResult<Vec<String>>;
 
     /// Get the databases metadata.
-    async fn get_metadata(&self, schema: &str) -> DescriberResult<SQLMetadata>;
+    async fn get_metadata(&self, schema: &str) -> DescriberResult<SqlMetadata>;
 
     /// Describe a database schema.
     async fn describe(&self, schema: &str) -> DescriberResult<SqlSchema>;
@@ -38,7 +38,7 @@ pub trait SqlSchemaDescriberBackend: Send + Sync + 'static {
     async fn version(&self, schema: &str) -> DescriberResult<Option<String>>;
 }
 
-pub struct SQLMetadata {
+pub struct SqlMetadata {
     pub table_count: usize,
     pub size_in_bytes: usize,
 }
@@ -476,30 +476,30 @@ pub struct DefaultValue {
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub enum DefaultKind {
     /// A constant value, parsed as String
-    VALUE(PrismaValue),
+    Value(PrismaValue),
     /// An expression generating a current timestamp.
-    NOW,
+    Now,
     /// An expression generating a sequence.
-    SEQUENCE(String),
+    Sequence(String),
     /// An unrecognized Default Value
-    DBGENERATED(String),
+    DbGenerated(String),
 }
 
 impl DefaultValue {
     pub fn db_generated(val: impl ToString) -> Self {
-        Self::new(DefaultKind::DBGENERATED(val.to_string()))
+        Self::new(DefaultKind::DbGenerated(val.to_string()))
     }
 
     pub fn now() -> Self {
-        Self::new(DefaultKind::NOW)
+        Self::new(DefaultKind::Now)
     }
 
     pub fn value(val: impl Into<PrismaValue>) -> Self {
-        Self::new(DefaultKind::VALUE(val.into()))
+        Self::new(DefaultKind::Value(val.into()))
     }
 
     pub fn sequence(val: impl ToString) -> Self {
-        Self::new(DefaultKind::SEQUENCE(val.to_string()))
+        Self::new(DefaultKind::Sequence(val.to_string()))
     }
 
     pub fn new(kind: DefaultKind) -> Self {
@@ -523,25 +523,25 @@ impl DefaultValue {
 
     pub fn as_value(&self) -> Option<&PrismaValue> {
         match self.kind {
-            DefaultKind::VALUE(ref v) => Some(v),
+            DefaultKind::Value(ref v) => Some(v),
             _ => None,
         }
     }
 
     pub fn is_value(&self) -> bool {
-        matches!(self.kind, DefaultKind::VALUE(_))
+        matches!(self.kind, DefaultKind::Value(_))
     }
 
     pub fn is_now(&self) -> bool {
-        matches!(self.kind, DefaultKind::NOW)
+        matches!(self.kind, DefaultKind::Now)
     }
 
     pub fn is_sequence(&self) -> bool {
-        matches!(self.kind, DefaultKind::SEQUENCE(_))
+        matches!(self.kind, DefaultKind::Sequence(_))
     }
 
     pub fn is_db_generated(&self) -> bool {
-        matches!(self.kind, DefaultKind::DBGENERATED(_))
+        matches!(self.kind, DefaultKind::DbGenerated(_))
     }
 }
 

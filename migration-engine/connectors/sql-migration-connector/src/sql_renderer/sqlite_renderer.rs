@@ -140,9 +140,7 @@ impl SqlRenderer for SqliteFlavour {
 
     fn render_redefine_tables(&self, tables: &[RedefineTable], schemas: &Pair<&SqlSchema>) -> Vec<String> {
         // Based on 'Making Other Kinds Of Table Schema Changes' from https://www.sqlite.org/lang_altertable.html
-        let mut result = Vec::new();
-
-        result.push("PRAGMA foreign_keys=OFF".to_string());
+        let mut result = vec!["PRAGMA foreign_keys=OFF".to_string()];
 
         for redefine_table in tables {
             let tables = schemas.tables(&redefine_table.table_index);
@@ -261,7 +259,7 @@ fn render_column<'a>(column: &ColumnWalker<'a>) -> ddl::Column<'a> {
         autoincrement: column.is_single_primary_key() && column.column_type_family().is_int(),
         default: column
             .default()
-            .filter(|default| !matches!(default.kind(), DefaultKind::SEQUENCE(_)))
+            .filter(|default| !matches!(default.kind(), DefaultKind::Sequence(_)))
             .map(|default| render_default(default)),
         name: column.name().into(),
         not_null: !column.arity().is_nullable(),
@@ -272,14 +270,14 @@ fn render_column<'a>(column: &ColumnWalker<'a>) -> ddl::Column<'a> {
 
 fn render_default(default: &DefaultValue) -> Cow<'_, str> {
     match default.kind() {
-        DefaultKind::DBGENERATED(val) => val.as_str().into(),
-        DefaultKind::VALUE(PrismaValue::String(val)) | DefaultKind::VALUE(PrismaValue::Enum(val)) => {
+        DefaultKind::DbGenerated(val) => val.as_str().into(),
+        DefaultKind::Value(PrismaValue::String(val)) | DefaultKind::Value(PrismaValue::Enum(val)) => {
             Quoted::sqlite_string(escape_quotes(&val)).to_string().into()
         }
-        DefaultKind::VALUE(PrismaValue::Bytes(b)) => Quoted::sqlite_string(format_hex(b)).to_string().into(),
-        DefaultKind::NOW => "CURRENT_TIMESTAMP".into(),
-        DefaultKind::VALUE(PrismaValue::DateTime(val)) => Quoted::sqlite_string(val).to_string().into(),
-        DefaultKind::VALUE(val) => format!("{}", val).into(),
-        DefaultKind::SEQUENCE(_) => "".into(),
+        DefaultKind::Value(PrismaValue::Bytes(b)) => Quoted::sqlite_string(format_hex(b)).to_string().into(),
+        DefaultKind::Now => "CURRENT_TIMESTAMP".into(),
+        DefaultKind::Value(PrismaValue::DateTime(val)) => Quoted::sqlite_string(val).to_string().into(),
+        DefaultKind::Value(val) => format!("{}", val).into(),
+        DefaultKind::Sequence(_) => "".into(),
     }
 }

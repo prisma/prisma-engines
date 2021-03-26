@@ -129,7 +129,7 @@ fn should_fail_on_argument_out_of_range_for_decimal_type() {
             "Argument M is out of range for Native type {} of MySQL: {} can range from {}.",
             type_name, arg, range
         )
-    };
+    }
 
     let native_type = "Decimal(66,20)";
 

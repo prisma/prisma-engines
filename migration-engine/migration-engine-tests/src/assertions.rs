@@ -334,7 +334,7 @@ impl<'a> ColumnAssertion<'a> {
         let found = &self.0.default;
 
         match found.as_ref().map(|d| d.kind()) {
-            Some(DefaultKind::VALUE(val)) => anyhow::ensure!(
+            Some(DefaultKind::Value(val)) => anyhow::ensure!(
                 val == expected,
                 "Assertion failed. Expected the default value for `{}` to be `{:?}`, got `{:?}`",
                 self.0.name,
@@ -355,7 +355,7 @@ impl<'a> ColumnAssertion<'a> {
         let found = &self.0.default;
 
         match found.as_ref().map(|d| d.kind()) {
-            Some(DefaultKind::DBGENERATED(val)) => anyhow::ensure!(
+            Some(DefaultKind::DbGenerated(val)) => anyhow::ensure!(
                 val == expected,
                 "Assertion failed. Expected the default value for `{}` to be dbgenerated with `{:?}`, got `{:?}`",
                 self.0.name,

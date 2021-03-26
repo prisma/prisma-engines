@@ -17,9 +17,7 @@ impl GeneratorSerializer {
     }
 
     fn lower_generator(generator: &Generator) -> ast::GeneratorConfig {
-        let mut arguments: Vec<ast::Argument> = Vec::new();
-
-        arguments.push(ast::Argument::new_string("provider", &generator.provider));
+        let mut arguments: Vec<ast::Argument> = vec![ast::Argument::new_string("provider", &generator.provider)];
 
         if let Some(output) = &generator.output {
             arguments.push(ast::Argument::new_string("output", &output));

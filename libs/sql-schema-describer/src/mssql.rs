@@ -1,7 +1,7 @@
 use crate::{
     getters::Getter, parsers::Parser, Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue, DescriberError,
     DescriberErrorKind, DescriberResult, ForeignKey, ForeignKeyAction, Index, IndexType, PrimaryKey, Procedure,
-    SQLMetadata, SqlSchema, Table, View,
+    SqlMetadata, SqlSchema, Table, View,
 };
 use indoc::indoc;
 use native_types::{MsSqlType, MsSqlTypeParameter, NativeType};
@@ -71,11 +71,11 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
         Ok(self.get_databases().await?)
     }
 
-    async fn get_metadata(&self, schema: &str) -> DescriberResult<SQLMetadata> {
+    async fn get_metadata(&self, schema: &str) -> DescriberResult<SqlMetadata> {
         let table_count = self.get_table_names(schema).await?.len();
         let size_in_bytes = self.get_size(schema).await?;
 
-        Ok(SQLMetadata {
+        Ok(SqlMetadata {
             table_count,
             size_in_bytes,
         })
@@ -554,7 +554,7 @@ impl SqlSchemaDescriber {
                 1 => ForeignKeyAction::Cascade,
                 2 => ForeignKeyAction::SetNull,
                 3 => ForeignKeyAction::SetDefault,
-                s => panic!(format!("Unrecognized on delete action '{}'", s)),
+                s => panic!("Unrecognized on delete action '{}'", s),
             };
 
             let on_update_action = match row.get_expect_i64("update_referential_action") {
@@ -562,7 +562,7 @@ impl SqlSchemaDescriber {
                 1 => ForeignKeyAction::Cascade,
                 2 => ForeignKeyAction::SetNull,
                 3 => ForeignKeyAction::SetDefault,
-                s => panic!(format!("Unrecognized on delete action '{}'", s)),
+                s => panic!("Unrecognized on delete action '{}'", s),
             };
 
             let intermediate_fks = map.entry(table_name).or_default();

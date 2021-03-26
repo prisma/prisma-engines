@@ -252,6 +252,7 @@ async fn bad_datasource_url_and_provider_combinations_must_return_a_proper_error
 
     assert!(
         err_message.contains("The URL for datasource `db` must start with the protocol `file:`"),
+        "{}",
         err_message
     );
 
