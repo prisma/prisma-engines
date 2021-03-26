@@ -266,7 +266,7 @@ impl SqlSchemaDescriber {
             let is_required = match is_nullable.as_ref() {
                 "no" => true,
                 "yes" => false,
-                x => panic!(format!("unrecognized is_nullable variant '{}'", x)),
+                x => panic!("unrecognized is_nullable variant '{}'", x),
             };
 
             let arity = if is_required {
@@ -571,7 +571,7 @@ impl SqlSchemaDescriber {
                 "set default" => ForeignKeyAction::SetDefault,
                 "restrict" => ForeignKeyAction::Restrict,
                 "no action" => ForeignKeyAction::NoAction,
-                s => panic!(format!("Unrecognized on delete action '{}'", s)),
+                s => panic!("Unrecognized on delete action '{}'", s),
             };
             let on_update_action = match row.get_expect_string("update_rule").to_lowercase().as_str() {
                 "cascade" => ForeignKeyAction::Cascade,
@@ -579,7 +579,7 @@ impl SqlSchemaDescriber {
                 "set default" => ForeignKeyAction::SetDefault,
                 "restrict" => ForeignKeyAction::Restrict,
                 "no action" => ForeignKeyAction::NoAction,
-                s => panic!(format!("Unrecognized on update action '{}'", s)),
+                s => panic!("Unrecognized on update action '{}'", s),
             };
 
             let intermediate_fks = map.entry(table_name).or_default();

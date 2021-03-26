@@ -554,7 +554,7 @@ impl SqlSchemaDescriber {
                 1 => ForeignKeyAction::Cascade,
                 2 => ForeignKeyAction::SetNull,
                 3 => ForeignKeyAction::SetDefault,
-                s => panic!(format!("Unrecognized on delete action '{}'", s)),
+                s => panic!("Unrecognized on delete action '{}'", s),
             };
 
             let on_update_action = match row.get_expect_i64("update_referential_action") {
@@ -562,7 +562,7 @@ impl SqlSchemaDescriber {
                 1 => ForeignKeyAction::Cascade,
                 2 => ForeignKeyAction::SetNull,
                 3 => ForeignKeyAction::SetDefault,
-                s => panic!(format!("Unrecognized on delete action '{}'", s)),
+                s => panic!("Unrecognized on delete action '{}'", s),
             };
 
             let intermediate_fks = map.entry(table_name).or_default();

@@ -349,7 +349,7 @@ impl SqlSchemaDescriber {
                         "set null" => ForeignKeyAction::SetNull,
                         "set default" => ForeignKeyAction::SetDefault,
                         "cascade" => ForeignKeyAction::Cascade,
-                        s => panic!(format!("Unrecognized on delete action '{}'", s)),
+                        s => panic!("Unrecognized on delete action '{}'", s),
                     };
                     let on_update_action = match row
                         .get("on_update")
@@ -363,7 +363,7 @@ impl SqlSchemaDescriber {
                         "set null" => ForeignKeyAction::SetNull,
                         "set default" => ForeignKeyAction::SetDefault,
                         "cascade" => ForeignKeyAction::Cascade,
-                        s => panic!(format!("Unrecognized on update action '{}'", s)),
+                        s => panic!("Unrecognized on update action '{}'", s),
                     };
                     let fk = IntermediateForeignKey {
                         columns,
