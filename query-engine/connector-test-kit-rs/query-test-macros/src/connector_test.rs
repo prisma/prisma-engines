@@ -68,10 +68,9 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
             let enabled_connectors = vec![
                 #connectors
             ];
-            println!("{:?}", enabled_connectors);
 
             if !ConnectorTag::should_run(&config, &enabled_connectors) {
-                println!("Skipping test '{}', current test connector is not enabled.", #test_name);
+                tracing::info!("Skipping test '{}', current test connector is not enabled.", #test_name);
                 return
             }
 
@@ -79,6 +78,7 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
             let datamodel = query_tests_setup::render_test_datamodel(config, #test_database, template);
 
             query_tests_setup::run_with_tokio(async move {
+                tracing::debug!("Used datamodel:\n {}", datamodel.clone().yellow());
                 let runner = Runner::load(config.runner(), datamodel.clone()).await.unwrap();
                 query_tests_setup::setup_project(&datamodel).await.unwrap();
                 #runner_fn_ident(&runner).await.unwrap();

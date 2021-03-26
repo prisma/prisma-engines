@@ -1,8 +1,8 @@
-use query_engine_tests::prelude::*;
+use query_engine_tests::*;
 
-#[test_suite]
+#[test_suite(schema(schemas::generic))]
 mod find_first_query {
-    #[connector_test(schema(schemas::basic))]
+    #[connector_test]
     async fn fetch_first_matching(runner: &Runner) -> TestResult<()> {
         test_data(runner).await?;
 

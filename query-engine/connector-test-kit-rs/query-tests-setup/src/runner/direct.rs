@@ -18,8 +18,6 @@ impl RunnerInterface for DirectRunner {
     async fn load(datamodel: String) -> TestResult<Self> {
         feature_flags::initialize(&["all".to_owned()]).unwrap();
 
-        dbg!(feature_flags::get());
-
         let config = datamodel::parse_configuration_with_url_overrides(&datamodel, vec![])
             .unwrap()
             .subject;

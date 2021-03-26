@@ -10,13 +10,15 @@
 // - Tests run in separate units in the data source. For MySQL, this may be a separate database, for postgres a schema, etc. -> These units are named `{mod_name}_{test_name}`
 // - Test logs. We could write the logs for each test into a logs folder with a file named after the test.
 
-pub mod prelude;
 pub mod schemas;
+pub mod utils;
 
-#[macro_export]
-macro_rules! assert_query {
-    ($runner:expr, $q:expr, $result:expr) => {
-        let result = $runner.query($q).await?;
-        assert_eq!(result.to_string(), $result);
-    };
-}
+pub use colored::*;
+pub use indoc::indoc;
+pub use query_test_macros::{connector_test, test_suite};
+pub use query_tests_setup::*;
+pub use schemas::*;
+pub use std::convert::TryFrom;
+pub use tracing;
+pub use tracing_futures::WithSubscriber;
+pub use utils::*;

@@ -7,6 +7,7 @@ pub use sql_renderer::*;
 use crate::{templating, ConnectorTagInterface, DatamodelFragment, IdFragment, TestConfig};
 use lazy_static::lazy_static;
 use regex::Regex;
+use indoc::indoc;
 
 lazy_static! {
     /// Test configuration, loaded once at runtime.
@@ -28,17 +29,17 @@ pub trait DatamodelRenderer {
 pub fn render_test_datamodel(config: &TestConfig, test_database: &str, template: String) -> String {
     let tag = config.test_connector_tag().unwrap();
     let datasource_with_generator = format!(
-        r#"
-      datasource test {{
-        provider = "{}"
-        url = "{}"
-      }}
+        indoc! {r#"
+            datasource test {{
+                provider = "{}"
+                url = "{}"
+            }}
 
-      generator client {{
-        provider = "prisma-client-js"
-        previewFeatures = ["microsoftSqlServer"]
-      }}
-    "#,
+            generator client {{
+                provider = "prisma-client-js"
+                previewFeatures = ["microsoftSqlServer"]
+            }}
+        "#},
         tag.datamodel_provider(),
         tag.connection_string(test_database, config.is_ci())
     );

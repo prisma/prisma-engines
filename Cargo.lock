@@ -3504,6 +3504,8 @@ name = "query-engine-tests"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "chrono",
+ "colored 2.0.0",
  "indoc",
  "query-test-macros",
  "query-tests-setup",
@@ -3534,6 +3536,7 @@ dependencies = [
  "datamodel-connector",
  "enum_dispatch",
  "feature-flags",
+ "indoc",
  "itertools 0.10.0",
  "lazy_static",
  "migration-core",

@@ -12,3 +12,5 @@ query-tests-setup = { path = "../query-tests-setup" }
 indoc = "1.0"
 tracing = "0.1.12"
 tracing-futures = "0.2.1"
+colored = "2"
+chrono = "0.4"
