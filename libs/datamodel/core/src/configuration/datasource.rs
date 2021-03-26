@@ -45,7 +45,7 @@ impl Datasource {
     }
 
     /// By default we treat relative paths (in the connection string and
-    /// datasource url value) as relative to the CWD. This does not work in all 
+    /// datasource url value) as relative to the CWD. This does not work in all
     /// cases, so we need a way to prefix these relative paths with a config_dir.
     ///
     /// P.S. Don't forget to add new parameters here if needed!
