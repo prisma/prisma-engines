@@ -122,16 +122,14 @@ impl AttributeValidator<dml::Model> for ModelLevelIdAttributeValidator {
 
     fn serialize(&self, model: &dml::Model, _datamodel: &dml::Datamodel) -> Vec<ast::Attribute> {
         if !model.id_fields.is_empty() {
-            let mut args = Vec::new();
-
-            args.push(ast::Argument::new_array(
+            let args = vec![ast::Argument::new_array(
                 "",
                 model
                     .id_fields
                     .iter()
                     .map(|f| ast::Expression::ConstantValue(f.to_string(), ast::Span::empty()))
                     .collect(),
-            ));
+            )];
 
             return vec![ast::Attribute::new(self.attribute_name(), args)];
         }

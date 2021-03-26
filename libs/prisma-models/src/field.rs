@@ -57,6 +57,7 @@ impl From<&RelationFieldRef> for FieldWeak {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
+#[allow(clippy::upper_case_acronyms)]
 pub enum TypeIdentifier {
     String,
     Int,

@@ -242,16 +242,15 @@ trait IndexAttributeBase<T>: AttributeValidator<T> {
             .iter()
             .filter(|index| index.tpe == index_type)
             .map(|index_def| {
-                let mut args = Vec::new();
-
-                args.push(ast::Argument::new_array(
+                let mut args = vec![ast::Argument::new_array(
                     "",
                     index_def
                         .fields
                         .iter()
                         .map(|f| ast::Expression::ConstantValue(f.to_string(), ast::Span::empty()))
                         .collect(),
-                ));
+                )];
+
                 if let Some(name) = &index_def.name {
                     args.push(ast::Argument::new_string("name", &name));
                 }
