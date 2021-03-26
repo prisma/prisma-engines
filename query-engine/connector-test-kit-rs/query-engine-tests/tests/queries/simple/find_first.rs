@@ -6,29 +6,30 @@ mod find_first_query {
     async fn fetch_first_matching(runner: &Runner) -> TestResult<()> {
         test_data(runner).await?;
 
-        let result = runner
-            .query("query { findFirstTestModel(where: { id: 1 }) { id }}")
-            .await?;
+        assert_query!(
+            runner,
+            "query { findFirstTestModel(where: { id: 1 }) { id }}",
+            r#"{"data":{"findFirstTestModel":{"id":1}}}"#
+        );
 
-        assert_eq!(result.to_string(), r#"{"data":{"findFirstTestModel":{"id":1}}}"#);
+        assert_query!(
+            runner,
+            "query { findFirstTestModel(where: { field: { not: null }}) { id }}",
+            r#"{"data":{"findFirstTestModel":{"id":1}}}"#
+        );
 
-        let result = runner
-            .query("query { findFirstTestModel(where: { field: { not: null }}) { id }}")
-            .await?;
+        assert_query!(
+            runner,
+            "query { findFirstTestModel(where: { field: { not: null }}, orderBy: { id: desc }) { id }}",
+            r#"{"data":{"findFirstTestModel":{"id":5}}}"#
+        );
 
-        assert_eq!(result.to_string(), r#"{"data":{"findFirstTestModel":{"id":1}}}"#);
+        assert_query!(
+            runner,
+            "query { findFirstTestModel(where: { field: { not: null }}, cursor: { id: 1 }, take: 1, skip: 1, orderBy: { id: asc }) { id }}",
+            r#"{"data":{"findFirstTestModel":{"id":2}}}"#
+        );
 
-        let result = runner
-            .query("query { findFirstTestModel(where: { field: { not: null }}, orderBy: { id: desc }) { id }}")
-            .await?;
-
-        assert_eq!(result.to_string(), r#"{"data":{"findFirstTestModel":{"id":5}}}"#);
-
-        let result = runner
-            .query("query { findFirstTestModel(where: { field: { not: null }}, cursor: { id: 1 }, take: 1, skip: 1, orderBy: { id: asc }) { id }}")
-            .await?;
-
-        assert_eq!(result.to_string(), r#"{"data":{"findFirstTestModel":{"id":2}}}"#);
         Ok(())
     }
 
