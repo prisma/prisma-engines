@@ -191,7 +191,7 @@ class CreateMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
     val project = ProjectDsl.fromString {
       s"""
          |model A {
-         |  timestamp DateTime @id @default(now())
+         |  timestamp DateTime @id
          |}
     """.stripMargin
     }
@@ -200,13 +200,13 @@ class CreateMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
 
     val res = server.query(
       """mutation {
-        |  createOneA(data: {}) {
+        |  createOneA(data: { timestamp: "1999-05-01T00:00:00.000Z" }) {
         |    timestamp
         |  }}""".stripMargin,
       project = project,
       legacy = false
     )
 
-    res.toString() should be("""{"data":{"createOneA":{"timestamp":"2021-03-25T15:20:31.342+00:00"}}}""")
+    res.toString() should be("""{"data":{"createOneA":{"timestamp":"1999-05-01T00:00:00.000Z"}}}""")
   }
 }
