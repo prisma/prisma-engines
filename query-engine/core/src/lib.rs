@@ -8,7 +8,8 @@
     clippy::match_like_matches_macro,
     clippy::from_over_into,
     clippy::or_fun_call,
-    clippy::needless_question_mark
+    clippy::needless_question_mark,
+    clippy::ptr_arg
 )]
 #![warn(warnings)] // Todo deny warnings once done
 
