@@ -91,7 +91,7 @@ async fn unique_constraint_violation(api: &mut dyn TestApi) -> crate::Result<()>
             DatabaseConstraint::ForeignKey => assert!(false, "Expecting index or field constraints."),
             DatabaseConstraint::CannotParse => assert!(false, "Couldn't parse the error message."),
         },
-        _ => panic!(err),
+        _ => panic!("{}", err),
     }
 
     Ok(())
@@ -108,7 +108,7 @@ async fn null_constraint_violation(api: &mut dyn TestApi) -> crate::Result<()> {
         ErrorKind::NullConstraintViolation { constraint } => {
             assert_eq!(&DatabaseConstraint::fields(Some("id1")), constraint)
         }
-        _ => panic!(err),
+        _ => panic!("{}", err),
     }
 
     let insert = Insert::single_into(&table).value("id1", 50).value("id2", 55);
@@ -125,7 +125,7 @@ async fn null_constraint_violation(api: &mut dyn TestApi) -> crate::Result<()> {
         ErrorKind::NullConstraintViolation { constraint } => {
             assert_eq!(&DatabaseConstraint::fields(Some("id2")), constraint);
         }
-        _ => panic!(err),
+        _ => panic!("{}", err),
     }
 
     Ok(())

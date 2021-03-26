@@ -1789,3 +1789,29 @@ async fn ints_read_write_to_numeric(api: &mut dyn TestApi) -> crate::Result<()> 
 
     Ok(())
 }
+
+#[cfg(feature = "bigdecimal")]
+#[test_each_connector(tags("postgresql"))]
+async fn bigdecimal_read_write_to_floating(api: &mut dyn TestApi) -> crate::Result<()> {
+    use bigdecimal::BigDecimal;
+    use std::str::FromStr;
+
+    let table = api.create_table("id int, a float4, b float8").await?;
+    let val = BigDecimal::from_str("0.1").unwrap();
+
+    let insert = Insert::multi_into(&table, &["id", "a", "b"]).values(vec![
+        Value::integer(1),
+        Value::numeric(val.clone()),
+        Value::numeric(val.clone()),
+    ]);
+
+    api.conn().execute(insert.into()).await?;
+
+    let select = Select::from_table(&table);
+    let row = api.conn().select(select).await?.into_single()?;
+
+    assert_eq!(Value::float(0.1), row["a"]);
+    assert_eq!(Value::double(0.1), row["b"]);
+
+    Ok(())
+}

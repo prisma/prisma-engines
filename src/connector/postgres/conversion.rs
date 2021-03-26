@@ -526,12 +526,12 @@ impl<'a> ToSql for Value<'a> {
             (Value::Double(double), _) => double.map(|double| double.to_sql(ty, out)),
             #[cfg(feature = "bigdecimal")]
             (Value::Numeric(decimal), &PostgresType::FLOAT4) => decimal.as_ref().map(|decimal| {
-                let f = decimal.to_f32().expect("decimal to f32 conversion");
+                let f = decimal.to_string().parse::<f32>().expect("decimal to f32 conversion");
                 f.to_sql(ty, out)
             }),
             #[cfg(feature = "bigdecimal")]
             (Value::Numeric(decimal), &PostgresType::FLOAT8) => decimal.as_ref().map(|decimal| {
-                let f = decimal.to_f64().expect("decimal to f64 conversion");
+                let f = decimal.to_string().parse::<f64>().expect("decimal to f64 conversion");
                 f.to_sql(ty, out)
             }),
             #[cfg(feature = "bigdecimal")]
@@ -540,7 +540,7 @@ impl<'a> ToSql for Value<'a> {
 
                 for value in values.iter() {
                     let float = match value {
-                        Value::Numeric(n) => n.as_ref().and_then(|n| n.to_f32()),
+                        Value::Numeric(n) => n.as_ref().and_then(|n| n.to_string().parse::<f32>().ok()),
                         Value::Float(f) => *f,
                         Value::Double(d) => d.map(|d| d as f32),
                         v => {
@@ -564,7 +564,7 @@ impl<'a> ToSql for Value<'a> {
 
                 for value in values.iter() {
                     let float = match value {
-                        Value::Numeric(n) => n.as_ref().and_then(|n| n.to_f64()),
+                        Value::Numeric(n) => n.as_ref().and_then(|n| n.to_string().parse::<f64>().ok()),
                         Value::Float(f) => f.map(|f| f as f64),
                         Value::Double(d) => *d,
                         v => {
