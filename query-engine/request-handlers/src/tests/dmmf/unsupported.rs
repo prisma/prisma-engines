@@ -134,14 +134,14 @@ fn no_find_unique_when_model_only_has_unsupported_index_or_compound() {
           unsupported_index_a  Unsupported("X")  @id
           unsupported_index_c  Unsupported("X")  @unique
           unsupported_index_d  Unsupported("X")  @unique @default(dbgenerated("X"))
-          
+
           @@ignore
         }
 
         model ItemB {
           id                Int
           unsupported_index_a  Unsupported("X")  @id @default(dbgenerated("X"))
-        
+
           @@ignore
         }
 
@@ -154,7 +154,7 @@ fn no_find_unique_when_model_only_has_unsupported_index_or_compound() {
 
           @@index([unsupported_index_a, unsupported_index_b])
           @@unique([unsupported_index_c, unsupported_index_d])
-        
+
           @@ignore
         }
     "#;
@@ -209,7 +209,8 @@ fn no_create_or_upsert_should_exist_with_unsupported_field_without_default_value
     unsupported_ops.iter().for_each(|op| {
         assert!(
             !field_names.contains(&format!("{}Item", *op).as_str()),
-            format!("operation '{}' should not be supported", op)
+            "operation '{}' should not be supported",
+            op
         );
     });
 
@@ -217,7 +218,8 @@ fn no_create_or_upsert_should_exist_with_unsupported_field_without_default_value
     supported_ops.iter().for_each(|op| {
         assert!(
             field_names.contains(&format!("{}Item", *op).as_str()),
-            format!("operation '{}' should be supported", op)
+            "operation '{}' should be supported",
+            op
         );
     });
 }

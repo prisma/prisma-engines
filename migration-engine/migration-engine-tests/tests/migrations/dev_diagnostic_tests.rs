@@ -123,7 +123,7 @@ async fn dev_diagnostic_calculates_drift_in_presence_of_failed_migrations(api: &
         })?;
 
     let err = api.apply_migrations(&directory).send().await.unwrap_err().to_string();
-    assert!(err.contains("yolo") || err.contains("YOLO"), err);
+    assert!(err.contains("yolo") || err.contains("YOLO"), "{}", err);
 
     let migration_two =
         migration_two.modify_migration(|migration| migration.truncate(migration.len() - "SELECT YOLO;".len()))?;
@@ -433,8 +433,8 @@ async fn with_a_failed_migration(api: &TestApi) -> TestResult {
         .to_string();
 
     match api.sql_family() {
-        SqlFamily::Mssql => assert!(err.contains("Could not find stored procedure"), err),
-        _ => assert!(&err.contains("syntax"), err),
+        SqlFamily::Mssql => assert!(err.contains("Could not find stored procedure"), "{}", err),
+        _ => assert!(&err.contains("syntax"), "{}", err),
     }
 
     std::fs::remove_dir_all(

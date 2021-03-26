@@ -1,4 +1,15 @@
-#![allow(clippy::module_inception, clippy::wrong_self_convention)]
+#![allow(
+    clippy::module_inception,
+    clippy::wrong_self_convention,
+    clippy::vec_init_then_push,
+    clippy::upper_case_acronyms,
+    clippy::redundant_clone,
+    clippy::explicit_counter_loop,
+    clippy::match_like_matches_macro,
+    clippy::from_over_into,
+    clippy::or_fun_call,
+    clippy::needless_question_mark
+)]
 #![warn(warnings)] // Todo deny warnings once done
 
 #[macro_use]

@@ -104,7 +104,7 @@ async fn diagnose_migration_history_with_opt_in_to_shadow_database_calculates_dr
 
     let rollback = drift.unwrap().unwrap_drift_detected();
 
-    assert!(rollback.starts_with(expected_rollback_warnings), rollback);
+    assert!(rollback.starts_with(expected_rollback_warnings), "{}", rollback);
 
     assert!(history.is_none());
     assert!(failed_migration_names.is_empty());
@@ -198,7 +198,7 @@ async fn diagnose_migration_history_calculates_drift_in_presence_of_failed_migra
         })?;
 
     let err = api.apply_migrations(&directory).send().await.unwrap_err().to_string();
-    assert!(err.contains("yolo") || err.contains("YOLO"), err);
+    assert!(err.contains("yolo") || err.contains("YOLO"), "{}", err);
 
     migration_two.modify_migration(|migration| migration.truncate(migration.len() - "SELECT YOLO;".len()))?;
 
@@ -229,7 +229,7 @@ async fn diagnose_migration_history_calculates_drift_in_presence_of_failed_migra
         "
     );
 
-    assert!(rollback.starts_with(expected_rollback_warnings), rollback);
+    assert!(rollback.starts_with(expected_rollback_warnings), "{}", rollback);
 
     assert!(history.is_none());
     assert_eq!(failed_migration_names.len(), 1);
@@ -639,7 +639,7 @@ async fn with_a_failed_migration(api: &TestApi) -> TestResult {
         .to_string();
 
     if api.is_mssql() {
-        assert!(err.contains("Could not find stored procedure"), err)
+        assert!(err.contains("Could not find stored procedure"), "{}", err)
     }
 
     let DiagnoseMigrationHistoryOutput {
@@ -669,6 +669,7 @@ async fn with_a_failed_migration(api: &TestApi) -> TestResult {
 
     assert!(
         message.contains("01-init` failed to apply cleanly to a temporary database."),
+        "{}",
         message,
     );
     assert_eq!(
@@ -745,6 +746,7 @@ async fn with_an_invalid_unapplied_migration_should_report_it(api: &TestApi) -> 
 
     assert!(
         message.contains("_second-migration` failed to apply cleanly to a temporary database."),
+        "{}",
         message,
     );
     assert_eq!(
