@@ -35,12 +35,19 @@ use std::fmt::Write as _;
 use tempfile::TempDir;
 use test_setup::{create_mysql_database, create_postgres_database, Features, TestApiArgs};
 
+#[derive(BitFlags, Debug, Clone, Copy, PartialEq)]
+#[repr(u8)]
+pub enum Circumstances {
+    LowerCasesTableNames = 0b0001,
+}
+
 /// A handle to all the context needed for end-to-end testing of the migration engine across
 /// connectors.
 pub struct TestApi {
     api: SqlMigrationConnector,
     args: TestApiArgs,
     connection_string: String,
+    circumstances: BitFlags<Circumstances>,
 }
 
 impl TestApi {
@@ -76,10 +83,27 @@ impl TestApi {
             .await
             .unwrap();
 
+        let mut circumstances = BitFlags::empty();
+
+        if tags.contains(Tags::Mysql) {
+            let val = api.quaint()
+                .query_raw("SELECT @@lower_case_table_names", &[])
+                .await
+                .ok()
+                .and_then(|row| row.into_single().ok())
+                .and_then(|row| row.at(0).and_then(|col| col.as_i64()))
+                .filter(|val| *val == 1);
+
+            if let Some(_) = val {
+                circumstances |= Circumstances::LowerCasesTableNames;
+            }
+        }
+
         TestApi {
             api,
             args,
             connection_string,
+            circumstances
         }
     }
 
@@ -109,6 +133,10 @@ impl TestApi {
 
     pub fn is_mariadb(&self) -> bool {
         self.tags().contains(Tags::Mariadb)
+    }
+
+    pub fn lower_case_identifiers(&self) -> bool {
+        self.circumstances.contains(Circumstances::LowerCasesTableNames)
     }
 
     pub fn is_mysql_5_6(&self) -> bool {
@@ -251,8 +279,7 @@ impl TestApi {
 
     pub async fn assert_schema(&self) -> Result<SchemaAssertion, anyhow::Error> {
         let schema = self.describe_database().await?;
-
-        Ok(SchemaAssertion(schema))
+        Ok(SchemaAssertion::new(schema, self.circumstances))
     }
 
     pub async fn dump_table(&self, table_name: &str) -> Result<quaint::prelude::ResultSet, quaint::error::Error> {

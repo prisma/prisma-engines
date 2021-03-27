@@ -1,9 +1,14 @@
+use std::borrow::Cow;
+
 use datamodel_connector::Connector;
+use enumflags2::BitFlags;
 use pretty_assertions::assert_eq;
 use sql_schema_describer::{
     Column, ColumnTypeFamily, DefaultKind, DefaultValue, Enum, ForeignKey, ForeignKeyAction, Index, IndexType,
     PrimaryKey, SqlSchema, Table,
 };
+
+use crate::Circumstances;
 
 pub(crate) type AssertionResult<T> = Result<T, anyhow::Error>;
 
@@ -13,7 +18,12 @@ pub trait SqlSchemaExt {
 
 impl SqlSchemaExt for SqlSchema {
     fn assert_table<'a>(&'a self, table_name: &str) -> AssertionResult<TableAssertion<'a>> {
-        self.table(table_name).map(TableAssertion).map_err(|_| {
+        let circumstances = match self.lower_case_identifiers {
+            true => BitFlags::from_flag(Circumstances::LowerCasesTableNames),
+            false => BitFlags::empty(),
+        };
+
+        self.table(table_name).map(|table| TableAssertion::new(table, circumstances)).map_err(|_| {
             anyhow::anyhow!(
                 "assert_table failed. Table {} not found. Tables in database: {:?}",
                 table_name,
@@ -23,32 +33,49 @@ impl SqlSchemaExt for SqlSchema {
     }
 }
 
-pub struct SchemaAssertion(pub SqlSchema);
+pub struct SchemaAssertion {
+    schema: SqlSchema,
+    circumstances: BitFlags<Circumstances>,
+}
 
 impl SchemaAssertion {
+    pub fn new(schema: SqlSchema, circumstances: BitFlags<Circumstances>) -> Self {
+        Self { schema, circumstances }
+    }
+
     pub fn into_schema(self) -> SqlSchema {
-        self.0
+        self.schema
     }
 
     pub fn assert_equals(self, other: &SqlSchema) -> AssertionResult<Self> {
-        assert_eq!(&self.0, other);
+        assert_eq!(&self.schema, other);
 
         Ok(self)
     }
 
     pub fn assert_ne(self, other: &SqlSchema) -> AssertionResult<Self> {
-        assert_ne!(&self.0, other);
+        assert_ne!(&self.schema, other);
 
         Ok(self)
     }
 
+    fn normalize<'a>(&self, s: &'a str) -> Cow<'a, str> {
+        if self.circumstances.contains(Circumstances::LowerCasesTableNames) {
+            s.to_lowercase().into()
+        } else {
+            s.into()
+        }
+    }
+
     fn find_table(&self, table_name: &str) -> anyhow::Result<&sql_schema_describer::Table> {
-        match self.0.table(table_name) {
+        let table_name = self.normalize(table_name);
+
+        match self.schema.table(&table_name) {
             Ok(table) => Ok(table),
             Err(_) => Err(anyhow::anyhow!(
                 "assert_has_table failed. Table {} not found. Tables in database: {:?}",
                 table_name,
-                self.0.tables.iter().map(|table| &table.name).collect::<Vec<_>>()
+                self.schema.tables.iter().map(|table| &table.name).collect::<Vec<_>>()
             )),
         }
     }
@@ -64,13 +91,14 @@ impl SchemaAssertion {
     {
         let table = self.find_table(table_name)?;
 
-        table_assertions(TableAssertion(table))?;
+        table_assertions(TableAssertion::new(table, self.circumstances))?;
 
         Ok(self)
     }
 
     pub fn assert_has_no_enum(self, enum_name: &str) -> AssertionResult<Self> {
-        assert!(self.0.get_enum(enum_name).is_none());
+        let enum_name = self.normalize(enum_name);
+        assert!(self.schema.get_enum(&enum_name).is_none());
 
         Ok(self)
     }
@@ -80,7 +108,7 @@ impl SchemaAssertion {
         F: for<'a> FnOnce(EnumAssertion<'a>) -> AssertionResult<EnumAssertion<'a>>,
     {
         let r#enum = self
-            .0
+            .schema
             .get_enum(enum_name)
             .ok_or_else(|| anyhow::anyhow!("Assertion failed. Enum `{}` not found", enum_name))?;
 
@@ -90,21 +118,21 @@ impl SchemaAssertion {
     }
 
     pub fn assert_tables_count(self, expected_count: usize) -> AssertionResult<Self> {
-        let actual_count = self.0.tables.len();
+        let actual_count = self.schema.tables.len();
 
         anyhow::ensure!(
             actual_count == expected_count,
             "Assertion failed. Expected the schema to have {expected_count} tables, found {actual_count}. ({table_names:?})",
             expected_count = expected_count,
             actual_count = actual_count,
-            table_names = self.0.tables.iter().map(|t| t.name.as_str()).collect::<Vec<&str>>(),
+            table_names = self.schema.tables.iter().map(|t| t.name.as_str()).collect::<Vec<&str>>(),
         );
 
         Ok(self)
     }
 
     pub fn debug_print(self) -> Self {
-        println!("{:?}", &self.0);
+        println!("{:?}", &self.schema);
 
         self
     }
@@ -119,18 +147,25 @@ impl<'a> EnumAssertion<'a> {
             "Assertion failed. The `{}` enum does not contain the expected variants.\nExpected:\n{:#?}\n\nFound:\n{:#?}\n",
             self.0.name,
             expected_values,
-            self.0.values
+            self.0.values,
         );
 
         Ok(self)
     }
 }
 
-pub struct TableAssertion<'a>(&'a Table);
+pub struct TableAssertion<'a> {
+    table: &'a Table,
+    circumstances: BitFlags<Circumstances>,
+}
 
 impl<'a> TableAssertion<'a> {
+    pub fn new(table: &'a Table, circumstances: BitFlags<Circumstances>) -> Self {
+        Self { table, circumstances }
+    }
+
     pub fn assert_column_count(self, n: usize) -> AssertionResult<Self> {
-        let columns_count = self.0.columns.len();
+        let columns_count = self.table.columns.len();
 
         anyhow::ensure!(
             columns_count == n,
@@ -138,7 +173,7 @@ impl<'a> TableAssertion<'a> {
                 "Assertion failed. Expected {n} columns, found {columns_count}. {columns:#?}",
                 n = n,
                 columns_count = columns_count,
-                columns = &self.0.columns,
+                columns = &self.table.columns,
             )
         );
 
@@ -146,7 +181,7 @@ impl<'a> TableAssertion<'a> {
     }
 
     pub fn assert_foreign_keys_count(self, n: usize) -> AssertionResult<Self> {
-        let fk_count = self.0.foreign_keys.len();
+        let fk_count = self.table.foreign_keys.len();
         anyhow::ensure!(
             fk_count == n,
             anyhow::anyhow!("Expected {} foreign keys, found {}.", n, fk_count)
@@ -156,7 +191,7 @@ impl<'a> TableAssertion<'a> {
     }
 
     pub fn assert_has_fk(self, fk: &ForeignKey) -> AssertionResult<Self> {
-        let matching_fk = self.0.foreign_keys.iter().any(|found| found == fk);
+        let matching_fk = self.table.foreign_keys.iter().any(|found| found == fk);
 
         anyhow::ensure!(matching_fk, "Assertion failed. Could not find fk.");
 
@@ -167,29 +202,33 @@ impl<'a> TableAssertion<'a> {
     where
         F: FnOnce(ForeignKeyAssertion<'a>) -> AssertionResult<ForeignKeyAssertion<'a>>,
     {
-        if let Some(fk) = self.0.foreign_keys.iter().find(|fk| fk.columns == columns) {
-            fk_assertions(ForeignKeyAssertion(fk))?;
+        if let Some(fk) = self.table.foreign_keys.iter().find(|fk| fk.columns == columns) {
+            fk_assertions(ForeignKeyAssertion::new(fk, self.circumstances))?;
         } else {
-            anyhow::bail!("Could not find foreign key on {}.{:?}", self.0.name, columns);
+            anyhow::bail!("Could not find foreign key on {}.{:?}", self.table.name, columns);
         }
 
         Ok(self)
     }
 
     pub fn assert_does_not_have_column(self, column_name: &str) -> AssertionResult<Self> {
-        if self.0.column(column_name).is_some() {
-            anyhow::bail!("Assertion failed: found column `{}` on `{}`.", column_name, self.0.name);
+        if self.table.column(column_name).is_some() {
+            anyhow::bail!(
+                "Assertion failed: found column `{}` on `{}`.",
+                column_name,
+                self.table.name
+            );
         }
 
         Ok(self)
     }
 
     pub fn assert_has_column(self, column_name: &str) -> AssertionResult<Self> {
-        self.0.column(column_name).ok_or_else(|| {
+        self.table.column(column_name).ok_or_else(|| {
             anyhow::anyhow!(
                 "Assertion failed: column {} not found. Existing columns: {:?}",
                 column_name,
-                self.0.columns.iter().map(|col| &col.name).collect::<Vec<_>>()
+                self.table.columns.iter().map(|col| &col.name).collect::<Vec<_>>()
             )
         })?;
 
@@ -201,7 +240,7 @@ impl<'a> TableAssertion<'a> {
         F: FnOnce(ColumnAssertion<'a>) -> AssertionResult<ColumnAssertion<'a>>,
     {
         let this = self.assert_has_column(column_name)?;
-        let column = this.0.column(column_name).unwrap();
+        let column = this.table.column(column_name).unwrap();
 
         column_assertions(ColumnAssertion(column))?;
 
@@ -209,7 +248,7 @@ impl<'a> TableAssertion<'a> {
     }
 
     pub fn assert_columns_count(self, count: usize) -> AssertionResult<Self> {
-        let actual_count = self.0.columns.len();
+        let actual_count = self.table.columns.len();
 
         anyhow::ensure!(
             actual_count == count,
@@ -223,10 +262,10 @@ impl<'a> TableAssertion<'a> {
 
     pub fn assert_has_no_pk(self) -> AssertionResult<Self> {
         anyhow::ensure!(
-            self.0.primary_key.is_none(),
+            self.table.primary_key.is_none(),
             "Assertion failed: expected no primary key on {}, but found one. ({:?})",
-            self.0.name,
-            self.0.primary_key
+            self.table.name,
+            self.table.primary_key
         );
 
         Ok(self)
@@ -237,18 +276,18 @@ impl<'a> TableAssertion<'a> {
         F: FnOnce(PrimaryKeyAssertion<'a>) -> AssertionResult<PrimaryKeyAssertion<'a>>,
     {
         let pk = self
-            .0
+            .table
             .primary_key
             .as_ref()
-            .ok_or_else(|| anyhow::anyhow!("Primary key not found on {}.", self.0.name))?;
+            .ok_or_else(|| anyhow::anyhow!("Primary key not found on {}.", self.table.name))?;
 
-        pk_assertions(PrimaryKeyAssertion { pk, table: self.0 })?;
+        pk_assertions(PrimaryKeyAssertion { pk, table: self.table })?;
 
         Ok(self)
     }
 
     pub fn assert_indexes_count(self, n: usize) -> AssertionResult<Self> {
-        let idx_count = self.0.indices.len();
+        let idx_count = self.table.indices.len();
         anyhow::ensure!(
             idx_count == n,
             anyhow::anyhow!("Expected {} indexes, found {}.", n, idx_count)
@@ -261,17 +300,17 @@ impl<'a> TableAssertion<'a> {
     where
         F: FnOnce(IndexAssertion<'a>) -> AssertionResult<IndexAssertion<'a>>,
     {
-        if let Some(idx) = self.0.indices.iter().find(|idx| idx.columns == columns) {
+        if let Some(idx) = self.table.indices.iter().find(|idx| idx.columns == columns) {
             index_assertions(IndexAssertion(idx))?;
         } else {
-            anyhow::bail!("Could not find index on {}.{:?}", self.0.name, columns);
+            anyhow::bail!("Could not find index on {}.{:?}", self.table.name, columns);
         }
 
         Ok(self)
     }
 
     pub fn debug_print(self) -> AssertionResult<Self> {
-        println!("{:?}", self.0);
+        println!("{:?}", self.table);
         Ok(self)
     }
 }
@@ -334,7 +373,7 @@ impl<'a> ColumnAssertion<'a> {
         let found = &self.0.default;
 
         match found.as_ref().map(|d| d.kind()) {
-            Some(DefaultKind::Value(val)) => anyhow::ensure!(
+            Some(DefaultKind::Value(ref val)) => anyhow::ensure!(
                 val == expected,
                 "Assertion failed. Expected the default value for `{}` to be `{:?}`, got `{:?}`",
                 self.0.name,
@@ -387,6 +426,7 @@ impl<'a> ColumnAssertion<'a> {
 
     pub fn assert_type_family(self, expected: ColumnTypeFamily) -> AssertionResult<Self> {
         let found = &self.0.tpe.family;
+        let expected = expected.normalized();
 
         anyhow::ensure!(
             found == &expected,
@@ -548,17 +588,26 @@ impl<'a> PrimaryKeyAssertion<'a> {
     }
 }
 
-pub struct ForeignKeyAssertion<'a>(&'a ForeignKey);
+pub struct ForeignKeyAssertion<'a> {
+    fk: &'a ForeignKey,
+    circumstances: BitFlags<Circumstances>,
+}
 
 impl<'a> ForeignKeyAssertion<'a> {
+    pub fn new(fk: &'a ForeignKey, circumstances: BitFlags<Circumstances>) -> Self {
+        Self { fk, circumstances }
+    }
+
     pub fn assert_references(self, table: &str, columns: &[&str]) -> AssertionResult<Self> {
+        let table = self.normalize(table);
+
         anyhow::ensure!(
-            self.0.referenced_table == table && self.0.referenced_columns == columns,
+            self.fk.referenced_table == table && self.fk.referenced_columns == columns,
             r#"Assertion failed. Expected reference to "{}" ({:?}). Found "{}" ({:?}) "#,
             table,
             columns,
-            self.0.referenced_table,
-            self.0.referenced_columns,
+            self.fk.referenced_table,
+            self.fk.referenced_columns,
         );
 
         Ok(self)
@@ -566,11 +615,19 @@ impl<'a> ForeignKeyAssertion<'a> {
 
     pub fn assert_cascades_on_delete(self) -> AssertionResult<Self> {
         anyhow::ensure!(
-            self.0.on_delete_action == ForeignKeyAction::Cascade,
+            self.fk.on_delete_action == ForeignKeyAction::Cascade,
             "Assertion failed: expected foreign key to cascade on delete."
         );
 
         Ok(self)
+    }
+
+    fn normalize<'b>(&self, s: &'b str) -> Cow<'b, str> {
+        if self.circumstances.contains(Circumstances::LowerCasesTableNames) {
+            s.to_lowercase().into()
+        } else {
+            s.into()
+        }
     }
 }
 

@@ -31,6 +31,8 @@ async fn altering_the_type_of_a_column_in_a_non_empty_table_warns(api: &TestApi)
     api.schema_push(dm2).send().await?.assert_warnings(&[
         if api.is_postgres() {
             "You are about to alter the column `dogs` on the `User` table, which contains 1 non-null values. The data in that column will be cast from `BigInt` to `Integer`.".into()
+        } else if api.lower_case_identifiers() {
+            "You are about to alter the column `dogs` on the `user` table, which contains 1 non-null values. The data in that column will be cast from `BigInt` to `Int`.".into()
         } else {
             "You are about to alter the column `dogs` on the `User` table, which contains 1 non-null values. The data in that column will be cast from `BigInt` to `Int`.".into()
         }
@@ -271,6 +273,22 @@ async fn string_to_int_conversions_are_risky(api: &TestApi) -> TestResult {
                 .await?
                 .assert_no_warning()?
                 .assert_unexecutable(&["Changed the type of `tag` on the `Cat` table. No cast exists, the column would be dropped and recreated, which cannot be done since the column is required and there is data in the table.".into()])?;
+        }
+        // Executable, conditionally.
+        SqlFamily::Mysql if api.lower_case_identifiers() => {
+            api.schema_push(dm2)
+            .force(true)
+            .send()
+            .await?
+            .assert_warnings(&[
+                "You are about to alter the column `tag` on the `cat` table, which contains 1 non-null values. The data in that column will be cast from `VarChar(191)` to `Int`.".into()
+            ])?
+            .assert_executable()?
+            .assert_has_executed_steps()?;
+
+            api.dump_table("Cat")
+                .await?
+                .assert_single_row(|row| row.assert_int_value("tag", 20))?;
         }
         // Executable, conditionally.
         SqlFamily::Mysql => {

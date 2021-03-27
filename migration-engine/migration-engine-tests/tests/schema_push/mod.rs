@@ -87,7 +87,11 @@ async fn schema_push_warns_about_destructive_changes(api: &TestApi) -> TestResul
         }
     "#;
 
-    let expected_warning = "You are about to drop the `Box` table, which is not empty (1 rows).";
+    let expected_warning = if api.lower_case_identifiers() {
+        "You are about to drop the `box` table, which is not empty (1 rows)."
+    } else {
+        "You are about to drop the `Box` table, which is not empty (1 rows)."
+    };
 
     api.schema_push(dm2)
         .send()

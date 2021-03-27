@@ -16,7 +16,9 @@ enum CatMood {
 async fn an_enum_can_be_turned_into_a_model(api: &TestApi) -> TestResult {
     api.schema_push(BASIC_ENUM_DM).send().await?.assert_green()?;
 
-    let enum_name = if api.sql_family().is_mysql() {
+    let enum_name = if api.lower_case_identifiers() {
+        "cat_mood"
+    } else if api.sql_family().is_mysql() {
         "Cat_mood"
     } else {
         "CatMood"
@@ -68,7 +70,9 @@ async fn variants_can_be_added_to_an_existing_enum(api: &TestApi) -> TestResult 
 
     api.schema_push(dm1).send().await?.assert_green()?;
 
-    let enum_name = if api.sql_family().is_mysql() {
+    let enum_name = if api.lower_case_identifiers() {
+        "cat_mood"
+    } else if api.sql_family().is_mysql() {
         "Cat_mood"
     } else {
         "CatMood"
@@ -116,7 +120,9 @@ async fn variants_can_be_removed_from_an_existing_enum(api: &TestApi) -> TestRes
 
     api.schema_push(dm1).send().await?.assert_green()?;
 
-    let enum_name = if api.sql_family().is_mysql() {
+    let enum_name = if api.lower_case_identifiers() {
+        "cat_mood"
+    } else if api.sql_family().is_mysql() {
         "Cat_mood"
     } else {
         "CatMood"
@@ -141,7 +147,7 @@ async fn variants_can_be_removed_from_an_existing_enum(api: &TestApi) -> TestRes
         .force(true)
         .send()
         .await?
-        .assert_warnings(&[format!("The values [HAPPY] on the enum `{}` will be removed. If these variants are still used in the database, this will fail.", enum_name).into()])?
+        .assert_warnings(&["The values [HAPPY] on the enum `Cat_mood` will be removed. If these variants are still used in the database, this will fail.".into()])?
         .assert_executable()?;
 
     api.assert_schema()
@@ -163,12 +169,18 @@ async fn models_with_enum_values_can_be_dropped(api: &TestApi) -> TestResult {
         .result_raw()
         .await?;
 
+    let warn = if api.lower_case_identifiers() {
+        "You are about to drop the `cat` table, which is not empty (1 rows)."
+    } else {
+        "You are about to drop the `Cat` table, which is not empty (1 rows)."
+    };
+
     api.schema_push("")
         .force(true)
         .send()
         .await?
         .assert_executable()?
-        .assert_warnings(&["You are about to drop the `Cat` table, which is not empty (1 rows).".into()])?;
+        .assert_warnings(&[warn.into()])?;
 
     api.assert_schema().await?.assert_tables_count(0)?;
 
@@ -250,15 +262,20 @@ async fn string_field_to_enum_field_works(api: &TestApi) -> TestResult {
         }
     "#;
 
+    let warn = if api.is_postgres() {
+        "The `mood` column on the `Cat` table would be dropped and recreated. This will lead to data loss."
+    } else if api.lower_case_identifiers() {
+        "You are about to alter the column `mood` on the `cat` table, which contains 1 non-null values. The data in that column will be cast from `VarChar(191)` to `Enum(\"Cat_mood\")`."
+    } else {
+        "You are about to alter the column `mood` on the `Cat` table, which contains 1 non-null values. The data in that column will be cast from `VarChar(191)` to `Enum(\"Cat_mood\")`."
+    };
+
     api.schema_push(dm2)
         .force(true)
         .send()
         .await?
         .assert_executable()?
-        .assert_warnings(&[if api.is_postgres() {
-
-            "The `mood` column on the `Cat` table would be dropped and recreated. This will lead to data loss.".into()
-        } else {"You are about to alter the column `mood` on the `Cat` table, which contains 1 non-null values. The data in that column will be cast from `VarChar(191)` to `Enum(\"Cat_mood\")`.".into() }])?;
+        .assert_warnings(&[warn.into()])?;
 
     api.assert_schema().await?.assert_table("Cat", |table| {
         table.assert_column("mood", |col| col.assert_type_is_enum())

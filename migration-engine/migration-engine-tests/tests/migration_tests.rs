@@ -968,12 +968,13 @@ async fn changing_a_relation_field_to_a_scalar_field_must_work(api: &TestApi) ->
             .assert_has_fk(&ForeignKey {
                 constraint_name: match api.sql_family() {
                     SqlFamily::Postgres => Some("A_b_fkey".to_owned()),
+                    SqlFamily::Mysql if api.lower_case_identifiers() => Some("a_ibfk_1".to_owned()),
                     SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
                     SqlFamily::Sqlite => None,
                     SqlFamily::Mssql => Some("A_b_fkey".to_owned()),
                 },
                 columns: vec!["b".to_owned()],
-                referenced_table: "B".to_string(),
+                referenced_table: if api.lower_case_identifiers() { "b".to_string() } else { "B".to_string() },
                 referenced_columns: vec!["id".to_string()],
                 on_delete_action: ForeignKeyAction::Cascade,
                 on_update_action: ForeignKeyAction::NoAction,
@@ -1659,8 +1660,10 @@ async fn relations_can_reference_arbitrary_unique_fields(api: &TestApi) -> TestR
 
     let fk = fks.iter().next().unwrap();
 
+    let ref_table = if api.lower_case_identifiers() { "user" } else { "User" };
+
     assert_eq!(fk.columns, &["uem"]);
-    assert_eq!(fk.referenced_table, "User");
+    assert_eq!(fk.referenced_table, ref_table);
     assert_eq!(fk.referenced_columns, &["email"]);
 
     Ok(())

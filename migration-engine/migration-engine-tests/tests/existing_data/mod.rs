@@ -30,10 +30,13 @@ async fn dropping_a_table_with_rows_should_warn(api: &TestApi) -> TestResult {
 
     let dm = "";
 
-    api.schema_push(dm)
-        .send()
-        .await?
-        .assert_warnings(&["You are about to drop the `Test` table, which is not empty (1 rows).".into()])?;
+    let warn = if api.lower_case_identifiers() {
+        "You are about to drop the `test` table, which is not empty (1 rows)."
+    } else {
+        "You are about to drop the `Test` table, which is not empty (1 rows)."
+    };
+
+    api.schema_push(dm).send().await?.assert_warnings(&[warn.into()])?;
 
     // The schema should not change because the migration should not run if there are warnings
     // and the force flag isn't passed.
@@ -68,10 +71,13 @@ async fn dropping_a_column_with_non_null_values_should_warn(api: &TestApi) -> Te
             }
         "#;
 
-    api.schema_push(dm).send().await?.assert_warnings(&[
+    let warn = if api.lower_case_identifiers() {
+        "You are about to drop the column `puppiesCount` on the `test` table, which still contains 2 non-null values."
+    } else {
         "You are about to drop the column `puppiesCount` on the `Test` table, which still contains 2 non-null values."
-            .into(),
-    ])?;
+    };
+
+    api.schema_push(dm).send().await?.assert_warnings(&[warn.into()])?;
 
     // The schema should not change because the migration should not run if there are warnings
     // and the force flag isn't passed.
@@ -142,6 +148,7 @@ async fn altering_a_column_with_non_null_values_should_warn(api: &TestApi) -> Te
         match api.sql_family() {
             SqlFamily::Postgres => "The `age` column on the `Test` table would be dropped and recreated. This will lead to data loss.",
             SqlFamily::Mssql => "You are about to alter the column `age` on the `Test` table, which contains 2 non-null values. The data in that column will be cast from `NVarChar(1000)` to `Int`.",
+            SqlFamily::Mysql if api.lower_case_identifiers() => "You are about to alter the column `age` on the `test` table, which contains 2 non-null values. The data in that column will be cast from `VarChar(191)` to `Int`.",
             SqlFamily::Mysql => "You are about to alter the column `age` on the `Test` table, which contains 2 non-null values. The data in that column will be cast from `VarChar(191)` to `Int`.",
             _ => "You are about to alter the column `age` on the `Test` table, which contains 2 non-null values. The data in that column will be cast from `String` to `Int`.",
         }
@@ -359,13 +366,18 @@ async fn changing_a_column_from_optional_to_required_is_unexecutable(api: &TestA
         }
     "#;
 
+    let table = if api.lower_case_identifiers() { "test" } else { "Test" };
+
+    let error = format!(
+        "Made the column `age` on table `{}` required, but there are 1 existing NULL values.",
+        table
+    );
+
     api.schema_push(dm2)
         .send()
         .await?
         .assert_no_warning()?
-        .assert_unexecutable(&[
-            "Made the column `age` on table `Test` required, but there are 1 existing NULL values.".into(),
-        ])?;
+        .assert_unexecutable(&[error.into()])?;
 
     // The schema should not change because the migration should not run if there are warnings
     // and the force flag isn't passed.
@@ -640,12 +652,18 @@ async fn enum_variants_can_be_added_without_data_loss(api: &TestApi) -> TestResu
         assert_eq!(human_data, expected_human_data);
 
         if api.sql_family().is_mysql() {
+            let (cat, hum) = if api.lower_case_identifiers() {
+                ("cat_mood", "human_mood")
+            } else {
+                ("Cat_mood", "Human_mood")
+            };
+
             api.assert_schema()
                 .await?
-                .assert_enum("Cat_mood", |enm| {
+                .assert_enum(cat, |enm| {
                     enm.assert_values(&["HAPPY", "HUNGRY", "ABSOLUTELY_FABULOUS"])
                 })?
-                .assert_enum("Human_mood", |enm| {
+                .assert_enum(hum, |enm| {
                     enm.assert_values(&["HAPPY", "HUNGRY", "ABSOLUTELY_FABULOUS"])
                 })?;
         } else {
@@ -755,10 +773,16 @@ async fn enum_variants_can_be_dropped_without_data_loss(api: &TestApi) -> TestRe
         assert_eq!(human_data, expected_human_data);
 
         if api.sql_family().is_mysql() {
+            let (c, h) = if api.lower_case_identifiers() {
+                ("cat_mood", "human_mood")
+            } else {
+                ("Cat_mood", "Human_mood")
+            };
+
             api.assert_schema()
                 .await?
-                .assert_enum("Cat_mood", |enm| enm.assert_values(&["HAPPY", "HUNGRY"]))?
-                .assert_enum("Human_mood", |enm| enm.assert_values(&["HAPPY", "HUNGRY"]))?;
+                .assert_enum(c, |enm| enm.assert_values(&["HAPPY", "HUNGRY"]))?
+                .assert_enum(h, |enm| enm.assert_values(&["HAPPY", "HUNGRY"]))?;
         } else {
             api.assert_schema()
                 .await?
@@ -861,14 +885,18 @@ async fn primary_key_migrations_do_not_cause_data_loss(api: &TestApi) -> TestRes
         }
     "#;
 
+    let warn = if api.lower_case_identifiers() {
+        "The primary key for the `dog` table will be changed. If it partially fails, the table could be left without primary key constraint."
+    } else {
+        "The primary key for the `Dog` table will be changed. If it partially fails, the table could be left without primary key constraint."
+    };
+
     api.schema_push(dm2)
         .force(true)
         .send()
         .await?
         .assert_executable()?
-        .assert_warnings(&[
-            "The primary key for the `Dog` table will be changed. If it partially fails, the table could be left without primary key constraint.".into(),
-        ])?;
+        .assert_warnings(&[warn.into()])?;
 
     api.assert_schema().await?.assert_table("Dog", |table| {
         table.assert_pk(|pk| pk.assert_columns(&["name", "passportNumber"]))

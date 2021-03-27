@@ -44,7 +44,7 @@ async fn authentication_failure_must_return_a_known_error_on_postgres() {
 
 #[tokio::test]
 async fn authentication_failure_must_return_a_known_error_on_mysql() {
-    let mut url: Url = mysql_url("authentication_failure_must_return_a_known_error_on_mysql")
+    let mut url: Url = mysql_5_7_url("authentication_failure_must_return_a_known_error_on_mysql")
         .parse()
         .unwrap();
 
@@ -81,7 +81,7 @@ async fn authentication_failure_must_return_a_known_error_on_mysql() {
 
 #[tokio::test]
 async fn unreachable_database_must_return_a_proper_error_on_mysql() {
-    let mut url: Url = mysql_url("unreachable_database_must_return_a_proper_error_on_mysql")
+    let mut url: Url = mysql_5_7_url("unreachable_database_must_return_a_proper_error_on_mysql")
         .parse()
         .unwrap();
 
@@ -155,7 +155,7 @@ async fn unreachable_database_must_return_a_proper_error_on_postgres() {
 
 #[tokio::test]
 async fn database_does_not_exist_must_return_a_proper_error() {
-    let mut url: Url = mysql_url("database_does_not_exist_must_return_a_proper_error")
+    let mut url: Url = mysql_5_7_url("database_does_not_exist_must_return_a_proper_error")
         .parse()
         .unwrap();
     let database_name = "notmydatabase";
@@ -192,7 +192,7 @@ async fn database_does_not_exist_must_return_a_proper_error() {
 #[tokio::test]
 async fn database_access_denied_must_return_a_proper_error_in_rpc() {
     let db_name = "dbaccessdeniedinrpc";
-    let url: Url = mysql_url(db_name).parse().unwrap();
+    let url: Url = mysql_5_7_url(db_name).parse().unwrap();
     let conn = create_mysql_database(&url).await.unwrap();
 
     conn.execute_raw("DROP USER IF EXISTS jeanyves", &[]).await.unwrap();

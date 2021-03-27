@@ -140,7 +140,21 @@ impl EngineTestApi {
     pub async fn assert_schema(&self) -> Result<SchemaAssertion, anyhow::Error> {
         let schema = self.0.describe_schema().await?;
 
-        Ok(SchemaAssertion(schema))
+        Ok(SchemaAssertion::new(schema, BitFlags::empty()))
+    }
+
+    /// True if MySQL on Windows with default settings.
+    pub async fn lower_case_identifiers(&self) -> bool {
+        self
+            .0
+            .quaint()
+            .query_raw("SELECT @@lower_case_table_names", &[])
+            .await
+            .ok()
+            .and_then(|row| row.into_single().ok())
+            .and_then(|row| row.at(0).and_then(|col| col.as_i64()))
+            .map(|val| val == 1)
+            .unwrap_or(false)
     }
 
     /// Expose the GenericApi impl.

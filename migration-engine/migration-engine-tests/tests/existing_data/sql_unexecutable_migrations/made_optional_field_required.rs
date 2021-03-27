@@ -28,12 +28,18 @@ async fn making_an_optional_field_required_with_data_without_a_default_is_unexec
         }
     "#;
 
+    let error = if api.lower_case_identifiers() {
+        "Made the column `age` on table `test` required, but there are 1 existing NULL values."
+    } else {
+        "Made the column `age` on table `Test` required, but there are 1 existing NULL values."
+    };
+
     api.schema_push(dm2)
         .send()
         .await?
         .assert_no_warning()?
         .assert_unexecutable(&[
-            "Made the column `age` on table `Test` required, but there are 1 existing NULL values.".into(),
+            error.into(),
         ])?;
 
     api.assert_schema()
@@ -147,12 +153,18 @@ async fn making_an_optional_field_required_with_data_with_a_default_is_unexecuta
         }
     "#;
 
+    let error = if api.lower_case_identifiers() {
+        "Made the column `age` on table `test` required, but there are 1 existing NULL values."
+    } else {
+        "Made the column `age` on table `Test` required, but there are 1 existing NULL values."
+    };
+
     api.schema_push(dm2)
         .force(false)
         .send()
         .await?
         .assert_unexecutable(&[
-            "Made the column `age` on table `Test` required, but there are 1 existing NULL values.".into(),
+            error.into(),
         ])?
         .assert_no_warning()?;
 
