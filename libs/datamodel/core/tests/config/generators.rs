@@ -19,15 +19,24 @@ generator go {
     let expected = r#"[
   {
     "name": "js1",
-    "provider": "javascript",
-    "output": "../../js",
+    "provider": {
+        "fromEnvVar": null,
+        "value": "javascript"
+    },
+    "output": {
+        "fromEnvVar": null,
+        "value": "../../js"
+    },
     "binaryTargets": [],
     "previewFeatures": [],
     "config": {}
   },
   {
     "name": "go",
-    "provider": "go",
+    "provider": {
+        "fromEnvVar": null,
+        "value": "go"
+    },
     "output": null,
     "binaryTargets": ["a","b"],
     "previewFeatures": [],
@@ -56,7 +65,10 @@ fn preview_features_setting_must_work() {
     let expected = r#"[
   {
     "name": "js",
-    "provider": "javascript",
+    "provider": {
+        "fromEnvVar": null,
+        "value": "javascript"
+    },
     "output":null,
     "binaryTargets": [],
     "previewFeatures": ["connectOrCreate"],
@@ -64,7 +76,10 @@ fn preview_features_setting_must_work() {
   },
   {
     "name": "go",
-    "provider": "go",
+    "provider": {
+        "fromEnvVar": null,
+        "value": "go"
+    },
     "output":null,
     "binaryTargets": [],
     "previewFeatures": ["connectOrCreate", "transactionApi"],
@@ -86,7 +101,10 @@ fn back_slashes_in_providers_must_work() {
     let expected = r#"[
         {
           "name": "mygen",
-          "provider": "../folder\\ with\\ space/my\\ generator.js",
+          "provider":{
+            "fromEnvVar": null,
+            "value": "../folder\\ with\\ space/my\\ generator.js"
+          },
           "output": null,
           "binaryTargets": [],
           "previewFeatures": [],
@@ -110,7 +128,10 @@ fn new_lines_in_generator_must_work() {
     let expected = r#"[
         {
           "name": "go",
-          "provider": "go",
+          "provider": {
+            "fromEnvVar": null,
+            "value": "go"
+          },
           "output": null,
           "binaryTargets": ["b","c"],
           "previewFeatures": [],
@@ -164,11 +185,41 @@ fn nice_error_for_unknown_generator_preview_feature() {
     }
 }
 
+#[test]
+fn retain_env_var_definitions_in_generator_block() {
+    std::env::set_var("PROVIDER", "postgres");
+    std::env::set_var("OUTPUT", "~/home/prisma/");
+
+    let schema1 = r#"
+    generator js1 {
+        provider = env("PROVIDER")
+        output = env("OUTPUT")
+    }
+    "#;
+
+    let expected_dmmf_1 = r#"[
+  {
+    "name": "js1",
+    "provider": {
+      "fromEnvVar": "PROVIDER",
+      "value": "postgres"
+    },
+    "output": {
+      "fromEnvVar": "OUTPUT",
+      "value": "~/home/prisma/"
+    },
+    "binaryTargets": [],
+    "previewFeatures": [],
+    "config": {}
+  }
+]"#;
+
+    assert_mcf(schema1, expected_dmmf_1);
+}
+
 fn assert_mcf(schema: &str, expected_mcf: &str) {
     let config = parse_configuration(schema);
     let rendered = datamodel::json::mcf::generators_to_json(&config.generators);
-
-    print!("{}", &expected_mcf);
 
     assert_eq_json(&rendered, expected_mcf);
 }

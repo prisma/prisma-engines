@@ -138,6 +138,7 @@ impl DatasourceLoader {
             (_, _) if ignore_datasource_urls => {
                 // glorious hack. ask marcus
                 StringFromEnvVar {
+                    name: "url",
                     from_env_var: None,
                     value: format!("{}://", providers.first().unwrap()),
                 }
@@ -145,11 +146,13 @@ impl DatasourceLoader {
             (_, Some(url)) => {
                 tracing::debug!("overwriting datasource `{}` with url '{}'", &source_name, &url);
                 StringFromEnvVar {
+                    name: "url",
                     from_env_var: None,
                     value: url.to_owned(),
                 }
             }
             (Ok((env_var, url)), _) => StringFromEnvVar {
+                name: "url",
                 from_env_var: env_var,
                 value: url.trim().to_owned(),
             },
@@ -174,12 +177,14 @@ impl DatasourceLoader {
                     _ if ignore_datasource_urls => {
                         // glorious hack. ask marcus
                         Some(StringFromEnvVar {
+                            name: "shadow_database_url",
                             from_env_var: None,
                             value: format!("{}://", providers.first().unwrap()),
                         })
                     }
 
                     Ok((env_var, url)) => Some(StringFromEnvVar {
+                        name: "shadow_database_url",
                         from_env_var: env_var,
                         value: url.trim().to_owned(),
                     })

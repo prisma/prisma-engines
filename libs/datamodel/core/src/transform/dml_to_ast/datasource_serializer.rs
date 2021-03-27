@@ -20,15 +20,7 @@ impl DatasourceSerializer {
     fn lower_datasource(source: &Datasource) -> ast::SourceConfig {
         let mut arguments: Vec<ast::Argument> = vec![ast::Argument::new_string("provider", &source.active_provider)];
 
-        match source.url.from_env_var {
-            Some(ref env_var) => {
-                let values = vec![ast::Expression::StringValue(env_var.to_string(), ast::Span::empty())];
-                arguments.push(ast::Argument::new_function("url", "env", values));
-            }
-            None => {
-                arguments.push(ast::Argument::new_string("url", &source.url.value));
-            }
-        }
+        arguments.push(super::lower_string_from_env_var(&source.url));
 
         ast::SourceConfig {
             name: ast::Identifier::new(&source.name),
