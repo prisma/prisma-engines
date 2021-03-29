@@ -1,9 +1,13 @@
+use datamodel_connector::Connector;
+use sql_datamodel_connector::MySqlDatamodelConnector;
+
 use super::*;
 use crate::{datamodel_rendering::SqlDatamodelRenderer, TestError, TestResult};
 
-#[derive(Debug, Default, Clone, Copy)]
+#[derive(Debug, Default, Clone)]
 pub struct MySqlConnectorTag {
     version: Option<MySqlVersion>,
+    capabilities: Vec<ConnectorCapability>,
 }
 
 impl ConnectorTagInterface for MySqlConnectorTag {
@@ -45,8 +49,8 @@ impl ConnectorTagInterface for MySqlConnectorTag {
         .to_string()
     }
 
-    fn capabilities(&self) -> Vec<ConnectorCapability> {
-        todo!()
+    fn capabilities(&self) -> &[ConnectorCapability] {
+        &self.capabilities
     }
 
     fn as_parse_pair(&self) -> (String, Option<String>) {
@@ -74,23 +78,32 @@ impl MySqlConnectorTag {
             None => None,
         };
 
-        Ok(Self { version })
+        Ok(Self {
+            version,
+            capabilities: mysql_capabilities(),
+        })
     }
 
     /// Returns all versions of this connector.
     pub fn all() -> Vec<Self> {
+        let capabilities = mysql_capabilities();
+
         vec![
             Self {
                 version: Some(MySqlVersion::V5_6),
+                capabilities: capabilities.clone(),
             },
             Self {
                 version: Some(MySqlVersion::V5_7),
+                capabilities: capabilities.clone(),
             },
             Self {
                 version: Some(MySqlVersion::V8),
+                capabilities: capabilities.clone(),
             },
             Self {
                 version: Some(MySqlVersion::MariaDb),
+                capabilities,
             },
         ]
     }
@@ -131,4 +144,9 @@ impl ToString for MySqlVersion {
         }
         .to_owned()
     }
+}
+
+fn mysql_capabilities() -> Vec<ConnectorCapability> {
+    let dm_connector = MySqlDatamodelConnector::new();
+    dm_connector.capabilities().clone()
 }

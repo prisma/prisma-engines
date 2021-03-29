@@ -1,8 +1,13 @@
+use datamodel_connector::Connector;
+use sql_datamodel_connector::SqliteDatamodelConnector;
+
 use super::*;
 use crate::SqlDatamodelRenderer;
 
-#[derive(Debug, Default, Clone, Copy, PartialEq)]
-pub struct SqliteConnectorTag {}
+#[derive(Debug, Default, Clone, PartialEq)]
+pub struct SqliteConnectorTag {
+    capabilities: Vec<ConnectorCapability>,
+}
 
 impl ConnectorTagInterface for SqliteConnectorTag {
     fn datamodel_provider(&self) -> &'static str {
@@ -22,8 +27,8 @@ impl ConnectorTagInterface for SqliteConnectorTag {
         format!("file://{}/db/{}.db", workspace_root, database)
     }
 
-    fn capabilities(&self) -> Vec<ConnectorCapability> {
-        todo!()
+    fn capabilities(&self) -> &[ConnectorCapability] {
+        &self.capabilities
     }
 
     fn as_parse_pair(&self) -> (String, Option<String>) {
@@ -37,11 +42,18 @@ impl ConnectorTagInterface for SqliteConnectorTag {
 
 impl SqliteConnectorTag {
     pub fn new() -> Self {
-        Self::default()
+        Self {
+            capabilities: sqlite_capabilities(),
+        }
     }
 
     /// Returns all versions of this connector.
     pub fn all() -> Vec<Self> {
         vec![Self::new()]
     }
+}
+
+fn sqlite_capabilities() -> Vec<ConnectorCapability> {
+    let dm_connector = SqliteDatamodelConnector::new();
+    dm_connector.capabilities().clone()
 }

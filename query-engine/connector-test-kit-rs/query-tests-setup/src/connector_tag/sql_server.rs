@@ -1,10 +1,14 @@
+use datamodel_connector::Connector;
+use sql_datamodel_connector::MsSqlDatamodelConnector;
+
 use crate::{datamodel_rendering::SqlDatamodelRenderer, TestError, TestResult};
 
 use super::*;
 
-#[derive(Debug, Default, Clone, Copy)]
+#[derive(Debug, Default, Clone)]
 pub struct SqlServerConnectorTag {
     version: Option<SqlServerVersion>,
+    capabilities: Vec<ConnectorCapability>,
 }
 
 impl ConnectorTagInterface for SqlServerConnectorTag {
@@ -28,8 +32,8 @@ impl ConnectorTagInterface for SqlServerConnectorTag {
         }.to_string()
     }
 
-    fn capabilities(&self) -> Vec<ConnectorCapability> {
-        todo!()
+    fn capabilities(&self) -> &[ConnectorCapability] {
+        &self.capabilities
     }
 
     fn as_parse_pair(&self) -> (String, Option<String>) {
@@ -55,17 +59,24 @@ impl SqlServerConnectorTag {
             None => None,
         };
 
-        Ok(Self { version })
+        Ok(Self {
+            version,
+            capabilities: sql_server_capabilities(),
+        })
     }
 
     /// Returns all versions of this connector.
     pub fn all() -> Vec<Self> {
+        let capabilities = sql_server_capabilities();
+
         vec![
             Self {
                 version: Some(SqlServerVersion::V2017),
+                capabilities: capabilities.clone(),
             },
             Self {
                 version: Some(SqlServerVersion::V2019),
+                capabilities,
             },
         ]
     }
@@ -102,4 +113,9 @@ impl ToString for SqlServerVersion {
         }
         .to_owned()
     }
+}
+
+fn sql_server_capabilities() -> Vec<ConnectorCapability> {
+    let dm_connector = MsSqlDatamodelConnector::new();
+    dm_connector.capabilities().clone()
 }

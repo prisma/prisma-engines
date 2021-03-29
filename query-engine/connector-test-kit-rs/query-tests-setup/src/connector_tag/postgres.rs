@@ -1,10 +1,14 @@
+use datamodel_connector::Connector;
+use sql_datamodel_connector::PostgresDatamodelConnector;
+
 use crate::{datamodel_rendering::SqlDatamodelRenderer, TestError, TestResult};
 
 use super::*;
 
-#[derive(Debug, Default, Clone, Copy)]
+#[derive(Debug, Default, Clone)]
 pub struct PostgresConnectorTag {
     version: Option<PostgresVersion>,
+    capabilities: Vec<ConnectorCapability>,
 }
 
 impl ConnectorTagInterface for PostgresConnectorTag {
@@ -72,8 +76,8 @@ impl ConnectorTagInterface for PostgresConnectorTag {
         .to_string()
     }
 
-    fn capabilities(&self) -> Vec<ConnectorCapability> {
-        todo!()
+    fn capabilities(&self) -> &[ConnectorCapability] {
+        &self.capabilities
     }
 
     fn as_parse_pair(&self) -> (String, Option<String>) {
@@ -103,29 +107,39 @@ impl PostgresConnectorTag {
             None => None,
         };
 
-        Ok(Self { version })
+        Ok(Self {
+            version,
+            capabilities: postgres_capabilities(),
+        })
     }
 
     /// Returns all versions of this connector.
     pub fn all() -> Vec<Self> {
+        let capabilities = postgres_capabilities();
         vec![
             Self {
                 version: Some(PostgresVersion::V9),
+                capabilities: capabilities.clone(),
             },
             Self {
                 version: Some(PostgresVersion::V10),
+                capabilities: capabilities.clone(),
             },
             Self {
                 version: Some(PostgresVersion::V11),
+                capabilities: capabilities.clone(),
             },
             Self {
                 version: Some(PostgresVersion::V12),
+                capabilities: capabilities.clone(),
             },
             Self {
                 version: Some(PostgresVersion::V13),
+                capabilities: capabilities.clone(),
             },
             Self {
                 version: Some(PostgresVersion::PgBouncer),
+                capabilities: capabilities,
             },
         ]
     }
@@ -170,4 +184,9 @@ impl ToString for PostgresVersion {
         }
         .to_owned()
     }
+}
+
+fn postgres_capabilities() -> Vec<ConnectorCapability> {
+    let dm_connector = PostgresDatamodelConnector::new();
+    dm_connector.capabilities().clone()
 }

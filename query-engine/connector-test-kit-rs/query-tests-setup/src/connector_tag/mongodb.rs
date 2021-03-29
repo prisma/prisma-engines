@@ -1,9 +1,13 @@
+use datamodel_connector::Connector;
+use mongodb_datamodel_connector::MongoDbDatamodelConnector;
+
 use super::*;
 use crate::{MongoDbSchemaRenderer, TestError, TestResult};
 
-#[derive(Debug, Default, Clone, Copy)]
+#[derive(Debug, Default, Clone)]
 pub struct MongoDbConnectorTag {
     version: Option<MongoDbVersion>,
+    capabilities: Vec<ConnectorCapability>,
 }
 
 impl ConnectorTagInterface for MongoDbConnectorTag {
@@ -30,8 +34,8 @@ impl ConnectorTagInterface for MongoDbConnectorTag {
         .to_string()
     }
 
-    fn capabilities(&self) -> Vec<ConnectorCapability> {
-        todo!()
+    fn capabilities(&self) -> &[ConnectorCapability] {
+        &self.capabilities
     }
 
     fn as_parse_pair(&self) -> (String, Option<String>) {
@@ -56,13 +60,17 @@ impl MongoDbConnectorTag {
             None => None,
         };
 
-        Ok(Self { version })
+        Ok(Self {
+            version,
+            capabilities: mongo_capabilities(),
+        })
     }
 
     /// Returns all versions of this connector.
     pub fn all() -> Vec<Self> {
         vec![Self {
             version: Some(MongoDbVersion::V4),
+            capabilities: mongo_capabilities(),
         }]
     }
 }
@@ -96,4 +104,9 @@ impl ToString for MongoDbVersion {
         }
         .to_owned()
     }
+}
+
+fn mongo_capabilities() -> Vec<ConnectorCapability> {
+    let dm_connector = MongoDbDatamodelConnector::default();
+    dm_connector.capabilities().clone()
 }

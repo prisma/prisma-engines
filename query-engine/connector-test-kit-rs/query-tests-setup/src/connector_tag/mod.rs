@@ -32,7 +32,7 @@ pub trait ConnectorTagInterface {
     fn connection_string(&self, test_database: &str, is_ci: bool) -> String;
 
     /// Capabilities of the implementing connector.
-    fn capabilities(&self) -> Vec<ConnectorCapability>;
+    fn capabilities(&self) -> &[ConnectorCapability];
 
     /// Serialization of the connector. Expected to return `(tag_name, version)`.
     /// Todo: Think of something better.
@@ -43,7 +43,7 @@ pub trait ConnectorTagInterface {
 }
 
 #[enum_dispatch(ConnectorTagInterface)]
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum ConnectorTag {
     SqlServer(SqlServerConnectorTag),
     Postgres(PostgresConnectorTag),
