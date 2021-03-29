@@ -34,11 +34,7 @@ pub(crate) fn from_connection_info(
     features: BitFlags<MigrationFeature>,
 ) -> Box<dyn SqlFlavour + Send + Sync + 'static> {
     match connection_info {
-        ConnectionInfo::Mysql(url) => Box::new(MysqlFlavour {
-            url: url.clone(),
-            circumstances: Default::default(),
-            features,
-        }),
+        ConnectionInfo::Mysql(url) => Box::new(MysqlFlavour::new(url.clone(), features)),
         ConnectionInfo::Postgres(url) => Box::new(PostgresFlavour::new(url.clone(), features)),
         ConnectionInfo::Sqlite { file_path, db_name } => Box::new(SqliteFlavour {
             file_path: file_path.clone(),

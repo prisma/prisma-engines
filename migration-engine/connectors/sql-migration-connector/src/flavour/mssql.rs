@@ -10,10 +10,18 @@ use sql_schema_describer::{DescriberErrorKind, SqlSchema, SqlSchemaDescriberBack
 use std::str::FromStr;
 use user_facing_errors::{introspection_engine::DatabaseSchemaInconsistent, KnownError};
 
-#[derive(Debug)]
 pub(crate) struct MssqlFlavour {
-    pub(crate) url: MssqlUrl,
+    url: MssqlUrl,
     features: BitFlags<MigrationFeature>,
+}
+
+impl std::fmt::Debug for MssqlFlavour {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("MssqlFlavour")
+            .field("features", &self.features)
+            .field("url", &"<REDACTED>")
+            .finish()
+    }
 }
 
 impl MssqlFlavour {
@@ -364,5 +372,24 @@ impl SqlFlavour for MssqlFlavour {
 
     fn features(&self) -> BitFlags<MigrationFeature> {
         self.features
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn debug_impl_does_not_leak_connection_info() {
+        let url = "sqlserver://myserver:8765;database=master;schema=mydbname;user=SA;password=<mypassword>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED";
+
+        let flavour = MssqlFlavour::new(MssqlUrl::new(&url).unwrap(), BitFlags::default());
+        let debugged = format!("{:?}", flavour);
+
+        let words = &["myname", "mypassword", "myserver", "8765", "mydbname"];
+
+        for word in words {
+            assert!(!debugged.contains(word));
+        }
     }
 }
