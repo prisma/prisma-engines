@@ -13,11 +13,9 @@ pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRe
                 plain_aggregation_field(ctx, &model),
             ];
 
-            if feature_flags::get().groupBy {
-                vec.push(group_by_aggregation_field(ctx, &model));
-            }
-
+            vec.push(group_by_aggregation_field(ctx, &model));
             append_opt(&mut vec, find_unique_field(ctx, &model));
+
             vec
         })
         .flatten()

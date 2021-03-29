@@ -18,9 +18,7 @@ pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRe
                 vec.push(create_item_field(ctx, &model));
 
                 append_opt(&mut vec, upsert_item_field(ctx, &model));
-                if feature_flags::get().createMany {
-                    append_opt(&mut vec, create_many_field(ctx, &model));
-                }
+                append_opt(&mut vec, create_many_field(ctx, &model));
             }
 
             append_opt(&mut vec, delete_item_field(ctx, &model));
@@ -62,10 +60,7 @@ fn create_nested_inputs(ctx: &mut BuilderContext) {
                 fields.push(input_fields::nested_create_one_input_field(ctx, &rf));
 
                 append_opt(&mut fields, input_fields::nested_connect_or_create_field(ctx, &rf));
-
-                if feature_flags::get().createMany {
-                    append_opt(&mut fields, input_fields::nested_create_many_input_field(ctx, &rf));
-                }
+                append_opt(&mut fields, input_fields::nested_create_many_input_field(ctx, &rf));
             }
 
             append_opt(&mut fields, input_fields::nested_connect_input_field(ctx, &rf));
@@ -82,17 +77,16 @@ fn create_nested_inputs(ctx: &mut BuilderContext) {
 
                 append_opt(&mut fields, input_fields::nested_connect_or_create_field(ctx, &rf));
                 append_opt(&mut fields, input_fields::nested_upsert_field(ctx, &rf));
-
-                if feature_flags::get().createMany {
-                    append_opt(&mut fields, input_fields::nested_create_many_input_field(ctx, &rf));
-                }
+                append_opt(&mut fields, input_fields::nested_create_many_input_field(ctx, &rf));
             }
 
             append_opt(&mut fields, input_fields::nested_connect_input_field(ctx, &rf));
             append_opt(&mut fields, input_fields::nested_set_input_field(ctx, &rf));
             append_opt(&mut fields, input_fields::nested_disconnect_input_field(ctx, &rf));
             append_opt(&mut fields, input_fields::nested_delete_input_field(ctx, &rf));
+
             fields.push(input_fields::nested_update_input_field(ctx, &rf));
+
             append_opt(&mut fields, input_fields::nested_update_many_field(ctx, &rf));
             append_opt(&mut fields, input_fields::nested_delete_many_field(ctx, &rf));
 
