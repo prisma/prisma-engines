@@ -17,6 +17,7 @@ use std::sync::atomic::{AtomicU8, Ordering};
 use url::Url;
 
 const ADVISORY_LOCK_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(10);
+static QUALIFIED_NAME_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"`[^ ]+`\.`[^ ]+`"#).unwrap());
 
 pub(crate) struct MysqlFlavour {
     url: MysqlUrl,
@@ -281,8 +282,6 @@ impl SqlFlavour for MysqlFlavour {
     }
 
     fn scan_migration_script(&self, script: &str) {
-        static QUALIFIED_NAME_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"`[^ ]`.``"#).unwrap());
-
         for capture in QUALIFIED_NAME_RE
             .captures_iter(script)
             .filter_map(|captures| captures.get(0))
@@ -385,5 +384,18 @@ mod tests {
         for word in words {
             assert!(!debugged.contains(word));
         }
+    }
+
+    #[test]
+    fn qualified_name_re_matches_as_expected() {
+        let should_match = r#"ALTER TABLE `mydb`.`cat` DROP PRIMARY KEY"#;
+        let should_not_match = r#"ALTER TABLE `cat` ADD FOREIGN KEY (`ab`, cd`) REFERENCES `dog`(`id`)"#;
+
+        assert!(
+            QUALIFIED_NAME_RE.is_match_at(should_match, 12),
+            "captures: {:?}",
+            QUALIFIED_NAME_RE.captures(should_match)
+        );
+        assert!(!QUALIFIED_NAME_RE.is_match(should_not_match));
     }
 }
