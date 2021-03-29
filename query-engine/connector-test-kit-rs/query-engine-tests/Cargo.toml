@@ -15,3 +15,4 @@ tracing-futures = "0.2.1"
 colored = "2"
 chrono = "0.4"
 datamodel-connector = { path = "../../../libs/datamodel/connectors/datamodel-connector" }
+base64 = "0.13"
