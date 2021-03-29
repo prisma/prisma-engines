@@ -5,7 +5,7 @@ use proc_macro2::Span;
 use query_tests_setup::ConnectorTag;
 use quote::quote;
 use std::convert::TryFrom;
-use syn::{spanned::Spanned, Meta, Path};
+use syn::{spanned::Spanned, Ident, Meta, Path};
 
 #[derive(Debug, FromMeta)]
 pub struct ConnectorTestArgs {
@@ -20,6 +20,9 @@ pub struct ConnectorTestArgs {
 
     #[darling(default)]
     pub exclude: ExcludeConnectorTags,
+
+    #[darling(default)]
+    pub capabilities: RunOnlyForCapabilities,
 }
 
 impl ConnectorTestArgs {
@@ -203,5 +206,47 @@ fn tag_string_from_path(path: &Path) -> Result<String, darling::Error> {
         Err(darling::Error::custom(
             "Expected `only` to be a list of idents (ConnectorTag variants), not paths.",
         ))
+    }
+}
+
+#[derive(Debug, Default)]
+pub struct RunOnlyForCapabilities {
+    pub idents: Vec<Ident>,
+}
+
+impl darling::FromMeta for RunOnlyForCapabilities {
+    fn from_list(items: &[syn::NestedMeta]) -> Result<Self, darling::Error> {
+        if items.is_empty() {
+            return Err(darling::Error::custom(
+                "When specifying capabilities to run for, at least one needs to be given.",
+            ));
+        }
+
+        let mut idents: Vec<Ident> = vec![];
+
+        for item in items {
+            match item {
+                syn::NestedMeta::Meta(meta) => {
+                    match meta {
+                        // A single variant without version, like `Postgres`.
+                        Meta::Path(p) => match p.get_ident() {
+                            Some(ident) => idents.push(ident.clone()),
+                            None => {
+                                return Err(darling::Error::unexpected_type("Invalid identifier").with_span(&p.span()))
+                            }
+                        },
+                        x => return Err(darling::Error::unexpected_type("Expected identifiers").with_span(&x.span())),
+                    }
+                }
+                x => {
+                    return Err(
+                        darling::Error::custom("Expected `only` or `exclude` to be a list of `ConnectorTag`.")
+                            .with_span(&x.span()),
+                    )
+                }
+            }
+        }
+
+        Ok(Self { idents })
     }
 }

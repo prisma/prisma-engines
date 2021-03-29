@@ -3506,6 +3506,7 @@ dependencies = [
  "anyhow",
  "chrono",
  "colored 2.0.0",
+ "datamodel-connector",
  "indoc",
  "query-test-macros",
  "query-tests-setup",

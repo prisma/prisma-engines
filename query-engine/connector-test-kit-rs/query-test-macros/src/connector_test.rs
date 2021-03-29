@@ -58,6 +58,16 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
     let test_name = test_fn_ident.to_string();
     let suite_name = args.suite.expect("A test must have a test suite.");
     let test_database = format!("{}_{}", suite_name, test_name);
+    let capabilities: Vec<_> = args
+        .capabilities
+        .idents
+        .into_iter()
+        .map(|cap| {
+            quote! {
+                ConnectorCapability::#cap
+            }
+        })
+        .collect();
 
     // The actual test is a shell function that gets the name of the original function,
     // which is then calling `{orig_name}_run` in the end (see `runner_fn_ident`).
@@ -69,20 +79,21 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
                 #connectors
             ];
 
-            if !ConnectorTag::should_run(&config, &enabled_connectors) {
-                tracing::info!("Skipping test '{}', current test connector is not enabled.", #test_name);
-                return
+            let capabilities: Vec<ConnectorCapability> = vec![
+                #(#capabilities),*
+            ];
+
+            if ConnectorTag::should_run(&config, &enabled_connectors, &capabilities, #test_name) {
+                let template = #handler();
+                let datamodel = query_tests_setup::render_test_datamodel(config, #test_database, template);
+
+                query_tests_setup::run_with_tokio(async move {
+                    tracing::debug!("Used datamodel:\n {}", datamodel.clone().yellow());
+                    let runner = Runner::load(config.runner(), datamodel.clone()).await.unwrap();
+                    query_tests_setup::setup_project(&datamodel).await.unwrap();
+                    #runner_fn_ident(&runner).await.unwrap();
+                }.with_subscriber(test_tracing_subscriber(std::env::var("LOG_LEVEL").unwrap_or("info".to_string()))));
             }
-
-            let template = #handler();
-            let datamodel = query_tests_setup::render_test_datamodel(config, #test_database, template);
-
-            query_tests_setup::run_with_tokio(async move {
-                tracing::debug!("Used datamodel:\n {}", datamodel.clone().yellow());
-                let runner = Runner::load(config.runner(), datamodel.clone()).await.unwrap();
-                query_tests_setup::setup_project(&datamodel).await.unwrap();
-                #runner_fn_ident(&runner).await.unwrap();
-            }.with_subscriber(test_tracing_subscriber(std::env::var("LOG_LEVEL").unwrap_or("info".to_string()))));
         }
 
         #test_function

@@ -65,11 +65,32 @@ impl ConnectorTag {
             .collect()
     }
 
-    /// Based on the connector tags that are enabled for a test, check if
-    /// the current configuration allows for this test to run.
-    pub fn should_run(config: &TestConfig, enabled: &[ConnectorTag]) -> bool {
+    /// Determines whether or not a test should run for the given enabled connectors and capabilities
+    /// a connector is required to have.
+    pub fn should_run(
+        config: &TestConfig,
+        enabled: &[ConnectorTag],
+        capabilities: &[ConnectorCapability],
+        test_name: &str,
+    ) -> bool {
         let current_connector = config.test_connector_tag().unwrap();
-        enabled.contains(&current_connector)
+        if !enabled.contains(&current_connector) {
+            println!("Skipping test '{}', current test connector is not enabled.", test_name);
+            return false;
+        }
+
+        if capabilities
+            .into_iter()
+            .any(|cap| !current_connector.capabilities().contains(cap))
+        {
+            println!(
+                "Skipping test '{}', current test connector doesn't offer one or more capabilities that are required.",
+                test_name
+            );
+            return false;
+        }
+
+        true
     }
 }
 
