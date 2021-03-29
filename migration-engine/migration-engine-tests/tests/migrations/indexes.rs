@@ -71,7 +71,7 @@ async fn index_settings_must_be_migrated(api: &TestApi) -> TestResult {
         .force(true)
         .send()
         .await?
-        .assert_warnings(&["The migration will add a unique constraint covering the columns `[name,followersCount]` on the table `Test`. If there are existing duplicate values, the migration will fail.".into()])?;
+        .assert_warnings(&["A unique constraint covering the columns `[name,followersCount]` on the table `Test` will be added. If there are existing duplicate values, this will fail.".into()])?;
 
     api.assert_schema().await?.assert_table("Test", |table| {
         table

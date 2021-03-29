@@ -80,6 +80,24 @@ impl TestApiArgs {
 }
 
 mod urls {
+    use super::SCHEMA_NAME;
+
+    fn db_host_and_port_postgres_11() -> (&'static str, usize) {
+        match std::env::var("IS_BUILDKITE") {
+            Ok(_) => ("test-db-postgres-11", 5432),
+            Err(_) => ("127.0.0.1", 5433),
+        }
+    }
+
+    pub fn postgres11(db_name: &str) -> String {
+        let (host, port) = db_host_and_port_postgres_11();
+
+        format!(
+            "postgresql://postgres:prisma@{}:{}/{}?schema={}&statement_cache_size=0&socket_timeout=60",
+            host, port, db_name, SCHEMA_NAME
+        )
+    }
+
     pub use super::mariadb_url as mysql_mariadb;
     pub use super::mssql_2017_url as mssql_2017;
     pub use super::mssql_2019_url as mssql_2019;
@@ -87,7 +105,6 @@ mod urls {
     pub use super::mysql_8_url as mysql_8;
     pub use super::mysql_url as mysql;
     pub use super::postgres_10_url as postgres;
-    pub use super::postgres_11_url as postgres11;
     pub use super::postgres_12_url as postgres12;
     pub use super::postgres_13_url as postgres13;
     pub use super::postgres_9_url as postgres9;
@@ -140,15 +157,6 @@ pub fn pgbouncer_url(db_name: &str) -> String {
 
 pub fn postgres_10_url(db_name: &str) -> String {
     let (host, port) = db_host_and_port_postgres_10();
-
-    format!(
-        "postgresql://postgres:prisma@{}:{}/{}?schema={}&statement_cache_size=0&socket_timeout=60",
-        host, port, db_name, SCHEMA_NAME
-    )
-}
-
-pub fn postgres_11_url(db_name: &str) -> String {
-    let (host, port) = db_host_and_port_postgres_11();
 
     format!(
         "postgresql://postgres:prisma@{}:{}/{}?schema={}&statement_cache_size=0&socket_timeout=60",
@@ -269,13 +277,6 @@ fn db_host_and_port_for_pgbouncer() -> (&'static str, usize) {
     match std::env::var("IS_BUILDKITE") {
         Ok(_) => ("test-db-pgbouncer", 6432),
         Err(_) => ("127.0.0.1", 6432),
-    }
-}
-
-fn db_host_and_port_postgres_11() -> (&'static str, usize) {
-    match std::env::var("IS_BUILDKITE") {
-        Ok(_) => ("test-db-postgres-11", 5432),
-        Err(_) => ("127.0.0.1", 5433),
     }
 }
 

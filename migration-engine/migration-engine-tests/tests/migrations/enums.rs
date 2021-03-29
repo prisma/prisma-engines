@@ -141,7 +141,7 @@ async fn variants_can_be_removed_from_an_existing_enum(api: &TestApi) -> TestRes
         .force(true)
         .send()
         .await?
-        .assert_warnings(&[format!("The migration will remove the values [HAPPY] on the enum `{}`. If these variants are still used in the database, the migration will fail.", enum_name).into()])?
+        .assert_warnings(&[format!("The values [HAPPY] on the enum `{}` will be removed. If these variants are still used in the database, this will fail.", enum_name).into()])?
         .assert_executable()?;
 
     api.assert_schema()
@@ -267,7 +267,7 @@ async fn string_field_to_enum_field_works(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(log = "debug", capabilities("enums"))]
+#[test_each_connector(capabilities("enums"))]
 async fn enums_used_in_default_can_be_changed(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Panther {
@@ -354,7 +354,7 @@ async fn enums_used_in_default_can_be_changed(api: &TestApi) -> TestResult {
             .send()
             .await?
             .assert_executable()?
-            .assert_warnings(&["The migration will remove the values [HUNGRY] on the enum `CatMood`. If these variants are still used in the database, the migration will fail.".into()]
+            .assert_warnings(&["The values [HUNGRY] on the enum `CatMood` will be removed. If these variants are still used in the database, this will fail.".into()]
             )?;
     } else {
         api.schema_push(dm2)
@@ -362,8 +362,8 @@ async fn enums_used_in_default_can_be_changed(api: &TestApi) -> TestResult {
             .send()
             .await?
             .assert_executable()?
-            .assert_warnings(& ["The migration will remove the values [HUNGRY] on the enum `Panther_mood`. If these variants are still used in the database, the migration will fail.".into(),
-                "The migration will remove the values [HUNGRY] on the enum `Tiger_mood`. If these variants are still used in the database, the migration will fail.".into(),]
+            .assert_warnings(& ["The values [HUNGRY] on the enum `Panther_mood` will be removed. If these variants are still used in the database, this will fail.".into(),
+                "The values [HUNGRY] on the enum `Tiger_mood` will be removed. If these variants are still used in the database, this will fail.".into(),]
             )?;
     };
 

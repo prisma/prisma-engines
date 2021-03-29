@@ -2,7 +2,7 @@ mod sql_unexecutable_migrations;
 mod sqlite_existing_data_tests;
 mod type_migration_tests;
 
-use migration_engine_tests::sql::*;
+use migration_engine_tests::sql::{test_each_connector, TestApi, TestResult};
 use pretty_assertions::assert_eq;
 use prisma_value::PrismaValue;
 use quaint::{
@@ -717,9 +717,9 @@ async fn enum_variants_can_be_dropped_without_data_loss(api: &TestApi) -> TestRe
         .await?;
 
     if api.sql_family().is_mysql() {
-        res.assert_warnings(&["The migration will remove the values [OUTRAGED] on the enum `Cat_mood`. If these variants are still used in the database, the migration will fail.".into(), "The migration will remove the values [OUTRAGED] on the enum `Human_mood`. If these variants are still used in the database, the migration will fail.".into()])?;
+        res.assert_warnings(&["The values [OUTRAGED] on the enum `Cat_mood` will be removed. If these variants are still used in the database, this will fail.".into(), "The values [OUTRAGED] on the enum `Human_mood` will be removed. If these variants are still used in the database, this will fail.".into()])?;
     } else {
-        res.assert_warnings(&["The migration will remove the values [OUTRAGED] on the enum `Mood`. If these variants are still used in the database, the migration will fail.".into()])?;
+        res.assert_warnings(&["The values [OUTRAGED] on the enum `Mood` will be removed. If these variants are still used in the database, this will fail.".into()])?;
     }
 
     // Assertions
@@ -867,7 +867,7 @@ async fn primary_key_migrations_do_not_cause_data_loss(api: &TestApi) -> TestRes
         .await?
         .assert_executable()?
         .assert_warnings(&[
-            "The migration will change the primary key for the `Dog` table. If it partially fails, the table could be left without primary key constraint.".into(),
+            "The primary key for the `Dog` table will be changed. If it partially fails, the table could be left without primary key constraint.".into(),
         ])?;
 
     api.assert_schema().await?.assert_table("Dog", |table| {

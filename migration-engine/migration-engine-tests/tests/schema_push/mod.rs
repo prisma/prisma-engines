@@ -137,7 +137,7 @@ async fn schema_push_with_an_unexecutable_migration_returns_a_message_and_aborts
     api.schema_push(dm2)
         .send()
         .await?
-        .assert_unexecutable(&["Added the required column `volumeCm3` to the `Box` table without a default value. There are 1 rows in this table, it is not possible to execute this migration.".into()])?
+        .assert_unexecutable(&["Added the required column `volumeCm3` to the `Box` table without a default value. There are 1 rows in this table, it is not possible to execute this step.".into()])?
         .assert_no_steps()?;
 
     Ok(())

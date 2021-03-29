@@ -36,7 +36,7 @@ async fn adding_a_unique_constraint_should_warn(api: &TestApi) -> TestResult {
         .force(false)
         .send()
         .await?
-        .assert_warnings(&["The migration will add a unique constraint covering the columns `[name]` on the table `Test`. If there are existing duplicate values, the migration will fail.".into()])?;
+        .assert_warnings(&["A unique constraint covering the columns `[name]` on the table `Test` will be added. If there are existing duplicate values, this will fail.".into()])?;
 
     let rows = api.select("Test").column("id").column("name").send_debug().await?;
 
@@ -100,7 +100,7 @@ async fn dropping_enum_values_should_warn(api: &TestApi) -> TestResult {
         .force(false)
         .send()
         .await?
-        .assert_warnings(&["The migration will remove the values [george] on the enum `Test_name`. If these variants are still used in the database, the migration will fail.".into()])?;
+        .assert_warnings(&["The values [george] on the enum `Test_name` will be removed. If these variants are still used in the database, this will fail.".into()])?;
 
     let rows = api.select("Test").column("id").column("name").send_debug().await?;
 
@@ -159,7 +159,7 @@ async fn adding_a_unique_constraint_when_existing_data_respects_it_works(api: &T
         .force(true)
         .send()
         .await?
-        .assert_warnings(&["The migration will add a unique constraint covering the columns `[name]` on the table `Test`. If there are existing duplicate values, the migration will fail.".into()])?;
+        .assert_warnings(&["A unique constraint covering the columns `[name]` on the table `Test` will be added. If there are existing duplicate values, this will fail.".into()])?;
 
     let rows = api.select("Test").column("id").column("name").send_debug().await?;
     assert_eq!(
