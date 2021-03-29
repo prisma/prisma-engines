@@ -1,3 +1,5 @@
+#![allow(clippy::clippy::vec_init_then_push)]
+
 mod cursor;
 mod error;
 mod filter;

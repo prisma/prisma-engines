@@ -21,11 +21,11 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
         Ok(self.get_databases().await?)
     }
 
-    async fn get_metadata(&self, schema: &str) -> DescriberResult<SQLMetadata> {
+    async fn get_metadata(&self, schema: &str) -> DescriberResult<SqlMetadata> {
         let table_count = self.get_table_names(&schema).await?.len();
         let size_in_bytes = self.get_size(&schema).await?;
 
-        Ok(SQLMetadata {
+        Ok(SqlMetadata {
             table_count,
             size_in_bytes,
         })
@@ -255,7 +255,7 @@ impl SqlSchemaDescriber {
             let default = Self::get_default_value(&col, &tpe, &data_type, sequences);
 
             let auto_increment =
-                is_identity || matches!(default.as_ref().map(|d| d.kind()), Some(DefaultKind::SEQUENCE(_)));
+                is_identity || matches!(default.as_ref().map(|d| d.kind()), Some(DefaultKind::Sequence(_)));
 
             let col = Column {
                 name,
@@ -404,7 +404,7 @@ impl SqlSchemaDescriber {
                 'c' => ForeignKeyAction::Cascade,
                 'n' => ForeignKeyAction::SetNull,
                 'd' => ForeignKeyAction::SetDefault,
-                _ => panic!(format!("unrecognized foreign key action '{}'", confdeltype)),
+                _ => panic!("unrecognized foreign key action '{}'", confdeltype),
             };
             let on_update_action = match confupdtype {
                 'a' => ForeignKeyAction::NoAction,
@@ -412,7 +412,7 @@ impl SqlSchemaDescriber {
                 'c' => ForeignKeyAction::Cascade,
                 'n' => ForeignKeyAction::SetNull,
                 'd' => ForeignKeyAction::SetDefault,
-                _ => panic!(format!("unrecognized foreign key action '{}'", confdeltype)),
+                _ => panic!("unrecognized foreign key action '{}'", confdeltype),
             };
             match intermediate_fks.get_mut(&id) {
                 Some((_, fk)) => {
@@ -713,7 +713,7 @@ fn get_column_type(row: &ResultRow, enums: &[Enum]) -> ColumnType {
     let is_required = match row.get_expect_string("is_nullable").to_lowercase().as_ref() {
         "no" => true,
         "yes" => false,
-        x => panic!(format!("unrecognized is_nullable variant '{}'", x)),
+        x => panic!("unrecognized is_nullable variant '{}'", x),
     };
 
     let arity = match matches!(data_type.as_str(), "ARRAY") {
@@ -744,9 +744,9 @@ fn get_column_type(row: &ResultRow, enums: &[Enum]) -> ColumnType {
         "bpchar" | "_bpchar" => (String, Some(PostgresType::Char(precision.character_maximum_length))),
         "date" | "_date" => (DateTime, Some(PostgresType::Date)),
         "bytea" | "_bytea" => (Binary, Some(PostgresType::ByteA)),
-        "json" | "_json" => (Json, Some(PostgresType::JSON)),
-        "jsonb" | "_jsonb" => (Json, Some(PostgresType::JSONB)),
-        "uuid" | "_uuid" => (Uuid, Some(PostgresType::UUID)),
+        "json" | "_json" => (Json, Some(PostgresType::Json)),
+        "jsonb" | "_jsonb" => (Json, Some(PostgresType::JsonB)),
+        "uuid" | "_uuid" => (Uuid, Some(PostgresType::Uuid)),
         "xml" | "_xml" => (String, Some(PostgresType::Xml)),
         // bit and varbit should be binary, but are currently mapped to strings.
         "bit" | "_bit" => (String, Some(PostgresType::Bit(precision.character_maximum_length))),

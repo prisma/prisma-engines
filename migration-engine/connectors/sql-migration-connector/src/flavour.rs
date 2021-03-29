@@ -89,6 +89,9 @@ pub(crate) trait SqlFlavour:
     /// Drop the database and recreate it empty.
     async fn reset(&self, connection: &Connection) -> ConnectorResult<()>;
 
+    /// Optionally scan a migration script that could have been altered by users and emit warnings.
+    fn scan_migration_script(&self, _script: &str) {}
+
     /// Apply the given migration history to a temporary database, and return
     /// the final introspected SQL schema.
     async fn sql_schema_from_migration_history(

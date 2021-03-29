@@ -646,7 +646,7 @@ impl<'a> Reformatter<'a> {
                     return token;
                 }
             }
-            panic!(error_msg)
+            panic!("{}", error_msg)
         }
     }
 

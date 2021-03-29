@@ -69,43 +69,43 @@ impl<'a> ColumnDiffer<'a> {
         match defaults {
             // Avoid naive string comparisons for JSON defaults.
             (
-                Some(DefaultKind::VALUE(PrismaValue::Json(prev_json))),
-                Some(DefaultKind::VALUE(PrismaValue::Json(next_json))),
+                Some(DefaultKind::Value(PrismaValue::Json(prev_json))),
+                Some(DefaultKind::Value(PrismaValue::Json(next_json))),
             )
             | (
-                Some(DefaultKind::VALUE(PrismaValue::String(prev_json))),
-                Some(DefaultKind::VALUE(PrismaValue::Json(next_json))),
+                Some(DefaultKind::Value(PrismaValue::String(prev_json))),
+                Some(DefaultKind::Value(PrismaValue::Json(next_json))),
             )
             | (
-                Some(DefaultKind::VALUE(PrismaValue::Json(prev_json))),
-                Some(DefaultKind::VALUE(PrismaValue::String(next_json))),
+                Some(DefaultKind::Value(PrismaValue::Json(prev_json))),
+                Some(DefaultKind::Value(PrismaValue::String(next_json))),
             ) => json_defaults_match(prev_json, next_json),
 
-            (Some(DefaultKind::VALUE(prev)), Some(DefaultKind::VALUE(next))) => prev == next,
-            (Some(DefaultKind::VALUE(_)), Some(DefaultKind::NOW)) => false,
-            (Some(DefaultKind::VALUE(_)), None) => false,
+            (Some(DefaultKind::Value(prev)), Some(DefaultKind::Value(next))) => prev == next,
+            (Some(DefaultKind::Value(_)), Some(DefaultKind::Now)) => false,
+            (Some(DefaultKind::Value(_)), None) => false,
 
-            (Some(DefaultKind::NOW), Some(DefaultKind::NOW)) => true,
-            (Some(DefaultKind::NOW), None) => false,
-            (Some(DefaultKind::NOW), Some(DefaultKind::VALUE(_))) => false,
+            (Some(DefaultKind::Now), Some(DefaultKind::Now)) => true,
+            (Some(DefaultKind::Now), None) => false,
+            (Some(DefaultKind::Now), Some(DefaultKind::Value(_))) => false,
 
-            (Some(DefaultKind::DBGENERATED(_)), Some(DefaultKind::VALUE(_))) => false,
-            (Some(DefaultKind::DBGENERATED(_)), Some(DefaultKind::NOW)) => false,
-            (Some(DefaultKind::DBGENERATED(_)), None) => false,
+            (Some(DefaultKind::DbGenerated(_)), Some(DefaultKind::Value(_))) => false,
+            (Some(DefaultKind::DbGenerated(_)), Some(DefaultKind::Now)) => false,
+            (Some(DefaultKind::DbGenerated(_)), None) => false,
 
-            (Some(DefaultKind::SEQUENCE(_)), None) => true, // sequences are dropped separately
-            (Some(DefaultKind::SEQUENCE(_)), Some(DefaultKind::VALUE(_))) => false,
-            (Some(DefaultKind::SEQUENCE(_)), Some(DefaultKind::NOW)) => false,
+            (Some(DefaultKind::Sequence(_)), None) => true, // sequences are dropped separately
+            (Some(DefaultKind::Sequence(_)), Some(DefaultKind::Value(_))) => false,
+            (Some(DefaultKind::Sequence(_)), Some(DefaultKind::Now)) => false,
 
             (None, None) => true,
-            (None, Some(DefaultKind::VALUE(_))) => false,
-            (None, Some(DefaultKind::NOW)) => false,
+            (None, Some(DefaultKind::Value(_))) => false,
+            (None, Some(DefaultKind::Now)) => false,
 
             // We now do migrate to @dbgenerated
-            (Some(DefaultKind::DBGENERATED(prev)), Some(DefaultKind::DBGENERATED(next))) => prev == next,
-            (_, Some(DefaultKind::DBGENERATED(_))) => false,
+            (Some(DefaultKind::DbGenerated(prev)), Some(DefaultKind::DbGenerated(next))) => prev == next,
+            (_, Some(DefaultKind::DbGenerated(_))) => false,
             // Sequence migrations are handled separately.
-            (_, Some(DefaultKind::SEQUENCE(_))) => true,
+            (_, Some(DefaultKind::Sequence(_))) => true,
         }
     }
 }

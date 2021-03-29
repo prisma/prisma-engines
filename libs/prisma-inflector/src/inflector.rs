@@ -29,10 +29,8 @@ impl Inflector {
     }
 
     pub fn new(mode: Mode) -> Inflector {
-        let mut rules = vec![];
-
         // Rules for words that do not inflect in the plural (such as fish, travois, chassis, nationality endings
-        rules.push(Self::category_rule("", "", &exceptions::UNCOUNTABLE));
+        let mut rules = vec![Self::category_rule("", "", &exceptions::UNCOUNTABLE)];
 
         // Handle standard irregular plurals (mongooses, oxen, etc.)
         exceptions::STANDARD_IRREGULAR.iter().for_each(|irr| {

@@ -111,6 +111,7 @@ impl DatabaseMigrationStepApplier<SqlMigration> for SqlMigrationConnector {
     }
 
     async fn apply_script(&self, script: &str) -> ConnectorResult<()> {
+        self.flavour.scan_migration_script(script);
         Ok(self.conn().raw_cmd(script).await?)
     }
 }

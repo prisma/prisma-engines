@@ -189,7 +189,7 @@ async fn bad_migrations_should_make_the_command_fail_with_a_good_error(api: &Tes
 
     let error = api.create_migration("create-cats", dm, &dir).send().await.unwrap_err();
 
-    assert!(error.to_string().contains("syntax"), error.to_string());
+    assert!(error.to_string().contains("syntax"), "{}", error);
 
     Ok(())
 }

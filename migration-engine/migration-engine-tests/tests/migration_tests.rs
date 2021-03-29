@@ -1586,7 +1586,7 @@ async fn created_at_does_not_get_arbitrarily_migrated(api: &TestApi) -> TestResu
             .default
             .as_ref()
             .map(|d| d.kind()),
-        Some(DefaultKind::NOW)
+        Some(DefaultKind::Now)
     ),);
 
     let dm2 = r#"
@@ -2236,7 +2236,7 @@ async fn schemas_with_dbgenerated_work(api: &TestApi) -> TestResult {
         id          Int       @id @default(autoincrement())
         lastName    String    @default("")
         password    String?
-        updatedAt   DateTime  @default(dbgenerated())      
+        updatedAt   DateTime  @default(dbgenerated())
     }
     "#;
 
@@ -2259,10 +2259,10 @@ async fn schemas_with_dbgenerated_expressions_work(api: &TestApi) -> TestResult 
         binary_col Bytes @default(dbgenerated("(conv(10,10,2))"))
         enum_col Smolness @default(dbgenerated("(Trim('XSMALL   '))"))
         unsupported_col Unsupported("SET('one', 'two')") @default(dbgenerated("(Trim(' '))"))
-        
+
         @@ignore
     }
-    
+
     enum Smolness{
         XSMALL
     }

@@ -1,3 +1,5 @@
+#![allow(clippy::upper_case_acronyms)]
+
 pub mod dmmf;
 mod error;
 mod graphql;

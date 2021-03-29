@@ -203,7 +203,8 @@ fn no_create_or_upsert_should_exist_with_ignored_field_without_default_value() {
     ignored_ops.iter().for_each(|op| {
         assert!(
             !field_names.contains(&format!("{}Item", *op).as_str()),
-            format!("operation '{}' should not be supported", op)
+            "operation '{}' should not be supported",
+            op
         );
     });
 
@@ -211,7 +212,8 @@ fn no_create_or_upsert_should_exist_with_ignored_field_without_default_value() {
     supported_ops.iter().for_each(|op| {
         assert!(
             field_names.contains(&format!("{}Item", *op).as_str()),
-            format!("operation '{}' should be supported", op)
+            "operation '{}' should be supported",
+            op
         );
     });
 }

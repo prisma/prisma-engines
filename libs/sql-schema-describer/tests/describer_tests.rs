@@ -614,5 +614,5 @@ async fn defaults_must_work(api: &TestApi) {
         assert!(default.constraint_name().unwrap().starts_with("DF__User__id__"));
     }
 
-    assert_eq!(&DefaultKind::VALUE(PrismaValue::Int(1)), default.kind());
+    assert_eq!(&DefaultKind::Value(PrismaValue::Int(1)), default.kind());
 }

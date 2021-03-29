@@ -1,4 +1,8 @@
-#![allow(clippy::wrong_self_convention)]
+#![allow(
+    clippy::wrong_self_convention,
+    clippy::clippy::upper_case_acronyms,
+    clippy::needless_question_mark
+)]
 
 mod column_metadata;
 mod cursor_condition;
