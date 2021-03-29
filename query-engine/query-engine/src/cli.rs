@@ -122,6 +122,11 @@ impl CliCommand {
         let decoded = base64::decode(&request.query)?;
         let decoded_request = String::from_utf8(decoded)?;
 
+        dbg!("**********************************");
+        dbg!("QUERY ENGINE");
+        dbg!("**********************************");
+        dbg!(&request.config.datasources);
+
         let cx = PrismaContext::builder(
             request.config.validate_that_one_datasource_is_provided()?,
             request.datamodel,

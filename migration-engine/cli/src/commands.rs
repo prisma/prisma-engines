@@ -51,7 +51,10 @@ impl Cli {
             CliCommand::CanConnectToDatabase => connect_to_database(&self.datasource).await,
             CliCommand::DropDatabase => drop_database(&self.datasource).await,
             CliCommand::QeSetup => {
-                qe_setup(&self.datasource).await?;
+                dbg!("**********************************");
+                dbg!("MIGRATION ENGINE");
+                dbg!("**********************************");
+                qe_setup(dbg!(&self.datasource)).await?;
                 Ok(String::new())
             }
         }
