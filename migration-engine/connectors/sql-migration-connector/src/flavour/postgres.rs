@@ -15,10 +15,18 @@ use user_facing_errors::{
 
 const ADVISORY_LOCK_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(10);
 
-#[derive(Debug)]
 pub(crate) struct PostgresFlavour {
-    pub(crate) url: PostgresUrl,
+    url: PostgresUrl,
     features: BitFlags<MigrationFeature>,
+}
+
+impl std::fmt::Debug for PostgresFlavour {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("PostgresFlavour")
+            .field("features", &self.features)
+            .field("url", &"<REDACTED>")
+            .finish()
+    }
 }
 
 impl PostgresFlavour {
@@ -365,4 +373,23 @@ async fn create_postgres_admin_conn(mut url: Url) -> ConnectorResult<Connection>
     })??;
 
     Ok(conn)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn debug_impl_does_not_leak_connection_info() {
+        let url = "postgresql://myname:mypassword@myserver:8765/mydbname";
+
+        let flavour = PostgresFlavour::new(PostgresUrl::new(url.parse().unwrap()).unwrap(), BitFlags::default());
+        let debugged = format!("{:?}", flavour);
+
+        let words = &["myname", "mypassword", "myserver", "8765", "mydbname"];
+
+        for word in words {
+            assert!(!debugged.contains(word));
+        }
+    }
 }
