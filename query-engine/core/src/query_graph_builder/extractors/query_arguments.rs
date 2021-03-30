@@ -101,16 +101,17 @@ fn process_order_object(
     match object.into_iter().next() {
         None => Ok(None),
         Some((field_name, field_value)) => {
-            let field = model.fields().find_from_all(&field_name).ok();
+            let sort_aggregation = extract_sort_aggregation(field_name.as_str());
 
-            if field.is_none() {
-                let sort_aggregation = extract_sort_aggregation(field_name.as_str())?;
+            if let Ok(sort_aggr) = sort_aggregation {
                 let object: ParsedInputMap = field_value.try_into()?;
 
-                return process_order_object(model, object, path, Some(sort_aggregation));
+                return process_order_object(model, object, path, Some(sort_aggr));
             }
 
-            match field.unwrap() {
+            let field = model.fields().find_from_all(&field_name)?;
+
+            match field {
                 Field::Relation(rf) if rf.is_list => {
                     path.push(rf.clone());
 
