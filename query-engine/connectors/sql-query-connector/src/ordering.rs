@@ -22,24 +22,40 @@ pub fn build(
 ) -> (Vec<OrderDefinition<'static>>, Vec<OrderingJoins>) {
     let needs_reversed_order = query_arguments.needs_reversed_order();
 
-    let mut order_definitions = vec![];
+    let mut order_definitions: Vec<OrderDefinition<'static>> = vec![];
     let mut ordering_joins = vec![];
 
     // The index is used to differentiate potentially separate relations to the same model.
     for (index, order_by) in query_arguments.order_by.iter().enumerate() {
-        let (computed_joins, order_column) = compute_joins(order_by, index, base_model);
+        let (joins, order_column) = compute_joins(order_by, index, base_model);
+        let order_dir = Some(order_by.sort_order.into_order(needs_reversed_order));
+
+        if joins.is_empty() && order_by.sort_aggregation.is_some() {
+            match order_by.sort_aggregation.unwrap() {
+                SortAggregation::Count => {
+                    order_definitions.push((count(order_column.clone()).into(), order_dir));
+                }
+                SortAggregation::Avg => {
+                    order_definitions.push((avg(order_column.clone()).into(), order_dir));
+                }
+                SortAggregation::Sum => {
+                    order_definitions.push((sum(order_column.clone()).into(), order_dir));
+                }
+                SortAggregation::Min => {
+                    order_definitions.push((min(order_column.clone()).into(), order_dir));
+                }
+                SortAggregation::Max => {
+                    order_definitions.push((max(order_column.clone()).into(), order_dir));
+                }
+            }
+        } else {
+            order_definitions.push((order_column.clone().into(), order_dir));
+        }
 
         ordering_joins.push(OrderingJoins {
-            joins: computed_joins,
-            order_column: order_column.clone(),
+            joins,
+            order_column: order_column,
         });
-
-        match (order_by.sort_order, needs_reversed_order) {
-            (SortOrder::Ascending, true) => order_definitions.push(order_column.descend()),
-            (SortOrder::Descending, true) => order_definitions.push(order_column.ascend()),
-            (SortOrder::Ascending, false) => order_definitions.push(order_column.ascend()),
-            (SortOrder::Descending, false) => order_definitions.push(order_column.descend()),
-        }
     }
 
     (order_definitions, ordering_joins)
@@ -59,7 +75,8 @@ pub fn compute_joins(
         if order_by.sort_aggregation.is_some() && Some(rf) == last_path {
             let sort_aggregation = order_by.sort_aggregation.unwrap();
             let aggregation_type = match sort_aggregation {
-                SortAggregation::Count { _all } => AggregationType::Count { _all },
+                SortAggregation::Count => AggregationType::Count { _all: true },
+                _ => unreachable!("Order by relation aggregation other than count are not supported"),
             };
             let ordering_join = compute_aggr_join(
                 rf,
