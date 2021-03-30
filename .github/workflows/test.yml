@@ -111,6 +111,9 @@ jobs:
 
       - name: Commit changes
         run: |
+          set -e
+          shopt -s globstar
+
           git config user.name "GitHub agent"
           git config user.email "hello@prisma.io"
 
