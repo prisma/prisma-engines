@@ -44,6 +44,27 @@ impl Display for AlterTableClause<'_> {
     }
 }
 
+/// Render a `DROP TABLE` statement.
+///
+/// ```
+/// # use sql_ddl::postgres::DropTable;
+///
+/// let drop_table = DropTable { table_name: "Cat".into() };
+/// assert_eq!(drop_table.to_string(), r#"DROP TABLE "Cat""#);
+/// ```
+#[derive(Debug)]
+pub struct DropTable<'a> {
+    /// The name of the table to be dropped.
+    pub table_name: PostgresIdentifier<'a>,
+}
+
+impl Display for DropTable<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("DROP TABLE ")?;
+        Display::fmt(&self.table_name, f)
+    }
+}
+
 #[derive(Debug)]
 pub struct ForeignKey<'a> {
     pub constraint_name: Option<Cow<'a, str>>,

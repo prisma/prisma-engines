@@ -9,7 +9,7 @@ use native_types::PostgresType;
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
-use sql_ddl::postgres::{self as ddl, CreateEnum, CreateIndex};
+use sql_ddl::postgres::{self as ddl};
 use sql_schema_describer::{walkers::*, *};
 use std::borrow::Cow;
 
@@ -309,7 +309,7 @@ impl SqlRenderer for PostgresFlavour {
     }
 
     fn render_create_enum(&self, enm: &EnumWalker<'_>) -> Vec<String> {
-        vec![CreateEnum {
+        vec![ddl::CreateEnum {
             enum_name: enm.name().into(),
             variants: enm.values().iter().map(|s| Cow::Borrowed(s.as_str())).collect(),
         }
@@ -317,7 +317,7 @@ impl SqlRenderer for PostgresFlavour {
     }
 
     fn render_create_index(&self, index: &IndexWalker<'_>) -> String {
-        CreateIndex {
+        ddl::CreateIndex {
             index_name: index.name().into(),
             is_unique: index.index_type().is_unique(),
             table_reference: index.table().name().into(),
@@ -371,7 +371,14 @@ impl SqlRenderer for PostgresFlavour {
     }
 
     fn render_drop_table(&self, table_name: &str) -> Vec<String> {
-        vec![format!("DROP TABLE {}", self.quote(&table_name))]
+        vec![ddl::DropTable {
+            table_name: table_name.into(),
+        }
+        .to_string()]
+    }
+
+    fn render_drop_view(&self, view: &ViewWalker<'_>) -> String {
+        format!("DROP VIEW {}", self.quote(view.name()))
     }
 
     fn render_redefine_tables(&self, _names: &[RedefineTable], _schemas: &Pair<&SqlSchema>) -> Vec<String> {
@@ -385,10 +392,6 @@ impl SqlRenderer for PostgresFlavour {
             ..Default::default()
         }
         .to_string()
-    }
-
-    fn render_drop_view(&self, view: &ViewWalker<'_>) -> String {
-        format!("DROP VIEW {}", self.quote(view.name()))
     }
 }
 
