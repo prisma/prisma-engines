@@ -1,4 +1,7 @@
-use super::{common::*, SqlRenderer};
+use super::{
+    common::{format_hex, render_nullability, IteratorJoin, Quoted, SQL_INDENTATION},
+    SqlRenderer,
+};
 use crate::{
     flavour::PostgresFlavour,
     pair::Pair,
@@ -9,8 +12,10 @@ use native_types::PostgresType;
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
-use sql_ddl::postgres::{self as ddl};
-use sql_schema_describer::{walkers::*, *};
+use sql_ddl::postgres as ddl;
+use sql_schema_describer::{
+    walkers::*, ColumnArity, ColumnTypeFamily, DefaultKind, DefaultValue, ForeignKeyAction, SqlSchema,
+};
 use std::borrow::Cow;
 
 impl PostgresFlavour {
@@ -205,10 +210,10 @@ impl SqlRenderer for PostgresFlavour {
 
         // drop old enum
         {
-            let sql = format!(
-                "DROP TYPE {tmp_old_name}",
-                tmp_old_name = Quoted::postgres_ident(&tmp_old_name),
-            );
+            let sql = ddl::DropType {
+                type_name: tmp_old_name.as_str().into(),
+            }
+            .to_string();
 
             stmts.push(sql)
         }
@@ -350,10 +355,10 @@ impl SqlRenderer for PostgresFlavour {
     }
 
     fn render_drop_enum(&self, dropped_enum: &EnumWalker<'_>) -> Vec<String> {
-        let sql = format!(
-            "DROP TYPE {enum_name}",
-            enum_name = Quoted::postgres_ident(dropped_enum.name()),
-        );
+        let sql = ddl::DropType {
+            type_name: dropped_enum.name().into(),
+        }
+        .to_string();
 
         vec![sql]
     }

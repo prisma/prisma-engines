@@ -86,6 +86,27 @@ impl Display for DropTable<'_> {
     }
 }
 
+/// Render a `DROP TYPE` statement.
+///
+/// ```
+/// # use sql_ddl::postgres::DropType;
+///
+/// let drop_type = DropType { type_name: "CatMood".into() };
+/// assert_eq!(drop_type.to_string(), r#"DROP TYPE "CatMood""#);
+/// ```
+#[derive(Debug)]
+pub struct DropType<'a> {
+    /// The name of the type to be dropped.
+    pub type_name: PostgresIdentifier<'a>,
+}
+
+impl Display for DropType<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("DROP TYPE ")?;
+        Display::fmt(&self.type_name, f)
+    }
+}
+
 /// Render a `DROP VIEW` statement.
 ///
 /// ```
