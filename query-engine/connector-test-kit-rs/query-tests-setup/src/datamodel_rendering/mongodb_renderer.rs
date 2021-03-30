@@ -75,4 +75,22 @@ mod mongo_render_tests {
 
         assert_eq!(rendered, r#"someIdField SomeType @id @map("_id")"#)
     }
+
+    #[test]
+    fn add_m2m_mapping() {
+        let fragment = M2mFragment {
+            field_name: "posts".to_owned(),
+            field_type: "Post[]".to_owned(),
+            opposing_type: "String".to_owned(),
+            directives: vec![],
+        };
+
+        let renderer = MongoDbSchemaRenderer::new();
+        let rendered = renderer.render_m2m(fragment);
+
+        assert_eq!(
+            rendered.trim(),
+            "posts_ids String[]\nposts Post[] @relation(fields: [posts_ids])"
+        )
+    }
 }

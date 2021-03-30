@@ -123,28 +123,7 @@ mod parser_tests {
     // Invalid ID fragment
     fn no_args_id_fragment() {
         let fragment = r#"#id()"#;
-        let fragment = parse_fragment(fragment);
-
-        assert_eq!(
-            fragment,
-            Ok((
-                "",
-                DatamodelFragment::Id(IdFragment {
-                    field_name: String::from("id"),
-                    field_type: String::from("Int"),
-                    directives: vec![
-                        Directive {
-                            ident: String::from("id"),
-                            args: vec![]
-                        },
-                        Directive {
-                            ident: String::from("map"),
-                            args: vec![String::from("\"_id\"")]
-                        }
-                    ]
-                })
-            ))
-        );
+        parse_fragment(fragment).unwrap();
     }
 
     #[test]
@@ -170,5 +149,36 @@ mod parser_tests {
         let parsed = parse_fragment_argument(directive);
 
         assert_eq!(parsed, Ok(("", FragmentArgument::Value(String::from("someString")))));
+    }
+
+    #[test]
+    // Valid m2m fragment
+    fn basic_m2m_fragment_parsing() {
+        let fragment = r#"#m2m(posts, Post[], String, @relation(fields: [field]))"#;
+        let fragment = parse_fragment(fragment);
+
+        assert_eq!(
+            fragment,
+            Ok((
+                "",
+                DatamodelFragment::M2m(M2mFragment {
+                    field_name: String::from("posts"),
+                    field_type: String::from("Post[]"),
+                    opposing_type: String::from("String"),
+                    directives: vec![Directive {
+                        ident: String::from("relation"),
+                        args: vec![String::from("fields: [field]")]
+                    }]
+                })
+            ))
+        );
+    }
+
+    #[test]
+    #[should_panic]
+    fn invalid_m2m_fragment() {
+        let fragment = r#"#m2m(name, Type, @relation(...))"#;
+
+        parse_fragment(fragment).unwrap();
     }
 }
