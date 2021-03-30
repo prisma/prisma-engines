@@ -30,6 +30,16 @@ pub struct GQLError {
     user_facing_error: user_facing_errors::Error,
 }
 
+impl GQLError {
+    pub fn code(&self) -> Option<&str> {
+        self.user_facing_error.as_known().map(|err| err.error_code)
+    }
+
+    pub fn message(&self) -> &str {
+        self.user_facing_error.message()
+    }
+}
+
 impl GQLResponse {
     pub fn with_capacity(capacity: usize) -> Self {
         Self {
