@@ -378,7 +378,10 @@ impl SqlRenderer for PostgresFlavour {
     }
 
     fn render_drop_view(&self, view: &ViewWalker<'_>) -> String {
-        format!("DROP VIEW {}", self.quote(view.name()))
+        ddl::DropView {
+            view_name: view.name().into(),
+        }
+        .to_string()
     }
 
     fn render_redefine_tables(&self, _names: &[RedefineTable], _schemas: &Pair<&SqlSchema>) -> Vec<String> {

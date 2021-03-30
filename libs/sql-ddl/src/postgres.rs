@@ -65,6 +65,27 @@ impl Display for DropTable<'_> {
     }
 }
 
+/// Render a `DROP VIEW` statement.
+///
+/// ```
+/// # use sql_ddl::postgres::DropView;
+///
+/// let drop_view = DropView { view_name: "Cat".into() };
+/// assert_eq!(drop_view.to_string(), r#"DROP VIEW "Cat""#);
+/// ```
+#[derive(Debug)]
+pub struct DropView<'a> {
+    /// The name of the view to be dropped.
+    pub view_name: PostgresIdentifier<'a>,
+}
+
+impl Display for DropView<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("DROP VIEW ")?;
+        Display::fmt(&self.view_name, f)
+    }
+}
+
 #[derive(Debug)]
 pub struct ForeignKey<'a> {
     pub constraint_name: Option<Cow<'a, str>>,
