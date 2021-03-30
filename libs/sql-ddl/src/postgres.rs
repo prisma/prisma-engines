@@ -26,14 +26,19 @@ impl Display for AlterTable<'_> {
 #[derive(Debug)]
 pub enum AlterTableClause<'a> {
     AddForeignKey(ForeignKey<'a>),
+    RenameTo(Cow<'a, str>),
 }
 
 impl Display for AlterTableClause<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
+        match &self {
             AlterTableClause::AddForeignKey(fk) => {
                 f.write_str("ADD ")?;
-                fk.fmt(f)
+                Display::fmt(fk, f)
+            }
+            &AlterTableClause::RenameTo(to) => {
+                f.write_str("RENAME TO ")?;
+                Display::fmt(&PostgresIdentifier::from(to.as_ref()), f)
             }
         }
     }
@@ -124,6 +129,27 @@ impl<'a> From<&'a str> for PostgresIdentifier<'a> {
     }
 }
 
+impl Display for PostgresIdentifier<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let delimiter = "\"";
+
+        match self {
+            PostgresIdentifier::Simple(name) => {
+                f.write_str(delimiter)?;
+                f.write_str(name)?;
+                f.write_str(delimiter)
+            }
+            PostgresIdentifier::WithSchema(prefix, name) => {
+                f.write_str(delimiter)?;
+                f.write_str(prefix)?;
+                f.write_str(r#"".""#)?;
+                f.write_str(name)?;
+                f.write_str(delimiter)
+            }
+        }
+    }
+}
+
 struct StrLit<'a>(&'a str);
 
 impl Display for StrLit<'_> {
@@ -145,15 +171,6 @@ impl Display for Ident<'_> {
 impl<'a> From<(&'a str, &'a str)> for PostgresIdentifier<'a> {
     fn from((schema, item): (&'a str, &'a str)) -> Self {
         PostgresIdentifier::WithSchema(Cow::Borrowed(schema), Cow::Borrowed(item))
-    }
-}
-
-impl<'a> Display for PostgresIdentifier<'a> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            PostgresIdentifier::Simple(ident) => write!(f, "\"{}\"", ident),
-            PostgresIdentifier::WithSchema(schema_name, ident) => write!(f, "\"{}\".\"{}\"", schema_name, ident),
-        }
     }
 }
 
@@ -254,6 +271,18 @@ mod tests {
 
         let expected =
             "ALTER TABLE \"public\".\"Cat\" ADD CONSTRAINT \"cat_friend\" FOREIGN KEY (\"friendName\", \"friendTemperament\") REFERENCES \"Dog\"(\"name\", \"temperament\")";
+
+        assert_eq!(alter_table.to_string(), expected);
+    }
+
+    #[test]
+    fn rename_table() {
+        let expected = r#"ALTER TABLE "Cat" RENAME TO "Dog""#;
+        let alter_table = AlterTable {
+            table_name: "Cat".into(),
+            clauses: vec![AlterTableClause::RenameTo("Dog".into())],
+            ..Default::default()
+        };
 
         assert_eq!(alter_table.to_string(), expected);
     }

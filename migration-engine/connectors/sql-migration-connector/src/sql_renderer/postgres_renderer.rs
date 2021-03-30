@@ -379,11 +379,12 @@ impl SqlRenderer for PostgresFlavour {
     }
 
     fn render_rename_table(&self, name: &str, new_name: &str) -> String {
-        format!(
-            "ALTER TABLE {} RENAME TO {}",
-            self.quote(name),
-            new_name = self.quote(new_name),
-        )
+        ddl::AlterTable {
+            table_name: name.into(),
+            clauses: vec![ddl::AlterTableClause::RenameTo(new_name.into())],
+            ..Default::default()
+        }
+        .to_string()
     }
 
     fn render_drop_view(&self, view: &ViewWalker<'_>) -> String {
@@ -413,6 +414,7 @@ pub(crate) fn render_column_type(col: &ColumnWalker<'_>) -> Cow<'static, str> {
             Some(arg) => format!("({})", arg),
         }
     }
+
     fn render_decimal(input: Option<(u32, u32)>) -> String {
         match input {
             None => "".to_string(),
