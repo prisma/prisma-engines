@@ -4,7 +4,7 @@ mod sql_renderer;
 pub use mongodb_renderer::*;
 pub use sql_renderer::*;
 
-use crate::{templating, ConnectorTagInterface, DatamodelFragment, IdFragment, TestConfig};
+use crate::{templating, ConnectorTagInterface, DatamodelFragment, IdFragment, M2mFragment, TestConfig};
 use indoc::indoc;
 use lazy_static::lazy_static;
 use regex::Regex;
@@ -19,10 +19,12 @@ pub trait DatamodelRenderer {
     fn render(&self, fragment: DatamodelFragment) -> String {
         match fragment {
             DatamodelFragment::Id(id) => self.render_id(id),
+            DatamodelFragment::M2m(m2m) => self.render_m2m(m2m),
         }
     }
 
     fn render_id(&self, id: IdFragment) -> String;
+    fn render_m2m(&self, m2m: M2mFragment) -> String;
 }
 
 /// Render the complete datamodel with all bells and whistles.

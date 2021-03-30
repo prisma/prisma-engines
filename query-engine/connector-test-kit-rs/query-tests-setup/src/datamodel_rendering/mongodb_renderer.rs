@@ -1,6 +1,6 @@
-use crate::Directive;
-
 use super::*;
+use crate::Directive;
+use itertools::Itertools;
 
 #[derive(Debug, Default)]
 pub struct MongoDbSchemaRenderer {}
@@ -23,6 +23,23 @@ impl DatamodelRenderer for MongoDbSchemaRenderer {
         });
 
         id.to_string()
+    }
+
+    // Currently just an accepted hack for MongoDB
+    fn render_m2m(&self, m2m: M2mFragment) -> String {
+        // Add an array field for mongo, name: "<rel_field_name>_ids <Opposing type>[]"
+        let fk_field_name = format!("{}_ids", m2m.field_name);
+        let additional_fk_field = format!("{} {}[]", fk_field_name, m2m.opposing_type);
+
+        // Add @relation directive that specifies the local array to hold the FKs.
+        format!(
+            "{}\n{} {} @relation(fields: [{}]) {}",
+            additional_fk_field,
+            m2m.field_name,
+            m2m.field_type,
+            fk_field_name,
+            m2m.directives.iter().map(ToString::to_string).join(" "),
+        )
     }
 }
 

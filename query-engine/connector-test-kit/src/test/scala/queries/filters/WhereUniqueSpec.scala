@@ -3,6 +3,7 @@ package queries.filters
 import org.scalatest.{FlatSpec, Matchers}
 import util._
 
+// RS: Ported
 class WhereUniqueSpec extends FlatSpec with Matchers with ApiSpecBase {
 
   val project: Project = ProjectDsl.fromString { """

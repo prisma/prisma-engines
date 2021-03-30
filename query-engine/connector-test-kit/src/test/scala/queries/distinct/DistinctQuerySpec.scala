@@ -3,6 +3,7 @@ package queries.distinct
 import org.scalatest.{FlatSpec, Matchers}
 import util._
 
+// RS: Ported
 class DistinctQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
   val project = SchemaDsl.fromStringV11() {
     """model ModelA {

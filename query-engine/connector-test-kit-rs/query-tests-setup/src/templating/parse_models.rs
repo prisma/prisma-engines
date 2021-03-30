@@ -6,12 +6,14 @@ use std::fmt::Display;
 #[derive(Debug, PartialEq)]
 pub enum DatamodelFragment {
     Id(IdFragment),
+    M2m(M2mFragment),
 }
 
 impl DatamodelFragment {
     pub fn parse(ident: &str, args: Vec<FragmentArgument>) -> TemplatingResult<Self> {
         let fragment = match ident {
             "id" => Self::Id(IdFragment::from_args(args)?),
+            "m2m" => Self::M2m(M2mFragment::from_args(args)?),
             ident => return Err(TemplatingError::unknown_ident(ident)),
         };
 
@@ -22,8 +24,13 @@ impl DatamodelFragment {
 /// ID field definition, e.g. `#id(id, Int, @id @test.SmallInt)`
 #[derive(Debug, PartialEq)]
 pub struct IdFragment {
+    /// Field name of the ID field.
     pub field_name: String,
+
+    /// Field type of the ID field.
     pub field_type: String,
+
+    /// Optional directives.
     pub directives: Vec<Directive>,
 }
 
@@ -51,10 +58,6 @@ impl IdFragment {
         })
     }
 
-    // pub fn has_directive(&self, name: &str) -> bool {
-    //     self.directives.iter().any(|dir| dir.ident == name)
-    // }
-
     /// Function to update receives a mutable reference to directive with `name`, if it already exists.
     /// The function `f` may choose to return a new directive that will be inserted into the list of directives.
     pub fn upsert_directive<F>(&mut self, name: &str, f: F)
@@ -76,7 +79,7 @@ impl ToString for IdFragment {
             "{} {} {}",
             self.field_name,
             self.field_type,
-            self.directives.iter().map(|dir| format!("{}", dir)).join(" ")
+            self.directives.iter().map(ToString::to_string).join(" ")
         )
     }
 }
@@ -133,5 +136,50 @@ impl FragmentArgument {
             )),
             FragmentArgument::Directive(dir) => Ok(dir),
         }
+    }
+}
+
+/// M2m field definition, e.g. `#m2m(posts, Post[], vec![])`
+#[derive(Debug, PartialEq)]
+pub struct M2mFragment {
+    /// Field name of the m2m field.
+    pub field_name: String,
+
+    /// Field type of the m2m field.
+    pub field_type: String,
+
+    /// Type of the opposing ID.
+    //// Required info for some connectors to render.
+    pub opposing_type: String,
+
+    /// Optional directives on the m2m field.
+    pub directives: Vec<Directive>,
+}
+
+impl M2mFragment {
+    // Todo code can be merged with id fragment, resulting in a FieldDefinitionFragment or something.
+    fn from_args(args: Vec<FragmentArgument>) -> TemplatingResult<Self> {
+        if args.len() < 3 {
+            return Err(TemplatingError::num_args("m2m", 3, args.len()));
+        }
+
+        let mut args = args.into_iter();
+        let (field_name, field_type) = args.next_tuple().unwrap();
+        let opposing_type = args.next().unwrap();
+
+        let field_name = field_name.into_value_string()?;
+        let field_type = field_type.into_value_string()?;
+        let opposing_type = opposing_type.into_value_string()?;
+        let directives = args
+            .into_iter()
+            .map(|arg| arg.into_directive())
+            .collect::<TemplatingResult<Vec<_>>>()?;
+
+        Ok(Self {
+            field_name,
+            field_type,
+            directives,
+            opposing_type,
+        })
     }
 }

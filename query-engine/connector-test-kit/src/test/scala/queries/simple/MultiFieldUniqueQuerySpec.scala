@@ -4,6 +4,7 @@ import org.scalatest.{FlatSpec, Matchers}
 import play.api.libs.json.JsNull
 import util._
 
+// RS: Ported
 class MultiFieldUniqueQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
   "A simple multi-field-unique query" should "work" in {
     val project = SchemaDsl.fromStringV11() { """model User {
@@ -192,7 +193,8 @@ class MultiFieldUniqueQuerySpec extends FlatSpec with Matchers with ApiSpecBase 
                                  |}""".stripMargin,
       project,
       errorCode = 2012,
-      errorContains = """Missing a required value at `Query.user.where.UserWhereUniqueInput.FirstName_LastName.UserFirstNameLastNameCompoundUniqueInput.LastName""",
+      errorContains =
+        """Missing a required value at `Query.user.where.UserWhereUniqueInput.FirstName_LastName.UserFirstNameLastNameCompoundUniqueInput.LastName""",
     )
   }
 

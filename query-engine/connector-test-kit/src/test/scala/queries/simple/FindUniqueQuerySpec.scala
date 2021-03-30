@@ -3,6 +3,7 @@ package queries.simple
 import org.scalatest.{FlatSpec, Matchers}
 import util._
 
+// RS: Ported
 class FindUniqueQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
   "Fetching a unique record" should "work by id" in {
     val project = SchemaDsl.fromStringV11() {
