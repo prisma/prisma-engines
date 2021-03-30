@@ -52,10 +52,7 @@ pub fn build(
             order_definitions.push((order_column.clone().into(), order_dir));
         }
 
-        ordering_joins.push(OrderingJoins {
-            joins,
-            order_column: order_column,
-        });
+        ordering_joins.push(OrderingJoins { joins, order_column });
     }
 
     (order_definitions, ordering_joins)

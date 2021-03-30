@@ -33,7 +33,7 @@ pub enum SortOrder {
 }
 
 impl SortOrder {
-    pub fn into_order(&self, reverse: bool) -> Order {
+    pub fn into_order(self, reverse: bool) -> Order {
         match (self, reverse) {
             (SortOrder::Ascending, false) => Order::Asc,
             (SortOrder::Descending, false) => Order::Desc,
