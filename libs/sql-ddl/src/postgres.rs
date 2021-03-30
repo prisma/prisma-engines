@@ -1,5 +1,5 @@
 use crate::common::IteratorJoin;
-use std::{borrow::Cow, fmt::Display, todo};
+use std::{borrow::Cow, fmt::Display};
 
 #[derive(Debug, Default)]
 pub struct AlterTable<'a> {
@@ -25,22 +25,69 @@ impl Display for AlterTable<'_> {
 
 #[derive(Debug)]
 pub enum AlterTableClause<'a> {
+    AddColumn(Column<'a>),
     AddForeignKey(ForeignKey<'a>),
+    AddPrimaryKey(Vec<Cow<'a, str>>),
+    DropColumn(Cow<'a, str>),
+    DropConstraint(Cow<'a, str>),
     RenameTo(Cow<'a, str>),
 }
 
 impl Display for AlterTableClause<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match &self {
+            AlterTableClause::AddColumn(col) => {
+                f.write_str("ADD COLUMN ")?;
+                Display::fmt(col, f)
+            }
             AlterTableClause::AddForeignKey(fk) => {
                 f.write_str("ADD ")?;
                 Display::fmt(fk, f)
             }
-            &AlterTableClause::RenameTo(to) => {
+            AlterTableClause::AddPrimaryKey(cols) => {
+                f.write_str("ADD PRIMARY KEY (")?;
+
+                cols.iter()
+                    .map(|s| PostgresIdentifier::from(s.as_ref()))
+                    .join(", ", f)?;
+
+                f.write_str(")")
+            }
+            AlterTableClause::DropColumn(colname) => {
+                f.write_str("DROP COLUMN ")?;
+                Display::fmt(&PostgresIdentifier::from(colname.as_ref()), f)
+            }
+            AlterTableClause::DropConstraint(constraint_name) => {
+                f.write_str("DROP CONSTRAINT ")?;
+                Display::fmt(&PostgresIdentifier::from(constraint_name.as_ref()), f)
+            }
+            AlterTableClause::RenameTo(to) => {
                 f.write_str("RENAME TO ")?;
                 Display::fmt(&PostgresIdentifier::from(to.as_ref()), f)
             }
         }
+    }
+}
+
+#[derive(Debug, Default)]
+pub struct Column<'a> {
+    pub name: Cow<'a, str>,
+    pub r#type: Cow<'a, str>,
+    pub default: Option<Cow<'a, str>>,
+}
+
+impl Display for Column<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        Display::fmt(&PostgresIdentifier::from(self.name.as_ref()), f)?;
+        f.write_str(" ")?;
+        f.write_str(self.r#type.as_ref())?;
+
+        if let Some(default) = &self.default {
+            f.write_str(" DEFAULT ")?;
+            f.write_str(default)?;
+        }
+
+        Ok(())
     }
 }
 
@@ -365,7 +412,6 @@ mod tests {
         let alter_table = AlterTable {
             table_name: "Cat".into(),
             clauses: vec![AlterTableClause::RenameTo("Dog".into())],
-            ..Default::default()
         };
 
         assert_eq!(alter_table.to_string(), expected);

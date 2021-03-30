@@ -400,7 +400,6 @@ impl SqlRenderer for PostgresFlavour {
         ddl::AlterTable {
             table_name: name.into(),
             clauses: vec![ddl::AlterTableClause::RenameTo(new_name.into())],
-            ..Default::default()
         }
         .to_string()
     }
