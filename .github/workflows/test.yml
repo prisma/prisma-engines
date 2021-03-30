@@ -109,12 +109,12 @@ jobs:
         run: |
           cargo +nightly rustdoc --all-features
 
-      - name: Commit changes
-        run: ./.github/publish_rustdoc.sh
-
-      - name: Push changes
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: gh-pages
-          directory: deploy_docs
+      - name: Deploy Documentation
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PUBLISH_BRANCH: gh-pages
+          PUBLISH_DIR: ./target/doc
+          SCRIPT_MODE: true
+        run: |
+          wget https://gist.githubusercontent.com/pimeys/73853d2718a99a471ce82d481002de50/raw/13ccccccfb0a11db3fbe90eeacafa487a80e6068/entrypoint.sh
+          bash ./entrypoint.sh
