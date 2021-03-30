@@ -367,7 +367,10 @@ impl SqlRenderer for PostgresFlavour {
     }
 
     fn render_drop_index(&self, index: &IndexWalker<'_>) -> String {
-        format!("DROP INDEX {}", self.quote(index.name()))
+        ddl::DropIndex {
+            index_name: index.name().into(),
+        }
+        .to_string()
     }
 
     fn render_drop_table(&self, table_name: &str) -> Vec<String> {

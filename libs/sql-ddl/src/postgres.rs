@@ -44,6 +44,27 @@ impl Display for AlterTableClause<'_> {
     }
 }
 
+/// Render a `DROP INDEX` statement.
+///
+/// ```
+/// # use sql_ddl::postgres::DropIndex;
+///
+/// let drop_index = DropIndex { index_name: "Catidx".into() };
+/// assert_eq!(drop_index.to_string(), r#"DROP INDEX "Catidx""#);
+/// ```
+#[derive(Debug)]
+pub struct DropIndex<'a> {
+    /// The name of the index to be dropped.
+    pub index_name: Cow<'a, str>,
+}
+
+impl Display for DropIndex<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("DROP INDEX ")?;
+        Display::fmt(&PostgresIdentifier::from(self.index_name.as_ref()), f)
+    }
+}
+
 /// Render a `DROP TABLE` statement.
 ///
 /// ```
