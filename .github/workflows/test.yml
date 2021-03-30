@@ -107,7 +107,8 @@ jobs:
 
       - name: Generate documentation
         run: |
-          cargo rustdoc --all-features
+          cargo +nightly rustdoc --all-features
+
       - name: Commit changes
         run: |
           git config user.name "GitHub agent"
@@ -119,7 +120,7 @@ jobs:
           mv target/doc/* deploy_docs/
           echo "<meta http-equiv=refresh content=0;url=quaint/index.html>" > deploy_docs/index.html
 
-          DIFF=$(git status -s)
+          DIFF=$(git -C deploy_docs status -s)
           printf "$DIFF\n"
 
           if [ -z "$DIFF" ]
