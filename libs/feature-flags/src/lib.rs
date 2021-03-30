@@ -53,20 +53,10 @@ macro_rules! flags {
 }
 
 // `microsoftSqlServer`: Support for Microsoft SQL Server databases.
-// `groupBy`: Group-By aggregations in the QE.
-// `createMany`: Create many (bulk insert) API operation.
 // `orderByRelation`: Allows ordering by to-one relation in the QE API.
 // `mongoDb`: Support for MongoDB.
 // `selectRelationCount`: Allows selecting `_count` on to-many relations in find queries.
-flags!(
-    microsoftSqlServer,
-    groupBy,
-    createMany,
-    orderByRelation,
-    napi,
-    mongoDb,
-    selectRelationCount
-);
+flags!(microsoftSqlServer, orderByRelation, napi, mongoDb, selectRelationCount);
 
 /// Initializes the feature flags with given flags.
 /// Noop if already initialized.
