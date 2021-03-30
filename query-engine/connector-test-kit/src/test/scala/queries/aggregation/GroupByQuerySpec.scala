@@ -272,6 +272,233 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     result.toString should be("""{"data":{"groupByModel":[{"s":"group3","count":{"s":2},"sum":{"float":25},"min":{"int":5}}]}}""")
   }
 
+
+  "Using a group-by with ordering COUNT aggregation" should "work" in {
+    // Float, int, dec, s, id
+    create(1.1, 1, "11", "group1", Some("1"))
+    create(1.1, 2, "11", "group1", Some("2"))
+    create(1.1, 3, "3", "group2", Some("3"))
+    create(4.0, 3, "4", "group3", Some("4"))
+
+    var result = server.query(
+      s"""{
+         |  groupByModel(by: [float], orderBy: { _count: { float: asc } }) {
+         |    float
+         |    count {
+         |      float
+         |    }
+         |  }
+         |}""".stripMargin,
+      project
+    )
+
+    result.toString should be("""{"data":{"groupByModel":[{"float":4,"count":{"float":1}},{"float":1.1,"count":{"float":3}}]}}""")
+
+    result = server.query(
+      s"""{
+         |  groupByModel(by: [float], orderBy: { _count: { float: desc } }) {
+         |    float
+         |    count {
+         |      float
+         |    }
+         |  }
+         |}""".stripMargin,
+      project
+    )
+
+    result.toString should be("""{"data":{"groupByModel":[{"float":1.1,"count":{"float":3}},{"float":4,"count":{"float":1}}]}}""")
+  }
+
+  "Using a group-by with ordering SUM aggregation" should "work" in {
+    // Float, int, dec, s, id
+    create(1.1, 1, "11", "group1", Some("1"))
+    create(1.1, 2, "11", "group1", Some("2"))
+    create(1.1, 3, "3", "group2", Some("3"))
+    create(4.0, 3, "4", "group3", Some("4"))
+
+    var result = server.query(
+      s"""{
+         |  groupByModel(by: [float], orderBy: { _sum: { float: asc } }) {
+         |    float
+         |    sum {
+         |      float
+         |    }
+         |  }
+         |}""".stripMargin,
+      project
+    )
+
+    result.toString should be("""{"data":{"groupByModel":[{"float":1.1,"sum":{"float":3.3}},{"float":4,"sum":{"float":4}}]}}""")
+
+    result = server.query(
+      s"""{
+         |  groupByModel(by: [float], orderBy: { _sum: { float: desc } }) {
+         |    float
+         |    sum {
+         |      float
+         |    }
+         |  }
+         |}""".stripMargin,
+      project
+    )
+
+    result.toString should be("""{"data":{"groupByModel":[{"float":4,"sum":{"float":4}},{"float":1.1,"sum":{"float":3.3}}]}}""")
+  }
+
+  "Using a group-by with ordering AVG aggregation" should "work" in {
+    // Float, int, dec, s, id
+    create(1.1, 1, "11", "group1", Some("1"))
+    create(1.1, 2, "11", "group1", Some("2"))
+    create(1.1, 3, "3", "group2", Some("3"))
+    create(4.0, 3, "4", "group3", Some("4"))
+
+    var result = server.query(
+      s"""{
+         |  groupByModel(by: [float], orderBy: { _avg: { float: asc } }) {
+         |    float
+         |    avg {
+         |      float
+         |    }
+         |  }
+         |}""".stripMargin,
+      project
+    )
+
+    result.toString should be("""{"data":{"groupByModel":[{"float":1.1,"avg":{"float":1.1}},{"float":4,"avg":{"float":4}}]}}""")
+
+    result = server.query(
+      s"""{
+         |  groupByModel(by: [float], orderBy: { _avg: { float: desc } }) {
+         |    float
+         |    avg {
+         |      float
+         |    }
+         |  }
+         |}""".stripMargin,
+      project
+    )
+
+    result.toString should be("""{"data":{"groupByModel":[{"float":4,"avg":{"float":4}},{"float":1.1,"avg":{"float":1.1}}]}}""")
+  }
+
+  "Using a group-by with ordering MIN aggregation" should "work" in {
+    // Float, int, dec, s, id
+    create(1.1, 1, "11", "group1", Some("1"))
+    create(1.1, 2, "11", "group1", Some("2"))
+    create(1.1, 3, "3", "group2", Some("3"))
+    create(4.0, 3, "4", "group3", Some("4"))
+
+    var result = server.query(
+      s"""{
+         |  groupByModel(by: [float], orderBy: { _min: { float: asc } }) {
+         |    float
+         |    min {
+         |      float
+         |    }
+         |  }
+         |}""".stripMargin,
+      project
+    )
+
+    result.toString should be("""{"data":{"groupByModel":[{"float":1.1,"min":{"float":1.1}},{"float":4,"min":{"float":4}}]}}""")
+
+    result = server.query(
+      s"""{
+         |  groupByModel(by: [float], orderBy: { _min: { float: desc } }) {
+         |    float
+         |    min {
+         |      float
+         |    }
+         |  }
+         |}""".stripMargin,
+      project
+    )
+
+    result.toString should be("""{"data":{"groupByModel":[{"float":4,"min":{"float":4}},{"float":1.1,"min":{"float":1.1}}]}}""")
+  }
+
+  "Using a group-by with ordering MAX aggregation" should "work" in {
+    // Float, int, dec, s, id
+    create(1.1, 1, "11", "group1", Some("1"))
+    create(1.1, 2, "11", "group1", Some("2"))
+    create(1.1, 3, "3", "group2", Some("3"))
+    create(4.0, 3, "4", "group3", Some("4"))
+
+    var result = server.query(
+      s"""{
+         |  groupByModel(by: [float], orderBy: { _max: { float: asc } }) {
+         |    float
+         |    max {
+         |      float
+         |    }
+         |  }
+         |}""".stripMargin,
+      project
+    )
+
+    result.toString should be("""{"data":{"groupByModel":[{"float":1.1,"max":{"float":1.1}},{"float":4,"max":{"float":4}}]}}""")
+
+    result = server.query(
+      s"""{
+         |  groupByModel(by: [float], orderBy: { _max: { float: desc } }) {
+         |    float
+         |    max {
+         |      float
+         |    }
+         |  }
+         |}""".stripMargin,
+      project
+    )
+
+    result.toString should be("""{"data":{"groupByModel":[{"float":4,"max":{"float":4}},{"float":1.1,"max":{"float":1.1}}]}}""")
+  }
+
+
+  "Using a group-by with multiple ordering aggregation of different fields" should "work" in {
+    // Float, int, dec, s, id
+    create(1.1, 1, "11", "group1", Some("1"))
+    create(1.1, 1, "11", "group1", Some("2"))
+    create(1.1, 1, "3", "group2", Some("3"))
+    create(3.0, 3, "4", "group3", Some("5"))
+    create(4.0, 4, "4", "group3", Some("4"))
+
+    val result = server.query(
+      s"""{
+         |  groupByModel(by: [float, int], orderBy: [{ _count: { float: desc } }, { _sum: { int: asc } }]) {
+         |    float
+         |    count { float }
+         |    sum { int }
+         |  }
+         |}""".stripMargin,
+      project
+    )
+
+    result.toString should be("""{"data":{"groupByModel":[{"float":1.1,"count":{"float":3},"sum":{"int":3}},{"float":3.0,"count":{"float":1},"sum":{"int":3}},{"float":4.0,"count":{"float":1},"sum":{"int":4}}]}}""")
+  }
+
+  "Using a group-by with multiple ordering aggregation and having" should "work" in {
+    // Float, int, dec, s, id
+    create(1.1, 1, "11", "group1", Some("1"))
+    create(1.1, 1, "11", "group1", Some("2"))
+    create(1.1, 1, "3", "group2", Some("3"))
+    create(3.0, 3, "4", "group3", Some("5"))
+    create(4.0, 4, "4", "group3", Some("4"))
+
+    val result = server.query(
+      s"""{
+         |  groupByModel(by: [float, int], orderBy: [{ _count: { float: desc } }, { _sum: { int: asc } }], having: { float: { lt: 4 } }) {
+         |    float
+         |    count { float }
+         |    sum { int }
+         |  }
+         |}""".stripMargin,
+      project
+    )
+
+    result.toString should be("""{"data":{"groupByModel":[{"float":1.1,"count":{"float":3},"sum":{"int":3}},{"float":3.0,"count":{"float":1},"sum":{"int":3}}]}}""")
+  }
+
+
   /////// Error Cases
 
   "Using a groupBy without any by selection" should "error" in {
