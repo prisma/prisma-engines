@@ -154,16 +154,16 @@ fn process_order_object(
 }
 
 fn extract_sort_aggregation(field_name: &str) -> QueryGraphBuilderResult<SortAggregation> {
-    let sort_aggregation = match field_name {
-        filters::COUNT | filters::UNDERSCORE_COUNT => SortAggregation::Count,
-        filters::UNDERSCORE_AVG => SortAggregation::Avg,
-        filters::UNDERSCORE_SUM => SortAggregation::Sum,
-        filters::UNDERSCORE_MIN => SortAggregation::Min,
-        filters::UNDERSCORE_MAX => SortAggregation::Max,
-        _ => unreachable!("No aggregation operation could be found. This should not happen"),
-    };
-
-    Ok(sort_aggregation)
+    match field_name {
+        filters::COUNT | filters::UNDERSCORE_COUNT => Ok(SortAggregation::Count),
+        filters::UNDERSCORE_AVG => Ok(SortAggregation::Avg),
+        filters::UNDERSCORE_SUM => Ok(SortAggregation::Sum),
+        filters::UNDERSCORE_MIN => Ok(SortAggregation::Min),
+        filters::UNDERSCORE_MAX => Ok(SortAggregation::Max),
+        _ => Err(QueryGraphBuilderError::InputError(
+            "No aggregation operation could be found. This should not happen".to_string(),
+        )),
+    }
 }
 
 fn extract_sort_order(field_value: ParsedInputValue) -> QueryGraphBuilderResult<SortOrder> {
