@@ -473,7 +473,7 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       project
     )
 
-    result.toString should be("""{"data":{"groupByModel":[{"float":1.1,"count":{"float":3},"sum":{"int":3}},{"float":3.0,"count":{"float":1},"sum":{"int":3}},{"float":4.0,"count":{"float":1},"sum":{"int":4}}]}}""")
+    result.toString should be("""{"data":{"groupByModel":[{"float":1.1,"count":{"float":3},"sum":{"int":3}},{"float":3,"count":{"float":1},"sum":{"int":3}},{"float":4,"count":{"float":1},"sum":{"int":4}}]}}""")
   }
 
   "Using a group-by with multiple ordering aggregation and having" should "work" in {
@@ -495,7 +495,7 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       project
     )
 
-    result.toString should be("""{"data":{"groupByModel":[{"float":1.1,"count":{"float":3},"sum":{"int":3}},{"float":3.0,"count":{"float":1},"sum":{"int":3}}]}}""")
+    result.toString should be("""{"data":{"groupByModel":[{"float":1.1,"count":{"float":3},"sum":{"int":3}},{"float":3,"count":{"float":1},"sum":{"int":3}}]}}""")
   }
 
 
