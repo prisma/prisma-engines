@@ -1,5 +1,5 @@
 use crate::common::IteratorJoin;
-use std::{borrow::Cow, fmt::Display, todo};
+use std::{borrow::Cow, fmt::Display};
 
 #[derive(Debug, Default)]
 pub struct AlterTable<'a> {
@@ -25,17 +25,153 @@ impl Display for AlterTable<'_> {
 
 #[derive(Debug)]
 pub enum AlterTableClause<'a> {
+    AddColumn(Column<'a>),
     AddForeignKey(ForeignKey<'a>),
+    AddPrimaryKey(Vec<Cow<'a, str>>),
+    DropColumn(Cow<'a, str>),
+    DropConstraint(Cow<'a, str>),
+    RenameTo(Cow<'a, str>),
 }
 
 impl Display for AlterTableClause<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
+        match &self {
+            AlterTableClause::AddColumn(col) => {
+                f.write_str("ADD COLUMN ")?;
+                Display::fmt(col, f)
+            }
             AlterTableClause::AddForeignKey(fk) => {
                 f.write_str("ADD ")?;
-                fk.fmt(f)
+                Display::fmt(fk, f)
+            }
+            AlterTableClause::AddPrimaryKey(cols) => {
+                f.write_str("ADD PRIMARY KEY (")?;
+
+                cols.iter()
+                    .map(|s| PostgresIdentifier::from(s.as_ref()))
+                    .join(", ", f)?;
+
+                f.write_str(")")
+            }
+            AlterTableClause::DropColumn(colname) => {
+                f.write_str("DROP COLUMN ")?;
+                Display::fmt(&PostgresIdentifier::from(colname.as_ref()), f)
+            }
+            AlterTableClause::DropConstraint(constraint_name) => {
+                f.write_str("DROP CONSTRAINT ")?;
+                Display::fmt(&PostgresIdentifier::from(constraint_name.as_ref()), f)
+            }
+            AlterTableClause::RenameTo(to) => {
+                f.write_str("RENAME TO ")?;
+                Display::fmt(&PostgresIdentifier::from(to.as_ref()), f)
             }
         }
+    }
+}
+
+#[derive(Debug, Default)]
+pub struct Column<'a> {
+    pub name: Cow<'a, str>,
+    pub r#type: Cow<'a, str>,
+    pub default: Option<Cow<'a, str>>,
+}
+
+impl Display for Column<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        Display::fmt(&PostgresIdentifier::from(self.name.as_ref()), f)?;
+        f.write_str(" ")?;
+        f.write_str(self.r#type.as_ref())?;
+
+        if let Some(default) = &self.default {
+            f.write_str(" DEFAULT ")?;
+            f.write_str(default)?;
+        }
+
+        Ok(())
+    }
+}
+
+/// Render a `DROP INDEX` statement.
+///
+/// ```
+/// # use sql_ddl::postgres::DropIndex;
+///
+/// let drop_index = DropIndex { index_name: "Catidx".into() };
+/// assert_eq!(drop_index.to_string(), r#"DROP INDEX "Catidx""#);
+/// ```
+#[derive(Debug)]
+pub struct DropIndex<'a> {
+    /// The name of the index to be dropped.
+    pub index_name: Cow<'a, str>,
+}
+
+impl Display for DropIndex<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("DROP INDEX ")?;
+        Display::fmt(&PostgresIdentifier::from(self.index_name.as_ref()), f)
+    }
+}
+
+/// Render a `DROP TABLE` statement.
+///
+/// ```
+/// # use sql_ddl::postgres::DropTable;
+///
+/// let drop_table = DropTable { table_name: "Cat".into() };
+/// assert_eq!(drop_table.to_string(), r#"DROP TABLE "Cat""#);
+/// ```
+#[derive(Debug)]
+pub struct DropTable<'a> {
+    /// The name of the table to be dropped.
+    pub table_name: PostgresIdentifier<'a>,
+}
+
+impl Display for DropTable<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("DROP TABLE ")?;
+        Display::fmt(&self.table_name, f)
+    }
+}
+
+/// Render a `DROP TYPE` statement.
+///
+/// ```
+/// # use sql_ddl::postgres::DropType;
+///
+/// let drop_type = DropType { type_name: "CatMood".into() };
+/// assert_eq!(drop_type.to_string(), r#"DROP TYPE "CatMood""#);
+/// ```
+#[derive(Debug)]
+pub struct DropType<'a> {
+    /// The name of the type to be dropped.
+    pub type_name: PostgresIdentifier<'a>,
+}
+
+impl Display for DropType<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("DROP TYPE ")?;
+        Display::fmt(&self.type_name, f)
+    }
+}
+
+/// Render a `DROP VIEW` statement.
+///
+/// ```
+/// # use sql_ddl::postgres::DropView;
+///
+/// let drop_view = DropView { view_name: "Cat".into() };
+/// assert_eq!(drop_view.to_string(), r#"DROP VIEW "Cat""#);
+/// ```
+#[derive(Debug)]
+pub struct DropView<'a> {
+    /// The name of the view to be dropped.
+    pub view_name: PostgresIdentifier<'a>,
+}
+
+impl Display for DropView<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("DROP VIEW ")?;
+        Display::fmt(&self.view_name, f)
     }
 }
 
@@ -124,6 +260,27 @@ impl<'a> From<&'a str> for PostgresIdentifier<'a> {
     }
 }
 
+impl Display for PostgresIdentifier<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let delimiter = "\"";
+
+        match self {
+            PostgresIdentifier::Simple(name) => {
+                f.write_str(delimiter)?;
+                f.write_str(name)?;
+                f.write_str(delimiter)
+            }
+            PostgresIdentifier::WithSchema(prefix, name) => {
+                f.write_str(delimiter)?;
+                f.write_str(prefix)?;
+                f.write_str(r#"".""#)?;
+                f.write_str(name)?;
+                f.write_str(delimiter)
+            }
+        }
+    }
+}
+
 struct StrLit<'a>(&'a str);
 
 impl Display for StrLit<'_> {
@@ -145,15 +302,6 @@ impl Display for Ident<'_> {
 impl<'a> From<(&'a str, &'a str)> for PostgresIdentifier<'a> {
     fn from((schema, item): (&'a str, &'a str)) -> Self {
         PostgresIdentifier::WithSchema(Cow::Borrowed(schema), Cow::Borrowed(item))
-    }
-}
-
-impl<'a> Display for PostgresIdentifier<'a> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            PostgresIdentifier::Simple(ident) => write!(f, "\"{}\"", ident),
-            PostgresIdentifier::WithSchema(schema_name, ident) => write!(f, "\"{}\".\"{}\"", schema_name, ident),
-        }
     }
 }
 
@@ -254,6 +402,17 @@ mod tests {
 
         let expected =
             "ALTER TABLE \"public\".\"Cat\" ADD CONSTRAINT \"cat_friend\" FOREIGN KEY (\"friendName\", \"friendTemperament\") REFERENCES \"Dog\"(\"name\", \"temperament\")";
+
+        assert_eq!(alter_table.to_string(), expected);
+    }
+
+    #[test]
+    fn rename_table() {
+        let expected = r#"ALTER TABLE "Cat" RENAME TO "Dog""#;
+        let alter_table = AlterTable {
+            table_name: "Cat".into(),
+            clauses: vec![AlterTableClause::RenameTo("Dog".into())],
+        };
 
         assert_eq!(alter_table.to_string(), expected);
     }
