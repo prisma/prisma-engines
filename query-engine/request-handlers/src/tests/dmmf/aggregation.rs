@@ -17,7 +17,7 @@ fn nullable_fields_should_be_nullable_in_group_by_output_types() {
         }
 
         model Blog {
-            id           String @id
+            required_id           String @id
             optional_string   String?
             required_string   String
             optional_int      Int?
@@ -32,22 +32,33 @@ fn nullable_fields_should_be_nullable_in_group_by_output_types() {
         let field_in_nested_type = parent_type.name != "BlogGroupByOutputType";
         let is_nullable = field.is_nullable;
 
-        match (field.output_type.location, field_in_nested_type) {
-            (TypeLocation::Scalar, false) => match field.name.as_str() {
-                "id" => assert_eq!(is_nullable, false),
+        match (
+            field.output_type.location,
+            field_in_nested_type,
+            parent_type.name.as_str(),
+        ) {
+            (TypeLocation::Scalar, false, _) => match field.name.as_str() {
+                "required_id" => assert_eq!(is_nullable, false),
                 "optional_string" => assert_eq!(is_nullable, true),
                 "required_string" => assert_eq!(is_nullable, false),
                 "optional_int" => assert_eq!(is_nullable, true),
                 "required_int" => assert_eq!(is_nullable, false),
                 _ => (),
             },
-            (TypeLocation::Scalar, true) => match field.name.as_str() {
-                "id" => assert_eq!(is_nullable, true),
+            (TypeLocation::Scalar, true, "BlogCountAggregateOutputType") => match field.name.as_str() {
+                "required_id" => assert_eq!(is_nullable, false),
+                "optional_string" => assert_eq!(is_nullable, false),
+                "required_string" => assert_eq!(is_nullable, false),
+                "optional_int" => assert_eq!(is_nullable, false),
+                "required_int" => assert_eq!(is_nullable, false),
+                _ => (),
+            },
+            (TypeLocation::Scalar, true, _) => match field.name.as_str() {
+                "required_id" => assert_eq!(is_nullable, true),
                 "optional_string" => assert_eq!(is_nullable, true),
-                // non-numerical fields in aggregation types should always be nullable
                 "required_string" => assert_eq!(is_nullable, true),
                 "optional_int" => assert_eq!(is_nullable, true),
-                "required_int" => assert_eq!(is_nullable, false),
+                "required_int" => assert_eq!(is_nullable, true),
                 _ => (),
             },
             _ => (),

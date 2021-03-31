@@ -38,7 +38,7 @@ class MinAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     )
   }
 
-  "Calculating min with no records in the database" should "return zero" in {
+  "Calculating min with no records in the database" should "return null" in {
     val result = server.query(
       s"""{
          |  aggregateItem {
@@ -54,11 +54,11 @@ class MinAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       project
     )
 
-    result.pathAsFloat("data.aggregateItem.min.float") should be(0.0)
-    result.pathAsString("data.aggregateItem.min.dec") should be("0")
+    result.pathAsJsValue("data.aggregateItem.min.float") should be(JsNull)
+    result.pathAsJsValue("data.aggregateItem.min.dec") should be(JsNull)
 
-    result.pathAsInt("data.aggregateItem.min.int") should be(0)
-    result.pathAsString("data.aggregateItem.min.bInt") should be("0")
+    result.pathAsJsValue("data.aggregateItem.min.int") should be(JsNull)
+    result.pathAsJsValue("data.aggregateItem.min.bInt") should be(JsNull)
 
     result.pathAsJsValue("data.aggregateItem.min.s") should be(JsNull)
   }

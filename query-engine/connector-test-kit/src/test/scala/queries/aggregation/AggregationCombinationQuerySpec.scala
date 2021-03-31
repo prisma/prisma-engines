@@ -67,7 +67,7 @@ class AggregationCombinationQuerySpec extends FlatSpec with Matchers with ApiSpe
     )
 
     result.toString should be(
-      """{"data":{"aggregateItem":{"count":{"_all":0},"sum":{"float":0,"int":0,"dec":"0"},"avg":{"float":0,"int":0,"dec":"0"},"min":{"float":0,"int":0,"dec":"0"},"max":{"float":0,"int":0,"dec":"0"}}}}""")
+      """{"data":{"aggregateItem":{"count":{"_all":0},"sum":{"float":null,"int":null,"dec":null},"avg":{"float":null,"int":null,"dec":null},"min":{"float":null,"int":null,"dec":null},"max":{"float":null,"int":null,"dec":null}}}}""")
   }
 
   "Using a combination of aggregations with some records in the database" should "return the correct results for each aggregation" in {
