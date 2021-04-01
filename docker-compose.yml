@@ -12,11 +12,8 @@ services:
       - "3307:3306"
     networks:
       - databases
-    volumes:
-      - /tmp:/var/lib/memsql:rw
+    tmpfs: /var/lib/memsql
 
 networks:
   databases:
-
-volumes:
-  tmp:
+  
