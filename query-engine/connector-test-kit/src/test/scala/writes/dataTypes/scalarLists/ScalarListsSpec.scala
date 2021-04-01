@@ -122,6 +122,34 @@ class ScalarListsSpec extends FlatSpec with Matchers with ApiSpecBase {
 
     res should be(
       s"""{"data":{"updateScalarModel":{"strings":["updated","now","future"],"ints":[14,15],"floats":[1.2345678,2],"decimals":["1.2345678","2"],"booleans":[false,false,true,true],"enums":["A"],"dateTimes":["2019-07-31T23:59:01.000Z","2019-07-31T23:59:01.000Z"],"bytes":["dGVzdA==","dGVzdA=="]}}}""".parseJson)
+
+    res = server.query(
+      s"""mutation {
+         |  updateScalarModel(where: { id: 1 }, data: {
+         |    strings:   { push: ["more", "items"] }
+         |    ints:      { push: [16, 17] }
+         |    floats:    { push: [3, 4] }
+         |    decimals:  { push: ["3", "4"] }
+         |    booleans:  { push: [false, true] }
+         |    enums:     { push: [B, A] }
+         |    dateTimes: { push: ["2019-07-31T23:59:01.000Z", "2019-07-31T23:59:01.000Z"] }
+         |    bytes:     { push: ["dGVzdA==", "dGVzdA=="] }
+         |  }) {
+         |    strings
+         |    ints
+         |    floats
+         |    decimals
+         |    booleans
+         |    enums
+         |    dateTimes
+         |    bytes
+         |  }
+         |}""",
+      project = project
+    )
+
+    res should be(
+      s"""{"data":{"updateScalarModel":{"strings":["updated","now","future","more","items"],"ints":[14,15,16,17],"floats":[1.2345678,2.0,3.0,4.0],"decimals":["1.2345678","2","3","4"],"booleans":[false,false,true,true,false,true],"enums":["A","B","A"],"dateTimes":["2019-07-31T23:59:01.000Z","2019-07-31T23:59:01.000Z","2019-07-31T23:59:01.000Z","2019-07-31T23:59:01.000Z"],"bytes":["dGVzdA==","dGVzdA==","dGVzdA==","dGVzdA=="]}}}""".parseJson)
   }
 
   "A Create Mutation" should "create and return items with list values with shorthand notation" in {
@@ -226,7 +254,18 @@ class ScalarListsSpec extends FlatSpec with Matchers with ApiSpecBase {
       project = project
     )
 
-    val res = server.query(
+    server.query(
+      s"""mutation {
+         |  createScalarModel(data: {
+         |    id: 2,
+         |  }) {
+         |    id
+         |  }
+         |}""",
+      project = project
+    )
+
+    var res = server.query(
       s"""mutation {
          |  updateScalarModel(where: { id: 1 }, data: {
          |    strings:   { push: "future" }
@@ -253,5 +292,32 @@ class ScalarListsSpec extends FlatSpec with Matchers with ApiSpecBase {
 
     res should be(
       s"""{"data":{"updateScalarModel":{"strings":["future"],"ints":[15],"floats":[2.0],"decimals":["2"],"booleans":[true],"enums":["A"],"dateTimes":["2019-07-31T23:59:01.000Z"],"bytes":["dGVzdA=="]}}}""".parseJson)
+
+    res = server.query(
+      s"""mutation {
+         |  updateScalarModel(where: { id: 2 }, data: {
+         |    strings:   { push: ["present", "future"] }
+         |    ints:      { push: [14, 15] }
+         |    floats:    { push: [1, 2] }
+         |    decimals:  { push: ["1", "2"] }
+         |    booleans:  { push: [false, true] }
+         |    enums:     { push: [A, B] }
+         |    dateTimes: { push: ["2019-07-31T23:59:01.000Z", "2019-07-31T23:59:02.000Z"] }
+         |    bytes:     { push: ["dGVzdA==", "dGVzdA=="] }
+         |  }) {
+         |    strings
+         |    ints
+         |    floats
+         |    decimals
+         |    booleans
+         |    enums
+         |    dateTimes
+         |    bytes
+         |  }
+         |}""",
+      project = project
+    )
+
+    res should be(s"""{"data":{"updateScalarModel":{"strings":["present","future"],"ints":[14,15],"floats":[1.0,2.0],"decimals":["1","2"],"booleans":[false,true],"enums":["A","B"],"dateTimes":["2019-07-31T23:59:01.000Z","2019-07-31T23:59:02.000Z"],"bytes":["dGVzdA==","dGVzdA=="]}}}""".parseJson)
   }
 }

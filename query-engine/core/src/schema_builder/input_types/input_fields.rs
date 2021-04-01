@@ -279,7 +279,10 @@ where
                 object_fields.push(
                     input_field(
                         operations::PUSH,
-                        map_scalar_input_type(ctx, &f.type_identifier, false),
+                        vec![
+                            map_scalar_input_type(ctx, &f.type_identifier, false),
+                            list_input_type.clone(),
+                        ],
                         None,
                     )
                     .optional(),
