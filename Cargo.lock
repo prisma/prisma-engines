@@ -2476,9 +2476,9 @@ dependencies = [
 
 [[package]]
 name = "napi"
-version = "1.3.3"
+version = "1.3.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8c9776104a02699ad61c89007221f409ec4410652389cac52547079a62026f02"
+checksum = "367b5bffa0f6669f1511b4f1b96beb70b14d9ae79379e70de6bcd1ce16476c42"
 dependencies = [
  "futures 0.3.13",
  "napi-build",
@@ -3896,7 +3896,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e0bccbcf40c8938196944a3da0e133e031a33f4d6b72db3bda3cc556e361905d"
 dependencies = [
  "lazy_static",
- "parking_lot 0.10.2",
+ "parking_lot 0.11.1",
  "serial_test_derive",
 ]
 
