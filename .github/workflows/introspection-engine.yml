@@ -16,11 +16,16 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - run: df -h
+      
       - name: "Start database"
         run: docker-compose up -d mysql-8-0
         env:
           SINGLESTORE_LICENSE_KEY: ${{ secrets.SINGLESTORE_LICENSE_KEY }}
-          
+  
+      - run: df -h
+      - run: docker-compose run mysql-8-0 df -h
+        
       - name: Sleep for 30 seconds
         uses: jakejarvis/wait-action@master
         with:
@@ -35,6 +40,9 @@ jobs:
           toolchain: 1.48.0
           default: true
 
+      - run: df -h
+      - run: docker-compose run mysql-8-0 df -h
+      
       - uses: actions/cache@v2
         with:
           path: |
@@ -43,7 +51,12 @@ jobs:
             target
           key: introspection-engine-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
+      - run: df -h
+      
       - run: cargo test ${{ matrix.database }}
         working-directory: introspection-engine/introspection-engine-tests
         env:
           CLICOLOR_FORCE: 1
+          
+      - run: df -h
+      - run: docker-compose run mysql-8-0 df -h
