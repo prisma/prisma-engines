@@ -23,7 +23,11 @@ jobs:
         run: docker-compose up -d mysql-8-0
         env:
           SINGLESTORE_LICENSE_KEY: ${{ secrets.SINGLESTORE_LICENSE_KEY }}
-  
+      - name: Check running containers
+        run: docker ps -a
+      - name: Check logs
+        run: docker logs backend
+
       - run: df -h
       - run: docker-compose run mysql-8-0 df -h
         
