@@ -100,12 +100,11 @@ services:
     environment:
       ROOT_PASSWORD: "prisma"
       LICENSE_KEY: $SINGLESTORE_LICENSE_KEY 
-      START_AFTER_INIT: true
+      START_AFTER_INIT: "true"
     ports:
       - "3306:3306"
     networks:
       - databases
-    tmpfs: /var/lib/mysql
 
   mysql-8-0:
     image: mysql:8.0.22
