@@ -1,0 +1,35 @@
+name: Query Engine
+on:
+  push:
+
+jobs:
+
+  test:
+    name: "Test Query Engine - ${{ matrix.connector }}"
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        connector: [postgresql9, postgresql10, postgresql11, postgresql12, postgresql13, pgbouncer, mysql, mysql56, mysql8, mariadb, mssql2017, mssql2019, sqlite]
+        
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: "Start databases"
+        run: docker-compose up -d 
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: query-engine-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          
+      - name: Build Engines on image
+        run: docker-compose run -e SQLITE_MAX_VARIABLE_NUMBER=250000 -e SQLITE_MAX_EXPR_DEPTH=10000 test-base cargo build --all-features --release --bin query-engine --bin migration-engine          
+      
+      - name: Run tests on image
+        run: docker-compose run -e TEST_CONNECTOR=${{ matrix.connector }} -e TEST_MODE=simple -w /root/build/query-engine/connector-test-kit test-base sbt test
+
