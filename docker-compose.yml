@@ -12,7 +12,11 @@ services:
       - "3307:3306"
     networks:
       - databases
-    tmpfs: /var/lib/mysql8
-    
+    volumes:
+      - tmp:/var/lib/memsql
+
 networks:
   databases:
+
+volumes:
+  tmp:
