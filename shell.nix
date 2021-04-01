@@ -9,7 +9,7 @@ mkShell {
   buildInputs = with pkgs; [
     sbt
     sbt-extras
-    jdk
+    jdk8
     openssl
     pkg-config
     clangStdenv
