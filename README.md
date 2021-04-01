@@ -2,7 +2,7 @@
 
 This repository contains a collection of engines that power the core stack for
 [Prisma](https://github.com/prisma/prisma), most prominently [Prisma
-Client](http://prisma.io/client) and [Prisma
+Client](https://www.prisma.io/client) and [Prisma
 Migrate](https://www.prisma.io/migrate).
 
 The engines and their respective binary crates are:
