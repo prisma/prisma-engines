@@ -64,6 +64,8 @@ On the note of docker containers: Most connectors require an endpoint to run aga
 If you choose to set up the databases yourself, please note that the connection strings used in the tests (found in the files in `<repo_root>/query-engine/connector-test-kit-rs/query-tests-setup/src/connector_tag/`) to set up user, password and database for the test user.
 
 #### Running
+Note that by default tests run concurrently.
+
 - VSCode should automatically detect tests and display `run test`.
 - Use `make test-qe` (minimal log output) or `make test-qe-verbose` (all log output) in `$WORKSPACE_ROOT`.
 - `cargo test` in the `query-engine-tests` crate.
@@ -119,8 +121,8 @@ The full attribute definitions are as follows:
 
 ```rust
 #[connector_test(
-    suite = "name",
-    schema(schema_handler),
+    suite = "name", // Required (Optional if in a `test_suite` mod)
+    schema(schema_handler), // Required either on the mod or on the test itself.
     exclude(Connector(Version1, ...), Connector, ...),
     only(Connector(Version1, ...), Connector, ...),
     capabilities(Capability1, Capability2, ...)
@@ -151,7 +153,7 @@ Let's take a look at what the properties mean:
 The _schema handler_ to use for the test, given as a path ending in a function pointer. This is *always required* to be present on a test. A schema handler produces the schema that the test tests against. The path must be resolvable from the scope of the test function.
 ```rust
 #[test_suite(schema(schema_handler))]
-mod some_spec
+mod some_spec {
     fn schema_handler() -> String {
         "model A {
             #id(id, Int, @id)
@@ -165,6 +167,7 @@ mod some_spec
         // Assertions against the models as given by the handler.
         Ok(())
     }
+}
 ```
 Note that the schema handlers can be located anywhere, the only important bit is that they're in scope for the test:
 `#[test_suite(schema(some_other_mod::path::schema_handler))]`
@@ -185,10 +188,35 @@ Connector tags can be written all lowercase, uppercase, camel, doesn't matter. V
 `exclude(SqlServer)`: All connectors except all versions of SqlServer.
 `only(SQLSERVER)`: All versions of SQL Server, nothing else.
 
+**`capabilities`**
+Requires connectors to have _all_ of the given connector capabilities (for a full list of valid capabilities see `pub enum ConnectorCapability` in `datamodel-connector/src/lib.rs`). Note that you can give both connectors and capabilities, but if the connectors you specify do not have the capabilities, the test(s) will be skipped.
+
+Example: `capabilities(ScalarLists, CreateMany)`.
+
+#### A Word on Test Execution
+Tests are running concurrently by default, which makes it necessary to isolate them from each other.
+For that purpose, each test runs against a separate sandbox in the underlying connector. In MySQL, this is a separate database, in Sqlite this is a separate database file.
+The name of the "sandbox" is defined as `suite` + '_' + `test function name`.
+
+A minimal test example is:
+```rust
+#[test_suite(schema(some_handler))]
+mod some_spec {
+    #[connector_test]
+    async fn my_test(runner: &Runner) -> TestResult<()> {
+        // Assertions against the models as given by the handler.
+        Ok(())
+    }
+}
+```
+
+The test database in MySQL would be `some_spec_my_test`, the file for Sqlite `some_spec_my_test.db`.
+For details on how each connector handles it, look into the files in `query-tests-setup/src/connector_tag` where the connection strings are rendered.
+
 #### Writing Schema templates & Common Schemas
 Schemas that are used for tests that are supposed to run for all connectors must be templated. Currently, MongoDb requires parts of a schema to have different forms, which would require writing all schemas twice, or duplicating tests for Mongo, etc.
 
-For this reason, schemas have template strings of the form `#name(args)` embedded in them. Connectors decide how to render schemas (see `query-tests-setup/datamodel_rendering` for details). Currently two templates are available:
+For this reason, schemas have template strings of the form `#name(args)` embedded in them. Connectors decide how to render schemas (see `query-tests-setup/src/datamodel_rendering` for details). Currently two templates are available:
 - `#id(field_name, field_type, directives ...)` - For defining an ID field on a model.
     - `#id(pid, Int, @id, @map("_pid"))`
 - `#m2m(field_name, field_type, opposing_type, directives ...)` - For defining a many-to-many relation between two models.
