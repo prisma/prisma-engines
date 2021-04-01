@@ -13,10 +13,7 @@ services:
     networks:
       - databases
     volumes:
-      - /home/runner/work/prisma-engines/prisma-engines:/var/lib/memsql
+      - /home/runner/work/prisma-engines/prisma-engines/memsql:/var/lib/memsql
 
 networks:
   databases:
-
-volumes:
-  tmp:
