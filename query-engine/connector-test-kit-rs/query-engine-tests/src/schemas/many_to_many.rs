@@ -1,6 +1,6 @@
 use indoc::indoc;
 
-/// User <-1---m-> posts
+/// User <-m---n-> posts
 pub fn posts_categories() -> String {
     let schema = indoc! {
         r#"
