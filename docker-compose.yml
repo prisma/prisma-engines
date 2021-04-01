@@ -1,7 +1,7 @@
 version: "3"
 services:
 
-  mysql-8-0:
+  singlestore:
     image: 'memsql/cluster-in-a-box:centos-7.3.6-ae5d1857b8-3.2.5-1.11.0'
     restart: always
     environment:
