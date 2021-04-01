@@ -95,13 +95,12 @@ services:
     tmpfs: /var/lib/mysql
 
   mysql-5-7:
-    image: mysql:5.7.32
-    command: mysqld
+    image: 'memsql/cluster-in-a-box:centos-7.3.6-ae5d1857b8-3.2.5-1.11.0'
     restart: always
     environment:
-      MYSQL_USER: root
-      MYSQL_ROOT_PASSWORD: prisma
-      MYSQL_DATABASE: prisma
+      ROOT_PASSWORD: "prisma"
+      LICENSE_KEY: $SINGLESTORE_LICENSE_KEY 
+      START_AFTER_INIT: true
     ports:
       - "3306:3306"
     networks:
