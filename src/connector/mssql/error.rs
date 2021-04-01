@@ -12,6 +12,16 @@ impl From<tiberius::error::Error> for Error {
 
                 Error::builder(ErrorKind::TlsError { message }).build()
             }
+            tiberius::error::Error::Server(e) if e.code() == 8169 => {
+                let kind = ErrorKind::conversion(e.message().to_string());
+
+                let mut builder = Error::builder(kind);
+
+                builder.set_original_code(format!("{}", e.code()));
+                builder.set_original_message(e.message().to_string());
+
+                builder.build()
+            }
             tiberius::error::Error::Server(e) if e.code() == 18456 => {
                 let user = e.message().split('\'').nth(1).into();
                 let kind = ErrorKind::AuthenticationFailed { user };
