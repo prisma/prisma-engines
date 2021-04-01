@@ -241,7 +241,7 @@ impl SqlSchemaDescriber {
                 character_maximum_length character_maximum_length,
                 numeric_precision numeric_precision,
                 numeric_scale numeric_scale,
-                datetime_precision datetime_precision,
+                NULL datetime_precision,
                 column_default column_default,
                 is_nullable is_nullable,
                 extra extra,
