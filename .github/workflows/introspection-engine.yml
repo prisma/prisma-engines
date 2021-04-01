@@ -21,7 +21,7 @@ jobs:
       - name: Check running containers
         run: docker ps -a
       - name: Check logs
-        run: docker logs singlestore
+        run: docker logs prisma-engines_singlestore_1
 
       - run: df -h
       - run: docker-compose run singlestore df -h
