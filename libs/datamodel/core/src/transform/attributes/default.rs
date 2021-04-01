@@ -1,10 +1,13 @@
 use super::{super::helpers::*, AttributeValidator};
-use crate::diagnostics::DatamodelError;
-use crate::{ast, dml};
+use crate::{
+    ast::{self, Span},
+    diagnostics::DatamodelError,
+    dml,
+};
 use prisma_value::PrismaValue;
 
 /// Prismas builtin `@default` attribute.
-pub struct DefaultAttributeValidator {}
+pub struct DefaultAttributeValidator;
 
 impl AttributeValidator<dml::Field> for DefaultAttributeValidator {
     fn attribute_name(&self) -> &'static str {
@@ -63,6 +66,9 @@ impl AttributeValidator<dml::Field> for DefaultAttributeValidator {
                 }
             }
         }
+
+        validate_dbgenerated(self, field, args.span())?;
+
         Ok(())
     }
 
@@ -76,6 +82,25 @@ impl AttributeValidator<dml::Field> for DefaultAttributeValidator {
 
         vec![]
     }
+}
+
+fn validate_dbgenerated(
+    validator: &DefaultAttributeValidator,
+    field: &dml::Field,
+    span: Span,
+) -> Result<(), DatamodelError> {
+    if let Some("") = field
+        .default_value()
+        .and_then(|v| v.as_expression())
+        .and_then(|e| e.as_dbgenerated())
+    {
+        return validator.new_attribute_validation_error(
+            "dbgenerated() takes either no argument, or a single nonempty string argument.",
+            span,
+        );
+    }
+
+    Ok(())
 }
 
 pub fn lower_default_value(dv: dml::DefaultValue) -> ast::Expression {

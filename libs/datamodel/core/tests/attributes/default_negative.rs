@@ -281,3 +281,21 @@ fn must_error_if_non_string_expression_in_function_default_2() {
         Span::new(72, 86),
     ));
 }
+
+#[test]
+fn must_error_on_empty_string_in_dbgenerated() {
+    let dml = r#"
+    model Model {
+        id      Int @id
+        balance Int @default(dbgenerated(""))
+    }
+    "#;
+
+    let errors = parse_error(dml);
+
+    errors.assert_is(DatamodelError::new_attribute_validation_error(
+        "dbgenerated() takes either no argument, or a single nonempty string argument.",
+        "default",
+        Span::new(64, 88),
+    ));
+}

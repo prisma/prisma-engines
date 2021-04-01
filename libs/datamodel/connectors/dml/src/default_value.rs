@@ -14,6 +14,13 @@ pub enum DefaultValue {
 }
 
 impl DefaultValue {
+    pub fn as_expression(&self) -> Option<&ValueGenerator> {
+        match self {
+            DefaultValue::Expression(expr) => Some(expr),
+            DefaultValue::Single(_) => None,
+        }
+    }
+
     pub fn as_single(&self) -> Option<&PrismaValue> {
         match self {
             DefaultValue::Single(v) => Some(v),
@@ -79,7 +86,7 @@ pub struct ValueGenerator {
 }
 
 impl ValueGenerator {
-    pub fn new(name: String, args: Vec<PrismaValue>) -> std::result::Result<Self, String> {
+    pub fn new(name: String, args: Vec<PrismaValue>) -> Result<Self, String> {
         let generator = ValueGeneratorFn::new(name.as_ref())?;
 
         Ok(ValueGenerator { name, args, generator })
@@ -113,11 +120,19 @@ impl ValueGenerator {
         &self.args
     }
 
+    pub fn as_dbgenerated(&self) -> Option<&str> {
+        if !(self.is_dbgenerated()) {
+            return None;
+        }
+
+        self.args.get(0).and_then(|v| v.as_string())
+    }
+
     pub fn generate(&self) -> Option<PrismaValue> {
         self.generator.invoke()
     }
 
-    pub fn check_compatibility_with_scalar_type(&self, scalar_type: ScalarType) -> std::result::Result<(), String> {
+    pub fn check_compatibility_with_scalar_type(&self, scalar_type: ScalarType) -> Result<(), String> {
         if self.generator.can_handle(scalar_type) {
             Ok(())
         } else {
