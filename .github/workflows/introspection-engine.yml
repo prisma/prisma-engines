@@ -50,9 +50,9 @@ jobs:
 
       - run: mysql -h 127.0.0.1 -P 3309 -u root -pprisma -e "SHOW DATABASES;"
       
-      - run: mysql -h 127.0.0.1 -P 3306 -u root -pprisma -e "SHOW DATABASES;"
-      - run: mysql -h 127.0.0.1 -P 3306 -u root -pprisma -e "CREATE DATABASE mysql;"
-      - run: mysql -h 127.0.0.1 -P 3306 -u root -pprisma -e "SHOW DATABASES;"
+      - run: mysql -h 127.0.0.1 -P 3306 -u root -pprisma -e "SHOW DATABASES;" --loose-default-auth=mysql_native_password
+      - run: mysql -h 127.0.0.1 -P 3306 -u root -pprisma -e "CREATE DATABASE mysql;" --loose-default-auth=mysql_native_password
+      - run: mysql -h 127.0.0.1 -P 3306 -u root -pprisma -e "SHOW DATABASES;" --loose-default-auth=mysql_native_password
 
       - uses: actions-rs/toolchain@v1
         with:
