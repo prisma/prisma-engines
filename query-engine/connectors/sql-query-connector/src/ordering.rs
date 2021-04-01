@@ -28,28 +28,28 @@ pub fn build(
     // The index is used to differentiate potentially separate relations to the same model.
     for (index, order_by) in query_arguments.order_by.iter().enumerate() {
         let (joins, order_column) = compute_joins(order_by, index, base_model);
-        let order_dir = Some(order_by.sort_order.into_order(needs_reversed_order));
+        let order = Some(order_by.sort_order.into_order(needs_reversed_order));
 
         if joins.is_empty() && order_by.sort_aggregation.is_some() {
             match order_by.sort_aggregation.unwrap() {
                 SortAggregation::Count => {
-                    order_definitions.push((count(order_column.clone()).into(), order_dir));
+                    order_definitions.push((count(order_column.clone()).into(), order));
                 }
                 SortAggregation::Avg => {
-                    order_definitions.push((avg(order_column.clone()).into(), order_dir));
+                    order_definitions.push((avg(order_column.clone()).into(), order));
                 }
                 SortAggregation::Sum => {
-                    order_definitions.push((sum(order_column.clone()).into(), order_dir));
+                    order_definitions.push((sum(order_column.clone()).into(), order));
                 }
                 SortAggregation::Min => {
-                    order_definitions.push((min(order_column.clone()).into(), order_dir));
+                    order_definitions.push((min(order_column.clone()).into(), order));
                 }
                 SortAggregation::Max => {
-                    order_definitions.push((max(order_column.clone()).into(), order_dir));
+                    order_definitions.push((max(order_column.clone()).into(), order));
                 }
             }
         } else {
-            order_definitions.push((order_column.clone().into(), order_dir));
+            order_definitions.push((order_column.clone().into(), order));
         }
 
         ordering_joins.push(OrderingJoins { joins, order_column });

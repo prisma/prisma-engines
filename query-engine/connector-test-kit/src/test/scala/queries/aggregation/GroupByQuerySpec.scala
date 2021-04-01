@@ -498,6 +498,23 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     result.toString should be("""{"data":{"groupByModel":[{"float":1.1,"count":{"float":3},"sum":{"int":3}},{"float":3,"count":{"float":1},"sum":{"int":3}}]}}""")
   }
 
+  "Using a group-by with order by aggregation without selecting the ordered field" should "work" in {
+    // Float, int, dec, s, id
+    create(1.1, 1, "11", "group1", Some("1"))
+    create(1.1, 1, "11", "group1", Some("2"))
+    create(1.1, 1, "3", "group2", Some("3"))
+
+    val result = server.query(
+      s"""{
+         |  groupByModel(by: [float], orderBy: { _count: { float: desc } }) {
+         |    sum { int }
+         |  }
+         |}""".stripMargin,
+      project
+    )
+
+    result.toString should be("""{"data":{"groupByModel":[{"sum":{"int":3}}]}}""")
+  }
 
   /////// Error Cases
 
