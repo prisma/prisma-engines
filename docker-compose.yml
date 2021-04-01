@@ -13,8 +13,10 @@ services:
     networks:
       - databases
     volumes:
-      - /tmp/memsql:/var/lib/memsql:rw
+      - tmp:/var/lib/memsql
 
 networks:
   databases:
-  
+
+volumes:
+  tmp:
