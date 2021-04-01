@@ -139,7 +139,7 @@ impl PostgresConnectorTag {
             },
             Self {
                 version: Some(PostgresVersion::PgBouncer),
-                capabilities: capabilities,
+                capabilities,
             },
         ]
     }

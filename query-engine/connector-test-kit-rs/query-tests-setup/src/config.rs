@@ -2,7 +2,7 @@ use crate::{ConnectorTag, ConnectorTagInterface, TestError, TestResult};
 use serde::Deserialize;
 use std::{convert::TryFrom, env, fs::File, io::Read, path::PathBuf};
 
-static TEST_CONFIG_FILE_NAME: &'static str = ".test_config";
+static TEST_CONFIG_FILE_NAME: &str = ".test_config";
 
 /// The central test configuration.
 #[derive(Debug, Default, Deserialize)]
