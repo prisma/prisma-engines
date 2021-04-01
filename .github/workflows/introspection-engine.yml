@@ -26,6 +26,8 @@ jobs:
       
       - run: mkdir memsql
       - run: ls -l
+      - run: chmod -R 757 memsql
+      - run: ls -l
       
       - name: "Start database"
         run: docker-compose up -d singlestore
