@@ -27,12 +27,12 @@ jobs:
         working-directory: introspection-engine/introspection-engine-tests
 
   test:
-    name: "Test Introspection Engine - ${{ matrix.segment }}"
+    name: "Test Introspection Engine - ${{ matrix.database }}"
     
     strategy:
       fail-fast: false
       matrix:
-        segment: [""]
+        database: [mysql]
         
     runs-on: ubuntu-latest
     steps:
@@ -40,6 +40,8 @@ jobs:
 
       - name: "Start databases"
         run: docker-compose up -d
+        env:
+          SINGLESTORE_LICENSE_KEY: ${{ secrets.SINGLESTORE_LICENSE_KEY }}
       
       - uses: actions-rs/toolchain@v1
         with:
@@ -54,7 +56,7 @@ jobs:
             target
           key: introspection-engine-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
-      - run: cargo test ${{ matrix.segment }}
+      - run: cargo test ${{ matrix.database }}
         working-directory: introspection-engine/introspection-engine-tests
         env:
           CLICOLOR_FORCE: 1
