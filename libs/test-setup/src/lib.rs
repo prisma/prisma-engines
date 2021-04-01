@@ -62,7 +62,7 @@ test_api_constructors!(
     (mysql_8, "mysql"),
     (mysql_mariadb, "mysql"),
     (postgres9, "postgresql"),
-    (postgres, "postgresql"),
+    (postgres10, "postgresql"),
     (postgres11, "postgresql"),
     (postgres12, "postgresql"),
     (postgres13, "postgresql"),
@@ -104,7 +104,7 @@ mod urls {
     pub use super::mysql_5_6_url as mysql_5_6;
     pub use super::mysql_8_url as mysql_8;
     pub use super::mysql_url as mysql;
-    pub use super::postgres_10_url as postgres;
+    pub use super::postgres_10_url as postgres10;
     pub use super::postgres_12_url as postgres12;
     pub use super::postgres_13_url as postgres13;
     pub use super::postgres_9_url as postgres9;
