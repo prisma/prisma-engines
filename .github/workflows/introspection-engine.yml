@@ -5,12 +5,7 @@ on:
 jobs:
 
   test:
-    name: "Test Introspection Engine - ${{ matrix.database }}"
-    
-    strategy:
-      fail-fast: false
-      matrix:
-        database: [mysql_8]
+    name: "Test Introspection Engine - singlestore"
         
     runs-on: ubuntu-latest
     steps:
@@ -20,16 +15,16 @@ jobs:
       
       - run: mkdir /tmp/memsql
       - name: "Start database"
-        run: docker-compose up -d mysql-8-0
+        run: docker-compose up -d singlestore
         env:
           SINGLESTORE_LICENSE_KEY: ${{ secrets.SINGLESTORE_LICENSE_KEY }}
       - name: Check running containers
         run: docker ps -a
       - name: Check logs
-        run: docker logs backend
+        run: docker logs singlestore
 
       - run: df -h
-      - run: docker-compose run mysql-8-0 df -h
+      - run: docker-compose run singlestore df -h
         
       - name: Sleep for 30 seconds
         uses: jakejarvis/wait-action@master
@@ -46,7 +41,7 @@ jobs:
           default: true
 
       - run: df -h
-      - run: docker-compose run mysql-8-0 df -h
+      - run: docker-compose run singlestore df -h
       
       - uses: actions/cache@v2
         with:
@@ -58,10 +53,10 @@ jobs:
 
       - run: df -h
       
-      - run: cargo test ${{ matrix.database }}
+      - run: cargo test mysql_8
         working-directory: introspection-engine/introspection-engine-tests
         env:
           CLICOLOR_FORCE: 1
           
       - run: df -h
-      - run: docker-compose run mysql-8-0 df -h
+      - run: docker-compose run singlestore df -h
