@@ -43,6 +43,10 @@ jobs:
         env:
           SINGLESTORE_LICENSE_KEY: ${{ secrets.SINGLESTORE_LICENSE_KEY }}
       
+      - run: mysql -u root -pprisma -e "SHOW DATABASES;"
+      - run: mysql -u root -pprisma -e "CREATE DATABASE mysql;"
+      - run: mysql -u root -pprisma -e "SHOW DATABASES;"
+
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: 1.48.0
