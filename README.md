@@ -2,8 +2,8 @@
 
 This repository contains a collection of engines that power the core stack for
 [Prisma](https://github.com/prisma/prisma), most prominently [Prisma
-Client](https://github.com/prisma/prisma-client-js) and [Prisma
-Migrate](https://github.com/prisma/migrate).
+Client](https://www.prisma.io/client) and [Prisma
+Migrate](https://www.prisma.io/migrate).
 
 The engines and their respective binary crates are:
 - Query engine: `query-engine`
