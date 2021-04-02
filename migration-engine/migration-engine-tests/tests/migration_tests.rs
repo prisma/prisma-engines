@@ -974,7 +974,11 @@ async fn changing_a_relation_field_to_a_scalar_field_must_work(api: &TestApi) ->
                     SqlFamily::Mssql => Some("A_b_fkey".to_owned()),
                 },
                 columns: vec!["b".to_owned()],
-                referenced_table: if api.lower_case_identifiers() { "b".to_string() } else { "B".to_string() },
+                referenced_table: if api.lower_case_identifiers() {
+                    "b".to_string()
+                } else {
+                    "B".to_string()
+                },
                 referenced_columns: vec!["id".to_string()],
                 on_delete_action: ForeignKeyAction::Cascade,
                 on_update_action: ForeignKeyAction::NoAction,

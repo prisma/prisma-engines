@@ -215,11 +215,12 @@ async fn evaluate_data_loss_returns_warnings_for_the_local_database_for_the_next
         }
     "#;
 
-    let cat = if api.lower_case_identifiers() {
-        "cat"
-    } else { "Cat" };
+    let cat = if api.lower_case_identifiers() { "cat" } else { "Cat" };
 
-    let warn = format!("You are about to drop the `{}` table, which is not empty (1 rows).", cat);
+    let warn = format!(
+        "You are about to drop the `{}` table, which is not empty (1 rows).",
+        cat
+    );
 
     api.evaluate_data_loss(&directory, dm2)
         .send()
@@ -284,13 +285,12 @@ async fn evaluate_data_loss_maps_warnings_to_the_right_steps(api: &TestApi) -> T
         }
     "#;
 
-    let cat = if api.lower_case_identifiers() {
-        "cat"
-    } else {
-        "Cat"
-    };
+    let cat = if api.lower_case_identifiers() { "cat" } else { "Cat" };
 
-    let warn = format!("You are about to drop the column `name` on the `{}` table, which still contains 1 non-null values.", cat);
+    let warn = format!(
+        "You are about to drop the column `name` on the `{}` table, which still contains 1 non-null values.",
+        cat
+    );
 
     api.evaluate_data_loss(&directory, dm2)
         .send()

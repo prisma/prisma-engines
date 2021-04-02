@@ -99,11 +99,7 @@ async fn diagnose_migration_history_with_opt_in_to_shadow_database_calculates_dr
         .await?
         .into_output();
 
-    let table = if api.lower_case_identifiers() {
-        "cat"
-    } else {
-        "Cat"
-    };
+    let table = if api.lower_case_identifiers() { "cat" } else { "Cat" };
 
     let expected_rollback_warnings =
          format!("/*\n  Warnings:\n\n  - You are about to drop the column `fluffiness` on the `{}` table. All the data in the column will be lost.\n\n*/", table);
@@ -224,11 +220,7 @@ async fn diagnose_migration_history_calculates_drift_in_presence_of_failed_migra
 
     let rollback = drift.unwrap().unwrap_drift_detected();
 
-    let table = if api.lower_case_identifiers() {
-        "dog"
-    } else {
-        "Dog"
-    };
+    let table = if api.lower_case_identifiers() { "dog" } else { "Dog" };
 
     let expected_rollback_warnings = indoc::formatdoc!(
         "
@@ -238,7 +230,8 @@ async fn diagnose_migration_history_calculates_drift_in_presence_of_failed_migra
           - You are about to drop the `{}` table. If the table is not empty, all the data it contains will be lost.
 
         */
-        ", table
+        ",
+        table
     );
 
     assert!(rollback.starts_with(&expected_rollback_warnings), "{}", rollback);

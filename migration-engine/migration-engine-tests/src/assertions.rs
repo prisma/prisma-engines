@@ -23,13 +23,15 @@ impl SqlSchemaExt for SqlSchema {
             false => BitFlags::empty(),
         };
 
-        self.table(table_name).map(|table| TableAssertion::new(table, circumstances)).map_err(|_| {
-            anyhow::anyhow!(
-                "assert_table failed. Table {} not found. Tables in database: {:?}",
-                table_name,
-                self.tables.iter().map(|table| &table.name).collect::<Vec<_>>()
-            )
-        })
+        self.table(table_name)
+            .map(|table| TableAssertion::new(table, circumstances))
+            .map_err(|_| {
+                anyhow::anyhow!(
+                    "assert_table failed. Table {} not found. Tables in database: {:?}",
+                    table_name,
+                    self.tables.iter().map(|table| &table.name).collect::<Vec<_>>()
+                )
+            })
     }
 }
 

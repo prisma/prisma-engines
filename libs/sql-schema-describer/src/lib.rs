@@ -354,7 +354,7 @@ impl ColumnTypeFamily {
     pub fn normalized(self) -> Self {
         match self {
             Self::Enum(s) => Self::Enum(s.to_lowercase()),
-            _ => self
+            _ => self,
         }
     }
 

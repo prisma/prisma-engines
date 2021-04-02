@@ -86,7 +86,8 @@ impl TestApi {
         let mut circumstances = BitFlags::empty();
 
         if tags.contains(Tags::Mysql) {
-            let val = api.quaint()
+            let val = api
+                .quaint()
                 .query_raw("SELECT @@lower_case_table_names", &[])
                 .await
                 .ok()
@@ -103,7 +104,7 @@ impl TestApi {
             api,
             args,
             connection_string,
-            circumstances
+            circumstances,
         }
     }
 

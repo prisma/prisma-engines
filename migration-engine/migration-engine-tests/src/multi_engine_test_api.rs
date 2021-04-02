@@ -145,8 +145,7 @@ impl EngineTestApi {
 
     /// True if MySQL on Windows with default settings.
     pub async fn lower_case_identifiers(&self) -> bool {
-        self
-            .0
+        self.0
             .quaint()
             .query_raw("SELECT @@lower_case_table_names", &[])
             .await

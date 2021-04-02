@@ -38,9 +38,7 @@ async fn making_an_optional_field_required_with_data_without_a_default_is_unexec
         .send()
         .await?
         .assert_no_warning()?
-        .assert_unexecutable(&[
-            error.into(),
-        ])?;
+        .assert_unexecutable(&[error.into()])?;
 
     api.assert_schema()
         .await?
@@ -163,9 +161,7 @@ async fn making_an_optional_field_required_with_data_with_a_default_is_unexecuta
         .force(false)
         .send()
         .await?
-        .assert_unexecutable(&[
-            error.into(),
-        ])?
+        .assert_unexecutable(&[error.into()])?
         .assert_no_warning()?;
 
     api.assert_schema().await?.assert_equals(&initial_schema)?;
