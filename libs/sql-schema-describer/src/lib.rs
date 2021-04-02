@@ -68,7 +68,7 @@ impl SqlSchema {
 
     /// Get a view.
     pub fn get_view(&self, name: &str) -> Option<&View> {
-        self.views.iter().find(|v| v.name == name.as_ref())
+        self.views.iter().find(|v| v.name == name)
     }
 
     /// Get an enum.
@@ -78,7 +78,7 @@ impl SqlSchema {
 
     /// Get a procedure.
     pub fn get_procedure(&self, name: &str) -> Option<&Procedure> {
-        self.procedures.iter().find(|x| x.name == name.as_ref())
+        self.procedures.iter().find(|x| x.name == name)
     }
 
     /// Is this schema empty?
@@ -109,7 +109,7 @@ impl SqlSchema {
 
     /// Get a sequence.
     pub fn get_sequence(&self, name: &str) -> Option<&Sequence> {
-        self.sequences.iter().find(|x| x.name == name.as_ref())
+        self.sequences.iter().find(|x| x.name == name)
     }
 
     pub fn empty() -> SqlSchema {
