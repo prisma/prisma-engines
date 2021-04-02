@@ -95,7 +95,7 @@ impl TestApi {
                 .and_then(|row| row.at(0).and_then(|col| col.as_i64()))
                 .filter(|val| *val == 1);
 
-            if let Some(_) = val {
+            if val.is_some() {
                 circumstances |= Circumstances::LowerCasesTableNames;
             }
         }
