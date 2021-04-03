@@ -16,8 +16,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: "Start databases"
-        run: docker-compose up -d 
+      - run: mkdir memsql
+      - run: chmod -R 757 memsql
+      - run: docker-compose up -d
         env:
           SINGLESTORE_LICENSE_KEY: ${{ secrets.SINGLESTORE_LICENSE_KEY }}
           
