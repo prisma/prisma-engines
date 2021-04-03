@@ -18,7 +18,9 @@ jobs:
 
       - name: "Start databases"
         run: docker-compose up -d 
-
+        env:
+          SINGLESTORE_LICENSE_KEY: ${{ secrets.SINGLESTORE_LICENSE_KEY }}
+          
       - uses: actions/cache@v2
         with:
           path: |
