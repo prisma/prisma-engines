@@ -83,3 +83,6 @@ jobs:
         if: ${{ always() }}
       - run: docker logs prisma-engines_singlestore_1
         if: ${{ always() }}
+        
+      - run: ls -l memsql
+        if: ${{ always() }}
