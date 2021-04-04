@@ -10,23 +10,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        database: [mysql_8]
+        database: [postgres13]
         
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
 
-      - run: mkdir memsql
-      - run: chmod -R 757 memsql
       - run: docker-compose up -d
-        env:
-          SINGLESTORE_LICENSE_KEY: ${{ secrets.SINGLESTORE_LICENSE_KEY }}
-
-      - name: Sleep for 30 seconds
-        uses: jakejarvis/wait-action@master
-        with:
-          time: '30s'
-      - run: mysql -h 127.0.0.1 -P 3307 -u root -pprisma -e "CREATE DATABASE mysql;" --loose-default-auth=mysql_native_password
       
       - uses: actions-rs/toolchain@v1
         with:
@@ -48,5 +38,5 @@ jobs:
 
       - run: docker ps -a
         if: ${{ always() }}
-      - run: docker logs prisma-engines_test-db-mysql-8-0_1
+      - run: docker logs prisma-engines_test-db-postgres-13_1
         if: ${{ always() }}
