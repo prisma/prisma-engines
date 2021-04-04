@@ -16,19 +16,18 @@ services:
     networks:
       - databases
 
-  test-db-mysql-8-0:
-    image: 'memsql/cluster-in-a-box:centos-7.3.6-ae5d1857b8-3.2.5-1.11.0'
+  test-db-postgres-13:
+    image: timescale/timescaledb:2.1.0-pg13
     restart: always
+    command: postgres -c 'max_connections=1000'
     environment:
-      ROOT_PASSWORD: "prisma"
-      LICENSE_KEY: $SINGLESTORE_LICENSE_KEY 
-      START_AFTER_INIT: "true"
+      POSTGRES_PASSWORD: "prisma"
+      PGDATA: "/pgtmpfs13"
     ports:
-      - "3307:3306"
+      - "5435:5432"
     networks:
       - databases
-    volumes:
-      - /home/runner/work/prisma-engines/prisma-engines/memsql:/var/lib/memsql
+    tmpfs: /pgtmpfs12
 
 
 networks:
