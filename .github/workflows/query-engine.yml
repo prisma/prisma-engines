@@ -10,24 +10,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        connector: [mysql8]
+        connector: [postgresql13]
         
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
 
-      - run: mkdir memsql
-      - run: chmod -R 757 memsql
       - run: docker-compose up -d
-        env:
-          SINGLESTORE_LICENSE_KEY: ${{ secrets.SINGLESTORE_LICENSE_KEY }}
-               
-      - name: Sleep for 30 seconds
-        uses: jakejarvis/wait-action@master
-        with:
-          time: '30s'
-      - run: mysql -h 127.0.0.1 -P 3307 -u root -pprisma -e "CREATE DATABASE mysql;" --loose-default-auth=mysql_native_password
-      
+
       - uses: actions/cache@v2
         with:
           path: |
