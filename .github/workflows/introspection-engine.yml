@@ -52,6 +52,21 @@ jobs:
       - run: mysql -h 127.0.0.1 -P 3307 -u root -pprisma -e "CREATE DATABASE mysql;" --loose-default-auth=mysql_native_password
       - run: mysql -h 127.0.0.1 -P 3307 -u root -pprisma -e "SHOW DATABASES;" --loose-default-auth=mysql_native_password
 
+
+
+      - run: mysql -h 127.0.0.1 -P 3307 -u root -pprisma -e "SELECT @@core_file;" --loose-default-auth=mysql_native_password
+      - run: mysql -h 127.0.0.1 -P 3307 -u root -pprisma -e "SELECT @@core_file_mode;" --loose-default-auth=mysql_native_password
+
+      - run: docker-compose run singlestore memsqlctl -y update-config --key core_file --value 0
+      - run: docker-compose run singlestore memsqlctl -y restart-node
+
+      - run: docker-compose run prisma-engines_singlestore_1 memsqlctl -y update-config --key core_file --value 0
+      - run: docker-compose run prisma-engines_singlestore_1 memsqlctl -y restart-node
+
+      - run: mysql -h 127.0.0.1 -P 3307 -u root -pprisma -e "SELECT @@core_file;" --loose-default-auth=mysql_native_password
+
+
+
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: 1.48.0
