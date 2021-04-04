@@ -38,7 +38,7 @@ jobs:
       - run: docker logs prisma-engines_singlestore_1
 
       - run: df -h
-      - run: docker-compose run singlestore df -h
+      - run: docker-compose exec prisma-engines_singlestore_1 df -h
         
       - name: Sleep for 30 seconds
         uses: jakejarvis/wait-action@master
@@ -56,8 +56,8 @@ jobs:
 
       - run: mysql -h 127.0.0.1 -P 3307 -u root -pprisma -e "SELECT @@core_file;" --loose-default-auth=mysql_native_password
 
-      - run: docker-compose run singlestore memsqlctl -y update-config --all --key core_file --value 0
-      - run: docker-compose run singlestore memsqlctl -y restart-node --all
+      - run: docker-compose exec prisma-engines_singlestore_1 memsqlctl -y update-config --all --key core_file --value 0
+      - run: docker-compose exec prisma-engines_singlestore_1 memsqlctl -y restart-node --all
 
       - run: mysql -h 127.0.0.1 -P 3307 -u root -pprisma -e "SELECT @@core_file;" --loose-default-auth=mysql_native_password
 
@@ -69,7 +69,7 @@ jobs:
           default: true
 
       - run: df -h
-      - run: docker-compose run singlestore df -h
+      - run: docker-compose exec prisma-engines_singlestore_1 df -h
       
       - uses: actions/cache@v2
         with:
@@ -88,7 +88,7 @@ jobs:
           
       - run: df -h
         if: ${{ always() }}
-      - run: docker-compose run singlestore df -h
+      - run: docker-compose exec prisma-engines_singlestore_1 df -h
         if: ${{ always() }}
       - run: docker ps -a
         if: ${{ always() }}
@@ -99,4 +99,4 @@ jobs:
         if: ${{ always() }}
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
-        if: ${{ always() }}
+        #if: ${{ always() }}
