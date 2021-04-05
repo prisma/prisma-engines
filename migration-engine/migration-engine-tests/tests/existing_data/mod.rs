@@ -377,7 +377,7 @@ async fn changing_a_column_from_optional_to_required_is_unexecutable(api: &TestA
         .send()
         .await?
         .assert_no_warning()?
-        .assert_unexecutable(&[error.into()])?;
+        .assert_unexecutable(&[error])?;
 
     // The schema should not change because the migration should not run if there are warnings
     // and the force flag isn't passed.
