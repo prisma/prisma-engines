@@ -240,7 +240,7 @@ pub fn mysql_8_url(db_name: &str) -> String {
         let db_name = mysql_safe_identifier(db_name);
 
         format!(
-            "mysql://root@{host}:{port}{maybe_slash}{db_name}?connect_timeout=20&socket_timeout=60",
+            "mysql://root:prisma@{host}:{port}{maybe_slash}{db_name}?connect_timeout=20&socket_timeout=60",
             maybe_slash = if db_name.is_empty() { "" } else { "/" },
             host = host,
             port = port,
@@ -323,7 +323,7 @@ fn db_host_and_port_postgres_10() -> (&'static str, usize) {
 
 fn db_host_and_port_postgres_11() -> (&'static str, usize) {
     match std::env::var("IS_BUILDKITE") {
-        Ok(_) => ("test-db-postgres-10", 5432),
+        Ok(_) => ("test-db-postgres-11", 5432),
         Err(_) => ("127.0.0.1", 5433),
     }
 }
