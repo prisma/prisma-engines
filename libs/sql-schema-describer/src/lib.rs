@@ -351,9 +351,12 @@ pub enum ColumnTypeFamily {
 
 impl ColumnTypeFamily {
     /// Lower-cased variants
-    pub fn normalized(self) -> Self {
+    pub fn normalized(self, table_name: &str) -> Self {
         match self {
-            Self::Enum(s) => Self::Enum(s.to_lowercase()),
+            Self::Enum(s) if s.starts_with(table_name) => {
+                let e = s.replacen(table_name, &table_name.to_lowercase(), 1);
+                Self::Enum(e)
+            }
             _ => self,
         }
     }

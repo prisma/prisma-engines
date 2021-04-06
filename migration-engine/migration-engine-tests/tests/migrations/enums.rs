@@ -143,11 +143,13 @@ async fn variants_can_be_removed_from_an_existing_enum(api: &TestApi) -> TestRes
         }
     "#;
 
+    let warning = format!("The values [HAPPY] on the enum `{}` will be removed. If these variants are still used in the database, this will fail.", enum_name);
+
     api.schema_push(dm2)
         .force(true)
         .send()
         .await?
-        .assert_warnings(&["The values [HAPPY] on the enum `Cat_mood` will be removed. If these variants are still used in the database, this will fail.".into()])?
+        .assert_warnings(&[warning.into()])?
         .assert_executable()?;
 
     api.assert_schema()

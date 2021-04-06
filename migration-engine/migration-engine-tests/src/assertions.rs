@@ -156,6 +156,7 @@ impl<'a> EnumAssertion<'a> {
     }
 }
 
+#[derive(Clone, Copy)]
 pub struct TableAssertion<'a> {
     table: &'a Table,
     circumstances: BitFlags<Circumstances>,
@@ -244,7 +245,7 @@ impl<'a> TableAssertion<'a> {
         let this = self.assert_has_column(column_name)?;
         let column = this.table.column(column_name).unwrap();
 
-        column_assertions(ColumnAssertion(column))?;
+        column_assertions(ColumnAssertion::new(column, &self.table, self.circumstances))?;
 
         Ok(this)
     }
@@ -317,14 +318,26 @@ impl<'a> TableAssertion<'a> {
     }
 }
 
-pub struct ColumnAssertion<'a>(&'a Column);
+pub struct ColumnAssertion<'a> {
+    column: &'a Column,
+    table: &'a Table,
+    circumstances: BitFlags<Circumstances>,
+}
 
 impl<'a> ColumnAssertion<'a> {
+    pub fn new(column: &'a Column, table: &'a Table, circumstances: BitFlags<Circumstances>) -> Self {
+        Self {
+            column,
+            table,
+            circumstances,
+        }
+    }
+
     pub fn assert_auto_increments(self) -> AssertionResult<Self> {
         anyhow::ensure!(
-            self.0.auto_increment,
+            self.column.auto_increment,
             "Assertion failed. Expected column `{}` to be auto-incrementing.",
-            self.0.name,
+            self.column.name,
         );
 
         Ok(self)
@@ -332,16 +345,16 @@ impl<'a> ColumnAssertion<'a> {
 
     pub fn assert_no_auto_increment(self) -> AssertionResult<Self> {
         anyhow::ensure!(
-            !self.0.auto_increment,
+            !self.column.auto_increment,
             "Assertion failed. Expected column `{}` not to be auto-incrementing.",
-            self.0.name,
+            self.column.name,
         );
 
         Ok(self)
     }
 
     pub fn assert_default(self, expected: Option<DefaultValue>) -> AssertionResult<Self> {
-        let found = &self.0.default.as_ref().map(|d| d.kind());
+        let found = &self.column.default.as_ref().map(|d| d.kind());
 
         anyhow::ensure!(
             found == &expected.as_ref().map(|d| d.kind()),
@@ -354,12 +367,12 @@ impl<'a> ColumnAssertion<'a> {
     }
 
     pub fn assert_full_data_type(self, full_data_type: &str) -> AssertionResult<Self> {
-        let found = &self.0.tpe.full_data_type;
+        let found = &self.column.tpe.full_data_type;
 
         anyhow::ensure!(
             found == full_data_type,
             "Assertion failed: expected the full_data_type for the `{}` column to be `{}`, found `{}`",
-            self.0.name,
+            self.column.name,
             full_data_type,
             found
         );
@@ -372,13 +385,13 @@ impl<'a> ColumnAssertion<'a> {
     }
 
     pub fn assert_default_value(self, expected: &prisma_value::PrismaValue) -> AssertionResult<Self> {
-        let found = &self.0.default;
+        let found = &self.column.default;
 
         match found.as_ref().map(|d| d.kind()) {
             Some(DefaultKind::Value(ref val)) => anyhow::ensure!(
                 val == expected,
                 "Assertion failed. Expected the default value for `{}` to be `{:?}`, got `{:?}`",
-                self.0.name,
+                self.column.name,
                 expected,
                 val
             ),
@@ -393,13 +406,13 @@ impl<'a> ColumnAssertion<'a> {
     }
 
     pub fn assert_dbgenerated(self, expected: &str) -> AssertionResult<Self> {
-        let found = &self.0.default;
+        let found = &self.column.default;
 
         match found.as_ref().map(|d| d.kind()) {
             Some(DefaultKind::DbGenerated(val)) => anyhow::ensure!(
                 val == expected,
                 "Assertion failed. Expected the default value for `{}` to be dbgenerated with `{:?}`, got `{:?}`",
-                self.0.name,
+                self.column.name,
                 expected,
                 val
             ),
@@ -414,11 +427,11 @@ impl<'a> ColumnAssertion<'a> {
     }
 
     pub fn assert_native_type(self, expected: &str, connector: &dyn Connector) -> AssertionResult<Self> {
-        let found = connector.render_native_type(self.0.tpe.native_type.clone().unwrap());
+        let found = connector.render_native_type(self.column.tpe.native_type.clone().unwrap());
         anyhow::ensure!(
             found == expected,
             "Assertion failed. Expected the column native type for `{}` to be `{:?}`, found `{:?}`",
-            self.0.name,
+            self.column.name,
             expected,
             found,
         );
@@ -427,13 +440,18 @@ impl<'a> ColumnAssertion<'a> {
     }
 
     pub fn assert_type_family(self, expected: ColumnTypeFamily) -> AssertionResult<Self> {
-        let found = &self.0.tpe.family;
-        let expected = expected.normalized();
+        let found = &self.column.tpe.family;
+
+        let expected = if self.circumstances.contains(Circumstances::LowerCasesTableNames) {
+            expected.normalized(&self.table.name)
+        } else {
+            expected
+        };
 
         anyhow::ensure!(
             found == &expected,
             "Assertion failed. Expected the column type family for `{}` to be `{:?}`, found `{:?}`",
-            self.0.name,
+            self.column.name,
             expected,
             found,
         );
@@ -442,7 +460,7 @@ impl<'a> ColumnAssertion<'a> {
     }
 
     pub fn assert_type_is_bigint(self) -> AssertionResult<Self> {
-        let found = &self.0.tpe.family;
+        let found = &self.column.tpe.family;
 
         anyhow::ensure!(
             found == &sql_schema_describer::ColumnTypeFamily::BigInt,
@@ -454,7 +472,7 @@ impl<'a> ColumnAssertion<'a> {
     }
 
     pub fn assert_type_is_bytes(self) -> AssertionResult<Self> {
-        let found = &self.0.tpe.family;
+        let found = &self.column.tpe.family;
 
         anyhow::ensure!(
             found == &sql_schema_describer::ColumnTypeFamily::Binary,
@@ -466,7 +484,7 @@ impl<'a> ColumnAssertion<'a> {
     }
 
     pub fn assert_type_is_decimal(self) -> AssertionResult<Self> {
-        let found = &self.0.tpe.family;
+        let found = &self.column.tpe.family;
 
         anyhow::ensure!(
             found == &sql_schema_describer::ColumnTypeFamily::Decimal,
@@ -478,7 +496,7 @@ impl<'a> ColumnAssertion<'a> {
     }
 
     pub fn assert_type_is_enum(self) -> AssertionResult<Self> {
-        let found = &self.0.tpe.family;
+        let found = &self.column.tpe.family;
 
         assert!(
             matches!(found, sql_schema_describer::ColumnTypeFamily::Enum(_)),
@@ -490,7 +508,7 @@ impl<'a> ColumnAssertion<'a> {
     }
 
     pub fn assert_type_is_string(self) -> AssertionResult<Self> {
-        let found = &self.0.tpe.family;
+        let found = &self.column.tpe.family;
 
         anyhow::ensure!(
             found == &sql_schema_describer::ColumnTypeFamily::String,
@@ -502,7 +520,7 @@ impl<'a> ColumnAssertion<'a> {
     }
 
     pub fn assert_type_is_int(self) -> AssertionResult<Self> {
-        let found = &self.0.tpe.family;
+        let found = &self.column.tpe.family;
 
         anyhow::ensure!(
             found == &sql_schema_describer::ColumnTypeFamily::Int,
@@ -515,10 +533,10 @@ impl<'a> ColumnAssertion<'a> {
 
     pub fn assert_is_list(self) -> AssertionResult<Self> {
         anyhow::ensure!(
-            self.0.tpe.arity.is_list(),
+            self.column.tpe.arity.is_list(),
             "Assertion failed. Expected column `{}` to be a list, got {:?}",
-            self.0.name,
-            self.0.tpe.arity,
+            self.column.name,
+            self.column.tpe.arity,
         );
 
         Ok(self)
@@ -526,10 +544,10 @@ impl<'a> ColumnAssertion<'a> {
 
     pub fn assert_is_nullable(self) -> AssertionResult<Self> {
         anyhow::ensure!(
-            self.0.tpe.arity.is_nullable(),
+            self.column.tpe.arity.is_nullable(),
             "Assertion failed. Expected column `{}` to be nullable, got {:?}",
-            self.0.name,
-            self.0.tpe.arity,
+            self.column.name,
+            self.column.tpe.arity,
         );
 
         Ok(self)
@@ -537,10 +555,10 @@ impl<'a> ColumnAssertion<'a> {
 
     pub fn assert_is_required(self) -> AssertionResult<Self> {
         anyhow::ensure!(
-            self.0.tpe.arity.is_required(),
+            self.column.tpe.arity.is_required(),
             "Assertion failed. Expected column `{}` to be NOT NULL, got {:?}",
-            self.0.name,
-            self.0.tpe.arity,
+            self.column.name,
+            self.column.tpe.arity,
         );
 
         Ok(self)
