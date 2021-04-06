@@ -30,11 +30,11 @@ impl ConnectorTagInterface for MySqlConnectorTag {
                 database
             ),
             Some(MySqlVersion::V8) if is_ci => format!(
-                "mysql://root:prisma@test-db-mysql-8:3306/{}?connection_limit=1",
+                "mysql://root:prisma@test-db-mysql-8-0:3306/{}?connection_limit=1",
                 database
             ),
             Some(MySqlVersion::MariaDb) if is_ci => format!(
-                "mysql://root:prisma@test-db-mysql-mariadb:3306/{}?connection_limit=1",
+                "mysql://root:prisma@test-db-mariadb:3306/{}?connection_limit=1",
                 database
             ),
             Some(MySqlVersion::V5_6) => format!("mysql://root:prisma@127.0.0.1:3309/{}?connection_limit=1", database),
