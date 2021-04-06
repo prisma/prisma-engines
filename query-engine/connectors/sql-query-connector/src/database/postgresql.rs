@@ -30,7 +30,6 @@ impl FromSource for PostgreSql {
             .map_err(SqlError::from)
             .map_err(|sql_error| sql_error.into_connector_error(&connection_info))?;
 
-        builder.max_idle_lifetime(Duration::from_secs(300));
         builder.health_check_interval(Duration::from_secs(15));
         builder.test_on_check_out(true);
 
