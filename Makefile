@@ -7,9 +7,9 @@ default: build
 build:
 	cargo build
 
-# Build the crates with deny-warnings on to emulate CI
+# Emulate pedantic CI compilation.
 pedantic:
-	RUSTFLAGS="-D warnings" cargo build
+	RUSTFLAGS="-D warnings" cargo fmt -- --check && RUSTFLAGS="-D warnings" cargo clippy --all-targets
 
 release:
 	cargo build --release
