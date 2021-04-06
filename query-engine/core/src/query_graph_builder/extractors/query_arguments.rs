@@ -77,12 +77,12 @@ fn extract_order_by(model: &ModelRef, value: ParsedInputValue) -> QueryGraphBuil
             .into_iter()
             .map(|list_value| {
                 let object: ParsedInputMap = list_value.try_into()?;
-                Ok(process_order_object(model, object, vec![])?)
+                Ok(process_order_object(model, object, vec![], None)?)
             })
             .collect::<QueryGraphBuilderResult<Vec<_>>>()
             .map(|results| results.into_iter().filter_map(identity).collect()),
 
-        ParsedInputValue::Map(map) => Ok(match process_order_object(model, map, vec![])? {
+        ParsedInputValue::Map(map) => Ok(match process_order_object(model, map, vec![], None)? {
             Some(order) => vec![order],
             None => vec![],
         }),
@@ -96,17 +96,29 @@ fn process_order_object(
     model: &ModelRef,
     object: ParsedInputMap,
     mut path: Vec<RelationFieldRef>,
+    parent_sort_aggregation: Option<SortAggregation>,
 ) -> QueryGraphBuilderResult<Option<OrderBy>> {
     match object.into_iter().next() {
         None => Ok(None),
         Some((field_name, field_value)) => {
+            let sort_aggregation = extract_sort_aggregation(field_name.as_str());
+
+            if let Ok(sort_aggr) = sort_aggregation {
+                let object: ParsedInputMap = field_value.try_into()?;
+
+                return process_order_object(model, object, path, Some(sort_aggr));
+            }
+
             let field = model.fields().find_from_all(&field_name)?;
+
             match field {
                 Field::Relation(rf) if rf.is_list => {
                     path.push(rf.clone());
 
                     let object: ParsedInputMap = field_value.try_into()?;
-                    let (sort_aggregation, sort_order) = extract_sort_aggregation(object)?;
+                    let (inner_field_name, inner_field_value) = object.into_iter().next().unwrap();
+                    let sort_aggregation = extract_sort_aggregation(inner_field_name.as_str())?;
+                    let sort_order = extract_sort_order(inner_field_value)?;
                     let ids: Vec<_> = rf.related_model().primary_identifier().scalar_fields().collect();
                     // FIXME: This is a hack to fulfil the requirement of the `OrderBy` struct to have a field to order by
                     // In the case of aggregations, at least for now, we use AGGR(*), meaning that this field won't ever be used
@@ -124,27 +136,34 @@ fn process_order_object(
                     path.push(rf.clone());
 
                     let object: ParsedInputMap = field_value.try_into()?;
-                    process_order_object(&rf.related_model(), object, path)
+                    process_order_object(&rf.related_model(), object, path, None)
                 }
                 Field::Scalar(sf) => {
                     let sort_order = extract_sort_order(field_value)?;
 
-                    Ok(Some(OrderBy::new(sf.clone(), path, sort_order, None)))
+                    Ok(Some(OrderBy::new(
+                        sf.clone(),
+                        path,
+                        sort_order,
+                        parent_sort_aggregation,
+                    )))
                 }
             }
         }
     }
 }
 
-fn extract_sort_aggregation(object: ParsedInputMap) -> QueryGraphBuilderResult<(SortAggregation, SortOrder)> {
-    let (field_name, field_value) = object.into_iter().next().unwrap();
-    let sort_order = extract_sort_order(field_value)?;
-    let sort_aggregation = match field_name.as_str() {
-        filters::COUNT => Some(SortAggregation::Count { _all: true }),
-        _ => unreachable!("No aggregation operation could be found. This should not happen"),
-    };
-
-    Ok((sort_aggregation.unwrap(), sort_order))
+fn extract_sort_aggregation(field_name: &str) -> QueryGraphBuilderResult<SortAggregation> {
+    match field_name {
+        filters::COUNT | filters::UNDERSCORE_COUNT => Ok(SortAggregation::Count),
+        filters::UNDERSCORE_AVG => Ok(SortAggregation::Avg),
+        filters::UNDERSCORE_SUM => Ok(SortAggregation::Sum),
+        filters::UNDERSCORE_MIN => Ok(SortAggregation::Min),
+        filters::UNDERSCORE_MAX => Ok(SortAggregation::Max),
+        _ => Err(QueryGraphBuilderError::InputError(
+            "No aggregation operation could be found. This should not happen".to_string(),
+        )),
+    }
 }
 
 fn extract_sort_order(field_value: ParsedInputValue) -> QueryGraphBuilderResult<SortOrder> {
