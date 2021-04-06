@@ -14,10 +14,11 @@ pub mod runtime;
 /// The built-in connectors database.
 pub mod connectors;
 
-use std::{borrow::Cow, collections::BTreeMap};
+use std::{borrow::Cow, collections::BTreeMap, str::FromStr};
 
 pub use crate::connectors::Features;
 use crate::connectors::Tags;
+use connection_string::JdbcString;
 use enumflags2::BitFlags;
 use once_cell::sync::Lazy;
 use quaint::{prelude::Queryable, single::Quaint};
@@ -307,45 +308,129 @@ pub fn mssql_2019_url(schema_name: &str) -> String {
     })
 }
 
-fn db_host_and_port_postgres_9() -> (&'static str, usize) {
+fn db_host_and_port_postgres_9() -> (Cow<'static, str>, usize) {
+    if let Some(var) = std::env::var("POSTGRES_9_TEST_URL")
+        .ok()
+        .and_then(|s| Url::parse(&s).ok())
+    {
+        let host = var
+            .host()
+            .map(|s| Cow::from(s.to_string()))
+            .unwrap_or_else(|| Cow::from("localhost"));
+
+        let port = var.port().unwrap_or(5432) as usize;
+
+        return (host, port);
+    }
+
     match std::env::var("IS_BUILDKITE") {
-        Ok(_) => ("test-db-postgres-9", 5432),
-        Err(_) => ("127.0.0.1", 5431),
+        Ok(_) => ("test-db-postgres-9".into(), 5432),
+        Err(_) => ("127.0.0.1".into(), 5431),
     }
 }
 
-fn db_host_and_port_postgres_10() -> (&'static str, usize) {
+fn db_host_and_port_postgres_10() -> (Cow<'static, str>, usize) {
+    if let Some(var) = std::env::var("POSTGRES_10_TEST_URL")
+        .ok()
+        .and_then(|s| Url::parse(&s).ok())
+    {
+        let host = var
+            .host()
+            .map(|s| Cow::from(s.to_string()))
+            .unwrap_or_else(|| Cow::from("localhost"));
+
+        let port = var.port().unwrap_or(5432) as usize;
+
+        return (host, port);
+    }
+
     match std::env::var("IS_BUILDKITE") {
-        Ok(_) => ("test-db-postgres-10", 5432),
-        Err(_) => ("127.0.0.1", 5432),
+        Ok(_) => ("test-db-postgres-10".into(), 5432),
+        Err(_) => ("127.0.0.1".into(), 5432),
     }
 }
 
-fn db_host_and_port_postgres_11() -> (&'static str, usize) {
+fn db_host_and_port_postgres_11() -> (Cow<'static, str>, usize) {
+    if let Some(var) = std::env::var("POSTGRES_11_TEST_URL")
+        .ok()
+        .and_then(|s| Url::parse(&s).ok())
+    {
+        let host = var
+            .host()
+            .map(|s| Cow::from(s.to_string()))
+            .unwrap_or_else(|| Cow::from("localhost"));
+
+        let port = var.port().unwrap_or(5432) as usize;
+
+        return (host, port);
+    }
+
     match std::env::var("IS_BUILDKITE") {
-        Ok(_) => ("test-db-postgres-11", 5432),
-        Err(_) => ("127.0.0.1", 5433),
+        Ok(_) => ("test-db-postgres-11".into(), 5432),
+        Err(_) => ("127.0.0.1".into(), 5433),
     }
 }
 
-fn db_host_and_port_for_pgbouncer() -> (&'static str, usize) {
+fn db_host_and_port_for_pgbouncer() -> (Cow<'static, str>, usize) {
+    if let Some(var) = std::env::var("PGBOUNCER_TEST_URL")
+        .ok()
+        .and_then(|s| Url::parse(&s).ok())
+    {
+        let host = var
+            .host()
+            .map(|s| Cow::from(s.to_string()))
+            .unwrap_or_else(|| Cow::from("localhost"));
+
+        let port = var.port().unwrap_or(5432) as usize;
+
+        return (host, port);
+    }
+
     match std::env::var("IS_BUILDKITE") {
-        Ok(_) => ("test-db-pgbouncer", 6432),
-        Err(_) => ("127.0.0.1", 6432),
+        Ok(_) => ("test-db-pgbouncer".into(), 6432),
+        Err(_) => ("127.0.0.1".into(), 6432),
     }
 }
 
-pub fn db_host_and_port_postgres_12() -> (&'static str, usize) {
+pub fn db_host_and_port_postgres_12() -> (Cow<'static, str>, usize) {
+    if let Some(var) = std::env::var("POSTGRES_12_TEST_URL")
+        .ok()
+        .and_then(|s| Url::parse(&s).ok())
+    {
+        let host = var
+            .host()
+            .map(|s| Cow::from(s.to_string()))
+            .unwrap_or_else(|| Cow::from("localhost"));
+
+        let port = var.port().unwrap_or(5432) as usize;
+
+        return (host, port);
+    }
+
     match std::env::var("IS_BUILDKITE") {
-        Ok(_) => ("test-db-postgres-12", 5432),
-        Err(_) => ("127.0.0.1", 5434),
+        Ok(_) => ("test-db-postgres-12".into(), 5432),
+        Err(_) => ("127.0.0.1".into(), 5434),
     }
 }
 
-fn db_host_and_port_postgres_13() -> (&'static str, usize) {
+fn db_host_and_port_postgres_13() -> (Cow<'static, str>, usize) {
+    if let Some(var) = std::env::var("POSTGRES_13_TEST_URL")
+        .ok()
+        .and_then(|s| Url::parse(&s).ok())
+    {
+        let host = var
+            .host()
+            .map(|s| Cow::from(s.to_string()))
+            .unwrap_or_else(|| Cow::from("localhost"));
+
+        let port = var.port().unwrap_or(5432) as usize;
+
+        return (host, port);
+    }
+
     match std::env::var("IS_BUILDKITE") {
-        Ok(_) => ("test-db-postgres-13", 5432),
-        Err(_) => ("127.0.0.1", 5435),
+        Ok(_) => ("test-db-postgres-13".into(), 5432),
+        Err(_) => ("127.0.0.1".into(), 5435),
     }
 }
 
@@ -367,38 +452,105 @@ pub fn db_host_and_port_mysql_8_0() -> (Cow<'static, str>, usize) {
     }
 }
 
-fn db_host_and_port_mysql_5_6() -> (&'static str, usize) {
+fn db_host_and_port_mysql_5_6() -> (Cow<'static, str>, usize) {
+    if let Some(var) = std::env::var("MYSQL_5_6_TEST_URL")
+        .ok()
+        .and_then(|s| Url::parse(&s).ok())
+    {
+        let host = var
+            .host()
+            .map(|s| Cow::from(s.to_string()))
+            .unwrap_or_else(|| Cow::from("localhost"));
+
+        let port = var.port().unwrap_or(3306) as usize;
+
+        return (host, port);
+    }
+
     match std::env::var("IS_BUILDKITE") {
-        Ok(_) => ("test-db-mysql-5-6", 3306),
-        Err(_) => ("127.0.0.1", 3309),
+        Ok(_) => ("test-db-mysql-5-6".into(), 3306),
+        Err(_) => ("127.0.0.1".into(), 3309),
     }
 }
 
-pub fn db_host_and_port_mysql_5_7() -> (&'static str, usize) {
+pub fn db_host_and_port_mysql_5_7() -> (Cow<'static, str>, usize) {
+    if let Some(var) = std::env::var("MYSQL_5_7_TEST_URL")
+        .ok()
+        .and_then(|s| Url::parse(&s).ok())
+    {
+        let host = var
+            .host()
+            .map(|s| Cow::from(s.to_string()))
+            .unwrap_or_else(|| Cow::from("localhost"));
+
+        let port = var.port().unwrap_or(3306) as usize;
+
+        return (host, port);
+    }
+
     match std::env::var("IS_BUILDKITE") {
-        Ok(_) => ("test-db-mysql-5-7", 3306),
-        Err(_) => ("127.0.0.1", 3306),
+        Ok(_) => ("test-db-mysql-5-7".into(), 3306),
+        Err(_) => ("127.0.0.1".into(), 3306),
     }
 }
 
-fn db_host_and_port_mariadb() -> (&'static str, usize) {
+fn db_host_and_port_mariadb() -> (Cow<'static, str>, usize) {
+    if let Some(var) = std::env::var("MARIADB_TEST_URL").ok().and_then(|s| Url::parse(&s).ok()) {
+        let host = var
+            .host()
+            .map(|s| Cow::from(s.to_string()))
+            .unwrap_or_else(|| Cow::from("localhost"));
+
+        let port = var.port().unwrap_or(3306) as usize;
+
+        return (host, port);
+    }
+
     match std::env::var("IS_BUILDKITE") {
-        Ok(_) => ("test-db-mariadb", 3306),
-        Err(_) => ("127.0.0.1", 3308),
+        Ok(_) => ("test-db-mariadb".into(), 3306),
+        Err(_) => ("127.0.0.1".into(), 3308),
     }
 }
 
-fn db_host_mssql_2017() -> (&'static str, usize) {
+fn db_host_mssql_2017() -> (Cow<'static, str>, usize) {
+    if let Some(var) = std::env::var("MSSQL_2017_TEST_URL")
+        .ok()
+        .and_then(|s| JdbcString::from_str(&s).ok())
+    {
+        let host = var
+            .server_name()
+            .map(|s| Cow::from(s.to_string()))
+            .unwrap_or_else(|| Cow::from("localhost"));
+
+        let port = var.port().unwrap_or(1433) as usize;
+
+        return (host, port);
+    }
+
     match std::env::var("IS_BUILDKITE") {
-        Ok(_) => ("test-db-mssql-2017", 1433),
-        Err(_) => ("127.0.0.1", 1434),
+        Ok(_) => ("test-db-mssql-2017".into(), 1433),
+        Err(_) => ("127.0.0.1".into(), 1434),
     }
 }
 
-pub fn db_host_and_port_mssql_2019() -> (&'static str, usize) {
+pub fn db_host_and_port_mssql_2019() -> (Cow<'static, str>, usize) {
+    if let Some(var) = std::env::var("MSSQL_2019_TEST_URL")
+        .ok()
+        .and_then(|s| JdbcString::from_str(&s).ok())
+    {
+        let host = var
+            .server_name()
+            .map(|s| Cow::from(s.to_string()))
+            .unwrap_or_else(|| Cow::from("localhost"));
+
+        let port = var.port().unwrap_or(1433) as usize;
+
+        return (host, port);
+    }
+
     match std::env::var("IS_BUILDKITE") {
-        Ok(_) => ("test-db-mssql-2019", 1433),
-        Err(_) => ("127.0.0.1", 1433),
+        Ok(_) => ("test-db-mssql-2019".into(), 1433),
+        Err(_) => ("127.0.0.1".into(), 1433),
     }
 }
 
