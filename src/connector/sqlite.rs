@@ -32,6 +32,8 @@ pub struct SqliteParams {
     pub file_path: String,
     pub db_name: String,
     pub socket_timeout: Option<Duration>,
+    pub max_connection_lifetime: Option<Duration>,
+    pub max_idle_connection_lifetime: Option<Duration>,
 }
 
 impl TryFrom<&str> for SqliteParams {
@@ -53,6 +55,8 @@ impl TryFrom<&str> for SqliteParams {
         } else {
             let mut connection_limit = None;
             let mut socket_timeout = None;
+            let mut max_connection_lifetime = None;
+            let mut max_idle_connection_lifetime = None;
 
             if path_parts.len() > 1 {
                 let params = path_parts.last().unwrap().split('&').map(|kv| {
@@ -76,6 +80,28 @@ impl TryFrom<&str> for SqliteParams {
 
                             socket_timeout = Some(Duration::from_secs(as_int));
                         }
+                        "max_connection_lifetime" => {
+                            let as_int = v
+                                .parse()
+                                .map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
+
+                            if as_int == 0 {
+                                max_connection_lifetime = None;
+                            } else {
+                                max_connection_lifetime = Some(Duration::from_secs(as_int));
+                            }
+                        }
+                        "max_idle_connection_lifetime" => {
+                            let as_int = v
+                                .parse()
+                                .map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
+
+                            if as_int == 0 {
+                                max_idle_connection_lifetime = None;
+                            } else {
+                                max_idle_connection_lifetime = Some(Duration::from_secs(as_int));
+                            }
+                        }
                         _ => {
                             tracing::trace!(message = "Discarding connection string param", param = k);
                         }
@@ -88,6 +114,8 @@ impl TryFrom<&str> for SqliteParams {
                 file_path: path_str.to_owned(),
                 db_name: DEFAULT_SQLITE_SCHEMA_NAME.to_owned(),
                 socket_timeout,
+                max_connection_lifetime,
+                max_idle_connection_lifetime,
             })
         }
     }

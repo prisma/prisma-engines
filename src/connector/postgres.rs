@@ -232,6 +232,16 @@ impl PostgresUrl {
         self.query_params.socket_timeout
     }
 
+    /// The maximum connection lifetime
+    pub fn max_connection_lifetime(&self) -> Option<Duration> {
+        self.query_params.max_connection_lifetime
+    }
+
+    /// The maximum idle connection lifetime
+    pub fn max_idle_connection_lifetime(&self) -> Option<Duration> {
+        self.query_params.max_idle_connection_lifetime
+    }
+
     pub(crate) fn cache(&self) -> LruCache<String, Statement> {
         if self.query_params.pg_bouncer {
             LruCache::new(0)
@@ -254,6 +264,8 @@ impl PostgresUrl {
         let mut pool_timeout = Some(Duration::from_secs(10));
         let mut pg_bouncer = false;
         let mut statement_cache_size = 500;
+        let mut max_connection_lifetime = None;
+        let mut max_idle_connection_lifetime = Some(Duration::from_secs(300));
 
         for (k, v) in url.query_pairs() {
             match k.as_ref() {
@@ -344,6 +356,28 @@ impl PostgresUrl {
                         pool_timeout = Some(Duration::from_secs(as_int));
                     }
                 }
+                "max_connection_lifetime" => {
+                    let as_int = v
+                        .parse()
+                        .map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
+
+                    if as_int == 0 {
+                        max_connection_lifetime = None;
+                    } else {
+                        max_connection_lifetime = Some(Duration::from_secs(as_int));
+                    }
+                }
+                "max_idle_connection_lifetime" => {
+                    let as_int = v
+                        .parse()
+                        .map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
+
+                    if as_int == 0 {
+                        max_idle_connection_lifetime = None;
+                    } else {
+                        max_idle_connection_lifetime = Some(Duration::from_secs(as_int));
+                    }
+                }
                 _ => {
                     tracing::trace!(message = "Discarding connection string param", param = &*k);
                 }
@@ -366,6 +400,8 @@ impl PostgresUrl {
             socket_timeout,
             pg_bouncer,
             statement_cache_size,
+            max_connection_lifetime,
+            max_idle_connection_lifetime,
         })
     }
 
@@ -410,6 +446,8 @@ pub(crate) struct PostgresUrlQueryParams {
     connect_timeout: Option<Duration>,
     pool_timeout: Option<Duration>,
     statement_cache_size: usize,
+    max_connection_lifetime: Option<Duration>,
+    max_idle_connection_lifetime: Option<Duration>,
 }
 
 impl PostgreSql {

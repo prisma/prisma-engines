@@ -75,6 +75,8 @@ pub(crate) struct MssqlQueryParams {
     connect_timeout: Option<Duration>,
     pool_timeout: Option<Duration>,
     transaction_isolation_level: Option<IsolationLevel>,
+    max_connection_lifetime: Option<Duration>,
+    max_idle_connection_lifetime: Option<Duration>,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -186,6 +188,16 @@ impl MssqlUrl {
     pub fn connection_string(&self) -> &str {
         &self.connection_string
     }
+
+    /// The maximum connection lifetime
+    pub fn max_connection_lifetime(&self) -> Option<Duration> {
+        self.query_params.max_connection_lifetime()
+    }
+
+    /// The maximum idle connection lifetime
+    pub fn max_idle_connection_lifetime(&self) -> Option<Duration> {
+        self.query_params.max_idle_connection_lifetime()
+    }
 }
 
 impl MssqlQueryParams {
@@ -223,6 +235,14 @@ impl MssqlQueryParams {
 
     fn pool_timeout(&self) -> Option<Duration> {
         self.pool_timeout
+    }
+
+    fn max_connection_lifetime(&self) -> Option<Duration> {
+        self.max_connection_lifetime
+    }
+
+    fn max_idle_connection_lifetime(&self) -> Option<Duration> {
+        self.max_idle_connection_lifetime
     }
 }
 
@@ -467,6 +487,27 @@ impl MssqlUrl {
             .transpose()?
             .unwrap_or(false);
 
+        let mut max_connection_lifetime = props
+            .remove("max_connection_lifetime")
+            .map(|param| param.parse().map(Duration::from_secs))
+            .transpose()?;
+
+        match max_connection_lifetime {
+            Some(dur) if dur.as_secs() == 0 => max_connection_lifetime = None,
+            _ => (),
+        }
+
+        let mut max_idle_connection_lifetime = props
+            .remove("max_idle_connection_lifetime")
+            .map(|param| param.parse().map(Duration::from_secs))
+            .transpose()?;
+
+        match max_idle_connection_lifetime {
+            None => max_idle_connection_lifetime = Some(Duration::from_secs(300)),
+            Some(dur) if dur.as_secs() == 0 => max_idle_connection_lifetime = None,
+            _ => (),
+        }
+
         Ok(MssqlQueryParams {
             encrypt,
             port,
@@ -481,6 +522,8 @@ impl MssqlUrl {
             connect_timeout,
             pool_timeout,
             transaction_isolation_level,
+            max_connection_lifetime,
+            max_idle_connection_lifetime,
         })
     }
 }
