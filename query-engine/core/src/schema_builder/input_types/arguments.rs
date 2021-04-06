@@ -165,7 +165,7 @@ pub(crate) fn group_by_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> 
 
     vec![
         where_argument(ctx, &model),
-        order_by_argument(ctx, &model, false, true),
+        order_by_argument(ctx, &model, false, feature_flags::get().orderByAggregateGroup),
         input_field(
             args::BY,
             vec![InputType::list(field_enum_type.clone()), field_enum_type],
