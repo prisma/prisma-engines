@@ -73,7 +73,6 @@ impl ConnectorTagInterface for PostgresConnectorTag {
 
             None => unreachable!("A versioned connector must have a concrete version to run."),
         }
-        .to_string()
     }
 
     fn capabilities(&self) -> &[ConnectorCapability] {

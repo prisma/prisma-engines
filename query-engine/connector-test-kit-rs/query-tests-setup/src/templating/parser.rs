@@ -28,7 +28,7 @@ fn parse_fragment(input: &str) -> IResult<&str, DatamodelFragment> {
     let (_, args) = unwrap_parenthesis(input)?;
     let (input, parsed_args) = many0(parse_fragment_argument)(args)?;
     let fragment = DatamodelFragment::parse(fragment_ident, parsed_args)
-        .expect(&format!("Invalid fragment definition: {}", fragment_ident));
+        .unwrap_or_else(|_| panic!("Invalid fragment definition: {}", fragment_ident));
 
     Ok((input, fragment))
 }
@@ -61,7 +61,7 @@ fn parse_directive_argument(input: &str) -> IResult<&str, FragmentArgument> {
     // Fragment arguments can have parenthesis and argument lists of their own,
     // so we need to find out what comes first: `(` or `,`.
     let (input, ident) = take_till(|c| c == '(' || c == ',')(input)?;
-    if input.starts_with("(") {
+    if input.starts_with('(') {
         // `(` came first, parse argument parameters.
         let (input, all_args) = unwrap_parenthesis(input)?;
 

@@ -20,8 +20,8 @@ impl ConnectorTagInterface for SqliteConnectorTag {
 
     fn connection_string(&self, database: &str, _is_ci: bool) -> String {
         let workspace_root = std::env::var("WORKSPACE_ROOT")
-            .unwrap_or(".".to_owned())
-            .trim_end_matches("/")
+            .unwrap_or_else(|_| ".".to_owned())
+            .trim_end_matches('/')
             .to_owned();
 
         format!("file://{}/db/{}.db", workspace_root, database)

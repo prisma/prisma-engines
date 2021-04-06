@@ -2,6 +2,7 @@ use crate::TemplatingError;
 use std::env::VarError;
 use thiserror::Error;
 
+#[allow(clippy::large_enum_variant)]
 #[derive(Debug, Error)]
 pub enum TestError {
     #[error("Parse error: {0}")]

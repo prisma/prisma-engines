@@ -80,7 +80,7 @@ impl ConnectorTag {
         }
 
         if capabilities
-            .into_iter()
+            .iter()
             .any(|cap| !current_connector.capabilities().contains(cap))
         {
             println!(

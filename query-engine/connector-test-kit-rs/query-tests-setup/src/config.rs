@@ -30,7 +30,7 @@ pub struct TestConfig {
 impl TestConfig {
     /// Loads a configuration. File-based config has precedence over env config.
     pub fn load() -> TestResult<Self> {
-        let config = Self::from_file().or_else(|| Self::from_env());
+        let config = Self::from_file().or_else(Self::from_env);
 
         match config {
             Some(config) => {
@@ -79,11 +79,11 @@ impl TestConfig {
 
     fn from_file() -> Option<Self> {
         let current_dir = env::current_dir().ok();
-        let workspace_root = std::env::var("WORKSPACE_ROOT").ok().map(|p| PathBuf::from(p));
+        let workspace_root = std::env::var("WORKSPACE_ROOT").ok().map(PathBuf::from);
 
         current_dir
             .and_then(|path| Self::try_path(config_path(path)))
-            .or(workspace_root.and_then(|path| Self::try_path(config_path(path))))
+            .or_else(|| workspace_root.and_then(|path| Self::try_path(config_path(path))))
     }
 
     fn try_path(path: PathBuf) -> Option<Self> {

@@ -29,7 +29,7 @@ impl ConnectorTagInterface for SqlServerConnectorTag {
             Some(SqlServerVersion::V2019) => format!("sqlserver://127.0.0.1:1433;database=master;schema={};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel=READ UNCOMMITTED", database),
 
             None => unreachable!("A versioned connector must have a concrete version to run."),
-        }.to_string()
+        }
     }
 
     fn capabilities(&self) -> &[ConnectorCapability] {

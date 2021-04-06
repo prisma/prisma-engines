@@ -49,7 +49,7 @@ pub fn test_suite_impl(attr: TokenStream, input: TokenStream) -> TokenStream {
     // end validation
 
     let mut test_module = parse_macro_input!(input as ItemMod);
-    let module_name = test_module.ident.clone().to_string();
+    let module_name = test_module.ident.to_string();
     let mut module_attrs = NestedAttrMap::from(&attributes_meta);
 
     let suite_meta: Meta = parse_quote! { suite = #module_name };

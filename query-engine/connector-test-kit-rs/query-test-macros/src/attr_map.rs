@@ -35,20 +35,14 @@ impl NestedAttrMap {
         let self_has_connector = self.contains_key("only") || self.contains_key("exclude");
 
         for (k, v) in other.iter() {
-            if (k == "only" || k == "exclude") && !self_has_connector {
-                match self.inner.entry(k.clone()) {
-                    hash_map::Entry::Occupied(_) => {}
-                    hash_map::Entry::Vacant(vacant) => {
-                        vacant.insert(v.clone());
-                    }
+            let incoming_is_connector = k == "only" || k == "exclude";
+            let allow_insert = !(self_has_connector && incoming_is_connector);
+
+            match self.inner.entry(k.clone()) {
+                hash_map::Entry::Vacant(vacant) if allow_insert => {
+                    vacant.insert(v.clone());
                 }
-            } else if k != "only" && k != "exclude" {
-                match self.inner.entry(k.clone()) {
-                    hash_map::Entry::Occupied(_) => {}
-                    hash_map::Entry::Vacant(vacant) => {
-                        vacant.insert(v.clone());
-                    }
-                }
+                _ => {}
             }
         }
 
