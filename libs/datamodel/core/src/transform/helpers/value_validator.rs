@@ -202,9 +202,11 @@ impl ValueValidator {
                     _ => return Err(DatamodelError::new_validation_error(&format!("DefaultValue function parsing failed. The function arg should only be empty or a single String. Got: `{:?}`. You can read about the available functions here: https://pris.ly/d/attribute-functions", args), self.span())),
                 };
                 let generator = self.get_value_generator(&name, prisma_args)?;
+
                 generator
                     .check_compatibility_with_scalar_type(scalar_type)
                     .map_err(|err_msg| DatamodelError::new_functional_evaluation_error(&err_msg, self.span()))?;
+
                 Ok(DefaultValue::Expression(generator))
             }
             _ => {
