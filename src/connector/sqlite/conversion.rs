@@ -6,10 +6,14 @@ use crate::{
     },
     error::{Error, ErrorKind},
 };
+
 use rusqlite::{
     types::{Null, ToSql, ToSqlOutput, ValueRef},
     Column, Error as RusqlError, Row as SqliteRow, Rows as SqliteRows,
 };
+
+#[cfg(feature = "chrono")]
+use chrono::TimeZone;
 
 impl TypeIdentifier for Column<'_> {
     fn is_real(&self) -> bool {
@@ -157,10 +161,8 @@ impl<'a> GetRow for SqliteRow<'a> {
                     }
                     #[cfg(feature = "chrono")]
                     c if c.is_datetime() => {
-                        let sec = i / 1000;
-                        let ns = i % 1000 * 1_000_000;
-                        let dt = chrono::NaiveDateTime::from_timestamp(sec, ns as u32);
-                        Value::datetime(chrono::DateTime::from_utc(dt, chrono::Utc))
+                        let dt = chrono::Utc.timestamp_millis(i);
+                        Value::datetime(dt)
                     }
                     _ => Value::integer(i),
                 },
