@@ -95,6 +95,9 @@ async fn adding_an_enum_field_must_work(api: &TestApi) -> TestResult {
                 SqlFamily::Postgres => c
                     .assert_is_required()?
                     .assert_type_family(ColumnTypeFamily::Enum("MyEnum".to_owned())),
+                SqlFamily::Mysql if api.lower_case_identifiers() => c
+                    .assert_is_required()?
+                    .assert_type_family(ColumnTypeFamily::Enum("test_enum".to_owned())),
                 SqlFamily::Mysql => c
                     .assert_is_required()?
                     .assert_type_family(ColumnTypeFamily::Enum("Test_enum".to_owned())),
@@ -131,9 +134,12 @@ async fn adding_an_enum_field_must_work_with_native_types_off(api: &TestApi) -> 
                 SqlFamily::Postgres => c
                     .assert_is_required()?
                     .assert_type_family(ColumnTypeFamily::Enum("MyEnum".to_owned())),
+                SqlFamily::Mysql if api.lower_case_identifiers() => c
+                    .assert_is_required()?
+                    .assert_type_family(ColumnTypeFamily::Enum("test_enum".into())),
                 SqlFamily::Mysql => c
                     .assert_is_required()?
-                    .assert_type_family(ColumnTypeFamily::Enum("Test_enum".to_owned())),
+                    .assert_type_family(ColumnTypeFamily::Enum("Test_enum".into())),
                 _ => c.assert_is_required()?.assert_type_is_string(),
             })
     })?;

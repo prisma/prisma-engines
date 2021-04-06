@@ -143,7 +143,11 @@ async fn variants_can_be_removed_from_an_existing_enum(api: &TestApi) -> TestRes
         }
     "#;
 
-    let warning = format!("The values [HAPPY] on the enum `{}` will be removed. If these variants are still used in the database, this will fail.", enum_name);
+    let warning = if api.sql_family().is_mysql() {
+        "The values [HAPPY] on the enum `Cat_mood` will be removed. If these variants are still used in the database, this will fail."
+    } else {
+        "The values [HAPPY] on the enum `CatMood` will be removed. If these variants are still used in the database, this will fail."
+    };
 
     api.schema_push(dm2)
         .force(true)
