@@ -12,9 +12,6 @@ jobs:
       - uses: actions/checkout@v2
 
       - run: docker-compose up -d
-      
-      - run: docker logs prisma-engines_test-db-postgres-13_1
-      - run: psql -d postgresql://root@45e61a857032:26257?sslmode=disable -c 'SELECT * FROM mytable'
 
       - uses: actions-rs/toolchain@v1
         with:
