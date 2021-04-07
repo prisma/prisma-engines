@@ -23,7 +23,7 @@ services:
     networks:
       - databases
     ports:
-      - "26257:5435" # Database
+      - "5435:26257" # Database
       - "8036:8080" # Web UI
     tmpfs: /cockroachfs20
 
