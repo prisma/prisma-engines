@@ -22,6 +22,9 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
+    
+      - run: mysql -h 127.0.0.1 -P 33577 -u test -ptest -e "SHOW DATABASES;"
+      
       - uses: actions/checkout@v2
 
       - uses: actions-rs/toolchain@v1
