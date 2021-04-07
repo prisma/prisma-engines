@@ -8,7 +8,6 @@ import scala.util.Try
 case class ConnectorConfig(
     provider: String,
     url: String,
-    isBouncer: Boolean,
     name: String,
 ) {
   def capabilities = {
@@ -33,50 +32,48 @@ object ConnectorConfig {
                                   sys.error("Neither current_connector file nor TEST_CONNECTOR found to decide which connector to test with. Aborting.")))
 
     connectorToTest match {
-      case "sqlite" => ConnectorConfig("sqlite", "file://$DB_FILE", false, "sqlite")
+      case "sqlite" => ConnectorConfig("sqlite", "file://$DB_FILE", "sqlite")
+
       case "postgres9" | "postgresql9" =>
-        ConnectorConfig("postgresql", s"postgresql://postgres:prisma@$postgres_9_Host:$postgres_9_Port/db?schema=$$DB&connection_limit=1", false, "postgres9")
+        ConnectorConfig("postgresql", s"postgresql://postgres:prisma@$postgres_9_Host:$postgres_9_Port/db?schema=$$DB&connection_limit=1", "postgres9")
+
       case "postgres10" | "postgresql10" =>
-        ConnectorConfig("postgresql",
-                        s"postgresql://postgres:prisma@$postgres_10_Host:$postgres_10_Port/db?schema=$$DB&connection_limit=1",
-                        false,
-                        "postgres10")
+        ConnectorConfig("postgresql", s"postgresql://postgres:prisma@$postgres_10_Host:$postgres_10_Port/db?schema=$$DB&connection_limit=1", "postgres10")
+
       case "postgres11" | "postgresql11" =>
-        ConnectorConfig("postgresql",
-                        s"postgresql://postgres:prisma@$postgres_11_Host:$postgres_11_Port/db?schema=$$DB&connection_limit=1",
-                        false,
-                        "postgres11")
+        ConnectorConfig("postgresql", s"postgresql://postgres:prisma@$postgres_11_Host:$postgres_11_Port/db?schema=$$DB&connection_limit=1", "postgres11")
+
       case "postgres12" | "postgresql12" =>
-        ConnectorConfig("postgresql",
-                        s"postgresql://postgres:prisma@$postgres_12_Host:$postgres_12_Port/db?schema=$$DB&connection_limit=1",
-                        false,
-                        "postgres12")
+        ConnectorConfig("postgresql", s"postgresql://postgres:prisma@$postgres_12_Host:$postgres_12_Port/db?schema=$$DB&connection_limit=1", "postgres12")
+
       case "postgres13" | "postgresql13" =>
-        ConnectorConfig("postgresql",
-                        s"postgresql://postgres:prisma@$postgres_13_Host:$postgres_13_Port/db?schema=$$DB&connection_limit=1",
-                        false,
-                        "postgres13")
+        ConnectorConfig("postgresql", s"postgresql://postgres:prisma@$postgres_13_Host:$postgres_13_Port/db?schema=$$DB&connection_limit=1", "postgres13")
+
       case "pgbouncer" =>
-        ConnectorConfig("postgresql", s"postgresql://postgres:prisma@$postgres_11_Host:$postgres_11_Port/db?schema=$$DB&connection_limit=1", true, "pgbouncer")
-      case "mysql"   => ConnectorConfig("mysql", s"mysql://root:prisma@$mysql_5_7_Host:3306/$$DB?connection_limit=1", false, "mysql")
-      case "mysql8"  => ConnectorConfig("mysql", s"mysql://root:prisma@$mysql_8_0_Host:$mysql_8_0_Port/$$DB?connection_limit=1", false, "mysql8")
-      case "mysql56" => ConnectorConfig("mysql56", s"mysql://root:prisma@$mysql_5_6_Host:$mysql_5_6_Port/$$DB?connection_limit=1", false, "mysql56")
-      case "mariadb" => ConnectorConfig("mysql", s"mysql://root:prisma@$mariadb_Host:$mariadb_Port/$$DB?connection_limit=1", false, "mariadb")
+        ConnectorConfig("postgresql",
+                        s"postgresql://postgres:prisma@$pgbouncer_host:$pgbouncer_port/db?schema=$$DB&connection_limit=1&pgbouncer=true",
+                        "pgbouncer")
+
+      case "mysql"   => ConnectorConfig("mysql", s"mysql://root:prisma@$mysql_5_7_Host:3306/$$DB?connection_limit=1", "mysql")
+      case "mysql8"  => ConnectorConfig("mysql", s"mysql://root:prisma@$mysql_8_0_Host:$mysql_8_0_Port/$$DB?connection_limit=1", "mysql8")
+      case "mysql56" => ConnectorConfig("mysql56", s"mysql://root:prisma@$mysql_5_6_Host:$mysql_5_6_Port/$$DB?connection_limit=1", "mysql56")
+      case "mariadb" => ConnectorConfig("mysql", s"mysql://root:prisma@$mariadb_Host:$mariadb_Port/$$DB?connection_limit=1", "mariadb")
+
       case "mssql2017" =>
         ConnectorConfig(
           "sqlserver",
           s"sqlserver://$mssql_2017_Host:$mssql_2017_Port;database=master;schema=$$DB;user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel=READ UNCOMMITTED",
-          false,
           "mssql2017"
         )
+
       case "mssql2019" =>
         ConnectorConfig(
           "sqlserver",
           s"sqlserver://$mssql_2019_Host:$mssql_2019_Port;database=master;schema=$$DB;user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel=READ UNCOMMITTED",
-          false,
           "mssql2019"
         )
-      case "mongodb" => ConnectorConfig("mongodb", s"mongodb://prisma:prisma@$mongo_host:$mongo_port/$$DB?authSource=admin", false, "mongodb")
+
+      case "mongodb" => ConnectorConfig("mongodb", s"mongodb://prisma:prisma@$mongo_host:$mongo_port/$$DB?authSource=admin", "mongodb")
       case x         => sys.error(s"Connector $x is not supported yet.")
     }
   }
@@ -254,6 +251,22 @@ object ConnectorConfig {
       27017
     } else {
       27017
+    }
+  }
+
+  lazy val pgbouncer_host = {
+    if (EnvVars.isBuildkite) {
+      "test-db-pgbouncer"
+    } else {
+      "127.0.0.1"
+    }
+  }
+
+  lazy val pgbouncer_port = {
+    if (EnvVars.isBuildkite) {
+      6432
+    } else {
+      6432
     }
   }
 }
