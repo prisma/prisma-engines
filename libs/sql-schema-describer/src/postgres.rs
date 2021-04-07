@@ -101,9 +101,10 @@ impl SqlSchemaDescriber {
     async fn get_procedures(&self, schema: &str) -> DescriberResult<Vec<Procedure>> {
         let sql = r#"
             SELECT p.proname AS name,
-                CASE WHEN l.lanname = 'internal' THEN p.prosrc
-                     ELSE pg_get_functiondef(p.oid)
-                     END as definition
+                p.prosrc AS definition
+                -- CASE WHEN l.lanname = 'internal' THEN p.prosrc
+                --      ELSE pg_get_functiondef(p.oid)
+                --      END as definition
             FROM pg_proc p
             LEFT JOIN pg_namespace n ON p.pronamespace = n.oid
             LEFT JOIN pg_language l ON p.prolang = l.oid
