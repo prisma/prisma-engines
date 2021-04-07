@@ -177,11 +177,13 @@ impl crate::UserFacingError for ShadowDbCreationError {
 #[derive(Debug, Serialize, UserFacingError)]
 #[user_facing(
     code = "P3014",
-    message = "The datasource provider `{provider}` specified in your schema does not match the one specified in the migration_lock.toml. You will encounter errors when you try to apply migrations generated for a different provider. Please archive your current migration directory at a different location and start a new migration history with `prisma migrate dev`."
+    message = "The datasource provider `{provider}` specified in your schema does not match the one specified in the migration_lock.toml, `{expected_provider}`. Please remove your current migration directory and start a new migration history with prisma migrate dev. Read more: https://pris.ly/d/migrate-provider-switch"
 )]
 pub struct ProviderSwitchedError {
     /// The provider specified in the schema.
     pub provider: String,
+    /// The provider from migrate.lock
+    pub expected_provider: String,
 }
 
 #[derive(Debug, Serialize, UserFacingError)]

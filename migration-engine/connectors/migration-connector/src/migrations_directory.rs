@@ -79,25 +79,33 @@ provider = "{}""##,
 pub fn error_on_changed_provider(migrations_directory_path: &str, provider: &str) -> ConnectorResult<()> {
     match match_provider_in_lock_file(migrations_directory_path, provider) {
         None => Ok(()),
-        Some(false) => Err(ConnectorError::user_facing_error(ProviderSwitchedError {
+        Some(Err(expected_provider)) => Err(ConnectorError::user_facing_error(ProviderSwitchedError {
             provider: provider.into(),
+            expected_provider,
         })),
-        Some(true) => Ok(()),
+        Some(Ok(())) => Ok(()),
     }
 }
 
-/// Check whether provider matches Return None/Some(true)/Some(false)
+/// Check whether provider matches.
 #[tracing::instrument]
-pub fn match_provider_in_lock_file(migrations_directory_path: &str, provider: &str) -> Option<bool> {
+fn match_provider_in_lock_file(migrations_directory_path: &str, provider: &str) -> Option<Result<(), String>> {
     let directory_path = Path::new(migrations_directory_path);
     let file_path = directory_path.join("migration_lock.toml");
 
-    let read_result = std::fs::read_to_string(file_path);
+    std::fs::read_to_string(file_path).ok().map(|content| {
+        let found_provider = content
+            .lines()
+            .nth(2)
+            .map(|line| line.trim_start_matches("provider = ").trim_matches('"'))
+            .unwrap_or("<PROVIDER NOT FOUND>");
 
-    match read_result {
-        Err(_) => None,
-        Ok(content) => Some(content.contains(format!("provider = \"{}\"", provider).as_str())),
-    }
+        if found_provider == provider {
+            Ok(())
+        } else {
+            Err(found_provider.to_owned())
+        }
+    })
 }
 
 /// An IO error that occurred while reading the migrations directory.
