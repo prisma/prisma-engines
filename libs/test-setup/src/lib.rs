@@ -562,14 +562,14 @@ pub fn db_host_and_port_mssql_2019() -> (Cow<'static, str>, usize) {
     }
 }
 
-/// The maximum length of identifiers on mysql is 64 bytes.
+/// The maximum length of identifiers on mysql is 64 bytes. (and 60 on vitess)
 ///
 /// Source: https://dev.mysql.com/doc/mysql-reslimits-excerpt/5.5/en/identifier-length.html
 pub fn mysql_safe_identifier(identifier: &str) -> &str {
-    if identifier.len() < 64 {
+    if identifier.len() < 60 {
         identifier
     } else {
-        identifier.get(0..63).expect("mysql identifier truncation")
+        identifier.get(0..59).expect("mysql identifier truncation")
     }
 }
 
@@ -588,8 +588,8 @@ pub async fn create_mysql_database(original_url: &Url) -> Result<Quaint, AnyErro
 
     debug_assert!(!db_name.is_empty());
     debug_assert!(
-        db_name.len() < 64,
-        "db_name should be less than 64 characters, got {:?}",
+        db_name.len() < 60,
+        "db_name should be less than 60 characters, got {:?}",
         db_name.len()
     );
 
