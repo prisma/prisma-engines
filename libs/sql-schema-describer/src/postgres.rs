@@ -404,7 +404,7 @@ impl SqlSchemaDescriber {
                 'c' => ForeignKeyAction::Cascade,
                 'n' => ForeignKeyAction::SetNull,
                 'd' => ForeignKeyAction::SetDefault,
-                _ => panic!("unrecognized foreign key action '{}'", confdeltype),
+                _ => panic!("unrecognized foreign key action (on delete) '{}'", confdeltype),
             };
             let on_update_action = match confupdtype {
                 'a' => ForeignKeyAction::NoAction,
@@ -412,7 +412,7 @@ impl SqlSchemaDescriber {
                 'c' => ForeignKeyAction::Cascade,
                 'n' => ForeignKeyAction::SetNull,
                 'd' => ForeignKeyAction::SetDefault,
-                _ => panic!("unrecognized foreign key action '{}'", confdeltype),
+                _ => panic!("unrecognized foreign key action (on update) '{}'", confupdtype),
             };
             match intermediate_fks.get_mut(&id) {
                 Some((_, fk)) => {
