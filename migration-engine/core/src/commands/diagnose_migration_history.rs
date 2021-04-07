@@ -290,7 +290,7 @@ pub enum DriftDiagnostic {
         /// A database script to correct the drift by reverting to the expected schema.
         rollback: String,
     },
-    /// When a migration fails to apply cleanly to a temporary database.
+    /// When a migration fails to apply cleanly to a shadow database.
     #[serde(rename_all = "camelCase")]
     MigrationFailedToApply {
         /// The full error.

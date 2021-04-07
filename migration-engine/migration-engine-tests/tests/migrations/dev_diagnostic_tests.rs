@@ -500,7 +500,7 @@ async fn with_an_invalid_unapplied_migration_should_report_it(api: &TestApi) -> 
 
     assert_eq!(err.error_code, MigrationDoesNotApplyCleanly::ERROR_CODE);
     assert!(err.message.starts_with(&format!(
-        "Migration `{}` failed to apply cleanly to a temporary database. \nError:",
+        "Migration `{}` failed to apply cleanly to the shadow database. \nError:",
         generated_migration_name.unwrap()
     )));
 
