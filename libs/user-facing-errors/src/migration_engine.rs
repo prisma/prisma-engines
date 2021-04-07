@@ -72,7 +72,7 @@ impl crate::UserFacingError for MigrationDoesNotApplyCleanly {
             crate::ErrorType::Unknown(_) => String::new(),
         };
 
-        format!("Migration `{migration_name}` failed to apply cleanly to a temporary database. \n{error_code}Error:\n{inner_error}", migration_name = self.migration_name, inner_error = self.inner_error.message(), error_code = error_code)
+        format!("Migration `{migration_name}` failed to apply cleanly to the shadow database. \n{error_code}Error:\n{inner_error}", migration_name = self.migration_name, inner_error = self.inner_error.message(), error_code = error_code)
     }
 }
 

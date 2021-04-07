@@ -55,7 +55,7 @@ impl MssqlFlavour {
         &self,
         main_connection: &Connection,
         connector: &SqlMigrationConnector,
-        temporary_database_name: Option<&str>,
+        shadow_database_name: Option<&str>,
     ) -> ConnectorResult<Connection> {
         if let Some(shadow_database_connection_string) = &connector.shadow_database_connection_string {
             let conn = crate::connect(shadow_database_connection_string).await?;
@@ -74,7 +74,7 @@ impl MssqlFlavour {
             return Ok(conn);
         }
 
-        let database_name = temporary_database_name.unwrap();
+        let database_name = shadow_database_name.unwrap();
         let create_database = format!("CREATE DATABASE [{}]", database_name);
 
         main_connection
@@ -319,18 +319,18 @@ impl SqlFlavour for MssqlFlavour {
         connection: &Connection,
         connector: &SqlMigrationConnector,
     ) -> ConnectorResult<SqlSchema> {
-        let temporary_database_name = connector.temporary_database_name();
+        let shadow_database_name = connector.shadow_database_name();
 
         // We must create the connection in a block, closing it before dropping
         // the database.
         let sql_schema_result = {
             // We go through the whole process without early return, then clean up
-            // the temporary database, and only then return the result. This avoids
+            // the shadow database, and only then return the result. This avoids
             // leaving shadow databases behind in case of e.g. faulty
             // migrations.
 
             let temp_database = self
-                .shadow_database_connection(connection, connector, temporary_database_name.as_deref())
+                .shadow_database_connection(connection, connector, shadow_database_name.as_deref())
                 .await?;
 
             if self.schema_name() != "dbo" {
@@ -344,7 +344,7 @@ impl SqlFlavour for MssqlFlavour {
                     let script = migration.read_migration_script()?;
 
                     tracing::debug!(
-                        "Applying migration `{}` to temporary database.",
+                        "Applying migration `{}` to shadow database.",
                         migration.migration_name()
                     );
 
@@ -362,9 +362,8 @@ impl SqlFlavour for MssqlFlavour {
             .await
         };
 
-        if let Some(temporary_database_name) = temporary_database_name {
-            self.clean_up_shadow_database(connection, &temporary_database_name)
-                .await?;
+        if let Some(shadow_database_name) = shadow_database_name {
+            self.clean_up_shadow_database(connection, &shadow_database_name).await?;
         }
 
         sql_schema_result

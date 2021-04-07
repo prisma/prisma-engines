@@ -64,7 +64,7 @@ impl MysqlFlavour {
         &self,
         main_connection: &Connection,
         connector: &SqlMigrationConnector,
-        temporary_database_name: Option<&str>,
+        shadow_database_name: Option<&str>,
     ) -> ConnectorResult<Connection> {
         if let Some(shadow_database_connection_string) = &connector.shadow_database_connection_string {
             let conn = crate::connect(shadow_database_connection_string).await?;
@@ -87,7 +87,7 @@ impl MysqlFlavour {
             return Ok(conn);
         }
 
-        let database_name = temporary_database_name.unwrap();
+        let database_name = shadow_database_name.unwrap();
         let create_database = format!("CREATE DATABASE `{}`", database_name);
 
         main_connection
@@ -96,13 +96,13 @@ impl MysqlFlavour {
             .map_err(ConnectorError::from)
             .map_err(|err| err.into_shadow_db_creation_error())?;
 
-        let mut temporary_database_url = self.url.url().clone();
-        temporary_database_url.set_path(&format!("/{}", database_name));
-        let temporary_database_url = temporary_database_url.to_string();
+        let mut shadow_database_url = self.url.url().clone();
+        shadow_database_url.set_path(&format!("/{}", database_name));
+        let shadow_database_url = shadow_database_url.to_string();
 
-        tracing::debug!("Connecting to temporary database at {:?}", temporary_database_url);
+        tracing::debug!("Connecting to shadow database at {:?}", shadow_database_url);
 
-        Ok(crate::connect(&temporary_database_url).await?)
+        Ok(crate::connect(&shadow_database_url).await?)
     }
 }
 
@@ -301,14 +301,14 @@ impl SqlFlavour for MysqlFlavour {
         connection: &Connection,
         connector: &SqlMigrationConnector,
     ) -> ConnectorResult<SqlSchema> {
-        let temporary_database_name = connector.temporary_database_name();
+        let shadow_database_name = connector.shadow_database_name();
 
         let temp_database = self
-            .shadow_database_connection(connection, connector, temporary_database_name.as_deref())
+            .shadow_database_connection(connection, connector, shadow_database_name.as_deref())
             .await?;
 
         // We go through the whole process without early return, then clean up
-        // the temporary database, and only then return the result. This avoids
+        // the shadow database, and only then return the result. This avoids
         // leaving shadow databases behind in case of e.g. faulty migrations.
 
         let sql_schema_result = (|| async {
@@ -316,7 +316,7 @@ impl SqlFlavour for MysqlFlavour {
                 let script = migration.read_migration_script()?;
 
                 tracing::debug!(
-                    "Applying migration `{}` to temporary database.",
+                    "Applying migration `{}` to shadow database.",
                     migration.migration_name()
                 );
 
@@ -335,7 +335,7 @@ impl SqlFlavour for MysqlFlavour {
         })()
         .await;
 
-        if let Some(database_name) = temporary_database_name {
+        if let Some(database_name) = shadow_database_name {
             let drop_database = format!("DROP DATABASE IF EXISTS `{}`", database_name);
             connection.raw_cmd(&drop_database).await?;
         }

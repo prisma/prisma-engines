@@ -88,7 +88,7 @@ pub(crate) trait SqlFlavour:
     /// Optionally scan a migration script that could have been altered by users and emit warnings.
     fn scan_migration_script(&self, _script: &str) {}
 
-    /// Apply the given migration history to a temporary database, and return
+    /// Apply the given migration history to a shadow database, and return
     /// the final introspected SQL schema.
     async fn sql_schema_from_migration_history(
         &self,

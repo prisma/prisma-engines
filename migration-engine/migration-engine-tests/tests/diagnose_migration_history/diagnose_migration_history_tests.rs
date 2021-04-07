@@ -668,7 +668,7 @@ async fn with_a_failed_migration(api: &TestApi) -> TestResult {
     let message = error_in_unapplied_migration.message().to_owned();
 
     assert!(
-        message.contains("01-init` failed to apply cleanly to a temporary database."),
+        message.contains("01-init` failed to apply cleanly to the shadow database."),
         "{}",
         message,
     );
@@ -745,7 +745,7 @@ async fn with_an_invalid_unapplied_migration_should_report_it(api: &TestApi) -> 
     let message = error_in_unapplied_migration.message().to_owned();
 
     assert!(
-        message.contains("_second-migration` failed to apply cleanly to a temporary database."),
+        message.contains("_second-migration` failed to apply cleanly to the shadow database."),
         "{}",
         message,
     );
