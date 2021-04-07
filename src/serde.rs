@@ -11,8 +11,9 @@ use serde::{de::Error as SerdeError, de::*};
 
 impl ResultSet {
     /// Takes the first row and deserializes it.
+    #[allow(clippy::wrong_self_convention)]
     pub fn from_first<T: DeserializeOwned>(self) -> crate::Result<T> {
-        Ok(from_row(self.into_single()?)?)
+        from_row(self.into_single()?)
     }
 }
 

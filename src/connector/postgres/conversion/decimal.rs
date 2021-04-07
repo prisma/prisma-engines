@@ -85,7 +85,7 @@ fn to_postgres(decimal: &BigDecimal) -> crate::Result<PostgresDecimal<Vec<i16>>>
         let remainder = 4 - groups_diff as u32;
         let power = 10u32.pow(remainder as u32) as u128;
 
-        mantissa = mantissa * power;
+        mantissa *= power;
     }
 
     // Array to store max mantissa of Decimal in Postgres decimal format.
@@ -116,8 +116,8 @@ fn to_postgres(decimal: &BigDecimal) -> crate::Result<PostgresDecimal<Vec<i16>>>
 
     Ok(PostgresDecimal {
         neg,
-        scale,
         weight,
+        scale,
         digits,
     })
 }
@@ -204,10 +204,7 @@ impl<'a> FromSql<'a> for DecimalWrapper {
     }
 
     fn accepts(ty: &Type) -> bool {
-        match ty {
-            &Type::NUMERIC => true,
-            _ => false,
-        }
+        matches!(*ty, Type::NUMERIC)
     }
 }
 
@@ -246,10 +243,7 @@ impl ToSql for DecimalWrapper {
     }
 
     fn accepts(ty: &Type) -> bool {
-        match ty {
-            &Type::NUMERIC => true,
-            _ => false,
-        }
+        matches!(*ty, Type::NUMERIC)
     }
 
     to_sql_checked!();

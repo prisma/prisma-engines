@@ -125,7 +125,6 @@
 //! async fn main() -> Result<(), quaint::error::Error> {
 //!     let mut builder = Quaint::builder("postgresql://postgres:password@localhost:5432/postgres")?;
 //!     builder.connection_limit(5);
-//!     builder.connect_timeout(Duration::from_secs(5));
 //!     builder.max_idle_lifetime(Duration::from_secs(300));
 //!     builder.test_on_check_out(true);
 //!
@@ -179,7 +178,6 @@ pub struct Builder {
     max_lifetime: Option<Duration>,
     health_check_interval: Option<Duration>,
     test_on_check_out: bool,
-    connect_timeout: Option<Duration>,
     pool_timeout: Option<Duration>,
 }
 
@@ -197,7 +195,6 @@ impl Builder {
             max_lifetime: None,
             health_check_interval: None,
             test_on_check_out: false,
-            connect_timeout: None,
             pool_timeout: None,
         })
     }
@@ -217,24 +214,6 @@ impl Builder {
     /// - Defaults to the same value as `connection_limit`.
     pub fn max_idle(&mut self, max_idle: u64) {
         self.max_idle = Some(max_idle);
-    }
-
-    /// A timeout for connecting to the database. If not set, the connection
-    /// never times out.
-    ///
-    /// # Panics
-    ///
-    /// Panics if `connect_timeout` is zero.
-    ///
-    /// [`check_out`]: struct.Quaint.html#method.check_out
-    pub fn connect_timeout(&mut self, connect_timeout: Duration) {
-        assert_ne!(
-            connect_timeout,
-            Duration::from_secs(0),
-            "connect_timeout must be positive"
-        );
-
-        self.connect_timeout = Some(connect_timeout);
     }
 
     /// A timeout for acquiring a connection with the [`check_out`] method. If

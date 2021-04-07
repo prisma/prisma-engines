@@ -193,7 +193,7 @@ pub trait Visitor<'a> {
                                 self.write(".*")?;
                             }
                         },
-                        TableType::JoinedTable((table_name, _)) => match table.alias.clone() {
+                        TableType::JoinedTable(jt) => match table.alias.clone() {
                             Some(ref alias) => {
                                 self.surround_with(Self::C_BACKTICK_OPEN, Self::C_BACKTICK_CLOSE, |ref mut s| {
                                     s.write(alias)
@@ -204,7 +204,7 @@ pub trait Visitor<'a> {
                                 let mut unjoined_table = table.clone();
                                 // Convert the table typ to a `TableType::Table` for the SELECT statement print
                                 // We only want the join to appear in the FROM clause
-                                unjoined_table.typ = TableType::Table(table_name.to_owned());
+                                unjoined_table.typ = TableType::Table(jt.0.to_owned());
 
                                 self.visit_table(unjoined_table, false)?;
                                 self.write(".*")?;
@@ -438,7 +438,7 @@ pub trait Visitor<'a> {
             ExpressionKind::Selection(selection) => {
                 self.surround_with("(", ")", |ref mut s| s.visit_selection(selection))?
             }
-            ExpressionKind::Function(function) => self.visit_function(function)?,
+            ExpressionKind::Function(function) => self.visit_function(*function)?,
             ExpressionKind::Op(op) => self.visit_operation(*op)?,
             ExpressionKind::Values(values) => self.visit_values(*values)?,
             ExpressionKind::Asterisk(table) => match table {
@@ -488,13 +488,13 @@ pub trait Visitor<'a> {
                 None => self.delimited_identifiers(&[&*table_name])?,
             },
             TableType::Values(values) => self.visit_values(values)?,
-            TableType::Query(select) => self.surround_with("(", ")", |ref mut s| s.visit_select(select))?,
-            TableType::JoinedTable((table_name, joins)) => {
+            TableType::Query(select) => self.surround_with("(", ")", |ref mut s| s.visit_select(*select))?,
+            TableType::JoinedTable(jt) => {
                 match table.database {
-                    Some(database) => self.delimited_identifiers(&[&*database, &*table_name])?,
-                    None => self.delimited_identifiers(&[&*table_name])?,
+                    Some(database) => self.delimited_identifiers(&[&*database, &*jt.0])?,
+                    None => self.delimited_identifiers(&[&*jt.0])?,
                 }
-                self.visit_joins(joins)?
+                self.visit_joins(jt.1)?
             }
         };
 

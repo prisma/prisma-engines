@@ -19,8 +19,8 @@ pub trait Aliasable<'a> {
 /// Either an identifier or a nested query.
 pub enum TableType<'a> {
     Table(Cow<'a, str>),
-    JoinedTable((Cow<'a, str>, Vec<Join<'a>>)),
-    Query(Select<'a>),
+    JoinedTable(Box<(Cow<'a, str>, Vec<Join<'a>>)>),
+    Query(Box<Select<'a>>),
     Values(Values<'a>),
 }
 
@@ -161,9 +161,9 @@ impl<'a> Table<'a> {
     {
         match self.typ {
             TableType::Table(table_name) => {
-                self.typ = TableType::JoinedTable((table_name, vec![Join::Left(join.into())]))
+                self.typ = TableType::JoinedTable(Box::new((table_name, vec![Join::Left(join.into())])))
             }
-            TableType::JoinedTable((_, ref mut joins)) => joins.push(Join::Left(join.into())),
+            TableType::JoinedTable(ref mut jt) => jt.1.push(Join::Left(join.into())),
             TableType::Query(_) => {
                 panic!("You cannot left_join on a table of type Query")
             }
@@ -208,9 +208,9 @@ impl<'a> Table<'a> {
     {
         match self.typ {
             TableType::Table(table_name) => {
-                self.typ = TableType::JoinedTable((table_name, vec![Join::Inner(join.into())]))
+                self.typ = TableType::JoinedTable(Box::new((table_name, vec![Join::Inner(join.into())])))
             }
-            TableType::JoinedTable((_, ref mut joins)) => joins.push(Join::Inner(join.into())),
+            TableType::JoinedTable(ref mut jt) => jt.1.push(Join::Inner(join.into())),
             TableType::Query(_) => {
                 panic!("You cannot inner_join on a table of type Query")
             }
@@ -255,9 +255,9 @@ impl<'a> Table<'a> {
     {
         match self.typ {
             TableType::Table(table_name) => {
-                self.typ = TableType::JoinedTable((table_name, vec![Join::Right(join.into())]))
+                self.typ = TableType::JoinedTable(Box::new((table_name, vec![Join::Right(join.into())])))
             }
-            TableType::JoinedTable((_, ref mut joins)) => joins.push(Join::Right(join.into())),
+            TableType::JoinedTable(ref mut jt) => jt.1.push(Join::Right(join.into())),
             TableType::Query(_) => {
                 panic!("You cannot right_join on a table of type Query")
             }
@@ -302,9 +302,9 @@ impl<'a> Table<'a> {
     {
         match self.typ {
             TableType::Table(table_name) => {
-                self.typ = TableType::JoinedTable((table_name, vec![Join::Full(join.into())]))
+                self.typ = TableType::JoinedTable(Box::new((table_name, vec![Join::Full(join.into())])))
             }
-            TableType::JoinedTable((_, ref mut joins)) => joins.push(Join::Full(join.into())),
+            TableType::JoinedTable(ref mut jt) => jt.1.push(Join::Full(join.into())),
             TableType::Query(_) => {
                 panic!("You cannot full_join on a table of type Query")
             }
@@ -405,7 +405,7 @@ impl<'a> From<(String, String)> for Table<'a> {
 impl<'a> From<Select<'a>> for Table<'a> {
     fn from(select: Select<'a>) -> Self {
         Table {
-            typ: TableType::Query(select),
+            typ: TableType::Query(Box::new(select)),
             alias: None,
             database: None,
             index_definitions: Vec::new(),

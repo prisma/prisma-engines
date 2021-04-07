@@ -165,7 +165,7 @@ pub enum ExpressionKind<'a> {
     /// A nested `SELECT` or `SELECT .. UNION` statement
     Selection(SelectQuery<'a>),
     /// A database function call
-    Function(Function<'a>),
+    Function(Box<Function<'a>>),
     /// A qualified asterisk to a table
     Asterisk(Option<Box<Table<'a>>>),
     /// An operation: sum, sub, mul or div.
@@ -209,7 +209,15 @@ pub fn default_value() -> Expression<'static> {
 }
 
 expression!(Row, Row);
-expression!(Function, Function);
+
+impl<'a> From<Function<'a>> for Expression<'a> {
+    fn from(f: Function<'a>) -> Self {
+        Expression {
+            kind: ExpressionKind::Function(Box::new(f)),
+            alias: None,
+        }
+    }
+}
 
 impl<'a> From<Raw<'a>> for Expression<'a> {
     fn from(r: Raw<'a>) -> Self {
@@ -377,10 +385,12 @@ impl<'a> Comparable<'a> for Expression<'a> {
         Compare::NotEndsInto(Box::new(self), pattern.into())
     }
 
+    #[allow(clippy::wrong_self_convention)]
     fn is_null(self) -> Compare<'a> {
         Compare::Null(Box::new(self))
     }
 
+    #[allow(clippy::wrong_self_convention)]
     fn is_not_null(self) -> Compare<'a> {
         Compare::NotNull(Box::new(self))
     }

@@ -357,7 +357,7 @@ impl<'a> Visitor<'a> for Mssql<'a> {
     }
 
     fn visit_insert(&mut self, insert: Insert<'a>) -> visitor::Result {
-        if let Some(returning) = insert.returning.as_ref().map(|r| r.clone()) {
+        if let Some(returning) = insert.returning.as_ref().cloned() {
             self.create_generated_keys(returning)?;
             self.write(" ")?;
         }
@@ -427,7 +427,7 @@ impl<'a> Visitor<'a> for Mssql<'a> {
     }
 
     fn visit_merge(&mut self, merge: Merge<'a>) -> visitor::Result {
-        if let Some(returning) = merge.returning.as_ref().map(|r| r.clone()) {
+        if let Some(returning) = merge.returning.as_ref().cloned() {
             self.create_generated_keys(returning)?;
             self.write(" ")?;
         }

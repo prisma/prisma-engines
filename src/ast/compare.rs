@@ -541,6 +541,7 @@ pub trait Comparable<'a> {
     /// # Ok(())
     /// # }
     /// ```
+    #[allow(clippy::wrong_self_convention)]
     fn is_null(self) -> Compare<'a>;
 
     /// Tests if the left side is not `NULL`.
@@ -555,6 +556,7 @@ pub trait Comparable<'a> {
     /// # Ok(())
     /// # }
     /// ```
+    #[allow(clippy::wrong_self_convention)]
     fn is_not_null(self) -> Compare<'a>;
 
     /// Tests if the value is between two given values.
@@ -754,12 +756,14 @@ where
         val.not_ends_into(pattern)
     }
 
+    #[allow(clippy::wrong_self_convention)]
     fn is_null(self) -> Compare<'a> {
         let col: Column<'a> = self.into();
         let val: Expression<'a> = col.into();
         val.is_null()
     }
 
+    #[allow(clippy::wrong_self_convention)]
     fn is_not_null(self) -> Compare<'a> {
         let col: Column<'a> = self.into();
         let val: Expression<'a> = col.into();

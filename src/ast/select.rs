@@ -632,7 +632,7 @@ impl<'a> Select<'a> {
 
                 ctes.into_iter().collect()
             })
-            .unwrap_or_else(|| Vec::new());
+            .unwrap_or_else(Vec::new);
 
         if top_level {
             let clashing_names = self
@@ -669,7 +669,7 @@ impl<'a> Select<'a> {
                 ExpressionKind::Parameterized(_) => expr.alias.as_ref().map(|a| a.to_string()),
                 _ => None,
             })
-            .filter_map(|c| c)
+            .flatten()
             .collect()
     }
 }

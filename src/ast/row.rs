@@ -274,11 +274,13 @@ impl<'a> Comparable<'a> for Row<'a> {
         value.not_ends_into(pattern)
     }
 
+    #[allow(clippy::wrong_self_convention)]
     fn is_null(self) -> Compare<'a> {
         let value: Expression<'a> = self.into();
         value.is_null()
     }
 
+    #[allow(clippy::wrong_self_convention)]
     fn is_not_null(self) -> Compare<'a> {
         let value: Expression<'a> = self.into();
         value.is_not_null()

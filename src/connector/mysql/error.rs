@@ -138,7 +138,7 @@ impl From<my::Error> for Error {
                 let user = message
                     .split_whitespace()
                     .nth(4)
-                    .and_then(|s| s.split('@').nth(0))
+                    .and_then(|s| s.split('@').next())
                     .and_then(|s| s.split('\'').nth(1))
                     .into();
 

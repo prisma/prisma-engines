@@ -503,7 +503,7 @@ impl<'a> ToSql for Value<'a> {
             #[cfg(feature = "bigdecimal")]
             (Value::Integer(integer), &PostgresType::NUMERIC) => integer
                 .map(|integer| BigDecimal::from_i64(integer).unwrap())
-                .map(|bd| DecimalWrapper(bd))
+                .map(DecimalWrapper)
                 .map(|dw| dw.to_sql(ty, out)),
             (Value::Integer(integer), &PostgresType::TEXT) => {
                 integer.map(|integer| format!("{}", integer).to_sql(ty, out))
@@ -549,7 +549,7 @@ impl<'a> ToSql for Value<'a> {
                                 v
                             ));
 
-                            Err(Error::builder(kind).build())?
+                            return Err(Error::builder(kind).build().into());
                         }
                     };
 
@@ -573,7 +573,7 @@ impl<'a> ToSql for Value<'a> {
                                 v
                             ));
 
-                            Err(Error::builder(kind).build())?
+                            return Err(Error::builder(kind).build().into());
                         }
                     };
 

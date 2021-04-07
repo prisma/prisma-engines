@@ -45,7 +45,7 @@ impl From<rusqlite::Error> for Error {
                     .nth(1)
                     .map(|s| s.split(", "))
                     .map(|i| i.flat_map(|s| s.split('.').last()))
-                    .map(|i| DatabaseConstraint::fields(i))
+                    .map(DatabaseConstraint::fields)
                     .unwrap_or(DatabaseConstraint::CannotParse);
 
                 let kind = ErrorKind::UniqueConstraintViolation { constraint };

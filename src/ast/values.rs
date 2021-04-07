@@ -453,8 +453,8 @@ impl<'a> Value<'a> {
     pub fn into_numeric(self) -> Option<BigDecimal> {
         match self {
             Value::Numeric(d) => d,
-            Value::Float(f) => f.and_then(|f| BigDecimal::from_f32(f)),
-            Value::Double(f) => f.and_then(|f| BigDecimal::from_f64(f)),
+            Value::Float(f) => f.and_then(BigDecimal::from_f32),
+            Value::Double(f) => f.and_then(BigDecimal::from_f64),
             _ => None,
         }
     }

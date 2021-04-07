@@ -30,10 +30,7 @@ pub fn conv_params<'a>(params: &[Value<'a>]) -> crate::Result<my::Params> {
                 Value::Enum(s) => s.clone().map(|s| my::Value::Bytes((&*s).as_bytes().to_vec())),
                 Value::Boolean(b) => b.map(|b| my::Value::Int(b as i64)),
                 Value::Char(c) => c.map(|c| my::Value::Bytes(vec![c as u8])),
-                Value::Xml(s) => match s {
-                    Some(ref s) => Some(my::Value::Bytes((s).as_bytes().to_vec())),
-                    None => None,
-                },
+                Value::Xml(s) => s.as_ref().map(|s| my::Value::Bytes((s).as_bytes().to_vec())),
                 Value::Array(_) => {
                     let msg = "Arrays are not supported in MySQL.";
                     let kind = ErrorKind::conversion(msg);
@@ -44,10 +41,7 @@ pub fn conv_params<'a>(params: &[Value<'a>]) -> crate::Result<my::Params> {
                     return Err(builder.build());
                 }
                 #[cfg(feature = "bigdecimal")]
-                Value::Numeric(f) => match f {
-                    Some(f) => Some(my::Value::Bytes(f.to_string().as_bytes().to_vec())),
-                    None => None,
-                },
+                Value::Numeric(f) => f.as_ref().map(|f| my::Value::Bytes(f.to_string().as_bytes().to_vec())),
                 #[cfg(feature = "json")]
                 Value::Json(s) => match s {
                     Some(ref s) => {

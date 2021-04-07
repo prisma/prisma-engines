@@ -56,11 +56,7 @@ impl ResultRow {
     /// Take a value with the given column name from the row. Usage
     /// documentation in [ResultRowRef](struct.ResultRowRef.html).
     pub fn get(&self, name: &str) -> Option<&Value<'static>> {
-        if let Some(idx) = self.columns.iter().position(|c| c == name) {
-            Some(&self.values[idx])
-        } else {
-            None
-        }
+        self.columns.iter().position(|c| c == name).map(|idx| &self.values[idx])
     }
 
     /// Make a referring [ResultRowRef](struct.ResultRowRef.html).
@@ -110,10 +106,6 @@ impl<'a> ResultRowRef<'a> {
     /// assert_eq!(Some(&row["id"]), row.get("id"));
     /// ```
     pub fn get(&self, name: &str) -> Option<&Value<'static>> {
-        if let Some(idx) = self.columns.iter().position(|c| c == name) {
-            Some(&self.values[idx])
-        } else {
-            None
-        }
+        self.columns.iter().position(|c| c == name).map(|idx| &self.values[idx])
     }
 }
