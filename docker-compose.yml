@@ -19,7 +19,7 @@ services:
   test-db-postgres-13:
     image: cockroachdb/cockroach:latest
     restart: always
-    command: start --insecure -s /cockroachfs20 
+    command: start-single-node --cluster-name=example-single-node --logtostderr=WARNING --log-file-verbosity=WARNING --insecure -s /cockroachfs20 
     networks:
       - databases
     ports:
