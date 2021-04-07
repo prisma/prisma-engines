@@ -339,8 +339,8 @@ impl SqlSchemaDescriber {
                 att2.attname    as "child_column",
                 cl.relname      as "parent_table",
                 att.attname     as "parent_column",
-                con.confdeltype,
-                con.confupdtype,
+                'a' AS con.confdeltype,
+                'a' AS con.confupdtype,
                 rel_ns.nspname as "referenced_schema_name",
                 conname         as constraint_name,
                 child,
@@ -355,8 +355,8 @@ impl SqlSchemaDescriber {
                         con1.confrelid,
                         con1.conrelid,
                         con1.conname,
-                        con1.confdeltype,
-                        con1.confupdtype
+                        'a' AS con1.confdeltype,
+                        'a' AS con1.confupdtype
                 FROM pg_class cl
                         join pg_constraint con1 on con1.conrelid = cl.oid
                         join pg_namespace ns on cl.relnamespace = ns.oid
