@@ -20,8 +20,8 @@ pub use error::ConnectorError;
 pub use features::MigrationFeature;
 pub use migration_persistence::{MigrationPersistence, MigrationRecord, PersistenceNotInitializedError, Timestamp};
 pub use migrations_directory::{
-    create_migration_directory, error_on_changed_provider, list_migrations, match_provider_in_lock_file,
-    write_migration_lock_file, ListMigrationsError, MigrationDirectory,
+    create_migration_directory, error_on_changed_provider, list_migrations, write_migration_lock_file,
+    ListMigrationsError, MigrationDirectory,
 };
 
 use sha2::{Digest, Sha256};

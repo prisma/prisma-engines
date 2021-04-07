@@ -3,7 +3,7 @@ use crate::{parse_datamodel, CoreError, CoreResult};
 use migration_connector::{DatabaseMigrationMarker, MigrationConnector};
 use serde::{Deserialize, Serialize};
 use std::path::Path;
-use user_facing_errors::migration_engine::{MigrationNameTooLong, ProviderSwitchedError};
+use user_facing_errors::migration_engine::MigrationNameTooLong;
 
 /// Create and potentially apply a new migration.
 pub struct CreateMigrationCommand;
@@ -47,16 +47,7 @@ impl<'a> MigrationCommand for CreateMigrationCommand {
         }
 
         // Check for provider switch
-        {
-            if matches!(
-                migration_connector::match_provider_in_lock_file(&input.migrations_directory_path, connector_type),
-                Some(false)
-            ) {
-                return Err(CoreError::user_facing(ProviderSwitchedError {
-                    provider: connector_type.into(),
-                }));
-            }
-        }
+        migration_connector::error_on_changed_provider(&input.migrations_directory_path, connector_type)?;
 
         // Infer the migration.
         let previous_migrations = migration_connector::list_migrations(&Path::new(&input.migrations_directory_path))?;
