@@ -53,14 +53,11 @@ jobs:
       - run: mysql -h 127.0.0.1 -P 3307 -u root -pprisma -e "SHOW DATABASES;" --loose-default-auth=mysql_native_password
 
 
-
       - run: mysql -h 127.0.0.1 -P 3307 -u root -pprisma -e "SELECT @@core_file;" --loose-default-auth=mysql_native_password
       - run: mysql -h 127.0.0.1 -P 3307 -u root -pprisma -e "SELECT @@snapshots_to_keep;" --loose-default-auth=mysql_native_password
       - run: mysql -h 127.0.0.1 -P 3307 -u root -pprisma -e "SELECT @@log_file_size_partitions;" --loose-default-auth=mysql_native_password
       - run: mysql -h 127.0.0.1 -P 3307 -u root -pprisma -e "SELECT @@log_file_size_ref_dbs;" --loose-default-auth=mysql_native_password
       - run: mysql -h 127.0.0.1 -P 3307 -u root -pprisma -e "SELECT @@snapshot_trigger_size;" --loose-default-auth=mysql_native_password
-
-      
 
       
       - run: docker-compose exec -T singlestore memsqlctl -y update-config --all --key core_file --value 0
@@ -94,7 +91,7 @@ jobs:
 
       - run: df -h
       
-      - run: timeout 40m cargo test mysql_8
+      - run: timeout 30m cargo test mysql_8
         working-directory: introspection-engine/introspection-engine-tests
         env:
           CLICOLOR_FORCE: 1
