@@ -17,7 +17,7 @@ services:
       - databases
 
   test-db-postgres-13:
-    image: cockroachdb/cockroach:v20.1.5
+    image: cockroachdb/cockroach:latest
     restart: always
     command: start --insecure -s /cockroachfs20 
     networks:
