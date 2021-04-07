@@ -35,7 +35,3 @@ jobs:
         if: ${{ always() }}
       - run: docker logs prisma-engines_test-db-postgres-13_1
         if: ${{ always() }}
-        
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        if: ${{ always() }}
