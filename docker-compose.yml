@@ -17,17 +17,15 @@ services:
       - databases
 
   test-db-postgres-13:
-    image: timescale/timescaledb:2.1.0-pg13
+    image: cockroachdb/cockroach:v20.1.5
     restart: always
-    command: postgres -c 'max_connections=1000'
-    environment:
-      POSTGRES_PASSWORD: "prisma"
-      PGDATA: "/pgtmpfs13"
-    ports:
-      - "5435:5432"
+    command: start --insecure -s /cockroachfs20 
     networks:
       - databases
-    tmpfs: /pgtmpfs12
+    ports:
+      - "5435:5436" # Database
+      - "8036:8080" # Web UI
+    tmpfs: /cockroachfs20
 
 
 networks:
