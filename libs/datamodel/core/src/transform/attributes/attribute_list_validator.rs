@@ -46,12 +46,10 @@ impl<T: 'static> AttributeListValidator<T> {
             }
         }
 
-        errors.to_result()?;
-
         for attribute in ast.attributes() {
             match self.known_attributes.get(&attribute.name.name) {
                 Some(validator) => {
-                    let mut arguments = Arguments::new(&attribute.arguments, attribute.span);
+                    let mut arguments = Arguments::new(&attribute)?;
 
                     let attribute_count = attribute_counts.get(&attribute.name.name).unwrap();
                     if *attribute_count > 1 && !validator.is_duplicate_definition_allowed() {
@@ -59,14 +57,6 @@ impl<T: 'static> AttributeListValidator<T> {
                             &attribute.name.name,
                             attribute.name.span,
                         ));
-                    }
-
-                    if let Err(mut errs) = arguments.check_for_duplicate_named_arguments() {
-                        errors.append(&mut errs);
-                    }
-
-                    if let Err(mut errs) = arguments.check_for_multiple_unnamed_arguments(&attribute.name.name) {
-                        errors.append(&mut errs);
                     }
 
                     let attribute_validation_result = validator.validate_and_apply(&mut arguments, t);
@@ -82,11 +72,9 @@ impl<T: 'static> AttributeListValidator<T> {
                         Err(err) => {
                             errors.push_error(err);
                         }
-                        _ => {
+                        Ok(()) => {
                             // We only check for unused arguments if attribute parsing succeeded.
-                            if let Err(mut errs) = arguments.check_for_unused_arguments() {
-                                errors.append(&mut errs);
-                            }
+                            arguments.check_for_unused_arguments(&mut errors);
                         }
                     }
                 }
