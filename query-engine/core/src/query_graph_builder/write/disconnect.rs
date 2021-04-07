@@ -33,13 +33,12 @@ use std::sync::Arc;
 /// └─▶│   Disconnect    │
 ///    └─────────────────┘
 /// ```
-#[tracing::instrument(skip(graph, parent_node, child_node, parent_relation_field, expected_disconnects))]
+#[tracing::instrument(skip(graph, parent_node, child_node, parent_relation_field))]
 pub fn disconnect_records_node(
     graph: &mut QueryGraph,
     parent_node: &NodeRef,
     child_node: &NodeRef,
     parent_relation_field: &RelationFieldRef,
-    expected_disconnects: usize,
 ) -> QueryGraphBuilderResult<NodeRef> {
     assert!(parent_relation_field.relation().is_many_to_many());
 
@@ -79,10 +78,6 @@ pub fn disconnect_records_node(
         ),
     )?;
 
-    let relation_name = parent_relation_field.relation().name.clone();
-    let parent_name = parent_relation_field.model().name.clone();
-    let child_name = parent_relation_field.related_model().name.clone();
-
     // Edge from child to disconnect.
     graph.create_edge(
         &child_node,
@@ -90,16 +85,6 @@ pub fn disconnect_records_node(
         QueryGraphDependency::ParentProjection(
             child_model_id,
             Box::new(move |mut disconnect_node, child_ids| {
-                let len = child_ids.len();
-
-                if len != expected_disconnects {
-                    return Err(QueryGraphBuilderError::RecordsNotConnected {
-                        relation_name,
-                        parent_name,
-                        child_name,
-                    });
-                }
-
                 if let Node::Query(Query::Write(WriteQuery::DisconnectRecords(ref mut c))) = disconnect_node {
                     c.child_ids = child_ids;
                 }

@@ -390,7 +390,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
 
       empty.toString() should be("{\"data\":{\"updateParent\":{\"childrenOpt\":[{\"c\":\"c1\"},{\"c\":\"c2\"}]}}}")
 
-      server.queryThatMustFail(
+      server.query(
         s"""
          |mutation {
          |  updateParent(
@@ -404,29 +404,8 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |  }
          |}
       """,
-        project,
-        errorCode = 2017,
-        errorContains = """The records for relation `ChildToParent` between the `Parent` and `Child` models are not connected."""
-      )
-
-      val res = server.query(
-        s"""
-         |mutation {
-         |  updateParent(
-         |  where: $parentIdentifier
-         |  data:{
-         |    childrenOpt: {disconnect: [$firstChild]}
-         |  }){
-         |    childrenOpt{
-         |      c
-         |    }
-         |  }
-         |}
-      """,
         project
       )
-
-      res.toString should be("""{"data":{"updateParent":{"childrenOpt":[{"c":"c2"}]}}}""")
 
       server.query(s"""query{child(where:{c:"c1"}){c, parentsOpt{p}}}""", project).toString should be(
         """{"data":{"child":{"c":"c1","parentsOpt":[{"p":"otherParent"}]}}}""")
@@ -490,7 +469,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
       )
       val otherChild = t.child.whereMulti(otherParentResult, "data.createParent.childrenOpt")(1)
 
-      server.queryThatMustFail(
+      server.query(
         s"""
          |mutation {
          |  updateParent(
@@ -504,9 +483,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |  }
          |}
       """,
-        project,
-        errorCode = 2017,
-        errorContains = """The records for relation `ChildToParent` between the `Parent` and `Child` models are not connected."""
+        project
       )
     }
   }
