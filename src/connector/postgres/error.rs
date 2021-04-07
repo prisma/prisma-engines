@@ -4,6 +4,10 @@ impl From<tokio_postgres::error::Error> for Error {
     fn from(e: tokio_postgres::error::Error) -> Error {
         use tokio_postgres::error::DbError;
 
+        if e.is_closed() {
+            return Error::builder(ErrorKind::ConnectionClosed).build();
+        }
+
         match e.code().map(|c| c.code()) {
             Some(code) if code == "22001" => {
                 let code = code.to_string();

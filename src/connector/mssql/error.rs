@@ -1,8 +1,14 @@
 use crate::error::{DatabaseConstraint, Error, ErrorKind};
+use tiberius::error::IoErrorKind;
 
 impl From<tiberius::error::Error> for Error {
     fn from(e: tiberius::error::Error) -> Error {
         match e {
+            tiberius::error::Error::Io { kind, message } if kind == IoErrorKind::UnexpectedEof => {
+                let mut builder = Error::builder(ErrorKind::ConnectionClosed);
+                builder.set_original_message(message);
+                builder.build()
+            }
             e @ tiberius::error::Error::Io { .. } => Error::builder(ErrorKind::ConnectionError(e.into())).build(),
             tiberius::error::Error::Tls(message) => {
                 let message = format!(

@@ -10,7 +10,14 @@ use crate::{
 use async_trait::async_trait;
 use connection_string::JdbcString;
 use futures::lock::Mutex;
-use std::{convert::TryFrom, fmt, str::FromStr, time::Duration};
+use std::{
+    convert::TryFrom,
+    fmt,
+    future::Future,
+    str::FromStr,
+    sync::atomic::{AtomicBool, Ordering},
+    time::Duration,
+};
 use tiberius::*;
 use tokio::net::TcpStream;
 use tokio_util::compat::{Compat, TokioAsyncWriteCompatExt};
@@ -253,6 +260,7 @@ pub struct Mssql {
     client: Mutex<Client<Compat<TcpStream>>>,
     url: MssqlUrl,
     socket_timeout: Option<Duration>,
+    is_healthy: AtomicBool,
 }
 
 impl Mssql {
@@ -284,6 +292,7 @@ impl Mssql {
             client: Mutex::new(client),
             url,
             socket_timeout,
+            is_healthy: AtomicBool::new(true),
         };
 
         if let Some(isolation) = this.url.transaction_isolation_level() {
@@ -292,6 +301,19 @@ impl Mssql {
         };
 
         Ok(this)
+    }
+
+    async fn perform_io<F, T>(&self, fut: F) -> crate::Result<T>
+    where
+        F: Future<Output = std::result::Result<T, tiberius::error::Error>>,
+    {
+        match super::timeout::socket(self.socket_timeout, fut).await {
+            Err(e) if e.is_closed() => {
+                self.is_healthy.store(false, Ordering::SeqCst);
+                Err(e)
+            }
+            res => res,
+        }
     }
 }
 
@@ -314,10 +336,7 @@ impl Queryable for Mssql {
             let params = conversion::conv_params(params)?;
 
             let query = client.query(sql, params.as_slice());
-            let mut results = super::timeout::socket(self.socket_timeout, query)
-                .await?
-                .into_results()
-                .await?;
+            let mut results = self.perform_io(query).await?.into_results().await?;
 
             match results.pop() {
                 Some(rows) => {
@@ -355,7 +374,7 @@ impl Queryable for Mssql {
             let params = conversion::conv_params(params)?;
 
             let query = client.execute(sql, params.as_slice());
-            let changes = super::timeout::socket(self.socket_timeout, query).await?.total();
+            let changes = self.perform_io(query).await?.total();
 
             Ok(changes)
         })
@@ -366,12 +385,7 @@ impl Queryable for Mssql {
     async fn raw_cmd(&self, cmd: &str) -> crate::Result<()> {
         metrics::query("mssql.raw_cmd", cmd, &[], move || async move {
             let mut client = self.client.lock().await;
-
-            super::timeout::socket(self.socket_timeout, client.simple_query(cmd))
-                .await?
-                .into_results()
-                .await?;
-
+            self.perform_io(client.simple_query(cmd)).await?.into_results().await?;
             Ok(())
         })
         .await
@@ -387,6 +401,10 @@ impl Queryable for Mssql {
             .and_then(|row| row.get("version").and_then(|version| version.to_string()));
 
         Ok(version_string)
+    }
+
+    fn is_healthy(&self) -> bool {
+        self.is_healthy.load(Ordering::SeqCst)
     }
 
     fn begin_statement(&self) -> &'static str {

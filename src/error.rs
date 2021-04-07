@@ -124,6 +124,11 @@ impl Error {
     pub fn kind(&self) -> &ErrorKind {
         &self.kind
     }
+
+    /// Determines if the error was associated with closed connection.
+    pub fn is_closed(&self) -> bool {
+        matches!(self.kind, ErrorKind::ConnectionClosed)
+    }
 }
 
 impl fmt::Display for Error {
@@ -196,6 +201,9 @@ pub enum ErrorKind {
 
     #[error("Timed out when connecting to the database.")]
     ConnectTimeout,
+
+    #[error("The server terminated the connection.")]
+    ConnectionClosed,
 
     #[error(
         "Timed out fetching a connection from the pool (connection limit: {}, in use: {})",

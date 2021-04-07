@@ -7,7 +7,13 @@ use mysql_async::{
     prelude::{Query as _, Queryable as _},
 };
 use percent_encoding::percent_decode;
-use std::{borrow::Cow, path::Path, time::Duration};
+use std::{
+    borrow::Cow,
+    future::Future,
+    path::Path,
+    sync::atomic::{AtomicBool, Ordering},
+    time::Duration,
+};
 use tokio::sync::Mutex;
 use url::Url;
 
@@ -25,6 +31,7 @@ pub struct Mysql {
     pub(crate) conn: Mutex<my::Conn>,
     pub(crate) url: MysqlUrl,
     socket_timeout: Option<Duration>,
+    is_healthy: AtomicBool,
 }
 
 /// Wraps a connection url and exposes the parsing logic used by quaint, including default values.
@@ -293,7 +300,21 @@ impl Mysql {
             socket_timeout: url.query_params.socket_timeout,
             conn: Mutex::new(conn),
             url,
+            is_healthy: AtomicBool::new(true),
         })
+    }
+
+    async fn perform_io<F, T>(&self, fut: F) -> crate::Result<T>
+    where
+        F: Future<Output = Result<T, my::Error>>,
+    {
+        match super::timeout::socket(self.socket_timeout, fut).await {
+            Err(e) if e.is_closed() => {
+                self.is_healthy.store(false, Ordering::SeqCst);
+                Err(e)
+            }
+            res => res,
+        }
     }
 }
 
@@ -315,10 +336,11 @@ impl Queryable for Mysql {
     async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet> {
         metrics::query("mysql.query_raw", sql, params, move || async move {
             let mut conn = self.conn.lock().await;
-            let stmt = super::timeout::socket(self.socket_timeout, conn.prep(sql)).await?;
+            let stmt = self.perform_io(conn.prep(sql)).await?;
 
-            let rows: Vec<my::Row> =
-                super::timeout::socket(self.socket_timeout, conn.exec(&stmt, conversion::conv_params(params)?)).await?;
+            let rows: Vec<my::Row> = self
+                .perform_io(conn.exec(&stmt, conversion::conv_params(params)?))
+                .await?;
 
             let columns = stmt.columns().iter().map(|s| s.name_str().into_owned()).collect();
 
@@ -342,12 +364,8 @@ impl Queryable for Mysql {
     async fn execute_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<u64> {
         metrics::query("mysql.execute_raw", sql, params, move || async move {
             let mut conn = self.conn.lock().await;
-
-            super::timeout::socket(
-                self.socket_timeout,
-                conn.exec_drop(sql, conversion::conv_params(params)?),
-            )
-            .await?;
+            self.perform_io(conn.exec_drop(sql, conversion::conv_params(params)?))
+                .await?;
 
             Ok(conn.affected_rows())
         })
@@ -371,10 +389,10 @@ impl Queryable for Mysql {
                     }
                 }
 
-                crate::Result::<()>::Ok(())
+                Ok(())
             };
 
-            super::timeout::socket(self.socket_timeout, fut).await?;
+            self.perform_io(fut).await?;
 
             Ok(())
         })
@@ -391,6 +409,10 @@ impl Queryable for Mysql {
             .and_then(|row| row.get("version").and_then(|version| version.to_string()));
 
         Ok(version_string)
+    }
+
+    fn is_healthy(&self) -> bool {
+        self.is_healthy.load(Ordering::SeqCst)
     }
 }
 

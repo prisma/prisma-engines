@@ -64,4 +64,8 @@ impl<'a> Queryable for Transaction<'a> {
     async fn version(&self) -> crate::Result<Option<String>> {
         self.inner.version().await
     }
+
+    fn is_healthy(&self) -> bool {
+        self.inner.is_healthy()
+    }
 }

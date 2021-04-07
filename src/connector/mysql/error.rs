@@ -10,6 +10,9 @@ impl From<my::Error> for Error {
                 message: err.to_string(),
             })
             .build(),
+            my::Error::Io(my::IoError::Io(err)) if err.kind() == std::io::ErrorKind::UnexpectedEof => {
+                Error::builder(ErrorKind::ConnectionClosed).build()
+            }
             my::Error::Io(io_error) => Error::builder(ErrorKind::ConnectionError(io_error.into())).build(),
             my::Error::Driver(e) => Error::builder(ErrorKind::QueryError(e.into())).build(),
             my::Error::Server(ServerError { ref message, code, .. }) if code == 1062 => {

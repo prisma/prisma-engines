@@ -16,6 +16,8 @@ use postgres_native_tls::MakeTlsConnector;
 use std::{
     borrow::{Borrow, Cow},
     fs,
+    future::Future,
+    sync::atomic::{AtomicBool, Ordering},
     time::Duration,
 };
 use tokio_postgres::{config::SslMode, Client, Config, Statement};
@@ -48,6 +50,7 @@ pub struct PostgreSql {
     pg_bouncer: bool,
     socket_timeout: Option<Duration>,
     statement_cache: Mutex<LruCache<String, Statement>>,
+    is_healthy: AtomicBool,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -504,6 +507,7 @@ impl PostgreSql {
             socket_timeout: url.query_params.socket_timeout,
             pg_bouncer: url.query_params.pg_bouncer,
             statement_cache: Mutex::new(url.cache()),
+            is_healthy: AtomicBool::new(true),
         })
     }
 
@@ -532,10 +536,23 @@ impl PostgreSql {
                     stored = stored,
                 );
 
-                let stmt = super::timeout::socket(self.socket_timeout, self.client.0.prepare(sql)).await?;
+                let stmt = self.perform_io(self.client.0.prepare(sql)).await?;
                 cache.insert(sql.to_string(), stmt.clone());
                 Ok(stmt)
             }
+        }
+    }
+
+    async fn perform_io<F, T>(&self, fut: F) -> crate::Result<T>
+    where
+        F: Future<Output = Result<T, tokio_postgres::Error>>,
+    {
+        match super::timeout::socket(self.socket_timeout, fut).await {
+            Err(e) if e.is_closed() => {
+                self.is_healthy.store(false, Ordering::SeqCst);
+                Err(e)
+            }
+            res => res,
         }
     }
 }
@@ -568,11 +585,9 @@ impl Queryable for PostgreSql {
                 return Err(Error::builder(kind).build());
             }
 
-            let rows = super::timeout::socket(
-                self.socket_timeout,
-                self.client.0.query(&stmt, conversion::conv_params(params).as_slice()),
-            )
-            .await?;
+            let rows = self
+                .perform_io(self.client.0.query(&stmt, conversion::conv_params(params).as_slice()))
+                .await?;
 
             let mut result = ResultSet::new(stmt.to_column_names(), Vec::new());
 
@@ -599,11 +614,9 @@ impl Queryable for PostgreSql {
                 return Err(Error::builder(kind).build());
             }
 
-            let changes = super::timeout::socket(
-                self.socket_timeout,
-                self.client.0.execute(&stmt, conversion::conv_params(params).as_slice()),
-            )
-            .await?;
+            let changes = self
+                .perform_io(self.client.0.execute(&stmt, conversion::conv_params(params).as_slice()))
+                .await?;
 
             Ok(changes)
         })
@@ -613,8 +626,7 @@ impl Queryable for PostgreSql {
     #[tracing::instrument(skip(self))]
     async fn raw_cmd(&self, cmd: &str) -> crate::Result<()> {
         metrics::query("postgres.raw_cmd", cmd, &[], move || async move {
-            super::timeout::socket(self.socket_timeout, self.client.0.simple_query(cmd)).await?;
-
+            self.perform_io(self.client.0.simple_query(cmd)).await?;
             Ok(())
         })
         .await
@@ -639,6 +651,10 @@ impl Queryable for PostgreSql {
         } else {
             Ok(())
         }
+    }
+
+    fn is_healthy(&self) -> bool {
+        self.is_healthy.load(Ordering::SeqCst)
     }
 }
 

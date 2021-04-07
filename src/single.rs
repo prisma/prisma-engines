@@ -219,4 +219,8 @@ impl Queryable for Quaint {
     fn begin_statement(&self) -> &'static str {
         self.inner.begin_statement()
     }
+
+    fn is_healthy(&self) -> bool {
+        self.inner.is_healthy()
+    }
 }

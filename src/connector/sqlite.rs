@@ -218,6 +218,10 @@ impl Queryable for Sqlite {
     async fn version(&self) -> crate::Result<Option<String>> {
         Ok(Some(rusqlite::version().into()))
     }
+
+    fn is_healthy(&self) -> bool {
+        true
+    }
 }
 
 #[cfg(test)]
