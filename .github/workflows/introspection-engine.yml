@@ -13,6 +13,9 @@ jobs:
 
       - run: docker-compose up -d
 
+      - run: docker logs prisma-engines_test-db-postgres-13_1
+      - run: psql -d postgresql://root@localhost:5435?sslmode=disable -c 'SHOW DATABASES'
+      
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: 1.48.0
