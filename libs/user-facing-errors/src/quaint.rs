@@ -238,6 +238,8 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
             }))
         }
 
+        (ErrorKind::ConnectionClosed, _) => Some(KnownError::new(common::ConnectionClosed)),
+
         _ => None,
     }
 }
