@@ -114,7 +114,7 @@ pub struct ListMigrationsError(io::Error);
 
 impl Display for ListMigrationsError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "An error occurred when reading the migrations directory.")
+        f.write_str("An error occurred when reading the migrations directory.")
     }
 }
 
@@ -173,7 +173,8 @@ impl ReadMigrationScriptError {
 
 impl Display for ReadMigrationScriptError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Failed to read migration script at {}", self.2)
+        f.write_str("Failed to read migration script at ")?;
+        Display::fmt(&self.2, f)
     }
 }
 
