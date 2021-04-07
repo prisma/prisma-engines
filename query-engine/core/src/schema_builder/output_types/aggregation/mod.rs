@@ -13,7 +13,7 @@ fn field_avg_output_type(ctx: &mut BuilderContext, field: &ScalarFieldRef) -> Ou
     }
 }
 
-fn collect_non_list_nor_json_fields(model: &ModelRef) -> Vec<ScalarFieldRef> {
+pub fn collect_non_list_nor_json_fields(model: &ModelRef) -> Vec<ScalarFieldRef> {
     model
         .fields()
         .scalar()
@@ -22,7 +22,7 @@ fn collect_non_list_nor_json_fields(model: &ModelRef) -> Vec<ScalarFieldRef> {
         .collect()
 }
 
-fn collect_numeric_fields(model: &ModelRef) -> Vec<ScalarFieldRef> {
+pub fn collect_numeric_fields(model: &ModelRef) -> Vec<ScalarFieldRef> {
     model
         .fields()
         .scalar()
@@ -40,6 +40,7 @@ fn aggregation_field<F, G>(
     fields: Vec<ScalarFieldRef>,
     type_mapper: F,
     object_mapper: G,
+    is_count: bool,
 ) -> Option<OutputField>
 where
     F: Fn(&mut BuilderContext, &ScalarFieldRef) -> OutputType,
@@ -55,6 +56,7 @@ where
             &fields,
             type_mapper,
             object_mapper,
+            is_count,
         ));
 
         Some(field(name, vec![], object_type, None).nullable())
@@ -69,6 +71,7 @@ fn map_field_aggregation_object<F, G>(
     fields: &[ScalarFieldRef],
     type_mapper: F,
     object_mapper: G,
+    is_count: bool,
 ) -> ObjectTypeWeakRef
 where
     F: Fn(&mut BuilderContext, &ScalarFieldRef) -> OutputType,
@@ -84,9 +87,7 @@ where
     // This is because when there's no data, doing aggregation on them will return NULL
     let fields: Vec<OutputField> = fields
         .iter()
-        .map(|sf| {
-            field(sf.name.clone(), vec![], type_mapper(ctx, sf), None).nullable_if(!sf.is_required || !sf.is_numeric())
-        })
+        .map(|sf| field(sf.name.clone(), vec![], type_mapper(ctx, sf), None).nullable_if(!is_count))
         .collect();
 
     let object = object_mapper(object_type(ident.clone(), fields, None));

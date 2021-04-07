@@ -1,4 +1,7 @@
-use super::{common::*, SqlRenderer};
+use super::{
+    common::{format_hex, render_nullability, IteratorJoin, Quoted, SQL_INDENTATION},
+    SqlRenderer,
+};
 use crate::{
     flavour::PostgresFlavour,
     pair::Pair,
@@ -9,8 +12,10 @@ use native_types::PostgresType;
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
-use sql_ddl::postgres::{self as ddl, CreateEnum, CreateIndex};
-use sql_schema_describer::{walkers::*, *};
+use sql_ddl::postgres as ddl;
+use sql_schema_describer::{
+    walkers::*, ColumnArity, ColumnTypeFamily, DefaultKind, DefaultValue, ForeignKeyAction, SqlSchema,
+};
 use std::borrow::Cow;
 
 impl PostgresFlavour {
@@ -205,10 +210,10 @@ impl SqlRenderer for PostgresFlavour {
 
         // drop old enum
         {
-            let sql = format!(
-                "DROP TYPE {tmp_old_name}",
-                tmp_old_name = Quoted::postgres_ident(&tmp_old_name),
-            );
+            let sql = ddl::DropType {
+                type_name: tmp_old_name.as_str().into(),
+            }
+            .to_string();
 
             stmts.push(sql)
         }
@@ -269,7 +274,6 @@ impl SqlRenderer for PostgresFlavour {
                     let columns = tables.columns(column_index);
 
                     render_alter_column(
-                        self,
                         &columns,
                         changes,
                         &mut before_statements,
@@ -310,7 +314,7 @@ impl SqlRenderer for PostgresFlavour {
     }
 
     fn render_create_enum(&self, enm: &EnumWalker<'_>) -> Vec<String> {
-        vec![CreateEnum {
+        vec![ddl::CreateEnum {
             enum_name: enm.name().into(),
             variants: enm.values().iter().map(|s| Cow::Borrowed(s.as_str())).collect(),
         }
@@ -318,7 +322,7 @@ impl SqlRenderer for PostgresFlavour {
     }
 
     fn render_create_index(&self, index: &IndexWalker<'_>) -> String {
-        CreateIndex {
+        ddl::CreateIndex {
             index_name: index.name().into(),
             is_unique: index.index_type().is_unique(),
             table_reference: index.table().name().into(),
@@ -351,10 +355,10 @@ impl SqlRenderer for PostgresFlavour {
     }
 
     fn render_drop_enum(&self, dropped_enum: &EnumWalker<'_>) -> Vec<String> {
-        let sql = format!(
-            "DROP TYPE {enum_name}",
-            enum_name = Quoted::postgres_ident(dropped_enum.name()),
-        );
+        let sql = ddl::DropType {
+            type_name: dropped_enum.name().into(),
+        }
+        .to_string();
 
         vec![sql]
     }
@@ -368,11 +372,24 @@ impl SqlRenderer for PostgresFlavour {
     }
 
     fn render_drop_index(&self, index: &IndexWalker<'_>) -> String {
-        format!("DROP INDEX {}", self.quote(index.name()))
+        ddl::DropIndex {
+            index_name: index.name().into(),
+        }
+        .to_string()
     }
 
     fn render_drop_table(&self, table_name: &str) -> Vec<String> {
-        vec![format!("DROP TABLE {}", self.quote(&table_name))]
+        vec![ddl::DropTable {
+            table_name: table_name.into(),
+        }
+        .to_string()]
+    }
+
+    fn render_drop_view(&self, view: &ViewWalker<'_>) -> String {
+        ddl::DropView {
+            view_name: view.name().into(),
+        }
+        .to_string()
     }
 
     fn render_redefine_tables(&self, _names: &[RedefineTable], _schemas: &Pair<&SqlSchema>) -> Vec<String> {
@@ -380,15 +397,11 @@ impl SqlRenderer for PostgresFlavour {
     }
 
     fn render_rename_table(&self, name: &str, new_name: &str) -> String {
-        format!(
-            "ALTER TABLE {} RENAME TO {}",
-            self.quote(name),
-            new_name = self.quote(new_name),
-        )
-    }
-
-    fn render_drop_view(&self, view: &ViewWalker<'_>) -> String {
-        format!("DROP VIEW {}", self.quote(view.name()))
+        ddl::AlterTable {
+            table_name: name.into(),
+            clauses: vec![ddl::AlterTableClause::RenameTo(new_name.into())],
+        }
+        .to_string()
     }
 }
 
@@ -414,6 +427,7 @@ pub(crate) fn render_column_type(col: &ColumnWalker<'_>) -> Cow<'static, str> {
             Some(arg) => format!("({})", arg),
         }
     }
+
     fn render_decimal(input: Option<(u32, u32)>) -> String {
         match input {
             None => "".to_string(),
@@ -467,7 +481,6 @@ fn escape_string_literal(s: &str) -> Cow<'_, str> {
 }
 
 fn render_alter_column(
-    renderer: &PostgresFlavour,
     columns: &Pair<ColumnWalker<'_>>,
     column_changes: &ColumnChanges,
     before_statements: &mut Vec<String>,
@@ -527,10 +540,8 @@ fn render_alter_column(
                 ));
 
                 after_statements.push(format!(
-                    //todo we should probably get rid of the schema here?
-                    "ALTER SEQUENCE {sequence_name} OWNED BY {schema_name}.{table_name}.{column_name}",
+                    "ALTER SEQUENCE {sequence_name} OWNED BY {table_name}.{column_name}",
                     sequence_name = Quoted::postgres_ident(sequence_name),
-                    schema_name = Quoted::postgres_ident(renderer.url.schema()),
                     table_name = table_name,
                     column_name = column_name,
                 ));

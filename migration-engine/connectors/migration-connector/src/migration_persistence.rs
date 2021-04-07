@@ -1,5 +1,4 @@
 use crate::{checksum, ConnectorError, ConnectorResult};
-use serde::Deserialize;
 
 /// A timestamp.
 pub type Timestamp = chrono::DateTime<chrono::Utc>;
@@ -84,7 +83,7 @@ impl PersistenceNotInitializedError {
 }
 
 /// An applied migration, as returned by list_migrations.
-#[derive(Debug, PartialEq, Deserialize)]
+#[derive(Debug)]
 pub struct MigrationRecord {
     /// A unique, randomly generated identifier.
     pub id: String,

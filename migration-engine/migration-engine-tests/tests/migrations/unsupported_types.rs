@@ -164,7 +164,7 @@ async fn adding_and_removing_properties_on_unsupported_should_work(api: &TestApi
         }
     "#;
 
-    api.schema_push(dm2).force(true).send().await?.assert_warnings(&["The migration will add a unique constraint covering the columns `[user_ip]` on the table `Post`. If there are existing duplicate values, the migration will fail.".into()])?;
+    api.schema_push(dm2).force(true).send().await?.assert_warnings(&["A unique constraint covering the columns `[user_ip]` on the table `Post` will be added. If there are existing duplicate values, this will fail.".into()])?;
 
     api.assert_schema().await?.assert_table("Post", |table| {
         table

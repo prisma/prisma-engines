@@ -17,17 +17,31 @@ use std::sync::atomic::{AtomicU8, Ordering};
 use url::Url;
 
 const ADVISORY_LOCK_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(10);
+static QUALIFIED_NAME_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"`[^ ]+`\.`[^ ]+`"#).unwrap());
 
-#[derive(Debug)]
 pub(crate) struct MysqlFlavour {
-    pub(super) url: MysqlUrl,
+    url: MysqlUrl,
     /// See the [Circumstances] enum.
-    pub(super) circumstances: AtomicU8,
+    circumstances: AtomicU8,
     /// Relevant features enabled in the schema,
-    pub(super) features: BitFlags<MigrationFeature>,
+    features: BitFlags<MigrationFeature>,
+}
+
+impl std::fmt::Debug for MysqlFlavour {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("MysqlFlavour").field("url", &"<REDACTED>").finish()
+    }
 }
 
 impl MysqlFlavour {
+    pub(crate) fn new(url: MysqlUrl, features: BitFlags<MigrationFeature>) -> Self {
+        MysqlFlavour {
+            url,
+            circumstances: Default::default(),
+            features,
+        }
+    }
+
     pub(crate) fn is_mariadb(&self) -> bool {
         BitFlags::<Circumstances>::from_bits(self.circumstances.load(Ordering::Relaxed))
             .unwrap_or_default()
@@ -268,8 +282,6 @@ impl SqlFlavour for MysqlFlavour {
     }
 
     fn scan_migration_script(&self, script: &str) {
-        static QUALIFIED_NAME_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"`[^ ]`.``"#).unwrap());
-
         for capture in QUALIFIED_NAME_RE
             .captures_iter(script)
             .filter_map(|captures| captures.get(0))
@@ -354,4 +366,36 @@ fn check_datamodel_for_mysql_5_6(datamodel: &Datamodel, errors: &mut Vec<String>
             ))
         }
     });
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn debug_impl_does_not_leak_connection_info() {
+        let url = "mysql://myname:mypassword@myserver:8765/mydbname";
+
+        let flavour = MysqlFlavour::new(MysqlUrl::new(url.parse().unwrap()).unwrap(), BitFlags::default());
+        let debugged = format!("{:?}", flavour);
+
+        let words = &["myname", "mypassword", "myserver", "8765", "mydbname"];
+
+        for word in words {
+            assert!(!debugged.contains(word));
+        }
+    }
+
+    #[test]
+    fn qualified_name_re_matches_as_expected() {
+        let should_match = r#"ALTER TABLE `mydb`.`cat` DROP PRIMARY KEY"#;
+        let should_not_match = r#"ALTER TABLE `cat` ADD FOREIGN KEY (`ab`, cd`) REFERENCES `dog`(`id`)"#;
+
+        assert!(
+            QUALIFIED_NAME_RE.is_match_at(should_match, 12),
+            "captures: {:?}",
+            QUALIFIED_NAME_RE.captures(should_match)
+        );
+        assert!(!QUALIFIED_NAME_RE.is_match(should_not_match));
+    }
 }

@@ -32,7 +32,6 @@ features = [
   "mysql",
   "mssql",
   "bigdecimal",
-  "serde-support"
 ]
 git = "https://github.com/prisma/quaint"
 

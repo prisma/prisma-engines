@@ -34,6 +34,7 @@ pub(crate) fn group_by_output_object_type(ctx: &mut BuilderContext, model: &Mode
                 obj.add_field(field("_all", vec![], OutputType::int(), None));
                 obj
             },
+            true,
         ),
     );
 
@@ -46,6 +47,7 @@ pub(crate) fn group_by_output_object_type(ctx: &mut BuilderContext, model: &Mode
             numeric_fields.clone(),
             field_avg_output_type,
             identity,
+            false,
         ),
     );
 
@@ -58,6 +60,7 @@ pub(crate) fn group_by_output_object_type(ctx: &mut BuilderContext, model: &Mode
             numeric_fields,
             map_scalar_output_type_for_field,
             identity,
+            false,
         ),
     );
 
@@ -70,6 +73,7 @@ pub(crate) fn group_by_output_object_type(ctx: &mut BuilderContext, model: &Mode
             non_list_nor_json_fields.clone(),
             map_scalar_output_type_for_field,
             identity,
+            false,
         ),
     );
 
@@ -82,6 +86,7 @@ pub(crate) fn group_by_output_object_type(ctx: &mut BuilderContext, model: &Mode
             non_list_nor_json_fields,
             map_scalar_output_type_for_field,
             identity,
+            false,
         ),
     );
 

@@ -1,11 +1,8 @@
-use crate::{error::quaint_error_to_connector_error, SqlMigrationConnector};
+use crate::SqlMigrationConnector;
 use migration_connector::{
     ConnectorError, ConnectorResult, MigrationPersistence, MigrationRecord, PersistenceNotInitializedError,
 };
-use quaint::{
-    ast::*,
-    error::{ErrorKind as QuaintKind, Name},
-};
+use quaint::{ast::*, error::ErrorKind as QuaintKind};
 use uuid::Uuid;
 
 #[async_trait::async_trait]
@@ -138,16 +135,43 @@ impl MigrationPersistence for SqlMigrationConnector {
             .column("applied_steps_count")
             .order_by("started_at".ascend());
 
-        let result = match self.conn().query(select).await {
+        let rows = match self.conn().query(select).await {
             Ok(result) => result,
-            Err(err) if matches!(err.kind(), QuaintKind::TableDoesNotExist { table: Name::Available(table) } if table.contains(self.flavour().migrations_table_name())) => {
+            Err(err) if matches!(err.kind(), QuaintKind::TableDoesNotExist { .. }) => {
                 return Ok(Err(PersistenceNotInitializedError))
             }
             err @ Err(_) => err?,
         };
 
-        let rows = quaint::serde::from_rows(result)
-            .map_err(|err| quaint_error_to_connector_error(err, self.connection.connection_info()))?;
+        let rows = rows
+            .into_iter()
+            .map(|row| -> ConnectorResult<_> {
+                Ok(MigrationRecord {
+                    id: row.get("id").and_then(|v| v.to_string()).ok_or_else(|| {
+                        ConnectorError::from_msg("Failed to extract `id` from `_prisma_migrations` row.".into())
+                    })?,
+                    checksum: row.get("checksum").and_then(|v| v.to_string()).ok_or_else(|| {
+                        ConnectorError::from_msg("Failed to extract `checksum` from `_prisma_migrations` row.".into())
+                    })?,
+                    finished_at: row.get("finished_at").and_then(|v| v.as_datetime()),
+                    migration_name: row.get("migration_name").and_then(|v| v.to_string()).ok_or_else(|| {
+                        ConnectorError::from_msg(
+                            "Failed to extract `migration_name` from `_prisma_migrations` row.".into(),
+                        )
+                    })?,
+                    logs: None,
+                    rolled_back_at: row.get("rolled_back_at").and_then(|v| v.as_datetime()),
+                    started_at: row.get("started_at").and_then(|v| v.as_datetime()).ok_or_else(|| {
+                        ConnectorError::from_msg("Failed to extract `started_at` from `_prisma_migrations` row.".into())
+                    })?,
+                    applied_steps_count: row.get("applied_steps_count").and_then(|v| v.as_i64()).ok_or_else(|| {
+                        ConnectorError::from_msg(
+                            "Failed to extract `applied_steps_count` from `_prisma_migrations` row.".into(),
+                        )
+                    })? as u32,
+                })
+            })
+            .collect::<Result<Vec<_>, _>>()?;
 
         tracing::debug!("Found {} migrations in the migrations table.", rows.len());
 

@@ -1,6 +1,5 @@
 use migration_engine_tests::sql::*;
 use quaint::prelude::Queryable;
-use std::borrow::Cow;
 
 #[test_each_connector(tags("sql"))]
 async fn creating_tables_without_primary_key_must_work(api: &TestApi) -> TestResult {
@@ -135,26 +134,18 @@ async fn enum_value_with_database_names_must_work(api: &TestApi) -> TestResult {
     "##;
 
     if api.is_mysql() {
-        api.schema_push(dm).force(true).send().await?.assert_warnings(&["The migration will remove the values [hongry] on the enum `Cat_mood`. If these variants are still used in the database, the migration will fail.".into()])?;
+        api.schema_push(dm).force(true).send().await?.assert_warnings(&["The values [hongry] on the enum `Cat_mood` will be removed. If these variants are still used in the database, this will fail.".into()])?;
         api.assert_schema()
             .await?
             .assert_enum("Cat_mood", |enm| enm.assert_values(&["ANGRY", "hongery"]))?;
     } else {
-        api.schema_push(dm).force(true).send().await?.assert_warnings(&["The migration will remove the values [hongry] on the enum `CatMood`. If these variants are still used in the database, the migration will fail.".into()])?;
+        api.schema_push(dm).force(true).send().await?.assert_warnings(&["The values [hongry] on the enum `CatMood` will be removed. If these variants are still used in the database, this will fail.".into()])?;
         api.assert_schema()
             .await?
             .assert_enum("CatMood", |enm| enm.assert_values(&["ANGRY", "hongery"]))?;
     }
 
     Ok(())
-}
-
-#[derive(serde::Deserialize, Debug, PartialEq)]
-struct Cat<'a> {
-    id: Cow<'a, str>,
-    mood: Cow<'a, str>,
-    #[serde(rename = "previousMood")]
-    previous_mood: Cow<'a, str>,
 }
 
 #[test_each_connector(capabilities("enums"), tags("sql"))]
@@ -181,7 +172,7 @@ async fn enum_defaults_must_work(api: &TestApi) -> TestResult {
     let insert = quaint::ast::Insert::single_into(api.render_table_name("Cat")).value("id", "the-id");
     api.database().execute(insert.into()).await?;
 
-    let record = api
+    let row = api
         .database()
         .query(
             quaint::ast::Select::from_table(api.render_table_name("Cat"))
@@ -190,17 +181,26 @@ async fn enum_defaults_must_work(api: &TestApi) -> TestResult {
                 .column("previousMood")
                 .into(),
         )
-        .await?;
+        .await?
+        .into_single()?;
 
-    let cat: Cat = quaint::serde::from_row(record.into_single()?)?;
-
-    let expected_cat = Cat {
-        id: "the-id".into(),
-        mood: "hongry".into(),
-        previous_mood: "ANGRY".into(),
-    };
-
-    assert_eq!(cat, expected_cat);
+    assert_eq!(row.get("id").unwrap().to_string().unwrap(), "the-id");
+    assert_eq!(
+        match row.get("mood").unwrap() {
+            quaint::Value::Enum(Some(enm)) => enm.as_ref(),
+            quaint::Value::Text(Some(enm)) => enm.as_ref(),
+            _ => panic!("mood is not an enum value"),
+        },
+        "hongry"
+    );
+    assert_eq!(
+        match row.get("previousMood").unwrap() {
+            quaint::Value::Enum(Some(enm)) => enm.as_ref(),
+            quaint::Value::Text(Some(enm)) => enm.as_ref(),
+            _ => panic!("previousMood is not an enum value"),
+        },
+        "ANGRY"
+    );
 
     Ok(())
 }
@@ -379,7 +379,7 @@ async fn dropping_mutually_referencing_tables_works(api: &TestApi) -> TestResult
         c_id Int
         bc C @relation("BtoC", fields: [c_id], references: [id])
         a  A[] @relation("AtoB")
-        c  C[] @relation("CtoB")  
+        c  C[] @relation("CtoB")
     }
 
     model C {

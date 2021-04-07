@@ -59,13 +59,13 @@ where
                     .expect("a namespace is required to iterate over a nested output type but could not find one");
                 let nested_output_type = find_output_type(dmmf, namespace, field.output_type.typ.as_str());
 
-                iteratee(&field, nested_output_type);
+                iteratee(&field, output_type);
                 iterate_output_type_fields(nested_output_type, dmmf, iteratee)
             }
             TypeLocation::Scalar | TypeLocation::EnumTypes => {
                 iteratee(&field, output_type);
             }
-            _ => (),
+            TypeLocation::InputObjectTypes => panic!("No input object types should be iterated"),
         }
     }
 }
@@ -100,7 +100,7 @@ where
                     TypeLocation::Scalar | TypeLocation::EnumTypes => {
                         iteratee(&input_type_ref, &field, input_type);
                     }
-                    _ => (),
+                    TypeLocation::OutputObjectTypes => panic!("No output object types should be iterated"),
                 }
             }
         }

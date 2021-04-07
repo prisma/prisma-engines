@@ -194,6 +194,13 @@ impl PrismaValue {
         }
     }
 
+    pub fn as_string(&self) -> Option<&str> {
+        match self {
+            PrismaValue::String(s) => Some(s),
+            _ => None,
+        }
+    }
+
     pub fn is_null(&self) -> bool {
         matches!(self, PrismaValue::Null)
     }

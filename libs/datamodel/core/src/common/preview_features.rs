@@ -11,6 +11,7 @@ const CREATE_MANY: &str = "createMany";
 const ORDER_BY_RELATION: &str = "orderByRelation";
 const NAPI: &str = "napi";
 const SELECT_RELATION_COUNT: &str = "selectRelationCount";
+const ORDER_BY_AGGREGATE_GROUP: &str = "orderByAggregateGroup";
 
 // deprecated preview features
 const ATOMIC_NUMBER_OPERATIONS: &str = "atomicNumberOperations";
@@ -23,11 +24,10 @@ pub const DATASOURCE_PREVIEW_FEATURES: &[&str] = &[];
 
 pub const GENERATOR_PREVIEW_FEATURES: &[&str] = &[
     SQL_SERVER,
-    GROUP_BY,
-    CREATE_MANY,
     ORDER_BY_RELATION,
     NAPI,
     SELECT_RELATION_COUNT,
+    ORDER_BY_AGGREGATE_GROUP,
 ];
 
 pub const DEPRECATED_GENERATOR_PREVIEW_FEATURES: &[&str] = &[
@@ -39,6 +39,8 @@ pub const DEPRECATED_GENERATOR_PREVIEW_FEATURES: &[&str] = &[
     CONNECT_OR_CREATE,
     TRANSACTION_API,
     UNCHECKED_SCALAR_INPUTS,
+    GROUP_BY,
+    CREATE_MANY,
 ];
 
 pub const DEPRECATED_DATASOURCE_PREVIEW_FEATURES: &[&str] = &[];

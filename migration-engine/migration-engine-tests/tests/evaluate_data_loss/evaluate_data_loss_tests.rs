@@ -101,7 +101,7 @@ async fn evaluate_data_loss_with_not_up_to_date_db_and_pending_changes_returns_t
     Ok(())
 }
 
-#[test_each_connector(capabilities("enums"), log = "debug,sql_schema_describer=info")]
+#[test_each_connector(capabilities("enums"))]
 async fn evaluate_data_loss_with_past_unapplied_migrations_with_destructive_changes_does_not_warn_for_these(
     api: &TestApi,
 ) -> TestResult {
@@ -138,13 +138,12 @@ async fn evaluate_data_loss_with_past_unapplied_migrations_with_destructive_chan
     api.evaluate_data_loss(&directory, dm2)
         .send()
         .await?
-        .assert_warnings(&[
-            if api.is_mysql() {
-                "The migration will remove the values [PLAYFUL] on the enum `Cat_mood`. If these variants are still used in the database, the migration will fail."
-            } else {
-                "The migration will remove the values [PLAYFUL] on the enum `CatMood`. If these variants are still used in the database, the migration will fail." }
-
-        .into()])?;
+        .assert_warnings(&[if api.is_mysql() {
+        "The values [PLAYFUL] on the enum `Cat_mood` will be removed. If these variants are still used in the database, this will fail."
+    } else {
+        "The values [PLAYFUL] on the enum `CatMood` will be removed. If these variants are still used in the database, this will fail."
+    }
+    .into()])?;
 
     api.create_migration("2-remove-value", dm2, &directory).send().await?;
 
@@ -176,7 +175,7 @@ async fn evaluate_data_loss_with_past_unapplied_migrations_with_destructive_chan
     Ok(())
 }
 
-#[test_each_connector(log = "debug,sql_schema_describer=info")]
+#[test_each_connector]
 async fn evaluate_data_loss_returns_warnings_for_the_local_database_for_the_next_migration(
     api: &TestApi,
 ) -> TestResult {
@@ -221,7 +220,7 @@ async fn evaluate_data_loss_returns_warnings_for_the_local_database_for_the_next
         .await?
         .assert_warnings(&["You are about to drop the `Cat` table, which is not empty (1 rows).".into()])?
         .assert_unexecutable(&[
-            "Added the required column `fluffiness` to the `Dog` table without a default value. There are 1 rows in this table, it is not possible to execute this migration.".into()
+            "Added the required column `fluffiness` to the `Dog` table without a default value. There are 1 rows in this table, it is not possible to execute this step.".into()
         ])?
         .assert_steps_count(2)?;
 
@@ -284,7 +283,7 @@ async fn evaluate_data_loss_maps_warnings_to_the_right_steps(api: &TestApi) -> T
         .await?
         .assert_warnings_with_indices(&[("You are about to drop the column `name` on the `Cat` table, which still contains 1 non-null values.".into(), if api.is_postgres() { 1 } else { 0 })])?
         .assert_unexecutables_with_indices(&[
-            ("Added the required column `isGoodDog` to the `Dog` table without a default value. There are 1 rows in this table, it is not possible to execute this migration.".into(), if api.is_postgres() { 2 } else { 1 }),
+            ("Added the required column `isGoodDog` to the `Dog` table without a default value. There are 1 rows in this table, it is not possible to execute this step.".into(), if api.is_postgres() { 2 } else { 1 }),
         ])?;
 
     Ok(())

@@ -38,7 +38,7 @@ class MaxAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     )
   }
 
-  "Calculating min with no records in the database" should "return zero" in {
+  "Calculating min with no records in the database" should "return null" in {
     val result = server.query(
       s"""{
          |  aggregateItem {
@@ -54,11 +54,11 @@ class MaxAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       project
     )
 
-    result.pathAsFloat("data.aggregateItem.max.float") should be(0.0)
-    result.pathAsString("data.aggregateItem.max.dec") should be("0")
+    result.pathAsJsValue("data.aggregateItem.max.float") should be(JsNull)
+    result.pathAsJsValue("data.aggregateItem.max.dec") should be(JsNull)
 
-    result.pathAsInt("data.aggregateItem.max.int") should be(0)
-    result.pathAsString("data.aggregateItem.max.bInt") should be("0")
+    result.pathAsJsValue("data.aggregateItem.max.int") should be(JsNull)
+    result.pathAsJsValue("data.aggregateItem.max.bInt") should be(JsNull)
 
     result.pathAsJsValue("data.aggregateItem.max.s") should be(JsNull)
   }
