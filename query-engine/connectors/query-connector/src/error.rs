@@ -189,6 +189,9 @@ pub enum ErrorKind {
         actual
     )]
     IncorrectNumberOfParameters { expected: usize, actual: usize },
+
+    #[error("Server terminated the connection.")]
+    ConnectionClosed,
 }
 
 impl From<DomainError> for ConnectorError {
