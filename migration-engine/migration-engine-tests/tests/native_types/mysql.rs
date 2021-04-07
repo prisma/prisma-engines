@@ -831,7 +831,7 @@ async fn risky_casts_with_existing_data_should_warn(api: &TestApi) -> TestResult
         warnings.clear();
 
         for (idx, to_type) in to_types.iter().enumerate() {
-            let table = if api.lower_case_identifiers() { "test" } else { "Test" };
+            let table = api.normalize_identifier("Test");
 
             warnings.push(format!(
                 "You are about to alter the column `{column_name}` on the `{table}` table, which contains 1 non-null values. The data in that column will be cast from `{from}` to `{to}`.",
@@ -900,7 +900,7 @@ async fn impossible_casts_with_existing_data_should_warn(api: &TestApi) -> TestR
         warnings.clear();
 
         for (idx, _to_type) in to_types.iter().enumerate() {
-            let table = if api.lower_case_identifiers() { "test" } else { "Test" };
+            let table = api.normalize_identifier("Test");
 
             warnings.push(format!(
                 "The `{column_name}` column on the `{table}` table would be dropped and recreated. This will lead to data loss.",

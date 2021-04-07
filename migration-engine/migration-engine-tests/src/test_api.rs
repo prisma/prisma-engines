@@ -31,7 +31,7 @@ use quaint::{
 };
 use sql_migration_connector::SqlMigrationConnector;
 use sql_schema_describer::SqlSchema;
-use std::fmt::Write as _;
+use std::{borrow::Cow, fmt::Write as _};
 use tempfile::TempDir;
 use test_setup::{create_mysql_database, create_postgres_database, Features, TestApiArgs};
 
@@ -326,6 +326,14 @@ impl TestApi {
         out.push_str(schema);
 
         out
+    }
+
+    pub fn normalize_identifier<'a>(&self, identifier: &'a str) -> Cow<'a, str> {
+        if self.lower_case_identifiers() {
+            identifier.to_ascii_lowercase().into()
+        } else {
+            identifier.into()
+        }
     }
 }
 

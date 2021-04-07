@@ -30,11 +30,10 @@ async fn dropping_a_table_with_rows_should_warn(api: &TestApi) -> TestResult {
 
     let dm = "";
 
-    let warn = if api.lower_case_identifiers() {
-        "You are about to drop the `test` table, which is not empty (1 rows)."
-    } else {
-        "You are about to drop the `Test` table, which is not empty (1 rows)."
-    };
+    let warn = format!(
+        "You are about to drop the `{}` table, which is not empty (1 rows).",
+        api.normalize_identifier("Test")
+    );
 
     api.schema_push(dm).send().await?.assert_warnings(&[warn.into()])?;
 
@@ -71,11 +70,10 @@ async fn dropping_a_column_with_non_null_values_should_warn(api: &TestApi) -> Te
             }
         "#;
 
-    let warn = if api.lower_case_identifiers() {
-        "You are about to drop the column `puppiesCount` on the `test` table, which still contains 2 non-null values."
-    } else {
-        "You are about to drop the column `puppiesCount` on the `Test` table, which still contains 2 non-null values."
-    };
+    let warn = format!(
+        "You are about to drop the column `puppiesCount` on the `{}` table, which still contains 2 non-null values.",
+        api.normalize_identifier("Test")
+    );
 
     api.schema_push(dm).send().await?.assert_warnings(&[warn.into()])?;
 
@@ -366,11 +364,9 @@ async fn changing_a_column_from_optional_to_required_is_unexecutable(api: &TestA
         }
     "#;
 
-    let table = if api.lower_case_identifiers() { "test" } else { "Test" };
-
     let error = format!(
         "Made the column `age` on table `{}` required, but there are 1 existing NULL values.",
-        table
+        api.normalize_identifier("Test")
     );
 
     api.schema_push(dm2)
@@ -652,18 +648,12 @@ async fn enum_variants_can_be_added_without_data_loss(api: &TestApi) -> TestResu
         assert_eq!(human_data, expected_human_data);
 
         if api.sql_family().is_mysql() {
-            let (cat, hum) = if api.lower_case_identifiers() {
-                ("cat_mood", "human_mood")
-            } else {
-                ("Cat_mood", "Human_mood")
-            };
-
             api.assert_schema()
                 .await?
-                .assert_enum(cat, |enm| {
+                .assert_enum(&api.normalize_identifier("Cat_mod"), |enm| {
                     enm.assert_values(&["HAPPY", "HUNGRY", "ABSOLUTELY_FABULOUS"])
                 })?
-                .assert_enum(hum, |enm| {
+                .assert_enum(&api.normalize_identifier("Human_mood"), |enm| {
                     enm.assert_values(&["HAPPY", "HUNGRY", "ABSOLUTELY_FABULOUS"])
                 })?;
         } else {
@@ -773,16 +763,14 @@ async fn enum_variants_can_be_dropped_without_data_loss(api: &TestApi) -> TestRe
         assert_eq!(human_data, expected_human_data);
 
         if api.sql_family().is_mysql() {
-            let (c, h) = if api.lower_case_identifiers() {
-                ("cat_mood", "human_mood")
-            } else {
-                ("Cat_mood", "Human_mood")
-            };
-
             api.assert_schema()
                 .await?
-                .assert_enum(c, |enm| enm.assert_values(&["HAPPY", "HUNGRY"]))?
-                .assert_enum(h, |enm| enm.assert_values(&["HAPPY", "HUNGRY"]))?;
+                .assert_enum(&api.normalize_identifier("Cat_mood"), |enm| {
+                    enm.assert_values(&["HAPPY", "HUNGRY"])
+                })?
+                .assert_enum(&api.normalize_identifier("Human_mood"), |enm| {
+                    enm.assert_values(&["HAPPY", "HUNGRY"])
+                })?;
         } else {
             api.assert_schema()
                 .await?
@@ -885,11 +873,10 @@ async fn primary_key_migrations_do_not_cause_data_loss(api: &TestApi) -> TestRes
         }
     "#;
 
-    let warn = if api.lower_case_identifiers() {
-        "The primary key for the `dog` table will be changed. If it partially fails, the table could be left without primary key constraint."
-    } else {
-        "The primary key for the `Dog` table will be changed. If it partially fails, the table could be left without primary key constraint."
-    };
+    let warn = format!(
+        "The primary key for the `{}` table will be changed. If it partially fails, the table could be left without primary key constraint.",
+        api.normalize_identifier("Dog"),
+    );
 
     api.schema_push(dm2)
         .force(true)
