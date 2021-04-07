@@ -15,8 +15,8 @@ jobs:
           - 33577:33577
         env:
           PORT: 33574
-          KEYSPACES: apply_migrations_with_an_empty_migrations_folder_works,applying_a_single_migration_should_work,applying_two_migrations_works,migrations_should_fail_when_the_script_is_invalid,migrations_should_not_reapply_modified_migrations,migrations_should_fail_on_an_uninitialized_nonempty_database,migrations_should_succeed_on_an_uninitialized_nonempty_database_with_postgis_tables,basic_create_migration_works
-          NUM_SHARDS: 1,1,1,1,1,1,1,1
+          KEYSPACES: apply_migrations_with_an_empty_migrations_folder_works,applying_a_single_migration_should_work,applying_two_migrations_works,migrations_should_fail_when_the_script_is_invalid,migrations_should_not_reapply_modified_migrations,migrations_should_fail_on_an_uninitialized_nonempty_database,migrations_should_succeed_on_an_uninitialized_nonempty_database_with_postgis_tables
+          NUM_SHARDS: 1,1,1,1,1,1,1
           MYSQL_BIND_HOST: "0.0.0.0"
         options: --health-cmd="mysqladmin ping -h127.0.0.1 -P33577" --health-interval=5s --health-timeout=2s --health-retries=20
 
