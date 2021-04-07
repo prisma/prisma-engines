@@ -153,6 +153,14 @@ fn url_from_env(env_var: &str, db: TestDb<'_>) -> Option<String> {
     })
 }
 
+fn jdbc_from_env(env_var: &str, schema: &str) -> Option<String> {
+    std::env::var(env_var).ok().and_then(|url| {
+        let mut conn_str = JdbcString::from_str(&url).ok()?;
+        conn_str.properties_mut().insert("schema".into(), schema.into());
+        Some(conn_str.to_string())
+    })
+}
+
 pub fn postgres_9_url(db_name: &str) -> String {
     url_from_env("POSTGRES_9_TEST_URL", TestDb::Schema(db_name)).unwrap_or_else(|| {
         let (host, port) = db_host_and_port_postgres_9();
@@ -283,7 +291,7 @@ pub fn mariadb_url(db_name: &str) -> String {
 }
 
 pub fn mssql_2017_url(schema_name: &str) -> String {
-    url_from_env("MSSQL_2017_TEST_URL", TestDb::Schema(schema_name)).unwrap_or_else(|| {
+    jdbc_from_env("MSSQL_2017_TEST_URL", schema_name).unwrap_or_else(|| {
         let (host, port) = db_host_mssql_2017();
 
         format!(
@@ -296,7 +304,7 @@ pub fn mssql_2017_url(schema_name: &str) -> String {
 }
 
 pub fn mssql_2019_url(schema_name: &str) -> String {
-    url_from_env("MSSQL_2019_TEST_URL", TestDb::Schema(schema_name)).unwrap_or_else(|| {
+    jdbc_from_env("MSSQL_2019_TEST_URL", schema_name).unwrap_or_else(|| {
         let (host, port) = db_host_and_port_mssql_2019();
 
         format!(
