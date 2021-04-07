@@ -219,7 +219,7 @@ impl SqlSchemaDescriber {
                 info.udt_name as full_data_type,
                 info.column_default,
                 info.is_nullable,
-                info.is_identity,
+                'NO' AS is_identity,
                 info.data_type,
                 info.character_maximum_length
             FROM information_schema.columns info
