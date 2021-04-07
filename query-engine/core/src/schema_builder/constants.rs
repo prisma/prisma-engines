@@ -99,10 +99,15 @@ pub mod inputs {
 
         // aggregation filters
         pub const COUNT: &str = "count";
+        pub const UNDERSCORE_COUNT: &str = "_count";
         pub const AVG: &str = "avg";
+        pub const UNDERSCORE_AVG: &str = "_avg";
         pub const SUM: &str = "sum";
+        pub const UNDERSCORE_SUM: &str = "_sum";
         pub const MIN: &str = "min";
+        pub const UNDERSCORE_MIN: &str = "_min";
         pub const MAX: &str = "max";
+        pub const UNDERSCORE_MAX: &str = "_max";
     }
 
     pub mod ordering {

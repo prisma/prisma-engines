@@ -2987,7 +2987,7 @@ dependencies = [
 [[package]]
 name = "postgres-native-tls"
 version = "0.5.0"
-source = "git+https://github.com/pimeys/rust-postgres?branch=pgbouncer-mode#e3cef429e94721ec9ec53c539e3cff5a4f45ebda"
+source = "git+https://github.com/pimeys/rust-postgres?branch=pgbouncer-mode#8a61d46905571ff2b530b204dfa7c56ccbace7f4"
 dependencies = [
  "futures 0.3.13",
  "native-tls",
@@ -2998,8 +2998,8 @@ dependencies = [
 
 [[package]]
 name = "postgres-protocol"
-version = "0.6.0"
-source = "git+https://github.com/pimeys/rust-postgres?branch=pgbouncer-mode#e3cef429e94721ec9ec53c539e3cff5a4f45ebda"
+version = "0.6.1"
+source = "git+https://github.com/pimeys/rust-postgres?branch=pgbouncer-mode#8a61d46905571ff2b530b204dfa7c56ccbace7f4"
 dependencies = [
  "base64 0.13.0",
  "byteorder",
@@ -3015,8 +3015,8 @@ dependencies = [
 
 [[package]]
 name = "postgres-types"
-version = "0.2.0"
-source = "git+https://github.com/pimeys/rust-postgres?branch=pgbouncer-mode#e3cef429e94721ec9ec53c539e3cff5a4f45ebda"
+version = "0.2.1"
+source = "git+https://github.com/pimeys/rust-postgres?branch=pgbouncer-mode#8a61d46905571ff2b530b204dfa7c56ccbace7f4"
 dependencies = [
  "bit-vec",
  "bytes 1.0.1",
@@ -3238,7 +3238,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.13"
-source = "git+https://github.com/prisma/quaint#af5feffdab559be7d9a709e21d1115c4e2a5c811"
+source = "git+https://github.com/prisma/quaint#f0bd031e2989651e110c1c12e64bd0133e99e41a"
 dependencies = [
  "async-trait",
  "base64 0.12.3",
@@ -3895,7 +3895,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e0bccbcf40c8938196944a3da0e133e031a33f4d6b72db3bda3cc556e361905d"
 dependencies = [
  "lazy_static",
- "parking_lot 0.11.1",
+ "parking_lot 0.10.2",
  "serial_test_derive",
 ]
 
@@ -4599,8 +4599,8 @@ dependencies = [
 
 [[package]]
 name = "tokio-postgres"
-version = "0.7.0"
-source = "git+https://github.com/pimeys/rust-postgres?branch=pgbouncer-mode#e3cef429e94721ec9ec53c539e3cff5a4f45ebda"
+version = "0.7.1"
+source = "git+https://github.com/pimeys/rust-postgres?branch=pgbouncer-mode#8a61d46905571ff2b530b204dfa7c56ccbace7f4"
 dependencies = [
  "async-trait",
  "byteorder",
@@ -4614,7 +4614,7 @@ dependencies = [
  "pin-project-lite 0.2.6",
  "postgres-protocol",
  "postgres-types",
- "socket2 0.3.19",
+ "socket2 0.4.0",
  "tokio",
  "tokio-util",
 ]
