@@ -138,7 +138,7 @@ services:
       - databases
     tmpfs: /var/lib/mysql8
 
-  test-db-mariadb-10-0:
+  test-db-mariadb:
     image: mariadb:10
     restart: always
     environment:
