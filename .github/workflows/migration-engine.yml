@@ -1,6 +1,9 @@
-name: Migration Engine
+name: Cargo tests
 on:
   push:
+    branches:
+      - master
+  pull_request:
 
 jobs:
 
@@ -12,7 +15,7 @@ jobs:
       
       - uses: actions-rs/toolchain@v1
         with:
-          toolchain: 1.48.0
+          toolchain: stable
           default: true
 
       - uses: actions/cache@v2
@@ -32,18 +35,30 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        database: [mssql_2017, mssql_2019, mysql_5_6, mysql_5_7, mysql_8, mysql_mariadb, postgres9, postgres10, postgres11, postgres12, postgres13, sqlite]
+        database:
+          - mssql_2017
+          - mssql_2019
+          - mysql_5_6
+          - mysql_5_7
+          - mysql_8
+          - mysql_mariadb
+          - postgres9
+          - postgres10
+          - postgres11
+          - postgres12
+          - postgres13
+          - sqlite
         
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
 
-      - name: "Start databases"
-        run: docker-compose up -d
+      - name: "Start ${{ matrix.database }} database"
+        run: make dev-${{ matrix.database }}
       
       - uses: actions-rs/toolchain@v1
         with:
-          toolchain: 1.48.0
+          toolchain: stable
           default: true
 
       - uses: actions/cache@v2
