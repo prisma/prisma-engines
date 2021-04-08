@@ -84,5 +84,8 @@ jobs:
       - name: Install ${{ matrix.db }}
         run: choco install ${{ matrix.db }}
 
+      - name: Output running database 
+        run: mysql -h localhost -P 3306 -u root -e "SELECT @@version;"
+        
       - name: Run tests
         run: cargo test -p migration-engine-tests ${{ matrix.db == 'mysql' && 'mysql_8' || 'mariadb' }}
