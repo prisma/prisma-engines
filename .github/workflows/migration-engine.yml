@@ -32,7 +32,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        database: [mssql_2017, mssql_2019, mysql_5_6, mysql, mysql_8, mysql_mariadb, postgres9, postgres10, postgres11, postgres12, postgres13, sqlite]
+        database: [mssql_2017, mssql_2019, mysql_5_6, mysql_5_7, mysql_8, mysql_mariadb, postgres9, postgres10, postgres11, postgres12, postgres13, sqlite]
         
     runs-on: ubuntu-latest
     steps:
