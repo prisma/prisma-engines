@@ -14,8 +14,11 @@ pub mod runtime;
 /// The built-in connectors database.
 pub mod connectors;
 
+use std::{borrow::Cow, collections::BTreeMap, str::FromStr};
+
 pub use crate::connectors::Features;
 use crate::connectors::Tags;
+use connection_string::JdbcString;
 use enumflags2::BitFlags;
 use once_cell::sync::Lazy;
 use quaint::{prelude::Queryable, single::Quaint};
@@ -58,7 +61,7 @@ test_api_constructors!(
     (mssql_2017, "sqlserver"),
     (mssql_2019, "sqlserver"),
     (mysql_5_6, "mysql"),
-    (mysql, "mysql"),
+    (mysql_5_7, "mysql"),
     (mysql_8, "mysql"),
     (mysql_mariadb, "mysql"),
     (postgres9, "postgresql"),
@@ -80,31 +83,14 @@ impl TestApiArgs {
 }
 
 mod urls {
-    use super::SCHEMA_NAME;
-
-    fn db_host_and_port_postgres_11() -> (&'static str, usize) {
-        match std::env::var("IS_BUILDKITE") {
-            Ok(_) => ("test-db-postgres-11", 5432),
-            Err(_) => ("127.0.0.1", 5433),
-        }
-    }
-
-    pub fn postgres11(db_name: &str) -> String {
-        let (host, port) = db_host_and_port_postgres_11();
-
-        format!(
-            "postgresql://postgres:prisma@{}:{}/{}?schema={}&statement_cache_size=0&socket_timeout=60",
-            host, port, db_name, SCHEMA_NAME
-        )
-    }
-
     pub use super::mariadb_url as mysql_mariadb;
     pub use super::mssql_2017_url as mssql_2017;
     pub use super::mssql_2019_url as mssql_2019;
     pub use super::mysql_5_6_url as mysql_5_6;
+    pub use super::mysql_5_7_url as mysql_5_7;
     pub use super::mysql_8_url as mysql_8;
-    pub use super::mysql_url as mysql;
     pub use super::postgres_10_url as postgres10;
+    pub use super::postgres_11_url as postgres11;
     pub use super::postgres_12_url as postgres12;
     pub use super::postgres_13_url as postgres13;
     pub use super::postgres_9_url as postgres9;
@@ -112,7 +98,7 @@ mod urls {
 }
 
 pub fn sqlite_test_url(db_name: &str) -> String {
-    format!("file:{}", sqlite_test_file(db_name))
+    std::env::var("SQLITE_TEST_URL").unwrap_or_else(|_| format!("file:{}", sqlite_test_file(db_name)))
 }
 
 pub fn sqlite_test_file(db_name: &str) -> String {
@@ -137,202 +123,442 @@ pub fn sqlite_test_file(db_name: &str) -> String {
     file_path.to_string_lossy().into_owned()
 }
 
-pub fn postgres_9_url(db_name: &str) -> String {
-    let (host, port) = db_host_and_port_postgres_9();
+enum TestDb<'a> {
+    Schema(&'a str),
+    Database(&'a str),
+}
 
-    format!(
-        "postgresql://postgres:prisma@{}:{}/{}?schema={}&statement_cache_size=0&socket_timeout=60",
-        host, port, db_name, SCHEMA_NAME
-    )
+fn url_from_env(env_var: &str, db: TestDb<'_>) -> Option<String> {
+    std::env::var(env_var).ok().map(|url| {
+        let mut url = Url::parse(&url).unwrap();
+
+        match db {
+            TestDb::Schema(schema) => {
+                let mut params: BTreeMap<String, String> =
+                    url.query_pairs().map(|(k, v)| (k.to_string(), v.to_string())).collect();
+
+                params.insert("schema".into(), schema.into());
+                url.query_pairs_mut().clear();
+
+                for (k, v) in params.into_iter() {
+                    url.query_pairs_mut().append_pair(&k, &v);
+                }
+            }
+            TestDb::Database(db) => {
+                url.set_path(db);
+            }
+        }
+
+        url.to_string()
+    })
+}
+
+fn jdbc_from_env(env_var: &str, schema: &str) -> Option<String> {
+    std::env::var(env_var).ok().and_then(|url| {
+        let mut conn_str = JdbcString::from_str(&url).ok()?;
+        conn_str.properties_mut().insert("schema".into(), schema.into());
+        Some(conn_str.to_string())
+    })
+}
+
+pub fn postgres_9_url(db_name: &str) -> String {
+    url_from_env("POSTGRES_9_TEST_URL", TestDb::Schema(db_name)).unwrap_or_else(|| {
+        let (host, port) = db_host_and_port_postgres_9();
+
+        format!(
+            "postgresql://postgres:prisma@{}:{}/{}?schema={}&statement_cache_size=0&socket_timeout=60",
+            host, port, db_name, SCHEMA_NAME
+        )
+    })
 }
 
 pub fn pgbouncer_url(db_name: &str) -> String {
-    let (host, port) = db_host_and_port_for_pgbouncer();
+    url_from_env("PGBOUNCER_TEST_URL", TestDb::Schema(db_name)).unwrap_or_else(|| {
+        let (host, port) = db_host_and_port_for_pgbouncer();
 
-    format!(
-        "postgresql://postgres:prisma@{}:{}/{}?schema={}&pgbouncer=true&socket_timeout=60",
-        host, port, db_name, SCHEMA_NAME
-    )
+        format!(
+            "postgresql://postgres:prisma@{}:{}/{}?schema={}&pgbouncer=true&socket_timeout=60",
+            host, port, db_name, SCHEMA_NAME
+        )
+    })
 }
 
 pub fn postgres_10_url(db_name: &str) -> String {
-    let (host, port) = db_host_and_port_postgres_10();
+    url_from_env("POSTGRES_10_TEST_URL", TestDb::Schema(db_name)).unwrap_or_else(|| {
+        let (host, port) = db_host_and_port_postgres_10();
 
-    format!(
-        "postgresql://postgres:prisma@{}:{}/{}?schema={}&statement_cache_size=0&socket_timeout=60",
-        host, port, db_name, SCHEMA_NAME
-    )
+        format!(
+            "postgresql://postgres:prisma@{}:{}/{}?schema={}&statement_cache_size=0&socket_timeout=60",
+            host, port, db_name, SCHEMA_NAME
+        )
+    })
+}
+
+pub fn postgres_11_url(db_name: &str) -> String {
+    url_from_env("POSTGRES_11_TEST_URL", TestDb::Schema(db_name)).unwrap_or_else(|| {
+        let (host, port) = db_host_and_port_postgres_11();
+
+        format!(
+            "postgresql://postgres:prisma@{}:{}/{}?schema={}&statement_cache_size=0&socket_timeout=60",
+            host, port, db_name, SCHEMA_NAME
+        )
+    })
 }
 
 pub fn postgres_12_url(db_name: &str) -> String {
-    let (host, port) = db_host_and_port_postgres_12();
+    url_from_env("POSTGRES_12_TEST_URL", TestDb::Schema(db_name)).unwrap_or_else(|| {
+        let (host, port) = db_host_and_port_postgres_12();
 
-    format!(
-        "postgresql://postgres:prisma@{}:{}/{}?schema={}&statement_cache_size=0&socket_timeout=60",
-        host, port, db_name, SCHEMA_NAME
-    )
+        format!(
+            "postgresql://postgres:prisma@{}:{}/{}?schema={}&statement_cache_size=0&socket_timeout=60",
+            host, port, db_name, SCHEMA_NAME
+        )
+    })
 }
 
 pub fn postgres_13_url(db_name: &str) -> String {
-    let (host, port) = db_host_and_port_postgres_13();
+    url_from_env("POSTGRES_13_TEST_URL", TestDb::Schema(db_name)).unwrap_or_else(|| {
+        let (host, port) = db_host_and_port_postgres_13();
 
-    format!(
-        "postgresql://postgres:prisma@{}:{}/{}?schema={}&statement_cache_size=0&socket_timeout=60",
-        host, port, db_name, SCHEMA_NAME
-    )
+        format!(
+            "postgresql://postgres:prisma@{}:{}/{}?schema={}&statement_cache_size=0&socket_timeout=60",
+            host, port, db_name, SCHEMA_NAME
+        )
+    })
 }
 
-pub fn mysql_url(db_name: &str) -> String {
-    let db_name = mysql_safe_identifier(db_name);
-    let (host, port) = db_host_and_port_mysql_5_7();
+pub fn mysql_5_7_url(db_name: &str) -> String {
+    url_from_env("MYSQL_5_7_TEST_URL", TestDb::Database(db_name)).unwrap_or_else(|| {
+        let db_name = mysql_safe_identifier(db_name);
+        let (host, port) = db_host_and_port_mysql_5_7();
 
-    format!(
-        "mysql://root:prisma@{host}:{port}/{db_name}?connect_timeout=20&socket_timeout=60",
-        host = host,
-        port = port,
-        db_name = db_name,
-    )
+        format!(
+            "mysql://root:prisma@{host}:{port}/{db_name}?connect_timeout=20&socket_timeout=60",
+            host = host,
+            port = port,
+            db_name = db_name,
+        )
+    })
 }
 
 pub fn mysql_8_url(db_name: &str) -> String {
-    let (host, port) = db_host_and_port_mysql_8_0();
+    url_from_env("MYSQL_8_TEST_URL", TestDb::Database(db_name)).unwrap_or_else(|| {
+        let (host, port) = db_host_and_port_mysql_8_0();
 
-    // maximum length of identifiers on mysql
-    let db_name = mysql_safe_identifier(db_name);
+        // maximum length of identifiers on mysql
+        let db_name = mysql_safe_identifier(db_name);
 
-    format!(
-        "mysql://root:prisma@{host}:{port}{maybe_slash}{db_name}?connect_timeout=20&socket_timeout=60",
-        maybe_slash = if db_name.is_empty() { "" } else { "/" },
-        host = host,
-        port = port,
-        db_name = db_name,
-    )
+        format!(
+            "mysql://root:prisma@{host}:{port}{maybe_slash}{db_name}?connect_timeout=20&socket_timeout=60",
+            maybe_slash = if db_name.is_empty() { "" } else { "/" },
+            host = host,
+            port = port,
+            db_name = db_name,
+        )
+    })
 }
 
 pub fn mysql_5_6_url(db_name: &str) -> String {
-    let (host, port) = db_host_and_port_mysql_5_6();
+    url_from_env("MYSQL_5_6_TEST_URL", TestDb::Database(db_name)).unwrap_or_else(|| {
+        let (host, port) = db_host_and_port_mysql_5_6();
 
-    // maximum length of identifiers on mysql
-    let db_name = mysql_safe_identifier(db_name);
+        // maximum length of identifiers on mysql
+        let db_name = mysql_safe_identifier(db_name);
 
-    format!(
-        "mysql://root:prisma@{host}:{port}/{db_name}?connect_timeout=20&socket_timeout=60",
-        host = host,
-        port = port,
-        db_name = db_name,
-    )
+        format!(
+            "mysql://root:prisma@{host}:{port}/{db_name}?connect_timeout=20&socket_timeout=60",
+            host = host,
+            port = port,
+            db_name = db_name,
+        )
+    })
 }
 
 pub fn mariadb_url(db_name: &str) -> String {
-    let (host, port) = db_host_and_port_mariadb();
+    url_from_env("MARIADB_TEST_URL", TestDb::Database(db_name)).unwrap_or_else(|| {
+        let (host, port) = db_host_and_port_mariadb();
 
-    // maximum length of identifiers on mysql
-    let db_name = mysql_safe_identifier(db_name);
+        // maximum length of identifiers on mysql
+        let db_name = mysql_safe_identifier(db_name);
 
-    format!(
-        "mysql://root:prisma@{host}:{port}/{db_name}?connect_timeout=20&socket_timeout=60",
-        host = host,
-        port = port,
-        db_name = db_name,
-    )
+        format!(
+            "mysql://root:prisma@{host}:{port}/{db_name}?connect_timeout=20&socket_timeout=60",
+            host = host,
+            port = port,
+            db_name = db_name,
+        )
+    })
 }
 
 pub fn mssql_2017_url(schema_name: &str) -> String {
-    let (host, port) = db_host_mssql_2017();
+    jdbc_from_env("MSSQL_2017_TEST_URL", schema_name).unwrap_or_else(|| {
+        let (host, port) = db_host_mssql_2017();
 
-    format!(
-        "sqlserver://{host}:{port};database=master;schema={schema_name};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED",
-        schema_name = schema_name,
-        host = host,
-        port = port,
-    )
+        format!(
+            "sqlserver://{host}:{port};database=master;schema={schema_name};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED",
+            schema_name = schema_name,
+            host = host,
+            port = port,
+        )
+    })
 }
 
 pub fn mssql_2019_url(schema_name: &str) -> String {
-    let (host, port) = db_host_and_port_mssql_2019();
+    jdbc_from_env("MSSQL_2019_TEST_URL", schema_name).unwrap_or_else(|| {
+        let (host, port) = db_host_and_port_mssql_2019();
 
-    format!(
-        "sqlserver://{host}:{port};database=master;schema={schema_name};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED",
-        schema_name = schema_name,
-        host = host,
-        port = port,
-    )
+        format!(
+            "sqlserver://{host}:{port};database=master;schema={schema_name};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED",
+            schema_name = schema_name,
+            host = host,
+            port = port,
+        )
+    })
 }
 
-fn db_host_and_port_postgres_9() -> (&'static str, usize) {
+fn db_host_and_port_postgres_9() -> (Cow<'static, str>, usize) {
+    if let Some(var) = std::env::var("POSTGRES_9_TEST_URL")
+        .ok()
+        .and_then(|s| Url::parse(&s).ok())
+    {
+        let host = var
+            .host()
+            .map(|s| Cow::from(s.to_string()))
+            .unwrap_or_else(|| Cow::from("localhost"));
+
+        let port = var.port().unwrap_or(5432) as usize;
+
+        return (host, port);
+    }
+
     match std::env::var("IS_BUILDKITE") {
-        Ok(_) => ("test-db-postgres-9", 5432),
-        Err(_) => ("127.0.0.1", 5431),
+        Ok(_) => ("test-db-postgres-9".into(), 5432),
+        Err(_) => ("127.0.0.1".into(), 5431),
     }
 }
 
-fn db_host_and_port_postgres_10() -> (&'static str, usize) {
+fn db_host_and_port_postgres_10() -> (Cow<'static, str>, usize) {
+    if let Some(var) = std::env::var("POSTGRES_10_TEST_URL")
+        .ok()
+        .and_then(|s| Url::parse(&s).ok())
+    {
+        let host = var
+            .host()
+            .map(|s| Cow::from(s.to_string()))
+            .unwrap_or_else(|| Cow::from("localhost"));
+
+        let port = var.port().unwrap_or(5432) as usize;
+
+        return (host, port);
+    }
+
     match std::env::var("IS_BUILDKITE") {
-        Ok(_) => ("test-db-postgres-10", 5432),
-        Err(_) => ("127.0.0.1", 5432),
+        Ok(_) => ("test-db-postgres-10".into(), 5432),
+        Err(_) => ("127.0.0.1".into(), 5432),
     }
 }
 
-fn db_host_and_port_for_pgbouncer() -> (&'static str, usize) {
+fn db_host_and_port_postgres_11() -> (Cow<'static, str>, usize) {
+    if let Some(var) = std::env::var("POSTGRES_11_TEST_URL")
+        .ok()
+        .and_then(|s| Url::parse(&s).ok())
+    {
+        let host = var
+            .host()
+            .map(|s| Cow::from(s.to_string()))
+            .unwrap_or_else(|| Cow::from("localhost"));
+
+        let port = var.port().unwrap_or(5432) as usize;
+
+        return (host, port);
+    }
+
     match std::env::var("IS_BUILDKITE") {
-        Ok(_) => ("test-db-pgbouncer", 6432),
-        Err(_) => ("127.0.0.1", 6432),
+        Ok(_) => ("test-db-postgres-11".into(), 5432),
+        Err(_) => ("127.0.0.1".into(), 5433),
     }
 }
 
-pub fn db_host_and_port_postgres_12() -> (&'static str, usize) {
+fn db_host_and_port_for_pgbouncer() -> (Cow<'static, str>, usize) {
+    if let Some(var) = std::env::var("PGBOUNCER_TEST_URL")
+        .ok()
+        .and_then(|s| Url::parse(&s).ok())
+    {
+        let host = var
+            .host()
+            .map(|s| Cow::from(s.to_string()))
+            .unwrap_or_else(|| Cow::from("localhost"));
+
+        let port = var.port().unwrap_or(5432) as usize;
+
+        return (host, port);
+    }
+
     match std::env::var("IS_BUILDKITE") {
-        Ok(_) => ("test-db-postgres-12", 5432),
-        Err(_) => ("127.0.0.1", 5434),
+        Ok(_) => ("test-db-pgbouncer".into(), 6432),
+        Err(_) => ("127.0.0.1".into(), 6432),
     }
 }
 
-fn db_host_and_port_postgres_13() -> (&'static str, usize) {
+pub fn db_host_and_port_postgres_12() -> (Cow<'static, str>, usize) {
+    if let Some(var) = std::env::var("POSTGRES_12_TEST_URL")
+        .ok()
+        .and_then(|s| Url::parse(&s).ok())
+    {
+        let host = var
+            .host()
+            .map(|s| Cow::from(s.to_string()))
+            .unwrap_or_else(|| Cow::from("localhost"));
+
+        let port = var.port().unwrap_or(5432) as usize;
+
+        return (host, port);
+    }
+
     match std::env::var("IS_BUILDKITE") {
-        Ok(_) => ("test-db-postgres-13", 5432),
-        Err(_) => ("127.0.0.1", 5435),
+        Ok(_) => ("test-db-postgres-12".into(), 5432),
+        Err(_) => ("127.0.0.1".into(), 5434),
     }
 }
 
-pub fn db_host_and_port_mysql_8_0() -> (&'static str, usize) {
+fn db_host_and_port_postgres_13() -> (Cow<'static, str>, usize) {
+    if let Some(var) = std::env::var("POSTGRES_13_TEST_URL")
+        .ok()
+        .and_then(|s| Url::parse(&s).ok())
+    {
+        let host = var
+            .host()
+            .map(|s| Cow::from(s.to_string()))
+            .unwrap_or_else(|| Cow::from("localhost"));
+
+        let port = var.port().unwrap_or(5432) as usize;
+
+        return (host, port);
+    }
+
     match std::env::var("IS_BUILDKITE") {
-        Ok(_) => ("test-db-mysql-8-0", 3306),
-        Err(_) => ("127.0.0.1", 3307),
+        Ok(_) => ("test-db-postgres-13".into(), 5432),
+        Err(_) => ("127.0.0.1".into(), 5435),
     }
 }
 
-fn db_host_and_port_mysql_5_6() -> (&'static str, usize) {
+pub fn db_host_and_port_mysql_8_0() -> (Cow<'static, str>, usize) {
+    if let Some(var) = std::env::var("MYSQL_8_TEST_URL").ok().and_then(|s| Url::parse(&s).ok()) {
+        let host = var
+            .host()
+            .map(|s| Cow::from(s.to_string()))
+            .unwrap_or_else(|| Cow::from("localhost"));
+
+        let port = var.port().unwrap_or(3306) as usize;
+
+        return (host, port);
+    }
+
     match std::env::var("IS_BUILDKITE") {
-        Ok(_) => ("test-db-mysql-5-6", 3306),
-        Err(_) => ("127.0.0.1", 3309),
+        Ok(_) => ("test-db-mysql-8-0".into(), 3306),
+        Err(_) => ("127.0.0.1".into(), 3307),
     }
 }
 
-pub fn db_host_and_port_mysql_5_7() -> (&'static str, usize) {
+fn db_host_and_port_mysql_5_6() -> (Cow<'static, str>, usize) {
+    if let Some(var) = std::env::var("MYSQL_5_6_TEST_URL")
+        .ok()
+        .and_then(|s| Url::parse(&s).ok())
+    {
+        let host = var
+            .host()
+            .map(|s| Cow::from(s.to_string()))
+            .unwrap_or_else(|| Cow::from("localhost"));
+
+        let port = var.port().unwrap_or(3306) as usize;
+
+        return (host, port);
+    }
+
     match std::env::var("IS_BUILDKITE") {
-        Ok(_) => ("test-db-mysql-5-7", 3306),
-        Err(_) => ("127.0.0.1", 3306),
+        Ok(_) => ("test-db-mysql-5-6".into(), 3306),
+        Err(_) => ("127.0.0.1".into(), 3309),
     }
 }
 
-fn db_host_and_port_mariadb() -> (&'static str, usize) {
+pub fn db_host_and_port_mysql_5_7() -> (Cow<'static, str>, usize) {
+    if let Some(var) = std::env::var("MYSQL_5_7_TEST_URL")
+        .ok()
+        .and_then(|s| Url::parse(&s).ok())
+    {
+        let host = var
+            .host()
+            .map(|s| Cow::from(s.to_string()))
+            .unwrap_or_else(|| Cow::from("localhost"));
+
+        let port = var.port().unwrap_or(3306) as usize;
+
+        return (host, port);
+    }
+
     match std::env::var("IS_BUILDKITE") {
-        Ok(_) => ("test-db-mariadb", 3306),
-        Err(_) => ("127.0.0.1", 3308),
+        Ok(_) => ("test-db-mysql-5-7".into(), 3306),
+        Err(_) => ("127.0.0.1".into(), 3306),
     }
 }
 
-fn db_host_mssql_2017() -> (&'static str, usize) {
+fn db_host_and_port_mariadb() -> (Cow<'static, str>, usize) {
+    if let Some(var) = std::env::var("MARIADB_TEST_URL").ok().and_then(|s| Url::parse(&s).ok()) {
+        let host = var
+            .host()
+            .map(|s| Cow::from(s.to_string()))
+            .unwrap_or_else(|| Cow::from("localhost"));
+
+        let port = var.port().unwrap_or(3306) as usize;
+
+        return (host, port);
+    }
+
     match std::env::var("IS_BUILDKITE") {
-        Ok(_) => ("test-db-mssql-2017", 1433),
-        Err(_) => ("127.0.0.1", 1434),
+        Ok(_) => ("test-db-mariadb".into(), 3306),
+        Err(_) => ("127.0.0.1".into(), 3308),
     }
 }
 
-pub fn db_host_and_port_mssql_2019() -> (&'static str, usize) {
+fn db_host_mssql_2017() -> (Cow<'static, str>, usize) {
+    if let Some(var) = std::env::var("MSSQL_2017_TEST_URL")
+        .ok()
+        .and_then(|s| JdbcString::from_str(&s).ok())
+    {
+        let host = var
+            .server_name()
+            .map(|s| Cow::from(s.to_string()))
+            .unwrap_or_else(|| Cow::from("localhost"));
+
+        let port = var.port().unwrap_or(1433) as usize;
+
+        return (host, port);
+    }
+
     match std::env::var("IS_BUILDKITE") {
-        Ok(_) => ("test-db-mssql-2019", 1433),
-        Err(_) => ("127.0.0.1", 1433),
+        Ok(_) => ("test-db-mssql-2017".into(), 1433),
+        Err(_) => ("127.0.0.1".into(), 1434),
+    }
+}
+
+pub fn db_host_and_port_mssql_2019() -> (Cow<'static, str>, usize) {
+    if let Some(var) = std::env::var("MSSQL_2019_TEST_URL")
+        .ok()
+        .and_then(|s| JdbcString::from_str(&s).ok())
+    {
+        let host = var
+            .server_name()
+            .map(|s| Cow::from(s.to_string()))
+            .unwrap_or_else(|| Cow::from("localhost"));
+
+        let port = var.port().unwrap_or(1433) as usize;
+
+        return (host, port);
+    }
+
+    match std::env::var("IS_BUILDKITE") {
+        Ok(_) => ("test-db-mssql-2019".into(), 1433),
+        Err(_) => ("127.0.0.1".into(), 1433),
     }
 }
 
