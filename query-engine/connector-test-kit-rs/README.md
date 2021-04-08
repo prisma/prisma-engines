@@ -1,0 +1,227 @@
+# Query Engine Test Kit - A Full Guide
+The test kit is a (currently incomplete) port of the Scala test kit, located in `../connector-test-kit`.
+It's fully focused on integration testing the query engine through request-response assertions.
+
+## Test organization
+The test kit is a combination of three crates, from which two are "lower level" crates that are only required to make it work, whereas only one is important if you only want to author tests. The three-crate approach is required to prevent circular dependencies between the crates (arrow = depends-on):
+```
+               ┌────────────────────┐
+           ┌───│ query-engine-tests │───┐
+           │   └────────────────────┘   │
+           ▼                            ▼
+┌────────────────────┐       ┌────────────────────┐
+│ query-test-macros  │──────▶│ query-tests-setup  │
+└────────────────────┘       └────────────────────┘
+```
+
+#### `query-engine-tests`
+The actual integration tests can be found in the `query-engine-tests` crate, specifically the `tests/` folder. The `src/` folder contains general utilities like time rendering, common schemas, string rendering, so everythign that makes writing tests less painful.
+
+Tests follow a `mod` tree like regular source files, with `query_engine_tests.rs` being the root. Ideally, the modules carry semantics on what is tested in the name and form coherent units that make it easy to spot and extend areas to test.
+
+#### `query-test-macros`
+As the name implies, this crate contains the macro definitions used for the test suites (as shown later in this guide).
+
+#### `query-tests-setup`
+Contains the main bulk of logic to make tests run, which is mostly invisible to the tests:
+- Test configuration.
+- Connector tags that know the connection strings, capabilities of connectors, how to render data models.
+- Template parser of datamodels.
+- Runners that know how to make requests against a certain query backend (+ the results that allow the tests to make assertions).
+- Logging setup & error handling.
+
+## Running tests
+Tests are executed in the context of *one* _connector_ (with version) and _runner_. Some tests may only be specified to run for a subset of connectors or versions, in which case they will be skipped. Testing all connectors at once is not supported, however, for example, CI will run all the different connectors and versions concurrently in separate runs.
+
+#### Configuration
+Tests must be configured to run There's a set of env vars that is always useful to have and an optional one.
+Always useful to have:
+```shell
+export WORKSPACE_ROOT=/path/to/engines/repository/root
+```
+
+Test run env vars:
+```shell
+export TEST_RUNNER="direct" # Currently only `direct`, later `napi` and `binary` as well.
+export TEST_CONNECTOR="postgres" # One of the supported providers.
+export TEST_CONNECTOR_VERSION="10" # One of the supported versions.
+```
+
+As previously stated, the above can be omitted in favor of the `.test_config` config file:
+```json
+{
+    "connector": "postgres",
+    "version": "10",
+    "runner": "direct"
+}
+```
+The config file must be either in the current working folder from which you invoke a test run or in `$WORKSPACE_ROOT`.
+It's recommended to use the file-based config as it's easier to switch between providers with an open IDE (reloading env vars would usually require reloading the IDE).
+The workspace root makefile contains a series of convenience commands to setup different connector test configs, e.g. `make dev-postgres10` sets up the correct test config file for the tests to pick up.
+
+On the note of docker containers: Most connectors require an endpoint to run against (notable exception at the moment is SQLite), so you need to provide one. The `docker-compose.yml` in the workspace root offers all possible databases and versions we actively test. The aforementioned `make` commands also set up the container for you together with the .
+
+If you choose to set up the databases yourself, please note that the connection strings used in the tests (found in the files in `<repo_root>/query-engine/connector-test-kit-rs/query-tests-setup/src/connector_tag/`) to set up user, password and database for the test user.
+
+#### Running
+Note that by default tests run concurrently.
+
+- VSCode should automatically detect tests and display `run test`.
+- Use `make test-qe` (minimal log output) or `make test-qe-verbose` (all log output) in `$WORKSPACE_ROOT`.
+- `cargo test` in the `query-engine-tests` crate.
+- A single test can be tested with the normal cargo rust facilitied from command line, eg. `cargo test --package query-engine-tests --test query_engine_tests --all-features -- queries::filters::where_unique::where_unique::no_unique_fields --exact --nocapture` where `queries::filters::where_unique::where_unique::no_unique_fields` can be substituted for the path you want to test.
+
+## Authoring tests
+The following is an example on how to write a new test suite, as extending or changing an existing one follows the same rules and considerations.
+
+#### Find a suitable place for the module
+For example if you choose `tests/queries/filters/some_spec.rs`, you create the file and add the module to the `filters/mod.rs`.
+The modules usually follow a tree structure that convey some sort of meaning on what is tested. If you're unsure ping Dom.
+
+#### Decide on the test layout
+_Option 1:_
+```rust
+use query_engine_tests::*;
+
+#[test_suite(...)]
+mod some_spec {
+    #[connector_test(...)]
+    async fn my_test(runner: &Runner) -> TestResult<()> {
+        // ...
+        Ok(())
+    }
+}
+```
+
+_Option 2:_
+```rust
+use query_engine_tests::*;
+
+#[connector_test(...)]
+async fn my_test(runner: &Runner) -> TestResult<()> {
+    // ...
+    Ok(())
+}
+```
+
+Note that regardless of the shape, `connector_test` tests must _always_ have the signature of `async fn test_name(runner: &Runner) -> TestResult<()>`.
+
+Option 1 uses a `mod` that can be used to define common attributes on all tests contained in the module. Option 2 doesn't use a `mod` and requires you to set more attributes per test (will be shown later). Option 1 produces a test like `queries::filters::some_spec::some_spec::my_test` and option 2 `queries::filters::some_spec::my_test` (note the double `some_spec`). Apart from the aesthetics in the naming, there are no other consequences for using option 1 over 2. You can also choose any `mod` name you wish, e.g. `mod my_specs` would produce `queries::filters::some_spec::my_specs::my_test`.
+
+Why is this important? The macro attributes used above define all of the properties of the tests that are used to determine how and when they are run.
+The full attribute definitions are as follows:
+```rust
+#[test_suite(
+    schema(schema_handler),
+    exclude(Connector(Version1, ...), Connector, ...),
+    only(Connector(Version1, ...), Connector, ...),
+    capabilities(Capability1, Capability2, ...)
+)]
+```
+
+```rust
+#[connector_test(
+    suite = "name", // Required (Optional if in a `test_suite` mod)
+    schema(schema_handler), // Required either on the mod or on the test itself.
+    exclude(Connector(Version1, ...), Connector, ...),
+    only(Connector(Version1, ...), Connector, ...),
+    capabilities(Capability1, Capability2, ...)
+)]
+```
+
+The definitions can have almost the same properties, and the used properties are identical in meaning, however `connector_test` depends on `test_suite` if both are present. The basic rule is: Everything that is set on `test_suite` is propagated to every `connector_test` in the module, except if it's already set on `connector_test`.
+
+For example, if `schema` is set on `test_suite`, then all contained connector tests that do not have a `schema` property of their own implicitly have the `schema` attribute set.
+There are two special cases in that rule:
+- `suite`: No explicit `suite = "..."` is required on `test_suite`, as every `connector_test` in a `test_suite` has the name of the `mod` (eg. "some_spec" for `mod some_spec`) set (again, only if not `suite = "..."` is set already).
+- `only` and `exclude` are mutually exclusive (more details below), which means that if one of the two is set on `connector_test` already, the other will not implicitly propagate to `connector_test` from `test_suite`:
+```rust
+#[test_suite(only(Postgres))]
+mod some_spec {
+    // Will run for everything except SQL Server 2017. The `only` of `test_suite` is not propagated!
+    #[connector_test(exclude(SqlServer(2017))]
+    async fn my_test(runner: &Runner) -> TestResult<()> {
+        // ...
+        Ok(())
+    }
+}
+```
+
+Let's take a look at what the properties mean:
+
+**`schema`**
+The _schema handler_ to use for the test, given as a path ending in a function pointer. This is *always required* to be present on a test. A schema handler produces the schema that the test tests against. The path must be resolvable from the scope of the test function.
+```rust
+#[test_suite(schema(schema_handler))]
+mod some_spec {
+    fn schema_handler() -> String {
+        "model A {
+            #id(id, Int, @id)
+            field String?
+        }"
+        .to_owned()
+    }
+
+    #[connector_test]
+    async fn my_test(runner: &Runner) -> TestResult<()> {
+        // Assertions against the models as given by the handler.
+        Ok(())
+    }
+}
+```
+Note that the schema handlers can be located anywhere, the only important bit is that they're in scope for the test:
+`#[test_suite(schema(some_other_mod::path::schema_handler))]`
+
+**`exclude` and `only`**
+Mutually exclusive properties that constrain tests to run only for a set of connectors. By default (when none of the two are given), _all_ possible connectors are run for a test. `only` sets a whitelist of connectors to run, `exclude` sets a blacklist. The values used in both are identical in form: `Connector` or `Connector(Version, Version, ...)`. If no version is given, the entire connector family (all versions) is included or excluded.
+
+Connectors are at the time of writing:
+- `Postgres`: 9, 10, 11, 12, 13
+- `MySql`: 5.6, 5.7, 8, mariadb
+- `SqlServer`: 2017, 2019
+- `Sqlite`: No versions
+- `MongoDb`: 4
+
+Connector tags can be written all lowercase, uppercase, camel, doesn't matter. Versions can be written as literal, string, float, int. A few examples:
+
+`only(Postgres, MySql(5.7, "5.6"))`: All Postgres versions + MySql 5.6 and 5.7
+`exclude(SqlServer)`: All connectors except all versions of SqlServer.
+`only(SQLSERVER)`: All versions of SQL Server, nothing else.
+
+**`capabilities`**
+Requires connectors to have _all_ of the given connector capabilities (for a full list of valid capabilities see `pub enum ConnectorCapability` in `datamodel-connector/src/lib.rs`). Note that you can give both connectors and capabilities, but if the connectors you specify do not have the capabilities, the test(s) will be skipped.
+
+Example: `capabilities(ScalarLists, CreateMany)`.
+
+#### A Word on Test Execution
+Tests are running concurrently by default, which makes it necessary to isolate them from each other.
+For that purpose, each test runs against a separate sandbox in the underlying connector. In MySQL, this is a separate database, in Sqlite this is a separate database file.
+The name of the "sandbox" is defined as `suite` + '_' + `test function name`.
+
+A minimal test example is:
+```rust
+#[test_suite(schema(some_handler))]
+mod some_spec {
+    #[connector_test]
+    async fn my_test(runner: &Runner) -> TestResult<()> {
+        // Assertions against the models as given by the handler.
+        Ok(())
+    }
+}
+```
+
+The test database in MySQL would be `some_spec_my_test`, the file for Sqlite `some_spec_my_test.db`.
+For details on how each connector handles it, look into the files in `query-tests-setup/src/connector_tag` where the connection strings are rendered.
+
+#### Writing Schema templates & Common Schemas
+Schemas that are used for tests that are supposed to run for all connectors must be templated. Currently, MongoDb requires parts of a schema to have different forms, which would require writing all schemas twice, or duplicating tests for Mongo, etc.
+
+For this reason, schemas have template strings of the form `#name(args)` embedded in them. Connectors decide how to render schemas (see `query-tests-setup/src/datamodel_rendering` for details). Currently two templates are available:
+- `#id(field_name, field_type, directives ...)` - For defining an ID field on a model.
+    - `#id(pid, Int, @id, @map("_pid"))`
+- `#m2m(field_name, field_type, opposing_type, directives ...)` - For defining a many-to-many relation between two models.
+    - Example: `#m2m(posts, Post[], String)`
+
+All SQL connectors render these with a standard `SqlDatamodelRenderer`, Mongo uses its own `MongoDbSchemaRenderer`.
+
+Consider using one of the common schemas located in `query-engine-tests/sec/schemas` to write your tests - they are already templated correctly and reducing the number of schemas used overall helps keeping the tests more compact. However, if a test suite requires a specialized schema, it's totally fine to write one yourself, just remember to template it correctly.
