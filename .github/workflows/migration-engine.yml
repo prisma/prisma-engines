@@ -55,7 +55,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: "Start ${{ matrix.database }} database"
-        run: make dev-${{ matrix.database }}
+        run: make start-${{ matrix.database }}
       
       - uses: actions-rs/toolchain@v1
         with:
