@@ -11,7 +11,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - run: docker-compose up -d
+      - name: "Start databases"
+        run: docker-compose up -d
       
       - uses: actions-rs/toolchain@v1
         with:

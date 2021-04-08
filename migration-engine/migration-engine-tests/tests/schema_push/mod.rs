@@ -87,19 +87,22 @@ async fn schema_push_warns_about_destructive_changes(api: &TestApi) -> TestResul
         }
     "#;
 
-    let expected_warning = "You are about to drop the `Box` table, which is not empty (1 rows).";
+    let expected_warning = format!(
+        "You are about to drop the `{}` table, which is not empty (1 rows).",
+        api.normalize_identifier("Box")
+    );
 
     api.schema_push(dm2)
         .send()
         .await?
-        .assert_warnings(&[expected_warning.into()])?
+        .assert_warnings(&[expected_warning.as_str().into()])?
         .assert_no_steps()?;
 
     api.schema_push(dm2)
         .force(true)
         .send()
         .await?
-        .assert_warnings(&[expected_warning.into()])?
+        .assert_warnings(&[expected_warning.as_str().into()])?
         .assert_has_executed_steps()?;
 
     Ok(())

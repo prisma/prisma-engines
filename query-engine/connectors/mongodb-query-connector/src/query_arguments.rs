@@ -291,8 +291,6 @@ impl MongoQueryArgs {
         outer_stages.push(doc! { "$unwind": "$cursor_inner" });
         outer_stages.push(doc! { "$replaceRoot": { "newRoot": "$cursor_inner" } });
 
-        dbg!(&outer_stages);
-
         Ok(coll.aggregate(outer_stages, opts).await?)
     }
 

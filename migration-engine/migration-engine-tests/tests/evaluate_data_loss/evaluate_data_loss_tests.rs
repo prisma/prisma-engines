@@ -215,10 +215,15 @@ async fn evaluate_data_loss_returns_warnings_for_the_local_database_for_the_next
         }
     "#;
 
+    let warn = format!(
+        "You are about to drop the `{}` table, which is not empty (1 rows).",
+        api.normalize_identifier("Cat")
+    );
+
     api.evaluate_data_loss(&directory, dm2)
         .send()
         .await?
-        .assert_warnings(&["You are about to drop the `Cat` table, which is not empty (1 rows).".into()])?
+        .assert_warnings(&[warn.into()])?
         .assert_unexecutable(&[
             "Added the required column `fluffiness` to the `Dog` table without a default value. There are 1 rows in this table, it is not possible to execute this step.".into()
         ])?
@@ -278,10 +283,15 @@ async fn evaluate_data_loss_maps_warnings_to_the_right_steps(api: &TestApi) -> T
         }
     "#;
 
+    let warn = format!(
+        "You are about to drop the column `name` on the `{}` table, which still contains 1 non-null values.",
+        api.normalize_identifier("Cat")
+    );
+
     api.evaluate_data_loss(&directory, dm2)
         .send()
         .await?
-        .assert_warnings_with_indices(&[("You are about to drop the column `name` on the `Cat` table, which still contains 1 non-null values.".into(), if api.is_postgres() { 1 } else { 0 })])?
+        .assert_warnings_with_indices(&[(warn.into(), if api.is_postgres() { 1 } else { 0 })])?
         .assert_unexecutables_with_indices(&[
             ("Added the required column `isGoodDog` to the `Dog` table without a default value. There are 1 rows in this table, it is not possible to execute this step.".into(), if api.is_postgres() { 2 } else { 1 }),
         ])?;

@@ -7,7 +7,7 @@ pub use error::{DescriberError, DescriberErrorKind, DescriberResult};
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
-use std::fmt::Debug;
+use std::{borrow::Cow, fmt::Debug};
 use walkers::{EnumWalker, TableWalker, ViewWalker};
 
 pub mod getters;
@@ -56,12 +56,14 @@ pub struct SqlSchema {
     pub views: Vec<View>,
     /// The stored procedures.
     pub procedures: Vec<Procedure>,
+    /// The database lowercases all identifiers.
+    pub lower_case_identifiers: bool,
 }
 
 impl SqlSchema {
     /// Get a table.
     pub fn get_table(&self, name: &str) -> Option<&Table> {
-        self.tables.iter().find(|x| x.name == name)
+        self.tables.iter().find(|x| x.name == self.normalize(name).as_ref())
     }
 
     /// Get a view.
@@ -89,12 +91,13 @@ impl SqlSchema {
                 sequences,
                 views,
                 procedures,
+                ..
             } if tables.is_empty() && enums.is_empty() && sequences.is_empty() && views.is_empty() && procedures.is_empty()
         )
     }
 
     pub fn table(&self, name: &str) -> core::result::Result<&Table, String> {
-        match self.tables.iter().find(|t| t.name == name) {
+        match self.tables.iter().find(|t| t.name == self.normalize(name).as_ref()) {
             Some(t) => Ok(t),
             None => Err(name.to_string()),
         }
@@ -126,6 +129,14 @@ impl SqlSchema {
             schema: self,
             enum_index,
         })
+    }
+
+    fn normalize<'a>(&self, s: &'a str) -> Cow<'a, str> {
+        if self.lower_case_identifiers {
+            s.to_lowercase().into()
+        } else {
+            s.into()
+        }
     }
 }
 
@@ -339,6 +350,17 @@ pub enum ColumnTypeFamily {
 }
 
 impl ColumnTypeFamily {
+    /// Lower-cased variants
+    pub fn normalized(self, table_name: &str) -> Self {
+        match self {
+            Self::Enum(s) if s.starts_with(table_name) => {
+                let e = s.replacen(table_name, &table_name.to_lowercase(), 1);
+                Self::Enum(e)
+            }
+            _ => self,
+        }
+    }
+
     pub fn as_enum(&self) -> Option<&str> {
         match self {
             ColumnTypeFamily::Enum(name) => Some(name),

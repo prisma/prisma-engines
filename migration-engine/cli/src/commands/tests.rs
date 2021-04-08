@@ -20,7 +20,7 @@ fn postgres_url_with_scheme(db: Option<&str>, scheme: &str) -> String {
 }
 
 fn mysql_url(db: Option<&str>) -> String {
-    test_setup::mysql_url(db.unwrap_or(""))
+    test_setup::mysql_5_7_url(db.unwrap_or(""))
 }
 
 #[tokio::test]

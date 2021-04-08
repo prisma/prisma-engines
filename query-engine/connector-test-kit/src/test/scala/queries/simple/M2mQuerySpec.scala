@@ -4,6 +4,7 @@ import org.scalatest.{FlatSpec, Matchers}
 import util.ConnectorCapability.RelationLinkTableCapability
 import util._
 
+// RS: Ported
 class M2mQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
   val project: Project = ProjectDsl.fromString { """
                                                    |model Blog {

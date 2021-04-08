@@ -140,7 +140,7 @@ impl SqlFlavour for SqliteFlavour {
             let script = migration.read_migration_script()?;
 
             tracing::debug!(
-                "Applying migration `{}` to temporary database.",
+                "Applying migration `{}` to shadow database.",
                 migration.migration_name()
             );
 

@@ -30,6 +30,16 @@ pub struct GQLError {
     user_facing_error: user_facing_errors::Error,
 }
 
+impl GQLError {
+    pub fn code(&self) -> Option<&str> {
+        self.user_facing_error.as_known().map(|err| err.error_code)
+    }
+
+    pub fn message(&self) -> &str {
+        self.user_facing_error.message()
+    }
+}
+
 impl GQLResponse {
     pub fn with_capacity(capacity: usize) -> Self {
         Self {
@@ -48,6 +58,10 @@ impl GQLResponse {
 
     pub fn take_data(&mut self, key: impl AsRef<str>) -> Option<Item> {
         self.data.remove(key.as_ref())
+    }
+
+    pub fn errors(&self) -> impl Iterator<Item = &GQLError> {
+        self.errors.iter()
     }
 }
 
@@ -128,6 +142,10 @@ impl GQLBatchResponse {
 
     pub fn insert_error(&mut self, error: impl Into<GQLError>) {
         self.errors.push(error.into());
+    }
+
+    pub fn errors(&self) -> impl Iterator<Item = &GQLError> {
+        self.errors.iter()
     }
 }
 

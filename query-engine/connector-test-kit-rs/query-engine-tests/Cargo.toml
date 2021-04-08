@@ -1,0 +1,18 @@
+[package]
+authors = ["Dominic Petrick <dompetrick@gmail.com>"]
+edition = "2018"
+name = "query-engine-tests"
+version = "0.1.0"
+
+[dependencies]
+anyhow = "1.0"
+serde_json = "1.0"
+query-test-macros = { path = "../query-test-macros" }
+query-tests-setup = { path = "../query-tests-setup" }
+indoc = "1.0"
+tracing = "0.1.12"
+tracing-futures = "0.2.1"
+colored = "2"
+chrono = "0.4"
+datamodel-connector = { path = "../../../libs/datamodel/connectors/datamodel-connector" }
+base64 = "0.13"

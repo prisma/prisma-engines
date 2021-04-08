@@ -42,7 +42,7 @@ impl PostgresFlavour {
         &self,
         main_connection: &Connection,
         connector: &SqlMigrationConnector,
-        temporary_database_name: Option<String>,
+        shadow_database_name: Option<String>,
     ) -> ConnectorResult<Connection> {
         if let Some(shadow_database_connection_string) = &connector.shadow_database_connection_string {
             let conn = crate::connect(shadow_database_connection_string).await?;
@@ -65,7 +65,7 @@ impl PostgresFlavour {
             return Ok(conn);
         }
 
-        let database_name = temporary_database_name.unwrap();
+        let database_name = shadow_database_name.unwrap();
         let create_database = format!("CREATE DATABASE \"{}\"", database_name);
         let create_schema = format!("CREATE SCHEMA IF NOT EXISTS \"{}\"", self.schema_name());
 
@@ -75,17 +75,17 @@ impl PostgresFlavour {
             .map_err(ConnectorError::from)
             .map_err(|err| err.into_shadow_db_creation_error())?;
 
-        let mut temporary_database_url = self.url.url().clone();
-        temporary_database_url.set_path(&format!("/{}", database_name));
-        let temporary_database_url = temporary_database_url.to_string();
+        let mut shadow_database_url = self.url.url().clone();
+        shadow_database_url.set_path(&format!("/{}", database_name));
+        let shadow_database_url = shadow_database_url.to_string();
 
-        tracing::debug!("Connecting to temporary database at {}", temporary_database_url);
+        tracing::debug!("Connecting to shadow database at {}", shadow_database_url);
 
-        let temporary_database_conn = crate::connect(&temporary_database_url).await?;
+        let shadow_database_conn = crate::connect(&shadow_database_url).await?;
 
-        temporary_database_conn.raw_cmd(&create_schema).await?;
+        shadow_database_conn.raw_cmd(&create_schema).await?;
 
-        Ok(temporary_database_conn)
+        Ok(shadow_database_conn)
     }
 }
 
@@ -282,27 +282,27 @@ impl SqlFlavour for PostgresFlavour {
         connection: &Connection,
         connector: &SqlMigrationConnector,
     ) -> ConnectorResult<SqlSchema> {
-        let temporary_database_name = connector.temporary_database_name();
+        let shadow_database_name = connector.shadow_database_name();
 
         // We go through the whole process without early return, then clean up
-        // the temporary database, and only then return the result. This avoids
+        // the shadow database, and only then return the result. This avoids
         // leaving shadow databases behind in case of e.g. faulty migrations.
 
         let sql_schema_result = (|| {
             async {
-                let temporary_database = self
-                    .shadow_database_connection(connection, connector, temporary_database_name.clone())
+                let shadow_database = self
+                    .shadow_database_connection(connection, connector, shadow_database_name.clone())
                     .await?;
 
                 for migration in migrations {
                     let script = migration.read_migration_script()?;
 
                     tracing::debug!(
-                        "Applying migration `{}` to temporary database.",
+                        "Applying migration `{}` to shadow database.",
                         migration.migration_name()
                     );
 
-                    temporary_database
+                    shadow_database
                         .raw_cmd(&script)
                         .await
                         .map_err(ConnectorError::from)
@@ -311,15 +311,15 @@ impl SqlFlavour for PostgresFlavour {
                         })?;
                 }
 
-                // the connection to the temporary database is dropped at the end of
+                // The connection to the shadow database is dropped at the end of
                 // the block.
-                self.describe_schema(&temporary_database).await
+                self.describe_schema(&shadow_database).await
             }
         })()
         .await;
 
-        if let Some(temporary_database_name) = temporary_database_name {
-            let drop_database = format!("DROP DATABASE IF EXISTS \"{}\"", temporary_database_name);
+        if let Some(shadow_database_name) = shadow_database_name {
+            let drop_database = format!("DROP DATABASE IF EXISTS \"{}\"", shadow_database_name);
             connection.raw_cmd(&drop_database).await?;
         }
 

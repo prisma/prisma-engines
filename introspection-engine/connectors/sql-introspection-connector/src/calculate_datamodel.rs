@@ -143,6 +143,7 @@ mod tests {
             enums: vec![],
             sequences: vec![],
             views: vec![],
+            lower_case_identifiers: false,
         };
         let introspection_result =
             calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new()).expect("calculate data model");
@@ -258,6 +259,7 @@ mod tests {
         };
 
         let schema = SqlSchema {
+            lower_case_identifiers: false,
             procedures: vec![],
             tables: vec![
                 Table {
@@ -375,6 +377,7 @@ mod tests {
         };
 
         let schema = SqlSchema {
+            lower_case_identifiers: false,
             views: vec![],
             procedures: vec![],
             tables: vec![Table {
@@ -563,6 +566,7 @@ mod tests {
         };
 
         let schema = SqlSchema {
+            lower_case_identifiers: false,
             views: vec![],
             procedures: vec![],
             tables: vec![
@@ -732,6 +736,7 @@ mod tests {
         };
 
         let schema = SqlSchema {
+            lower_case_identifiers: false,
             views: vec![],
             procedures: vec![],
             tables: vec![Table {
@@ -915,6 +920,7 @@ mod tests {
         };
 
         let schema = SqlSchema {
+            lower_case_identifiers: false,
             views: vec![],
             procedures: vec![],
             tables: vec![
@@ -1039,6 +1045,7 @@ mod tests {
                 values: enum_values,
             }],
             sequences: vec![],
+            lower_case_identifiers: false,
         };
         let introspection_result =
             calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new()).expect("calculate data model");

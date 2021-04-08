@@ -1,4 +1,5 @@
-use crate::{ModelRef, RelationFieldRef, ScalarFieldRef};
+use crate::{RelationFieldRef, ScalarFieldRef};
+use quaint::prelude::Order;
 use std::string::ToString;
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
@@ -25,19 +26,30 @@ impl OrderBy {
     }
 }
 
-pub trait IntoOrderBy {
-    fn into_order_by(self, model: ModelRef) -> OrderBy;
-}
-
 #[derive(Clone, Copy, PartialEq, Debug, Eq, Hash)]
 pub enum SortOrder {
     Ascending,
     Descending,
 }
 
+impl SortOrder {
+    pub fn into_order(self, reverse: bool) -> Order {
+        match (self, reverse) {
+            (SortOrder::Ascending, false) => Order::Asc,
+            (SortOrder::Descending, false) => Order::Desc,
+            (SortOrder::Ascending, true) => Order::Desc,
+            (SortOrder::Descending, true) => Order::Asc,
+        }
+    }
+}
+
 #[derive(Clone, Copy, PartialEq, Debug, Eq, Hash)]
 pub enum SortAggregation {
-    Count { _all: bool },
+    Count,
+    Avg,
+    Sum,
+    Min,
+    Max,
 }
 
 impl ToString for SortOrder {

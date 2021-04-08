@@ -59,7 +59,7 @@ async fn bad_postgres_url_must_return_a_good_error() {
 #[tokio::test]
 async fn database_access_denied_must_return_a_proper_error_in_cli() {
     let db_name = "dbaccessdeniedincli";
-    let url: Url = mysql_url(db_name).parse().unwrap();
+    let url: Url = mysql_5_7_url(db_name).parse().unwrap();
     let conn = create_mysql_database(&url).await.unwrap();
 
     conn.execute_raw("DROP USER IF EXISTS jeanmichel", &[]).await.unwrap();

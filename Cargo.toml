@@ -19,6 +19,7 @@ members = [
   "query-engine/core",
   "query-engine/query-engine",
   "query-engine/query-engine-napi",
+  "query-engine/connector-test-kit-rs/query-engine-tests",
   "query-engine/request-handlers",
   "prisma-fmt",
   "libs/datamodel/core",
@@ -38,6 +39,6 @@ members = [
 opt-level = 3
 
 [profile.release.package.introspection-core]
-codegen-units = 1 
+codegen-units = 1
 opt-level = 'z' # Optimize for size.
 #strip="symbols"

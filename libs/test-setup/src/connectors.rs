@@ -16,7 +16,7 @@ fn connector_names() -> Vec<(&'static str, BitFlags<Tags>)> {
         ("mssql_2017", (Tags::Mssql | Tags::Mssql2017)),
         ("mssql_2019", (Tags::Mssql | Tags::Mssql2019)),
         ("mysql_8", Tags::Mysql | Tags::Mysql8),
-        ("mysql", Tags::Mysql | Tags::Mysql57),
+        ("mysql_5_7", Tags::Mysql | Tags::Mysql57),
         ("mysql_5_6", Tags::Mysql | Tags::Mysql56),
         ("postgres9", Tags::Postgres.into()),
         ("postgres10", Tags::Postgres.into()),
@@ -32,7 +32,7 @@ fn postgres_capabilities() -> BitFlags<Capabilities> {
     Capabilities::ScalarLists | Capabilities::Enums | Capabilities::Json
 }
 
-fn mysql_capabilities() -> BitFlags<Capabilities> {
+fn mysql_5_7_capabilities() -> BitFlags<Capabilities> {
     Capabilities::Enums | Capabilities::Json
 }
 
@@ -58,7 +58,7 @@ fn infer_capabilities(tags: BitFlags<Tags>) -> BitFlags<Capabilities> {
     }
 
     if tags.intersects(Tags::Mysql) {
-        return mysql_capabilities();
+        return mysql_5_7_capabilities();
     }
 
     if tags.intersects(Tags::Mssql2017) {

@@ -95,9 +95,9 @@ async fn adding_an_enum_field_must_work(api: &TestApi) -> TestResult {
                 SqlFamily::Postgres => c
                     .assert_is_required()?
                     .assert_type_family(ColumnTypeFamily::Enum("MyEnum".to_owned())),
-                SqlFamily::Mysql => c
-                    .assert_is_required()?
-                    .assert_type_family(ColumnTypeFamily::Enum("Test_enum".to_owned())),
+                SqlFamily::Mysql => c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Enum(
+                    api.normalize_identifier("Test_enum").into_owned(),
+                )),
                 _ => c.assert_is_required()?.assert_type_is_string(),
             })
     })?;
@@ -133,7 +133,7 @@ async fn adding_an_enum_field_must_work_with_native_types_off(api: &TestApi) -> 
                     .assert_type_family(ColumnTypeFamily::Enum("MyEnum".to_owned())),
                 SqlFamily::Mysql => c
                     .assert_is_required()?
-                    .assert_type_family(ColumnTypeFamily::Enum("Test_enum".to_owned())),
+                    .assert_type_family(ColumnTypeFamily::Enum(api.normalize_identifier("Test_enum").into())),
                 _ => c.assert_is_required()?.assert_type_is_string(),
             })
     })?;
@@ -968,12 +968,12 @@ async fn changing_a_relation_field_to_a_scalar_field_must_work(api: &TestApi) ->
             .assert_has_fk(&ForeignKey {
                 constraint_name: match api.sql_family() {
                     SqlFamily::Postgres => Some("A_b_fkey".to_owned()),
-                    SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
+                    SqlFamily::Mysql => Some(api.normalize_identifier("A_ibfk_1").into_owned()),
                     SqlFamily::Sqlite => None,
                     SqlFamily::Mssql => Some("A_b_fkey".to_owned()),
                 },
                 columns: vec!["b".to_owned()],
-                referenced_table: "B".to_string(),
+                referenced_table: api.normalize_identifier("B").into_owned(),
                 referenced_columns: vec!["id".to_string()],
                 on_delete_action: ForeignKeyAction::Cascade,
                 on_update_action: ForeignKeyAction::NoAction,
@@ -1660,7 +1660,7 @@ async fn relations_can_reference_arbitrary_unique_fields(api: &TestApi) -> TestR
     let fk = fks.iter().next().unwrap();
 
     assert_eq!(fk.columns, &["uem"]);
-    assert_eq!(fk.referenced_table, "User");
+    assert_eq!(fk.referenced_table, api.normalize_identifier("User").as_ref());
     assert_eq!(fk.referenced_columns, &["email"]);
 
     Ok(())

@@ -6,11 +6,11 @@ use super::{
     },
     datasource_provider::DatasourceProvider,
 };
-use crate::ast::Span;
 use crate::configuration::StringFromEnvVar;
 use crate::diagnostics::{DatamodelError, DatamodelWarning, Diagnostics, ValidatedDatasource, ValidatedDatasources};
 use crate::{ast, Datasource};
 use datamodel_connector::{CombinedConnector, Connector};
+use std::collections::HashMap;
 
 const PREVIEW_FEATURES_KEY: &str = "previewFeatures";
 const SHADOW_DATABASE_URL_KEY: &str = "shadowDatabaseUrl";
@@ -95,10 +95,16 @@ impl DatasourceLoader {
         datasource_url_overrides: &[(String, String)],
     ) -> Result<ValidatedDatasource, Diagnostics> {
         let source_name = &ast_source.name.name;
-        let mut args = Arguments::new(&ast_source.properties, ast_source.span);
+        let args: HashMap<_, _> = ast_source
+            .properties
+            .iter()
+            .map(|arg| (arg.name.name.as_str(), ValueValidator::new(&arg.value)))
+            .collect();
         let mut diagnostics = Diagnostics::new();
 
-        let provider_arg = args.arg("provider")?;
+        let provider_arg = args
+            .get("provider")
+            .ok_or_else(|| DatamodelError::new_argument_not_found_error("provider", ast_source.span))?;
 
         if provider_arg.is_from_env() {
             return Err(diagnostics.merge_error(DatamodelError::new_functional_evaluation_error(
@@ -123,7 +129,10 @@ impl DatasourceLoader {
             )));
         }
 
-        let url_arg = args.arg(URL_KEY)?;
+        let url_arg = args
+            .get(URL_KEY)
+            .ok_or_else(|| DatamodelError::new_argument_not_found_error(URL_KEY, ast_source.span))?;
+
         let override_url = datasource_url_overrides
             .iter()
             .find(|x| &x.0 == source_name)
@@ -163,7 +172,7 @@ impl DatasourceLoader {
 
         validate_datasource_url(&url, source_name, &url_arg)?;
 
-        let shadow_database_url_arg = args.optional_arg(SHADOW_DATABASE_URL_KEY);
+        let shadow_database_url_arg = args.get(SHADOW_DATABASE_URL_KEY);
 
         let shadow_database_url: Option<StringFromEnvVar> =
             if let Some(shadow_database_url_arg) = shadow_database_url_arg.as_ref() {
@@ -213,7 +222,7 @@ impl DatasourceLoader {
                 None
             };
 
-        preview_features_guardrail(&mut args)?;
+        preview_features_guardrail(&args)?;
 
         let documentation = ast_source.documentation.as_ref().map(|comment| comment.text.clone());
 
@@ -306,21 +315,18 @@ fn get_builtin_datasource_providers() -> Vec<Box<dyn DatasourceProvider>> {
     ]
 }
 
-fn preview_features_guardrail(args: &mut Arguments) -> Result<(), DatamodelError> {
-    let preview_features_arg = args.arg(PREVIEW_FEATURES_KEY);
-    let (preview_features, span) = match preview_features_arg.ok() {
-        Some(x) => (x.as_array().to_str_vec()?, x.span()),
-        None => (Vec::new(), Span::empty()),
-    };
-
-    if preview_features.is_empty() {
-        return Ok(());
-    }
-
-    Err(DatamodelError::new_connector_error(
+fn preview_features_guardrail(args: &HashMap<&str, ValueValidator>) -> Result<(), DatamodelError> {
+    args.get(PREVIEW_FEATURES_KEY)
+        .map(|val| -> Result<_, _> { Ok((val.as_array().to_str_vec()?, val.span())) })
+        .transpose()?
+        .filter(|(feats, _span)| !feats.is_empty())
+        .map(|(_, span)| {
+            Err(DatamodelError::new_connector_error(
         "Preview features are only supported in the generator block. Please move this field to the generator block.",
         span,
     ))
+        })
+        .unwrap_or(Ok(()))
 }
 
 /// Validate that the `url` argument in the datasource block is not empty.

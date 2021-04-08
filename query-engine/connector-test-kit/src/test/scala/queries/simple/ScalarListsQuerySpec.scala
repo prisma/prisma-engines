@@ -4,6 +4,7 @@ import org.scalatest.{FlatSpec, Matchers}
 import util.ConnectorCapability.ScalarListsCapability
 import util._
 
+// RS: Ported
 class ScalarListsQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
   override def runOnlyForCapabilities = Set(ScalarListsCapability)
 

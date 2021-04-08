@@ -1,5 +1,3 @@
-#![allow(clippy::upper_case_acronyms)]
-
 //! This crate is responsible for parsing, rendering and formatting a Prisma Schema.
 //! A Prisma Schema consists out of two parts:
 //! 1. The `Datamodel` part refers to the model and enum definitions.
@@ -73,7 +71,11 @@
 //!</pre>
 //!
 
-#![allow(clippy::module_inception, clippy::suspicious_operation_groupings)]
+#![allow(
+    clippy::module_inception,
+    clippy::suspicious_operation_groupings,
+    clippy::upper_case_acronyms
+)]
 
 pub mod ast;
 pub mod common;
@@ -84,13 +86,12 @@ pub mod json;
 pub mod transform;
 pub mod walkers;
 
-use std::path::Path;
-
 pub use crate::dml::*;
 pub use configuration::*;
 
 use crate::ast::SchemaAst;
 use crate::diagnostics::{ValidatedConfiguration, ValidatedDatamodel, ValidatedDatasources};
+use std::path::Path;
 use transform::{
     ast_to_dml::{DatasourceLoader, GeneratorLoader, ValidationPipeline},
     dml_to_ast::{DatasourceSerializer, GeneratorSerializer, LowerDmlToAst},

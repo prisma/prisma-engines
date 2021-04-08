@@ -32,11 +32,6 @@ impl AttributeValidator<dml::Field> for RelationAttributeValidator {
                 rf.relation_info.fields = base_fields.as_array().to_literal_vec()?;
             }
 
-            // TODO: bring `onDelete` back once `prisma migrate` is a thing
-            //            if let Ok(on_delete) = args.arg("onDelete") {
-            //                relation_info.on_delete = on_delete.parse_literal::<dml::OnDeleteStrategy>()?;
-            //            }
-
             Ok(())
         } else {
             self.new_attribute_validation_error("Invalid field type, not a relation.", args.span())
