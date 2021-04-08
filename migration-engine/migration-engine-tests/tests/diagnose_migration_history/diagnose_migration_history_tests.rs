@@ -904,7 +904,7 @@ async fn shadow_database_creation_error_is_special_cased_postgres(api: &TestApi)
     Ok(())
 }
 
-#[test_each_connector(tags("mssql"))]
+#[test_each_connector(tags("mssql_2019"))]
 async fn shadow_database_creation_error_is_special_cased_mssql(api: &TestApi) -> TestResult {
     let directory = api.create_migrations_directory()?;
 
