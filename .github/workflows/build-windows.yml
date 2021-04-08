@@ -89,3 +89,4 @@ jobs:
         
       - name: Run tests
         run: cargo test -p migration-engine-tests ${{ matrix.db == 'mysql' && 'mysql_8' || 'mariadb' }}
+
