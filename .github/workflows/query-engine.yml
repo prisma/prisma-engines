@@ -64,4 +64,4 @@ jobs:
 
       - name: Run tests
         working-directory: query-engine/connector-test-kit
-        run: sbt test
+        run: SERVER_ROOT="../../" sbt test
