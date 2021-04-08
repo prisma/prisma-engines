@@ -7,28 +7,6 @@ on:
 
 jobs:
 
-  compile:
-    name: "Compile Migration Engine tests"
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          default: true
-
-      - uses: actions/cache@v2
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: migration-engine-${{ runner.os }}-cargo
-
-      - run: cargo test --no-run
-        working-directory: migration-engine/migration-engine-tests
-
   test:
     name: "Test Migration Engine - ${{ matrix.database }}"
     needs: [compile]
