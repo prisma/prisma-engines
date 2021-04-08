@@ -136,6 +136,28 @@ impl From<tokio_postgres::error::Error> for Error {
 
                 builder.build()
             }
+            Some(code) if code == "28000" => {
+                let code = code.to_string();
+                let db_error = e.into_source().and_then(|e| e.downcast::<DbError>().ok());
+                let message = db_error.as_ref().map(|e| e.message());
+
+                let db_name = message
+                    .as_ref()
+                    .and_then(|m| m.split_whitespace().nth(5))
+                    .and_then(|s| s.split('"').nth(1))
+                    .into();
+
+                let kind = ErrorKind::DatabaseAccessDenied { db_name };
+                let mut builder = Error::builder(kind);
+
+                builder.set_original_code(code);
+
+                if let Some(message) = message {
+                    builder.set_original_message(message);
+                }
+
+                builder.build()
+            }
             Some(code) if code == "28P01" => {
                 let code = code.to_string();
                 let db_error = e.into_source().and_then(|e| e.downcast::<DbError>().ok());
