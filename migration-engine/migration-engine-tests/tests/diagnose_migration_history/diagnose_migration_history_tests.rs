@@ -100,11 +100,11 @@ async fn diagnose_migration_history_with_opt_in_to_shadow_database_calculates_dr
         .into_output();
 
     let expected_rollback_warnings =
-         "/*\n  Warnings:\n\n  - You are about to drop the column `fluffiness` on the `Cat` table. All the data in the column will be lost.\n\n*/";
+         format!("/*\n  Warnings:\n\n  - You are about to drop the column `fluffiness` on the `{}` table. All the data in the column will be lost.\n\n*/", api.normalize_identifier("Cat"));
 
     let rollback = drift.unwrap().unwrap_drift_detected();
 
-    assert!(rollback.starts_with(expected_rollback_warnings), "{}", rollback);
+    assert!(rollback.starts_with(&expected_rollback_warnings), "{}", rollback);
 
     assert!(history.is_none());
     assert!(failed_migration_names.is_empty());
@@ -218,18 +218,19 @@ async fn diagnose_migration_history_calculates_drift_in_presence_of_failed_migra
 
     let rollback = drift.unwrap().unwrap_drift_detected();
 
-    let expected_rollback_warnings = indoc::indoc!(
+    let expected_rollback_warnings = indoc::formatdoc!(
         "
         /*
           Warnings:
 
-          - You are about to drop the `Dog` table. If the table is not empty, all the data it contains will be lost.
+          - You are about to drop the `{}` table. If the table is not empty, all the data it contains will be lost.
 
         */
-        "
+        ",
+        api.normalize_identifier("Dog")
     );
 
-    assert!(rollback.starts_with(expected_rollback_warnings), "{}", rollback);
+    assert!(rollback.starts_with(&expected_rollback_warnings), "{}", rollback);
 
     assert!(history.is_none());
     assert_eq!(failed_migration_names.len(), 1);
@@ -613,7 +614,7 @@ async fn with_a_failed_migration(api: &TestApi) -> TestResult {
     let migrations_directory = api.create_migrations_directory()?;
 
     let dm = r#"
-        model Test {
+        model catsu {
             id Int @id
         }
     "#;

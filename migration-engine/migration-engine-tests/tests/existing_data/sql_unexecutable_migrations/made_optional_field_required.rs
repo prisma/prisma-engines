@@ -28,13 +28,16 @@ async fn making_an_optional_field_required_with_data_without_a_default_is_unexec
         }
     "#;
 
+    let error = format!(
+        "Made the column `age` on table `{}` required, but there are 1 existing NULL values.",
+        api.normalize_identifier("Test")
+    );
+
     api.schema_push(dm2)
         .send()
         .await?
         .assert_no_warning()?
-        .assert_unexecutable(&[
-            "Made the column `age` on table `Test` required, but there are 1 existing NULL values.".into(),
-        ])?;
+        .assert_unexecutable(&[error])?;
 
     api.assert_schema()
         .await?
@@ -147,13 +150,16 @@ async fn making_an_optional_field_required_with_data_with_a_default_is_unexecuta
         }
     "#;
 
+    let error = format!(
+        "Made the column `age` on table `{}` required, but there are 1 existing NULL values.",
+        api.normalize_identifier("Test")
+    );
+
     api.schema_push(dm2)
         .force(false)
         .send()
         .await?
-        .assert_unexecutable(&[
-            "Made the column `age` on table `Test` required, but there are 1 existing NULL values.".into(),
-        ])?
+        .assert_unexecutable(&[error])?
         .assert_no_warning()?;
 
     api.assert_schema().await?.assert_equals(&initial_schema)?;

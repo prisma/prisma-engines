@@ -45,3 +45,40 @@ jobs:
           path: |
             ${{ github.workspace }}/target/release/*.exe
             ${{ github.workspace }}/target/release/*.dll
+
+  cargo-test:
+    name: "Windows Migration Engine MySQL test run on branch ${{ github.event.ref }} for commit ${{ github.event.inputs.commit }}"
+    strategy:
+      fail-fast: false
+      matrix:
+        rust:
+          - stable
+        os:
+          - windows-latest
+
+    runs-on: ${{ matrix.os }}
+
+    env:
+      MYSQL_8_TEST_URL: "mysql://root@localhost:3306?connect_timeout=20&socket_timeout=60"
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{matrix.rust}}
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ matrix.rust }}
+
+      - name: Install MySQL
+        run: |
+          choco install mysql
+
+      - name: Run tests
+        run: cargo test -p migration-engine-tests mysql_8

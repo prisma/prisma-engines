@@ -114,7 +114,9 @@ async fn enum_value_with_database_names_must_work(api: &TestApi) -> TestResult {
     if api.is_mysql() {
         api.assert_schema()
             .await?
-            .assert_enum("Cat_mood", |enm| enm.assert_values(&["ANGRY", "hongry"]))?;
+            .assert_enum(&api.normalize_identifier("Cat_mood"), |enm| {
+                enm.assert_values(&["ANGRY", "hongry"])
+            })?;
     } else {
         api.assert_schema()
             .await?
@@ -135,9 +137,12 @@ async fn enum_value_with_database_names_must_work(api: &TestApi) -> TestResult {
 
     if api.is_mysql() {
         api.schema_push(dm).force(true).send().await?.assert_warnings(&["The values [hongry] on the enum `Cat_mood` will be removed. If these variants are still used in the database, this will fail.".into()])?;
+
         api.assert_schema()
             .await?
-            .assert_enum("Cat_mood", |enm| enm.assert_values(&["ANGRY", "hongery"]))?;
+            .assert_enum(&api.normalize_identifier("Cat_mood"), |enm| {
+                enm.assert_values(&["ANGRY", "hongery"])
+            })?;
     } else {
         api.schema_push(dm).force(true).send().await?.assert_warnings(&["The values [hongry] on the enum `CatMood` will be removed. If these variants are still used in the database, this will fail.".into()])?;
         api.assert_schema()

@@ -407,7 +407,7 @@ async fn with_a_failed_migration(api: &TestApi) -> TestResult {
     let migrations_directory = api.create_migrations_directory()?;
 
     let dm = r#"
-        model Test {
+        model catsu {
             id Int @id
         }
     "#;
@@ -458,7 +458,7 @@ async fn with_an_invalid_unapplied_migration_should_report_it(api: &TestApi) -> 
     let directory = api.create_migrations_directory()?;
 
     let dm1 = r#"
-        model Cat {
+        model catcat {
             id      Int @id
             name    String
         }
@@ -472,7 +472,7 @@ async fn with_an_invalid_unapplied_migration_should_report_it(api: &TestApi) -> 
         .assert_applied_migrations(&["initial"])?;
 
     let dm2 = r#"
-        model Cat {
+        model catcat {
             id          Int @id
             name        String
             fluffiness  Float
@@ -512,11 +512,11 @@ async fn drift_can_be_detected_without_migrations_table(api: &TestApi) -> TestRe
     let directory = api.create_migrations_directory()?;
 
     api.database()
-        .raw_cmd("CREATE TABLE \"Cat\" (\nid SERIAL PRIMARY KEY\n);")
+        .raw_cmd("CREATE TABLE \"cat\" (\nid SERIAL PRIMARY KEY\n);")
         .await?;
 
     let dm1 = r#"
-        model Cat {
+        model cat {
             id      Int @id @default(autoincrement())
         }
     "#;
