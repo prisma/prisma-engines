@@ -6,13 +6,14 @@ on:
   pull_request:
 
 jobs:
-  env:
-    SQLITE_MAX_VARIABLE_NUMBER: 250000
-    SQLITE_MAX_EXPR_DEPTH: 10000
-
   compile:
     name: "Compile Migration and Query Engines"
     runs-on: ubuntu-latest
+
+    env:
+      SQLITE_MAX_VARIABLE_NUMBER: 250000
+      SQLITE_MAX_EXPR_DEPTH: 10000
+
     steps:
       - uses: actions/checkout@v2
 
@@ -33,6 +34,7 @@ jobs:
 
   test:
     name: "Test Query Engine - ${{ matrix.connector }}"
+    needs: [compile]
     
     strategy:
       fail-fast: false
@@ -53,6 +55,8 @@ jobs:
           - sqlite
 
     env:
+      SQLITE_MAX_VARIABLE_NUMBER: 250000
+      SQLITE_MAX_EXPR_DEPTH: 10000
       TEST_CONNECTOR: "${{ matrix.connector }}"
       TEST_MODE: "simple"
       SCALA_VERSION: "2.12.3"
