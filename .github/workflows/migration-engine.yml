@@ -38,8 +38,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: "Start database test-db-${{ matrix.database }}"
-        run: docker-compose up -d test-db-${{ matrix.database }}
+      - name: "Start databases"
+        run: docker-compose up -d
       
       - uses: actions-rs/toolchain@v1
         with:
