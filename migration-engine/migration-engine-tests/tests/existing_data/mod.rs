@@ -650,7 +650,7 @@ async fn enum_variants_can_be_added_without_data_loss(api: &TestApi) -> TestResu
         if api.sql_family().is_mysql() {
             api.assert_schema()
                 .await?
-                .assert_enum(&api.normalize_identifier("Cat_mod"), |enm| {
+                .assert_enum(&api.normalize_identifier("Cat_mood"), |enm| {
                     enm.assert_values(&["HAPPY", "HUNGRY", "ABSOLUTELY_FABULOUS"])
                 })?
                 .assert_enum(&api.normalize_identifier("Human_mood"), |enm| {
