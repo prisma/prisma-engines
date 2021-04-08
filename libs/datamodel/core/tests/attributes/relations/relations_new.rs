@@ -142,7 +142,7 @@ fn required_relation_field_must_error_when_one_underlying_field_is_optional() {
 }
 
 #[test]
-fn required_relation_field_must_succeed_when_at_least_one_underlying_fields_is_required() {
+fn optional_relation_field_must_succeed_when_at_least_one_underlying_fields_is_optional() {
     let dml = r#"
     model User {
         id        Int     @id
@@ -159,7 +159,7 @@ fn required_relation_field_must_succeed_when_at_least_one_underlying_fields_is_r
         userFirstName String
         userLastName  String?
 
-        user          User    @relation(fields: [userFirstName, userLastName], references: [firstName, lastName])
+        user          User?    @relation(fields: [userFirstName, userLastName], references: [firstName, lastName])
     }
     "#;
 
