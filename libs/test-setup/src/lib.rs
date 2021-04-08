@@ -220,10 +220,11 @@ pub fn postgres_13_url(db_name: &str) -> String {
     url_from_env("POSTGRES_13_TEST_URL", TestDb::Schema(db_name)).unwrap_or_else(|| {
         let (host, port) = db_host_and_port_postgres_13();
 
-    format!(
-        "postgresql://root@{}:{}/{}?schema={}&statement_cache_size=0&socket_timeout=60",
-        host, port, db_name, SCHEMA_NAME
-    )
+        format!(
+            "postgresql://root@{}:{}/{}?schema={}&statement_cache_size=0&socket_timeout=60",
+            host, port, db_name, SCHEMA_NAME
+        )
+    })
 }
 
 pub fn mysql_5_7_url(db_name: &str) -> String {
