@@ -56,5 +56,4 @@ jobs:
           key: query-engine-${{ runner.os }}-cargo
 
       - name: Run tests
-        working-directory: query-engine/connector-test-kit
-        run: SERVER_ROOT="../../" sbt test
+        run: SERVER_ROOT=$(pwd) && cd query-engine/connector-test-kit && sbt test
