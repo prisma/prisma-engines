@@ -1,21 +1,22 @@
 version: "3"
 services:
-  pgbouncer:
-    image: brainsam/pgbouncer:latest
-    restart: always
+
+  qe-test-base:
+    image: prismagraphql/build:test
     environment:
-      DB_HOST: "postgres11"
-      DB_PORT: "5432"
-      DB_USER: "postgres"
-      DB_PASSWORD: "prisma"
-      POOL_MODE: "transaction"
-      MAX_CLIENT_CONN: "1000"
+      SERVER_ROOT: /root/build
+      COMMIT_SHA: "ci_test_binary"
+      RUST_BACKTRACE: "1"
+      IS_BUILDKITE: "1"
+      RUST_LOG_FORMAT: "devel"
+      LOG_LEVEL: "error"
+    volumes:
+      - .:/root/build
+    working_dir: /root/build/
     networks:
       - databases
-    ports:
-      - "6432:6432"
 
-  postgres9:
+  test-db-postgres-9:
     image: postgres:9
     restart: always
     command: postgres -c 'max_connections=1000'
@@ -28,7 +29,7 @@ services:
       - databases
     tmpfs: /pgtmpfs9
 
-  postgres10:
+  test-db-postgres-10:
     image: postgres:10
     restart: always
     command: postgres -c 'max_connections=1000'
@@ -41,7 +42,7 @@ services:
       - databases
     tmpfs: /pgtmpfs10
 
-  postgres11:
+  test-db-postgres-11:
     image: postgres:11
     restart: always
     command: postgres -c 'max_connections=1000'
@@ -54,7 +55,7 @@ services:
       - databases
     tmpfs: /pgtmpfs11
 
-  postgres12:
+  test-db-postgres-12:
     image: postgres:12
     restart: always
     command: postgres -c 'max_connections=1000'
@@ -67,7 +68,7 @@ services:
       - databases
     tmpfs: /pgtmpfs12
 
-  postgres13:
+  test-db-postgres-13:
     image: postgres:13
     restart: always
     command: postgres -c 'max_connections=1000'
@@ -79,8 +80,23 @@ services:
     networks:
       - databases
     tmpfs: /pgtmpfs12
+    
+  test-db-pgbouncer:
+    image: brainsam/pgbouncer:latest
+    restart: always
+    environment:
+      DB_HOST: "test-db-postgres-11"
+      DB_PORT: "5432"
+      DB_USER: "postgres"
+      DB_PASSWORD: "prisma"
+      POOL_MODE: "transaction"
+      MAX_CLIENT_CONN: "1000"
+    networks:
+      - databases
+    ports:
+      - "6432:6432"
 
-  mysql-5-6:
+  test-db-mysql-5-6:
     image: mysql:5.6.50
     command: mysqld
     restart: always
@@ -94,7 +110,7 @@ services:
       - databases
     tmpfs: /var/lib/mysql
 
-  mysql-5-7:
+  test-db-mysql-5-7:
     image: mysql:5.7.32
     command: mysqld
     restart: always
@@ -108,7 +124,7 @@ services:
       - databases
     tmpfs: /var/lib/mysql
 
-  mysql-8-0:
+  test-db-mysql-8-0:
     image: mysql:8.0.22
     command: mysqld
     restart: always
@@ -121,8 +137,8 @@ services:
     networks:
       - databases
     tmpfs: /var/lib/mysql8
-
-  mariadb-10-0:
+    
+  test-db-mariadb:
     image: mariadb:10
     restart: always
     environment:
@@ -135,7 +151,7 @@ services:
       - databases
     tmpfs: /var/lib/mariadb
 
-  mssql-2019:
+  test-db-mssql-2019:
     image: mcr.microsoft.com/mssql/server:2019-latest
     restart: always
     environment:
@@ -146,7 +162,7 @@ services:
     networks:
       - databases
 
-  mssql-2017:
+  test-db-mssql-2017:
     image: mcr.microsoft.com/mssql/server:2017-latest
     restart: always
     environment:
@@ -167,7 +183,7 @@ services:
       - "27017:27017"
     networks:
       - databases
-
+      
   jaeger:
     image: jaegertracing/all-in-one:latest
     restart: always
@@ -175,7 +191,7 @@ services:
       - "16686:16686" # the trace viewer (http)
     networks:
       - telemetry
-
+      
   otel-agent:
     image: otel/opentelemetry-collector-dev:latest
     command: ["--config=/etc/otel-agent-config.yaml"]
@@ -188,7 +204,7 @@ services:
       - jaeger
     networks:
       - telemetry
-
+      
 networks:
   databases:
   telemetry:
