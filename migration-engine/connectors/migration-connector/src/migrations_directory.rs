@@ -96,7 +96,7 @@ fn match_provider_in_lock_file(migrations_directory_path: &str, provider: &str) 
     std::fs::read_to_string(file_path).ok().map(|content| {
         let found_provider = content
             .lines()
-            .nth(2)
+            .find(|line| line.starts_with("provider"))
             .map(|line| line.trim_start_matches("provider = ").trim_matches('"'))
             .unwrap_or("<PROVIDER NOT FOUND>");
 
