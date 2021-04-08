@@ -546,13 +546,6 @@ impl<'a> Validator<'a> {
                 .filter_map(|base_field| model.find_scalar_field(&base_field))
                 .any(|f| f.is_optional());
 
-            let all_underlying_fields_are_optional = rel_info
-                .fields
-                .iter()
-                .filter_map(|base_field| model.find_scalar_field(&base_field))
-                .all(|f| f.is_optional())
-                && !rel_info.fields.is_empty(); // TODO: hack to maintain backwards compatibility for test schemas that don't specify fields yet
-
             if !unknown_fields.is_empty() {
                 errors.push_error(DatamodelError::new_validation_error(
                         &format!("The argument fields must refer only to existing fields. The following fields do not exist in this model: {}", unknown_fields.join(", ")),
@@ -571,17 +564,6 @@ impl<'a> Validator<'a> {
                 errors.push_error(DatamodelError::new_validation_error(
                         &format!(
                             "The relation field `{}` uses the scalar fields {}. At least one of those fields is optional. Hence the relation field must be optional as well.",
-                            &field.name,
-                            rel_info.fields.join(", ")
-                        ),
-                        ast_field.span)
-                    );
-            }
-
-            if all_underlying_fields_are_optional && field.is_required() {
-                errors.push_error(DatamodelError::new_validation_error(
-                        &format!(
-                            "The relation field `{}` uses the scalar fields {}. All those fields are optional. Hence the relation field must be optional as well.",
                             &field.name,
                             rel_info.fields.join(", ")
                         ),

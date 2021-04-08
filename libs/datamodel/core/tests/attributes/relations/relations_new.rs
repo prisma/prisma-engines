@@ -190,7 +190,7 @@ fn required_relation_field_must_error_when_all_underlying_fields_are_optional() 
     "#;
 
     let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_validation_error("The relation field `user` uses the scalar fields userFirstName, userLastName. All those fields are optional. Hence the relation field must be optional as well.", Span::new(322, 428)));
+    errors.assert_is(DatamodelError::new_validation_error("The relation field `user` uses the scalar fields userFirstName, userLastName. At least one of those fields is optional. Hence the relation field must be optional as well.", Span::new(322, 428)));
 }
 
 #[test]
