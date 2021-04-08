@@ -7,6 +7,7 @@ mod json;
 mod mariadb;
 mod mark_migration_applied_tests;
 mod mark_migration_rolled_back_tests;
+mod migrate_lock;
 mod migration_persistence_tests;
 mod mssql;
 mod mysql;
