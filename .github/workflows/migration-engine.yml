@@ -1,4 +1,4 @@
-name: Cargo tests
+name: Migration Engine
 on:
   push:
     branches:
