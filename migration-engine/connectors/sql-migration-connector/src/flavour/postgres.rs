@@ -9,8 +9,9 @@ use sql_schema_describer::{DescriberErrorKind, SqlSchema, SqlSchemaDescriberBack
 use std::collections::HashMap;
 use url::Url;
 use user_facing_errors::{
-    common::DatabaseDoesNotExist, introspection_engine::DatabaseSchemaInconsistent, migration_engine, KnownError,
-    UserFacingError,
+    common::{DatabaseAccessDenied, DatabaseDoesNotExist},
+    introspection_engine::DatabaseSchemaInconsistent,
+    migration_engine, KnownError, UserFacingError,
 };
 
 const ADVISORY_LOCK_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(10);
@@ -355,6 +356,7 @@ async fn create_postgres_admin_conn(mut url: Url) -> ConnectorResult<Connection>
             // If the database does not exist, try the next one.
             Err(err) => match &err.error_code() {
                 Some(DatabaseDoesNotExist::ERROR_CODE) => (),
+                Some(DatabaseAccessDenied::ERROR_CODE) => (),
                 _ => {
                     conn = Some(Err(err));
                     break;
