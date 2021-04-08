@@ -137,7 +137,7 @@ services:
     networks:
       - databases
     tmpfs: /var/lib/mysql8
-    
+
   test-db-mariadb:
     image: mariadb:10
     restart: always
@@ -183,7 +183,7 @@ services:
       - "27017:27017"
     networks:
       - databases
-      
+
   jaeger:
     image: jaegertracing/all-in-one:latest
     restart: always
@@ -191,7 +191,7 @@ services:
       - "16686:16686" # the trace viewer (http)
     networks:
       - telemetry
-      
+
   otel-agent:
     image: otel/opentelemetry-collector-dev:latest
     command: ["--config=/etc/otel-agent-config.yaml"]
@@ -204,7 +204,7 @@ services:
       - jaeger
     networks:
       - telemetry
-      
+
 networks:
   databases:
   telemetry:
