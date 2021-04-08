@@ -47,10 +47,12 @@ jobs:
             ${{ github.workspace }}/target/release/*.dll
 
   cargo-test:
-    name: "Windows Migration Engine MySQL test run on branch ${{ github.event.ref }} for commit ${{ github.event.inputs.commit }}"
     strategy:
       fail-fast: false
       matrix:
+        db:
+          - mysql
+          - mariadb
         rust:
           - stable
         os:
@@ -58,8 +60,11 @@ jobs:
 
     runs-on: ${{ matrix.os }}
 
+    name: "Windows Migration Engine ${{ matrix.db }} test run on branch ${{ github.event.ref }} for commit ${{ github.event.inputs.commit }}"
+
     env:
       MYSQL_8_TEST_URL: "mysql://root@localhost:3306?connect_timeout=20&socket_timeout=60"
+      MARIADB_TEST_URL: "mysql://root@localhost:3306?connect_timeout=20&socket_timeout=60"
 
     steps:
       - uses: actions/checkout@v2
@@ -74,11 +79,10 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             target
-          key: ${{ runner.os }}-cargo-${{ matrix.rust }}
+          key: ${{ runner.os }}-cargo-${{ matrix.rust }}-${{ matrix.db }}
 
-      - name: Install MySQL
-        run: |
-          choco install mysql
+      - name: Install ${{ matrix.db }}
+        run: choco install ${{ matrix.db }}
 
       - name: Run tests
-        run: cargo test -p migration-engine-tests mysql_8
+        run: cargo test -p migration-engine-tests ${{ matrix.db == 'mysql' && 'mysql_8' || 'mariadb' }}
