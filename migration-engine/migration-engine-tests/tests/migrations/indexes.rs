@@ -150,7 +150,7 @@ async fn model_with_multiple_indexes_works(api: &TestApi) -> TestResult {
 
     model Post {
       id        Int       @id
-      l         Like[]    
+      l         Like[]
     }
 
     model Comment {
@@ -536,6 +536,90 @@ async fn new_index_with_same_name_as_index_from_dropped_table_works(api: &TestAp
 
     api.assert_schema().await?.assert_table("Owner", |table| {
         table.assert_column("ownerid", |col| col.assert_is_required())
+    })?;
+
+    Ok(())
+}
+
+#[test_each_connector(log = "debug")]
+async fn column_type_migrations_should_not_implicitly_drop_indexes(api: &TestApi) -> TestResult {
+    let migrations_directory = api.create_migrations_directory()?;
+
+    let dm1 = r#"
+        model Cat {
+            id Int @id @default(autoincrement())
+            name String
+
+            @@index([name])
+        }
+    "#;
+
+    api.create_migration("01init", dm1, &migrations_directory)
+        .send()
+        .await?;
+
+    let dm2 = r#"
+        model Cat {
+            id Int @id
+            name Int
+
+            @@index([name])
+        }
+    "#;
+
+    // NOTE: we are relying on the fact that we will drop and recreate the column for that particular type migration.
+    api.create_migration("02change", dm2, &migrations_directory)
+        .send()
+        .await?;
+
+    api.apply_migrations(&migrations_directory).send().await?;
+
+    api.assert_schema().await?.assert_table("Cat", |cat| {
+        cat.assert_indexes_count(1)?
+            .assert_index_on_columns(&["name"], |idx| idx.assert_is_not_unique())
+    })?;
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn column_type_migrations_should_not_implicitly_drop_compound_indexes(api: &TestApi) -> TestResult {
+    let migrations_directory = api.create_migrations_directory()?;
+
+    let dm1 = r#"
+        model Cat {
+            id Int @id @default(autoincrement())
+            name String
+            age Int
+
+            @@index([name, age])
+        }
+    "#;
+
+    api.create_migration("01init", dm1, &migrations_directory)
+        .send()
+        .await?;
+
+    let dm2 = r#"
+        model Cat {
+            id Int @id
+            name Int
+            age Int
+
+            @@index([name, age])
+        }
+    "#;
+
+    // NOTE: we are relying on the fact that we will drop and recreate the column for that particular type migration.
+    api.create_migration("02change", dm2, &migrations_directory)
+        .send()
+        .await?;
+
+    api.apply_migrations(&migrations_directory).send().await?;
+
+    api.assert_schema().await?.assert_table("Cat", |cat| {
+        cat.assert_indexes_count(1)?
+            .assert_index_on_columns(&["name", "age"], |idx| idx.assert_is_not_unique())
     })?;
 
     Ok(())

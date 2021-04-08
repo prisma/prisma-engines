@@ -44,6 +44,11 @@ pub(crate) trait SqlSchemaDifferFlavour {
         Vec::new()
     }
 
+    /// Returns whether the underlying database implicitly drops indexes on dropped (and potentially recreated) columns.
+    fn indexes_should_be_recreated_after_column_drop(&self) -> bool {
+        false
+    }
+
     /// Return whether an index should be renamed by the migration.
     fn index_should_be_renamed(&self, indexes: &Pair<IndexWalker<'_>>) -> bool {
         indexes.previous().name() != indexes.next().name()

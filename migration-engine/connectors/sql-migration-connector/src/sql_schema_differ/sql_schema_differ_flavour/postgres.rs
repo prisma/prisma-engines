@@ -59,7 +59,6 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
             .collect()
     }
 
-    /// Return potential `CreateEnum` steps.
     fn create_enums(&self, differ: &SqlSchemaDiffer<'_>) -> Vec<CreateEnum> {
         differ
             .created_enums()
@@ -69,7 +68,6 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
             .collect()
     }
 
-    /// Return potential `DropEnum` steps.
     fn drop_enums(&self, differ: &SqlSchemaDiffer<'_>) -> Vec<DropEnum> {
         differ
             .dropped_enums()
@@ -77,6 +75,10 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
                 enum_index: r#enum.enum_index(),
             })
             .collect()
+    }
+
+    fn indexes_should_be_recreated_after_column_drop(&self) -> bool {
+        true
     }
 
     fn index_should_be_renamed(&self, pair: &Pair<IndexWalker<'_>>) -> bool {

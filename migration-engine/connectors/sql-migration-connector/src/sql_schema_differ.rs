@@ -340,6 +340,27 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                     caused_by_create_table: false,
                 })
             }
+
+            if self.flavour.indexes_should_be_recreated_after_column_drop() {
+                let dropped_and_recreated_column_indexes_next: HashSet<usize> = tables
+                    .column_pairs()
+                    .filter(|columns| matches!(columns.all_changes().1, Some(ColumnTypeChange::NotCastable)))
+                    .map(|col| col.as_pair().next().column_index())
+                    .collect();
+
+                for index in tables.index_pairs().filter(|index| {
+                    index
+                        .next()
+                        .columns()
+                        .any(|col| dropped_and_recreated_column_indexes_next.contains(&col.column_index()))
+                }) {
+                    steps.push(CreateIndex {
+                        table_index: tables.next().table_index(),
+                        index_index: index.next().index(),
+                        caused_by_create_table: false,
+                    })
+                }
+            }
         }
 
         steps
