@@ -65,10 +65,17 @@ impl GeneratorLoader {
     }
 
     fn lift_generator(ast_generator: &ast::GeneratorConfig) -> Result<ValidatedGenerator, Diagnostics> {
-        let mut args = Arguments::new(&ast_generator.properties, ast_generator.span);
+        let args: HashMap<_, _> = ast_generator
+            .properties
+            .iter()
+            .map(|arg| (arg.name.name.as_str(), ValueValidator::new(&arg.value)))
+            .collect();
         let mut diagnostics = Diagnostics::new();
 
-        let (from_env_var, value) = args.arg(PROVIDER_KEY)?.as_str_from_env()?;
+        let (from_env_var, value) = args
+            .get(PROVIDER_KEY)
+            .ok_or_else(|| DatamodelError::new_argument_not_found_error(PROVIDER_KEY, ast_generator.span))?
+            .as_str_from_env()?;
 
         let provider = StringFromEnvVar {
             name: PROVIDER_KEY,
@@ -76,7 +83,7 @@ impl GeneratorLoader {
             value,
         };
 
-        let output = if let Ok(arg) = args.arg(OUTPUT_KEY) {
+        let output = if let Some(arg) = args.get(OUTPUT_KEY) {
             let (from_env_var, value) = arg.as_str_from_env()?;
 
             Some(StringFromEnvVar {
@@ -90,16 +97,17 @@ impl GeneratorLoader {
 
         let mut properties: HashMap<String, String> = HashMap::new();
 
-        let binary_targets = match args.arg(BINARY_TARGETS_KEY).ok() {
+        let binary_targets = match args.get(BINARY_TARGETS_KEY) {
             Some(x) => x.as_array().to_str_vec()?,
             None => Vec::new(),
         };
 
         // for compatibility reasons we still accept the old experimental key
         let preview_features_arg = args
-            .arg(PREVIEW_FEATURES_KEY)
-            .or_else(|_| args.arg(EXPERIMENTAL_FEATURES_KEY));
-        let (preview_features, span) = match preview_features_arg.ok() {
+            .get(PREVIEW_FEATURES_KEY)
+            .or_else(|| args.get(EXPERIMENTAL_FEATURES_KEY));
+
+        let (preview_features, span) = match preview_features_arg {
             Some(x) => (x.as_array().to_str_vec()?, x.span()),
             None => (Vec::new(), Span::empty()),
         };
