@@ -399,20 +399,20 @@ impl SqlSchemaDescriber {
                 }));
             }
 
-            let on_delete_action = match confdeltype {
-                Some("a") => ForeignKeyAction::NoAction,
-                Some("r") => ForeignKeyAction::Restrict,
-                Some("c") => ForeignKeyAction::Cascade,
-                Some("n") => ForeignKeyAction::SetNull,
-                Some("d") => ForeignKeyAction::SetDefault,
+            let on_delete_action = match confdeltype.as_str() {
+                "a" => ForeignKeyAction::NoAction,
+                "r" => ForeignKeyAction::Restrict,
+                "c" => ForeignKeyAction::Cascade,
+                "n" => ForeignKeyAction::SetNull,
+                "d" => ForeignKeyAction::SetDefault,
                 _ => panic!("unrecognized foreign key action '{}'", confdeltype),
             };
-            let on_update_action = match confupdtype {
-                Some("a") => ForeignKeyAction::NoAction,
-                Some("r") => ForeignKeyAction::Restrict,
-                Some("c") => ForeignKeyAction::Cascade,
-                Some("n") => ForeignKeyAction::SetNull,
-                Some("d") => ForeignKeyAction::SetDefault,
+            let on_update_action = match confupdtype.as_str() {
+                "a" => ForeignKeyAction::NoAction,
+                "r" => ForeignKeyAction::Restrict,
+                "c" => ForeignKeyAction::Cascade,
+                "n" => ForeignKeyAction::SetNull,
+                "d" => ForeignKeyAction::SetDefault,
                 _ => panic!("unrecognized foreign key action '{}'", confdeltype),
             };
             match intermediate_fks.get_mut(&id) {
