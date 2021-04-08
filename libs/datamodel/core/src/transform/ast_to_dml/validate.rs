@@ -544,16 +544,13 @@ impl<'a> Validator<'a> {
                 .fields
                 .iter()
                 .filter_map(|base_field| model.find_scalar_field(&base_field))
-                .any(|f| !f.is_required());
+                .any(|f| f.is_optional());
 
             let all_underlying_fields_are_optional = rel_info
                 .fields
                 .iter()
-                .map(|base_field| match model.find_scalar_field(&base_field) {
-                    Some(f) => f.is_optional(),
-                    None => false,
-                })
-                .all(|x| x)
+                .filter_map(|base_field| model.find_scalar_field(&base_field))
+                .all(|f| f.is_optional())
                 && !rel_info.fields.is_empty(); // TODO: hack to maintain backwards compatibility for test schemas that don't specify fields yet
 
             if !unknown_fields.is_empty() {
