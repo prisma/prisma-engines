@@ -7,8 +7,8 @@ on:
 
 jobs:
   env:
-    - SQLITE_MAX_VARIABLE_NUMBER: 250000
-    - SQLITE_MAX_EXPR_DEPTH: 10000
+    SQLITE_MAX_VARIABLE_NUMBER: 250000
+    SQLITE_MAX_EXPR_DEPTH: 10000
 
   compile:
     name: "Compile Migration and Query Engines"
