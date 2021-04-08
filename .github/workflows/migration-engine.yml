@@ -31,6 +31,7 @@ jobs:
 
   test:
     name: "Test Migration Engine - ${{ matrix.database }}"
+    needs: [compile]
     
     strategy:
       fail-fast: false
