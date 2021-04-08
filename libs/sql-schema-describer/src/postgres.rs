@@ -385,8 +385,8 @@ impl SqlSchemaDescriber {
             let referenced_table = row.get_expect_string("parent_table");
             let referenced_column = row.get_expect_string("parent_column");
             let table_name = row.get_expect_string("table_name");
-            let confdeltype = row.get_expect_char("confdeltype");
-            let confupdtype = row.get_expect_char("confupdtype");
+            let confdeltype = row.get_expect_string("confdeltype");
+            let confupdtype = row.get_expect_string("confupdtype");
             let constraint_name = row.get_expect_string("constraint_name");
 
             let referenced_schema_name = row.get_expect_string("referenced_schema_name");
