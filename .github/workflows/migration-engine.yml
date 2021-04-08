@@ -24,7 +24,7 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             target
-          key: migration-engine-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          key: migration-engine-${{ runner.os }}-cargo
 
       - run: cargo test --no-run
         working-directory: migration-engine/migration-engine-tests
@@ -68,7 +68,7 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             target
-          key: migration-engine-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          key: migration-engine-${{ runner.os }}-cargo
 
       - run: timeout 40m cargo test ${{ matrix.database }}
         working-directory: migration-engine/migration-engine-tests

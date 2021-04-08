@@ -6,21 +6,20 @@ on:
   pull_request:
 
 jobs:
+  env:
+    - SQLITE_MAX_VARIABLE_NUMBER: 250000
+    - SQLITE_MAX_EXPR_DEPTH: 10000
 
-  test:
-    name: "Test Query Engine - ${{ matrix.connector }}"
-    
-    strategy:
-      fail-fast: false
-      matrix:
-        connector: [postgresql9, postgresql10, postgresql11, postgresql12, postgresql13, pgbouncer, mysql, mysql56, mysql8, mariadb, mssql2017, mssql2019, sqlite]
-        
+  compile:
+    name: "Compile Migration and Query Engines"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
 
-      - name: "Start databases"
-        run: docker-compose up -d 
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          default: true
 
       - uses: actions/cache@v2
         with:
@@ -28,11 +27,72 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             target
-          key: query-engine-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          
-      - name: Build Engines on image
-        run: docker-compose run -e SQLITE_MAX_VARIABLE_NUMBER=250000 -e SQLITE_MAX_EXPR_DEPTH=10000 qe-test-base cargo build --all-features --release --bin query-engine --bin migration-engine          
-      
-      - name: Run tests on image
-        run: docker-compose run -e TEST_CONNECTOR=${{ matrix.connector }} -e TEST_MODE=simple -w /root/build/query-engine/connector-test-kit qe-test-base sbt test
+          key: query-engine-${{ runner.os }}-cargo
 
+      - run: cargo build --all-features --release --bin query-engine --bin migration-engine
+
+  test:
+    name: "Test Query Engine - ${{ matrix.connector }}"
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        connector:
+          - postgres9
+          - postgres10
+          - postgres11
+          - postgres12
+          - postgres13
+          - pgbouncer
+          - mysql
+          - mysql56
+          - mysql8
+          - mariadb
+          - mssql2017
+          - mssql2019
+          - sqlite
+
+    env:
+      TEST_CONNECTOR: "${{ matrix.connector }}"
+      TEST_MODE: "simple"
+      SCALA_VERSION: "2.12.3"
+      SBT_VERSION: "1.2.3"
+      SBT_HOME: "/usr/local/sbt"
+      SCALA_HOME: "/usr/local/scala"
+      PATH: "${SCALA_HOME}/bin:${SBT_HOME}/bin:/root/.cargo/bin:$PATH"
+      LD_LIBRARY_PATH: "/lib:/usr/lib:/usr/include/linux:/lib/x86_64-linux-gnu"
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: "Start database"
+        run: make dev-${{ matrix.connector }}
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: query-engine-${{ runner.os }}-cargo
+
+      - name: Install dependencies
+        run: |
+          # Dependencies
+          apt-get update
+          apt-get -y install wget curl git make build-essential libz-dev libsqlite3-dev openssl libssl-dev pkg-config gzip mingw-w64 libkrb5-dev libgss-dev libclang-dev libc6-dev libclang-common-7-dev software-properties-common clang
+          apt-get -y install llvm
+          wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | apt-key add -
+          add-apt-repository --yes https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/
+          apt-get update && apt-get -y install adoptopenjdk-8-hotspot
+          mkdir -p $SCALA_HOME
+          mkdir -p $SBT_HOME
+
+          # Install Scala & SBT
+          curl -fsL https://downloads.typesafe.com/scala/$SCALA_VERSION/scala-$SCALA_VERSION.tgz | tar xfz - -C $SCALA_HOME --strip-components 1
+          curl -fsL https://github.com/sbt/sbt/releases/download/v${SBT_VERSION}/sbt-${SBT_VERSION}.tgz | tar xfz - -C $SBT_HOME --strip-components 1
+
+      - name: Run tests
+        working-directory: query-engine/connector-test-kit
+        run: sbt test
