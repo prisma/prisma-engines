@@ -30,7 +30,6 @@ jobs:
     env:
       SQLITE_MAX_VARIABLE_NUMBER: 250000
       SQLITE_MAX_EXPR_DEPTH: 10000
-      CURRENT_CONNECTOR: ${{ matrix.connector }}
 
     runs-on: ubuntu-latest
     steps:
@@ -38,9 +37,6 @@ jobs:
 
       - name: "Start database"
         run: make dev-${{ matrix.connector }}
-
-      - name: "Set connector"
-        run: echo "${{ matrix.connector }}" > current_connector
 
       - uses: olafurpg/setup-scala@v10
         with:
