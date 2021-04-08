@@ -400,19 +400,19 @@ impl SqlSchemaDescriber {
             }
 
             let on_delete_action = match confdeltype {
-                "a" => ForeignKeyAction::NoAction,
-                "r" => ForeignKeyAction::Restrict,
-                "c" => ForeignKeyAction::Cascade,
-                "n" => ForeignKeyAction::SetNull,
-                "d" => ForeignKeyAction::SetDefault,
+                Some("a") => ForeignKeyAction::NoAction,
+                Some("r") => ForeignKeyAction::Restrict,
+                Some("c") => ForeignKeyAction::Cascade,
+                Some("n") => ForeignKeyAction::SetNull,
+                Some("d") => ForeignKeyAction::SetDefault,
                 _ => panic!("unrecognized foreign key action '{}'", confdeltype),
             };
             let on_update_action = match confupdtype {
-                "a" => ForeignKeyAction::NoAction,
-                "r" => ForeignKeyAction::Restrict,
-                "c" => ForeignKeyAction::Cascade,
-                "n" => ForeignKeyAction::SetNull,
-                "d" => ForeignKeyAction::SetDefault,
+                Some("a") => ForeignKeyAction::NoAction,
+                Some("r") => ForeignKeyAction::Restrict,
+                Some("c") => ForeignKeyAction::Cascade,
+                Some("n") => ForeignKeyAction::SetNull,
+                Some("d") => ForeignKeyAction::SetDefault,
                 _ => panic!("unrecognized foreign key action '{}'", confdeltype),
             };
             match intermediate_fks.get_mut(&id) {
