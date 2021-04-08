@@ -89,7 +89,7 @@ start-mysql_8:
 
 dev-mysql8: start-mysql_8
 	echo 'mysql8' > current_connector
-	cp $(CONFIG_PATH)/mysql58 $(CONFIG_FILE)
+	cp $(CONFIG_PATH)/mysql8 $(CONFIG_FILE)
 
 start-mysql_mariadb:
 	docker-compose -f docker-compose.yml up -d --remove-orphans mariadb-10-0
