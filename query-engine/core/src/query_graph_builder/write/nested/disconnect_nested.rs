@@ -167,12 +167,14 @@ fn handle_one_to_x(
     // Depending on where the relation is inlined, we update the parent or the child nodes.
     let (node_to_attach, model_to_update, extractor_model_id, null_record_id) =
         if parent_relation_field.is_inlined_on_enclosing_model() {
+            // Inlined on parent
             let parent_model = parent_relation_field.model();
             let extractor_model_id = parent_model.primary_identifier();
             let null_record_id = parent_relation_field.linking_fields().empty_record_projection();
 
             (parent_node, parent_model, extractor_model_id, null_record_id)
         } else {
+            // Inlined on child
             let child_model = child_relation_field.model();
             let extractor_model_id = child_model.primary_identifier();
             let null_record_id = child_relation_field.linking_fields().empty_record_projection();
@@ -186,9 +188,6 @@ fn handle_one_to_x(
         };
 
     let update_node = utils::update_records_node_placeholder(graph, Filter::empty(), model_to_update);
-    let relation_name = parent_relation_field.relation().name.clone();
-    let parent_name = parent_relation_field.model().name.clone();
-    let child_name = parent_relation_field.related_model().name.clone();
 
     // Edge to inject the correct data into the update (either from the parent or child).
     graph.create_edge(
@@ -198,11 +197,7 @@ fn handle_one_to_x(
             extractor_model_id,
             Box::new(move |mut update_node, links| {
                 if links.is_empty() {
-                    return Err(QueryGraphBuilderError::RecordsNotConnected {
-                        relation_name,
-                        parent_name,
-                        child_name,
-                    });
+                    return Ok(update_node);
                 }
 
                 // Handle filter & arg injection
