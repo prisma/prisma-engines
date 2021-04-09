@@ -6,14 +6,12 @@ use url::Url;
 /// a `datasource` from the prisma schema.
 pub struct Datasource {
     pub name: String,
-    /// all providers that were specified
-    pub provider: Vec<String>,
+    /// The provider string
+    pub provider: String,
     /// the provider that was selected as active from all specified providers
     pub active_provider: String,
     pub url: StringFromEnvVar,
     pub documentation: Option<String>,
-    /// a connector representing the intersection of all providers specified
-    pub combined_connector: Box<dyn Connector>,
     /// the connector of the active provider
     pub active_connector: Box<dyn Connector>,
     /// An optional user-defined shadow database URL.

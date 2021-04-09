@@ -71,8 +71,8 @@ pub enum DatamodelError {
   #[error("Function not known: \"{}\".", function_name)]
   FunctionNotKnownError { function_name: String, span: Span },
 
-  #[error("Datasource provider not known: \"{}\".", source_name)]
-  DatasourceProviderNotKnownError { source_name: String, span: Span },
+  #[error("Datasource provider not known: \"{}\".", provider)]
+  DatasourceProviderNotKnownError { provider: String, span: Span },
 
   #[error("shadowDatabaseUrl is the same as url for datasource \"{}\". Please specify a different database as shadow database.", source_name)]
   ShadowDatabaseUrlIsSameAsMainUrl { source_name: String, span: Span },
@@ -355,8 +355,8 @@ impl DatamodelError {
     DatamodelError::FunctionNotKnownError { function_name: String::from(function_name), span }
   }
 
-  pub fn new_datasource_provider_not_known_error(source_name: &str, span: Span) -> DatamodelError {
-    DatamodelError::DatasourceProviderNotKnownError { source_name: String::from(source_name), span }
+  pub fn new_datasource_provider_not_known_error(provider: &str, span: Span) -> DatamodelError {
+    DatamodelError::DatasourceProviderNotKnownError { provider: String::from(provider), span }
   }
 
   pub fn new_shadow_database_is_same_as_main_url_error(source_name: String, span: Span) -> DatamodelError {
