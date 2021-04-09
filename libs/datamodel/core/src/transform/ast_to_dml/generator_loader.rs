@@ -1,6 +1,5 @@
 use super::super::helpers::*;
 use crate::ast::Span;
-use crate::common::preview_features::{DEPRECATED_GENERATOR_PREVIEW_FEATURES, GENERATOR_PREVIEW_FEATURES};
 use crate::transform::ast_to_dml::common::validate_preview_features;
 use crate::StringFromEnvVar;
 use crate::{ast, configuration::Generator, diagnostics::*};
@@ -113,12 +112,7 @@ impl GeneratorLoader {
         };
 
         if !preview_features.is_empty() {
-            let mut result = validate_preview_features(
-                preview_features.clone(),
-                span,
-                Vec::from(GENERATOR_PREVIEW_FEATURES),
-                Vec::from(DEPRECATED_GENERATOR_PREVIEW_FEATURES),
-            );
+            let mut result = validate_preview_features(preview_features.clone(), span);
             diagnostics.append(&mut result);
             if diagnostics.has_errors() {
                 return Err(diagnostics);
