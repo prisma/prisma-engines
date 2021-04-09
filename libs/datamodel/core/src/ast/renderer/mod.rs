@@ -16,7 +16,7 @@ pub trait LineWriteable {
 }
 
 pub struct Renderer<'a> {
-    stream: &'a mut dyn std::io::Write,
+    stream: &'a mut dyn std::fmt::Write,
     indent: usize,
     new_line: usize,
     is_new: bool,
@@ -25,7 +25,7 @@ pub struct Renderer<'a> {
 }
 
 impl<'a> Renderer<'a> {
-    pub fn new(stream: &'a mut dyn std::io::Write, indent_width: usize) -> Renderer<'a> {
+    pub fn new(stream: &'a mut dyn std::fmt::Write, indent_width: usize) -> Renderer<'a> {
         Renderer {
             stream,
             indent: 0,
@@ -75,7 +75,8 @@ impl<'a> Renderer<'a> {
                 }
             };
         }
-        writeln!(self.stream).expect("Writer error.");
+
+        self.stream.write_char('\n').expect("Writer error.");
     }
 
     fn render_documentation(target: &mut dyn LineWriteable, obj: &dyn ast::WithDocumentation) {
@@ -422,14 +423,14 @@ impl<'a> LineWriteable for Renderer<'a> {
         // TODO: Proper result handling.
         if self.new_line > 0 || self.maybe_new_line > 0 {
             for _i in 0..std::cmp::max(self.new_line, self.maybe_new_line) {
-                writeln!(self.stream).expect("Writer error.");
+                self.stream.write_char('\n').expect("Writer error.");
             }
             write!(self.stream, "{}", " ".repeat(self.indent * self.indent_width)).expect("Writer error.");
             self.new_line = 0;
             self.maybe_new_line = 0;
         }
 
-        write!(self.stream, "{}", param).expect("Writer error.");
+        self.stream.write_str(param).expect("Writer error.");
     }
 
     fn end_line(&mut self) {
