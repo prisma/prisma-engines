@@ -249,6 +249,20 @@ impl<'a> RelationFieldWalker<'a> {
         self.get().arity
     }
 
+    pub fn scalar_arities(&self) -> impl Iterator<Item = FieldArity> + '_ {
+        self
+            .get()
+            .relation_info
+            .fields
+            .iter()
+            .map(move |field| {
+                let field = self.model().find_scalar_field(field.as_str())
+                    .unwrap_or_else(|| panic!("Unable to resolve field {} on {}, Expected relation `fields` to point to fields on the enclosing model.", field, self.model().name()));
+
+                field.arity()
+            })
+    }
+
     fn get(&self) -> &'a RelationField {
         self.datamodel.models[self.model_idx].fields[self.field_idx]
             .as_relation_field()

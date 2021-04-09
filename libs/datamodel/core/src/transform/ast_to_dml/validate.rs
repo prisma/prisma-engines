@@ -540,21 +540,11 @@ impl<'a> Validator<'a> {
                 .cloned()
                 .collect();
 
-            let at_least_one_underlying_field_is_required = rel_info
+            let at_least_one_underlying_field_is_optional = rel_info
                 .fields
                 .iter()
                 .filter_map(|base_field| model.find_scalar_field(&base_field))
-                .any(|f| f.is_required());
-
-            let all_underlying_fields_are_optional = rel_info
-                .fields
-                .iter()
-                .map(|base_field| match model.find_scalar_field(&base_field) {
-                    Some(f) => f.is_optional(),
-                    None => false,
-                })
-                .all(|x| x)
-                && !rel_info.fields.is_empty(); // TODO: hack to maintain backwards compatibility for test schemas that don't specify fields yet
+                .any(|f| f.is_optional());
 
             if !unknown_fields.is_empty() {
                 errors.push_error(DatamodelError::new_validation_error(
@@ -570,21 +560,10 @@ impl<'a> Validator<'a> {
                     );
             }
 
-            if at_least_one_underlying_field_is_required && !field.is_required() {
+            if at_least_one_underlying_field_is_optional && field.is_required() {
                 errors.push_error(DatamodelError::new_validation_error(
                         &format!(
-                            "The relation field `{}` uses the scalar fields {}. At least one of those fields is required. Hence the relation field must be required as well.",
-                            &field.name,
-                            rel_info.fields.join(", ")
-                        ),
-                        ast_field.span)
-                    );
-            }
-
-            if all_underlying_fields_are_optional && field.is_required() {
-                errors.push_error(DatamodelError::new_validation_error(
-                        &format!(
-                            "The relation field `{}` uses the scalar fields {}. All those fields are optional. Hence the relation field must be optional as well.",
+                            "The relation field `{}` uses the scalar fields {}. At least one of those fields is optional. Hence the relation field must be optional as well.",
                             &field.name,
                             rel_info.fields.join(", ")
                         ),

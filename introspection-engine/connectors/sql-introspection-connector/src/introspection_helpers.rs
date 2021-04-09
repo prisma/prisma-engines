@@ -188,7 +188,7 @@ pub(crate) fn calculate_relation_field(
         .map(|c| table.columns.iter().find(|tc| tc.name == *c).unwrap())
         .collect();
 
-    let arity = match !columns.iter().any(|c| c.is_required()) {
+    let arity = match columns.iter().any(|c| !c.is_required()) {
         true => FieldArity::Optional,
         false => FieldArity::Required,
     };
