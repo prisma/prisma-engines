@@ -10,8 +10,8 @@ pub(crate) use sql_schema_differ_flavour::SqlSchemaDifferFlavour;
 use crate::{
     pair::Pair,
     sql_migration::{
-        self, AddColumn, AddForeignKey, AlterColumn, AlterEnum, AlterTable, CreateEnum, CreateIndex, CreateTable,
-        DropColumn, DropEnum, DropForeignKey, DropIndex, DropTable, RedefineTable, SqlMigrationStep, TableChange,
+        self, AddColumn, AddForeignKey, AlterColumn, AlterEnum, AlterTable, CreateIndex, CreateTable, DropColumn,
+        DropForeignKey, DropIndex, DropTable, RedefineTable, SqlMigrationStep, TableChange,
     },
     SqlFlavour, SqlSchema,
 };
@@ -48,16 +48,18 @@ pub(crate) fn calculate_steps(schemas: Pair<&SqlSchema>, flavour: &dyn SqlFlavou
 
     let redefine_tables = differ.redefine_tables(&tables_to_redefine);
     let add_foreign_keys = differ.add_foreign_keys(&tables_to_redefine);
-    let create_enums = differ.create_enums();
+    let mut alter_enums = flavour.alter_enums(&differ);
+    push_previous_usages_as_defaults_in_altered_enums(&differ, &mut alter_enums);
 
     let redefine_tables = Some(redefine_tables)
         .filter(|tables| !tables.is_empty())
         .map(SqlMigrationStep::RedefineTables);
 
-    create_enums
+    flavour
+        .create_enums(&differ)
         .into_iter()
         .map(SqlMigrationStep::CreateEnum)
-        .chain(differ.alter_enums().into_iter().map(SqlMigrationStep::AlterEnum))
+        .chain(alter_enums.into_iter().map(SqlMigrationStep::AlterEnum))
         .chain(drop_foreign_keys.into_iter().map(SqlMigrationStep::DropForeignKey))
         .chain(drop_indexes.into_iter().map(SqlMigrationStep::DropIndex))
         .chain(alter_tables.into_iter().map(SqlMigrationStep::AlterTable))
@@ -71,7 +73,7 @@ pub(crate) fn calculate_steps(schemas: Pair<&SqlSchema>, flavour: &dyn SqlFlavou
         //   postgres.
         // - We must drop enums after we drop tables, or dropping the enum will
         //   fail on postgres because objects (=tables) still depend on them.
-        .chain(differ.drop_enums().into_iter().map(SqlMigrationStep::DropEnum))
+        .chain(flavour.drop_enums(&differ).into_iter().map(SqlMigrationStep::DropEnum))
         .chain(differ.create_tables().map(SqlMigrationStep::CreateTable))
         .chain(redefine_tables)
         // Order matters: we must create indexes after ALTER TABLEs because the indexes can be
@@ -101,8 +103,7 @@ pub(crate) struct SqlSchemaDiffer<'a> {
 }
 
 impl<'schema> SqlSchemaDiffer<'schema> {
-    #[allow(clippy::needless_lifetimes)] // clippy is wrong here
-    fn create_tables<'a>(&'a self) -> impl Iterator<Item = CreateTable> + 'a {
+    fn create_tables(&self) -> impl Iterator<Item = CreateTable> + '_ {
         self.created_tables().map(|created_table| CreateTable {
             table_index: created_table.table_index(),
         })
@@ -234,11 +235,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         })
     }
 
-    fn drop_foreign_keys<'a>(
-        &'a self,
-        drop_foreign_keys: &mut Vec<DropForeignKey>,
-        tables_to_redefine: &HashSet<String>,
-    ) {
+    fn drop_foreign_keys(&self, drop_foreign_keys: &mut Vec<DropForeignKey>, tables_to_redefine: &HashSet<String>) {
         for differ in self
             .table_pairs()
             .filter(|tables| !tables_to_redefine.contains(tables.next().name()))
@@ -400,18 +397,6 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         drop_indexes.into_iter().collect()
     }
 
-    fn create_enums(&self) -> Vec<CreateEnum> {
-        self.flavour.create_enums(self)
-    }
-
-    fn drop_enums(&self) -> Vec<DropEnum> {
-        self.flavour.drop_enums(self)
-    }
-
-    fn alter_enums(&self) -> Vec<AlterEnum> {
-        self.flavour.alter_enums(self)
-    }
-
     fn redefine_tables(&self, tables_to_redefine: &HashSet<String>) -> Vec<RedefineTable> {
         self.table_pairs()
             .filter(|tables| tables_to_redefine.contains(tables.next().name()))
@@ -546,6 +531,47 @@ impl<'schema> SqlSchemaDiffer<'schema> {
 
     fn next_enums(&self) -> impl Iterator<Item = EnumWalker<'schema>> {
         self.schemas.next().enum_walkers()
+    }
+}
+
+fn push_previous_usages_as_defaults_in_altered_enums(differ: &SqlSchemaDiffer<'_>, alter_enums: &mut [AlterEnum]) {
+    for alter_enum in alter_enums {
+        let mut previous_usages_as_default = Vec::new();
+
+        let enum_names = differ.schemas.enums(&alter_enum.index).map(|enm| enm.name());
+
+        for table in differ.dropped_tables() {
+            for column in table
+                .columns()
+                .filter(|col| col.column_type_is_enum(enum_names.previous()) && col.default().is_some())
+            {
+                previous_usages_as_default.push(((column.table().table_index(), column.column_index()), None));
+            }
+        }
+
+        for tables in differ.table_pairs() {
+            for column in tables
+                .dropped_columns()
+                .filter(|col| col.column_type_is_enum(enum_names.previous()) && col.default().is_some())
+            {
+                previous_usages_as_default.push(((column.table().table_index(), column.column_index()), None));
+            }
+
+            for columns in tables.column_pairs().filter(|col| {
+                col.previous.column_type_is_enum(enum_names.previous()) && col.previous.default().is_some()
+            }) {
+                let next_usage_as_default = Some(&columns.next)
+                    .filter(|col| col.column_type_is_enum(enum_names.next()) && col.default().is_some())
+                    .map(|col| (col.table().table_index(), col.column_index()));
+
+                previous_usages_as_default.push((
+                    (columns.previous.table().table_index(), columns.previous.column_index()),
+                    next_usage_as_default,
+                ));
+            }
+        }
+
+        alter_enum.previous_usages_as_default = previous_usages_as_default;
     }
 }
 

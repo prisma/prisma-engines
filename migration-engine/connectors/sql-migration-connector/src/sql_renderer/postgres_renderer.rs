@@ -109,7 +109,7 @@ impl SqlRenderer for PostgresFlavour {
 
         stmts.push("BEGIN".to_string());
 
-        // create the new enum with tmp name
+        // Create the new enum with tmp name
         {
             let create_new_enum = format!(
                 "CREATE TYPE {enum_name} AS ENUM ({variants})",
@@ -120,27 +120,22 @@ impl SqlRenderer for PostgresFlavour {
             stmts.push(create_new_enum);
         }
 
-        // find all usages as a default and drop them
+        // Find all usages as a default and drop them
         {
-            for (table_index, column_index) in &alter_enum.previous_usages_as_default {
-                let table_name = schemas.previous().table_walker_at(*table_index).name();
-                let column_name = schemas
-                    .previous()
-                    .table_walker_at(*table_index)
-                    .column_at(*column_index)
-                    .name();
+            for ((table_idx, colidx), _) in &alter_enum.previous_usages_as_default {
+                let table = schemas.previous().table_walker_at(*table_idx);
 
                 let drop_default = format!(
-                    "ALTER TABLE {table_name} ALTER COLUMN {column_name} DROP DEFAULT",
-                    table_name = Quoted::postgres_ident(&table_name),
-                    column_name = Quoted::postgres_ident(&column_name),
+                    "ALTER TABLE \"{table_name}\" ALTER COLUMN \"{column_name}\" DROP DEFAULT",
+                    table_name = table.name(),
+                    column_name = table.column_at(*colidx).name(),
                 );
 
                 stmts.push(drop_default);
             }
         }
 
-        // alter type of the current columns to new, with a cast
+        // Alter type of the current columns to new, with a cast
         {
             let affected_columns = walk_columns(schemas.next()).filter(|column| matches!(&column.column_type().family, ColumnTypeFamily::Enum(name) if name.as_str() == enums.next().name()));
 
@@ -158,35 +153,7 @@ impl SqlRenderer for PostgresFlavour {
             }
         }
 
-        // reestablish dropped defaults
-        {
-            for (table_index, column_index) in &alter_enum.previous_usages_as_default {
-                let table_name = schemas.previous().table_walker_at(*table_index).name();
-                let column = schemas
-                    .previous()
-                    .table_walker_at(*table_index)
-                    .column_at(*column_index);
-
-                let column_name = column.name();
-                let default_str = column
-                    .default()
-                    .map(|default| render_default(default))
-                    .filter(|default| !default.is_empty())
-                    .map(|default| format!(" DEFAULT {}", default))
-                    .expect("We should only be setting a changed default if there was one on the previous schema.");
-
-                let set_default = format!(
-                    "ALTER TABLE {table_name} ALTER COLUMN {column_name} SET {default}",
-                    table_name = Quoted::postgres_ident(&table_name),
-                    column_name = Quoted::postgres_ident(&column_name),
-                    default = default_str,
-                );
-
-                stmts.push(set_default);
-            }
-        }
-
-        // rename old enum
+        // Rename old enum
         {
             let sql = format!(
                 "ALTER TYPE {enum_name} RENAME TO {tmp_old_name}",
@@ -197,7 +164,7 @@ impl SqlRenderer for PostgresFlavour {
             stmts.push(sql);
         }
 
-        // rename new enum
+        // Rename new enum
         {
             let sql = format!(
                 "ALTER TYPE {tmp_name} RENAME TO {enum_name}",
@@ -208,7 +175,7 @@ impl SqlRenderer for PostgresFlavour {
             stmts.push(sql)
         }
 
-        // drop old enum
+        // Drop old enum
         {
             let sql = ddl::DropType {
                 type_name: tmp_old_name.as_str().into(),
@@ -216,6 +183,37 @@ impl SqlRenderer for PostgresFlavour {
             .to_string();
 
             stmts.push(sql)
+        }
+
+        // Reinstall dropped defaults that need to be reinstalled
+        {
+            for ((prev_tblidx, prev_colidx), (next_tblidx, next_colidx)) in alter_enum
+                .previous_usages_as_default
+                .iter()
+                .filter_map(|(prev, next)| next.map(|next| (prev, next)))
+            {
+                let columns = schemas
+                    .tables(&Pair::new(*prev_tblidx, next_tblidx))
+                    .columns(&Pair::new(*prev_colidx, next_colidx));
+
+                let table_name = columns.previous().table().name();
+                let column_name = columns.previous().name();
+                let default_str = columns
+                    .next()
+                    .default()
+                    .and_then(|default| default.as_value())
+                    .and_then(|value| value.as_enum_value())
+                    .expect("We should only be setting a changed default if there was one on the previous schema and in the next with the same enum.");
+
+                let set_default = format!(
+                    "ALTER TABLE {table_name} ALTER COLUMN {column_name} SET DEFAULT '{default}'",
+                    table_name = Quoted::postgres_ident(&table_name),
+                    column_name = Quoted::postgres_ident(&column_name),
+                    default = escape_string_literal(default_str),
+                );
+
+                stmts.push(set_default);
+            }
         }
 
         stmts.push("COMMIT".to_string());

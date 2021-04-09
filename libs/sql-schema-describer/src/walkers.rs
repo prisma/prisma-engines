@@ -56,6 +56,23 @@ impl<'a> ColumnWalker<'a> {
         self.column_index
     }
 
+    /// Returns whether the column has the enum default value of the given enum type.
+    pub fn column_has_enum_default_value(&self, enum_name: &str, value: &str) -> bool {
+        self.column_type_family_as_enum().map(|enm| enm.name.as_str()) == Some(enum_name)
+            && self
+                .default()
+                .and_then(|default| default.as_value())
+                .and_then(|value| value.as_enum_value())
+                == Some(value)
+    }
+
+    /// Returns whether the type of the column matches the provided enum name.
+    pub fn column_type_is_enum(&self, enum_name: &str) -> bool {
+        self.column_type_family_as_enum()
+            .map(|enm| enm.name == enum_name)
+            .unwrap_or(false)
+    }
+
     /// The type family.
     pub fn column_type_family(&self) -> &'a ColumnTypeFamily {
         &self.column().tpe.family

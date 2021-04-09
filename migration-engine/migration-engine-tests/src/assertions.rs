@@ -3,6 +3,7 @@ use std::borrow::Cow;
 use datamodel_connector::Connector;
 use enumflags2::BitFlags;
 use pretty_assertions::assert_eq;
+use prisma_value::PrismaValue;
 use sql_schema_describer::{
     Column, ColumnTypeFamily, DefaultKind, DefaultValue, Enum, ForeignKey, ForeignKeyAction, Index, IndexType,
     PrimaryKey, SqlSchema, Table,
@@ -424,6 +425,14 @@ impl<'a> ColumnAssertion<'a> {
         }
 
         Ok(self)
+    }
+
+    pub fn assert_enum_default(self, expected: &str) -> Self {
+        let default = self.column.default.as_ref().unwrap();
+
+        assert!(matches!(default.kind(), DefaultKind::Value(PrismaValue::Enum(s)) if s == expected));
+
+        self
     }
 
     pub fn assert_native_type(self, expected: &str, connector: &dyn Connector) -> AssertionResult<Self> {
