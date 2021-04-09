@@ -178,7 +178,7 @@ object ConnectorConfig {
     if (EnvVars.isBuildkite) {
       5432
     } else {
-      5435
+      26257
     }
   }
 
