@@ -170,7 +170,7 @@ object ConnectorConfig {
     if (EnvVars.isBuildkite) {
       "test-db-postgres-13"
     } else {
-      "127.0.0.1"
+      "test-db-postgres-13"
     }
   }
 
