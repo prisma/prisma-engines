@@ -4,7 +4,6 @@ on:
 
 jobs:
 
-
   test:
     name: "Test Migration Engine - vttestserver"
 
