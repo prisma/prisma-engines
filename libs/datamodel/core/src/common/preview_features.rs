@@ -5,7 +5,7 @@ const CONNECT_OR_CREATE: &str = "connectOrCreate";
 const TRANSACTION_API: &str = "transactionApi";
 const NATIVE_TYPES: &str = "nativeTypes";
 const SQL_SERVER: &str = "microsoftSqlServer";
-// const MONGODB: &str = "mongoDb"; Hide MongoDB feature in tooling for now, it's not broadly available yet.
+const MONGODB: &str = "mongoDb";
 const GROUP_BY: &str = "groupBy";
 const CREATE_MANY: &str = "createMany";
 const ORDER_BY_RELATION: &str = "orderByRelation";
@@ -30,6 +30,10 @@ pub const GENERATOR_PREVIEW_FEATURES: &[&str] = &[
     ORDER_BY_AGGREGATE_GROUP,
 ];
 
+/// Hidden preview features are valid features, but are not propagated into the tooling
+/// (as autocomplete or similar) or into error messages (eg. showing a list of valid features).
+pub const HIDDEN_GENERATOR_PREVIEW_FEATURES: &[&str] = &[MONGODB];
+
 pub const DEPRECATED_GENERATOR_PREVIEW_FEATURES: &[&str] = &[
     ATOMIC_NUMBER_OPERATIONS,
     AGGREGATE_API,
@@ -44,3 +48,10 @@ pub const DEPRECATED_GENERATOR_PREVIEW_FEATURES: &[&str] = &[
 ];
 
 pub const DEPRECATED_DATASOURCE_PREVIEW_FEATURES: &[&str] = &[];
+
+/// Returns all current features available.
+pub fn current_features() -> Vec<&'static str> {
+    let mut features = Vec::from(GENERATOR_PREVIEW_FEATURES);
+    features.extend(HIDDEN_GENERATOR_PREVIEW_FEATURES);
+    features
+}

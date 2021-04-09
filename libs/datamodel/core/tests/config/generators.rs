@@ -55,11 +55,11 @@ fn preview_features_setting_must_work() {
             provider = "javascript"
             previewFeatures = "connectOrCreate"
         }
-        
+
         generator go {
             provider = "go"
             previewFeatures = ["connectOrCreate", "transactionApi"]
-        } 
+        }
     "#;
 
     let expected = r#"[
@@ -91,6 +91,31 @@ fn preview_features_setting_must_work() {
 }
 
 #[test]
+fn hidden_preview_features_setting_must_work() {
+    let schema = r#"
+        generator go {
+            provider = "go"
+            previewFeatures = ["mongoDb"]
+        }
+    "#;
+
+    let expected = r#"[
+  {
+    "name": "go",
+    "provider": {
+        "fromEnvVar": null,
+        "value": "go"
+    },
+    "output":null,
+    "binaryTargets": [],
+    "previewFeatures": ["mongoDb"],
+    "config": {}
+  }
+]"#;
+
+    assert_mcf(&schema, &expected);
+}
+#[test]
 fn back_slashes_in_providers_must_work() {
     let schema = r#"
         generator mygen {
@@ -121,7 +146,7 @@ fn new_lines_in_generator_must_work() {
         generator go {
           provider = "go"
           binaryTargets = ["b", "c"]
-        
+
         }
     "#;
 
