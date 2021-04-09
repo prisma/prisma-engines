@@ -120,7 +120,7 @@ fn push_inline_relations(model: ModelWalker<'_>, table: &mut sql::Table) {
                 referenced_table: relation_field.referenced_model().database_name().to_owned(),
                 referenced_columns: relation_field.referenced_columns().map(String::from).collect(),
                 on_update_action: sql::ForeignKeyAction::Cascade,
-                on_delete_action: calculate_on_delete_action(model, relation_field),
+                on_delete_action: calculate_on_delete_action(relation_field),
             };
 
             table.foreign_keys.push(fk);
@@ -128,11 +128,8 @@ fn push_inline_relations(model: ModelWalker<'_>, table: &mut sql::Table) {
     }
 }
 
-fn calculate_on_delete_action(model: ModelWalker<'_>, relation_field: RelationFieldWalker<'_>) -> ForeignKeyAction {
-    if relation_field
-        .referencing_columns()
-        .any(|c| model.find_scalar_field(c).map_or(false, |f| f.is_required()))
-    {
+fn calculate_on_delete_action(relation_field: RelationFieldWalker<'_>) -> ForeignKeyAction {
+    if relation_field.scalar_arities().any(|ar| ar.is_required()) {
         sql::ForeignKeyAction::Cascade
     } else {
         sql::ForeignKeyAction::SetNull
