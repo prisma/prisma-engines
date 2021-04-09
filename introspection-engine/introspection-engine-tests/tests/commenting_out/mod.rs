@@ -314,7 +314,7 @@ async fn remapping_field_names_to_empty(api: &TestApi) -> crate::TestResult {
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn db_generated_values_should_add_comments(api: &TestApi) -> crate::TestResult {
+async fn dbgenerated_in_unsupported(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute_with_schema(
             |migration| {
