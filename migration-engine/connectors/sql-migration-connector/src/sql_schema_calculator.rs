@@ -107,7 +107,7 @@ fn push_inline_relations(model: ModelWalker<'_>, table: &mut sql::Table) {
     for relation_field in relation_fields {
         let fk_columns: Vec<String> = relation_field.referencing_columns().map(String::from).collect();
 
-        // Optional unique index for 1:1relations.
+        // Optional unique index for 1:1 relations.
         if relation_field.is_one_to_one() {
             push_one_to_one_relation_unique_index(&fk_columns, table);
         }

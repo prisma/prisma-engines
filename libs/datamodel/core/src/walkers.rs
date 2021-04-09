@@ -249,7 +249,7 @@ impl<'a> RelationFieldWalker<'a> {
         self.get().arity
     }
     #[allow(clippy::needless_lifetimes)]
-    pub fn scalar_arities<'b>(&'b self) -> impl Iterator<Item = FieldArity> + 'b {
+    pub fn scalar_arities(&self) -> impl Iterator<Item = FieldArity> + '_ {
         self
             .get()
             .relation_info
