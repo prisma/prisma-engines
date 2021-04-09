@@ -7,7 +7,6 @@ services:
       SERVER_ROOT: /root/build
       COMMIT_SHA: "ci_test_binary"
       RUST_BACKTRACE: "1"
-      IS_BUILDKITE: "1"
       RUST_LOG_FORMAT: "devel"
       LOG_LEVEL: "error"
     volumes:
