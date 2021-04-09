@@ -1,5 +1,5 @@
 use anyhow::Context;
-use migration_core::{commands::CreateMigrationInput, commands::CreateMigrationOutput, GenericApi};
+use migration_core::{commands::CreateMigrationInput, commands::CreateMigrationOutput, CoreResult, GenericApi};
 use pretty_assertions::assert_eq;
 use std::path::Path;
 use tempfile::TempDir;
@@ -31,7 +31,7 @@ impl<'a> CreateMigration<'a> {
         self
     }
 
-    pub async fn send(self) -> anyhow::Result<CreateMigrationAssertion<'a>> {
+    pub async fn send(self) -> CoreResult<CreateMigrationAssertion<'a>> {
         let output = self
             .api
             .create_migration(&CreateMigrationInput {
