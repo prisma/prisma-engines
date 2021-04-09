@@ -21,6 +21,6 @@ case class MigrationEngine(project: Project) {
     import scala.sys.process._
     val cmd = List(EnvVars.migrationEngineBinaryPath, "cli", "-d", project.fullDatamodelBase64Encoded, "qe-setup")
 
-    cmd.!!
+    cmd.!
   }
 }
