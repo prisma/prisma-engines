@@ -13,10 +13,10 @@ jobs:
       
       - run: docker-compose up -d vttestserver57
       
-      - name: Sleep for 30 seconds
+      - name: Sleep for 130 seconds
         uses: jakejarvis/wait-action@master
         with:
-          time: '30s'
+          time: '130s'
           
       - run: mysql -h 127.0.0.1 -P 33577 -u test -ptest -e "SHOW DATABASES;"
 
