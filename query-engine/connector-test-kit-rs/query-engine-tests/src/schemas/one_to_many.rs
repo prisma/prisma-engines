@@ -23,3 +23,21 @@ pub fn user_posts() -> String {
 
     schema.to_owned()
 }
+
+/// A <-1?---m-> B
+pub fn a1_to_bm_opt() -> String {
+    let schema = indoc! {
+        r#"model A {
+            #id(id, Int, @id)
+            many_b B[]
+        }
+
+        model B {
+            #id(id, Int, @id)
+            a_id Int?
+            a    A?   @relation(fields: [a_id], references: [id])
+        }"#
+    };
+
+    schema.to_owned()
+}
