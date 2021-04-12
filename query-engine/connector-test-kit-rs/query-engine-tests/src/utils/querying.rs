@@ -7,6 +7,13 @@ macro_rules! assert_query {
 }
 
 #[macro_export]
+macro_rules! run_query {
+    ($runner:expr, $q:expr) => {
+        $runner.query($q).await?.to_string()
+    };
+}
+
+#[macro_export]
 macro_rules! assert_error {
     ($runner:expr, $q:expr, $code:expr) => {
         $runner.query($q).await?.assert_failure($code, None);
