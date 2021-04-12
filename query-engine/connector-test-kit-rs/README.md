@@ -240,6 +240,8 @@ If you want to easily review/update/generate your snapshots, it is recommended t
 
 `cargo-insta` is also useful to run all the tests without having them stop at the first failure. Instead, it will collect all the failing snapshots and let you review them in a batch after your tests are done running.
 
+If you prefer, you can follow [this short video](https://www.youtube.com/watch?v=rCHrMqE4JOY) which explains how to use the tool.
+
 #### Step 2 - Create the test
 
 We intentionally leave the expected output empty as you can see below.
