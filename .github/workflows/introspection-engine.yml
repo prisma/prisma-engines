@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - run: docker-compose up
+      - run: docker-compose up -d
       - run: docker-compose -f vitess/docker-compose.yml up -d --remove-orphans
 
       - run: docker ps -a
