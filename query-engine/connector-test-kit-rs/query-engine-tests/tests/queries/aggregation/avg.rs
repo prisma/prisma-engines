@@ -10,7 +10,7 @@ mod aggregation_avg {
                 runner,
                 "query { aggregateTestModel { avg { int bInt float decimal } } }"
             ),
-            r#"{"data":{"aggregateTestModel":{"avg":{"int":null,"bInt":null,"float":null,"decimal":null}}}}"#
+            @r###"{"data":{"aggregateTestModel":{"avg":{"int":null,"bInt":null,"float":null,"decimal":null}}}}"###
         );
 
         Ok(())
@@ -26,7 +26,7 @@ mod aggregation_avg {
                 runner,
                 "query { aggregateTestModel { avg { int bInt float decimal } } }"
             ),
-            r#"{"data":{"aggregateTestModel":{"avg":{"int":7.5,"bInt":7.5,"float":5.0,"decimal":"5"}}}}"#
+            @r###"{"data":{"aggregateTestModel":{"avg":{"int":7.5,"bInt":7.5,"float":5.0,"decimal":"5"}}}}"###
         );
 
         Ok(())
