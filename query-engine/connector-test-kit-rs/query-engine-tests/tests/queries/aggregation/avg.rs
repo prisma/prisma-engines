@@ -69,7 +69,7 @@ mod aggregation_avg {
 
         insta::assert_snapshot!(
             run_query!(runner, r#"query { aggregateTestModel(cursor: { id: 3 }) { avg { int bInt float decimal } } }"#),
-            @r###"{"data":{"aggregateTestModel":{"_avg":{"int":1.5,"bInt":1.5,"float":0.75,"decimal":"0.75"}}}}"###
+            @r###"{"data":{"aggregateTestModel":{"avg":{"int":1.5,"bInt":1.5,"float":0.75,"decimal":"0.75"}}}}"###
         );
 
         Ok(())
