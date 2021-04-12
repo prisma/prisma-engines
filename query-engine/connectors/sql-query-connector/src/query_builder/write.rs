@@ -67,7 +67,8 @@ pub fn create_records(model: &ModelRef, args: Vec<WriteArgs>, skip_duplicates: b
         })
         .collect();
 
-    let insert = Insert::multi_into(model.as_table(), fields.as_columns());
+    let columns = fields.as_columns().map(|c| c.name.into_owned());
+    let insert = Insert::multi_into(model.as_table(), columns);
     let insert = values.into_iter().fold(insert, |stmt, values| stmt.values(values));
     let insert: Insert = insert.into();
 
@@ -151,10 +152,16 @@ pub fn create_relation_table_records(
     child_ids: &[RecordProjection],
 ) -> Query<'static> {
     let relation = field.relation();
-    let parent_columns: Vec<_> = field.related_field().m2m_columns();
-    let child_columns: Vec<_> = field.m2m_columns();
 
-    let columns: Vec<_> = parent_columns.into_iter().chain(child_columns).collect();
+    let parent_columns = field
+        .related_field()
+        .m2m_columns()
+        .into_iter()
+        .map(|c| c.name.into_owned());
+
+    let child_columns = field.m2m_columns().into_iter().map(|c| c.name.into_owned());
+
+    let columns: Vec<_> = parent_columns.chain(child_columns).collect();
     let insert = Insert::multi_into(relation.as_table(), columns);
 
     let insert: MultiRowInsert = child_ids.iter().fold(insert, |insert, child_id| {
