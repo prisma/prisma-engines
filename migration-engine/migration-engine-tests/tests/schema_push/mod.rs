@@ -181,7 +181,7 @@ async fn multi_column_indexes_and_unique_constraints_on_the_same_fields_do_not_c
     Ok(())
 }
 
-#[test_each_connector(tags("mysql"))]
+#[test_each_connector(tags("mysql_8", "mysql_5_7", "mysql_5_6"))]
 async fn db_generated_should_work(api: &TestApi) -> TestResult {
     let dm = r#"
         datasource db {
@@ -197,5 +197,6 @@ async fn db_generated_should_work(api: &TestApi) -> TestResult {
 
     api.schema_push(dm).send().await?.assert_green()?;
 
+    api.schema_push(dm).send().await?.assert_green()?.assert_no_steps()?;
     Ok(())
 }
