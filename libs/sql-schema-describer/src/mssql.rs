@@ -234,7 +234,10 @@ impl SqlSchemaDescriber {
     async fn get_all_columns(&self, schema: &str) -> DescriberResult<HashMap<String, Vec<Column>>> {
         let sql = indoc! {r#"
             SELECT c.name                                                       AS column_name,
-                typ.name                                                        AS data_type,
+                CASE typ.is_assembly_type
+                        WHEN 1 THEN TYPE_NAME(c.user_type_id)
+                        ELSE TYPE_NAME(c.system_type_id)
+                END                                                             AS data_type,
                 COLUMNPROPERTY(c.object_id, c.name, 'charmaxlen')               AS character_maximum_length,
                 OBJECT_DEFINITION(c.default_object_id)                          AS column_default,
                 c.is_nullable                                                   AS is_nullable,
