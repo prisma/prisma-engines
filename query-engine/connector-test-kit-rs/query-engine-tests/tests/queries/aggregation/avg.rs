@@ -3,7 +3,8 @@ use query_engine_tests::*;
 #[test_suite(schema(schemas::common_numeric_types))]
 mod aggregation_avg {
 
-    #[connector_test]
+    // TODO: remove exclude once fixed for mongo
+    #[connector_test(exclude(MongoDb))]
     async fn avg_no_records(runner: &Runner) -> TestResult<()> {
         insta::assert_snapshot!(
             run_query!(
@@ -16,7 +17,8 @@ mod aggregation_avg {
         Ok(())
     }
 
-    #[connector_test]
+    // TODO: remove exclude once fixed for mongo
+    #[connector_test(exclude(MongoDb))]
     async fn avg_some_records(runner: &Runner) -> TestResult<()> {
         create_row(runner, r#"{ id: 1, float: 5.5, int: 5, decimal: "5.5", bInt: "5" }"#).await?;
         create_row(runner, r#"{ id: 2, float: 4.5, int: 10, decimal: "4.5", bInt: "10" }"#).await?;
@@ -32,7 +34,8 @@ mod aggregation_avg {
         Ok(())
     }
 
-    #[connector_test]
+    // TODO: remove exclude once fixed for mongo
+    #[connector_test(exclude(MongoDb))]
     async fn avg_with_all_sorts_of_query_args(runner: &Runner) -> TestResult<()> {
         create_row(runner, r#"{ id: 1, float: 5.5, int: 5, decimal: "5.5", bInt: "5" }"#).await?;
         create_row(runner, r#"{ id: 2, float: 4.5, int: 10, decimal: "4.5", bInt: "10" }"#).await?;
@@ -66,7 +69,7 @@ mod aggregation_avg {
 
         insta::assert_snapshot!(
             run_query!(runner, r#"query { aggregateTestModel(cursor: { id: 3 }) { avg { int bInt float decimal } } }"#),
-            @r###"{"data":{"aggregateTestModel":{"avg":{"int":1.5,"bInt":1.5,"float":0.75,"decimal":"0.75"}}}}"###
+            @r###"{"data":{"aggregateTestModel":{"_avg":{"int":1.5,"bInt":1.5,"float":0.75,"decimal":"0.75"}}}}"###
         );
 
         Ok(())

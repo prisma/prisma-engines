@@ -3,7 +3,8 @@ use query_engine_tests::*;
 #[test_suite(schema(schemas::common_text_and_numeric_types))]
 mod aggregation_min {
 
-    #[connector_test]
+    // TODO: remove exclude once fixed for mongo
+    #[connector_test(exclude(MongoDb))]
     async fn min_no_records(runner: &Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(runner, "query { aggregateTestModel { min { string int bInt float decimal } } }"),
@@ -13,7 +14,8 @@ mod aggregation_min {
         Ok(())
     }
 
-    #[connector_test]
+    // TODO: remove exclude once fixed for mongo
+    #[connector_test(exclude(MongoDb))]
     async fn min_some_records(runner: &Runner) -> TestResult<()> {
         create_row(
             runner,
@@ -37,7 +39,8 @@ mod aggregation_min {
         Ok(())
     }
 
-    #[connector_test]
+    // TODO: remove exclude once fixed for mongo
+    #[connector_test(exclude(MongoDb))]
     async fn min_with_all_sorts_of_query_args(runner: &Runner) -> TestResult<()> {
         create_row(
             runner,
