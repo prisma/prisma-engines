@@ -5,6 +5,23 @@ pub async fn reset_schema(conn: &dyn Queryable, schema_name: &str) -> Result<(),
     // delete first the foreign keys, then all the tables from the test schema
     // to allow a clean slate for the next test.
 
+    let drop_types = format!(
+        r#"
+        DECLARE @stmt NVARCHAR(max)
+        DECLARE @n CHAR(1)
+
+        SET @n = CHAR(10)
+
+        SELECT @stmt = ISNULL(@stmt + @n, '') +
+            'DROP TYPE [' + SCHEMA_NAME(schema_id) + '].[' + name + ']'
+        FROM sys.types
+        WHERE SCHEMA_NAME(schema_id) = '{0}' AND is_user_defined = 1
+
+        EXEC SP_EXECUTESQL @stmt
+        "#,
+        schema_name
+    );
+
     let drop_procedures = format!(
         r#"
         DECLARE @stmt NVARCHAR(max)
@@ -95,6 +112,7 @@ pub async fn reset_schema(conn: &dyn Queryable, schema_name: &str) -> Result<(),
     conn.raw_cmd(&drop_fks).await?;
     conn.raw_cmd(&drop_tables).await?;
     conn.raw_cmd(&drop_shared_defaults).await?;
+    conn.raw_cmd(&drop_types).await?;
 
     conn.raw_cmd(&format!("DROP SCHEMA IF EXISTS {}", schema_name)).await?;
     conn.raw_cmd(&format!("CREATE SCHEMA {}", schema_name)).await?;
