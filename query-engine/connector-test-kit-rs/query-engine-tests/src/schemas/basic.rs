@@ -30,6 +30,77 @@ pub fn user() -> String {
     schema.to_owned()
 }
 
+/// Test model containing all possible Prisma scalar types, nullable.
+/// Excludes capability-dependent types (e.g. JSON).
+pub fn common_nullable_types() -> String {
+    let schema = indoc! {
+        "model TestModel {
+            #id(id, Int, @id)
+            string  String?
+            int     Int?
+            bInt    BigInt?
+            float   Float?
+            decimal Decimal?
+            bytes   Bytes?
+            bool    Boolean?
+            dt      DateTime?
+        }"
+    };
+
+    schema.to_owned()
+}
+
+/// Test model containing all common Prisma numeric types.
+pub fn common_numeric_types() -> String {
+    let schema = indoc! {
+        "model TestModel {
+            #id(id, Int, @id)
+            int     Int
+            bInt    BigInt
+            float   Float
+            decimal Decimal
+        }"
+    };
+
+    schema.to_owned()
+}
+
+/// Test model containing all common Prisma numeric and string types.
+pub fn common_text_and_numeric_types() -> String {
+    let schema = indoc! {
+        "model TestModel {
+            #id(id, Int, @id)
+            int     Int
+            bInt    BigInt
+            float   Float
+            decimal Decimal
+            string  String
+        }"
+    };
+
+    schema.to_owned()
+}
+
+/// Test model containing all possible Prisma scalar types.
+/// Excludes capability-dependent types (e.g. JSON).
+pub fn common_types() -> String {
+    let schema = indoc! {
+        "model TestModel {
+            #id(id, Int, @id)
+            string  String
+            int     Int
+            bInt    BigInt
+            float   Float
+            decimal Decimal
+            bytes   Bytes
+            bool    Boolean
+            dt      DateTime
+        }"
+    };
+
+    schema.to_owned()
+}
+
 /// Test model containing all possible Prisma list types.
 /// Excludes capability-dependent types (e.g. JSON).
 pub fn common_list_types() -> String {

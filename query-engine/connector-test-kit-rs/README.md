@@ -14,15 +14,15 @@ The test kit is a combination of three crates, from which two are "lower level" 
 └────────────────────┘       └────────────────────┘
 ```
 
-#### `query-engine-tests`
+### `query-engine-tests`
 The actual integration tests can be found in the `query-engine-tests` crate, specifically the `tests/` folder. The `src/` folder contains general utilities like time rendering, common schemas, string rendering, so everythign that makes writing tests less painful.
 
 Tests follow a `mod` tree like regular source files, with `query_engine_tests.rs` being the root. Ideally, the modules carry semantics on what is tested in the name and form coherent units that make it easy to spot and extend areas to test.
 
-#### `query-test-macros`
+### `query-test-macros`
 As the name implies, this crate contains the macro definitions used for the test suites (as shown later in this guide).
 
-#### `query-tests-setup`
+### `query-tests-setup`
 Contains the main bulk of logic to make tests run, which is mostly invisible to the tests:
 - Test configuration.
 - Connector tags that know the connection strings, capabilities of connectors, how to render data models.
@@ -33,7 +33,7 @@ Contains the main bulk of logic to make tests run, which is mostly invisible to 
 ## Running tests
 Tests are executed in the context of *one* _connector_ (with version) and _runner_. Some tests may only be specified to run for a subset of connectors or versions, in which case they will be skipped. Testing all connectors at once is not supported, however, for example, CI will run all the different connectors and versions concurrently in separate runs.
 
-#### Configuration
+### Configuration
 Tests must be configured to run There's a set of env vars that is always useful to have and an optional one.
 Always useful to have:
 ```shell
@@ -63,7 +63,7 @@ On the note of docker containers: Most connectors require an endpoint to run aga
 
 If you choose to set up the databases yourself, please note that the connection strings used in the tests (found in the files in `<repo_root>/query-engine/connector-test-kit-rs/query-tests-setup/src/connector_tag/`) to set up user, password and database for the test user.
 
-#### Running
+### Running
 Note that by default tests run concurrently.
 
 - VSCode should automatically detect tests and display `run test`.
@@ -74,11 +74,11 @@ Note that by default tests run concurrently.
 ## Authoring tests
 The following is an example on how to write a new test suite, as extending or changing an existing one follows the same rules and considerations.
 
-#### Find a suitable place for the module
+### Find a suitable place for the module
 For example if you choose `tests/queries/filters/some_spec.rs`, you create the file and add the module to the `filters/mod.rs`.
 The modules usually follow a tree structure that convey some sort of meaning on what is tested. If you're unsure ping Dom.
 
-#### Decide on the test layout
+### Decide on the test layout
 _Option 1:_
 ```rust
 use query_engine_tests::*;
@@ -213,7 +213,7 @@ mod some_spec {
 The test database in MySQL would be `some_spec_my_test`, the file for Sqlite `some_spec_my_test.db`.
 For details on how each connector handles it, look into the files in `query-tests-setup/src/connector_tag` where the connection strings are rendered.
 
-#### Writing Schema templates & Common Schemas
+### Writing Schema templates & Common Schemas
 Schemas that are used for tests that are supposed to run for all connectors must be templated. Currently, MongoDb requires parts of a schema to have different forms, which would require writing all schemas twice, or duplicating tests for Mongo, etc.
 
 For this reason, schemas have template strings of the form `#name(args)` embedded in them. Connectors decide how to render schemas (see `query-tests-setup/src/datamodel_rendering` for details). Currently two templates are available:
@@ -225,3 +225,88 @@ For this reason, schemas have template strings of the form `#name(args)` embedde
 All SQL connectors render these with a standard `SqlDatamodelRenderer`, Mongo uses its own `MongoDbSchemaRenderer`.
 
 Consider using one of the common schemas located in `query-engine-tests/sec/schemas` to write your tests - they are already templated correctly and reducing the number of schemas used overall helps keeping the tests more compact. However, if a test suite requires a specialized schema, it's totally fine to write one yourself, just remember to template it correctly.
+
+## Assertions
+
+Some utils are available to ease assertions. You'll find below how to use each of them.
+
+### `insta::assert_snapshot!`
+
+In most tests, we simply run a query and expect an output. Snapshots are extremely convenient to automatically generate the expected output of an assertion, directly in your code. Here's how the flow goes:
+
+#### Step 1 - (Optional) Install `cargo-insta`
+
+If you want to easily review/update/generate your snapshots, it is recommended to install `cargo-insta` via `cargo install cargo-insta`.
+
+`cargo-insta` is also useful to run all the tests without having them stop at the first failure. Instead, it will collect all the failing snapshots and let you review them in a batch after your tests are done running.
+
+If you prefer, you can follow [this short video](https://www.youtube.com/watch?v=rCHrMqE4JOY) which explains how to use the tool.
+
+#### Step 2 - Create the test
+
+We intentionally leave the expected output empty as you can see below.
+
+```rs
+#[connector_test]
+async fn some_test(runner: &Runner) -> TestResult<()> {
+    insta::assert_snapshot!(
+        run_query!(runner, r#"<your_query>"#),
+        @""
+    );
+
+    Ok(())
+}
+```
+
+#### Step 3 - Run your tests
+
+##### With `cargo-insta`
+
+  - If you want to run all the tests without them stoping at the first failure, use  `cargo insta test --package query-engine-tests`. (Caveat: all the tests have to be run). There's a couple of handy additional flags that can be passed to the command (such as `--review`). Use `cargo insta test --help` to know more about them.
+  
+  - If you want to run a single test or test-suite, use `cargo test` as usual. Pay attention to the end of the output log. You should see something like `info: X snapshot to review`. See Step 4 for the review process.
+
+##### Without `cargo-insta`
+
+If you haven't installed `cargo-insta`, use `cargo test` as usual.
+
+#### Step 4 - Review the snapshots
+
+##### With `cargo-insta`
+
+> ⚠️ **Important**: While automatic snapshot updates are extremely convienent, it is also an easy way to miss unintended changes. **Please, don't ever just update all your snapshots to make the CI green without carefully checking what was changed and whether that was the intended change.**
+
+Run `cargo insta review` to be prompted with an interactive view that lets you accept or reject the snapshots changes if there are any. Below is an example of a failing snapshot:
+
+```
+Package: query-engine-tests (0.1.0)
+Snapshot: avg_with_all_sorts_of_query_args-6
+Source: query-engine/connector-test-kit-rs/query-engine-tests/tests/queries/aggregation/avg.rs:67
+-old snapshot
++new results
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+run_query!(
+    runner,
+    r#"query { aggregateTestModel(cursor: { id: 3 }) { avg { int bInt float decimal } } }"#
+)
+────────────┬─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+    0       │-{"data":{"aggregateTestModel":{"_avg":{"int":1.5,"bInt":1.5,"float":0.75,"decimal":"0.75"}}}}
+          0 │+{"data":{"aggregateTestModel":{"avg":{"int":1.5,"bInt":1.5,"float":0.75,"decimal":"0.75"}}}}
+────────────┴─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  a accept   keep the new snapshot
+  r reject   keep the old snapshot
+  s skip     keep both for now
+```
+
+- Press `a` to accept the snapshot update
+- Press `r` to reject the snapshot update
+- Press `s` to skip the snapshot update
+
+**Accepting a snapshot update will replace, directly in your code, the expected output in the assertion.**
+
+If you dislike the interactive view, you can also run `cargo insta accept` to automatically accept all snapshots and then use your git diff to check if everything is as intented.
+
+##### Without `cargo-insta`
+
+If you haven't installed `cargo-insta`, have a look at the error output and manually update the snapshot if the change is expected, just like when using `assert_eq!`.
