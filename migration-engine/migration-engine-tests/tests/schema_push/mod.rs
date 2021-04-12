@@ -180,3 +180,22 @@ async fn multi_column_indexes_and_unique_constraints_on_the_same_fields_do_not_c
 
     Ok(())
 }
+
+#[test_each_connector(tags("mysql"))]
+async fn db_generated_should_work(api: &TestApi) -> TestResult {
+    let dm = r#"
+        datasource db {
+          provider = "mysql"
+          url = "mysql://unreachable:unreachable@example.com/unreachable"
+        }
+        
+        model Blog {
+          id                Int     @id @default(autoincrement())
+          ip        Bytes?  @db.VarBinary(16) @default(dbgenerated("''"))
+        }
+    "#;
+
+    api.schema_push(dm).send().await?.assert_green()?;
+
+    Ok(())
+}

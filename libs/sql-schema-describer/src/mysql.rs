@@ -405,6 +405,8 @@ impl SqlSchemaDescriber {
     fn db_generated(default_string: &str, default_generated: bool) -> DefaultValue {
         if default_generated {
             Self::dbgenerated_expression(default_string)
+        } else if default_string.is_empty() {
+            DefaultValue::db_generated("''")
         } else {
             DefaultValue::db_generated(default_string)
         }

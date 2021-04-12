@@ -30,8 +30,8 @@ impl MysqlFlavour {
                 !matches!(default.kind(),  DefaultKind::Sequence(_))
                     // We do not want to render JSON defaults because they are not supported by MySQL.
                     && !matches!(column.column_type_family(), ColumnTypeFamily::Json)
-                    // We do not want to render binary defaults because they are not supported by MySQL.
-                    && !matches!(column.column_type_family(), ColumnTypeFamily::Binary)
+                // We do not want to render binary defaults because they are not supported by MySQL.
+                // && !matches!(column.column_type_family(), ColumnTypeFamily::Binary)
             })
             .map(|default| format!(" DEFAULT {}", render_default(column, default)))
             .unwrap_or_else(String::new);

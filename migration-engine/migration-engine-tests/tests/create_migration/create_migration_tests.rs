@@ -507,3 +507,47 @@ async fn no_additional_unique_created(api: &TestApi) -> TestResult {
 
     Ok(())
 }
+
+#[test_each_connector(tags("mysql"))]
+async fn db_generated_defaults_work(api: &TestApi) -> TestResult {
+    let dm = r#"
+        datasource db {
+          provider = "mysql"
+          url = "mysql://unreachable:unreachable@example.com/unreachable"
+        }
+
+        model Blog {
+          id                Int     @id @default(autoincrement())
+          ip        Bytes?  @db.VarBinary(16) @default(dbgenerated("''"))
+        }
+    "#;
+
+    let dir = api.create_migrations_directory()?;
+
+    api.create_migration("setup", dm, &dir)
+        .send()
+        .await?
+        .assert_migration_directories_count(1)?
+        .assert_migration("setup", |migration| {
+            let expected_script = match api.sql_family() {
+                SqlFamily::Mysql => {
+                    indoc! {
+                        r#"
+                        -- CreateTable
+                        CREATE TABLE `Blog` (
+                            `id` INTEGER NOT NULL AUTO_INCREMENT,
+                            `ip` VARBINARY(16) DEFAULT '',
+                        
+                            PRIMARY KEY (`id`)
+                        ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+                        "#
+                    }
+                }
+                _ => unreachable!(),
+            };
+
+            migration.assert_contents(expected_script)
+        })?;
+
+    Ok(())
+}

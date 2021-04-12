@@ -724,3 +724,63 @@ async fn partial_indexes_should_be_ignored_on_mysql(api: &TestApi) -> crate::Tes
 
     Ok(())
 }
+
+#[test_each_connector(tags("mysql_8", "mysql_5_7", "mysql_5_6"))]
+async fn empty_db_generated_defaults_should_work(api: &TestApi) -> crate::TestResult {
+    api.barrel()
+        .execute_with_schema(
+            |migration| {
+                migration.create_table("Blog", move |t| {
+                    t.add_column("id", types::primary());
+                    t.inject_custom("ip_address varbinary(16) Default ''");
+                });
+            },
+            api.schema_name(),
+        )
+        .await?;
+
+    let dm = indoc! {r##"
+        model Blog {
+          id                Int     @id @default(autoincrement())
+          ip_address        Bytes?  @db.VarBinary(16) @default(dbgenerated("''"))
+        }
+    "##};
+
+    let result = &api.introspect().await?;
+    api.assert_eq_datamodels(&dm, result);
+
+    Ok(())
+}
+
+// #[test_each_connector(tags("mysql"))]
+// async fn extended_db_generated_defaults_should_work(api: &TestApi) -> crate::TestResult {
+//     api.barrel()
+//         .execute_with_schema(
+//             |migration| {
+//                 migration.create_table("Blog", move |t| {
+//                     t.add_column("id", types::primary());
+//                     t.inject_custom("ip_address varbinary(16) Default ''");
+//                     t.inject_custom("ip_address_2 varbinary(16) Default 0x41");
+//                     t.inject_custom("ip_address_3 varbinary(16) Default '0x41'");
+//                     t.inject_custom("ip_address_4 varbinary(16) Default 'A'");
+//                 });
+//             },
+//             api.schema_name(),
+//         )
+//         .await?;
+//
+//     let dm = indoc! {r##"
+//         model Blog {
+//           id                Int     @id @default(autoincrement())
+//           ip_address        Bytes?  @db.VarBinary(16) @default(dbgenerated("''"))
+//           ip_address_2      Bytes?  @db.VarBinary(16) @default(dbgenerated("A"))
+//           ip_address_3      Bytes?  @default(dbgenerated("0x30783431")) @db.VarBinary(16)
+//           ip_address_4      Bytes?  @default(dbgenerated("0x41")) @db.VarBinary(16)
+//         }
+//     "##};
+//
+//     let result = &api.introspect().await?;
+//     api.assert_eq_datamodels(&dm, result);
+//
+//     Ok(())
+// }
