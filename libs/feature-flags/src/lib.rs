@@ -54,14 +54,14 @@ macro_rules! flags {
 
 // `microsoftSqlServer`: Support for Microsoft SQL Server databases.
 // `orderByRelation`: Allows ordering by to-one relation in the QE API.
-// `mongoDb`: Support for MongoDB.
+// `mongodb`: Support for MongoDB.
 // `selectRelationCount`: Allows selecting `_count` on to-many relations in find queries.
 // `orderByAggregateGroup`: Allows ordering by aggregations of scalars in groupBy
 flags!(
     microsoftSqlServer,
     orderByRelation,
     napi,
-    mongoDb,
+    mongodb,
     selectRelationCount,
     orderByAggregateGroup
 );

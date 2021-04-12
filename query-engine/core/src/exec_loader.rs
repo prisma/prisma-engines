@@ -43,7 +43,7 @@ pub async fn load(source: &Datasource) -> crate::Result<(String, Box<dyn QueryEx
 
         #[cfg(feature = "mongodb")]
         MONGODB_SOURCE_NAME => {
-            if !feature_flags::get().mongoDb {
+            if !feature_flags::get().mongodb {
                 let error = CoreError::UnsupportedFeatureError(
                     "MongoDB query connector (experimental feature, needs to be enabled)".into(),
                 );
