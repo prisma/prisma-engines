@@ -1,0 +1,46 @@
+name: Introspection Engine
+on:
+  push:
+
+jobs:
+
+  test:
+    name: "Test Introspection Engine - vitess"
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - run: docker-compose up
+      - run: docker-compose -f vitess/docker-compose.yml up -d --remove-orphans
+
+      - run: docker ps -a
+        
+      - name: Sleep for 30 seconds
+        uses: jakejarvis/wait-action@master
+        with:
+          time: '30s'
+      - run: mysql -h 127.0.0.1 -P 15306 -u root -proot -e "SHOW DATABASES;" --loose-default-auth=mysql_native_password
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: 1.48.0
+          default: true
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: introspection-engine-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - run: cargo test mysql_5_7
+        working-directory: introspection-engine/introspection-engine-tests
+        env:
+          CLICOLOR_FORCE: 1
+
+      - run: docker ps -a
+        if: ${{ always() }}
+      - run: docker logs prisma-engines_test-db-mysql-5-7_1
+        if: ${{ always() }}
