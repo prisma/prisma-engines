@@ -4,6 +4,7 @@ import org.scalatest.{FlatSpec, Matchers}
 import play.api.libs.json.JsNull
 import util._
 
+// RS: Ported
 class MaxAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
   val project = SchemaDsl.fromStringV11() {
     """model Item {
