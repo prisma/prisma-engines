@@ -46,11 +46,11 @@ pub async fn create_record(conn: &dyn QueryExt, model: &ModelRef, args: WriteArg
                 }
                 quaint::error::DatabaseConstraint::ForeignKey => {
                     let constraint = DatabaseConstraint::ForeignKey;
-                    return Err(SqlError::UniqueConstraintViolation { constraint });
+                    return Err(SqlError::NullConstraintViolation { constraint });
                 }
                 quaint::error::DatabaseConstraint::CannotParse => {
                     let constraint = DatabaseConstraint::CannotParse;
-                    return Err(SqlError::UniqueConstraintViolation { constraint });
+                    return Err(SqlError::NullConstraintViolation { constraint });
                 }
             },
             _ => return Err(SqlError::from(e)),
