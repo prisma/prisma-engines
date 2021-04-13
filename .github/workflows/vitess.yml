@@ -1,13 +1,17 @@
 on:
   push:
     branches:
-      - planetscale
+      - master
   pull_request:
 
 jobs:
   query-engine:
     name: Query Engine Tests
     runs-on: ubuntu-latest
+
+    env:
+      TEST_CONNECTOR: vitess
+
     steps:
       - uses: actions/checkout@v2
 
