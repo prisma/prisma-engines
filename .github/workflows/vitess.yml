@@ -1,8 +1,7 @@
 on:
   push:
     branches:
-      - master
-  pull_request:
+      - planetscale
 
 jobs:
   query-engine:
