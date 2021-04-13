@@ -34,7 +34,7 @@ pub fn render_test_datamodel(config: &TestConfig, test_database: &str, template:
     let tag = config.test_connector_tag().unwrap();
     let all_features = GENERATOR
         .active_features()
-        .into_iter()
+        .iter()
         .chain(GENERATOR.hidden_features())
         .map(|f| format!(r#""{}""#, f.to_string()))
         .join(", ");
