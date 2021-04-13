@@ -35,6 +35,11 @@ jobs:
             target
           key: query-engine-cargo-vitess
 
+      - name: Wait for databases to get healthy
+        uses: juliangruber/sleep-action@v1
+        with:
+          time: 30s
+
       - name: Run tests
         run: export SERVER_ROOT=$(pwd) && cd query-engine/connector-test-kit && sbt test
 
@@ -59,6 +64,11 @@ jobs:
             ~/.cargo/git
             target
           key: migration-engine-cargo-vitess
+
+      - name: Wait for databases to get healthy
+        uses: juliangruber/sleep-action@v1
+        with:
+          time: 30s
 
       - name: Run tests
         working-directory: migration-engine/migration-engine-tests
@@ -85,6 +95,11 @@ jobs:
             ~/.cargo/git
             target
           key: introspection-engine-cargo-vitess
+
+      - name: Wait for databases to get healthy
+        uses: juliangruber/sleep-action@v1
+        with:
+          time: 30s
 
       - name: Run tests
         working-directory: introspection-engine/introspection-engine-tests
