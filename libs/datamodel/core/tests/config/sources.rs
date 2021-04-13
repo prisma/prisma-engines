@@ -446,7 +446,7 @@ fn microsoft_sql_server_preview_feature_must_work() {
     let config = parse_configuration(schema);
     let generator = config.generators.first().unwrap();
 
-    assert!(generator.preview_features.contains(&PreviewFeature::SqlServer));
+    assert!(generator.preview_features.contains(&PreviewFeature::MicrosoftSqlServer));
 }
 
 fn assert_eq_json(a: &str, b: &str) {

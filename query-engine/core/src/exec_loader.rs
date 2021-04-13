@@ -36,7 +36,7 @@ pub async fn load(
         POSTGRES_SOURCE_NAME => postgres(source).await,
 
         MSSQL_SOURCE_NAME => {
-            if !features.contains(&PreviewFeature::SqlServer) {
+            if !features.contains(&PreviewFeature::MicrosoftSqlServer) {
                 let error = CoreError::UnsupportedFeatureError(
                     "Microsoft SQL Server (experimental feature, needs to be enabled)".into(),
                 );

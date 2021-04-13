@@ -51,7 +51,7 @@ features!(
     Middlewares,
     Distinct,
     UncheckedScalarInputs,
-    SqlServer,
+    MicrosoftSqlServer,
     MongoDb,
     OrderByRelation,
     NApi,
@@ -65,7 +65,7 @@ lazy_static! {
     /// Generator preview features
     pub static ref GENERATOR: FeatureMap = {
         FeatureMap::default().with_active(vec![
-            SqlServer,
+            MicrosoftSqlServer,
             OrderByRelation,
             NApi,
             SelectRelationCount,
@@ -114,17 +114,17 @@ impl FeatureMap {
         &self.hidden
     }
 
-    pub fn with_active(mut self, active: Vec<PreviewFeature>) -> Self {
+    fn with_active(mut self, active: Vec<PreviewFeature>) -> Self {
         self.active = active;
         self
     }
 
-    pub fn with_hidden(mut self, hidden: Vec<PreviewFeature>) -> Self {
+    fn with_hidden(mut self, hidden: Vec<PreviewFeature>) -> Self {
         self.hidden = hidden;
         self
     }
 
-    pub fn with_deprecated(mut self, deprecated: Vec<PreviewFeature>) -> Self {
+    fn with_deprecated(mut self, deprecated: Vec<PreviewFeature>) -> Self {
         self.deprecated = deprecated;
         self
     }
