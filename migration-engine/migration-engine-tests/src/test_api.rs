@@ -62,7 +62,11 @@ impl TestApi {
         };
 
         let connection_string = (args.url_fn)(db_name);
-        let shadow_db = "mysql://root:prisma@localhost:3309/prisma";
+
+        let shadow_db = match std::env::var("IS_BUILDKITE") {
+            Ok(_) => "mysql://root:prisma@shadowdb:3309/prisma",
+            Err(_) => "mysql://root:prisma@localhost:3309/prisma",
+        };
 
         let api = SqlMigrationConnector::new(&connection_string, features, Some(shadow_db.into()))
             .await

@@ -496,7 +496,7 @@ pub fn db_host_and_port_mysql_5_7() -> (Cow<'static, str>, usize) {
     }
 
     match std::env::var("IS_BUILDKITE") {
-        Ok(_) => ("test-db-mysql-5-7".into(), 3306),
+        Ok(_) => ("vtgate".into(), 15306),
         Err(_) => ("127.0.0.1".into(), 15306),
     }
 }
