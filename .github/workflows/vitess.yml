@@ -42,7 +42,7 @@ jobs:
           time: 30s
 
       - name: Run tests on image
-        run: docker-compose run -e TEST_CONNECTOR=vitess -e TEST_MODE=simple -w /root/build/query-engine/connector-test-kit qe-test-base sbt test
+        run: docker-compose --file vitess/docker-compose.yml run -e TEST_CONNECTOR=vitess -e TEST_MODE=simple -w /root/build/query-engine/connector-test-kit qe-test-base sbt test
 
   migration-engine:
     name: Migration Engine Tests

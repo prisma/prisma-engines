@@ -2,7 +2,7 @@ networks:
   test:
 
 services:
-  test-base:
+  qe-test-base:
     image: prismagraphql/build:test
     environment:
       SERVER_ROOT: /root/build
