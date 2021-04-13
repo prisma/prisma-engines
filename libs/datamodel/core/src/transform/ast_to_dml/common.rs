@@ -1,6 +1,6 @@
 use crate::{ast, diagnostics::DatamodelError, dml};
 use crate::{
-    common::preview_features::{current_features, DEPRECATED_GENERATOR_PREVIEW_FEATURES, GENERATOR_PREVIEW_FEATURES},
+    common::preview_features::*,
     diagnostics::{DatamodelWarning, Diagnostics},
 };
 
@@ -29,7 +29,11 @@ pub fn field_validation_error(
     )
 }
 
-pub fn validate_preview_features(preview_features: Vec<String>, span: ast::Span) -> Diagnostics {
+pub fn validate_preview_features(
+    preview_features: Vec<String>,
+    feature_map: &FeatureMap,
+    span: ast::Span,
+) -> Diagnostics {
     let all_supported = current_features();
     let deprecated = Vec::from(DEPRECATED_GENERATOR_PREVIEW_FEATURES);
 

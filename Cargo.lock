@@ -961,6 +961,7 @@ dependencies = [
  "dml",
  "indoc",
  "itertools 0.8.2",
+ "lazy_static",
  "mongodb-datamodel-connector",
  "native-types",
  "once_cell",
