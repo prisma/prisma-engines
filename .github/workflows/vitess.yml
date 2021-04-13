@@ -6,7 +6,7 @@ on:
 jobs:
   query-engine:
     name: Query Engine Tests
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     env:
       TEST_CONNECTOR: vitess
@@ -45,7 +45,7 @@ jobs:
           time: 30s
 
       - name: Run tests
-        run: export SERVER_ROOT=$(pwd) && cd query-engine/connector-test-kit && timeout 60m sbt test
+        run: export SERVER_ROOT=$(pwd) && cd query-engine/connector-test-kit && sbt test
 
   migration-engine:
     name: Migration Engine Tests
@@ -72,7 +72,7 @@ jobs:
       - name: Wait for databases to get healthy
         uses: juliangruber/sleep-action@v1
         with:
-          time: 30s
+          time: 60s
 
       - name: Run tests
         working-directory: migration-engine/migration-engine-tests
@@ -103,7 +103,7 @@ jobs:
       - name: Wait for databases to get healthy
         uses: juliangruber/sleep-action@v1
         with:
-          time: 30s
+          time: 60s
 
       - name: Run tests
         working-directory: introspection-engine/introspection-engine-tests
