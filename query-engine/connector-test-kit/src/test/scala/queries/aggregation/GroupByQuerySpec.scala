@@ -272,7 +272,6 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     result.toString should be("""{"data":{"groupByModel":[{"s":"group3","count":{"s":2},"sum":{"float":25},"min":{"int":5}}]}}""")
   }
 
-
   "Using a group-by with ordering COUNT aggregation" should "work" in {
     // Float, int, dec, s, id
     create(1.1, 1, "11", "group1", Some("1"))
@@ -453,7 +452,6 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     result.toString should be("""{"data":{"groupByModel":[{"float":4,"max":{"float":4}},{"float":1.1,"max":{"float":1.1}}]}}""")
   }
 
-
   "Using a group-by with multiple ordering aggregation of different fields" should "work" in {
     // Float, int, dec, s, id
     create(1.1, 1, "11", "group1", Some("1"))
@@ -473,7 +471,8 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       project
     )
 
-    result.toString should be("""{"data":{"groupByModel":[{"float":1.1,"count":{"float":3},"sum":{"int":3}},{"float":3,"count":{"float":1},"sum":{"int":3}},{"float":4,"count":{"float":1},"sum":{"int":4}}]}}""")
+    result.toString should be(
+      """{"data":{"groupByModel":[{"float":1.1,"count":{"float":3},"sum":{"int":3}},{"float":3,"count":{"float":1},"sum":{"int":3}},{"float":4,"count":{"float":1},"sum":{"int":4}}]}}""")
   }
 
   "Using a group-by with multiple ordering aggregation and having" should "work" in {
@@ -495,7 +494,8 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       project
     )
 
-    result.toString should be("""{"data":{"groupByModel":[{"float":1.1,"count":{"float":3},"sum":{"int":3}},{"float":3,"count":{"float":1},"sum":{"int":3}}]}}""")
+    result.toString should be(
+      """{"data":{"groupByModel":[{"float":1.1,"count":{"float":3},"sum":{"int":3}},{"float":3,"count":{"float":1},"sum":{"int":3}}]}}""")
   }
 
   "Using a group-by with order by aggregation without selecting the ordered field" should "work" in {
@@ -514,6 +514,28 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     result.toString should be("""{"data":{"groupByModel":[{"sum":{"int":3}}]}}""")
+  }
+
+  "Using a group-by with order by aggregation without selecting the ordered field or grouping by it" should "work" in {
+    // Float, int, dec, s, id
+    create(1.1, 4, "11", "group1", Some("1"))
+    create(1.1, 1, "11", "group1", Some("2"))
+    create(1.1, 1, "3", "group2", Some("3"))
+
+    val result = server.query(
+      s"""{
+         |  groupByModel(by: [s], orderBy: { _sum: { int: asc } }) {
+         |    s
+         |    sum { int }
+         |  }
+         |}""".stripMargin,
+      project
+    )
+
+    // Ordered by number of records ASC (basically, since int is not null):
+    // Group 2 with 1 (sum is 4)
+    // Group 1 with 2 (sum is 2)
+    result.toString should be("""{"data":{"groupByModel":[{"s":"group2","sum":{"int":1}},{"s":"group1","sum":{"int":5}}]}}""")
   }
 
   /////// Error Cases
