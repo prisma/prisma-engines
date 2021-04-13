@@ -25,6 +25,6 @@ impl Configuration {
     pub fn preview_features(&self) -> impl Iterator<Item = &PreviewFeature> {
         self.generators
             .iter()
-            .flat_map(|generator| generator.preview_features().iter().map(|feat| feat.as_str()))
+            .flat_map(|generator| generator.preview_features.iter())
     }
 }

@@ -1,5 +1,3 @@
-pub mod preview_features;
-
 mod configuration;
 mod datasource;
 mod env_vars;
