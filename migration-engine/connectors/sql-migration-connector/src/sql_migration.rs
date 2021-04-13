@@ -210,7 +210,12 @@ pub(crate) struct AlterEnum {
     pub index: Pair<usize>,
     pub created_variants: Vec<String>,
     pub dropped_variants: Vec<String>,
-    pub previous_usages_as_default: Vec<(usize, usize)>,
+    /// This should be intepreted as ((prev_tblidx, prev_colidx),
+    /// Option<(next_tblidx, next_colidx)>) The second item in the tuple is
+    /// `Some` _only_ when the next column has the same enum as a default, such
+    /// that the default would need to be reinstalled after the drop.
+    #[allow(clippy::type_complexity)]
+    pub previous_usages_as_default: Vec<((usize, usize), Option<(usize, usize)>)>,
 }
 
 impl AlterEnum {
