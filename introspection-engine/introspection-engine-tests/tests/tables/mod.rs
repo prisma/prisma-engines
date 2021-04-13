@@ -763,7 +763,6 @@ async fn casing_should_not_lead_to_mix_ups(api: &TestApi) -> crate::TestResult {
     "##};
 
     let result = &api.introspect().await?;
-    println!("{}", result);
     api.assert_eq_datamodels(&dm, result);
 
     Ok(())
