@@ -8,6 +8,10 @@ jobs:
     name: Query Engine Tests
     runs-on: self-hosted
 
+    env:
+      TEST_CONNECTOR: vitess
+      LOG_LEVEL: error
+
     steps:
       - uses: actions/checkout@v2
 
@@ -41,8 +45,11 @@ jobs:
         with:
           time: 30s
 
-      - name: Run tests on image
-        run: docker-compose --file vitess/docker-compose.yml run -e TEST_CONNECTOR=vitess -e TEST_MODE=simple -w /home/gh-actions/build/query-engine/connector-test-kit qe-test-base sbt test
+      - name: Run tests
+        run: export SERVER_ROOT=$(pwd) && cd query-engine/connector-test-kit && sbt test
+
+      #- name: Run tests on image
+      #  run: docker-compose --file vitess/docker-compose.yml run -e TEST_CONNECTOR=vitess -e TEST_MODE=simple -w /home/gh-actions/build/query-engine/connector-test-kit qe-test-base sbt test
 
   migration-engine:
     name: Migration Engine Tests
