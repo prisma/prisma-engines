@@ -150,8 +150,8 @@ impl ConnectorError {
     }
 
     /// Construct an UrlParseError.
-    pub fn url_parse_error(err: impl Display, url: &str) -> Self {
-        Self::from_msg(format!("{} in `{}`", err, url))
+    pub fn url_parse_error(err: impl Display) -> Self {
+        Self::from_msg(format!("{} in database URL", err))
     }
 }
 

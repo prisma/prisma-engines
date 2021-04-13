@@ -56,16 +56,14 @@ impl SqlMigrationConnector {
 
     /// Create the database corresponding to the connection string, without initializing the connector.
     pub async fn create_database(database_str: &str) -> ConnectorResult<String> {
-        let connection_info =
-            ConnectionInfo::from_url(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
+        let connection_info = ConnectionInfo::from_url(database_str).map_err(ConnectorError::url_parse_error)?;
         let flavour = flavour::from_connection_info(&connection_info, BitFlags::empty());
         flavour.create_database(database_str).await
     }
 
     /// Drop the database corresponding to the connection string, without initializing the connector.
     pub async fn drop_database(database_str: &str) -> ConnectorResult<()> {
-        let connection_info =
-            ConnectionInfo::from_url(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
+        let connection_info = ConnectionInfo::from_url(database_str).map_err(ConnectorError::url_parse_error)?;
         let flavour = flavour::from_connection_info(&connection_info, BitFlags::empty());
 
         flavour.drop_database(database_str).await
@@ -73,8 +71,7 @@ impl SqlMigrationConnector {
 
     /// Set up the database for connector-test-kit, without initializing the connector.
     pub async fn qe_setup(database_str: &str) -> ConnectorResult<()> {
-        let connection_info =
-            ConnectionInfo::from_url(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
+        let connection_info = ConnectionInfo::from_url(database_str).map_err(ConnectorError::url_parse_error)?;
 
         let flavour = flavour::from_connection_info(&connection_info, BitFlags::empty());
 
@@ -217,7 +214,7 @@ impl MigrationConnector for SqlMigrationConnector {
 
 async fn connect(database_str: &str) -> ConnectorResult<Connection> {
     let connection_info = ConnectionInfo::from_url(database_str).map_err(|err| {
-        let details = user_facing_errors::quaint::invalid_url_description(database_str, &err.to_string());
+        let details = user_facing_errors::quaint::invalid_url_description(&err.to_string());
         KnownError::new(InvalidDatabaseString { details })
     })?;
 

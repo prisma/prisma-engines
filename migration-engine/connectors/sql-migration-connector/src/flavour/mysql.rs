@@ -145,7 +145,7 @@ impl SqlFlavour for MysqlFlavour {
     }
 
     async fn create_database(&self, database_str: &str) -> ConnectorResult<String> {
-        let mut url = Url::parse(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
+        let mut url = Url::parse(database_str).map_err(ConnectorError::url_parse_error)?;
         url.set_path("/mysql");
 
         let conn = connect(&url.to_string()).await?;
@@ -253,7 +253,7 @@ impl SqlFlavour for MysqlFlavour {
     }
 
     async fn qe_setup(&self, database_str: &str) -> ConnectorResult<()> {
-        let mut url = Url::parse(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
+        let mut url = Url::parse(database_str).map_err(ConnectorError::url_parse_error)?;
         url.set_path("/mysql");
 
         let conn = connect(&url.to_string()).await?;

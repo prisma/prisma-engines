@@ -78,7 +78,7 @@ impl SqlFlavour for SqliteFlavour {
         let file_path = match ConnectionInfo::from_url(database_url) {
             Ok(ConnectionInfo::Sqlite { file_path, .. }) => file_path,
             Ok(_) => unreachable!(),
-            Err(err) => return Err(ConnectorError::url_parse_error(err, database_url)),
+            Err(err) => return Err(ConnectorError::url_parse_error(err)),
         };
 
         std::fs::remove_file(&file_path).map_err(|err| {

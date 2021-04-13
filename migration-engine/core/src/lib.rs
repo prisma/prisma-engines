@@ -46,10 +46,10 @@ pub async fn migration_api(datamodel: &str) -> CoreResult<Box<dyn api::GenericAp
             let database_str = &source.url().value;
 
             let mut u = url::Url::parse(database_str).map_err(|err| {
-                let details = user_facing_errors::quaint::invalid_url_description(
-                    database_str,
-                    &format!("Error parsing connection string: {}", err),
-                );
+                let details = user_facing_errors::quaint::invalid_url_description(&format!(
+                    "Error parsing connection string: {}",
+                    err
+                ));
 
                 ConnectorError::from(KnownError::new(InvalidDatabaseString { details }))
             })?;
