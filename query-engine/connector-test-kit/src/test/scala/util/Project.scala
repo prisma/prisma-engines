@@ -27,12 +27,11 @@ case class Project(
     """.stripMargin
   }
 
-  // Completely useless, but required since previewFeatures are a complete mess.
   val generatorBlock: String = {
     s"""
        |generator client {
        |  provider = "prisma-client-js"
-       |  previewFeatures = ["microsoftSqlServer"]
+       |  previewFeatures = ["microsoftSqlServer", "mongodb", "orderByRelation", "napi", "selectRelationCount", "orderByAggregateGroup"]
        |}
     """.stripMargin
   }

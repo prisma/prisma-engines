@@ -5,8 +5,6 @@ use crate::context::PrismaContext;
 
 #[tokio::test]
 async fn connection_string_problems_give_a_nice_error() {
-    feature_flags::initialize(&[String::from("all")]).unwrap();
-
     let providers = &[
         ("mysql", "mysql://root:password-with-#@localhost:3306/database"),
         (

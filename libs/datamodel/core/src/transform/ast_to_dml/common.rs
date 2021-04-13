@@ -45,6 +45,14 @@ pub fn parse_and_validate_preview_features(
                 DatamodelWarning::new_deprecated_preview_feature_warning(&feature_str, span),
             ),
 
+            Some(feature) if !feature_map.is_valid(&feature) => {
+                diagnostics.push_error(DatamodelError::new_preview_feature_not_known_error(
+                    &feature_str,
+                    feature_map.active_features().iter().map(ToString::to_string).join(", "),
+                    span,
+                ))
+            }
+
             Some(feature) => features.push(feature),
 
             None => diagnostics.push_error(DatamodelError::new_preview_feature_not_known_error(

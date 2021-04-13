@@ -1,4 +1,5 @@
 use lazy_static::lazy_static;
+use paste::paste;
 use serde::{Serialize, Serializer};
 use PreviewFeature::*;
 
@@ -13,12 +14,14 @@ macro_rules! features {
 
         impl PreviewFeature {
             pub fn parse_opt(s: &str) -> Option<Self> {
-                let parsed = match s.to_lowercase().as_str() {
-                    $(
-                        stringify!(paste! { $variant:lower }) => Self::$variant,
-                    )*
-                    _ => return None,
-                };
+                paste! {
+                    let parsed = match s.to_lowercase().as_str() {
+                        $(
+                            stringify!([<$variant:lower>]) => Self::$variant,
+                        )*
+                        _ => return None,
+                    };
+                }
 
                 Some(parsed)
             }
@@ -53,7 +56,7 @@ features!(
     OrderByRelation,
     NApi,
     SelectRelationCount,
-    OrderByAggregationGroup
+    OrderByAggregateGroup
 );
 
 // Mapping of which active, deprecated and hidden
@@ -66,7 +69,7 @@ lazy_static! {
             OrderByRelation,
             NApi,
             SelectRelationCount,
-            OrderByAggregationGroup
+            OrderByAggregateGroup
         ]).with_hidden(vec![
             MongoDb
         ]).with_deprecated(vec![
@@ -105,6 +108,10 @@ pub struct FeatureMap {
 impl FeatureMap {
     pub fn active_features(&self) -> &[PreviewFeature] {
         &self.active
+    }
+
+    pub fn hidden_features(&self) -> &[PreviewFeature] {
+        &self.hidden
     }
 
     pub fn with_active(mut self, active: Vec<PreviewFeature>) -> Self {
