@@ -1,0 +1,87 @@
+on:
+  push:
+    branches:
+      - planetscale
+  pull_request:
+
+jobs:
+  query-engine:
+    name: Query Engine Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: "Start vitess"
+        run: docker-compose --file vitess/docker-compose.yml up -d
+
+      - uses: olafurpg/setup-scala@v10
+        with:
+          java-version: adopt@1.8
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          default: true
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: query-engine-cargo-vitess
+
+      - name: Run tests
+        run: export SERVER_ROOT=$(pwd) && cd query-engine/connector-test-kit && sbt test
+
+  migration-engine:
+    name: Migration Engine Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: "Start vitess"
+        run: docker-compose --file vitess/docker-compose.yml up -d
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          default: true
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: migration-engine-cargo-vitess
+
+      - name: Run tests
+        working-directory: migration-engine/migration-engine-tests
+        run: cargo test mysql_5_7 -- --test-threads=1
+
+  introspection-engine:
+    name: Introspection Engine Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: "Start vitess"
+        run: docker-compose --file vitess/docker-compose.yml up -d
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          default: true
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: introspection-engine-cargo-vitess
+
+      - name: Run tests
+        working-directory: introspection-engine/introspection-engine-tests
+        run: cargo test mysql_5_7 -- --test-threads=1
