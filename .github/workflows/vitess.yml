@@ -39,13 +39,13 @@ jobs:
           cargo build -p migration-engine-cli --manifest-path migration-engine/cli/Cargo.toml --features quaint/vendored-openssl --release
           cargo build -p query-engine --manifest-path query-engine/query-engine/Cargo.toml --features quaint/vendored-openssl --release
 
-      # - name: Wait for databases to get healthy
-      #   uses: juliangruber/sleep-action@v1
-      #   with:
-      #     time: 30s
+      - name: Wait for databases to get healthy
+        uses: juliangruber/sleep-action@v1
+        with:
+          time: 30s
 
-      # - name: Run tests
-      #   run: export SERVER_ROOT=$(pwd) && cd query-engine/connector-test-kit && sbt test
+      - name: Run tests
+        run: export SERVER_ROOT=$(pwd) && cd query-engine/connector-test-kit && timeout 60m sbt test
 
   migration-engine:
     name: Migration Engine Tests
