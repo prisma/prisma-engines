@@ -3,20 +3,19 @@ networks:
 
 services:
   qe-test-base:
-    image: prismagraphql/build:test
+    image: prismagraphql/build:test-gh-actions
     environment:
-      SERVER_ROOT: /root/build
+      SERVER_ROOT: /home/gh-actions/build
       COMMIT_SHA: "ci_test_binary"
       RUST_BACKTRACE: "1"
       IS_BUILDKITE: "1"
       RUST_LOG_FORMAT: "devel"
       LOG_LEVEL: "error"
     volumes:
-      - ..:/root/build
-    working_dir: /root/build/
+      - ..:/home/gh-actions/build
+    working_dir: /home/gh-actions/build/
     networks:
       - test
-
   consul1:
     command: agent -server -bootstrap-expect 3 -ui -disable-host-node-id -client 0.0.0.0
     hostname: consul1
