@@ -116,7 +116,7 @@ impl SqlFlavour for PostgresFlavour {
 
     #[tracing::instrument(skip(database_str))]
     async fn create_database(&self, database_str: &str) -> ConnectorResult<String> {
-        let mut url = Url::parse(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
+        let mut url = Url::parse(database_str).map_err(ConnectorError::url_parse_error)?;
         let db_name = self.url.dbname();
 
         strip_schema_param_from_url(&mut url);
@@ -190,7 +190,7 @@ impl SqlFlavour for PostgresFlavour {
     }
 
     async fn drop_database(&self, database_str: &str) -> ConnectorResult<()> {
-        let mut url = Url::parse(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
+        let mut url = Url::parse(database_str).map_err(ConnectorError::url_parse_error)?;
         let db_name = url.path().trim_start_matches('/').to_owned();
         assert!(!db_name.is_empty(), "Database name should not be empty.");
 
@@ -238,7 +238,7 @@ impl SqlFlavour for PostgresFlavour {
     }
 
     async fn qe_setup(&self, database_str: &str) -> ConnectorResult<()> {
-        let mut url = Url::parse(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
+        let mut url = Url::parse(database_str).map_err(ConnectorError::url_parse_error)?;
 
         strip_schema_param_from_url(&mut url);
         let conn = create_postgres_admin_conn(url.clone()).await?;

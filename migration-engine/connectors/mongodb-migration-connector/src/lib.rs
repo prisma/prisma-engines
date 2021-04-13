@@ -50,7 +50,7 @@ impl MongoDbMigrationConnector {
     }
 
     async fn create_client(database_str: &str) -> ConnectorResult<(Client, String)> {
-        let url = Url::parse(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
+        let url = Url::parse(database_str).map_err(ConnectorError::url_parse_error)?;
         let db_name = url.path().trim_start_matches('/').to_string();
 
         let client_options = ClientOptions::parse(database_str).await.into_connector_result()?;

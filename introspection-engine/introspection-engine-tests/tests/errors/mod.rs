@@ -1,4 +1,4 @@
-use indoc::formatdoc;
+use indoc::indoc;
 use introspection_core::RpcImpl;
 use pretty_assertions::assert_eq;
 use serde_json::json;
@@ -24,21 +24,19 @@ async fn connection_string_problems_give_a_nice_error() {
 
         let details = match provider.0 {
             "sqlserver" => {
-                formatdoc!(
-                    "Error parsing connection string: Conversion error: invalid digit found in string in `{connection_string}`.
+                indoc!(
+                    "Error parsing connection string: Conversion error: invalid digit found in string in database URL.
                     Please refer to the documentation in https://www.prisma.io/docs/reference/database-reference/connection-urls
                     for constructing a correct connection string. In some cases, certain characters must be escaped.
                     Please check the string for any illegal characters.",
-                    connection_string = provider.1
                 ).replace('\n', " ")
             },
             _ => {
-                formatdoc!(
-                    "Error parsing connection string: invalid port number in `{connection_string}`.
+                indoc!(
+                    "Error parsing connection string: invalid port number in database URL.
                     Please refer to the documentation in https://www.prisma.io/docs/reference/database-reference/connection-urls
                     for constructing a correct connection string. In some cases, certain characters must be escaped.
                     Please check the string for any illegal characters.",
-                    connection_string = provider.1
                 ).replace('\n', " ")
             }
         };
