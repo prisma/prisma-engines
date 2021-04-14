@@ -1,6 +1,8 @@
-use crate::*;
+use crate::{test_each_connector, MigrationsAssertions, Queryable, TestApi, TestResult};
+use indoc::formatdoc;
 use pretty_assertions::assert_eq;
-use user_facing_errors::UserFacingError;
+use test_setup::connectors::Tags;
+use user_facing_errors::{migration_engine::ApplyMigrationError, UserFacingError};
 
 #[test_each_connector]
 async fn apply_migrations_with_an_empty_migrations_folder_works(api: &TestApi) -> TestResult {
@@ -103,14 +105,57 @@ async fn migrations_should_fail_when_the_script_is_invalid(api: &TestApi) -> Tes
         }
     "#;
 
-    api.create_migration("second-migration", dm2, &migrations_directory)
+    let second_migration_name = api
+        .create_migration("second-migration", dm2, &migrations_directory)
         .send()
         .await?
-        .modify_migration(|contents| contents.push_str("\nSELECT (^.^)_n;\n"))?;
+        .modify_migration(|contents| contents.push_str("\nSELECT (^.^)_n;\n"))?
+        .into_output()
+        .generated_migration_name
+        .unwrap();
 
-    let result = api.apply_migrations(&migrations_directory).send().await;
+    let error = api
+        .apply_migrations(&migrations_directory)
+        .send()
+        .await
+        .unwrap_err()
+        .render_user_facing()
+        .unwrap_known();
 
-    assert!(result.is_err());
+    // Assertions about the user facing error.
+    {
+        let expected_error_message = formatdoc!(
+            r#"
+                A migration failed to apply.
+
+                Migration name: {second_migration_name}
+
+                Database error code: {error_code}
+
+                Database error:
+                {message}
+                "#,
+            second_migration_name = second_migration_name,
+            error_code = match api.tags() {
+                t if t.contains(Tags::Mysql) => 1064,
+                t if t.contains(Tags::Mssql) => 102,
+                t if t.contains(Tags::Postgres) => 42601,
+                t if t.contains(Tags::Sqlite) => 1,
+                _ => todo!(),
+            },
+            message = match api.tags() {
+                t if t.contains(Tags::Mariadb) => "You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near \'^.^)_n\' at line 1",
+                t if t.contains(Tags::Mysql) => "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near \'^.^)_n\' at line 1",
+                t if t.contains(Tags::Mssql) => "Incorrect syntax near \'^\'.",
+                t if t.contains(Tags::Postgres) => "db error: ERROR: syntax error at or near \"^\"",
+                t if t.contains(Tags::Sqlite) => "unrecognized token: \"^\"",
+                _ => todo!(),
+            },
+        );
+
+        assert_eq!(error.error_code, ApplyMigrationError::ERROR_CODE);
+        assert_eq!(error.message, expected_error_message);
+    }
 
     let mut migrations = api.migration_persistence().list_migrations().await?.unwrap();
 

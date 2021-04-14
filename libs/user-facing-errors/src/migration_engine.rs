@@ -231,6 +231,25 @@ pub struct MigrationToMarkAppliedNotFound {
     pub migration_name: String,
 }
 
+#[derive(Debug, Serialize, UserFacingError)]
+#[user_facing(
+    code = "P3018",
+    message = "A migration failed to apply.
+
+Migration name: {migration_name}
+
+Database error code: {database_error_code}
+
+Database error:
+{database_error}
+"
+)]
+pub struct ApplyMigrationError {
+    pub migration_name: String,
+    pub database_error_code: String,
+    pub database_error: String,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
