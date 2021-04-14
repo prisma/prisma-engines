@@ -175,7 +175,7 @@ impl SqlSchemaDescriber {
             WHERE table_schema = ?
             -- Views are not supported yet
             AND table_type = 'BASE TABLE'
-            ORDER BY table_name";
+            ORDER BY Binary table_name";
         let rows = self.conn.query_raw(sql, &[schema.into()]).await?;
         let names = rows
             .into_iter()
@@ -437,9 +437,9 @@ impl SqlSchemaDescriber {
             SELECT DISTINCT
                 index_name AS index_name,
                 non_unique AS non_unique,
-                column_name AS column_name,
+                Binary column_name AS column_name,
                 seq_in_index AS seq_in_index,
-                table_name AS table_name,
+                Binary table_name AS table_name,
                 sub_part AS partial
             FROM INFORMATION_SCHEMA.STATISTICS
             WHERE table_schema = ?

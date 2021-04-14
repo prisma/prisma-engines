@@ -724,3 +724,46 @@ async fn partial_indexes_should_be_ignored_on_mysql(api: &TestApi) -> crate::Tes
 
     Ok(())
 }
+
+#[test_each_connector(tags("mysql"))]
+async fn casing_should_not_lead_to_mix_ups(api: &TestApi) -> crate::TestResult {
+    api.barrel()
+        .execute_with_schema(
+            |migration| {
+                migration.create_table("address", move |t| {
+                    t.inject_custom("addressid INT NOT NULL");
+                    t.inject_custom("PRIMARY KEY(addressid)");
+                });
+
+                migration.create_table("ADDRESS", move |t| {
+                    t.inject_custom("ADDRESSID INT NOT NULL");
+                    t.inject_custom("PRIMARY KEY(ADDRESSID)");
+                });
+                migration.create_table("Address", move |t| {
+                    t.inject_custom("AddressID INT NOT NULL AUTO_INCREMENT");
+                    t.inject_custom("PRIMARY KEY(AddressID)");
+                });
+            },
+            api.schema_name(),
+        )
+        .await?;
+
+    let dm = indoc! {r##"
+        model ADDRESS {
+          ADDRESSID Int @id
+        }
+          
+        model Address {
+          AddressID Int @id @default(autoincrement())
+        }
+            
+        model address {
+          addressid Int @id
+        }
+    "##};
+
+    let result = &api.introspect().await?;
+    api.assert_eq_datamodels(&dm, result);
+
+    Ok(())
+}
