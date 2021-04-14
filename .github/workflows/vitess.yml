@@ -10,7 +10,7 @@ jobs:
 
     env:
       TEST_CONNECTOR: vitess
-      LOG_LEVEL: error
+      LOG_LEVEL: info
 
     steps:
       - uses: actions/checkout@v2
