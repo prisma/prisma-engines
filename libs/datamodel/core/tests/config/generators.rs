@@ -96,7 +96,7 @@ fn hidden_preview_features_setting_must_work() {
     let schema = r#"
         generator go {
             provider = "go"
-            previewFeatures = ["mongodb"]
+            previewFeatures = ["mongoDb"]
         }
     "#;
 
@@ -108,9 +108,9 @@ fn hidden_preview_features_setting_must_work() {
         "value": "go"
     },
     "output":null,
+    "config": {},
     "binaryTargets": [],
-    "previewFeatures": ["mongodb"],
-    "config": {}
+    "previewFeatures": ["mongoDb"]
   }
 ]"#;
 

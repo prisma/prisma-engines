@@ -402,7 +402,6 @@ datasource db {
     {
         let config = parse_configuration(input_with_preview);
         let rendered = datamodel::render_datamodel_and_config_to_string(&Datamodel::new(), &config);
-        println!("{}", rendered);
         assert_eq!(rendered, input_with_preview);
     }
 }
@@ -420,10 +419,10 @@ fn test_parser_renderer_ignored_via_dml() {
           id      Int
           user_ip Int
           User    User @relation(fields: [user_ip], references: [ip])
-        
+
           @@ignore
         }
-        
+
         model User {
           id   Int    @id @default(autoincrement())
           ip   Int    @unique
