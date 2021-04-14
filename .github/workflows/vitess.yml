@@ -9,8 +9,9 @@ jobs:
     runs-on: self-hosted
 
     env:
-      TEST_CONNECTOR: vitess
-      LOG_LEVEL: info
+      TEST_CONNECTOR: "vitess"
+      LOG_LEVEL: "info"
+      LOG_QUERIES: "y"
 
     steps:
       - uses: actions/checkout@v2
