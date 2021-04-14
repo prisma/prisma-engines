@@ -14,6 +14,7 @@ jobs:
       LOG_QUERIES: "y"
       RUST_LOG_FORMAT: "devel"
       RUST_BACKTRACE: 1
+      CLICOLOR_FORCE: 1
 
     steps:
       - uses: actions/checkout@v2
