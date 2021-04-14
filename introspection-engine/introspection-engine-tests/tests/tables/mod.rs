@@ -734,10 +734,7 @@ async fn expression_indexes_should_be_ignored_on_sqlite(api: &TestApi) -> crate:
                     t.add_column("id", types::primary());
                     t.add_column("author", types::text());
                 });
-                migration.inject_custom(
-                    "CREATE INDEX author_lowercase_index ON Blog(LOWER(author));
-",
-                )
+                migration.inject_custom("CREATE INDEX author_lowercase_index ON Blog(LOWER(author));")
             },
             api.schema_name(),
         )
