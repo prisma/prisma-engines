@@ -33,3 +33,30 @@ async fn scalar_list_types(api: &TestApi) -> crate::TestResult {
 
     Ok(())
 }
+
+#[test_each_connector(tags("sqlite"))]
+async fn ignore_array_syntax_on_sqlite(api: &TestApi) -> crate::TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("col int[]");
+                t.inject_custom("col2 int []");
+            });
+        })
+        .await?;
+
+    let dm = indoc! {r#"
+         model Post {
+            id      Int  @id @default(autoincrement())
+            col     Int? 
+            col2    Int? 
+         }
+    "#};
+
+    let result = api.introspect().await?;
+
+    api.assert_eq_datamodels(dm, &result);
+
+    Ok(())
+}
