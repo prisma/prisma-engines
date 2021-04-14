@@ -25,7 +25,7 @@ impl ConnectorError {
 
         ConnectorError {
             user_facing_error: Some(known),
-            kind: ErrorKind::InvalidDatabaseUrl(format!("{} in database URL", err)),
+            kind: ErrorKind::InvalidDatabaseUrl(format!("{} in data source url", err)),
         }
     }
 

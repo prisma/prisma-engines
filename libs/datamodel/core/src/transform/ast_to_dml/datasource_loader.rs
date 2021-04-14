@@ -199,7 +199,7 @@ impl DatasourceLoader {
                     })
                     .filter(|s| !s.value.is_empty()),
 
-                    // We intentionally ignore the shadow database URL if it is defined in an env var that is missing.
+                    // We intentionally ignore the shadow data source url if it is defined in an env var that is missing.
                     Err(DatamodelError::EnvironmentFunctionalEvaluationError { .. }) => None,
 
                     Err(err) => {
@@ -248,7 +248,7 @@ impl DatasourceLoader {
                     DatamodelError::new_source_validation_error(&err_msg, source_name, url_arg.span())
                 })?;
 
-                // Validate the shadow database URL
+                // Validate the shadow data source url
                 if let (Some(shadow_database_url), Some(shadow_database_url_arg)) =
                     (shadow_database_url.as_ref(), shadow_database_url_arg.as_ref())
                 {

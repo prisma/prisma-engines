@@ -29,7 +29,7 @@ pub fn invalid_url_description(error_details: &str) -> String {
     let docs = r#"https://www.prisma.io/docs/reference/database-reference/connection-urls"#;
 
     let details = formatdoc! {r#"
-            {} in database URL. Please refer to the documentation in {} for constructing a correct
+            {} in data source url. Please refer to the documentation in {} for constructing a correct
             connection string. In some cases, certain characters must be escaped. Please
             check the string for any illegal characters."#, error_details, docs};
 

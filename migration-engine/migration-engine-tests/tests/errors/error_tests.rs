@@ -453,7 +453,7 @@ async fn connection_string_problems_give_a_nice_error() {
         let details = match provider.0 {
             "sqlserver" => {
                 indoc!(
-                    "Error parsing connection string: Conversion error: invalid digit found in string in database URL.
+                    "Error parsing connection string: Conversion error: invalid digit found in string in data source url.
                     Please refer to the documentation in https://www.prisma.io/docs/reference/database-reference/connection-urls
                     for constructing a correct connection string. In some cases, certain characters must be escaped.
                     Please check the string for any illegal characters.",
@@ -461,7 +461,7 @@ async fn connection_string_problems_give_a_nice_error() {
             },
             _ => {
                 indoc!(
-                    "Error parsing connection string: invalid port number in database URL.
+                    "Error parsing connection string: invalid port number in data source url.
                     Please refer to the documentation in https://www.prisma.io/docs/reference/database-reference/connection-urls
                     for constructing a correct connection string. In some cases, certain characters must be escaped.
                     Please check the string for any illegal characters.",

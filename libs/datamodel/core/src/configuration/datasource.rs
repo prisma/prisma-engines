@@ -16,7 +16,7 @@ pub struct Datasource {
     pub combined_connector: Box<dyn Connector>,
     /// the connector of the active provider
     pub active_connector: Box<dyn Connector>,
-    /// An optional user-defined shadow database URL.
+    /// An optional user-defined shadow data source url.
     pub shadow_database_url: Option<StringFromEnvVar>,
 }
 

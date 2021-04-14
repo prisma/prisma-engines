@@ -144,7 +144,7 @@ impl SqlMigrationConnector {
         Ok(())
     }
 
-    /// Generate a name for a temporary (shadow) database, _if_ there is no user-configured shadow database url.
+    /// Generate a name for a temporary (shadow) database, _if_ there is no user-configured shadow data source url.
     fn shadow_database_name(&self) -> Option<String> {
         if self.shadow_database_connection_string.is_some() {
             return None;

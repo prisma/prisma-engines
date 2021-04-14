@@ -185,7 +185,7 @@ fn validate_shadow_database_url(name: &str, expected_protocol: &str, url: &Strin
     }
 
     Err(format!(
-        "The shadow database URL for datasource `{}` must start with the protocol `{}`.",
+        "The shadow data source url for datasource `{}` must start with the protocol `{}`.",
         name, expected_protocol
     ))
 }

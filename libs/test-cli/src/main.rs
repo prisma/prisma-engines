@@ -20,7 +20,7 @@ enum Command {
         #[structopt(long = "file-path")]
         file_path: Option<String>,
     },
-    /// Generate DMMF from a schema, or directly from a database URl.
+    /// Generate DMMF from a schema, or directly from a data source url.
     Dmmf(DmmfCommand),
     /// Push a prisma schema directly to the database, without interacting with migrations.
     SchemaPush(SchemaPush),
@@ -34,7 +34,7 @@ struct DmmfCommand {
     /// env var, or just `query-engine`.
     #[structopt(env = "PRISMA_BINARY_PATH", default_value = "query-engine")]
     query_engine_binary_path: String,
-    /// A database URL to introspect and generate DMMF for.
+    /// A data source url to introspect and generate DMMF for.
     #[structopt(long = "url")]
     url: Option<String>,
     /// Path of the prisma schema to generate DMMF for.
@@ -138,7 +138,7 @@ async fn generate_dmmf(cmd: &DmmfCommand) -> anyhow::Result<()> {
                 .await
                 .map_err(|err| anyhow::anyhow!("{:?}", err.data))?;
 
-            eprintln!("{}", "Schema was successfully introspected from database URL".green());
+            eprintln!("{}", "Schema was successfully introspected from data source url".green());
 
             let path = "/tmp/prisma-test-cli-introspected.prisma";
             std::fs::write(path, introspected.datamodel)?;
