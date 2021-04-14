@@ -475,13 +475,16 @@ fn get_column_type(tpe: &str, arity: ColumnArity) -> ColumnType {
         "bigint" => ColumnTypeFamily::BigInt,
         "real" | "float" | "double" => ColumnTypeFamily::Float,
         "text" => ColumnTypeFamily::String,
+        "date" | "datetime" | "timestamp" => ColumnTypeFamily::DateTime,
         "binary" | "blob" => ColumnTypeFamily::Binary,
         "boolean[]" | "boolean []" => ColumnTypeFamily::Boolean,
         "int[]" | "int []" | "integer[]" | "integer []" => ColumnTypeFamily::Int,
         "bigint[]" | "bigint []" => ColumnTypeFamily::BigInt,
-        "date[]" | "datetime[]" | "timestamp[]" => ColumnTypeFamily::DateTime,
         "real[]" | "real []" | "double[]" | "double []" | "float[]" | "float []" => ColumnTypeFamily::Float,
         "text[]" | "text []" => ColumnTypeFamily::String,
+        "date[]" | "datetime[]" | "timestamp[]" | "date []" | "datetime []" | "timestamp []" => {
+            ColumnTypeFamily::DateTime
+        }
         "binary[]" | "binary []" => ColumnTypeFamily::Binary,
         s if s.contains("char") => ColumnTypeFamily::String,
         s if s.contains("numeric") => ColumnTypeFamily::Decimal,
