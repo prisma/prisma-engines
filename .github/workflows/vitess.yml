@@ -6,7 +6,7 @@ on:
 jobs:
   query-engine:
     name: Query Engine Tests
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     env:
       TEST_CONNECTOR: "vitess"
@@ -50,9 +50,6 @@ jobs:
 
       - name: Run tests
         run: export SERVER_ROOT=$(pwd) && cd query-engine/connector-test-kit && sbt test
-
-      #- name: Run tests on image
-      #  run: docker-compose --file vitess/docker-compose.yml run -e TEST_CONNECTOR=vitess -e TEST_MODE=simple -w /home/gh-actions/build/query-engine/connector-test-kit qe-test-base sbt test
 
   migration-engine:
     name: Migration Engine Tests
