@@ -6,13 +6,18 @@ use quaint::connector::{ConnectionInfo, SqlFamily};
 use serde_json::json;
 use test_macros::test_each_connector;
 
-static TODO: &str = indoc! {"
+static TODO: &str = indoc! {r#"
+    generator js {
+        provider = "prisma-client-js"
+        previewFeatures = ["microsoftSqlServer", "mongodb", "orderByRelation", "napi", "selectRelationCount", "orderByAggregateGroup"]
+    }
+
     model Todo {
         id String @id @default(cuid())
         title String
         dt DateTime?
     }
-"};
+"#};
 
 fn execute_raw(query: &str, params: Vec<Value>) -> String {
     let params: Vec<serde_json::Value> = params
