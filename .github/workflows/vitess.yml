@@ -14,7 +14,6 @@ jobs:
       LOG_QUERIES: "y"
       RUST_LOG_FORMAT: "devel"
       RUST_BACKTRACE: 1
-      RUST_LOG: "query_engine=debug,quaint=debug,query_core=trace,query_connector=debug,sql_query_connector=debug,prisma_models=debug,engineer=info,sql_introspection_connector=debug"
 
     steps:
       - uses: actions/checkout@v2
