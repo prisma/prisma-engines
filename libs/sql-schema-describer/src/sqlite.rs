@@ -433,7 +433,7 @@ impl SqlSchemaDescriber {
             // Exclude partial indices
             .filter(|row| !row.get("partial").and_then(|partial| partial.as_bool()).unwrap());
 
-        for row in filtered_rows {
+        'index_loop: for row in filtered_rows {
             let is_unique = row.get("unique").and_then(|x| x.as_bool()).expect("get unique");
             let name = row.get("name").and_then(|x| x.to_string()).expect("get name");
             let mut index = Index {
@@ -449,12 +449,17 @@ impl SqlSchemaDescriber {
             let result_set = self.conn.query_raw(&sql, &[]).await.expect("querying for index info");
             trace!("Got index description results: {:?}", result_set);
             for row in result_set.into_iter() {
-                let pos = row.get("seqno").and_then(|x| x.as_i64()).expect("get seqno") as usize;
-                let col_name = row.get("name").and_then(|x| x.to_string()).expect("get name");
-                if index.columns.len() <= pos {
-                    index.columns.resize(pos + 1, "".to_string());
+                //if the index is on a rowid or expression, the name of the column will be null, we ignore these for now
+                match row.get("name").and_then(|x| x.to_string()) {
+                    Some(name) => {
+                        let pos = row.get("seqno").and_then(|x| x.as_i64()).expect("get seqno") as usize;
+                        if index.columns.len() <= pos {
+                            index.columns.resize(pos + 1, "".to_string());
+                        }
+                        index.columns[pos] = name;
+                    }
+                    None => break 'index_loop,
                 }
-                index.columns[pos] = col_name;
             }
 
             indices.push(index)
