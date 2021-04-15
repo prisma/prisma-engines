@@ -15,7 +15,7 @@ pub trait DatabaseMigrationStepApplier<T>: Send + Sync {
 
     /// Apply a migration script to the database. The migration persistence is
     /// managed by the core.
-    async fn apply_script(&self, script: &str) -> ConnectorResult<()>;
+    async fn apply_script(&self, migration_name: &str, script: &str) -> ConnectorResult<()>;
 }
 
 /// A helper struct to serialize a database migration with an additional `raw` field containing the

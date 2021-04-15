@@ -42,7 +42,7 @@ impl DatabaseMigrationStepApplier<MongoDbMigration> for MongoDbMigrationConnecto
         todo!()
     }
 
-    async fn apply_script(&self, _script: &str) -> migration_connector::ConnectorResult<()> {
+    async fn apply_script(&self, _migration_name: &str, _script: &str) -> migration_connector::ConnectorResult<()> {
         todo!()
     }
 }

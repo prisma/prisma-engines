@@ -94,12 +94,12 @@ impl<'a> Display for ForeignKey<'a> {
 
         if let Some(on_delete) = &self.on_delete {
             f.write_str(" ON DELETE ")?;
-            on_delete.fmt(f)?;
+            Display::fmt(on_delete, f)?;
         }
 
         if let Some(on_update) = &self.on_update {
             f.write_str(" ON UPDATE ")?;
-            on_update.fmt(f)?;
+            Display::fmt(&on_update, f)?;
         }
 
         Ok(())
