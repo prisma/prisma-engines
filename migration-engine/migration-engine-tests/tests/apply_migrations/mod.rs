@@ -126,7 +126,7 @@ async fn migrations_should_fail_when_the_script_is_invalid(api: &TestApi) -> Tes
     {
         let expected_error_message = formatdoc!(
             r#"
-                A migration failed to apply.
+                A migration failed to apply. New migrations can not be applied before the error is recovered from. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve
 
                 Migration name: {second_migration_name}
 
