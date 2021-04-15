@@ -143,7 +143,7 @@ fn test_parser_renderer_order_of_block_attributes_via_dml() {
   lastName    String
   codeName    String
   yearOfBirth Int
-  @@map("blog")
+  @@map("person")
   @@index([yearOfBirth])
   @@unique([codeName, yearOfBirth])
   @@id([firstName, lastName])
@@ -158,6 +158,7 @@ model Blog {
   @@map("blog")
 }
 "#;
+
     let expected = r#"model Person {
   firstName   String
   lastName    String
@@ -167,7 +168,7 @@ model Blog {
   @@id([firstName, lastName])
   @@unique([codeName, yearOfBirth])
   @@index([yearOfBirth])
-  @@map("blog")
+  @@map("person")
 }
 
 model Blog {
@@ -420,10 +421,10 @@ fn test_parser_renderer_ignored_via_dml() {
           id      Int
           user_ip Int
           User    User @relation(fields: [user_ip], references: [ip])
-        
+
           @@ignore
         }
-        
+
         model User {
           id   Int    @id @default(autoincrement())
           ip   Int    @unique

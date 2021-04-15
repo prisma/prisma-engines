@@ -31,6 +31,9 @@ pub enum DatamodelError {
   #[error("Attribute \"@{}\" is defined twice.", attribute_name)]
   DuplicateAttributeError { attribute_name: String, span: Span },
 
+  #[error("The model with database name \"{}\" could not be defined because another model with this name exists: \"{}\"", model_database_name, existing_model_name)]
+  DuplicateModelDatabaseNameError { model_database_name: String, existing_model_name: String, span: Span },
+
   #[error("\"{}\" is a reserved scalar type name and can not be used.", type_name)]
   ReservedScalarTypeError { type_name: String, span: Span },
 
@@ -188,6 +191,14 @@ impl DatamodelError {
   pub fn new_reserved_scalar_type_error(type_name: &str, span: Span) -> DatamodelError {
     DatamodelError::ReservedScalarTypeError {
       type_name: String::from(type_name),
+      span,
+    }
+  }
+
+  pub fn new_duplicate_model_database_name_error(model_database_name: String, existing_model_name: String, span: Span) -> DatamodelError {
+    DatamodelError::DuplicateModelDatabaseNameError {
+      model_database_name,
+      existing_model_name,
       span,
     }
   }
@@ -403,6 +414,7 @@ impl DatamodelError {
       DatamodelError::DuplicateFieldError { span, .. } => *span,
       DatamodelError::DuplicateEnumValueError { span, .. } => *span,
       DatamodelError::DuplicateArgumentError { span, .. } => *span,
+      DatamodelError::DuplicateModelDatabaseNameError { span, .. } => *span,
       DatamodelError::DuplicateDefaultArgumentError { span, .. } => *span,
       DatamodelError::UnusedArgumentError { span, .. } => *span,
       DatamodelError::ScalarListFieldsAreNotSupported {span, ..} => *span,
