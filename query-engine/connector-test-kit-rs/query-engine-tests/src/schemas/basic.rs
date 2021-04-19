@@ -81,6 +81,22 @@ pub fn common_text_and_numeric_types() -> String {
     schema.to_owned()
 }
 
+/// Test model containing all common Prisma numeric and string types, optional.
+pub fn common_text_and_numeric_types_optional() -> String {
+    let schema = indoc! {
+        "model TestModel {
+            #id(id, Int, @id)
+            int     Int?
+            bInt    BigInt?
+            float   Float?
+            decimal Decimal?
+            string  String?
+        }"
+    };
+
+    schema.to_owned()
+}
+
 /// Test model containing all possible Prisma scalar types.
 /// Excludes capability-dependent types (e.g. JSON).
 pub fn common_types() -> String {
