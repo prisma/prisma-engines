@@ -13,7 +13,9 @@ use indoc::formatdoc;
 use native_types::{MsSqlType, MsSqlTypeParameter};
 use prisma_value::PrismaValue;
 use sql_schema_describer::{
-    walkers::{ColumnWalker, EnumWalker, ForeignKeyWalker, IndexWalker, TableWalker, ViewWalker},
+    walkers::{
+        ColumnWalker, EnumWalker, ForeignKeyWalker, IndexWalker, TableWalker, UserDefinedTypeWalker, ViewWalker,
+    },
     ColumnTypeFamily, DefaultKind, DefaultValue, IndexType, SqlSchema,
 };
 use std::{
@@ -297,9 +299,9 @@ impl SqlRenderer for MssqlFlavour {
             result.push(formatdoc! {r#"
                 IF EXISTS(SELECT * FROM {table})
                     EXEC('INSERT INTO {tmp_table} ({columns}) SELECT {columns} FROM {table} WITH (holdlock tablockx)')"#,
-                columns = columns.join(","),
-                table = self.quote_with_schema(tables.previous().name()),
-                tmp_table = self.quote_with_schema(&temporary_table_name),
+                                    columns = columns.join(","),
+                                    table = self.quote_with_schema(tables.previous().name()),
+                                    tmp_table = self.quote_with_schema(&temporary_table_name),
             });
 
             // When done copying, disallow identity inserts again if needed.
@@ -386,6 +388,10 @@ impl SqlRenderer for MssqlFlavour {
 
     fn render_drop_view(&self, view: &ViewWalker<'_>) -> String {
         format!("DROP VIEW {}", self.quote_with_schema(view.name()))
+    }
+
+    fn render_drop_user_defined_type(&self, udt: &UserDefinedTypeWalker<'_>) -> String {
+        todo!("DROP TYPE {}", self.quote_with_schema(udt.name()))
     }
 }
 

@@ -22,7 +22,7 @@ use crate::{
 };
 use common::Quoted;
 use sql_schema_describer::{
-    walkers::{EnumWalker, ForeignKeyWalker, IndexWalker, TableWalker, ViewWalker},
+    walkers::{EnumWalker, ForeignKeyWalker, IndexWalker, TableWalker, UserDefinedTypeWalker, ViewWalker},
     SqlSchema,
 };
 
@@ -76,5 +76,9 @@ pub(crate) trait SqlRenderer {
     /// Render a table renaming step.
     fn render_rename_table(&self, name: &str, new_name: &str) -> String;
 
+    /// Render a drop view step.
     fn render_drop_view(&self, view: &ViewWalker<'_>) -> String;
+
+    /// Render a drop type step.
+    fn render_drop_user_defined_type(&self, udt: &UserDefinedTypeWalker<'_>) -> String;
 }

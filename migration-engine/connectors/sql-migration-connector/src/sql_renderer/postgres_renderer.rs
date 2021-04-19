@@ -401,6 +401,10 @@ impl SqlRenderer for PostgresFlavour {
         }
         .to_string()
     }
+
+    fn render_drop_user_defined_type(&self, _: &UserDefinedTypeWalker<'_>) -> String {
+        unreachable!("render_drop_user_defined_type on PostgreSQL")
+    }
 }
 
 pub(crate) fn render_column_type(col: &ColumnWalker<'_>) -> Cow<'static, str> {

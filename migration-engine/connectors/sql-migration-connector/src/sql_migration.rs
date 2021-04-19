@@ -44,6 +44,7 @@ pub(crate) enum SqlMigrationStep {
     DropEnum(DropEnum),
     AlterEnum(AlterEnum),
     DropView(DropView),
+    DropUserDefinedType(DropUserDefinedType),
 }
 
 impl SqlMigrationStep {
@@ -77,6 +78,7 @@ impl SqlMigrationStep {
             SqlMigrationStep::DropEnum(_) => "DropEnum",
             SqlMigrationStep::AlterEnum(_) => "AlterEnum",
             SqlMigrationStep::DropView(_) => "DropView",
+            SqlMigrationStep::DropUserDefinedType(_) => "DropUserDefinedType",
         }
     }
 }
@@ -139,6 +141,17 @@ pub(crate) struct DropView {
 impl DropView {
     pub fn new(view_index: usize) -> Self {
         Self { view_index }
+    }
+}
+
+#[derive(Debug, Copy, Clone)]
+pub(crate) struct DropUserDefinedType {
+    pub udt_index: usize,
+}
+
+impl DropUserDefinedType {
+    pub(crate) fn new(udt_index: usize) -> Self {
+        Self { udt_index }
     }
 }
 

@@ -93,6 +93,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
             views,
             procedures,
             sequences: vec![],
+            user_defined_types: vec![],
             lower_case_identifiers,
         })
     }

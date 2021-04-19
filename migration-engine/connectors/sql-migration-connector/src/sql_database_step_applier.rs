@@ -189,5 +189,10 @@ fn render_raw_sql(
 
             vec![renderer.render_drop_view(&view)]
         }
+        SqlMigrationStep::DropUserDefinedType(drop_udt) => {
+            let udt = schemas.previous().udt_walker_at(drop_udt.udt_index);
+
+            vec![renderer.render_drop_user_defined_type(&udt)]
+        }
     }
 }

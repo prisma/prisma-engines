@@ -1,7 +1,7 @@
 use crate::{
     getters::Getter, parsers::Parser, Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue, DescriberError,
     DescriberErrorKind, DescriberResult, ForeignKey, ForeignKeyAction, Index, IndexType, PrimaryKey, Procedure,
-    SqlMetadata, SqlSchema, Table, View,
+    SqlMetadata, SqlSchema, Table, UserDefinedType, View,
 };
 use indoc::indoc;
 use native_types::{MsSqlType, MsSqlTypeParameter, NativeType};
@@ -97,6 +97,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
 
         let views = self.get_views(schema).await?;
         let procedures = self.get_procedures(schema).await?;
+        let user_defined_types = self.get_user_defined_types(schema).await?;
 
         Ok(SqlSchema {
             tables,
@@ -104,6 +105,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
             procedures,
             enums: vec![],
             sequences: vec![],
+            user_defined_types,
             lower_case_identifiers: false,
         })
     }
@@ -496,6 +498,66 @@ impl SqlSchemaDescriber {
         }
 
         Ok(views)
+    }
+
+    async fn get_user_defined_types(&self, schema: &str) -> DescriberResult<Vec<UserDefinedType>> {
+        let sql = indoc! {r#"
+            SELECT
+                udt.name AS user_type_name,
+                systyp.name AS system_type_name,
+                CONVERT(SMALLINT,
+                        CASE
+                            -- nchar + nvarchar are double size
+                            WHEN udt.system_type_id IN (231, 239) AND udt.max_length = -1 THEN -1
+                            -- nchar + nvarchar are double size
+                            WHEN udt.system_type_id IN (231, 239) THEN udt.max_length / 2.0
+                            -- varbinary, varchar, binary and char
+                            WHEN udt.system_type_id IN (165, 167, 173, 175) THEN udt.max_length
+                            ELSE null
+                            END) AS max_length,
+                CONVERT(tinyint,
+                        CASE
+                            -- numeric, decimal
+                            WHEN udt.system_type_id IN (106, 108) THEN udt.precision
+                            ELSE null
+                            END) AS precision,
+                CONVERT(tinyint,
+                        CASE
+                            -- numeric, decimal
+                            WHEN udt.system_type_id IN (106, 108) THEN udt.scale
+                            ELSE null
+                            END) AS scale
+            FROM sys.types udt
+                    LEFT JOIN sys.types systyp
+                            ON udt.system_type_id = systyp.user_type_id
+            WHERE SCHEMA_NAME(udt.schema_id) = @P1
+            AND udt.is_user_defined = 1
+        "#};
+
+        let result_set = self.conn.query_raw(sql, &[schema.into()]).await?;
+
+        let types: Vec<UserDefinedType> = result_set
+            .into_iter()
+            .map(|row| {
+                let name = row.get_expect_string("user_type_name");
+                let max_length = row.get_i64("max_length");
+                let precision = row.get_u32("precision");
+                let scale = row.get_u32("scale");
+
+                let definition = row
+                    .get_string("system_type_name")
+                    .map(|name| match (max_length, precision, scale) {
+                        (Some(len), _, _) if len == -1 => format!("{}(max)", name),
+                        (Some(len), _, _) => format!("{}({})", name, len),
+                        (_, Some(p), Some(s)) => format!("{}({},{})", name, p, s),
+                        _ => name,
+                    });
+
+                UserDefinedType { name, definition }
+            })
+            .collect();
+
+        Ok(types)
     }
 
     async fn get_foreign_keys(&self, schema: &str) -> DescriberResult<HashMap<String, Vec<ForeignKey>>> {
