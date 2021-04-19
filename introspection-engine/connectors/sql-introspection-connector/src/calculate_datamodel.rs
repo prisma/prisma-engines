@@ -145,6 +145,7 @@ mod tests {
             enums: vec![],
             sequences: vec![],
             views: vec![],
+            user_defined_types: vec![],
             lower_case_identifiers: false,
         };
         let introspection_result =
@@ -333,6 +334,7 @@ mod tests {
             enums: vec![],
             sequences: vec![],
             views: vec![],
+            user_defined_types: vec![],
         };
         let introspection_result =
             calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new()).expect("calculate data model");
@@ -408,6 +410,7 @@ mod tests {
             }],
             enums: vec![],
             sequences: vec![],
+            user_defined_types: vec![],
         };
         let introspection_result =
             calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new()).expect("calculate data model");
@@ -662,6 +665,7 @@ mod tests {
             ],
             enums: vec![],
             sequences: vec![],
+            user_defined_types: vec![],
         };
         let introspection_result =
             calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new()).expect("calculate data model");
@@ -792,6 +796,7 @@ mod tests {
             }],
             enums: vec![],
             sequences: vec![],
+            user_defined_types: vec![],
         };
         let introspection_result =
             calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new()).expect("calculate data model");
@@ -1004,6 +1009,7 @@ mod tests {
             ],
             enums: vec![],
             sequences: vec![],
+            user_defined_types: vec![],
         };
         let introspection_result =
             calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new()).expect("calculate data model");
@@ -1047,6 +1053,7 @@ mod tests {
                 values: enum_values,
             }],
             sequences: vec![],
+            user_defined_types: vec![],
             lower_case_identifiers: false,
         };
         let introspection_result =

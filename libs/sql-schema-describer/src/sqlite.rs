@@ -70,6 +70,7 @@ impl SqlSchemaDescriberBackend for SqlSchemaDescriber {
             procedures: vec![],
             tables,
             views,
+            user_defined_types: vec![],
             lower_case_identifiers: false,
         })
     }

@@ -4,7 +4,7 @@
 
 use crate::{
     Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue, Enum, ForeignKey, ForeignKeyAction, Index,
-    IndexType, PrimaryKey, SqlSchema, Table, View,
+    IndexType, PrimaryKey, SqlSchema, Table, UserDefinedType, View,
 };
 use serde::de::DeserializeOwned;
 use std::fmt;
@@ -189,6 +189,39 @@ impl<'a> ViewWalker<'a> {
 
     fn view(&self) -> &'a View {
         &self.schema.views[self.view_index]
+    }
+}
+
+/// Traverse a user-defined type
+#[derive(Clone, Copy)]
+pub struct UserDefinedTypeWalker<'a> {
+    schema: &'a SqlSchema,
+    udt_index: usize,
+}
+
+impl<'a> UserDefinedTypeWalker<'a> {
+    /// Create a UserDefinedTypeWalker from a schema and a reference to one of its udts.
+    pub fn new(schema: &'a SqlSchema, udt_index: usize) -> Self {
+        Self { schema, udt_index }
+    }
+
+    /// The name of the type
+    pub fn name(&self) -> &'a str {
+        &self.udt().name
+    }
+
+    /// The SQL definition of the type
+    pub fn definition(&self) -> Option<&'a str> {
+        self.udt().definition.as_deref()
+    }
+
+    /// The index of the user-defined type in the schema.
+    pub fn udt_index(&self) -> usize {
+        self.udt_index
+    }
+
+    fn udt(&self) -> &'a UserDefinedType {
+        &self.schema.user_defined_types[self.udt_index]
     }
 }
 
@@ -551,6 +584,9 @@ pub trait SqlSchemaExt {
 
     /// Find a view by index.
     fn view_walker_at(&self, index: usize) -> ViewWalker<'_>;
+
+    /// Find a user-defined type by index.
+    fn udt_walker_at(&self, index: usize) -> UserDefinedTypeWalker<'_>;
 }
 
 impl SqlSchemaExt for SqlSchema {
@@ -578,6 +614,13 @@ impl SqlSchemaExt for SqlSchema {
     fn view_walker_at(&self, index: usize) -> ViewWalker<'_> {
         ViewWalker {
             view_index: index,
+            schema: self,
+        }
+    }
+
+    fn udt_walker_at(&self, index: usize) -> UserDefinedTypeWalker<'_> {
+        UserDefinedTypeWalker {
+            udt_index: index,
             schema: self,
         }
     }
