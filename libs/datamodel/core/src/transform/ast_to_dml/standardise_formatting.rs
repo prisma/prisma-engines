@@ -260,7 +260,6 @@ impl StandardiserForFormatting {
                                 }
                                 Some(other) if other.field_type().is_compatible_with(&f.field_type) => {
                                     // field with name exists and its type is compatible. We must not add it since we would have a duplicate.
-                                    //todo collect arities of fields on other model
                                     if other.arity().is_optional() {all_existing_underlying_fields_on_opposite_model_are_required =false;}
                                     false
                                 }
