@@ -73,12 +73,3 @@ impl StandardiserForParsing {
         rels
     }
 }
-
-#[derive(Debug)]
-struct AddMissingBackRelationField {
-    model: String,
-    field: dml::RelationField,
-    related_model: String,
-    related_field: String,
-    underlying_fields: Vec<dml::ScalarField>,
-}

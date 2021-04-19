@@ -1002,3 +1002,35 @@ fn assert_reformat(schema: &str, expected_result: &str) {
     parse_datamodel(&result).unwrap();
     assert_eq!(result, expected_result);
 }
+
+#[test]
+fn issue_3548() {
+    let input = indoc! {r#"
+    model Session {
+      id       Int @id
+      userId   Int
+    }
+    
+    model User {
+      id       Int       @id
+      sessions Session[] // NEW ADDED LINE
+    }
+    "#};
+
+    let expected = indoc! {r#"
+    model Session {
+      id     Int  @id
+      userId Int
+      User   User @relation(fields: [userId], references: [id])
+    }
+    
+    model User {
+      id       Int       @id
+      sessions Session[] // NEW ADDED LINE
+    }
+    "#};
+
+    let result = datamodel::ast::reformat::Reformatter::new(&input).reformat_to_string();
+
+    assert_eq!(result, expected);
+}
