@@ -3,6 +3,7 @@ package queries.aggregation
 import org.scalatest.{FlatSpec, Matchers}
 import util._
 
+// RS: Ported
 class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
   val project = SchemaDsl.fromStringV11() {
     """model Model {
