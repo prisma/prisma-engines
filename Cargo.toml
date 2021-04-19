@@ -35,9 +35,6 @@ members = [
   "libs/user-facing-errors",
 ]
 
-[profile.dev]
-split-debuginfo = "unpacked"
-
 [profile.dev.package.backtrace]
 opt-level = 3
 
