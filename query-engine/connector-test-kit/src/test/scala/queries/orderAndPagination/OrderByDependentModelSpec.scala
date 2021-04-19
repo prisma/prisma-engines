@@ -30,6 +30,9 @@ class OrderByDependentModelSpec extends FlatSpec with Matchers with ApiSpecBase 
     """
   }
 
+  // Take this out when cascading rules can be set.
+  override def doNotRunForConnectors: Set[ConnectorTag] = Set(ConnectorTag.MsSqlConnectorTag)
+
   override protected def beforeEach(): Unit = {
     super.beforeEach()
     database.setup(project)

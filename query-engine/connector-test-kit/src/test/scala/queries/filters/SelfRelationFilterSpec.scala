@@ -8,6 +8,9 @@ import util._
 class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
   override def runOnlyForCapabilities = Set(JoinRelationLinksCapability)
 
+  // Take this out when cascading rules can be set.
+  override def doNotRunForConnectors: Set[ConnectorTag] = Set(ConnectorTag.MsSqlConnectorTag)
+
   val project = ProjectDsl.fromString {
     connectorTag match {
       case _: RelationalConnectorTag =>
@@ -71,6 +74,7 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
     setupRockRelations
   }
 
+  // Bring back sql server when cascading rules can be set!
   "Filter Queries along self relations" should "succeed with one level " taggedAs (IgnoreMsSql) in {
     val filterKurt =
       s"""

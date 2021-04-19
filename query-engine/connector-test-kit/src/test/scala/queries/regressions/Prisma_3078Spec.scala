@@ -95,7 +95,8 @@ class Prisma_3078Spec extends FlatSpec with Matchers with ApiSpecBase with Schem
     }
   }
 
-  "A relation filter on a 1:M self relation " should "work" in {
+  // Bring back sql server when cascading rules can be set!
+  "A relation filter on a 1:M self relation " should "work" taggedAs (IgnoreMsSql) in {
     for (fieldName <- Vector("field_a", "field_z")) {
       val project = ProjectDsl.fromString {
         s"""
@@ -174,7 +175,8 @@ class Prisma_3078Spec extends FlatSpec with Matchers with ApiSpecBase with Schem
     }
   }
 
-  "A relation filter on a N:M self relation " should "work" in {
+  // Bring back sql server when cascading rules can be set!
+  "A relation filter on a N:M self relation " should "work" taggedAs (IgnoreMsSql) in {
 
     for (fieldName <- Vector("field_a", "field_z")) {
       val project = ProjectDsl.fromString {

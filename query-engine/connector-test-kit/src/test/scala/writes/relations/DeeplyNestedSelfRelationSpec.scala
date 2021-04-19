@@ -7,7 +7,8 @@ import util._
 class DeeplyNestedSelfRelationSpec extends FlatSpec with Matchers with ApiSpecBase {
   override def runOnlyForCapabilities = Set(JoinRelationLinksCapability)
 
-  "A deeply nested self relation create" should "be executed completely" in {
+  // Bring back sql server when cascading rules can be set!
+  "A deeply nested self relation create" should "be executed completely" taggedAs IgnoreMsSql in {
     val project = ProjectDsl.fromString {
       """model User {
       |  id       String  @id @default(cuid())
