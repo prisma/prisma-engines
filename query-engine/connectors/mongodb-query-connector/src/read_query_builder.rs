@@ -3,20 +3,65 @@ use crate::{
     filter::convert_filter,
     join::JoinStage,
     orderby::OrderByBuilder,
-    BsonTransform, IntoBson,
+    vacuum_cursor, BsonTransform, IntoBson,
 };
 use connector_interface::{AggregationSelection, Filter, QueryArguments};
 use itertools::Itertools;
 use mongodb::{
     bson::{doc, Bson, Document},
     options::{AggregateOptions, FindOptions},
-    Collection, Cursor,
+    Collection,
 };
-use prisma_models::{ModelProjection, ScalarFieldRef};
+use prisma_models::{ModelProjection, ModelRef, ScalarFieldRef};
+
+/// Ergonomics wrapper for query execution and logging.
+/// Todo: Add all other queries gradually.
+pub enum MongoReadQuery {
+    Find(FindQuery),
+    Pipeline(PipelineQuery),
+}
+
+impl MongoReadQuery {
+    pub async fn execute(self, on_collection: Collection) -> crate::Result<Vec<Document>> {
+        match self {
+            MongoReadQuery::Find(q) => q.execute(on_collection).await,
+            MongoReadQuery::Pipeline(q) => q.execute(on_collection).await,
+        }
+    }
+}
+
+pub struct PipelineQuery {
+    filter: Option<Document>,
+    stages: Vec<Document>,
+}
+
+impl PipelineQuery {
+    pub async fn execute(self, on_collection: Collection) -> crate::Result<Vec<Document>> {
+        let opts = AggregateOptions::builder().allow_disk_use(true).build();
+        let cursor = on_collection.aggregate(self.filter, opts).await?;
+
+        Ok(vacuum_cursor(cursor).await?)
+    }
+}
+
+pub struct FindQuery {
+    options: FindOptions,
+}
+
+impl FindQuery {
+    pub async fn execute(self, on_collection: Collection) -> crate::Result<Vec<Document>> {
+        let opts = AggregateOptions::builder().allow_disk_use(true).build();
+        let cursor = on_collection.find(None, self.options).await?;
+
+        Ok(vacuum_cursor(cursor).await?)
+    }
+}
 
 /// Translated query arguments ready to use in mongo find or aggregation queries.
-#[derive(Debug, Default)]
-pub(crate) struct MongoQueryArgs {
+#[derive(Debug)]
+pub(crate) struct MongoReadQueryBuilder {
+    pub(crate) model: ModelRef,
+
     /// Pre-join, "normal" filters.
     pub(crate) query: Option<Document>,
 
@@ -65,8 +110,28 @@ pub(crate) struct MongoQueryArgs {
     pub(crate) is_group_by_query: bool,
 }
 
-impl MongoQueryArgs {
-    pub(crate) fn new(args: QueryArguments) -> crate::Result<MongoQueryArgs> {
+impl MongoReadQueryBuilder {
+    pub fn new(model: ModelRef) -> Self {
+        Self {
+            model,
+            query: None,
+            joins: vec![],
+            join_filters: vec![],
+            aggregations: vec![],
+            aggregation_filters: vec![],
+            order_builder: None,
+            order: None,
+            order_joins: vec![],
+            cursor_builder: None,
+            cursor_data: None,
+            skip: None,
+            limit: None,
+            projection: None,
+            is_group_by_query: false,
+        }
+    }
+
+    pub(crate) fn from_args(args: QueryArguments) -> crate::Result<MongoReadQueryBuilder> {
         let reverse_order = args.take.map(|t| t < 0).unwrap_or(false);
         let order_by = args.order_by;
 
@@ -92,7 +157,8 @@ impl MongoQueryArgs {
             None => None,
         };
 
-        Ok(MongoQueryArgs {
+        Ok(MongoReadQueryBuilder {
+            model: args.model,
             query,
             join_filters: post_filters,
             joins,
@@ -100,55 +166,62 @@ impl MongoQueryArgs {
             cursor_builder,
             skip: skip(args.skip, args.ignore_skip),
             limit: take(args.take, args.ignore_take),
-            ..Default::default()
+            aggregations: vec![],
+            aggregation_filters: vec![],
+            order: None,
+            order_joins: vec![],
+            cursor_data: None,
+            projection: None,
+            is_group_by_query: false,
         })
     }
 
-    /// Turns the query args into a find operation on the collection.
-    /// Depending on the arguments, either an aggregation pipeline or a plain query is build and run.
-    pub(crate) async fn find_documents(mut self, coll: Collection) -> crate::Result<Cursor> {
+    /// Finalizes the builder and builds a `MongoQuery`.
+    pub(crate) fn build(mut self) -> crate::Result<MongoReadQuery> {
         self.finalize()?;
 
+        // Depending on the builder contents, either an
+        // aggregation pipeline or a plain query is build.
         if self.joins.is_empty()
             && self.order_joins.is_empty()
             && self.aggregations.is_empty()
             && self.cursor_data.is_none()
         {
-            self.execute_find_query(coll).await
+            self.build_find_query()
         } else {
-            self.execute_pipeline_query(coll).await
+            self.build_pipeline_query()
         }
     }
 
-    /// Simplest form of find-documents query.
-    /// Todo: Find out if always using aggregation pipeline is a good idea.
-    async fn execute_find_query(self, coll: Collection) -> crate::Result<Cursor> {
-        let find_options = FindOptions::builder()
+    // Todo: Find out if always using aggregation pipeline is a good idea.
+    /// Simplest form of find-documents query: `coll.find(filter, opts)`.
+    fn build_find_query(self) -> crate::Result<MongoReadQuery> {
+        let options = FindOptions::builder()
             .projection(self.projection)
             .limit(self.limit)
             .skip(self.skip)
             .sort(self.order)
             .build();
 
-        Ok(coll.find(self.query, find_options).await?)
+        Ok(MongoReadQuery::Find(FindQuery { options }))
     }
 
-    async fn execute_pipeline_query(self, coll: Collection) -> crate::Result<Cursor> {
-        if self.cursor_data.is_none() {
-            self.execute_pipeline_internal(coll).await
+    /// Aggregation-pipeline based query. A distinction must be made between cursored and uncursored queries,
+    /// as they require different stage shapes (see individual fns for details).
+    fn build_pipeline_query(self) -> crate::Result<MongoReadQuery> {
+        let filter = self.query.clone();
+        let stages = if self.cursor_data.is_none() {
+            self.flat_pipeline_stages()
         } else {
-            self.execute_cursored_internal(coll).await
-        }
+            self.cursored_pipeline_stages()
+        };
+
+        Ok(MongoReadQuery::Pipeline(PipelineQuery { filter, stages }))
     }
 
-    /// Pipeline not requiring a cursor.
-    async fn execute_pipeline_internal(self, coll: Collection) -> crate::Result<Cursor> {
-        let opts = AggregateOptions::builder().allow_disk_use(true).build();
-        let stages = self.into_pipeline_stages();
-
-        dbg!(&stages);
-
-        Ok(coll.aggregate(stages, opts).await?)
+    /// Pipeline not requiring a cursor. Flat `coll.aggregate(stages, opts)` query.
+    fn flat_pipeline_stages(self) -> Vec<Document> {
+        self.into_pipeline_stages()
     }
 
     fn into_pipeline_stages(self) -> Vec<Document> {
@@ -228,7 +301,7 @@ impl MongoQueryArgs {
     /// Pipeline query with a cursor. Requires special building to form a query that first
     /// pins a cursor and then builds cursor conditions based on that cursor document
     /// and the orderings that the query defined.
-    /// The query has the form:
+    /// The stages have the form:
     /// ```text
     /// testModel.aggregate([
     ///     { $match: { <filter finding exactly one document (cursor doc)> }},
@@ -247,8 +320,8 @@ impl MongoQueryArgs {
     /// actually join anything.
     ///
     /// Todo concrete example
-    async fn execute_cursored_internal(mut self, coll: Collection) -> crate::Result<Cursor> {
-        let opts = AggregateOptions::builder().allow_disk_use(true).build();
+    fn cursored_pipeline_stages(mut self) -> Vec<Document> {
+        let coll_name = self.model.db_name().to_owned();
         let cursor_data = self.cursor_data.take().unwrap();
 
         // For now we assume that simply putting the cursor condition into the join conditions is enough
@@ -281,7 +354,7 @@ impl MongoQueryArgs {
 
         outer_stages.push(doc! {
             "$lookup": {
-                "from": coll.name(),
+                "from": coll_name,
                 "let": cursor_data.bindings,
                 "pipeline": inner_stages,
                 "as": "cursor_inner",
@@ -291,7 +364,7 @@ impl MongoQueryArgs {
         outer_stages.push(doc! { "$unwind": "$cursor_inner" });
         outer_stages.push(doc! { "$replaceRoot": { "newRoot": "$cursor_inner" } });
 
-        Ok(coll.aggregate(outer_stages, opts).await?)
+        outer_stages
     }
 
     /// Adds a final projection onto the fields specified by the `ModelProjection`.
@@ -363,6 +436,7 @@ impl MongoQueryArgs {
         Ok(self)
     }
 
+    /// Runs last transformations on `self` to execute steps dependent on base args.
     fn finalize(&mut self) -> crate::Result<()> {
         // Cursor building depends on the ordering, so it must come first.
         if let Some(order_builder) = self.order_builder.take() {

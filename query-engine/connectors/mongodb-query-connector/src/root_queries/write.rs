@@ -1,5 +1,5 @@
 use super::*;
-use crate::{filter::convert_filter, IntoBson};
+use crate::{filter::convert_filter, vacuum_cursor, IntoBson};
 use connector_interface::*;
 use mongodb::{
     bson::{doc, Document},

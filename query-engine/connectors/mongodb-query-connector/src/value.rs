@@ -191,7 +191,7 @@ impl IntoBson for (&TypeIdentifier, PrismaValue) {
 pub(crate) fn value_from_bson(bson: Bson) -> crate::Result<PrismaValue> {
     match bson {
         Bson::Double(d) => match BigDecimal::from_f64(d) {
-            Some(decimal) => Ok(PrismaValue::Float(decimal)),
+            Some(decimal) => Ok(PrismaValue::Float(decimal.normalized())),
             None => Err(MongoError::ConversionError {
                 from: format!("{}", d),
                 to: "Decimal".to_owned(),
