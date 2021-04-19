@@ -31,27 +31,26 @@ impl MongoReadQuery {
 }
 
 pub struct PipelineQuery {
-    filter: Option<Document>,
     stages: Vec<Document>,
 }
 
 impl PipelineQuery {
     pub async fn execute(self, on_collection: Collection) -> crate::Result<Vec<Document>> {
         let opts = AggregateOptions::builder().allow_disk_use(true).build();
-        let cursor = on_collection.aggregate(self.filter, opts).await?;
+        let cursor = on_collection.aggregate(self.stages, opts).await?;
 
         Ok(vacuum_cursor(cursor).await?)
     }
 }
 
 pub struct FindQuery {
+    filter: Option<Document>,
     options: FindOptions,
 }
 
 impl FindQuery {
     pub async fn execute(self, on_collection: Collection) -> crate::Result<Vec<Document>> {
-        let opts = AggregateOptions::builder().allow_disk_use(true).build();
-        let cursor = on_collection.find(None, self.options).await?;
+        let cursor = on_collection.find(self.filter, self.options).await?;
 
         Ok(vacuum_cursor(cursor).await?)
     }
@@ -111,7 +110,7 @@ pub(crate) struct MongoReadQueryBuilder {
 }
 
 impl MongoReadQueryBuilder {
-    pub fn new(model: ModelRef) -> Self {
+    pub fn _new(model: ModelRef) -> Self {
         Self {
             model,
             query: None,
@@ -203,20 +202,22 @@ impl MongoReadQueryBuilder {
             .sort(self.order)
             .build();
 
-        Ok(MongoReadQuery::Find(FindQuery { options }))
+        Ok(MongoReadQuery::Find(FindQuery {
+            filter: self.query,
+            options,
+        }))
     }
 
     /// Aggregation-pipeline based query. A distinction must be made between cursored and uncursored queries,
     /// as they require different stage shapes (see individual fns for details).
     fn build_pipeline_query(self) -> crate::Result<MongoReadQuery> {
-        let filter = self.query.clone();
         let stages = if self.cursor_data.is_none() {
             self.flat_pipeline_stages()
         } else {
             self.cursored_pipeline_stages()
         };
 
-        Ok(MongoReadQuery::Pipeline(PipelineQuery { filter, stages }))
+        Ok(MongoReadQuery::Pipeline(PipelineQuery { stages }))
     }
 
     /// Pipeline not requiring a cursor. Flat `coll.aggregate(stages, opts)` query.
