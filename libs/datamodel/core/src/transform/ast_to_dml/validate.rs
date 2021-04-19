@@ -1,11 +1,13 @@
-use crate::ast::WithAttributes;
 use crate::{
     ast, configuration,
     diagnostics::{DatamodelError, Diagnostics},
-    dml, DefaultValue, FieldType,
+    dml,
+    walkers::ModelWalker,
+    DefaultValue, FieldType,
 };
+use crate::{ast::WithAttributes, walkers::walk_models};
 use prisma_value::PrismaValue;
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 
 /// Helper for validating a datamodel.
 ///
@@ -131,6 +133,8 @@ impl<'a> Validator<'a> {
 
             all_errors.append(&mut errors_for_model);
         }
+
+        validate_name_collisions_with_map(schema, ast_schema, &mut all_errors);
 
         // Enum level validations.
         for declared_enum in schema.enums() {
@@ -1080,5 +1084,32 @@ impl<'a> Validator<'a> {
         }
 
         Ok(())
+    }
+}
+
+fn validate_name_collisions_with_map(schema: &dml::Datamodel, ast: &ast::SchemaAst, diagnostics: &mut Diagnostics) {
+    let mut used_model_names: HashMap<&str, ModelWalker<'_>> = HashMap::with_capacity(schema.models.len());
+    let mut used_field_names: HashSet<&str> = HashSet::with_capacity(4);
+
+    for model in walk_models(schema) {
+        for field in model.scalar_fields() {
+            if !used_field_names.insert(field.db_name()) {
+                diagnostics.push_error(DatamodelError::new_duplicate_field_error(
+                    model.name(),
+                    field.name(),
+                    ast.find_model(model.name()).unwrap().find_field(field.name()).span,
+                ));
+            }
+        }
+
+        used_field_names.clear();
+
+        if let Some(existing_model) = used_model_names.insert(model.database_name(), model) {
+            diagnostics.push_error(DatamodelError::new_duplicate_model_database_name_error(
+                model.database_name().into(),
+                existing_model.name().into(),
+                ast.find_model(model.name()).unwrap().span,
+            ));
+        }
     }
 }
