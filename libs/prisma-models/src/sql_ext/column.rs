@@ -2,7 +2,7 @@ use crate::{
     Field, ModelProjection, RelationField, RelationLinkManifestation, ScalarField, ScalarFieldExt, TypeIdentifier,
 };
 use itertools::Itertools;
-use quaint::ast::{Column, Row, TypeFamily};
+use quaint::ast::{Column, Row, TypeDataLength, TypeFamily};
 use std::convert::AsRef;
 
 pub struct ColumnIterator {
@@ -155,19 +155,38 @@ where
         let table = sf.model().db_name().to_string();
         let col = sf.db_name().to_string();
 
+        let parse_len = |sf: &ScalarField| {
+            sf.native_type
+                .as_ref()
+                .and_then(|nt| nt.args.first())
+                .and_then(|len| match len.as_str() {
+                    "max" | "Max" | "MAX" | "MaX" | "mAx" | "maX" => Some(TypeDataLength::Maximum),
+                    num => num.parse().map(TypeDataLength::Constant).ok(),
+                })
+        };
+
         let type_family = match sf.type_identifier {
-            TypeIdentifier::String => TypeFamily::Text,
+            TypeIdentifier::String => TypeFamily::Text(parse_len(&sf)),
             TypeIdentifier::Int => TypeFamily::Int,
             TypeIdentifier::BigInt => TypeFamily::Int,
             TypeIdentifier::Float => TypeFamily::Double,
-            TypeIdentifier::Decimal => TypeFamily::Decimal,
+            TypeIdentifier::Decimal => {
+                let params = sf
+                    .native_type
+                    .as_ref()
+                    .map(|nt| nt.args.iter())
+                    .and_then(|mut args| Some((args.next()?, args.next()?)))
+                    .and_then(|(p, s)| Some((p.parse::<u8>().ok()?, s.parse::<u8>().ok()?)));
+
+                TypeFamily::Decimal(params)
+            }
             TypeIdentifier::Boolean => TypeFamily::Boolean,
-            TypeIdentifier::Enum(_) => TypeFamily::Text,
+            TypeIdentifier::Enum(_) => TypeFamily::Text(Some(TypeDataLength::Constant(8000))),
             TypeIdentifier::UUID => TypeFamily::Uuid,
-            TypeIdentifier::Json => TypeFamily::Text,
-            TypeIdentifier::Xml => TypeFamily::Text,
+            TypeIdentifier::Json => TypeFamily::Text(Some(TypeDataLength::Maximum)),
+            TypeIdentifier::Xml => TypeFamily::Text(Some(TypeDataLength::Maximum)),
             TypeIdentifier::DateTime => TypeFamily::DateTime,
-            TypeIdentifier::Bytes => TypeFamily::Bytes,
+            TypeIdentifier::Bytes => TypeFamily::Text(parse_len(&sf)),
             TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach that path"),
         };
 
