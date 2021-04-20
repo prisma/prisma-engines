@@ -146,6 +146,21 @@ fn multi_field_ids_must_work() {
 }
 
 #[test]
+fn named_multi_field_ids_must_work() {
+    let dml = r#"
+    model Model {
+        a String
+        b Int
+        @@id([a,b], name: "compoundId")
+    }
+    "#;
+
+    let datamodel = parse(dml);
+    let user_model = datamodel.assert_has_model("Model");
+    user_model.assert_has_id_fields(&["a", "b"]);
+}
+
+#[test]
 fn relation_field_as_id_must_error() {
     let dml = r#"
     model User {
