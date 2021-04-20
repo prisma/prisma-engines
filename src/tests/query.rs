@@ -628,6 +628,120 @@ async fn returning_insert(api: &mut dyn TestApi) -> crate::Result<()> {
     Ok(())
 }
 
+#[cfg(all(feature = "mssql", feature = "bigdecimal"))]
+#[test_each_connector(tags("mssql"))]
+async fn returning_decimal_insert_with_type_defs(api: &mut dyn TestApi) -> crate::Result<()> {
+    use bigdecimal::BigDecimal;
+    use std::str::FromStr;
+
+    let dec = BigDecimal::from_str("17661757261711787211853")?;
+    let table = api.create_table("id int, val numeric(26,0)").await?;
+    let col = Column::from("val").type_family(TypeFamily::Decimal(Some((26, 0))));
+
+    let insert = Insert::single_into(&table).value("id", 2).value(col, dec.clone());
+
+    let res = api
+        .conn()
+        .insert(Insert::from(insert).returning(vec!["id", "val"]))
+        .await?;
+
+    assert_eq!(1, res.len());
+
+    let row = res.get(0).unwrap();
+    assert_eq!(Some(2), row["id"].as_i64());
+    assert_eq!(Some(&dec), row["val"].as_numeric());
+
+    Ok(())
+}
+
+#[cfg(feature = "mssql")]
+#[test_each_connector(tags("mssql"))]
+async fn returning_constant_nvarchar_insert_with_type_defs(api: &mut dyn TestApi) -> crate::Result<()> {
+    let table = api.create_table("id int, val nvarchar(4000)").await?;
+    let col = Column::from("val").type_family(TypeFamily::Text(Some(TypeDataLength::Constant(4000))));
+
+    let insert = Insert::single_into(&table).value("id", 2).value(col, "meowmeow");
+
+    let res = api
+        .conn()
+        .insert(Insert::from(insert).returning(vec!["id", "val"]))
+        .await?;
+
+    assert_eq!(1, res.len());
+
+    let row = res.get(0).unwrap();
+    assert_eq!(Some(2), row["id"].as_i64());
+    assert_eq!(Some("meowmeow"), row["val"].as_str());
+
+    Ok(())
+}
+
+#[cfg(feature = "mssql")]
+#[test_each_connector(tags("mssql"))]
+async fn returning_max_nvarchar_insert_with_type_defs(api: &mut dyn TestApi) -> crate::Result<()> {
+    let table = api.create_table("id int, val nvarchar(max)").await?;
+    let col = Column::from("val").type_family(TypeFamily::Text(Some(TypeDataLength::Maximum)));
+
+    let insert = Insert::single_into(&table).value("id", 2).value(col, "meowmeow");
+
+    let res = api
+        .conn()
+        .insert(Insert::from(insert).returning(vec!["id", "val"]))
+        .await?;
+
+    assert_eq!(1, res.len());
+
+    let row = res.get(0).unwrap();
+    assert_eq!(Some(2), row["id"].as_i64());
+    assert_eq!(Some("meowmeow"), row["val"].as_str());
+
+    Ok(())
+}
+
+#[cfg(feature = "mssql")]
+#[test_each_connector(tags("mssql"))]
+async fn returning_constant_varchar_insert_with_type_defs(api: &mut dyn TestApi) -> crate::Result<()> {
+    let table = api.create_table("id int, val varchar(4000)").await?;
+    let col = Column::from("val").type_family(TypeFamily::Text(Some(TypeDataLength::Constant(4000))));
+
+    let insert = Insert::single_into(&table).value("id", 2).value(col, "meowmeow");
+
+    let res = api
+        .conn()
+        .insert(Insert::from(insert).returning(vec!["id", "val"]))
+        .await?;
+
+    assert_eq!(1, res.len());
+
+    let row = res.get(0).unwrap();
+    assert_eq!(Some(2), row["id"].as_i64());
+    assert_eq!(Some("meowmeow"), row["val"].as_str());
+
+    Ok(())
+}
+
+#[cfg(feature = "mssql")]
+#[test_each_connector(tags("mssql"))]
+async fn returning_max_varchar_insert_with_type_defs(api: &mut dyn TestApi) -> crate::Result<()> {
+    let table = api.create_table("id int, val varchar(max)").await?;
+    let col = Column::from("val").type_family(TypeFamily::Text(Some(TypeDataLength::Maximum)));
+
+    let insert = Insert::single_into(&table).value("id", 2).value(col, "meowmeow");
+
+    let res = api
+        .conn()
+        .insert(Insert::from(insert).returning(vec!["id", "val"]))
+        .await?;
+
+    assert_eq!(1, res.len());
+
+    let row = res.get(0).unwrap();
+    assert_eq!(Some(2), row["id"].as_i64());
+    assert_eq!(Some("meowmeow"), row["val"].as_str());
+
+    Ok(())
+}
+
 #[cfg(feature = "mssql")]
 #[test_each_connector(tags("mssql"))]
 async fn multiple_resultset_should_return_the_last_one(api: &mut dyn TestApi) -> crate::Result<()> {

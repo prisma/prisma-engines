@@ -29,7 +29,7 @@ mod union;
 mod update;
 mod values;
 
-pub use column::{Column, DefaultValue, TypeFamily};
+pub use column::{Column, DefaultValue, TypeDataLength, TypeFamily};
 pub use compare::{Comparable, Compare};
 pub use conditions::ConditionTree;
 pub use conjunctive::Conjunctive;

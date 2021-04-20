@@ -5,7 +5,7 @@ use crate::prelude::Query;
 use crate::{
     ast::{
         Column, Comparable, Expression, ExpressionKind, Insert, IntoRaw, Join, JoinData, Joinable, Merge, OnConflict,
-        Order, Ordering, Row, Table, TypeFamily, Values,
+        Order, Ordering, Row, Table, TypeDataLength, TypeFamily, Values,
     },
     prelude::Average,
     visitor, Value,
@@ -48,15 +48,42 @@ impl<'a> Mssql<'a> {
 
     fn visit_type_family(&mut self, type_family: TypeFamily) -> visitor::Result {
         match type_family {
-            TypeFamily::Text => self.write("NVARCHAR(2000)"),
+            TypeFamily::Text(len) => {
+                self.write("NVARCHAR(")?;
+                match len {
+                    Some(TypeDataLength::Constant(len)) => self.write(len)?,
+                    Some(TypeDataLength::Maximum) => self.write("MAX")?,
+                    None => self.write(4000)?,
+                }
+                self.write(")")
+            }
             TypeFamily::Int => self.write("BIGINT"),
             TypeFamily::Float => self.write("FLOAT(24)"),
             TypeFamily::Double => self.write("FLOAT(53)"),
-            TypeFamily::Decimal => self.write("DECIMAL(32,16)"),
+            TypeFamily::Decimal(size) => {
+                self.write("DECIMAL(")?;
+                match size {
+                    Some((p, s)) => {
+                        self.write(p)?;
+                        self.write(",")?;
+                        self.write(s)?;
+                    }
+                    None => self.write("32,16")?,
+                }
+                self.write(")")
+            }
             TypeFamily::Boolean => self.write("BIT"),
             TypeFamily::Uuid => self.write("UNIQUEIDENTIFIER"),
             TypeFamily::DateTime => self.write("DATETIMEOFFSET"),
-            TypeFamily::Bytes => self.write("VARBYTES(4000)"),
+            TypeFamily::Bytes(len) => {
+                self.write("VARBINARY(")?;
+                match len {
+                    Some(TypeDataLength::Constant(len)) => self.write(len)?,
+                    Some(TypeDataLength::Maximum) => self.write("MAX")?,
+                    None => self.write(8000)?,
+                }
+                self.write(")")
+            }
         }
     }
 

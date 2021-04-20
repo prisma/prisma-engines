@@ -6,16 +6,22 @@ use crate::{
 use std::borrow::Cow;
 
 #[derive(Debug, Clone, Copy)]
+pub enum TypeDataLength {
+    Constant(u16),
+    Maximum,
+}
+
+#[derive(Debug, Clone, Copy)]
 pub enum TypeFamily {
-    Text,
+    Text(Option<TypeDataLength>),
     Int,
     Float,
     Double,
     Boolean,
     Uuid,
     DateTime,
-    Decimal,
-    Bytes,
+    Decimal(Option<(u8, u8)>),
+    Bytes(Option<TypeDataLength>),
 }
 
 /// A column definition.
