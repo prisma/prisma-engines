@@ -507,3 +507,48 @@ async fn no_additional_unique_created(api: &TestApi) -> TestResult {
 
     Ok(())
 }
+
+#[test_each_connector]
+async fn index_tests(api: &TestApi) -> TestResult {
+    let dm = r#"
+        model A {
+          id   Int    @id
+          name String @unique
+          a    String
+          b    String
+          B    B[]    @relation("AtoB")
+        
+          @@unique([a, b], name: "compound")
+          @@unique([a, b])
+          @@index([a])
+        }
+        
+        model B {
+          a   String
+          b   String
+          aId Int
+          A   A      @relation("AtoB", fields: [aId], references: [id])
+          
+          @@index([a,b])
+          @@id([a, b])
+        }
+    "#;
+
+    let dir = api.create_migrations_directory()?;
+
+    api.create_migration("setup", dm, &dir)
+        .send()
+        .await?
+        .assert_migration_directories_count(1)?
+        .assert_migration("setup", |migration| {
+            let expected_script = indoc! {
+                r#"
+                        
+                        "#
+            };
+
+            migration.assert_contents(expected_script)
+        })?;
+
+    Ok(())
+}
