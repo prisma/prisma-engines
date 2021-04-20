@@ -223,7 +223,7 @@ impl<'a> Validator<'a> {
 
         let multiple_indexes_with_same_name_are_supported = self
             .source
-            .map(|source| source.combined_connector.supports_multiple_indexes_with_same_name())
+            .map(|source| source.active_connector.supports_multiple_indexes_with_same_name())
             .unwrap_or(false);
 
         for model in schema.models() {
@@ -256,7 +256,7 @@ impl<'a> Validator<'a> {
 
         // TODO: this is really ugly
         let scalar_lists_are_supported = match self.source {
-            Some(source) => source.combined_connector.supports_scalar_lists(),
+            Some(source) => source.active_connector.supports_scalar_lists(),
             None => false,
         };
 
@@ -284,7 +284,7 @@ impl<'a> Validator<'a> {
             if let Some(dml::ScalarType::Json) = field.field_type.scalar_type() {
                 // TODO: this is really ugly
                 let supports_json_type = match self.source {
-                    Some(source) => source.combined_connector.supports_json(),
+                    Some(source) => source.active_connector.supports_json(),
                     None => false,
                 };
                 if !supports_json_type {
@@ -341,7 +341,7 @@ impl<'a> Validator<'a> {
         let mut errors = Diagnostics::new();
 
         if let Some(data_source) = self.source {
-            if !data_source.combined_connector.supports_multiple_auto_increment()
+            if !data_source.active_connector.supports_multiple_auto_increment()
                 && model.auto_increment_fields().count() > 1
             {
                 errors.push_error(DatamodelError::new_attribute_validation_error(
@@ -357,7 +357,7 @@ impl<'a> Validator<'a> {
 
                 if !field.is_id
                     && field.is_auto_increment()
-                    && !data_source.combined_connector.supports_non_id_auto_increment()
+                    && !data_source.active_connector.supports_non_id_auto_increment()
                 {
                     errors.push_error(DatamodelError::new_attribute_validation_error(
                     &"The `autoincrement()` default value is used on a non-id field even though the datasource does not support this.".to_string(),
@@ -368,7 +368,7 @@ impl<'a> Validator<'a> {
 
                 if field.is_auto_increment()
                     && !model.field_is_indexed(&field.name)
-                    && !data_source.combined_connector.supports_non_indexed_auto_increment()
+                    && !data_source.active_connector.supports_non_indexed_auto_increment()
                 {
                     errors.push_error(DatamodelError::new_attribute_validation_error(
                     &"The `autoincrement()` default value is used on a non-indexed field even though the datasource does not support this.".to_string(),
@@ -724,7 +724,7 @@ impl<'a> Validator<'a> {
                 };
 
                 let must_reference_unique_criteria = match self.source {
-                    Some(source) => !source.combined_connector.supports_relations_over_non_unique_criteria(),
+                    Some(source) => !source.active_connector.supports_relations_over_non_unique_criteria(),
                     None => true,
                 };
 

@@ -18,7 +18,7 @@ use datamodel::{
 };
 use migration_connector::{features, ConnectorError};
 use sql_migration_connector::SqlMigrationConnector;
-use user_facing_errors::{common::InvalidDatabaseString, migration_engine::DeprecatedProviderArray, KnownError};
+use user_facing_errors::{common::InvalidDatabaseString, KnownError};
 
 #[cfg(feature = "mongodb")]
 use datamodel::common::provider_names::MONGODB_SOURCE_NAME;
@@ -33,12 +33,7 @@ pub async fn migration_api(datamodel: &str) -> CoreResult<Box<dyn api::GenericAp
     let source = config
         .datasources
         .first()
-        .map(|source| match source.provider.as_slice() {
-            [_] => Ok(source),
-            [] => Err(CoreError::new_unknown("There is no provider in the datasource.".into())),
-            _ => Err(CoreError::user_facing(DeprecatedProviderArray)),
-        })
-        .unwrap_or_else(|| Err(CoreError::new_unknown("There is no datasource in the schema.".into())))?;
+        .ok_or_else(|| CoreError::new_unknown("There is no datasource in the schema.".into()))?;
 
     match &source.active_provider {
         #[cfg(feature = "sql")]
@@ -203,29 +198,4 @@ fn parse_datamodel(datamodel: &str) -> CoreResult<Datamodel> {
     datamodel::parse_datamodel(&datamodel)
         .map(|d| d.subject)
         .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", datamodel)))
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use user_facing_errors::UserFacingError;
-
-    #[tokio::test]
-    async fn migration_api_with_a_provider_array_returns_a_user_facing_error() {
-        let datamodel = r#"
-            datasource dbs {
-                provider = ["sqlite", "mysql"]
-                url = "file:dev.db"
-            }
-        "#;
-
-        let err = migration_api(datamodel)
-            .await
-            .map(drop)
-            .unwrap_err()
-            .render_user_facing()
-            .unwrap_known();
-
-        assert_eq!(err.error_code, DeprecatedProviderArray::ERROR_CODE);
-    }
 }

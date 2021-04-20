@@ -1,5 +1,5 @@
 use super::{
-    super::helpers::*,
+    super::helpers::{ValueListValidator, ValueValidator},
     builtin_datasource_providers::{
         MongoDbDatasourceProvider, MsSqlDatasourceProvider, MySqlDatasourceProvider, PostgresDatasourceProvider,
         SqliteDatasourceProvider,
@@ -7,9 +7,8 @@ use super::{
     datasource_provider::DatasourceProvider,
 };
 use crate::configuration::StringFromEnvVar;
-use crate::diagnostics::{DatamodelError, DatamodelWarning, Diagnostics, ValidatedDatasource, ValidatedDatasources};
+use crate::diagnostics::{DatamodelError, Diagnostics, ValidatedDatasource, ValidatedDatasources};
 use crate::{ast, Datasource};
-use datamodel_connector::{CombinedConnector, Connector};
 use std::collections::HashMap;
 
 const PREVIEW_FEATURES_KEY: &str = "previewFeatures";
@@ -100,7 +99,7 @@ impl DatasourceLoader {
             .iter()
             .map(|arg| (arg.name.name.as_str(), ValueValidator::new(&arg.value)))
             .collect();
-        let mut diagnostics = Diagnostics::new();
+        let diagnostics = Diagnostics::new();
 
         let provider_arg = args
             .get("provider")
@@ -113,21 +112,23 @@ impl DatasourceLoader {
             )));
         }
 
-        let providers = provider_arg.as_array().to_str_vec()?;
-
-        if provider_arg.is_array() {
-            diagnostics.push_warning(DatamodelWarning::new_deprecated_provider_array_warning(
-                provider_arg.span(),
-            ))
-        }
-
-        if providers.is_empty() {
-            return Err(diagnostics.merge_error(DatamodelError::new_source_validation_error(
-                "The provider argument in a datasource must not be empty",
-                source_name,
-                provider_arg.span(),
-            )));
-        }
+        let provider = match provider_arg.as_string_literal() {
+            Some(("", _)) => {
+                return Err(diagnostics.merge_error(DatamodelError::new_source_validation_error(
+                    "The provider argument in a datasource must not be empty",
+                    source_name,
+                    provider_arg.span(),
+                )));
+            }
+            None => {
+                return Err(diagnostics.merge_error(DatamodelError::new_source_validation_error(
+                    "The provider argument in a datasource must be a string literal",
+                    source_name,
+                    provider_arg.span(),
+                )));
+            }
+            Some((provider, _)) => provider,
+        };
 
         let url_arg = args
             .get(URL_KEY)
@@ -149,7 +150,7 @@ impl DatasourceLoader {
                 StringFromEnvVar {
                     name: "url",
                     from_env_var: None,
-                    value: format!("{}://", providers.first().unwrap()),
+                    value: format!("{}://", provider),
                 }
             }
             (_, Some(url)) => {
@@ -188,7 +189,7 @@ impl DatasourceLoader {
                         Some(StringFromEnvVar {
                             name: "shadow_database_url",
                             from_env_var: None,
-                            value: format!("{}://", providers.first().unwrap()),
+                            value: format!("{}://", provider),
                         })
                     }
 
@@ -226,75 +227,43 @@ impl DatasourceLoader {
 
         let documentation = ast_source.documentation.as_ref().map(|comment| comment.text.clone());
 
-        let all_datasource_providers: Vec<_> = providers
-            .iter()
-            .filter_map(|provider| self.get_datasource_provider(&provider))
-            .collect();
-
-        if all_datasource_providers.is_empty() {
-            return Err(
-                diagnostics.merge_error(DatamodelError::new_datasource_provider_not_known_error(
-                    &providers.join(","),
+        let datasource_provider = self.get_datasource_provider(&provider).ok_or_else(|| {
+            diagnostics
+                .clone()
+                .merge_error(DatamodelError::new_datasource_provider_not_known_error(
+                    provider,
                     provider_arg.span(),
-                )),
-            );
-        }
+                ))
+        })?;
 
-        let validated_providers: Vec<_> = all_datasource_providers
-            .iter()
-            .map(|provider| {
-                // Validate the URL
-                provider.validate_url(source_name, &url).map_err(|err_msg| {
-                    DatamodelError::new_source_validation_error(&err_msg, source_name, url_arg.span())
+        // Validate the URL
+        datasource_provider
+            .validate_url(source_name, &url)
+            .map_err(|err_msg| DatamodelError::new_source_validation_error(&err_msg, source_name, url_arg.span()))?;
+
+        // Validate the shadow database URL
+        if let (Some(shadow_database_url), Some(shadow_database_url_arg)) =
+            (shadow_database_url.as_ref(), shadow_database_url_arg.as_ref())
+        {
+            datasource_provider
+                .validate_shadow_database_url(source_name, shadow_database_url)
+                .map_err(|err_msg| {
+                    DatamodelError::new_source_validation_error(&err_msg, source_name, shadow_database_url_arg.span())
                 })?;
-
-                // Validate the shadow database URL
-                if let (Some(shadow_database_url), Some(shadow_database_url_arg)) =
-                    (shadow_database_url.as_ref(), shadow_database_url_arg.as_ref())
-                {
-                    provider
-                        .validate_shadow_database_url(source_name, shadow_database_url)
-                        .map_err(|err_msg| {
-                            DatamodelError::new_source_validation_error(
-                                &err_msg,
-                                source_name,
-                                shadow_database_url_arg.span(),
-                            )
-                        })?;
-                }
-
-                Ok(provider)
-            })
-            .collect();
-
-        let combined_connector: Box<dyn Connector> = {
-            let connectors = all_datasource_providers.iter().map(|sd| sd.connector()).collect();
-            Box::new(CombinedConnector::new(connectors))
-        };
-
-        // The first provider that can handle the URL is used to construct the Datasource.
-        // If no provider can handle it, return the first error.
-        let (successes, errors): (Vec<_>, Vec<_>) = validated_providers.into_iter().partition(|result| result.is_ok());
-
-        if let Some(first_provider) = successes.into_iter().next() {
-            let first_successful_provider = first_provider?;
-
-            Ok(ValidatedDatasource {
-                subject: Datasource {
-                    name: source_name.to_string(),
-                    provider: providers,
-                    active_provider: first_successful_provider.canonical_name().to_string(),
-                    url,
-                    documentation,
-                    combined_connector,
-                    active_connector: first_successful_provider.connector(),
-                    shadow_database_url,
-                },
-                warnings: diagnostics.warnings,
-            })
-        } else {
-            Err(diagnostics.merge_error(errors.into_iter().next().unwrap().err().unwrap()))
         }
+
+        Ok(ValidatedDatasource {
+            subject: Datasource {
+                name: source_name.to_string(),
+                provider: provider.to_owned(),
+                active_provider: datasource_provider.canonical_name().to_owned(),
+                url,
+                documentation,
+                active_connector: datasource_provider.connector(),
+                shadow_database_url,
+            },
+            warnings: diagnostics.warnings,
+        })
     }
 
     fn get_datasource_provider(&self, provider: &str) -> Option<&dyn DatasourceProvider> {

@@ -34,7 +34,7 @@ fn sources_to_json_structs(sources: &[configuration::Datasource]) -> Vec<SourceC
 fn source_to_json_struct(source: &configuration::Datasource) -> SourceConfig {
     SourceConfig {
         name: source.name.clone(),
-        provider: source.provider.clone(),
+        provider: vec![source.provider.clone()],
         active_provider: source.active_provider.to_string(),
         url: source.url().clone(),
         documentation: source.documentation.clone(),
