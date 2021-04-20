@@ -753,6 +753,51 @@ async fn expression_indexes_should_be_ignored_on_sqlite(api: &TestApi) -> crate:
     Ok(())
 }
 
+#[test_each_connector(tags("postgres", "mssql"))]
+async fn primary_key_is_named(api: &TestApi) -> crate::TestResult {
+    let postgres = api.sql_family().is_sqlite();
+    api.barrel()
+        .execute_with_schema(
+            |migration| {
+                migration.create_table("Single", move |t| {
+                    if postgres {
+                        t.inject_custom("id Integer ");
+                        t.inject_custom("Constraint name_persisted Primary Key(id)");
+                    } else {
+                        t.inject_custom("id Int");
+                        t.inject_custom("Constraint name_persisted Primary Key(id)");
+                    }
+                });
+
+                migration.create_table("Compound", move |t| {
+                    t.add_column("id_1", types::integer());
+                    t.add_column("id_2", types::integer());
+                    t.inject_custom("Constraint name_persisted_2 Primary Key(id_1, id_2)");
+                });
+            },
+            api.schema_name(),
+        )
+        .await?;
+
+    let dm = indoc! {r##"
+        model Compound {
+          id_1 Int
+          id_2 Int
+            
+          @@id([id_1, id_2])
+        }
+              
+        model Single {
+          id Int @id @default(1)
+        }
+    "##};
+
+    let result = &api.introspect().await?;
+    api.assert_eq_datamodels(&dm, result);
+
+    Ok(())
+}
+
 #[test_each_connector(tags("mysql"))]
 async fn casing_should_not_lead_to_mix_ups(api: &TestApi) -> crate::TestResult {
     api.barrel()
@@ -780,11 +825,11 @@ async fn casing_should_not_lead_to_mix_ups(api: &TestApi) -> crate::TestResult {
         model ADDRESS {
           ADDRESSID Int @id
         }
-          
+
         model Address {
           AddressID Int @id @default(autoincrement())
         }
-            
+
         model address {
           addressid Int @id
         }
