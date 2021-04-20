@@ -150,7 +150,7 @@ impl From<tiberius::error::Error> for Error {
 
                 builder.build()
             }
-            tiberius::error::Error::Server(e) if e.code() == 2714 => {
+            tiberius::error::Error::Server(e) if e.code() == 1801 => {
                 let db_name = e.message().split('\'').nth(1).into();
                 let kind = ErrorKind::DatabaseAlreadyExists { db_name };
 
