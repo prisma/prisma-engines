@@ -33,7 +33,7 @@ pub async fn migration_api(datamodel: &str) -> CoreResult<Box<dyn api::GenericAp
     let source = config
         .datasources
         .first()
-        .ok_or_else(|| CoreError::new_unknown("There is no datasource in the schema.".into()))?;
+        .ok_or_else(|| CoreError::from_msg("There is no datasource in the schema.".into()))?;
 
     match &source.active_provider {
         #[cfg(feature = "sql")]
@@ -101,7 +101,7 @@ pub async fn create_database(schema: &str) -> CoreResult<String> {
     let source = config
         .datasources
         .first()
-        .ok_or_else(|| CoreError::new_unknown("There is no datasource in the schema.".into()))?;
+        .ok_or_else(|| CoreError::from_msg("There is no datasource in the schema.".into()))?;
 
     match &source.active_provider {
         provider
@@ -126,7 +126,7 @@ pub async fn drop_database(schema: &str) -> CoreResult<()> {
     let source = config
         .datasources
         .first()
-        .ok_or_else(|| CoreError::new_unknown("There is no datasource in the schema.".into()))?;
+        .ok_or_else(|| CoreError::from_msg("There is no datasource in the schema.".into()))?;
 
     match &source.active_provider {
         provider
@@ -152,7 +152,7 @@ pub async fn qe_setup(prisma_schema: &str) -> CoreResult<()> {
     let source = config
         .datasources
         .first()
-        .ok_or_else(|| CoreError::new_unknown("There is no datasource in the schema.".into()))?;
+        .ok_or_else(|| CoreError::from_msg("There is no datasource in the schema.".into()))?;
 
     let api: Box<dyn GenericApi> = match &source.active_provider {
         provider

@@ -39,7 +39,7 @@ pub struct DiagnoseMigrationHistoryOutput {
     /// applied in the main database to the shadow database. We do this to
     /// validate that unapplied migrations are at least minimally valid.
     #[serde(skip)]
-    pub error_in_unapplied_migration: Option<user_facing_errors::Error>,
+    pub error_in_unapplied_migration: Option<ConnectorError>,
     /// Is the migrations table initialized in the database.
     pub has_migrations_table: bool,
 }
@@ -139,9 +139,7 @@ impl<'a> MigrationCommand for DiagnoseMigrationHistoryCommand {
             if input.opt_in_to_shadow_database {
                 let drift = match migration_inferrer.calculate_drift(&applied_migrations).await {
                     Ok(Some(rollback)) => Some(DriftDiagnostic::DriftDetected { rollback }),
-                    Err(error) => Some(DriftDiagnostic::MigrationFailedToApply {
-                        error: error.to_user_facing(),
-                    }),
+                    Err(error) => Some(DriftDiagnostic::MigrationFailedToApply { error }),
                     _ => None,
                 };
 
@@ -151,7 +149,6 @@ impl<'a> MigrationCommand for DiagnoseMigrationHistoryCommand {
                             .validate_migrations(&migrations_from_filesystem)
                             .await
                             .err()
-                            .map(|connector_error| connector_error.to_user_facing())
                     } else {
                         None
                     };
@@ -283,8 +280,7 @@ pub enum HistoryDiagnostic {
 /// A diagnostic returned by `diagnoseMigrationHistory` when trying to determine
 /// whether the development database has the expected schema at its stage in
 /// history.
-#[derive(Debug, PartialEq, Serialize)]
-#[serde(tag = "diagnostic", rename_all = "camelCase")]
+#[derive(Debug)]
 pub enum DriftDiagnostic {
     /// The database schema of the current database does not match what would be
     /// expected at its stage in the migration history.
@@ -293,10 +289,9 @@ pub enum DriftDiagnostic {
         rollback: String,
     },
     /// When a migration fails to apply cleanly to a shadow database.
-    #[serde(rename_all = "camelCase")]
     MigrationFailedToApply {
         /// The full error.
-        error: user_facing_errors::Error,
+        error: ConnectorError,
     },
 }
 

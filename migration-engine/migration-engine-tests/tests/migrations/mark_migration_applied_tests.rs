@@ -170,7 +170,7 @@ async fn mark_migration_applied_when_the_migration_is_already_applied_errors(api
     assert_eq!(
         err.to_string(),
         format!(
-            "The migration `{}` is already recorded as applied in the database.",
+            "The migration `{}` is already recorded as applied in the database.\n",
             second_migration_name
         )
     );
@@ -346,7 +346,7 @@ async fn must_return_helpful_error_on_migration_not_found(api: &TestApi) -> Test
         .send()
         .await
         .unwrap_err()
-        .render_user_facing()
+        .to_user_facing()
         .unwrap_known();
 
     assert_eq!(err.error_code, MigrationToMarkAppliedNotFound::ERROR_CODE);

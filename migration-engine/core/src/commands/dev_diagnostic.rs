@@ -2,7 +2,7 @@ use super::{
     DiagnoseMigrationHistoryCommand, DiagnoseMigrationHistoryInput, DiagnoseMigrationHistoryOutput, DriftDiagnostic,
     HistoryDiagnostic, MigrationCommand,
 };
-use crate::{core_error::CoreResult, CoreError};
+use crate::core_error::CoreResult;
 use migration_connector::MigrationConnector;
 use serde::{Deserialize, Serialize};
 
@@ -57,11 +57,11 @@ impl<'a> MigrationCommand for DevDiagnosticCommand {
 
 fn check_for_broken_migrations(output: &DiagnoseMigrationHistoryOutput) -> CoreResult<()> {
     if let Some(DriftDiagnostic::MigrationFailedToApply { error }) = &output.drift {
-        return Err(CoreError::UserFacing(error.clone()));
+        return Err(error.clone());
     }
 
     if let Some(error) = &output.error_in_unapplied_migration {
-        return Err(CoreError::UserFacing(error.clone()));
+        return Err(error.clone());
     }
 
     Ok(())

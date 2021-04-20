@@ -119,7 +119,7 @@ async fn migrations_should_fail_when_the_script_is_invalid(api: &TestApi) -> Tes
         .send()
         .await
         .unwrap_err()
-        .render_user_facing()
+        .to_user_facing()
         .unwrap_known();
 
     // Assertions about the user facing error.
@@ -240,7 +240,7 @@ async fn migrations_should_fail_on_an_uninitialized_nonempty_database(api: &Test
         .send()
         .await
         .unwrap_err()
-        .render_user_facing()
+        .to_user_facing()
         .unwrap_known();
 
     assert_eq!(
