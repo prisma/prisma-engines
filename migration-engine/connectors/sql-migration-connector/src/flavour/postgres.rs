@@ -101,7 +101,7 @@ impl SqlFlavour for PostgresFlavour {
         )
         .await
         .map_err(|_elapsed| {
-            ConnectorError::user_facing_error(user_facing_errors::common::DatabaseTimeout {
+            ConnectorError::user_facing(user_facing_errors::common::DatabaseTimeout {
                 database_host: connection.connection_info().host().to_owned(),
                 database_port: connection
                     .connection_info()
@@ -371,7 +371,7 @@ async fn create_postgres_admin_conn(mut url: Url) -> ConnectorResult<Connection>
     }
 
     let conn = conn.ok_or_else(|| {
-        ConnectorError::user_facing_error(migration_engine::DatabaseCreationFailed { database_error: "Prisma could not connect to a default database (`postgres` or `template1`), it cannot create the specified database.".to_owned() })
+        ConnectorError::user_facing(migration_engine::DatabaseCreationFailed { database_error: "Prisma could not connect to a default database (`postgres` or `template1`), it cannot create the specified database.".to_owned() })
     })??;
 
     Ok(conn)

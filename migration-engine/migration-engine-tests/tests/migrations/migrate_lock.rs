@@ -51,7 +51,7 @@ async fn create_migration_with_new_provider_errors(api: TestApi) -> TestResult {
         .send()
         .await
         .unwrap_err()
-        .render_user_facing();
+        .to_user_facing();
 
     let err = err.as_known().unwrap();
 
@@ -117,7 +117,7 @@ async fn migration_lock_with_different_comment_shapes_work(api: TestApi) -> Test
             .send()
             .await
             .unwrap_err()
-            .render_user_facing();
+            .to_user_facing();
 
         let err = err.as_known().unwrap();
 

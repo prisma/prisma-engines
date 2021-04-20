@@ -165,7 +165,7 @@ impl SqlFlavour for MssqlFlavour {
 
     async fn drop_database(&self, _database_url: &str) -> ConnectorResult<()> {
         let features = vec!["microsoftSqlServer".into()];
-        return Err(ConnectorError::user_facing_error(
+        return Err(ConnectorError::user_facing(
             user_facing_errors::migration_engine::PreviewFeaturesBlocked { features },
         ));
     }

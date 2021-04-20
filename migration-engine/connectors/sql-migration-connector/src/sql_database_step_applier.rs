@@ -115,7 +115,7 @@ impl DatabaseMigrationStepApplier<SqlMigration> for SqlMigrationConnector {
         self.flavour.scan_migration_script(script);
 
         self.conn().raw_cmd(script).await.map_err(|quaint_error| {
-            ConnectorError::user_facing_error(ApplyMigrationError {
+            ConnectorError::user_facing(ApplyMigrationError {
                 migration_name: migration_name.to_owned(),
                 database_error_code: String::from(quaint_error.original_code().unwrap_or("none")),
                 database_error: quaint_error
