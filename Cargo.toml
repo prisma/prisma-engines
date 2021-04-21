@@ -42,6 +42,3 @@ opt-level = 3
 codegen-units = 1
 opt-level = 'z' # Optimize for size.
 #strip="symbols"
-
-[profile.dev]
-split-debuginfo = "unpacked"
