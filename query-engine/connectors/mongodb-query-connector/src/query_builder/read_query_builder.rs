@@ -73,7 +73,7 @@ pub(crate) struct MongoReadQueryBuilder {
     /// or aggregations added the required data to execute them.
     pub(crate) join_filters: Vec<Document>,
 
-    /// Aggregation stages.
+    /// Aggregation-related stages.
     pub(crate) aggregations: Vec<Document>,
 
     /// Filters that can only be applied after the aggregations
@@ -395,37 +395,87 @@ impl MongoReadQueryBuilder {
 
         let mut grouping_stage = doc! { "_id": grouping };
 
+        // Needed for field-count aggregations
+        let mut project_stage = doc! {};
+
+        let requires_projection = aggregations.iter().any(|a| match a {
+            AggregationSelection::Count { all: _, fields } if !fields.is_empty() => true,
+            _ => false,
+        });
+
         for selection in aggregations {
             match selection {
                 AggregationSelection::Field(_) => (),
                 AggregationSelection::Count { all, fields } => {
                     if *all {
                         grouping_stage.insert("count_all", doc! { "$sum": 1 });
+                        project_stage.insert("count_all", Bson::Int64(1));
                     }
 
-                    let pairs = aggregation_pairs("count", fields);
+                    // MongoDB requires a different construct for counting on fields.
+                    // First, we push them into an array and then, in a separate project stage,
+                    // we count the number of items in the array.
+                    let pairs = aggregation_pairs("push", fields);
                     grouping_stage.extend(pairs);
+
+                    let grouping_pairs = count_field_pairs(fields);
+                    let projection_pairs = grouping_pairs
+                        .iter()
+                        .map(|(a, _)| (a.clone(), doc! { "$sum": format!("${}", a) }.into()))
+                        .collect_vec();
+
+                    grouping_stage.extend(grouping_pairs);
+                    project_stage.extend(projection_pairs);
                 }
                 AggregationSelection::Average(fields) => {
-                    let pairs = aggregation_pairs("avg", fields);
-                    grouping_stage.extend(pairs);
+                    let grouping_pairs = aggregation_pairs("avg", fields);
+                    let projection_pairs = grouping_pairs
+                        .iter()
+                        .map(|(a, _)| (a.clone(), Bson::Int64(1)))
+                        .collect_vec();
+
+                    grouping_stage.extend(grouping_pairs);
+                    project_stage.extend(projection_pairs);
                 }
                 AggregationSelection::Sum(fields) => {
-                    let pairs = aggregation_pairs("sum", fields);
-                    grouping_stage.extend(pairs);
+                    let grouping_pairs = aggregation_pairs("sum", fields);
+                    let projection_pairs = grouping_pairs
+                        .iter()
+                        .map(|(a, _)| (a.clone(), Bson::Int64(1)))
+                        .collect_vec();
+
+                    grouping_stage.extend(grouping_pairs);
+                    project_stage.extend(projection_pairs);
                 }
                 AggregationSelection::Min(fields) => {
-                    let pairs = aggregation_pairs("min", fields);
-                    grouping_stage.extend(pairs);
+                    let grouping_pairs = aggregation_pairs("min", fields);
+                    let projection_pairs = grouping_pairs
+                        .iter()
+                        .map(|(a, _)| (a.clone(), Bson::Int64(1)))
+                        .collect_vec();
+
+                    grouping_stage.extend(grouping_pairs);
+                    project_stage.extend(projection_pairs);
                 }
                 AggregationSelection::Max(fields) => {
-                    let pairs = aggregation_pairs("max", fields);
-                    grouping_stage.extend(pairs);
+                    let grouping_pairs = aggregation_pairs("max", fields);
+                    let projection_pairs = grouping_pairs
+                        .iter()
+                        .map(|(a, _)| (a.clone(), Bson::Int64(1)))
+                        .collect_vec();
+
+                    grouping_stage.extend(grouping_pairs);
+                    project_stage.extend(projection_pairs);
                 }
             }
         }
 
         self.aggregations.push(doc! { "$group": grouping_stage });
+
+        if requires_projection {
+            self.aggregations.push(doc! { "$project": project_stage });
+        }
+
         self
     }
 
@@ -461,6 +511,22 @@ impl MongoReadQueryBuilder {
 
 /// Utilities below ///
 
+/// Produces pairs like `("count_fieldName", { "$sum": "$fieldName" })`.
+/// Important: Only valid for field-level count aggregations.
+fn count_field_pairs(fields: &[ScalarFieldRef]) -> Vec<(String, Bson)> {
+    fields
+        .iter()
+        .map(|field| {
+            (
+                format!("count_{}", field.db_name()),
+                doc! { "$push": { "$cond": { "if": format!("${}", field.db_name()), "then": 1, "else": 0 }}}.into(),
+            )
+        })
+        .collect()
+}
+
+/// Produces pairs like `("sum_fieldName", { "$sum": "$fieldName" })`.
+/// Important: Only valid for non-count aggregations.
 fn aggregation_pairs(op: &str, fields: &[ScalarFieldRef]) -> Vec<(String, Bson)> {
     fields
         .iter()

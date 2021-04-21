@@ -12,7 +12,6 @@ mod aggregation_count {
         Ok(())
     }
 
-    // TODO: remove exclude once fixed for mongo
     #[connector_test]
     async fn count_nullable_fields(runner: &Runner) -> TestResult<()> {
         create_row(runner, r#"{ id: 1, string: "test1" }"#).await?;

@@ -92,12 +92,11 @@ fn to_aggregation_rows(
                     if *all {
                         let field_val = value_from_bson(doc.remove("count_all").unwrap())?;
                         row.push(AggregationResult::Count(None, field_val));
-                    } else {
-                        for field in fields {
-                            let field_val =
-                                value_from_bson(doc.remove(&format!("count_{}", field.db_name())).unwrap())?;
-                            row.push(AggregationResult::Count(Some(field.clone()), field_val));
-                        }
+                    }
+
+                    for field in fields {
+                        let field_val = value_from_bson(doc.remove(&format!("count_{}", field.db_name())).unwrap())?;
+                        row.push(AggregationResult::Count(Some(field.clone()), field_val));
                     }
                 }
                 AggregationSelection::Average(fields) => {
