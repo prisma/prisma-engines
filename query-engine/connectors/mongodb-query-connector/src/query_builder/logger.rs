@@ -49,7 +49,7 @@ fn fmt_query(buffer: &mut String, coll_name: &str, query: &MongoReadQuery) -> st
 }
 
 fn fmt_opts(buffer: &mut String, opts: &FindOptions, depth: usize) -> std::fmt::Result {
-    write!(buffer, "{{\n")?;
+    writeln!(buffer, "{{")?;
 
     if let Some(skip) = opts.skip {
         write_indented!(buffer, depth, "skip: {},\n", skip);
@@ -62,13 +62,13 @@ fn fmt_opts(buffer: &mut String, opts: &FindOptions, depth: usize) -> std::fmt::
     if let Some(ref sort) = opts.sort {
         write_indented!(buffer, depth, "sort: ",);
         fmt_doc(buffer, sort, depth + 1)?;
-        write!(buffer, ",\n")?;
+        writeln!(buffer, ",")?;
     }
 
     if let Some(ref projection) = opts.projection {
         write_indented!(buffer, depth, "projection: ",);
         fmt_doc(buffer, projection, depth + 1)?;
-        write!(buffer, "\n")?;
+        writeln!(buffer)?;
     }
 
     write!(buffer, "}}")
@@ -79,12 +79,12 @@ fn indent(depth: usize) -> String {
 }
 
 fn fmt_doc(buffer: &mut String, doc: &Document, depth: usize) -> std::fmt::Result {
-    write!(buffer, "{{\n")?;
+    writeln!(buffer, "{{")?;
 
     for (key, value) in doc {
         write_indented!(buffer, depth, "{}: ", key);
         fmt_val(buffer, value, depth)?;
-        write!(buffer, ",\n")?;
+        writeln!(buffer, ",")?;
     }
 
     write_indented!(buffer, usize::max(depth - 1, 0), "}}",);
@@ -92,12 +92,12 @@ fn fmt_doc(buffer: &mut String, doc: &Document, depth: usize) -> std::fmt::Resul
 }
 
 fn fmt_list(buffer: &mut String, list: &[Bson], depth: usize) -> std::fmt::Result {
-    write!(buffer, "[\n")?;
+    writeln!(buffer, "[")?;
 
     for item in list {
         write_indented!(buffer, depth, "",);
         fmt_val(buffer, item, depth)?;
-        write!(buffer, ",\n")?;
+        writeln!(buffer, ",")?;
     }
 
     write_indented!(buffer, usize::max(depth - 1, 0), "]",);

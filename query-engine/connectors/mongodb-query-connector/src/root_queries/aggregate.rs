@@ -19,13 +19,13 @@ pub async fn aggregate(
 
     let docs = query.execute(coll).await?;
     if docs.is_empty() {
-        empty_aggregation(selections)
+        Ok(empty_aggregation(selections))
     } else {
         to_aggregation_rows(docs, selections)
     }
 }
 
-fn empty_aggregation(selections: Vec<AggregationSelection>) -> crate::Result<Vec<AggregationRow>> {
+fn empty_aggregation(selections: Vec<AggregationSelection>) -> Vec<AggregationRow> {
     let mut row = vec![];
 
     for selection in selections.iter() {
@@ -65,7 +65,7 @@ fn empty_aggregation(selections: Vec<AggregationSelection>) -> crate::Result<Vec
         };
     }
 
-    Ok(vec![row])
+    vec![row]
 }
 
 fn to_aggregation_rows(

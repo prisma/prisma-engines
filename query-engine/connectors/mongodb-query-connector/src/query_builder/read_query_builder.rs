@@ -188,15 +188,15 @@ impl MongoReadQueryBuilder {
             && self.aggregations.is_empty()
             && self.cursor_data.is_none()
         {
-            self.build_find_query()
+            Ok(self.build_find_query())
         } else {
-            self.build_pipeline_query()
+            Ok(self.build_pipeline_query())
         }
     }
 
     // Todo: Find out if always using aggregation pipeline is a good idea.
     /// Simplest form of find-documents query: `coll.find(filter, opts)`.
-    fn build_find_query(self) -> crate::Result<MongoReadQuery> {
+    fn build_find_query(self) -> MongoReadQuery {
         let options = FindOptions::builder()
             .projection(self.projection)
             .limit(self.limit)
@@ -204,22 +204,22 @@ impl MongoReadQueryBuilder {
             .sort(self.order)
             .build();
 
-        Ok(MongoReadQuery::Find(FindQuery {
+        MongoReadQuery::Find(FindQuery {
             filter: self.query,
             options,
-        }))
+        })
     }
 
     /// Aggregation-pipeline based query. A distinction must be made between cursored and uncursored queries,
     /// as they require different stage shapes (see individual fns for details).
-    fn build_pipeline_query(self) -> crate::Result<MongoReadQuery> {
+    fn build_pipeline_query(self) -> MongoReadQuery {
         let stages = if self.cursor_data.is_none() {
             self.flat_pipeline_stages()
         } else {
             self.cursored_pipeline_stages()
         };
 
-        Ok(MongoReadQuery::Pipeline(PipelineQuery { stages }))
+        MongoReadQuery::Pipeline(PipelineQuery { stages })
     }
 
     /// Pipeline not requiring a cursor. Flat `coll.aggregate(stages, opts)` query.
@@ -398,10 +398,9 @@ impl MongoReadQueryBuilder {
         // Needed for field-count aggregations
         let mut project_stage = doc! {};
 
-        let requires_projection = aggregations.iter().any(|a| match a {
-            AggregationSelection::Count { all: _, fields } if !fields.is_empty() => true,
-            _ => false,
-        });
+        let requires_projection = aggregations
+            .iter()
+            .any(|a| matches!(a, AggregationSelection::Count { all: _, fields } if !fields.is_empty()));
 
         for selection in aggregations {
             match selection {

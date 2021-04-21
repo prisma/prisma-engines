@@ -1,7 +1,5 @@
 use super::*;
-use crate::{
-    filter::convert_filter, query_builder::MongoReadQueryBuilder, vacuum_cursor, BsonTransform, IntoBson,
-};
+use crate::{filter::convert_filter, query_builder::MongoReadQueryBuilder, vacuum_cursor, BsonTransform, IntoBson};
 use connector_interface::{Filter, QueryArguments, RelAggregationSelection};
 use mongodb::Database;
 use mongodb::{bson::doc, options::FindOptions};
