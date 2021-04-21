@@ -1,15 +1,16 @@
-use crate::common::*;
+use crate::common::{parse_error, ErrorAsserts};
 use datamodel::{ast::Span, diagnostics::DatamodelError};
 
 #[test]
 fn fail_on_duplicate_models() {
     let dml = r#"
-    model User {
-        id Int @id
-    }
-    model User {
-        id Int @id
-    }
+        model User {
+            id Int @id
+        }
+
+        model User {
+            id Int @id
+        }
     "#;
 
     let errors = parse_error(dml);
@@ -18,7 +19,30 @@ fn fail_on_duplicate_models() {
         "User",
         "model",
         "model",
-        Span::new(53, 57),
+        Span::new(70, 74),
+    ));
+}
+
+#[test]
+fn fail_on_duplicate_models_with_map() {
+    let dml = r#"
+        model Customer {
+            id Int @id
+
+            @@map("User")
+        }
+
+        model User {
+            id Int @id
+        }
+    "#;
+
+    let errors = parse_error(dml);
+
+    errors.assert_is(DatamodelError::new_duplicate_model_database_name_error(
+        "User".into(),
+        "Customer".into(),
+        Span::new(95, 140),
     ));
 }
 
@@ -125,6 +149,44 @@ fn fail_on_duplicate_field() {
         "User",
         "firstName",
         Span::new(70, 79),
+    ));
+}
+
+#[test]
+fn fail_on_duplicate_field_with_map() {
+    let dml = r#"
+    model User {
+        id Int @id
+        firstName String
+        otherName String @map("firstName")
+    }
+    "#;
+
+    let errors = parse_error(dml);
+
+    errors.assert_is(DatamodelError::new_duplicate_field_error(
+        "User",
+        "otherName",
+        Span::new(70, 105),
+    ));
+}
+
+#[test]
+fn fail_on_duplicate_mapped_field_name() {
+    let dml = r#"
+    model User {
+        id Int @id
+        firstName String @map("thename")
+        lastName String @map("thename")
+    }
+    "#;
+
+    let errors = parse_error(dml);
+
+    errors.assert_is(DatamodelError::new_duplicate_field_error(
+        "User",
+        "lastName",
+        Span::new(86, 118),
     ));
 }
 

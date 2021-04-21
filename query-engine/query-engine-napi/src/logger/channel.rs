@@ -1,7 +1,7 @@
 use super::visitor::JsonVisitor;
 use napi::threadsafe_function::{ThreadsafeFunction, ThreadsafeFunctionCallMode};
 use serde_json::{Map, Value};
-use tracing::{metadata::LevelFilter, span::Record, Event, Id, Subscriber};
+use tracing::{metadata::LevelFilter, Event, Subscriber};
 use tracing_subscriber::{layer::Context, registry::LookupSpan, Layer};
 
 #[derive(Clone)]
@@ -27,36 +27,6 @@ impl<S> Layer<S> for EventChannel
 where
     S: Subscriber + for<'a> LookupSpan<'a>,
 {
-    fn new_span(&self, attrs: &tracing::span::Attributes<'_>, id: &Id, ctx: Context<'_, S>) {
-        let span = ctx.span(id).unwrap();
-
-        let mut extensions = span.extensions_mut();
-
-        if extensions.get_mut::<Map<String, Value>>().is_none() {
-            let mut object = Map::with_capacity(10);
-            let mut visitor = JsonVisitor::new(&mut object);
-            attrs.record(&mut visitor);
-            extensions.insert(object);
-        }
-    }
-
-    fn on_record(&self, id: &Id, values: &Record<'_>, ctx: Context<'_, S>) {
-        let span = ctx.span(id).unwrap();
-        let mut extensions = span.extensions_mut();
-
-        if let Some(mut object) = extensions.get_mut::<Map<String, Value>>() {
-            let mut visitor = JsonVisitor::new(&mut object);
-
-            values.record(&mut visitor);
-        } else {
-            let mut object = Map::with_capacity(10);
-            let mut visitor = JsonVisitor::new(&mut object);
-
-            values.record(&mut visitor);
-            extensions.insert(object);
-        }
-    }
-
     fn on_event(&self, event: &Event<'_>, _: Context<'_, S>) {
         let mut object: Map<String, Value> = Map::with_capacity(5);
 

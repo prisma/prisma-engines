@@ -45,6 +45,7 @@ pub enum ArgumentContainer<'a> {
     SourceConfig(&'a mut SourceConfig),
     Attribute(&'a mut Attribute),
 }
+
 impl ArgumentContainer<'_> {
     pub fn name(&self) -> &str {
         match self {

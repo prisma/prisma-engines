@@ -9,7 +9,7 @@ use std::collections::HashMap;
 /// Helper for formatting a datamodel.
 ///
 /// When formatting, datamodel will be made consistent.
-/// Implicit back relation fields, `references` and `fields` attributes in @relation will be generated.
+/// Implicit opposite relation fields, `references` and `fields` attributes in @relation will be generated.
 /// Scalar fields to back relations will be added if necessary.
 pub struct StandardiserForFormatting {}
 impl StandardiserForFormatting {
@@ -19,7 +19,7 @@ impl StandardiserForFormatting {
     }
 
     pub fn standardise(&self, ast_schema: &ast::SchemaAst, schema: &mut dml::Datamodel) -> Result<(), Diagnostics> {
-        self.add_missing_back_relations(ast_schema, schema)?;
+        self.add_missing_opposite_relation_fields(ast_schema, schema)?;
         self.set_relation_to_field_to_id_if_missing_for_non_m2m_relations(ast_schema, schema)?;
         Ok(())
     }
@@ -138,34 +138,34 @@ impl StandardiserForFormatting {
         }
     }
 
-    /// Identifies and adds missing back relations. For 1:1 and 1:N relations.
-    /// Explicit n:m relations are not touched, as they already have a back relation field.
+    /// Identifies and adds missing opposite relation fields. For 1:1 and 1:N relations.
+    /// Explicit n:m relations are not touched, as they already have an opposite relation field.
     /// Underlying scalar fields are not added here.
-    fn add_missing_back_relations(
+    fn add_missing_opposite_relation_fields(
         &self,
         ast_schema: &ast::SchemaAst,
         schema: &mut dml::Datamodel,
     ) -> Result<(), Diagnostics> {
         let mut errors = Diagnostics::new();
 
-        let mut missing_back_relation_fields = Vec::new();
+        let mut missing_opposite_relation_fields = Vec::new();
         for model in schema.models() {
-            let mut missing_for_model = self.find_missing_back_relation_fields(&model, schema, ast_schema)?;
-            missing_back_relation_fields.append(&mut missing_for_model);
+            let mut missing_for_model = self.find_missing_opposite_relation_fields(&model, schema, ast_schema)?;
+            missing_opposite_relation_fields.append(&mut missing_for_model);
         }
 
-        for missing_back_relation_field in missing_back_relation_fields {
+        for missing_opposite_relation_field in missing_opposite_relation_fields {
             let model = schema
-                .find_model(&missing_back_relation_field.model)
+                .find_model(&missing_opposite_relation_field.model)
                 .expect(STATE_ERROR);
-            let field_name = &missing_back_relation_field.field.name;
+            let field_name = &missing_opposite_relation_field.field.name;
 
             if model.find_relation_field(&field_name).is_some() {
                 let source_model = schema
-                    .find_model(&missing_back_relation_field.related_model)
+                    .find_model(&missing_opposite_relation_field.related_model)
                     .expect(STATE_ERROR);
                 let source_field = source_model
-                    .find_relation_field(&missing_back_relation_field.related_field)
+                    .find_relation_field(&missing_opposite_relation_field.related_field)
                     .expect(STATE_ERROR);
                 errors.push_error(field_validation_error(
                                 "Automatic related field generation would cause a naming conflict. Please add an explicit opposite relation field.",
@@ -174,11 +174,11 @@ impl StandardiserForFormatting {
                                 &ast_schema,
                             ));
             } else {
-                let model_mut = schema.find_model_mut(&missing_back_relation_field.model);
+                let model_mut = schema.find_model_mut(&missing_opposite_relation_field.model);
 
-                model_mut.add_field(Field::RelationField(missing_back_relation_field.field));
+                model_mut.add_field(Field::RelationField(missing_opposite_relation_field.field));
 
-                for underlying_field in missing_back_relation_field.underlying_fields.into_iter() {
+                for underlying_field in missing_opposite_relation_field.underlying_fields.into_iter() {
                     if !model_mut.has_field(&underlying_field.name) {
                         model_mut.add_field(Field::ScalarField(underlying_field));
                     }
@@ -193,12 +193,12 @@ impl StandardiserForFormatting {
         }
     }
 
-    fn find_missing_back_relation_fields(
+    fn find_missing_opposite_relation_fields(
         &self,
         model: &dml::Model,
         schema: &dml::Datamodel,
         schema_ast: &ast::SchemaAst,
-    ) -> Result<Vec<AddMissingBackRelationField>, Diagnostics> {
+    ) -> Result<Vec<AddMissingOppositeRelationField>, Diagnostics> {
         let mut errors = Diagnostics::new();
         let mut result = Vec::new();
         for field in model.relation_fields() {
@@ -214,13 +214,14 @@ impl StandardiserForFormatting {
                         name: rel_info.name.clone(),
                         on_delete: OnDeleteStrategy::None,
                     };
-                    let mut back_relation_field = dml::RelationField::new_generated(&model.name, relation_info);
-                    back_relation_field.arity = dml::FieldArity::List;
-                    back_relation_field.is_ignored = model.is_ignored;
+                    let mut opposite_relation_field =
+                        dml::RelationField::new_generated(&model.name, relation_info, false);
+                    opposite_relation_field.arity = dml::FieldArity::List;
+                    opposite_relation_field.is_ignored = model.is_ignored;
 
-                    result.push(AddMissingBackRelationField {
+                    result.push(AddMissingOppositeRelationField {
                         model: rel_info.to.clone(),
-                        field: back_relation_field,
+                        field: opposite_relation_field,
                         related_model: model.name.to_string(),
                         related_field: field.name.to_string(),
                         underlying_fields: vec![],
@@ -247,7 +248,9 @@ impl StandardiserForFormatting {
 
                     let underlying_field_names = underlying_fields.iter().map(|f| f.name.clone()).collect();
 
-                    let underlying_fields_to_add = underlying_fields
+                    let mut all_existing_underlying_fields_on_opposite_model_are_required = true;
+
+                    let underlying_fields_to_add: Vec<dml::ScalarField> = underlying_fields
                         .into_iter()
                         .filter(|f| {
                             match related_model.find_field(&f.name) {
@@ -257,6 +260,7 @@ impl StandardiserForFormatting {
                                 }
                                 Some(other) if other.field_type().is_compatible_with(&f.field_type) => {
                                     // field with name exists and its type is compatible. We must not add it since we would have a duplicate.
+                                    if other.arity().is_optional() {all_existing_underlying_fields_on_opposite_model_are_required =false;}
                                     false
                                 }
                                 _ => {
@@ -288,10 +292,14 @@ impl StandardiserForFormatting {
                         on_delete: OnDeleteStrategy::None,
                     };
 
-                    let back_relation_field = dml::RelationField::new_generated(&model.name, relation_info);
-                    result.push(AddMissingBackRelationField {
+                    let is_required = all_existing_underlying_fields_on_opposite_model_are_required
+                        && underlying_fields_to_add.is_empty();
+
+                    let opposite_relation_field =
+                        dml::RelationField::new_generated(&model.name, relation_info, is_required);
+                    result.push(AddMissingOppositeRelationField {
                         model: rel_info.to.clone(),
-                        field: back_relation_field,
+                        field: opposite_relation_field,
                         related_model: model.name.to_owned(),
                         related_field: field.name.to_owned(),
                         underlying_fields: underlying_fields_to_add,
@@ -333,7 +341,7 @@ impl StandardiserForFormatting {
 }
 
 #[derive(Debug)]
-struct AddMissingBackRelationField {
+struct AddMissingOppositeRelationField {
     model: String,
     field: dml::RelationField,
     related_model: String,

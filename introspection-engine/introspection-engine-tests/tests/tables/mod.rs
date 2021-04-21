@@ -725,6 +725,34 @@ async fn partial_indexes_should_be_ignored_on_mysql(api: &TestApi) -> crate::Tes
     Ok(())
 }
 
+#[test_each_connector(tags("sqlite"))]
+async fn expression_indexes_should_be_ignored_on_sqlite(api: &TestApi) -> crate::TestResult {
+    api.barrel()
+        .execute_with_schema(
+            |migration| {
+                migration.create_table("Blog", move |t| {
+                    t.add_column("id", types::primary());
+                    t.add_column("author", types::text());
+                });
+                migration.inject_custom("CREATE INDEX author_lowercase_index ON Blog(LOWER(author));")
+            },
+            api.schema_name(),
+        )
+        .await?;
+
+    let dm = indoc! {r##"
+        model Blog {
+          id                Int     @id @default(autoincrement())
+          author            String
+        }
+    "##};
+
+    let result = &api.introspect().await?;
+    api.assert_eq_datamodels(&dm, result);
+
+    Ok(())
+}
+
 #[test_each_connector(tags("mysql"))]
 async fn casing_should_not_lead_to_mix_ups(api: &TestApi) -> crate::TestResult {
     api.barrel()

@@ -8,7 +8,7 @@ use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
 use std::{borrow::Cow, fmt::Debug};
-use walkers::{EnumWalker, TableWalker, ViewWalker};
+use walkers::{EnumWalker, TableWalker, UserDefinedTypeWalker, ViewWalker};
 
 pub mod getters;
 pub mod mssql;
@@ -56,6 +56,8 @@ pub struct SqlSchema {
     pub views: Vec<View>,
     /// The stored procedures.
     pub procedures: Vec<Procedure>,
+    /// The user-defined types procedures.
+    pub user_defined_types: Vec<UserDefinedType>,
     /// The database lowercases all identifiers.
     pub lower_case_identifiers: bool,
 }
@@ -81,6 +83,10 @@ impl SqlSchema {
         self.procedures.iter().find(|x| x.name == name)
     }
 
+    pub fn get_user_defined_type(&self, name: &str) -> Option<&UserDefinedType> {
+        self.user_defined_types.iter().find(|x| x.name == name)
+    }
+
     /// Is this schema empty?
     pub fn is_empty(&self) -> bool {
         matches!(
@@ -91,8 +97,9 @@ impl SqlSchema {
                 sequences,
                 views,
                 procedures,
+                user_defined_types,
                 ..
-            } if tables.is_empty() && enums.is_empty() && sequences.is_empty() && views.is_empty() && procedures.is_empty()
+            } if tables.is_empty() && enums.is_empty() && sequences.is_empty() && views.is_empty() && procedures.is_empty() && user_defined_types.is_empty()
         )
     }
 
@@ -122,6 +129,10 @@ impl SqlSchema {
 
     pub fn view_walkers(&self) -> impl Iterator<Item = ViewWalker<'_>> {
         (0..self.views.len()).map(move |view_index| ViewWalker::new(self, view_index))
+    }
+
+    pub fn udt_walkers(&self) -> impl Iterator<Item = UserDefinedTypeWalker<'_>> {
+        (0..self.user_defined_types.len()).map(move |udt_index| UserDefinedTypeWalker::new(self, udt_index))
     }
 
     pub fn enum_walkers(&self) -> impl Iterator<Item = EnumWalker<'_>> {
@@ -247,6 +258,15 @@ pub struct Procedure {
     /// Procedure name.
     pub name: String,
     /// The definition of the procedure.
+    pub definition: Option<String>,
+}
+
+/// A user-defined type. Can map to another type, or be declared as assembly.
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
+pub struct UserDefinedType {
+    /// Type name
+    pub name: String,
+    /// Type mapping
     pub definition: Option<String>,
 }
 

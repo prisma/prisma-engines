@@ -160,7 +160,7 @@ impl TestApi {
         self.connection_info().sql_family()
     }
 
-    fn tags(&self) -> BitFlags<Tags> {
+    pub fn tags(&self) -> BitFlags<Tags> {
         self.args.connector_tags
     }
 

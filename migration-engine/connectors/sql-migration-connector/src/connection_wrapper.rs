@@ -24,6 +24,14 @@ impl ConnectionError<'_> {
     pub(crate) fn kind(&self) -> &QuaintKind {
         self.quaint_error.kind()
     }
+
+    pub(crate) fn original_code(&self) -> Option<&str> {
+        self.quaint_error.original_code()
+    }
+
+    pub(crate) fn original_message(&self) -> Option<&str> {
+        self.quaint_error.original_message()
+    }
 }
 
 impl From<ConnectionError<'_>> for ConnectorError {

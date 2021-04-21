@@ -24,7 +24,7 @@ use flavour::SqlFlavour;
 use migration_connector::*;
 use pair::Pair;
 use quaint::{prelude::ConnectionInfo, single::Quaint};
-use sql_migration::{DropView, SqlMigration, SqlMigrationStep};
+use sql_migration::{DropUserDefinedType, DropView, SqlMigration, SqlMigrationStep};
 use sql_schema_describer::{walkers::SqlSchemaExt, SqlSchema};
 use user_facing_errors::{common::InvalidDatabaseString, KnownError};
 
@@ -127,6 +127,14 @@ impl SqlMigrationConnector {
             Pair::new(&source_schema, &target_schema),
             self.flavour.as_ref(),
         ));
+
+        let drop_udts = source_schema
+            .udt_walkers()
+            .map(|udtw| udtw.udt_index())
+            .map(DropUserDefinedType::new)
+            .map(SqlMigrationStep::DropUserDefinedType);
+
+        steps.extend(drop_udts);
 
         let migration = SqlMigration {
             added_columns_with_virtual_defaults: Vec::new(),

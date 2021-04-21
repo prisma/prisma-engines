@@ -25,14 +25,14 @@ fn serialize_builtin_sources_to_dmmf() {
     assert_rendered_mcf(schema1, expected_dmmf_1);
 
     let schema2 = r#"datasource pg2 {
-            provider = ["sqlite", "postgresql"]
+            provider = "postgresql"
             url = env("pg2")
         }"#;
 
     let expected_dmmf_2 = r#"[
   {
     "name": "pg2",
-    "provider": ["sqlite", "postgresql"],
+    "provider": ["postgresql"],
     "activeProvider": "postgresql",
     "url": {
       "fromEnvVar": "pg2",

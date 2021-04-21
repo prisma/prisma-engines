@@ -10,6 +10,67 @@ use sql_schema_describer::{mssql::SqlSchemaDescriber, *};
 use test_setup::mssql_2019_url;
 
 #[tokio::test]
+async fn udts_can_be_described() {
+    let db_name = "udts_can_be_described";
+    let connection_string = mssql_2019_url(db_name);
+    let conn = Quaint::new(&connection_string).await.unwrap();
+
+    let types = &[
+        "bigint",
+        "binary(255)",
+        "bit",
+        "char(255)",
+        "date",
+        "datetime",
+        "datetime2",
+        "datetimeoffset",
+        "decimal(10,2)",
+        "real",
+        "float",
+        "image",
+        "int",
+        "money",
+        "nchar(100)",
+        "ntext",
+        "numeric(10,5)",
+        "nvarchar(100)",
+        "nvarchar(max)",
+        "real",
+        "smalldatetime",
+        "smallint",
+        "smallmoney",
+        "text",
+        "time",
+        "tinyint",
+        "uniqueidentifier",
+        "varbinary(50)",
+        "varbinary(max)",
+        "varchar(100)",
+        "varchar(max)",
+    ];
+
+    for r#type in types {
+        test_setup::connectors::mssql::reset_schema(&conn, db_name)
+            .await
+            .unwrap();
+
+        conn.raw_cmd(&format!("CREATE TYPE {}.a FROM {}", db_name, r#type))
+            .await
+            .unwrap();
+
+        let inspector = SqlSchemaDescriber::new(conn.clone());
+        let result = inspector.describe(db_name).await.expect("describing");
+        let udt = result
+            .get_user_defined_type("a")
+            .expect("couldn't get a type")
+            .to_owned();
+
+        assert_eq!("a", &udt.name);
+        assert_eq!(Some(*r#type), udt.definition.as_deref());
+    }
+}
+
+#[tokio::test]
 async fn views_can_be_described() {
     let db_name = "views_can_be_described";
 

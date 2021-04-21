@@ -185,11 +185,6 @@ impl ValueValidator {
         }
     }
 
-    /// Checks if the wrapped value is an array
-    pub fn is_array(&self) -> bool {
-        self.value.is_array()
-    }
-
     pub fn as_default_value_for_scalar_type(&self, scalar_type: ScalarType) -> Result<DefaultValue, DatamodelError> {
         match &self.value {
             ast::Expression::Function(name, args, _) => {

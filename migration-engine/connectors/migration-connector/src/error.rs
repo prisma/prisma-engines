@@ -1,25 +1,28 @@
 //! The migration connector ConnectorError type.
 
-use crate::migrations_directory::ReadMigrationScriptError;
+use crate::{migrations_directory::ReadMigrationScriptError, ListMigrationsError};
 use std::{
     error::Error as StdError,
     fmt::{Display, Write},
+    sync::Arc,
 };
 use tracing_error::SpanTrace;
-use user_facing_errors::{migration_engine::MigrationFileNotFound, KnownError, UserFacingError};
+use user_facing_errors::{
+    common::SchemaParserError, migration_engine::MigrationFileNotFound, KnownError, UserFacingError,
+};
 
 /// The general error reporting type for migration connectors.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ConnectorError(Box<ConnectorErrorImpl>);
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct ConnectorErrorImpl {
     /// An optional error already rendered for users in case the migration core does not handle it.
     user_facing_error: Option<KnownError>,
     /// Additional context.
     message: Option<Box<str>>,
     /// The source of the error.
-    source: Option<Box<(dyn StdError + Send + Sync + 'static)>>,
+    source: Option<Arc<(dyn StdError + Send + Sync + 'static)>>,
     /// See the tracing-error docs.
     context: SpanTrace,
 }
@@ -75,7 +78,7 @@ impl ConnectorError {
         ConnectorError(Box::new(ConnectorErrorImpl {
             user_facing_error: None,
             message: Some(context.into()),
-            source: Some(Box::new(source)),
+            source: Some(Arc::new(source)),
             context: SpanTrace::capture(),
         }))
     }
@@ -90,7 +93,7 @@ impl ConnectorError {
 
         ConnectorError(Box::new(ConnectorErrorImpl {
             user_facing_error: Some(KnownError::new(user_facing_error)),
-            source: Some(Box::new(self)),
+            source: Some(Arc::new(self)),
             context,
             message: None,
         }))
@@ -107,7 +110,7 @@ impl ConnectorError {
             user_facing_error: Some(KnownError::new(user_facing_error)),
             message: None,
             context,
-            source: Some(Box::new(self)),
+            source: Some(Arc::new(self)),
         }))
     }
 
@@ -122,13 +125,18 @@ impl ConnectorError {
             user_facing_error: Some(KnownError::new(user_facing_error)),
             context,
             message: None,
-            source: Some(Box::new(self)),
+            source: Some(Arc::new(self)),
         }))
     }
 
     /// Access the inner `user_facing_error::KnownError`.
     pub fn known_error(&self) -> Option<&KnownError> {
         self.0.user_facing_error.as_ref()
+    }
+
+    /// Create a new P1012 user facing error from the rendered datamodel parser error.
+    pub fn new_schema_parser_error(full_error: String) -> Self {
+        ConnectorError::user_facing(SchemaParserError { full_error })
     }
 
     /// Render to a user_facing_error::Error
@@ -140,7 +148,7 @@ impl ConnectorError {
     }
 
     /// Construct a GenericError with an associated user facing error.
-    pub fn user_facing_error<T: UserFacingError>(err: T) -> Self {
+    pub fn user_facing<T: UserFacingError>(err: T) -> Self {
         ConnectorError(Box::new(ConnectorErrorImpl {
             message: Some(err.message().into_boxed_str()),
             user_facing_error: Some(KnownError::new(err)),
@@ -176,8 +184,14 @@ impl From<ReadMigrationScriptError> for ConnectorError {
             })),
             context,
             message: None,
-            source: Some(Box::new(err)),
+            source: Some(Arc::new(err)),
         }))
+    }
+}
+
+impl From<ListMigrationsError> for ConnectorError {
+    fn from(err: ListMigrationsError) -> Self {
+        ConnectorError::from_msg(err.to_string())
     }
 }
 

@@ -1,10 +1,6 @@
 pub mod connector_error;
 pub mod helper;
 
-mod combined_connector;
-
-pub use combined_connector::CombinedConnector;
-
 use crate::connector_error::{ConnectorError, ConnectorErrorFactory, ErrorKind};
 use dml::{
     field::Field, model::Model, native_type_constructor::NativeTypeConstructor,

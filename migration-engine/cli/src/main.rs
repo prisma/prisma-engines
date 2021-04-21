@@ -5,7 +5,7 @@ mod commands;
 mod error_tests;
 mod logger;
 
-use migration_core::{api::RpcApi, CoreError};
+use migration_core::api::RpcApi;
 use structopt::StructOpt;
 use user_facing_errors::{common::SchemaParserError, UserFacingError};
 
@@ -72,16 +72,15 @@ async fn start_engine(datamodel_location: &str) -> ! {
         // Block the thread and handle IO in async until EOF.
         Ok(api) => json_rpc_stdio::run(api.io_handler()).await.unwrap(),
         Err(err) => {
-            let (error, exit_code) = match &err {
-                CoreError::UserFacing(err)
-                    if err.as_known().map(|e| e.error_code) == Some(SchemaParserError::ERROR_CODE) =>
-                {
-                    (err.clone(), 1)
-                }
-                _ => (err.render_user_facing(), 250),
-            };
+            let user_facing_error = err.to_user_facing();
+            let exit_code =
+                if user_facing_error.as_known().map(|err| err.error_code) == Some(SchemaParserError::ERROR_CODE) {
+                    1
+                } else {
+                    250
+                };
 
-            serde_json::to_writer(std::io::stdout().lock(), &error).expect("failed to write to stdout");
+            serde_json::to_writer(std::io::stdout().lock(), &user_facing_error).expect("failed to write to stdout");
             std::process::exit(exit_code)
         }
     }

@@ -138,7 +138,7 @@ async fn soft_resets_work_on_sql_server(api: TestApi) -> TestResult {
         let create_user = r#"
             USE [resetTest];
 
-            IF EXISTS (SELECT loginname from dbo.syslogins 
+            IF EXISTS (SELECT loginname from dbo.syslogins
                 WHERE name = 'softresetstestuser')
             BEGIN
                 DROP LOGIN softresetstestuser;
@@ -200,11 +200,23 @@ async fn soft_resets_work_on_sql_server(api: TestApi) -> TestResult {
 
         engine.raw_cmd(&add_view).await?;
 
+        let add_type = format!(r#"CREATE TYPE [{0}].[Litter] FROM int"#, engine.schema_name(),);
+
+        engine.raw_cmd(&add_type).await?;
+
+        let add_table_with_type = format!(
+            r#"CREATE TABLE [{0}].specialLitter (id int primary key, litterAmount [{0}].Litter)"#,
+            engine.schema_name()
+        );
+
+        engine.raw_cmd(&add_table_with_type).await?;
+
         engine
             .assert_schema()
             .await?
-            .assert_tables_count(2)?
+            .assert_tables_count(3)?
             .assert_has_table("_prisma_migrations")?
+            .assert_has_table("specialLitter")?
             .assert_has_table("Cat")?;
 
         engine.reset().send().await?;
