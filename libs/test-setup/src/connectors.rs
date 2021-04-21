@@ -33,7 +33,8 @@ fn connector_names() -> Vec<(&'static str, BitFlags<Tags>)> {
         ("postgres13", Tags::Postgres.into()),
         ("mysql_mariadb", Tags::Mysql | Tags::Mariadb),
         ("sqlite", Tags::Sqlite.into()),
-        ("vitess_5_7", Tags::Mysql | Tags::Vitess57),
+        ("vitess_5_7", Tags::Vitess | Tags::Mysql | Tags::Vitess57),
+        ("vitess_8_0", Tags::Vitess | Tags::Mysql | Tags::Vitess80),
     ]
 }
 
@@ -61,6 +62,10 @@ fn vitess_5_7_capabilities() -> BitFlags<Capabilities> {
     Capabilities::Enums | Capabilities::Json
 }
 
+fn vitess_8_0_capabilities() -> BitFlags<Capabilities> {
+    Capabilities::Enums | Capabilities::Json
+}
+
 fn infer_capabilities(tags: BitFlags<Tags>) -> BitFlags<Capabilities> {
     if tags.intersects(Tags::Postgres) {
         return postgres_capabilities();
@@ -84,6 +89,10 @@ fn infer_capabilities(tags: BitFlags<Tags>) -> BitFlags<Capabilities> {
 
     if tags.intersects(Tags::Vitess57) {
         return vitess_5_7_capabilities();
+    }
+
+    if tags.intersects(Tags::Vitess80) {
+        return vitess_8_0_capabilities();
     }
 
     BitFlags::empty()

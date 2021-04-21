@@ -49,7 +49,7 @@ impl BarrelMigrationExecutor {
     where
         F: FnOnce(&mut Migration),
     {
-        let mut migration = if self.tags.contains(Tags::Vitess57) {
+        let mut migration = if self.tags.intersects(Tags::Vitess) {
             Migration::new()
         } else {
             Migration::new().schema(schema_name)
