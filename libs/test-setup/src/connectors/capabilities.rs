@@ -7,6 +7,7 @@ pub enum Capabilities {
     ScalarLists = 0b0001,
     Enums = 0b0010,
     Json = 0b0100,
+    CreateDatabase = 0b1000,
 }
 
 #[derive(Debug)]
@@ -41,6 +42,7 @@ impl FromStr for Capabilities {
 
 /// All the capabilities, sorted by name.
 const CAPABILITY_NAMES: &[(&str, Capabilities)] = &[
+    ("create_db", Capabilities::CreateDatabase),
     ("enums", Capabilities::Enums),
     ("json", Capabilities::Json),
     ("scalar_lists", Capabilities::ScalarLists),

@@ -117,6 +117,9 @@ dev-mongodb: start-mongodb
 	echo 'mongodb' > current_connector
 	cp $(CONFIG_PATH)/mongodb4 $(CONFIG_FILE)
 
+start-vitess_5_7:
+	docker-compose -f docker-compose.yml up -d --remove-orphans vitess-test-5_7 vitess-shadow-5_7
+
 dev-down:
 	docker-compose -f docker-compose.yml down -v --remove-orphans
 

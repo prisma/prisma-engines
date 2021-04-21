@@ -40,7 +40,7 @@ macro_rules! test_api_constructors {
     ($(($connector:ident, $provider:literal),)*) => {
         impl TestApiArgs {
             $(
-                pub fn $connector(name: &'static str, tags: u16, features: u8) -> Self {
+                pub fn $connector(name: &'static str, tags: u32, features: u8) -> Self {
                     let tags: BitFlags<Tags> = BitFlags::from_bits(tags).unwrap();
                     let features: BitFlags<Features> = BitFlags::from_bits(features).unwrap();
 
@@ -64,6 +64,7 @@ test_api_constructors!(
     (mysql_5_7, "mysql"),
     (mysql_8, "mysql"),
     (mysql_mariadb, "mysql"),
+    (vitess_5_7, "mysql"),
     (postgres9, "postgresql"),
     (postgres10, "postgresql"),
     (postgres11, "postgresql"),
@@ -95,6 +96,7 @@ mod urls {
     pub use super::postgres_13_url as postgres13;
     pub use super::postgres_9_url as postgres9;
     pub use super::sqlite_test_url as sqlite;
+    pub use super::vitess_5_7_url as vitess_5_7;
 }
 
 pub fn sqlite_test_url(db_name: &str) -> String {
@@ -272,6 +274,21 @@ pub fn mysql_5_6_url(db_name: &str) -> String {
             db_name = db_name,
         )
     })
+}
+
+pub fn vitess_5_7_url(_: &str) -> String {
+    match std::env::var("VITESS_5_7_TEST_URL") {
+        Ok(url) => url,
+        Err(_) => {
+            let (host, port) = db_host_and_port_vitess_5_7();
+
+            format!(
+                "mysql://root:prisma@{host}:{port}/test?connect_timeout=20&socket_timeout=60",
+                host = host,
+                port = port,
+            )
+        }
+    }
 }
 
 pub fn mariadb_url(db_name: &str) -> String {
@@ -499,6 +516,27 @@ pub fn db_host_and_port_mysql_5_7() -> (Cow<'static, str>, usize) {
     match std::env::var("IS_BUILDKITE") {
         Ok(_) => ("test-db-mysql-5-7".into(), 3306),
         Err(_) => ("127.0.0.1".into(), 3306),
+    }
+}
+
+pub fn db_host_and_port_vitess_5_7() -> (Cow<'static, str>, usize) {
+    if let Some(var) = std::env::var("VITESXS_5_7_TEST_URL")
+        .ok()
+        .and_then(|s| Url::parse(&s).ok())
+    {
+        let host = var
+            .host()
+            .map(|s| Cow::from(s.to_string()))
+            .unwrap_or_else(|| Cow::from("localhost"));
+
+        let port = var.port().unwrap_or(33577) as usize;
+
+        return (host, port);
+    }
+
+    match std::env::var("IS_BUILDKITE") {
+        Ok(_) => ("test-db-vitess-5-7".into(), 33577),
+        Err(_) => ("127.0.0.1".into(), 33577),
     }
 }
 

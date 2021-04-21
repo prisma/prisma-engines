@@ -4,12 +4,20 @@ mod capabilities;
 mod features;
 mod tags;
 
+use std::collections::HashSet;
+
 pub use capabilities::*;
 pub use features::*;
 pub use tags::*;
 
 use enumflags2::BitFlags;
 use once_cell::sync::Lazy;
+
+static SKIP_CONNECTORS: Lazy<HashSet<String>> = Lazy::new(|| {
+    std::env::var("SKIP_CONNECTORS")
+        .map(|s| s.split(",").map(ToString::to_string).collect())
+        .unwrap_or_else(|_| HashSet::new())
+});
 
 fn connector_names() -> Vec<(&'static str, BitFlags<Tags>)> {
     vec![
@@ -25,27 +33,32 @@ fn connector_names() -> Vec<(&'static str, BitFlags<Tags>)> {
         ("postgres13", Tags::Postgres.into()),
         ("mysql_mariadb", Tags::Mysql | Tags::Mariadb),
         ("sqlite", Tags::Sqlite.into()),
+        ("vitess_5_7", Tags::Mysql | Tags::Vitess57),
     ]
 }
 
 fn postgres_capabilities() -> BitFlags<Capabilities> {
-    Capabilities::ScalarLists | Capabilities::Enums | Capabilities::Json
+    Capabilities::ScalarLists | Capabilities::Enums | Capabilities::Json | Capabilities::CreateDatabase
 }
 
 fn mysql_5_7_capabilities() -> BitFlags<Capabilities> {
-    Capabilities::Enums | Capabilities::Json
+    Capabilities::Enums | Capabilities::Json | Capabilities::CreateDatabase
 }
 
 fn mysql_5_6_capabilities() -> BitFlags<Capabilities> {
-    Capabilities::Enums.into()
+    Capabilities::Enums | Capabilities::CreateDatabase
 }
 
 fn mssql_2017_capabilities() -> BitFlags<Capabilities> {
-    BitFlags::empty()
+    Capabilities::CreateDatabase.into()
 }
 
 fn mssql_2019_capabilities() -> BitFlags<Capabilities> {
-    BitFlags::empty()
+    Capabilities::CreateDatabase.into()
+}
+
+fn vitess_5_7_capabilities() -> BitFlags<Capabilities> {
+    Capabilities::Enums | Capabilities::Json
 }
 
 fn infer_capabilities(tags: BitFlags<Tags>) -> BitFlags<Capabilities> {
@@ -69,12 +82,17 @@ fn infer_capabilities(tags: BitFlags<Tags>) -> BitFlags<Capabilities> {
         return mssql_2019_capabilities();
     }
 
+    if tags.intersects(Tags::Vitess57) {
+        return vitess_5_7_capabilities();
+    }
+
     BitFlags::empty()
 }
 
 pub static CONNECTORS: Lazy<Connectors> = Lazy::new(|| {
     let connectors: Vec<Connector> = connector_names()
         .iter()
+        .filter(|(name, _)| !SKIP_CONNECTORS.contains(*name))
         .map(|(name, tags)| Connector {
             name: (*name).to_owned(),
             capabilities: infer_capabilities(*tags),
