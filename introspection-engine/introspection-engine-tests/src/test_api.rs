@@ -4,11 +4,13 @@ use enumflags2::BitFlags;
 use eyre::{Context, Report, Result};
 use introspection_connector::{DatabaseMetadata, IntrospectionConnector, Version};
 use introspection_core::rpc::RpcImpl;
+use migration_connector::MigrationConnector;
 use quaint::{
     prelude::{ConnectionInfo, SqlFamily},
     single::Quaint,
 };
 use sql_introspection_connector::SqlIntrospectionConnector;
+use sql_migration_connector::SqlMigrationConnector;
 use sql_schema_describer::{mssql, mysql, postgres, sqlite, SqlSchema, SqlSchemaDescriberBackend};
 use test_setup::{connectors::Tags, *};
 use tracing::Instrument;
@@ -33,7 +35,14 @@ impl TestApi {
 
         let connection_string = (args.url_fn)(db_name);
 
-        let database = if tags.contains(Tags::Mysql) {
+        let database = if tags.contains(Tags::Vitess57) {
+            let me = SqlMigrationConnector::new(&connection_string, BitFlags::empty(), None)
+                .await
+                .unwrap();
+            me.reset().await.unwrap();
+
+            Quaint::new(&connection_string).await.unwrap()
+        } else if tags.contains(Tags::Mysql) {
             create_mysql_database(&connection_string.parse().unwrap())
                 .await
                 .unwrap()
@@ -186,12 +195,18 @@ impl TestApi {
                 SqlFamily::Sqlite => barrel::SqlVariant::Sqlite,
                 SqlFamily::Mssql => barrel::SqlVariant::Mssql,
             },
+            tags: self.tags(),
         }
     }
 
     pub fn db_name(&self) -> &str {
-        self.db_name
+        if self.tags().contains(Tags::Vitess57) {
+            "test"
+        } else {
+            self.db_name
+        }
     }
+
     pub fn tags(&self) -> BitFlags<Tags> {
         self.args.connector_tags
     }

@@ -6,15 +6,33 @@ on:
   pull_request:
 jobs:
   test:
-    name: "Test on Linux"
+    name: "Test ${{ matrix.database }} on Linux"
     runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        database:
+          - mssql_2017
+          - mssql_2019
+          - mysql_5_6
+          - mysql_5_7
+          - mysql_8
+          - mysql_mariadb
+          - postgres9
+          - postgres10
+          - postgres11
+          - postgres12
+          - postgres13
+          - sqlite
+          - vitess_5_7
 
     steps:
       - uses: actions/checkout@v2
 
-      - name: "Start databases"
-        run: docker-compose up -d
-      
+      - name: "Start ${{ matrix.database }}"
+        run: make start-${{ matrix.database }}
+
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
@@ -28,7 +46,14 @@ jobs:
             target
           key: introspection-engine-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
-      - run: cargo test ${{ matrix.segment }}
+      - run: cargo test ${{ matrix.database }}
+        if: ${{ matrix.database != 'vitess_5_7' }}
+        working-directory: introspection-engine/introspection-engine-tests
+        env:
+          CLICOLOR_FORCE: 1
+
+      - run: cargo test ${{ matrix.database }} -- --test-threads=1
+        if: ${{ matrix.database == 'vitess_5_7' }}
         working-directory: introspection-engine/introspection-engine-tests
         env:
           CLICOLOR_FORCE: 1

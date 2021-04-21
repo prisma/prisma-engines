@@ -45,11 +45,6 @@ jobs:
             target
           key: migration-engine-${{ runner.os }}-cargo-${{ matrix.database }}-${{ hashFiles('**/Cargo.lock') }}
 
-      - name: "Wait for database to get healthy"
-        uses: juliangruber/sleep-action@v1
-        with:
-          time: 20s
-
       - run: timeout 40m cargo test ${{ matrix.database }}
         working-directory: migration-engine/migration-engine-tests
         env:

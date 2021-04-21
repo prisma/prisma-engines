@@ -2,7 +2,7 @@ use barrel::types;
 use introspection_engine_tests::{test_api::*, BarrelMigrationExecutor};
 use test_macros::test_each_connector;
 
-#[test_each_connector(tags("mysql"))]
+#[test_each_connector(tags("mysql"), ignore("vitess_5_7"))]
 async fn databases_for_mysql_should_work(api: &TestApi) -> crate::TestResult {
     setup(&api.barrel(), api.db_name()).await?;
 
