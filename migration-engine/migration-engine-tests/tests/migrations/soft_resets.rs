@@ -138,7 +138,7 @@ async fn soft_resets_work_on_sql_server(api: TestApi) -> TestResult {
         let create_user = r#"
             USE [resetTest];
 
-            IF EXISTS (SELECT loginname from dbo.syslogins 
+            IF EXISTS (SELECT loginname from dbo.syslogins
                 WHERE name = 'softresetstestuser')
             BEGIN
                 DROP LOGIN softresetstestuser;

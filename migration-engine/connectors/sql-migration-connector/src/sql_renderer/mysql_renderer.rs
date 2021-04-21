@@ -1,7 +1,4 @@
-use super::{
-    common::{render_nullability, Quoted, SQL_INDENTATION},
-    IteratorJoin, SqlRenderer,
-};
+use super::{common::Quoted, IteratorJoin, SqlRenderer};
 use crate::{
     flavour::{MysqlFlavour, MYSQL_IDENTIFIER_SIZE_LIMIT},
     pair::Pair,
@@ -22,37 +19,25 @@ use sql_schema_describer::{
 use std::borrow::Cow;
 
 impl MysqlFlavour {
-    fn render_column(&self, column: &ColumnWalker<'_>) -> String {
-        let column_name = self.quote(column.name());
-        let tpe_str = render_column_type(&column);
-        let nullability_str = render_nullability(&column);
-        let default_str = column
-            .default()
-            .filter(|default| {
-                !matches!(default.kind(),  DefaultKind::Sequence(_))
-                    // We do not want to render JSON defaults because they are not supported by MySQL.
-                    && !matches!(column.column_type_family(), ColumnTypeFamily::Json)
-                    // We do not want to render binary defaults because they are not supported by MySQL.
-                    && !matches!(column.column_type_family(), ColumnTypeFamily::Binary)
-            })
-            .map(|default| format!(" DEFAULT {}", render_default(column, default)))
-            .unwrap_or_else(String::new);
-        let foreign_key = column.table().foreign_key_for_column(column.name());
-        let auto_increment_str = if column.is_autoincrement() {
-            " AUTO_INCREMENT"
-        } else {
-            ""
-        };
-
-        match foreign_key {
-            Some(_) => format!(
-                "{}{} {}{}{}",
-                SQL_INDENTATION, column_name, tpe_str, nullability_str, default_str
-            ),
-            None => format!(
-                "{}{} {}{}{}{}",
-                SQL_INDENTATION, column_name, tpe_str, nullability_str, default_str, auto_increment_str
-            ),
+    fn render_column<'a>(&self, col: &ColumnWalker<'a>) -> ddl::Column<'a> {
+        ddl::Column {
+            column_name: col.name().into(),
+            not_null: col.arity().is_required(),
+            column_type: render_column_type(&col),
+            default: col
+                .default()
+                .filter(|default| {
+                    !matches!(default.kind(),  DefaultKind::Sequence(_))
+                    // We do not want to render JSON defaults because
+                    // they are not supported by MySQL.
+                    && !matches!(col.column_type_family(), ColumnTypeFamily::Json)
+                    // We do not want to render binary defaults because
+                    // they are not supported by MySQL.
+                    && !matches!(col.column_type_family(), ColumnTypeFamily::Binary)
+                })
+                .map(|default| render_default(&col, default)),
+            auto_increment: col.is_autoincrement(),
+            ..Default::default()
         }
     }
 }
@@ -205,49 +190,31 @@ impl SqlRenderer for MysqlFlavour {
     }
 
     fn render_create_table_as(&self, table: &TableWalker<'_>, table_name: &str) -> String {
-        let columns: String = table.columns().map(|column| self.render_column(&column)).join(",\n");
-
-        let primary_columns = table.primary_key_column_names();
-
-        let primary_key = if let Some(primary_columns) = primary_columns.as_ref().filter(|cols| !cols.is_empty()) {
-            let column_names = primary_columns.iter().map(|col| self.quote(&col)).join(",");
-            format!(",\n\n{}PRIMARY KEY ({})", SQL_INDENTATION, column_names)
-        } else {
-            String::new()
-        };
-
-        let indexes = if table.indexes().next().is_some() {
-            let indices: String = table
+        ddl::CreateTable {
+            table_name: table_name.into(),
+            columns: table.columns().map(|col| self.render_column(&col)).collect(),
+            indexes: table
                 .indexes()
-                .map(|index| {
-                    let tpe = if index.index_type().is_unique() { "UNIQUE " } else { "" };
-                    let index_name = if index.name().len() > MYSQL_IDENTIFIER_SIZE_LIMIT {
-                        &index.name()[0..MYSQL_IDENTIFIER_SIZE_LIMIT]
+                .map(move |index| ddl::IndexClause {
+                    index_name: if index.name().len() > MYSQL_IDENTIFIER_SIZE_LIMIT {
+                        Some(Cow::Borrowed(&index.name()[0..MYSQL_IDENTIFIER_SIZE_LIMIT]))
                     } else {
-                        &index.name()
-                    };
-
-                    format!(
-                        "{}INDEX {}({})",
-                        tpe,
-                        self.quote(&index_name),
-                        index.columns().map(|col| self.quote(col.name())).join(", ")
-                    )
+                        Some(Cow::Borrowed(&index.name()))
+                    },
+                    unique: index.index_type().is_unique(),
+                    columns: index.column_names().iter().map(Cow::from).collect(),
                 })
-                .join(",\n");
-
-            format!(",\n{}", indices)
-        } else {
-            String::new()
-        };
-
-        format!(
-            "CREATE TABLE {} (\n{columns}{indexes}{primary_key}\n) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci",
-            table_name = self.quote(table_name),
-            columns = columns,
-            indexes = indexes,
-            primary_key = primary_key,
-        )
+                .collect(),
+            primary_key: table
+                .primary_key_column_names()
+                .unwrap_or_default()
+                .iter()
+                .map(|s| Cow::Borrowed(s.as_str()))
+                .collect(),
+            default_character_set: Some("utf8mb4".into()),
+            collate: Some("utf8mb4_unicode_ci".into()),
+        }
+        .to_string()
     }
 
     fn render_drop_and_recreate_index(&self, indexes: Pair<&IndexWalker<'_>>) -> Vec<String> {
