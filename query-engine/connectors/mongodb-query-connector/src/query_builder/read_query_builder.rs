@@ -1,3 +1,4 @@
+use super::logger::*;
 use crate::{
     cursor::{CursorBuilder, CursorData},
     filter::convert_filter,
@@ -23,6 +24,7 @@ pub enum MongoReadQuery {
 
 impl MongoReadQuery {
     pub async fn execute(self, on_collection: Collection) -> crate::Result<Vec<Document>> {
+        log_query(on_collection.name(), &self);
         match self {
             MongoReadQuery::Find(q) => q.execute(on_collection).await,
             MongoReadQuery::Pipeline(q) => q.execute(on_collection).await,
@@ -31,7 +33,7 @@ impl MongoReadQuery {
 }
 
 pub struct PipelineQuery {
-    stages: Vec<Document>,
+    pub(crate) stages: Vec<Document>,
 }
 
 impl PipelineQuery {
@@ -44,8 +46,8 @@ impl PipelineQuery {
 }
 
 pub struct FindQuery {
-    filter: Option<Document>,
-    options: FindOptions,
+    pub(crate) filter: Option<Document>,
+    pub(crate) options: FindOptions,
 }
 
 impl FindQuery {

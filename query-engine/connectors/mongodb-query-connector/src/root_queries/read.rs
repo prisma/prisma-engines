@@ -1,6 +1,6 @@
 use super::*;
 use crate::{
-    filter::convert_filter, read_query_builder::MongoReadQueryBuilder, vacuum_cursor, BsonTransform, IntoBson,
+    filter::convert_filter, query_builder::MongoReadQueryBuilder, vacuum_cursor, BsonTransform, IntoBson,
 };
 use connector_interface::{Filter, QueryArguments, RelAggregationSelection};
 use mongodb::Database;

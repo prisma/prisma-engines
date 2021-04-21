@@ -1,4 +1,4 @@
-use crate::{read_query_builder::MongoReadQueryBuilder, value::value_from_bson};
+use crate::{query_builder::MongoReadQueryBuilder, value::value_from_bson};
 use connector_interface::*;
 use mongodb::{bson::Document, Database};
 use prisma_models::prelude::*;

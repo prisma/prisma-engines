@@ -7,7 +7,7 @@ mod interface;
 mod join;
 mod orderby;
 mod projection;
-mod read_query_builder;
+mod query_builder;
 mod root_queries;
 mod value;
 
