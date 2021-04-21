@@ -98,6 +98,10 @@ dev-mariadb: start-mysql_mariadb
 
 start-vitess:
 	docker-compose -f vitess/docker-compose.yml up -d --remove-orphans
+<<<<<<< HEAD
+=======
+	echo 'vitess' > current_connector
+>>>>>>> 5fab4e14d (Correct current_connector setup)
 
 dev-vitess: start-vitess
 	echo 'vitess' > current_connector
