@@ -35,7 +35,7 @@ impl TestApi {
 
         let connection_string = (args.url_fn)(db_name);
 
-        let database = if tags.contains(Tags::Vitess57) {
+        let database = if tags.intersects(Tags::Vitess) {
             let me = SqlMigrationConnector::new(&connection_string, BitFlags::empty(), None)
                 .await
                 .unwrap();
@@ -200,7 +200,7 @@ impl TestApi {
     }
 
     pub fn db_name(&self) -> &str {
-        if self.tags().contains(Tags::Vitess57) {
+        if self.tags().intersects(Tags::Vitess) {
             "test"
         } else {
             self.db_name

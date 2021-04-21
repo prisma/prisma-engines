@@ -17,6 +17,8 @@ pub enum Tags {
     Postgres12 = 0x200,
     Mssql = 0x400,
     Vitess57 = 0x800,
+    Vitess80 = 0x1000,
+    Vitess = 0x2000,
 }
 
 impl Tags {
@@ -61,6 +63,8 @@ static TAG_NAMES: Lazy<Vec<(&str, BitFlags<Tags>)>> = Lazy::new(|| {
         ("postgres_12", Tags::Postgres12.into()),
         ("sql", Tags::Mysql | Tags::Postgres | Tags::Sqlite | Tags::Mssql),
         ("sqlite", Tags::Sqlite.into()),
+        ("vitess", Tags::Vitess.into()),
         ("vitess_5_7", Tags::Vitess57.into()),
+        ("vitess_8_0", Tags::Vitess80.into()),
     ]
 });

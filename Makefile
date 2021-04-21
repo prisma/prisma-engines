@@ -120,6 +120,9 @@ dev-mongodb: start-mongodb
 start-vitess_5_7:
 	docker-compose -f docker-compose.yml up -d --remove-orphans vitess-test-5_7 vitess-shadow-5_7
 
+start-vitess_8_0:
+	docker-compose -f docker-compose.yml up -d --remove-orphans vitess-test-8_0 vitess-shadow-8_0
+
 dev-down:
 	docker-compose -f docker-compose.yml down -v --remove-orphans
 
