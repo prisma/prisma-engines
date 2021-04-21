@@ -45,7 +45,7 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             target
-          key: introspection-engine-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          key: introspection-engine-${{ runner.os }}-${{ matrix.database}}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - run: cargo test ${{ matrix.database }}
         if: ${{ matrix.database != 'vitess_5_7' && matrix.database != 'vitess_8_0' }}
