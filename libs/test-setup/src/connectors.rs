@@ -15,7 +15,7 @@ use once_cell::sync::Lazy;
 
 static SKIP_CONNECTORS: Lazy<HashSet<String>> = Lazy::new(|| {
     std::env::var("SKIP_CONNECTORS")
-        .map(|s| s.split(",").map(ToString::to_string).collect())
+        .map(|s| s.split(',').map(ToString::to_string).collect())
         .unwrap_or_else(|_| HashSet::new())
 });
 
