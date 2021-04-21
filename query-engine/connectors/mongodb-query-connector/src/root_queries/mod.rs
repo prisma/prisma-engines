@@ -1,11 +1,11 @@
+//! Top level queries to satisfy the connector interface operations.
 pub mod aggregate;
 pub mod read;
 pub mod write;
 
 use crate::value::value_from_bson;
-use futures::stream::StreamExt;
 use mongodb::bson::Bson;
-use mongodb::{bson::Document, Cursor};
+use mongodb::bson::Document;
 use prisma_models::*;
 
 /// Transforms a document to a `Record`, fields ordered as defined in `fields`.
@@ -20,18 +20,4 @@ fn document_to_record(mut doc: Document, fields: &[String]) -> crate::Result<Rec
     }
 
     Ok(Record::new(values))
-}
-
-/// Consumes a cursor stream until exhausted.
-async fn vacuum_cursor(mut cursor: Cursor) -> crate::Result<Vec<Document>> {
-    let mut docs = vec![];
-
-    while let Some(result) = cursor.next().await {
-        match result {
-            Ok(document) => docs.push(document),
-            Err(e) => return Err(e.into()),
-        }
-    }
-
-    Ok(docs)
 }

@@ -7,13 +7,18 @@ mod interface;
 mod join;
 mod orderby;
 mod projection;
-mod queries;
-mod query_arguments;
+mod query_builder;
+mod root_queries;
 mod value;
 
 use error::MongoError;
+use futures::stream::StreamExt;
+use mongodb::{
+    bson::{Bson, Document},
+    Cursor,
+};
+
 pub use interface::*;
-use mongodb::bson::{Bson, Document};
 
 type Result<T> = std::result::Result<T, MongoError>;
 
@@ -36,4 +41,19 @@ impl BsonTransform for Bson {
             })
         }
     }
+}
+
+// Todo: Move to approriate place
+/// Consumes a cursor stream until exhausted.
+async fn vacuum_cursor(mut cursor: Cursor) -> crate::Result<Vec<Document>> {
+    let mut docs = vec![];
+
+    while let Some(result) = cursor.next().await {
+        match result {
+            Ok(document) => docs.push(document),
+            Err(e) => return Err(e.into()),
+        }
+    }
+
+    Ok(docs)
 }

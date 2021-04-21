@@ -1,5 +1,4 @@
-use super::vacuum_cursor;
-use crate::{query_arguments::MongoQueryArgs, value::value_from_bson};
+use crate::{query_builder::MongoReadQueryBuilder, value::value_from_bson};
 use connector_interface::*;
 use mongodb::{bson::Document, Database};
 use prisma_models::prelude::*;
@@ -13,14 +12,60 @@ pub async fn aggregate(
     having: Option<Filter>,
 ) -> crate::Result<Vec<AggregationRow>> {
     let coll = database.collection(&model.db_name());
-    let mongo_args = MongoQueryArgs::new(query_arguments)?
+    let query = MongoReadQueryBuilder::from_args(query_arguments)?
         .with_groupings(group_by, &selections)
-        .with_having(having)?;
+        .with_having(having)?
+        .build()?;
 
-    let cursor = mongo_args.find_documents(coll).await?;
-    let docs = vacuum_cursor(cursor).await?;
+    let docs = query.execute(coll).await?;
+    if docs.is_empty() {
+        Ok(empty_aggregation(selections))
+    } else {
+        to_aggregation_rows(docs, selections)
+    }
+}
 
-    to_aggregation_rows(docs, selections)
+fn empty_aggregation(selections: Vec<AggregationSelection>) -> Vec<AggregationRow> {
+    let mut row = vec![];
+
+    for selection in selections.iter() {
+        match selection {
+            AggregationSelection::Field(f) => {
+                row.push(AggregationResult::Field(f.clone(), PrismaValue::Null));
+            }
+            AggregationSelection::Count { all, fields } => {
+                if *all {
+                    row.push(AggregationResult::Count(None, PrismaValue::Int(0)));
+                } else {
+                    for field in fields {
+                        row.push(AggregationResult::Count(Some(field.clone()), PrismaValue::Int(0)));
+                    }
+                }
+            }
+            AggregationSelection::Average(fields) => {
+                for field in fields {
+                    row.push(AggregationResult::Average(field.clone(), PrismaValue::Null));
+                }
+            }
+            AggregationSelection::Sum(fields) => {
+                for field in fields {
+                    row.push(AggregationResult::Sum(field.clone(), PrismaValue::Null));
+                }
+            }
+            AggregationSelection::Min(fields) => {
+                for field in fields {
+                    row.push(AggregationResult::Min(field.clone(), PrismaValue::Null));
+                }
+            }
+            AggregationSelection::Max(fields) => {
+                for field in fields {
+                    row.push(AggregationResult::Max(field.clone(), PrismaValue::Null));
+                }
+            }
+        };
+    }
+
+    vec![row]
 }
 
 fn to_aggregation_rows(
@@ -47,12 +92,11 @@ fn to_aggregation_rows(
                     if *all {
                         let field_val = value_from_bson(doc.remove("count_all").unwrap())?;
                         row.push(AggregationResult::Count(None, field_val));
-                    } else {
-                        for field in fields {
-                            let field_val =
-                                value_from_bson(doc.remove(&format!("count_{}", field.db_name())).unwrap())?;
-                            row.push(AggregationResult::Count(Some(field.clone()), field_val));
-                        }
+                    }
+
+                    for field in fields {
+                        let field_val = value_from_bson(doc.remove(&format!("count_{}", field.db_name())).unwrap())?;
+                        row.push(AggregationResult::Count(Some(field.clone()), field_val));
                     }
                 }
                 AggregationSelection::Average(fields) => {

@@ -1,22 +1,68 @@
+use super::logger::*;
 use crate::{
     cursor::{CursorBuilder, CursorData},
     filter::convert_filter,
     join::JoinStage,
     orderby::OrderByBuilder,
-    BsonTransform, IntoBson,
+    vacuum_cursor, BsonTransform, IntoBson,
 };
 use connector_interface::{AggregationSelection, Filter, QueryArguments};
 use itertools::Itertools;
 use mongodb::{
     bson::{doc, Bson, Document},
     options::{AggregateOptions, FindOptions},
-    Collection, Cursor,
+    Collection,
 };
-use prisma_models::{ModelProjection, ScalarFieldRef};
+use prisma_models::{ModelProjection, ModelRef, ScalarFieldRef};
+
+/// Ergonomics wrapper for query execution and logging.
+/// Todo: Add all other queries gradually.
+pub enum MongoReadQuery {
+    Find(FindQuery),
+    Pipeline(PipelineQuery),
+}
+
+impl MongoReadQuery {
+    pub async fn execute(self, on_collection: Collection) -> crate::Result<Vec<Document>> {
+        log_query(on_collection.name(), &self);
+        match self {
+            MongoReadQuery::Find(q) => q.execute(on_collection).await,
+            MongoReadQuery::Pipeline(q) => q.execute(on_collection).await,
+        }
+    }
+}
+
+pub struct PipelineQuery {
+    pub(crate) stages: Vec<Document>,
+}
+
+impl PipelineQuery {
+    pub async fn execute(self, on_collection: Collection) -> crate::Result<Vec<Document>> {
+        let opts = AggregateOptions::builder().allow_disk_use(true).build();
+        let cursor = on_collection.aggregate(self.stages, opts).await?;
+
+        Ok(vacuum_cursor(cursor).await?)
+    }
+}
+
+pub struct FindQuery {
+    pub(crate) filter: Option<Document>,
+    pub(crate) options: FindOptions,
+}
+
+impl FindQuery {
+    pub async fn execute(self, on_collection: Collection) -> crate::Result<Vec<Document>> {
+        let cursor = on_collection.find(self.filter, self.options).await?;
+
+        Ok(vacuum_cursor(cursor).await?)
+    }
+}
 
 /// Translated query arguments ready to use in mongo find or aggregation queries.
-#[derive(Debug, Default)]
-pub(crate) struct MongoQueryArgs {
+#[derive(Debug)]
+pub(crate) struct MongoReadQueryBuilder {
+    pub(crate) model: ModelRef,
+
     /// Pre-join, "normal" filters.
     pub(crate) query: Option<Document>,
 
@@ -27,7 +73,7 @@ pub(crate) struct MongoQueryArgs {
     /// or aggregations added the required data to execute them.
     pub(crate) join_filters: Vec<Document>,
 
-    /// Aggregation stages.
+    /// Aggregation-related stages.
     pub(crate) aggregations: Vec<Document>,
 
     /// Filters that can only be applied after the aggregations
@@ -65,8 +111,28 @@ pub(crate) struct MongoQueryArgs {
     pub(crate) is_group_by_query: bool,
 }
 
-impl MongoQueryArgs {
-    pub(crate) fn new(args: QueryArguments) -> crate::Result<MongoQueryArgs> {
+impl MongoReadQueryBuilder {
+    pub fn _new(model: ModelRef) -> Self {
+        Self {
+            model,
+            query: None,
+            joins: vec![],
+            join_filters: vec![],
+            aggregations: vec![],
+            aggregation_filters: vec![],
+            order_builder: None,
+            order: None,
+            order_joins: vec![],
+            cursor_builder: None,
+            cursor_data: None,
+            skip: None,
+            limit: None,
+            projection: None,
+            is_group_by_query: false,
+        }
+    }
+
+    pub(crate) fn from_args(args: QueryArguments) -> crate::Result<MongoReadQueryBuilder> {
         let reverse_order = args.take.map(|t| t < 0).unwrap_or(false);
         let order_by = args.order_by;
 
@@ -92,7 +158,8 @@ impl MongoQueryArgs {
             None => None,
         };
 
-        Ok(MongoQueryArgs {
+        Ok(MongoReadQueryBuilder {
+            model: args.model,
             query,
             join_filters: post_filters,
             joins,
@@ -100,55 +167,64 @@ impl MongoQueryArgs {
             cursor_builder,
             skip: skip(args.skip, args.ignore_skip),
             limit: take(args.take, args.ignore_take),
-            ..Default::default()
+            aggregations: vec![],
+            aggregation_filters: vec![],
+            order: None,
+            order_joins: vec![],
+            cursor_data: None,
+            projection: None,
+            is_group_by_query: false,
         })
     }
 
-    /// Turns the query args into a find operation on the collection.
-    /// Depending on the arguments, either an aggregation pipeline or a plain query is build and run.
-    pub(crate) async fn find_documents(mut self, coll: Collection) -> crate::Result<Cursor> {
+    /// Finalizes the builder and builds a `MongoQuery`.
+    pub(crate) fn build(mut self) -> crate::Result<MongoReadQuery> {
         self.finalize()?;
 
+        // Depending on the builder contents, either an
+        // aggregation pipeline or a plain query is build.
         if self.joins.is_empty()
             && self.order_joins.is_empty()
             && self.aggregations.is_empty()
             && self.cursor_data.is_none()
         {
-            self.execute_find_query(coll).await
+            Ok(self.build_find_query())
         } else {
-            self.execute_pipeline_query(coll).await
+            Ok(self.build_pipeline_query())
         }
     }
 
-    /// Simplest form of find-documents query.
-    /// Todo: Find out if always using aggregation pipeline is a good idea.
-    async fn execute_find_query(self, coll: Collection) -> crate::Result<Cursor> {
-        let find_options = FindOptions::builder()
+    // Todo: Find out if always using aggregation pipeline is a good idea.
+    /// Simplest form of find-documents query: `coll.find(filter, opts)`.
+    fn build_find_query(self) -> MongoReadQuery {
+        let options = FindOptions::builder()
             .projection(self.projection)
             .limit(self.limit)
             .skip(self.skip)
             .sort(self.order)
             .build();
 
-        Ok(coll.find(self.query, find_options).await?)
+        MongoReadQuery::Find(FindQuery {
+            filter: self.query,
+            options,
+        })
     }
 
-    async fn execute_pipeline_query(self, coll: Collection) -> crate::Result<Cursor> {
-        if self.cursor_data.is_none() {
-            self.execute_pipeline_internal(coll).await
+    /// Aggregation-pipeline based query. A distinction must be made between cursored and uncursored queries,
+    /// as they require different stage shapes (see individual fns for details).
+    fn build_pipeline_query(self) -> MongoReadQuery {
+        let stages = if self.cursor_data.is_none() {
+            self.flat_pipeline_stages()
         } else {
-            self.execute_cursored_internal(coll).await
-        }
+            self.cursored_pipeline_stages()
+        };
+
+        MongoReadQuery::Pipeline(PipelineQuery { stages })
     }
 
-    /// Pipeline not requiring a cursor.
-    async fn execute_pipeline_internal(self, coll: Collection) -> crate::Result<Cursor> {
-        let opts = AggregateOptions::builder().allow_disk_use(true).build();
-        let stages = self.into_pipeline_stages();
-
-        dbg!(&stages);
-
-        Ok(coll.aggregate(stages, opts).await?)
+    /// Pipeline not requiring a cursor. Flat `coll.aggregate(stages, opts)` query.
+    fn flat_pipeline_stages(self) -> Vec<Document> {
+        self.into_pipeline_stages()
     }
 
     fn into_pipeline_stages(self) -> Vec<Document> {
@@ -228,7 +304,7 @@ impl MongoQueryArgs {
     /// Pipeline query with a cursor. Requires special building to form a query that first
     /// pins a cursor and then builds cursor conditions based on that cursor document
     /// and the orderings that the query defined.
-    /// The query has the form:
+    /// The stages have the form:
     /// ```text
     /// testModel.aggregate([
     ///     { $match: { <filter finding exactly one document (cursor doc)> }},
@@ -247,8 +323,8 @@ impl MongoQueryArgs {
     /// actually join anything.
     ///
     /// Todo concrete example
-    async fn execute_cursored_internal(mut self, coll: Collection) -> crate::Result<Cursor> {
-        let opts = AggregateOptions::builder().allow_disk_use(true).build();
+    fn cursored_pipeline_stages(mut self) -> Vec<Document> {
+        let coll_name = self.model.db_name().to_owned();
         let cursor_data = self.cursor_data.take().unwrap();
 
         // For now we assume that simply putting the cursor condition into the join conditions is enough
@@ -281,7 +357,7 @@ impl MongoQueryArgs {
 
         outer_stages.push(doc! {
             "$lookup": {
-                "from": coll.name(),
+                "from": coll_name,
                 "let": cursor_data.bindings,
                 "pipeline": inner_stages,
                 "as": "cursor_inner",
@@ -291,7 +367,7 @@ impl MongoQueryArgs {
         outer_stages.push(doc! { "$unwind": "$cursor_inner" });
         outer_stages.push(doc! { "$replaceRoot": { "newRoot": "$cursor_inner" } });
 
-        Ok(coll.aggregate(outer_stages, opts).await?)
+        outer_stages
     }
 
     /// Adds a final projection onto the fields specified by the `ModelProjection`.
@@ -319,37 +395,86 @@ impl MongoQueryArgs {
 
         let mut grouping_stage = doc! { "_id": grouping };
 
+        // Needed for field-count aggregations
+        let mut project_stage = doc! {};
+
+        let requires_projection = aggregations
+            .iter()
+            .any(|a| matches!(a, AggregationSelection::Count { all: _, fields } if !fields.is_empty()));
+
         for selection in aggregations {
             match selection {
                 AggregationSelection::Field(_) => (),
                 AggregationSelection::Count { all, fields } => {
                     if *all {
                         grouping_stage.insert("count_all", doc! { "$sum": 1 });
+                        project_stage.insert("count_all", Bson::Int64(1));
                     }
 
-                    let pairs = aggregation_pairs("count", fields);
+                    // MongoDB requires a different construct for counting on fields.
+                    // First, we push them into an array and then, in a separate project stage,
+                    // we count the number of items in the array.
+                    let pairs = aggregation_pairs("push", fields);
                     grouping_stage.extend(pairs);
+
+                    let grouping_pairs = count_field_pairs(fields);
+                    let projection_pairs = grouping_pairs
+                        .iter()
+                        .map(|(a, _)| (a.clone(), doc! { "$sum": format!("${}", a) }.into()))
+                        .collect_vec();
+
+                    grouping_stage.extend(grouping_pairs);
+                    project_stage.extend(projection_pairs);
                 }
                 AggregationSelection::Average(fields) => {
-                    let pairs = aggregation_pairs("avg", fields);
-                    grouping_stage.extend(pairs);
+                    let grouping_pairs = aggregation_pairs("avg", fields);
+                    let projection_pairs = grouping_pairs
+                        .iter()
+                        .map(|(a, _)| (a.clone(), Bson::Int64(1)))
+                        .collect_vec();
+
+                    grouping_stage.extend(grouping_pairs);
+                    project_stage.extend(projection_pairs);
                 }
                 AggregationSelection::Sum(fields) => {
-                    let pairs = aggregation_pairs("sum", fields);
-                    grouping_stage.extend(pairs);
+                    let grouping_pairs = aggregation_pairs("sum", fields);
+                    let projection_pairs = grouping_pairs
+                        .iter()
+                        .map(|(a, _)| (a.clone(), Bson::Int64(1)))
+                        .collect_vec();
+
+                    grouping_stage.extend(grouping_pairs);
+                    project_stage.extend(projection_pairs);
                 }
                 AggregationSelection::Min(fields) => {
-                    let pairs = aggregation_pairs("min", fields);
-                    grouping_stage.extend(pairs);
+                    let grouping_pairs = aggregation_pairs("min", fields);
+                    let projection_pairs = grouping_pairs
+                        .iter()
+                        .map(|(a, _)| (a.clone(), Bson::Int64(1)))
+                        .collect_vec();
+
+                    grouping_stage.extend(grouping_pairs);
+                    project_stage.extend(projection_pairs);
                 }
                 AggregationSelection::Max(fields) => {
-                    let pairs = aggregation_pairs("max", fields);
-                    grouping_stage.extend(pairs);
+                    let grouping_pairs = aggregation_pairs("max", fields);
+                    let projection_pairs = grouping_pairs
+                        .iter()
+                        .map(|(a, _)| (a.clone(), Bson::Int64(1)))
+                        .collect_vec();
+
+                    grouping_stage.extend(grouping_pairs);
+                    project_stage.extend(projection_pairs);
                 }
             }
         }
 
         self.aggregations.push(doc! { "$group": grouping_stage });
+
+        if requires_projection {
+            self.aggregations.push(doc! { "$project": project_stage });
+        }
+
         self
     }
 
@@ -363,6 +488,7 @@ impl MongoQueryArgs {
         Ok(self)
     }
 
+    /// Runs last transformations on `self` to execute steps dependent on base args.
     fn finalize(&mut self) -> crate::Result<()> {
         // Cursor building depends on the ordering, so it must come first.
         if let Some(order_builder) = self.order_builder.take() {
@@ -384,6 +510,22 @@ impl MongoQueryArgs {
 
 /// Utilities below ///
 
+/// Produces pairs like `("count_fieldName", { "$sum": "$fieldName" })`.
+/// Important: Only valid for field-level count aggregations.
+fn count_field_pairs(fields: &[ScalarFieldRef]) -> Vec<(String, Bson)> {
+    fields
+        .iter()
+        .map(|field| {
+            (
+                format!("count_{}", field.db_name()),
+                doc! { "$push": { "$cond": { "if": format!("${}", field.db_name()), "then": 1, "else": 0 }}}.into(),
+            )
+        })
+        .collect()
+}
+
+/// Produces pairs like `("sum_fieldName", { "$sum": "$fieldName" })`.
+/// Important: Only valid for non-count aggregations.
 fn aggregation_pairs(op: &str, fields: &[ScalarFieldRef]) -> Vec<(String, Bson)> {
     fields
         .iter()

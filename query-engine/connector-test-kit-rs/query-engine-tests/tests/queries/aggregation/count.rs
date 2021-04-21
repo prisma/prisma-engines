@@ -2,9 +2,7 @@ use query_engine_tests::*;
 
 #[test_suite(schema(schemas::common_nullable_types))]
 mod aggregation_count {
-
-    // TODO: remove exclude once fixed for mongo
-    #[connector_test(exclude(MongoDb))]
+    #[connector_test]
     async fn count_no_records(runner: &Runner) -> TestResult<()> {
         insta::assert_snapshot!(
             run_query!(runner, "query { aggregateTestModel { count { _all } } }"),
@@ -14,8 +12,7 @@ mod aggregation_count {
         Ok(())
     }
 
-    // TODO: remove exclude once fixed for mongo
-    #[connector_test(exclude(MongoDb))]
+    #[connector_test]
     async fn count_nullable_fields(runner: &Runner) -> TestResult<()> {
         create_row(runner, r#"{ id: 1, string: "test1" }"#).await?;
         create_row(runner, r#"{ id: 2, int: 1 }"#).await?;

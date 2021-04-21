@@ -2,9 +2,7 @@ use query_engine_tests::*;
 
 #[test_suite(schema(schemas::common_numeric_types))]
 mod aggregation_avg {
-
-    // TODO: remove exclude once fixed for mongo
-    #[connector_test(exclude(MongoDb))]
+    #[connector_test]
     async fn avg_no_records(runner: &Runner) -> TestResult<()> {
         insta::assert_snapshot!(
             run_query!(
@@ -17,8 +15,7 @@ mod aggregation_avg {
         Ok(())
     }
 
-    // TODO: remove exclude once fixed for mongo
-    #[connector_test(exclude(MongoDb))]
+    #[connector_test]
     async fn avg_some_records(runner: &Runner) -> TestResult<()> {
         create_row(runner, r#"{ id: 1, float: 5.5, int: 5, decimal: "5.5", bInt: "5" }"#).await?;
         create_row(runner, r#"{ id: 2, float: 4.5, int: 10, decimal: "4.5", bInt: "10" }"#).await?;
@@ -34,7 +31,7 @@ mod aggregation_avg {
         Ok(())
     }
 
-    // TODO: remove exclude once fixed for mongo
+    /// [MONGO TODO]: Decimal precision issue
     #[connector_test(exclude(MongoDb))]
     async fn avg_with_all_sorts_of_query_args(runner: &Runner) -> TestResult<()> {
         create_row(runner, r#"{ id: 1, float: 5.5, int: 5, decimal: "5.5", bInt: "5" }"#).await?;
