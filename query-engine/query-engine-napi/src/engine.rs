@@ -47,8 +47,18 @@ struct EngineDatamodel {
 pub struct EngineBuilder {
     datamodel: EngineDatamodel,
     config: ValidatedConfiguration,
-    logger: ChannelLogger,
+    logging: LoggingOptions,
     config_dir: PathBuf,
+}
+
+#[derive(Clone)]
+pub enum LoggingOptions {
+    Builder {
+        telemetry: TelemetryOptions,
+        log_callback: ThreadsafeFunction<String>,
+        log_level: LevelFilter,
+    },
+    Logger(ChannelLogger),
 }
 
 /// Internal structure for querying and reconnecting with the engine.
@@ -96,7 +106,7 @@ pub struct ConstructorOptions {
     config_dir: PathBuf,
 }
 
-#[derive(Debug, Deserialize, Default)]
+#[derive(Clone, Debug, Deserialize, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct TelemetryOptions {
     enabled: bool,
@@ -113,6 +123,13 @@ where
 
 impl QueryEngine {
     /// Parse a validated datamodel and configuration to allow connecting later on.
+    ///
+    /// Here we can't do anything runtime-specific, especially logging with
+    /// telemetry which causes trouble if we have no runtime enabled...
+    ///
+    /// JavaScript constructors can't be async, so we manage a proper workflow
+    /// with an event machine that can be either a builder or a connected
+    /// engine.
     pub fn new(opts: ConstructorOptions, log_callback: ThreadsafeFunction<String>) -> crate::Result<Self> {
         set_panic_hook();
 
@@ -143,16 +160,18 @@ impl QueryEngine {
             datasource_overrides: overrides,
         };
 
-        let logger = if telemetry.enabled {
-            ChannelLogger::new_with_telemetry(log_callback, telemetry.endpoint)
-        } else {
-            ChannelLogger::new(log_level, log_callback)
+        // Do not start logger yet. If the telemetry is enabled, it'll run tonic
+        // grpc server that panics when it cannot find a runtime.
+        let logging = LoggingOptions::Builder {
+            telemetry,
+            log_callback,
+            log_level,
         };
 
         let builder = EngineBuilder {
             config,
             datamodel,
-            logger,
+            logging,
             config_dir,
         };
 
@@ -167,13 +186,32 @@ impl QueryEngine {
 
         match *inner {
             Inner::Builder(ref builder) => {
-                let engine = builder
-                    .logger
+                // Either use the already initialized logger, or initialize one
+                // now when we know we have started the Tokio in the N-API code.
+                let logger = match builder.logging.clone() {
+                    LoggingOptions::Builder {
+                        telemetry,
+                        log_callback,
+                        log_level,
+                    } => {
+                        if telemetry.enabled {
+                            // Talks OTLP and to the JavaScript callback. Requires a runtime.
+                            ChannelLogger::new_with_telemetry(log_callback, telemetry.endpoint)
+                        } else {
+                            // Talks to the JavaScript callback. Doesn't require a runtime.
+                            ChannelLogger::new(log_level, log_callback)
+                        }
+                    }
+                    LoggingOptions::Logger(logger) => logger,
+                };
+
+                let engine = logger
                     .clone()
                     .with_logging(|| async move {
                         let template = DatamodelConverter::convert(&builder.datamodel.ast);
 
-                        // We only support one data source & generator at the moment, so take the first one (default not exposed yet).
+                        // We only support one data source at the moment, so
+                        // take the first one (default not exposed yet).
                         let data_source = builder
                             .config
                             .subject
@@ -203,7 +241,7 @@ impl QueryEngine {
                         Ok(ConnectedEngine {
                             datamodel: builder.datamodel.clone(),
                             query_schema: Arc::new(query_schema),
-                            logger: builder.logger.clone(),
+                            logger,
                             executor,
                             config,
                             config_dir: builder.config_dir.clone(),
@@ -234,7 +272,7 @@ impl QueryEngine {
 
                 let builder = EngineBuilder {
                     datamodel: engine.datamodel.clone(),
-                    logger: engine.logger.clone(),
+                    logging: LoggingOptions::Logger(engine.logger.clone()),
                     config,
                     config_dir: engine.config_dir.clone(),
                 };
