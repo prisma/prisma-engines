@@ -7,7 +7,10 @@ use connector::Connector;
 use std::str::FromStr;
 
 use datamodel::{
-    common::provider_names::{MSSQL_SOURCE_NAME, MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME},
+    common::{
+        preview_features::PreviewFeature,
+        provider_names::{MSSQL_SOURCE_NAME, MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME},
+    },
     Datasource,
 };
 use std::collections::HashMap;
@@ -23,14 +26,17 @@ use mongodb_connector::MongoDb;
 const DEFAULT_SQLITE_DB_NAME: &str = "main";
 
 #[tracing::instrument(name = "exec_loader", skip(source))]
-pub async fn load(source: &Datasource) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
+pub async fn load(
+    source: &Datasource,
+    features: &[PreviewFeature],
+) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
     match source.active_provider.as_str() {
         SQLITE_SOURCE_NAME => sqlite(source).await,
         MYSQL_SOURCE_NAME => mysql(source).await,
         POSTGRES_SOURCE_NAME => postgres(source).await,
 
         MSSQL_SOURCE_NAME => {
-            if !feature_flags::get().microsoftSqlServer {
+            if !features.contains(&PreviewFeature::MicrosoftSqlServer) {
                 let error = CoreError::UnsupportedFeatureError(
                     "Microsoft SQL Server (experimental feature, needs to be enabled)".into(),
                 );
@@ -43,7 +49,7 @@ pub async fn load(source: &Datasource) -> crate::Result<(String, Box<dyn QueryEx
 
         #[cfg(feature = "mongodb")]
         MONGODB_SOURCE_NAME => {
-            if !feature_flags::get().mongodb {
+            if !features.contains(&PreviewFeature::MongoDb) {
                 let error = CoreError::UnsupportedFeatureError(
                     "MongoDB query connector (experimental feature, needs to be enabled)".into(),
                 );

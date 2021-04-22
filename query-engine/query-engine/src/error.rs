@@ -1,6 +1,5 @@
 use connector::error::ConnectorError;
 use datamodel::diagnostics::Diagnostics;
-use feature_flags::FeatureFlagError;
 use graphql_parser::query::ParseError as GqlParseError;
 use query_core::CoreError;
 
@@ -41,9 +40,6 @@ pub enum PrismaError {
 
     #[error("{}", _0)]
     QueryConversionError(String),
-
-    #[error("{}", _0)]
-    FeatureError(String),
 }
 
 impl From<PrismaError> for user_facing_errors::Error {
@@ -153,11 +149,5 @@ impl From<GqlParseError> for PrismaError {
 impl From<ConnectorError> for PrismaError {
     fn from(e: ConnectorError) -> PrismaError {
         PrismaError::ConnectorError(Box::new(e))
-    }
-}
-
-impl From<FeatureFlagError> for PrismaError {
-    fn from(e: FeatureFlagError) -> Self {
-        PrismaError::FeatureError(e.to_string())
     }
 }

@@ -17,7 +17,6 @@ request-handlers = { path = "../../request-handlers" }
 tokio = "1.0"
 query-core = { path = "../../core" }
 datamodel = { path = "../../../libs/datamodel/core" }
-feature-flags = { path = "../../../libs/feature-flags" }
 thiserror = "1.0"
 async-trait = "0.1"
 nom = "6"

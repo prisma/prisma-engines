@@ -15,6 +15,7 @@ class QueryEngine extends FlatSpec with Matchers with ApiSpecBase {
         |
         |generator js {
         |  provider = "prisma-client-js"
+        |  previewFeatures = ["microsoftSqlServer", "mongodb", "orderByRelation", "napi", "selectRelationCount", "orderByAggregateGroup"]
         |}
         """.stripMargin
 

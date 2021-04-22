@@ -12,7 +12,6 @@ user-facing-errors = { path = "../../libs/user-facing-errors" }
 datamodel = { path = "../../libs/datamodel/core" }
 itertools = "0.8"
 graphql-parser = { git = "https://github.com/prisma/graphql-parser" }
-feature-flags = { path = "../../libs/feature-flags" }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1"
 futures = "0.3"

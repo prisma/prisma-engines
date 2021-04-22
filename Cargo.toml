@@ -23,7 +23,6 @@ members = [
   "query-engine/request-handlers",
   "prisma-fmt",
   "libs/datamodel/core",
-  "libs/feature-flags",
   "libs/json-rpc-stdio",
   "libs/native-types",
   "libs/prisma-inflector",

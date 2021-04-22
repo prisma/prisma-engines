@@ -974,6 +974,7 @@ dependencies = [
  "dml",
  "indoc",
  "itertools 0.8.2",
+ "lazy_static",
  "mongodb-datamodel-connector",
  "native-types",
  "once_cell",
@@ -1244,14 +1245,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ca5faf057445ce5c9d4329e382b2ce7ca38550ef3b73a5348362d5f24e0c7fe3"
 dependencies = [
  "instant",
-]
-
-[[package]]
-name = "feature-flags"
-version = "0.1.0"
-dependencies = [
- "once_cell",
- "thiserror",
 ]
 
 [[package]]
@@ -3431,7 +3424,6 @@ dependencies = [
  "crossbeam-queue",
  "datamodel",
  "datamodel-connector",
- "feature-flags",
  "futures 0.3.13",
  "im",
  "indexmap",
@@ -3468,7 +3460,6 @@ dependencies = [
  "datamodel",
  "datamodel-connector",
  "enumflags2",
- "feature-flags",
  "futures 0.3.13",
  "graphql-parser",
  "indexmap",
@@ -3515,7 +3506,6 @@ version = "0.1.0"
 dependencies = [
  "connection-string",
  "datamodel",
- "feature-flags",
  "napi",
  "napi-build",
  "napi-derive",
@@ -3577,7 +3567,6 @@ dependencies = [
  "datamodel",
  "datamodel-connector",
  "enum_dispatch",
- "feature-flags",
  "indoc",
  "itertools 0.10.0",
  "lazy_static",
@@ -3770,7 +3759,6 @@ dependencies = [
  "connection-string",
  "datamodel",
  "datamodel-connector",
- "feature-flags",
  "futures 0.3.13",
  "graphql-parser",
  "indexmap",

@@ -1,7 +1,8 @@
 use crate::common::parse_configuration;
 use crate::common::ErrorAsserts;
-use datamodel::common::preview_features::GENERATOR_PREVIEW_FEATURES;
+use datamodel::common::preview_features::GENERATOR;
 use datamodel::diagnostics::DatamodelError;
+use itertools::Itertools;
 
 #[test]
 fn serialize_generators_to_cmf() {
@@ -95,7 +96,7 @@ fn hidden_preview_features_setting_must_work() {
     let schema = r#"
         generator go {
             provider = "go"
-            previewFeatures = ["mongodb"]
+            previewFeatures = ["mongoDb"]
         }
     "#;
 
@@ -107,9 +108,9 @@ fn hidden_preview_features_setting_must_work() {
         "value": "go"
     },
     "output":null,
+    "config": {},
     "binaryTargets": [],
-    "previewFeatures": ["mongodb"],
-    "config": {}
+    "previewFeatures": ["mongoDb"]
   }
 ]"#;
 
@@ -202,7 +203,7 @@ fn nice_error_for_unknown_generator_preview_feature() {
     if let Err(diagnostics) = res {
         diagnostics.assert_is(DatamodelError::new_preview_feature_not_known_error(
             "foo",
-            Vec::from(GENERATOR_PREVIEW_FEATURES),
+            GENERATOR.active_features().iter().map(ToString::to_string).join(", "),
             datamodel::ast::Span::new(84, 91),
         ));
     } else {

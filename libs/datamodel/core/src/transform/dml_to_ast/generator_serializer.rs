@@ -27,7 +27,7 @@ impl GeneratorSerializer {
             let features: Vec<ast::Expression> = generator
                 .preview_features
                 .iter()
-                .map(|f| ast::Expression::StringValue(f.to_owned(), ast::Span::empty()))
+                .map(|f| ast::Expression::StringValue(f.to_string(), ast::Span::empty()))
                 .collect::<Vec<ast::Expression>>();
 
             arguments.push(ast::Argument::new_array("previewFeatures", features));

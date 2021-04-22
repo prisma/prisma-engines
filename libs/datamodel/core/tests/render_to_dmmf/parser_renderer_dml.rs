@@ -403,7 +403,6 @@ datasource db {
     {
         let config = parse_configuration(input_with_preview);
         let rendered = datamodel::render_datamodel_and_config_to_string(&Datamodel::new(), &config);
-        println!("{}", rendered);
         assert_eq!(rendered, input_with_preview);
     }
 }

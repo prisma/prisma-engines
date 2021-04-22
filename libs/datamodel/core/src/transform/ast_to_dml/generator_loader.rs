@@ -1,8 +1,12 @@
 use super::super::helpers::*;
-use crate::ast::Span;
-use crate::transform::ast_to_dml::common::validate_preview_features;
-use crate::StringFromEnvVar;
-use crate::{ast, configuration::Generator, diagnostics::*};
+use crate::{
+    ast::{self, Span},
+    common::preview_features::GENERATOR,
+    configuration::Generator,
+    diagnostics::*,
+    transform::ast_to_dml::common::parse_and_validate_preview_features,
+    StringFromEnvVar,
+};
 use std::collections::HashMap;
 
 const PROVIDER_KEY: &str = "provider";
@@ -106,18 +110,23 @@ impl GeneratorLoader {
             .get(PREVIEW_FEATURES_KEY)
             .or_else(|| args.get(EXPERIMENTAL_FEATURES_KEY));
 
-        let (preview_features, span) = match preview_features_arg {
+        let (raw_preview_features, span) = match preview_features_arg {
             Some(x) => (x.as_array().to_str_vec()?, x.span()),
             None => (Vec::new(), Span::empty()),
         };
 
-        if !preview_features.is_empty() {
-            let mut result = validate_preview_features(preview_features.clone(), span);
-            diagnostics.append(&mut result);
+        let preview_features = if !raw_preview_features.is_empty() {
+            let (features, mut diag) = parse_and_validate_preview_features(raw_preview_features, &GENERATOR, span);
+            diagnostics.append(&mut diag);
+
             if diagnostics.has_errors() {
                 return Err(diagnostics);
             }
-        }
+
+            features
+        } else {
+            vec![]
+        };
 
         for prop in &ast_generator.properties {
             let is_first_class_prop = FIRST_CLASS_PROPERTIES.iter().any(|k| *k == prop.name.name);

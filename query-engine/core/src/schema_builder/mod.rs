@@ -39,6 +39,7 @@ mod utils;
 
 use crate::schema::*;
 use cache::TypeRefCache;
+use datamodel::common::preview_features::PreviewFeature;
 use datamodel_connector::ConnectorCapabilities;
 use prisma_models::{Field as ModelField, Index, InternalDataModelRef, ModelRef, RelationFieldRef, TypeIdentifier};
 use std::sync::Arc;
@@ -63,6 +64,7 @@ pub(crate) struct BuilderContext {
     enable_raw_queries: bool,
     cache: TypeCache,
     capabilities: ConnectorCapabilities,
+    preview_features: Vec<PreviewFeature>,
     nested_create_inputs_queue: NestedInputsQueue,
     nested_update_inputs_queue: NestedInputsQueue,
 }
@@ -73,6 +75,7 @@ impl BuilderContext {
         internal_data_model: InternalDataModelRef,
         enable_raw_queries: bool,
         capabilities: ConnectorCapabilities,
+        preview_features: Vec<PreviewFeature>,
     ) -> Self {
         Self {
             mode,
@@ -80,9 +83,14 @@ impl BuilderContext {
             enable_raw_queries,
             cache: TypeCache::new(),
             capabilities,
+            preview_features,
             nested_create_inputs_queue: Vec::new(),
             nested_update_inputs_queue: Vec::new(),
         }
+    }
+
+    pub fn has_feature(&self, feature: &PreviewFeature) -> bool {
+        self.preview_features.contains(feature)
     }
 
     // Just here for convenience, will be removed soon.
@@ -149,8 +157,15 @@ pub fn build(
     mode: BuildMode,
     enable_raw_queries: bool,
     capabilities: ConnectorCapabilities,
+    preview_features: Vec<PreviewFeature>,
 ) -> QuerySchema {
-    let mut ctx = BuilderContext::new(mode, internal_data_model, enable_raw_queries, capabilities);
+    let mut ctx = BuilderContext::new(
+        mode,
+        internal_data_model,
+        enable_raw_queries,
+        capabilities,
+        preview_features,
+    );
     output_types::output_objects::initialize_model_object_type_cache(&mut ctx);
 
     let (query_type, query_object_ref) = output_types::query_type::build(&mut ctx);

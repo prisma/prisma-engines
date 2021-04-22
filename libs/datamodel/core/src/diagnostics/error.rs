@@ -78,7 +78,7 @@ pub enum DatamodelError {
   ShadowDatabaseUrlIsSameAsMainUrl { source_name: String, span: Span },
 
   #[error("The preview feature \"{}\" is not known. Expected one of: {}", preview_feature, expected_preview_features)]
-  PreviewFeatureNotKnownError { preview_feature: String, expected_preview_features: String,  span: Span },
+  PreviewFeatureNotKnownError { preview_feature: String, expected_preview_features: String, span: Span },
 
   #[error("\"{}\" is not a valid value for {}.", raw_value, literal_type)]
   LiteralParseError { literal_type: String, raw_value: String, span: Span },
@@ -363,8 +363,8 @@ impl DatamodelError {
     DatamodelError::ShadowDatabaseUrlIsSameAsMainUrl { source_name, span }
   }
 
-  pub fn new_preview_feature_not_known_error(preview_feature: &str, expected_preview_features: Vec<&str>, span: Span) -> DatamodelError {
-    DatamodelError::PreviewFeatureNotKnownError { preview_feature: String::from(preview_feature), expected_preview_features:  expected_preview_features.join(", "), span}
+  pub fn new_preview_feature_not_known_error(preview_feature: &str, expected_preview_features: String, span: Span) -> DatamodelError {
+    DatamodelError::PreviewFeatureNotKnownError { preview_feature: String::from(preview_feature), expected_preview_features, span}
   }
 
   pub fn new_value_parser_error(expected_type: &str, parser_error: &str, raw: &str, span: Span) -> DatamodelError {

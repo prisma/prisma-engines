@@ -10,23 +10,28 @@ use serial_test::serial;
 use std::sync::Arc;
 
 pub fn get_query_schema(datamodel_string: &str) -> (QuerySchema, datamodel::dml::Datamodel) {
-    feature_flags::initialize(&[String::from("all")]).unwrap();
-
+    let config = datamodel::parse_configuration_and_ignore_datasource_urls(datamodel_string).unwrap();
     let dm = datamodel::parse_datamodel_and_ignore_datasource_urls(datamodel_string)
         .unwrap()
         .subject;
-    let config = datamodel::parse_configuration_and_ignore_datasource_urls(datamodel_string).unwrap();
+
     let capabilities = match config.subject.datasources.first() {
         Some(ds) => ds.capabilities(),
         None => ConnectorCapabilities::empty(),
     };
+
     let internal_dm_template = DatamodelConverter::convert(&dm);
     let internal_ref = internal_dm_template.build("db".to_owned());
 
-    (
-        schema_builder::build(internal_ref, BuildMode::Modern, false, capabilities),
-        dm,
-    )
+    let schema = schema_builder::build(
+        internal_ref,
+        BuildMode::Modern,
+        false,
+        capabilities,
+        config.subject.preview_features().cloned().collect(),
+    );
+
+    (schema, dm)
 }
 
 // Tests in this file run serially because the function `get_query_schema` depends on setting an env var.
@@ -94,8 +99,6 @@ fn must_fail_if_the_schema_is_invalid() {
 }
 
 fn test_dmmf_cli_command(schema: &str) -> PrismaResult<()> {
-    feature_flags::initialize(&[String::from("all")]).unwrap();
-
     let prisma_opt = PrismaOpt {
         host: "".to_string(),
         datamodel: Some(schema.to_string()),
@@ -107,7 +110,6 @@ fn test_dmmf_cli_command(schema: &str) -> PrismaResult<()> {
         log_format: None,
         overwrite_datasources: None,
         port: 123,
-        raw_feature_flags: vec![],
         unix_path: None,
         subcommand: Some(Subcommand::Cli(CliOpt::Dmmf)),
         open_telemetry: false,

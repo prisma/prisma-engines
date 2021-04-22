@@ -30,7 +30,7 @@ pub(crate) fn initialize_model_object_type_cache(ctx: &mut BuilderContext) {
             let obj: ObjectTypeWeakRef = output_objects::map_model_object_type(ctx, &model);
             let mut fields = compute_model_object_type_fields(ctx, &model);
 
-            if feature_flags::get().selectRelationCount {
+            if ctx.has_feature(&PreviewFeature::SelectRelationCount) {
                 // Only include to-many fields
                 let relation_fields = model.fields().relation().into_iter().filter(|f| f.is_list).collect();
 
