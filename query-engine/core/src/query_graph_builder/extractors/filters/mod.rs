@@ -4,12 +4,13 @@ mod scalar;
 
 use super::utils;
 use crate::{
+    constants::inputs::filters,
     query_document::{ParsedInputMap, ParsedInputValue},
     QueryGraphBuilderError, QueryGraphBuilderResult,
 };
-use connector::{filter::Filter, QueryMode, RelationCompare, ScalarCompare};
+use connector::{filter::Filter, JsonFilter, JsonFilterPath, QueryMode, RelationCompare, ScalarCompare};
 use filter_grouping::*;
-use prisma_models::{Field, ModelRef, PrismaValue, RelationFieldRef, ScalarFieldRef};
+use prisma_models::{Field, ModelRef, PrismaValue, RelationFieldRef, ScalarFieldRef, TypeIdentifier};
 use std::{convert::TryInto, str::FromStr};
 
 /// Extracts a filter for a unique selector, i.e. a filter that selects exactly one record.
@@ -152,12 +153,17 @@ fn extract_scalar_filters(field: &ScalarFieldRef, value: ParsedInputValue) -> Qu
     match value {
         ParsedInputValue::Single(pv) => Ok(vec![field.equals(pv)]),
         ParsedInputValue::Map(mut filter_map) => {
-            let mode = match filter_map.remove("mode") {
+            let mode = match filter_map.remove(filters::MODE) {
                 Some(i) => parse_query_mode(i)?,
                 None => QueryMode::Default,
             };
 
-            let mut filters: Vec<Filter> = filter_map
+            let json_path: Option<JsonFilterPath> = match filter_map.remove(filters::PATH) {
+                Some(i) => Some(parse_json_path(i)?),
+                _ => None,
+            };
+
+            let filters: Vec<Filter> = filter_map
                 .into_iter()
                 .map(|(k, v)| scalar::parse(&k, field, v, false))
                 .collect::<QueryGraphBuilderResult<Vec<Vec<_>>>>()?
@@ -165,6 +171,24 @@ fn extract_scalar_filters(field: &ScalarFieldRef, value: ParsedInputValue) -> Qu
                 .flatten()
                 .collect();
 
+            let mut filters: Vec<Filter> = match field.type_identifier {
+                TypeIdentifier::Json => filters
+                    .into_iter()
+                    .map(|f| match f {
+                        Filter::Scalar(sf) => Filter::Json(JsonFilter {
+                            filter: sf,
+                            path: json_path.clone(),
+                            target_type: None,
+                        }),
+                        Filter::Json(mut jf) => {
+                            jf.set_path(json_path.clone());
+                            jf.into()
+                        }
+                        _ => panic!("There should only be scalar or json filters"),
+                    })
+                    .collect(),
+                _ => filters,
+            };
             filters.iter_mut().for_each(|f| f.set_mode(mode.clone()));
             Ok(filters)
         }
@@ -217,4 +241,24 @@ fn parse_query_mode(input: ParsedInputValue) -> QueryGraphBuilderResult<QueryMod
         "insensitive" => QueryMode::Insensitive,
         _ => unreachable!(),
     })
+}
+
+fn parse_json_path(input: ParsedInputValue) -> QueryGraphBuilderResult<JsonFilterPath> {
+    let path: PrismaValue = input.try_into()?;
+
+    match path {
+        PrismaValue::String(str) => Ok(JsonFilterPath::String(str)),
+        PrismaValue::List(list) => {
+            let keys = list
+                .into_iter()
+                .map(|key| {
+                    key.into_string()
+                        .expect("Json filtering array path elements must all be of type string")
+                })
+                .collect();
+
+            Ok(JsonFilterPath::Array(keys))
+        }
+        _ => unreachable!(),
+    }
 }

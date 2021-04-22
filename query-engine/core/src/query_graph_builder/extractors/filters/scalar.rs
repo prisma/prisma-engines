@@ -1,8 +1,7 @@
 use crate::{
     constants::inputs::filters, ParsedInputMap, ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult,
 };
-use connector::{Filter, ScalarCompare, ScalarListCompare};
-use connector::{Filter, JsonFilter, ScalarCompare};
+use connector::{Filter, JsonCompare, JsonTargetType, ScalarCompare, ScalarListCompare};
 use prisma_models::{PrismaValue, ScalarFieldRef};
 use std::convert::TryInto;
 
@@ -97,23 +96,39 @@ pub fn parse(
         filters::SUM => aggregation_filter(field, input, reverse, Filter::sum)?,
         filters::MIN => aggregation_filter(field, input, reverse, Filter::min)?,
         filters::MAX => aggregation_filter(field, input, reverse, Filter::max)?,
-        "path" => {
-            let inner_object: ParsedInputMap = input.try_into()?;
 
-            let path = inner_object.get("value").expect("path should be set");
-            let path: String = match path {
-                ParsedInputValue::Single(val) => match val {
-                    PrismaValue::String(inner_val) => inner_val.to_owned(),
-                    _ => panic!("should not happen"),
-                },
-                _ => panic!("should not happen"),
-            };
-
-            vec![Filter::Json(JsonFilter {
-                path,
-                is_target_array: false,
-                field: field.to_owned(),
-            })]
+        // Json-specific filters
+        filters::ARRAY_CONTAINS if reverse => {
+            vec![field.json_not_contains(as_prisma_value(input)?, JsonTargetType::Array)]
+        }
+        filters::ARRAY_STARTS_WITH if reverse => {
+            vec![field.json_not_starts_with(as_prisma_value(input)?, JsonTargetType::Array)]
+        }
+        filters::ARRAY_ENDS_WITH if reverse => {
+            vec![field.json_not_ends_with(as_prisma_value(input)?, JsonTargetType::Array)]
+        }
+        filters::STRING_CONTAINS if reverse => {
+            vec![field.json_not_contains(as_prisma_value(input)?, JsonTargetType::String)]
+        }
+        filters::STRING_STARTS_WITH if reverse => {
+            vec![field.json_not_starts_with(as_prisma_value(input)?, JsonTargetType::String)]
+        }
+        filters::STRING_ENDS_WITH if reverse => {
+            vec![field.json_not_ends_with(as_prisma_value(input)?, JsonTargetType::String)]
+        }
+        filters::ARRAY_CONTAINS => vec![field.json_contains(as_prisma_value(input)?, JsonTargetType::Array)],
+        filters::ARRAY_STARTS_WITH => {
+            vec![field.json_starts_with(as_prisma_value(input)?, JsonTargetType::Array)]
+        }
+        filters::ARRAY_ENDS_WITH => {
+            vec![field.json_ends_with(as_prisma_value(input)?, JsonTargetType::Array)]
+        }
+        filters::STRING_CONTAINS => vec![field.json_contains(as_prisma_value(input)?, JsonTargetType::String)],
+        filters::STRING_STARTS_WITH => {
+            vec![field.json_starts_with(as_prisma_value(input)?, JsonTargetType::String)]
+        }
+        filters::STRING_ENDS_WITH => {
+            vec![field.json_ends_with(as_prisma_value(input)?, JsonTargetType::String)]
         }
         _ => {
             return Err(QueryGraphBuilderError::InputError(format!(

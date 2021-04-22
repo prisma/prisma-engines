@@ -5,13 +5,13 @@
 //! [RelationCompare](/query-connector/trait.RelationCompare.html).
 
 mod id_filter;
-mod json_filter;
+mod json;
 mod list;
 mod relation;
 mod scalar;
 
 pub use id_filter::*;
-pub use json_filter::*;
+pub use json::*;
 pub use list::*;
 pub use relation::*;
 pub use scalar::*;
@@ -178,6 +178,12 @@ impl From<ScalarListFilter> for Filter {
 impl From<OneRelationIsNullFilter> for Filter {
     fn from(sf: OneRelationIsNullFilter) -> Self {
         Filter::OneRelationIsNull(sf)
+    }
+}
+
+impl From<JsonFilter> for Filter {
+    fn from(jf: JsonFilter) -> Self {
+        Filter::Json(jf)
     }
 }
 

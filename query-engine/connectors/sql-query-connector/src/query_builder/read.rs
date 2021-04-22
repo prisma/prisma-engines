@@ -58,8 +58,6 @@ impl SelectDefinition for QueryArguments {
             .map(|f| f.aliased_cond(None))
             .unwrap_or(ConditionTree::NoCondition);
 
-            dbg!(&filter);
-
         let conditions = match (filter, cursor_condition) {
             (ConditionTree::NoCondition, cursor) => cursor,
             (filter, ConditionTree::NoCondition) => filter,

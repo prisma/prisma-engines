@@ -108,6 +108,15 @@ pub mod inputs {
         pub const UNDERSCORE_MIN: &str = "_min";
         pub const MAX: &str = "max";
         pub const UNDERSCORE_MAX: &str = "_max";
+
+        // json filters
+        pub const PATH: &str = "path";
+        pub const ARRAY_CONTAINS: &str = "array_contains";
+        pub const ARRAY_STARTS_WITH: &str = "array_starts_with";
+        pub const ARRAY_ENDS_WITH: &str = "array_ends_with";
+        pub const STRING_CONTAINS: &str = "string_contains";
+        pub const STRING_STARTS_WITH: &str = "string_starts_with";
+        pub const STRING_ENDS_WITH: &str = "string_ends_with";
     }
 
     pub mod ordering {
