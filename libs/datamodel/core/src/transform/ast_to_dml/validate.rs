@@ -31,12 +31,12 @@ impl<'a> Validator<'a> {
     pub fn validate(&self, ast_schema: &ast::SchemaAst, schema: &mut dml::Datamodel) -> Result<(), Diagnostics> {
         let mut all_errors = Diagnostics::new();
 
-        if let Err(ref mut errs) = self.validate_names(ast_schema) {
-            all_errors.append(errs);
+        if let Err(errs) = self.validate_names(ast_schema) {
+            all_errors.extend(errs);
         }
 
-        if let Err(ref mut errs) = self.validate_names_for_indexes(ast_schema, schema) {
-            all_errors.append(errs);
+        if let Err(errs) = self.validate_names_for_indexes(ast_schema, schema) {
+            all_errors.extend(errs);
         }
 
         // Model level validations.
@@ -79,59 +79,59 @@ impl<'a> Validator<'a> {
                 errors_for_model.push_error(err);
             }
 
-            if let Err(ref mut the_errors) =
+            if let Err(the_errors) =
                 self.validate_field_arities(ast_schema.find_model(&model.name).expect(STATE_ERROR), model)
             {
-                errors_for_model.append(the_errors);
+                errors_for_model.extend(the_errors);
             }
 
-            if let Err(ref mut the_errors) =
+            if let Err(the_errors) =
                 self.validate_field_types(ast_schema.find_model(&model.name).expect(STATE_ERROR), model)
             {
-                errors_for_model.append(the_errors);
+                errors_for_model.extend(the_errors);
             }
 
-            if let Err(ref mut the_errors) =
+            if let Err(the_errors) =
                 self.validate_field_connector_specific(ast_schema.find_model(&model.name).expect(STATE_ERROR), model)
             {
-                errors_for_model.append(the_errors)
+                errors_for_model.extend(the_errors);
             }
 
-            if let Err(ref mut the_errors) =
+            if let Err(the_errors) =
                 self.validate_model_connector_specific(ast_schema.find_model(&model.name).expect(STATE_ERROR), model)
             {
-                errors_for_model.append(the_errors)
+                errors_for_model.extend(the_errors);
             }
 
-            if let Err(ref mut the_errors) =
+            if let Err(the_errors) =
                 self.validate_enum_default_values(schema, ast_schema.find_model(&model.name).expect(STATE_ERROR), model)
             {
-                errors_for_model.append(the_errors);
+                errors_for_model.extend(the_errors);
             }
 
-            if let Err(ref mut the_errors) =
+            if let Err(the_errors) =
                 self.validate_auto_increment(ast_schema.find_model(&model.name).expect(STATE_ERROR), model)
             {
-                errors_for_model.append(the_errors);
+                errors_for_model.extend(the_errors);
             }
 
-            if let Err(ref mut the_errors) = self.validate_base_fields_for_relation(
+            if let Err(the_errors) = self.validate_base_fields_for_relation(
                 schema,
                 ast_schema.find_model(&model.name).expect(STATE_ERROR),
                 model,
             ) {
-                errors_for_model.append(the_errors);
+                errors_for_model.extend(the_errors);
             }
 
-            if let Err(ref mut the_errors) = self.validate_referenced_fields_for_relation(
+            if let Err(the_errors) = self.validate_referenced_fields_for_relation(
                 schema,
                 ast_schema.find_model(&model.name).expect(STATE_ERROR),
                 model,
             ) {
-                errors_for_model.append(the_errors);
+                errors_for_model.extend(the_errors);
             }
 
-            all_errors.append(&mut errors_for_model);
+            all_errors.extend(errors_for_model);
         }
 
         validate_name_collisions_with_map(schema, ast_schema, &mut all_errors);
@@ -146,14 +146,10 @@ impl<'a> Validator<'a> {
                 errors_for_enum.push_error(err);
             }
 
-            all_errors.append(&mut errors_for_enum);
+            all_errors.extend(errors_for_enum);
         }
 
-        if all_errors.has_errors() {
-            Err(all_errors)
-        } else {
-            Ok(())
-        }
+        all_errors.to_result()
     }
 
     pub fn post_standardisation_validate(
@@ -169,22 +165,18 @@ impl<'a> Validator<'a> {
             let mut errors_for_model = Diagnostics::new();
 
             if !errors_for_model.has_errors() {
-                let mut new_errors = self.validate_relation_arguments_bla(
+                let new_errors = self.validate_relation_arguments_bla(
                     schema,
                     ast_schema.find_model(&model.name).expect(STATE_ERROR),
                     model,
                 );
-                errors_for_model.append(&mut new_errors);
+                errors_for_model.extend(new_errors);
             }
 
-            all_errors.append(&mut errors_for_model);
+            all_errors.extend(errors_for_model);
         }
 
-        if all_errors.has_errors() {
-            Err(all_errors)
-        } else {
-            Ok(())
-        }
+        all_errors.to_result()
     }
 
     fn validate_names(&self, ast_schema: &ast::SchemaAst) -> Result<(), Diagnostics> {
@@ -192,21 +184,21 @@ impl<'a> Validator<'a> {
 
         for model in ast_schema.models() {
             errors.push_opt_error(model.name.validate("Model").err());
-            errors.append(&mut model.validate_attributes());
+            errors.extend(model.validate_attributes());
 
             for field in model.fields.iter() {
                 errors.push_opt_error(field.name.validate("Field").err());
-                errors.append(&mut field.validate_attributes());
+                errors.extend(field.validate_attributes());
             }
         }
 
         for enum_decl in ast_schema.enums() {
             errors.push_opt_error(enum_decl.name.validate("Enum").err());
-            errors.append(&mut enum_decl.validate_attributes());
+            errors.extend(enum_decl.validate_attributes());
 
             for enum_value in enum_decl.values.iter() {
                 errors.push_opt_error(enum_value.name.validate("Enum Value").err());
-                errors.append(&mut enum_value.validate_attributes());
+                errors.extend(enum_value.validate_attributes());
             }
         }
 
@@ -270,11 +262,7 @@ impl<'a> Validator<'a> {
             }
         }
 
-        if errors.has_errors() {
-            Err(errors)
-        } else {
-            Ok(())
-        }
+        errors.to_result()
     }
 
     fn validate_field_types(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), Diagnostics> {
@@ -298,11 +286,7 @@ impl<'a> Validator<'a> {
             }
         }
 
-        if errors.has_errors() {
-            Err(errors)
-        } else {
-            Ok(())
-        }
+        errors.to_result()
     }
 
     fn validate_enum_default_values(
@@ -330,11 +314,7 @@ impl<'a> Validator<'a> {
             }
         }
 
-        if errors.has_errors() {
-            Err(errors)
-        } else {
-            Ok(())
-        }
+        errors.to_result()
     }
 
     fn validate_auto_increment(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), Diagnostics> {
@@ -494,11 +474,7 @@ impl<'a> Validator<'a> {
             }
         }
 
-        if diagnostics.has_errors() {
-            Err(diagnostics)
-        } else {
-            Ok(())
-        }
+        diagnostics.to_result()
     }
 
     fn validate_model_connector_specific(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), Diagnostics> {
@@ -511,11 +487,7 @@ impl<'a> Validator<'a> {
             }
         }
 
-        if diagnostics.has_errors() {
-            Err(diagnostics)
-        } else {
-            Ok(())
-        }
+        diagnostics.to_result()
     }
 
     fn validate_base_fields_for_relation(
@@ -576,11 +548,7 @@ impl<'a> Validator<'a> {
             }
         }
 
-        if errors.has_errors() {
-            Err(errors)
-        } else {
-            Ok(())
-        }
+        errors.to_result()
     }
 
     fn validate_referenced_fields_for_relation(
@@ -775,11 +743,7 @@ impl<'a> Validator<'a> {
             }
         }
 
-        if errors.has_errors() {
-            Err(errors)
-        } else {
-            Ok(())
-        }
+        errors.to_result()
     }
 
     fn validate_relation_arguments_bla(

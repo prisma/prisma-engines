@@ -112,8 +112,8 @@ impl GeneratorLoader {
         };
 
         if !preview_features.is_empty() {
-            let mut result = validate_preview_features(preview_features.clone(), span);
-            diagnostics.append(&mut result);
+            let result = validate_preview_features(preview_features.clone(), span);
+            diagnostics.extend(result);
             if diagnostics.has_errors() {
                 return Err(diagnostics);
             }

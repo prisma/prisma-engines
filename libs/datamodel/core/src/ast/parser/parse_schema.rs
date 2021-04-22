@@ -24,19 +24,19 @@ pub fn parse_schema(datamodel_string: &str) -> Result<SchemaAst, Diagnostics> {
                 match current.as_rule() {
                     Rule::model_declaration => match parse_model(&current) {
                         Ok(model) => top_level_definitions.push(Top::Model(model)),
-                        Err(mut err) => errors.append(&mut err),
+                        Err(err) => errors.extend(err),
                     },
                     Rule::enum_declaration => match parse_enum(&current) {
                         Ok(enm) => top_level_definitions.push(Top::Enum(enm)),
-                        Err(mut err) => errors.append(&mut err),
+                        Err(err) => errors.extend(err),
                     },
                     Rule::source_block => match parse_source(&current) {
                         Ok(source) => top_level_definitions.push(Top::Source(source)),
-                        Err(mut err) => errors.append(&mut err),
+                        Err(err) => errors.extend(err),
                     },
                     Rule::generator_block => match parse_generator(&current) {
                         Ok(generator) => top_level_definitions.push(Top::Generator(generator)),
-                        Err(mut err) => errors.append(&mut err),
+                        Err(err) => errors.extend(err),
                     },
                     Rule::type_alias => top_level_definitions.push(Top::Type(parse_type_alias(&current))),
                     Rule::comment_block => (),

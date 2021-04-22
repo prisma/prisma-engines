@@ -41,8 +41,8 @@ impl<'a, 'b> ValidationPipeline<'a> {
         // Phase 1 is source block loading.
 
         // Phase 2: Prechecks.
-        if let Err(mut err) = precheck::Precheck::precheck(&ast_schema) {
-            diagnostics.append(&mut err);
+        if let Err(err) = precheck::Precheck::precheck(&ast_schema) {
+            diagnostics.extend(err);
         }
 
         // Early return so that the validator does not have to deal with invalid schemas
@@ -52,17 +52,17 @@ impl<'a, 'b> ValidationPipeline<'a> {
 
         // Phase 3: Lift AST to DML.
         let mut schema = match self.lifter.lift(ast_schema) {
-            Err(mut err) => {
+            Err(err) => {
                 // Cannot continue on lifter error.
-                diagnostics.append(&mut err);
+                diagnostics.extend(err);
                 return Err(diagnostics);
             }
             Ok(schema) => schema,
         };
 
         // Phase 4: Validation
-        if let Err(mut err) = self.validator.validate(ast_schema, &mut schema) {
-            diagnostics.append(&mut err);
+        if let Err(err) = self.validator.validate(ast_schema, &mut schema) {
+            diagnostics.extend(err);
         }
 
         // Early return so that the standardiser does not have to deal with invalid schemas
@@ -72,14 +72,14 @@ impl<'a, 'b> ValidationPipeline<'a> {
 
         // TODO: Move consistency stuff into different module.
         // Phase 5: Consistency fixes. These don't fail and always run, during parsing AND formatting
-        if let Err(mut err) = self.standardiser_for_parsing.standardise(&mut schema) {
-            diagnostics.append(&mut err);
+        if let Err(err) = self.standardiser_for_parsing.standardise(&mut schema) {
+            diagnostics.extend(err);
         }
 
         // Transform phase: These only run during formatting.
         if relation_transformation_enabled {
-            if let Err(mut err) = self.standardiser_for_formatting.standardise(ast_schema, &mut schema) {
-                diagnostics.append(&mut err);
+            if let Err(err) = self.standardiser_for_formatting.standardise(ast_schema, &mut schema) {
+                diagnostics.extend(err);
             }
         }
         // Early return so that the post validation does not have to deal with invalid schemas
@@ -88,8 +88,8 @@ impl<'a, 'b> ValidationPipeline<'a> {
         }
 
         // Phase 6: Post Standardisation Validation
-        if let Err(mut err) = self.validator.post_standardisation_validate(ast_schema, &mut schema) {
-            diagnostics.append(&mut err);
+        if let Err(err) = self.validator.post_standardisation_validate(ast_schema, &mut schema) {
+            diagnostics.extend(err);
         }
 
         if diagnostics.has_errors() {

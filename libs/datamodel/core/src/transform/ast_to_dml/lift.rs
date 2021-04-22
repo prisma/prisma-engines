@@ -39,11 +39,11 @@ impl<'a> LiftAstToDml<'a> {
             match ast_obj {
                 ast::Top::Enum(en) => match self.lift_enum(&en) {
                     Ok(en) => schema.add_enum(en),
-                    Err(mut err) => errors.append(&mut err),
+                    Err(err) => errors.extend(err),
                 },
                 ast::Top::Model(ty) => match self.lift_model(&ty, ast_schema) {
                     Ok(md) => schema.add_model(md),
-                    Err(mut err) => errors.append(&mut err),
+                    Err(err) => errors.extend(err),
                 },
                 ast::Top::Source(_) => { /* Source blocks are explicitly ignored by the validator */ }
                 ast::Top::Generator(_) => { /* Generator blocks are explicitly ignored by the validator */ }
@@ -52,11 +52,7 @@ impl<'a> LiftAstToDml<'a> {
             }
         }
 
-        if errors.has_errors() {
-            Err(errors)
-        } else {
-            Ok(schema)
-        }
+        errors.errors_or(schema)
     }
 
     /// Internal: Validates a model AST node and lifts it to a DML model.
@@ -69,19 +65,15 @@ impl<'a> LiftAstToDml<'a> {
         for ast_field in &ast_model.fields {
             match self.lift_field(ast_field, ast_schema) {
                 Ok(field) => model.add_field(field),
-                Err(mut err) => errors.append(&mut err),
+                Err(err) => errors.extend(err),
             }
         }
 
-        if let Err(mut err) = self.attributes.model.validate_and_apply(ast_model, &mut model) {
-            errors.append(&mut err);
+        if let Err(err) = self.attributes.model.validate_and_apply(ast_model, &mut model) {
+            errors.extend(err);
         }
 
-        if errors.has_errors() {
-            return Err(errors);
-        }
-
-        Ok(model)
+        errors.errors_or(model)
     }
 
     /// Internal: Validates an enum AST node.
@@ -108,7 +100,7 @@ impl<'a> LiftAstToDml<'a> {
         for ast_enum_value in &ast_enum.values {
             match self.lift_enum_value(ast_enum_value) {
                 Ok(value) => en.add_value(value),
-                Err(mut err) => errors.append(&mut err),
+                Err(err) => errors.extend(err),
             }
         }
 
@@ -121,15 +113,11 @@ impl<'a> LiftAstToDml<'a> {
 
         en.documentation = ast_enum.documentation.clone().map(|comment| comment.text);
 
-        if let Err(mut err) = self.attributes.enm.validate_and_apply(ast_enum, &mut en) {
-            errors.append(&mut err);
+        if let Err(err) = self.attributes.enm.validate_and_apply(ast_enum, &mut en) {
+            errors.extend(err);
         }
 
-        if errors.has_errors() {
-            Err(errors)
-        } else {
-            Ok(en)
-        }
+        errors.errors_or(en)
     }
 
     /// Internal: Validates an enum value AST node.
@@ -168,15 +156,11 @@ impl<'a> LiftAstToDml<'a> {
         // We merge attributes so we can fail on duplicates.
         let attributes = [&extra_attributes[..], &ast_field.attributes[..]].concat();
 
-        if let Err(mut err) = self.attributes.field.validate_and_apply(&attributes, &mut field) {
-            errors.append(&mut err);
+        if let Err(err) = self.attributes.field.validate_and_apply(&attributes, &mut field) {
+            errors.extend(err);
         }
 
-        if errors.has_errors() {
-            Err(errors)
-        } else {
-            Ok(field)
-        }
+        errors.errors_or(field)
     }
 
     /// Internal: Lift a field's arity.

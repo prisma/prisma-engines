@@ -59,10 +59,16 @@ impl Diagnostics {
         self.warnings.iter()
     }
 
-    /// Appends all errors from another collection to this collection.
+    /// Appends all errors and warnings from another collection to this collection.
     pub fn append(&mut self, err_and_warn: &mut Diagnostics) {
         self.errors.append(&mut err_and_warn.errors);
         self.warnings.append(&mut err_and_warn.warnings)
+    }
+
+    /// Extends the collection with all errors and warnings from another collection.
+    pub fn extend(&mut self, err_and_warn: Diagnostics) {
+        self.errors.extend(err_and_warn.errors);
+        self.warnings.extend(err_and_warn.warnings)
     }
 
     pub fn append_error_vec(&mut self, mut errors: Vec<DatamodelError>) {
@@ -73,9 +79,9 @@ impl Diagnostics {
         self.warnings.append(&mut warnings);
     }
 
-    pub fn to_result(&self) -> Result<(), Diagnostics> {
+    pub fn to_result(self) -> Result<(), Diagnostics> {
         if self.has_errors() {
-            Err(self.clone())
+            Err(self)
         } else {
             Ok(())
         }
@@ -90,6 +96,14 @@ impl Diagnostics {
         }
 
         String::from_utf8_lossy(&message).into_owned()
+    }
+
+    pub fn errors_or<T>(self, obj: T) -> Result<T, Diagnostics> {
+        if self.has_errors() {
+            Err(self)
+        } else {
+            Ok(obj)
+        }
     }
 }
 

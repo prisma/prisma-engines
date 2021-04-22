@@ -53,9 +53,9 @@ impl Precheck {
             }
         }
 
-        errors.append(&mut top_level_types_checker.errors());
-        errors.append(&mut sources_checker.errors());
-        errors.append(&mut generators_checker.errors());
+        errors.extend(top_level_types_checker.errors());
+        errors.extend(sources_checker.errors());
+        errors.extend(generators_checker.errors());
 
         errors.to_result()
     }
@@ -76,7 +76,7 @@ impl Precheck {
                 DatamodelError::new_duplicate_enum_value_error(&enum_type.name.name, &value.name.name, value.span)
             });
         }
-        errors.append(&mut checker.errors());
+        errors.extend(checker.errors());
     }
 
     fn precheck_model(model: &ast::Model, errors: &mut Diagnostics) {
@@ -86,7 +86,7 @@ impl Precheck {
                 DatamodelError::new_duplicate_field_error(&model.name.name, &field.name.name, field.identifier().span)
             });
         }
-        errors.append(&mut checker.errors());
+        errors.extend(checker.errors());
     }
 
     fn precheck_generator_config(config: &ast::GeneratorConfig, errors: &mut Diagnostics) {
@@ -100,7 +100,7 @@ impl Precheck {
                 )
             });
         }
-        errors.append(&mut checker.errors());
+        errors.extend(checker.errors());
     }
 
     fn precheck_source_config(config: &ast::SourceConfig, errors: &mut Diagnostics) {
@@ -114,7 +114,7 @@ impl Precheck {
                 )
             });
         }
-        errors.append(&mut checker.errors());
+        errors.extend(checker.errors());
     }
 }
 
