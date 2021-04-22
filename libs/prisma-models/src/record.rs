@@ -1,4 +1,7 @@
-use crate::{DomainError, ModelProjection, OrderBy, PrismaValue, RecordProjection, ScalarFieldRef, SortOrder};
+use crate::{
+    DomainError, ModelProjection, OrderBy, PrismaValue, PrismaValueExtensions, RecordProjection, ScalarFieldRef,
+    SortOrder,
+};
 use itertools::Itertools;
 use std::collections::HashMap;
 
@@ -151,8 +154,14 @@ impl Record {
             .into_iter()
             .flat_map(|field| {
                 field.scalar_fields().into_iter().map(|field| {
-                    self.get_field_value(field_names, field.db_name())
-                        .map(|val| (field, val.clone()))
+                    self.get_field_value(field_names, field.db_name()).map(|val| {
+                        let coerced = val
+                            .clone()
+                            .coerce(&field.type_identifier)
+                            .expect("Invalid coercion encountered");
+
+                        (field, coerced)
+                    })
                 })
             })
             .collect::<crate::Result<Vec<_>>>()?;
