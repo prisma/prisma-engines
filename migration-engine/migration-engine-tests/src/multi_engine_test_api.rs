@@ -15,22 +15,29 @@ use test_setup::{connectors::Tags, TestApiArgs};
 pub struct TestApi {
     args: TestApiArgs,
     connection_string: String,
+    shadow_db: Option<String>,
 }
 
 impl TestApi {
     /// Initializer, called by the test macros.
     pub fn new(args: TestApiArgs) -> Self {
-        let connection_string = (args.url_fn)(args.test_function_name);
+        let (connection_string, shadow_db) = (args.url_fn)(args.test_function_name);
 
         TestApi {
             args,
             connection_string,
+            shadow_db,
         }
     }
 
     /// The connection string for the database associated with the test.
     pub fn connection_string(&self) -> &str {
         &self.connection_string
+    }
+
+    /// The shadow database connection string, if set.
+    pub fn shadow_db(&self) -> Option<&str> {
+        self.shadow_db.as_deref()
     }
 
     /// Create a temporary directory to serve as a test migrations directory.
@@ -60,7 +67,7 @@ impl TestApi {
 
     /// Returns true only when testing on MySQL 8.
     pub fn is_mysql_8(&self) -> bool {
-        self.args.connector_tags.contains(Tags::Mysql8)
+        self.args.connector_tags.intersects(Tags::Mysql8 | Tags::Vitess80)
     }
 
     /// Returns true only when testing on postgres.
@@ -68,9 +75,16 @@ impl TestApi {
         self.args.connector_tags.contains(Tags::Postgres)
     }
 
+    /// Returns true only when testing on vitess.
+    pub fn is_vitess(&self) -> bool {
+        self.args.connector_tags.contains(Tags::Vitess)
+    }
+
     /// Instantiate a new migration engine for the current database.
     pub async fn new_engine(&self) -> anyhow::Result<EngineTestApi> {
-        self.new_engine_with_connection_strings(&self.connection_string, None)
+        let shadow_db = self.shadow_db().as_ref().map(ToString::to_string);
+
+        self.new_engine_with_connection_strings(&self.connection_string, shadow_db)
             .await
     }
 
@@ -88,17 +102,24 @@ impl TestApi {
 
     /// Initialize the database.
     pub async fn initialize(&self) -> anyhow::Result<Quaint> {
-        if self.args.connector_tags.contains(Tags::Postgres) {
+        let tags = self.args.connector_tags;
+
+        if tags.contains(Tags::Postgres) {
             Ok(test_setup::create_postgres_database(&self.connection_string.parse()?)
                 .await
                 .unwrap())
-        } else if self.args.connector_tags.contains(Tags::Mysql) {
+        } else if tags.contains(Tags::Vitess) {
+            self.new_engine().await?.reset().send().await?;
+
+            Ok(Quaint::new(&self.connection_string).await?)
+        } else if tags.contains(Tags::Mysql) {
             Ok(test_setup::create_mysql_database(&self.connection_string.parse()?)
                 .await
                 .unwrap())
-        } else if self.args.connector_tags.contains(Tags::Mssql) {
+        } else if tags.contains(Tags::Mssql) {
             let conn = Quaint::new(&self.connection_string).await?;
             test_setup::connectors::mssql::reset_schema(&conn, self.args.test_function_name).await?;
+
             Ok(conn)
         } else {
             Ok(Quaint::new(&self.connection_string).await?)

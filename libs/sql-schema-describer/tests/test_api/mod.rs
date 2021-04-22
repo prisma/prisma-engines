@@ -44,7 +44,7 @@ impl TestApi {
             args.test_function_name
         };
 
-        let url = (args.url_fn)(db_name);
+        let (url, _) = (args.url_fn)(db_name);
 
         let conn = if tags.contains(Tags::Mysql) {
             create_mysql_database(&url.parse().unwrap()).await.unwrap()

@@ -143,10 +143,12 @@ impl SqlMigrationConnector {
             steps,
         };
 
-        self.apply_migration(&migration).await?;
-
         if migration.before.table_walker("_prisma_migrations").is_some() {
-            self.flavour.drop_migrations_table(self.conn()).await?;
+            self.flavour.drop_migrations_table(connection).await?;
+        }
+
+        for step in self.render_steps_pretty(&migration)? {
+            connection.raw_cmd(&step.raw).await?;
         }
 
         Ok(())

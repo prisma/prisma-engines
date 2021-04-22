@@ -5,7 +5,7 @@ use url::Url;
 
 #[tokio::test]
 async fn connecting_to_a_postgres_database_with_missing_schema_creates_it() {
-    let url_str = postgres_10_url("test_connecting_with_a_nonexisting_schema");
+    let url_str = postgres_10_url("test_connecting_with_a_nonexisting_schema").0;
     test_setup::create_postgres_database(&url_str.parse().unwrap())
         .await
         .unwrap();

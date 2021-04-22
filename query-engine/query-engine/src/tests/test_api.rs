@@ -38,7 +38,7 @@ pub struct TestApi {
 impl TestApi {
     pub async fn new(args: TestApiArgs) -> Self {
         let tags = args.connector_tags;
-        let connection_string = (args.url_fn)(args.test_function_name);
+        let (connection_string, _) = (args.url_fn)(args.test_function_name);
 
         let migration_api = if tags.contains(Tags::Mysql) {
             mysql_migration_connector(&connection_string).await
@@ -128,7 +128,7 @@ pub(super) async fn postgres_migration_connector(url_str: &str) -> SqlMigrationC
 }
 
 pub(super) async fn sqlite_migration_connector(db_name: &str) -> SqlMigrationConnector {
-    SqlMigrationConnector::new(&sqlite_test_url(db_name), BitFlags::all(), None)
+    SqlMigrationConnector::new(&sqlite_test_url(db_name).0, BitFlags::all(), None)
         .await
         .unwrap()
 }

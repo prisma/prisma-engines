@@ -13,14 +13,14 @@ fn postgres_url(db: Option<&str>) -> String {
 }
 
 fn postgres_url_with_scheme(db: Option<&str>, scheme: &str) -> String {
-    let original_url = test_setup::postgres_10_url(db.unwrap_or("postgres"));
+    let (original_url, _) = test_setup::postgres_10_url(db.unwrap_or("postgres"));
     let mut parsed: url::Url = original_url.parse().unwrap();
     parsed.set_scheme(scheme).unwrap();
     parsed.to_string()
 }
 
 fn mysql_url(db: Option<&str>) -> String {
-    test_setup::mysql_5_7_url(db.unwrap_or(""))
+    test_setup::mysql_5_7_url(db.unwrap_or("")).0
 }
 
 #[tokio::test]
@@ -115,7 +115,6 @@ async fn test_create_psql_database() {
     // Drop the database
     {
         let url = postgres_url(None);
-
         let conn = Quaint::new(&url).await.unwrap();
 
         conn.raw_cmd("DROP DATABASE IF EXISTS \"this_should_exist\"")
@@ -124,7 +123,6 @@ async fn test_create_psql_database() {
     };
 
     let url = postgres_url(Some(db_name));
-
     let res = run(&["--datasource", &url, "create-database"]).await;
 
     assert_eq!(
@@ -150,7 +148,6 @@ async fn test_create_sqlite_database() {
     assert!(!sqlite_path.exists());
 
     let url = format!("file:{}", sqlite_path.to_string_lossy());
-
     let res = run(&["--datasource", &url, "create-database"]).await;
     let msg = res.as_ref().unwrap();
 
