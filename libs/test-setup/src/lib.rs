@@ -32,7 +32,7 @@ pub struct TestApiArgs {
     pub connector_tags: BitFlags<Tags>,
     pub test_function_name: &'static str,
     pub test_features: BitFlags<Features>,
-    pub url_fn: &'static (dyn Fn(&str) -> String + Send + Sync),
+    pub url_fn: &'static (dyn Fn(&str) -> (String, Option<String>) + Send + Sync),
     pub provider: &'static str,
 }
 
@@ -101,8 +101,10 @@ mod urls {
     pub use super::vitess_8_0_url as vitess_8_0;
 }
 
-pub fn sqlite_test_url(db_name: &str) -> String {
-    std::env::var("SQLITE_TEST_URL").unwrap_or_else(|_| format!("file:{}", sqlite_test_file(db_name)))
+pub fn sqlite_test_url(db_name: &str) -> (String, Option<String>) {
+    let url = std::env::var("SQLITE_TEST_URL").unwrap_or_else(|_| format!("file:{}", sqlite_test_file(db_name)));
+
+    (url, None)
 }
 
 pub fn sqlite_test_file(db_name: &str) -> String {
@@ -132,7 +134,7 @@ enum TestDb<'a> {
     Database(&'a str),
 }
 
-fn url_from_env(env_var: &str, db: TestDb<'_>) -> Option<String> {
+fn url_from_env(env_var: &str, db: TestDb<'_>) -> Option<(String, Option<String>)> {
     std::env::var(env_var).ok().map(|url| {
         let mut url = Url::parse(&url).unwrap();
 
@@ -153,200 +155,241 @@ fn url_from_env(env_var: &str, db: TestDb<'_>) -> Option<String> {
             }
         }
 
-        url.to_string()
+        (url.to_string(), None)
     })
 }
 
-fn jdbc_from_env(env_var: &str, schema: &str) -> Option<String> {
-    std::env::var(env_var).ok().and_then(|url| {
-        let mut conn_str = JdbcString::from_str(&url).ok()?;
-        conn_str.properties_mut().insert("schema".into(), schema.into());
-        Some(conn_str.to_string())
-    })
+fn jdbc_from_env(env_var: &str, schema: &str) -> Option<(String, Option<String>)> {
+    std::env::var(env_var)
+        .ok()
+        .and_then(|url| {
+            let mut conn_str = JdbcString::from_str(&url).ok()?;
+            conn_str.properties_mut().insert("schema".into(), schema.into());
+            Some(conn_str.to_string())
+        })
+        .map(|s| (s, None))
 }
 
-pub fn postgres_9_url(db_name: &str) -> String {
+pub fn postgres_9_url(db_name: &str) -> (String, Option<String>) {
     url_from_env("POSTGRES_9_TEST_URL", TestDb::Schema(db_name)).unwrap_or_else(|| {
         let (host, port) = db_host_and_port_postgres_9();
 
-        format!(
+        let url = format!(
             "postgresql://postgres:prisma@{}:{}/{}?schema={}&statement_cache_size=0&socket_timeout=60",
             host, port, db_name, SCHEMA_NAME
-        )
+        );
+
+        (url, None)
     })
 }
 
-pub fn pgbouncer_url(db_name: &str) -> String {
+pub fn pgbouncer_url(db_name: &str) -> (String, Option<String>) {
     url_from_env("PGBOUNCER_TEST_URL", TestDb::Schema(db_name)).unwrap_or_else(|| {
         let (host, port) = db_host_and_port_for_pgbouncer();
 
-        format!(
+        let url = format!(
             "postgresql://postgres:prisma@{}:{}/{}?schema={}&pgbouncer=true&socket_timeout=60",
             host, port, db_name, SCHEMA_NAME
-        )
+        );
+
+        (url, None)
     })
 }
 
-pub fn postgres_10_url(db_name: &str) -> String {
+pub fn postgres_10_url(db_name: &str) -> (String, Option<String>) {
     url_from_env("POSTGRES_10_TEST_URL", TestDb::Schema(db_name)).unwrap_or_else(|| {
         let (host, port) = db_host_and_port_postgres_10();
 
-        format!(
+        let url = format!(
             "postgresql://postgres:prisma@{}:{}/{}?schema={}&statement_cache_size=0&socket_timeout=60",
             host, port, db_name, SCHEMA_NAME
-        )
+        );
+
+        (url, None)
     })
 }
 
-pub fn postgres_11_url(db_name: &str) -> String {
+pub fn postgres_11_url(db_name: &str) -> (String, Option<String>) {
     url_from_env("POSTGRES_11_TEST_URL", TestDb::Schema(db_name)).unwrap_or_else(|| {
         let (host, port) = db_host_and_port_postgres_11();
 
-        format!(
+        let url = format!(
             "postgresql://postgres:prisma@{}:{}/{}?schema={}&statement_cache_size=0&socket_timeout=60",
             host, port, db_name, SCHEMA_NAME
-        )
+        );
+
+        (url, None)
     })
 }
 
-pub fn postgres_12_url(db_name: &str) -> String {
+pub fn postgres_12_url(db_name: &str) -> (String, Option<String>) {
     url_from_env("POSTGRES_12_TEST_URL", TestDb::Schema(db_name)).unwrap_or_else(|| {
         let (host, port) = db_host_and_port_postgres_12();
 
-        format!(
+        let url = format!(
             "postgresql://postgres:prisma@{}:{}/{}?schema={}&statement_cache_size=0&socket_timeout=60",
             host, port, db_name, SCHEMA_NAME
-        )
+        );
+
+        (url, None)
     })
 }
 
-pub fn postgres_13_url(db_name: &str) -> String {
+pub fn postgres_13_url(db_name: &str) -> (String, Option<String>) {
     url_from_env("POSTGRES_13_TEST_URL", TestDb::Schema(db_name)).unwrap_or_else(|| {
         let (host, port) = db_host_and_port_postgres_13();
 
-        format!(
+        let url = format!(
             "postgresql://postgres:prisma@{}:{}/{}?schema={}&statement_cache_size=0&socket_timeout=60",
             host, port, db_name, SCHEMA_NAME
-        )
+        );
+
+        (url, None)
     })
 }
 
-pub fn mysql_5_7_url(db_name: &str) -> String {
+pub fn mysql_5_7_url(db_name: &str) -> (String, Option<String>) {
     url_from_env("MYSQL_5_7_TEST_URL", TestDb::Database(db_name)).unwrap_or_else(|| {
         let db_name = mysql_safe_identifier(db_name);
         let (host, port) = db_host_and_port_mysql_5_7();
 
-        format!(
+        let url = format!(
             "mysql://root:prisma@{host}:{port}/{db_name}?connect_timeout=20&socket_timeout=60",
             host = host,
             port = port,
             db_name = db_name,
-        )
+        );
+
+        (url, None)
     })
 }
 
-pub fn mysql_8_url(db_name: &str) -> String {
+pub fn mysql_8_url(db_name: &str) -> (String, Option<String>) {
     url_from_env("MYSQL_8_TEST_URL", TestDb::Database(db_name)).unwrap_or_else(|| {
         let (host, port) = db_host_and_port_mysql_8_0();
 
         // maximum length of identifiers on mysql
         let db_name = mysql_safe_identifier(db_name);
 
-        format!(
+        let url = format!(
             "mysql://root:prisma@{host}:{port}{maybe_slash}{db_name}?connect_timeout=20&socket_timeout=60",
             maybe_slash = if db_name.is_empty() { "" } else { "/" },
             host = host,
             port = port,
             db_name = db_name,
-        )
+        );
+
+        (url, None)
     })
 }
 
-pub fn mysql_5_6_url(db_name: &str) -> String {
+pub fn mysql_5_6_url(db_name: &str) -> (String, Option<String>) {
     url_from_env("MYSQL_5_6_TEST_URL", TestDb::Database(db_name)).unwrap_or_else(|| {
         let (host, port) = db_host_and_port_mysql_5_6();
 
         // maximum length of identifiers on mysql
         let db_name = mysql_safe_identifier(db_name);
 
-        format!(
+        let url = format!(
             "mysql://root:prisma@{host}:{port}/{db_name}?connect_timeout=20&socket_timeout=60",
             host = host,
             port = port,
             db_name = db_name,
-        )
+        );
+
+        (url, None)
     })
 }
 
-pub fn vitess_5_7_url(_: &str) -> String {
-    match std::env::var("VITESS_5_7_TEST_URL") {
+pub fn vitess_5_7_url(_: &str) -> (String, Option<String>) {
+    let shadow_url = match std::env::var("VITESS_5_7_SHADOW_URL") {
         Ok(url) => url,
+        Err(_) => String::from("mysql://root@localhost:33578/shadow?connect_timeout=20&socket_timeout=60"),
+    };
+
+    match std::env::var("VITESS_5_7_TEST_URL") {
+        Ok(url) => (url, Some(shadow_url)),
         Err(_) => {
             let (host, port) = db_host_and_port_vitess_5_7();
 
-            format!(
+            let url = format!(
                 "mysql://root@{host}:{port}/test?connect_timeout=20&socket_timeout=60",
                 host = host,
                 port = port,
-            )
+            );
+
+            (url, Some(shadow_url))
         }
     }
 }
 
-pub fn vitess_8_0_url(_: &str) -> String {
-    match std::env::var("VITESS_8_0_TEST_URL") {
+pub fn vitess_8_0_url(_: &str) -> (String, Option<String>) {
+    let shadow_url = match std::env::var("VITESS_5_7_SHADOW_URL") {
         Ok(url) => url,
+        Err(_) => String::from("mysql://root@localhost:33808/shadow?connect_timeout=20&socket_timeout=60"),
+    };
+
+    match std::env::var("VITESS_8_0_TEST_URL") {
+        Ok(url) => (url, Some(shadow_url)),
         Err(_) => {
             let (host, port) = db_host_and_port_vitess_8_0();
 
-            format!(
+            let url = format!(
                 "mysql://root@{host}:{port}/test?connect_timeout=20&socket_timeout=60",
                 host = host,
                 port = port,
-            )
+            );
+
+            (url, Some(shadow_url))
         }
     }
 }
 
-pub fn mariadb_url(db_name: &str) -> String {
+pub fn mariadb_url(db_name: &str) -> (String, Option<String>) {
     url_from_env("MARIADB_TEST_URL", TestDb::Database(db_name)).unwrap_or_else(|| {
         let (host, port) = db_host_and_port_mariadb();
 
         // maximum length of identifiers on mysql
         let db_name = mysql_safe_identifier(db_name);
 
-        format!(
+        let url = format!(
             "mysql://root:prisma@{host}:{port}/{db_name}?connect_timeout=20&socket_timeout=60",
             host = host,
             port = port,
             db_name = db_name,
-        )
+        );
+
+        (url, None)
     })
 }
 
-pub fn mssql_2017_url(schema_name: &str) -> String {
+pub fn mssql_2017_url(schema_name: &str) -> (String, Option<String>) {
     jdbc_from_env("MSSQL_2017_TEST_URL", schema_name).unwrap_or_else(|| {
         let (host, port) = db_host_mssql_2017();
 
-        format!(
+        let url = format!(
             "sqlserver://{host}:{port};database=master;schema={schema_name};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED",
             schema_name = schema_name,
             host = host,
             port = port,
-        )
+        );
+
+        (url, None)
     })
 }
 
-pub fn mssql_2019_url(schema_name: &str) -> String {
+pub fn mssql_2019_url(schema_name: &str) -> (String, Option<String>) {
     jdbc_from_env("MSSQL_2019_TEST_URL", schema_name).unwrap_or_else(|| {
         let (host, port) = db_host_and_port_mssql_2019();
 
-        format!(
+        let url = format!(
             "sqlserver://{host}:{port};database=master;schema={schema_name};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED",
             schema_name = schema_name,
             host = host,
             port = port,
-        )
+        );
+
+        (url, None)
     })
 }
 

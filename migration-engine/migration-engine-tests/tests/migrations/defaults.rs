@@ -4,7 +4,7 @@ use test_macros::test_connectors;
 
 // MySQL 5.7 and MariaDB are skipped, because the datamodel parser gives us a
 // chrono DateTime, and we don't render that in the exact expected format.
-#[test_connectors(ignore("mysql_5_7", "mariadb"))]
+#[test_connectors(ignore("mysql_5_7", "mariadb", "vitess_5_7"))]
 async fn datetime_defaults_work(api: TestApi) -> TestResult {
     api.initialize().await?;
 

@@ -576,7 +576,11 @@ async fn diagnose_migrations_history_reports_migrations_failing_to_apply_cleanly
                 user_facing_errors::migration_engine::MigrationDoesNotApplyCleanly::ERROR_CODE
             );
             assert_eq!(known_error.meta["migration_name"], initial_migration_name.as_str());
-            assert!(known_error.message.contains("yolo") || known_error.message.contains("YOLO"));
+            assert!(
+                known_error.message.contains("yolo")
+                    || known_error.message.contains("YOLO")
+                    || known_error.message.contains("(not available)")
+            );
         }
         _ => panic!("assertion failed"),
     }

@@ -43,7 +43,7 @@ async fn create_migration_with_new_provider_errors(api: TestApi) -> TestResult {
     "#;
 
     let sqlite_engine = api
-        .new_engine_with_connection_strings(&sqlite_test_url("migratelocktest"), None)
+        .new_engine_with_connection_strings(&sqlite_test_url("migratelocktest").0, None)
         .await?;
 
     let err = sqlite_engine

@@ -6,9 +6,9 @@ use url::Url;
 #[tokio::test]
 async fn database_already_exists_must_return_a_proper_error() {
     let db_name = "database_already_exists_must_return_a_proper_error";
-    let url = postgres_10_url(db_name);
+    let (url, _) = postgres_10_url(db_name);
 
-    let conn = Quaint::new(&postgres_10_url("postgres")).await.unwrap();
+    let conn = Quaint::new(&postgres_10_url("postgres").0).await.unwrap();
     conn.execute_raw(
         "CREATE DATABASE \"database_already_exists_must_return_a_proper_error\"",
         &[],
@@ -59,7 +59,7 @@ async fn bad_postgres_url_must_return_a_good_error() {
 #[tokio::test]
 async fn database_access_denied_must_return_a_proper_error_in_cli() {
     let db_name = "dbaccessdeniedincli";
-    let url: Url = mysql_5_7_url(db_name).parse().unwrap();
+    let url: Url = mysql_5_7_url(db_name).0.parse().unwrap();
     let conn = create_mysql_database(&url).await.unwrap();
 
     conn.execute_raw("DROP USER IF EXISTS jeanmichel", &[]).await.unwrap();
@@ -99,7 +99,7 @@ async fn database_access_denied_must_return_a_proper_error_in_cli() {
 async fn tls_errors_must_be_mapped_in_the_cli() {
     let url = format!(
         "{}&sslmode=require&sslaccept=strict",
-        postgres_10_url("tls_errors_must_be_mapped_in_the_cli")
+        postgres_10_url("tls_errors_must_be_mapped_in_the_cli").0
     );
     let error = get_cli_error(&[
         "migration-engine",

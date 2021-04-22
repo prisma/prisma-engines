@@ -15,7 +15,7 @@ use test_setup::mysql_5_7_url;
 async fn views_can_be_described() {
     let db_name = "views_can_be_described";
 
-    let url = mysql_5_7_url(db_name);
+    let (url, _) = mysql_5_7_url(db_name);
     let conn = test_setup::create_mysql_database(&url.parse().unwrap()).await.unwrap();
 
     conn.raw_cmd(&format!("CREATE TABLE {}.a (a_id int)", db_name))

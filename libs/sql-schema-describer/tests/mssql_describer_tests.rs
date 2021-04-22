@@ -12,7 +12,7 @@ use test_setup::mssql_2019_url;
 #[tokio::test]
 async fn udts_can_be_described() {
     let db_name = "udts_can_be_described";
-    let connection_string = mssql_2019_url(db_name);
+    let (connection_string, _) = mssql_2019_url(db_name);
     let conn = Quaint::new(&connection_string).await.unwrap();
 
     let types = &[
@@ -74,7 +74,7 @@ async fn udts_can_be_described() {
 async fn views_can_be_described() {
     let db_name = "views_can_be_described";
 
-    let connection_string = mssql_2019_url(db_name);
+    let (connection_string, _) = mssql_2019_url(db_name);
     let conn = Quaint::new(&connection_string).await.unwrap();
 
     test_setup::connectors::mssql::reset_schema(&conn, db_name)
@@ -542,7 +542,7 @@ async fn mssql_cross_schema_references_are_not_allowed() {
     let secondary = "mssql_foreign_key_on_delete_must_be_handled_B";
 
     for s in &[db_name, secondary] {
-        let connection_string = mssql_2019_url("master");
+        let (connection_string, _) = mssql_2019_url("master");
         let conn = Quaint::new(&connection_string).await.unwrap();
 
         test_setup::connectors::mssql::reset_schema(&conn, s).await.unwrap();

@@ -14,6 +14,7 @@ pub use create_migration::CreateMigration;
 pub use diagnose_migration_history::DiagnoseMigrationHistory;
 pub use evaluate_data_loss::EvaluateDataLoss;
 pub use mark_migration_applied::MarkMigrationApplied;
+use migration_core::GenericApi;
 pub use reset::Reset;
 pub use schema_push::SchemaPush;
 
@@ -61,9 +62,9 @@ impl TestApi {
             args.test_function_name
         };
 
-        let connection_string = (args.url_fn)(db_name);
+        let (connection_string, shadow_db) = (args.url_fn)(db_name);
 
-        if tags.contains(Tags::Mysql) {
+        if tags.contains(Tags::Mysql) && !tags.contains(Tags::Vitess) {
             create_mysql_database(&connection_string.parse().unwrap())
                 .await
                 .unwrap();
@@ -79,9 +80,13 @@ impl TestApi {
                 .unwrap();
         };
 
-        let api = SqlMigrationConnector::new(&connection_string, features, None)
+        let api = SqlMigrationConnector::new(&connection_string, features, shadow_db)
             .await
             .unwrap();
+
+        if tags.contains(Tags::Vitess) {
+            api.reset().await.unwrap()
+        }
 
         let mut circumstances = BitFlags::empty();
 
@@ -129,7 +134,7 @@ impl TestApi {
     }
 
     pub fn is_mysql_8(&self) -> bool {
-        self.tags().contains(Tags::Mysql8)
+        self.tags().intersects(Tags::Mysql8 | Tags::Vitess80)
     }
 
     pub fn is_mariadb(&self) -> bool {

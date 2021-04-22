@@ -145,8 +145,6 @@ services:
       KEYSPACES: "test"
       NUM_SHARDS: "1"
       MYSQL_BIND_HOST: "0.0.0.0"
-    networks:
-      - databases
 
   vitess-test-8_0:
     image: vitess/vttestserver:mysql80
@@ -158,8 +156,6 @@ services:
       KEYSPACES: "test"
       NUM_SHARDS: "1"
       MYSQL_BIND_HOST: "0.0.0.0"
-    networks:
-      - databases
 
   vitess-shadow-5_7:
     image: vitess/vttestserver:mysql57
@@ -171,8 +167,6 @@ services:
       KEYSPACES: "shadow"
       NUM_SHARDS: "1"
       MYSQL_BIND_HOST: "0.0.0.0"
-    networks:
-      - databases
 
   vitess-shadow-8_0:
     image: vitess/vttestserver:mysql80
@@ -184,8 +178,6 @@ services:
       KEYSPACES: "shadow"
       NUM_SHARDS: "1"
       MYSQL_BIND_HOST: "0.0.0.0"
-    networks:
-      - databases
 
   mssql-2019:
     image: mcr.microsoft.com/mssql/server:2019-latest

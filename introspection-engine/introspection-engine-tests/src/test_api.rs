@@ -33,7 +33,7 @@ impl TestApi {
             args.test_function_name
         };
 
-        let connection_string = (args.url_fn)(db_name);
+        let (connection_string, _) = (args.url_fn)(db_name);
 
         let database = if tags.intersects(Tags::Vitess) {
             let me = SqlMigrationConnector::new(&connection_string, BitFlags::empty(), None)

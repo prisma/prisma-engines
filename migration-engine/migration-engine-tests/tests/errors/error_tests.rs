@@ -1,3 +1,4 @@
+use connectors::Tags;
 use indoc::{formatdoc, indoc};
 use migration_core::api::RpcApi;
 use migration_engine_tests::sql::*;
@@ -9,7 +10,7 @@ use url::Url;
 
 #[tokio::test]
 async fn authentication_failure_must_return_a_known_error_on_postgres() {
-    let mut url: Url = postgres_10_url("test-db").parse().unwrap();
+    let mut url: Url = postgres_10_url("test-db").0.parse().unwrap();
 
     url.set_password(Some("obviously-not-right")).unwrap();
 
@@ -45,6 +46,7 @@ async fn authentication_failure_must_return_a_known_error_on_postgres() {
 #[tokio::test]
 async fn authentication_failure_must_return_a_known_error_on_mysql() {
     let mut url: Url = mysql_5_7_url("authentication_failure_must_return_a_known_error_on_mysql")
+        .0
         .parse()
         .unwrap();
 
@@ -82,6 +84,7 @@ async fn authentication_failure_must_return_a_known_error_on_mysql() {
 #[tokio::test]
 async fn unreachable_database_must_return_a_proper_error_on_mysql() {
     let mut url: Url = mysql_5_7_url("unreachable_database_must_return_a_proper_error_on_mysql")
+        .0
         .parse()
         .unwrap();
 
@@ -119,6 +122,7 @@ async fn unreachable_database_must_return_a_proper_error_on_mysql() {
 #[tokio::test]
 async fn unreachable_database_must_return_a_proper_error_on_postgres() {
     let mut url: Url = postgres_10_url("unreachable_database_must_return_a_proper_error_on_postgres")
+        .0
         .parse()
         .unwrap();
 
@@ -156,6 +160,7 @@ async fn unreachable_database_must_return_a_proper_error_on_postgres() {
 #[tokio::test]
 async fn database_does_not_exist_must_return_a_proper_error() {
     let mut url: Url = mysql_5_7_url("database_does_not_exist_must_return_a_proper_error")
+        .0
         .parse()
         .unwrap();
     let database_name = "notmydatabase";
@@ -192,7 +197,7 @@ async fn database_does_not_exist_must_return_a_proper_error() {
 #[tokio::test]
 async fn database_access_denied_must_return_a_proper_error_in_rpc() {
     let db_name = "dbaccessdeniedinrpc";
-    let url: Url = mysql_5_7_url(db_name).parse().unwrap();
+    let url: Url = mysql_5_7_url(db_name).0.parse().unwrap();
     let conn = create_mysql_database(&url).await.unwrap();
 
     conn.execute_raw("DROP USER IF EXISTS jeanyves", &[]).await.unwrap();
@@ -241,7 +246,7 @@ async fn bad_datasource_url_and_provider_combinations_must_return_a_proper_error
                 url = "{}"
             }}
         "#,
-        postgres_10_url(db_name),
+        postgres_10_url(db_name).0,
     );
 
     let error = RpcApi::new(&dm).await.map(drop).unwrap_err();
@@ -279,7 +284,7 @@ async fn connections_to_system_databases_must_be_rejected(_api: &TestApi) -> Tes
                     url = "{}"
                 }}
             "#,
-            mysql_8_url(name),
+            mysql_8_url(name).0,
         );
 
         // "mysql" is the default in Quaint.
@@ -364,12 +369,14 @@ async fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: &
     let json_error = serde_json::to_value(&res).unwrap();
 
     let expected_msg = match api.sql_family() {
+        SqlFamily::Mysql if api.tags().contains(Tags::Vitess) => "Unique constraint failed on the (not available)",
         SqlFamily::Mysql => "Unique constraint failed on the constraint: `name_unique`",
         SqlFamily::Mssql => "Unique constraint failed on the constraint: `Fruit_name_unique`",
         _ => "Unique constraint failed on the fields: (`name`)",
     };
 
     let expected_target = match api.sql_family() {
+        SqlFamily::Mysql if api.tags().contains(Tags::Vitess) => serde_json::Value::Null,
         SqlFamily::Mysql => json!("name_unique"),
         SqlFamily::Mssql => json!("Fruit_name_unique"),
         _ => json!(["name"]),

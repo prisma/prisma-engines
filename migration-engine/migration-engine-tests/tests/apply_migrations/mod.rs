@@ -137,6 +137,7 @@ async fn migrations_should_fail_when_the_script_is_invalid(api: &TestApi) -> Tes
                 "#,
             second_migration_name = second_migration_name,
             error_code = match api.tags() {
+                t if t.contains(Tags::Vitess) => 1105,
                 t if t.contains(Tags::Mysql) => 1064,
                 t if t.contains(Tags::Mssql) => 102,
                 t if t.contains(Tags::Postgres) => 42601,
@@ -144,6 +145,7 @@ async fn migrations_should_fail_when_the_script_is_invalid(api: &TestApi) -> Tes
                 _ => todo!(),
             },
             message = match api.tags() {
+                t if t.contains(Tags::Vitess) => "syntax error at position 10",
                 t if t.contains(Tags::Mariadb) => "You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near \'^.^)_n\' at line 1",
                 t if t.contains(Tags::Mysql) => "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near \'^.^)_n\' at line 1",
                 t if t.contains(Tags::Mssql) => "Incorrect syntax near \'^\'.",
@@ -195,7 +197,7 @@ async fn migrations_should_not_reapply_modified_migrations(api: &TestApi) -> Tes
 
     api.apply_migrations(&migrations_directory).send().await?;
 
-    assertions.modify_migration(|script| script.push_str("/* this is just a harmless comment */"))?;
+    assertions.modify_migration(|script| *script = format!("/* this is just a harmless comment */\n{}", script))?;
 
     let dm2 = r#"
         model Cat {
