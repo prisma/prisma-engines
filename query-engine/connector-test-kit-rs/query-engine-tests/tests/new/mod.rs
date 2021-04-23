@@ -1,1 +1,2 @@
+mod cursor;
 mod disconnect;
