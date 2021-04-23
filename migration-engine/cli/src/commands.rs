@@ -18,8 +18,8 @@ pub(crate) struct Cli {
     /// The connection string to the database
     #[structopt(long, short = "d", parse(try_from_str = parse_base64_string))]
     datasource: String,
-    #[structopt(long, short = "f", parse(try_from_str = parse_setup_flags), default_value = "Bitflags::empty")]
-    qe_test_setup_flags: BitFlags<QueryEngineFlags>,
+    #[structopt(long, short = "f", parse(try_from_str = parse_setup_flags))]
+    qe_test_setup_flags: Option<BitFlags<QueryEngineFlags>>,
     #[structopt(subcommand)]
     command: CliCommand,
 }
@@ -54,7 +54,11 @@ impl Cli {
             CliCommand::CanConnectToDatabase => connect_to_database(&self.datasource).await,
             CliCommand::DropDatabase => drop_database(&self.datasource).await,
             CliCommand::QeSetup => {
-                qe_setup(&self.datasource, self.qe_test_setup_flags).await?;
+                qe_setup(
+                    &self.datasource,
+                    self.qe_test_setup_flags.unwrap_or_else(BitFlags::empty),
+                )
+                .await?;
                 Ok(String::new())
             }
         }
@@ -94,6 +98,7 @@ fn parse_setup_flags(s: &str) -> Result<BitFlags<QueryEngineFlags>, CliError> {
     for flag in s.split(',') {
         match flag {
             "database_creation_not_allowed" => flags.insert(QueryEngineFlags::DatabaseCreationNotAllowed),
+            "" => (),
             flag => return Err(CliError::invalid_parameters(format!("Unknown flag: {}", flag))),
         }
     }
