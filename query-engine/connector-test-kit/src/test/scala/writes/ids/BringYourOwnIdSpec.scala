@@ -6,7 +6,7 @@ import util._
 
 class BringYourOwnIdSpec extends FlatSpec with Matchers with ApiSpecBase with SchemaBaseV11 {
 
-  override def runOnlyForConnectors: Set[ConnectorTag] = Set(MySqlConnectorTag, PostgresConnectorTag, SQLiteConnectorTag)
+  override def runOnlyForConnectors: Set[ConnectorTag] = Set(VitessConnectorTag, MySqlConnectorTag, PostgresConnectorTag, SQLiteConnectorTag)
 
   "A Create Mutation" should "create and return item with own Id" in {
     schemaP1optToC1opt.test { dataModel =>
@@ -23,8 +23,9 @@ class BringYourOwnIdSpec extends FlatSpec with Matchers with ApiSpecBase with Sc
       res.toString should be(s"""{"data":{"createParent":{"p":"Parent","id":"Own Id"}}}""")
 
       val errorTarget = () match {
-        case _ if connectorTag == ConnectorTag.MySqlConnectorTag => "constraint: `PRIMARY`"
-        case _                                                   => "fields: (`id`)"
+        case _ if connectorTag == ConnectorTag.MySqlConnectorTag    => "constraint: `PRIMARY`"
+        case _ if connectorTag == ConnectorTag.VitessConnectorTag   => "(not available)"
+        case _                                                      => "fields: (`id`)"
       }
 
       server.queryThatMustFail(
@@ -101,8 +102,9 @@ class BringYourOwnIdSpec extends FlatSpec with Matchers with ApiSpecBase with Sc
       res.toString should be(s"""{"data":{"createParent":{"p":"Parent","id":"Own Id","childOpt":{"c":"Child","id":"Own Child Id"}}}}""")
 
       val constraintTarget = () match {
-        case _ if connectorTag == ConnectorTag.MySqlConnectorTag => "constraint: `PRIMARY`"
-        case _                                                   => "fields: (`id`)"
+        case _ if connectorTag == ConnectorTag.MySqlConnectorTag  => "constraint: `PRIMARY`"
+        case _ if connectorTag == ConnectorTag.VitessConnectorTag => "(not available)"
+        case _                                                    => "fields: (`id`)"
       }
 
       server.queryThatMustFail(

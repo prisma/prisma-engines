@@ -19,9 +19,14 @@ case class Project(
   val dataSourceConfig: String = {
     val config = ConnectorConfig.instance
 
+    val provider = config.provider.stripSuffix("56") match {
+      case "vitess" => "mysql"
+      case provider => provider
+    }
+
     s"""
            |datasource test {
-           |  provider = "${config.provider.stripSuffix("56")}"
+           |  provider = "${provider}"
            |  url = "$dataSourceUrl"
            |}
     """.stripMargin

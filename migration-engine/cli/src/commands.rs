@@ -3,9 +3,10 @@ pub(crate) mod error;
 #[cfg(test)]
 mod tests;
 
+use enumflags2::BitFlags;
 use error::CliError;
 use futures::FutureExt;
-use migration_core::migration_api;
+use migration_core::{migration_api, qe_setup::QueryEngineFlags};
 use structopt::StructOpt;
 use user_facing_errors::{
     common::{InvalidDatabaseString, SchemaParserError},
@@ -17,6 +18,8 @@ pub(crate) struct Cli {
     /// The connection string to the database
     #[structopt(long, short = "d", parse(try_from_str = parse_base64_string))]
     datasource: String,
+    #[structopt(long, short = "f", parse(try_from_str = parse_setup_flags), default_value = "Bitflags::empty")]
+    qe_test_setup_flags: BitFlags<QueryEngineFlags>,
     #[structopt(subcommand)]
     command: CliCommand,
 }
@@ -51,7 +54,7 @@ impl Cli {
             CliCommand::CanConnectToDatabase => connect_to_database(&self.datasource).await,
             CliCommand::DropDatabase => drop_database(&self.datasource).await,
             CliCommand::QeSetup => {
-                qe_setup(&self.datasource).await?;
+                qe_setup(&self.datasource, self.qe_test_setup_flags).await?;
                 Ok(String::new())
             }
         }
@@ -85,6 +88,19 @@ fn parse_base64_string(s: &str) -> Result<String, CliError> {
     }
 }
 
+fn parse_setup_flags(s: &str) -> Result<BitFlags<QueryEngineFlags>, CliError> {
+    let mut flags = BitFlags::empty();
+
+    for flag in s.split(',') {
+        match flag {
+            "database_creation_not_allowed" => flags.insert(QueryEngineFlags::DatabaseCreationNotAllowed),
+            flag => return Err(CliError::invalid_parameters(format!("Unknown flag: {}", flag))),
+        }
+    }
+
+    Ok(flags)
+}
+
 async fn connect_to_database(database_str: &str) -> Result<String, CliError> {
     let datamodel = datasource_from_database_str(database_str)?;
     migration_api(&datamodel).await?;
@@ -105,8 +121,8 @@ async fn drop_database(database_str: &str) -> Result<String, CliError> {
     Ok("The database was successfully dropped.".to_string())
 }
 
-async fn qe_setup(prisma_schema: &str) -> Result<(), CliError> {
-    migration_core::qe_setup(&prisma_schema).await?;
+async fn qe_setup(prisma_schema: &str, flags: BitFlags<QueryEngineFlags>) -> Result<(), CliError> {
+    migration_core::qe_setup::run(&prisma_schema, flags).await?;
 
     Ok(())
 }

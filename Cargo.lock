@@ -2288,6 +2288,7 @@ name = "migration-engine-cli"
 version = "0.1.0"
 dependencies = [
  "base64 0.13.0",
+ "enumflags2",
  "futures 0.3.13",
  "json-rpc-stdio",
  "migration-connector",
@@ -3569,6 +3570,7 @@ dependencies = [
  "datamodel",
  "datamodel-connector",
  "enum_dispatch",
+ "enumflags2",
  "indoc",
  "itertools 0.10.0",
  "lazy_static",

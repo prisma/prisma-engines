@@ -5,6 +5,8 @@ import play.api.libs.json.Json
 import util._
 
 class UpdateMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
+  override def doNotRunForConnectors: Set[ConnectorTag] = Set(ConnectorTag.VitessConnectorTag)
+
   "An updateOne mutation" should "update an item" taggedAs IgnoreSQLite in {
     val project = ProjectDsl.fromString {
       """

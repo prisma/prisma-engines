@@ -13,6 +13,10 @@ pub enum CliError {
         error: user_facing_errors::KnownError,
         exit_code: i32,
     },
+    InvalidParameters {
+        error: String,
+        exit_code: i32,
+    },
     Unknown {
         error: ConnectorError,
         context: SpanTrace,
@@ -24,6 +28,7 @@ impl Display for CliError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             CliError::Known { error, exit_code: _ } => write!(f, "Known error: {:?}", error),
+            CliError::InvalidParameters { error, .. } => write!(f, "Invalid parameters: {}", error),
             CliError::Unknown {
                 error,
                 context,
@@ -38,6 +43,14 @@ impl CliError {
         match self {
             CliError::Known { exit_code, .. } => *exit_code,
             CliError::Unknown { exit_code, .. } => *exit_code,
+            CliError::InvalidParameters { exit_code, .. } => *exit_code,
+        }
+    }
+
+    pub fn invalid_parameters<S: ToString>(error: S) -> Self {
+        Self::InvalidParameters {
+            error: error.to_string(),
+            exit_code: 255,
         }
     }
 

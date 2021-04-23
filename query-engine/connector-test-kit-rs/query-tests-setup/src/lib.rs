@@ -16,6 +16,7 @@ pub use query_result::*;
 pub use runner::*;
 pub use templating::*;
 
+use enumflags2::BitFlags;
 use lazy_static::lazy_static;
 use tokio::runtime::Builder;
 
@@ -28,7 +29,7 @@ lazy_static! {
 
 /// Teardown & setup of everything as defined in the passed datamodel.
 pub async fn setup_project(datamodel: &str) -> TestResult<()> {
-    Ok(migration_core::qe_setup(datamodel).await?)
+    Ok(migration_core::qe_setup::run(datamodel, BitFlags::empty()).await?)
 }
 
 /// Helper method to allow a sync shell function to run the async test blocks.
