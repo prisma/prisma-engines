@@ -5,7 +5,7 @@ on:
       - master
   pull_request:
 jobs:
-  test:
+  scala-vitess-tests:
     name: "Scala test suite: ${{ matrix.database }} on Linux"
     runs-on: ubuntu-latest
 
@@ -49,5 +49,46 @@ jobs:
 
       - run: export SERVER_ROOT=$(pwd) && cd query-engine/connector-test-kit && sbt test
         name: Run tests
+        env:
+          CLICOLOR_FORCE: 1
+
+  rust-vitess-tests:
+    name: "Rust test suite: Vitess ${{ matrix.database }} on Linux"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        database:
+          - "vitess_5_7"
+          - "vitess_8_0"
+
+    env:
+      LOG_LEVEL: "info"
+      LOG_QUERIES: "y"
+      RUST_LOG_FORMAT: "devel"
+      RUST_BACKTRACE: 1
+      CLICOLOR_FORCE: 1
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: "Start ${{ matrix.database }}"
+        run: make dev-${{ matrix.database }}
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          default: true
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: query-engine-rs-${{ runner.os }}-cargo-vitess-${{ matrix.version }}-${{ hashFiles('**/Cargo.lock') }}
+
+      - run: timeout 40m cargo test --package query-engine-tests -- --test-threads=1
         env:
           CLICOLOR_FORCE: 1
