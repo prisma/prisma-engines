@@ -19,7 +19,7 @@ case class TestServer() extends PlayJsonExtensions with LogSupport {
       project: Project,
       dataContains: String = "",
       legacy: Boolean = true,
-      batchSize: Int = 500,
+      batchSize: Int = 5000,
   ): JsValue = {
     val result = queryBinary(
       request = createSingleQuery(query),
