@@ -16,8 +16,8 @@ pub struct Model {
     pub is_embedded: bool,
     /// Describes Composite Indexes
     pub indices: Vec<IndexDefinition>,
-    /// Describes Composite Primary Keys
-    pub id_fields: Vec<String>,
+    /// Describes Primary Keys
+    pub primary_key: Option<PrimaryKeyDefinition>,
     /// Indicates if this model is generated.
     pub is_generated: bool,
     /// Indicates if this model has to be commented out.
@@ -38,12 +38,23 @@ impl IndexDefinition {
     pub fn is_unique(&self) -> bool {
         matches!(self.tpe, IndexType::Unique)
     }
+
+    pub fn is_single_field(&self) -> bool {
+        self.fields.len() == 1
+    }
 }
 
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum IndexType {
     Unique,
     Normal,
+}
+
+/// Represents a primary key defined via `@@id` or `@id`.
+#[derive(Debug, PartialEq, Clone)]
+pub struct PrimaryKeyDefinition {
+    pub name: Option<String>,
+    pub fields: Vec<String>,
 }
 
 /// A unique criteria is a set of fields through which a record can be uniquely identified.
@@ -65,7 +76,7 @@ impl Model {
             name,
             fields: vec![],
             indices: vec![],
-            id_fields: vec![],
+            primary_key: None,
             documentation: None,
             database_name,
             is_embedded: false,
@@ -166,11 +177,7 @@ impl Model {
 
     /// Finds the name of all id fields
     pub fn id_field_names(&self) -> Vec<String> {
-        let singular_id_field = self.singular_id_fields().next();
-        match singular_id_field {
-            Some(f) => vec![f.name.clone()],
-            None => self.id_fields.clone(),
-        }
+        self.primary_key.as_ref().map_or(vec![], |pk| pk.fields.clone())
     }
 
     /// This should match the logic in `prisma_models::Model::primary_identifier`.
@@ -223,11 +230,9 @@ impl Model {
 
         // second candidate: the multi field id
         {
-            let id_fields: Vec<_> = self
-                .id_fields
-                .iter()
-                .map(|f| self.find_scalar_field(&f).unwrap())
-                .collect();
+            let id_fields: Vec<_> = self.primary_key.as_ref().map_or(vec![], |pk| {
+                pk.fields.iter().map(|f| self.find_scalar_field(&f).unwrap()).collect()
+            });
 
             if !id_fields.is_empty()
                 && !id_fields
@@ -285,7 +290,7 @@ impl Model {
             .iter()
             .any(|index| index.fields.first().unwrap() == field_name);
 
-        let is_first_in_primary_key = matches!(self.id_fields.first(), Some(f) if f == field_name);
+        let is_first_in_primary_key = matches!(&self.primary_key, Some(pk) if pk.fields.first().unwrap() == field_name);
 
         is_first_in_index || is_first_in_primary_key
     }
@@ -301,8 +306,19 @@ impl Model {
     }
 
     /// Determines whether there is a singular primary key
-    pub fn has_single_id_field(&self) -> bool {
-        self.singular_id_fields().count() == 1
+    pub fn has_singular_id(&self) -> bool {
+        match &self.primary_key {
+            Some(pk) if pk.fields.len() == 1 => true,
+            _ => false,
+        }
+    }
+
+    /// Determines whether there is a singular primary key
+    pub fn has_compound_id(&self) -> bool {
+        match &self.primary_key {
+            Some(pk) if pk.fields.len() > 1 => true,
+            _ => false,
+        }
     }
 
     pub fn add_index(&mut self, index: IndexDefinition) {

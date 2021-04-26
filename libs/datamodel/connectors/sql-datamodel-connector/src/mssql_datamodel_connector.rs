@@ -247,16 +247,18 @@ impl Connector for MsSqlDatamodelConnector {
             }
         }
 
-        for id_field in model.id_fields.iter() {
-            let field = model.find_field(id_field).unwrap();
+        if let Some(pk) = &model.primary_key {
+            for id_field in pk.fields.iter() {
+                let field = model.find_field(id_field).unwrap();
 
-            if let FieldType::NativeType(_, native_type) = field.field_type() {
-                let r#type: MsSqlType = native_type.deserialize_native_type();
+                if let FieldType::NativeType(_, native_type) = field.field_type() {
+                    let r#type: MsSqlType = native_type.deserialize_native_type();
 
-                if heap_allocated_types().contains(&r#type) {
-                    return self
-                        .native_instance_error(native_type)
-                        .new_incompatible_native_type_with_id();
+                    if heap_allocated_types().contains(&r#type) {
+                        return self
+                            .native_instance_error(native_type)
+                            .new_incompatible_native_type_with_id();
+                    }
                 }
             }
         }

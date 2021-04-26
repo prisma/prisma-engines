@@ -62,7 +62,7 @@ impl<'a> DatamodelConverter<'a> {
                 is_embedded: model.is_embedded,
                 fields: self.convert_fields(&model),
                 manifestation: model.database_name().map(|s| s.to_owned()),
-                id_field_names: model.id_fields.clone(),
+                id_field_names: model.primary_key.as_ref().map_or(vec![], |pk| pk.fields.clone()),
                 indexes: self.convert_indexes(&model),
                 supports_create_operation: model.supports_create_operation(),
                 dml_model: model.clone(),
@@ -470,7 +470,7 @@ impl DatamodelFieldExtensions for dml::ScalarField {
 
     fn is_id(&self, model: &dml::Model) -> bool {
         // transform @@id for 1 field to is_id
-        self.is_id || model.id_fields == vec![self.name.clone()]
+        self.is_id || matches!(&model.primary_key, Some(pk) if pk.fields == vec![self.name.clone()])
     }
 
     fn is_auto_generated_int_id(&self) -> bool {

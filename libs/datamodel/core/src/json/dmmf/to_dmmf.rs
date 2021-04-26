@@ -64,7 +64,7 @@ fn model_to_dmmf(model: &dml::Model) -> Model {
             .collect(),
         is_generated: Some(model.is_generated),
         documentation: model.documentation.clone(),
-        id_fields: model.id_fields.clone(),
+        id_fields: model.primary_key.as_ref().map_or(vec![], |pk| pk.fields.clone()),
         unique_fields: model
             .indices
             .iter()

@@ -149,7 +149,7 @@ impl<'a> Validator<'a> {
             all_errors.extend(errors_for_enum);
         }
 
-        all_errors.to_result()
+        all_errors.into_result()
     }
 
     pub fn post_standardisation_validate(
@@ -176,7 +176,7 @@ impl<'a> Validator<'a> {
             all_errors.extend(errors_for_model);
         }
 
-        all_errors.to_result()
+        all_errors.into_result()
     }
 
     fn validate_names(&self, ast_schema: &ast::SchemaAst) -> Result<(), Diagnostics> {
@@ -202,7 +202,7 @@ impl<'a> Validator<'a> {
             }
         }
 
-        errors.to_result()
+        errors.into_result()
     }
 
     fn validate_names_for_indexes(
@@ -240,7 +240,7 @@ impl<'a> Validator<'a> {
             }
         }
 
-        errors.to_result()
+        errors.into_result()
     }
 
     fn validate_field_arities(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), Diagnostics> {
@@ -262,7 +262,7 @@ impl<'a> Validator<'a> {
             }
         }
 
-        errors.to_result()
+        errors.into_result()
     }
 
     fn validate_field_types(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), Diagnostics> {
@@ -286,7 +286,7 @@ impl<'a> Validator<'a> {
             }
         }
 
-        errors.to_result()
+        errors.into_result()
     }
 
     fn validate_enum_default_values(
@@ -314,7 +314,7 @@ impl<'a> Validator<'a> {
             }
         }
 
-        errors.to_result()
+        errors.into_result()
     }
 
     fn validate_auto_increment(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), Diagnostics> {
@@ -383,14 +383,11 @@ impl<'a> Validator<'a> {
             ast_model.span,
         ));
 
-        let has_single_field_id = model.singular_id_fields().next().is_some();
-        let has_multi_field_id = !model.id_fields.is_empty();
-
         if model.singular_id_fields().count() > 1 {
             return multiple_single_field_id_error;
         }
 
-        if has_single_field_id && has_multi_field_id {
+        if model.has_singular_id() && model.has_compound_id() {
             return multiple_id_criteria_error;
         }
 
@@ -474,7 +471,7 @@ impl<'a> Validator<'a> {
             }
         }
 
-        diagnostics.to_result()
+        diagnostics.into_result()
     }
 
     fn validate_model_connector_specific(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), Diagnostics> {
@@ -487,7 +484,7 @@ impl<'a> Validator<'a> {
             }
         }
 
-        diagnostics.to_result()
+        diagnostics.into_result()
     }
 
     fn validate_base_fields_for_relation(
@@ -548,7 +545,7 @@ impl<'a> Validator<'a> {
             }
         }
 
-        errors.to_result()
+        errors.into_result()
     }
 
     fn validate_referenced_fields_for_relation(
@@ -714,7 +711,7 @@ impl<'a> Validator<'a> {
 
                 // TODO: This error is only valid for connectors that don't support native many to manys.
                 // We only render this error if there's a singular id field. Otherwise we render a better error in a different function.
-                if is_many_to_many && !references_singular_id_field && related_model.has_single_id_field() {
+                if is_many_to_many && !references_singular_id_field && related_model.has_singular_id() {
                     errors.push_error(DatamodelError::new_validation_error(
                             &format!(
                                 "Many to many relations must always reference the id field of the related model. Change the argument `references` to use the id field of the related model `{}`. But it is referencing the following fields that are not the id: {}",
@@ -743,7 +740,7 @@ impl<'a> Validator<'a> {
             }
         }
 
-        errors.to_result()
+        errors.into_result()
     }
 
     fn validate_relation_arguments_bla(
@@ -900,7 +897,7 @@ impl<'a> Validator<'a> {
                 }
 
                 // MANY TO MANY
-                if field.is_list() && related_field.is_list() && !related_model.has_single_id_field() {
+                if field.is_list() && related_field.is_list() && !related_model.has_singular_id() {
                     errors.push_error(DatamodelError::new_field_validation_error(
                             &format!(
                                 "The relation field `{}` on Model `{}` references `{}` which does not have an `@id` field. Models without `@id` can not be part of a many to many relation. Use an explicit intermediate Model to represent this relationship.",

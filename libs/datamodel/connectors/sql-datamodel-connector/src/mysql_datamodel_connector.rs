@@ -301,14 +301,17 @@ impl Connector for MySqlDatamodelConnector {
                 }
             }
         }
-        for id_field in model.id_fields.iter() {
-            let field = model.find_field(id_field).unwrap();
-            if let FieldType::NativeType(_, native_type) = field.field_type() {
-                let native_type_name = native_type.name.as_str();
-                if NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type_name) {
-                    return self
-                        .native_instance_error(native_type.clone())
-                        .new_incompatible_native_type_with_id();
+
+        if let Some(pk) = &model.primary_key {
+            for id_field in pk.fields.iter() {
+                let field = model.find_field(id_field).unwrap();
+                if let FieldType::NativeType(_, native_type) = field.field_type() {
+                    let native_type_name = native_type.name.as_str();
+                    if NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type_name) {
+                        return self
+                            .native_instance_error(native_type.clone())
+                            .new_incompatible_native_type_with_id();
+                    }
                 }
             }
         }

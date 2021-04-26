@@ -57,7 +57,7 @@ impl Precheck {
         errors.extend(sources_checker.errors());
         errors.extend(generators_checker.errors());
 
-        errors.to_result()
+        errors.into_result()
     }
 
     fn assert_is_not_a_reserved_scalar_type(identifier: &ast::Identifier, errors: &mut Diagnostics) {

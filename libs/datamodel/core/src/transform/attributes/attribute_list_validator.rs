@@ -89,7 +89,7 @@ impl<T: 'static> AttributeListValidator<T> {
             };
         }
 
-        errors.to_result()?;
+        errors.into_result()?;
 
         Ok(())
     }

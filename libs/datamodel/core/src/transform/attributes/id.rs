@@ -1,6 +1,6 @@
 use super::{super::helpers::*, AttributeValidator};
 use crate::diagnostics::DatamodelError;
-use crate::{ast, dml};
+use crate::{ast, dml, PrimaryKeyDefinition};
 
 /// Prismas builtin `@primary` attribute.
 pub struct IdAttributeValidator {}
@@ -52,10 +52,12 @@ impl AttributeValidator<dml::Model> for ModelLevelIdAttributeValidator {
             .map(|f| f.as_constant_literal())
             .collect::<Result<Vec<_>, _>>()?;
 
-        obj.id_fields = fields;
+        obj.primary_key = Some(PrimaryKeyDefinition {
+            name: None,
+            fields: fields.clone(),
+        });
 
-        let undefined_fields: Vec<String> = obj
-            .id_fields
+        let undefined_fields: Vec<String> = fields
             .iter()
             .filter_map(|field| {
                 if obj.find_field(&field).is_none() {
@@ -66,8 +68,7 @@ impl AttributeValidator<dml::Model> for ModelLevelIdAttributeValidator {
             })
             .collect();
 
-        let referenced_relation_fields: Vec<String> = obj
-            .id_fields
+        let referenced_relation_fields: Vec<String> = fields
             .iter()
             .filter(|field| match obj.find_field(&field) {
                 Some(field) => field.is_relation(),
@@ -99,8 +100,7 @@ impl AttributeValidator<dml::Model> for ModelLevelIdAttributeValidator {
         }
 
         // the unwrap is safe because we error on undefined fields before
-        let fields_that_are_not_required: Vec<_> = obj
-            .id_fields
+        let fields_that_are_not_required: Vec<_> = fields
             .iter()
             .filter(|field| !obj.find_field(&field).unwrap().arity().is_required())
             .map(|field| field.to_string())
@@ -121,17 +121,18 @@ impl AttributeValidator<dml::Model> for ModelLevelIdAttributeValidator {
     }
 
     fn serialize(&self, model: &dml::Model, _datamodel: &dml::Datamodel) -> Vec<ast::Attribute> {
-        if !model.id_fields.is_empty() {
-            let args = vec![ast::Argument::new_array(
-                "",
-                model
-                    .id_fields
-                    .iter()
-                    .map(|f| ast::Expression::ConstantValue(f.to_string(), ast::Span::empty()))
-                    .collect(),
-            )];
+        if let Some(pk) = &model.primary_key {
+            if model.has_compound_id() {
+                let args = vec![ast::Argument::new_array(
+                    "",
+                    pk.fields
+                        .iter()
+                        .map(|f| ast::Expression::ConstantValue(f.to_string(), ast::Span::empty()))
+                        .collect(),
+                )];
 
-            return vec![ast::Attribute::new(self.attribute_name(), args)];
+                return vec![ast::Attribute::new(self.attribute_name(), args)];
+            }
         }
 
         vec![]

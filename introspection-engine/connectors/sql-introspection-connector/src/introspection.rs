@@ -6,7 +6,7 @@ use crate::introspection_helpers::{
 use crate::version_checker::VersionChecker;
 use crate::Dedup;
 use crate::SqlError;
-use datamodel::{dml, walkers::find_model_by_db_name, Datamodel, Field, Model, RelationField};
+use datamodel::{dml, walkers::find_model_by_db_name, Datamodel, Field, Model, PrimaryKeyDefinition, RelationField};
 use quaint::connector::SqlFamily;
 use sql_schema_describer::{SqlSchema, Table};
 use tracing::debug;
@@ -53,9 +53,10 @@ pub fn introspect(
             model.add_index(calculate_index(index));
         }
 
-        if table.primary_key_columns().len() > 1 {
-            model.id_fields = table.primary_key_columns();
-        }
+        model.primary_key = table.primary_key.as_ref().map(|pk| PrimaryKeyDefinition {
+            name: pk.constraint_name.clone(),
+            fields: pk.columns.clone(),
+        });
 
         version_check.always_has_created_at_updated_at(table, &model);
         version_check.has_p1_compatible_primary_key_column(table);

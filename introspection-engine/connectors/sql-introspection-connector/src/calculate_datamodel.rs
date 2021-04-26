@@ -105,7 +105,7 @@ mod tests {
                 ],
                 is_generated: false,
                 indices: vec![],
-                id_fields: vec![],
+                primary_key: None,
             }],
             enums: vec![],
         };
@@ -189,7 +189,7 @@ mod tests {
                     })],
                     is_generated: false,
                     indices: vec![],
-                    id_fields: vec![],
+                    primary_key: None,
                 },
                 // Model with non-auto-incrementing primary key
                 Model {
@@ -222,7 +222,7 @@ mod tests {
                     })],
                     is_generated: false,
                     indices: vec![],
-                    id_fields: vec![],
+                    primary_key: None,
                 },
                 // Model with primary key seeded by sequence
                 Model {
@@ -255,7 +255,7 @@ mod tests {
                     })],
                     is_generated: false,
                     indices: vec![],
-                    id_fields: vec![],
+                    primary_key: None,
                 },
             ],
             enums: vec![],
@@ -375,7 +375,7 @@ mod tests {
                 ],
                 is_generated: false,
                 indices: vec![],
-                id_fields: vec![],
+                primary_key: None,
             }],
             enums: vec![],
         };
@@ -477,7 +477,7 @@ mod tests {
                     ],
                     is_generated: false,
                     indices: vec![],
-                    id_fields: vec![],
+                    primary_key: None,
                 },
                 Model {
                     database_name: None,
@@ -564,7 +564,7 @@ mod tests {
                     ],
                     is_generated: false,
                     indices: vec![],
-                    id_fields: vec![],
+                    primary_key: None,
                 },
             ],
             enums: vec![],
@@ -736,7 +736,7 @@ mod tests {
                     fields: vec!["name".to_string(), "lastname".to_string()],
                     tpe: datamodel::dml::IndexType::Unique,
                 }],
-                id_fields: vec![],
+                primary_key: None,
             }],
             enums: vec![],
         };
@@ -863,7 +863,7 @@ mod tests {
                     ],
                     is_generated: false,
                     indices: vec![],
-                    id_fields: vec![],
+                    primary_key: None,
                 },
                 Model {
                     database_name: None,
@@ -920,7 +920,7 @@ mod tests {
                     ],
                     is_generated: false,
                     indices: vec![],
-                    id_fields: vec![],
+                    primary_key: None,
                 },
             ],
             enums: vec![],
