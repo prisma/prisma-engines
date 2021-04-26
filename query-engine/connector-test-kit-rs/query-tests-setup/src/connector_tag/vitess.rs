@@ -35,7 +35,7 @@ impl ConnectorTagInterface for VitessConnectorTag {
 
     fn as_parse_pair(&self) -> (String, Option<String>) {
         let version = self.version.as_ref().map(ToString::to_string);
-        ("sqlite".to_owned(), version)
+        ("vitess".to_owned(), version)
     }
 
     fn is_versioned(&self) -> bool {
