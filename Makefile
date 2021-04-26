@@ -128,7 +128,7 @@ start-vitess_8_0:
 	docker-compose -f docker-compose.yml up -d --remove-orphans vitess-test-8_0 vitess-shadow-8_0
 
 dev-vitess_8_0: start-vitess_8_0
-	echo 'vitess_5_7' > current_connector
+	echo 'vitess_8_0' > current_connector
 	cp $(CONFIG_PATH)/vitess_8_0 $(CONFIG_FILE)
 
 dev-down:
