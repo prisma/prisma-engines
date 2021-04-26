@@ -73,7 +73,7 @@ impl VitessConnectorTag {
             },
             Self {
                 version: Some(VitessVersion::V8_0),
-                capabilities: capabilities.clone(),
+                capabilities,
             },
         ]
     }
