@@ -6,7 +6,7 @@ use migration_core::{
 use pretty_assertions::assert_eq;
 use user_facing_errors::{migration_engine::MigrationDoesNotApplyCleanly, UserFacingError};
 
-#[test_each_connector]
+#[test_connector]
 async fn dev_diagnostic_on_an_empty_database_without_migration_returns_create_migration(api: &TestApi) -> TestResult {
     let directory = api.create_migrations_directory()?;
     let DevDiagnosticOutput { action } = api.dev_diagnostic(&directory).send().await?.into_output();
@@ -16,7 +16,7 @@ async fn dev_diagnostic_on_an_empty_database_without_migration_returns_create_mi
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn dev_diagnostic_after_two_migrations_happy_path(api: &TestApi) -> TestResult {
     let directory = api.create_migrations_directory()?;
 
@@ -51,7 +51,7 @@ async fn dev_diagnostic_after_two_migrations_happy_path(api: &TestApi) -> TestRe
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn dev_diagnostic_detects_drift(api: &TestApi) -> TestResult {
     let directory = api.create_migrations_directory()?;
 
@@ -89,7 +89,7 @@ async fn dev_diagnostic_detects_drift(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(ignore("postgres", "mssql"))]
+#[test_connector(exclude(Postgres, Mssql))]
 async fn dev_diagnostic_calculates_drift_in_presence_of_failed_migrations(api: &TestApi) -> TestResult {
     let directory = api.create_migrations_directory()?;
 
@@ -142,7 +142,7 @@ async fn dev_diagnostic_calculates_drift_in_presence_of_failed_migrations(api: &
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn dev_diagnostic_returns_create_migration_when_the_database_is_behind(api: &TestApi) -> TestResult {
     let directory = api.create_migrations_directory()?;
 
@@ -177,7 +177,7 @@ async fn dev_diagnostic_returns_create_migration_when_the_database_is_behind(api
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn dev_diagnostic_can_detect_when_the_migrations_directory_is_behind(api: &TestApi) -> TestResult {
     let directory = api.create_migrations_directory()?;
 
@@ -221,7 +221,7 @@ async fn dev_diagnostic_can_detect_when_the_migrations_directory_is_behind(api: 
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn dev_diagnostic_can_detect_when_history_diverges(api: &TestApi) -> TestResult {
     let directory = api.create_migrations_directory()?;
 
@@ -291,7 +291,7 @@ async fn dev_diagnostic_can_detect_when_history_diverges(api: &TestApi) -> TestR
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn dev_diagnostic_can_detect_edited_migrations(api: &TestApi) -> TestResult {
     let directory = api.create_migrations_directory()?;
 
@@ -339,7 +339,7 @@ async fn dev_diagnostic_can_detect_edited_migrations(api: &TestApi) -> TestResul
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn dev_diagnostic_reports_migrations_failing_to_apply_cleanly(api: &TestApi) -> TestResult {
     let directory = api.create_migrations_directory()?;
 
@@ -390,7 +390,7 @@ async fn dev_diagnostic_reports_migrations_failing_to_apply_cleanly(api: &TestAp
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn dev_diagnostic_with_a_nonexistent_migrations_directory_works(api: &TestApi) -> TestResult {
     let directory = api.create_migrations_directory()?;
 
@@ -402,7 +402,7 @@ async fn dev_diagnostic_with_a_nonexistent_migrations_directory_works(api: &Test
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn with_a_failed_migration(api: &TestApi) -> TestResult {
     let migrations_directory = api.create_migrations_directory()?;
 
@@ -453,7 +453,7 @@ async fn with_a_failed_migration(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn with_an_invalid_unapplied_migration_should_report_it(api: &TestApi) -> TestResult {
     let directory = api.create_migrations_directory()?;
 
@@ -507,7 +507,7 @@ async fn with_an_invalid_unapplied_migration_should_report_it(api: &TestApi) -> 
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"))]
+#[test_connector(tags(Postgres))]
 async fn drift_can_be_detected_without_migrations_table(api: &TestApi) -> TestResult {
     let directory = api.create_migrations_directory()?;
 
@@ -533,7 +533,7 @@ async fn drift_can_be_detected_without_migrations_table(api: &TestApi) -> TestRe
     Ok(())
 }
 
-#[test_each_connector(tags("mysql_8"), log = "debug")]
+#[test_connector(tags(Mysql8), exclude(Vitess))]
 async fn dev_diagnostic_shadow_database_creation_error_is_special_cased_mysql(api: &TestApi) -> TestResult {
     let directory = api.create_migrations_directory()?;
 
@@ -556,7 +556,7 @@ async fn dev_diagnostic_shadow_database_creation_error_is_special_cased_mysql(ap
         ))
         .await?;
 
-    let (host, port) = test_setup::db_host_and_port_mysql_8_0();
+    let db_url: url::Url = api.connection_string().parse().unwrap();
 
     let datamodel = format!(
         r#"
@@ -565,9 +565,9 @@ async fn dev_diagnostic_shadow_database_creation_error_is_special_cased_mysql(ap
             url = "mysql://prismashadowdbtestuser:1234batman@{dbhost}:{dbport}/{dbname}"
         }}
         "#,
-        dbhost = host,
+        dbhost = db_url.host().unwrap(),
         dbname = api.connection_info().dbname().unwrap(),
-        dbport = port,
+        dbport = db_url.port().unwrap_or(3306),
     );
 
     let migration_api = migration_api(&datamodel).await?;
@@ -586,7 +586,7 @@ async fn dev_diagnostic_shadow_database_creation_error_is_special_cased_mysql(ap
     Ok(())
 }
 
-#[test_each_connector(tags("postgres_12"))]
+#[test_connector(tags(Postgres12))]
 async fn dev_diagnostic_shadow_database_creation_error_is_special_cased_postgres(api: &TestApi) -> TestResult {
     let directory = api.create_migrations_directory()?;
 
@@ -607,7 +607,7 @@ async fn dev_diagnostic_shadow_database_creation_error_is_special_cased_postgres
         )
         .await?;
 
-    let (host, port) = test_setup::db_host_and_port_postgres_12();
+    let db_url: url::Url = api.connection_string().parse().unwrap();
 
     let datamodel = format!(
         r#"
@@ -616,9 +616,9 @@ async fn dev_diagnostic_shadow_database_creation_error_is_special_cased_postgres
             url = "postgresql://prismashadowdbtestuser:1234batman@{dbhost}:{dbport}/{dbname}"
         }}
         "#,
-        dbhost = host,
+        dbhost = db_url.host().unwrap(),
         dbname = api.connection_info().dbname().unwrap(),
-        dbport = port,
+        dbport = db_url.port().unwrap(),
     );
 
     let migration_api = migration_api(&datamodel).await?;
@@ -638,7 +638,7 @@ async fn dev_diagnostic_shadow_database_creation_error_is_special_cased_postgres
 }
 
 // (Hopefully) Temporarily commented out because this test is flaky in CI.
-// #[test_each_connector(tags("mssql"))]
+// #[test_connector(tags("mssql"))]
 // async fn dev_diagnostic_shadow_database_creation_error_is_special_cased_mssql(api: &TestApi) -> TestResult {
 //     let directory = api.create_migrations_directory()?;
 

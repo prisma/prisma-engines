@@ -1,6 +1,6 @@
 use crate::*;
 
-#[test_each_connector]
+#[test_connector]
 async fn list_migration_directories_with_an_empty_migrations_folder_works(api: &TestApi) -> TestResult {
     let migrations_directory = api.create_migrations_directory()?;
 
@@ -12,7 +12,7 @@ async fn list_migration_directories_with_an_empty_migrations_folder_works(api: &
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn listing_a_single_migration_name_should_work(api: &TestApi) -> TestResult {
     let dm = r#"
         model Cat {

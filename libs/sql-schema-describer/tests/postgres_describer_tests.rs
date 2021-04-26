@@ -1,20 +1,16 @@
 mod common;
-mod postgres;
 mod test_api;
 
-use crate::{common::*, postgres::*};
+use crate::{common::*, test_api::*};
 use barrel::{types, Migration};
 use native_types::{NativeType, PostgresType};
 use pretty_assertions::assert_eq;
 use quaint::prelude::Queryable;
 use sql_schema_describer::*;
-use test_api::*;
-use test_macros::test_each_connector;
+use test_macros::test_connector;
 
-#[tokio::test]
-async fn views_can_be_described() {
-    let db_name = "views_can_be_described";
-
+#[test_connector(tags(Postgres))]
+async fn views_can_be_described(api: &TestApi) -> TestResult {
     let full_sql = format!(
         r#"
         CREATE TABLE "{0}".a (a_id int);
@@ -24,8 +20,8 @@ async fn views_can_be_described() {
         SCHEMA,
     );
 
-    let inspector = get_postgres_describer(&full_sql, db_name).await;
-    let result = inspector.describe(SCHEMA).await.expect("describing");
+    api.database().raw_cmd(&full_sql).await?;
+    let result = api.describe().await?;
     let view = result.get_view("ab").expect("couldn't get ab view").to_owned();
 
     let expected_sql = format!(
@@ -35,10 +31,12 @@ async fn views_can_be_described() {
 
     assert_eq!("ab", &view.name);
     assert_eq!(expected_sql, view.definition.unwrap());
+
+    Ok(())
 }
 
-#[tokio::test]
-async fn all_postgres_column_types_must_work() {
+#[test_connector(tags(Postgres))]
+async fn all_postgres_column_types_must_work(api: &TestApi) -> TestResult {
     let mut migration = Migration::new().schema(SCHEMA);
     migration.create_table("User", move |t| {
         t.add_column("array_bin_col", types::array(&types::binary()));
@@ -88,8 +86,8 @@ async fn all_postgres_column_types_must_work() {
     });
 
     let full_sql = migration.make::<barrel::backend::Pg>();
-    let inspector = get_postgres_describer(&full_sql, "all_postgres_column_types_must_work").await;
-    let result = inspector.describe(SCHEMA).await.expect("describing");
+    api.database().raw_cmd(&full_sql).await?;
+    let result = api.describe().await?;
     let mut table = result.get_table("User").expect("couldn't get User table").to_owned();
     // Ensure columns are sorted as expected when comparing
     table.columns.sort_unstable_by_key(|c| c.name.to_owned());
@@ -590,10 +588,12 @@ async fn all_postgres_column_types_must_work() {
             foreign_keys: vec![],
         }
     );
+
+    Ok(())
 }
 
-#[tokio::test]
-async fn postgres_cross_schema_references_are_not_allowed() {
+#[test_connector(tags(Postgres))]
+async fn postgres_cross_schema_references_are_not_allowed(api: &TestApi) -> TestResult {
     let schema2 = format!("{}_2", SCHEMA);
 
     let sql = format!(
@@ -608,18 +608,20 @@ async fn postgres_cross_schema_references_are_not_allowed() {
         schema2, SCHEMA
     );
 
-    let inspector = get_postgres_describer(&sql, "postgres_cross_schema_references_are_not_allowed").await;
+    api.database().raw_cmd(&sql).await?;
 
-    let err = inspector.describe(SCHEMA).await.unwrap_err();
+    let err = api.describe().await.unwrap_err();
 
     assert_eq!(
         "Illegal cross schema reference from `DatabaseInspector-Test.User` to `DatabaseInspector-Test_2.City` in constraint `User_city_fkey`. Foreign keys between database schemas are not supported in Prisma. Please follow the GitHub ticket: https://github.com/prisma/prisma/issues/1175".to_string(),
         format!("{}", err),
     );
+
+    Ok(())
 }
 
-#[tokio::test]
-async fn postgres_foreign_key_on_delete_must_be_handled() {
+#[test_connector(tags(Postgres))]
+async fn postgres_foreign_key_on_delete_must_be_handled(api: &TestApi) -> TestResult {
     let sql = format!(
         "CREATE TABLE \"{0}\".\"City\" (id INT PRIMARY KEY);
          CREATE TABLE \"{0}\".\"User\" (
@@ -633,9 +635,9 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
         ",
         SCHEMA
     );
-    let inspector = get_postgres_describer(&sql, "postgres_foreign_key_on_delete_must_be_handled").await;
+    api.database().raw_cmd(&sql).await?;
 
-    let schema = inspector.describe(SCHEMA).await.expect("describing");
+    let schema = api.describe().await?;
     let mut table = schema.get_table("User").expect("get User table").to_owned();
     table.foreign_keys.sort_unstable_by_key(|fk| fk.columns.clone());
 
@@ -762,17 +764,19 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
             ],
         }
     );
+
+    Ok(())
 }
 
-#[tokio::test]
-async fn postgres_enums_must_work() {
-    let inspector = get_postgres_describer(
-        &format!("CREATE TYPE \"{}\".\"mood\" AS ENUM ('sad', 'ok', 'happy')", SCHEMA),
-        "postgres_enums_must_work",
-    )
-    .await;
-
-    let schema = inspector.describe(SCHEMA).await.expect("describing");
+#[test_connector(tags(Postgres))]
+async fn postgres_enums_must_work(api: &TestApi) -> TestResult {
+    api.database()
+        .raw_cmd(&format!(
+            "CREATE TYPE \"{}\".\"mood\" AS ENUM ('sad', 'ok', 'happy')",
+            SCHEMA
+        ))
+        .await?;
+    let schema = api.describe().await?;
     let got_enum = schema.get_enum("mood").expect("get enum");
 
     let values: Vec<String> = vec!["sad".into(), "ok".into(), "happy".into()];
@@ -783,24 +787,26 @@ async fn postgres_enums_must_work() {
             values,
         }
     );
+
+    Ok(())
 }
 
-#[tokio::test]
-async fn postgres_sequences_must_work() {
-    let inspector = get_postgres_describer(
-        &format!("CREATE SEQUENCE \"{}\".\"test\"", SCHEMA),
-        "postgres_sequences_must_work",
-    )
-    .await;
+#[test_connector(tags(Postgres))]
+async fn postgres_sequences_must_work(api: &TestApi) -> TestResult {
+    api.database()
+        .raw_cmd(&format!("CREATE SEQUENCE \"{}\".\"test\"", SCHEMA))
+        .await?;
 
-    let schema = inspector.describe(SCHEMA).await.expect("describing");
+    let schema = api.describe().await?;
     let got_seq = schema.get_sequence("test").expect("get sequence");
 
     assert_eq!(got_seq, &Sequence { name: "test".into() },);
+
+    Ok(())
 }
 
-#[tokio::test]
-async fn postgres_multi_field_indexes_must_be_inferred_in_the_right_order() {
+#[test_connector(tags(Postgres))]
+async fn postgres_multi_field_indexes_must_be_inferred_in_the_right_order(api: &TestApi) -> TestResult {
     let schema = format!(
         r##"
             CREATE TABLE "{schema_name}"."indexes_test" (
@@ -814,9 +820,9 @@ async fn postgres_multi_field_indexes_must_be_inferred_in_the_right_order() {
         "##,
         schema_name = SCHEMA
     );
+    api.database().raw_cmd(&schema).await?;
 
-    let inspector = get_postgres_describer(&schema, "postgres_multi_field_indexes").await;
-    let schema = inspector.describe(SCHEMA).await.unwrap();
+    let schema = api.describe().await?;
 
     let table = schema.table_bang("indexes_test");
     let index = &table.indices[0];
@@ -828,9 +834,11 @@ async fn postgres_multi_field_indexes_must_be_inferred_in_the_right_order() {
 
     assert!(!index.tpe.is_unique());
     assert_eq!(&index.columns, &["age", "name"]);
+
+    Ok(())
 }
 
-#[test_each_connector(tags("postgres"))]
+#[test_connector(tags(Postgres))]
 async fn escaped_quotes_in_string_defaults_must_be_unescaped(api: &TestApi) -> TestResult {
     let create_table = format!(
         r#"
@@ -878,7 +886,7 @@ async fn escaped_quotes_in_string_defaults_must_be_unescaped(api: &TestApi) -> T
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"))]
+#[test_connector(tags(Postgres))]
 async fn escaped_backslashes_in_string_literals_must_be_unescaped(api: &TestApi) -> TestResult {
     let create_table = r#"
         CREATE TABLE test (

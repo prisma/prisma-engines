@@ -1,9 +1,9 @@
 use barrel::types;
 use indoc::indoc;
 use introspection_engine_tests::test_api::*;
-use test_macros::test_each_connector;
+use test_macros::test_connector;
 
-#[test_each_connector(capabilities("scalar_lists"))]
+#[test_connector(capabilities(ScalarLists))]
 async fn scalar_list_types(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {

@@ -18,8 +18,7 @@ use crate::{
     sql_schema_differ::SqlSchemaDifferFlavour, SqlMigrationConnector,
 };
 use datamodel::Datamodel;
-use enumflags2::BitFlags;
-use migration_connector::{ConnectorResult, MigrationDirectory, MigrationFeature};
+use migration_connector::{ConnectorResult, MigrationDirectory};
 use quaint::prelude::{ConnectionInfo, Table};
 use sql_schema_describer::SqlSchema;
 use std::fmt::Debug;
@@ -29,19 +28,15 @@ use std::fmt::Debug;
 /// reference: https://dev.mysql.com/doc/refman/5.7/en/identifier-length.html
 pub(crate) const MYSQL_IDENTIFIER_SIZE_LIMIT: usize = 64;
 
-pub(crate) fn from_connection_info(
-    connection_info: &ConnectionInfo,
-    features: BitFlags<MigrationFeature>,
-) -> Box<dyn SqlFlavour + Send + Sync + 'static> {
+pub(crate) fn from_connection_info(connection_info: &ConnectionInfo) -> Box<dyn SqlFlavour + Send + Sync + 'static> {
     match connection_info {
-        ConnectionInfo::Mysql(url) => Box::new(MysqlFlavour::new(url.clone(), features)),
-        ConnectionInfo::Postgres(url) => Box::new(PostgresFlavour::new(url.clone(), features)),
+        ConnectionInfo::Mysql(url) => Box::new(MysqlFlavour::new(url.clone())),
+        ConnectionInfo::Postgres(url) => Box::new(PostgresFlavour::new(url.clone())),
         ConnectionInfo::Sqlite { file_path, db_name } => Box::new(SqliteFlavour {
             file_path: file_path.clone(),
             attached_name: db_name.clone(),
-            features,
         }),
-        ConnectionInfo::Mssql(url) => Box::new(MssqlFlavour::new(url.clone(), features)),
+        ConnectionInfo::Mssql(url) => Box::new(MssqlFlavour::new(url.clone())),
         ConnectionInfo::InMemorySqlite { .. } => unreachable!("SqlFlavour for in-memory SQLite"),
     }
 }
@@ -106,7 +101,4 @@ pub(crate) trait SqlFlavour:
     fn migrations_table(&self) -> Table<'_> {
         self.migrations_table_name().into()
     }
-
-    /// Feature flags for the flavor
-    fn features(&self) -> BitFlags<MigrationFeature>;
 }

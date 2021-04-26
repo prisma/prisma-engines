@@ -4,9 +4,9 @@ use indoc::indoc;
 use introspection_engine_tests::{assert_eq_json, test_api::*};
 use quaint::prelude::Queryable;
 use serde_json::json;
-use test_macros::test_each_connector;
+use test_macros::test_connector;
 
-#[test_each_connector]
+#[test_connector]
 async fn mapped_model_name(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
@@ -55,7 +55,7 @@ async fn mapped_model_name(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn manually_overwritten_mapped_field_name(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
@@ -104,7 +104,7 @@ async fn manually_overwritten_mapped_field_name(api: &TestApi) -> crate::TestRes
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn mapped_model_and_field_name(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
@@ -205,7 +205,7 @@ async fn mapped_model_and_field_name(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"))]
+#[test_connector(tags(Postgres))]
 async fn manually_mapped_model_and_field_name(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
@@ -304,7 +304,7 @@ async fn manually_mapped_model_and_field_name(api: &TestApi) -> crate::TestResul
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn mapped_field_name(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
@@ -388,7 +388,7 @@ async fn mapped_field_name(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector(capabilities("enums"))]
+#[test_connector(capabilities(Enums))]
 async fn mapped_enum_name(api: &TestApi) -> crate::TestResult {
     let sql_family = api.sql_family();
 
@@ -476,7 +476,7 @@ async fn mapped_enum_name(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector(capabilities("enums"))]
+#[test_connector(capabilities(Enums))]
 async fn mapped_enum_value_name(api: &TestApi) -> crate::TestResult {
     let sql_family = api.sql_family();
 
@@ -561,7 +561,7 @@ async fn mapped_enum_value_name(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"))]
+#[test_connector(tags(Postgres))]
 async fn manually_remapped_enum_value_name(api: &TestApi) -> crate::TestResult {
     let sql = "CREATE Type color as ENUM (\'_black\', \'white\')";
     api.database().execute_raw(sql, &[]).await?;
@@ -624,7 +624,7 @@ async fn manually_remapped_enum_value_name(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"))]
+#[test_connector(tags(Postgres))]
 async fn manually_re_mapped_enum_name(api: &TestApi) -> crate::TestResult {
     let sql = "CREATE Type _color as ENUM (\'black\', \'white\')";
     api.database().execute_raw(sql, &[]).await?;
@@ -689,7 +689,7 @@ async fn manually_re_mapped_enum_name(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"))]
+#[test_connector(tags(Postgres))]
 async fn manually_re_mapped_invalid_enum_values(api: &TestApi) -> crate::TestResult {
     let sql_family = api.sql_family();
 
@@ -774,7 +774,7 @@ async fn manually_re_mapped_invalid_enum_values(api: &TestApi) -> crate::TestRes
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn multiple_changed_relation_names(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
@@ -857,7 +857,7 @@ async fn multiple_changed_relation_names(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"))]
+#[test_connector(tags(Postgres))]
 async fn custom_virtual_relation_field_names(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
@@ -913,7 +913,7 @@ async fn custom_virtual_relation_field_names(api: &TestApi) -> crate::TestResult
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn custom_model_order(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
@@ -1006,7 +1006,7 @@ async fn custom_model_order(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"))]
+#[test_connector(tags(Postgres))]
 async fn custom_enum_order(api: &TestApi) -> crate::TestResult {
     let sql = "CREATE Type a as ENUM ( \'id\')".to_string();
     api.database().execute_raw(&sql, &[]).await?;
@@ -1094,7 +1094,7 @@ async fn custom_enum_order(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn multiple_changed_relation_names_due_to_mapped_models(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
@@ -1162,7 +1162,7 @@ async fn multiple_changed_relation_names_due_to_mapped_models(api: &TestApi) -> 
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"))]
+#[test_connector(tags(Postgres))]
 async fn virtual_cuid_default(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
@@ -1212,7 +1212,7 @@ async fn virtual_cuid_default(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"))]
+#[test_connector(tags(Postgres))]
 async fn comments_should_be_kept(api: &TestApi) -> crate::TestResult {
     let sql = "CREATE Type a as ENUM (\'A\')".to_string();
     api.database().execute_raw(&sql, &[]).await?;
@@ -1280,7 +1280,7 @@ async fn comments_should_be_kept(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn updated_at(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
@@ -1325,7 +1325,7 @@ async fn updated_at(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("mssql"), log = "debug")]
+#[test_connector(tags(Mssql))]
 async fn updated_at_with_native_types_on(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
@@ -1366,7 +1366,7 @@ async fn updated_at_with_native_types_on(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn multiple_many_to_many_on_same_model(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
@@ -1443,7 +1443,7 @@ async fn multiple_many_to_many_on_same_model(api: &TestApi) -> crate::TestResult
     Ok(())
 }
 
-#[test_each_connector(tags("mysql"))]
+#[test_connector(tags(Mysql))]
 async fn re_introspecting_mysql_enum_names(api: &TestApi) -> crate::TestResult {
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -1495,7 +1495,7 @@ async fn re_introspecting_mysql_enum_names(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("mysql"))]
+#[test_connector(tags(Mysql))]
 async fn re_introspecting_mysql_enum_names_if_enum_is_reused(api: &TestApi) -> crate::TestResult {
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -1555,7 +1555,7 @@ async fn re_introspecting_mysql_enum_names_if_enum_is_reused(api: &TestApi) -> c
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"))]
+#[test_connector(tags(Postgres))]
 async fn custom_repro(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
@@ -1618,7 +1618,7 @@ async fn custom_repro(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn re_introspecting_ignore(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
@@ -1643,13 +1643,13 @@ async fn re_introspecting_ignore(api: &TestApi) -> crate::TestResult {
             id           Int @id @default(autoincrement())
             test         Int?      @ignore
         }
-        
+
         model Ignored {
             id           Int @id @default(autoincrement())
             test         Int?
-        
+
             @@ignore
-        }        
+        }
     "#};
 
     let final_dm = indoc! {r#"
@@ -1657,11 +1657,11 @@ async fn re_introspecting_ignore(api: &TestApi) -> crate::TestResult {
             id           Int @id @default(autoincrement())
             test         Int?      @ignore
         }
-        
+
         model Ignored {
             id           Int @id @default(autoincrement())
             test         Int?
-        
+
             @@ignore
         }
 
@@ -1675,7 +1675,7 @@ async fn re_introspecting_ignore(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn do_not_try_to_keep_custom_many_to_many_self_relation_names(api: &TestApi) -> crate::TestResult {
     //we do not have enough information to correctly assign which field should point to column A in the
     //join table and which one to B

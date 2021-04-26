@@ -1,4 +1,4 @@
-use crate::{common::*, test_api::*};
+use crate::test_api::*;
 use barrel::types;
 use native_types::{MsSqlType, MsSqlTypeParameter, MySqlType, NativeType, PostgresType};
 use pretty_assertions::assert_eq;
@@ -6,13 +6,9 @@ use prisma_value::PrismaValue;
 use quaint::prelude::{Queryable, SqlFamily};
 use serde_json::Value;
 use sql_schema_describer::*;
-use test_macros::test_each_connector;
-use test_setup::connectors::Tags;
+use test_macros::test_connector;
 
 mod common;
-mod mssql;
-mod mysql;
-mod postgres;
 mod sqlite;
 mod test_api;
 
@@ -56,8 +52,8 @@ fn varchar_native_type(api: &TestApi, length: u32) -> Option<Value> {
     }
 }
 
-#[test_each_connector]
-async fn is_required_must_work(api: &TestApi) {
+#[test_connector]
+async fn is_required_must_work(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -95,10 +91,12 @@ async fn is_required_must_work(api: &TestApi) {
     ];
 
     assert_eq!(user_table.columns, expected_columns);
+
+    Ok(())
 }
 
-#[test_each_connector]
-async fn foreign_keys_must_work(api: &TestApi) {
+#[test_connector]
+async fn foreign_keys_must_work(api: &TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
     api.barrel()
@@ -169,10 +167,12 @@ async fn foreign_keys_must_work(api: &TestApi) {
             }],
         }
     );
+
+    Ok(())
 }
 
-#[test_each_connector(log = "quaint=info")]
-async fn multi_column_foreign_keys_must_work(api: &TestApi) {
+#[test_connector]
+async fn multi_column_foreign_keys_must_work(api: &TestApi) -> TestResult {
     let sql_family = api.sql_family();
     let schema = api.schema_name().to_owned();
 
@@ -276,10 +276,12 @@ async fn multi_column_foreign_keys_must_work(api: &TestApi) {
             },],
         }
     );
+
+    Ok(())
 }
 
-#[test_each_connector]
-async fn names_with_hyphens_must_work(api: &TestApi) {
+#[test_connector]
+async fn names_with_hyphens_must_work(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User-table", |t| {
@@ -301,10 +303,12 @@ async fn names_with_hyphens_must_work(api: &TestApi) {
         auto_increment: false,
     }];
     assert_eq!(user_table.columns, expected_columns);
+
+    Ok(())
 }
 
-#[test_each_connector]
-async fn composite_primary_keys_must_work(api: &TestApi) {
+#[test_connector]
+async fn composite_primary_keys_must_work(api: &TestApi) -> TestResult {
     let sql = match api.sql_family() {
         SqlFamily::Mysql => format!(
             "CREATE TABLE `{0}`.`User` (
@@ -380,10 +384,12 @@ async fn composite_primary_keys_must_work(api: &TestApi) {
             foreign_keys: vec![],
         }
     );
+
+    Ok(())
 }
 
-#[test_each_connector]
-async fn indices_must_work(api: &TestApi) {
+#[test_connector]
+async fn indices_must_work(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", move |t| {
@@ -460,10 +466,12 @@ async fn indices_must_work(api: &TestApi) {
             .unwrap_or(false)),
         _ => assert!(pk.constraint_name.is_none()),
     }
+
+    Ok(())
 }
 
-#[test_each_connector]
-async fn column_uniqueness_must_be_detected(api: &TestApi) {
+#[test_connector]
+async fn column_uniqueness_must_be_detected(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", move |t| {
@@ -574,10 +582,12 @@ async fn column_uniqueness_must_be_detected(api: &TestApi) {
         user_table.is_column_unique(&user_table.columns[1].name),
         "Column 2 should return true for is_unique"
     );
+
+    Ok(())
 }
 
-#[test_each_connector]
-async fn defaults_must_work(api: &TestApi) {
+#[test_connector]
+async fn defaults_must_work(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", move |t| {
@@ -615,4 +625,6 @@ async fn defaults_must_work(api: &TestApi) {
     }
 
     assert_eq!(&DefaultKind::Value(PrismaValue::Int(1)), default.kind());
+
+    Ok(())
 }

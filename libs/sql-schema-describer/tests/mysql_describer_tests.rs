@@ -1,28 +1,21 @@
-mod mysql;
 mod test_api;
 
-use crate::mysql::*;
 use barrel::{types, Migration};
 use native_types::{MySqlType, NativeType};
 use pretty_assertions::assert_eq;
 use quaint::prelude::Queryable;
-use sql_schema_describer::{mysql::SqlSchemaDescriber, SqlSchemaDescriberBackend, *};
+use sql_schema_describer::*;
 use test_api::*;
-use test_macros::*;
-use test_setup::mysql_5_7_url;
 
-#[tokio::test]
-async fn views_can_be_described() {
-    let db_name = "views_can_be_described";
+#[test_connector(tags(Mysql))]
+async fn views_can_be_described(api: &TestApi) -> TestResult {
+    let conn = api.database();
 
-    let (url, _) = mysql_5_7_url(db_name);
-    let conn = test_setup::create_mysql_database(&url.parse().unwrap()).await.unwrap();
-
-    conn.raw_cmd(&format!("CREATE TABLE {}.a (a_id int)", db_name))
+    conn.raw_cmd(&format!("CREATE TABLE {}.a (a_id int)", api.db_name()))
         .await
         .unwrap();
 
-    conn.raw_cmd(&format!("CREATE TABLE {}.b (b_id int)", db_name))
+    conn.raw_cmd(&format!("CREATE TABLE {}.b (b_id int)", api.db_name()))
         .await
         .unwrap();
 
@@ -34,48 +27,47 @@ async fn views_can_be_described() {
             UNION ALL
             SELECT b_id
             FROM {0}.b"#,
-        db_name
+        api.db_name()
     );
 
     conn.raw_cmd(&create_view).await.unwrap();
 
-    let inspector = SqlSchemaDescriber::new(conn);
-    let result = inspector.describe(db_name).await.expect("describing");
+    let result = api.describe().await?;
     let view = result.get_view("ab").expect("couldn't get ab view").to_owned();
 
     let expected_sql = format!(
         "select `{0}`.`a`.`a_id` AS `a_id` from `{0}`.`a` union all select `{0}`.`b`.`b_id` AS `b_id` from `{0}`.`b`",
-        db_name
+        api.db_name()
     );
 
     assert_eq!("ab", &view.name);
     assert_eq!(expected_sql, view.definition.unwrap());
+
+    Ok(())
 }
 
-#[tokio::test]
-async fn procedures_can_be_described() {
-    let db_name = "procedures_can_be_described";
-
+#[test_connector(tags(Mysql))]
+async fn procedures_can_be_described(api: &TestApi) -> TestResult {
     let sql = format!(
         r#"
         CREATE PROCEDURE {}.foo (OUT res INT) SELECT 1 INTO res
         "#,
-        db_name
+        api.db_name()
     );
 
-    let inspector = get_mysql_describer_for_schema(&sql, db_name).await;
-    let result = inspector.describe(db_name).await.expect("describing");
+    api.database().raw_cmd(&sql).await?;
+    let result = api.describe().await?;
     let procedure = result.get_procedure("foo").unwrap();
 
     assert_eq!("foo", &procedure.name);
     assert_eq!(Some("SELECT 1 INTO res"), procedure.definition.as_deref());
+
+    Ok(())
 }
 
-#[tokio::test]
-async fn all_mysql_column_types_must_work() {
-    let db_name = "all_mysql_column_types_must_work";
-
-    let mut migration = Migration::new().schema(db_name);
+#[test_connector(tags(Mysql))]
+async fn all_mysql_column_types_must_work(api: &TestApi) -> TestResult {
+    let mut migration = Migration::new().schema(api.db_name());
     migration.create_table("User", move |t| {
         t.add_column("primary_col", types::primary());
         t.add_column("int_col", types::custom("int"));
@@ -119,8 +111,8 @@ async fn all_mysql_column_types_must_work() {
     });
 
     let full_sql = migration.make::<barrel::backend::MySql>();
-    let inspector = get_mysql_describer_for_schema(&full_sql, db_name).await;
-    let result = inspector.describe(db_name).await.expect("describing");
+    api.database().raw_cmd(&full_sql).await?;
+    let result = api.describe().await?;
     let mut table = result.get_table("User").expect("couldn't get User table").to_owned();
     // Ensure columns are sorted as expected when comparing
     table.columns.sort_unstable_by_key(|c| c.name.to_owned());
@@ -601,12 +593,12 @@ async fn all_mysql_column_types_must_work() {
             foreign_keys: vec![],
         }
     );
+
+    Ok(())
 }
 
-#[tokio::test]
-async fn mysql_foreign_key_on_delete_must_be_handled() {
-    let db_name = "mysql_foreign_key_on_delete_must_be_handled";
-
+#[test_connector(tags(Mysql))]
+async fn mysql_foreign_key_on_delete_must_be_handled(api: &TestApi) -> TestResult {
     // NB: We don't test the SET DEFAULT variety since it isn't supported on InnoDB and will
     // just cause an error
     let sql = format!(
@@ -618,11 +610,11 @@ async fn mysql_foreign_key_on_delete_must_be_handled() {
             city_restrict INTEGER, FOREIGN KEY(city_restrict) REFERENCES City (id) ON DELETE RESTRICT,
             city_set_null INTEGER, FOREIGN KEY(city_set_null) REFERENCES City (id) ON DELETE SET NULL
         )",
-        db_name
+        api.db_name()
     );
-    let inspector = get_mysql_describer_for_schema(&sql, db_name).await;
+    api.database().raw_cmd(&sql).await?;
 
-    let schema = inspector.describe(db_name).await.expect("describing");
+    let schema = api.describe().await?;
     let mut table = schema.get_table("User").expect("get User table").to_owned();
     table.foreign_keys.sort_unstable_by_key(|fk| fk.columns.clone());
 
@@ -750,13 +742,13 @@ async fn mysql_foreign_key_on_delete_must_be_handled() {
             ],
         }
     );
+
+    Ok(())
 }
 
-#[tokio::test]
-async fn mysql_multi_field_indexes_must_be_inferred() {
-    let db_name = "mysql_multi_field_indexes_must_be_inferred";
-
-    let mut migration = Migration::new().schema(db_name);
+#[test_connector(tags(Mysql))]
+async fn mysql_multi_field_indexes_must_be_inferred(api: &TestApi) -> TestResult {
+    let mut migration = Migration::new().schema(api.db_name());
     migration.create_table("Employee", move |t| {
         t.add_column("id", types::primary());
         t.add_column("age", types::integer());
@@ -765,8 +757,8 @@ async fn mysql_multi_field_indexes_must_be_inferred() {
     });
 
     let full_sql = migration.make::<barrel::backend::MySql>();
-    let inspector = get_mysql_describer_for_schema(&full_sql, db_name).await;
-    let result = inspector.describe(db_name).await.expect("describing");
+    api.database().raw_cmd(&full_sql).await?;
+    let result = api.describe().await?;
     let table = result.get_table("Employee").expect("couldn't get Employee table");
 
     assert_eq!(
@@ -777,13 +769,13 @@ async fn mysql_multi_field_indexes_must_be_inferred() {
             tpe: IndexType::Unique,
         }]
     );
+
+    Ok(())
 }
 
-#[tokio::test]
-async fn mysql_join_table_unique_indexes_must_be_inferred() {
-    let db_name = "mysql_join_table_unique_indexes_must_be_inferred";
-
-    let mut migration = Migration::new().schema(db_name);
+#[test_connector(tags(Mysql))]
+async fn mysql_join_table_unique_indexes_must_be_inferred(api: &TestApi) -> TestResult {
+    let mut migration = Migration::new().schema(api.db_name());
 
     migration.create_table("Cat", move |t| {
         t.add_column("id", types::primary());
@@ -803,8 +795,8 @@ async fn mysql_join_table_unique_indexes_must_be_inferred() {
     });
 
     let full_sql = migration.make::<barrel::backend::MySql>();
-    let inspector = get_mysql_describer_for_schema(&full_sql, db_name).await;
-    let result = inspector.describe(db_name).await.expect("describing");
+    api.database().raw_cmd(&full_sql).await?;
+    let result = api.describe().await?;
     let table = result.get_table("CatToHuman").expect("couldn't get CatToHuman table");
 
     assert_eq!(
@@ -815,14 +807,14 @@ async fn mysql_join_table_unique_indexes_must_be_inferred() {
             tpe: IndexType::Unique,
         }]
     );
+
+    Ok(())
 }
 
 // When multiple databases exist on a mysql instance, and they share names for foreign key
 // constraints, introspecting one database should not yield constraints from the other.
-#[tokio::test]
-async fn constraints_from_other_databases_should_not_be_introspected() {
-    let db_name = "constraints_from_other_databases_should_not_be_introspected";
-
+#[test_connector(tags(Mysql))]
+async fn constraints_from_other_databases_should_not_be_introspected(api: &TestApi) -> TestResult {
     let mut other_migration = Migration::new().schema("other_schema");
 
     other_migration.create_table("User", |t| {
@@ -834,12 +826,9 @@ async fn constraints_from_other_databases_should_not_be_introspected() {
     });
 
     let full_sql = other_migration.make::<barrel::backend::MySql>();
-    let inspector = get_mysql_describer_for_schema(&full_sql, "other_schema").await;
+    api.database().raw_cmd(&full_sql).await?;
 
-    let schema = inspector
-        .describe(&"other_schema".to_string())
-        .await
-        .expect("describing");
+    let schema = api.describer().describe(&"other_schema").await.expect("describing");
     let table = schema.table_bang("Post");
 
     let fks = &table.foreign_keys;
@@ -858,7 +847,7 @@ async fn constraints_from_other_databases_should_not_be_introspected() {
 
     // Now the migration in the current database.
 
-    let mut migration = Migration::new().schema(db_name);
+    let mut migration = Migration::new().schema(api.db_name());
 
     migration.create_table("User", |t| {
         t.add_column("id", types::primary());
@@ -870,8 +859,8 @@ async fn constraints_from_other_databases_should_not_be_introspected() {
     });
 
     let full_sql = migration.make::<barrel::backend::MySql>();
-    let inspector = get_mysql_describer_for_schema(&full_sql, db_name).await;
-    let schema = inspector.describe(db_name).await.expect("describing");
+    api.database().raw_cmd(&full_sql).await?;
+    let schema = api.describe().await?;
     let table = schema.table_bang("Post");
 
     let fks = &table.foreign_keys;
@@ -887,12 +876,12 @@ async fn constraints_from_other_databases_should_not_be_introspected() {
             on_update_action: ForeignKeyAction::NoAction,
         }]
     );
+
+    Ok(())
 }
 
-#[tokio::test]
-async fn mysql_introspected_default_strings_should_be_unescaped() {
-    let db_name = "mysql_introspected_default_strings_should_be_unescaped";
-
+#[test_connector(tags(Mysql))]
+async fn mysql_introspected_default_strings_should_be_unescaped(api: &TestApi) -> TestResult {
     let create_table = r#"
         CREATE TABLE `mysql_introspected_default_strings_should_be_unescaped`.`User` (
             id INTEGER PRIMARY KEY,
@@ -900,8 +889,8 @@ async fn mysql_introspected_default_strings_should_be_unescaped() {
         )
     "#;
 
-    let inspector = get_mysql_describer_for_schema(create_table, db_name).await;
-    let schema = inspector.describe(db_name).await.unwrap();
+    api.database().raw_cmd(&create_table).await?;
+    let schema = api.describe().await?;
 
     let expected_default = prisma_value::PrismaValue::String(
         r#""That's a lot of fish!"
@@ -915,9 +904,11 @@ async fn mysql_introspected_default_strings_should_be_unescaped() {
     let actual_default = column.default.as_ref().unwrap().as_value().unwrap();
 
     assert_eq!(actual_default, &expected_default);
+
+    Ok(())
 }
 
-#[test_each_connector(tags("mysql"))]
+#[test_connector(tags(Mysql))]
 async fn escaped_quotes_in_string_defaults_must_be_unescaped(api: &TestApi) -> TestResult {
     let create_table = format!(
         r#"
@@ -969,7 +960,7 @@ async fn escaped_quotes_in_string_defaults_must_be_unescaped(api: &TestApi) -> T
     Ok(())
 }
 
-#[test_each_connector(tags("mysql"))]
+#[test_connector(tags(Mysql))]
 async fn escaped_backslashes_in_string_literals_must_be_unescaped(api: &TestApi) -> TestResult {
     let create_table = r#"
         CREATE TABLE test (
@@ -999,10 +990,10 @@ async fn escaped_backslashes_in_string_literals_must_be_unescaped(api: &TestApi)
     Ok(())
 }
 
-#[test_each_connector(tags("mysql_8", "mariadb"))]
-async fn function_expression_defaults_are_described_as_dbgenerated(api: &TestApi) {
+#[test_connector(tags(Mysql8, Mariadb))]
+async fn function_expression_defaults_are_described_as_dbgenerated(api: &TestApi) -> TestResult {
     let create_table = r#"
-        CREATE TABLE game (       
+        CREATE TABLE game (
             int_col Int DEFAULT (ABS(8) + ABS(8)),
             bigint_col BigInt DEFAULT (ABS(8)),
             float_col Float DEFAULT (ABS(8)),
@@ -1045,10 +1036,12 @@ async fn function_expression_defaults_are_described_as_dbgenerated(api: &TestApi
     //     &DefaultValue::db_generated("(trim(\'x-small   \'))")
     // );
     // assert_eq!(default("unsupported_col"), &DefaultValue::db_generated("(trim(\' \'))"));
+
+    Ok(())
 }
 
-#[test_each_connector(tags("mysql"))]
-async fn dangling_foreign_keys_are_filtered_out(api: &TestApi) {
+#[test_connector(tags(Mysql))]
+async fn dangling_foreign_keys_are_filtered_out(api: &TestApi) -> TestResult {
     let setup = r#"
     SET FOREIGN_KEY_CHECKS=0;
 
@@ -1078,4 +1071,6 @@ async fn dangling_foreign_keys_are_filtered_out(api: &TestApi) {
         "{:#?}",
         table.foreign_keys
     );
+
+    Ok(())
 }

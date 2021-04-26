@@ -1,9 +1,9 @@
 use barrel::types;
 use indoc::indoc;
 use introspection_engine_tests::test_api::*;
-use test_macros::test_each_connector;
+use test_macros::test_connector;
 
-#[test_each_connector]
+#[test_connector]
 async fn compound_foreign_keys_for_one_to_one_relations(api: &TestApi) -> crate::TestResult {
     let constraint_name = if api.sql_family().is_sqlite() {
         "sqlite_autoindex_Post_1"
@@ -59,7 +59,7 @@ async fn compound_foreign_keys_for_one_to_one_relations(api: &TestApi) -> crate:
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn compound_foreign_keys_for_required_one_to_one_relations(api: &TestApi) -> crate::TestResult {
     let constraint_name = if api.sql_family().is_sqlite() {
         "sqlite_autoindex_Post_1"
@@ -115,7 +115,7 @@ async fn compound_foreign_keys_for_required_one_to_one_relations(api: &TestApi) 
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn compound_foreign_keys_for_one_to_many_relations(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
@@ -168,7 +168,7 @@ async fn compound_foreign_keys_for_one_to_many_relations(api: &TestApi) -> crate
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn compound_foreign_keys_for_one_to_many_relations_with_mixed_requiredness(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
@@ -221,7 +221,7 @@ async fn compound_foreign_keys_for_one_to_many_relations_with_mixed_requiredness
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn compound_foreign_keys_for_required_one_to_many_relations(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
@@ -274,7 +274,7 @@ async fn compound_foreign_keys_for_required_one_to_many_relations(api: &TestApi)
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn compound_foreign_keys_for_required_self_relations(api: &TestApi) -> crate::TestResult {
     let constraint_name = if api.sql_family().is_sqlite() {
         "sqlite_autoindex_Person_1"
@@ -324,7 +324,7 @@ async fn compound_foreign_keys_for_required_self_relations(api: &TestApi) -> cra
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn compound_foreign_keys_for_self_relations(api: &TestApi) -> crate::TestResult {
     let constraint_name = if api.sql_family().is_sqlite() {
         "sqlite_autoindex_Person_1"
@@ -374,7 +374,7 @@ async fn compound_foreign_keys_for_self_relations(api: &TestApi) -> crate::TestR
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn compound_foreign_keys_with_defaults(api: &TestApi) -> crate::TestResult {
     let constraint_name = if api.sql_family().is_sqlite() {
         "sqlite_autoindex_Person_1"
@@ -424,7 +424,7 @@ async fn compound_foreign_keys_with_defaults(api: &TestApi) -> crate::TestResult
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn compound_foreign_keys_for_one_to_many_relations_with_non_unique_index(api: &TestApi) -> crate::TestResult {
     let constraint_name = if api.sql_family().is_sqlite() {
         "sqlite_autoindex_User_1"
@@ -483,7 +483,7 @@ async fn compound_foreign_keys_for_one_to_many_relations_with_non_unique_index(a
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn repro_matt_references_on_wrong_side(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
@@ -535,7 +535,7 @@ async fn repro_matt_references_on_wrong_side(api: &TestApi) -> crate::TestResult
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn a_compound_fk_pk_with_overlapping_primary_key(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
@@ -590,7 +590,7 @@ async fn a_compound_fk_pk_with_overlapping_primary_key(api: &TestApi) -> crate::
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn compound_foreign_keys_for_duplicate_one_to_many_relations(api: &TestApi) -> crate::TestResult {
     let constraint_name = if api.sql_family().is_sqlite() {
         "sqlite_autoindex_User_1"

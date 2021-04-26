@@ -1,7 +1,6 @@
 use indoc::formatdoc;
 use introspection_engine_tests::test_api::*;
-use test_macros::test_each_connector;
-use test_setup::connectors::Tags;
+use test_macros::test_connector;
 
 const TYPES: &[(&str, &str)] = &[
     //fieldname, db datatype
@@ -45,7 +44,7 @@ const TYPES: &[(&str, &str)] = &[
     ("json", "Json"),
 ];
 
-#[test_each_connector(tags("mariadb", "mysql_8"))]
+#[test_connector(tags(Mariadb, Mysql8))]
 async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
     let columns: Vec<String> = TYPES
         .iter()

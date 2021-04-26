@@ -6,16 +6,20 @@ use tracing_subscriber::{
     EnvFilter, FmtSubscriber,
 };
 
+pub(crate) fn init_logger() {
+    tracing::subscriber::set_global_default(test_tracing_subscriber())
+        .map_err(|err| eprintln!("Error initializing the global logger: {}", err))
+        .ok();
+}
+
 type Sub = Layered<
     ErrorLayer<FmtSubscriber<DefaultFields, Format, EnvFilter, PrintWriter>>,
     FmtSubscriber<DefaultFields, Format, EnvFilter, PrintWriter>,
 >;
 
-pub fn test_tracing_subscriber(log_config: &'static str) -> Sub {
-    let filter = EnvFilter::new(log_config);
-
+fn test_tracing_subscriber() -> Sub {
     FmtSubscriber::builder()
-        .with_env_filter(filter)
+        .with_env_filter(EnvFilter::from_default_env())
         .with_writer(PrintWriter)
         .finish()
         .with(ErrorLayer::default())

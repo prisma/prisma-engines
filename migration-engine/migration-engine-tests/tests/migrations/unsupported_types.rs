@@ -3,7 +3,7 @@ use prisma_value::PrismaValue;
 use quaint::prelude::SqlFamily;
 use sql_schema_describer::ColumnTypeFamily;
 
-#[test_each_connector(tags("postgres"))]
+#[test_connector(tags(Postgres))]
 async fn adding_an_unsupported_type_must_work(api: &TestApi) -> TestResult {
     let dm = r#"
         model Post {
@@ -50,7 +50,7 @@ async fn adding_an_unsupported_type_must_work(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"))]
+#[test_connector(tags(Postgres))]
 async fn switching_an_unsupported_type_to_supported_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Post {
@@ -104,7 +104,7 @@ async fn switching_an_unsupported_type_to_supported_must_work(api: &TestApi) -> 
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"))]
+#[test_connector(tags(Postgres))]
 async fn adding_and_removing_properties_on_unsupported_should_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Post {
@@ -204,7 +204,7 @@ async fn adding_and_removing_properties_on_unsupported_should_work(api: &TestApi
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn using_unsupported_and_ignore_should_work(api: &TestApi) -> TestResult {
     let unsupported_type = match api.sql_family() {
         SqlFamily::Sqlite => "some random string",

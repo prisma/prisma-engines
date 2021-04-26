@@ -1,11 +1,9 @@
 use migration_core::commands::{ApplyMigrationsInput, CreateMigrationInput};
 use migration_engine_tests::{multi_engine_test_api::*, TestResult};
-use test_macros::test_connectors;
+use test_macros::test_connector;
 
-#[test_connectors]
-async fn advisory_locking_works(api: TestApi) -> TestResult {
-    api.initialize().await?;
-
+#[test_connector]
+async fn advisory_locking_works(api: &TestApi) -> TestResult {
     let first_me = api.new_engine().await?;
     let migrations_directory = api.create_migrations_directory()?;
     let p = migrations_directory.path().to_string_lossy().into_owned();

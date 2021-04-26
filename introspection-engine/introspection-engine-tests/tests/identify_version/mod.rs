@@ -2,10 +2,10 @@ use barrel::types;
 use introspection_connector::Version;
 use introspection_engine_tests::test_api::*;
 use pretty_assertions::assert_eq;
-use test_macros::test_each_connector;
+use test_macros::test_connector;
 
 //Sqlite
-#[test_each_connector(tags("sqlite"))]
+#[test_connector(tags(Sqlite))]
 async fn introspect_sqlite_non_prisma(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
@@ -20,7 +20,7 @@ async fn introspect_sqlite_non_prisma(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("sqlite"))]
+#[test_connector(tags(Sqlite))]
 async fn sqlite_non_prisma_due_to_types(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
@@ -49,7 +49,7 @@ async fn sqlite_non_prisma_due_to_types(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("sqlite"))]
+#[test_connector(tags(Sqlite))]
 async fn introspect_sqlite_prisma2(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
@@ -79,7 +79,7 @@ async fn introspect_sqlite_prisma2(api: &TestApi) -> crate::TestResult {
 
 //Postgres
 
-#[test_each_connector(tags("postgres"))]
+#[test_connector(tags(Postgres))]
 async fn introspect_postgres_non_prisma(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
@@ -95,7 +95,7 @@ async fn introspect_postgres_non_prisma(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"))]
+#[test_connector(tags(Postgres))]
 async fn introspect_postgres_prisma_1(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
@@ -127,7 +127,7 @@ async fn introspect_postgres_prisma_1(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"))]
+#[test_connector(tags(Postgres))]
 async fn introspect_postgres_prisma_1_1(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
@@ -153,7 +153,7 @@ async fn introspect_postgres_prisma_1_1(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"))]
+#[test_connector(tags(Postgres))]
 async fn introspect_postgres_prisma2(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
@@ -183,7 +183,7 @@ async fn introspect_postgres_prisma2(api: &TestApi) -> crate::TestResult {
 
 //Mysql
 
-#[test_each_connector(tags("mysql"))]
+#[test_connector(tags(Mysql))]
 async fn introspect_mysql_non_prisma(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
@@ -199,7 +199,7 @@ async fn introspect_mysql_non_prisma(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("mysql"))]
+#[test_connector(tags(Mysql))]
 async fn introspect_mysql_prisma_1(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
@@ -224,7 +224,7 @@ async fn introspect_mysql_prisma_1(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("mysql"))]
+#[test_connector(tags(Mysql))]
 async fn introspect_mysql_prisma_1_1_if_not_for_default_value(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
@@ -243,7 +243,7 @@ async fn introspect_mysql_prisma_1_1_if_not_for_default_value(api: &TestApi) -> 
     Ok(())
 }
 
-#[test_each_connector(tags("mysql"))]
+#[test_connector(tags(Mysql))]
 async fn introspect_mysql_prisma_1_1(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
@@ -263,7 +263,7 @@ async fn introspect_mysql_prisma_1_1(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("mysql"))]
+#[test_connector(tags(Mysql))]
 async fn introspect_mysql_prisma2(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
@@ -291,7 +291,7 @@ async fn introspect_mysql_prisma2(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("mysql"))]
+#[test_connector(tags(Mysql))]
 async fn introspect_mysql_non_prisma_empty(api: &TestApi) -> crate::TestResult {
     api.barrel().execute(|_migration| {}).await?;
 
@@ -300,7 +300,7 @@ async fn introspect_mysql_non_prisma_empty(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("mssql_2017", "mssql_2019"))]
+#[test_connector(tags(Mssql))]
 async fn introspect_mssql_non_prisma_empty(api: &TestApi) -> crate::TestResult {
     api.barrel().execute(|_migration| {}).await?;
 

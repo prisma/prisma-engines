@@ -1,6 +1,6 @@
 use indoc::indoc;
 use introspection_engine_tests::test_api::*;
-use test_macros::test_each_connector;
+use test_macros::test_connector;
 
 const TYPES: &[(&str, &str)] = &[
     //fieldname, db datatype
@@ -36,7 +36,7 @@ const TYPES: &[(&str, &str)] = &[
     ("ntext", "NText"),
 ];
 
-#[test_each_connector(tags("mssql_2017", "mssql_2019"))]
+#[test_connector(tags(Mssql))]
 async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
     let columns: Vec<String> = TYPES
         .iter()

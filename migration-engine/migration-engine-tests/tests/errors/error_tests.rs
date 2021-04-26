@@ -1,18 +1,17 @@
-use connectors::Tags;
 use indoc::{formatdoc, indoc};
 use migration_core::api::RpcApi;
 use migration_engine_tests::sql::*;
 use pretty_assertions::assert_eq;
 use quaint::prelude::{Queryable, SqlFamily};
 use serde_json::json;
-use test_setup::*;
+use test_macros::test_connector;
 use url::Url;
 
-#[tokio::test]
-async fn authentication_failure_must_return_a_known_error_on_postgres() {
-    let mut url: Url = postgres_10_url("test-db").0.parse().unwrap();
+#[test_connector(tags(Postgres12))]
+async fn authentication_failure_must_return_a_known_error_on_postgres(api: &TestApi) -> TestResult {
+    let mut db_url: Url = api.connection_string().parse().unwrap();
 
-    url.set_password(Some("obviously-not-right")).unwrap();
+    db_url.set_password(Some("obviously-not-right")).unwrap();
 
     let dm = format!(
         r#"
@@ -21,13 +20,13 @@ async fn authentication_failure_must_return_a_known_error_on_postgres() {
               url      = "{}"
             }}
         "#,
-        url
+        db_url
     );
 
     let error = RpcApi::new(&dm).await.map(|_| ()).unwrap_err();
 
-    let user = url.username();
-    let host = url.host().unwrap().to_string();
+    let user = db_url.username();
+    let host = db_url.host().unwrap().to_string();
 
     let json_error = serde_json::to_value(&error.to_user_facing()).unwrap();
     let expected = json!({
@@ -41,14 +40,13 @@ async fn authentication_failure_must_return_a_known_error_on_postgres() {
     });
 
     assert_eq!(json_error, expected);
+
+    Ok(())
 }
 
-#[tokio::test]
-async fn authentication_failure_must_return_a_known_error_on_mysql() {
-    let mut url: Url = mysql_5_7_url("authentication_failure_must_return_a_known_error_on_mysql")
-        .0
-        .parse()
-        .unwrap();
+#[test_connector(tags(Mysql), exclude(Vitess))]
+async fn authentication_failure_must_return_a_known_error_on_mysql(api: &TestApi) -> TestResult {
+    let mut url: Url = api.connection_string().parse().unwrap();
 
     url.set_password(Some("obviously-not-right")).unwrap();
 
@@ -79,14 +77,13 @@ async fn authentication_failure_must_return_a_known_error_on_mysql() {
     });
 
     assert_eq!(json_error, expected);
+
+    Ok(())
 }
 
-#[tokio::test]
-async fn unreachable_database_must_return_a_proper_error_on_mysql() {
-    let mut url: Url = mysql_5_7_url("unreachable_database_must_return_a_proper_error_on_mysql")
-        .0
-        .parse()
-        .unwrap();
+#[test_connector(tags(Mysql))]
+async fn unreachable_database_must_return_a_proper_error_on_mysql(api: &TestApi) -> TestResult {
+    let mut url: Url = api.connection_string().parse().unwrap();
 
     url.set_port(Some(8787)).unwrap();
 
@@ -117,14 +114,13 @@ async fn unreachable_database_must_return_a_proper_error_on_mysql() {
     });
 
     assert_eq!(json_error, expected);
+
+    Ok(())
 }
 
-#[tokio::test]
-async fn unreachable_database_must_return_a_proper_error_on_postgres() {
-    let mut url: Url = postgres_10_url("unreachable_database_must_return_a_proper_error_on_postgres")
-        .0
-        .parse()
-        .unwrap();
+#[test_connector(tags(Postgres12))]
+async fn unreachable_database_must_return_a_proper_error_on_postgres(api: &TestApi) -> TestResult {
+    let mut url: Url = api.connection_string().parse().unwrap();
 
     url.set_port(Some(8787)).unwrap();
 
@@ -155,14 +151,13 @@ async fn unreachable_database_must_return_a_proper_error_on_postgres() {
     });
 
     assert_eq!(json_error, expected);
+
+    Ok(())
 }
 
-#[tokio::test]
-async fn database_does_not_exist_must_return_a_proper_error() {
-    let mut url: Url = mysql_5_7_url("database_does_not_exist_must_return_a_proper_error")
-        .0
-        .parse()
-        .unwrap();
+#[test_connector(tags(Mysql))]
+async fn database_does_not_exist_must_return_a_proper_error(api: &TestApi) -> TestResult {
+    let mut url: Url = api.connection_string().parse().unwrap();
     let database_name = "notmydatabase";
 
     url.set_path(&format!("/{}", database_name));
@@ -185,60 +180,19 @@ async fn database_does_not_exist_must_return_a_proper_error() {
         "message": format!("Database `{database_name}` does not exist on the database server at `{database_host}:{database_port}`.", database_name = database_name, database_host = url.host().unwrap(), database_port = url.port().unwrap()),
         "meta": {
             "database_name": database_name,
-            "database_host": format!("{}", url.host().unwrap()),
+            "database_host": url.host().unwrap().to_string(),
             "database_port": url.port().unwrap(),
         },
         "error_code": "P1003"
     });
 
     assert_eq!(json_error, expected);
+
+    Ok(())
 }
 
-#[tokio::test]
-async fn database_access_denied_must_return_a_proper_error_in_rpc() {
-    let db_name = "dbaccessdeniedinrpc";
-    let url: Url = mysql_5_7_url(db_name).0.parse().unwrap();
-    let conn = create_mysql_database(&url).await.unwrap();
-
-    conn.execute_raw("DROP USER IF EXISTS jeanyves", &[]).await.unwrap();
-    conn.execute_raw("CREATE USER jeanyves IDENTIFIED BY '1234'", &[])
-        .await
-        .unwrap();
-
-    let mut url: Url = url.clone();
-    url.set_username("jeanyves").unwrap();
-    url.set_password(Some("1234")).unwrap();
-    url.set_path("/access_denied_test");
-
-    let dm = format!(
-        r#"
-            datasource db {{
-              provider = "mysql"
-              url      = "{}"
-            }}
-        "#,
-        url,
-    );
-
-    let error = RpcApi::new(&dm).await.map(|_| ()).unwrap_err();
-    let json_error = serde_json::to_value(&error.to_user_facing()).unwrap();
-
-    let expected = json!({
-        "is_panic": false,
-        "message": "User `jeanyves` was denied access on the database `access_denied_test`",
-        "meta": {
-            "database_user": "jeanyves",
-            "database_name": "access_denied_test",
-        },
-        "error_code": "P1010",
-    });
-
-    assert_eq!(json_error, expected);
-}
-
-#[tokio::test]
-async fn bad_datasource_url_and_provider_combinations_must_return_a_proper_error() {
-    let db_name = "bad_datasource_url_and_provider_combinations_must_return_a_proper_error";
+#[test_connector(tags(Postgres))]
+async fn bad_datasource_url_and_provider_combinations_must_return_a_proper_error(api: &TestApi) -> TestResult {
     let dm = format!(
         r#"
             datasource db {{
@@ -246,7 +200,7 @@ async fn bad_datasource_url_and_provider_combinations_must_return_a_proper_error
                 url = "{}"
             }}
         "#,
-        postgres_10_url(db_name).0,
+        api.connection_string()
     );
 
     let error = RpcApi::new(&dm).await.map(drop).unwrap_err();
@@ -271,12 +225,17 @@ async fn bad_datasource_url_and_provider_combinations_must_return_a_proper_error
     });
 
     assert_eq!(json_error, expected);
+
+    Ok(())
 }
 
-#[test_each_connector(tags("mysql_8"))]
-async fn connections_to_system_databases_must_be_rejected(_api: &TestApi) -> TestResult {
+#[test_connector(tags(Mysql8))]
+async fn connections_to_system_databases_must_be_rejected(api: &TestApi) -> TestResult {
     let names = &["", "mysql", "sys", "performance_schema"];
     for name in names {
+        let mut url: url::Url = api.connection_string().parse().unwrap();
+        url.set_path(name);
+
         let dm = format!(
             r#"
                 datasource db {{
@@ -284,7 +243,7 @@ async fn connections_to_system_databases_must_be_rejected(_api: &TestApi) -> Tes
                     url = "{}"
                 }}
             "#,
-            mysql_8_url(name).0,
+            url
         );
 
         // "mysql" is the default in Quaint.
@@ -308,8 +267,8 @@ async fn connections_to_system_databases_must_be_rejected(_api: &TestApi) -> Tes
     Ok(())
 }
 
-#[test_each_connector(tags("sqlite"))]
-async fn datamodel_parser_errors_must_return_a_known_error(api: &TestApi) {
+#[test_connector(tags(Sqlite))]
+async fn datamodel_parser_errors_must_return_a_known_error(api: &TestApi) -> TestResult {
     let bad_dm = r#"
         model Test {
             id Float @id
@@ -328,9 +287,11 @@ async fn datamodel_parser_errors_must_return_a_known_error(api: &TestApi) {
     });
 
     assert_eq!(error, expected_error);
+
+    Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: &TestApi) -> TestResult {
     use quaint::ast::*;
 
@@ -396,7 +357,7 @@ async fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: &
     Ok(())
 }
 
-#[test_each_connector(tags("mysql_5_6"))]
+#[test_connector(tags(Mysql56))]
 async fn json_fields_must_be_rejected(api: &TestApi) -> TestResult {
     let dm = format!(
         r#"

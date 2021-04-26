@@ -1,8 +1,6 @@
 use migration_engine_tests::sql::*;
-use quaint::prelude::SqlFamily;
-use sql_schema_describer::{ColumnArity, ColumnTypeFamily, ForeignKey, ForeignKeyAction};
 
-#[test_each_connector]
+#[test_connector]
 async fn adding_a_many_to_many_relation_must_result_in_a_prisma_style_relation_table(api: &TestApi) -> TestResult {
     let dm1 = r##"
         model A {
@@ -34,7 +32,7 @@ async fn adding_a_many_to_many_relation_must_result_in_a_prisma_style_relation_t
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn adding_a_many_to_many_relation_with_custom_name_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model A {
@@ -62,7 +60,7 @@ async fn adding_a_many_to_many_relation_with_custom_name_must_work(api: &TestApi
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn adding_an_inline_relation_must_result_in_a_foreign_key_in_the_model_table(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model A {
@@ -85,55 +83,20 @@ async fn adding_an_inline_relation_must_result_in_a_foreign_key_in_the_model_tab
     "#;
 
     api.schema_push(dm1).send().await?.assert_green()?;
-
-    let result = api.describe_database().await?;
-
-    let table = result.table_bang("A");
-
-    let b_column = table.column_bang("bid");
-    assert_eq!(b_column.tpe.family, ColumnTypeFamily::Int);
-    assert_eq!(b_column.tpe.arity, ColumnArity::Required);
-
-    let c_column = table.column_bang("cid");
-    assert_eq!(c_column.tpe.family, ColumnTypeFamily::Int);
-    assert_eq!(c_column.tpe.arity, ColumnArity::Nullable);
-
-    assert_eq!(
-        table.foreign_keys,
-        &[
-            ForeignKey {
-                constraint_name: match api.sql_family() {
-                    SqlFamily::Postgres => Some("A_bid_fkey".to_owned()),
-                    SqlFamily::Mysql => Some(api.normalize_identifier("A_ibfk_1").into_owned()),
-                    SqlFamily::Sqlite => None,
-                    SqlFamily::Mssql => Some("A_bid_fkey".to_owned()),
-                },
-                columns: vec![b_column.name.clone()],
-                referenced_table: api.normalize_identifier("B").into_owned(),
-                referenced_columns: vec!["id".to_string()],
-                on_delete_action: ForeignKeyAction::Cascade, // required relations can't set ON DELETE SET NULL
-                on_update_action: ForeignKeyAction::NoAction,
-            },
-            ForeignKey {
-                constraint_name: match api.sql_family() {
-                    SqlFamily::Postgres => Some("A_cid_fkey".to_owned()),
-                    SqlFamily::Mysql => Some(api.normalize_identifier("A_ibfk_2").into_owned()),
-                    SqlFamily::Sqlite => None,
-                    SqlFamily::Mssql => Some("A_cid_fkey".to_owned()),
-                },
-                columns: vec![c_column.name.clone()],
-                referenced_table: api.normalize_identifier("C").into_owned(),
-                referenced_columns: vec!["id".to_string()],
-                on_delete_action: ForeignKeyAction::SetNull,
-                on_update_action: ForeignKeyAction::NoAction,
-            }
-        ]
-    );
+    api.assert_schema().await?.assert_table("A", |t| {
+        t.assert_column("bid", |c| c.assert_type_is_int()?.assert_is_required())?
+            .assert_column("cid", |c| c.assert_type_is_int()?.assert_is_nullable())?
+            .assert_foreign_keys_count(2)?
+            .assert_fk_on_columns(&["bid"], |fk| {
+                fk.assert_references("B", &["id"])?.assert_cascades_on_delete()
+            })?
+            .assert_fk_on_columns(&["cid"], |fk| fk.assert_references("C", &["id"]))
+    })?;
 
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn specifying_a_db_name_for_an_inline_relation_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model A {
@@ -149,33 +112,16 @@ async fn specifying_a_db_name_for_an_inline_relation_must_work(api: &TestApi) ->
     "#;
 
     api.schema_push(dm1).send().await?.assert_green()?;
-
-    let result = api.describe_database().await?;
-
-    let table = result.table_bang("A");
-    let column = table.column_bang("b_column");
-    assert_eq!(column.tpe.family, ColumnTypeFamily::Int);
-    assert_eq!(
-        table.foreign_keys,
-        &[ForeignKey {
-            constraint_name: match api.sql_family() {
-                SqlFamily::Postgres => Some("A_b_column_fkey".to_owned()),
-                SqlFamily::Mysql => Some(api.normalize_identifier("A_ibfk_1").into_owned()),
-                SqlFamily::Sqlite => None,
-                SqlFamily::Mssql => Some("A_b_column_fkey".to_owned()),
-            },
-            columns: vec![column.name.clone()],
-            referenced_table: api.normalize_identifier("B").into_owned(),
-            referenced_columns: vec!["id".to_string()],
-            on_delete_action: ForeignKeyAction::Cascade,
-            on_update_action: ForeignKeyAction::NoAction,
-        }]
-    );
+    api.assert_schema().await?.assert_table("A", |t| {
+        t.assert_column("b_column", |c| c.assert_type_is_int())?
+            .assert_foreign_keys_count(1)?
+            .assert_fk_on_columns(&["b_column"], |fk| fk.assert_references("B", &["id"]))
+    })?;
 
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn adding_an_inline_relation_to_a_model_with_an_exotic_id_type(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model A {
@@ -191,33 +137,18 @@ async fn adding_an_inline_relation_to_a_model_with_an_exotic_id_type(api: &TestA
     "#;
 
     api.schema_push(dm1).send().await?.assert_green()?;
-
-    let result = api.describe_database().await?;
-
-    let table = result.table_bang("A");
-    let column = table.column_bang("b_id");
-    assert_eq!(column.tpe.family, ColumnTypeFamily::String);
-    assert_eq!(
-        table.foreign_keys,
-        &[ForeignKey {
-            constraint_name: match api.sql_family() {
-                SqlFamily::Postgres => Some("A_b_id_fkey".to_owned()),
-                SqlFamily::Mysql => Some(api.normalize_identifier("A_ibfk_1").into_owned()),
-                SqlFamily::Sqlite => None,
-                SqlFamily::Mssql => Some("A_b_id_fkey".to_owned()),
-            },
-            columns: vec![column.name.clone()],
-            referenced_table: api.normalize_identifier("B").into_owned(),
-            referenced_columns: vec!["id".to_string()],
-            on_delete_action: ForeignKeyAction::Cascade,
-            on_update_action: ForeignKeyAction::NoAction,
-        }]
-    );
+    api.assert_schema().await?.assert_table("A", |t| {
+        t.assert_column("b_id", |c| c.assert_type_is_string())?
+            .assert_foreign_keys_count(1)?
+            .assert_fk_on_columns(&["b_id"], |fk| {
+                fk.assert_references("B", &["id"])?.assert_cascades_on_delete()
+            })
+    })?;
 
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn removing_an_inline_relation_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
             model A {
@@ -260,7 +191,7 @@ async fn removing_an_inline_relation_must_work(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn compound_foreign_keys_should_work_in_correct_order(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model A {
@@ -282,30 +213,18 @@ async fn compound_foreign_keys_should_work_in_correct_order(api: &TestApi) -> Te
 
     api.schema_push(dm1).send().await?.assert_green()?;
 
-    let result = api.describe_database().await?;
-    let table = result.table_bang("A");
-
-    assert_eq!(
-        table.foreign_keys,
-        &[ForeignKey {
-            constraint_name: match api.sql_family() {
-                SqlFamily::Postgres => Some("A_a_b_d_fkey".to_owned()),
-                SqlFamily::Sqlite => None,
-                SqlFamily::Mysql => Some(api.normalize_identifier("A_ibfk_1").into_owned()),
-                SqlFamily::Mssql => Some("A_a_b_d_fkey".to_owned()),
-            },
-            columns: vec!["a".to_string(), "b".to_string(), "d".to_string()],
-            referenced_table: api.normalize_identifier("B").into_owned(),
-            referenced_columns: vec!["a_id".to_string(), "b_id".to_string(), "d_id".to_string()],
-            on_delete_action: ForeignKeyAction::Cascade,
-            on_update_action: ForeignKeyAction::NoAction,
-        }]
-    );
+    api.assert_schema().await?.assert_table("A", |t| {
+        t.assert_foreign_keys_count(1)?
+            .assert_fk_on_columns(&["a", "b", "d"], |fk| {
+                fk.assert_cascades_on_delete()?
+                    .assert_references("B", &["a_id", "b_id", "d_id"])
+            })
+    })?;
 
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn moving_an_inline_relation_to_the_other_side_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model A {
@@ -321,26 +240,11 @@ async fn moving_an_inline_relation_to_the_other_side_must_work(api: &TestApi) ->
     "#;
 
     api.schema_push(dm1).send().await?.assert_green()?;
-
-    let result = api.describe_database().await?;
-
-    let table = result.table_bang("A");
-    assert_eq!(
-        table.foreign_keys,
-        &[ForeignKey {
-            constraint_name: match api.sql_family() {
-                SqlFamily::Postgres => Some("A_b_id_fkey".to_owned()),
-                SqlFamily::Sqlite => None,
-                SqlFamily::Mysql => Some(api.normalize_identifier("A_ibfk_1").into_owned()),
-                SqlFamily::Mssql => Some("A_b_id_fkey".to_owned()),
-            },
-            columns: vec!["b_id".to_string()],
-            referenced_table: api.normalize_identifier("B").into_owned(),
-            referenced_columns: vec!["id".to_string()],
-            on_delete_action: ForeignKeyAction::Cascade,
-            on_update_action: ForeignKeyAction::NoAction,
-        }]
-    );
+    api.assert_schema().await?.assert_table("A", |t| {
+        t.assert_foreign_keys_count(1)?.assert_fk_on_columns(&["b_id"], |fk| {
+            fk.assert_cascades_on_delete()?.assert_references("B", &["id"])
+        })
+    })?;
 
     let dm2 = r#"
         model A {
@@ -357,25 +261,11 @@ async fn moving_an_inline_relation_to_the_other_side_must_work(api: &TestApi) ->
 
     api.schema_push(dm2).send().await?.assert_green()?;
 
-    let result = api.describe_database().await?;
-
-    let table = result.table_bang("B");
-    assert_eq!(
-        table.foreign_keys,
-        &[ForeignKey {
-            constraint_name: match api.sql_family() {
-                SqlFamily::Postgres => Some("B_a_id_fkey".to_owned()),
-                SqlFamily::Sqlite => None,
-                SqlFamily::Mysql => Some(api.normalize_identifier("B_ibfk_1").into_owned()),
-                SqlFamily::Mssql => Some("B_a_id_fkey".to_owned()),
-            },
-            columns: vec!["a_id".to_string()],
-            referenced_table: api.normalize_identifier("A").into_owned(),
-            referenced_columns: vec!["id".to_string()],
-            on_delete_action: ForeignKeyAction::Cascade,
-            on_update_action: ForeignKeyAction::NoAction,
-        }]
-    );
+    api.assert_schema().await?.assert_table("B", |table| {
+        table.assert_fk_on_columns(&["a_id"], |fk| {
+            fk.assert_references("A", &["id"])?.assert_cascades_on_delete()
+        })
+    })?;
 
     api.assert_schema()
         .await?

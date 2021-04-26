@@ -2,9 +2,9 @@ use barrel::types;
 use indoc::indoc;
 use introspection_engine_tests::test_api::*;
 use quaint::prelude::{Queryable, SqlFamily};
-use test_macros::test_each_connector;
+use test_macros::test_connector;
 
-#[test_each_connector(capabilities("enums"))]
+#[test_connector(capabilities(Enums))]
 async fn a_table_with_enums(api: &TestApi) -> crate::TestResult {
     let sql_family = api.sql_family();
 
@@ -67,7 +67,7 @@ async fn a_table_with_enums(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector(capabilities("enums"))]
+#[test_connector(capabilities(Enums))]
 async fn a_table_with_an_enum_default_value_that_is_an_empty_string(api: &TestApi) -> crate::TestResult {
     let sql_family = api.sql_family();
 
@@ -115,7 +115,7 @@ async fn a_table_with_an_enum_default_value_that_is_an_empty_string(api: &TestAp
     Ok(())
 }
 
-#[test_each_connector(capabilities("enums"))]
+#[test_connector(capabilities(Enums))]
 async fn a_table_enums_should_return_alphabetically_even_when_in_different_order(api: &TestApi) -> crate::TestResult {
     let sql_family = api.sql_family();
 
@@ -177,7 +177,7 @@ async fn a_table_enums_should_return_alphabetically_even_when_in_different_order
     Ok(())
 }
 
-#[test_each_connector(capabilities("enums"))]
+#[test_connector(capabilities(Enums))]
 async fn a_table_with_enum_default_values(api: &TestApi) -> crate::TestResult {
     let sql_family = api.sql_family();
 
@@ -225,7 +225,7 @@ async fn a_table_with_enum_default_values(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector(capabilities("enums", "scalar_lists"))]
+#[test_connector(capabilities(Enums, ScalarLists))]
 async fn a_table_enums_array(api: &TestApi) -> crate::TestResult {
     let sql_family = api.sql_family();
 
@@ -266,7 +266,7 @@ async fn a_table_enums_array(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector(capabilities("enums"))]
+#[test_connector(capabilities(Enums))]
 async fn a_table_with_enum_default_values_that_look_like_booleans(api: &TestApi) -> crate::TestResult {
     let sql_family = api.sql_family();
 

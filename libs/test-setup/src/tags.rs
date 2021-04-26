@@ -3,22 +3,23 @@ use once_cell::sync::Lazy;
 use std::error::Error as StdError;
 
 #[derive(BitFlags, Copy, Clone, Debug, PartialEq)]
-#[repr(u32)]
+#[repr(u16)]
 pub enum Tags {
-    Mysql = 0x01,
-    Mariadb = 0x02,
-    Postgres = 0x04,
-    Sqlite = 0x08,
-    Mysql8 = 0x10,
-    Mysql56 = 0x20,
-    Mysql57 = 0x40,
-    Mssql2017 = 0x80,
-    Mssql2019 = 0x100,
-    Postgres12 = 0x200,
-    Mssql = 0x400,
-    Vitess57 = 0x800,
-    Vitess80 = 0x1000,
-    Vitess = 0x2000,
+    LowerCasesTableNames = 1 << 1,
+    Mysql = 1 << 2,
+    Mariadb = 1 << 3,
+    Postgres = 1 << 4,
+    Sqlite = 1 << 5,
+    Mysql8 = 1 << 6,
+    Mysql56 = 1 << 7,
+    Mysql57 = 1 << 8,
+    Mssql2017 = 1 << 9,
+    Mssql2019 = 1 << 10,
+    Postgres12 = 1 << 11,
+    Mssql = 1 << 12,
+    Vitess57 = 1 << 13,
+    Vitess80 = 1 << 14,
+    Vitess = 1 << 15,
 }
 
 impl Tags {

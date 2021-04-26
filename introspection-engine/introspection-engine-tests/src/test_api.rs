@@ -1,6 +1,7 @@
+pub use test_setup::{BitFlags, Capabilities, Tags};
+
 use crate::BarrelMigrationExecutor;
 use datamodel::{Configuration, Datamodel};
-use enumflags2::BitFlags;
 use eyre::{Context, Report, Result};
 use introspection_connector::{DatabaseMetadata, IntrospectionConnector, Version};
 use introspection_core::rpc::RpcImpl;
@@ -12,54 +13,46 @@ use quaint::{
 use sql_introspection_connector::SqlIntrospectionConnector;
 use sql_migration_connector::SqlMigrationConnector;
 use sql_schema_describer::{mssql, mysql, postgres, sqlite, SqlSchema, SqlSchemaDescriberBackend};
-use test_setup::{connectors::Tags, *};
+use test_setup::{create_mysql_database, create_postgres_database, sqlite_test_url, TestApiArgs};
 use tracing::Instrument;
 
 pub struct TestApi {
     api: SqlIntrospectionConnector,
+    database: Quaint,
     args: TestApiArgs,
     connection_string: String,
-    db_name: &'static str,
-    database: Quaint,
 }
 
 impl TestApi {
     pub async fn new(args: TestApiArgs) -> Self {
-        let tags = args.connector_tags;
+        let tags = args.tags();
+        let connection_string = args.database_url();
 
-        let db_name = if args.connector_tags.contains(Tags::Mysql) {
-            test_setup::mysql_safe_identifier(args.test_function_name)
+        let db_name = if tags.contains(Tags::Mysql) {
+            test_setup::mysql_safe_identifier(args.test_function_name())
         } else {
-            args.test_function_name
+            args.test_function_name()
         };
 
-        let (connection_string, _) = (args.url_fn)(db_name);
-
-        let database = if tags.intersects(Tags::Vitess) {
-            let me = SqlMigrationConnector::new(&connection_string, BitFlags::empty(), None)
-                .await
-                .unwrap();
+        let (database, connection_string): (Quaint, String) = if tags.intersects(Tags::Vitess) {
+            let me = SqlMigrationConnector::new(&connection_string, None).await.unwrap();
             me.reset().await.unwrap();
 
-            Quaint::new(&connection_string).await.unwrap()
+            (
+                Quaint::new(&connection_string).await.unwrap(),
+                connection_string.to_owned(),
+            )
         } else if tags.contains(Tags::Mysql) {
-            create_mysql_database(&connection_string.parse().unwrap())
-                .await
-                .unwrap()
+            create_mysql_database(db_name).await.unwrap()
         } else if tags.contains(Tags::Postgres) {
-            create_postgres_database(&connection_string.parse().unwrap())
+            create_postgres_database(db_name).await.unwrap()
+        } else if tags.contains(Tags::Mssql) {
+            test_setup::init_mssql_database(args.database_url(), db_name)
                 .await
                 .unwrap()
-        } else if tags.contains(Tags::Mssql) {
-            let conn = Quaint::new(&connection_string).await.unwrap();
-
-            test_setup::connectors::mssql::reset_schema(&conn, db_name)
-                .await
-                .unwrap();
-
-            conn
         } else if tags.contains(Tags::Sqlite) {
-            Quaint::new(&connection_string).await.unwrap()
+            let url = sqlite_test_url(db_name);
+            (Quaint::new(&url).await.unwrap(), url)
         } else {
             unreachable!()
         };
@@ -69,9 +62,8 @@ impl TestApi {
         TestApi {
             api,
             args,
-            connection_string,
             database,
-            db_name,
+            connection_string,
         }
     }
 
@@ -203,12 +195,12 @@ impl TestApi {
         if self.tags().intersects(Tags::Vitess) {
             "test"
         } else {
-            self.db_name
+            self.args.test_function_name()
         }
     }
 
     pub fn tags(&self) -> BitFlags<Tags> {
-        self.args.connector_tags
+        self.args.tags()
     }
 
     pub fn datasource_block(&self) -> String {

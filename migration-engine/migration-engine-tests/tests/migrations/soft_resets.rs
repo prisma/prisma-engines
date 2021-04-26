@@ -1,10 +1,10 @@
 use connection_string::JdbcString;
-use migration_engine_tests::{multi_engine_test_api::TestApi, TestResult};
+use migration_engine_tests::{multi_engine_test_api::*, TestResult};
 use quaint::{prelude::Queryable, single::Quaint};
-use test_macros::test_connectors;
+use test_macros::test_connector;
 
-#[test_connectors(tags("postgres"))]
-async fn soft_resets_work_on_postgres(api: TestApi) -> TestResult {
+#[test_connector(tags(Postgres))]
+async fn soft_resets_work_on_postgres(api: &TestApi) -> TestResult {
     let migrations_directory = api.create_migrations_directory()?;
     let mut url: url::Url = api.connection_string().parse()?;
 
@@ -18,7 +18,7 @@ async fn soft_resets_work_on_postgres(api: TestApi) -> TestResult {
 
     // Create the database, a first migration and the test user.
     {
-        let admin_connection = api.initialize().await?;
+        let admin_connection = api.admin_conn();
 
         api.new_engine()
             .await?
@@ -102,8 +102,8 @@ async fn soft_resets_work_on_postgres(api: TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connectors(tags("mssql"))]
-async fn soft_resets_work_on_sql_server(api: TestApi) -> TestResult {
+#[test_connector(tags(Mssql))]
+async fn soft_resets_work_on_sql_server(api: &TestApi) -> TestResult {
     let migrations_directory = api.create_migrations_directory()?;
 
     let mut url: JdbcString = format!("jdbc:{}", api.connection_string()).parse()?;
@@ -118,7 +118,7 @@ async fn soft_resets_work_on_sql_server(api: TestApi) -> TestResult {
 
     // Create the database, a first migration and the test user.
     {
-        let admin_connection = api.initialize().await?;
+        let admin_connection = api.admin_conn();
 
         api.new_engine()
             .await?
@@ -242,13 +242,13 @@ async fn soft_resets_work_on_sql_server(api: TestApi) -> TestResult {
     Ok(())
 }
 
-/// MySQL 5.6 doesn't have `DROP USER IF EXISTS`...
-/// Neither does Vitess
-#[test_connectors(tags("mysql"), ignore("mysql_5_6", "vitess"))]
-async fn soft_resets_work_on_mysql(api: TestApi) -> TestResult {
+// MySQL 5.6 doesn't have `DROP USER IF EXISTS`...
+// Neither does Vitess
+#[test_connector(tags(Mysql), exclude(Mysql56, Vitess))]
+async fn soft_resets_work_on_mysql(api: &TestApi) -> TestResult {
     let migrations_directory = api.create_migrations_directory()?;
     let mut url: url::Url = api.connection_string().parse()?;
-    let admin_connection = api.initialize().await?;
+    let admin_connection = api.admin_conn();
 
     let dm = r#"
         model Cat {

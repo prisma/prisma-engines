@@ -6,33 +6,47 @@ on:
   pull_request:
 jobs:
   test:
-    name: "Test ${{ matrix.database }} on Linux"
+    name: "Test ${{ matrix.database.name }} on Linux"
     runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
       matrix:
         database:
-          - mssql_2017
-          - mssql_2019
-          - mysql_5_6
-          - mysql_5_7
-          - mysql_8
-          - mysql_mariadb
-          - postgres9
-          - postgres10
-          - postgres11
-          - postgres12
-          - postgres13
-          - sqlite
-          - vitess_5_7
-          - vitess_8_0
+          - name: mssql_2017
+            url: "sqlserver://localhost:1434;database=master;user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED"
+          - name: mssql_2019
+            url: "sqlserver://localhost:1433;database=master;user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED"
+          - name: mysql_5_6
+            url: "mysql://root:prisma@localhost:3309"
+          - name: mysql_5_7
+            url: "mysql://root:prisma@localhost:3306"
+          - name: mysql_8
+            url: "mysql://root:prisma@localhost:3307"
+          - name: mysql_mariadb
+            url: "mysql://root:prisma@localhost:3308"
+          - name: postgres9
+            url: "postgresql://postgres:prisma@localhost:5431"
+          - name: postgres10
+            url: "postgresql://postgres:prisma@localhost:5432"
+          - name: postgres11
+            url: "postgresql://postgres:prisma@localhost:5433"
+          - name: postgres12
+            url: "postgresql://postgres:prisma@localhost:5434"
+          - name: postgres13
+            url: "postgresql://postgres:prisma@localhost:5435"
+          - name: sqlite
+            url: sqlite
+          - name: vitess_5_7
+            url: "mysql://root:prisma@localhost:33577/test"
+          - name: vitess_8_0
+            url: "mysql://root:prisma@localhost:33807/test"
 
     steps:
       - uses: actions/checkout@v2
 
-      - name: "Start ${{ matrix.database }}"
-        run: make start-${{ matrix.database }}
+      - name: "Start ${{ matrix.database.name }}"
+        run: make start-${{ matrix.database.name }}
 
       - uses: actions-rs/toolchain@v1
         with:
@@ -45,16 +59,19 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             target
-          key: introspection-engine-${{ runner.os }}-${{ matrix.database}}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          key: introspection-engine-${{ runner.os }}-${{ matrix.database.name }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
-      - run: cargo test ${{ matrix.database }}
-        if: ${{ matrix.database != 'vitess_5_7' && matrix.database != 'vitess_8_0' }}
+      - run: cargo test
+        if: ${{ matrix.database.name != 'vitess_5_7' && matrix.database.name != 'vitess_8_0' }}
         working-directory: introspection-engine/introspection-engine-tests
         env:
           CLICOLOR_FORCE: 1
+          TEST_DATABASE_URL: ${{ matrix.database.url }}
 
-      - run: cargo test ${{ matrix.database }} -- --test-threads=1
-        if: ${{ matrix.database == 'vitess_5_7' || matrix.database == 'vitess_8_0' }}
+      - run: cargo test -- --test-threads=1
+        if: ${{ matrix.database.name == 'vitess_5_7' || matrix.database.name == 'vitess_8_0' }}
         working-directory: introspection-engine/introspection-engine-tests
         env:
           CLICOLOR_FORCE: 1
+          IS_VITESS: 1
+          TEST_DATABASE_URL: ${{ matrix.database.url }}

@@ -2,9 +2,8 @@ use crate::{
     connect, connection_wrapper::Connection, error::quaint_error_to_connector_error, SqlFlavour, SqlMigrationConnector,
 };
 use connection_string::JdbcString;
-use enumflags2::BitFlags;
 use indoc::formatdoc;
-use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory, MigrationFeature};
+use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
 use quaint::{connector::MssqlUrl, prelude::Table};
 use sql_schema_describer::{DescriberErrorKind, SqlSchema, SqlSchemaDescriberBackend};
 use std::str::FromStr;
@@ -12,21 +11,17 @@ use user_facing_errors::{introspection_engine::DatabaseSchemaInconsistent, Known
 
 pub(crate) struct MssqlFlavour {
     url: MssqlUrl,
-    features: BitFlags<MigrationFeature>,
 }
 
 impl std::fmt::Debug for MssqlFlavour {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("MssqlFlavour")
-            .field("features", &self.features)
-            .field("url", &"<REDACTED>")
-            .finish()
+        f.debug_struct("MssqlFlavour").field("url", &"<REDACTED>").finish()
     }
 }
 
 impl MssqlFlavour {
-    pub fn new(url: MssqlUrl, features: BitFlags<MigrationFeature>) -> Self {
-        Self { url, features }
+    pub fn new(url: MssqlUrl) -> Self {
+        Self { url }
     }
 
     pub(crate) fn schema_name(&self) -> &str {
@@ -368,10 +363,6 @@ impl SqlFlavour for MssqlFlavour {
 
         sql_schema_result
     }
-
-    fn features(&self) -> BitFlags<MigrationFeature> {
-        self.features
-    }
 }
 
 #[cfg(test)]
@@ -382,7 +373,7 @@ mod tests {
     fn debug_impl_does_not_leak_connection_info() {
         let url = "sqlserver://myserver:8765;database=master;schema=mydbname;user=SA;password=<mypassword>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED";
 
-        let flavour = MssqlFlavour::new(MssqlUrl::new(&url).unwrap(), BitFlags::default());
+        let flavour = MssqlFlavour::new(MssqlUrl::new(&url).unwrap());
         let debugged = format!("{:?}", flavour);
 
         let words = &["myname", "mypassword", "myserver", "8765", "mydbname"];

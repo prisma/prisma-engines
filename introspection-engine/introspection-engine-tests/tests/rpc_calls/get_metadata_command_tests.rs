@@ -1,9 +1,9 @@
 use barrel::types;
 use introspection_engine_tests::{test_api::*, BarrelMigrationExecutor};
 use pretty_assertions::assert_eq;
-use test_macros::test_each_connector;
+use test_macros::test_connector;
 
-#[test_each_connector(tags("mysql"))]
+#[test_connector(tags(Mysql))]
 async fn metadata_for_mysql_should_work(api: &TestApi) -> crate::TestResult {
     setup(&api.barrel(), api.db_name()).await?;
 
@@ -15,7 +15,7 @@ async fn metadata_for_mysql_should_work(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"))]
+#[test_connector(tags(Postgres))]
 async fn metadata_for_postgres_should_work(api: &TestApi) -> crate::TestResult {
     setup(&api.barrel(), api.schema_name()).await?;
 
@@ -27,7 +27,7 @@ async fn metadata_for_postgres_should_work(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("sqlite"))]
+#[test_connector(tags(Sqlite))]
 async fn metadata_for_sqlite_should_work(api: &TestApi) -> crate::TestResult {
     setup(&api.barrel(), api.schema_name()).await?;
 
@@ -39,7 +39,7 @@ async fn metadata_for_sqlite_should_work(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("mssql_2017", "mssql_2019"))]
+#[test_connector(tags(Mssql))]
 async fn metadata_for_mssql_should_work(api: &TestApi) -> crate::TestResult {
     setup(&api.barrel(), api.schema_name()).await?;
 

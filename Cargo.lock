@@ -2297,6 +2297,7 @@ dependencies = [
  "serde_json",
  "structopt",
  "tempfile",
+ "test-macros",
  "test-setup",
  "tokio",
  "tracing",
@@ -4579,13 +4580,8 @@ dependencies = [
 name = "test-macros"
 version = "0.1.0"
 dependencies = [
- "darling 0.10.2",
- "enumflags2",
- "once_cell",
- "proc-macro2",
  "quote",
  "syn",
- "test-setup",
 ]
 
 [[package]]
@@ -4597,6 +4593,7 @@ dependencies = [
  "once_cell",
  "quaint",
  "tokio",
+ "tracing",
  "tracing-error",
  "tracing-subscriber",
  "url 2.2.1",

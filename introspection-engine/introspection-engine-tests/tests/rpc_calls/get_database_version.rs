@@ -1,6 +1,6 @@
 use introspection_engine_tests::{test_api::*, BarrelMigrationExecutor};
 use pretty_assertions::assert_eq;
-use test_macros::test_each_connector;
+use test_macros::test_connector;
 
 async fn setup_empty(barrel: &BarrelMigrationExecutor, db_name: &str) -> crate::TestResult {
     barrel.execute_with_schema(|_| {}, db_name).await?;
@@ -8,7 +8,7 @@ async fn setup_empty(barrel: &BarrelMigrationExecutor, db_name: &str) -> crate::
     Ok(())
 }
 
-#[test_each_connector(tags("sqlite"))]
+#[test_connector(tags(Sqlite))]
 async fn database_version_for_sqlite_should_work(api: &TestApi) -> crate::TestResult {
     setup_empty(&api.barrel(), api.schema_name()).await?;
     let result = api.get_database_version().await?;
@@ -17,7 +17,7 @@ async fn database_version_for_sqlite_should_work(api: &TestApi) -> crate::TestRe
     Ok(())
 }
 
-#[test_each_connector(tags("mysql_5_6"))]
+#[test_connector(tags(Mysql56))]
 async fn database_version_for_mysql_5_6_should_work(api: &TestApi) -> crate::TestResult {
     setup_empty(&api.barrel(), api.schema_name()).await?;
     let result = api.get_database_version().await?;
@@ -26,7 +26,7 @@ async fn database_version_for_mysql_5_6_should_work(api: &TestApi) -> crate::Tes
     Ok(())
 }
 
-#[test_each_connector(tags("mariadb"))]
+#[test_connector(tags(Mariadb))]
 async fn database_version_for_mariadb_should_work(api: &TestApi) -> crate::TestResult {
     setup_empty(&api.barrel(), api.schema_name()).await?;
     let result = api.get_database_version().await?;
@@ -35,7 +35,7 @@ async fn database_version_for_mariadb_should_work(api: &TestApi) -> crate::TestR
     Ok(())
 }
 
-#[test_each_connector(tags("mysql_8"))]
+#[test_connector(tags(Mysql8))]
 async fn database_version_for_mysql_8_should_work(api: &TestApi) -> crate::TestResult {
     setup_empty(&api.barrel(), api.schema_name()).await?;
     let result = api.get_database_version().await?;
@@ -44,7 +44,7 @@ async fn database_version_for_mysql_8_should_work(api: &TestApi) -> crate::TestR
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"))]
+#[test_connector(tags(Postgres))]
 async fn database_version_for_postgres_should_work(api: &TestApi) -> crate::TestResult {
     setup_empty(&api.barrel(), api.schema_name()).await?;
     let result = api.get_database_version().await?;
@@ -53,7 +53,7 @@ async fn database_version_for_postgres_should_work(api: &TestApi) -> crate::Test
     Ok(())
 }
 
-#[test_each_connector(tags("mssql_2017"))]
+#[test_connector(tags(Mssql2017))]
 async fn database_version_for_mssql_2017_should_work(api: &TestApi) -> crate::TestResult {
     setup_empty(&api.barrel(), api.schema_name()).await?;
     let result = api.get_database_version().await?;
@@ -62,7 +62,7 @@ async fn database_version_for_mssql_2017_should_work(api: &TestApi) -> crate::Te
     Ok(())
 }
 
-#[test_each_connector(tags("mssql_2019"))]
+#[test_connector(tags(Mssql2019))]
 async fn database_version_for_mssql_2019_should_work(api: &TestApi) -> crate::TestResult {
     setup_empty(&api.barrel(), api.schema_name()).await?;
     let result = api.get_database_version().await?;

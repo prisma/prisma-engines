@@ -8,8 +8,8 @@ use pretty_assertions::assert_eq;
 use quaint::prelude::Queryable;
 use sql_schema_describer::*;
 use sqlite::*;
-use test_api::{TestApi, TestResult};
-use test_macros::test_each_connector;
+use test_api::{BitFlags, Tags, TestApi, TestResult};
+use test_macros::test_connector;
 
 #[tokio::test]
 async fn views_can_be_described() {
@@ -303,7 +303,7 @@ async fn sqlite_text_primary_keys_must_be_inferred_on_table_and_not_as_separate_
     );
 }
 
-#[test_each_connector(tags("sqlite"))]
+#[test_connector(tags(Sqlite))]
 async fn escaped_quotes_in_string_defaults_must_be_unescaped(api: &TestApi) -> TestResult {
     let create_table = format!(
         r#"
@@ -352,7 +352,7 @@ async fn escaped_quotes_in_string_defaults_must_be_unescaped(api: &TestApi) -> T
     Ok(())
 }
 
-#[test_each_connector(tags("sqlite"))]
+#[test_connector(tags(Sqlite))]
 async fn escaped_backslashes_in_string_literals_must_be_unescaped(api: &TestApi) -> TestResult {
     let create_table = format!(
         r#"
@@ -385,8 +385,8 @@ async fn escaped_backslashes_in_string_literals_must_be_unescaped(api: &TestApi)
     Ok(())
 }
 
-#[test_each_connector(tags("sqlite"))]
-async fn broken_relations_are_filtered_out(api: &TestApi) {
+#[test_connector(tags(Sqlite))]
+async fn broken_relations_are_filtered_out(api: &TestApi) -> TestResult {
     let setup = r#"
         PRAGMA foreign_keys=OFF;
 
@@ -414,4 +414,6 @@ async fn broken_relations_are_filtered_out(api: &TestApi) {
         "{:#?}",
         table.foreign_keys
     );
+
+    Ok(())
 }

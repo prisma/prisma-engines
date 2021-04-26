@@ -1,8 +1,8 @@
 use indoc::indoc;
 use introspection_engine_tests::test_api::*;
-use test_macros::test_each_connector;
+use test_macros::test_connector;
 
-#[test_each_connector(tags("postgres"))]
+#[test_connector(tags(Postgres))]
 async fn sequences_should_work(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(move |migration| {

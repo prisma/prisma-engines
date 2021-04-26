@@ -1897,7 +1897,7 @@ fn with_params(r#type: &str) -> &str {
     }
 }
 
-#[test_each_connector(tags("mssql_2017", "mssql_2019"))]
+#[test_connector(tags(Mssql))]
 async fn safe_casts_with_existing_data_should_work(api: &TestApi) -> TestResult {
     for (from, seed, casts) in SAFE_CASTS.iter() {
         for to in *casts {
@@ -1959,7 +1959,7 @@ async fn safe_casts_with_existing_data_should_work(api: &TestApi) -> TestResult 
     Ok(())
 }
 
-#[test_each_connector(tags("mssql_2017", "mssql_2019"))]
+#[test_connector(tags(Mssql))]
 async fn risky_casts_with_existing_data_should_warn(api: &TestApi) -> TestResult {
     for (from, seed, casts) in RISKY_CASTS.iter() {
         for to in *casts {
@@ -2027,7 +2027,7 @@ async fn risky_casts_with_existing_data_should_warn(api: &TestApi) -> TestResult
     Ok(())
 }
 
-#[test_each_connector(tags("mssql_2017", "mssql_2019"))]
+#[test_connector(tags(Mssql))]
 async fn not_castable_with_existing_data_should_warn(api: &TestApi) -> TestResult {
     for (from, seed, casts) in NOT_CASTABLE.iter() {
         for to in *casts {
@@ -2097,7 +2097,7 @@ async fn not_castable_with_existing_data_should_warn(api: &TestApi) -> TestResul
     Ok(())
 }
 
-#[test_each_connector(tags("mssql"))]
+#[test_connector(tags(Mssql))]
 async fn typescript_starter_schema_with_native_types_is_idempotent(api: &TestApi) -> TestResult {
     let dm = api.native_types_datamodel(
         r#"
@@ -2162,7 +2162,7 @@ async fn typescript_starter_schema_with_native_types_is_idempotent(api: &TestApi
     Ok(())
 }
 
-#[test_each_connector(log = "debug,sql_schema_describer=info", tags("mssql"))]
+#[test_connector(tags(Mssql))]
 async fn typescript_starter_schema_with_different_native_types_is_idempotent(api: &TestApi) -> TestResult {
     let dm = api.native_types_datamodel(
         r#"
