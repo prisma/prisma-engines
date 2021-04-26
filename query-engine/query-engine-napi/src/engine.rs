@@ -17,6 +17,7 @@ use std::{
 };
 use tokio::sync::RwLock;
 use tracing::{metadata::LevelFilter, Level};
+use tracing_futures::Instrument;
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 /// The main engine, that can be cloned between threads when using JavaScript
@@ -289,16 +290,19 @@ impl QueryEngine {
     pub async fn query(&self, query: GraphQlBody, trace: HashMap<String, String>) -> crate::Result<PrismaResponse> {
         match *self.inner.read().await {
             Inner::Connected(ref engine) => {
+                let span = tracing::span!(Level::INFO, "query");
+                let cx = global::get_text_map_propagator(|propagator| propagator.extract(&trace));
+
+                span.set_parent(cx);
+
                 engine
                     .logger
-                    .with_logging(|| async move {
-                        let cx = global::get_text_map_propagator(|propagator| propagator.extract(&trace));
-                        let span = tracing::span!(Level::TRACE, "query");
-
-                        span.set_parent(cx);
-
-                        let handler = GraphQlHandler::new(engine.executor(), engine.query_schema());
-                        Ok(handler.handle(query).await)
+                    .with_logging(|| {
+                        async move {
+                            let handler = GraphQlHandler::new(engine.executor(), engine.query_schema());
+                            Ok(handler.handle(query).await)
+                        }
+                        .instrument(span)
                     })
                     .await
             }

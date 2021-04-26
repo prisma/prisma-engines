@@ -100,7 +100,7 @@ async fn graphql_handler(mut req: Request<State>) -> tide::Result {
     }
 
     let cx = get_parent_span_context(&req);
-    let span = tracing::span!(Level::TRACE, "graphql_handler");
+    let span = tracing::span!(Level::INFO, "graphql_handler");
     span.set_parent(cx);
 
     let work = async move {
