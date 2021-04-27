@@ -4,6 +4,7 @@
 
 pub mod api;
 pub mod commands;
+pub mod qe_setup;
 
 mod core_error;
 
@@ -142,50 +143,6 @@ pub async fn drop_database(schema: &str) -> CoreResult<()> {
         }
         x => unimplemented!("Connector {} is not supported yet", x),
     }
-}
-
-/// Database setup for connector-test-kit.
-pub async fn qe_setup(prisma_schema: &str) -> CoreResult<()> {
-    let config = parse_configuration(prisma_schema)?;
-    let features = features::from_config(&config);
-
-    let source = config
-        .datasources
-        .first()
-        .ok_or_else(|| CoreError::from_msg("There is no datasource in the schema.".into()))?;
-
-    let api: Box<dyn GenericApi> = match &source.active_provider {
-        provider
-            if [
-                MYSQL_SOURCE_NAME,
-                POSTGRES_SOURCE_NAME,
-                SQLITE_SOURCE_NAME,
-                MSSQL_SOURCE_NAME,
-            ]
-            .contains(&provider.as_str()) =>
-        {
-            // 1. creates schema & database
-            SqlMigrationConnector::qe_setup(&source.url().value).await?;
-            Box::new(SqlMigrationConnector::new(&source.url().value, features, None).await?)
-        }
-        #[cfg(feature = "mongodb")]
-        provider if provider == MONGODB_SOURCE_NAME => {
-            MongoDbMigrationConnector::qe_setup(&source.url().value).await?;
-            let connector = MongoDbMigrationConnector::new(&source.url().value, features).await?;
-            Box::new(connector)
-        }
-        x => unimplemented!("Connector {} is not supported yet", x),
-    };
-
-    // 2. create the database schema for given Prisma schema
-    let schema_push_input = SchemaPushInput {
-        schema: prisma_schema.to_string(),
-        assume_empty: true,
-        force: true,
-    };
-
-    api.schema_push(&schema_push_input).await?;
-    Ok(())
 }
 
 fn parse_configuration(datamodel: &str) -> CoreResult<Configuration> {

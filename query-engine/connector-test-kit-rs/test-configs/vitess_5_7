@@ -1,0 +1,5 @@
+{
+    "connector": "vitess",
+    "version": "5.7",
+    "runner": "direct"
+}

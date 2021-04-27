@@ -155,6 +155,7 @@ pub fn create_relation_table_records(
     child_ids: &[RecordProjection],
 ) -> Query<'static> {
     let relation = field.relation();
+
     let parent_columns: Vec<_> = field.related_field().m2m_columns();
     let child_columns: Vec<_> = field.m2m_columns();
 

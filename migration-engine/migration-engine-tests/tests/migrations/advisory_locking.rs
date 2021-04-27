@@ -2,8 +2,7 @@ use migration_core::commands::{ApplyMigrationsInput, CreateMigrationInput};
 use migration_engine_tests::{multi_engine_test_api::*, TestResult};
 use test_macros::test_connectors;
 
-// Tom says: THIS IS OK TO IGNORE.
-#[test_connectors(ignore("vitess"))]
+#[test_connectors]
 async fn advisory_locking_works(api: TestApi) -> TestResult {
     api.initialize().await?;
 

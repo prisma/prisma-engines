@@ -2288,6 +2288,7 @@ name = "migration-engine-cli"
 version = "0.1.0"
 dependencies = [
  "base64 0.13.0",
+ "enumflags2",
  "futures 0.3.13",
  "json-rpc-stdio",
  "migration-connector",
@@ -3357,7 +3358,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.13"
-source = "git+https://github.com/prisma/quaint#19d62bb7d87590a18c9844620c87f2f38e972d7d"
+source = "git+https://github.com/prisma/quaint#32d028ffb5f7b22dc4ee20206a598ac8431ce0bf"
 dependencies = [
  "async-trait",
  "base64 0.12.3",
@@ -3569,6 +3570,7 @@ dependencies = [
  "datamodel",
  "datamodel-connector",
  "enum_dispatch",
+ "enumflags2",
  "indoc",
  "itertools 0.10.0",
  "lazy_static",
