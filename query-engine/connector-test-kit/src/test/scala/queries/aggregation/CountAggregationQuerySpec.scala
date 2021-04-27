@@ -39,29 +39,28 @@ class CountAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase 
     val result = server.query(
       s"""{
          |  aggregateItem {
-         |    count { _all }
+         |    _count { _all }
          |  }
          |}""".stripMargin,
       project
     )
 
-    result.pathAsLong("data.aggregateItem.count._all") should be(0)
+    result.pathAsLong("data.aggregateItem._count._all") should be(0)
   }
 
   "Counting on multiple fields" should "return the correct counts" in {
     val result = server.query(
       s"""{
          |  aggregateItem {
-         |    count { 
+         |    _count {
          |      _all
-         |       
          |    }
          |  }
          |}""".stripMargin,
       project
     )
 
-    result.pathAsLong("data.aggregateItem.count._all") should be(0)
+    result.pathAsLong("data.aggregateItem._count._all") should be(0)
   }
 
   "Counting fields that contain null" should "only return the count of these fields that don't have null" in {
@@ -71,7 +70,7 @@ class CountAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase 
     val result = server.query(
       s"""{
          |  aggregateItem {
-         |    count {
+         |    _count {
          |      _all
          |      s1
          |      s2
@@ -81,9 +80,9 @@ class CountAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase 
       project
     )
 
-    result.pathAsLong("data.aggregateItem.count._all") should be(2)
-    result.pathAsLong("data.aggregateItem.count.s1") should be(1)
-    result.pathAsLong("data.aggregateItem.count.s2") should be(1)
+    result.pathAsLong("data.aggregateItem._count._all") should be(2)
+    result.pathAsLong("data.aggregateItem._count.s1") should be(1)
+    result.pathAsLong("data.aggregateItem._count.s2") should be(1)
   }
 
   "Counting with all sorts of query arguments" should "work" in {
@@ -95,85 +94,85 @@ class CountAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase 
     val result = server.query(
       """{
         |  aggregateItem(take: 2) {
-        |    count { _all }
+        |    _count { _all }
         |  }
         |}
       """.stripMargin,
       project
     )
 
-    result should equal("""{"data":{"aggregateItem":{"count":{"_all":2}}}}""".parseJson)
+    result should equal("""{"data":{"aggregateItem":{"_count":{"_all":2}}}}""".parseJson)
 
     val result2 = server.query(
       """{
         |  aggregateItem(take: 5) {
-        |    count { _all }
+        |    _count { _all }
         |  }
         |}
       """.stripMargin,
       project
     )
 
-    result2 should equal("""{"data":{"aggregateItem":{"count":{"_all":4}}}}""".parseJson)
+    result2 should equal("""{"data":{"aggregateItem":{"_count":{"_all":4}}}}""".parseJson)
 
     val result3 = server.query(
       """{
         |  aggregateItem(take: -5) {
-        |    count { _all }
+        |    _count { _all }
         |  }
         |}
       """.stripMargin,
       project
     )
 
-    result3 should equal("""{"data":{"aggregateItem":{"count":{"_all":4}}}}""".parseJson)
+    result3 should equal("""{"data":{"aggregateItem":{"_count":{"_all":4}}}}""".parseJson)
 
     val result4 = server.query(
       """{
         |  aggregateItem(where: { s1: { gt: "2" }}) {
-        |    count { _all }
+        |    _count { _all }
         |  }
         |}
       """.stripMargin,
       project
     )
 
-    result4 should equal("""{"data":{"aggregateItem":{"count":{"_all":2}}}}""".parseJson)
+    result4 should equal("""{"data":{"aggregateItem":{"_count":{"_all":2}}}}""".parseJson)
 
     val result5 = server.query(
       """{
         |  aggregateItem(where: { s1: { gt: "1" }} orderBy: { s1: desc }) {
-        |    count { _all }
+        |    _count { _all }
         |  }
         |}
       """.stripMargin,
       project
     )
 
-    result5 should equal("""{"data":{"aggregateItem":{"count":{"_all":3}}}}""".parseJson)
+    result5 should equal("""{"data":{"aggregateItem":{"_count":{"_all":3}}}}""".parseJson)
 
     val result6 = server.query(
       """{
         |  aggregateItem(skip: 2) {
-        |    count { _all }
+        |    _count { _all }
         |  }
         |}
       """.stripMargin,
       project
     )
 
-    result6 should equal("""{"data":{"aggregateItem":{"count":{"_all":2}}}}""".parseJson)
+    result6 should equal("""{"data":{"aggregateItem":{"_count":{"_all":2}}}}""".parseJson)
 
     val result7 = server.query(
       s"""{
         |  aggregateItem(cursor: { id: "${i2.pathAsString("data.createItem.id")}" }) {
-        |    count { _all }
+        |    _count { _all }
         |  }
         |}
       """.stripMargin,
       project
     )
 
-    result7 should equal("""{"data":{"aggregateItem":{"count":{"_all":3}}}}""".parseJson)
+    result7 should equal("""{"data":{"aggregateItem":{"_count":{"_all":3}}}}""".parseJson)
   }
 }
