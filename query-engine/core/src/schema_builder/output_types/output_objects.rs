@@ -1,7 +1,7 @@
 use super::*;
 use std::convert::identity;
 
-use crate::constants::aggregations::*;
+use crate::constants::{aggregations::*, output_fields::*};
 use prisma_models::ScalarFieldRef;
 
 /// Initializes model output object type cache on the context.
@@ -140,7 +140,7 @@ pub(crate) fn affected_records_object_type(ctx: &mut BuilderContext) -> ObjectTy
 
     let object_type = Arc::new(object_type(
         ident.clone(),
-        vec![field(UNDERSCORE_COUNT, vec![], OutputType::int(), None)],
+        vec![field(AFFECTED_COUNT, vec![], OutputType::int(), None)],
         None,
     ));
 

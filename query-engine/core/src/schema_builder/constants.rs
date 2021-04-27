@@ -110,3 +110,7 @@ pub mod ordering {
     pub const ASC: &str = "asc";
     pub const DESC: &str = "desc";
 }
+
+pub mod output_fields {
+    pub const AFFECTED_COUNT: &str = "count";
+}
