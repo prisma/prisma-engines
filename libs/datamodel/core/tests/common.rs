@@ -154,7 +154,7 @@ impl ScalarFieldAsserts for dml::ScalarField {
     }
 
     fn assert_is_id(&self) -> &Self {
-        assert!(self.is_id);
+        assert!(self.primary_key.is_some());
         self
     }
 

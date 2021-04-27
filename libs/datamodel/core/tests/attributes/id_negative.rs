@@ -76,7 +76,7 @@ fn id_must_error_when_single_and_multi_field_id_is_used() {
     errors.assert_is(DatamodelError::new_model_validation_error(
         "Each model must have at most one id criteria. You can\'t have `@id` and `@@id` at the same time.",
         "Model",
-        Span::new(5, 104),
+        Span::new(88, 98),
     ));
 }
 

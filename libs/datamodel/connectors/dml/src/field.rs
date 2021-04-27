@@ -1,5 +1,6 @@
 use super::*;
 use crate::default_value::{DefaultValue, ValueGenerator};
+use crate::model::PrimaryKeyDefinition;
 use crate::native_type_instance::NativeTypeInstance;
 use crate::scalars::ScalarType;
 use crate::traits::{Ignorable, WithDatabaseName, WithName};
@@ -185,7 +186,7 @@ impl Field {
 
     pub fn is_id(&self) -> bool {
         match &self {
-            Field::ScalarField(sf) => sf.is_id,
+            Field::ScalarField(sf) => sf.primary_key.is_some(),
             Field::RelationField(_) => false,
         }
     }
@@ -323,8 +324,8 @@ pub struct ScalarField {
     /// Indicates if the field is unique.
     pub is_unique: bool,
 
-    /// true if this field marked with @id.
-    pub is_id: bool,
+    /// The Primary Key definition if the PK covers only this field .
+    pub primary_key: Option<PrimaryKeyDefinition>,
 
     /// Comments associated with this field.
     pub documentation: Option<String>,
@@ -353,7 +354,7 @@ impl ScalarField {
             database_name: None,
             default_value: None,
             is_unique: false,
-            is_id: false,
+            primary_key: None,
             documentation: None,
             is_generated: false,
             is_updated_at: false,

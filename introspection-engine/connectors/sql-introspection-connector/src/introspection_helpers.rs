@@ -2,7 +2,7 @@ use crate::Dedup;
 use crate::SqlError;
 use datamodel::{
     common::RelationNames, Datamodel, DefaultValue as DMLDef, FieldArity, FieldType, IndexDefinition, Model,
-    OnDeleteStrategy, RelationField, RelationInfo, ScalarField, ScalarType, ValueGenerator as VG,
+    OnDeleteStrategy, PrimaryKeyDefinition, RelationField, RelationInfo, ScalarField, ScalarType, ValueGenerator as VG,
 };
 use datamodel_connector::Connector;
 use quaint::connector::SqlFamily;
@@ -141,7 +141,7 @@ pub(crate) fn calculate_scalar_field(table: &Table, column: &Column, family: &Sq
 
     let is_id = is_id(&column, &table);
     let arity = match column.tpe.arity {
-        _ if is_id && column.auto_increment => FieldArity::Required,
+        _ if is_id.is_some() && column.auto_increment => FieldArity::Required,
         ColumnArity::Required => FieldArity::Required,
         ColumnArity::Nullable => FieldArity::Optional,
         ColumnArity::List => FieldArity::List,
@@ -149,7 +149,7 @@ pub(crate) fn calculate_scalar_field(table: &Table, column: &Column, family: &Sq
 
     let default_value = calculate_default(table, &column, &arity);
 
-    let is_unique = table.is_column_unique(&column.name) && !is_id;
+    let is_unique = table.is_column_unique(&column.name) && is_id.is_none();
 
     ScalarField {
         name: column.name.clone(),
@@ -158,7 +158,7 @@ pub(crate) fn calculate_scalar_field(table: &Table, column: &Column, family: &Sq
         database_name: None,
         default_value,
         is_unique,
-        is_id,
+        primary_key: is_id,
         documentation: None,
         is_generated: false,
         is_updated_at: false,
@@ -260,12 +260,16 @@ pub(crate) fn calculate_default(table: &Table, column: &Column, arity: &FieldAri
     }
 }
 
-pub(crate) fn is_id(column: &Column, table: &Table) -> bool {
-    table
-        .primary_key
-        .as_ref()
-        .map(|pk| pk.is_single_primary_key(&column.name))
-        .unwrap_or(false)
+pub(crate) fn is_id(column: &Column, table: &Table) -> Option<PrimaryKeyDefinition> {
+    match &table.primary_key {
+        Some(pk) if pk.columns.len() == 1 && pk.columns.first().unwrap() == &column.name => {
+            Some(PrimaryKeyDefinition {
+                name: pk.constraint_name.clone(),
+                fields: pk.columns.clone(),
+            })
+        }
+        _ => None,
+    }
 }
 
 pub(crate) fn is_sequence(column: &Column, table: &Table) -> bool {

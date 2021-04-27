@@ -38,7 +38,7 @@ impl AttributeValidator<dml::Field> for FieldLevelUniqueAttributeValidator {
                 args.span(),
             );
         } else if let dml::Field::ScalarField(sf) = obj {
-            if sf.is_id {
+            if sf.primary_key.is_some() {
                 return self.new_attribute_validation_error(
                     "Fields that are marked as id should not have an additional @unique.",
                     args.span(),

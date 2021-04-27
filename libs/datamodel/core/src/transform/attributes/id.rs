@@ -12,7 +12,10 @@ impl AttributeValidator<dml::Field> for IdAttributeValidator {
 
     fn validate_and_apply(&self, args: &mut Arguments, obj: &mut dml::Field) -> Result<(), DatamodelError> {
         if let dml::Field::ScalarField(sf) = obj {
-            sf.is_id = true;
+            sf.primary_key = Some(PrimaryKeyDefinition {
+                name: None,
+                fields: vec![sf.name.clone()],
+            });
             Ok(())
         } else {
             self.new_attribute_validation_error(
@@ -28,7 +31,7 @@ impl AttributeValidator<dml::Field> for IdAttributeValidator {
 
     fn serialize(&self, field: &dml::Field, _datamodel: &dml::Datamodel) -> Vec<ast::Attribute> {
         if let dml::Field::ScalarField(sf) = field {
-            if sf.is_id {
+            if sf.primary_key.is_some() {
                 return vec![ast::Attribute::new(self.attribute_name(), Vec::new())];
             }
         }
@@ -45,6 +48,14 @@ impl AttributeValidator<dml::Model> for ModelLevelIdAttributeValidator {
     }
 
     fn validate_and_apply(&self, args: &mut Arguments, obj: &mut dml::Model) -> Result<(), DatamodelError> {
+        if obj.fields.iter().any(|f| f.is_id()) {
+            return Err(DatamodelError::new_model_validation_error(
+                "Each model must have at most one id criteria. You can't have `@id` and `@@id` at the same time.",
+                &obj.name,
+                args.span(),
+            ));
+        }
+
         let fields = args
             .default_arg("fields")?
             .as_array()

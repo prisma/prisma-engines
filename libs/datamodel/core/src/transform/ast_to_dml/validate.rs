@@ -44,7 +44,10 @@ impl<'a> Validator<'a> {
             // Having a separate error collection allows checking whether any error has occurred for a model.
             let mut errors_for_model = Diagnostics::new();
 
-            if let Some(sf) = model.scalar_fields().find(|f| f.is_id && !f.is_required()) {
+            if let Some(sf) = model
+                .scalar_fields()
+                .find(|f| f.primary_key.is_some() && !f.is_required())
+            {
                 if !model.is_ignored {
                     let span = ast_schema
                         .models()
@@ -335,7 +338,7 @@ impl<'a> Validator<'a> {
             for field in model.scalar_fields() {
                 let ast_field = ast_model.find_field(&field.name);
 
-                if !field.is_id
+                if field.primary_key.is_none()
                     && field.is_auto_increment()
                     && !data_source.combined_connector.supports_non_id_auto_increment()
                 {
@@ -371,24 +374,12 @@ impl<'a> Validator<'a> {
         ast_model: &ast::Model,
         model: &dml::Model,
     ) -> Result<(), DatamodelError> {
-        let multiple_single_field_id_error = Err(DatamodelError::new_model_validation_error(
-            "At most one field must be marked as the id field with the `@id` attribute.",
-            &model.name,
-            ast_model.span,
-        ));
-
-        let multiple_id_criteria_error = Err(DatamodelError::new_model_validation_error(
-            "Each model must have at most one id criteria. You can't have `@id` and `@@id` at the same time.",
-            &model.name,
-            ast_model.span,
-        ));
-
         if model.singular_id_fields().count() > 1 {
-            return multiple_single_field_id_error;
-        }
-
-        if model.has_singular_id() && model.has_compound_id() {
-            return multiple_id_criteria_error;
+            return Err(DatamodelError::new_model_validation_error(
+                "At most one field must be marked as the id field with the `@id` attribute.",
+                &model.name,
+                ast_model.span,
+            ));
         }
 
         let loose_criterias = model.loose_unique_criterias();
@@ -675,7 +666,7 @@ impl<'a> Validator<'a> {
                     let field_name = rel_info.references.first().unwrap();
                     // the unwrap is safe. We error out earlier if an unknown field is referenced.
                     let referenced_field = related_model.find_scalar_field(&field_name).unwrap();
-                    referenced_field.is_id
+                    referenced_field.primary_key.is_some()
                 } else {
                     false
                 };
