@@ -297,7 +297,7 @@ impl Model {
 
     /// Finds the name of all id fields
     pub fn singular_id_fields(&self) -> impl std::iter::Iterator<Item = &ScalarField> {
-        self.scalar_fields().filter(|x| x.primary_key.is_some())
+        self.scalar_fields().filter(|x| x.is_id())
     }
 
     /// Finds all fields defined as autoincrement

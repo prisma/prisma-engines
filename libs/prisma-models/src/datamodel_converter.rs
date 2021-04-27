@@ -111,7 +111,7 @@ impl<'a> DatamodelConverter<'a> {
                         is_required: sf.is_required(),
                         is_list: sf.is_list(),
                         is_unique: sf.is_unique(&model),
-                        is_id: sf.is_id(&model),
+                        is_id: sf.is_singular_primary_key(&model),
                         is_auto_generated_int_id: sf.is_auto_generated_int_id(),
                         is_autoincrement: sf.is_auto_increment(),
                         behaviour: sf.behaviour(),
@@ -429,7 +429,7 @@ impl ModelConverterUtilities for dml::Model {
 trait DatamodelFieldExtensions {
     fn type_identifier(&self) -> TypeIdentifier;
     fn is_unique(&self, model: &dml::Model) -> bool;
-    fn is_id(&self, model: &dml::Model) -> bool;
+    fn is_singular_primary_key(&self, model: &dml::Model) -> bool;
     fn is_auto_generated_int_id(&self) -> bool;
     fn behaviour(&self) -> Option<FieldBehaviour>;
     fn internal_enum(&self, datamodel: &dml::Datamodel) -> Option<InternalEnum>;
@@ -468,9 +468,8 @@ impl DatamodelFieldExtensions for dml::ScalarField {
         self.is_unique || is_declared_as_unique_through_multi_field_unique
     }
 
-    fn is_id(&self, model: &dml::Model) -> bool {
-        // transform @@id for 1 field to is_id
-        self.primary_key.is_some() || matches!(&model.primary_key, Some(pk) if pk.fields == vec![self.name.clone()])
+    fn is_singular_primary_key(&self, model: &dml::Model) -> bool {
+        matches!(&model.primary_key, Some(pk) if pk.fields == vec![self.name.clone()])
     }
 
     fn is_auto_generated_int_id(&self) -> bool {

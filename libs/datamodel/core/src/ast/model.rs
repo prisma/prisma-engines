@@ -18,11 +18,12 @@ pub struct Model {
 }
 
 impl Model {
-    pub fn find_field(&self, name: &str) -> &Field {
-        self.fields
-            .iter()
-            .find(|ast_field| ast_field.name.name == name)
-            .unwrap()
+    pub fn find_field(&self, name: &str) -> Option<&Field> {
+        self.fields.iter().find(|ast_field| ast_field.name.name == name)
+    }
+
+    pub fn find_field_bang(&self, name: &str) -> &Field {
+        self.find_field(name).unwrap()
     }
 }
 

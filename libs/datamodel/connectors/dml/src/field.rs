@@ -324,6 +324,7 @@ pub struct ScalarField {
     /// Indicates if the field is unique.
     pub is_unique: bool,
 
+    //todo make private??
     /// The Primary Key definition if the PK covers only this field .
     pub primary_key: Option<PrimaryKeyDefinition>,
 
@@ -393,6 +394,10 @@ impl ScalarField {
 
     pub fn is_auto_increment(&self) -> bool {
         matches!(&self.default_value, Some(DefaultValue::Expression(expr)) if expr == &ValueGenerator::new_autoincrement())
+    }
+
+    pub fn is_id(&self) -> bool {
+        self.primary_key.is_some()
     }
 }
 

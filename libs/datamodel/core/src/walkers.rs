@@ -184,7 +184,7 @@ impl<'a> ScalarFieldWalker<'a> {
     }
 
     pub fn is_id(&self) -> bool {
-        self.get().primary_key.is_some()
+        self.get().is_id()
     }
 
     pub fn is_required(&self) -> bool {
