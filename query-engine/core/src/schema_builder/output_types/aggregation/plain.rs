@@ -1,4 +1,4 @@
-use crate::constants::outputs::fields;
+use crate::constants::aggregations::*;
 
 use super::*;
 use std::convert::identity;
@@ -20,7 +20,7 @@ pub(crate) fn aggregation_object_type(ctx: &mut BuilderContext, model: &ModelRef
         &mut object_fields,
         aggregation_field(
             ctx,
-            fields::COUNT,
+            UNDERSCORE_COUNT,
             &model,
             model.fields().scalar(),
             |_, _| OutputType::int(),
@@ -36,7 +36,7 @@ pub(crate) fn aggregation_object_type(ctx: &mut BuilderContext, model: &ModelRef
         &mut object_fields,
         aggregation_field(
             ctx,
-            fields::AVG,
+            UNDERSCORE_AVG,
             &model,
             numeric_fields.clone(),
             field_avg_output_type,
@@ -49,7 +49,7 @@ pub(crate) fn aggregation_object_type(ctx: &mut BuilderContext, model: &ModelRef
         &mut object_fields,
         aggregation_field(
             ctx,
-            fields::SUM,
+            UNDERSCORE_SUM,
             &model,
             numeric_fields,
             map_scalar_output_type_for_field,
@@ -62,7 +62,7 @@ pub(crate) fn aggregation_object_type(ctx: &mut BuilderContext, model: &ModelRef
         &mut object_fields,
         aggregation_field(
             ctx,
-            fields::MIN,
+            UNDERSCORE_MIN,
             &model,
             non_list_nor_json_fields.clone(),
             map_scalar_output_type_for_field,
@@ -75,7 +75,7 @@ pub(crate) fn aggregation_object_type(ctx: &mut BuilderContext, model: &ModelRef
         &mut object_fields,
         aggregation_field(
             ctx,
-            fields::MAX,
+            UNDERSCORE_MAX,
             &model,
             non_list_nor_json_fields,
             map_scalar_output_type_for_field,

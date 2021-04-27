@@ -6,7 +6,7 @@ mod group_by;
 pub use aggregate::*;
 pub use group_by::*;
 
-use crate::{constants::outputs::fields, FieldPair};
+use crate::{constants::aggregations::*, FieldPair};
 use connector::AggregationSelection;
 use itertools::Itertools;
 use prisma_models::{ModelRef, ScalarFieldRef};
@@ -16,7 +16,7 @@ use prisma_models::{ModelRef, ScalarFieldRef};
 #[tracing::instrument(skip(field, model))]
 fn resolve_query(mut field: FieldPair, model: &ModelRef) -> QueryGraphBuilderResult<AggregationSelection> {
     let query = match field.parsed_field.name.as_str() {
-        fields::COUNT => {
+        UNDERSCORE_COUNT => {
             let nested_fields = field
                 .parsed_field
                 .nested_fields
@@ -43,10 +43,10 @@ fn resolve_query(mut field: FieldPair, model: &ModelRef) -> QueryGraphBuilderRes
                 },
             }
         }
-        fields::AVG => AggregationSelection::Average(resolve_fields(model, field)),
-        fields::SUM => AggregationSelection::Sum(resolve_fields(model, field)),
-        fields::MIN => AggregationSelection::Min(resolve_fields(model, field)),
-        fields::MAX => AggregationSelection::Max(resolve_fields(model, field)),
+        UNDERSCORE_AVG => AggregationSelection::Average(resolve_fields(model, field)),
+        UNDERSCORE_SUM => AggregationSelection::Sum(resolve_fields(model, field)),
+        UNDERSCORE_MIN => AggregationSelection::Min(resolve_fields(model, field)),
+        UNDERSCORE_MAX => AggregationSelection::Max(resolve_fields(model, field)),
         name => AggregationSelection::Field(model.fields().find_from_scalar(name).unwrap()),
     };
 

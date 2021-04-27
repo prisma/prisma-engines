@@ -1,5 +1,5 @@
 use super::*;
-use constants::inputs::filters;
+use constants::{aggregations, filters};
 use datamodel_connector::ConnectorCapability;
 use prisma_models::{dml::DefaultValue, PrismaValue};
 
@@ -196,7 +196,7 @@ fn full_scalar_filter_type(
     if include_aggregates {
         fields.push(aggregate_filter_field(
             ctx,
-            filters::COUNT,
+            aggregations::UNDERSCORE_COUNT,
             &TypeIdentifier::Int,
             nullable,
             list,
@@ -204,13 +204,37 @@ fn full_scalar_filter_type(
 
         if typ.is_numeric() {
             let avg_type = map_avg_type_ident(typ.clone());
-            fields.push(aggregate_filter_field(ctx, filters::AVG, &avg_type, nullable, list));
-            fields.push(aggregate_filter_field(ctx, filters::SUM, typ, nullable, list));
+            fields.push(aggregate_filter_field(
+                ctx,
+                aggregations::UNDERSCORE_AVG,
+                &avg_type,
+                nullable,
+                list,
+            ));
+            fields.push(aggregate_filter_field(
+                ctx,
+                aggregations::UNDERSCORE_SUM,
+                typ,
+                nullable,
+                list,
+            ));
         }
 
         if !list {
-            fields.push(aggregate_filter_field(ctx, filters::MIN, typ, nullable, list));
-            fields.push(aggregate_filter_field(ctx, filters::MAX, typ, nullable, list));
+            fields.push(aggregate_filter_field(
+                ctx,
+                aggregations::UNDERSCORE_MIN,
+                typ,
+                nullable,
+                list,
+            ));
+            fields.push(aggregate_filter_field(
+                ctx,
+                aggregations::UNDERSCORE_MAX,
+                typ,
+                nullable,
+                list,
+            ));
         }
     }
 

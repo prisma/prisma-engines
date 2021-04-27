@@ -1,4 +1,4 @@
-use crate::constants::inputs::args;
+use crate::constants::args;
 
 use super::*;
 

@@ -1,6 +1,6 @@
 use super::*;
 use crate::{
-    constants::outputs::fields,
+    constants::aggregations::*,
     schema::{IntoArc, ObjectTypeStrongRef, OutputType, OutputTypeRef, ScalarType},
     CoreError, DatabaseEnumType, EnumType, OutputFieldRef, QueryResult, RecordAggregations, RecordSelection,
 };
@@ -49,7 +49,7 @@ pub fn serialize_internal(
             let mut map: Map = IndexMap::with_capacity(1);
             let mut result = CheckedItemsWithParents::new();
 
-            map.insert(fields::COUNT.into(), Item::Value(PrismaValue::Int(c as i64)));
+            map.insert(UNDERSCORE_COUNT.into(), Item::Value(PrismaValue::Int(c as i64)));
             result.insert(None, Item::Map(map));
 
             Ok(result)
@@ -91,19 +91,19 @@ fn serialize_aggregations(
 
                 AggregationResult::Average(field, value) => {
                     let output_field =
-                        find_nested_aggregate_output_field(&aggregate_object_type, fields::AVG, &field.name);
+                        find_nested_aggregate_output_field(&aggregate_object_type, UNDERSCORE_AVG, &field.name);
                     flattened.insert(format!("avg_{}", &field.name), serialize_scalar(&output_field, value)?);
                 }
 
                 AggregationResult::Sum(field, value) => {
                     let output_field =
-                        find_nested_aggregate_output_field(&aggregate_object_type, fields::SUM, &field.name);
+                        find_nested_aggregate_output_field(&aggregate_object_type, UNDERSCORE_SUM, &field.name);
                     flattened.insert(format!("sum_{}", &field.name), serialize_scalar(&output_field, value)?);
                 }
 
                 AggregationResult::Min(field, value) => {
                     let output_field =
-                        find_nested_aggregate_output_field(&aggregate_object_type, fields::MIN, &field.name);
+                        find_nested_aggregate_output_field(&aggregate_object_type, UNDERSCORE_MIN, &field.name);
                     flattened.insert(
                         format!("min_{}", &field.name),
                         serialize_scalar(&output_field, coerce_non_numeric(value, &output_field.field_type))?,
@@ -112,7 +112,7 @@ fn serialize_aggregations(
 
                 AggregationResult::Max(field, value) => {
                     let output_field =
-                        find_nested_aggregate_output_field(&aggregate_object_type, fields::MAX, &field.name);
+                        find_nested_aggregate_output_field(&aggregate_object_type, UNDERSCORE_MAX, &field.name);
                     flattened.insert(
                         format!("max_{}", &field.name),
                         serialize_scalar(&output_field, coerce_non_numeric(value, &output_field.field_type))?,
@@ -162,7 +162,7 @@ fn serialize_aggregations(
 fn write_rel_aggregation_row(row: &RelAggregationRow, map: &mut HashMap<String, Item>) {
     for result in row.iter() {
         match result {
-            RelAggregationResult::Count(rf, count) => match map.get_mut(fields::UNDERSCORE_COUNT) {
+            RelAggregationResult::Count(rf, count) => match map.get_mut(UNDERSCORE_COUNT) {
                 Some(item) => match item {
                     Item::Map(inner_map) => inner_map.insert(rf.name.clone(), Item::Value(count.clone())),
                     _ => unreachable!(),
@@ -170,7 +170,7 @@ fn write_rel_aggregation_row(row: &RelAggregationRow, map: &mut HashMap<String, 
                 None => {
                     let mut inner_map: Map = Map::new();
                     inner_map.insert(rf.name.clone(), Item::Value(count.clone()));
-                    map.insert(fields::UNDERSCORE_COUNT.to_owned(), Item::Map(inner_map))
+                    map.insert(UNDERSCORE_COUNT.to_owned(), Item::Map(inner_map))
                 }
             },
         };
@@ -338,7 +338,7 @@ fn serialize_objects(
             .map(|row| {
                 row.iter()
                     .map(|aggr_result| match aggr_result {
-                        RelAggregationResult::Count(_, _) => fields::UNDERSCORE_COUNT.to_owned(),
+                        RelAggregationResult::Count(_, _) => UNDERSCORE_COUNT.to_owned(),
                     })
                     .unique()
                     .collect()

@@ -1,5 +1,5 @@
 use super::*;
-use crate::{constants::inputs::args, query_document::*, ReadQuery, RecordQuery};
+use crate::{constants::args, query_document::*, ReadQuery, RecordQuery};
 use prisma_models::ModelRef;
 use std::convert::TryInto;
 

@@ -1,4 +1,4 @@
-use crate::constants::inputs::filters;
+use crate::constants::filters;
 
 use super::QueryValue;
 use indexmap::IndexMap;
