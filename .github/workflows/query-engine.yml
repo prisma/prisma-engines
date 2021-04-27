@@ -53,7 +53,7 @@ jobs:
           CLICOLOR_FORCE: 1
 
   rust-vitess-tests:
-    name: "Rust test suite: Vitess ${{ matrix.database }} on Linux"
+    name: "Rust test suite: ${{ matrix.database }} on Linux"
 
     strategy:
       fail-fast: false
