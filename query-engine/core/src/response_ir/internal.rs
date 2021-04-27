@@ -1,6 +1,6 @@
 use super::*;
 use crate::{
-    constants::aggregations::*,
+    constants::{aggregations::*, output_fields::*},
     schema::{IntoArc, ObjectTypeStrongRef, OutputType, OutputTypeRef, ScalarType},
     CoreError, DatabaseEnumType, EnumType, OutputFieldRef, QueryResult, RecordAggregations, RecordSelection,
 };
@@ -49,7 +49,7 @@ pub fn serialize_internal(
             let mut map: Map = IndexMap::with_capacity(1);
             let mut result = CheckedItemsWithParents::new();
 
-            map.insert(UNDERSCORE_COUNT.into(), Item::Value(PrismaValue::Int(c as i64)));
+            map.insert(AFFECTED_COUNT.into(), Item::Value(PrismaValue::Int(c as i64)));
             result.insert(None, Item::Map(map));
 
             Ok(result)
