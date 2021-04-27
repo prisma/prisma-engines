@@ -83,29 +83,29 @@ fn serialize_aggregations(
 
                 AggregationResult::Count(field, count) => {
                     if let Some(f) = field {
-                        flattened.insert(format!("count_{}", &f.name), Item::Value(count));
+                        flattened.insert(format!("_count_{}", &f.name), Item::Value(count));
                     } else {
-                        flattened.insert("count__all".to_owned(), Item::Value(count));
+                        flattened.insert("_count__all".to_owned(), Item::Value(count));
                     }
                 }
 
                 AggregationResult::Average(field, value) => {
                     let output_field =
                         find_nested_aggregate_output_field(&aggregate_object_type, UNDERSCORE_AVG, &field.name);
-                    flattened.insert(format!("avg_{}", &field.name), serialize_scalar(&output_field, value)?);
+                    flattened.insert(format!("_avg_{}", &field.name), serialize_scalar(&output_field, value)?);
                 }
 
                 AggregationResult::Sum(field, value) => {
                     let output_field =
                         find_nested_aggregate_output_field(&aggregate_object_type, UNDERSCORE_SUM, &field.name);
-                    flattened.insert(format!("sum_{}", &field.name), serialize_scalar(&output_field, value)?);
+                    flattened.insert(format!("_sum_{}", &field.name), serialize_scalar(&output_field, value)?);
                 }
 
                 AggregationResult::Min(field, value) => {
                     let output_field =
                         find_nested_aggregate_output_field(&aggregate_object_type, UNDERSCORE_MIN, &field.name);
                     flattened.insert(
-                        format!("min_{}", &field.name),
+                        format!("_min_{}", &field.name),
                         serialize_scalar(&output_field, coerce_non_numeric(value, &output_field.field_type))?,
                     );
                 }
@@ -114,7 +114,7 @@ fn serialize_aggregations(
                     let output_field =
                         find_nested_aggregate_output_field(&aggregate_object_type, UNDERSCORE_MAX, &field.name);
                     flattened.insert(
-                        format!("max_{}", &field.name),
+                        format!("_max_{}", &field.name),
                         serialize_scalar(&output_field, coerce_non_numeric(value, &output_field.field_type))?,
                     );
                 }

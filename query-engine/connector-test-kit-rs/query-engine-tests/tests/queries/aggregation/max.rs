@@ -5,8 +5,8 @@ mod aggregation_max {
     #[connector_test]
     async fn max_no_records(runner: &Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, "query { aggregateTestModel { max { string int bInt float decimal } } }"),
-          @r###"{"data":{"aggregateTestModel":{"max":{"string":null,"int":null,"bInt":null,"float":null,"decimal":null}}}}"###
+          run_query!(runner, "query { aggregateTestModel { _max { string int bInt float decimal } } }"),
+          @r###"{"data":{"aggregateTestModel":{"_max":{"string":null,"int":null,"bInt":null,"float":null,"decimal":null}}}}"###
         );
 
         Ok(())
@@ -28,9 +28,9 @@ mod aggregation_max {
         insta::assert_snapshot!(
             run_query!(
                 runner,
-                "query { aggregateTestModel { max { int bInt float decimal string } } }"
+                "query { aggregateTestModel { _max { int bInt float decimal string } } }"
             ),
-            @r###"{"data":{"aggregateTestModel":{"max":{"int":10,"bInt":"10","float":5.5,"decimal":"5.5","string":"b"}}}}"###
+            @r###"{"data":{"aggregateTestModel":{"_max":{"int":10,"bInt":"10","float":5.5,"decimal":"5.5","string":"b"}}}}"###
         );
 
         Ok(())
@@ -60,33 +60,33 @@ mod aggregation_max {
         .await?;
 
         insta::assert_snapshot!(
-            run_query!(runner, "query { aggregateTestModel(take: 2) { max { int bInt float decimal string } } }"),
-            @r###"{"data":{"aggregateTestModel":{"max":{"int":10,"bInt":"10","float":5.5,"decimal":"5.5","string":"f"}}}}"###
+            run_query!(runner, "query { aggregateTestModel(take: 2) { _max { int bInt float decimal string } } }"),
+            @r###"{"data":{"aggregateTestModel":{"_max":{"int":10,"bInt":"10","float":5.5,"decimal":"5.5","string":"f"}}}}"###
         );
 
         insta::assert_snapshot!(
-            run_query!(runner, "query { aggregateTestModel(take: 5) { max { int bInt float decimal string } } }"),
-            @r###"{"data":{"aggregateTestModel":{"max":{"int":10,"bInt":"10","float":5.5,"decimal":"5.5","string":"z"}}}}"###
+            run_query!(runner, "query { aggregateTestModel(take: 5) { _max { int bInt float decimal string } } }"),
+            @r###"{"data":{"aggregateTestModel":{"_max":{"int":10,"bInt":"10","float":5.5,"decimal":"5.5","string":"z"}}}}"###
         );
 
         insta::assert_snapshot!(
-            run_query!(runner, "query { aggregateTestModel(take: -5) { max { int bInt float decimal string } } }"),
-            @r###"{"data":{"aggregateTestModel":{"max":{"int":10,"bInt":"10","float":5.5,"decimal":"5.5","string":"z"}}}}"###
+            run_query!(runner, "query { aggregateTestModel(take: -5) { _max { int bInt float decimal string } } }"),
+            @r###"{"data":{"aggregateTestModel":{"_max":{"int":10,"bInt":"10","float":5.5,"decimal":"5.5","string":"z"}}}}"###
         );
 
         insta::assert_snapshot!(
-            run_query!(runner, r#"query { aggregateTestModel(where: { id: { gt: 2 }}) { max { int bInt float decimal string } } }"#),
-            @r###"{"data":{"aggregateTestModel":{"max":{"int":2,"bInt":"2","float":1.5,"decimal":"1.5","string":"z"}}}}"###
+            run_query!(runner, r#"query { aggregateTestModel(where: { id: { gt: 2 }}) { _max { int bInt float decimal string } } }"#),
+            @r###"{"data":{"aggregateTestModel":{"_max":{"int":2,"bInt":"2","float":1.5,"decimal":"1.5","string":"z"}}}}"###
         );
 
         insta::assert_snapshot!(
-            run_query!(runner, "query { aggregateTestModel(skip: 2) { max { int bInt float decimal string } } }"),
-            @r###"{"data":{"aggregateTestModel":{"max":{"int":2,"bInt":"2","float":1.5,"decimal":"1.5","string":"z"}}}}"###
+            run_query!(runner, "query { aggregateTestModel(skip: 2) { _max { int bInt float decimal string } } }"),
+            @r###"{"data":{"aggregateTestModel":{"_max":{"int":2,"bInt":"2","float":1.5,"decimal":"1.5","string":"z"}}}}"###
         );
 
         insta::assert_snapshot!(
-            run_query!(runner, r#"query { aggregateTestModel(cursor: { id: 3 }) { max { int bInt float decimal string } } }"#),
-            @r###"{"data":{"aggregateTestModel":{"max":{"int":2,"bInt":"2","float":1.5,"decimal":"1.5","string":"z"}}}}"###
+            run_query!(runner, r#"query { aggregateTestModel(cursor: { id: 3 }) { _max { int bInt float decimal string } } }"#),
+            @r###"{"data":{"aggregateTestModel":{"_max":{"int":2,"bInt":"2","float":1.5,"decimal":"1.5","string":"z"}}}}"###
         );
 
         Ok(())
