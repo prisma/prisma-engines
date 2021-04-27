@@ -30,7 +30,7 @@ pub use query_value::*;
 pub use selection::*;
 pub use transformers::*;
 
-use crate::constants::inputs::args;
+use crate::constants::args;
 
 pub type QueryParserResult<T> = std::result::Result<T, QueryParserError>;
 

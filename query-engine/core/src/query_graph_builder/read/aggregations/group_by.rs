@@ -2,7 +2,7 @@ use std::convert::TryInto;
 
 use super::*;
 use crate::{
-    constants::inputs::args, query_document::ParsedField, AggregateRecordsQuery, ArgumentListLookup, ParsedInputValue,
+    constants::args, query_document::ParsedField, AggregateRecordsQuery, ArgumentListLookup, ParsedInputValue,
     ReadQuery,
 };
 use connector::Filter;

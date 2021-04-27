@@ -1,5 +1,5 @@
 use super::*;
-use crate::{constants::inputs::args, query_graph_builder::write::write_args_parser::*};
+use crate::{constants::args, query_graph_builder::write::write_args_parser::*};
 use crate::{
     query_ast::*,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},

@@ -1,6 +1,6 @@
 use super::*;
 use crate::{
-    constants::inputs::args,
+    constants::args,
     query_ast::*,
     query_graph::{QueryGraph, QueryGraphDependency},
     ArgumentListLookup, FilteredQuery, ParsedField,

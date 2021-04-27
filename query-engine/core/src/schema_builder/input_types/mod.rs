@@ -5,7 +5,7 @@ pub(crate) mod input_fields;
 mod objects;
 
 use super::*;
-use crate::{constants::inputs::ordering, schema::*};
+use crate::schema::*;
 use objects::*;
 use prisma_models::{RelationFieldRef, ScalarFieldRef};
 
