@@ -13,9 +13,37 @@ jobs:
       fail-fast: false
       matrix:
         database:
-          - connector: vitess_5_7
+          - connector: "postgres9"
+            docker: "postgres9"
+          - connector: "postgres10"
+            docker: "postgres10"
+          - connector: "postgres11"
+            docker: "postgres11"
+          - connector: "postgres12"
+            docker: "postgres12"
+          - connector: "postgres13"
+            docker: "postgres13"
+          - connector: "pgbouncer"
+            docker: "pgbouncer postgres11"
+          - connector: "mysql56"
+            docker: "mysql-5-6"
+          - connector: "mysql"
+            docker: "mysql-5-7"
+          - connector: "mysql8"
+            docker: "mysql-8-0"
+          - connector: "mariadb"
+            docker: "mariadb-10-0"
+
+          # TODO: OOM in the huge query tests. We might need our own machines
+          # for these.
+          #- connector: "mssql2017"
+          #  docker: "mssql-2017"
+          #- connector: "mssql2019"
+          #  docker: "mssql-2019"
+
+          - connector: "vitess_5_7"
             docker: "vitess-test-5_7 vitess-shadow-5_7"
-          - connector: vitess_8_0
+          - connector: "vitess_8_0"
             docker: "vitess-test-8_0 vitess-shadow-8_0"
 
     env:
@@ -59,14 +87,89 @@ jobs:
       fail-fast: false
       matrix:
         database:
+          - connector: "postgres"
+            docker: "postgres9"
+            version: "9"
+            runner: "direct"
+            single-threaded: false
+
+          - connector: "postgres"
+            docker: "postgres10"
+            version: "10"
+            runner: "direct"
+            single-threaded: false
+
+          - connector: "postgres"
+            docker: "postgres11"
+            version: "11"
+            runner: "direct"
+            single-threaded: false
+
+          - connector: "postgres"
+            docker: "postgres12"
+            version: "12"
+            runner: "direct"
+            single-threaded: false
+
+          - connector: "postgres"
+            docker: "postgres13"
+            version: "13"
+            runner: "direct"
+            single-threaded: false
+
+          - connector: "postgres"
+            docker: "pgbouncer postgres11"
+            version: "pgbouncer"
+            runner: "direct"
+            single-threaded: true
+
+          - connector: "mysql"
+            docker: "mysql-5-6"
+            version: "5.6"
+            runner: "direct"
+            single-threaded: false
+
+          - connector: "mysql"
+            docker: "mysql-5-7"
+            version: "5.7"
+            runner: "direct"
+            single-threaded: false
+
+          - connector: "mysql"
+            docker: "mysql-8-0"
+            version: "8"
+            runner: "direct"
+            single-threaded: false
+
+          - connector: "mysql"
+            docker: "mariadb-10-0"
+            version: "mariadb"
+            runner: "direct"
+            single-threaded: false
+
+          - connector: "sqlserver"
+            docker: "mssql-2017"
+            version: "2017"
+            runner: "direct"
+            single-threaded: false
+
+          - connector: "sqlserver"
+            docker: "mssql-2019"
+            version: "2019"
+            runner: "direct"
+            single-threaded: false
+
           - docker: "vitess-test-5_7 vitess-shadow-5_7"
             connector: "vitess"
             version: "5.7"
             runner: "direct"
+            single-threaded: true
+
           - docker: "vitess-test-8_0 vitess-shadow-8_0"
             connector: "vitess"
             version: "8.0"
             runner: "direct"
+            single-threaded: true
 
     env:
       TEST_RUNNER: ${{ matrix.database.runner }}
@@ -99,6 +202,10 @@ jobs:
             target
           key: query-engine-rs-${{ runner.os }}-cargo-vitess-${{ matrix.database.connector }}-${{ hashFiles('**/Cargo.lock') }}
 
+      - run: export WORKSPACE_ROOT=$(pwd) && cargo test --package query-engine-tests
+        name: "Multi-threaded test run"
+        if: ${{ !matrix.database.single-threaded }}
+
       - run: export WORKSPACE_ROOT=$(pwd) && cargo test --package query-engine-tests -- --test-threads=1
-        env:
-          CLICOLOR_FORCE: 1
+        name: "Single-threaded test run"
+        if: ${{ matrix.database.single-threaded }}
