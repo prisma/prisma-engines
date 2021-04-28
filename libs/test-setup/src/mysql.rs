@@ -17,11 +17,11 @@ pub fn mysql_safe_identifier(identifier: &str) -> &str {
 pub(crate) fn get_mysql_tags(database_url: &str) -> Result<BitFlags<Tags>, String> {
     let fut = async {
         let quaint = Quaint::new(database_url).await.map_err(|err| err.to_string())?;
-        let mut tags = Tags::Mysql.into();
+        let mut tags: BitFlags<Tags> = Tags::Mysql.into();
 
         let metadata = quaint
             .query_raw(
-                "SELECT @@lower_case_table_names lower_cases_table_names, @@GLOBAL.version version",
+                "SELECT @@lower_case_table_names lower_cases_table_names, @@version version",
                 &[],
             )
             .await
@@ -57,9 +57,16 @@ pub(crate) fn get_mysql_tags(database_url: &str) -> Result<BitFlags<Tags>, Strin
                     tags |= Tags::Mariadb
                 }
 
-                match std::env::var("IS_VITESS").as_deref() {
-                    Err(_) | Ok("0") => (),
-                    _ => tags |= Tags::Vitess,
+                if version.contains("vitess") {
+                    tags |= Tags::Vitess;
+
+                    if tags.contains(Tags::Mysql57) {
+                        tags |= Tags::Vitess57
+                    }
+
+                    if tags.contains(Tags::Mysql8) {
+                        tags |= Tags::Vitess80
+                    }
                 }
 
                 eprintln!("Inferred tags: {:?}", tags);
