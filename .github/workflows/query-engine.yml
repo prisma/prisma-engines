@@ -6,18 +6,20 @@ on:
   pull_request:
 jobs:
   scala-vitess-tests:
-    name: "Scala test suite: ${{ matrix.database }} on Linux"
+    name: "Scala test suite: ${{ matrix.database.connector }} on Linux"
     runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
       matrix:
         database:
-          - vitess_5_7
-          - vitess_8_0
+          - connector: vitess_5_7
+            docker: "vitess-test-5_7 vitess-shadow-5_7"
+          - connector: vitess_8_0
+            docker: "vitess-test-8_0 vitess-shadow-8_0"
 
     env:
-      TEST_CONNECTOR: ${{ matrix.database }}
+      TEST_CONNECTOR: ${{ matrix.database.connector }}
       LOG_LEVEL: "info"
       LOG_QUERIES: "y"
       RUST_LOG_FORMAT: "devel"
@@ -27,8 +29,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: "Start ${{ matrix.database }}"
-        run: make start-${{ matrix.database }}
+      - name: "Start ${{ matrix.database.connector }}"
+        run: docker-compose -f docker-compose.yml up -d --remove-orphans ${{ matrix.database.docker }}
 
       - uses: actions-rs/toolchain@v1
         with:
@@ -45,24 +47,32 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             target
-          key: query-engine-${{ runner.os }}-${{ matrix.database}}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          key: query-engine-${{ runner.os }}-${{ matrix.database.connector }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - run: export SERVER_ROOT=$(pwd) && cd query-engine/connector-test-kit && sbt test
         name: Run tests
-        env:
-          CLICOLOR_FORCE: 1
 
   rust-vitess-tests:
-    name: "Rust test suite: ${{ matrix.database }} on Linux"
+    name: "Rust test suite: ${{ matrix.database.connector }} ${{ matrix.database.version }} on Linux"
 
     strategy:
       fail-fast: false
       matrix:
         database:
-          - "vitess_5_7"
-          - "vitess_8_0"
+          - docker: "vitess-test-5_7 vitess-shadow-5_7"
+            connector: "vitess"
+            version: "5.7"
+            runner: "direct"
+          - docker: "vitess-test-8_0 vitess-shadow-8_0"
+            connector: "vitess"
+            version: "8.0"
+            runner: "direct"
 
     env:
+      TEST_RUNNER: ${{ matrix.database.runner }}
+      TEST_CONNECTOR: ${{ matrix.database.connector }}
+      TEST_CONNECTOR_VERSION: ${{ matrix.database.version }}
+
       LOG_LEVEL: "info"
       LOG_QUERIES: "y"
       RUST_LOG_FORMAT: "devel"
@@ -73,8 +83,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: "Start ${{ matrix.database }}"
-        run: make dev-${{ matrix.database }}
+      - name: "Start ${{ matrix.database.connector }} ${{ matrix.database.version }}"
+        run: docker-compose -f docker-compose.yml up -d --remove-orphans ${{ matrix.database.docker }}
 
       - uses: actions-rs/toolchain@v1
         with:
@@ -87,7 +97,7 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             target
-          key: query-engine-rs-${{ runner.os }}-cargo-vitess-${{ matrix.version }}-${{ hashFiles('**/Cargo.lock') }}
+          key: query-engine-rs-${{ runner.os }}-cargo-vitess-${{ matrix.database.connector }}-${{ hashFiles('**/Cargo.lock') }}
 
       - run: export WORKSPACE_ROOT=$(pwd) && cargo test --package query-engine-tests -- --test-threads=1
         env:
