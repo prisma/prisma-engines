@@ -366,7 +366,7 @@ class GroupByHavingQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
          |    dec: { _min: { equals: "0" }}
          |  }) {
          |    s
-         |    min {
+         |    _min {
          |      float
          |      int
          |      dec
@@ -387,7 +387,7 @@ class GroupByHavingQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
          |    dec: { _min: { not: { equals: "0" }}}
          |  }) {
          |    s
-         |    min {
+         |    _min {
          |      float
          |      int
          |      dec
@@ -407,7 +407,7 @@ class GroupByHavingQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
          |    dec: { _min: { in: ["0"] }}
          |  }) {
          |    s
-         |    min {
+         |    _min {
          |      float
          |      int
          |      dec
@@ -437,12 +437,12 @@ class GroupByHavingQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     var result = server.query(
       s"""{
          |  groupByModel(by: [s], orderBy: { s: asc }, having: {
-         |    float: { max: { equals: 10 }}
-         |    int: { max: { equals: 10 }}
-         |    dec: { max: { equals: "10" }}
+         |    float: { _max: { equals: 10 }}
+         |    int: { _max: { equals: 10 }}
+         |    dec: { _max: { equals: "10" }}
          |  }) {
          |    s
-         |    max {
+         |    _max {
          |      float
          |      int
          |      dec
@@ -458,12 +458,12 @@ class GroupByHavingQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     result = server.query(
       s"""{
          |  groupByModel(by: [s], orderBy: { s: asc }, having: {
-         |    float: { max: { not: { equals: 10 }}}
-         |    int: { max: { not: { equals: 10 }}}
-         |    dec: { max: { not: { equals: "10" }}}
+         |    float: { _max: { not: { equals: 10 }}}
+         |    int: { _max: { not: { equals: 10 }}}
+         |    dec: { _max: { not: { equals: "10" }}}
          |  }) {
          |    s
-         |    max {
+         |    _max {
          |      float
          |      int
          |      dec
@@ -478,12 +478,12 @@ class GroupByHavingQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     result = server.query(
       s"""{
          |  groupByModel(by: [s], orderBy: { s: asc }, having: {
-         |    float: { max: { in: [10] }}
-         |    int: { max: { in: [10] }}
-         |    dec: { max: { in: ["10"] }}
+         |    float: { _max: { in: [10] }}
+         |    int: { _max: { in: [10] }}
+         |    dec: { _max: { in: ["10"] }}
          |  }) {
          |    s
-         |    max {
+         |    _max {
          |      float
          |      int
          |      dec
@@ -493,7 +493,7 @@ class GroupByHavingQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       project
     )
     result.toString should be(
-      """{"data":{"groupByModel":[{"s":"group1","_max":{"floats":10,"int":10,"dec":"10"}},{"s":"group2","_max":{"float":10,"int":10,"dec":"10"}}]}}""")
+      """{"data":{"groupByModel":[{"s":"group1","_max":{"float":10,"int":10,"dec":"10"}},{"s":"group2","_max":{"float":10,"int":10,"dec":"10"}}]}}""")
   }
 
   // *******************
