@@ -31,7 +31,7 @@ fn test_tracing_subscriber() -> Sub {
 /// specific test outputs for readability.
 ///
 /// It is used from test_macros.
-pub struct PrintWriter;
+struct PrintWriter;
 
 impl tracing_subscriber::fmt::MakeWriter for PrintWriter {
     type Writer = PrintWriter;
