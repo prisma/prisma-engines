@@ -7,7 +7,6 @@ import util._
 
 class CreateMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
 
-  override def doNotRunForConnectors: Set[ConnectorTag] = Set(ConnectorTag.VitessConnectorTag)
   override def runOnlyForCapabilities = Set(EnumCapability)
 
   val schema =
