@@ -4,7 +4,7 @@ pub fn sqlite_test_url(db_name: &str) -> String {
     std::env::var("SQLITE_TEST_URL").unwrap_or_else(|_| format!("file:{}", sqlite_test_file(db_name)))
 }
 
-pub fn sqlite_test_file(db_name: &str) -> String {
+fn sqlite_test_file(db_name: &str) -> String {
     static SERVER_ROOT: Lazy<std::path::PathBuf> = Lazy::new(|| {
         std::env::var("SERVER_ROOT")
             .map(|root| std::path::Path::new(&root).join("db"))

@@ -20,7 +20,7 @@ pub use enumflags2::BitFlags;
 pub use mssql::{init_mssql_database, reset_schema as reset_mssql_schema};
 pub use mysql::{create_mysql_database, mysql_safe_identifier};
 pub use postgres::create_postgres_database;
-pub use sqlite::{sqlite_test_file, sqlite_test_url};
+pub use sqlite::sqlite_test_url;
 pub use tags::Tags;
 
 use once_cell::sync::Lazy;
@@ -57,7 +57,7 @@ static TAGS: Lazy<Result<DbUnderTest, String>> = Lazy::new(|| {
     let prefix = database_url
         .find(':')
         .map(|prefix_end| &database_url[..prefix_end])
-        .unwrap_or(database_url.as_str());
+        .unwrap_or_else(|| database_url.as_str());
 
     logging::init_logger();
 

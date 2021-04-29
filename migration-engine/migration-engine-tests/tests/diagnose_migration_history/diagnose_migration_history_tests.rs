@@ -993,7 +993,6 @@ async fn empty_migration_directories_should_cause_known_errors(api: &TestApi) ->
         .create_migration("01init", dm, &migrations_directory)
         .send()
         .await?
-        .assert_migration("01init", |migration| Ok(migration))?
         .into_output();
 
     api.apply_migrations(&migrations_directory)

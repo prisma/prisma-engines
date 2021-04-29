@@ -57,9 +57,9 @@ pub fn test_connector(attr: TokenStream, input: TokenStream) -> TokenStream {
     };
 
     let tokens = if sig.asyncness.is_some() {
-        let return_ty = match sig.output {
-            syn::ReturnType::Default => quote!(()),
-            syn::ReturnType::Type(_, ref ty) => quote!(#ty),
+        let (return_ty, unwrap) = match sig.output {
+            syn::ReturnType::Default => (quote!(()), quote!()),
+            syn::ReturnType::Type(_, ref ty) => (quote!(#ty), quote!(.unwrap())),
         };
 
         quote! {
@@ -79,7 +79,7 @@ pub fn test_connector(attr: TokenStream, input: TokenStream) -> TokenStream {
 
                     #body
 
-                }).unwrap();
+                })#unwrap;
             }
         }
     } else {

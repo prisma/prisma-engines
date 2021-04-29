@@ -11,25 +11,6 @@ use quaint::{
 use sql_schema_describer::*;
 use test_setup::*;
 
-#[derive(Debug)]
-pub struct TestError {
-    inner: Box<dyn std::error::Error>,
-}
-
-impl From<quaint::error::Error> for TestError {
-    fn from(err: quaint::error::Error) -> Self {
-        TestError { inner: err.into() }
-    }
-}
-
-impl From<DescriberError> for TestError {
-    fn from(err: DescriberError) -> Self {
-        TestError { inner: err.into() }
-    }
-}
-
-pub type TestResult = Result<(), TestError>;
-
 pub struct TestApi {
     db_name: &'static str,
     database: Quaint,
@@ -54,7 +35,7 @@ impl TestApi {
                 .await
                 .unwrap()
         } else if tags.contains(Tags::Sqlite) {
-            let url = sqlite_test_file(db_name);
+            let url = sqlite_test_url(db_name);
             (Quaint::new(&url).await.unwrap(), url)
         } else {
             unreachable!()
@@ -75,8 +56,12 @@ impl TestApi {
         self.tags
     }
 
-    pub(crate) async fn describe(&self) -> Result<SqlSchema, DescriberError> {
-        self.describer().describe(self.schema_name()).await
+    pub(crate) async fn describe(&self) -> SqlSchema {
+        self.describer().describe(self.schema_name()).await.unwrap()
+    }
+
+    pub(crate) async fn describe_error(&self) -> DescriberError {
+        self.describer().describe(self.schema_name()).await.unwrap_err()
     }
 
     pub(crate) fn describer(&self) -> Box<dyn SqlSchemaDescriberBackend> {

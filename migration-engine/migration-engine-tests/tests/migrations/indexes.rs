@@ -377,8 +377,7 @@ async fn index_updates_with_rename_must_work(api: &TestApi) -> TestResult {
     api.schema_push(dm2).force(true).send().await?.assert_executable()?;
 
     api.assert_schema().await?.assert_table("A", |t| {
-        t.assert_indexes_count(1)?
-            .assert_index_on_columns(&["field", "id"], |idx| Ok(idx))
+        t.assert_indexes_count(1)?.assert_index_on_columns(&["field", "id"], Ok)
     })?;
 
     Ok(())

@@ -31,9 +31,8 @@ pub(crate) fn get_mysql_tags(database_url: &str) -> Result<BitFlags<Tags>, Strin
             .first()
             .ok_or_else(|| "Got an empty result set when fetching metadata".to_owned())?;
 
-        match first_row.get("lower_cases_table_names").and_then(|lctn| lctn.as_i64()) {
-            Some(1) => tags |= Tags::LowerCasesTableNames,
-            _ => (),
+        if let Some(1) = first_row.get("lower_cases_table_names").and_then(|lctn| lctn.as_i64()) {
+            tags |= Tags::LowerCasesTableNames;
         }
 
         match first_row.get("version").and_then(|version| version.to_string()) {

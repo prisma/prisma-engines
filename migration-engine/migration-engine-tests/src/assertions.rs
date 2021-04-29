@@ -73,13 +73,15 @@ impl SchemaAssertion {
     }
 
     pub fn assert_has_no_enum(self, enum_name: &str) -> AssertionResult<Self> {
-        if self.schema.enums.iter().any(|enm| {
+        let has_matching_enum = self.schema.enums.iter().any(|enm| {
             if self.tags.contains(Tags::LowerCasesTableNames) {
                 enm.name.eq_ignore_ascii_case(enum_name)
             } else {
                 enm.name == enum_name
             }
-        }) {
+        });
+
+        if has_matching_enum {
             anyhow::bail!("Expected no enum named {}, found one", enum_name);
         }
 
