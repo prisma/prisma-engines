@@ -4253,6 +4253,7 @@ dependencies = [
  "dml",
  "native-types",
  "once_cell",
+ "regex",
  "serde_json",
 ]
 
