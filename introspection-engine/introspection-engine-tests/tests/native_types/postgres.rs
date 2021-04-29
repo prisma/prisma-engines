@@ -37,7 +37,7 @@ const TYPES: &[(&str, &str)] = &[
 ];
 
 #[test_connector(tags(Postgres))]
-async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
+async fn native_type_columns_feature_on(api: &TestApi) -> TestResult {
     let columns: Vec<String> = TYPES
         .iter()
         .map(|(name, db_type)| format!("\"{}\" {} Not Null", name, db_type))
@@ -101,7 +101,7 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
 }
 
 #[test_connector(tags(Postgres))]
-async fn native_type_array_columns_feature_on(api: &TestApi) -> crate::TestResult {
+async fn native_type_array_columns_feature_on(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
             migration.create_table("Blog", move |t| {

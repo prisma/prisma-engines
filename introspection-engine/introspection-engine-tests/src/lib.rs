@@ -5,6 +5,8 @@ use eyre::Result;
 use quaint::{prelude::Queryable, single::Quaint};
 use test_setup::{BitFlags, Tags};
 
+pub type TestResult = eyre::Result<()>;
+
 #[macro_export]
 macro_rules! assert_eq_schema {
     ($left:expr, $right:expr) => {

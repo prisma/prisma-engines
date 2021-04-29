@@ -1,6 +1,7 @@
-use proc_macro::{TokenStream, TokenTree};
+use proc_macro::TokenStream;
+use proc_macro2::{Delimiter, TokenTree};
 use quote::quote;
-use syn::{parse_macro_input, AttributeArgs, Meta, MetaList, NestedMeta};
+use syn::{parse_macro_input, AttributeArgs, Meta, MetaList, NestedMeta, Signature};
 
 #[derive(Default)]
 struct TestConnectorAttrs {
@@ -35,52 +36,10 @@ impl TestConnectorAttrs {
 }
 
 pub fn test_connector_impl(attr: TokenStream, input: TokenStream) -> TokenStream {
-    use std::fmt::Write;
-
     let attributes_meta: syn::AttributeArgs = parse_macro_input!(attr as AttributeArgs);
+    let input = proc_macro2::TokenStream::from(input);
 
-    // We go to some length to avoid parsing the whole function body, so the
-    // macro goes faster. We only need to parse at most three tokens:
-    // - `async fn #fn_name` or
-    // - `fn #fn_name`.
-    //
-    // This has been measured to make a ~250ms difference on the compile times
-    // of migration-engine-tests. This number should only grow over time.
-    let mut str_buf = String::with_capacity("async".len());
-    let mut fn_tokens = input.into_iter();
-    let (original_async_token, mut original_fn_token) = match fn_tokens.next() {
-        Some(ident) => {
-            write!(str_buf, "{}", ident).unwrap();
-
-            match str_buf.as_str() {
-                "async" => (Some(ident), None),
-                "fn" => (None, Some(ident)),
-                _ => {
-                    return syn::Error::new(ident.span().into(), "Bad syntax")
-                        .into_compile_error()
-                        .into()
-                }
-            }
-        }
-        _ => todo!(),
-    };
-
-    str_buf.clear();
-
-    // Skip the "fn" token
-    if original_async_token.is_some() {
-        original_fn_token = fn_tokens.next();
-    }
-
-    let (test_function_name, original_fn_name_ident) = match fn_tokens.next() {
-        Some(TokenTree::Ident(ident)) => {
-            write!(str_buf, "{}", ident).unwrap();
-
-            (syn::Ident::new(&str_buf, ident.span().into()), ident)
-        }
-        _ => todo!(),
-    };
-
+    // First the attributes
     let mut attrs = TestConnectorAttrs::default();
 
     for meta in attributes_meta {
@@ -98,63 +57,122 @@ pub fn test_connector_impl(attr: TokenStream, input: TokenStream) -> TokenStream
         }
     }
 
+    // Then the function body
+    let (sig, body): (syn::Signature, proc_macro2::TokenStream) = {
+        // We take advantage of the function body being the last token tree (surrounded by braces).
+        let sig_tokens = input
+            .clone()
+            .into_iter()
+            .take_while(|t| match t {
+                TokenTree::Group(g) if matches!(g.delimiter(), Delimiter::Brace) => false,
+                _ => true,
+            })
+            .collect();
+
+        let body = input.into_iter().last().expect("Failed to find function body");
+
+        match syn::parse2(sig_tokens) {
+            Ok(sig) => (sig, body.into()),
+            Err(err) => return err.into_compile_error().into(),
+        }
+    };
+
+    // Generate the final function
     let include_tagged = &attrs.include_tagged;
     let exclude_tagged = &attrs.exclude_tagged;
     let capabilities = &attrs.capabilities;
+    let test_function_name = &sig.ident;
+    let test_function_name_lit = sig.ident.to_string();
+    let (arg_name, arg_type) = match extract_api_arg(&sig) {
+        Ok(args) => args,
+        Err(err) => return err.to_compile_error().into(),
+    };
 
-    let tokens = if original_async_token.is_some() {
+    let tokens = if sig.asyncness.is_some() {
+        let return_ty = match sig.output {
+            syn::ReturnType::Default => quote!(()),
+            syn::ReturnType::Type(_, ref ty) => quote!(#ty),
+        };
+
         quote! {
-            mod #test_function_name {
-                #[test]
-                fn test() {
-                    use super::*;
+            #[test]
+            fn #test_function_name() {
+                let args = test_setup::TestApiArgs::new(#test_function_name_lit);
 
-                    let args = test_setup::TestApiArgs::new(#str_buf);
+                if test_setup::should_skip_test(
+                    &args,
+                    BitFlags::empty() #(| Tags::#include_tagged)*,
+                    BitFlags::empty() #(| Tags::#exclude_tagged)*,
+                    BitFlags::empty() #(| Capabilities::#capabilities)*,
+                ) { return }
 
-                    if test_setup::should_skip_test(
-                        &args,
-                        BitFlags::empty() #(| Tags::#include_tagged)*,
-                        BitFlags::empty() #(| Tags::#exclude_tagged)*,
-                        BitFlags::empty() #(| Capabilities::#capabilities)*,
-                    ) { return }
+                test_setup::runtime::run_with_tokio::<#return_ty, _>(async {
+                    let #arg_name = &#arg_type::new(args).await;
 
-                    test_setup::runtime::run_with_tokio(async {
-                        let api = TestApi::new(args).await;
-                        super::#test_function_name(&api).await
-                    }).unwrap()
-                }
+                    #body
+
+                }).unwrap();
             }
         }
     } else {
         quote! {
-            mod #test_function_name {
-                #[test]
-                fn test() {
-                    use super::*;
+            #[test]
+            fn #test_function_name() {
+                let args = test_setup::TestApiArgs::new(#test_function_name_lit);
 
-                    let args = test_setup::TestApiArgs::new(#str_buf);
+                if test_setup::should_skip_test(
+                    &args,
+                    BitFlags::empty() #(| Tags::#include_tagged)*,
+                    BitFlags::empty() #(| Tags::#exclude_tagged)*,
+                    BitFlags::empty() #(| Capabilities::#capabilities)*,
+                ) { return }
 
-                    if test_setup::should_skip_test(
-                        &args,
-                        BitFlags::empty() #(| Tags::#include_tagged)*,
-                        BitFlags::empty() #(| Tags::#exclude_tagged)*,
-                        BitFlags::empty() #(| Capabilities::#capabilities)*,
-                    ) { return }
+                let #arg_name = #arg_type::new(args);
 
-                    #test_function_name ( TestApi::new(args) )
-                }
+                #body
             }
         }
     };
 
-    let mut token_stream: TokenStream = tokens.into();
-    let rest = original_async_token
-        .into_iter()
-        .chain(original_fn_token.into_iter())
-        .chain(std::iter::once(TokenTree::Ident(original_fn_name_ident)))
-        .chain(fn_tokens);
+    tokens.into()
+}
 
-    token_stream.extend(rest);
+fn extract_api_arg(sig: &Signature) -> Result<(&syn::Ident, &syn::Ident), syn::Error> {
+    use syn::spanned::Spanned;
 
-    token_stream
+    let err = |span| {
+        Err(syn::Error::new(
+            span,
+            &format!(
+                "Unsupported syntax. Arguments to test functions should be of the form `fn test_fn(api: {}TestApi)`",
+                if sig.asyncness.is_some() { "&" } else { "" }
+            ),
+        ))
+    };
+
+    match (sig.inputs.first(), sig.inputs.len()) {
+        (Some(syn::FnArg::Typed(pattype)), 1) => {
+            let arg_name = match pattype.pat.as_ref() {
+                syn::Pat::Ident(ident) => &ident.ident,
+                other => return err(other.span()),
+            };
+
+            let arg_type = match pattype.ty.as_ref() {
+                syn::Type::Reference(syn::TypeReference {
+                    mutability: None, elem, ..
+                }) if sig.asyncness.is_some() => match elem.as_ref() {
+                    syn::Type::Path(ident) => ident.path.get_ident().unwrap(),
+                    other => return err(other.span()),
+                },
+                syn::Type::Path(ident) => ident.path.get_ident().unwrap(),
+                other => return err(other.span()),
+            };
+
+            Ok((arg_name, arg_type))
+        }
+        (_, n) => Err(syn::Error::new_spanned(
+            &sig.inputs,
+            &format!("Test functions should take one argument, not {}", n),
+        )),
+    }
 }

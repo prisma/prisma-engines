@@ -7,7 +7,7 @@ use serde_json::json;
 use test_macros::test_connector;
 
 #[test_connector]
-async fn mapped_model_name(api: &TestApi) -> crate::TestResult {
+async fn mapped_model_name(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("_User", |t| {
@@ -56,7 +56,7 @@ async fn mapped_model_name(api: &TestApi) -> crate::TestResult {
 }
 
 #[test_connector]
-async fn manually_overwritten_mapped_field_name(api: &TestApi) -> crate::TestResult {
+async fn manually_overwritten_mapped_field_name(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -105,7 +105,7 @@ async fn manually_overwritten_mapped_field_name(api: &TestApi) -> crate::TestRes
 }
 
 #[test_connector]
-async fn mapped_model_and_field_name(api: &TestApi) -> crate::TestResult {
+async fn mapped_model_and_field_name(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -206,7 +206,7 @@ async fn mapped_model_and_field_name(api: &TestApi) -> crate::TestResult {
 }
 
 #[test_connector(tags(Postgres))]
-async fn manually_mapped_model_and_field_name(api: &TestApi) -> crate::TestResult {
+async fn manually_mapped_model_and_field_name(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("_User", |t| {
@@ -305,7 +305,7 @@ async fn manually_mapped_model_and_field_name(api: &TestApi) -> crate::TestResul
 }
 
 #[test_connector]
-async fn mapped_field_name(api: &TestApi) -> crate::TestResult {
+async fn mapped_field_name(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -389,7 +389,7 @@ async fn mapped_field_name(api: &TestApi) -> crate::TestResult {
 }
 
 #[test_connector(capabilities(Enums))]
-async fn mapped_enum_name(api: &TestApi) -> crate::TestResult {
+async fn mapped_enum_name(api: &TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
     if sql_family.is_postgres() {
@@ -477,7 +477,7 @@ async fn mapped_enum_name(api: &TestApi) -> crate::TestResult {
 }
 
 #[test_connector(capabilities(Enums))]
-async fn mapped_enum_value_name(api: &TestApi) -> crate::TestResult {
+async fn mapped_enum_value_name(api: &TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
     if sql_family.is_postgres() {
@@ -562,7 +562,7 @@ async fn mapped_enum_value_name(api: &TestApi) -> crate::TestResult {
 }
 
 #[test_connector(tags(Postgres))]
-async fn manually_remapped_enum_value_name(api: &TestApi) -> crate::TestResult {
+async fn manually_remapped_enum_value_name(api: &TestApi) -> TestResult {
     let sql = "CREATE Type color as ENUM (\'_black\', \'white\')";
     api.database().execute_raw(sql, &[]).await?;
 
@@ -625,7 +625,7 @@ async fn manually_remapped_enum_value_name(api: &TestApi) -> crate::TestResult {
 }
 
 #[test_connector(tags(Postgres))]
-async fn manually_re_mapped_enum_name(api: &TestApi) -> crate::TestResult {
+async fn manually_re_mapped_enum_name(api: &TestApi) -> TestResult {
     let sql = "CREATE Type _color as ENUM (\'black\', \'white\')";
     api.database().execute_raw(sql, &[]).await?;
 
@@ -690,7 +690,7 @@ async fn manually_re_mapped_enum_name(api: &TestApi) -> crate::TestResult {
 }
 
 #[test_connector(tags(Postgres))]
-async fn manually_re_mapped_invalid_enum_values(api: &TestApi) -> crate::TestResult {
+async fn manually_re_mapped_invalid_enum_values(api: &TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
     if sql_family.is_postgres() {
@@ -775,7 +775,7 @@ async fn manually_re_mapped_invalid_enum_values(api: &TestApi) -> crate::TestRes
 }
 
 #[test_connector]
-async fn multiple_changed_relation_names(api: &TestApi) -> crate::TestResult {
+async fn multiple_changed_relation_names(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Employee", |t| {
@@ -858,7 +858,7 @@ async fn multiple_changed_relation_names(api: &TestApi) -> crate::TestResult {
 }
 
 #[test_connector(tags(Postgres))]
-async fn custom_virtual_relation_field_names(api: &TestApi) -> crate::TestResult {
+async fn custom_virtual_relation_field_names(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -914,7 +914,7 @@ async fn custom_virtual_relation_field_names(api: &TestApi) -> crate::TestResult
 }
 
 #[test_connector]
-async fn custom_model_order(api: &TestApi) -> crate::TestResult {
+async fn custom_model_order(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("A", |t| {
@@ -1007,7 +1007,7 @@ async fn custom_model_order(api: &TestApi) -> crate::TestResult {
 }
 
 #[test_connector(tags(Postgres))]
-async fn custom_enum_order(api: &TestApi) -> crate::TestResult {
+async fn custom_enum_order(api: &TestApi) -> TestResult {
     let sql = "CREATE Type a as ENUM ( \'id\')".to_string();
     api.database().execute_raw(&sql, &[]).await?;
 
@@ -1095,7 +1095,7 @@ async fn custom_enum_order(api: &TestApi) -> crate::TestResult {
 }
 
 #[test_connector]
-async fn multiple_changed_relation_names_due_to_mapped_models(api: &TestApi) -> crate::TestResult {
+async fn multiple_changed_relation_names_due_to_mapped_models(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -1163,7 +1163,7 @@ async fn multiple_changed_relation_names_due_to_mapped_models(api: &TestApi) -> 
 }
 
 #[test_connector(tags(Postgres))]
-async fn virtual_cuid_default(api: &TestApi) -> crate::TestResult {
+async fn virtual_cuid_default(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -1213,7 +1213,7 @@ async fn virtual_cuid_default(api: &TestApi) -> crate::TestResult {
 }
 
 #[test_connector(tags(Postgres))]
-async fn comments_should_be_kept(api: &TestApi) -> crate::TestResult {
+async fn comments_should_be_kept(api: &TestApi) -> TestResult {
     let sql = "CREATE Type a as ENUM (\'A\')".to_string();
     api.database().execute_raw(&sql, &[]).await?;
 
@@ -1281,7 +1281,7 @@ async fn comments_should_be_kept(api: &TestApi) -> crate::TestResult {
 }
 
 #[test_connector]
-async fn updated_at(api: &TestApi) -> crate::TestResult {
+async fn updated_at(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", move |t| {
@@ -1326,7 +1326,7 @@ async fn updated_at(api: &TestApi) -> crate::TestResult {
 }
 
 #[test_connector(tags(Mssql))]
-async fn updated_at_with_native_types_on(api: &TestApi) -> crate::TestResult {
+async fn updated_at_with_native_types_on(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", move |t| {
@@ -1367,7 +1367,7 @@ async fn updated_at_with_native_types_on(api: &TestApi) -> crate::TestResult {
 }
 
 #[test_connector]
-async fn multiple_many_to_many_on_same_model(api: &TestApi) -> crate::TestResult {
+async fn multiple_many_to_many_on_same_model(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("A", |t| {
@@ -1444,7 +1444,7 @@ async fn multiple_many_to_many_on_same_model(api: &TestApi) -> crate::TestResult
 }
 
 #[test_connector(tags(Mysql))]
-async fn re_introspecting_mysql_enum_names(api: &TestApi) -> crate::TestResult {
+async fn re_introspecting_mysql_enum_names(api: &TestApi) -> TestResult {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -1496,7 +1496,7 @@ async fn re_introspecting_mysql_enum_names(api: &TestApi) -> crate::TestResult {
 }
 
 #[test_connector(tags(Mysql))]
-async fn re_introspecting_mysql_enum_names_if_enum_is_reused(api: &TestApi) -> crate::TestResult {
+async fn re_introspecting_mysql_enum_names_if_enum_is_reused(api: &TestApi) -> TestResult {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -1556,7 +1556,7 @@ async fn re_introspecting_mysql_enum_names_if_enum_is_reused(api: &TestApi) -> c
 }
 
 #[test_connector(tags(Postgres))]
-async fn custom_repro(api: &TestApi) -> crate::TestResult {
+async fn custom_repro(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("tag", |t| {
@@ -1619,7 +1619,7 @@ async fn custom_repro(api: &TestApi) -> crate::TestResult {
 }
 
 #[test_connector]
-async fn re_introspecting_ignore(api: &TestApi) -> crate::TestResult {
+async fn re_introspecting_ignore(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", move |t| {
@@ -1676,7 +1676,7 @@ async fn re_introspecting_ignore(api: &TestApi) -> crate::TestResult {
 }
 
 #[test_connector]
-async fn do_not_try_to_keep_custom_many_to_many_self_relation_names(api: &TestApi) -> crate::TestResult {
+async fn do_not_try_to_keep_custom_many_to_many_self_relation_names(api: &TestApi) -> TestResult {
     //we do not have enough information to correctly assign which field should point to column A in the
     //join table and which one to B
     //upon table creation this is dependant on lexicographic order of the names of the fields, but we

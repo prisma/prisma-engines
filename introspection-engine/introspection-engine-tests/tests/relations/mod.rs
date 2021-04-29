@@ -6,7 +6,7 @@ use quaint::prelude::SqlFamily;
 use test_macros::test_connector;
 
 #[test_connector]
-async fn one_to_one_req_relation(api: &TestApi) -> crate::TestResult {
+async fn one_to_one_req_relation(api: &TestApi) -> TestResult {
     api.barrel()
         .execute_with_schema(
             move |migration| {
@@ -43,7 +43,7 @@ async fn one_to_one_req_relation(api: &TestApi) -> crate::TestResult {
 }
 
 #[test_connector]
-async fn one_to_one_relation_on_a_singular_primary_key(api: &TestApi) -> crate::TestResult {
+async fn one_to_one_relation_on_a_singular_primary_key(api: &TestApi) -> TestResult {
     api.barrel()
         .execute_with_schema(
             |migration| {
@@ -78,7 +78,7 @@ async fn one_to_one_relation_on_a_singular_primary_key(api: &TestApi) -> crate::
 }
 
 #[test_connector]
-async fn two_one_to_one_relations_between_the_same_models(api: &TestApi) -> crate::TestResult {
+async fn two_one_to_one_relations_between_the_same_models(api: &TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
     api.barrel()
@@ -137,7 +137,7 @@ async fn two_one_to_one_relations_between_the_same_models(api: &TestApi) -> crat
 }
 
 #[test_connector]
-async fn a_one_to_one_relation(api: &TestApi) -> crate::TestResult {
+async fn a_one_to_one_relation(api: &TestApi) -> TestResult {
     api.barrel()
         .execute_with_schema(
             |migration| {
@@ -174,7 +174,7 @@ async fn a_one_to_one_relation(api: &TestApi) -> crate::TestResult {
 }
 
 #[test_connector]
-async fn a_one_to_one_relation_referencing_non_id(api: &TestApi) -> crate::TestResult {
+async fn a_one_to_one_relation_referencing_non_id(api: &TestApi) -> TestResult {
     api.barrel()
         .execute_with_schema(
             |migration| {
@@ -219,7 +219,7 @@ async fn a_one_to_one_relation_referencing_non_id(api: &TestApi) -> crate::TestR
 }
 
 #[test_connector]
-async fn a_one_to_many_relation(api: &TestApi) -> crate::TestResult {
+async fn a_one_to_many_relation(api: &TestApi) -> TestResult {
     api.barrel()
         .execute_with_schema(
             |migration| {
@@ -275,7 +275,7 @@ async fn a_one_to_many_relation(api: &TestApi) -> crate::TestResult {
 }
 
 #[test_connector]
-async fn a_one_req_to_many_relation(api: &TestApi) -> crate::TestResult {
+async fn a_one_req_to_many_relation(api: &TestApi) -> TestResult {
     api.barrel()
         .execute_with_schema(
             |migration| {
@@ -331,7 +331,7 @@ async fn a_one_req_to_many_relation(api: &TestApi) -> crate::TestResult {
 }
 
 #[test_connector]
-async fn a_prisma_many_to_many_relation(api: &TestApi) -> crate::TestResult {
+async fn a_prisma_many_to_many_relation(api: &TestApi) -> TestResult {
     api.barrel()
         .execute_with_schema(
             |migration| {
@@ -376,7 +376,7 @@ async fn a_prisma_many_to_many_relation(api: &TestApi) -> crate::TestResult {
 }
 
 #[test_connector]
-async fn a_many_to_many_relation_with_an_id(api: &TestApi) -> crate::TestResult {
+async fn a_many_to_many_relation_with_an_id(api: &TestApi) -> TestResult {
     api.barrel()
         .execute_with_schema(
             |migration| {
@@ -454,7 +454,7 @@ async fn a_many_to_many_relation_with_an_id(api: &TestApi) -> crate::TestResult 
 }
 
 #[test_connector]
-async fn a_self_relation(api: &TestApi) -> crate::TestResult {
+async fn a_self_relation(api: &TestApi) -> TestResult {
     api.barrel()
         .execute_with_schema(
             move |migration| {
@@ -510,7 +510,7 @@ async fn a_self_relation(api: &TestApi) -> crate::TestResult {
 // SQLite will always make the primary key autoincrement, which makes no sense
 // to build.
 #[test_connector(exclude(Sqlite))]
-async fn id_fields_with_foreign_key(api: &TestApi) -> crate::TestResult {
+async fn id_fields_with_foreign_key(api: &TestApi) -> TestResult {
     api.barrel()
         .execute_with_schema(
             move |migration| {
@@ -545,7 +545,7 @@ async fn id_fields_with_foreign_key(api: &TestApi) -> crate::TestResult {
 
 // SQLite cannot alter tables to add foreign keys, so skipping the tests.
 #[test_connector(exclude(Sqlite))]
-async fn duplicate_fks_should_ignore_one_of_them(api: &TestApi) -> crate::TestResult {
+async fn duplicate_fks_should_ignore_one_of_them(api: &TestApi) -> TestResult {
     api.barrel()
         .execute_with_schema(
             |migration| {
@@ -605,7 +605,7 @@ async fn duplicate_fks_should_ignore_one_of_them(api: &TestApi) -> crate::TestRe
 }
 
 #[test_connector(tags(Postgres))]
-async fn default_values_on_relations(api: &TestApi) -> crate::TestResult {
+async fn default_values_on_relations(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -638,7 +638,7 @@ async fn default_values_on_relations(api: &TestApi) -> crate::TestResult {
 }
 
 #[test_connector]
-async fn prisma_1_0_relations(api: &TestApi) -> crate::TestResult {
+async fn prisma_1_0_relations(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Book", |t| {
@@ -687,7 +687,7 @@ async fn prisma_1_0_relations(api: &TestApi) -> crate::TestResult {
 }
 
 #[test_connector]
-async fn relations_should_avoid_name_clashes(api: &TestApi) -> crate::TestResult {
+async fn relations_should_avoid_name_clashes(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("y", |t| {
@@ -760,7 +760,7 @@ async fn relations_should_avoid_name_clashes(api: &TestApi) -> crate::TestResult
 // SQL Server cannot form a foreign key without the related columns being part
 // of a primary or candidate keys.
 #[test_connector]
-async fn relations_should_avoid_name_clashes_2(api: &TestApi) -> crate::TestResult {
+async fn relations_should_avoid_name_clashes_2(api: &TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
     api.barrel()
@@ -851,7 +851,7 @@ async fn relations_should_avoid_name_clashes_2(api: &TestApi) -> crate::TestResu
 #[test_connector]
 async fn one_to_many_relation_field_names_do_not_conflict_with_many_to_many_relation_field_names(
     api: &TestApi,
-) -> crate::TestResult {
+) -> TestResult {
     let sql_family = api.sql_family();
 
     api.barrel()
@@ -915,7 +915,7 @@ async fn one_to_many_relation_field_names_do_not_conflict_with_many_to_many_rela
 }
 
 #[test_connector]
-async fn many_to_many_relation_field_names_do_not_conflict_with_themselves(api: &TestApi) -> crate::TestResult {
+async fn many_to_many_relation_field_names_do_not_conflict_with_themselves(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |table| {

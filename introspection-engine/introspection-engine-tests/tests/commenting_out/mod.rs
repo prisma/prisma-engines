@@ -1,11 +1,11 @@
 use barrel::types;
 use indoc::indoc;
-use introspection_engine_tests::{assert_eq_json, test_api::*};
+use introspection_engine_tests::{assert_eq_json, test_api::*, TestResult};
 use serde_json::json;
 use test_macros::test_connector;
 
 #[test_connector]
-async fn a_table_without_uniques_should_ignore(api: &TestApi) -> crate::TestResult {
+async fn a_table_without_uniques_should_ignore(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -60,7 +60,7 @@ async fn a_table_without_uniques_should_ignore(api: &TestApi) -> crate::TestResu
 }
 
 #[test_connector(tags(Postgres))]
-async fn relations_between_ignored_models_should_not_have_field_level_ignores(api: &TestApi) -> crate::TestResult {
+async fn relations_between_ignored_models_should_not_have_field_level_ignores(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -99,7 +99,7 @@ async fn relations_between_ignored_models_should_not_have_field_level_ignores(ap
 }
 
 #[test_connector]
-async fn a_table_without_required_uniques(api: &TestApi) -> crate::TestResult {
+async fn a_table_without_required_uniques(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Post", |t| {
@@ -125,7 +125,7 @@ async fn a_table_without_required_uniques(api: &TestApi) -> crate::TestResult {
 }
 
 #[test_connector]
-async fn a_table_without_fully_required_compound_unique(api: &TestApi) -> crate::TestResult {
+async fn a_table_without_fully_required_compound_unique(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Post", |t| {
@@ -159,7 +159,7 @@ async fn a_table_without_fully_required_compound_unique(api: &TestApi) -> crate:
 }
 
 #[test_connector(tags(Postgres))]
-async fn unsupported_type_keeps_its_usages(api: &TestApi) -> crate::TestResult {
+async fn unsupported_type_keeps_its_usages(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Test", |t| {
@@ -205,7 +205,7 @@ async fn unsupported_type_keeps_its_usages(api: &TestApi) -> crate::TestResult {
 }
 
 #[test_connector(tags(Postgres))]
-async fn a_table_with_only_an_unsupported_id(api: &TestApi) -> crate::TestResult {
+async fn a_table_with_only_an_unsupported_id(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Test", |t| {
@@ -255,7 +255,7 @@ async fn a_table_with_only_an_unsupported_id(api: &TestApi) -> crate::TestResult
 }
 
 #[test_connector(tags(Postgres))]
-async fn a_table_with_unsupported_types_in_a_relation(api: &TestApi) -> crate::TestResult {
+async fn a_table_with_unsupported_types_in_a_relation(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -290,7 +290,7 @@ async fn a_table_with_unsupported_types_in_a_relation(api: &TestApi) -> crate::T
 }
 
 #[test_connector]
-async fn remapping_field_names_to_empty(api: &TestApi) -> crate::TestResult {
+async fn remapping_field_names_to_empty(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -314,7 +314,7 @@ async fn remapping_field_names_to_empty(api: &TestApi) -> crate::TestResult {
 }
 
 #[test_connector(tags(Postgres))]
-async fn db_generated_values_should_add_comments(api: &TestApi) -> crate::TestResult {
+async fn db_generated_values_should_add_comments(api: &TestApi) -> TestResult {
     api.barrel()
         .execute_with_schema(
             |migration| {
@@ -344,7 +344,7 @@ async fn db_generated_values_should_add_comments(api: &TestApi) -> crate::TestRe
 }
 
 #[test_connector(tags(Postgres))]
-async fn commenting_out_a_table_without_columns(api: &TestApi) -> crate::TestResult {
+async fn commenting_out_a_table_without_columns(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Test", |_t| {});
@@ -375,7 +375,7 @@ async fn commenting_out_a_table_without_columns(api: &TestApi) -> crate::TestRes
 }
 
 #[test_connector(tags(Postgres))]
-async fn ignore_on_back_relation_field_if_pointing_to_ignored_model(api: &TestApi) -> crate::TestResult {
+async fn ignore_on_back_relation_field_if_pointing_to_ignored_model(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -413,7 +413,7 @@ async fn ignore_on_back_relation_field_if_pointing_to_ignored_model(api: &TestAp
 }
 
 #[test_connector(tags(Sqlite))]
-async fn ignore_on_model_with_only_optional_id(api: &TestApi) -> crate::TestResult {
+async fn ignore_on_model_with_only_optional_id(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("ValidId", |t| {

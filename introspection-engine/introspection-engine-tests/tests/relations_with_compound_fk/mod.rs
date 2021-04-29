@@ -4,7 +4,7 @@ use introspection_engine_tests::test_api::*;
 use test_macros::test_connector;
 
 #[test_connector]
-async fn compound_foreign_keys_for_one_to_one_relations(api: &TestApi) -> crate::TestResult {
+async fn compound_foreign_keys_for_one_to_one_relations(api: &TestApi) -> TestResult {
     let constraint_name = if api.sql_family().is_sqlite() {
         "sqlite_autoindex_Post_1"
     } else {
@@ -60,7 +60,7 @@ async fn compound_foreign_keys_for_one_to_one_relations(api: &TestApi) -> crate:
 }
 
 #[test_connector]
-async fn compound_foreign_keys_for_required_one_to_one_relations(api: &TestApi) -> crate::TestResult {
+async fn compound_foreign_keys_for_required_one_to_one_relations(api: &TestApi) -> TestResult {
     let constraint_name = if api.sql_family().is_sqlite() {
         "sqlite_autoindex_Post_1"
     } else {
@@ -116,7 +116,7 @@ async fn compound_foreign_keys_for_required_one_to_one_relations(api: &TestApi) 
 }
 
 #[test_connector]
-async fn compound_foreign_keys_for_one_to_many_relations(api: &TestApi) -> crate::TestResult {
+async fn compound_foreign_keys_for_one_to_many_relations(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -169,7 +169,7 @@ async fn compound_foreign_keys_for_one_to_many_relations(api: &TestApi) -> crate
 }
 
 #[test_connector]
-async fn compound_foreign_keys_for_one_to_many_relations_with_mixed_requiredness(api: &TestApi) -> crate::TestResult {
+async fn compound_foreign_keys_for_one_to_many_relations_with_mixed_requiredness(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -222,7 +222,7 @@ async fn compound_foreign_keys_for_one_to_many_relations_with_mixed_requiredness
 }
 
 #[test_connector]
-async fn compound_foreign_keys_for_required_one_to_many_relations(api: &TestApi) -> crate::TestResult {
+async fn compound_foreign_keys_for_required_one_to_many_relations(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -275,7 +275,7 @@ async fn compound_foreign_keys_for_required_one_to_many_relations(api: &TestApi)
 }
 
 #[test_connector]
-async fn compound_foreign_keys_for_required_self_relations(api: &TestApi) -> crate::TestResult {
+async fn compound_foreign_keys_for_required_self_relations(api: &TestApi) -> TestResult {
     let constraint_name = if api.sql_family().is_sqlite() {
         "sqlite_autoindex_Person_1"
     } else {
@@ -325,7 +325,7 @@ async fn compound_foreign_keys_for_required_self_relations(api: &TestApi) -> cra
 }
 
 #[test_connector]
-async fn compound_foreign_keys_for_self_relations(api: &TestApi) -> crate::TestResult {
+async fn compound_foreign_keys_for_self_relations(api: &TestApi) -> TestResult {
     let constraint_name = if api.sql_family().is_sqlite() {
         "sqlite_autoindex_Person_1"
     } else {
@@ -375,7 +375,7 @@ async fn compound_foreign_keys_for_self_relations(api: &TestApi) -> crate::TestR
 }
 
 #[test_connector]
-async fn compound_foreign_keys_with_defaults(api: &TestApi) -> crate::TestResult {
+async fn compound_foreign_keys_with_defaults(api: &TestApi) -> TestResult {
     let constraint_name = if api.sql_family().is_sqlite() {
         "sqlite_autoindex_Person_1"
     } else {
@@ -425,7 +425,7 @@ async fn compound_foreign_keys_with_defaults(api: &TestApi) -> crate::TestResult
 }
 
 #[test_connector]
-async fn compound_foreign_keys_for_one_to_many_relations_with_non_unique_index(api: &TestApi) -> crate::TestResult {
+async fn compound_foreign_keys_for_one_to_many_relations_with_non_unique_index(api: &TestApi) -> TestResult {
     let constraint_name = if api.sql_family().is_sqlite() {
         "sqlite_autoindex_User_1"
     } else {
@@ -484,7 +484,7 @@ async fn compound_foreign_keys_for_one_to_many_relations_with_non_unique_index(a
 }
 
 #[test_connector]
-async fn repro_matt_references_on_wrong_side(api: &TestApi) -> crate::TestResult {
+async fn repro_matt_references_on_wrong_side(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("a", |t| {
@@ -536,7 +536,7 @@ async fn repro_matt_references_on_wrong_side(api: &TestApi) -> crate::TestResult
 }
 
 #[test_connector]
-async fn a_compound_fk_pk_with_overlapping_primary_key(api: &TestApi) -> crate::TestResult {
+async fn a_compound_fk_pk_with_overlapping_primary_key(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("a", |t| {
@@ -591,7 +591,7 @@ async fn a_compound_fk_pk_with_overlapping_primary_key(api: &TestApi) -> crate::
 }
 
 #[test_connector]
-async fn compound_foreign_keys_for_duplicate_one_to_many_relations(api: &TestApi) -> crate::TestResult {
+async fn compound_foreign_keys_for_duplicate_one_to_many_relations(api: &TestApi) -> TestResult {
     let constraint_name = if api.sql_family().is_sqlite() {
         "sqlite_autoindex_User_1"
     } else {

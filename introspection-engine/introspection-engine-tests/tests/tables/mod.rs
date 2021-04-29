@@ -6,7 +6,7 @@ use quaint::prelude::Queryable;
 use test_macros::test_connector;
 
 #[test_connector]
-async fn a_simple_table_with_gql_types(api: &TestApi) -> crate::TestResult {
+async fn a_simple_table_with_gql_types(api: &TestApi) -> TestResult {
     api.barrel()
         .execute_with_schema(
             |migration| {
@@ -61,7 +61,7 @@ async fn a_simple_table_with_gql_types(api: &TestApi) -> crate::TestResult {
 }
 
 #[test_connector]
-async fn should_ignore_prisma_helper_tables(api: &TestApi) -> crate::TestResult {
+async fn should_ignore_prisma_helper_tables(api: &TestApi) -> TestResult {
     api.barrel()
         .execute_with_schema(
             |migration| {
@@ -115,7 +115,7 @@ async fn should_ignore_prisma_helper_tables(api: &TestApi) -> crate::TestResult 
 }
 
 #[test_connector]
-async fn a_table_with_compound_primary_keys(api: &TestApi) -> crate::TestResult {
+async fn a_table_with_compound_primary_keys(api: &TestApi) -> TestResult {
     api.barrel()
         .execute_with_schema(
             |migration| {
@@ -143,7 +143,7 @@ async fn a_table_with_compound_primary_keys(api: &TestApi) -> crate::TestResult 
 }
 
 #[test_connector]
-async fn a_table_with_unique_index(api: &TestApi) -> crate::TestResult {
+async fn a_table_with_unique_index(api: &TestApi) -> TestResult {
     api.barrel()
         .execute_with_schema(
             |migration| {
@@ -170,7 +170,7 @@ async fn a_table_with_unique_index(api: &TestApi) -> crate::TestResult {
 }
 
 #[test_connector]
-async fn a_table_with_multi_column_unique_index(api: &TestApi) -> crate::TestResult {
+async fn a_table_with_multi_column_unique_index(api: &TestApi) -> TestResult {
     api.barrel()
         .execute_with_schema(
             |migration| {
@@ -200,7 +200,7 @@ async fn a_table_with_multi_column_unique_index(api: &TestApi) -> crate::TestRes
 }
 
 #[test_connector]
-async fn a_table_with_required_and_optional_columns(api: &TestApi) -> crate::TestResult {
+async fn a_table_with_required_and_optional_columns(api: &TestApi) -> TestResult {
     api.barrel()
         .execute_with_schema(
             |migration| {
@@ -228,7 +228,7 @@ async fn a_table_with_required_and_optional_columns(api: &TestApi) -> crate::Tes
 }
 
 #[test_connector]
-async fn a_table_with_default_values(api: &TestApi) -> crate::TestResult {
+async fn a_table_with_default_values(api: &TestApi) -> TestResult {
     api.barrel()
         .execute_with_schema(
             |migration| {
@@ -275,7 +275,7 @@ async fn a_table_with_default_values(api: &TestApi) -> crate::TestResult {
 }
 
 #[test_connector]
-async fn a_table_with_a_non_unique_index(api: &TestApi) -> crate::TestResult {
+async fn a_table_with_a_non_unique_index(api: &TestApi) -> TestResult {
     api.barrel()
         .execute_with_schema(
             |migration| {
@@ -303,7 +303,7 @@ async fn a_table_with_a_non_unique_index(api: &TestApi) -> crate::TestResult {
 }
 
 #[test_connector]
-async fn a_table_with_a_multi_column_non_unique_index(api: &TestApi) -> crate::TestResult {
+async fn a_table_with_a_multi_column_non_unique_index(api: &TestApi) -> TestResult {
     api.barrel()
         .execute_with_schema(
             |migration| {
@@ -334,7 +334,7 @@ async fn a_table_with_a_multi_column_non_unique_index(api: &TestApi) -> crate::T
 
 // SQLite does not have a serial type that's not a primary key.
 #[test_connector(exclude(Sqlite))]
-async fn a_table_with_non_id_autoincrement(api: &TestApi) -> crate::TestResult {
+async fn a_table_with_non_id_autoincrement(api: &TestApi) -> TestResult {
     api.barrel()
         .execute_with_schema(
             |migration| {
@@ -360,7 +360,7 @@ async fn a_table_with_non_id_autoincrement(api: &TestApi) -> crate::TestResult {
 }
 
 #[test_connector]
-async fn default_values(api: &TestApi) -> crate::TestResult {
+async fn default_values(api: &TestApi) -> TestResult {
     api.barrel()
         .execute_with_schema(
             |migration| {
@@ -436,7 +436,7 @@ async fn default_values(api: &TestApi) -> crate::TestResult {
 }
 
 #[test_connector(tags(Postgres))]
-async fn pg_default_value_as_dbgenerated(api: &TestApi) -> crate::TestResult {
+async fn pg_default_value_as_dbgenerated(api: &TestApi) -> TestResult {
     let sequence = "CREATE SEQUENCE test_seq START 1".to_string();
     api.database().execute_raw(&sequence, &[]).await?;
 
@@ -475,7 +475,7 @@ async fn pg_default_value_as_dbgenerated(api: &TestApi) -> crate::TestResult {
 // no function default values on mysql 5.7 and 8.0 -.-
 // maria db allows this
 #[test_connector(tags(Mysql))]
-async fn my_default_value_as_dbgenerated(api: &TestApi) -> crate::TestResult {
+async fn my_default_value_as_dbgenerated(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Test", |t| {
@@ -500,7 +500,7 @@ async fn my_default_value_as_dbgenerated(api: &TestApi) -> crate::TestResult {
 }
 
 #[test_connector(tags(Mysql8))]
-async fn a_table_with_an_index_that_contains_expressions_should_be_ignored(api: &TestApi) -> crate::TestResult {
+async fn a_table_with_an_index_that_contains_expressions_should_be_ignored(api: &TestApi) -> TestResult {
     api.barrel()
         .execute_with_schema(
             |migration| {
@@ -529,7 +529,7 @@ async fn a_table_with_an_index_that_contains_expressions_should_be_ignored(api: 
 }
 
 #[test_connector(tags(Postgres))]
-async fn default_values_on_lists_should_be_ignored(api: &TestApi) -> crate::TestResult {
+async fn default_values_on_lists_should_be_ignored(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -557,7 +557,7 @@ async fn default_values_on_lists_should_be_ignored(api: &TestApi) -> crate::Test
 
 // MySQL doesn't have partial indices.
 #[test_connector(exclude(Mysql))]
-async fn a_table_with_partial_indexes_should_ignore_them(api: &TestApi) -> crate::TestResult {
+async fn a_table_with_partial_indexes_should_ignore_them(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
             migration.create_table("pages", move |t| {
@@ -586,7 +586,7 @@ async fn a_table_with_partial_indexes_should_ignore_them(api: &TestApi) -> crate
 }
 
 #[test_connector(tags(Postgres))]
-async fn introspecting_a_table_with_json_type_must_work(api: &TestApi) -> crate::TestResult {
+async fn introspecting_a_table_with_json_type_must_work(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Blog", |t| {
@@ -611,7 +611,7 @@ async fn introspecting_a_table_with_json_type_must_work(api: &TestApi) -> crate:
 }
 
 #[test_connector(tags(Mariadb))]
-async fn different_default_values_should_work(api: &TestApi) -> crate::TestResult {
+async fn different_default_values_should_work(api: &TestApi) -> TestResult {
     api.barrel()
         .execute_with_schema(
             |migration| {
@@ -651,7 +651,7 @@ async fn different_default_values_should_work(api: &TestApi) -> crate::TestResul
 }
 
 #[test_connector(exclude(Sqlite))]
-async fn negative_default_values_should_work(api: &TestApi) -> crate::TestResult {
+async fn negative_default_values_should_work(api: &TestApi) -> TestResult {
     api.barrel()
         .execute_with_schema(
             |migration| {
@@ -695,7 +695,7 @@ async fn negative_default_values_should_work(api: &TestApi) -> crate::TestResult
 }
 
 #[test_connector(tags(Mysql))]
-async fn partial_indexes_should_be_ignored_on_mysql(api: &TestApi) -> crate::TestResult {
+async fn partial_indexes_should_be_ignored_on_mysql(api: &TestApi) -> TestResult {
     api.barrel()
         .execute_with_schema(
             |migration| {
@@ -726,7 +726,7 @@ async fn partial_indexes_should_be_ignored_on_mysql(api: &TestApi) -> crate::Tes
 }
 
 #[test_connector(tags(Sqlite))]
-async fn expression_indexes_should_be_ignored_on_sqlite(api: &TestApi) -> crate::TestResult {
+async fn expression_indexes_should_be_ignored_on_sqlite(api: &TestApi) -> TestResult {
     api.barrel()
         .execute_with_schema(
             |migration| {
@@ -754,7 +754,7 @@ async fn expression_indexes_should_be_ignored_on_sqlite(api: &TestApi) -> crate:
 }
 
 #[test_connector(tags(Mysql))]
-async fn casing_should_not_lead_to_mix_ups(api: &TestApi) -> crate::TestResult {
+async fn casing_should_not_lead_to_mix_ups(api: &TestApi) -> TestResult {
     api.barrel()
         .execute_with_schema(
             |migration| {

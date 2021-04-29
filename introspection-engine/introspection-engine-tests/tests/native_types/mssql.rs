@@ -1,5 +1,5 @@
 use indoc::indoc;
-use introspection_engine_tests::test_api::*;
+use introspection_engine_tests::{test_api::*, TestResult};
 use test_macros::test_connector;
 
 const TYPES: &[(&str, &str)] = &[
@@ -37,7 +37,7 @@ const TYPES: &[(&str, &str)] = &[
 ];
 
 #[test_connector(tags(Mssql))]
-async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
+async fn native_type_columns_feature_on(api: &TestApi) -> TestResult {
     let columns: Vec<String> = TYPES
         .iter()
         .map(|(name, db_type)| format!("[{}] {} NOT NULL", name, db_type))

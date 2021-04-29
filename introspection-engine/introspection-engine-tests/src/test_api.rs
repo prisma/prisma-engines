@@ -1,3 +1,4 @@
+pub use super::TestResult;
 pub use test_setup::{BitFlags, Capabilities, Tags};
 
 use crate::BarrelMigrationExecutor;

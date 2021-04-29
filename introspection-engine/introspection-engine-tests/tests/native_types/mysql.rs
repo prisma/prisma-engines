@@ -45,7 +45,7 @@ const TYPES: &[(&str, &str)] = &[
 ];
 
 #[test_connector(tags(Mariadb, Mysql8))]
-async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
+async fn native_type_columns_feature_on(api: &TestApi) -> TestResult {
     let columns: Vec<String> = TYPES
         .iter()
         .map(|(name, db_type)| format!("`{}` {} Not Null", name, db_type))
