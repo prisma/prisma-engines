@@ -313,7 +313,7 @@ async fn remapping_field_names_to_empty(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"))]
+#[test_connector(tags("postgres"))]
 async fn dbgenerated_in_unsupported(api: &TestApi) -> TestResult {
     api.barrel()
         .execute_with_schema(
