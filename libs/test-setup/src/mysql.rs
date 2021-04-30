@@ -58,14 +58,6 @@ pub(crate) fn get_mysql_tags(database_url: &str) -> Result<BitFlags<Tags>, Strin
 
                 if version.contains("vitess") {
                     tags |= Tags::Vitess;
-
-                    if tags.contains(Tags::Mysql57) {
-                        tags |= Tags::Vitess57
-                    }
-
-                    if tags.contains(Tags::Mysql8) {
-                        tags |= Tags::Vitess80
-                    }
                 }
 
                 eprintln!("Inferred tags: {:?}", tags);

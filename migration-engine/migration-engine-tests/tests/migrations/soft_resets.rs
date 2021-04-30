@@ -1,30 +1,27 @@
 use connection_string::JdbcString;
-use migration_engine_tests::{multi_engine_test_api::*, TestResult};
+use migration_engine_tests::multi_engine_test_api::*;
 use quaint::{prelude::Queryable, single::Quaint};
 use test_macros::test_connector;
 
 #[test_connector(tags(Postgres))]
-async fn soft_resets_work_on_postgres(api: &TestApi) -> TestResult {
-    let migrations_directory = api.create_migrations_directory()?;
-    let mut url: url::Url = api.connection_string().parse()?;
+fn soft_resets_work_on_postgres(api: TestApi) {
+    let migrations_directory = api.create_migrations_directory();
+    let mut url: url::Url = api.connection_string().parse().unwrap();
 
     let dm = r#"
-        model Cat {
-            id Int @id
-            litterConsumption Int
-            hungry Boolean @default(true)
-        }
+    model Cat {
+        id Int @id
+        litterConsumption Int
+        hungry Boolean @default(true)
+    }
     "#;
 
     // Create the database, a first migration and the test user.
     {
-        let admin_connection = api.admin_conn();
-
         api.new_engine()
-            .await?
             .create_migration("01init", dm, &migrations_directory)
-            .send()
-            .await?;
+            .send_sync()
+            .unwrap();
 
         let create_user = r#"
             DROP USER IF EXISTS softresetstestuser;
@@ -32,7 +29,7 @@ async fn soft_resets_work_on_postgres(api: &TestApi) -> TestResult {
             GRANT USAGE, CREATE ON SCHEMA "prisma-tests" TO softresetstestuser;
         "#;
 
-        admin_connection.raw_cmd(&create_user).await?;
+        api.raw_cmd(&create_user);
     }
 
     let test_user_connection_string = {
@@ -43,11 +40,10 @@ async fn soft_resets_work_on_postgres(api: &TestApi) -> TestResult {
 
     // Check that the test user can't drop databases.
     {
-        let test_user_connection = Quaint::new(&test_user_connection_string).await?;
+        let test_user_connection = api.block_on(Quaint::new(&test_user_connection_string)).unwrap();
 
-        let err = test_user_connection
-            .raw_cmd(&format!(r#"DROP DATABASE {}"#, api.test_fn_name()))
-            .await
+        let err = api
+            .block_on(test_user_connection.raw_cmd(&format!(r#"DROP DATABASE {}"#, api.test_fn_name())))
             .unwrap_err();
 
         assert_eq!(err.original_code().unwrap(), "42501"); // insufficient_privilege (https://www.postgresql.org/docs/current/errcodes-appendix.html)
@@ -55,58 +51,60 @@ async fn soft_resets_work_on_postgres(api: &TestApi) -> TestResult {
 
     // Check that the soft reset works with migrations, then with schema push.
     {
-        let engine = api
-            .new_engine_with_connection_strings(&test_user_connection_string, None)
-            .await?;
+        let engine = api.new_engine_with_connection_strings(&test_user_connection_string, None);
 
         engine
             .apply_migrations(&migrations_directory)
-            .send()
-            .await?
-            .assert_applied_migrations(&["01init"])?;
+            .send_sync()
+            .unwrap()
+            .assert_applied_migrations(&["01init"])
+            .unwrap();
 
         let add_view = format!(
             r#"CREATE VIEW "{0}"."catcat" AS SELECT * FROM "{0}"."Cat" LIMIT 2"#,
             engine.schema_name(),
         );
 
-        engine.raw_cmd(&add_view).await?;
+        engine.raw_cmd(&add_view).unwrap();
 
         engine
             .assert_schema()
-            .await?
-            .assert_tables_count(2)?
-            .assert_has_table("_prisma_migrations")?
-            .assert_has_table("Cat")?;
+            .assert_tables_count(2)
+            .unwrap()
+            .assert_has_table("_prisma_migrations")
+            .unwrap()
+            .assert_has_table("Cat")
+            .unwrap();
 
-        engine.reset().send().await?;
-        engine.assert_schema().await?.assert_tables_count(0)?;
+        engine.reset().send_sync().unwrap();
+        engine.assert_schema().assert_tables_count(0).unwrap();
 
         engine
             .schema_push(dm)
-            .send()
-            .await?
-            .assert_has_executed_steps()?
-            .assert_green()?;
+            .send_sync()
+            .unwrap()
+            .assert_has_executed_steps()
+            .unwrap()
+            .assert_green()
+            .unwrap();
 
         engine
             .assert_schema()
-            .await?
-            .assert_tables_count(1)?
-            .assert_has_table("Cat")?;
+            .assert_tables_count(1)
+            .unwrap()
+            .assert_has_table("Cat")
+            .unwrap();
 
-        engine.reset().send().await?;
-        engine.assert_schema().await?.assert_tables_count(0)?;
+        engine.reset().send_sync().unwrap();
+        engine.assert_schema().assert_tables_count(0).unwrap();
     }
-
-    Ok(())
 }
 
 #[test_connector(tags(Mssql))]
-async fn soft_resets_work_on_sql_server(api: &TestApi) -> TestResult {
-    let migrations_directory = api.create_migrations_directory()?;
+fn soft_resets_work_on_sql_server(api: TestApi) {
+    let migrations_directory = api.create_migrations_directory();
 
-    let mut url: JdbcString = format!("jdbc:{}", api.connection_string()).parse()?;
+    let mut url: JdbcString = format!("jdbc:{}", api.connection_string()).parse().unwrap();
 
     let dm = r#"
         model Cat {
@@ -118,13 +116,10 @@ async fn soft_resets_work_on_sql_server(api: &TestApi) -> TestResult {
 
     // Create the database, a first migration and the test user.
     {
-        let admin_connection = api.admin_conn();
-
         api.new_engine()
-            .await?
             .create_migration("01init", dm, &migrations_directory)
-            .send()
-            .await?;
+            .send_sync()
+            .unwrap();
 
         let create_database = r#"
             IF(DB_ID(N'resetTest') IS NOT NULL)
@@ -150,8 +145,8 @@ async fn soft_resets_work_on_sql_server(api: &TestApi) -> TestResult {
             REVOKE ALTER TO softresetstestuser;
         "#;
 
-        admin_connection.raw_cmd(create_database).await?;
-        admin_connection.raw_cmd(create_user).await?;
+        api.raw_cmd(create_database);
+        api.raw_cmd(create_user);
     }
 
     let test_user_connection_string = {
@@ -166,11 +161,10 @@ async fn soft_resets_work_on_sql_server(api: &TestApi) -> TestResult {
 
     // Check that the test user can't drop databases.
     {
-        let test_user_connection = Quaint::new(&test_user_connection_string).await?;
+        let test_user_connection = api.block_on(Quaint::new(&test_user_connection_string)).unwrap();
 
-        let err = test_user_connection
-            .raw_cmd(&format!(r#"DROP DATABASE {}"#, api.test_fn_name()))
-            .await
+        let err = api
+            .block_on(test_user_connection.raw_cmd(&format!(r#"DROP DATABASE {}"#, api.test_fn_name())))
             .unwrap_err();
 
         // insufficent privilege
@@ -180,75 +174,77 @@ async fn soft_resets_work_on_sql_server(api: &TestApi) -> TestResult {
 
     // Check that the soft reset works with migrations, then with schema push.
     {
-        let engine = api
-            .new_engine_with_connection_strings(&test_user_connection_string, None)
-            .await?;
+        let engine = api.new_engine_with_connection_strings(&test_user_connection_string, None);
 
         let create_schema = format!("CREATE SCHEMA [{}];", engine.schema_name());
-        engine.raw_cmd(&create_schema).await?;
+        engine.raw_cmd(&create_schema).unwrap();
 
         engine
             .apply_migrations(&migrations_directory)
-            .send()
-            .await?
-            .assert_applied_migrations(&["01init"])?;
+            .send_sync()
+            .unwrap()
+            .assert_applied_migrations(&["01init"])
+            .unwrap();
 
         let add_view = format!(
             r#"CREATE VIEW [{0}].[catcat] AS SELECT * FROM [{0}].[Cat]"#,
             engine.schema_name(),
         );
 
-        engine.raw_cmd(&add_view).await?;
+        engine.raw_cmd(&add_view).unwrap();
 
         let add_type = format!(r#"CREATE TYPE [{0}].[Litter] FROM int"#, engine.schema_name(),);
 
-        engine.raw_cmd(&add_type).await?;
+        engine.raw_cmd(&add_type).unwrap();
 
         let add_table_with_type = format!(
             r#"CREATE TABLE [{0}].specialLitter (id int primary key, litterAmount [{0}].Litter)"#,
             engine.schema_name()
         );
 
-        engine.raw_cmd(&add_table_with_type).await?;
+        engine.raw_cmd(&add_table_with_type).unwrap();
 
         engine
             .assert_schema()
-            .await?
-            .assert_tables_count(3)?
-            .assert_has_table("_prisma_migrations")?
-            .assert_has_table("specialLitter")?
-            .assert_has_table("Cat")?;
+            .assert_tables_count(3)
+            .unwrap()
+            .assert_has_table("_prisma_migrations")
+            .unwrap()
+            .assert_has_table("specialLitter")
+            .unwrap()
+            .assert_has_table("Cat")
+            .unwrap();
 
-        engine.reset().send().await?;
-        engine.assert_schema().await?.assert_tables_count(0)?;
+        engine.reset().send_sync().unwrap();
+        engine.assert_schema().assert_tables_count(0).unwrap();
 
         engine
             .schema_push(dm)
-            .send()
-            .await?
-            .assert_has_executed_steps()?
-            .assert_green()?;
+            .send_sync()
+            .unwrap()
+            .assert_has_executed_steps()
+            .unwrap()
+            .assert_green()
+            .unwrap();
 
         engine
             .assert_schema()
-            .await?
-            .assert_tables_count(1)?
-            .assert_has_table("Cat")?;
+            .assert_tables_count(1)
+            .unwrap()
+            .assert_has_table("Cat")
+            .unwrap();
 
-        engine.reset().send().await?;
-        engine.assert_schema().await?.assert_tables_count(0)?;
+        engine.reset().send_sync().unwrap();
+        engine.assert_schema().assert_tables_count(0).unwrap();
     }
-
-    Ok(())
 }
 
 // MySQL 5.6 doesn't have `DROP USER IF EXISTS`...
 // Neither does Vitess
 #[test_connector(tags(Mysql), exclude(Mysql56, Vitess))]
-async fn soft_resets_work_on_mysql(api: &TestApi) -> TestResult {
-    let migrations_directory = api.create_migrations_directory()?;
-    let mut url: url::Url = api.connection_string().parse()?;
-    let admin_connection = api.admin_conn();
+fn soft_resets_work_on_mysql(api: TestApi) {
+    let migrations_directory = api.create_migrations_directory();
+    let mut url: url::Url = api.connection_string().parse().unwrap();
 
     let dm = r#"
         model Cat {
@@ -259,25 +255,28 @@ async fn soft_resets_work_on_mysql(api: &TestApi) -> TestResult {
     "#;
 
     {
-        let engine = api.new_engine().await?;
+        let engine = api.new_engine();
 
         engine
             .create_migration("01init", dm, &migrations_directory)
-            .send()
-            .await?;
+            .send_sync()
+            .unwrap();
 
         engine
             .apply_migrations(&migrations_directory)
-            .send()
-            .await?
-            .assert_applied_migrations(&["01init"])?;
+            .send_sync()
+            .unwrap()
+            .assert_applied_migrations(&["01init"])
+            .unwrap();
 
         engine
             .assert_schema()
-            .await?
-            .assert_tables_count(2)?
-            .assert_has_table("_prisma_migrations")?
-            .assert_has_table("Cat")?;
+            .assert_tables_count(2)
+            .unwrap()
+            .assert_has_table("_prisma_migrations")
+            .unwrap()
+            .assert_has_table("Cat")
+            .unwrap();
     }
 
     {
@@ -293,7 +292,7 @@ async fn soft_resets_work_on_mysql(api: &TestApi) -> TestResult {
             api.test_fn_name()
         );
 
-        admin_connection.raw_cmd(&create_user).await?;
+        api.raw_cmd(&create_user);
     }
 
     let test_user_connection_string = {
@@ -304,11 +303,10 @@ async fn soft_resets_work_on_mysql(api: &TestApi) -> TestResult {
 
     // Check that the test user can't drop databases.
     {
-        let test_user_connection = Quaint::new(&test_user_connection_string).await?;
+        let test_user_connection = api.block_on(Quaint::new(&test_user_connection_string)).unwrap();
 
-        let err = test_user_connection
-            .raw_cmd(&format!(r#"DROP DATABASE `{}`"#, api.test_fn_name()))
-            .await
+        let err = api
+            .block_on(test_user_connection.raw_cmd(&format!(r#"DROP DATABASE `{}`"#, api.test_fn_name())))
             .unwrap_err();
 
         // insufficient_privilege
@@ -318,29 +316,28 @@ async fn soft_resets_work_on_mysql(api: &TestApi) -> TestResult {
 
     // Check that the soft reset works with migrations, then with schema push.
     {
-        let engine = api
-            .new_engine_with_connection_strings(&test_user_connection_string, None)
-            .await?;
+        let engine = api.new_engine_with_connection_strings(&test_user_connection_string, None);
 
-        engine.reset().send().await?;
-        engine.assert_schema().await?.assert_tables_count(0)?;
+        engine.reset().send_sync().unwrap();
+        engine.assert_schema().assert_tables_count(0).unwrap();
 
         engine
             .schema_push(dm)
-            .send()
-            .await?
-            .assert_has_executed_steps()?
-            .assert_green()?;
+            .send_sync()
+            .unwrap()
+            .assert_has_executed_steps()
+            .unwrap()
+            .assert_green()
+            .unwrap();
 
         engine
             .assert_schema()
-            .await?
-            .assert_tables_count(1)?
-            .assert_has_table("Cat")?;
+            .assert_tables_count(1)
+            .unwrap()
+            .assert_has_table("Cat")
+            .unwrap();
 
-        engine.reset().send().await?;
-        engine.assert_schema().await?.assert_tables_count(0)?;
+        engine.reset().send_sync().unwrap();
+        engine.assert_schema().assert_tables_count(0).unwrap();
     }
-
-    Ok(())
 }
