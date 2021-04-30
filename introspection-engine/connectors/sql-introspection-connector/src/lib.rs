@@ -46,7 +46,7 @@ impl SqlIntrospectionConnector {
             .map_err(|error| {
                 ConnectionInfo::from_url(url)
                     .map(|connection_info| error.into_connector_error(&connection_info))
-                    .unwrap_or_else(|err| ConnectorError::url_parse_error(err, url))
+                    .unwrap_or_else(ConnectorError::url_parse_error)
             })?;
 
         tracing::debug!("SqlIntrospectionConnector initialized.");

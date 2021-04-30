@@ -1,7 +1,7 @@
 use super::*;
 use crate::{
     error::MongoError,
-    queries::{aggregate, read, write},
+    root_queries::{aggregate, read, write},
 };
 use connector_interface::{ReadOperations, RelAggregationSelection, Transaction, WriteOperations};
 use futures::Future;
@@ -33,7 +33,7 @@ impl MongoDbTransaction {
 #[async_trait]
 impl Transaction for MongoDbTransaction {
     async fn commit(&self) -> connector_interface::Result<()> {
-        // Totally commited.
+        // Totally committed.
         Ok(())
     }
 

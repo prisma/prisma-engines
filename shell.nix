@@ -13,6 +13,7 @@ mkShell {
     sbt
     sbt-extras
     jdk8
+    gcc
     openssl
     pkg-config
     clangStdenv

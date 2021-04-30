@@ -3,6 +3,7 @@ mod mysql;
 mod postgres;
 mod sql_server;
 mod sqlite;
+mod vitess;
 
 use datamodel_connector::ConnectorCapability;
 use enum_dispatch::enum_dispatch;
@@ -12,6 +13,7 @@ use postgres::*;
 use sql_server::*;
 use sqlite::*;
 use std::convert::TryFrom;
+use vitess::*;
 
 use crate::{datamodel_rendering::DatamodelRenderer, TestConfig, TestError};
 
@@ -50,6 +52,7 @@ pub enum ConnectorTag {
     MySql(MySqlConnectorTag),
     MongoDb(MongoDbConnectorTag),
     Sqlite(SqliteConnectorTag),
+    Vitess(VitessConnectorTag),
 }
 
 impl ConnectorTag {
@@ -114,6 +117,7 @@ impl TryFrom<(&str, Option<&str>)> for ConnectorTag {
             "postgres" => Self::Postgres(PostgresConnectorTag::new(version)?),
             "mysql" => Self::MySql(MySqlConnectorTag::new(version)?),
             "mongodb" => Self::MongoDb(MongoDbConnectorTag::new(version)?),
+            "vitess" => Self::Vitess(VitessConnectorTag::new(version)?),
             _ => return Err(TestError::parse_error(format!("Unknown connector tag `{}`", connector))),
         };
 

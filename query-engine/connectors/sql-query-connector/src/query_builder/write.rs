@@ -101,9 +101,13 @@ pub fn update_many(model: &ModelRef, ids: &[&RecordProjection], args: WriteArgs)
                 WriteExpression::Value(rhs) => field.value(rhs).into(),
                 WriteExpression::Add(rhs) if field.is_list => {
                     let e: Expression = Column::from(name.clone()).into();
+                    let vals: Vec<_> = match rhs {
+                        PrismaValue::List(vals) => vals.into_iter().map(|val| field.value(val)).collect(),
+                        _ => vec![field.value(rhs)],
+                    };
 
                     // Postgres only
-                    e.compare_raw("||", Value::array(vec![field.value(rhs)])).into()
+                    e.compare_raw("||", Value::array(vals)).into()
                 }
                 WriteExpression::Add(rhs) => {
                     let e: Expression<'_> = Column::from(name.clone()).into();
@@ -151,6 +155,7 @@ pub fn create_relation_table_records(
     child_ids: &[RecordProjection],
 ) -> Query<'static> {
     let relation = field.relation();
+
     let parent_columns: Vec<_> = field.related_field().m2m_columns();
     let child_columns: Vec<_> = field.m2m_columns();
 

@@ -116,33 +116,7 @@ fn optional_relation_field_must_succeed_when_all_underlying_fields_are_optional(
 }
 
 #[test]
-fn optional_relation_field_must_error_when_one_underlying_field_is_required() {
-    let dml = r#"
-    model User {
-        id        Int     @id
-        firstName String
-        lastName  String?
-        posts     Post[]
-
-        @@unique([firstName, lastName])
-    }
-
-    model Post {
-        id            Int     @id
-        text          String
-        userFirstName String
-        userLastName  String?
-
-        user          User?   @relation(fields: [userFirstName, userLastName], references: [firstName, lastName])
-    }
-    "#;
-
-    let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_validation_error("The relation field `user` uses the scalar fields userFirstName, userLastName. At least one of those fields is required. Hence the relation field must be required as well.", Span::new(320, 426)));
-}
-
-#[test]
-fn required_relation_field_must_succeed_when_at_least_one_underlying_fields_is_required() {
+fn required_relation_field_must_error_when_one_underlying_field_is_optional() {
     let dml = r#"
     model User {
         id        Int     @id
@@ -160,6 +134,32 @@ fn required_relation_field_must_succeed_when_at_least_one_underlying_fields_is_r
         userLastName  String?
 
         user          User    @relation(fields: [userFirstName, userLastName], references: [firstName, lastName])
+    }
+    "#;
+
+    let errors = parse_error(dml);
+    errors.assert_is(DatamodelError::new_validation_error("The relation field `user` uses the scalar fields userFirstName, userLastName. At least one of those fields is optional. Hence the relation field must be optional as well.", Span::new(320, 426)));
+}
+
+#[test]
+fn optional_relation_field_must_succeed_when_at_least_one_underlying_fields_is_optional() {
+    let dml = r#"
+    model User {
+        id        Int     @id
+        firstName String
+        lastName  String?
+        posts     Post[]
+
+        @@unique([firstName, lastName])
+    }
+
+    model Post {
+        id            Int     @id
+        text          String
+        userFirstName String
+        userLastName  String?
+
+        user          User?    @relation(fields: [userFirstName, userLastName], references: [firstName, lastName])
     }
     "#;
 
@@ -190,7 +190,7 @@ fn required_relation_field_must_error_when_all_underlying_fields_are_optional() 
     "#;
 
     let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_validation_error("The relation field `user` uses the scalar fields userFirstName, userLastName. All those fields are optional. Hence the relation field must be optional as well.", Span::new(322, 428)));
+    errors.assert_is(DatamodelError::new_validation_error("The relation field `user` uses the scalar fields userFirstName, userLastName. At least one of those fields is optional. Hence the relation field must be optional as well.", Span::new(322, 428)));
 }
 
 #[test]

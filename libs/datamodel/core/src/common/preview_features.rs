@@ -1,46 +1,155 @@
-// datasource preview features
+use lazy_static::lazy_static;
+use paste::paste;
+use serde::{Serialize, Serializer};
+use PreviewFeature::*;
 
-// generator preview features
-const CONNECT_OR_CREATE: &str = "connectOrCreate";
-const TRANSACTION_API: &str = "transactionApi";
-const NATIVE_TYPES: &str = "nativeTypes";
-const SQL_SERVER: &str = "microsoftSqlServer";
-// const MONGODB: &str = "mongoDb"; Hide MongoDB feature in tooling for now, it's not broadly available yet.
-const GROUP_BY: &str = "groupBy";
-const CREATE_MANY: &str = "createMany";
-const ORDER_BY_RELATION: &str = "orderByRelation";
-const NAPI: &str = "napi";
-const SELECT_RELATION_COUNT: &str = "selectRelationCount";
-const ORDER_BY_AGGREGATE_GROUP: &str = "orderByAggregateGroup";
+macro_rules! features {
+    ($( $variant:ident ),*) => {
+        #[derive(Debug, Copy, Clone, PartialEq)]
+        pub enum PreviewFeature {
+            $(
+                $variant,
+            )*
+        }
 
-// deprecated preview features
-const ATOMIC_NUMBER_OPERATIONS: &str = "atomicNumberOperations";
-const AGGREGATE_API: &str = "aggregateApi";
-const MIDDLEWARES: &str = "middlewares";
-const DISTINCT: &str = "distinct";
-const UNCHECKED_SCALAR_INPUTS: &str = "uncheckedScalarInputs";
+        impl PreviewFeature {
+            pub fn parse_opt(s: &str) -> Option<Self> {
+                paste! {
+                    let parsed = match s.to_lowercase().as_str() {
+                        $(
+                            stringify!([<$variant:lower>]) => Self::$variant,
+                        )*
+                        _ => return None,
+                    };
+                }
 
-pub const DATASOURCE_PREVIEW_FEATURES: &[&str] = &[];
+                Some(parsed)
+            }
+        }
 
-pub const GENERATOR_PREVIEW_FEATURES: &[&str] = &[
-    SQL_SERVER,
-    ORDER_BY_RELATION,
-    NAPI,
-    SELECT_RELATION_COUNT,
-    ORDER_BY_AGGREGATE_GROUP,
-];
+        impl ToString for PreviewFeature {
+            fn to_string(&self) -> String {
+                match self {
+                    $(
+                        Self::$variant => decapitalize(stringify!($variant)),
+                    )*
+                }
+            }
+        }
+    };
+}
 
-pub const DEPRECATED_GENERATOR_PREVIEW_FEATURES: &[&str] = &[
-    ATOMIC_NUMBER_OPERATIONS,
-    AGGREGATE_API,
-    MIDDLEWARES,
-    NATIVE_TYPES,
-    DISTINCT,
-    CONNECT_OR_CREATE,
-    TRANSACTION_API,
-    UNCHECKED_SCALAR_INPUTS,
-    GROUP_BY,
-    CREATE_MANY,
-];
+// (Usually) Append-only list of features.
+features!(
+    ConnectOrCreate,
+    TransactionApi,
+    NativeTypes,
+    GroupBy,
+    CreateMany,
+    AtomicNumberOperations,
+    AggregateApi,
+    Middlewares,
+    Distinct,
+    UncheckedScalarInputs,
+    MicrosoftSqlServer,
+    MongoDb,
+    OrderByRelation,
+    NApi,
+    SelectRelationCount,
+    OrderByAggregateGroup
+);
 
-pub const DEPRECATED_DATASOURCE_PREVIEW_FEATURES: &[&str] = &[];
+// Mapping of which active, deprecated and hidden
+// features are valid in which place in the datamodel.
+lazy_static! {
+    /// Generator preview features
+    pub static ref GENERATOR: FeatureMap = {
+        FeatureMap::default().with_active(vec![
+            MicrosoftSqlServer,
+            OrderByRelation,
+            NApi,
+            SelectRelationCount,
+            OrderByAggregateGroup
+        ]).with_hidden(vec![
+            MongoDb
+        ]).with_deprecated(vec![
+            AtomicNumberOperations,
+            AggregateApi,
+            Middlewares,
+            NativeTypes,
+            Distinct,
+            ConnectOrCreate,
+            TransactionApi,
+            UncheckedScalarInputs,
+            GroupBy,
+            CreateMany
+        ])
+    };
+
+    /// Datasource preview features.
+    pub static ref DATASOURCE: FeatureMap = {
+        FeatureMap::default()
+    };
+}
+
+#[derive(Debug, Default)]
+pub struct FeatureMap {
+    /// Valid, visible features.
+    active: Vec<PreviewFeature>,
+
+    /// Deprecated features.
+    deprecated: Vec<PreviewFeature>,
+
+    /// Hidden preview features are valid features, but are not propagated into the tooling
+    /// (as autocomplete or similar) or into error messages (eg. showing a list of valid features).
+    hidden: Vec<PreviewFeature>,
+}
+
+impl FeatureMap {
+    pub fn active_features(&self) -> &[PreviewFeature] {
+        &self.active
+    }
+
+    pub fn hidden_features(&self) -> &[PreviewFeature] {
+        &self.hidden
+    }
+
+    fn with_active(mut self, active: Vec<PreviewFeature>) -> Self {
+        self.active = active;
+        self
+    }
+
+    fn with_hidden(mut self, hidden: Vec<PreviewFeature>) -> Self {
+        self.hidden = hidden;
+        self
+    }
+
+    fn with_deprecated(mut self, deprecated: Vec<PreviewFeature>) -> Self {
+        self.deprecated = deprecated;
+        self
+    }
+
+    pub fn is_valid(&self, flag: &PreviewFeature) -> bool {
+        self.active.contains(flag) || self.hidden.contains(flag)
+    }
+
+    pub fn is_deprecated(&self, flag: &PreviewFeature) -> bool {
+        self.deprecated.contains(flag)
+    }
+}
+
+impl Serialize for PreviewFeature {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serializer.serialize_str(&self.to_string())
+    }
+}
+
+/// Lowercases first character.
+/// Assumes 1-byte characters!
+pub fn decapitalize(s: &str) -> String {
+    let first_char = s.chars().next().unwrap();
+    format!("{}{}", first_char.to_lowercase(), s[1..].to_owned())
+}

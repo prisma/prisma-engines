@@ -29,7 +29,9 @@ class NonEmbeddedUpdatedAtShouldChangeSpec extends FlatSpec with Matchers with A
       |"""
   }
 
-  database.setup(project)
+  override def beforeEach(): Unit = {
+    database.setup(project)
+  }
 
   "Updating a nested data item" should "change it's updatedAt value" in {
     val updatedAt = server

@@ -254,21 +254,23 @@ fn load_sources(
 
 /// Renders to a return string.
 pub fn render_datamodel_to_string(datamodel: &dml::Datamodel) -> String {
-    let mut writable_string = common::WritableString::new();
+    let mut writable_string = String::with_capacity(datamodel.models.len() * 20);
     render_datamodel_to(&mut writable_string, datamodel, None);
-    writable_string.into()
+    writable_string
 }
 
 /// Renders an AST to a string.
 pub fn render_schema_ast_to_string(schema: &SchemaAst) -> String {
-    let mut writable_string = common::WritableString::new();
+    let mut writable_string = String::with_capacity(schema.models().len() * 20);
+
     render_schema_ast_to(&mut writable_string, &schema, 2);
-    writable_string.into()
+
+    writable_string
 }
 
 /// Renders as a string into the stream.
 pub fn render_datamodel_to(
-    stream: &mut dyn std::io::Write,
+    stream: &mut dyn std::fmt::Write,
     datamodel: &dml::Datamodel,
     datasource: Option<&Datasource>,
 ) {
@@ -281,14 +283,16 @@ pub fn render_datamodel_and_config_to_string(
     datamodel: &dml::Datamodel,
     config: &configuration::Configuration,
 ) -> String {
-    let mut writable_string = common::WritableString::new();
+    let mut writable_string = String::with_capacity(datamodel.models.len() * 20);
+
     render_datamodel_and_config_to(&mut writable_string, datamodel, config);
-    writable_string.into()
+
+    writable_string
 }
 
 /// Renders a datamodel, generators and sources to a stream as a string.
 fn render_datamodel_and_config_to(
-    stream: &mut dyn std::io::Write,
+    stream: &mut dyn std::fmt::Write,
     datamodel: &dml::Datamodel,
     config: &configuration::Configuration,
 ) {
@@ -301,7 +305,7 @@ fn render_datamodel_and_config_to(
 }
 
 /// Renders as a string into the stream.
-fn render_schema_ast_to(stream: &mut dyn std::io::Write, schema: &ast::SchemaAst, ident_width: usize) {
+fn render_schema_ast_to(stream: &mut dyn std::fmt::Write, schema: &ast::SchemaAst, ident_width: usize) {
     let mut renderer = ast::Renderer::new(stream, ident_width);
     renderer.render(schema);
 }

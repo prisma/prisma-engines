@@ -1,16 +1,16 @@
+pub use test_setup::{BitFlags, Capabilities, Tags};
+
 use crate::context::PrismaContext;
-use enumflags2::BitFlags;
 use migration_core::{api::GenericApi, commands::SchemaPushInput};
 use quaint::{
     ast::*,
     connector::ConnectionInfo,
-    single::Quaint,
     visitor::{self, Visitor},
 };
 use request_handlers::{GraphQlBody, GraphQlHandler, PrismaResponse, SingleQuery};
 use sql_migration_connector::SqlMigrationConnector;
 use std::sync::Arc;
-use test_setup::{connectors::Tags, create_mysql_database, create_postgres_database, sqlite_test_url, TestApiArgs};
+use test_setup::{create_mysql_database, create_postgres_database, sqlite_test_url, TestApiArgs};
 
 pub struct QueryEngine {
     context: Arc<PrismaContext>,
@@ -37,30 +37,27 @@ pub struct TestApi {
 
 impl TestApi {
     pub async fn new(args: TestApiArgs) -> Self {
-        let tags = args.connector_tags;
-        let connection_string = (args.url_fn)(args.test_function_name);
+        let tags = args.tags();
 
-        let migration_api = if tags.contains(Tags::Mysql) {
-            mysql_migration_connector(&connection_string).await
+        let (migration_api, url) = if tags.contains(Tags::Mysql) {
+            mysql_migration_connector(args.test_function_name()).await
         } else if tags.contains(Tags::Postgres) {
-            postgres_migration_connector(&connection_string).await
+            postgres_migration_connector(args.test_function_name()).await
         } else if tags.contains(Tags::Sqlite) {
-            sqlite_migration_connector(args.test_function_name).await
+            sqlite_migration_connector(args.test_function_name()).await
         } else if tags.contains(Tags::Mssql) {
-            mssql_migration_connector(&connection_string, &args).await
+            mssql_migration_connector(args.test_function_name(), &args).await
         } else {
             unreachable!()
         };
 
         TestApi {
             migration_api,
-            config: args.datasource_block(&connection_string),
+            config: args.datasource_block(&url),
         }
     }
 
     pub async fn create_engine(&self, datamodel: &str) -> anyhow::Result<QueryEngine> {
-        feature_flags::initialize(&[String::from("all")]).unwrap();
-
         let datamodel_string = format!("{}\n\n{}", self.config, datamodel);
         let dml = datamodel::parse_datamodel(&datamodel_string).unwrap().subject;
         let config = datamodel::parse_configuration(&datamodel_string).unwrap();
@@ -105,32 +102,24 @@ impl TestApi {
     }
 }
 
-pub(super) async fn mysql_migration_connector(url_str: &str) -> SqlMigrationConnector {
-    create_mysql_database(&url_str.parse().unwrap()).await.unwrap();
-    SqlMigrationConnector::new(url_str, BitFlags::all(), None)
-        .await
-        .unwrap()
+pub(super) async fn mysql_migration_connector(db_name: &str) -> (SqlMigrationConnector, String) {
+    let (_, url) = create_mysql_database(db_name).await.unwrap();
+    (SqlMigrationConnector::new(&url, None).await.unwrap(), url)
 }
 
-pub(super) async fn mssql_migration_connector(url_str: &str, args: &TestApiArgs) -> SqlMigrationConnector {
-    let conn = Quaint::new(url_str).await.unwrap();
-    test_setup::connectors::mssql::reset_schema(&conn, args.test_function_name)
+pub(super) async fn mssql_migration_connector(db_name: &str, args: &TestApiArgs) -> (SqlMigrationConnector, String) {
+    let (_, url) = test_setup::init_mssql_database(args.database_url(), db_name)
         .await
         .unwrap();
-    SqlMigrationConnector::new(url_str, BitFlags::all(), None)
-        .await
-        .unwrap()
+    (SqlMigrationConnector::new(&url, None).await.unwrap(), url)
 }
 
-pub(super) async fn postgres_migration_connector(url_str: &str) -> SqlMigrationConnector {
-    create_postgres_database(&url_str.parse().unwrap()).await.unwrap();
-    SqlMigrationConnector::new(url_str, BitFlags::all(), None)
-        .await
-        .unwrap()
+pub(super) async fn postgres_migration_connector(db_name: &str) -> (SqlMigrationConnector, String) {
+    let (_, url) = create_postgres_database(db_name).await.unwrap();
+    (SqlMigrationConnector::new(&url, None).await.unwrap(), url)
 }
 
-pub(super) async fn sqlite_migration_connector(db_name: &str) -> SqlMigrationConnector {
-    SqlMigrationConnector::new(&sqlite_test_url(db_name), BitFlags::all(), None)
-        .await
-        .unwrap()
+pub(super) async fn sqlite_migration_connector(db_name: &str) -> (SqlMigrationConnector, String) {
+    let url = sqlite_test_url(db_name);
+    (SqlMigrationConnector::new(&url, None).await.unwrap(), url)
 }

@@ -2,10 +2,10 @@ use indoc::indoc;
 use migration_engine_tests::sql::*;
 use std::fmt::Write as _;
 
-/// We need to test this specifically for mysql, because foreign keys are indexes, and they are
-/// inferred as both foreign key and index by the sql-schema-describer. We do not want to
-/// create/delete a second index.
-#[test_each_connector(tags("mysql"))]
+// We need to test this specifically for mysql, because foreign keys are indexes, and they are
+// inferred as both foreign key and index by the sql-schema-describer. We do not want to
+// create/delete a second index.
+#[test_connector(tags(Mysql))]
 async fn indexes_on_foreign_key_fields_are_not_created_twice(api: &TestApi) -> TestResult {
     let schema = r#"
         model Human {
@@ -49,7 +49,7 @@ async fn indexes_on_foreign_key_fields_are_not_created_twice(api: &TestApi) -> T
 }
 
 // We have to test this because one enum on MySQL can map to multiple enums in the database.
-#[test_each_connector(tags("mysql"))]
+#[test_connector(tags(Mysql))]
 async fn enum_creation_is_idempotent(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Cat {
@@ -75,7 +75,7 @@ async fn enum_creation_is_idempotent(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("mysql"))]
+#[test_connector(tags(Mysql))]
 async fn enums_work_when_table_name_is_remapped(api: &TestApi) -> TestResult {
     let schema = r#"
     model User {
@@ -97,7 +97,7 @@ async fn enums_work_when_table_name_is_remapped(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("mysql"))]
+#[test_connector(tags(Mysql))]
 async fn arity_of_enum_columns_can_be_changed(api: &TestApi) -> TestResult {
     let dm1 = r#"
         enum Color {
@@ -146,7 +146,7 @@ async fn arity_of_enum_columns_can_be_changed(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("mysql"))]
+#[test_connector(tags(Mysql))]
 async fn arity_is_preserved_by_alter_enum(api: &TestApi) -> TestResult {
     let dm1 = r#"
         enum Color {
@@ -200,7 +200,7 @@ async fn arity_is_preserved_by_alter_enum(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("mysql"))]
+#[test_connector(tags(Mysql))]
 async fn native_type_columns_can_be_created(api: &TestApi) -> TestResult {
     let types = &[
         ("int", "Int", "Int", if api.is_mysql_8() { "int" } else { "int(11)" }),
@@ -292,7 +292,7 @@ async fn native_type_columns_can_be_created(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("mysql"))]
+#[test_connector(tags(Mysql))]
 async fn default_current_timestamp_precision_follows_column_precision(api: &TestApi) -> TestResult {
     let migrations_directory = api.create_migrations_directory()?;
 

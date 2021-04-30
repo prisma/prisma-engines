@@ -2,7 +2,7 @@ use migration_engine_tests::sql::*;
 use quaint::{prelude::Insert, prelude::Queryable, Value};
 use sql_schema_describer::DefaultValue;
 
-#[test_each_connector(tags("sqlite"))]
+#[test_connector(tags(Sqlite))]
 async fn changing_a_column_from_optional_to_required_with_a_default_is_safe(api: &TestApi) -> TestResult {
     let dm = r#"
         model Test {

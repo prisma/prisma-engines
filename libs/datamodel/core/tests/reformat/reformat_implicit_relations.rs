@@ -1002,3 +1002,93 @@ fn assert_reformat(schema: &str, expected_result: &str) {
     parse_datamodel(&result).unwrap();
     assert_eq!(result, expected_result);
 }
+
+#[test]
+fn must_add_required_relation_field_if_underlying_scalar_is_required() {
+    let input = indoc! {r#"
+    model Session {
+      id       Int @id
+      userId   Int
+    }
+    
+    model User {
+      id       Int       @id
+      sessions Session[]
+    }
+    
+    model Session2 {
+      id         Int @id
+      user2Id    Int
+      user2Id2   Int
+    }
+    
+    model User2 {
+      id       Int
+      id2      Int
+      sessions Session2[]
+    
+      @@id([id, id2])  
+    }
+    
+    model Session3 {
+      id         Int @id
+      user3Id    Int?
+      user3Id2   Int
+    }
+    
+    model User3 {
+      id       Int
+      id2      Int
+      sessions Session3[]
+    
+      @@id([id, id2])  
+    }
+    "#};
+
+    let expected = indoc! {r#"
+    model Session {
+      id     Int  @id
+      userId Int
+      User   User @relation(fields: [userId], references: [id])
+    }
+    
+    model User {
+      id       Int       @id
+      sessions Session[]
+    }
+    
+    model Session2 {
+      id       Int   @id
+      user2Id  Int
+      user2Id2 Int
+      User2    User2 @relation(fields: [user2Id, user2Id2], references: [id, id2])
+    }
+    
+    model User2 {
+      id       Int
+      id2      Int
+      sessions Session2[]
+    
+      @@id([id, id2])
+    }
+    
+    model Session3 {
+      id       Int    @id
+      user3Id  Int?
+      user3Id2 Int
+      User3    User3? @relation(fields: [user3Id, user3Id2], references: [id, id2])
+    }
+    
+    model User3 {
+      id       Int
+      id2      Int
+      sessions Session3[]
+    
+      @@id([id, id2])
+    }
+    "#};
+
+    let result = datamodel::ast::reformat::Reformatter::new(&input).reformat_to_string();
+
+    assert_eq!(result, expected);
+}

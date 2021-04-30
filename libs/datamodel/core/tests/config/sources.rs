@@ -1,5 +1,5 @@
 use crate::common::*;
-use datamodel::{ast::Span, diagnostics::DatamodelError, StringFromEnvVar};
+use datamodel::{ast::Span, common::preview_features::*, diagnostics::DatamodelError, StringFromEnvVar};
 use pretty_assertions::assert_eq;
 use serial_test::serial;
 
@@ -385,14 +385,12 @@ fn fail_to_load_sources_for_invalid_source() {
     "#;
     let res = datamodel::parse_configuration(invalid_datamodel);
 
-    if let Err(diagnostics) = res {
-        diagnostics.assert_is(DatamodelError::DatasourceProviderNotKnownError {
-            source_name: String::from("AStrangeHalfMongoDatabase"),
+    res.err()
+        .unwrap()
+        .assert_is(DatamodelError::DatasourceProviderNotKnownError {
+            provider: String::from("AStrangeHalfMongoDatabase"),
             span: datamodel::ast::Span::new(49, 76),
         });
-    } else {
-        panic!("Expected error.")
-    }
 }
 
 #[test]
@@ -446,7 +444,7 @@ fn microsoft_sql_server_preview_feature_must_work() {
     let config = parse_configuration(schema);
     let generator = config.generators.first().unwrap();
 
-    assert!(generator.preview_features.contains(&String::from("microsoftSqlServer")));
+    assert!(generator.preview_features.contains(&PreviewFeature::MicrosoftSqlServer));
 }
 
 fn assert_eq_json(a: &str, b: &str) {

@@ -33,8 +33,10 @@ pub fn calculate_datamodel(
     deduplicate_relation_field_names(&mut data_model);
 
     let mut warnings = vec![];
-    warnings.append(&mut enrich(previous_data_model, &mut data_model, family));
-    tracing::debug!("Enriching datamodel is done: {:?}", data_model);
+    if !previous_data_model.is_empty() {
+        warnings.append(&mut enrich(previous_data_model, &mut data_model, family));
+        tracing::debug!("Enriching datamodel is done: {:?}", data_model);
+    }
 
     // commenting out models, fields, enums, enum values
     warnings.append(&mut commenting_out_guardrails(&mut data_model, family));
@@ -143,7 +145,7 @@ mod tests {
             enums: vec![],
             sequences: vec![],
             views: vec![],
-            lower_case_identifiers: false,
+            user_defined_types: vec![],
         };
         let introspection_result =
             calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new()).expect("calculate data model");
@@ -259,7 +261,6 @@ mod tests {
         };
 
         let schema = SqlSchema {
-            lower_case_identifiers: false,
             procedures: vec![],
             tables: vec![
                 Table {
@@ -331,6 +332,7 @@ mod tests {
             enums: vec![],
             sequences: vec![],
             views: vec![],
+            user_defined_types: vec![],
         };
         let introspection_result =
             calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new()).expect("calculate data model");
@@ -377,7 +379,6 @@ mod tests {
         };
 
         let schema = SqlSchema {
-            lower_case_identifiers: false,
             views: vec![],
             procedures: vec![],
             tables: vec![Table {
@@ -406,6 +407,7 @@ mod tests {
             }],
             enums: vec![],
             sequences: vec![],
+            user_defined_types: vec![],
         };
         let introspection_result =
             calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new()).expect("calculate data model");
@@ -566,7 +568,6 @@ mod tests {
         };
 
         let schema = SqlSchema {
-            lower_case_identifiers: false,
             views: vec![],
             procedures: vec![],
             tables: vec![
@@ -660,6 +661,7 @@ mod tests {
             ],
             enums: vec![],
             sequences: vec![],
+            user_defined_types: vec![],
         };
         let introspection_result =
             calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new()).expect("calculate data model");
@@ -736,7 +738,6 @@ mod tests {
         };
 
         let schema = SqlSchema {
-            lower_case_identifiers: false,
             views: vec![],
             procedures: vec![],
             tables: vec![Table {
@@ -790,6 +791,7 @@ mod tests {
             }],
             enums: vec![],
             sequences: vec![],
+            user_defined_types: vec![],
         };
         let introspection_result =
             calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new()).expect("calculate data model");
@@ -920,7 +922,6 @@ mod tests {
         };
 
         let schema = SqlSchema {
-            lower_case_identifiers: false,
             views: vec![],
             procedures: vec![],
             tables: vec![
@@ -1002,6 +1003,7 @@ mod tests {
             ],
             enums: vec![],
             sequences: vec![],
+            user_defined_types: vec![],
         };
         let introspection_result =
             calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new()).expect("calculate data model");
@@ -1045,7 +1047,7 @@ mod tests {
                 values: enum_values,
             }],
             sequences: vec![],
-            lower_case_identifiers: false,
+            user_defined_types: vec![],
         };
         let introspection_result =
             calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new()).expect("calculate data model");

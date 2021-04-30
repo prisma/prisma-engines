@@ -12,7 +12,7 @@ enum CatMood {
 }
 "#;
 
-#[test_each_connector(capabilities("enums"))]
+#[test_connector(capabilities(Enums))]
 async fn an_enum_can_be_turned_into_a_model(api: &TestApi) -> TestResult {
     api.schema_push(BASIC_ENUM_DM).send().await?.assert_green()?;
 
@@ -55,7 +55,7 @@ async fn an_enum_can_be_turned_into_a_model(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(capabilities("enums"))]
+#[test_connector(capabilities(Enums))]
 async fn variants_can_be_added_to_an_existing_enum(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Cat {
@@ -104,7 +104,7 @@ async fn variants_can_be_added_to_an_existing_enum(api: &TestApi) -> TestResult 
     Ok(())
 }
 
-#[test_each_connector(capabilities("enums"))]
+#[test_connector(capabilities(Enums))]
 async fn variants_can_be_removed_from_an_existing_enum(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Cat {
@@ -163,7 +163,7 @@ async fn variants_can_be_removed_from_an_existing_enum(api: &TestApi) -> TestRes
     Ok(())
 }
 
-#[test_each_connector(capabilities("enums"))]
+#[test_connector(capabilities(Enums))]
 async fn models_with_enum_values_can_be_dropped(api: &TestApi) -> TestResult {
     api.schema_push(BASIC_ENUM_DM).send().await?.assert_green()?;
 
@@ -193,7 +193,7 @@ async fn models_with_enum_values_can_be_dropped(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(capabilities("enums"))]
+#[test_connector(capabilities(Enums))]
 async fn enum_field_to_string_field_works(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Cat {
@@ -235,7 +235,7 @@ async fn enum_field_to_string_field_works(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(capabilities("enums"))]
+#[test_connector(capabilities(Enums))]
 async fn string_field_to_enum_field_works(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Cat {
@@ -290,7 +290,7 @@ async fn string_field_to_enum_field_works(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(capabilities("enums"))]
+#[test_connector(capabilities(Enums))]
 async fn enums_used_in_default_can_be_changed(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Panther {
@@ -302,17 +302,17 @@ async fn enums_used_in_default_can_be_changed(api: &TestApi) -> TestResult {
             id Int @id
             mood CatMood @default(HAPPY)
         }
-        
+
          model Leopard {
             id Int @id
             mood CatMood @default(HAPPY)
         }
-        
+
         model Lion {
             id Int @id
             mood CatMood
         }
-        
+
         model GoodDog {
             id Int @id
             mood DogMood @default(HAPPY)
@@ -322,7 +322,7 @@ async fn enums_used_in_default_can_be_changed(api: &TestApi) -> TestResult {
             HAPPY
             HUNGRY
         }
-        
+
         enum DogMood {
             HAPPY
             HUNGRY
@@ -343,17 +343,17 @@ async fn enums_used_in_default_can_be_changed(api: &TestApi) -> TestResult {
             id Int @id
             mood CatMood @default(HAPPY)
         }
-        
+
          model Leopard {
             id Int @id
-            mood CatMood 
+            mood CatMood
         }
-        
+
         model Lion {
             id Int @id
             mood CatMood @default(HAPPY)
         }
-        
+
         model GoodDog {
             id Int @id
             mood DogMood @default(HAPPY)
@@ -363,7 +363,7 @@ async fn enums_used_in_default_can_be_changed(api: &TestApi) -> TestResult {
             HAPPY
             ANGRY
         }
-        
+
         enum DogMood {
             HAPPY
             HUNGRY
@@ -391,6 +391,53 @@ async fn enums_used_in_default_can_be_changed(api: &TestApi) -> TestResult {
     };
 
     api.assert_schema().await?.assert_tables_count(5)?;
+
+    Ok(())
+}
+
+#[test_connector(capabilities(Enums))]
+async fn changing_all_values_of_enums_used_in_defaults_works(api: &TestApi) -> TestResult {
+    let dm1 = r#"
+        model Cat {
+            id Int @id
+            morningMood             CatMood @default(HUNGRY)
+            alternateMorningMood    CatMood @default(HUNGRY)
+            afternoonMood           CatMood @default(HAPPY)
+            eveningMood             CatMood @default(HUNGRY)
+            defaultMood             CatMood
+        }
+
+        enum CatMood {
+            HAPPY
+            HUNGRY
+        }
+    "#;
+
+    api.schema_push(dm1).send().await?.assert_green()?;
+
+    let dm2 = r#"
+        model Cat {
+            id Int @id
+            morningMood             CatMood @default(MEOW)
+            alternateMorningMood    CatMood @default(MEOWMEOWMEOW)
+            afternoonMood           CatMood @default(PURR)
+            eveningMood             CatMood @default(MEOWMEOW)
+            defaultMood             CatMood
+        }
+
+        enum CatMood {
+            MEOW
+            MEOWMEOW
+            MEOWMEOWMEOW
+            PURR
+        }
+    "#;
+
+    api.schema_push(dm2).force(true).send().await?;
+
+    api.assert_schema().await?.assert_table("Cat", |table| {
+        table.assert_column("eveningMood", |col| Ok(col.assert_enum_default("MEOWMEOW")))
+    })?;
 
     Ok(())
 }

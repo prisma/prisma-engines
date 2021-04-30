@@ -1,6 +1,6 @@
 use migration_engine_tests::sql::*;
 
-#[test_each_connector]
+#[test_connector]
 async fn typescript_starter_schema_is_idempotent_without_native_type_annotations(api: &TestApi) -> TestResult {
     let dm = api.native_types_datamodel(
         r#"
@@ -32,7 +32,7 @@ async fn typescript_starter_schema_is_idempotent_without_native_type_annotations
 
     Ok(())
 }
-#[test_each_connector]
+#[test_connector]
 async fn typescript_starter_schema_starting_without_native_types_is_idempotent(api: &TestApi) -> TestResult {
     let dm = r#"
         model Post {
@@ -65,7 +65,7 @@ async fn typescript_starter_schema_starting_without_native_types_is_idempotent(a
     Ok(())
 }
 
-#[test_each_connector(tags("postgres", "mysql", "mssql"))]
+#[test_connector(tags(Postgres, Mysql, Mssql))]
 async fn bigint_primary_keys_are_idempotent(api: &TestApi) -> TestResult {
     let dm1 = api.native_types_datamodel(
         r#"

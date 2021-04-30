@@ -1,13 +1,13 @@
+use crate::common::{Indented, IteratorJoin, SQL_INDENTATION};
 use std::{borrow::Cow, fmt::Display};
-
-use crate::common::IteratorJoin;
 
 struct Ident<'a>(&'a str);
 
 impl Display for Ident<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "`{}`", self.0)?;
-        Ok(())
+        f.write_str("`")?;
+        f.write_str(self.0)?;
+        f.write_str("`")
     }
 }
 
@@ -19,10 +19,12 @@ pub struct AlterTable<'a> {
 
 impl Display for AlterTable<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "ALTER TABLE `{}`", self.table_name)?;
+        f.write_str("ALTER TABLE ")?;
+        Display::fmt(&Ident(self.table_name.as_ref()), f)?;
 
         if self.changes.len() == 1 {
-            write!(f, " {}", self.changes[0])?;
+            f.write_str(" ")?;
+            Display::fmt(&self.changes[0], f)?;
 
             return Ok(());
         }
@@ -94,12 +96,12 @@ impl<'a> Display for ForeignKey<'a> {
 
         if let Some(on_delete) = &self.on_delete {
             f.write_str(" ON DELETE ")?;
-            on_delete.fmt(f)?;
+            Display::fmt(on_delete, f)?;
         }
 
         if let Some(on_update) = &self.on_update {
             f.write_str(" ON UPDATE ")?;
-            on_update.fmt(f)?;
+            Display::fmt(&on_update, f)?;
         }
 
         Ok(())
@@ -129,7 +131,50 @@ impl Display for ForeignKeyAction {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
+pub struct Column<'a> {
+    pub column_name: Cow<'a, str>,
+    pub not_null: bool,
+    pub column_type: Cow<'a, str>,
+    pub default: Option<Cow<'a, str>>,
+    pub auto_increment: bool,
+    pub primary_key: bool,
+    pub references: Option<ForeignKey<'a>>,
+}
+
+impl Display for Column<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        Display::fmt(&Ident(&self.column_name), f)?;
+        f.write_str(" ")?;
+        Display::fmt(&self.column_type, f)?;
+
+        if self.not_null {
+            f.write_str(" NOT NULL")?;
+        }
+
+        if self.auto_increment {
+            f.write_str(" AUTO_INCREMENT")?;
+        }
+
+        if self.primary_key {
+            f.write_str(" PRIMARY KEY")?;
+        }
+
+        if let Some(default) = &self.default {
+            f.write_str(" DEFAULT ")?;
+            f.write_str(default.as_ref())?;
+        }
+
+        if let Some(references) = &self.references {
+            f.write_str(" ")?;
+            Display::fmt(references, f)?;
+        }
+
+        Ok(())
+    }
+}
+
+#[derive(Debug, Default)]
 pub struct CreateIndex<'a> {
     pub unique: bool,
     pub index_name: Cow<'a, str>,
@@ -149,6 +194,57 @@ impl Display for CreateIndex<'_> {
         self.on.1.iter().map(|s| Ident(s)).join(", ", f)?;
 
         write!(f, ")")
+    }
+}
+
+#[derive(Debug, Default)]
+pub struct CreateTable<'a> {
+    pub table_name: Cow<'a, str>,
+    pub columns: Vec<Column<'a>>,
+    pub indexes: Vec<IndexClause<'a>>,
+    pub primary_key: Vec<Cow<'a, str>>,
+    pub default_character_set: Option<Cow<'a, str>>,
+    pub collate: Option<Cow<'a, str>>,
+}
+
+impl Display for CreateTable<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("CREATE TABLE ")?;
+        Display::fmt(&Ident(self.table_name.as_ref()), f)?;
+
+        f.write_str(" (\n")?;
+
+        self.columns.iter().map(Indented).join(",\n", f)?;
+
+        if !self.indexes.is_empty() || !self.primary_key.is_empty() {
+            f.write_str(",\n\n")?;
+        }
+
+        self.indexes.iter().map(Indented).join(",\n", f)?;
+
+        if !self.primary_key.is_empty() {
+            if !self.indexes.is_empty() {
+                f.write_str(",\n")?;
+            }
+            f.write_str(SQL_INDENTATION)?;
+            f.write_str("PRIMARY KEY (")?;
+            self.primary_key.iter().map(|col| Ident(col.as_ref())).join(", ", f)?;
+            f.write_str(")")?;
+        }
+
+        f.write_str("\n)")?;
+
+        if let Some(default_character_set) = &self.default_character_set {
+            f.write_str(" DEFAULT CHARACTER SET ")?;
+            f.write_str(default_character_set.as_ref())?;
+        }
+
+        if let Some(collate) = &self.collate {
+            f.write_str(" COLLATE ")?;
+            f.write_str(collate.as_ref())?;
+        }
+
+        Ok(())
     }
 }
 
@@ -175,9 +271,37 @@ impl Display for DropIndex<'_> {
     }
 }
 
+#[derive(Debug)]
+pub struct IndexClause<'a> {
+    pub index_name: Option<Cow<'a, str>>,
+    pub unique: bool,
+    pub columns: Vec<Cow<'a, str>>,
+}
+
+impl Display for IndexClause<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        if self.unique {
+            f.write_str("UNIQUE ")?;
+        }
+
+        f.write_str("INDEX ")?;
+
+        if let Some(index_name) = &self.index_name {
+            Display::fmt(&Ident(index_name.as_ref()), f)?;
+        }
+
+        f.write_str("(")?;
+
+        self.columns.iter().map(|col| Ident(col.as_ref())).join(", ", f)?;
+
+        f.write_str(")")
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    use indoc::indoc;
 
     #[test]
     fn alter_table_add_foreign_key() {
@@ -196,5 +320,36 @@ mod tests {
         let expected = "ALTER TABLE `Cat` ADD CONSTRAINT `myfk` FOREIGN KEY (`bestFriendId`) REFERENCES `Dog`(`id`) ON DELETE DO NOTHING ON UPDATE SET NULL";
 
         assert_eq!(alter_table.to_string(), expected);
+    }
+
+    #[test]
+    fn full_create_table() {
+        let stmt = CreateTable {
+            table_name: "Cat".into(),
+            columns: vec![Column {
+                column_type: "INTEGER".into(),
+                column_name: "id".into(),
+                not_null: false,
+                default: None,
+                auto_increment: true,
+                primary_key: true,
+                references: None,
+            }],
+            indexes: vec![],
+            default_character_set: Some("utf8mb4".into()),
+            collate: Some("utf8mb4_unicode_ci".into()),
+            ..Default::default()
+        };
+
+        let expected = indoc!(
+            r#"
+            CREATE TABLE `Cat` (
+                `id` INTEGER AUTO_INCREMENT PRIMARY KEY
+            ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
+            "#,
+        )
+        .trim_end();
+
+        assert_eq!(stmt.to_string(), expected);
     }
 }

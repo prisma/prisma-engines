@@ -1,5 +1,4 @@
 use migration_connector::ConnectorError;
-use migration_core::CoreError;
 use std::fmt::Display;
 use tracing_error::SpanTrace;
 use user_facing_errors::{
@@ -14,6 +13,10 @@ pub enum CliError {
         error: user_facing_errors::KnownError,
         exit_code: i32,
     },
+    InvalidParameters {
+        error: String,
+        exit_code: i32,
+    },
     Unknown {
         error: ConnectorError,
         context: SpanTrace,
@@ -25,6 +28,7 @@ impl Display for CliError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             CliError::Known { error, exit_code: _ } => write!(f, "Known error: {:?}", error),
+            CliError::InvalidParameters { error, .. } => write!(f, "Invalid parameters: {}", error),
             CliError::Unknown {
                 error,
                 context,
@@ -39,6 +43,14 @@ impl CliError {
         match self {
             CliError::Known { exit_code, .. } => *exit_code,
             CliError::Unknown { exit_code, .. } => *exit_code,
+            CliError::InvalidParameters { exit_code, .. } => *exit_code,
+        }
+    }
+
+    pub fn invalid_parameters<S: ToString>(error: S) -> Self {
+        Self::InvalidParameters {
+            error: error.to_string(),
+            exit_code: 255,
         }
     }
 
@@ -94,19 +106,6 @@ impl From<ConnectorError> for CliError {
                 error: err,
                 exit_code,
                 context,
-            },
-        }
-    }
-}
-
-impl From<CoreError> for CliError {
-    fn from(e: CoreError) -> Self {
-        match e {
-            CoreError::ConnectorError(e) => e.into(),
-            e => CliError::Unknown {
-                error: ConnectorError::from_source(e, "Generic error"),
-                context: SpanTrace::capture(),
-                exit_code: 255,
             },
         }
     }

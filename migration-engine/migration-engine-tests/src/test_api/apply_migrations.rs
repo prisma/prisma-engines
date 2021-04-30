@@ -7,6 +7,7 @@ use crate::AssertionResult;
 pub struct ApplyMigrations<'a> {
     api: &'a dyn GenericApi,
     migrations_directory: &'a TempDir,
+    rt: Option<&'a tokio::runtime::Runtime>,
 }
 
 impl<'a> ApplyMigrations<'a> {
@@ -14,6 +15,19 @@ impl<'a> ApplyMigrations<'a> {
         ApplyMigrations {
             api,
             migrations_directory,
+            rt: None,
+        }
+    }
+
+    pub fn new_sync(
+        api: &'a dyn GenericApi,
+        migrations_directory: &'a TempDir,
+        rt: &'a tokio::runtime::Runtime,
+    ) -> Self {
+        ApplyMigrations {
+            api,
+            migrations_directory,
+            rt: Some(rt),
         }
     }
 
@@ -30,6 +44,10 @@ impl<'a> ApplyMigrations<'a> {
             _api: self.api,
             _migrations_directory: self.migrations_directory,
         })
+    }
+
+    pub fn send_sync(self) -> CoreResult<ApplyMigrationsAssertion<'a>> {
+        self.rt.unwrap().block_on(self.send())
     }
 }
 
@@ -62,5 +80,9 @@ impl<'a> ApplyMigrationsAssertion<'a> {
         );
 
         Ok(self)
+    }
+
+    pub fn into_output(self) -> ApplyMigrationsOutput {
+        self.output
     }
 }

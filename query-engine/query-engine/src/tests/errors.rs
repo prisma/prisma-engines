@@ -1,12 +1,10 @@
-use indoc::formatdoc;
+use indoc::{formatdoc, indoc};
 use serde_json::json;
 
 use crate::context::PrismaContext;
 
 #[tokio::test]
 async fn connection_string_problems_give_a_nice_error() {
-    feature_flags::initialize(&[String::from("all")]).unwrap();
-
     let providers = &[
         ("mysql", "mysql://root:password-with-#@localhost:3306/database"),
         (
@@ -22,6 +20,11 @@ async fn connection_string_problems_give_a_nice_error() {
                 datasource db {{
                   provider = "{}"
                   url = "{}"
+                }}
+
+                generator js {{
+                    provider = "prisma-client-js"
+                    previewFeatures = ["microsoftSqlServer"]
                 }}
 
                 model A {{
@@ -46,21 +49,19 @@ async fn connection_string_problems_give_a_nice_error() {
 
         let details = match provider.0 {
             "sqlserver" => {
-                formatdoc!(
-                    "Error parsing connection string: Conversion error: invalid digit found in string in `{connection_string}`.
+                indoc!(
+                    "Error parsing connection string: Conversion error: invalid digit found in string in database URL.
                     Please refer to the documentation in https://www.prisma.io/docs/reference/database-reference/connection-urls
                     for constructing a correct connection string. In some cases, certain characters must be escaped.
                     Please check the string for any illegal characters.",
-                    connection_string = provider.1
                 ).replace('\n', " ")
             },
             _ => {
-                formatdoc!(
-                    "Error parsing connection string: invalid port number in `{connection_string}`.
+                indoc!(
+                    "Error parsing connection string: invalid port number in database URL.
                     Please refer to the documentation in https://www.prisma.io/docs/reference/database-reference/connection-urls
                     for constructing a correct connection string. In some cases, certain characters must be escaped.
                     Please check the string for any illegal characters.",
-                    connection_string = provider.1
                 ).replace('\n', " ")
             }
         };

@@ -92,8 +92,6 @@ pub struct ConstructorOptions {
     #[serde(default)]
     datasource_overrides: BTreeMap<String, String>,
     #[serde(default)]
-    feature_flags_overrides: Option<Vec<String>>,
-    #[serde(default)]
     telemetry: TelemetryOptions,
     config_dir: PathBuf,
 }
@@ -122,7 +120,6 @@ impl QueryEngine {
             datamodel,
             log_level,
             datasource_overrides,
-            feature_flags_overrides,
             telemetry,
             config_dir,
         } = opts;
@@ -139,15 +136,6 @@ impl QueryEngine {
         let ast = datamodel::parse_datamodel(&datamodel)
             .map_err(|errors| ApiError::conversion(errors, &datamodel))?
             .subject;
-
-        let flags: Vec<_> = match feature_flags_overrides {
-            Some(overrides) => overrides,
-            None => config.subject.preview_features().map(|s| s.to_string()).collect(),
-        };
-
-        if feature_flags::initialize(&flags).is_err() {
-            eprintln!("We currently cannot change the feature flags more than once per process.");
-        }
 
         let datamodel = EngineDatamodel {
             ast,
@@ -185,7 +173,7 @@ impl QueryEngine {
                     .with_logging(|| async move {
                         let template = DatamodelConverter::convert(&builder.datamodel.ast);
 
-                        // We only support one data source at the moment, so take the first one (default not exposed yet).
+                        // We only support one data source & generator at the moment, so take the first one (default not exposed yet).
                         let data_source = builder
                             .config
                             .subject
@@ -193,7 +181,9 @@ impl QueryEngine {
                             .first()
                             .ok_or_else(|| ApiError::configuration("No valid data source found"))?;
 
-                        let (db_name, executor) = exec_loader::load(&data_source).await?;
+                        let preview_features: Vec<_> = builder.config.subject.preview_features().cloned().collect();
+
+                        let (db_name, executor) = exec_loader::load(&data_source, &preview_features).await?;
                         let connector = executor.primary_connector();
                         connector.get_connection().await?;
 
@@ -205,6 +195,7 @@ impl QueryEngine {
                             BuildMode::Modern,
                             true, // enable raw queries
                             data_source.capabilities(),
+                            preview_features,
                         );
 
                         let config = datamodel::json::mcf::config_to_mcf_json_value(&builder.config);

@@ -1,0 +1,1 @@
+export TEST_DATABASE_URL="sqlserver://localhost:1433;database=master;user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED"

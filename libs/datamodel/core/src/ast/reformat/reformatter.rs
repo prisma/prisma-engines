@@ -1,6 +1,5 @@
 use super::helpers::*;
 use crate::ast::helper::get_sort_index_of_attribute;
-use crate::common::WritableString;
 use crate::diagnostics::ValidatedMissingFields;
 use crate::{ast, ast::parser::*, ast::renderer::*};
 use pest::iterators::Pair;
@@ -154,16 +153,16 @@ impl<'a> Reformatter<'a> {
 
     fn reformat_internal(&self, ident_width: usize) -> String {
         let mut ast = PrismaDatamodelParser::parse(Rule::schema, self.input).unwrap(); // TODO: Handle error.
-        let mut target_string = WritableString::new();
+        let mut target_string = String::with_capacity(self.input.len());
         let mut renderer = Renderer::new(&mut target_string, ident_width);
         self.reformat_top(&mut renderer, &ast.next().unwrap());
-        let result = target_string.into();
+
         // all schemas must end with a newline
-        if result.ends_with('\n') {
-            result
-        } else {
-            format!("{}\n", result)
+        if !target_string.ends_with('\n') {
+            target_string.push('\n');
         }
+
+        target_string
     }
 
     fn reformat_top(&self, target: &mut Renderer, token: &Token) {

@@ -16,8 +16,9 @@ use pretty_assertions::assert_eq;
 use prisma_value::PrismaValue;
 use quaint::prelude::{Queryable, SqlFamily};
 use sql_schema_describer::*;
+use test_macros::test_connector;
 
-#[test_each_connector]
+#[test_connector]
 async fn adding_a_scalar_field_must_work(api: &TestApi) -> TestResult {
     let dm = api.native_types_datamodel(
         r#"
@@ -72,7 +73,7 @@ async fn adding_a_scalar_field_must_work(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(capabilities("enums"))]
+#[test_connector(capabilities(Enums))]
 async fn adding_an_enum_field_must_work(api: &TestApi) -> TestResult {
     let dm = r#"
         model Test {
@@ -108,7 +109,7 @@ async fn adding_an_enum_field_must_work(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(capabilities("enums"))]
+#[test_connector(capabilities(Enums))]
 async fn adding_an_enum_field_must_work_with_native_types_off(api: &TestApi) -> TestResult {
     let dm = r#"
         model Test {
@@ -144,7 +145,7 @@ async fn adding_an_enum_field_must_work_with_native_types_off(api: &TestApi) -> 
     Ok(())
 }
 
-#[test_each_connector(capabilities("json"), ignore("mysql_5_6"), log = "debug")]
+#[test_connector(capabilities(Json), exclude(Mysql56))]
 async fn json_fields_can_be_created(api: &TestApi) -> TestResult {
     let dm = format!(
         r#"
@@ -176,7 +177,7 @@ async fn json_fields_can_be_created(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn adding_an_optional_field_must_work(api: &TestApi) -> TestResult {
     let dm2 = r#"
         model Test {
@@ -193,7 +194,7 @@ async fn adding_an_optional_field_must_work(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn adding_an_id_field_with_a_special_name_must_work(api: &TestApi) -> TestResult {
     let dm2 = r#"
         model Test {
@@ -202,15 +203,14 @@ async fn adding_an_id_field_with_a_special_name_must_work(api: &TestApi) -> Test
     "#;
 
     api.schema_push(dm2).send().await?.assert_green()?;
-
-    let result = api.describe_database().await?;
-    let column = result.table_bang("Test").column("specialName");
-    assert_eq!(column.is_some(), true);
+    api.assert_schema()
+        .await?
+        .assert_table("Test", |table| table.assert_has_column("specialName"))?;
 
     Ok(())
 }
 
-#[test_each_connector(ignore("sqlite"))]
+#[test_connector(exclude(Sqlite))]
 async fn adding_an_id_field_of_type_int_must_work(api: &TestApi) -> TestResult {
     let dm2 = r#"
         model Test {
@@ -220,17 +220,14 @@ async fn adding_an_id_field_of_type_int_must_work(api: &TestApi) -> TestResult {
     "#;
 
     api.schema_push(dm2).send().await?.assert_green()?;
-
-    let result = api.describe_database().await?;
-
-    let column = result.table_bang("Test").column_bang("myId");
-
-    assert!(!column.auto_increment);
+    api.assert_schema()
+        .await?
+        .assert_table("Test", |t| t.assert_column("myId", |c| c.assert_no_auto_increment()))?;
 
     Ok(())
 }
 
-#[test_each_connector(tags("sqlite"))]
+#[test_connector(tags(Sqlite))]
 async fn adding_an_id_field_of_type_int_must_work_for_sqlite(api: &TestApi) -> TestResult {
     let dm2 = r#"
         model Test {
@@ -248,7 +245,7 @@ async fn adding_an_id_field_of_type_int_must_work_for_sqlite(api: &TestApi) -> T
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn adding_an_id_field_of_type_int_with_autoincrement_works(api: &TestApi) -> TestResult {
     let dm2 = r#"
         model Test {
@@ -258,25 +255,21 @@ async fn adding_an_id_field_of_type_int_with_autoincrement_works(api: &TestApi) 
     "#;
 
     api.schema_push(dm2).send().await?.assert_green()?;
-
-    let result = api.describe_database().await?;
-
-    let column = result.table_bang("Test").column_bang("myId");
-
-    match api.sql_family() {
-        SqlFamily::Postgres => {
-            let sequence = result.get_sequence("Test_myId_seq").expect("sequence must exist");
-            let default = column.default.as_ref().expect("Must have nextval default");
-            assert_eq!(DefaultValue::sequence(sequence.name.clone()), *default);
-        }
-        _ => assert_eq!(column.auto_increment, true),
-    }
+    api.assert_schema().await?.assert_table("Test", |t| {
+        t.assert_column("myId", |c| {
+            if api.is_postgres() {
+                c.assert_default(Some(DefaultValue::sequence("Test_myId_seq")))
+            } else {
+                c.assert_auto_increments()
+            }
+        })
+    })?;
 
     Ok(())
 }
 
 // Ignoring sqlite is OK, because sqlite integer primary keys are always auto-incrementing.
-#[test_each_connector(ignore("sqlite"))]
+#[test_connector(exclude(Sqlite))]
 async fn making_an_existing_id_field_autoincrement_works(api: &TestApi) -> TestResult {
     use quaint::ast::{Insert, Select};
 
@@ -352,7 +345,7 @@ async fn making_an_existing_id_field_autoincrement_works(api: &TestApi) -> TestR
 }
 
 // Ignoring sqlite is OK, because sqlite integer primary keys are always auto-incrementing.
-#[test_each_connector(ignore("sqlite"))]
+#[test_connector(exclude(Sqlite))]
 async fn removing_autoincrement_from_an_existing_field_works(api: &TestApi) -> TestResult {
     use quaint::ast::{Insert, Select};
 
@@ -423,7 +416,7 @@ async fn removing_autoincrement_from_an_existing_field_works(api: &TestApi) -> T
     Ok(())
 }
 
-#[test_each_connector(tags("mssql_2017", "mssql_2019"))]
+#[test_connector(tags(Mssql))]
 async fn making_an_existing_id_field_autoincrement_works_with_indices(api: &TestApi) -> TestResult {
     use quaint::ast::{Insert, Select};
 
@@ -492,7 +485,7 @@ async fn making_an_existing_id_field_autoincrement_works_with_indices(api: &Test
     Ok(())
 }
 
-#[test_each_connector(tags("mssql_2019", "mssql_2017"))]
+#[test_connector(tags(Mssql))]
 async fn making_an_existing_id_field_autoincrement_works_with_foreign_keys(api: &TestApi) -> TestResult {
     use quaint::ast::{Insert, Select};
 
@@ -607,7 +600,7 @@ async fn making_an_existing_id_field_autoincrement_works_with_foreign_keys(api: 
 }
 
 // Ignoring sqlite is OK, because sqlite integer primary keys are always auto-incrementing.
-#[test_each_connector(ignore("sqlite"))]
+#[test_connector(exclude(Sqlite))]
 async fn flipping_autoincrement_on_and_off_works(api: &TestApi) -> TestResult {
     let dm_without = r#"
         model Post {
@@ -633,7 +626,7 @@ async fn flipping_autoincrement_on_and_off_works(api: &TestApi) -> TestResult {
 }
 
 // Ignoring sqlite is OK, because sqlite integer primary keys are always auto-incrementing.
-#[test_each_connector(ignore("sqlite"))]
+#[test_connector(exclude(Sqlite))]
 async fn making_an_autoincrement_default_an_expression_then_autoincrement_again_works(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Post {
@@ -687,7 +680,7 @@ async fn making_an_autoincrement_default_an_expression_then_autoincrement_again_
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn removing_a_scalar_field_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Test {
@@ -698,10 +691,9 @@ async fn removing_a_scalar_field_must_work(api: &TestApi) -> TestResult {
 
     api.schema_push(dm1).send().await?.assert_green()?;
 
-    let result = api.describe_database().await?;
-
-    let column1 = result.table_bang("Test").column("field");
-    assert_eq!(column1.is_some(), true);
+    api.assert_schema().await?.assert_table("Test", |table| {
+        table.assert_columns_count(2)?.assert_has_column("field")
+    })?;
 
     let dm2 = r#"
         model Test {
@@ -711,16 +703,14 @@ async fn removing_a_scalar_field_must_work(api: &TestApi) -> TestResult {
 
     api.schema_push(dm2).send().await?.assert_green()?;
 
-    let result = api.describe_database().await?;
-
-    let column2 = result.table_bang("Test").column("field");
-
-    assert!(column2.is_none());
+    api.assert_schema()
+        .await?
+        .assert_table("Test", |table| table.assert_column_count(1))?;
 
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn can_handle_reserved_sql_keywords_for_model_name(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Group {
@@ -730,11 +720,9 @@ async fn can_handle_reserved_sql_keywords_for_model_name(api: &TestApi) -> TestR
     "#;
 
     api.schema_push(dm1).send().await?.assert_green()?;
-
-    let result = api.describe_database().await?;
-
-    let column = result.table_bang("Group").column_bang("field");
-    assert_eq!(column.tpe.family, ColumnTypeFamily::String);
+    api.assert_schema()
+        .await?
+        .assert_table("Group", |t| t.assert_column("field", |c| c.assert_type_is_string()))?;
 
     let dm2 = r#"
         model Group {
@@ -744,17 +732,14 @@ async fn can_handle_reserved_sql_keywords_for_model_name(api: &TestApi) -> TestR
     "#;
 
     api.schema_push(dm2).send().await?.assert_green()?;
-
-    let result = api.describe_database().await?;
-
-    let column = result.table_bang("Group").column_bang("field");
-
-    assert_eq!(column.tpe.family, ColumnTypeFamily::Int);
+    api.assert_schema()
+        .await?
+        .assert_table("Group", |t| t.assert_column("field", |c| c.assert_type_is_int()))?;
 
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn can_handle_reserved_sql_keywords_for_field_name(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Test {
@@ -764,11 +749,9 @@ async fn can_handle_reserved_sql_keywords_for_field_name(api: &TestApi) -> TestR
     "#;
 
     api.schema_push(dm1).send().await?.assert_green()?;
-
-    let result = api.describe_database().await?;
-
-    let column = result.table_bang("Test").column_bang("Group");
-    assert_eq!(column.tpe.family, ColumnTypeFamily::String);
+    api.assert_schema()
+        .await?
+        .assert_table("Test", |t| t.assert_column("Group", |c| c.assert_type_is_string()))?;
 
     let dm2 = r#"
         model Test {
@@ -778,16 +761,14 @@ async fn can_handle_reserved_sql_keywords_for_field_name(api: &TestApi) -> TestR
     "#;
 
     api.schema_push(dm2).send().await?.assert_green()?;
-
-    let result = api.describe_database().await?;
-
-    let column = result.table_bang("Test").column_bang("Group");
-    assert_eq!(column.tpe.family, ColumnTypeFamily::Int);
+    api.assert_schema()
+        .await?
+        .assert_table("Test", |t| t.assert_column("Group", |c| c.assert_type_is_int()))?;
 
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn update_type_of_scalar_field_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Test {
@@ -818,7 +799,7 @@ async fn update_type_of_scalar_field_must_work(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn changing_the_type_of_an_id_field_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model A {
@@ -866,7 +847,7 @@ async fn changing_the_type_of_an_id_field_must_work(api: &TestApi) -> TestResult
     Ok(())
 }
 
-#[test_each_connector(log = "debug")]
+#[test_connector]
 async fn changing_the_type_of_a_field_referenced_by_a_fk_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model A {
@@ -915,7 +896,7 @@ async fn changing_the_type_of_a_field_referenced_by_a_fk_must_work(api: &TestApi
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn updating_db_name_of_a_scalar_field_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model A {
@@ -937,15 +918,16 @@ async fn updating_db_name_of_a_scalar_field_must_work(api: &TestApi) -> TestResu
     "#;
 
     api.schema_push(dm2).send().await?.assert_green()?;
-
-    let result = api.describe_database().await?;
-    assert_eq!(result.table_bang("A").column("name1").is_some(), false);
-    assert_eq!(result.table_bang("A").column("name2").is_some(), true);
+    api.assert_schema().await?.assert_table("A", |t| {
+        t.assert_columns_count(2)?
+            .assert_has_column("id")?
+            .assert_has_column("name2")
+    })?;
 
     Ok(())
 }
 
-#[test_each_connector(log = "debug,sql_schema_describer=info")]
+#[test_connector]
 async fn changing_a_relation_field_to_a_scalar_field_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model A {
@@ -1001,7 +983,7 @@ async fn changing_a_relation_field_to_a_scalar_field_must_work(api: &TestApi) ->
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn changing_a_scalar_field_to_a_relation_field_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model A {
@@ -1015,14 +997,11 @@ async fn changing_a_scalar_field_to_a_relation_field_must_work(api: &TestApi) ->
     "#;
 
     api.schema_push(dm1).send().await?.assert_green()?;
-
-    let result = api.describe_database().await?;
-
-    let table = result.table_bang("A");
-    let column = table.column_bang("b");
-    assert_eq!(column.tpe.family, ColumnTypeFamily::String);
-    assert_eq!(table.foreign_keys, vec![]);
-    assert!(table.indices.is_empty(), "{:?}", table.indices);
+    api.assert_schema().await?.assert_table("A", |t| {
+        t.assert_column("b", |c| c.assert_type_is_string())?
+            .assert_foreign_keys_count(0)?
+            .assert_indexes_count(0)
+    })?;
 
     let dm2 = r#"
         model A {
@@ -1053,7 +1032,7 @@ async fn changing_a_scalar_field_to_a_relation_field_must_work(api: &TestApi) ->
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn adding_a_new_unique_field_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model A {
@@ -1071,7 +1050,7 @@ async fn adding_a_new_unique_field_must_work(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn adding_new_fields_with_multi_column_unique_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model A {
@@ -1084,21 +1063,14 @@ async fn adding_new_fields_with_multi_column_unique_must_work(api: &TestApi) -> 
     "#;
 
     api.schema_push(dm1).send().await?.assert_green()?;
-
-    let result = api.describe_database().await?;
-
-    let index = result
-        .table_bang("A")
-        .indices
-        .iter()
-        .find(|i| i.columns == vec!["field", "secondField"]);
-    assert!(index.is_some());
-    assert_eq!(index.unwrap().tpe, IndexType::Unique);
+    api.assert_schema().await?.assert_table("A", |t| {
+        t.assert_index_on_columns(&["field", "secondField"], |idx| idx.assert_is_unique())
+    })?;
 
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn unique_in_conjunction_with_custom_column_name_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model A {
@@ -1108,22 +1080,14 @@ async fn unique_in_conjunction_with_custom_column_name_must_work(api: &TestApi) 
     "#;
 
     api.schema_push(dm1).send().await?.assert_green()?;
-
-    let result = api.describe_database().await?;
-
-    let index = result
-        .table_bang("A")
-        .indices
-        .iter()
-        .find(|i| i.columns == ["custom_field_name"]);
-
-    assert!(index.is_some());
-    assert_eq!(index.unwrap().tpe, IndexType::Unique);
+    api.assert_schema().await?.assert_table("A", |t| {
+        t.assert_index_on_columns(&["custom_field_name"], |idx| idx.assert_is_unique())
+    })?;
 
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn multi_column_unique_in_conjunction_with_custom_column_name_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model A {
@@ -1136,21 +1100,16 @@ async fn multi_column_unique_in_conjunction_with_custom_column_name_must_work(ap
     "#;
 
     api.schema_push(dm1).send().await?.assert_green()?;
-
-    let result = api.describe_database().await?;
-
-    let index = result
-        .table_bang("A")
-        .indices
-        .iter()
-        .find(|i| i.columns == ["custom_field_name", "second_custom_field_name"]);
-    assert!(index.is_some());
-    assert_eq!(index.unwrap().tpe, IndexType::Unique);
+    api.assert_schema().await?.assert_table("A", |t| {
+        t.assert_index_on_columns(&["custom_field_name", "second_custom_field_name"], |idx| {
+            idx.assert_is_unique()
+        })
+    })?;
 
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn removing_an_existing_unique_field_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model A {
@@ -1160,16 +1119,9 @@ async fn removing_an_existing_unique_field_must_work(api: &TestApi) -> TestResul
     "#;
 
     api.schema_push(dm1).send().await?.assert_green()?;
-
-    let result = api.describe_database().await?;
-
-    let index = result
-        .table_bang("A")
-        .indices
-        .iter()
-        .find(|i| i.columns == vec!["field"]);
-    assert!(index.is_some());
-    assert_eq!(index.unwrap().tpe, IndexType::Unique);
+    api.assert_schema().await?.assert_table("A", |table| {
+        table.assert_index_on_columns(&["field"], |idx| idx.assert_is_unique())
+    })?;
 
     let dm2 = r#"
         model A {
@@ -1179,20 +1131,16 @@ async fn removing_an_existing_unique_field_must_work(api: &TestApi) -> TestResul
 
     api.schema_push(dm2).send().await?.assert_green()?;
 
-    let result = api.describe_database().await?;
-
-    let index = result
-        .table_bang("A")
-        .indices
-        .iter()
-        .find(|i| i.columns == vec!["field"]);
-
-    assert!(index.is_none());
+    api.assert_schema().await?.assert_table("A", |t| {
+        t.assert_indexes_count(0)?
+            .assert_columns_count(1)?
+            .assert_has_column("id")
+    })?;
 
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn adding_unique_to_an_existing_field_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model A {
@@ -1231,7 +1179,7 @@ async fn adding_unique_to_an_existing_field_must_work(api: &TestApi) -> TestResu
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn removing_unique_from_an_existing_field_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model A {
@@ -1241,12 +1189,9 @@ async fn removing_unique_from_an_existing_field_must_work(api: &TestApi) -> Test
     "#;
 
     api.schema_push(dm1).send().await?.assert_green()?;
-
-    let result = api.describe_database().await?;
-
-    let index = result.table_bang("A").indices.iter().find(|i| i.columns == ["field"]);
-    assert!(index.is_some());
-    assert_eq!(index.unwrap().tpe, IndexType::Unique);
+    api.assert_schema().await?.assert_table("A", |t| {
+        t.assert_index_on_columns(&["field"], |idx| idx.assert_is_unique())
+    })?;
 
     let dm2 = r#"
         model A {
@@ -1256,17 +1201,15 @@ async fn removing_unique_from_an_existing_field_must_work(api: &TestApi) -> Test
     "#;
 
     api.schema_push(dm2).send().await?.assert_green()?;
-
-    let result = api.describe_database().await?;
-
-    let index = result.table_bang("A").indices.iter().find(|i| i.columns == ["field"]);
-    assert!(index.is_none());
+    api.assert_schema()
+        .await?
+        .assert_table("A", |t| t.assert_indexes_count(0))?;
 
     Ok(())
 }
 
 // TODO: Enable SQL Server when cascading rules are in PSL.
-#[test_each_connector(ignore("mssql_2019", "mssql_2017"))]
+#[test_connector(exclude(Mssql))]
 async fn reserved_sql_key_words_must_work(api: &TestApi) -> TestResult {
     // Group is a reserved keyword
     let dm = r#"
@@ -1287,7 +1230,7 @@ async fn reserved_sql_key_words_must_work(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn migrations_with_many_to_many_related_models_must_not_recreate_indexes(api: &TestApi) -> TestResult {
     // test case for https://github.com/prisma/lift/issues/148
     let dm_1 = r#"
@@ -1310,16 +1253,9 @@ async fn migrations_with_many_to_many_related_models_must_not_recreate_indexes(a
     "#;
 
     api.schema_push(dm_1).send().await?.assert_green()?;
-
-    let sql_schema = api.describe_database().await?;
-
-    let index = sql_schema
-        .table_bang("_ProfileToSkill")
-        .indices
-        .iter()
-        .find(|index| index.name == "_ProfileToSkill_AB_unique")
-        .expect("index is present");
-    assert_eq!(index.tpe, IndexType::Unique);
+    api.assert_schema().await?.assert_table("_ProfileToSkill", |t| {
+        t.assert_index_on_columns(&["A", "B"], |idx| idx.assert_is_unique())
+    })?;
 
     let dm_2 = r#"
         model User {
@@ -1342,21 +1278,16 @@ async fn migrations_with_many_to_many_related_models_must_not_recreate_indexes(a
     "#;
 
     api.schema_push(dm_2).send().await?;
-    let sql_schema = api.describe_database().await?;
-
-    let index = sql_schema
-        .table_bang("_ProfileToSkill")
-        .indices
-        .iter()
-        .find(|index| index.name == "_ProfileToSkill_AB_unique")
-        .expect("index is present");
-
-    assert!(index.tpe.is_unique());
+    api.assert_schema().await?.assert_table("_ProfileToSkill", |table| {
+        table.assert_index_on_columns(&["A", "B"], |idx| {
+            idx.assert_is_unique()?.assert_name("_ProfileToSkill_AB_unique")
+        })
+    })?;
 
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn removing_a_relation_field_must_work(api: &TestApi) -> TestResult {
     let dm_1 = r#"
         model User {
@@ -1398,7 +1329,7 @@ async fn removing_a_relation_field_must_work(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn simple_type_aliases_in_migrations_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         type CUID = String @id @default(cuid())
@@ -1414,7 +1345,7 @@ async fn simple_type_aliases_in_migrations_must_work(api: &TestApi) -> TestResul
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn foreign_keys_of_inline_one_to_one_relations_have_a_unique_constraint(api: &TestApi) -> TestResult {
     let dm = r#"
         model Cat {
@@ -1430,22 +1361,16 @@ async fn foreign_keys_of_inline_one_to_one_relations_have_a_unique_constraint(ap
     "#;
 
     api.schema_push(dm).send().await?.assert_green()?;
-    let schema = api.describe_database().await?;
-
-    let box_table = schema.table_bang("Box");
-
-    let expected_indexes = &[Index {
-        name: "Box_cat_id_unique".into(),
-        columns: vec!["cat_id".into()],
-        tpe: IndexType::Unique,
-    }];
-
-    assert_eq!(box_table.indices, expected_indexes);
+    api.assert_schema().await?.assert_table("Box", |t| {
+        t.assert_indexes_count(1)?.assert_index_on_columns(&["cat_id"], |idx| {
+            idx.assert_is_unique()?.assert_name("Box_cat_id_unique")
+        })
+    })?;
 
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn column_defaults_must_be_migrated(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Fruit {
@@ -1478,7 +1403,7 @@ async fn column_defaults_must_be_migrated(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> TestResult {
     use quaint::ast::Insert;
 
@@ -1513,8 +1438,8 @@ async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> 
         .assert_green()?
         .assert_no_steps()?;
 
-    let sql_schema = api.describe_database().await?;
-    let table = sql_schema.table_bang("Fruit");
+    let sql_schema = api.assert_schema().await?.into_schema();
+    let table = sql_schema.table_bang(&api.normalize_identifier("Fruit"));
 
     match api.sql_family() {
         SqlFamily::Mssql => {
@@ -1560,7 +1485,7 @@ async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> 
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn created_at_does_not_get_arbitrarily_migrated(api: &TestApi) -> TestResult {
     use quaint::ast::Insert;
 
@@ -1573,21 +1498,12 @@ async fn created_at_does_not_get_arbitrarily_migrated(api: &TestApi) -> TestResu
     "#;
 
     api.schema_push(dm1).send().await?;
-
-    let schema = api.describe_database().await?;
+    api.assert_schema().await?.assert_table("Fruit", |t| {
+        t.assert_column("createdAt", |c| c.assert_default(Some(DefaultValue::now())))
+    })?;
 
     let insert = Insert::single_into(api.render_table_name("Fruit")).value("name", "banana");
     api.database().query(insert.into()).await.unwrap();
-
-    assert!(matches!(
-        schema
-            .table_bang("Fruit")
-            .column_bang("createdAt")
-            .default
-            .as_ref()
-            .map(|d| d.kind()),
-        Some(DefaultKind::Now)
-    ),);
 
     let dm2 = r#"
         model Fruit {
@@ -1602,7 +1518,7 @@ async fn created_at_does_not_get_arbitrarily_migrated(api: &TestApi) -> TestResu
     Ok(())
 }
 
-#[test_each_connector(tags("sqlite"))]
+#[test_connector(tags(Sqlite))]
 async fn renaming_a_datasource_works(api: &TestApi) -> TestResult {
     let dm1 = r#"
         datasource db1 {
@@ -1633,7 +1549,7 @@ async fn renaming_a_datasource_works(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn relations_can_reference_arbitrary_unique_fields(api: &TestApi) -> TestResult {
     let dm = r#"
         model User {
@@ -1650,23 +1566,15 @@ async fn relations_can_reference_arbitrary_unique_fields(api: &TestApi) -> TestR
     "#;
 
     api.schema_push(dm).send().await?.assert_green()?;
-
-    let schema = api.describe_database().await?;
-
-    let fks = &schema.table_bang("Account").foreign_keys;
-
-    assert_eq!(fks.len(), 1);
-
-    let fk = fks.iter().next().unwrap();
-
-    assert_eq!(fk.columns, &["uem"]);
-    assert_eq!(fk.referenced_table, api.normalize_identifier("User").as_ref());
-    assert_eq!(fk.referenced_columns, &["email"]);
+    api.assert_schema().await?.assert_table("Account", |t| {
+        t.assert_foreign_keys_count(1)?
+            .assert_fk_on_columns(&["uem"], |fk| fk.assert_references("User", &["email"]))
+    })?;
 
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn relations_can_reference_arbitrary_unique_fields_with_maps(api: &TestApi) -> TestResult {
     let dm = r#"
         model User {
@@ -1695,7 +1603,7 @@ async fn relations_can_reference_arbitrary_unique_fields_with_maps(api: &TestApi
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn relations_can_reference_multiple_fields(api: &TestApi) -> TestResult {
     let dm = r#"
         model User {
@@ -1728,7 +1636,7 @@ async fn relations_can_reference_multiple_fields(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn a_relation_with_mappings_on_both_sides_can_reference_multiple_fields(api: &TestApi) -> TestResult {
     let dm = r#"
         model User {
@@ -1763,7 +1671,7 @@ async fn a_relation_with_mappings_on_both_sides_can_reference_multiple_fields(ap
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn relations_with_mappings_on_referenced_side_can_reference_multiple_fields(api: &TestApi) -> TestResult {
     let dm = r#"
         model User {
@@ -1797,7 +1705,7 @@ async fn relations_with_mappings_on_referenced_side_can_reference_multiple_field
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn relations_with_mappings_on_referencing_side_can_reference_multiple_fields(api: &TestApi) -> TestResult {
     let dm = r#"
         model User {
@@ -1831,7 +1739,7 @@ async fn relations_with_mappings_on_referencing_side_can_reference_multiple_fiel
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn foreign_keys_are_added_on_existing_tables(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model User {
@@ -1876,7 +1784,7 @@ async fn foreign_keys_are_added_on_existing_tables(api: &TestApi) -> TestResult 
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn foreign_keys_can_be_added_on_existing_columns(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model User {
@@ -1922,7 +1830,7 @@ async fn foreign_keys_can_be_added_on_existing_columns(api: &TestApi) -> TestRes
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn foreign_keys_can_be_dropped_on_existing_columns(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model User {
@@ -1967,7 +1875,7 @@ async fn foreign_keys_can_be_dropped_on_existing_columns(api: &TestApi) -> TestR
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn basic_compound_primary_keys_must_work(api: &TestApi) -> TestResult {
     let dm = r#"
         model User {
@@ -1987,7 +1895,7 @@ async fn basic_compound_primary_keys_must_work(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn compound_primary_keys_on_mapped_columns_must_work(api: &TestApi) -> TestResult {
     let dm = r#"
         model User {
@@ -2007,7 +1915,7 @@ async fn compound_primary_keys_on_mapped_columns_must_work(api: &TestApi) -> Tes
     Ok(())
 }
 
-#[test_each_connector(tags("sql"))]
+#[test_connector]
 async fn references_to_models_with_compound_primary_keys_must_work(api: &TestApi) -> TestResult {
     let dm = r#"
         model User {
@@ -2029,22 +1937,21 @@ async fn references_to_models_with_compound_primary_keys_must_work(api: &TestApi
 
     api.schema_push(dm).send().await?.assert_green()?;
 
-    let sql_schema = api.describe_database().await?;
-
-    sql_schema
-        .assert_table("Pet")?
-        .assert_has_column("id")?
-        .assert_has_column("human_firstName")?
-        .assert_has_column("human_lastName")?
-        .assert_foreign_keys_count(1)?
-        .assert_fk_on_columns(&["human_firstName", "human_lastName"], |fk| {
-            fk.assert_references("User", &["firstName", "lastName"])
-        })?;
+    api.assert_schema().await?.assert_table("Pet", |table| {
+        table
+            .assert_has_column("id")?
+            .assert_has_column("human_firstName")?
+            .assert_has_column("human_lastName")?
+            .assert_foreign_keys_count(1)?
+            .assert_fk_on_columns(&["human_firstName", "human_lastName"], |fk| {
+                fk.assert_references("User", &["firstName", "lastName"])
+            })
+    })?;
 
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn join_tables_between_models_with_compound_primary_keys_must_work(api: &TestApi) -> TestResult {
     let dm = r#"
         model Human {
@@ -2097,7 +2004,7 @@ async fn join_tables_between_models_with_compound_primary_keys_must_work(api: &T
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn join_tables_between_models_with_mapped_compound_primary_keys_must_work(api: &TestApi) -> TestResult {
     let dm = r#"
         model Human {
@@ -2128,23 +2035,22 @@ async fn join_tables_between_models_with_mapped_compound_primary_keys_must_work(
 
     api.schema_push(dm).send().await?.assert_green()?;
 
-    let sql_schema = api.describe_database().await?;
-
-    sql_schema
-        .assert_table("HumanToCat")?
-        .assert_has_column("human_the_first_name")?
-        .assert_has_column("human_the_last_name")?
-        .assert_has_column("cat_id")?
-        .assert_fk_on_columns(&["human_the_first_name", "human_the_last_name"], |fk| {
-            fk.assert_references("Human", &["the_first_name", "the_last_name"])
-        })?
-        .assert_fk_on_columns(&["cat_id"], |fk| fk.assert_references("Cat", &["id"]))?
-        .assert_indexes_count(2)?;
+    api.assert_schema().await?.assert_table("HumanToCat", |table| {
+        table
+            .assert_has_column("human_the_first_name")?
+            .assert_has_column("human_the_last_name")?
+            .assert_has_column("cat_id")?
+            .assert_fk_on_columns(&["human_the_first_name", "human_the_last_name"], |fk| {
+                fk.assert_references("Human", &["the_first_name", "the_last_name"])
+            })?
+            .assert_fk_on_columns(&["cat_id"], |fk| fk.assert_references("Cat", &["id"]))?
+            .assert_indexes_count(2)
+    })?;
 
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn switching_databases_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         datasource db {
@@ -2182,7 +2088,7 @@ async fn switching_databases_must_work(api: &TestApi) -> TestResult {
 }
 
 // TODO: Enable SQL Server when cascading rules are in PSL.
-#[test_each_connector(ignore("mssql_2019", "mssql_2017"))]
+#[test_connector(exclude(Mssql))]
 async fn adding_mutual_references_on_existing_tables_works(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model A {
@@ -2225,7 +2131,7 @@ async fn adding_mutual_references_on_existing_tables_works(api: &TestApi) -> Tes
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn schemas_with_dbgenerated_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
     model User {
@@ -2244,7 +2150,7 @@ async fn schemas_with_dbgenerated_work(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("mysql_8", "mariadb"), log = "debug")]
+#[test_connector(tags(Mysql8, Mariadb), exclude(Vitess))]
 async fn schemas_with_dbgenerated_expressions_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
     model User {
@@ -2272,7 +2178,7 @@ async fn schemas_with_dbgenerated_expressions_work(api: &TestApi) -> TestResult 
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn models_with_an_autoincrement_field_as_part_of_a_multi_field_id_can_be_created(api: &TestApi) -> TestResult {
     let dm = r#"
         model List {
@@ -2309,7 +2215,7 @@ async fn models_with_an_autoincrement_field_as_part_of_a_multi_field_id_can_be_c
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn migrating_a_unique_constraint_to_a_primary_key_works(api: &TestApi) -> TestResult {
     let dm = r#"
         model model1 {
@@ -2364,7 +2270,7 @@ async fn migrating_a_unique_constraint_to_a_primary_key_works(api: &TestApi) -> 
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn adding_multiple_optional_fields_to_an_existing_model_works(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Cat {
@@ -2394,7 +2300,7 @@ async fn adding_multiple_optional_fields_to_an_existing_model_works(api: &TestAp
 }
 
 // TODO: Enable SQL Server when cascading rules are in PSL.
-#[test_each_connector(ignore("mssql_2019", "mssql_2017"))]
+#[test_connector(exclude(Mssql))]
 async fn reordering_and_altering_models_at_the_same_time_works(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model A {
@@ -2450,7 +2356,7 @@ async fn reordering_and_altering_models_at_the_same_time_works(api: &TestApi) ->
 }
 
 // TODO: Enable SQL Server when cascading rules are in PSL.
-#[test_each_connector(ignore("mssql_2019", "mssql_2017"))]
+#[test_connector(exclude(Mssql))]
 async fn changing_all_referenced_columns_of_foreign_key_works(api: &TestApi) -> TestResult {
     let dm1 = r#"
        model Post {
@@ -2485,7 +2391,7 @@ async fn changing_all_referenced_columns_of_foreign_key_works(api: &TestApi) -> 
     Ok(())
 }
 
-#[test_each_connector(tags("mssql"), log = "debug")]
+#[test_connector(tags(Mssql))]
 async fn a_table_recreation_with_noncastable_columns_should_trigger_warnings(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Blog {
@@ -2514,7 +2420,7 @@ async fn a_table_recreation_with_noncastable_columns_should_trigger_warnings(api
     Ok(())
 }
 
-// #[test_each_connector]
+// #[test_connector]
 // //todo something is rotten in the state of Denmark
 // async fn a_column_recreation_with_non_castable_type_change_should_trigger_warnings(api: &TestApi) -> TestResult {
 //     let dm1 = r#"
@@ -2543,7 +2449,7 @@ async fn a_table_recreation_with_noncastable_columns_should_trigger_warnings(api
 //     Ok(())
 // }
 
-#[test_each_connector]
+#[test_connector]
 async fn a_model_can_be_removed(api: &TestApi) -> TestResult {
     let directory = api.create_migrations_directory()?;
 
@@ -2585,7 +2491,7 @@ async fn a_model_can_be_removed(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn a_default_can_be_dropped(api: &TestApi) -> TestResult {
     let directory = api.create_migrations_directory()?;
 

@@ -1,7 +1,7 @@
 use barrel::types;
 use migration_engine_tests::sql::*;
 use pretty_assertions::assert_eq;
-use test_macros::test_each_connector;
+use test_macros::test_connector;
 use user_facing_errors::{migration_engine::MigrationToMarkAppliedNotFound, UserFacingError};
 
 const BASE_DM: &str = r#"
@@ -10,7 +10,7 @@ const BASE_DM: &str = r#"
     }
 "#;
 
-#[test_each_connector]
+#[test_connector]
 async fn mark_migration_applied_on_an_empty_database_works(api: &TestApi) -> TestResult {
     let migrations_directory = api.create_migrations_directory()?;
     let persistence = api.migration_persistence();
@@ -52,7 +52,7 @@ async fn mark_migration_applied_on_an_empty_database_works(api: &TestApi) -> Tes
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn mark_migration_applied_on_a_non_empty_database_works(api: &TestApi) -> TestResult {
     let migrations_directory = api.create_migrations_directory()?;
     let persistence = api.migration_persistence();
@@ -119,7 +119,7 @@ async fn mark_migration_applied_on_a_non_empty_database_works(api: &TestApi) -> 
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn mark_migration_applied_when_the_migration_is_already_applied_errors(api: &TestApi) -> TestResult {
     let migrations_directory = api.create_migrations_directory()?;
     let persistence = api.migration_persistence();
@@ -167,13 +167,10 @@ async fn mark_migration_applied_when_the_migration_is_already_applied_errors(api
         .await
         .unwrap_err();
 
-    assert_eq!(
-        err.to_string(),
-        format!(
-            "The migration `{}` is already recorded as applied in the database.",
-            second_migration_name
-        )
-    );
+    assert!(err.to_string().starts_with(&format!(
+        "The migration `{}` is already recorded as applied in the database.\n",
+        second_migration_name
+    )));
 
     let applied_migrations = persistence.list_migrations().await?.unwrap();
 
@@ -193,7 +190,7 @@ async fn mark_migration_applied_when_the_migration_is_already_applied_errors(api
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn mark_migration_applied_when_the_migration_is_failed(api: &TestApi) -> TestResult {
     let migrations_directory = api.create_migrations_directory()?;
     let persistence = api.migration_persistence();
@@ -277,7 +274,7 @@ async fn mark_migration_applied_when_the_migration_is_failed(api: &TestApi) -> T
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn baselining_should_work(api: &TestApi) -> TestResult {
     let migrations_directory = api.create_migrations_directory()?;
     let persistence = api.migration_persistence();
@@ -288,7 +285,7 @@ async fn baselining_should_work(api: &TestApi) -> TestResult {
                 t.add_column("id", types::primary());
             });
         })
-        .await?;
+        .await;
 
     // Create a first local migration that matches the db contents
     let baseline_migration_name = {
@@ -328,7 +325,7 @@ async fn baselining_should_work(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn must_return_helpful_error_on_migration_not_found(api: &TestApi) -> TestResult {
     let migrations_directory = api.create_migrations_directory()?;
 
@@ -346,7 +343,7 @@ async fn must_return_helpful_error_on_migration_not_found(api: &TestApi) -> Test
         .send()
         .await
         .unwrap_err()
-        .render_user_facing()
+        .to_user_facing()
         .unwrap_known();
 
     assert_eq!(err.error_code, MigrationToMarkAppliedNotFound::ERROR_CODE);

@@ -1,7 +1,7 @@
 use migration_engine_tests::sql::*;
 use sql_schema_describer::ColumnTypeFamily;
 
-#[test_each_connector]
+#[test_connector]
 async fn bytes_columns_are_idempotent(api: &TestApi) -> TestResult {
     let dm = format!(
         r#"
@@ -26,7 +26,7 @@ async fn bytes_columns_are_idempotent(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn float_columns_are_idempotent(api: &TestApi) -> TestResult {
     let dm = r#"
         model Cat {
@@ -46,7 +46,7 @@ async fn float_columns_are_idempotent(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn decimal_columns_are_idempotent(api: &TestApi) -> TestResult {
     let dm = format!(
         r#"
@@ -71,7 +71,7 @@ async fn decimal_columns_are_idempotent(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn float_to_decimal_works(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Cat {
@@ -111,7 +111,7 @@ async fn float_to_decimal_works(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn decimal_to_float_works(api: &TestApi) -> TestResult {
     let dm1 = format!(
         r#"
@@ -151,7 +151,7 @@ async fn decimal_to_float_works(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn bytes_to_string_works(api: &TestApi) -> TestResult {
     let dm1 = format!(
         r#"
@@ -191,7 +191,7 @@ async fn bytes_to_string_works(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn string_to_bytes_works(api: &TestApi) -> TestResult {
     let dm1 = format!(
         r#"
@@ -231,7 +231,7 @@ async fn string_to_bytes_works(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(capabilities("scalar_lists"), log = "debug")]
+#[test_connector(capabilities(ScalarLists))]
 async fn decimal_to_decimal_array_works(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Test {
@@ -277,7 +277,7 @@ async fn decimal_to_decimal_array_works(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(capabilities("scalar_lists"))]
+#[test_connector(capabilities(ScalarLists))]
 async fn bytes_to_bytes_array_works(api: &TestApi) -> TestResult {
     let dm1 = format!(
         r#"

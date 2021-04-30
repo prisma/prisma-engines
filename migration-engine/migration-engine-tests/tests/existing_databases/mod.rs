@@ -1,10 +1,9 @@
 use barrel::types;
 use migration_engine_tests::sql::*;
-use pretty_assertions::assert_eq;
 use quaint::prelude::Queryable;
 use sql_schema_describer::*;
 
-#[test_each_connector]
+#[test_connector]
 async fn adding_a_model_for_an_existing_table_must_work(api: &TestApi) -> TestResult {
     let initial_result = api
         .barrel()
@@ -13,7 +12,7 @@ async fn adding_a_model_for_an_existing_table_must_work(api: &TestApi) -> TestRe
                 t.add_column("id", types::primary());
             });
         })
-        .await?;
+        .await;
 
     let dm = r#"
         model Blog {
@@ -23,12 +22,14 @@ async fn adding_a_model_for_an_existing_table_must_work(api: &TestApi) -> TestRe
 
     api.schema_push(dm).send().await?.assert_green()?;
 
-    api.assert_schema().await?.assert_equals(&initial_result)?;
+    api.assert_schema()
+        .await?
+        .assert_equals(&initial_result.into_schema())?;
 
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn removing_a_model_for_a_table_that_is_already_deleted_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Blog {
@@ -41,18 +42,16 @@ async fn removing_a_model_for_a_table_that_is_already_deleted_must_work(api: &Te
     "#;
 
     api.schema_push(dm1).send().await?.assert_green()?;
-    let initial_result = api.describe_database().await?;
-
-    assert!(initial_result.get_table("Post").is_some());
+    api.assert_schema().await?.assert_has_table("Post")?;
 
     let result = api
         .barrel()
         .execute(|migration| {
             migration.drop_table("Post");
         })
-        .await?;
+        .await;
 
-    assert!(!result.get_table("Post").is_some());
+    let result = result.assert_tables_count(1)?.assert_has_table("Blog")?;
 
     let dm2 = r#"
         model Blog {
@@ -62,12 +61,12 @@ async fn removing_a_model_for_a_table_that_is_already_deleted_must_work(api: &Te
 
     api.schema_push(dm2).send().await?;
 
-    api.assert_schema().await?.assert_equals(&result)?;
+    api.assert_schema().await?.assert_equals(&result.into_schema())?;
 
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn creating_a_field_for_an_existing_column_with_a_compatible_type_must_work(api: &TestApi) -> TestResult {
     let is_mysql = api.is_mysql();
     let is_mssql = api.is_mssql();
@@ -88,7 +87,7 @@ async fn creating_a_field_for_an_existing_column_with_a_compatible_type_must_wor
                 );
             });
         })
-        .await?;
+        .await;
 
     let dm = r#"
         model Blog {
@@ -99,14 +98,14 @@ async fn creating_a_field_for_an_existing_column_with_a_compatible_type_must_wor
 
     api.schema_push(dm).force(true).send().await?.assert_green()?;
 
-    let final_schema = api.describe_database().await?;
-
-    assert_eq!(initial_result, final_schema);
+    api.assert_schema()
+        .await?
+        .assert_equals(&initial_result.into_schema())?;
 
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn creating_a_field_for_an_existing_column_and_changing_its_type_must_work(api: &TestApi) -> TestResult {
     let initial_result = api
         .barrel()
@@ -116,11 +115,11 @@ async fn creating_a_field_for_an_existing_column_and_changing_its_type_must_work
                 t.add_column("title", types::integer().nullable(true));
             });
         })
-        .await?;
+        .await;
 
-    let initial_column = initial_result.table_bang("Blog").column_bang("title");
-    assert_eq!(initial_column.tpe.family, ColumnTypeFamily::Int);
-    assert_eq!(initial_column.is_required(), false);
+    initial_result.assert_table("Blog", |t| {
+        t.assert_column("title", |c| c.assert_type_is_int()?.assert_is_nullable())
+    })?;
 
     let dm = r#"
             model Blog {
@@ -130,24 +129,15 @@ async fn creating_a_field_for_an_existing_column_and_changing_its_type_must_work
         "#;
 
     api.schema_push(dm).force(true).send().await?;
-
-    let result = api.describe_database().await?;
-
-    let table = result.table_bang("Blog");
-    let column = table.column_bang("title");
-
-    assert_eq!(column.tpe.family, ColumnTypeFamily::String);
-    assert!(column.is_required());
-
-    let index = table.indices.iter().find(|i| i.columns == ["title"]);
-
-    assert!(index.is_some());
-    assert_eq!(index.unwrap().tpe, IndexType::Unique);
+    api.assert_schema().await?.assert_table("Blog", |t| {
+        t.assert_column("title", |c| c.assert_type_is_string()?.assert_is_required())?
+            .assert_index_on_columns(&["title"], |idx| idx.assert_is_unique())
+    })?;
 
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn creating_a_field_for_an_existing_column_and_simultaneously_making_it_optional(api: &TestApi) -> TestResult {
     let initial_result = api
         .barrel()
@@ -157,9 +147,9 @@ async fn creating_a_field_for_an_existing_column_and_simultaneously_making_it_op
                 t.add_column("title", types::text());
             });
         })
-        .await?;
-    let initial_column = initial_result.table_bang("Blog").column_bang("title");
-    assert_eq!(initial_column.is_required(), true);
+        .await;
+
+    initial_result.assert_table("Blog", |t| t.assert_column("title", |c| c.assert_is_required()))?;
 
     let dm = r#"
         model Blog {
@@ -170,15 +160,14 @@ async fn creating_a_field_for_an_existing_column_and_simultaneously_making_it_op
 
     api.schema_push(dm).send().await?.assert_green()?;
 
-    let result = api.describe_database().await?;
-
-    let column = result.table_bang("Blog").column_bang("title");
-    assert!(!column.is_required());
+    api.assert_schema()
+        .await?
+        .assert_table("Blog", |t| t.assert_column("title", |c| c.assert_is_nullable()))?;
 
     Ok(())
 }
 
-#[test_each_connector(capabilities("scalar_lists"))]
+#[test_connector(capabilities(ScalarLists))]
 async fn creating_a_scalar_list_field_for_an_existing_table_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         datasource pg {
@@ -192,10 +181,7 @@ async fn creating_a_scalar_list_field_for_an_existing_table_must_work(api: &Test
     "#;
 
     api.schema_push(dm1).send().await?.assert_green()?;
-
-    let initial_result = api.describe_database().await?;
-
-    assert!(!initial_result.get_table("Blog_tags").is_some());
+    api.assert_schema().await?.assert_has_table("Blog")?;
 
     let result = api
         .barrel()
@@ -205,7 +191,7 @@ async fn creating_a_scalar_list_field_for_an_existing_table_must_work(api: &Test
                 t.add_column("tags", types::array(&inner));
             });
         })
-        .await?;
+        .await;
 
     let dm2 = r#"
         datasource pg {
@@ -219,14 +205,13 @@ async fn creating_a_scalar_list_field_for_an_existing_table_must_work(api: &Test
         }
     "#;
 
-    api.schema_push(dm2).send().await?.assert_green()?;
-
-    api.assert_schema().await?.assert_equals(&result)?;
+    api.schema_push(dm2).send().await?.assert_green()?.assert_no_steps()?;
+    api.assert_schema().await?.assert_equals(&result.into_schema())?;
 
     Ok(())
 }
 
-#[test_each_connector(tags("sql"))]
+#[test_connector]
 async fn delete_a_field_for_a_non_existent_column_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
             model Blog {
@@ -236,9 +221,9 @@ async fn delete_a_field_for_a_non_existent_column_must_work(api: &TestApi) -> Te
         "#;
 
     api.schema_push(dm1).send().await?;
-
-    let initial_result = api.describe_database().await?;
-    assert!(initial_result.table_bang("Blog").column("title").is_some());
+    api.assert_schema()
+        .await?
+        .assert_table("Blog", |t| t.assert_columns_count(2)?.assert_has_column("title"))?;
 
     let result = api
         .barrel()
@@ -249,9 +234,11 @@ async fn delete_a_field_for_a_non_existent_column_must_work(api: &TestApi) -> Te
                 t.add_column("id", types::primary());
             });
         })
-        .await?;
+        .await;
 
-    assert!(result.table_bang("Blog").column("title").is_none());
+    api.assert_schema()
+        .await?
+        .assert_table("Blog", |t| t.assert_columns_count(1)?.assert_has_column("id"))?;
 
     let dm2 = r#"
         model Blog {
@@ -259,14 +246,13 @@ async fn delete_a_field_for_a_non_existent_column_must_work(api: &TestApi) -> Te
         }
     "#;
 
-    api.schema_push(dm2).send().await?.assert_green()?;
-
-    api.assert_schema().await?.assert_equals(&result)?;
+    api.schema_push(dm2).send().await?.assert_green()?.assert_no_steps()?;
+    api.assert_schema().await?.assert_equals(&result.into_schema())?;
 
     Ok(())
 }
 
-#[test_each_connector(tags("sql"), capabilities("scalar_lists"))]
+#[test_connector(capabilities(ScalarLists))]
 async fn deleting_a_scalar_list_field_for_a_non_existent_column_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
             datasource pg {
@@ -289,27 +275,26 @@ async fn deleting_a_scalar_list_field_for_a_non_existent_column_must_work(api: &
                 t.drop_column("tags");
             });
         })
-        .await?;
+        .await;
 
     let dm2 = r#"
-            datasource pg {
-              provider = "postgres"
-              url = "postgres://localhost:5432"
-            }
+        datasource pg {
+            provider = "postgres"
+            url = "postgres://localhost:5432"
+        }
 
-            model Blog {
-                id Int @id
-            }
-        "#;
+        model Blog {
+            id Int @id
+        }
+    "#;
 
     api.schema_push(dm2).send().await?.assert_green()?;
-
-    api.assert_schema().await?.assert_equals(&result)?;
+    api.assert_schema().await?.assert_equals(&result.into_schema())?;
 
     Ok(())
 }
 
-#[test_each_connector(tags("sql"))]
+#[test_connector]
 async fn updating_a_field_for_a_non_existent_column(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Blog {
@@ -319,11 +304,9 @@ async fn updating_a_field_for_a_non_existent_column(api: &TestApi) -> TestResult
     "#;
 
     api.schema_push(dm1).send().await?.assert_green()?;
-
-    let initial_result = api.describe_database().await?;
-
-    let initial_column = initial_result.table_bang("Blog").column_bang("title");
-    assert_eq!(initial_column.tpe.family, ColumnTypeFamily::String);
+    api.assert_schema()
+        .await?
+        .assert_table("Blog", |t| t.assert_column("title", |c| c.assert_type_is_string()))?;
 
     let result = api
         .barrel()
@@ -334,8 +317,9 @@ async fn updating_a_field_for_a_non_existent_column(api: &TestApi) -> TestResult
                 t.add_column("id", types::primary());
             });
         })
-        .await?;
-    assert!(result.table_bang("Blog").column("title").is_none());
+        .await;
+
+    result.assert_table("Blog", |t| t.assert_columns_count(1)?.assert_has_column("id"))?;
 
     let dm2 = r#"
         model Blog {
@@ -345,22 +329,15 @@ async fn updating_a_field_for_a_non_existent_column(api: &TestApi) -> TestResult
     "#;
 
     api.schema_push(dm2).force(true).send().await?;
-
-    let final_result = api.describe_database().await?;
-    let final_column = final_result.table_bang("Blog").column_bang("title");
-    assert_eq!(final_column.tpe.family, ColumnTypeFamily::Int);
-    let index = final_result
-        .table_bang("Blog")
-        .indices
-        .iter()
-        .find(|i| i.columns == vec!["title"]);
-    assert_eq!(index.is_some(), true);
-    assert_eq!(index.unwrap().tpe, IndexType::Unique);
+    api.assert_schema().await?.assert_table("Blog", |t| {
+        t.assert_column("title", |c| c.assert_type_is_int())?
+            .assert_index_on_columns(&["title"], |idx| idx.assert_is_unique())
+    })?;
 
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn renaming_a_field_where_the_column_was_already_renamed_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Blog {
@@ -370,10 +347,9 @@ async fn renaming_a_field_where_the_column_was_already_renamed_must_work(api: &T
     "#;
 
     api.schema_push(dm1).send().await?.assert_green()?;
-
-    let initial_result = api.assert_schema().await?.into_schema();
-    let initial_column = initial_result.table_bang("Blog").column_bang("title");
-    assert_eq!(initial_column.tpe.family, ColumnTypeFamily::String);
+    api.assert_schema()
+        .await?
+        .assert_table("Blog", |t| t.assert_column("title", |c| c.assert_type_is_string()))?;
 
     let result = api
         .barrel()
@@ -385,9 +361,9 @@ async fn renaming_a_field_where_the_column_was_already_renamed_must_work(api: &T
                 t.add_column("new_title", types::text());
             });
         })
-        .await?;
+        .await;
 
-    assert!(result.table_bang("Blog").column("new_title").is_some());
+    result.assert_table("Blog", |t| t.assert_has_column("new_title"))?;
 
     let dm2 = r#"
         model Blog {
@@ -398,16 +374,16 @@ async fn renaming_a_field_where_the_column_was_already_renamed_must_work(api: &T
 
     api.schema_push(dm2).send().await?.assert_green()?;
 
-    let final_result = api.assert_schema().await?.into_schema();
-    let final_column = final_result.table_bang("Blog").column_bang("new_title");
-
-    assert_eq!(final_column.tpe.family, ColumnTypeFamily::Float);
-    assert!(final_result.table_bang("Blog").column("title").is_none());
+    api.assert_schema().await?.assert_table("Blog", |t| {
+        t.assert_column("new_title", |c| c.assert_type_family(ColumnTypeFamily::Float))?
+            .assert_columns_count(2)?
+            .assert_has_column("id")
+    })?;
 
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"))]
+#[test_connector(tags(Postgres))]
 async fn existing_enums_are_picked_up(api: &TestApi) -> TestResult {
     let sql = r#"
         CREATE TYPE "Genre" AS ENUM ('SKA', 'PUNK');

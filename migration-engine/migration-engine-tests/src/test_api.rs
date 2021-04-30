@@ -18,28 +18,21 @@ pub use reset::Reset;
 pub use schema_push::SchemaPush;
 
 use crate::{
-    assertions::SchemaAssertion, connectors::Tags, sql::barrel_migration_executor::BarrelMigrationExecutor,
+    assertions::SchemaAssertion, sql::barrel_migration_executor::BarrelMigrationExecutor,
     test_api::list_migration_directories::ListMigrationDirectories, AssertionResult,
 };
 use dev_diagnostic::DevDiagnostic;
-use enumflags2::BitFlags;
 use mark_migration_rolled_back::MarkMigrationRolledBack;
-use migration_connector::{MigrationFeature, MigrationPersistence, MigrationRecord};
+use migration_connector::{ConnectorError, MigrationPersistence, MigrationRecord};
+use migration_core::GenericApi;
 use quaint::{
     prelude::{ConnectionInfo, Queryable, SqlFamily},
     single::Quaint,
 };
 use sql_migration_connector::SqlMigrationConnector;
-use sql_schema_describer::SqlSchema;
 use std::{borrow::Cow, fmt::Write as _};
 use tempfile::TempDir;
-use test_setup::{create_mysql_database, create_postgres_database, Features, TestApiArgs};
-
-#[derive(BitFlags, Debug, Clone, Copy, PartialEq)]
-#[repr(u8)]
-pub enum Circumstances {
-    LowerCasesTableNames = 0b0001,
-}
+use test_setup::{create_mysql_database, create_postgres_database, sqlite_test_url, BitFlags, Tags, TestApiArgs};
 
 /// A handle to all the context needed for end-to-end testing of the migration engine across
 /// connectors.
@@ -47,41 +40,49 @@ pub struct TestApi {
     api: SqlMigrationConnector,
     args: TestApiArgs,
     connection_string: String,
-    circumstances: BitFlags<Circumstances>,
 }
 
 impl TestApi {
     pub async fn new(args: TestApiArgs) -> Self {
-        let features = preview_features(args.test_features);
-        let tags = args.connector_tags;
+        let tags = args.tags();
 
         let db_name = if tags.contains(Tags::Mysql) {
-            test_setup::mysql_safe_identifier(args.test_function_name)
+            test_setup::mysql_safe_identifier(args.test_function_name())
         } else {
-            args.test_function_name
+            args.test_function_name()
         };
 
-        let connection_string = (args.url_fn)(db_name);
+        let (_conn, connection_string): (_, String) = if tags.contains(Tags::Mysql | Tags::Vitess) {
+            let connector =
+                SqlMigrationConnector::new(args.database_url(), args.shadow_database_url().map(String::from))
+                    .await
+                    .unwrap();
+            connector.reset().await.unwrap();
 
-        if tags.contains(Tags::Mysql) {
-            create_mysql_database(&connection_string.parse().unwrap())
-                .await
-                .unwrap();
+            (connector.quaint().clone(), args.database_url().to_owned())
+        } else if tags.contains(Tags::Mysql) {
+            create_mysql_database(&db_name).await.unwrap()
         } else if tags.contains(Tags::Postgres) {
-            create_postgres_database(&connection_string.parse().unwrap())
-                .await
-                .unwrap();
+            create_postgres_database(&db_name).await.unwrap()
         } else if tags.contains(Tags::Mssql) {
-            let conn = Quaint::new(&connection_string).await.unwrap();
-
-            test_setup::connectors::mssql::reset_schema(&conn, db_name)
+            test_setup::init_mssql_database(args.database_url(), db_name)
                 .await
-                .unwrap();
+                .unwrap()
+        } else if tags.contains(Tags::Sqlite) {
+            let url = sqlite_test_url(db_name);
+
+            (Quaint::new(&url).await.unwrap(), url)
+        } else {
+            unreachable!()
         };
 
-        let api = SqlMigrationConnector::new(&connection_string, features, None)
+        let api = SqlMigrationConnector::new(&connection_string, args.shadow_database_url().map(String::from))
             .await
             .unwrap();
+
+        if tags.contains(Tags::Vitess) {
+            api.reset().await.unwrap()
+        }
 
         let mut circumstances = BitFlags::empty();
 
@@ -96,7 +97,7 @@ impl TestApi {
                 .filter(|val| *val == 1);
 
             if val.is_some() {
-                circumstances |= Circumstances::LowerCasesTableNames;
+                circumstances |= Tags::LowerCasesTableNames;
             }
         }
 
@@ -104,8 +105,11 @@ impl TestApi {
             api,
             args,
             connection_string,
-            circumstances,
         }
+    }
+
+    pub fn connection_string(&self) -> &str {
+        &self.connection_string
     }
 
     pub fn schema_name(&self) -> &str {
@@ -137,7 +141,7 @@ impl TestApi {
     }
 
     pub fn lower_case_identifiers(&self) -> bool {
-        self.circumstances.contains(Circumstances::LowerCasesTableNames)
+        self.tags().contains(Tags::LowerCasesTableNames)
     }
 
     pub fn is_mysql_5_6(&self) -> bool {
@@ -160,8 +164,8 @@ impl TestApi {
         self.connection_info().sql_family()
     }
 
-    fn tags(&self) -> BitFlags<Tags> {
-        self.args.connector_tags
+    pub fn tags(&self) -> BitFlags<Tags> {
+        self.args.tags()
     }
 
     pub fn datasource(&self) -> String {
@@ -178,11 +182,11 @@ impl TestApi {
     }
 
     /// Create a temporary directory to serve as a test migrations directory.
-    pub fn create_migrations_directory(&self) -> anyhow::Result<TempDir> {
-        Ok(tempfile::tempdir()?)
+    pub fn create_migrations_directory(&self) -> std::io::Result<TempDir> {
+        tempfile::tempdir()
     }
 
-    pub fn display_migrations(&self, migrations_directory: &TempDir) -> anyhow::Result<()> {
+    pub fn display_migrations(&self, migrations_directory: &TempDir) -> std::io::Result<()> {
         for entry in std::fs::read_dir(migrations_directory.path())? {
             let entry = entry?;
             if entry.file_type()?.is_dir() {
@@ -273,14 +277,9 @@ impl TestApi {
         }
     }
 
-    pub async fn describe_database(&self) -> Result<SqlSchema, anyhow::Error> {
-        let result = self.api.describe_schema().await?;
-        Ok(result)
-    }
-
-    pub async fn assert_schema(&self) -> Result<SchemaAssertion, anyhow::Error> {
-        let schema = self.describe_database().await?;
-        Ok(SchemaAssertion::new(schema, self.circumstances))
+    pub async fn assert_schema(&self) -> Result<SchemaAssertion, ConnectorError> {
+        let schema = self.api.describe_schema().await?;
+        Ok(SchemaAssertion::new(schema, self.tags()))
     }
 
     pub async fn dump_table(&self, table_name: &str) -> Result<quaint::prelude::ResultSet, quaint::error::Error> {
@@ -314,7 +313,7 @@ impl TestApi {
               }}
 
             "#,
-            provider = self.args.provider
+            provider = self.args.provider()
         )
         .unwrap();
     }
@@ -367,7 +366,7 @@ impl<'a> TestApiSelect<'a> {
     }
 
     /// This is deprecated. Used row assertions instead with the ResultSetExt trait.
-    pub async fn send_debug(self) -> Result<Vec<Vec<String>>, anyhow::Error> {
+    pub async fn send_debug(self) -> Result<Vec<Vec<String>>, quaint::error::Error> {
         let rows = self.send().await?;
 
         let rows: Vec<Vec<String>> = rows
@@ -378,15 +377,9 @@ impl<'a> TestApiSelect<'a> {
         Ok(rows)
     }
 
-    pub async fn send(self) -> anyhow::Result<quaint::prelude::ResultSet> {
+    pub async fn send(self) -> Result<quaint::prelude::ResultSet, quaint::error::Error> {
         Ok(self.api.database().query(self.select.into()).await?)
     }
-}
-
-fn preview_features(features: BitFlags<Features>) -> BitFlags<MigrationFeature> {
-    features.iter().fold(BitFlags::empty(), |acc, feature| match feature {
-        Features::Other => acc,
-    })
 }
 
 pub trait MigrationsAssertions: Sized {

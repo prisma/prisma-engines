@@ -176,6 +176,10 @@ impl SqlRenderer for SqliteFlavour {
     fn render_drop_view(&self, view: &ViewWalker<'_>) -> String {
         format!(r#"DROP VIEW "{}""#, view.name())
     }
+
+    fn render_drop_user_defined_type(&self, _: &UserDefinedTypeWalker<'_>) -> String {
+        unreachable!("render_drop_user_defined_type on SQLite")
+    }
 }
 
 fn render_column_type(t: &ColumnType) -> &str {

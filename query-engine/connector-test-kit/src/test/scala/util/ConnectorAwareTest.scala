@@ -25,9 +25,12 @@ object IgnoreSQLite extends Tag("ignore.sqlite") with AssociatedWithConnectorTag
 object IgnoreMsSql extends Tag("ignore.mssql") with AssociatedWithConnectorTags {
   override def tag = ConnectorTag.MsSqlConnectorTag
 }
+object IgnoreVitess extends Tag("ignore.vitess") with AssociatedWithConnectorTags {
+  override def tag = ConnectorTag.VitessConnectorTag
+}
 
 object IgnoreSet {
-  val ignoreConnectorTags = Set(IgnorePostgres, IgnoreMySql, IgnoreMySql56, IgnoreMongo, IgnoreSQLite, IgnoreMsSql)
+  val ignoreConnectorTags = Set(IgnorePostgres, IgnoreMySql, IgnoreMySql56, IgnoreMongo, IgnoreSQLite, IgnoreMsSql, IgnoreVitess)
 
   def byName(name: String): Option[AssociatedWithConnectorTags] = ignoreConnectorTags.find(_.name == name)
 }
@@ -49,6 +52,9 @@ object ConnectorTag extends Enum[ConnectorTag] {
   object PostgresConnectorTag extends RelationalConnectorTag
   object SQLiteConnectorTag   extends RelationalConnectorTag
   object MsSqlConnectorTag    extends RelationalConnectorTag
+  object VitessConnectorTag extends RelationalConnectorTag {
+    override def superTags() = Seq(MySqlConnectorTag)
+  }
 
   sealed trait DocumentConnectorTag extends ConnectorTag
 
@@ -65,6 +71,7 @@ trait ConnectorAwareTest extends SuiteMixin { self: Suite with ApiSpecBase =>
     case "mongodb"                 => ConnectorTag.MongoConnectorTag
     case "mysql56"                 => ConnectorTag.Mysql56ConnectorTag
     case "mysql"                   => ConnectorTag.MySqlConnectorTag
+    case "vitess"                  => ConnectorTag.VitessConnectorTag
     case "postgres" | "postgresql" => ConnectorTag.PostgresConnectorTag
     case "sqlite"                  => ConnectorTag.SQLiteConnectorTag
     case "sqlserver"               => ConnectorTag.MsSqlConnectorTag

@@ -17,7 +17,6 @@ request-handlers = { path = "../../request-handlers" }
 tokio = "1.0"
 query-core = { path = "../../core" }
 datamodel = { path = "../../../libs/datamodel/core" }
-feature-flags = { path = "../../../libs/feature-flags" }
 thiserror = "1.0"
 async-trait = "0.1"
 nom = "6"
@@ -29,6 +28,7 @@ tracing-subscriber = { version = "0.2", features = ["fmt"] }
 tracing-error = "0.1.2"
 colored = "2"
 indoc = "1.0"
+enumflags2 = "0.6"
 
 # Only this version is vetted, upgrade only after going through the code,
 # as this is a small crate with little user base.

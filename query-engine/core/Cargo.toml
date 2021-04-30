@@ -19,7 +19,6 @@ connector = { path = "../connectors/query-connector", package = "query-connector
 crossbeam-queue = "0.2"
 datamodel = { path = "../../libs/datamodel/core" }
 datamodel-connector = { path = "../../libs/datamodel/connectors/datamodel-connector" }
-feature-flags = { path = "../../libs/feature-flags" }
 futures = "0.3"
 im = "13.0"
 indexmap = { version = "1.0", features = ["serde-1"] }

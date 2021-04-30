@@ -29,7 +29,7 @@ impl MigrationPersistence for SqlMigrationConnector {
                 .table_walkers()
                 .any(|t| !self.flavour().table_should_be_ignored(t.name()))
         {
-            return Err(ConnectorError::user_facing_error(
+            return Err(ConnectorError::user_facing(
                 user_facing_errors::migration_engine::DatabaseSchemaNotEmpty {
                     database_name: self.connection.connection_info().database_location(),
                 },

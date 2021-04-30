@@ -1,20 +1,14 @@
-use crate::{common::*, test_api::*};
+mod describers;
+mod test_api;
+
+use crate::test_api::*;
 use barrel::types;
 use native_types::{MsSqlType, MsSqlTypeParameter, MySqlType, NativeType, PostgresType};
 use pretty_assertions::assert_eq;
 use prisma_value::PrismaValue;
-use quaint::prelude::{Queryable, SqlFamily};
+use quaint::prelude::SqlFamily;
 use serde_json::Value;
 use sql_schema_describer::*;
-use test_macros::test_each_connector;
-use test_setup::connectors::Tags;
-
-mod common;
-mod mssql;
-mod mysql;
-mod postgres;
-mod sqlite;
-mod test_api;
 
 fn int_full_data_type(api: &TestApi) -> &'static str {
     match api.sql_family() {
@@ -56,7 +50,7 @@ fn varchar_native_type(api: &TestApi, length: u32) -> Option<Value> {
     }
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn is_required_must_work(api: &TestApi) {
     api.barrel()
         .execute(|migration| {
@@ -67,7 +61,7 @@ async fn is_required_must_work(api: &TestApi) {
         })
         .await;
 
-    let result = api.describe().await.expect("describing");
+    let result = api.describe().await;
     let user_table = result.get_table("User").expect("getting User table");
     let expected_columns = vec![
         Column {
@@ -97,7 +91,7 @@ async fn is_required_must_work(api: &TestApi) {
     assert_eq!(user_table.columns, expected_columns);
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn foreign_keys_must_work(api: &TestApi) {
     let sql_family = api.sql_family();
 
@@ -119,7 +113,7 @@ async fn foreign_keys_must_work(api: &TestApi) {
         })
         .await;
 
-    let schema = api.describe().await.expect("describe failed");
+    let schema = api.describe().await;
     let user_table = schema.get_table("User").expect("couldn't get User table");
     let expected_columns = vec![Column {
         name: "city".to_string(),
@@ -171,7 +165,7 @@ async fn foreign_keys_must_work(api: &TestApi) {
     );
 }
 
-#[test_each_connector(log = "quaint=info")]
+#[test_connector]
 async fn multi_column_foreign_keys_must_work(api: &TestApi) {
     let sql_family = api.sql_family();
     let schema = api.schema_name().to_owned();
@@ -210,7 +204,7 @@ async fn multi_column_foreign_keys_must_work(api: &TestApi) {
             });
         })
         .await;
-    let schema = api.describe().await.expect("describe failed");
+    let schema = api.describe().await;
     let user_table = schema.get_table("User").expect("couldn't get User table");
     let expected_columns = vec![
         Column {
@@ -278,7 +272,7 @@ async fn multi_column_foreign_keys_must_work(api: &TestApi) {
     );
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn names_with_hyphens_must_work(api: &TestApi) {
     api.barrel()
         .execute(|migration| {
@@ -287,7 +281,7 @@ async fn names_with_hyphens_must_work(api: &TestApi) {
             });
         })
         .await;
-    let result = api.describe().await.expect("describing");
+    let result = api.describe().await;
     let user_table = result.get_table("User-table").expect("getting User table");
     let expected_columns = vec![Column {
         name: "column-1".to_string(),
@@ -303,7 +297,7 @@ async fn names_with_hyphens_must_work(api: &TestApi) {
     assert_eq!(user_table.columns, expected_columns);
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn composite_primary_keys_must_work(api: &TestApi) {
     let sql = match api.sql_family() {
         SqlFamily::Mysql => format!(
@@ -334,7 +328,7 @@ async fn composite_primary_keys_must_work(api: &TestApi) {
 
     api.database().query_raw(&sql, &[]).await.unwrap();
 
-    let schema = api.describe().await.expect("describe failed");
+    let schema = api.describe().await;
     let table = schema.get_table("User").expect("couldn't get User table");
     let mut expected_columns = vec![
         Column {
@@ -382,7 +376,7 @@ async fn composite_primary_keys_must_work(api: &TestApi) {
     );
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn indices_must_work(api: &TestApi) {
     api.barrel()
         .execute(|migration| {
@@ -393,7 +387,7 @@ async fn indices_must_work(api: &TestApi) {
             });
         })
         .await;
-    let result = api.describe().await.expect("describing");
+    let result = api.describe().await;
     let user_table = result.get_table("User").expect("getting User table");
     let default = match api.sql_family() {
         SqlFamily::Postgres => Some(DefaultValue::sequence("User_id_seq".to_string())),
@@ -462,7 +456,7 @@ async fn indices_must_work(api: &TestApi) {
     }
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn column_uniqueness_must_be_detected(api: &TestApi) {
     api.barrel()
         .execute(|migration| {
@@ -474,7 +468,7 @@ async fn column_uniqueness_must_be_detected(api: &TestApi) {
         })
         .await;
 
-    let result = api.describe().await.expect("describing");
+    let result = api.describe().await;
     let user_table = result.get_table("User").expect("getting User table");
     let expected_columns = vec![
         Column {
@@ -576,7 +570,7 @@ async fn column_uniqueness_must_be_detected(api: &TestApi) {
     );
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn defaults_must_work(api: &TestApi) {
     api.barrel()
         .execute(|migration| {
@@ -586,7 +580,7 @@ async fn defaults_must_work(api: &TestApi) {
         })
         .await;
 
-    let result = api.describe().await.expect("describing");
+    let result = api.describe().await;
     let user_table = result.get_table("User").expect("getting User table");
 
     assert_eq!("User", &user_table.name);

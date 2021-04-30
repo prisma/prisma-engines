@@ -4,6 +4,7 @@
 
 pub mod api;
 pub mod commands;
+pub mod qe_setup;
 
 mod core_error;
 
@@ -16,9 +17,9 @@ use datamodel::{
     dml::Datamodel,
     Configuration,
 };
-use migration_connector::{features, ConnectorError};
+use migration_connector::ConnectorError;
 use sql_migration_connector::SqlMigrationConnector;
-use user_facing_errors::{common::InvalidDatabaseString, migration_engine::DeprecatedProviderArray, KnownError};
+use user_facing_errors::{common::InvalidDatabaseString, KnownError};
 
 #[cfg(feature = "mongodb")]
 use datamodel::common::provider_names::MONGODB_SOURCE_NAME;
@@ -28,17 +29,10 @@ use mongodb_migration_connector::MongoDbMigrationConnector;
 /// Top-level constructor for the migration engine API.
 pub async fn migration_api(datamodel: &str) -> CoreResult<Box<dyn api::GenericApi>> {
     let config = parse_configuration(datamodel)?;
-    let features = features::from_config(&config);
-
     let source = config
         .datasources
         .first()
-        .map(|source| match source.provider.as_slice() {
-            [_] => Ok(source),
-            [] => Err(CoreError::new_unknown("There is no provider in the datasource.".into())),
-            _ => Err(CoreError::user_facing(DeprecatedProviderArray)),
-        })
-        .unwrap_or_else(|| Err(CoreError::new_unknown("There is no datasource in the schema.".into())))?;
+        .ok_or_else(|| CoreError::from_msg("There is no datasource in the schema.".into()))?;
 
     match &source.active_provider {
         #[cfg(feature = "sql")]
@@ -46,10 +40,10 @@ pub async fn migration_api(datamodel: &str) -> CoreResult<Box<dyn api::GenericAp
             let database_str = &source.url().value;
 
             let mut u = url::Url::parse(database_str).map_err(|err| {
-                let details = user_facing_errors::quaint::invalid_url_description(
-                    database_str,
-                    &format!("Error parsing connection string: {}", err),
-                );
+                let details = user_facing_errors::quaint::invalid_url_description(&format!(
+                    "Error parsing connection string: {}",
+                    err
+                ));
 
                 ConnectorError::from(KnownError::new(InvalidDatabaseString { details }))
             })?;
@@ -72,7 +66,6 @@ pub async fn migration_api(datamodel: &str) -> CoreResult<Box<dyn api::GenericAp
 
             let connector = SqlMigrationConnector::new(
                 u.as_str(),
-                features,
                 source.shadow_database_url.as_ref().map(|url| url.value.clone()),
             )
             .await?;
@@ -83,7 +76,6 @@ pub async fn migration_api(datamodel: &str) -> CoreResult<Box<dyn api::GenericAp
         provider if [MYSQL_SOURCE_NAME, SQLITE_SOURCE_NAME, MSSQL_SOURCE_NAME].contains(&provider.as_str()) => {
             let connector = SqlMigrationConnector::new(
                 &source.url().value,
-                features,
                 source.shadow_database_url.as_ref().map(|url| url.value.clone()),
             )
             .await?;
@@ -92,7 +84,7 @@ pub async fn migration_api(datamodel: &str) -> CoreResult<Box<dyn api::GenericAp
         }
         #[cfg(feature = "mongodb")]
         provider if provider.as_str() == MONGODB_SOURCE_NAME => {
-            let connector = MongoDbMigrationConnector::new(&source.url().value, features).await?;
+            let connector = MongoDbMigrationConnector::new(&source.url().value).await?;
             Ok(Box::new(connector))
         }
         x => unimplemented!("Connector {} is not supported yet", x),
@@ -106,7 +98,7 @@ pub async fn create_database(schema: &str) -> CoreResult<String> {
     let source = config
         .datasources
         .first()
-        .ok_or_else(|| CoreError::new_unknown("There is no datasource in the schema.".into()))?;
+        .ok_or_else(|| CoreError::from_msg("There is no datasource in the schema.".into()))?;
 
     match &source.active_provider {
         provider
@@ -131,7 +123,7 @@ pub async fn drop_database(schema: &str) -> CoreResult<()> {
     let source = config
         .datasources
         .first()
-        .ok_or_else(|| CoreError::new_unknown("There is no datasource in the schema.".into()))?;
+        .ok_or_else(|| CoreError::from_msg("There is no datasource in the schema.".into()))?;
 
     match &source.active_provider {
         provider
@@ -149,50 +141,6 @@ pub async fn drop_database(schema: &str) -> CoreResult<()> {
     }
 }
 
-/// Database setup for connector-test-kit.
-pub async fn qe_setup(prisma_schema: &str) -> CoreResult<()> {
-    let config = parse_configuration(prisma_schema)?;
-    let features = features::from_config(&config);
-
-    let source = config
-        .datasources
-        .first()
-        .ok_or_else(|| CoreError::new_unknown("There is no datasource in the schema.".into()))?;
-
-    let api: Box<dyn GenericApi> = match &source.active_provider {
-        provider
-            if [
-                MYSQL_SOURCE_NAME,
-                POSTGRES_SOURCE_NAME,
-                SQLITE_SOURCE_NAME,
-                MSSQL_SOURCE_NAME,
-            ]
-            .contains(&provider.as_str()) =>
-        {
-            // 1. creates schema & database
-            SqlMigrationConnector::qe_setup(&source.url().value).await?;
-            Box::new(SqlMigrationConnector::new(&source.url().value, features, None).await?)
-        }
-        #[cfg(feature = "mongodb")]
-        provider if provider == MONGODB_SOURCE_NAME => {
-            MongoDbMigrationConnector::qe_setup(&source.url().value).await?;
-            let connector = MongoDbMigrationConnector::new(&source.url().value, features).await?;
-            Box::new(connector)
-        }
-        x => unimplemented!("Connector {} is not supported yet", x),
-    };
-
-    // 2. create the database schema for given Prisma schema
-    let schema_push_input = SchemaPushInput {
-        schema: prisma_schema.to_string(),
-        assume_empty: true,
-        force: true,
-    };
-
-    api.schema_push(&schema_push_input).await?;
-    Ok(())
-}
-
 fn parse_configuration(datamodel: &str) -> CoreResult<Configuration> {
     datamodel::parse_configuration(&datamodel)
         .map(|validated_config| validated_config.subject)
@@ -203,29 +151,4 @@ fn parse_datamodel(datamodel: &str) -> CoreResult<Datamodel> {
     datamodel::parse_datamodel(&datamodel)
         .map(|d| d.subject)
         .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", datamodel)))
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use user_facing_errors::UserFacingError;
-
-    #[tokio::test]
-    async fn migration_api_with_a_provider_array_returns_a_user_facing_error() {
-        let datamodel = r#"
-            datasource dbs {
-                provider = ["sqlite", "mysql"]
-                url = "file:dev.db"
-            }
-        "#;
-
-        let err = migration_api(datamodel)
-            .await
-            .map(drop)
-            .unwrap_err()
-            .render_user_facing()
-            .unwrap_known();
-
-        assert_eq!(err.error_code, DeprecatedProviderArray::ERROR_CODE);
-    }
 }

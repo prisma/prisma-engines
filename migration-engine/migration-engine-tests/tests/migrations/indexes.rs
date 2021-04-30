@@ -1,7 +1,6 @@
 use migration_engine_tests::sql::*;
-use sql_schema_describer::IndexType;
 
-#[test_each_connector]
+#[test_connector]
 async fn index_on_compound_relation_fields_must_work(api: &TestApi) -> TestResult {
     let dm = r#"
         model User {
@@ -35,7 +34,7 @@ async fn index_on_compound_relation_fields_must_work(api: &TestApi) -> TestResul
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn index_settings_must_be_migrated(api: &TestApi) -> TestResult {
     let dm = r#"
         model Test {
@@ -84,7 +83,7 @@ async fn index_settings_must_be_migrated(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn unique_directive_on_required_one_to_one_relation_creates_one_index(api: &TestApi) -> TestResult {
     // We want to test that only one index is created, because of the implicit unique index on
     // required 1:1 relations.
@@ -112,7 +111,7 @@ async fn unique_directive_on_required_one_to_one_relation_creates_one_index(api:
 }
 
 // TODO: Enable SQL Server when cascading rules are in PSL.
-#[test_each_connector(ignore("mssql_2019", "mssql_2017"))]
+#[test_connector(exclude(Mssql))]
 async fn one_to_many_self_relations_do_not_create_a_unique_index(api: &TestApi) -> TestResult {
     let dm = r#"
         model Location {
@@ -140,7 +139,7 @@ async fn one_to_many_self_relations_do_not_create_a_unique_index(api: &TestApi) 
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn model_with_multiple_indexes_works(api: &TestApi) -> TestResult {
     let dm = r#"
     model User {
@@ -150,7 +149,7 @@ async fn model_with_multiple_indexes_works(api: &TestApi) -> TestResult {
 
     model Post {
       id        Int       @id
-      l         Like[]    
+      l         Like[]
     }
 
     model Comment {
@@ -181,7 +180,7 @@ async fn model_with_multiple_indexes_works(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn removing_multi_field_unique_index_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model A {
@@ -195,15 +194,9 @@ async fn removing_multi_field_unique_index_must_work(api: &TestApi) -> TestResul
 
     api.schema_push(dm1).send().await?.assert_green()?;
 
-    let result = api.assert_schema().await?.into_schema();
-
-    let index = result
-        .table_bang("A")
-        .indices
-        .iter()
-        .find(|i| i.columns == ["field", "secondField"]);
-    assert!(index.is_some());
-    assert_eq!(index.unwrap().tpe, IndexType::Unique);
+    api.assert_schema().await?.assert_table("A", |table| {
+        table.assert_index_on_columns(&["field", "secondField"], |idx| idx.assert_is_unique())
+    })?;
 
     let dm2 = r#"
         model A {
@@ -214,18 +207,15 @@ async fn removing_multi_field_unique_index_must_work(api: &TestApi) -> TestResul
     "#;
 
     api.schema_push(dm2).send().await?.assert_green()?;
-    let result = api.assert_schema().await?.into_schema();
-    let index = result
-        .table_bang("A")
-        .indices
-        .iter()
-        .find(|i| i.columns == ["field", "secondField"]);
-    assert!(index.is_none());
+
+    api.assert_schema()
+        .await?
+        .assert_table("A", |table| table.assert_indexes_count(0))?;
 
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn index_renaming_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model A {
@@ -277,7 +267,7 @@ async fn index_renaming_must_work(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn index_renaming_must_work_when_renaming_to_default(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model A {
@@ -290,16 +280,9 @@ async fn index_renaming_must_work_when_renaming_to_default(api: &TestApi) -> Tes
     "#;
 
     api.schema_push(dm1).send().await?.assert_green()?;
-
-    let result = api.describe_database().await?;
-
-    let index = result
-        .table_bang("A")
-        .indices
-        .iter()
-        .find(|i| i.columns == ["field", "secondField"]);
-    assert!(index.is_some());
-    assert_eq!(index.unwrap().tpe, IndexType::Unique);
+    api.assert_schema().await?.assert_table("A", |t| {
+        t.assert_index_on_columns(&["field", "secondField"], |idx| idx.assert_is_unique())
+    })?;
 
     let dm2 = r#"
         model A {
@@ -312,20 +295,16 @@ async fn index_renaming_must_work_when_renaming_to_default(api: &TestApi) -> Tes
     "#;
 
     api.schema_push(dm2).send().await?;
-
-    let sql_schema = api.describe_database().await?;
-
-    let indexes = sql_schema
-        .table_bang("A")
-        .indices
-        .iter()
-        .filter(|i| i.columns == ["field", "secondField"] && i.name == "A.field_secondField_unique");
-    assert_eq!(indexes.count(), 1);
+    api.assert_schema().await?.assert_table("A", |t| {
+        t.assert_index_on_columns(&["field", "secondField"], |idx| {
+            idx.assert_is_unique()?.assert_name("A.field_secondField_unique")
+        })
+    })?;
 
     Ok(())
 }
 
-#[test_each_connector(log = "debug")]
+#[test_connector]
 async fn index_renaming_must_work_when_renaming_to_custom(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model A {
@@ -368,7 +347,7 @@ async fn index_renaming_must_work_when_renaming_to_custom(api: &TestApi) -> Test
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn index_updates_with_rename_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model A {
@@ -381,16 +360,9 @@ async fn index_updates_with_rename_must_work(api: &TestApi) -> TestResult {
     "#;
 
     api.schema_push(dm1).send().await?.assert_green()?;
-
-    let sql_schema = api.describe_database().await?;
-
-    let index = sql_schema
-        .table_bang("A")
-        .indices
-        .iter()
-        .find(|i| i.name == "customName" && i.columns == ["field", "secondField"]);
-    assert!(index.is_some());
-    assert_eq!(index.unwrap().tpe, IndexType::Unique);
+    api.assert_schema().await?.assert_table("A", |t| {
+        t.assert_index_on_columns(&["field", "secondField"], |idx| idx.assert_is_unique())
+    })?;
 
     let dm2 = r#"
         model A {
@@ -404,19 +376,14 @@ async fn index_updates_with_rename_must_work(api: &TestApi) -> TestResult {
 
     api.schema_push(dm2).force(true).send().await?.assert_executable()?;
 
-    let result = api.describe_database().await?;
-
-    let indexes = result
-        .table_bang("A")
-        .indices
-        .iter()
-        .filter(|i| i.columns == ["field", "id"] && i.name == "customNameA");
-    assert_eq!(indexes.count(), 1);
+    api.assert_schema().await?.assert_table("A", |t| {
+        t.assert_indexes_count(1)?.assert_index_on_columns(&["field", "id"], Ok)
+    })?;
 
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn dropping_a_model_with_a_multi_field_unique_index_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model A {
@@ -429,24 +396,18 @@ async fn dropping_a_model_with_a_multi_field_unique_index_must_work(api: &TestAp
     "#;
 
     api.schema_push(dm1).send().await?.assert_green()?;
-
-    let result = api.describe_database().await?;
-
-    let index = result
-        .table_bang("A")
-        .indices
-        .iter()
-        .find(|i| i.name == "customName" && i.columns == ["field", "secondField"]);
-
-    assert!(index.is_some());
-    assert_eq!(index.unwrap().tpe, IndexType::Unique);
+    api.assert_schema().await?.assert_table("A", |t| {
+        t.assert_index_on_columns(&["field", "secondField"], |idx| {
+            idx.assert_name("customName")?.assert_is_unique()
+        })
+    })?;
 
     api.schema_push("").send().await?.assert_green()?;
 
     Ok(())
 }
 
-#[test_each_connector(tags("postgres", "mysql"))]
+#[test_connector(tags(Postgres, Mysql))]
 async fn indexes_with_an_automatically_truncated_name_are_idempotent(api: &TestApi) -> TestResult {
     let dm = r#"
         model TestModelWithALongName {
@@ -487,7 +448,7 @@ async fn indexes_with_an_automatically_truncated_name_are_idempotent(api: &TestA
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn new_index_with_same_name_as_index_from_dropped_table_works(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Cat {
@@ -536,6 +497,90 @@ async fn new_index_with_same_name_as_index_from_dropped_table_works(api: &TestAp
 
     api.assert_schema().await?.assert_table("Owner", |table| {
         table.assert_column("ownerid", |col| col.assert_is_required())
+    })?;
+
+    Ok(())
+}
+
+#[test_connector]
+async fn column_type_migrations_should_not_implicitly_drop_indexes(api: &TestApi) -> TestResult {
+    let migrations_directory = api.create_migrations_directory()?;
+
+    let dm1 = r#"
+        model Cat {
+            id Int @id @default(autoincrement())
+            name String
+
+            @@index([name])
+        }
+    "#;
+
+    api.create_migration("01init", dm1, &migrations_directory)
+        .send()
+        .await?;
+
+    let dm2 = r#"
+        model Cat {
+            id Int @id
+            name Int
+
+            @@index([name])
+        }
+    "#;
+
+    // NOTE: we are relying on the fact that we will drop and recreate the column for that particular type migration.
+    api.create_migration("02change", dm2, &migrations_directory)
+        .send()
+        .await?;
+
+    api.apply_migrations(&migrations_directory).send().await?;
+
+    api.assert_schema().await?.assert_table("Cat", |cat| {
+        cat.assert_indexes_count(1)?
+            .assert_index_on_columns(&["name"], |idx| idx.assert_is_not_unique())
+    })?;
+
+    Ok(())
+}
+
+#[test_connector]
+async fn column_type_migrations_should_not_implicitly_drop_compound_indexes(api: &TestApi) -> TestResult {
+    let migrations_directory = api.create_migrations_directory()?;
+
+    let dm1 = r#"
+        model Cat {
+            id Int @id @default(autoincrement())
+            name String
+            age Int
+
+            @@index([name, age])
+        }
+    "#;
+
+    api.create_migration("01init", dm1, &migrations_directory)
+        .send()
+        .await?;
+
+    let dm2 = r#"
+        model Cat {
+            id Int @id
+            name Int
+            age Int
+
+            @@index([name, age])
+        }
+    "#;
+
+    // NOTE: we are relying on the fact that we will drop and recreate the column for that particular type migration.
+    api.create_migration("02change", dm2, &migrations_directory)
+        .send()
+        .await?;
+
+    api.apply_migrations(&migrations_directory).send().await?;
+
+    api.assert_schema().await?.assert_table("Cat", |cat| {
+        cat.assert_indexes_count(1)?
+            .assert_index_on_columns(&["name", "age"], |idx| idx.assert_is_not_unique())
     })?;
 
     Ok(())

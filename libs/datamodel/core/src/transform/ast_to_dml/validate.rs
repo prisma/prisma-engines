@@ -1,11 +1,13 @@
-use crate::ast::WithAttributes;
 use crate::{
     ast, configuration,
     diagnostics::{DatamodelError, Diagnostics},
-    dml, DefaultValue, FieldType,
+    dml,
+    walkers::ModelWalker,
+    DefaultValue, FieldType,
 };
+use crate::{ast::WithAttributes, walkers::walk_models};
 use prisma_value::PrismaValue;
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 
 /// Helper for validating a datamodel.
 ///
@@ -132,6 +134,8 @@ impl<'a> Validator<'a> {
             all_errors.append(&mut errors_for_model);
         }
 
+        validate_name_collisions_with_map(schema, ast_schema, &mut all_errors);
+
         // Enum level validations.
         for declared_enum in schema.enums() {
             let mut errors_for_enum = Diagnostics::new();
@@ -219,7 +223,7 @@ impl<'a> Validator<'a> {
 
         let multiple_indexes_with_same_name_are_supported = self
             .source
-            .map(|source| source.combined_connector.supports_multiple_indexes_with_same_name())
+            .map(|source| source.active_connector.supports_multiple_indexes_with_same_name())
             .unwrap_or(false);
 
         for model in schema.models() {
@@ -252,7 +256,7 @@ impl<'a> Validator<'a> {
 
         // TODO: this is really ugly
         let scalar_lists_are_supported = match self.source {
-            Some(source) => source.combined_connector.supports_scalar_lists(),
+            Some(source) => source.active_connector.supports_scalar_lists(),
             None => false,
         };
 
@@ -280,7 +284,7 @@ impl<'a> Validator<'a> {
             if let Some(dml::ScalarType::Json) = field.field_type.scalar_type() {
                 // TODO: this is really ugly
                 let supports_json_type = match self.source {
-                    Some(source) => source.combined_connector.supports_json(),
+                    Some(source) => source.active_connector.supports_json(),
                     None => false,
                 };
                 if !supports_json_type {
@@ -337,7 +341,7 @@ impl<'a> Validator<'a> {
         let mut errors = Diagnostics::new();
 
         if let Some(data_source) = self.source {
-            if !data_source.combined_connector.supports_multiple_auto_increment()
+            if !data_source.active_connector.supports_multiple_auto_increment()
                 && model.auto_increment_fields().count() > 1
             {
                 errors.push_error(DatamodelError::new_attribute_validation_error(
@@ -353,7 +357,7 @@ impl<'a> Validator<'a> {
 
                 if !field.is_id
                     && field.is_auto_increment()
-                    && !data_source.combined_connector.supports_non_id_auto_increment()
+                    && !data_source.active_connector.supports_non_id_auto_increment()
                 {
                     errors.push_error(DatamodelError::new_attribute_validation_error(
                     &"The `autoincrement()` default value is used on a non-id field even though the datasource does not support this.".to_string(),
@@ -364,7 +368,7 @@ impl<'a> Validator<'a> {
 
                 if field.is_auto_increment()
                     && !model.field_is_indexed(&field.name)
-                    && !data_source.combined_connector.supports_non_indexed_auto_increment()
+                    && !data_source.active_connector.supports_non_indexed_auto_increment()
                 {
                     errors.push_error(DatamodelError::new_attribute_validation_error(
                     &"The `autoincrement()` default value is used on a non-indexed field even though the datasource does not support this.".to_string(),
@@ -540,21 +544,11 @@ impl<'a> Validator<'a> {
                 .cloned()
                 .collect();
 
-            let at_least_one_underlying_field_is_required = rel_info
+            let at_least_one_underlying_field_is_optional = rel_info
                 .fields
                 .iter()
                 .filter_map(|base_field| model.find_scalar_field(&base_field))
-                .any(|f| f.is_required());
-
-            let all_underlying_fields_are_optional = rel_info
-                .fields
-                .iter()
-                .map(|base_field| match model.find_scalar_field(&base_field) {
-                    Some(f) => f.is_optional(),
-                    None => false,
-                })
-                .all(|x| x)
-                && !rel_info.fields.is_empty(); // TODO: hack to maintain backwards compatibility for test schemas that don't specify fields yet
+                .any(|f| f.is_optional());
 
             if !unknown_fields.is_empty() {
                 errors.push_error(DatamodelError::new_validation_error(
@@ -570,21 +564,10 @@ impl<'a> Validator<'a> {
                     );
             }
 
-            if at_least_one_underlying_field_is_required && !field.is_required() {
+            if at_least_one_underlying_field_is_optional && field.is_required() {
                 errors.push_error(DatamodelError::new_validation_error(
                         &format!(
-                            "The relation field `{}` uses the scalar fields {}. At least one of those fields is required. Hence the relation field must be required as well.",
-                            &field.name,
-                            rel_info.fields.join(", ")
-                        ),
-                        ast_field.span)
-                    );
-            }
-
-            if all_underlying_fields_are_optional && field.is_required() {
-                errors.push_error(DatamodelError::new_validation_error(
-                        &format!(
-                            "The relation field `{}` uses the scalar fields {}. All those fields are optional. Hence the relation field must be optional as well.",
+                            "The relation field `{}` uses the scalar fields {}. At least one of those fields is optional. Hence the relation field must be optional as well.",
                             &field.name,
                             rel_info.fields.join(", ")
                         ),
@@ -741,7 +724,7 @@ impl<'a> Validator<'a> {
                 };
 
                 let must_reference_unique_criteria = match self.source {
-                    Some(source) => !source.combined_connector.supports_relations_over_non_unique_criteria(),
+                    Some(source) => !source.active_connector.supports_relations_over_non_unique_criteria(),
                     None => true,
                 };
 
@@ -1101,5 +1084,32 @@ impl<'a> Validator<'a> {
         }
 
         Ok(())
+    }
+}
+
+fn validate_name_collisions_with_map(schema: &dml::Datamodel, ast: &ast::SchemaAst, diagnostics: &mut Diagnostics) {
+    let mut used_model_names: HashMap<&str, ModelWalker<'_>> = HashMap::with_capacity(schema.models.len());
+    let mut used_field_names: HashSet<&str> = HashSet::with_capacity(4);
+
+    for model in walk_models(schema) {
+        for field in model.scalar_fields() {
+            if !used_field_names.insert(field.db_name()) {
+                diagnostics.push_error(DatamodelError::new_duplicate_field_error(
+                    model.name(),
+                    field.name(),
+                    ast.find_model(model.name()).unwrap().find_field(field.name()).span,
+                ));
+            }
+        }
+
+        used_field_names.clear();
+
+        if let Some(existing_model) = used_model_names.insert(model.database_name(), model) {
+            diagnostics.push_error(DatamodelError::new_duplicate_model_database_name_error(
+                model.database_name().into(),
+                existing_model.name().into(),
+                ast.find_model(model.name()).unwrap().span,
+            ));
+        }
     }
 }

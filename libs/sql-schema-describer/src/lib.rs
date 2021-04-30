@@ -7,8 +7,8 @@ pub use error::{DescriberError, DescriberErrorKind, DescriberResult};
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
-use std::{borrow::Cow, fmt::Debug};
-use walkers::{EnumWalker, TableWalker, ViewWalker};
+use std::fmt::Debug;
+use walkers::{EnumWalker, TableWalker, UserDefinedTypeWalker, ViewWalker};
 
 pub mod getters;
 pub mod mssql;
@@ -56,14 +56,14 @@ pub struct SqlSchema {
     pub views: Vec<View>,
     /// The stored procedures.
     pub procedures: Vec<Procedure>,
-    /// The database lowercases all identifiers.
-    pub lower_case_identifiers: bool,
+    /// The user-defined types procedures.
+    pub user_defined_types: Vec<UserDefinedType>,
 }
 
 impl SqlSchema {
     /// Get a table.
     pub fn get_table(&self, name: &str) -> Option<&Table> {
-        self.tables.iter().find(|x| x.name == self.normalize(name).as_ref())
+        self.tables.iter().find(|x| x.name == name)
     }
 
     /// Get a view.
@@ -81,6 +81,10 @@ impl SqlSchema {
         self.procedures.iter().find(|x| x.name == name)
     }
 
+    pub fn get_user_defined_type(&self, name: &str) -> Option<&UserDefinedType> {
+        self.user_defined_types.iter().find(|x| x.name == name)
+    }
+
     /// Is this schema empty?
     pub fn is_empty(&self) -> bool {
         matches!(
@@ -91,13 +95,14 @@ impl SqlSchema {
                 sequences,
                 views,
                 procedures,
+                user_defined_types,
                 ..
-            } if tables.is_empty() && enums.is_empty() && sequences.is_empty() && views.is_empty() && procedures.is_empty()
+            } if tables.is_empty() && enums.is_empty() && sequences.is_empty() && views.is_empty() && procedures.is_empty() && user_defined_types.is_empty()
         )
     }
 
     pub fn table(&self, name: &str) -> core::result::Result<&Table, String> {
-        match self.tables.iter().find(|t| t.name == self.normalize(name).as_ref()) {
+        match self.tables.iter().find(|t| t.name == name) {
             Some(t) => Ok(t),
             None => Err(name.to_string()),
         }
@@ -124,19 +129,15 @@ impl SqlSchema {
         (0..self.views.len()).map(move |view_index| ViewWalker::new(self, view_index))
     }
 
+    pub fn udt_walkers(&self) -> impl Iterator<Item = UserDefinedTypeWalker<'_>> {
+        (0..self.user_defined_types.len()).map(move |udt_index| UserDefinedTypeWalker::new(self, udt_index))
+    }
+
     pub fn enum_walkers(&self) -> impl Iterator<Item = EnumWalker<'_>> {
         (0..self.enums.len()).map(move |enum_index| EnumWalker {
             schema: self,
             enum_index,
         })
-    }
-
-    fn normalize<'a>(&self, s: &'a str) -> Cow<'a, str> {
-        if self.lower_case_identifiers {
-            s.to_lowercase().into()
-        } else {
-            s.into()
-        }
     }
 }
 
@@ -250,6 +251,15 @@ pub struct Procedure {
     pub definition: Option<String>,
 }
 
+/// A user-defined type. Can map to another type, or be declared as assembly.
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
+pub struct UserDefinedType {
+    /// Type name
+    pub name: String,
+    /// Type mapping
+    pub definition: Option<String>,
+}
+
 /// The primary key of a table.
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub struct PrimaryKey {
@@ -350,17 +360,6 @@ pub enum ColumnTypeFamily {
 }
 
 impl ColumnTypeFamily {
-    /// Lower-cased variants
-    pub fn normalized(self, table_name: &str) -> Self {
-        match self {
-            Self::Enum(s) if s.starts_with(table_name) => {
-                let e = s.replacen(table_name, &table_name.to_lowercase(), 1);
-                Self::Enum(e)
-            }
-            _ => self,
-        }
-    }
-
     pub fn as_enum(&self) -> Option<&str> {
         match self {
             ColumnTypeFamily::Enum(name) => Some(name),

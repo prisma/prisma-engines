@@ -4,10 +4,11 @@ use crate::{
     SqlFlavour, SqlMigrationConnector,
 };
 use migration_connector::{
-    ConnectorResult, DatabaseMigrationMarker, DatabaseMigrationStepApplier, DestructiveChangeDiagnostics,
-    PrettyDatabaseMigrationStep,
+    ConnectorError, ConnectorResult, DatabaseMigrationMarker, DatabaseMigrationStepApplier,
+    DestructiveChangeDiagnostics, PrettyDatabaseMigrationStep,
 };
 use sql_schema_describer::{walkers::SqlSchemaExt, SqlSchema};
+use user_facing_errors::migration_engine::ApplyMigrationError;
 
 #[async_trait::async_trait]
 impl DatabaseMigrationStepApplier<SqlMigration> for SqlMigrationConnector {
@@ -110,9 +111,19 @@ impl DatabaseMigrationStepApplier<SqlMigration> for SqlMigrationConnector {
         script
     }
 
-    async fn apply_script(&self, script: &str) -> ConnectorResult<()> {
+    async fn apply_script(&self, migration_name: &str, script: &str) -> ConnectorResult<()> {
         self.flavour.scan_migration_script(script);
-        Ok(self.conn().raw_cmd(script).await?)
+
+        self.conn().raw_cmd(script).await.map_err(|quaint_error| {
+            ConnectorError::user_facing(ApplyMigrationError {
+                migration_name: migration_name.to_owned(),
+                database_error_code: String::from(quaint_error.original_code().unwrap_or("none")),
+                database_error: quaint_error
+                    .original_message()
+                    .map(String::from)
+                    .unwrap_or_else(|| ConnectorError::from(quaint_error).to_string()),
+            })
+        })
     }
 }
 
@@ -177,6 +188,11 @@ fn render_raw_sql(
             let view = schemas.previous().view_walker_at(drop_view.view_index);
 
             vec![renderer.render_drop_view(&view)]
+        }
+        SqlMigrationStep::DropUserDefinedType(drop_udt) => {
+            let udt = schemas.previous().udt_walker_at(drop_udt.udt_index);
+
+            vec![renderer.render_drop_user_defined_type(&udt)]
         }
     }
 }

@@ -71,12 +71,12 @@ fn verify_selections(selectors: &[AggregationSelection], group_by: &[ScalarField
 }
 
 /// Cross checks that the requested order-bys of the request are valid with regard to the requested group bys.
-/// Every ordered field must be present in the group by as well. (Note: We do not yet allow order by aggregate)
+/// Every ordered field must be present in the group by as well, except aggregation orderings, which are always valid.
 fn verify_orderings(orderings: &[OrderBy], group_by: &[ScalarFieldRef]) -> QueryGraphBuilderResult<()> {
     let mut missing_fields = vec![];
 
     for ordering in orderings {
-        if !group_by.contains(&ordering.field) {
+        if !group_by.contains(&ordering.field) && ordering.sort_aggregation.is_none() {
             missing_fields.push(ordering.field.name.clone());
         }
     }

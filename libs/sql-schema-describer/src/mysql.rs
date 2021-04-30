@@ -77,23 +77,13 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
         let views = self.get_views(schema).await?;
         let procedures = self.get_procedures(schema).await?;
 
-        let lower_case_identifiers = self
-            .conn
-            .query_raw("SELECT @@lower_case_table_names", &[])
-            .await
-            .ok()
-            .and_then(|row| row.into_single().ok())
-            .and_then(|row| row.at(0).and_then(|col| col.as_i64()))
-            .map(|val| val == 1)
-            .unwrap_or(false);
-
         Ok(SqlSchema {
             tables,
             enums,
             views,
             procedures,
             sequences: vec![],
-            lower_case_identifiers,
+            user_defined_types: vec![],
         })
     }
 
@@ -175,7 +165,7 @@ impl SqlSchemaDescriber {
             WHERE table_schema = ?
             -- Views are not supported yet
             AND table_type = 'BASE TABLE'
-            ORDER BY table_name";
+            ORDER BY Binary table_name";
         let rows = self.conn.query_raw(sql, &[schema.into()]).await?;
         let names = rows
             .into_iter()
@@ -437,9 +427,9 @@ impl SqlSchemaDescriber {
             SELECT DISTINCT
                 index_name AS index_name,
                 non_unique AS non_unique,
-                column_name AS column_name,
+                Binary column_name AS column_name,
                 seq_in_index AS seq_in_index,
-                table_name AS table_name,
+                Binary table_name AS table_name,
                 sub_part AS partial
             FROM INFORMATION_SCHEMA.STATISTICS
             WHERE table_schema = ?

@@ -6,23 +6,27 @@ use prisma_models::DatamodelConverter;
 use query_core::{schema_builder, BuildMode, QuerySchema};
 
 pub fn get_query_schema(datamodel_string: &str) -> (QuerySchema, datamodel::dml::Datamodel) {
-    feature_flags::initialize(&[String::from("all")]).unwrap();
-
+    let config = datamodel::parse_configuration_and_ignore_datasource_urls(datamodel_string).unwrap();
     let dm = datamodel::parse_datamodel_and_ignore_datasource_urls(datamodel_string)
         .unwrap()
         .subject;
-    let config = datamodel::parse_configuration_and_ignore_datasource_urls(datamodel_string).unwrap();
+
     let capabilities = match config.subject.datasources.first() {
         Some(ds) => ds.capabilities(),
         None => ConnectorCapabilities::empty(),
     };
+
     let internal_dm_template = DatamodelConverter::convert(&dm);
     let internal_ref = internal_dm_template.build("db".to_owned());
+    let schema = schema_builder::build(
+        internal_ref,
+        BuildMode::Modern,
+        false,
+        capabilities,
+        config.subject.preview_features().cloned().collect(),
+    );
 
-    (
-        schema_builder::build(internal_ref, BuildMode::Modern, false, capabilities),
-        dm,
-    )
+    (schema, dm)
 }
 
 pub fn find_output_type<'a>(dmmf: &'a DataModelMetaFormat, namespace: &str, type_name: &str) -> &'a DmmfOutputType {

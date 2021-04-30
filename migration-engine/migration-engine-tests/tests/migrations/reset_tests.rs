@@ -1,6 +1,6 @@
-use crate::*;
+use migration_engine_tests::sql::*;
 
-#[test_each_connector]
+#[test_connector]
 async fn reset_works(api: &TestApi) -> TestResult {
     let dm = r#"
         model Cat {
@@ -30,7 +30,7 @@ async fn reset_works(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(log = "debug")]
+#[test_connector]
 async fn reset_then_apply_with_migrations_directory_works(api: &TestApi) -> TestResult {
     let dm = r#"
         model Cat {
@@ -70,7 +70,7 @@ async fn reset_then_apply_with_migrations_directory_works(api: &TestApi) -> Test
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn reset_then_diagnostics_with_migrations_directory_works(api: &TestApi) -> TestResult {
     let dm = r#"
         model Cat {

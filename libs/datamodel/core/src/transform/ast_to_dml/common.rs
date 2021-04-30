@@ -1,5 +1,9 @@
-use crate::diagnostics::{DatamodelWarning, Diagnostics};
 use crate::{ast, diagnostics::DatamodelError, dml};
+use crate::{
+    common::preview_features::*,
+    diagnostics::{DatamodelWarning, Diagnostics},
+};
+use itertools::Itertools;
 
 /// State error message. Seeing this error means something went really wrong internally. It's the datamodel equivalent of a bluescreen.
 pub (crate) const STATE_ERROR: &str = "Failed lookup of model or field during internal processing. This means that the internal representation was mutated incorrectly.";
@@ -26,31 +30,42 @@ pub fn field_validation_error(
     )
 }
 
-pub fn validate_preview_features(
+pub fn parse_and_validate_preview_features(
     preview_features: Vec<String>,
+    feature_map: &FeatureMap,
     span: ast::Span,
-    supported_preview_features: Vec<&str>,
-    deprecated_preview_features: Vec<&str>,
-) -> Diagnostics {
-    let mut result = Diagnostics::new();
-    if let Some(unknown_preview_feature) = preview_features
-        .iter()
-        .find(|pf| !supported_preview_features.contains(&pf.as_str()))
-    {
-        if let Some(deprecated) = preview_features
-            .iter()
-            .find(|pf| deprecated_preview_features.contains(&pf.as_str()))
-        {
-            result.push_warning(DatamodelWarning::new_deprecated_preview_feature_warning(
-                deprecated, span,
-            ))
-        } else {
-            result.push_error(DatamodelError::new_preview_feature_not_known_error(
-                unknown_preview_feature,
-                supported_preview_features,
+) -> (Vec<PreviewFeature>, Diagnostics) {
+    let mut diagnostics = Diagnostics::new();
+    let mut features = vec![];
+
+    for feature_str in preview_features {
+        let feature_opt = PreviewFeature::parse_opt(&feature_str);
+        match feature_opt {
+            Some(feature) if feature_map.is_deprecated(&feature) => {
+                features.push(feature);
+                diagnostics.push_warning(DatamodelWarning::new_deprecated_preview_feature_warning(
+                    &feature_str,
+                    span,
+                ))
+            }
+
+            Some(feature) if !feature_map.is_valid(&feature) => {
+                diagnostics.push_error(DatamodelError::new_preview_feature_not_known_error(
+                    &feature_str,
+                    feature_map.active_features().iter().map(ToString::to_string).join(", "),
+                    span,
+                ))
+            }
+
+            Some(feature) => features.push(feature),
+
+            None => diagnostics.push_error(DatamodelError::new_preview_feature_not_known_error(
+                &feature_str,
+                feature_map.active_features().iter().map(ToString::to_string).join(", "),
                 span,
-            ));
+            )),
         }
     }
-    result
+
+    (features, diagnostics)
 }

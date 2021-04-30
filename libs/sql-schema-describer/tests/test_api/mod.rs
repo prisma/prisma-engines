@@ -1,33 +1,11 @@
-#![allow(dead_code)]
+pub use quaint::{prelude::Queryable, single::Quaint};
+pub use test_macros::test_connector;
+pub use test_setup::{BitFlags, Capabilities, Tags};
 
 use barrel::Migration;
-use enumflags2::BitFlags;
-use quaint::{
-    prelude::{ConnectionInfo, Queryable, SqlFamily},
-    single::Quaint,
-};
+use quaint::prelude::{ConnectionInfo, SqlFamily};
 use sql_schema_describer::*;
-use test_setup::connectors::Tags;
 use test_setup::*;
-
-#[derive(Debug)]
-pub struct TestError {
-    inner: Box<dyn std::error::Error>,
-}
-
-impl From<quaint::error::Error> for TestError {
-    fn from(err: quaint::error::Error) -> Self {
-        TestError { inner: err.into() }
-    }
-}
-
-impl From<DescriberError> for TestError {
-    fn from(err: DescriberError) -> Self {
-        TestError { inner: err.into() }
-    }
-}
-
-pub type TestResult = Result<(), TestError>;
 
 pub struct TestApi {
     db_name: &'static str,
@@ -37,36 +15,31 @@ pub struct TestApi {
 
 impl TestApi {
     pub(crate) async fn new(args: TestApiArgs) -> Self {
-        let tags = args.connector_tags;
-        let db_name = if args.connector_tags.contains(Tags::Mysql) {
-            test_setup::mysql_safe_identifier(args.test_function_name)
+        let tags = args.tags();
+        let db_name = if tags.contains(Tags::Mysql) {
+            test_setup::mysql_safe_identifier(args.test_function_name())
         } else {
-            args.test_function_name
+            args.test_function_name()
         };
 
-        let url = (args.url_fn)(db_name);
-
-        let conn = if tags.contains(Tags::Mysql) {
-            create_mysql_database(&url.parse().unwrap()).await.unwrap()
+        let (conn, _connection_string) = if tags.contains(Tags::Mysql) {
+            create_mysql_database(&db_name).await.unwrap()
         } else if tags.contains(Tags::Postgres) {
-            create_postgres_database(&url.parse().unwrap()).await.unwrap()
+            create_postgres_database(&db_name).await.unwrap()
         } else if tags.contains(Tags::Mssql) {
-            let conn = Quaint::new(&url).await.unwrap();
-
-            test_setup::connectors::mssql::reset_schema(&conn, args.test_function_name)
+            test_setup::init_mssql_database(args.database_url(), db_name)
                 .await
-                .unwrap();
-
-            conn
+                .unwrap()
         } else if tags.contains(Tags::Sqlite) {
-            Quaint::new(&url).await.unwrap()
+            let url = sqlite_test_url(db_name);
+            (Quaint::new(&url).await.unwrap(), url)
         } else {
             unreachable!()
         };
 
         TestApi {
             db_name,
-            tags: args.connector_tags,
+            tags: args.tags(),
             database: conn,
         }
     }
@@ -79,16 +52,23 @@ impl TestApi {
         self.tags
     }
 
-    pub(crate) async fn describe(&self) -> Result<SqlSchema, TestError> {
+    pub(crate) async fn describe(&self) -> SqlSchema {
+        self.describer().describe(self.schema_name()).await.unwrap()
+    }
+
+    pub(crate) async fn describe_error(&self) -> DescriberError {
+        self.describer().describe(self.schema_name()).await.unwrap_err()
+    }
+
+    pub(crate) fn describer(&self) -> Box<dyn SqlSchemaDescriberBackend> {
         let db = self.database.clone();
-        let describer: Box<dyn sql_schema_describer::SqlSchemaDescriberBackend> = match self.sql_family() {
+
+        match self.sql_family() {
             SqlFamily::Postgres => Box::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(db)),
             SqlFamily::Sqlite => Box::new(sql_schema_describer::sqlite::SqlSchemaDescriber::new(db)),
             SqlFamily::Mysql => Box::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(db)),
             SqlFamily::Mssql => Box::new(sql_schema_describer::mssql::SqlSchemaDescriber::new(db)),
-        };
-
-        Ok(describer.describe(self.schema_name()).await?)
+        }
     }
 
     pub(crate) fn db_name(&self) -> &'static str {

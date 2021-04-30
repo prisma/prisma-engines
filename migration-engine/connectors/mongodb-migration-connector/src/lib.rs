@@ -7,9 +7,8 @@ mod mongodb_migration_persistence;
 mod mongodb_migration_step_applier;
 mod mongodb_migration_step_inferrer;
 
-use enumflags2::BitFlags;
 use error::IntoConnectorResult;
-use migration_connector::{ConnectorError, ConnectorResult, MigrationConnector, MigrationFeature};
+use migration_connector::{ConnectorError, ConnectorResult, MigrationConnector};
 use mongodb::{
     options::{ClientOptions, WriteConcern},
     Client,
@@ -25,7 +24,7 @@ pub struct MongoDbMigrationConnector {
 
 impl MongoDbMigrationConnector {
     /// Construct and initialize the SQL migration connector.
-    pub async fn new(database_str: &str, _features: BitFlags<MigrationFeature>) -> ConnectorResult<Self> {
+    pub async fn new(database_str: &str) -> ConnectorResult<Self> {
         let (client, db_name) = Self::create_client(database_str).await?;
 
         Ok(Self { client, db_name })
@@ -50,7 +49,7 @@ impl MongoDbMigrationConnector {
     }
 
     async fn create_client(database_str: &str) -> ConnectorResult<(Client, String)> {
-        let url = Url::parse(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
+        let url = Url::parse(database_str).map_err(ConnectorError::url_parse_error)?;
         let db_name = url.path().trim_start_matches('/').to_string();
 
         let client_options = ClientOptions::parse(database_str).await.into_connector_result()?;

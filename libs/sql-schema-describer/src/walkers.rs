@@ -4,7 +4,7 @@
 
 use crate::{
     Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue, Enum, ForeignKey, ForeignKeyAction, Index,
-    IndexType, PrimaryKey, SqlSchema, Table, View,
+    IndexType, PrimaryKey, SqlSchema, Table, UserDefinedType, View,
 };
 use serde::de::DeserializeOwned;
 use std::fmt;
@@ -54,6 +54,23 @@ impl<'a> ColumnWalker<'a> {
     /// The index of the column in the parent table.
     pub fn column_index(&self) -> usize {
         self.column_index
+    }
+
+    /// Returns whether the column has the enum default value of the given enum type.
+    pub fn column_has_enum_default_value(&self, enum_name: &str, value: &str) -> bool {
+        self.column_type_family_as_enum().map(|enm| enm.name.as_str()) == Some(enum_name)
+            && self
+                .default()
+                .and_then(|default| default.as_value())
+                .and_then(|value| value.as_enum_value())
+                == Some(value)
+    }
+
+    /// Returns whether the type of the column matches the provided enum name.
+    pub fn column_type_is_enum(&self, enum_name: &str) -> bool {
+        self.column_type_family_as_enum()
+            .map(|enm| enm.name == enum_name)
+            .unwrap_or(false)
     }
 
     /// The type family.
@@ -172,6 +189,39 @@ impl<'a> ViewWalker<'a> {
 
     fn view(&self) -> &'a View {
         &self.schema.views[self.view_index]
+    }
+}
+
+/// Traverse a user-defined type
+#[derive(Clone, Copy)]
+pub struct UserDefinedTypeWalker<'a> {
+    schema: &'a SqlSchema,
+    udt_index: usize,
+}
+
+impl<'a> UserDefinedTypeWalker<'a> {
+    /// Create a UserDefinedTypeWalker from a schema and a reference to one of its udts.
+    pub fn new(schema: &'a SqlSchema, udt_index: usize) -> Self {
+        Self { schema, udt_index }
+    }
+
+    /// The name of the type
+    pub fn name(&self) -> &'a str {
+        &self.udt().name
+    }
+
+    /// The SQL definition of the type
+    pub fn definition(&self) -> Option<&'a str> {
+        self.udt().definition.as_deref()
+    }
+
+    /// The index of the user-defined type in the schema.
+    pub fn udt_index(&self) -> usize {
+        self.udt_index
+    }
+
+    fn udt(&self) -> &'a UserDefinedType {
+        &self.schema.user_defined_types[self.udt_index]
     }
 }
 
@@ -439,7 +489,7 @@ impl<'a> fmt::Debug for IndexWalker<'a> {
 
 impl<'a> IndexWalker<'a> {
     /// The names of the indexed columns.
-    pub fn column_names(&self) -> &[String] {
+    pub fn column_names(&self) -> &'a [String] {
         &self.get().columns
     }
 
@@ -467,12 +517,12 @@ impl<'a> IndexWalker<'a> {
     }
 
     /// The IndexType
-    pub fn index_type(&self) -> &IndexType {
+    pub fn index_type(&self) -> &'a IndexType {
         &self.get().tpe
     }
 
     /// The name of the index.
-    pub fn name(&self) -> &str {
+    pub fn name(&self) -> &'a str {
         &self.get().name
     }
 
@@ -534,6 +584,9 @@ pub trait SqlSchemaExt {
 
     /// Find a view by index.
     fn view_walker_at(&self, index: usize) -> ViewWalker<'_>;
+
+    /// Find a user-defined type by index.
+    fn udt_walker_at(&self, index: usize) -> UserDefinedTypeWalker<'_>;
 }
 
 impl SqlSchemaExt for SqlSchema {
@@ -561,6 +614,13 @@ impl SqlSchemaExt for SqlSchema {
     fn view_walker_at(&self, index: usize) -> ViewWalker<'_> {
         ViewWalker {
             view_index: index,
+            schema: self,
+        }
+    }
+
+    fn udt_walker_at(&self, index: usize) -> UserDefinedTypeWalker<'_> {
+        UserDefinedTypeWalker {
+            udt_index: index,
             schema: self,
         }
     }

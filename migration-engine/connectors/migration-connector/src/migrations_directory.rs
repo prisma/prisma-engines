@@ -79,7 +79,7 @@ provider = "{}""##,
 pub fn error_on_changed_provider(migrations_directory_path: &str, provider: &str) -> ConnectorResult<()> {
     match match_provider_in_lock_file(migrations_directory_path, provider) {
         None => Ok(()),
-        Some(Err(expected_provider)) => Err(ConnectorError::user_facing_error(ProviderSwitchedError {
+        Some(Err(expected_provider)) => Err(ConnectorError::user_facing(ProviderSwitchedError {
             provider: provider.into(),
             expected_provider,
         })),

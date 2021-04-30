@@ -18,13 +18,12 @@ mod sql_schema_differ;
 
 use connection_wrapper::Connection;
 use datamodel::Datamodel;
-use enumflags2::BitFlags;
 use error::quaint_error_to_connector_error;
 use flavour::SqlFlavour;
 use migration_connector::*;
 use pair::Pair;
 use quaint::{prelude::ConnectionInfo, single::Quaint};
-use sql_migration::{DropView, SqlMigration, SqlMigrationStep};
+use sql_migration::{DropUserDefinedType, DropView, SqlMigration, SqlMigrationStep};
 use sql_schema_describer::{walkers::SqlSchemaExt, SqlSchema};
 use user_facing_errors::{common::InvalidDatabaseString, KnownError};
 
@@ -39,11 +38,10 @@ impl SqlMigrationConnector {
     /// Construct and initialize the SQL migration connector.
     pub async fn new(
         connection_string: &str,
-        features: BitFlags<MigrationFeature>,
         shadow_database_connection_string: Option<String>,
     ) -> ConnectorResult<Self> {
         let connection = connect(connection_string).await?;
-        let flavour = flavour::from_connection_info(connection.connection_info(), features);
+        let flavour = flavour::from_connection_info(connection.connection_info());
 
         flavour.ensure_connection_validity(&connection).await?;
 
@@ -56,27 +54,24 @@ impl SqlMigrationConnector {
 
     /// Create the database corresponding to the connection string, without initializing the connector.
     pub async fn create_database(database_str: &str) -> ConnectorResult<String> {
-        let connection_info =
-            ConnectionInfo::from_url(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
-        let flavour = flavour::from_connection_info(&connection_info, BitFlags::empty());
+        let connection_info = ConnectionInfo::from_url(database_str).map_err(ConnectorError::url_parse_error)?;
+        let flavour = flavour::from_connection_info(&connection_info);
         flavour.create_database(database_str).await
     }
 
     /// Drop the database corresponding to the connection string, without initializing the connector.
     pub async fn drop_database(database_str: &str) -> ConnectorResult<()> {
-        let connection_info =
-            ConnectionInfo::from_url(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
-        let flavour = flavour::from_connection_info(&connection_info, BitFlags::empty());
+        let connection_info = ConnectionInfo::from_url(database_str).map_err(ConnectorError::url_parse_error)?;
+        let flavour = flavour::from_connection_info(&connection_info);
 
         flavour.drop_database(database_str).await
     }
 
     /// Set up the database for connector-test-kit, without initializing the connector.
     pub async fn qe_setup(database_str: &str) -> ConnectorResult<()> {
-        let connection_info =
-            ConnectionInfo::from_url(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
+        let connection_info = ConnectionInfo::from_url(database_str).map_err(ConnectorError::url_parse_error)?;
 
-        let flavour = flavour::from_connection_info(&connection_info, BitFlags::empty());
+        let flavour = flavour::from_connection_info(&connection_info);
 
         flavour.qe_setup(database_str).await
     }
@@ -131,6 +126,14 @@ impl SqlMigrationConnector {
             self.flavour.as_ref(),
         ));
 
+        let drop_udts = source_schema
+            .udt_walkers()
+            .map(|udtw| udtw.udt_index())
+            .map(DropUserDefinedType::new)
+            .map(SqlMigrationStep::DropUserDefinedType);
+
+        steps.extend(drop_udts);
+
         let migration = SqlMigration {
             added_columns_with_virtual_defaults: Vec::new(),
             before: source_schema,
@@ -138,10 +141,12 @@ impl SqlMigrationConnector {
             steps,
         };
 
-        self.apply_migration(&migration).await?;
-
         if migration.before.table_walker("_prisma_migrations").is_some() {
-            self.flavour.drop_migrations_table(self.conn()).await?;
+            self.flavour.drop_migrations_table(connection).await?;
+        }
+
+        for step in self.render_steps_pretty(&migration)? {
+            connection.raw_cmd(&step.raw).await?;
         }
 
         Ok(())
@@ -217,7 +222,7 @@ impl MigrationConnector for SqlMigrationConnector {
 
 async fn connect(database_str: &str) -> ConnectorResult<Connection> {
     let connection_info = ConnectionInfo::from_url(database_str).map_err(|err| {
-        let details = user_facing_errors::quaint::invalid_url_description(database_str, &err.to_string());
+        let details = user_facing_errors::quaint::invalid_url_description(&err.to_string());
         KnownError::new(InvalidDatabaseString { details })
     })?;
 

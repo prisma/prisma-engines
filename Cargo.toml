@@ -23,7 +23,6 @@ members = [
   "query-engine/request-handlers",
   "prisma-fmt",
   "libs/datamodel/core",
-  "libs/feature-flags",
   "libs/json-rpc-stdio",
   "libs/native-types",
   "libs/prisma-inflector",
@@ -34,6 +33,9 @@ members = [
   "libs/test-cli",
   "libs/user-facing-errors",
 ]
+
+[profile.dev]
+split-debuginfo = "unpacked"
 
 [profile.dev.package.backtrace]
 opt-level = 3

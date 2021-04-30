@@ -268,8 +268,14 @@ impl RelationField {
         }
     }
     /// Creates a new field with the given name and type, marked as generated and optional.
-    pub fn new_generated(name: &str, info: RelationInfo) -> Self {
-        let mut field = Self::new(name, FieldArity::Optional, info);
+    pub fn new_generated(name: &str, info: RelationInfo, required: bool) -> Self {
+        let arity = if required {
+            FieldArity::Required
+        } else {
+            FieldArity::Optional
+        };
+
+        let mut field = Self::new(name, arity, info);
         field.is_generated = true;
 
         field

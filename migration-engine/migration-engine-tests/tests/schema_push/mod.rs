@@ -15,7 +15,7 @@ model Box {
 }
 "#;
 
-#[test_each_connector]
+#[test_connector]
 async fn schema_push_happy_path(api: &TestApi) -> TestResult {
     api.schema_push(SCHEMA)
         .send()
@@ -67,7 +67,7 @@ async fn schema_push_happy_path(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn schema_push_warns_about_destructive_changes(api: &TestApi) -> TestResult {
     api.schema_push(SCHEMA)
         .send()
@@ -108,7 +108,7 @@ async fn schema_push_warns_about_destructive_changes(api: &TestApi) -> TestResul
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn schema_push_with_an_unexecutable_migration_returns_a_message_and_aborts(api: &TestApi) -> TestResult {
     api.schema_push(SCHEMA)
         .send()
@@ -146,7 +146,7 @@ async fn schema_push_with_an_unexecutable_migration_returns_a_message_and_aborts
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn indexes_and_unique_constraints_on_the_same_field_do_not_collide(api: &TestApi) -> TestResult {
     let dm = r#"
         model User {
@@ -163,7 +163,7 @@ async fn indexes_and_unique_constraints_on_the_same_field_do_not_collide(api: &T
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn multi_column_indexes_and_unique_constraints_on_the_same_fields_do_not_collide(api: &TestApi) -> TestResult {
     let dm = r#"
         model User {

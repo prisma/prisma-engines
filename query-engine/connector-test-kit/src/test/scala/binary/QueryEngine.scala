@@ -4,7 +4,7 @@ import org.scalatest.{FlatSpec, Matchers}
 import util._
 
 class QueryEngine extends FlatSpec with Matchers with ApiSpecBase {
-  "Setting a data source override via env" should "prevent env errors" in {
+  "Setting a data source override via env" should "prevent env errors" taggedAs (IgnoreVitess) in {
     val config = ConnectorConfig.instance
 
     val header = s"""
@@ -15,6 +15,7 @@ class QueryEngine extends FlatSpec with Matchers with ApiSpecBase {
         |
         |generator js {
         |  provider = "prisma-client-js"
+        |  previewFeatures = ["microsoftSqlServer", "mongodb", "orderByRelation", "napi", "selectRelationCount", "orderByAggregateGroup"]
         |}
         """.stripMargin
 

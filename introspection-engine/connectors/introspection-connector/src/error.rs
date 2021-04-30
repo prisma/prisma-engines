@@ -19,13 +19,13 @@ impl ConnectorError {
         }
     }
 
-    pub fn url_parse_error(err: impl Display, url: &str) -> Self {
-        let details = user_facing_errors::quaint::invalid_url_description(url, &format!("{}", err));
+    pub fn url_parse_error(err: impl Display) -> Self {
+        let details = user_facing_errors::quaint::invalid_url_description(&err.to_string());
         let known = KnownError::new(InvalidDatabaseString { details });
 
         ConnectorError {
             user_facing_error: Some(known),
-            kind: ErrorKind::InvalidDatabaseUrl(format!("{} in `{}`)", err, url)),
+            kind: ErrorKind::InvalidDatabaseUrl(format!("{} in database URL", err)),
         }
     }
 
