@@ -86,9 +86,10 @@ impl TestApi {
                 Ok(sql_schema)
             }
             ConnectionInfo::Postgres(url) => {
-                let sql_schema = postgres::SqlSchemaDescriber::new(self.database.clone())
-                    .describe(url.schema())
-                    .await?;
+                let sql_schema =
+                    postgres::SqlSchemaDescriber::new(self.database.clone(), self.tags().contains(Tags::Cockroach))
+                        .describe(url.schema())
+                        .await?;
 
                 Ok(sql_schema)
             }

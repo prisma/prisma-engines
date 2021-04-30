@@ -18,6 +18,10 @@ pub(crate) fn get_postgres_tags(database_url: &str) -> Result<BitFlags<Tags>, St
                     tags |= Tags::Postgres12;
                 }
 
+                if version.contains("CockroachDB") {
+                    tags |= Tags::Cockroach;
+                }
+
                 eprintln!("Inferred tags: {:?}", tags);
 
                 Ok(tags)

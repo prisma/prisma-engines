@@ -13,6 +13,7 @@ use tracing::trace;
 #[derive(Debug)]
 pub struct SqlSchemaDescriber {
     conn: Quaint,
+    is_cockroach: bool,
 }
 
 #[async_trait::async_trait]
@@ -31,7 +32,6 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
         })
     }
 
-    #[tracing::instrument]
     async fn describe(&self, schema: &str) -> DescriberResult<SqlSchema> {
         let sequences = self.get_sequences(schema).await?;
         let enums = self.get_enums(schema).await?;
@@ -80,8 +80,8 @@ impl Parser for SqlSchemaDescriber {
 
 impl SqlSchemaDescriber {
     /// Constructor.
-    pub fn new(conn: Quaint) -> SqlSchemaDescriber {
-        SqlSchemaDescriber { conn }
+    pub fn new(conn: Quaint, is_cockroach: bool) -> SqlSchemaDescriber {
+        SqlSchemaDescriber { conn, is_cockroach }
     }
 
     #[tracing::instrument]
@@ -100,6 +100,10 @@ impl SqlSchemaDescriber {
 
     #[tracing::instrument]
     async fn get_procedures(&self, schema: &str) -> DescriberResult<Vec<Procedure>> {
+        if self.is_cockroach {
+            return Ok(Vec::new());
+        }
+
         let sql = r#"
             SELECT p.proname AS name,
                 CASE WHEN l.lanname = 'internal' THEN p.prosrc
@@ -250,13 +254,17 @@ impl SqlSchemaDescriber {
                 _ => panic!("unrecognized is_identity variant '{}'", is_identity_str),
             };
 
-            let tpe = get_column_type(&col, enums);
             let data_type = col.get_expect_string("data_type");
+            let tpe = get_column_type(&col, enums);
+            let default = Self::get_default_value(&col, &data_type, &tpe, sequences);
 
-            let default = Self::get_default_value(&col, &tpe, &data_type, sequences);
-
-            let auto_increment =
-                is_identity || matches!(default.as_ref().map(|d| d.kind()), Some(DefaultKind::Sequence(_)));
+            let auto_increment = is_identity
+                || matches!(default.as_ref().map(|d| d.kind()), Some(DefaultKind::Sequence(_)))
+                || (self.is_cockroach
+                    && matches!(
+                        default.as_ref().map(|d| d.kind()),
+                        Some(DefaultKind::DbGenerated(s)) if s == "unique_rowid()"
+                    ));
 
             let col = Column {
                 name,
@@ -385,8 +393,12 @@ impl SqlSchemaDescriber {
             let referenced_table = row.get_expect_string("parent_table");
             let referenced_column = row.get_expect_string("parent_column");
             let table_name = row.get_expect_string("table_name");
-            let confdeltype = row.get_expect_char("confdeltype");
-            let confupdtype = row.get_expect_char("confupdtype");
+            let confdeltype = row
+                .get_char("confdeltype")
+                .unwrap_or_else(|| row.get_expect_string("confdeltype").chars().next().unwrap());
+            let confupdtype = row
+                .get_char("confupdtype")
+                .unwrap_or_else(|| row.get_expect_string("confupdtype").chars().next().unwrap());
             let constraint_name = row.get_expect_string("constraint_name");
 
             let referenced_schema_name = row.get_expect_string("referenced_schema_name");
@@ -626,8 +638,8 @@ impl SqlSchemaDescriber {
 
     fn get_default_value(
         col: &ResultRow,
-        tpe: &ColumnType,
         data_type: &str,
+        tpe: &ColumnType,
         sequences: &[Sequence],
     ) -> Option<DefaultValue> {
         match col.get("column_default") {
@@ -637,20 +649,26 @@ impl SqlSchemaDescriber {
                 Some(x) if x.starts_with("NULL") => None,
                 Some(default_string) => {
                     Some(match &tpe.family {
-                        ColumnTypeFamily::Int => match Self::parse_int(&default_string) {
-                            Some(int_value) => DefaultValue::value(int_value),
-                            None => match is_autoincrement(&default_string, sequences) {
-                                Some(seq) => DefaultValue::sequence(seq),
-                                None => DefaultValue::db_generated(default_string),
-                            },
-                        },
-                        ColumnTypeFamily::BigInt => match Self::parse_big_int(&default_string) {
-                            Some(int_value) => DefaultValue::value(int_value),
-                            None => match is_autoincrement(&default_string, sequences) {
-                                Some(seq) => DefaultValue::sequence(seq),
-                                None => DefaultValue::db_generated(default_string),
-                            },
-                        },
+                        ColumnTypeFamily::Int | ColumnTypeFamily::BigInt => {
+                            let default_expr = unsuffix_default_literal(
+                                &default_string,
+                                &[data_type, &tpe.full_data_type, "integer", "INT8", "INT4"],
+                            )
+                            .unwrap_or_else(|| default_string.as_str().into());
+                            let default_expr = process_string_literal(&default_expr);
+
+                            match default_expr.parse::<i64>().ok() {
+                                Some(int_value) => DefaultValue::value(if tpe.family.is_int() {
+                                    PrismaValue::Int(int_value)
+                                } else {
+                                    PrismaValue::BigInt(int_value)
+                                }),
+                                None => match is_autoincrement(&default_string, sequences) {
+                                    Some(seq) => DefaultValue::sequence(seq),
+                                    None => DefaultValue::db_generated(default_string),
+                                },
+                            }
+                        }
                         ColumnTypeFamily::Float => match Self::parse_float(&default_string) {
                             Some(float_value) => DefaultValue::value(float_value),
                             None => DefaultValue::db_generated(default_string),
@@ -664,7 +682,8 @@ impl SqlSchemaDescriber {
                             None => DefaultValue::db_generated(default_string),
                         },
                         ColumnTypeFamily::String => {
-                            match unsuffix_default_literal(&default_string, data_type, &tpe.full_data_type) {
+                            match unsuffix_default_literal(&default_string, &[data_type, &tpe.full_data_type, "STRING"])
+                            {
                                 Some(default_literal) => {
                                     DefaultValue::value(process_string_literal(default_literal.as_ref()).into_owned())
                                 }
@@ -679,10 +698,11 @@ impl SqlSchemaDescriber {
                         }
                         ColumnTypeFamily::Binary => DefaultValue::db_generated(default_string),
                         // JSON/JSONB defaults come in the '{}'::jsonb form.
-                        ColumnTypeFamily::Json => unsuffix_default_literal(&default_string, "jsonb", "jsonb")
-                            .or_else(|| unsuffix_default_literal(&default_string, "json", "json"))
-                            .map(|default| DefaultValue::value(PrismaValue::Json(unquote_string(&default))))
-                            .unwrap_or_else(move || DefaultValue::db_generated(default_string)),
+                        ColumnTypeFamily::Json => {
+                            unsuffix_default_literal(&default_string, &[data_type, &tpe.full_data_type])
+                                .map(|default| DefaultValue::value(PrismaValue::Json(unquote_string(&default))))
+                                .unwrap_or_else(move || DefaultValue::db_generated(default_string))
+                        }
                         ColumnTypeFamily::Uuid => DefaultValue::db_generated(default_string),
                         ColumnTypeFamily::Enum(enum_name) => {
                             let enum_suffix_without_quotes = format!("::{}", enum_name);
@@ -811,32 +831,34 @@ fn is_autoincrement(value: &str, sequences: &[Sequence]) -> Option<String> {
     })
 }
 
-fn unsuffix_default_literal<'a>(literal: &'a str, data_type: &str, full_data_type: &str) -> Option<Cow<'a, str>> {
+fn unsuffix_default_literal<'a>(literal: &'a str, expected_suffixes: &[&str]) -> Option<Cow<'a, str>> {
     static POSTGRES_DATA_TYPE_SUFFIX_RE: Lazy<Regex> =
-        Lazy::new(|| Regex::new(r#"(?ms)^(.*)::(\\")?(.*)(\\")?$"#).unwrap());
+        Lazy::new(|| Regex::new(r#"(?ms)^(.*?):{2,3}(\\")?(.*)(\\")?$"#).unwrap());
 
     let captures = POSTGRES_DATA_TYPE_SUFFIX_RE.captures(literal)?;
     let suffix = captures.get(3).unwrap().as_str();
 
-    if suffix != data_type && suffix != full_data_type {
+    if !expected_suffixes.iter().any(|expected| *expected == suffix) {
         return None;
     }
 
     let first_capture = captures.get(1).unwrap().as_str();
 
-    Some(first_capture.into())
+    Some(Cow::Borrowed(first_capture))
 }
 
 // See https://www.postgresql.org/docs/9.3/sql-syntax-lexical.html
 fn process_string_literal(literal: &str) -> Cow<'_, str> {
-    static POSTGRES_STRING_DEFAULT_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"(?ms)^B?'(.*)'$"#).unwrap());
+    static POSTGRES_STRING_DEFAULT_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"(?ms)^(?:B|e)?'(.*)'$"#).unwrap());
     static POSTGRES_DEFAULT_QUOTE_UNESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"'(')"#).unwrap());
     static POSTGRES_DEFAULT_BACKSLASH_UNESCAPE_RE: Lazy<Regex> =
         Lazy::new(|| Regex::new(r#"\\(["']|\\[^\\])"#).unwrap());
+    static COCKROACH_DEFAULT_BACKSLASH_UNESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\\\\(["']|\\)"#).unwrap());
     static POSTGRES_STRING_DEFAULTS_PIPELINE: &[(&Lazy<Regex>, &str)] = &[
         (&POSTGRES_STRING_DEFAULT_RE, "$1"),
         (&POSTGRES_DEFAULT_QUOTE_UNESCAPE_RE, "$1"),
         (&POSTGRES_DEFAULT_BACKSLASH_UNESCAPE_RE, "$1"),
+        (&COCKROACH_DEFAULT_BACKSLASH_UNESCAPE_RE, "$1"),
     ];
 
     chain_replaces(literal, POSTGRES_STRING_DEFAULTS_PIPELINE)

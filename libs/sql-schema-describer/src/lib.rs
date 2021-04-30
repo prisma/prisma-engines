@@ -7,6 +7,7 @@ pub use error::{DescriberError, DescriberErrorKind, DescriberResult};
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
+use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
 use walkers::{EnumWalker, TableWalker, UserDefinedTypeWalker, ViewWalker};
 
@@ -16,7 +17,6 @@ pub mod mysql;
 pub mod postgres;
 pub mod sqlite;
 pub mod walkers;
-use serde::{Deserialize, Serialize};
 
 pub(crate) mod common;
 mod error;
@@ -367,6 +367,10 @@ impl ColumnTypeFamily {
         }
     }
 
+    pub fn is_bigint(&self) -> bool {
+        matches!(self, ColumnTypeFamily::BigInt)
+    }
+
     pub fn is_boolean(&self) -> bool {
         matches!(self, ColumnTypeFamily::Boolean)
     }
@@ -385,6 +389,10 @@ impl ColumnTypeFamily {
 
     pub fn is_json(&self) -> bool {
         matches!(self, ColumnTypeFamily::Json)
+    }
+
+    pub fn is_string(&self) -> bool {
+        matches!(self, ColumnTypeFamily::String)
     }
 }
 
@@ -435,6 +443,12 @@ pub enum ForeignKeyAction {
     /// referenced table matching the default values, if they are not null, or the operation
     /// will fail).
     SetDefault,
+}
+
+impl ForeignKeyAction {
+    pub fn is_cascade(&self) -> bool {
+        matches!(self, ForeignKeyAction::Cascade)
+    }
 }
 
 /// A foreign key.

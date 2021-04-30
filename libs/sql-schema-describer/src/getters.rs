@@ -8,6 +8,7 @@ pub trait Getter {
     fn get_expect_i64(&self, name: &str) -> i64;
     fn get_expect_bool(&self, name: &str) -> bool;
 
+    fn get_char(&self, name: &str) -> Option<char>;
     fn get_string(&self, name: &str) -> Option<String>;
     fn get_u32(&self, name: &str) -> Option<u32>;
     fn get_i64(&self, name: &str) -> Option<i64>;
@@ -60,6 +61,10 @@ impl Getter for ResultRow {
             })
             .ok_or_else(|| format!("Getting {} from Resultrow {:?} as bool failed", name, &self))
             .unwrap()
+    }
+
+    fn get_char(&self, name: &str) -> Option<char> {
+        self.get(name).and_then(|x| x.as_char())
     }
 
     fn get_string(&self, name: &str) -> Option<String> {

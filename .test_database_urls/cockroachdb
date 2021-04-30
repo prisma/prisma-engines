@@ -1,0 +1,1 @@
+export TEST_DATABASE_URL="postgresql://root@localhost:5436"

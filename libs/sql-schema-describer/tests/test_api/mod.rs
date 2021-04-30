@@ -4,7 +4,10 @@ pub use test_setup::{BitFlags, Capabilities, Tags};
 
 use barrel::Migration;
 use quaint::prelude::{ConnectionInfo, SqlFamily};
-use sql_schema_describer::*;
+use sql_schema_describer::{
+    walkers::{ColumnWalker, ForeignKeyWalker, IndexWalker, SqlSchemaExt, TableWalker},
+    ColumnTypeFamily, DescriberError, ForeignKeyAction, SqlSchema, SqlSchemaDescriberBackend,
+};
 use test_setup::*;
 
 pub struct TestApi {
@@ -64,7 +67,10 @@ impl TestApi {
         let db = self.database.clone();
 
         match self.sql_family() {
-            SqlFamily::Postgres => Box::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(db)),
+            SqlFamily::Postgres => Box::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(
+                db,
+                self.tags.contains(Tags::Cockroach),
+            )),
             SqlFamily::Sqlite => Box::new(sql_schema_describer::sqlite::SqlSchemaDescriber::new(db)),
             SqlFamily::Mysql => Box::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(db)),
             SqlFamily::Mssql => Box::new(sql_schema_describer::mssql::SqlSchemaDescriber::new(db)),
@@ -77,6 +83,14 @@ impl TestApi {
 
     pub(crate) fn database(&self) -> &Quaint {
         &self.database
+    }
+
+    pub(crate) fn is_cockroach(&self) -> bool {
+        self.tags.contains(Tags::Cockroach)
+    }
+
+    pub(crate) fn is_mssql(&self) -> bool {
+        self.tags.contains(Tags::Mssql)
     }
 
     pub(crate) fn schema_name(&self) -> &str {
@@ -129,5 +143,194 @@ impl BarrelMigrationExecutor {
 
         let full_sql = migration.make_from(self.sql_variant);
         self.database.raw_cmd(&full_sql).await.unwrap();
+    }
+}
+
+pub trait SqlSchemaAssertionsExt {
+    fn assert_table(
+        &self,
+        table_name: &str,
+        assertions: impl for<'a> FnOnce(&'a TableAssertion<'a>) -> &'a TableAssertion<'a>,
+    ) -> &Self;
+}
+
+impl SqlSchemaAssertionsExt for SqlSchema {
+    fn assert_table(
+        &self,
+        table_name: &str,
+        assertions: impl for<'a> FnOnce(&'a TableAssertion<'a>) -> &'a TableAssertion<'a>,
+    ) -> &Self {
+        let mut table = TableAssertion {
+            table: self.table_walker(table_name).unwrap(),
+        };
+
+        assertions(&mut table);
+
+        self
+    }
+}
+
+pub struct TableAssertion<'a> {
+    table: TableWalker<'a>,
+}
+
+impl TableAssertion<'_> {
+    pub fn assert_column(
+        &self,
+        column_name: &str,
+        assertions: impl for<'c> FnOnce(&'c ColumnAssertion<'c>) -> &'c ColumnAssertion<'c>,
+    ) -> &Self {
+        let mut column = ColumnAssertion {
+            column: self
+                .table
+                .column(column_name)
+                .ok_or_else(|| format!("Could not find the {} column", column_name))
+                .unwrap(),
+        };
+
+        assertions(&mut column);
+
+        self
+    }
+
+    pub fn assert_foreign_keys_count(&self, expected_count: usize) -> &Self {
+        assert_eq!(self.table.foreign_key_count(), expected_count);
+        self
+    }
+
+    pub fn assert_foreign_key_on_columns(
+        &self,
+        cols: &[&str],
+        assertions: impl for<'fk> FnOnce(&'fk ForeignKeyAssertion<'fk>) -> &'fk ForeignKeyAssertion<'fk>,
+    ) -> &Self {
+        let fk = ForeignKeyAssertion {
+            fk: self
+                .table
+                .foreign_keys()
+                .find(|fk| fk.constrained_column_names() == cols)
+                .unwrap(),
+        };
+
+        assertions(&fk);
+
+        self
+    }
+
+    pub fn assert_index_on_columns(
+        &self,
+        columns: &[&str],
+        assertions: impl for<'i> FnOnce(&'i IndexAssertion<'i>) -> &'i IndexAssertion<'i>,
+    ) -> &Self {
+        let index = self.table.indexes().find(|idx| idx.column_names() == columns).unwrap();
+
+        assertions(&IndexAssertion { index });
+
+        self
+    }
+
+    pub fn assert_indexes_count(&self, expected_count: usize) -> &Self {
+        assert_eq!(self.table.indexes_count(), expected_count);
+        self
+    }
+
+    pub fn assert_pk_on_columns(&self, columns: &[&str]) -> &Self {
+        assert_eq!(self.table.primary_key().unwrap().columns, columns);
+        self
+    }
+}
+
+pub struct ColumnAssertion<'a> {
+    column: ColumnWalker<'a>,
+}
+
+impl ColumnAssertion<'_> {
+    pub fn assert_auto_increment(&self, expected: bool) -> &Self {
+        assert_eq!(self.column.is_autoincrement(), expected);
+        self
+    }
+
+    pub fn assert_column_type_family(&self, fam: ColumnTypeFamily) -> &Self {
+        assert_eq!(self.column.column_type_family(), &fam);
+        self
+    }
+
+    pub fn assert_full_data_type(&self, full_data_type: &str) -> &Self {
+        assert_eq!(
+            self.column.column().tpe.full_data_type,
+            full_data_type,
+            "assert_full_data_type() for {}",
+            self.column.name()
+        );
+        self
+    }
+
+    pub fn assert_is_list(&self) -> &Self {
+        assert!(self.column.arity().is_list());
+        self
+    }
+
+    pub fn assert_no_default(&self) -> &Self {
+        assert!(self.column.default().is_none());
+        self
+    }
+
+    pub fn assert_not_null(&self) -> &Self {
+        assert!(self.column.arity().is_required());
+        self
+    }
+
+    pub fn assert_nullable(&self) -> &Self {
+        assert!(self.column.arity().is_nullable());
+        self
+    }
+
+    pub fn assert_type_is_int_or_bigint(&self) -> &Self {
+        let fam = self.column.column_type_family();
+        assert!(fam.is_int() || fam.is_bigint(), "Expected int or bigint, got {:?}", fam);
+        self
+    }
+
+    #[allow(unused)]
+    pub fn assert_type_is_int(&self) -> &Self {
+        assert!(self.column.column_type_family().is_int());
+        self
+    }
+
+    pub fn assert_type_is_string(&self) -> &Self {
+        assert!(self.column.column_type_family().is_string());
+        self
+    }
+}
+
+pub struct IndexAssertion<'a> {
+    index: IndexWalker<'a>,
+}
+
+impl IndexAssertion<'_> {
+    pub fn assert_name(&self, name: &str) -> &Self {
+        assert_eq!(self.index.name(), name);
+        self
+    }
+
+    pub fn assert_is_unique(&self) -> &Self {
+        assert!(self.index.index_type().is_unique());
+        self
+    }
+}
+
+pub struct ForeignKeyAssertion<'a> {
+    fk: ForeignKeyWalker<'a>,
+}
+
+impl<'a> ForeignKeyAssertion<'a> {
+    pub fn assert_references(&self, table: &str, columns: &[&str]) -> &Self {
+        assert_eq!(self.fk.referenced_table().name(), table);
+        assert_eq!(self.fk.referenced_column_names(), columns);
+        self
+    }
+
+    pub fn assert_on_delete(&self, expected: ForeignKeyAction) -> &Self {
+        assert_eq!(self.fk.on_delete_action(), &expected);
+        self
     }
 }

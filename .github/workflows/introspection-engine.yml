@@ -61,16 +61,14 @@ jobs:
             target
           key: introspection-engine-${{ runner.os }}-${{ matrix.database.name }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
-      - run: cargo test
+      - run: cargo test -p introspection-engine-tests && cargo test -p sql-schema-describer
         if: ${{ matrix.database.name != 'vitess_5_7' && matrix.database.name != 'vitess_8_0' }}
-        working-directory: introspection-engine/introspection-engine-tests
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
 
-      - run: cargo test -- --test-threads=1
+      - run: cargo test -p introspection-engine-tests && cargo test -p sql-schema-describer -- --test-threads=1
         if: ${{ matrix.database.name == 'vitess_5_7' || matrix.database.name == 'vitess_8_0' }}
-        working-directory: introspection-engine/introspection-engine-tests
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
