@@ -13,6 +13,7 @@ pub struct SchemaPush<'a> {
     force: bool,
     /// Purely for logging diagnostics.
     migration_id: Option<&'a str>,
+    rt: Option<&'a tokio::runtime::Runtime>,
 }
 
 impl<'a> SchemaPush<'a> {
@@ -22,6 +23,17 @@ impl<'a> SchemaPush<'a> {
             schema,
             force: false,
             migration_id: None,
+            rt: None,
+        }
+    }
+
+    pub fn new_sync(api: &'a dyn GenericApi, schema: String, rt: &'a tokio::runtime::Runtime) -> Self {
+        SchemaPush {
+            api,
+            schema,
+            force: false,
+            migration_id: None,
+            rt: Some(rt),
         }
     }
 
@@ -52,6 +64,10 @@ impl<'a> SchemaPush<'a> {
             result: output,
             _api: self.api,
         })
+    }
+
+    pub fn send_sync(self) -> CoreResult<SchemaPushAssertion<'a>> {
+        self.rt.unwrap().block_on(self.send())
     }
 }
 

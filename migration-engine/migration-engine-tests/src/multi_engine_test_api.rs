@@ -9,6 +9,7 @@ use crate::{ApplyMigrations, CreateMigration, DiagnoseMigrationHistory, Reset, S
 use migration_core::GenericApi;
 use quaint::{prelude::Queryable, single::Quaint};
 use sql_migration_connector::SqlMigrationConnector;
+use std::future::Future;
 use tempfile::TempDir;
 use test_setup::TestApiArgs;
 
@@ -17,38 +18,40 @@ pub struct TestApi {
     args: TestApiArgs,
     connection_string: String,
     admin_conn: Quaint,
+    rt: tokio::runtime::Runtime,
 }
 
 impl TestApi {
     /// Initializer, called by the test macros.
-    pub async fn new(args: TestApiArgs) -> Self {
+    pub fn new(args: TestApiArgs) -> Self {
+        let rt = test_setup::runtime::test_tokio_runtime();
         let tags = args.tags();
         let db_name = args.test_function_name();
 
         let (admin_conn, connection_string) = if tags.contains(Tags::Postgres) {
-            test_setup::create_postgres_database(db_name).await.unwrap()
+            rt.block_on(test_setup::create_postgres_database(db_name)).unwrap()
         } else if tags.contains(Tags::Vitess) {
-            SqlMigrationConnector::new(args.database_url(), args.shadow_database_url().map(String::from))
-                .await
-                .unwrap()
-                .reset()
-                .await
+            let conn = rt
+                .block_on(SqlMigrationConnector::new(
+                    args.database_url(),
+                    args.shadow_database_url().map(String::from),
+                ))
                 .unwrap();
+            rt.block_on(conn.reset()).unwrap();
 
             (
-                Quaint::new(args.database_url()).await.unwrap(),
+                rt.block_on(Quaint::new(args.database_url())).unwrap(),
                 args.database_url().to_owned(),
             )
         } else if tags.contains(Tags::Mysql) {
-            test_setup::create_mysql_database(db_name).await.unwrap()
+            rt.block_on(test_setup::create_mysql_database(db_name)).unwrap()
         } else if tags.contains(Tags::Mssql) {
-            test_setup::init_mssql_database(args.database_url(), db_name)
-                .await
+            rt.block_on(test_setup::init_mssql_database(args.database_url(), db_name))
                 .unwrap()
         } else if tags.contains(Tags::Sqlite) {
             let url = test_setup::sqlite_test_url(db_name);
 
-            (Quaint::new(&url).await.unwrap(), url)
+            (rt.block_on(Quaint::new(&url)).unwrap(), url)
         } else {
             unreachable!()
         };
@@ -57,12 +60,23 @@ impl TestApi {
             args,
             admin_conn,
             connection_string,
+            rt,
         }
     }
 
-    /// The default connection to the database.
-    pub fn admin_conn(&self) -> &Quaint {
-        &self.admin_conn
+    /// Block on a future
+    pub fn block_on<O, F: Future<Output = O>>(&self, f: F) -> O {
+        self.rt.block_on(f)
+    }
+
+    /// Equivalent to quaint's query_raw()
+    pub fn query_raw(&self, sql: &str, params: &[quaint::Value<'_>]) -> quaint::Result<quaint::prelude::ResultSet> {
+        self.block_on(self.admin_conn.query_raw(sql, params))
+    }
+
+    /// Send a SQL command to the database, and expect it to succeed.
+    pub fn raw_cmd(&self, sql: &str) {
+        self.rt.block_on(self.admin_conn.raw_cmd(sql)).unwrap()
     }
 
     /// The connection string for the database associated with the test.
@@ -71,8 +85,8 @@ impl TestApi {
     }
 
     /// Create a temporary directory to serve as a test migrations directory.
-    pub fn create_migrations_directory(&self) -> anyhow::Result<TempDir> {
-        Ok(tempfile::tempdir()?)
+    pub fn create_migrations_directory(&self) -> TempDir {
+        tempfile::tempdir().unwrap()
     }
 
     /// Returns true only when testing on MSSQL.
@@ -111,22 +125,31 @@ impl TestApi {
     }
 
     /// Instantiate a new migration engine for the current database.
-    pub async fn new_engine(&self) -> anyhow::Result<EngineTestApi> {
+    pub fn new_engine(&self) -> EngineTestApi<'_> {
         let shadow_db = self.args.shadow_database_url().as_ref().map(ToString::to_string);
 
         self.new_engine_with_connection_strings(&self.connection_string, shadow_db)
-            .await
     }
 
     /// Instantiate a new migration with the provided connection string.
-    pub async fn new_engine_with_connection_strings(
+    pub fn new_engine_with_connection_strings(
         &self,
         connection_string: &str,
         shadow_db_connection_string: Option<String>,
-    ) -> anyhow::Result<EngineTestApi> {
-        let connector = SqlMigrationConnector::new(&connection_string, shadow_db_connection_string).await?;
+    ) -> EngineTestApi<'_> {
+        let connector = self
+            .rt
+            .block_on(SqlMigrationConnector::new(
+                &connection_string,
+                shadow_db_connection_string,
+            ))
+            .unwrap();
 
-        Ok(EngineTestApi(connector, self.args.tags()))
+        EngineTestApi {
+            connector,
+            tags: self.args.tags(),
+            rt: &self.rt,
+        }
     }
 
     fn tags(&self) -> BitFlags<Tags> {
@@ -141,12 +164,16 @@ impl TestApi {
 
 /// A wrapper around a migration engine instance optimized for convenience in
 /// writing tests.
-pub struct EngineTestApi(SqlMigrationConnector, BitFlags<Tags>);
+pub struct EngineTestApi<'a> {
+    connector: SqlMigrationConnector,
+    tags: BitFlags<Tags>,
+    rt: &'a tokio::runtime::Runtime,
+}
 
-impl EngineTestApi {
+impl EngineTestApi<'_> {
     /// Plan an `applyMigrations` command
     pub fn apply_migrations<'a>(&'a self, migrations_directory: &'a TempDir) -> ApplyMigrations<'a> {
-        ApplyMigrations::new(&self.0, migrations_directory)
+        ApplyMigrations::new_sync(&self.connector, migrations_directory, &self.rt)
     }
 
     /// Plan a `createMigration` command
@@ -156,56 +183,41 @@ impl EngineTestApi {
         schema: &'a str,
         migrations_directory: &'a TempDir,
     ) -> CreateMigration<'a> {
-        CreateMigration::new(&self.0, name, schema, migrations_directory)
+        CreateMigration::new_sync(&self.connector, name, schema, migrations_directory, &self.rt)
     }
 
     /// Builder and assertions to call the DiagnoseMigrationHistory command.
     pub fn diagnose_migration_history<'a>(&'a self, migrations_directory: &'a TempDir) -> DiagnoseMigrationHistory<'a> {
-        DiagnoseMigrationHistory::new(&self.0, migrations_directory)
+        DiagnoseMigrationHistory::new(&self.connector, migrations_directory)
     }
 
     /// Assert facts about the database schema
-    pub async fn assert_schema(&self) -> Result<SchemaAssertion, anyhow::Error> {
-        let schema = self.0.describe_schema().await?;
-
-        Ok(SchemaAssertion::new(schema, self.1))
-    }
-
-    /// True if MySQL on Windows with default settings.
-    pub async fn lower_case_identifiers(&self) -> bool {
-        self.0
-            .quaint()
-            .query_raw("SELECT @@lower_case_table_names", &[])
-            .await
-            .ok()
-            .and_then(|row| row.into_single().ok())
-            .and_then(|row| row.at(0).and_then(|col| col.as_i64()))
-            .map(|val| val == 1)
-            .unwrap_or(false)
+    pub fn assert_schema(&self) -> SchemaAssertion {
+        SchemaAssertion::new(self.rt.block_on(self.connector.describe_schema()).unwrap(), self.tags)
     }
 
     /// Expose the GenericApi impl.
     pub fn generic_api(&self) -> &dyn GenericApi {
-        &self.0
+        &self.connector
     }
 
     /// Plan a `reset` command
     pub fn reset(&self) -> Reset<'_> {
-        Reset::new(&self.0)
+        Reset::new_sync(&self.connector, &self.rt)
     }
 
     /// Plan a `schemaPush` command
     pub fn schema_push(&self, dm: impl Into<String>) -> SchemaPush<'_> {
-        SchemaPush::new(&self.0, dm.into())
+        SchemaPush::new_sync(&self.connector, dm.into(), &self.rt)
     }
 
     /// The schema name of the current connected database.
     pub fn schema_name(&self) -> &str {
-        self.0.quaint().connection_info().schema_name()
+        self.connector.quaint().connection_info().schema_name()
     }
 
     /// Execute a raw SQL command.
-    pub async fn raw_cmd(&self, cmd: &str) -> Result<(), quaint::error::Error> {
-        self.0.quaint().raw_cmd(cmd).await
+    pub fn raw_cmd(&self, cmd: &str) -> Result<(), quaint::error::Error> {
+        self.rt.block_on(self.connector.quaint().raw_cmd(cmd))
     }
 }

@@ -65,5 +65,5 @@ pub async fn create_postgres_database(db_name: &str) -> Result<(Quaint, String),
 
     conn.raw_cmd("CREATE SCHEMA \"prisma-tests\"").await?;
 
-    Ok((conn, dbg!(url_str)))
+    Ok((conn, url_str))
 }
