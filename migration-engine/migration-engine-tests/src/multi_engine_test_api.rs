@@ -111,7 +111,7 @@ impl TestApi {
 
     /// Returns true only when testing on MySQL 8.
     pub fn is_mysql_8(&self) -> bool {
-        self.tags().intersects(Tags::Mysql8 | Tags::Vitess80)
+        self.tags().contains(Tags::Mysql8)
     }
 
     /// Returns true only when testing on postgres.

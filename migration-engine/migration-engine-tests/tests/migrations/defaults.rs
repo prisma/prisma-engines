@@ -4,7 +4,7 @@ use test_macros::test_connector;
 
 // MySQL 5.7 and MariaDB are skipped, because the datamodel parser gives us a
 // chrono DateTime, and we don't render that in the exact expected format.
-#[test_connector(exclude(Mysql57, Mariadb, Vitess57))]
+#[test_connector(exclude(Mysql57, Mariadb))]
 fn datetime_defaults_work(api: TestApi) {
     let engine = api.new_engine();
 

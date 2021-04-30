@@ -133,7 +133,7 @@ impl TestApi {
     }
 
     pub fn is_mysql_8(&self) -> bool {
-        self.tags().intersects(Tags::Mysql8 | Tags::Vitess80)
+        self.tags().contains(Tags::Mysql8)
     }
 
     pub fn is_mariadb(&self) -> bool {

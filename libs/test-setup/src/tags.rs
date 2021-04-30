@@ -15,7 +15,5 @@ pub enum Tags {
     Mssql2019 = 1 << 9,
     Postgres12 = 1 << 10,
     Mssql = 1 << 11,
-    Vitess57 = 1 << 12,
-    Vitess80 = 1 << 13,
-    Vitess = 1 << 14,
+    Vitess = 1 << 12,
 }
