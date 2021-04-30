@@ -3,41 +3,71 @@
 //! A TestApi that is initialized without IO or async code and can instantiate
 //! multiple migration engines.
 
+pub use test_setup::{BitFlags, Capabilities, Tags};
+
 use crate::{ApplyMigrations, CreateMigration, DiagnoseMigrationHistory, Reset, SchemaAssertion, SchemaPush};
-use enumflags2::BitFlags;
 use migration_core::GenericApi;
 use quaint::{prelude::Queryable, single::Quaint};
 use sql_migration_connector::SqlMigrationConnector;
 use tempfile::TempDir;
-use test_setup::{connectors::Tags, TestApiArgs};
+use test_setup::TestApiArgs;
 
 /// The multi-engine test API.
 pub struct TestApi {
     args: TestApiArgs,
     connection_string: String,
-    shadow_db: Option<String>,
+    admin_conn: Quaint,
 }
 
 impl TestApi {
     /// Initializer, called by the test macros.
-    pub fn new(args: TestApiArgs) -> Self {
-        let (connection_string, shadow_db) = (args.url_fn)(args.test_function_name);
+    pub async fn new(args: TestApiArgs) -> Self {
+        let tags = args.tags();
+        let db_name = args.test_function_name();
+
+        let (admin_conn, connection_string) = if tags.contains(Tags::Postgres) {
+            test_setup::create_postgres_database(db_name).await.unwrap()
+        } else if tags.contains(Tags::Vitess) {
+            SqlMigrationConnector::new(args.database_url(), args.shadow_database_url().map(String::from))
+                .await
+                .unwrap()
+                .reset()
+                .await
+                .unwrap();
+
+            (
+                Quaint::new(args.database_url()).await.unwrap(),
+                args.database_url().to_owned(),
+            )
+        } else if tags.contains(Tags::Mysql) {
+            test_setup::create_mysql_database(db_name).await.unwrap()
+        } else if tags.contains(Tags::Mssql) {
+            test_setup::init_mssql_database(args.database_url(), db_name)
+                .await
+                .unwrap()
+        } else if tags.contains(Tags::Sqlite) {
+            let url = test_setup::sqlite_test_url(db_name);
+
+            (Quaint::new(&url).await.unwrap(), url)
+        } else {
+            unreachable!()
+        };
 
         TestApi {
             args,
+            admin_conn,
             connection_string,
-            shadow_db,
         }
+    }
+
+    /// The default connection to the database.
+    pub fn admin_conn(&self) -> &Quaint {
+        &self.admin_conn
     }
 
     /// The connection string for the database associated with the test.
     pub fn connection_string(&self) -> &str {
         &self.connection_string
-    }
-
-    /// The shadow database connection string, if set.
-    pub fn shadow_db(&self) -> Option<&str> {
-        self.shadow_db.as_deref()
     }
 
     /// Create a temporary directory to serve as a test migrations directory.
@@ -47,42 +77,42 @@ impl TestApi {
 
     /// Returns true only when testing on MSSQL.
     pub fn is_mssql(&self) -> bool {
-        self.args.connector_tags.contains(Tags::Mssql)
+        self.tags().contains(Tags::Mssql)
     }
 
     /// Returns true only when testing on MySQL.
     pub fn is_mysql(&self) -> bool {
-        self.args.connector_tags.contains(Tags::Mysql)
+        self.tags().contains(Tags::Mysql)
     }
 
     /// Returns true only when testing on MariaDB.
     pub fn is_mysql_mariadb(&self) -> bool {
-        self.args.connector_tags.contains(Tags::Mariadb)
+        self.tags().contains(Tags::Mariadb)
     }
 
     /// Returns true only when testing on MySQL 5.6.
     pub fn is_mysql_5_6(&self) -> bool {
-        self.args.connector_tags.contains(Tags::Mysql56)
+        self.tags().contains(Tags::Mysql56)
     }
 
     /// Returns true only when testing on MySQL 8.
     pub fn is_mysql_8(&self) -> bool {
-        self.args.connector_tags.intersects(Tags::Mysql8 | Tags::Vitess80)
+        self.tags().intersects(Tags::Mysql8 | Tags::Vitess80)
     }
 
     /// Returns true only when testing on postgres.
     pub fn is_postgres(&self) -> bool {
-        self.args.connector_tags.contains(Tags::Postgres)
+        self.tags().contains(Tags::Postgres)
     }
 
     /// Returns true only when testing on vitess.
     pub fn is_vitess(&self) -> bool {
-        self.args.connector_tags.contains(Tags::Vitess)
+        self.tags().contains(Tags::Vitess)
     }
 
     /// Instantiate a new migration engine for the current database.
     pub async fn new_engine(&self) -> anyhow::Result<EngineTestApi> {
-        let shadow_db = self.shadow_db().as_ref().map(ToString::to_string);
+        let shadow_db = self.args.shadow_database_url().as_ref().map(ToString::to_string);
 
         self.new_engine_with_connection_strings(&self.connection_string, shadow_db)
             .await
@@ -94,47 +124,24 @@ impl TestApi {
         connection_string: &str,
         shadow_db_connection_string: Option<String>,
     ) -> anyhow::Result<EngineTestApi> {
-        let connector =
-            SqlMigrationConnector::new(&connection_string, BitFlags::empty(), shadow_db_connection_string).await?;
+        let connector = SqlMigrationConnector::new(&connection_string, shadow_db_connection_string).await?;
 
-        Ok(EngineTestApi(connector))
+        Ok(EngineTestApi(connector, self.args.tags()))
     }
 
-    /// Initialize the database.
-    pub async fn initialize(&self) -> anyhow::Result<Quaint> {
-        let tags = self.args.connector_tags;
-
-        if tags.contains(Tags::Postgres) {
-            Ok(test_setup::create_postgres_database(&self.connection_string.parse()?)
-                .await
-                .unwrap())
-        } else if tags.contains(Tags::Vitess) {
-            self.new_engine().await?.reset().send().await?;
-
-            Ok(Quaint::new(&self.connection_string).await?)
-        } else if tags.contains(Tags::Mysql) {
-            Ok(test_setup::create_mysql_database(&self.connection_string.parse()?)
-                .await
-                .unwrap())
-        } else if tags.contains(Tags::Mssql) {
-            let conn = Quaint::new(&self.connection_string).await?;
-            test_setup::connectors::mssql::reset_schema(&conn, self.args.test_function_name).await?;
-
-            Ok(conn)
-        } else {
-            Ok(Quaint::new(&self.connection_string).await?)
-        }
+    fn tags(&self) -> BitFlags<Tags> {
+        self.args.tags()
     }
 
     /// The name of the test function, as a string.
     pub fn test_fn_name(&self) -> &str {
-        self.args.test_function_name
+        self.args.test_function_name()
     }
 }
 
 /// A wrapper around a migration engine instance optimized for convenience in
 /// writing tests.
-pub struct EngineTestApi(SqlMigrationConnector);
+pub struct EngineTestApi(SqlMigrationConnector, BitFlags<Tags>);
 
 impl EngineTestApi {
     /// Plan an `applyMigrations` command
@@ -161,7 +168,7 @@ impl EngineTestApi {
     pub async fn assert_schema(&self) -> Result<SchemaAssertion, anyhow::Error> {
         let schema = self.0.describe_schema().await?;
 
-        Ok(SchemaAssertion::new(schema, BitFlags::empty()))
+        Ok(SchemaAssertion::new(schema, self.1))
     }
 
     /// True if MySQL on Windows with default settings.

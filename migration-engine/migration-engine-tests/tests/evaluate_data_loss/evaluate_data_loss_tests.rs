@@ -1,8 +1,9 @@
 use crate::*;
 use migration_core::commands::EvaluateDataLossOutput;
 use pretty_assertions::assert_eq;
+use test_macros::test_connector;
 
-#[test_each_connector]
+#[test_connector]
 async fn evaluate_data_loss_with_an_up_to_date_database_returns_no_step(api: &TestApi) -> TestResult {
     let dm = r#"
         model Cat {
@@ -28,7 +29,7 @@ async fn evaluate_data_loss_with_an_up_to_date_database_returns_no_step(api: &Te
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn evaluate_data_loss_with_up_to_date_db_and_pending_changes_returns_steps(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Cat {
@@ -64,7 +65,7 @@ async fn evaluate_data_loss_with_up_to_date_db_and_pending_changes_returns_steps
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn evaluate_data_loss_with_not_up_to_date_db_and_pending_changes_returns_the_right_steps(
     api: &TestApi,
 ) -> TestResult {
@@ -101,7 +102,7 @@ async fn evaluate_data_loss_with_not_up_to_date_db_and_pending_changes_returns_t
     Ok(())
 }
 
-#[test_each_connector(capabilities("enums"))]
+#[test_connector(capabilities(Enums))]
 async fn evaluate_data_loss_with_past_unapplied_migrations_with_destructive_changes_does_not_warn_for_these(
     api: &TestApi,
 ) -> TestResult {
@@ -175,7 +176,7 @@ async fn evaluate_data_loss_with_past_unapplied_migrations_with_destructive_chan
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn evaluate_data_loss_returns_warnings_for_the_local_database_for_the_next_migration(
     api: &TestApi,
 ) -> TestResult {
@@ -232,7 +233,7 @@ async fn evaluate_data_loss_returns_warnings_for_the_local_database_for_the_next
     Ok(())
 }
 
-#[test_each_connector(capabilities("enums"))]
+#[test_connector(capabilities(Enums))]
 async fn evaluate_data_loss_maps_warnings_to_the_right_steps(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Cat {

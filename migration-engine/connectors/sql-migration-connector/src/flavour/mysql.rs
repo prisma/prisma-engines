@@ -8,7 +8,7 @@ use crate::{
 use datamodel::{walkers::walk_scalar_fields, Datamodel};
 use enumflags2::BitFlags;
 use indoc::indoc;
-use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory, MigrationFeature};
+use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
 use once_cell::sync::Lazy;
 use quaint::connector::MysqlUrl;
 use regex::{Regex, RegexSet};
@@ -23,8 +23,6 @@ pub(crate) struct MysqlFlavour {
     url: MysqlUrl,
     /// See the [Circumstances] enum.
     circumstances: AtomicU8,
-    /// Relevant features enabled in the schema,
-    features: BitFlags<MigrationFeature>,
 }
 
 impl std::fmt::Debug for MysqlFlavour {
@@ -34,11 +32,10 @@ impl std::fmt::Debug for MysqlFlavour {
 }
 
 impl MysqlFlavour {
-    pub(crate) fn new(url: MysqlUrl, features: BitFlags<MigrationFeature>) -> Self {
+    pub(crate) fn new(url: MysqlUrl) -> Self {
         MysqlFlavour {
             url,
             circumstances: Default::default(),
-            features,
         }
     }
 
@@ -342,10 +339,6 @@ impl SqlFlavour for MysqlFlavour {
 
         sql_schema_result
     }
-
-    fn features(&self) -> BitFlags<MigrationFeature> {
-        self.features
-    }
 }
 
 #[derive(BitFlags, Debug, Clone, Copy, PartialEq)]
@@ -376,7 +369,7 @@ mod tests {
     fn debug_impl_does_not_leak_connection_info() {
         let url = "mysql://myname:mypassword@myserver:8765/mydbname";
 
-        let flavour = MysqlFlavour::new(MysqlUrl::new(url.parse().unwrap()).unwrap(), BitFlags::default());
+        let flavour = MysqlFlavour::new(MysqlUrl::new(url.parse().unwrap()).unwrap());
         let debugged = format!("{:?}", flavour);
 
         let words = &["myname", "mypassword", "myserver", "8765", "mydbname"];

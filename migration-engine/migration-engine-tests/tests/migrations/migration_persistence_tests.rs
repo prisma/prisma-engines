@@ -1,8 +1,8 @@
 use chrono::Duration;
-use migration_engine_tests::*;
+use migration_engine_tests::sql::*;
 use pretty_assertions::assert_eq;
 
-#[test_each_connector]
+#[test_connector]
 async fn starting_a_migration_works(api: &TestApi) -> TestResult {
     let persistence = api.migration_persistence();
 
@@ -39,7 +39,7 @@ async fn starting_a_migration_works(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn finishing_a_migration_works(api: &TestApi) -> TestResult {
     let persistence = api.migration_persistence();
 
@@ -80,7 +80,7 @@ async fn finishing_a_migration_works(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn updating_then_finishing_a_migration_works(api: &TestApi) -> TestResult {
     let persistence = api.migration_persistence();
 
@@ -122,7 +122,7 @@ async fn updating_then_finishing_a_migration_works(api: &TestApi) -> TestResult 
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn multiple_successive_migrations_work(api: &TestApi) -> TestResult {
     let persistence = api.migration_persistence();
 

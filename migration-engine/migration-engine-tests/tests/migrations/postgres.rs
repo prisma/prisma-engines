@@ -1,9 +1,9 @@
-use migration_engine_tests::*;
+use migration_engine_tests::sql::*;
 use quaint::prelude::Queryable;
-use sql_schema_describer::{ColumnArity, ColumnTypeFamily};
+use sql_schema_describer::ColumnTypeFamily;
 use std::fmt::Write;
 
-#[test_each_connector(tags("postgres"))]
+#[test_connector(tags(Postgres))]
 async fn enums_can_be_dropped_on_postgres(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Cat {
@@ -37,7 +37,7 @@ async fn enums_can_be_dropped_on_postgres(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(capabilities("scalar_lists"))]
+#[test_connector(capabilities(ScalarLists))]
 async fn adding_a_scalar_list_for_a_model_with_id_type_int_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         datasource pg {
@@ -59,22 +59,20 @@ async fn adding_a_scalar_list_for_a_model_with_id_type_int_must_work(api: &TestA
 
     api.schema_push(dm1).send().await?.assert_green()?;
 
-    let result = api.describe_database().await?;
-
-    let table_for_a = result.table_bang("A");
-    let string_column = table_for_a.column_bang("strings");
-    assert_eq!(string_column.tpe.family, ColumnTypeFamily::String);
-    assert_eq!(string_column.tpe.arity, ColumnArity::List);
-
-    let enum_column = table_for_a.column_bang("enums");
-    assert_eq!(enum_column.tpe.family, ColumnTypeFamily::Enum("Status".to_owned()));
-    assert_eq!(enum_column.tpe.arity, ColumnArity::List);
+    api.assert_schema().await?.assert_table("A", |table| {
+        table
+            .assert_column("strings", |col| col.assert_is_list()?.assert_type_is_string())?
+            .assert_column("enums", |col| {
+                col.assert_type_family(ColumnTypeFamily::Enum("Status".into()))?
+                    .assert_is_list()
+            })
+    })?;
 
     Ok(())
 }
 
 // Reference for the tables created by PostGIS: https://postgis.net/docs/manual-1.4/ch04.html#id418599
-#[test_each_connector(tags("postgres"))]
+#[test_connector(tags(Postgres))]
 async fn existing_postgis_tables_must_not_be_migrated(api: &TestApi) -> TestResult {
     let create_spatial_ref_sys_table = "CREATE TABLE IF NOT EXISTS \"spatial_ref_sys\" ( id SERIAL PRIMARY KEY )";
     // The capitalized Geometry is intentional here, because we want the matching to be case-insensitive.
@@ -104,7 +102,7 @@ async fn existing_postgis_tables_must_not_be_migrated(api: &TestApi) -> TestResu
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"), log = "debug")]
+#[test_connector(tags(Postgres))]
 async fn native_type_columns_can_be_created(api: &TestApi) -> TestResult {
     let types = &[
         ("smallint", "Int", "SmallInt", "int2"),
@@ -171,7 +169,7 @@ async fn native_type_columns_can_be_created(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"))]
+#[test_connector(tags(Postgres))]
 async fn uuids_do_not_generate_drift_issue_5282(api: &TestApi) -> TestResult {
     api.database().raw_cmd(
         r#"

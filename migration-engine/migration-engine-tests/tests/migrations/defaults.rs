@@ -1,13 +1,11 @@
 use migration_engine_tests::{multi_engine_test_api::*, TestResult};
 use sql_schema_describer::DefaultValue;
-use test_macros::test_connectors;
+use test_macros::test_connector;
 
 // MySQL 5.7 and MariaDB are skipped, because the datamodel parser gives us a
 // chrono DateTime, and we don't render that in the exact expected format.
-#[test_connectors(ignore("mysql_5_7", "mariadb", "vitess_5_7"))]
-async fn datetime_defaults_work(api: TestApi) -> TestResult {
-    api.initialize().await?;
-
+#[test_connector(exclude(Mysql57, Mariadb, Vitess57))]
+async fn datetime_defaults_work(api: &TestApi) -> TestResult {
     let engine = api.new_engine().await?;
 
     let dm = r#"
@@ -38,10 +36,8 @@ async fn datetime_defaults_work(api: TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connectors(tags("mariadb", "mysql_8"))]
-async fn function_expressions_as_dbgenerated_work(api: TestApi) -> TestResult {
-    api.initialize().await?;
-
+#[test_connector(tags(Mariadb, Mysql8), exclude(Vitess))]
+async fn function_expressions_as_dbgenerated_work(api: &TestApi) -> TestResult {
     let engine = api.new_engine().await?;
 
     let dm = r#"

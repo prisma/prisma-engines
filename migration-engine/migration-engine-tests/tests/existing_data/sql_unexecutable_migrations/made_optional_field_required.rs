@@ -2,7 +2,7 @@ use migration_engine_tests::sql::*;
 use quaint::Value;
 use sql_schema_describer::DefaultValue;
 
-#[test_each_connector(tags("sql"))]
+#[test_connector]
 async fn making_an_optional_field_required_with_data_without_a_default_is_unexecutable(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Test {
@@ -49,7 +49,7 @@ async fn making_an_optional_field_required_with_data_without_a_default_is_unexec
     Ok(())
 }
 
-#[test_each_connector(tags("sqlite"))]
+#[test_connector(tags(Sqlite))]
 async fn making_an_optional_field_required_with_data_with_a_default_works(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Test {
@@ -115,7 +115,7 @@ async fn making_an_optional_field_required_with_data_with_a_default_works(api: &
 // CONFIRMED: this is unexecutable on postgres
 // CONFIRMED: all mysql versions except 5.6 will return an error. 5.6 will just insert 0s, which
 // seems very wrong, so we should warn against it.
-#[test_each_connector(log = "debug", ignore("sqlite"))]
+#[test_connector(exclude(Sqlite))]
 async fn making_an_optional_field_required_with_data_with_a_default_is_unexecutable(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Test {
@@ -185,7 +185,7 @@ async fn making_an_optional_field_required_with_data_with_a_default_is_unexecuta
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn making_an_optional_field_required_on_an_empty_table_works(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Test {

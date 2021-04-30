@@ -56,7 +56,6 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
             views,
             procedures,
             user_defined_types: vec![],
-            lower_case_identifiers: false,
         })
     }
 

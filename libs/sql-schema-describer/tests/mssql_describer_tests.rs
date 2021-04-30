@@ -1,19 +1,16 @@
-mod mssql;
 mod test_api;
 
-use crate::mssql::*;
+use crate::test_api::*;
 use barrel::{types, Migration};
 use native_types::{MsSqlType, MsSqlTypeParameter::*, NativeType};
 use pretty_assertions::assert_eq;
-use quaint::{prelude::Queryable, single::Quaint};
+use quaint::prelude::Queryable;
 use sql_schema_describer::{mssql::SqlSchemaDescriber, *};
-use test_setup::mssql_2019_url;
 
-#[tokio::test]
-async fn udts_can_be_described() {
-    let db_name = "udts_can_be_described";
-    let (connection_string, _) = mssql_2019_url(db_name);
-    let conn = Quaint::new(&connection_string).await.unwrap();
+#[test_connector(tags(Mssql))]
+async fn udts_can_be_described(api: &TestApi) {
+    let conn = api.database();
+    let db_name = api.db_name();
 
     let types = &[
         "bigint",
@@ -50,16 +47,13 @@ async fn udts_can_be_described() {
     ];
 
     for r#type in types {
-        test_setup::connectors::mssql::reset_schema(&conn, db_name)
-            .await
-            .unwrap();
+        test_setup::reset_mssql_schema(conn, db_name).await.unwrap();
 
         conn.raw_cmd(&format!("CREATE TYPE {}.a FROM {}", db_name, r#type))
             .await
             .unwrap();
 
-        let inspector = SqlSchemaDescriber::new(conn.clone());
-        let result = inspector.describe(db_name).await.expect("describing");
+        let result = api.describe().await;
         let udt = result
             .get_user_defined_type("a")
             .expect("couldn't get a type")
@@ -70,21 +64,16 @@ async fn udts_can_be_described() {
     }
 }
 
-#[tokio::test]
-async fn views_can_be_described() {
-    let db_name = "views_can_be_described";
+#[test_connector(tags(Mssql))]
+async fn views_can_be_described(api: &TestApi) {
+    let db_name = api.db_name();
+    let conn = api.database();
 
-    let (connection_string, _) = mssql_2019_url(db_name);
-    let conn = Quaint::new(&connection_string).await.unwrap();
-
-    test_setup::connectors::mssql::reset_schema(&conn, db_name)
-        .await
-        .unwrap();
+    test_setup::reset_mssql_schema(conn, db_name).await.unwrap();
 
     conn.raw_cmd(&format!("CREATE TABLE {}.a (a_id int)", db_name))
         .await
         .unwrap();
-
     conn.raw_cmd(&format!("CREATE TABLE {}.b (b_id int)", db_name))
         .await
         .unwrap();
@@ -102,36 +91,33 @@ async fn views_can_be_described() {
 
     conn.raw_cmd(&create_view).await.unwrap();
 
-    let inspector = SqlSchemaDescriber::new(conn);
-    let result = inspector.describe(db_name).await.expect("describing");
+    let inspector = SqlSchemaDescriber::new(conn.clone());
+    let result = inspector.describe(db_name).await.unwrap();
     let view = result.get_view("ab").expect("couldn't get ab view").to_owned();
 
     assert_eq!("ab", &view.name);
     assert_eq!(create_view, view.definition.unwrap());
 }
 
-#[tokio::test]
-async fn procedures_can_be_described() {
-    let db_name = "procedures_can_be_described";
-
+#[test_connector(tags(Mssql))]
+async fn procedures_can_be_described(api: &TestApi) {
     let sql = format!(
         "CREATE PROCEDURE [{}].foo @ID INT AS SELECT DB_NAME(@ID) AS bar",
-        db_name
+        api.db_name()
     );
 
-    let inspector = get_mssql_describer_for_schema(&sql, db_name).await;
-    let result = inspector.describe(db_name).await.expect("describing");
+    api.database().raw_cmd(&sql).await.unwrap();
+
+    let result = api.describe().await;
     let procedure = result.get_procedure("foo").unwrap();
 
     assert_eq!("foo", &procedure.name);
     assert_eq!(Some(sql), procedure.definition);
 }
 
-#[tokio::test]
-async fn all_mssql_column_types_must_work() {
-    let db_name = "all_mssql_column_types_must_work";
-
-    let mut migration = Migration::new().schema(db_name);
+#[test_connector(tags(Mssql))]
+async fn all_mssql_column_types_must_work(api: &TestApi) {
+    let mut migration = Migration::new().schema(api.db_name());
     migration.create_table("User", move |t| {
         t.add_column("primary_col", types::primary());
         t.add_column("bit_col", types::custom("bit"));
@@ -165,8 +151,8 @@ async fn all_mssql_column_types_must_work() {
     });
 
     let full_sql = migration.make::<barrel::backend::MsSql>();
-    let inspector = get_mssql_describer_for_schema(&full_sql, db_name).await;
-    let result = inspector.describe(db_name).await.expect("describing");
+    api.database().raw_cmd(&full_sql).await.unwrap();
+    let result = api.describe().await;
     let mut table = result.get_table("User").expect("couldn't get User table").to_owned();
     // Ensure columns are sorted as expected when comparing
     table.columns.sort_unstable_by_key(|c| c.name.to_owned());
@@ -536,17 +522,13 @@ async fn all_mssql_column_types_must_work() {
         .unwrap_or(false));
 }
 
-#[tokio::test]
-async fn mssql_cross_schema_references_are_not_allowed() {
-    let db_name = "mssql_cross_schema_references_are_not_allowed";
+#[test_connector(tags(Mssql))]
+async fn mssql_cross_schema_references_are_not_allowed(api: &TestApi) {
+    let db_name = api.db_name();
     let secondary = "mssql_foreign_key_on_delete_must_be_handled_B";
+    let conn = api.database();
 
-    for s in &[db_name, secondary] {
-        let (connection_string, _) = mssql_2019_url("master");
-        let conn = Quaint::new(&connection_string).await.unwrap();
-
-        test_setup::connectors::mssql::reset_schema(&conn, s).await.unwrap();
-    }
+    test_setup::reset_mssql_schema(conn, secondary).await.unwrap();
 
     let sql = format!(
         "
@@ -563,8 +545,8 @@ async fn mssql_cross_schema_references_are_not_allowed() {
         db_name, secondary
     );
 
-    let inspector = get_mssql_describer_for_schema(&sql, db_name).await;
-    let err = inspector.describe(db_name).await.unwrap_err();
+    api.database().raw_cmd(&sql).await.unwrap();
+    let err = api.describe_error().await;
 
     assert_eq!(
         "Illegal cross schema reference from `mssql_cross_schema_references_are_not_allowed.User` to `mssql_foreign_key_on_delete_must_be_handled_B.City` in constraint `FK__city`. Foreign keys between database schemas are not supported in Prisma. Please follow the GitHub ticket: https://github.com/prisma/prisma/issues/1175".to_string(),
@@ -572,10 +554,8 @@ async fn mssql_cross_schema_references_are_not_allowed() {
     );
 }
 
-#[tokio::test]
-async fn mssql_foreign_key_on_delete_must_be_handled() {
-    let db_name = "mssql_foreign_key_on_delete_must_be_handled";
-
+#[test_connector(tags(Mssql))]
+async fn mssql_foreign_key_on_delete_must_be_handled(api: &TestApi) {
     let sql = format!(
         "
             CREATE TABLE [{0}].[City] (id INT NOT NULL IDENTITY(1,1), CONSTRAINT [PK__City] PRIMARY KEY ([id]));
@@ -589,11 +569,12 @@ async fn mssql_foreign_key_on_delete_must_be_handled() {
                 CONSTRAINT [PK__User] PRIMARY KEY ([id])
             );
         ",
-        db_name
+        api.db_name()
     );
-    let inspector = get_mssql_describer_for_schema(&sql, db_name).await;
 
-    let schema = inspector.describe(db_name).await.expect("describing");
+    api.database().raw_cmd(&sql).await.unwrap();
+
+    let schema = api.describe().await;
     let mut table = schema.get_table("User").expect("get User table").to_owned();
     table.foreign_keys.sort_unstable_by_key(|fk| fk.columns.clone());
 
@@ -665,11 +646,9 @@ async fn mssql_foreign_key_on_delete_must_be_handled() {
     );
 }
 
-#[tokio::test]
-async fn mssql_multi_field_indexes_must_be_inferred() {
-    let db_name = "mssql_multi_field_indexes_must_be_inferred";
-
-    let mut migration = Migration::new().schema(db_name);
+#[test_connector(tags(Mssql))]
+async fn mssql_multi_field_indexes_must_be_inferred(api: &TestApi) {
+    let mut migration = Migration::new().schema(api.db_name());
     migration.create_table("Employee", move |t| {
         t.add_column("id", types::primary());
         t.add_column("age", types::integer());
@@ -678,8 +657,8 @@ async fn mssql_multi_field_indexes_must_be_inferred() {
     });
 
     let full_sql = migration.make::<barrel::backend::MsSql>();
-    let inspector = get_mssql_describer_for_schema(&full_sql, db_name).await;
-    let result = inspector.describe(db_name).await.expect("describing");
+    api.database().raw_cmd(&full_sql).await.unwrap();
+    let result = api.describe().await;
     let table = result.get_table("Employee").expect("couldn't get Employee table");
 
     assert_eq!(
@@ -692,11 +671,9 @@ async fn mssql_multi_field_indexes_must_be_inferred() {
     );
 }
 
-#[tokio::test]
-async fn mssql_join_table_unique_indexes_must_be_inferred() {
-    let db_name = "mssql_join_table_unique_indexes_must_be_inferred";
-
-    let mut migration = Migration::new().schema(db_name);
+#[test_connector(tags(Mssql))]
+async fn mssql_join_table_unique_indexes_must_be_inferred(api: &TestApi) {
+    let mut migration = Migration::new().schema(api.db_name());
 
     migration.create_table("Cat", move |t| {
         t.add_column("id", types::primary());
@@ -716,8 +693,8 @@ async fn mssql_join_table_unique_indexes_must_be_inferred() {
     });
 
     let full_sql = migration.make::<barrel::backend::MsSql>();
-    let inspector = get_mssql_describer_for_schema(&full_sql, db_name).await;
-    let result = inspector.describe(db_name).await.expect("describing");
+    api.database().raw_cmd(&full_sql).await.unwrap();
+    let result = api.describe().await;
     let table = result.get_table("CatToHuman").expect("couldn't get CatToHuman table");
 
     assert_eq!(

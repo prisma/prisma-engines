@@ -1,14 +1,11 @@
-use std::{fs::File, io::Write};
-
 use indoc::indoc;
-use migration_engine_tests::{multi_engine_test_api::TestApi, sqlite_test_url, TestResult};
-use test_macros::test_connectors;
+use migration_engine_tests::{multi_engine_test_api::*, sqlite_test_url, TestResult};
+use std::{fs::File, io::Write};
+use test_macros::test_connector;
 use user_facing_errors::{migration_engine::ProviderSwitchedError, UserFacingError};
 
-#[test_connectors(tags("postgres"))]
-async fn create_migration_with_new_provider_errors(api: TestApi) -> TestResult {
-    api.initialize().await?;
-
+#[test_connector(tags(Postgres))]
+async fn create_migration_with_new_provider_errors(api: &TestApi) -> TestResult {
     let dm = r#"
     datasource db {
         provider = "postgresql"
@@ -43,7 +40,7 @@ async fn create_migration_with_new_provider_errors(api: TestApi) -> TestResult {
     "#;
 
     let sqlite_engine = api
-        .new_engine_with_connection_strings(&sqlite_test_url("migratelocktest").0, None)
+        .new_engine_with_connection_strings(&sqlite_test_url("migratelocktest"), None)
         .await?;
 
     let err = sqlite_engine
@@ -62,10 +59,8 @@ async fn create_migration_with_new_provider_errors(api: TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connectors(tags("postgres"))]
-async fn migration_lock_with_different_comment_shapes_work(api: TestApi) -> TestResult {
-    api.initialize().await?;
-
+#[test_connector(tags(Postgres))]
+async fn migration_lock_with_different_comment_shapes_work(api: &TestApi) -> TestResult {
     let dm = r#"
     datasource db {
         provider = "postgresql"

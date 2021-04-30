@@ -1,8 +1,6 @@
 #![deny(rust_2018_idioms, unsafe_code)]
 
 mod commands;
-#[cfg(test)]
-mod error_tests;
 mod logger;
 
 use migration_core::api::RpcApi;

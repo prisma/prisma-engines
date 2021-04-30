@@ -1,6 +1,6 @@
 use indoc::indoc;
 use introspection_engine_tests::test_api::*;
-use test_macros::test_each_connector;
+use test_macros::test_connector;
 
 const TYPES: &[(&str, &str)] = &[
     //fieldname, db datatype
@@ -36,8 +36,8 @@ const TYPES: &[(&str, &str)] = &[
     ("inet", "Inet"),
 ];
 
-#[test_each_connector(tags("postgres"))]
-async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
+#[test_connector(tags(Postgres))]
+async fn native_type_columns_feature_on(api: &TestApi) -> TestResult {
     let columns: Vec<String> = TYPES
         .iter()
         .map(|(name, db_type)| format!("\"{}\" {} Not Null", name, db_type))
@@ -100,8 +100,8 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"))]
-async fn native_type_array_columns_feature_on(api: &TestApi) -> crate::TestResult {
+#[test_connector(tags(Postgres))]
+async fn native_type_array_columns_feature_on(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
             migration.create_table("Blog", move |t| {

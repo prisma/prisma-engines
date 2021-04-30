@@ -3,7 +3,7 @@ use prisma_value::PrismaValue;
 use quaint::prelude::SqlFamily;
 use sql_schema_describer::{ColumnTypeFamily, DefaultValue};
 
-#[test_each_connector(capabilities("json"))]
+#[test_connector(capabilities(Json), exclude(Mysql56))]
 async fn database_level_json_defaults_can_be_defined(api: &TestApi) -> TestResult {
     let dm = format!(
         r#"

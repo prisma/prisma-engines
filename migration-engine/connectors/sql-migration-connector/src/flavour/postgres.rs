@@ -1,9 +1,8 @@
 use crate::{
     connect, connection_wrapper::Connection, error::quaint_error_to_connector_error, SqlFlavour, SqlMigrationConnector,
 };
-use enumflags2::BitFlags;
 use indoc::indoc;
-use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory, MigrationFeature};
+use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
 use quaint::{connector::PostgresUrl, error::ErrorKind as QuaintKind};
 use sql_schema_describer::{DescriberErrorKind, SqlSchema, SqlSchemaDescriberBackend};
 use std::collections::HashMap;
@@ -18,21 +17,17 @@ const ADVISORY_LOCK_TIMEOUT: std::time::Duration = std::time::Duration::from_sec
 
 pub(crate) struct PostgresFlavour {
     url: PostgresUrl,
-    features: BitFlags<MigrationFeature>,
 }
 
 impl std::fmt::Debug for PostgresFlavour {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("PostgresFlavour")
-            .field("features", &self.features)
-            .field("url", &"<REDACTED>")
-            .finish()
+        f.debug_struct("PostgresFlavour").field("url", &"<REDACTED>").finish()
     }
 }
 
 impl PostgresFlavour {
-    pub fn new(url: PostgresUrl, features: BitFlags<MigrationFeature>) -> Self {
-        Self { url, features }
+    pub fn new(url: PostgresUrl) -> Self {
+        Self { url }
     }
 
     pub(crate) fn schema_name(&self) -> &str {
@@ -326,10 +321,6 @@ impl SqlFlavour for PostgresFlavour {
 
         sql_schema_result
     }
-
-    fn features(&self) -> BitFlags<MigrationFeature> {
-        self.features
-    }
 }
 
 fn strip_schema_param_from_url(url: &mut Url) {
@@ -385,7 +376,7 @@ mod tests {
     fn debug_impl_does_not_leak_connection_info() {
         let url = "postgresql://myname:mypassword@myserver:8765/mydbname";
 
-        let flavour = PostgresFlavour::new(PostgresUrl::new(url.parse().unwrap()).unwrap(), BitFlags::default());
+        let flavour = PostgresFlavour::new(PostgresUrl::new(url.parse().unwrap()).unwrap());
         let debugged = format!("{:?}", flavour);
 
         let words = &["myname", "mypassword", "myserver", "8765", "mydbname"];

@@ -2,7 +2,7 @@ mod sql_unexecutable_migrations;
 mod sqlite_existing_data_tests;
 mod type_migration_tests;
 
-use migration_engine_tests::sql::{test_each_connector, TestApi, TestResult};
+use migration_engine_tests::sql::*;
 use pretty_assertions::assert_eq;
 use prisma_value::PrismaValue;
 use quaint::{
@@ -11,7 +11,7 @@ use quaint::{
 };
 use sql_schema_describer::DefaultValue;
 
-#[test_each_connector]
+#[test_connector]
 async fn dropping_a_table_with_rows_should_warn(api: &TestApi) -> TestResult {
     let dm = r#"
         model Test {
@@ -44,7 +44,7 @@ async fn dropping_a_table_with_rows_should_warn(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn dropping_a_column_with_non_null_values_should_warn(api: &TestApi) -> TestResult {
     let dm = r#"
         model Test {
@@ -55,7 +55,7 @@ async fn dropping_a_column_with_non_null_values_should_warn(api: &TestApi) -> Te
 
     api.schema_push(dm).send().await?.assert_green()?;
 
-    let original_database_schema = api.describe_database().await?;
+    let original_database_schema = api.assert_schema().await?.into_schema();
 
     let insert = Insert::multi_into(api.render_table_name("Test"), &["id", "puppiesCount"])
         .values(("a", 7))
@@ -84,7 +84,7 @@ async fn dropping_a_column_with_non_null_values_should_warn(api: &TestApi) -> Te
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn altering_a_column_without_non_null_values_should_not_warn(api: &TestApi) -> TestResult {
     let dm = r#"
         model Test {
@@ -95,7 +95,7 @@ async fn altering_a_column_without_non_null_values_should_not_warn(api: &TestApi
 
     api.schema_push(dm).send().await?.assert_green()?;
 
-    let original_database_schema = api.describe_database().await?;
+    let original_database_schema = api.assert_schema().await?.into_schema();
 
     let insert = Insert::multi_into(api.render_table_name("Test"), &["id"])
         .values(("a",))
@@ -117,7 +117,7 @@ async fn altering_a_column_without_non_null_values_should_not_warn(api: &TestApi
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn altering_a_column_with_non_null_values_should_warn(api: &TestApi) -> TestResult {
     let dm = r#"
         model Test {
@@ -127,7 +127,7 @@ async fn altering_a_column_with_non_null_values_should_warn(api: &TestApi) -> Te
     "#;
 
     api.schema_push(dm).send().await?.assert_green()?;
-    let original_database_schema = api.describe_database().await?;
+    let original_database_schema = api.assert_schema().await?.into_schema();
 
     let insert = Insert::multi_into(api.render_table_name("Test"), vec!["id", "age"])
         .values(("a", 12))
@@ -163,7 +163,7 @@ async fn altering_a_column_with_non_null_values_should_warn(api: &TestApi) -> Te
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn column_defaults_can_safely_be_changed(api: &TestApi) -> TestResult {
     let combinations = &[
         ("Meow", Some(PrismaValue::String("Cats".to_string())), None),
@@ -294,7 +294,7 @@ async fn column_defaults_can_safely_be_changed(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn changing_a_column_from_required_to_optional_should_work(api: &TestApi) -> TestResult {
     let dm = r#"
         model Test {
@@ -304,7 +304,7 @@ async fn changing_a_column_from_required_to_optional_should_work(api: &TestApi) 
     "#;
 
     api.schema_push(dm).send().await?.assert_green()?;
-    let original_database_schema = api.describe_database().await?;
+    let original_database_schema = api.assert_schema().await?.into_schema();
 
     let insert = Insert::multi_into(api.render_table_name("Test"), &["id", "age"])
         .values(("a", 12))
@@ -338,7 +338,7 @@ async fn changing_a_column_from_required_to_optional_should_work(api: &TestApi) 
     Ok(())
 }
 
-#[test_each_connector(ignore("sqlite"))]
+#[test_connector(exclude(Sqlite))]
 async fn changing_a_column_from_optional_to_required_is_unexecutable(api: &TestApi) -> TestResult {
     let dm = r#"
         model Test {
@@ -348,7 +348,7 @@ async fn changing_a_column_from_optional_to_required_is_unexecutable(api: &TestA
     "#;
 
     api.schema_push(dm).send().await?.assert_green()?;
-    let original_database_schema = api.describe_database().await?;
+    let original_database_schema = api.assert_schema().await?.into_schema();
 
     let insert = Insert::multi_into(api.render_table_name("Test"), &["id", "age"])
         .values(("a", 12))
@@ -391,7 +391,7 @@ async fn changing_a_column_from_optional_to_required_is_unexecutable(api: &TestA
     Ok(())
 }
 
-#[test_each_connector(tags("sql"))]
+#[test_connector]
 async fn dropping_a_table_referenced_by_foreign_keys_must_work(api: &TestApi) -> TestResult {
     use quaint::ast::*;
 
@@ -437,15 +437,16 @@ async fn dropping_a_table_referenced_by_foreign_keys_must_work(api: &TestApi) ->
     "#;
 
     api.schema_push(dm2).force(true).send().await?;
-    let sql_schema = api.describe_database().await.unwrap();
 
-    assert!(sql_schema.table("Category").is_err());
-    assert!(sql_schema.table_bang("Recipe").foreign_keys.is_empty());
+    api.assert_schema()
+        .await?
+        .assert_tables_count(1)?
+        .assert_table("Recipe", |table| table.assert_foreign_keys_count(0))?;
 
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn string_columns_do_not_get_arbitrarily_migrated(api: &TestApi) -> TestResult {
     use quaint::ast::*;
 
@@ -500,7 +501,7 @@ async fn string_columns_do_not_get_arbitrarily_migrated(api: &TestApi) -> TestRe
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn altering_the_type_of_a_column_in_an_empty_table_should_not_warn(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model User {
@@ -529,7 +530,7 @@ async fn altering_the_type_of_a_column_in_an_empty_table_should_not_warn(api: &T
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn making_a_column_required_in_an_empty_table_should_not_warn(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model User {
@@ -558,7 +559,7 @@ async fn making_a_column_required_in_an_empty_table_should_not_warn(api: &TestAp
     Ok(())
 }
 
-#[test_each_connector(capabilities("enums"))]
+#[test_connector(capabilities(Enums))]
 async fn enum_variants_can_be_added_without_data_loss(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Cat {
@@ -666,7 +667,7 @@ async fn enum_variants_can_be_added_without_data_loss(api: &TestApi) -> TestResu
     Ok(())
 }
 
-#[test_each_connector(capabilities("enums"))]
+#[test_connector(capabilities(Enums))]
 async fn enum_variants_can_be_dropped_without_data_loss(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Cat {
@@ -781,7 +782,7 @@ async fn enum_variants_can_be_dropped_without_data_loss(api: &TestApi) -> TestRe
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn set_default_current_timestamp_on_existing_column_works(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model User {
@@ -820,7 +821,7 @@ async fn set_default_current_timestamp_on_existing_column_works(api: &TestApi) -
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn primary_key_migrations_do_not_cause_data_loss(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Dog {
@@ -912,7 +913,7 @@ async fn primary_key_migrations_do_not_cause_data_loss(api: &TestApi) -> TestRes
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"))]
+#[test_connector(tags(Postgres))]
 async fn failing_enum_migrations_should_not_be_partially_applied(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Cat {

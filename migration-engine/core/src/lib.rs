@@ -17,7 +17,7 @@ use datamodel::{
     dml::Datamodel,
     Configuration,
 };
-use migration_connector::{features, ConnectorError};
+use migration_connector::ConnectorError;
 use sql_migration_connector::SqlMigrationConnector;
 use user_facing_errors::{common::InvalidDatabaseString, KnownError};
 
@@ -29,8 +29,6 @@ use mongodb_migration_connector::MongoDbMigrationConnector;
 /// Top-level constructor for the migration engine API.
 pub async fn migration_api(datamodel: &str) -> CoreResult<Box<dyn api::GenericApi>> {
     let config = parse_configuration(datamodel)?;
-    let features = features::from_config(&config);
-
     let source = config
         .datasources
         .first()
@@ -68,7 +66,6 @@ pub async fn migration_api(datamodel: &str) -> CoreResult<Box<dyn api::GenericAp
 
             let connector = SqlMigrationConnector::new(
                 u.as_str(),
-                features,
                 source.shadow_database_url.as_ref().map(|url| url.value.clone()),
             )
             .await?;
@@ -79,7 +76,6 @@ pub async fn migration_api(datamodel: &str) -> CoreResult<Box<dyn api::GenericAp
         provider if [MYSQL_SOURCE_NAME, SQLITE_SOURCE_NAME, MSSQL_SOURCE_NAME].contains(&provider.as_str()) => {
             let connector = SqlMigrationConnector::new(
                 &source.url().value,
-                features,
                 source.shadow_database_url.as_ref().map(|url| url.value.clone()),
             )
             .await?;
@@ -88,7 +84,7 @@ pub async fn migration_api(datamodel: &str) -> CoreResult<Box<dyn api::GenericAp
         }
         #[cfg(feature = "mongodb")]
         provider if provider.as_str() == MONGODB_SOURCE_NAME => {
-            let connector = MongoDbMigrationConnector::new(&source.url().value, features).await?;
+            let connector = MongoDbMigrationConnector::new(&source.url().value).await?;
             Ok(Box::new(connector))
         }
         x => unimplemented!("Connector {} is not supported yet", x),

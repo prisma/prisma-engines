@@ -1,6 +1,7 @@
 use migration_engine_tests::sql::*;
+use test_macros::test_connector;
 
-#[test_each_connector(tags("sqlite"))]
+#[test_connector(tags(Sqlite))]
 async fn sqlite_must_recreate_indexes(api: &TestApi) -> TestResult {
     // SQLite must go through a complicated migration procedure which requires dropping and recreating indexes. This test checks that.
     // We run them still against each connector.
@@ -34,7 +35,7 @@ async fn sqlite_must_recreate_indexes(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("sqlite"))]
+#[test_connector(tags(Sqlite))]
 async fn sqlite_must_recreate_multi_field_indexes(api: &TestApi) -> TestResult {
     // SQLite must go through a complicated migration procedure which requires dropping and recreating indexes. This test checks that.
     // We run them still against each connector.
@@ -75,7 +76,7 @@ async fn sqlite_must_recreate_multi_field_indexes(api: &TestApi) -> TestResult {
 }
 
 // This is necessary because of how INTEGER PRIMARY KEY works on SQLite. This has already caused problems.
-#[test_each_connector(tags("sqlite"))]
+#[test_connector(tags(Sqlite))]
 async fn creating_a_model_with_a_non_autoincrement_id_column_is_idempotent(api: &TestApi) -> TestResult {
     let dm = r#"
         model Cat {

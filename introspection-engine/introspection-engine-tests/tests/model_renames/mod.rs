@@ -1,10 +1,10 @@
 use barrel::types;
 use indoc::indoc;
-use introspection_engine_tests::test_api::*;
-use test_macros::test_each_connector;
+use introspection_engine_tests::{test_api::*, TestResult};
+use test_macros::test_connector;
 
-#[test_each_connector]
-async fn a_table_with_reserved_name(api: &TestApi) -> crate::TestResult {
+#[test_connector]
+async fn a_table_with_reserved_name(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("PrismaClient", |t| {
@@ -27,8 +27,8 @@ async fn a_table_with_reserved_name(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector]
-async fn reserved_names_case_sensitivity(api: &TestApi) -> crate::TestResult {
+#[test_connector]
+async fn reserved_names_case_sensitivity(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("prismaclient", |t| {

@@ -1,9 +1,9 @@
-use migration_engine_tests::{multi_engine_test_api::TestApi, TestResult};
+use migration_engine_tests::{multi_engine_test_api::*, TestResult};
 use quaint::{prelude::Queryable, single::Quaint};
-use test_macros::test_connectors;
+use test_macros::test_connector;
 
-#[test_connectors(tags("postgres"), log = "debug")]
-async fn shadow_db_url_can_be_configured_on_postgres(api: TestApi) -> TestResult {
+#[test_connector(tags(Postgres))]
+async fn shadow_db_url_can_be_configured_on_postgres(api: &TestApi) -> TestResult {
     let migrations_directory = api.create_migrations_directory()?;
     let mut url: url::Url = api.connection_string().parse()?;
 
@@ -27,7 +27,7 @@ async fn shadow_db_url_can_be_configured_on_postgres(api: TestApi) -> TestResult
 
     // Create the database, a first migration and the test user.
     {
-        let admin_connection = api.initialize().await?;
+        let admin_connection = api.admin_conn();
 
         {
             let engine = api.new_engine().await?;
