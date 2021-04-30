@@ -1,15 +1,17 @@
-mod common;
-mod sqlite;
-mod test_api;
-
+use crate::test_api::*;
 use barrel::{types, Migration};
-use common::*;
 use pretty_assertions::assert_eq;
-use quaint::prelude::Queryable;
 use sql_schema_describer::*;
-use sqlite::*;
-use test_api::{BitFlags, Tags, TestApi};
-use test_macros::test_connector;
+
+pub const SCHEMA: &str = "DatabaseInspector-Test";
+
+pub async fn get_sqlite_describer(sql: &str) -> sqlite::SqlSchemaDescriber {
+    let conn = Quaint::new_in_memory().unwrap();
+
+    conn.raw_cmd(sql).await.unwrap();
+
+    sqlite::SqlSchemaDescriber::new(conn)
+}
 
 #[tokio::test]
 async fn views_can_be_described() {

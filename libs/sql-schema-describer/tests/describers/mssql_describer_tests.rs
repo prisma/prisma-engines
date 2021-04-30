@@ -1,10 +1,7 @@
-mod test_api;
-
 use crate::test_api::*;
 use barrel::{types, Migration};
 use native_types::{MsSqlType, MsSqlTypeParameter::*, NativeType};
 use pretty_assertions::assert_eq;
-use quaint::prelude::Queryable;
 use sql_schema_describer::{mssql::SqlSchemaDescriber, *};
 
 #[test_connector(tags(Mssql))]

@@ -1,13 +1,9 @@
-#![allow(dead_code)]
-
+pub use quaint::{prelude::Queryable, single::Quaint};
 pub use test_macros::test_connector;
 pub use test_setup::{BitFlags, Capabilities, Tags};
 
 use barrel::Migration;
-use quaint::{
-    prelude::{ConnectionInfo, Queryable, SqlFamily},
-    single::Quaint,
-};
+use quaint::prelude::{ConnectionInfo, SqlFamily};
 use sql_schema_describer::*;
 use test_setup::*;
 

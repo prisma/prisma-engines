@@ -1,11 +1,8 @@
-mod test_api;
-
+use crate::test_api::*;
 use barrel::{types, Migration};
 use native_types::{MySqlType, NativeType};
 use pretty_assertions::assert_eq;
-use quaint::prelude::Queryable;
 use sql_schema_describer::*;
-use test_api::*;
 
 #[test_connector(tags(Mysql))]
 async fn views_can_be_described(api: &TestApi) {
