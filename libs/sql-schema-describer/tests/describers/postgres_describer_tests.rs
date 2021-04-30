@@ -1,33 +1,22 @@
-mod common;
-mod test_api;
-
-use crate::{common::*, test_api::*};
+use crate::test_api::*;
 use barrel::{types, Migration};
 use native_types::{NativeType, PostgresType};
 use pretty_assertions::assert_eq;
-use quaint::prelude::Queryable;
 use sql_schema_describer::*;
-use test_macros::test_connector;
 
 #[test_connector(tags(Postgres))]
 async fn views_can_be_described(api: &TestApi) {
-    let full_sql = format!(
-        r#"
-        CREATE TABLE "{0}".a (a_id int);
-        CREATE TABLE "{0}".b (b_id int);
-        CREATE VIEW "{0}".ab AS SELECT a_id FROM "{0}".a UNION ALL SELECT b_id FROM "{0}".b;
-        "#,
-        SCHEMA,
-    );
+    let full_sql = r#"
+        CREATE TABLE a (a_id int);
+        CREATE TABLE b (b_id int);
+        CREATE VIEW ab AS SELECT a_id FROM a UNION ALL SELECT b_id FROM b;
+    "#;
 
     api.database().raw_cmd(&full_sql).await.unwrap();
     let result = api.describe().await;
     let view = result.get_view("ab").expect("couldn't get ab view").to_owned();
 
-    let expected_sql = format!(
-        " SELECT a.a_id\n   FROM \"{0}\".a\nUNION ALL\n SELECT b.b_id AS a_id\n   FROM \"{0}\".b;",
-        SCHEMA
-    );
+    let expected_sql = " SELECT a.a_id\n   FROM a\nUNION ALL\n SELECT b.b_id AS a_id\n   FROM b;";
 
     assert_eq!("ab", &view.name);
     assert_eq!(expected_sql, view.definition.unwrap());
@@ -35,7 +24,7 @@ async fn views_can_be_described(api: &TestApi) {
 
 #[test_connector(tags(Postgres))]
 async fn all_postgres_column_types_must_work(api: &TestApi) {
-    let mut migration = Migration::new().schema(SCHEMA);
+    let mut migration = Migration::new().schema(api.schema_name());
     migration.create_table("User", move |t| {
         t.add_column("array_bin_col", types::array(&types::binary()));
         t.add_column("array_bool_col", types::array(&types::boolean()));
@@ -590,18 +579,18 @@ async fn all_postgres_column_types_must_work(api: &TestApi) {
 
 #[test_connector(tags(Postgres))]
 async fn postgres_cross_schema_references_are_not_allowed(api: &TestApi) {
-    let schema2 = format!("{}_2", SCHEMA);
+    let schema2 = format!("{}_2", api.schema_name());
 
     let sql = format!(
         "DROP SCHEMA IF EXISTS \"{0}\" CASCADE;
          CREATE SCHEMA \"{0}\";
          CREATE TABLE \"{0}\".\"City\" (id INT PRIMARY KEY);
-         CREATE TABLE \"{1}\".\"User\" (
+         CREATE TABLE \"User\" (
             id INT PRIMARY KEY,
             city INT REFERENCES \"{0}\".\"City\" (id) ON DELETE NO ACTION
         );
         ",
-        schema2, SCHEMA
+        schema2,
     );
 
     api.database().raw_cmd(&sql).await.unwrap();
@@ -609,8 +598,8 @@ async fn postgres_cross_schema_references_are_not_allowed(api: &TestApi) {
     let err = api.describe_error().await;
 
     assert_eq!(
-        "Illegal cross schema reference from `DatabaseInspector-Test.User` to `DatabaseInspector-Test_2.City` in constraint `User_city_fkey`. Foreign keys between database schemas are not supported in Prisma. Please follow the GitHub ticket: https://github.com/prisma/prisma/issues/1175".to_string(),
-        format!("{}", err),
+        "Illegal cross schema reference from `prisma-tests.User` to `prisma-tests_2.City` in constraint `User_city_fkey`. Foreign keys between database schemas are not supported in Prisma. Please follow the GitHub ticket: https://github.com/prisma/prisma/issues/1175".to_string(),
+        err.to_string()
     );
 }
 
@@ -627,7 +616,7 @@ async fn postgres_foreign_key_on_delete_must_be_handled(api: &TestApi) {
             city_set_default INT REFERENCES \"{0}\".\"City\" (id) ON DELETE SET DEFAULT
         );
         ",
-        SCHEMA
+        api.schema_name()
     );
     api.database().raw_cmd(&sql).await.unwrap();
 
@@ -765,7 +754,7 @@ async fn postgres_enums_must_work(api: &TestApi) {
     api.database()
         .raw_cmd(&format!(
             "CREATE TYPE \"{}\".\"mood\" AS ENUM ('sad', 'ok', 'happy')",
-            SCHEMA
+            api.schema_name()
         ))
         .await
         .unwrap();
@@ -785,7 +774,7 @@ async fn postgres_enums_must_work(api: &TestApi) {
 #[test_connector(tags(Postgres))]
 async fn postgres_sequences_must_work(api: &TestApi) {
     api.database()
-        .raw_cmd(&format!("CREATE SEQUENCE \"{}\".\"test\"", SCHEMA))
+        .raw_cmd(&format!("CREATE SEQUENCE \"{}\".\"test\"", api.schema_name()))
         .await
         .unwrap();
 
@@ -808,7 +797,7 @@ async fn postgres_multi_field_indexes_must_be_inferred_in_the_right_order(api: &
             CREATE UNIQUE INDEX "my_idx" ON "{schema_name}"."indexes_test" (name, age);
             CREATE INDEX "my_idx2" ON "{schema_name}"."indexes_test" (age, name);
         "##,
-        schema_name = SCHEMA
+        schema_name = api.schema_name()
     );
     api.database().raw_cmd(&schema).await.unwrap();
 

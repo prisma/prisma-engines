@@ -1,16 +1,14 @@
+mod describers;
+mod test_api;
+
 use crate::test_api::*;
 use barrel::types;
 use native_types::{MsSqlType, MsSqlTypeParameter, MySqlType, NativeType, PostgresType};
 use pretty_assertions::assert_eq;
 use prisma_value::PrismaValue;
-use quaint::prelude::{Queryable, SqlFamily};
+use quaint::prelude::SqlFamily;
 use serde_json::Value;
 use sql_schema_describer::*;
-use test_macros::test_connector;
-
-mod common;
-mod sqlite;
-mod test_api;
 
 fn int_full_data_type(api: &TestApi) -> &'static str {
     match api.sql_family() {
