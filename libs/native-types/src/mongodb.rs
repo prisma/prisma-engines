@@ -17,15 +17,15 @@ pub enum MongoDbType {
     Timestamp,
     Long,
     Decimal,
-    MinKey,
-    MaxKey,
-    Object,
     // Deprecated:
     // DbPointer
     // Undefined
     // Symbol
 
     // Unsupported:
+    // MinKey,
+    // MaxKey,
+    // Object,
     // Javascript
     // JavascriptWithScope
     // Regex
