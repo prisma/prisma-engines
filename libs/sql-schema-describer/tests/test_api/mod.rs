@@ -89,6 +89,10 @@ impl TestApi {
         self.tags.contains(Tags::Cockroach)
     }
 
+    pub(crate) fn is_mariadb(&self) -> bool {
+        self.tags.contains(Tags::Mariadb)
+    }
+
     pub(crate) fn is_mssql(&self) -> bool {
         self.tags.contains(Tags::Mssql)
     }
@@ -314,6 +318,11 @@ impl IndexAssertion<'_> {
 
     pub fn assert_is_unique(&self) -> &Self {
         assert!(self.index.index_type().is_unique());
+        self
+    }
+
+    pub fn assert_is_not_unique(&self) -> &Self {
+        assert!(!self.index.index_type().is_unique());
         self
     }
 }
