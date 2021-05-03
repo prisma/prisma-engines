@@ -122,7 +122,7 @@ impl<'a> GetRow for SqliteRow<'a> {
         let mut row = Vec::with_capacity(self.columns().len());
 
         for (i, column) in self.columns().iter().enumerate() {
-            let pv = match self.get_raw(i) {
+            let pv = match self.get_ref_unwrap(i) {
                 ValueRef::Null => match column {
                     c if c.is_integer() | c.is_null() => Value::Integer(None),
                     c if c.is_text() => Value::Text(None),

@@ -111,12 +111,12 @@ optional = true
 branch = "vendored-openssl"
 
 [dependencies.rusqlite]
-version = "0.23"
-features = ["chrono", "bundled"]
+version = "0.25"
+features = ["chrono", "bundled", "column_decltype"]
 optional = true
 
 [dependencies.libsqlite3-sys]
-version = "0.18"
+version = "0.22"
 default-features = false
 features = ["bundled"]
 optional = true

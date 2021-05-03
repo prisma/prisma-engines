@@ -162,6 +162,21 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
             expr => self.visit_expression(expr)?,
         }
 
+        if let Some(returning) = insert.returning {
+            if !returning.is_empty() {
+                let values_len = returning.len();
+                self.write(" RETURNING ")?;
+
+                for (i, column) in returning.into_iter().enumerate() {
+                    self.write(&column.name)?;
+
+                    if i < (values_len - 1) {
+                        self.write(", ")?;
+                    }
+                }
+            }
+        };
+
         Ok(())
     }
 
@@ -639,11 +654,8 @@ mod tests {
     fn sqlite_harness() -> ::rusqlite::Connection {
         let conn = ::rusqlite::Connection::open_in_memory().unwrap();
 
-        conn.execute(
-            "CREATE TABLE users (id, name TEXT, age REAL, nice INTEGER)",
-            ::rusqlite::NO_PARAMS,
-        )
-        .unwrap();
+        conn.execute("CREATE TABLE users (id, name TEXT, age REAL, nice INTEGER)", [])
+            .unwrap();
 
         let insert = Insert::single_into("users")
             .value("id", 1)
@@ -653,7 +665,7 @@ mod tests {
 
         let (sql, params) = Sqlite::build(insert).unwrap();
 
-        conn.execute(&sql, params.as_slice()).unwrap();
+        conn.execute(&sql, rusqlite::params_from_iter(params.iter())).unwrap();
         conn
     }
 
@@ -675,7 +687,7 @@ mod tests {
 
         let mut stmt = conn.prepare(&sql_str).unwrap();
         let mut person_iter = stmt
-            .query_map(&params, |row| {
+            .query_map(rusqlite::params_from_iter(params.iter()), |row| {
                 Ok(Person {
                     name: row.get(1).unwrap(),
                     age: row.get(2).unwrap(),

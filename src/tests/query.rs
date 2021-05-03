@@ -608,21 +608,33 @@ async fn single_default_value_insert(api: &mut dyn TestApi) -> crate::Result<()>
     Ok(())
 }
 
-#[cfg(any(feature = "mssql", feature = "postgresql"))]
-#[test_each_connector(tags("mssql", "postgresql"))]
+#[cfg(any(feature = "mssql", feature = "postgresql", feature = "sqlite"))]
+#[test_each_connector(tags("mssql", "postgresql", "sqlite"))]
 async fn returning_insert(api: &mut dyn TestApi) -> crate::Result<()> {
-    let table = api.create_table("id int, name varchar(255)").await?;
-    let insert = Insert::single_into(&table).value("id", 2).value("name", "Naukio");
+    let table = api.get_name();
+
+    api.conn()
+        .raw_cmd(&format!(
+            "CREATE TABLE {} (id int primary key, name varchar(255))",
+            table
+        ))
+        .await?;
+
+    let insert = Insert::single_into(&table).value("id", 1).value("name", "Naukio");
 
     let res = api
         .conn()
         .insert(Insert::from(insert).returning(vec!["id", "name"]))
-        .await?;
+        .await;
+
+    api.conn().raw_cmd(&format!("DROP TABLE {}", table)).await?;
+
+    let res = res?;
 
     assert_eq!(1, res.len());
 
     let row = res.get(0).unwrap();
-    assert_eq!(Some(2), row["id"].as_i64());
+    assert_eq!(Some(1), row["id"].as_i64());
     assert_eq!(Some("Naukio"), row["name"].as_str());
 
     Ok(())

@@ -229,8 +229,11 @@ impl<'a> Insert<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg(any(feature = "postgresql", feature = "mssql"))]
-    #[cfg_attr(feature = "docs", doc(cfg(any(feature = "postgresql", feature = "mssql"))))]
+    #[cfg(any(feature = "postgresql", feature = "mssql", feature = "sqlite"))]
+    #[cfg_attr(
+        feature = "docs",
+        doc(cfg(any(feature = "postgresql", feature = "mssql", feature = "sqlite")))
+    )]
     pub fn returning<K, I>(mut self, columns: I) -> Self
     where
         K: Into<Column<'a>>,

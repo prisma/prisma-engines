@@ -1,7 +1,7 @@
 mod conversion;
 mod error;
 
-pub use rusqlite::version as sqlite_version;
+pub use rusqlite::{params_from_iter, version as sqlite_version};
 
 use crate::{
     ast::{Query, Value},
@@ -178,7 +178,7 @@ impl Queryable for Sqlite {
 
             let mut stmt = client.prepare_cached(sql)?;
 
-            let mut rows = stmt.query(params)?;
+            let mut rows = stmt.query(params_from_iter(params.iter()))?;
             let mut result = ResultSet::new(rows.to_column_names(), Vec::new());
 
             while let Some(row) = rows.next()? {
@@ -197,7 +197,7 @@ impl Queryable for Sqlite {
         metrics::query("sqlite.query_raw", sql, params, move || async move {
             let client = self.client.lock().await;
             let mut stmt = client.prepare_cached(sql)?;
-            let res = u64::try_from(stmt.execute(params)?)?;
+            let res = u64::try_from(stmt.execute(params_from_iter(params.iter()))?)?;
 
             Ok(res)
         })
