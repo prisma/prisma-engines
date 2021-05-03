@@ -366,13 +366,6 @@ async fn column_uniqueness_must_be_detected(api: &TestApi) {
         })
         .await;
 
-    let expected_uniq1_idx_name = match api.sql_family() {
-        SqlFamily::Mysql => "uniq1",
-        SqlFamily::Postgres => "User_uniq1_key",
-        SqlFamily::Sqlite => "sqlite_autoindex_User_1",
-        SqlFamily::Mssql => "UQ__User__CD572100A176666B",
-    };
-
     let schema = api.describe().await;
 
     schema.assert_table("User", |t| {
@@ -399,9 +392,7 @@ async fn column_uniqueness_must_be_detected(api: &TestApi) {
                 idx
             }
         })
-        .assert_index_on_columns(&["uniq1"], |idx| {
-            idx.assert_is_unique().assert_name(expected_uniq1_idx_name)
-        })
+        .assert_index_on_columns(&["uniq1"], |idx| idx.assert_is_unique())
     });
 
     let user_table = schema.table_bang("User");
