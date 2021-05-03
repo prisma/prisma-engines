@@ -87,7 +87,7 @@ impl<'a> ResultRowRef<'a> {
     /// # let row = result_set.first().unwrap();
     /// assert_eq!(Some(&row[0]), row.at(0));
     /// ```
-    pub fn at(&self, i: usize) -> Option<&Value<'static>> {
+    pub fn at(&self, i: usize) -> Option<&'a Value<'static>> {
         if self.values.len() <= i {
             None
         } else {
@@ -105,7 +105,7 @@ impl<'a> ResultRowRef<'a> {
     /// # let row = result_set.first().unwrap();
     /// assert_eq!(Some(&row["id"]), row.get("id"));
     /// ```
-    pub fn get(&self, name: &str) -> Option<&Value<'static>> {
+    pub fn get(&self, name: &str) -> Option<&'a Value<'static>> {
         self.columns.iter().position(|c| c == name).map(|idx| &self.values[idx])
     }
 }
