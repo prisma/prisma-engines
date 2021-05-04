@@ -843,6 +843,7 @@ fn is_autoincrement(value: &str, sequences: &[Sequence]) -> Option<String> {
 }
 
 fn unsuffix_default_literal<'a>(literal: &'a str, expected_suffixes: &[&str]) -> Option<Cow<'a, str>> {
+    // Tries to match expressions of the form <expr> or <expr>::<type> or <expr>:::<type>.
     static POSTGRES_DATA_TYPE_SUFFIX_RE: Lazy<Regex> =
         Lazy::new(|| Regex::new(r#"(?ms)^(.*?):{2,3}(\\")?(.*)(\\")?$"#).unwrap());
 
@@ -860,6 +861,7 @@ fn unsuffix_default_literal<'a>(literal: &'a str, expected_suffixes: &[&str]) ->
 
 // See https://www.postgresql.org/docs/9.3/sql-syntax-lexical.html
 fn process_string_literal(literal: &str) -> Cow<'_, str> {
+    // B'...' or e'...' or '...'
     static POSTGRES_STRING_DEFAULT_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"(?ms)^(?:B|e)?'(.*)'$"#).unwrap());
     static POSTGRES_DEFAULT_QUOTE_UNESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"'(')"#).unwrap());
     static POSTGRES_DEFAULT_BACKSLASH_UNESCAPE_RE: Lazy<Regex> =
