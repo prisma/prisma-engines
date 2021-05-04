@@ -1,5 +1,14 @@
 version: "3"
 services:
+  cockroach:
+    image: cockroachdb/cockroach-unstable:v21.1.0-beta.5
+    restart: always
+    command: start-single-node --insecure
+    ports:
+      - "5436:26257"
+    networks:
+      - databases
+
   pgbouncer:
     image: brainsam/pgbouncer:latest
     restart: always

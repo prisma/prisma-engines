@@ -300,6 +300,11 @@ impl<'a> TableWalker<'a> {
         })
     }
 
+    /// The number of indexes on the table.
+    pub fn indexes_count(&self) -> usize {
+        self.table().indices.len()
+    }
+
     /// Traverse the foreign keys on the table.
     pub fn foreign_keys(&self) -> impl Iterator<Item = ForeignKeyWalker<'a>> {
         let table_index = self.table_index;

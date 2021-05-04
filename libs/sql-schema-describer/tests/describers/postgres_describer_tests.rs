@@ -1,10 +1,12 @@
+mod cockroach_describer_tests;
+
 use crate::test_api::*;
 use barrel::{types, Migration};
 use native_types::{NativeType, PostgresType};
 use pretty_assertions::assert_eq;
 use sql_schema_describer::*;
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(Cockroach))]
 async fn views_can_be_described(api: &TestApi) {
     let full_sql = r#"
         CREATE TABLE a (a_id int);
@@ -22,7 +24,7 @@ async fn views_can_be_described(api: &TestApi) {
     assert_eq!(expected_sql, view.definition.unwrap());
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(Cockroach))]
 async fn all_postgres_column_types_must_work(api: &TestApi) {
     let mut migration = Migration::new().schema(api.schema_name());
     migration.create_table("User", move |t| {
@@ -596,9 +598,14 @@ async fn postgres_cross_schema_references_are_not_allowed(api: &TestApi) {
     api.database().raw_cmd(&sql).await.unwrap();
 
     let err = api.describe_error().await;
+    let fk_name = if api.is_cockroach() {
+        "fk_city_ref_City"
+    } else {
+        "User_city_fkey"
+    };
 
     assert_eq!(
-        "Illegal cross schema reference from `prisma-tests.User` to `prisma-tests_2.City` in constraint `User_city_fkey`. Foreign keys between database schemas are not supported in Prisma. Please follow the GitHub ticket: https://github.com/prisma/prisma/issues/1175".to_string(),
+        format!("Illegal cross schema reference from `prisma-tests.User` to `prisma-tests_2.City` in constraint `{}`. Foreign keys between database schemas are not supported in Prisma. Please follow the GitHub ticket: https://github.com/prisma/prisma/issues/1175", fk_name),
         err.to_string()
     );
 }
@@ -618,135 +625,40 @@ async fn postgres_foreign_key_on_delete_must_be_handled(api: &TestApi) {
         ",
         api.schema_name()
     );
+
     api.database().raw_cmd(&sql).await.unwrap();
 
     let schema = api.describe().await;
-    let mut table = schema.get_table("User").expect("get User table").to_owned();
-    table.foreign_keys.sort_unstable_by_key(|fk| fk.columns.clone());
 
-    assert_eq!(
-        table,
-        Table {
-            name: "User".into(),
-            columns: vec![
-                Column {
-                    name: "id".into(),
-                    tpe: ColumnType {
-                        full_data_type: "int4".into(),
-                        family: ColumnTypeFamily::Int,
-                        arity: ColumnArity::Required,
-                        native_type: Some(PostgresType::Integer.to_json()),
-                    },
-
-                    default: None,
-                    auto_increment: false,
-                },
-                Column {
-                    name: "city".into(),
-                    tpe: ColumnType {
-                        full_data_type: "int4".into(),
-                        family: ColumnTypeFamily::Int,
-                        arity: ColumnArity::Nullable,
-                        native_type: Some(PostgresType::Integer.to_json()),
-                    },
-                    default: None,
-                    auto_increment: false,
-                },
-                Column {
-                    name: "city_cascade".into(),
-                    tpe: ColumnType {
-                        full_data_type: "int4".into(),
-                        family: ColumnTypeFamily::Int,
-                        arity: ColumnArity::Nullable,
-                        native_type: Some(PostgresType::Integer.to_json()),
-                    },
-                    default: None,
-                    auto_increment: false,
-                },
-                Column {
-                    name: "city_restrict".into(),
-                    tpe: ColumnType {
-                        full_data_type: "int4".into(),
-                        family: ColumnTypeFamily::Int,
-                        arity: ColumnArity::Nullable,
-                        native_type: Some(PostgresType::Integer.to_json()),
-                    },
-                    default: None,
-                    auto_increment: false,
-                },
-                Column {
-                    name: "city_set_null".into(),
-                    tpe: ColumnType {
-                        full_data_type: "int4".into(),
-                        family: ColumnTypeFamily::Int,
-                        arity: ColumnArity::Nullable,
-                        native_type: Some(PostgresType::Integer.to_json()),
-                    },
-                    default: None,
-                    auto_increment: false,
-                },
-                Column {
-                    name: "city_set_default".into(),
-                    tpe: ColumnType {
-                        full_data_type: "int4".into(),
-                        family: ColumnTypeFamily::Int,
-                        arity: ColumnArity::Nullable,
-                        native_type: Some(PostgresType::Integer.to_json()),
-                    },
-                    default: None,
-                    auto_increment: false,
-                },
-            ],
-            indices: vec![],
-            primary_key: Some(PrimaryKey {
-                columns: vec!["id".into()],
-                sequence: None,
-                constraint_name: Some("User_pkey".into()),
-            }),
-            foreign_keys: vec![
-                ForeignKey {
-                    constraint_name: Some("User_city_fkey".to_owned()),
-                    columns: vec!["city".into()],
-                    referenced_columns: vec!["id".into()],
-                    referenced_table: "City".into(),
-                    on_update_action: ForeignKeyAction::NoAction,
-                    on_delete_action: ForeignKeyAction::NoAction,
-                },
-                ForeignKey {
-                    constraint_name: Some("User_city_cascade_fkey".to_owned()),
-                    columns: vec!["city_cascade".into()],
-                    referenced_columns: vec!["id".into()],
-                    referenced_table: "City".into(),
-                    on_update_action: ForeignKeyAction::NoAction,
-                    on_delete_action: ForeignKeyAction::Cascade,
-                },
-                ForeignKey {
-                    constraint_name: Some("User_city_restrict_fkey".to_owned()),
-                    columns: vec!["city_restrict".into()],
-                    referenced_columns: vec!["id".into()],
-                    referenced_table: "City".into(),
-                    on_update_action: ForeignKeyAction::NoAction,
-                    on_delete_action: ForeignKeyAction::Restrict,
-                },
-                ForeignKey {
-                    constraint_name: Some("User_city_set_default_fkey".to_owned()),
-                    columns: vec!["city_set_default".into()],
-                    referenced_columns: vec!["id".into()],
-                    referenced_table: "City".into(),
-                    on_update_action: ForeignKeyAction::NoAction,
-                    on_delete_action: ForeignKeyAction::SetDefault,
-                },
-                ForeignKey {
-                    constraint_name: Some("User_city_set_null_fkey".to_owned()),
-                    columns: vec!["city_set_null".into()],
-                    referenced_columns: vec!["id".into()],
-                    referenced_table: "City".into(),
-                    on_update_action: ForeignKeyAction::NoAction,
-                    on_delete_action: ForeignKeyAction::SetNull,
-                },
-            ],
-        }
-    );
+    schema.assert_table("User", |t| {
+        t.assert_column("id", |c| c.assert_type_is_int_or_bigint())
+            .assert_column("city", |c| c.assert_type_is_int_or_bigint())
+            .assert_column("city_cascade", |c| c.assert_type_is_int_or_bigint())
+            .assert_column("city_restrict", |c| c.assert_type_is_int_or_bigint())
+            .assert_column("city_set_null", |c| c.assert_type_is_int_or_bigint())
+            .assert_column("city_set_default", |c| c.assert_type_is_int_or_bigint())
+            .assert_pk_on_columns(&["id"])
+            .assert_foreign_key_on_columns(&["city"], |fk| {
+                fk.assert_references("City", &["id"])
+                    .assert_on_delete(ForeignKeyAction::NoAction)
+            })
+            .assert_foreign_key_on_columns(&["city_cascade"], |fk| {
+                fk.assert_references("City", &["id"])
+                    .assert_on_delete(ForeignKeyAction::Cascade)
+            })
+            .assert_foreign_key_on_columns(&["city_restrict"], |fk| {
+                fk.assert_references("City", &["id"])
+                    .assert_on_delete(ForeignKeyAction::Restrict)
+            })
+            .assert_foreign_key_on_columns(&["city_set_default"], |fk| {
+                fk.assert_references("City", &["id"])
+                    .assert_on_delete(ForeignKeyAction::SetDefault)
+            })
+            .assert_foreign_key_on_columns(&["city_set_null"], |fk| {
+                fk.assert_references("City", &["id"])
+                    .assert_on_delete(ForeignKeyAction::SetNull)
+            })
+    });
 }
 
 #[test_connector(tags(Postgres))]
@@ -886,5 +798,5 @@ async fn escaped_backslashes_in_string_literals_must_be_unescaped(api: &TestApi)
         .into_string()
         .unwrap();
 
-    assert_eq!(default, "xyz\\Datasource\\Model");
+    assert_eq!(default, r#"xyz\Datasource\Model"#);
 }
