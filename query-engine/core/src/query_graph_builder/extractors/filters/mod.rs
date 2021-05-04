@@ -175,7 +175,7 @@ fn extract_scalar_filters(field: &ScalarFieldRef, value: ParsedInputValue) -> Qu
                 TypeIdentifier::Json => filters
                     .into_iter()
                     .map(|f| match f {
-                        Filter::Scalar(sf) => Filter::Json(JsonFilter {
+                        Filter::Scalar(sf) => Filter::from(JsonFilter {
                             filter: sf,
                             path: json_path.clone(),
                             target_type: None,
