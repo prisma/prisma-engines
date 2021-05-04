@@ -2,6 +2,7 @@
 
 use super::*;
 use crate::{getters::Getter, parsers::Parser};
+use enumflags2::BitFlags;
 use indoc::indoc;
 use native_types::{NativeType, PostgresType};
 use quaint::{connector::ResultRow, prelude::Queryable, single::Quaint};
@@ -10,10 +11,16 @@ use serde_json::from_str;
 use std::{borrow::Cow, collections::HashMap, convert::TryInto};
 use tracing::trace;
 
+#[derive(BitFlags, Clone, Copy, Debug)]
+#[repr(u8)]
+pub enum Circumstances {
+    Cockroach = 1 << 0,
+}
+
 #[derive(Debug)]
 pub struct SqlSchemaDescriber {
     conn: Quaint,
-    is_cockroach: bool,
+    circumstances: BitFlags<Circumstances>,
 }
 
 #[async_trait::async_trait]
@@ -80,8 +87,12 @@ impl Parser for SqlSchemaDescriber {
 
 impl SqlSchemaDescriber {
     /// Constructor.
-    pub fn new(conn: Quaint, is_cockroach: bool) -> SqlSchemaDescriber {
-        SqlSchemaDescriber { conn, is_cockroach }
+    pub fn new(conn: Quaint, circumstances: BitFlags<Circumstances>) -> SqlSchemaDescriber {
+        SqlSchemaDescriber { conn, circumstances }
+    }
+
+    fn is_cockroach(&self) -> bool {
+        self.circumstances.contains(Circumstances::Cockroach)
     }
 
     #[tracing::instrument]
@@ -100,7 +111,7 @@ impl SqlSchemaDescriber {
 
     #[tracing::instrument]
     async fn get_procedures(&self, schema: &str) -> DescriberResult<Vec<Procedure>> {
-        if self.is_cockroach {
+        if self.is_cockroach() {
             return Ok(Vec::new());
         }
 
@@ -260,7 +271,7 @@ impl SqlSchemaDescriber {
 
             let auto_increment = is_identity
                 || matches!(default.as_ref().map(|d| d.kind()), Some(DefaultKind::Sequence(_)))
-                || (self.is_cockroach
+                || (self.is_cockroach()
                     && matches!(
                         default.as_ref().map(|d| d.kind()),
                         Some(DefaultKind::DbGenerated(s)) if s == "unique_rowid()"

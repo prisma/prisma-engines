@@ -4,7 +4,7 @@ use quaint::{
     prelude::{ConnectionInfo, Queryable, SqlFamily},
     single::Quaint,
 };
-use sql_schema_describer::SqlSchemaDescriberBackend;
+use sql_schema_describer::{postgres::Circumstances, SqlSchemaDescriberBackend};
 use std::time::Duration;
 
 const CONNECTION_TIMEOUT: Duration = Duration::from_secs(10);
@@ -25,10 +25,15 @@ pub async fn load_describer(url: &str) -> Result<(Box<dyn SqlSchemaDescriberBack
 
     let describer: Box<dyn SqlSchemaDescriberBackend> = match connection_info.sql_family() {
         SqlFamily::Postgres => {
-            let is_cockroach = version.map(|version| version.contains("CockroachDB")).unwrap_or(false);
+            let mut circumstances = Default::default();
+
+            if version.map(|version| version.contains("CockroachDB")).unwrap_or(false) {
+                circumstances |= Circumstances::Cockroach;
+            }
+
             Box::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(
                 connection,
-                is_cockroach,
+                circumstances,
             ))
         }
         SqlFamily::Mysql => Box::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(connection)),

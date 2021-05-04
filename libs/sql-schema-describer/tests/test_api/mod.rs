@@ -5,6 +5,7 @@ pub use test_setup::{BitFlags, Capabilities, Tags};
 use barrel::Migration;
 use quaint::prelude::{ConnectionInfo, SqlFamily};
 use sql_schema_describer::{
+    postgres::Circumstances,
     walkers::{ColumnWalker, ForeignKeyWalker, IndexWalker, SqlSchemaExt, TableWalker},
     ColumnTypeFamily, DescriberError, ForeignKeyAction, SqlSchema, SqlSchemaDescriberBackend,
 };
@@ -69,7 +70,11 @@ impl TestApi {
         match self.sql_family() {
             SqlFamily::Postgres => Box::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(
                 db,
-                self.tags.contains(Tags::Cockroach),
+                if self.tags.contains(Tags::Cockroach) {
+                    Circumstances::Cockroach.into()
+                } else {
+                    Default::default()
+                },
             )),
             SqlFamily::Sqlite => Box::new(sql_schema_describer::sqlite::SqlSchemaDescriber::new(db)),
             SqlFamily::Mysql => Box::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(db)),

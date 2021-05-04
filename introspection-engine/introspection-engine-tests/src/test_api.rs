@@ -13,7 +13,11 @@ use quaint::{
 };
 use sql_introspection_connector::SqlIntrospectionConnector;
 use sql_migration_connector::SqlMigrationConnector;
-use sql_schema_describer::{mssql, mysql, postgres, sqlite, SqlSchema, SqlSchemaDescriberBackend};
+use sql_schema_describer::{
+    mssql, mysql,
+    postgres::{self, Circumstances},
+    sqlite, SqlSchema, SqlSchemaDescriberBackend,
+};
 use test_setup::{create_mysql_database, create_postgres_database, sqlite_test_url, TestApiArgs};
 use tracing::Instrument;
 
@@ -86,10 +90,16 @@ impl TestApi {
                 Ok(sql_schema)
             }
             ConnectionInfo::Postgres(url) => {
-                let sql_schema =
-                    postgres::SqlSchemaDescriber::new(self.database.clone(), self.tags().contains(Tags::Cockroach))
-                        .describe(url.schema())
-                        .await?;
+                let sql_schema = postgres::SqlSchemaDescriber::new(
+                    self.database.clone(),
+                    if self.tags().contains(Tags::Cockroach) {
+                        Circumstances::Cockroach.into()
+                    } else {
+                        Default::default()
+                    },
+                )
+                .describe(url.schema())
+                .await?;
 
                 Ok(sql_schema)
             }
