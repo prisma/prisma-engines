@@ -1,12 +1,11 @@
-use std::fmt::Display;
-
-use crate::{IntoBson, MongoError};
+use crate::{output_meta::OutputMeta, IntoBson, MongoError};
 use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 use chrono::{TimeZone, Utc};
 use itertools::Itertools;
 use mongodb::bson::{oid::ObjectId, spec::BinarySubtype, Binary, Bson, Timestamp};
 use native_types::MongoDbType;
 use prisma_models::{PrismaValue, ScalarFieldRef, TypeIdentifier};
+use std::fmt::Display;
 
 /// Transforms a `PrismaValue` of a specific field into the BSON mapping as prescribed by the native types
 /// or as defined by the default `TypeIdentifier` to BSON mapping.
@@ -118,6 +117,10 @@ impl IntoBson for (&TypeIdentifier, PrismaValue) {
             (TypeIdentifier::UUID, PrismaValue::Uuid(s)) => Bson::String(s.to_string()),
             (TypeIdentifier::UUID, PrismaValue::String(s)) => Bson::String(s),
 
+            // Enums
+            (TypeIdentifier::Enum(_), PrismaValue::String(s)) => Bson::String(s),
+            (TypeIdentifier::Enum(_), PrismaValue::Enum(s)) => Bson::String(s),
+
             // Bool
             (TypeIdentifier::Boolean, PrismaValue::Boolean(b)) => Bson::Boolean(b),
 
@@ -164,7 +167,6 @@ impl IntoBson for (&TypeIdentifier, PrismaValue) {
             (TypeIdentifier::Unsupported, _) => unreachable!("Unsupported types should never hit the connector."),
 
             // Todo
-            // Enum
             // Json
 
             // Unhandled mappings
@@ -206,45 +208,100 @@ fn format_opt<T: Display>(opt: Option<T>) -> String {
 
 /// Explanation constants for conversion errors.
 mod expl {
+    #![allow(dead_code)]
+
     pub const MONGO_DOUBLE: &str = "MongoDB Double (64bit)";
     pub const MONGO_I32: &str = "MongoDB Int (32 bit)";
     pub const MONGO_I64: &str = "MongoDB Int (64 bit)";
+
+    pub const PRISMA_FLOAT: &str = "Prisma Float (BigDecimal)";
+    pub const PRISMA_BIGINT: &str = "Prisma BigInt (64 bit)";
+    pub const PRISMA_INT: &str = "Prisma Int (64 bit)";
 }
 
-/// Parsing of values coming from MongoDB back to the connector / core.
-/// Todo: This will cause issues with objectID, for example. We need to use the exact PrismaValue type it came in with.
-pub(crate) fn value_from_bson(bson: Bson) -> crate::Result<PrismaValue> {
-    match bson {
-        Bson::Double(d) => match BigDecimal::from_f64(d) {
-            Some(decimal) => Ok(PrismaValue::Float(decimal.normalized())),
-            None => Err(MongoError::ConversionError {
-                from: format!("{}", d),
-                to: "Decimal".to_owned(),
-            }),
+// Parsing of values coming from MongoDB back to the connector / core.
+pub fn value_from_bson(bson: Bson, meta: &OutputMeta) -> crate::Result<PrismaValue> {
+    let val = match (&meta.ident, bson) {
+        // We expect a list to be returned.
+        (type_identifier, bson) if meta.list => match bson {
+            Bson::Null => PrismaValue::List(Vec::new()),
+
+            Bson::Array(list) => PrismaValue::List(
+                list.into_iter()
+                    .map(|list_val| value_from_bson(list_val, &meta.strip_list()))
+                    .collect::<crate::Result<Vec<_>>>()?,
+            ),
+
+            _ => {
+                return Err(MongoError::ConversionError {
+                    from: format!("{}", bson),
+                    to: format!("List of {:?}", type_identifier),
+                });
+            }
         },
-        Bson::Array(list) => Ok(PrismaValue::List(
-            list.into_iter()
-                .map(value_from_bson)
-                .collect::<crate::Result<Vec<_>>>()?,
-        )),
-        Bson::String(s) => Ok(PrismaValue::String(s)),
-        Bson::Document(_) => unimplemented!("Figure out BSON => JSON conversion."),
-        Bson::Boolean(b) => Ok(PrismaValue::Boolean(b)),
-        Bson::Null => Ok(PrismaValue::Null),
-        Bson::Int32(i) => Ok(PrismaValue::Int(i as i64)),
-        Bson::Int64(i) => Ok(PrismaValue::Int(i)),
-        Bson::DateTime(dt) => Ok(PrismaValue::DateTime(dt.into())),
-        Bson::Timestamp(ts) => Ok(PrismaValue::DateTime(Utc.timestamp(ts.time as i64, 0).into())),
-        Bson::Binary(bin) => Ok(PrismaValue::Bytes(bin.bytes)),
-        Bson::ObjectId(oid) => Ok(PrismaValue::String(oid.to_hex())),
-        Bson::Decimal128(_) => unimplemented!("Figure out decimal to bigdecimal crate conversion."),
-        Bson::RegularExpression(_) => Err(MongoError::Unsupported("Regex Mongo type.".to_owned())),
-        Bson::JavaScriptCode(_) => Err(MongoError::Unsupported("JS code Mongo type.".to_owned())),
-        Bson::JavaScriptCodeWithScope(_) => Err(MongoError::Unsupported("JS code with scope Mongo type.".to_owned())),
-        Bson::Symbol(_) => Err(MongoError::Unsupported("Symbol Mongo type.".to_owned())),
-        Bson::Undefined => Err(MongoError::Unsupported("Undefined  Mongo type.".to_owned())),
-        Bson::MaxKey => Err(MongoError::Unsupported("MaxKey Mongo type.".to_owned())),
-        Bson::MinKey => Err(MongoError::Unsupported("MinKey Mongo type.".to_owned())),
-        Bson::DbPointer(_) => Err(MongoError::Unsupported("DbPointer Mongo type.".to_owned())),
-    }
+
+        // Null catch-all.
+        (_, Bson::Null) => PrismaValue::Null,
+
+        // String + UUID + Enum
+        (TypeIdentifier::String, Bson::String(s)) => PrismaValue::String(s),
+        (TypeIdentifier::String, Bson::ObjectId(oid)) => PrismaValue::String(oid.to_string()),
+        (TypeIdentifier::UUID, Bson::String(s)) => PrismaValue::Uuid(uuid::Uuid::parse_str(&s)?),
+        (TypeIdentifier::Enum(_), Bson::String(s)) => PrismaValue::Enum(s),
+
+        // Bool
+        (TypeIdentifier::Boolean, Bson::Boolean(b)) => PrismaValue::Boolean(b),
+
+        // Int
+        (TypeIdentifier::Int, Bson::Int64(i)) => PrismaValue::Int(i),
+        (TypeIdentifier::Int, Bson::Int32(i)) => PrismaValue::Int(i as i64),
+
+        // BigInt
+        (TypeIdentifier::BigInt, Bson::Int64(i)) => PrismaValue::BigInt(i),
+        (TypeIdentifier::BigInt, Bson::Int32(i)) => PrismaValue::BigInt(i as i64),
+
+        // Floats
+        (TypeIdentifier::Float, Bson::Double(f)) => {
+            PrismaValue::Float(BigDecimal::from_f64(f).convert(expl::PRISMA_FLOAT)?.normalized())
+        }
+        (TypeIdentifier::Float, Bson::Int32(i)) => {
+            PrismaValue::Float(BigDecimal::from_i64(i as i64).convert(expl::PRISMA_FLOAT)?.normalized())
+        }
+        (TypeIdentifier::Float, Bson::Int64(i)) => {
+            PrismaValue::Float(BigDecimal::from_i64(i).convert(expl::PRISMA_FLOAT)?.normalized())
+        }
+
+        // Decimals
+        (TypeIdentifier::Decimal, Bson::Double(f)) => {
+            PrismaValue::Float(BigDecimal::from_f64(f).convert(expl::PRISMA_FLOAT)?.normalized())
+        }
+        (TypeIdentifier::Decimal, Bson::Int32(i)) => {
+            PrismaValue::Float(BigDecimal::from_i64(i as i64).convert(expl::PRISMA_FLOAT)?.normalized())
+        }
+        (TypeIdentifier::Decimal, Bson::Int64(i)) => {
+            PrismaValue::Float(BigDecimal::from_i64(i).convert(expl::PRISMA_FLOAT)?.normalized())
+        }
+
+        // DateTime
+        (TypeIdentifier::DateTime, Bson::DateTime(dt)) => PrismaValue::DateTime(dt.into()),
+        (TypeIdentifier::DateTime, Bson::Timestamp(ts)) => {
+            PrismaValue::DateTime(Utc.timestamp(ts.time as i64, 0).into())
+        }
+
+        // Bytes
+        (TypeIdentifier::Bytes, Bson::Binary(bin)) => PrismaValue::Bytes(bin.bytes),
+        (TypeIdentifier::Bytes, Bson::ObjectId(oid)) => PrismaValue::Bytes(oid.bytes().to_vec()),
+
+        // Json
+        (TypeIdentifier::Json, bson) => PrismaValue::Json(serde_json::to_string(&bson.into_relaxed_extjson())?),
+
+        (ident, bson) => {
+            return Err(MongoError::UnhandledError(format!(
+                "Converting BSON to type {:?}. Data: '{}'",
+                ident, bson
+            )))
+        }
+    };
+
+    Ok(val)
 }

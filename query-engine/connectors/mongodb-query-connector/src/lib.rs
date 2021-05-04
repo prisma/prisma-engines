@@ -6,6 +6,7 @@ mod filter;
 mod interface;
 mod join;
 mod orderby;
+mod output_meta;
 mod projection;
 mod query_builder;
 mod root_queries;

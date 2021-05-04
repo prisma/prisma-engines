@@ -14,6 +14,10 @@ pub enum MongoError {
     #[error("Failed to convert '{}' to '{}'.", from, to)]
     ConversionError { from: String, to: String },
 
+    /// Unhanded behavior error.
+    #[error("Unhandled behavior: {0}.")]
+    UnhandledError(String),
+
     /// ObjectID specific conversion error.
     #[error("Malformed ObjectID: {0}.")]
     MalformedObjectId(String),
@@ -21,6 +25,12 @@ pub enum MongoError {
     /// Raw Mongo driver error
     #[error("{0}")]
     DriverError(#[from] DriverError),
+
+    #[error("{0}")]
+    UuidError(#[from] uuid::Error),
+
+    #[error("{0}")]
+    JsonError(#[from] serde_json::Error),
 }
 
 // Error translation is WIP.
@@ -28,6 +38,9 @@ impl MongoError {
     pub fn into_connector_error(self) -> ConnectorError {
         match self {
             MongoError::Unsupported(feature) => ConnectorError::from_kind(ErrorKind::UnsupportedFeature(feature)),
+            MongoError::UnhandledError(reason) => ConnectorError::from_kind(ErrorKind::UnsupportedFeature(reason)),
+            MongoError::UuidError(err) => ConnectorError::from_kind(ErrorKind::ConversionError(err.into())),
+            MongoError::JsonError(err) => ConnectorError::from_kind(ErrorKind::ConversionError(err.into())),
 
             err @ MongoError::ConversionError { .. } => {
                 ConnectorError::from_kind(ErrorKind::ConversionError(err.into()))
