@@ -54,7 +54,8 @@ pub fn introspect(
         }
 
         model.primary_key = table.primary_key.as_ref().map(|pk| PrimaryKeyDefinition {
-            name: pk.constraint_name.clone(),
+            name_in_client: None,
+            name_in_db: pk.constraint_name.clone(),
             fields: pk.columns.clone(),
         });
 

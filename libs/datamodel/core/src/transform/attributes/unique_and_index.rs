@@ -121,7 +121,7 @@ trait IndexAttributeBase<T>: AttributeValidator<T> {
         index_type: IndexType,
     ) -> Result<IndexDefinition, DatamodelError> {
         let mut index_def = IndexDefinition {
-            name: None,
+            name_in_db: None,
             fields: vec![],
             tpe: index_type,
         };
@@ -138,7 +138,7 @@ trait IndexAttributeBase<T>: AttributeValidator<T> {
                     span,
                 ))
             }
-            Some((name, _)) => index_def.name = Some(name.to_owned()),
+            Some((name, _)) => index_def.name_in_db = Some(name.to_owned()),
             None => (),
         };
 
@@ -251,7 +251,7 @@ trait IndexAttributeBase<T>: AttributeValidator<T> {
                         .collect(),
                 )];
 
-                if let Some(name) = &index_def.name {
+                if let Some(name) = &index_def.name_in_db {
                     args.push(ast::Argument::new_string("name", &name));
                 }
 

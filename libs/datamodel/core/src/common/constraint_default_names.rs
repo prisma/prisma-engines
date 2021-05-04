@@ -20,7 +20,7 @@ impl ConstraintNames {
     /// addditional for SQLSever
     /// dflt for Default Constraint
 
-    pub fn primary_key_name(model: &str, fields: &[&str]) -> String {
+    pub fn primary_key_name(model: &str, fields: Vec<String>) -> String {
         format!("{}_{}_pkey", model, fields.join("_"))
     }
 

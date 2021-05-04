@@ -1,4 +1,5 @@
 use super::{super::helpers::*, AttributeValidator};
+use crate::common::ConstraintNames;
 use crate::diagnostics::DatamodelError;
 use crate::{ast, dml, PrimaryKeyDefinition};
 
@@ -12,8 +13,11 @@ impl AttributeValidator<dml::Field> for IdAttributeValidator {
 
     fn validate_and_apply(&self, args: &mut Arguments, obj: &mut dml::Field) -> Result<(), DatamodelError> {
         if let dml::Field::ScalarField(sf) = obj {
+            let name = args.optional_default_arg("name")?.map(|v| v.as_str().unwrap());
+
             sf.primary_key = Some(PrimaryKeyDefinition {
-                name: None,
+                name_in_db: name, // if this is none, the default name needs to be set one level higher since we do not have the model name here -.-
+                name_in_client: None,
                 fields: vec![sf.name.clone()],
             });
             Ok(())
@@ -63,8 +67,22 @@ impl AttributeValidator<dml::Model> for ModelLevelIdAttributeValidator {
             .map(|f| f.as_constant_literal())
             .collect::<Result<Vec<_>, _>>()?;
 
+        let (name_in_client, name_in_db) = match (
+            args.optional_arg("name").map(|v| v.as_str().unwrap()),
+            args.optional_arg("map").map(|v| v.as_str().unwrap()),
+        ) {
+            (Some(client_name), Some(db_name)) => (Some(client_name), Some(db_name)),
+            (Some(client_name), None) => (
+                Some(client_name),
+                Some(ConstraintNames::primary_key_name(&obj.name, fields.clone())),
+            ),
+            (None, Some(db_name)) => (None, Some(db_name)),
+            (None, None) => (None, Some(ConstraintNames::primary_key_name(&obj.name, fields.clone()))),
+        };
+
         obj.primary_key = Some(PrimaryKeyDefinition {
-            name: None,
+            name_in_client,
+            name_in_db,
             fields: fields.clone(),
         });
 

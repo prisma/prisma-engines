@@ -7,5 +7,6 @@ mod constraint_default_names;
 pub mod preview_features;
 pub mod provider_names;
 
+pub use constraint_default_names::ConstraintNames;
 pub use name_normalizer::NameNormalizer;
 pub use relation_default_names::RelationNames;

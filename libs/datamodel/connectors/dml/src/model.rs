@@ -29,7 +29,7 @@ pub struct Model {
 /// Represents an index defined via `@@index` or `@@unique`.
 #[derive(Debug, PartialEq, Clone)]
 pub struct IndexDefinition {
-    pub name: Option<String>,
+    pub name_in_db: Option<String>,
     pub fields: Vec<String>,
     pub tpe: IndexType,
 }
@@ -53,7 +53,8 @@ pub enum IndexType {
 /// Represents a primary key defined via `@@id` or `@id`.
 #[derive(Debug, PartialEq, Clone)]
 pub struct PrimaryKeyDefinition {
-    pub name: Option<String>,
+    pub name_in_db: Option<String>,
+    pub name_in_client: Option<String>,
     pub fields: Vec<String>,
 }
 

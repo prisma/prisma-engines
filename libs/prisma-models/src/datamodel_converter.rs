@@ -147,7 +147,7 @@ impl<'a> DatamodelConverter<'a> {
             .iter()
             .filter(|i| i.fields.len() > 1 && model.is_compound_index_supported(i)) // @@unique for 1 field are transformed to is_unique instead
             .map(|i| IndexTemplate {
-                name: i.name.clone(),
+                name: i.name_in_db.clone(),
                 fields: i.fields.clone(),
                 typ: match i.tpe {
                     dml::IndexType::Unique => IndexType::Unique,

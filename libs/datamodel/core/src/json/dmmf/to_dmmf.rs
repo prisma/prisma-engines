@@ -82,7 +82,7 @@ fn model_to_dmmf(model: &dml::Model) -> Model {
             .filter_map(|i| {
                 if i.tpe == IndexType::Unique {
                     Some(UniqueIndex {
-                        name: i.name.clone(),
+                        name: i.name_in_db.clone(),
                         fields: i.fields.clone(),
                     })
                 } else {

@@ -128,7 +128,7 @@ pub(crate) fn calculate_index(index: &Index) -> IndexDefinition {
     };
 
     IndexDefinition {
-        name: Some(index.name.clone()),
+        name_in_db: Some(index.name.clone()),
         fields: index.columns.clone(),
         tpe,
     }
@@ -264,7 +264,8 @@ pub(crate) fn is_id(column: &Column, table: &Table) -> Option<PrimaryKeyDefiniti
     match &table.primary_key {
         Some(pk) if pk.columns.len() == 1 && pk.columns.first().unwrap() == &column.name => {
             Some(PrimaryKeyDefinition {
-                name: pk.constraint_name.clone(),
+                name_in_client: None,
+                name_in_db: pk.constraint_name.clone(),
                 fields: pk.columns.clone(),
             })
         }

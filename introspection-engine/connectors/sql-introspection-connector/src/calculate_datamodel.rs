@@ -91,7 +91,8 @@ mod tests {
                         default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
                         is_unique: false,
                         primary_key: Some(PrimaryKeyDefinition {
-                            name: None,
+                            name_in_client: None,
+                            name_in_db: None,
                             fields: vec!["required".to_string()],
                         }),
                         documentation: None,
@@ -184,7 +185,8 @@ mod tests {
                         default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
                         is_unique: false,
                         primary_key: Some(PrimaryKeyDefinition {
-                            name: None,
+                            name_in_client: None,
+                            name_in_db: None,
                             fields: vec!["primary".to_string()],
                         }),
                         documentation: None,
@@ -220,7 +222,9 @@ mod tests {
                         default_value: None,
                         is_unique: false,
                         primary_key: Some(PrimaryKeyDefinition {
-                            name: None,
+                            name_in_client: None,
+
+                            name_in_db: None,
                             fields: vec!["primary".to_string()],
                         }),
                         documentation: None,
@@ -256,7 +260,8 @@ mod tests {
                         default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
                         is_unique: false,
                         primary_key: Some(PrimaryKeyDefinition {
-                            name: None,
+                            name_in_client: None,
+                            name_in_db: None,
                             fields: vec!["primary".to_string()],
                         }),
                         documentation: None,
@@ -457,7 +462,9 @@ mod tests {
                             default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
                             is_unique: false,
                             primary_key: Some(PrimaryKeyDefinition {
-                                name: None,
+                                name_in_client: None,
+
+                                name_in_db: None,
                                 fields: vec!["id".to_string()],
                             }),
                             documentation: None,
@@ -517,7 +524,9 @@ mod tests {
                             default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
                             is_unique: false,
                             primary_key: Some(PrimaryKeyDefinition {
-                                name: None,
+                                name_in_client: None,
+
+                                name_in_db: None,
                                 fields: vec!["id".to_string()],
                             }),
                             documentation: None,
@@ -717,7 +726,8 @@ mod tests {
                         default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
                         is_unique: false,
                         primary_key: Some(PrimaryKeyDefinition {
-                            name: None,
+                            name_in_client: None,
+                            name_in_db: None,
                             fields: vec!["id".to_string()],
                         }),
                         documentation: None,
@@ -753,7 +763,7 @@ mod tests {
                 ],
                 is_generated: false,
                 indices: vec![datamodel::dml::IndexDefinition {
-                    name: Some("name_last_name_unique".to_string()),
+                    name_in_db: Some("name_last_name_unique".to_string()),
                     fields: vec!["name".to_string(), "lastname".to_string()],
                     tpe: datamodel::dml::IndexType::Unique,
                 }],
@@ -852,7 +862,8 @@ mod tests {
                             default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
                             is_unique: false,
                             primary_key: Some(PrimaryKeyDefinition {
-                                name: None,
+                                name_in_client: None,
+                                name_in_db: None,
                                 fields: vec!["id".to_string()],
                             }),
                             documentation: None,
@@ -912,7 +923,8 @@ mod tests {
                             default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
                             is_unique: false,
                             primary_key: Some(PrimaryKeyDefinition {
-                                name: None,
+                                name_in_client: None,
+                                name_in_db: None,
                                 fields: vec!["id".to_string()],
                             }),
                             documentation: None,

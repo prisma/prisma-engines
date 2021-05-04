@@ -64,7 +64,7 @@ fn calculate_model_tables<'a>(
                 IndexType::Normal => sql::IndexType::Normal,
             };
 
-            let index_name = index_definition.name.clone().unwrap_or_else(|| {
+            let index_name = index_definition.name_in_db.clone().unwrap_or_else(|| {
                 format!(
                     "{table}.{fields}_{qualifier}",
                     table = &model.db_name(),

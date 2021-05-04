@@ -1,6 +1,7 @@
 use std::str::FromStr;
 
 use super::super::attributes::AllAttributes;
+use crate::common::ConstraintNames;
 use crate::diagnostics::{DatamodelError, Diagnostics};
 use crate::dml::ScalarType;
 use crate::transform::helpers::ValueValidator;
@@ -73,6 +74,21 @@ impl<'a> LiftAstToDml<'a> {
             errors.extend(err);
         }
 
+        // transfer primary keys from field level to model level and name them
+        if !model.has_compound_id() {
+            let model_name = model.name.clone();
+            {
+                let id_field = model.scalar_fields_mut().find(|f| f.is_id());
+                id_field.map(|f| {
+                    let field_name = f.name.clone();
+                    f.primary_key.as_mut().map(|mut pk| {
+                        pk.name_in_db = Some(ConstraintNames::primary_key_name(&model_name, vec![field_name]))
+                    });
+                });
+            }
+            let id_field = model.scalar_fields_mut().find(|f| f.is_id());
+            model.primary_key = id_field.and_then(|f| f.primary_key.clone());
+        }
         errors.errors_or(model)
     }
 
