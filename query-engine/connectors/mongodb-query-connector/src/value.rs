@@ -186,45 +186,6 @@ impl IntoBson for (&TypeIdentifier, PrismaValue) {
     }
 }
 
-trait UnwrapConversion<T: Display> {
-    fn convert(self, to_type_explanation: &str) -> crate::Result<T>;
-}
-
-impl<T> UnwrapConversion<T> for Option<T>
-where
-    T: Display,
-{
-    fn convert(self, to_type_explanation: &str) -> crate::Result<T> {
-        match self {
-            Some(i) => Ok(i),
-            None => Err(MongoError::ConversionError {
-                from: format_opt(self),
-                to: to_type_explanation.to_owned(),
-            }),
-        }
-    }
-}
-
-fn format_opt<T: Display>(opt: Option<T>) -> String {
-    match opt {
-        Some(t) => format!("{}", t),
-        None => "None".to_owned(),
-    }
-}
-
-/// Explanation constants for conversion errors.
-mod expl {
-    #![allow(dead_code)]
-
-    pub const MONGO_DOUBLE: &str = "MongoDB Double (64bit)";
-    pub const MONGO_I32: &str = "MongoDB Int (32 bit)";
-    pub const MONGO_I64: &str = "MongoDB Int (64 bit)";
-
-    pub const PRISMA_FLOAT: &str = "Prisma Float (BigDecimal)";
-    pub const PRISMA_BIGINT: &str = "Prisma BigInt (64 bit)";
-    pub const PRISMA_INT: &str = "Prisma Int (64 bit)";
-}
-
 // Parsing of values coming from MongoDB back to the connector / core.
 pub fn value_from_bson(bson: Bson, meta: &OutputMeta) -> crate::Result<PrismaValue> {
     let val = match (&meta.ident, bson) {
@@ -310,4 +271,43 @@ pub fn value_from_bson(bson: Bson, meta: &OutputMeta) -> crate::Result<PrismaVal
     };
 
     Ok(val)
+}
+
+trait UnwrapConversion<T: Display> {
+    fn convert(self, to_type_explanation: &str) -> crate::Result<T>;
+}
+
+impl<T> UnwrapConversion<T> for Option<T>
+where
+    T: Display,
+{
+    fn convert(self, to_type_explanation: &str) -> crate::Result<T> {
+        match self {
+            Some(i) => Ok(i),
+            None => Err(MongoError::ConversionError {
+                from: format_opt(self),
+                to: to_type_explanation.to_owned(),
+            }),
+        }
+    }
+}
+
+fn format_opt<T: Display>(opt: Option<T>) -> String {
+    match opt {
+        Some(t) => format!("{}", t),
+        None => "None".to_owned(),
+    }
+}
+
+/// Explanation constants for conversion errors.
+mod expl {
+    #![allow(dead_code)]
+
+    pub const MONGO_DOUBLE: &str = "MongoDB Double (64bit)";
+    pub const MONGO_I32: &str = "MongoDB Int (32 bit)";
+    pub const MONGO_I64: &str = "MongoDB Int (64 bit)";
+
+    pub const PRISMA_FLOAT: &str = "Prisma Float (BigDecimal)";
+    pub const PRISMA_BIGINT: &str = "Prisma BigInt (64 bit)";
+    pub const PRISMA_INT: &str = "Prisma Int (64 bit)";
 }
