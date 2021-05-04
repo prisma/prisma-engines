@@ -221,10 +221,10 @@ impl SqlFlavour for MysqlFlavour {
             return Err(SystemDatabase(db_name.to_owned()).into());
         }
 
-        let version = connection.version().await?;
+        let global_version = connection.version().await?;
         let mut circumstances = BitFlags::<Circumstances>::default();
 
-        if let Some(version) = version {
+        if let Some(version) = global_version {
             if version.starts_with("5.6") {
                 circumstances |= Circumstances::IsMysql56;
             }
@@ -269,6 +269,22 @@ impl SqlFlavour for MysqlFlavour {
     }
 
     async fn reset(&self, connection: &Connection) -> ConnectorResult<()> {
+        let is_vitess = connection
+            .query_raw("SELECT @@version", &[])
+            .await?
+            .into_iter()
+            .next()
+            .and_then(|r| r.into_iter().next())
+            .and_then(|val| val.into_string())
+            .map(|s| s.contains("vitess"))
+            .unwrap_or(false);
+
+        if is_vitess {
+            return Err(ConnectorError::from_msg(
+                "We do not drop databases on Vitess until it works better.".into(),
+            ));
+        }
+
         let db_name = connection.connection_info().dbname().unwrap();
 
         connection.raw_cmd(&format!("DROP DATABASE `{}`", db_name)).await?;
@@ -344,9 +360,9 @@ impl SqlFlavour for MysqlFlavour {
 #[derive(BitFlags, Debug, Clone, Copy, PartialEq)]
 #[repr(u8)]
 pub enum Circumstances {
-    LowerCasesTableNames = 0b0001,
-    IsMysql56 = 0b0010,
-    IsMariadb = 0b0100,
+    LowerCasesTableNames = 1 << 0,
+    IsMysql56 = 1 << 1,
+    IsMariadb = 1 << 2,
 }
 
 fn check_datamodel_for_mysql_5_6(datamodel: &Datamodel, errors: &mut Vec<String>) {
