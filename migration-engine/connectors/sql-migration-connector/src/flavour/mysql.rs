@@ -51,6 +51,12 @@ impl MysqlFlavour {
             .contains(Circumstances::IsMysql56)
     }
 
+    pub(crate) fn is_vitess(&self) -> bool {
+        BitFlags::<Circumstances>::from_bits(self.circumstances.load(Ordering::Relaxed))
+            .unwrap_or_default()
+            .contains(Circumstances::IsVitess)
+    }
+
     pub(crate) fn lower_cases_table_names(&self) -> bool {
         BitFlags::<Circumstances>::from_bits(self.circumstances.load(Ordering::Relaxed))
             .unwrap_or_default()
@@ -221,8 +227,22 @@ impl SqlFlavour for MysqlFlavour {
             return Err(SystemDatabase(db_name.to_owned()).into());
         }
 
+        let version = connection
+            .query_raw("SELECT @@version", &[])
+            .await?
+            .into_iter()
+            .next()
+            .and_then(|r| r.into_iter().next())
+            .and_then(|val| val.into_string());
+
         let global_version = connection.version().await?;
         let mut circumstances = BitFlags::<Circumstances>::default();
+
+        if let Some(version) = version {
+            if version.contains("vitess") {
+                circumstances |= Circumstances::IsVitess;
+            }
+        }
 
         if let Some(version) = global_version {
             if version.starts_with("5.6") {
@@ -269,17 +289,7 @@ impl SqlFlavour for MysqlFlavour {
     }
 
     async fn reset(&self, connection: &Connection) -> ConnectorResult<()> {
-        let is_vitess = connection
-            .query_raw("SELECT @@version", &[])
-            .await?
-            .into_iter()
-            .next()
-            .and_then(|r| r.into_iter().next())
-            .and_then(|val| val.into_string())
-            .map(|s| s.contains("vitess"))
-            .unwrap_or(false);
-
-        if is_vitess {
+        if self.is_vitess() {
             return Err(ConnectorError::from_msg(
                 "We do not drop databases on Vitess until it works better.".into(),
             ));
@@ -363,6 +373,7 @@ pub enum Circumstances {
     LowerCasesTableNames = 1 << 0,
     IsMysql56 = 1 << 1,
     IsMariadb = 1 << 2,
+    IsVitess = 1 << 3,
 }
 
 fn check_datamodel_for_mysql_5_6(datamodel: &Datamodel, errors: &mut Vec<String>) {
