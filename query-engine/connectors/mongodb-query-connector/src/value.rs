@@ -5,7 +5,8 @@ use itertools::Itertools;
 use mongodb::bson::{oid::ObjectId, spec::BinarySubtype, Binary, Bson, Timestamp};
 use native_types::MongoDbType;
 use prisma_models::{PrismaValue, ScalarFieldRef, TypeIdentifier};
-use std::fmt::Display;
+use serde_json::Value;
+use std::{convert::TryFrom, fmt::Display};
 
 /// Transforms a `PrismaValue` of a specific field into the BSON mapping as prescribed by the native types
 /// or as defined by the default `TypeIdentifier` to BSON mapping.
@@ -155,6 +156,15 @@ impl IntoBson for (&TypeIdentifier, PrismaValue) {
                 bytes,
             }),
 
+            // Json
+            (TypeIdentifier::Json, PrismaValue::Json(json)) => {
+                let val: Value = serde_json::from_str(&json)?;
+                Bson::try_from(val).map_err(|_| MongoError::ConversionError {
+                    from: "Stringified JSON".to_owned(),
+                    to: "Mongo BSON (extJSON)".to_owned(),
+                })?
+            }
+
             // List values
             (typ, PrismaValue::List(vals)) => Bson::Array(
                 vals.into_iter()
@@ -162,14 +172,10 @@ impl IntoBson for (&TypeIdentifier, PrismaValue) {
                     .collect::<crate::Result<Vec<_>>>()?,
             ),
 
-            // Unhandled
+            // Unhandled mappings
             (TypeIdentifier::Xml, _) => return Err(MongoError::Unsupported("Mongo doesn't support XML.".to_owned())),
             (TypeIdentifier::Unsupported, _) => unreachable!("Unsupported types should never hit the connector."),
 
-            // Todo
-            // Json
-
-            // Unhandled mappings
             (ident, val) => {
                 return Err(MongoError::Unsupported(format!(
                     "Unhandled and unsupported value mapping for MongoDB: {} as {:?}.",
