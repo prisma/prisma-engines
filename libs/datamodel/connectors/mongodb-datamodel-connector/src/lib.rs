@@ -22,6 +22,7 @@ impl MongoDbDatamodelConnector {
         let capabilities = vec![
             ConnectorCapability::RelationsOverNonUniqueCriteria,
             ConnectorCapability::Json,
+            ConnectorCapability::Enums,
             ConnectorCapability::MultipleIndexesWithSameName,
             ConnectorCapability::RelationFieldsInArbitraryOrder,
             ConnectorCapability::CreateMany,

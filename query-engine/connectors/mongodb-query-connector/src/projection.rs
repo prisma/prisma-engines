@@ -2,7 +2,7 @@ use crate::IntoBson;
 use mongodb::bson::{Bson, Document};
 use prisma_models::ModelProjection;
 
-// Used as projection document for Mongo queries.
+/// Used as projection document for Mongo queries.
 impl IntoBson for ModelProjection {
     fn into_bson(self) -> crate::Result<Bson> {
         let mut doc = Document::new();
