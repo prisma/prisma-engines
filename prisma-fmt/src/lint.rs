@@ -2,18 +2,14 @@ use crate::{LintOpts, MiniError};
 use datamodel::diagnostics::{DatamodelError, DatamodelWarning};
 use std::io::{self, Read};
 
-pub fn run(opts: LintOpts) {
+pub fn run(_opts: LintOpts) {
     let mut datamodel_string = String::new();
 
     io::stdin()
         .read_to_string(&mut datamodel_string)
         .expect("Unable to read from stdin.");
 
-    let datamodel_result = if opts.no_env_errors {
-        datamodel::parse_datamodel_and_ignore_datasource_urls(&datamodel_string)
-    } else {
-        datamodel::parse_datamodel(&datamodel_string)
-    };
+    let datamodel_result = datamodel::parse_datamodel(&datamodel_string);
 
     match datamodel_result {
         Err(err) => {

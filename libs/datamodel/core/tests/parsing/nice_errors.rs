@@ -183,7 +183,7 @@ fn nice_error_in_case_of_literal_type_in_env_var() {
     }
     "#;
 
-    let error = parse_error_and_ignore_datasource_urls(source);
+    let error = parse_error(source);
 
     error.assert_is(DatamodelError::new_type_mismatch_error(
         "String",
@@ -202,7 +202,7 @@ fn nice_error_in_case_of_bool_type_in_env_var() {
     }
     "#;
 
-    let error = parse_error_and_ignore_datasource_urls(source);
+    let error = parse_error(source);
 
     error.assert_is(DatamodelError::new_type_mismatch_error(
         "String",
@@ -221,7 +221,7 @@ fn nice_error_in_case_of_numeric_type_in_env_var() {
     }
     "#;
 
-    let error = parse_error_and_ignore_datasource_urls(source);
+    let error = parse_error(source);
 
     error.assert_is(DatamodelError::new_type_mismatch_error(
         "String",
@@ -240,7 +240,7 @@ fn nice_error_in_case_of_array_type_in_env_var() {
     }
     "#;
 
-    let error = parse_error_and_ignore_datasource_urls(source);
+    let error = parse_error(source);
 
     error.assert_is(DatamodelError::new_type_mismatch_error(
         "String",

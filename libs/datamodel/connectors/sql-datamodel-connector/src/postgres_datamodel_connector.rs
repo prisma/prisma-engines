@@ -311,6 +311,14 @@ impl Connector for PostgresDatamodelConnector {
             self.native_str_error(constructor_name).native_type_name_unknown()
         }
     }
+
+    fn validate_url(&self, url: &str) -> Result<(), String> {
+        if !url.starts_with("postgres://") && !url.starts_with("postgresql://") {
+            return Err("must start with the protocol `postgresql://` or `postgres://`.".to_owned());
+        }
+
+        Ok(())
+    }
 }
 
 impl Default for PostgresDatamodelConnector {

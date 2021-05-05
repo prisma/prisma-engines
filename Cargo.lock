@@ -1001,6 +1001,7 @@ dependencies = [
  "itertools 0.8.2",
  "serde_json",
  "thiserror",
+ "url 2.2.1",
 ]
 
 [[package]]

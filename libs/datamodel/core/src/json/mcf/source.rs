@@ -36,7 +36,7 @@ fn source_to_json_struct(source: &configuration::Datasource) -> SourceConfig {
         name: source.name.clone(),
         provider: vec![source.provider.clone()],
         active_provider: source.active_provider.to_string(),
-        url: source.url().clone(),
+        url: source.url.clone(),
         documentation: source.documentation.clone(),
     }
 }

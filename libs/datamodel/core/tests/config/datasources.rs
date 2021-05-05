@@ -36,10 +36,11 @@ fn serialize_builtin_sources_to_dmmf() {
     "activeProvider": "postgresql",
     "url": {
       "fromEnvVar": "pg2",
-      "value": "postgresql://localhost/postgres2"
+      "value": null
     }
   }
 ]"#;
+
     assert_rendered_mcf(schema2, expected_dmmf_2);
 
     let schema3 = r#"datasource sqlite1 {

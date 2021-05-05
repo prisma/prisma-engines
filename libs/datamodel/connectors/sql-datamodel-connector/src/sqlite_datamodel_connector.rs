@@ -3,6 +3,7 @@ use dml::model::Model;
 use dml::native_type_constructor::NativeTypeConstructor;
 use dml::native_type_instance::NativeTypeInstance;
 use dml::{field::Field, scalars::ScalarType};
+use std::borrow::Cow;
 
 pub struct SqliteDatamodelConnector {
     capabilities: Vec<ConnectorCapability>,
@@ -67,6 +68,32 @@ impl Connector for SqliteDatamodelConnector {
 
     fn introspect_native_type(&self, _native_type: serde_json::Value) -> Result<NativeTypeInstance, ConnectorError> {
         self.native_types_not_supported()
+    }
+
+    fn set_config_dir<'a>(&self, config_dir: &std::path::Path, url: &'a str) -> Cow<'a, str> {
+        let set_root = |path: &str| {
+            let path = std::path::Path::new(path);
+
+            if path.is_relative() {
+                Some(config_dir.join(&path).to_str().map(ToString::to_string).unwrap())
+            } else {
+                None
+            }
+        };
+
+        if let Some(path) = set_root(&url.trim_start_matches("file:")) {
+            return format!("file:{}", path).into();
+        };
+
+        url.into()
+    }
+
+    fn validate_url(&self, url: &str) -> Result<(), String> {
+        if !url.starts_with("file") && !url.starts_with("sqlite:") {
+            return Err("must start with the protocol `file:`.".to_string());
+        }
+
+        Ok(())
     }
 }
 

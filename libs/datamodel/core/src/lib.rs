@@ -91,7 +91,6 @@ pub use configuration::*;
 
 use crate::ast::SchemaAst;
 use crate::diagnostics::{ValidatedConfiguration, ValidatedDatamodel, ValidatedDatasources};
-use std::path::Path;
 use transform::{
     ast_to_dml::{DatasourceLoader, GeneratorLoader, ValidationPipeline},
     dml_to_ast::{DatasourceSerializer, GeneratorSerializer, LowerDmlToAst},
@@ -99,37 +98,27 @@ use transform::{
 
 /// Parses and validates a datamodel string, using core attributes only.
 pub fn parse_datamodel(datamodel_string: &str) -> Result<ValidatedDatamodel, diagnostics::Diagnostics> {
-    parse_datamodel_internal(datamodel_string, false, false)
+    parse_datamodel_internal(datamodel_string, false)
 }
 
-pub fn parse_datamodel_and_ignore_datasource_urls(
-    datamodel_string: &str,
-) -> Result<ValidatedDatamodel, diagnostics::Diagnostics> {
-    parse_datamodel_internal(datamodel_string, true, false)
-}
-
-pub fn parse_datamodel_and_ignore_datasource_urls_for_formatter(
-    datamodel_string: &str,
-) -> Result<ValidatedDatamodel, diagnostics::Diagnostics> {
-    parse_datamodel_internal(datamodel_string, true, true)
+pub fn parse_datamodel_for_formatter(datamodel_string: &str) -> Result<ValidatedDatamodel, diagnostics::Diagnostics> {
+    parse_datamodel_internal(datamodel_string, true)
 }
 
 /// Parses and validates a datamodel string, using core attributes only.
 /// In case of an error, a pretty, colorful string is returned.
 pub fn parse_datamodel_or_pretty_error(datamodel_string: &str, file_name: &str) -> Result<ValidatedDatamodel, String> {
-    parse_datamodel_internal(datamodel_string, false, false)
-        .map_err(|err| err.to_pretty_string(file_name, datamodel_string))
+    parse_datamodel_internal(datamodel_string, false).map_err(|err| err.to_pretty_string(file_name, datamodel_string))
 }
 
 fn parse_datamodel_internal(
     datamodel_string: &str,
-    ignore_datasource_urls: bool,
     transform: bool,
 ) -> Result<ValidatedDatamodel, diagnostics::Diagnostics> {
     let mut diagnostics = diagnostics::Diagnostics::new();
     let ast = ast::parse_schema(datamodel_string)?;
 
-    let sources = load_sources(&ast, ignore_datasource_urls, vec![])?;
+    let sources = load_sources(&ast, vec![])?;
     let generators = GeneratorLoader::load_generators_from_ast(&ast)?;
     let validator = ValidationPipeline::new(&sources.subject);
 
@@ -156,7 +145,7 @@ pub fn parse_schema_ast(datamodel_string: &str) -> Result<SchemaAst, diagnostics
 pub fn parse_configuration(datamodel_string: &str) -> Result<ValidatedConfiguration, diagnostics::Diagnostics> {
     let mut warnings = Vec::new();
     let ast = ast::parse_schema(datamodel_string)?;
-    let mut validated_sources = load_sources(&ast, false, vec![])?;
+    let mut validated_sources = load_sources(&ast, vec![])?;
     let mut validated_generators = GeneratorLoader::load_generators_from_ast(&ast)?;
 
     warnings.append(&mut validated_generators.warnings);
@@ -178,53 +167,7 @@ pub fn parse_configuration_with_url_overrides(
 ) -> Result<ValidatedConfiguration, diagnostics::Diagnostics> {
     let mut warnings = Vec::new();
     let ast = ast::parse_schema(schema)?;
-    let mut validated_sources = load_sources(&ast, false, datasource_url_overrides)?;
-    let mut validated_generators = GeneratorLoader::load_generators_from_ast(&ast)?;
-
-    warnings.append(&mut validated_generators.warnings);
-    warnings.append(&mut validated_sources.warnings);
-
-    Ok(ValidatedConfiguration {
-        subject: Configuration {
-            datasources: validated_sources.subject,
-            generators: validated_generators.subject,
-        },
-        warnings,
-    })
-}
-
-pub fn parse_configuration_with_config_dir(
-    schema: &str,
-    datasource_url_overrides: Vec<(String, String)>,
-    config_dir: &Path,
-) -> Result<ValidatedConfiguration, diagnostics::Diagnostics> {
-    let mut warnings = Vec::new();
-    let ast = ast::parse_schema(schema)?;
-    let mut validated_sources = load_sources(&ast, false, datasource_url_overrides)?;
-    let mut validated_generators = GeneratorLoader::load_generators_from_ast(&ast)?;
-
-    warnings.append(&mut validated_generators.warnings);
-    warnings.append(&mut validated_sources.warnings);
-
-    for source in validated_sources.subject.iter_mut() {
-        source.set_config_dir(config_dir);
-    }
-
-    Ok(ValidatedConfiguration {
-        subject: Configuration {
-            datasources: validated_sources.subject,
-            generators: validated_generators.subject,
-        },
-        warnings,
-    })
-}
-
-pub fn parse_configuration_and_ignore_datasource_urls(
-    datamodel_string: &str,
-) -> Result<ValidatedConfiguration, diagnostics::Diagnostics> {
-    let mut warnings = Vec::new();
-    let ast = ast::parse_schema(datamodel_string)?;
-    let mut validated_sources = load_sources(&ast, true, vec![])?;
+    let mut validated_sources = load_sources(&ast, datasource_url_overrides)?;
     let mut validated_generators = GeneratorLoader::load_generators_from_ast(&ast)?;
 
     warnings.append(&mut validated_generators.warnings);
@@ -241,11 +184,10 @@ pub fn parse_configuration_and_ignore_datasource_urls(
 
 fn load_sources(
     schema_ast: &SchemaAst,
-    ignore_datasource_urls: bool,
     datasource_url_overrides: Vec<(String, String)>,
 ) -> Result<ValidatedDatasources, diagnostics::Diagnostics> {
     let source_loader = DatasourceLoader::new();
-    source_loader.load_datasources_from_ast(&schema_ast, ignore_datasource_urls, datasource_url_overrides)
+    source_loader.load_datasources_from_ast(&schema_ast, datasource_url_overrides)
 }
 
 //

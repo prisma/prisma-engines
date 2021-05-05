@@ -17,8 +17,8 @@ pub struct Mssql {
 
 #[async_trait]
 impl FromSource for Mssql {
-    async fn from_source(source: &Datasource) -> connector_interface::Result<Self> {
-        let database_str = &source.url().value;
+    async fn from_source(_source: &Datasource, url: &str) -> connector_interface::Result<Self> {
+        let database_str = url;
 
         let connection_info = ConnectionInfo::from_url(database_str).map_err(|err| {
             ConnectorError::from_kind(ErrorKind::InvalidDatabaseUrl {

@@ -55,10 +55,12 @@ impl PrismaContext {
             .first()
             .ok_or_else(|| PrismaError::ConfigurationError("No valid data source found".into()))?;
 
+        let url = data_source.load_url()?;
+
         // Load executor
 
         let preview_features: Vec<_> = config.preview_features().cloned().collect();
-        let (db_name, executor) = exec_loader::load(&data_source, &preview_features).await?;
+        let (db_name, executor) = exec_loader::load(&data_source, &preview_features, &url).await?;
 
         // Build internal data model
         let internal_data_model = template.build(db_name);

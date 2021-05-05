@@ -28,7 +28,7 @@ use mongodb_migration_connector::MongoDbMigrationConnector;
 
 /// Top-level constructor for the migration engine API.
 pub async fn migration_api(datamodel: &str) -> CoreResult<Box<dyn api::GenericApi>> {
-    let config = parse_configuration(datamodel)?;
+    let (config, url, shadow_database_url) = parse_configuration(datamodel)?;
     let source = config
         .datasources
         .first()
@@ -37,9 +37,7 @@ pub async fn migration_api(datamodel: &str) -> CoreResult<Box<dyn api::GenericAp
     match &source.active_provider {
         #[cfg(feature = "sql")]
         provider if POSTGRES_SOURCE_NAME == provider => {
-            let database_str = &source.url().value;
-
-            let mut u = url::Url::parse(database_str).map_err(|err| {
+            let mut u = url::Url::parse(&url).map_err(|err| {
                 let details = user_facing_errors::quaint::invalid_url_description(&format!(
                     "Error parsing connection string: {}",
                     err
@@ -64,27 +62,19 @@ pub async fn migration_api(datamodel: &str) -> CoreResult<Box<dyn api::GenericAp
                 u.query_pairs_mut().append_pair("statement_cache_size", "0");
             }
 
-            let connector = SqlMigrationConnector::new(
-                u.as_str(),
-                source.shadow_database_url.as_ref().map(|url| url.value.clone()),
-            )
-            .await?;
+            let connector = SqlMigrationConnector::new(u.as_str(), shadow_database_url).await?;
 
             Ok(Box::new(connector))
         }
         #[cfg(feature = "sql")]
         provider if [MYSQL_SOURCE_NAME, SQLITE_SOURCE_NAME, MSSQL_SOURCE_NAME].contains(&provider.as_str()) => {
-            let connector = SqlMigrationConnector::new(
-                &source.url().value,
-                source.shadow_database_url.as_ref().map(|url| url.value.clone()),
-            )
-            .await?;
+            let connector = SqlMigrationConnector::new(&url, shadow_database_url).await?;
 
             Ok(Box::new(connector))
         }
         #[cfg(feature = "mongodb")]
         provider if provider.as_str() == MONGODB_SOURCE_NAME => {
-            let connector = MongoDbMigrationConnector::new(&source.url().value).await?;
+            let connector = MongoDbMigrationConnector::new(&url).await?;
             Ok(Box::new(connector))
         }
         x => unimplemented!("Connector {} is not supported yet", x),
@@ -93,7 +83,7 @@ pub async fn migration_api(datamodel: &str) -> CoreResult<Box<dyn api::GenericAp
 
 /// Create the database referenced by the passed in Prisma schema.
 pub async fn create_database(schema: &str) -> CoreResult<String> {
-    let config = parse_configuration(schema)?;
+    let (config, url, _shadow_database_url) = parse_configuration(schema)?;
 
     let source = config
         .datasources
@@ -110,7 +100,7 @@ pub async fn create_database(schema: &str) -> CoreResult<String> {
             ]
             .contains(&provider.as_str()) =>
         {
-            Ok(SqlMigrationConnector::create_database(&source.url().value).await?)
+            Ok(SqlMigrationConnector::create_database(&url).await?)
         }
         x => unimplemented!("Connector {} is not supported yet", x),
     }
@@ -118,7 +108,7 @@ pub async fn create_database(schema: &str) -> CoreResult<String> {
 
 /// Drop the database referenced by the passed in Prisma schema.
 pub async fn drop_database(schema: &str) -> CoreResult<()> {
-    let config = parse_configuration(schema)?;
+    let (config, url, _shadow_database_url) = parse_configuration(schema)?;
 
     let source = config
         .datasources
@@ -135,16 +125,26 @@ pub async fn drop_database(schema: &str) -> CoreResult<()> {
             ]
             .contains(&provider.as_str()) =>
         {
-            Ok(SqlMigrationConnector::drop_database(&source.url().value).await?)
+            Ok(SqlMigrationConnector::drop_database(&url).await?)
         }
         x => unimplemented!("Connector {} is not supported yet", x),
     }
 }
 
-fn parse_configuration(datamodel: &str) -> CoreResult<Configuration> {
-    datamodel::parse_configuration(&datamodel)
+fn parse_configuration(datamodel: &str) -> CoreResult<(Configuration, String, Option<String>)> {
+    let config = datamodel::parse_configuration(&datamodel)
         .map(|validated_config| validated_config.subject)
-        .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", datamodel)))
+        .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", datamodel)))?;
+
+    let url = config.datasources[0]
+        .load_url()
+        .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", datamodel)))?;
+
+    let shadow_database_url = config.datasources[0]
+        .load_shadow_database_url()
+        .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", datamodel)))?;
+
+    Ok((config, url, shadow_database_url))
 }
 
 fn parse_datamodel(datamodel: &str) -> CoreResult<Datamodel> {

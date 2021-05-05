@@ -1,8 +1,11 @@
 use super::env_function::EnvFunction;
-use crate::ast::{Expression, Span};
 use crate::diagnostics::DatamodelError;
 use crate::ValueGenerator;
 use crate::{ast, DefaultValue};
+use crate::{
+    ast::{Expression, Span},
+    StringFromEnvVar,
+};
 use bigdecimal::BigDecimal;
 use chrono::{DateTime, FixedOffset};
 use dml::scalars::ScalarType;
@@ -58,8 +61,8 @@ impl ValueValidator {
             ScalarType::Float => self.as_float().map(PrismaValue::Float),
             ScalarType::Boolean => self.as_bool().map(PrismaValue::Boolean),
             ScalarType::DateTime => self.as_date_time().map(PrismaValue::DateTime),
-            ScalarType::String => self.as_str().map(PrismaValue::String),
-            ScalarType::Json => self.as_str().map(PrismaValue::String),
+            ScalarType::String => self.as_str().map(String::from).map(PrismaValue::String),
+            ScalarType::Json => self.as_str().map(String::from).map(PrismaValue::String),
             ScalarType::Bytes => self.as_str().and_then(|s| {
                 prisma_value::decode_bytes(&s).map(PrismaValue::Bytes).map_err(|_| {
                     DatamodelError::new_validation_error(&format!("Invalid base64 string '{}'.", s), self.span())
@@ -83,20 +86,21 @@ impl ValueValidator {
     }
 
     /// Tries to convert the wrapped value to a Prisma String.
-    pub fn as_str(&self) -> Result<String, DatamodelError> {
-        self.as_str_from_env().map(|tuple| tuple.1)
+    pub fn as_str(&self) -> Result<&str, DatamodelError> {
+        match &self.value {
+            ast::Expression::StringValue(value, _) => Ok(value),
+            _ => Err(self.construct_type_mismatch_error("String")),
+        }
     }
 
     /// returns a (Some(a), b) if the string was deducted from an env var
-    pub fn as_str_from_env(&self) -> Result<(Option<String>, String), DatamodelError> {
+    pub fn as_str_from_env(&self) -> Result<StringFromEnvVar, DatamodelError> {
         match &self.value {
             ast::Expression::Function(name, _, _) if name == "env" => {
                 let env_function = self.as_env_function()?;
-                let var_name = Some(env_function.var_name().to_owned());
-                let value = env_function.evaluate().and_then(|x| x.as_str())?;
-                Ok((var_name, value))
+                Ok(StringFromEnvVar::new_from_env_var(env_function.var_name().to_owned()))
             }
-            ast::Expression::StringValue(value, _) => Ok((None, value.clone())),
+            ast::Expression::StringValue(value, _) => Ok(StringFromEnvVar::new_literal(value.clone())),
             _ => Err(self.construct_type_mismatch_error("String")),
         }
     }
@@ -249,7 +253,7 @@ impl ValueListValidator for Vec<ValueValidator> {
         let mut res: Vec<String> = Vec::new();
 
         for val in self {
-            res.push(val.as_str()?);
+            res.push(val.as_str()?.to_owned());
         }
 
         Ok(res)
