@@ -58,7 +58,7 @@ async fn procedures_can_be_described(api: &TestApi) {
     assert_eq!(Some("SELECT 1 INTO res"), procedure.definition.as_deref());
 }
 
-#[test_connector(tags(Mysql))]
+#[test_connector(tags(Mysql), exclude(Mysql8, Mysql56))]
 async fn all_mysql_column_types_must_work(api: &TestApi) {
     let mut migration = Migration::new().schema(api.db_name());
     migration.create_table("User", move |t| {
@@ -160,7 +160,7 @@ async fn all_mysql_column_types_must_work(api: &TestApi) {
         Column {
             name: "tinyint1_col".to_string(),
             tpe: ColumnType {
-                full_data_type: "tinyint(1)".to_string(),
+                full_data_type: "tinyint(1)".into(),
                 family: ColumnTypeFamily::Boolean,
                 arity: ColumnArity::Required,
                 native_type: Some(MySqlType::TinyInt.to_json()),
@@ -561,6 +561,548 @@ async fn all_mysql_column_types_must_work(api: &TestApi) {
         Column {
             name: "json_col".to_string(),
             tpe: ColumnType {
+                full_data_type: if api.is_mariadb() {
+                    "longtext".into()
+                } else {
+                    "json".to_string()
+                },
+                family: if api.is_mariadb() {
+                    ColumnTypeFamily::String
+                } else {
+                    ColumnTypeFamily::Json
+                },
+                arity: ColumnArity::Required,
+                native_type: if api.is_mariadb() {
+                    Some(MySqlType::LongText.to_json())
+                } else {
+                    Some(MySqlType::Json.to_json())
+                },
+            },
+            default: None,
+            auto_increment: false,
+        },
+    ];
+    expected_columns.sort_unstable_by_key(|c| c.name.to_owned());
+
+    assert_eq!(
+        table,
+        Table {
+            name: "User".to_string(),
+            columns: expected_columns,
+            indices: vec![],
+            primary_key: Some(PrimaryKey {
+                columns: vec!["primary_col".to_string()],
+                sequence: None,
+                constraint_name: None,
+            }),
+            foreign_keys: vec![],
+        }
+    );
+}
+
+#[test_connector(tags(Mysql8))]
+async fn all_mysql_8_column_types_must_work(api: &TestApi) {
+    let mut migration = Migration::new().schema(api.db_name());
+    migration.create_table("User", move |t| {
+        t.add_column("primary_col", types::primary());
+        t.add_column("int_col", types::custom("int"));
+        t.add_column("smallint_col", types::custom("smallint"));
+        t.add_column("tinyint4_col", types::custom("tinyint(4)"));
+        t.add_column("tinyint1_col", types::custom("tinyint(1)"));
+        t.add_column("mediumint_col", types::custom("mediumint"));
+        t.add_column("bigint_col", types::custom("bigint"));
+        t.add_column("decimal_col", types::custom("decimal"));
+        t.add_column("numeric_col", types::custom("numeric"));
+        t.add_column("float_col", types::custom("float"));
+        t.add_column("double_col", types::custom("double"));
+        t.add_column("date_col", types::custom("date"));
+        t.add_column("time_col", types::custom("time"));
+        t.add_column("datetime_col", types::custom("datetime"));
+        t.add_column("timestamp_col", types::custom("timestamp"));
+        t.add_column("year_col", types::custom("year"));
+        t.add_column("char_col", types::custom("char"));
+        t.add_column("varchar_col", types::custom("varchar(255)"));
+        t.add_column("text_col", types::custom("text"));
+        t.add_column("tinytext_col", types::custom("tinytext"));
+        t.add_column("mediumtext_col", types::custom("mediumtext"));
+        t.add_column("longtext_col", types::custom("longtext"));
+        t.add_column("enum_col", types::custom("enum('a', 'b')"));
+        t.add_column("set_col", types::custom("set('a', 'b')"));
+        t.add_column("binary_col", types::custom("binary"));
+        t.add_column("varbinary_col", types::custom("varbinary(255)"));
+        t.add_column("blob_col", types::custom("blob"));
+        t.add_column("tinyblob_col", types::custom("tinyblob"));
+        t.add_column("mediumblob_col", types::custom("mediumblob"));
+        t.add_column("longblob_col", types::custom("longblob"));
+        t.add_column("geometry_col", types::custom("geometry"));
+        t.add_column("point_col", types::custom("point"));
+        t.add_column("linestring_col", types::custom("linestring"));
+        t.add_column("polygon_col", types::custom("polygon"));
+        t.add_column("multipoint_col", types::custom("multipoint"));
+        t.add_column("multilinestring_col", types::custom("multilinestring"));
+        t.add_column("multipolygon_col", types::custom("multipolygon"));
+        t.add_column("geometrycollection_col", types::custom("geometrycollection"));
+        t.add_column("json_col", types::custom("json"));
+    });
+
+    let full_sql = migration.make::<barrel::backend::MySql>();
+    api.database().raw_cmd(&full_sql).await.unwrap();
+    let result = api.describe().await;
+    let mut table = result.get_table("User").expect("couldn't get User table").to_owned();
+    // Ensure columns are sorted as expected when comparing
+    table.columns.sort_unstable_by_key(|c| c.name.to_owned());
+    let mut expected_columns = vec![
+        Column {
+            name: "primary_col".to_string(),
+            tpe: ColumnType {
+                full_data_type: "int".to_string(),
+                family: ColumnTypeFamily::Int,
+                arity: ColumnArity::Required,
+                native_type: Some(MySqlType::Int.to_json()),
+            },
+
+            default: None,
+            auto_increment: true,
+        },
+        Column {
+            name: "int_col".to_string(),
+            tpe: ColumnType {
+                full_data_type: "int".to_string(),
+                family: ColumnTypeFamily::Int,
+                arity: ColumnArity::Required,
+                native_type: Some(MySqlType::Int.to_json()),
+            },
+
+            default: None,
+            auto_increment: false,
+        },
+        Column {
+            name: "smallint_col".to_string(),
+            tpe: ColumnType {
+                full_data_type: "smallint".to_string(),
+                family: ColumnTypeFamily::Int,
+                arity: ColumnArity::Required,
+                native_type: Some(MySqlType::SmallInt.to_json()),
+            },
+
+            default: None,
+            auto_increment: false,
+        },
+        Column {
+            name: "tinyint4_col".to_string(),
+            tpe: ColumnType {
+                full_data_type: "tinyint".to_string(),
+                family: ColumnTypeFamily::Int,
+                arity: ColumnArity::Required,
+                native_type: Some(MySqlType::TinyInt.to_json()),
+            },
+            default: None,
+            auto_increment: false,
+        },
+        Column {
+            name: "tinyint1_col".to_string(),
+            tpe: ColumnType {
+                full_data_type: "tinyint(1)".to_string(),
+                family: ColumnTypeFamily::Boolean,
+                arity: ColumnArity::Required,
+                native_type: Some(MySqlType::TinyInt.to_json()),
+            },
+
+            default: None,
+            auto_increment: false,
+        },
+        Column {
+            name: "mediumint_col".to_string(),
+            tpe: ColumnType {
+                full_data_type: "mediumint".to_string(),
+                family: ColumnTypeFamily::Int,
+                arity: ColumnArity::Required,
+                native_type: Some(MySqlType::MediumInt.to_json()),
+            },
+
+            default: None,
+            auto_increment: false,
+        },
+        Column {
+            name: "bigint_col".to_string(),
+            tpe: ColumnType {
+                full_data_type: "bigint".to_string(),
+                family: ColumnTypeFamily::BigInt,
+                arity: ColumnArity::Required,
+                native_type: Some(MySqlType::BigInt.to_json()),
+            },
+
+            default: None,
+            auto_increment: false,
+        },
+        Column {
+            name: "decimal_col".to_string(),
+            tpe: ColumnType {
+                full_data_type: "decimal(10,0)".to_string(),
+                family: ColumnTypeFamily::Decimal,
+                arity: ColumnArity::Required,
+                native_type: Some(MySqlType::Decimal(Some((10, 0))).to_json()),
+            },
+
+            default: None,
+            auto_increment: false,
+        },
+        Column {
+            name: "numeric_col".to_string(),
+            tpe: ColumnType {
+                full_data_type: "decimal(10,0)".to_string(),
+                family: ColumnTypeFamily::Decimal,
+                arity: ColumnArity::Required,
+                native_type: Some(MySqlType::Decimal(Some((10, 0))).to_json()),
+            },
+
+            default: None,
+            auto_increment: false,
+        },
+        Column {
+            name: "float_col".to_string(),
+            tpe: ColumnType {
+                full_data_type: "float".to_string(),
+                family: ColumnTypeFamily::Float,
+                arity: ColumnArity::Required,
+                native_type: Some(MySqlType::Float.to_json()),
+            },
+
+            default: None,
+            auto_increment: false,
+        },
+        Column {
+            name: "double_col".to_string(),
+            tpe: ColumnType {
+                full_data_type: "double".to_string(),
+                family: ColumnTypeFamily::Float,
+                arity: ColumnArity::Required,
+                native_type: Some(MySqlType::Double.to_json()),
+            },
+
+            default: None,
+            auto_increment: false,
+        },
+        Column {
+            name: "date_col".to_string(),
+            tpe: ColumnType {
+                full_data_type: "date".to_string(),
+                family: ColumnTypeFamily::DateTime,
+                arity: ColumnArity::Required,
+                native_type: Some(MySqlType::Date.to_json()),
+            },
+
+            default: None,
+            auto_increment: false,
+        },
+        Column {
+            name: "time_col".to_string(),
+            tpe: ColumnType {
+                full_data_type: "time".to_string(),
+                family: ColumnTypeFamily::DateTime,
+                arity: ColumnArity::Required,
+                native_type: Some(MySqlType::Time(Some(0)).to_json()),
+            },
+
+            default: None,
+            auto_increment: false,
+        },
+        Column {
+            name: "datetime_col".to_string(),
+            tpe: ColumnType {
+                full_data_type: "datetime".to_string(),
+                family: ColumnTypeFamily::DateTime,
+                arity: ColumnArity::Required,
+                native_type: Some(MySqlType::DateTime(Some(0)).to_json()),
+            },
+
+            default: None,
+            auto_increment: false,
+        },
+        Column {
+            name: "timestamp_col".to_string(),
+            tpe: ColumnType {
+                full_data_type: "timestamp".to_string(),
+                family: ColumnTypeFamily::DateTime,
+                arity: ColumnArity::Required,
+                native_type: Some(MySqlType::Timestamp(Some(0)).to_json()),
+            },
+
+            default: None,
+            auto_increment: false,
+        },
+        Column {
+            name: "year_col".to_string(),
+            tpe: ColumnType {
+                full_data_type: "year".to_string(),
+                family: ColumnTypeFamily::Int,
+                arity: ColumnArity::Required,
+                native_type: Some(MySqlType::Year.to_json()),
+            },
+
+            default: None,
+            auto_increment: false,
+        },
+        Column {
+            name: "char_col".to_string(),
+            tpe: ColumnType {
+                full_data_type: "char(1)".to_string(),
+                family: ColumnTypeFamily::String,
+                arity: ColumnArity::Required,
+                native_type: Some(MySqlType::Char(1).to_json()),
+            },
+
+            default: None,
+            auto_increment: false,
+        },
+        Column {
+            name: "varchar_col".to_string(),
+            tpe: ColumnType {
+                full_data_type: "varchar(255)".to_string(),
+                family: ColumnTypeFamily::String,
+                arity: ColumnArity::Required,
+                native_type: Some(MySqlType::VarChar(255).to_json()),
+            },
+
+            default: None,
+            auto_increment: false,
+        },
+        Column {
+            name: "text_col".to_string(),
+            tpe: ColumnType {
+                full_data_type: "text".to_string(),
+                family: ColumnTypeFamily::String,
+                arity: ColumnArity::Required,
+                native_type: Some(MySqlType::Text.to_json()),
+            },
+
+            default: None,
+            auto_increment: false,
+        },
+        Column {
+            name: "tinytext_col".to_string(),
+            tpe: ColumnType {
+                full_data_type: "tinytext".to_string(),
+                family: ColumnTypeFamily::String,
+                arity: ColumnArity::Required,
+                native_type: Some(MySqlType::TinyText.to_json()),
+            },
+
+            default: None,
+            auto_increment: false,
+        },
+        Column {
+            name: "mediumtext_col".to_string(),
+            tpe: ColumnType {
+                full_data_type: "mediumtext".to_string(),
+                family: ColumnTypeFamily::String,
+                arity: ColumnArity::Required,
+                native_type: Some(MySqlType::MediumText.to_json()),
+            },
+
+            default: None,
+            auto_increment: false,
+        },
+        Column {
+            name: "longtext_col".to_string(),
+            tpe: ColumnType {
+                full_data_type: "longtext".to_string(),
+                family: ColumnTypeFamily::String,
+                arity: ColumnArity::Required,
+                native_type: Some(MySqlType::LongText.to_json()),
+            },
+
+            default: None,
+            auto_increment: false,
+        },
+        Column {
+            name: "enum_col".to_string(),
+            tpe: ColumnType {
+                full_data_type: "enum(\'a\',\'b\')".to_string(),
+                family: ColumnTypeFamily::Enum("User_enum_col".into()),
+                arity: ColumnArity::Required,
+                native_type: None,
+            },
+
+            default: None,
+            auto_increment: false,
+        },
+        Column {
+            name: "set_col".to_string(),
+            tpe: ColumnType {
+                full_data_type: "set(\'a\',\'b\')".to_string(),
+                family: ColumnTypeFamily::String,
+                arity: ColumnArity::Required,
+                native_type: None,
+            },
+
+            default: None,
+            auto_increment: false,
+        },
+        Column {
+            name: "binary_col".to_string(),
+            tpe: ColumnType {
+                full_data_type: "binary(1)".to_string(),
+                family: ColumnTypeFamily::Binary,
+                arity: ColumnArity::Required,
+                native_type: Some(MySqlType::Binary(1).to_json()),
+            },
+
+            default: None,
+            auto_increment: false,
+        },
+        Column {
+            name: "varbinary_col".to_string(),
+            tpe: ColumnType {
+                full_data_type: "varbinary(255)".to_string(),
+                family: ColumnTypeFamily::Binary,
+                arity: ColumnArity::Required,
+                native_type: Some(MySqlType::VarBinary(255).to_json()),
+            },
+
+            default: None,
+            auto_increment: false,
+        },
+        Column {
+            name: "blob_col".to_string(),
+            tpe: ColumnType {
+                full_data_type: "blob".to_string(),
+                family: ColumnTypeFamily::Binary,
+                arity: ColumnArity::Required,
+                native_type: Some(MySqlType::Blob.to_json()),
+            },
+
+            default: None,
+            auto_increment: false,
+        },
+        Column {
+            name: "tinyblob_col".to_string(),
+            tpe: ColumnType {
+                full_data_type: "tinyblob".to_string(),
+                family: ColumnTypeFamily::Binary,
+                arity: ColumnArity::Required,
+                native_type: Some(MySqlType::TinyBlob.to_json()),
+            },
+
+            default: None,
+            auto_increment: false,
+        },
+        Column {
+            name: "mediumblob_col".to_string(),
+            tpe: ColumnType {
+                full_data_type: "mediumblob".to_string(),
+                family: ColumnTypeFamily::Binary,
+                arity: ColumnArity::Required,
+                native_type: Some(MySqlType::MediumBlob.to_json()),
+            },
+
+            default: None,
+            auto_increment: false,
+        },
+        Column {
+            name: "longblob_col".to_string(),
+            tpe: ColumnType {
+                full_data_type: "longblob".to_string(),
+                family: ColumnTypeFamily::Binary,
+                arity: ColumnArity::Required,
+                native_type: Some(MySqlType::LongBlob.to_json()),
+            },
+
+            default: None,
+            auto_increment: false,
+        },
+        Column {
+            name: "geometry_col".to_string(),
+            tpe: ColumnType {
+                full_data_type: "geometry".to_string(),
+                family: ColumnTypeFamily::Unsupported("geometry".into()),
+                arity: ColumnArity::Required,
+                native_type: None,
+            },
+
+            default: None,
+            auto_increment: false,
+        },
+        Column {
+            name: "point_col".to_string(),
+            tpe: ColumnType {
+                full_data_type: "point".to_string(),
+                family: ColumnTypeFamily::Unsupported("point".into()),
+                arity: ColumnArity::Required,
+                native_type: None,
+            },
+            default: None,
+            auto_increment: false,
+        },
+        Column {
+            name: "linestring_col".to_string(),
+            tpe: ColumnType {
+                full_data_type: "linestring".to_string(),
+                family: ColumnTypeFamily::Unsupported("linestring".into()),
+                arity: ColumnArity::Required,
+                native_type: None,
+            },
+            default: None,
+            auto_increment: false,
+        },
+        Column {
+            name: "polygon_col".to_string(),
+            tpe: ColumnType {
+                full_data_type: "polygon".to_string(),
+                family: ColumnTypeFamily::Unsupported("polygon".into()),
+                arity: ColumnArity::Required,
+                native_type: None,
+            },
+            default: None,
+            auto_increment: false,
+        },
+        Column {
+            name: "multipoint_col".to_string(),
+            tpe: ColumnType {
+                full_data_type: "multipoint".to_string(),
+                family: ColumnTypeFamily::Unsupported("multipoint".into()),
+                arity: ColumnArity::Required,
+                native_type: None,
+            },
+            default: None,
+            auto_increment: false,
+        },
+        Column {
+            name: "multilinestring_col".to_string(),
+            tpe: ColumnType {
+                full_data_type: "multilinestring".to_string(),
+                family: ColumnTypeFamily::Unsupported("multilinestring".into()),
+                arity: ColumnArity::Required,
+                native_type: None,
+            },
+            default: None,
+            auto_increment: false,
+        },
+        Column {
+            name: "multipolygon_col".to_string(),
+            tpe: ColumnType {
+                full_data_type: "multipolygon".to_string(),
+                family: ColumnTypeFamily::Unsupported("multipolygon".into()),
+                arity: ColumnArity::Required,
+                native_type: None,
+            },
+            default: None,
+            auto_increment: false,
+        },
+        Column {
+            name: "geometrycollection_col".to_string(),
+            tpe: ColumnType {
+                full_data_type: "geomcollection".to_string(),
+                family: ColumnTypeFamily::Unsupported("geomcollection".into()),
+                arity: ColumnArity::Required,
+                native_type: None,
+            },
+            default: None,
+            auto_increment: false,
+        },
+        Column {
+            name: "json_col".to_string(),
+            tpe: ColumnType {
                 full_data_type: "json".to_string(),
                 family: ColumnTypeFamily::Json,
                 arity: ColumnArity::Required,
@@ -605,134 +1147,33 @@ async fn mysql_foreign_key_on_delete_must_be_handled(api: &TestApi) {
     );
     api.database().raw_cmd(&sql).await.unwrap();
 
-    let schema = api.describe().await;
-    let mut table = schema.get_table("User").expect("get User table").to_owned();
-    table.foreign_keys.sort_unstable_by_key(|fk| fk.columns.clone());
-
-    assert_eq!(
-        table,
-        Table {
-            name: "User".to_string(),
-            columns: vec![
-                Column {
-                    name: "id".to_string(),
-                    tpe: ColumnType {
-                        full_data_type: "int(11)".to_string(),
-                        family: ColumnTypeFamily::Int,
-                        arity: ColumnArity::Required,
-                        native_type: Some(MySqlType::Int.to_json()),
-                    },
-                    default: None,
-                    auto_increment: true,
-                },
-                Column {
-                    name: "city".to_string(),
-                    tpe: ColumnType {
-                        full_data_type: "int(11)".to_string(),
-                        family: ColumnTypeFamily::Int,
-                        arity: ColumnArity::Nullable,
-                        native_type: Some(MySqlType::Int.to_json()),
-                    },
-                    default: None,
-                    auto_increment: false,
-                },
-                Column {
-                    name: "city_cascade".to_string(),
-                    tpe: ColumnType {
-                        full_data_type: "int(11)".to_string(),
-                        family: ColumnTypeFamily::Int,
-                        arity: ColumnArity::Nullable,
-                        native_type: Some(MySqlType::Int.to_json()),
-                    },
-                    default: None,
-                    auto_increment: false,
-                },
-                Column {
-                    name: "city_restrict".to_string(),
-                    tpe: ColumnType {
-                        full_data_type: "int(11)".to_string(),
-                        family: ColumnTypeFamily::Int,
-                        arity: ColumnArity::Nullable,
-                        native_type: Some(MySqlType::Int.to_json()),
-                    },
-                    default: None,
-                    auto_increment: false,
-                },
-                Column {
-                    name: "city_set_null".to_string(),
-                    tpe: ColumnType {
-                        full_data_type: "int(11)".to_string(),
-                        family: ColumnTypeFamily::Int,
-                        arity: ColumnArity::Nullable,
-                        native_type: Some(MySqlType::Int.to_json()),
-                    },
-                    default: None,
-                    auto_increment: false,
-                },
-            ],
-            indices: vec![
-                Index {
-                    name: "city".to_owned(),
-                    columns: vec!["city".to_owned(),],
-                    tpe: IndexType::Normal,
-                },
-                Index {
-                    name: "city_cascade".to_owned(),
-                    columns: vec!["city_cascade".to_owned(),],
-                    tpe: IndexType::Normal,
-                },
-                Index {
-                    name: "city_restrict".to_owned(),
-                    columns: vec!["city_restrict".to_owned(),],
-                    tpe: IndexType::Normal,
-                },
-                Index {
-                    name: "city_set_null".to_owned(),
-                    columns: vec!["city_set_null".to_owned(),],
-                    tpe: IndexType::Normal,
-                }
-            ],
-            primary_key: Some(PrimaryKey {
-                columns: vec!["id".to_string()],
-                sequence: None,
-                constraint_name: None,
-            }),
-            foreign_keys: vec![
-                ForeignKey {
-                    constraint_name: Some("User_ibfk_1".to_owned()),
-                    columns: vec!["city".to_string()],
-                    referenced_columns: vec!["id".to_string()],
-                    referenced_table: "City".to_string(),
-                    on_delete_action: ForeignKeyAction::NoAction,
-                    on_update_action: ForeignKeyAction::NoAction,
-                },
-                ForeignKey {
-                    constraint_name: Some("User_ibfk_2".to_owned()),
-                    columns: vec!["city_cascade".to_string()],
-                    referenced_columns: vec!["id".to_string()],
-                    referenced_table: "City".to_string(),
-                    on_delete_action: ForeignKeyAction::Cascade,
-                    on_update_action: ForeignKeyAction::NoAction,
-                },
-                ForeignKey {
-                    constraint_name: Some("User_ibfk_3".to_owned()),
-                    columns: vec!["city_restrict".to_string()],
-                    referenced_columns: vec!["id".to_string()],
-                    referenced_table: "City".to_string(),
-                    on_delete_action: ForeignKeyAction::Restrict,
-                    on_update_action: ForeignKeyAction::NoAction,
-                },
-                ForeignKey {
-                    constraint_name: Some("User_ibfk_4".to_owned()),
-                    columns: vec!["city_set_null".to_string()],
-                    referenced_columns: vec!["id".to_string()],
-                    referenced_table: "City".to_string(),
-                    on_delete_action: ForeignKeyAction::SetNull,
-                    on_update_action: ForeignKeyAction::NoAction,
-                },
-            ],
-        }
-    );
+    api.describe().await.assert_table("User", |t| {
+        t.assert_column("id", |id| id.assert_type_is_int())
+            .assert_column("city", |c| c.assert_type_is_int())
+            .assert_column("city_cascade", |c| c.assert_type_is_int())
+            .assert_column("city_restrict", |c| c.assert_type_is_int())
+            .assert_column("city_set_null", |c| c.assert_type_is_int())
+            .assert_index_on_columns(&["city"], |idx| idx.assert_is_not_unique())
+            .assert_index_on_columns(&["city_cascade"], |idx| idx.assert_is_not_unique())
+            .assert_index_on_columns(&["city_restrict"], |idx| idx.assert_is_not_unique())
+            .assert_index_on_columns(&["city_set_null"], |idx| idx.assert_is_not_unique())
+            .assert_foreign_key_on_columns(&["city"], |fk| {
+                fk.assert_references("City", &["id"])
+                    .assert_on_delete(ForeignKeyAction::NoAction)
+            })
+            .assert_foreign_key_on_columns(&["city_cascade"], |fk| {
+                fk.assert_references("City", &["id"])
+                    .assert_on_delete(ForeignKeyAction::Cascade)
+            })
+            .assert_foreign_key_on_columns(&["city_restrict"], |fk| {
+                fk.assert_references("City", &["id"])
+                    .assert_on_delete(ForeignKeyAction::Restrict)
+            })
+            .assert_foreign_key_on_columns(&["city_set_null"], |fk| {
+                fk.assert_references("City", &["id"])
+                    .assert_on_delete(ForeignKeyAction::SetNull)
+            })
+    });
 }
 
 #[test_connector(tags(Mysql))]
@@ -783,23 +1224,20 @@ async fn mysql_join_table_unique_indexes_must_be_inferred(api: &TestApi) {
 
     let full_sql = migration.make::<barrel::backend::MySql>();
     api.database().raw_cmd(&full_sql).await.unwrap();
-    let result = api.describe().await;
-    let table = result.get_table("CatToHuman").expect("couldn't get CatToHuman table");
 
-    assert_eq!(
-        table.indices,
-        &[Index {
-            name: "cat_and_human_index".into(),
-            columns: vec!["cat".to_owned(), "human".to_owned()],
-            tpe: IndexType::Unique,
-        }]
-    );
+    api.describe().await.assert_table("CatToHuman", |t| {
+        t.assert_index_on_columns(&["cat", "human"], |idx| {
+            idx.assert_name("cat_and_human_index").assert_is_unique()
+        })
+    });
 }
 
 // When multiple databases exist on a mysql instance, and they share names for foreign key
 // constraints, introspecting one database should not yield constraints from the other.
 #[test_connector(tags(Mysql))]
 async fn constraints_from_other_databases_should_not_be_introspected(api: &TestApi) {
+    api.database().raw_cmd("DROP DATABASE `other_schema`").await.ok();
+    api.database().raw_cmd("CREATE DATABASE `other_schema`").await.unwrap();
     let mut other_migration = Migration::new().schema("other_schema");
 
     other_migration.create_table("User", |t| {

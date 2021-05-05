@@ -18,6 +18,10 @@ pub(crate) fn get_postgres_tags(database_url: &str) -> Result<BitFlags<Tags>, St
                     tags |= Tags::Postgres12;
                 }
 
+                if version.contains("CockroachDB") {
+                    tags |= Tags::Cockroach;
+                }
+
                 eprintln!("Inferred tags: {:?}", tags);
 
                 Ok(tags)
@@ -65,5 +69,5 @@ pub async fn create_postgres_database(db_name: &str) -> Result<(Quaint, String),
 
     conn.raw_cmd("CREATE SCHEMA \"prisma-tests\"").await?;
 
-    Ok((conn, dbg!(url_str)))
+    Ok((conn, url_str))
 }

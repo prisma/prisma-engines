@@ -1,5 +1,8 @@
 # Prisma Engines
 
+[![Query Engine](https://github.com/prisma/prisma-engines/actions/workflows/query-engine.yml/badge.svg)](https://github.com/prisma/prisma-engines/actions/workflows/query-engine.yml)
+[![Introspection Engine + Migration Engine + sql_schema_describer](https://github.com/prisma/prisma-engines/actions/workflows/migration-engine.yml/badge.svg)](https://github.com/prisma/prisma-engines/actions/workflows/migration-engine.yml)
+
 This repository contains a collection of engines that power the core stack for
 [Prisma](https://github.com/prisma/prisma), most prominently [Prisma
 Client](https://www.prisma.io/client) and [Prisma

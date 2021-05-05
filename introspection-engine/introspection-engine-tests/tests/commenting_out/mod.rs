@@ -314,7 +314,7 @@ async fn remapping_field_names_to_empty(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres))]
-async fn db_generated_values_should_add_comments(api: &TestApi) -> TestResult {
+async fn dbgenerated_in_unsupported(api: &TestApi) -> TestResult {
     api.barrel()
         .execute_with_schema(
             |migration| {
