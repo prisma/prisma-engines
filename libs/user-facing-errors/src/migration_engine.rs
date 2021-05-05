@@ -72,7 +72,12 @@ impl crate::UserFacingError for MigrationDoesNotApplyCleanly {
             crate::ErrorType::Unknown(_) => String::new(),
         };
 
-        format!("Migration `{migration_name}` failed to apply cleanly to the shadow database. \n{error_code}Error:\n{inner_error}", migration_name = self.migration_name, inner_error = self.inner_error.message(), error_code = error_code)
+        format!(
+            "Migration `{migration_name}` failed to apply cleanly to the shadow database. \n{error_code}Error:\n{inner_error}",
+            migration_name = self.migration_name,
+            inner_error = self.inner_error.message(),
+            error_code = error_code
+        )
     }
 }
 
@@ -88,8 +93,8 @@ impl crate::UserFacingError for PreviewFeaturesBlocked {
         let blocked: Vec<_> = self.features.iter().map(|s| format!("`{}`", s)).collect();
 
         format!(
-            "Some of the requested preview features are not yet allowed in migration engine. Please remove them from your data model before using migrations. (blocked: {})",
-            blocked.join(", "),
+            "Some of the requested preview features are not yet allowed in migration engine. Please remove them from your data model before using migrations. (blocked: {list_of_blocked_features})",
+            list_of_blocked_features = blocked.join(", "),
         )
     }
 }
@@ -222,14 +227,7 @@ pub struct MigrationToMarkAppliedNotFound {
 #[derive(Debug, Serialize, UserFacingError)]
 #[user_facing(
     code = "P3018",
-    message = "A migration failed to apply. New migrations can not be applied before the error is recovered from. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve
-
-Migration name: {migration_name}
-
-Database error code: {database_error_code}
-
-Database error:
-{database_error}
+    message = "A migration failed to apply. New migrations can not be applied before the error is recovered from. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve\n\nMigration name: {migration_name}\n\nDatabase error code: {database_error_code}\n\nDatabase error:\n{database_error}
 "
 )]
 pub struct ApplyMigrationError {
