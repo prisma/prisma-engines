@@ -5,7 +5,7 @@
 //! It also contains multiple subfolders, named after the migration id, and each containing:
 //! - A migration script
 
-use crate::{ConnectorError, ConnectorResult, FormatChecksum};
+use crate::{ConnectorError, ConnectorResult, FormatChecksum, CHECKSUM_STR_LEN};
 use sha2::{Digest, Sha256, Sha512};
 use std::{
     error::Error,
@@ -221,7 +221,19 @@ impl MigrationDirectory {
         hasher.update(&filesystem_script);
         let filesystem_script_checksum: [u8; 32] = hasher.finalize().into();
 
-        Ok(checksum_str == filesystem_script_checksum.format_checksum())
+        // Due to an omission in a previous version of the migration engine,
+        // some migrations tables will have old migrations with checksum strings
+        // that have not been zero-padded.
+        //
+        // Corresponding issue:
+        // https://github.com/prisma/prisma-engines/issues/1887
+        let filesystem_script_checksum_str = if !checksum_str.is_empty() && checksum_str.len() != CHECKSUM_STR_LEN {
+            filesystem_script_checksum.format_checksum_old()
+        } else {
+            filesystem_script_checksum.format_checksum()
+        };
+
+        Ok(checksum_str == filesystem_script_checksum_str)
     }
 
     /// Write the migration script to the directory.

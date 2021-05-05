@@ -93,11 +93,17 @@ fn checksum(script: &str) -> String {
     checksum.format_checksum()
 }
 
+/// The length (in bytes, or equivalently ascii characters) of the checksum
+/// strings.
+const CHECKSUM_STR_LEN: usize = 64;
+
 /// Format a checksum to a hexadecimal string. This is used to checksum
 /// migration scripts with Sha256.
 pub trait FormatChecksum {
     /// Format a checksum to a hexadecimal string.
     fn format_checksum(&self) -> String;
+    /// Obsolete checksum method, should only be used for compatibility.
+    fn format_checksum_old(&self) -> String;
 }
 
 impl FormatChecksum for [u8; 32] {
@@ -107,9 +113,43 @@ impl FormatChecksum for [u8; 32] {
         let mut checksum_string = String::with_capacity(32 * 2);
 
         for byte in self {
+            write!(checksum_string, "{:02x}", byte).unwrap();
+        }
+
+        assert_eq!(checksum_string.len(), CHECKSUM_STR_LEN);
+
+        checksum_string
+    }
+
+    // Due to an omission in a previous version of the migration engine,
+    // some migrations tables will have old migrations with checksum strings
+    // that have not been zero-padded.
+    //
+    // Corresponding issue:
+    // https://github.com/prisma/prisma-engines/issues/1887
+    fn format_checksum_old(&self) -> String {
+        use std::fmt::Write as _;
+
+        let mut checksum_string = String::with_capacity(32 * 2);
+
+        for byte in self {
             write!(checksum_string, "{:x}", byte).unwrap();
         }
 
         checksum_string
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn format_checksum_does_not_strip_zeros() {
+        assert_eq!(
+            checksum("hello"),
+            "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824"
+        );
+        assert_eq!(checksum("abcd").len(), CHECKSUM_STR_LEN);
     }
 }
