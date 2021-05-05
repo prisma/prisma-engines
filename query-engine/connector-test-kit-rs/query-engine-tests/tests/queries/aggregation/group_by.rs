@@ -3,7 +3,7 @@ use query_engine_tests::*;
 #[test_suite(schema(schemas::numeric_text_optional_one2m))]
 mod aggregation_group_by {
 
-    #[connector_test]
+    #[connector_test(exclude(MongoDb))]
     async fn group_by_no_records(runner: &Runner) -> TestResult<()> {
         insta::assert_snapshot!(
             run_query!(
@@ -21,6 +21,7 @@ mod aggregation_group_by {
 
         Ok(())
     }
+
     #[connector_test]
     async fn group_by_some_records(runner: &Runner) -> TestResult<()> {
         create_row(
@@ -54,6 +55,7 @@ mod aggregation_group_by {
 
         Ok(())
     }
+
     #[connector_test]
     async fn group_by_rev_ordering(runner: &Runner) -> TestResult<()> {
         create_row(
@@ -87,6 +89,7 @@ mod aggregation_group_by {
 
         Ok(())
     }
+
     #[connector_test]
     async fn group_by_multiple_ordering(runner: &Runner) -> TestResult<()> {
         create_row(
@@ -132,6 +135,7 @@ mod aggregation_group_by {
 
         Ok(())
     }
+
     #[connector_test]
     async fn group_by_take_skip(runner: &Runner) -> TestResult<()> {
         create_row(
@@ -208,6 +212,7 @@ mod aggregation_group_by {
 
         Ok(())
     }
+
     #[connector_test]
     async fn group_by_scalar_filters(runner: &Runner) -> TestResult<()> {
         // What this test checks: Scalar filters apply before the grouping is done,
@@ -263,7 +268,7 @@ mod aggregation_group_by {
         Ok(())
     }
 
-    #[connector_test]
+    #[connector_test(exclude(MongoDb))]
     async fn group_by_relation_filters(runner: &Runner) -> TestResult<()> {
         create_row(
             runner,
@@ -333,7 +338,8 @@ mod aggregation_group_by {
 
         Ok(())
     }
-    #[connector_test]
+
+    #[connector_test(exclude(MongoDb))]
     async fn group_by_ordering_count_aggregation(runner: &Runner) -> TestResult<()> {
         create_row(
             runner,
@@ -388,6 +394,7 @@ mod aggregation_group_by {
 
         Ok(())
     }
+
     #[connector_test]
     async fn group_by_ordering_sum_aggregation(runner: &Runner) -> TestResult<()> {
         create_row(
@@ -443,6 +450,7 @@ mod aggregation_group_by {
 
         Ok(())
     }
+
     #[connector_test]
     async fn group_by_ordering_avg_aggregation(runner: &Runner) -> TestResult<()> {
         create_row(
@@ -498,6 +506,7 @@ mod aggregation_group_by {
 
         Ok(())
     }
+
     #[connector_test]
     async fn group_by_ordering_min_aggregation(runner: &Runner) -> TestResult<()> {
         create_row(
@@ -553,6 +562,7 @@ mod aggregation_group_by {
 
         Ok(())
     }
+
     #[connector_test]
     async fn group_by_ordering_max_aggregation(runner: &Runner) -> TestResult<()> {
         create_row(
@@ -608,7 +618,8 @@ mod aggregation_group_by {
 
         Ok(())
     }
-    #[connector_test]
+
+    #[connector_test(exclude(MongoDb))]
     async fn group_by_ordering_aggr_multiple_fields(runner: &Runner) -> TestResult<()> {
         create_row(
             runner,
@@ -652,7 +663,8 @@ mod aggregation_group_by {
 
         Ok(())
     }
-    #[connector_test]
+
+    #[connector_test(exclude(MongoDb))]
     async fn group_by_ordering_aggr_and_having(runner: &Runner) -> TestResult<()> {
         create_row(
             runner,

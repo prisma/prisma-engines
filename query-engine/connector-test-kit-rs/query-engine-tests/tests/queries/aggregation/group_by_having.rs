@@ -13,7 +13,7 @@ mod aggregation_group_by_having {
     // The assumption is that we don't need to test all normal scalar filters as they share the exact same code path
     // and are extracted and applied exactly as the already tested ones. This also extends to AND/OR/NOT combinators.
     // Consequently, subsequent tests in this file will deal exclusively with the newly added aggregation filters.
-    #[connector_test]
+    #[connector_test(exclude(MongoDb))]
     async fn basic_having_scalar_filter(runner: &Runner) -> TestResult<()> {
         create_row(
             runner,
@@ -210,7 +210,7 @@ mod aggregation_group_by_having {
         Ok(())
     }
 
-    #[connector_test]
+    #[connector_test(exclude(MongoDb))]
     async fn having_sum_scalar_filter(runner: &Runner) -> TestResult<()> {
         create_row(
             runner,
@@ -289,7 +289,7 @@ mod aggregation_group_by_having {
         Ok(())
     }
 
-    #[connector_test]
+    #[connector_test(exclude(MongoDb))]
     async fn having_min_scalar_filter(runner: &Runner) -> TestResult<()> {
         create_row(
             runner,
@@ -368,7 +368,7 @@ mod aggregation_group_by_having {
         Ok(())
     }
 
-    #[connector_test]
+    #[connector_test(exclude(MongoDb))]
     async fn having_max_scalar_filter(runner: &Runner) -> TestResult<()> {
         create_row(
             runner,
