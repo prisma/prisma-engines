@@ -65,6 +65,7 @@ fn calculate_model_tables<'a>(
             };
 
             let index_name = index_definition.name_in_db.clone().unwrap_or_else(|| {
+                //todo change for new name convention
                 format!(
                     "{table}.{fields}_{qualifier}",
                     table = &model.db_name(),

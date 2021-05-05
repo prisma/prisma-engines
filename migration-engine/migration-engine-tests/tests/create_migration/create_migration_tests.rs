@@ -520,6 +520,7 @@ async fn index_tests(api: &TestApi) -> TestResult {
         
           @@unique([a, b], name: "compound")
           @@unique([a, b])
+          @@unique([a, b])
           @@index([a])
         }
         
@@ -531,6 +532,13 @@ async fn index_tests(api: &TestApi) -> TestResult {
           
           @@index([a,b])
           @@id([a, b])
+        }
+        
+          model CIsVeryVeryVeryVeryVeryVeryVeryVeryVeryLong {
+          aIsAlsoWayWayWayTooLong    String
+          bIsAlsoWayWayWayTooLong    String
+          
+          @@unique([aIsAlsoWayWayWayTooLong, bIsAlsoWayWayWayTooLong])
         }
     "#;
 
