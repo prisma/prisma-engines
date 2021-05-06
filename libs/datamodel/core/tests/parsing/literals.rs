@@ -22,9 +22,9 @@ fn strings_with_quotes_are_unescaped() {
         name.default_value
             .as_ref()
             .unwrap()
-            .get()
+            .as_single()
             .unwrap()
-            .into_string()
+            .as_string()
             .unwrap(),
         "a \" b\"c d"
     );
@@ -48,9 +48,9 @@ fn strings_with_newlines_are_unescpaed() {
         name.default_value
             .as_ref()
             .unwrap()
-            .get()
+            .as_single()
             .unwrap()
-            .into_string()
+            .as_string()
             .unwrap(),
         "Jean\nClaude\nVan\nDamme"
     );

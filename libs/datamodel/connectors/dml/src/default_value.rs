@@ -1,8 +1,6 @@
 use crate::scalars::ScalarType;
-use chrono::Utc;
 use prisma_value::PrismaValue;
 use std::fmt;
-use uuid::Uuid;
 
 /// Represents a default specified on a field.
 #[derive(Clone, PartialEq)]
@@ -170,11 +168,12 @@ impl ValueGeneratorFn {
         }
     }
 
+    // Render a dummy value of the matching type.
     fn invoke(&self) -> Option<PrismaValue> {
         match self {
-            Self::Uuid => Some(Self::generate_uuid()),
-            Self::Cuid => Some(Self::generate_cuid()),
-            Self::Now => Some(Self::generate_now()),
+            Self::Uuid => Some(PrismaValue::String("00000000-0000-0000-0000-000000000000".to_owned())),
+            Self::Cuid => Some(PrismaValue::String("00000000-0000-0000-0000-000000000000".to_owned())),
+            Self::Now => Some(PrismaValue::new_datetime("1970-01-01T08:00:00Z")),
             Self::Autoincrement => None,
             Self::DbGenerated => None,
         }
@@ -191,18 +190,6 @@ impl ValueGeneratorFn {
             (Self::DbGenerated, _) => true,
             _ => false,
         }
-    }
-
-    fn generate_cuid() -> PrismaValue {
-        PrismaValue::String(cuid::cuid().unwrap())
-    }
-
-    fn generate_uuid() -> PrismaValue {
-        PrismaValue::Uuid(Uuid::new_v4())
-    }
-
-    fn generate_now() -> PrismaValue {
-        PrismaValue::DateTime(Utc::now().into())
     }
 }
 

@@ -143,21 +143,7 @@ pub fn parse_schema_ast(datamodel_string: &str) -> Result<SchemaAst, diagnostics
 
 /// Loads all configuration blocks from a datamodel using the built-in source definitions.
 pub fn parse_configuration(datamodel_string: &str) -> Result<ValidatedConfiguration, diagnostics::Diagnostics> {
-    let mut warnings = Vec::new();
-    let ast = ast::parse_schema(datamodel_string)?;
-    let mut validated_sources = load_sources(&ast, vec![])?;
-    let mut validated_generators = GeneratorLoader::load_generators_from_ast(&ast)?;
-
-    warnings.append(&mut validated_generators.warnings);
-    warnings.append(&mut validated_sources.warnings);
-
-    Ok(ValidatedConfiguration {
-        subject: Configuration {
-            datasources: validated_sources.subject,
-            generators: validated_generators.subject,
-        },
-        warnings,
-    })
+    parse_configuration_with_url_overrides(datamodel_string, Vec::new())
 }
 
 /// - `datasource_url_overrides`: the tuples consist of datasource name and url
