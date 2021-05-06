@@ -63,7 +63,7 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             target
-          key: me-ie-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          key: me-ie-${{ runner.os }}-${{ matrix.database.name }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - run: cargo test -p introspection-engine-tests
         if: ${{ !matrix.database.is_vitess }}

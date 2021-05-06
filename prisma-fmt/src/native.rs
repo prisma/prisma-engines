@@ -7,7 +7,7 @@ pub fn run() {
         .read_to_string(&mut datamodel_string)
         .expect("Unable to read from stdin.");
 
-    let datamodel_result = datamodel::parse_configuration_and_ignore_datasource_urls(&datamodel_string);
+    let datamodel_result = datamodel::parse_configuration(&datamodel_string);
 
     match datamodel_result {
         Ok(validated_configuration) => {

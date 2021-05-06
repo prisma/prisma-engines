@@ -210,7 +210,7 @@ async fn bad_datasource_url_and_provider_combinations_must_return_a_proper_error
     let err_message: String = json_error["message"].as_str().unwrap().into();
 
     assert!(
-        err_message.contains("The URL for datasource `db` must start with the protocol `file:`"),
+        err_message.contains("the URL must start with the protocol `file:`"),
         "{}",
         err_message
     );

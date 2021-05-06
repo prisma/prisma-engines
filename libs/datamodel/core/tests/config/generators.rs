@@ -228,11 +228,11 @@ fn retain_env_var_definitions_in_generator_block() {
     "name": "js1",
     "provider": {
       "fromEnvVar": "PROVIDER",
-      "value": "postgres"
+      "value": null
     },
     "output": {
       "fromEnvVar": "OUTPUT",
-      "value": "~/home/prisma/"
+      "value": null
     },
     "binaryTargets": [],
     "previewFeatures": [],

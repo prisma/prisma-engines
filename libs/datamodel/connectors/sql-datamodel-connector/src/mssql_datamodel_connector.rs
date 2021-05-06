@@ -8,6 +8,7 @@ use dml::native_type_instance::NativeTypeInstance;
 use dml::scalars::ScalarType;
 use native_types::{MsSqlType, MsSqlTypeParameter};
 use once_cell::sync::Lazy;
+use std::borrow::Cow;
 use MsSqlType::*;
 use MsSqlTypeParameter::*;
 
@@ -200,6 +201,10 @@ impl Connector for MsSqlDatamodelConnector {
             .any(|(st, nt)| scalar_type == st && &native_type == nt)
     }
 
+    fn set_config_dir<'a>(&self, _config_dir: &std::path::Path, url: &'a str) -> Cow<'a, str> {
+        Cow::Borrowed(url)
+    }
+
     fn validate_field(&self, field: &Field) -> Result<(), ConnectorError> {
         match field.field_type() {
             FieldType::NativeType(_, native_type) => {
@@ -365,6 +370,14 @@ impl Connector for MsSqlDatamodelConnector {
         } else {
             self.native_str_error(constructor_name).native_type_name_unknown()
         }
+    }
+
+    fn validate_url(&self, url: &str) -> Result<(), String> {
+        if !url.starts_with("sqlserver") {
+            return Err("must start with the protocol `sqlserver://`.".to_string());
+        }
+
+        Ok(())
     }
 }
 
