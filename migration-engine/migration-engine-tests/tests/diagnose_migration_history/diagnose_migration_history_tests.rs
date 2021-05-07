@@ -1031,3 +1031,38 @@ async fn empty_migration_directories_should_cause_known_errors(api: &TestApi) ->
 
     Ok(())
 }
+
+#[test_connector]
+async fn indexes_on_same_columns_with_different_names_should_work(api: &TestApi) -> TestResult {
+    let directory = api.create_migrations_directory()?;
+
+    let dm = r#"
+        model a {
+            users_id Int
+            roles_id Int
+
+            @@id([users_id, roles_id])
+            @@unique([users_id, roles_id], name: "unique_constraint")
+            @@index([users_id, roles_id], name: "users_has_roles.users_id_roles_id_index")
+            @@index([users_id, roles_id], name: "users_id_with_roles_id_index")
+        }
+    "#;
+
+    api.create_migration("initial", dm, &directory).send().await?;
+
+    api.apply_migrations(&directory)
+        .send()
+        .await?
+        .assert_applied_migrations(&["initial"])?;
+
+    let output = api
+        .diagnose_migration_history(&directory)
+        .opt_in_to_shadow_database(true)
+        .send()
+        .await?
+        .into_output();
+
+    assert!(output.drift.is_none());
+
+    Ok(())
+}
