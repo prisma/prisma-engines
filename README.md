@@ -1,5 +1,8 @@
 # Prisma Engines
 
+[![Query Engine](https://github.com/prisma/prisma-engines/actions/workflows/query-engine.yml/badge.svg)](https://github.com/prisma/prisma-engines/actions/workflows/query-engine.yml)
+[![Introspection Engine + Migration Engine + sql_schema_describer](https://github.com/prisma/prisma-engines/actions/workflows/migration-engine.yml/badge.svg)](https://github.com/prisma/prisma-engines/actions/workflows/migration-engine.yml)
+
 This repository contains a collection of engines that power the core stack for
 [Prisma](https://github.com/prisma/prisma), most prominently [Prisma
 Client](https://www.prisma.io/client) and [Prisma
@@ -179,8 +182,6 @@ If you want to use the command line, start `sbt` in
 **Prerequisites:**
 - Installed Rust toolchain.
 - Installed Docker and Docker-Compose.
-- Installed `direnv`, then `direnv allow` on the repository root.
-    - Alternatively: Load the defined environment in `./.envrc` manually in your shell.
 - Start all test databases with `make all-dbs`.
 
 **Run:**

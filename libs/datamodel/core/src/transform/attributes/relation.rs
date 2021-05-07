@@ -21,7 +21,7 @@ impl AttributeValidator<dml::Field> for RelationAttributeValidator {
                         .new_attribute_validation_error("A relation cannot have an empty name.", name_arg.span());
                 }
 
-                rf.relation_info.name = name;
+                rf.relation_info.name = name.to_owned();
             }
 
             if let Ok(related_fields) = args.arg("references") {

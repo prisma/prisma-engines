@@ -66,10 +66,10 @@ fn relative_sqlite_paths_can_be_modified() {
         }"#
     );
 
-    let config =
-        datamodel::parse_configuration_with_config_dir(schema, Vec::new(), &Path::new("/path/to/prisma")).unwrap();
+    let config = datamodel::parse_configuration(schema).unwrap();
+    let url = config.subject.datasources[0].load_url_with_config_dir(Path::new("/path/to/prisma"));
 
-    assert_eq!("file:/path/to/prisma/dev.db", &config.subject.datasources[0].url.value)
+    assert_eq!("file:/path/to/prisma/dev.db", url.unwrap())
 }
 
 #[test]
@@ -82,10 +82,10 @@ fn absolute_sqlite_paths_are_not_modified() {
         }"#
     );
 
-    let config =
-        datamodel::parse_configuration_with_config_dir(schema, Vec::new(), &Path::new("/path/to/prisma")).unwrap();
+    let config = datamodel::parse_configuration(schema).unwrap();
+    let url = config.subject.datasources[0].load_url_with_config_dir(Path::new("/path/to/prisma"));
 
-    assert_eq!("file:/foo/bar/dev.db", &config.subject.datasources[0].url.value)
+    assert_eq!("file:/foo/bar/dev.db", url.unwrap())
 }
 
 #[test]
@@ -98,12 +98,12 @@ fn postgres_relative_sslidentity_can_be_modified() {
         }"#
     );
 
-    let config =
-        datamodel::parse_configuration_with_config_dir(schema, Vec::new(), &Path::new("/path/to/prisma")).unwrap();
+    let config = datamodel::parse_configuration(schema).unwrap();
+    let url = config.subject.datasources[0].load_url_with_config_dir(Path::new("/path/to/prisma"));
 
     assert_eq!(
         "postgres://localhost:420/?foo=bar&sslidentity=%2Fpath%2Fto%2Fprisma%2Fwe%2Fare%2Fhere.key",
-        &config.subject.datasources[0].url.value
+        url.unwrap()
     )
 }
 
@@ -117,12 +117,14 @@ fn postgres_absolute_sslidentity_should_not_be_modified() {
         }"#
     );
 
-    let config =
-        datamodel::parse_configuration_with_config_dir(schema, Vec::new(), &Path::new("/path/to/prisma")).unwrap();
+    let config = datamodel::parse_configuration(schema).unwrap();
+    let url = config.subject.datasources[0]
+        .load_url_with_config_dir(Path::new("/path/to/prisma"))
+        .unwrap();
 
     assert_eq!(
         "postgres://localhost:420/?foo=bar&sslidentity=%2Fwe%2Fare%2Fhere.key",
-        &config.subject.datasources[0].url.value
+        url
     )
 }
 
@@ -136,12 +138,14 @@ fn mysql_relative_sslidentity_can_be_modified() {
         }"#
     );
 
-    let config =
-        datamodel::parse_configuration_with_config_dir(schema, Vec::new(), &Path::new("/path/to/prisma")).unwrap();
+    let config = datamodel::parse_configuration(schema).unwrap();
+    let url = config.subject.datasources[0]
+        .load_url_with_config_dir(Path::new("/path/to/prisma"))
+        .unwrap();
 
     assert_eq!(
         "mysql://localhost:420/?foo=bar&sslidentity=%2Fpath%2Fto%2Fprisma%2Fwe%2Fare%2Fhere.key",
-        &config.subject.datasources[0].url.value
+        url
     )
 }
 
@@ -155,13 +159,12 @@ fn mysql_absolute_sslidentity_should_not_be_modified() {
         }"#
     );
 
-    let config =
-        datamodel::parse_configuration_with_config_dir(schema, Vec::new(), &Path::new("/path/to/prisma")).unwrap();
+    let config = datamodel::parse_configuration(schema).unwrap();
+    let url = config.subject.datasources[0]
+        .load_url_with_config_dir(Path::new("/path/to/prisma"))
+        .unwrap();
 
-    assert_eq!(
-        "mysql://localhost:420/?foo=bar&sslidentity=%2Fwe%2Fare%2Fhere.key",
-        &config.subject.datasources[0].url.value
-    )
+    assert_eq!("mysql://localhost:420/?foo=bar&sslidentity=%2Fwe%2Fare%2Fhere.key", url)
 }
 
 #[test]
@@ -174,12 +177,14 @@ fn postgres_relative_sslcert_can_be_modified() {
         }"#
     );
 
-    let config =
-        datamodel::parse_configuration_with_config_dir(schema, Vec::new(), &Path::new("/path/to/prisma")).unwrap();
+    let config = datamodel::parse_configuration(schema).unwrap();
+    let url = config.subject.datasources[0]
+        .load_url_with_config_dir(Path::new("/path/to/prisma"))
+        .unwrap();
 
     assert_eq!(
         "postgres://localhost:420/?foo=bar&sslcert=%2Fpath%2Fto%2Fprisma%2Fwe%2Fare%2Fhere.crt",
-        &config.subject.datasources[0].url.value
+        url
     )
 }
 
@@ -193,13 +198,12 @@ fn postgres_absolute_sslcert_should_not_be_modified() {
         }"#
     );
 
-    let config =
-        datamodel::parse_configuration_with_config_dir(schema, Vec::new(), &Path::new("/path/to/prisma")).unwrap();
+    let config = datamodel::parse_configuration(schema).unwrap();
+    let url = config.subject.datasources[0]
+        .load_url_with_config_dir(Path::new("/path/to/prisma"))
+        .unwrap();
 
-    assert_eq!(
-        "postgres://localhost:420/?foo=bar&sslcert=%2Fwe%2Fare%2Fhere.crt",
-        &config.subject.datasources[0].url.value
-    )
+    assert_eq!("postgres://localhost:420/?foo=bar&sslcert=%2Fwe%2Fare%2Fhere.crt", url)
 }
 
 #[test]
@@ -212,12 +216,14 @@ fn mysql_relative_sslcert_can_be_modified() {
         }"#
     );
 
-    let config =
-        datamodel::parse_configuration_with_config_dir(schema, Vec::new(), &Path::new("/path/to/prisma")).unwrap();
+    let config = datamodel::parse_configuration(schema).unwrap();
+    let url = config.subject.datasources[0]
+        .load_url_with_config_dir(Path::new("/path/to/prisma"))
+        .unwrap();
 
     assert_eq!(
         "mysql://localhost:420/?foo=bar&sslcert=%2Fpath%2Fto%2Fprisma%2Fwe%2Fare%2Fhere.crt",
-        &config.subject.datasources[0].url.value
+        url
     )
 }
 
@@ -231,11 +237,10 @@ fn mysql_absolute_sslcert_should_not_be_modified() {
         }"#
     );
 
-    let config =
-        datamodel::parse_configuration_with_config_dir(schema, Vec::new(), &Path::new("/path/to/prisma")).unwrap();
+    let config = datamodel::parse_configuration(schema).unwrap();
+    let url = config.subject.datasources[0]
+        .load_url_with_config_dir(Path::new("/path/to/prisma"))
+        .unwrap();
 
-    assert_eq!(
-        "mysql://localhost:420/?foo=bar&sslcert=%2Fwe%2Fare%2Fhere.crt",
-        &config.subject.datasources[0].url.value
-    )
+    assert_eq!("mysql://localhost:420/?foo=bar&sslcert=%2Fwe%2Fare%2Fhere.crt", url)
 }

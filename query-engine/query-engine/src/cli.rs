@@ -56,7 +56,7 @@ impl CliCommand {
                     };
 
                     Ok(Some(CliCommand::Dmmf(DmmfRequest {
-                        datamodel: opts.datamodel(true)?,
+                        datamodel: opts.datamodel()?,
                         build_mode,
                         enable_raw_queries: opts.enable_raw_queries,
                         config: opts.configuration(true)?.subject,
@@ -69,7 +69,7 @@ impl CliCommand {
                     query: input.query.clone(),
                     enable_raw_queries: opts.enable_raw_queries,
                     legacy: input.legacy,
-                    datamodel: opts.datamodel(true)?,
+                    datamodel: opts.datamodel()?,
                     config: opts.configuration(false)?.subject,
                 }))),
             },

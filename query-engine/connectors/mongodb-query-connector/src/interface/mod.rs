@@ -24,12 +24,12 @@ pub struct MongoDb {
 }
 
 impl MongoDb {
-    pub async fn new(source: &Datasource) -> connector_interface::Result<Self> {
-        let database_str = &source.url().value;
+    pub async fn new(_source: &Datasource, url: &str) -> connector_interface::Result<Self> {
+        let database_str = url;
         let url = Url::parse(database_str).map_err(|_err| {
             ConnectorError::from_kind(ErrorKind::InvalidDatabaseUrl {
                 details: "Unable to parse URL.".to_owned(),
-                url: source.url().value.clone(),
+                url: url.to_owned(),
             })
         })?;
 
@@ -37,7 +37,7 @@ impl MongoDb {
         let client_options = ClientOptions::parse(database_str).await.map_err(|_err| {
             ConnectorError::from_kind(ErrorKind::InvalidDatabaseUrl {
                 details: "Invalid MongoDB connection string".to_owned(),
-                url: source.url().value.clone(),
+                url: database_str.to_owned(),
             })
         })?;
 

@@ -183,6 +183,50 @@ fn should_fail_on_incompatible_scalar_type_with_tiny_int() {
     ));
 }
 
+#[test]
+fn should_fail_on_bad_type_params() {
+    let dml = r#"
+        datasource db {
+          provider = "sqlserver"
+          url = "sqlserver://"
+        }
+
+        model Blog {
+            id     Int    @id
+            s      String @db.NVarChar(Ma)
+        }
+    "#;
+
+    let error = parse_error(dml);
+
+    error.assert_is(DatamodelError::new_connector_error(
+        "Invalid argument for type NVarChar: Ma. Allowed values: a number or `Max`.",
+        ast::Span::new(178, 193),
+    ));
+}
+
+#[test]
+fn should_fail_on_too_many_type_params() {
+    let dml = r#"
+        datasource db {
+          provider = "sqlserver"
+          url = "sqlserver://"
+        }
+
+        model Blog {
+            id     Int    @id
+            s      String @db.NVarChar(1, 2)
+        }
+    "#;
+
+    let error = parse_error(dml);
+
+    error.assert_is(DatamodelError::new_connector_error(
+        "Native type NVarChar takes 1 optional arguments, but received 2.",
+        ast::Span::new(178, 195),
+    ));
+}
+
 macro_rules! test_type {
     ($name:ident($(($input:expr, $output:expr)),+ $(,)?)) => {
         paste::item! {

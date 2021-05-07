@@ -8,6 +8,7 @@ use dml::native_type_instance::NativeTypeInstance;
 use dml::scalars::ScalarType;
 use native_types::{MsSqlType, MsSqlTypeParameter};
 use once_cell::sync::Lazy;
+use std::borrow::Cow;
 use MsSqlType::*;
 use MsSqlTypeParameter::*;
 
@@ -89,6 +90,24 @@ impl MsSqlDatamodelConnector {
         MsSqlDatamodelConnector {
             capabilities,
             constructors,
+        }
+    }
+
+    fn parse_mssql_type_parameter(
+        &self,
+        r#type: &str,
+        args: &[String],
+    ) -> Result<Option<MsSqlTypeParameter>, ConnectorError> {
+        static MAX_REGEX: Lazy<regex::Regex> = Lazy::new(|| regex::Regex::new(r"^(?i)max$").unwrap());
+        static NUM_REGEX: Lazy<regex::Regex> = Lazy::new(|| regex::Regex::new(r"^\d+$").unwrap());
+
+        match args {
+            [] => Ok(None),
+            [s] if MAX_REGEX.is_match(&s) => Ok(Some(MsSqlTypeParameter::Max)),
+            [s] if NUM_REGEX.is_match(&s) => Ok(s.trim().parse().map(MsSqlTypeParameter::Number).ok()),
+            s => Err(self
+                .native_str_error(r#type)
+                .native_type_invalid_param("a number or `Max`", &s.join(","))),
         }
     }
 }
@@ -180,6 +199,10 @@ impl Connector for MsSqlDatamodelConnector {
         SCALAR_TYPE_DEFAULTS
             .iter()
             .any(|(st, nt)| scalar_type == st && &native_type == nt)
+    }
+
+    fn set_config_dir<'a>(&self, _config_dir: &std::path::Path, url: &'a str) -> Cow<'a, str> {
+        Cow::Borrowed(url)
     }
 
     fn validate_field(&self, field: &Field) -> Result<(), ConnectorError> {
@@ -289,12 +312,12 @@ impl Connector for MsSqlDatamodelConnector {
             SMALL_DATETIME_TYPE_NAME => SmallDateTime,
             CHAR_TYPE_NAME => Char(parse_one_opt_u32(args, CHAR_TYPE_NAME)?),
             NCHAR_TYPE_NAME => NChar(parse_one_opt_u32(args, NCHAR_TYPE_NAME)?),
-            VARCHAR_TYPE_NAME => VarChar(parse_mssql_type_parameter(args)),
+            VARCHAR_TYPE_NAME => VarChar(self.parse_mssql_type_parameter(name, &args)?),
             TEXT_TYPE_NAME => Text,
-            NVARCHAR_TYPE_NAME => NVarChar(parse_mssql_type_parameter(args)),
+            NVARCHAR_TYPE_NAME => NVarChar(self.parse_mssql_type_parameter(name, &args)?),
             NTEXT_TYPE_NAME => NText,
             BINARY_TYPE_NAME => Binary(parse_one_opt_u32(args, BINARY_TYPE_NAME)?),
-            VAR_BINARY_TYPE_NAME => VarBinary(parse_mssql_type_parameter(args)),
+            VAR_BINARY_TYPE_NAME => VarBinary(self.parse_mssql_type_parameter(name, &args)?),
             IMAGE_TYPE_NAME => Image,
             XML_TYPE_NAME => Xml,
             UNIQUE_IDENTIFIER_TYPE_NAME => UniqueIdentifier,
@@ -348,6 +371,14 @@ impl Connector for MsSqlDatamodelConnector {
             self.native_str_error(constructor_name).native_type_name_unknown()
         }
     }
+
+    fn validate_url(&self, url: &str) -> Result<(), String> {
+        if !url.starts_with("sqlserver") {
+            return Err("must start with the protocol `sqlserver://`.".to_string());
+        }
+
+        Ok(())
+    }
 }
 
 impl Default for MsSqlDatamodelConnector {
@@ -372,25 +403,6 @@ static HEAP_ALLOCATED: Lazy<Vec<MsSqlType>> = Lazy::new(|| {
 /// certain properties such as not allowed in keys or normal indices.
 pub fn heap_allocated_types() -> &'static [MsSqlType] {
     &*HEAP_ALLOCATED
-}
-
-fn parse_mssql_type_parameter(args: Vec<String>) -> Option<MsSqlTypeParameter> {
-    if args.len() > 1 {
-        unreachable!()
-    };
-
-    args.first().map(|arg| {
-        let is_max = arg
-            .split(',')
-            .map(|s| s.trim())
-            .any(|s| matches!(s, "max" | "MAX" | "Max" | "MaX" | "maX" | "mAx"));
-
-        if is_max {
-            MsSqlTypeParameter::Max
-        } else {
-            arg.parse().map(MsSqlTypeParameter::Number).unwrap()
-        }
-    })
 }
 
 fn arg_vec_for_type_param(type_param: Option<MsSqlTypeParameter>) -> Vec<String> {

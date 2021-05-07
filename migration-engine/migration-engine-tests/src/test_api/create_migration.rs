@@ -12,6 +12,7 @@ pub struct CreateMigration<'a> {
     migrations_directory: &'a TempDir,
     draft: bool,
     name: &'a str,
+    rt: Option<&'a tokio::runtime::Runtime>,
 }
 
 impl<'a> CreateMigration<'a> {
@@ -22,7 +23,20 @@ impl<'a> CreateMigration<'a> {
             migrations_directory,
             draft: false,
             name,
+            rt: None,
         }
+    }
+
+    pub fn new_sync(
+        api: &'a dyn GenericApi,
+        name: &'a str,
+        schema: &'a str,
+        migrations_directory: &'a TempDir,
+        rt: &'a tokio::runtime::Runtime,
+    ) -> Self {
+        let mut initial = Self::new(api, name, schema, migrations_directory);
+        initial.rt = Some(rt);
+        initial
     }
 
     pub fn draft(mut self, draft: bool) -> Self {
@@ -47,6 +61,10 @@ impl<'a> CreateMigration<'a> {
             _api: self.api,
             migrations_directory: self.migrations_directory,
         })
+    }
+
+    pub fn send_sync(self) -> CoreResult<CreateMigrationAssertion<'a>> {
+        self.rt.unwrap().block_on(self.send())
     }
 }
 

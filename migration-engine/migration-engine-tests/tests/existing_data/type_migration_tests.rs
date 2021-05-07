@@ -1,7 +1,7 @@
 use crate::*;
 use quaint::Value;
 
-#[test_each_connector]
+#[test_connector]
 async fn altering_the_type_of_a_column_in_a_non_empty_table_warns(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model User {
@@ -49,7 +49,7 @@ async fn altering_the_type_of_a_column_in_a_non_empty_table_warns(api: &TestApi)
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn migrating_a_required_column_from_int_to_string_should_cast(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Test {
@@ -92,7 +92,7 @@ async fn migrating_a_required_column_from_int_to_string_should_cast(api: &TestAp
     Ok(())
 }
 
-#[test_each_connector(capabilities("scalar_lists"))]
+#[test_connector(capabilities(ScalarLists))]
 async fn changing_a_string_array_column_to_scalar_is_fine(api: &TestApi) -> TestResult {
     let datasource_block = api.datasource();
 
@@ -151,7 +151,7 @@ async fn changing_a_string_array_column_to_scalar_is_fine(api: &TestApi) -> Test
     Ok(())
 }
 
-#[test_each_connector(capabilities("scalar_lists"), log = "debug")]
+#[test_connector(capabilities(ScalarLists))]
 async fn changing_an_int_array_column_to_scalar_is_not_possible(api: &TestApi) -> TestResult {
     let datasource_block = api.datasource();
 
@@ -211,7 +211,7 @@ async fn changing_an_int_array_column_to_scalar_is_not_possible(api: &TestApi) -
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn int_to_string_conversions_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Cat {
@@ -244,7 +244,7 @@ async fn int_to_string_conversions_work(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn string_to_int_conversions_are_risky(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Cat {
@@ -343,7 +343,7 @@ async fn string_to_int_conversions_are_risky(api: &TestApi) -> TestResult {
 
 // of course, 2018-01-18T08:01:02Z gets cast to 20180118080102.0 on MySQL
 // of course, 2018-01-18T08:01:02Z gets cast to 1516262462000.0 (UNIX timestamp) on SQLite
-#[test_each_connector(ignore("mysql", "sqlite"))]
+#[test_connector(exclude(Mysql, Sqlite))]
 async fn datetime_to_float_conversions_are_impossible(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Cat {

@@ -1,10 +1,11 @@
 pub mod test_api;
 
 use barrel::Migration;
-use enumflags2::BitFlags;
 use eyre::Result;
 use quaint::{prelude::Queryable, single::Quaint};
-use test_setup::connectors::Tags;
+use test_setup::{BitFlags, Tags};
+
+pub type TestResult = eyre::Result<()>;
 
 #[macro_export]
 macro_rules! assert_eq_schema {

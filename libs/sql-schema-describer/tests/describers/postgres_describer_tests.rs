@@ -1,45 +1,32 @@
-mod common;
-mod postgres;
-mod test_api;
+mod cockroach_describer_tests;
 
-use crate::{common::*, postgres::*};
+use crate::test_api::*;
 use barrel::{types, Migration};
 use native_types::{NativeType, PostgresType};
 use pretty_assertions::assert_eq;
-use quaint::prelude::Queryable;
 use sql_schema_describer::*;
-use test_api::*;
-use test_macros::test_each_connector;
 
-#[tokio::test]
-async fn views_can_be_described() {
-    let db_name = "views_can_be_described";
+#[test_connector(tags(Postgres), exclude(Cockroach))]
+async fn views_can_be_described(api: &TestApi) {
+    let full_sql = r#"
+        CREATE TABLE a (a_id int);
+        CREATE TABLE b (b_id int);
+        CREATE VIEW ab AS SELECT a_id FROM a UNION ALL SELECT b_id FROM b;
+    "#;
 
-    let full_sql = format!(
-        r#"
-        CREATE TABLE "{0}".a (a_id int);
-        CREATE TABLE "{0}".b (b_id int);
-        CREATE VIEW "{0}".ab AS SELECT a_id FROM "{0}".a UNION ALL SELECT b_id FROM "{0}".b;
-        "#,
-        SCHEMA,
-    );
-
-    let inspector = get_postgres_describer(&full_sql, db_name).await;
-    let result = inspector.describe(SCHEMA).await.expect("describing");
+    api.database().raw_cmd(&full_sql).await.unwrap();
+    let result = api.describe().await;
     let view = result.get_view("ab").expect("couldn't get ab view").to_owned();
 
-    let expected_sql = format!(
-        " SELECT a.a_id\n   FROM \"{0}\".a\nUNION ALL\n SELECT b.b_id AS a_id\n   FROM \"{0}\".b;",
-        SCHEMA
-    );
+    let expected_sql = " SELECT a.a_id\n   FROM a\nUNION ALL\n SELECT b.b_id AS a_id\n   FROM b;";
 
     assert_eq!("ab", &view.name);
     assert_eq!(expected_sql, view.definition.unwrap());
 }
 
-#[tokio::test]
-async fn all_postgres_column_types_must_work() {
-    let mut migration = Migration::new().schema(SCHEMA);
+#[test_connector(tags(Postgres), exclude(Cockroach))]
+async fn all_postgres_column_types_must_work(api: &TestApi) {
+    let mut migration = Migration::new().schema(api.schema_name());
     migration.create_table("User", move |t| {
         t.add_column("array_bin_col", types::array(&types::binary()));
         t.add_column("array_bool_col", types::array(&types::boolean()));
@@ -88,8 +75,8 @@ async fn all_postgres_column_types_must_work() {
     });
 
     let full_sql = migration.make::<barrel::backend::Pg>();
-    let inspector = get_postgres_describer(&full_sql, "all_postgres_column_types_must_work").await;
-    let result = inspector.describe(SCHEMA).await.expect("describing");
+    api.database().raw_cmd(&full_sql).await.unwrap();
+    let result = api.describe().await;
     let mut table = result.get_table("User").expect("couldn't get User table").to_owned();
     // Ensure columns are sorted as expected when comparing
     table.columns.sort_unstable_by_key(|c| c.name.to_owned());
@@ -592,34 +579,39 @@ async fn all_postgres_column_types_must_work() {
     );
 }
 
-#[tokio::test]
-async fn postgres_cross_schema_references_are_not_allowed() {
-    let schema2 = format!("{}_2", SCHEMA);
+#[test_connector(tags(Postgres))]
+async fn postgres_cross_schema_references_are_not_allowed(api: &TestApi) {
+    let schema2 = format!("{}_2", api.schema_name());
 
     let sql = format!(
         "DROP SCHEMA IF EXISTS \"{0}\" CASCADE;
          CREATE SCHEMA \"{0}\";
          CREATE TABLE \"{0}\".\"City\" (id INT PRIMARY KEY);
-         CREATE TABLE \"{1}\".\"User\" (
+         CREATE TABLE \"User\" (
             id INT PRIMARY KEY,
             city INT REFERENCES \"{0}\".\"City\" (id) ON DELETE NO ACTION
         );
         ",
-        schema2, SCHEMA
+        schema2,
     );
 
-    let inspector = get_postgres_describer(&sql, "postgres_cross_schema_references_are_not_allowed").await;
+    api.database().raw_cmd(&sql).await.unwrap();
 
-    let err = inspector.describe(SCHEMA).await.unwrap_err();
+    let err = api.describe_error().await;
+    let fk_name = if api.is_cockroach() {
+        "fk_city_ref_City"
+    } else {
+        "User_city_fkey"
+    };
 
     assert_eq!(
-        "Illegal cross schema reference from `DatabaseInspector-Test.User` to `DatabaseInspector-Test_2.City` in constraint `User_city_fkey`. Foreign keys between database schemas are not supported in Prisma. Please follow the GitHub ticket: https://github.com/prisma/prisma/issues/1175".to_string(),
-        format!("{}", err),
+        format!("Illegal cross schema reference from `prisma-tests.User` to `prisma-tests_2.City` in constraint `{}`. Foreign keys between database schemas are not supported in Prisma. Please follow the GitHub ticket: https://github.com/prisma/prisma/issues/1175", fk_name),
+        err.to_string()
     );
 }
 
-#[tokio::test]
-async fn postgres_foreign_key_on_delete_must_be_handled() {
+#[test_connector(tags(Postgres))]
+async fn postgres_foreign_key_on_delete_must_be_handled(api: &TestApi) {
     let sql = format!(
         "CREATE TABLE \"{0}\".\"City\" (id INT PRIMARY KEY);
          CREATE TABLE \"{0}\".\"User\" (
@@ -631,148 +623,54 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
             city_set_default INT REFERENCES \"{0}\".\"City\" (id) ON DELETE SET DEFAULT
         );
         ",
-        SCHEMA
+        api.schema_name()
     );
-    let inspector = get_postgres_describer(&sql, "postgres_foreign_key_on_delete_must_be_handled").await;
 
-    let schema = inspector.describe(SCHEMA).await.expect("describing");
-    let mut table = schema.get_table("User").expect("get User table").to_owned();
-    table.foreign_keys.sort_unstable_by_key(|fk| fk.columns.clone());
+    api.database().raw_cmd(&sql).await.unwrap();
 
-    assert_eq!(
-        table,
-        Table {
-            name: "User".into(),
-            columns: vec![
-                Column {
-                    name: "id".into(),
-                    tpe: ColumnType {
-                        full_data_type: "int4".into(),
-                        family: ColumnTypeFamily::Int,
-                        arity: ColumnArity::Required,
-                        native_type: Some(PostgresType::Integer.to_json()),
-                    },
+    let schema = api.describe().await;
 
-                    default: None,
-                    auto_increment: false,
-                },
-                Column {
-                    name: "city".into(),
-                    tpe: ColumnType {
-                        full_data_type: "int4".into(),
-                        family: ColumnTypeFamily::Int,
-                        arity: ColumnArity::Nullable,
-                        native_type: Some(PostgresType::Integer.to_json()),
-                    },
-                    default: None,
-                    auto_increment: false,
-                },
-                Column {
-                    name: "city_cascade".into(),
-                    tpe: ColumnType {
-                        full_data_type: "int4".into(),
-                        family: ColumnTypeFamily::Int,
-                        arity: ColumnArity::Nullable,
-                        native_type: Some(PostgresType::Integer.to_json()),
-                    },
-                    default: None,
-                    auto_increment: false,
-                },
-                Column {
-                    name: "city_restrict".into(),
-                    tpe: ColumnType {
-                        full_data_type: "int4".into(),
-                        family: ColumnTypeFamily::Int,
-                        arity: ColumnArity::Nullable,
-                        native_type: Some(PostgresType::Integer.to_json()),
-                    },
-                    default: None,
-                    auto_increment: false,
-                },
-                Column {
-                    name: "city_set_null".into(),
-                    tpe: ColumnType {
-                        full_data_type: "int4".into(),
-                        family: ColumnTypeFamily::Int,
-                        arity: ColumnArity::Nullable,
-                        native_type: Some(PostgresType::Integer.to_json()),
-                    },
-                    default: None,
-                    auto_increment: false,
-                },
-                Column {
-                    name: "city_set_default".into(),
-                    tpe: ColumnType {
-                        full_data_type: "int4".into(),
-                        family: ColumnTypeFamily::Int,
-                        arity: ColumnArity::Nullable,
-                        native_type: Some(PostgresType::Integer.to_json()),
-                    },
-                    default: None,
-                    auto_increment: false,
-                },
-            ],
-            indices: vec![],
-            primary_key: Some(PrimaryKey {
-                columns: vec!["id".into()],
-                sequence: None,
-                constraint_name: Some("User_pkey".into()),
-            }),
-            foreign_keys: vec![
-                ForeignKey {
-                    constraint_name: Some("User_city_fkey".to_owned()),
-                    columns: vec!["city".into()],
-                    referenced_columns: vec!["id".into()],
-                    referenced_table: "City".into(),
-                    on_update_action: ForeignKeyAction::NoAction,
-                    on_delete_action: ForeignKeyAction::NoAction,
-                },
-                ForeignKey {
-                    constraint_name: Some("User_city_cascade_fkey".to_owned()),
-                    columns: vec!["city_cascade".into()],
-                    referenced_columns: vec!["id".into()],
-                    referenced_table: "City".into(),
-                    on_update_action: ForeignKeyAction::NoAction,
-                    on_delete_action: ForeignKeyAction::Cascade,
-                },
-                ForeignKey {
-                    constraint_name: Some("User_city_restrict_fkey".to_owned()),
-                    columns: vec!["city_restrict".into()],
-                    referenced_columns: vec!["id".into()],
-                    referenced_table: "City".into(),
-                    on_update_action: ForeignKeyAction::NoAction,
-                    on_delete_action: ForeignKeyAction::Restrict,
-                },
-                ForeignKey {
-                    constraint_name: Some("User_city_set_default_fkey".to_owned()),
-                    columns: vec!["city_set_default".into()],
-                    referenced_columns: vec!["id".into()],
-                    referenced_table: "City".into(),
-                    on_update_action: ForeignKeyAction::NoAction,
-                    on_delete_action: ForeignKeyAction::SetDefault,
-                },
-                ForeignKey {
-                    constraint_name: Some("User_city_set_null_fkey".to_owned()),
-                    columns: vec!["city_set_null".into()],
-                    referenced_columns: vec!["id".into()],
-                    referenced_table: "City".into(),
-                    on_update_action: ForeignKeyAction::NoAction,
-                    on_delete_action: ForeignKeyAction::SetNull,
-                },
-            ],
-        }
-    );
+    schema.assert_table("User", |t| {
+        t.assert_column("id", |c| c.assert_type_is_int_or_bigint())
+            .assert_column("city", |c| c.assert_type_is_int_or_bigint())
+            .assert_column("city_cascade", |c| c.assert_type_is_int_or_bigint())
+            .assert_column("city_restrict", |c| c.assert_type_is_int_or_bigint())
+            .assert_column("city_set_null", |c| c.assert_type_is_int_or_bigint())
+            .assert_column("city_set_default", |c| c.assert_type_is_int_or_bigint())
+            .assert_pk_on_columns(&["id"])
+            .assert_foreign_key_on_columns(&["city"], |fk| {
+                fk.assert_references("City", &["id"])
+                    .assert_on_delete(ForeignKeyAction::NoAction)
+            })
+            .assert_foreign_key_on_columns(&["city_cascade"], |fk| {
+                fk.assert_references("City", &["id"])
+                    .assert_on_delete(ForeignKeyAction::Cascade)
+            })
+            .assert_foreign_key_on_columns(&["city_restrict"], |fk| {
+                fk.assert_references("City", &["id"])
+                    .assert_on_delete(ForeignKeyAction::Restrict)
+            })
+            .assert_foreign_key_on_columns(&["city_set_default"], |fk| {
+                fk.assert_references("City", &["id"])
+                    .assert_on_delete(ForeignKeyAction::SetDefault)
+            })
+            .assert_foreign_key_on_columns(&["city_set_null"], |fk| {
+                fk.assert_references("City", &["id"])
+                    .assert_on_delete(ForeignKeyAction::SetNull)
+            })
+    });
 }
 
-#[tokio::test]
-async fn postgres_enums_must_work() {
-    let inspector = get_postgres_describer(
-        &format!("CREATE TYPE \"{}\".\"mood\" AS ENUM ('sad', 'ok', 'happy')", SCHEMA),
-        "postgres_enums_must_work",
-    )
-    .await;
-
-    let schema = inspector.describe(SCHEMA).await.expect("describing");
+#[test_connector(tags(Postgres))]
+async fn postgres_enums_must_work(api: &TestApi) {
+    api.database()
+        .raw_cmd(&format!(
+            "CREATE TYPE \"{}\".\"mood\" AS ENUM ('sad', 'ok', 'happy')",
+            api.schema_name()
+        ))
+        .await
+        .unwrap();
+    let schema = api.describe().await;
     let got_enum = schema.get_enum("mood").expect("get enum");
 
     let values: Vec<String> = vec!["sad".into(), "ok".into(), "happy".into()];
@@ -785,22 +683,21 @@ async fn postgres_enums_must_work() {
     );
 }
 
-#[tokio::test]
-async fn postgres_sequences_must_work() {
-    let inspector = get_postgres_describer(
-        &format!("CREATE SEQUENCE \"{}\".\"test\"", SCHEMA),
-        "postgres_sequences_must_work",
-    )
-    .await;
+#[test_connector(tags(Postgres))]
+async fn postgres_sequences_must_work(api: &TestApi) {
+    api.database()
+        .raw_cmd(&format!("CREATE SEQUENCE \"{}\".\"test\"", api.schema_name()))
+        .await
+        .unwrap();
 
-    let schema = inspector.describe(SCHEMA).await.expect("describing");
+    let schema = api.describe().await;
     let got_seq = schema.get_sequence("test").expect("get sequence");
 
     assert_eq!(got_seq, &Sequence { name: "test".into() },);
 }
 
-#[tokio::test]
-async fn postgres_multi_field_indexes_must_be_inferred_in_the_right_order() {
+#[test_connector(tags(Postgres))]
+async fn postgres_multi_field_indexes_must_be_inferred_in_the_right_order(api: &TestApi) {
     let schema = format!(
         r##"
             CREATE TABLE "{schema_name}"."indexes_test" (
@@ -812,11 +709,11 @@ async fn postgres_multi_field_indexes_must_be_inferred_in_the_right_order() {
             CREATE UNIQUE INDEX "my_idx" ON "{schema_name}"."indexes_test" (name, age);
             CREATE INDEX "my_idx2" ON "{schema_name}"."indexes_test" (age, name);
         "##,
-        schema_name = SCHEMA
+        schema_name = api.schema_name()
     );
+    api.database().raw_cmd(&schema).await.unwrap();
 
-    let inspector = get_postgres_describer(&schema, "postgres_multi_field_indexes").await;
-    let schema = inspector.describe(SCHEMA).await.unwrap();
+    let schema = api.describe().await;
 
     let table = schema.table_bang("indexes_test");
     let index = &table.indices[0];
@@ -830,8 +727,8 @@ async fn postgres_multi_field_indexes_must_be_inferred_in_the_right_order() {
     assert_eq!(&index.columns, &["age", "name"]);
 }
 
-#[test_each_connector(tags("postgres"))]
-async fn escaped_quotes_in_string_defaults_must_be_unescaped(api: &TestApi) -> TestResult {
+#[test_connector(tags(Postgres))]
+async fn escaped_quotes_in_string_defaults_must_be_unescaped(api: &TestApi) {
     let create_table = format!(
         r#"
             CREATE TABLE "{0}"."string_defaults_test" (
@@ -843,9 +740,9 @@ async fn escaped_quotes_in_string_defaults_must_be_unescaped(api: &TestApi) -> T
         api.schema_name()
     );
 
-    api.database().raw_cmd(&create_table).await?;
+    api.database().raw_cmd(&create_table).await.unwrap();
 
-    let schema = api.describe().await?;
+    let schema = api.describe().await;
 
     let table = schema.table_bang("string_defaults_test");
 
@@ -874,21 +771,19 @@ async fn escaped_quotes_in_string_defaults_must_be_unescaped(api: &TestApi) -> T
         .unwrap();
 
     assert_eq!(escaped_column_default, r#""That's a lot of fish!" - Godzilla, 1998"#);
-
-    Ok(())
 }
 
-#[test_each_connector(tags("postgres"))]
-async fn escaped_backslashes_in_string_literals_must_be_unescaped(api: &TestApi) -> TestResult {
+#[test_connector(tags(Postgres))]
+async fn escaped_backslashes_in_string_literals_must_be_unescaped(api: &TestApi) {
     let create_table = r#"
         CREATE TABLE test (
             "model_name_space" VARCHAR(255) NOT NULL DEFAULT 'xyz\\Datasource\\Model'
         )
     "#;
 
-    api.database().raw_cmd(&create_table).await?;
+    api.database().raw_cmd(&create_table).await.unwrap();
 
-    let schema = api.describe().await?;
+    let schema = api.describe().await;
 
     let table = schema.table_bang("test");
 
@@ -903,7 +798,5 @@ async fn escaped_backslashes_in_string_literals_must_be_unescaped(api: &TestApi)
         .into_string()
         .unwrap();
 
-    assert_eq!(default, "xyz\\Datasource\\Model");
-
-    Ok(())
+    assert_eq!(default, r#"xyz\Datasource\Model"#);
 }

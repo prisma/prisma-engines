@@ -1,7 +1,7 @@
 use migration_engine_tests::sql::*;
 use quaint::prelude::Queryable;
 
-#[test_each_connector(tags("sql"))]
+#[test_connector]
 async fn creating_tables_without_primary_key_must_work(api: &TestApi) -> TestResult {
     let dm = r#"
         model Pair {
@@ -24,7 +24,7 @@ async fn creating_tables_without_primary_key_must_work(api: &TestApi) -> TestRes
     Ok(())
 }
 
-#[test_each_connector(tags("sql"))]
+#[test_connector]
 async fn relations_to_models_without_a_primary_key_work(api: &TestApi) -> TestResult {
     let dm = r#"
         model Pair {
@@ -60,7 +60,7 @@ async fn relations_to_models_without_a_primary_key_work(api: &TestApi) -> TestRe
     Ok(())
 }
 
-#[test_each_connector(tags("sql"))]
+#[test_connector]
 async fn relations_to_models_with_no_pk_and_a_single_unique_required_field_work(api: &TestApi) -> TestResult {
     let dm = r#"
         model Pair {
@@ -91,7 +91,7 @@ async fn relations_to_models_with_no_pk_and_a_single_unique_required_field_work(
     Ok(())
 }
 
-#[test_each_connector(capabilities("enums"), tags("sql"))]
+#[test_connector(capabilities(Enums))]
 async fn enum_value_with_database_names_must_work(api: &TestApi) -> TestResult {
     let dm = r##"
         model Cat {
@@ -153,7 +153,7 @@ async fn enum_value_with_database_names_must_work(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(capabilities("enums"), tags("sql"))]
+#[test_connector(capabilities(Enums))]
 async fn enum_defaults_must_work(api: &TestApi) -> TestResult {
     let dm = r##"
         model Cat {
@@ -210,7 +210,7 @@ async fn enum_defaults_must_work(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("sql"))]
+#[test_connector]
 async fn id_as_part_of_relation_must_work(api: &TestApi) -> TestResult {
     let dm = r##"
         model Cat {
@@ -235,7 +235,7 @@ async fn id_as_part_of_relation_must_work(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("sql"))]
+#[test_connector]
 async fn multi_field_id_as_part_of_relation_must_work(api: &TestApi) -> TestResult {
     let dm = r##"
         model Cat {
@@ -269,7 +269,7 @@ async fn multi_field_id_as_part_of_relation_must_work(api: &TestApi) -> TestResu
     Ok(())
 }
 
-#[test_each_connector(tags("sql"))]
+#[test_connector]
 async fn remapped_multi_field_id_as_part_of_relation_must_work(api: &TestApi) -> TestResult {
     let dm = r##"
         model Cat {
@@ -302,7 +302,7 @@ async fn remapped_multi_field_id_as_part_of_relation_must_work(api: &TestApi) ->
     Ok(())
 }
 
-#[test_each_connector(tags("sql"))]
+#[test_connector]
 async fn unique_constraints_on_composite_relation_fields(api: &TestApi) -> TestResult {
     let dm = r##"
         model Parent {
@@ -333,7 +333,7 @@ async fn unique_constraints_on_composite_relation_fields(api: &TestApi) -> TestR
     Ok(())
 }
 
-#[test_each_connector(tags("sql"))]
+#[test_connector]
 async fn indexes_on_composite_relation_fields(api: &TestApi) -> TestResult {
     let dm = r##"
         model User {
@@ -364,7 +364,7 @@ async fn indexes_on_composite_relation_fields(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("sql"), ignore("mssql"))]
+#[test_connector(exclude(Mssql))]
 async fn dropping_mutually_referencing_tables_works(api: &TestApi) -> TestResult {
     let dm1 = r#"
     model A {

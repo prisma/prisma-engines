@@ -1,6 +1,5 @@
-use crate::sql::TestApi;
+use crate::{sql::TestApi, SchemaAssertion};
 use quaint::prelude::Queryable;
-use sql_schema_describer::SqlSchema;
 
 pub struct BarrelMigrationExecutor<'a> {
     pub(crate) api: &'a TestApi,
@@ -8,7 +7,7 @@ pub struct BarrelMigrationExecutor<'a> {
 }
 
 impl BarrelMigrationExecutor<'_> {
-    pub async fn execute<F>(self, migration_fn: F) -> anyhow::Result<SqlSchema>
+    pub async fn execute<F>(self, migration_fn: F) -> SchemaAssertion
     where
         F: FnOnce(&mut barrel::Migration),
     {
@@ -25,8 +24,6 @@ impl BarrelMigrationExecutor<'_> {
         let full_sql = migration.make_from(self.sql_variant);
         self.api.database().raw_cmd(&full_sql).await.unwrap();
 
-        let result = self.api.describe_database().await.expect("Description failed");
-
-        Ok(result)
+        self.api.assert_schema().await.unwrap()
     }
 }

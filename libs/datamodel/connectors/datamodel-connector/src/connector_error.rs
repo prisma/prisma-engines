@@ -90,6 +90,14 @@ impl ConnectorErrorFactory {
             connector_name: self.connector,
         }))
     }
+
+    pub fn native_type_invalid_param(self, expected: &str, got: &str) -> ConnectorError {
+        ConnectorError::from_kind(ErrorKind::InvalidArgumentError {
+            native_type: self.native_type,
+            expected: expected.into(),
+            got: got.into(),
+        })
+    }
 }
 
 impl ConnectorError {
@@ -254,6 +262,13 @@ pub enum ErrorKind {
         native_type: String,
         connector_name: String,
         message: String,
+    },
+
+    #[error("Invalid argument for type {}: {}. Allowed values: {}.", native_type, got, expected)]
+    InvalidArgumentError {
+        native_type: String,
+        expected: String,
+        got: String,
     },
 
     #[error("Error validating field '{}': {}", field, message)]

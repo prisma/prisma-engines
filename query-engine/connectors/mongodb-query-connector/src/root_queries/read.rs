@@ -1,5 +1,7 @@
 use super::*;
-use crate::{filter::convert_filter, query_builder::MongoReadQueryBuilder, vacuum_cursor, BsonTransform, IntoBson};
+use crate::{
+    filter::convert_filter, output_meta, query_builder::MongoReadQueryBuilder, vacuum_cursor, BsonTransform, IntoBson,
+};
 use connector_interface::{Filter, QueryArguments, RelAggregationSelection};
 use mongodb::Database;
 use mongodb::{bson::doc, options::FindOptions};
@@ -14,6 +16,7 @@ pub async fn get_single_record(
     _aggr_selections: &[RelAggregationSelection],
 ) -> crate::Result<Option<SingleRecord>> {
     let coll = database.collection(model.db_name());
+    let meta_mapping = output_meta::from_selected_fields(selected_fields);
     let (filter, _) = convert_filter(filter.clone(), false)?.render();
     let find_options = FindOptions::builder()
         .projection(selected_fields.clone().into_bson()?.into_document()?)
@@ -27,7 +30,7 @@ pub async fn get_single_record(
     } else {
         let field_names: Vec<_> = selected_fields.db_names().collect();
         let doc = docs.into_iter().next().unwrap();
-        let record = document_to_record(doc, &field_names)?;
+        let record = document_to_record(doc, &field_names, &meta_mapping)?;
 
         Ok(Some(SingleRecord { record, field_names }))
     }
@@ -50,6 +53,7 @@ pub async fn get_many_records(
     let coll = database.collection(model.db_name());
     let reverse_order = query_arguments.take.map(|t| t < 0).unwrap_or(false);
     let field_names: Vec<_> = selected_fields.db_names().collect();
+    let meta_mapping = output_meta::from_selected_fields(selected_fields);
     let mut records = ManyRecords::new(field_names.clone());
 
     if let Some(0) = query_arguments.take {
@@ -62,7 +66,7 @@ pub async fn get_many_records(
 
     let docs = query.execute(coll).await?;
     for doc in docs {
-        let record = document_to_record(doc, &field_names)?;
+        let record = document_to_record(doc, &field_names, &meta_mapping)?;
         records.push(record)
     }
 
@@ -103,6 +107,10 @@ pub async fn get_related_m2m_record_ids(
     let cursor = coll.find(filter, Some(find_options)).await?;
     let docs = vacuum_cursor(cursor).await?;
 
+    let parent_id_meta = output_meta::from_field(&id_field);
+    let id_holder_field = model.fields().find_from_scalar(relation_ids_field_name).unwrap();
+    let related_ids_holder_meta = output_meta::from_field(&id_holder_field);
+
     let child_id_field = from_field
         .related_model()
         .primary_identifier()
@@ -112,11 +120,14 @@ pub async fn get_related_m2m_record_ids(
 
     let mut id_pairs = vec![];
     for mut doc in docs {
-        let parent_id = value_from_bson(doc.remove(id_field.db_name()).unwrap())?;
-        let child_ids: Vec<PrismaValue> = match value_from_bson(
-            doc.remove(relation_ids_field_name)
-                .unwrap_or_else(|| Bson::Array(vec![])),
-        )? {
+        let id_value = doc.remove(id_field.db_name()).unwrap();
+        let parent_id = value_from_bson(id_value, &parent_id_meta)?;
+
+        let related_id_array = doc
+            .remove(relation_ids_field_name)
+            .unwrap_or_else(|| Bson::Array(vec![]));
+
+        let child_ids: Vec<PrismaValue> = match value_from_bson(related_id_array, &related_ids_holder_meta)? {
             PrismaValue::List(vals) => vals,
             val => vec![val],
         };

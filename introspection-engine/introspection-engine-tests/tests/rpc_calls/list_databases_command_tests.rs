@@ -1,9 +1,9 @@
 use barrel::types;
 use introspection_engine_tests::{test_api::*, BarrelMigrationExecutor};
-use test_macros::test_each_connector;
+use test_macros::test_connector;
 
-#[test_each_connector(tags("mysql"), ignore("vitess"))]
-async fn databases_for_mysql_should_work(api: &TestApi) -> crate::TestResult {
+#[test_connector(tags(Mysql), exclude(Vitess))]
+async fn databases_for_mysql_should_work(api: &TestApi) -> TestResult {
     setup(&api.barrel(), api.db_name()).await?;
 
     let result = api.list_databases().await?;
@@ -12,8 +12,8 @@ async fn databases_for_mysql_should_work(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"))]
-async fn databases_for_postgres_should_work(api: &TestApi) -> crate::TestResult {
+#[test_connector(tags(Postgres))]
+async fn databases_for_postgres_should_work(api: &TestApi) -> TestResult {
     setup(&api.barrel(), api.schema_name()).await?;
 
     let result = api.list_databases().await?;
@@ -22,8 +22,8 @@ async fn databases_for_postgres_should_work(api: &TestApi) -> crate::TestResult 
     Ok(())
 }
 
-#[test_each_connector(tags("mssql_2017", "mssql_2019"))]
-async fn databases_for_mssql_should_work(api: &TestApi) -> crate::TestResult {
+#[test_connector(tags(Mssql))]
+async fn databases_for_mssql_should_work(api: &TestApi) -> TestResult {
     setup(&api.barrel(), api.schema_name()).await?;
 
     let result = api.list_databases().await?;
@@ -32,8 +32,8 @@ async fn databases_for_mssql_should_work(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("sqlite"))]
-async fn databases_for_sqlite_should_work(api: &TestApi) -> crate::TestResult {
+#[test_connector(tags(Sqlite))]
+async fn databases_for_sqlite_should_work(api: &TestApi) -> TestResult {
     setup(&api.barrel(), api.schema_name()).await?;
 
     let result = api.list_databases().await?;
@@ -42,7 +42,7 @@ async fn databases_for_sqlite_should_work(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-async fn setup(barrel: &BarrelMigrationExecutor, db_name: &str) -> crate::TestResult {
+async fn setup(barrel: &BarrelMigrationExecutor, db_name: &str) -> TestResult {
     barrel
         .execute_with_schema(
             |migration| {

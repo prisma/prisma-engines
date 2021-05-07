@@ -1,5 +1,5 @@
 use super::*;
-use crate::{filter::convert_filter, vacuum_cursor, IntoBson};
+use crate::{filter::convert_filter, output_meta, vacuum_cursor, IntoBson};
 use connector_interface::*;
 use mongodb::{
     bson::{doc, Document},
@@ -36,6 +36,7 @@ pub async fn create_record(
         .collect();
 
     let mut doc = Document::new();
+    let id_meta = output_meta::from_field(&id_field);
 
     for field in fields {
         let db_name = field.db_name();
@@ -49,7 +50,7 @@ pub async fn create_record(
     }
 
     let insert_result = coll.insert_one(doc, None).await?;
-    let id_value = value_from_bson(insert_result.inserted_id)?;
+    let id_value = value_from_bson(insert_result.inserted_id, &id_meta)?;
 
     Ok(RecordProjection::from((id_field, id_value)))
 }
@@ -118,6 +119,8 @@ pub async fn update_records(
     // Mongo can only have singular IDs (always `_id`), hence the unwraps. Since IDs are immutable, we also don't
     // need to merge back id changes into the result set as with SQL.
     let id_field = model.primary_identifier().scalar_fields().next().unwrap();
+    let id_meta = output_meta::from_field(&id_field);
+
     let ids: Vec<Bson> = if let Some(selectors) = record_filter.selectors {
         selectors
             .into_iter()
@@ -169,7 +172,12 @@ pub async fn update_records(
 
     let ids = ids
         .into_iter()
-        .map(|bson_id| Ok(RecordProjection::from((id_field.clone(), value_from_bson(bson_id)?))))
+        .map(|bson_id| {
+            Ok(RecordProjection::from((
+                id_field.clone(),
+                value_from_bson(bson_id, &id_meta)?,
+            )))
+        })
         .collect::<crate::Result<Vec<_>>>()?;
 
     Ok(ids)

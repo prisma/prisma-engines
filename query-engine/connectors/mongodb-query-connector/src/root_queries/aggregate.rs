@@ -1,4 +1,4 @@
-use crate::{query_builder::MongoReadQueryBuilder, value::value_from_bson};
+use crate::{output_meta, query_builder::MongoReadQueryBuilder, value::value_from_bson};
 use connector_interface::*;
 use mongodb::{bson::Document, Database};
 use prisma_models::prelude::*;
@@ -82,44 +82,65 @@ fn to_aggregation_rows(
         let mut id_key_doc = doc.remove("_id").unwrap();
 
         for selection in selections.iter() {
+            let selection_meta = output_meta::from_aggregation_selection(&selection);
+
             match selection {
                 // All flat selection can only be in the _id part of the result doc.
                 AggregationSelection::Field(f) => {
                     let field_val = id_key_doc.as_document_mut().unwrap().remove(f.db_name()).unwrap();
-                    row.push(AggregationResult::Field(f.clone(), value_from_bson(field_val)?));
+                    let meta = selection_meta.get(f.db_name()).unwrap();
+
+                    row.push(AggregationResult::Field(f.clone(), value_from_bson(field_val, &meta)?));
                 }
                 AggregationSelection::Count { all, fields } => {
                     if *all {
-                        let field_val = value_from_bson(doc.remove("count_all").unwrap())?;
+                        let meta = selection_meta.get("all").unwrap();
+                        let field_val = value_from_bson(doc.remove("count_all").unwrap(), &meta)?;
+
                         row.push(AggregationResult::Count(None, field_val));
                     }
 
                     for field in fields {
-                        let field_val = value_from_bson(doc.remove(&format!("count_{}", field.db_name())).unwrap())?;
+                        let meta = selection_meta.get(field.db_name()).unwrap();
+                        let bson = doc.remove(&format!("count_{}", field.db_name())).unwrap();
+                        let field_val = value_from_bson(bson, &meta)?;
+
                         row.push(AggregationResult::Count(Some(field.clone()), field_val));
                     }
                 }
                 AggregationSelection::Average(fields) => {
                     for field in fields {
-                        let field_val = value_from_bson(doc.remove(&format!("avg_{}", field.db_name())).unwrap())?;
+                        let meta = selection_meta.get(field.db_name()).unwrap();
+                        let bson = doc.remove(&format!("avg_{}", field.db_name())).unwrap();
+                        let field_val = value_from_bson(bson, &meta)?;
+
                         row.push(AggregationResult::Average(field.clone(), field_val));
                     }
                 }
                 AggregationSelection::Sum(fields) => {
                     for field in fields {
-                        let field_val = value_from_bson(doc.remove(&format!("sum_{}", field.db_name())).unwrap())?;
+                        let meta = selection_meta.get(field.db_name()).unwrap();
+                        let bson = doc.remove(&format!("sum_{}", field.db_name())).unwrap();
+                        let field_val = value_from_bson(bson, &meta)?;
+
                         row.push(AggregationResult::Sum(field.clone(), field_val));
                     }
                 }
                 AggregationSelection::Min(fields) => {
                     for field in fields {
-                        let field_val = value_from_bson(doc.remove(&format!("min_{}", field.db_name())).unwrap())?;
+                        let meta = selection_meta.get(field.db_name()).unwrap();
+                        let bson = doc.remove(&format!("min_{}", field.db_name())).unwrap();
+                        let field_val = value_from_bson(bson, &meta)?;
+
                         row.push(AggregationResult::Min(field.clone(), field_val));
                     }
                 }
                 AggregationSelection::Max(fields) => {
                     for field in fields {
-                        let field_val = value_from_bson(doc.remove(&format!("max_{}", field.db_name())).unwrap())?;
+                        let meta = selection_meta.get(field.db_name()).unwrap();
+                        let bson = doc.remove(&format!("max_{}", field.db_name())).unwrap();
+                        let field_val = value_from_bson(bson, &meta)?;
+
                         row.push(AggregationResult::Max(field.clone(), field_val));
                     }
                 }

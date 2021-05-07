@@ -1,11 +1,11 @@
 use barrel::types;
 use indoc::formatdoc;
-use introspection_engine_tests::{assert_eq_json, test_api::*};
+use introspection_engine_tests::{assert_eq_json, test_api::*, TestResult};
 use serde_json::json;
-use test_macros::test_each_connector;
+use test_macros::test_connector;
 
-#[test_each_connector(tags("postgres", "mysql"))]
-async fn add_cuid_default(api: &TestApi) -> crate::TestResult {
+#[test_connector(tags(Postgres, Mysql))]
+async fn add_cuid_default(api: &TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
     api.barrel()
@@ -52,8 +52,8 @@ async fn add_cuid_default(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("postgres", "mysql"))]
-async fn add_uuid_default(api: &TestApi) -> crate::TestResult {
+#[test_connector(tags(Postgres, Mysql))]
+async fn add_uuid_default(api: &TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
     api.barrel()

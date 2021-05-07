@@ -1,7 +1,10 @@
-use crate::StringFromEnvVar;
+use crate::{
+    ast::Span,
+    diagnostics::{DatamodelError, Diagnostics},
+    StringFromEnvVar,
+};
 use datamodel_connector::{Connector, ConnectorCapabilities};
-use std::{collections::BTreeMap, path::Path};
-use url::Url;
+use std::path::Path;
 
 /// a `datasource` from the prisma schema.
 pub struct Datasource {
@@ -11,11 +14,12 @@ pub struct Datasource {
     /// the provider that was selected as active from all specified providers
     pub active_provider: String,
     pub url: StringFromEnvVar,
+    pub url_span: Span,
     pub documentation: Option<String>,
     /// the connector of the active provider
     pub active_connector: Box<dyn Connector>,
     /// An optional user-defined shadow database URL.
-    pub shadow_database_url: Option<StringFromEnvVar>,
+    pub(crate) shadow_database_url: Option<(StringFromEnvVar, Span)>,
 }
 
 impl std::fmt::Debug for Datasource {
@@ -24,7 +28,7 @@ impl std::fmt::Debug for Datasource {
             .field("name", &self.name)
             .field("provider", &self.provider)
             .field("active_provider", &self.active_provider)
-            .field("url", &self.url)
+            .field("url", &"<url>")
             .field("documentation", &self.documentation)
             .field("active_connector", &&"...")
             .field("shadow_database_url", &self.shadow_database_url)
@@ -33,60 +37,92 @@ impl std::fmt::Debug for Datasource {
 }
 
 impl Datasource {
-    pub fn url(&self) -> &StringFromEnvVar {
-        &self.url
-    }
-
     pub fn capabilities(&self) -> ConnectorCapabilities {
         let capabilities = self.active_connector.capabilities().clone();
         ConnectorCapabilities::new(capabilities)
     }
 
-    /// By default we treat relative paths (in the connection string and
-    /// datasource url value) as relative to the CWD. This does not work in all
-    /// cases, so we need a way to prefix these relative paths with a config_dir.
-    ///
-    /// P.S. Don't forget to add new parameters here if needed!
-    pub fn set_config_dir(&mut self, config_dir: &Path) {
-        let set_root = |path: &str| {
-            let path = Path::new(path);
+    /// Load the database URL, validating it and resolving env vars in the process. Also see `load_url_with_config_dir()`.
+    pub fn load_url(&self) -> Result<String, Diagnostics> {
+        let url = match &self.url {
+            StringFromEnvVar::Literal(lit) if lit.trim().is_empty() => {
+                let msg = "You must provide a nonempty URL";
 
-            if path.is_relative() {
-                Some(config_dir.join(&path).to_str().map(ToString::to_string).unwrap())
-            } else {
-                None
+                return Err(DatamodelError::new_source_validation_error(&msg, &self.name, self.url_span).into());
             }
+            StringFromEnvVar::Literal(lit) => lit.clone(),
+            StringFromEnvVar::FromEnvVar(env_var) => match std::env::var(env_var) {
+                Ok(var) if var.trim().is_empty() => {
+                    return Err(DatamodelError::new_source_validation_error(
+                        &format!(
+                        "You must provide a nonempty URL. The environment variable `{}` resolved to an empty string.",
+                        env_var
+                    ),
+                        &self.name,
+                        self.url_span,
+                    )
+                    .into())
+                }
+                Ok(var) => var,
+                Err(_) => {
+                    return Err(DatamodelError::new_environment_functional_evaluation_error(
+                        env_var.to_owned(),
+                        self.url_span,
+                    )
+                    .into())
+                }
+            },
         };
 
-        match self.active_provider.as_str() {
-            "sqlserver" => (),
-            "sqlite" => {
-                if let Some(path) = set_root(&self.url.value.trim_start_matches("file:")) {
-                    self.url.value = format!("file:{}", path);
-                };
-            }
-            _ => {
-                let mut url = Url::parse(&self.url.value).unwrap();
+        self.active_connector.validate_url(&url).map_err(|err_str| {
+            DatamodelError::new_source_validation_error(&format!("the URL {}", &err_str), &self.name, self.url_span)
+        })?;
 
-                let mut params: BTreeMap<String, String> =
-                    url.query_pairs().map(|(k, v)| (k.to_string(), v.to_string())).collect();
+        Ok(url)
+    }
 
-                url.query_pairs_mut().clear();
+    /// Same as `load_url()`, with the following difference.
+    ///
+    /// By default we treat relative paths (in the connection string and
+    /// datasource url value) as relative to the CWD. This does not work in all
+    /// cases, so we need a way to prefix these relative paths with a
+    /// config_dir.
+    ///
+    /// This is, at the time of this writing (2021-05-05), only used in the
+    /// context of NAPI integration.
+    ///
+    /// P.S. Don't forget to add new parameters here if needed!
+    pub fn load_url_with_config_dir(&self, config_dir: &Path) -> Result<String, Diagnostics> {
+        let url = self.load_url()?;
+        let url = self.active_connector.set_config_dir(config_dir, &url);
 
-                if let Some(path) = params.get("sslcert").map(|s| s.as_str()).and_then(set_root) {
-                    params.insert("sslcert".into(), path);
-                }
+        Ok(url.into_owned())
+    }
 
-                if let Some(path) = params.get("sslidentity").map(|s| s.as_str()).and_then(set_root) {
-                    params.insert("sslidentity".into(), path);
-                }
+    /// Load the shadow database URL, validating it and resolving env vars in the process.
+    pub fn load_shadow_database_url(&self) -> Result<Option<String>, Diagnostics> {
+        let (url, url_span) = match &self.shadow_database_url {
+            None => return Ok(None),
+            Some((StringFromEnvVar::Literal(lit), span)) => (lit.clone(), span),
+            Some((StringFromEnvVar::FromEnvVar(env_var), span)) => match std::env::var(env_var) {
+                // We explicitly ignore empty and missing env vars, because the same schema (with the same env function) has to be usable for dev and deployment alike.
+                Ok(var) if var.trim().is_empty() => return Ok(None),
+                Err(_) => return Ok(None),
 
-                for (k, v) in params.into_iter() {
-                    url.query_pairs_mut().append_pair(&k, &v);
-                }
+                Ok(var) => (var, span),
+            },
+        };
 
-                self.url.value = url.to_string();
-            }
+        if !url.trim().is_empty() {
+            self.active_connector.validate_url(&url).map_err(|err_str| {
+                DatamodelError::new_source_validation_error(
+                    &format!("the shadow database URL {}", &err_str),
+                    &self.name,
+                    *url_span,
+                )
+            })?;
         }
+
+        Ok(Some(url))
     }
 }

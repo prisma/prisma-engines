@@ -1,8 +1,8 @@
 use chrono::Duration;
-use migration_engine_tests::*;
+use migration_engine_tests::sql::*;
 use pretty_assertions::assert_eq;
 
-#[test_each_connector]
+#[test_connector]
 async fn starting_a_migration_works(api: &TestApi) -> TestResult {
     let persistence = api.migration_persistence();
 
@@ -23,7 +23,7 @@ async fn starting_a_migration_works(api: &TestApi) -> TestResult {
     assert_eq!(first_migration.id, id);
     assert_eq!(
         first_migration.checksum,
-        "e0c9674d3b332d71b8bc304aae5b7b8a8bb8ec72e772429fb20d8cc69a864"
+        "e0c9674d3b332d71b8bc304aae5b7b8a8bb8ec720e07072429fb20d8cc69a864"
     );
     assert_eq!(first_migration.finished_at, None);
     assert_eq!(first_migration.migration_name, "initial_migration");
@@ -39,7 +39,7 @@ async fn starting_a_migration_works(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn finishing_a_migration_works(api: &TestApi) -> TestResult {
     let persistence = api.migration_persistence();
 
@@ -61,7 +61,7 @@ async fn finishing_a_migration_works(api: &TestApi) -> TestResult {
     assert_eq!(first_migration.id, id);
     assert_eq!(
         first_migration.checksum,
-        "e0c9674d3b332d71b8bc304aae5b7b8a8bb8ec72e772429fb20d8cc69a864"
+        "e0c9674d3b332d71b8bc304aae5b7b8a8bb8ec720e07072429fb20d8cc69a864"
     );
     assert_eq!(first_migration.migration_name, "initial_migration");
     assert_eq!(first_migration.logs.as_deref(), None);
@@ -80,7 +80,7 @@ async fn finishing_a_migration_works(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn updating_then_finishing_a_migration_works(api: &TestApi) -> TestResult {
     let persistence = api.migration_persistence();
 
@@ -103,7 +103,7 @@ async fn updating_then_finishing_a_migration_works(api: &TestApi) -> TestResult 
     assert_eq!(first_migration.id, id);
     assert_eq!(
         first_migration.checksum,
-        "e0c9674d3b332d71b8bc304aae5b7b8a8bb8ec72e772429fb20d8cc69a864"
+        "e0c9674d3b332d71b8bc304aae5b7b8a8bb8ec720e07072429fb20d8cc69a864"
     );
     assert_eq!(first_migration.migration_name, "initial_migration");
     assert!(first_migration.logs.is_none());
@@ -122,7 +122,7 @@ async fn updating_then_finishing_a_migration_works(api: &TestApi) -> TestResult 
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn multiple_successive_migrations_work(api: &TestApi) -> TestResult {
     let persistence = api.migration_persistence();
 
@@ -155,7 +155,7 @@ async fn multiple_successive_migrations_work(api: &TestApi) -> TestResult {
         assert_eq!(first_migration.id, id_1);
         assert_eq!(
             first_migration.checksum,
-            "e0c9674d3b332d71b8bc304aae5b7b8a8bb8ec72e772429fb20d8cc69a864"
+            "e0c9674d3b332d71b8bc304aae5b7b8a8bb8ec720e07072429fb20d8cc69a864"
         );
         assert_eq!(first_migration.migration_name, "initial_migration");
         assert!(first_migration.logs.is_none());
@@ -179,7 +179,7 @@ async fn multiple_successive_migrations_work(api: &TestApi) -> TestResult {
         assert_eq!(second_migration.id, id_2);
         assert_eq!(
             second_migration.checksum,
-            "822db1ee793d76eaa1319eb2c453a7ec92ab6ec235268b4d27ac395c6c5a6ef"
+            "822db1ee793d76eaa1319eb2c453a7ec92ab6ec235268b4d27ac395c6c5a6e0f"
         );
         assert_eq!(second_migration.migration_name, "second_migration");
         assert!(second_migration.logs.is_none());

@@ -1,7 +1,7 @@
-use migration_engine_tests::*;
+use migration_engine_tests::sql::*;
 use quaint::{ast as quaint_ast, prelude::Queryable};
 
-#[test_each_connector(tags("mariadb"), log = "debug")]
+#[test_connector(tags(Mariadb))]
 async fn foreign_keys_to_indexes_being_renamed_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model User {

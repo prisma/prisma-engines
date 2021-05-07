@@ -1,15 +1,11 @@
-use std::borrow::Cow;
-
 use datamodel_connector::Connector;
-use enumflags2::BitFlags;
 use pretty_assertions::assert_eq;
 use prisma_value::PrismaValue;
 use sql_schema_describer::{
     Column, ColumnTypeFamily, DefaultKind, DefaultValue, Enum, ForeignKey, ForeignKeyAction, Index, IndexType,
     PrimaryKey, SqlSchema, Table,
 };
-
-use crate::Circumstances;
+use test_setup::{BitFlags, Tags};
 
 pub(crate) type AssertionResult<T> = Result<T, anyhow::Error>;
 
@@ -17,33 +13,14 @@ pub trait SqlSchemaExt {
     fn assert_table<'a>(&'a self, table_name: &str) -> AssertionResult<TableAssertion<'a>>;
 }
 
-impl SqlSchemaExt for SqlSchema {
-    fn assert_table<'a>(&'a self, table_name: &str) -> AssertionResult<TableAssertion<'a>> {
-        let circumstances = match self.lower_case_identifiers {
-            true => BitFlags::from_flag(Circumstances::LowerCasesTableNames),
-            false => BitFlags::empty(),
-        };
-
-        self.table(table_name)
-            .map(|table| TableAssertion::new(table, circumstances))
-            .map_err(|_| {
-                anyhow::anyhow!(
-                    "assert_table failed. Table {} not found. Tables in database: {:?}",
-                    table_name,
-                    self.tables.iter().map(|table| &table.name).collect::<Vec<_>>()
-                )
-            })
-    }
-}
-
 pub struct SchemaAssertion {
     schema: SqlSchema,
-    circumstances: BitFlags<Circumstances>,
+    tags: BitFlags<Tags>,
 }
 
 impl SchemaAssertion {
-    pub fn new(schema: SqlSchema, circumstances: BitFlags<Circumstances>) -> Self {
-        Self { schema, circumstances }
+    pub fn new(schema: SqlSchema, tags: BitFlags<Tags>) -> Self {
+        Self { schema, tags }
     }
 
     pub fn into_schema(self) -> SqlSchema {
@@ -62,20 +39,16 @@ impl SchemaAssertion {
         Ok(self)
     }
 
-    fn normalize<'a>(&self, s: &'a str) -> Cow<'a, str> {
-        if self.circumstances.contains(Circumstances::LowerCasesTableNames) {
-            s.to_lowercase().into()
-        } else {
-            s.into()
-        }
-    }
-
     fn find_table(&self, table_name: &str) -> anyhow::Result<&sql_schema_describer::Table> {
-        let table_name = self.normalize(table_name);
-
-        match self.schema.table(&table_name) {
-            Ok(table) => Ok(table),
-            Err(_) => Err(anyhow::anyhow!(
+        match self.schema.tables.iter().find(|t| {
+            if self.tags.contains(Tags::LowerCasesTableNames) {
+                t.name.eq_ignore_ascii_case(table_name)
+            } else {
+                t.name == table_name
+            }
+        }) {
+            Some(table) => Ok(table),
+            None => Err(anyhow::anyhow!(
                 "assert_has_table failed. Table {} not found. Tables in database: {:?}",
                 table_name,
                 self.schema.tables.iter().map(|table| &table.name).collect::<Vec<_>>()
@@ -94,14 +67,23 @@ impl SchemaAssertion {
     {
         let table = self.find_table(table_name)?;
 
-        table_assertions(TableAssertion::new(table, self.circumstances))?;
+        table_assertions(TableAssertion::new(table, self.tags))?;
 
         Ok(self)
     }
 
     pub fn assert_has_no_enum(self, enum_name: &str) -> AssertionResult<Self> {
-        let enum_name = self.normalize(enum_name);
-        assert!(self.schema.get_enum(&enum_name).is_none());
+        let has_matching_enum = self.schema.enums.iter().any(|enm| {
+            if self.tags.contains(Tags::LowerCasesTableNames) {
+                enm.name.eq_ignore_ascii_case(enum_name)
+            } else {
+                enm.name == enum_name
+            }
+        });
+
+        if has_matching_enum {
+            anyhow::bail!("Expected no enum named {}, found one", enum_name);
+        }
 
         Ok(self)
     }
@@ -160,12 +142,12 @@ impl<'a> EnumAssertion<'a> {
 #[derive(Clone, Copy)]
 pub struct TableAssertion<'a> {
     table: &'a Table,
-    circumstances: BitFlags<Circumstances>,
+    tags: BitFlags<Tags>,
 }
 
 impl<'a> TableAssertion<'a> {
-    pub fn new(table: &'a Table, circumstances: BitFlags<Circumstances>) -> Self {
-        Self { table, circumstances }
+    pub fn new(table: &'a Table, tags: BitFlags<Tags>) -> Self {
+        Self { table, tags }
     }
 
     pub fn assert_column_count(self, n: usize) -> AssertionResult<Self> {
@@ -207,7 +189,7 @@ impl<'a> TableAssertion<'a> {
         F: FnOnce(ForeignKeyAssertion<'a>) -> AssertionResult<ForeignKeyAssertion<'a>>,
     {
         if let Some(fk) = self.table.foreign_keys.iter().find(|fk| fk.columns == columns) {
-            fk_assertions(ForeignKeyAssertion::new(fk, self.circumstances))?;
+            fk_assertions(ForeignKeyAssertion::new(fk, self.tags))?;
         } else {
             anyhow::bail!("Could not find foreign key on {}.{:?}", self.table.name, columns);
         }
@@ -246,7 +228,7 @@ impl<'a> TableAssertion<'a> {
         let this = self.assert_has_column(column_name)?;
         let column = this.table.column(column_name).unwrap();
 
-        column_assertions(ColumnAssertion::new(column, &self.table, self.circumstances))?;
+        column_assertions(ColumnAssertion::new(column, self.tags))?;
 
         Ok(this)
     }
@@ -321,17 +303,12 @@ impl<'a> TableAssertion<'a> {
 
 pub struct ColumnAssertion<'a> {
     column: &'a Column,
-    table: &'a Table,
-    circumstances: BitFlags<Circumstances>,
+    tags: BitFlags<Tags>,
 }
 
 impl<'a> ColumnAssertion<'a> {
-    pub fn new(column: &'a Column, table: &'a Table, circumstances: BitFlags<Circumstances>) -> Self {
-        Self {
-            column,
-            table,
-            circumstances,
-        }
+    pub fn new(column: &'a Column, tags: BitFlags<Tags>) -> Self {
+        Self { column, tags }
     }
 
     pub fn assert_auto_increments(self) -> AssertionResult<Self> {
@@ -451,10 +428,11 @@ impl<'a> ColumnAssertion<'a> {
     pub fn assert_type_family(self, expected: ColumnTypeFamily) -> AssertionResult<Self> {
         let found = &self.column.tpe.family;
 
-        let expected = if self.circumstances.contains(Circumstances::LowerCasesTableNames) {
-            expected.normalized(&self.table.name)
-        } else {
-            expected
+        let expected = match expected {
+            ColumnTypeFamily::Enum(tbl_name) if self.tags.contains(Tags::LowerCasesTableNames) => {
+                ColumnTypeFamily::Enum(tbl_name.to_lowercase())
+            }
+            _ => expected,
         };
 
         anyhow::ensure!(
@@ -619,19 +597,17 @@ impl<'a> PrimaryKeyAssertion<'a> {
 
 pub struct ForeignKeyAssertion<'a> {
     fk: &'a ForeignKey,
-    circumstances: BitFlags<Circumstances>,
+    tags: BitFlags<Tags>,
 }
 
 impl<'a> ForeignKeyAssertion<'a> {
-    pub fn new(fk: &'a ForeignKey, circumstances: BitFlags<Circumstances>) -> Self {
-        Self { fk, circumstances }
+    pub fn new(fk: &'a ForeignKey, tags: BitFlags<Tags>) -> Self {
+        Self { fk, tags }
     }
 
     pub fn assert_references(self, table: &str, columns: &[&str]) -> AssertionResult<Self> {
-        let table = self.normalize(table);
-
         anyhow::ensure!(
-            self.fk.referenced_table == table && self.fk.referenced_columns == columns,
+            self.is_same_table_name(&self.fk.referenced_table, table) && self.fk.referenced_columns == columns,
             r#"Assertion failed. Expected reference to "{}" ({:?}). Found "{}" ({:?}) "#,
             table,
             columns,
@@ -651,11 +627,11 @@ impl<'a> ForeignKeyAssertion<'a> {
         Ok(self)
     }
 
-    fn normalize<'b>(&self, s: &'b str) -> Cow<'b, str> {
-        if self.circumstances.contains(Circumstances::LowerCasesTableNames) {
-            s.to_lowercase().into()
+    fn is_same_table_name(&self, fst: &str, snd: &str) -> bool {
+        if self.tags.contains(Tags::LowerCasesTableNames) {
+            fst.eq_ignore_ascii_case(snd)
         } else {
-            s.into()
+            fst == snd
         }
     }
 }

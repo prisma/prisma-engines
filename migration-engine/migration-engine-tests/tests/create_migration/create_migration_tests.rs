@@ -1,8 +1,9 @@
 use crate::*;
 use indoc::indoc;
-use migration_engine_tests::{test_each_connector, TestResult};
+use migration_engine_tests::TestResult;
+use test_macros::test_connector;
 
-#[test_each_connector]
+#[test_connector]
 async fn basic_create_migration_works(api: &TestApi) -> TestResult {
     let dm = r#"
         model Cat {
@@ -76,7 +77,7 @@ async fn basic_create_migration_works(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn creating_a_second_migration_should_have_the_previous_sql_schema_as_baseline(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Cat {
@@ -167,7 +168,7 @@ async fn creating_a_second_migration_should_have_the_previous_sql_schema_as_base
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn bad_migrations_should_make_the_command_fail_with_a_good_error(api: &TestApi) -> TestResult {
     use std::io::Write as _;
 
@@ -194,7 +195,7 @@ async fn bad_migrations_should_make_the_command_fail_with_a_good_error(api: &Tes
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn empty_migrations_should_not_be_created(api: &TestApi) -> TestResult {
     let dm = r#"
         model Cat {
@@ -218,7 +219,7 @@ async fn empty_migrations_should_not_be_created(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn migration_name_length_is_validated(api: &TestApi) -> TestResult {
     let dm = r#"
         model Cat {
@@ -237,7 +238,7 @@ async fn migration_name_length_is_validated(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn empty_migrations_should_be_created_with_the_draft_option(api: &TestApi) -> TestResult {
     let dm = r#"
         model Cat {
@@ -265,7 +266,7 @@ async fn empty_migrations_should_be_created_with_the_draft_option(api: &TestApi)
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn creating_a_migration_with_a_non_existent_migrations_directory_should_work(api: &TestApi) -> TestResult {
     let dm = r#"
         model Cat {
@@ -286,7 +287,7 @@ async fn creating_a_migration_with_a_non_existent_migrations_directory_should_wo
     Ok(())
 }
 
-#[test_each_connector(tags("mysql", "postgres"))]
+#[test_connector(tags(Mysql, Postgres))]
 async fn create_enum_step_only_rendered_when_needed(api: &TestApi) -> TestResult {
     let dm = r#"
         datasource test {
@@ -352,7 +353,7 @@ async fn create_enum_step_only_rendered_when_needed(api: &TestApi) -> TestResult
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"))]
+#[test_connector(tags(Postgres))]
 async fn create_enum_renders_correctly(api: &TestApi) -> TestResult {
     let dm = r#"
         datasource test {
@@ -404,7 +405,7 @@ async fn create_enum_renders_correctly(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"))]
+#[test_connector(tags(Postgres))]
 async fn unsupported_type_renders_correctly(api: &TestApi) -> TestResult {
     let dm = r#"
         datasource test {
@@ -448,7 +449,7 @@ async fn unsupported_type_renders_correctly(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"))]
+#[test_connector(tags(Postgres))]
 async fn no_additional_unique_created(api: &TestApi) -> TestResult {
     let dm = r#"
         datasource test {

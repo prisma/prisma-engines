@@ -411,6 +411,14 @@ impl Connector for MySqlDatamodelConnector {
             self.native_str_error(constructor_name).native_type_name_unknown()
         }
     }
+
+    fn validate_url(&self, url: &str) -> Result<(), String> {
+        if !url.starts_with("mysql") {
+            return Err("must start with the protocol `mysql://`.".to_owned());
+        }
+
+        Ok(())
+    }
 }
 
 impl Default for MySqlDatamodelConnector {

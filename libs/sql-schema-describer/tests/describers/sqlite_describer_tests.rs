@@ -1,15 +1,17 @@
-mod common;
-mod sqlite;
-mod test_api;
-
+use crate::test_api::*;
 use barrel::{types, Migration};
-use common::*;
 use pretty_assertions::assert_eq;
-use quaint::prelude::Queryable;
 use sql_schema_describer::*;
-use sqlite::*;
-use test_api::{TestApi, TestResult};
-use test_macros::test_each_connector;
+
+pub const SCHEMA: &str = "DatabaseInspector-Test";
+
+pub async fn get_sqlite_describer(sql: &str) -> sqlite::SqlSchemaDescriber {
+    let conn = Quaint::new_in_memory().unwrap();
+
+    conn.raw_cmd(sql).await.unwrap();
+
+    sqlite::SqlSchemaDescriber::new(conn)
+}
 
 #[tokio::test]
 async fn views_can_be_described() {
@@ -303,8 +305,8 @@ async fn sqlite_text_primary_keys_must_be_inferred_on_table_and_not_as_separate_
     );
 }
 
-#[test_each_connector(tags("sqlite"))]
-async fn escaped_quotes_in_string_defaults_must_be_unescaped(api: &TestApi) -> TestResult {
+#[test_connector(tags(Sqlite))]
+async fn escaped_quotes_in_string_defaults_must_be_unescaped(api: &TestApi) {
     let create_table = format!(
         r#"
             CREATE TABLE "{0}"."string_defaults_test" (
@@ -317,9 +319,9 @@ async fn escaped_quotes_in_string_defaults_must_be_unescaped(api: &TestApi) -> T
         api.schema_name()
     );
 
-    api.database().query_raw(&create_table, &[]).await?;
+    api.database().query_raw(&create_table, &[]).await.unwrap();
 
-    let schema = api.describe().await?;
+    let schema = api.describe().await;
 
     let table = schema.table_bang("string_defaults_test");
 
@@ -348,12 +350,10 @@ async fn escaped_quotes_in_string_defaults_must_be_unescaped(api: &TestApi) -> T
         .unwrap();
 
     assert_eq!(escaped_column_default, "\"That's a lot of fish!\"\n- Godzilla, 1998");
-
-    Ok(())
 }
 
-#[test_each_connector(tags("sqlite"))]
-async fn escaped_backslashes_in_string_literals_must_be_unescaped(api: &TestApi) -> TestResult {
+#[test_connector(tags(Sqlite))]
+async fn escaped_backslashes_in_string_literals_must_be_unescaped(api: &TestApi) {
     let create_table = format!(
         r#"
             CREATE TABLE "{0}"."test" (
@@ -363,9 +363,9 @@ async fn escaped_backslashes_in_string_literals_must_be_unescaped(api: &TestApi)
         api.schema_name()
     );
 
-    api.database().raw_cmd(&create_table).await?;
+    api.database().raw_cmd(&create_table).await.unwrap();
 
-    let schema = api.describe().await?;
+    let schema = api.describe().await;
 
     let table = schema.table_bang("test");
 
@@ -381,11 +381,9 @@ async fn escaped_backslashes_in_string_literals_must_be_unescaped(api: &TestApi)
         .unwrap();
 
     assert_eq!(default, "xyz\\Datasource\\Model");
-
-    Ok(())
 }
 
-#[test_each_connector(tags("sqlite"))]
+#[test_connector(tags(Sqlite))]
 async fn broken_relations_are_filtered_out(api: &TestApi) {
     let setup = r#"
         PRAGMA foreign_keys=OFF;
@@ -406,7 +404,7 @@ async fn broken_relations_are_filtered_out(api: &TestApi) {
 
     api.database().raw_cmd(setup).await.unwrap();
 
-    let schema = api.describe().await.unwrap();
+    let schema = api.describe().await;
     let table = schema.table_bang("dog");
 
     assert!(

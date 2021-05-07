@@ -17,10 +17,10 @@ impl GeneratorSerializer {
     }
 
     fn lower_generator(generator: &Generator) -> ast::GeneratorConfig {
-        let mut arguments: Vec<ast::Argument> = vec![super::lower_string_from_env_var(&generator.provider)];
+        let mut arguments: Vec<ast::Argument> = vec![super::lower_string_from_env_var("provider", &generator.provider)];
 
         if let Some(output) = &generator.output {
-            arguments.push(super::lower_string_from_env_var(&output));
+            arguments.push(super::lower_string_from_env_var("output", &output));
         }
 
         if !&generator.preview_features.is_empty() {

@@ -11,8 +11,8 @@ pub fn config_to_mcf_json_value(mcf: &ValidatedConfiguration) -> serde_json::Val
     serde_json::to_value(&model_to_serializable(&mcf)).expect("Failed to render JSON.")
 }
 
-#[serde(rename_all = "camelCase")]
 #[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct SerializeableMcf {
     generators: serde_json::Value,
     datasources: serde_json::Value,

@@ -1,10 +1,10 @@
-use crate::{test_each_connector, MigrationsAssertions, Queryable, TestApi, TestResult};
 use indoc::formatdoc;
+use migration_engine_tests::sql::*;
 use pretty_assertions::assert_eq;
-use test_setup::connectors::Tags;
+use test_macros::test_connector;
 use user_facing_errors::{migration_engine::ApplyMigrationError, UserFacingError};
 
-#[test_each_connector]
+#[test_connector]
 async fn apply_migrations_with_an_empty_migrations_folder_works(api: &TestApi) -> TestResult {
     let migrations_directory = api.create_migrations_directory()?;
 
@@ -16,7 +16,7 @@ async fn apply_migrations_with_an_empty_migrations_folder_works(api: &TestApi) -
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn applying_a_single_migration_should_work(api: &TestApi) -> TestResult {
     let dm = r#"
         model Cat {
@@ -42,7 +42,7 @@ async fn applying_a_single_migration_should_work(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn applying_two_migrations_works(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Cat {
@@ -82,7 +82,7 @@ async fn applying_two_migrations_works(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn migrations_should_fail_when_the_script_is_invalid(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Cat {
@@ -179,7 +179,7 @@ async fn migrations_should_fail_when_the_script_is_invalid(api: &TestApi) -> Tes
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn migrations_should_not_reapply_modified_migrations(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Cat {
@@ -219,7 +219,7 @@ async fn migrations_should_not_reapply_modified_migrations(api: &TestApi) -> Tes
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn migrations_should_fail_on_an_uninitialized_nonempty_database(api: &TestApi) -> TestResult {
     let dm = r#"
         model Cat {
@@ -254,7 +254,7 @@ async fn migrations_should_fail_on_an_uninitialized_nonempty_database(api: &Test
 }
 
 // Reference for the tables created by PostGIS: https://postgis.net/docs/manual-1.4/ch04.html#id418599
-#[test_each_connector(tags("postgres"))]
+#[test_connector(tags(Postgres))]
 async fn migrations_should_succeed_on_an_uninitialized_nonempty_database_with_postgis_tables(
     api: &TestApi,
 ) -> TestResult {

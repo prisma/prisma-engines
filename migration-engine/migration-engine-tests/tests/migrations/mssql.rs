@@ -1,7 +1,7 @@
 use migration_engine_tests::sql::*;
 use quaint::connector::Queryable;
 
-#[test_each_connector(tags("mssql"), log = "debug")]
+#[test_connector(tags(Mssql))]
 async fn shared_default_constraints_are_ignored_issue_5423(api: &TestApi) -> TestResult {
     api.database()
         .raw_cmd(&format!("CREATE DEFAULT [{}].catcat AS 'musti'", api.schema_name()))

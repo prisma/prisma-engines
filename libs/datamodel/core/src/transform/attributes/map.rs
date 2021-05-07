@@ -75,10 +75,13 @@ impl AttributeValidator<dml::EnumValue> for MapAttributeValidator {
 }
 
 fn internal_validate_and_apply(args: &mut Arguments, obj: &mut dyn WithDatabaseName) -> Result<(), DatamodelError> {
-    let db_name = args.default_arg("name")?.as_str().map_err(|err| {
+    let name_arg = args.default_arg("name")?;
+    let db_name = name_arg.as_str().map_err(|err| {
         DatamodelError::new_attribute_validation_error(&format!("{}", err), ATTRIBUTE_NAME, err.span())
     })?;
-    obj.set_database_name(Some(db_name));
+
+    obj.set_database_name(Some(db_name.to_owned()));
+
     Ok(())
 }
 

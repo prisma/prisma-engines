@@ -4,7 +4,6 @@ use crate::transform::helpers::ValueValidator;
 
 pub struct EnvFunction {
     var_name: String,
-    span: ast::Span,
 }
 
 impl EnvFunction {
@@ -33,26 +32,12 @@ impl EnvFunction {
         }
 
         let var_wrapped = &args[0];
-        let var_name = ValueValidator::new(var_wrapped).as_str()?;
-        Ok(Self {
-            var_name,
-            span: expr.span(),
-        })
+        let var_name = ValueValidator::new(var_wrapped).as_str()?.to_owned();
+
+        Ok(Self { var_name })
     }
 
     pub fn var_name(&self) -> &str {
         &self.var_name
-    }
-
-    pub fn evaluate(&self) -> Result<ValueValidator, DatamodelError> {
-        if let Ok(var) = std::env::var(&self.var_name) {
-            let value_validator = ValueValidator::new(&ast::Expression::StringValue(var, self.span));
-            Ok(value_validator)
-        } else {
-            Err(DatamodelError::new_environment_functional_evaluation_error(
-                &self.var_name,
-                self.span,
-            ))
-        }
     }
 }
