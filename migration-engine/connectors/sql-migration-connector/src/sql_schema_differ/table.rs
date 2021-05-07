@@ -81,7 +81,7 @@ impl<'schema> TableDiffer<'schema> {
             let number_of_identical_indexes = self
                 .previous_indexes()
                 .filter(|right| left.column_names() == right.column_names() && left.index_type() == right.index_type())
-                .fold(0, |acc, _| acc + 1);
+                .count();
 
             number_of_identical_indexes == 1
         });
