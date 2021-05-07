@@ -108,8 +108,6 @@ pub async fn get_related_m2m_record_ids(
     let docs = vacuum_cursor(cursor).await?;
 
     let parent_meta_mapping = output_meta::from_selected_fields(&model.primary_identifier());
-    // let child_meta_mapping = create_meta_mapping(&from_field.related_model().primary_identifier());
-
     let parent_id_holder_field = model.fields().find_from_scalar(relation_ids_field_name).unwrap();
 
     let child_id_field = from_field
