@@ -186,7 +186,7 @@ mod ext_rel_filters {
         test_data(runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyArtist(where:{ Albums: { some: { Tracks: { some: { Milliseconds: { lte: 9000 }}}}}}, orderBy: {Name: asc}){ Name }}"#),
+          run_query!(runner, r#"{ findManyArtist(where:{ Albums: { some: { Tracks: { some: { Milliseconds: { lte: 9000 }}}}}}, orderBy: { Name: asc}){ Name }}"#),
           @r###"{"data":{"findManyArtist":[{"Name":"CompleteArtist2"},{"Name":"CompleteArtistWith2Albums"}]}}"###
         );
 
@@ -331,7 +331,7 @@ mod ext_rel_filters {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyAlbum(where:{Tracks: { some: { AND:[] }}}){Title}}"#),
+          run_query!(runner, r#"{ findManyAlbum(where: { Tracks: { some: { AND:[] }}}){Title}}"#),
           @r###"{"data":{"findManyAlbum":[{"Title":"Album1"},{"Title":"Album3"},{"Title":"Album4"},{"Title":"Album5"}]}}"###
         );
 
@@ -366,32 +366,32 @@ mod ext_rel_filters {
         test_data(runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyAlbum(where:{Tracks: { some: { OR:[{ MediaType: {is: {Name: { equals: "MediaType1" }}}}, { Genre: { is: { Name: { equals: "Genre2" }}}}]}}}){Title}}"#),
+          run_query!(runner, r#"{ findManyAlbum(where: { Tracks: { some: { OR:[{ MediaType: {is: { Name: { equals: "MediaType1" }}}}, { Genre: { is: { Name: { equals: "Genre2" }}}}]}}}){Title}}"#),
           @r###"{"data":{"findManyAlbum":[{"Title":"Album1"},{"Title":"Album3"},{"Title":"Album4"},{"Title":"Album5"}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyAlbum(where:{Tracks: { every:{OR:[{ MediaType: { is: {Name: { equals: "MediaType1"}}}},{Genre: { is: {Name: { equals: "Genre2"}}}}]}}}){Title}}"#),
+          run_query!(runner, r#"{ findManyAlbum(where: { Tracks: { every:{OR:[{ MediaType: { is: { Name: { equals: "MediaType1"}}}},{Genre: { is: { Name: { equals: "Genre2"}}}}]}}}){Title}}"#),
           @r###"{"data":{"findManyAlbum":[{"Title":"Album1"},{"Title":"TheAlbumWithoutTracks"},{"Title":"Album4"},{"Title":"Album5"}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyAlbum(where:{Tracks: { some: { OR:[{ MediaType: { is: {Name: { equals: "MediaType2"}}}}]}}}){Title}}"#),
+          run_query!(runner, r#"{ findManyAlbum(where: { Tracks: { some: { OR:[{ MediaType: { is: { Name: { equals: "MediaType2"}}}}]}}}){Title}}"#),
           @r###"{"data":{"findManyAlbum":[{"Title":"Album3"}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyAlbum(where:{Tracks: { every:{OR:[{ MediaType: { is: {Name: { equals: "MediaType2"}}}}]}}}){Title}}"#),
+          run_query!(runner, r#"{ findManyAlbum(where: { Tracks: { every:{OR:[{ MediaType: { is: { Name: { equals: "MediaType2"}}}}]}}}){Title}}"#),
           @r###"{"data":{"findManyAlbum":[{"Title":"TheAlbumWithoutTracks"}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyAlbum(where:{Tracks: { some: { OR:[]}}}){Title}}"#),
+          run_query!(runner, r#"{ findManyAlbum(where: { Tracks: { some: { OR:[]}}}){Title}}"#),
           @r###"{"data":{"findManyAlbum":[]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyAlbum(where:{Tracks: { every:{OR:[]}}}){Title}}"#),
+          run_query!(runner, r#"{ findManyAlbum(where: { Tracks: { every:{OR:[]}}}){Title}}"#),
           @r###"{"data":{"findManyAlbum":[{"Title":"TheAlbumWithoutTracks"}]}}"###
         );
 
@@ -403,32 +403,32 @@ mod ext_rel_filters {
         test_data(runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyAlbum(where:{Tracks: { some: { NOT: [{ MediaType: { is: {Name: { equals: "MediaType1"}}}},{Genre: { is: { Name: { equals: "Genre1"}}}}]}}}, orderBy: { Title: asc}){Title}}"#),
+          run_query!(runner, r#"{ findManyAlbum(where: { Tracks: { some: { NOT: [{ MediaType: { is: { Name: { equals: "MediaType1"}}}},{Genre: { is: { Name: { equals: "Genre1"}}}}]}}}, orderBy: { Title: asc}){Title}}"#),
           @r###"{"data":{"findManyAlbum":[{"Title":"Album3"},{"Title":"Album5"}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyAlbum(where:{Tracks: { every:{ NOT: [{ MediaType: { is: {Name: { equals: "MediaType1"}}}},{Genre: { is: {Name: { equals: "Genre1"}}}}]}}}){Title}}"#),
+          run_query!(runner, r#"{ findManyAlbum(where: { Tracks: { every:{ NOT: [{ MediaType: { is: { Name: { equals: "MediaType1"}}}},{Genre: { is: { Name: { equals: "Genre1"}}}}]}}}){Title}}"#),
           @r###"{"data":{"findManyAlbum":[{"Title":"TheAlbumWithoutTracks"},{"Title":"Album3"}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyAlbum(where:{Tracks: { some: { NOT: [{ MediaType: { is: {Name: { equals: "MediaType2"}}}}]}}}){Title}}"#),
+          run_query!(runner, r#"{ findManyAlbum(where: { Tracks: { some: { NOT: [{ MediaType: { is: { Name: { equals: "MediaType2"}}}}]}}}){Title}}"#),
           @r###"{"data":{"findManyAlbum":[{"Title":"Album1"},{"Title":"Album3"},{"Title":"Album4"},{"Title":"Album5"}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyAlbum(where:{Tracks: { every:{ NOT: [{ MediaType: { is: {Name: { equals: "MediaType2"}}}}]}}}){Title}}"#),
+          run_query!(runner, r#"{ findManyAlbum(where: { Tracks: { every:{ NOT: [{ MediaType: { is: { Name: { equals: "MediaType2"}}}}]}}}){Title}}"#),
           @r###"{"data":{"findManyAlbum":[{"Title":"Album1"},{"Title":"TheAlbumWithoutTracks"},{"Title":"Album4"},{"Title":"Album5"}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyAlbum(where:{Tracks: { some: { NOT:[]}}}){Title}}"#),
+          run_query!(runner, r#"{ findManyAlbum(where: { Tracks: { some: { NOT:[]}}}){Title}}"#),
           @r###"{"data":{"findManyAlbum":[{"Title":"Album1"},{"Title":"Album3"},{"Title":"Album4"},{"Title":"Album5"}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyAlbum(where:{Tracks: { every:{ NOT:[]}}}){Title}}"#),
+          run_query!(runner, r#"{ findManyAlbum(where: { Tracks: { every:{ NOT:[]}}}){Title}}"#),
 
           @r###"{"data":{"findManyAlbum":[{"Title":"Album1"},{"Title":"TheAlbumWithoutTracks"},{"Title":"Album3"},{"Title":"Album4"},{"Title":"Album5"}]}}"###
         );
@@ -493,8 +493,8 @@ mod ext_rel_filters {
         test_data(runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{findManyGenre(where:{Tracks: { none:{}}}){ Name }}"#),
-          @r###"{"data":{"genres":[{"Name":"GenreThatIsNotUsed"}]}}"###
+          run_query!(runner, r#"{ findManyGenre(where: { Tracks: { none: {} }}){ Name }}"#),
+          @r###"{"data":{"findManyGenre":[{"Name":"GenreThatIsNotUsed"}]}}"###
         );
 
         Ok(())
@@ -505,8 +505,8 @@ mod ext_rel_filters {
         test_data(runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{findManyGenre(where:{Tracks: { some: { } }}){ Name }}"#),
-          @r###"{"data":{"genres":[{"Name":"Genre1"},{"Name":"Genre2"},{"Name":"Genre3"}]}}"###
+          run_query!(runner, r#"{ findManyGenre(where: { Tracks: { some: {} }}){ Name }}"#),
+          @r###"{"data":{"findManyGenre":[{"Name":"Genre1"},{"Name":"Genre2"},{"Name":"Genre3"}]}}"###
         );
 
         Ok(())
@@ -514,42 +514,42 @@ mod ext_rel_filters {
 
     async fn test_data(runner: &Runner) -> TestResult<()> {
         runner
-            .query(r#"mutation {createOneGenre(data: {Name: "Genre1", GenreId: 1}){ Name }}"#)
+            .query(r#"mutation { createOneGenre(data: { Name: "Genre1", GenreId: 1}){ Name }}"#)
             .await?
             .assert_success();
 
         runner
-            .query(r#"mutation {createOneGenre(data: {Name: "Genre2", GenreId: 2}){ Name }}"#)
+            .query(r#"mutation { createOneGenre(data: { Name: "Genre2", GenreId: 2}){ Name }}"#)
             .await?
             .assert_success();
 
         runner
-            .query(r#"mutation {createOneGenre(data: {Name: "Genre3", GenreId: 3}){ Name }}"#)
+            .query(r#"mutation { createOneGenre(data: { Name: "Genre3", GenreId: 3}){ Name }}"#)
             .await?
             .assert_success();
 
         runner
-            .query(r#"mutation {createOneGenre(data: {Name: "GenreThatIsNotUsed", GenreId: 4}){ Name }}"#)
+            .query(r#"mutation { createOneGenre(data: { Name: "GenreThatIsNotUsed", GenreId: 4}){ Name }}"#)
             .await?
             .assert_success();
 
         runner
-            .query(r#"mutation {createOneMediaType(data: {Name: "MediaType1", MediaTypeId: 1}){ Name }}"#)
+            .query(r#"mutation { createOneMediaType(data: { Name: "MediaType1", MediaTypeId: 1}){ Name }}"#)
             .await?
             .assert_success();
 
         runner
-            .query(r#"mutation {createOneMediaType(data: {Name: "MediaType2", MediaTypeId: 2}){ Name }}"#)
+            .query(r#"mutation { createOneMediaType(data: { Name: "MediaType2", MediaTypeId: 2}){ Name }}"#)
             .await?
             .assert_success();
 
         runner
-            .query(r#"mutation {createOneMediaType(data: {Name: "MediaType3", MediaTypeId: 3}){ Name }}"#)
+            .query(r#"mutation { createOneMediaType(data: { Name: "MediaType3", MediaTypeId: 3}){ Name }}"#)
             .await?
             .assert_success();
 
         runner
-            .query(r#"mutation {createOneMediaType(data: {Name: "MediaTypeThatIsNotUsed", MediaTypeId: 4}){ Name }}"#)
+            .query(r#"mutation { createOneMediaType(data: { Name: "MediaTypeThatIsNotUsed", MediaTypeId: 4}){ Name }}"#)
             .await?
             .assert_success();
 
