@@ -1,7 +1,7 @@
 use crate::{configuration, StringFromEnvVar};
 
-#[serde(rename_all = "camelCase")]
 #[derive(Debug, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct SourceConfig {
     pub name: String,
     pub provider: Vec<String>,

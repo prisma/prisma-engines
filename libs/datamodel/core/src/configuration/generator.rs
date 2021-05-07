@@ -3,8 +3,8 @@ use crate::common::preview_features::PreviewFeature;
 use serde::Serialize;
 use std::collections::HashMap;
 
-#[serde(rename_all = "camelCase")]
 #[derive(Debug, Serialize, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct Generator {
     pub name: String,
     pub provider: StringFromEnvVar,
