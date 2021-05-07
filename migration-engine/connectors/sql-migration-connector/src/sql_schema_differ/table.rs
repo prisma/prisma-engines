@@ -74,7 +74,19 @@ impl<'schema> TableDiffer<'schema> {
     }
 
     pub(crate) fn index_pairs<'a>(&'a self) -> impl Iterator<Item = Pair<IndexWalker<'schema>>> + 'a {
-        self.previous_indexes().filter_map(move |previous_index| {
+        let singular_indexes = self.previous_indexes().filter(move |left| {
+            // Renaming an index in a situation where we have multiple indexes
+            // with the same columns, but a different name, is highly unstable.
+            // We do not rename them for now.
+            let number_of_identical_indexes = self
+                .previous_indexes()
+                .filter(|right| left.column_names() == right.column_names() && left.index_type() == right.index_type())
+                .fold(0, |acc, _| acc + 1);
+
+            number_of_identical_indexes == 1
+        });
+
+        singular_indexes.filter_map(move |previous_index| {
             self.next_indexes()
                 .find(|next_index| indexes_match(&previous_index, next_index))
                 .map(|renamed_index| Pair::new(previous_index, renamed_index))
