@@ -11,10 +11,10 @@ pub struct Generator {
     pub output: Option<StringFromEnvVar>,
     pub config: HashMap<String, String>,
 
-    #[serde(default = "Vec::new")]
+    #[serde(default)]
     pub binary_targets: Vec<String>,
 
-    #[serde(default = "Vec::new")]
+    #[serde(default)]
     pub preview_features: Vec<PreviewFeature>,
 
     #[serde(skip_serializing_if = "Option::is_none")]

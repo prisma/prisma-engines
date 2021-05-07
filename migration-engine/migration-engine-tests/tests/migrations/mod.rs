@@ -2,6 +2,7 @@ mod advisory_locking;
 mod defaults;
 mod dev_diagnostic_tests;
 mod enums;
+mod foreign_keys;
 mod indexes;
 mod json;
 mod mariadb;
