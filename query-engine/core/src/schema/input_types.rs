@@ -127,11 +127,10 @@ impl InputField {
         self
     }
 
-    pub fn deprecate<T, S, U>(mut self, reason: T, since_version: S, planned_removal_version: Option<U>) -> Self
+    pub fn deprecate<T, S>(mut self, reason: T, since_version: S, planned_removal_version: Option<S>) -> Self
     where
         T: Into<String>,
         S: Into<String>,
-        U: Into<String>,
     {
         self.deprecation = Some(Deprecation {
             reason: reason.into(),

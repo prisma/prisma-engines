@@ -122,19 +122,28 @@ fn serialize_aggregations(
         }
 
         // Reorder fields based on the original query selection.
+        // Temporary: The original selection may be done with _ or no underscore (deprecated).
         let mut inner_map: Map = IndexMap::with_capacity(ordering.len());
         for (query, field_order) in ordering.iter() {
             if let Some(order) = field_order {
                 let mut nested_map = Map::new();
 
                 for field in order {
-                    let item = flattened.remove(&format!("{}_{}", query, field)).unwrap();
+                    let item = flattened
+                        .remove(&format!("{}_{}", query, field))
+                        .or_else(|| flattened.remove(&format!("_{}_{}", query, field)))
+                        .unwrap();
+
                     nested_map.insert(field.clone(), item);
                 }
 
                 inner_map.insert(query.clone(), Item::Map(nested_map));
             } else {
-                let item = flattened.remove(&query.clone()).unwrap();
+                let item = flattened
+                    .remove(&query.clone())
+                    .or_else(|| flattened.remove(&format!("_{}", query)))
+                    .unwrap();
+
                 inner_map.insert(query.clone(), item);
             }
         }
