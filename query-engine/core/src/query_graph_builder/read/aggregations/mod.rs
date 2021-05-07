@@ -16,7 +16,7 @@ use prisma_models::{ModelRef, ScalarFieldRef};
 #[tracing::instrument(skip(field, model))]
 fn resolve_query(mut field: FieldPair, model: &ModelRef) -> QueryGraphBuilderResult<AggregationSelection> {
     let query = match field.parsed_field.name.as_str() {
-        UNDERSCORE_COUNT => {
+        UNDERSCORE_COUNT | COUNT => {
             let nested_fields = field
                 .parsed_field
                 .nested_fields
@@ -43,10 +43,10 @@ fn resolve_query(mut field: FieldPair, model: &ModelRef) -> QueryGraphBuilderRes
                 },
             }
         }
-        UNDERSCORE_AVG => AggregationSelection::Average(resolve_fields(model, field)),
-        UNDERSCORE_SUM => AggregationSelection::Sum(resolve_fields(model, field)),
-        UNDERSCORE_MIN => AggregationSelection::Min(resolve_fields(model, field)),
-        UNDERSCORE_MAX => AggregationSelection::Max(resolve_fields(model, field)),
+        UNDERSCORE_AVG | AVG => AggregationSelection::Average(resolve_fields(model, field)),
+        UNDERSCORE_SUM | SUM => AggregationSelection::Sum(resolve_fields(model, field)),
+        UNDERSCORE_MIN | MIN => AggregationSelection::Min(resolve_fields(model, field)),
+        UNDERSCORE_MAX | MAX => AggregationSelection::Max(resolve_fields(model, field)),
         name => AggregationSelection::Field(model.fields().find_from_scalar(name).unwrap()),
     };
 

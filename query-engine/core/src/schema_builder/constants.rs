@@ -103,6 +103,12 @@ pub mod aggregations {
     pub const UNDERSCORE_SUM: &str = "_sum";
     pub const UNDERSCORE_MIN: &str = "_min";
     pub const UNDERSCORE_MAX: &str = "_max";
+
+    pub const COUNT: &str = "count";
+    pub const AVG: &str = "avg";
+    pub const SUM: &str = "sum";
+    pub const MIN: &str = "min";
+    pub const MAX: &str = "max";
 }
 
 pub mod ordering {
@@ -113,4 +119,9 @@ pub mod ordering {
 
 pub mod output_fields {
     pub const AFFECTED_COUNT: &str = "count";
+}
+
+pub mod deprecation {
+    pub const AGGR_DEPRECATION: &str =
+        "Aggregation keywords got unified to use underscore as prefix to prevent field clashes.";
 }
