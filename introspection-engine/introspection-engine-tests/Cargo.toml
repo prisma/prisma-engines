@@ -7,8 +7,6 @@ edition = "2018"
 [dependencies]
 sql-datamodel-connector = { path = "../../libs/datamodel/connectors/sql-datamodel-connector" }
 sql-introspection-connector = { path = "../connectors/sql-introspection-connector" }
-migration-connector = { path = "../../migration-engine/connectors/migration-connector" }
-sql-migration-connector = { path = "../../migration-engine/connectors/sql-migration-connector" }
 introspection-connector = { path = "../connectors/introspection-connector" }
 introspection-core = { path = "../core" }
 datamodel-connector = { path = "../../libs/datamodel/connectors/datamodel-connector" }

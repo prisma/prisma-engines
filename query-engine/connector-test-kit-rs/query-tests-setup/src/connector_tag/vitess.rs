@@ -21,10 +21,10 @@ impl ConnectorTagInterface for VitessConnectorTag {
         Box::new(SqlDatamodelRenderer::new())
     }
 
-    fn connection_string(&self, _database: &str, _is_ci: bool) -> String {
+    fn connection_string(&self, database: &str, _is_ci: bool) -> String {
         match self.version {
-            Some(VitessVersion::V5_7) => "mysql://root@localhost:33577/test?connection_limit=1".into(),
-            Some(VitessVersion::V8_0) => "mysql://root@localhost:33807/test?connection_limit=1".into(),
+            Some(VitessVersion::V5_7) => format!("mysql://root@localhost:33577/{}?connection_limit=1", database),
+            Some(VitessVersion::V8_0) => format!("mysql://root@localhost:33807/{}?connection_limit=1", database),
             None => unreachable!("A versioned connector must have a concrete version to run."),
         }
     }

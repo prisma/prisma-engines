@@ -5,10 +5,8 @@ use crate::{BarrelMigrationExecutor, Result};
 use datamodel::{Configuration, Datamodel};
 use introspection_connector::{DatabaseMetadata, IntrospectionConnector, Version};
 use introspection_core::rpc::RpcImpl;
-use migration_connector::MigrationConnector;
 use quaint::{prelude::SqlFamily, single::Quaint};
 use sql_introspection_connector::SqlIntrospectionConnector;
-use sql_migration_connector::SqlMigrationConnector;
 use sql_schema_describer::SqlSchema;
 use test_setup::{sqlite_test_url, TestApiArgs};
 use tracing::Instrument;
@@ -23,17 +21,8 @@ pub struct TestApi {
 impl TestApi {
     pub async fn new(args: TestApiArgs) -> Self {
         let tags = args.tags();
-        let connection_string = args.database_url();
 
-        let (database, connection_string): (Quaint, String) = if tags.intersects(Tags::Vitess) {
-            let me = SqlMigrationConnector::new(&connection_string, None).await.unwrap();
-            me.reset().await.unwrap();
-
-            (
-                Quaint::new(&connection_string).await.unwrap(),
-                connection_string.to_owned(),
-            )
-        } else if tags.contains(Tags::Mysql) {
+        let (database, connection_string): (Quaint, String) = if tags.contains(Tags::Mysql) {
             let (_, cs) = args.create_mysql_database().await;
             (Quaint::new(&cs).await.unwrap(), cs)
         } else if tags.contains(Tags::Postgres) {

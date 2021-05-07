@@ -51,12 +51,6 @@ impl MysqlFlavour {
             .contains(Circumstances::IsMysql56)
     }
 
-    pub(crate) fn is_vitess(&self) -> bool {
-        BitFlags::<Circumstances>::from_bits(self.circumstances.load(Ordering::Relaxed))
-            .unwrap_or_default()
-            .contains(Circumstances::IsVitess)
-    }
-
     pub(crate) fn lower_cases_table_names(&self) -> bool {
         BitFlags::<Circumstances>::from_bits(self.circumstances.load(Ordering::Relaxed))
             .unwrap_or_default()
@@ -289,12 +283,6 @@ impl SqlFlavour for MysqlFlavour {
     }
 
     async fn reset(&self, connection: &Connection) -> ConnectorResult<()> {
-        if self.is_vitess() {
-            return Err(ConnectorError::from_msg(
-                "We do not drop databases on Vitess until it works better.".into(),
-            ));
-        }
-
         let db_name = connection.connection_info().dbname().unwrap();
 
         connection.raw_cmd(&format!("DROP DATABASE `{}`", db_name)).await?;

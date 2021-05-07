@@ -17,9 +17,6 @@ def allowParallelExecution(): Boolean = {
 
   connectorToTest match {
     case "pgbouncer" => false
-    case "vitess_5_7" => false
-    case "vitess_8_0" => false
-    case "vitess" => false
     case _ => true
   }
 }

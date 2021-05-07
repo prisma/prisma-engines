@@ -60,8 +60,8 @@ object ConnectorConfig {
       case "mysql56" => ConnectorConfig("mysql56", s"mysql://root:prisma@$mysql_5_6_Host:$mysql_5_6_Port/$$DB?connection_limit=1", "mysql56")
       case "mariadb" => ConnectorConfig("mysql", s"mysql://root:prisma@$mariadb_Host:$mariadb_Port/$$DB?connection_limit=1", "mariadb")
 
-      case "vitess_5_7" => ConnectorConfig("vitess", s"mysql://root:prisma@127.0.0.1:33577/test?connection_limit=1", "vitess")
-      case "vitess_8_0" => ConnectorConfig("vitess", s"mysql://root:prisma@127.0.0.1:33807/test?connection_limit=1", "vitess")
+      case "vitess_5_7" => ConnectorConfig("vitess", s"mysql://root:prisma@127.0.0.1:33577/$$DB?connection_limit=1", "vitess")
+      case "vitess_8_0" => ConnectorConfig("vitess", s"mysql://root:prisma@127.0.0.1:33807/$$DB?connection_limit=1", "vitess")
 
       case "mssql2017" =>
         ConnectorConfig(

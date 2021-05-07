@@ -22,7 +22,6 @@ pub use schema_push::SchemaPush;
 
 use crate::{assertions::SchemaAssertion, sql::barrel_migration_executor::BarrelMigrationExecutor, AssertionResult};
 use migration_connector::{ConnectorError, MigrationRecord};
-use migration_core::GenericApi;
 use quaint::{
     prelude::{ConnectionInfo, Queryable, SqlFamily},
     single::Quaint,
@@ -44,15 +43,7 @@ impl TestApi {
     pub async fn new(args: TestApiArgs) -> Self {
         let tags = args.tags();
 
-        let connection_string = if tags.contains(Tags::Mysql | Tags::Vitess) {
-            let connector =
-                SqlMigrationConnector::new(args.database_url(), args.shadow_database_url().map(String::from))
-                    .await
-                    .unwrap();
-            connector.reset().await.unwrap();
-
-            args.database_url().to_owned()
-        } else if tags.contains(Tags::Mysql) {
+        let connection_string = if tags.contains(Tags::Mysql) {
             args.create_mysql_database().await.1
         } else if tags.contains(Tags::Postgres) {
             args.create_postgres_database().await.2
@@ -70,10 +61,6 @@ impl TestApi {
         let api = SqlMigrationConnector::new(&connection_string, args.shadow_database_url().map(String::from))
             .await
             .unwrap();
-
-        if tags.contains(Tags::Vitess) {
-            api.reset().await.unwrap()
-        }
 
         let mut circumstances = BitFlags::empty();
 
