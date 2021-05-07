@@ -12,7 +12,7 @@ async fn setup_empty(barrel: &BarrelMigrationExecutor, db_name: &str) -> TestRes
 async fn database_version_for_sqlite_should_work(api: &TestApi) -> TestResult {
     setup_empty(&api.barrel(), api.schema_name()).await?;
     let result = api.get_database_version().await?;
-    assert_eq!(true, result.contains("3.31"));
+    assert_eq!(true, result.contains("3.35.4"));
 
     Ok(())
 }
