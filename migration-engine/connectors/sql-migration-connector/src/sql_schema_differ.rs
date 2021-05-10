@@ -1,4 +1,5 @@
 mod column;
+mod differ_database;
 mod enums;
 mod index;
 mod sql_schema_differ_flavour;
@@ -24,8 +25,11 @@ use sql_schema_describer::{
 use std::collections::HashSet;
 use table::TableDiffer;
 
+use self::differ_database::DifferDatabase;
+
 pub(crate) fn calculate_steps(schemas: Pair<&SqlSchema>, flavour: &dyn SqlFlavour) -> Vec<SqlMigrationStep> {
-    let differ = SqlSchemaDiffer { schemas, flavour };
+    let db = DifferDatabase::new(schemas, flavour);
+    let differ = SqlSchemaDiffer { schemas, flavour, db };
 
     let tables_to_redefine = differ.flavour.tables_to_redefine(&differ);
     let mut alter_indexes = differ.alter_indexes(&tables_to_redefine);
@@ -100,6 +104,7 @@ pub(crate) fn calculate_steps(schemas: Pair<&SqlSchema>, flavour: &dyn SqlFlavou
 pub(crate) struct SqlSchemaDiffer<'a> {
     schemas: Pair<&'a SqlSchema>,
     flavour: &'a dyn SqlFlavour,
+    db: DifferDatabase<'a>,
 }
 
 impl<'schema> SqlSchemaDiffer<'schema> {
@@ -182,7 +187,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
             })
     }
 
-    fn drop_columns<'a>(differ: &'a TableDiffer<'schema>) -> impl Iterator<Item = TableChange> + 'a {
+    fn drop_columns<'a>(differ: &'a TableDiffer<'schema, 'a>) -> impl Iterator<Item = TableChange> + 'a {
         differ.dropped_columns().map(|column| {
             let change = DropColumn {
                 index: column.column_index(),
@@ -192,7 +197,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         })
     }
 
-    fn add_columns<'a>(differ: &'a TableDiffer<'schema>) -> impl Iterator<Item = TableChange> + 'a {
+    fn add_columns<'a>(differ: &'a TableDiffer<'schema, 'a>) -> impl Iterator<Item = TableChange> + 'a {
         differ.added_columns().map(move |column| {
             let change = AddColumn {
                 column_index: column.column_index(),
@@ -202,7 +207,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         })
     }
 
-    fn alter_columns<'a>(table_differ: &'a TableDiffer<'schema>) -> impl Iterator<Item = TableChange> + 'a {
+    fn alter_columns<'a>(table_differ: &'a TableDiffer<'schema, 'a>) -> impl Iterator<Item = TableChange> + 'a {
         table_differ.column_pairs().filter_map(move |column_differ| {
             let (changes, type_change) = column_differ.all_changes();
 
@@ -254,7 +259,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         }
     }
 
-    fn add_primary_key(differ: &TableDiffer<'_>) -> Option<TableChange> {
+    fn add_primary_key(differ: &TableDiffer<'_, '_>) -> Option<TableChange> {
         let from_psl_change = differ
             .created_primary_key()
             .filter(|pk| !pk.columns.is_empty())
@@ -285,7 +290,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         }
     }
 
-    fn drop_primary_key(differ: &TableDiffer<'_>) -> Option<TableChange> {
+    fn drop_primary_key(differ: &TableDiffer<'_, '_>) -> Option<TableChange> {
         let from_psl_change = differ.dropped_primary_key().map(|_pk| TableChange::DropPrimaryKey);
 
         if differ.flavour.should_recreate_the_primary_key_on_column_recreate() {
@@ -429,26 +434,12 @@ impl<'schema> SqlSchemaDiffer<'schema> {
     }
 
     /// An iterator over the tables that are present in both schemas.
-    fn table_pairs<'a>(&'a self) -> impl Iterator<Item = TableDiffer<'schema>> + 'a
-    where
-        'schema: 'a,
-    {
-        self.schemas
-            .previous()
-            .table_walkers()
-            .filter_map(move |previous_table| {
-                self.schemas
-                    .next()
-                    .table_walkers()
-                    .find(move |next_table| {
-                        self.flavour
-                            .table_names_match(Pair::new(previous_table.name(), next_table.name()))
-                    })
-                    .map(move |next_table| TableDiffer {
-                        flavour: self.flavour,
-                        tables: Pair::new(previous_table, next_table),
-                    })
-            })
+    fn table_pairs(&self) -> impl Iterator<Item = TableDiffer<'schema, '_>> + '_ {
+        self.db.table_pairs().map(move |tables| TableDiffer {
+            flavour: self.flavour,
+            tables,
+            db: &self.db,
+        })
     }
 
     fn alter_indexes(&self, tables_to_redefine: &HashSet<String>) -> Vec<Pair<(usize, usize)>> {
@@ -470,39 +461,11 @@ impl<'schema> SqlSchemaDiffer<'schema> {
     }
 
     fn created_tables(&self) -> impl Iterator<Item = TableWalker<'_>> {
-        self.next_tables().filter(move |next_table| {
-            !self.previous_tables().any(|previous_table| {
-                self.flavour
-                    .table_names_match(Pair::new(previous_table.name(), next_table.name()))
-            })
-        })
+        self.db.created_tables()
     }
 
     fn dropped_tables<'a>(&'a self) -> impl Iterator<Item = TableWalker<'schema>> + 'a {
-        self.previous_tables().filter(move |previous_table| {
-            !self.next_tables().any(|next_table| {
-                self.flavour
-                    .table_names_match(Pair::new(previous_table.name(), next_table.name()))
-            })
-        })
-    }
-
-    fn previous_tables<'a>(&'a self) -> impl Iterator<Item = TableWalker<'schema>> + 'a {
-        self.schemas
-            .previous()
-            .table_walkers()
-            .filter(move |table| !self.table_is_ignored(&table.name()))
-    }
-
-    fn next_tables<'a>(&'a self) -> impl Iterator<Item = TableWalker<'schema>> + 'a {
-        self.schemas
-            .next()
-            .table_walkers()
-            .filter(move |table| !self.table_is_ignored(&table.name()))
-    }
-
-    fn table_is_ignored(&self, table_name: &str) -> bool {
-        table_name == "_prisma_migrations" || self.flavour.table_should_be_ignored(&table_name)
+        self.db.dropped_tables()
     }
 
     fn enum_pairs(&self) -> impl Iterator<Item = EnumDiffer<'_>> {
@@ -575,9 +538,9 @@ fn push_previous_usages_as_defaults_in_altered_enums(differ: &SqlSchemaDiffer<'_
     }
 }
 
-fn push_created_foreign_keys<'a, 'schema>(
+fn push_created_foreign_keys<'a, 'b: 'a>(
     added_foreign_keys: &mut Vec<AddForeignKey>,
-    table_pairs: impl Iterator<Item = TableDiffer<'schema>>,
+    table_pairs: impl Iterator<Item = TableDiffer<'b, 'a>>,
 ) {
     table_pairs.for_each(|differ| {
         added_foreign_keys.extend(differ.created_foreign_keys().map(|created_fk| AddForeignKey {
