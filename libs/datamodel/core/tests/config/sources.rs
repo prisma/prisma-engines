@@ -324,7 +324,10 @@ fn must_succeed_if_env_var_is_missing_but_override_was_provided() {
     let data_source = config.datasources.first().unwrap();
 
     data_source.assert_name("ds");
-    data_source.assert_url(StringFromEnvVar::Literal(url.to_string()));
+    data_source.assert_url(StringFromEnvVar {
+        value: Some(url.to_string()),
+        from_env_var: None,
+    });
 }
 
 #[test]
@@ -344,7 +347,7 @@ fn must_succeed_if_env_var_exists_and_override_was_provided() {
     let data_source = config.datasources.first().unwrap();
 
     data_source.assert_name("ds");
-    data_source.assert_url(StringFromEnvVar::Literal(url.to_string()));
+    assert_eq!(data_source.url.value.as_deref(), Some(url));
 
     // make sure other tests that run afterwards are not run in a modified environment
     std::env::remove_var("DATABASE_URL");
@@ -366,7 +369,7 @@ fn must_succeed_with_overrides() {
     let data_source = config.datasources.first().unwrap();
 
     data_source.assert_name("ds");
-    data_source.assert_url(StringFromEnvVar::Literal(url.to_string()));
+    assert_eq!(data_source.url.value.as_deref(), Some(url));
 }
 
 #[test]

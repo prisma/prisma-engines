@@ -133,6 +133,11 @@ impl QueryEngine {
             .validate_that_one_datasource_is_provided()
             .map_err(|errors| ApiError::conversion(errors, &datamodel))?;
 
+        config
+            .subject
+            .resolve_datasource_urls_from_env()
+            .map_err(|errors| ApiError::conversion(errors, &datamodel))?;
+
         let ast = datamodel::parse_datamodel(&datamodel)
             .map_err(|errors| ApiError::conversion(errors, &datamodel))?
             .subject;
