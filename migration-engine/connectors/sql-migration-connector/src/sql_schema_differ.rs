@@ -47,7 +47,8 @@ pub(crate) fn calculate_steps(schemas: Pair<&SqlSchema>, flavour: &dyn SqlFlavou
     let mut drop_indexes = differ.drop_indexes(&tables_to_redefine);
     let mut create_indexes = differ.create_indexes(&tables_to_redefine);
 
-    let alter_tables = differ.alter_tables(&tables_to_redefine).collect::<Vec<_>>();
+    let mut alter_tables = differ.alter_tables(&tables_to_redefine).collect::<Vec<_>>();
+    alter_tables.sort_by_key(|at| at.table_index);
 
     flavour.push_index_changes_for_column_changes(&alter_tables, &mut drop_indexes, &mut create_indexes, &differ);
 
@@ -59,6 +60,8 @@ pub(crate) fn calculate_steps(schemas: Pair<&SqlSchema>, flavour: &dyn SqlFlavou
     let redefine_tables = Some(redefine_tables)
         .filter(|tables| !tables.is_empty())
         .map(SqlMigrationStep::RedefineTables);
+
+    create_indexes.sort();
 
     flavour
         .create_enums(&differ)
@@ -175,7 +178,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                     .into_iter()
                     .chain(SqlSchemaDiffer::drop_columns(&differ))
                     .chain(SqlSchemaDiffer::add_columns(&differ))
-                    .chain(SqlSchemaDiffer::alter_columns(&differ))
+                    .chain(SqlSchemaDiffer::alter_columns(&differ).into_iter())
                     .chain(SqlSchemaDiffer::add_primary_key(&differ))
                     .collect();
 
@@ -208,37 +211,48 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         })
     }
 
-    fn alter_columns<'a>(table_differ: &'a TableDiffer<'schema, 'a>) -> impl Iterator<Item = TableChange> + 'a {
-        table_differ.column_pairs().filter_map(move |column_differ| {
-            let (changes, type_change) = column_differ.all_changes();
+    fn alter_columns<'a>(table_differ: &TableDiffer<'_, '_>) -> Vec<TableChange> {
+        let mut alter_columns: Vec<_> = table_differ
+            .column_pairs()
+            .filter_map(move |column_differ| {
+                let (changes, type_change) = column_differ.all_changes();
 
-            if !changes.differs_in_something() {
-                return None;
-            }
-
-            let column_index = Pair::new(column_differ.previous.column_index(), column_differ.next.column_index());
-
-            match type_change {
-                Some(ColumnTypeChange::NotCastable) => {
-                    Some(TableChange::DropAndRecreateColumn { column_index, changes })
+                if !changes.differs_in_something() {
+                    return None;
                 }
-                Some(ColumnTypeChange::RiskyCast) => Some(TableChange::AlterColumn(AlterColumn {
-                    column_index,
-                    changes,
-                    type_change: Some(crate::sql_migration::ColumnTypeChange::RiskyCast),
-                })),
-                Some(ColumnTypeChange::SafeCast) => Some(TableChange::AlterColumn(AlterColumn {
-                    column_index,
-                    changes,
-                    type_change: Some(crate::sql_migration::ColumnTypeChange::SafeCast),
-                })),
-                None => Some(TableChange::AlterColumn(AlterColumn {
-                    column_index,
-                    changes,
-                    type_change: None,
-                })),
-            }
-        })
+
+                let column_index = Pair::new(column_differ.previous.column_index(), column_differ.next.column_index());
+
+                match type_change {
+                    Some(ColumnTypeChange::NotCastable) => {
+                        Some(TableChange::DropAndRecreateColumn { column_index, changes })
+                    }
+                    Some(ColumnTypeChange::RiskyCast) => Some(TableChange::AlterColumn(AlterColumn {
+                        column_index,
+                        changes,
+                        type_change: Some(crate::sql_migration::ColumnTypeChange::RiskyCast),
+                    })),
+                    Some(ColumnTypeChange::SafeCast) => Some(TableChange::AlterColumn(AlterColumn {
+                        column_index,
+                        changes,
+                        type_change: Some(crate::sql_migration::ColumnTypeChange::SafeCast),
+                    })),
+                    None => Some(TableChange::AlterColumn(AlterColumn {
+                        column_index,
+                        changes,
+                        type_change: None,
+                    })),
+                }
+            })
+            .collect();
+
+        alter_columns.sort_by_key(|alter_col| match alter_col {
+            TableChange::AlterColumn(alter_col) => alter_col.column_index,
+            TableChange::DropAndRecreateColumn { column_index, .. } => *column_index,
+            _ => unreachable!(),
+        });
+
+        alter_columns
     }
 
     fn drop_foreign_keys(&self, drop_foreign_keys: &mut Vec<DropForeignKey>, tables_to_redefine: &HashSet<String>) {
@@ -270,7 +284,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
 
         if differ.flavour.should_recreate_the_primary_key_on_column_recreate() {
             from_psl_change.or_else(|| {
-                let from_recreate = Self::alter_columns(differ).any(|tc| match tc {
+                let from_recreate = Self::alter_columns(differ).into_iter().any(|tc| match tc {
                     TableChange::DropAndRecreateColumn { column_index, .. } => {
                         let idx = *column_index.previous();
                         differ.previous().column_at(idx).is_part_of_primary_key()
@@ -296,7 +310,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
 
         if differ.flavour.should_recreate_the_primary_key_on_column_recreate() {
             from_psl_change.or_else(|| {
-                let from_recreate = Self::alter_columns(differ).any(|tc| match tc {
+                let from_recreate = Self::alter_columns(differ).into_iter().any(|tc| match tc {
                     TableChange::DropAndRecreateColumn { column_index, .. } => {
                         let idx = *column_index.previous();
                         differ.previous().column_at(idx).is_part_of_primary_key()
