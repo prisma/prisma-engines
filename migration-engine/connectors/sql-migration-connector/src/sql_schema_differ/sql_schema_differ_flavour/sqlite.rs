@@ -3,8 +3,11 @@ use sql_schema_describer::ColumnTypeFamily;
 use super::SqlSchemaDifferFlavour;
 use crate::{
     flavour::SqliteFlavour,
-    sql_schema_differ::column::{ColumnDiffer, ColumnTypeChange},
     sql_schema_differ::SqlSchemaDiffer,
+    sql_schema_differ::{
+        column::{ColumnDiffer, ColumnTypeChange},
+        differ_database::DifferDatabase,
+    },
 };
 use std::collections::HashSet;
 
@@ -21,19 +24,18 @@ impl SqlSchemaDifferFlavour for SqliteFlavour {
         true
     }
 
-    fn tables_to_redefine(&self, differ: &SqlSchemaDiffer<'_>) -> HashSet<String> {
-        differ
-            .table_pairs()
-            .filter(|differ| {
-                differ.created_primary_key().is_some()
-                    || differ.dropped_primary_key().is_some()
-                    || differ.dropped_columns().next().is_some()
-                    || differ.added_columns().any(|col| col.arity().is_required())
-                    || differ.column_pairs().any(|columns| columns.all_changes().0.differs_in_something())
+    fn tables_to_redefine(&self, db: &DifferDatabase<'_>) -> HashSet<String> {
+        db.table_pairs()
+            .filter(|table| {
+                db.created_primary_key(table).is_some()
+                    || db.dropped_primary_key(table).is_some()
+                    || db.dropped_columns(table).next().is_some()
+                    || db.added_columns(table).any(|col| col.arity().is_required())
+                    || db.column_pairs(table).any(|columns| columns.all_changes().0.differs_in_something())
                     // ALTER INDEX does not exist on SQLite
-                    || differ.index_pairs().any(|pair| self.index_should_be_renamed(&pair))
-                    || differ.created_foreign_keys().next().is_some()
-                    || differ.dropped_foreign_keys().next().is_some()
+                    || db.index_pairs(table).any(|pair| self.index_should_be_renamed(&pair))
+                    || db.created_foreign_keys(table).next().is_some()
+                    || db.dropped_foreign_keys(table).next().is_some()
             })
             .map(|table| table.next().name().to_owned())
             .collect()

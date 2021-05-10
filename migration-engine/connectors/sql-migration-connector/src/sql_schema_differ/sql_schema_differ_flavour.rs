@@ -1,4 +1,4 @@
-use super::{column::ColumnDiffer, ColumnTypeChange, SqlSchemaDiffer};
+use super::{column::ColumnDiffer, differ_database::DifferDatabase, ColumnTypeChange, SqlSchemaDiffer};
 use crate::{
     pair::Pair,
     sql_migration::{AlterEnum, AlterTable, CreateEnum, CreateIndex, DropEnum, DropIndex},
@@ -52,6 +52,10 @@ pub(crate) trait SqlSchemaDifferFlavour {
     /// Return whether an index should be renamed by the migration.
     fn index_should_be_renamed(&self, indexes: &Pair<IndexWalker<'_>>) -> bool {
         indexes.previous().name() != indexes.next().name()
+    }
+
+    fn lower_cases_table_names(&self) -> bool {
+        false
     }
 
     /// Evaluate indexes/constraints that need to be dropped and re-created based on other changes in the schema
@@ -108,7 +112,7 @@ pub(crate) trait SqlSchemaDifferFlavour {
 
     /// Return the tables that cannot be migrated without being redefined. This
     /// is currently useful only on SQLite.
-    fn tables_to_redefine(&self, _differ: &SqlSchemaDiffer<'_>) -> HashSet<String> {
+    fn tables_to_redefine(&self, _differ: &DifferDatabase<'_>) -> HashSet<String> {
         HashSet::new()
     }
 
