@@ -61,13 +61,11 @@ fn function_expressions_as_dbgenerated_work(api: TestApi) {
 
 #[test_connector(tags(Postgres))]
 fn default_dbgenerated_with_type_definitions_should_work(api: TestApi) {
-    api.raw_cmd(r#"CREATE EXTENSION IF NOT EXISTS "uuid-ossp""#);
-
     let engine = api.new_engine();
 
     let dm = r#"
         model A {
-            uuid String @id @default(dbgenerated("(gen_random_uuid())::TEXT"))
+            id String @id @default(dbgenerated("(now())::TEXT"))
         }
     "#;
 
@@ -76,8 +74,8 @@ fn default_dbgenerated_with_type_definitions_should_work(api: TestApi) {
     engine
         .assert_schema()
         .assert_table("A", |table| {
-            table.assert_column("uuid", |col| {
-                col.assert_default(Some(DefaultValue::db_generated("(gen_random_uuid())::text")))
+            table.assert_column("id", |col| {
+                col.assert_default(Some(DefaultValue::db_generated("(now())::text")))
             })
         })
         .unwrap();
@@ -85,13 +83,11 @@ fn default_dbgenerated_with_type_definitions_should_work(api: TestApi) {
 
 #[test_connector(tags(Postgres))]
 fn default_dbgenerated_should_work(api: TestApi) {
-    api.raw_cmd(r#"CREATE EXTENSION IF NOT EXISTS "uuid-ossp""#);
-
     let engine = api.new_engine();
 
     let dm = r#"
         model A {
-            uuid String @id @default(dbgenerated("(gen_random_uuid())"))
+            id String @id @default(dbgenerated("(now())"))
         }
     "#;
 
@@ -100,8 +96,8 @@ fn default_dbgenerated_should_work(api: TestApi) {
     engine
         .assert_schema()
         .assert_table("A", |table| {
-            table.assert_column("uuid", |col| {
-                col.assert_default(Some(DefaultValue::db_generated("gen_random_uuid()")))
+            table.assert_column("id", |col| {
+                col.assert_default(Some(DefaultValue::db_generated("now()")))
             })
         })
         .unwrap();

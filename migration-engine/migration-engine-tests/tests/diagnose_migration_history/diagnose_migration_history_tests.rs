@@ -1069,15 +1069,11 @@ async fn indexes_on_same_columns_with_different_names_should_work(api: &TestApi)
 
 #[test_connector(tags(Postgres))]
 async fn default_dbgenerated_should_not_cause_drift(api: &TestApi) -> TestResult {
-    api.database()
-        .raw_cmd(r#"CREATE EXTENSION IF NOT EXISTS "uuid-ossp""#)
-        .await?;
-
     let migrations_directory = api.create_migrations_directory()?;
 
     let dm = r#"
         model A {
-            uuid String @id @default(dbgenerated("(gen_random_uuid())::TEXT"))
+            id String @id @default(dbgenerated("(now())::TEXT"))
         }
     "#;
 

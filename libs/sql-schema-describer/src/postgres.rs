@@ -849,7 +849,7 @@ fn is_autoincrement(value: &str, sequences: &[Sequence]) -> Option<String> {
     })
 }
 
-fn fetch_dbgenerated<'a>(value: &'a str) -> Option<String> {
+fn fetch_dbgenerated(value: &str) -> Option<String> {
     static POSTGRES_DB_GENERATED_RE: Lazy<Regex> =
         Lazy::new(|| Regex::new(r#"(^\((.*)\)):{2,3}(\\")?(.*)(\\")?$"#).unwrap());
 
