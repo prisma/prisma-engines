@@ -1,4 +1,5 @@
 mod column;
+mod differ_database;
 mod enums;
 mod index;
 mod sql_schema_differ_flavour;
@@ -7,6 +8,7 @@ mod table;
 pub(crate) use column::{ColumnChange, ColumnChanges};
 pub(crate) use sql_schema_differ_flavour::SqlSchemaDifferFlavour;
 
+use self::differ_database::DifferDatabase;
 use crate::{
     pair::Pair,
     sql_migration::{
@@ -18,14 +20,17 @@ use crate::{
 use column::ColumnTypeChange;
 use enums::EnumDiffer;
 use sql_schema_describer::{
-    walkers::{EnumWalker, ForeignKeyWalker, TableWalker},
+    walkers::{EnumWalker, ForeignKeyWalker, SqlSchemaExt, TableWalker},
     ColumnTypeFamily,
 };
 use std::collections::HashSet;
 use table::TableDiffer;
 
 pub(crate) fn calculate_steps(schemas: Pair<&SqlSchema>, flavour: &dyn SqlFlavour) -> Vec<SqlMigrationStep> {
-    let differ = SqlSchemaDiffer { schemas, flavour };
+    let db = DifferDatabase::new(schemas, flavour);
+    let differ = SqlSchemaDiffer { schemas, flavour, db };
+    let mut create_tables: Vec<CreateTable> = differ.create_tables().collect();
+    create_tables.sort();
 
     let tables_to_redefine = differ.flavour.tables_to_redefine(&differ);
     let mut alter_indexes = differ.alter_indexes(&tables_to_redefine);
@@ -42,7 +47,8 @@ pub(crate) fn calculate_steps(schemas: Pair<&SqlSchema>, flavour: &dyn SqlFlavou
     let mut drop_indexes = differ.drop_indexes(&tables_to_redefine);
     let mut create_indexes = differ.create_indexes(&tables_to_redefine);
 
-    let alter_tables = differ.alter_tables(&tables_to_redefine).collect::<Vec<_>>();
+    let mut alter_tables = differ.alter_tables(&tables_to_redefine).collect::<Vec<_>>();
+    alter_tables.sort_by_key(|at| at.table_index);
 
     flavour.push_index_changes_for_column_changes(&alter_tables, &mut drop_indexes, &mut create_indexes, &differ);
 
@@ -54,6 +60,8 @@ pub(crate) fn calculate_steps(schemas: Pair<&SqlSchema>, flavour: &dyn SqlFlavou
     let redefine_tables = Some(redefine_tables)
         .filter(|tables| !tables.is_empty())
         .map(SqlMigrationStep::RedefineTables);
+
+    create_indexes.sort();
 
     flavour
         .create_enums(&differ)
@@ -74,7 +82,7 @@ pub(crate) fn calculate_steps(schemas: Pair<&SqlSchema>, flavour: &dyn SqlFlavou
         // - We must drop enums after we drop tables, or dropping the enum will
         //   fail on postgres because objects (=tables) still depend on them.
         .chain(flavour.drop_enums(&differ).into_iter().map(SqlMigrationStep::DropEnum))
-        .chain(differ.create_tables().map(SqlMigrationStep::CreateTable))
+        .chain(create_tables.into_iter().map(SqlMigrationStep::CreateTable))
         .chain(redefine_tables)
         // Order matters: we must create indexes after ALTER TABLEs because the indexes can be
         // on fields that are dropped/created there.
@@ -100,6 +108,7 @@ pub(crate) fn calculate_steps(schemas: Pair<&SqlSchema>, flavour: &dyn SqlFlavou
 pub(crate) struct SqlSchemaDiffer<'a> {
     schemas: Pair<&'a SqlSchema>,
     flavour: &'a dyn SqlFlavour,
+    db: DifferDatabase<'a>,
 }
 
 impl<'schema> SqlSchemaDiffer<'schema> {
@@ -169,7 +178,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                     .into_iter()
                     .chain(SqlSchemaDiffer::drop_columns(&differ))
                     .chain(SqlSchemaDiffer::add_columns(&differ))
-                    .chain(SqlSchemaDiffer::alter_columns(&differ))
+                    .chain(SqlSchemaDiffer::alter_columns(&differ).into_iter())
                     .chain(SqlSchemaDiffer::add_primary_key(&differ))
                     .collect();
 
@@ -182,7 +191,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
             })
     }
 
-    fn drop_columns<'a>(differ: &'a TableDiffer<'schema>) -> impl Iterator<Item = TableChange> + 'a {
+    fn drop_columns<'a>(differ: &'a TableDiffer<'schema, 'a>) -> impl Iterator<Item = TableChange> + 'a {
         differ.dropped_columns().map(|column| {
             let change = DropColumn {
                 index: column.column_index(),
@@ -192,7 +201,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         })
     }
 
-    fn add_columns<'a>(differ: &'a TableDiffer<'schema>) -> impl Iterator<Item = TableChange> + 'a {
+    fn add_columns<'a>(differ: &'a TableDiffer<'schema, 'a>) -> impl Iterator<Item = TableChange> + 'a {
         differ.added_columns().map(move |column| {
             let change = AddColumn {
                 column_index: column.column_index(),
@@ -202,37 +211,48 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         })
     }
 
-    fn alter_columns<'a>(table_differ: &'a TableDiffer<'schema>) -> impl Iterator<Item = TableChange> + 'a {
-        table_differ.column_pairs().filter_map(move |column_differ| {
-            let (changes, type_change) = column_differ.all_changes();
+    fn alter_columns(table_differ: &TableDiffer<'_, '_>) -> Vec<TableChange> {
+        let mut alter_columns: Vec<_> = table_differ
+            .column_pairs()
+            .filter_map(move |column_differ| {
+                let (changes, type_change) = column_differ.all_changes();
 
-            if !changes.differs_in_something() {
-                return None;
-            }
-
-            let column_index = Pair::new(column_differ.previous.column_index(), column_differ.next.column_index());
-
-            match type_change {
-                Some(ColumnTypeChange::NotCastable) => {
-                    Some(TableChange::DropAndRecreateColumn { column_index, changes })
+                if !changes.differs_in_something() {
+                    return None;
                 }
-                Some(ColumnTypeChange::RiskyCast) => Some(TableChange::AlterColumn(AlterColumn {
-                    column_index,
-                    changes,
-                    type_change: Some(crate::sql_migration::ColumnTypeChange::RiskyCast),
-                })),
-                Some(ColumnTypeChange::SafeCast) => Some(TableChange::AlterColumn(AlterColumn {
-                    column_index,
-                    changes,
-                    type_change: Some(crate::sql_migration::ColumnTypeChange::SafeCast),
-                })),
-                None => Some(TableChange::AlterColumn(AlterColumn {
-                    column_index,
-                    changes,
-                    type_change: None,
-                })),
-            }
-        })
+
+                let column_index = Pair::new(column_differ.previous.column_index(), column_differ.next.column_index());
+
+                match type_change {
+                    Some(ColumnTypeChange::NotCastable) => {
+                        Some(TableChange::DropAndRecreateColumn { column_index, changes })
+                    }
+                    Some(ColumnTypeChange::RiskyCast) => Some(TableChange::AlterColumn(AlterColumn {
+                        column_index,
+                        changes,
+                        type_change: Some(crate::sql_migration::ColumnTypeChange::RiskyCast),
+                    })),
+                    Some(ColumnTypeChange::SafeCast) => Some(TableChange::AlterColumn(AlterColumn {
+                        column_index,
+                        changes,
+                        type_change: Some(crate::sql_migration::ColumnTypeChange::SafeCast),
+                    })),
+                    None => Some(TableChange::AlterColumn(AlterColumn {
+                        column_index,
+                        changes,
+                        type_change: None,
+                    })),
+                }
+            })
+            .collect();
+
+        alter_columns.sort_by_key(|alter_col| match alter_col {
+            TableChange::AlterColumn(alter_col) => alter_col.column_index,
+            TableChange::DropAndRecreateColumn { column_index, .. } => *column_index,
+            _ => unreachable!(),
+        });
+
+        alter_columns
     }
 
     fn drop_foreign_keys(&self, drop_foreign_keys: &mut Vec<DropForeignKey>, tables_to_redefine: &HashSet<String>) {
@@ -254,7 +274,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         }
     }
 
-    fn add_primary_key(differ: &TableDiffer<'_>) -> Option<TableChange> {
+    fn add_primary_key(differ: &TableDiffer<'_, '_>) -> Option<TableChange> {
         let from_psl_change = differ
             .created_primary_key()
             .filter(|pk| !pk.columns.is_empty())
@@ -264,7 +284,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
 
         if differ.flavour.should_recreate_the_primary_key_on_column_recreate() {
             from_psl_change.or_else(|| {
-                let from_recreate = Self::alter_columns(differ).any(|tc| match tc {
+                let from_recreate = Self::alter_columns(differ).into_iter().any(|tc| match tc {
                     TableChange::DropAndRecreateColumn { column_index, .. } => {
                         let idx = *column_index.previous();
                         differ.previous().column_at(idx).is_part_of_primary_key()
@@ -285,12 +305,12 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         }
     }
 
-    fn drop_primary_key(differ: &TableDiffer<'_>) -> Option<TableChange> {
+    fn drop_primary_key(differ: &TableDiffer<'_, '_>) -> Option<TableChange> {
         let from_psl_change = differ.dropped_primary_key().map(|_pk| TableChange::DropPrimaryKey);
 
         if differ.flavour.should_recreate_the_primary_key_on_column_recreate() {
             from_psl_change.or_else(|| {
-                let from_recreate = Self::alter_columns(differ).any(|tc| match tc {
+                let from_recreate = Self::alter_columns(differ).into_iter().any(|tc| match tc {
                     TableChange::DropAndRecreateColumn { column_index, .. } => {
                         let idx = *column_index.previous();
                         differ.previous().column_at(idx).is_part_of_primary_key()
@@ -429,26 +449,12 @@ impl<'schema> SqlSchemaDiffer<'schema> {
     }
 
     /// An iterator over the tables that are present in both schemas.
-    fn table_pairs<'a>(&'a self) -> impl Iterator<Item = TableDiffer<'schema>> + 'a
-    where
-        'schema: 'a,
-    {
-        self.schemas
-            .previous()
-            .table_walkers()
-            .filter_map(move |previous_table| {
-                self.schemas
-                    .next()
-                    .table_walkers()
-                    .find(move |next_table| {
-                        self.flavour
-                            .table_names_match(Pair::new(previous_table.name(), next_table.name()))
-                    })
-                    .map(move |next_table| TableDiffer {
-                        flavour: self.flavour,
-                        tables: Pair::new(previous_table, next_table),
-                    })
-            })
+    fn table_pairs(&self) -> impl Iterator<Item = TableDiffer<'schema, '_>> + '_ {
+        self.db.table_pairs().map(move |tables| TableDiffer {
+            flavour: self.flavour,
+            tables: self.schemas.tables(&tables),
+            db: &self.db,
+        })
     }
 
     fn alter_indexes(&self, tables_to_redefine: &HashSet<String>) -> Vec<Pair<(usize, usize)>> {
@@ -469,40 +475,16 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         steps
     }
 
-    fn created_tables(&self) -> impl Iterator<Item = TableWalker<'_>> {
-        self.next_tables().filter(move |next_table| {
-            !self.previous_tables().any(|previous_table| {
-                self.flavour
-                    .table_names_match(Pair::new(previous_table.name(), next_table.name()))
-            })
-        })
+    fn created_tables(&self) -> impl Iterator<Item = TableWalker<'schema>> + '_ {
+        self.db
+            .created_tables()
+            .map(move |table_index| self.schemas.next().table_walker_at(table_index))
     }
 
-    fn dropped_tables<'a>(&'a self) -> impl Iterator<Item = TableWalker<'schema>> + 'a {
-        self.previous_tables().filter(move |previous_table| {
-            !self.next_tables().any(|next_table| {
-                self.flavour
-                    .table_names_match(Pair::new(previous_table.name(), next_table.name()))
-            })
-        })
-    }
-
-    fn previous_tables<'a>(&'a self) -> impl Iterator<Item = TableWalker<'schema>> + 'a {
-        self.schemas
-            .previous()
-            .table_walkers()
-            .filter(move |table| !self.table_is_ignored(&table.name()))
-    }
-
-    fn next_tables<'a>(&'a self) -> impl Iterator<Item = TableWalker<'schema>> + 'a {
-        self.schemas
-            .next()
-            .table_walkers()
-            .filter(move |table| !self.table_is_ignored(&table.name()))
-    }
-
-    fn table_is_ignored(&self, table_name: &str) -> bool {
-        table_name == "_prisma_migrations" || self.flavour.table_should_be_ignored(&table_name)
+    fn dropped_tables(&self) -> impl Iterator<Item = TableWalker<'schema>> + '_ {
+        self.db
+            .dropped_tables()
+            .map(move |table_index| self.schemas.previous().table_walker_at(table_index))
     }
 
     fn enum_pairs(&self) -> impl Iterator<Item = EnumDiffer<'_>> {
@@ -575,9 +557,9 @@ fn push_previous_usages_as_defaults_in_altered_enums(differ: &SqlSchemaDiffer<'_
     }
 }
 
-fn push_created_foreign_keys<'a, 'schema>(
+fn push_created_foreign_keys<'a, 'b: 'a>(
     added_foreign_keys: &mut Vec<AddForeignKey>,
-    table_pairs: impl Iterator<Item = TableDiffer<'schema>>,
+    table_pairs: impl Iterator<Item = TableDiffer<'b, 'a>>,
 ) {
     table_pairs.for_each(|differ| {
         added_foreign_keys.extend(differ.created_foreign_keys().map(|created_fk| AddForeignKey {

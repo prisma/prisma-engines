@@ -73,6 +73,10 @@ impl SqlSchemaDifferFlavour for MysqlFlavour {
         }
     }
 
+    fn lower_cases_table_names(&self) -> bool {
+        self.lower_cases_table_names()
+    }
+
     fn should_create_indexes_from_created_tables(&self) -> bool {
         false
     }

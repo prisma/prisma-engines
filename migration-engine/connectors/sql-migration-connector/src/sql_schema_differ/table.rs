@@ -1,44 +1,37 @@
-use super::column::ColumnDiffer;
+use super::{column::ColumnDiffer, differ_database::DifferDatabase};
 use crate::{flavour::SqlFlavour, pair::Pair};
 use sql_schema_describer::{
     walkers::{ColumnWalker, ForeignKeyWalker, IndexWalker, TableWalker},
     PrimaryKey,
 };
 
-pub(crate) struct TableDiffer<'a> {
+pub(crate) struct TableDiffer<'a, 'b> {
     pub(crate) flavour: &'a dyn SqlFlavour,
     pub(crate) tables: Pair<TableWalker<'a>>,
+    pub(crate) db: &'b DifferDatabase<'a>,
 }
 
-impl<'schema> TableDiffer<'schema> {
+impl<'schema, 'b> TableDiffer<'schema, 'b> {
     pub(crate) fn column_pairs<'a>(&'a self) -> impl Iterator<Item = ColumnDiffer<'schema>> + 'a {
-        self.previous_columns()
-            .filter_map(move |previous_column| {
-                self.next_columns()
-                    .find(|next_column| columns_match(&previous_column, next_column))
-                    .map(|next_column| (previous_column, next_column))
-            })
-            .map(move |(previous, next)| ColumnDiffer {
+        self.db
+            .column_pairs(self.tables.map(|t| t.table_index()))
+            .map(move |colidxs| ColumnDiffer {
                 flavour: self.flavour,
-                previous,
-                next,
+                previous: self.tables.previous().column_at(*colidxs.previous()),
+                next: self.tables.next().column_at(*colidxs.next()),
             })
     }
 
     pub(crate) fn dropped_columns<'a>(&'a self) -> impl Iterator<Item = ColumnWalker<'schema>> + 'a {
-        self.previous_columns().filter(move |previous_column| {
-            self.next_columns()
-                .find(|next_column| columns_match(previous_column, next_column))
-                .is_none()
-        })
+        self.db
+            .dropped_columns(self.tables.map(|t| t.table_index()))
+            .map(move |idx| self.tables.previous().column_at(idx))
     }
 
     pub(crate) fn added_columns<'a>(&'a self) -> impl Iterator<Item = ColumnWalker<'schema>> + 'a {
-        self.next_columns().filter(move |next_column| {
-            self.previous_columns()
-                .find(|previous_column| columns_match(previous_column, next_column))
-                .is_none()
-        })
+        self.db
+            .created_columns(self.tables.map(|t| t.table_index()))
+            .map(move |idx| self.tables.next().column_at(idx))
     }
 
     pub(crate) fn created_foreign_keys<'a>(&'a self) -> impl Iterator<Item = ForeignKeyWalker<'schema>> + 'a {
@@ -137,14 +130,6 @@ impl<'schema> TableDiffer<'schema> {
             .any(|columns| columns.all_changes().0.type_changed())
     }
 
-    fn previous_columns<'a>(&'a self) -> impl Iterator<Item = ColumnWalker<'schema>> + 'a {
-        self.previous().columns()
-    }
-
-    fn next_columns<'a>(&'a self) -> impl Iterator<Item = ColumnWalker<'schema>> + 'a {
-        self.next().columns()
-    }
-
     fn previous_foreign_keys<'a>(&'a self) -> impl Iterator<Item = ForeignKeyWalker<'schema>> + 'a {
         self.previous().foreign_keys()
     }
@@ -168,10 +153,6 @@ impl<'schema> TableDiffer<'schema> {
     pub(super) fn next(&self) -> &TableWalker<'schema> {
         self.tables.next()
     }
-}
-
-pub(crate) fn columns_match(a: &ColumnWalker<'_>, b: &ColumnWalker<'_>) -> bool {
-    a.name() == b.name()
 }
 
 /// Compare two SQL indexes and return whether they only differ by name.

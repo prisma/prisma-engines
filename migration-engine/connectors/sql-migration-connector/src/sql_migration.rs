@@ -83,7 +83,7 @@ impl SqlMigrationStep {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) struct CreateTable {
     pub table_index: usize,
 }
@@ -195,7 +195,7 @@ pub(crate) struct DropForeignKey {
     pub constraint_name: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub(crate) struct CreateIndex {
     pub table_index: usize,
     pub index_index: usize,
