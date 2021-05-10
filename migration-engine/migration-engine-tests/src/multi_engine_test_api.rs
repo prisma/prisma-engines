@@ -3,6 +3,7 @@
 //! A TestApi that is initialized without IO or async code and can instantiate
 //! multiple migration engines.
 
+pub use test_macros::test_connector;
 pub use test_setup::{BitFlags, Capabilities, Tags};
 
 use crate::{ApplyMigrations, CreateMigration, DiagnoseMigrationHistory, Reset, SchemaAssertion, SchemaPush};
@@ -26,7 +27,11 @@ impl TestApi {
     pub fn new(args: TestApiArgs) -> Self {
         let rt = test_setup::runtime::test_tokio_runtime();
         let tags = args.tags();
-        let db_name = args.test_function_name();
+        let db_name = if tags.contains(Tags::Mysql) {
+            test_setup::mysql_safe_identifier(args.test_function_name())
+        } else {
+            args.test_function_name()
+        };
 
         let (admin_conn, connection_string) = if tags.contains(Tags::Postgres) {
             rt.block_on(test_setup::create_postgres_database(db_name)).unwrap()
