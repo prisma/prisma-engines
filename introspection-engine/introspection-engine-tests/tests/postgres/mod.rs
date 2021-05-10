@@ -39,27 +39,3 @@ async fn sequences_should_work(api: &TestApi) -> TestResult {
 
     Ok(())
 }
-
-#[test_connector(tags(Postgres))]
-async fn dbgenerated_type_casts_should_work(api: &TestApi) -> TestResult {
-    api.barrel()
-        .execute(move |migration| {
-            migration.inject_custom(r#"CREATE EXTENSION IF NOT EXISTS "uuid-ossp""#);
-
-            migration.create_table("A", move |t| {
-                t.inject_custom("id VARCHAR(32) PRIMARY KEY DEFAULT gen_random_uuid()::text");
-            });
-        })
-        .await?;
-
-    let dm = indoc! {r#"
-        model A {
-          id String @id @default(dbgenerated("(gen_random_uuid())::text")) @db.VarChar(32)
-        }
-    "#};
-
-    let result = api.introspect().await?;
-    api.assert_eq_datamodels(dm, &result);
-
-    Ok(())
-}
