@@ -277,3 +277,41 @@ fn changing_a_relation_field_to_a_scalar_field_must_work(api: TestApi) {
         })
         .unwrap();
 }
+
+#[test_connector]
+fn changing_a_foreign_key_constrained_column_from_nullable_to_required_and_back_works(api: TestApi) {
+    let api = api.new_engine();
+
+    let dm = r#"
+        model Student {
+            id       String @id @default(cuid())
+            name     String
+            career   Career? @relation(fields: [careerId], references: [id])
+            careerId String?
+        }
+        model Career {
+            id       String    @id @default(cuid())
+            name     String
+            students Student[]
+        }
+    "#;
+
+    api.schema_push(dm).send_sync().unwrap().assert_green().unwrap();
+
+    let dm2 = r#"
+        model Student {
+            id       String @id @default(cuid())
+            name     String
+            career   Career @relation(fields: [careerId], references: [id])
+            careerId String
+        }
+        model Career {
+            id       String    @id @default(cuid())
+            name     String
+            students Student[]
+        }
+    "#;
+
+    api.schema_push(dm2).send_sync().unwrap().assert_green().unwrap();
+    api.schema_push(dm).send_sync().unwrap().assert_green().unwrap();
+}
