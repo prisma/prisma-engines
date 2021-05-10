@@ -1066,3 +1066,36 @@ async fn indexes_on_same_columns_with_different_names_should_work(api: &TestApi)
 
     Ok(())
 }
+
+#[test_connector(tags(Postgres))]
+async fn default_dbgenerated_should_not_cause_drift(api: &TestApi) -> TestResult {
+    api.database()
+        .raw_cmd(r#"CREATE EXTENSION IF NOT EXISTS "uuid-ossp""#)
+        .await?;
+
+    let migrations_directory = api.create_migrations_directory()?;
+
+    let dm = r#"
+        model A {
+            uuid String @id @default(dbgenerated("(gen_random_uuid())::TEXT"))
+        }
+    "#;
+
+    api.create_migration("01init", dm, &migrations_directory).send().await?;
+
+    api.apply_migrations(&migrations_directory)
+        .send()
+        .await?
+        .assert_applied_migrations(&["01init"])?;
+
+    let output = api
+        .diagnose_migration_history(&migrations_directory)
+        .opt_in_to_shadow_database(true)
+        .send()
+        .await?
+        .into_output();
+
+    assert!(output.drift.is_none());
+
+    Ok(())
+}

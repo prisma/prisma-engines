@@ -102,7 +102,9 @@ impl<'a> ColumnDiffer<'a> {
             (None, Some(DefaultKind::Now)) => false,
 
             // We now do migrate to @dbgenerated
-            (Some(DefaultKind::DbGenerated(prev)), Some(DefaultKind::DbGenerated(next))) => prev == next,
+            (Some(DefaultKind::DbGenerated(prev)), Some(DefaultKind::DbGenerated(next))) => {
+                prev.to_lowercase() == next.to_lowercase()
+            }
             (_, Some(DefaultKind::DbGenerated(_))) => false,
             // Sequence migrations are handled separately.
             (_, Some(DefaultKind::Sequence(_))) => true,

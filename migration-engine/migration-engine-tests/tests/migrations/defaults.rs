@@ -58,3 +58,51 @@ fn function_expressions_as_dbgenerated_work(api: TestApi) {
         })
         .unwrap();
 }
+
+#[test_connector(tags(Postgres))]
+fn default_dbgenerated_with_type_definitions_should_work(api: TestApi) {
+    api.raw_cmd(r#"CREATE EXTENSION IF NOT EXISTS "uuid-ossp""#);
+
+    let engine = api.new_engine();
+
+    let dm = r#"
+        model A {
+            uuid String @id @default(dbgenerated("(gen_random_uuid())::TEXT"))
+        }
+    "#;
+
+    engine.schema_push(dm).send_sync().unwrap().assert_green().unwrap();
+
+    engine
+        .assert_schema()
+        .assert_table("A", |table| {
+            table.assert_column("uuid", |col| {
+                col.assert_default(Some(DefaultValue::db_generated("(gen_random_uuid())::text")))
+            })
+        })
+        .unwrap();
+}
+
+#[test_connector(tags(Postgres))]
+fn default_dbgenerated_should_work(api: TestApi) {
+    api.raw_cmd(r#"CREATE EXTENSION IF NOT EXISTS "uuid-ossp""#);
+
+    let engine = api.new_engine();
+
+    let dm = r#"
+        model A {
+            uuid String @id @default(dbgenerated("(gen_random_uuid())"))
+        }
+    "#;
+
+    engine.schema_push(dm).send_sync().unwrap().assert_green().unwrap();
+
+    engine
+        .assert_schema()
+        .assert_table("A", |table| {
+            table.assert_column("uuid", |col| {
+                col.assert_default(Some(DefaultValue::db_generated("gen_random_uuid()")))
+            })
+        })
+        .unwrap();
+}
