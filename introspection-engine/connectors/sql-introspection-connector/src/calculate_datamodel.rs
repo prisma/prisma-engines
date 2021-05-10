@@ -5,11 +5,13 @@ use crate::prisma_1_defaults::*;
 use crate::re_introspection::enrich;
 use crate::sanitize_datamodel_names::sanitize_datamodel_names;
 use crate::version_checker::VersionChecker;
+use crate::SqlError;
 use crate::SqlIntrospectionResult;
 use datamodel::Datamodel;
 use introspection_connector::IntrospectionResult;
 use quaint::connector::SqlFamily;
 use sql_schema_describer::*;
+use std::collections::HashMap;
 use tracing::debug;
 
 /// Calculate a data model from a database schema.
@@ -28,6 +30,8 @@ pub fn calculate_datamodel(
 
     // our opinionation about valid names
     sanitize_datamodel_names(&mut data_model, family);
+
+    validate_duplicates(&data_model)?;
 
     // deduplicating relation field names
     deduplicate_relation_field_names(&mut data_model);
@@ -54,6 +58,35 @@ pub fn calculate_datamodel(
         version,
         warnings,
     })
+}
+
+// if after opionated renames we have duplicated names, e.g. a database with
+// tables `a` and `_a`, the tables in the data model (`a` and `a`) would
+// cause really weird errors
+fn validate_duplicates(data_model: &Datamodel) -> SqlIntrospectionResult<()> {
+    debug!("Validating duplicates");
+
+    let mut names: HashMap<&str, Option<&str>> = HashMap::new();
+
+    for model in data_model.models() {
+        if names.contains_key(model.name.as_str()) {
+            let db_name = match names.get(model.name.as_str()) {
+                Some(Some(db_name)) => db_name,
+                _ => model.database_name.as_deref().unwrap(),
+            };
+
+            let explanation = format!(
+                "Due to name sanitization, table `{}` was renamed to `{}` in the data model, being not a unique name anymore. Consider renaming one of the tables.",
+                db_name, model.name
+            );
+
+            return Err(SqlError::SchemaInconsistent { explanation });
+        } else {
+            names.insert(model.name.as_str(), model.database_name.as_deref());
+        }
+    }
+
+    Ok(())
 }
 
 #[cfg(test)]

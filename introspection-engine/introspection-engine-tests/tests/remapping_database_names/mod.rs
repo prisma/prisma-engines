@@ -6,6 +6,33 @@ use quaint::prelude::Queryable;
 use test_macros::test_connector;
 
 #[test_connector]
+async fn remapping_name_clashes_should_error(api: &TestApi) -> TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("a", |t| {
+                t.add_column("id", types::primary());
+            });
+
+            migration.create_table("_a", |t| {
+                t.add_column("a_a", types::integer().nullable(false));
+                t.add_column("a_b", types::integer().nullable(false));
+                t.add_foreign_key(&["a_a"], "a", &["id"]);
+                t.add_foreign_key(&["a_b"], "a", &["id"]);
+            });
+        })
+        .await?;
+
+    let error_msg = format!("{}", api.introspect().await.unwrap_err());
+
+    assert_eq!(
+        "Could not introspect the database since the schema was inconsistent. Due to name sanitization, table `_a` was renamed to `a` in the data model, being not a unique name anymore. Consider renaming one of the tables.",
+        &error_msg,
+    );
+
+    Ok(())
+}
+
+#[test_connector]
 async fn remapping_fields_with_invalid_characters(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
