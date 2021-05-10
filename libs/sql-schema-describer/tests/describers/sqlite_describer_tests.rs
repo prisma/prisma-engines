@@ -306,7 +306,7 @@ async fn sqlite_text_primary_keys_must_be_inferred_on_table_and_not_as_separate_
 }
 
 #[test_connector(tags(Sqlite))]
-async fn escaped_quotes_in_string_defaults_must_be_unescaped(api: &TestApi) {
+fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
     let create_table = format!(
         r#"
             CREATE TABLE "{0}"."string_defaults_test" (
@@ -319,9 +319,9 @@ async fn escaped_quotes_in_string_defaults_must_be_unescaped(api: &TestApi) {
         api.schema_name()
     );
 
-    api.database().query_raw(&create_table, &[]).await.unwrap();
+    api.raw_cmd(&create_table).unwrap();
 
-    let schema = api.describe().await;
+    let schema = api.describe();
 
     let table = schema.table_bang("string_defaults_test");
 
@@ -353,7 +353,7 @@ async fn escaped_quotes_in_string_defaults_must_be_unescaped(api: &TestApi) {
 }
 
 #[test_connector(tags(Sqlite))]
-async fn escaped_backslashes_in_string_literals_must_be_unescaped(api: &TestApi) {
+fn escaped_backslashes_in_string_literals_must_be_unescaped(api: TestApi) {
     let create_table = format!(
         r#"
             CREATE TABLE "{0}"."test" (
@@ -363,9 +363,9 @@ async fn escaped_backslashes_in_string_literals_must_be_unescaped(api: &TestApi)
         api.schema_name()
     );
 
-    api.database().raw_cmd(&create_table).await.unwrap();
+    api.raw_cmd(&create_table).unwrap();
 
-    let schema = api.describe().await;
+    let schema = api.describe();
 
     let table = schema.table_bang("test");
 
@@ -384,7 +384,7 @@ async fn escaped_backslashes_in_string_literals_must_be_unescaped(api: &TestApi)
 }
 
 #[test_connector(tags(Sqlite))]
-async fn broken_relations_are_filtered_out(api: &TestApi) {
+fn broken_relations_are_filtered_out(api: TestApi) {
     let setup = r#"
         PRAGMA foreign_keys=OFF;
 
@@ -402,9 +402,9 @@ async fn broken_relations_are_filtered_out(api: &TestApi) {
         PRAGMA foreign_keys=ON;
     "#;
 
-    api.database().raw_cmd(setup).await.unwrap();
+    api.raw_cmd(setup).unwrap();
 
-    let schema = api.describe().await;
+    let schema = api.describe();
     let table = schema.table_bang("dog");
 
     assert!(

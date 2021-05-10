@@ -53,45 +53,41 @@ fn varchar_native_type(api: &TestApi, length: u32) -> Option<Value> {
 }
 
 #[test_connector]
-async fn is_required_must_work(api: &TestApi) {
-    api.barrel()
-        .execute(|migration| {
-            migration.create_table("User", |t| {
-                t.add_column("column1", types::integer().nullable(false));
-                t.add_column("column2", types::integer().nullable(true));
-            });
-        })
-        .await;
+fn is_required_must_work(api: TestApi) {
+    api.execute_barrel(|migration| {
+        migration.create_table("User", |t| {
+            t.add_column("column1", types::integer().nullable(false));
+            t.add_column("column2", types::integer().nullable(true));
+        });
+    });
 
-    api.describe().await.assert_table("User", |t| {
+    api.describe().assert_table("User", |t| {
         t.assert_column("column1", |c| c.assert_not_null())
             .assert_column("column2", |c| c.assert_nullable())
     });
 }
 
 #[test_connector]
-async fn foreign_keys_must_work(api: &TestApi) {
+fn foreign_keys_must_work(api: TestApi) {
     let sql_family = api.sql_family();
 
-    api.barrel()
-        .execute(|migration| {
-            migration.create_table("City", |t| {
-                t.add_column("id", types::primary());
-            });
-            migration.create_table("User", move |t| {
-                // barrel does not render foreign keys correctly for mysql
-                // TODO: Investigate
-                if sql_family == SqlFamily::Mysql {
-                    t.add_column("city", types::integer());
-                    t.inject_custom("FOREIGN KEY(city) REFERENCES City(id) ON DELETE RESTRICT");
-                } else {
-                    t.add_column("city", types::foreign("City", "id"));
-                }
-            });
-        })
-        .await;
+    api.execute_barrel(|migration| {
+        migration.create_table("City", |t| {
+            t.add_column("id", types::primary());
+        });
+        migration.create_table("User", move |t| {
+            // barrel does not render foreign keys correctly for mysql
+            // TODO: Investigate
+            if sql_family == SqlFamily::Mysql {
+                t.add_column("city", types::integer());
+                t.inject_custom("FOREIGN KEY(city) REFERENCES City(id) ON DELETE RESTRICT");
+            } else {
+                t.add_column("city", types::foreign("City", "id"));
+            }
+        });
+    });
 
-    let schema = api.describe().await;
+    let schema = api.describe();
 
     schema.assert_table("User", |t| {
         let t = t
@@ -107,46 +103,44 @@ async fn foreign_keys_must_work(api: &TestApi) {
 }
 
 #[test_connector]
-async fn multi_column_foreign_keys_must_work(api: &TestApi) {
+fn multi_column_foreign_keys_must_work(api: TestApi) {
     let sql_family = api.sql_family();
     let schema = api.schema_name().to_owned();
 
-    api.barrel()
-        .execute(|migration| {
-            migration.create_table("City", move |t| {
-                t.add_column("id", types::primary());
-                t.add_column("name", types::varchar(255));
+    api.execute_barrel(|migration| {
+        migration.create_table("City", move |t| {
+            t.add_column("id", types::primary());
+            t.add_column("name", types::varchar(255));
 
-                if sql_family != SqlFamily::Sqlite {
-                    t.inject_custom("constraint uniq unique (name, id)");
-                }
-            });
-            migration.create_table("User", move |t| {
-                t.add_column("city", types::integer());
-                t.add_column("city_name", types::varchar(255));
+            if sql_family != SqlFamily::Sqlite {
+                t.inject_custom("constraint uniq unique (name, id)");
+            }
+        });
+        migration.create_table("User", move |t| {
+            t.add_column("city", types::integer());
+            t.add_column("city_name", types::varchar(255));
 
-                if sql_family == SqlFamily::Mysql {
-                    t.inject_custom("FOREIGN KEY(city_name, city) REFERENCES City(name, id) ON DELETE RESTRICT");
-                } else if sql_family == SqlFamily::Mssql {
-                    t.inject_custom(format!(
-                        "FOREIGN KEY(city_name, city) REFERENCES [{}].[City]([name], [id])",
-                        schema,
-                    ));
-                } else {
-                    let relation_prefix = match sql_family {
-                        SqlFamily::Postgres => format!("\"{}\".", &schema),
-                        _ => "".to_string(),
-                    };
-                    t.inject_custom(format!(
-                        "FOREIGN KEY(city_name, city) REFERENCES {}\"City\"(name, id)",
-                        relation_prefix
-                    ));
-                }
-            });
-        })
-        .await;
+            if sql_family == SqlFamily::Mysql {
+                t.inject_custom("FOREIGN KEY(city_name, city) REFERENCES City(name, id) ON DELETE RESTRICT");
+            } else if sql_family == SqlFamily::Mssql {
+                t.inject_custom(format!(
+                    "FOREIGN KEY(city_name, city) REFERENCES [{}].[City]([name], [id])",
+                    schema,
+                ));
+            } else {
+                let relation_prefix = match sql_family {
+                    SqlFamily::Postgres => format!("\"{}\".", &schema),
+                    _ => "".to_string(),
+                };
+                t.inject_custom(format!(
+                    "FOREIGN KEY(city_name, city) REFERENCES {}\"City\"(name, id)",
+                    relation_prefix
+                ));
+            }
+        });
+    });
 
-    let schema = api.describe().await;
+    let schema = api.describe();
 
     schema.assert_table("User", |t| {
         let t = t
@@ -165,22 +159,20 @@ async fn multi_column_foreign_keys_must_work(api: &TestApi) {
 }
 
 #[test_connector]
-async fn names_with_hyphens_must_work(api: &TestApi) {
-    api.barrel()
-        .execute(|migration| {
-            migration.create_table("User-table", |t| {
-                t.add_column("column-1", types::integer().nullable(false));
-            });
-        })
-        .await;
+fn names_with_hyphens_must_work(api: TestApi) {
+    api.execute_barrel(|migration| {
+        migration.create_table("User-table", |t| {
+            t.add_column("column-1", types::integer().nullable(false));
+        });
+    });
 
-    api.describe().await.assert_table("User-table", |table| {
+    api.describe().assert_table("User-table", |table| {
         table.assert_column("column-1", |c| c.assert_not_null())
     });
 }
 
 #[test_connector]
-async fn composite_primary_keys_must_work(api: &TestApi) {
+fn composite_primary_keys_must_work(api: TestApi) {
     let sql = match api.sql_family() {
         SqlFamily::Mysql => format!(
             "CREATE TABLE `{0}`.`User` (
@@ -208,22 +200,22 @@ async fn composite_primary_keys_must_work(api: &TestApi) {
         ),
     };
 
-    api.database().query_raw(&sql, &[]).await.unwrap();
+    api.raw_cmd(&sql).unwrap();
 
-    let schema = api.describe().await;
+    let schema = api.describe();
     let table = schema.get_table("User").expect("couldn't get User table");
     let mut expected_columns = vec![
         Column {
             name: "id".to_string(),
             tpe: ColumnType {
-                full_data_type: int_full_data_type(api).into(),
+                full_data_type: int_full_data_type(&api).into(),
                 family: if api.is_cockroach() {
                     ColumnTypeFamily::BigInt
                 } else {
                     ColumnTypeFamily::Int
                 },
                 arity: ColumnArity::Required,
-                native_type: int_native_type(api),
+                native_type: int_native_type(&api),
             },
             default: None,
             auto_increment: false,
@@ -231,10 +223,10 @@ async fn composite_primary_keys_must_work(api: &TestApi) {
         Column {
             name: "name".to_string(),
             tpe: ColumnType {
-                full_data_type: varchar_full_data_type(api, 255),
+                full_data_type: varchar_full_data_type(&api, 255),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
-                native_type: varchar_native_type(api, 255),
+                native_type: varchar_native_type(&api, 255),
             },
             default: None,
             auto_increment: false,
@@ -264,17 +256,15 @@ async fn composite_primary_keys_must_work(api: &TestApi) {
 }
 
 #[test_connector]
-async fn indices_must_work(api: &TestApi) {
-    api.barrel()
-        .execute(|migration| {
-            migration.create_table("User", move |t| {
-                t.add_column("id", types::primary());
-                t.add_column("count", types::integer());
-                t.add_index("count", types::index(vec!["count"]));
-            });
-        })
-        .await;
-    let result = api.describe().await;
+fn indices_must_work(api: TestApi) {
+    api.execute_barrel(|migration| {
+        migration.create_table("User", move |t| {
+            t.add_column("id", types::primary());
+            t.add_column("count", types::integer());
+            t.add_index("count", types::index(vec!["count"]));
+        });
+    });
+    let result = api.describe();
     let user_table = result.get_table("User").expect("getting User table");
     let default = match api.sql_family() {
         SqlFamily::Postgres if api.is_cockroach() => Some(DefaultValue::db_generated("unique_rowid()")),
@@ -285,14 +275,14 @@ async fn indices_must_work(api: &TestApi) {
         Column {
             name: "id".to_string(),
             tpe: ColumnType {
-                full_data_type: int_full_data_type(api).into(),
+                full_data_type: int_full_data_type(&api).into(),
                 family: if api.is_cockroach() {
                     ColumnTypeFamily::BigInt
                 } else {
                     ColumnTypeFamily::Int
                 },
                 arity: ColumnArity::Required,
-                native_type: int_native_type(api),
+                native_type: int_native_type(&api),
             },
 
             default,
@@ -301,14 +291,14 @@ async fn indices_must_work(api: &TestApi) {
         Column {
             name: "count".to_string(),
             tpe: ColumnType {
-                full_data_type: int_full_data_type(api).into(),
+                full_data_type: int_full_data_type(&api).into(),
                 family: if api.is_cockroach() {
                     ColumnTypeFamily::BigInt
                 } else {
                     ColumnTypeFamily::Int
                 },
                 arity: ColumnArity::Required,
-                native_type: int_native_type(api),
+                native_type: int_native_type(&api),
             },
             default: None,
             auto_increment: false,
@@ -355,18 +345,16 @@ async fn indices_must_work(api: &TestApi) {
 }
 
 #[test_connector]
-async fn column_uniqueness_must_be_detected(api: &TestApi) {
-    api.barrel()
-        .execute(|migration| {
-            migration.create_table("User", move |t| {
-                t.add_column("uniq1", types::integer().unique(true));
-                t.add_column("uniq2", types::integer());
-                t.add_index("uniq", types::index(vec!["uniq2"]).unique(true));
-            });
-        })
-        .await;
+fn column_uniqueness_must_be_detected(api: TestApi) {
+    api.execute_barrel(|migration| {
+        migration.create_table("User", move |t| {
+            t.add_column("uniq1", types::integer().unique(true));
+            t.add_column("uniq2", types::integer());
+            t.add_index("uniq", types::index(vec!["uniq2"]).unique(true));
+        });
+    });
 
-    let schema = api.describe().await;
+    let schema = api.describe();
 
     schema.assert_table("User", |t| {
         t.assert_column("uniq1", |c| {
@@ -408,16 +396,14 @@ async fn column_uniqueness_must_be_detected(api: &TestApi) {
 }
 
 #[test_connector]
-async fn defaults_must_work(api: &TestApi) {
-    api.barrel()
-        .execute(|migration| {
-            migration.create_table("User", move |t| {
-                t.add_column("id", types::integer().default(1).nullable(true));
-            });
-        })
-        .await;
+fn defaults_must_work(api: TestApi) {
+    api.execute_barrel(|migration| {
+        migration.create_table("User", move |t| {
+            t.add_column("id", types::integer().default(1).nullable(true));
+        });
+    });
 
-    let result = api.describe().await;
+    let result = api.describe();
     let user_table = result.get_table("User").expect("getting User table");
 
     assert_eq!("User", &user_table.name);
@@ -434,14 +420,14 @@ async fn defaults_must_work(api: &TestApi) {
     assert_eq!(false, id.auto_increment);
 
     let expected_type = ColumnType {
-        full_data_type: int_full_data_type(api).into(),
+        full_data_type: int_full_data_type(&api).into(),
         family: if api.is_cockroach() {
             ColumnTypeFamily::BigInt
         } else {
             ColumnTypeFamily::Int
         },
         arity: ColumnArity::Nullable,
-        native_type: int_native_type(api),
+        native_type: int_native_type(&api),
     };
 
     assert_eq!(expected_type, id.tpe);
