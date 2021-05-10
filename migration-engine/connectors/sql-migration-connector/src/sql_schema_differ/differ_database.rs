@@ -1,8 +1,5 @@
 use crate::{flavour::SqlFlavour, pair::Pair};
-use sql_schema_describer::{
-    walkers::{SqlSchemaExt, TableWalker},
-    SqlSchema,
-};
+use sql_schema_describer::SqlSchema;
 use std::{
     borrow::Cow,
     collections::{BTreeMap, HashMap},
@@ -10,7 +7,6 @@ use std::{
 };
 
 pub(crate) struct DifferDatabase<'a> {
-    schemas: Pair<&'a SqlSchema>,
     /// Table name -> table indexes.
     tables: HashMap<Cow<'a, str>, Pair<Option<usize>>>,
     /// (table_idxs, column_name) -> column_idxs
@@ -68,11 +64,7 @@ impl<'a> DifferDatabase<'a> {
             }
         }
 
-        DifferDatabase {
-            tables,
-            columns,
-            schemas,
-        }
+        DifferDatabase { tables, columns }
     }
 
     pub(crate) fn column_pairs(&self, table: Pair<usize>) -> impl Iterator<Item = Pair<usize>> + '_ {
@@ -85,12 +77,11 @@ impl<'a> DifferDatabase<'a> {
             .filter_map(|(_k, v)| *v.next())
     }
 
-    pub(crate) fn created_tables(&self) -> impl Iterator<Item = TableWalker<'a>> + '_ {
+    pub(crate) fn created_tables(&self) -> impl Iterator<Item = usize> + '_ {
         self.tables
             .values()
             .filter(|p| p.previous().is_none())
             .filter_map(|p| *p.next())
-            .map(move |idx| self.schemas.next().table_walker_at(idx))
     }
 
     pub(crate) fn dropped_columns(&self, table: Pair<usize>) -> impl Iterator<Item = usize> + '_ {
@@ -99,12 +90,11 @@ impl<'a> DifferDatabase<'a> {
             .filter_map(|(_k, v)| *v.previous())
     }
 
-    pub(crate) fn dropped_tables(&self) -> impl Iterator<Item = TableWalker<'a>> + '_ {
+    pub(crate) fn dropped_tables(&self) -> impl Iterator<Item = usize> + '_ {
         self.tables
             .values()
             .filter(|p| p.next().is_none())
             .filter_map(|p| *p.previous())
-            .map(move |idx| self.schemas.previous().table_walker_at(idx))
     }
 
     fn range_columns(
@@ -117,10 +107,7 @@ impl<'a> DifferDatabase<'a> {
     }
 
     /// An iterator over the tables that are present in both schemas.
-    pub(crate) fn table_pairs(&self) -> impl Iterator<Item = Pair<TableWalker<'a>>> + '_ {
-        self.tables
-            .values()
-            .filter_map(|p| p.transpose())
-            .map(move |idxs| self.schemas.tables(&idxs))
+    pub(crate) fn table_pairs(&self) -> impl Iterator<Item = Pair<usize>> + '_ {
+        self.tables.values().filter_map(|p| p.transpose())
     }
 }

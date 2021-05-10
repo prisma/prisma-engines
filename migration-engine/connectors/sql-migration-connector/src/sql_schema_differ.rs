@@ -20,7 +20,7 @@ use crate::{
 use column::ColumnTypeChange;
 use enums::EnumDiffer;
 use sql_schema_describer::{
-    walkers::{EnumWalker, ForeignKeyWalker, TableWalker},
+    walkers::{EnumWalker, ForeignKeyWalker, SqlSchemaExt, TableWalker},
     ColumnTypeFamily,
 };
 use std::collections::HashSet;
@@ -211,7 +211,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         })
     }
 
-    fn alter_columns<'a>(table_differ: &TableDiffer<'_, '_>) -> Vec<TableChange> {
+    fn alter_columns(table_differ: &TableDiffer<'_, '_>) -> Vec<TableChange> {
         let mut alter_columns: Vec<_> = table_differ
             .column_pairs()
             .filter_map(move |column_differ| {
@@ -452,7 +452,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
     fn table_pairs(&self) -> impl Iterator<Item = TableDiffer<'schema, '_>> + '_ {
         self.db.table_pairs().map(move |tables| TableDiffer {
             flavour: self.flavour,
-            tables,
+            tables: self.schemas.tables(&tables),
             db: &self.db,
         })
     }
@@ -475,12 +475,16 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         steps
     }
 
-    fn created_tables(&self) -> impl Iterator<Item = TableWalker<'_>> {
-        self.db.created_tables()
+    fn created_tables(&self) -> impl Iterator<Item = TableWalker<'schema>> + '_ {
+        self.db
+            .created_tables()
+            .map(move |table_index| self.schemas.next().table_walker_at(table_index))
     }
 
-    fn dropped_tables<'a>(&'a self) -> impl Iterator<Item = TableWalker<'schema>> + 'a {
-        self.db.dropped_tables()
+    fn dropped_tables(&self) -> impl Iterator<Item = TableWalker<'schema>> + '_ {
+        self.db
+            .dropped_tables()
+            .map(move |table_index| self.schemas.previous().table_walker_at(table_index))
     }
 
     fn enum_pairs(&self) -> impl Iterator<Item = EnumDiffer<'_>> {
