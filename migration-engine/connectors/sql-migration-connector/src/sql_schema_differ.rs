@@ -8,6 +8,7 @@ mod table;
 pub(crate) use column::{ColumnChange, ColumnChanges};
 pub(crate) use sql_schema_differ_flavour::SqlSchemaDifferFlavour;
 
+use self::differ_database::DifferDatabase;
 use crate::{
     pair::Pair,
     sql_migration::{
@@ -25,11 +26,11 @@ use sql_schema_describer::{
 use std::collections::HashSet;
 use table::TableDiffer;
 
-use self::differ_database::DifferDatabase;
-
 pub(crate) fn calculate_steps(schemas: Pair<&SqlSchema>, flavour: &dyn SqlFlavour) -> Vec<SqlMigrationStep> {
     let db = DifferDatabase::new(schemas, flavour);
     let differ = SqlSchemaDiffer { schemas, flavour, db };
+    let mut create_tables: Vec<CreateTable> = differ.create_tables().collect();
+    create_tables.sort();
 
     let tables_to_redefine = differ.flavour.tables_to_redefine(&differ);
     let mut alter_indexes = differ.alter_indexes(&tables_to_redefine);
@@ -78,7 +79,7 @@ pub(crate) fn calculate_steps(schemas: Pair<&SqlSchema>, flavour: &dyn SqlFlavou
         // - We must drop enums after we drop tables, or dropping the enum will
         //   fail on postgres because objects (=tables) still depend on them.
         .chain(flavour.drop_enums(&differ).into_iter().map(SqlMigrationStep::DropEnum))
-        .chain(differ.create_tables().map(SqlMigrationStep::CreateTable))
+        .chain(create_tables.into_iter().map(SqlMigrationStep::CreateTable))
         .chain(redefine_tables)
         // Order matters: we must create indexes after ALTER TABLEs because the indexes can be
         // on fields that are dropped/created there.

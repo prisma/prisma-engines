@@ -83,7 +83,7 @@ impl SqlMigrationStep {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) struct CreateTable {
     pub table_index: usize,
 }
