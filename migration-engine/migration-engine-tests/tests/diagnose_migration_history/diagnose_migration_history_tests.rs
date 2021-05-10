@@ -1066,3 +1066,62 @@ async fn indexes_on_same_columns_with_different_names_should_work(api: &TestApi)
 
     Ok(())
 }
+
+#[test_connector(tags(Postgres))]
+async fn default_dbgenerated_should_not_cause_drift(api: &TestApi) -> TestResult {
+    let migrations_directory = api.create_migrations_directory()?;
+
+    let dm = r#"
+        model A {
+            id String @id @default(dbgenerated("(now())::TEXT"))
+        }
+    "#;
+
+    api.create_migration("01init", dm, &migrations_directory).send().await?;
+
+    api.apply_migrations(&migrations_directory)
+        .send()
+        .await?
+        .assert_applied_migrations(&["01init"])?;
+
+    let output = api
+        .diagnose_migration_history(&migrations_directory)
+        .opt_in_to_shadow_database(true)
+        .send()
+        .await?
+        .into_output();
+
+    assert!(output.drift.is_none());
+
+    Ok(())
+}
+
+#[test_connector(tags(Postgres))]
+async fn default_uuid_should_not_cause_drift(api: &TestApi) -> TestResult {
+    let migrations_directory = api.create_migrations_directory()?;
+
+    let dm = r#"
+        model A {
+            id   String @id @db.Uuid
+            uuid String @db.Uuid @default("00000000-0000-0000-0016-000000000004")
+        }
+    "#;
+
+    api.create_migration("01init", dm, &migrations_directory).send().await?;
+
+    api.apply_migrations(&migrations_directory)
+        .send()
+        .await?
+        .assert_applied_migrations(&["01init"])?;
+
+    let output = api
+        .diagnose_migration_history(&migrations_directory)
+        .opt_in_to_shadow_database(true)
+        .send()
+        .await?
+        .into_output();
+
+    assert!(output.drift.is_none());
+
+    Ok(())
+}

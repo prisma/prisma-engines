@@ -28,14 +28,36 @@ async fn sequences_should_work(api: &TestApi) -> TestResult {
           second BigInt?    @default(autoincrement())
           third  BigInt     @default(autoincrement())
         }
-    "#}
-    .to_string();
+    "#};
 
-    let result = api.re_introspect(&dm).await?;
+    let result = api.re_introspect(dm).await?;
 
     println!("EXPECTATION: \n {:#}", dm);
     println!("RESULT: \n {:#}", result);
 
-    api.assert_eq_datamodels(&dm, &result);
+    api.assert_eq_datamodels(dm, &result);
+
+    Ok(())
+}
+
+#[test_connector(tags(Postgres))]
+async fn dbgenerated_type_casts_should_work(api: &TestApi) -> TestResult {
+    api.barrel()
+        .execute(move |migration| {
+            migration.create_table("A", move |t| {
+                t.inject_custom("id VARCHAR(30) PRIMARY KEY DEFAULT (now())::text");
+            });
+        })
+        .await?;
+
+    let dm = indoc! {r#"
+        model A {
+          id String @id @default(dbgenerated("(now())::text")) @db.VarChar(30)
+        }
+    "#};
+
+    let result = api.introspect().await?;
+    api.assert_eq_datamodels(dm, &result);
+
     Ok(())
 }

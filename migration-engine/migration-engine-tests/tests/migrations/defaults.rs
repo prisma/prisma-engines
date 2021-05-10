@@ -58,3 +58,70 @@ fn function_expressions_as_dbgenerated_work(api: TestApi) {
         })
         .unwrap();
 }
+
+#[test_connector(tags(Postgres))]
+fn default_dbgenerated_with_type_definitions_should_work(api: TestApi) {
+    let engine = api.new_engine();
+
+    let dm = r#"
+        model A {
+            id String @id @default(dbgenerated("(now())::TEXT"))
+        }
+    "#;
+
+    engine.schema_push(dm).send_sync().unwrap().assert_green().unwrap();
+
+    engine
+        .assert_schema()
+        .assert_table("A", |table| {
+            table.assert_column("id", |col| {
+                col.assert_default(Some(DefaultValue::db_generated("(now())::text")))
+            })
+        })
+        .unwrap();
+}
+
+#[test_connector(tags(Postgres))]
+fn default_dbgenerated_should_work(api: TestApi) {
+    let engine = api.new_engine();
+
+    let dm = r#"
+        model A {
+            id String @id @default(dbgenerated("(now())"))
+        }
+    "#;
+
+    engine.schema_push(dm).send_sync().unwrap().assert_green().unwrap();
+
+    engine
+        .assert_schema()
+        .assert_table("A", |table| {
+            table.assert_column("id", |col| {
+                col.assert_default(Some(DefaultValue::db_generated("now()")))
+            })
+        })
+        .unwrap();
+}
+
+#[test_connector(tags(Postgres))]
+fn uuid_default(api: TestApi) {
+    let engine = api.new_engine();
+
+    let dm = r#"
+        model A {
+            id   String @id @db.Uuid
+            uuid String @db.Uuid @default("00000000-0000-0000-0016-000000000004")
+        }
+    "#;
+
+    engine.schema_push(dm).send_sync().unwrap().assert_green().unwrap();
+
+    engine
+        .assert_schema()
+        .assert_table("A", |table| {
+            table.assert_column("uuid", |col| {
+                col.assert_default(Some(DefaultValue::value("00000000-0000-0000-0016-000000000004")))
+            })
+        })
+        .unwrap();
+}
