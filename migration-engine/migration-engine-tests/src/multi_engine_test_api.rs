@@ -8,7 +8,10 @@ pub use test_setup::{BitFlags, Capabilities, Tags};
 
 use crate::{ApplyMigrations, CreateMigration, DiagnoseMigrationHistory, Reset, SchemaAssertion, SchemaPush};
 use migration_core::GenericApi;
-use quaint::{prelude::Queryable, single::Quaint};
+use quaint::{
+    prelude::{Queryable, ResultSet},
+    single::Quaint,
+};
 use sql_migration_connector::SqlMigrationConnector;
 use std::future::Future;
 use tempfile::TempDir;
@@ -124,9 +127,19 @@ impl TestApi {
         self.tags().contains(Tags::Postgres)
     }
 
+    /// Returns true only when testing on sqlite.
+    pub fn is_sqlite(&self) -> bool {
+        self.tags().contains(Tags::Sqlite)
+    }
+
     /// Returns true only when testing on vitess.
     pub fn is_vitess(&self) -> bool {
         self.tags().contains(Tags::Vitess)
+    }
+
+    /// Returns whether the database automatically lower-cases table names.
+    pub fn lower_cases_table_names(&self) -> bool {
+        self.tags().contains(Tags::LowerCasesTableNames)
     }
 
     /// Instantiate a new migration engine for the current database.
@@ -154,6 +167,7 @@ impl TestApi {
             connector,
             tags: self.args.tags(),
             rt: &self.rt,
+            api: self,
         }
     }
 
@@ -173,6 +187,7 @@ pub struct EngineTestApi<'a> {
     connector: SqlMigrationConnector,
     tags: BitFlags<Tags>,
     rt: &'a tokio::runtime::Runtime,
+    api: &'a TestApi,
 }
 
 impl EngineTestApi<'_> {
@@ -204,6 +219,20 @@ impl EngineTestApi<'_> {
     /// Expose the GenericApi impl.
     pub fn generic_api(&self) -> &dyn GenericApi {
         &self.connector
+    }
+
+    /// Same as quaint::Queryable::query()
+    pub fn query(&self, q: quaint::ast::Query<'_>) -> ResultSet {
+        self.rt.block_on(self.connector.quaint().query(q)).unwrap()
+    }
+
+    /// Render a table name with the required prefixing for use with quaint query building.
+    pub fn render_table_name<'a>(&'a self, table_name: &'a str) -> quaint::ast::Table<'a> {
+        if self.api.is_sqlite() {
+            table_name.into()
+        } else {
+            (self.connector.quaint().connection_info().schema_name(), table_name).into()
+        }
     }
 
     /// Plan a `reset` command
