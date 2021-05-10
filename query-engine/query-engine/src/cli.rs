@@ -110,7 +110,8 @@ impl CliCommand {
         Ok(())
     }
 
-    fn get_config(config: ValidatedConfiguration) -> PrismaResult<()> {
+    fn get_config(mut config: ValidatedConfiguration) -> PrismaResult<()> {
+        config.subject.resolve_datasource_urls_from_env()?;
         let json = datamodel::json::mcf::config_to_mcf_json_value(&config);
         let serialized = serde_json::to_string(&json)?;
 
