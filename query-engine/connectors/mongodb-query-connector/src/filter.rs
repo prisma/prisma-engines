@@ -262,10 +262,14 @@ fn one_is_null(filter: OneRelationIsNullFilter, invert: bool) -> MongoFilter {
 fn relation_filter(filter: RelationFilter, invert: bool) -> crate::Result<MongoFilter> {
     let from_field = filter.field;
     let relation_name = &from_field.relation().name;
+    let nested_filter = *filter.nested_filter;
+
+    // Tmp condition check while mongo is getting fully tested.
+    let is_empty = matches!(nested_filter, Filter::Empty);
 
     // `invert` xor `filter requires invert`
     let (nested_filter, nested_joins) =
-        convert_filter(*filter.nested_filter, invert ^ requires_invert(&filter.condition))?.render();
+        convert_filter(nested_filter, invert ^ requires_invert(&filter.condition))?.render();
 
     let mut join_stage = JoinStage::new(from_field);
     join_stage.extend_nested(nested_joins);
@@ -278,7 +282,11 @@ fn relation_filter(filter: RelationFilter, invert: bool) -> crate::Result<MongoF
             doc! { "$elemMatch": nested_filter }
         }
         connector_interface::RelationCondition::NoRelatedRecord => {
-            doc! { "$all": [{ "$elemMatch": nested_filter }]}
+            if is_empty {
+                doc! { "$size": 0 }
+            } else {
+                doc! { "$all": [{ "$elemMatch": nested_filter }]}
+            }
         }
         connector_interface::RelationCondition::ToOneRelatedRecord => {
             doc! { "$all": [{ "$elemMatch": nested_filter }]}
