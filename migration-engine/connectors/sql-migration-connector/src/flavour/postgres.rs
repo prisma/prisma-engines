@@ -103,6 +103,9 @@ impl SqlFlavour for PostgresFlavour {
                     .port()
                     .map(|port| port.to_string())
                     .unwrap_or_else(|| "<unknown>".into()),
+                context: format!(
+                    "Timed out trying to acquire a postgres advisory lock (SELECT pg_advisory_lock(72707369)). Elapsed: {}ms. See https://pris.ly/d/migrate-advisory-locking for details.", ADVISORY_LOCK_TIMEOUT.as_millis()
+                ),
             })
         })??;
 

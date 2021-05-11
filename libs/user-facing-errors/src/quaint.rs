@@ -160,7 +160,11 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
                 None => String::from("N/A"),
             };
 
-            Some(KnownError::new(common::DatabaseOperationTimeout { time }))
+            Some(KnownError::new(common::DatabaseOperationTimeout {
+                time,
+                context: "Socket timeout (the database failed to respond to a query within the configured timeout — see https://pris.ly/d/mysql-connector for more details.)."
+                    .into(),
+            }))
         }
 
         (ErrorKind::SocketTimeout, ConnectionInfo::Postgres(url)) => {
@@ -169,7 +173,11 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
                 None => String::from("N/A"),
             };
 
-            Some(KnownError::new(common::DatabaseOperationTimeout { time }))
+            Some(KnownError::new(common::DatabaseOperationTimeout {
+                time,
+                context: "Socket timeout (the database failed to respond to a query within the configured timeout — see https://pris.ly/d/mssql-connector for more details.)."
+                    .into(),
+            }))
         }
 
         (ErrorKind::SocketTimeout, ConnectionInfo::Mssql(url)) => {
@@ -178,7 +186,11 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
                 None => String::from("N/A"),
             };
 
-            Some(KnownError::new(common::DatabaseOperationTimeout { time }))
+            Some(KnownError::new(common::DatabaseOperationTimeout {
+                time,
+                context: "Socket timeout (the database failed to respond to a query within the configured timeout — see https://pris.ly/d/postgres-connector for more details.)."
+                    .into(),
+            }))
         }
 
         (ErrorKind::PoolTimeout { max_open, .. }, _) => Some(KnownError::new(query_engine::PoolTimeout {
