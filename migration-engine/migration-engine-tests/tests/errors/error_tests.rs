@@ -1,14 +1,13 @@
 use indoc::{formatdoc, indoc};
 use migration_core::api::RpcApi;
-use migration_engine_tests::sql::*;
+use migration_engine_tests::multi_engine_test_api::*;
 use pretty_assertions::assert_eq;
-use quaint::prelude::{Queryable, SqlFamily};
+use quaint::prelude::Insert;
 use serde_json::json;
-use test_macros::test_connector;
 use url::Url;
 
 #[test_connector(tags(Postgres12))]
-async fn authentication_failure_must_return_a_known_error_on_postgres(api: &TestApi) -> TestResult {
+fn authentication_failure_must_return_a_known_error_on_postgres(api: TestApi) {
     let mut db_url: Url = api.connection_string().parse().unwrap();
 
     db_url.set_password(Some("obviously-not-right")).unwrap();
@@ -23,7 +22,7 @@ async fn authentication_failure_must_return_a_known_error_on_postgres(api: &Test
         db_url
     );
 
-    let error = RpcApi::new(&dm).await.map(|_| ()).unwrap_err();
+    let error = api.block_on(RpcApi::new(&dm)).map(|_| ()).unwrap_err();
 
     let user = db_url.username();
     let host = db_url.host().unwrap().to_string();
@@ -40,12 +39,10 @@ async fn authentication_failure_must_return_a_known_error_on_postgres(api: &Test
     });
 
     assert_eq!(json_error, expected);
-
-    Ok(())
 }
 
 #[test_connector(tags(Mysql), exclude(Vitess))]
-async fn authentication_failure_must_return_a_known_error_on_mysql(api: &TestApi) -> TestResult {
+fn authentication_failure_must_return_a_known_error_on_mysql(api: TestApi) {
     let mut url: Url = api.connection_string().parse().unwrap();
 
     url.set_password(Some("obviously-not-right")).unwrap();
@@ -60,7 +57,7 @@ async fn authentication_failure_must_return_a_known_error_on_mysql(api: &TestApi
         url
     );
 
-    let error = RpcApi::new(&dm).await.map(|_| ()).unwrap_err();
+    let error = api.block_on(RpcApi::new(&dm)).map(|_| ()).unwrap_err();
 
     let user = url.username();
     let host = url.host().unwrap().to_string();
@@ -77,12 +74,10 @@ async fn authentication_failure_must_return_a_known_error_on_mysql(api: &TestApi
     });
 
     assert_eq!(json_error, expected);
-
-    Ok(())
 }
 
 #[test_connector(tags(Mysql))]
-async fn unreachable_database_must_return_a_proper_error_on_mysql(api: &TestApi) -> TestResult {
+fn unreachable_database_must_return_a_proper_error_on_mysql(api: TestApi) {
     let mut url: Url = api.connection_string().parse().unwrap();
 
     url.set_port(Some(8787)).unwrap();
@@ -97,7 +92,7 @@ async fn unreachable_database_must_return_a_proper_error_on_mysql(api: &TestApi)
         url
     );
 
-    let error = RpcApi::new(&dm).await.map(|_| ()).unwrap_err();
+    let error = api.block_on(RpcApi::new(&dm)).map(|_| ()).unwrap_err();
 
     let port = url.port().unwrap();
     let host = url.host().unwrap().to_string();
@@ -114,12 +109,10 @@ async fn unreachable_database_must_return_a_proper_error_on_mysql(api: &TestApi)
     });
 
     assert_eq!(json_error, expected);
-
-    Ok(())
 }
 
 #[test_connector(tags(Postgres12))]
-async fn unreachable_database_must_return_a_proper_error_on_postgres(api: &TestApi) -> TestResult {
+fn unreachable_database_must_return_a_proper_error_on_postgres(api: TestApi) {
     let mut url: Url = api.connection_string().parse().unwrap();
 
     url.set_port(Some(8787)).unwrap();
@@ -134,7 +127,7 @@ async fn unreachable_database_must_return_a_proper_error_on_postgres(api: &TestA
         url
     );
 
-    let error = RpcApi::new(&dm).await.map(|_| ()).unwrap_err();
+    let error = api.block_on(RpcApi::new(&dm)).map(|_| ()).unwrap_err();
 
     let host = url.host().unwrap().to_string();
     let port = url.port().unwrap();
@@ -151,12 +144,10 @@ async fn unreachable_database_must_return_a_proper_error_on_postgres(api: &TestA
     });
 
     assert_eq!(json_error, expected);
-
-    Ok(())
 }
 
 #[test_connector(tags(Mysql))]
-async fn database_does_not_exist_must_return_a_proper_error(api: &TestApi) -> TestResult {
+fn database_does_not_exist_must_return_a_proper_error(api: TestApi) {
     let mut url: Url = api.connection_string().parse().unwrap();
     let database_name = "notmydatabase";
 
@@ -172,7 +163,7 @@ async fn database_does_not_exist_must_return_a_proper_error(api: &TestApi) -> Te
         url
     );
 
-    let error = RpcApi::new(&dm).await.map(|_| ()).unwrap_err();
+    let error = api.block_on(RpcApi::new(&dm)).map(|_| ()).unwrap_err();
 
     let json_error = serde_json::to_value(&error.to_user_facing()).unwrap();
     let expected = json!({
@@ -187,12 +178,10 @@ async fn database_does_not_exist_must_return_a_proper_error(api: &TestApi) -> Te
     });
 
     assert_eq!(json_error, expected);
-
-    Ok(())
 }
 
 #[test_connector(tags(Postgres))]
-async fn bad_datasource_url_and_provider_combinations_must_return_a_proper_error(api: &TestApi) -> TestResult {
+fn bad_datasource_url_and_provider_combinations_must_return_a_proper_error(api: TestApi) {
     let dm = format!(
         r#"
             datasource db {{
@@ -203,7 +192,7 @@ async fn bad_datasource_url_and_provider_combinations_must_return_a_proper_error
         api.connection_string()
     );
 
-    let error = RpcApi::new(&dm).await.map(drop).unwrap_err();
+    let error = api.block_on(RpcApi::new(&dm)).map(drop).unwrap_err();
 
     let json_error = serde_json::to_value(&error.to_user_facing()).unwrap();
 
@@ -225,12 +214,10 @@ async fn bad_datasource_url_and_provider_combinations_must_return_a_proper_error
     });
 
     assert_eq!(json_error, expected);
-
-    Ok(())
 }
 
 #[test_connector(tags(Mysql8))]
-async fn connections_to_system_databases_must_be_rejected(api: &TestApi) -> TestResult {
+fn connections_to_system_databases_must_be_rejected(api: TestApi) {
     let names = &["", "mysql", "sys", "performance_schema"];
     for name in names {
         let mut url: url::Url = api.connection_string().parse().unwrap();
@@ -249,7 +236,7 @@ async fn connections_to_system_databases_must_be_rejected(api: &TestApi) -> Test
         // "mysql" is the default in Quaint.
         let name = if name == &"" { "mysql" } else { name };
 
-        let error = RpcApi::new(&dm).await.map(drop).unwrap_err();
+        let error = api.block_on(RpcApi::new(&dm)).map(drop).unwrap_err();
         let json_error = serde_json::to_value(&error.to_user_facing()).unwrap();
 
         let expected = json!({
@@ -263,12 +250,12 @@ async fn connections_to_system_databases_must_be_rejected(api: &TestApi) -> Test
 
         assert_eq!(json_error, expected);
     }
-
-    Ok(())
 }
 
 #[test_connector(tags(Sqlite))]
-async fn datamodel_parser_errors_must_return_a_known_error(api: &TestApi) -> TestResult {
+fn datamodel_parser_errors_must_return_a_known_error(api: TestApi) {
+    let api = api.new_engine();
+
     let bad_dm = r#"
         model Test {
             id Float @id
@@ -276,7 +263,7 @@ async fn datamodel_parser_errors_must_return_a_known_error(api: &TestApi) -> Tes
         }
     "#;
 
-    let error = api.schema_push(bad_dm).send().await.unwrap_err().to_user_facing();
+    let error = api.schema_push(bad_dm).send_sync().unwrap_err().to_user_facing();
 
     let expected_msg = "\u{1b}[1;91merror\u{1b}[0m: \u{1b}[1mType \"Post\" is neither a built-in type, nor refers to another model, custom type, or enum.\u{1b}[0m\n  \u{1b}[1;94m-->\u{1b}[0m  \u{1b}[4mschema.prisma:4\u{1b}[0m\n\u{1b}[1;94m   | \u{1b}[0m\n\u{1b}[1;94m 3 | \u{1b}[0m            id Float @id\n\u{1b}[1;94m 4 | \u{1b}[0m            post \u{1b}[1;91mPost[]\u{1b}[0m\n\u{1b}[1;94m   | \u{1b}[0m\n";
 
@@ -287,13 +274,11 @@ async fn datamodel_parser_errors_must_return_a_known_error(api: &TestApi) -> Tes
     });
 
     assert_eq!(error, expected_error);
-
-    Ok(())
 }
 
 #[test_connector]
-async fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: &TestApi) -> TestResult {
-    use quaint::ast::*;
+fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: TestApi) {
+    let engine = api.new_engine();
 
     let dm = r#"
         model Fruit {
@@ -302,14 +287,14 @@ async fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: &
         }
     "#;
 
-    api.schema_push(dm).send().await?.assert_green()?;
+    engine.schema_push(dm).send_sync().unwrap().assert_green().unwrap();
 
-    let insert = Insert::multi_into(api.render_table_name("Fruit"), &["name"])
+    let insert = Insert::multi_into(engine.render_table_name("Fruit"), &["name"])
         .values(("banana",))
         .values(("apple",))
         .values(("banana",));
 
-    api.database().execute(insert.into()).await?;
+    engine.query(insert.into());
 
     let dm2 = r#"
         model Fruit {
@@ -318,29 +303,34 @@ async fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: &
         }
     "#;
 
-    let res = api
+    let res = engine
         .schema_push(dm2)
         .force(true)
         .migration_id(Some("the-migration"))
-        .send()
-        .await
+        .send_sync()
         .unwrap_err()
         .to_user_facing();
 
     let json_error = serde_json::to_value(&res).unwrap();
 
-    let expected_msg = match api.sql_family() {
-        SqlFamily::Mysql if api.tags().contains(Tags::Vitess) => "Unique constraint failed on the (not available)",
-        SqlFamily::Mysql => "Unique constraint failed on the constraint: `name_unique`",
-        SqlFamily::Mssql => "Unique constraint failed on the constraint: `Fruit_name_unique`",
-        _ => "Unique constraint failed on the fields: (`name`)",
+    let expected_msg = if api.is_vitess() {
+        "Unique constraint failed on the (not available)"
+    } else if api.is_mysql() {
+        "Unique constraint failed on the constraint: `name_unique`"
+    } else if api.is_mssql() {
+        "Unique constraint failed on the constraint: `Fruit_name_unique`"
+    } else {
+        "Unique constraint failed on the fields: (`name`)"
     };
 
-    let expected_target = match api.sql_family() {
-        SqlFamily::Mysql if api.tags().contains(Tags::Vitess) => serde_json::Value::Null,
-        SqlFamily::Mysql => json!("name_unique"),
-        SqlFamily::Mssql => json!("Fruit_name_unique"),
-        _ => json!(["name"]),
+    let expected_target = if api.is_vitess() {
+        serde_json::Value::Null
+    } else if api.is_mysql() {
+        json!("name_unique")
+    } else if api.is_mssql() {
+        json!("Fruit_name_unique")
+    } else {
+        json!(["name"])
     };
 
     let expected_json = json!({
@@ -353,12 +343,11 @@ async fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: &
     });
 
     assert_eq!(json_error, expected_json);
-
-    Ok(())
 }
 
 #[test_connector(tags(Mysql56))]
-async fn json_fields_must_be_rejected(api: &TestApi) -> TestResult {
+fn json_fields_must_be_rejected(api: TestApi) {
+    let engine = api.new_engine();
     let dm = format!(
         r#"
         {}
@@ -369,13 +358,12 @@ async fn json_fields_must_be_rejected(api: &TestApi) -> TestResult {
         }}
 
         "#,
-        api.datasource()
+        api.datasource_block()
     );
 
-    let result = api
+    let result = engine
         .schema_push(dm)
-        .send()
-        .await
+        .send_sync()
         .unwrap_err()
         .to_user_facing()
         .unwrap_known();
@@ -387,8 +375,6 @@ async fn json_fields_must_be_rejected(api: &TestApi) -> TestResult {
     assert!(result
         .message
         .contains("- The `Json` data type used in Test.j is not supported on MySQL 5.6.\n"));
-
-    Ok(())
 }
 
 #[tokio::test]

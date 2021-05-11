@@ -97,6 +97,11 @@ impl TestApi {
         tempfile::tempdir().unwrap()
     }
 
+    /// Render a valid datasource block, including database URL.
+    pub fn datasource_block(&self) -> String {
+        self.args.datasource_block(self.args.database_url())
+    }
+
     /// Returns true only when testing on MSSQL.
     pub fn is_mssql(&self) -> bool {
         self.tags().contains(Tags::Mssql)
