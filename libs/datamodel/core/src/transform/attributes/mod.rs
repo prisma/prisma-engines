@@ -8,7 +8,7 @@ mod relation;
 mod unique_and_index;
 mod updated_at;
 
-use crate::dml;
+use crate::{ast, dml};
 use attribute_list_validator::AttributeListValidator;
 use attribute_validator::AttributeValidator;
 
@@ -73,4 +73,11 @@ fn new_builtin_enum_value_attributes() -> AttributeListValidator<dml::EnumValue>
     validator.add(Box::new(map::MapAttributeValidator {}));
 
     validator
+}
+
+pub fn field_array(fields: &[String]) -> Vec<ast::Expression> {
+    fields
+        .iter()
+        .map(|f| ast::Expression::ConstantValue(f.to_string(), ast::Span::empty()))
+        .collect()
 }

@@ -2,6 +2,7 @@
 
 use super::{super::helpers::Arguments, AttributeValidator};
 use crate::common::ConstraintNames;
+use crate::transform::attributes::field_array;
 use crate::{ast, diagnostics::DatamodelError, dml, transform::helpers::ValueValidator, IndexDefinition, IndexType};
 use std::cmp::Ordering;
 use std::collections::HashMap;
@@ -292,14 +293,7 @@ trait IndexAttributeBase<T>: AttributeValidator<T> {
                 index.tpe == index_type && !matches!(index.tpe, IndexType::Unique if index.fields.len()== 1)
             })
             .map(|index_def| {
-                let mut args = vec![ast::Argument::new_array(
-                    "",
-                    index_def
-                        .fields
-                        .iter()
-                        .map(|f| ast::Expression::ConstantValue(f.to_string(), ast::Span::empty()))
-                        .collect(),
-                )];
+                let mut args = vec![ast::Argument::new_array("", field_array(&index_def.fields))];
 
                 if let Some(name) = &index_def.name_in_client {
                     args.push(ast::Argument::new_string("name", name));

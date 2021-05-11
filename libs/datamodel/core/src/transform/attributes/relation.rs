@@ -1,6 +1,7 @@
 use super::{super::helpers::*, AttributeValidator};
 use crate::common::RelationNames;
 use crate::diagnostics::DatamodelError;
+use crate::transform::attributes::field_array;
 use crate::{ast, dml, Field};
 
 /// Prismas builtin `@relation` attribute.
@@ -64,12 +65,7 @@ impl AttributeValidator<dml::Field> for RelationAttributeValidator {
             all_related_ids.sort();
 
             if !relation_info.fields.is_empty() {
-                let mut fields: Vec<ast::Expression> = Vec::new();
-                for field in &relation_info.fields {
-                    fields.push(ast::Expression::ConstantValue(field.clone(), ast::Span::empty()));
-                }
-
-                args.push(ast::Argument::new_array("fields", fields));
+                args.push(ast::Argument::new_array("fields", field_array(&relation_info.fields)));
             }
 
             // if we are on the physical field
@@ -82,16 +78,11 @@ impl AttributeValidator<dml::Field> for RelationAttributeValidator {
                     _ => false,
                 };
 
-                let mut related_fields: Vec<ast::Expression> = Vec::with_capacity(relation_info.references.len());
-                for related_field in &relation_info.references {
-                    related_fields.push(ast::Expression::ConstantValue(
-                        related_field.clone(),
-                        ast::Span::empty(),
-                    ));
-                }
-
                 if !is_many_to_many {
-                    args.push(ast::Argument::new_array("references", related_fields));
+                    args.push(ast::Argument::new_array(
+                        "references",
+                        field_array(&relation_info.references),
+                    ));
                 }
             }
 

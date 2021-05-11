@@ -223,18 +223,7 @@ impl Model {
             }
         };
 
-        //we now propagate field level unique and id definitions also to the model level
-
-        // // first candidate: the singular id field
-        // {
-        //     if let Some(x) = self.singular_id_fields().next() {
-        //         if !in_eligible(x) && (x.is_required() || allow_optional) {
-        //             result.push(UniqueCriteria::new(vec![x]))
-        //         }
-        //     }
-        // }
-
-        // second candidate: the multi field id
+        // first candidate: the primary key
         {
             let id_fields: Vec<_> = self.primary_key.as_ref().map_or(vec![], |pk| {
                 pk.fields.iter().map(|f| self.find_scalar_field(&f).unwrap()).collect()
@@ -249,20 +238,7 @@ impl Model {
             }
         }
 
-        // // third candidate: a required scalar field with a unique index.
-        // {
-        //     let mut unique_required_fields: Vec<_> = self
-        //         .scalar_fields()
-        //         .filter(|field| {
-        //             field.is_unique.is_some() && (field.is_required() || allow_optional) && !in_eligible(field)
-        //         })
-        //         .map(|f| UniqueCriteria::new(vec![f]))
-        //         .collect();
-        //
-        //     result.append(&mut unique_required_fields);
-        // }
-
-        // fourth candidate: any multi-field unique constraint where all fields are required
+        // second candidate: any unique constraint where all fields are required
         {
             let mut unique_field_combi = self
                 .indices

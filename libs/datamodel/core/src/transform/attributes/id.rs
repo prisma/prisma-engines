@@ -1,6 +1,7 @@
 use super::{super::helpers::*, AttributeValidator};
 use crate::common::ConstraintNames;
 use crate::diagnostics::DatamodelError;
+use crate::transform::attributes::field_array;
 use crate::{ast, dml, PrimaryKeyDefinition};
 
 /// Prismas builtin `@primary` attribute.
@@ -162,13 +163,7 @@ impl AttributeValidator<dml::Model> for ModelLevelIdAttributeValidator {
     fn serialize(&self, model: &dml::Model, _datamodel: &dml::Datamodel) -> Vec<ast::Attribute> {
         if let Some(pk) = &model.primary_key {
             if model.has_compound_id() {
-                let mut args = vec![ast::Argument::new_array(
-                    "",
-                    pk.fields
-                        .iter()
-                        .map(|f| ast::Expression::ConstantValue(f.to_string(), ast::Span::empty()))
-                        .collect(),
-                )];
+                let mut args = vec![ast::Argument::new_array("", field_array(&pk.fields))];
 
                 if let Some(name) = &pk.name_in_client {
                     args.push(ast::Argument::new(
