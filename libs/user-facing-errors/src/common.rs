@@ -44,6 +44,8 @@ The database server at `{database_host}`:`{database_port}` was reached but timed
 Please try again.
 
 Please make sure your database server is running at `{database_host}`:`{database_port}`.
+
+Context: {context}
 "
 )]
 pub struct DatabaseTimeout {
@@ -52,6 +54,9 @@ pub struct DatabaseTimeout {
 
     /// Database port
     pub database_port: String,
+
+    /// Extra context
+    pub context: String,
 }
 
 #[derive(Debug, UserFacingError, Serialize)]
@@ -83,10 +88,13 @@ pub enum DatabaseDoesNotExist {
 }
 
 #[derive(Debug, UserFacingError, Serialize)]
-#[user_facing(code = "P1008", message = "Operations timed out after `{time}`")]
+#[user_facing(code = "P1008", message = "Operations timed out after `{time}`. Context: {context}")]
 pub struct DatabaseOperationTimeout {
     /// Operation time in s or ms (if <1000ms)
     pub time: String,
+
+    /// Extra context
+    pub context: String,
 }
 
 #[derive(Debug, UserFacingError, Serialize)]
