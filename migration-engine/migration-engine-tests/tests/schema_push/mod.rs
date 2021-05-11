@@ -21,7 +21,7 @@ async fn schema_push_happy_path(api: &TestApi) -> TestResult {
         .send()
         .await?
         .assert_green()?
-        .assert_has_executed_steps()?;
+        .assert_has_executed_steps();
 
     api.assert_schema()
         .await?
@@ -51,7 +51,7 @@ async fn schema_push_happy_path(api: &TestApi) -> TestResult {
         .send()
         .await?
         .assert_green()?
-        .assert_has_executed_steps()?;
+        .assert_has_executed_steps();
 
     api.assert_schema()
         .await?
@@ -73,7 +73,7 @@ async fn schema_push_warns_about_destructive_changes(api: &TestApi) -> TestResul
         .send()
         .await?
         .assert_green()?
-        .assert_has_executed_steps()?;
+        .assert_has_executed_steps();
 
     api.insert("Box")
         .value("id", 1)
@@ -95,15 +95,17 @@ async fn schema_push_warns_about_destructive_changes(api: &TestApi) -> TestResul
     api.schema_push(dm2)
         .send()
         .await?
-        .assert_warnings(&[expected_warning.as_str().into()])?
-        .assert_no_steps()?;
+        .assert_warnings(&[expected_warning.as_str().into()])
+        .unwrap()
+        .assert_no_steps();
 
     api.schema_push(dm2)
         .force(true)
         .send()
         .await?
-        .assert_warnings(&[expected_warning.as_str().into()])?
-        .assert_has_executed_steps()?;
+        .assert_warnings(&[expected_warning.as_str().into()])
+        .unwrap()
+        .assert_has_executed_steps();
 
     Ok(())
 }
@@ -114,7 +116,7 @@ async fn schema_push_with_an_unexecutable_migration_returns_a_message_and_aborts
         .send()
         .await?
         .assert_green()?
-        .assert_has_executed_steps()?;
+        .assert_has_executed_steps();
 
     api.insert("Box")
         .value("id", 1)
@@ -141,7 +143,7 @@ async fn schema_push_with_an_unexecutable_migration_returns_a_message_and_aborts
         .send()
         .await?
         .assert_unexecutable(&["Added the required column `volumeCm3` to the `Box` table without a default value. There are 1 rows in this table, it is not possible to execute this step.".into()])?
-        .assert_no_steps()?;
+        .assert_no_steps();
 
     Ok(())
 }

@@ -2,7 +2,7 @@ use super::super::assertions::AssertionResult;
 use migration_core::{
     api::GenericApi,
     commands::{SchemaPushInput, SchemaPushOutput},
-    CoreResult,
+    CoreError, CoreResult,
 };
 use std::{borrow::Cow, fmt::Debug};
 use tracing_futures::Instrument;
@@ -66,8 +66,16 @@ impl<'a> SchemaPush<'a> {
         })
     }
 
-    pub fn send_sync(self) -> CoreResult<SchemaPushAssertion<'a>> {
-        self.rt.unwrap().block_on(self.send())
+    /// Execute the command and expect it to succeed.
+    #[track_caller]
+    pub fn send_sync(self) -> SchemaPushAssertion<'a> {
+        self.rt.unwrap().block_on(self.send()).unwrap()
+    }
+
+    /// Execute the command and expect it to fail, returning the error.
+    #[track_caller]
+    pub fn send_unwrap_err(self) -> CoreError {
+        self.rt.unwrap().block_on(self.send()).unwrap_err()
     }
 }
 
@@ -85,17 +93,17 @@ impl Debug for SchemaPushAssertion<'_> {
 impl<'a> SchemaPushAssertion<'a> {
     /// Asserts that the command produced no warning and no unexecutable migration message.
     pub fn assert_green(self) -> AssertionResult<Self> {
-        self.assert_no_warning()?.assert_executable()
+        Ok(self.assert_no_warning().assert_executable())
     }
 
-    pub fn assert_no_warning(self) -> AssertionResult<Self> {
-        anyhow::ensure!(
+    pub fn assert_no_warning(self) -> Self {
+        assert!(
             self.result.warnings.is_empty(),
             "Assertion failed. Expected no warning, got {:?}",
             self.result.warnings
         );
 
-        Ok(self)
+        self
     }
 
     pub fn assert_warnings(self, warnings: &[Cow<'_, str>]) -> AssertionResult<Self> {
@@ -117,33 +125,33 @@ impl<'a> SchemaPushAssertion<'a> {
         Ok(self)
     }
 
-    pub fn assert_no_steps(self) -> AssertionResult<Self> {
-        anyhow::ensure!(
+    #[track_caller]
+    pub fn assert_no_steps(self) -> Self {
+        assert!(
             self.result.executed_steps == 0,
             "Assertion failed. Executed steps should be zero, but found {:#?}",
-            self.result.executed_steps
+            self.result.executed_steps,
         );
-
-        Ok(self)
+        self
     }
 
-    pub fn assert_has_executed_steps(self) -> AssertionResult<Self> {
-        anyhow::ensure!(
+    pub fn assert_has_executed_steps(self) -> Self {
+        assert!(
             self.result.executed_steps != 0,
             "Assertion failed. Executed steps should be not zero.",
         );
-
-        Ok(self)
+        self
     }
 
-    pub fn assert_executable(self) -> AssertionResult<Self> {
+    #[track_caller]
+    pub fn assert_executable(self) -> Self {
         assert!(
             self.result.unexecutable.is_empty(),
             "Expected an executable migration, got following: {:?}",
             self.result.unexecutable
         );
 
-        Ok(self)
+        self
     }
 
     pub fn assert_unexecutable(self, expected_messages: &[String]) -> AssertionResult<Self> {

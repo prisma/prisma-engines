@@ -191,7 +191,7 @@ async fn changing_an_int_array_column_to_scalar_is_not_possible(api: &TestApi) -
         .force(true)
         .send()
         .await?
-        .assert_no_warning()?
+        .assert_no_warning()
         .assert_unexecutable(&["Changed the type of `mainProtagonist` on the `Film` table. No cast exists, the column would be dropped and recreated, which cannot be done since the column is required and there is data in the table.".into()])?;
 
     api.assert_schema().await?.assert_table("Film", |table| {
@@ -235,7 +235,7 @@ async fn int_to_string_conversions_work(api: &TestApi) -> TestResult {
         .send()
         .await?
         .assert_green()?
-        .assert_has_executed_steps()?;
+        .assert_has_executed_steps();
 
     api.dump_table("Cat")
         .await?
@@ -271,7 +271,7 @@ async fn string_to_int_conversions_are_risky(api: &TestApi) -> TestResult {
                 .force(true)
                 .send()
                 .await?
-                .assert_no_warning()?
+                .assert_no_warning()
                 .assert_unexecutable(&["Changed the type of `tag` on the `Cat` table. No cast exists, the column would be dropped and recreated, which cannot be done since the column is required and there is data in the table.".into()])?;
         }
         // Executable, conditionally.
@@ -283,8 +283,8 @@ async fn string_to_int_conversions_are_risky(api: &TestApi) -> TestResult {
             .assert_warnings(&[
                 "You are about to alter the column `tag` on the `cat` table, which contains 1 non-null values. The data in that column will be cast from `VarChar(191)` to `Int`.".into()
             ])?
-            .assert_executable()?
-            .assert_has_executed_steps()?;
+            .assert_executable()
+            .assert_has_executed_steps();
 
             api.dump_table("Cat")
                 .await?
@@ -299,8 +299,8 @@ async fn string_to_int_conversions_are_risky(api: &TestApi) -> TestResult {
             .assert_warnings(&[
                 "You are about to alter the column `tag` on the `Cat` table, which contains 1 non-null values. The data in that column will be cast from `VarChar(191)` to `Int`.".into()
             ])?
-            .assert_executable()?
-            .assert_has_executed_steps()?;
+            .assert_executable()
+            .assert_has_executed_steps();
 
             api.dump_table("Cat")
                 .await?
@@ -314,8 +314,8 @@ async fn string_to_int_conversions_are_risky(api: &TestApi) -> TestResult {
             .assert_warnings(&[
                 "You are about to alter the column `tag` on the `Cat` table, which contains 1 non-null values. The data in that column will be cast from `NVarChar(1000)` to `Int`.".into()
             ])?
-            .assert_executable()?
-            .assert_has_executed_steps()?;
+            .assert_executable()
+            .assert_has_executed_steps();
 
             api.dump_table("Cat")
                 .await?
@@ -329,8 +329,8 @@ async fn string_to_int_conversions_are_risky(api: &TestApi) -> TestResult {
                 .assert_warnings(&[
                     "You are about to alter the column `tag` on the `Cat` table, which contains 1 non-null values. The data in that column will be cast from `String` to `Int`.".into()
                 ])?
-                .assert_executable()?
-                .assert_has_executed_steps()?;
+                .assert_executable()
+                .assert_has_executed_steps();
 
             api.dump_table("Cat")
                 .await?
@@ -373,8 +373,8 @@ async fn datetime_to_float_conversions_are_impossible(api: &TestApi) -> TestResu
             "The `birthday` column on the `Cat` table would be dropped and recreated. This will lead to data loss."
                 .into(),
         ])?
-        .assert_executable()?
-        .assert_no_steps()?;
+        .assert_executable()
+        .assert_no_steps();
 
     api.dump_table("Cat")
         .await?
@@ -388,8 +388,8 @@ async fn datetime_to_float_conversions_are_impossible(api: &TestApi) -> TestResu
             "The `birthday` column on the `Cat` table would be dropped and recreated. This will lead to data loss."
                 .into(),
         ])?
-        .assert_executable()?
-        .assert_has_executed_steps()?;
+        .assert_executable()
+        .assert_has_executed_steps();
 
     api.dump_table("Cat")
         .await?

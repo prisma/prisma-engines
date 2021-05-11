@@ -205,7 +205,7 @@ async fn creating_a_scalar_list_field_for_an_existing_table_must_work(api: &Test
         }
     "#;
 
-    api.schema_push(dm2).send().await?.assert_green()?.assert_no_steps()?;
+    api.schema_push(dm2).send().await?.assert_green()?.assert_no_steps();
     api.assert_schema().await?.assert_equals(&result.into_schema())?;
 
     Ok(())
@@ -246,7 +246,7 @@ async fn delete_a_field_for_a_non_existent_column_must_work(api: &TestApi) -> Te
         }
     "#;
 
-    api.schema_push(dm2).send().await?.assert_green()?.assert_no_steps()?;
+    api.schema_push(dm2).send().await?.assert_green()?.assert_no_steps();
     api.assert_schema().await?.assert_equals(&result.into_schema())?;
 
     Ok(())
@@ -410,7 +410,7 @@ async fn existing_enums_are_picked_up(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.schema_push(dm).send().await?.assert_green()?.assert_no_steps()?;
+    api.schema_push(dm).send().await?.assert_green()?.assert_no_steps();
 
     Ok(())
 }

@@ -32,8 +32,7 @@ fn shadow_db_url_can_be_configured_on_postgres(api: TestApi) {
 
             engine
                 .create_migration("01initcats", dm1, &migrations_directory)
-                .send_sync()
-                .unwrap();
+                .send_sync();
         }
 
         api.raw_cmd("DROP DATABASE IF EXISTS testshadowdb0001");
@@ -88,21 +87,16 @@ fn shadow_db_url_can_be_configured_on_postgres(api: TestApi) {
         engine
             .apply_migrations(&migrations_directory)
             .send_sync()
-            .unwrap()
-            .assert_applied_migrations(&["01initcats"])
-            .unwrap();
+            .assert_applied_migrations(&["01initcats"]);
 
         engine
             .create_migration("02addMeowFrequency", dm2, &migrations_directory)
-            .send_sync()
-            .unwrap();
+            .send_sync();
 
         engine
             .apply_migrations(&migrations_directory)
             .send_sync()
-            .unwrap()
-            .assert_applied_migrations(&["02addMeowFrequency"])
-            .unwrap();
+            .assert_applied_migrations(&["02addMeowFrequency"]);
 
         engine
             .assert_schema()

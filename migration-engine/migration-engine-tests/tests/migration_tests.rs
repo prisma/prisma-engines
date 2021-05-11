@@ -68,7 +68,7 @@ async fn adding_a_scalar_field_must_work(api: &TestApi) -> TestResult {
     })?;
 
     // Check that the migration is idempotent.
-    api.schema_push(dm).send().await?.assert_green()?.assert_no_steps()?;
+    api.schema_push(dm).send().await?.assert_green()?.assert_no_steps();
 
     Ok(())
 }
@@ -104,7 +104,7 @@ async fn adding_an_enum_field_must_work(api: &TestApi) -> TestResult {
     })?;
 
     // Check that the migration is idempotent.
-    api.schema_push(dm).send().await?.assert_no_steps()?;
+    api.schema_push(dm).send().await?.assert_no_steps();
 
     Ok(())
 }
@@ -140,7 +140,7 @@ async fn adding_an_enum_field_must_work_with_native_types_off(api: &TestApi) -> 
     })?;
 
     // Check that the migration is idempotent.
-    api.schema_push(dm).send().await?.assert_no_steps()?;
+    api.schema_push(dm).send().await?.assert_no_steps();
 
     Ok(())
 }
@@ -172,7 +172,7 @@ async fn json_fields_can_be_created(api: &TestApi) -> TestResult {
         })
     })?;
 
-    api.schema_push(&dm).send().await?.assert_green()?.assert_no_steps()?;
+    api.schema_push(&dm).send().await?.assert_green()?.assert_no_steps();
 
     Ok(())
 }
@@ -328,7 +328,7 @@ async fn making_an_existing_id_field_autoincrement_works(api: &TestApi) -> TestR
     })?;
 
     // Check that the migration is idempotent.
-    api.schema_push(dm2).send().await?.assert_green()?.assert_no_steps()?;
+    api.schema_push(dm2).send().await?.assert_green()?.assert_no_steps();
 
     // MySQL cannot add autoincrement property to a column that already has data.
     if !api.sql_family().is_mysql() {
@@ -403,7 +403,7 @@ async fn removing_autoincrement_from_an_existing_field_works(api: &TestApi) -> T
         .send()
         .await?
         .assert_green()?
-        .assert_no_steps()?;
+        .assert_no_steps();
 
     assert_eq!(
         3,
@@ -472,7 +472,7 @@ async fn making_an_existing_id_field_autoincrement_works_with_indices(api: &Test
     })?;
 
     // Check that the migration is idempotent.
-    api.schema_push(dm2).send().await?.assert_green()?.assert_no_steps()?;
+    api.schema_push(dm2).send().await?.assert_green()?.assert_no_steps();
 
     assert_eq!(
         3,
@@ -586,7 +586,7 @@ async fn making_an_existing_id_field_autoincrement_works_with_foreign_keys(api: 
 
     // TODO: Why not empty?
     // Check that the migration is idempotent.
-    //api.schema_push(dm2).send().await?.assert_green()?.assert_no_steps()?;
+    //api.schema_push(dm2).send().await?.assert_green()?.assert_no_steps();
 
     assert_eq!(
         3,
@@ -1061,9 +1061,9 @@ async fn adding_unique_to_an_existing_field_must_work(api: &TestApi) -> TestResu
         .force(true)
         .send()
         .await?
-        .assert_executable()?
+        .assert_executable()
         .assert_warnings(&["A unique constraint covering the columns `[field]` on the table `A` will be added. If there are existing duplicate values, this will fail.".into()])?
-        .assert_has_executed_steps()?;
+        .assert_has_executed_steps();
 
     api.assert_schema().await?.assert_table("A", |table| {
         table
@@ -1306,7 +1306,7 @@ async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> 
         .send()
         .await?
         .assert_green()?
-        .assert_no_steps()?;
+        .assert_no_steps();
 
     let sql_schema = api.assert_schema().await?.into_schema();
     let table = sql_schema.table_bang(&api.normalize_identifier("Fruit"));
@@ -1383,7 +1383,7 @@ async fn created_at_does_not_get_arbitrarily_migrated(api: &TestApi) -> TestResu
         }
     "#;
 
-    api.schema_push(dm2).send().await?.assert_green()?.assert_no_steps()?;
+    api.schema_push(dm2).send().await?.assert_green()?.assert_no_steps();
 
     Ok(())
 }
@@ -1994,7 +1994,7 @@ async fn migrating_a_unique_constraint_to_a_primary_key_works(api: &TestApi) -> 
         .force(true)
         .send()
         .await?
-        .assert_executable()?
+        .assert_executable()
         .assert_warnings(&["The primary key for the `model1` table will be changed. If it partially fails, the table could be left without primary key constraint.".into(), "You are about to drop the column `id` on the `model1` table, which still contains 1 non-null values.".into()])?;
 
     api.assert_schema().await?.assert_table("model1", |table| {
@@ -2216,7 +2216,7 @@ async fn a_model_can_be_removed(api: &TestApi) -> TestResult {
     api.apply_migrations(&directory)
         .send()
         .await?
-        .assert_applied_migrations(&["initial", "second-migration"])?;
+        .assert_applied_migrations(&["initial", "second-migration"]);
 
     let output = api.diagnose_migration_history(&directory).send().await?.into_output();
 
@@ -2250,7 +2250,7 @@ async fn a_default_can_be_dropped(api: &TestApi) -> TestResult {
     api.apply_migrations(&directory)
         .send()
         .await?
-        .assert_applied_migrations(&["initial", "second-migration"])?;
+        .assert_applied_migrations(&["initial", "second-migration"]);
 
     let output = api.diagnose_migration_history(&directory).send().await?.into_output();
 

@@ -1,9 +1,8 @@
-use migration_engine_tests::multi_engine_test_api::*;
+use migration_engine_tests::sync_test_api::*;
 use quaint::ast as quaint_ast;
 
 #[test_connector(tags(Mariadb))]
 fn foreign_keys_to_indexes_being_renamed_must_work(api: TestApi) {
-    let engine = api.new_engine();
     let dm1 = r#"
         model User {
             id String @id
@@ -20,10 +19,9 @@ fn foreign_keys_to_indexes_being_renamed_must_work(api: TestApi) {
         }
     "#;
 
-    engine.schema_push(dm1).send_sync().unwrap().assert_green().unwrap();
+    api.schema_push(dm1).send_sync().assert_green().unwrap();
 
-    engine
-        .assert_schema()
+    api.assert_schema()
         .assert_table("User", |table| {
             table.assert_index_on_columns(&["name"], |idx| idx.assert_name("idxname"))
         })
@@ -33,16 +31,16 @@ fn foreign_keys_to_indexes_being_renamed_must_work(api: TestApi) {
         })
         .unwrap();
 
-    let insert_post = quaint_ast::Insert::single_into(engine.render_table_name("Post"))
+    let insert_post = quaint_ast::Insert::single_into(api.render_table_name("Post"))
         .value("id", "the-post-id")
         .value("author", "steve");
 
-    let insert_user = quaint::ast::Insert::single_into(engine.render_table_name("User"))
+    let insert_user = quaint::ast::Insert::single_into(api.render_table_name("User"))
         .value("id", "the-user-id")
         .value("name", "steve");
 
-    engine.query(insert_user.into());
-    engine.query(insert_post.into());
+    api.query(insert_user.into());
+    api.query(insert_post.into());
 
     let dm2 = r#"
         model User {
@@ -60,10 +58,9 @@ fn foreign_keys_to_indexes_being_renamed_must_work(api: TestApi) {
         }
     "#;
 
-    engine.schema_push(dm2).send_sync().unwrap().assert_green().unwrap();
+    api.schema_push(dm2).send_sync().assert_green().unwrap();
 
-    engine
-        .assert_schema()
+    api.assert_schema()
         .assert_table("User", |table| {
             table.assert_index_on_columns(&["name"], |idx| idx.assert_name("idxrenamed"))
         })
