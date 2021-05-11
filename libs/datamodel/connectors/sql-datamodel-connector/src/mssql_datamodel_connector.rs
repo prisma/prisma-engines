@@ -201,12 +201,12 @@ impl Connector for MsSqlDatamodelConnector {
                     Float(Some(bits)) if bits == 0 || bits > 53 => {
                         error.new_argument_m_out_of_range_error("Bits can range from 1 to 53.")
                     }
-                    typ if heap_allocated_types().contains(&typ) && field.is_unique() => {
-                        error.new_incompatible_native_type_with_unique()
-                    }
-                    typ if heap_allocated_types().contains(&typ) && field.is_id() => {
-                        error.new_incompatible_native_type_with_id()
-                    }
+                    // typ if heap_allocated_types().contains(&typ) && field.is_unique() => {
+                    //     error.new_incompatible_native_type_with_unique()
+                    // }
+                    // typ if heap_allocated_types().contains(&typ) && field.is_id() => {
+                    //     error.new_incompatible_native_type_with_id()
+                    // }
                     NVarChar(Some(Number(p))) if p > 4000 => error.new_argument_m_out_of_range_error(
                         "Length can range from 1 to 4000. For larger sizes, use the `Max` variant.",
                     ),

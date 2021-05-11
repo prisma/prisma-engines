@@ -223,14 +223,16 @@ impl Model {
             }
         };
 
-        // first candidate: the singular id field
-        {
-            if let Some(x) = self.singular_id_fields().next() {
-                if !in_eligible(x) && (x.is_required() || allow_optional) {
-                    result.push(UniqueCriteria::new(vec![x]))
-                }
-            }
-        }
+        //we now propagate field level unique and id definitions also to the model level
+
+        // // first candidate: the singular id field
+        // {
+        //     if let Some(x) = self.singular_id_fields().next() {
+        //         if !in_eligible(x) && (x.is_required() || allow_optional) {
+        //             result.push(UniqueCriteria::new(vec![x]))
+        //         }
+        //     }
+        // }
 
         // second candidate: the multi field id
         {
@@ -247,18 +249,18 @@ impl Model {
             }
         }
 
-        // third candidate: a required scalar field with a unique index.
-        {
-            let mut unique_required_fields: Vec<_> = self
-                .scalar_fields()
-                .filter(|field| {
-                    field.is_unique.is_some() && (field.is_required() || allow_optional) && !in_eligible(field)
-                })
-                .map(|f| UniqueCriteria::new(vec![f]))
-                .collect();
-
-            result.append(&mut unique_required_fields);
-        }
+        // // third candidate: a required scalar field with a unique index.
+        // {
+        //     let mut unique_required_fields: Vec<_> = self
+        //         .scalar_fields()
+        //         .filter(|field| {
+        //             field.is_unique.is_some() && (field.is_required() || allow_optional) && !in_eligible(field)
+        //         })
+        //         .map(|f| UniqueCriteria::new(vec![f]))
+        //         .collect();
+        //
+        //     result.append(&mut unique_required_fields);
+        // }
 
         // fourth candidate: any multi-field unique constraint where all fields are required
         {

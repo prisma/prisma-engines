@@ -60,9 +60,9 @@ fn the_name_argument_must_work() {
     let schema = parse(dml);
     let user_model = schema.assert_has_model("User");
     user_model.assert_has_index(IndexDefinition {
-        name_in_db: "MyIndexName".to_string(),
-        name_in_db_matches_default: false,
-        name_in_client: None,
+        name_in_db: "User_firstName_lastName_key".to_string(),
+        name_in_db_matches_default: true,
+        name_in_client: Some("MyIndexName".to_string()),
         fields: vec!["firstName".to_string(), "lastName".to_string()],
         tpe: IndexType::Unique,
     });
@@ -77,7 +77,7 @@ fn multiple_unique_must_work() {
         lastName  String
 
         @@unique([firstName,lastName])
-        @@unique([firstName,lastName], name: "MyIndexName")
+        @@unique([firstName,lastName], map: "MyIndexName")
     }
     "#;
 

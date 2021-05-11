@@ -183,6 +183,8 @@ trait IndexAttributeBase<T>: AttributeValidator<T> {
                 ))
             }
             (Some((name, _)), Some((map, _))) => (Some(name.to_owned()), map.to_owned()),
+            //backwards compatibility, accept name arg on normal indexes and use it as map arg
+            (Some((name, _)), None) if matches!(index_type, IndexType::Normal) => (None, name.to_owned()),
             (Some((name, _)), None) => (Some(name.to_owned()), default_name.clone()),
             (None, Some((map, _))) => (None, map.to_owned()),
             (None, None) => (None, default_name.clone()),

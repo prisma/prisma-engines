@@ -101,6 +101,29 @@ fn the_name_argument_must_work() {
 }
 
 #[test]
+fn the_map_argument_must_work() {
+    let dml = r#"
+    model User {
+        id        Int    @id
+        firstName String
+        lastName  String
+
+        @@index([firstName,lastName], map: "MyIndexName")
+    }
+    "#;
+
+    let schema = parse(dml);
+    let user_model = schema.assert_has_model("User");
+    user_model.assert_has_index(IndexDefinition {
+        name_in_db: "MyIndexName".to_string(),
+        name_in_db_matches_default: false,
+        name_in_client: None,
+        fields: vec!["firstName".to_string(), "lastName".to_string()],
+        tpe: IndexType::Normal,
+    });
+}
+
+#[test]
 fn empty_index_names_are_rejected() {
     let dml = r#"
     model User {
@@ -255,7 +278,7 @@ fn multiple_indexes_with_same_name_are_not_supported_by_postgres() {
 }
 
 #[test]
-fn unique_insert_with_same_name_are_not_supported_by_postgres() {
+fn unique_insert_with_same_dbname_are_not_supported_by_postgres() {
     let dml = r#"
     datasource postgres {
         provider = "postgres"
@@ -266,14 +289,14 @@ fn unique_insert_with_same_name_are_not_supported_by_postgres() {
         id         Int @id
         neighborId Int
 
-        @@index([id], name: "MyIndexName")
+        @@index([id], map: "MyIndexName")
      }
 
      model Post {
         id Int @id
         optionId Int
 
-        @@unique([id], name: "MyIndexName")
+        @@unique([id], map: "MyIndexName")
      }
     "#;
 
@@ -285,7 +308,7 @@ fn unique_insert_with_same_name_are_not_supported_by_postgres() {
     errors.assert_length(1);
     errors.assert_is_at(
         0,
-        DatamodelError::new_multiple_indexes_with_same_name_are_not_supported("MyIndexName", Span::new(285, 318)),
+        DatamodelError::new_multiple_indexes_with_same_name_are_not_supported("MyIndexName", Span::new(284, 316)),
     );
 }
 
