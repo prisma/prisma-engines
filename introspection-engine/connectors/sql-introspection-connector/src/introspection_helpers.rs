@@ -1,8 +1,10 @@
 use crate::Dedup;
 use crate::SqlError;
+use datamodel::common::ConstraintNames;
 use datamodel::{
-    common::RelationNames, Datamodel, DefaultValue as DMLDef, FieldArity, FieldType, IndexDefinition, Model,
-    OnDeleteStrategy, PrimaryKeyDefinition, RelationField, RelationInfo, ScalarField, ScalarType, ValueGenerator as VG,
+    common::RelationNames, Datamodel, DefaultValue as DMLDef, FieldArity, FieldType, IndexDefinition,
+    IndexType as DMLIndexType, Model, OnDeleteStrategy, PrimaryKeyDefinition, RelationField, RelationInfo, ScalarField,
+    ScalarType, ValueGenerator as VG,
 };
 use datamodel_connector::Connector;
 use quaint::connector::SqlFamily;
@@ -128,7 +130,8 @@ pub(crate) fn calculate_index(index: &Index) -> IndexDefinition {
     };
 
     IndexDefinition {
-        name_in_db: Some(index.name.clone()),
+        name_in_db: index.name.clone(),
+        name_in_client: None,
         fields: index.columns.clone(),
         tpe,
     }
@@ -149,7 +152,20 @@ pub(crate) fn calculate_scalar_field(table: &Table, column: &Column, family: &Sq
 
     let default_value = calculate_default(table, &column, &arity);
 
-    let is_unique = table.is_column_unique(&column.name) && is_id.is_none();
+    let is_unique = table
+        .indices
+        .iter()
+        .find(|index| {
+            index.tpe == IndexType::Unique
+                && index.columns.len() == 1
+                && index.columns.contains(&column.name.to_owned())
+        })
+        .map(|index| IndexDefinition {
+            name_in_client: None,
+            name_in_db: index.name.clone(),
+            tpe: DMLIndexType::Unique,
+            fields: vec![column.name.to_owned()],
+        });
 
     ScalarField {
         name: column.name.clone(),
@@ -263,8 +279,10 @@ pub(crate) fn calculate_default(table: &Table, column: &Column, arity: &FieldAri
 pub(crate) fn is_id(column: &Column, table: &Table) -> Option<PrimaryKeyDefinition> {
     match &table.primary_key {
         Some(pk) if pk.columns.len() == 1 && pk.columns.first().unwrap() == &column.name => {
+            let default_name = ConstraintNames::primary_key_name(&table.name, pk.columns.clone());
             Some(PrimaryKeyDefinition {
                 name_in_client: None,
+                name_in_db_is_default: pk.constraint_name == Some(default_name),
                 name_in_db: pk.constraint_name.clone(),
                 fields: pk.columns.clone(),
             })

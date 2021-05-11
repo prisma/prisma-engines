@@ -1,3 +1,5 @@
+use crate::IndexType;
+
 pub struct ConstraintNames {}
 
 impl ConstraintNames {
@@ -24,15 +26,14 @@ impl ConstraintNames {
         format!("{}_{}_pkey", model, fields.join("_"))
     }
 
-    pub fn unique_constraint_name(model: &str, fields: &[&str]) -> String {
-        format!("{}_{}_key", model, fields.join("_"))
+    pub fn index_name(model: &str, fields: Vec<String>, tpe: IndexType) -> String {
+        match tpe {
+            IndexType::Unique => format!("{}_{}_key", model, fields.join("_")),
+            IndexType::Normal => format!("{}_{}_idx", model, fields.join("_")),
+        }
     }
 
-    pub fn index_name(model: &str, fields: &[&str]) -> String {
-        format!("{}_{}_idx", model, fields.join("_"))
-    }
-
-    pub fn foreign_key_constraint_name(model: &str, fields: &[&str]) -> String {
+    pub fn foreign_key_constraint_name(model: &str, fields: Vec<String>) -> String {
         format!("{}_{}_fkey", model, fields.join("_"))
     }
 

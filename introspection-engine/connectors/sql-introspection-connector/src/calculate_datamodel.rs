@@ -60,8 +60,9 @@ pub fn calculate_datamodel(
 mod tests {
     use super::*;
     use datamodel::{
-        dml, Datamodel, DefaultValue as DMLDefault, Field, FieldArity, FieldType, Model, NativeTypeInstance,
-        OnDeleteStrategy, PrimaryKeyDefinition, RelationField, RelationInfo, ScalarField, ScalarType, ValueGenerator,
+        dml, Datamodel, DefaultValue as DMLDefault, Field, FieldArity, FieldType, IndexDefinition,
+        IndexType as DMLIndexType, Model, NativeTypeInstance, OnDeleteStrategy, PrimaryKeyDefinition, RelationField,
+        RelationInfo, ScalarField, ScalarType, ValueGenerator,
     };
     use native_types::{NativeType, PostgresType};
     use pretty_assertions::assert_eq;
@@ -89,9 +90,10 @@ mod tests {
                         field_type: FieldType::Base(ScalarType::Int, None),
                         database_name: None,
                         default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
-                        is_unique: false,
+                        is_unique: None,
                         primary_key: Some(PrimaryKeyDefinition {
                             name_in_client: None,
+                            name_in_db_is_default: false,
                             name_in_db: None,
                             fields: vec!["required".to_string()],
                         }),
@@ -183,9 +185,10 @@ mod tests {
                         ),
                         database_name: None,
                         default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
-                        is_unique: false,
+                        is_unique: None,
                         primary_key: Some(PrimaryKeyDefinition {
                             name_in_client: None,
+                            name_in_db_is_default: false,
                             name_in_db: None,
                             fields: vec!["primary".to_string()],
                         }),
@@ -220,10 +223,10 @@ mod tests {
                         ),
                         database_name: None,
                         default_value: None,
-                        is_unique: false,
+                        is_unique: None,
                         primary_key: Some(PrimaryKeyDefinition {
                             name_in_client: None,
-
+                            name_in_db_is_default: false,
                             name_in_db: None,
                             fields: vec!["primary".to_string()],
                         }),
@@ -258,9 +261,10 @@ mod tests {
                         ),
                         database_name: None,
                         default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
-                        is_unique: false,
+                        is_unique: None,
                         primary_key: Some(PrimaryKeyDefinition {
                             name_in_client: None,
+                            name_in_db_is_default: false,
                             name_in_db: None,
                             fields: vec!["primary".to_string()],
                         }),
@@ -381,7 +385,12 @@ mod tests {
                         field_type: FieldType::Base(ScalarType::Int, None),
                         database_name: None,
                         default_value: None,
-                        is_unique: true,
+                        is_unique: Some(IndexDefinition {
+                            name_in_db: "Table1_unique_key".to_string(),
+                            name_in_client: None,
+                            fields: vec!["unique".to_string()],
+                            tpe: DMLIndexType::Unique,
+                        }),
                         primary_key: None,
                         documentation: None,
                         is_generated: false,
@@ -460,10 +469,10 @@ mod tests {
                             ),
                             database_name: None,
                             default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
-                            is_unique: false,
+                            is_unique: None,
                             primary_key: Some(PrimaryKeyDefinition {
                                 name_in_client: None,
-
+                                name_in_db_is_default: false,
                                 name_in_db: None,
                                 fields: vec!["id".to_string()],
                             }),
@@ -522,10 +531,10 @@ mod tests {
                             ),
                             database_name: None,
                             default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
-                            is_unique: false,
+                            is_unique: None,
                             primary_key: Some(PrimaryKeyDefinition {
                                 name_in_client: None,
-
+                                name_in_db_is_default: false,
                                 name_in_db: None,
                                 fields: vec!["id".to_string()],
                             }),
@@ -548,7 +557,7 @@ mod tests {
                             ),
                             database_name: Some("city-id".to_string()),
                             default_value: None,
-                            is_unique: false,
+                            is_unique: None,
                             primary_key: None,
                             documentation: None,
                             is_generated: false,
@@ -569,7 +578,7 @@ mod tests {
                             arity: FieldArity::Required,
                             database_name: Some("city-name".to_string()),
                             default_value: None,
-                            is_unique: false,
+                            is_unique: None,
                             primary_key: None,
                             documentation: None,
                             is_generated: false,
@@ -724,9 +733,10 @@ mod tests {
                         ),
                         database_name: None,
                         default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
-                        is_unique: false,
+                        is_unique: None,
                         primary_key: Some(PrimaryKeyDefinition {
                             name_in_client: None,
+                            name_in_db_is_default: false,
                             name_in_db: None,
                             fields: vec!["id".to_string()],
                         }),
@@ -763,7 +773,8 @@ mod tests {
                 ],
                 is_generated: false,
                 indices: vec![datamodel::dml::IndexDefinition {
-                    name_in_db: Some("name_last_name_unique".to_string()),
+                    name_in_db: "name_last_name_unique".to_string(),
+                    name_in_client: None,
                     fields: vec!["name".to_string(), "lastname".to_string()],
                     tpe: datamodel::dml::IndexType::Unique,
                 }],
@@ -860,9 +871,10 @@ mod tests {
                             ),
                             database_name: None,
                             default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
-                            is_unique: false,
+                            is_unique: None,
                             primary_key: Some(PrimaryKeyDefinition {
                                 name_in_client: None,
+                                name_in_db_is_default: false,
                                 name_in_db: None,
                                 fields: vec!["id".to_string()],
                             }),
@@ -921,9 +933,10 @@ mod tests {
                             ),
                             database_name: None,
                             default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
-                            is_unique: false,
+                            is_unique: None,
                             primary_key: Some(PrimaryKeyDefinition {
                                 name_in_client: None,
+                                name_in_db_is_default: false,
                                 name_in_db: None,
                                 fields: vec!["id".to_string()],
                             }),

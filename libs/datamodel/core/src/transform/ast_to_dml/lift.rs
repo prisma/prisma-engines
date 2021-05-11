@@ -5,7 +5,7 @@ use crate::common::ConstraintNames;
 use crate::diagnostics::{DatamodelError, Diagnostics};
 use crate::dml::ScalarType;
 use crate::transform::helpers::ValueValidator;
-use crate::{ast, configuration, dml, Field, FieldType};
+use crate::{ast, configuration, dml, Field, FieldType, IndexType};
 use datamodel_connector::connector_error::{ConnectorError, ErrorKind};
 use itertools::Itertools;
 use once_cell::sync::Lazy;
@@ -82,13 +82,34 @@ impl<'a> LiftAstToDml<'a> {
                 id_field.map(|f| {
                     let field_name = f.name.clone();
                     f.primary_key.as_mut().map(|mut pk| {
-                        pk.name_in_db = Some(ConstraintNames::primary_key_name(&model_name, vec![field_name]))
+                        let default_name = ConstraintNames::primary_key_name(&model_name, vec![field_name]);
+                        if pk.name_in_db.is_none() {
+                            pk.name_in_db = Some(default_name.clone())
+                        }
+                        pk.name_in_db_is_default = pk.name_in_db == Some(default_name);
                     });
                 });
             }
             let id_field = model.scalar_fields_mut().find(|f| f.is_id());
             model.primary_key = id_field.and_then(|f| f.primary_key.clone());
         }
+        // transfer indexes from field level to model level and name them if names is empty
+        let mut indices_to_copy = vec![];
+        {
+            let model_name = model.name.clone();
+            for field in model.scalar_fields_mut() {
+                if let Some(index) = &mut field.is_unique {
+                    if index.name_in_db.is_empty() {
+                        index.name_in_db =
+                            ConstraintNames::index_name(&model_name, vec![field.name.clone()], IndexType::Unique)
+                    }
+
+                    indices_to_copy.push(index.clone())
+                }
+            }
+        }
+
+        model.indices.append(&mut indices_to_copy);
         errors.errors_or(model)
     }
 

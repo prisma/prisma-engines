@@ -29,7 +29,8 @@ pub struct Model {
 /// Represents an index defined via `@@index` or `@@unique`.
 #[derive(Debug, PartialEq, Clone)]
 pub struct IndexDefinition {
-    pub name_in_db: Option<String>,
+    pub name_in_db: String,
+    pub name_in_client: Option<String>,
     pub fields: Vec<String>,
     pub tpe: IndexType,
 }
@@ -54,6 +55,7 @@ pub enum IndexType {
 #[derive(Debug, PartialEq, Clone)]
 pub struct PrimaryKeyDefinition {
     pub name_in_db: Option<String>,
+    pub name_in_db_is_default: bool,
     pub name_in_client: Option<String>,
     pub fields: Vec<String>,
 }
@@ -248,7 +250,9 @@ impl Model {
         {
             let mut unique_required_fields: Vec<_> = self
                 .scalar_fields()
-                .filter(|field| field.is_unique && (field.is_required() || allow_optional) && !in_eligible(field))
+                .filter(|field| {
+                    field.is_unique.is_some() && (field.is_required() || allow_optional) && !in_eligible(field)
+                })
                 .map(|f| UniqueCriteria::new(vec![f]))
                 .collect();
 

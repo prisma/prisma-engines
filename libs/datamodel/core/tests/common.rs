@@ -159,7 +159,7 @@ impl ScalarFieldAsserts for dml::ScalarField {
     }
 
     fn assert_is_unique(&self, b: bool) -> &Self {
-        assert_eq!(self.is_unique, b);
+        assert_eq!(self.is_unique.is_some(), b);
         self
     }
 

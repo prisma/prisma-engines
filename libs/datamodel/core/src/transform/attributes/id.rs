@@ -13,10 +13,12 @@ impl AttributeValidator<dml::Field> for IdAttributeValidator {
 
     fn validate_and_apply(&self, args: &mut Arguments, obj: &mut dml::Field) -> Result<(), DatamodelError> {
         if let dml::Field::ScalarField(sf) = obj {
-            let name = args.optional_default_arg("name")?.map(|v| v.as_str().unwrap());
+            let name_in_db = args.optional_default_arg("map")?.map(|v| v.as_str().unwrap());
 
             sf.primary_key = Some(PrimaryKeyDefinition {
-                name_in_db: name, // if this is none, the default name needs to be set one level higher since we do not have the model name here -.-
+                // if this is none, the default name needs to be set one level higher since we do not have the model name here -.-
+                name_in_db,
+                name_in_db_is_default: false,
                 name_in_client: None,
                 fields: vec![sf.name.clone()],
             });
@@ -35,8 +37,16 @@ impl AttributeValidator<dml::Field> for IdAttributeValidator {
 
     fn serialize(&self, field: &dml::Field, _datamodel: &dml::Datamodel) -> Vec<ast::Attribute> {
         if let dml::Field::ScalarField(sf) = field {
-            if sf.primary_key.is_some() {
-                return vec![ast::Attribute::new(self.attribute_name(), Vec::new())];
+            if let Some(pk) = &sf.primary_key {
+                let arguments = if !pk.name_in_db_is_default && pk.name_in_db.is_some() {
+                    vec![ast::Argument::new_unnamed(ast::Expression::StringValue(
+                        pk.name_in_db.clone().unwrap(),
+                        ast::Span::empty(),
+                    ))]
+                } else {
+                    vec![]
+                };
+                return vec![ast::Attribute::new(self.attribute_name(), arguments)];
             }
         }
 
@@ -67,21 +77,21 @@ impl AttributeValidator<dml::Model> for ModelLevelIdAttributeValidator {
             .map(|f| f.as_constant_literal())
             .collect::<Result<Vec<_>, _>>()?;
 
-        let (name_in_client, name_in_db) = match (
+        let default_name = ConstraintNames::primary_key_name(&obj.name, fields.clone());
+
+        let (name_in_db_is_default, name_in_client, name_in_db) = match (
             args.optional_arg("name").map(|v| v.as_str().unwrap()),
             args.optional_arg("map").map(|v| v.as_str().unwrap()),
         ) {
-            (Some(client_name), Some(db_name)) => (Some(client_name), Some(db_name)),
-            (Some(client_name), None) => (
-                Some(client_name),
-                Some(ConstraintNames::primary_key_name(&obj.name, fields.clone())),
-            ),
-            (None, Some(db_name)) => (None, Some(db_name)),
-            (None, None) => (None, Some(ConstraintNames::primary_key_name(&obj.name, fields.clone()))),
+            (Some(client_name), Some(db_name)) => (db_name == default_name, Some(client_name), Some(db_name)),
+            (Some(client_name), None) => (true, Some(client_name), Some(default_name)),
+            (None, Some(db_name)) => (db_name == default_name, None, Some(db_name)),
+            (None, None) => (true, None, Some(default_name)),
         };
 
         obj.primary_key = Some(PrimaryKeyDefinition {
             name_in_client,
+            name_in_db_is_default,
             name_in_db,
             fields: fields.clone(),
         });
@@ -152,13 +162,29 @@ impl AttributeValidator<dml::Model> for ModelLevelIdAttributeValidator {
     fn serialize(&self, model: &dml::Model, _datamodel: &dml::Datamodel) -> Vec<ast::Attribute> {
         if let Some(pk) = &model.primary_key {
             if model.has_compound_id() {
-                let args = vec![ast::Argument::new_array(
+                let mut args = vec![ast::Argument::new_array(
                     "",
                     pk.fields
                         .iter()
                         .map(|f| ast::Expression::ConstantValue(f.to_string(), ast::Span::empty()))
                         .collect(),
                 )];
+
+                if let Some(name) = &pk.name_in_client {
+                    args.push(ast::Argument::new(
+                        "name",
+                        ast::Expression::StringValue(name.to_string(), ast::Span::empty()),
+                    ))
+                }
+
+                if let Some(name) = &pk.name_in_db {
+                    if !pk.name_in_db_is_default {
+                        args.push(ast::Argument::new(
+                            "map",
+                            ast::Expression::StringValue(name.to_string(), ast::Span::empty()),
+                        ))
+                    }
+                }
 
                 return vec![ast::Attribute::new(self.attribute_name(), args)];
             }

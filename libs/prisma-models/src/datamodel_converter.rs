@@ -147,7 +147,7 @@ impl<'a> DatamodelConverter<'a> {
             .iter()
             .filter(|i| i.fields.len() > 1 && model.is_compound_index_supported(i)) // @@unique for 1 field are transformed to is_unique instead
             .map(|i| IndexTemplate {
-                name: i.name_in_db.clone(),
+                name: i.name_in_client.clone(),
                 fields: i.fields.clone(),
                 typ: match i.tpe {
                     dml::IndexType::Unique => IndexType::Unique,
@@ -465,7 +465,7 @@ impl DatamodelFieldExtensions for dml::ScalarField {
             .iter()
             .any(|ixd| ixd.is_unique() && ixd.fields == vec![self.name.clone()]);
 
-        self.is_unique || is_declared_as_unique_through_multi_field_unique
+        self.is_unique.is_some() || is_declared_as_unique_through_multi_field_unique
     }
 
     fn is_singular_primary_key(&self, model: &dml::Model) -> bool {

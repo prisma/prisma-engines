@@ -199,21 +199,19 @@ impl<'a> Validator<'a> {
         for model in schema.models() {
             if let Some(ast_model) = ast_schema.find_model(&model.name) {
                 for index in model.indices.iter() {
-                    if let Some(index_name) = &index.name_in_db {
-                        if index_names.contains(index_name) && !multiple_indexes_with_same_name_are_supported {
-                            let ast_index = ast_model
-                                .attributes
-                                .iter()
-                                .find(|attribute| attribute.is_index())
-                                .unwrap();
+                    if index_names.contains(&index.name_in_db) && !multiple_indexes_with_same_name_are_supported {
+                        let ast_index = ast_model
+                            .attributes
+                            .iter()
+                            .find(|attribute| attribute.is_index())
+                            .unwrap();
 
-                            errors.push_error(DatamodelError::new_multiple_indexes_with_same_name_are_not_supported(
-                                index_name,
-                                ast_index.span,
-                            ));
-                        }
-                        index_names.insert(index_name);
+                        errors.push_error(DatamodelError::new_multiple_indexes_with_same_name_are_not_supported(
+                            &index.name_in_db,
+                            ast_index.span,
+                        ));
                     }
+                    index_names.insert(&index.name_in_db);
                 }
             }
         }

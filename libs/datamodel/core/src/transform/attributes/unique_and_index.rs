@@ -1,6 +1,7 @@
 #![deny(missing_docs)]
 
 use super::{super::helpers::Arguments, AttributeValidator};
+use crate::common::ConstraintNames;
 use crate::{ast, diagnostics::DatamodelError, dml, transform::helpers::ValueValidator, IndexDefinition, IndexType};
 use std::cmp::Ordering;
 use std::collections::HashMap;
@@ -14,6 +15,8 @@ impl AttributeValidator<dml::Field> for FieldLevelUniqueAttributeValidator {
     }
 
     fn validate_and_apply(&self, args: &mut Arguments, obj: &mut dml::Field) -> Result<(), DatamodelError> {
+        let field_name = obj.name().to_owned();
+
         if let dml::Field::RelationField(rf) = obj {
             let suggestion = match rf.relation_info.fields.len().cmp(&1) {
                 Ordering::Equal => format!(
@@ -44,7 +47,28 @@ impl AttributeValidator<dml::Field> for FieldLevelUniqueAttributeValidator {
                     args.span(),
                 );
             } else {
-                sf.is_unique = true;
+                let name_in_db = match args
+                    .optional_default_arg("map")?
+                    .map(|v| v.as_string_literal().map(|(str, span)| (str.to_owned(), span)))
+                    .flatten()
+                {
+                    Some((x, span)) if x.is_empty() => {
+                        return Err(DatamodelError::new_attribute_validation_error(
+                            "The `map` argument cannot be an empty string.",
+                            self.attribute_name(),
+                            span,
+                        ))
+                    }
+                    Some((map, _)) => map,
+                    None => "".to_string(), //todo need to upgrade this on the modellevel with the actual name -.-
+                };
+
+                sf.is_unique = Some(IndexDefinition {
+                    name_in_db,
+                    name_in_client: None,
+                    fields: vec![field_name.to_string()],
+                    tpe: IndexType::Unique,
+                });
             }
         }
 
@@ -53,8 +77,15 @@ impl AttributeValidator<dml::Field> for FieldLevelUniqueAttributeValidator {
 
     fn serialize(&self, field: &dml::Field, _datamodel: &dml::Datamodel) -> Vec<ast::Attribute> {
         if let dml::Field::ScalarField(sf) = field {
-            if sf.is_unique {
-                return vec![ast::Attribute::new(self.attribute_name(), vec![])];
+            if let Some(unique) = &sf.is_unique {
+                //todo need to generate the default name here. we need the model for that -.-
+                let arguments = if unique.name_in_db == "default" {
+                    vec![]
+                } else {
+                    vec![ast::Argument::new_string("map", &unique.name_in_db)]
+                };
+
+                return vec![ast::Attribute::new(self.attribute_name(), arguments)];
             }
         }
 
@@ -120,35 +151,50 @@ trait IndexAttributeBase<T>: AttributeValidator<T> {
         obj: &mut dml::Model,
         index_type: IndexType,
     ) -> Result<IndexDefinition, DatamodelError> {
-        let mut index_def = IndexDefinition {
-            name_in_db: None,
-            fields: vec![],
-            tpe: index_type,
-        };
-
-        match args
-            .optional_arg("name")
-            .as_ref()
-            .and_then(ValueValidator::as_string_literal)
-        {
-            Some(("", span)) => {
-                return Err(DatamodelError::new_attribute_validation_error(
-                    "The `name` argument cannot be an empty string.",
-                    self.attribute_name(),
-                    span,
-                ))
-            }
-            Some((name, _)) => index_def.name_in_db = Some(name.to_owned()),
-            None => (),
-        };
-
         let fields = args
             .default_arg("fields")?
             .as_array()
             .iter()
             .map(|f| f.as_constant_literal())
             .collect::<Result<Vec<_>, _>>()?;
-        index_def.fields = fields;
+
+        let (name_in_client, name_in_db) = match (
+            args.optional_arg("name")
+                .as_ref()
+                .and_then(ValueValidator::as_string_literal),
+            args.optional_arg("map")
+                .as_ref()
+                .and_then(ValueValidator::as_string_literal),
+        ) {
+            (Some(("", span)), _) => {
+                return Err(DatamodelError::new_attribute_validation_error(
+                    "The `name` argument cannot be an empty string.",
+                    self.attribute_name(),
+                    span,
+                ))
+            }
+            (_, Some(("", span))) => {
+                return Err(DatamodelError::new_attribute_validation_error(
+                    "The `map` argument cannot be an empty string.",
+                    self.attribute_name(),
+                    span,
+                ))
+            }
+            (Some((name, _)), Some((map, _))) => (Some(name.to_owned()), map.to_owned()),
+            (Some((name, _)), None) => (
+                Some(name.to_owned()),
+                ConstraintNames::index_name(&obj.name, fields.clone(), index_type),
+            ),
+            (None, Some((map, _))) => (None, map.to_owned()),
+            (None, None) => (None, ConstraintNames::index_name(&obj.name, fields.clone(), index_type)),
+        };
+
+        let index_def = IndexDefinition {
+            name_in_client,
+            name_in_db,
+            fields,
+            tpe: index_type,
+        };
 
         let duplicated_fields = find_duplicates(&index_def.fields);
         if !duplicated_fields.is_empty() {
@@ -251,9 +297,7 @@ trait IndexAttributeBase<T>: AttributeValidator<T> {
                         .collect(),
                 )];
 
-                if let Some(name) = &index_def.name_in_db {
-                    args.push(ast::Argument::new_string("name", &name));
-                }
+                args.push(ast::Argument::new_string("name", &index_def.name_in_db));
 
                 ast::Attribute::new(self.attribute_name(), args)
             })
