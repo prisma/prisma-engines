@@ -30,6 +30,7 @@ pub struct Model {
 #[derive(Debug, PartialEq, Clone)]
 pub struct IndexDefinition {
     pub name_in_db: String,
+    pub name_in_db_matches_default: bool,
     pub name_in_client: Option<String>,
     pub fields: Vec<String>,
     pub tpe: IndexType,

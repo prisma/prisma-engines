@@ -387,6 +387,7 @@ mod tests {
                         default_value: None,
                         is_unique: Some(IndexDefinition {
                             name_in_db: "Table1_unique_key".to_string(),
+                            name_in_db_matches_default: false,
                             name_in_client: None,
                             fields: vec!["unique".to_string()],
                             tpe: DMLIndexType::Unique,
@@ -774,6 +775,7 @@ mod tests {
                 is_generated: false,
                 indices: vec![datamodel::dml::IndexDefinition {
                     name_in_db: "name_last_name_unique".to_string(),
+                    name_in_db_matches_default: false,
                     name_in_client: None,
                     fields: vec!["name".to_string(), "lastname".to_string()],
                     tpe: datamodel::dml::IndexType::Unique,

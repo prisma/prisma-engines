@@ -51,7 +51,7 @@ pub fn introspect(
             .iter()
             .filter(|i| !(i.columns.len() == 1 && i.is_unique()))
         {
-            model.add_index(calculate_index(index));
+            model.add_index(calculate_index(model.name.clone(), index));
         }
 
         model.primary_key = table.primary_key.as_ref().map(|pk| {

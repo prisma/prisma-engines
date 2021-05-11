@@ -99,10 +99,13 @@ impl<'a> LiftAstToDml<'a> {
             let model_name = model.name.clone();
             for field in model.scalar_fields_mut() {
                 if let Some(index) = &mut field.is_unique {
+                    let default_name =
+                        ConstraintNames::index_name(&model_name, vec![field.name.clone()], IndexType::Unique);
+
                     if index.name_in_db.is_empty() {
-                        index.name_in_db =
-                            ConstraintNames::index_name(&model_name, vec![field.name.clone()], IndexType::Unique)
+                        index.name_in_db = default_name.clone()
                     }
+                    index.name_in_db_matches_default = default_name == index.name_in_db;
 
                     indices_to_copy.push(index.clone())
                 }

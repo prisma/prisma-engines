@@ -83,6 +83,15 @@ fn constraint_names() {
       @@unique([a, b])
       @@id([a, b])
     }
+    
+    //backwards compatibility
+    model B6 {
+      a   String @id
+      b   String
+   
+      @@index([a], name: "shouldChangeToMap")
+    }
+    
     "#;
 
     let res = parse(dml);

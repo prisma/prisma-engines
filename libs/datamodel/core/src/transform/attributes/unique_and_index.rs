@@ -60,11 +60,12 @@ impl AttributeValidator<dml::Field> for FieldLevelUniqueAttributeValidator {
                         ))
                     }
                     Some((map, _)) => map,
-                    None => "".to_string(), //todo need to upgrade this on the modellevel with the actual name -.-
+                    None => "".to_string(),
                 };
 
                 sf.is_unique = Some(IndexDefinition {
                     name_in_db,
+                    name_in_db_matches_default: false,
                     name_in_client: None,
                     fields: vec![field_name.to_string()],
                     tpe: IndexType::Unique,
@@ -78,11 +79,10 @@ impl AttributeValidator<dml::Field> for FieldLevelUniqueAttributeValidator {
     fn serialize(&self, field: &dml::Field, _datamodel: &dml::Datamodel) -> Vec<ast::Attribute> {
         if let dml::Field::ScalarField(sf) = field {
             if let Some(unique) = &sf.is_unique {
-                //todo need to generate the default name here. we need the model for that -.-
-                let arguments = if unique.name_in_db == "default" {
+                let arguments = if unique.name_in_db_matches_default {
                     vec![]
                 } else {
-                    vec![ast::Argument::new_string("map", &unique.name_in_db)]
+                    vec![ast::Argument::new_string("", &unique.name_in_db)]
                 };
 
                 return vec![ast::Attribute::new(self.attribute_name(), arguments)];
@@ -158,6 +158,8 @@ trait IndexAttributeBase<T>: AttributeValidator<T> {
             .map(|f| f.as_constant_literal())
             .collect::<Result<Vec<_>, _>>()?;
 
+        let default_name = ConstraintNames::index_name(&obj.name, fields.clone(), index_type);
+
         let (name_in_client, name_in_db) = match (
             args.optional_arg("name")
                 .as_ref()
@@ -181,16 +183,14 @@ trait IndexAttributeBase<T>: AttributeValidator<T> {
                 ))
             }
             (Some((name, _)), Some((map, _))) => (Some(name.to_owned()), map.to_owned()),
-            (Some((name, _)), None) => (
-                Some(name.to_owned()),
-                ConstraintNames::index_name(&obj.name, fields.clone(), index_type),
-            ),
+            (Some((name, _)), None) => (Some(name.to_owned()), default_name.clone()),
             (None, Some((map, _))) => (None, map.to_owned()),
-            (None, None) => (None, ConstraintNames::index_name(&obj.name, fields.clone(), index_type)),
+            (None, None) => (None, default_name.clone()),
         };
 
         let index_def = IndexDefinition {
             name_in_client,
+            name_in_db_matches_default: name_in_db == default_name,
             name_in_db,
             fields,
             tpe: index_type,
@@ -286,7 +286,9 @@ trait IndexAttributeBase<T>: AttributeValidator<T> {
         let attributes: Vec<ast::Attribute> = model
             .indices
             .iter()
-            .filter(|index| index.tpe == index_type)
+            .filter(|index| {
+                index.tpe == index_type && !matches!(index.tpe, IndexType::Unique if index.fields.len()== 1)
+            })
             .map(|index_def| {
                 let mut args = vec![ast::Argument::new_array(
                     "",
@@ -297,7 +299,12 @@ trait IndexAttributeBase<T>: AttributeValidator<T> {
                         .collect(),
                 )];
 
-                args.push(ast::Argument::new_string("name", &index_def.name_in_db));
+                if let Some(name) = &index_def.name_in_client {
+                    args.push(ast::Argument::new_string("name", name));
+                }
+                if !index_def.name_in_db_matches_default {
+                    args.push(ast::Argument::new_string("map", &index_def.name_in_db));
+                }
 
                 ast::Attribute::new(self.attribute_name(), args)
             })

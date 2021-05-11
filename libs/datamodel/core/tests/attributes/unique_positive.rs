@@ -17,6 +17,7 @@ fn basic_unique_index_must_work() {
     let user_model = schema.assert_has_model("User");
     user_model.assert_has_index(IndexDefinition {
         name_in_client: None,
+        name_in_db_matches_default: true,
         name_in_db: "User_firstName_lastName_key".to_string(),
         fields: vec!["firstName".to_string(), "lastName".to_string()],
         tpe: IndexType::Unique,
@@ -60,6 +61,7 @@ fn the_name_argument_must_work() {
     let user_model = schema.assert_has_model("User");
     user_model.assert_has_index(IndexDefinition {
         name_in_db: "MyIndexName".to_string(),
+        name_in_db_matches_default: false,
         name_in_client: None,
         fields: vec!["firstName".to_string(), "lastName".to_string()],
         tpe: IndexType::Unique,
@@ -84,6 +86,7 @@ fn multiple_unique_must_work() {
 
     user_model.assert_has_index(IndexDefinition {
         name_in_db: "User_firstName_lastName_key".to_string(),
+        name_in_db_matches_default: true,
         name_in_client: None,
         fields: vec!["firstName".to_string(), "lastName".to_string()],
         tpe: IndexType::Unique,
@@ -91,6 +94,7 @@ fn multiple_unique_must_work() {
 
     user_model.assert_has_index(IndexDefinition {
         name_in_db: "MyIndexName".to_string(),
+        name_in_db_matches_default: false,
         name_in_client: None,
         fields: vec!["firstName".to_string(), "lastName".to_string()],
         tpe: IndexType::Unique,
@@ -117,6 +121,7 @@ fn multi_field_unique_indexes_on_enum_fields_must_work() {
     let user_model = schema.assert_has_model("User");
     user_model.assert_has_index(IndexDefinition {
         name_in_client: None,
+        name_in_db_matches_default: true,
         name_in_db: "User_role_key".to_string(),
         fields: vec!["role".to_string()],
         tpe: IndexType::Unique,
