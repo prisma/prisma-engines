@@ -3,22 +3,25 @@ pub use test_macros::test_connector;
 pub use test_setup::{BitFlags, Capabilities, Tags};
 
 use barrel::Migration;
-use quaint::prelude::{ConnectionInfo, SqlFamily};
+use quaint::prelude::SqlFamily;
 use sql_schema_describer::{
     postgres::Circumstances,
     walkers::{ColumnWalker, ForeignKeyWalker, IndexWalker, SqlSchemaExt, TableWalker},
     ColumnTypeFamily, DescriberError, ForeignKeyAction, SqlSchema, SqlSchemaDescriberBackend,
 };
+use std::future::Future;
 use test_setup::*;
 
 pub struct TestApi {
     db_name: &'static str,
     database: Quaint,
     tags: BitFlags<Tags>,
+    rt: tokio::runtime::Runtime,
 }
 
 impl TestApi {
-    pub(crate) async fn new(args: TestApiArgs) -> Self {
+    pub(crate) fn new(args: TestApiArgs) -> Self {
+        let rt = test_setup::runtime::test_tokio_runtime();
         let tags = args.tags();
         let db_name = if tags.contains(Tags::Mysql) {
             test_setup::mysql_safe_identifier(args.test_function_name())
@@ -27,16 +30,15 @@ impl TestApi {
         };
 
         let (conn, _connection_string) = if tags.contains(Tags::Mysql) {
-            create_mysql_database(&db_name).await.unwrap()
+            rt.block_on(create_mysql_database(&db_name)).unwrap()
         } else if tags.contains(Tags::Postgres) {
-            create_postgres_database(&db_name).await.unwrap()
+            rt.block_on(create_postgres_database(&db_name)).unwrap()
         } else if tags.contains(Tags::Mssql) {
-            test_setup::init_mssql_database(args.database_url(), db_name)
-                .await
+            rt.block_on(test_setup::init_mssql_database(args.database_url(), db_name))
                 .unwrap()
         } else if tags.contains(Tags::Sqlite) {
             let url = sqlite_test_url(db_name);
-            (Quaint::new(&url).await.unwrap(), url)
+            (rt.block_on(Quaint::new(&url)).unwrap(), url)
         } else {
             unreachable!()
         };
@@ -45,23 +47,26 @@ impl TestApi {
             db_name,
             tags: args.tags(),
             database: conn,
+            rt,
         }
     }
 
-    fn connection_info(&self) -> &ConnectionInfo {
-        self.database.connection_info()
+    pub(crate) fn block_on<O>(&self, f: impl Future<Output = O>) -> O {
+        self.rt.block_on(f)
     }
 
     pub(crate) fn connector_tags(&self) -> BitFlags<Tags> {
         self.tags
     }
 
-    pub(crate) async fn describe(&self) -> SqlSchema {
-        self.describer().describe(self.schema_name()).await.unwrap()
+    pub(crate) fn describe(&self) -> SqlSchema {
+        self.rt.block_on(self.describer().describe(self.schema_name())).unwrap()
     }
 
-    pub(crate) async fn describe_error(&self) -> DescriberError {
-        self.describer().describe(self.schema_name()).await.unwrap_err()
+    pub(crate) fn describe_error(&self) -> DescriberError {
+        self.rt
+            .block_on(self.describer().describe(self.schema_name()))
+            .unwrap_err()
     }
 
     pub(crate) fn describer(&self) -> Box<dyn SqlSchemaDescriberBackend> {
@@ -90,6 +95,19 @@ impl TestApi {
         &self.database
     }
 
+    pub(crate) fn execute_barrel(&self, migration_fn: impl FnOnce(&mut Migration)) {
+        let mut migration = Migration::new().schema(self.schema_name());
+        migration_fn(&mut migration);
+
+        let full_sql = migration.make_from(match self.sql_family() {
+            SqlFamily::Mysql => barrel::SqlVariant::Mysql,
+            SqlFamily::Postgres => barrel::SqlVariant::Pg,
+            SqlFamily::Sqlite => barrel::SqlVariant::Sqlite,
+            SqlFamily::Mssql => barrel::SqlVariant::Mssql,
+        });
+        self.rt.block_on(self.database.raw_cmd(&full_sql)).unwrap();
+    }
+
     pub(crate) fn is_cockroach(&self) -> bool {
         self.tags.contains(Tags::Cockroach)
     }
@@ -107,51 +125,16 @@ impl TestApi {
             // It is not possible to connect to a specific schema in MSSQL. The
             // user has a dedicated schema from the admin, that's all.
             SqlFamily::Mssql => self.db_name(),
-            _ => self.connection_info().schema_name(),
+            _ => self.database.connection_info().schema_name(),
         }
+    }
+
+    pub(crate) fn raw_cmd(&self, sql: &str) -> quaint::Result<()> {
+        self.rt.block_on(self.database.raw_cmd(sql))
     }
 
     pub(crate) fn sql_family(&self) -> SqlFamily {
-        self.connection_info().sql_family()
-    }
-
-    pub(crate) fn barrel(&self) -> BarrelMigrationExecutor {
-        BarrelMigrationExecutor {
-            schema_name: self.schema_name().to_owned(),
-            database: self.database.clone(),
-            sql_variant: match self.sql_family() {
-                SqlFamily::Mysql => barrel::SqlVariant::Mysql,
-                SqlFamily::Postgres => barrel::SqlVariant::Pg,
-                SqlFamily::Sqlite => barrel::SqlVariant::Sqlite,
-                SqlFamily::Mssql => barrel::SqlVariant::Mssql,
-            },
-        }
-    }
-}
-
-pub struct BarrelMigrationExecutor {
-    pub(super) database: Quaint,
-    pub(super) sql_variant: barrel::backend::SqlVariant,
-    pub(super) schema_name: String,
-}
-
-impl BarrelMigrationExecutor {
-    pub async fn execute<F>(&self, migration_fn: F)
-    where
-        F: FnOnce(&mut Migration),
-    {
-        self.execute_with_schema(migration_fn, &self.schema_name).await
-    }
-
-    pub async fn execute_with_schema<F>(&self, migration_fn: F, schema_name: &str)
-    where
-        F: FnOnce(&mut Migration),
-    {
-        let mut migration = Migration::new().schema(schema_name);
-        migration_fn(&mut migration);
-
-        let full_sql = migration.make_from(self.sql_variant);
-        self.database.raw_cmd(&full_sql).await.unwrap();
+        self.database.connection_info().sql_family()
     }
 }
 
@@ -299,7 +282,6 @@ impl ColumnAssertion<'_> {
         self
     }
 
-    #[allow(unused)]
     pub fn assert_type_is_int(&self) -> &Self {
         assert!(self.column.column_type_family().is_int());
         self
