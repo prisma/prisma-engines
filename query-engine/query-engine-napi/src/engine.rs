@@ -125,8 +125,8 @@ impl QueryEngine {
         } = opts;
 
         let overrides: Vec<(_, _)> = datasource_overrides.into_iter().collect();
-        let mut config = datamodel::parse_configuration_with_url_overrides(&datamodel, overrides.clone())
-            .map_err(|errors| ApiError::conversion(errors, &datamodel))?;
+        let mut config =
+            datamodel::parse_configuration(&datamodel).map_err(|errors| ApiError::conversion(errors, &datamodel))?;
 
         config.subject = config
             .subject
@@ -135,7 +135,7 @@ impl QueryEngine {
 
         config
             .subject
-            .resolve_datasource_urls_from_env()
+            .resolve_datasource_urls_from_env(&overrides)
             .map_err(|errors| ApiError::conversion(errors, &datamodel))?;
 
         let ast = datamodel::parse_datamodel(&datamodel)
@@ -233,11 +233,8 @@ impl QueryEngine {
 
         match *inner {
             Inner::Connected(ref engine) => {
-                let config = datamodel::parse_configuration_with_url_overrides(
-                    &engine.datamodel.raw,
-                    engine.datamodel.datasource_overrides.clone(),
-                )
-                .map_err(|errors| ApiError::conversion(errors, &engine.datamodel.raw))?;
+                let config = datamodel::parse_configuration(&engine.datamodel.raw)
+                    .map_err(|errors| ApiError::conversion(errors, &engine.datamodel.raw))?;
 
                 let builder = EngineBuilder {
                     datamodel: engine.datamodel.clone(),
