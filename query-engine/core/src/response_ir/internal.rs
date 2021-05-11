@@ -481,11 +481,11 @@ fn convert_prisma_value(value: PrismaValue, st: &ScalarType) -> Result<PrismaVal
 
         (ScalarType::Float, PrismaValue::Float(f)) => PrismaValue::Float(f),
         (ScalarType::Float, PrismaValue::Int(i)) => {
-            PrismaValue::Int(i.to_i64().expect("Unable to convert BigDecimal to i64."))
+            PrismaValue::Int(i.to_i64().expect("Unable to convert 64bit float to i64."))
         }
 
+        (ScalarType::Decimal, PrismaValue::Decimal(dec)) => PrismaValue::Decimal(dec),
         (ScalarType::Decimal, PrismaValue::Int(i)) => PrismaValue::String(i.to_string()),
-        (ScalarType::Decimal, PrismaValue::Float(f)) => PrismaValue::String(f.to_string()),
 
         (ScalarType::BigInt, PrismaValue::BigInt(i)) => PrismaValue::BigInt(i),
         (ScalarType::BigInt, PrismaValue::Int(i)) => PrismaValue::BigInt(i),
