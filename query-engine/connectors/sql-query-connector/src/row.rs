@@ -3,7 +3,7 @@ use bigdecimal::{BigDecimal, FromPrimitive};
 use chrono::{DateTime, NaiveDate, Utc};
 use connector_interface::{coerce_null_to_zero_value, AggregationResult, AggregationSelection};
 use datamodel::FieldArity;
-use prisma_models::{PrismaValue, Record, TypeIdentifier};
+use prisma_models::{FloatValue, PrismaValue, Record, TypeIdentifier};
 use quaint::{
     ast::{Expression, Value},
     connector::ResultRow,
@@ -203,21 +203,12 @@ pub fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Re
             }
             _ => return Err(create_error(&p_value)),
         },
-        TypeIdentifier::Float | TypeIdentifier::Decimal => match p_value {
+        TypeIdentifier::Float => match p_value {
             value if value.is_null() => PrismaValue::Null,
-            Value::Numeric(Some(f)) => PrismaValue::Float(f.normalized()),
-            Value::Double(Some(f)) => match f {
-                f if f.is_nan() => return Err(create_error(&p_value)),
-                f if f.is_infinite() => return Err(create_error(&p_value)),
-                _ => PrismaValue::Float(BigDecimal::from_f64(f).unwrap().normalized()),
-            },
-            Value::Float(Some(f)) => match f {
-                f if f.is_nan() => return Err(create_error(&p_value)),
-                f if f.is_infinite() => return Err(create_error(&p_value)),
-                _ => PrismaValue::Float(BigDecimal::from_f32(f).unwrap().normalized()),
-            },
+            Value::Float(Some(f)) => PrismaValue::Float(FloatValue(f64::from_f32(f).unwrap())),
+            Value::Double(Some(f)) => PrismaValue::Float(FloatValue(f)),
             Value::Integer(Some(i)) => match BigDecimal::from_i64(i) {
-                Some(dec) => PrismaValue::Float(dec),
+                Some(dec) => PrismaValue::Decimal(dec),
                 None => return Err(create_error(&p_value)),
             },
             Value::Text(_) | Value::Bytes(_) => {
@@ -227,7 +218,25 @@ pub fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Re
                     .parse()
                     .map_err(|_| create_error(&p_value))?;
 
-                PrismaValue::Float(dec.normalized())
+                PrismaValue::Decimal(dec.normalized())
+            }
+            _ => return Err(create_error(&p_value)),
+        },
+        TypeIdentifier::Decimal => match p_value {
+            value if value.is_null() => PrismaValue::Null,
+            Value::Numeric(Some(f)) => PrismaValue::Decimal(f.normalized()),
+            Value::Integer(Some(i)) => match BigDecimal::from_i64(i) {
+                Some(dec) => PrismaValue::Decimal(dec),
+                None => return Err(create_error(&p_value)),
+            },
+            Value::Text(_) | Value::Bytes(_) => {
+                let dec: BigDecimal = p_value
+                    .as_str()
+                    .expect("text/bytes as str")
+                    .parse()
+                    .map_err(|_| create_error(&p_value))?;
+
+                PrismaValue::Decimal(dec.normalized())
             }
             _ => return Err(create_error(&p_value)),
         },

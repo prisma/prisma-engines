@@ -3,24 +3,32 @@ mod error;
 #[cfg(feature = "sql-ext")]
 mod sql_ext;
 
-use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
+use bigdecimal::{BigDecimal, FromPrimitive};
 use chrono::prelude::*;
+use cmp::{Ord, Ordering};
 use serde::de::Unexpected;
 use serde::{ser::Serializer, Deserialize, Deserializer, Serialize};
-use std::{convert::TryFrom, fmt, str::FromStr};
+use std::{
+    cmp,
+    convert::TryFrom,
+    fmt::{self},
+    ops::Deref,
+    str::FromStr,
+};
 use uuid::Uuid;
 
 pub use error::ConversionFailure;
 pub type PrismaValueResult<T> = std::result::Result<T, ConversionFailure>;
 pub type PrismaListValue = Vec<PrismaValue>;
 
-#[derive(Debug, PartialEq, Clone, Eq, Hash, Serialize, Deserialize, PartialOrd, Ord)]
+#[derive(Debug, PartialEq, Clone, Serialize, Deserialize, PartialOrd, Ord, Hash, Eq)]
 #[serde(untagged)]
 pub enum PrismaValue {
     String(String),
     Boolean(bool),
     Enum(String),
     Int(i64),
+    Float(FloatValue),
     Uuid(Uuid),
     List(PrismaListValue),
     Json(String),
@@ -33,13 +41,82 @@ pub enum PrismaValue {
     DateTime(DateTime<FixedOffset>),
 
     #[serde(serialize_with = "serialize_decimal", deserialize_with = "deserialize_decimal")]
-    Float(BigDecimal),
+    Decimal(BigDecimal),
 
     #[serde(serialize_with = "serialize_bigint")]
     BigInt(i64),
 
     #[serde(serialize_with = "serialize_bytes")]
     Bytes(Vec<u8>),
+}
+
+#[derive(Debug, PartialEq, Serialize, Deserialize, Clone, Copy, PartialOrd)]
+// todo: serialize only f64
+pub struct FloatValue(pub f64);
+
+impl Deref for FloatValue {
+    type Target = f64;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl Eq for FloatValue {}
+
+impl std::hash::Hash for FloatValue {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        let bytes = self.0.to_be_bytes();
+        state.write(&bytes);
+    }
+}
+
+impl Ord for FloatValue {
+    fn cmp(&self, other: &Self) -> Ordering {
+        if self.is_nan() {
+            if other.is_nan() {
+                Ordering::Equal
+            } else if other.is_infinite() && other.is_sign_positive() {
+                Ordering::Greater
+            } else if other.is_infinite() && other.is_sign_negative() {
+                Ordering::Greater
+            } else {
+                Ordering::Greater
+            }
+        } else if self.is_infinite() && self.is_sign_positive() {
+            if other.is_nan() {
+                Ordering::Less
+            } else if other.is_infinite() && other.is_sign_positive() {
+                Ordering::Equal
+            } else if other.is_infinite() && other.is_sign_negative() {
+                Ordering::Greater
+            } else {
+                Ordering::Greater
+            }
+        } else if self.is_infinite() && self.is_sign_negative() {
+            if other.is_nan() {
+                Ordering::Less
+            } else if other.is_infinite() && other.is_sign_positive() {
+                Ordering::Less
+            } else if other.is_infinite() && other.is_sign_negative() {
+                Ordering::Equal
+            } else {
+                Ordering::Less
+            }
+        } else {
+            if other.is_nan() {
+                Ordering::Less
+            } else if other.is_infinite() && other.is_sign_positive() {
+                Ordering::Less
+            } else if other.is_infinite() && other.is_sign_negative() {
+                Ordering::Greater
+            } else {
+                self.0
+                    .partial_cmp(&other.0)
+                    .unwrap_or_else(|| panic!("Unhandled float comparison: {} {}", self.0, other.0))
+            }
+        }
+    }
 }
 
 /// Stringify a date to the following format
@@ -77,9 +154,7 @@ impl TryFrom<serde_json::Value> for PrismaValue {
                     Ok(PrismaValue::Int(num.as_i64().unwrap()))
                 } else {
                     let fl = num.as_f64().unwrap();
-                    let dec = BigDecimal::from_f64(fl).unwrap().normalized();
-
-                    Ok(PrismaValue::Float(dec))
+                    Ok(PrismaValue::Float(FloatValue(fl)))
                 }
             }
             serde_json::Value::Object(obj) => match obj.get("prisma__type").as_ref().and_then(|s| s.as_str()) {
@@ -221,7 +296,7 @@ impl PrismaValue {
     }
 
     pub fn new_float(float: f64) -> PrismaValue {
-        PrismaValue::Float(BigDecimal::from_f64(float).unwrap())
+        PrismaValue::Float(FloatValue(float))
     }
 
     pub fn new_datetime(datetime: &str) -> PrismaValue {
@@ -233,7 +308,8 @@ impl fmt::Display for PrismaValue {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             PrismaValue::String(x) => x.fmt(f),
-            PrismaValue::Float(x) => x.fmt(f),
+            PrismaValue::Float(x) => x.0.fmt(f),
+            PrismaValue::Decimal(x) => x.fmt(f),
             PrismaValue::Boolean(x) => x.fmt(f),
             PrismaValue::DateTime(x) => x.fmt(f),
             PrismaValue::Enum(x) => x.fmt(f),
@@ -261,16 +337,6 @@ impl From<&str> for PrismaValue {
 impl From<String> for PrismaValue {
     fn from(s: String) -> Self {
         PrismaValue::String(s)
-    }
-}
-
-impl TryFrom<f64> for PrismaValue {
-    type Error = ConversionFailure;
-
-    fn try_from(f: f64) -> PrismaValueResult<PrismaValue> {
-        BigDecimal::from_f64(f)
-            .map(PrismaValue::Float)
-            .ok_or_else(|| ConversionFailure::new("f64", "Decimal"))
     }
 }
 

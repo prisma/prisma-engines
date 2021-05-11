@@ -93,7 +93,7 @@ fn should_be_able_to_handle_native_type_combined_with_default_attribute() {
 
     user_model
         .assert_has_scalar_field("test")
-        .assert_default_value(DefaultValue::Single(PrismaValue::Float(
+        .assert_default_value(DefaultValue::Single(PrismaValue::Decimal(
             BigDecimal::from_f64(1.00).unwrap(),
         )));
 

@@ -1,9 +1,9 @@
 use super::*;
 use crate::schema::*;
-use bigdecimal::{BigDecimal, ToPrimitive};
+use bigdecimal::BigDecimal;
 use chrono::prelude::*;
 use indexmap::IndexMap;
-use prisma_value::PrismaValue;
+use prisma_value::{FloatValue, PrismaValue};
 use std::{borrow::Borrow, collections::HashSet, convert::TryFrom, str::FromStr, sync::Arc};
 use uuid::Uuid;
 
@@ -242,13 +242,23 @@ impl QueryDocumentParser {
             }
 
             (QueryValue::Int(i), ScalarType::Int) => Ok(PrismaValue::Int(i)),
-            (QueryValue::Int(i), ScalarType::Float) => Ok(PrismaValue::Float(BigDecimal::from(i))),
-            (QueryValue::Int(i), ScalarType::Decimal) => Ok(PrismaValue::Float(BigDecimal::from(i))),
+            (QueryValue::Int(i), ScalarType::Float) => {
+                let i = i32::try_from(i).map_err(|_| QueryParserError {
+                    path: parent_path.clone(),
+                    error_kind: QueryParserErrorKind::ValueParseError(format!(
+                        "Can't convert to 64bit floating point value: Overflowing int '{}'.",
+                        i
+                    )),
+                })?;
+
+                Ok(PrismaValue::Float(FloatValue(f64::from(i))))
+            }
+
+            (QueryValue::Int(i), ScalarType::Decimal) => Ok(PrismaValue::Decimal(BigDecimal::from(i))),
             (QueryValue::Int(i), ScalarType::BigInt) => Ok(PrismaValue::BigInt(i)),
 
             (QueryValue::Float(f), ScalarType::Float) => Ok(PrismaValue::Float(f)),
-            (QueryValue::Float(f), ScalarType::Int) => Ok(PrismaValue::Int(f.to_i64().unwrap())),
-            (QueryValue::Float(d), ScalarType::Decimal) => Ok(PrismaValue::Float(d)),
+            (QueryValue::Float(f), ScalarType::Int) => Ok(PrismaValue::Int(f.0 as i64)),
 
             (QueryValue::Boolean(b), ScalarType::Boolean) => Ok(PrismaValue::Boolean(b)),
 
@@ -290,7 +300,7 @@ impl QueryDocumentParser {
     #[tracing::instrument(skip(path, s))]
     pub fn parse_decimal(path: &QueryPath, s: String) -> QueryParserResult<PrismaValue> {
         BigDecimal::from_str(&s)
-            .map(PrismaValue::Float)
+            .map(PrismaValue::Decimal)
             .map_err(|_| QueryParserError {
                 path: path.clone(),
                 error_kind: QueryParserErrorKind::ValueParseError(format!("'{}' is not a valid decimal string", s)),

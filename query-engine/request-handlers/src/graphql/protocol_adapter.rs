@@ -1,5 +1,4 @@
 use crate::HandlerError;
-use bigdecimal::{BigDecimal, FromPrimitive};
 use graphql_parser::query::{
     Definition, Document, OperationDefinition, Selection as GqlSelection, SelectionSet, Value,
 };
@@ -138,10 +137,7 @@ impl GraphQLProtocolAdapter {
                     i
                 ))),
             },
-            Value::Float(f) => match BigDecimal::from_f64(f) {
-                Some(dec) => Ok(QueryValue::Float(dec)),
-                None => Err(HandlerError::query_conversion(format!("invalid 64-bit float: {:?}", f))),
-            },
+            Value::Float(f) => Ok(QueryValue::from_f64(f)),
             Value::String(s) => Ok(QueryValue::String(s)),
             Value::Boolean(b) => Ok(QueryValue::Boolean(b)),
             Value::Null => Ok(QueryValue::Null),

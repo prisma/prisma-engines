@@ -9,7 +9,7 @@ use crate::{
 use bigdecimal::BigDecimal;
 use chrono::{DateTime, FixedOffset};
 use dml::scalars::ScalarType;
-use prisma_value::PrismaValue;
+use prisma_value::{FloatValue, PrismaValue};
 use std::error;
 
 /// Wraps a value and provides convenience methods for
@@ -69,7 +69,7 @@ impl ValueValidator {
                 })
             }),
 
-            ScalarType::Decimal => self.as_float().map(PrismaValue::Float),
+            ScalarType::Decimal => self.as_decimal().map(PrismaValue::Decimal),
             ScalarType::BigInt => self.as_int().map(PrismaValue::BigInt),
         }
     }
@@ -124,7 +124,20 @@ impl ValueValidator {
     }
 
     /// Tries to convert the wrapped value to a Prisma Float.
-    pub fn as_float(&self) -> Result<BigDecimal, DatamodelError> {
+    pub fn as_float(&self) -> Result<FloatValue, DatamodelError> {
+        match &self.value {
+            ast::Expression::NumericValue(value, _) => {
+                self.wrap_error_from_result(value.parse::<f64>().map(FloatValue), "numeric")
+            }
+            ast::Expression::Any(value, _) => {
+                self.wrap_error_from_result(value.parse::<f64>().map(FloatValue), "numeric")
+            }
+            _ => Err(self.construct_type_mismatch_error("numeric")),
+        }
+    }
+
+    /// Tries to convert the wrapped value to a Prisma Float.
+    pub fn as_decimal(&self) -> Result<BigDecimal, DatamodelError> {
         match &self.value {
             ast::Expression::StringValue(value, _) => {
                 self.wrap_error_from_result(value.parse::<BigDecimal>(), "numeric")

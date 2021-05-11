@@ -1,5 +1,4 @@
-use crate::PrismaValue;
-use bigdecimal::{BigDecimal, FromPrimitive};
+use crate::{FloatValue, PrismaValue};
 use chrono::{DateTime, NaiveDate, Utc};
 use quaint::ast::Value;
 use std::convert::TryFrom;
@@ -11,45 +10,15 @@ impl<'a> TryFrom<Value<'a>> for PrismaValue {
         let val = match pv {
             Value::Integer(i) => i.map(PrismaValue::Int).unwrap_or(PrismaValue::Null),
 
-            Value::Float(Some(f)) => match f {
-                f if f.is_nan() => {
-                    return Err(crate::ConversionFailure {
-                        from: "NaN",
-                        to: "BigDecimal",
-                    })
-                }
-                f if f.is_infinite() => {
-                    return Err(crate::ConversionFailure {
-                        from: "Infinity",
-                        to: "BigDecimal",
-                    })
-                }
-                _ => PrismaValue::Float(BigDecimal::from_f32(f).unwrap().normalized()),
-            },
-
+            Value::Float(Some(f)) => PrismaValue::Float(FloatValue(f as f64)),
             Value::Float(None) => PrismaValue::Null,
 
-            Value::Double(Some(f)) => match f {
-                f if f.is_nan() => {
-                    return Err(crate::ConversionFailure {
-                        from: "NaN",
-                        to: "BigDecimal",
-                    })
-                }
-                f if f.is_infinite() => {
-                    return Err(crate::ConversionFailure {
-                        from: "Infinity",
-                        to: "BigDecimal",
-                    })
-                }
-                _ => PrismaValue::Float(BigDecimal::from_f64(f).unwrap().normalized()),
-            },
-
+            Value::Double(Some(f)) => PrismaValue::Float(FloatValue(f)),
             Value::Double(None) => PrismaValue::Null,
 
             Value::Numeric(d) => d
                 // chop the trailing zeroes off so javascript doesn't start rounding things wrong
-                .map(|d| PrismaValue::Float(d.normalized()))
+                .map(|d| PrismaValue::Decimal(d.normalized()))
                 .unwrap_or(PrismaValue::Null),
 
             Value::Text(s) => s

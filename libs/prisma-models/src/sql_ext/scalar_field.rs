@@ -12,7 +12,8 @@ impl ScalarFieldExt for ScalarField {
     fn value<'a>(&self, pv: PrismaValue) -> Value<'a> {
         match (pv, &self.type_identifier) {
             (PrismaValue::String(s), _) => s.into(),
-            (PrismaValue::Float(f), _) => f.into(),
+            (PrismaValue::Float(f), _) => f.0.into(),
+            (PrismaValue::Decimal(d), _) => d.into(),
             (PrismaValue::Boolean(b), _) => b.into(),
             (PrismaValue::DateTime(d), _) => d.with_timezone(&Utc).into(),
             (PrismaValue::Enum(e), _) => e.into(),
@@ -47,7 +48,8 @@ impl ScalarFieldExt for ScalarField {
 pub fn convert_lossy<'a>(pv: PrismaValue) -> Value<'a> {
     match pv {
         PrismaValue::String(s) => s.into(),
-        PrismaValue::Float(f) => f.into(),
+        PrismaValue::Float(f) => f.0.into(),
+        PrismaValue::Decimal(d) => d.into(),
         PrismaValue::Boolean(b) => b.into(),
         PrismaValue::DateTime(d) => d.with_timezone(&Utc).into(),
         PrismaValue::Enum(e) => e.into(),

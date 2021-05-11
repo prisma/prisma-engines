@@ -1,7 +1,7 @@
 use super::{Datamodel, Enum, EnumValue, Field, Function, Model, UniqueIndex};
 use crate::{dml, FieldType, Ignorable, IndexType, ScalarType};
-use bigdecimal::ToPrimitive;
 use prisma_value::PrismaValue;
+use serde_json::Number;
 
 pub fn render_to_dmmf(schema: &dml::Datamodel) -> String {
     let dmmf = schema_to_dmmf(schema);
@@ -141,10 +141,9 @@ fn prisma_value_to_serde(value: &PrismaValue) -> serde_json::Value {
         PrismaValue::Boolean(val) => serde_json::Value::Bool(*val),
         PrismaValue::String(val) => serde_json::Value::String(val.clone()),
         PrismaValue::Enum(val) => serde_json::Value::String(val.clone()),
-        PrismaValue::Float(val) => {
-            serde_json::Value::Number(serde_json::Number::from_f64(val.to_f64().unwrap()).unwrap())
-        }
-        PrismaValue::Int(val) => serde_json::Value::Number(serde_json::Number::from_f64(*val as f64).unwrap()),
+        PrismaValue::Float(val) => serde_json::Value::Number(Number::from_f64(**val).unwrap()),
+        PrismaValue::Decimal(val) => serde_json::Value::String(val.to_string()),
+        PrismaValue::Int(val) => serde_json::Value::Number(Number::from_f64(*val as f64).unwrap()),
         PrismaValue::BigInt(val) => serde_json::Value::String(val.to_string()),
         PrismaValue::DateTime(val) => serde_json::Value::String(val.to_rfc3339()),
         PrismaValue::Null => serde_json::Value::Null,

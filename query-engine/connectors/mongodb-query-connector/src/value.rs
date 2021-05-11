@@ -228,26 +228,26 @@ pub fn value_from_bson(bson: Bson, meta: &OutputMeta) -> crate::Result<PrismaVal
         (TypeIdentifier::BigInt, Bson::Int32(i)) => PrismaValue::BigInt(i as i64),
 
         // Floats
-        (TypeIdentifier::Float, Bson::Double(f)) => {
-            PrismaValue::Float(BigDecimal::from_f64(f).convert(expl::PRISMA_FLOAT)?.normalized())
-        }
-        (TypeIdentifier::Float, Bson::Int32(i)) => {
-            PrismaValue::Float(BigDecimal::from_i64(i as i64).convert(expl::PRISMA_FLOAT)?.normalized())
-        }
-        (TypeIdentifier::Float, Bson::Int64(i)) => {
-            PrismaValue::Float(BigDecimal::from_i64(i).convert(expl::PRISMA_FLOAT)?.normalized())
-        }
+        // (TypeIdentifier::Float, Bson::Double(f)) => {
+        //     PrismaValue::Float(BigDecimal::from_f64(f).convert(expl::PRISMA_FLOAT)?.normalized())
+        // }
+        // (TypeIdentifier::Float, Bson::Int32(i)) => {
+        //     PrismaValue::Float(BigDecimal::from_i64(i as i64).convert(expl::PRISMA_FLOAT)?.normalized())
+        // }
+        // (TypeIdentifier::Float, Bson::Int64(i)) => {
+        //     PrismaValue::Float(BigDecimal::from_i64(i).convert(expl::PRISMA_FLOAT)?.normalized())
+        // }
 
-        // Decimals
-        (TypeIdentifier::Decimal, Bson::Double(f)) => {
-            PrismaValue::Float(BigDecimal::from_f64(f).convert(expl::PRISMA_FLOAT)?.normalized())
-        }
-        (TypeIdentifier::Decimal, Bson::Int32(i)) => {
-            PrismaValue::Float(BigDecimal::from_i64(i as i64).convert(expl::PRISMA_FLOAT)?.normalized())
-        }
-        (TypeIdentifier::Decimal, Bson::Int64(i)) => {
-            PrismaValue::Float(BigDecimal::from_i64(i).convert(expl::PRISMA_FLOAT)?.normalized())
-        }
+        // // Decimals
+        // (TypeIdentifier::Decimal, Bson::Double(f)) => {
+        //     PrismaValue::Float(BigDecimal::from_f64(f).convert(expl::PRISMA_FLOAT)?.normalized())
+        // }
+        // (TypeIdentifier::Decimal, Bson::Int32(i)) => {
+        //     PrismaValue::Float(BigDecimal::from_i64(i as i64).convert(expl::PRISMA_FLOAT)?.normalized())
+        // }
+        // (TypeIdentifier::Decimal, Bson::Int64(i)) => {
+        //     PrismaValue::Float(BigDecimal::from_i64(i).convert(expl::PRISMA_FLOAT)?.normalized())
+        // }
 
         // DateTime
         (TypeIdentifier::DateTime, Bson::DateTime(dt)) => PrismaValue::DateTime(dt.into()),

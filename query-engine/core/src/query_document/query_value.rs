@@ -1,18 +1,24 @@
-use bigdecimal::BigDecimal;
 use indexmap::IndexMap;
+use prisma_models::FloatValue;
 use prisma_value::{stringify_date, PrismaValue};
 use std::hash::Hash;
 
 #[derive(Debug, Clone, Eq)]
 pub enum QueryValue {
     Int(i64),
-    Float(BigDecimal),
+    Float(FloatValue),
     String(String),
     Boolean(bool),
     Null,
     Enum(String),
     List(Vec<QueryValue>),
     Object(IndexMap<String, QueryValue>),
+}
+
+impl QueryValue {
+    pub fn from_f64(f: f64) -> Self {
+        Self::Float(FloatValue(f))
+    }
 }
 
 impl PartialEq for QueryValue {
@@ -63,6 +69,7 @@ impl From<PrismaValue> for QueryValue {
         match pv {
             PrismaValue::String(s) => Self::String(s),
             PrismaValue::Float(f) => Self::Float(f),
+            PrismaValue::Decimal(d) => Self::String(d.to_string()),
             PrismaValue::Boolean(b) => Self::Boolean(b),
             PrismaValue::DateTime(dt) => Self::String(stringify_date(&dt)),
             PrismaValue::Enum(s) => Self::Enum(s),

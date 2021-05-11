@@ -680,11 +680,11 @@ impl SqlSchemaDescriber {
                                 },
                             }
                         }
-                        ColumnTypeFamily::Float => match Self::parse_float(&default_string) {
+                        ColumnTypeFamily::Float => match Self::parse_decimal(&default_string) {
                             Some(float_value) => DefaultValue::value(float_value),
                             None => DefaultValue::db_generated(default_string),
                         },
-                        ColumnTypeFamily::Decimal => match Self::parse_float(&default_string) {
+                        ColumnTypeFamily::Decimal => match Self::parse_decimal(&default_string) {
                             Some(float_value) => DefaultValue::value(float_value),
                             None => DefaultValue::db_generated(default_string),
                         },
