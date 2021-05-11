@@ -1,8 +1,9 @@
-use migration_engine_tests::sql::*;
-use quaint::{ast as quaint_ast, prelude::Queryable};
+use migration_engine_tests::multi_engine_test_api::*;
+use quaint::ast as quaint_ast;
 
 #[test_connector(tags(Mariadb))]
-async fn foreign_keys_to_indexes_being_renamed_must_work(api: &TestApi) -> TestResult {
+fn foreign_keys_to_indexes_being_renamed_must_work(api: TestApi) {
+    let engine = api.new_engine();
     let dm1 = r#"
         model User {
             id String @id
@@ -19,28 +20,29 @@ async fn foreign_keys_to_indexes_being_renamed_must_work(api: &TestApi) -> TestR
         }
     "#;
 
-    api.schema_push(dm1).send().await?.assert_green()?;
+    engine.schema_push(dm1).send_sync().unwrap().assert_green().unwrap();
 
-    api.assert_schema()
-        .await?
+    engine
+        .assert_schema()
         .assert_table("User", |table| {
             table.assert_index_on_columns(&["name"], |idx| idx.assert_name("idxname"))
-        })?
+        })
+        .unwrap()
         .assert_table("Post", |table| {
             table.assert_fk_on_columns(&["author"], |fk| fk.assert_references("User", &["name"]))
-        })?;
+        })
+        .unwrap();
 
-    let insert_post = quaint_ast::Insert::single_into(api.render_table_name("Post"))
+    let insert_post = quaint_ast::Insert::single_into(engine.render_table_name("Post"))
         .value("id", "the-post-id")
         .value("author", "steve");
 
-    let insert_user = quaint::ast::Insert::single_into(api.render_table_name("User"))
+    let insert_user = quaint::ast::Insert::single_into(engine.render_table_name("User"))
         .value("id", "the-user-id")
         .value("name", "steve");
 
-    let db = api.database();
-    db.query(insert_user.into()).await?;
-    db.query(insert_post.into()).await?;
+    engine.query(insert_user.into());
+    engine.query(insert_post.into());
 
     let dm2 = r#"
         model User {
@@ -58,16 +60,16 @@ async fn foreign_keys_to_indexes_being_renamed_must_work(api: &TestApi) -> TestR
         }
     "#;
 
-    api.schema_push(dm2).send().await?.assert_green()?;
+    engine.schema_push(dm2).send_sync().unwrap().assert_green().unwrap();
 
-    api.assert_schema()
-        .await?
+    engine
+        .assert_schema()
         .assert_table("User", |table| {
             table.assert_index_on_columns(&["name"], |idx| idx.assert_name("idxrenamed"))
-        })?
+        })
+        .unwrap()
         .assert_table("Post", |table| {
             table.assert_fk_on_columns(&["author"], |fk| fk.assert_references("User", &["name"]))
-        })?;
-
-    Ok(())
+        })
+        .unwrap();
 }

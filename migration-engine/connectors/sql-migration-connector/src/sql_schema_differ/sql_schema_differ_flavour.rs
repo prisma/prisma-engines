@@ -25,6 +25,12 @@ pub(crate) trait SqlSchemaDifferFlavour {
         true
     }
 
+    /// Returns true only if the database can cope with an optional column
+    /// constrained by a foreign key being made NOT NULL.
+    fn can_cope_with_foreign_key_column_becoming_nonnullable(&self) -> bool {
+        true
+    }
+
     /// Return whether a column's type needs to be migrated, and how.
     fn column_type_change(&self, differ: &ColumnDiffer<'_>) -> Option<ColumnTypeChange> {
         if differ.previous.column_type_family() != differ.next.column_type_family() {

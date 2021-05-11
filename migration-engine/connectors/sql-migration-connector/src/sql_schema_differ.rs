@@ -589,14 +589,18 @@ fn foreign_keys_match(fks: Pair<&ForeignKeyWalker<'_>>, flavour: &dyn SqlFlavour
         fks.previous().referenced_columns_count() == fks.next().referenced_columns_count();
     let constrains_same_column_count =
         fks.previous().constrained_columns().count() == fks.next().constrained_columns().count();
-    let constrains_same_columns = fks.interleave(|fk| fk.constrained_columns()).all(|fks| {
-        let families_match = match fks.map(|fk| fk.column_type_family()).as_tuple() {
+    let constrains_same_columns = fks.interleave(|fk| fk.constrained_columns()).all(|cols| {
+        let families_match = match cols.map(|col| col.column_type_family()).as_tuple() {
             (ColumnTypeFamily::Uuid, ColumnTypeFamily::String) => true,
             (ColumnTypeFamily::String, ColumnTypeFamily::Uuid) => true,
             (x, y) => x == y,
         };
 
-        fks.previous().name() == fks.next().name() && families_match
+        let arities_ok = flavour.can_cope_with_foreign_key_column_becoming_nonnullable()
+            || (cols.previous().arity() == cols.next().arity()
+                || (cols.previous().arity().is_required() && cols.next().arity().is_nullable()));
+
+        cols.previous().name() == cols.next().name() && families_match && arities_ok
     });
 
     // Foreign key references different columns or the same columns in a different order.
