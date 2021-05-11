@@ -245,11 +245,8 @@ impl Connector for MySqlDatamodelConnector {
     fn validate_field(&self, field: &Field) -> Result<(), ConnectorError> {
         match field.field_type() {
             FieldType::NativeType(scalar_type, native_type_instance) => {
-                // let native_type_name = native_type_instance.name.as_str();
                 let native_type: MySqlType = native_type_instance.deserialize_native_type();
-                let error = self.native_instance_error(native_type_instance.clone());
-                // let incompatible_with_key =
-                //     NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type_name);
+                let error = self.native_instance_error(native_type_instance);
 
                 match native_type {
                     Decimal(Some((precision, scale))) if scale > precision => {
@@ -273,8 +270,6 @@ impl Connector for MySqlDatamodelConnector {
                     Bit(n) if n > 1 && scalar_type.is_boolean() => {
                         error.new_argument_m_out_of_range_error("only Bit(1) can be used as Boolean.")
                     }
-                    // _ if field.is_unique() && incompatible_with_key => error.new_incompatible_native_type_with_unique(),
-                    // _ if field.is_id() && incompatible_with_key => error.new_incompatible_native_type_with_id(),
                     _ => Ok(()),
                 }
             }
