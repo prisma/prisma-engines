@@ -41,7 +41,7 @@ impl<'a> Arguments<'a> {
             ))
         }
 
-        errors.into_result()?;
+        errors.make_result()?;
 
         Ok(Arguments {
             args: remaining_arguments,

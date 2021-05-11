@@ -78,17 +78,15 @@ impl<'a> LiftAstToDml<'a> {
         if !model.has_compound_id() {
             let model_name = model.name.clone();
             {
-                let id_field = model.scalar_fields_mut().find(|f| f.is_id());
-                id_field.map(|f| {
-                    let field_name = f.name.clone();
-                    f.primary_key.as_mut().map(|mut pk| {
-                        let default_name = ConstraintNames::primary_key_name(&model_name, vec![field_name]);
+                if let Some(f) = model.scalar_fields_mut().find(|f| f.is_id()) {
+                    if let Some(mut pk) = f.primary_key.as_mut() {
+                        let default_name = ConstraintNames::primary_key_name(&model_name, vec![f.name.clone()]);
                         if pk.name_in_db.is_none() {
                             pk.name_in_db = Some(default_name.clone())
                         }
                         pk.name_in_db_is_default = pk.name_in_db == Some(default_name);
-                    });
-                });
+                    }
+                }
             }
             let id_field = model.scalar_fields_mut().find(|f| f.is_id());
             model.primary_key = id_field.and_then(|f| f.primary_key.clone());

@@ -53,7 +53,7 @@ pub fn parse_schema(datamodel_string: &str) -> Result<SchemaAst, Diagnostics> {
                 }
             }
 
-            errors.into_result()?;
+            errors.make_result()?;
 
             Ok(SchemaAst {
                 tops: top_level_definitions,

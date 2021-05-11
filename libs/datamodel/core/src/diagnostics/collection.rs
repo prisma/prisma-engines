@@ -79,7 +79,7 @@ impl Diagnostics {
         self.warnings.append(&mut warnings);
     }
 
-    pub fn into_result(&self) -> Result<(), Diagnostics> {
+    pub fn make_result(&self) -> Result<(), Diagnostics> {
         if self.has_errors() {
             Err(self.clone())
         } else {

@@ -36,7 +36,7 @@ pub fn parse_model(token: &Token) -> Result<Model, Diagnostics> {
         }
     }
 
-    errors.into_result()?;
+    errors.make_result()?;
 
     match name {
         Some(name) => Ok(Model {

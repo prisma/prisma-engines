@@ -313,18 +313,12 @@ impl Model {
 
     /// Determines whether there is a singular primary key
     pub fn has_singular_id(&self) -> bool {
-        match &self.primary_key {
-            Some(pk) if pk.fields.len() == 1 => true,
-            _ => false,
-        }
+        matches!(&self.primary_key, Some(pk) if pk.fields.len() == 1)
     }
 
     /// Determines whether there is a singular primary key
     pub fn has_compound_id(&self) -> bool {
-        match &self.primary_key {
-            Some(pk) if pk.fields.len() > 1 => true,
-            _ => false,
-        }
+        matches!(&self.primary_key, Some(pk) if pk.fields.len() > 1)
     }
 
     pub fn add_index(&mut self, index: IndexDefinition) {

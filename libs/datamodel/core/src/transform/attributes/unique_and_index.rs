@@ -67,7 +67,7 @@ impl AttributeValidator<dml::Field> for FieldLevelUniqueAttributeValidator {
                     name_in_db,
                     name_in_db_matches_default: false,
                     name_in_client: None,
-                    fields: vec![field_name.to_string()],
+                    fields: vec![field_name],
                     tpe: IndexType::Unique,
                 });
             }
