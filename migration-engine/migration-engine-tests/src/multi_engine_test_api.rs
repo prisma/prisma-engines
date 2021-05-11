@@ -226,6 +226,14 @@ impl EngineTestApi<'_> {
         &self.connector
     }
 
+    /// Insert test values
+    pub fn insert<'a>(&'a self, table_name: &'a str) -> SingleRowInsert<'a> {
+        SingleRowInsert {
+            insert: quaint::ast::Insert::single_into(self.render_table_name(table_name)),
+            api: self,
+        }
+    }
+
     /// Same as quaint::Queryable::query()
     pub fn query(&self, q: quaint::ast::Query<'_>) -> ResultSet {
         self.rt.block_on(self.connector.quaint().query(q)).unwrap()
@@ -258,5 +266,25 @@ impl EngineTestApi<'_> {
     /// Execute a raw SQL command.
     pub fn raw_cmd(&self, cmd: &str) -> Result<(), quaint::error::Error> {
         self.rt.block_on(self.connector.quaint().raw_cmd(cmd))
+    }
+}
+
+/// A convenience for inserting test values
+pub struct SingleRowInsert<'a> {
+    insert: quaint::ast::SingleRowInsert<'a>,
+    api: &'a EngineTestApi<'a>,
+}
+
+impl<'a> SingleRowInsert<'a> {
+    /// Add a value to the row
+    pub fn value(mut self, name: &'a str, value: impl Into<quaint::ast::Expression<'a>>) -> Self {
+        self.insert = self.insert.value(name, value);
+
+        self
+    }
+
+    /// Execute the request and return the result set.
+    pub fn result_raw(self) -> quaint::connector::ResultSet {
+        self.api.query(self.insert.into())
     }
 }
