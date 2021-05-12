@@ -42,7 +42,7 @@ impl IrSerializer {
                         }
                     }
                 } else {
-                    let (_, item) = serialized.into_iter().take(1).next().unwrap();
+                    let (_, item) = dbg!(serialized.into_iter().take(1).next().unwrap());
                     item
                 };
 

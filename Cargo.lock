@@ -3369,7 +3369,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.13"
-source = "git+https://github.com/prisma/quaint#93fca2904bb9cffafe5e729b459a69fba720c095"
+source = "git+https://github.com/prisma/quaint?branch=serialize-decimals-as-strings#042e34149691508b1f3648efed5dbd9a4c2b2e81"
 dependencies = [
  "async-trait",
  "base64 0.12.3",

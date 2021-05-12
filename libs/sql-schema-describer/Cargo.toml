@@ -22,6 +22,7 @@ tracing-futures = "0.2.4"
 
 [dependencies.quaint]
 git = "https://github.com/prisma/quaint"
+branch = "serialize-decimals-as-strings"
 features = [
     "chrono",
     "sqlite",
