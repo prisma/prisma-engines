@@ -46,7 +46,7 @@ async fn float_columns_are_idempotent(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(capabilities(Decimal))]
 async fn decimal_columns_are_idempotent(api: &TestApi) -> TestResult {
     let dm = format!(
         r#"
@@ -71,7 +71,7 @@ async fn decimal_columns_are_idempotent(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(capabilities(Decimal))]
 async fn float_to_decimal_works(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Cat {
@@ -111,7 +111,7 @@ async fn float_to_decimal_works(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(capabilities(Decimal))]
 async fn decimal_to_float_works(api: &TestApi) -> TestResult {
     let dm1 = format!(
         r#"
@@ -231,16 +231,20 @@ async fn string_to_bytes_works(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(capabilities(ScalarLists))]
+#[test_connector(capabilities(ScalarLists, Decimal))]
 async fn decimal_to_decimal_array_works(api: &TestApi) -> TestResult {
-    let dm1 = r#"
-        model Test {
-            id       String    @id @default(cuid())
-            decFloat Decimal
-        }
-    "#;
+    let dm1 = format!(
+        r#"
+        {}
 
-    api.schema_push(dm1).send().await?.assert_green()?;
+        model Test {{
+            id       String  @id @default(cuid())
+            decFloat Decimal
+        }}
+        "#,
+        api.datasource()
+    );
+    api.schema_push(&dm1).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Test", |table| {
         table.assert_column("decFloat", |col| col.assert_type_is_decimal()?.assert_is_required())

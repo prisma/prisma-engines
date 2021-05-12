@@ -71,7 +71,7 @@ static TAGS: Lazy<Result<DbUnderTest, String>> = Lazy::new(|| {
         }),
         "mysql" => {
             let tags = mysql::get_mysql_tags(&database_url)?;
-            let mut capabilities = Capabilities::Enums | Capabilities::Json;
+            let mut capabilities = Capabilities::Enums | Capabilities::Json | Capabilities::Decimal;
 
             if tags.contains(Tags::Vitess) {
                 capabilities |= Capabilities::CreateDatabase;
@@ -91,14 +91,15 @@ static TAGS: Lazy<Result<DbUnderTest, String>> = Lazy::new(|| {
             capabilities: Capabilities::Enums
                 | Capabilities::Json
                 | Capabilities::ScalarLists
-                | Capabilities::CreateDatabase,
+                | Capabilities::CreateDatabase
+                | Capabilities::Decimal,
             provider: "postgresql",
             shadow_database_url,
         }),
         "sqlserver" => Ok(DbUnderTest {
             tags: mssql::get_mssql_tags(&database_url)?,
             database_url,
-            capabilities: Capabilities::CreateDatabase.into(),
+            capabilities: (Capabilities::CreateDatabase | Capabilities::Decimal).into(),
             provider: "sqlserver",
             shadow_database_url,
         }),

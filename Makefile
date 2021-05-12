@@ -20,6 +20,18 @@ test-qe:
 test-qe-verbose:
 	cargo test --package query-engine-tests -- --nocapture
 
+test-me:
+	cargo test --package migration-engine-tests
+
+test-me-verbose:
+	cargo test --package migration-engine-tests  -- --nocapture
+
+test-ie:
+	cargo test --package introspection-engine-tests
+
+test-ie-verbose:
+	cargo test --package introspection-engine-tests  -- --nocapture
+
 all-dbs:
 	docker-compose -f docker-compose.yml up  -d --remove-orphans
 

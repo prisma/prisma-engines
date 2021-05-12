@@ -30,7 +30,6 @@ async fn adding_a_scalar_field_must_work(api: &TestApi) -> TestResult {
             boolean     Boolean
             string      String
             dateTime    DateTime
-            decimal     Decimal
             bytes       Bytes
         }
     "#,
@@ -40,7 +39,7 @@ async fn adding_a_scalar_field_must_work(api: &TestApi) -> TestResult {
 
     api.assert_schema().await?.assert_table("Test", |table| {
         table
-            .assert_columns_count(9)?
+            .assert_columns_count(8)?
             .assert_column("int", |c| {
                 c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Int)
             })?
@@ -58,9 +57,6 @@ async fn adding_a_scalar_field_must_work(api: &TestApi) -> TestResult {
             })?
             .assert_column("dateTime", |c| {
                 c.assert_is_required()?.assert_type_family(ColumnTypeFamily::DateTime)
-            })?
-            .assert_column("decimal", |c| {
-                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Decimal)
             })?
             .assert_column("bytes", |c| {
                 c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Binary)
@@ -169,6 +165,33 @@ async fn json_fields_can_be_created(api: &TestApi) -> TestResult {
             } else {
                 c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Json)
             }
+        })
+    })?;
+
+    api.schema_push(&dm).send().await?.assert_green()?.assert_no_steps()?;
+
+    Ok(())
+}
+
+#[test_connector(capabilities(Decimal))]
+async fn decimal_fields_can_be_created(api: &TestApi) -> TestResult {
+    let dm = format!(
+        r#"
+            {}
+
+            model Test {{
+                id  String @id @default(cuid())
+                dec Decimal
+            }}
+        "#,
+        api.datasource()
+    );
+
+    api.schema_push(&dm).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("Test", |table| {
+        table.assert_column("dec", |c| {
+            c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Decimal)
         })
     })?;
 
