@@ -281,20 +281,40 @@ impl<'a> Validator<'a> {
         let mut errors = Diagnostics::new();
 
         for field in model.scalar_fields() {
-            if let Some(dml::ScalarType::Json) = field.field_type.scalar_type() {
-                // TODO: this is really ugly
-                let supports_json_type = match self.source {
-                    Some(source) => source.active_connector.supports_json(),
-                    None => false,
-                };
-                if !supports_json_type {
-                    errors.push_error(DatamodelError::new_field_validation_error(
-                        &format!("Field `{}` in model `{}` can't be of type Json. The current connector does not support the Json type.", &field.name, &model.name),
-                        &model.name,
-                        &field.name,
-                        ast_model.find_field(&field.name).span,
-                    ));
+            match field.field_type.scalar_type() {
+                Some(dml::ScalarType::Json) => {
+                    // TODO: this is really ugly
+                    let supports_json_type = match self.source {
+                        Some(source) => source.active_connector.supports_json(),
+                        None => false,
+                    };
+                    if !supports_json_type {
+                        errors.push_error(DatamodelError::new_field_validation_error(
+                            &format!("Field `{}` in model `{}` can't be of type Json. The current connector does not support the Json type.", &field.name, &model.name),
+                            &model.name,
+                            &field.name,
+                            ast_model.find_field(&field.name).span,
+                        ));
+                    }
                 }
+
+                Some(dml::ScalarType::Decimal) => {
+                    // TODO: this is still really ugly.
+                    let supports_decimal_type = match self.source {
+                        Some(source) => source.active_connector.supports_decimals(),
+                        None => false,
+                    };
+                    if !supports_decimal_type {
+                        errors.push_error(DatamodelError::new_field_validation_error(
+                            &format!("Field `{}` in model `{}` can't be of type Decimal. The current connector does not support the Decimal type.", &field.name, &model.name),
+                            &model.name,
+                            &field.name,
+                            ast_model.find_field(&field.name).span,
+                        ));
+                    }
+                }
+
+                _ => (),
             }
         }
 

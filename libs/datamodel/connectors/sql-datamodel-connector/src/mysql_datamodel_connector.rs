@@ -71,6 +71,7 @@ impl MySqlDatamodelConnector {
             ConnectorCapability::WritableAutoincField,
             ConnectorCapability::CreateSkipDuplicates,
             ConnectorCapability::UpdateableId,
+            ConnectorCapability::Decimal,
         ];
 
         let int = NativeTypeConstructor::without_args(INT_TYPE_NAME, vec![ScalarType::Int]);

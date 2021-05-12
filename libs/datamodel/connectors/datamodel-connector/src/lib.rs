@@ -124,6 +124,10 @@ pub trait Connector: Send + Sync {
         self.has_capability(ConnectorCapability::RelationFieldsInArbitraryOrder)
     }
 
+    fn supports_decimals(&self) -> bool {
+        self.has_capability(ConnectorCapability::Decimal)
+    }
+
     fn native_instance_error(&self, instance: NativeTypeInstance) -> ConnectorErrorFactory {
         ConnectorErrorFactory {
             connector: self.name(),
@@ -159,6 +163,7 @@ pub enum ConnectorCapability {
     MultipleIndexesWithSameName,
     Enums,
     Json,
+    Decimal,
     AutoIncrementAllowedOnNonId,
     AutoIncrementMultipleAllowed,
     AutoIncrementNonIndexedAllowed,
