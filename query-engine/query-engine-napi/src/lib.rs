@@ -1,10 +1,12 @@
 use engine::{ConstructorOptions, QueryEngine};
+use error::ApiError;
 use napi::{
     threadsafe_function::ThreadSafeCallContext, CallContext, Env, JsFunction, JsObject, JsUndefined, JsUnknown,
     Property,
 };
 use napi_derive::{js_function, module_exports};
 use query_core::QueryExecutor;
+use std::collections::BTreeMap;
 
 mod engine;
 mod error;
@@ -92,30 +94,6 @@ fn sdl_schema(ctx: CallContext) -> napi::Result<JsObject> {
 }
 
 #[js_function(0)]
-fn dmmf(ctx: CallContext) -> napi::Result<JsObject> {
-    let this: JsObject = ctx.this_unchecked();
-    let engine: &QueryEngine = ctx.env.unwrap(&this)?;
-    let engine: QueryEngine = engine.clone();
-
-    ctx.env
-        .execute_tokio_future(async move { Ok(engine.dmmf().await?) }, |&mut env, dmmf| {
-            env.create_string(&serde_json::to_string(&dmmf).unwrap())
-        })
-}
-
-#[js_function(0)]
-fn get_config(ctx: CallContext) -> napi::Result<JsObject> {
-    let this: JsObject = ctx.this_unchecked();
-    let engine: &QueryEngine = ctx.env.unwrap(&this)?;
-    let engine: QueryEngine = engine.clone();
-
-    ctx.env
-        .execute_tokio_future(async move { Ok(engine.get_config().await?) }, |&mut env, config| {
-            env.create_string(&serde_json::to_string(&config).unwrap())
-        })
-}
-
-#[js_function(0)]
 fn version(ctx: CallContext) -> napi::Result<JsUnknown> {
     #[derive(serde::Serialize, Clone, Copy)]
     struct Version {
@@ -131,6 +109,59 @@ fn version(ctx: CallContext) -> napi::Result<JsUnknown> {
     ctx.env.to_js_value(&version)
 }
 
+#[js_function(0)]
+fn dmmf(ctx: CallContext) -> napi::Result<JsObject> {
+    let this: JsObject = ctx.this_unchecked();
+    let engine: &QueryEngine = ctx.env.unwrap(&this)?;
+    let engine: QueryEngine = engine.clone();
+
+    ctx.env
+        .execute_tokio_future(async move { Ok(engine.dmmf().await?) }, |&mut env, dmmf| {
+            env.create_string(&serde_json::to_string(&dmmf).unwrap())
+        })
+}
+
+#[js_function(1)]
+fn get_config(ctx: CallContext) -> napi::Result<JsUnknown> {
+    #[derive(serde::Deserialize)]
+    #[serde(rename_all = "camelCase")]
+    struct GetConfigOptions {
+        datamodel: String,
+        #[serde(default)]
+        ignore_env_var_errors: bool,
+        #[serde(default)]
+        datasource_overrides: BTreeMap<String, String>,
+    }
+
+    let options = ctx.get::<JsUnknown>(0)?;
+    let options: GetConfigOptions = ctx.env.from_js_value(options)?;
+
+    let GetConfigOptions {
+        datamodel,
+        ignore_env_var_errors,
+        datasource_overrides,
+    } = options;
+
+    let overrides: Vec<(_, _)> = datasource_overrides.into_iter().collect();
+    let mut config = datamodel::parse_configuration_with_url_overrides(&datamodel, overrides)
+        .map_err(|errors| ApiError::conversion(errors, &datamodel))?;
+
+    config.subject = config
+        .subject
+        .validate_that_one_datasource_is_provided()
+        .map_err(|errors| ApiError::conversion(errors, &datamodel))?;
+
+    if !ignore_env_var_errors {
+        config
+            .subject
+            .resolve_datasource_urls_from_env()
+            .map_err(|errors| ApiError::conversion(errors, &datamodel))?;
+    }
+
+    let serialized = datamodel::json::mcf::config_to_mcf_json_value(&config);
+    ctx.env.to_js_value(&serialized)
+}
+
 #[module_exports]
 pub fn init(mut exports: JsObject, env: Env) -> napi::Result<()> {
     let query_engine = env.define_class(
@@ -142,12 +173,12 @@ pub fn init(mut exports: JsObject, env: Env) -> napi::Result<()> {
             Property::new(&env, "query")?.with_method(query),
             Property::new(&env, "sdlSchema")?.with_method(sdl_schema),
             Property::new(&env, "dmmf")?.with_method(dmmf),
-            Property::new(&env, "getConfig")?.with_method(get_config),
         ],
     )?;
 
     exports.set_named_property("QueryEngine", query_engine)?;
     exports.create_named_method("version", version)?;
+    exports.create_named_method("getConfig", get_config)?;
 
     Ok(())
 }
