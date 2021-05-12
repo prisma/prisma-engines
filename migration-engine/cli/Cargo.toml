@@ -28,7 +28,7 @@ test-setup = { path = "../../libs/test-setup" }
 test-macros = { path = "../../libs/test-macros" }
 enumflags2 = "*"
 url = "2.1.1"
-quaint = { git = "https://github.com/prisma/quaint" }
+quaint = { git = "https://github.com/prisma/quaint", branch = "serialize-decimals-as-strings" }
 
 [features]
 default = ["sql"]

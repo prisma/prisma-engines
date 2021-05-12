@@ -207,7 +207,7 @@ fn serialize_decimal<S>(decimal: &BigDecimal, serializer: S) -> Result<S::Ok, S:
 where
     S: Serializer,
 {
-    decimal.to_string().parse::<f64>().unwrap().serialize(serializer)
+    decimal.to_string().serialize(serializer)
 }
 
 fn deserialize_decimal<'de, D>(deserializer: D) -> Result<BigDecimal, D::Error>

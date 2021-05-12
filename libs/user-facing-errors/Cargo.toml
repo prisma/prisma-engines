@@ -17,6 +17,7 @@ indoc = "1"
 [dependencies.quaint]
 git = "https://github.com/prisma/quaint"
 features = ["mysql", "postgresql", "sqlite", "mssql"]
+branch = "serialize-decimals-as-strings"
 optional = true
 
 [features]

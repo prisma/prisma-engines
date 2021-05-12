@@ -31,6 +31,7 @@ uuid = { version = "0.8", features = ["v4"] }
 
 [dependencies.quaint]
 git = "https://github.com/prisma/quaint"
+branch = "serialize-decimals-as-strings"
 features = [
     "json",
     "uuid",
