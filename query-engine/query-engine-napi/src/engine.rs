@@ -94,6 +94,8 @@ pub struct ConstructorOptions {
     #[serde(default)]
     telemetry: TelemetryOptions,
     config_dir: PathBuf,
+    #[serde(default)]
+    ignore_env_var_errors: bool,
 }
 
 #[derive(Debug, Deserialize, Default)]
@@ -122,6 +124,7 @@ impl QueryEngine {
             datasource_overrides,
             telemetry,
             config_dir,
+            ignore_env_var_errors,
         } = opts;
 
         let overrides: Vec<(_, _)> = datasource_overrides.into_iter().collect();
@@ -133,10 +136,12 @@ impl QueryEngine {
             .validate_that_one_datasource_is_provided()
             .map_err(|errors| ApiError::conversion(errors, &datamodel))?;
 
-        config
-            .subject
-            .resolve_datasource_urls_from_env(&overrides)
-            .map_err(|errors| ApiError::conversion(errors, &datamodel))?;
+        if !ignore_env_var_errors {
+            config
+                .subject
+                .resolve_datasource_urls_from_env(&overrides)
+                .map_err(|errors| ApiError::conversion(errors, &datamodel))?;
+        }
 
         let ast = datamodel::parse_datamodel(&datamodel)
             .map_err(|errors| ApiError::conversion(errors, &datamodel))?
