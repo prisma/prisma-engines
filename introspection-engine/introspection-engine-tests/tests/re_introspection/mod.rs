@@ -315,12 +315,12 @@ async fn mapped_field_name(api: &TestApi) -> crate::TestResult {
                 t.add_column("unique_1", types::integer());
                 t.add_column("unique_2", types::integer());
 
-                t.add_constraint(
-                    "sqlite_autoindex_User_1",
-                    types::unique_constraint(vec!["unique_1", "unique_2"]),
+                t.add_index(
+                    "User_unique_1_unique_2_key",
+                    types::index(vec!["unique_1", "unique_2"]).unique(true),
                 );
 
-                t.add_index("test2", types::index(vec!["index"]));
+                t.add_index("User_index_idx", types::index(vec!["index"]));
 
                 t.set_primary_key(&["id_1", "id_2"]);
             });
@@ -340,8 +340,8 @@ async fn mapped_field_name(api: &TestApi) -> crate::TestResult {
             unique_2    Int
 
             @@id([c_id_1, id_2])
-            @@index([c_index], name: "test2")
-            @@unique([c_unique_1, unique_2], name: "sqlite_autoindex_User_1")
+            @@index([c_index])
+            @@unique([c_unique_1, unique_2])
         }
     "#};
 
@@ -354,8 +354,8 @@ async fn mapped_field_name(api: &TestApi) -> crate::TestResult {
             unique_2    Int
 
             @@id([c_id_1, id_2])
-            @@index([c_index], name: "test2")
-            @@unique([c_unique_1, unique_2], name: "sqlite_autoindex_User_1")
+            @@index([c_index])
+            @@unique([c_unique_1, unique_2])
         }
 
         model Unrelated {
@@ -1104,8 +1104,10 @@ async fn multiple_changed_relation_names_due_to_mapped_models(api: &TestApi) -> 
 
             migration.create_table("Post", |t| {
                 t.add_column("id", types::primary());
-                t.add_column("user_id", types::integer().nullable(false).unique(true));
-                t.add_column("user_id2", types::integer().nullable(false).unique(true));
+                t.add_column("user_id", types::integer().nullable(false));
+                t.add_index("Post_user_id_key", types::index(&["user_id"]).unique(true));
+                t.add_column("user_id2", types::integer().nullable(false));
+                t.add_index("Post_user_id2_key", types::index(&["user_id2"]).unique(true));
 
                 t.add_foreign_key(&["user_id"], "User", &["id"]);
                 t.add_foreign_key(&["user_id2"], "User", &["id"]);

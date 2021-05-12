@@ -94,12 +94,8 @@ async fn remapping_models_in_relations(api: &TestApi) -> crate::TestResult {
             migration.create_table("Post", |t| {
                 t.add_column("id", types::primary());
                 t.add_column("user_id", types::integer());
+                t.add_index("Post_user_id_key", types::index(vec!["user_id"]).unique(true));
                 t.add_foreign_key(&["user_id"], "User with Space", &["id"]);
-
-                t.add_constraint(
-                    "post_user_unique",
-                    types::unique_constraint(vec!["user_id"]).unique(true),
-                );
             });
         })
         .await?;
@@ -137,9 +133,11 @@ async fn remapping_models_in_relations_should_not_map_virtual_fields(api: &TestA
             migration.create_table("Post With Space", |t| {
                 t.add_column("id", types::primary());
                 t.add_column("user_id", types::integer());
+                t.add_index(
+                    "Post With Space_user_id_key",
+                    types::index(vec!["user_id"]).unique(true),
+                );
                 t.add_foreign_key(&["user_id"], "User", &["id"]);
-
-                t.add_constraint("Post With Space_user_id_key", types::unique_constraint(vec!["user_id"]));
             });
         })
         .await?;
