@@ -327,7 +327,7 @@ impl SqlSchemaDescriber {
                                 Some(int_value) => DefaultValue::value(int_value),
                                 None => Self::db_generated(&default_string, default_expression),
                             },
-                            ColumnTypeFamily::Float => match Self::parse_decimal(&default_string) {
+                            ColumnTypeFamily::Float => match Self::parse_float(&default_string) {
                                 Some(float_value) => DefaultValue::value(float_value),
                                 None => Self::db_generated(&default_string, default_expression),
                             },
