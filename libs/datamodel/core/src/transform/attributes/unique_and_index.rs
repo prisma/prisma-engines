@@ -289,8 +289,15 @@ trait IndexAttributeBase<T>: AttributeValidator<T> {
         let attributes: Vec<ast::Attribute> = model
             .indices
             .iter()
+            .filter(|index| index.tpe == index_type)
+            // no field level equivalent
             .filter(|index| {
-                index.tpe == index_type && !matches!(index.tpe, IndexType::Unique if index.fields.len()== 1)
+                if index.fields.len() == 1 && index.tpe == IndexType::Unique {
+                    let covered_field = index.fields.first().unwrap();
+                    !model.find_field(covered_field).unwrap().is_unique()
+                } else {
+                    true
+                }
             })
             .map(|index_def| {
                 let mut args = vec![ast::Argument::new_array("", field_array(&index_def.fields))];

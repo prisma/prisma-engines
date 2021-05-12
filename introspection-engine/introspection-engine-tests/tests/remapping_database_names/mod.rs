@@ -139,7 +139,7 @@ async fn remapping_models_in_relations_should_not_map_virtual_fields(api: &TestA
                 t.add_column("user_id", types::integer());
                 t.add_foreign_key(&["user_id"], "User", &["id"]);
 
-                t.add_constraint("post_user_unique", types::unique_constraint(vec!["user_id"]));
+                t.add_constraint("Post With Space_user_id_key", types::unique_constraint(vec!["user_id"]));
             });
         })
         .await?;

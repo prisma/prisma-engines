@@ -162,7 +162,7 @@ impl AttributeValidator<dml::Model> for ModelLevelIdAttributeValidator {
 
     fn serialize(&self, model: &dml::Model, _datamodel: &dml::Datamodel) -> Vec<ast::Attribute> {
         if let Some(pk) = &model.primary_key {
-            if model.has_compound_id() {
+            if model.singular_id_fields().next().is_none() {
                 let mut args = vec![ast::Argument::new_array("", field_array(&pk.fields))];
 
                 if let Some(name) = &pk.name_in_client {

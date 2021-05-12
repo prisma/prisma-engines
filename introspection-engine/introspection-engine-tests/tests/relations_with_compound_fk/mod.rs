@@ -5,54 +5,45 @@ use test_macros::test_each_connector;
 
 #[test_each_connector]
 async fn compound_foreign_keys_for_one_to_one_relations(api: &TestApi) -> crate::TestResult {
-    let constraint_name = if api.sql_family().is_sqlite() {
-        "sqlite_autoindex_Post_1"
-    } else {
-        "post_user_unique"
-    };
-
     api.barrel()
         .execute(move |migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::primary());
                 t.add_column("age", types::integer());
-
-                t.add_index("user_unique", types::index(vec!["id", "age"]).unique(true));
+                t.add_index("User_id_age_key", types::index(vec!["id", "age"]).unique(true));
             });
 
             migration.create_table("Post", move |t| {
                 t.add_column("id", types::primary());
                 t.add_column("user_id", types::integer().nullable(true));
                 t.add_column("user_age", types::integer().nullable(true));
-
                 t.add_foreign_key(&["user_id", "user_age"], "User", &["id", "age"]);
-
-                t.add_constraint(constraint_name, types::unique_constraint(vec!["user_id", "user_age"]));
+                t.add_index(
+                    "Post_user_id_user_age_key",
+                    types::index(vec!["user_id", "user_age"]).unique(true),
+                );
             });
         })
         .await?;
 
-    let dm = format!(
-        r#"
-        model Post {{
+    let dm = r#"
+        model Post {
             id       Int   @id @default(autoincrement())
             user_id  Int?
             user_age Int?
             User     User? @relation(fields: [user_id, user_age], references: [id, age])
 
-            @@unique([user_id, user_age], name: "{}")
-        }}
+            @@unique([user_id, user_age])
+        }
 
-        model User {{
+        model User {
             id   Int   @id @default(autoincrement())
             age  Int
             Post Post?
 
-            @@unique([id, age], name: "user_unique")
-        }}
-    "#,
-        constraint_name
-    );
+            @@unique([id, age])
+        }
+    "#;
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);
 

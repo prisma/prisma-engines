@@ -160,7 +160,7 @@ async fn a_table_with_unique_index(api: &TestApi) -> crate::TestResult {
     let dm = indoc! {r##"
         model Blog {
             id       Int @id @default(autoincrement())
-            authorId Int @unique
+            authorId Int @unique("test")
         }
     "##};
 
@@ -190,7 +190,7 @@ async fn a_table_with_multi_column_unique_index(api: &TestApi) -> crate::TestRes
             id      Int @id @default(autoincrement())
             firstname Int
             lastname Int
-            @@unique([firstname, lastname], name: "test")
+            @@unique([firstname, lastname], map: "test")
         }
     "##};
 
@@ -293,7 +293,8 @@ async fn a_table_with_a_non_unique_index(api: &TestApi) -> crate::TestResult {
         model User {
             a       Int
             id      Int @id @default(autoincrement())
-            @@index([a], name: "test")
+            
+            @@index([a], map: "test")
         }
     "##};
 
@@ -323,7 +324,8 @@ async fn a_table_with_a_multi_column_non_unique_index(api: &TestApi) -> crate::T
             a  Int
             b  Int
             id Int @id @default(autoincrement())
-            @@index([a,b], name: "test")
+            
+            @@index([a,b], map: "test")
         }
     "##};
 
@@ -565,7 +567,7 @@ async fn a_table_with_partial_indexes_should_ignore_them(api: &TestApi) -> crate
                 t.add_column("staticId", types::integer().nullable(false));
                 t.add_column("latest", types::integer().nullable(false));
                 t.add_column("other", types::integer().nullable(false));
-                t.add_index("full", types::index(vec!["other"]).unique(true));
+                t.add_index("pages_other_key", types::index(vec!["other"]).unique(true));
                 t.add_partial_index("partial", types::index(vec!["staticId"]).unique(true), "latest = 1");
             });
         })
@@ -873,11 +875,11 @@ async fn primary_key_is_named(api: &TestApi) -> crate::TestResult {
           id_1 Int
           id_2 Int
             
-          @@id([id_1, id_2])
+          @@id([id_1, id_2], map: "name_persisted_2")
         }
               
         model Single {
-          id Int @id @default(1)
+          id Int @id("name_persisted") @default(1)
         }
     "##};
 

@@ -75,7 +75,7 @@ impl<'a> LiftAstToDml<'a> {
         }
 
         // transfer primary keys from field level to model level and name them
-        if !model.has_compound_id() {
+        if model.singular_id_fields().next().is_some() {
             let model_name = model.name.clone();
             {
                 if let Some(f) = model.scalar_fields_mut().find(|f| f.is_id()) {

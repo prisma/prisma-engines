@@ -27,7 +27,7 @@ async fn a_table_without_uniques_should_ignore(api: &TestApi) -> crate::TestResu
               user_id Int
               User    User @relation(fields: [user_id], references: [id])
 
-              @@index([user_id], name: "user_id")
+              @@index([user_id], map: "user_id")
               @@ignore
             }
 
@@ -148,7 +148,7 @@ async fn a_table_without_fully_required_compound_unique(api: &TestApi) -> crate:
           opt_unique Int?
           req_unique Int
 
-          @@unique([opt_unique, req_unique], name: "sqlite_autoindex_Post_1")
+          @@unique([opt_unique, req_unique], map: "sqlite_autoindex_Post_1")
           @@ignore
         }
     "#};
@@ -194,8 +194,8 @@ async fn unsupported_type_keeps_its_usages(api: &TestApi) -> crate::TestResult {
             broken Unsupported("macaddr")
 
             @@id([broken, dummy])
-            @@unique([broken, dummy], name: "unique")
-            @@index([broken, dummy], name: "non_unique")
+            @@unique([broken, dummy], map: "unique")
+            @@index([broken, dummy], map: "non_unique")
         }
     "#};
 
@@ -331,10 +331,10 @@ async fn db_generated_values_should_add_comments(api: &TestApi) -> crate::TestRe
 
     let dm = indoc! {r##"
         model Blog {
-          id            Int    @id @default(autoincrement())
-          number        Int?   @default(1)
-          bigger_number Int?   @default(dbgenerated("sqrt((4)::double precision)"))
-          point      Unsupported("point")? @default(dbgenerated("point((0)::double precision, (0)::double precision)"))
+          id            Int                   @id @default(autoincrement())
+          number        Int?                  @default(1)
+          bigger_number Int?                  @default(dbgenerated("sqrt((4)::double precision)"))
+          point         Unsupported("point")? @default(dbgenerated("point((0)::double precision, (0)::double precision)"))
         }
     "##};
 
