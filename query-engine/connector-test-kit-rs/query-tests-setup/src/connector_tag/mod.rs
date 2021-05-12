@@ -63,6 +63,7 @@ impl fmt::Display for ConnectorTag {
             ConnectorTag::MySql(_) => "MySQL",
             ConnectorTag::MongoDb(_) => "MongoDB",
             ConnectorTag::Sqlite(_) => "SQLite",
+            ConnectorTag::Vitess(_) => "Vitess",
         };
 
         write!(f, "{}", printable)

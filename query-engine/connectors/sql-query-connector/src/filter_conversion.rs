@@ -487,7 +487,7 @@ fn convert_json_filter(
                 .into(),
             JsonTargetType::Array => expr_json
                 .clone()
-                .json_array_ends_with(convert_value(&field, value))
+                .json_array_ends_into(convert_value(&field, value))
                 .and(expr_json.json_type_equals(JsonType::Array))
                 .into(),
         },
@@ -498,7 +498,7 @@ fn convert_json_filter(
                 .into(),
             JsonTargetType::Array => expr_json
                 .clone()
-                .json_array_not_ends_with(convert_value(&field, value))
+                .json_array_not_ends_into(convert_value(&field, value))
                 .and(expr_json.json_type_equals(JsonType::Array))
                 .into(),
         },
