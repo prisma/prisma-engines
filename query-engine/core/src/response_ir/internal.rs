@@ -42,7 +42,7 @@ pub fn serialize_internal(
     is_list: bool,
 ) -> crate::Result<CheckedItemsWithParents> {
     match result {
-        QueryResult::RecordSelection(rs) => dbg!(serialize_record_selection(*rs, field, &field.field_type, is_list)),
+        QueryResult::RecordSelection(rs) => serialize_record_selection(*rs, field, &field.field_type, is_list),
         QueryResult::RecordAggregations(ras) => serialize_aggregations(field, ras),
         QueryResult::Count(c) => {
             // Todo needs a real implementation or needs to move to RecordAggregation
