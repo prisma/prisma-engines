@@ -461,3 +461,10 @@ pub const MSSQL_SOURCE: &str = r#"
         url      = "sqlserver://localhost:1433"
     }
 "#;
+
+pub const MONGODB_SOURCE: &str = r#"
+    datasource db {
+        provider = "mongodb"
+        url      = "mongodb://127.0.0.1:27017"
+    }
+"#;

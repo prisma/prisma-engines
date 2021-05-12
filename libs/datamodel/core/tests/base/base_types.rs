@@ -156,7 +156,7 @@ fn scalar_list_types_are_not_supported_by_mysql() {
 fn json_type_must_work_for_some_connectors() {
     let dml = r#"
     model User {
-        id   Int    @id
+        id   Int    @id @map("_id")
         json Json
     }
     "#;
@@ -166,7 +166,7 @@ fn json_type_must_work_for_some_connectors() {
         "Field `json` in model `User` can\'t be of type Json. The current connector does not support the Json type.",
         "User",
         "json",
-        Span::new(50, 60),
+        Span::new(62, 72),
     ));
 
     // SQLite does not support it
@@ -174,7 +174,7 @@ fn json_type_must_work_for_some_connectors() {
         "Field `json` in model `User` can\'t be of type Json. The current connector does not support the Json type.",
         "User",
         "json",
-        Span::new(139, 149),
+        Span::new(151, 161),
     ));
 
     // Postgres does support it
@@ -188,13 +188,19 @@ fn json_type_must_work_for_some_connectors() {
         .assert_has_model("User")
         .assert_has_scalar_field("json")
         .assert_base_type(&ScalarType::Json);
+
+    // MongoDB does support it
+    parse(&format!("{}\n{}", MONGODB_SOURCE, dml))
+        .assert_has_model("User")
+        .assert_has_scalar_field("json")
+        .assert_base_type(&ScalarType::Json);
 }
 
 #[test]
 fn decimal_type_must_work_for_some_connectors() {
     let dml = r#"
     model User {
-        id  Int     @id
+        id  Int     @id @map("_id")
         dec Decimal
     }
     "#;
@@ -204,7 +210,7 @@ fn decimal_type_must_work_for_some_connectors() {
         "Field `dec` in model `User` can\'t be of type Decimal. The current connector does not support the Decimal type.",
         "User",
         "dec",
-        Span::new(50, 62),
+        Span::new(62, 74),
     ));
 
     // SQLite does not support it
@@ -212,7 +218,15 @@ fn decimal_type_must_work_for_some_connectors() {
         "Field `dec` in model `User` can\'t be of type Decimal. The current connector does not support the Decimal type.",
         "User",
         "dec",
-        Span::new(139, 151),
+        Span::new(151, 163),
+    ));
+
+    // MongoDB does not support it
+    parse_error(&format!("{}\n{}", MONGODB_SOURCE, dml)).assert_is(DatamodelError::new_field_validation_error(
+        "Field `dec` in model `User` can\'t be of type Decimal. The current connector does not support the Decimal type.",
+        "User",
+        "dec",
+        Span::new(166, 178),
     ));
 
     // Postgres does support it
