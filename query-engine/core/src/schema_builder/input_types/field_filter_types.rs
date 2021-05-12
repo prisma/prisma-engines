@@ -163,10 +163,16 @@ fn full_scalar_filter_type(
             .chain(alphanumeric_filters(mapped_scalar_type.clone()))
             .collect(),
 
-        TypeIdentifier::Json => equality_filters(mapped_scalar_type.clone(), nullable)
-            .chain(alphanumeric_filters(mapped_scalar_type.clone()))
-            .chain(json_filters(ctx))
-            .collect(),
+        TypeIdentifier::Json => {
+            if ctx.has_feature(&PreviewFeature::JsonFiltering) {
+                equality_filters(mapped_scalar_type.clone(), nullable)
+                    .chain(alphanumeric_filters(mapped_scalar_type.clone()))
+                    .chain(json_filters(ctx))
+                    .collect()
+            } else {
+                equality_filters(mapped_scalar_type.clone(), nullable).collect()
+            }
+        }
 
         TypeIdentifier::Boolean | TypeIdentifier::Xml | TypeIdentifier::Bytes => {
             equality_filters(mapped_scalar_type.clone(), nullable).collect()
