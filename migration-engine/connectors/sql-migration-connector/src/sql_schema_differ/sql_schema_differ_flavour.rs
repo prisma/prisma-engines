@@ -54,6 +54,10 @@ pub(crate) trait SqlSchemaDifferFlavour {
         indexes.previous().name() != indexes.next().name()
     }
 
+    fn lower_cases_table_names(&self) -> bool {
+        false
+    }
+
     /// Evaluate indexes/constraints that need to be dropped and re-created based on other changes in the schema
     fn push_index_changes_for_column_changes(
         &self,

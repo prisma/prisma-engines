@@ -7,15 +7,15 @@ use pretty_assertions::assert_eq;
 use sql_schema_describer::*;
 
 #[test_connector(tags(Postgres), exclude(Cockroach))]
-async fn views_can_be_described(api: &TestApi) {
+fn views_can_be_described(api: TestApi) {
     let full_sql = r#"
         CREATE TABLE a (a_id int);
         CREATE TABLE b (b_id int);
         CREATE VIEW ab AS SELECT a_id FROM a UNION ALL SELECT b_id FROM b;
     "#;
 
-    api.database().raw_cmd(&full_sql).await.unwrap();
-    let result = api.describe().await;
+    api.raw_cmd(&full_sql).unwrap();
+    let result = api.describe();
     let view = result.get_view("ab").expect("couldn't get ab view").to_owned();
 
     let expected_sql = " SELECT a.a_id\n   FROM a\nUNION ALL\n SELECT b.b_id AS a_id\n   FROM b;";
@@ -25,7 +25,7 @@ async fn views_can_be_described(api: &TestApi) {
 }
 
 #[test_connector(tags(Postgres), exclude(Cockroach))]
-async fn all_postgres_column_types_must_work(api: &TestApi) {
+fn all_postgres_column_types_must_work(api: TestApi) {
     let mut migration = Migration::new().schema(api.schema_name());
     migration.create_table("User", move |t| {
         t.add_column("array_bin_col", types::array(&types::binary()));
@@ -75,8 +75,8 @@ async fn all_postgres_column_types_must_work(api: &TestApi) {
     });
 
     let full_sql = migration.make::<barrel::backend::Pg>();
-    api.database().raw_cmd(&full_sql).await.unwrap();
-    let result = api.describe().await;
+    api.raw_cmd(&full_sql).unwrap();
+    let result = api.describe();
     let mut table = result.get_table("User").expect("couldn't get User table").to_owned();
     // Ensure columns are sorted as expected when comparing
     table.columns.sort_unstable_by_key(|c| c.name.to_owned());
@@ -580,7 +580,7 @@ async fn all_postgres_column_types_must_work(api: &TestApi) {
 }
 
 #[test_connector(tags(Postgres))]
-async fn postgres_cross_schema_references_are_not_allowed(api: &TestApi) {
+fn postgres_cross_schema_references_are_not_allowed(api: TestApi) {
     let schema2 = format!("{}_2", api.schema_name());
 
     let sql = format!(
@@ -595,9 +595,9 @@ async fn postgres_cross_schema_references_are_not_allowed(api: &TestApi) {
         schema2,
     );
 
-    api.database().raw_cmd(&sql).await.unwrap();
+    api.raw_cmd(&sql).unwrap();
 
-    let err = api.describe_error().await;
+    let err = api.describe_error();
     let fk_name = if api.is_cockroach() {
         "fk_city_ref_City"
     } else {
@@ -611,7 +611,7 @@ async fn postgres_cross_schema_references_are_not_allowed(api: &TestApi) {
 }
 
 #[test_connector(tags(Postgres))]
-async fn postgres_foreign_key_on_delete_must_be_handled(api: &TestApi) {
+fn postgres_foreign_key_on_delete_must_be_handled(api: TestApi) {
     let sql = format!(
         "CREATE TABLE \"{0}\".\"City\" (id INT PRIMARY KEY);
          CREATE TABLE \"{0}\".\"User\" (
@@ -626,9 +626,9 @@ async fn postgres_foreign_key_on_delete_must_be_handled(api: &TestApi) {
         api.schema_name()
     );
 
-    api.database().raw_cmd(&sql).await.unwrap();
+    api.raw_cmd(&sql).unwrap();
 
-    let schema = api.describe().await;
+    let schema = api.describe();
 
     schema.assert_table("User", |t| {
         t.assert_column("id", |c| c.assert_type_is_int_or_bigint())
@@ -662,15 +662,13 @@ async fn postgres_foreign_key_on_delete_must_be_handled(api: &TestApi) {
 }
 
 #[test_connector(tags(Postgres))]
-async fn postgres_enums_must_work(api: &TestApi) {
-    api.database()
-        .raw_cmd(&format!(
-            "CREATE TYPE \"{}\".\"mood\" AS ENUM ('sad', 'ok', 'happy')",
-            api.schema_name()
-        ))
-        .await
-        .unwrap();
-    let schema = api.describe().await;
+fn postgres_enums_must_work(api: TestApi) {
+    api.raw_cmd(&format!(
+        "CREATE TYPE \"{}\".\"mood\" AS ENUM ('sad', 'ok', 'happy')",
+        api.schema_name()
+    ))
+    .unwrap();
+    let schema = api.describe();
     let got_enum = schema.get_enum("mood").expect("get enum");
 
     let values: Vec<String> = vec!["sad".into(), "ok".into(), "happy".into()];
@@ -684,20 +682,18 @@ async fn postgres_enums_must_work(api: &TestApi) {
 }
 
 #[test_connector(tags(Postgres))]
-async fn postgres_sequences_must_work(api: &TestApi) {
-    api.database()
-        .raw_cmd(&format!("CREATE SEQUENCE \"{}\".\"test\"", api.schema_name()))
-        .await
+fn postgres_sequences_must_work(api: TestApi) {
+    api.raw_cmd(&format!("CREATE SEQUENCE \"{}\".\"test\"", api.schema_name()))
         .unwrap();
 
-    let schema = api.describe().await;
+    let schema = api.describe();
     let got_seq = schema.get_sequence("test").expect("get sequence");
 
     assert_eq!(got_seq, &Sequence { name: "test".into() },);
 }
 
 #[test_connector(tags(Postgres))]
-async fn postgres_multi_field_indexes_must_be_inferred_in_the_right_order(api: &TestApi) {
+fn postgres_multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi) {
     let schema = format!(
         r##"
             CREATE TABLE "{schema_name}"."indexes_test" (
@@ -711,9 +707,9 @@ async fn postgres_multi_field_indexes_must_be_inferred_in_the_right_order(api: &
         "##,
         schema_name = api.schema_name()
     );
-    api.database().raw_cmd(&schema).await.unwrap();
+    api.raw_cmd(&schema).unwrap();
 
-    let schema = api.describe().await;
+    let schema = api.describe();
 
     let table = schema.table_bang("indexes_test");
     let index = &table.indices[0];
@@ -728,7 +724,7 @@ async fn postgres_multi_field_indexes_must_be_inferred_in_the_right_order(api: &
 }
 
 #[test_connector(tags(Postgres))]
-async fn escaped_quotes_in_string_defaults_must_be_unescaped(api: &TestApi) {
+fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
     let create_table = format!(
         r#"
             CREATE TABLE "{0}"."string_defaults_test" (
@@ -740,9 +736,9 @@ async fn escaped_quotes_in_string_defaults_must_be_unescaped(api: &TestApi) {
         api.schema_name()
     );
 
-    api.database().raw_cmd(&create_table).await.unwrap();
+    api.raw_cmd(&create_table).unwrap();
 
-    let schema = api.describe().await;
+    let schema = api.describe();
 
     let table = schema.table_bang("string_defaults_test");
 
@@ -774,16 +770,16 @@ async fn escaped_quotes_in_string_defaults_must_be_unescaped(api: &TestApi) {
 }
 
 #[test_connector(tags(Postgres))]
-async fn escaped_backslashes_in_string_literals_must_be_unescaped(api: &TestApi) {
+fn escaped_backslashes_in_string_literals_must_be_unescaped(api: TestApi) {
     let create_table = r#"
         CREATE TABLE test (
             "model_name_space" VARCHAR(255) NOT NULL DEFAULT 'xyz\\Datasource\\Model'
         )
     "#;
 
-    api.database().raw_cmd(&create_table).await.unwrap();
+    api.raw_cmd(&create_table).unwrap();
 
-    let schema = api.describe().await;
+    let schema = api.describe();
 
     let table = schema.table_bang("test");
 

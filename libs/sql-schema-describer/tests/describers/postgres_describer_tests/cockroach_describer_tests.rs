@@ -2,15 +2,15 @@ use crate::test_api::*;
 use sql_schema_describer::ColumnTypeFamily;
 
 #[test_connector(tags(Cockroach))]
-async fn views_can_be_described(api: &TestApi) {
+fn views_can_be_described(api: TestApi) {
     let full_sql = r#"
         CREATE TABLE a (a_id int);
         CREATE TABLE b (b_id int);
         CREATE VIEW ab AS SELECT a_id FROM a UNION ALL SELECT b_id FROM b;
     "#;
 
-    api.database().raw_cmd(&full_sql).await.unwrap();
-    let result = api.describe().await;
+    api.raw_cmd(&full_sql).unwrap();
+    let result = api.describe();
     let view = result.get_view("ab").expect("couldn't get ab view").to_owned();
 
     let expected_sql = "SELECT a_id FROM views_can_be_described.\"prisma-tests\".a UNION ALL SELECT b_id FROM views_can_be_described.\"prisma-tests\".b";
@@ -20,7 +20,7 @@ async fn views_can_be_described(api: &TestApi) {
 }
 
 #[test_connector(tags(Cockroach))]
-async fn all_postgres_column_types_must_work(api: &TestApi) {
+fn all_postgres_column_types_must_work(api: TestApi) {
     let migration = r#"
         CREATE TABLE "User" (
             array_bin_col BYTEA[],
@@ -59,9 +59,9 @@ async fn all_postgres_column_types_must_work(api: &TestApi) {
         )
         "#;
 
-    api.database().raw_cmd(migration).await.unwrap();
+    api.raw_cmd(migration).unwrap();
 
-    api.describe().await.assert_table("User", |t| {
+    api.describe().assert_table("User", |t| {
         t.assert_column("array_bin_col", |c| {
             c.assert_full_data_type("_bytea")
                 .assert_column_type_family(ColumnTypeFamily::Binary)

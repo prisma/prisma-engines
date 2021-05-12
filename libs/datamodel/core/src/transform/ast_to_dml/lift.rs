@@ -384,25 +384,27 @@ impl<'a> LiftAstToDml<'a> {
                 if captures.name("suffix").is_none() {
                     // anything after a closing brace means its not just a supported native type
                     let connector = &source.active_connector;
-                    let captures = TYPE_REGEX.captures(type_definition).unwrap();
 
-                    let prefix = captures.name("prefix").unwrap().as_str().trim();
+                    if let Some(captures) = TYPE_REGEX.captures(type_definition) {
+                        let prefix = captures.name("prefix").unwrap().as_str().trim();
 
-                    let params = captures.name("params");
-                    let args = match params {
-                        None => vec![],
-                        Some(params) => params.as_str().split(',').map(|s| s.trim().to_string()).collect(),
-                    };
+                        let params = captures.name("params");
+                        let args = match params {
+                            None => vec![],
+                            Some(params) => params.as_str().split(',').map(|s| s.trim().to_string()).collect(),
+                        };
 
-                    if let Ok(native_type) = connector.parse_native_type(prefix, args) {
-                        let prisma_type =
-                            connector.scalar_type_for_native_type(native_type.serialized_native_type.clone());
+                        if let Ok(native_type) = connector.parse_native_type(prefix, args) {
+                            let prisma_type =
+                                connector.scalar_type_for_native_type(native_type.serialized_native_type.clone());
 
-                        return Err(DatamodelError::new_validation_error(
-                    &format!("The type `{}` you specified in the type definition for the field `{}` is supported as a native type by Prisma. Please use the native type notation `{} @{}.{}` for full support.",
-                            type_name, ast_field.name.name, prisma_type.to_string(), &source.name, native_type.render()),
-                            ast_field.field_type.span,
-                            ));
+                            let msg = format!(
+                                "The type `{}` you specified in the type definition for the field `{}` is supported as a native type by Prisma. Please use the native type notation `{} @{}.{}` for full support.",
+                                type_name, ast_field.name.name, prisma_type.to_string(), &source.name, native_type.render()
+                            );
+
+                            return Err(DatamodelError::new_validation_error(&msg, ast_field.field_type.span));
+                        }
                     }
                 }
             }

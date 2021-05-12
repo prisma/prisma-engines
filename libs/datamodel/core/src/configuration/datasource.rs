@@ -44,14 +44,14 @@ impl Datasource {
 
     /// Load the database URL, validating it and resolving env vars in the process. Also see `load_url_with_config_dir()`.
     pub fn load_url(&self) -> Result<String, Diagnostics> {
-        let url = match &self.url {
-            StringFromEnvVar::Literal(lit) if lit.trim().is_empty() => {
+        let url = match (&self.url.value, &self.url.from_env_var) {
+            (Some(lit), _) if lit.trim().is_empty() => {
                 let msg = "You must provide a nonempty URL";
 
                 return Err(DatamodelError::new_source_validation_error(&msg, &self.name, self.url_span).into());
             }
-            StringFromEnvVar::Literal(lit) => lit.clone(),
-            StringFromEnvVar::FromEnvVar(env_var) => match std::env::var(env_var) {
+            (Some(lit), _) => lit.clone(),
+            (None, Some(env_var)) => match std::env::var(env_var) {
                 Ok(var) if var.trim().is_empty() => {
                     return Err(DatamodelError::new_source_validation_error(
                         &format!(
@@ -72,6 +72,7 @@ impl Datasource {
                     .into())
                 }
             },
+            (None, None) => unreachable!("Missing url in datasource"),
         };
 
         self.active_connector.validate_url(&url).map_err(|err_str| {
@@ -101,16 +102,21 @@ impl Datasource {
 
     /// Load the shadow database URL, validating it and resolving env vars in the process.
     pub fn load_shadow_database_url(&self) -> Result<Option<String>, Diagnostics> {
-        let (url, url_span) = match &self.shadow_database_url {
+        let (url, url_span) = match self
+            .shadow_database_url
+            .as_ref()
+            .map(|(url, span)| (&url.value, &url.from_env_var, span))
+        {
             None => return Ok(None),
-            Some((StringFromEnvVar::Literal(lit), span)) => (lit.clone(), span),
-            Some((StringFromEnvVar::FromEnvVar(env_var), span)) => match std::env::var(env_var) {
+            Some((Some(lit), _, span)) => (lit.clone(), span),
+            Some((None, Some(env_var), span)) => match std::env::var(env_var) {
                 // We explicitly ignore empty and missing env vars, because the same schema (with the same env function) has to be usable for dev and deployment alike.
                 Ok(var) if var.trim().is_empty() => return Ok(None),
                 Err(_) => return Ok(None),
 
                 Ok(var) => (var, span),
             },
+            Some((None, None, _span)) => unreachable!("Missing url in datasource"),
         };
 
         if !url.trim().is_empty() {

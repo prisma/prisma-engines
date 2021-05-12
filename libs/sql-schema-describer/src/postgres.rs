@@ -692,15 +692,22 @@ impl SqlSchemaDescriber {
                             Some(bool_value) => DefaultValue::value(bool_value),
                             None => DefaultValue::db_generated(default_string),
                         },
-                        ColumnTypeFamily::String => {
-                            match unsuffix_default_literal(&default_string, &[data_type, &tpe.full_data_type, "STRING"])
-                            {
-                                Some(default_literal) => {
-                                    DefaultValue::value(process_string_literal(default_literal.as_ref()).into_owned())
+                        ColumnTypeFamily::String => match fetch_dbgenerated(&default_string) {
+                            Some(fun) => DefaultValue::db_generated(fun),
+                            None => {
+                                let literal = unsuffix_default_literal(
+                                    &default_string,
+                                    &[data_type, &tpe.full_data_type, "STRING"],
+                                );
+
+                                match literal {
+                                    Some(default_literal) => DefaultValue::value(
+                                        process_string_literal(default_literal.as_ref()).into_owned(),
+                                    ),
+                                    None => DefaultValue::db_generated(default_string),
                                 }
-                                None => DefaultValue::db_generated(default_string),
                             }
-                        }
+                        },
                         ColumnTypeFamily::DateTime => {
                             match default_string.to_lowercase().as_str() {
                                 "now()" | "current_timestamp" => DefaultValue::now(),
@@ -840,6 +847,21 @@ fn is_autoincrement(value: &str, sequences: &[Sequence]) -> Option<String> {
                 .map(|x| x.name.clone())
         })
     })
+}
+
+fn fetch_dbgenerated(value: &str) -> Option<String> {
+    static POSTGRES_DB_GENERATED_RE: Lazy<Regex> =
+        Lazy::new(|| Regex::new(r#"(^\((.*)\)):{2,3}(\\")?(.*)(\\")?$"#).unwrap());
+
+    if !POSTGRES_DB_GENERATED_RE.is_match(value) {
+        None
+    } else {
+        let captures = POSTGRES_DB_GENERATED_RE.captures(value)?;
+        let fun = captures.get(1).unwrap().as_str();
+        let suffix = captures.get(4).unwrap().as_str();
+
+        Some(format!("{}::{}", fun, suffix))
+    }
 }
 
 fn unsuffix_default_literal<'a>(literal: &'a str, expected_suffixes: &[&str]) -> Option<Cow<'a, str>> {

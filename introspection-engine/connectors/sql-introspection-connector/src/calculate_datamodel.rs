@@ -3,7 +3,7 @@ use crate::introspection::introspect;
 use crate::introspection_helpers::*;
 use crate::prisma_1_defaults::*;
 use crate::re_introspection::enrich;
-use crate::sanitize_datamodel_names::sanitize_datamodel_names;
+use crate::sanitize_datamodel_names::{sanitization_leads_to_duplicate_names, sanitize_datamodel_names};
 use crate::version_checker::VersionChecker;
 use crate::SqlIntrospectionResult;
 use datamodel::Datamodel;
@@ -26,8 +26,10 @@ pub fn calculate_datamodel(
     // 1to1 translation of the sql schema
     introspect(schema, &mut version_check, &mut data_model, *family)?;
 
-    // our opinionation about valid names
-    sanitize_datamodel_names(&mut data_model, family);
+    if !sanitization_leads_to_duplicate_names(&data_model) {
+        // our opinionation about valid names
+        sanitize_datamodel_names(&mut data_model, family);
+    }
 
     // deduplicating relation field names
     deduplicate_relation_field_names(&mut data_model);
