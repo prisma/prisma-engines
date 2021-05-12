@@ -1,6 +1,5 @@
-use migration_connector::ConnectorError;
+use migration_core::CoreError as ConnectorError;
 use std::fmt::Display;
-use tracing_error::SpanTrace;
 use user_facing_errors::{
     common::DatabaseAccessDenied, common::DatabaseAlreadyExists, common::DatabaseDoesNotExist,
     common::DatabaseNotReachable, common::DatabaseTimeout, common::IncorrectDatabaseCredentials,
@@ -13,13 +12,8 @@ pub enum CliError {
         error: user_facing_errors::KnownError,
         exit_code: i32,
     },
-    InvalidParameters {
-        error: String,
-        exit_code: i32,
-    },
     Unknown {
         error: ConnectorError,
-        context: SpanTrace,
         exit_code: i32,
     },
 }
@@ -27,33 +21,13 @@ pub enum CliError {
 impl Display for CliError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            CliError::Known { error, exit_code: _ } => write!(f, "Known error: {:?}", error),
-            CliError::InvalidParameters { error, .. } => write!(f, "Invalid parameters: {}", error),
-            CliError::Unknown {
-                error,
-                context,
-                exit_code: _,
-            } => write!(f, "{}\n{}", error, context),
+            CliError::Known { error, exit_code: _ } => write!(f, "Known error: {}", error.message),
+            CliError::Unknown { error, exit_code: _ } => Display::fmt(error, f),
         }
     }
 }
 
 impl CliError {
-    pub fn exit_code(&self) -> i32 {
-        match self {
-            CliError::Known { exit_code, .. } => *exit_code,
-            CliError::Unknown { exit_code, .. } => *exit_code,
-            CliError::InvalidParameters { exit_code, .. } => *exit_code,
-        }
-    }
-
-    pub fn invalid_parameters<S: ToString>(error: S) -> Self {
-        Self::InvalidParameters {
-            error: error.to_string(),
-            exit_code: 255,
-        }
-    }
-
     /// The errors spec error code, if applicable
     #[cfg(test)]
     pub(crate) fn error_code(&self) -> Option<&str> {
@@ -67,7 +41,7 @@ impl CliError {
     }
 }
 
-pub fn exit_code(error: &migration_connector::ConnectorError) -> i32 {
+pub fn exit_code(error: &ConnectorError) -> i32 {
     match error.error_code() {
         Some(DatabaseDoesNotExist::ERROR_CODE) => 1,
         Some(DatabaseAccessDenied::ERROR_CODE) => 2,
@@ -79,6 +53,7 @@ pub fn exit_code(error: &migration_connector::ConnectorError) -> i32 {
     }
 }
 
+#[cfg(test)]
 pub fn render_error(cli_error: CliError) -> user_facing_errors::Error {
     use user_facing_errors::UnknownError;
 
@@ -95,18 +70,13 @@ pub fn render_error(cli_error: CliError) -> user_facing_errors::Error {
 impl From<ConnectorError> for CliError {
     fn from(err: ConnectorError) -> Self {
         let exit_code = exit_code(&err);
-        let context = err.context().clone();
 
         match err.known_error() {
             Some(error) => CliError::Known {
                 error: error.clone(),
                 exit_code,
             },
-            None => CliError::Unknown {
-                error: err,
-                exit_code,
-                context,
-            },
+            None => CliError::Unknown { error: err, exit_code },
         }
     }
 }

@@ -1,6 +1,6 @@
 use super::CliError;
 use quaint::{prelude::Queryable, single::Quaint};
-use structopt::StructOpt;
+use std::ffi::OsString;
 use test_macros::test_connector;
 use test_setup::{create_mysql_database, create_postgres_database, sqlite_test_url, BitFlags, Tags, TestApiArgs};
 use url::Url;
@@ -34,16 +34,13 @@ impl TestApi {
         self.rt.block_on(fut)
     }
 
-    fn run(&self, args: &[&str]) -> Result<String, CliError> {
-        let cli = super::Cli::from_iter(std::iter::once(&"migration-engine-cli-test").chain(args.iter()));
-        self.rt.block_on(cli.run_inner())
+    fn run(&self, args: &[&str]) -> Result<(), CliError> {
+        let args = pico_args::Arguments::from_vec(args.iter().map(OsString::from).collect());
+        self.rt.block_on(crate::run_with_args(args))
     }
 
-    fn get_cli_error(&self, cli_args: &[&str]) -> user_facing_errors::Error {
-        let matches = crate::MigrationEngineCli::from_iter(cli_args.iter());
-        let cli_command = matches.cli_subcommand.expect("cli subcommand is passed");
-        self.rt
-            .block_on(cli_command.unwrap_cli().run_inner())
+    fn get_cli_error(&self, args: &[&str]) -> user_facing_errors::Error {
+        self.run(args)
             .map_err(crate::commands::error::render_error)
             .unwrap_err()
     }
@@ -51,11 +48,8 @@ impl TestApi {
 
 #[test_connector(tags(Mysql))]
 fn test_connecting_with_a_working_mysql_connection_string(api: TestApi) {
-    let result = api
-        .run(&["--datasource", &api.connection_string, "can-connect-to-database"])
+    api.run(&["--datasource", &api.connection_string, "can-connect-to-database"])
         .unwrap();
-
-    assert_eq!(result, "Connection successful");
 }
 
 #[test_connector(tags(Mysql))]
@@ -79,11 +73,8 @@ fn test_connecting_with_a_working_postgres_connection_string(api: TestApi) {
         api.connection_string.clone()
     };
 
-    let result = api
-        .run(&["--datasource", &conn_string, "can-connect-to-database"])
+    api.run(&["--datasource", &conn_string, "can-connect-to-database"])
         .unwrap();
-
-    assert_eq!(result, "Connection successful");
 }
 
 // Note: not redundant with previous test because of the different URL scheme.
@@ -95,11 +86,8 @@ fn test_connecting_with_a_working_postgresql_connection_string(api: TestApi) {
         api.connection_string.clone()
     };
 
-    let result = api
-        .run(&["--datasource", &conn_string, "can-connect-to-database"])
+    api.run(&["--datasource", &conn_string, "can-connect-to-database"])
         .unwrap();
-
-    assert_eq!(result, "Connection successful");
 }
 
 #[test_connector(tags(Postgres))]
@@ -119,14 +107,11 @@ fn test_create_database(api: TestApi) {
     api.run(&["--datasource", &api.connection_string, "drop-database"])
         .unwrap();
 
-    let res = api
-        .run(&["--datasource", &api.connection_string, "create-database"])
+    api.run(&["--datasource", &api.connection_string, "create-database"])
         .unwrap();
 
-    assert_eq!("Database 'test_create_database\' was successfully created.", res);
-
-    let res = api.run(&["--datasource", &api.connection_string, "can-connect-to-database"]);
-    assert_eq!("Connection successful", res.as_ref().unwrap());
+    api.run(&["--datasource", &api.connection_string, "can-connect-to-database"])
+        .unwrap();
 }
 
 #[test_connector(tags(Sqlite))]
@@ -142,10 +127,7 @@ fn test_create_sqlite_database(api: TestApi) {
 
     let url = format!("file:{}", sqlite_path.to_string_lossy());
     let res = api.run(&["--datasource", &url, "create-database"]);
-    let msg = res.as_ref().unwrap();
-
-    assert!(msg.contains("success"));
-    assert!(msg.contains("test_create_sqlite_database.db"));
+    res.as_ref().unwrap();
 
     assert!(sqlite_path.exists());
 }

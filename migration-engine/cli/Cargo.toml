@@ -7,20 +7,17 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-migration-connector = { path = "../connectors/migration-connector" }
 migration-core = { path = "../core" }
 user-facing-errors = { path = "../../libs/user-facing-errors" }
 
-base64 = "0.13"
-futures = { version = "0.3", default-features = false }
+enumflags2 = "0.6.0"
 json-rpc-stdio = { path = "../../libs/json-rpc-stdio" }
+pico-args = { version = "0.4.1", default-features = false }
 serde_json = { version = "1.0", features = ["float_roundtrip"] }
-structopt = "0.3.8"
 tokio = { version = "1.0", default-features = false, features = ["macros"] }
 tracing = "0.1"
-tracing-subscriber = "0.2"
 tracing-error = "0.1.2"
-enumflags2 = "0.6.0"
+tracing-subscriber = { version = "0.2", default-features = false, features = ["json", "smallvec", "tracing-log", "parking_lot"] }
 
 [dev-dependencies]
 tempfile = "3.1.0"

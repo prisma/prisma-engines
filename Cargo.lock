@@ -2317,15 +2317,12 @@ dependencies = [
 name = "migration-engine-cli"
 version = "0.1.0"
 dependencies = [
- "base64 0.13.0",
  "enumflags2",
- "futures 0.3.13",
  "json-rpc-stdio",
- "migration-connector",
  "migration-core",
+ "pico-args",
  "quaint",
  "serde_json",
- "structopt",
  "tempfile",
  "test-macros",
  "test-setup",
@@ -3066,6 +3063,12 @@ checksum = "c00cf8b9eafe68dde5e9eaa2cef8ee84a9336a47d566ec55ca16589633b65af7"
 dependencies = [
  "siphasher",
 ]
+
+[[package]]
+name = "pico-args"
+version = "0.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7d7afeb98c5a10e0bffcc7fc16e105b04d06729fac5fd6384aebf7ff5cb5a67d"
 
 [[package]]
 name = "pin-project"
@@ -4120,7 +4123,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e0bccbcf40c8938196944a3da0e133e031a33f4d6b72db3bda3cc556e361905d"
 dependencies = [
  "lazy_static",
- "parking_lot 0.10.2",
+ "parking_lot 0.11.1",
  "serial_test_derive",
 ]
 
@@ -5082,6 +5085,7 @@ dependencies = [
  "chrono",
  "lazy_static",
  "matchers",
+ "parking_lot 0.11.1",
  "regex",
  "serde",
  "serde_json",

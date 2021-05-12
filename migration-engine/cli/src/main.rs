@@ -3,85 +3,51 @@
 mod commands;
 mod logger;
 
-use migration_core::api::RpcApi;
-use structopt::StructOpt;
-use user_facing_errors::{common::SchemaParserError, UserFacingError};
+use commands::error::CliError;
 
-/// When no subcommand is specified, the migration engine will default to starting as a JSON-RPC
-/// server over stdio.
-#[derive(Debug, StructOpt)]
-#[structopt(version = env!("GIT_HASH"))]
-struct MigrationEngineCli {
-    /// Path to the datamodel
-    #[structopt(short = "d", long, name = "FILE")]
-    datamodel: Option<String>,
-    #[structopt(subcommand)]
-    cli_subcommand: Option<SubCommand>,
-}
+fn print_help_text() -> ! {
+    const HELP_TEXT: &str = r#"
+USAGE:
+    migration-engine [SUBCOMMAND] [OPTIONS]
 
-#[derive(Debug, StructOpt)]
-enum SubCommand {
-    /// Doesn't start a server, but allows running specific commands against Prisma.
-    #[structopt(name = "cli")]
-    Cli(commands::Cli),
-}
+SUBCOMMANDS:
+    create-database             Create a logical database
+    can-connect-to-database     Check that the migration engine can connect to a given database
+    drop-database               Drops a logical database
+    qe-setup                    Internal setup for query engine tests
+    start                       Start the migration engine JSON-RPC server over stdio
+"#;
 
-impl SubCommand {
-    #[cfg(test)]
-    fn unwrap_cli(self) -> commands::Cli {
-        match self {
-            SubCommand::Cli(cli) => cli,
-        }
-    }
+    eprintln!("{}", HELP_TEXT);
+
+    std::process::exit(1);
 }
 
 #[tokio::main]
 async fn main() {
-    user_facing_errors::set_panic_hook();
     logger::init_logger();
 
-    let input = MigrationEngineCli::from_args();
-
-    match input.cli_subcommand {
-        None => {
-            if let Some(datamodel_location) = input.datamodel.as_ref() {
-                start_engine(datamodel_location).await
-            } else {
-                panic!("Missing --datamodel");
-            }
-        }
-        Some(SubCommand::Cli(cli_command)) => {
-            tracing::info!(git_hash = env!("GIT_HASH"), "Starting migration engine CLI");
-            cli_command.run().await;
+    match run_with_args(pico_args::Arguments::from_env()).await {
+        Ok(()) => (),
+        Err(cli_error) => {
+            panic!("CLI error:\n{}", cli_error)
         }
     }
 }
 
-async fn start_engine(datamodel_location: &str) -> ! {
-    use std::io::Read as _;
+async fn run_with_args(mut args: pico_args::Arguments) -> Result<(), CliError> {
+    // if args.contains("-h") || args.contains("--help") {
+    //     print_help_text()
+    // }
 
-    tracing::info!(git_hash = env!("GIT_HASH"), "Starting migration engine RPC server",);
-    let mut file = std::fs::File::open(datamodel_location).expect("error opening datamodel file");
-
-    let mut datamodel = String::new();
-    file.read_to_string(&mut datamodel).unwrap();
-
-    match RpcApi::new(&datamodel).await {
-        // Block the thread and handle IO in async until EOF.
-        Ok(api) => json_rpc_stdio::run(api.io_handler()).await.unwrap(),
-        Err(err) => {
-            let user_facing_error = err.to_user_facing();
-            let exit_code =
-                if user_facing_error.as_known().map(|err| err.error_code) == Some(SchemaParserError::ERROR_CODE) {
-                    1
-                } else {
-                    250
-                };
-
-            serde_json::to_writer(std::io::stdout().lock(), &user_facing_error).expect("failed to write to stdout");
-            std::process::exit(exit_code)
+    match args.subcommand().expect("Arguments were not UTF-8") {
+        None => {
+            eprintln!("No subcommand was passed.");
+            print_help_text();
+        }
+        Some(subcommand) => {
+            tracing::info!(git_hash = env!("GIT_HASH"), "Starting migration engine CLI");
+            commands::run(&subcommand, args).await
         }
     }
-
-    std::process::exit(0);
 }
