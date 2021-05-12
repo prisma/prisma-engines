@@ -54,7 +54,6 @@ pub struct EngineBuilder {
 /// Internal structure for querying and reconnecting with the engine.
 pub struct ConnectedEngine {
     datamodel: EngineDatamodel,
-    config: serde_json::Value,
     query_schema: Arc<QuerySchema>,
     executor: crate::Executor,
     logger: ChannelLogger,
@@ -211,14 +210,11 @@ impl QueryEngine {
                             preview_features,
                         );
 
-                        let config = datamodel::json::mcf::config_to_mcf_json_value(&builder.config);
-
                         Ok(ConnectedEngine {
                             datamodel: builder.datamodel.clone(),
                             query_schema: Arc::new(query_schema),
                             logger: builder.logger.clone(),
                             executor,
-                            config,
                             config_dir: builder.config_dir.clone(),
                         })
                     })
@@ -294,17 +290,6 @@ impl QueryEngine {
                 Ok(dmmf)
             }
             Inner::Builder(_) => Err(ApiError::NotConnected),
-        }
-    }
-
-    /// Loads the configuration.
-    pub async fn get_config(&self) -> crate::Result<serde_json::Value> {
-        match *self.inner.read().await {
-            Inner::Connected(ref engine) => Ok(engine.config.clone()),
-            Inner::Builder(ref builder) => {
-                let value = datamodel::json::mcf::config_to_mcf_json_value(&builder.config);
-                Ok(value)
-            }
         }
     }
 }
