@@ -116,15 +116,19 @@ fn get_config(ctx: CallContext) -> napi::Result<JsObject> {
 }
 
 #[js_function(0)]
-fn server_info(ctx: CallContext) -> napi::Result<JsObject> {
-    let this: JsObject = ctx.this_unchecked();
-    let engine: &QueryEngine = ctx.env.unwrap(&this)?;
-    let engine: QueryEngine = engine.clone();
+fn version(ctx: CallContext) -> napi::Result<JsUnknown> {
+    #[derive(serde::Serialize, Clone, Copy)]
+    struct Version {
+        commit: &'static str,
+        version: &'static str,
+    }
 
-    ctx.env.execute_tokio_future(
-        async move { Ok(engine.server_info().await?) },
-        |&mut env, server_info| env.create_string(&serde_json::to_string(&server_info).unwrap()),
-    )
+    let version = Version {
+        commit: env!("GIT_HASH"),
+        version: env!("CARGO_PKG_VERSION"),
+    };
+
+    ctx.env.to_js_value(&version)
 }
 
 #[module_exports]
@@ -139,11 +143,11 @@ pub fn init(mut exports: JsObject, env: Env) -> napi::Result<()> {
             Property::new(&env, "sdlSchema")?.with_method(sdl_schema),
             Property::new(&env, "dmmf")?.with_method(dmmf),
             Property::new(&env, "getConfig")?.with_method(get_config),
-            Property::new(&env, "serverInfo")?.with_method(server_info),
         ],
     )?;
 
     exports.set_named_property("QueryEngine", query_engine)?;
+    exports.create_named_method("version", version)?;
 
     Ok(())
 }

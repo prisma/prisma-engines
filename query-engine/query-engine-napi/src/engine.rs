@@ -305,22 +305,6 @@ impl QueryEngine {
             }
         }
     }
-
-    /// Info about the runnings server.
-    pub async fn server_info(&self) -> crate::Result<ServerInfo> {
-        match *self.inner.read().await {
-            Inner::Connected(ref engine) => Ok(ServerInfo {
-                commit: env!("GIT_HASH").into(),
-                version: env!("CARGO_PKG_VERSION").into(),
-                primary_connector: Some(engine.executor().primary_connector().name()),
-            }),
-            Inner::Builder(_) => Ok(ServerInfo {
-                commit: env!("GIT_HASH").into(),
-                version: env!("CARGO_PKG_VERSION").into(),
-                primary_connector: None,
-            }),
-        }
-    }
 }
 
 pub fn set_panic_hook() {
