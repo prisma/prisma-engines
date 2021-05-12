@@ -215,7 +215,7 @@ impl Model {
     fn unique_criterias(&self, allow_optional: bool, disregard_unsupported: bool) -> Vec<UniqueCriteria> {
         let mut result = Vec::new();
 
-        let in_eligible = |field: &ScalarField| {
+        let ineligible = |field: &ScalarField| {
             if disregard_unsupported {
                 field.is_commented_out || matches!(field.field_type, FieldType::Unsupported(_))
             } else {
@@ -232,7 +232,7 @@ impl Model {
             if !id_fields.is_empty()
                 && !id_fields
                     .iter()
-                    .any(|f| in_eligible(f) || (f.is_optional() && !allow_optional))
+                    .any(|f| ineligible(f) || (f.is_optional() && !allow_optional))
             {
                 result.push(UniqueCriteria::new(id_fields));
             }
@@ -240,15 +240,17 @@ impl Model {
 
         // second candidate: any unique constraint where all fields are required
         {
-            let mut unique_field_combi = self
+            println!("{:?}", self.indices);
+
+            let unique_field_combi: Vec<UniqueCriteria> = self
                 .indices
                 .iter()
                 .filter(|id| id.tpe == IndexType::Unique)
                 .filter_map(|id| {
                     let fields: Vec<_> = id.fields.iter().map(|f| self.find_scalar_field(&f).unwrap()).collect();
-                    let no_fields_are_commented_out = !fields.iter().any(|f| in_eligible(f));
+                    let no_fields_are_ineligible = !fields.iter().any(|f| ineligible(f));
                     let all_fields_are_required = fields.iter().all(|f| f.is_required());
-                    if (all_fields_are_required || allow_optional) && no_fields_are_commented_out {
+                    if (all_fields_are_required || allow_optional) && no_fields_are_ineligible {
                         Some(UniqueCriteria::new(fields))
                     } else {
                         None
@@ -256,27 +258,30 @@ impl Model {
                 })
                 .collect();
 
-            result.append(&mut unique_field_combi)
+            result.extend(unique_field_combi)
         }
 
         result
     }
 
     pub fn field_is_indexed(&self, field_name: &str) -> bool {
-        let field = self.find_field(field_name).unwrap();
+        if let Some(field) = self.find_field(field_name) {
+            if field.is_id() || field.is_unique() {
+                return true;
+            }
 
-        if field.is_id() || field.is_unique() {
-            return true;
+            let is_first_in_index = self
+                .indices
+                .iter()
+                .any(|index| index.fields.first().unwrap() == field_name);
+
+            let is_first_in_primary_key =
+                matches!(&self.primary_key, Some(pk) if pk.fields.first().unwrap() == field_name);
+
+            return is_first_in_index || is_first_in_primary_key;
         }
 
-        let is_first_in_index = self
-            .indices
-            .iter()
-            .any(|index| index.fields.first().unwrap() == field_name);
-
-        let is_first_in_primary_key = matches!(&self.primary_key, Some(pk) if pk.fields.first().unwrap() == field_name);
-
-        is_first_in_index || is_first_in_primary_key
+        false
     }
 
     /// Finds the name of all id fields

@@ -104,7 +104,8 @@ async fn a_table_without_required_uniques(api: &TestApi) -> crate::TestResult {
         .execute(|migration| {
             migration.create_table("Post", |t| {
                 t.add_column("id", types::integer());
-                t.add_column("opt_unique", types::integer().unique(true).nullable(true));
+                t.add_column("opt_unique", types::integer().nullable(true));
+                t.add_index("Post_opt_unique_key", types::index(vec!["opt_unique"]).unique(true));
             });
         })
         .await?;
@@ -132,10 +133,9 @@ async fn a_table_without_fully_required_compound_unique(api: &TestApi) -> crate:
                 t.add_column("id", types::integer());
                 t.add_column("opt_unique", types::integer().nullable(true));
                 t.add_column("req_unique", types::integer().nullable(false));
-
-                t.add_constraint(
-                    "sqlite_autoindex_Post_1",
-                    types::unique_constraint(vec!["opt_unique", "req_unique"]),
+                t.add_index(
+                    "Post_opt_unique_req_unique_key",
+                    types::index(vec!["opt_unique", "req_unique"]).unique(true),
                 );
             });
         })
@@ -148,7 +148,7 @@ async fn a_table_without_fully_required_compound_unique(api: &TestApi) -> crate:
           opt_unique Int?
           req_unique Int
 
-          @@unique([opt_unique, req_unique], map: "sqlite_autoindex_Post_1")
+          @@unique([opt_unique, req_unique])
           @@ignore
         }
     "#};
@@ -166,8 +166,11 @@ async fn unsupported_type_keeps_its_usages(api: &TestApi) -> crate::TestResult {
                 t.add_column("id", types::integer().unique(true));
                 t.add_column("dummy", types::integer());
                 t.add_column("broken", types::custom("macaddr"));
-                t.add_index("unique", types::index(vec!["broken", "dummy"]).unique(true));
-                t.add_index("non_unique", types::index(vec!["broken", "dummy"]).unique(false));
+                t.add_index(
+                    "Test_broken_dummy_key",
+                    types::index(vec!["broken", "dummy"]).unique(true),
+                );
+                t.add_index("Test_broken_dummy_idx", types::index(vec!["broken", "dummy"]));
                 t.set_primary_key(&["broken", "dummy"]);
             });
         })
@@ -194,8 +197,8 @@ async fn unsupported_type_keeps_its_usages(api: &TestApi) -> crate::TestResult {
             broken Unsupported("macaddr")
 
             @@id([broken, dummy])
-            @@unique([broken, dummy], map: "unique")
-            @@index([broken, dummy], map: "non_unique")
+            @@unique([broken, dummy])
+            @@index([broken, dummy])
         }
     "#};
 
@@ -426,7 +429,11 @@ async fn ignore_on_model_with_only_optional_id(api: &TestApi) -> crate::TestResu
 
             migration.create_table("OptionalIdAndOptionalUnique", |t| {
                 t.inject_custom("id Text Primary Key");
-                t.add_column("unique", types::integer().unique(true).nullable(true));
+                t.add_column("unique", types::integer().nullable(true));
+                t.add_index(
+                    "OptionalIdAndOptionalUnique_unique_key",
+                    types::index(&["unique"]).unique(true),
+                )
             });
         })
         .await?;

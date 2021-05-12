@@ -63,17 +63,14 @@ async fn compound_foreign_keys_for_required_one_to_one_relations(api: &TestApi) 
             migration.create_table("User", |t| {
                 t.add_column("id", types::primary());
                 t.add_column("age", types::integer());
-
-                t.add_index("user_unique", types::index(vec!["id", "age"]).unique(true));
+                t.add_index("user_unique", types::unique_constraint(vec!["id", "age"]));
             });
 
             migration.create_table("Post", move |t| {
                 t.add_column("id", types::primary());
                 t.add_column("user_id", types::integer());
                 t.add_column("user_age", types::integer());
-
                 t.add_foreign_key(&["user_id", "user_age"], "User", &["id", "age"]);
-
                 t.add_constraint(constraint_name, types::unique_constraint(vec!["user_id", "user_age"]));
             });
         })

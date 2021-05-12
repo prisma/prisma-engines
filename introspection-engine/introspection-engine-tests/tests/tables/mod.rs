@@ -343,6 +343,7 @@ async fn a_table_with_non_id_autoincrement(api: &TestApi) -> crate::TestResult {
                 migration.create_table("Test", |t| {
                     t.add_column("id", types::integer().primary(true));
                     t.add_column("authorId", types::serial().unique(true));
+                    t.add_index("Test_authorId_key", types::index(vec!["authorId"]).unique(true));
                 });
             },
             api.schema_name(),
@@ -879,7 +880,7 @@ async fn primary_key_is_named(api: &TestApi) -> crate::TestResult {
         }
               
         model Single {
-          id Int @id("name_persisted") @default(1)
+          id Int @id("name_persisted")
         }
     "##};
 
