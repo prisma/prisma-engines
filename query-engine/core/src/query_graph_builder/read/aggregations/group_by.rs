@@ -27,7 +27,7 @@ pub fn group_by(mut field: ParsedField, model: ModelRef) -> QueryGraphBuilderRes
 
     let selectors: Vec<_> = nested_fields
         .into_iter()
-        .map(|field| resolve_query(field, &model))
+        .map(|field| resolve_query(field, &model, false))
         .collect::<QueryGraphBuilderResult<_>>()?;
 
     verify_selections(&selectors, &group_by)

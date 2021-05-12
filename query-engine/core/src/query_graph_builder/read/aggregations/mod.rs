@@ -14,39 +14,52 @@ use prisma_models::{ModelRef, ScalarFieldRef};
 /// Resolves the given field as a aggregation query.
 #[allow(clippy::unnecessary_wraps)]
 #[tracing::instrument(skip(field, model))]
-fn resolve_query(mut field: FieldPair, model: &ModelRef) -> QueryGraphBuilderResult<AggregationSelection> {
-    let query = match field.parsed_field.name.as_str() {
-        UNDERSCORE_COUNT | COUNT => {
-            let nested_fields = field
-                .parsed_field
-                .nested_fields
-                .as_mut()
-                .expect("Expected at least one selection for aggregate");
+fn resolve_query(
+    field: FieldPair,
+    model: &ModelRef,
+    allow_deprecated: bool,
+) -> QueryGraphBuilderResult<AggregationSelection> {
+    let count_resolver = |mut field: FieldPair, model: &ModelRef| {
+        let nested_fields = field
+            .parsed_field
+            .nested_fields
+            .as_mut()
+            .expect("Expected at least one selection for aggregate");
 
-            let all_position = nested_fields
-                .fields
-                .iter()
-                .find_position(|f| f.parsed_field.name == "_all");
+        let all_position = nested_fields
+            .fields
+            .iter()
+            .find_position(|f| f.parsed_field.name == "_all");
 
-            match all_position {
-                Some((pos, _)) => {
-                    nested_fields.fields.remove(pos);
+        match all_position {
+            Some((pos, _)) => {
+                nested_fields.fields.remove(pos);
 
-                    AggregationSelection::Count {
-                        all: true,
-                        fields: resolve_fields(model, field),
-                    }
-                }
-                None => AggregationSelection::Count {
-                    all: false,
+                AggregationSelection::Count {
+                    all: true,
                     fields: resolve_fields(model, field),
-                },
+                }
             }
+            None => AggregationSelection::Count {
+                all: false,
+                fields: resolve_fields(model, field),
+            },
         }
-        UNDERSCORE_AVG | AVG => AggregationSelection::Average(resolve_fields(model, field)),
-        UNDERSCORE_SUM | SUM => AggregationSelection::Sum(resolve_fields(model, field)),
-        UNDERSCORE_MIN | MIN => AggregationSelection::Min(resolve_fields(model, field)),
-        UNDERSCORE_MAX | MAX => AggregationSelection::Max(resolve_fields(model, field)),
+    };
+
+    let query = match field.parsed_field.name.as_str() {
+        COUNT if allow_deprecated => count_resolver(field, model),
+        AVG if allow_deprecated => AggregationSelection::Average(resolve_fields(model, field)),
+        SUM if allow_deprecated => AggregationSelection::Sum(resolve_fields(model, field)),
+        MIN if allow_deprecated => AggregationSelection::Min(resolve_fields(model, field)),
+        MAX if allow_deprecated => AggregationSelection::Max(resolve_fields(model, field)),
+
+        UNDERSCORE_COUNT => count_resolver(field, model),
+        UNDERSCORE_AVG => AggregationSelection::Average(resolve_fields(model, field)),
+        UNDERSCORE_SUM => AggregationSelection::Sum(resolve_fields(model, field)),
+        UNDERSCORE_MIN => AggregationSelection::Min(resolve_fields(model, field)),
+        UNDERSCORE_MAX => AggregationSelection::Max(resolve_fields(model, field)),
+
         name => AggregationSelection::Field(model.fields().find_from_scalar(name).unwrap()),
     };
 
