@@ -33,6 +33,7 @@ features = [
   "mssql",
   "bigdecimal",
 ]
+branch = "serialize-decimals-as-strings"
 git = "https://github.com/prisma/quaint"
 
 [dependencies.connector-interface]

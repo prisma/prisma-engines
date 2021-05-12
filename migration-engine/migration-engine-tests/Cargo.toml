@@ -42,5 +42,6 @@ connection-string = "0.1.13"
 
 [dependencies.quaint]
 git = "https://github.com/prisma/quaint"
+branch = "serialize-decimals-as-strings"
 optional = true
 features = ["vendored-openssl"]
