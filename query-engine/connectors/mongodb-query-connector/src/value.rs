@@ -4,9 +4,9 @@ use chrono::{TimeZone, Utc};
 use itertools::Itertools;
 use mongodb::bson::{oid::ObjectId, spec::BinarySubtype, Binary, Bson, Timestamp};
 use native_types::MongoDbType;
-use prisma_models::{PrismaValue, ScalarFieldRef, TypeIdentifier};
+use prisma_models::{FloatValue, PrismaValue, ScalarFieldRef, TypeIdentifier};
 use serde_json::Value;
-use std::{convert::TryFrom, fmt::Display};
+use std::{convert::TryFrom, fmt::Display, str::FromStr};
 
 /// Transforms a `PrismaValue` of a specific field into the BSON mapping as prescribed by the native types
 /// or as defined by the default `TypeIdentifier` to BSON mapping.
@@ -54,7 +54,6 @@ impl IntoBson for (MongoDbType, PrismaValue) {
             // Double
             (MongoDbType::Double, PrismaValue::Int(i)) => Bson::Double(i as f64),
             (MongoDbType::Double, PrismaValue::Float(f)) => Bson::Double(f.to_f64().convert(expl::MONGO_DOUBLE)?),
-            (MongoDbType::Double, PrismaValue::BigInt(b)) => Bson::Double(b.to_f64().convert(expl::MONGO_DOUBLE)?),
 
             // Decimal
             (MongoDbType::Decimal, _) => unimplemented!("Mongo decimals."),
@@ -143,12 +142,12 @@ impl IntoBson for (&TypeIdentifier, PrismaValue) {
             (TypeIdentifier::Float, PrismaValue::Int(i)) => Bson::Double(i.to_f64().convert(expl::MONGO_DOUBLE)?),
             (TypeIdentifier::Float, PrismaValue::BigInt(i)) => Bson::Double(i.to_f64().convert(expl::MONGO_DOUBLE)?),
 
-            // Decimal (todo properly when the driver supports dec128)
-            (TypeIdentifier::Decimal, PrismaValue::Float(dec)) => {
-                Bson::Double(dec.to_f64().convert(expl::MONGO_DOUBLE)?)
-            }
-            (TypeIdentifier::Decimal, PrismaValue::Int(i)) => Bson::Double(i.to_f64().convert(expl::MONGO_DOUBLE)?),
-            (TypeIdentifier::Decimal, PrismaValue::BigInt(i)) => Bson::Double(i.to_f64().convert(expl::MONGO_DOUBLE)?),
+            // Decimal
+            // (TypeIdentifier::Decimal, PrismaValue::Decimal(dec)) => {
+            //     Bson::Decimal128(Decimal128::from_str(&dec.to_string()))
+            // }
+            // (TypeIdentifier::Decimal, PrismaValue::Int(i)) => Bson::Double(i.to_f64().convert(expl::MONGO_DOUBLE)?),
+            // (TypeIdentifier::Decimal, PrismaValue::BigInt(i)) => Bson::Double(i.to_f64().convert(expl::MONGO_DOUBLE)?),
 
             // Bytes
             (TypeIdentifier::Bytes, PrismaValue::Bytes(bytes)) => Bson::Binary(Binary {
@@ -228,26 +227,22 @@ pub fn value_from_bson(bson: Bson, meta: &OutputMeta) -> crate::Result<PrismaVal
         (TypeIdentifier::BigInt, Bson::Int32(i)) => PrismaValue::BigInt(i as i64),
 
         // Floats
-        // (TypeIdentifier::Float, Bson::Double(f)) => {
-        //     PrismaValue::Float(BigDecimal::from_f64(f).convert(expl::PRISMA_FLOAT)?.normalized())
-        // }
-        // (TypeIdentifier::Float, Bson::Int32(i)) => {
-        //     PrismaValue::Float(BigDecimal::from_i64(i as i64).convert(expl::PRISMA_FLOAT)?.normalized())
-        // }
-        // (TypeIdentifier::Float, Bson::Int64(i)) => {
-        //     PrismaValue::Float(BigDecimal::from_i64(i).convert(expl::PRISMA_FLOAT)?.normalized())
-        // }
+        (TypeIdentifier::Float, Bson::Double(f)) => PrismaValue::Float(FloatValue(f)),
+        (TypeIdentifier::Float, Bson::Int32(i)) => PrismaValue::Float(FloatValue(f64::from(i))),
 
-        // // Decimals
-        // (TypeIdentifier::Decimal, Bson::Double(f)) => {
-        //     PrismaValue::Float(BigDecimal::from_f64(f).convert(expl::PRISMA_FLOAT)?.normalized())
-        // }
-        // (TypeIdentifier::Decimal, Bson::Int32(i)) => {
-        //     PrismaValue::Float(BigDecimal::from_i64(i as i64).convert(expl::PRISMA_FLOAT)?.normalized())
-        // }
-        // (TypeIdentifier::Decimal, Bson::Int64(i)) => {
-        //     PrismaValue::Float(BigDecimal::from_i64(i).convert(expl::PRISMA_FLOAT)?.normalized())
-        // }
+        // Decimals
+        (TypeIdentifier::Decimal, Bson::Decimal128(d)) => PrismaValue::Decimal(
+            BigDecimal::from_str(&d.to_string()).map_err(|_| MongoError::ConversionError {
+                from: format!("BSON Decimal '{}'", d),
+                to: expl::PRISMA_DECIMAL.to_owned(),
+            })?,
+        ),
+        (TypeIdentifier::Decimal, Bson::Int32(i)) => {
+            PrismaValue::Decimal(BigDecimal::from_i32(i).convert(expl::PRISMA_DECIMAL)?.normalized())
+        }
+        (TypeIdentifier::Decimal, Bson::Int64(i)) => {
+            PrismaValue::Decimal(BigDecimal::from_i64(i).convert(expl::PRISMA_DECIMAL)?.normalized())
+        }
 
         // DateTime
         (TypeIdentifier::DateTime, Bson::DateTime(dt)) => PrismaValue::DateTime(dt.into()),
@@ -307,7 +302,7 @@ mod expl {
     pub const MONGO_I32: &str = "MongoDB Int (32 bit)";
     pub const MONGO_I64: &str = "MongoDB Int (64 bit)";
 
-    pub const PRISMA_FLOAT: &str = "Prisma Float (BigDecimal)";
+    pub const PRISMA_DECIMAL: &str = "Prisma Decimal";
     pub const PRISMA_BIGINT: &str = "Prisma BigInt (64 bit)";
     pub const PRISMA_INT: &str = "Prisma Int (64 bit)";
 }
