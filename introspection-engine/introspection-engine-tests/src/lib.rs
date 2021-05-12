@@ -50,6 +50,7 @@ impl BarrelMigrationExecutor {
         migration_fn(&mut migration);
 
         let full_sql = migration.make_from(self.sql_variant);
+        println!("{}", full_sql);
 
         if full_sql.is_empty() {
             return Ok(());

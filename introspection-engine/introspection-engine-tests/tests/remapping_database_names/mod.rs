@@ -164,64 +164,49 @@ async fn remapping_models_in_relations_should_not_map_virtual_fields(api: &TestA
 
 #[test_each_connector]
 async fn remapping_models_in_compound_relations(api: &TestApi) -> crate::TestResult {
-    let post_constraint = if api.sql_family().is_sqlite() {
-        "sqlite_autoindex_Post_1"
-    } else {
-        "post_user_unique"
-    };
-
-    let user_constraint = if api.sql_family().is_sqlite() {
-        "sqlite_autoindex_User with Space_1"
-    } else {
-        "user_unique"
-    };
-
     api.barrel()
         .execute(move |migration| {
             migration.create_table("User with Space", move |t| {
                 t.add_column("id", types::primary());
                 t.add_column("age", types::integer());
-
-                t.add_constraint(user_constraint, types::unique_constraint(vec!["id", "age"]));
+                t.add_index(
+                    "User with Space_id_age_key",
+                    types::index(vec!["id", "age"]).unique(true),
+                );
             });
 
             migration.create_table("Post", move |t| {
                 t.add_column("id", types::primary());
                 t.add_column("user_id", types::integer());
                 t.add_column("user_age", types::integer());
-
                 t.add_foreign_key(&["user_id", "user_age"], "User with Space", &["id", "age"]);
-
                 t.add_constraint(
-                    post_constraint,
-                    types::unique_constraint(vec!["user_id", "user_age"]).unique(true),
+                    "Post_user_id_user_age_key",
+                    types::unique_constraint(vec!["user_id", "user_age"]),
                 );
             });
         })
         .await?;
 
-    let dm = format!(
-        r#"
-        model Post {{
+    let dm = r#"
+        model Post {
             id              Int             @id @default(autoincrement())
             user_id         Int
             user_age        Int
             User_with_Space User_with_Space @relation(fields: [user_id, user_age], references: [id, age])
 
-            @@unique([user_id, user_age], name: "{}")
-        }}
+            @@unique([user_id, user_age])
+        }
 
-        model User_with_Space {{
+        model User_with_Space {
             id   Int   @id @default(autoincrement())
             age  Int
             Post Post?
 
             @@map("User with Space")
-            @@unique([id, age], name: "{}")
-        }}
-    "#,
-        post_constraint, user_constraint
-    );
+            @@unique([id, age])
+        }
+    "#;
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
@@ -230,27 +215,14 @@ async fn remapping_models_in_compound_relations(api: &TestApi) -> crate::TestRes
 
 #[test_each_connector]
 async fn remapping_fields_in_compound_relations(api: &TestApi) -> crate::TestResult {
-    let user_post_constraint = if api.sql_family().is_sqlite() {
-        "sqlite_autoindex_Post_1"
-    } else {
-        "post_user_unique"
-    };
-
-    let user_constraint = if api.sql_family().is_sqlite() {
-        "sqlite_autoindex_User_1"
-    } else {
-        "user_unique"
-    };
-
     api.barrel()
         .execute(move |migration| {
             migration.create_table("User", move |t| {
                 t.add_column("id", types::primary());
                 t.add_column("age-that-is-invalid", types::integer());
-
-                t.add_constraint(
-                    user_constraint,
-                    types::unique_constraint(vec!["id", "age-that-is-invalid"]),
+                t.add_index(
+                    "User_id_age-that-is-invalid_key",
+                    types::index(vec!["id", "age-that-is-invalid"]).unique(true),
                 );
             });
 
@@ -258,38 +230,33 @@ async fn remapping_fields_in_compound_relations(api: &TestApi) -> crate::TestRes
                 t.add_column("id", types::primary());
                 t.add_column("user_id", types::integer());
                 t.add_column("user_age", types::integer());
-
                 t.add_foreign_key(&["user_id", "user_age"], "User", &["id", "age-that-is-invalid"]);
-
-                t.add_constraint(
-                    user_post_constraint,
-                    types::unique_constraint(vec!["user_id", "user_age"]),
+                t.add_index(
+                    "Post_user_id_user_age_key",
+                    types::index(vec!["user_id", "user_age"]).unique(true),
                 );
             });
         })
         .await?;
 
-    let dm = format!(
-        r#"
-        model Post {{
+    let dm = r#"
+        model Post {
             id       Int  @id @default(autoincrement())
             user_id  Int
             user_age Int
             User     User @relation(fields: [user_id, user_age], references: [id, age_that_is_invalid])
 
-            @@unique([user_id, user_age], name: "{}")
-        }}
+            @@unique([user_id, user_age])
+        }
 
-        model User {{
+        model User {
             id                  Int   @id @default(autoincrement())
             age_that_is_invalid Int   @map("age-that-is-invalid")
             Post                Post?
 
-            @@unique([id, age_that_is_invalid], name: "{}")
-        }}
-    "#,
-        user_post_constraint, user_constraint
-    );
+            @@unique([id, age_that_is_invalid])
+        }
+    "#;
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);
 

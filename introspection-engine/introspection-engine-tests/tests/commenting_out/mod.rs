@@ -9,53 +9,37 @@ async fn a_table_without_uniques_should_ignore(api: &TestApi) -> crate::TestResu
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::boolean().nullable(false));
+                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
             });
             migration.create_table("Post", |t| {
                 t.add_column("id", types::integer());
-                t.add_column("user_id", types::integer().nullable(false));
+                t.add_column("user_id", types::boolean().nullable(false));
+                t.add_index("Post_user_id_idx", types::index(&["user_id"]));
                 t.add_foreign_key(&["user_id"], "User", &["id"]);
             });
         })
         .await?;
 
-    let dm = if api.sql_family().is_mysql() {
-        indoc! {r#"
+    let dm = indoc! {r#"
             /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
             model Post {
               id      Int
-              user_id Int
+              user_id Boolean
               User    User @relation(fields: [user_id], references: [id])
 
-              @@index([user_id], map: "user_id")
+              @@index([user_id])
               @@ignore
             }
 
             model User {
-              id   Int    @id @default(autoincrement())
+              id   Boolean    @id 
               Post Post[] @ignore
             }
-        "#}
-    } else {
-        indoc! {r#"
-            /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
-            model Post {
-              id      Int
-              user_id Int
-              User    User @relation(fields: [user_id], references: [id])
-
-              @@ignore
-            }
-
-            model User {
-              id   Int    @id @default(autoincrement())
-              Post Post[] @ignore
-            }
-        "#}
+        "#
     };
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);
-
     Ok(())
 }
 
