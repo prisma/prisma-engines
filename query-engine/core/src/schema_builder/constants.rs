@@ -117,6 +117,7 @@ pub mod inputs {
         pub const STRING_CONTAINS: &str = "string_contains";
         pub const STRING_STARTS_WITH: &str = "string_starts_with";
         pub const STRING_ENDS_WITH: &str = "string_ends_with";
+        pub const JSON_TYPE: &str = "json_type";
     }
 
     pub mod ordering {
