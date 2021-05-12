@@ -30,7 +30,7 @@ class MaxAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
 
     server.query(
       s"""mutation {
-         |  createItem(data: { $idString float: $float, int: $int, dec: $dec, bInt: $bInt, s: "$s" }) {
+         |  createItem(data: { $idString float: $float, int: $int, dec: "$dec", bInt: $bInt, s: "$s" }) {
          |    id
          |  }
          |}""".stripMargin,

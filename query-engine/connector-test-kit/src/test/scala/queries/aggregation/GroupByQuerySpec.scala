@@ -41,7 +41,7 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
 
     server.query(
       s"""mutation {
-         |  createModel(data: { $idString float: $float, int: $int, dec: $dec, s: "$s" $stringifiedOther }) {
+         |  createModel(data: { $idString float: $float, int: $int, dec: "$dec", s: "$s" $stringifiedOther }) {
          |    id
          |  }
          |}""".stripMargin,
@@ -327,7 +327,7 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       project
     )
 
-    result.toString should be("""{"data":{"groupByModel":[{"float":1.1,"sum":{"float":3.3}},{"float":4,"sum":{"float":4}}]}}""")
+    result.toString should be("""{"data":{"groupByModel":[{"float":1.1,"sum":{"float":3.3000000000000003}},{"float":4,"sum":{"float":4}}]}}""")
 
     result = server.query(
       s"""{
@@ -341,7 +341,7 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       project
     )
 
-    result.toString should be("""{"data":{"groupByModel":[{"float":4,"sum":{"float":4}},{"float":1.1,"sum":{"float":3.3}}]}}""")
+    result.toString should be("""{"data":{"groupByModel":[{"float":4,"sum":{"float":4}},{"float":1.1,"sum":{"float":3.3000000000000003}}]}}""")
   }
 
   "Using a group-by with ordering AVG aggregation" should "work" in {

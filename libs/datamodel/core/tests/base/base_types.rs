@@ -191,6 +191,44 @@ fn json_type_must_work_for_some_connectors() {
 }
 
 #[test]
+fn decimal_type_must_work_for_some_connectors() {
+    let dml = r#"
+    model User {
+        id  Int     @id
+        dec Decimal
+    }
+    "#;
+
+    // empty connector does not support it
+    parse_error(dml).assert_is(DatamodelError::new_field_validation_error(
+        "Field `dec` in model `User` can\'t be of type Decimal. The current connector does not support the Decimal type.",
+        "User",
+        "dec",
+        Span::new(50, 62),
+    ));
+
+    // SQLite does not support it
+    parse_error(&format!("{}\n{}", SQLITE_SOURCE, dml)).assert_is(DatamodelError::new_field_validation_error(
+        "Field `dec` in model `User` can\'t be of type Decimal. The current connector does not support the Decimal type.",
+        "User",
+        "dec",
+        Span::new(139, 151),
+    ));
+
+    // Postgres does support it
+    parse(&format!("{}\n{}", POSTGRES_SOURCE, dml))
+        .assert_has_model("User")
+        .assert_has_scalar_field("dec")
+        .assert_base_type(&ScalarType::Decimal);
+
+    // MySQL does support it
+    parse(&format!("{}\n{}", MYSQL_SOURCE, dml))
+        .assert_has_model("User")
+        .assert_has_scalar_field("dec")
+        .assert_base_type(&ScalarType::Decimal);
+}
+
+#[test]
 fn resolve_enum_field() {
     let dml = r#"
     model User {
