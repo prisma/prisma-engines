@@ -50,7 +50,7 @@ pub enum PrismaValue {
     Bytes(Vec<u8>),
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize, Clone, Copy, PartialOrd)]
+#[derive(Debug, Serialize, Deserialize, Clone, Copy)]
 // todo: serialize only f64
 pub struct FloatValue(pub f64);
 
@@ -64,6 +64,18 @@ impl Deref for FloatValue {
 
 impl Eq for FloatValue {}
 
+impl PartialOrd for FloatValue {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        self.0.partial_cmp(&other.0)
+    }
+}
+
+impl PartialEq for FloatValue {
+    fn eq(&self, other: &Self) -> bool {
+        self.0 == other.0
+    }
+}
+
 impl std::hash::Hash for FloatValue {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
         let bytes = self.0.to_be_bytes();
@@ -71,6 +83,8 @@ impl std::hash::Hash for FloatValue {
     }
 }
 
+// For readability, if-else blocks are not collapsed and separate branches are not unified.
+#[allow(clippy::collapsible_else_if, clippy::if_same_then_else)]
 impl Ord for FloatValue {
     fn cmp(&self, other: &Self) -> Ordering {
         if self.is_nan() {
