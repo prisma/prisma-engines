@@ -1,5 +1,5 @@
 use crate::{output_meta::OutputMeta, IntoBson, MongoError};
-use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
+use bigdecimal::ToPrimitive;
 use chrono::{TimeZone, Utc};
 use itertools::Itertools;
 use mongodb::bson::{oid::ObjectId, spec::BinarySubtype, Binary, Bson, Timestamp};
