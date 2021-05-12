@@ -78,7 +78,7 @@ impl AttributeValidator<dml::Model> for ModelLevelIdAttributeValidator {
             .map(|f| f.as_constant_literal())
             .collect::<Result<Vec<_>, _>>()?;
 
-        let default_name = ConstraintNames::primary_key_name(&obj.name, fields.clone());
+        let default_name = ConstraintNames::primary_key_name(&obj.name);
 
         let (name_in_db_is_default, name_in_client, name_in_db) = match (
             args.optional_arg("name").map(|v| v.as_str().unwrap()),

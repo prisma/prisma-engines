@@ -23,7 +23,7 @@ fn constraint_names() {
     //explicit same dbnames
 
     model A2 {
-      id   Int    @id("A2_id_pkey") 
+      id   Int    @id("A2_pkey") 
       name String @unique(A2_name_key)
     }
     
@@ -33,7 +33,7 @@ fn constraint_names() {
    
       @@index([a], map: "B2_a_idx")
       @@unique([a, b], name: "clientUnique", map: "B2_a_b_key")
-      @@id([a, b], name: "clientId", map: "B2_a_b_pkey")
+      @@id([a, b], name: "clientId", map: "B2_pkey")
     }
     
     //only explicit different dbnames

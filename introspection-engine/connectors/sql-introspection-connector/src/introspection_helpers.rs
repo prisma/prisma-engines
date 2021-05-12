@@ -288,7 +288,7 @@ pub(crate) fn calculate_default(table: &Table, column: &Column, arity: &FieldAri
 pub(crate) fn is_id(column: &Column, table: &Table) -> Option<PrimaryKeyDefinition> {
     match &table.primary_key {
         Some(pk) if pk.columns.len() == 1 && pk.columns.first().unwrap() == &column.name => {
-            let default_name = ConstraintNames::primary_key_name(&table.name, pk.columns.clone());
+            let default_name = ConstraintNames::primary_key_name(&table.name);
             Some(PrimaryKeyDefinition {
                 name_in_client: None,
                 name_in_db_is_default: pk.constraint_name == Some(default_name),

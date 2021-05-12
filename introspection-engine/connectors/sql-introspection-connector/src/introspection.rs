@@ -55,7 +55,7 @@ pub fn introspect(
         }
 
         model.primary_key = table.primary_key.as_ref().map(|pk| {
-            let default_name = ConstraintNames::primary_key_name(&model.name, pk.columns.clone());
+            let default_name = ConstraintNames::primary_key_name(&model.name);
             PrimaryKeyDefinition {
                 name_in_client: None,
                 name_in_db_is_default: pk.constraint_name == Some(default_name),

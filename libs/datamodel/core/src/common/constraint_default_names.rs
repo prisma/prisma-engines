@@ -7,23 +7,25 @@ impl ConstraintNames {
     ///to render names because they already align with our convention
     ///
     /// Postgres Naming conventions
-    /// {tablename}_{columnname(s)}_{suffix}
     ///
-    /// where the suffix is one of the following:
-    ///
+    /// Without column names {tablename}_{suffix}
     /// pkey for a Primary Key constraint
+    ///
+    /// Including column names: {tablename}_{columnname(s)}_{suffix}
     /// key for a Unique constraint
-    /// excl for an Exclusion constraint
     /// idx for any other kind of index
     /// fkey for a Foreign key
-    /// check for a Check constraint
-    /// seq for sequences
     ///
-    /// addditional for SQLSever
+    /// addditional for SQLSever:
     /// dflt for Default Constraint
+    ///
+    /// not used for now:
+    /// check for a Check constraint
+    /// excl for an Exclusion constraint
+    /// seq for sequences
 
-    pub fn primary_key_name(model: &str, fields: Vec<String>) -> String {
-        format!("{}_{}_pkey", model, fields.join("_"))
+    pub fn primary_key_name(model: &str) -> String {
+        format!("{}_pkey", model)
     }
 
     pub fn index_name(model: &str, fields: Vec<String>, tpe: IndexType) -> String {

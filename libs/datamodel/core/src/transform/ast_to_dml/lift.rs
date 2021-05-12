@@ -80,7 +80,7 @@ impl<'a> LiftAstToDml<'a> {
             {
                 if let Some(f) = model.scalar_fields_mut().find(|f| f.is_id()) {
                     if let Some(mut pk) = f.primary_key.as_mut() {
-                        let default_name = ConstraintNames::primary_key_name(&model_name, vec![f.name.clone()]);
+                        let default_name = ConstraintNames::primary_key_name(&model_name);
                         if pk.name_in_db.is_none() {
                             pk.name_in_db = Some(default_name.clone())
                         }
