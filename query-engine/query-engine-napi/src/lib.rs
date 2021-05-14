@@ -7,7 +7,7 @@ use napi::{
 };
 use napi_derive::{js_function, module_exports};
 use prisma_models::DatamodelConverter;
-use query_core::{schema_builder, BuildMode, QueryExecutor, QuerySchemaRef};
+use query_core::{exec_loader, schema_builder, BuildMode, QueryExecutor, QuerySchemaRef};
 use request_handlers::dmmf;
 use std::{collections::BTreeMap, sync::Arc};
 
@@ -133,12 +133,25 @@ fn dmmf(ctx: CallContext) -> napi::Result<JsUnknown> {
     let template = DatamodelConverter::convert_string(datamodel.clone());
     let config =
         datamodel::parse_configuration(&datamodel).map_err(|errors| ApiError::conversion(errors, &datamodel))?;
+
     let capabilities = match config.subject.datasources.first() {
         Some(datasource) => datasource.capabilities(),
         None => ConnectorCapabilities::empty(),
     };
-    // temporary code duplication
-    let internal_data_model = template.build("".into());
+
+    let source = config
+        .subject
+        .datasources
+        .first()
+        .ok_or_else(|| ApiError::configuration("No valid data source found"))?;
+
+    let url = source
+        .load_url()
+        .map_err(|err| ApiError::Conversion(err, datamodel.clone()))?;
+
+    let db_name = exec_loader::db_name(source, &url).map_err(ApiError::from)?;
+
+    let internal_data_model = template.build(db_name);
     let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(
         internal_data_model,
         BuildMode::Modern,
@@ -146,9 +159,11 @@ fn dmmf(ctx: CallContext) -> napi::Result<JsUnknown> {
         capabilities,
         config.subject.preview_features().cloned().collect(),
     ));
+
     let dm = datamodel::parse_datamodel(datamodel.as_str()).unwrap();
     let dmmf = dmmf::render_dmmf(&dm.subject, query_schema);
     let serialized = serde_json::to_string_pretty(&dmmf)?;
+
     ctx.env.to_js_value(&serialized)
 }
 
