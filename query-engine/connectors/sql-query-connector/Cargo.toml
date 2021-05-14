@@ -33,6 +33,7 @@ features = [
   "mssql",
   "bigdecimal",
 ]
+branch = "log-queries-param"
 git = "https://github.com/prisma/quaint"
 
 [dependencies.connector-interface]
