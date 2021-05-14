@@ -44,6 +44,30 @@ pub enum Compare<'a> {
     /// Raw comparator, allows to use an operator `left <raw> right` as is,
     /// without visitor transformation in between.
     Raw(Box<Expression<'a>>, Cow<'a, str>, Box<Expression<'a>>),
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    // All json related comparators
+    JsonCompare(JsonCompare<'a>),
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum JsonCompare<'a> {
+    ArrayContains(Box<Expression<'a>>, Box<Expression<'a>>),
+    ArrayNotContains(Box<Expression<'a>>, Box<Expression<'a>>),
+    ArrayBeginsWith(Box<Expression<'a>>, Box<Expression<'a>>),
+    ArrayNotBeginsWith(Box<Expression<'a>>, Box<Expression<'a>>),
+    ArrayEndsInto(Box<Expression<'a>>, Box<Expression<'a>>),
+    ArrayNotEndsInto(Box<Expression<'a>>, Box<Expression<'a>>),
+    TypeEquals(Box<Expression<'a>>, JsonType),
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum JsonType {
+    Array,
+    Object,
+    String,
+    Number,
+    Boolean,
+    Null,
 }
 
 impl<'a> Compare<'a> {
@@ -603,6 +627,149 @@ pub trait Comparable<'a> {
         T: Into<Expression<'a>>,
         V: Into<Expression<'a>>;
 
+    /// Tests if the JSON array contains a value.
+    ///
+    /// ```rust
+    /// # use quaint::{ast::*, visitor::{Visitor, Mysql}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
+    /// let query = Select::from_table("users").so_that("json".json_array_contains("1"));
+    /// let (sql, params) = Mysql::build(query)?;
+    ///
+    /// assert_eq!("SELECT `users`.* FROM `users` WHERE JSON_CONTAINS(`json`, ?)", sql);
+    ///
+    /// assert_eq!(vec![Value::from("1")], params);
+    /// # Ok(())
+    /// # }
+    /// ```
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    fn json_array_contains<T>(self, item: T) -> Compare<'a>
+    where
+        T: Into<Expression<'a>>;
+
+    /// Tests if the JSON array does not contain a value.
+    ///
+    /// ```rust
+    /// # use quaint::{ast::*, visitor::{Visitor, Mysql}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
+    /// let query = Select::from_table("users").so_that("json".json_array_not_contains("1"));
+    /// let (sql, params) = Mysql::build(query)?;
+    ///
+    /// assert_eq!("SELECT `users`.* FROM `users` WHERE JSON_CONTAINS(`json`, ?) = FALSE", sql);
+    ///
+    /// assert_eq!(vec![Value::from("1")], params);
+    /// # Ok(())
+    /// # }
+    /// ```
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    fn json_array_not_contains<T>(self, item: T) -> Compare<'a>
+    where
+        T: Into<Expression<'a>>;
+
+    /// Tests if the JSON array starts with a value.
+    ///
+    /// ```rust
+    /// # use quaint::{ast::*, visitor::{Visitor, Mysql}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
+    /// let query = Select::from_table("users").so_that("json".json_array_begins_with("1"));
+    /// let (sql, params) = Mysql::build(query)?;
+    ///
+    /// assert_eq!("SELECT `users`.* FROM `users` WHERE JSON_EXTRACT(`json`, ?) = CAST(? AS JSON)", sql);
+    ///
+    /// assert_eq!(vec![
+    ///     Value::from("$[0]"),
+    ///     Value::from("1"),
+    /// ], params);
+    /// # Ok(())
+    /// # }
+    /// ```
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    fn json_array_begins_with<T>(self, item: T) -> Compare<'a>
+    where
+        T: Into<Expression<'a>>;
+
+    /// Tests if the JSON array does not start with a value.
+    ///
+    /// ```rust
+    /// # use quaint::{ast::*, visitor::{Visitor, Mysql}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
+    /// let query = Select::from_table("users").so_that("json".json_array_not_begins_with("1"));
+    /// let (sql, params) = Mysql::build(query)?;
+    ///
+    /// assert_eq!("SELECT `users`.* FROM `users` WHERE JSON_EXTRACT(`json`, ?) <> CAST(? AS JSON)", sql);
+    ///
+    /// assert_eq!(vec![
+    ///     Value::from("$[0]"),
+    ///     Value::from("1"),
+    /// ], params);
+    /// # Ok(())
+    /// # }
+    /// ```
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    fn json_array_not_begins_with<T>(self, item: T) -> Compare<'a>
+    where
+        T: Into<Expression<'a>>;
+
+    /// Tests if the JSON array ends with a value.
+    ///
+    /// ```rust
+    /// # use quaint::{ast::*, visitor::{Visitor, Mysql}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
+    /// let query = Select::from_table("users").so_that("json".json_array_ends_into("1"));
+    /// let (sql, params) = Mysql::build(query)?;
+    ///
+    /// assert_eq!(
+    ///   "SELECT `users`.* FROM `users` WHERE \
+    ///   JSON_EXTRACT(`json`, CONCAT(\'$[\', JSON_LENGTH(`json`) - 1, \']\')) = CAST(? AS JSON)", sql);
+    ///
+    /// assert_eq!(vec![Value::from("1")], params);
+    /// # Ok(())
+    /// # }
+    /// ```
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    fn json_array_ends_into<T>(self, item: T) -> Compare<'a>
+    where
+        T: Into<Expression<'a>>;
+
+    /// Tests if the JSON array does not end with a value.
+    ///
+    /// ```rust
+    /// # use quaint::{ast::*, visitor::{Visitor, Mysql}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
+    /// let query = Select::from_table("users").so_that("json".json_array_not_ends_into("1"));
+    /// let (sql, params) = Mysql::build(query)?;
+    ///
+    /// assert_eq!(
+    ///   "SELECT `users`.* FROM `users` WHERE \
+    ///   JSON_EXTRACT(`json`, CONCAT(\'$[\', JSON_LENGTH(`json`) - 1, \']\')) <> CAST(? AS JSON)", sql);
+    ///
+    /// assert_eq!(vec![Value::from("1")], params);
+    /// # Ok(())
+    /// # }
+    /// ```
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    fn json_array_not_ends_into<T>(self, item: T) -> Compare<'a>
+    where
+        T: Into<Expression<'a>>;
+
+    /// Tests if the JSON value is of a certain type.
+    ///
+    /// ```rust
+    /// # use quaint::{ast::*, visitor::{Visitor, Mysql}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
+    /// let query = Select::from_table("users").so_that("json".json_type_equals(JsonType::Array));
+    /// let (sql, params) = Mysql::build(query)?;
+    ///
+    /// assert_eq!("SELECT `users`.* FROM `users` WHERE (JSON_TYPE(`json`) = ?)", sql);
+    ///
+    /// assert_eq!(vec![Value::from("ARRAY")], params);
+    /// # Ok(())
+    /// # }
+    /// ```
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    fn json_type_equals<T>(self, json_type: T) -> Compare<'a>
+    where
+        T: Into<JsonType>;
+
     /// Compares two expressions with a custom operator.
     ///
     /// ```rust
@@ -800,5 +967,82 @@ where
         let right: Expression<'a> = right.into();
 
         left.compare_raw(raw_comparator.into(), right)
+    }
+
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    fn json_array_contains<T>(self, item: T) -> Compare<'a>
+    where
+        T: Into<Expression<'a>>,
+    {
+        let col: Column<'a> = self.into();
+        let val: Expression<'a> = col.into();
+
+        val.json_array_contains(item)
+    }
+
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    fn json_array_not_contains<T>(self, item: T) -> Compare<'a>
+    where
+        T: Into<Expression<'a>>,
+    {
+        let col: Column<'a> = self.into();
+        let val: Expression<'a> = col.into();
+
+        val.json_array_not_contains(item)
+    }
+
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    fn json_array_begins_with<T>(self, item: T) -> Compare<'a>
+    where
+        T: Into<Expression<'a>>,
+    {
+        let col: Column<'a> = self.into();
+        let val: Expression<'a> = col.into();
+
+        val.json_array_begins_with(item)
+    }
+
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    fn json_array_not_begins_with<T>(self, item: T) -> Compare<'a>
+    where
+        T: Into<Expression<'a>>,
+    {
+        let col: Column<'a> = self.into();
+        let val: Expression<'a> = col.into();
+
+        val.json_array_not_begins_with(item)
+    }
+
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    fn json_array_ends_into<T>(self, item: T) -> Compare<'a>
+    where
+        T: Into<Expression<'a>>,
+    {
+        let col: Column<'a> = self.into();
+        let val: Expression<'a> = col.into();
+
+        val.json_array_ends_into(item)
+    }
+
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    fn json_array_not_ends_into<T>(self, item: T) -> Compare<'a>
+    where
+        T: Into<Expression<'a>>,
+    {
+        let col: Column<'a> = self.into();
+        let val: Expression<'a> = col.into();
+
+        val.json_array_not_ends_into(item)
+    }
+
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    fn json_type_equals<T>(self, json_type: T) -> Compare<'a>
+    where
+        T: Into<JsonType>,
+    {
+        let col: Column<'a> = self.into();
+        let val: Expression<'a> = col.into();
+
+        val.json_type_equals(json_type)
     }
 }

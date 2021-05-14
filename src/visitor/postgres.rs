@@ -262,6 +262,115 @@ impl<'a> Visitor<'a> for Postgres<'a> {
 
         Ok(())
     }
+
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    fn visit_json_extract(&mut self, json_extract: JsonExtract<'a>) -> visitor::Result {
+        match json_extract.path {
+            #[cfg(feature = "mysql")]
+            JsonPath::String(_) => panic!("JSON path string notation is not supported for Postgres"),
+            JsonPath::Array(json_path) => {
+                self.visit_expression(*json_extract.column)?;
+
+                if json_extract.extract_as_string {
+                    self.write("#>>")?;
+                } else {
+                    self.write("#>")?;
+                }
+
+                // We use the `ARRAY[]::text[]` notation to better handle escaped character
+                // The text protocol used when sending prepared statement doesn't seem to work well with escaped characters
+                // when using the '{a, b, c}' string array notation.
+                self.surround_with("ARRAY[", "]::text[]", |s| {
+                    let len = json_path.len();
+                    for (index, path) in json_path.into_iter().enumerate() {
+                        s.visit_parameterized(Value::text(path))?;
+                        if index < len - 1 {
+                            s.write(", ")?;
+                        }
+                    }
+                    Ok(())
+                })
+            }
+        }
+    }
+
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    fn visit_json_array_contains(&mut self, left: Expression<'a>, right: Expression<'a>, not: bool) -> visitor::Result {
+        if not {
+            self.write("( NOT ")?;
+        }
+
+        self.visit_expression(left)?;
+        self.write(" @> ")?;
+        self.visit_expression(right)?;
+
+        if not {
+            self.write(" )")?;
+        }
+
+        Ok(())
+    }
+
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    fn visit_json_array_begins_with(
+        &mut self,
+        left: Expression<'a>,
+        right: Expression<'a>,
+        not: bool,
+    ) -> visitor::Result {
+        if not {
+            self.write("( NOT ")?;
+        }
+
+        self.visit_expression(left)?;
+        self.write("->0 = ")?;
+        self.visit_expression(right)?;
+
+        if not {
+            self.write(" )")?;
+        }
+
+        Ok(())
+    }
+
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    fn visit_json_array_ends_into(
+        &mut self,
+        left: Expression<'a>,
+        right: Expression<'a>,
+        not: bool,
+    ) -> visitor::Result {
+        if not {
+            self.write("( NOT ")?;
+        }
+
+        self.visit_expression(left)?;
+        self.write("->-1 = ")?;
+        self.visit_expression(right)?;
+
+        if not {
+            self.write(" )")?;
+        }
+
+        Ok(())
+    }
+
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    fn visit_json_type_equals(&mut self, left: Expression<'a>, json_type: JsonType) -> visitor::Result {
+        self.write("JSONB_TYPEOF")?;
+        self.write("(")?;
+        self.visit_expression(left)?;
+        self.write(")")?;
+        self.write(" = ")?;
+        match json_type {
+            JsonType::Array => self.visit_expression(Value::text("array").into()),
+            JsonType::Boolean => self.visit_expression(Value::text("boolean").into()),
+            JsonType::Number => self.visit_expression(Value::text("number").into()),
+            JsonType::Object => self.visit_expression(Value::text("object").into()),
+            JsonType::String => self.visit_expression(Value::text("string").into()),
+            JsonType::Null => self.visit_expression(Value::text("null").into()),
+        }
+    }
 }
 
 #[cfg(test)]

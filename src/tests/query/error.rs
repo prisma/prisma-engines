@@ -1,6 +1,5 @@
 use super::*;
 use crate::{
-    ast::*,
     connector::Queryable,
     error::{DatabaseConstraint, ErrorKind, Name},
 };

@@ -278,6 +278,136 @@ impl<'a> Visitor<'a> for Mysql<'a> {
             self.visit_regular_difference_comparison(left, right)
         }
     }
+
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    fn visit_json_extract(&mut self, json_extract: JsonExtract<'a>) -> visitor::Result {
+        if json_extract.extract_as_string {
+            self.write("JSON_UNQUOTE(")?;
+        }
+
+        self.write("JSON_EXTRACT(")?;
+        self.visit_expression(*json_extract.column)?;
+        self.write(", ")?;
+
+        match json_extract.path.clone() {
+            #[cfg(feature = "postgresql")]
+            JsonPath::Array(_) => panic!("JSON path array notation is not supported for MySQL"),
+            JsonPath::String(path) => self.visit_parameterized(Value::text(path))?,
+        }
+
+        self.write(")")?;
+
+        if json_extract.extract_as_string {
+            self.write(")")?;
+        }
+
+        Ok(())
+    }
+
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    fn visit_json_array_contains(&mut self, left: Expression<'a>, right: Expression<'a>, not: bool) -> visitor::Result {
+        self.write("JSON_CONTAINS(")?;
+        self.visit_expression(left)?;
+        self.write(", ")?;
+        self.visit_expression(right)?;
+        self.write(")")?;
+
+        if not {
+            self.write(" = FALSE")?;
+        }
+
+        Ok(())
+    }
+
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    fn visit_json_array_begins_with(
+        &mut self,
+        left: Expression<'a>,
+        right: Expression<'a>,
+        not: bool,
+    ) -> visitor::Result {
+        self.write("JSON_EXTRACT(")?;
+        self.visit_expression(left)?;
+        self.write(", ")?;
+        self.visit_parameterized(Value::text("$[0]"))?;
+        self.write(")")?;
+
+        if not {
+            self.write(" <> ")?;
+        } else {
+            self.write(" = ")?;
+        }
+
+        self.write("CAST(")?;
+        self.visit_expression(right)?;
+        self.write(" AS JSON)")?;
+
+        Ok(())
+    }
+
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    fn visit_json_array_ends_into(
+        &mut self,
+        left: Expression<'a>,
+        right: Expression<'a>,
+        not: bool,
+    ) -> visitor::Result {
+        self.write("JSON_EXTRACT(")?;
+        self.visit_expression(left.clone())?;
+        self.write(", ")?;
+        self.write("CONCAT('$[', ")?;
+        self.write("JSON_LENGTH(")?;
+        self.visit_expression(left)?;
+        self.write(") - 1, ']'))")?;
+
+        if not {
+            self.write(" <> ")?;
+        } else {
+            self.write(" = ")?;
+        }
+
+        self.write("CAST(")?;
+        self.visit_expression(right)?;
+        self.write(" AS JSON)")?;
+
+        Ok(())
+    }
+
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    fn visit_json_type_equals(&mut self, left: Expression<'a>, json_type: JsonType) -> visitor::Result {
+        self.write("(")?;
+        self.write("JSON_TYPE")?;
+        self.surround_with("(", ")", |s| s.visit_expression(left.clone()))?;
+        self.write(" = ")?;
+
+        match json_type {
+            JsonType::Array => {
+                self.visit_expression(Value::text("ARRAY").into())?;
+            }
+            JsonType::Boolean => {
+                self.visit_expression(Value::text("BOOLEAN").into())?;
+            }
+            JsonType::Number => {
+                self.visit_expression(Value::text("INTEGER").into())?;
+                self.write(" OR JSON_TYPE(")?;
+                self.visit_expression(left)?;
+                self.write(")")?;
+                self.write(" = ")?;
+                self.visit_expression(Value::text("DOUBLE").into())?;
+            }
+            JsonType::Object => {
+                self.visit_expression(Value::text("OBJECT").into())?;
+            }
+            JsonType::String => {
+                self.visit_expression(Value::text("STRING").into())?;
+            }
+            JsonType::Null => {
+                self.visit_expression(Value::text("NULL").into())?;
+            }
+        }
+
+        self.write(")")
+    }
 }
 
 #[cfg(test)]

@@ -1,13 +1,13 @@
 use super::Visitor;
-use crate::error::{Error, ErrorKind};
-use crate::prelude::Aliasable;
-use crate::prelude::Query;
+#[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+use crate::prelude::{JsonExtract, JsonType};
 use crate::{
     ast::{
         Column, Comparable, Expression, ExpressionKind, Insert, IntoRaw, Join, JoinData, Joinable, Merge, OnConflict,
         Order, Ordering, Row, Table, TypeDataLength, TypeFamily, Values,
     },
-    prelude::Average,
+    error::{Error, ErrorKind},
+    prelude::{Aliasable, Average, Query},
     visitor, Value,
 };
 use std::{convert::TryFrom, fmt::Write, iter};
@@ -578,6 +578,46 @@ impl<'a> Visitor<'a> for Mssql<'a> {
         })?;
 
         Ok(())
+    }
+
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    fn visit_json_extract(&mut self, _json_extract: JsonExtract<'a>) -> visitor::Result {
+        unimplemented!("JSON filtering is not yet supported on MSSQL")
+    }
+
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    fn visit_json_array_contains(
+        &mut self,
+        _left: Expression<'a>,
+        _right: Expression<'a>,
+        _not: bool,
+    ) -> visitor::Result {
+        unimplemented!("JSON filtering is not yet supported on MSSQL")
+    }
+
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    fn visit_json_array_begins_with(
+        &mut self,
+        _left: Expression<'a>,
+        _right: Expression<'a>,
+        _not: bool,
+    ) -> visitor::Result {
+        unimplemented!("JSON filtering is not yet supported on MSSQL")
+    }
+
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    fn visit_json_array_ends_into(
+        &mut self,
+        _left: Expression<'a>,
+        _right: Expression<'a>,
+        _not: bool,
+    ) -> visitor::Result {
+        unimplemented!("JSON filtering is not yet supported on MSSQL")
+    }
+
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    fn visit_json_type_equals(&mut self, _left: Expression<'a>, _json_type: JsonType) -> visitor::Result {
+        unimplemented!("JSON_TYPE is not yet supported on MSSQL")
     }
 }
 

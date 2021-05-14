@@ -102,6 +102,21 @@ pub trait Visitor<'a> {
     /// Visit a non-parameterized value.
     fn visit_raw_value(&mut self, value: Value<'a>) -> Result;
 
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    fn visit_json_extract(&mut self, json_extract: JsonExtract<'a>) -> Result;
+
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    fn visit_json_array_contains(&mut self, left: Expression<'a>, right: Expression<'a>, not: bool) -> Result;
+
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    fn visit_json_array_begins_with(&mut self, left: Expression<'a>, right: Expression<'a>, not: bool) -> Result;
+
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    fn visit_json_array_ends_into(&mut self, left: Expression<'a>, right: Expression<'a>, not: bool) -> Result;
+
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    fn visit_json_type_equals(&mut self, left: Expression<'a>, json_type: JsonType) -> Result;
+
     /// A visit to a value we parameterize
     fn visit_parameterized(&mut self, value: Value<'a>) -> Result {
         self.add_parameter(value);
@@ -839,6 +854,16 @@ pub trait Visitor<'a> {
                 self.write(" ")?;
                 self.visit_expression(*right)
             }
+            #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+            Compare::JsonCompare(json_compare) => match json_compare {
+                JsonCompare::ArrayContains(left, right) => self.visit_json_array_contains(*left, *right, false),
+                JsonCompare::ArrayNotContains(left, right) => self.visit_json_array_contains(*left, *right, true),
+                JsonCompare::ArrayBeginsWith(left, right) => self.visit_json_array_begins_with(*left, *right, false),
+                JsonCompare::ArrayNotBeginsWith(left, right) => self.visit_json_array_begins_with(*left, *right, true),
+                JsonCompare::ArrayEndsInto(left, right) => self.visit_json_array_ends_into(*left, *right, false),
+                JsonCompare::ArrayNotEndsInto(left, right) => self.visit_json_array_ends_into(*left, *right, true),
+                JsonCompare::TypeEquals(left, json_type) => self.visit_json_type_equals(*left, json_type),
+            },
         }
     }
 
@@ -948,6 +973,10 @@ pub trait Visitor<'a> {
             FunctionType::Maximum(max) => {
                 self.write("MAX")?;
                 self.surround_with("(", ")", |ref mut s| s.visit_column(max.column))?;
+            }
+            #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+            FunctionType::JsonExtract(json_extract) => {
+                self.visit_json_extract(json_extract)?;
             }
         };
 

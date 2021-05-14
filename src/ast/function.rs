@@ -1,6 +1,8 @@
 mod aggregate_to_string;
 mod average;
 mod count;
+#[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+mod json_extract;
 mod lower;
 mod maximum;
 mod minimum;
@@ -13,6 +15,8 @@ mod upper;
 pub use aggregate_to_string::*;
 pub use average::*;
 pub use count::*;
+#[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+pub use json_extract::*;
 pub use lower::*;
 pub use maximum::*;
 pub use minimum::*;
@@ -46,6 +50,8 @@ pub(crate) enum FunctionType<'a> {
     Upper(Upper<'a>),
     Minimum(Minimum<'a>),
     Maximum(Maximum<'a>),
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    JsonExtract(JsonExtract<'a>),
 }
 
 impl<'a> Aliasable<'a> for Function<'a> {
@@ -62,6 +68,9 @@ impl<'a> Aliasable<'a> for Function<'a> {
 
 #[cfg(all(feature = "json", feature = "postgresql"))]
 function!(RowToJson);
+
+#[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+function!(JsonExtract);
 
 function!(
     RowNumber,
