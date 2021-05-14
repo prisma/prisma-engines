@@ -171,6 +171,12 @@ fn extract_scalar_filters(field: &ScalarFieldRef, value: ParsedInputValue) -> Qu
                 .flatten()
                 .collect();
 
+            if json_path.is_some() && filters.is_empty() {
+                return Err(QueryGraphBuilderError::InputError(
+                    "A JSON path cannot be set without a scalar filter.".to_owned(),
+                ));
+            }
+
             let mut filters: Vec<Filter> = match field.type_identifier {
                 TypeIdentifier::Json => filters
                     .into_iter()
@@ -189,6 +195,7 @@ fn extract_scalar_filters(field: &ScalarFieldRef, value: ParsedInputValue) -> Qu
                     .collect(),
                 _ => filters,
             };
+
             filters.iter_mut().for_each(|f| f.set_mode(mode.clone()));
             Ok(filters)
         }

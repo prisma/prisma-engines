@@ -4,6 +4,18 @@ use query_engine_tests::*;
 mod json {
     use query_engine_tests::ConnectorTag;
 
+    #[connector_test]
+    async fn no_path_without_filter(runner: &Runner) -> TestResult<()> {
+        assert_error!(
+            runner,
+            jsonq(runner, json_path(runner), Some("")),
+            2019,
+            "A JSON path cannot be set without a scalar filter."
+        );
+
+        Ok(())
+    }
+
     #[connector_test(only(Postgres))]
     async fn extract_path_psql(runner: &Runner) -> TestResult<()> {
         create_row(runner, 1, r#"{ \"a\": { \"b\": \"c\" } }"#, false).await?;
