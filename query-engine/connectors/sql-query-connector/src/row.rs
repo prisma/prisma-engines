@@ -1,5 +1,5 @@
 use crate::{column_metadata::ColumnMetadata, error::SqlError};
-use bigdecimal::{BigDecimal, FromPrimitive};
+use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 use chrono::{DateTime, NaiveDate, Utc};
 use connector_interface::{coerce_null_to_zero_value, AggregationResult, AggregationSelection};
 use datamodel::FieldArity;
@@ -207,18 +207,9 @@ pub fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Re
             value if value.is_null() => PrismaValue::Null,
             Value::Float(Some(f)) => PrismaValue::Float(FloatValue(f64::from_f32(f).unwrap())),
             Value::Double(Some(f)) => PrismaValue::Float(FloatValue(f)),
-            Value::Integer(Some(i)) => match BigDecimal::from_i64(i) {
-                Some(dec) => PrismaValue::Decimal(dec),
-                None => return Err(create_error(&p_value)),
-            },
-            Value::Text(_) | Value::Bytes(_) => {
-                let dec: BigDecimal = p_value
-                    .as_str()
-                    .expect("text/bytes as str")
-                    .parse()
-                    .map_err(|_| create_error(&p_value))?;
-
-                PrismaValue::Decimal(dec.normalized())
+            Value::Integer(Some(i)) => {
+                let as_compat_int = i32::try_from(i).map_err(|_| create_error(&p_value))?;
+                PrismaValue::Float(FloatValue(f64::from(as_compat_int)))
             }
             _ => return Err(create_error(&p_value)),
         },
@@ -243,6 +234,13 @@ pub fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Re
         TypeIdentifier::Int | TypeIdentifier::BigInt => match p_value {
             Value::Integer(Some(i)) => PrismaValue::Int(i),
             Value::Bytes(Some(bytes)) => PrismaValue::Int(interpret_bytes_as_i64(&bytes)),
+            Value::Numeric(Some(ref numeric)) => {
+                // Here for cases where DB operations returns a larger type than int, like aggregations.
+                match numeric.to_i64() {
+                    Some(i) => PrismaValue::BigInt(i),
+                    None => return Err(create_error(&p_value)),
+                }
+            }
             Value::Text(Some(ref txt)) => {
                 PrismaValue::Int(i64::from_str(txt.trim_start_matches('\0')).map_err(|_| create_error(&p_value))?)
             }

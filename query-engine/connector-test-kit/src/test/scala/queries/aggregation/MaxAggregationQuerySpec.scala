@@ -10,7 +10,6 @@ class MaxAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       |  id    String @id @default(cuid())
       |  float Float
       |  int   Int
-      |  dec   Decimal
       |  bInt  BigInt
       |  s     String
       |}
@@ -22,7 +21,7 @@ class MaxAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     database.setup(project)
   }
 
-  def createItem(float: Double, int: Int, dec: String, bInt: String, s: String, id: Option[String] = None) = {
+  def createItem(float: Double, int: Int, bInt: String, s: String, id: Option[String] = None) = {
     val idString = id match {
       case Some(i) => s"""id: "$i","""
       case None    => ""
@@ -30,7 +29,7 @@ class MaxAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
 
     server.query(
       s"""mutation {
-         |  createItem(data: { $idString float: $float, int: $int, dec: "$dec", bInt: $bInt, s: "$s" }) {
+         |  createItem(data: { $idString float: $float, int: $int, bInt: $bInt, s: "$s" }) {
          |    id
          |  }
          |}""".stripMargin,
@@ -45,7 +44,6 @@ class MaxAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
          |    max {
          |      float
          |      int
-         |      dec
          |      bInt
          |      s
          |    }
@@ -55,8 +53,6 @@ class MaxAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     result.pathAsJsValue("data.aggregateItem.max.float") should be(JsNull)
-    result.pathAsJsValue("data.aggregateItem.max.dec") should be(JsNull)
-
     result.pathAsJsValue("data.aggregateItem.max.int") should be(JsNull)
     result.pathAsJsValue("data.aggregateItem.max.bInt") should be(JsNull)
 
@@ -64,8 +60,8 @@ class MaxAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "Calculating max with some records in the database" should "return the correct maxima" in {
-    createItem(5.5, 5, "5.5", "5", "a")
-    createItem(4.5, 10, "4.5", "10", "b")
+    createItem(5.5, 5, "5", "a")
+    createItem(4.5, 10, "10", "b")
 
     val result = server.query(
       s"""{
@@ -73,7 +69,6 @@ class MaxAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
          |    max {
          |      float
          |      int
-         |      dec
          |      bInt
          |      s
          |    }
@@ -83,19 +78,16 @@ class MaxAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     result.pathAsDouble("data.aggregateItem.max.float") should be(5.5)
-    result.pathAsString("data.aggregateItem.max.dec") should be("5.5")
-
     result.pathAsDouble("data.aggregateItem.max.int") should be(10)
     result.pathAsString("data.aggregateItem.max.bInt") should be("10")
-
     result.pathAsString("data.aggregateItem.max.s") should be("b")
   }
 
   "Calculating max with all sorts of query arguments" should "work" in {
-    createItem(5.5, 5, "5.5", "5", "2", Some("1"))
-    createItem(4.5, 10, "4.5", "10", "f", Some("2"))
-    createItem(1.5, 2, "1.5", "2", "z", Some("3"))
-    createItem(0.0, 1, "0.0", "1", "g", Some("4"))
+    createItem(5.5, 5, "5", "2", Some("1"))
+    createItem(4.5, 10, "10", "f", Some("2"))
+    createItem(1.5, 2, "2", "z", Some("3"))
+    createItem(0.0, 1, "1", "g", Some("4"))
 
     var result = server.query(
       """{
@@ -103,7 +95,6 @@ class MaxAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
         |    max {
         |      float
         |      int
-        |      dec
         |      bInt
         |      s
         |    }
@@ -114,11 +105,8 @@ class MaxAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     result.pathAsDouble("data.aggregateItem.max.float") should be(5.5)
-    result.pathAsString("data.aggregateItem.max.dec") should be("5.5")
-
     result.pathAsInt("data.aggregateItem.max.int") should be(10)
     result.pathAsString("data.aggregateItem.max.bInt") should be("10")
-
     result.pathAsString("data.aggregateItem.max.s") should be("f")
 
     result = server.query(
@@ -127,7 +115,6 @@ class MaxAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
         |    max {
         |      float
         |      int
-        |      dec
         |      bInt
         |      s
         |    }
@@ -138,11 +125,8 @@ class MaxAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     result.pathAsDouble("data.aggregateItem.max.float") should be(5.5)
-    result.pathAsString("data.aggregateItem.max.dec") should be("5.5")
-
     result.pathAsInt("data.aggregateItem.max.int") should be(10)
     result.pathAsString("data.aggregateItem.max.bInt") should be("10")
-
     result.pathAsString("data.aggregateItem.max.s") should be("z")
 
     result = server.query(
@@ -151,7 +135,6 @@ class MaxAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
         |    max {
         |      float
         |      int
-        |      dec
         |      bInt
         |      s
         |    }
@@ -162,11 +145,8 @@ class MaxAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     result.pathAsDouble("data.aggregateItem.max.float") should be(5.5)
-    result.pathAsString("data.aggregateItem.max.dec") should be("5.5")
-
     result.pathAsInt("data.aggregateItem.max.int") should be(10)
     result.pathAsString("data.aggregateItem.max.bInt") should be("10")
-
     result.pathAsString("data.aggregateItem.max.s") should be("z")
 
     result = server.query(
@@ -175,7 +155,6 @@ class MaxAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
         |    max {
         |      float
         |      int
-        |      dec
         |      bInt
         |      s
         |    }
@@ -186,11 +165,8 @@ class MaxAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     result.pathAsDouble("data.aggregateItem.max.float") should be(1.5)
-    result.pathAsString("data.aggregateItem.max.dec") should be("1.5")
-
     result.pathAsInt("data.aggregateItem.max.int") should be(2)
     result.pathAsString("data.aggregateItem.max.bInt") should be("2")
-
     result.pathAsString("data.aggregateItem.max.s") should be("z")
 
     result = server.query(
@@ -199,7 +175,6 @@ class MaxAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
         |    max {
         |      float
         |      int
-        |      dec
         |      bInt
         |    }
         |  }
@@ -209,8 +184,6 @@ class MaxAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     result.pathAsDouble("data.aggregateItem.max.float") should be(1.5)
-    result.pathAsString("data.aggregateItem.max.dec") should be("1.5")
-
     result.pathAsInt("data.aggregateItem.max.int") should be(2)
     result.pathAsString("data.aggregateItem.max.bInt") should be("2")
 
@@ -220,7 +193,6 @@ class MaxAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
         |    max {
         |      float
         |      int
-        |      dec
         |      bInt
         |      s
         |    }
@@ -231,11 +203,8 @@ class MaxAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     result.pathAsDouble("data.aggregateItem.max.float") should be(1.5)
-    result.pathAsString("data.aggregateItem.max.dec") should be("1.5")
-
     result.pathAsInt("data.aggregateItem.max.int") should be(2)
     result.pathAsString("data.aggregateItem.max.bInt") should be("2")
-
     result.pathAsString("data.aggregateItem.max.s") should be("z")
   }
 }

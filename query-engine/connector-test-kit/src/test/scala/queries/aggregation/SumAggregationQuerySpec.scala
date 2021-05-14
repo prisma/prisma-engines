@@ -10,7 +10,6 @@ class SumAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       |  id    String @id @default(cuid())
       |  float Float
       |  int   Int
-      |  dec   Decimal
       |  bInt  BigInt
       |}
     """.stripMargin
@@ -21,7 +20,7 @@ class SumAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     database.setup(project)
   }
 
-  def createItem(float: Double, int: Int, dec: String, bInt: String, id: Option[String] = None) = {
+  def createItem(float: Double, int: Int, bInt: String, id: Option[String] = None) = {
     val idString = id match {
       case Some(i) => s"""id: "$i","""
       case None    => ""
@@ -29,7 +28,7 @@ class SumAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
 
     server.query(
       s"""mutation {
-         |  createItem(data: { $idString float: $float, int: $int, dec: $dec, bInt: $bInt }) {
+         |  createItem(data: { $idString float: $float, int: $int, bInt: $bInt }) {
          |    id
          |  }
          |}""".stripMargin,
@@ -44,7 +43,6 @@ class SumAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
          |    sum {
          |      float
          |      int
-         |      dec
          |      bInt
          |    }
          |  }
@@ -53,15 +51,13 @@ class SumAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     result.pathAsJsValue("data.aggregateItem.sum.float") should be(JsNull)
-    result.pathAsJsValue("data.aggregateItem.sum.dec") should be(JsNull)
-
     result.pathAsJsValue("data.aggregateItem.sum.int") should be(JsNull)
     result.pathAsJsValue("data.aggregateItem.sum.bInt") should be(JsNull)
   }
 
   "Summing with some records in the database" should "return the correct sum" in {
-    createItem(5.5, 5, "5.5", "5")
-    createItem(4.5, 10, "4.5", "10")
+    createItem(5.5, 5, "5")
+    createItem(4.5, 10, "10")
 
     val result = server.query(
       s"""{
@@ -69,7 +65,6 @@ class SumAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
          |    sum {
          |      float
          |      int
-         |      dec
          |      bInt
          |    }
          |  }
@@ -78,17 +73,15 @@ class SumAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     result.pathAsDouble("data.aggregateItem.sum.float") should be(10.0)
-    result.pathAsString("data.aggregateItem.sum.dec") should be("10")
-
     result.pathAsInt("data.aggregateItem.sum.int") should be(15)
     result.pathAsString("data.aggregateItem.sum.bInt") should be("15")
   }
 
   "Summing with all sorts of query arguments" should "work" in {
-    createItem(5.5, 5, "5.5", "5", Some("1"))
-    createItem(4.5, 10, "4.5", "10", Some("2"))
-    createItem(1.5, 2, "1.5", "2", Some("3"))
-    createItem(0.0, 1, "0", "1", Some("4"))
+    createItem(5.5, 5, "5", Some("1"))
+    createItem(4.5, 10, "10", Some("2"))
+    createItem(1.5, 2, "2", Some("3"))
+    createItem(0.0, 1, "1", Some("4"))
 
     var result = server.query(
       """{
@@ -96,7 +89,6 @@ class SumAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
         |    sum {
         |      float
         |      int
-        |      dec
         |      bInt
         |    }
         |  }
@@ -106,8 +98,6 @@ class SumAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     result.pathAsDouble("data.aggregateItem.sum.float") should be(10.0)
-    result.pathAsString("data.aggregateItem.sum.dec") should be("10")
-
     result.pathAsInt("data.aggregateItem.sum.int") should be(15)
     result.pathAsString("data.aggregateItem.sum.bInt") should be("15")
 
@@ -117,7 +107,6 @@ class SumAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
         |    sum {
         |      float
         |      int
-        |      dec
         |      bInt
         |    }
         |  }
@@ -127,8 +116,6 @@ class SumAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     result.pathAsDouble("data.aggregateItem.sum.float") should be(11.5)
-    result.pathAsString("data.aggregateItem.sum.dec") should be("11.5")
-
     result.pathAsInt("data.aggregateItem.sum.int") should be(18)
     result.pathAsString("data.aggregateItem.sum.bInt") should be("18")
 
@@ -138,7 +125,6 @@ class SumAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
         |    sum {
         |      float
         |      int
-        |      dec
         |      bInt
         |    }
         |  }
@@ -148,8 +134,6 @@ class SumAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     result.pathAsDouble("data.aggregateItem.sum.float") should be(11.5)
-    result.pathAsString("data.aggregateItem.sum.dec") should be("11.5")
-
     result.pathAsInt("data.aggregateItem.sum.int") should be(18)
     result.pathAsString("data.aggregateItem.sum.bInt") should be("18")
 
@@ -159,7 +143,6 @@ class SumAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
         |    sum {
         |      float
         |      int
-        |      dec
         |      bInt
         |    }
         |  }
@@ -169,8 +152,6 @@ class SumAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     result.pathAsDouble("data.aggregateItem.sum.float") should be(1.5)
-    result.pathAsString("data.aggregateItem.sum.dec") should be("1.5")
-
     result.pathAsInt("data.aggregateItem.sum.int") should be(3)
     result.pathAsString("data.aggregateItem.sum.bInt") should be("3")
 
@@ -180,7 +161,6 @@ class SumAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
         |    sum {
         |      float
         |      int
-        |      dec
         |      bInt
         |    }
         |  }
@@ -190,8 +170,6 @@ class SumAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     result.pathAsDouble("data.aggregateItem.sum.float") should be(1.5)
-    result.pathAsString("data.aggregateItem.sum.dec") should be("1.5")
-
     result.pathAsInt("data.aggregateItem.sum.int") should be(3)
     result.pathAsString("data.aggregateItem.sum.bInt") should be("3")
 
@@ -201,7 +179,6 @@ class SumAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
         |    sum {
         |      float
         |      int
-        |      dec
         |      bInt
         |    }
         |  }
@@ -211,8 +188,6 @@ class SumAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     result.pathAsDouble("data.aggregateItem.sum.float") should be(1.5)
-    result.pathAsString("data.aggregateItem.sum.dec") should be("1.5")
-
     result.pathAsInt("data.aggregateItem.sum.int") should be(3)
     result.pathAsString("data.aggregateItem.sum.bInt") should be("3")
   }

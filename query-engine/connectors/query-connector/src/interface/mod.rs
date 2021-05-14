@@ -1,4 +1,6 @@
 mod dispatch;
+use std::convert::identity;
+
 use crate::{coerce_null_to_zero_value, Filter, QueryArguments, WriteArgs};
 use async_trait::async_trait;
 pub use dispatch::*;
@@ -118,7 +120,7 @@ impl AggregationSelection {
             )],
 
             AggregationSelection::Count { all, fields } => {
-                let mut mapped = Self::map_field_types(&fields, Some(TypeIdentifier::Int));
+                let mut mapped = Self::map_field_types(&fields, |_| TypeIdentifier::Int);
 
                 if *all {
                     mapped.push(("all".to_owned(), TypeIdentifier::Int, FieldArity::Required));
@@ -127,23 +129,33 @@ impl AggregationSelection {
                 mapped
             }
 
-            AggregationSelection::Average(fields) => Self::map_field_types(&fields, Some(TypeIdentifier::Float)),
-            AggregationSelection::Sum(fields) => Self::map_field_types(&fields, None),
-            AggregationSelection::Min(fields) => Self::map_field_types(&fields, None),
-            AggregationSelection::Max(fields) => Self::map_field_types(&fields, None),
+            AggregationSelection::Average(fields) => Self::map_field_types(&fields, Self::avg_fixed_type),
+            AggregationSelection::Sum(fields) => Self::map_field_types(&fields, identity),
+            AggregationSelection::Min(fields) => Self::map_field_types(&fields, identity),
+            AggregationSelection::Max(fields) => Self::map_field_types(&fields, identity),
         }
     }
 
-    fn map_field_types(
+    fn avg_fixed_type(ident: TypeIdentifier) -> TypeIdentifier {
+        match ident {
+            TypeIdentifier::Decimal => TypeIdentifier::Decimal,
+            _ => TypeIdentifier::Float,
+        }
+    }
+
+    fn map_field_types<F>(
         fields: &[ScalarFieldRef],
-        fixed_type: Option<TypeIdentifier>,
-    ) -> Vec<(String, TypeIdentifier, FieldArity)> {
+        type_ident_transform: F,
+    ) -> Vec<(String, TypeIdentifier, FieldArity)>
+    where
+        F: Fn(TypeIdentifier) -> TypeIdentifier,
+    {
         fields
             .iter()
             .map(|f| {
                 (
                     f.db_name().to_owned(),
-                    fixed_type.clone().unwrap_or_else(|| f.type_identifier.clone()),
+                    type_ident_transform(f.type_identifier.clone()),
                     FieldArity::Required,
                 )
             })
