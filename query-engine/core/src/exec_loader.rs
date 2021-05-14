@@ -4,8 +4,6 @@ use crate::{
 };
 use connection_string::JdbcString;
 use connector::Connector;
-use std::str::FromStr;
-
 use datamodel::{
     common::{
         preview_features::PreviewFeature,
@@ -13,9 +11,12 @@ use datamodel::{
     },
     Datasource,
 };
+use enumflags2::BitFlags;
 use std::collections::HashMap;
+use std::str::FromStr;
 use url::Url;
 
+use connector::SourceParameter;
 use sql_connector::*;
 
 #[cfg(feature = "mongodb")]
@@ -30,11 +31,12 @@ pub async fn load(
     source: &Datasource,
     features: &[PreviewFeature],
     url: &str,
+    flags: BitFlags<SourceParameter>,
 ) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
     match source.active_provider.as_str() {
-        SQLITE_SOURCE_NAME => sqlite(source, url).await,
-        MYSQL_SOURCE_NAME => mysql(source, url).await,
-        POSTGRES_SOURCE_NAME => postgres(source, url).await,
+        SQLITE_SOURCE_NAME => sqlite(source, url, flags).await,
+        MYSQL_SOURCE_NAME => mysql(source, url, flags).await,
+        POSTGRES_SOURCE_NAME => postgres(source, url, flags).await,
 
         MSSQL_SOURCE_NAME => {
             if !features.contains(&PreviewFeature::MicrosoftSqlServer) {
@@ -45,7 +47,7 @@ pub async fn load(
                 return Err(error);
             }
 
-            mssql(source, url).await
+            mssql(source, url, flags).await
         }
 
         #[cfg(feature = "mongodb")]
@@ -68,21 +70,29 @@ pub async fn load(
     }
 }
 
-async fn sqlite(source: &Datasource, url: &str) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
+async fn sqlite(
+    source: &Datasource,
+    url: &str,
+    flags: BitFlags<SourceParameter>,
+) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
     trace!("Loading SQLite query connector...");
 
-    let sqlite = Sqlite::from_source(source, url).await?;
+    let sqlite = Sqlite::from_source(source, url, flags).await?;
     let db_name = DEFAULT_SQLITE_DB_NAME.to_owned();
 
     trace!("Loaded SQLite query connector.");
     Ok((db_name, sql_executor(sqlite, false)))
 }
 
-async fn postgres(source: &Datasource, url: &str) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
+async fn postgres(
+    source: &Datasource,
+    url: &str,
+    flags: BitFlags<SourceParameter>,
+) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
     trace!("Loading Postgres query connector...");
 
     let database_str = url;
-    let psql = PostgreSql::from_source(source, url).await?;
+    let psql = PostgreSql::from_source(source, url, flags).await?;
 
     let url = Url::parse(database_str)?;
     let params: HashMap<String, String> = url.query_pairs().into_owned().collect();
@@ -101,10 +111,14 @@ async fn postgres(source: &Datasource, url: &str) -> crate::Result<(String, Box<
     Ok((db_name, sql_executor(psql, force_transactions)))
 }
 
-async fn mysql(source: &Datasource, url: &str) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
+async fn mysql(
+    source: &Datasource,
+    url: &str,
+    flags: BitFlags<SourceParameter>,
+) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
     trace!("Loading MySQL query connector...");
 
-    let mysql = Mysql::from_source(source, url).await?;
+    let mysql = Mysql::from_source(source, url, flags).await?;
 
     let url = Url::parse(url)?;
     let err_str = "No database found in connection string";
@@ -119,10 +133,14 @@ async fn mysql(source: &Datasource, url: &str) -> crate::Result<(String, Box<dyn
     Ok((db_name, sql_executor(mysql, false)))
 }
 
-async fn mssql(source: &Datasource, url: &str) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
+async fn mssql(
+    source: &Datasource,
+    url: &str,
+    flags: BitFlags<SourceParameter>,
+) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
     trace!("Loading SQL Server query connector...");
 
-    let mssql = Mssql::from_source(source, url).await?;
+    let mssql = Mssql::from_source(source, url, flags).await?;
 
     let mut conn = JdbcString::from_str(&format!("jdbc:{}", url))?;
     let db_name = conn

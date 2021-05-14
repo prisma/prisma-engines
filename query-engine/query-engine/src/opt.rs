@@ -70,6 +70,10 @@ pub struct PrismaOpt {
     #[structopt(long, short)]
     pub legacy: bool,
 
+    /// Enable query logging [env: LOG_QUERIES=y]
+    #[structopt(long, short = "o")]
+    pub log_queries: bool,
+
     /// Enables raw SQL queries with executeRaw/queryRaw mutation
     #[structopt(long, short = "r")]
     pub enable_raw_queries: bool,
@@ -87,7 +91,7 @@ pub struct PrismaOpt {
     pub log_format: Option<String>,
 
     /// Enable OpenTelemetry streaming from requests.
-    #[structopt(long)]
+    #[structopt(long, short = "t")]
     pub open_telemetry: bool,
 
     /// The url to the OpenTelemetry collector.
@@ -117,6 +121,13 @@ impl PrismaOpt {
             })?;
 
         Ok(res)
+    }
+
+    pub fn log_queries(&self) -> bool {
+        match std::env::var("LOG_QUERIES") {
+            Ok(_) => true,
+            _ => self.log_queries,
+        }
     }
 
     pub fn datamodel(&self) -> PrismaResult<Datamodel> {

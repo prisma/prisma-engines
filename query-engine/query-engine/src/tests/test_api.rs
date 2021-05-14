@@ -72,6 +72,7 @@ impl TestApi {
 
         let context = PrismaContext::builder(config.subject, dml)
             .enable_raw_queries(true)
+            .log_queries(true)
             .build()
             .await
             .unwrap();
