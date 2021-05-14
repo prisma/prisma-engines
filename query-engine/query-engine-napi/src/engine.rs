@@ -6,10 +6,7 @@ use opentelemetry::global;
 use prisma_models::DatamodelConverter;
 use query_connector::SourceParameter;
 use query_core::{exec_loader, schema_builder, BuildMode, QueryExecutor, QuerySchema, QuerySchemaRenderer};
-use request_handlers::{
-    dmmf::{self, DataModelMetaFormat},
-    GraphQLSchemaRenderer, GraphQlBody, GraphQlHandler, PrismaResponse,
-};
+use request_handlers::{GraphQLSchemaRenderer, GraphQlBody, GraphQlHandler, PrismaResponse};
 use serde::{Deserialize, Deserializer, Serialize};
 use std::{
     collections::{BTreeMap, HashMap},
@@ -298,18 +295,6 @@ impl QueryEngine {
     pub async fn sdl_schema(&self) -> crate::Result<String> {
         match *self.inner.read().await {
             Inner::Connected(ref engine) => Ok(GraphQLSchemaRenderer::render(engine.query_schema().clone())),
-            Inner::Builder(_) => Err(ApiError::NotConnected),
-        }
-    }
-
-    /// Loads the DMMF. Only available when connected.
-    pub async fn dmmf(&self) -> crate::Result<DataModelMetaFormat> {
-        match *self.inner.read().await {
-            Inner::Connected(ref engine) => {
-                let dmmf = dmmf::render_dmmf(&engine.datamodel.ast, engine.query_schema().clone());
-
-                Ok(dmmf)
-            }
             Inner::Builder(_) => Err(ApiError::NotConnected),
         }
     }

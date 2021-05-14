@@ -3521,6 +3521,7 @@ version = "0.1.0"
 dependencies = [
  "connection-string",
  "datamodel",
+ "datamodel-connector",
  "enumflags2",
  "napi",
  "napi-build",
