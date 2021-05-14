@@ -1,8 +1,10 @@
 use crate::{error::ApiError, logger::ChannelLogger};
 use datamodel::{diagnostics::ValidatedConfiguration, Datamodel};
+use enumflags2::BitFlags;
 use napi::threadsafe_function::ThreadsafeFunction;
 use opentelemetry::global;
 use prisma_models::DatamodelConverter;
+use query_connector::SourceParameter;
 use query_core::{exec_loader, schema_builder, BuildMode, QueryExecutor, QuerySchema, QuerySchemaRenderer};
 use request_handlers::{
     dmmf::{self, DataModelMetaFormat},
@@ -49,6 +51,7 @@ pub struct EngineBuilder {
     config: ValidatedConfiguration,
     logger: ChannelLogger,
     config_dir: PathBuf,
+    source_parameters: BitFlags<SourceParameter>,
 }
 
 /// Internal structure for querying and reconnecting with the engine.
@@ -58,6 +61,7 @@ pub struct ConnectedEngine {
     executor: crate::Executor,
     logger: ChannelLogger,
     config_dir: PathBuf,
+    source_parameters: BitFlags<SourceParameter>,
 }
 
 /// Returned from the `serverInfo` method in javascript.
@@ -88,6 +92,8 @@ pub struct ConstructorOptions {
     datamodel: String,
     #[serde(deserialize_with = "deserialize_log_level")]
     log_level: LevelFilter,
+    #[serde(default)]
+    log_queries: bool,
     #[serde(default)]
     datasource_overrides: BTreeMap<String, String>,
     #[serde(default)]
@@ -120,6 +126,7 @@ impl QueryEngine {
         let ConstructorOptions {
             datamodel,
             log_level,
+            log_queries,
             datasource_overrides,
             telemetry,
             config_dir,
@@ -158,11 +165,18 @@ impl QueryEngine {
             ChannelLogger::new(log_level, log_callback)
         };
 
+        let mut source_parameters = BitFlags::empty();
+
+        if log_queries {
+            source_parameters.insert(SourceParameter::QueryLogging);
+        }
+
         let builder = EngineBuilder {
             datamodel,
             config,
             logger,
             config_dir,
+            source_parameters,
         };
 
         Ok(Self {
@@ -195,7 +209,9 @@ impl QueryEngine {
                             .load_url_with_config_dir(&builder.config_dir)
                             .map_err(|err| crate::error::ApiError::Conversion(err, builder.datamodel.raw.clone()))?;
 
-                        let (db_name, executor) = exec_loader::load(&data_source, &preview_features, &url).await?;
+                        let (db_name, executor) =
+                            exec_loader::load(&data_source, &preview_features, &url, builder.source_parameters).await?;
+
                         let connector = executor.primary_connector();
                         connector.get_connection().await?;
 
@@ -216,6 +232,7 @@ impl QueryEngine {
                             logger: builder.logger.clone(),
                             executor,
                             config_dir: builder.config_dir.clone(),
+                            source_parameters: builder.source_parameters,
                         })
                     })
                     .await?;
@@ -242,6 +259,7 @@ impl QueryEngine {
                     logger: engine.logger.clone(),
                     config,
                     config_dir: engine.config_dir.clone(),
+                    source_parameters: engine.source_parameters,
                 };
 
                 *inner = Inner::Builder(builder);

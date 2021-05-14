@@ -136,8 +136,10 @@ impl CliCommand {
         let cx = PrismaContext::builder(request.config, request.datamodel)
             .legacy(request.legacy)
             .enable_raw_queries(request.enable_raw_queries)
+            .log_queries(true)
             .build()
             .await?;
+
         let cx = Arc::new(cx);
 
         let handler = GraphQlHandler::new(&*cx.executor, cx.query_schema());
