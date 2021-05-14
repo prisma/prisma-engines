@@ -1,6 +1,9 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(schemas::json))]
+#[test_suite(
+    schema(schemas::json),
+    capabilities(JsonFilteringJsonPath, JsonFilteringArrayPath)
+)]
 mod json {
     use query_engine_tests::ConnectorTag;
 
@@ -16,8 +19,8 @@ mod json {
         Ok(())
     }
 
-    #[connector_test(only(Postgres))]
-    async fn extract_path_psql(runner: &Runner) -> TestResult<()> {
+    #[connector_test(capabilities(JsonFilteringArrayPath))]
+    async fn extract_array_path(runner: &Runner) -> TestResult<()> {
         create_row(runner, 1, r#"{ \"a\": { \"b\": \"c\" } }"#, false).await?;
         create_row(runner, 2, r#"{ \"a\": { \"b\": [1, 2, 3] } }"#, false).await?;
 
@@ -40,8 +43,8 @@ mod json {
         Ok(())
     }
 
-    #[connector_test(only(MySql))]
-    async fn extract_path_mysql(runner: &Runner) -> TestResult<()> {
+    #[connector_test(capabilities(JsonFilteringJsonPath))]
+    async fn extract_json_path(runner: &Runner) -> TestResult<()> {
         create_row(runner, 1, r#"{ \"a\": { \"b\": \"c\" } }"#, false).await?;
         create_row(runner, 2, r#"{ \"a\": { \"b\": [1, 2, 3] } }"#, false).await?;
 
