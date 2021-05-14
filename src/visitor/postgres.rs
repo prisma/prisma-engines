@@ -269,6 +269,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
             #[cfg(feature = "mysql")]
             JsonPath::String(_) => panic!("JSON path string notation is not supported for Postgres"),
             JsonPath::Array(json_path) => {
+                self.write("(")?;
                 self.visit_expression(*json_extract.column)?;
 
                 if json_extract.extract_as_string {
@@ -289,7 +290,8 @@ impl<'a> Visitor<'a> for Postgres<'a> {
                         }
                     }
                     Ok(())
-                })
+                })?;
+                self.write(")")
             }
         }
     }

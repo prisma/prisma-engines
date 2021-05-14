@@ -2016,6 +2016,12 @@ async fn json_extract_array_path_fun(api: &mut dyn TestApi) -> crate::Result<()>
     let row = api.conn().select(select).await?.into_single()?;
     assert_eq!(Some(&serde_json::json!({ "a": { "b": "c" } })), row["obj"].as_json());
 
+    // Test equality with Json value
+    let extract: Expression = json_extract(col!("obj"), JsonPath::array(["a", "b"]), false).into();
+    let select = Select::from_table(&table).so_that(extract.equals(serde_json::Value::String("c".to_owned())));
+    let row = api.conn().select(select).await?.into_single()?;
+    assert_eq!(Some(&serde_json::json!({ "a": { "b": "c" } })), row["obj"].as_json());
+
     // Test array index extraction
     let extract: Expression = json_extract(col!("obj"), JsonPath::array(["a", "b", "1"]), false).into();
     let select = Select::from_table(&table).so_that(extract.equals("2"));
