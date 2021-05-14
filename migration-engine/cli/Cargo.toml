@@ -28,7 +28,10 @@ test-setup = { path = "../../libs/test-setup" }
 test-macros = { path = "../../libs/test-macros" }
 enumflags2 = "*"
 url = "2.1.1"
-quaint = { git = "https://github.com/prisma/quaint" }
+
+[dev-dependencies.quaint]
+git = "https://github.com/prisma/quaint"
+branch = "log-queries-param"
 
 [features]
 default = ["sql"]

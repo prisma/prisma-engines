@@ -3390,7 +3390,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.13"
-source = "git+https://github.com/prisma/quaint#7d3e8d6a93bcf44546f2e46d8026bd7c98c8a13e"
+source = "git+https://github.com/prisma/quaint?branch=log-queries-param#99c6f5ed9cb9c7efd76cfbfdcda90e0279a3b8ff"
 dependencies = [
  "async-trait",
  "base64 0.12.3",
@@ -3411,7 +3411,6 @@ dependencies = [
  "native-tls",
  "num-bigint",
  "num_cpus",
- "once_cell",
  "percent-encoding 2.1.0",
  "postgres-native-tls",
  "postgres-types",

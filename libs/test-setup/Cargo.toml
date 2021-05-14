@@ -19,6 +19,7 @@ url = "2.1.1"
 [dependencies.quaint]
 git = "https://github.com/prisma/quaint"
 optional = true
+branch = "log-queries-param"
 features = [
     "postgresql",
     "mysql",

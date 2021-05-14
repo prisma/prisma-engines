@@ -33,6 +33,7 @@ branch = "mssql-support"
 
 [dependencies.quaint]
 git = "https://github.com/prisma/quaint"
+branch = "log-queries-param"
 features = [
     "postgresql",
     "mysql",
