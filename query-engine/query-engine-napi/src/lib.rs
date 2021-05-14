@@ -1,3 +1,4 @@
+use datamodel_connector::ConnectorCapabilities;
 use engine::{ConstructorOptions, QueryEngine};
 use error::ApiError;
 use napi::{
@@ -5,8 +6,10 @@ use napi::{
     Property,
 };
 use napi_derive::{js_function, module_exports};
-use query_core::QueryExecutor;
-use std::collections::BTreeMap;
+use prisma_models::DatamodelConverter;
+use query_core::{schema_builder, BuildMode, QueryExecutor, QuerySchemaRef};
+use request_handlers::dmmf;
+use std::{collections::BTreeMap, sync::Arc};
 
 mod engine;
 mod error;
@@ -109,16 +112,44 @@ fn version(ctx: CallContext) -> napi::Result<JsUnknown> {
     ctx.env.to_js_value(&version)
 }
 
-#[js_function(0)]
-fn dmmf(ctx: CallContext) -> napi::Result<JsObject> {
-    let this: JsObject = ctx.this_unchecked();
-    let engine: &QueryEngine = ctx.env.unwrap(&this)?;
-    let engine: QueryEngine = engine.clone();
+#[js_function(1)]
+fn dmmf(ctx: CallContext) -> napi::Result<JsUnknown> {
+    #[derive(serde::Deserialize)]
+    #[serde(rename_all = "camelCase")]
+    struct GetConfigOptions {
+        datamodel: String,
+        #[serde(default)]
+        enable_raw_queries: bool,
+    }
 
-    ctx.env
-        .execute_tokio_future(async move { Ok(engine.dmmf().await?) }, |&mut env, dmmf| {
-            env.create_string(&serde_json::to_string(&dmmf).unwrap())
-        })
+    let options = ctx.get::<JsUnknown>(0)?;
+    let options: GetConfigOptions = ctx.env.from_js_value(options)?;
+
+    let GetConfigOptions {
+        datamodel,
+        enable_raw_queries,
+    } = options;
+
+    let template = DatamodelConverter::convert_string(datamodel.clone());
+    let config =
+        datamodel::parse_configuration(&datamodel).map_err(|errors| ApiError::conversion(errors, &datamodel))?;
+    let capabilities = match config.subject.datasources.first() {
+        Some(datasource) => datasource.capabilities(),
+        None => ConnectorCapabilities::empty(),
+    };
+    // temporary code duplication
+    let internal_data_model = template.build("".into());
+    let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(
+        internal_data_model,
+        BuildMode::Modern,
+        enable_raw_queries,
+        capabilities,
+        config.subject.preview_features().cloned().collect(),
+    ));
+    let dm = datamodel::parse_datamodel(datamodel.as_str()).unwrap();
+    let dmmf = dmmf::render_dmmf(&dm.subject, query_schema);
+    let serialized = serde_json::to_string_pretty(&dmmf)?;
+    ctx.env.to_js_value(&serialized)
 }
 
 #[js_function(1)]
@@ -172,13 +203,13 @@ pub fn init(mut exports: JsObject, env: Env) -> napi::Result<()> {
             Property::new(&env, "disconnect")?.with_method(disconnect),
             Property::new(&env, "query")?.with_method(query),
             Property::new(&env, "sdlSchema")?.with_method(sdl_schema),
-            Property::new(&env, "dmmf")?.with_method(dmmf),
         ],
     )?;
 
     exports.set_named_property("QueryEngine", query_engine)?;
     exports.create_named_method("version", version)?;
     exports.create_named_method("getConfig", get_config)?;
+    exports.create_named_method("dmmf", dmmf)?;
 
     Ok(())
 }
