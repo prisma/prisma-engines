@@ -1,9 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(
-    schema(schemas::json),
-    capabilities(JsonFilteringJsonPath, JsonFilteringArrayPath)
-)]
+#[test_suite(schema(schemas::json), capabilities(JsonFilteringJsonPath, JsonFilteringArrayPath))]
 mod json {
     use query_engine_tests::ConnectorTag;
 
