@@ -974,6 +974,20 @@ pub trait Visitor<'a> {
                 self.write("MAX")?;
                 self.surround_with("(", ")", |ref mut s| s.visit_column(max.column))?;
             }
+            FunctionType::Coalesce(coalesce) => {
+                self.write("COALESCE")?;
+                self.surround_with("(", ")", |s| {
+                    let len = coalesce.exprs.len();
+                    for (index, expr) in coalesce.exprs.into_iter().enumerate() {
+                        s.visit_expression(expr)?;
+                        if index < len - 1 {
+                            s.write(", ")?;
+                        }
+                    }
+
+                    Ok(())
+                })?;
+            }
             #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
             FunctionType::JsonExtract(json_extract) => {
                 self.visit_json_extract(json_extract)?;

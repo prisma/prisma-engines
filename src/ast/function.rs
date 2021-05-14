@@ -1,5 +1,6 @@
 mod aggregate_to_string;
 mod average;
+mod coalesce;
 mod count;
 #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
 mod json_extract;
@@ -14,6 +15,7 @@ mod upper;
 
 pub use aggregate_to_string::*;
 pub use average::*;
+pub use coalesce::*;
 pub use count::*;
 #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
 pub use json_extract::*;
@@ -50,6 +52,7 @@ pub(crate) enum FunctionType<'a> {
     Upper(Upper<'a>),
     Minimum(Minimum<'a>),
     Maximum(Maximum<'a>),
+    Coalesce(Coalesce<'a>),
     #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
     JsonExtract(JsonExtract<'a>),
 }
@@ -81,5 +84,6 @@ function!(
     Lower,
     Upper,
     Minimum,
-    Maximum
+    Maximum,
+    Coalesce
 );

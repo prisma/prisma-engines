@@ -1944,6 +1944,17 @@ async fn bigdecimal_read_write_to_floating(api: &mut dyn TestApi) -> crate::Resu
     Ok(())
 }
 
+#[test_each_connector]
+async fn coalesce_fun(api: &mut dyn TestApi) -> crate::Result<()> {
+    let exprs: Vec<Expression> = vec![Value::Text(None).into(), Value::text("Individual").into()];
+    let select = Select::default().value(coalesce(exprs).alias("val"));
+    let row = api.conn().select(select).await?.into_single()?;
+
+    assert_eq!(Some("Individual"), row["val"].as_str());
+
+    Ok(())
+}
+
 #[cfg(all(feature = "json", feature = "mysql"))]
 #[test_each_connector(tags("mysql"))]
 async fn json_extract_path_fun(api: &mut dyn TestApi) -> crate::Result<()> {
