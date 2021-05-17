@@ -1,6 +1,6 @@
 use indoc::{formatdoc, indoc};
 use migration_core::api::RpcApi;
-use migration_engine_tests::multi_engine_test_api::*;
+use migration_engine_tests::sync_test_api::*;
 use pretty_assertions::assert_eq;
 use quaint::prelude::Insert;
 use serde_json::json;
@@ -254,8 +254,6 @@ fn connections_to_system_databases_must_be_rejected(api: TestApi) {
 
 #[test_connector(tags(Sqlite))]
 fn datamodel_parser_errors_must_return_a_known_error(api: TestApi) {
-    let api = api.new_engine();
-
     let bad_dm = r#"
         model Test {
             id Float @id
@@ -263,7 +261,7 @@ fn datamodel_parser_errors_must_return_a_known_error(api: TestApi) {
         }
     "#;
 
-    let error = api.schema_push(bad_dm).send_sync().unwrap_err().to_user_facing();
+    let error = api.schema_push(bad_dm).send_unwrap_err().to_user_facing();
 
     let expected_msg = "\u{1b}[1;91merror\u{1b}[0m: \u{1b}[1mType \"Post\" is neither a built-in type, nor refers to another model, custom type, or enum.\u{1b}[0m\n  \u{1b}[1;94m-->\u{1b}[0m  \u{1b}[4mschema.prisma:4\u{1b}[0m\n\u{1b}[1;94m   | \u{1b}[0m\n\u{1b}[1;94m 3 | \u{1b}[0m            id Float @id\n\u{1b}[1;94m 4 | \u{1b}[0m            post \u{1b}[1;91mPost[]\u{1b}[0m\n\u{1b}[1;94m   | \u{1b}[0m\n";
 
@@ -278,8 +276,6 @@ fn datamodel_parser_errors_must_return_a_known_error(api: TestApi) {
 
 #[test_connector]
 fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: TestApi) {
-    let engine = api.new_engine();
-
     let dm = r#"
         model Fruit {
             id Int @id @default(autoincrement())
@@ -287,14 +283,14 @@ fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: TestApi
         }
     "#;
 
-    engine.schema_push(dm).send_sync().unwrap().assert_green().unwrap();
+    api.schema_push(dm).send_sync().assert_green().unwrap();
 
-    let insert = Insert::multi_into(engine.render_table_name("Fruit"), &["name"])
+    let insert = Insert::multi_into(api.render_table_name("Fruit"), &["name"])
         .values(("banana",))
         .values(("apple",))
         .values(("banana",));
 
-    engine.query(insert.into());
+    api.query(insert.into());
 
     let dm2 = r#"
         model Fruit {
@@ -303,12 +299,11 @@ fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: TestApi
         }
     "#;
 
-    let res = engine
+    let res = api
         .schema_push(dm2)
         .force(true)
         .migration_id(Some("the-migration"))
-        .send_sync()
-        .unwrap_err()
+        .send_unwrap_err()
         .to_user_facing();
 
     let json_error = serde_json::to_value(&res).unwrap();
@@ -347,7 +342,6 @@ fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: TestApi
 
 #[test_connector(tags(Mysql56))]
 fn json_fields_must_be_rejected(api: TestApi) {
-    let engine = api.new_engine();
     let dm = format!(
         r#"
         {}
@@ -361,12 +355,7 @@ fn json_fields_must_be_rejected(api: TestApi) {
         api.datasource_block()
     );
 
-    let result = engine
-        .schema_push(dm)
-        .send_sync()
-        .unwrap_err()
-        .to_user_facing()
-        .unwrap_known();
+    let result = api.schema_push(dm).send_unwrap_err().to_user_facing().unwrap_known();
 
     assert_eq!(result.error_code, "P1015");
     assert!(result

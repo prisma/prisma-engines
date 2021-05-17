@@ -19,9 +19,9 @@ async fn bytes_columns_are_idempotent(api: &TestApi) -> TestResult {
         .send()
         .await?
         .assert_green()?
-        .assert_has_executed_steps()?;
+        .assert_has_executed_steps();
 
-    api.schema_push(&dm).send().await?.assert_green()?.assert_no_steps()?;
+    api.schema_push(&dm).send().await?.assert_green()?.assert_no_steps();
 
     Ok(())
 }
@@ -39,9 +39,9 @@ async fn float_columns_are_idempotent(api: &TestApi) -> TestResult {
         .send()
         .await?
         .assert_green()?
-        .assert_has_executed_steps()?;
+        .assert_has_executed_steps();
 
-    api.schema_push(dm).send().await?.assert_green()?.assert_no_steps()?;
+    api.schema_push(dm).send().await?.assert_green()?.assert_no_steps();
 
     Ok(())
 }
@@ -64,9 +64,9 @@ async fn decimal_columns_are_idempotent(api: &TestApi) -> TestResult {
         .send()
         .await?
         .assert_green()?
-        .assert_has_executed_steps()?;
+        .assert_has_executed_steps();
 
-    api.schema_push(&dm).send().await?.assert_green()?.assert_no_steps()?;
+    api.schema_push(&dm).send().await?.assert_green()?.assert_no_steps();
 
     Ok(())
 }
@@ -102,7 +102,7 @@ async fn float_to_decimal_works(api: &TestApi) -> TestResult {
         .send()
         .await?
         .assert_green()?
-        .assert_has_executed_steps()?;
+        .assert_has_executed_steps();
 
     api.assert_schema().await?.assert_table("Cat", |table| {
         table.assert_column("meowFrequency", |col| col.assert_type_family(ColumnTypeFamily::Decimal))
@@ -142,7 +142,7 @@ async fn decimal_to_float_works(api: &TestApi) -> TestResult {
         .send()
         .await?
         .assert_green()?
-        .assert_has_executed_steps()?;
+        .assert_has_executed_steps();
 
     api.assert_schema().await?.assert_table("Cat", |table| {
         table.assert_column("meowFrequency", |col| col.assert_type_family(ColumnTypeFamily::Float))
@@ -182,7 +182,7 @@ async fn bytes_to_string_works(api: &TestApi) -> TestResult {
         .send()
         .await?
         .assert_green()?
-        .assert_has_executed_steps()?;
+        .assert_has_executed_steps();
 
     api.assert_schema().await?.assert_table("Cat", |table| {
         table.assert_column("meowData", |col| col.assert_type_is_string())
@@ -222,7 +222,7 @@ async fn string_to_bytes_works(api: &TestApi) -> TestResult {
         .send()
         .await?
         .assert_green()?
-        .assert_has_executed_steps()?;
+        .assert_has_executed_steps();
 
     api.assert_schema().await?.assert_table("Cat", |table| {
         table.assert_column("meowData", |col| col.assert_type_is_string())
@@ -262,7 +262,7 @@ async fn decimal_to_decimal_array_works(api: &TestApi) -> TestResult {
         .send()
         .await?
         .assert_green()?
-        .assert_has_executed_steps()?;
+        .assert_has_executed_steps();
 
     api.assert_schema().await?.assert_table("Test", |table| {
         table.assert_column("decFloat", |col| col.assert_type_is_decimal()?.assert_is_list())
@@ -313,7 +313,7 @@ async fn bytes_to_bytes_array_works(api: &TestApi) -> TestResult {
         .send()
         .await?
         .assert_green()?
-        .assert_has_executed_steps()?;
+        .assert_has_executed_steps();
 
     api.assert_schema().await?.assert_table("Test", |table| {
         table.assert_column("bytesCol", |col| col.assert_type_is_bytes()?.assert_is_list())

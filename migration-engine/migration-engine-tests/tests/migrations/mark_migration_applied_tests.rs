@@ -226,7 +226,7 @@ async fn mark_migration_applied_when_the_migration_is_failed(api: &TestApi) -> T
             .modify_migration(|migration| {
                 migration.clear();
                 migration.push_str("\nSELECT YOLO;");
-            })?
+            })
             .into_output();
 
         output_second_migration.generated_migration_name.unwrap()
@@ -333,7 +333,7 @@ async fn must_return_helpful_error_on_migration_not_found(api: &TestApi) -> Test
         .create_migration("01init", BASE_DM, &migrations_directory)
         .send()
         .await?
-        .assert_migration_directories_count(1)?
+        .assert_migration_directories_count(1)
         .into_output();
 
     let migration_name = output.generated_migration_name.unwrap();

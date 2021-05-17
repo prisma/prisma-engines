@@ -38,7 +38,7 @@ async fn database_level_json_defaults_can_be_defined(api: &TestApi) -> TestResul
     })?;
 
     // Check that the migration is idempotent.
-    api.schema_push(&dm).send().await?.assert_green()?.assert_no_steps()?;
+    api.schema_push(&dm).send().await?.assert_green()?.assert_no_steps();
 
     Ok(())
 }

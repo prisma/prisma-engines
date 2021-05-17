@@ -1313,19 +1313,19 @@ async fn typescript_starter_schema_with_native_types_is_idempotent(api: &TestApi
         .send()
         .await?
         .assert_green()?
-        .assert_has_executed_steps()?;
+        .assert_has_executed_steps();
     api.schema_push(&dm)
         .migration_id(Some("second"))
         .send()
         .await?
         .assert_green()?
-        .assert_no_steps()?;
+        .assert_no_steps();
     api.schema_push(&dm2)
         .migration_id(Some("third"))
         .send()
         .await?
         .assert_green()?
-        .assert_no_steps()?;
+        .assert_no_steps();
 
     Ok(())
 }
@@ -1378,25 +1378,25 @@ async fn typescript_starter_schema_with_differnt_native_types_is_idempotent(api:
         .send()
         .await?
         .assert_green()?
-        .assert_has_executed_steps()?;
+        .assert_has_executed_steps();
     api.schema_push(&dm)
         .migration_id(Some("second"))
         .send()
         .await?
         .assert_green()?
-        .assert_no_steps()?;
+        .assert_no_steps();
     api.schema_push(&dm2)
         .migration_id(Some("third"))
         .send()
         .await?
         .assert_green()?
-        .assert_has_executed_steps()?;
+        .assert_has_executed_steps();
     api.schema_push(&dm2)
         .migration_id(Some("third"))
         .send()
         .await?
         .assert_green()?
-        .assert_no_steps()?;
+        .assert_no_steps();
 
     Ok(())
 }

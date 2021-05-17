@@ -8,10 +8,7 @@ pub use test_setup::{BitFlags, Capabilities, Tags};
 
 use crate::{ApplyMigrations, CreateMigration, DiagnoseMigrationHistory, Reset, SchemaAssertion, SchemaPush};
 use migration_core::GenericApi;
-use quaint::{
-    prelude::{Queryable, ResultSet},
-    single::Quaint,
-};
+use quaint::{prelude::Queryable, single::Quaint};
 use sql_migration_connector::SqlMigrationConnector;
 use std::future::Future;
 use tempfile::TempDir;
@@ -19,10 +16,10 @@ use test_setup::TestApiArgs;
 
 /// The multi-engine test API.
 pub struct TestApi {
-    args: TestApiArgs,
+    pub(crate) args: TestApiArgs,
     connection_string: String,
     admin_conn: Quaint,
-    rt: tokio::runtime::Runtime,
+    pub(crate) rt: tokio::runtime::Runtime,
 }
 
 impl TestApi {
@@ -172,7 +169,6 @@ impl TestApi {
             connector,
             tags: self.args.tags(),
             rt: &self.rt,
-            api: self,
         }
     }
 
@@ -189,10 +185,9 @@ impl TestApi {
 /// A wrapper around a migration engine instance optimized for convenience in
 /// writing tests.
 pub struct EngineTestApi<'a> {
-    connector: SqlMigrationConnector,
+    pub(crate) connector: SqlMigrationConnector,
     tags: BitFlags<Tags>,
     rt: &'a tokio::runtime::Runtime,
-    api: &'a TestApi,
 }
 
 impl EngineTestApi<'_> {
@@ -226,28 +221,6 @@ impl EngineTestApi<'_> {
         &self.connector
     }
 
-    /// Insert test values
-    pub fn insert<'a>(&'a self, table_name: &'a str) -> SingleRowInsert<'a> {
-        SingleRowInsert {
-            insert: quaint::ast::Insert::single_into(self.render_table_name(table_name)),
-            api: self,
-        }
-    }
-
-    /// Same as quaint::Queryable::query()
-    pub fn query(&self, q: quaint::ast::Query<'_>) -> ResultSet {
-        self.rt.block_on(self.connector.quaint().query(q)).unwrap()
-    }
-
-    /// Render a table name with the required prefixing for use with quaint query building.
-    pub fn render_table_name<'a>(&'a self, table_name: &'a str) -> quaint::ast::Table<'a> {
-        if self.api.is_sqlite() {
-            table_name.into()
-        } else {
-            (self.connector.quaint().connection_info().schema_name(), table_name).into()
-        }
-    }
-
     /// Plan a `reset` command
     pub fn reset(&self) -> Reset<'_> {
         Reset::new_sync(&self.connector, &self.rt)
@@ -263,28 +236,9 @@ impl EngineTestApi<'_> {
         self.connector.quaint().connection_info().schema_name()
     }
 
-    /// Execute a raw SQL command.
-    pub fn raw_cmd(&self, cmd: &str) -> Result<(), quaint::error::Error> {
-        self.rt.block_on(self.connector.quaint().raw_cmd(cmd))
-    }
-}
-
-/// A convenience for inserting test values
-pub struct SingleRowInsert<'a> {
-    insert: quaint::ast::SingleRowInsert<'a>,
-    api: &'a EngineTestApi<'a>,
-}
-
-impl<'a> SingleRowInsert<'a> {
-    /// Add a value to the row
-    pub fn value(mut self, name: &'a str, value: impl Into<quaint::ast::Expression<'a>>) -> Self {
-        self.insert = self.insert.value(name, value);
-
-        self
-    }
-
-    /// Execute the request and return the result set.
-    pub fn result_raw(self) -> quaint::connector::ResultSet {
-        self.api.query(self.insert.into())
+    /// Execute a raw SQL command and expect it to succeed.
+    #[track_caller]
+    pub fn raw_cmd(&self, cmd: &str) {
+        self.rt.block_on(self.connector.quaint().raw_cmd(cmd)).unwrap()
     }
 }
