@@ -18,7 +18,10 @@ pub fn parse(
 
     let filters: Vec<Filter> = input_map
         .into_iter()
-        .map(|(k, v)| parse_impl(&k, v, field, &json_path, reverse))
+        .map(|(k, v)| match field.type_identifier {
+            TypeIdentifier::Json => parse_internal_json(&k, v, field, &json_path, reverse),
+            _ => parse_internal_scalar(&k, v, field, &json_path, reverse),
+        })
         .collect::<QueryGraphBuilderResult<Vec<Vec<_>>>>()?
         .into_iter()
         .flatten()
@@ -33,104 +36,7 @@ pub fn parse(
     Ok(filters)
 }
 
-fn parse_impl(
-    filter_key: &str,
-    input: ParsedInputValue,
-    field: &ScalarFieldRef,
-    json_path: &Option<JsonFilterPath>,
-    reverse: bool,
-) -> QueryGraphBuilderResult<Vec<Filter>> {
-    if field.type_identifier == TypeIdentifier::Json {
-        return parse_impl_json(filter_key, input, field, json_path, reverse);
-    }
-
-    match filter_key {
-        filters::NOT_LOWERCASE => {
-            match input {
-                // Support for syntax `{ scalarField: { not: null } }` and `{ scalarField: { not: <value> } }`
-                ParsedInputValue::Single(value) => Ok(vec![field.not_equals(value)]),
-                _ => {
-                    let inner_object: ParsedInputMap = input.try_into()?;
-
-                    parse(inner_object, field, !reverse)
-                }
-            }
-        }
-
-        filters::IN => {
-            let value: PrismaValue = input.try_into()?;
-            let filter = match value {
-                PrismaValue::Null if reverse => field.not_equals(value),
-                PrismaValue::List(values) if reverse => field.not_in(values),
-
-                PrismaValue::Null => field.equals(value),
-                PrismaValue::List(values) => field.is_in(values),
-
-                _ => unreachable!(), // Validation guarantees this.
-            };
-
-            Ok(vec![filter])
-        }
-
-        // Legacy operation
-        filters::NOT_IN => {
-            let value: PrismaValue = input.try_into()?;
-            let filter = match value {
-                PrismaValue::Null if reverse => field.equals(value), // not not in null => in null
-                PrismaValue::List(values) if reverse => field.is_in(values), // not not in values => in values
-
-                PrismaValue::Null => field.not_equals(value),
-                PrismaValue::List(values) => field.not_in(values),
-
-                _ => unreachable!(), // Validation guarantees this.
-            };
-
-            Ok(vec![filter])
-        }
-
-        filters::EQUALS if reverse => Ok(vec![field.not_equals(as_prisma_value(input)?)]),
-        filters::CONTAINS if reverse => Ok(vec![field.not_contains(as_prisma_value(input)?)]),
-        filters::STARTS_WITH if reverse => Ok(vec![field.not_starts_with(as_prisma_value(input)?)]),
-        filters::ENDS_WITH if reverse => Ok(vec![field.not_ends_with(as_prisma_value(input)?)]),
-
-        filters::EQUALS => Ok(vec![field.equals(as_prisma_value(input)?)]),
-        filters::CONTAINS => Ok(vec![field.contains(as_prisma_value(input)?)]),
-        filters::STARTS_WITH => Ok(vec![field.starts_with(as_prisma_value(input)?)]),
-        filters::ENDS_WITH => Ok(vec![field.ends_with(as_prisma_value(input)?)]),
-
-        filters::LOWER_THAN if reverse => Ok(vec![field.greater_than_or_equals(as_prisma_value(input)?)]),
-        filters::GREATER_THAN if reverse => Ok(vec![field.less_than_or_equals(as_prisma_value(input)?)]),
-        filters::LOWER_THAN_OR_EQUAL if reverse => Ok(vec![field.greater_than(as_prisma_value(input)?)]),
-        filters::GREATER_THAN_OR_EQUAL if reverse => Ok(vec![field.less_than(as_prisma_value(input)?)]),
-
-        filters::LOWER_THAN => Ok(vec![field.less_than(as_prisma_value(input)?)]),
-        filters::GREATER_THAN => Ok(vec![field.greater_than(as_prisma_value(input)?)]),
-        filters::LOWER_THAN_OR_EQUAL => Ok(vec![field.less_than_or_equals(as_prisma_value(input)?)]),
-        filters::GREATER_THAN_OR_EQUAL => Ok(vec![field.greater_than_or_equals(as_prisma_value(input)?)]),
-
-        // List-specific filters
-        filters::HAS => Ok(vec![field.contains_element(as_prisma_value(input)?)]),
-        filters::HAS_EVERY => Ok(vec![field.contains_every_element(as_prisma_value_list(input)?)]),
-        filters::HAS_SOME => Ok(vec![field.contains_some_element(as_prisma_value_list(input)?)]),
-        filters::IS_EMPTY => Ok(vec![field.is_empty_list(input.try_into()?)]),
-
-        // Aggregation filters
-        filters::COUNT => aggregation_filter(field, input, reverse, Filter::count),
-        filters::AVG => aggregation_filter(field, input, reverse, Filter::average),
-        filters::SUM => aggregation_filter(field, input, reverse, Filter::sum),
-        filters::MIN => aggregation_filter(field, input, reverse, Filter::min),
-        filters::MAX => aggregation_filter(field, input, reverse, Filter::max),
-
-        _ => {
-            return Err(QueryGraphBuilderError::InputError(format!(
-                "{} is not a valid scalar filter operation",
-                filter_key
-            )))
-        }
-    }
-}
-
-fn parse_impl_json(
+fn parse_internal_json(
     filter_key: &str,
     input: ParsedInputValue,
     field: &ScalarFieldRef,
@@ -256,6 +162,99 @@ fn parse_impl_json(
             json_path.to_owned(),
             JsonTargetType::String,
         )]),
+        _ => {
+            return Err(QueryGraphBuilderError::InputError(format!(
+                "{} is not a valid scalar filter operation",
+                filter_key
+            )))
+        }
+    }
+}
+
+fn parse_internal_scalar(
+    filter_key: &str,
+    input: ParsedInputValue,
+    field: &ScalarFieldRef,
+    json_path: &Option<JsonFilterPath>,
+    reverse: bool,
+) -> QueryGraphBuilderResult<Vec<Filter>> {
+    match filter_key {
+        filters::NOT_LOWERCASE => {
+            match input {
+                // Support for syntax `{ scalarField: { not: null } }` and `{ scalarField: { not: <value> } }`
+                ParsedInputValue::Single(value) => Ok(vec![field.not_equals(value)]),
+                _ => {
+                    let inner_object: ParsedInputMap = input.try_into()?;
+
+                    parse(inner_object, field, !reverse)
+                }
+            }
+        }
+
+        filters::IN => {
+            let value: PrismaValue = input.try_into()?;
+            let filter = match value {
+                PrismaValue::Null if reverse => field.not_equals(value),
+                PrismaValue::List(values) if reverse => field.not_in(values),
+
+                PrismaValue::Null => field.equals(value),
+                PrismaValue::List(values) => field.is_in(values),
+
+                _ => unreachable!(), // Validation guarantees this.
+            };
+
+            Ok(vec![filter])
+        }
+
+        // Legacy operation
+        filters::NOT_IN => {
+            let value: PrismaValue = input.try_into()?;
+            let filter = match value {
+                PrismaValue::Null if reverse => field.equals(value), // not not in null => in null
+                PrismaValue::List(values) if reverse => field.is_in(values), // not not in values => in values
+
+                PrismaValue::Null => field.not_equals(value),
+                PrismaValue::List(values) => field.not_in(values),
+
+                _ => unreachable!(), // Validation guarantees this.
+            };
+
+            Ok(vec![filter])
+        }
+
+        filters::EQUALS if reverse => Ok(vec![field.not_equals(as_prisma_value(input)?)]),
+        filters::CONTAINS if reverse => Ok(vec![field.not_contains(as_prisma_value(input)?)]),
+        filters::STARTS_WITH if reverse => Ok(vec![field.not_starts_with(as_prisma_value(input)?)]),
+        filters::ENDS_WITH if reverse => Ok(vec![field.not_ends_with(as_prisma_value(input)?)]),
+
+        filters::EQUALS => Ok(vec![field.equals(as_prisma_value(input)?)]),
+        filters::CONTAINS => Ok(vec![field.contains(as_prisma_value(input)?)]),
+        filters::STARTS_WITH => Ok(vec![field.starts_with(as_prisma_value(input)?)]),
+        filters::ENDS_WITH => Ok(vec![field.ends_with(as_prisma_value(input)?)]),
+
+        filters::LOWER_THAN if reverse => Ok(vec![field.greater_than_or_equals(as_prisma_value(input)?)]),
+        filters::GREATER_THAN if reverse => Ok(vec![field.less_than_or_equals(as_prisma_value(input)?)]),
+        filters::LOWER_THAN_OR_EQUAL if reverse => Ok(vec![field.greater_than(as_prisma_value(input)?)]),
+        filters::GREATER_THAN_OR_EQUAL if reverse => Ok(vec![field.less_than(as_prisma_value(input)?)]),
+
+        filters::LOWER_THAN => Ok(vec![field.less_than(as_prisma_value(input)?)]),
+        filters::GREATER_THAN => Ok(vec![field.greater_than(as_prisma_value(input)?)]),
+        filters::LOWER_THAN_OR_EQUAL => Ok(vec![field.less_than_or_equals(as_prisma_value(input)?)]),
+        filters::GREATER_THAN_OR_EQUAL => Ok(vec![field.greater_than_or_equals(as_prisma_value(input)?)]),
+
+        // List-specific filters
+        filters::HAS => Ok(vec![field.contains_element(as_prisma_value(input)?)]),
+        filters::HAS_EVERY => Ok(vec![field.contains_every_element(as_prisma_value_list(input)?)]),
+        filters::HAS_SOME => Ok(vec![field.contains_some_element(as_prisma_value_list(input)?)]),
+        filters::IS_EMPTY => Ok(vec![field.is_empty_list(input.try_into()?)]),
+
+        // Aggregation filters
+        filters::COUNT => aggregation_filter(field, input, reverse, Filter::count),
+        filters::AVG => aggregation_filter(field, input, reverse, Filter::average),
+        filters::SUM => aggregation_filter(field, input, reverse, Filter::sum),
+        filters::MIN => aggregation_filter(field, input, reverse, Filter::min),
+        filters::MAX => aggregation_filter(field, input, reverse, Filter::max),
+
         _ => {
             return Err(QueryGraphBuilderError::InputError(format!(
                 "{} is not a valid scalar filter operation",

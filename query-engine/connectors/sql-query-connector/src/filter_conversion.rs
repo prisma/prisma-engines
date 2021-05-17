@@ -381,9 +381,14 @@ fn convert_scalar_filter(
     fields: &[ScalarFieldRef],
     is_parent_aggregation: bool,
 ) -> ConditionTree<'static> {
-    match mode {
-        QueryMode::Default => default_scalar_filter(comparable, cond, fields),
-        QueryMode::Insensitive => insensitive_scalar_filter(comparable, cond, fields, is_parent_aggregation),
+    match cond {
+        ScalarCondition::JsonCompare(json_compare) => {
+            convert_json_filter(comparable, json_compare, mode, fields.first().unwrap().to_owned())
+        }
+        _ => match mode {
+            QueryMode::Default => default_scalar_filter(comparable, cond, fields),
+            QueryMode::Insensitive => insensitive_scalar_filter(comparable, cond, fields, is_parent_aggregation),
+        },
     }
 }
 
@@ -502,7 +507,7 @@ fn filter_json_type(comparable: Expression<'static>, value: PrismaValue) -> Comp
             match json {
                 serde_json::Value::String(_) => comparable.json_type_equals(JsonType::String),
                 serde_json::Value::Number(_) => comparable.json_type_equals(JsonType::Number),
-                _ => panic!("Only numbers or strings can be inputted"),
+                v => panic!("JSON target types only accept strings or numbers, found: {}", v),
             }
         }
         _ => unreachable!(),
@@ -557,15 +562,7 @@ fn default_scalar_filter(
             }
             _ => comparable.not_in_selection(convert_values(fields, values)),
         },
-
-        ScalarCondition::JsonCompare(json_compare) => {
-            return convert_json_filter(
-                comparable,
-                json_compare,
-                QueryMode::Default,
-                fields.first().unwrap().to_owned(),
-            )
-        }
+        ScalarCondition::JsonCompare(_) => unreachable!(),
     };
 
     ConditionTree::single(condition)
@@ -664,14 +661,7 @@ fn insensitive_scalar_filter(
                 )
             }
         },
-        ScalarCondition::JsonCompare(json_compare) => {
-            return convert_json_filter(
-                comparable,
-                json_compare,
-                QueryMode::Insensitive,
-                fields.first().unwrap().to_owned(),
-            )
-        }
+        ScalarCondition::JsonCompare(_) => unreachable!(),
     };
 
     ConditionTree::single(condition)

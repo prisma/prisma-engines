@@ -269,6 +269,7 @@ fn string_filters(mapped_type: InputType) -> impl Iterator<Item = InputField> {
 
 fn json_filters(ctx: &mut BuilderContext) -> impl Iterator<Item = InputField> {
     // TODO: also add json-specific "keys" filters
+    // TODO: add json_type filter
     let path_type = if ctx.capabilities.contains(ConnectorCapability::JsonFilteringJsonPath) {
         InputType::string()
     } else if ctx.capabilities.contains(ConnectorCapability::JsonFilteringArrayPath) {
