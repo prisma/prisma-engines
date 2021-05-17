@@ -52,8 +52,8 @@ impl SqlIntrospectionConnector {
         tracing::debug!("SqlIntrospectionConnector initialized.");
 
         Ok(SqlIntrospectionConnector {
-            describer,
             connection_info,
+            describer,
         })
     }
 

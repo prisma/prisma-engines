@@ -41,7 +41,7 @@ async fn indexes_on_foreign_key_fields_are_not_created_twice(api: &TestApi) -> T
         .send()
         .await?
         .assert_green()?
-        .assert_no_steps()?;
+        .assert_no_steps();
 
     api.assert_schema().await?.assert_equals(&sql_schema)?;
 
@@ -70,7 +70,7 @@ async fn enum_creation_is_idempotent(api: &TestApi) -> TestResult {
 
     api.schema_push(dm1).send().await?.assert_green()?;
 
-    api.schema_push(dm1).send().await?.assert_green()?.assert_no_steps()?;
+    api.schema_push(dm1).send().await?.assert_green()?.assert_no_steps();
 
     Ok(())
 }
@@ -188,8 +188,8 @@ async fn arity_is_preserved_by_alter_enum(api: &TestApi) -> TestResult {
         .force(true)
         .send()
         .await?
-        .assert_executable()?
-        .assert_has_executed_steps()?;
+        .assert_executable()
+        .assert_has_executed_steps();
 
     api.assert_schema().await?.assert_table("A", |table| {
         table
@@ -287,7 +287,7 @@ async fn native_type_columns_can_be_created(api: &TestApi) -> TestResult {
     })?;
 
     // Check that the migration is idempotent
-    api.schema_push(dm).send().await?.assert_green()?.assert_no_steps()?;
+    api.schema_push(dm).send().await?.assert_green()?.assert_no_steps();
 
     Ok(())
 }

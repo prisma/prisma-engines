@@ -1,4 +1,4 @@
-use migration_engine_tests::multi_engine_test_api::*;
+use migration_engine_tests::sync_test_api::*;
 
 const BASIC_ENUM_DM: &str = r#"
 model Cat {
@@ -14,14 +14,7 @@ enum CatMood {
 
 #[test_connector(capabilities(Enums))]
 fn an_enum_can_be_turned_into_a_model(api: TestApi) {
-    let engine = api.new_engine();
-
-    engine
-        .schema_push(BASIC_ENUM_DM)
-        .send_sync()
-        .unwrap()
-        .assert_green()
-        .unwrap();
+    api.schema_push(BASIC_ENUM_DM).send_sync().assert_green().unwrap();
 
     let enum_name = if api.lower_cases_table_names() {
         "cat_mood"
@@ -32,7 +25,7 @@ fn an_enum_can_be_turned_into_a_model(api: TestApi) {
     };
 
     #[allow(clippy::redundant_closure)]
-    engine.assert_schema().assert_enum(enum_name, |enm| Ok(enm)).unwrap();
+    api.assert_schema().assert_enum(enum_name, |enm| Ok(enm)).unwrap();
 
     let dm2 = r#"
         model Cat {
@@ -49,10 +42,9 @@ fn an_enum_can_be_turned_into_a_model(api: TestApi) {
         }
     "#;
 
-    engine.schema_push(dm2).send_sync().unwrap().assert_green().unwrap();
+    api.schema_push(dm2).send_sync().assert_green().unwrap();
 
-    engine
-        .assert_schema()
+    api.assert_schema()
         .assert_table("Cat", |table| {
             table.assert_columns_count(2)?.assert_column("moodId", Ok)
         })
@@ -65,7 +57,6 @@ fn an_enum_can_be_turned_into_a_model(api: TestApi) {
 
 #[test_connector(capabilities(Enums))]
 fn variants_can_be_added_to_an_existing_enum(api: TestApi) {
-    let engine = api.new_engine();
     let dm1 = r#"
         model Cat {
             id Int @id
@@ -77,7 +68,7 @@ fn variants_can_be_added_to_an_existing_enum(api: TestApi) {
         }
     "#;
 
-    engine.schema_push(dm1).send_sync().unwrap().assert_green().unwrap();
+    api.schema_push(dm1).send_sync().assert_green().unwrap();
 
     let enum_name = if api.lower_cases_table_names() {
         "cat_mood"
@@ -87,8 +78,7 @@ fn variants_can_be_added_to_an_existing_enum(api: TestApi) {
         "CatMood"
     };
 
-    engine
-        .assert_schema()
+    api.assert_schema()
         .assert_enum(enum_name, |enm| enm.assert_values(&["HUNGRY"]))
         .unwrap();
 
@@ -105,18 +95,15 @@ fn variants_can_be_added_to_an_existing_enum(api: TestApi) {
         }
     "#;
 
-    engine.schema_push(dm2).send_sync().unwrap().assert_green().unwrap();
+    api.schema_push(dm2).send_sync().assert_green().unwrap();
 
-    engine
-        .assert_schema()
+    api.assert_schema()
         .assert_enum(enum_name, |enm| enm.assert_values(&["HUNGRY", "HAPPY", "JOYJOY"]))
         .unwrap();
 }
 
 #[test_connector(capabilities(Enums))]
 fn variants_can_be_removed_from_an_existing_enum(api: TestApi) {
-    let engine = api.new_engine();
-
     let dm1 = r#"
         model Cat {
             id Int @id
@@ -129,7 +116,7 @@ fn variants_can_be_removed_from_an_existing_enum(api: TestApi) {
         }
     "#;
 
-    engine.schema_push(dm1).send_sync().unwrap().assert_green().unwrap();
+    api.schema_push(dm1).send_sync().assert_green().unwrap();
 
     let enum_name = if api.lower_cases_table_names() {
         "cat_mood"
@@ -139,8 +126,7 @@ fn variants_can_be_removed_from_an_existing_enum(api: TestApi) {
         "CatMood"
     };
 
-    engine
-        .assert_schema()
+    api.assert_schema()
         .assert_enum(enum_name, |enm| enm.assert_values(&["HAPPY", "HUNGRY"]))
         .unwrap();
 
@@ -161,35 +147,25 @@ fn variants_can_be_removed_from_an_existing_enum(api: TestApi) {
         "The values [HAPPY] on the enum `CatMood` will be removed. If these variants are still used in the database, this will fail."
     };
 
-    engine
-        .schema_push(dm2)
+    api.schema_push(dm2)
         .force(true)
         .send_sync()
-        .unwrap()
         .assert_warnings(&[warning.into()])
         .unwrap()
-        .assert_executable()
-        .unwrap();
+        .assert_executable();
 
-    engine
-        .assert_schema()
+    api.assert_schema()
         .assert_enum(enum_name, |enm| enm.assert_values(&["HUNGRY"]))
         .unwrap();
 }
 
 #[test_connector(capabilities(Enums))]
 fn models_with_enum_values_can_be_dropped(api: TestApi) {
-    let engine = api.new_engine();
-    engine
-        .schema_push(BASIC_ENUM_DM)
-        .send_sync()
-        .unwrap()
-        .assert_green()
-        .unwrap();
+    api.schema_push(BASIC_ENUM_DM).send_sync().assert_green().unwrap();
 
-    engine.assert_schema().assert_tables_count(1).unwrap();
+    api.assert_schema().assert_tables_count(1).unwrap();
 
-    engine.insert("Cat").value("id", 1).value("mood", "HAPPY").result_raw();
+    api.insert("Cat").value("id", 1).value("mood", "HAPPY").result_raw();
 
     let warn = if api.lower_cases_table_names() {
         "You are about to drop the `cat` table, which is not empty (1 rows)."
@@ -197,22 +173,18 @@ fn models_with_enum_values_can_be_dropped(api: TestApi) {
         "You are about to drop the `Cat` table, which is not empty (1 rows)."
     };
 
-    engine
-        .schema_push("")
+    api.schema_push("")
         .force(true)
         .send_sync()
-        .unwrap()
         .assert_executable()
-        .unwrap()
         .assert_warnings(&[warn.into()])
         .unwrap();
 
-    engine.assert_schema().assert_tables_count(0).unwrap();
+    api.assert_schema().assert_tables_count(0).unwrap();
 }
 
 #[test_connector(capabilities(Enums))]
 fn enum_field_to_string_field_works(api: TestApi) {
-    let engine = api.new_engine();
     let dm1 = r#"
         model Cat {
             id Int @id
@@ -225,16 +197,15 @@ fn enum_field_to_string_field_works(api: TestApi) {
         }
     "#;
 
-    engine.schema_push(dm1).send_sync().unwrap().assert_green().unwrap();
+    api.schema_push(dm1).send_sync().assert_green().unwrap();
 
-    engine
-        .assert_schema()
+    api.assert_schema()
         .assert_table("Cat", |table| {
             table.assert_column("mood", |col| col.assert_type_is_enum())
         })
         .unwrap();
 
-    engine.insert("Cat").value("id", 1).value("mood", "HAPPY").result_raw();
+    api.insert("Cat").value("id", 1).value("mood", "HAPPY").result_raw();
 
     let dm2 = r#"
         model Cat {
@@ -243,16 +214,9 @@ fn enum_field_to_string_field_works(api: TestApi) {
         }
     "#;
 
-    engine
-        .schema_push(dm2)
-        .force(true)
-        .send_sync()
-        .unwrap()
-        .assert_executable()
-        .unwrap();
+    api.schema_push(dm2).force(true).send_sync().assert_executable();
 
-    engine
-        .assert_schema()
+    api.assert_schema()
         .assert_table("Cat", |table| {
             table.assert_column("mood", |col| col.assert_type_is_string())
         })
@@ -261,7 +225,6 @@ fn enum_field_to_string_field_works(api: TestApi) {
 
 #[test_connector(capabilities(Enums))]
 fn string_field_to_enum_field_works(api: TestApi) {
-    let engine = api.new_engine();
     let dm1 = r#"
         model Cat {
             id      Int @id
@@ -269,16 +232,15 @@ fn string_field_to_enum_field_works(api: TestApi) {
         }
     "#;
 
-    engine.schema_push(dm1).send_sync().unwrap().assert_green().unwrap();
+    api.schema_push(dm1).send_sync().assert_green().unwrap();
 
-    engine
-        .assert_schema()
+    api.assert_schema()
         .assert_table("Cat", |table| {
             table.assert_column("mood", |col| col.assert_type_is_string())
         })
         .unwrap();
 
-    engine.insert("Cat").value("id", 1).value("mood", "HAPPY").result_raw();
+    api.insert("Cat").value("id", 1).value("mood", "HAPPY").result_raw();
 
     let dm2 = r#"
         model Cat {
@@ -300,18 +262,14 @@ fn string_field_to_enum_field_works(api: TestApi) {
         "You are about to alter the column `mood` on the `Cat` table, which contains 1 non-null values. The data in that column will be cast from `VarChar(191)` to `Enum(\"Cat_mood\")`."
     };
 
-    engine
-        .schema_push(dm2)
+    api.schema_push(dm2)
         .force(true)
         .send_sync()
-        .unwrap()
         .assert_executable()
-        .unwrap()
         .assert_warnings(&[warn.into()])
         .unwrap();
 
-    engine
-        .assert_schema()
+    api.assert_schema()
         .assert_table("Cat", |table| {
             table.assert_column("mood", |col| col.assert_type_is_enum())
         })
@@ -320,8 +278,6 @@ fn string_field_to_enum_field_works(api: TestApi) {
 
 #[test_connector(capabilities(Enums))]
 fn enums_used_in_default_can_be_changed(api: TestApi) {
-    let engine = api.new_engine();
-
     let dm1 = r#"
         model Panther {
             id Int @id
@@ -359,9 +315,9 @@ fn enums_used_in_default_can_be_changed(api: TestApi) {
         }
     "#;
 
-    engine.schema_push(dm1).send_sync().unwrap().assert_green().unwrap();
+    api.schema_push(dm1).send_sync().assert_green().unwrap();
 
-    engine.assert_schema().assert_tables_count(5).unwrap();
+    api.assert_schema().assert_tables_count(5).unwrap();
 
     let dm2 = r#"
         model Panther {
@@ -402,29 +358,27 @@ fn enums_used_in_default_can_be_changed(api: TestApi) {
     "#;
 
     if api.is_postgres() {
-        engine.schema_push(dm2)
+        api.schema_push(dm2)
             .force(true)
             .send_sync()
-            .unwrap()
-            .assert_executable().unwrap()
+            .assert_executable()
             .assert_warnings(&["The values [HUNGRY] on the enum `CatMood` will be removed. If these variants are still used in the database, this will fail.".into()]
             ).unwrap();
     } else {
-        engine.schema_push(dm2)
+        api.schema_push(dm2)
             .force(true)
-            .send_sync().unwrap()
-            .assert_executable().unwrap()
+            .send_sync()
+            .assert_executable()
             .assert_warnings(& ["The values [HUNGRY] on the enum `Panther_mood` will be removed. If these variants are still used in the database, this will fail.".into(),
                 "The values [HUNGRY] on the enum `Tiger_mood` will be removed. If these variants are still used in the database, this will fail.".into(),]
             ).unwrap();
     };
 
-    engine.assert_schema().assert_tables_count(5).unwrap();
+    api.assert_schema().assert_tables_count(5).unwrap();
 }
 
 #[test_connector(capabilities(Enums))]
 fn changing_all_values_of_enums_used_in_defaults_works(api: TestApi) {
-    let api = api.new_engine();
     let dm1 = r#"
         model Cat {
             id Int @id
@@ -441,7 +395,7 @@ fn changing_all_values_of_enums_used_in_defaults_works(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send_sync().unwrap().assert_green().unwrap();
+    api.schema_push(dm1).send_sync().assert_green().unwrap();
 
     let dm2 = r#"
         model Cat {
@@ -461,7 +415,7 @@ fn changing_all_values_of_enums_used_in_defaults_works(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).force(true).send_sync().unwrap();
+    api.schema_push(dm2).force(true).send_sync();
 
     api.assert_schema()
         .assert_table("Cat", |table| {

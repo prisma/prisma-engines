@@ -1,5 +1,5 @@
 use super::*;
-use crate::{constants::outputs::fields, FieldPair, ReadQuery};
+use crate::{constants::aggregations::*, FieldPair, ReadQuery};
 use connector::RelAggregationSelection;
 use prisma_models::{Field, ModelProjection, ModelRef, RecordProjection, RelationFieldRef};
 use std::sync::Arc;
@@ -106,7 +106,7 @@ pub fn merge_cursor_fields(selected_fields: ModelProjection, cursor: &Option<Rec
 pub fn collect_relation_aggr_selections(from: &[FieldPair], model: &ModelRef) -> Vec<RelAggregationSelection> {
     from.iter()
         .flat_map(|pair| match pair.parsed_field.name.as_str() {
-            fields::UNDERSCORE_COUNT => {
+            UNDERSCORE_COUNT => {
                 let nested_fields = pair.parsed_field.nested_fields.as_ref().unwrap();
 
                 nested_fields

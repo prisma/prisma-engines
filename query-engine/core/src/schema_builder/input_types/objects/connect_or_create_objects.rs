@@ -1,5 +1,5 @@
 use super::*;
-use constants::inputs::args;
+use constants::args;
 
 /// Builds "<x>CreateOrConnectNestedInput" input object types.
 #[tracing::instrument(skip(ctx, parent_field))]

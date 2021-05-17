@@ -90,6 +90,8 @@ impl SqlFlavour for PostgresFlavour {
     async fn acquire_lock(&self, connection: &Connection) -> ConnectorResult<()> {
         // https://www.postgresql.org/docs/current/explicit-locking.html#ADVISORY-LOCKS
 
+        // 72707369 is a unique number we chose to identify Migrate. It does not
+        // have any meaning, but it should not be used by any other tool.
         tokio::time::timeout(
             ADVISORY_LOCK_TIMEOUT,
             connection.raw_cmd("SELECT pg_advisory_lock(72707369)"),

@@ -1,5 +1,5 @@
 use super::*;
-use crate::{constants::inputs::args, query_ast::*, query_graph::QueryGraph, ArgumentListLookup, ParsedField};
+use crate::{constants::args, query_ast::*, query_graph::QueryGraph, ArgumentListLookup, ParsedField};
 use prisma_value::PrismaValue;
 use std::convert::TryInto;
 

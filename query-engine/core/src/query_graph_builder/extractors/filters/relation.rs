@@ -1,7 +1,5 @@
 use super::extract_filter;
-use crate::{
-    constants::inputs::filters, ParsedInputMap, ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult,
-};
+use crate::{constants::filters, ParsedInputMap, ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult};
 use connector::{Filter, RelationCompare};
 use prisma_models::RelationFieldRef;
 use std::convert::TryInto;

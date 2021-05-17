@@ -1,6 +1,6 @@
 use super::*;
 use crate::{
-    constants::inputs::operations,
+    constants::operations,
     query_document::{ParsedInputMap, ParsedInputValue},
 };
 use connector::{WriteArgs, WriteExpression};

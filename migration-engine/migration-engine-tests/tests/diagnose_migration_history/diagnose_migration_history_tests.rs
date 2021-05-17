@@ -49,7 +49,7 @@ async fn diagnose_migrations_history_after_two_migrations_happy_path(api: &TestA
     api.apply_migrations(&directory)
         .send()
         .await?
-        .assert_applied_migrations(&["initial", "second-migration"])?;
+        .assert_applied_migrations(&["initial", "second-migration"]);
 
     let output = api.diagnose_migration_history(&directory).send().await?.into_output();
 
@@ -74,7 +74,7 @@ async fn diagnose_migration_history_with_opt_in_to_shadow_database_calculates_dr
     api.apply_migrations(&directory)
         .send()
         .await?
-        .assert_applied_migrations(&["initial"])?;
+        .assert_applied_migrations(&["initial"]);
 
     let dm2 = r#"
         model Cat {
@@ -134,7 +134,7 @@ async fn diagnose_migration_history_without_opt_in_to_shadow_database_does_not_c
     api.apply_migrations(&directory)
         .send()
         .await?
-        .assert_applied_migrations(&["initial"])?;
+        .assert_applied_migrations(&["initial"]);
 
     let dm2 = r#"
         model Cat {
@@ -196,12 +196,12 @@ async fn diagnose_migration_history_calculates_drift_in_presence_of_failed_migra
         .await?
         .modify_migration(|migration| {
             migration.push_str("\nSELECT YOLO;");
-        })?;
+        });
 
     let err = api.apply_migrations(&directory).send().await.unwrap_err().to_string();
     assert!(err.contains("yolo") || err.contains("YOLO"), "{}", err);
 
-    migration_two.modify_migration(|migration| migration.truncate(migration.len() - "SELECT YOLO;".len()))?;
+    migration_two.modify_migration(|migration| migration.truncate(migration.len() - "SELECT YOLO;".len()));
 
     let DiagnoseMigrationHistoryOutput {
         drift,
@@ -258,7 +258,7 @@ async fn diagnose_migrations_history_can_detect_when_the_database_is_behind(api:
     api.apply_migrations(&directory)
         .send()
         .await?
-        .assert_applied_migrations(&["initial"])?;
+        .assert_applied_migrations(&["initial"]);
 
     let dm2 = r#"
         model Cat {
@@ -332,7 +332,7 @@ async fn diagnose_migrations_history_can_detect_when_the_folder_is_behind(api: &
     api.apply_migrations(&directory)
         .send()
         .await?
-        .assert_applied_migrations(&["initial", "second-migration"])?;
+        .assert_applied_migrations(&["initial", "second-migration"]);
 
     let second_migration_folder_path = directory.path().join(&name);
     std::fs::remove_dir_all(&second_migration_folder_path)?;
@@ -404,7 +404,7 @@ async fn diagnose_migrations_history_can_detect_when_history_diverges(api: &Test
     api.apply_migrations(&directory)
         .send()
         .await?
-        .assert_applied_migrations(&["1-initial", "2-second-migration"])?;
+        .assert_applied_migrations(&["1-initial", "2-second-migration"]);
 
     let second_migration_folder_path = directory.path().join(&deleted_migration_name);
     std::fs::remove_dir_all(&second_migration_folder_path)?;
@@ -422,7 +422,7 @@ async fn diagnose_migrations_history_can_detect_when_history_diverges(api: &Test
         .draft(true)
         .send()
         .await?
-        .assert_migration_directories_count(2)?
+        .assert_migration_directories_count(2)
         .into_output()
         .generated_migration_name
         .unwrap();
@@ -484,12 +484,12 @@ async fn diagnose_migrations_history_can_detect_edited_migrations(api: &TestApi)
     api.apply_migrations(&directory)
         .send()
         .await?
-        .assert_applied_migrations(&["initial", "second-migration"])?;
+        .assert_applied_migrations(&["initial", "second-migration"]);
 
     let initial_migration_name = initial_assertions
         .modify_migration(|script| {
             std::mem::swap(script, &mut format!("/* test */\n{}", script));
-        })?
+        })
         .into_output()
         .generated_migration_name
         .unwrap();
@@ -539,12 +539,12 @@ async fn diagnose_migrations_history_reports_migrations_failing_to_apply_cleanly
     api.apply_migrations(&directory)
         .send()
         .await?
-        .assert_applied_migrations(&["initial", "second-migration"])?;
+        .assert_applied_migrations(&["initial", "second-migration"]);
 
     let initial_migration_name = initial_assertions
         .modify_migration(|script| {
             script.push_str("SELECT YOLO;\n");
-        })?
+        })
         .into_output()
         .generated_migration_name
         .unwrap();
@@ -630,11 +630,11 @@ async fn with_a_failed_migration(api: &TestApi) -> TestResult {
         .create_migration("01-init", dm, &migrations_directory)
         .send()
         .await?
-        .assert_migration_directories_count(1)?
+        .assert_migration_directories_count(1)
         .modify_migration(|migration| {
             migration.clear();
             migration.push_str("CREATE_BROKEN");
-        })?
+        })
         .into_output();
 
     let err = api
@@ -703,7 +703,7 @@ async fn with_an_invalid_unapplied_migration_should_report_it(api: &TestApi) -> 
     api.apply_migrations(&directory)
         .send()
         .await?
-        .assert_applied_migrations(&["initial"])?;
+        .assert_applied_migrations(&["initial"]);
 
     let dm2 = r#"
         model Cat {
@@ -721,7 +721,7 @@ async fn with_an_invalid_unapplied_migration_should_report_it(api: &TestApi) -> 
         .await?
         .modify_migration(|script| {
             *script = "CREATE BROKEN".into();
-        })?
+        })
         .into_output();
 
     let DiagnoseMigrationHistoryOutput {
@@ -998,7 +998,7 @@ async fn empty_migration_directories_should_cause_known_errors(api: &TestApi) ->
     api.apply_migrations(&migrations_directory)
         .send()
         .await?
-        .assert_applied_migrations(&["01init"])?;
+        .assert_applied_migrations(&["01init"]);
 
     let dirname = output.generated_migration_name.unwrap();
     let dirpath = migrations_directory.path().join(dirname);
@@ -1053,7 +1053,7 @@ async fn indexes_on_same_columns_with_different_names_should_work(api: &TestApi)
     api.apply_migrations(&directory)
         .send()
         .await?
-        .assert_applied_migrations(&["initial"])?;
+        .assert_applied_migrations(&["initial"]);
 
     let output = api
         .diagnose_migration_history(&directory)
@@ -1082,7 +1082,7 @@ async fn default_dbgenerated_should_not_cause_drift(api: &TestApi) -> TestResult
     api.apply_migrations(&migrations_directory)
         .send()
         .await?
-        .assert_applied_migrations(&["01init"])?;
+        .assert_applied_migrations(&["01init"]);
 
     let output = api
         .diagnose_migration_history(&migrations_directory)
@@ -1112,7 +1112,7 @@ async fn default_uuid_should_not_cause_drift(api: &TestApi) -> TestResult {
     api.apply_migrations(&migrations_directory)
         .send()
         .await?
-        .assert_applied_migrations(&["01init"])?;
+        .assert_applied_migrations(&["01init"]);
 
     let output = api
         .diagnose_migration_history(&migrations_directory)

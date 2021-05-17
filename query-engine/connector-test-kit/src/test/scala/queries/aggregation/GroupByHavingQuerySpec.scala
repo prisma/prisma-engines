@@ -72,8 +72,8 @@ class GroupByHavingQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
          |  }) {
          |    s
          |    int
-         |    count { _all }
-         |    sum { int }
+         |    _count { _all }
+         |    _sum { int }
          |  }
          |}""".stripMargin,
       project
@@ -81,7 +81,7 @@ class GroupByHavingQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
 
     // group3 is filtered completely, group1 (int 0) is filtered as well.
     result.toString should be(
-      """{"data":{"groupByModel":[{"s":"group1","int":5,"count":{"_all":1},"sum":{"int":5}},{"s":"group2","int":5,"count":{"_all":1},"sum":{"int":5}}]}}""")
+      """{"data":{"groupByModel":[{"s":"group1","int":5,"_count":{"_all":1},"_sum":{"int":5}},{"s":"group2","int":5,"_count":{"_all":1},"_sum":{"int":5}}]}}""")
   }
 
   "Using a groupBy with a `having` scalar filters on list fields" should "work" taggedAs (IgnoreMySql, IgnoreSQLite, IgnoreMsSql) in {
@@ -112,14 +112,14 @@ class GroupByHavingQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
          |    ints: { equals: [1, 2, 3] }
          |  }) {
          |    ints
-         |    count {
+         |    _count {
          |      ints
          |    }
          |  }
          |}""".stripMargin,
       project
     )
-    result.toString should be("""{"data":{"groupByModel":[{"ints":[1,2,3],"count":{"ints":1}}]}}""")
+    result.toString should be("""{"data":{"groupByModel":[{"ints":[1,2,3],"_count":{"ints":1}}]}}""")
   }
 
   // *************
@@ -140,60 +140,60 @@ class GroupByHavingQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       s"""{
          |  groupByModel(by: [s], orderBy: { s: asc }, having: {
          |    int: {
-         |      count: {
+         |      _count: {
          |        equals: 2
          |      }
          |    }
          |  }) {
          |    s
-         |    count {
+         |    _count {
          |      int
          |    }
          |  }
          |}""".stripMargin,
       project
     )
-    result.toString should be("""{"data":{"groupByModel":[{"s":"group1","count":{"int":2}}]}}""")
+    result.toString should be("""{"data":{"groupByModel":[{"s":"group1","_count":{"int":2}}]}}""")
 
     // Group 2 and 3 returned
     result = server.query(
       s"""{
          |  groupByModel(by: [s], orderBy: { s: asc }, having: {
          |    int: {
-         |      count: {
+         |      _count: {
          |        not: { equals: 2 }
          |      }
          |    }
          |  }) {
          |    s
-         |    count {
+         |    _count {
          |      int
          |    }
          |  }
          |}""".stripMargin,
       project
     )
-    result.toString should be("""{"data":{"groupByModel":[{"s":"group2","count":{"int":1}},{"s":"group3","count":{"int":0}}]}}""")
+    result.toString should be("""{"data":{"groupByModel":[{"s":"group2","_count":{"int":1}},{"s":"group3","_count":{"int":0}}]}}""")
 
     // Group 1 and 3 returned
     result = server.query(
       s"""{
          |  groupByModel(by: [s], orderBy: { s: asc }, having: {
          |    int: {
-         |      count: {
+         |      _count: {
          |        in: [0, 2]
          |      }
          |    }
          |  }) {
          |    s
-         |    count {
+         |    _count {
          |      int
          |    }
          |  }
          |}""".stripMargin,
       project
     )
-    result.toString should be("""{"data":{"groupByModel":[{"s":"group1","count":{"int":2}},{"s":"group3","count":{"int":0}}]}}""")
+    result.toString should be("""{"data":{"groupByModel":[{"s":"group1","_count":{"int":2}},{"s":"group3","_count":{"int":0}}]}}""")
   }
 
   // ***************
@@ -214,59 +214,59 @@ class GroupByHavingQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       s"""{
          |  groupByModel(by: [s], orderBy: { s: asc }, having: {
          |    dec: {
-         |      avg: {
+         |      _avg: {
          |        equals: "8.0"
          |      }
          |    }
          |  }) {
          |    s
-         |    avg {
+         |    _avg {
          |      dec
          |    }
          |  }
          |}""".stripMargin,
       project
     )
-    result.toString should be("""{"data":{"groupByModel":[{"s":"group1","avg":{"dec":"8"}}]}}""")
+    result.toString should be("""{"data":{"groupByModel":[{"s":"group1","_avg":{"dec":"8"}}]}}""")
 
     // Group 2 and 3 returned (3 is null)
     result = server.query(
       s"""{
          |  groupByModel(by: [s], orderBy: { s: asc }, having: {
          |    OR: [
-         |      { dec: { avg: { not: { equals: "8.0" }}}},
-         |      { dec: { avg: { equals: null }}}
+         |      { dec: { _avg: { not: { equals: "8.0" }}}},
+         |      { dec: { _avg: { equals: null }}}
          |    ]}
          |  ) {
          |      s
-         |      avg {
+         |      _avg {
          |        dec
          |      }
          |    }
          |}""".stripMargin,
       project
     )
-    result.toString should be("""{"data":{"groupByModel":[{"s":"group2","avg":{"dec":"5"}},{"s":"group3","avg":{"dec":null}}]}}""")
+    result.toString should be("""{"data":{"groupByModel":[{"s":"group2","_avg":{"dec":"5"}},{"s":"group3","_avg":{"dec":null}}]}}""")
 
     // Group 1 and 2 returned
     result = server.query(
       s"""{
          |  groupByModel(by: [s], orderBy: { s: asc }, having: {
          |    dec: {
-         |      avg: {
+         |      _avg: {
          |        in: ["8", "5"]
          |      }
          |    }
          |  }) {
          |    s
-         |    avg {
+         |    _avg {
          |      dec
          |    }
          |  }
          |}""".stripMargin,
       project
     )
-    result.toString should be("""{"data":{"groupByModel":[{"s":"group1","avg":{"dec":"8"}},{"s":"group2","avg":{"dec":"5"}}]}}""")
+    result.toString should be("""{"data":{"groupByModel":[{"s":"group1","_avg":{"dec":"8"}},{"s":"group2","_avg":{"dec":"5"}}]}}""")
   }
 
   // ***********
@@ -286,12 +286,12 @@ class GroupByHavingQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     var result = server.query(
       s"""{
          |  groupByModel(by: [s], orderBy: { s: asc }, having: {
-         |    float: { sum: { equals: 16 }}
-         |    int: { sum: { equals: 16 }}
-         |    dec: { sum: { equals: "16" }}
+         |    float: { _sum: { equals: 16 }}
+         |    int: { _sum: { equals: 16 }}
+         |    dec: { _sum: { equals: "16" }}
          |  }) {
          |    s
-         |    sum {
+         |    _sum {
          |      float
          |      int
          |      dec
@@ -300,18 +300,18 @@ class GroupByHavingQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
          |}""".stripMargin,
       project
     )
-    result.toString should be("""{"data":{"groupByModel":[{"s":"group1","sum":{"float":16,"int":16,"dec":"16"}}]}}""")
+    result.toString should be("""{"data":{"groupByModel":[{"s":"group1","_sum":{"float":16,"int":16,"dec":"16"}}]}}""")
 
     // Group 2 (3 is null)
     result = server.query(
       s"""{
          |  groupByModel(by: [s], orderBy: { s: asc }, having: {
-         |    float: { sum: { not: { equals: 16 }}}
-         |    int: { sum: { not: { equals: 16 }}}
-         |    dec: { sum: { not: { equals: "16" }}}
+         |    float: { _sum: { not: { equals: 16 }}}
+         |    int: { _sum: { not: { equals: 16 }}}
+         |    dec: { _sum: { not: { equals: "16" }}}
          |  }) {
          |    s
-         |    sum {
+         |    _sum {
          |      float
          |      int
          |      dec
@@ -320,18 +320,18 @@ class GroupByHavingQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
          |}""".stripMargin,
       project
     )
-    result.toString should be("""{"data":{"groupByModel":[{"s":"group2","sum":{"float":5,"int":5,"dec":"5"}}]}}""")
+    result.toString should be("""{"data":{"groupByModel":[{"s":"group2","_sum":{"float":5,"int":5,"dec":"5"}}]}}""")
 
     // Group 1 and 2 returned
     result = server.query(
       s"""{
          |  groupByModel(by: [s], orderBy: { s: asc }, having: {
-         |    float: { sum: { in: [16, 5] }}
-         |    int: { sum: { in: [16, 5] }}
-         |    dec: { sum: { in: ["16", "5"] }}
+         |    float: { _sum: { in: [16, 5] }}
+         |    int: { _sum: { in: [16, 5] }}
+         |    dec: { _sum: { in: ["16", "5"] }}
          |  }) {
          |    s
-         |    sum {
+         |    _sum {
          |      float
          |      int
          |      dec
@@ -341,7 +341,7 @@ class GroupByHavingQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       project
     )
     result.toString should be(
-      """{"data":{"groupByModel":[{"s":"group1","sum":{"float":16,"int":16,"dec":"16"}},{"s":"group2","sum":{"float":5,"int":5,"dec":"5"}}]}}""")
+      """{"data":{"groupByModel":[{"s":"group1","_sum":{"float":16,"int":16,"dec":"16"}},{"s":"group2","_sum":{"float":5,"int":5,"dec":"5"}}]}}""")
   }
 
   // ***********
@@ -361,12 +361,12 @@ class GroupByHavingQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     var result = server.query(
       s"""{
          |  groupByModel(by: [s], orderBy: { s: asc }, having: {
-         |    float: { min: { equals: 0 }}
-         |    int: { min: { equals: 0 }}
-         |    dec: { min: { equals: "0" }}
+         |    float: { _min: { equals: 0 }}
+         |    int: { _min: { equals: 0 }}
+         |    dec: { _min: { equals: "0" }}
          |  }) {
          |    s
-         |    min {
+         |    _min {
          |      float
          |      int
          |      dec
@@ -376,18 +376,18 @@ class GroupByHavingQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       project
     )
     result.toString should be(
-      """{"data":{"groupByModel":[{"s":"group1","min":{"float":0,"int":0,"dec":"0"}},{"s":"group2","min":{"float":0,"int":0,"dec":"0"}}]}}""")
+      """{"data":{"groupByModel":[{"s":"group1","_min":{"float":0,"int":0,"dec":"0"}},{"s":"group2","_min":{"float":0,"int":0,"dec":"0"}}]}}""")
 
     // Empty
     result = server.query(
       s"""{
          |  groupByModel(by: [s], orderBy: { s: asc }, having: {
-         |    float: { min: { not: { equals: 0 }}}
-         |    int: { min: { not: { equals: 0 }}}
-         |    dec: { min: { not: { equals: "0" }}}
+         |    float: { _min: { not: { equals: 0 }}}
+         |    int: { _min: { not: { equals: 0 }}}
+         |    dec: { _min: { not: { equals: "0" }}}
          |  }) {
          |    s
-         |    min {
+         |    _min {
          |      float
          |      int
          |      dec
@@ -402,12 +402,12 @@ class GroupByHavingQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     result = server.query(
       s"""{
          |  groupByModel(by: [s], orderBy: { s: asc }, having: {
-         |    float: { min: { in: [0] }}
-         |    int: { min: { in: [0] }}
-         |    dec: { min: { in: ["0"] }}
+         |    float: { _min: { in: [0] }}
+         |    int: { _min: { in: [0] }}
+         |    dec: { _min: { in: ["0"] }}
          |  }) {
          |    s
-         |    min {
+         |    _min {
          |      float
          |      int
          |      dec
@@ -417,7 +417,7 @@ class GroupByHavingQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       project
     )
     result.toString should be(
-      """{"data":{"groupByModel":[{"s":"group1","min":{"float":0,"int":0,"dec":"0"}},{"s":"group2","min":{"float":0,"int":0,"dec":"0"}}]}}""")
+      """{"data":{"groupByModel":[{"s":"group1","_min":{"float":0,"int":0,"dec":"0"}},{"s":"group2","_min":{"float":0,"int":0,"dec":"0"}}]}}""")
   }
 
   // ***********
@@ -437,12 +437,12 @@ class GroupByHavingQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     var result = server.query(
       s"""{
          |  groupByModel(by: [s], orderBy: { s: asc }, having: {
-         |    float: { max: { equals: 10 }}
-         |    int: { max: { equals: 10 }}
-         |    dec: { max: { equals: "10" }}
+         |    float: { _max: { equals: 10 }}
+         |    int: { _max: { equals: 10 }}
+         |    dec: { _max: { equals: "10" }}
          |  }) {
          |    s
-         |    max {
+         |    _max {
          |      float
          |      int
          |      dec
@@ -452,18 +452,18 @@ class GroupByHavingQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       project
     )
     result.toString should be(
-      """{"data":{"groupByModel":[{"s":"group1","max":{"float":10,"int":10,"dec":"10"}},{"s":"group2","max":{"float":10,"int":10,"dec":"10"}}]}}""")
+      """{"data":{"groupByModel":[{"s":"group1","_max":{"float":10,"int":10,"dec":"10"}},{"s":"group2","_max":{"float":10,"int":10,"dec":"10"}}]}}""")
 
     // Empty
     result = server.query(
       s"""{
          |  groupByModel(by: [s], orderBy: { s: asc }, having: {
-         |    float: { max: { not: { equals: 10 }}}
-         |    int: { max: { not: { equals: 10 }}}
-         |    dec: { max: { not: { equals: "10" }}}
+         |    float: { _max: { not: { equals: 10 }}}
+         |    int: { _max: { not: { equals: 10 }}}
+         |    dec: { _max: { not: { equals: "10" }}}
          |  }) {
          |    s
-         |    max {
+         |    _max {
          |      float
          |      int
          |      dec
@@ -478,12 +478,12 @@ class GroupByHavingQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     result = server.query(
       s"""{
          |  groupByModel(by: [s], orderBy: { s: asc }, having: {
-         |    float: { max: { in: [10] }}
-         |    int: { max: { in: [10] }}
-         |    dec: { max: { in: ["10"] }}
+         |    float: { _max: { in: [10] }}
+         |    int: { _max: { in: [10] }}
+         |    dec: { _max: { in: ["10"] }}
          |  }) {
          |    s
-         |    max {
+         |    _max {
          |      float
          |      int
          |      dec
@@ -493,7 +493,7 @@ class GroupByHavingQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       project
     )
     result.toString should be(
-      """{"data":{"groupByModel":[{"s":"group1","max":{"float":10,"int":10,"dec":"10"}},{"s":"group2","max":{"float":10,"int":10,"dec":"10"}}]}}""")
+      """{"data":{"groupByModel":[{"s":"group1","_max":{"float":10,"int":10,"dec":"10"}},{"s":"group2","_max":{"float":10,"int":10,"dec":"10"}}]}}""")
   }
 
   // *******************
@@ -504,7 +504,7 @@ class GroupByHavingQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     server.queryThatMustFail(
       s"""{
            |  groupByModel(by: [s], having: { int: { gt: 3 } }) {
-           |    sum {
+           |    _sum {
            |      int
            |    }
            |  }

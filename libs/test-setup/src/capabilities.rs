@@ -1,5 +1,6 @@
 use enumflags2::BitFlags;
 
+/// Test-relevant connector capabilities.
 #[derive(BitFlags, Copy, Clone, Debug, PartialEq)]
 #[repr(u8)]
 pub enum Capabilities {

@@ -53,8 +53,8 @@ pub fn calculate_datamodel(
     debug!("Done calculating data model {:?}", data_model);
     Ok(IntrospectionResult {
         data_model,
-        version,
         warnings,
+        version,
     })
 }
 

@@ -1,6 +1,9 @@
 use tracing_error::ErrorLayer;
 use tracing_subscriber::{
-    fmt::format::{DefaultFields, Format},
+    fmt::{
+        format::{DefaultFields, Format},
+        TestWriter,
+    },
     layer::Layered,
     prelude::*,
     EnvFilter, FmtSubscriber,
@@ -8,46 +11,22 @@ use tracing_subscriber::{
 
 pub(crate) fn init_logger() {
     tracing::subscriber::set_global_default(test_tracing_subscriber())
-        .map_err(|err| eprintln!("Error initializing the global logger: {}", err))
+        .map_err(|err| {
+            eprintln!("Error initializing the global logger: {}", err);
+            std::process::exit(1);
+        })
         .ok();
 }
 
 type Sub = Layered<
-    ErrorLayer<FmtSubscriber<DefaultFields, Format, EnvFilter, PrintWriter>>,
-    FmtSubscriber<DefaultFields, Format, EnvFilter, PrintWriter>,
+    ErrorLayer<FmtSubscriber<DefaultFields, Format, EnvFilter, TestWriter>>,
+    FmtSubscriber<DefaultFields, Format, EnvFilter, TestWriter>,
 >;
 
 fn test_tracing_subscriber() -> Sub {
     FmtSubscriber::builder()
         .with_env_filter(EnvFilter::from_default_env())
-        .with_writer(PrintWriter)
+        .with_test_writer()
         .finish()
         .with(ErrorLayer::default())
-}
-
-/// This is a temporary implementation detail for `tracing` logs in tests.
-/// Instead of going through `std::io::stderr`, it goes through the specific
-/// local stderr handle used by `eprintln` and `dbg`, allowing logs to appear in
-/// specific test outputs for readability.
-///
-/// It is used from test_macros.
-struct PrintWriter;
-
-impl tracing_subscriber::fmt::MakeWriter for PrintWriter {
-    type Writer = PrintWriter;
-
-    fn make_writer(&self) -> Self::Writer {
-        PrintWriter
-    }
-}
-
-impl std::io::Write for PrintWriter {
-    fn write(&mut self, buf: &[u8]) -> Result<usize, std::io::Error> {
-        eprint!("{}", std::str::from_utf8(buf).unwrap_or("<invalid UTF-8>"));
-        Ok(buf.len())
-    }
-
-    fn flush(&mut self) -> Result<(), std::io::Error> {
-        Ok(())
-    }
 }

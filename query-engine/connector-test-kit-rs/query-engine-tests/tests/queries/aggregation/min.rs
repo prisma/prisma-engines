@@ -5,8 +5,8 @@ mod aggregation_min {
     #[connector_test]
     async fn min_no_records(runner: &Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, "query { aggregateTestModel { min { string int bInt float decimal } } }"),
-          @r###"{"data":{"aggregateTestModel":{"min":{"string":null,"int":null,"bInt":null,"float":null,"decimal":null}}}}"###
+          run_query!(runner, "query { aggregateTestModel { _min { string int bInt float decimal } } }"),
+          @r###"{"data":{"aggregateTestModel":{"_min":{"string":null,"int":null,"bInt":null,"float":null,"decimal":null}}}}"###
         );
 
         Ok(())
@@ -28,9 +28,9 @@ mod aggregation_min {
         insta::assert_snapshot!(
             run_query!(
                 runner,
-                "query { aggregateTestModel { min { int bInt float decimal string } } }"
+                "query { aggregateTestModel { _min { int bInt float decimal string } } }"
             ),
-            @r###"{"data":{"aggregateTestModel":{"min":{"int":5,"bInt":"5","float":4.5,"decimal":"4.5","string":"a"}}}}"###
+            @r###"{"data":{"aggregateTestModel":{"_min":{"int":5,"bInt":"5","float":4.5,"decimal":"4.5","string":"a"}}}}"###
         );
 
         Ok(())
@@ -60,33 +60,33 @@ mod aggregation_min {
         .await?;
 
         insta::assert_snapshot!(
-            run_query!(runner, "query { aggregateTestModel(take: 2) { min { int bInt float decimal string } } }"),
-            @r###"{"data":{"aggregateTestModel":{"min":{"int":5,"bInt":"5","float":4.5,"decimal":"4.5","string":"2"}}}}"###
+            run_query!(runner, "query { aggregateTestModel(take: 2) { _min { int bInt float decimal string } } }"),
+            @r###"{"data":{"aggregateTestModel":{"_min":{"int":5,"bInt":"5","float":4.5,"decimal":"4.5","string":"2"}}}}"###
         );
 
         insta::assert_snapshot!(
-            run_query!(runner, "query { aggregateTestModel(take: 5) { min { int bInt float decimal string } } }"),
-            @r###"{"data":{"aggregateTestModel":{"min":{"int":1,"bInt":"1","float":0.0,"decimal":"0","string":"2"}}}}"###
+            run_query!(runner, "query { aggregateTestModel(take: 5) { _min { int bInt float decimal string } } }"),
+            @r###"{"data":{"aggregateTestModel":{"_min":{"int":1,"bInt":"1","float":0.0,"decimal":"0","string":"2"}}}}"###
         );
 
         insta::assert_snapshot!(
-            run_query!(runner, "query { aggregateTestModel(take: -5) { min { int bInt float decimal string } } }"),
-            @r###"{"data":{"aggregateTestModel":{"min":{"int":1,"bInt":"1","float":0.0,"decimal":"0","string":"2"}}}}"###
+            run_query!(runner, "query { aggregateTestModel(take: -5) { _min { int bInt float decimal string } } }"),
+            @r###"{"data":{"aggregateTestModel":{"_min":{"int":1,"bInt":"1","float":0.0,"decimal":"0","string":"2"}}}}"###
         );
 
         insta::assert_snapshot!(
-            run_query!(runner, r#"query { aggregateTestModel(where: { id: { gt: 2 }}) { min { int bInt float decimal string } } }"#),
-            @r###"{"data":{"aggregateTestModel":{"min":{"int":1,"bInt":"1","float":0.0,"decimal":"0","string":"g"}}}}"###
+            run_query!(runner, r#"query { aggregateTestModel(where: { id: { gt: 2 }}) { _min { int bInt float decimal string } } }"#),
+            @r###"{"data":{"aggregateTestModel":{"_min":{"int":1,"bInt":"1","float":0.0,"decimal":"0","string":"g"}}}}"###
         );
 
         insta::assert_snapshot!(
-            run_query!(runner, "query { aggregateTestModel(skip: 2) { min { int bInt float decimal string } } }"),
-            @r###"{"data":{"aggregateTestModel":{"min":{"int":1,"bInt":"1","float":0.0,"decimal":"0","string":"g"}}}}"###
+            run_query!(runner, "query { aggregateTestModel(skip: 2) { _min { int bInt float decimal string } } }"),
+            @r###"{"data":{"aggregateTestModel":{"_min":{"int":1,"bInt":"1","float":0.0,"decimal":"0","string":"g"}}}}"###
         );
 
         insta::assert_snapshot!(
-            run_query!(runner, r#"query { aggregateTestModel(cursor: { id: 3 }) { min { int bInt float decimal string } } }"#),
-            @r###"{"data":{"aggregateTestModel":{"min":{"int":1,"bInt":"1","float":0.0,"decimal":"0","string":"g"}}}}"###
+            run_query!(runner, r#"query { aggregateTestModel(cursor: { id: 3 }) { _min { int bInt float decimal string } } }"#),
+            @r###"{"data":{"aggregateTestModel":{"_min":{"int":1,"bInt":"1","float":0.0,"decimal":"0","string":"g"}}}}"###
         );
 
         Ok(())

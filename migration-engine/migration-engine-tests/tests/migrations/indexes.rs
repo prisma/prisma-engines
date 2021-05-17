@@ -374,7 +374,7 @@ async fn index_updates_with_rename_must_work(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.schema_push(dm2).force(true).send().await?.assert_executable()?;
+    api.schema_push(dm2).force(true).send().await?.assert_executable();
 
     api.assert_schema().await?.assert_table("A", |t| {
         t.assert_indexes_count(1)?.assert_index_on_columns(&["field", "id"], Ok)
@@ -443,7 +443,7 @@ async fn indexes_with_an_automatically_truncated_name_are_idempotent(api: &TestA
             )
         })?;
 
-    api.schema_push(dm).send().await?.assert_green()?.assert_no_steps()?;
+    api.schema_push(dm).send().await?.assert_green()?.assert_no_steps();
 
     Ok(())
 }

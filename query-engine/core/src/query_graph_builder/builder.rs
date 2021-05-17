@@ -1,7 +1,7 @@
 use std::fmt;
 
 use super::*;
-use crate::{constants::inputs::args, query_document::*, query_graph::*, schema::*, IrSerializer};
+use crate::{constants::args, query_document::*, query_graph::*, schema::*, IrSerializer};
 use prisma_value::PrismaValue;
 
 // TODO: Think about if this is really necessary here, or if the whole code should move into

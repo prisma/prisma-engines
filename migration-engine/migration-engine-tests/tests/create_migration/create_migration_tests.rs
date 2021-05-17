@@ -17,7 +17,7 @@ async fn basic_create_migration_works(api: &TestApi) -> TestResult {
     api.create_migration("create-cats", dm, &dir)
         .send()
         .await?
-        .assert_migration_directories_count(1)?
+        .assert_migration_directories_count(1)
         .assert_migration("create-cats", |migration| {
             let expected_script = match api.sql_family() {
                 SqlFamily::Postgres => {
@@ -91,7 +91,7 @@ async fn creating_a_second_migration_should_have_the_previous_sql_schema_as_base
     api.create_migration("create-cats", dm1, &dir)
         .send()
         .await?
-        .assert_migration_directories_count(1)?;
+        .assert_migration_directories_count(1);
 
     let dm2 = r#"
         model Cat {
@@ -108,7 +108,7 @@ async fn creating_a_second_migration_should_have_the_previous_sql_schema_as_base
     api.create_migration("create-dogs", dm2, &dir)
         .send()
         .await?
-        .assert_migration_directories_count(2)?
+        .assert_migration_directories_count(2)
         .assert_migration("create-dogs", |migration| {
             let expected_script = match api.sql_family() {
                 SqlFamily::Postgres => {
@@ -209,12 +209,12 @@ async fn empty_migrations_should_not_be_created(api: &TestApi) -> TestResult {
     api.create_migration("create-cats", dm, &dir)
         .send()
         .await?
-        .assert_migration_directories_count(1)?;
+        .assert_migration_directories_count(1);
 
     api.create_migration("create-cats-again", dm, &dir)
         .send()
         .await?
-        .assert_migration_directories_count(1)?;
+        .assert_migration_directories_count(1);
 
     Ok(())
 }
@@ -233,7 +233,7 @@ async fn migration_name_length_is_validated(api: &TestApi) -> TestResult {
     api.create_migration("a-migration-with-a-name-that-is-way-too-long-a-migration-with-a-name-that-is-way-too-long-a-migration-with-a-name-that-is-way-too-long-a-migration-with-a-name-that-is-way-too-long", dm, &dir)
         .send()
         .await?
-        .assert_migration_directories_count(1)?;
+        .assert_migration_directories_count(1);
 
     Ok(())
 }
@@ -252,13 +252,13 @@ async fn empty_migrations_should_be_created_with_the_draft_option(api: &TestApi)
     api.create_migration("create-cats", dm, &dir)
         .send()
         .await?
-        .assert_migration_directories_count(1)?;
+        .assert_migration_directories_count(1);
 
     api.create_migration("create-cats-again", dm, &dir)
         .draft(true)
         .send()
         .await?
-        .assert_migration_directories_count(2)?
+        .assert_migration_directories_count(2)
         .assert_migration("create-cats-again", |migration| {
             migration.assert_contents("-- This is an empty migration.")
         })?;
@@ -282,7 +282,7 @@ async fn creating_a_migration_with_a_non_existent_migrations_directory_should_wo
     api.create_migration("create-cats", dm, &dir)
         .send()
         .await?
-        .assert_migration_directories_count(1)?;
+        .assert_migration_directories_count(1);
 
     Ok(())
 }
@@ -312,7 +312,7 @@ async fn create_enum_step_only_rendered_when_needed(api: &TestApi) -> TestResult
     api.create_migration("create-cats", dm, &dir)
         .send()
         .await?
-        .assert_migration_directories_count(1)?
+        .assert_migration_directories_count(1)
         .assert_migration("create-cats", |migration| {
             let expected_script = match api.sql_family() {
                 SqlFamily::Postgres => {
@@ -377,7 +377,7 @@ async fn create_enum_renders_correctly(api: &TestApi) -> TestResult {
     api.create_migration("create-cats", dm, &dir)
         .send()
         .await?
-        .assert_migration_directories_count(1)?
+        .assert_migration_directories_count(1)
         .assert_migration("create-cats", |migration| {
             let expected_script = match api.sql_family() {
                 SqlFamily::Postgres => {
@@ -424,7 +424,7 @@ async fn unsupported_type_renders_correctly(api: &TestApi) -> TestResult {
     api.create_migration("create-cats", dm, &dir)
         .send()
         .await?
-        .assert_migration_directories_count(1)?
+        .assert_migration_directories_count(1)
         .assert_migration("create-cats", |migration| {
             let expected_script = match api.sql_family() {
                 SqlFamily::Postgres => {
@@ -475,7 +475,7 @@ async fn no_additional_unique_created(api: &TestApi) -> TestResult {
     api.create_migration("create-cats", dm, &dir)
         .send()
         .await?
-        .assert_migration_directories_count(1)?
+        .assert_migration_directories_count(1)
         .assert_migration("create-cats", |migration| {
             let expected_script = match api.sql_family() {
                 SqlFamily::Postgres => {

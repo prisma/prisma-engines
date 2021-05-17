@@ -26,9 +26,9 @@ async fn typescript_starter_schema_is_idempotent_without_native_type_annotations
         .send()
         .await?
         .assert_green()?
-        .assert_has_executed_steps()?;
-    api.schema_push(&dm).send().await?.assert_green()?.assert_no_steps()?;
-    api.schema_push(&dm).send().await?.assert_green()?.assert_no_steps()?;
+        .assert_has_executed_steps();
+    api.schema_push(&dm).send().await?.assert_green()?.assert_no_steps();
+    api.schema_push(&dm).send().await?.assert_green()?.assert_no_steps();
 
     Ok(())
 }
@@ -58,9 +58,9 @@ async fn typescript_starter_schema_starting_without_native_types_is_idempotent(a
         .send()
         .await?
         .assert_green()?
-        .assert_has_executed_steps()?;
-    api.schema_push(dm).send().await?.assert_green()?.assert_no_steps()?;
-    api.schema_push(&dm2).send().await?.assert_green()?.assert_no_steps()?;
+        .assert_has_executed_steps();
+    api.schema_push(dm).send().await?.assert_green()?.assert_no_steps();
+    api.schema_push(&dm2).send().await?.assert_green()?.assert_no_steps();
 
     Ok(())
 }
@@ -76,7 +76,7 @@ async fn bigint_primary_keys_are_idempotent(api: &TestApi) -> TestResult {
     );
 
     api.schema_push(&dm1).send().await?.assert_green()?;
-    api.schema_push(dm1).send().await?.assert_green()?.assert_no_steps()?;
+    api.schema_push(dm1).send().await?.assert_green()?.assert_no_steps();
 
     let dm2 = api.native_types_datamodel(
         r#"
@@ -87,7 +87,7 @@ async fn bigint_primary_keys_are_idempotent(api: &TestApi) -> TestResult {
     );
 
     api.schema_push(&dm2).send().await?.assert_green()?;
-    api.schema_push(dm2).send().await?.assert_green()?.assert_no_steps()?;
+    api.schema_push(dm2).send().await?.assert_green()?.assert_no_steps();
 
     Ok(())
 }
