@@ -130,6 +130,7 @@ case class TestServer() extends PlayJsonExtensions with LogSupport {
       case true =>
         Seq(
           EnvVars.prismaBinaryPath,
+          "--log-queries",
           "--enable-raw-queries",
           "--datamodel",
           encodedDataModel,
@@ -142,6 +143,7 @@ case class TestServer() extends PlayJsonExtensions with LogSupport {
       case false =>
         Seq(
           EnvVars.prismaBinaryPath,
+          "--log-queries",
           "--enable-raw-queries",
           "--datamodel",
           encodedDataModel,
