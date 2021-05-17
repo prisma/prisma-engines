@@ -4,6 +4,7 @@ mod scalar;
 
 use super::utils;
 use crate::{
+    constants::filters,
     query_document::{ParsedInputMap, ParsedInputValue},
     QueryGraphBuilderError, QueryGraphBuilderResult,
 };
@@ -152,18 +153,11 @@ fn extract_scalar_filters(field: &ScalarFieldRef, value: ParsedInputValue) -> Qu
     match value {
         ParsedInputValue::Single(pv) => Ok(vec![field.equals(pv)]),
         ParsedInputValue::Map(mut filter_map) => {
-            let mode = match filter_map.remove("mode") {
+            let mode = match filter_map.remove(filters::MODE) {
                 Some(i) => parse_query_mode(i)?,
                 None => QueryMode::Default,
             };
-
-            let mut filters: Vec<Filter> = filter_map
-                .into_iter()
-                .map(|(k, v)| scalar::parse(&k, field, v, false))
-                .collect::<QueryGraphBuilderResult<Vec<Vec<_>>>>()?
-                .into_iter()
-                .flatten()
-                .collect();
+            let mut filters: Vec<Filter> = scalar::parse(filter_map, field, false)?;
 
             filters.iter_mut().for_each(|f| f.set_mode(mode.clone()));
             Ok(filters)

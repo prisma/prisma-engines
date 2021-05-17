@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use crate::{RunnerInterface, TestResult};
+use crate::{ConnectorTag, RunnerInterface, TestResult};
 use prisma_models::DatamodelConverter;
 use query_core::{exec_loader, schema_builder, BuildMode, QueryExecutor, QuerySchemaRef};
 use request_handlers::{GraphQlBody, GraphQlHandler, MultiQuery};
@@ -11,11 +11,12 @@ pub(crate) type Executor = Box<dyn QueryExecutor + Send + Sync>;
 pub struct DirectRunner {
     executor: Executor,
     query_schema: QuerySchemaRef,
+    connector_tag: ConnectorTag,
 }
 
 #[async_trait::async_trait]
 impl RunnerInterface for DirectRunner {
-    async fn load(datamodel: String) -> TestResult<Self> {
+    async fn load(datamodel: String, connector_tag: ConnectorTag) -> TestResult<Self> {
         let config = datamodel::parse_configuration_with_url_overrides(&datamodel, vec![])
             .unwrap()
             .subject;
@@ -36,7 +37,11 @@ impl RunnerInterface for DirectRunner {
             preview_features,
         ));
 
-        Ok(Self { executor, query_schema })
+        Ok(Self {
+            executor,
+            query_schema,
+            connector_tag,
+        })
     }
 
     async fn query(&self, query: String) -> TestResult<crate::QueryResult> {
@@ -54,5 +59,9 @@ impl RunnerInterface for DirectRunner {
         ));
 
         Ok(handler.handle(query).await.into())
+    }
+
+    fn connector(&self) -> &crate::ConnectorTag {
+        &self.connector_tag
     }
 }

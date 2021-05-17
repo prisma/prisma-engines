@@ -170,6 +170,8 @@ pub enum ConnectorCapability {
     WritableAutoincField,
     CreateSkipDuplicates,
     UpdateableId,
+    JsonFilteringJsonPath,
+    JsonFilteringArrayPath,
 }
 
 /// Contains all capabilities that the connector is able to serve.

@@ -381,9 +381,136 @@ fn convert_scalar_filter(
     fields: &[ScalarFieldRef],
     is_parent_aggregation: bool,
 ) -> ConditionTree<'static> {
-    match mode {
-        QueryMode::Default => default_scalar_filter(comparable, cond, fields),
-        QueryMode::Insensitive => insensitive_scalar_filter(comparable, cond, fields, is_parent_aggregation),
+    match cond {
+        ScalarCondition::JsonCompare(json_compare) => {
+            convert_json_filter(comparable, json_compare, mode, fields.first().unwrap().to_owned())
+        }
+        _ => match mode {
+            QueryMode::Default => default_scalar_filter(comparable, cond, fields),
+            QueryMode::Insensitive => insensitive_scalar_filter(comparable, cond, fields, is_parent_aggregation),
+        },
+    }
+}
+
+fn convert_json_filter(
+    comparable: Expression<'static>,
+    json_condition: JsonCondition,
+    query_mode: QueryMode,
+    field: ScalarFieldRef,
+) -> ConditionTree<'static> {
+    let json_filter_path = json_condition.path;
+    let cond = json_condition.condition;
+    let target_type = json_condition.target_type;
+    let (expr_json, expr_string): (Expression, Expression) = if let Some(path) = json_filter_path {
+        match path {
+            JsonFilterPath::String(path) => (
+                json_extract(comparable.clone(), JsonPath::string(path.clone()), false).into(),
+                json_extract(comparable, JsonPath::string(path), true).into(),
+            ),
+            JsonFilterPath::Array(path) => (
+                json_extract(comparable.clone(), JsonPath::array(path.clone()), false).into(),
+                json_extract(comparable, JsonPath::array(path), true).into(),
+            ),
+        }
+    } else {
+        (comparable.clone(), comparable)
+    };
+
+    let condition: Expression = match *cond {
+        ScalarCondition::Contains(value) => match target_type.unwrap() {
+            JsonTargetType::String => expr_string
+                .like(format!("{}", value))
+                .and(expr_json.json_type_equals(JsonType::String))
+                .into(),
+            JsonTargetType::Array => expr_json.json_array_contains(convert_value(&field, value)).into(),
+        },
+        ScalarCondition::NotContains(value) => match target_type.unwrap() {
+            JsonTargetType::String => expr_string
+                .not_like(format!("{}", value))
+                .and(expr_json.json_type_equals(JsonType::String))
+                .into(),
+            JsonTargetType::Array => expr_json.json_array_not_contains(convert_value(&field, value)).into(),
+        },
+        ScalarCondition::StartsWith(value) => match target_type.unwrap() {
+            JsonTargetType::String => expr_string
+                .begins_with(format!("{}", value))
+                .and(expr_json.json_type_equals(JsonType::String))
+                .into(),
+            JsonTargetType::Array => expr_json
+                .clone()
+                .json_array_begins_with(convert_value(&field, value))
+                .and(expr_json.json_type_equals(JsonType::Array))
+                .into(),
+        },
+        ScalarCondition::NotStartsWith(value) => match target_type.unwrap() {
+            JsonTargetType::String => expr_string
+                .not_begins_with(format!("{}", value))
+                .and(expr_json.json_type_equals(JsonType::String))
+                .into(),
+            JsonTargetType::Array => expr_json
+                .clone()
+                .json_array_not_begins_with(convert_value(&field, value))
+                .and(expr_json.json_type_equals(JsonType::Array))
+                .into(),
+        },
+        ScalarCondition::EndsWith(value) => match target_type.unwrap() {
+            JsonTargetType::String => expr_string
+                .ends_into(format!("{}", value))
+                .and(expr_json.json_type_equals(JsonType::String))
+                .into(),
+            JsonTargetType::Array => expr_json
+                .clone()
+                .json_array_ends_into(convert_value(&field, value))
+                .and(expr_json.json_type_equals(JsonType::Array))
+                .into(),
+        },
+        ScalarCondition::NotEndsWith(value) => match target_type.unwrap() {
+            JsonTargetType::String => expr_string
+                .not_ends_into(format!("{}", value))
+                .and(expr_json.json_type_equals(JsonType::String))
+                .into(),
+            JsonTargetType::Array => expr_json
+                .clone()
+                .json_array_not_ends_into(convert_value(&field, value))
+                .and(expr_json.json_type_equals(JsonType::Array))
+                .into(),
+        },
+        ScalarCondition::GreaterThan(value) => expr_string
+            .greater_than(convert_value(&field, value.clone()))
+            .and(filter_json_type(expr_json, value))
+            .into(),
+        ScalarCondition::GreaterThanOrEquals(value) => expr_string
+            .greater_than_or_equals(convert_value(&field, value.clone()))
+            .and(filter_json_type(expr_json, value))
+            .into(),
+        ScalarCondition::LessThan(value) => expr_string
+            .less_than(convert_value(&field, value.clone()))
+            .and(filter_json_type(expr_json, value))
+            .into(),
+        ScalarCondition::LessThanOrEquals(value) => expr_string
+            .less_than_or_equals(convert_value(&field, value.clone()))
+            .and(filter_json_type(expr_json, value))
+            .into(),
+        _ => {
+            return convert_scalar_filter(expr_json, *cond, query_mode, &[field], false);
+        }
+    };
+
+    ConditionTree::single(condition)
+}
+
+fn filter_json_type(comparable: Expression<'static>, value: PrismaValue) -> Compare {
+    match value {
+        PrismaValue::Json(json) => {
+            let json: serde_json::Value = serde_json::from_str(json.as_str()).unwrap();
+
+            match json {
+                serde_json::Value::String(_) => comparable.json_type_equals(JsonType::String),
+                serde_json::Value::Number(_) => comparable.json_type_equals(JsonType::Number),
+                v => panic!("JSON target types only accept strings or numbers, found: {}", v),
+            }
+        }
+        _ => unreachable!(),
     }
 }
 
@@ -435,6 +562,7 @@ fn default_scalar_filter(
             }
             _ => comparable.not_in_selection(convert_values(fields, values)),
         },
+        ScalarCondition::JsonCompare(_) => unreachable!(),
     };
 
     ConditionTree::single(condition)
@@ -533,6 +661,7 @@ fn insensitive_scalar_filter(
                 )
             }
         },
+        ScalarCondition::JsonCompare(_) => unreachable!(),
     };
 
     ConditionTree::single(condition)
@@ -546,16 +675,16 @@ fn lower_if(expr: Expression<'static>, cond: bool) -> Expression<'static> {
     }
 }
 
-fn convert_first_value<'a>(fields: &[ScalarFieldRef], value: PrismaValue) -> Value<'a> {
-    fields.first().unwrap().value(value)
-}
-
 fn convert_value<'a>(field: &ScalarFieldRef, value: PrismaValue) -> Value<'a> {
     field.value(value)
 }
 
+fn convert_first_value<'a>(fields: &[ScalarFieldRef], value: PrismaValue) -> Value<'a> {
+    convert_value(fields.first().unwrap(), value)
+}
+
 fn convert_list_value<'a>(field: &ScalarFieldRef, values: Vec<PrismaValue>) -> Value<'a> {
-    Value::Array(Some(values.into_iter().map(|val| field.value(val)).collect()))
+    Value::Array(Some(values.into_iter().map(|val| convert_value(field, val)).collect()))
 }
 
 fn convert_values<'a>(fields: &[ScalarFieldRef], values: Vec<PrismaValue>) -> Vec<Value<'a>> {

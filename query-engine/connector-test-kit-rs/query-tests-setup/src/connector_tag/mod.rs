@@ -12,7 +12,7 @@ use mysql::*;
 use postgres::*;
 use sql_server::*;
 use sqlite::*;
-use std::convert::TryFrom;
+use std::{convert::TryFrom, fmt};
 use vitess::*;
 
 use crate::{datamodel_rendering::DatamodelRenderer, TestConfig, TestError};
@@ -53,6 +53,21 @@ pub enum ConnectorTag {
     MongoDb(MongoDbConnectorTag),
     Sqlite(SqliteConnectorTag),
     Vitess(VitessConnectorTag),
+}
+
+impl fmt::Display for ConnectorTag {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let printable = match self {
+            ConnectorTag::SqlServer(_) => "SQL Server",
+            ConnectorTag::Postgres(_) => "PostgreSQL",
+            ConnectorTag::MySql(_) => "MySQL",
+            ConnectorTag::MongoDb(_) => "MongoDB",
+            ConnectorTag::Sqlite(_) => "SQLite",
+            ConnectorTag::Vitess(_) => "Vitess",
+        };
+
+        write!(f, "{}", printable)
+    }
 }
 
 impl ConnectorTag {
