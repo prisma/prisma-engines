@@ -15,20 +15,19 @@ where
     let res = f().await;
     let end = Instant::now();
 
-    if *crate::LOG_QUERIES {
-        let result = match res {
-            Ok(_) => "success",
-            Err(_) => "error",
-        };
+    let result = match res {
+        Ok(_) => "success",
+        Err(_) => "error",
+    };
 
-        tracing::info!(
-            query,
-            item_type = "query",
-            params = %Params(params),
-            duration_ms = start.elapsed().as_millis() as u64,
-            result,
-        )
-    }
+    tracing::trace!(
+        query,
+        item_type = "query",
+        is_query = true,
+        params = %Params(params),
+        duration_ms = start.elapsed().as_millis() as u64,
+        result,
+    );
 
     timing!(format!("{}.query.time", tag), start, end);
 
@@ -44,18 +43,18 @@ where
     let res = f.await;
     let end = Instant::now();
 
-    if *crate::LOG_QUERIES {
-        let result = match res {
-            Ok(_) => "success",
-            Err(_) => "error",
-        };
+    let result = match res {
+        Ok(_) => "success",
+        Err(_) => "error",
+    };
 
-        tracing::info!(
-            message = "Fetched a connection from the pool",
-            duration_ms = start.elapsed().as_millis() as u64,
-            result,
-        );
-    }
+    tracing::trace!(
+        message = "Fetched a connection from the pool",
+        duration_ms = start.elapsed().as_millis() as u64,
+        item_type = "query",
+        is_query = true,
+        result,
+    );
 
     timing!("pool.check_out", start, end);
 

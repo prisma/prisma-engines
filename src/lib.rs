@@ -133,10 +133,6 @@ pub mod single;
 mod tests;
 pub mod visitor;
 
-use once_cell::sync::Lazy;
-
 pub use ast::Value;
-
-pub(crate) static LOG_QUERIES: Lazy<bool> = Lazy::new(|| std::env::var("LOG_QUERIES").map(|_| true).unwrap_or(false));
 
 pub type Result<T> = std::result::Result<T, error::Error>;
