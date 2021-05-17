@@ -1,7 +1,4 @@
-use std::str::FromStr;
-
 use crate::common::*;
-use bigdecimal::BigDecimal;
 use chrono::DateTime;
 use datamodel::{DefaultValue, ScalarType, ValueGenerator};
 use prisma_value::{FloatValue, PrismaValue};
@@ -12,11 +9,11 @@ fn should_set_default_for_all_scalar_types() {
     model Model {
         id Int @id
         int Int @default(3)
+        bInt BigInt @default(3)
         float Float @default(3.20)
         string String @default("String")
         boolean Boolean @default(false)
         dateTime DateTime @default("2019-06-17T14:20:57Z")
-        decimal Decimal @default(3.20)
     }
     "#;
 
@@ -51,11 +48,9 @@ fn should_set_default_for_all_scalar_types() {
         )));
 
     user_model
-        .assert_has_scalar_field("decimal")
-        .assert_base_type(&ScalarType::Decimal)
-        .assert_default_value(DefaultValue::Single(PrismaValue::Decimal(
-            BigDecimal::from_str("3.20").unwrap(),
-        )));
+        .assert_has_scalar_field("bInt")
+        .assert_base_type(&ScalarType::BigInt)
+        .assert_default_value(DefaultValue::Single(PrismaValue::BigInt(3)));
 }
 
 #[test]
