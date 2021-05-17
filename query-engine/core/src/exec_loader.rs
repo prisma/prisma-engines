@@ -133,7 +133,6 @@ async fn postgres(source: &Datasource, url: &str) -> crate::Result<(String, Box<
     let database_str = url;
     let psql = PostgreSql::from_source(source, url).await?;
 
-    let db_name = db_name(source, database_str)?;
     let url = Url::parse(database_str)?;
     let params: HashMap<String, String> = url.query_pairs().into_owned().collect();
 
@@ -142,6 +141,8 @@ async fn postgres(source: &Datasource, url: &str) -> crate::Result<(String, Box<
         .and_then(|flag| flag.parse().ok())
         .unwrap_or(false);
 
+    let db_name = db_name(source, database_str)?;
+
     trace!("Loaded Postgres query connector.");
     Ok((db_name, sql_executor(psql, force_transactions)))
 }
@@ -149,8 +150,8 @@ async fn postgres(source: &Datasource, url: &str) -> crate::Result<(String, Box<
 async fn mysql(source: &Datasource, url: &str) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
     trace!("Loading MySQL query connector...");
 
-    let db_name = db_name(source, url)?;
     let mysql = Mysql::from_source(source, url).await?;
+    let db_name = db_name(source, url)?;
 
     trace!("Loaded MySQL query connector.");
     Ok((db_name, sql_executor(mysql, false)))
@@ -159,8 +160,8 @@ async fn mysql(source: &Datasource, url: &str) -> crate::Result<(String, Box<dyn
 async fn mssql(source: &Datasource, url: &str) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
     trace!("Loading SQL Server query connector...");
 
-    let db_name = db_name(source, url)?;
     let mssql = Mssql::from_source(source, url).await?;
+    let db_name = db_name(source, url)?;
 
     trace!("Loaded SQL Server query connector.");
     Ok((db_name, sql_executor(mssql, false)))
@@ -177,8 +178,8 @@ where
 async fn mongodb(source: &Datasource, url: &str) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
     trace!("Loading MongoDB query connector...");
 
-    let db_name = db_name(source, url)?;
     let mongo = MongoDb::new(source, url).await?;
+    let db_name = db_name(source, url)?;
 
     trace!("Loaded MongoDB query connector.");
     Ok((db_name.to_owned(), Box::new(InterpretingExecutor::new(mongo, false))))
