@@ -5,15 +5,14 @@ use opentelemetry::global;
 use prisma_models::DatamodelConverter;
 use query_core::{exec_loader, schema_builder, BuildMode, QueryExecutor, QuerySchema, QuerySchemaRenderer};
 use request_handlers::{GraphQLSchemaRenderer, GraphQlBody, GraphQlHandler, PrismaResponse};
-use serde::{Deserialize, Deserializer, Serialize};
+use serde::{Deserialize, Serialize};
 use std::{
     collections::{BTreeMap, HashMap},
     path::PathBuf,
-    str::FromStr,
     sync::Arc,
 };
 use tokio::sync::RwLock;
-use tracing::{metadata::LevelFilter, Level};
+use tracing::Level;
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 /// The main engine, that can be cloned between threads when using JavaScript
@@ -83,8 +82,9 @@ impl ConnectedEngine {
 #[serde(rename_all = "camelCase")]
 pub struct ConstructorOptions {
     datamodel: String,
-    #[serde(deserialize_with = "deserialize_log_level")]
-    log_level: LevelFilter,
+    log_level: String,
+    #[serde(default)]
+    log_queries: bool,
     #[serde(default)]
     datasource_overrides: BTreeMap<String, String>,
     #[serde(default)]
@@ -101,14 +101,6 @@ pub struct TelemetryOptions {
     endpoint: Option<String>,
 }
 
-fn deserialize_log_level<'de, D>(deserializer: D) -> Result<LevelFilter, D::Error>
-where
-    D: Deserializer<'de>,
-{
-    let buf = String::deserialize(deserializer)?;
-    LevelFilter::from_str(&buf).map_err(serde::de::Error::custom)
-}
-
 impl QueryEngine {
     /// Parse a validated datamodel and configuration to allow connecting later on.
     pub fn new(opts: ConstructorOptions, log_callback: ThreadsafeFunction<String>) -> crate::Result<Self> {
@@ -117,6 +109,7 @@ impl QueryEngine {
         let ConstructorOptions {
             datamodel,
             log_level,
+            log_queries,
             datasource_overrides,
             telemetry,
             config_dir,
@@ -152,7 +145,7 @@ impl QueryEngine {
         let logger = if telemetry.enabled {
             ChannelLogger::new_with_telemetry(log_callback, telemetry.endpoint)
         } else {
-            ChannelLogger::new(log_level, log_callback)
+            ChannelLogger::new(&log_level, log_queries, log_callback)
         };
 
         let builder = EngineBuilder {
