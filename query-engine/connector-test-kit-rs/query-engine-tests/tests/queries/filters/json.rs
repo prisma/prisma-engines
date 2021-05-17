@@ -40,7 +40,7 @@ mod json {
         Ok(())
     }
 
-    #[connector_test(capabilities(JsonFilteringJsonPath))]
+    #[connector_test(capabilities(JsonFilteringJsonPath), exclude(MySql(5.6)))]
     async fn extract_json_path(runner: &Runner) -> TestResult<()> {
         create_row(runner, 1, r#"{ \"a\": { \"b\": \"c\" } }"#, false).await?;
         create_row(runner, 2, r#"{ \"a\": { \"b\": [1, 2, 3] } }"#, false).await?;

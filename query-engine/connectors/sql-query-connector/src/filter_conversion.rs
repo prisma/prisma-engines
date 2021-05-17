@@ -396,7 +396,6 @@ fn convert_json_filter(
     let json_filter_path = json_condition.path;
     let cond = json_condition.condition;
     let target_type = json_condition.target_type;
-
     let (expr_json, expr_string): (Expression, Expression) = if let Some(path) = json_filter_path {
         match path {
             JsonFilterPath::String(path) => (
