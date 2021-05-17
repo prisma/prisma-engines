@@ -57,7 +57,7 @@ features!(
     NApi,
     SelectRelationCount,
     OrderByAggregateGroup,
-    JsonFiltering
+    FilterJson
 );
 
 // Mapping of which active, deprecated and hidden
@@ -71,7 +71,7 @@ lazy_static! {
             NApi,
             SelectRelationCount,
             OrderByAggregateGroup,
-            JsonFiltering
+            FilterJson
         ]).with_hidden(vec![
             MongoDb
         ]).with_deprecated(vec![
