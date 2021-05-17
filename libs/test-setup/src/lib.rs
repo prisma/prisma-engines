@@ -99,7 +99,7 @@ static TAGS: Lazy<Result<DbUnderTest, String>> = Lazy::new(|| {
         "sqlserver" => Ok(DbUnderTest {
             tags: mssql::get_mssql_tags(&database_url)?,
             database_url,
-            capabilities: (Capabilities::CreateDatabase | Capabilities::Decimal).into(),
+            capabilities: Capabilities::CreateDatabase | Capabilities::Decimal,
             provider: "sqlserver",
             shadow_database_url,
         }),
