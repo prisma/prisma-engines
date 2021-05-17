@@ -1,4 +1,5 @@
 use migration_engine_tests::sync_test_api::*;
+use sql_schema_describer::ColumnTypeFamily;
 
 const BASIC_ENUM_DM: &str = r#"
 model Cat {
@@ -11,6 +12,79 @@ enum CatMood {
     HUNGRY
 }
 "#;
+
+#[test_connector(capabilities(Enums))]
+fn adding_an_enum_field_must_work(api: TestApi) {
+    let dm = r#"
+        model Test {
+            id String @id @default(cuid())
+            enum MyEnum
+        }
+
+        enum MyEnum {
+            A
+            B
+        }
+    "#;
+
+    api.schema_push(dm).send_sync().assert_green().unwrap();
+
+    api.assert_schema()
+        .assert_table("Test", |table| {
+            table.assert_columns_count(2)?.assert_column("enum", |c| {
+                if api.is_postgres() {
+                    c.assert_is_required()?
+                        .assert_type_family(ColumnTypeFamily::Enum("MyEnum".to_owned()))
+                } else if api.is_mysql() {
+                    c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Enum(
+                        api.normalize_identifier("Test_enum").into_owned(),
+                    ))
+                } else {
+                    c.assert_is_required()?.assert_type_is_string()
+                }
+            })
+        })
+        .unwrap();
+
+    // Check that the migration is idempotent.
+    api.schema_push(dm).send_sync().assert_no_steps();
+}
+
+#[test_connector(capabilities(Enums))]
+fn adding_an_enum_field_must_work_with_native_types_off(api: TestApi) {
+    let dm = r#"
+        model Test {
+            id String @id @default(cuid())
+            enum MyEnum
+        }
+
+        enum MyEnum {
+            A
+            B
+        }
+    "#;
+
+    api.schema_push(dm).send_sync().assert_green().unwrap();
+
+    api.assert_schema()
+        .assert_table("Test", |table| {
+            table.assert_columns_count(2)?.assert_column("enum", |c| {
+                if api.is_postgres() {
+                    c.assert_is_required()?
+                        .assert_type_family(ColumnTypeFamily::Enum("MyEnum".to_owned()))
+                } else if api.is_mysql() {
+                    c.assert_is_required()?
+                        .assert_type_family(ColumnTypeFamily::Enum(api.normalize_identifier("Test_enum").into()))
+                } else {
+                    c.assert_is_required()?.assert_type_is_string()
+                }
+            })
+        })
+        .unwrap();
+
+    // Check that the migration is idempotent.
+    api.schema_push(dm).send_sync().assert_no_steps();
+}
 
 #[test_connector(capabilities(Enums))]
 fn an_enum_can_be_turned_into_a_model(api: TestApi) {

@@ -4,11 +4,12 @@ pub use test_macros::test_connector;
 pub use test_setup::{BitFlags, Capabilities, Tags};
 
 use crate::{
-    multi_engine_test_api::TestApi as RootTestApi, ApplyMigrations, CreateMigration, SchemaAssertion, SchemaPush,
+    multi_engine_test_api::TestApi as RootTestApi, ApplyMigrations, CreateMigration, DiagnoseMigrationHistory,
+    SchemaAssertion, SchemaPush,
 };
 use quaint::prelude::{Queryable, ResultSet};
 use sql_migration_connector::SqlMigrationConnector;
-use std::future::Future;
+use std::{borrow::Cow, future::Future};
 use test_setup::TestApiArgs;
 
 pub struct TestApi {
@@ -47,6 +48,10 @@ impl TestApi {
     /// Create a temporary directory to serve as a test migrations directory.
     pub fn create_migrations_directory(&self) -> TempDir {
         self.root.create_migrations_directory()
+    }
+
+    pub fn diagnose_migration_history<'a>(&'a self, migrations_directory: &'a TempDir) -> DiagnoseMigrationHistory<'a> {
+        DiagnoseMigrationHistory::new_sync(&self.connector, migrations_directory, &self.root.rt)
     }
 
     /// Returns true only when testing on MSSQL.
@@ -121,6 +126,14 @@ impl TestApi {
     /// Render a valid datasource block, including database URL.
     pub fn datasource_block(&self) -> String {
         self.root.args.datasource_block(self.root.args.database_url())
+    }
+
+    pub fn normalize_identifier<'a>(&self, identifier: &'a str) -> Cow<'a, str> {
+        if self.lower_cases_table_names() {
+            identifier.to_ascii_lowercase().into()
+        } else {
+            identifier.into()
+        }
     }
 
     /// Same as quaint::Queryable::query()

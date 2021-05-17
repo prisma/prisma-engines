@@ -301,3 +301,37 @@ fn changing_a_foreign_key_constrained_column_from_nullable_to_required_and_back_
     api.schema_push(dm2).send_sync().assert_green().unwrap();
     api.schema_push(dm).send_sync().assert_green().unwrap();
 }
+
+// TODO: Enable SQL Server when cascading rules are in PSL.
+#[test_connector(exclude(Mssql))]
+fn changing_all_referenced_columns_of_foreign_key_works(api: TestApi) {
+    let dm1 = r#"
+       model Post {
+          id        Int     @default(autoincrement()) @id
+          author    User?   @relation(fields: [authorId], references: [id])
+          authorId  Int?
+        }
+
+        model User {
+          id       Int     @default(autoincrement()) @id
+          posts    Post[]
+        }
+    "#;
+
+    api.schema_push(dm1).send_sync().assert_green().unwrap();
+
+    let dm2 = r#"
+        model Post {
+          id        Int     @default(autoincrement()) @id
+          author    User?   @relation(fields: [authorId], references: [uid])
+          authorId  Int?
+        }
+
+        model User {
+          uid   Int    @id
+          posts Post[]
+        }
+    "#;
+
+    api.schema_push(dm2).send_sync().assert_green().unwrap();
+}

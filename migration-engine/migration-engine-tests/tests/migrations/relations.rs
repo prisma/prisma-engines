@@ -274,3 +274,193 @@ fn moving_an_inline_relation_to_the_other_side_must_work(api: TestApi) {
         .assert_table("A", |table| table.assert_foreign_keys_count(0)?.assert_indexes_count(0))
         .unwrap();
 }
+
+#[test_connector]
+fn relations_can_reference_arbitrary_unique_fields(api: TestApi) {
+    let dm = r#"
+        model User {
+            id Int @id
+            email String @unique
+            a     Account[]
+        }
+
+        model Account {
+            id Int @id
+            uem String
+            user User @relation(fields: [uem], references: [email])
+        }
+    "#;
+
+    api.schema_push(dm).send_sync().assert_green().unwrap();
+    api.assert_schema()
+        .assert_table("Account", |t| {
+            t.assert_foreign_keys_count(1)?
+                .assert_fk_on_columns(&["uem"], |fk| fk.assert_references("User", &["email"]))
+        })
+        .unwrap();
+}
+
+#[test_connector]
+fn relations_can_reference_arbitrary_unique_fields_with_maps(api: TestApi) {
+    let dm = r#"
+        model User {
+            id Int @id
+            email String @unique @map("emergency-mail")
+            accounts Account[]
+
+            @@map("users")
+        }
+
+        model Account {
+            id Int @id
+            uem String @map("user-id")
+            user User @relation(fields: [uem], references: [email])
+        }
+    "#;
+
+    api.schema_push(dm).send_sync().assert_green().unwrap();
+
+    api.assert_schema()
+        .assert_table("Account", |table| {
+            table
+                .assert_foreign_keys_count(1)?
+                .assert_fk_on_columns(&["user-id"], |fk| fk.assert_references("users", &["emergency-mail"]))
+        })
+        .unwrap();
+}
+
+#[test_connector]
+fn relations_can_reference_multiple_fields(api: TestApi) {
+    let dm = r#"
+        model User {
+            id Int @id
+            email  String
+            age    Int
+            a      Account[]
+
+            @@unique([email, age])
+        }
+
+        model Account {
+            id   Int @id
+            usermail String
+            userage Int
+            user User @relation(fields: [usermail, userage], references: [email, age])
+        }
+    "#;
+
+    api.schema_push(dm).send_sync().assert_green().unwrap();
+
+    api.assert_schema()
+        .assert_table("Account", |table| {
+            table
+                .assert_foreign_keys_count(1)?
+                .assert_fk_on_columns(&["usermail", "userage"], |fk| {
+                    fk.assert_references("User", &["email", "age"])
+                })
+        })
+        .unwrap();
+}
+
+#[test_connector]
+fn a_relation_with_mappings_on_both_sides_can_reference_multiple_fields(api: TestApi) {
+    let dm = r#"
+        model User {
+            id Int @id
+            email  String @map("emergency-mail")
+            age    Int    @map("birthdays-count")
+            a      Account[]
+
+            @@unique([email, age])
+            @@map("users")
+        }
+
+        model Account {
+            id   Int @id
+            usermail String @map("emergency-mail-fk-1")
+            userage Int @map("age-fk2")
+
+            user User @relation(fields: [usermail, userage], references: [email, age])
+        }
+    "#;
+
+    api.schema_push(dm).send_sync().assert_green().unwrap();
+
+    api.assert_schema()
+        .assert_table("Account", |table| {
+            table
+                .assert_foreign_keys_count(1)?
+                .assert_fk_on_columns(&["emergency-mail-fk-1", "age-fk2"], |fk| {
+                    fk.assert_references("users", &["emergency-mail", "birthdays-count"])
+                })
+        })
+        .unwrap();
+}
+
+#[test_connector]
+fn relations_with_mappings_on_referenced_side_can_reference_multiple_fields(api: TestApi) {
+    let dm = r#"
+        model User {
+            id Int @id
+            email  String @map("emergency-mail")
+            age    Int    @map("birthdays-count")
+            a      Account[]
+
+            @@unique([email, age])
+            @@map("users")
+        }
+
+        model Account {
+            id   Int @id
+            useremail String
+            userage Int
+            user User @relation(fields: [useremail, userage], references: [email, age])
+        }
+    "#;
+
+    api.schema_push(dm).send_sync().assert_green().unwrap();
+
+    api.assert_schema()
+        .assert_table("Account", |table| {
+            table
+                .assert_foreign_keys_count(1)?
+                .assert_fk_on_columns(&["useremail", "userage"], |fk| {
+                    fk.assert_references("users", &["emergency-mail", "birthdays-count"])
+                })
+        })
+        .unwrap();
+}
+
+#[test_connector]
+fn relations_with_mappings_on_referencing_side_can_reference_multiple_fields(api: TestApi) {
+    let dm = r#"
+        model User {
+            id Int @id
+            email  String
+            age    Int
+            a      Account[]
+
+            @@unique([email, age])
+            @@map("users")
+        }
+
+        model Account {
+            id   Int @id
+            user_email String @map("emergency-mail-fk1")
+            user_age Int @map("age-fk2")
+            user User @relation(fields: [user_email, user_age], references: [email, age])
+        }
+    "#;
+
+    api.schema_push(dm).send_sync().assert_green().unwrap();
+
+    api.assert_schema()
+        .assert_table("Account", |table| {
+            table
+                .assert_foreign_keys_count(1)?
+                .assert_fk_on_columns(&["emergency-mail-fk1", "age-fk2"], |fk| {
+                    fk.assert_references("users", &["email", "age"])
+                })
+        })
+        .unwrap();
+}
