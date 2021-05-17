@@ -267,7 +267,7 @@ impl<'a> LiftAstToDml<'a> {
                         ));
                     };
 
-                    let number_of_args = args.iter().count();
+                    let number_of_args = args.len();
                     if number_of_args < constructor._number_of_args
                         || ((number_of_args > constructor._number_of_args) && constructor._number_of_optional_args == 0)
                     {

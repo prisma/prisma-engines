@@ -40,7 +40,7 @@ async fn shared_default_constraints_are_ignored_issue_5423(api: &TestApi) -> Tes
         .send()
         .await?
         .assert_green()?
-        .assert_no_steps()?;
+        .assert_no_steps();
 
     Ok(())
 }

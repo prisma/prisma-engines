@@ -88,11 +88,7 @@ async fn existing_postgis_tables_must_not_be_migrated(api: &TestApi) -> TestResu
 
     let schema = "";
 
-    api.schema_push(schema)
-        .send()
-        .await?
-        .assert_green()?
-        .assert_no_steps()?;
+    api.schema_push(schema).send().await?.assert_green()?.assert_no_steps();
 
     api.assert_schema()
         .await?
@@ -164,7 +160,7 @@ async fn native_type_columns_can_be_created(api: &TestApi) -> TestResult {
         )
     })?;
 
-    api.schema_push(dm).send().await?.assert_green()?.assert_no_steps()?;
+    api.schema_push(dm).send().await?.assert_green()?.assert_no_steps();
 
     Ok(())
 }
@@ -199,7 +195,7 @@ async fn uuids_do_not_generate_drift_issue_5282(api: &TestApi) -> TestResult {
         .send()
         .await?
         .assert_green()?
-        .assert_no_steps()?;
+        .assert_no_steps();
 
     Ok(())
 }

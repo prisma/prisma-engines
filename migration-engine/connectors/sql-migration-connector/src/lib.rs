@@ -46,8 +46,8 @@ impl SqlMigrationConnector {
         flavour.ensure_connection_validity(&connection).await?;
 
         Ok(Self {
-            flavour,
             connection,
+            flavour,
             shadow_database_connection_string,
         })
     }

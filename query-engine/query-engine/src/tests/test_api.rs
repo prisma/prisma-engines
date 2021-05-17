@@ -10,7 +10,7 @@ use quaint::{
 use request_handlers::{GraphQlBody, GraphQlHandler, PrismaResponse, SingleQuery};
 use sql_migration_connector::SqlMigrationConnector;
 use std::sync::Arc;
-use test_setup::{create_mysql_database, create_postgres_database, sqlite_test_url, TestApiArgs};
+use test_setup::{sqlite_test_url, TestApiArgs};
 
 pub struct QueryEngine {
     context: Arc<PrismaContext>,
@@ -40,9 +40,9 @@ impl TestApi {
         let tags = args.tags();
 
         let (migration_api, url) = if tags.contains(Tags::Mysql) {
-            mysql_migration_connector(args.test_function_name()).await
+            mysql_migration_connector(&args).await
         } else if tags.contains(Tags::Postgres) {
-            postgres_migration_connector(args.test_function_name()).await
+            postgres_migration_connector(&args).await
         } else if tags.contains(Tags::Sqlite) {
             sqlite_migration_connector(args.test_function_name()).await
         } else if tags.contains(Tags::Mssql) {
@@ -102,8 +102,8 @@ impl TestApi {
     }
 }
 
-pub(super) async fn mysql_migration_connector(db_name: &str) -> (SqlMigrationConnector, String) {
-    let (_, url) = create_mysql_database(db_name).await.unwrap();
+pub(super) async fn mysql_migration_connector(args: &TestApiArgs) -> (SqlMigrationConnector, String) {
+    let (_db_name, url) = args.create_mysql_database().await;
     (SqlMigrationConnector::new(&url, None).await.unwrap(), url)
 }
 
@@ -114,8 +114,8 @@ pub(super) async fn mssql_migration_connector(db_name: &str, args: &TestApiArgs)
     (SqlMigrationConnector::new(&url, None).await.unwrap(), url)
 }
 
-pub(super) async fn postgres_migration_connector(db_name: &str) -> (SqlMigrationConnector, String) {
-    let (_, url) = create_postgres_database(db_name).await.unwrap();
+pub(super) async fn postgres_migration_connector(args: &TestApiArgs) -> (SqlMigrationConnector, String) {
+    let (_db_name, _, url) = args.create_postgres_database().await;
     (SqlMigrationConnector::new(&url, None).await.unwrap(), url)
 }
 

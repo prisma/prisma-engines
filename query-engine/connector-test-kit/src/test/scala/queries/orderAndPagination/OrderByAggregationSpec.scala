@@ -41,7 +41,7 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       """
         |{
-        |  findManyUser(orderBy: { posts: { count: asc } }) {
+        |  findManyUser(orderBy: { posts: { _count: asc } }) {
         |    id
         |    posts {
         |      title
@@ -62,7 +62,7 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       """
         |{
-        |  findManyUser(orderBy: { posts: { count: desc } }) {
+        |  findManyUser(orderBy: { posts: { _count: desc } }) {
         |    id
         |    posts {
         |      title
@@ -83,7 +83,7 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       """
         |{
-        |  findManyPost(orderBy: { categories: { count: asc } }) {
+        |  findManyPost(orderBy: { categories: { _count: asc } }) {
         |    title
         |    categories {
         |      name
@@ -104,7 +104,7 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       """
         |{
-        |  findManyPost(orderBy: { categories: { count: desc } }) {
+        |  findManyPost(orderBy: { categories: { _count: desc } }) {
         |    title
         |    categories {
         |      name
@@ -125,7 +125,7 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       """
         |{
-        |  findManyUser(orderBy: [{ posts: { count: asc } }, { name: asc }]) {
+        |  findManyUser(orderBy: [{ posts: { _count: asc } }, { name: asc }]) {
         |    id
         |    name
         |    posts {
@@ -147,7 +147,7 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       """
         |{
-        |  findManyUser(orderBy: [{ name: desc }, { posts: { count: asc } }]) {
+        |  findManyUser(orderBy: [{ name: desc }, { posts: { _count: asc } }]) {
         |    id
         |    name
         |    posts {
@@ -169,7 +169,7 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       """
         |{
-        |  findManyPost(orderBy: [{ categories: { count: asc } }, { title: asc }]) {
+        |  findManyPost(orderBy: [{ categories: { _count: asc } }, { title: asc }]) {
         |    title
         |    categories {
         |      name
@@ -190,7 +190,7 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       """
         |{
-        |  findManyPost(orderBy: [{ user: { name: asc }}, { categories: { count: desc }}]) {
+        |  findManyPost(orderBy: [{ user: { name: asc }}, { categories: { _count: desc }}]) {
         |    user {
         |      name
         |    }
@@ -213,7 +213,7 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       """
         |{
-        |  findManyPost(orderBy: [{ user: { categories: { count: asc } } }, { id: asc }]) {
+        |  findManyPost(orderBy: [{ user: { categories: { _count: asc } } }, { id: asc }]) {
         |    id
         |    user { categories { name } }
         |  }
@@ -232,7 +232,7 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       """
         |{
-        |  findManyPost(orderBy: { user: { categories: { count: desc } } }) {
+        |  findManyPost(orderBy: { user: { categories: { _count: desc } } }) {
         |    id
         |    user { categories { name } }
         |  }
@@ -254,7 +254,7 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       """
         |{
-        |  findManyPost(orderBy: [{ categories: { count: asc }}, { user: { categories: { count: desc }} }]) {
+        |  findManyPost(orderBy: [{ categories: { _count: asc }}, { user: { categories: { _count: desc }} }]) {
         |    id
         |    categories(orderBy: { name: asc }) {
         |      name
@@ -275,7 +275,7 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       """
         |{
-        |  findManyPost(orderBy: [{ user: { name: asc }}, { user: { categories: { count: desc }} }]) {
+        |  findManyPost(orderBy: [{ user: { name: asc }}, { user: { categories: { _count: desc }} }]) {
         |    id
         |    user {
         |      name
@@ -302,7 +302,7 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       """
         |{
-        |  findManyUser(orderBy: { posts: { count: asc } }, cursor: { id: 2 }) {
+        |  findManyUser(orderBy: { posts: { _count: asc } }, cursor: { id: 2 }) {
         |    id
         |    posts {
         |      title
@@ -323,7 +323,7 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       """
         |{
-        |  findManyUser(orderBy: { posts: { count: desc } }, cursor: { id: 1 }) {
+        |  findManyUser(orderBy: { posts: { _count: desc } }, cursor: { id: 1 }) {
         |    id
         |    posts {
         |      title
@@ -344,7 +344,7 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       """
         |{
-        |  findManyPost(orderBy: { categories: { count: asc } }, cursor: { id: 2 }, take: 2) {
+        |  findManyPost(orderBy: { categories: { _count: asc } }, cursor: { id: 2 }, take: 2) {
         |    id
         |    title
         |    categories {
@@ -366,7 +366,7 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       """
         |{
-        |  findManyPost(orderBy: { categories: { count: desc } }, cursor: { id: 1 }, take: 2) {
+        |  findManyPost(orderBy: { categories: { _count: desc } }, cursor: { id: 1 }, take: 2) {
         |    id
         |    title
         |    categories {
@@ -388,7 +388,7 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       """
         |{
-        |  findManyUser(orderBy: [{ posts: { count: asc } }, { name: asc }], cursor: { id: 2 }) {
+        |  findManyUser(orderBy: [{ posts: { _count: asc } }, { name: asc }], cursor: { id: 2 }) {
         |    id
         |    name
         |    posts {
@@ -410,7 +410,7 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       """
         |{
-        |  findManyUser(orderBy: [{ name: desc }, { posts: { count: asc } }], cursor: { id: 2 }, take: 1) {
+        |  findManyUser(orderBy: [{ name: desc }, { posts: { _count: asc } }], cursor: { id: 2 }, take: 1) {
         |    id
         |    name
         |    posts {
@@ -432,7 +432,7 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       """
         |{
-        |  findManyPost(orderBy: [{ categories: { count: asc } }, { title: asc }], cursor: { id: 2 }, take: 2) {
+        |  findManyPost(orderBy: [{ categories: { _count: asc } }, { title: asc }], cursor: { id: 2 }, take: 2) {
         |    id
         |    title
         |    categories {
@@ -454,7 +454,7 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       """
         |{
-        |  findManyPost(orderBy: [{ user: { name: asc }}, { categories: { count: desc }}], cursor: { id: 1 }, take: 2) {
+        |  findManyPost(orderBy: [{ user: { name: asc }}, { categories: { _count: desc }}], cursor: { id: 1 }, take: 2) {
         |    id
         |    title
         |    user {
@@ -479,7 +479,7 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       """
         |{
-        |  findManyPost(orderBy: [{ user: { categories: { count: asc } } }, { id: asc }], cursor: { id: 2 }, take: 1) {
+        |  findManyPost(orderBy: [{ user: { categories: { _count: asc } } }, { id: asc }], cursor: { id: 2 }, take: 1) {
         |    id
         |    user { categories { name } }
         |  }
@@ -498,7 +498,7 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       """
         |{
-        |  findManyPost(orderBy: [{ user: { categories: { count: desc } } }, { id: asc }], cursor: { id: 2 }, take: 2) {
+        |  findManyPost(orderBy: [{ user: { categories: { _count: desc } } }, { id: asc }], cursor: { id: 2 }, take: 2) {
         |    id
         |    user { categories { name } }
         |  }
@@ -517,7 +517,7 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       """
         |{
-        |  findManyPost(orderBy: [{ categories: { count: asc }}, { user: { categories: { count: desc }} }], cursor: { id: 2 }, take: 2) {
+        |  findManyPost(orderBy: [{ categories: { _count: asc }}, { user: { categories: { _count: desc }} }], cursor: { id: 2 }, take: 2) {
         |    id
         |    categories { name }
         |    user { categories { name } }
@@ -537,7 +537,7 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       """
         |{
-        |  findManyPost(orderBy: [{ user: { name: asc }}, { user: { categories: { count: desc }} }, { id: asc }], cursor: { id: 2 }, take: 2) {
+        |  findManyPost(orderBy: [{ user: { name: asc }}, { user: { categories: { _count: desc }} }, { id: asc }], cursor: { id: 2 }, take: 2) {
         |    id
         |    user {
         |      name
@@ -556,7 +556,15 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   private def createTestData(): Unit = {
-    server.query("""mutation { createOneUser(data: { id: 1, name: "Alice", categories: { create: [{ id: 1, name: "Startup" }] }, posts: { create: { id: 1, title: "alice_post_1", categories: { create: [{ id: 2, name: "News" }, { id: 3, name: "Society" }] }} } }){ id }}""".stripMargin, project, legacy = false)
-    server.query("""mutation { createOneUser(data: { id: 2, name: "Bob", categories: { create: [{ id: 4, name: "Computer Science" }, { id: 5, name: "Music" }] }, posts: { create: [{ id: 2, title: "bob_post_1", categories: { create: [{ id: 6, name: "Finance" }] } }, { id: 3, title: "bob_post_2", categories: { create: [{ id: 7, name: "History" }, { id: 8, name: "Gaming" }, { id: 9, name: "Hacking" }] } }] } }){ id }}""".stripMargin, project, legacy = false)
+    server.query(
+      """mutation { createOneUser(data: { id: 1, name: "Alice", categories: { create: [{ id: 1, name: "Startup" }] }, posts: { create: { id: 1, title: "alice_post_1", categories: { create: [{ id: 2, name: "News" }, { id: 3, name: "Society" }] }} } }){ id }}""".stripMargin,
+      project,
+      legacy = false
+    )
+    server.query(
+      """mutation { createOneUser(data: { id: 2, name: "Bob", categories: { create: [{ id: 4, name: "Computer Science" }, { id: 5, name: "Music" }] }, posts: { create: [{ id: 2, title: "bob_post_1", categories: { create: [{ id: 6, name: "Finance" }] } }, { id: 3, title: "bob_post_2", categories: { create: [{ id: 7, name: "History" }, { id: 8, name: "Gaming" }, { id: 9, name: "Hacking" }] } }] } }){ id }}""".stripMargin,
+      project,
+      legacy = false
+    )
   }
 }

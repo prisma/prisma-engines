@@ -1,8 +1,6 @@
 use super::*;
 use crate::{
-    constants::inputs::args,
-    constants::inputs::filters,
-    constants::inputs::ordering,
+    constants::{aggregations, args, ordering},
     query_document::{ParsedArgument, ParsedInputMap},
     QueryGraphBuilderError, QueryGraphBuilderResult,
 };
@@ -155,11 +153,11 @@ fn process_order_object(
 
 fn extract_sort_aggregation(field_name: &str) -> QueryGraphBuilderResult<SortAggregation> {
     match field_name {
-        filters::COUNT | filters::UNDERSCORE_COUNT => Ok(SortAggregation::Count),
-        filters::UNDERSCORE_AVG => Ok(SortAggregation::Avg),
-        filters::UNDERSCORE_SUM => Ok(SortAggregation::Sum),
-        filters::UNDERSCORE_MIN => Ok(SortAggregation::Min),
-        filters::UNDERSCORE_MAX => Ok(SortAggregation::Max),
+        aggregations::COUNT | aggregations::UNDERSCORE_COUNT => Ok(SortAggregation::Count),
+        aggregations::UNDERSCORE_AVG => Ok(SortAggregation::Avg),
+        aggregations::UNDERSCORE_SUM => Ok(SortAggregation::Sum),
+        aggregations::UNDERSCORE_MIN => Ok(SortAggregation::Min),
+        aggregations::UNDERSCORE_MAX => Ok(SortAggregation::Max),
         _ => Err(QueryGraphBuilderError::InputError(
             "No aggregation operation could be found. This should not happen".to_string(),
         )),

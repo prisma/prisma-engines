@@ -1,7 +1,7 @@
-use migration_core::{commands::ApplyMigrationsInput, commands::ApplyMigrationsOutput, CoreResult, GenericApi};
+use migration_core::{
+    commands::ApplyMigrationsInput, commands::ApplyMigrationsOutput, CoreError, CoreResult, GenericApi,
+};
 use tempfile::TempDir;
-
-use crate::AssertionResult;
 
 #[must_use = "This struct does nothing on its own. See ApplyMigrations::send()"]
 pub struct ApplyMigrations<'a> {
@@ -46,8 +46,14 @@ impl<'a> ApplyMigrations<'a> {
         })
     }
 
-    pub fn send_sync(self) -> CoreResult<ApplyMigrationsAssertion<'a>> {
-        self.rt.unwrap().block_on(self.send())
+    #[track_caller]
+    pub fn send_sync(self) -> ApplyMigrationsAssertion<'a> {
+        self.rt.unwrap().block_on(self.send()).unwrap()
+    }
+
+    #[track_caller]
+    pub fn send_unwrap_err(self) -> CoreError {
+        self.rt.unwrap().block_on(self.send()).unwrap_err()
     }
 }
 
@@ -64,7 +70,8 @@ impl std::fmt::Debug for ApplyMigrationsAssertion<'_> {
 }
 
 impl<'a> ApplyMigrationsAssertion<'a> {
-    pub fn assert_applied_migrations(self, names: &[&str]) -> AssertionResult<Self> {
+    #[track_caller]
+    pub fn assert_applied_migrations(self, names: &[&str]) -> Self {
         let found_names: Vec<&str> = self
             .output
             .applied_migration_names
@@ -72,14 +79,13 @@ impl<'a> ApplyMigrationsAssertion<'a> {
             .map(|name| &name[15..])
             .collect();
 
-        anyhow::ensure!(
+        assert!(
             found_names == names,
             "Assertion failed. The applied migrations do not match the expectations. ({:?} vs {:?})",
             found_names,
             names
         );
-
-        Ok(self)
+        self
     }
 
     pub fn into_output(self) -> ApplyMigrationsOutput {

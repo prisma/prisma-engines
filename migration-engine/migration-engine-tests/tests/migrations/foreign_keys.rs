@@ -1,9 +1,7 @@
-use migration_engine_tests::multi_engine_test_api::*;
+use migration_engine_tests::sync_test_api::*;
 
 #[test_connector]
 fn foreign_keys_of_inline_one_to_one_relations_have_a_unique_constraint(api: TestApi) {
-    let engine = api.new_engine();
-
     let dm = r#"
         model Cat {
             id Int   @id
@@ -17,9 +15,8 @@ fn foreign_keys_of_inline_one_to_one_relations_have_a_unique_constraint(api: Tes
         }
     "#;
 
-    engine.schema_push(dm).send_sync().unwrap().assert_green().unwrap();
-    engine
-        .assert_schema()
+    api.schema_push(dm).send_sync().assert_green().unwrap();
+    api.assert_schema()
         .assert_table("Box", |t| {
             t.assert_indexes_count(1)
                 .unwrap()
@@ -32,8 +29,6 @@ fn foreign_keys_of_inline_one_to_one_relations_have_a_unique_constraint(api: Tes
 
 #[test_connector]
 fn foreign_keys_are_added_on_existing_tables(api: TestApi) -> TestResult {
-    let api = api.new_engine();
-
     let dm1 = r#"
         model User {
             id Int @id
@@ -45,7 +40,7 @@ fn foreign_keys_are_added_on_existing_tables(api: TestApi) -> TestResult {
         }
     "#;
 
-    api.schema_push(dm1).send_sync().unwrap().assert_green().unwrap();
+    api.schema_push(dm1).send_sync().assert_green().unwrap();
 
     api.assert_schema()
         // There should be no foreign keys yet.
@@ -66,7 +61,7 @@ fn foreign_keys_are_added_on_existing_tables(api: TestApi) -> TestResult {
         }
     "#;
 
-    api.schema_push(dm2).send_sync().unwrap().assert_green().unwrap();
+    api.schema_push(dm2).send_sync().assert_green().unwrap();
 
     api.assert_schema()
         .assert_table("Account", |table| {
@@ -80,7 +75,6 @@ fn foreign_keys_are_added_on_existing_tables(api: TestApi) -> TestResult {
 
 #[test_connector]
 fn foreign_keys_can_be_added_on_existing_columns(api: TestApi) -> TestResult {
-    let api = api.new_engine();
     let dm1 = r#"
         model User {
             id Int @id
@@ -93,7 +87,7 @@ fn foreign_keys_can_be_added_on_existing_columns(api: TestApi) -> TestResult {
         }
     "#;
 
-    api.schema_push(dm1).send_sync().unwrap().assert_green().unwrap();
+    api.schema_push(dm1).send_sync().assert_green().unwrap();
 
     api.assert_schema()
         // There should be no foreign keys yet.
@@ -114,7 +108,7 @@ fn foreign_keys_can_be_added_on_existing_columns(api: TestApi) -> TestResult {
         }
     "#;
 
-    api.schema_push(dm2).send_sync().unwrap().assert_green().unwrap();
+    api.schema_push(dm2).send_sync().assert_green().unwrap();
 
     api.assert_schema()
         .assert_table("Account", |table| {
@@ -128,7 +122,6 @@ fn foreign_keys_can_be_added_on_existing_columns(api: TestApi) -> TestResult {
 
 #[test_connector]
 fn foreign_keys_can_be_dropped_on_existing_columns(api: TestApi) {
-    let api = api.new_engine();
     let dm1 = r#"
         model User {
             id Int @id
@@ -143,7 +136,7 @@ fn foreign_keys_can_be_dropped_on_existing_columns(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send_sync().unwrap().assert_green().unwrap();
+    api.schema_push(dm1).send_sync().assert_green().unwrap();
 
     api.assert_schema()
         .assert_table("Account", |table| {
@@ -166,7 +159,7 @@ fn foreign_keys_can_be_dropped_on_existing_columns(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send_sync().unwrap().assert_green().unwrap();
+    api.schema_push(dm2).send_sync().assert_green().unwrap();
 
     api.assert_schema()
         .assert_table("Account", |table| table.assert_foreign_keys_count(0))
@@ -175,7 +168,6 @@ fn foreign_keys_can_be_dropped_on_existing_columns(api: TestApi) {
 
 #[test_connector]
 fn changing_a_scalar_field_to_a_relation_field_must_work(api: TestApi) {
-    let api = api.new_engine();
     let dm1 = r#"
         model A {
             id Int @id
@@ -187,7 +179,7 @@ fn changing_a_scalar_field_to_a_relation_field_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send_sync().unwrap().assert_green().unwrap();
+    api.schema_push(dm1).send_sync().assert_green().unwrap();
     api.assert_schema()
         .assert_table("A", |t| {
             t.assert_column("b", |c| c.assert_type_is_string())?
@@ -212,11 +204,8 @@ fn changing_a_scalar_field_to_a_relation_field_must_work(api: TestApi) {
     api.schema_push(dm2)
         .force(true)
         .send_sync()
-        .unwrap()
         .assert_executable()
-        .unwrap()
-        .assert_has_executed_steps()
-        .unwrap();
+        .assert_has_executed_steps();
 
     api.assert_schema()
         .assert_table("A", |table| {
@@ -229,7 +218,6 @@ fn changing_a_scalar_field_to_a_relation_field_must_work(api: TestApi) {
 
 #[test_connector]
 fn changing_a_relation_field_to_a_scalar_field_must_work(api: TestApi) {
-    let api = api.new_engine();
     let dm1 = r#"
         model A {
             id Int @id
@@ -242,7 +230,7 @@ fn changing_a_relation_field_to_a_scalar_field_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send_sync().unwrap().assert_green().unwrap();
+    api.schema_push(dm1).send_sync().assert_green().unwrap();
 
     api.assert_schema()
         .assert_table("A", |table| {
@@ -267,7 +255,7 @@ fn changing_a_relation_field_to_a_scalar_field_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send_sync().unwrap().assert_green().unwrap();
+    api.schema_push(dm2).send_sync().assert_green().unwrap();
 
     api.assert_schema()
         .assert_table("A", |table| {
@@ -280,8 +268,6 @@ fn changing_a_relation_field_to_a_scalar_field_must_work(api: TestApi) {
 
 #[test_connector]
 fn changing_a_foreign_key_constrained_column_from_nullable_to_required_and_back_works(api: TestApi) {
-    let api = api.new_engine();
-
     let dm = r#"
         model Student {
             id       String @id @default(cuid())
@@ -296,7 +282,7 @@ fn changing_a_foreign_key_constrained_column_from_nullable_to_required_and_back_
         }
     "#;
 
-    api.schema_push(dm).send_sync().unwrap().assert_green().unwrap();
+    api.schema_push(dm).send_sync().assert_green().unwrap();
 
     let dm2 = r#"
         model Student {
@@ -312,6 +298,6 @@ fn changing_a_foreign_key_constrained_column_from_nullable_to_required_and_back_
         }
     "#;
 
-    api.schema_push(dm2).send_sync().unwrap().assert_green().unwrap();
-    api.schema_push(dm).send_sync().unwrap().assert_green().unwrap();
+    api.schema_push(dm2).send_sync().assert_green().unwrap();
+    api.schema_push(dm).send_sync().assert_green().unwrap();
 }

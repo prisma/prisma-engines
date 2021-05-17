@@ -1,5 +1,5 @@
 use super::*;
-use crate::{constants::inputs::args, query_graph_builder::write::utils::coerce_vec};
+use crate::{constants::args, query_graph_builder::write::utils::coerce_vec};
 use crate::{
     query_ast::*,
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},

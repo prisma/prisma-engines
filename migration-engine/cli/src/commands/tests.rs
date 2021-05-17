@@ -1,8 +1,7 @@
 use super::CliError;
-use quaint::{prelude::Queryable, single::Quaint};
 use structopt::StructOpt;
 use test_macros::test_connector;
-use test_setup::{create_mysql_database, create_postgres_database, sqlite_test_url, BitFlags, Tags, TestApiArgs};
+use test_setup::{sqlite_test_url, BitFlags, Tags, TestApiArgs};
 use url::Url;
 use user_facing_errors::{common::DatabaseDoesNotExist, UserFacingError};
 
@@ -15,23 +14,17 @@ impl TestApi {
     fn new(args: TestApiArgs) -> Self {
         let rt = test_setup::runtime::test_tokio_runtime();
 
-        let (_, connection_string) = if args.tags().contains(Tags::Postgres) {
-            rt.block_on(create_postgres_database(args.test_function_name()))
-                .unwrap()
+        let connection_string = if args.tags().contains(Tags::Postgres) {
+            rt.block_on(args.create_postgres_database()).2
         } else if args.tags().contains(Tags::Mysql) {
-            rt.block_on(create_mysql_database(args.test_function_name())).unwrap()
+            rt.block_on(args.create_mysql_database()).1
         } else if args.tags().contains(Tags::Sqlite) {
-            let url = sqlite_test_url(args.test_function_name());
-            (rt.block_on(Quaint::new(&url)).unwrap(), url)
+            sqlite_test_url(args.test_function_name())
         } else {
             unreachable!()
         };
 
         TestApi { connection_string, rt }
-    }
-
-    fn block_on<O>(&self, fut: impl std::future::Future<Output = O>) -> O {
-        self.rt.block_on(fut)
     }
 
     fn run(&self, args: &[&str]) -> Result<String, CliError> {
@@ -217,43 +210,6 @@ fn bad_postgres_url_must_return_a_good_error(api: TestApi) {
         "is_panic": false,
         "message": "Error parsing connection string: invalid port number in database URL\n\n",
         "backtrace": null,
-    });
-
-    assert_eq!(json_error, expected);
-}
-
-#[test_connector(tags(Mysql))]
-fn database_access_denied_must_return_a_proper_error_in_cli(api: TestApi) {
-    let db_name = "dbaccessdeniedincli";
-    let (conn, connection_string) = api.block_on(create_mysql_database(db_name)).unwrap();
-
-    api.block_on(conn.execute_raw("DROP USER IF EXISTS jeanmichel", &[]))
-        .unwrap();
-    api.block_on(conn.execute_raw("CREATE USER jeanmichel IDENTIFIED BY '1234'", &[]))
-        .unwrap();
-
-    let mut url: Url = connection_string.parse().unwrap();
-    url.set_username("jeanmichel").unwrap();
-    url.set_password(Some("1234")).unwrap();
-    url.set_path("/access_denied_test");
-
-    let error = api.get_cli_error(&[
-        "migration-engine",
-        "cli",
-        "--datasource",
-        url.as_str(),
-        "can-connect-to-database",
-    ]);
-
-    let json_error = serde_json::to_value(&error).unwrap();
-    let expected = serde_json::json!({
-        "is_panic": false,
-        "message": "User `jeanmichel` was denied access on the database `access_denied_test`",
-        "meta": {
-            "database_user": "jeanmichel",
-            "database_name": "access_denied_test",
-        },
-        "error_code": "P1010",
     });
 
     assert_eq!(json_error, expected);

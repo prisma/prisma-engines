@@ -1,5 +1,6 @@
 use enumflags2::BitFlags;
 
+/// Test-relevant connector tags.
 #[derive(BitFlags, Copy, Clone, Debug, PartialEq)]
 #[repr(u16)]
 pub enum Tags {

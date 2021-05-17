@@ -4,7 +4,7 @@ mod scalar;
 
 use super::utils;
 use crate::{
-    constants::inputs::filters,
+    constants::filters,
     query_document::{ParsedInputMap, ParsedInputValue},
     QueryGraphBuilderError, QueryGraphBuilderResult,
 };

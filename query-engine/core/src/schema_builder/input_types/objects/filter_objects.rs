@@ -1,5 +1,5 @@
 use super::*;
-use constants::inputs::filters;
+use constants::filters;
 use std::sync::Arc;
 
 #[tracing::instrument(skip(ctx, model, include_aggregates))]

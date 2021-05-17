@@ -23,22 +23,23 @@ impl TestApi {
     pub(crate) fn new(args: TestApiArgs) -> Self {
         let rt = test_setup::runtime::test_tokio_runtime();
         let tags = args.tags();
-        let db_name = if tags.contains(Tags::Mysql) {
-            test_setup::mysql_safe_identifier(args.test_function_name())
-        } else {
-            args.test_function_name()
-        };
-
-        let (conn, _connection_string) = if tags.contains(Tags::Mysql) {
-            rt.block_on(create_mysql_database(&db_name)).unwrap()
+        let (db_name, conn) = if tags.contains(Tags::Mysql) {
+            let (db_name, cs) = rt.block_on(args.create_mysql_database());
+            (db_name, rt.block_on(Quaint::new(&cs)).unwrap())
         } else if tags.contains(Tags::Postgres) {
-            rt.block_on(create_postgres_database(&db_name)).unwrap()
+            let (db_name, q, _) = rt.block_on(args.create_postgres_database());
+            (db_name, q)
         } else if tags.contains(Tags::Mssql) {
-            rt.block_on(test_setup::init_mssql_database(args.database_url(), db_name))
-                .unwrap()
+            let (q, _cs) = rt
+                .block_on(test_setup::init_mssql_database(
+                    args.database_url(),
+                    args.test_function_name(),
+                ))
+                .unwrap();
+            (args.test_function_name(), q)
         } else if tags.contains(Tags::Sqlite) {
-            let url = sqlite_test_url(db_name);
-            (rt.block_on(Quaint::new(&url)).unwrap(), url)
+            let url = sqlite_test_url(args.test_function_name());
+            (args.test_function_name(), rt.block_on(Quaint::new(&url)).unwrap())
         } else {
             unreachable!()
         };

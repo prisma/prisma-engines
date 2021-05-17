@@ -21,8 +21,10 @@ impl<'a> Reset<'a> {
         Ok(ResetAssertion { _api: self.api })
     }
 
-    pub fn send_sync(self) -> CoreResult<ResetAssertion<'a>> {
-        self.rt.unwrap().block_on(self.send())
+    /// Execute the command and expect it to succeed.
+    #[track_caller]
+    pub fn send_sync(self) -> ResetAssertion<'a> {
+        self.rt.unwrap().block_on(self.send()).unwrap()
     }
 }
 

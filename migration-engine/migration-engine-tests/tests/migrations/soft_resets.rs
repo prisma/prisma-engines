@@ -20,8 +20,7 @@ fn soft_resets_work_on_postgres(api: TestApi) {
     {
         api.new_engine()
             .create_migration("01init", dm, &migrations_directory)
-            .send_sync()
-            .unwrap();
+            .send_sync();
 
         let create_user = r#"
             DROP USER IF EXISTS softresetstestuser;
@@ -56,16 +55,14 @@ fn soft_resets_work_on_postgres(api: TestApi) {
         engine
             .apply_migrations(&migrations_directory)
             .send_sync()
-            .unwrap()
-            .assert_applied_migrations(&["01init"])
-            .unwrap();
+            .assert_applied_migrations(&["01init"]);
 
         let add_view = format!(
             r#"CREATE VIEW "{0}"."catcat" AS SELECT * FROM "{0}"."Cat" LIMIT 2"#,
             engine.schema_name(),
         );
 
-        engine.raw_cmd(&add_view).unwrap();
+        engine.raw_cmd(&add_view);
 
         engine
             .assert_schema()
@@ -76,15 +73,13 @@ fn soft_resets_work_on_postgres(api: TestApi) {
             .assert_has_table("Cat")
             .unwrap();
 
-        engine.reset().send_sync().unwrap();
+        engine.reset().send_sync();
         engine.assert_schema().assert_tables_count(0).unwrap();
 
         engine
             .schema_push(dm)
             .send_sync()
-            .unwrap()
             .assert_has_executed_steps()
-            .unwrap()
             .assert_green()
             .unwrap();
 
@@ -95,7 +90,7 @@ fn soft_resets_work_on_postgres(api: TestApi) {
             .assert_has_table("Cat")
             .unwrap();
 
-        engine.reset().send_sync().unwrap();
+        engine.reset().send_sync();
         engine.assert_schema().assert_tables_count(0).unwrap();
     }
 }
@@ -118,8 +113,7 @@ fn soft_resets_work_on_sql_server(api: TestApi) {
     {
         api.new_engine()
             .create_migration("01init", dm, &migrations_directory)
-            .send_sync()
-            .unwrap();
+            .send_sync();
 
         let create_database = r#"
             IF(DB_ID(N'resetTest') IS NOT NULL)
@@ -177,32 +171,30 @@ fn soft_resets_work_on_sql_server(api: TestApi) {
         let engine = api.new_engine_with_connection_strings(&test_user_connection_string, None);
 
         let create_schema = format!("CREATE SCHEMA [{}];", engine.schema_name());
-        engine.raw_cmd(&create_schema).unwrap();
+        engine.raw_cmd(&create_schema);
 
         engine
             .apply_migrations(&migrations_directory)
             .send_sync()
-            .unwrap()
-            .assert_applied_migrations(&["01init"])
-            .unwrap();
+            .assert_applied_migrations(&["01init"]);
 
         let add_view = format!(
             r#"CREATE VIEW [{0}].[catcat] AS SELECT * FROM [{0}].[Cat]"#,
             engine.schema_name(),
         );
 
-        engine.raw_cmd(&add_view).unwrap();
+        engine.raw_cmd(&add_view);
 
         let add_type = format!(r#"CREATE TYPE [{0}].[Litter] FROM int"#, engine.schema_name(),);
 
-        engine.raw_cmd(&add_type).unwrap();
+        engine.raw_cmd(&add_type);
 
         let add_table_with_type = format!(
             r#"CREATE TABLE [{0}].specialLitter (id int primary key, litterAmount [{0}].Litter)"#,
             engine.schema_name()
         );
 
-        engine.raw_cmd(&add_table_with_type).unwrap();
+        engine.raw_cmd(&add_table_with_type);
 
         engine
             .assert_schema()
@@ -215,15 +207,13 @@ fn soft_resets_work_on_sql_server(api: TestApi) {
             .assert_has_table("Cat")
             .unwrap();
 
-        engine.reset().send_sync().unwrap();
+        engine.reset().send_sync();
         engine.assert_schema().assert_tables_count(0).unwrap();
 
         engine
             .schema_push(dm)
             .send_sync()
-            .unwrap()
             .assert_has_executed_steps()
-            .unwrap()
             .assert_green()
             .unwrap();
 
@@ -234,7 +224,7 @@ fn soft_resets_work_on_sql_server(api: TestApi) {
             .assert_has_table("Cat")
             .unwrap();
 
-        engine.reset().send_sync().unwrap();
+        engine.reset().send_sync();
         engine.assert_schema().assert_tables_count(0).unwrap();
     }
 }
@@ -257,17 +247,12 @@ fn soft_resets_work_on_mysql(api: TestApi) {
     {
         let engine = api.new_engine();
 
-        engine
-            .create_migration("01init", dm, &migrations_directory)
-            .send_sync()
-            .unwrap();
+        engine.create_migration("01init", dm, &migrations_directory).send_sync();
 
         engine
             .apply_migrations(&migrations_directory)
             .send_sync()
-            .unwrap()
-            .assert_applied_migrations(&["01init"])
-            .unwrap();
+            .assert_applied_migrations(&["01init"]);
 
         engine
             .assert_schema()
@@ -318,15 +303,13 @@ fn soft_resets_work_on_mysql(api: TestApi) {
     {
         let engine = api.new_engine_with_connection_strings(&test_user_connection_string, None);
 
-        engine.reset().send_sync().unwrap();
+        engine.reset().send_sync();
         engine.assert_schema().assert_tables_count(0).unwrap();
 
         engine
             .schema_push(dm)
             .send_sync()
-            .unwrap()
             .assert_has_executed_steps()
-            .unwrap()
             .assert_green()
             .unwrap();
 
@@ -337,7 +320,7 @@ fn soft_resets_work_on_mysql(api: TestApi) {
             .assert_has_table("Cat")
             .unwrap();
 
-        engine.reset().send_sync().unwrap();
+        engine.reset().send_sync();
         engine.assert_schema().assert_tables_count(0).unwrap();
     }
 }

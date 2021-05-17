@@ -28,7 +28,7 @@ async fn listing_a_single_migration_name_should_work(api: &TestApi) -> TestResul
     api.apply_migrations(&migrations_directory)
         .send()
         .await?
-        .assert_applied_migrations(&["init"])?;
+        .assert_applied_migrations(&["init"]);
 
     api.list_migration_directories(&migrations_directory)
         .send()

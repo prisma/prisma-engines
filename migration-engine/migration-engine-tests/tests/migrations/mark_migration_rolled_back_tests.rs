@@ -81,7 +81,7 @@ async fn mark_migration_rolled_back_with_a_failed_migration_works(api: &TestApi)
             .modify_migration(|migration| {
                 migration.clear();
                 migration.push_str("\nSELECT YOLO;");
-            })?
+            })
             .into_output();
 
         output_second_migration.generated_migration_name.unwrap()
@@ -244,7 +244,7 @@ async fn rolling_back_applying_again_then_rolling_back_again_should_error(api: &
             .modify_migration(|migration| {
                 migration.clear();
                 migration.push_str("\nSELECT YOLO;");
-            })?;
+            });
 
         (
             output_second_migration
@@ -274,7 +274,7 @@ async fn rolling_back_applying_again_then_rolling_back_again_should_error(api: &
     second_migration_assertions.modify_migration(|migration| {
         migration.clear();
         migration.push_str("SELECT 'YOLO'");
-    })?;
+    });
 
     // Reapply migration 2
     api.apply_migrations(&migrations_directory).send().await?;

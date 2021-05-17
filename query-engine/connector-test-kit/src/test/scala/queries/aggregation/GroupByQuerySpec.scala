@@ -53,9 +53,9 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       s"""{
          |  groupByModel(by: [id, float, int]) {
-         |    count { id }
+         |    _count { id }
          |    float
-         |    sum { int }
+         |    _sum { int }
          |  }
          |}""".stripMargin,
       project
@@ -75,15 +75,15 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       s"""{
          |  groupByModel(by: [s], orderBy: { s: asc }) {
          |    s
-         |    count { s }
-         |    sum { float }
+         |    _count { s }
+         |    _sum { float }
          |  }
          |}""".stripMargin,
       project
     )
 
     result.toString should be(
-      """{"data":{"groupByModel":[{"s":"group1","count":{"s":2},"sum":{"float":15.6}},{"s":"group2","count":{"s":1},"sum":{"float":10}},{"s":"group3","count":{"s":1},"sum":{"float":10}}]}}""")
+      """{"data":{"groupByModel":[{"s":"group1","_count":{"s":2},"_sum":{"float":15.6}},{"s":"group2","_count":{"s":1},"_sum":{"float":10}},{"s":"group3","_count":{"s":1},"_sum":{"float":10}}]}}""")
   }
 
   "Using a groupBy with reverse ordering" should "return the correct groups" in {
@@ -97,15 +97,15 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       s"""{
          |  groupByModel(by: [s], orderBy: { s: desc }) {
          |    s
-         |    count { s }
-         |    sum { float }
+         |    _count { s }
+         |    _sum { float }
          |  }
          |}""".stripMargin,
       project
     )
 
     result.toString should be(
-      """{"data":{"groupByModel":[{"s":"group3","count":{"s":1},"sum":{"float":10}},{"s":"group2","count":{"s":1},"sum":{"float":10}},{"s":"group1","count":{"s":2},"sum":{"float":15.6}}]}}""")
+      """{"data":{"groupByModel":[{"s":"group3","_count":{"s":1},"_sum":{"float":10}},{"s":"group2","_count":{"s":1},"_sum":{"float":10}},{"s":"group1","_count":{"s":2},"_sum":{"float":15.6}}]}}""")
   }
 
   "Using a groupBy with multiple orderings" should "return the correct groups" in {
@@ -120,16 +120,16 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       s"""{
          |  groupByModel(by: [s, int], orderBy: [{ s: desc }, { int: asc }]) {
          |    s
-         |    count { s }
-         |    sum { float }
-         |    min { int }
+         |    _count { s }
+         |    _sum { float }
+         |    _min { int }
          |  }
          |}""".stripMargin,
       project
     )
 
     result.toString should be(
-      """{"data":{"groupByModel":[{"s":"group3","count":{"s":2},"sum":{"float":25},"min":{"int":5}},{"s":"group2","count":{"s":1},"sum":{"float":10},"min":{"int":5}},{"s":"group1","count":{"s":1},"sum":{"float":5.5},"min":{"int":0}},{"s":"group1","count":{"s":1},"sum":{"float":10.1},"min":{"int":5}}]}}""")
+      """{"data":{"groupByModel":[{"s":"group3","_count":{"s":2},"_sum":{"float":25},"_min":{"int":5}},{"s":"group2","_count":{"s":1},"_sum":{"float":10},"_min":{"int":5}},{"s":"group1","_count":{"s":1},"_sum":{"float":5.5},"_min":{"int":0}},{"s":"group1","_count":{"s":1},"_sum":{"float":10.1},"_min":{"int":5}}]}}""")
   }
 
   "Using a groupBy with take and skip" should "return the correct groups" in {
@@ -143,9 +143,9 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       s"""{
          |  groupByModel(by: [s, int], orderBy: { s: desc }, take: 1, skip: 1) {
          |    s
-         |    count { s }
-         |    sum { float }
-         |    min { int }
+         |    _count { s }
+         |    _sum { float }
+         |    _min { int }
          |  }
          |}""".stripMargin,
       project
@@ -153,15 +153,15 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
 
     // group3 is the first one with 2, then group2 with one, then group1 with 1.
     // group2 is returned, because group3 is skipped.
-    result.toString should be("""{"data":{"groupByModel":[{"s":"group2","count":{"s":1},"sum":{"float":10},"min":{"int":5}}]}}""")
+    result.toString should be("""{"data":{"groupByModel":[{"s":"group2","_count":{"s":1},"_sum":{"float":10},"_min":{"int":5}}]}}""")
 
     result = server.query(
       s"""{
          |  groupByModel(by: [s, int], orderBy: { s: desc }, take: -1, skip: 2) {
          |    s
-         |    count { s }
-         |    sum { float }
-         |    min { int }
+         |    _count { s }
+         |    _sum { float }
+         |    _min { int }
          |  }
          |}""".stripMargin,
       project
@@ -169,15 +169,15 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
 
     // group3 is the first one with 2, then group2 with one, then group1 with 1.
     // group3 is returned, because group1 and 2 is skipped (reverse order due to negative take).
-    result.toString should be("""{"data":{"groupByModel":[{"s":"group3","count":{"s":2},"sum":{"float":25},"min":{"int":5}}]}}""")
+    result.toString should be("""{"data":{"groupByModel":[{"s":"group3","_count":{"s":2},"_sum":{"float":25},"_min":{"int":5}}]}}""")
 
     result = server.query(
       s"""{
          |  groupByModel(by: [s, int], orderBy: { s: desc }, take: 2, skip: 1) {
          |    s
-         |    count { s }
-         |    sum { float }
-         |    min { int }
+         |    _count { s }
+         |    _sum { float }
+         |    _min { int }
          |  }
          |}""".stripMargin,
       project
@@ -186,7 +186,7 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     // group3 is the first one with 2, then group2 with one, then group1 with 1.
     // group2 & 1 are returned, because group3 is skipped.
     result.toString should be(
-      """{"data":{"groupByModel":[{"s":"group2","count":{"s":1},"sum":{"float":10},"min":{"int":5}},{"s":"group1","count":{"s":1},"sum":{"float":10.1},"min":{"int":5}}]}}""")
+      """{"data":{"groupByModel":[{"s":"group2","_count":{"s":1},"_sum":{"float":10},"_min":{"int":5}},{"s":"group1","_count":{"s":1},"_sum":{"float":10.1},"_min":{"int":5}}]}}""")
   }
 
   "Using a groupBy with scalar filters" should "return the correct groups" in {
@@ -206,9 +206,9 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
          |    float: { lt: 15 }
          |  }) {
          |    s
-         |    count { s }
-         |    sum { float }
-         |    min { int }
+         |    _count { s }
+         |    _sum { float }
+         |    _min { int }
          |  }
          |}""".stripMargin,
       project
@@ -219,7 +219,7 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     // Group1 id 1, id 2 is filtered.
     // => All groups have count 1
     result.toString should be(
-      """{"data":{"groupByModel":[{"s":"group3","count":{"s":1},"sum":{"float":10},"min":{"int":5}},{"s":"group2","count":{"s":1},"sum":{"float":10},"min":{"int":5}},{"s":"group1","count":{"s":1},"sum":{"float":10.1},"min":{"int":5}}]}}""")
+      """{"data":{"groupByModel":[{"s":"group3","_count":{"s":1},"_sum":{"float":10},"_min":{"int":5}},{"s":"group2","_count":{"s":1},"_sum":{"float":10},"_min":{"int":5}},{"s":"group1","_count":{"s":1},"_sum":{"float":10.1},"_min":{"int":5}}]}}""")
   }
 
   "Using a groupBy with relation filters" should "return the correct groups" in {
@@ -238,9 +238,9 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
          |    other: { isNot: null }
          |  }) {
          |    s
-         |    count { s }
-         |    sum { float }
-         |    min { int }
+         |    _count { s }
+         |    _sum { float }
+         |    _min { int }
          |  }
          |}""".stripMargin,
       project
@@ -250,7 +250,7 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     // Group2 has 0
     // Group1 has 1
     result.toString should be(
-      """{"data":{"groupByModel":[{"s":"group3","count":{"s":2},"sum":{"float":25},"min":{"int":5}},{"s":"group1","count":{"s":1},"sum":{"float":10.1},"min":{"int":5}}]}}""")
+      """{"data":{"groupByModel":[{"s":"group3","_count":{"s":2},"_sum":{"float":25},"_min":{"int":5}},{"s":"group1","_count":{"s":1},"_sum":{"float":10.1},"_min":{"int":5}}]}}""")
 
     result = server.query(
       s"""{
@@ -258,9 +258,9 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
          |    other: { is: { field: { equals: "b" }}}
          |  }) {
          |    s
-         |    count { s }
-         |    sum { float }
-         |    min { int }
+         |    _count { s }
+         |    _sum { float }
+         |    _min { int }
          |  }
          |}""".stripMargin,
       project
@@ -269,7 +269,7 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     // Group3 has 2 matches
     // Group2 has 0 matches
     // Group1 has 0 matches
-    result.toString should be("""{"data":{"groupByModel":[{"s":"group3","count":{"s":2},"sum":{"float":25},"min":{"int":5}}]}}""")
+    result.toString should be("""{"data":{"groupByModel":[{"s":"group3","_count":{"s":2},"_sum":{"float":25},"_min":{"int":5}}]}}""")
   }
 
   "Using a group-by with ordering COUNT aggregation" should "work" in {
@@ -283,7 +283,7 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       s"""{
          |  groupByModel(by: [float], orderBy: { _count: { float: asc } }) {
          |    float
-         |    count {
+         |    _count {
          |      float
          |    }
          |  }
@@ -291,13 +291,13 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       project
     )
 
-    result.toString should be("""{"data":{"groupByModel":[{"float":4,"count":{"float":1}},{"float":1.1,"count":{"float":3}}]}}""")
+    result.toString should be("""{"data":{"groupByModel":[{"float":4,"_count":{"float":1}},{"float":1.1,"_count":{"float":3}}]}}""")
 
     result = server.query(
       s"""{
          |  groupByModel(by: [float], orderBy: { _count: { float: desc } }) {
          |    float
-         |    count {
+         |    _count {
          |      float
          |    }
          |  }
@@ -305,7 +305,7 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       project
     )
 
-    result.toString should be("""{"data":{"groupByModel":[{"float":1.1,"count":{"float":3}},{"float":4,"count":{"float":1}}]}}""")
+    result.toString should be("""{"data":{"groupByModel":[{"float":1.1,"_count":{"float":3}},{"float":4,"_count":{"float":1}}]}}""")
   }
 
   "Using a group-by with ordering SUM aggregation" should "work" in {
@@ -319,7 +319,7 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       s"""{
          |  groupByModel(by: [float], orderBy: { _sum: { float: asc } }) {
          |    float
-         |    sum {
+         |    _sum {
          |      float
          |    }
          |  }
@@ -327,13 +327,13 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       project
     )
 
-    result.toString should be("""{"data":{"groupByModel":[{"float":1.1,"sum":{"float":3.3}},{"float":4,"sum":{"float":4}}]}}""")
+    result.toString should be("""{"data":{"groupByModel":[{"float":1.1,"_sum":{"float":3.3}},{"float":4,"_sum":{"float":4}}]}}""")
 
     result = server.query(
       s"""{
          |  groupByModel(by: [float], orderBy: { _sum: { float: desc } }) {
          |    float
-         |    sum {
+         |    _sum {
          |      float
          |    }
          |  }
@@ -341,7 +341,7 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       project
     )
 
-    result.toString should be("""{"data":{"groupByModel":[{"float":4,"sum":{"float":4}},{"float":1.1,"sum":{"float":3.3}}]}}""")
+    result.toString should be("""{"data":{"groupByModel":[{"float":4,"_sum":{"float":4}},{"float":1.1,"_sum":{"float":3.3}}]}}""")
   }
 
   "Using a group-by with ordering AVG aggregation" should "work" in {
@@ -355,7 +355,7 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       s"""{
          |  groupByModel(by: [float], orderBy: { _avg: { float: asc } }) {
          |    float
-         |    avg {
+         |    _avg {
          |      float
          |    }
          |  }
@@ -363,13 +363,13 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       project
     )
 
-    result.toString should be("""{"data":{"groupByModel":[{"float":1.1,"avg":{"float":1.1}},{"float":4,"avg":{"float":4}}]}}""")
+    result.toString should be("""{"data":{"groupByModel":[{"float":1.1,"_avg":{"float":1.1}},{"float":4,"_avg":{"float":4}}]}}""")
 
     result = server.query(
       s"""{
          |  groupByModel(by: [float], orderBy: { _avg: { float: desc } }) {
          |    float
-         |    avg {
+         |    _avg {
          |      float
          |    }
          |  }
@@ -377,7 +377,7 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       project
     )
 
-    result.toString should be("""{"data":{"groupByModel":[{"float":4,"avg":{"float":4}},{"float":1.1,"avg":{"float":1.1}}]}}""")
+    result.toString should be("""{"data":{"groupByModel":[{"float":4,"_avg":{"float":4}},{"float":1.1,"_avg":{"float":1.1}}]}}""")
   }
 
   "Using a group-by with ordering MIN aggregation" should "work" in {
@@ -391,7 +391,7 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       s"""{
          |  groupByModel(by: [float], orderBy: { _min: { float: asc } }) {
          |    float
-         |    min {
+         |    _min {
          |      float
          |    }
          |  }
@@ -399,13 +399,13 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       project
     )
 
-    result.toString should be("""{"data":{"groupByModel":[{"float":1.1,"min":{"float":1.1}},{"float":4,"min":{"float":4}}]}}""")
+    result.toString should be("""{"data":{"groupByModel":[{"float":1.1,"_min":{"float":1.1}},{"float":4,"_min":{"float":4}}]}}""")
 
     result = server.query(
       s"""{
          |  groupByModel(by: [float], orderBy: { _min: { float: desc } }) {
          |    float
-         |    min {
+         |    _min {
          |      float
          |    }
          |  }
@@ -413,7 +413,7 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       project
     )
 
-    result.toString should be("""{"data":{"groupByModel":[{"float":4,"min":{"float":4}},{"float":1.1,"min":{"float":1.1}}]}}""")
+    result.toString should be("""{"data":{"groupByModel":[{"float":4,"_min":{"float":4}},{"float":1.1,"_min":{"float":1.1}}]}}""")
   }
 
   "Using a group-by with ordering MAX aggregation" should "work" in {
@@ -427,7 +427,7 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       s"""{
          |  groupByModel(by: [float], orderBy: { _max: { float: asc } }) {
          |    float
-         |    max {
+         |    _max {
          |      float
          |    }
          |  }
@@ -435,13 +435,13 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       project
     )
 
-    result.toString should be("""{"data":{"groupByModel":[{"float":1.1,"max":{"float":1.1}},{"float":4,"max":{"float":4}}]}}""")
+    result.toString should be("""{"data":{"groupByModel":[{"float":1.1,"_max":{"float":1.1}},{"float":4,"_max":{"float":4}}]}}""")
 
     result = server.query(
       s"""{
          |  groupByModel(by: [float], orderBy: { _max: { float: desc } }) {
          |    float
-         |    max {
+         |    _max {
          |      float
          |    }
          |  }
@@ -449,7 +449,7 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       project
     )
 
-    result.toString should be("""{"data":{"groupByModel":[{"float":4,"max":{"float":4}},{"float":1.1,"max":{"float":1.1}}]}}""")
+    result.toString should be("""{"data":{"groupByModel":[{"float":4,"_max":{"float":4}},{"float":1.1,"_max":{"float":1.1}}]}}""")
   }
 
   "Using a group-by with multiple ordering aggregation of different fields" should "work" in {
@@ -464,15 +464,15 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       s"""{
          |  groupByModel(by: [float, int], orderBy: [{ _count: { float: desc } }, { _sum: { int: asc } }]) {
          |    float
-         |    count { float }
-         |    sum { int }
+         |    _count { float }
+         |    _sum { int }
          |  }
          |}""".stripMargin,
       project
     )
 
     result.toString should be(
-      """{"data":{"groupByModel":[{"float":1.1,"count":{"float":3},"sum":{"int":3}},{"float":3,"count":{"float":1},"sum":{"int":3}},{"float":4,"count":{"float":1},"sum":{"int":4}}]}}""")
+      """{"data":{"groupByModel":[{"float":1.1,"_count":{"float":3},"_sum":{"int":3}},{"float":3,"_count":{"float":1},"_sum":{"int":3}},{"float":4,"_count":{"float":1},"_sum":{"int":4}}]}}""")
   }
 
   "Using a group-by with multiple ordering aggregation and having" should "work" in {
@@ -487,15 +487,15 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       s"""{
          |  groupByModel(by: [float, int], orderBy: [{ _count: { float: desc } }, { _sum: { int: asc } }], having: { float: { lt: 4 } }) {
          |    float
-         |    count { float }
-         |    sum { int }
+         |    _count { float }
+         |    _sum { int }
          |  }
          |}""".stripMargin,
       project
     )
 
     result.toString should be(
-      """{"data":{"groupByModel":[{"float":1.1,"count":{"float":3},"sum":{"int":3}},{"float":3,"count":{"float":1},"sum":{"int":3}}]}}""")
+      """{"data":{"groupByModel":[{"float":1.1,"_count":{"float":3},"_sum":{"int":3}},{"float":3,"_count":{"float":1},"_sum":{"int":3}}]}}""")
   }
 
   "Using a group-by with order by aggregation without selecting the ordered field" should "work" in {
@@ -507,13 +507,13 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       s"""{
          |  groupByModel(by: [float], orderBy: { _count: { float: desc } }) {
-         |    sum { int }
+         |    _sum { int }
          |  }
          |}""".stripMargin,
       project
     )
 
-    result.toString should be("""{"data":{"groupByModel":[{"sum":{"int":3}}]}}""")
+    result.toString should be("""{"data":{"groupByModel":[{"_sum":{"int":3}}]}}""")
   }
 
   "Using a group-by with order by aggregation without selecting the ordered field or grouping by it" should "work" in {
@@ -526,7 +526,7 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       s"""{
          |  groupByModel(by: [s], orderBy: { _sum: { int: asc } }) {
          |    s
-         |    sum { int }
+         |    _sum { int }
          |  }
          |}""".stripMargin,
       project
@@ -535,7 +535,7 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     // Ordered by number of records ASC (basically, since int is not null):
     // Group 2 with 1 (sum is 4)
     // Group 1 with 2 (sum is 2)
-    result.toString should be("""{"data":{"groupByModel":[{"s":"group2","sum":{"int":1}},{"s":"group1","sum":{"int":5}}]}}""")
+    result.toString should be("""{"data":{"groupByModel":[{"s":"group2","_sum":{"int":1}},{"s":"group1","_sum":{"int":5}}]}}""")
   }
 
   /////// Error Cases
@@ -558,8 +558,8 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       s"""{
          |  groupByModel(by: [int]) {
          |    s
-         |    count { s }
-         |    sum { float }
+         |    _count { s }
+         |    _sum { float }
          |  }
          |}""".stripMargin,
       project,
@@ -572,8 +572,8 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     server.queryThatMustFail(
       s"""{
          |  groupByModel(by: [int], orderBy: { s: desc }) {
-         |    count { int }
-         |    sum { float }
+         |    _count { int }
+         |    _sum { float }
          |  }
          |}""".stripMargin,
       project,
@@ -586,7 +586,7 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     server.queryThatMustFail(
       s"""{
          |  groupByModel(by: [s]) {
-         |    sum
+         |    _sum
          |  }
          |}""".stripMargin,
       project,

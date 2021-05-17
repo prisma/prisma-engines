@@ -9,7 +9,7 @@ mod upsert_nested;
 
 use super::*;
 use crate::{
-    constants::inputs::operations,
+    constants::operations,
     query_graph::{NodeRef, QueryGraph},
     ParsedInputMap,
 };
