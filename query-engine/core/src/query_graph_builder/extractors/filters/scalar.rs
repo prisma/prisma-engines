@@ -1,5 +1,6 @@
 use crate::{
-    constants::inputs::filters, ParsedInputMap, ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult,
+    constants::{aggregations, filters},
+    ParsedInputMap, ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult,
 };
 use connector::{Filter, ScalarCompare, ScalarListCompare};
 use prisma_models::{PrismaValue, ScalarFieldRef};
@@ -91,11 +92,18 @@ pub fn parse(
         filters::IS_EMPTY => vec![field.is_empty_list(input.try_into()?)],
 
         // Aggregation filters
-        filters::COUNT => aggregation_filter(field, input, reverse, Filter::count)?,
-        filters::AVG => aggregation_filter(field, input, reverse, Filter::average)?,
-        filters::SUM => aggregation_filter(field, input, reverse, Filter::sum)?,
-        filters::MIN => aggregation_filter(field, input, reverse, Filter::min)?,
-        filters::MAX => aggregation_filter(field, input, reverse, Filter::max)?,
+        aggregations::UNDERSCORE_COUNT => aggregation_filter(field, input, reverse, Filter::count)?,
+        aggregations::UNDERSCORE_AVG => aggregation_filter(field, input, reverse, Filter::average)?,
+        aggregations::UNDERSCORE_SUM => aggregation_filter(field, input, reverse, Filter::sum)?,
+        aggregations::UNDERSCORE_MIN => aggregation_filter(field, input, reverse, Filter::min)?,
+        aggregations::UNDERSCORE_MAX => aggregation_filter(field, input, reverse, Filter::max)?,
+
+        // Deprecated aggregation filters
+        aggregations::COUNT => aggregation_filter(field, input, reverse, Filter::count)?,
+        aggregations::AVG => aggregation_filter(field, input, reverse, Filter::average)?,
+        aggregations::SUM => aggregation_filter(field, input, reverse, Filter::sum)?,
+        aggregations::MIN => aggregation_filter(field, input, reverse, Filter::min)?,
+        aggregations::MAX => aggregation_filter(field, input, reverse, Filter::max)?,
 
         _ => {
             return Err(QueryGraphBuilderError::InputError(format!(

@@ -1,5 +1,5 @@
 use super::*;
-use constants::inputs::args;
+use constants::args;
 
 #[tracing::instrument(skip(ctx, model, parent_field))]
 pub(crate) fn update_many_input_types(

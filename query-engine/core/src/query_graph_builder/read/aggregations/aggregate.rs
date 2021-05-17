@@ -23,7 +23,7 @@ pub fn aggregate(field: ParsedField, model: ModelRef) -> QueryGraphBuilderResult
 
     let selectors: Vec<_> = nested_fields
         .into_iter()
-        .map(|field| resolve_query(field, &model))
+        .map(|field| resolve_query(field, &model, true))
         .collect::<QueryGraphBuilderResult<_>>()?;
 
     Ok(ReadQuery::AggregateRecordsQuery(AggregateRecordsQuery {

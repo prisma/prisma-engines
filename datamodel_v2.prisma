@@ -3,6 +3,11 @@ datasource chinook {
   url      = "file:./db/Chinook.db?connection_limit=1&socket_timeout=20"
 }
 
+generator js {
+  provider        = "prisma-client-js"
+  previewFeatures = ["microsoftSqlServer", "mongodb", "orderByRelation", "napi", "selectRelationCount", "orderByAggregateGroup"]
+}
+
 model Album {
   id       Int     @id @map("AlbumId")
   Title    String  @default("TestDefaultTitle")

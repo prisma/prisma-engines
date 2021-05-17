@@ -52,7 +52,7 @@ where
         let object_type = OutputType::object(map_field_aggregation_object(
             ctx,
             model,
-            name,
+            name.trim_start_matches('_'),
             &fields,
             type_mapper,
             object_mapper,

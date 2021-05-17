@@ -1,6 +1,6 @@
 use super::*;
 use crate::{
-    constants::inputs::args,
+    constants::args,
     query_ast::*,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     write::write_args_parser::WriteArgsParser,
