@@ -1,5 +1,5 @@
 use barrel::types;
-use indoc::indoc;
+use indoc::formatdoc;
 use introspection_engine_tests::{test_api::*, TestResult};
 use test_macros::test_connector;
 
@@ -17,19 +17,19 @@ async fn scalar_list_types(api: &TestApi) -> TestResult {
         })
         .await?;
 
-    let dm = indoc! {r#"
-         model Post {
-            id      Int @id @default(autoincrement())
-            ints     Int []
+    let dm = formatdoc! {r#"
+         model Post {{
+            id       {int_type} @id @default(autoincrement())
+            ints     {int_type} []
             bools    Boolean []
             strings  String []
             floats   Float []
-         }
-    "#};
+         }}
+    "#, int_type = api.int_type()};
 
     let result = api.introspect().await?;
 
-    api.assert_eq_datamodels(dm, &result);
+    api.assert_eq_datamodels(&dm, &result);
 
     Ok(())
 }

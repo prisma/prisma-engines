@@ -160,6 +160,10 @@ impl SqlSchemaDescriber {
 
     #[tracing::instrument]
     async fn get_size(&self, schema: &str) -> DescriberResult<usize> {
+        if self.circumstances.contains(Circumstances::Cockroach) {
+            return Ok(0); // TODO
+        }
+
         let sql =
             "SELECT SUM(pg_total_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename)))::BIGINT as size
              FROM pg_tables
@@ -267,7 +271,7 @@ impl SqlSchemaDescriber {
 
             let data_type = col.get_expect_string("data_type");
             let tpe = get_column_type(&col, enums);
-            let default = Self::get_default_value(&col, &data_type, &tpe, sequences);
+            let default = Self::get_default_value(&col, &data_type, &tpe, sequences, schema);
 
             let auto_increment = is_identity
                 || matches!(default.as_ref().map(|d| d.kind()), Some(DefaultKind::Sequence(_)))
@@ -652,6 +656,7 @@ impl SqlSchemaDescriber {
         data_type: &str,
         tpe: &ColumnType,
         sequences: &[Sequence],
+        schema: &str,
     ) -> Option<DefaultValue> {
         match col.get("column_default") {
             None => None,
@@ -723,18 +728,14 @@ impl SqlSchemaDescriber {
                         }
                         ColumnTypeFamily::Uuid => DefaultValue::db_generated(default_string),
                         ColumnTypeFamily::Enum(enum_name) => {
-                            let enum_suffix_without_quotes = format!("::{}", enum_name);
-                            let enum_suffix_with_quotes = format!("::\"{}\"", enum_name);
-                            if default_string.ends_with(&enum_suffix_with_quotes) {
-                                DefaultValue::value(PrismaValue::Enum(Self::unquote_string(
-                                    &default_string.replace(&enum_suffix_with_quotes, ""),
-                                )))
-                            } else if default_string.ends_with(&enum_suffix_without_quotes) {
-                                DefaultValue::value(PrismaValue::Enum(Self::unquote_string(
-                                    &default_string.replace(&enum_suffix_without_quotes, ""),
-                                )))
-                            } else {
-                                DefaultValue::db_generated(default_string)
+                            let expected_suffixes: &[Cow<'_, str>] = &[
+                                Cow::Borrowed(enum_name),
+                                Cow::Owned(format!("\"{}\"", enum_name)),
+                                Cow::Owned(format!("{}.{}", schema, enum_name)),
+                            ];
+                            match unsuffix_default_literal(&default_string, expected_suffixes) {
+                                Some(value) => DefaultValue::value(PrismaValue::Enum(Self::unquote_string(&value))),
+                                None => DefaultValue::db_generated(default_string),
                             }
                         }
                         ColumnTypeFamily::Unsupported(_) => DefaultValue::db_generated(default_string),
@@ -817,6 +818,7 @@ fn get_column_type(row: &ResultRow, enums: &[Enum]) -> ColumnType {
         "lseg" | "_lseg" => unsupported_type(),
         "path" | "_path" => unsupported_type(),
         "polygon" | "_polygon" => unsupported_type(),
+        name if enum_exists(name) => (Enum(name.to_owned()), None),
         _ => unsupported_type(),
     };
 
@@ -864,7 +866,7 @@ fn fetch_dbgenerated(value: &str) -> Option<String> {
     }
 }
 
-fn unsuffix_default_literal<'a>(literal: &'a str, expected_suffixes: &[&str]) -> Option<Cow<'a, str>> {
+fn unsuffix_default_literal<'a, T: AsRef<str>>(literal: &'a str, expected_suffixes: &[T]) -> Option<Cow<'a, str>> {
     // Tries to match expressions of the form <expr> or <expr>::<type> or <expr>:::<type>.
     static POSTGRES_DATA_TYPE_SUFFIX_RE: Lazy<Regex> =
         Lazy::new(|| Regex::new(r#"(?ms)^(.*?):{2,3}(\\")?(.*)(\\")?$"#).unwrap());
@@ -872,7 +874,7 @@ fn unsuffix_default_literal<'a>(literal: &'a str, expected_suffixes: &[&str]) ->
     let captures = POSTGRES_DATA_TYPE_SUFFIX_RE.captures(literal)?;
     let suffix = captures.get(3).unwrap().as_str();
 
-    if !expected_suffixes.iter().any(|expected| *expected == suffix) {
+    if !expected_suffixes.iter().any(|expected| expected.as_ref() == suffix) {
         return None;
     }
 

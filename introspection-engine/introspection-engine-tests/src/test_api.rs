@@ -80,6 +80,10 @@ impl TestApi {
         ))
     }
 
+    pub fn is_cockroach(&self) -> bool {
+        self.tags().contains(Tags::Cockroach)
+    }
+
     #[tracing::instrument(skip(self, data_model_string))]
     #[track_caller]
     pub async fn re_introspect(&self, data_model_string: &str) -> Result<String> {
@@ -104,6 +108,14 @@ impl TestApi {
         let introspection_result = self.api.introspect(&data_model).await?;
 
         Ok(serde_json::to_string(&introspection_result.warnings)?)
+    }
+
+    pub fn int_type(&self) -> &'static str {
+        if self.tags().contains(Tags::Cockroach) {
+            "BigInt"
+        } else {
+            "Int"
+        }
     }
 
     pub async fn introspect_version(&self) -> Result<Version> {
@@ -174,6 +186,7 @@ impl TestApi {
             .subject
     }
 
+    #[track_caller]
     pub fn assert_eq_datamodels(&self, expected_without_header: &str, result_with_header: &str) {
         let parsed_expected = datamodel::parse_datamodel(&self.dm_with_sources(expected_without_header))
             .unwrap()

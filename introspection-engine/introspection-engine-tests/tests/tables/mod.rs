@@ -47,13 +47,13 @@ async fn a_simple_table_with_gql_types(api: &TestApi) -> TestResult {
     let dm = formatdoc! {r##"
         model Blog {{
             bool    Boolean
-            float   Float {}
-            date    DateTime {}
-            id      Int @id @default(autoincrement())
+            float   Float {float_native}
+            date    DateTime {timestamp_native}
+            id      {int_type} @id @default(autoincrement())
             int     Int
-            string  String {}
+            string  String {text_native}
         }}
-    "##, float_native, timestamp_native, text_native};
+    "##, float_native = float_native, timestamp_native = timestamp_native, text_native = text_native, int_type = api.int_type()};
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
@@ -103,13 +103,13 @@ async fn should_ignore_prisma_helper_tables(api: &TestApi) -> TestResult {
         )
         .await?;
 
-    let dm = indoc! {r##"
-        model Blog {
-            id      Int @id @default(autoincrement())
-        }
-    "##};
+    let dm = formatdoc! {r##"
+        model Blog {{
+            id      {int_type} @id @default(autoincrement())
+        }}
+    "##, int_type = api.int_type()};
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -435,7 +435,7 @@ async fn default_values(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(Cockroach))]
 async fn pg_default_value_as_dbgenerated(api: &TestApi) -> TestResult {
     let sequence = "CREATE SEQUENCE test_seq START 1".to_string();
     api.database().execute_raw(&sequence, &[]).await?;
@@ -571,16 +571,16 @@ async fn a_table_with_partial_indexes_should_ignore_them(api: &TestApi) -> TestR
         })
         .await?;
 
-    let dm = indoc! {r#"
-        model pages {
-            id       Int     @id @default(autoincrement())
-            staticId Int
-            latest   Int
-            other    Int     @unique
-        }
-    "#};
+    let dm = formatdoc! {r#"
+        model pages {{
+            id       {int_type}     @id @default(autoincrement())
+            staticId {int_type}
+            latest   {int_type}
+            other    {int_type}     @unique
+        }}
+    "#, int_type = api.int_type()};
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -679,15 +679,15 @@ async fn negative_default_values_should_work(api: &TestApi) -> TestResult {
 
     let dm = formatdoc! {r##"
         model Blog {{
-          id                     Int     @id @default(autoincrement())
-          int                    Int     @default(1)
-          neg_int                Int     @default(-1)
-          float                  Float   @default(2.1) {}
-          neg_float              Float   @default(-2.1) {}
-          big_int                BigInt  @default(3)
-          neg_big_int            BigInt  @default(-3)
+          id                     {int_type}  @id @default(autoincrement())
+          int                    {int_type}  @default(1)
+          neg_int                {int_type}  @default(-1)
+          float                  Float       @default(2.1) {float_native}
+          neg_float              Float       @default(-2.1) {float_native}
+          big_int                BigInt      @default(3)
+          neg_big_int            BigInt      @default(-3)
         }}
-    "##, float_native, float_native};
+    "##, float_native = float_native, int_type = api.int_type()};
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);
 

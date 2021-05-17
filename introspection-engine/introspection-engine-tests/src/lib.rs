@@ -1,4 +1,3 @@
-pub mod sync_test_api;
 pub mod test_api;
 
 use barrel::Migration;
