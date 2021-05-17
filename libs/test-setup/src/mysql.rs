@@ -72,6 +72,7 @@ pub(crate) fn get_mysql_tags(database_url: &str) -> Result<BitFlags<Tags>, Strin
 
 /// Returns a connection to the new database, as well as the corresponding
 /// complete connection string.
+#[allow(clippy::needless_lifetimes)] // clippy is wrong
 pub(crate) async fn create_mysql_database<'a>(
     database_url: &str,
     db_name: &'a str,
