@@ -1,18 +1,7 @@
-use crate::{Filter, JsonCompare, ScalarCompare, ScalarFilter};
+use std::sync::Arc;
+
+use crate::{Filter, JsonCompare, JsonCondition, QueryMode, ScalarCondition, ScalarFilter, ScalarProjection};
 use prisma_models::{PrismaValue, ScalarFieldRef};
-
-#[derive(Debug, Clone, Eq, Hash, PartialEq)]
-pub struct JsonFilter {
-    pub filter: ScalarFilter,
-    pub target_type: Option<JsonTargetType>,
-    pub path: Option<JsonFilterPath>,
-}
-
-impl JsonFilter {
-    pub fn set_path(&mut self, path: Option<JsonFilterPath>) {
-        self.path = path
-    }
-}
 
 #[derive(Debug, Clone, Eq, Hash, PartialEq)]
 pub enum JsonTargetType {
@@ -27,76 +16,183 @@ pub enum JsonFilterPath {
 }
 
 impl JsonCompare for ScalarFieldRef {
-    fn json_contains<T>(&self, value: T, target_type: JsonTargetType) -> Filter
+    fn json_contains<T>(&self, value: T, path: Option<JsonFilterPath>, target_type: JsonTargetType) -> Filter
     where
         T: Into<PrismaValue>,
     {
-        Filter::from(JsonFilter {
-            filter: convert_filter_to_scalar_filter(self.contains(value)),
-            target_type: Some(target_type),
-            path: None,
+        Filter::from(ScalarFilter {
+            condition: ScalarCondition::JsonCompare(JsonCondition {
+                condition: Box::new(ScalarCondition::Contains(value.into())),
+                path,
+                target_type: Some(target_type),
+            }),
+            projection: ScalarProjection::Single(Arc::clone(self)),
+            mode: QueryMode::Default,
         })
     }
 
-    fn json_not_contains<T>(&self, value: T, target_type: JsonTargetType) -> Filter
+    fn json_not_contains<T>(&self, value: T, path: Option<JsonFilterPath>, target_type: JsonTargetType) -> Filter
     where
         T: Into<PrismaValue>,
     {
-        Filter::from(JsonFilter {
-            filter: convert_filter_to_scalar_filter(self.not_contains(value)),
-            target_type: Some(target_type),
-            path: None,
+        Filter::from(ScalarFilter {
+            condition: ScalarCondition::JsonCompare(JsonCondition {
+                condition: Box::new(ScalarCondition::NotContains(value.into())),
+                path,
+                target_type: Some(target_type),
+            }),
+            projection: ScalarProjection::Single(Arc::clone(self)),
+            mode: QueryMode::Default,
         })
     }
 
-    fn json_starts_with<T>(&self, value: T, target_type: JsonTargetType) -> Filter
+    fn json_starts_with<T>(&self, value: T, path: Option<JsonFilterPath>, target_type: JsonTargetType) -> Filter
     where
         T: Into<PrismaValue>,
     {
-        Filter::from(JsonFilter {
-            filter: convert_filter_to_scalar_filter(self.starts_with(value)),
-            target_type: Some(target_type),
-            path: None,
+        Filter::from(ScalarFilter {
+            condition: ScalarCondition::JsonCompare(JsonCondition {
+                condition: Box::new(ScalarCondition::StartsWith(value.into())),
+                path,
+                target_type: Some(target_type),
+            }),
+            projection: ScalarProjection::Single(Arc::clone(self)),
+            mode: QueryMode::Default,
         })
     }
 
-    fn json_not_starts_with<T>(&self, value: T, target_type: JsonTargetType) -> Filter
+    fn json_not_starts_with<T>(&self, value: T, path: Option<JsonFilterPath>, target_type: JsonTargetType) -> Filter
     where
         T: Into<PrismaValue>,
     {
-        Filter::from(JsonFilter {
-            filter: convert_filter_to_scalar_filter(self.not_starts_with(value)),
-            target_type: Some(target_type),
-            path: None,
+        Filter::from(ScalarFilter {
+            condition: ScalarCondition::JsonCompare(JsonCondition {
+                condition: Box::new(ScalarCondition::NotStartsWith(value.into())),
+                path,
+                target_type: Some(target_type),
+            }),
+            projection: ScalarProjection::Single(Arc::clone(self)),
+            mode: QueryMode::Default,
         })
     }
 
-    fn json_ends_with<T>(&self, value: T, target_type: JsonTargetType) -> Filter
+    fn json_ends_with<T>(&self, value: T, path: Option<JsonFilterPath>, target_type: JsonTargetType) -> Filter
     where
         T: Into<PrismaValue>,
     {
-        Filter::from(JsonFilter {
-            filter: convert_filter_to_scalar_filter(self.ends_with(value)),
-            target_type: Some(target_type),
-            path: None,
+        Filter::from(ScalarFilter {
+            condition: ScalarCondition::JsonCompare(JsonCondition {
+                condition: Box::new(ScalarCondition::EndsWith(value.into())),
+                path,
+                target_type: Some(target_type),
+            }),
+            projection: ScalarProjection::Single(Arc::clone(self)),
+            mode: QueryMode::Default,
         })
     }
 
-    fn json_not_ends_with<T>(&self, value: T, target_type: JsonTargetType) -> Filter
+    fn json_not_ends_with<T>(&self, value: T, path: Option<JsonFilterPath>, target_type: JsonTargetType) -> Filter
     where
         T: Into<PrismaValue>,
     {
-        Filter::from(JsonFilter {
-            filter: convert_filter_to_scalar_filter(self.not_ends_with(value)),
-            target_type: Some(target_type),
-            path: None,
+        Filter::from(ScalarFilter {
+            condition: ScalarCondition::JsonCompare(JsonCondition {
+                condition: Box::new(ScalarCondition::NotEndsWith(value.into())),
+                path,
+                target_type: Some(target_type),
+            }),
+            projection: ScalarProjection::Single(Arc::clone(self)),
+            mode: QueryMode::Default,
         })
     }
-}
 
-fn convert_filter_to_scalar_filter(filter: Filter) -> ScalarFilter {
-    match filter {
-        Filter::Scalar(scalar_filter) => scalar_filter,
-        x => panic!("A scalar filter was expected, found: {:?}", x),
+    fn json_equals<T>(&self, value: T, path: Option<JsonFilterPath>) -> Filter
+    where
+        T: Into<PrismaValue>,
+    {
+        Filter::from(ScalarFilter {
+            condition: ScalarCondition::JsonCompare(JsonCondition {
+                condition: Box::new(ScalarCondition::Equals(value.into())),
+                path,
+                target_type: None,
+            }),
+            projection: ScalarProjection::Single(Arc::clone(self)),
+            mode: QueryMode::Default,
+        })
+    }
+
+    fn json_not_equals<T>(&self, value: T, path: Option<JsonFilterPath>) -> Filter
+    where
+        T: Into<PrismaValue>,
+    {
+        Filter::from(ScalarFilter {
+            condition: ScalarCondition::JsonCompare(JsonCondition {
+                condition: Box::new(ScalarCondition::NotEquals(value.into())),
+                path,
+                target_type: None,
+            }),
+            projection: ScalarProjection::Single(Arc::clone(self)),
+            mode: QueryMode::Default,
+        })
+    }
+
+    fn json_less_than<T>(&self, value: T, path: Option<JsonFilterPath>) -> Filter
+    where
+        T: Into<PrismaValue>,
+    {
+        Filter::from(ScalarFilter {
+            condition: ScalarCondition::JsonCompare(JsonCondition {
+                condition: Box::new(ScalarCondition::LessThan(value.into())),
+                path,
+                target_type: None,
+            }),
+            projection: ScalarProjection::Single(Arc::clone(self)),
+            mode: QueryMode::Default,
+        })
+    }
+
+    fn json_less_than_or_equals<T>(&self, value: T, path: Option<JsonFilterPath>) -> Filter
+    where
+        T: Into<PrismaValue>,
+    {
+        Filter::from(ScalarFilter {
+            condition: ScalarCondition::JsonCompare(JsonCondition {
+                condition: Box::new(ScalarCondition::LessThanOrEquals(value.into())),
+                path,
+                target_type: None,
+            }),
+            projection: ScalarProjection::Single(Arc::clone(self)),
+            mode: QueryMode::Default,
+        })
+    }
+
+    fn json_greater_than<T>(&self, value: T, path: Option<JsonFilterPath>) -> Filter
+    where
+        T: Into<PrismaValue>,
+    {
+        Filter::from(ScalarFilter {
+            condition: ScalarCondition::JsonCompare(JsonCondition {
+                condition: Box::new(ScalarCondition::GreaterThan(value.into())),
+                path,
+                target_type: None,
+            }),
+            projection: ScalarProjection::Single(Arc::clone(self)),
+            mode: QueryMode::Default,
+        })
+    }
+
+    fn json_greater_than_or_equals<T>(&self, value: T, path: Option<JsonFilterPath>) -> Filter
+    where
+        T: Into<PrismaValue>,
+    {
+        Filter::from(ScalarFilter {
+            condition: ScalarCondition::JsonCompare(JsonCondition {
+                condition: Box::new(ScalarCondition::GreaterThanOrEquals(value.into())),
+                path,
+                target_type: None,
+            }),
+            projection: ScalarProjection::Single(Arc::clone(self)),
+            mode: QueryMode::Default,
+        })
     }
 }

@@ -27,7 +27,6 @@ pub enum Filter {
     Relation(RelationFilter),
     BoolFilter(bool),
     Aggregation(AggregationFilter),
-    Json(JsonFilter),
     Empty,
 }
 
@@ -178,12 +177,6 @@ impl From<ScalarListFilter> for Filter {
 impl From<OneRelationIsNullFilter> for Filter {
     fn from(sf: OneRelationIsNullFilter) -> Self {
         Filter::OneRelationIsNull(sf)
-    }
-}
-
-impl From<JsonFilter> for Filter {
-    fn from(jf: JsonFilter) -> Self {
-        Filter::Json(jf)
     }
 }
 
