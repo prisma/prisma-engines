@@ -408,7 +408,7 @@ fn convert_json_filter(
             ),
         }
     } else {
-        (comparable.clone().into(), comparable.into())
+        (comparable.clone(), comparable)
     };
 
     let condition: Expression = match *cond {
