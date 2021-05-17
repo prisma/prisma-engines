@@ -6,7 +6,7 @@ use url::Url;
 /// The maximum length of identifiers on mysql is 64 bytes.
 ///
 /// Source: https://dev.mysql.com/doc/mysql-reslimits-excerpt/5.5/en/identifier-length.html
-pub fn mysql_safe_identifier(identifier: &str) -> &str {
+fn mysql_safe_identifier(identifier: &str) -> &str {
     if identifier.len() < 64 {
         identifier
     } else {
@@ -72,9 +72,13 @@ pub(crate) fn get_mysql_tags(database_url: &str) -> Result<BitFlags<Tags>, Strin
 
 /// Returns a connection to the new database, as well as the corresponding
 /// complete connection string.
-pub async fn create_mysql_database(db_name: &str) -> Result<(Quaint, String), AnyError> {
-    let mut url: Url = super::TAGS.as_ref().unwrap().database_url.parse()?;
+pub(crate) async fn create_mysql_database<'a>(
+    database_url: &str,
+    db_name: &'a str,
+) -> Result<(&'a str, String), AnyError> {
+    let mut url: Url = database_url.parse()?;
     let mut mysql_db_url = url.clone();
+    let db_name = mysql_safe_identifier(db_name);
 
     mysql_db_url.set_path("/mysql");
     url.set_path(db_name);
@@ -107,5 +111,5 @@ pub async fn create_mysql_database(db_name: &str) -> Result<(Quaint, String), An
     conn.raw_cmd(&recreate).await?;
     let url_str = url.to_string();
 
-    Ok((Quaint::new(&url_str).await?, url_str))
+    Ok((db_name, url_str))
 }

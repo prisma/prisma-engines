@@ -18,7 +18,7 @@ use sql_schema_describer::{
     postgres::{self, Circumstances},
     sqlite, SqlSchema, SqlSchemaDescriberBackend,
 };
-use test_setup::{create_mysql_database, create_postgres_database, sqlite_test_url, TestApiArgs};
+use test_setup::{sqlite_test_url, TestApiArgs};
 use tracing::Instrument;
 
 pub struct TestApi {
@@ -33,12 +33,6 @@ impl TestApi {
         let tags = args.tags();
         let connection_string = args.database_url();
 
-        let db_name = if tags.contains(Tags::Mysql) {
-            test_setup::mysql_safe_identifier(args.test_function_name())
-        } else {
-            args.test_function_name()
-        };
-
         let (database, connection_string): (Quaint, String) = if tags.intersects(Tags::Vitess) {
             let me = SqlMigrationConnector::new(&connection_string, None).await.unwrap();
             me.reset().await.unwrap();
@@ -48,15 +42,17 @@ impl TestApi {
                 connection_string.to_owned(),
             )
         } else if tags.contains(Tags::Mysql) {
-            create_mysql_database(db_name).await.unwrap()
+            let (_, cs) = args.create_mysql_database().await;
+            (Quaint::new(&cs).await.unwrap(), cs)
         } else if tags.contains(Tags::Postgres) {
-            create_postgres_database(db_name).await.unwrap()
+            let (_, q, cs) = args.create_postgres_database().await;
+            (q, cs)
         } else if tags.contains(Tags::Mssql) {
-            test_setup::init_mssql_database(args.database_url(), db_name)
+            test_setup::init_mssql_database(args.database_url(), args.test_function_name())
                 .await
                 .unwrap()
         } else if tags.contains(Tags::Sqlite) {
-            let url = sqlite_test_url(db_name);
+            let url = sqlite_test_url(args.test_function_name());
             (Quaint::new(&url).await.unwrap(), url)
         } else {
             unreachable!()
