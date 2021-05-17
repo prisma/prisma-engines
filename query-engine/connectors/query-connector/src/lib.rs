@@ -16,7 +16,6 @@ pub use interface::*;
 pub use query_arguments::*;
 pub use write_args::*;
 
-use enumflags2::BitFlags;
 use once_cell::sync::Lazy;
 use std::env;
 
@@ -30,11 +29,3 @@ pub static MAX_BATCH_SIZE: Lazy<usize> = Lazy::new(|| match env::var("QUERY_BATC
     Ok(size) => size.parse().unwrap_or(5000),
     Err(_) => 5000,
 });
-
-/// Flags to setup the connector behavior outside of the connection string.
-#[derive(BitFlags, Copy, Clone, Debug, PartialEq)]
-#[repr(u8)]
-pub enum SourceParameter {
-    /// Enable logging of the query SQL and parameters.
-    QueryLogging = 1 << 0,
-}

@@ -20,7 +20,6 @@ tracing = "0.1.22"
 tracing-futures = "0.2.4"
 tokio = "1.0"
 uuid = "0.8"
-enumflags2 = "0.6"
 
 [dependencies.quaint]
 features = [

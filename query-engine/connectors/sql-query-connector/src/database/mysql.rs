@@ -4,10 +4,9 @@ use async_trait::async_trait;
 use connector_interface::{
     self as connector,
     error::{ConnectorError, ErrorKind},
-    Connection, Connector, SourceParameter,
+    Connection, Connector,
 };
 use datamodel::Datasource;
-use enumflags2::BitFlags;
 use quaint::{pooled::Quaint, prelude::ConnectionInfo};
 use std::time::Duration;
 
@@ -18,11 +17,7 @@ pub struct Mysql {
 
 #[async_trait]
 impl FromSource for Mysql {
-    async fn from_source(
-        _source: &Datasource,
-        url: &str,
-        flags: BitFlags<SourceParameter>,
-    ) -> connector_interface::Result<Self> {
+    async fn from_source(_source: &Datasource, url: &str) -> connector_interface::Result<Self> {
         let database_str = url;
 
         let connection_info = ConnectionInfo::from_url(database_str).map_err(|err| {
@@ -38,10 +33,6 @@ impl FromSource for Mysql {
 
         builder.health_check_interval(Duration::from_secs(15));
         builder.test_on_check_out(true);
-
-        if flags.contains(SourceParameter::QueryLogging) {
-            builder.log_queries();
-        }
 
         let pool = builder.build();
         let connection_info = pool.connection_info().to_owned();

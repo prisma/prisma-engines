@@ -1,7 +1,5 @@
 use crate::{PrismaError, PrismaResult};
-use connector::SourceParameter;
 use datamodel::{Configuration, Datamodel};
-use enumflags2::BitFlags;
 use prisma_models::DatamodelConverter;
 use query_core::{exec_loader, schema::QuerySchemaRef, schema_builder, BuildMode, QueryExecutor};
 use std::{fmt, sync::Arc};
@@ -28,7 +26,6 @@ pub struct ContextBuilder {
     enable_raw_queries: bool,
     datamodel: Datamodel,
     config: Configuration,
-    log_queries: bool,
 }
 
 impl ContextBuilder {
@@ -42,32 +39,14 @@ impl ContextBuilder {
         self
     }
 
-    pub fn log_queries(mut self, val: bool) -> Self {
-        self.log_queries = val;
-        self
-    }
-
     pub async fn build(self) -> PrismaResult<PrismaContext> {
-        PrismaContext::new(
-            self.config,
-            self.datamodel,
-            self.legacy,
-            self.enable_raw_queries,
-            self.log_queries,
-        )
-        .await
+        PrismaContext::new(self.config, self.datamodel, self.legacy, self.enable_raw_queries).await
     }
 }
 
 impl PrismaContext {
     /// Initializes a new Prisma context.
-    async fn new(
-        config: Configuration,
-        dm: Datamodel,
-        legacy: bool,
-        enable_raw_queries: bool,
-        log_queries: bool,
-    ) -> PrismaResult<Self> {
+    async fn new(config: Configuration, dm: Datamodel, legacy: bool, enable_raw_queries: bool) -> PrismaResult<Self> {
         let template = DatamodelConverter::convert(&dm);
 
         // We only support one data source at the moment, so take the first one (default not exposed yet).
@@ -78,16 +57,10 @@ impl PrismaContext {
 
         let url = data_source.load_url()?;
 
-        let mut params = BitFlags::empty();
-
-        if log_queries {
-            params.insert(SourceParameter::QueryLogging);
-        }
-
         // Load executor
 
         let preview_features: Vec<_> = config.preview_features().cloned().collect();
-        let (db_name, executor) = exec_loader::load(&data_source, &preview_features, &url, params).await?;
+        let (db_name, executor) = exec_loader::load(&data_source, &preview_features, &url).await?;
 
         // Build internal data model
         let internal_data_model = template.build(db_name);
@@ -124,7 +97,6 @@ impl PrismaContext {
             enable_raw_queries: false,
             datamodel,
             config,
-            log_queries: false,
         }
     }
 

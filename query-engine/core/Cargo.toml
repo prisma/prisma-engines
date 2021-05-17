@@ -39,4 +39,3 @@ tracing-futures = "0.2.4"
 url = "1"
 user-facing-errors = { path = "../../libs/user-facing-errors" }
 uuid = "0.8"
-enumflags2 = "0.6"

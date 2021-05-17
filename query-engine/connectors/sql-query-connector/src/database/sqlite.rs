@@ -4,10 +4,9 @@ use async_trait::async_trait;
 use connector_interface::{
     self as connector,
     error::{ConnectorError, ErrorKind},
-    Connection, Connector, SourceParameter,
+    Connection, Connector,
 };
 use datamodel::Datasource;
-use enumflags2::BitFlags;
 use quaint::{connector::SqliteParams, error::ErrorKind as QuaintKind, pooled::Quaint, prelude::ConnectionInfo};
 use std::{convert::TryFrom, time::Duration};
 
@@ -28,11 +27,7 @@ impl Sqlite {
 
 #[async_trait]
 impl FromSource for Sqlite {
-    async fn from_source(
-        _source: &Datasource,
-        url: &str,
-        flags: BitFlags<SourceParameter>,
-    ) -> connector_interface::Result<Sqlite> {
+    async fn from_source(_source: &Datasource, url: &str) -> connector_interface::Result<Sqlite> {
         let database_str = url;
 
         let connection_info = ConnectionInfo::from_url(database_str)
@@ -55,10 +50,6 @@ impl FromSource for Sqlite {
 
         builder.health_check_interval(Duration::from_secs(15));
         builder.test_on_check_out(true);
-
-        if flags.contains(SourceParameter::QueryLogging) {
-            builder.log_queries();
-        }
 
         let pool = builder.build();
 

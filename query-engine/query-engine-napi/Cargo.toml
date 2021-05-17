@@ -33,7 +33,6 @@ datamodel-connector = { path = "../../libs/datamodel/connectors/datamodel-connec
 opentelemetry = "0.12"
 opentelemetry-otlp = { version = "0.5", features = ["tls", "tls-roots"] }
 tokio = { version = "1", features = ["sync"] }
-enumflags2 = "0.6"
 
 [build-dependencies]
 napi-build = "1"

@@ -38,7 +38,6 @@ thiserror = "1.0"
 tide = { version = "0.15.0", default-features = false, features = ["h1-server", "logger"] }
 tide-server-timing = "0.15.0"
 url = "2.1"
-enumflags2 = "0.6"
 
 tracing = "0.1"
 tracing-opentelemetry = "0.11"
@@ -58,6 +57,7 @@ rustc_version = "0.2.3"
 [dev-dependencies]
 anyhow = "1"
 chrono = "0.4"
+enumflags2 = "0.6"
 indoc = "1"
 migration-connector = { path = "../../migration-engine/connectors/migration-connector" }
 migration-core = { path = "../../migration-engine/core" }

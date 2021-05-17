@@ -4,6 +4,8 @@ use crate::{
 };
 use connection_string::JdbcString;
 use connector::Connector;
+use std::str::FromStr;
+
 use datamodel::{
     common::{
         preview_features::PreviewFeature,
@@ -11,12 +13,9 @@ use datamodel::{
     },
     Datasource,
 };
-use enumflags2::BitFlags;
 use std::collections::HashMap;
-use std::str::FromStr;
 use url::Url;
 
-use connector::SourceParameter;
 use sql_connector::*;
 
 #[cfg(feature = "mongodb")]
@@ -31,12 +30,11 @@ pub async fn load(
     source: &Datasource,
     features: &[PreviewFeature],
     url: &str,
-    flags: BitFlags<SourceParameter>,
 ) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
     match source.active_provider.as_str() {
-        SQLITE_SOURCE_NAME => sqlite(source, url, flags).await,
-        MYSQL_SOURCE_NAME => mysql(source, url, flags).await,
-        POSTGRES_SOURCE_NAME => postgres(source, url, flags).await,
+        SQLITE_SOURCE_NAME => sqlite(source, url).await,
+        MYSQL_SOURCE_NAME => mysql(source, url).await,
+        POSTGRES_SOURCE_NAME => postgres(source, url).await,
 
         MSSQL_SOURCE_NAME => {
             if !features.contains(&PreviewFeature::MicrosoftSqlServer) {
@@ -47,7 +45,7 @@ pub async fn load(
                 return Err(error);
             }
 
-            mssql(source, url, flags).await
+            mssql(source, url).await
         }
 
         #[cfg(feature = "mongodb")]
@@ -119,29 +117,21 @@ pub fn db_name(source: &Datasource, url: &str) -> crate::Result<String> {
     }
 }
 
-async fn sqlite(
-    source: &Datasource,
-    url: &str,
-    flags: BitFlags<SourceParameter>,
-) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
+async fn sqlite(source: &Datasource, url: &str) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
     trace!("Loading SQLite query connector...");
 
-    let sqlite = Sqlite::from_source(source, url, flags).await?;
+    let sqlite = Sqlite::from_source(source, url).await?;
     let db_name = db_name(source, url)?;
 
     trace!("Loaded SQLite query connector.");
     Ok((db_name, sql_executor(sqlite, false)))
 }
 
-async fn postgres(
-    source: &Datasource,
-    url: &str,
-    flags: BitFlags<SourceParameter>,
-) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
+async fn postgres(source: &Datasource, url: &str) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
     trace!("Loading Postgres query connector...");
 
     let database_str = url;
-    let psql = PostgreSql::from_source(source, url, flags).await?;
+    let psql = PostgreSql::from_source(source, url).await?;
 
     let db_name = db_name(source, database_str)?;
     let url = Url::parse(database_str)?;
@@ -156,29 +146,21 @@ async fn postgres(
     Ok((db_name, sql_executor(psql, force_transactions)))
 }
 
-async fn mysql(
-    source: &Datasource,
-    url: &str,
-    flags: BitFlags<SourceParameter>,
-) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
+async fn mysql(source: &Datasource, url: &str) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
     trace!("Loading MySQL query connector...");
 
     let db_name = db_name(source, url)?;
-    let mysql = Mysql::from_source(source, url, flags).await?;
+    let mysql = Mysql::from_source(source, url).await?;
 
     trace!("Loaded MySQL query connector.");
     Ok((db_name, sql_executor(mysql, false)))
 }
 
-async fn mssql(
-    source: &Datasource,
-    url: &str,
-    flags: BitFlags<SourceParameter>,
-) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
+async fn mssql(source: &Datasource, url: &str) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
     trace!("Loading SQL Server query connector...");
 
     let db_name = db_name(source, url)?;
-    let mssql = Mssql::from_source(source, url, flags).await?;
+    let mssql = Mssql::from_source(source, url).await?;
 
     trace!("Loaded SQL Server query connector.");
     Ok((db_name, sql_executor(mssql, false)))
