@@ -322,13 +322,12 @@ mod json {
     }
 
     fn jsonq(runner: &Runner, filter: &str, path: Option<&str>) -> String {
-        let path = path.unwrap_or(json_path(runner));
+        let path = path.unwrap_or_else(|| json_path(runner));
 
         format!(
             r#"query {{ findManyTestModel(where: {{ json: {{ {}, {} }} }} ) {{ json }} }}"#,
             filter, path
         )
-        .to_owned()
     }
 
     fn json_path(runner: &Runner) -> &str {

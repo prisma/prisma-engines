@@ -8,7 +8,7 @@ use crate::{
     query_document::{ParsedInputMap, ParsedInputValue},
     QueryGraphBuilderError, QueryGraphBuilderResult,
 };
-use connector::{filter::Filter, JsonFilterPath, QueryMode, RelationCompare, ScalarCompare};
+use connector::{filter::Filter, QueryMode, RelationCompare, ScalarCompare};
 use filter_grouping::*;
 use prisma_models::{Field, ModelRef, PrismaValue, RelationFieldRef, ScalarFieldRef};
 use std::{convert::TryInto, str::FromStr};
