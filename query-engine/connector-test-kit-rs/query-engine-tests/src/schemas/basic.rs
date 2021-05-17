@@ -58,7 +58,6 @@ pub fn common_numeric_types() -> String {
             int     Int
             bInt    BigInt
             float   Float
-            decimal Decimal
         }"
     };
 
@@ -73,7 +72,6 @@ pub fn common_text_and_numeric_types() -> String {
             int     Int
             bInt    BigInt
             float   Float
-            decimal Decimal
             string  String
         }"
     };
