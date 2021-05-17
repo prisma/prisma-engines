@@ -65,7 +65,7 @@ impl<'a> Logger<'a> {
             .add_directive("tower=error".parse().unwrap());
 
         if self.log_queries {
-            filter = filter.add_directive("quaint[{query}]".parse().unwrap());
+            filter = filter.add_directive("quaint[{is_query}]=trace".parse().unwrap());
         }
 
         match self.log_format {
@@ -77,7 +77,7 @@ impl<'a> Logger<'a> {
 
                     self.finalize(subscriber)
                 } else {
-                    let subscriber = FmtSubscriber::builder().with_env_filter(filter).finish();
+                    let subscriber = FmtSubscriber::builder().with_env_filter(filter).compact().finish();
                     self.finalize(subscriber)
                 }
             }

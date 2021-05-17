@@ -41,7 +41,7 @@ impl ChannelLogger {
         let mut filter = EnvFilter::new(level);
 
         if log_queries {
-            filter = filter.add_directive("quaint[{query}]".parse().unwrap());
+            filter = filter.add_directive("quaint[{is_query}]".parse().unwrap());
         }
 
         let javascript_cb = EventChannel::new(callback, filter);
