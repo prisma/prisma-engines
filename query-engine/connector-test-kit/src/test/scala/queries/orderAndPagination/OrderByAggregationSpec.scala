@@ -54,7 +54,7 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     result.toString should be(
-      """{"data":{"findManyUser":[{"id":1,"posts":[{"title":"alice_post_1"}]},{"id":2,"posts":[{"title":"bob_post_1"},{"title":"bob_post_2"}]}]}}"""
+      """{"data":{"findManyUser":[{"id":3,"posts":[]},{"id":1,"posts":[{"title":"alice_post_1"}]},{"id":2,"posts":[{"title":"bob_post_1"},{"title":"bob_post_2"}]}]}}"""
     )
   }
 
@@ -75,7 +75,7 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     result.toString should be(
-      """{"data":{"findManyUser":[{"id":2,"posts":[{"title":"bob_post_1"},{"title":"bob_post_2"}]},{"id":1,"posts":[{"title":"alice_post_1"}]}]}}"""
+      """{"data":{"findManyUser":[{"id":2,"posts":[{"title":"bob_post_1"},{"title":"bob_post_2"}]},{"id":1,"posts":[{"title":"alice_post_1"}]},{"id":3,"posts":[]}]}}"""
     )
   }
 
@@ -139,7 +139,7 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     result.toString should be(
-      """{"data":{"findManyUser":[{"id":1,"name":"Alice","posts":[{"title":"alice_post_1"}]},{"id":2,"name":"Bob","posts":[{"title":"bob_post_1"},{"title":"bob_post_2"}]}]}}"""
+      """{"data":{"findManyUser":[{"id":3,"name":"Motongo","posts":[]},{"id":1,"name":"Alice","posts":[{"title":"alice_post_1"}]},{"id":2,"name":"Bob","posts":[{"title":"bob_post_1"},{"title":"bob_post_2"}]}]}}"""
     )
   }
 
@@ -161,7 +161,7 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     result.toString should be(
-      """{"data":{"findManyUser":[{"id":2,"name":"Bob","posts":[{"title":"bob_post_1"},{"title":"bob_post_2"}]},{"id":1,"name":"Alice","posts":[{"title":"alice_post_1"}]}]}}"""
+      """{"data":{"findManyUser":[{"id":3,"name":"Motongo","posts":[]},{"id":2,"name":"Bob","posts":[{"title":"bob_post_1"},{"title":"bob_post_2"}]},{"id":1,"name":"Alice","posts":[{"title":"alice_post_1"}]}]}}"""
     )
   }
 
@@ -556,15 +556,8 @@ class OrderByAggregationSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   private def createTestData(): Unit = {
-    server.query(
-      """mutation { createOneUser(data: { id: 1, name: "Alice", categories: { create: [{ id: 1, name: "Startup" }] }, posts: { create: { id: 1, title: "alice_post_1", categories: { create: [{ id: 2, name: "News" }, { id: 3, name: "Society" }] }} } }){ id }}""".stripMargin,
-      project,
-      legacy = false
-    )
-    server.query(
-      """mutation { createOneUser(data: { id: 2, name: "Bob", categories: { create: [{ id: 4, name: "Computer Science" }, { id: 5, name: "Music" }] }, posts: { create: [{ id: 2, title: "bob_post_1", categories: { create: [{ id: 6, name: "Finance" }] } }, { id: 3, title: "bob_post_2", categories: { create: [{ id: 7, name: "History" }, { id: 8, name: "Gaming" }, { id: 9, name: "Hacking" }] } }] } }){ id }}""".stripMargin,
-      project,
-      legacy = false
-    )
+    server.query("""mutation { createOneUser(data: { id: 1, name: "Alice", categories: { create: [{ id: 1, name: "Startup" }] }, posts: { create: { id: 1, title: "alice_post_1", categories: { create: [{ id: 2, name: "News" }, { id: 3, name: "Society" }] }} } }){ id }}""".stripMargin, project, legacy = false)
+    server.query("""mutation { createOneUser(data: { id: 2, name: "Bob", categories: { create: [{ id: 4, name: "Computer Science" }, { id: 5, name: "Music" }] }, posts: { create: [{ id: 2, title: "bob_post_1", categories: { create: [{ id: 6, name: "Finance" }] } }, { id: 3, title: "bob_post_2", categories: { create: [{ id: 7, name: "History" }, { id: 8, name: "Gaming" }, { id: 9, name: "Hacking" }] } }] } }){ id }}""".stripMargin, project, legacy = false)
+    server.query("""mutation { createOneUser(data: { id: 3, name: "Motongo" }){ id }}""".stripMargin, project, legacy = false)
   }
 }

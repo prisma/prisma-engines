@@ -49,7 +49,17 @@ pub fn build(
                 }
             }
         } else {
-            order_definitions.push((order_column.clone().into(), order));
+            let expr: Expression = if let Some(SortAggregation::Count) = order_by.sort_aggregation {
+                let exprs: Vec<Expression> = vec![order_column.clone().into(), Value::integer(0).into()];
+
+                // We coalesce the order by expr to 0 so that if there's no relation,
+                // `COALESCE(NULL, 0)` will return `0`, thus preserving the order
+                coalesce(exprs).into()
+            } else {
+                order_column.clone().into()
+            };
+
+            order_definitions.push((expr, order));
         }
 
         ordering_joins.push(OrderingJoins { joins, order_column });
