@@ -319,7 +319,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
         api.schema_name()
     );
 
-    api.raw_cmd(&create_table).unwrap();
+    api.raw_cmd(&create_table);
 
     let schema = api.describe();
 
@@ -363,7 +363,7 @@ fn escaped_backslashes_in_string_literals_must_be_unescaped(api: TestApi) {
         api.schema_name()
     );
 
-    api.raw_cmd(&create_table).unwrap();
+    api.raw_cmd(&create_table);
 
     let schema = api.describe();
 
@@ -402,7 +402,7 @@ fn broken_relations_are_filtered_out(api: TestApi) {
         PRAGMA foreign_keys=ON;
     "#;
 
-    api.raw_cmd(setup).unwrap();
+    api.raw_cmd(setup);
 
     let schema = api.describe();
     let table = schema.table_bang("dog");

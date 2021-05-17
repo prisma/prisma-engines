@@ -9,7 +9,7 @@ fn views_can_be_described(api: TestApi) {
         CREATE VIEW ab AS SELECT a_id FROM a UNION ALL SELECT b_id FROM b;
     "#;
 
-    api.raw_cmd(&full_sql).unwrap();
+    api.raw_cmd(&full_sql);
     let result = api.describe();
     let view = result.get_view("ab").expect("couldn't get ab view").to_owned();
 
@@ -59,7 +59,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
         )
         "#;
 
-    api.raw_cmd(migration).unwrap();
+    api.raw_cmd(migration);
 
     api.describe().assert_table("User", |t| {
         t.assert_column("array_bin_col", |c| {

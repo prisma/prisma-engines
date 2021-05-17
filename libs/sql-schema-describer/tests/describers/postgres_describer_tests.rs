@@ -14,7 +14,7 @@ fn views_can_be_described(api: TestApi) {
         CREATE VIEW ab AS SELECT a_id FROM a UNION ALL SELECT b_id FROM b;
     "#;
 
-    api.raw_cmd(&full_sql).unwrap();
+    api.raw_cmd(&full_sql);
     let result = api.describe();
     let view = result.get_view("ab").expect("couldn't get ab view").to_owned();
 
@@ -75,7 +75,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
     });
 
     let full_sql = migration.make::<barrel::backend::Pg>();
-    api.raw_cmd(&full_sql).unwrap();
+    api.raw_cmd(&full_sql);
     let result = api.describe();
     let mut table = result.get_table("User").expect("couldn't get User table").to_owned();
     // Ensure columns are sorted as expected when comparing
@@ -595,7 +595,7 @@ fn postgres_cross_schema_references_are_not_allowed(api: TestApi) {
         schema2,
     );
 
-    api.raw_cmd(&sql).unwrap();
+    api.raw_cmd(&sql);
 
     let err = api.describe_error();
     let fk_name = if api.is_cockroach() {
@@ -626,7 +626,7 @@ fn postgres_foreign_key_on_delete_must_be_handled(api: TestApi) {
         api.schema_name()
     );
 
-    api.raw_cmd(&sql).unwrap();
+    api.raw_cmd(&sql);
 
     let schema = api.describe();
 
@@ -666,25 +666,18 @@ fn postgres_enums_must_work(api: TestApi) {
     api.raw_cmd(&format!(
         "CREATE TYPE \"{}\".\"mood\" AS ENUM ('sad', 'ok', 'happy')",
         api.schema_name()
-    ))
-    .unwrap();
+    ));
     let schema = api.describe();
     let got_enum = schema.get_enum("mood").expect("get enum");
+    let values = &["sad", "ok", "happy"];
 
-    let values: Vec<String> = vec!["sad".into(), "ok".into(), "happy".into()];
-    assert_eq!(
-        got_enum,
-        &Enum {
-            name: "mood".into(),
-            values,
-        }
-    );
+    assert_eq!(got_enum.name, "mood");
+    assert_eq!(got_enum.values, values);
 }
 
 #[test_connector(tags(Postgres))]
 fn postgres_sequences_must_work(api: TestApi) {
-    api.raw_cmd(&format!("CREATE SEQUENCE \"{}\".\"test\"", api.schema_name()))
-        .unwrap();
+    api.raw_cmd(&format!("CREATE SEQUENCE \"{}\".\"test\"", api.schema_name()));
 
     let schema = api.describe();
     let got_seq = schema.get_sequence("test").expect("get sequence");
@@ -707,7 +700,7 @@ fn postgres_multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi
         "##,
         schema_name = api.schema_name()
     );
-    api.raw_cmd(&schema).unwrap();
+    api.raw_cmd(&schema);
 
     let schema = api.describe();
 
@@ -736,7 +729,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
         api.schema_name()
     );
 
-    api.raw_cmd(&create_table).unwrap();
+    api.raw_cmd(&create_table);
 
     let schema = api.describe();
 
@@ -777,7 +770,7 @@ fn escaped_backslashes_in_string_literals_must_be_unescaped(api: TestApi) {
         )
     "#;
 
-    api.raw_cmd(&create_table).unwrap();
+    api.raw_cmd(&create_table);
 
     let schema = api.describe();
 

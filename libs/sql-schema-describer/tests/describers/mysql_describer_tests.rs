@@ -6,11 +6,8 @@ use sql_schema_describer::*;
 
 #[test_connector(tags(Mysql))]
 fn views_can_be_described(api: TestApi) {
-    api.raw_cmd(&format!("CREATE TABLE {}.a (a_id int)", api.db_name()))
-        .unwrap();
-
-    api.raw_cmd(&format!("CREATE TABLE {}.b (b_id int)", api.db_name()))
-        .unwrap();
+    api.raw_cmd(&format!("CREATE TABLE {}.a (a_id int)", api.db_name()));
+    api.raw_cmd(&format!("CREATE TABLE {}.b (b_id int)", api.db_name()));
 
     let create_view = format!(
         r#"
@@ -23,7 +20,7 @@ fn views_can_be_described(api: TestApi) {
         api.db_name()
     );
 
-    api.raw_cmd(&create_view).unwrap();
+    api.raw_cmd(&create_view);
 
     let result = api.describe();
     let view = result.get_view("ab").expect("couldn't get ab view").to_owned();
@@ -46,7 +43,7 @@ fn procedures_can_be_described(api: TestApi) {
         api.db_name()
     );
 
-    api.raw_cmd(&sql).unwrap();
+    api.raw_cmd(&sql);
     let result = api.describe();
     let procedure = result.get_procedure("foo").unwrap();
 
@@ -100,7 +97,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
     });
 
     let full_sql = migration.make::<barrel::backend::MySql>();
-    api.raw_cmd(&full_sql).unwrap();
+    api.raw_cmd(&full_sql);
     let result = api.describe();
     let mut table = result.get_table("User").expect("couldn't get User table").to_owned();
     // Ensure columns are sorted as expected when comparing
@@ -642,7 +639,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
     });
 
     let full_sql = migration.make::<barrel::backend::MySql>();
-    api.raw_cmd(&full_sql).unwrap();
+    api.raw_cmd(&full_sql);
     let result = api.describe();
     let mut table = result.get_table("User").expect("couldn't get User table").to_owned();
     // Ensure columns are sorted as expected when comparing
@@ -1141,7 +1138,7 @@ fn mysql_foreign_key_on_delete_must_be_handled(api: TestApi) {
         )",
         api.db_name()
     );
-    api.raw_cmd(&sql).unwrap();
+    api.raw_cmd(&sql);
 
     api.describe().assert_table("User", |t| {
         t.assert_column("id", |id| id.assert_type_is_int())
@@ -1183,7 +1180,7 @@ fn mysql_multi_field_indexes_must_be_inferred(api: TestApi) {
     });
 
     let full_sql = migration.make::<barrel::backend::MySql>();
-    api.raw_cmd(&full_sql).unwrap();
+    api.raw_cmd(&full_sql);
     let result = api.describe();
     let table = result.get_table("Employee").expect("couldn't get Employee table");
 
@@ -1219,7 +1216,7 @@ fn mysql_join_table_unique_indexes_must_be_inferred(api: TestApi) {
     });
 
     let full_sql = migration.make::<barrel::backend::MySql>();
-    api.raw_cmd(&full_sql).unwrap();
+    api.raw_cmd(&full_sql);
 
     api.describe().assert_table("CatToHuman", |t| {
         t.assert_index_on_columns(&["cat", "human"], |idx| {
@@ -1232,8 +1229,9 @@ fn mysql_join_table_unique_indexes_must_be_inferred(api: TestApi) {
 // constraints, introspecting one database should not yield constraints from the other.
 #[test_connector(tags(Mysql))]
 fn constraints_from_other_databases_should_not_be_introspected(api: TestApi) {
-    api.raw_cmd("DROP DATABASE `other_schema`").ok();
-    api.raw_cmd("CREATE DATABASE `other_schema`").unwrap();
+    api.block_on(api.database().raw_cmd("DROP DATABASE `other_schema`"))
+        .ok();
+    api.raw_cmd("CREATE DATABASE `other_schema`");
     let mut other_migration = Migration::new().schema("other_schema");
 
     other_migration.create_table("User", |t| {
@@ -1245,7 +1243,7 @@ fn constraints_from_other_databases_should_not_be_introspected(api: TestApi) {
     });
 
     let full_sql = other_migration.make::<barrel::backend::MySql>();
-    api.raw_cmd(&full_sql).unwrap();
+    api.raw_cmd(&full_sql);
 
     let schema = api
         .block_on(api.describer().describe(&"other_schema"))
@@ -1280,7 +1278,7 @@ fn constraints_from_other_databases_should_not_be_introspected(api: TestApi) {
     });
 
     let full_sql = migration.make::<barrel::backend::MySql>();
-    api.raw_cmd(&full_sql).unwrap();
+    api.raw_cmd(&full_sql);
     let schema = api.describe();
     let table = schema.table_bang("Post");
 
@@ -1308,7 +1306,7 @@ fn mysql_introspected_default_strings_should_be_unescaped(api: TestApi) {
         )
     "#;
 
-    api.raw_cmd(&create_table).unwrap();
+    api.raw_cmd(&create_table);
     let schema = api.describe();
 
     let expected_default = prisma_value::PrismaValue::String(
@@ -1338,7 +1336,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
         api.schema_name()
     );
 
-    api.raw_cmd(&create_table).unwrap();
+    api.raw_cmd(&create_table);
 
     let schema = api.describe();
 
@@ -1383,7 +1381,7 @@ fn escaped_backslashes_in_string_literals_must_be_unescaped(api: TestApi) {
         )
     "#;
 
-    api.raw_cmd(&create_table).unwrap();
+    api.raw_cmd(&create_table);
 
     let schema = api.describe();
 
@@ -1422,7 +1420,7 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
         );
     "#;
 
-    api.raw_cmd(&create_table).unwrap();
+    api.raw_cmd(&create_table);
 
     let schema = api.describe();
 
@@ -1472,7 +1470,7 @@ fn dangling_foreign_keys_are_filtered_out(api: TestApi) {
     SET FOREIGN_KEY_CHECKS=1;
     "#;
 
-    api.raw_cmd(setup).unwrap();
+    api.raw_cmd(setup);
 
     let schema = api.describe();
     let table = schema.table_bang("dog");
