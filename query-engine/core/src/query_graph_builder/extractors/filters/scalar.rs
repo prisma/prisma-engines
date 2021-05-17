@@ -20,7 +20,7 @@ pub fn parse(
         .into_iter()
         .map(|(k, v)| match field.type_identifier {
             TypeIdentifier::Json => parse_internal_json(&k, v, field, &json_path, reverse),
-            _ => parse_internal_scalar(&k, v, field, &json_path, reverse),
+            _ => parse_internal_scalar(&k, v, field, reverse),
         })
         .collect::<QueryGraphBuilderResult<Vec<Vec<_>>>>()?
         .into_iter()
@@ -175,7 +175,6 @@ fn parse_internal_scalar(
     filter_key: &str,
     input: ParsedInputValue,
     field: &ScalarFieldRef,
-    json_path: &Option<JsonFilterPath>,
     reverse: bool,
 ) -> QueryGraphBuilderResult<Vec<Filter>> {
     match filter_key {
