@@ -477,6 +477,7 @@ fn convert_prisma_value(value: PrismaValue, st: &ScalarType) -> Result<PrismaVal
         (ScalarType::Json, PrismaValue::Json(s)) => PrismaValue::Json(s),
 
         (ScalarType::Int, PrismaValue::Float(f)) => PrismaValue::Int(f.to_i64().unwrap()),
+        (ScalarType::Int, PrismaValue::BigInt(i)) => PrismaValue::Int(i),
         (ScalarType::Int, PrismaValue::Int(i)) => PrismaValue::Int(i),
 
         (ScalarType::Float, PrismaValue::Float(f)) => PrismaValue::Float(f),

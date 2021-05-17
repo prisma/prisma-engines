@@ -11,13 +11,16 @@ macro_rules! number_operation {
       fn $fname(self, rhs: Self) -> Self::Output {
         match (self, rhs) {
           (PrismaValue::Null, _) | (_, PrismaValue::Null) => PrismaValue::Null,
-
           (PrismaValue::Int(l), PrismaValue::Int(r)) => PrismaValue::Int(l $op r),
-          // (PrismaValue::Float(l), PrismaValue::Int(r)) => PrismaValue::Float(
-          //     l $op (BigDecimal::from_i64(r).expect("Invalid i64 to decimal conversion.")),
-          // ),
+          (PrismaValue::BigInt(l), PrismaValue::BigInt(r)) => PrismaValue::BigInt(l $op r),
+
+          (PrismaValue::Int(l), PrismaValue::BigInt(r)) => PrismaValue::Int(l $op r),
+          (PrismaValue::BigInt(l), PrismaValue::Int(r)) => PrismaValue::BigInt(l $op r),
 
           (PrismaValue::Float(l), PrismaValue::Float(r)) => PrismaValue::Float(FloatValue(*l $op *r)),
+          (PrismaValue::Decimal(l), PrismaValue::Decimal(r)) => PrismaValue::Decimal(l $op r),
+
+          // (PrismaValue::Float(l), PrismaValue::Int(r)) => PrismaValue::Float(FloatValue(l.0 $op r)),
 
           _ => unimplemented!(),
         }

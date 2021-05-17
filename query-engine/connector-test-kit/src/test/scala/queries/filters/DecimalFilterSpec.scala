@@ -16,7 +16,7 @@ class DecimalFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
     super.beforeEach()
   }
 
-  "Using a Decimal field in a basic (not) equals where clause" should "work" in {
+  "Using a Decimal field in a basic (not) equals where clause" should "work" taggedAs IgnoreSQLite in {
     create(1, Some("5.5"))
     create(2, Some("1"))
     create(3, None)
@@ -34,7 +34,7 @@ class DecimalFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
       .toString should be("""{"data":{"findManyModel":[{"id":1},{"id":2}]}}""")
   }
 
-  "A Decimal field in where clause" should "have (not) equals shorthands" in {
+  "A Decimal field in where clause" should "have (not) equals shorthands" taggedAs IgnoreSQLite in {
     create(1, Some("5.5"))
     create(2, Some("1"))
     create(3, None)
@@ -48,7 +48,7 @@ class DecimalFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
       .toString should be("""{"data":{"findManyModel":[{"id":3}]}}""")
   }
 
-  "Using a Decimal field with inclusion filter clauses" should "work" in {
+  "Using a Decimal field with inclusion filter clauses" should "work" taggedAs IgnoreSQLite in {
     create(1, Some("5.5"))
     create(2, Some("1"))
     create(3, None)
@@ -66,7 +66,7 @@ class DecimalFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
       .toString should be("""{"data":{"findManyModel":[{"id":1}]}}""")
   }
 
-  "Using a Decimal field with numeric comparison filter clauses" should "work" in {
+  "Using a Decimal field with numeric comparison filter clauses" should "work" taggedAs IgnoreSQLite in {
     create(1, Some("5.5"))
     create(2, Some("1"))
     create(3, None)

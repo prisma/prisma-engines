@@ -26,7 +26,7 @@ impl ScalarFieldExt for ScalarField {
             (PrismaValue::Xml(s), _) => Value::Xml(Some(s.into())),
             (PrismaValue::Null, ident) => match ident {
                 TypeIdentifier::String => Value::Text(None),
-                TypeIdentifier::Float => Value::Numeric(None),
+                TypeIdentifier::Float => Value::Double(None),
                 TypeIdentifier::Decimal => Value::Numeric(None),
                 TypeIdentifier::Boolean => Value::Boolean(None),
                 TypeIdentifier::Enum(_) => Value::Enum(None),
