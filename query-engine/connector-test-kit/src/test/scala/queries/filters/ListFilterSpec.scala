@@ -53,7 +53,7 @@ class ListFilterSpec extends FlatSpec with Matchers with ApiSpecBase with Connec
     query("intList", "has", """2""", Some(1))
     query("floatList", "has", """1.1""", Some(1))
     query("bIntList", "has", """"200"""", Some(1))
-    query("decList", "has", """33.33""", Some(1))
+    query("decList", "has", """"33.33"""", Some(1))
     query("dtList", "has", """"2018-12-05T12:34:23.000Z"""", Some(1))
     query("boolList", "has", """true""", Some(1))
     query("jsonList", "has", """"[1, 2, 3]"""", Some(1))
@@ -66,7 +66,7 @@ class ListFilterSpec extends FlatSpec with Matchers with ApiSpecBase with Connec
     query("intList", "hasSome", """[2, 10]""", Some(1))
     query("floatList", "hasSome", """[1.1, 5.5]""", Some(1))
     query("bIntList", "hasSome", """["200", "5000"]""", Some(1))
-    query("decList", "hasSome", """[55.55, 33.33]""", Some(1))
+    query("decList", "hasSome", """["55.55", "33.33"]""", Some(1))
     query("dtList", "hasSome", """["2018-12-05T12:34:23.000Z", "2019-12-05T12:34:23.000Z"]""", Some(1))
     query("boolList", "hasSome", """[true, false]""", Some(1))
     query("jsonList", "hasSome", """["{}", "[1]"]""", Some(1))
@@ -89,8 +89,8 @@ class ListFilterSpec extends FlatSpec with Matchers with ApiSpecBase with Connec
     query("bIntList", "hasEvery", """["200", "5000"]""", None)
     query("bIntList", "hasEvery", """["200"]""", Some(1))
 
-    query("decList", "hasEvery", """[55.55, 33.33]""", None)
-    query("decList", "hasEvery", """[33.33]""", Some(1))
+    query("decList", "hasEvery", """["55.55", "33.33"]""", None)
+    query("decList", "hasEvery", """["33.33"]""", Some(1))
 
     query("dtList", "hasEvery", """["2018-12-05T12:34:23.000Z", "2019-12-05T12:34:23.000Z"]""", None)
     query("dtList", "hasEvery", """["2018-12-05T12:34:23.000Z"]""", Some(1))

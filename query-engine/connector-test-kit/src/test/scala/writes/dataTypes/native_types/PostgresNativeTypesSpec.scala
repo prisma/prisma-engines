@@ -56,11 +56,11 @@ class PostgresNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase wi
     val project = ProjectDsl.fromString {
       """
         |model Model {
-        |  id       String  @id @default(cuid())
-        |  float    Float   @test.Real
-        |  dfloat   Float   @test.DoublePrecision
-        |  decFloat Decimal @test.Decimal(2, 1)
-        |  money    Decimal @test.Money
+        |  id     String  @id @default(cuid())
+        |  float  Float   @test.Real
+        |  dFloat Float   @test.DoublePrecision
+        |  dec    Decimal @test.Decimal(2, 1)
+        |  money  Decimal @test.Money
         |}"""
     }
 
@@ -72,14 +72,14 @@ class PostgresNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase wi
        |  createOneModel(
        |    data: {
        |      float: 1.1
-       |      dfloat: 2.2
-       |      decFloat: 3.1234
-       |      money: 3.51
+       |      dFloat: 2.2
+       |      dec: "3.1234"
+       |      money: "3.51"
        |    }
        |  ) {
        |    float
-       |    dfloat
-       |    decFloat
+       |    dFloat
+       |    dec
        |    money
        |  }
        |}""".stripMargin,
@@ -87,8 +87,7 @@ class PostgresNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase wi
       legacy = false
     )
 
-    // decFloat is cut due to precision
-    res.toString should be("""{"data":{"createOneModel":{"float":1.1,"dfloat":2.2,"decFloat":"3.1","money":"3.51"}}}""")
+    res.toString should be("""{"data":{"createOneModel":{"float":1.100000023841858,"dFloat":2.2,"dec":"3.1","money":"3.51"}}}""")
   }
 
   "Postgres native string types" should "work" in {
