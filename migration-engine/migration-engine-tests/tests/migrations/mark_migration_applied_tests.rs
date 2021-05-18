@@ -1,4 +1,3 @@
-use barrel::types;
 use migration_engine_tests::sql::*;
 use pretty_assertions::assert_eq;
 use test_macros::test_connector;
@@ -279,22 +278,16 @@ async fn baselining_should_work(api: &TestApi) -> TestResult {
     let migrations_directory = api.create_migrations_directory()?;
     let persistence = api.migration_persistence();
 
-    api.barrel()
-        .execute(|migration| {
-            migration.create_table("test", move |t| {
-                t.add_column("id", types::primary());
-            });
-        })
-        .await;
+    let dm1 = r#"
+        model test {
+            id Int @id
+        }
+    "#;
+
+    api.schema_push(dm1).send().await?;
 
     // Create a first local migration that matches the db contents
     let baseline_migration_name = {
-        let dm1 = r#"
-            model test {
-                id Int @id
-            }
-        "#;
-
         let output_baseline_migration = api
             .create_migration("01baseline", dm1, &migrations_directory)
             .send()
@@ -305,10 +298,9 @@ async fn baselining_should_work(api: &TestApi) -> TestResult {
     };
 
     // Mark the baseline migration as applied
-    let _ = api
-        .mark_migration_applied(&baseline_migration_name, &migrations_directory)
+    api.mark_migration_applied(&baseline_migration_name, &migrations_directory)
         .send()
-        .await;
+        .await?;
 
     let applied_migrations = persistence.list_migrations().await?.unwrap();
 
