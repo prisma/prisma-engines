@@ -358,19 +358,21 @@ async fn a_prisma_many_to_many_relation(api: &TestApi) -> TestResult {
         )
         .await?;
 
-    let dm = indoc! {r##"
-        model Post {
-            id   Int    @id @default(autoincrement())
+    let dm = formatdoc! {r##"
+        model Post {{
+            id   {int_type}    @id @default(autoincrement())
             User User[]
-        }
+        }}
 
-        model User {
-            id   Int    @id @default(autoincrement())
+        model User {{
+            id   {int_type}    @id @default(autoincrement())
             Post Post[]
-        }
-    "##};
+        }}
+        "##,
+        int_type = api.int_type(),
+    };
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }

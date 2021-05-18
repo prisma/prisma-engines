@@ -1,12 +1,14 @@
-use crate::introspection_helpers::{
-    calculate_backrelation_field, calculate_index, calculate_many_to_many_field, calculate_relation_field,
-    calculate_scalar_field, is_new_migration_table, is_old_migration_table, is_prisma_1_point_0_join_table,
-    is_prisma_1_point_1_or_2_join_table, is_relay_table,
+use crate::{
+    introspection_helpers::{
+        calculate_backrelation_field, calculate_index, calculate_many_to_many_field, calculate_relation_field,
+        calculate_scalar_field, is_new_migration_table, is_old_migration_table, is_prisma_1_point_0_join_table,
+        is_prisma_1_point_1_or_2_join_table, is_relay_table,
+    },
+    version_checker::VersionChecker,
+    Circumstances, Dedup, SqlError,
 };
-use crate::version_checker::VersionChecker;
-use crate::Dedup;
-use crate::SqlError;
 use datamodel::{dml, walkers::find_model_by_db_name, Datamodel, Field, Model, RelationField};
+use enumflags2::BitFlags;
 use quaint::connector::SqlFamily;
 use sql_schema_describer::{SqlSchema, Table};
 use tracing::debug;
@@ -15,6 +17,7 @@ pub fn introspect(
     schema: &SqlSchema,
     version_check: &mut VersionChecker,
     data_model: &mut Datamodel,
+    circumstances: BitFlags<Circumstances>,
     sql_family: SqlFamily,
 ) -> Result<(), SqlError> {
     for table in schema
@@ -22,7 +25,7 @@ pub fn introspect(
         .iter()
         .filter(|table| !is_old_migration_table(&table))
         .filter(|table| !is_new_migration_table(&table))
-        .filter(|table| !is_prisma_1_point_1_or_2_join_table(&table))
+        .filter(|table| !is_prisma_1_point_1_or_2_join_table(&table, circumstances))
         .filter(|table| !is_prisma_1_point_0_join_table(&table))
         .filter(|table| !is_relay_table(&table))
     {
@@ -87,11 +90,9 @@ pub fn introspect(
     }
 
     // add prisma many to many relation fields
-    for table in schema
-        .tables
-        .iter()
-        .filter(|table| is_prisma_1_point_1_or_2_join_table(&table) || is_prisma_1_point_0_join_table(&table))
-    {
+    for table in schema.tables.iter().filter(|table| {
+        is_prisma_1_point_1_or_2_join_table(&table, circumstances) || is_prisma_1_point_0_join_table(&table)
+    }) {
         calculate_fields_for_prisma_join_table(&table, &mut fields_to_be_added, data_model)
     }
 

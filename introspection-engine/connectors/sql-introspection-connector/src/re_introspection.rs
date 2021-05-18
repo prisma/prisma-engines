@@ -10,7 +10,7 @@ use std::cmp::Ordering::{Equal, Greater, Less};
 pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family: &SqlFamily) -> Vec<Warning> {
     let mut warnings = vec![];
 
-    //@@map on models
+    // @@map on models
     let mut changed_model_names = vec![];
     {
         for model in new_data_model.models() {
@@ -23,7 +23,7 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family
             }
         }
 
-        //change model names
+        // change model names
         for changed_model_name in &changed_model_names {
             let model = new_data_model.find_model_mut(&changed_model_name.0.model);
             model.name = changed_model_name.1.model.clone();

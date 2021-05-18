@@ -1,26 +1,36 @@
-use crate::SqlError;
+use crate::{Circumstances, SqlError};
+use enumflags2::BitFlags;
 use quaint::{
-    prelude::{ConnectionInfo, Queryable, SqlFamily},
+    prelude::{ConnectionInfo, SqlFamily},
     single::Quaint,
 };
-use sql_schema_describer::{postgres::Circumstances, SqlSchemaDescriberBackend};
+use sql_schema_describer::{postgres::Circumstances as PostgresCircumstances, SqlSchemaDescriberBackend};
 
-pub async fn load_describer(url: &str) -> Result<(Box<dyn SqlSchemaDescriberBackend>, ConnectionInfo), SqlError> {
+pub(crate) async fn load_describer(
+    url: &str,
+) -> Result<
+    (
+        Box<dyn SqlSchemaDescriberBackend>,
+        ConnectionInfo,
+        BitFlags<Circumstances>,
+    ),
+    SqlError,
+> {
     let connection = Quaint::new(&url).await?;
-    let version = connection.version().await?;
+    let circumstances = Circumstances::new(&connection).await?;
     let connection_info = connection.connection_info().to_owned();
 
     let describer: Box<dyn SqlSchemaDescriberBackend> = match connection_info.sql_family() {
         SqlFamily::Postgres => {
-            let mut circumstances = Default::default();
+            let mut postgres_circumstances = BitFlags::empty();
 
-            if version.map(|version| version.contains("CockroachDB")).unwrap_or(false) {
-                circumstances |= Circumstances::Cockroach;
+            if circumstances.contains(Circumstances::Cockroach) {
+                postgres_circumstances |= PostgresCircumstances::Cockroach;
             }
 
             Box::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(
                 connection,
-                circumstances,
+                postgres_circumstances,
             ))
         }
         SqlFamily::Mysql => Box::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(connection)),
@@ -28,5 +38,5 @@ pub async fn load_describer(url: &str) -> Result<(Box<dyn SqlSchemaDescriberBack
         SqlFamily::Mssql => Box::new(sql_schema_describer::mssql::SqlSchemaDescriber::new(connection)),
     };
 
-    Ok((describer, connection_info))
+    Ok((describer, connection_info, circumstances))
 }
