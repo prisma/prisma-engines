@@ -72,6 +72,7 @@ impl MySqlDatamodelConnector {
             ConnectorCapability::CreateSkipDuplicates,
             ConnectorCapability::UpdateableId,
             ConnectorCapability::JsonFilteringJsonPath,
+            ConnectorCapability::CreateManyWriteableAutoIncID,
         ];
 
         let int = NativeTypeConstructor::without_args(INT_TYPE_NAME, vec![ScalarType::Int]);
