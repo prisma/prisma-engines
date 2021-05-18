@@ -8,7 +8,7 @@ use super::helpers::{parsing_catch_all, Token, TokenExtensions};
 use super::Rule;
 use crate::ast::*;
 
-pub fn parse_expression(token: &Token) -> Expression {
+pub fn parse_expression(token: &Token<'_>) -> Expression {
     let first_child = token.first_relevant_child();
     let span = Span::from_pest(first_child.as_span());
     match first_child.as_rule() {
@@ -25,7 +25,7 @@ pub fn parse_expression(token: &Token) -> Expression {
     }
 }
 
-fn parse_function(token: &Token) -> Expression {
+fn parse_function(token: &Token<'_>) -> Expression {
     let mut name: Option<String> = None;
     let mut arguments: Vec<Expression> = vec![];
 
@@ -43,7 +43,7 @@ fn parse_function(token: &Token) -> Expression {
     }
 }
 
-fn parse_array(token: &Token) -> Expression {
+fn parse_array(token: &Token<'_>) -> Expression {
     let mut elements: Vec<Expression> = vec![];
 
     for current in token.relevant_children() {
@@ -56,7 +56,7 @@ fn parse_array(token: &Token) -> Expression {
     Expression::Array(elements, Span::from_pest(token.as_span()))
 }
 
-pub fn parse_arg_value(token: &Token) -> Expression {
+pub fn parse_arg_value(token: &Token<'_>) -> Expression {
     let current = token.first_relevant_child();
     match current.as_rule() {
         Rule::expression => parse_expression(&current),
@@ -64,7 +64,7 @@ pub fn parse_arg_value(token: &Token) -> Expression {
     }
 }
 
-fn parse_string_literal(token: &Token) -> String {
+fn parse_string_literal(token: &Token<'_>) -> String {
     let current = token.first_relevant_child();
     match current.as_rule() {
         Rule::string_content => unescape_string_literal(current.as_str()).into_owned(),

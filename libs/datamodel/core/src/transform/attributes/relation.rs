@@ -11,7 +11,7 @@ impl AttributeValidator<dml::Field> for RelationAttributeValidator {
         &"relation"
     }
 
-    fn validate_and_apply(&self, args: &mut Arguments, field: &mut dml::Field) -> Result<(), DatamodelError> {
+    fn validate_and_apply(&self, args: &mut Arguments<'_>, field: &mut dml::Field) -> Result<(), DatamodelError> {
         if let dml::Field::RelationField(rf) = field {
             if let Ok(name_arg) = args.default_arg("name") {
                 let name = name_arg.as_str()?;

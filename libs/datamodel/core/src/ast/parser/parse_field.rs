@@ -8,7 +8,7 @@ use super::{
 use crate::ast::*;
 use crate::diagnostics::DatamodelError;
 
-pub fn parse_field(model_name: &str, token: &Token) -> Result<Field, DatamodelError> {
+pub fn parse_field(model_name: &str, token: &Token<'_>) -> Result<Field, DatamodelError> {
     let mut name: Option<Identifier> = None;
     let mut attributes: Vec<Attribute> = Vec::new();
     let mut field_type: Option<(FieldArity, FieldType)> = None;

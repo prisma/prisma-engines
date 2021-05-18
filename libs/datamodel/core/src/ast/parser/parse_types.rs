@@ -8,7 +8,7 @@ use crate::ast::parser::parse_expression::parse_expression;
 use crate::ast::*;
 use crate::diagnostics::DatamodelError;
 
-pub fn parse_type_alias(token: &Token) -> Field {
+pub fn parse_type_alias(token: &Token<'_>) -> Field {
     let mut name: Option<Identifier> = None;
     let mut attributes: Vec<Attribute> = vec![];
     let mut base_type: Option<FieldType> = None;
@@ -42,7 +42,7 @@ pub fn parse_type_alias(token: &Token) -> Field {
     }
 }
 
-pub fn parse_field_type(token: &Token) -> Result<(FieldArity, FieldType), DatamodelError> {
+pub fn parse_field_type(token: &Token<'_>) -> Result<(FieldArity, FieldType), DatamodelError> {
     let current = token.first_relevant_child();
     match current.as_rule() {
         Rule::optional_type => Ok((FieldArity::Optional, parse_base_type(&current.first_relevant_child()))),
@@ -64,7 +64,7 @@ pub fn parse_field_type(token: &Token) -> Result<(FieldArity, FieldType), Datamo
     }
 }
 
-fn parse_base_type(token: &Token) -> FieldType {
+fn parse_base_type(token: &Token<'_>) -> FieldType {
     let current = token.first_relevant_child();
     match current.as_rule() {
         Rule::non_empty_identifier => FieldType::Supported(Identifier {

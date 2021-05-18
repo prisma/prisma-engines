@@ -14,7 +14,7 @@ impl AttributeValidator<dml::Field> for DefaultAttributeValidator {
         &"default"
     }
 
-    fn validate_and_apply(&self, args: &mut Arguments, field: &mut dml::Field) -> Result<(), DatamodelError> {
+    fn validate_and_apply(&self, args: &mut Arguments<'_>, field: &mut dml::Field) -> Result<(), DatamodelError> {
         if let dml::Field::RelationField(_) = field {
             return self.new_attribute_validation_error("Cannot set a default value on a relation field.", args.span());
         } else if let dml::Field::ScalarField(sf) = field {

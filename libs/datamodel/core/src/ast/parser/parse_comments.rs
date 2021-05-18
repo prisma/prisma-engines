@@ -4,7 +4,7 @@ use super::{
 };
 use crate::ast::Comment;
 
-pub fn parse_comment_block(token: &Token) -> Option<Comment> {
+pub fn parse_comment_block(token: &Token<'_>) -> Option<Comment> {
     let mut comments: Vec<String> = Vec::new();
     for comment in token.clone().into_inner() {
         match comment.as_rule() {
@@ -23,7 +23,7 @@ pub fn parse_comment_block(token: &Token) -> Option<Comment> {
     }
 }
 
-pub fn parse_doc_comment(token: &Token) -> String {
+pub fn parse_doc_comment(token: &Token<'_>) -> String {
     let child = token.first_relevant_child();
     match child.as_rule() {
         Rule::doc_content => String::from(child.as_str().trim()),

@@ -321,7 +321,7 @@ impl StandardiserForFormatting {
 
     fn underlying_fields_for_unique_criteria(
         &self,
-        unique_criteria: &dml::UniqueCriteria,
+        unique_criteria: &dml::UniqueCriteria<'_>,
         model_name: &str,
         field_arity: dml::FieldArity,
     ) -> Vec<ScalarField> {

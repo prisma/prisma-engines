@@ -5,7 +5,7 @@ use super::{
 };
 use crate::ast::*;
 
-pub fn parse_attribute(token: &Token) -> Attribute {
+pub fn parse_attribute(token: &Token<'_>) -> Attribute {
     let mut name: Option<Identifier> = None;
     let mut arguments: Vec<Argument> = vec![];
 
@@ -28,7 +28,7 @@ pub fn parse_attribute(token: &Token) -> Attribute {
     }
 }
 
-fn parse_attribute_args(token: &Token, arguments: &mut Vec<Argument>) {
+fn parse_attribute_args(token: &Token<'_>, arguments: &mut Vec<Argument>) {
     for current in token.relevant_children() {
         match current.as_rule() {
             // This is a named arg.
@@ -44,7 +44,7 @@ fn parse_attribute_args(token: &Token, arguments: &mut Vec<Argument>) {
     }
 }
 
-fn parse_attribute_arg(token: &Token) -> Argument {
+fn parse_attribute_arg(token: &Token<'_>) -> Argument {
     let mut name: Option<Identifier> = None;
     let mut argument: Option<Expression> = None;
 

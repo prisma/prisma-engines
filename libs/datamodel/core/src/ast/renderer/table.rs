@@ -42,14 +42,14 @@ impl TableFormat {
         self.maybe_new_line = false;
     }
 
-    pub fn interleave_writer(&mut self) -> TableFormatInterleaveWrapper {
+    pub fn interleave_writer(&mut self) -> TableFormatInterleaveWrapper<'_> {
         TableFormatInterleaveWrapper {
             formatter: self,
             string_builder: StringBuilder::new(),
         }
     }
 
-    pub fn column_locked_writer_for(&mut self, index: usize) -> ColumnLockedWriter {
+    pub fn column_locked_writer_for(&mut self, index: usize) -> ColumnLockedWriter<'_> {
         ColumnLockedWriter {
             formatter: self,
             column: index,
@@ -58,7 +58,7 @@ impl TableFormat {
 
     // TODO: make a decision on whether we can remove this once i understand what this is
     #[allow(unused)]
-    fn column_locked_writer(&mut self) -> ColumnLockedWriter {
+    fn column_locked_writer(&mut self) -> ColumnLockedWriter<'_> {
         if self.table.is_empty() {
             self.start_new_line();
             self.write("");

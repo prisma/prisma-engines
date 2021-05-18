@@ -7,7 +7,7 @@ use super::{
 use crate::ast::*;
 use crate::diagnostics::{DatamodelError, Diagnostics};
 
-pub fn parse_source(token: &Token) -> Result<SourceConfig, Diagnostics> {
+pub fn parse_source(token: &Token<'_>) -> Result<SourceConfig, Diagnostics> {
     let mut errors = Diagnostics::new();
     let mut name: Option<Identifier> = None;
     let mut properties: Vec<Argument> = vec![];
@@ -42,7 +42,7 @@ pub fn parse_source(token: &Token) -> Result<SourceConfig, Diagnostics> {
     }
 }
 
-pub fn parse_generator(token: &Token) -> Result<GeneratorConfig, Diagnostics> {
+pub fn parse_generator(token: &Token<'_>) -> Result<GeneratorConfig, Diagnostics> {
     let mut errors = Diagnostics::new();
     let mut name: Option<Identifier> = None;
     let mut properties: Vec<Argument> = vec![];
@@ -78,7 +78,7 @@ pub fn parse_generator(token: &Token) -> Result<GeneratorConfig, Diagnostics> {
     }
 }
 
-fn parse_key_value(token: &Token) -> Argument {
+fn parse_key_value(token: &Token<'_>) -> Argument {
     let mut name: Option<Identifier> = None;
     let mut value: Option<Expression> = None;
 

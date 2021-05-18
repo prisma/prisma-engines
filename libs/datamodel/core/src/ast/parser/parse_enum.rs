@@ -8,7 +8,7 @@ use crate::ast::parser::helpers::TokenExtensions;
 use crate::ast::*;
 use crate::diagnostics::{DatamodelError, Diagnostics};
 
-pub fn parse_enum(token: &Token) -> Result<Enum, Diagnostics> {
+pub fn parse_enum(token: &Token<'_>) -> Result<Enum, Diagnostics> {
     let mut errors = Diagnostics::new();
     let mut name: Option<Identifier> = None;
     let mut attributes: Vec<Attribute> = vec![];
@@ -49,7 +49,7 @@ pub fn parse_enum(token: &Token) -> Result<Enum, Diagnostics> {
     }
 }
 
-fn parse_enum_value(enum_name: &str, token: &Token) -> Result<EnumValue, DatamodelError> {
+fn parse_enum_value(enum_name: &str, token: &Token<'_>) -> Result<EnumValue, DatamodelError> {
     let mut name: Option<Identifier> = None;
     let mut attributes: Vec<Attribute> = vec![];
     let mut comments: Vec<String> = vec![];

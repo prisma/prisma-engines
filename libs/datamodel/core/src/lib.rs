@@ -76,6 +76,7 @@
     clippy::suspicious_operation_groupings,
     clippy::upper_case_acronyms
 )]
+#![deny(rust_2018_idioms, unsafe_code)]
 
 pub mod ast;
 pub mod common;

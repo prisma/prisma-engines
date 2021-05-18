@@ -165,7 +165,7 @@ impl<'a> Reformatter<'a> {
         target_string
     }
 
-    fn reformat_top(&self, target: &mut Renderer, token: &Token) {
+    fn reformat_top(&self, target: &mut Renderer<'_>, token: &Token<'_>) {
         let mut types_table = TableFormat::new();
         let mut types_mode = false;
         let mut seen_at_least_one_top_level_element = false;
@@ -232,7 +232,7 @@ impl<'a> Reformatter<'a> {
         target.write("");
     }
 
-    fn reformat_datasource(&self, target: &mut Renderer, token: &Token) {
+    fn reformat_datasource(&self, target: &mut Renderer<'_>, token: &Token<'_>) {
         self.reformat_block_element(
             "datasource",
             target,
@@ -244,7 +244,7 @@ impl<'a> Reformatter<'a> {
         );
     }
 
-    fn reformat_generator(&self, target: &mut Renderer, token: &Token) {
+    fn reformat_generator(&self, target: &mut Renderer<'_>, token: &Token<'_>) {
         self.reformat_block_element(
             "generator",
             target,
@@ -259,7 +259,7 @@ impl<'a> Reformatter<'a> {
         );
     }
 
-    fn reformat_key_value(target: &mut TableFormat, token: &Token) {
+    fn reformat_key_value(target: &mut TableFormat, token: &Token<'_>) {
         for current in token.clone().into_inner() {
             match current.as_rule() {
                 Rule::non_empty_identifier | Rule::maybe_empty_identifier => {
@@ -277,7 +277,7 @@ impl<'a> Reformatter<'a> {
         }
     }
 
-    fn reformat_model(&self, target: &mut Renderer, token: &Token) {
+    fn reformat_model(&self, target: &mut Renderer<'_>, token: &Token<'_>) {
         self.reformat_block_element_internal(
             "model",
             target,
@@ -309,9 +309,9 @@ impl<'a> Reformatter<'a> {
     fn reformat_block_element(
         &self,
         block_type: &'static str,
-        renderer: &'a mut Renderer,
-        token: &'a Token,
-        the_fn: Box<dyn Fn(&mut TableFormat, &mut Renderer, &Token, &str) + 'a>,
+        renderer: &'a mut Renderer<'_>,
+        token: &'a Token<'_>,
+        the_fn: Box<dyn Fn(&mut TableFormat, &mut Renderer<'_>, &Token<'_>, &str) + 'a>,
     ) {
         self.reformat_block_element_internal(block_type, renderer, token, the_fn, {
             // a no op
@@ -322,10 +322,10 @@ impl<'a> Reformatter<'a> {
     fn reformat_block_element_internal(
         &self,
         block_type: &'static str,
-        renderer: &'a mut Renderer,
-        token: &'a Token,
-        the_fn: Box<dyn Fn(&mut TableFormat, &mut Renderer, &Token, &str) + 'a>,
-        after_fn: Box<dyn Fn(&mut TableFormat, &mut Renderer, &str) + 'a>,
+        renderer: &'a mut Renderer<'_>,
+        token: &'a Token<'_>,
+        the_fn: Box<dyn Fn(&mut TableFormat, &mut Renderer<'_>, &Token<'_>, &str) + 'a>,
+        after_fn: Box<dyn Fn(&mut TableFormat, &mut Renderer<'_>, &str) + 'a>,
     ) {
         let mut table = TableFormat::new();
         let mut block_name = "";
@@ -412,7 +412,7 @@ impl<'a> Reformatter<'a> {
         renderer.maybe_end_line();
     }
 
-    fn reformat_enum(&self, target: &mut Renderer, token: &Token) {
+    fn reformat_enum(&self, target: &mut Renderer<'_>, token: &Token<'_>) {
         self.reformat_block_element(
             "enum",
             target,
@@ -432,7 +432,7 @@ impl<'a> Reformatter<'a> {
         );
     }
 
-    fn reformat_enum_entry(target: &mut TableFormat, token: &Token) {
+    fn reformat_enum_entry(target: &mut TableFormat, token: &Token<'_>) {
         for current in token.clone().into_inner() {
             match current.as_rule() {
                 Rule::non_empty_identifier => target.write(current.as_str()),
@@ -445,7 +445,7 @@ impl<'a> Reformatter<'a> {
         }
     }
 
-    fn extract_and_sort_attributes<'i>(token: &'i Token, is_field_attribute: bool) -> Vec<Pair<'i, Rule>> {
+    fn extract_and_sort_attributes<'i>(token: &'i Token<'_>, is_field_attribute: bool) -> Vec<Pair<'i, Rule>> {
         // get indices of attributes and store in separate Vector
         let mut attributes = Vec::new();
         for pair in token.clone().into_inner() {
@@ -467,7 +467,7 @@ impl<'a> Reformatter<'a> {
         attributes
     }
 
-    fn reformat_field(&self, target: &mut TableFormat, token: &Token, model_name: &str) {
+    fn reformat_field(&self, target: &mut TableFormat, token: &Token<'_>, model_name: &str) {
         let field_name = token
             .clone()
             .into_inner()
@@ -538,7 +538,7 @@ impl<'a> Reformatter<'a> {
         target.maybe_end_line();
     }
 
-    fn reformat_type_alias(target: &mut TableFormat, token: &Token) {
+    fn reformat_type_alias(target: &mut TableFormat, token: &Token<'_>) {
         let mut identifier = None;
 
         for current in token.clone().into_inner() {
@@ -567,7 +567,7 @@ impl<'a> Reformatter<'a> {
         target.maybe_end_line();
     }
 
-    fn reformat_field_type(token: &Token) -> String {
+    fn reformat_field_type(token: &Token<'_>) -> String {
         let mut builder = StringBuilder::new();
 
         for current in token.clone().into_inner() {
@@ -590,7 +590,7 @@ impl<'a> Reformatter<'a> {
         builder.to_string()
     }
 
-    fn get_identifier(token: Token) -> &str {
+    fn get_identifier(token: Token<'_>) -> &str {
         let ident_token = match token.as_rule() {
             Rule::base_type => token.as_str(),
             Rule::list_type
@@ -610,7 +610,7 @@ impl<'a> Reformatter<'a> {
 
     fn reformat_attribute(
         target: &mut dyn LineWriteable,
-        token: &Token,
+        token: &Token<'_>,
         owl: &str,
         missing_args: Vec<&MissingRelationAttributeArg>,
     ) {
@@ -644,7 +644,7 @@ impl<'a> Reformatter<'a> {
         }
     }
 
-    fn unpack_token_to_find_matching_rule(token: Token, rule: Rule) -> Token {
+    fn unpack_token_to_find_matching_rule(token: Token<'_>, rule: Rule) -> Token<'_> {
         if token.as_rule() == rule {
             token
         } else {
@@ -660,7 +660,7 @@ impl<'a> Reformatter<'a> {
 
     fn reformat_attribute_args(
         target: &mut dyn LineWriteable,
-        token: &Token,
+        token: &Token<'_>,
         missing_args: Vec<&MissingRelationAttributeArg>,
     ) {
         let mut builder = StringBuilder::new();
@@ -753,7 +753,7 @@ impl<'a> Reformatter<'a> {
     }
     //duplicated from renderer -.-
 
-    fn reformat_attribute_arg(target: &mut dyn LineWriteable, token: &Token) {
+    fn reformat_attribute_arg(target: &mut dyn LineWriteable, token: &Token<'_>) {
         for current in token.clone().into_inner() {
             match current.as_rule() {
                 Rule::argument_name => {
@@ -769,7 +769,7 @@ impl<'a> Reformatter<'a> {
         }
     }
 
-    fn reformat_arg_value(target: &mut dyn LineWriteable, token: &Token) {
+    fn reformat_arg_value(target: &mut dyn LineWriteable, token: &Token<'_>) {
         for current in token.clone().into_inner() {
             match current.as_rule() {
                 Rule::expression => Self::reformat_expression(target, &current),
@@ -782,7 +782,7 @@ impl<'a> Reformatter<'a> {
     }
 
     /// Parses an expression, given a Pest parser token.
-    fn reformat_expression(target: &mut dyn LineWriteable, token: &Token) {
+    fn reformat_expression(target: &mut dyn LineWriteable, token: &Token<'_>) {
         for current in token.clone().into_inner() {
             match current.as_rule() {
                 Rule::numeric_literal => target.write(current.as_str()),
@@ -799,7 +799,7 @@ impl<'a> Reformatter<'a> {
         }
     }
 
-    fn reformat_array_expression(target: &mut dyn LineWriteable, token: &Token) {
+    fn reformat_array_expression(target: &mut dyn LineWriteable, token: &Token<'_>) {
         target.write("[");
         let mut expr_count = 0;
 
@@ -822,7 +822,7 @@ impl<'a> Reformatter<'a> {
         target.write("]");
     }
 
-    fn reformat_function_expression(target: &mut dyn LineWriteable, token: &Token) {
+    fn reformat_function_expression(target: &mut dyn LineWriteable, token: &Token<'_>) {
         let mut has_seen_one_argument = false;
 
         for current in token.clone().into_inner() {
@@ -848,7 +848,7 @@ impl<'a> Reformatter<'a> {
         target.write(")");
     }
 
-    fn reformat_generic_token(target: &mut dyn LineWriteable, token: &Token) {
+    fn reformat_generic_token(target: &mut dyn LineWriteable, token: &Token<'_>) {
         //        println!("generic token: |{:?}|", token.as_str());
         match token.as_rule() {
             Rule::NEWLINE => target.end_line(),
