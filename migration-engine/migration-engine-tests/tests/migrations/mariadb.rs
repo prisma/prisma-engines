@@ -19,7 +19,7 @@ fn foreign_keys_to_indexes_being_renamed_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green().unwrap();
+    api.schema_push(dm1).send_sync().assert_green_bang();
 
     api.assert_schema()
         .assert_table("User", |table| {
@@ -58,7 +58,7 @@ fn foreign_keys_to_indexes_being_renamed_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send_sync().assert_green().unwrap();
+    api.schema_push(dm2).send_sync().assert_green_bang();
 
     api.assert_schema()
         .assert_table("User", |table| {

@@ -59,6 +59,11 @@ impl TestApi {
         self.root.is_mssql()
     }
 
+    /// Returns true only when testing on MariaDB.
+    pub fn is_mariadb(&self) -> bool {
+        self.root.is_mysql_mariadb()
+    }
+
     /// Returns true only when testing on MySQL.
     pub fn is_mysql(&self) -> bool {
         self.root.is_mysql()

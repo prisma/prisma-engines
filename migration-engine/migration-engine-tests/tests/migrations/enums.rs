@@ -27,7 +27,7 @@ fn adding_an_enum_field_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm).send_sync().assert_green().unwrap();
+    api.schema_push(dm).send_sync().assert_green_bang();
 
     api.assert_schema()
         .assert_table("Test", |table| {
@@ -64,7 +64,7 @@ fn adding_an_enum_field_must_work_with_native_types_off(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm).send_sync().assert_green().unwrap();
+    api.schema_push(dm).send_sync().assert_green_bang();
 
     api.assert_schema()
         .assert_table("Test", |table| {
@@ -88,7 +88,7 @@ fn adding_an_enum_field_must_work_with_native_types_off(api: TestApi) {
 
 #[test_connector(capabilities(Enums))]
 fn an_enum_can_be_turned_into_a_model(api: TestApi) {
-    api.schema_push(BASIC_ENUM_DM).send_sync().assert_green().unwrap();
+    api.schema_push(BASIC_ENUM_DM).send_sync().assert_green_bang();
 
     let enum_name = if api.lower_cases_table_names() {
         "cat_mood"
@@ -116,7 +116,7 @@ fn an_enum_can_be_turned_into_a_model(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send_sync().assert_green().unwrap();
+    api.schema_push(dm2).send_sync().assert_green_bang();
 
     api.assert_schema()
         .assert_table("Cat", |table| {
@@ -142,7 +142,7 @@ fn variants_can_be_added_to_an_existing_enum(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green().unwrap();
+    api.schema_push(dm1).send_sync().assert_green_bang();
 
     let enum_name = if api.lower_cases_table_names() {
         "cat_mood"
@@ -169,7 +169,7 @@ fn variants_can_be_added_to_an_existing_enum(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send_sync().assert_green().unwrap();
+    api.schema_push(dm2).send_sync().assert_green_bang();
 
     api.assert_schema()
         .assert_enum(enum_name, |enm| enm.assert_values(&["HUNGRY", "HAPPY", "JOYJOY"]))
@@ -190,7 +190,7 @@ fn variants_can_be_removed_from_an_existing_enum(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green().unwrap();
+    api.schema_push(dm1).send_sync().assert_green_bang();
 
     let enum_name = if api.lower_cases_table_names() {
         "cat_mood"
@@ -235,7 +235,7 @@ fn variants_can_be_removed_from_an_existing_enum(api: TestApi) {
 
 #[test_connector(capabilities(Enums))]
 fn models_with_enum_values_can_be_dropped(api: TestApi) {
-    api.schema_push(BASIC_ENUM_DM).send_sync().assert_green().unwrap();
+    api.schema_push(BASIC_ENUM_DM).send_sync().assert_green_bang();
 
     api.assert_schema().assert_tables_count(1).unwrap();
 
@@ -271,7 +271,7 @@ fn enum_field_to_string_field_works(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green().unwrap();
+    api.schema_push(dm1).send_sync().assert_green_bang();
 
     api.assert_schema()
         .assert_table("Cat", |table| {
@@ -306,7 +306,7 @@ fn string_field_to_enum_field_works(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green().unwrap();
+    api.schema_push(dm1).send_sync().assert_green_bang();
 
     api.assert_schema()
         .assert_table("Cat", |table| {
@@ -389,7 +389,7 @@ fn enums_used_in_default_can_be_changed(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green().unwrap();
+    api.schema_push(dm1).send_sync().assert_green_bang();
 
     api.assert_schema().assert_tables_count(5).unwrap();
 
@@ -469,7 +469,7 @@ fn changing_all_values_of_enums_used_in_defaults_works(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green().unwrap();
+    api.schema_push(dm1).send_sync().assert_green_bang();
 
     let dm2 = r#"
         model Cat {

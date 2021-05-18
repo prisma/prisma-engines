@@ -283,7 +283,7 @@ fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: TestApi
         }
     "#;
 
-    api.schema_push(dm).send_sync().assert_green().unwrap();
+    api.schema_push(dm).send_sync().assert_green_bang();
 
     let insert = Insert::multi_into(api.render_table_name("Fruit"), &["name"])
         .values(("banana",))

@@ -14,7 +14,7 @@ fn datetime_defaults_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm).send_sync().assert_green().unwrap();
+    api.schema_push(dm).send_sync().assert_green_bang();
 
     let expected_default = if api.is_postgres() {
         DefaultValue::db_generated("'2018-01-27 08:00:00'::timestamp without time zone")
@@ -43,7 +43,7 @@ fn function_expressions_as_dbgenerated_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm).send_sync().assert_green().unwrap();
+    api.schema_push(dm).send_sync().assert_green_bang();
 
     api.assert_schema()
         .assert_table("Cat", |table| {
@@ -62,7 +62,7 @@ fn default_dbgenerated_with_type_definitions_should_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm).send_sync().assert_green().unwrap();
+    api.schema_push(dm).send_sync().assert_green_bang();
 
     api.assert_schema()
         .assert_table("A", |table| {
@@ -81,7 +81,7 @@ fn default_dbgenerated_should_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm).send_sync().assert_green().unwrap();
+    api.schema_push(dm).send_sync().assert_green_bang();
 
     api.assert_schema()
         .assert_table("A", |table| {
@@ -101,7 +101,7 @@ fn uuid_default(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm).send_sync().assert_green().unwrap();
+    api.schema_push(dm).send_sync().assert_green_bang();
 
     api.assert_schema()
         .assert_table("A", |table| {
@@ -158,7 +158,7 @@ fn schemas_with_dbgenerated_work(api: TestApi) {
     }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green().unwrap();
+    api.schema_push(dm1).send_sync().assert_green_bang();
 }
 
 #[test_connector(tags(Mysql8, Mariadb), exclude(Vitess))]
@@ -185,7 +185,7 @@ fn schemas_with_dbgenerated_expressions_work(api: TestApi) {
     }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green().unwrap();
+    api.schema_push(dm1).send_sync().assert_green_bang();
 }
 
 #[test_connector]
@@ -197,7 +197,7 @@ fn column_defaults_must_be_migrated(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green().unwrap();
+    api.schema_push(dm1).send_sync().assert_green_bang();
 
     api.assert_schema()
         .assert_table("Fruit", |table| {
@@ -214,7 +214,7 @@ fn column_defaults_must_be_migrated(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send_sync().assert_green().unwrap();
+    api.schema_push(dm2).send_sync().assert_green_bang();
 
     api.assert_schema()
         .assert_table("Fruit", |table| {
