@@ -497,3 +497,33 @@ fn changing_all_values_of_enums_used_in_defaults_works(api: TestApi) {
         })
         .unwrap();
 }
+
+#[test_connector(tags(Postgres))]
+fn existing_enums_are_picked_up(api: TestApi) {
+    let sql = r#"
+        CREATE TYPE "Genre" AS ENUM ('SKA', 'PUNK');
+
+        CREATE TABLE "prisma-tests"."Band" (
+            id SERIAL PRIMARY KEY,
+            name TEXT NOT NULL,
+            genre "Genre" NOT NULL
+        );
+    "#;
+
+    api.raw_cmd(sql);
+
+    let dm = r#"
+        enum Genre {
+            SKA
+            PUNK
+        }
+
+        model Band {
+            id Int @id @default(autoincrement())
+            name String
+            genre Genre
+        }
+    "#;
+
+    api.schema_push(dm).send_sync().assert_green_bang().assert_no_steps();
+}

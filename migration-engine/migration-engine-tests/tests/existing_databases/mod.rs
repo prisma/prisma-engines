@@ -1,33 +1,6 @@
 use barrel::types;
 use migration_engine_tests::sql::*;
-use quaint::prelude::Queryable;
 use sql_schema_describer::*;
-
-#[test_connector]
-async fn adding_a_model_for_an_existing_table_must_work(api: &TestApi) -> TestResult {
-    let initial_result = api
-        .barrel()
-        .execute(|migration| {
-            migration.create_table("Blog", |t| {
-                t.add_column("id", types::primary());
-            });
-        })
-        .await;
-
-    let dm = r#"
-        model Blog {
-            id Int @id @default(autoincrement())
-        }
-    "#;
-
-    api.schema_push(dm).send().await?.assert_green()?;
-
-    api.assert_schema()
-        .await?
-        .assert_equals(&initial_result.into_schema())?;
-
-    Ok(())
-}
 
 #[test_connector]
 async fn removing_a_model_for_a_table_that_is_already_deleted_must_work(api: &TestApi) -> TestResult {
@@ -379,38 +352,6 @@ async fn renaming_a_field_where_the_column_was_already_renamed_must_work(api: &T
             .assert_columns_count(2)?
             .assert_has_column("id")
     })?;
-
-    Ok(())
-}
-
-#[test_connector(tags(Postgres))]
-async fn existing_enums_are_picked_up(api: &TestApi) -> TestResult {
-    let sql = r#"
-        CREATE TYPE "Genre" AS ENUM ('SKA', 'PUNK');
-
-        CREATE TABLE "prisma-tests"."Band" (
-            id SERIAL PRIMARY KEY,
-            name TEXT NOT NULL,
-            genre "Genre" NOT NULL
-        );
-    "#;
-
-    api.database().raw_cmd(sql).await?;
-
-    let dm = r#"
-        enum Genre {
-            SKA
-            PUNK
-        }
-
-        model Band {
-            id Int @id @default(autoincrement())
-            name String
-            genre Genre
-        }
-    "#;
-
-    api.schema_push(dm).send().await?.assert_green()?.assert_no_steps();
 
     Ok(())
 }
