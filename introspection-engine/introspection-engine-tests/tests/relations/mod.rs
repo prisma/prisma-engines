@@ -16,7 +16,8 @@ async fn one_to_one_req_relation(api: &TestApi) -> crate::TestResult {
 
                 migration.create_table("Post", move |t| {
                     t.add_column("id", types::primary());
-                    t.add_column("user_id", types::integer().nullable(false).unique(true));
+                    t.add_column("user_id", types::integer().nullable(false));
+                    t.add_index("Post_user_id_key", types::index(&["user_id"]).unique(true));
                     t.add_foreign_key(&["user_id"], "User", &["id"]);
                 });
             },
@@ -86,7 +87,8 @@ async fn two_one_to_one_relations_between_the_same_models(api: &TestApi) -> crat
             move |migration| {
                 migration.create_table("User", move |t| {
                     t.add_column("id", types::primary());
-                    t.add_column("post_id", types::integer().unique(true).nullable(false));
+                    t.add_column("post_id", types::integer().nullable(false));
+                    t.add_index("User_post_id_key", types::index(&["post_id"]).unique(true));
 
                     // Other databases can't create a foreign key before the table
                     // exists, SQLite can, but cannot alter table with a foreign
@@ -98,7 +100,8 @@ async fn two_one_to_one_relations_between_the_same_models(api: &TestApi) -> crat
 
                 migration.create_table("Post", |t| {
                     t.add_column("id", types::primary());
-                    t.add_column("user_id", types::integer().unique(true).nullable(false));
+                    t.add_column("user_id", types::integer().nullable(false));
+                    t.add_index("Post_user_id_key", types::index(&["user_id"]).unique(true));
                     t.add_foreign_key(&["user_id"], "User", &["id"]);
                 });
 
@@ -147,7 +150,8 @@ async fn a_one_to_one_relation(api: &TestApi) -> crate::TestResult {
 
                 migration.create_table("Post", |t| {
                     t.add_column("id", types::primary());
-                    t.add_column("user_id", types::integer().unique(true).nullable(true));
+                    t.add_column("user_id", types::integer().nullable(true));
+                    t.add_index("Post_user_id_key", types::index(&["user_id"]).unique(true));
                     t.add_foreign_key(&["user_id"], "User", &["id"]);
                 });
             },
@@ -180,12 +184,14 @@ async fn a_one_to_one_relation_referencing_non_id(api: &TestApi) -> crate::TestR
             |migration| {
                 migration.create_table("User", |t| {
                     t.add_column("id", types::primary());
-                    t.add_column("email", types::varchar(10).unique(true).nullable(true));
+                    t.add_column("email", types::varchar(10).nullable(true));
+                    t.add_index("User_email_key", types::index(&["email"]).unique(true));
                 });
 
                 migration.create_table("Post", move |t| {
                     t.add_column("id", types::primary());
-                    t.add_column("user_email", types::varchar(10).unique(true).nullable(true));
+                    t.add_column("user_email", types::varchar(10).nullable(true));
+                    t.add_index("Post_user_email_key", types::index(&["user_email"]).unique(true));
                     t.add_foreign_key(&["user_email"], "User", &["email"]);
                 });
             },
@@ -768,7 +774,7 @@ async fn relations_should_avoid_name_clashes_2(api: &TestApi) -> crate::TestResu
             migration.create_table("x", move |t| {
                 t.add_column("id", types::primary());
                 t.add_column("y", types::integer().nullable(false));
-                t.add_index("unique_y_id", types::index(vec!["id", "y"]).unique(true));
+                t.add_index("x_id_y_key", types::index(vec!["id", "y"]).unique(true));
 
                 if sql_family.is_sqlite() {
                     t.add_foreign_key(&["y"], "y", &["id"]);
@@ -806,7 +812,7 @@ async fn relations_should_avoid_name_clashes_2(api: &TestApi) -> crate::TestResu
                     y                    Int
                     y_x_yToy             y   @relation("x_yToy", fields: [y], references: [id])
                     y_xToy_fk_x_1_fk_x_2 y[] @relation("xToy_fk_x_1_fk_x_2")
-                    @@unique([id, y], name: "unique_y_id")
+                    @@unique([id, y])
                     @@index([y], name: "y")
                 }
 
@@ -828,7 +834,7 @@ async fn relations_should_avoid_name_clashes_2(api: &TestApi) -> crate::TestResu
                     y                    Int
                     y_x_yToy             y   @relation("x_yToy", fields: [y], references: [id])
                     y_xToy_fk_x_1_fk_x_2 y[] @relation("xToy_fk_x_1_fk_x_2")
-                    @@unique([id, y], name: "unique_y_id")
+                    @@unique([id, y])
                 }
 
                 model y {

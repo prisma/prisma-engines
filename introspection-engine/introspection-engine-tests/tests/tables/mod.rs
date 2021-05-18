@@ -342,7 +342,7 @@ async fn a_table_with_non_id_autoincrement(api: &TestApi) -> crate::TestResult {
             |migration| {
                 migration.create_table("Test", |t| {
                     t.add_column("id", types::integer().primary(true));
-                    t.add_column("authorId", types::serial().unique(true));
+                    t.add_column("authorId", types::serial());
                     t.add_index("Test_authorId_key", types::index(vec!["authorId"]).unique(true));
                 });
             },
