@@ -1,10 +1,13 @@
 use std::str::FromStr;
 
 use super::super::attributes::AllAttributes;
-use crate::diagnostics::{DatamodelError, Diagnostics};
-use crate::dml::ScalarType;
 use crate::transform::helpers::ValueValidator;
 use crate::{ast, configuration, dml, Field, FieldType};
+use crate::{
+    ast::Identifier,
+    diagnostics::{DatamodelError, Diagnostics},
+};
+use crate::{dml::ScalarType, Datasource};
 use datamodel_connector::connector_error::{ConnectorError, ErrorKind};
 use itertools::Itertools;
 use once_cell::sync::Lazy;
@@ -197,7 +200,14 @@ impl<'a> LiftAstToDml<'a> {
         ast_schema: &ast::SchemaAst,
         checked_types: &mut Vec<String>,
     ) -> Result<(dml::FieldType, Vec<ast::Attribute>), DatamodelError> {
-        let type_name = &ast_field.field_type.name;
+        let type_ident: &Identifier = match &ast_field.field_type {
+            ast::FieldType::Supported(ident) => ident,
+            ast::FieldType::Unsupported(unsupported_lit, _) => {
+                return lift_unsupported_field_type(ast_field, unsupported_lit, self.source)
+            }
+        };
+
+        let type_name = &type_ident.name;
 
         if let Ok(scalar_type) = ScalarType::from_str(type_name) {
             if let Some(source) = self.source {
@@ -336,7 +346,8 @@ impl<'a> LiftAstToDml<'a> {
         ast_schema: &ast::SchemaAst,
         checked_types: &mut Vec<String>,
     ) -> Result<(dml::FieldType, Vec<ast::Attribute>), DatamodelError> {
-        let type_name = &ast_field.field_type.name;
+        let field_type = ast_field.field_type.unwrap_supported();
+        let type_name = &field_type.name;
 
         if checked_types.iter().any(|x| x == type_name) {
             // Recursive type.
@@ -346,22 +357,9 @@ impl<'a> LiftAstToDml<'a> {
                     checked_types.join(" -> "),
                     type_name
                 ),
-                ast_field.field_type.span,
+                field_type.span,
             ));
         }
-
-        static UNSUPPORTED_REGEX: Lazy<Regex> =
-            Lazy::new(|| Regex::new(r#"Unsupported\("(.*)"\)(\?|\[\])?$"#).unwrap());
-
-        static TYPE_REGEX: Lazy<Regex> = Lazy::new(|| {
-            Regex::new(r#"(?x)
-        ^                           # beginning of the string
-        (?P<prefix>[^(]+)           # a required prefix that is any character until the first opening brace
-        (?:\((?P<params>.*?)\))?    # (optional) an opening parenthesis, a closing parenthesis and captured params in-between
-        (?P<suffix>.+)?             # (optional) captured suffix after the params until the end of the string
-        $                           # end of the string
-        "#).unwrap()
-        });
 
         if let Some(custom_type) = ast_schema.find_type_alias(&type_name) {
             checked_types.push(custom_type.name.name.clone());
@@ -371,50 +369,60 @@ impl<'a> LiftAstToDml<'a> {
             if let dml::FieldType::Relation(_) = field_type {
                 return Err(DatamodelError::new_validation_error(
                     "Only scalar types can be used for defining custom types.",
-                    custom_type.field_type.span,
+                    custom_type.field_type.span(),
                 ));
             }
 
             attrs.append(&mut custom_type.attributes.clone());
             Ok((field_type, attrs))
-        } else if UNSUPPORTED_REGEX.is_match(type_name) {
-            let captures = UNSUPPORTED_REGEX.captures(type_name).unwrap();
-            let type_definition = captures.get(1).expect("get type definition").as_str();
-            if let Some(source) = self.source {
-                if captures.name("suffix").is_none() {
-                    // anything after a closing brace means its not just a supported native type
-                    let connector = &source.active_connector;
-
-                    if let Some(captures) = TYPE_REGEX.captures(type_definition) {
-                        let prefix = captures.name("prefix").unwrap().as_str().trim();
-
-                        let params = captures.name("params");
-                        let args = match params {
-                            None => vec![],
-                            Some(params) => params.as_str().split(',').map(|s| s.trim().to_string()).collect(),
-                        };
-
-                        if let Ok(native_type) = connector.parse_native_type(prefix, args) {
-                            let prisma_type =
-                                connector.scalar_type_for_native_type(native_type.serialized_native_type.clone());
-
-                            let msg = format!(
-                                "The type `{}` you specified in the type definition for the field `{}` is supported as a native type by Prisma. Please use the native type notation `{} @{}.{}` for full support.",
-                                type_name, ast_field.name.name, prisma_type.to_string(), &source.name, native_type.render()
-                            );
-
-                            return Err(DatamodelError::new_validation_error(&msg, ast_field.field_type.span));
-                        }
-                    }
-                }
-            }
-
-            Ok((dml::FieldType::Unsupported(type_definition.into()), vec![]))
         } else {
             Err(DatamodelError::new_type_not_found_error(
                 type_name,
-                ast_field.field_type.span,
+                ast_field.field_type.span(),
             ))
         }
     }
+}
+
+fn lift_unsupported_field_type(
+    ast_field: &ast::Field,
+    unsupported_lit: &str,
+    source: Option<&Datasource>,
+) -> Result<(dml::FieldType, Vec<ast::Attribute>), DatamodelError> {
+    static TYPE_REGEX: Lazy<Regex> = Lazy::new(|| {
+        Regex::new(r#"(?x)
+    ^                           # beginning of the string
+    (?P<prefix>[^(]+)           # a required prefix that is any character until the first opening brace
+    (?:\((?P<params>.*?)\))?    # (optional) an opening parenthesis, a closing parenthesis and captured params in-between
+    (?P<suffix>.+)?             # (optional) captured suffix after the params until the end of the string
+    $                           # end of the string
+    "#).unwrap()
+    });
+
+    if let Some(source) = source {
+        let connector = &source.active_connector;
+
+        if let Some(captures) = TYPE_REGEX.captures(unsupported_lit) {
+            let prefix = captures.name("prefix").unwrap().as_str().trim();
+
+            let params = captures.name("params");
+            let args = match params {
+                None => vec![],
+                Some(params) => params.as_str().split(',').map(|s| s.trim().to_string()).collect(),
+            };
+
+            if let Ok(native_type) = connector.parse_native_type(prefix, args) {
+                let prisma_type = connector.scalar_type_for_native_type(native_type.serialized_native_type.clone());
+
+                let msg = format!(
+                        "The type `Unsupported(\"{}\")` you specified in the type definition for the field `{}` is supported as a native type by Prisma. Please use the native type notation `{} @{}.{}` for full support.",
+                        unsupported_lit, ast_field.name.name, prisma_type.to_string(), &source.name, native_type.render()
+                    );
+
+                return Err(DatamodelError::new_validation_error(&msg, ast_field.span));
+            }
+        }
+    }
+
+    Ok((dml::FieldType::Unsupported(unsupported_lit.into()), vec![]))
 }

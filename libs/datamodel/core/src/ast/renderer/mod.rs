@@ -151,7 +151,7 @@ impl<'a> Renderer<'a> {
         target.write("type ");
         target.write(&field.name.name);
         target.write(&" = ");
-        target.write(&field.field_type.name);
+        Self::render_field_type(target, &field.field_type);
 
         // Attributes
         if !field.attributes.is_empty() {
@@ -280,7 +280,7 @@ impl<'a> Renderer<'a> {
         {
             let mut type_builder = StringBuilder::new();
 
-            type_builder.write(&field.field_type.name);
+            Self::render_field_type(&mut type_builder, &field.field_type);
             Self::render_field_arity(&mut type_builder, &field.arity);
 
             target.write(&type_builder.to_string());
@@ -318,6 +318,19 @@ impl<'a> Renderer<'a> {
             target.write("(");
             Self::render_arguments(target, &attribute.arguments);
             target.write(")");
+        }
+    }
+
+    pub fn render_field_type(target: &mut dyn LineWriteable, field_type: &ast::FieldType) {
+        match field_type {
+            ast::FieldType::Supported(ft) => {
+                target.write(&ft.name);
+            }
+            ast::FieldType::Unsupported(lit, _) => {
+                target.write("Unsupported(\"");
+                target.write(&lit);
+                target.write("\")");
+            }
         }
     }
 

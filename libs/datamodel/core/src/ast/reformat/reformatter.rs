@@ -468,7 +468,12 @@ impl<'a> Reformatter<'a> {
     }
 
     fn reformat_field(&self, target: &mut TableFormat, token: &Token, model_name: &str) {
-        let field_name = &Self::get_identifier(token);
+        let field_name = token
+            .clone()
+            .into_inner()
+            .find(|tok| tok.as_rule() == Rule::non_empty_identifier)
+            .unwrap()
+            .as_str();
 
         // extract and sort attributes
         let attributes = Self::extract_and_sort_attributes(token, true);
@@ -521,8 +526,7 @@ impl<'a> Reformatter<'a> {
 
         if let Ok(missing_field_attributes) = self.missing_field_attributes.as_ref() {
             for missing_field_attribute in missing_field_attributes.iter() {
-                if &missing_field_attribute.field == field_name && missing_field_attribute.model.as_str() == model_name
-                {
+                if missing_field_attribute.field == field_name && missing_field_attribute.model.as_str() == model_name {
                     Renderer::render_field_attribute(
                         &mut target.column_locked_writer_for(2),
                         &missing_field_attribute.attribute,
@@ -547,7 +551,7 @@ impl<'a> Reformatter<'a> {
                     target.write("type");
                     target.write(&identifier.clone().expect("Unknown field identifier."));
                     target.write("=");
-                    target.write(&Self::get_identifier(&current));
+                    target.write(&Self::get_identifier(current));
                 }
                 Rule::attribute => {
                     Self::reformat_attribute(&mut target.column_locked_writer_for(4), &current, "@", vec![]);
@@ -569,18 +573,15 @@ impl<'a> Reformatter<'a> {
         for current in token.clone().into_inner() {
             match current.as_rule() {
                 Rule::optional_type => {
-                    builder.write(&Self::get_identifier(&current));
+                    builder.write(&Self::get_identifier(current));
                     builder.write("?");
                 }
                 Rule::base_type => {
-                    builder.write(&Self::get_identifier(&current));
+                    builder.write(&Self::get_identifier(current));
                 }
                 Rule::list_type => {
-                    builder.write(&Self::get_identifier(&current));
+                    builder.write(&Self::get_identifier(current));
                     builder.write("[]");
-                }
-                Rule::optional_unsupported_type | Rule::list_unsupported_type | Rule::unsupported_type => {
-                    builder.write(current.as_str());
                 }
                 _ => Self::reformat_generic_token(&mut builder, &current),
             }
@@ -589,14 +590,22 @@ impl<'a> Reformatter<'a> {
         builder.to_string()
     }
 
-    fn get_identifier(token: &Token) -> String {
-        for current in token.clone().into_inner() {
-            if let Rule::non_empty_identifier | Rule::maybe_empty_identifier = current.as_rule() {
-                return current.as_str().to_string();
+    fn get_identifier(token: Token) -> &str {
+        let ident_token = match token.as_rule() {
+            Rule::base_type => token.as_str(),
+            Rule::list_type
+            | Rule::legacy_list_type
+            | Rule::legacy_required_type
+            | Rule::optional_type
+            | Rule::unsupported_optional_list_type => {
+                let ident_token = token.into_inner().next().unwrap();
+                assert!(ident_token.as_rule() == Rule::base_type);
+                ident_token.as_str()
             }
-        }
+            _ => unreachable!("Get identified failed. Unexpected input: {:#?}", token),
+        };
 
-        panic!("No identifier found.")
+        ident_token
     }
 
     fn reformat_attribute(
