@@ -7,7 +7,7 @@ on:
 jobs:
   scala-vitess-tests:
     name: "Scala test suite: ${{ matrix.database }} on Linux"
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     strategy:
       fail-fast: false
@@ -69,7 +69,7 @@ jobs:
       RUST_BACKTRACE: 1
       CLICOLOR_FORCE: 1
 
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v2
 
