@@ -157,14 +157,14 @@ async fn a_table_with_unique_index(api: &TestApi) -> TestResult {
         )
         .await?;
 
-    let dm = indoc! {r##"
-        model Blog {
-            id       Int @id @default(autoincrement())
-            authorId Int @unique
-        }
-    "##};
+    let dm = formatdoc! {r##"
+        model Blog {{
+            id       {int_type} @id @default(autoincrement())
+            authorId {int_type} @unique
+        }}
+    "##, int_type = api.int_type()};
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }

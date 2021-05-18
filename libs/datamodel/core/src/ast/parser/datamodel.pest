@@ -144,8 +144,7 @@ constant_literal = @{ non_empty_identifier }
 
 // ######################################
 // String Interpolation
-// Called seperatedly, but falls back
-// to expression.
+// Called separately, but falls back to expression.
 // ######################################
 // We can safely assume that our strings are stripped of their "s and
 // that strings do not contain new lines.
