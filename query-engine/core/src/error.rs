@@ -40,6 +40,15 @@ pub enum CoreError {
     ConfigurationError(String),
 }
 
+impl CoreError {
+    pub fn null_serialization_error(field_name: &str) -> Self {
+        CoreError::SerializationError(format!(
+            "Inconsistent query result: Field {} is required to return data, got `null` instead.",
+            field_name
+        ))
+    }
+}
+
 impl From<QueryGraphBuilderError> for CoreError {
     fn from(e: QueryGraphBuilderError) -> CoreError {
         CoreError::QueryGraphBuilderError(e)

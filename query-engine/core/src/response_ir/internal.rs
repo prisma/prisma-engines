@@ -241,10 +241,7 @@ fn serialize_record_selection(
                             if !opt {
                                 // Check that all items are non-null
                                 if items.iter().any(|item| matches!(item, Item::Value(PrismaValue::Null))) {
-                                    return Err(CoreError::SerializationError(format!(
-                                        "Required field '{}' returned a null record",
-                                        name
-                                    )));
+                                    return Err(CoreError::null_serialization_error(&name));
                                 }
                             }
 
@@ -268,10 +265,7 @@ fn serialize_record_selection(
                             } else if items.is_empty() && opt {
                                 Ok((parent, Item::Ref(ItemRef::new(Item::Value(PrismaValue::Null)))))
                             } else if items.is_empty() && opt {
-                                Err(CoreError::SerializationError(format!(
-                                    "Required field '{}' returned a null record",
-                                    name
-                                )))
+                                Err(CoreError::null_serialization_error(&name))
                             } else {
                                 Ok((parent, Item::Ref(ItemRef::new(items.pop().unwrap()))))
                             }
@@ -335,10 +329,9 @@ fn serialize_objects(
         }
 
         // Write nested results
-        write_nested_items(&record_id, &mut nested_mapping, &mut object, &typ);
+        write_nested_items(&record_id, &mut nested_mapping, &mut object, &typ)?;
 
         let aggr_row = result.aggregation_rows.as_ref().map(|rows| rows.get(r_index).unwrap());
-
         if let Some(aggr_row) = aggr_row {
             write_rel_aggregation_row(aggr_row, &mut object);
         }
@@ -353,8 +346,8 @@ fn serialize_objects(
                     .collect()
             })
             .unwrap_or(vec![]);
-        let mut all_fields = result.fields.clone();
 
+        let mut all_fields = result.fields.clone();
         all_fields.append(&mut aggr_fields);
 
         let map = all_fields
@@ -386,8 +379,8 @@ fn write_nested_items(
     items_with_parent: &mut HashMap<String, CheckedItemsWithParents>,
     into: &mut HashMap<String, Item>,
     enclosing_type: &ObjectTypeStrongRef,
-) {
-    items_with_parent.iter_mut().for_each(|(field_name, inner)| {
+) -> crate::Result<()> {
+    for (field_name, inner) in items_with_parent.iter_mut() {
         let val = inner.get(record_id);
 
         // The value must be a reference (or None - handle default), everything else is an error in the serialization logic.
@@ -401,17 +394,16 @@ fn write_nested_items(
                 let default = match field.field_type.borrow() {
                     OutputType::List(_) => Item::list(Vec::new()),
                     _ if field.is_nullable => Item::Value(PrismaValue::Null),
-                    _ => panic!(
-                        "Application logic invariant error: received null value for field {} which may not be null",
-                        &field_name
-                    ),
+                    _ => return Err(CoreError::null_serialization_error(field_name)),
                 };
 
                 into.insert(field_name.to_owned(), Item::Ref(ItemRef::new(default)));
             }
-            _ => panic!("Application logic invariant error: Nested items have to be wrapped as a Item::Ref."),
+            _ => panic!("Invariant error: Nested items have to be wrapped as a Item::Ref."),
         };
-    });
+    }
+
+    Ok(())
 }
 
 /// Processes nested results into a more ergonomic structure of { <nested field name> -> { parent ID -> item (list, map, ...) } }.
@@ -450,7 +442,7 @@ fn serialize_scalar(field: &OutputFieldRef, value: PrismaValue) -> crate::Result
             OutputType::Scalar(subtype) => {
                 let items = unwrap_prisma_value(value)
                     .into_iter()
-                    .map(|v| convert_prisma_value(v, subtype))
+                    .map(|v| convert_prisma_value(field, v, subtype))
                     .map(|pv| pv.map(Item::Value))
                     .collect::<Result<Vec<Item>, CoreError>>()?;
                 Ok(Item::list(items))
@@ -466,19 +458,19 @@ fn serialize_scalar(field: &OutputFieldRef, value: PrismaValue) -> crate::Result
                 Ok(Item::list(items))
             }
             _ => Err(CoreError::SerializationError(format!(
-                "Attempted to serialize scalar list which contained non-scalar items of type '{:?}'",
-                arc_type
+                "Attempted to serialize scalar list which contained non-scalar items of type '{:?}' for field {}.",
+                arc_type, field.name
             ))),
         },
-        (_, OutputType::Scalar(st)) => Ok(Item::Value(convert_prisma_value(value, st)?)),
+        (_, OutputType::Scalar(st)) => Ok(Item::Value(convert_prisma_value(field, value, st)?)),
         (pv, ot) => Err(CoreError::SerializationError(format!(
-            "Attempted to serialize scalar '{}' with non-scalar compatible type '{:?}'",
-            pv, ot
+            "Attempted to serialize scalar '{}' with non-scalar compatible type '{:?}' for field {}.",
+            pv, ot, field.name
         ))),
     }
 }
 
-fn convert_prisma_value(value: PrismaValue, st: &ScalarType) -> Result<PrismaValue, CoreError> {
+fn convert_prisma_value(field: &OutputFieldRef, value: PrismaValue, st: &ScalarType) -> Result<PrismaValue, CoreError> {
     let item_value = match (st, value) {
         (ScalarType::String, PrismaValue::String(s)) => PrismaValue::String(s),
 
@@ -511,8 +503,8 @@ fn convert_prisma_value(value: PrismaValue, st: &ScalarType) -> Result<PrismaVal
 
         (st, pv) => {
             return Err(CoreError::SerializationError(format!(
-                "Attempted to serialize scalar '{}' with incompatible type '{:?}'",
-                pv, st
+                "Attempted to serialize scalar '{}' with incompatible type '{:?}' for field {}.",
+                pv, st, field.name
             )))
         }
     };
@@ -525,14 +517,14 @@ fn convert_enum(value: PrismaValue, dbt: &DatabaseEnumType) -> Result<Item, Core
         PrismaValue::String(s) | PrismaValue::Enum(s) => match dbt.map_output_value(&s) {
             Some(inum) => Ok(Item::Value(inum)),
             None => Err(CoreError::SerializationError(format!(
-                "Value '{}' not found in enum '{:?}'",
-                s, dbt
+                "Value '{}' not found in enum '{}'",
+                s, dbt.name
             ))),
         },
 
         val => Err(CoreError::SerializationError(format!(
-            "Attempted to serialize non-enum-compatible value '{}' with enum '{:?}'",
-            val, dbt
+            "Attempted to serialize non-enum-compatible value '{}' for enum '{}'",
+            val, dbt.name
         ))),
     }
 }
@@ -540,6 +532,6 @@ fn convert_enum(value: PrismaValue, dbt: &DatabaseEnumType) -> Result<Item, Core
 fn unwrap_prisma_value(pv: PrismaValue) -> Vec<PrismaValue> {
     match pv {
         PrismaValue::List(l) => l,
-        _ => panic!("We want lists!"),
+        _ => panic!("Invariant error: Called unwrap list value on non-list."),
     }
 }
