@@ -426,7 +426,7 @@ async fn mapped_enum_name(api: &TestApi) -> TestResult {
     let input_dm = format!(
         r#"
         model User {{
-            id               {int_type} @id @default(autoincrement())
+            id               Int @id @default(autoincrement())
             color            BlackNWhite
         }}
 
@@ -438,18 +438,17 @@ async fn mapped_enum_name(api: &TestApi) -> TestResult {
         }}
     "#,
         enum_name = enum_name,
-        int_type = api.int_type(),
     );
 
     let final_dm = format!(
         r#"
         model User {{
-            id               {int_type} @id @default(autoincrement())
+            id               Int @id @default(autoincrement())
             color            BlackNWhite
         }}
 
         model Unrelated {{
-            id               {int_type} @id @default(autoincrement())
+            id               Int @id @default(autoincrement())
         }}
 
         enum BlackNWhite {{
@@ -460,7 +459,6 @@ async fn mapped_enum_name(api: &TestApi) -> TestResult {
         }}
     "#,
         enum_name = enum_name,
-        int_type = api.int_type(),
     );
 
     api.assert_eq_datamodels(&final_dm, &api.re_introspect(&input_dm).await?);
@@ -1306,17 +1304,16 @@ async fn updated_at(api: &TestApi) -> TestResult {
     };
     let input_dm = formatdoc! {r#"
         model User {{
-            id           {int_type} @id @default(autoincrement())
+            id           Int @id @default(autoincrement())
             lastupdated  DateTime?  @updatedAt {native_datetime}
         }}
         "#,
         native_datetime = native_datetime,
-        int_type = api.int_type(),
     };
 
     let final_dm = formatdoc! {r#"
         model User {{
-            id           {int_type} @id @default(autoincrement())
+            id           Int @id @default(autoincrement())
             lastupdated  DateTime?  @updatedAt {}
         }}
 
@@ -1325,7 +1322,6 @@ async fn updated_at(api: &TestApi) -> TestResult {
         }}
         "#,
         native_datetime = native_datetime,
-        int_type = api.int_type(),
     };
 
     api.assert_eq_datamodels(&final_dm, &api.re_introspect(&input_dm).await?);

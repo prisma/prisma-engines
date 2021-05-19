@@ -110,14 +110,6 @@ impl TestApi {
         Ok(serde_json::to_string(&introspection_result.warnings)?)
     }
 
-    pub fn int_type(&self) -> &'static str {
-        if self.tags().contains(Tags::Cockroach) {
-            "BigInt"
-        } else {
-            "Int"
-        }
-    }
-
     pub async fn introspect_version(&self) -> Result<Version> {
         let introspection_result = self.api.introspect(&Datamodel::new()).await?;
 

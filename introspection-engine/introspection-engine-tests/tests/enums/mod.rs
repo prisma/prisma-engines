@@ -1,5 +1,5 @@
 use barrel::types;
-use indoc::formatdoc;
+use indoc::indoc;
 use introspection_engine_tests::{test_api::*, TestResult};
 use quaint::prelude::{Queryable, SqlFamily};
 use test_macros::test_connector;
@@ -41,7 +41,7 @@ async fn a_table_with_enums(api: &TestApi) -> TestResult {
     let dm = format!(
         r#"
         model Book {{
-            id      {2}     @id @default(autoincrement())
+            id      Int     @id @default(autoincrement())
             color   {0}
             color2  {1}
         }}
@@ -56,9 +56,7 @@ async fn a_table_with_enums(api: &TestApi) -> TestResult {
             white2
         }}
     "#,
-        color,
-        color2,
-        api.int_type()
+        color, color2,
     );
 
     for _ in 0..4 {
@@ -99,7 +97,7 @@ async fn a_table_with_an_enum_default_value_that_is_an_empty_string(api: &TestAp
     let dm = format!(
         r#"
         model Book {{
-            id      {1} @id @default(autoincrement())
+            id      Int @id @default(autoincrement())
             color   {0}     @default(EMPTY_ENUM_VALUE)
         }}
 
@@ -109,7 +107,6 @@ async fn a_table_with_an_enum_default_value_that_is_an_empty_string(api: &TestAp
         }}
     "#,
         color,
-        api.int_type()
     );
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);
@@ -154,7 +151,7 @@ async fn a_table_enums_should_return_alphabetically_even_when_in_different_order
     let dm = format!(
         r#"
         model Book {{
-            id      {2}     @id @default(autoincrement())
+            id      Int     @id @default(autoincrement())
             color   {1}
             color2  {0}
         }}
@@ -169,9 +166,7 @@ async fn a_table_enums_should_return_alphabetically_even_when_in_different_order
             white2
         }}
     "#,
-        color2,
-        color,
-        api.int_type()
+        color2, color,
     );
 
     for _ in 0..4 {
@@ -212,7 +207,7 @@ async fn a_table_with_enum_default_values(api: &TestApi) -> TestResult {
     let dm = format!(
         r#"
         model Book {{
-            id      {1} @id @default(autoincrement())
+            id      Int @id @default(autoincrement())
             color   {0} @default(black)
         }}
 
@@ -222,7 +217,6 @@ async fn a_table_with_enum_default_values(api: &TestApi) -> TestResult {
         }}
     "#,
         enum_name,
-        api.int_type()
     );
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);
@@ -252,19 +246,18 @@ async fn a_table_enums_array(api: &TestApi) -> TestResult {
         })
         .await?;
 
-    let dm = formatdoc! {
+    let dm = indoc! {
         r#"
-        model Book {{
-            id      {int_type}     @id @default(autoincrement())
+        model Book {
+            id      Int     @id @default(autoincrement())
             color   color[]
-        }}
+        }
 
-        enum color {{
+        enum color {
             black
             white
-        }}
+        }
         "#,
-        int_type = api.int_type(),
     };
 
     let result = api.introspect().await?;
@@ -309,7 +302,7 @@ async fn a_table_with_enum_default_values_that_look_like_booleans(api: &TestApi)
     let dm = format!(
         r#"
         model News {{
-            id          {1} @id @default(autoincrement())
+            id          Int @id @default(autoincrement())
             confirmed   {0} @default(true)
         }}
 
@@ -320,7 +313,6 @@ async fn a_table_with_enum_default_values_that_look_like_booleans(api: &TestApi)
         }}
     "#,
         enum_name,
-        api.int_type()
     );
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);
