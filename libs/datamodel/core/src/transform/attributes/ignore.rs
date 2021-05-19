@@ -14,7 +14,7 @@ impl AttributeValidator<dml::Model> for IgnoreAttributeValidator {
         ATTRIBUTE_NAME
     }
 
-    fn validate_and_apply(&self, args: &mut Arguments, obj: &mut dml::Model) -> Result<(), DatamodelError> {
+    fn validate_and_apply(&self, args: &mut Arguments<'_>, obj: &mut dml::Model) -> Result<(), DatamodelError> {
         if obj.fields().any(|f| f.is_ignored()) {
             return self.new_attribute_validation_error(
                 "Fields on an already ignored Model do not need an `@ignore` annotation.",
@@ -37,7 +37,7 @@ impl AttributeValidator<dml::Field> for IgnoreAttributeValidatorForField {
         ATTRIBUTE_NAME
     }
 
-    fn validate_and_apply(&self, args: &mut Arguments, obj: &mut dml::Field) -> Result<(), DatamodelError> {
+    fn validate_and_apply(&self, args: &mut Arguments<'_>, obj: &mut dml::Field) -> Result<(), DatamodelError> {
         match obj {
             ScalarField(sf) if matches!(sf.field_type, dml::FieldType::Unsupported(_)) => {
                 self.new_attribute_validation_error("Fields of type `Unsupported` cannot take an `@ignore` attribute. They are already treated as ignored by the client due to their type.", args.span())

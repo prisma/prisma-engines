@@ -26,7 +26,7 @@ pub use argument::Argument;
 pub use attribute::Attribute;
 pub use comment::Comment;
 pub use expression::Expression;
-pub use field::{Field, FieldArity};
+pub use field::{Field, FieldArity, FieldType};
 pub use generator_config::GeneratorConfig;
 pub use identifier::Identifier;
 pub use model::Model;

@@ -111,8 +111,6 @@ fn rule_to_string(rule: Rule) -> &'static str {
         Rule::attribute => "attribute",
         Rule::optional_type => "optional type",
         Rule::base_type => "type",
-        Rule::optional_unsupported_type => "optional unsupported type",
-        Rule::list_unsupported_type => "list unsupported type",
         Rule::unsupported_type => "unsupported type",
         Rule::list_type => "list type",
         Rule::field_type => "field type",

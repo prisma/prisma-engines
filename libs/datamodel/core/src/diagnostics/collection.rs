@@ -50,12 +50,12 @@ impl Diagnostics {
     }
 
     /// Creates an iterator over all errors in this collection.
-    pub fn to_error_iter(&self) -> std::slice::Iter<DatamodelError> {
+    pub fn to_error_iter(&self) -> std::slice::Iter<'_, DatamodelError> {
         self.errors.iter()
     }
 
     /// Creates an iterator over all warnings in this collection.
-    pub fn to_warning_iter(&self) -> std::slice::Iter<DatamodelWarning> {
+    pub fn to_warning_iter(&self) -> std::slice::Iter<'_, DatamodelWarning> {
         self.warnings.iter()
     }
 
@@ -94,7 +94,7 @@ impl Diagnostics {
 }
 
 impl std::fmt::Display for Diagnostics {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let msg: Vec<String> = self.errors.iter().map(|e| e.to_string()).collect();
         f.write_str(&msg.join("\n"))
     }

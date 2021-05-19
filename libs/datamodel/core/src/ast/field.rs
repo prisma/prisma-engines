@@ -1,9 +1,9 @@
-use super::*;
+use super::{Attribute, Comment, Identifier, Span, WithAttributes, WithDocumentation, WithIdentifier, WithSpan};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Field {
     /// The field's type.
-    pub field_type: Identifier,
+    pub field_type: FieldType,
     /// The name of the field.
     pub name: Identifier,
     /// The aritiy of the field.
@@ -51,4 +51,26 @@ pub enum FieldArity {
     Required,
     Optional,
     List,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum FieldType {
+    Supported(Identifier),
+    Unsupported(String, Span),
+}
+
+impl FieldType {
+    pub(crate) fn span(&self) -> Span {
+        match self {
+            FieldType::Supported(ident) => ident.span,
+            FieldType::Unsupported(_, span) => *span,
+        }
+    }
+
+    pub(crate) fn unwrap_supported(&self) -> &Identifier {
+        match self {
+            FieldType::Supported(ident) => ident,
+            FieldType::Unsupported(_, _) => panic!("Unsupported in unwrap_supported()"),
+        }
+    }
 }

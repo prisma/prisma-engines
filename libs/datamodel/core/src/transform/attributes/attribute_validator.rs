@@ -16,7 +16,7 @@ pub trait AttributeValidator<T> {
 
     /// Validates an attribute and applies the attribute
     /// to the given object.
-    fn validate_and_apply(&self, args: &mut Arguments, obj: &mut T) -> Result<(), DatamodelError>;
+    fn validate_and_apply(&self, args: &mut Arguments<'_>, obj: &mut T) -> Result<(), DatamodelError>;
 
     /// Serializes the given attribute's arguments for rendering.
     fn serialize(&self, obj: &T, datamodel: &dml::Datamodel) -> Vec<ast::Attribute>;

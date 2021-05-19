@@ -10,7 +10,7 @@ impl AttributeValidator<dml::Field> for IdAttributeValidator {
         &"id"
     }
 
-    fn validate_and_apply(&self, args: &mut Arguments, obj: &mut dml::Field) -> Result<(), DatamodelError> {
+    fn validate_and_apply(&self, args: &mut Arguments<'_>, obj: &mut dml::Field) -> Result<(), DatamodelError> {
         if let dml::Field::ScalarField(sf) = obj {
             sf.is_id = true;
             Ok(())
@@ -44,7 +44,7 @@ impl AttributeValidator<dml::Model> for ModelLevelIdAttributeValidator {
         "id"
     }
 
-    fn validate_and_apply(&self, args: &mut Arguments, obj: &mut dml::Model) -> Result<(), DatamodelError> {
+    fn validate_and_apply(&self, args: &mut Arguments<'_>, obj: &mut dml::Model) -> Result<(), DatamodelError> {
         let fields = args
             .default_arg("fields")?
             .as_array()

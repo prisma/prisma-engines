@@ -13,7 +13,7 @@ impl AttributeValidator<dml::Model> for MapAttributeValidator {
         ATTRIBUTE_NAME
     }
 
-    fn validate_and_apply(&self, args: &mut Arguments, obj: &mut dml::Model) -> Result<(), DatamodelError> {
+    fn validate_and_apply(&self, args: &mut Arguments<'_>, obj: &mut dml::Model) -> Result<(), DatamodelError> {
         internal_validate_and_apply(args, obj)
     }
 
@@ -28,7 +28,7 @@ impl AttributeValidator<dml::Field> for MapAttributeValidatorForField {
         ATTRIBUTE_NAME
     }
 
-    fn validate_and_apply(&self, args: &mut Arguments, obj: &mut dml::Field) -> Result<(), DatamodelError> {
+    fn validate_and_apply(&self, args: &mut Arguments<'_>, obj: &mut dml::Field) -> Result<(), DatamodelError> {
         if obj.is_relation() {
             return self.new_attribute_validation_error(
                 &format!(
@@ -51,7 +51,7 @@ impl AttributeValidator<dml::Enum> for MapAttributeValidator {
         ATTRIBUTE_NAME
     }
 
-    fn validate_and_apply(&self, args: &mut Arguments, obj: &mut dml::Enum) -> Result<(), DatamodelError> {
+    fn validate_and_apply(&self, args: &mut Arguments<'_>, obj: &mut dml::Enum) -> Result<(), DatamodelError> {
         internal_validate_and_apply(args, obj)
     }
 
@@ -65,7 +65,7 @@ impl AttributeValidator<dml::EnumValue> for MapAttributeValidator {
         ATTRIBUTE_NAME
     }
 
-    fn validate_and_apply(&self, args: &mut Arguments, obj: &mut dml::EnumValue) -> Result<(), DatamodelError> {
+    fn validate_and_apply(&self, args: &mut Arguments<'_>, obj: &mut dml::EnumValue) -> Result<(), DatamodelError> {
         internal_validate_and_apply(args, obj)
     }
 
@@ -74,7 +74,7 @@ impl AttributeValidator<dml::EnumValue> for MapAttributeValidator {
     }
 }
 
-fn internal_validate_and_apply(args: &mut Arguments, obj: &mut dyn WithDatabaseName) -> Result<(), DatamodelError> {
+fn internal_validate_and_apply(args: &mut Arguments<'_>, obj: &mut dyn WithDatabaseName) -> Result<(), DatamodelError> {
     let name_arg = args.default_arg("name")?;
     let db_name = name_arg.as_str().map_err(|err| {
         DatamodelError::new_attribute_validation_error(&format!("{}", err), ATTRIBUTE_NAME, err.span())
