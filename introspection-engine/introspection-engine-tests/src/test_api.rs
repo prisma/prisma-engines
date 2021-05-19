@@ -228,6 +228,14 @@ impl TestApi {
 
         out
     }
+
+    pub fn sqlite_default_autoincrement(&self) -> &str {
+        if self.sql_family().is_sqlite() {
+            "@default(autoincrement())"
+        } else {
+            ""
+        }
+    }
 }
 
 fn parse_datamodel(dm: &str) -> Result<Datamodel> {

@@ -53,7 +53,8 @@ async fn one_to_one_relation_on_a_singular_primary_key(api: &TestApi) -> crate::
                 });
 
                 migration.create_table("Post", |t| {
-                    t.add_column("id", types::integer().nullable(false).unique(true));
+                    t.add_column("id", types::integer().nullable(false));
+                    t.add_index("Post_id_key", types::index(&["id"]).unique(true));
                     t.add_foreign_key(&["id"], "User", &["id"]);
                 });
             },

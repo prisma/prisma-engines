@@ -201,17 +201,11 @@ async fn compound_foreign_keys_for_required_one_to_many_relations(api: &TestApi)
                 t.add_column("id", types::primary());
                 t.add_column("user_id", types::integer());
                 t.add_column("user_age", types::integer());
-
+                t.add_index("Post_user_id_user_age_idx", types::index(&["user_id", "user_age"]));
                 t.add_foreign_key(&["user_id", "user_age"], "User", &["id", "age"]);
             });
         })
         .await?;
-
-    let extra_index = if api.sql_family().is_mysql() {
-        r#"@@index([user_id, user_age], name: "user_id")"#
-    } else {
-        ""
-    };
 
     let dm = format!(
         r#"
@@ -220,7 +214,7 @@ async fn compound_foreign_keys_for_required_one_to_many_relations(api: &TestApi)
             user_id  Int
             user_age Int
             User     User @relation(fields: [user_id, user_age], references: [id, age])
-            {}
+            @@index([user_id, user_age])
         }}
 
         model User {{
@@ -228,10 +222,9 @@ async fn compound_foreign_keys_for_required_one_to_many_relations(api: &TestApi)
             age  Int
             Post Post[]
 
-            @@unique([id, age], name: "user_unique")
+            @@unique([id, age], map: "user_unique")
         }}
     "#,
-        extra_index
     );
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);
@@ -387,17 +380,11 @@ async fn compound_foreign_keys_for_one_to_many_relations_with_non_unique_index(a
                 t.add_column("id", types::primary());
                 t.add_column("user_id", types::integer());
                 t.add_column("user_age", types::integer());
-
+                t.add_index("Post_user_id_user_age_idx", types::index(&["user_id", "user_age"]));
                 t.add_foreign_key(&["user_id", "user_age"], "User", &["id", "age"]);
             });
         })
         .await?;
-
-    let extra_index = if api.sql_family().is_mysql() {
-        r#"@@index([user_id, user_age], name: "user_id")"#
-    } else {
-        ""
-    };
 
     let dm = format!(
         r#"
@@ -406,7 +393,8 @@ async fn compound_foreign_keys_for_one_to_many_relations_with_non_unique_index(a
             user_id  Int
             user_age Int
             User     User @relation(fields: [user_id, user_age], references: [id, age])
-            {}
+            
+            @@index([user_id, user_age])
         }}
 
         model User {{
@@ -414,10 +402,10 @@ async fn compound_foreign_keys_for_one_to_many_relations_with_non_unique_index(a
             age  Int
             Post Post[]
 
-            @@unique([id, age], name: "{}")
+            @@unique([id, age], map: "{}")
         }}
     "#,
-        extra_index, constraint_name
+        constraint_name
     );
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);
@@ -590,7 +578,7 @@ async fn compound_foreign_keys_for_duplicate_one_to_many_relations(api: &TestApi
             Post_Post_other_user_id_other_user_ageToUser    Post[] @relation("Post_other_user_id_other_user_ageToUser")
             Post_Post_user_id_user_ageToUser                Post[] @relation("Post_user_id_user_ageToUser")
 
-            @@unique([id, age], name: "{}")
+            @@unique([id, age], map: "{}")
         }}
     "#,
         extra_index, constraint_name

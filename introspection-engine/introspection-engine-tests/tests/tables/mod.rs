@@ -14,7 +14,8 @@ async fn a_simple_table_with_gql_types(api: &TestApi) -> crate::TestResult {
                     t.add_column("bool", types::boolean());
                     t.add_column("float", types::float());
                     t.add_column("date", types::datetime());
-                    t.add_column("id", types::primary());
+                    t.add_column("id", types::integer());
+                    t.add_constraint("Blog_pkey", types::primary_constraint(&["id"]));
                     t.add_column("int", types::integer());
                     t.add_column("string", types::text());
                 });
@@ -49,11 +50,11 @@ async fn a_simple_table_with_gql_types(api: &TestApi) -> crate::TestResult {
             bool    Boolean
             float   Float {}
             date    DateTime {}
-            id      Int @id @default(autoincrement())
+            id      Int @id {}
             int     Int
             string  String {}
         }}
-    "##, float_native, timestamp_native, text_native};
+    "##, float_native, timestamp_native, api.sqlite_default_autoincrement(), text_native};
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
@@ -66,7 +67,8 @@ async fn should_ignore_prisma_helper_tables(api: &TestApi) -> crate::TestResult 
         .execute_with_schema(
             |migration| {
                 migration.create_table("Blog", move |t| {
-                    t.add_column("id", types::primary());
+                    t.add_column("id", types::integer());
+                    t.add_constraint("Blog_pkey", types::primary_constraint(&["id"]));
                 });
 
                 migration.create_table("_RelayId", move |t| {
