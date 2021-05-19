@@ -3,6 +3,8 @@ package queries.aggregation
 import org.scalatest.{FlatSpec, Matchers}
 import util._
 
+//RS: Ported
+
 // Testing assumptions
 // - Grouping on fields itself works (as tested in the GroupBySpec).
 // - The above means we also don't need to test combinations except for what is required by the rules to make it work.
@@ -84,6 +86,7 @@ class GroupByHavingQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       """{"data":{"groupByModel":[{"s":"group1","int":5,"_count":{"_all":1},"_sum":{"int":5}},{"s":"group2","int":5,"_count":{"_all":1},"_sum":{"int":5}}]}}""")
   }
 
+  // TODO: Port this test
   "Using a groupBy with a `having` scalar filters on list fields" should "work" taggedAs (IgnoreMySql, IgnoreSQLite, IgnoreMsSql) in {
     val project = SchemaDsl.fromStringV11() {
       """model Model {
