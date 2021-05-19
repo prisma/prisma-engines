@@ -9,7 +9,7 @@ use prisma_models::{
     Field, ModelProjection, ModelRef, OrderBy, PrismaValue, RecordProjection, RelationFieldRef, ScalarFieldRef,
     SortAggregation, SortOrder,
 };
-use std::convert::{identity, TryInto};
+use std::convert::TryInto;
 
 /// Expects the caller to know that it is structurally guaranteed that query arguments can be extracted,
 /// e.g. that the query schema guarantees that required fields are present.
@@ -78,7 +78,7 @@ fn extract_order_by(model: &ModelRef, value: ParsedInputValue) -> QueryGraphBuil
                 Ok(process_order_object(model, object, vec![], None)?)
             })
             .collect::<QueryGraphBuilderResult<Vec<_>>>()
-            .map(|results| results.into_iter().filter_map(identity).collect()),
+            .map(|results| results.into_iter().flatten().collect()),
 
         ParsedInputValue::Map(map) => Ok(match process_order_object(model, map, vec![], None)? {
             Some(order) => vec![order],

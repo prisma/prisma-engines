@@ -147,6 +147,10 @@ impl ValueGenerator {
     pub fn is_dbgenerated(&self) -> bool {
         self.name == "dbgenerated"
     }
+
+    pub fn is_autoincrement(&self) -> bool {
+        self.name == "autoincrement"
+    }
 }
 
 #[derive(Clone, Copy, PartialEq)]

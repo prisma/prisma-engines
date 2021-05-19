@@ -63,8 +63,8 @@ impl TestApi {
 
         TestApi {
             args,
-            admin_conn,
             connection_string,
+            admin_conn,
             rt,
         }
     }

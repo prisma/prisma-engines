@@ -21,18 +21,18 @@ mod sql_server {
     }
 }
 
-#[test_suite(schema(autoinc_id))]
+#[test_suite(schema(autoinc_id), capabilities(AutoIncrement))]
 mod single_col {
     #[connector_test]
     async fn foo(runner: &Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, "mutation { createManyTestModel(data: [{}]) { count }}"),
-          @r###"{"data":{"createManyTestModel":{"count":1}}}"###
+          run_query!(runner, "mutation { createManyTestModel(data: [{},{}]) { count }}"),
+          @r###"{"data":{"createManyTestModel":{"count":2}}}"###
         );
 
         insta::assert_snapshot!(
           run_query!(runner, "query { findManyTestModel { id }}"),
-          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
 
         Ok(())
