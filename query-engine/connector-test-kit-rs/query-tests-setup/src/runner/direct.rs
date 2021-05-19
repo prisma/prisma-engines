@@ -1,7 +1,6 @@
 use std::sync::Arc;
 
 use crate::{ConnectorTag, RunnerInterface, TestResult};
-use enumflags2::BitFlags;
 use prisma_models::DatamodelConverter;
 use query_core::{exec_loader, schema_builder, BuildMode, QueryExecutor, QuerySchemaRef};
 use request_handlers::{GraphQlBody, GraphQlHandler, MultiQuery};
