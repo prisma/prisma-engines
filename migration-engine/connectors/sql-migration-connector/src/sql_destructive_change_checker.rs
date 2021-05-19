@@ -24,7 +24,7 @@ mod warning_check;
 pub(crate) use destructive_change_checker_flavour::DestructiveChangeCheckerFlavour;
 
 use crate::{
-    sql_migration::{AlterEnum, AlterTable, ColumnTypeChange, CreateIndex, DropTable, SqlMigrationStep, TableChange},
+    sql_migration::{AlterEnum, AlterTable, ColumnTypeChange, CreateIndex, SqlMigrationStep, TableChange},
     SqlMigration, SqlMigrationConnector,
 };
 use destructive_check_plan::DestructiveCheckPlan;
@@ -229,7 +229,7 @@ impl SqlMigrationConnector {
                         }
                     }
                 }
-                SqlMigrationStep::DropTable(DropTable { table_index }) => {
+                SqlMigrationStep::DropTable { table_index } => {
                     self.check_table_drop(
                         schemas.previous().table_walker_at(*table_index).name(),
                         &mut plan,

@@ -28,23 +28,37 @@ impl DatabaseMigrationMarker for SqlMigration {
     }
 }
 
-#[derive(Debug)]
+// The order of the variants matters for sorting.
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) enum SqlMigrationStep {
-    AddForeignKey(AddForeignKey),
-    CreateTable(CreateTable),
-    AlterTable(AlterTable),
-    DropForeignKey(DropForeignKey),
-    DropTable(DropTable),
-    RedefineIndex { table: Pair<usize>, index: Pair<usize> },
-    RedefineTables(Vec<RedefineTable>),
-    CreateIndex(CreateIndex),
-    DropIndex(DropIndex),
-    AlterIndex { table: Pair<usize>, index: Pair<usize> },
-    CreateEnum(CreateEnum),
-    DropEnum(DropEnum),
-    AlterEnum(AlterEnum),
     DropView(DropView),
     DropUserDefinedType(DropUserDefinedType),
+    CreateEnum(CreateEnum),
+    AlterEnum(AlterEnum),
+    DropForeignKey(DropForeignKey),
+    DropIndex(DropIndex),
+    AlterTable(AlterTable),
+    // Order matters: we must drop tables before we create indexes,
+    // because on Postgres and SQLite, we may create indexes whose names
+    // clash with the names of indexes on the dropped tables.
+    DropTable { table_index: usize },
+    // Order matters:
+    // - We must drop enums before we create tables, because the new tables
+    //   might be named the same as the dropped enum, and that conflicts on
+    //   postgres.
+    // - We must drop enums after we drop tables, or dropping the enum will
+    //   fail on postgres because objects (=tables) still depend on them.
+    DropEnum(DropEnum),
+    CreateTable(CreateTable),
+    RedefineTables(Vec<RedefineTable>),
+    // Order matters: we must create indexes after ALTER TABLEs because the indexes can be
+    // on fields that are dropped/created there.
+    CreateIndex(CreateIndex),
+    // Order matters: this needs to come after create_indexes, because the foreign keys can depend on unique
+    // indexes created there.
+    AddForeignKey(AddForeignKey),
+    AlterIndex { table: Pair<usize>, index: Pair<usize> },
+    RedefineIndex { table: Pair<usize>, index: Pair<usize> },
 }
 
 impl SqlMigrationStep {
@@ -69,7 +83,7 @@ impl SqlMigrationStep {
             SqlMigrationStep::AlterTable(_) => "AlterTable",
             SqlMigrationStep::RedefineIndex { .. } => "RedefineIndex",
             SqlMigrationStep::DropForeignKey(_) => "DropForeignKey",
-            SqlMigrationStep::DropTable(_) => "DropTable",
+            SqlMigrationStep::DropTable { .. } => "DropTable",
             SqlMigrationStep::RedefineTables { .. } => "RedefineTables",
             SqlMigrationStep::CreateIndex(_) => "CreateIndex",
             SqlMigrationStep::DropIndex(_) => "DropIndex",
@@ -88,19 +102,14 @@ pub(crate) struct CreateTable {
     pub table_index: usize,
 }
 
-#[derive(Debug)]
-pub(crate) struct DropTable {
-    pub table_index: usize,
-}
-
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) struct AlterTable {
     /// Index in (previous_schema, next_schema).
     pub table_index: Pair<usize>,
     pub changes: Vec<TableChange>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) enum TableChange {
     AddColumn(AddColumn),
     AlterColumn(AlterColumn),
@@ -133,7 +142,7 @@ impl TableChange {
     }
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) struct DropView {
     pub view_index: usize,
 }
@@ -144,7 +153,7 @@ impl DropView {
     }
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) struct DropUserDefinedType {
     pub udt_index: usize,
 }
@@ -155,31 +164,31 @@ impl DropUserDefinedType {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) struct AddColumn {
     pub column_index: usize,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) struct DropColumn {
     pub index: usize,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) struct AlterColumn {
     pub column_index: Pair<usize>,
     pub changes: ColumnChanges,
     pub type_change: Option<ColumnTypeChange>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) enum ColumnTypeChange {
     RiskyCast,
     SafeCast,
     NotCastable,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) struct AddForeignKey {
     /// The index of the table in the next schema.
     pub(crate) table_index: usize,
@@ -187,7 +196,7 @@ pub(crate) struct AddForeignKey {
     pub(crate) foreign_key_index: usize,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) struct DropForeignKey {
     pub table: String,
     pub table_index: usize,
@@ -202,23 +211,23 @@ pub(crate) struct CreateIndex {
     pub caused_by_create_table: bool,
 }
 
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub(crate) struct DropIndex {
     pub table_index: usize,
     pub index_index: usize,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) struct CreateEnum {
     pub enum_index: usize,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) struct DropEnum {
     pub enum_index: usize,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) struct AlterEnum {
     pub index: Pair<usize>,
     pub created_variants: Vec<String>,
@@ -237,7 +246,7 @@ impl AlterEnum {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) struct RedefineTable {
     pub added_columns: Vec<usize>,
     pub dropped_columns: Vec<usize>,

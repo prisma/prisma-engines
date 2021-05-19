@@ -367,13 +367,14 @@ impl SqlFlavour for MysqlFlavour {
     }
 }
 
-#[derive(BitFlags, Debug, Clone, Copy, PartialEq)]
+#[enumflags2::bitflags]
+#[derive(Debug, Clone, Copy, PartialEq)]
 #[repr(u8)]
 pub enum Circumstances {
-    LowerCasesTableNames = 1 << 0,
-    IsMysql56 = 1 << 1,
-    IsMariadb = 1 << 2,
-    IsVitess = 1 << 3,
+    LowerCasesTableNames,
+    IsMysql56,
+    IsMariadb,
+    IsVitess,
 }
 
 fn check_datamodel_for_mysql_5_6(datamodel: &Datamodel, errors: &mut Vec<String>) {

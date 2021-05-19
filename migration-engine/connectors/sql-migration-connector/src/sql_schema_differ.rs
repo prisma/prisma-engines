@@ -13,7 +13,7 @@ use crate::{
     pair::Pair,
     sql_migration::{
         self, AddColumn, AddForeignKey, AlterColumn, AlterEnum, AlterTable, CreateIndex, CreateTable, DropColumn,
-        DropForeignKey, DropIndex, DropTable, RedefineTable, SqlMigrationStep, TableChange,
+        DropForeignKey, DropIndex, RedefineTable, SqlMigrationStep, TableChange,
     },
     SqlFlavour, SqlSchema,
 };
@@ -29,8 +29,7 @@ use table::TableDiffer;
 pub(crate) fn calculate_steps(schemas: Pair<&SqlSchema>, flavour: &dyn SqlFlavour) -> Vec<SqlMigrationStep> {
     let db = DifferDatabase::new(schemas, flavour);
     let differ = SqlSchemaDiffer { schemas, flavour, db };
-    let mut create_tables: Vec<CreateTable> = differ.create_tables().collect();
-    create_tables.sort();
+    let mut steps: Vec<SqlMigrationStep> = differ.create_tables().map(SqlMigrationStep::CreateTable).collect();
 
     let tables_to_redefine = differ.flavour.tables_to_redefine(&differ);
     let mut alter_indexes = differ.alter_indexes(&tables_to_redefine);
@@ -61,48 +60,41 @@ pub(crate) fn calculate_steps(schemas: Pair<&SqlSchema>, flavour: &dyn SqlFlavou
         .filter(|tables| !tables.is_empty())
         .map(SqlMigrationStep::RedefineTables);
 
-    create_indexes.sort();
+    steps.extend(
+        flavour
+            .create_enums(&differ)
+            .into_iter()
+            .map(SqlMigrationStep::CreateEnum)
+            .chain(alter_enums.into_iter().map(SqlMigrationStep::AlterEnum))
+            .chain(drop_foreign_keys.into_iter().map(SqlMigrationStep::DropForeignKey))
+            .chain(drop_indexes.into_iter().map(SqlMigrationStep::DropIndex))
+            .chain(alter_tables.into_iter().map(SqlMigrationStep::AlterTable))
+            .chain(
+                drop_tables
+                    .into_iter()
+                    .map(|table_index| SqlMigrationStep::DropTable { table_index }),
+            )
+            .chain(flavour.drop_enums(&differ).into_iter().map(SqlMigrationStep::DropEnum))
+            .chain(redefine_tables)
+            .chain(create_indexes.into_iter().map(SqlMigrationStep::CreateIndex))
+            .chain(add_foreign_keys.into_iter().map(SqlMigrationStep::AddForeignKey))
+            .chain(alter_indexes.into_iter().map(|idxs| SqlMigrationStep::AlterIndex {
+                table: idxs.as_ref().map(|(table, _)| *table),
+                index: idxs.as_ref().map(|(_, idx)| *idx),
+            }))
+            .chain(
+                redefine_indexes
+                    .into_iter()
+                    .map(|idxs| SqlMigrationStep::RedefineIndex {
+                        table: idxs.as_ref().map(|(table, _)| *table),
+                        index: idxs.as_ref().map(|(_, idx)| *idx),
+                    }),
+            ),
+    );
 
-    flavour
-        .create_enums(&differ)
-        .into_iter()
-        .map(SqlMigrationStep::CreateEnum)
-        .chain(alter_enums.into_iter().map(SqlMigrationStep::AlterEnum))
-        .chain(drop_foreign_keys.into_iter().map(SqlMigrationStep::DropForeignKey))
-        .chain(drop_indexes.into_iter().map(SqlMigrationStep::DropIndex))
-        .chain(alter_tables.into_iter().map(SqlMigrationStep::AlterTable))
-        // Order matters: we must drop tables before we create indexes,
-        // because on Postgres and SQLite, we may create indexes whose names
-        // clash with the names of indexes on the dropped tables.
-        .chain(drop_tables.into_iter().map(SqlMigrationStep::DropTable))
-        // Order matters:
-        // - We must drop enums before we create tables, because the new tables
-        //   might be named the same as the dropped enum, and that conflicts on
-        //   postgres.
-        // - We must drop enums after we drop tables, or dropping the enum will
-        //   fail on postgres because objects (=tables) still depend on them.
-        .chain(flavour.drop_enums(&differ).into_iter().map(SqlMigrationStep::DropEnum))
-        .chain(create_tables.into_iter().map(SqlMigrationStep::CreateTable))
-        .chain(redefine_tables)
-        // Order matters: we must create indexes after ALTER TABLEs because the indexes can be
-        // on fields that are dropped/created there.
-        .chain(create_indexes.into_iter().map(SqlMigrationStep::CreateIndex))
-        // Order matters: this needs to come after create_indexes, because the foreign keys can depend on unique
-        // indexes created there.
-        .chain(add_foreign_keys.into_iter().map(SqlMigrationStep::AddForeignKey))
-        .chain(alter_indexes.into_iter().map(|idxs| SqlMigrationStep::AlterIndex {
-            table: idxs.as_ref().map(|(table, _)| *table),
-            index: idxs.as_ref().map(|(_, idx)| *idx),
-        }))
-        .chain(
-            redefine_indexes
-                .into_iter()
-                .map(|idxs| SqlMigrationStep::RedefineIndex {
-                    table: idxs.as_ref().map(|(table, _)| *table),
-                    index: idxs.as_ref().map(|(_, idx)| *idx),
-                }),
-        )
-        .collect()
+    steps.sort();
+
+    steps
 }
 
 pub(crate) struct SqlSchemaDiffer<'a> {
@@ -120,7 +112,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
 
     // We drop the foreign keys of dropped tables first, so we can drop tables in whatever order we
     // please later.
-    fn drop_tables(&self) -> (Vec<DropTable>, Vec<DropForeignKey>) {
+    fn drop_tables(&self) -> (Vec<usize>, Vec<DropForeignKey>) {
         let (dropped_tables_count, dropped_fks_count) = self.dropped_tables().fold((0, 0), |(tables, fks), item| {
             (tables + 1, fks + item.foreign_key_count())
         });
@@ -129,9 +121,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         let mut dropped_foreign_keys = Vec::with_capacity(dropped_fks_count);
 
         for dropped_table in self.dropped_tables() {
-            dropped_tables.push(DropTable {
-                table_index: dropped_table.table_index(),
-            });
+            dropped_tables.push(dropped_table.table_index());
 
             for (fk, fk_name) in dropped_table
                 .foreign_keys()

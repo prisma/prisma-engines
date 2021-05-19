@@ -1,6 +1,6 @@
 use crate::{
     pair::Pair,
-    sql_migration::{CreateTable, DropTable, SqlMigration, SqlMigrationStep},
+    sql_migration::{CreateTable, SqlMigration, SqlMigrationStep},
     SqlFlavour, SqlMigrationConnector,
 };
 use migration_connector::{
@@ -146,7 +146,7 @@ fn render_raw_sql(
 
             vec![renderer.render_create_table(&table)]
         }
-        SqlMigrationStep::DropTable(DropTable { table_index }) => {
+        SqlMigrationStep::DropTable { table_index } => {
             renderer.render_drop_table(schemas.previous().table_walker_at(*table_index).name())
         }
         SqlMigrationStep::RedefineIndex { table, index } => {

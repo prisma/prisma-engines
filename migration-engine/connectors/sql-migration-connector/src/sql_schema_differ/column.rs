@@ -119,21 +119,34 @@ fn json_defaults_match(previous: &str, next: &str) -> bool {
         .unwrap_or(true)
 }
 
-#[derive(BitFlags, Debug, Clone, Copy, PartialEq)]
+#[enumflags2::bitflags]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 #[repr(u8)]
 pub(crate) enum ColumnChange {
-    Renaming = 0b0001,
-    Arity = 0b0010,
-    Default = 0b0100,
-    TypeChanged = 0b1000,
-    Sequence = 0b0010000,
+    Renaming,
+    Arity,
+    Default,
+    TypeChanged,
+    Sequence,
 }
 
 // This should be pub(crate), but SqlMigration is exported, so it has to be
 // public at the moment.
-#[derive(Debug, Clone, Copy, PartialEq, Default)]
+#[derive(Debug, Clone, PartialEq, Default, Eq)]
 pub struct ColumnChanges {
     changes: BitFlags<ColumnChange>,
+}
+
+impl PartialOrd for ColumnChanges {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        self.changes.bits().partial_cmp(&other.changes.bits())
+    }
+}
+
+impl Ord for ColumnChanges {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        self.changes.bits().cmp(&other.changes.bits())
+    }
 }
 
 impl ColumnChanges {
