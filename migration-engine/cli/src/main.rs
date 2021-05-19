@@ -3,9 +3,9 @@
 mod commands;
 mod logger;
 
+use crate::logger::log_error_and_exit;
 use migration_core::rpc_api;
 use structopt::StructOpt;
-use user_facing_errors::{common::SchemaParserError, UserFacingError};
 
 /// When no subcommand is specified, the migration engine will default to starting as a JSON-RPC
 /// server over stdio.
@@ -58,27 +58,31 @@ async fn main() {
 }
 
 pub fn set_panic_hook() {
-    let _original_hook = std::panic::take_hook();
+    std::panic::set_hook(Box::new(move |panic_info| {
+        let message = panic_info
+            .payload()
+            .downcast_ref::<&str>()
+            .copied()
+            .or_else(|| panic_info.payload().downcast_ref::<String>().map(|s| s.as_str()))
+            .unwrap_or("<unknown panic>");
 
-    std::panic::set_hook(Box::new(move |panic| {
-        let err = user_facing_errors::Error::new_in_panic_hook(&panic);
+        let location = panic_info
+            .location()
+            .map(|loc| loc.to_string())
+            .unwrap_or_else(|| "<unknown location>".to_owned());
 
-        if let Some(known_error) = err.as_known() {
-            tracing::error!(
-                is_panic = true,
-                error_code = known_error.error_code,
-                "{}",
-                known_error.message
-            );
-        } else {
-            tracing::error!(is_panic = true, "{}", err.message());
-        }
-
-        std::process::exit(255)
+        tracing::error!(
+            is_panic = true,
+            backtrace = ?backtrace::Backtrace::new(),
+            location = %location,
+            "[{}] {}",
+            location,
+            message
+        );
     }));
 }
 
-async fn start_engine(datamodel_location: &str) -> ! {
+async fn start_engine(datamodel_location: &str) {
     use std::io::Read as _;
 
     tracing::info!(git_hash = env!("GIT_HASH"), "Starting migration engine RPC server",);
@@ -91,18 +95,7 @@ async fn start_engine(datamodel_location: &str) -> ! {
         // Block the thread and handle IO in async until EOF.
         Ok(api) => json_rpc_stdio::run(&api).await.unwrap(),
         Err(err) => {
-            let user_facing_error = err.to_user_facing();
-            let exit_code =
-                if user_facing_error.as_known().map(|err| err.error_code) == Some(SchemaParserError::ERROR_CODE) {
-                    1
-                } else {
-                    250
-                };
-
-            serde_json::to_writer(std::io::stdout().lock(), &user_facing_error).expect("failed to write to stdout");
-            std::process::exit(exit_code)
+            log_error_and_exit(err);
         }
     }
-
-    std::process::exit(0);
 }

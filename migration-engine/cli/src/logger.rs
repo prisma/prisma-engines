@@ -1,8 +1,8 @@
+use migration_connector::ConnectorError;
 use tracing_error::ErrorLayer;
-use tracing_subscriber::prelude::*;
 
 pub(crate) fn init_logger() {
-    use tracing_subscriber::{EnvFilter, FmtSubscriber};
+    use tracing_subscriber::{prelude::*, EnvFilter, FmtSubscriber};
 
     let subscriber = FmtSubscriber::builder()
         .with_env_filter(EnvFilter::from_default_env())
@@ -15,4 +15,14 @@ pub(crate) fn init_logger() {
     tracing::subscriber::set_global_default(subscriber)
         .map_err(|err| eprintln!("Error initializing the global logger: {}", err))
         .ok();
+}
+
+pub(crate) fn log_error_and_exit(error: ConnectorError) -> ! {
+    tracing::error!(
+        is_panic = false,
+        error_code = error.error_code().unwrap_or(""),
+        message = %error,
+    );
+
+    std::process::exit(1)
 }
