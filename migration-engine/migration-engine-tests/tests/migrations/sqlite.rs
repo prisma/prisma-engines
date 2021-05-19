@@ -12,7 +12,7 @@ fn sqlite_must_recreate_indexes(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green().unwrap();
+    api.schema_push(dm1).send_sync().assert_green_bang();
 
     api.assert_schema()
         .assert_table("A", |table| {
@@ -28,7 +28,7 @@ fn sqlite_must_recreate_indexes(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send_sync().assert_green().unwrap();
+    api.schema_push(dm2).send_sync().assert_green_bang();
 
     api.assert_schema()
         .assert_table("A", |table| {
@@ -51,7 +51,7 @@ fn sqlite_must_recreate_multi_field_indexes(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green().unwrap();
+    api.schema_push(dm1).send_sync().assert_green_bang();
 
     api.assert_schema()
         .assert_table("A", |table| {
@@ -70,7 +70,7 @@ fn sqlite_must_recreate_multi_field_indexes(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send_sync().assert_green().unwrap();
+    api.schema_push(dm2).send_sync().assert_green_bang();
 
     api.assert_schema()
         .assert_table("A", |table| {
@@ -88,7 +88,7 @@ fn creating_a_model_with_a_non_autoincrement_id_column_is_idempotent(api: TestAp
         }
     "#;
 
-    api.schema_push(dm).send_sync().assert_green().unwrap();
+    api.schema_push(dm).send_sync().assert_green_bang();
     api.schema_push(dm)
         .send_sync()
         .assert_green()

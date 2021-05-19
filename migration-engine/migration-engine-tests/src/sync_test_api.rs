@@ -1,14 +1,15 @@
-use migration_connector::MigrationPersistence;
-use tempfile::TempDir;
 pub use test_macros::test_connector;
 pub use test_setup::{BitFlags, Capabilities, Tags};
 
 use crate::{
-    multi_engine_test_api::TestApi as RootTestApi, ApplyMigrations, CreateMigration, SchemaAssertion, SchemaPush,
+    multi_engine_test_api::TestApi as RootTestApi, ApplyMigrations, CreateMigration, DiagnoseMigrationHistory,
+    SchemaAssertion, SchemaPush,
 };
-use quaint::prelude::{Queryable, ResultSet};
+use migration_connector::MigrationPersistence;
+use quaint::prelude::{ConnectionInfo, Queryable, ResultSet};
 use sql_migration_connector::SqlMigrationConnector;
-use std::future::Future;
+use std::{borrow::Cow, future::Future};
+use tempfile::TempDir;
 use test_setup::TestApiArgs;
 
 pub struct TestApi {
@@ -34,6 +35,10 @@ impl TestApi {
         self.root.connection_string()
     }
 
+    pub fn connection_info(&self) -> &ConnectionInfo {
+        self.connector.quaint().connection_info()
+    }
+
     /// Plan a `createMigration` command
     pub fn create_migration<'a>(
         &'a self,
@@ -49,9 +54,18 @@ impl TestApi {
         self.root.create_migrations_directory()
     }
 
+    pub fn diagnose_migration_history<'a>(&'a self, migrations_directory: &'a TempDir) -> DiagnoseMigrationHistory<'a> {
+        DiagnoseMigrationHistory::new_sync(&self.connector, migrations_directory, &self.root.rt)
+    }
+
     /// Returns true only when testing on MSSQL.
     pub fn is_mssql(&self) -> bool {
         self.root.is_mssql()
+    }
+
+    /// Returns true only when testing on MariaDB.
+    pub fn is_mariadb(&self) -> bool {
+        self.root.is_mysql_mariadb()
     }
 
     /// Returns true only when testing on MySQL.
@@ -121,6 +135,14 @@ impl TestApi {
     /// Render a valid datasource block, including database URL.
     pub fn datasource_block(&self) -> String {
         self.root.args.datasource_block(self.root.args.database_url())
+    }
+
+    pub fn normalize_identifier<'a>(&self, identifier: &'a str) -> Cow<'a, str> {
+        if self.lower_cases_table_names() {
+            identifier.to_ascii_lowercase().into()
+        } else {
+            identifier.into()
+        }
     }
 
     /// Same as quaint::Queryable::query()

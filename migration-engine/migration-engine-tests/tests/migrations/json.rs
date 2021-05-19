@@ -1,10 +1,43 @@
-use migration_engine_tests::sql::*;
+use migration_engine_tests::sync_test_api::*;
 use prisma_value::PrismaValue;
-use quaint::prelude::SqlFamily;
 use sql_schema_describer::{ColumnTypeFamily, DefaultValue};
 
 #[test_connector(capabilities(Json), exclude(Mysql56))]
-async fn database_level_json_defaults_can_be_defined(api: &TestApi) -> TestResult {
+fn json_fields_can_be_created(api: TestApi) {
+    let dm = format!(
+        r#"
+            {}
+
+            model Test {{
+                id String @id @default(cuid())
+                javaScriptObjectNotation Json
+            }}
+        "#,
+        api.datasource_block()
+    );
+
+    api.schema_push(&dm).send_sync().assert_green_bang();
+
+    api.assert_schema().assert_table_bang("Test", |table| {
+        table.assert_column("javaScriptObjectNotation", |c| {
+            if api.is_mariadb() {
+                // JSON is an alias for LONGTEXT on MariaDB - https://mariadb.com/kb/en/json-data-type/
+                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::String)
+            } else {
+                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Json)
+            }
+        })
+    });
+
+    api.schema_push(&dm)
+        .send_sync()
+        .assert_green()
+        .unwrap()
+        .assert_no_steps();
+}
+
+#[test_connector(capabilities(Json), exclude(Mysql56))]
+fn database_level_json_defaults_can_be_defined(api: TestApi) {
     let dm = format!(
         r#"
             {datasource}
@@ -14,12 +47,12 @@ async fn database_level_json_defaults_can_be_defined(api: &TestApi) -> TestResul
                 favouriteThings Json @default("[\"sticks\",\"chimken\",100,  \"dog park\"]")
             }}
         "#,
-        datasource = api.datasource()
+        datasource = api.datasource_block()
     );
 
-    api.schema_push(&dm).send().await?.assert_green()?;
+    api.schema_push(&dm).send_sync().assert_green_bang();
 
-    api.assert_schema().await?.assert_table("Dog", |table| {
+    api.assert_schema().assert_table_bang("Dog", |table| {
         table.assert_column("favouriteThings", |column| {
             column
                 .assert_type_family(if api.is_mariadb() {
@@ -27,18 +60,18 @@ async fn database_level_json_defaults_can_be_defined(api: &TestApi) -> TestResul
                 } else {
                     ColumnTypeFamily::Json
                 })?
-                .assert_default(match api.sql_family() {
-                    SqlFamily::Postgres => Some(DefaultValue::value(PrismaValue::Json(
+                .assert_default(if api.is_postgres() {
+                    Some(DefaultValue::value(PrismaValue::Json(
                         "[\"sticks\", \"chimken\", 100, \"dog park\"]".into(),
-                    ))),
-                    SqlFamily::Mysql => None,
-                    _ => unreachable!(),
+                    )))
+                } else if api.is_mysql() {
+                    None
+                } else {
+                    unreachable!()
                 })
         })
-    })?;
+    });
 
     // Check that the migration is idempotent.
-    api.schema_push(&dm).send().await?.assert_green()?.assert_no_steps();
-
-    Ok(())
+    api.schema_push(&dm).send_sync().assert_green_bang().assert_no_steps();
 }

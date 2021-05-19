@@ -75,7 +75,8 @@ impl SqlIntrospectionConnector {
         Ok(db_metadate)
     }
 
-    async fn describe(&self) -> SqlIntrospectionResult<SqlSchema> {
+    /// Exported for tests
+    pub async fn describe(&self) -> SqlIntrospectionResult<SqlSchema> {
         Ok(self.describer.describe(self.connection_info.schema_name()).await?)
     }
 

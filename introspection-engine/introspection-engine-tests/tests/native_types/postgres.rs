@@ -36,7 +36,7 @@ const TYPES: &[(&str, &str)] = &[
     ("inet", "Inet"),
 ];
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(Cockroach))]
 async fn native_type_columns_feature_on(api: &TestApi) -> TestResult {
     let columns: Vec<String> = TYPES
         .iter()
@@ -100,7 +100,7 @@ async fn native_type_columns_feature_on(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(Cockroach))]
 async fn native_type_array_columns_feature_on(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {

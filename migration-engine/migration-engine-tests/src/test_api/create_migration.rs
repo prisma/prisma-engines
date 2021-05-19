@@ -120,12 +120,13 @@ impl<'a> CreateMigrationAssertion<'a> {
     }
 
     /// Assert that there is one migration with `name_matcher` contained in its name present in the migration directory.
-    pub fn assert_migration<F>(self, name_matcher: &str, assertions: F) -> AssertionResult<Self>
+    pub fn assert_migration<F>(self, name_matcher: &str, assertions: F) -> Self
     where
         F: for<'b> FnOnce(MigrationAssertion<'b>) -> AssertionResult<MigrationAssertion<'b>>,
     {
         let migration = std::fs::read_dir(self.migrations_directory.path())
-            .context("Reading migrations directory for named migration.")?
+            .context("Reading migrations directory for named migration.")
+            .unwrap()
             .find_map(|entry| {
                 let entry = entry.unwrap();
                 let name = entry.file_name();
@@ -142,15 +143,15 @@ impl<'a> CreateMigrationAssertion<'a> {
                 let path = migration.path();
                 let assertion = MigrationAssertion { path: path.as_ref() };
 
-                assertions(assertion)?;
+                assertions(assertion).unwrap();
             }
-            None => anyhow::bail!(
+            None => panic!(
                 "Assertion error. Could not find migration with name matching `{}`",
                 name_matcher
             ),
         }
 
-        Ok(self)
+        self
     }
 
     pub fn output(&self) -> &CreateMigrationOutput {

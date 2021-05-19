@@ -15,7 +15,7 @@ async fn metadata_for_mysql_should_work(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(Cockroach))]
 async fn metadata_for_postgres_should_work(api: &TestApi) -> TestResult {
     setup(&api.barrel(), api.schema_name()).await?;
 
@@ -23,6 +23,18 @@ async fn metadata_for_postgres_should_work(api: &TestApi) -> TestResult {
 
     assert_eq!(result.table_count, 3);
     assert_eq!(result.size_in_bytes, 40960);
+
+    Ok(())
+}
+
+#[test_connector(tags(Cockroach))]
+async fn metadata_for_cockroach_should_work(api: &TestApi) -> TestResult {
+    setup(&api.barrel(), api.schema_name()).await?;
+
+    let result = api.get_metadata().await?;
+
+    assert_eq!(result.table_count, 3);
+    assert_eq!(result.size_in_bytes, 0);
 
     Ok(())
 }

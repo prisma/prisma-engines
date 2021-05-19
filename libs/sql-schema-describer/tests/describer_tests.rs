@@ -200,7 +200,7 @@ fn composite_primary_keys_must_work(api: TestApi) {
         ),
     };
 
-    api.raw_cmd(&sql).unwrap();
+    api.raw_cmd(&sql);
 
     let schema = api.describe();
     let table = schema.get_table("User").expect("couldn't get User table");

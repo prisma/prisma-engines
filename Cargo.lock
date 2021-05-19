@@ -1243,16 +1243,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f7531096570974c3a9dcf9e4b8e1cede1ec26cf5046219fb3b9d897503b9be59"
 
 [[package]]
-name = "eyre"
-version = "0.6.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "221239d1d5ea86bf5d6f91c9d6bc3646ffe471b08ff9b0f91c44f115ac969d2b"
-dependencies = [
- "indenter",
- "once_cell",
-]
-
-[[package]]
 name = "fake-simd"
 version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1836,12 +1826,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "indenter"
-version = "0.3.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ce23b50ad8242c51a442f3ff322d56b02f08852c77e4c0b4d3fd684abc89c683"
-
-[[package]]
 name = "indexmap"
 version = "1.6.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1934,14 +1918,12 @@ dependencies = [
  "datamodel",
  "datamodel-connector",
  "enumflags2 0.6.4",
- "eyre",
  "indoc",
  "introspection-connector",
  "introspection-core",
  "migration-connector",
  "pretty_assertions",
  "quaint",
- "serde",
  "serde_json",
  "sql-datamodel-connector",
  "sql-introspection-connector",

@@ -36,7 +36,6 @@ async fn a_table_with_enums(api: &TestApi) -> TestResult {
         .await?;
 
     let color = if sql_family.is_mysql() { "Book_color" } else { "color" };
-
     let color2 = if sql_family.is_mysql() { "Book_color2" } else { "color2" };
 
     let dm = format!(
@@ -57,7 +56,7 @@ async fn a_table_with_enums(api: &TestApi) -> TestResult {
             white2
         }}
     "#,
-        color, color2
+        color, color2,
     );
 
     for _ in 0..4 {
@@ -107,7 +106,7 @@ async fn a_table_with_an_enum_default_value_that_is_an_empty_string(api: &TestAp
             EMPTY_ENUM_VALUE @map("")
         }}
     "#,
-        color
+        color,
     );
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);
@@ -167,7 +166,7 @@ async fn a_table_enums_should_return_alphabetically_even_when_in_different_order
             white2
         }}
     "#,
-        color2, color
+        color2, color,
     );
 
     for _ in 0..4 {
@@ -217,7 +216,7 @@ async fn a_table_with_enum_default_values(api: &TestApi) -> TestResult {
             white
         }}
     "#,
-        enum_name
+        enum_name,
     );
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);
@@ -247,7 +246,8 @@ async fn a_table_enums_array(api: &TestApi) -> TestResult {
         })
         .await?;
 
-    let dm = indoc! {r#"
+    let dm = indoc! {
+        r#"
         model Book {
             id      Int     @id @default(autoincrement())
             color   color[]
@@ -257,7 +257,8 @@ async fn a_table_enums_array(api: &TestApi) -> TestResult {
             black
             white
         }
-    "#};
+        "#,
+    };
 
     let result = api.introspect().await?;
 
@@ -311,7 +312,7 @@ async fn a_table_with_enum_default_values_that_look_like_booleans(api: &TestApi)
             rumor
         }}
     "#,
-        enum_name
+        enum_name,
     );
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);

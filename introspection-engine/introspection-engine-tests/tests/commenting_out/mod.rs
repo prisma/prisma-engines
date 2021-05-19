@@ -124,7 +124,7 @@ async fn a_table_without_required_uniques(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(exclude(Cockroach))] // there is no such thing on cockroach, you will get the rowid column
 async fn a_table_without_fully_required_compound_unique(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -204,7 +204,7 @@ async fn unsupported_type_keeps_its_usages(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(Cockroach))]
 async fn a_table_with_only_an_unsupported_id(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -313,7 +313,7 @@ async fn remapping_field_names_to_empty(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(Cockroach))]
 async fn dbgenerated_in_unsupported(api: &TestApi) -> TestResult {
     api.barrel()
         .execute_with_schema(
@@ -331,10 +331,10 @@ async fn dbgenerated_in_unsupported(api: &TestApi) -> TestResult {
 
     let dm = indoc! {r##"
         model Blog {
-          id            Int    @id @default(autoincrement())
-          number        Int?   @default(1)
-          bigger_number Int?   @default(dbgenerated("sqrt((4)::double precision)"))
-          point      Unsupported("point")? @default(dbgenerated("point((0)::double precision, (0)::double precision)"))
+          id                Int    @id @default(autoincrement())
+          number            Int?   @default(1)
+          bigger_number     Int?   @default(dbgenerated("sqrt((4)::double precision)"))
+          point             Unsupported("point")? @default(dbgenerated("point((0)::double precision, (0)::double precision)"))
         }
     "##};
 

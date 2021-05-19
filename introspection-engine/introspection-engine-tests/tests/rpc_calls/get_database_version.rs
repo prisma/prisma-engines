@@ -44,11 +44,20 @@ async fn database_version_for_mysql_8_should_work(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(Cockroach))]
 async fn database_version_for_postgres_should_work(api: &TestApi) -> TestResult {
     setup_empty(&api.barrel(), api.schema_name()).await?;
     let result = api.get_database_version().await?;
     assert_eq!(true, result.contains("PostgreSQL"));
+
+    Ok(())
+}
+
+#[test_connector(tags(Cockroach))]
+async fn database_version_for_cockroach_should_work(api: &TestApi) -> TestResult {
+    setup_empty(&api.barrel(), api.schema_name()).await?;
+    let result = api.get_database_version().await?;
+    assert_eq!(true, result.contains("CockroachDB"));
 
     Ok(())
 }

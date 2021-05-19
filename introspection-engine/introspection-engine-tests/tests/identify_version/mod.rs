@@ -85,7 +85,7 @@ async fn introspect_postgres_non_prisma(api: &TestApi) -> TestResult {
         .execute(|migration| {
             migration.create_table("Book", |t| {
                 t.add_column("id", types::primary());
-                t.inject_custom("location   point");
+                t.inject_custom("location   INT2");
             });
         })
         .await?;
@@ -122,7 +122,11 @@ async fn introspect_postgres_prisma_1(api: &TestApi) -> TestResult {
         })
         .await?;
 
-    assert_eq!(Version::Prisma1, api.introspect_version().await?);
+    if api.is_cockroach() {
+        assert_eq!(Version::NonPrisma, api.introspect_version().await?);
+    } else {
+        assert_eq!(Version::Prisma1, api.introspect_version().await?);
+    }
 
     Ok(())
 }
@@ -148,7 +152,11 @@ async fn introspect_postgres_prisma_1_1(api: &TestApi) -> TestResult {
         })
         .await?;
 
-    assert_eq!(Version::Prisma11, api.introspect_version().await?);
+    if api.is_cockroach() {
+        assert_eq!(Version::NonPrisma, api.introspect_version().await?);
+    } else {
+        assert_eq!(Version::Prisma11, api.introspect_version().await?);
+    }
 
     Ok(())
 }
@@ -176,7 +184,11 @@ async fn introspect_postgres_prisma2(api: &TestApi) -> TestResult {
         })
         .await?;
 
-    assert_eq!(Version::Prisma2, api.introspect_version().await?);
+    if api.is_cockroach() {
+        assert_eq!(Version::NonPrisma, api.introspect_version().await?);
+    } else {
+        assert_eq!(Version::Prisma2, api.introspect_version().await?);
+    }
 
     Ok(())
 }

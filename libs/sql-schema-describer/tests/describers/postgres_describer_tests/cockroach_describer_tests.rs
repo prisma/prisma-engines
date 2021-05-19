@@ -9,7 +9,7 @@ fn views_can_be_described(api: TestApi) {
         CREATE VIEW ab AS SELECT a_id FROM a UNION ALL SELECT b_id FROM b;
     "#;
 
-    api.raw_cmd(&full_sql).unwrap();
+    api.raw_cmd(&full_sql);
     let result = api.describe();
     let view = result.get_view("ab").expect("couldn't get ab view").to_owned();
 
@@ -22,6 +22,8 @@ fn views_can_be_described(api: TestApi) {
 #[test_connector(tags(Cockroach))]
 fn all_postgres_column_types_must_work(api: TestApi) {
     let migration = r#"
+        CREATE TYPE "mood" AS ENUM ('sad', 'ok', 'happy');
+
         CREATE TABLE "User" (
             array_bin_col BYTEA[],
             array_bool_col BOOLEAN[],
@@ -41,6 +43,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
             date_col DATE,
             date_time_col TIMESTAMP,
             double_col DOUBLE PRECISION,
+            enum_col mood,
             float_col FLOAT,
             int_col INT,
             numeric_col NUMERIC,
@@ -59,7 +62,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
         )
         "#;
 
-    api.raw_cmd(migration).unwrap();
+    api.raw_cmd(migration);
 
     api.describe().assert_table("User", |t| {
         t.assert_column("array_bin_col", |c| {
@@ -117,6 +120,10 @@ fn all_postgres_column_types_must_work(api: TestApi) {
         .assert_column("double_col", |c| {
             c.assert_full_data_type("float8")
                 .assert_column_type_family(ColumnTypeFamily::Float)
+        })
+        .assert_column("enum_col", |c| {
+            c.assert_full_data_type("mood")
+                .assert_column_type_family(ColumnTypeFamily::Enum("mood".into()))
         })
         .assert_column("float_col", |c| {
             c.assert_full_data_type("float8")

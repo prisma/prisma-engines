@@ -434,10 +434,10 @@ async fn mapped_enum_name(api: &TestApi) -> TestResult {
             black
             white
 
-            @@map("{}")
+            @@map("{enum_name}")
         }}
     "#,
-        enum_name
+        enum_name = enum_name,
     );
 
     let final_dm = format!(
@@ -455,10 +455,10 @@ async fn mapped_enum_name(api: &TestApi) -> TestResult {
             black
             white
 
-            @@map("{}")
+            @@map("{enum_name}")
         }}
     "#,
-        enum_name
+        enum_name = enum_name,
     );
 
     api.assert_eq_datamodels(&final_dm, &api.re_introspect(&input_dm).await?);
@@ -1304,21 +1304,25 @@ async fn updated_at(api: &TestApi) -> TestResult {
     };
     let input_dm = formatdoc! {r#"
         model User {{
-            id           Int       @id @default(autoincrement())
-            lastupdated  DateTime? @updatedAt {}
+            id           Int @id @default(autoincrement())
+            lastupdated  DateTime?  @updatedAt {native_datetime}
         }}
-    "#, native_datetime};
+        "#,
+        native_datetime = native_datetime,
+    };
 
     let final_dm = formatdoc! {r#"
         model User {{
-            id           Int       @id @default(autoincrement())
-            lastupdated  DateTime? @updatedAt {}
+            id           Int @id @default(autoincrement())
+            lastupdated  DateTime?  @updatedAt {}
         }}
 
         model Unrelated {{
             id               Int @id @default(autoincrement())
         }}
-    "#, native_datetime};
+        "#,
+        native_datetime = native_datetime,
+    };
 
     api.assert_eq_datamodels(&final_dm, &api.re_introspect(&input_dm).await?);
 

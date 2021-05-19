@@ -130,8 +130,9 @@ impl TestApi {
         }
     }
 
-    pub(crate) fn raw_cmd(&self, sql: &str) -> quaint::Result<()> {
-        self.rt.block_on(self.database.raw_cmd(sql))
+    #[track_caller]
+    pub(crate) fn raw_cmd(&self, sql: &str) {
+        self.rt.block_on(self.database.raw_cmd(sql)).unwrap()
     }
 
     pub(crate) fn sql_family(&self) -> SqlFamily {

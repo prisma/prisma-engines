@@ -3,7 +3,7 @@
 use crate::{migrations_directory::ReadMigrationScriptError, ListMigrationsError};
 use std::{
     error::Error as StdError,
-    fmt::{Display, Write},
+    fmt::{Debug, Display, Write},
     sync::Arc,
 };
 use tracing_error::SpanTrace;
@@ -12,7 +12,7 @@ use user_facing_errors::{
 };
 
 /// The general error reporting type for migration connectors.
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct ConnectorError(Box<ConnectorErrorImpl>);
 
 #[derive(Debug, Clone)]
@@ -25,6 +25,14 @@ struct ConnectorErrorImpl {
     source: Option<Arc<(dyn StdError + Send + Sync + 'static)>>,
     /// See the tracing-error docs.
     context: SpanTrace,
+}
+
+impl Debug for ConnectorError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        Debug::fmt(&self.0, f)?;
+        f.write_char('\n')?;
+        Display::fmt(self, f)
+    }
 }
 
 impl Display for ConnectorError {

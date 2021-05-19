@@ -46,8 +46,7 @@ fn udts_can_be_described(api: TestApi) {
     for r#type in types {
         api.block_on(test_setup::reset_mssql_schema(conn, db_name)).unwrap();
 
-        api.raw_cmd(&format!("CREATE TYPE {}.a FROM {}", db_name, r#type))
-            .unwrap();
+        api.raw_cmd(&format!("CREATE TYPE {}.a FROM {}", db_name, r#type));
 
         let result = api.describe();
         let udt = result
@@ -67,8 +66,8 @@ fn views_can_be_described(api: TestApi) {
 
     api.block_on(test_setup::reset_mssql_schema(conn, db_name)).unwrap();
 
-    api.raw_cmd(&format!("CREATE TABLE {}.a (a_id int)", db_name)).unwrap();
-    api.raw_cmd(&format!("CREATE TABLE {}.b (b_id int)", db_name)).unwrap();
+    api.raw_cmd(&format!("CREATE TABLE {}.a (a_id int)", db_name));
+    api.raw_cmd(&format!("CREATE TABLE {}.b (b_id int)", db_name));
 
     let create_view = format!(
         r#"
@@ -81,7 +80,7 @@ fn views_can_be_described(api: TestApi) {
         db_name
     );
 
-    api.raw_cmd(&create_view).unwrap();
+    api.raw_cmd(&create_view);
 
     let inspector = SqlSchemaDescriber::new(conn.clone());
     let result = api.block_on(inspector.describe(db_name)).unwrap();
@@ -98,7 +97,7 @@ fn procedures_can_be_described(api: TestApi) {
         api.db_name()
     );
 
-    api.raw_cmd(&sql).unwrap();
+    api.raw_cmd(&sql);
 
     let result = api.describe();
     let procedure = result.get_procedure("foo").unwrap();
@@ -143,7 +142,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
     });
 
     let full_sql = migration.make::<barrel::backend::MsSql>();
-    api.raw_cmd(&full_sql).unwrap();
+    api.raw_cmd(&full_sql);
     let result = api.describe();
     let mut table = result.get_table("User").expect("couldn't get User table").to_owned();
     // Ensure columns are sorted as expected when comparing
@@ -537,7 +536,7 @@ fn mssql_cross_schema_references_are_not_allowed(api: TestApi) {
         db_name, secondary
     );
 
-    api.raw_cmd(&sql).unwrap();
+    api.raw_cmd(&sql);
     let err = api.describe_error();
 
     assert_eq!(
@@ -564,7 +563,7 @@ fn mssql_foreign_key_on_delete_must_be_handled(api: TestApi) {
         api.db_name()
     );
 
-    api.raw_cmd(&sql).unwrap();
+    api.raw_cmd(&sql);
 
     let schema = api.describe();
     let mut table = schema.get_table("User").expect("get User table").to_owned();
@@ -649,7 +648,7 @@ fn mssql_multi_field_indexes_must_be_inferred(api: TestApi) {
     });
 
     let full_sql = migration.make::<barrel::backend::MsSql>();
-    api.raw_cmd(&full_sql).unwrap();
+    api.raw_cmd(&full_sql);
     let result = api.describe();
     let table = result.get_table("Employee").expect("couldn't get Employee table");
 
@@ -685,7 +684,7 @@ fn mssql_join_table_unique_indexes_must_be_inferred(api: TestApi) {
     });
 
     let full_sql = migration.make::<barrel::backend::MsSql>();
-    api.raw_cmd(&full_sql).unwrap();
+    api.raw_cmd(&full_sql);
     let result = api.describe();
     let table = result.get_table("CatToHuman").expect("couldn't get CatToHuman table");
 
