@@ -442,7 +442,7 @@ impl MysqlAlterColumn {
         };
 
         MysqlAlterColumn::Modify {
-            changes: *changes,
+            changes: changes.clone(),
             new_default,
         }
     }

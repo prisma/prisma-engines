@@ -1,7 +1,7 @@
 use super::{column::ColumnDiffer, ColumnTypeChange, SqlSchemaDiffer};
 use crate::{
     pair::Pair,
-    sql_migration::{AlterEnum, AlterTable, CreateEnum, CreateIndex, DropEnum, DropIndex},
+    sql_migration::{AlterEnum, AlterTable, CreateIndex, DropIndex, SqlMigrationStep},
 };
 use sql_schema_describer::walkers::IndexWalker;
 use std::collections::HashSet;
@@ -41,14 +41,10 @@ pub(crate) trait SqlSchemaDifferFlavour {
     }
 
     /// Return potential `CreateEnum` steps.
-    fn create_enums(&self, _differ: &SqlSchemaDiffer<'_>) -> Vec<CreateEnum> {
-        Vec::new()
-    }
+    fn create_enums(&self, _differ: &SqlSchemaDiffer<'_>, _steps: &mut Vec<SqlMigrationStep>) {}
 
     /// Return potential `DropEnum` steps.
-    fn drop_enums(&self, _differ: &SqlSchemaDiffer<'_>) -> Vec<DropEnum> {
-        Vec::new()
-    }
+    fn drop_enums(&self, _differ: &SqlSchemaDiffer<'_>, _steps: &mut Vec<SqlMigrationStep>) {}
 
     /// Returns whether the underlying database implicitly drops indexes on dropped (and potentially recreated) columns.
     fn indexes_should_be_recreated_after_column_drop(&self) -> bool {
