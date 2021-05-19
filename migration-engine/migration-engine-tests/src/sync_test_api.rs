@@ -1,5 +1,3 @@
-use migration_connector::MigrationPersistence;
-use tempfile::TempDir;
 pub use test_macros::test_connector;
 pub use test_setup::{BitFlags, Capabilities, Tags};
 
@@ -7,9 +5,11 @@ use crate::{
     multi_engine_test_api::TestApi as RootTestApi, ApplyMigrations, CreateMigration, DiagnoseMigrationHistory,
     SchemaAssertion, SchemaPush,
 };
-use quaint::prelude::{Queryable, ResultSet};
+use migration_connector::MigrationPersistence;
+use quaint::prelude::{ConnectionInfo, Queryable, ResultSet};
 use sql_migration_connector::SqlMigrationConnector;
 use std::{borrow::Cow, future::Future};
+use tempfile::TempDir;
 use test_setup::TestApiArgs;
 
 pub struct TestApi {
@@ -33,6 +33,10 @@ impl TestApi {
 
     pub fn connection_string(&self) -> &str {
         self.root.connection_string()
+    }
+
+    pub fn connection_info(&self) -> &ConnectionInfo {
+        self.connector.quaint().connection_info()
     }
 
     /// Plan a `createMigration` command

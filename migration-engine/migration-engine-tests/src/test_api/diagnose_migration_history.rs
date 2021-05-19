@@ -1,5 +1,6 @@
 use migration_core::{
-    commands::DiagnoseMigrationHistoryInput, commands::DiagnoseMigrationHistoryOutput, CoreResult, GenericApi,
+    commands::DiagnoseMigrationHistoryInput, commands::DiagnoseMigrationHistoryOutput, CoreError, CoreResult,
+    GenericApi,
 };
 use tempfile::TempDir;
 
@@ -56,6 +57,11 @@ impl<'a> DiagnoseMigrationHistory<'a> {
     #[track_caller]
     pub fn send_sync(self) -> DiagnoseMigrationHistoryAssertions<'a> {
         self.rt.unwrap().block_on(self.send()).unwrap()
+    }
+
+    #[track_caller]
+    pub fn send_unwrap_err(self) -> CoreError {
+        self.rt.unwrap().block_on(self.send()).unwrap_err()
     }
 }
 

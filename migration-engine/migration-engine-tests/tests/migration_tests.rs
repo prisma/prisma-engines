@@ -1,6 +1,5 @@
 mod apply_migrations;
 mod create_migration;
-mod diagnose_migration_history;
 mod errors;
 mod evaluate_data_loss;
 mod existing_data;
