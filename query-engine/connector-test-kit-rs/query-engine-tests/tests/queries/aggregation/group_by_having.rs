@@ -50,12 +50,12 @@ mod aggregation_group_by_having {
                   }) {
                     string
                     int
-                    count { _all }
-                    sum { int }
+                    _count { _all }
+                    _sum { int }
                   }
                 }"#
             ),
-            @r###"{"data":{"groupByTestModel":[{"string":"group1","int":5,"count":{"_all":1},"sum":{"int":5}},{"string":"group2","int":5,"count":{"_all":1},"sum":{"int":5}}]}}"###
+            @r###"{"data":{"groupByTestModel":[{"string":"group1","int":5,"_count":{"_all":1},"_sum":{"int":5}},{"string":"group2","int":5,"_count":{"_all":1},"_sum":{"int":5}}]}}"###
         );
 
         Ok(())
@@ -76,19 +76,19 @@ mod aggregation_group_by_having {
                 runner,
                 "query { groupByTestModel(by: [string], orderBy: { string: asc }, having: {
                     int: {
-                      count: {
+                      _count: {
                         equals: 2
                       }
                     }
                   }) {
                     string
-                    count {
+                    _count {
                       int
                     }
                   }
                 }"
             ),
-            @r###"{"data":{"groupByTestModel":[{"string":"group1","count":{"int":2}}]}}"###
+            @r###"{"data":{"groupByTestModel":[{"string":"group1","_count":{"int":2}}]}}"###
         );
 
         // Group 2 and 3 returned
@@ -97,19 +97,19 @@ mod aggregation_group_by_having {
                 runner,
                 "query { groupByTestModel(by: [string], orderBy: { string: asc }, having: {
                     int: {
-                      count: {
+                      _count: {
                         not: { equals: 2 }
                       }
                     }
                   }) {
                     string
-                    count {
+                    _count {
                       int
                     }
                   }
                 }"
             ),
-            @r###"{"data":{"groupByTestModel":[{"string":"group2","count":{"int":1}},{"string":"group3","count":{"int":0}}]}}"###
+            @r###"{"data":{"groupByTestModel":[{"string":"group2","_count":{"int":1}},{"string":"group3","_count":{"int":0}}]}}"###
         );
 
         // Group 1 and 3 returned
@@ -118,19 +118,19 @@ mod aggregation_group_by_having {
                 runner,
                 "query { groupByTestModel(by: [string], orderBy: { string: asc }, having: {
                     int: {
-                      count: {
+                      _count: {
                         in: [0, 2]
                       }
                     }
                   }) {
                     string
-                    count {
+                    _count {
                       int
                     }
                   }
                 }"
             ),
-            @r###"{"data":{"groupByTestModel":[{"string":"group1","count":{"int":2}},{"string":"group3","count":{"int":0}}]}}"###
+            @r###"{"data":{"groupByTestModel":[{"string":"group1","_count":{"int":2}},{"string":"group3","_count":{"int":0}}]}}"###
         );
 
         Ok(())
@@ -151,19 +151,19 @@ mod aggregation_group_by_having {
                 runner,
                 r#"query { groupByTestModel(by: [string], orderBy: { string: asc }, having: {
                     decimal: {
-                      avg: {
+                      _avg: {
                         equals: "8.0"
                       }
                     }
                   }) {
                     string
-                    avg {
+                    _avg {
                       decimal
                     }
                   }
                 }"#
             ),
-            @r###"{"data":{"groupByTestModel":[{"string":"group1","avg":{"decimal":"8"}}]}}"###
+            @r###"{"data":{"groupByTestModel":[{"string":"group1","_avg":{"decimal":"8"}}]}}"###
         );
 
         // Group 2 and 3 returned (3 is null)
@@ -172,18 +172,18 @@ mod aggregation_group_by_having {
                 runner,
                 r#"query { groupByTestModel(by: [string], orderBy: { string: asc }, having: {
                     OR: [
-                      { decimal: { avg: { not: { equals: "8.0" }}}},
-                      { decimal: { avg: { equals: null }}}
+                      { decimal: { _avg: { not: { equals: "8.0" }}}},
+                      { decimal: { _avg: { equals: null }}}
                     ]}
                   ) {
                       string
-                      avg {
+                      _avg {
                         decimal
                       }
                     }
                 }"#
             ),
-            @r###"{"data":{"groupByTestModel":[{"string":"group2","avg":{"decimal":"5"}},{"string":"group3","avg":{"decimal":null}}]}}"###
+            @r###"{"data":{"groupByTestModel":[{"string":"group2","_avg":{"decimal":"5"}},{"string":"group3","_avg":{"decimal":null}}]}}"###
         );
 
         // Group 1 and 3 returned
@@ -192,19 +192,19 @@ mod aggregation_group_by_having {
                 runner,
                 r#"query { groupByTestModel(by: [string], orderBy: { string: asc }, having: {
                     decimal: {
-                      avg: {
+                      _avg: {
                         in: ["8", "5"]
                       }
                     }
                   }) {
                     string
-                    avg {
+                    _avg {
                       decimal
                     }
                   }
                 }"#
             ),
-            @r###"{"data":{"groupByTestModel":[{"string":"group1","avg":{"decimal":"8"}},{"string":"group2","avg":{"decimal":"5"}}]}}"###
+            @r###"{"data":{"groupByTestModel":[{"string":"group1","_avg":{"decimal":"8"}},{"string":"group2","_avg":{"decimal":"5"}}]}}"###
         );
 
         Ok(())
@@ -228,12 +228,12 @@ mod aggregation_group_by_having {
             run_query!(
                 runner,
                 r#"{ groupByTestModel(by: [string], orderBy: { string: asc }, having: {
-                    float: { sum: { equals: 16 }}
-                    int: { sum: { equals: 16 }}
-                    decimal: { sum: { equals: "16" }}
+                    float: { _sum: { equals: 16 }}
+                    int: { _sum: { equals: 16 }}
+                    decimal: { _sum: { equals: "16" }}
                   }) {
                     string
-                    sum {
+                    _sum {
                       float
                       int
                       decimal
@@ -241,7 +241,7 @@ mod aggregation_group_by_having {
                   }
                 }"#
             ),
-            @r###"{"data":{"groupByTestModel":[{"string":"group1","sum":{"float":16.0,"int":16,"decimal":"16"}}]}}"###
+            @r###"{"data":{"groupByTestModel":[{"string":"group1","_sum":{"float":16.0,"int":16,"decimal":"16"}}]}}"###
         );
 
         // Group 2 (3 is null)
@@ -249,12 +249,12 @@ mod aggregation_group_by_having {
             run_query!(
                 runner,
                 r#"query { groupByTestModel(by: [string], orderBy: { string: asc }, having: {
-                    float: { sum: { not: { equals: 16 }}}
-                    int: { sum: { not: { equals: 16 }}}
-                    decimal: { sum: { not: { equals: "16" }}}
+                    float: { _sum: { not: { equals: 16 }}}
+                    int: { _sum: { not: { equals: 16 }}}
+                    decimal: { _sum: { not: { equals: "16" }}}
                   }) {
                     string
-                    sum {
+                    _sum {
                       float
                       int
                       decimal
@@ -262,7 +262,7 @@ mod aggregation_group_by_having {
                   }
                 }"#
             ),
-            @r###"{"data":{"groupByTestModel":[{"string":"group2","sum":{"float":5.0,"int":5,"decimal":"5"}}]}}"###
+            @r###"{"data":{"groupByTestModel":[{"string":"group2","_sum":{"float":5.0,"int":5,"decimal":"5"}}]}}"###
         );
 
         // Group 1 and 2 returned
@@ -270,12 +270,12 @@ mod aggregation_group_by_having {
             run_query!(
                 runner,
                 r#"query { groupByTestModel(by: [string], orderBy: { string: asc }, having: {
-                    float: { sum: { in: [16, 5] }}
-                    int: { sum: { in: [16, 5] }}
-                    decimal: { sum: { in: ["16", "5"] }}
+                    float: { _sum: { in: [16, 5] }}
+                    int: { _sum: { in: [16, 5] }}
+                    decimal: { _sum: { in: ["16", "5"] }}
                   }) {
                     string
-                    sum {
+                    _sum {
                       float
                       int
                       decimal
@@ -283,7 +283,7 @@ mod aggregation_group_by_having {
                   }
                 }"#
             ),
-            @r###"{"data":{"groupByTestModel":[{"string":"group1","sum":{"float":16.0,"int":16,"decimal":"16"}},{"string":"group2","sum":{"float":5.0,"int":5,"decimal":"5"}}]}}"###
+            @r###"{"data":{"groupByTestModel":[{"string":"group1","_sum":{"float":16.0,"int":16,"decimal":"16"}},{"string":"group2","_sum":{"float":5.0,"int":5,"decimal":"5"}}]}}"###
         );
 
         Ok(())
@@ -307,12 +307,12 @@ mod aggregation_group_by_having {
             run_query!(
                 runner,
                 r#"query { groupByTestModel(by: [string], orderBy: { string: asc }, having: {
-                    float: { min: { equals: 0 }}
-                    int: { min: { equals: 0 }}
-                    decimal: { min: { equals: "0" }}
+                    float: { _min: { equals: 0 }}
+                    int: { _min: { equals: 0 }}
+                    decimal: { _min: { equals: "0" }}
                   }) {
                     string
-                    min {
+                    _min {
                       float
                       int
                       decimal
@@ -320,7 +320,7 @@ mod aggregation_group_by_having {
                   }
                 }"#
             ),
-            @r###"{"data":{"groupByTestModel":[{"string":"group1","min":{"float":0.0,"int":0,"decimal":"0"}},{"string":"group2","min":{"float":0.0,"int":0,"decimal":"0"}}]}}"###
+            @r###"{"data":{"groupByTestModel":[{"string":"group1","_min":{"float":0.0,"int":0,"decimal":"0"}},{"string":"group2","_min":{"float":0.0,"int":0,"decimal":"0"}}]}}"###
         );
 
         // Empty
@@ -328,12 +328,12 @@ mod aggregation_group_by_having {
             run_query!(
                 runner,
                 r#"query { groupByTestModel(by: [string], orderBy: { string: asc }, having: {
-                    float: { min: { not: { equals: 0 }}}
-                    int: { min: { not: { equals: 0 }}}
-                    decimal: { min: { not: { equals: "0" }}}
+                    float: { _min: { not: { equals: 0 }}}
+                    int: { _min: { not: { equals: 0 }}}
+                    decimal: { _min: { not: { equals: "0" }}}
                   }) {
                     string
-                    min {
+                    _min {
                       float
                       int
                       decimal
@@ -349,12 +349,12 @@ mod aggregation_group_by_having {
             run_query!(
                 runner,
                 r#"query { groupByTestModel(by: [string], orderBy: { string: asc }, having: {
-                    float: { min: { in: [0] }}
-                    int: { min: { in: [0] }}
-                    decimal: { min: { in: ["0"] }}
+                    float: { _min: { in: [0] }}
+                    int: { _min: { in: [0] }}
+                    decimal: { _min: { in: ["0"] }}
                   }) {
                     string
-                    min {
+                    _min {
                       float
                       int
                       decimal
@@ -362,7 +362,7 @@ mod aggregation_group_by_having {
                   }
                 }"#
             ),
-            @r###"{"data":{"groupByTestModel":[{"string":"group1","min":{"float":0.0,"int":0,"decimal":"0"}},{"string":"group2","min":{"float":0.0,"int":0,"decimal":"0"}}]}}"###
+            @r###"{"data":{"groupByTestModel":[{"string":"group1","_min":{"float":0.0,"int":0,"decimal":"0"}},{"string":"group2","_min":{"float":0.0,"int":0,"decimal":"0"}}]}}"###
         );
 
         Ok(())
@@ -390,12 +390,12 @@ mod aggregation_group_by_having {
             run_query!(
                 runner,
                 r#"query { groupByTestModel(by: [string], orderBy: { string: asc }, having: {
-                    float: { max: { equals: 10 }}
-                    int: { max: { equals: 10 }}
-                    decimal: { max: { equals: "10" }}
+                    float: { _max: { equals: 10 }}
+                    int: { _max: { equals: 10 }}
+                    decimal: { _max: { equals: "10" }}
                   }) {
                     string
-                    max {
+                    _max {
                       float
                       int
                       decimal
@@ -403,7 +403,7 @@ mod aggregation_group_by_having {
                   }
                 }"#
             ),
-            @r###"{"data":{"groupByTestModel":[{"string":"group1","max":{"float":10.0,"int":10,"decimal":"10"}},{"string":"group2","max":{"float":10.0,"int":10,"decimal":"10"}}]}}"###
+            @r###"{"data":{"groupByTestModel":[{"string":"group1","_max":{"float":10.0,"int":10,"decimal":"10"}},{"string":"group2","_max":{"float":10.0,"int":10,"decimal":"10"}}]}}"###
         );
 
         // Empty
@@ -411,12 +411,12 @@ mod aggregation_group_by_having {
             run_query!(
                 runner,
                 r#"query { groupByTestModel(by: [string], orderBy: { string: asc }, having: {
-                    float: { max: { not: { equals: 10 }}}
-                    int: { max: { not: { equals: 10 }}}
-                    decimal: { max: { not: { equals: "10" }}}
+                    float: { _max: { not: { equals: 10 }}}
+                    int: { _max: { not: { equals: 10 }}}
+                    decimal: { _max: { not: { equals: "10" }}}
                   }) {
                     string
-                    max {
+                    _max {
                       float
                       int
                       decimal
@@ -432,12 +432,12 @@ mod aggregation_group_by_having {
             run_query!(
                 runner,
                 r#"query { groupByTestModel(by: [string], orderBy: { string: asc }, having: {
-                    float: { max: { in: [10] }}
-                    int: { max: { in: [10] }}
-                    decimal: { max: { in: ["10"] }}
+                    float: { _max: { in: [10] }}
+                    int: { _max: { in: [10] }}
+                    decimal: { _max: { in: ["10"] }}
                   }) {
                     string
-                    max {
+                    _max {
                       float
                       int
                       decimal
@@ -445,7 +445,7 @@ mod aggregation_group_by_having {
                   }
                 }"#
             ),
-            @r###"{"data":{"groupByTestModel":[{"string":"group1","max":{"float":10.0,"int":10,"decimal":"10"}},{"string":"group2","max":{"float":10.0,"int":10,"decimal":"10"}}]}}"###
+            @r###"{"data":{"groupByTestModel":[{"string":"group1","_max":{"float":10.0,"int":10,"decimal":"10"}},{"string":"group2","_max":{"float":10.0,"int":10,"decimal":"10"}}]}}"###
         );
 
         Ok(())
@@ -458,7 +458,7 @@ mod aggregation_group_by_having {
         assert_error!(
             runner,
             "query { groupByTestModel(by: [string], having: { int: { gt: 3 } }) {
-                sum {
+                _sum {
                   int
                 }
               }

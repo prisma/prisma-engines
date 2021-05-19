@@ -10,9 +10,9 @@ mod aggregation_group_by {
                 runner,
                 "{
                     groupByA(by: [id, float, int]) {
-                      count { id }
+                      _count { id }
                       float
-                      sum { int }
+                      _sum { int }
                     }
                   }"
             ),
@@ -48,9 +48,9 @@ mod aggregation_group_by {
         insta::assert_snapshot!(
             run_query!(
                 runner,
-                "{ groupByA(by: [string], orderBy: { string: asc }) { string count { string } sum { float } } }"
+                "{ groupByA(by: [string], orderBy: { string: asc }) { string _count { string } _sum { float } } }"
             ),
-            @r###"{"data":{"groupByA":[{"string":"group1","count":{"string":2},"sum":{"float":15.6}},{"string":"group2","count":{"string":1},"sum":{"float":10.0}},{"string":"group3","count":{"string":1},"sum":{"float":10.0}}]}}"###
+            @r###"{"data":{"groupByA":[{"string":"group1","_count":{"string":2},"_sum":{"float":15.6}},{"string":"group2","_count":{"string":1},"_sum":{"float":10.0}},{"string":"group3","_count":{"string":1},"_sum":{"float":10.0}}]}}"###
         );
 
         Ok(())
@@ -82,9 +82,9 @@ mod aggregation_group_by {
         insta::assert_snapshot!(
             run_query!(
                 runner,
-                "{ groupByA(by: [string], orderBy: { string: desc }) { string count { string } sum { float } } }"
+                "{ groupByA(by: [string], orderBy: { string: desc }) { string _count { string } _sum { float } } }"
             ),
-            @r###"{"data":{"groupByA":[{"string":"group3","count":{"string":1},"sum":{"float":10.0}},{"string":"group2","count":{"string":1},"sum":{"float":10.0}},{"string":"group1","count":{"string":2},"sum":{"float":15.6}}]}}"###
+            @r###"{"data":{"groupByA":[{"string":"group3","_count":{"string":1},"_sum":{"float":10.0}},{"string":"group2","_count":{"string":1},"_sum":{"float":10.0}},{"string":"group1","_count":{"string":2},"_sum":{"float":15.6}}]}}"###
         );
 
         Ok(())
@@ -124,13 +124,13 @@ mod aggregation_group_by {
                 "{
                     groupByA(by: [string, int], orderBy: [{ string: desc }, { int: asc }]) {
                       string
-                      count { string }
-                      sum { float }
-                      min { int }
+                      _count { string }
+                      _sum { float }
+                      _min { int }
                     }
                 }"
             ),
-            @r###"{"data":{"groupByA":[{"string":"group3","count":{"string":2},"sum":{"float":25.0},"min":{"int":5}},{"string":"group2","count":{"string":1},"sum":{"float":10.0},"min":{"int":5}},{"string":"group1","count":{"string":1},"sum":{"float":5.5},"min":{"int":0}},{"string":"group1","count":{"string":1},"sum":{"float":10.1},"min":{"int":5}}]}}"###
+            @r###"{"data":{"groupByA":[{"string":"group3","_count":{"string":2},"_sum":{"float":25.0},"_min":{"int":5}},{"string":"group2","_count":{"string":1},"_sum":{"float":10.0},"_min":{"int":5}},{"string":"group1","_count":{"string":1},"_sum":{"float":5.5},"_min":{"int":0}},{"string":"group1","_count":{"string":1},"_sum":{"float":10.1},"_min":{"int":5}}]}}"###
         );
 
         Ok(())
@@ -165,15 +165,15 @@ mod aggregation_group_by {
                 "{
                     groupByA(by: [string, int], orderBy: { string: desc }, take: 1, skip: 1) {
                       string
-                      count { string }
-                      sum { float }
-                      min { int }
+                      _count { string }
+                      _sum { float }
+                      _min { int }
                     }
                   }"
             ),
             // group3 is the first one with 2, then group2 with one, then group1 with 1.
             // group2 is returned, because group3 is skipped.
-            @r###"{"data":{"groupByA":[{"string":"group2","count":{"string":1},"sum":{"float":10.0},"min":{"int":5}}]}}"###
+            @r###"{"data":{"groupByA":[{"string":"group2","_count":{"string":1},"_sum":{"float":10.0},"_min":{"int":5}}]}}"###
         );
 
         insta::assert_snapshot!(
@@ -182,15 +182,15 @@ mod aggregation_group_by {
                 "{
                     groupByA(by: [string, int], orderBy: { string: desc }, take: -1, skip: 2) {
                       string
-                      count { string }
-                      sum { float }
-                      min { int }
+                      _count { string }
+                      _sum { float }
+                      _min { int }
                     }
                   }"
             ),
             // group3 is the first one with 2, then group2 with one, then group1 with 1.
             // group3 is returned, because group1 and 2 is skipped (reverse order due to negative take).
-            @r###"{"data":{"groupByA":[{"string":"group3","count":{"string":2},"sum":{"float":25.0},"min":{"int":5}}]}}"###
+            @r###"{"data":{"groupByA":[{"string":"group3","_count":{"string":2},"_sum":{"float":25.0},"_min":{"int":5}}]}}"###
         );
 
         insta::assert_snapshot!(
@@ -199,15 +199,15 @@ mod aggregation_group_by {
                 "{
                     groupByA(by: [string, int], orderBy: { string: desc }, take: 2, skip: 1) {
                       string
-                      count { string }
-                      sum { float }
-                      min { int }
+                      _count { string }
+                      _sum { float }
+                      _min { int }
                     }
                   }"
             ),
             // group3 is the first one with 2, then group2 with one, then group1 with 1.
             // group2 & 1 are returned, because group3 is skipped.
-            @r###"{"data":{"groupByA":[{"string":"group2","count":{"string":1},"sum":{"float":10.0},"min":{"int":5}},{"string":"group1","count":{"string":1},"sum":{"float":10.1},"min":{"int":5}}]}}"###
+            @r###"{"data":{"groupByA":[{"string":"group2","_count":{"string":1},"_sum":{"float":10.0},"_min":{"int":5}},{"string":"group1","_count":{"string":1},"_sum":{"float":10.1},"_min":{"int":5}}]}}"###
         );
 
         Ok(())
@@ -252,9 +252,9 @@ mod aggregation_group_by {
                       float: { lt: 15 }
                     }) {
                       string
-                      count { string }
-                      sum { float }
-                      min { int }
+                      _count { string }
+                      _sum { float }
+                      _min { int }
                     }
                   }"
             ),
@@ -262,7 +262,7 @@ mod aggregation_group_by {
             // Group2 has id 3.
             // Group1 id 1, id 2 is filtered.
             // => All groups have count 1
-            @r###"{"data":{"groupByA":[{"string":"group3","count":{"string":1},"sum":{"float":10.0},"min":{"int":5}},{"string":"group2","count":{"string":1},"sum":{"float":10.0},"min":{"int":5}},{"string":"group1","count":{"string":1},"sum":{"float":10.1},"min":{"int":5}}]}}"###
+            @r###"{"data":{"groupByA":[{"string":"group3","_count":{"string":1},"_sum":{"float":10.0},"_min":{"int":5}},{"string":"group2","_count":{"string":1},"_sum":{"float":10.0},"_min":{"int":5}},{"string":"group1","_count":{"string":1},"_sum":{"float":10.1},"_min":{"int":5}}]}}"###
         );
 
         Ok(())
@@ -304,16 +304,16 @@ mod aggregation_group_by {
                       b: { isNot: null }
                     }) {
                       string
-                      count { string }
-                      sum { float }
-                      min { int }
+                      _count { string }
+                      _sum { float }
+                      _min { int }
                     }
                   }"
             ),
             // Group3 has 2
             // Group2 has 0
             // Group1 has 1
-            @r###"{"data":{"groupByA":[{"string":"group3","count":{"string":2},"sum":{"float":25.0},"min":{"int":5}},{"string":"group1","count":{"string":1},"sum":{"float":10.1},"min":{"int":5}}]}}"###
+            @r###"{"data":{"groupByA":[{"string":"group3","_count":{"string":2},"_sum":{"float":25.0},"_min":{"int":5}},{"string":"group1","_count":{"string":1},"_sum":{"float":10.1},"_min":{"int":5}}]}}"###
         );
 
         insta::assert_snapshot!(
@@ -324,16 +324,16 @@ mod aggregation_group_by {
                       b: { is: { field: { equals: "b" }}}
                     }) {
                       string
-                      count { string }
-                      sum { float }
-                      min { int }
+                      _count { string }
+                      _sum { float }
+                      _min { int }
                     }
                   }"#
             ),
             // Group3 has 2 matches
             // Group2 has 0 matches
             // Group1 has 0 matches
-            @r###"{"data":{"groupByA":[{"string":"group3","count":{"string":2},"sum":{"float":25.0},"min":{"int":5}}]}}"###
+            @r###"{"data":{"groupByA":[{"string":"group3","_count":{"string":2},"_sum":{"float":25.0},"_min":{"int":5}}]}}"###
         );
 
         Ok(())
@@ -368,13 +368,13 @@ mod aggregation_group_by {
                 "{
                     groupByA(by: [float], orderBy: { _count: { float: asc } }) {
                       float
-                      count {
+                      _count {
                         float
                       }
                     }
                   }"
             ),
-            @r###"{"data":{"groupByA":[{"float":4.0,"count":{"float":1}},{"float":1.1,"count":{"float":3}}]}}"###
+            @r###"{"data":{"groupByA":[{"float":4.0,"_count":{"float":1}},{"float":1.1,"_count":{"float":3}}]}}"###
         );
 
         insta::assert_snapshot!(
@@ -383,13 +383,13 @@ mod aggregation_group_by {
                 "{
                     groupByA(by: [float], orderBy: { _count: { float: desc } }) {
                       float
-                      count {
+                      _count {
                         float
                       }
                     }
                   }"
             ),
-            @r###"{"data":{"groupByA":[{"float":1.1,"count":{"float":3}},{"float":4.0,"count":{"float":1}}]}}"###
+            @r###"{"data":{"groupByA":[{"float":1.1,"_count":{"float":3}},{"float":4.0,"_count":{"float":1}}]}}"###
         );
 
         Ok(())
@@ -424,13 +424,13 @@ mod aggregation_group_by {
                 "{
                     groupByA(by: [float], orderBy: { _sum: { float: asc } }) {
                       float
-                      sum {
+                      _sum {
                         float
                       }
                     }
                   }"
             ),
-            @r###"{"data":{"groupByA":[{"float":1.1,"sum":{"float":3.3}},{"float":4.0,"sum":{"float":4.0}}]}}"###
+            @r###"{"data":{"groupByA":[{"float":1.1,"_sum":{"float":3.3}},{"float":4.0,"_sum":{"float":4.0}}]}}"###
         );
 
         insta::assert_snapshot!(
@@ -439,13 +439,13 @@ mod aggregation_group_by {
                 "{
                     groupByA(by: [float], orderBy: { _sum: { float: desc } }) {
                       float
-                      sum {
+                      _sum {
                         float
                       }
                     }
                   }"
             ),
-            @r###"{"data":{"groupByA":[{"float":4.0,"sum":{"float":4.0}},{"float":1.1,"sum":{"float":3.3}}]}}"###
+            @r###"{"data":{"groupByA":[{"float":4.0,"_sum":{"float":4.0}},{"float":1.1,"_sum":{"float":3.3}}]}}"###
         );
 
         Ok(())
@@ -480,13 +480,13 @@ mod aggregation_group_by {
                 "{
                     groupByA(by: [float], orderBy: { _avg: { float: asc } }) {
                       float
-                      avg {
+                      _avg {
                         float
                       }
                     }
                   }"
             ),
-            @r###"{"data":{"groupByA":[{"float":1.1,"avg":{"float":1.1}},{"float":4.0,"avg":{"float":4.0}}]}}"###
+            @r###"{"data":{"groupByA":[{"float":1.1,"_avg":{"float":1.1}},{"float":4.0,"_avg":{"float":4.0}}]}}"###
         );
 
         insta::assert_snapshot!(
@@ -495,13 +495,13 @@ mod aggregation_group_by {
                 "{
                     groupByA(by: [float], orderBy: { _avg: { float: desc } }) {
                       float
-                      avg {
+                      _avg {
                         float
                       }
                     }
                   }"
             ),
-            @r###"{"data":{"groupByA":[{"float":4.0,"avg":{"float":4.0}},{"float":1.1,"avg":{"float":1.1}}]}}"###
+            @r###"{"data":{"groupByA":[{"float":4.0,"_avg":{"float":4.0}},{"float":1.1,"_avg":{"float":1.1}}]}}"###
         );
 
         Ok(())
@@ -536,13 +536,13 @@ mod aggregation_group_by {
                 "{
                     groupByA(by: [float], orderBy: { _min: { float: asc } }) {
                       float
-                      min {
+                      _min {
                         float
                       }
                     }
                   }"
             ),
-            @r###"{"data":{"groupByA":[{"float":1.1,"min":{"float":1.1}},{"float":4.0,"min":{"float":4.0}}]}}"###
+            @r###"{"data":{"groupByA":[{"float":1.1,"_min":{"float":1.1}},{"float":4.0,"_min":{"float":4.0}}]}}"###
         );
 
         insta::assert_snapshot!(
@@ -551,13 +551,13 @@ mod aggregation_group_by {
                 "{
                     groupByA(by: [float], orderBy: { _min: { float: desc } }) {
                       float
-                      min {
+                      _min {
                         float
                       }
                     }
                   }"
             ),
-            @r###"{"data":{"groupByA":[{"float":4.0,"min":{"float":4.0}},{"float":1.1,"min":{"float":1.1}}]}}"###
+            @r###"{"data":{"groupByA":[{"float":4.0,"_min":{"float":4.0}},{"float":1.1,"_min":{"float":1.1}}]}}"###
         );
 
         Ok(())
@@ -592,13 +592,13 @@ mod aggregation_group_by {
                 "{
                     groupByA(by: [float], orderBy: { _max: { float: asc } }) {
                       float
-                      max {
+                      _max {
                         float
                       }
                     }
                   }"
             ),
-            @r###"{"data":{"groupByA":[{"float":1.1,"max":{"float":1.1}},{"float":4.0,"max":{"float":4.0}}]}}"###
+            @r###"{"data":{"groupByA":[{"float":1.1,"_max":{"float":1.1}},{"float":4.0,"_max":{"float":4.0}}]}}"###
         );
 
         insta::assert_snapshot!(
@@ -607,13 +607,13 @@ mod aggregation_group_by {
                 "{
                     groupByA(by: [float], orderBy: { _max: { float: desc } }) {
                       float
-                      max {
+                      _max {
                         float
                       }
                     }
                   }"
             ),
-            @r###"{"data":{"groupByA":[{"float":4.0,"max":{"float":4.0}},{"float":1.1,"max":{"float":1.1}}]}}"###
+            @r###"{"data":{"groupByA":[{"float":4.0,"_max":{"float":4.0}},{"float":1.1,"_max":{"float":1.1}}]}}"###
         );
 
         Ok(())
@@ -653,12 +653,12 @@ mod aggregation_group_by {
                 "{
                     groupByA(by: [float, int], orderBy: [{ _count: { float: desc } }, { _sum: { int: asc } }]) {
                       float
-                      count { float }
-                      sum { int }
+                      _count { float }
+                      _sum { int }
                     }
                   }"
             ),
-            @r###"{"data":{"groupByA":[{"float":1.1,"count":{"float":3},"sum":{"int":3}},{"float":3.0,"count":{"float":1},"sum":{"int":3}},{"float":4.0,"count":{"float":1},"sum":{"int":4}}]}}"###
+            @r###"{"data":{"groupByA":[{"float":1.1,"_count":{"float":3},"_sum":{"int":3}},{"float":3.0,"_count":{"float":1},"_sum":{"int":3}},{"float":4.0,"_count":{"float":1},"_sum":{"int":4}}]}}"###
         );
 
         Ok(())
@@ -698,12 +698,12 @@ mod aggregation_group_by {
                 "{
                     groupByA(by: [float, int], orderBy: [{ _count: { float: desc } }, { _sum: { int: asc } }], having: { float: { lt: 4 } }) {
                       float
-                      count { float }
-                      sum { int }
+                      _count { float }
+                      _sum { int }
                     }
                   }"
             ),
-            @r###"{"data":{"groupByA":[{"float":1.1,"count":{"float":3},"sum":{"int":3}},{"float":3.0,"count":{"float":1},"sum":{"int":3}}]}}"###
+            @r###"{"data":{"groupByA":[{"float":1.1,"_count":{"float":3},"_sum":{"int":3}},{"float":3.0,"_count":{"float":1},"_sum":{"int":3}}]}}"###
         );
 
         Ok(())
@@ -732,11 +732,11 @@ mod aggregation_group_by {
                 runner,
                 "{
                     groupByA(by: [float], orderBy: { _count: { float: desc } }) {
-                      sum { int }
+                      _sum { int }
                     }
                   }"
             ),
-            @r###"{"data":{"groupByA":[{"sum":{"int":3}}]}}"###
+            @r###"{"data":{"groupByA":[{"_sum":{"int":3}}]}}"###
         );
 
         Ok(())
@@ -760,7 +760,7 @@ mod aggregation_group_by {
     async fn group_by_mismatch_by_args_query_sel(runner: &Runner) -> TestResult<()> {
         assert_error!(
             runner,
-            "query { groupByA(by: [int]) { string count { string } sum { float } } }",
+            "query { groupByA(by: [int]) { string _count { string } _sum { float } } }",
             2019,
             "Every selected scalar field that is not part of an aggregation must be included in the by-arguments of the query. Missing fields: string"
         );
@@ -772,7 +772,7 @@ mod aggregation_group_by {
     async fn group_by_by_args_order_by(runner: &Runner) -> TestResult<()> {
         assert_error!(
             runner,
-            "query { groupByA(by: [int], orderBy: { string: desc }) { count { int } sum { float } } }",
+            "query { groupByA(by: [int], orderBy: { string: desc }) { _count { int } _sum { float } } }",
             2019,
             "Every field used for orderBy must be included in the by-arguments of the query. Missing fields: string"
         );
@@ -784,7 +784,7 @@ mod aggregation_group_by {
     async fn group_by_empty_aggregation_selection(runner: &Runner) -> TestResult<()> {
         assert_error!(
             runner,
-            "query { groupByA(by: [string]) { sum } }",
+            "query { groupByA(by: [string]) { _sum } }",
             2009,
             "Expected a minimum of 1 fields to be present, got 0."
         );
