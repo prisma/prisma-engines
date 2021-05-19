@@ -11,11 +11,13 @@ async fn mapped_model_name(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("_User", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("_User_pkey", types::primary_constraint(&["id"]));
             });
 
             migration.create_table("Unrelated", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("Unrelated_pkey", types::primary_constraint(&["id"]));
             });
         })
         .await?;
@@ -776,11 +778,13 @@ async fn multiple_changed_relation_names(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Employee", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("Employee_pkey", types::primary_constraint(&["id"]));
             });
 
             migration.create_table("Schedule", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("Schedule_pkey", types::primary_constraint(&["id"]));
                 t.add_column("morningEmployeeId", types::integer().nullable(false));
                 t.add_column("eveningEmployeeId", types::integer().nullable(false));
 
@@ -789,7 +793,8 @@ async fn multiple_changed_relation_names(api: &TestApi) -> crate::TestResult {
             });
 
             migration.create_table("Unrelated", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("Unrelated_pkey", types::primary_constraint(&["id"]));
             });
         })
         .await?;
@@ -1103,11 +1108,13 @@ async fn multiple_changed_relation_names_due_to_mapped_models(api: &TestApi) -> 
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
             });
 
             migration.create_table("Post", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("Post_pkey", types::primary_constraint(&["id"]));
                 t.add_column("user_id", types::integer().nullable(false));
                 t.add_index("Post_user_id_key", types::index(&["user_id"]).unique(true));
                 t.add_column("user_id2", types::integer().nullable(false));
@@ -1118,7 +1125,8 @@ async fn multiple_changed_relation_names_due_to_mapped_models(api: &TestApi) -> 
             });
 
             migration.create_table("Unrelated", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("Unrelated_pkey", types::primary_constraint(&["id"]));
             });
         })
         .await?;
@@ -1291,12 +1299,14 @@ async fn updated_at(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", move |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
                 t.add_column("lastupdated", types::datetime().nullable(true));
             });
 
             migration.create_table("Unrelated", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("Unrelated_pkey", types::primary_constraint(&["id"]));
             });
         })
         .await?;
@@ -1336,13 +1346,15 @@ async fn updated_at_with_native_types_on(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", move |t| {
-                t.add_column("id", types::integer().primary(true));
+                t.add_column("id", types::integer().nullable(false));
+                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
                 t.add_column("lastupdated", types::datetime().nullable(true));
                 t.inject_custom("lastupdated2 DATETIME");
             });
 
             migration.create_table("Unrelated", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("Unrelated_pkey", types::primary_constraint(&["id"]));
             });
         })
         .await?;
@@ -1377,11 +1389,13 @@ async fn multiple_many_to_many_on_same_model(api: &TestApi) -> crate::TestResult
     api.barrel()
         .execute(|migration| {
             migration.create_table("A", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("A_pkey", types::primary_constraint(&["id"]));
             });
 
             migration.create_table("B", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("B_pkey", types::primary_constraint(&["id"]));
             });
 
             migration.create_table("_AToB", |t| {
@@ -1407,7 +1421,8 @@ async fn multiple_many_to_many_on_same_model(api: &TestApi) -> crate::TestResult
             });
 
             migration.create_table("Unrelated", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("Unrelated_pkey", types::primary_constraint(&["id"]));
             });
         })
         .await?;
@@ -1629,17 +1644,20 @@ async fn re_introspecting_ignore(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", move |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
                 t.add_column("test", types::integer().nullable(true));
             });
 
             migration.create_table("Ignored", move |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("Ignored_pkey", types::primary_constraint(&["id"]));
                 t.add_column("test", types::integer().nullable(true));
             });
 
             migration.create_table("Unrelated", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("Unrelated_pkey", types::primary_constraint(&["id"]));
             });
         })
         .await?;
