@@ -13,15 +13,11 @@ mod version_checker;
 mod warnings;
 
 use datamodel::Datamodel;
-use enumflags2::{bitflags, BitFlags};
 pub use error::*;
 use introspection_connector::{
     ConnectorError, ConnectorResult, DatabaseMetadata, IntrospectionConnector, IntrospectionResult,
 };
-use quaint::{
-    prelude::{ConnectionInfo, Queryable},
-    single::Quaint,
-};
+use quaint::prelude::ConnectionInfo;
 use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend};
 use std::{fmt, future::Future};
 use tracing_futures::Instrument;
@@ -30,7 +26,6 @@ pub type SqlIntrospectionResult<T> = core::result::Result<T, SqlError>;
 
 pub struct SqlIntrospectionConnector {
     connection_info: ConnectionInfo,
-    circumstances: BitFlags<Circumstances>,
     describer: Box<dyn SqlSchemaDescriberBackend>,
 }
 
@@ -45,7 +40,7 @@ impl fmt::Debug for SqlIntrospectionConnector {
 
 impl SqlIntrospectionConnector {
     pub async fn new(url: &str) -> ConnectorResult<SqlIntrospectionConnector> {
-        let (describer, connection_info, circumstances) = schema_describer_loading::load_describer(&url)
+        let (describer, connection_info) = schema_describer_loading::load_describer(&url)
             .instrument(tracing::debug_span!("Loading describer"))
             .await
             .map_err(|error| {
@@ -58,7 +53,6 @@ impl SqlIntrospectionConnector {
 
         Ok(SqlIntrospectionConnector {
             connection_info,
-            circumstances,
             describer,
         })
     }
@@ -123,56 +117,12 @@ impl IntrospectionConnector for SqlIntrospectionConnector {
         tracing::debug!("SQL Schema Describer is done: {:?}", sql_schema);
         let family = self.connection_info.sql_family();
 
-        let introspection_result =
-            calculate_datamodel::calculate_datamodel(&sql_schema, self.circumstances, &family, &previous_data_model)
-                .map_err(|sql_introspection_error| {
-                    sql_introspection_error.into_connector_error(&self.connection_info)
-                })?;
+        let introspection_result = calculate_datamodel::calculate_datamodel(&sql_schema, &family, &previous_data_model)
+            .map_err(|sql_introspection_error| sql_introspection_error.into_connector_error(&self.connection_info))?;
 
         tracing::debug!("Calculating datamodel is done: {:?}", introspection_result.data_model);
 
         Ok(introspection_result)
-    }
-}
-
-#[bitflags]
-#[repr(u8)]
-#[derive(Debug, Copy, Clone)]
-pub enum Circumstances {
-    Mysql,
-    Postgres,
-    Mssql,
-    Sqlite,
-    Cockroach,
-}
-
-impl Circumstances {
-    pub(crate) async fn new(conn: &Quaint) -> Result<BitFlags<Self>, SqlError> {
-        let mut circumstances = BitFlags::empty();
-
-        match conn.connection_info().sql_family() {
-            quaint::prelude::SqlFamily::Postgres => {
-                circumstances |= Circumstances::Postgres;
-                let version = conn.version().await?;
-
-                if let Some(v) = version {
-                    if v.contains("Cockroach") {
-                        circumstances |= Circumstances::Cockroach;
-                    }
-                }
-            }
-            quaint::prelude::SqlFamily::Mysql => {
-                circumstances |= Circumstances::Postgres;
-            }
-            quaint::prelude::SqlFamily::Sqlite => {
-                circumstances |= Circumstances::Postgres;
-            }
-            quaint::prelude::SqlFamily::Mssql => {
-                circumstances |= Circumstances::Postgres;
-            }
-        }
-
-        Ok(circumstances)
     }
 }
 

@@ -2,7 +2,7 @@
 
 use super::*;
 use crate::{getters::Getter, parsers::Parser};
-use enumflags2::{bitflags, BitFlags};
+use enumflags2::BitFlags;
 use indoc::indoc;
 use native_types::{NativeType, PostgresType};
 use quaint::{connector::ResultRow, prelude::Queryable, single::Quaint};
@@ -11,8 +11,7 @@ use serde_json::from_str;
 use std::{borrow::Cow, collections::HashMap, convert::TryInto};
 use tracing::trace;
 
-#[bitflags]
-#[derive(Clone, Copy, Debug)]
+#[derive(BitFlags, Clone, Copy, Debug)]
 #[repr(u8)]
 pub enum Circumstances {
     Cockroach = 1 << 0,

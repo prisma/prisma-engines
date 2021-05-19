@@ -1,15 +1,14 @@
-use crate::{Circumstances, Dedup, SqlError};
+use crate::Dedup;
+use crate::SqlError;
 use datamodel::{
     common::RelationNames, Datamodel, DefaultValue as DMLDef, FieldArity, FieldType, IndexDefinition, Model,
     OnDeleteStrategy, RelationField, RelationInfo, ScalarField, ScalarType, ValueGenerator as VG,
 };
 use datamodel_connector::Connector;
-use enumflags2::BitFlags;
 use quaint::connector::SqlFamily;
 use sql_datamodel_connector::SqlDatamodelConnectors;
-use sql_schema_describer::{
-    Column, ColumnArity, ColumnTypeFamily, DefaultKind, ForeignKey, Index, IndexType, SqlSchema, Table,
-};
+use sql_schema_describer::DefaultKind;
+use sql_schema_describer::{Column, ColumnArity, ColumnTypeFamily, ForeignKey, Index, IndexType, SqlSchema, Table};
 use tracing::debug;
 
 //checks
@@ -53,16 +52,8 @@ pub(crate) fn is_prisma_1_or_11_list_table(table: &Table) -> bool {
         && table.columns[2].name == "value"
 }
 
-pub(crate) fn is_prisma_1_point_1_or_2_join_table(table: &Table, circumstances: BitFlags<Circumstances>) -> bool {
-    let expected_columns_count = if circumstances.contains(Circumstances::Cockroach) {
-        3
-    } else {
-        2
-    };
-
-    table.columns.len() == expected_columns_count
-        && table.indices.len() >= 2
-        && common_prisma_m_to_n_relation_conditions(table)
+pub(crate) fn is_prisma_1_point_1_or_2_join_table(table: &Table) -> bool {
+    table.columns.len() == 2 && table.indices.len() >= 2 && common_prisma_m_to_n_relation_conditions(table)
 }
 
 pub(crate) fn is_prisma_1_point_0_join_table(table: &Table) -> bool {

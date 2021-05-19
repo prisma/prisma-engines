@@ -1,12 +1,8 @@
-use crate::{
-    introspection_helpers::{
-        is_old_migration_table, is_prisma_1_or_11_list_table, is_prisma_1_point_0_join_table,
-        is_prisma_1_point_1_or_2_join_table, is_relay_table,
-    },
-    Circumstances,
+use crate::introspection_helpers::{
+    is_old_migration_table, is_prisma_1_or_11_list_table, is_prisma_1_point_0_join_table,
+    is_prisma_1_point_1_or_2_join_table, is_relay_table,
 };
 use datamodel::{Datamodel, Model};
-use enumflags2::BitFlags;
 use introspection_connector::{Version, Warning};
 use native_types::{MySqlType, PostgresType};
 use quaint::connector::SqlFamily;
@@ -53,7 +49,7 @@ const MYSQL_TYPES: &[MySqlType] = &[
 ];
 
 impl VersionChecker {
-    pub fn new(sql_family: SqlFamily, circumstances: BitFlags<Circumstances>, schema: &SqlSchema) -> VersionChecker {
+    pub fn new(sql_family: SqlFamily, schema: &SqlSchema) -> VersionChecker {
         VersionChecker {
             sql_family,
             has_migration_table: schema.tables.iter().any(|table| is_old_migration_table(&table)),
@@ -62,7 +58,7 @@ impl VersionChecker {
             has_prisma_1_1_or_2_join_table: schema
                 .tables
                 .iter()
-                .any(|table| is_prisma_1_point_1_or_2_join_table(&table, circumstances)),
+                .any(|table| is_prisma_1_point_1_or_2_join_table(&table)),
             uses_on_delete: false,
             uses_default_values: false,
             always_has_created_at_updated_at: true,
