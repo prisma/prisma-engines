@@ -27,11 +27,15 @@ pub fn version(ctx: CallContext) -> napi::Result<JsUnknown> {
 
 #[js_function(1)]
 pub fn dmmf(ctx: CallContext) -> napi::Result<JsUnknown> {
-    let datamodel = ctx.get::<JsString>(0)?.into_utf8()?.into_owned()?;
-    let template = DatamodelConverter::convert_string(datamodel.clone());
+    let datamodel_string = ctx.get::<JsString>(0)?.into_utf8()?.into_owned()?;
 
-    let config =
-        datamodel::parse_configuration(&datamodel).map_err(|errors| ApiError::conversion(errors, &datamodel))?;
+    let datamodel = datamodel::parse_datamodel(&datamodel_string)
+        .map_err(|errors| ApiError::conversion(errors, &datamodel_string))?;
+
+    let template = DatamodelConverter::convert(&datamodel.subject);
+
+    let config = datamodel::parse_configuration(&datamodel_string)
+        .map_err(|errors| ApiError::conversion(errors, &datamodel_string))?;
 
     let capabilities = match config.subject.datasources.first() {
         Some(datasource) => datasource.capabilities(),
@@ -46,7 +50,7 @@ pub fn dmmf(ctx: CallContext) -> napi::Result<JsUnknown> {
 
     let url = source
         .load_url()
-        .map_err(|err| ApiError::Conversion(err, datamodel.clone()))?;
+        .map_err(|err| ApiError::Conversion(err, datamodel_string.clone()))?;
 
     let db_name = exec_loader::db_name(source, &url).map_err(ApiError::from)?;
     let internal_data_model = template.build(db_name);
@@ -59,8 +63,7 @@ pub fn dmmf(ctx: CallContext) -> napi::Result<JsUnknown> {
         config.subject.preview_features().cloned().collect(),
     ));
 
-    let dm = datamodel::parse_datamodel(datamodel.as_str()).unwrap();
-    let dmmf = dmmf::render_dmmf(&dm.subject, query_schema);
+    let dmmf = dmmf::render_dmmf(&datamodel.subject, query_schema);
 
     ctx.env.to_js_value(&dmmf)
 }
