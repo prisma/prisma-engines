@@ -6,7 +6,8 @@ pub(crate) fn init_logger() {
 
     let subscriber = FmtSubscriber::builder()
         .with_env_filter(EnvFilter::from_default_env())
-        .with_ansi(false)
+        .json()
+        .with_timer(tracing_subscriber::fmt::time::ChronoUtc::rfc3339())
         .with_writer(std::io::stderr)
         .finish()
         .with(ErrorLayer::default());

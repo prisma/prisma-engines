@@ -5,7 +5,6 @@ mod tests;
 
 use enumflags2::BitFlags;
 use error::CliError;
-use futures::FutureExt;
 use migration_core::{migration_api, qe_setup::QueryEngineFlags};
 use structopt::StructOpt;
 use user_facing_errors::{
@@ -26,24 +25,21 @@ pub(crate) struct Cli {
 
 impl Cli {
     pub(crate) async fn run(self) -> ! {
-        match std::panic::AssertUnwindSafe(self.run_inner()).catch_unwind().await {
-            Ok(Ok(msg)) => {
+        match self.run_inner().await {
+            Ok(msg) => {
                 tracing::info!("{}", msg);
                 std::process::exit(0);
             }
-            Ok(Err(error)) => {
-                tracing::error!("{}", error);
+            Err(error) => {
+                tracing::error!(
+                    is_panic = false,
+                    error_code = error.error_code().unwrap_or(""),
+                    "{}",
+                    error
+                );
                 let exit_code = error.exit_code();
-                serde_json::to_writer(std::io::stdout(), &error::render_error(error))
-                    .expect("failed to write to stdout");
-                println!();
+
                 std::process::exit(exit_code)
-            }
-            Err(panic) => {
-                serde_json::to_writer(std::io::stdout(), &user_facing_errors::Error::from_panic_payload(panic))
-                    .expect("failed to write to stdout");
-                println!();
-                std::process::exit(255);
             }
         }
     }

@@ -32,13 +32,10 @@ impl TestApi {
         self.rt.block_on(cli.run_inner())
     }
 
-    fn get_cli_error(&self, cli_args: &[&str]) -> user_facing_errors::Error {
+    fn get_cli_error(&self, cli_args: &[&str]) -> CliError {
         let matches = crate::MigrationEngineCli::from_iter(cli_args.iter());
         let cli_command = matches.cli_subcommand.expect("cli subcommand is passed");
-        self.rt
-            .block_on(cli_command.unwrap_cli().run_inner())
-            .map_err(crate::commands::error::render_error)
-            .unwrap_err()
+        self.rt.block_on(cli_command.unwrap_cli().run_inner()).unwrap_err()
     }
 }
 
@@ -182,20 +179,8 @@ fn database_already_exists_must_return_a_proper_error(api: TestApi) {
         (url.host().unwrap().to_string(), url.port().unwrap())
     };
 
-    let json_error = serde_json::to_value(&error).unwrap();
-
-    let expected = serde_json::json!({
-        "is_panic": false,
-        "message": format!("Database `database_already_exists_must_return_a_proper_error` already exists on the database server at `{host}:{port}`", host = host, port = port),
-        "meta": {
-            "database_name": "database_already_exists_must_return_a_proper_error",
-            "database_host": host,
-            "database_port": port,
-        },
-        "error_code": "P1009"
-    });
-
-    assert_eq!(json_error, expected);
+    assert_eq!(error.error_code(), Some("P1009"));
+    assert_eq!(error.to_string(), format!("Database `database_already_exists_must_return_a_proper_error` already exists on the database server at `{host}:{port}`", host = host, port = port));
 }
 
 #[test_connector(tags(Postgres))]
@@ -204,15 +189,10 @@ fn bad_postgres_url_must_return_a_good_error(api: TestApi) {
 
     let error = api.get_cli_error(&["migration-engine", "cli", "--datasource", &url, "create-database"]);
 
-    let json_error = serde_json::to_value(&error).unwrap();
-
-    let expected = serde_json::json!({
-        "is_panic": false,
-        "message": "Error parsing connection string: invalid port number in database URL\n\n",
-        "backtrace": null,
-    });
-
-    assert_eq!(json_error, expected);
+    assert_eq!(
+        error.to_string(),
+        "Error parsing connection string: invalid port number in database URL"
+    );
 }
 
 #[test_connector(tags(Postgres))]
@@ -226,16 +206,9 @@ fn tls_errors_must_be_mapped_in_the_cli(api: TestApi) {
         "can-connect-to-database",
     ]);
 
-    let json_error = serde_json::to_value(&error).unwrap();
-
-    let expected = serde_json::json!({
-        "is_panic": false,
-        "message": "Error opening a TLS connection: error performing TLS handshake: server does not support TLS".to_string(),
-        "meta": {
-            "message": "error performing TLS handshake: server does not support TLS",
-        },
-        "error_code": "P1011"
-    });
-
-    assert_eq!(json_error, expected);
+    assert_eq!(error.error_code(), Some("P1011"));
+    assert_eq!(
+        error.to_string(),
+        "Error opening a TLS connection: error performing TLS handshake: server does not support TLS"
+    );
 }

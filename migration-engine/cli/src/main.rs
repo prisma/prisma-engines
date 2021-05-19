@@ -37,7 +37,7 @@ impl SubCommand {
 
 #[tokio::main]
 async fn main() {
-    user_facing_errors::set_panic_hook();
+    set_panic_hook();
     logger::init_logger();
 
     let input = MigrationEngineCli::from_args();
@@ -55,6 +55,27 @@ async fn main() {
             cli_command.run().await;
         }
     }
+}
+
+pub fn set_panic_hook() {
+    let _original_hook = std::panic::take_hook();
+
+    std::panic::set_hook(Box::new(move |panic| {
+        let err = user_facing_errors::Error::new_in_panic_hook(&panic);
+
+        if let Some(known_error) = err.as_known() {
+            tracing::error!(
+                is_panic = true,
+                error_code = known_error.error_code,
+                "{}",
+                known_error.message
+            );
+        } else {
+            tracing::error!(is_panic = true, "{}", err.message());
+        }
+
+        std::process::exit(255)
+    }));
 }
 
 async fn start_engine(datamodel_location: &str) -> ! {

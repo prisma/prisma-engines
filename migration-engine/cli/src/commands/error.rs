@@ -1,6 +1,5 @@
 use migration_connector::ConnectorError;
 use std::fmt::Display;
-use tracing_error::SpanTrace;
 use user_facing_errors::{
     common::DatabaseAccessDenied, common::DatabaseAlreadyExists, common::DatabaseDoesNotExist,
     common::DatabaseNotReachable, common::DatabaseTimeout, common::IncorrectDatabaseCredentials,
@@ -19,7 +18,6 @@ pub enum CliError {
     },
     Unknown {
         error: ConnectorError,
-        context: SpanTrace,
         exit_code: i32,
     },
 }
@@ -27,13 +25,9 @@ pub enum CliError {
 impl Display for CliError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            CliError::Known { error, exit_code: _ } => write!(f, "Known error: {:?}", error),
+            CliError::Known { error, exit_code: _ } => f.write_str(&error.message),
             CliError::InvalidParameters { error, .. } => write!(f, "Invalid parameters: {}", error),
-            CliError::Unknown {
-                error,
-                context,
-                exit_code: _,
-            } => write!(f, "{}\n{}", error, context),
+            CliError::Unknown { error, exit_code: _ } => Display::fmt(error, f),
         }
     }
 }
@@ -55,7 +49,6 @@ impl CliError {
     }
 
     /// The errors spec error code, if applicable
-    #[cfg(test)]
     pub(crate) fn error_code(&self) -> Option<&str> {
         match self {
             CliError::Known {
@@ -79,34 +72,16 @@ pub fn exit_code(error: &migration_connector::ConnectorError) -> i32 {
     }
 }
 
-pub fn render_error(cli_error: CliError) -> user_facing_errors::Error {
-    use user_facing_errors::UnknownError;
-
-    match cli_error {
-        CliError::Known { error, .. } => error.into(),
-        other => UnknownError {
-            message: format!("{}", other),
-            backtrace: None,
-        }
-        .into(),
-    }
-}
-
 impl From<ConnectorError> for CliError {
     fn from(err: ConnectorError) -> Self {
         let exit_code = exit_code(&err);
-        let context = err.context().clone();
 
         match err.known_error() {
             Some(error) => CliError::Known {
                 error: error.clone(),
                 exit_code,
             },
-            None => CliError::Unknown {
-                error: err,
-                exit_code,
-                context,
-            },
+            None => CliError::Unknown { error: err, exit_code },
         }
     }
 }
