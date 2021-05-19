@@ -62,8 +62,8 @@ impl TestApi {
 
         TestApi {
             api,
-            args,
             database,
+            args,
             connection_string,
         }
     }

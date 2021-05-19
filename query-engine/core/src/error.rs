@@ -126,20 +126,20 @@ impl From<CoreError> for user_facing_errors::Error {
             })
             .into(),
             CoreError::QueryGraphBuilderError(QueryGraphBuilderError::RelationViolation(RelationViolation {
+                relation_name,
                 model_a_name,
                 model_b_name,
-                relation_name,
             }))
             | CoreError::InterpreterError(InterpreterError::QueryGraphBuilderError(
                 QueryGraphBuilderError::RelationViolation(RelationViolation {
+                    relation_name,
                     model_a_name,
                     model_b_name,
-                    relation_name,
                 }),
             )) => user_facing_errors::KnownError::new(user_facing_errors::query_engine::RelationViolation {
+                relation_name,
                 model_a_name,
                 model_b_name,
-                relation_name,
             })
             .into(),
             CoreError::QueryGraphBuilderError(QueryGraphBuilderError::RecordNotFound(details))
@@ -162,9 +162,9 @@ impl From<CoreError> for user_facing_errors::Error {
                     }
                     InterpreterError::QueryGraphBuilderError(QueryGraphBuilderError::RelationViolation(
                         RelationViolation {
+                            relation_name,
                             model_a_name,
                             model_b_name,
-                            relation_name,
                         },
                     )) => user_facing_errors::KnownError::new(user_facing_errors::query_engine::RelationViolation {
                         model_a_name: model_a_name.clone(),
@@ -173,9 +173,9 @@ impl From<CoreError> for user_facing_errors::Error {
                     })
                     .into(),
                     InterpreterError::QueryGraphBuilderError(QueryGraphBuilderError::RecordsNotConnected {
+                        relation_name,
                         parent_name,
                         child_name,
-                        relation_name,
                     }) => user_facing_errors::KnownError::new(user_facing_errors::query_engine::RecordsNotConnected {
                         parent_name: parent_name.clone(),
                         child_name: child_name.clone(),

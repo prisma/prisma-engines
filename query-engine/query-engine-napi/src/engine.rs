@@ -155,8 +155,8 @@ impl QueryEngine {
         };
 
         let builder = EngineBuilder {
-            config,
             datamodel,
+            config,
             logger,
             config_dir,
         };

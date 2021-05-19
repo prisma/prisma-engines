@@ -235,9 +235,9 @@ where
 
                 Ok(binding_names
                     .into_iter()
-                    .find_map(|binding_name| match env.get(&binding_name) {
-                        Some(_) => Some(env.clone().remove(&binding_name).unwrap()),
-                        None => None,
+                    .find_map(|binding_name| {
+                        env.get(&binding_name)
+                            .map(|_| env.clone().remove(&binding_name).unwrap())
                     })
                     .unwrap())
             }),

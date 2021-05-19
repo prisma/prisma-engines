@@ -1,7 +1,8 @@
 use connector_interface::{DatasourceFieldName, WriteArgs, WriteExpression};
+use itertools::Itertools;
 use prisma_models::*;
 use quaint::ast::*;
-use std::convert::TryInto;
+use std::{collections::HashSet, convert::TryInto};
 
 /// `INSERT` a new record to the database. Resulting an `INSERT` ast and an
 /// optional `RecordProjection` if available from the arguments or model.
@@ -36,19 +37,23 @@ pub fn create_record(model: &ModelRef, mut args: WriteArgs) -> (Insert<'static>,
 
 /// `INSERT` new records into the database based on the given write arguments,
 /// where each `WriteArg` in the Vec is one row.
+/// Requires `affected_fields` to be non-empty to produce valid SQL.
 #[tracing::instrument(skip(model, args, skip_duplicates))]
-pub fn create_records(model: &ModelRef, args: Vec<WriteArgs>, skip_duplicates: bool) -> Insert<'static> {
+pub fn create_records_nonempty(
+    model: &ModelRef,
+    args: Vec<WriteArgs>,
+    skip_duplicates: bool,
+    affected_fields: &HashSet<ScalarFieldRef>,
+) -> Insert<'static> {
     // We need to bring all write args into a uniform shape.
     // The easiest way to do this is to take go over all fields of the batch and apply the following:
     // All fields that have a default but are not explicitly provided are inserted with `DEFAULT`.
-    let fields = model.fields().scalar();
-
     let values: Vec<_> = args
         .into_iter()
         .map(|mut arg| {
-            let mut row: Vec<Expression> = Vec::with_capacity(fields.len());
+            let mut row: Vec<Expression> = Vec::with_capacity(affected_fields.len());
 
-            for field in fields.iter() {
+            for field in affected_fields.iter() {
                 let value = arg.take_field_value(field.db_name());
                 match value {
                     Some(expr) => {
@@ -67,9 +72,22 @@ pub fn create_records(model: &ModelRef, args: Vec<WriteArgs>, skip_duplicates: b
         })
         .collect();
 
-    let insert = Insert::multi_into(model.as_table(), fields.as_columns());
+    let columns = affected_fields.iter().collect_vec().as_columns();
+    let insert = Insert::multi_into(model.as_table(), columns);
     let insert = values.into_iter().fold(insert, |stmt, values| stmt.values(values));
     let insert: Insert = insert.into();
+
+    if skip_duplicates {
+        insert.on_conflict(OnConflict::DoNothing)
+    } else {
+        insert
+    }
+}
+
+/// `INSERT` empty records statement.
+#[tracing::instrument(skip(model, skip_duplicates))]
+pub fn create_records_empty(model: &ModelRef, skip_duplicates: bool) -> Insert<'static> {
+    let insert: Insert<'static> = Insert::single_into(model.as_table()).into();
 
     if skip_duplicates {
         insert.on_conflict(OnConflict::DoNothing)

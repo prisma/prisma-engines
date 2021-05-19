@@ -132,3 +132,13 @@ pub fn json() -> String {
 
     schema.to_owned()
 }
+
+pub fn autoinc_id() -> String {
+    let schema = indoc! {
+        "model TestModel {
+            #id(id, Int, @id, @default(autoincrement()))
+        }"
+    };
+
+    schema.to_owned()
+}

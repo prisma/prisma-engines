@@ -108,6 +108,10 @@ pub trait Connector: Send + Sync {
         self.has_capability(ConnectorCapability::Json)
     }
 
+    fn supports_auto_increment(&self) -> bool {
+        self.has_capability(ConnectorCapability::AutoIncrement)
+    }
+
     fn supports_non_id_auto_increment(&self) -> bool {
         self.has_capability(ConnectorCapability::AutoIncrementAllowedOnNonId)
     }
@@ -159,6 +163,7 @@ pub enum ConnectorCapability {
     MultipleIndexesWithSameName,
     Enums,
     Json,
+    AutoIncrement,
     AutoIncrementAllowedOnNonId,
     AutoIncrementMultipleAllowed,
     AutoIncrementNonIndexedAllowed,
@@ -167,6 +172,7 @@ pub enum ConnectorCapability {
     // start of Query Engine Capabilities
     InsensitiveFilters,
     CreateMany,
+    CreateManyWriteableAutoIncId,
     WritableAutoincField,
     CreateSkipDuplicates,
     UpdateableId,
