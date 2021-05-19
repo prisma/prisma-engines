@@ -4,7 +4,7 @@ use itertools::Itertools;
 use prisma_models::*;
 use prisma_value::PrismaValue;
 use quaint::error::ErrorKind;
-use std::{convert::TryFrom, usize};
+use std::{collections::HashSet, convert::TryFrom, usize};
 use tracing::log::trace;
 use user_facing_errors::query_engine::DatabaseConstraint;
 
@@ -86,6 +86,32 @@ pub async fn create_records(
         return Ok(0);
     }
 
+    // Compute the set of fields affected by the createMany.
+    let mut fields = HashSet::new();
+    args.iter().for_each(|arg| fields.extend(arg.keys().into_iter()));
+
+    let affected_fields: HashSet<ScalarFieldRef> = fields
+        .into_iter()
+        .map(|dsfn| model.fields().find_from_scalar(&dsfn).unwrap())
+        .collect();
+
+    if affected_fields.is_empty() {
+        // If no fields are to be inserted (everything is DEFAULT) we need to fall back to inserting default rows `args.len()` times.
+        create_many_empty(conn, model, args.len(), skip_duplicates).await
+    } else {
+        create_many_nonempty(conn, sql_info, model, args, skip_duplicates, affected_fields).await
+    }
+}
+
+/// Standard create many records, requires `affected_fields` to be non-empty.
+async fn create_many_nonempty(
+    conn: &dyn QueryExt,
+    sql_info: SqlInfo,
+    model: &ModelRef,
+    args: Vec<WriteArgs>,
+    skip_duplicates: bool,
+    affected_fields: HashSet<ScalarFieldRef>,
+) -> crate::Result<usize> {
     let batches = if let Some(max_params) = sql_info.max_bind_values {
         // We need to split inserts if they are above a parameter threshold, as well as split based on number of rows.
         // -> Horizontal partitioning by row number, vertical by number of args.
@@ -158,8 +184,25 @@ pub async fn create_records(
 
     let mut count = 0;
     for batch in partitioned_batches {
-        let stmt = write::create_records(model, batch, skip_duplicates);
+        let stmt = write::create_records_nonempty(model, batch, skip_duplicates, &affected_fields);
         count += conn.execute(stmt.into()).await?;
+    }
+
+    Ok(count as usize)
+}
+
+/// Creates many empty (all default values) rows.
+async fn create_many_empty(
+    conn: &dyn QueryExt,
+    model: &ModelRef,
+    num_records: usize,
+    skip_duplicates: bool,
+) -> crate::Result<usize> {
+    let stmt = write::create_records_empty(model, skip_duplicates);
+    let mut count = 0;
+
+    for _ in 0..num_records {
+        count += conn.execute(stmt.clone().into()).await?;
     }
 
     Ok(count as usize)
