@@ -568,7 +568,7 @@ fn diagnose_migrations_history_with_a_nonexistent_migrations_directory_works(api
 }
 
 #[test_connector]
-fn with_a_failed_migration(api: TestApi) {
+fn dmh_with_a_failed_migration(api: TestApi) {
     let migrations_directory = api.create_migrations_directory();
 
     let dm = r#"
@@ -635,7 +635,7 @@ fn with_a_failed_migration(api: TestApi) {
 }
 
 #[test_connector]
-fn with_an_invalid_unapplied_migration_should_report_it(api: TestApi) {
+fn dmh_with_an_invalid_unapplied_migration_should_report_it(api: TestApi) {
     let directory = api.create_migrations_directory();
 
     let dm1 = r#"
