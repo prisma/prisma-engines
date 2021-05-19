@@ -282,7 +282,8 @@ async fn remapping_field_names_to_empty(api: &TestApi) -> crate::TestResult {
         .execute(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("1", types::text());
-                t.add_column("last", types::primary());
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
             });
         })
         .await?;
@@ -291,7 +292,7 @@ async fn remapping_field_names_to_empty(api: &TestApi) -> crate::TestResult {
         model User {
           // This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
           // 1 String @map("1")
-          last Int    @id @default(autoincrement())
+          id Int    @id @default(autoincrement())
         }
     "#};
 

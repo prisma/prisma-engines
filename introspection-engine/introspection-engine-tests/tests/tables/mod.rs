@@ -14,7 +14,7 @@ async fn a_simple_table_with_gql_types(api: &TestApi) -> crate::TestResult {
                     t.add_column("bool", types::boolean());
                     t.add_column("float", types::float());
                     t.add_column("date", types::datetime());
-                    t.add_column("id", types::integer());
+                    t.add_column("id", types::integer().increments(true).nullable(false));
                     t.add_constraint("Blog_pkey", types::primary_constraint(&["id"]));
                     t.add_column("int", types::integer());
                     t.add_column("string", types::text());
@@ -50,11 +50,11 @@ async fn a_simple_table_with_gql_types(api: &TestApi) -> crate::TestResult {
             bool    Boolean
             float   Float {}
             date    DateTime {}
-            id      Int @id {}
+            id      Int @id @default(autoincrement())
             int     Int
             string  String {}
         }}
-    "##, float_native, timestamp_native, api.sqlite_default_autoincrement(), text_native};
+    "##, float_native, timestamp_native, text_native};
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);
 

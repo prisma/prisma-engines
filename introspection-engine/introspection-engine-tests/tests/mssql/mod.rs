@@ -1,3 +1,4 @@
+use barrel::types;
 use indoc::indoc;
 use introspection_engine_tests::test_api::*;
 use quaint::prelude::Queryable;
@@ -8,7 +9,8 @@ async fn geometry_should_be_unsupported(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(move |migration| {
             migration.create_table("A", move |t| {
-                t.inject_custom("id int identity primary key");
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("A_pkey", types::primary_constraint(&["id"]));
                 t.inject_custom("location geography");
             });
         })

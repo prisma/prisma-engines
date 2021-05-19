@@ -1,3 +1,4 @@
+use barrel::types;
 use indoc::indoc;
 use introspection_engine_tests::test_api::*;
 use test_macros::test_each_connector;
@@ -47,8 +48,8 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
         .execute_with_schema(
             move |migration| {
                 migration.create_table("Blog", move |t| {
-                    t.inject_custom("id int identity(1,1) primary key");
-
+                    t.add_column("id", types::integer().increments(true).nullable(false));
+                    t.add_constraint("Blog_pkey", types::primary_constraint(&["id"]));
                     for column in &columns {
                         t.inject_custom(column);
                     }
