@@ -45,7 +45,7 @@ pub(crate) fn create_many_object_type(
                 false
             } else if sf.is_autoincrement {
                 ctx.capabilities
-                    .contains(ConnectorCapability::CreateManyWriteableAutoIncID)
+                    .contains(ConnectorCapability::CreateManyWriteableAutoIncId)
             } else {
                 true
             }

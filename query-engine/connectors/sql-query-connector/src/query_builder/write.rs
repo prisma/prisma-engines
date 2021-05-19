@@ -72,7 +72,7 @@ pub fn create_records_nonempty(
         })
         .collect();
 
-    let columns = affected_fields.into_iter().collect_vec().as_columns();
+    let columns = affected_fields.iter().collect_vec().as_columns();
     let insert = Insert::multi_into(model.as_table(), columns);
     let insert = values.into_iter().fold(insert, |stmt, values| stmt.values(values));
     let insert: Insert = insert.into();

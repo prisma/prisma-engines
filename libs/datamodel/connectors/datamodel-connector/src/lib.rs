@@ -167,7 +167,7 @@ pub enum ConnectorCapability {
     // start of Query Engine Capabilities
     InsensitiveFilters,
     CreateMany,
-    CreateManyWriteableAutoIncID,
+    CreateManyWriteableAutoIncId,
     WritableAutoincField,
     CreateSkipDuplicates,
     UpdateableId,
