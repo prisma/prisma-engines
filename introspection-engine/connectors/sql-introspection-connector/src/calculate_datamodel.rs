@@ -59,6 +59,7 @@ pub fn calculate_datamodel(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use datamodel::IndexType::Unique;
     use datamodel::{
         dml, Datamodel, DefaultValue as DMLDefault, Field, FieldArity, FieldType, IndexDefinition,
         IndexType as DMLIndexType, Model, NativeTypeInstance, OnDeleteStrategy, PrimaryKeyDefinition, RelationField,
@@ -111,7 +112,12 @@ mod tests {
                 ],
                 is_generated: false,
                 indices: vec![],
-                primary_key: None,
+                primary_key: Some(PrimaryKeyDefinition {
+                    name_in_db: None,
+                    name_in_db_is_default: false,
+                    name_in_client: None,
+                    fields: vec!["required".to_string()],
+                }),
             }],
             enums: vec![],
         };
@@ -200,7 +206,12 @@ mod tests {
                     })],
                     is_generated: false,
                     indices: vec![],
-                    primary_key: None,
+                    primary_key: Some(PrimaryKeyDefinition {
+                        name_in_db: None,
+                        name_in_db_is_default: false,
+                        name_in_client: None,
+                        fields: vec!["primary".to_string()],
+                    }),
                 },
                 // Model with non-auto-incrementing primary key
                 Model {
@@ -238,7 +249,12 @@ mod tests {
                     })],
                     is_generated: false,
                     indices: vec![],
-                    primary_key: None,
+                    primary_key: Some(PrimaryKeyDefinition {
+                        name_in_db: None,
+                        name_in_db_is_default: false,
+                        name_in_client: None,
+                        fields: vec!["primary".to_string()],
+                    }),
                 },
                 // Model with primary key seeded by sequence
                 Model {
@@ -276,7 +292,12 @@ mod tests {
                     })],
                     is_generated: false,
                     indices: vec![],
-                    primary_key: None,
+                    primary_key: Some(PrimaryKeyDefinition {
+                        name_in_db: None,
+                        name_in_db_is_default: false,
+                        name_in_client: None,
+                        fields: vec!["primary".to_string()],
+                    }),
                 },
             ],
             enums: vec![],
@@ -386,7 +407,7 @@ mod tests {
                         database_name: None,
                         default_value: None,
                         is_unique: Some(IndexDefinition {
-                            name_in_db: "Table1_unique_key".to_string(),
+                            name_in_db: "unique".to_string(),
                             name_in_db_matches_default: false,
                             name_in_client: None,
                             fields: vec!["unique".to_string()],
@@ -401,7 +422,13 @@ mod tests {
                     }),
                 ],
                 is_generated: false,
-                indices: vec![],
+                indices: vec![IndexDefinition {
+                    name_in_db: "unique".to_string(),
+                    name_in_db_matches_default: false,
+                    name_in_client: None,
+                    fields: vec!["unique".to_string()],
+                    tpe: Unique,
+                }],
                 primary_key: None,
             }],
             enums: vec![],
@@ -509,7 +536,12 @@ mod tests {
                     ],
                     is_generated: false,
                     indices: vec![],
-                    primary_key: None,
+                    primary_key: Some(PrimaryKeyDefinition {
+                        name_in_client: None,
+                        name_in_db_is_default: false,
+                        name_in_db: None,
+                        fields: vec!["id".to_string()],
+                    }),
                 },
                 Model {
                     database_name: None,
@@ -601,7 +633,12 @@ mod tests {
                     ],
                     is_generated: false,
                     indices: vec![],
-                    primary_key: None,
+                    primary_key: Some(PrimaryKeyDefinition {
+                        name_in_client: None,
+                        name_in_db_is_default: false,
+                        name_in_db: None,
+                        fields: vec!["id".to_string()],
+                    }),
                 },
             ],
             enums: vec![],
@@ -690,7 +727,6 @@ mod tests {
                         constraint_name: None,
                     }),
                     foreign_keys: vec![ForeignKey {
-                        // what does this mean? the from columns are not targeting a specific to column?
                         constraint_name: None,
                         columns: vec!["city-id".to_string(), "city-name".to_string()],
                         referenced_table: "City".to_string(),
@@ -780,7 +816,12 @@ mod tests {
                     fields: vec!["name".to_string(), "lastname".to_string()],
                     tpe: datamodel::dml::IndexType::Unique,
                 }],
-                primary_key: None,
+                primary_key: Some(PrimaryKeyDefinition {
+                    name_in_client: None,
+                    name_in_db_is_default: false,
+                    name_in_db: None,
+                    fields: vec!["id".to_string()],
+                }),
             }],
             enums: vec![],
         };
@@ -912,7 +953,12 @@ mod tests {
                     ],
                     is_generated: false,
                     indices: vec![],
-                    primary_key: None,
+                    primary_key: Some(PrimaryKeyDefinition {
+                        name_in_client: None,
+                        name_in_db_is_default: false,
+                        name_in_db: None,
+                        fields: vec!["id".to_string()],
+                    }),
                 },
                 Model {
                     database_name: None,
@@ -974,7 +1020,12 @@ mod tests {
                     ],
                     is_generated: false,
                     indices: vec![],
-                    primary_key: None,
+                    primary_key: Some(PrimaryKeyDefinition {
+                        name_in_client: None,
+                        name_in_db_is_default: false,
+                        name_in_db: None,
+                        fields: vec!["id".to_string()],
+                    }),
                 },
             ],
             enums: vec![],
