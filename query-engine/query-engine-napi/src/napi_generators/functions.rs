@@ -4,7 +4,7 @@ use datamodel_connector::ConnectorCapabilities;
 use napi::{CallContext, JsString, JsUnknown};
 use napi_derive::js_function;
 use prisma_models::DatamodelConverter;
-use query_core::{exec_loader, schema_builder, BuildMode, QuerySchemaRef};
+use query_core::{schema_builder, BuildMode, QuerySchemaRef};
 use request_handlers::dmmf;
 
 use crate::error::ApiError;
@@ -42,18 +42,7 @@ pub fn dmmf(ctx: CallContext) -> napi::Result<JsUnknown> {
         None => ConnectorCapabilities::empty(),
     };
 
-    let source = config
-        .subject
-        .datasources
-        .first()
-        .ok_or_else(|| ApiError::configuration("No valid data source found"))?;
-
-    let url = source
-        .load_url()
-        .map_err(|err| ApiError::Conversion(err, datamodel_string.clone()))?;
-
-    let db_name = exec_loader::db_name(source, &url).map_err(ApiError::from)?;
-    let internal_data_model = template.build(db_name);
+    let internal_data_model = template.build("".into());
 
     let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(
         internal_data_model,
@@ -91,11 +80,6 @@ pub fn get_config(ctx: CallContext) -> napi::Result<JsUnknown> {
 
     let overrides: Vec<(_, _)> = datasource_overrides.into_iter().collect();
     let mut config = datamodel::parse_configuration_with_url_overrides(&datamodel, overrides)
-        .map_err(|errors| ApiError::conversion(errors, &datamodel))?;
-
-    config.subject = config
-        .subject
-        .validate_that_one_datasource_is_provided()
         .map_err(|errors| ApiError::conversion(errors, &datamodel))?;
 
     if !ignore_env_var_errors {
