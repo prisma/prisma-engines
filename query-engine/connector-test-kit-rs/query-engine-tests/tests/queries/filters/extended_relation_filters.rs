@@ -198,7 +198,8 @@ mod ext_rel_filters {
         Ok(())
     }
 
-    #[connector_test]
+    // Todo: Mongo
+    #[connector_test(exclude(MongoDb))]
     async fn rel_filter_l2_all_filters(runner: &Runner) -> TestResult<()> {
         test_data(runner).await?;
 
@@ -305,7 +306,8 @@ mod ext_rel_filters {
         Ok(())
     }
 
-    #[connector_test]
+    // Todo: Mongo
+    #[connector_test(exclude(MongoDb))]
     async fn rel_filter_l2_implicit_and_every(runner: &Runner) -> TestResult<()> {
         test_data(runner).await?;
         insta::assert_snapshot!(
@@ -316,7 +318,8 @@ mod ext_rel_filters {
         Ok(())
     }
 
-    #[connector_test]
+    // Todo: Mongo
+    #[connector_test(exclude(MongoDb))]
     async fn rel_filter_l2_explicit_and_some(runner: &Runner) -> TestResult<()> {
         test_data(runner).await?;
 
@@ -338,7 +341,8 @@ mod ext_rel_filters {
         Ok(())
     }
 
-    #[connector_test]
+    // Todo: Mongo
+    #[connector_test(exclude(MongoDb))]
     async fn rel_filter_l2_explicit_and_every(runner: &Runner) -> TestResult<()> {
         test_data(runner).await?;
 
@@ -361,7 +365,8 @@ mod ext_rel_filters {
         Ok(())
     }
 
-    #[connector_test]
+    // Todo: Mongo
+    #[connector_test(exclude(MongoDb))]
     async fn rel_filter_l2_explicit_or_all(runner: &Runner) -> TestResult<()> {
         test_data(runner).await?;
 
@@ -398,7 +403,8 @@ mod ext_rel_filters {
         Ok(())
     }
 
-    #[connector_test]
+    // Todo: Mongo
+    #[connector_test(exclude(MongoDb))]
     async fn rel_filter_l2_explicit_not_all(runner: &Runner) -> TestResult<()> {
         test_data(runner).await?;
 
