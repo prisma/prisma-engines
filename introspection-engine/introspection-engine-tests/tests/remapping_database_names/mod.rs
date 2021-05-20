@@ -10,7 +10,8 @@ async fn remapping_fields_with_invalid_characters(api: &TestApi) -> crate::TestR
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
                 t.add_column("_a", types::text());
                 t.add_column("*b", types::text());
                 t.add_column("?c", types::text());
@@ -55,11 +56,13 @@ async fn remapping_tables_with_invalid_characters(api: &TestApi) -> crate::TestR
     api.barrel()
         .execute(|migration| {
             migration.create_table("?User", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("?User_pkey", types::primary_constraint(&["id"]));
             });
 
             migration.create_table("User with Space", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("User with Space_pkey", types::primary_constraint(&["id"]));
             });
         })
         .await?;
@@ -88,11 +91,13 @@ async fn remapping_models_in_relations(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User with Space", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("User with Space_pkey", types::primary_constraint(&["id"]));
             });
 
             migration.create_table("Post", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("Post_pkey", types::primary_constraint(&["id"]));
                 t.add_column("user_id", types::integer());
                 t.add_index("Post_user_id_key", types::index(vec!["user_id"]).unique(true));
                 t.add_foreign_key(&["user_id"], "User with Space", &["id"]);
@@ -127,11 +132,13 @@ async fn remapping_models_in_relations_should_not_map_virtual_fields(api: &TestA
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
             });
 
             migration.create_table("Post With Space", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("Post With Space_pkey", types::primary_constraint(&["id"]));
                 t.add_column("user_id", types::integer());
                 t.add_index(
                     "Post With Space_user_id_key",
@@ -167,7 +174,8 @@ async fn remapping_models_in_compound_relations(api: &TestApi) -> crate::TestRes
     api.barrel()
         .execute(move |migration| {
             migration.create_table("User with Space", move |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("User with Space_pkey", types::primary_constraint(&["id"]));
                 t.add_column("age", types::integer());
                 t.add_index(
                     "User with Space_id_age_key",
@@ -176,13 +184,14 @@ async fn remapping_models_in_compound_relations(api: &TestApi) -> crate::TestRes
             });
 
             migration.create_table("Post", move |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("Post_pkey", types::primary_constraint(&["id"]));
                 t.add_column("user_id", types::integer());
                 t.add_column("user_age", types::integer());
                 t.add_foreign_key(&["user_id", "user_age"], "User with Space", &["id", "age"]);
-                t.add_constraint(
+                t.add_index(
                     "Post_user_id_user_age_key",
-                    types::unique_constraint(vec!["user_id", "user_age"]),
+                    types::index(vec!["user_id", "user_age"]).unique(true),
                 );
             });
         })
@@ -218,7 +227,8 @@ async fn remapping_fields_in_compound_relations(api: &TestApi) -> crate::TestRes
     api.barrel()
         .execute(move |migration| {
             migration.create_table("User", move |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
                 t.add_column("age-that-is-invalid", types::integer());
                 t.add_index(
                     "User_id_age-that-is-invalid_key",
@@ -227,7 +237,8 @@ async fn remapping_fields_in_compound_relations(api: &TestApi) -> crate::TestRes
             });
 
             migration.create_table("Post", move |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("Post_pkey", types::primary_constraint(&["id"]));
                 t.add_column("user_id", types::integer());
                 t.add_column("user_age", types::integer());
                 t.add_foreign_key(&["user_id", "user_age"], "User", &["id", "age-that-is-invalid"]);
@@ -276,8 +287,8 @@ async fn remapping_enum_names(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(move |migration| {
             migration.create_table("123Book", move |t| {
-                t.add_column("id", types::primary());
-
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("123Book_pkey", types::primary_constraint(&["id"]));
                 let typ = if sql_family.is_mysql() {
                     "ENUM ('black')"
                 } else {
@@ -332,8 +343,8 @@ async fn remapping_enum_values(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(move |migration| {
             migration.create_table("Book", move |t| {
-                t.add_column("id", types::primary());
-
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("Book_pkey", types::primary_constraint(&["id"]));
                 let typ = if sql_family.is_mysql() {
                     "ENUM ('b lack', 'w hite')"
                 } else {
@@ -380,8 +391,8 @@ async fn remapping_enum_default_values(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(move |migration| {
             migration.create_table("Book", move |t| {
-                t.add_column("id", types::primary());
-
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("Book_pkey", types::primary_constraint(&["id"]));
                 let typ = if sql_family.is_mysql() {
                     "ENUM ('b lack', 'white')"
                 } else {
@@ -422,7 +433,7 @@ async fn remapping_compound_primary_keys(api: &TestApi) -> crate::TestResult {
             migration.create_table("User", |t| {
                 t.add_column("first_name", types::integer());
                 t.add_column("last@name", types::integer());
-                t.set_primary_key(&["first_name", "last@name"]);
+                t.add_constraint("User_pkey", types::primary_constraint(&["first_name", "last@name"]));
             });
         })
         .await?;

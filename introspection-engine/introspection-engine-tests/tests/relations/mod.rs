@@ -105,7 +105,7 @@ async fn two_one_to_one_relations_between_the_same_models(api: &TestApi) -> crat
 
                 migration.create_table("Post", |t| {
                     t.add_column("id", types::integer().increments(true).nullable(false));
-                    t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
+                    t.add_constraint("Post_pkey", types::primary_constraint(&["id"]));
                     t.add_column("user_id", types::integer().nullable(false));
                     t.add_index("Post_user_id_key", types::index(&["user_id"]).unique(true));
                     t.add_foreign_key(&["user_id"], "User", &["id"]);
@@ -545,7 +545,8 @@ async fn id_fields_with_foreign_key(api: &TestApi) -> crate::TestResult {
                     t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
                 });
                 migration.create_table("Post", move |t| {
-                    t.add_column("user_id", types::integer().primary(true));
+                    t.add_column("user_id", types::integer().nullable(false));
+                    t.add_constraint("Post_pkey", types::primary_constraint(&["user_id"]));
                     t.add_foreign_key(&["user_id"], "User", &["id"]);
                 });
             },
@@ -668,7 +669,7 @@ async fn default_values_on_relations(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_each_connector(ignore("mssql"))]
 async fn prisma_1_0_relations(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {

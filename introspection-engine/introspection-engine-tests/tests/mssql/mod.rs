@@ -36,7 +36,10 @@ async fn user_defined_type_aliases_should_map_to_the_system_type(api: &TestApi) 
     api.database().raw_cmd(&create_type).await?;
 
     let create_table = format!(
-        "CREATE TABLE [{schema_name}].[A] (id int identity primary key, name [{schema_name}].[Name])",
+        "CREATE TABLE [{schema_name}].[A] (\
+            id int identity, \
+            name [{schema_name}].[Name],\
+            CONSTRAINT [A_pkey] PRIMARY KEY ([id]))",
         schema_name = api.schema_name()
     );
 
