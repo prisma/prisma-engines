@@ -1,11 +1,11 @@
 pub mod test_api;
 
 use barrel::Migration;
-use eyre::Result;
 use quaint::{prelude::Queryable, single::Quaint};
 use test_setup::{BitFlags, Tags};
 
-pub type TestResult = eyre::Result<()>;
+pub type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync + 'static>>;
+pub type TestResult = Result<()>;
 
 #[macro_export]
 macro_rules! assert_eq_schema {
@@ -37,7 +37,7 @@ pub struct BarrelMigrationExecutor {
 }
 
 impl BarrelMigrationExecutor {
-    pub async fn execute<F>(&self, migration_fn: F) -> Result<()>
+    pub async fn execute<F>(&self, migration_fn: F) -> TestResult
     where
         F: FnOnce(&mut Migration),
     {
@@ -46,7 +46,7 @@ impl BarrelMigrationExecutor {
         Ok(())
     }
 
-    pub async fn execute_with_schema<F>(&self, migration_fn: F, schema_name: &str) -> Result<()>
+    pub async fn execute_with_schema<F>(&self, migration_fn: F, schema_name: &str) -> TestResult
     where
         F: FnOnce(&mut Migration),
     {

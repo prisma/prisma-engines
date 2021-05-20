@@ -44,7 +44,8 @@ pub(crate) fn create_many_object_type(
             if linking_fields.contains(sf) {
                 false
             } else if sf.is_autoincrement {
-                ctx.capabilities.contains(ConnectorCapability::WritableAutoincField)
+                ctx.capabilities
+                    .contains(ConnectorCapability::CreateManyWriteableAutoIncId)
             } else {
                 true
             }

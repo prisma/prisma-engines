@@ -32,7 +32,7 @@ use quaint::{
 use sql_migration_connector::SqlMigrationConnector;
 use std::{borrow::Cow, fmt::Write as _};
 use tempfile::TempDir;
-use test_setup::{create_mysql_database, create_postgres_database, sqlite_test_url, BitFlags, Tags, TestApiArgs};
+use test_setup::{sqlite_test_url, BitFlags, Tags, TestApiArgs};
 
 /// A handle to all the context needed for end-to-end testing of the migration engine across
 /// connectors.
@@ -46,32 +46,25 @@ impl TestApi {
     pub async fn new(args: TestApiArgs) -> Self {
         let tags = args.tags();
 
-        let db_name = if tags.contains(Tags::Mysql) {
-            test_setup::mysql_safe_identifier(args.test_function_name())
-        } else {
-            args.test_function_name()
-        };
-
-        let (_conn, connection_string): (_, String) = if tags.contains(Tags::Mysql | Tags::Vitess) {
+        let connection_string = if tags.contains(Tags::Mysql | Tags::Vitess) {
             let connector =
                 SqlMigrationConnector::new(args.database_url(), args.shadow_database_url().map(String::from))
                     .await
                     .unwrap();
             connector.reset().await.unwrap();
 
-            (connector.quaint().clone(), args.database_url().to_owned())
+            args.database_url().to_owned()
         } else if tags.contains(Tags::Mysql) {
-            create_mysql_database(&db_name).await.unwrap()
+            args.create_mysql_database().await.1
         } else if tags.contains(Tags::Postgres) {
-            create_postgres_database(&db_name).await.unwrap()
+            args.create_postgres_database().await.2
         } else if tags.contains(Tags::Mssql) {
-            test_setup::init_mssql_database(args.database_url(), db_name)
+            test_setup::init_mssql_database(args.database_url(), args.test_function_name())
                 .await
                 .unwrap()
+                .1
         } else if tags.contains(Tags::Sqlite) {
-            let url = sqlite_test_url(db_name);
-
-            (Quaint::new(&url).await.unwrap(), url)
+            sqlite_test_url(args.test_function_name())
         } else {
             unreachable!()
         };

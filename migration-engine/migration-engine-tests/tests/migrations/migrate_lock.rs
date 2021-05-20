@@ -20,10 +20,7 @@ fn create_migration_with_new_provider_errors(api: TestApi) {
     let migrations_directory = api.create_migrations_directory();
     let engine = api.new_engine_with_connection_strings(api.connection_string(), None);
 
-    engine
-        .create_migration("01init", dm, &migrations_directory)
-        .send_sync()
-        .unwrap();
+    engine.create_migration("01init", dm, &migrations_directory).send_sync();
 
     let dm2 = r#"
         datasource db {
@@ -40,8 +37,7 @@ fn create_migration_with_new_provider_errors(api: TestApi) {
 
     let err = sqlite_engine
         .create_migration("02switchprovider", dm2, &migrations_directory)
-        .send_sync()
-        .unwrap_err()
+        .send_unwrap_err()
         .to_user_facing();
 
     let err = err.as_known().unwrap();
@@ -99,8 +95,7 @@ fn migration_lock_with_different_comment_shapes_work(api: TestApi) {
 
         let err = engine
             .create_migration("01init", dm, &migrations_directory)
-            .send_sync()
-            .unwrap_err()
+            .send_unwrap_err()
             .to_user_facing();
 
         let err = err.as_known().unwrap();

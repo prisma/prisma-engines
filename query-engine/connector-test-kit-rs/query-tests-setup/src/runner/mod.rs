@@ -6,14 +6,15 @@ pub use binary::*;
 pub use direct::*;
 pub use napi::*;
 
-use crate::{QueryResult, TestError, TestResult};
+use crate::{ConnectorTag, QueryResult, TestError, TestResult};
 use colored::*;
 
 #[async_trait::async_trait]
 pub trait RunnerInterface: Sized {
-    async fn load(datamodel: String) -> TestResult<Self>;
+    async fn load(datamodel: String, connector_tag: ConnectorTag) -> TestResult<Self>;
     async fn query(&self, query: String) -> TestResult<QueryResult>;
     async fn batch(&self, queries: Vec<String>, transaction: bool) -> TestResult<QueryResult>;
+    fn connector(&self) -> &ConnectorTag;
 }
 
 pub enum Runner {
@@ -28,9 +29,9 @@ pub enum Runner {
 }
 
 impl Runner {
-    pub async fn load(ident: &str, datamodel: String) -> TestResult<Self> {
+    pub async fn load(ident: &str, datamodel: String, connector_tag: ConnectorTag) -> TestResult<Self> {
         match ident {
-            "direct" => Self::direct(datamodel).await,
+            "direct" => Self::direct(datamodel, connector_tag).await,
             "napi" => Ok(Self::NApi(NApiRunner {})),
             "binary" => Ok(Self::Binary(BinaryRunner {})),
             unknown => Err(TestError::parse_error(format!("Unknown test runner '{}'", unknown))),
@@ -71,9 +72,17 @@ impl Runner {
         }
     }
 
-    async fn direct(datamodel: String) -> TestResult<Self> {
-        let runner = DirectRunner::load(datamodel).await?;
+    async fn direct(datamodel: String, connector_tag: ConnectorTag) -> TestResult<Self> {
+        let runner = DirectRunner::load(datamodel, connector_tag).await?;
 
         Ok(Self::Direct(runner))
+    }
+
+    pub fn connector(&self) -> &ConnectorTag {
+        match self {
+            Runner::Direct(r) => r.connector(),
+            Runner::NApi(_) => todo!(),
+            Runner::Binary(_) => todo!(),
+        }
     }
 }

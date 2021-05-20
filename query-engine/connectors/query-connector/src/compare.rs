@@ -1,4 +1,4 @@
-use crate::filter::Filter;
+use crate::{filter::Filter, JsonFilterPath, JsonTargetType};
 use prisma_models::PrismaValue;
 
 /// Comparing methods for scalar fields.
@@ -96,4 +96,55 @@ pub trait ScalarListCompare {
         T: Into<PrismaValue>;
 
     fn is_empty_list(&self, b: bool) -> Filter;
+}
+
+/// Comparison methods for json fields
+pub trait JsonCompare {
+    fn json_equals<T>(&self, value: T, path: Option<JsonFilterPath>) -> Filter
+    where
+        T: Into<PrismaValue>;
+
+    fn json_not_equals<T>(&self, value: T, path: Option<JsonFilterPath>) -> Filter
+    where
+        T: Into<PrismaValue>;
+
+    fn json_less_than<T>(&self, value: T, path: Option<JsonFilterPath>) -> Filter
+    where
+        T: Into<PrismaValue>;
+
+    fn json_less_than_or_equals<T>(&self, value: T, path: Option<JsonFilterPath>) -> Filter
+    where
+        T: Into<PrismaValue>;
+
+    fn json_greater_than<T>(&self, value: T, path: Option<JsonFilterPath>) -> Filter
+    where
+        T: Into<PrismaValue>;
+
+    fn json_greater_than_or_equals<T>(&self, value: T, path: Option<JsonFilterPath>) -> Filter
+    where
+        T: Into<PrismaValue>;
+
+    fn json_contains<T>(&self, value: T, path: Option<JsonFilterPath>, target_type: JsonTargetType) -> Filter
+    where
+        T: Into<PrismaValue>;
+
+    fn json_not_contains<T>(&self, value: T, path: Option<JsonFilterPath>, target_type: JsonTargetType) -> Filter
+    where
+        T: Into<PrismaValue>;
+
+    fn json_starts_with<T>(&self, value: T, path: Option<JsonFilterPath>, target_type: JsonTargetType) -> Filter
+    where
+        T: Into<PrismaValue>;
+
+    fn json_not_starts_with<T>(&self, value: T, path: Option<JsonFilterPath>, target_type: JsonTargetType) -> Filter
+    where
+        T: Into<PrismaValue>;
+
+    fn json_ends_with<T>(&self, value: T, path: Option<JsonFilterPath>, target_type: JsonTargetType) -> Filter
+    where
+        T: Into<PrismaValue>;
+
+    fn json_not_ends_with<T>(&self, value: T, path: Option<JsonFilterPath>, target_type: JsonTargetType) -> Filter
+    where
+        T: Into<PrismaValue>;
 }

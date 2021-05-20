@@ -2,6 +2,64 @@ use migration_engine_tests::sql::*;
 use quaint::prelude::Queryable;
 
 #[test_connector]
+async fn can_handle_reserved_sql_keywords_for_model_name(api: &TestApi) -> TestResult {
+    let dm1 = r#"
+        model Group {
+            id String @id @default(cuid())
+            field String
+        }
+    "#;
+
+    api.schema_push(dm1).send().await?.assert_green()?;
+    api.assert_schema()
+        .await?
+        .assert_table("Group", |t| t.assert_column("field", |c| c.assert_type_is_string()))?;
+
+    let dm2 = r#"
+        model Group {
+            id String @id @default(cuid())
+            field Int
+        }
+    "#;
+
+    api.schema_push(dm2).send().await?.assert_green()?;
+    api.assert_schema()
+        .await?
+        .assert_table("Group", |t| t.assert_column("field", |c| c.assert_type_is_int()))?;
+
+    Ok(())
+}
+
+#[test_connector]
+async fn can_handle_reserved_sql_keywords_for_field_name(api: &TestApi) -> TestResult {
+    let dm1 = r#"
+        model Test {
+            id String @id @default(cuid())
+            Group String
+        }
+    "#;
+
+    api.schema_push(dm1).send().await?.assert_green()?;
+    api.assert_schema()
+        .await?
+        .assert_table("Test", |t| t.assert_column("Group", |c| c.assert_type_is_string()))?;
+
+    let dm2 = r#"
+        model Test {
+            id String @id @default(cuid())
+            Group Int
+        }
+    "#;
+
+    api.schema_push(dm2).send().await?.assert_green()?;
+    api.assert_schema()
+        .await?
+        .assert_table("Test", |t| t.assert_column("Group", |c| c.assert_type_is_int()))?;
+
+    Ok(())
+}
+
+#[test_connector]
 async fn creating_tables_without_primary_key_must_work(api: &TestApi) -> TestResult {
     let dm = r#"
         model Pair {

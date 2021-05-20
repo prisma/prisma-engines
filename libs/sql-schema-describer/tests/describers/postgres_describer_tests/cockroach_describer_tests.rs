@@ -2,15 +2,15 @@ use crate::test_api::*;
 use sql_schema_describer::ColumnTypeFamily;
 
 #[test_connector(tags(Cockroach))]
-async fn views_can_be_described(api: &TestApi) {
+fn views_can_be_described(api: TestApi) {
     let full_sql = r#"
         CREATE TABLE a (a_id int);
         CREATE TABLE b (b_id int);
         CREATE VIEW ab AS SELECT a_id FROM a UNION ALL SELECT b_id FROM b;
     "#;
 
-    api.database().raw_cmd(&full_sql).await.unwrap();
-    let result = api.describe().await;
+    api.raw_cmd(&full_sql);
+    let result = api.describe();
     let view = result.get_view("ab").expect("couldn't get ab view").to_owned();
 
     let expected_sql = "SELECT a_id FROM views_can_be_described.\"prisma-tests\".a UNION ALL SELECT b_id FROM views_can_be_described.\"prisma-tests\".b";
@@ -20,8 +20,10 @@ async fn views_can_be_described(api: &TestApi) {
 }
 
 #[test_connector(tags(Cockroach))]
-async fn all_postgres_column_types_must_work(api: &TestApi) {
+fn all_postgres_column_types_must_work(api: TestApi) {
     let migration = r#"
+        CREATE TYPE "mood" AS ENUM ('sad', 'ok', 'happy');
+
         CREATE TABLE "User" (
             array_bin_col BYTEA[],
             array_bool_col BOOLEAN[],
@@ -41,6 +43,7 @@ async fn all_postgres_column_types_must_work(api: &TestApi) {
             date_col DATE,
             date_time_col TIMESTAMP,
             double_col DOUBLE PRECISION,
+            enum_col mood,
             float_col FLOAT,
             int_col INT,
             numeric_col NUMERIC,
@@ -59,9 +62,9 @@ async fn all_postgres_column_types_must_work(api: &TestApi) {
         )
         "#;
 
-    api.database().raw_cmd(migration).await.unwrap();
+    api.raw_cmd(migration);
 
-    api.describe().await.assert_table("User", |t| {
+    api.describe().assert_table("User", |t| {
         t.assert_column("array_bin_col", |c| {
             c.assert_full_data_type("_bytea")
                 .assert_column_type_family(ColumnTypeFamily::Binary)
@@ -117,6 +120,10 @@ async fn all_postgres_column_types_must_work(api: &TestApi) {
         .assert_column("double_col", |c| {
             c.assert_full_data_type("float8")
                 .assert_column_type_family(ColumnTypeFamily::Float)
+        })
+        .assert_column("enum_col", |c| {
+            c.assert_full_data_type("mood")
+                .assert_column_type_family(ColumnTypeFamily::Enum("mood".into()))
         })
         .assert_column("float_col", |c| {
             c.assert_full_data_type("float8")

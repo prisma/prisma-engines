@@ -6,6 +6,7 @@ use dml::{
     field::Field, model::Model, native_type_constructor::NativeTypeConstructor,
     native_type_instance::NativeTypeInstance, scalars::ScalarType,
 };
+use std::{borrow::Cow, collections::BTreeMap};
 
 pub trait Connector: Send + Sync {
     fn name(&self) -> String;
@@ -54,6 +55,39 @@ pub trait Connector: Send + Sync {
     /// powers IE
     fn introspect_native_type(&self, native_type: serde_json::Value) -> Result<NativeTypeInstance, ConnectorError>;
 
+    fn set_config_dir<'a>(&self, config_dir: &std::path::Path, url: &'a str) -> Cow<'a, str> {
+        let set_root = |path: &str| {
+            let path = std::path::Path::new(path);
+
+            if path.is_relative() {
+                Some(config_dir.join(&path).to_str().map(ToString::to_string).unwrap())
+            } else {
+                None
+            }
+        };
+
+        let mut url = url::Url::parse(url).unwrap();
+
+        let mut params: BTreeMap<String, String> =
+            url.query_pairs().map(|(k, v)| (k.to_string(), v.to_string())).collect();
+
+        url.query_pairs_mut().clear();
+
+        if let Some(path) = params.get("sslcert").map(|s| s.as_str()).and_then(set_root) {
+            params.insert("sslcert".into(), path);
+        }
+
+        if let Some(path) = params.get("sslidentity").map(|s| s.as_str()).and_then(set_root) {
+            params.insert("sslidentity".into(), path);
+        }
+
+        for (k, v) in params.into_iter() {
+            url.query_pairs_mut().append_pair(&k, &v);
+        }
+
+        url.to_string().into()
+    }
+
     fn supports_scalar_lists(&self) -> bool {
         self.has_capability(ConnectorCapability::ScalarLists)
     }
@@ -72,6 +106,10 @@ pub trait Connector: Send + Sync {
 
     fn supports_json(&self) -> bool {
         self.has_capability(ConnectorCapability::Json)
+    }
+
+    fn supports_auto_increment(&self) -> bool {
+        self.has_capability(ConnectorCapability::AutoIncrement)
     }
 
     fn supports_non_id_auto_increment(&self) -> bool {
@@ -111,6 +149,8 @@ pub trait Connector: Send + Sync {
             },
         ))
     }
+
+    fn validate_url(&self, url: &str) -> Result<(), String>;
 }
 
 /// Not all Databases are created equal. Hence connectors for our datasources support different capabilities.
@@ -123,6 +163,7 @@ pub enum ConnectorCapability {
     MultipleIndexesWithSameName,
     Enums,
     Json,
+    AutoIncrement,
     AutoIncrementAllowedOnNonId,
     AutoIncrementMultipleAllowed,
     AutoIncrementNonIndexedAllowed,
@@ -131,9 +172,12 @@ pub enum ConnectorCapability {
     // start of Query Engine Capabilities
     InsensitiveFilters,
     CreateMany,
+    CreateManyWriteableAutoIncId,
     WritableAutoincField,
     CreateSkipDuplicates,
     UpdateableId,
+    JsonFilteringJsonPath,
+    JsonFilteringArrayPath,
 }
 
 /// Contains all capabilities that the connector is able to serve.

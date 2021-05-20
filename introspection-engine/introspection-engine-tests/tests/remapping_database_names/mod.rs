@@ -5,6 +5,29 @@ use introspection_engine_tests::test_api::*;
 use quaint::prelude::Queryable;
 use test_macros::test_connector;
 
+#[test_connector(tags(Postgres))]
+async fn should_not_remap_if_renaming_would_lead_to_duplicate_names(api: &TestApi) -> TestResult {
+    api.database()
+        .raw_cmd("CREATE TABLE nodes(id serial primary key)")
+        .await?;
+
+    api.database()
+        .raw_cmd(
+            "CREATE TABLE _nodes(
+                node_a int not null,
+                node_b int not null,
+                constraint _nodes_node_a_fkey foreign key(node_a) references nodes(id) on delete cascade on update cascade,
+                constraint _nodes_node_b_fkey foreign key(node_b) references nodes(id) on delete cascade on update cascade
+            )
+        ",
+        )
+        .await?;
+
+    assert!(api.introspect().await.is_ok());
+
+    Ok(())
+}
+
 #[test_connector]
 async fn remapping_fields_with_invalid_characters(api: &TestApi) -> TestResult {
     api.barrel()

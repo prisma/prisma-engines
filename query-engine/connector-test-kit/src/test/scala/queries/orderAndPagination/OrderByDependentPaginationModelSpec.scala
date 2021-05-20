@@ -4,6 +4,9 @@ import org.scalatest.{FlatSpec, Matchers}
 import util._
 
 class OrderByDependentPaginationModelSpec extends FlatSpec with Matchers with ApiSpecBase {
+  // Take this out when cascading rules can be set.
+  override def doNotRunForConnectors: Set[ConnectorTag] = Set(ConnectorTag.MsSqlConnectorTag)
+
   implicit val project: Project = SchemaDsl.fromStringV11() {
     """
       |model ModelA {

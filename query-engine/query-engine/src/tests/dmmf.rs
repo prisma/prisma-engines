@@ -10,10 +10,8 @@ use serial_test::serial;
 use std::sync::Arc;
 
 pub fn get_query_schema(datamodel_string: &str) -> (QuerySchema, datamodel::dml::Datamodel) {
-    let config = datamodel::parse_configuration_and_ignore_datasource_urls(datamodel_string).unwrap();
-    let dm = datamodel::parse_datamodel_and_ignore_datasource_urls(datamodel_string)
-        .unwrap()
-        .subject;
+    let config = datamodel::parse_configuration(datamodel_string).unwrap();
+    let dm = datamodel::parse_datamodel(datamodel_string).unwrap().subject;
 
     let capabilities = match config.subject.datasources.first() {
         Some(ds) => ds.capabilities(),

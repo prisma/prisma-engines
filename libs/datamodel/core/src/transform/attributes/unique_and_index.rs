@@ -13,7 +13,7 @@ impl AttributeValidator<dml::Field> for FieldLevelUniqueAttributeValidator {
         &"unique"
     }
 
-    fn validate_and_apply(&self, args: &mut Arguments, obj: &mut dml::Field) -> Result<(), DatamodelError> {
+    fn validate_and_apply(&self, args: &mut Arguments<'_>, obj: &mut dml::Field) -> Result<(), DatamodelError> {
         if let dml::Field::RelationField(rf) = obj {
             let suggestion = match rf.relation_info.fields.len().cmp(&1) {
                 Ordering::Equal => format!(
@@ -75,7 +75,7 @@ impl AttributeValidator<dml::Model> for ModelLevelUniqueAttributeValidator {
         true
     }
 
-    fn validate_and_apply(&self, args: &mut Arguments, obj: &mut dml::Model) -> Result<(), DatamodelError> {
+    fn validate_and_apply(&self, args: &mut Arguments<'_>, obj: &mut dml::Model) -> Result<(), DatamodelError> {
         let index_def = self.validate_index(args, obj, IndexType::Unique)?;
         obj.indices.push(index_def);
 
@@ -100,7 +100,7 @@ impl AttributeValidator<dml::Model> for ModelLevelIndexAttributeValidator {
         true
     }
 
-    fn validate_and_apply(&self, args: &mut Arguments, obj: &mut dml::Model) -> Result<(), DatamodelError> {
+    fn validate_and_apply(&self, args: &mut Arguments<'_>, obj: &mut dml::Model) -> Result<(), DatamodelError> {
         let index_def = self.validate_index(args, obj, IndexType::Normal)?;
         obj.indices.push(index_def);
 
@@ -116,7 +116,7 @@ impl AttributeValidator<dml::Model> for ModelLevelIndexAttributeValidator {
 trait IndexAttributeBase<T>: AttributeValidator<T> {
     fn validate_index(
         &self,
-        args: &mut Arguments,
+        args: &mut Arguments<'_>,
         obj: &mut dml::Model,
         index_type: IndexType,
     ) -> Result<IndexDefinition, DatamodelError> {

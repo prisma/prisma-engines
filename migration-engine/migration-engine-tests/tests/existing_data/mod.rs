@@ -372,7 +372,7 @@ async fn changing_a_column_from_optional_to_required_is_unexecutable(api: &TestA
     api.schema_push(dm2)
         .send()
         .await?
-        .assert_no_warning()?
+        .assert_no_warning()
         .assert_unexecutable(&[error])?;
 
     // The schema should not change because the migration should not run if there are warnings
@@ -811,8 +811,8 @@ async fn set_default_current_timestamp_on_existing_column_works(api: &TestApi) -
         .force(true)
         .send()
         .await?
-        .assert_executable()?
-        .assert_no_warning()?;
+        .assert_executable()
+        .assert_no_warning();
 
     api.assert_schema().await?.assert_table("User", |table| {
         table.assert_column("created_at", |column| column.assert_default(Some(DefaultValue::now())))
@@ -883,7 +883,7 @@ async fn primary_key_migrations_do_not_cause_data_loss(api: &TestApi) -> TestRes
         .force(true)
         .send()
         .await?
-        .assert_executable()?
+        .assert_executable()
         .assert_warnings(&[warn.into()])?;
 
     api.assert_schema().await?.assert_table("Dog", |table| {

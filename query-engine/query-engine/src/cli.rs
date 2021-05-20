@@ -29,6 +29,7 @@ pub struct DmmfRequest {
 
 pub struct GetConfigRequest {
     config: ValidatedConfiguration,
+    ignore_env_var_errors: bool,
 }
 
 pub enum CliCommand {
@@ -56,7 +57,7 @@ impl CliCommand {
                     };
 
                     Ok(Some(CliCommand::Dmmf(DmmfRequest {
-                        datamodel: opts.datamodel(true)?,
+                        datamodel: opts.datamodel()?,
                         build_mode,
                         enable_raw_queries: opts.enable_raw_queries,
                         config: opts.configuration(true)?.subject,
@@ -64,12 +65,13 @@ impl CliCommand {
                 }
                 CliOpt::GetConfig(input) => Ok(Some(CliCommand::GetConfig(GetConfigRequest {
                     config: opts.configuration(input.ignore_env_var_errors)?,
+                    ignore_env_var_errors: input.ignore_env_var_errors,
                 }))),
                 CliOpt::ExecuteRequest(input) => Ok(Some(CliCommand::ExecuteRequest(ExecuteRequest {
                     query: input.query.clone(),
                     enable_raw_queries: opts.enable_raw_queries,
                     legacy: input.legacy,
-                    datamodel: opts.datamodel(true)?,
+                    datamodel: opts.datamodel()?,
                     config: opts.configuration(false)?.subject,
                 }))),
             },
@@ -79,7 +81,7 @@ impl CliCommand {
     pub async fn execute(self) -> PrismaResult<()> {
         match self {
             CliCommand::Dmmf(request) => Self::dmmf(request).await,
-            CliCommand::GetConfig(input) => Self::get_config(input.config),
+            CliCommand::GetConfig(input) => Self::get_config(input),
             CliCommand::ExecuteRequest(request) => Self::execute_request(request).await,
         }
     }
@@ -110,7 +112,13 @@ impl CliCommand {
         Ok(())
     }
 
-    fn get_config(config: ValidatedConfiguration) -> PrismaResult<()> {
+    fn get_config(mut req: GetConfigRequest) -> PrismaResult<()> {
+        let config = &mut req.config;
+
+        if !req.ignore_env_var_errors {
+            config.subject.resolve_datasource_urls_from_env()?;
+        }
+
         let json = datamodel::json::mcf::config_to_mcf_json_value(&config);
         let serialized = serde_json::to_string(&json)?;
 

@@ -18,6 +18,26 @@ pub fn sanitize_datamodel_names(datamodel: &mut Datamodel, family: &SqlFamily) {
     sanitize_enums(datamodel, &enum_renames);
 }
 
+// if after opionated renames we have duplicated names, e.g. a database with
+// tables `a` and `_a`, the tables in the data model (`a` and `a`) would
+// cause really weird errors
+pub fn sanitization_leads_to_duplicate_names(datamodel: &Datamodel) -> bool {
+    for model in datamodel.models() {
+        let sanitized = sanitize_string(&model.name);
+
+        let dups = datamodel
+            .models()
+            .filter(|m| sanitize_string(m.name()) == sanitized)
+            .count();
+
+        if dups > 1 {
+            return true;
+        }
+    }
+
+    false
+}
+
 // Todo: Sanitizing might need to be adjusted to also change the fields in the RelationInfo
 fn sanitize_models(datamodel: &mut Datamodel, family: &SqlFamily) -> HashMap<String, (String, Option<String>)> {
     let mut enum_renames = HashMap::new();

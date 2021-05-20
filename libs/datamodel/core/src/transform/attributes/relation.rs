@@ -11,7 +11,7 @@ impl AttributeValidator<dml::Field> for RelationAttributeValidator {
         &"relation"
     }
 
-    fn validate_and_apply(&self, args: &mut Arguments, field: &mut dml::Field) -> Result<(), DatamodelError> {
+    fn validate_and_apply(&self, args: &mut Arguments<'_>, field: &mut dml::Field) -> Result<(), DatamodelError> {
         if let dml::Field::RelationField(rf) = field {
             if let Ok(name_arg) = args.default_arg("name") {
                 let name = name_arg.as_str()?;
@@ -21,7 +21,7 @@ impl AttributeValidator<dml::Field> for RelationAttributeValidator {
                         .new_attribute_validation_error("A relation cannot have an empty name.", name_arg.span());
                 }
 
-                rf.relation_info.name = name;
+                rf.relation_info.name = name.to_owned();
             }
 
             if let Ok(related_fields) = args.arg("references") {

@@ -4,8 +4,8 @@ pub use to_dmmf::render_to_dmmf_value;
 
 // This is a simple JSON serialization using Serde.
 // The JSON format follows the DMMF spec.
-#[serde(rename_all = "camelCase")]
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Field {
     pub name: String,
     pub kind: String,
@@ -35,15 +35,15 @@ pub struct Field {
     pub documentation: Option<String>,
 }
 
-#[serde(rename_all = "camelCase")]
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Function {
     pub name: String,
     pub args: Vec<serde_json::Value>,
 }
 
-#[serde(rename_all = "camelCase")]
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Model {
     pub name: String,
     pub is_embedded: bool,
@@ -58,15 +58,15 @@ pub struct Model {
     pub unique_indexes: Vec<UniqueIndex>,
 }
 
-#[serde(rename_all = "camelCase")]
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct UniqueIndex {
     pub name: Option<String>,
     pub fields: Vec<String>,
 }
 
-#[serde(rename_all = "camelCase")]
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Enum {
     pub name: String,
     pub values: Vec<EnumValue>,
@@ -75,8 +75,8 @@ pub struct Enum {
     pub documentation: Option<String>,
 }
 
-#[serde(rename_all = "camelCase")]
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct EnumValue {
     pub name: String,
     pub db_name: Option<String>,

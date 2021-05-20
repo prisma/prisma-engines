@@ -57,6 +57,9 @@ impl PostgresDatamodelConnector {
             ConnectorCapability::WritableAutoincField,
             ConnectorCapability::CreateSkipDuplicates,
             ConnectorCapability::UpdateableId,
+            ConnectorCapability::JsonFilteringArrayPath,
+            ConnectorCapability::CreateManyWriteableAutoIncId,
+            ConnectorCapability::AutoIncrement,
         ];
 
         let small_int = NativeTypeConstructor::without_args(SMALL_INT_TYPE_NAME, vec![ScalarType::Int]);
@@ -310,6 +313,14 @@ impl Connector for PostgresDatamodelConnector {
         } else {
             self.native_str_error(constructor_name).native_type_name_unknown()
         }
+    }
+
+    fn validate_url(&self, url: &str) -> Result<(), String> {
+        if !url.starts_with("postgres://") && !url.starts_with("postgresql://") {
+            return Err("must start with the protocol `postgresql://` or `postgres://`.".to_owned());
+        }
+
+        Ok(())
     }
 }
 

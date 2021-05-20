@@ -335,8 +335,8 @@ impl DatamodelError {
     DatamodelError::FunctionalEvaluationError { message: String::from(message), span }
   }
 
-  pub fn new_environment_functional_evaluation_error(var_name: &str, span: Span) -> DatamodelError {
-    DatamodelError::EnvironmentFunctionalEvaluationError { var_name: String::from(var_name), span }
+  pub fn new_environment_functional_evaluation_error(var_name: String, span: Span) -> DatamodelError {
+    DatamodelError::EnvironmentFunctionalEvaluationError { var_name, span }
   }
 
   pub fn new_type_not_found_error(type_name: &str, span: Span) -> DatamodelError {

@@ -1,7 +1,5 @@
-use crate::constants::inputs::args;
-
 use super::*;
-use constants::inputs::operations;
+use constants::{args, operations};
 use datamodel_connector::ConnectorCapability;
 use prisma_models::dml::DefaultValue;
 

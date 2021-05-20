@@ -147,7 +147,7 @@ async fn squashing_whole_migration_history_works(api: &TestApi) -> TestResult {
     api.apply_migrations(&directory)
         .send()
         .await?
-        .assert_applied_migrations(&[])?;
+        .assert_applied_migrations(&[]);
 
     let DiagnoseMigrationHistoryOutput {
         drift,
@@ -329,7 +329,7 @@ async fn squashing_migrations_history_at_the_start_works(api: &TestApi) -> TestR
     api.apply_migrations(&directory)
         .send()
         .await?
-        .assert_applied_migrations(&[])?;
+        .assert_applied_migrations(&[]);
 
     let DiagnoseMigrationHistoryOutput {
         drift,
@@ -488,7 +488,7 @@ async fn squashing_migrations_history_at_the_end_works(api: &TestApi) -> TestRes
     api.apply_migrations(&directory)
         .send()
         .await?
-        .assert_applied_migrations(&[])?;
+        .assert_applied_migrations(&[]);
 
     let DiagnoseMigrationHistoryOutput {
         drift,

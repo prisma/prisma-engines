@@ -1,5 +1,5 @@
 use super::*;
-use constants::inputs::filters;
+use constants::{aggregations, deprecation, ordering};
 use output_types::aggregation;
 
 /// Builds "<Model>OrderByInput" object types.
@@ -62,7 +62,7 @@ pub(crate) fn order_by_object_type(
         append_opt(
             &mut fields,
             order_by_field_aggregate(
-                filters::UNDERSCORE_COUNT,
+                aggregations::UNDERSCORE_COUNT,
                 "Count",
                 ctx,
                 model,
@@ -73,7 +73,7 @@ pub(crate) fn order_by_object_type(
         append_opt(
             &mut fields,
             order_by_field_aggregate(
-                filters::UNDERSCORE_AVG,
+                aggregations::UNDERSCORE_AVG,
                 "Avg",
                 ctx,
                 model,
@@ -84,7 +84,7 @@ pub(crate) fn order_by_object_type(
         append_opt(
             &mut fields,
             order_by_field_aggregate(
-                filters::UNDERSCORE_MAX,
+                aggregations::UNDERSCORE_MAX,
                 "Max",
                 ctx,
                 model,
@@ -95,7 +95,7 @@ pub(crate) fn order_by_object_type(
         append_opt(
             &mut fields,
             order_by_field_aggregate(
-                filters::UNDERSCORE_MIN,
+                aggregations::UNDERSCORE_MIN,
                 "Min",
                 ctx,
                 model,
@@ -105,7 +105,14 @@ pub(crate) fn order_by_object_type(
         );
         append_opt(
             &mut fields,
-            order_by_field_aggregate(filters::UNDERSCORE_SUM, "Sum", ctx, model, &enum_type, numeric_fields),
+            order_by_field_aggregate(
+                aggregations::UNDERSCORE_SUM,
+                "Sum",
+                ctx,
+                model,
+                &enum_type,
+                numeric_fields,
+            ),
         );
     }
 
@@ -185,11 +192,18 @@ fn order_by_object_type_rel_aggregate(
     let input_object = Arc::new(input_object);
     ctx.cache_input_type(ident, input_object.clone());
 
-    let fields = vec![input_field(
-        filters::COUNT,
-        InputType::Enum(ordering_enum.clone()),
-        None,
-    )];
+    let fields = vec![
+        input_field(
+            aggregations::UNDERSCORE_COUNT,
+            InputType::Enum(ordering_enum.clone()),
+            None,
+        )
+        .optional(),
+        input_field(aggregations::COUNT, InputType::Enum(ordering_enum.clone()), None)
+            .deprecate(deprecation::AGGR_DEPRECATION, "2.23", None)
+            .optional(),
+    ];
+
     input_object.set_fields(fields);
 
     Arc::downgrade(&input_object)

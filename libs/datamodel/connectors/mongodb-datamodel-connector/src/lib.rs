@@ -9,6 +9,7 @@ use dml::{
 };
 use mongodb_types::*;
 use native_types::MongoDbType;
+use std::result::Result as StdResult;
 
 type Result<T> = std::result::Result<T, ConnectorError>;
 
@@ -128,5 +129,13 @@ impl Connector for MongoDbDatamodelConnector {
     fn scalar_type_for_native_type(&self, _native_type: serde_json::Value) -> dml::scalars::ScalarType {
         // Out of scope for MVP
         todo!()
+    }
+
+    fn validate_url(&self, url: &str) -> StdResult<(), String> {
+        if !url.starts_with("mongo") {
+            return Err("must start with the protocol `mongo`.".into());
+        }
+
+        Ok(())
     }
 }

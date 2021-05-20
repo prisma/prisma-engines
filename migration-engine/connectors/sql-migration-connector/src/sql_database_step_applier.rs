@@ -1,6 +1,6 @@
 use crate::{
     pair::Pair,
-    sql_migration::{CreateTable, DropTable, SqlMigration, SqlMigrationStep},
+    sql_migration::{SqlMigration, SqlMigrationStep},
     SqlFlavour, SqlMigrationConnector,
 };
 use migration_connector::{
@@ -135,28 +135,31 @@ fn render_raw_sql(
     match step {
         SqlMigrationStep::AlterEnum(alter_enum) => renderer.render_alter_enum(alter_enum, &schemas),
         SqlMigrationStep::RedefineTables(redefine_tables) => renderer.render_redefine_tables(redefine_tables, &schemas),
-        SqlMigrationStep::CreateEnum(create_enum) => {
-            renderer.render_create_enum(&schemas.next().enum_walker_at(create_enum.enum_index))
+        SqlMigrationStep::CreateEnum { enum_index } => {
+            renderer.render_create_enum(&schemas.next().enum_walker_at(*enum_index))
         }
-        SqlMigrationStep::DropEnum(drop_enum) => {
-            renderer.render_drop_enum(&schemas.previous().enum_walker_at(drop_enum.enum_index))
+        SqlMigrationStep::DropEnum { enum_index } => {
+            renderer.render_drop_enum(&schemas.previous().enum_walker_at(*enum_index))
         }
-        SqlMigrationStep::CreateTable(CreateTable { table_index }) => {
+        SqlMigrationStep::CreateTable { table_index } => {
             let table = schemas.next().table_walker_at(*table_index);
 
             vec![renderer.render_create_table(&table)]
         }
-        SqlMigrationStep::DropTable(DropTable { table_index }) => {
+        SqlMigrationStep::DropTable { table_index } => {
             renderer.render_drop_table(schemas.previous().table_walker_at(*table_index).name())
         }
         SqlMigrationStep::RedefineIndex { table, index } => {
             renderer.render_drop_and_recreate_index(schemas.tables(table).indexes(index).as_ref())
         }
-        SqlMigrationStep::AddForeignKey(add_foreign_key) => {
+        SqlMigrationStep::AddForeignKey {
+            table_index,
+            foreign_key_index,
+        } => {
             let foreign_key = schemas
                 .next()
-                .table_walker_at(add_foreign_key.table_index)
-                .foreign_key_at(add_foreign_key.foreign_key_index);
+                .table_walker_at(*table_index)
+                .foreign_key_at(*foreign_key_index);
 
             vec![renderer.render_add_foreign_key(&foreign_key)]
         }

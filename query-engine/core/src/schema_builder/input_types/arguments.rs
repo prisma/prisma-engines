@@ -1,5 +1,5 @@
 use super::*;
-use constants::inputs::args;
+use constants::args;
 use datamodel_connector::ConnectorCapability;
 
 /// Builds "where" argument.

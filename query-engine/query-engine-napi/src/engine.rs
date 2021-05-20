@@ -125,12 +125,17 @@ impl QueryEngine {
         } = opts;
 
         let overrides: Vec<(_, _)> = datasource_overrides.into_iter().collect();
-        let mut config = datamodel::parse_configuration_with_config_dir(&datamodel, overrides.clone(), &config_dir)
+        let mut config = datamodel::parse_configuration_with_url_overrides(&datamodel, overrides.clone())
             .map_err(|errors| ApiError::conversion(errors, &datamodel))?;
 
         config.subject = config
             .subject
             .validate_that_one_datasource_is_provided()
+            .map_err(|errors| ApiError::conversion(errors, &datamodel))?;
+
+        config
+            .subject
+            .resolve_datasource_urls_from_env()
             .map_err(|errors| ApiError::conversion(errors, &datamodel))?;
 
         let ast = datamodel::parse_datamodel(&datamodel)
@@ -150,8 +155,8 @@ impl QueryEngine {
         };
 
         let builder = EngineBuilder {
-            config,
             datamodel,
+            config,
             logger,
             config_dir,
         };
@@ -182,8 +187,11 @@ impl QueryEngine {
                             .ok_or_else(|| ApiError::configuration("No valid data source found"))?;
 
                         let preview_features: Vec<_> = builder.config.subject.preview_features().cloned().collect();
+                        let url = data_source
+                            .load_url_with_config_dir(&builder.config_dir)
+                            .map_err(|err| crate::error::ApiError::Conversion(err, builder.datamodel.raw.clone()))?;
 
-                        let (db_name, executor) = exec_loader::load(&data_source, &preview_features).await?;
+                        let (db_name, executor) = exec_loader::load(&data_source, &preview_features, &url).await?;
                         let connector = executor.primary_connector();
                         connector.get_connection().await?;
 
@@ -225,10 +233,9 @@ impl QueryEngine {
 
         match *inner {
             Inner::Connected(ref engine) => {
-                let config = datamodel::parse_configuration_with_config_dir(
+                let config = datamodel::parse_configuration_with_url_overrides(
                     &engine.datamodel.raw,
                     engine.datamodel.datasource_overrides.clone(),
-                    &engine.config_dir,
                 )
                 .map_err(|errors| ApiError::conversion(errors, &engine.datamodel.raw))?;
 

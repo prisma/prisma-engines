@@ -72,6 +72,18 @@ impl SchemaAssertion {
         Ok(self)
     }
 
+    #[track_caller]
+    pub fn assert_table_bang<F>(self, table_name: &str, table_assertions: F) -> Self
+    where
+        F: for<'a> FnOnce(TableAssertion<'a>) -> AssertionResult<TableAssertion<'a>>,
+    {
+        let table = self.find_table(table_name).unwrap();
+
+        table_assertions(TableAssertion::new(table, self.tags)).unwrap();
+
+        self
+    }
+
     pub fn assert_has_no_enum(self, enum_name: &str) -> AssertionResult<Self> {
         let has_matching_enum = self.schema.enums.iter().any(|enm| {
             if self.tags.contains(Tags::LowerCasesTableNames) {

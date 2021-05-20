@@ -1,5 +1,5 @@
 use super::*;
-use constants::inputs::{args, operations};
+use constants::{args, operations};
 use datamodel_connector::ConnectorCapability;
 use prisma_models::{dml::DefaultValue, ModelProjection};
 

@@ -19,7 +19,7 @@ async fn scalar_list_types(api: &TestApi) -> TestResult {
 
     let dm = indoc! {r#"
          model Post {
-            id      Int @id @default(autoincrement())
+            id       Int @id @default(autoincrement())
             ints     Int []
             bools    Boolean []
             strings  String []
@@ -29,7 +29,7 @@ async fn scalar_list_types(api: &TestApi) -> TestResult {
 
     let result = api.introspect().await?;
 
-    api.assert_eq_datamodels(dm, &result);
+    api.assert_eq_datamodels(&dm, &result);
 
     Ok(())
 }

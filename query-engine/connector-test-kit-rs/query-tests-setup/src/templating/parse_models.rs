@@ -178,8 +178,8 @@ impl M2mFragment {
         Ok(Self {
             field_name,
             field_type,
-            directives,
             opposing_type,
+            directives,
         })
     }
 }

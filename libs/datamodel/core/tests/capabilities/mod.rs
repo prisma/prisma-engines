@@ -55,8 +55,9 @@ fn multiple_indexes_with_the_same_name_only_supported_if_all_specified_providers
     // Only MySQL supports multiple indexes with the same name.
 
     validate_uniqueness_of_names_of_indexes("mysql", false);
+    validate_uniqueness_of_names_of_indexes("sqlserver", false);
 
-    for provider in &["sqlserver", "sqlite", "postgres"] {
+    for provider in &["sqlite", "postgres"] {
         validate_uniqueness_of_names_of_indexes(provider, true);
     }
 }

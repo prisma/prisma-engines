@@ -30,18 +30,15 @@ field_declaration = { doc_comment_and_new_line* ~ non_empty_identifier ~ LEGACY_
 // ######################################
 
 // Pest is greedy, order is very important here.
-field_type = { optional_unsupported_type | list_unsupported_type | unsupported_type | unsupported_optional_list_type | list_type | optional_type | legacy_required_type | legacy_list_type | base_type  }
+field_type = { unsupported_optional_list_type | list_type | optional_type | legacy_required_type | legacy_list_type | base_type  }
 
-//todo can these be merged?
-optional_unsupported_type = { "Unsupported(" ~ string_literal ~ ")" ~"?" }
-list_unsupported_type = { "Unsupported(" ~ string_literal ~ ")" ~"[]" }
 unsupported_type = { "Unsupported(" ~ string_literal ~ ")" }
-unsupported_optional_list_type = { non_empty_identifier ~ "[]" ~ "?" }
-list_type = { non_empty_identifier ~ "[]" }
-optional_type = { non_empty_identifier ~ "?" }
+base_type = { unsupported_type | non_empty_identifier } // Called base type to not conflict with type rust keyword
+unsupported_optional_list_type = { base_type ~ "[]" ~ "?" }
+list_type = { base_type ~ "[]" }
+optional_type = { base_type ~ "?" }
 legacy_required_type = { non_empty_identifier ~ "!" }
 legacy_list_type = { "[" ~ non_empty_identifier ~ "]" }
-base_type = { non_empty_identifier } // Called base type to not conflict with type rust keyword
 
 // ######################################
 // Type Alias
@@ -147,8 +144,7 @@ constant_literal = @{ non_empty_identifier }
 
 // ######################################
 // String Interpolation
-// Called seperatedly, but falls back
-// to expression.
+// Called separately, but falls back to expression.
 // ######################################
 // We can safely assume that our strings are stripped of their "s and
 // that strings do not contain new lines.

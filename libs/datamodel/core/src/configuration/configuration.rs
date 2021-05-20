@@ -27,4 +27,14 @@ impl Configuration {
             .iter()
             .flat_map(|generator| generator.preview_features.iter())
     }
+
+    pub fn resolve_datasource_urls_from_env(&mut self) -> Result<(), Diagnostics> {
+        for datasource in &mut self.datasources {
+            if datasource.url.from_env_var.is_some() && datasource.url.value.is_none() {
+                datasource.url.value = Some(datasource.load_url()?);
+            }
+        }
+
+        Ok(())
+    }
 }

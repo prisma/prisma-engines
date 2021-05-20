@@ -6,9 +6,9 @@ use super::{
     },
     datasource_provider::DatasourceProvider,
 };
-use crate::configuration::StringFromEnvVar;
 use crate::diagnostics::{DatamodelError, Diagnostics, ValidatedDatasource, ValidatedDatasources};
 use crate::{ast, Datasource};
+use crate::{ast::Span, configuration::StringFromEnvVar};
 use std::collections::HashMap;
 
 const PREVIEW_FEATURES_KEY: &str = "previewFeatures";
@@ -34,14 +34,13 @@ impl DatasourceLoader {
     pub fn load_datasources_from_ast(
         &self,
         ast_schema: &ast::SchemaAst,
-        ignore_datasource_urls: bool,
         datasource_url_overrides: Vec<(String, String)>,
     ) -> Result<ValidatedDatasources, Diagnostics> {
         let mut sources = vec![];
         let mut diagnostics = Diagnostics::new();
 
         for src in &ast_schema.sources() {
-            match self.lift_datasource(&src, ignore_datasource_urls, &datasource_url_overrides) {
+            match self.lift_datasource(&src, &datasource_url_overrides) {
                 Ok(loaded_src) => {
                     diagnostics.append_warning_vec(loaded_src.warnings);
                     sources.push(loaded_src.subject)
@@ -90,7 +89,6 @@ impl DatasourceLoader {
     fn lift_datasource(
         &self,
         ast_source: &ast::SourceConfig,
-        ignore_datasource_urls: bool,
         datasource_url_overrides: &[(String, String)],
     ) -> Result<ValidatedDatasource, Diagnostics> {
         let source_name = &ast_source.name.name;
@@ -140,65 +138,24 @@ impl DatasourceLoader {
             .map(|x| &x.1);
 
         let url = match (url_arg.as_str_from_env(), override_url) {
-            (Err(err), _)
-                if ignore_datasource_urls && err.description().contains("Expected a String value, but received") =>
-            {
-                return Err(diagnostics.merge_error(err));
-            }
-            (_, _) if ignore_datasource_urls => {
-                // glorious hack. ask marcus
-                StringFromEnvVar {
-                    name: "url",
-                    from_env_var: None,
-                    value: format!("{}://", provider),
-                }
-            }
             (_, Some(url)) => {
                 tracing::debug!("overwriting datasource `{}` with url '{}'", &source_name, &url);
-                StringFromEnvVar {
-                    name: "url",
-                    from_env_var: None,
-                    value: url.to_owned(),
-                }
+                StringFromEnvVar::new_literal(url.clone())
             }
-            (Ok((env_var, url)), _) => StringFromEnvVar {
-                name: "url",
-                from_env_var: env_var,
-                value: url.trim().to_owned(),
-            },
+            (Ok(str_from_env_var), _) => str_from_env_var,
             (Err(err), _) => {
                 return Err(diagnostics.merge_error(err));
             }
         };
 
-        validate_datasource_url(&url, source_name, &url_arg)?;
-
         let shadow_database_url_arg = args.get(SHADOW_DATABASE_URL_KEY);
 
-        let shadow_database_url: Option<StringFromEnvVar> =
+        let shadow_database_url: Option<(StringFromEnvVar, Span)> =
             if let Some(shadow_database_url_arg) = shadow_database_url_arg.as_ref() {
                 let shadow_database_url = match shadow_database_url_arg.as_str_from_env() {
-                    Err(err)
-                        if ignore_datasource_urls
-                            && err.description().contains("Expected a String value, but received") =>
-                    {
-                        return Err(diagnostics.merge_error(err));
+                    Ok(shadow_database_url) => {
+                        Some(shadow_database_url).filter(|s| !s.as_literal().map(|lit| lit.is_empty()).unwrap_or(false))
                     }
-                    _ if ignore_datasource_urls => {
-                        // glorious hack. ask marcus
-                        Some(StringFromEnvVar {
-                            name: "shadow_database_url",
-                            from_env_var: None,
-                            value: format!("{}://", provider),
-                        })
-                    }
-
-                    Ok((env_var, url)) => Some(StringFromEnvVar {
-                        name: "shadow_database_url",
-                        from_env_var: env_var,
-                        value: url.trim().to_owned(),
-                    })
-                    .filter(|s| !s.value.is_empty()),
 
                     // We intentionally ignore the shadow database URL if it is defined in an env var that is missing.
                     Err(DatamodelError::EnvironmentFunctionalEvaluationError { .. }) => None,
@@ -218,7 +175,7 @@ impl DatasourceLoader {
                 //     );
                 // }
 
-                shadow_database_url
+                shadow_database_url.map(|url| (url, shadow_database_url_arg.span()))
             } else {
                 None
             };
@@ -236,28 +193,13 @@ impl DatasourceLoader {
                 ))
         })?;
 
-        // Validate the URL
-        datasource_provider
-            .validate_url(source_name, &url)
-            .map_err(|err_msg| DatamodelError::new_source_validation_error(&err_msg, source_name, url_arg.span()))?;
-
-        // Validate the shadow database URL
-        if let (Some(shadow_database_url), Some(shadow_database_url_arg)) =
-            (shadow_database_url.as_ref(), shadow_database_url_arg.as_ref())
-        {
-            datasource_provider
-                .validate_shadow_database_url(source_name, shadow_database_url)
-                .map_err(|err_msg| {
-                    DatamodelError::new_source_validation_error(&err_msg, source_name, shadow_database_url_arg.span())
-                })?;
-        }
-
         Ok(ValidatedDatasource {
             subject: Datasource {
                 name: source_name.to_string(),
                 provider: provider.to_owned(),
                 active_provider: datasource_provider.canonical_name().to_owned(),
                 url,
+                url_span: url_arg.span(),
                 documentation,
                 active_connector: datasource_provider.connector(),
                 shadow_database_url,
@@ -296,34 +238,4 @@ fn preview_features_guardrail(args: &HashMap<&str, ValueValidator>) -> Result<()
     ))
         })
         .unwrap_or(Ok(()))
-}
-
-/// Validate that the `url` argument in the datasource block is not empty.
-fn validate_datasource_url(
-    url: &StringFromEnvVar,
-    source_name: &str,
-    url_arg: &ValueValidator,
-) -> Result<(), DatamodelError> {
-    if !url.value.is_empty() {
-        return Ok(());
-    }
-
-    let suffix = match &url.from_env_var {
-        Some(env_var_name) => format!(
-            " The environment variable `{}` resolved to an empty string.",
-            env_var_name
-        ),
-        None => "".to_owned(),
-    };
-
-    let msg = format!(
-        "You must provide a nonempty URL for the datasource `{}`.{}",
-        source_name, &suffix
-    );
-
-    Err(DatamodelError::new_source_validation_error(
-        &msg,
-        source_name,
-        url_arg.span(),
-    ))
 }

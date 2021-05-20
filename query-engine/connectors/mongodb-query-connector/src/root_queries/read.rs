@@ -107,8 +107,9 @@ pub async fn get_related_m2m_record_ids(
     let cursor = coll.find(filter, Some(find_options)).await?;
     let docs = vacuum_cursor(cursor).await?;
 
-    let parent_meta_mapping = output_meta::from_selected_fields(&model.primary_identifier());
-    let parent_id_holder_field = model.fields().find_from_scalar(relation_ids_field_name).unwrap();
+    let parent_id_meta = output_meta::from_field(&id_field);
+    let id_holder_field = model.fields().find_from_scalar(relation_ids_field_name).unwrap();
+    let related_ids_holder_meta = output_meta::from_field(&id_holder_field);
 
     let child_id_field = from_field
         .related_model()
@@ -119,16 +120,14 @@ pub async fn get_related_m2m_record_ids(
 
     let mut id_pairs = vec![];
     for mut doc in docs {
-        let parent_id = value_from_bson(
-            doc.remove(id_field.db_name()).unwrap(),
-            parent_meta_mapping.get(id_field.db_name()).unwrap(),
-        )?;
+        let id_value = doc.remove(id_field.db_name()).unwrap();
+        let parent_id = value_from_bson(id_value, &parent_id_meta)?;
 
-        let child_ids: Vec<PrismaValue> = match value_from_bson(
-            doc.remove(relation_ids_field_name)
-                .unwrap_or_else(|| Bson::Array(vec![])),
-            parent_meta_mapping.get(parent_id_holder_field.db_name()).unwrap(),
-        )? {
+        let related_id_array = doc
+            .remove(relation_ids_field_name)
+            .unwrap_or_else(|| Bson::Array(vec![]));
+
+        let child_ids: Vec<PrismaValue> = match value_from_bson(related_id_array, &related_ids_holder_meta)? {
             PrismaValue::List(vals) => vals,
             val => vec![val],
         };

@@ -23,7 +23,7 @@ pub enum QueryEngineFlags {
 
 /// Database setup for connector-test-kit.
 pub async fn run(prisma_schema: &str, flags: BitFlags<QueryEngineFlags>) -> CoreResult<()> {
-    let config = super::parse_configuration(prisma_schema)?;
+    let (config, url, _shadow_database_url) = super::parse_configuration(prisma_schema)?;
     let source = config
         .datasources
         .first()
@@ -31,7 +31,7 @@ pub async fn run(prisma_schema: &str, flags: BitFlags<QueryEngineFlags>) -> Core
 
     let api: Box<dyn GenericApi> = match &source.active_provider {
         _ if flags.contains(QueryEngineFlags::DatabaseCreationNotAllowed) => {
-            let api = SqlMigrationConnector::new(&source.url().value, None).await?;
+            let api = SqlMigrationConnector::new(&url, None).await?;
             api.reset().await?;
 
             Box::new(api)
@@ -46,13 +46,13 @@ pub async fn run(prisma_schema: &str, flags: BitFlags<QueryEngineFlags>) -> Core
             .contains(&provider.as_str()) =>
         {
             // 1. creates schema & database
-            SqlMigrationConnector::qe_setup(&source.url().value).await?;
-            Box::new(SqlMigrationConnector::new(&source.url().value, None).await?)
+            SqlMigrationConnector::qe_setup(&url).await?;
+            Box::new(SqlMigrationConnector::new(&url, None).await?)
         }
         #[cfg(feature = "mongodb")]
         provider if provider == MONGODB_SOURCE_NAME => {
-            MongoDbMigrationConnector::qe_setup(&source.url().value).await?;
-            let connector = MongoDbMigrationConnector::new(&source.url().value).await?;
+            MongoDbMigrationConnector::qe_setup(&url).await?;
+            let connector = MongoDbMigrationConnector::new(&url).await?;
             Box::new(connector)
         }
         x => unimplemented!("Connector {} is not supported yet", x),

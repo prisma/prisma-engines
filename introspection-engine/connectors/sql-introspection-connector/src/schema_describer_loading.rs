@@ -1,26 +1,13 @@
 use crate::SqlError;
-use quaint::error::ErrorKind;
 use quaint::{
     prelude::{ConnectionInfo, Queryable, SqlFamily},
     single::Quaint,
 };
 use sql_schema_describer::{postgres::Circumstances, SqlSchemaDescriberBackend};
-use std::time::Duration;
-
-const CONNECTION_TIMEOUT: Duration = Duration::from_secs(10);
 
 pub async fn load_describer(url: &str) -> Result<(Box<dyn SqlSchemaDescriberBackend>, ConnectionInfo), SqlError> {
-    let wrapper_fut = async {
-        let connection = Quaint::new(&url).await?;
-        let version = connection.version().await?;
-        Result::Ok::<_, SqlError>((connection, version))
-    };
-
-    let (connection, version) = match tokio::time::timeout(CONNECTION_TIMEOUT, wrapper_fut).await {
-        Ok(result) => result?,
-        Err(_elapsed) => return Err(SqlError::from(ErrorKind::ConnectTimeout)),
-    };
-
+    let connection = Quaint::new(&url).await?;
+    let version = connection.version().await?;
     let connection_info = connection.connection_info().to_owned();
 
     let describer: Box<dyn SqlSchemaDescriberBackend> = match connection_info.sql_family() {

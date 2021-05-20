@@ -2,7 +2,7 @@ use super::SqlSchemaDifferFlavour;
 use crate::{
     flavour::PostgresFlavour,
     pair::Pair,
-    sql_migration::{AlterEnum, CreateEnum, DropEnum},
+    sql_migration::{AlterEnum, SqlMigrationStep},
     sql_schema_differ::{
         column::{ColumnDiffer, ColumnTypeChange},
         SqlSchemaDiffer,
@@ -39,22 +39,20 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
             .collect()
     }
 
-    fn create_enums(&self, differ: &SqlSchemaDiffer<'_>) -> Vec<CreateEnum> {
-        differ
-            .created_enums()
-            .map(|r#enum| CreateEnum {
-                enum_index: r#enum.enum_index(),
+    fn create_enums(&self, differ: &SqlSchemaDiffer<'_>, steps: &mut Vec<SqlMigrationStep>) {
+        for enm in differ.created_enums() {
+            steps.push(SqlMigrationStep::CreateEnum {
+                enum_index: enm.enum_index(),
             })
-            .collect()
+        }
     }
 
-    fn drop_enums(&self, differ: &SqlSchemaDiffer<'_>) -> Vec<DropEnum> {
-        differ
-            .dropped_enums()
-            .map(|r#enum| DropEnum {
-                enum_index: r#enum.enum_index(),
+    fn drop_enums(&self, differ: &SqlSchemaDiffer<'_>, steps: &mut Vec<SqlMigrationStep>) {
+        for enm in differ.dropped_enums() {
+            steps.push(SqlMigrationStep::DropEnum {
+                enum_index: enm.enum_index(),
             })
-            .collect()
+        }
     }
 
     fn indexes_should_be_recreated_after_column_drop(&self) -> bool {

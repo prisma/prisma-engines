@@ -5,33 +5,18 @@ use prisma_value::PrismaValue;
 #[test]
 fn skipping_of_env_vars() {
     let dml = r#"
-    datasource db {
-        provider = "postgresql"
-        url      = env("POSTGRES_URL")
-    }
-    
-    model User {
-        id   Int      @id
-        tags String[]
-    }
+        datasource db {
+            provider = "postgresql"
+            url      = env("POSTGRES_URL")
+        }
+
+        model User {
+            id   Int      @id
+            tags String[]
+        }
     "#;
 
-    // must fail without env var
-    parse_error(dml);
-
-    // must not fail when ignore flag is set
-    if let Err(err) = datamodel::parse_datamodel_and_ignore_datasource_urls(dml) {
-        panic!("Skipping env var errors did not work. Error was {:?}", err)
-    }
-
-    // must not fail with invalid env var set and ignore flag is set
-    std::env::set_var("POSTGRES_URL", "mysql://"); // wrong protocol
-    if let Err(err) = datamodel::parse_datamodel_and_ignore_datasource_urls(dml) {
-        panic!("Skipping env var errors did not work. Error was {:?}", err)
-    }
-
-    // must not fail with correct env var set
-    std::env::set_var("POSTGRES_URL", "postgresql://localhost:5432");
+    // must not fail without env var
     parse(dml);
 }
 

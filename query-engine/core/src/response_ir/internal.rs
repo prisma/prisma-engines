@@ -1,6 +1,6 @@
 use super::*;
 use crate::{
-    constants::outputs::fields,
+    constants::{aggregations::*, output_fields::*},
     schema::{IntoArc, ObjectTypeStrongRef, OutputType, OutputTypeRef, ScalarType},
     CoreError, DatabaseEnumType, EnumType, OutputFieldRef, QueryResult, RecordAggregations, RecordSelection,
 };
@@ -49,7 +49,7 @@ pub fn serialize_internal(
             let mut map: Map = IndexMap::with_capacity(1);
             let mut result = CheckedItemsWithParents::new();
 
-            map.insert(fields::COUNT.into(), Item::Value(PrismaValue::Int(c as i64)));
+            map.insert(AFFECTED_COUNT.into(), Item::Value(PrismaValue::Int(c as i64)));
             result.insert(None, Item::Map(map));
 
             Ok(result)
@@ -83,38 +83,38 @@ fn serialize_aggregations(
 
                 AggregationResult::Count(field, count) => {
                     if let Some(f) = field {
-                        flattened.insert(format!("count_{}", &f.name), Item::Value(count));
+                        flattened.insert(format!("_count_{}", &f.name), Item::Value(count));
                     } else {
-                        flattened.insert("count__all".to_owned(), Item::Value(count));
+                        flattened.insert("_count__all".to_owned(), Item::Value(count));
                     }
                 }
 
                 AggregationResult::Average(field, value) => {
                     let output_field =
-                        find_nested_aggregate_output_field(&aggregate_object_type, fields::AVG, &field.name);
-                    flattened.insert(format!("avg_{}", &field.name), serialize_scalar(&output_field, value)?);
+                        find_nested_aggregate_output_field(&aggregate_object_type, UNDERSCORE_AVG, &field.name);
+                    flattened.insert(format!("_avg_{}", &field.name), serialize_scalar(&output_field, value)?);
                 }
 
                 AggregationResult::Sum(field, value) => {
                     let output_field =
-                        find_nested_aggregate_output_field(&aggregate_object_type, fields::SUM, &field.name);
-                    flattened.insert(format!("sum_{}", &field.name), serialize_scalar(&output_field, value)?);
+                        find_nested_aggregate_output_field(&aggregate_object_type, UNDERSCORE_SUM, &field.name);
+                    flattened.insert(format!("_sum_{}", &field.name), serialize_scalar(&output_field, value)?);
                 }
 
                 AggregationResult::Min(field, value) => {
                     let output_field =
-                        find_nested_aggregate_output_field(&aggregate_object_type, fields::MIN, &field.name);
+                        find_nested_aggregate_output_field(&aggregate_object_type, UNDERSCORE_MIN, &field.name);
                     flattened.insert(
-                        format!("min_{}", &field.name),
+                        format!("_min_{}", &field.name),
                         serialize_scalar(&output_field, coerce_non_numeric(value, &output_field.field_type))?,
                     );
                 }
 
                 AggregationResult::Max(field, value) => {
                     let output_field =
-                        find_nested_aggregate_output_field(&aggregate_object_type, fields::MAX, &field.name);
+                        find_nested_aggregate_output_field(&aggregate_object_type, UNDERSCORE_MAX, &field.name);
                     flattened.insert(
-                        format!("max_{}", &field.name),
+                        format!("_max_{}", &field.name),
                         serialize_scalar(&output_field, coerce_non_numeric(value, &output_field.field_type))?,
                     );
                 }
@@ -122,19 +122,28 @@ fn serialize_aggregations(
         }
 
         // Reorder fields based on the original query selection.
+        // Temporary: The original selection may be done with _ or no underscore (deprecated).
         let mut inner_map: Map = IndexMap::with_capacity(ordering.len());
         for (query, field_order) in ordering.iter() {
             if let Some(order) = field_order {
                 let mut nested_map = Map::new();
 
                 for field in order {
-                    let item = flattened.remove(&format!("{}_{}", query, field)).unwrap();
+                    let item = flattened
+                        .remove(&format!("{}_{}", query, field))
+                        .or_else(|| flattened.remove(&format!("_{}_{}", query, field)))
+                        .unwrap();
+
                     nested_map.insert(field.clone(), item);
                 }
 
                 inner_map.insert(query.clone(), Item::Map(nested_map));
             } else {
-                let item = flattened.remove(&query.clone()).unwrap();
+                let item = flattened
+                    .remove(&query.clone())
+                    .or_else(|| flattened.remove(&format!("_{}", query)))
+                    .unwrap();
+
                 inner_map.insert(query.clone(), item);
             }
         }
@@ -162,7 +171,7 @@ fn serialize_aggregations(
 fn write_rel_aggregation_row(row: &RelAggregationRow, map: &mut HashMap<String, Item>) {
     for result in row.iter() {
         match result {
-            RelAggregationResult::Count(rf, count) => match map.get_mut(fields::UNDERSCORE_COUNT) {
+            RelAggregationResult::Count(rf, count) => match map.get_mut(UNDERSCORE_COUNT) {
                 Some(item) => match item {
                     Item::Map(inner_map) => inner_map.insert(rf.name.clone(), Item::Value(count.clone())),
                     _ => unreachable!(),
@@ -170,7 +179,7 @@ fn write_rel_aggregation_row(row: &RelAggregationRow, map: &mut HashMap<String, 
                 None => {
                     let mut inner_map: Map = Map::new();
                     inner_map.insert(rf.name.clone(), Item::Value(count.clone()));
-                    map.insert(fields::UNDERSCORE_COUNT.to_owned(), Item::Map(inner_map))
+                    map.insert(UNDERSCORE_COUNT.to_owned(), Item::Map(inner_map))
                 }
             },
         };
@@ -232,10 +241,7 @@ fn serialize_record_selection(
                             if !opt {
                                 // Check that all items are non-null
                                 if items.iter().any(|item| matches!(item, Item::Value(PrismaValue::Null))) {
-                                    return Err(CoreError::SerializationError(format!(
-                                        "Required field '{}' returned a null record",
-                                        name
-                                    )));
+                                    return Err(CoreError::null_serialization_error(&name));
                                 }
                             }
 
@@ -259,10 +265,7 @@ fn serialize_record_selection(
                             } else if items.is_empty() && opt {
                                 Ok((parent, Item::Ref(ItemRef::new(Item::Value(PrismaValue::Null)))))
                             } else if items.is_empty() && opt {
-                                Err(CoreError::SerializationError(format!(
-                                    "Required field '{}' returned a null record",
-                                    name
-                                )))
+                                Err(CoreError::null_serialization_error(&name))
                             } else {
                                 Ok((parent, Item::Ref(ItemRef::new(items.pop().unwrap()))))
                             }
@@ -326,10 +329,9 @@ fn serialize_objects(
         }
 
         // Write nested results
-        write_nested_items(&record_id, &mut nested_mapping, &mut object, &typ);
+        write_nested_items(&record_id, &mut nested_mapping, &mut object, &typ)?;
 
         let aggr_row = result.aggregation_rows.as_ref().map(|rows| rows.get(r_index).unwrap());
-
         if let Some(aggr_row) = aggr_row {
             write_rel_aggregation_row(aggr_row, &mut object);
         }
@@ -338,14 +340,14 @@ fn serialize_objects(
             .map(|row| {
                 row.iter()
                     .map(|aggr_result| match aggr_result {
-                        RelAggregationResult::Count(_, _) => fields::UNDERSCORE_COUNT.to_owned(),
+                        RelAggregationResult::Count(_, _) => UNDERSCORE_COUNT.to_owned(),
                     })
                     .unique()
                     .collect()
             })
             .unwrap_or(vec![]);
-        let mut all_fields = result.fields.clone();
 
+        let mut all_fields = result.fields.clone();
         all_fields.append(&mut aggr_fields);
 
         let map = all_fields
@@ -377,8 +379,8 @@ fn write_nested_items(
     items_with_parent: &mut HashMap<String, CheckedItemsWithParents>,
     into: &mut HashMap<String, Item>,
     enclosing_type: &ObjectTypeStrongRef,
-) {
-    items_with_parent.iter_mut().for_each(|(field_name, inner)| {
+) -> crate::Result<()> {
+    for (field_name, inner) in items_with_parent.iter_mut() {
         let val = inner.get(record_id);
 
         // The value must be a reference (or None - handle default), everything else is an error in the serialization logic.
@@ -392,17 +394,16 @@ fn write_nested_items(
                 let default = match field.field_type.borrow() {
                     OutputType::List(_) => Item::list(Vec::new()),
                     _ if field.is_nullable => Item::Value(PrismaValue::Null),
-                    _ => panic!(
-                        "Application logic invariant error: received null value for field {} which may not be null",
-                        &field_name
-                    ),
+                    _ => return Err(CoreError::null_serialization_error(field_name)),
                 };
 
                 into.insert(field_name.to_owned(), Item::Ref(ItemRef::new(default)));
             }
-            _ => panic!("Application logic invariant error: Nested items have to be wrapped as a Item::Ref."),
+            _ => panic!("Invariant error: Nested items have to be wrapped as a Item::Ref."),
         };
-    });
+    }
+
+    Ok(())
 }
 
 /// Processes nested results into a more ergonomic structure of { <nested field name> -> { parent ID -> item (list, map, ...) } }.
@@ -441,7 +442,7 @@ fn serialize_scalar(field: &OutputFieldRef, value: PrismaValue) -> crate::Result
             OutputType::Scalar(subtype) => {
                 let items = unwrap_prisma_value(value)
                     .into_iter()
-                    .map(|v| convert_prisma_value(v, subtype))
+                    .map(|v| convert_prisma_value(field, v, subtype))
                     .map(|pv| pv.map(Item::Value))
                     .collect::<Result<Vec<Item>, CoreError>>()?;
                 Ok(Item::list(items))
@@ -457,19 +458,19 @@ fn serialize_scalar(field: &OutputFieldRef, value: PrismaValue) -> crate::Result
                 Ok(Item::list(items))
             }
             _ => Err(CoreError::SerializationError(format!(
-                "Attempted to serialize scalar list which contained non-scalar items of type '{:?}'",
-                arc_type
+                "Attempted to serialize scalar list which contained non-scalar items of type '{:?}' for field {}.",
+                arc_type, field.name
             ))),
         },
-        (_, OutputType::Scalar(st)) => Ok(Item::Value(convert_prisma_value(value, st)?)),
+        (_, OutputType::Scalar(st)) => Ok(Item::Value(convert_prisma_value(field, value, st)?)),
         (pv, ot) => Err(CoreError::SerializationError(format!(
-            "Attempted to serialize scalar '{}' with non-scalar compatible type '{:?}'",
-            pv, ot
+            "Attempted to serialize scalar '{}' with non-scalar compatible type '{:?}' for field {}.",
+            pv, ot, field.name
         ))),
     }
 }
 
-fn convert_prisma_value(value: PrismaValue, st: &ScalarType) -> Result<PrismaValue, CoreError> {
+fn convert_prisma_value(field: &OutputFieldRef, value: PrismaValue, st: &ScalarType) -> Result<PrismaValue, CoreError> {
     let item_value = match (st, value) {
         (ScalarType::String, PrismaValue::String(s)) => PrismaValue::String(s),
 
@@ -502,8 +503,8 @@ fn convert_prisma_value(value: PrismaValue, st: &ScalarType) -> Result<PrismaVal
 
         (st, pv) => {
             return Err(CoreError::SerializationError(format!(
-                "Attempted to serialize scalar '{}' with incompatible type '{:?}'",
-                pv, st
+                "Attempted to serialize scalar '{}' with incompatible type '{:?}' for field {}.",
+                pv, st, field.name
             )))
         }
     };
@@ -516,14 +517,14 @@ fn convert_enum(value: PrismaValue, dbt: &DatabaseEnumType) -> Result<Item, Core
         PrismaValue::String(s) | PrismaValue::Enum(s) => match dbt.map_output_value(&s) {
             Some(inum) => Ok(Item::Value(inum)),
             None => Err(CoreError::SerializationError(format!(
-                "Value '{}' not found in enum '{:?}'",
-                s, dbt
+                "Value '{}' not found in enum '{}'",
+                s, dbt.name
             ))),
         },
 
         val => Err(CoreError::SerializationError(format!(
-            "Attempted to serialize non-enum-compatible value '{}' with enum '{:?}'",
-            val, dbt
+            "Attempted to serialize non-enum-compatible value '{}' for enum '{}'",
+            val, dbt.name
         ))),
     }
 }
@@ -531,6 +532,6 @@ fn convert_enum(value: PrismaValue, dbt: &DatabaseEnumType) -> Result<Item, Core
 fn unwrap_prisma_value(pv: PrismaValue) -> Vec<PrismaValue> {
     match pv {
         PrismaValue::List(l) => l,
-        _ => panic!("We want lists!"),
+        _ => panic!("Invariant error: Called unwrap list value on non-list."),
     }
 }
