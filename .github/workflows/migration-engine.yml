@@ -45,7 +45,7 @@ jobs:
             shadow_database_url: "mysql://root:prisma@localhost:33808/shadow"
             is_vitess: true
 
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, buildjet]
     steps:
       - uses: actions/checkout@v2
 
