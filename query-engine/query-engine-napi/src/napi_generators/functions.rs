@@ -26,7 +26,7 @@ pub fn version(ctx: CallContext) -> napi::Result<JsUnknown> {
 }
 
 #[js_function(1)]
-pub fn dmmf(ctx: CallContext) -> napi::Result<JsUnknown> {
+pub fn dmmf(ctx: CallContext) -> napi::Result<JsString> {
     let datamodel_string = ctx.get::<JsString>(0)?.into_utf8()?.into_owned()?;
 
     let datamodel = datamodel::parse_datamodel(&datamodel_string)
@@ -53,8 +53,8 @@ pub fn dmmf(ctx: CallContext) -> napi::Result<JsUnknown> {
     ));
 
     let dmmf = dmmf::render_dmmf(&datamodel.subject, query_schema);
-
-    ctx.env.to_js_value(&dmmf)
+    let dmmf_string = serde_json::to_string(&dmmf).unwrap();
+    ctx.env.create_string(&dmmf_string)
 }
 
 #[js_function(1)]
