@@ -1108,8 +1108,8 @@ async fn join_tables_between_models_with_compound_primary_keys_must_work(api: &T
             human_lastName String
             cat_id String
 
-            cat Cat @relation(fields: [cat_id], references: [id])
-            human Human @relation(fields: [human_firstName, human_lastName], references: [firstName, lastName])
+            cat Cat @relation(fields: [cat_id], references: [id], onDelete: Cascade)
+            human Human @relation(fields: [human_firstName, human_lastName], references: [firstName, lastName], onDelete: Cascade)
 
             @@unique([cat_id, human_firstName, human_lastName], name: "joinTableUnique")
             @@index([human_firstName, human_lastName], name: "joinTableIndex")
@@ -1130,10 +1130,11 @@ async fn join_tables_between_models_with_compound_primary_keys_must_work(api: &T
             .assert_has_column("cat_id")?
             .assert_fk_on_columns(&["human_firstName", "human_lastName"], |fk| {
                 fk.assert_references("Human", &["firstName", "lastName"])?
-                    .assert_cascades_on_delete()
+                    .assert_referential_action_on_delete(ForeignKeyAction::Cascade)
             })?
             .assert_fk_on_columns(&["cat_id"], |fk| {
-                fk.assert_references("Cat", &["id"])?.assert_cascades_on_delete()
+                fk.assert_references("Cat", &["id"])?
+                    .assert_referential_action_on_delete(ForeignKeyAction::Cascade)
             })?
             .assert_indexes_count(2)?
             .assert_index_on_columns(&["cat_id", "human_firstName", "human_lastName"], |idx| {

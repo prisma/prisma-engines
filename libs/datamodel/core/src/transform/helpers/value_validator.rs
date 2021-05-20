@@ -8,6 +8,7 @@ use crate::{
 };
 use bigdecimal::BigDecimal;
 use chrono::{DateTime, FixedOffset};
+use dml::relation_info::ReferentialAction;
 use dml::scalars::ScalarType;
 use prisma_value::PrismaValue;
 use std::error;
@@ -164,7 +165,27 @@ impl ValueValidator {
         }
     }
 
-    /// Unwraps the wrapped value as an array literal.
+    /// Unwraps the wrapped value as a referential action.
+    pub fn as_referential_action(&self) -> Result<ReferentialAction, DatamodelError> {
+        match self.as_constant_literal()?.as_str() {
+            "Cascade" => Ok(ReferentialAction::Cascade),
+            "Restrict" => Ok(ReferentialAction::Restrict),
+            "NoAction" => Ok(ReferentialAction::NoAction),
+            "SetNull" => Ok(ReferentialAction::SetNull),
+            "SetDefault" => Ok(ReferentialAction::SetDefault),
+            s => {
+                let message = format!("Invalid referential action: `{}`", s);
+
+                Err(DatamodelError::AttributeValidationError {
+                    message,
+                    attribute_name: String::from("relation"),
+                    span: self.span(),
+                })
+            }
+        }
+    }
+
+    /// Unwraps the wrapped value as a constant literal..
     pub fn as_array(&self) -> Vec<ValueValidator> {
         match &self.value {
             ast::Expression::Array(values, _) => {

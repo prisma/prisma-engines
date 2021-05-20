@@ -462,7 +462,7 @@ fn with_an_invalid_unapplied_migration_should_report_it(api: TestApi) {
 }
 
 #[test_connector(tags(Postgres))]
-fn drift_can_be_detected_without_migrations_table(api: TestApi) {
+fn drift_can_be_detected_without_migrations_table2(api: TestApi) {
     let directory = api.create_migrations_directory();
 
     api.raw_cmd("CREATE TABLE \"cat\" (\nid SERIAL PRIMARY KEY\n);");

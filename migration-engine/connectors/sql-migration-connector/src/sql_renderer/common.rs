@@ -67,13 +67,13 @@ pub(crate) fn render_nullability(column: &ColumnWalker<'_>) -> &'static str {
     }
 }
 
-pub(crate) fn render_on_delete(on_delete: &ForeignKeyAction) -> &'static str {
-    match on_delete {
-        ForeignKeyAction::NoAction => "",
-        ForeignKeyAction::SetNull => "ON DELETE SET NULL",
-        ForeignKeyAction::Cascade => "ON DELETE CASCADE",
-        ForeignKeyAction::SetDefault => "ON DELETE SET DEFAULT",
-        ForeignKeyAction::Restrict => "ON DELETE RESTRICT",
+pub(crate) fn render_referential_action(action: &ForeignKeyAction) -> &'static str {
+    match action {
+        ForeignKeyAction::NoAction => "NO ACTION",
+        ForeignKeyAction::Restrict => "RESTRICT",
+        ForeignKeyAction::Cascade => "CASCADE",
+        ForeignKeyAction::SetNull => "SET NULL",
+        ForeignKeyAction::SetDefault => "SET DEFAULT",
     }
 }
 

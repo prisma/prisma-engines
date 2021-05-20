@@ -1,8 +1,6 @@
 use super::common::*;
 use crate::diagnostics::DatamodelError;
-use crate::{
-    ast, common::NameNormalizer, diagnostics::Diagnostics, dml, Field, OnDeleteStrategy, ScalarField, UniqueCriteria,
-};
+use crate::{ast, common::NameNormalizer, diagnostics::Diagnostics, dml, Field, ScalarField, UniqueCriteria};
 use itertools::Itertools;
 use std::collections::HashMap;
 
@@ -212,7 +210,8 @@ impl StandardiserForFormatting {
                         fields: vec![],
                         references: vec![],
                         name: rel_info.name.clone(),
-                        on_delete: OnDeleteStrategy::None,
+                        on_delete: None,
+                        on_update: None,
                     };
                     let mut opposite_relation_field =
                         dml::RelationField::new_generated(&model.name, relation_info, false);
@@ -289,7 +288,8 @@ impl StandardiserForFormatting {
                         fields: underlying_field_names,
                         references: unique_criteria_field_names,
                         name: rel_info.name.clone(),
-                        on_delete: OnDeleteStrategy::None,
+                        on_delete: None,
+                        on_update: None,
                     };
 
                     let is_required = all_existing_underlying_fields_on_opposite_model_are_required

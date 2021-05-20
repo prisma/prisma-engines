@@ -204,7 +204,7 @@ fn get_relation_to_fields(field: &dml::Field) -> Option<Vec<String>> {
 
 fn get_relation_delete_strategy(field: &dml::Field) -> Option<String> {
     match &field {
-        dml::Field::RelationField(rf) => Some(rf.relation_info.on_delete.to_string()),
+        dml::Field::RelationField(rf) => rf.relation_info.on_delete.map(|ri| ri.to_string()),
         _ => None,
     }
 }

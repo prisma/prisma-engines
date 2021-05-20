@@ -19,13 +19,30 @@ async fn a_table_without_uniques_should_ignore(api: &TestApi) -> TestResult {
         })
         .await?;
 
-    let dm = if api.sql_family().is_mysql() {
+    let dm = if api.sql_family().is_mysql() && !api.is_mysql8() {
         indoc! {r#"
             /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
             model Post {
               id      Int
               user_id Int
-              User    User @relation(fields: [user_id], references: [id])
+              User    User @relation(fields: [user_id], references: [id], onDelete: Restrict, onUpdate: Restrict)
+
+              @@index([user_id], name: "user_id")
+              @@ignore
+            }
+
+            model User {
+              id   Int    @id @default(autoincrement())
+              Post Post[] @ignore
+            }
+        "#}
+    } else if api.sql_family().is_mysql() {
+        indoc! {r#"
+            /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+            model Post {
+              id      Int
+              user_id Int
+              User    User @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
               @@index([user_id], name: "user_id")
               @@ignore
@@ -42,7 +59,7 @@ async fn a_table_without_uniques_should_ignore(api: &TestApi) -> TestResult {
             model Post {
               id      Int
               user_id Int
-              User    User @relation(fields: [user_id], references: [id])
+              User    User @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
               @@ignore
             }
@@ -79,7 +96,7 @@ async fn relations_between_ignored_models_should_not_have_field_level_ignores(ap
             model Post {
               id      Unsupported("macaddr") @id
               user_id Unsupported("macaddr")
-              User    User                   @relation(fields: [user_id], references: [id])
+              User    User                   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
               @@ignore
             }
@@ -274,7 +291,7 @@ async fn a_table_with_unsupported_types_in_a_relation(api: &TestApi) -> TestResu
             model Post {
               id            Int                     @id @default(autoincrement())
               user_ip       Unsupported("cidr")
-              User          User                    @relation(fields: [user_ip], references: [ip])
+              User          User                    @relation(fields: [user_ip], references: [ip], onDelete: NoAction, onUpdate: NoAction)
             }
 
             model User {
@@ -395,7 +412,7 @@ async fn ignore_on_back_relation_field_if_pointing_to_ignored_model(api: &TestAp
             model Post {
                 id      Int
                 user_ip Int
-                User    User @relation(fields: [user_ip], references: [ip])
+                User    User @relation(fields: [user_ip], references: [ip], onDelete: NoAction, onUpdate: NoAction)
 
                 @@ignore
             }

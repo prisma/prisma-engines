@@ -167,7 +167,7 @@ fn uuids_do_not_generate_drift_issue_5282(api: TestApi) {
         r#"
         CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
         CREATE TABLE a (id uuid DEFAULT uuid_generate_v4() primary key);
-        CREATE TABLE b (id uuid DEFAULT uuid_generate_v4() primary key, a_id uuid, CONSTRAINT aaa FOREIGN KEY (a_id) REFERENCES a(id));
+        CREATE TABLE b (id uuid DEFAULT uuid_generate_v4() primary key, a_id uuid, CONSTRAINT aaa FOREIGN KEY (a_id) REFERENCES a(id) ON DELETE SET NULL ON UPDATE SET NULL);
         "#
     );
 

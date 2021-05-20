@@ -6,6 +6,7 @@ use crate::{
     DefaultValue, FieldType,
 };
 use crate::{ast::WithAttributes, walkers::walk_models};
+use datamodel_connector::ConnectorCapability;
 use itertools::Itertools;
 use prisma_value::PrismaValue;
 use std::collections::{HashMap, HashSet};
@@ -510,6 +511,38 @@ impl<'a> Validator<'a> {
                         &err.to_string(),
                         ast_model.find_field(&field.name()).span,
                     ));
+                }
+
+                if let dml::Field::RelationField(ref rf) = field {
+                    let actions = &[rf.relation_info.on_delete, rf.relation_info.on_update];
+
+                    actions.iter().flatten().for_each(|action| {
+                        if !connector.has_capability(ConnectorCapability::ReferentialActions) {
+                            diagnostics.push_error(DatamodelError::new_attribute_validation_error(
+                                "Referential actions are not supported for current connector.",
+                                "relation",
+                                ast_model.find_field(field.name()).span,
+                            ));
+                        } else if !connector.supports_referential_action(*action) {
+                            let allowed_values: Vec<_> = connector
+                                .referential_actions()
+                                .iter()
+                                .map(|f| format!("`{}`", f))
+                                .collect();
+
+                            let message = format!(
+                                "Invalid referential action: `{}`. Allowed values: ({})",
+                                action,
+                                allowed_values.join(", "),
+                            );
+
+                            diagnostics.push_error(DatamodelError::new_attribute_validation_error(
+                                &message,
+                                "relation",
+                                ast_model.find_field(field.name()).span,
+                            ));
+                        }
+                    });
                 }
             }
         }

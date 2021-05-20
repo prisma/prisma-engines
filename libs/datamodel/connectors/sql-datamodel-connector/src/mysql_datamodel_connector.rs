@@ -1,13 +1,18 @@
-use datamodel_connector::connector_error::ConnectorError;
-use datamodel_connector::helper::{args_vec_from_opt, parse_one_opt_u32, parse_one_u32, parse_two_opt_u32};
-use datamodel_connector::{Connector, ConnectorCapability};
-use dml::field::{Field, FieldType};
-use dml::model::{IndexType, Model};
-use dml::native_type_constructor::NativeTypeConstructor;
-use dml::native_type_instance::NativeTypeInstance;
-use dml::scalars::ScalarType;
-use native_types::MySqlType;
-use native_types::MySqlType::*;
+use datamodel_connector::{
+    connector_error::ConnectorError,
+    helper::{args_vec_from_opt, parse_one_opt_u32, parse_one_u32, parse_two_opt_u32},
+    Connector, ConnectorCapability,
+};
+use dml::{
+    field::{Field, FieldType},
+    model::{IndexType, Model},
+    native_type_constructor::NativeTypeConstructor,
+    native_type_instance::NativeTypeInstance,
+    relation_info::ReferentialAction,
+    scalars::ScalarType,
+};
+use enumflags2::BitFlags;
+use native_types::MySqlType::{self, *};
 
 const INT_TYPE_NAME: &str = "Int";
 const UNSIGNED_INT_TYPE_NAME: &str = "UnsignedInt";
@@ -56,10 +61,13 @@ const NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION: &[&str] = &[
 pub struct MySqlDatamodelConnector {
     capabilities: Vec<ConnectorCapability>,
     constructors: Vec<NativeTypeConstructor>,
+    referential_actions: BitFlags<ReferentialAction>,
 }
 
 impl MySqlDatamodelConnector {
     pub fn new() -> MySqlDatamodelConnector {
+        use ReferentialAction::*;
+
         let capabilities = vec![
             ConnectorCapability::RelationsOverNonUniqueCriteria,
             ConnectorCapability::Enums,
@@ -75,6 +83,7 @@ impl MySqlDatamodelConnector {
             ConnectorCapability::CreateManyWriteableAutoIncId,
             ConnectorCapability::AutoIncrement,
             ConnectorCapability::CompoundIds,
+            ConnectorCapability::ReferentialActions,
         ];
 
         let int = NativeTypeConstructor::without_args(INT_TYPE_NAME, vec![ScalarType::Int]);
@@ -149,9 +158,12 @@ impl MySqlDatamodelConnector {
             json,
         ];
 
+        let referential_actions = Restrict | Cascade | SetNull | NoAction | SetDefault;
+
         MySqlDatamodelConnector {
             capabilities,
             constructors,
+            referential_actions,
         }
     }
 }
@@ -175,6 +187,10 @@ impl Connector for MySqlDatamodelConnector {
 
     fn capabilities(&self) -> &Vec<ConnectorCapability> {
         &self.capabilities
+    }
+
+    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
+        self.referential_actions
     }
 
     fn scalar_type_for_native_type(&self, native_type: serde_json::Value) -> ScalarType {

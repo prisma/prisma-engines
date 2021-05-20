@@ -5,8 +5,10 @@ use datamodel_connector::{
     Connector, ConnectorCapability,
 };
 use dml::{
-    native_type_constructor::NativeTypeConstructor, native_type_instance::NativeTypeInstance, traits::WithDatabaseName,
+    native_type_constructor::NativeTypeConstructor, native_type_instance::NativeTypeInstance,
+    relation_info::ReferentialAction, traits::WithDatabaseName,
 };
+use enumflags2::BitFlags;
 use mongodb_types::*;
 use native_types::MongoDbType;
 use std::result::Result as StdResult;
@@ -54,6 +56,10 @@ impl Connector for MongoDbDatamodelConnector {
 
     fn capabilities(&self) -> &Vec<ConnectorCapability> {
         &self.capabilities
+    }
+
+    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
+        BitFlags::empty()
     }
 
     fn validate_field(&self, field: &dml::field::Field) -> Result<()> {

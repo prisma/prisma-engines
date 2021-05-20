@@ -1,4 +1,6 @@
+use datamodel::ReferentialAction;
 use migration_engine_tests::sync_test_api::*;
+use sql_schema_describer::ForeignKeyAction;
 
 #[test_connector]
 fn adding_a_many_to_many_relation_must_result_in_a_prisma_style_relation_table(api: TestApi) {
@@ -22,10 +24,14 @@ fn adding_a_many_to_many_relation_must_result_in_a_prisma_style_relation_table(a
             .assert_column("A", |col| col.assert_type_is_int())?
             .assert_column("B", |col| col.assert_type_is_string())?
             .assert_fk_on_columns(&["A"], |fk| {
-                fk.assert_references("A", &["id"])?.assert_cascades_on_delete()
+                fk.assert_references("A", &["id"])?
+                    .assert_referential_action_on_update(ForeignKeyAction::Cascade)?
+                    .assert_referential_action_on_delete(ForeignKeyAction::Cascade)
             })?
             .assert_fk_on_columns(&["B"], |fk| {
-                fk.assert_references("B", &["id"])?.assert_cascades_on_delete()
+                fk.assert_references("B", &["id"])?
+                    .assert_referential_action_on_update(ForeignKeyAction::Cascade)?
+                    .assert_referential_action_on_delete(ForeignKeyAction::Cascade)
             })
     });
 }
@@ -63,8 +69,8 @@ fn adding_an_inline_relation_must_result_in_a_foreign_key_in_the_model_table(api
             id Int @id
             bid Int
             cid Int?
-            b  B   @relation(fields: [bid], references: [id])
-            c  C?  @relation(fields: [cid], references: [id])
+            b  B   @relation(fields: [bid], references: [id], onDelete: NoAction)
+            c  C?  @relation(fields: [cid], references: [id], onDelete: NoAction)
         }
 
         model B {
@@ -84,7 +90,9 @@ fn adding_an_inline_relation_must_result_in_a_foreign_key_in_the_model_table(api
             .assert_column("cid", |c| c.assert_type_is_int()?.assert_is_nullable())?
             .assert_foreign_keys_count(2)?
             .assert_fk_on_columns(&["bid"], |fk| {
-                fk.assert_references("B", &["id"])?.assert_cascades_on_delete()
+                fk.assert_references("B", &["id"])?
+                    .assert_referential_action_on_update(ForeignKeyAction::Cascade)?
+                    .assert_referential_action_on_delete(ForeignKeyAction::NoAction)
             })?
             .assert_fk_on_columns(&["cid"], |fk| fk.assert_references("C", &["id"]))
     });
@@ -119,7 +127,7 @@ fn adding_an_inline_relation_to_a_model_with_an_exotic_id_type(api: TestApi) {
         model A {
             id Int @id
             b_id String
-            b B @relation(fields: [b_id], references: [id])
+            b B @relation(fields: [b_id], references: [id], onDelete: NoAction)
         }
 
         model B {
@@ -133,7 +141,9 @@ fn adding_an_inline_relation_to_a_model_with_an_exotic_id_type(api: TestApi) {
         t.assert_column("b_id", |c| c.assert_type_is_string())?
             .assert_foreign_keys_count(1)?
             .assert_fk_on_columns(&["b_id"], |fk| {
-                fk.assert_references("B", &["id"])?.assert_cascades_on_delete()
+                fk.assert_references("B", &["id"])?
+                    .assert_referential_action_on_update(ForeignKeyAction::Cascade)?
+                    .assert_referential_action_on_delete(ForeignKeyAction::NoAction)
             })
     });
 }
@@ -186,7 +196,7 @@ fn compound_foreign_keys_should_work_in_correct_order(api: TestApi) {
             b Int
             a Int
             d Int
-            bb B @relation(fields: [a, b, d], references: [a_id, b_id, d_id])
+            bb B @relation(fields: [a, b, d], references: [a_id, b_id, d_id], onDelete: NoAction)
         }
 
         model B {
@@ -203,7 +213,8 @@ fn compound_foreign_keys_should_work_in_correct_order(api: TestApi) {
     api.assert_schema().assert_table_bang("A", |t| {
         t.assert_foreign_keys_count(1)?
             .assert_fk_on_columns(&["a", "b", "d"], |fk| {
-                fk.assert_cascades_on_delete()?
+                fk.assert_referential_action_on_delete(ForeignKeyAction::NoAction)?
+                    .assert_referential_action_on_update(ForeignKeyAction::Cascade)?
                     .assert_references("B", &["a_id", "b_id", "d_id"])
             })
     });
@@ -215,7 +226,7 @@ fn moving_an_inline_relation_to_the_other_side_must_work(api: TestApi) {
         model A {
             id Int @id
             b_id Int
-            b B @relation(fields: [b_id], references: [id])
+            b B @relation(fields: [b_id], references: [id], onDelete: NoAction)
         }
 
         model B {
@@ -227,7 +238,9 @@ fn moving_an_inline_relation_to_the_other_side_must_work(api: TestApi) {
     api.schema_push(dm1).send_sync().assert_green_bang();
     api.assert_schema().assert_table_bang("A", |t| {
         t.assert_foreign_keys_count(1)?.assert_fk_on_columns(&["b_id"], |fk| {
-            fk.assert_cascades_on_delete()?.assert_references("B", &["id"])
+            fk.assert_referential_action_on_delete(ForeignKeyAction::NoAction)?
+                .assert_referential_action_on_update(ForeignKeyAction::Cascade)?
+                .assert_references("B", &["id"])
         })
     });
 
@@ -240,7 +253,7 @@ fn moving_an_inline_relation_to_the_other_side_must_work(api: TestApi) {
         model B {
             id Int @id
             a_id Int
-            a A @relation(fields: [a_id], references: [id])
+            a A @relation(fields: [a_id], references: [id], onDelete: NoAction)
         }
     "#;
 
@@ -250,7 +263,9 @@ fn moving_an_inline_relation_to_the_other_side_must_work(api: TestApi) {
             table
                 .assert_foreign_keys_count(1)?
                 .assert_fk_on_columns(&["a_id"], |fk| {
-                    fk.assert_references("A", &["id"])?.assert_cascades_on_delete()
+                    fk.assert_references("A", &["id"])?
+                        .assert_referential_action_on_delete(ForeignKeyAction::NoAction)?
+                        .assert_referential_action_on_update(ForeignKeyAction::Cascade)
                 })
         })
         .assert_table_bang("A", |table| table.assert_foreign_keys_count(0)?.assert_indexes_count(0));
@@ -430,6 +445,196 @@ fn relations_with_mappings_on_referencing_side_can_reference_multiple_fields(api
             .assert_foreign_keys_count(1)?
             .assert_fk_on_columns(&["emergency-mail-fk1", "age-fk2"], |fk| {
                 fk.assert_references("users", &["email", "age"])
+            })
+    });
+}
+
+#[test_connector]
+fn on_delete_referential_actions_should_work(api: TestApi) {
+    let actions = &[
+        (ReferentialAction::SetNull, ForeignKeyAction::SetNull),
+        (ReferentialAction::Cascade, ForeignKeyAction::Cascade),
+        (ReferentialAction::NoAction, ForeignKeyAction::NoAction),
+    ];
+
+    for (ra, fka) in actions {
+        let dm = format!(
+            r#"
+            model A {{
+                id Int @id @default(autoincrement())
+                b      B[]
+            }}
+
+            model B {{
+                id   Int @id
+                aId  Int?
+                a    A?    @relation(fields: [aId], references: [id], onDelete: {})
+            }}
+        "#,
+            ra
+        );
+
+        api.schema_push(&dm).send_sync().assert_green_bang();
+
+        api.assert_schema().assert_table_bang("B", |table| {
+            table
+                .assert_foreign_keys_count(1)?
+                .assert_fk_on_columns(&["aId"], |fk| {
+                    fk.assert_references("A", &["id"])?
+                        .assert_referential_action_on_delete(*fka)
+                })
+        });
+
+        api.schema_push("").send_sync().assert_green_bang();
+    }
+}
+
+// 5.6 and 5.7 doesn't let you `SET DEFAULT` without setting the default value
+// (even if nullable). Maria will silently just use `RESTRICT` instead.
+#[test_connector(exclude(Mysql56, Mysql57, Mariadb, Mssql))]
+fn on_delete_set_default_should_work(api: TestApi) {
+    let dm = r#"
+        model A {
+            id Int @id
+            b      B[]
+        }
+
+        model B {
+            id   Int @id
+            aId  Int
+            a    A    @relation(fields: [aId], references: [id], onDelete: SetDefault)
+        }
+    "#;
+
+    api.schema_push(dm).send_sync().assert_green_bang();
+
+    api.assert_schema().assert_table_bang("B", |table| {
+        table
+            .assert_foreign_keys_count(1)?
+            .assert_fk_on_columns(&["aId"], |fk| {
+                fk.assert_references("A", &["id"])?
+                    .assert_referential_action_on_delete(ForeignKeyAction::SetDefault)
+            })
+    });
+}
+
+#[test_connector(exclude(Mssql))]
+fn on_delete_restrict_should_work(api: TestApi) {
+    let dm = r#"
+        model A {
+            id Int @id
+            b      B[]
+        }
+
+        model B {
+            id   Int @id
+            aId  Int
+            a    A    @relation(fields: [aId], references: [id], onDelete: Restrict)
+        }
+    "#;
+
+    api.schema_push(dm).send_sync().assert_green_bang();
+
+    api.assert_schema().assert_table_bang("B", |table| {
+        table
+            .assert_foreign_keys_count(1)?
+            .assert_fk_on_columns(&["aId"], |fk| {
+                fk.assert_references("A", &["id"])?
+                    .assert_referential_action_on_delete(ForeignKeyAction::Restrict)
+            })
+    });
+}
+
+#[test_connector]
+fn on_update_referential_actions_should_work(api: TestApi) {
+    let actions = &[
+        (ReferentialAction::Cascade, ForeignKeyAction::Cascade),
+        (ReferentialAction::NoAction, ForeignKeyAction::NoAction),
+        (ReferentialAction::SetNull, ForeignKeyAction::SetNull),
+    ];
+
+    for (ra, fka) in actions {
+        let dm = format!(
+            r#"
+            model A {{
+                id Int @id @default(autoincrement())
+                b      B[]
+            }}
+
+            model B {{
+                id   Int @id
+                aId  Int?
+                a    A?    @relation(fields: [aId], references: [id], onUpdate: {})
+            }}
+        "#,
+            ra
+        );
+
+        api.schema_push(&dm).send_sync().assert_green_bang();
+
+        api.assert_schema().assert_table_bang("B", |table| {
+            table
+                .assert_foreign_keys_count(1)?
+                .assert_fk_on_columns(&["aId"], |fk| {
+                    fk.assert_references("A", &["id"])?
+                        .assert_referential_action_on_update(*fka)
+                })
+        });
+    }
+}
+
+// 5.6 and 5.7 doesn't let you `SET DEFAULT` without setting the default value
+// (even if nullable). Maria will silently just use `RESTRICT` instead.
+#[test_connector(exclude(Mysql56, Mysql57, Mariadb, Mssql))]
+fn on_update_set_default_should_work(api: TestApi) {
+    let dm = r#"
+        model A {
+            id Int @id
+            b      B[]
+        }
+
+        model B {
+            id   Int @id
+            aId  Int
+            a    A    @relation(fields: [aId], references: [id], onUpdate: SetDefault)
+        }
+    "#;
+
+    api.schema_push(dm).send_sync().assert_green_bang();
+
+    api.assert_schema().assert_table_bang("B", |table| {
+        table
+            .assert_foreign_keys_count(1)?
+            .assert_fk_on_columns(&["aId"], |fk| {
+                fk.assert_references("A", &["id"])?
+                    .assert_referential_action_on_update(ForeignKeyAction::SetDefault)
+            })
+    });
+}
+
+#[test_connector(exclude(Mssql))]
+fn on_update_restrict_should_work(api: TestApi) {
+    let dm = r#"
+        model A {
+            id Int @id
+            b      B[]
+        }
+
+        model B {
+            id   Int @id
+            aId  Int
+            a    A    @relation(fields: [aId], references: [id], onUpdate: Restrict)
+        }
+    "#;
+
+    api.schema_push(dm).send_sync().assert_green_bang();
+
+    api.assert_schema().assert_table_bang("B", |table| {
+        table
+            .assert_foreign_keys_count(1)?
+            .assert_fk_on_columns(&["aId"], |fk| {
+                fk.assert_references("A", &["id"])?
+                    .assert_referential_action_on_update(ForeignKeyAction::Restrict)
             })
     });
 }

@@ -4,8 +4,9 @@ pub mod helper;
 use crate::connector_error::{ConnectorError, ConnectorErrorFactory, ErrorKind};
 use dml::{
     field::Field, model::Model, native_type_constructor::NativeTypeConstructor,
-    native_type_instance::NativeTypeInstance, scalars::ScalarType,
+    native_type_instance::NativeTypeInstance, relation_info::ReferentialAction, scalars::ScalarType,
 };
+use enumflags2::BitFlags;
 use std::{borrow::Cow, collections::BTreeMap};
 
 pub trait Connector: Send + Sync {
@@ -15,6 +16,12 @@ pub trait Connector: Send + Sync {
 
     fn has_capability(&self, capability: ConnectorCapability) -> bool {
         self.capabilities().contains(&capability)
+    }
+
+    fn referential_actions(&self) -> BitFlags<ReferentialAction>;
+
+    fn supports_referential_action(&self, action: ReferentialAction) -> bool {
+        self.referential_actions().contains(action)
     }
 
     fn validate_field(&self, field: &Field) -> Result<(), ConnectorError>;
@@ -172,6 +179,7 @@ pub enum ConnectorCapability {
     AutoIncrementMultipleAllowed,
     AutoIncrementNonIndexedAllowed,
     RelationFieldsInArbitraryOrder,
+    ReferentialActions,
 
     // start of Query Engine Capabilities
     InsensitiveFilters,

@@ -52,14 +52,14 @@ impl SqlRenderer for PostgresFlavour {
                 referenced_table: foreign_key.referenced_table().name().into(),
                 on_delete: Some(match foreign_key.on_delete_action() {
                     ForeignKeyAction::Cascade => ddl::ForeignKeyAction::Cascade,
-                    ForeignKeyAction::NoAction => ddl::ForeignKeyAction::DoNothing,
+                    ForeignKeyAction::NoAction => ddl::ForeignKeyAction::NoAction,
                     ForeignKeyAction::Restrict => ddl::ForeignKeyAction::Restrict,
                     ForeignKeyAction::SetDefault => ddl::ForeignKeyAction::SetDefault,
                     ForeignKeyAction::SetNull => ddl::ForeignKeyAction::SetNull,
                 }),
                 on_update: Some(match foreign_key.on_update_action() {
                     ForeignKeyAction::Cascade => ddl::ForeignKeyAction::Cascade,
-                    ForeignKeyAction::NoAction => ddl::ForeignKeyAction::DoNothing,
+                    ForeignKeyAction::NoAction => ddl::ForeignKeyAction::NoAction,
                     ForeignKeyAction::Restrict => ddl::ForeignKeyAction::Restrict,
                     ForeignKeyAction::SetDefault => ddl::ForeignKeyAction::SetDefault,
                     ForeignKeyAction::SetNull => ddl::ForeignKeyAction::SetNull,

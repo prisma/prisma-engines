@@ -631,10 +631,25 @@ impl<'a> ForeignKeyAssertion<'a> {
         Ok(self)
     }
 
-    pub fn assert_cascades_on_delete(self) -> AssertionResult<Self> {
+    pub fn assert_referential_action_on_delete(self, action: ForeignKeyAction) -> AssertionResult<Self> {
         anyhow::ensure!(
-            self.fk.on_delete_action == ForeignKeyAction::Cascade,
-            "Assertion failed: expected foreign key to cascade on delete."
+            self.fk.on_delete_action == action,
+            format!(
+                "Assertion failed: expected foreign key to {:?} on delete, but got {:?}.",
+                action, self.fk.on_delete_action
+            )
+        );
+
+        Ok(self)
+    }
+
+    pub fn assert_referential_action_on_update(self, action: ForeignKeyAction) -> AssertionResult<Self> {
+        anyhow::ensure!(
+            self.fk.on_update_action == action,
+            format!(
+                "Assertion failed: expected foreign key to {:?} on update, but got {:?}.",
+                action, self.fk.on_update_action
+            )
         );
 
         Ok(self)

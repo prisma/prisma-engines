@@ -32,6 +32,14 @@ impl AttributeValidator<dml::Field> for RelationAttributeValidator {
                 rf.relation_info.fields = base_fields.as_array().to_literal_vec()?;
             }
 
+            if let Ok(on_delete) = args.arg("onDelete") {
+                rf.relation_info.on_delete = Some(on_delete.as_referential_action()?);
+            }
+
+            if let Ok(on_update) = args.arg("onUpdate") {
+                rf.relation_info.on_update = Some(on_update.as_referential_action()?);
+            }
+
             Ok(())
         } else {
             self.new_attribute_validation_error("Invalid field type, not a relation.", args.span())
@@ -95,11 +103,16 @@ impl AttributeValidator<dml::Field> for RelationAttributeValidator {
                 }
             }
 
-            if relation_info.on_delete != dml::OnDeleteStrategy::None {
-                args.push(ast::Argument::new_constant(
-                    "onDelete",
-                    &relation_info.on_delete.to_string(),
-                ));
+            if let Some(ref_action) = relation_info.on_delete {
+                let expression = ast::Expression::ConstantValue(ref_action.to_string(), ast::Span::empty());
+
+                args.push(ast::Argument::new("onDelete", expression));
+            }
+
+            if let Some(ref_action) = relation_info.on_update {
+                let expression = ast::Expression::ConstantValue(ref_action.to_string(), ast::Span::empty());
+
+                args.push(ast::Argument::new("onUpdate", expression));
             }
 
             if !args.is_empty() {

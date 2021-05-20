@@ -338,7 +338,7 @@ impl SqlSchemaDescriber {
                     if let Some(column) = referenced_column {
                         referenced_columns.insert(seq, column);
                     };
-                    let on_delete_action = match row
+                    let on_delete_action = match dbg!(&row)
                         .get("on_delete")
                         .and_then(|x| x.to_string())
                         .expect("on_delete")

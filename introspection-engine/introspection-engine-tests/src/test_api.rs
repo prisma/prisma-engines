@@ -85,6 +85,10 @@ impl TestApi {
         self.tags().contains(Tags::Cockroach)
     }
 
+    pub fn is_mysql8(&self) -> bool {
+        self.tags().contains(Tags::Mysql8)
+    }
+
     #[tracing::instrument(skip(self, data_model_string))]
     #[track_caller]
     pub async fn re_introspect(&self, data_model_string: &str) -> Result<String> {

@@ -1,8 +1,9 @@
 use barrel::types;
+use datamodel::ReferentialAction;
 use indoc::formatdoc;
 use indoc::indoc;
 use introspection_engine_tests::{assert_eq_json, test_api::*};
-use quaint::prelude::Queryable;
+use quaint::prelude::{Queryable, SqlFamily};
 use serde_json::json;
 use test_macros::test_connector;
 
@@ -130,13 +131,18 @@ async fn mapped_model_and_field_name(api: &TestApi) -> TestResult {
         ""
     };
 
+    let action = match api.sql_family() {
+        SqlFamily::Mysql if !api.is_mysql8() => ReferentialAction::Restrict,
+        _ => ReferentialAction::NoAction,
+    };
+
     let input_dm = format!(
         r#"
         model Post {{
             id               Int         @id @default(autoincrement())
             c_user_id        Int         @map("user_id")
-            Custom_User      Custom_User @relation(fields: [c_user_id], references: [c_id])
-            {}
+            Custom_User      Custom_User @relation(fields: [c_user_id], references: [c_id], onDelete: {action}, onUpdate: {action})
+            {extra_index}
         }}
 
         model Custom_User {{
@@ -146,7 +152,8 @@ async fn mapped_model_and_field_name(api: &TestApi) -> TestResult {
             @@map(name: "User")
         }}
     "#,
-        extra_index
+        action = action,
+        extra_index = extra_index
     );
 
     let final_dm = format!(
@@ -154,8 +161,8 @@ async fn mapped_model_and_field_name(api: &TestApi) -> TestResult {
         model Post {{
             id               Int         @id @default(autoincrement())
             c_user_id        Int         @map("user_id")
-            Custom_User      Custom_User @relation(fields: [c_user_id], references: [c_id])
-            {}
+            Custom_User      Custom_User @relation(fields: [c_user_id], references: [c_id], onDelete: {action}, onUpdate: {action})
+            {extra_index}
         }}
 
         model Custom_User {{
@@ -169,7 +176,8 @@ async fn mapped_model_and_field_name(api: &TestApi) -> TestResult {
             id               Int         @id @default(autoincrement())
         }}
     "#,
-        extra_index
+        action = action,
+        extra_index = extra_index
     );
 
     api.assert_eq_datamodels(&final_dm, &api.re_introspect(&input_dm).await?);
@@ -236,7 +244,7 @@ async fn manually_mapped_model_and_field_name(api: &TestApi) -> TestResult {
         model Post {{
             id               Int         @id @default(autoincrement())
             c_user_id        Int         @map("user_id")
-            Custom_User      Custom_User @relation(fields: [c_user_id], references: [c_id])
+            Custom_User      Custom_User @relation(fields: [c_user_id], references: [c_id], onDelete: NoAction, onUpdate: NoAction)
             {}
         }}
 
@@ -255,7 +263,7 @@ async fn manually_mapped_model_and_field_name(api: &TestApi) -> TestResult {
         model Post {{
             id               Int         @id @default(autoincrement())
             c_user_id        Int         @map("user_id")
-            Custom_User      Custom_User @relation(fields: [c_user_id], references: [c_id])
+            Custom_User      Custom_User @relation(fields: [c_user_id], references: [c_id], onDelete: NoAction, onUpdate: NoAction)
             {}
         }}
 
@@ -806,6 +814,11 @@ async fn multiple_changed_relation_names(api: &TestApi) -> TestResult {
         ("", "")
     };
 
+    let action = match api.sql_family() {
+        SqlFamily::Mysql if !api.is_mysql8() => ReferentialAction::Restrict,
+        _ => ReferentialAction::NoAction,
+    };
+
     let input_dm = format!(
         r#"
         model Employee {{
@@ -818,13 +831,15 @@ async fn multiple_changed_relation_names(api: &TestApi) -> TestResult {
             id                                            Int         @id @default(autoincrement())
             morningEmployeeId                             Int
             eveningEmployeeId                             Int
-            Employee_EmployeeToSchedule_eveningEmployeeId Employee    @relation("EmployeeToSchedule_eveningEmployeeId", fields: [eveningEmployeeId], references: [id])
-            Employee_EmployeeToSchedule_morningEmployeeId Employee    @relation("EmployeeToSchedule_morningEmployeeId", fields: [morningEmployeeId], references: [id])
-            {}
-            {}
+            Employee_EmployeeToSchedule_eveningEmployeeId Employee    @relation("EmployeeToSchedule_eveningEmployeeId", fields: [eveningEmployeeId], references: [id], onDelete: {action}, onUpdate: {action})
+            Employee_EmployeeToSchedule_morningEmployeeId Employee    @relation("EmployeeToSchedule_morningEmployeeId", fields: [morningEmployeeId], references: [id], onDelete: NoAction, onUpdate: {action})
+            {idx1}
+            {idx2}
         }}
     "#,
-        idx1, idx2
+        action = action,
+        idx1 = idx1,
+        idx2 = idx2,
     );
 
     let final_dm = format!(
@@ -839,17 +854,19 @@ async fn multiple_changed_relation_names(api: &TestApi) -> TestResult {
             id                                            Int         @id @default(autoincrement())
             morningEmployeeId                             Int
             eveningEmployeeId                             Int
-            Employee_EmployeeToSchedule_eveningEmployeeId Employee    @relation("EmployeeToSchedule_eveningEmployeeId", fields: [eveningEmployeeId], references: [id])
-            Employee_EmployeeToSchedule_morningEmployeeId Employee    @relation("EmployeeToSchedule_morningEmployeeId", fields: [morningEmployeeId], references: [id])
-            {}
-            {}
+            Employee_EmployeeToSchedule_eveningEmployeeId Employee    @relation("EmployeeToSchedule_eveningEmployeeId", fields: [eveningEmployeeId], references: [id], onDelete: {action}, onUpdate: {action})
+            Employee_EmployeeToSchedule_morningEmployeeId Employee    @relation("EmployeeToSchedule_morningEmployeeId", fields: [morningEmployeeId], references: [id], onDelete: {action}, onUpdate: {action})
+            {idx1}
+            {idx2}
         }}
 
         model Unrelated {{
             id               Int @id @default(autoincrement())
         }}
     "#,
-        idx1, idx2
+        action = action,
+        idx1 = idx1,
+        idx2 = idx2,
     );
 
     api.assert_eq_datamodels(&final_dm, &api.re_introspect(&input_dm).await?);
@@ -877,38 +894,42 @@ async fn custom_virtual_relation_field_names(api: &TestApi) -> TestResult {
         })
         .await?;
 
-    let input_dm = indoc! {r#"
-        model Post {
+    let action = match api.sql_family() {
+        SqlFamily::Mysql if !!api.is_mysql8() => ReferentialAction::Restrict,
+        _ => ReferentialAction::NoAction,
+    };
+
+    let input_dm = formatdoc! {r#"
+        model Post {{
             id               Int @id @default(autoincrement())
             user_id          Int  @unique
-            custom_User      User @relation(fields: [user_id], references: [id])
-        }
+            custom_User      User @relation(fields: [user_id], references: [id], onDelete: {action}, onUpdate: {action})
+        }}
 
-        model User {
+        model User {{
             id               Int @id @default(autoincrement())
             custom_Post      Post?
-        }
-    "#};
+        }}
+    "#, action = action};
 
-    let final_dm = indoc! {r#"
-        model Post {
+    let final_dm = formatdoc! {r#"
+        model Post {{
             id               Int @id @default(autoincrement())
             user_id          Int  @unique
-            custom_User      User @relation(fields: [user_id], references: [id])
-        }
+            custom_User      User @relation(fields: [user_id], references: [id], onDelete: {action}, onUpdate: {action})
+        }}
 
-        model User {
+        model User {{
             id               Int @id @default(autoincrement())
             custom_Post      Post?
-        }
+        }}
 
-        model Unrelated {
+        model Unrelated {{
             id               Int @id @default(autoincrement())
-        }
+        }}
+    "#, action = action};
 
-    "#};
-
-    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
+    api.assert_eq_datamodels(&final_dm, &api.re_introspect(&input_dm).await?);
 
     Ok(())
 }
@@ -1117,47 +1138,52 @@ async fn multiple_changed_relation_names_due_to_mapped_models(api: &TestApi) -> 
         })
         .await?;
 
-    let input_dm = indoc! {r#"
-        model Post {
+    let action = match api.sql_family() {
+        SqlFamily::Mysql if !api.is_mysql8() => ReferentialAction::Restrict,
+        _ => ReferentialAction::NoAction,
+    };
+
+    let input_dm = formatdoc! {r#"
+        model Post {{
             id               Int @id @default(autoincrement())
             user_id          Int  @unique
             user_id2         Int  @unique
-            custom_User      Custom_User @relation("CustomRelationName", fields: [user_id], references: [id])
-            custom_User2     Custom_User @relation("AnotherCustomRelationName", fields: [user_id2], references: [id])
-        }
+            custom_User      Custom_User @relation("CustomRelationName", fields: [user_id], references: [id], onDelete: {action}, onUpdate: {action})
+            custom_User2     Custom_User @relation("AnotherCustomRelationName", fields: [user_id2], references: [id], onDelete: {action}, onUpdate: {action})
+        }}
 
-        model Custom_User {
+        model Custom_User {{
             id               Int @id @default(autoincrement())
             custom_Post      Post? @relation("CustomRelationName")
             custom_Post2     Post? @relation("AnotherCustomRelationName")
 
             @@map("User")
-        }
-    "#};
+        }}
+    "#, action = action};
 
-    let final_dm = indoc! {r#"
-        model Post {
+    let final_dm = formatdoc! {r#"
+        model Post {{
             id               Int @id @default(autoincrement())
             user_id          Int  @unique
             user_id2         Int  @unique
-            custom_User      Custom_User @relation("CustomRelationName", fields: [user_id], references: [id])
-            custom_User2     Custom_User @relation("AnotherCustomRelationName", fields: [user_id2], references: [id])
-        }
+            custom_User      Custom_User @relation("CustomRelationName", fields: [user_id], references: [id], onDelete: {action}, onUpdate: {action})
+            custom_User2     Custom_User @relation("AnotherCustomRelationName", fields: [user_id2], references: [id], onDelete: {action}, onUpdate: {action})
+        }}
 
-        model Custom_User {
+        model Custom_User {{
             id               Int @id @default(autoincrement())
             custom_Post      Post? @relation("CustomRelationName")
             custom_Post2     Post? @relation("AnotherCustomRelationName")
 
             @@map("User")
-        }
+        }}
 
-        model Unrelated {
+        model Unrelated {{
             id               Int @id @default(autoincrement())
-        }
-    "#};
+        }}
+    "#, action = action};
 
-    api.assert_eq_datamodels(final_dm, &api.re_introspect(&input_dm).await?);
+    api.assert_eq_datamodels(&final_dm, &api.re_introspect(&input_dm).await?);
 
     Ok(())
 }
@@ -1584,7 +1610,7 @@ async fn custom_repro(api: &TestApi) -> TestResult {
         model Post{
           id        Int       @id @default(autoincrement())
           tag_id    Int
-          tag       Tag       @relation("post_to_tag", fields:[tag_id], references: id)
+          tag       Tag       @relation("post_to_tag", fields:[tag_id], references: id, onDelete: NoAction, onUpdate: NoAction)
         }
 
         model Tag {
@@ -1599,7 +1625,7 @@ async fn custom_repro(api: &TestApi) -> TestResult {
         model Post{
           id        Int       @id @default(autoincrement())
           tag_id    Int
-          tag       Tag       @relation("post_to_tag", fields:[tag_id], references: id)
+          tag       Tag       @relation("post_to_tag", fields:[tag_id], references: id, onDelete: NoAction, onUpdate: NoAction)
         }
 
         model Tag {

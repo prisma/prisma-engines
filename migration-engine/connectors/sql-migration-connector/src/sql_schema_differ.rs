@@ -584,11 +584,16 @@ fn foreign_keys_match(fks: Pair<&ForeignKeyWalker<'_>>, flavour: &dyn SqlFlavour
         .interleave(|fk| fk.referenced_column_names())
         .all(|pair| pair.previous() == pair.next());
 
+    let same_on_delete_action = fks.previous().on_delete_action() == fks.next().on_delete_action();
+    let same_on_update_action = fks.previous().on_update_action() == fks.next().on_update_action();
+
     references_same_table
         && references_same_column_count
         && constrains_same_column_count
         && constrains_same_columns
         && references_same_columns
+        && same_on_delete_action
+        && same_on_update_action
 }
 
 fn enums_match(previous: &EnumWalker<'_>, next: &EnumWalker<'_>) -> bool {

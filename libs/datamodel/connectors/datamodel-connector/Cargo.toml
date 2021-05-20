@@ -12,3 +12,4 @@ dml = { path = "../dml" }
 thiserror = "1.0"
 itertools = "0.8"
 url = "2.2.1"
+enumflags2 = "0.6"

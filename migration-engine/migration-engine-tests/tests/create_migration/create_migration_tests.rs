@@ -457,7 +457,7 @@ fn no_additional_unique_created(api: TestApi) {
                         );
 
                         -- AddForeignKey
-                        ALTER TABLE "Collar" ADD FOREIGN KEY ("id") REFERENCES "Cat"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+                        ALTER TABLE "Collar" ADD FOREIGN KEY ("id") REFERENCES "Cat"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
                         "#
                     }
                 }

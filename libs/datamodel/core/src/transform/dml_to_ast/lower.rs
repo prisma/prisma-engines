@@ -72,6 +72,7 @@ impl<'a> LowerDmlToAst<'a> {
 
     pub fn lower_field(&self, field: &dml::Field, datamodel: &dml::Datamodel) -> ast::Field {
         let mut attributes = self.attributes.field.serialize(field, datamodel);
+
         if let (Some((scalar_type, native_type)), Some(datasource)) = (
             field.as_scalar_field().and_then(|sf| sf.field_type.as_native_type()),
             self.datasource,

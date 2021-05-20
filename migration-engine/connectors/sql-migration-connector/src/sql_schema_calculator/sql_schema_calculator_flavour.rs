@@ -3,7 +3,11 @@ mod mysql;
 mod postgres;
 mod sqlite;
 
-use datamodel::{walkers::ModelWalker, walkers::ScalarFieldWalker, Datamodel, FieldArity, ScalarType};
+use datamodel::{
+    walkers::ModelWalker,
+    walkers::{RelationFieldWalker, ScalarFieldWalker},
+    Datamodel, FieldArity, ReferentialAction, ScalarType,
+};
 use sql_schema_describer::{self as sql, ColumnArity, ColumnType, ColumnTypeFamily};
 
 pub(crate) trait SqlSchemaCalculatorFlavour {
@@ -34,6 +38,30 @@ pub(crate) trait SqlSchemaCalculatorFlavour {
         false
     }
 
+    fn on_update_action(&self, rf: &RelationFieldWalker<'_>) -> sql::ForeignKeyAction {
+        let default = || match rf.arity() {
+            FieldArity::Required => sql::ForeignKeyAction::Cascade,
+            FieldArity::Optional => sql::ForeignKeyAction::SetNull,
+            FieldArity::List => unreachable!(),
+        };
+
+        rf.on_update_action()
+            .map(convert_referential_action)
+            .unwrap_or_else(default)
+    }
+
+    fn on_delete_action(&self, rf: &RelationFieldWalker<'_>) -> sql::ForeignKeyAction {
+        let default = || match rf.arity() {
+            FieldArity::Required => sql::ForeignKeyAction::Restrict,
+            FieldArity::Optional => sql::ForeignKeyAction::SetNull,
+            FieldArity::List => unreachable!(),
+        };
+
+        rf.on_delete_action()
+            .map(convert_referential_action)
+            .unwrap_or_else(default)
+    }
+
     fn m2m_foreign_key_action(&self, _model_a: &ModelWalker<'_>, _model_b: &ModelWalker<'_>) -> sql::ForeignKeyAction {
         sql::ForeignKeyAction::Cascade
     }
@@ -41,5 +69,15 @@ pub(crate) trait SqlSchemaCalculatorFlavour {
     // TODO: Maybe we should rethink this a bit?
     fn single_field_index_name(&self, model_name: &str, field_name: &str) -> String {
         format!("{}.{}_unique", model_name, field_name)
+    }
+}
+
+fn convert_referential_action(action: ReferentialAction) -> sql::ForeignKeyAction {
+    match action {
+        ReferentialAction::Cascade => sql::ForeignKeyAction::Cascade,
+        ReferentialAction::Restrict => sql::ForeignKeyAction::Restrict,
+        ReferentialAction::NoAction => sql::ForeignKeyAction::NoAction,
+        ReferentialAction::SetNull => sql::ForeignKeyAction::SetNull,
+        ReferentialAction::SetDefault => sql::ForeignKeyAction::SetDefault,
     }
 }

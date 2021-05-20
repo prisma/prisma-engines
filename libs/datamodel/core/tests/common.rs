@@ -32,7 +32,8 @@ pub trait ScalarFieldAsserts {
 pub trait RelationFieldAsserts {
     fn assert_relation_name(&self, t: &str) -> &Self;
     fn assert_relation_to(&self, t: &str) -> &Self;
-    fn assert_relation_delete_strategy(&self, t: dml::OnDeleteStrategy) -> &Self;
+    fn assert_relation_delete_strategy(&self, t: dml::ReferentialAction) -> &Self;
+    fn assert_relation_update_strategy(&self, t: dml::ReferentialAction) -> &Self;
     fn assert_relation_referenced_fields(&self, t: &[&str]) -> &Self;
     fn assert_relation_base_fields(&self, t: &[&str]) -> &Self;
     fn assert_ignored(&self, state: bool) -> &Self;
@@ -202,8 +203,13 @@ impl RelationFieldAsserts for dml::RelationField {
         self
     }
 
-    fn assert_relation_delete_strategy(&self, t: dml::OnDeleteStrategy) -> &Self {
-        assert_eq!(self.relation_info.on_delete, t);
+    fn assert_relation_delete_strategy(&self, t: dml::ReferentialAction) -> &Self {
+        assert_eq!(self.relation_info.on_delete, Some(t));
+        self
+    }
+
+    fn assert_relation_update_strategy(&self, t: dml::ReferentialAction) -> &Self {
+        assert_eq!(self.relation_info.on_update, Some(t));
         self
     }
 

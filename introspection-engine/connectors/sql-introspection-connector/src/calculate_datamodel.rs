@@ -1,11 +1,10 @@
-use crate::commenting_out_guardrails::commenting_out_guardrails;
-use crate::introspection::introspect;
 use crate::introspection_helpers::*;
 use crate::prisma_1_defaults::*;
 use crate::re_introspection::enrich;
 use crate::sanitize_datamodel_names::{sanitization_leads_to_duplicate_names, sanitize_datamodel_names};
 use crate::version_checker::VersionChecker;
 use crate::SqlIntrospectionResult;
+use crate::{commenting_out_guardrails::commenting_out_guardrails, introspection::introspect};
 use datamodel::Datamodel;
 use introspection_connector::IntrospectionResult;
 use quaint::connector::SqlFamily;
@@ -63,7 +62,7 @@ mod tests {
     use super::*;
     use datamodel::{
         dml, Datamodel, DefaultValue as DMLDefault, Field, FieldArity, FieldType, Model, NativeTypeInstance,
-        OnDeleteStrategy, RelationField, RelationInfo, ScalarField, ScalarType, ValueGenerator,
+        RelationField, RelationInfo, ScalarField, ScalarType, ValueGenerator,
     };
     use native_types::{NativeType, PostgresType};
     use pretty_assertions::assert_eq;
@@ -470,7 +469,8 @@ mod tests {
                                 fields: vec![],
                                 references: vec![],
                                 name: "CityToUser".to_string(),
-                                on_delete: OnDeleteStrategy::None,
+                                on_delete: None,
+                                on_update: None,
                             },
                         )),
                     ],
@@ -557,7 +557,8 @@ mod tests {
                                 to: "City".to_string(),
                                 fields: vec!["city_id".to_string(), "city_name".to_string()],
                                 references: vec!["id".to_string(), "name".to_string()],
-                                on_delete: OnDeleteStrategy::None,
+                                on_delete: None,
+                                on_update: None,
                             },
                         )),
                     ],
@@ -854,7 +855,8 @@ mod tests {
                                 fields: vec![],
                                 references: vec![],
                                 name: "CityToUser".to_string(),
-                                on_delete: OnDeleteStrategy::None,
+                                on_delete: None,
+                                on_update: None,
                             },
                         )),
                     ],
@@ -911,7 +913,8 @@ mod tests {
                                 to: "City".to_string(),
                                 fields: vec!["city_id".to_string()],
                                 references: vec!["id".to_string()],
-                                on_delete: OnDeleteStrategy::None,
+                                on_delete: None,
+                                on_update: None,
                             },
                         )),
                     ],

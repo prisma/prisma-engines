@@ -1,7 +1,7 @@
 mod alter_table;
 
 use super::{
-    common::{self, render_on_delete},
+    common::{self, render_referential_action},
     IteratorJoin, Quoted, SqlRenderer,
 };
 use crate::{
@@ -77,10 +77,11 @@ impl MssqlFlavour {
             .join(",");
 
         format!(
-            " REFERENCES {}({}) {} ON UPDATE CASCADE",
+            " REFERENCES {}({}) ON DELETE {} ON UPDATE {}",
             self.quote_with_schema(&foreign_key.referenced_table().name()),
             cols,
-            render_on_delete(&foreign_key.on_delete_action()),
+            render_referential_action(&foreign_key.on_delete_action()),
+            render_referential_action(&foreign_key.on_update_action()),
         )
     }
 }

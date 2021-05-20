@@ -856,12 +856,12 @@ fn shadow_database_creation_error_is_special_cased_mssql(api: TestApi) {
 
     api.raw_cmd(
         "
-            CREATE LOGIN prismashadowdbtestuser
-                WITH PASSWORD = '1234batmanZ';
-
-            CREATE USER prismashadowdbuser FOR LOGIN prismashadowdbtestuser;
-
-            GRANT SELECT TO prismashadowdbuser;
+            BEGIN TRY
+                CREATE LOGIN prismashadowdbtestuser WITH PASSWORD = '1234batmanZ';
+                GRANT SELECT TO prismashadowdbuser;
+            END TRY
+            BEGIN CATCH
+            END CATCH;
             ",
     );
 

@@ -2,13 +2,13 @@ use crate::Dedup;
 use crate::SqlError;
 use datamodel::{
     common::RelationNames, Datamodel, DefaultValue as DMLDef, FieldArity, FieldType, IndexDefinition, Model,
-    OnDeleteStrategy, RelationField, RelationInfo, ScalarField, ScalarType, ValueGenerator as VG,
+    ReferentialAction, RelationField, RelationInfo, ScalarField, ScalarType, ValueGenerator as VG,
 };
 use datamodel_connector::Connector;
 use quaint::connector::SqlFamily;
 use sql_datamodel_connector::SqlDatamodelConnectors;
-use sql_schema_describer::DefaultKind;
 use sql_schema_describer::{Column, ColumnArity, ColumnTypeFamily, ForeignKey, Index, IndexType, SqlSchema, Table};
+use sql_schema_describer::{DefaultKind, ForeignKeyAction};
 use tracing::debug;
 
 //checks
@@ -107,7 +107,8 @@ pub fn calculate_many_to_many_field(
         fields: vec![],
         to: opposite_foreign_key.referenced_table.clone(),
         references: opposite_foreign_key.referenced_columns.clone(),
-        on_delete: OnDeleteStrategy::None,
+        on_delete: None,
+        on_update: None,
     };
 
     let basename = opposite_foreign_key.referenced_table.clone();
@@ -174,12 +175,21 @@ pub(crate) fn calculate_relation_field(
 ) -> Result<RelationField, SqlError> {
     debug!("Handling foreign key  {:?}", foreign_key);
 
+    let map_action = |action: ForeignKeyAction| match action {
+        ForeignKeyAction::NoAction => ReferentialAction::NoAction,
+        ForeignKeyAction::Restrict => ReferentialAction::Restrict,
+        ForeignKeyAction::Cascade => ReferentialAction::Cascade,
+        ForeignKeyAction::SetNull => ReferentialAction::SetNull,
+        ForeignKeyAction::SetDefault => ReferentialAction::SetDefault,
+    };
+
     let relation_info = RelationInfo {
         name: calculate_relation_name(schema, foreign_key, table)?,
         fields: foreign_key.columns.clone(),
         to: foreign_key.referenced_table.clone(),
         references: foreign_key.referenced_columns.clone(),
-        on_delete: OnDeleteStrategy::None,
+        on_delete: Some(map_action(foreign_key.on_delete_action)),
+        on_update: Some(map_action(foreign_key.on_update_action)),
     };
 
     let columns: Vec<&Column> = foreign_key
@@ -213,7 +223,8 @@ pub(crate) fn calculate_backrelation_field(
                 to: model.name.clone(),
                 fields: vec![],
                 references: vec![],
-                on_delete: OnDeleteStrategy::None,
+                on_delete: None,
+                on_update: None,
             };
 
             // unique or id
