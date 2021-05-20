@@ -19,7 +19,7 @@ async fn index_on_compound_relation_fields_must_work(api: &TestApi) -> TestResul
             authorName String
             author User @relation(fields: [authorEmail, authorName], references: [email, name])
 
-            @@index([authorEmail, authorName], name: "testIndex")
+            @@index([authorEmail, authorName], map: "testIndex")
         }
     "#;
 
@@ -43,7 +43,7 @@ async fn index_settings_must_be_migrated(api: &TestApi) -> TestResult {
             name String
             followersCount Int
 
-            @@index([name, followersCount], name: "nameAndFollowers")
+            @@index([name, followersCount], map: "nameAndFollowers")
         }
     "#;
 
@@ -63,7 +63,7 @@ async fn index_settings_must_be_migrated(api: &TestApi) -> TestResult {
             name String
             followersCount Int
 
-            @@unique([name, followersCount], name: "nameAndFollowers")
+            @@unique([name, followersCount], map: "nameAndFollowers")
         }
     "#;
 
@@ -233,8 +233,8 @@ async fn index_renaming_must_work(api: &TestApi) -> TestResult {
             field String
             secondField Int
 
-            @@unique([field, secondField], name: "customName")
-            @@index([secondField, field], name: "customNameNonUnique")
+            @@unique([field, secondField], map: "customName")
+            @@index([secondField, field], map: "customNameNonUnique")
         }
     "#;
 
@@ -256,8 +256,8 @@ async fn index_renaming_must_work(api: &TestApi) -> TestResult {
             field String
             secondField Int
 
-            @@unique([field, secondField], name: "customNameA")
-            @@index([secondField, field], name: "customNameNonUniqueA")
+            @@unique([field, secondField], map: "customNameA")
+            @@index([secondField, field], map: "customNameNonUniqueA")
         }
     "#;
 
@@ -285,7 +285,7 @@ async fn index_renaming_must_work_when_renaming_to_default(api: &TestApi) -> Tes
             field String
             secondField Int
 
-            @@unique([field, secondField], name: "customName")
+            @@unique([field, secondField], map: "customName")
         }
     "#;
 
@@ -319,7 +319,7 @@ async fn index_renaming_must_work_when_renaming_to_default(api: &TestApi) -> Tes
         .table_bang("A")
         .indices
         .iter()
-        .filter(|i| i.columns == ["field", "secondField"] && i.name == "A.field_secondField_unique");
+        .filter(|i| i.columns == ["field", "secondField"] && i.name == "A_field_secondField_key");
     assert_eq!(indexes.count(), 1);
 
     Ok(())
@@ -351,7 +351,7 @@ async fn index_renaming_must_work_when_renaming_to_custom(api: &TestApi) -> Test
             field String
             secondField Int
 
-            @@unique([field, secondField], name: "somethingCustom")
+            @@unique([field, secondField], map: "somethingCustom")
         }
     "#;
 
@@ -376,7 +376,7 @@ async fn index_updates_with_rename_must_work(api: &TestApi) -> TestResult {
             field String
             secondField Int
 
-            @@unique([field, secondField], name: "customName")
+            @@unique([field, secondField], map: "customName")
         }
     "#;
 
@@ -398,7 +398,7 @@ async fn index_updates_with_rename_must_work(api: &TestApi) -> TestResult {
             field String
             secondField Int
 
-            @@unique([field, id], name: "customNameA")
+            @@unique([field, id], map: "customNameA")
         }
     "#;
 
@@ -424,7 +424,7 @@ async fn dropping_a_model_with_a_multi_field_unique_index_must_work(api: &TestAp
             field String
             secondField Int
 
-            @@unique([field, secondField], name: "customName")
+            @@unique([field, secondField], map: "customName")
         }
     "#;
 
@@ -446,6 +446,7 @@ async fn dropping_a_model_with_a_multi_field_unique_index_must_work(api: &TestAp
     Ok(())
 }
 
+//todo error in this case during datamodel parsing
 #[test_each_connector(tags("postgres", "mysql"))]
 async fn indexes_with_an_automatically_truncated_name_are_idempotent(api: &TestApi) -> TestResult {
     let dm = r#"
@@ -474,9 +475,9 @@ async fn indexes_with_an_automatically_truncated_name_are_idempotent(api: &TestA
                     idx.assert_name(if api.is_mysql() {
                         // The size limit of identifiers is 64 bytes on MySQL
                         // and 63 on Postgres.
-                        "TestModelWithALongName.looooooooooooongfield_evenLongerFieldName"
+                        "TestModelWithALongName_looooooooooooongfield_evenLongerFieldName"
                     } else {
-                        "TestModelWithALongName.looooooooooooongfield_evenLongerFieldNam"
+                        "TestModelWithALongName_looooooooooooongfield_evenLongerFieldNam"
                     })
                 },
             )
@@ -502,7 +503,7 @@ async fn new_index_with_same_name_as_index_from_dropped_table_works(api: &TestAp
             id Int @id
             ownerid String
 
-            @@index([ownerid], name: "ownerid")
+            @@index([ownerid], map: "ownerid")
         }
 
         model Owner {
@@ -523,7 +524,7 @@ async fn new_index_with_same_name_as_index_from_dropped_table_works(api: &TestAp
             ownerid String
             owner   Cat @relation(fields: [ownerid], references: id)
 
-            @@index([ownerid], name: "ownerid")
+            @@index([ownerid], map: "ownerid")
         }
 
         model Cat {

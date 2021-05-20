@@ -214,25 +214,23 @@ async fn compound_foreign_keys_for_required_one_to_many_relations(api: &TestApi)
         })
         .await?;
 
-    let dm = format!(
-        r#"
-        model Post {{
+    let dm = r#"
+        model Post {
             id       Int  @id @default(autoincrement())
             user_id  Int
             user_age Int
             User     User @relation(fields: [user_id, user_age], references: [id, age])
             @@index([user_id, user_age])
-        }}
+        }
 
-        model User {{
+        model User {
             id   Int    @id @default(autoincrement())
             age  Int
             Post Post[]
 
             @@unique([id, age], map: "user_unique")
-        }}
-    "#,
-    );
+        }
+    "#;
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);
 

@@ -42,44 +42,41 @@ fn calculate_model_tables<'a>(
         })
         .filter(|pk| !pk.columns.is_empty());
 
-        let single_field_indexes = model.scalar_fields().filter(|f| f.is_unique()).map(|f| sql::Index {
-            name: flavour.single_field_index_name(model.db_name(), f.db_name()),
-            columns: vec![f.db_name().to_owned()],
-            tpe: sql::IndexType::Unique,
-        });
-
-        let multiple_field_indexes = model.indexes().map(|index_definition: &IndexDefinition| {
-            let referenced_fields: Vec<ScalarFieldWalker<'_>> = index_definition
-                .fields
-                .iter()
-                .map(|field_name| {
-                    model
-                        .find_scalar_field(field_name)
-                        .expect("Unknown field in index directive.")
-                })
-                .collect();
-
-            let index_type = match index_definition.tpe {
-                IndexType::Unique => sql::IndexType::Unique,
-                IndexType::Normal => sql::IndexType::Normal,
-            };
-
-            sql::Index {
-                name: index_definition.name_in_db.clone(),
-                // The model index definition uses the model field names, but the SQL Index
-                // wants the column names.
-                columns: referenced_fields
+        let indices = model
+            .indexes()
+            .map(|index_definition: &IndexDefinition| {
+                let referenced_fields: Vec<ScalarFieldWalker<'_>> = index_definition
+                    .fields
                     .iter()
-                    .map(|field| field.db_name().to_owned())
-                    .collect(),
-                tpe: index_type,
-            }
-        });
+                    .map(|field_name| {
+                        model
+                            .find_scalar_field(field_name)
+                            .expect("Unknown field in index directive.")
+                    })
+                    .collect();
+
+                let index_type = match index_definition.tpe {
+                    IndexType::Unique => sql::IndexType::Unique,
+                    IndexType::Normal => sql::IndexType::Normal,
+                };
+
+                sql::Index {
+                    name: index_definition.name_in_db.clone(),
+                    // The model index definition uses the model field names, but the SQL Index
+                    // wants the column names.
+                    columns: referenced_fields
+                        .iter()
+                        .map(|field| field.db_name().to_owned())
+                        .collect(),
+                    tpe: index_type,
+                }
+            })
+            .collect();
 
         let mut table = sql::Table {
             name: model.database_name().to_owned(),
             columns,
-            indices: single_field_indexes.chain(multiple_field_indexes).collect(),
+            indices,
             primary_key,
             foreign_keys: Vec::new(),
         };

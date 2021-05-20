@@ -9,7 +9,7 @@ async fn foreign_keys_to_indexes_being_renamed_must_work(api: &TestApi) -> TestR
             name String
             posts Post[]
 
-            @@unique([name], name: "idxname")
+            @@unique([name], map: "idxname")
         }
 
         model Post {
@@ -48,7 +48,7 @@ async fn foreign_keys_to_indexes_being_renamed_must_work(api: &TestApi) -> TestR
             name String
             posts Post[]
 
-            @@unique([name], name: "idxrenamed")
+            @@unique([name], map: "idxrenamed")
         }
 
         model Post {
