@@ -220,10 +220,19 @@ pub fn warning_enriched_fields_with_ignore(affected: &[ModelAndField]) -> Warnin
     }
 }
 
-pub fn warning_enriched_with_custom_index_names_at(affected: &[ModelAndIndex]) -> Warning {
+pub fn warning_enriched_with_custom_index_names(affected: &[ModelAndIndex]) -> Warning {
     Warning {
         code: 17,
         message: "These Indices were enriched with custom index names taken from the previous Prisma schema.".into(),
+        affected: serde_json::to_value(&affected).unwrap(),
+    }
+}
+
+pub fn warning_enriched_with_custom_primary_key_names(affected: &[Model]) -> Warning {
+    Warning {
+        code: 18,
+        message: "These models were enriched with custom compound id names taken from the previous Prisma schema."
+            .into(),
         affected: serde_json::to_value(&affected).unwrap(),
     }
 }

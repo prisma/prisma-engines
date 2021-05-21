@@ -248,11 +248,8 @@ impl Model {
                     let fields: Vec<_> = id.fields.iter().map(|f| self.find_scalar_field(&f).unwrap()).collect();
                     let no_fields_are_ineligible = !fields.iter().any(|f| ineligible(f));
                     let all_fields_are_required = fields.iter().all(|f| f.is_required());
-                    if (all_fields_are_required || allow_optional) && no_fields_are_ineligible {
-                        Some(UniqueCriteria::new(fields))
-                    } else {
-                        None
-                    }
+                    ((all_fields_are_required || allow_optional) && no_fields_are_ineligible)
+                        .then(|| UniqueCriteria::new(fields))
                 })
                 .collect();
 

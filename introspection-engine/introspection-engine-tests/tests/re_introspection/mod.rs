@@ -1748,9 +1748,6 @@ async fn do_not_try_to_keep_custom_many_to_many_self_relation_names(api: &TestAp
     Ok(())
 }
 
-//todo compound uniques
-//todo compound ids
-// assert warnings
 #[test_each_connector]
 async fn re_introspecting_custom_compound_unique_names(api: &TestApi) -> crate::TestResult {
     api.barrel()
@@ -1804,6 +1801,90 @@ async fn re_introspecting_custom_compound_unique_names(api: &TestApi) -> crate::
         "message": "These Indices were enriched with custom index names taken from the previous Prisma schema.",
         "affected" :[
             {"model": "User", "index_db_name": "User.something@invalid-and/weird"},
+        ]
+    }]);
+
+    assert_eq_json!(expected, api.re_introspect_warnings(&input_dm).await?);
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn re_introspecting_custom_compound_id_names(api: &TestApi) -> crate::TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("first", types::integer());
+                t.add_column("last", types::integer());
+                t.add_constraint(
+                    "User.something@invalid-and/weird",
+                    types::primary_constraint(&["first", "last"]),
+                );
+            });
+
+            migration.create_table("User2", |t| {
+                t.add_column("first", types::integer());
+                t.add_column("last", types::integer());
+                t.add_constraint("User2_pkey", types::primary_constraint(&["first", "last"]));
+            });
+
+            migration.create_table("Unrelated", |t| {
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("Unrelated_pkey", types::primary_constraint(&["id"]));
+            });
+        })
+        .await?;
+
+    let map = if api.sql_family().is_mysql() || api.sql_family().is_sqlite() {
+        ""
+    } else {
+        ", map: \"User.something@invalid-and/weird\""
+    };
+
+    let input_dm = format! {r#"
+        model User {{
+            first  Int
+            last   Int
+
+            @@id([first, last], name: "compound"{})
+        }}
+        
+        model User2 {{
+            first  Int
+            last   Int
+
+            @@id([first, last], name: "compound")
+        }}
+    "#, map};
+
+    let final_dm = format! {r#"
+        model User {{
+            first  Int
+            last   Int
+
+            @@id([first, last], name: "compound"{})
+        }}
+        
+        model User2 {{
+            first  Int
+            last   Int
+
+            @@id([first, last], name: "compound")
+        }}
+
+        model Unrelated {{
+            id    Int @id @default(autoincrement())
+        }}
+    "#, map};
+
+    api.assert_eq_datamodels(&final_dm, &api.re_introspect(&input_dm).await?);
+
+    let expected = json!([{
+        "code": 18,
+        "message": "These models were enriched with custom compound id names taken from the previous Prisma schema.",
+        "affected" :[
+            {"model": "User"},
+            {"model": "User2"}
         ]
     }]);
 

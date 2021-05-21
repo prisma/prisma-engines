@@ -59,7 +59,7 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family
             }
         }
 
-        //change field name
+        //change index name
         for changed_index_name in &changed_index_names {
             let index = new_data_model
                 .find_model_mut(&changed_index_name.0.model)
@@ -68,6 +68,39 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family
                 .find(|i| i.name_in_db == changed_index_name.0.index_db_name)
                 .unwrap();
             index.name_in_client = changed_index_name.1.clone();
+        }
+    }
+
+    //custom primary key names
+    let mut changed_primary_key_names = vec![];
+    {
+        for model in new_data_model.models() {
+            if let Some(old_model) = &old_data_model.find_model(&model.name) {
+                if let Some(primary_key) = &model.primary_key {
+                    if let Some(old_primary_key) = &old_model.primary_key {
+                        if old_primary_key.fields == primary_key.fields
+                            && (old_primary_key.name_in_db == primary_key.name_in_db
+                                || primary_key.name_in_db.is_none())
+                            && old_primary_key.name_in_client.is_some()
+                        {
+                            let mf = Model::new(&model.name);
+                            changed_primary_key_names.push((mf, old_primary_key.name_in_client.clone()))
+                        }
+                    }
+                }
+            }
+        }
+
+        //change field name
+        for changed_primary_key_name in &changed_primary_key_names {
+            let pk = new_data_model
+                .find_model_mut(&changed_primary_key_name.0.model)
+                .primary_key
+                .as_mut();
+
+            if let Some(primary_key) = pk {
+                primary_key.name_in_client = changed_primary_key_name.1.clone()
+            }
         }
     }
 
@@ -494,7 +527,12 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family
 
     if !changed_index_names.is_empty() {
         let index: Vec<_> = changed_index_names.iter().map(|c| c.0.clone()).collect();
-        warnings.push(warning_enriched_with_custom_index_names_at(&index));
+        warnings.push(warning_enriched_with_custom_index_names(&index));
+    }
+
+    if !changed_primary_key_names.is_empty() {
+        let pk: Vec<_> = changed_primary_key_names.iter().map(|c| c.0.clone()).collect();
+        warnings.push(warning_enriched_with_custom_primary_key_names(&pk));
     }
 
     if !changed_scalar_field_names.is_empty() {
