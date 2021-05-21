@@ -60,6 +60,7 @@ impl PostgresDatamodelConnector {
             ConnectorCapability::JsonFilteringArrayPath,
             ConnectorCapability::CreateManyWriteableAutoIncId,
             ConnectorCapability::AutoIncrement,
+            ConnectorCapability::CompoundIds,
         ];
 
         let small_int = NativeTypeConstructor::without_args(SMALL_INT_TYPE_NAME, vec![ScalarType::Int]);

@@ -37,14 +37,14 @@ pub(crate) struct MongoRelationFilter {
 /// Builds a MongoDB query filter from a Prisma filter.
 pub(crate) fn convert_filter(filter: Filter, invert: bool) -> crate::Result<MongoFilter> {
     let filter_pair = match filter {
-        Filter::And(filters) if invert => compound_filter("$or", filters, invert)?,
-        Filter::And(filters) => compound_filter("$and", filters, invert)?,
+        Filter::And(filters) if invert => coerce_empty(false, "$or", filters, invert)?,
+        Filter::And(filters) => coerce_empty(true, "$and", filters, invert)?,
 
-        Filter::Or(filters) if invert => compound_filter("$and", filters, invert)?,
-        Filter::Or(filters) => compound_filter("$or", filters, invert)?,
+        Filter::Or(filters) if invert => coerce_empty(true, "$and", filters, invert)?,
+        Filter::Or(filters) => coerce_empty(false, "$or", filters, invert)?,
 
-        // todo requires some more testing
-        Filter::Not(filters) => compound_filter("$and", filters, !invert)?,
+        Filter::Not(filters) if invert => coerce_empty(false, "$or", filters, !invert)?,
+        Filter::Not(filters) => coerce_empty(true, "$and", filters, !invert)?,
 
         Filter::Scalar(sf) => scalar_filter(sf, invert, true)?,
         Filter::Empty => MongoFilter::Scalar(doc! {}),
@@ -57,6 +57,24 @@ pub(crate) fn convert_filter(filter: Filter, invert: bool) -> crate::Result<Mong
     };
 
     Ok(filter_pair)
+}
+
+fn coerce_empty(truthy: bool, operation: &str, filters: Vec<Filter>, invert: bool) -> crate::Result<MongoFilter> {
+    if filters.is_empty() {
+        // We need to create a truthy or falsey expression for empty AND / OR queries.
+        // _id always exists. So matching on exist/not exists creates our truthy/falsey expressions.
+
+        let doc = match (truthy, invert) {
+            (true, _) => doc! { "_id": { "$exists": 1 }},
+            (false, _) => doc! { "_id": { "$exists": 0 }},
+            // (true, true) => doc! { "_id": { "$exists": 0 }},
+            // (false, true) => doc! { "_id": { "$exists": 1 }},
+        };
+
+        Ok(MongoFilter::Scalar(doc))
+    } else {
+        compound_filter(operation, filters, invert)
+    }
 }
 
 fn compound_filter(operation: &str, filters: Vec<Filter>, invert: bool) -> crate::Result<MongoFilter> {
@@ -270,15 +288,17 @@ fn relation_filter(filter: RelationFilter, invert: bool) -> crate::Result<MongoF
     let is_empty = matches!(nested_filter, Filter::Empty);
 
     // `invert` xor `filter requires invert`
-    let (nested_filter, nested_joins) =
-        convert_filter(nested_filter, invert ^ requires_invert(&filter.condition))?.render();
+    // let (nested_filter, nested_joins) =
+    //     convert_filter(nested_filter, invert ^ requires_invert(&filter.condition))?.render();
+
+    let (nested_filter, nested_joins) = convert_filter(nested_filter, requires_invert(&filter.condition))?.render();
 
     let mut join_stage = JoinStage::new(from_field);
     join_stage.extend_nested(nested_joins);
 
     let filter_doc = match filter.condition {
         connector_interface::RelationCondition::EveryRelatedRecord => {
-            doc! { "$all": [{ "$elemMatch": nested_filter }]}
+            doc! { "$not": { "$all": [{ "$elemMatch": nested_filter }] }}
         }
         connector_interface::RelationCondition::AtLeastOneRelatedRecord => {
             doc! { "$elemMatch": nested_filter }
@@ -287,7 +307,7 @@ fn relation_filter(filter: RelationFilter, invert: bool) -> crate::Result<MongoF
             if is_empty {
                 doc! { "$size": 0 }
             } else {
-                doc! { "$all": [{ "$elemMatch": nested_filter }]}
+                doc! { "$not": { "$all": [{ "$elemMatch": nested_filter }] }}
             }
         }
         connector_interface::RelationCondition::ToOneRelatedRecord => {
@@ -295,15 +315,22 @@ fn relation_filter(filter: RelationFilter, invert: bool) -> crate::Result<MongoF
         }
     };
 
-    Ok(MongoFilter::relation(
-        doc! { relation_name: filter_doc },
-        vec![join_stage],
-    ))
+    if invert {
+        Ok(MongoFilter::relation(
+            doc! { relation_name: { "$not": filter_doc }},
+            vec![join_stage],
+        ))
+    } else {
+        Ok(MongoFilter::relation(
+            doc! { relation_name: filter_doc },
+            vec![join_stage],
+        ))
+    }
 }
 
 /// Checks if the given relation filter condition needs an inherent invert for MongoDB.
 fn requires_invert(rf: &RelationCondition) -> bool {
-    matches!(rf, RelationCondition::NoRelatedRecord)
+    matches!(rf, RelationCondition::EveryRelatedRecord)
 }
 
 fn aggregation_filter(filter: AggregationFilter, invert: bool) -> crate::Result<MongoFilter> {
