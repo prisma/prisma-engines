@@ -1,36 +1,39 @@
-use migration_core::{CoreResult, GenericApi};
+use migration_core::{
+    commands::{ListMigrationDirectoriesInput, ListMigrationDirectoriesOutput},
+    GenericApi,
+};
 use tempfile::TempDir;
-
-use crate::AssertionResult;
-use migration_core::commands::{ListMigrationDirectoriesInput, ListMigrationDirectoriesOutput};
 
 #[must_use = "This struct does nothing on its own. See ListMigrationDirectories::send()"]
 pub struct ListMigrationDirectories<'a> {
     api: &'a dyn GenericApi,
     migrations_directory: &'a TempDir,
+    rt: &'a tokio::runtime::Runtime,
 }
 
 impl<'a> ListMigrationDirectories<'a> {
-    pub fn new(api: &'a dyn GenericApi, migrations_directory: &'a TempDir) -> Self {
+    pub fn new(api: &'a dyn GenericApi, migrations_directory: &'a TempDir, rt: &'a tokio::runtime::Runtime) -> Self {
         ListMigrationDirectories {
             api,
             migrations_directory,
+            rt,
         }
     }
 
-    pub async fn send(self) -> CoreResult<ListMigrationDirectoriesAssertion<'a>> {
+    #[track_caller]
+    pub fn send(self) -> ListMigrationDirectoriesAssertion<'a> {
         let output = self
-            .api
-            .list_migration_directories(&ListMigrationDirectoriesInput {
+            .rt
+            .block_on(self.api.list_migration_directories(&ListMigrationDirectoriesInput {
                 migrations_directory_path: self.migrations_directory.path().to_str().unwrap().to_owned(),
-            })
-            .await?;
+            }))
+            .unwrap();
 
-        Ok(ListMigrationDirectoriesAssertion {
+        ListMigrationDirectoriesAssertion {
             output,
             _api: self.api,
             _migrations_directory: self.migrations_directory,
-        })
+        }
     }
 }
 
@@ -47,16 +50,17 @@ impl std::fmt::Debug for ListMigrationDirectoriesAssertion<'_> {
 }
 
 impl<'a> ListMigrationDirectoriesAssertion<'a> {
-    pub fn assert_listed_directories(self, names: &[&str]) -> AssertionResult<Self> {
+    #[track_caller]
+    pub fn assert_listed_directories(self, names: &[&str]) -> Self {
         let found_names: Vec<&str> = self.output.migrations.iter().map(|name| &name[15..]).collect();
 
-        anyhow::ensure!(
+        assert!(
             found_names == names,
             "Assertion failed. The listed migrations do not match the expectations. ({:?} vs {:?})",
             found_names,
             names
         );
 
-        Ok(self)
+        self
     }
 }
