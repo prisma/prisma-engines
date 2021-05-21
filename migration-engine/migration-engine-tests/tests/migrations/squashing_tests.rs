@@ -1,10 +1,10 @@
 use migration_core::commands::{DiagnoseMigrationHistoryOutput, HistoryDiagnostic};
-use migration_engine_tests::sql::*;
+use migration_engine_tests::sync_test_api::*;
 use std::io::Write;
 
 #[test_connector]
-async fn squashing_whole_migration_history_works(api: &TestApi) -> TestResult {
-    let directory = api.create_migrations_directory()?;
+fn squashing_whole_migration_history_works(api: TestApi) {
+    let directory = api.create_migrations_directory();
 
     // Create and apply a bunch of migrations
     let _initial_migration_names = {
@@ -40,8 +40,7 @@ async fn squashing_whole_migration_history_works(api: &TestApi) -> TestResult {
         for (count, schema) in [dm1, dm2, dm3].iter().enumerate() {
             let name = api
                 .create_migration(&format!("migration{}", count), schema, &directory)
-                .send()
-                .await?
+                .send_sync()
                 .into_output()
                 .generated_migration_name
                 .unwrap();
@@ -49,41 +48,41 @@ async fn squashing_whole_migration_history_works(api: &TestApi) -> TestResult {
             initial_migration_names.push(name);
         }
 
-        api.apply_migrations(&directory).send().await?;
+        api.apply_migrations(&directory).send_sync();
 
         initial_migration_names
     };
 
-    let initial_schema = api.assert_schema().await?.assert_tables_count(3)?.into_schema();
+    let initial_schema = api.assert_schema().assert_tables_count(3).unwrap().into_schema();
 
     // Squash the files, mark migration applied, assert the schema is the same.
 
     let mut squashed_migrations: Vec<(String, String)> = Vec::with_capacity(3);
 
-    for entry in std::fs::read_dir(directory.path())? {
-        let entry = entry?;
-        if entry.metadata()?.is_dir() {
+    for entry in std::fs::read_dir(directory.path()).unwrap() {
+        let entry = entry.unwrap();
+        if entry.metadata().unwrap().is_dir() {
             let file_path = entry.path().join("migration.sql");
-            let contents = std::fs::read_to_string(file_path)?;
+            let contents = std::fs::read_to_string(file_path).unwrap();
 
             squashed_migrations.push((entry.file_name().into_string().unwrap(), contents));
 
-            std::fs::remove_dir_all(entry.path())?;
+            std::fs::remove_dir_all(entry.path()).unwrap();
         }
     }
 
     squashed_migrations.sort_by(|left, right| left.0.cmp(&right.0));
 
     let squashed_migration_directory_path = directory.path().join("0000_initial");
-    std::fs::create_dir_all(&squashed_migration_directory_path)?;
+    std::fs::create_dir_all(&squashed_migration_directory_path).unwrap();
 
-    let mut migration_file = std::fs::File::create(squashed_migration_directory_path.join("migration.sql"))?;
+    let mut migration_file = std::fs::File::create(squashed_migration_directory_path.join("migration.sql")).unwrap();
 
     for (_, squashed_migration) in squashed_migrations {
-        migration_file.write_all(squashed_migration.as_bytes())?;
+        migration_file.write_all(squashed_migration.as_bytes()).unwrap();
     }
 
-    api.assert_schema().await?.assert_tables_count(3)?;
+    api.assert_schema().assert_tables_count(3).unwrap();
 
     let DiagnoseMigrationHistoryOutput {
         drift,
@@ -95,8 +94,7 @@ async fn squashing_whole_migration_history_works(api: &TestApi) -> TestResult {
     } = api
         .diagnose_migration_history(&directory)
         .opt_in_to_shadow_database(true)
-        .send()
-        .await?
+        .send_sync()
         .into_output();
 
     assert!(drift.is_some());
@@ -117,7 +115,7 @@ async fn squashing_whole_migration_history_works(api: &TestApi) -> TestResult {
     assert!(has_migrations_table);
     assert!(error_in_unapplied_migration.is_none());
 
-    api.mark_migration_applied("0000_initial", &directory).send().await?;
+    api.mark_migration_applied("0000_initial", &directory).send();
 
     let DiagnoseMigrationHistoryOutput {
         drift,
@@ -129,8 +127,7 @@ async fn squashing_whole_migration_history_works(api: &TestApi) -> TestResult {
     } = api
         .diagnose_migration_history(&directory)
         .opt_in_to_shadow_database(true)
-        .send()
-        .await?
+        .send_sync()
         .into_output();
 
     assert!(error_in_unapplied_migration.is_none());
@@ -145,8 +142,7 @@ async fn squashing_whole_migration_history_works(api: &TestApi) -> TestResult {
     assert!(has_migrations_table);
 
     api.apply_migrations(&directory)
-        .send()
-        .await?
+        .send_sync()
         .assert_applied_migrations(&[]);
 
     let DiagnoseMigrationHistoryOutput {
@@ -159,8 +155,7 @@ async fn squashing_whole_migration_history_works(api: &TestApi) -> TestResult {
     } = api
         .diagnose_migration_history(&directory)
         .opt_in_to_shadow_database(true)
-        .send()
-        .await?
+        .send_sync()
         .into_output();
 
     assert!(drift.is_none());
@@ -174,14 +169,14 @@ async fn squashing_whole_migration_history_works(api: &TestApi) -> TestResult {
     assert!(has_migrations_table);
     assert!(error_in_unapplied_migration.is_none());
 
-    api.assert_schema().await?.assert_equals(&initial_schema)?;
+    api.assert_schema().assert_equals(&initial_schema).unwrap();
 
     // The following does not work because we validate that migrations are failed before marking them as rolled back.
     //
     // // Confirm we can get back to a clean diagnoseMigrationHistory if we mark the squashed migrations as rolled back.
     // {
     //     for migration_name in initial_migration_names {
-    //         api.mark_migration_rolled_back(migration_name).send().await?;
+    //         api.mark_migration_rolled_back(migration_name).send().await.unwrap();
     //     }
 
     //     let DiagnoseMigrationHistoryOutput {
@@ -190,7 +185,7 @@ async fn squashing_whole_migration_history_works(api: &TestApi) -> TestResult {
     //         failed_migration_names,
     //         edited_migration_names,
     //         has_migrations_table,
-    //     } = api.diagnose_migration_history(&directory).send().await?.into_output();
+    //     } = api.diagnose_migration_history(&directory).send().await.unwrap().into_output();
 
     //     assert!(drift.is_none());
     //     assert!(history.is_none());
@@ -198,13 +193,11 @@ async fn squashing_whole_migration_history_works(api: &TestApi) -> TestResult {
     //     assert!(edited_migration_names.is_empty());
     //     assert!(has_migrations_table);
     // }
-
-    Ok(())
 }
 
 #[test_connector]
-async fn squashing_migrations_history_at_the_start_works(api: &TestApi) -> TestResult {
-    let directory = api.create_migrations_directory()?;
+fn squashing_migrations_history_at_the_start_works(api: TestApi) {
+    let directory = api.create_migrations_directory();
 
     // Create and apply a bunch of migrations
     let _initial_migration_names = {
@@ -240,8 +233,7 @@ async fn squashing_migrations_history_at_the_start_works(api: &TestApi) -> TestR
         for (count, schema) in [dm1, dm2, dm3].iter().enumerate() {
             let name = api
                 .create_migration(&format!("migration{}", count), schema, &directory)
-                .send()
-                .await?
+                .send_sync()
                 .into_output()
                 .generated_migration_name
                 .unwrap();
@@ -249,28 +241,29 @@ async fn squashing_migrations_history_at_the_start_works(api: &TestApi) -> TestR
             initial_migration_names.push(name);
         }
 
-        api.apply_migrations(&directory).send().await?;
+        api.apply_migrations(&directory).send_sync();
 
         initial_migration_names
     };
 
     let initial_schema = api
         .assert_schema()
-        .await?
-        .assert_tables_count(3)?
-        .assert_has_table("Hyena")?
+        .assert_tables_count(3)
+        .unwrap()
+        .assert_has_table("Hyena")
+        .unwrap()
         .into_schema();
 
     // Squash the files, mark migration applied, assert the schema is the same.
 
     let mut squashed_migrations: Vec<(String, String)> = Vec::with_capacity(3);
 
-    for entry in std::fs::read_dir(directory.path())? {
-        let entry = entry?;
+    for entry in std::fs::read_dir(directory.path()).unwrap() {
+        let entry = entry.unwrap();
 
-        if entry.metadata()?.is_dir() {
+        if entry.metadata().unwrap().is_dir() {
             let file_path = entry.path().join("migration.sql");
-            let contents = std::fs::read_to_string(file_path)?;
+            let contents = std::fs::read_to_string(file_path).unwrap();
 
             squashed_migrations.push((entry.file_name().into_string().unwrap(), contents));
         }
@@ -286,20 +279,20 @@ async fn squashing_migrations_history_at_the_start_works(api: &TestApi) -> TestR
 
         tracing::debug!("Deleting migration at {:?}", migration_directory_path);
 
-        std::fs::remove_dir_all(migration_directory_path)?;
+        std::fs::remove_dir_all(migration_directory_path).unwrap();
     }
 
     let squashed_migration_directory_path = directory.path().join("0000_initial");
-    std::fs::create_dir_all(&squashed_migration_directory_path)?;
+    std::fs::create_dir_all(&squashed_migration_directory_path).unwrap();
 
-    let mut migration_file = std::fs::File::create(squashed_migration_directory_path.join("migration.sql"))?;
+    let mut migration_file = std::fs::File::create(squashed_migration_directory_path.join("migration.sql")).unwrap();
 
     for (_, squashed_migration) in squashed_migrations {
-        migration_file.write_all(squashed_migration.as_bytes())?;
+        migration_file.write_all(squashed_migration.as_bytes()).unwrap();
     }
 
-    api.assert_schema().await?.assert_tables_count(3)?;
-    api.mark_migration_applied("0000_initial", &directory).send().await?;
+    api.assert_schema().assert_tables_count(3).unwrap();
+    api.mark_migration_applied("0000_initial", &directory).send();
 
     let DiagnoseMigrationHistoryOutput {
         drift,
@@ -311,8 +304,7 @@ async fn squashing_migrations_history_at_the_start_works(api: &TestApi) -> TestR
     } = api
         .diagnose_migration_history(&directory)
         .opt_in_to_shadow_database(true)
-        .send()
-        .await?
+        .send_sync()
         .into_output();
 
     assert!(drift.is_none());
@@ -327,8 +319,7 @@ async fn squashing_migrations_history_at_the_start_works(api: &TestApi) -> TestR
     assert!(error_in_unapplied_migration.is_none());
 
     api.apply_migrations(&directory)
-        .send()
-        .await?
+        .send_sync()
         .assert_applied_migrations(&[]);
 
     let DiagnoseMigrationHistoryOutput {
@@ -341,8 +332,7 @@ async fn squashing_migrations_history_at_the_start_works(api: &TestApi) -> TestR
     } = api
         .diagnose_migration_history(&directory)
         .opt_in_to_shadow_database(true)
-        .send()
-        .await?
+        .send_sync()
         .into_output();
 
     assert!(drift.is_none());
@@ -356,14 +346,12 @@ async fn squashing_migrations_history_at_the_start_works(api: &TestApi) -> TestR
     assert!(has_migrations_table);
     assert!(error_in_unapplied_migration.is_none());
 
-    api.assert_schema().await?.assert_equals(&initial_schema)?;
-
-    Ok(())
+    api.assert_schema().assert_equals(&initial_schema).unwrap();
 }
 
 #[test_connector]
-async fn squashing_migrations_history_at_the_end_works(api: &TestApi) -> TestResult {
-    let directory = api.create_migrations_directory()?;
+fn squashing_migrations_history_at_the_end_works(api: TestApi) {
+    let directory = api.create_migrations_directory();
 
     // Create and apply a bunch of migrations
     let _initial_migration_names = {
@@ -399,8 +387,7 @@ async fn squashing_migrations_history_at_the_end_works(api: &TestApi) -> TestRes
         for (count, schema) in [dm1, dm2, dm3].iter().enumerate() {
             let name = api
                 .create_migration(&format!("migration{}", count), schema, &directory)
-                .send()
-                .await?
+                .send_sync()
                 .into_output()
                 .generated_migration_name
                 .unwrap();
@@ -408,28 +395,29 @@ async fn squashing_migrations_history_at_the_end_works(api: &TestApi) -> TestRes
             initial_migration_names.push(name);
         }
 
-        api.apply_migrations(&directory).send().await?;
+        api.apply_migrations(&directory).send_sync();
 
         initial_migration_names
     };
 
     let initial_schema = api
         .assert_schema()
-        .await?
-        .assert_tables_count(3)?
-        .assert_has_table("Hyena")?
+        .assert_tables_count(3)
+        .unwrap()
+        .assert_has_table("Hyena")
+        .unwrap()
         .into_schema();
 
     // Squash the files, mark migration applied, assert the schema is the same.
 
     let mut squashed_migrations: Vec<(String, String)> = Vec::with_capacity(3);
 
-    for entry in std::fs::read_dir(directory.path())? {
-        let entry = entry?;
+    for entry in std::fs::read_dir(directory.path()).unwrap() {
+        let entry = entry.unwrap();
 
-        if entry.metadata()?.is_dir() {
+        if entry.metadata().unwrap().is_dir() {
             let file_path = entry.path().join("migration.sql");
-            let contents = std::fs::read_to_string(file_path)?;
+            let contents = std::fs::read_to_string(file_path).unwrap();
 
             squashed_migrations.push((entry.file_name().into_string().unwrap(), contents));
         }
@@ -445,20 +433,20 @@ async fn squashing_migrations_history_at_the_end_works(api: &TestApi) -> TestRes
 
         tracing::debug!("Deleting migration at {:?}", migration_directory_path);
 
-        std::fs::remove_dir_all(migration_directory_path)?;
+        std::fs::remove_dir_all(migration_directory_path).unwrap();
     }
 
     let squashed_migration_directory_path = directory.path().join("0000_initial");
-    std::fs::create_dir_all(&squashed_migration_directory_path)?;
+    std::fs::create_dir_all(&squashed_migration_directory_path).unwrap();
 
-    let mut migration_file = std::fs::File::create(squashed_migration_directory_path.join("migration.sql"))?;
+    let mut migration_file = std::fs::File::create(squashed_migration_directory_path.join("migration.sql")).unwrap();
 
     for (_, squashed_migration) in squashed_migrations {
-        migration_file.write_all(squashed_migration.as_bytes())?;
+        migration_file.write_all(squashed_migration.as_bytes()).unwrap();
     }
 
-    api.assert_schema().await?.assert_tables_count(3)?;
-    api.mark_migration_applied("0000_initial", &directory).send().await?;
+    api.assert_schema().assert_tables_count(3).unwrap();
+    api.mark_migration_applied("0000_initial", &directory).send();
 
     let DiagnoseMigrationHistoryOutput {
         drift,
@@ -470,8 +458,7 @@ async fn squashing_migrations_history_at_the_end_works(api: &TestApi) -> TestRes
     } = api
         .diagnose_migration_history(&directory)
         .opt_in_to_shadow_database(true)
-        .send()
-        .await?
+        .send_sync()
         .into_output();
 
     assert!(drift.is_none());
@@ -486,8 +473,7 @@ async fn squashing_migrations_history_at_the_end_works(api: &TestApi) -> TestRes
     assert!(error_in_unapplied_migration.is_none());
 
     api.apply_migrations(&directory)
-        .send()
-        .await?
+        .send_sync()
         .assert_applied_migrations(&[]);
 
     let DiagnoseMigrationHistoryOutput {
@@ -500,8 +486,7 @@ async fn squashing_migrations_history_at_the_end_works(api: &TestApi) -> TestRes
     } = api
         .diagnose_migration_history(&directory)
         .opt_in_to_shadow_database(true)
-        .send()
-        .await?
+        .send_sync()
         .into_output();
 
     assert!(drift.is_none());
@@ -515,7 +500,5 @@ async fn squashing_migrations_history_at_the_end_works(api: &TestApi) -> TestRes
     assert!(has_migrations_table);
     assert!(error_in_unapplied_migration.is_none());
 
-    api.assert_schema().await?.assert_equals(&initial_schema)?;
-
-    Ok(())
+    api.assert_schema().assert_equals(&initial_schema).unwrap();
 }

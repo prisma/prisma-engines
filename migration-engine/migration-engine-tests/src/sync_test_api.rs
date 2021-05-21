@@ -3,7 +3,8 @@ pub use test_setup::{BitFlags, Capabilities, Tags};
 
 use crate::{
     multi_engine_test_api::TestApi as RootTestApi, ApplyMigrations, CreateMigration, DevDiagnostic,
-    DiagnoseMigrationHistory, EvaluateDataLoss, Reset, SchemaAssertion, SchemaPush,
+    DiagnoseMigrationHistory, EvaluateDataLoss, ListMigrationDirectories, MarkMigrationApplied,
+    MarkMigrationRolledBack, Reset, SchemaAssertion, SchemaPush,
 };
 use migration_connector::MigrationPersistence;
 use quaint::prelude::{ConnectionInfo, Queryable, ResultSet};
@@ -63,6 +64,13 @@ impl TestApi {
         DiagnoseMigrationHistory::new_sync(&self.connector, migrations_directory, &self.root.rt)
     }
 
+    pub fn dump_table(&self, table_name: &str) -> quaint::prelude::ResultSet {
+        let select_star =
+            quaint::ast::Select::from_table(self.render_table_name(table_name)).value(quaint::ast::asterisk());
+
+        self.query(select_star.into())
+    }
+
     pub fn evaluate_data_loss<'a>(&'a self, migrations_directory: &'a TempDir, schema: String) -> EvaluateDataLoss<'a> {
         EvaluateDataLoss::new(&self.connector, migrations_directory, schema, &self.root.rt)
     }
@@ -120,8 +128,29 @@ impl TestApi {
         }
     }
 
+    pub fn list_migration_directories<'a>(&'a self, migrations_directory: &'a TempDir) -> ListMigrationDirectories<'a> {
+        ListMigrationDirectories::new(&self.connector, migrations_directory, &self.root.rt)
+    }
+
     pub fn lower_cases_table_names(&self) -> bool {
         self.root.lower_cases_table_names()
+    }
+
+    pub fn mark_migration_applied<'a>(
+        &'a self,
+        migration_name: impl Into<String>,
+        migrations_directory: &'a TempDir,
+    ) -> MarkMigrationApplied<'a> {
+        MarkMigrationApplied::new(
+            &self.connector,
+            migration_name.into(),
+            migrations_directory,
+            &self.root.rt,
+        )
+    }
+
+    pub fn mark_migration_rolled_back(&self, migration_name: impl Into<String>) -> MarkMigrationRolledBack<'_> {
+        MarkMigrationRolledBack::new(&self.connector, migration_name.into(), &self.root.rt)
     }
 
     pub fn migration_persistence<'a>(&'a self) -> &(dyn MigrationPersistence + 'a) {
@@ -178,6 +207,13 @@ impl TestApi {
         Reset::new_sync(&self.connector, &self.root.rt)
     }
 
+    pub fn select<'a>(&'a self, table_name: &'a str) -> TestApiSelect<'_> {
+        TestApiSelect {
+            select: quaint::ast::Select::from_table(self.render_table_name(table_name)),
+            api: self,
+        }
+    }
+
     /// Plan a `schemaPush` command
     pub fn schema_push(&self, dm: impl Into<String>) -> SchemaPush<'_> {
         SchemaPush::new_sync(&self.connector, dm.into(), &self.root.rt)
@@ -204,5 +240,22 @@ impl<'a> SingleRowInsert<'a> {
     /// Execute the request and return the result set.
     pub fn result_raw(self) -> quaint::connector::ResultSet {
         self.api.query(self.insert.into())
+    }
+}
+
+pub struct TestApiSelect<'a> {
+    select: quaint::ast::Select<'a>,
+    api: &'a TestApi,
+}
+
+impl<'a> TestApiSelect<'a> {
+    pub fn column(mut self, name: &'a str) -> Self {
+        self.select = self.select.column(name);
+
+        self
+    }
+
+    pub fn send(self) -> quaint::prelude::ResultSet {
+        self.api.query(self.select.into())
     }
 }
