@@ -1,4 +1,5 @@
 mod advisory_locking;
+mod basic;
 mod defaults;
 mod dev_diagnostic_tests;
 mod diagnose_migration_history_tests;

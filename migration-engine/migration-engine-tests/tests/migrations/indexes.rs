@@ -67,7 +67,7 @@ fn index_settings_must_be_migrated(api: TestApi) {
     api.schema_push(dm2)
         .force(true)
         .send_sync()
-        .assert_warnings(&["A unique constraint covering the columns `[name,followersCount]` on the table `Test` will be added. If there are existing duplicate values, this will fail.".into()]).unwrap();
+        .assert_warnings(&["A unique constraint covering the columns `[name,followersCount]` on the table `Test` will be added. If there are existing duplicate values, this will fail.".into()]);
 
     api.assert_schema().assert_table_bang("Test", |table| {
         table

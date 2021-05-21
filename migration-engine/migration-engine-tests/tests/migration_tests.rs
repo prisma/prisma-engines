@@ -896,10 +896,9 @@ async fn adding_unique_to_an_existing_field_must_work(api: &TestApi) -> TestResu
 
     api.schema_push(dm2)
         .force(true)
-        .send()
-        .await?
+        .send().await?
         .assert_executable()
-        .assert_warnings(&["A unique constraint covering the columns `[field]` on the table `A` will be added. If there are existing duplicate values, this will fail.".into()])?
+        .assert_warnings(&["A unique constraint covering the columns `[field]` on the table `A` will be added. If there are existing duplicate values, this will fail.".into()])
         .assert_has_executed_steps();
 
     api.assert_schema().await?.assert_table("A", |table| {
@@ -1391,7 +1390,7 @@ async fn adding_mutual_references_on_existing_tables_works(api: &TestApi) -> Tes
     if api.sql_family().is_sqlite() {
         res.assert_green()?;
     } else {
-        res.assert_warnings(&["A unique constraint covering the columns `[name]` on the table `A` will be added. If there are existing duplicate values, this will fail.".into(), "A unique constraint covering the columns `[email]` on the table `B` will be added. If there are existing duplicate values, this will fail.".into()])?;
+        res.assert_warnings(&["A unique constraint covering the columns `[name]` on the table `A` will be added. If there are existing duplicate values, this will fail.".into(), "A unique constraint covering the columns `[email]` on the table `B` will be added. If there are existing duplicate values, this will fail.".into()]);
     };
 
     Ok(())
@@ -1480,7 +1479,7 @@ async fn migrating_a_unique_constraint_to_a_primary_key_works(api: &TestApi) -> 
         .send()
         .await?
         .assert_executable()
-        .assert_warnings(&["The primary key for the `model1` table will be changed. If it partially fails, the table could be left without primary key constraint.".into(), "You are about to drop the column `id` on the `model1` table, which still contains 1 non-null values.".into()])?;
+        .assert_warnings(&["The primary key for the `model1` table will be changed. If it partially fails, the table could be left without primary key constraint.".into(), "You are about to drop the column `id` on the `model1` table, which still contains 1 non-null values.".into()]);
 
     api.assert_schema().await?.assert_table("model1", |table| {
         table.assert_pk(|pk| pk.assert_columns(&["a", "b", "c"]))
@@ -1598,7 +1597,7 @@ async fn a_table_recreation_with_noncastable_columns_should_trigger_warnings(api
     api.schema_push(dm2)
         .send()
         .await?
-        .assert_warnings(&["You are about to alter the column `title` on the `Blog` table, which contains 1 non-null values. The data in that column will be cast from `String` to `Float`.".into()])?;
+        .assert_warnings(&["You are about to alter the column `title` on the `Blog` table, which contains 1 non-null values. The data in that column will be cast from `String` to `Float`.".into()]);
 
     Ok(())
 }
@@ -1631,45 +1630,3 @@ async fn a_table_recreation_with_noncastable_columns_should_trigger_warnings(api
 //
 //     Ok(())
 // }
-
-#[test_connector]
-async fn a_model_can_be_removed(api: &TestApi) -> TestResult {
-    let directory = api.create_migrations_directory()?;
-
-    let dm1 = r#"
-        model User {
-            id   Int     @id @default(autoincrement())
-            name String?
-            Post Post[]
-        }
-
-        model Post {
-            id     Int    @id @default(autoincrement())
-            title  String
-            User   User   @relation(fields: [userId], references: [id])
-            userId Int
-        }
-    "#;
-
-    api.create_migration("initial", dm1, &directory).send().await?;
-
-    let dm2 = r#"
-        model User {
-            id   Int     @id @default(autoincrement())
-            name String?
-        }
-    "#;
-
-    api.create_migration("second-migration", dm2, &directory).send().await?;
-
-    api.apply_migrations(&directory)
-        .send()
-        .await?
-        .assert_applied_migrations(&["initial", "second-migration"]);
-
-    let output = api.diagnose_migration_history(&directory).send().await?.into_output();
-
-    assert!(output.is_empty());
-
-    Ok(())
-}

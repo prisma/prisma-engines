@@ -158,6 +158,7 @@ impl TestApi {
     }
 
     /// Assert facts about the database schema
+    #[track_caller]
     pub fn assert_schema(&self) -> SchemaAssertion {
         SchemaAssertion::new(
             self.root.block_on(self.connector.describe_schema()).unwrap(),
@@ -183,14 +184,16 @@ impl TestApi {
         }
     }
 
-    /// Same as quaint::Queryable::query()
+    /// Like quaint::Queryable::query()
+    #[track_caller]
     pub fn query(&self, q: quaint::ast::Query<'_>) -> ResultSet {
         self.root.block_on(self.connector.quaint().query(q)).unwrap()
     }
 
     /// Send a SQL command to the database, and expect it to succeed.
+    #[track_caller]
     pub fn raw_cmd(&self, sql: &str) {
-        self.root.raw_cmd(sql)
+        self.root.block_on(self.connector.quaint().raw_cmd(sql)).unwrap()
     }
 
     /// Render a table name with the required prefixing for use with quaint query building.

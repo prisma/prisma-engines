@@ -853,7 +853,7 @@ async fn risky_casts_with_existing_data_should_warn(api: &TestApi) -> TestResult
             .send()
             .await?
             .assert_executable()
-            .assert_warnings(&warnings)?;
+            .assert_warnings(&warnings);
 
         api.assert_schema().await?.assert_table("Test", |table| {
             to_types.iter().enumerate().fold(Ok(table), |result, (idx, to_type)| {
@@ -922,7 +922,7 @@ async fn impossible_casts_with_existing_data_should_warn(api: &TestApi) -> TestR
             .send()
             .await?
             .assert_executable()
-            .assert_warnings(&warnings)?;
+            .assert_warnings(&warnings);
 
         api.assert_schema().await?.assert_table("Test", |table| {
             to_types.iter().enumerate().fold(Ok(table), |result, (idx, to_type)| {

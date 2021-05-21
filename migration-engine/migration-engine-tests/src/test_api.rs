@@ -21,7 +21,7 @@ pub use reset::Reset;
 pub use schema_push::SchemaPush;
 
 use crate::{assertions::SchemaAssertion, sql::barrel_migration_executor::BarrelMigrationExecutor, AssertionResult};
-use migration_connector::{ConnectorError, MigrationPersistence, MigrationRecord};
+use migration_connector::{ConnectorError, MigrationRecord};
 use migration_core::GenericApi;
 use quaint::{
     prelude::{ConnectionInfo, Queryable, SqlFamily},
@@ -99,10 +99,6 @@ impl TestApi {
         }
     }
 
-    pub fn connection_string(&self) -> &str {
-        &self.connection_string
-    }
-
     pub fn schema_name(&self) -> &str {
         self.connection_info().schema_name()
     }
@@ -143,10 +139,6 @@ impl TestApi {
         self.tags().contains(Tags::Postgres)
     }
 
-    pub fn migration_persistence<'a>(&'a self) -> &(dyn MigrationPersistence + 'a) {
-        &self.api
-    }
-
     pub fn connection_info(&self) -> &ConnectionInfo {
         &self.database().connection_info()
     }
@@ -172,11 +164,6 @@ impl TestApi {
         }
     }
 
-    /// Create a temporary directory to serve as a test migrations directory.
-    pub fn create_migrations_directory(&self) -> std::io::Result<TempDir> {
-        tempfile::tempdir()
-    }
-
     pub fn display_migrations(&self, migrations_directory: &TempDir) -> std::io::Result<()> {
         for entry in std::fs::read_dir(migrations_directory.path())? {
             let entry = entry?;
@@ -200,10 +187,6 @@ impl TestApi {
         Ok(())
     }
 
-    pub fn apply_migrations<'a>(&'a self, migrations_directory: &'a TempDir) -> ApplyMigrations<'a> {
-        ApplyMigrations::new(&self.api, migrations_directory)
-    }
-
     /// Convenient builder and assertions for the CreateMigration command.
     pub fn create_migration<'a>(
         &'a self,
@@ -212,15 +195,6 @@ impl TestApi {
         migrations_directory: &'a TempDir,
     ) -> CreateMigration<'a> {
         CreateMigration::new(&self.api, name, prisma_schema, migrations_directory)
-    }
-
-    /// Builder and assertions to call the DiagnoseMigrationHistory command.
-    pub fn diagnose_migration_history<'a>(&'a self, migrations_directory: &'a TempDir) -> DiagnoseMigrationHistory<'a> {
-        DiagnoseMigrationHistory::new(&self.api, migrations_directory)
-    }
-
-    pub fn reset(&self) -> Reset<'_> {
-        Reset::new(&self.api)
     }
 
     pub fn schema_push(&self, dm: impl Into<String>) -> SchemaPush<'_> {
