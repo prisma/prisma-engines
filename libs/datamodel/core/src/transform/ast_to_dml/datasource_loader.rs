@@ -31,16 +31,12 @@ impl DatasourceLoader {
     /// Loads all datasources from the provided schema AST.
     /// - `ignore_datasource_urls`: datasource URLs are not parsed. They are replaced with dummy values.
     /// - `datasource_url_overrides`: datasource URLs are not parsed and overridden with the provided ones.
-    pub fn load_datasources_from_ast(
-        &self,
-        ast_schema: &ast::SchemaAst,
-        datasource_url_overrides: Vec<(String, String)>,
-    ) -> Result<ValidatedDatasources, Diagnostics> {
+    pub fn load_datasources_from_ast(&self, ast_schema: &ast::SchemaAst) -> Result<ValidatedDatasources, Diagnostics> {
         let mut sources = vec![];
         let mut diagnostics = Diagnostics::new();
 
         for src in &ast_schema.sources() {
-            match self.lift_datasource(&src, &datasource_url_overrides) {
+            match self.lift_datasource(&src) {
                 Ok(loaded_src) => {
                     diagnostics.append_warning_vec(loaded_src.warnings);
                     sources.push(loaded_src.subject)
@@ -86,11 +82,7 @@ impl DatasourceLoader {
         }
     }
 
-    fn lift_datasource(
-        &self,
-        ast_source: &ast::SourceConfig,
-        datasource_url_overrides: &[(String, String)],
-    ) -> Result<ValidatedDatasource, Diagnostics> {
+    fn lift_datasource(&self, ast_source: &ast::SourceConfig) -> Result<ValidatedDatasource, Diagnostics> {
         let source_name = &ast_source.name.name;
         let args: HashMap<_, _> = ast_source
             .properties
@@ -132,18 +124,9 @@ impl DatasourceLoader {
             .get(URL_KEY)
             .ok_or_else(|| DatamodelError::new_argument_not_found_error(URL_KEY, ast_source.span))?;
 
-        let override_url = datasource_url_overrides
-            .iter()
-            .find(|x| &x.0 == source_name)
-            .map(|x| &x.1);
-
-        let url = match (url_arg.as_str_from_env(), override_url) {
-            (_, Some(url)) => {
-                tracing::debug!("overwriting datasource `{}` with url '{}'", &source_name, &url);
-                StringFromEnvVar::new_literal(url.clone())
-            }
-            (Ok(str_from_env_var), _) => str_from_env_var,
-            (Err(err), _) => {
+        let url = match url_arg.as_str_from_env() {
+            Ok(str_from_env_var) => str_from_env_var,
+            Err(err) => {
                 return Err(diagnostics.merge_error(err));
             }
         };

@@ -119,7 +119,7 @@ fn parse_datamodel_internal(
     let mut diagnostics = diagnostics::Diagnostics::new();
     let ast = ast::parse_schema(datamodel_string)?;
 
-    let sources = load_sources(&ast, vec![])?;
+    let sources = load_sources(&ast)?;
     let generators = GeneratorLoader::load_generators_from_ast(&ast)?;
     let validator = ValidationPipeline::new(&sources.subject);
 
@@ -143,18 +143,10 @@ pub fn parse_schema_ast(datamodel_string: &str) -> Result<SchemaAst, diagnostics
 }
 
 /// Loads all configuration blocks from a datamodel using the built-in source definitions.
-pub fn parse_configuration(datamodel_string: &str) -> Result<ValidatedConfiguration, diagnostics::Diagnostics> {
-    parse_configuration_with_url_overrides(datamodel_string, Vec::new())
-}
-
-/// - `datasource_url_overrides`: the tuples consist of datasource name and url
-pub fn parse_configuration_with_url_overrides(
-    schema: &str,
-    datasource_url_overrides: Vec<(String, String)>,
-) -> Result<ValidatedConfiguration, diagnostics::Diagnostics> {
+pub fn parse_configuration(schema: &str) -> Result<ValidatedConfiguration, diagnostics::Diagnostics> {
     let mut warnings = Vec::new();
     let ast = ast::parse_schema(schema)?;
-    let mut validated_sources = load_sources(&ast, datasource_url_overrides)?;
+    let mut validated_sources = load_sources(&ast)?;
     let mut validated_generators = GeneratorLoader::load_generators_from_ast(&ast)?;
 
     warnings.append(&mut validated_generators.warnings);
@@ -169,12 +161,9 @@ pub fn parse_configuration_with_url_overrides(
     })
 }
 
-fn load_sources(
-    schema_ast: &SchemaAst,
-    datasource_url_overrides: Vec<(String, String)>,
-) -> Result<ValidatedDatasources, diagnostics::Diagnostics> {
+fn load_sources(schema_ast: &SchemaAst) -> Result<ValidatedDatasources, diagnostics::Diagnostics> {
     let source_loader = DatasourceLoader::new();
-    source_loader.load_datasources_from_ast(&schema_ast, datasource_url_overrides)
+    source_loader.load_datasources_from_ast(&schema_ast)
 }
 
 //

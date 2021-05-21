@@ -28,8 +28,13 @@ impl Configuration {
             .flat_map(|generator| generator.preview_features.iter())
     }
 
-    pub fn resolve_datasource_urls_from_env(&mut self) -> Result<(), Diagnostics> {
+    pub fn resolve_datasource_urls_from_env(&mut self, url_overrides: &[(String, String)]) -> Result<(), Diagnostics> {
         for datasource in &mut self.datasources {
+            if let Some((_, url)) = url_overrides.iter().find(|(name, _url)| name == &datasource.name) {
+                datasource.url.value = Some(url.clone());
+                datasource.url.from_env_var = None;
+            }
+
             if datasource.url.from_env_var.is_some() && datasource.url.value.is_none() {
                 datasource.url.value = Some(datasource.load_url()?);
             }

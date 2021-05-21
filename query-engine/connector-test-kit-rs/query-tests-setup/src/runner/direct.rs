@@ -17,9 +17,7 @@ pub struct DirectRunner {
 #[async_trait::async_trait]
 impl RunnerInterface for DirectRunner {
     async fn load(datamodel: String, connector_tag: ConnectorTag) -> TestResult<Self> {
-        let config = datamodel::parse_configuration_with_url_overrides(&datamodel, vec![])
-            .unwrap()
-            .subject;
+        let config = datamodel::parse_configuration(&datamodel).unwrap().subject;
 
         let parsed_datamodel = datamodel::parse_datamodel(&datamodel).unwrap().subject;
         let internal_datamodel = DatamodelConverter::convert(&parsed_datamodel);
