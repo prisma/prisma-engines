@@ -286,11 +286,6 @@ fn relation_filter(filter: RelationFilter, invert: bool) -> crate::Result<MongoF
 
     // Tmp condition check while mongo is getting fully tested.
     let is_empty = matches!(nested_filter, Filter::Empty);
-
-    // `invert` xor `filter requires invert`
-    // let (nested_filter, nested_joins) =
-    //     convert_filter(nested_filter, invert ^ requires_invert(&filter.condition))?.render();
-
     let (nested_filter, nested_joins) = convert_filter(nested_filter, requires_invert(&filter.condition))?.render();
 
     let mut join_stage = JoinStage::new(from_field);
