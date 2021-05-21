@@ -64,30 +64,22 @@ fn model_to_dmmf(model: &dml::Model) -> Model {
             .collect(),
         is_generated: Some(model.is_generated),
         documentation: model.documentation.clone(),
-        id_fields: model.primary_key.as_ref().map_or(vec![], |pk| pk.fields.clone()),
+        id_fields: model.id_field_names(),
+        //todo should these only be the ones with more than one field?
+        //what is the use case for unique fields / unique indexes here?
         unique_fields: model
             .indices
             .iter()
-            .filter_map(|i| {
-                if i.tpe == IndexType::Unique {
-                    Some(i.fields.clone())
-                } else {
-                    None
-                }
-            })
+            .filter_map(|i| (i.tpe == IndexType::Unique).then(|| i.fields.clone()))
             .collect(),
         unique_indexes: model
             .indices
             .iter()
             .filter_map(|i| {
-                if i.tpe == IndexType::Unique {
-                    Some(UniqueIndex {
-                        name: Some(i.name_in_db.clone()),
-                        fields: i.fields.clone(),
-                    })
-                } else {
-                    None
-                }
+                (i.tpe == IndexType::Unique).then(|| UniqueIndex {
+                    name: Some(i.name_in_db.clone()),
+                    fields: i.fields.clone(),
+                })
             })
             .collect(),
     }

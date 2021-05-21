@@ -4,7 +4,11 @@ pub struct ConstraintNames {}
 
 impl ConstraintNames {
     ///Aligned with PG, to maximize the amount of times where we do not need
-    ///to render names because they already align with our convention
+    ///to render names because they already align with our convention.
+    ///
+    /// We always take the database names of entities. So if a model is remapped to
+    /// a different name in the datamodel, the default name generation will still take
+    /// the name of the table in the db as input. Same goes for fields / columns.
     ///
     /// Postgres Naming conventions
     ///
@@ -16,7 +20,7 @@ impl ConstraintNames {
     /// idx for any other kind of index
     /// fkey for a Foreign key
     ///
-    /// addditional for SQLSever:
+    /// addditional for SQLServer:
     /// dflt for Default Constraint
     ///
     /// not used for now:

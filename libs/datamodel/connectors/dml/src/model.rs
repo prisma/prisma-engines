@@ -240,8 +240,6 @@ impl Model {
 
         // second candidate: any unique constraint where all fields are required
         {
-            println!("{:?}", self.indices);
-
             let unique_field_combi: Vec<UniqueCriteria> = self
                 .indices
                 .iter()
