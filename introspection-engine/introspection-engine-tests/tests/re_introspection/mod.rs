@@ -1705,7 +1705,7 @@ async fn do_not_try_to_keep_custom_many_to_many_self_relation_names(api: &TestAp
     //join table and which one to B
     //upon table creation this is dependant on lexicographic order of the names of the fields, but we
     //cannot be sure that users keep the order the same when renaming. worst case would be we accidentally
-    //switch the directions when reintrospecting.
+    //switch the directions when re-introspecting.
     //the generated names are also not helpful though, but at least they don't give a false sense of correctness -.-
     api.barrel()
         .execute(|migration| {
@@ -1744,6 +1744,70 @@ async fn do_not_try_to_keep_custom_many_to_many_self_relation_names(api: &TestAp
     "#};
 
     api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
+
+    Ok(())
+}
+
+//todo compound uniques
+//todo compound ids
+// assert warnings
+#[test_each_connector]
+async fn re_introspecting_custom_compound_unique_names(api: &TestApi) -> crate::TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
+                t.add_column("first", types::integer());
+                t.add_column("last", types::integer());
+                t.add_index(
+                    "User.something@invalid-and/weird",
+                    types::index(&["first", "last"]).unique(true),
+                );
+            });
+
+            migration.create_table("Unrelated", |t| {
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("Unrelated_pkey", types::primary_constraint(&["id"]));
+            });
+        })
+        .await?;
+
+    let input_dm = indoc! {r#"
+        model User {
+            id     Int @id @default(autoincrement()) 
+            first  Int
+            last   Int
+
+            @@unique([first, last], name: "compound", map: "User.something@invalid-and/weird")
+        }
+    "#};
+
+    let final_dm = indoc! {r#"
+        model User {
+            id     Int @id @default(autoincrement()) 
+            first  Int
+            last   Int
+
+            @@unique([first, last], name: "compound", map: "User.something@invalid-and/weird")
+        }
+
+        model Unrelated {
+            id    Int @id @default(autoincrement())
+        }
+    "#};
+
+    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
+
+    let expected = json!([{
+        "code": 17,
+        "message": "These Indices were enriched with custom index names taken from the previous Prisma schema.",
+        "affected" :[
+            {"model": "User", "index_db_name": "User.something@invalid-and/weird"},
+        ]
+    }]);
+
+    assert_eq_json!(expected, api.re_introspect_warnings(&input_dm).await?);
 
     Ok(())
 }

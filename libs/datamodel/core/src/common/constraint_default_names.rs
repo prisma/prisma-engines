@@ -28,22 +28,22 @@ impl ConstraintNames {
     /// excl for an Exclusion constraint
     /// seq for sequences
 
-    pub fn primary_key_name(model: &str) -> String {
-        format!("{}_pkey", model)
+    pub fn primary_key_name(table_name: &str) -> String {
+        format!("{}_pkey", table_name)
     }
 
-    pub fn index_name(model: &str, fields: Vec<String>, tpe: IndexType) -> String {
+    pub fn index_name(table_name: &str, column_names: Vec<String>, tpe: IndexType) -> String {
         match tpe {
-            IndexType::Unique => format!("{}_{}_key", model, fields.join("_")),
-            IndexType::Normal => format!("{}_{}_idx", model, fields.join("_")),
+            IndexType::Unique => format!("{}_{}_key", table_name, column_names.join("_")),
+            IndexType::Normal => format!("{}_{}_idx", table_name, column_names.join("_")),
         }
     }
 
-    pub fn foreign_key_constraint_name(model: &str, fields: Vec<String>) -> String {
-        format!("{}_{}_fkey", model, fields.join("_"))
+    pub fn foreign_key_constraint_name(table_name: &str, column_names: Vec<String>) -> String {
+        format!("{}_{}_fkey", table_name, column_names.join("_"))
     }
 
-    pub fn default_constraint_name(model: &str, field: &str) -> String {
-        format!("{}_{}_dflt", model, field)
+    pub fn default_constraint_name(table_name: &str, column_name: &str) -> String {
+        format!("{}_{}_dflt", table_name, column_name)
     }
 }

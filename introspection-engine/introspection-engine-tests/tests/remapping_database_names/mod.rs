@@ -451,3 +451,73 @@ async fn remapping_compound_primary_keys(api: &TestApi) -> crate::TestResult {
 
     Ok(())
 }
+//todo
+//invalid names for compound index
+//invalid names for compound id
+
+#[test_each_connector]
+async fn not_automatically_remapping_invalid_compound_unique_key_names(api: &TestApi) -> crate::TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
+                t.add_column("first", types::integer());
+                t.add_column("last", types::integer());
+                t.add_index(
+                    "User.something@invalid-and/weird",
+                    types::index(&["first", "last"]).unique(true),
+                );
+            });
+        })
+        .await?;
+
+    let dm = indoc! {r#"
+        model User {
+            id     Int @id @default(autoincrement()) 
+            first  Int
+            last   Int
+
+            @@unique([first, last], map: "User.something@invalid-and/weird")
+        }
+    "#};
+
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn not_automatically_remapping_invalid_compound_primary_key_names(api: &TestApi) -> crate::TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("first", types::integer());
+                t.add_column("last", types::integer());
+                t.add_constraint(
+                    "User.something@invalid-and/weird",
+                    types::primary_constraint(&["first", "last"]).unique(true),
+                );
+            });
+        })
+        .await?;
+
+    let pk_name = if api.sql_family().is_sqlite() || api.sql_family().is_mysql() {
+        ""
+    } else {
+        ", map: \"User.something@invalid-and/weird\""
+    };
+
+    let dm = format! {r#"
+        model User {{
+            first  Int
+            last   Int
+
+            @@id([first, last]{})
+        }}
+    "#, pk_name};
+
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
+
+    Ok(())
+}

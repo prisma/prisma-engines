@@ -47,11 +47,15 @@ pub fn introspect(
         }
 
         for index in table.indices.iter() {
-            model.add_index(calculate_index(model.name.clone(), index));
+            model.add_index(calculate_index(table.name.clone(), index));
         }
 
         model.primary_key = table.primary_key.as_ref().map(|pk| {
-            let default_name = ConstraintNames::primary_key_name(&model.name);
+            let default_name = ConstraintNames::primary_key_name(&table.name);
+
+            //We do not populate name in client by default. It increases datamodel noise,
+            //and we would need to sanitize it. Users can give their own names if they want
+            //and re-introspection will keep them.
             PrimaryKeyDefinition {
                 name_in_client: None,
                 name_in_db_is_default: pk.constraint_name == Some(default_name),

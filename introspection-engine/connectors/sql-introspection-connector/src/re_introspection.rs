@@ -43,6 +43,34 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family
         }
     }
 
+    //custom index names
+    let mut changed_index_names = vec![];
+    {
+        for model in new_data_model.models() {
+            if let Some(old_model) = &old_data_model.find_model(&model.name) {
+                for index in &model.indices {
+                    if let Some(old_index) = old_model.indices.iter().find(|old| old.name_in_db == index.name_in_db) {
+                        if old_index.name_in_client.is_some() {
+                            let mf = ModelAndIndex::new(&model.name, &old_index.name_in_db);
+                            changed_index_names.push((mf, old_index.name_in_client.clone()))
+                        }
+                    }
+                }
+            }
+        }
+
+        //change field name
+        for changed_index_name in &changed_index_names {
+            let index = new_data_model
+                .find_model_mut(&changed_index_name.0.model)
+                .indices
+                .iter_mut()
+                .find(|i| i.name_in_db == changed_index_name.0.index_db_name)
+                .unwrap();
+            index.name_in_client = changed_index_name.1.clone();
+        }
+    }
+
     // @map on fields
     let mut changed_scalar_field_names = vec![];
     {
@@ -462,6 +490,11 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family
     if !changed_model_names.is_empty() {
         let models: Vec<_> = changed_model_names.iter().map(|c| c.1.clone()).collect();
         warnings.push(warning_enriched_with_map_on_model(&models));
+    }
+
+    if !changed_index_names.is_empty() {
+        let index: Vec<_> = changed_index_names.iter().map(|c| c.0.clone()).collect();
+        warnings.push(warning_enriched_with_custom_index_names_at(&index));
     }
 
     if !changed_scalar_field_names.is_empty() {

@@ -94,10 +94,6 @@ fn sanitize_models(datamodel: &mut Datamodel, family: &SqlFamily) -> HashMap<Str
                 }
             }
         }
-
-        for index in &mut model.indices {
-            index.fields = sanitize_strings(&index.fields);
-        }
     }
 
     enum_renames

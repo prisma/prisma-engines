@@ -2,9 +2,8 @@ use crate::Dedup;
 use crate::SqlError;
 use datamodel::common::ConstraintNames;
 use datamodel::{
-    common::RelationNames, Datamodel, DefaultValue as DMLDef, FieldArity, FieldType, IndexDefinition,
-    IndexType as DMLIndexType, Model, OnDeleteStrategy, PrimaryKeyDefinition, RelationField, RelationInfo, ScalarField,
-    ScalarType, ValueGenerator as VG,
+    common::RelationNames, Datamodel, DefaultValue as DMLDef, FieldArity, FieldType, IndexDefinition, Model,
+    OnDeleteStrategy, PrimaryKeyDefinition, RelationField, RelationInfo, ScalarField, ScalarType, ValueGenerator as VG,
 };
 use datamodel_connector::Connector;
 use quaint::connector::SqlFamily;
@@ -122,14 +121,19 @@ pub fn calculate_many_to_many_field(
     RelationField::new(&name, FieldArity::List, relation_info)
 }
 
-pub(crate) fn calculate_index(model_name: String, index: &Index) -> IndexDefinition {
+pub(crate) fn calculate_index(table_name: String, index: &Index) -> IndexDefinition {
     debug!("Handling index  {:?}", index);
 
     let tpe = match index.tpe {
         IndexType::Unique => datamodel::dml::IndexType::Unique,
         IndexType::Normal => datamodel::dml::IndexType::Normal,
     };
-    let default_name = ConstraintNames::index_name(&model_name, index.columns.clone(), tpe);
+    let default_name = ConstraintNames::index_name(&table_name, index.columns.clone(), tpe);
+
+    //We do not populate name in client by default. It increases datamodel noise,
+    //and we would need to sanitize it. Users can give their own names if they want
+    //and re-introspection will keep them. This is a change in introspection behaviour,
+    //but due to re-introspection previous datamodels and clients should keep working as before.
 
     IndexDefinition {
         name_in_db: index.name.clone(),
@@ -154,27 +158,13 @@ pub(crate) fn calculate_scalar_field(table: &Table, column: &Column, family: &Sq
     };
 
     let default_value = calculate_default(table, &column, &arity);
+    let table_name = table.name.clone();
 
     let is_unique = table
         .indices
         .iter()
-        .find(|index| {
-            index.tpe == IndexType::Unique
-                && index.columns.len() == 1
-                && index.columns.contains(&column.name.to_owned())
-        })
-        .map(|index| {
-            let default_name =
-                ConstraintNames::index_name(&table.name, vec![column.name.clone()], DMLIndexType::Unique);
-
-            IndexDefinition {
-                name_in_client: None,
-                name_in_db: index.name.clone(),
-                name_in_db_matches_default: index.name == default_name,
-                tpe: DMLIndexType::Unique,
-                fields: vec![column.name.to_owned()],
-            }
-        });
+        .find(|index| index.tpe == IndexType::Unique && index.columns == vec![column.name.to_string()])
+        .map(|index| calculate_index(table_name, index));
 
     ScalarField {
         name: column.name.clone(),
