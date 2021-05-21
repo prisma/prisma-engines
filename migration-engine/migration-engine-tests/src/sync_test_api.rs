@@ -2,8 +2,8 @@ pub use test_macros::test_connector;
 pub use test_setup::{BitFlags, Capabilities, Tags};
 
 use crate::{
-    multi_engine_test_api::TestApi as RootTestApi, ApplyMigrations, CreateMigration, DiagnoseMigrationHistory,
-    SchemaAssertion, SchemaPush,
+    multi_engine_test_api::TestApi as RootTestApi, ApplyMigrations, CreateMigration, DevDiagnostic,
+    DiagnoseMigrationHistory, EvaluateDataLoss, Reset, SchemaAssertion, SchemaPush,
 };
 use migration_connector::MigrationPersistence;
 use quaint::prelude::{ConnectionInfo, Queryable, ResultSet};
@@ -54,8 +54,17 @@ impl TestApi {
         self.root.create_migrations_directory()
     }
 
+    /// Builder and assertions to call the `devDiagnostic` command.
+    pub fn dev_diagnostic<'a>(&'a self, migrations_directory: &'a TempDir) -> DevDiagnostic<'a> {
+        DevDiagnostic::new(&self.connector, migrations_directory, &self.root.rt)
+    }
+
     pub fn diagnose_migration_history<'a>(&'a self, migrations_directory: &'a TempDir) -> DiagnoseMigrationHistory<'a> {
         DiagnoseMigrationHistory::new_sync(&self.connector, migrations_directory, &self.root.rt)
+    }
+
+    pub fn evaluate_data_loss<'a>(&'a self, migrations_directory: &'a TempDir, schema: String) -> EvaluateDataLoss<'a> {
+        EvaluateDataLoss::new(&self.connector, migrations_directory, schema, &self.root.rt)
     }
 
     /// Returns true only when testing on MSSQL.
@@ -162,6 +171,11 @@ impl TestApi {
         } else {
             (self.connector.quaint().connection_info().schema_name(), table_name).into()
         }
+    }
+
+    /// Plan a `reset` command
+    pub fn reset(&self) -> Reset<'_> {
+        Reset::new_sync(&self.connector, &self.root.rt)
     }
 
     /// Plan a `schemaPush` command

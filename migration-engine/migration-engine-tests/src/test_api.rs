@@ -11,6 +11,7 @@ mod schema_push;
 
 pub use apply_migrations::ApplyMigrations;
 pub use create_migration::CreateMigration;
+pub use dev_diagnostic::DevDiagnostic;
 pub use diagnose_migration_history::DiagnoseMigrationHistory;
 pub use evaluate_data_loss::EvaluateDataLoss;
 pub use mark_migration_applied::MarkMigrationApplied;
@@ -21,7 +22,6 @@ use crate::{
     assertions::SchemaAssertion, sql::barrel_migration_executor::BarrelMigrationExecutor,
     test_api::list_migration_directories::ListMigrationDirectories, AssertionResult,
 };
-use dev_diagnostic::DevDiagnostic;
 use mark_migration_rolled_back::MarkMigrationRolledBack;
 use migration_connector::{ConnectorError, MigrationPersistence, MigrationRecord};
 use migration_core::GenericApi;
@@ -220,22 +220,9 @@ impl TestApi {
         CreateMigration::new(&self.api, name, prisma_schema, migrations_directory)
     }
 
-    /// Builder and assertions to call the `devDiagnostic` command.
-    pub fn dev_diagnostic<'a>(&'a self, migrations_directory: &'a TempDir) -> DevDiagnostic<'a> {
-        DevDiagnostic::new(&self.api, migrations_directory)
-    }
-
     /// Builder and assertions to call the DiagnoseMigrationHistory command.
     pub fn diagnose_migration_history<'a>(&'a self, migrations_directory: &'a TempDir) -> DiagnoseMigrationHistory<'a> {
         DiagnoseMigrationHistory::new(&self.api, migrations_directory)
-    }
-
-    pub fn evaluate_data_loss<'a>(
-        &'a self,
-        migrations_directory: &'a TempDir,
-        prisma_schema: impl Into<String>,
-    ) -> EvaluateDataLoss<'a> {
-        EvaluateDataLoss::new(&self.api, migrations_directory, prisma_schema.into())
     }
 
     pub fn mark_migration_applied<'a>(

@@ -1,7 +1,6 @@
-use crate::AssertionResult;
 use migration_core::{
     commands::{EvaluateDataLossInput, EvaluateDataLossOutput},
-    GenericApi,
+    CoreResult, GenericApi,
 };
 use std::borrow::Cow;
 use tempfile::TempDir;
@@ -11,31 +10,40 @@ pub struct EvaluateDataLoss<'a> {
     api: &'a dyn GenericApi,
     migrations_directory: &'a TempDir,
     prisma_schema: String,
+    rt: &'a tokio::runtime::Runtime,
 }
 
 impl<'a> EvaluateDataLoss<'a> {
-    pub fn new(api: &'a dyn GenericApi, migrations_directory: &'a TempDir, prisma_schema: String) -> Self {
+    pub fn new(
+        api: &'a dyn GenericApi,
+        migrations_directory: &'a TempDir,
+        prisma_schema: String,
+        rt: &'a tokio::runtime::Runtime,
+    ) -> Self {
         EvaluateDataLoss {
             api,
             migrations_directory,
             prisma_schema,
+            rt,
         }
     }
 
-    pub async fn send(self) -> anyhow::Result<EvaluateDataLossAssertion<'a>> {
-        let output = self
-            .api
-            .evaluate_data_loss(&EvaluateDataLossInput {
-                migrations_directory_path: self.migrations_directory.path().to_str().unwrap().to_owned(),
-                prisma_schema: self.prisma_schema,
-            })
-            .await?;
+    fn send_impl(self) -> CoreResult<EvaluateDataLossAssertion<'a>> {
+        let output = self.rt.block_on(self.api.evaluate_data_loss(&EvaluateDataLossInput {
+            migrations_directory_path: self.migrations_directory.path().to_str().unwrap().to_owned(),
+            prisma_schema: self.prisma_schema,
+        }))?;
 
         Ok(EvaluateDataLossAssertion {
             output,
             _api: self.api,
             _migrations_directory: self.migrations_directory,
         })
+    }
+
+    #[track_caller]
+    pub fn send(self) -> EvaluateDataLossAssertion<'a> {
+        self.send_impl().unwrap()
     }
 }
 
@@ -52,8 +60,9 @@ impl std::fmt::Debug for EvaluateDataLossAssertion<'_> {
 }
 
 impl<'a> EvaluateDataLossAssertion<'a> {
-    pub fn assert_steps_count(self, count: usize) -> AssertionResult<Self> {
-        anyhow::ensure!(
+    #[track_caller]
+    pub fn assert_steps_count(self, count: usize) -> Self {
+        assert!(
             self.output.migration_steps.len() == count,
             "Assertion failed. Expected evaluateDataLoss to return {} steps, found {}.\n{:?}",
             count,
@@ -61,12 +70,13 @@ impl<'a> EvaluateDataLossAssertion<'a> {
             self.output.migration_steps,
         );
 
-        Ok(self)
+        self
     }
 
-    pub fn assert_warnings(self, warnings: &[Cow<'_, str>]) -> AssertionResult<Self> {
-        anyhow::ensure!(
-            self.output.warnings.len() == warnings.len(),
+    pub fn assert_warnings(self, warnings: &[Cow<'_, str>]) -> Self {
+        assert_eq!(
+            self.output.warnings.len(),
+            warnings.len(),
             "Expected {} warnings, got {}.\n{:#?}",
             warnings.len(),
             self.output.warnings.len(),
@@ -82,11 +92,11 @@ impl<'a> EvaluateDataLossAssertion<'a> {
 
         assert_eq!(descriptions, warnings);
 
-        Ok(self)
+        self
     }
 
-    pub fn assert_warnings_with_indices(self, warnings: &[(Cow<'_, str>, usize)]) -> AssertionResult<Self> {
-        anyhow::ensure!(
+    pub fn assert_warnings_with_indices(self, warnings: &[(Cow<'_, str>, usize)]) -> Self {
+        assert!(
             self.output.warnings.len() == warnings.len(),
             "Expected {} warnings, got {}.\n{:#?}",
             warnings.len(),
@@ -103,11 +113,11 @@ impl<'a> EvaluateDataLossAssertion<'a> {
 
         assert_eq!(descriptions, warnings);
 
-        Ok(self)
+        self
     }
 
-    pub fn assert_unexecutable(self, unexecutable_steps: &[Cow<'_, str>]) -> AssertionResult<Self> {
-        anyhow::ensure!(
+    pub fn assert_unexecutable(self, unexecutable_steps: &[Cow<'_, str>]) -> Self {
+        assert!(
             self.output.unexecutable_steps.len() == unexecutable_steps.len(),
             "Expected {} unexecutable_steps, got {}.\n{:#?}",
             unexecutable_steps.len(),
@@ -124,11 +134,11 @@ impl<'a> EvaluateDataLossAssertion<'a> {
 
         assert_eq!(descriptions, unexecutable_steps);
 
-        Ok(self)
+        self
     }
 
-    pub fn assert_unexecutables_with_indices(self, unexecutables: &[(Cow<'_, str>, usize)]) -> AssertionResult<Self> {
-        anyhow::ensure!(
+    pub fn assert_unexecutables_with_indices(self, unexecutables: &[(Cow<'_, str>, usize)]) -> Self {
+        assert!(
             self.output.unexecutable_steps.len() == unexecutables.len(),
             "Expected {} unexecutables, got {}.\n{:#?}",
             unexecutables.len(),
@@ -144,8 +154,7 @@ impl<'a> EvaluateDataLossAssertion<'a> {
             .collect();
 
         assert_eq!(descriptions, unexecutables);
-
-        Ok(self)
+        self
     }
 
     pub fn into_output(self) -> EvaluateDataLossOutput {
