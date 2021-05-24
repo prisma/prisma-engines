@@ -79,13 +79,13 @@ pub fn get_config(ctx: CallContext) -> napi::Result<JsUnknown> {
     } = options;
 
     let overrides: Vec<(_, _)> = datasource_overrides.into_iter().collect();
-    let mut config = datamodel::parse_configuration_with_url_overrides(&datamodel, overrides)
-        .map_err(|errors| ApiError::conversion(errors, &datamodel))?;
+    let mut config =
+        datamodel::parse_configuration(&datamodel).map_err(|errors| ApiError::conversion(errors, &datamodel))?;
 
     if !ignore_env_var_errors {
         config
             .subject
-            .resolve_datasource_urls_from_env()
+            .resolve_datasource_urls_from_env(&overrides)
             .map_err(|errors| ApiError::conversion(errors, &datamodel))?;
     }
 
