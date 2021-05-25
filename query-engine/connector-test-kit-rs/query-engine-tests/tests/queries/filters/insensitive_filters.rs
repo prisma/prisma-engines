@@ -3,6 +3,8 @@ use query_engine_tests::*;
 
 #[test_suite(schema(schema), capabilities(InsensitiveFilters))]
 mod insensitive {
+    use query_engine_tests::assert_query_many;
+
     fn schema() -> String {
         let schema = indoc! {
             r#"model TestModel {
@@ -81,14 +83,22 @@ mod insensitive {
           @r###"{"data":{"findManyTestModel":[{"str":"æ"},{"str":"Æ"}]}}"###
         );
 
-        insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyTestModel(where: { str: { gte: "aÆB", mode: insensitive } }) { str }}"#),
-          @r###"{"data":{"findManyTestModel":[{"str":"æ"},{"str":"Æ"},{"str":"bar"},{"str":"aÆB"},{"str":"AÆB"},{"str":"aæB"},{"str":"aB"}]}}"###
+        assert_query_many!(
+            runner,
+            r#"query { findManyTestModel(where: { str: { gte: "aÆB", mode: insensitive } }) { str }}"#,
+            vec![
+                r#"{"data":{"findManyTestModel":[{"str":"æ"},{"str":"Æ"},{"str":"bar"},{"str":"aÆB"},{"str":"aæB"}]}}"#, // Mongo
+                r#"{"data":{"findManyTestModel":[{"str":"æ"},{"str":"Æ"},{"str":"bar"},{"str":"aÆB"},{"str":"AÆB"},{"str":"aæB"},{"str":"aB"}]}}"# // Postgres
+            ]
         );
 
-        insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyTestModel(where: { str: { lt: "aÆB", mode: insensitive } }) { str }}"#),
-          @r###"{"data":{"findManyTestModel":[{"data":{"findManyTestModel":[{"str":"A"}]}}]}}"###
+        assert_query_many!(
+            runner,
+            r#"query { findManyTestModel(where: { str: { lt: "aÆB", mode: insensitive } }) { str }}"#,
+            vec![
+                r#"{"data":{"findManyTestModel":[{"str":"A"},{"str":"AÆB"},{"str":"aB"}]}}"#, // Mongo
+                r#"{"data":{"findManyTestModel":[{"str":"A"}]}}"#                              // Postgres
+            ]
         );
 
         Ok(())

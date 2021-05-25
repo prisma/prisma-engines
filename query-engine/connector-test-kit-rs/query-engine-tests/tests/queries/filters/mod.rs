@@ -9,6 +9,7 @@ pub mod filter_unwrap;
 pub mod filters;
 pub mod insensitive_filters;
 pub mod json;
+pub mod json_path;
 pub mod where_unique;
 
 /// Creates test data used by filter tests using the `common_nullable_types` schema.

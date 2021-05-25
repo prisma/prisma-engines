@@ -180,6 +180,7 @@ pub enum ConnectorCapability {
     WritableAutoincField,
     CreateSkipDuplicates,
     UpdateableId,
+    JsonFiltering,
     JsonFilteringJsonPath,
     JsonFilteringArrayPath,
     CompoundIds,
