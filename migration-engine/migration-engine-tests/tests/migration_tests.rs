@@ -13,7 +13,7 @@ mod schema_push;
 use migration_engine_tests::{sql::*, TestResult};
 use pretty_assertions::assert_eq;
 use prisma_value::PrismaValue;
-use quaint::prelude::{Queryable, SqlFamily};
+use quaint::prelude::Queryable;
 use sql_schema_describer::*;
 use test_macros::test_connector;
 

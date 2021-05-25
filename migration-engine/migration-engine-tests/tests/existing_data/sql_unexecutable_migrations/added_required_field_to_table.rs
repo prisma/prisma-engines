@@ -1,9 +1,7 @@
-use migration_engine_tests::sql::*;
+use migration_engine_tests::{sql::ResultSetExt, sync_test_api::*};
 
 #[test_connector]
-async fn adding_a_required_field_to_an_existing_table_with_data_without_a_default_is_unexecutable(
-    api: &TestApi,
-) -> TestResult {
+fn adding_a_required_field_to_an_existing_table_with_data_without_a_default_is_unexecutable(api: TestApi) {
     let dm1 = r#"
         model Test {
             id String @id
@@ -11,13 +9,12 @@ async fn adding_a_required_field_to_an_existing_table_with_data_without_a_defaul
         }
     "#;
 
-    api.schema_push(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send_sync().assert_green_bang();
 
     api.insert("Test")
         .value("id", "abc")
         .value("name", "george")
-        .result_raw()
-        .await?;
+        .result_raw();
 
     let dm2 = r#"
         model Test {
@@ -29,20 +26,19 @@ async fn adding_a_required_field_to_an_existing_table_with_data_without_a_defaul
 
     api.schema_push(dm2)
         .force(false)
-        .send()
-        .await?
+        .send_sync()
         .assert_no_warning()
-        .assert_unexecutable(&["Added the required column `age` to the `Test` table without a default value. There are 1 rows in this table, it is not possible to execute this step.".to_string()])?;
+        .assert_unexecutable(&["Added the required column `age` to the `Test` table without a default value. There are 1 rows in this table, it is not possible to execute this step.".to_string()]).unwrap();
 
-    let rows = api.select("Test").column("id").column("name").send().await?;
-
-    rows.assert_single_row(|row| row.assert_text_value("id", "abc")?.assert_text_value("name", "george"))?;
-
-    Ok(())
+    api.select("Test")
+        .column("id")
+        .column("name")
+        .send()
+        .assert_single_row(|row| row.assert_text_value("id", "abc").assert_text_value("name", "george"));
 }
 
 #[test_connector]
-async fn adding_a_required_field_with_prisma_level_default_works(api: &TestApi) -> TestResult {
+fn adding_a_required_field_with_prisma_level_default_works(api: TestApi) {
     let dm1 = r#"
         model Test {
             id String @id
@@ -50,13 +46,9 @@ async fn adding_a_required_field_with_prisma_level_default_works(api: &TestApi) 
         }
     "#;
 
-    api.schema_push(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send_sync().assert_green_bang();
 
-    api.insert("Test")
-        .value("id", "abc")
-        .value("age", 100)
-        .result_raw()
-        .await?;
+    api.insert("Test").value("id", "abc").value("age", 100).result_raw();
 
     let dm2 = r#"
         model Test {
@@ -68,20 +60,19 @@ async fn adding_a_required_field_with_prisma_level_default_works(api: &TestApi) 
 
     api.schema_push(dm2)
         .force(false)
-        .send()
-        .await?
+        .send_sync()
         .assert_no_warning()
-        .assert_unexecutable(&["The required column `name` was added to the `Test` table with a prisma-level default value. There are 1 rows in this table, it is not possible to execute this step. Please add this column as optional, then populate it before making it required.".into()])?;
+        .assert_unexecutable(&["The required column `name` was added to the `Test` table with a prisma-level default value. There are 1 rows in this table, it is not possible to execute this step. Please add this column as optional, then populate it before making it required.".into()]).unwrap();
 
-    let rows = api.select("Test").column("id").column("age").send().await?;
-
-    rows.assert_single_row(|row| row.assert_text_value("id", "abc")?.assert_int_value("age", 100))?;
-
-    Ok(())
+    api.select("Test")
+        .column("id")
+        .column("age")
+        .send()
+        .assert_single_row(|row| row.assert_text_value("id", "abc").assert_int_value("age", 100));
 }
 
 #[test_connector]
-async fn adding_a_required_field_with_a_default_to_an_existing_table_works(api: &TestApi) -> TestResult {
+fn adding_a_required_field_with_a_default_to_an_existing_table_works(api: TestApi) {
     let dm1 = r#"
         model Test {
             id String @id
@@ -89,13 +80,12 @@ async fn adding_a_required_field_with_a_default_to_an_existing_table_works(api: 
         }
     "#;
 
-    api.schema_push(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send_sync().assert_green_bang();
 
     api.insert("Test")
         .value("id", "abc")
         .value("name", "george")
-        .result_raw()
-        .await?;
+        .result_raw();
 
     let dm2 = r#"
         model Test {
@@ -105,30 +95,22 @@ async fn adding_a_required_field_with_a_default_to_an_existing_table_works(api: 
         }
     "#;
 
-    api.schema_push(dm2).send().await?.assert_green()?;
+    api.schema_push(dm2).send_sync().assert_green_bang();
 
-    let rows = api
-        .select("Test")
+    api.select("Test")
         .column("id")
         .column("name")
         .column("age")
-        .send_debug()
-        .await?;
-
-    assert_eq!(
-        rows,
-        &[&[
-            r#"Text(Some("abc"))"#,
-            r#"Text(Some("george"))"#,
-            r#"Integer(Some(45))"#
-        ]]
-    );
-
-    Ok(())
+        .send()
+        .assert_single_row(|row| {
+            row.assert_text_value("id", "abc")
+                .assert_text_value("name", "george")
+                .assert_int_value("age", 45)
+        });
 }
 
 #[test_connector]
-async fn adding_a_required_field_without_default_to_an_existing_table_without_data_works(api: &TestApi) -> TestResult {
+fn adding_a_required_field_without_default_to_an_existing_table_without_data_works(api: TestApi) {
     let dm1 = r#"
         model Test {
             id String @id
@@ -136,7 +118,7 @@ async fn adding_a_required_field_without_default_to_an_existing_table_without_da
         }
     "#;
 
-    api.schema_push(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send_sync().assert_green_bang();
 
     let dm2 = r#"
         model Test {
@@ -146,11 +128,8 @@ async fn adding_a_required_field_without_default_to_an_existing_table_without_da
         }
     "#;
 
-    api.schema_push(dm2).send().await?.assert_green()?;
+    api.schema_push(dm2).send_sync().assert_green_bang();
 
     api.assert_schema()
-        .await?
-        .assert_table("Test", |table| table.assert_has_column("age"))?;
-
-    Ok(())
+        .assert_table_bang("Test", |table| table.assert_has_column("age"));
 }

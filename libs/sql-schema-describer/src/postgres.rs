@@ -261,12 +261,11 @@ impl SqlSchemaDescriber {
             let table_name = col.get_expect_string("table_name");
             let name = col.get_expect_string("column_name");
 
-            let is_identity_str = col.get_expect_string("is_identity").to_lowercase();
-
-            let is_identity = match is_identity_str.as_str() {
-                "no" => false,
-                "yes" => true,
-                _ => panic!("unrecognized is_identity variant '{}'", is_identity_str),
+            let is_identity = match col.get_string("is_identity") {
+                Some(is_id) if is_id.eq_ignore_ascii_case("yes") => true,
+                Some(is_id) if is_id.eq_ignore_ascii_case("no") => false,
+                Some(is_identity_str) => panic!("unrecognized is_identity variant '{}'", is_identity_str),
+                None => false,
             };
 
             let data_type = col.get_expect_string("data_type");

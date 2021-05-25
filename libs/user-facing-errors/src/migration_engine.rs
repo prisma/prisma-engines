@@ -172,7 +172,7 @@ impl crate::UserFacingError for ShadowDbCreationError {
         };
 
         format!(
-            "Prisma Migrate could not create the shadow database. Please make sure the database user has permission to create databases. More info: https://pris.ly/d/migrate-shadow. Original error: {error_code}\n{inner_error}",
+            "Prisma Migrate could not create the shadow database. Please make sure the database user has permission to create databases. Read more at https://pris.ly/d/migrate-shadow\n\nOriginal error: {error_code}\n{inner_error}",
             inner_error = self.inner_error.message(),
             error_code = error_code
         )

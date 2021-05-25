@@ -11,18 +11,16 @@ mod schema_push;
 
 pub use apply_migrations::ApplyMigrations;
 pub use create_migration::CreateMigration;
+pub use dev_diagnostic::DevDiagnostic;
 pub use diagnose_migration_history::DiagnoseMigrationHistory;
 pub use evaluate_data_loss::EvaluateDataLoss;
+pub use list_migration_directories::ListMigrationDirectories;
 pub use mark_migration_applied::MarkMigrationApplied;
+pub use mark_migration_rolled_back::MarkMigrationRolledBack;
 pub use reset::Reset;
 pub use schema_push::SchemaPush;
 
-use crate::{
-    assertions::SchemaAssertion, sql::barrel_migration_executor::BarrelMigrationExecutor,
-    test_api::list_migration_directories::ListMigrationDirectories, AssertionResult,
-};
-use dev_diagnostic::DevDiagnostic;
-use mark_migration_rolled_back::MarkMigrationRolledBack;
+use crate::{assertions::SchemaAssertion, sql::barrel_migration_executor::BarrelMigrationExecutor, AssertionResult};
 use migration_connector::{ConnectorError, MigrationPersistence, MigrationRecord};
 use migration_core::GenericApi;
 use quaint::{
@@ -206,10 +204,6 @@ impl TestApi {
         ApplyMigrations::new(&self.api, migrations_directory)
     }
 
-    pub fn list_migration_directories<'a>(&'a self, migrations_directory: &'a TempDir) -> ListMigrationDirectories<'a> {
-        ListMigrationDirectories::new(&self.api, migrations_directory)
-    }
-
     /// Convenient builder and assertions for the CreateMigration command.
     pub fn create_migration<'a>(
         &'a self,
@@ -220,34 +214,9 @@ impl TestApi {
         CreateMigration::new(&self.api, name, prisma_schema, migrations_directory)
     }
 
-    /// Builder and assertions to call the `devDiagnostic` command.
-    pub fn dev_diagnostic<'a>(&'a self, migrations_directory: &'a TempDir) -> DevDiagnostic<'a> {
-        DevDiagnostic::new(&self.api, migrations_directory)
-    }
-
     /// Builder and assertions to call the DiagnoseMigrationHistory command.
     pub fn diagnose_migration_history<'a>(&'a self, migrations_directory: &'a TempDir) -> DiagnoseMigrationHistory<'a> {
         DiagnoseMigrationHistory::new(&self.api, migrations_directory)
-    }
-
-    pub fn evaluate_data_loss<'a>(
-        &'a self,
-        migrations_directory: &'a TempDir,
-        prisma_schema: impl Into<String>,
-    ) -> EvaluateDataLoss<'a> {
-        EvaluateDataLoss::new(&self.api, migrations_directory, prisma_schema.into())
-    }
-
-    pub fn mark_migration_applied<'a>(
-        &'a self,
-        migration_name: impl Into<String>,
-        migrations_directory: &'a TempDir,
-    ) -> MarkMigrationApplied<'a> {
-        MarkMigrationApplied::new(&self.api, migration_name.into(), migrations_directory)
-    }
-
-    pub fn mark_migration_rolled_back(&self, migration_name: impl Into<String>) -> MarkMigrationRolledBack<'_> {
-        MarkMigrationRolledBack::new(&self.api, migration_name.into())
     }
 
     pub fn reset(&self) -> Reset<'_> {

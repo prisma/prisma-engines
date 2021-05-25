@@ -1,20 +1,20 @@
 use chrono::Duration;
-use migration_engine_tests::sql::*;
+use migration_engine_tests::sync_test_api::*;
 use pretty_assertions::assert_eq;
 
 #[test_connector]
-async fn starting_a_migration_works(api: &TestApi) -> TestResult {
+fn starting_a_migration_works(api: TestApi) {
     let persistence = api.migration_persistence();
 
-    persistence.initialize().await?;
+    api.block_on(persistence.initialize()).unwrap();
 
     let script = "CREATE ENUM MyBoolean ( \"TRUE\", \"FALSE\" )";
 
-    let id = persistence
-        .record_migration_started("initial_migration", script)
-        .await?;
+    let id = api
+        .block_on(persistence.record_migration_started("initial_migration", script))
+        .unwrap();
 
-    let migrations = persistence.list_migrations().await?.unwrap();
+    let migrations = api.block_on(persistence.list_migrations()).unwrap().unwrap();
 
     assert_eq!(migrations.len(), 1);
 
@@ -35,24 +35,22 @@ async fn starting_a_migration_works(api: &TestApi) -> TestResult {
 
     assert!(duration_since_started_at >= Duration::seconds(0));
     assert!(duration_since_started_at < Duration::seconds(1));
-
-    Ok(())
 }
 
 #[test_connector]
-async fn finishing_a_migration_works(api: &TestApi) -> TestResult {
+fn finishing_a_migration_works(api: TestApi) {
     let persistence = api.migration_persistence();
 
-    persistence.initialize().await?;
+    api.block_on(persistence.initialize()).unwrap();
 
     let script = "CREATE ENUM MyBoolean ( \"TRUE\", \"FALSE\" )";
 
-    let id = persistence
-        .record_migration_started("initial_migration", script)
-        .await?;
-    persistence.record_migration_finished(&id).await?;
+    let id = api
+        .block_on(persistence.record_migration_started("initial_migration", script))
+        .unwrap();
+    api.block_on(persistence.record_migration_finished(&id)).unwrap();
 
-    let migrations = persistence.list_migrations().await?.unwrap();
+    let migrations = api.block_on(persistence.list_migrations()).unwrap().unwrap();
 
     assert_eq!(migrations.len(), 1);
 
@@ -76,25 +74,23 @@ async fn finishing_a_migration_works(api: &TestApi) -> TestResult {
     assert!(duration_since_started_at < Duration::seconds(10));
     assert!(duration_between_started_at_and_finished_at >= Duration::seconds(0));
     assert!(duration_between_started_at_and_finished_at < Duration::seconds(10));
-
-    Ok(())
 }
 
 #[test_connector]
-async fn updating_then_finishing_a_migration_works(api: &TestApi) -> TestResult {
+fn updating_then_finishing_a_migration_works(api: TestApi) {
     let persistence = api.migration_persistence();
 
-    persistence.initialize().await?;
+    api.block_on(persistence.initialize()).unwrap();
 
     let script = "CREATE ENUM MyBoolean ( \"TRUE\", \"FALSE\" )";
 
-    let id = persistence
-        .record_migration_started("initial_migration", script)
-        .await?;
-    persistence.record_successful_step(&id).await?;
-    persistence.record_migration_finished(&id).await?;
+    let id = api
+        .block_on(persistence.record_migration_started("initial_migration", script))
+        .unwrap();
+    api.block_on(persistence.record_successful_step(&id)).unwrap();
+    api.block_on(persistence.record_migration_finished(&id)).unwrap();
 
-    let migrations = persistence.list_migrations().await?.unwrap();
+    let migrations = api.block_on(persistence.list_migrations()).unwrap().unwrap();
 
     assert_eq!(migrations.len(), 1);
 
@@ -118,33 +114,31 @@ async fn updating_then_finishing_a_migration_works(api: &TestApi) -> TestResult 
     assert!(duration_since_started_at < Duration::seconds(10));
     assert!(duration_between_started_at_and_finished_at >= Duration::seconds(0));
     assert!(duration_between_started_at_and_finished_at < Duration::seconds(10));
-
-    Ok(())
 }
 
 #[test_connector]
-async fn multiple_successive_migrations_work(api: &TestApi) -> TestResult {
+fn multiple_successive_migrations_work(api: TestApi) {
     let persistence = api.migration_persistence();
 
-    persistence.initialize().await?;
+    api.block_on(persistence.initialize()).unwrap();
 
     let script_1 = "CREATE ENUM MyBoolean ( \"TRUE\", \"FALSE\" )";
 
-    let id_1 = persistence
-        .record_migration_started("initial_migration", script_1)
-        .await?;
-    persistence.record_successful_step(&id_1).await?;
-    persistence.record_migration_finished(&id_1).await?;
+    let id_1 = api
+        .block_on(persistence.record_migration_started("initial_migration", script_1))
+        .unwrap();
+    api.block_on(persistence.record_successful_step(&id_1)).unwrap();
+    api.block_on(persistence.record_migration_finished(&id_1)).unwrap();
 
     std::thread::sleep(std::time::Duration::from_millis(10));
 
     let script_2 = "DROP ENUM MyBoolean";
-    let id_2 = persistence
-        .record_migration_started("second_migration", script_2)
-        .await?;
-    persistence.record_successful_step(&id_2).await?;
+    let id_2 = api
+        .block_on(persistence.record_migration_started("second_migration", script_2))
+        .unwrap();
+    api.block_on(persistence.record_successful_step(&id_2)).unwrap();
 
-    let migrations = persistence.list_migrations().await?.unwrap();
+    let migrations = api.block_on(persistence.list_migrations()).unwrap().unwrap();
 
     assert_eq!(migrations.len(), 2);
 
@@ -192,6 +186,4 @@ async fn multiple_successive_migrations_work(api: &TestApi) -> TestResult {
         assert!(duration_since_started_at >= Duration::seconds(0));
         assert!(duration_since_started_at < Duration::seconds(10));
     }
-
-    Ok(())
 }
