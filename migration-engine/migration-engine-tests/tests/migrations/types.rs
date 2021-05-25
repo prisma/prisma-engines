@@ -1,8 +1,8 @@
-use migration_engine_tests::sql::*;
+use migration_engine_tests::sync_test_api::*;
 use sql_schema_describer::ColumnTypeFamily;
 
 #[test_connector]
-async fn bytes_columns_are_idempotent(api: &TestApi) -> TestResult {
+fn bytes_columns_are_idempotent(api: TestApi) {
     let dm = format!(
         r#"
         {datasource}
@@ -12,22 +12,19 @@ async fn bytes_columns_are_idempotent(api: &TestApi) -> TestResult {
             chipData Bytes
         }}
     "#,
-        datasource = api.datasource()
+        datasource = api.datasource_block()
     );
 
     api.schema_push(&dm)
-        .send()
-        .await?
-        .assert_green()?
+        .send_sync()
+        .assert_green_bang()
         .assert_has_executed_steps();
 
-    api.schema_push(&dm).send().await?.assert_green()?.assert_no_steps();
-
-    Ok(())
+    api.schema_push(&dm).send_sync().assert_green_bang().assert_no_steps();
 }
 
 #[test_connector]
-async fn float_columns_are_idempotent(api: &TestApi) -> TestResult {
+fn float_columns_are_idempotent(api: TestApi) {
     let dm = r#"
         model Cat {
             id String @id
@@ -36,18 +33,15 @@ async fn float_columns_are_idempotent(api: &TestApi) -> TestResult {
     "#;
 
     api.schema_push(dm)
-        .send()
-        .await?
-        .assert_green()?
+        .send_sync()
+        .assert_green_bang()
         .assert_has_executed_steps();
 
-    api.schema_push(dm).send().await?.assert_green()?.assert_no_steps();
-
-    Ok(())
+    api.schema_push(dm).send_sync().assert_green_bang().assert_no_steps();
 }
 
 #[test_connector]
-async fn decimal_columns_are_idempotent(api: &TestApi) -> TestResult {
+fn decimal_columns_are_idempotent(api: TestApi) {
     let dm = format!(
         r#"
         {datasource}
@@ -57,22 +51,19 @@ async fn decimal_columns_are_idempotent(api: &TestApi) -> TestResult {
             meowFrequency Decimal
         }}
         "#,
-        datasource = api.datasource()
+        datasource = api.datasource_block()
     );
 
     api.schema_push(&dm)
-        .send()
-        .await?
-        .assert_green()?
+        .send_sync()
+        .assert_green_bang()
         .assert_has_executed_steps();
 
-    api.schema_push(&dm).send().await?.assert_green()?.assert_no_steps();
-
-    Ok(())
+    api.schema_push(&dm).send_sync().assert_green_bang().assert_no_steps();
 }
 
 #[test_connector]
-async fn float_to_decimal_works(api: &TestApi) -> TestResult {
+fn float_to_decimal_works(api: TestApi) {
     let dm1 = r#"
         model Cat {
             id String @id
@@ -80,11 +71,11 @@ async fn float_to_decimal_works(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.schema_push(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send_sync().assert_green_bang();
 
-    api.assert_schema().await?.assert_table("Cat", |table| {
+    api.assert_schema().assert_table_bang("Cat", |table| {
         table.assert_column("meowFrequency", |col| col.assert_type_family(ColumnTypeFamily::Float))
-    })?;
+    });
 
     let dm2 = format!(
         r#"
@@ -95,24 +86,21 @@ async fn float_to_decimal_works(api: &TestApi) -> TestResult {
             meowFrequency Decimal
         }}
     "#,
-        datasource = api.datasource()
+        datasource = api.datasource_block()
     );
 
     api.schema_push(&dm2)
-        .send()
-        .await?
-        .assert_green()?
+        .send_sync()
+        .assert_green_bang()
         .assert_has_executed_steps();
 
-    api.assert_schema().await?.assert_table("Cat", |table| {
+    api.assert_schema().assert_table_bang("Cat", |table| {
         table.assert_column("meowFrequency", |col| col.assert_type_family(ColumnTypeFamily::Decimal))
-    })?;
-
-    Ok(())
+    });
 }
 
 #[test_connector]
-async fn decimal_to_float_works(api: &TestApi) -> TestResult {
+fn decimal_to_float_works(api: TestApi) {
     let dm1 = format!(
         r#"
         {datasource}
@@ -122,14 +110,14 @@ async fn decimal_to_float_works(api: &TestApi) -> TestResult {
             meowFrequency Decimal
         }}
     "#,
-        datasource = api.datasource()
+        datasource = api.datasource_block()
     );
 
-    api.schema_push(&dm1).send().await?.assert_green()?;
+    api.schema_push(&dm1).send_sync().assert_green_bang();
 
-    api.assert_schema().await?.assert_table("Cat", |table| {
+    api.assert_schema().assert_table_bang("Cat", |table| {
         table.assert_column("meowFrequency", |col| col.assert_type_family(ColumnTypeFamily::Decimal))
-    })?;
+    });
 
     let dm2 = r#"
         model Cat {
@@ -139,20 +127,17 @@ async fn decimal_to_float_works(api: &TestApi) -> TestResult {
     "#;
 
     api.schema_push(dm2)
-        .send()
-        .await?
-        .assert_green()?
+        .send_sync()
+        .assert_green_bang()
         .assert_has_executed_steps();
 
-    api.assert_schema().await?.assert_table("Cat", |table| {
+    api.assert_schema().assert_table_bang("Cat", |table| {
         table.assert_column("meowFrequency", |col| col.assert_type_family(ColumnTypeFamily::Float))
-    })?;
-
-    Ok(())
+    });
 }
 
 #[test_connector]
-async fn bytes_to_string_works(api: &TestApi) -> TestResult {
+fn bytes_to_string_works(api: TestApi) {
     let dm1 = format!(
         r#"
         {datasource}
@@ -162,14 +147,14 @@ async fn bytes_to_string_works(api: &TestApi) -> TestResult {
             meowData Bytes
         }}
     "#,
-        datasource = api.datasource()
+        datasource = api.datasource_block()
     );
 
-    api.schema_push(&dm1).send().await?.assert_green()?;
+    api.schema_push(&dm1).send_sync().assert_green_bang();
 
-    api.assert_schema().await?.assert_table("Cat", |table| {
+    api.assert_schema().assert_table_bang("Cat", |table| {
         table.assert_column("meowData", |col| col.assert_type_is_bytes())
-    })?;
+    });
 
     let dm2 = r#"
         model Cat {
@@ -179,20 +164,17 @@ async fn bytes_to_string_works(api: &TestApi) -> TestResult {
     "#;
 
     api.schema_push(dm2)
-        .send()
-        .await?
-        .assert_green()?
+        .send_sync()
+        .assert_green_bang()
         .assert_has_executed_steps();
 
-    api.assert_schema().await?.assert_table("Cat", |table| {
+    api.assert_schema().assert_table_bang("Cat", |table| {
         table.assert_column("meowData", |col| col.assert_type_is_string())
-    })?;
-
-    Ok(())
+    });
 }
 
 #[test_connector]
-async fn string_to_bytes_works(api: &TestApi) -> TestResult {
+fn string_to_bytes_works(api: TestApi) {
     let dm1 = format!(
         r#"
         {datasource}
@@ -202,14 +184,14 @@ async fn string_to_bytes_works(api: &TestApi) -> TestResult {
             meowData Bytes
         }}
     "#,
-        datasource = api.datasource()
+        datasource = api.datasource_block()
     );
 
-    api.schema_push(&dm1).send().await?.assert_green()?;
+    api.schema_push(&dm1).send_sync().assert_green_bang();
 
-    api.assert_schema().await?.assert_table("Cat", |table| {
+    api.assert_schema().assert_table_bang("Cat", |table| {
         table.assert_column("meowData", |col| col.assert_type_is_bytes())
-    })?;
+    });
 
     let dm2 = r#"
         model Cat {
@@ -219,20 +201,17 @@ async fn string_to_bytes_works(api: &TestApi) -> TestResult {
     "#;
 
     api.schema_push(dm2)
-        .send()
-        .await?
-        .assert_green()?
+        .send_sync()
+        .assert_green_bang()
         .assert_has_executed_steps();
 
-    api.assert_schema().await?.assert_table("Cat", |table| {
+    api.assert_schema().assert_table_bang("Cat", |table| {
         table.assert_column("meowData", |col| col.assert_type_is_string())
-    })?;
-
-    Ok(())
+    });
 }
 
 #[test_connector(capabilities(ScalarLists))]
-async fn decimal_to_decimal_array_works(api: &TestApi) -> TestResult {
+fn decimal_to_decimal_array_works(api: TestApi) {
     let dm1 = r#"
         model Test {
             id       String    @id @default(cuid())
@@ -240,11 +219,11 @@ async fn decimal_to_decimal_array_works(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.schema_push(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send_sync().assert_green_bang();
 
-    api.assert_schema().await?.assert_table("Test", |table| {
+    api.assert_schema().assert_table_bang("Test", |table| {
         table.assert_column("decFloat", |col| col.assert_type_is_decimal()?.assert_is_required())
-    })?;
+    });
 
     let dm2 = format!(
         r#"
@@ -255,30 +234,27 @@ async fn decimal_to_decimal_array_works(api: &TestApi) -> TestResult {
             decFloat Decimal[]
         }}
         "#,
-        api.datasource()
+        api.datasource_block()
     );
 
     api.schema_push(dm2)
-        .send()
-        .await?
-        .assert_green()?
+        .send_sync()
+        .assert_green_bang()
         .assert_has_executed_steps();
 
-    api.assert_schema().await?.assert_table("Test", |table| {
+    api.assert_schema().assert_table_bang("Test", |table| {
         table.assert_column("decFloat", |col| col.assert_type_is_decimal()?.assert_is_list())
-    })?;
+    });
 
-    api.schema_push(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send_sync().assert_green_bang();
 
-    api.assert_schema().await?.assert_table("Test", |table| {
+    api.assert_schema().assert_table_bang("Test", |table| {
         table.assert_column("decFloat", |col| col.assert_type_is_decimal()?.assert_is_required())
-    })?;
-
-    Ok(())
+    });
 }
 
 #[test_connector(capabilities(ScalarLists))]
-async fn bytes_to_bytes_array_works(api: &TestApi) -> TestResult {
+fn bytes_to_bytes_array_works(api: TestApi) {
     let dm1 = format!(
         r#"
             {datasource}
@@ -288,14 +264,14 @@ async fn bytes_to_bytes_array_works(api: &TestApi) -> TestResult {
                 bytesCol Bytes
             }}
         "#,
-        datasource = api.datasource()
+        datasource = api.datasource_block()
     );
 
-    api.schema_push(&dm1).send().await?.assert_green()?;
+    api.schema_push(&dm1).send_sync().assert_green_bang();
 
-    api.assert_schema().await?.assert_table("Test", |table| {
+    api.assert_schema().assert_table_bang("Test", |table| {
         table.assert_column("bytesCol", |col| col.assert_type_is_bytes()?.assert_is_required())
-    })?;
+    });
 
     let dm2 = format!(
         r#"
@@ -306,24 +282,21 @@ async fn bytes_to_bytes_array_works(api: &TestApi) -> TestResult {
                 bytesCol Bytes[]
             }}
         "#,
-        datasource = api.datasource()
+        datasource = api.datasource_block()
     );
 
     api.schema_push(dm2)
-        .send()
-        .await?
-        .assert_green()?
+        .send_sync()
+        .assert_green_bang()
         .assert_has_executed_steps();
 
-    api.assert_schema().await?.assert_table("Test", |table| {
+    api.assert_schema().assert_table_bang("Test", |table| {
         table.assert_column("bytesCol", |col| col.assert_type_is_bytes()?.assert_is_list())
-    })?;
+    });
 
-    api.schema_push(&dm1).send().await?.assert_green()?;
+    api.schema_push(&dm1).send_sync().assert_green_bang();
 
-    api.assert_schema().await?.assert_table("Test", |table| {
+    api.assert_schema().assert_table_bang("Test", |table| {
         table.assert_column("bytesCol", |col| col.assert_type_is_bytes()?.assert_is_required())
-    })?;
-
-    Ok(())
+    });
 }

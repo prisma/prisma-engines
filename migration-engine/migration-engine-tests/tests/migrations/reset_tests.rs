@@ -1,7 +1,7 @@
-use migration_engine_tests::sql::*;
+use migration_engine_tests::sync_test_api::*;
 
 #[test_connector]
-async fn reset_works(api: &TestApi) -> TestResult {
+fn reset_works(api: TestApi) {
     let dm = r#"
         model Cat {
             id Int @id
@@ -9,29 +9,23 @@ async fn reset_works(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.schema_push(dm).send().await?;
+    api.schema_push(dm).send_sync();
 
-    api.assert_schema().await?.assert_tables_count(1)?;
+    api.assert_schema().assert_tables_count(1).unwrap();
 
-    api.insert("Cat")
-        .value("id", 1)
-        .value("name", "Garfield")
-        .result_raw()
-        .await?;
+    api.insert("Cat").value("id", 1).value("name", "Garfield").result_raw();
 
-    api.reset().send().await?;
+    api.reset().send_sync();
 
-    api.assert_schema().await?.assert_tables_count(0)?;
+    api.assert_schema().assert_tables_count(0).unwrap();
 
-    api.schema_push(dm).send().await?;
+    api.schema_push(dm).send_sync();
 
-    api.assert_schema().await?.assert_tables_count(1)?;
-
-    Ok(())
+    api.assert_schema().assert_tables_count(1).unwrap();
 }
 
 #[test_connector]
-async fn reset_then_apply_with_migrations_directory_works(api: &TestApi) -> TestResult {
+fn reset_then_apply_with_migrations_directory_works(api: TestApi) {
     let dm = r#"
         model Cat {
             id Int @id
@@ -39,39 +33,37 @@ async fn reset_then_apply_with_migrations_directory_works(api: &TestApi) -> Test
         }
     "#;
 
-    let dir = api.create_migrations_directory()?;
-    api.create_migration("0-init", dm, &dir).send().await?;
-    api.apply_migrations(&dir).send().await?;
+    let dir = api.create_migrations_directory();
+    api.create_migration("0-init", dm, &dir).send_sync();
+    api.apply_migrations(&dir).send_sync();
 
     api.assert_schema()
-        .await?
-        .assert_tables_count(2)?
-        .assert_has_table("Cat")?
-        .assert_has_table("_prisma_migrations")?;
+        .assert_tables_count(2)
+        .unwrap()
+        .assert_has_table("Cat")
+        .unwrap()
+        .assert_has_table("_prisma_migrations")
+        .unwrap();
 
-    api.insert("Cat")
-        .value("id", 1)
-        .value("name", "Garfield")
-        .result_raw()
-        .await?;
+    api.insert("Cat").value("id", 1).value("name", "Garfield").result_raw();
 
-    api.reset().send().await?;
+    api.reset().send_sync();
 
-    api.assert_schema().await?.assert_tables_count(0)?;
+    api.assert_schema().assert_tables_count(0).unwrap();
 
-    api.apply_migrations(&dir).send().await?;
+    api.apply_migrations(&dir).send_sync();
 
     api.assert_schema()
-        .await?
-        .assert_tables_count(2)?
-        .assert_has_table("Cat")?
-        .assert_has_table("_prisma_migrations")?;
-
-    Ok(())
+        .assert_tables_count(2)
+        .unwrap()
+        .assert_has_table("Cat")
+        .unwrap()
+        .assert_has_table("_prisma_migrations")
+        .unwrap();
 }
 
 #[test_connector]
-async fn reset_then_diagnostics_with_migrations_directory_works(api: &TestApi) -> TestResult {
+fn reset_then_diagnostics_with_migrations_directory_works(api: TestApi) {
     let dm = r#"
         model Cat {
             id Int @id
@@ -79,35 +71,33 @@ async fn reset_then_diagnostics_with_migrations_directory_works(api: &TestApi) -
         }
     "#;
 
-    let dir = api.create_migrations_directory()?;
-    api.create_migration("0-init", dm, &dir).send().await?;
-    api.apply_migrations(&dir).send().await?;
+    let dir = api.create_migrations_directory();
+    api.create_migration("0-init", dm, &dir).send_sync();
+    api.apply_migrations(&dir).send_sync();
 
     api.assert_schema()
-        .await?
-        .assert_tables_count(2)?
-        .assert_has_table("Cat")?
-        .assert_has_table("_prisma_migrations")?;
+        .assert_tables_count(2)
+        .unwrap()
+        .assert_has_table("Cat")
+        .unwrap()
+        .assert_has_table("_prisma_migrations")
+        .unwrap();
 
-    api.insert("Cat")
-        .value("id", 1)
-        .value("name", "Garfield")
-        .result_raw()
-        .await?;
+    api.insert("Cat").value("id", 1).value("name", "Garfield").result_raw();
 
-    api.reset().send().await?;
+    api.reset().send_sync();
 
-    api.assert_schema().await?.assert_tables_count(0)?;
+    api.assert_schema().assert_tables_count(0).unwrap();
 
-    api.diagnose_migration_history(&dir).send().await?;
-    api.evaluate_data_loss(&dir, dm).send().await?;
-    api.apply_migrations(&dir).send().await?;
+    api.diagnose_migration_history(&dir).send_sync();
+    api.evaluate_data_loss(&dir, dm.into()).send();
+    api.apply_migrations(&dir).send_sync();
 
     api.assert_schema()
-        .await?
-        .assert_tables_count(2)?
-        .assert_has_table("Cat")?
-        .assert_has_table("_prisma_migrations")?;
-
-    Ok(())
+        .assert_tables_count(2)
+        .unwrap()
+        .assert_has_table("Cat")
+        .unwrap()
+        .assert_has_table("_prisma_migrations")
+        .unwrap();
 }

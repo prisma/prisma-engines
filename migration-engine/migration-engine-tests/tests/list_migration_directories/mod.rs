@@ -1,19 +1,16 @@
-use crate::*;
+use migration_engine_tests::sync_test_api::*;
 
 #[test_connector]
-async fn list_migration_directories_with_an_empty_migrations_folder_works(api: &TestApi) -> TestResult {
-    let migrations_directory = api.create_migrations_directory()?;
+fn list_migration_directories_with_an_empty_migrations_folder_works(api: TestApi) {
+    let migrations_directory = api.create_migrations_directory();
 
     api.list_migration_directories(&migrations_directory)
         .send()
-        .await?
-        .assert_listed_directories(&[])?;
-
-    Ok(())
+        .assert_listed_directories(&[]);
 }
 
 #[test_connector]
-async fn listing_a_single_migration_name_should_work(api: &TestApi) -> TestResult {
+fn listing_a_single_migration_name_should_work(api: TestApi) {
     let dm = r#"
         model Cat {
             id Int @id
@@ -21,19 +18,15 @@ async fn listing_a_single_migration_name_should_work(api: &TestApi) -> TestResul
         }
     "#;
 
-    let migrations_directory = api.create_migrations_directory()?;
+    let migrations_directory = api.create_migrations_directory();
 
-    api.create_migration("init", dm, &migrations_directory).send().await?;
+    api.create_migration("init", dm, &migrations_directory).send_sync();
 
     api.apply_migrations(&migrations_directory)
-        .send()
-        .await?
+        .send_sync()
         .assert_applied_migrations(&["init"]);
 
     api.list_migration_directories(&migrations_directory)
         .send()
-        .await?
-        .assert_listed_directories(&["init"])?;
-
-    Ok(())
+        .assert_listed_directories(&["init"]);
 }

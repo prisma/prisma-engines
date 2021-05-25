@@ -143,12 +143,13 @@ impl PrismaOpt {
         let config_result = if ignore_env_errors {
             datamodel::parse_configuration(datamodel_str)
         } else {
-            datamodel::parse_configuration_with_url_overrides(datamodel_str, datasource_url_overrides).and_then(
-                |config| {
-                    config.subject.datasources[0].load_url()?;
-                    Ok(config)
-                },
-            )
+            datamodel::parse_configuration(datamodel_str).and_then(|mut config| {
+                config
+                    .subject
+                    .resolve_datasource_urls_from_env(&datasource_url_overrides)?;
+
+                Ok(config)
+            })
         };
         config_result.map_err(|errors| PrismaError::ConversionError(errors, datamodel_str.to_string()))
     }

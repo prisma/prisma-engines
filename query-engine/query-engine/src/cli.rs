@@ -116,7 +116,7 @@ impl CliCommand {
         let config = &mut req.config;
 
         if !req.ignore_env_var_errors {
-            config.subject.resolve_datasource_urls_from_env()?;
+            config.subject.resolve_datasource_urls_from_env(&[])?;
         }
 
         let json = datamodel::json::mcf::config_to_mcf_json_value(&config);
