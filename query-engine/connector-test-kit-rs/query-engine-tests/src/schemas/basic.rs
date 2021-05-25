@@ -149,6 +149,36 @@ pub fn json() -> String {
     schema.to_owned()
 }
 
+pub fn string_combination_unique() -> String {
+    let schema = indoc! {
+        r#"model TestModel {
+            #id(id, Int, @id)
+            fieldA String
+            fieldB String
+            fieldC String
+            fieldD String
+          
+            @@unique([fieldA, fieldB, fieldC, fieldD])
+          }"#
+    };
+
+    schema.to_owned()
+}
+
+pub fn string_combination() -> String {
+    let schema = indoc! {
+        r#"model TestModel {
+            #id(id, Int, @id)
+            fieldA String
+            fieldB String
+            fieldC String
+            fieldD String
+          }"#
+    };
+
+    schema.to_owned()
+}
+
 pub fn autoinc_id() -> String {
     let schema = indoc! {
         "model TestModel {

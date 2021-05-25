@@ -7,6 +7,15 @@ macro_rules! assert_query {
 }
 
 #[macro_export]
+macro_rules! assert_query_many {
+    ($runner:expr, $q:expr, $result:expr) => {
+        let q_result = $runner.query($q).await?.to_string();
+
+        assert_eq!($result.contains(&q_result.as_str()), true);
+    };
+}
+
+#[macro_export]
 macro_rules! run_query {
     ($runner:expr, $q:expr) => {
         $runner.query($q).await?.to_string()
