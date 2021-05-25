@@ -82,10 +82,11 @@ impl MssqlFlavour {
         jdbc_string
             .properties_mut()
             .insert("database".into(), database_name.into());
+        let host = jdbc_string.server_name();
 
         let jdbc_string = jdbc_string.to_string();
 
-        tracing::debug!("Connecting to shadow database at `{}`", jdbc_string);
+        tracing::debug!("Connecting to shadow database at {}", host.unwrap_or("localhost"));
 
         Ok(crate::connect(&jdbc_string).await?)
     }
