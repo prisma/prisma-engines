@@ -11,7 +11,7 @@ use quaint::prelude::{ConnectionInfo, Queryable, ResultSet};
 use sql_migration_connector::SqlMigrationConnector;
 use std::{borrow::Cow, future::Future};
 use tempfile::TempDir;
-use test_setup::TestApiArgs;
+use test_setup::{DatasourceBlock, TestApiArgs};
 
 pub struct TestApi {
     root: RootTestApi,
@@ -172,8 +172,12 @@ impl TestApi {
     }
 
     /// Render a valid datasource block, including database URL.
-    pub fn datasource_block(&self) -> String {
-        self.root.args.datasource_block(self.root.args.database_url())
+    pub fn datasource_block(&self) -> DatasourceBlock<'_> {
+        self.root.datasource_block()
+    }
+
+    pub fn datasource_block_with<'a>(&'a self, params: &'a [(&'a str, &'a str)]) -> DatasourceBlock<'a> {
+        self.root.args.datasource_block(self.root.connection_string(), params)
     }
 
     pub fn normalize_identifier<'a>(&self, identifier: &'a str) -> Cow<'a, str> {
@@ -217,16 +221,6 @@ impl TestApi {
 
     pub fn tags(&self) -> BitFlags<Tags> {
         self.root.args.tags()
-    }
-
-    /// Render a valid datasource block, including database URL.
-    pub fn write_datasource_block(&self, out: &mut dyn std::fmt::Write) {
-        write!(
-            out,
-            "{}",
-            self.root.args.datasource_block(self.root.args.database_url())
-        )
-        .unwrap()
     }
 }
 

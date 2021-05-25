@@ -30,7 +30,7 @@ use quaint::{
 use sql_migration_connector::SqlMigrationConnector;
 use std::{borrow::Cow, fmt::Write as _};
 use tempfile::TempDir;
-use test_setup::{sqlite_test_url, BitFlags, Tags, TestApiArgs};
+use test_setup::{sqlite_test_url, BitFlags, DatasourceBlock, Tags, TestApiArgs};
 
 /// A handle to all the context needed for end-to-end testing of the migration engine across
 /// connectors.
@@ -151,8 +151,8 @@ impl TestApi {
         self.args.tags()
     }
 
-    pub fn datasource(&self) -> String {
-        self.args.datasource_block(&self.connection_string)
+    pub fn datasource(&self) -> DatasourceBlock<'_> {
+        self.args.datasource_block(&self.connection_string, &[])
     }
 
     /// Render a table name with the required prefixing for use with quaint query building.

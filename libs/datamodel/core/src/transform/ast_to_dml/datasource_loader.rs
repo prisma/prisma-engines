@@ -135,10 +135,10 @@ impl DatasourceLoader {
 
         let shadow_database_url: Option<(StringFromEnvVar, Span)> =
             if let Some(shadow_database_url_arg) = shadow_database_url_arg.as_ref() {
-                let shadow_database_url = match shadow_database_url_arg.as_str_from_env() {
-                    Ok(shadow_database_url) => {
-                        Some(shadow_database_url).filter(|s| !s.as_literal().map(|lit| lit.is_empty()).unwrap_or(false))
-                    }
+                match shadow_database_url_arg.as_str_from_env() {
+                    Ok(shadow_database_url) => Some(shadow_database_url)
+                        .filter(|s| !s.as_literal().map(|lit| lit.is_empty()).unwrap_or(false))
+                        .map(|url| (url, shadow_database_url_arg.span())),
 
                     // We intentionally ignore the shadow database URL if it is defined in an env var that is missing.
                     Err(DatamodelError::EnvironmentFunctionalEvaluationError { .. }) => None,
@@ -146,19 +146,7 @@ impl DatasourceLoader {
                     Err(err) => {
                         return Err(diagnostics.merge_error(err));
                     }
-                };
-
-                // Temporarily disabled because of processing/hacks on URLs that make comparing the two URLs unreliable.
-                // if url.value == shadow_database_url.value {
-                //     return Err(
-                //         diagnostics.merge_error(DatamodelError::new_shadow_database_is_same_as_main_url_error(
-                //             source_name.clone(),
-                //             shadow_database_url_arg.span(),
-                //         )),
-                //     );
-                // }
-
-                shadow_database_url.map(|url| (url, shadow_database_url_arg.span()))
+                }
             } else {
                 None
             };
@@ -186,6 +174,7 @@ impl DatasourceLoader {
                 documentation,
                 active_connector: datasource_provider.connector(),
                 shadow_database_url,
+                planet_scale_mode: get_planet_scale_mode_arg(&args)?,
             },
             warnings: diagnostics.warnings,
         })
@@ -207,6 +196,12 @@ fn get_builtin_datasource_providers() -> Vec<Box<dyn DatasourceProvider>> {
         Box::new(MsSqlDatasourceProvider::new()),
         Box::new(MongoDbDatasourceProvider::new()),
     ]
+}
+
+fn get_planet_scale_mode_arg(args: &HashMap<&str, ValueValidator>) -> Result<bool, DatamodelError> {
+    args.get("planetScaleMode")
+        .map(|value| value.as_bool())
+        .unwrap_or(Ok(false))
 }
 
 fn preview_features_guardrail(args: &HashMap<&str, ValueValidator>) -> Result<(), DatamodelError> {

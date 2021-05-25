@@ -4,7 +4,7 @@ use serde::{Serialize, Serializer};
 use PreviewFeature::*;
 
 macro_rules! features {
-    ($( $variant:ident ),*) => {
+    ($( $variant:ident $(,)? ),*) => {
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub enum PreviewFeature {
             $(
@@ -57,7 +57,8 @@ features!(
     NApi,
     SelectRelationCount,
     OrderByAggregateGroup,
-    FilterJson
+    FilterJson,
+    PlanetScaleMode,
 );
 
 // Mapping of which active, deprecated and hidden
@@ -71,7 +72,8 @@ lazy_static! {
             NApi,
             SelectRelationCount,
             OrderByAggregateGroup,
-            FilterJson
+            FilterJson,
+            PlanetScaleMode,
         ]).with_hidden(vec![
             MongoDb
         ]).with_deprecated(vec![

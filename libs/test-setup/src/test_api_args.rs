@@ -2,7 +2,7 @@ use crate::{logging, mssql, mysql, postgres, Capabilities, Tags};
 use enumflags2::BitFlags;
 use once_cell::sync::Lazy;
 use quaint::single::Quaint;
-use std::io::Write as _;
+use std::{fmt::Display, io::Write as _};
 
 #[derive(Debug)]
 pub(crate) struct DbUnderTest {
@@ -138,12 +138,12 @@ impl TestApiArgs {
         self.db.database_url.as_str()
     }
 
-    pub fn datasource_block(&self, url: &str) -> String {
-        format!(
-            "datasource db {{\nprovider = \"{provider}\"\nurl = \"{url}\"\ndefault = true\n}}\n\n",
-            provider = self.db.provider,
-            url = url
-        )
+    pub fn datasource_block<'a>(&'a self, url: &'a str, params: &'a [(&'a str, &'a str)]) -> DatasourceBlock<'a> {
+        DatasourceBlock {
+            provider: self.db.provider,
+            url,
+            params,
+        }
     }
 
     pub fn provider(&self) -> &str {
@@ -156,5 +156,31 @@ impl TestApiArgs {
 
     pub fn tags(&self) -> BitFlags<Tags> {
         self.db.tags
+    }
+}
+
+pub struct DatasourceBlock<'a> {
+    provider: &'a str,
+    url: &'a str,
+    params: &'a [(&'a str, &'a str)],
+}
+
+impl Display for DatasourceBlock<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("datasource db {\n    provider = \"")?;
+        f.write_str(self.provider)?;
+        f.write_str("\"\n    url = \"")?;
+        f.write_str(self.url)?;
+        f.write_str("\"\n")?;
+
+        for (param_name, param_value) in self.params {
+            f.write_str("    ")?;
+            f.write_str(param_name)?;
+            f.write_str(" = ")?;
+            f.write_str(param_value)?;
+            f.write_str("\n")?;
+        }
+
+        f.write_str("}")
     }
 }
