@@ -1,5 +1,23 @@
 use indoc::indoc;
 
+pub fn simple_m2m() -> String {
+    let schema = indoc! {
+        r#"
+        model ModelA {
+            id    String   @id
+            manyB ModelB[]
+          }
+          
+          model ModelB {
+            id    String   @id
+            manyA ModelA[]
+          }
+        "#
+    };
+
+    schema.to_owned()
+}
+
 /// User <-m---n-> posts
 pub fn posts_categories() -> String {
     let schema = indoc! {
