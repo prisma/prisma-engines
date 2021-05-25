@@ -218,6 +218,16 @@ impl TestApi {
     pub fn tags(&self) -> BitFlags<Tags> {
         self.root.args.tags()
     }
+
+    /// Render a valid datasource block, including database URL.
+    pub fn write_datasource_block(&self, out: &mut dyn std::fmt::Write) {
+        write!(
+            out,
+            "{}",
+            self.root.args.datasource_block(self.root.args.database_url())
+        )
+        .unwrap()
+    }
 }
 
 pub struct SingleRowInsert<'a> {
