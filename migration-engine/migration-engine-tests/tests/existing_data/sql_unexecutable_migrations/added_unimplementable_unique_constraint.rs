@@ -35,11 +35,7 @@ fn adding_a_unique_constraint_should_warn(api: TestApi) {
         .send_sync()
         .assert_warnings(&["A unique constraint covering the columns `[name]` on the table `Test` will be added. If there are existing duplicate values, this will fail.".into()]);
 
-    api.select("Test")
-        .column("id")
-        .column("name")
-        .send()
-        .assert_row_count(2)
+    api.dump_table("Test")
         .assert_row(0, |row| {
             row.assert_text_value("id", "abc").assert_text_value("name", "george")
         })
@@ -96,9 +92,7 @@ fn dropping_enum_values_should_warn(api: TestApi) {
         .send_sync()
         .assert_warnings(&["The values [george] on the enum `Test_name` will be removed. If these variants are still used in the database, this will fail.".into()]);
 
-    let rows = dbg!(api.select("Test").column("id").column("name").send());
-
-    rows.assert_row_count(2)
+    api.dump_table("Test")
         .assert_row(0, |row| {
             row.assert_text_value("id", "abc").assert_text_value("name", "george")
         })
@@ -140,10 +134,7 @@ fn adding_a_unique_constraint_when_existing_data_respects_it_works(api: TestApi)
         .send_sync()
         .assert_warnings(&["A unique constraint covering the columns `[name]` on the table `Test` will be added. If there are existing duplicate values, this will fail.".into()]);
 
-    api.select("Test")
-        .column("id")
-        .column("name")
-        .send()
+    api.dump_table("Test")
         .assert_row(0, |row| {
             row.assert_text_value("id", "abc").assert_text_value("name", "george")
         })

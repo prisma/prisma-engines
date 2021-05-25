@@ -64,7 +64,7 @@ impl TestApi {
         DiagnoseMigrationHistory::new_sync(&self.connector, migrations_directory, &self.root.rt)
     }
 
-    pub fn dump_table(&self, table_name: &str) -> quaint::prelude::ResultSet {
+    pub fn dump_table(&self, table_name: &str) -> ResultSet {
         let select_star =
             quaint::ast::Select::from_table(self.render_table_name(table_name)).value(quaint::ast::asterisk());
 
@@ -210,13 +210,6 @@ impl TestApi {
         Reset::new_sync(&self.connector, &self.root.rt)
     }
 
-    pub fn select<'a>(&'a self, table_name: &'a str) -> TestApiSelect<'_> {
-        TestApiSelect {
-            select: quaint::ast::Select::from_table(self.render_table_name(table_name)),
-            api: self,
-        }
-    }
-
     /// Plan a `schemaPush` command
     pub fn schema_push(&self, dm: impl Into<String>) -> SchemaPush<'_> {
         SchemaPush::new_sync(&self.connector, dm.into(), &self.root.rt)
@@ -243,22 +236,5 @@ impl<'a> SingleRowInsert<'a> {
     /// Execute the request and return the result set.
     pub fn result_raw(self) -> quaint::connector::ResultSet {
         self.api.query(self.insert.into())
-    }
-}
-
-pub struct TestApiSelect<'a> {
-    select: quaint::ast::Select<'a>,
-    api: &'a TestApi,
-}
-
-impl<'a> TestApiSelect<'a> {
-    pub fn column(mut self, name: &'a str) -> Self {
-        self.select = self.select.column(name);
-
-        self
-    }
-
-    pub fn send(self) -> quaint::prelude::ResultSet {
-        self.api.query(self.select.into())
     }
 }

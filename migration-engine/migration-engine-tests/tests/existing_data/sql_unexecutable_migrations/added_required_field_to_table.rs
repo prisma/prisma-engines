@@ -30,10 +30,7 @@ fn adding_a_required_field_to_an_existing_table_with_data_without_a_default_is_u
         .assert_no_warning()
         .assert_unexecutable(&["Added the required column `age` to the `Test` table without a default value. There are 1 rows in this table, it is not possible to execute this step.".to_string()]);
 
-    api.select("Test")
-        .column("id")
-        .column("name")
-        .send()
+    api.dump_table("Test")
         .assert_single_row(|row| row.assert_text_value("id", "abc").assert_text_value("name", "george"));
 }
 
@@ -64,10 +61,7 @@ fn adding_a_required_field_with_prisma_level_default_works(api: TestApi) {
         .assert_no_warning()
         .assert_unexecutable(&["The required column `name` was added to the `Test` table with a prisma-level default value. There are 1 rows in this table, it is not possible to execute this step. Please add this column as optional, then populate it before making it required.".into()]);
 
-    api.select("Test")
-        .column("id")
-        .column("age")
-        .send()
+    api.dump_table("Test")
         .assert_single_row(|row| row.assert_text_value("id", "abc").assert_int_value("age", 100));
 }
 
@@ -97,16 +91,11 @@ fn adding_a_required_field_with_a_default_to_an_existing_table_works(api: TestAp
 
     api.schema_push(dm2).send_sync().assert_green_bang();
 
-    api.select("Test")
-        .column("id")
-        .column("name")
-        .column("age")
-        .send()
-        .assert_single_row(|row| {
-            row.assert_text_value("id", "abc")
-                .assert_text_value("name", "george")
-                .assert_int_value("age", 45)
-        });
+    api.dump_table("Test").assert_single_row(|row| {
+        row.assert_text_value("id", "abc")
+            .assert_text_value("name", "George")
+            .assert_int_value("age", 45)
+    });
 }
 
 #[test_connector]

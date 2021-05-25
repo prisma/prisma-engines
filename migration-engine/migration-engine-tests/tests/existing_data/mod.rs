@@ -859,17 +859,12 @@ fn primary_key_migrations_do_not_cause_data_loss(api: TestApi) {
         table.assert_pk(|pk| pk.assert_columns(&["name", "passportNumber"]))
     });
 
-    let dog = api.select("Dog").column("name").column("passportNumber").send();
+    let dog = api.dump_table("Dog");
     let dog_row: Vec<quaint::Value> = dog.into_single().unwrap().into_iter().collect();
 
     assert_eq!(dog_row, &[Value::text("Marnie"), Value::text("8000")]);
 
-    let puppy = api
-        .select("Puppy")
-        .column("id")
-        .column("motherName")
-        .column("motherPassportNumber")
-        .send();
+    let puppy = api.dump_table("Puppy");
 
     let puppy_row: Vec<quaint::Value> = puppy.into_single().unwrap().into_iter().collect();
 

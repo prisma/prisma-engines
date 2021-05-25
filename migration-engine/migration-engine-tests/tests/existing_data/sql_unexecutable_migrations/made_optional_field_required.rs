@@ -38,13 +38,9 @@ fn making_an_optional_field_required_with_data_without_a_default_is_unexecutable
         .assert_unexecutable(&[error]);
 
     api.assert_schema()
-        .assert_table("Test", |table| table.assert_does_not_have_column("Int"))
-        .unwrap();
+        .assert_table_bang("Test", |table| table.assert_does_not_have_column("Int"));
 
-    api.select("Test")
-        .column("id")
-        .column("name")
-        .send()
+    api.dump_table("Test")
         .assert_single_row(|row| row.assert_text_value("id", "abc").assert_text_value("name", "george"));
 }
 
@@ -89,7 +85,7 @@ fn making_an_optional_field_required_with_data_with_a_default_works(api: TestApi
         })
     });
 
-    let rows = api.select("Test").column("id").column("name").column("age").send();
+    let rows = api.dump_table("Test");
 
     assert_eq!(
         rows.into_iter()
@@ -151,7 +147,7 @@ fn making_an_optional_field_required_with_data_with_a_default_is_unexecutable(ap
 
     api.assert_schema().assert_equals(&initial_schema).unwrap();
 
-    let rows = api.select("Test").column("id").column("name").column("age").send();
+    let rows = api.dump_table("Test");
 
     assert_eq!(
         rows.into_iter()
@@ -189,10 +185,5 @@ fn making_an_optional_field_required_on_an_empty_table_works(api: TestApi) {
     api.assert_schema()
         .assert_table_bang("Test", |table| table.assert_does_not_have_column("Int"));
 
-    api.select("Test")
-        .column("id")
-        .column("name")
-        .column("age")
-        .send()
-        .assert_row_count(0);
+    assert!(api.dump_table("Test").is_empty());
 }

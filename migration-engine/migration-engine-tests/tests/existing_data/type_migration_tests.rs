@@ -38,9 +38,7 @@ fn altering_the_type_of_a_column_in_a_non_empty_table_warns(api: TestApi) {
         }
     ]);
 
-    api.select("User")
-        .column("dogs")
-        .send()
+    api.dump_table("User")
         .assert_single_row(|row| row.assert_int_value("dogs", 7));
 
     api.assert_schema().assert_table_bang("User", |table| {
@@ -130,15 +128,11 @@ fn changing_a_string_array_column_to_scalar_is_fine(api: TestApi) {
         table.assert_column("mainProtagonist", |column| column.assert_is_required())
     });
 
-    api.select("Film")
-        .column("id")
-        .column("mainProtagonist")
-        .send()
-        .assert_single_row(|row| {
-            row.assert_text_value("id", "film1")
-                // the array got cast to a string by postgres
-                .assert_text_value("mainProtagonist", "{\"giant shark\",\"jason statham\"}")
-        });
+    api.dump_table("Film").assert_single_row(|row| {
+        row.assert_text_value("id", "film1")
+            // the array got cast to a string by postgres
+            .assert_text_value("mainProtagonist", "{\"giant shark\",\"jason statham\"}")
+    });
 }
 
 #[test_connector(capabilities(ScalarLists))]
@@ -186,14 +180,10 @@ fn changing_an_int_array_column_to_scalar_is_not_possible(api: TestApi) {
         table.assert_column("mainProtagonist", |column| column.assert_is_list())
     });
 
-    api.select("Film")
-        .column("id")
-        .column("mainProtagonist")
-        .send()
-        .assert_single_row(|row| {
-            row.assert_text_value("id", "film1")
-                .assert_array_value("mainProtagonist", &[7.into(), 11.into()])
-        });
+    api.dump_table("Film").assert_single_row(|row| {
+        row.assert_text_value("id", "film1")
+            .assert_array_value("mainProtagonist", &[7.into(), 11.into()])
+    });
 }
 
 #[test_connector]
