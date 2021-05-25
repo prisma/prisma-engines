@@ -8,7 +8,7 @@ edition = "2018"
 
 [features]
 default = ["sql"]
-sql = ["barrel", "sql-schema-describer", "sql-migration-connector", "quaint", "user-facing-errors/quaint"]
+sql = ["sql-schema-describer", "sql-migration-connector", "quaint", "user-facing-errors/quaint"]
 
 [dependencies]
 datamodel = { path = "../../libs/datamodel/core" }
@@ -24,7 +24,6 @@ test-setup = { path = "../../libs/test-setup" }
 prisma-value = { path = "../../libs/prisma-value" }
 
 anyhow = "1.0"
-barrel = { git = "https://github.com/prisma/barrel.git", features = ["sqlite3", "mysql", "pg", "mssql"], optional = true, branch = "mssql-support" }
 bigdecimal = "0.2"
 chrono = "0.4.15"
 enumflags2 = "0.6.0"
