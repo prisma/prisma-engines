@@ -2,7 +2,7 @@ use indoc::indoc;
 use query_engine_tests::*;
 
 #[test_suite(schema(schema))]
-mod element {
+mod filter_spec {
     fn schema() -> String {
         let schema = indoc! {
             r#"

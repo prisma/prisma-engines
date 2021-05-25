@@ -5,7 +5,9 @@ pub mod bytes_filter;
 pub mod decimal_filter;
 pub mod extended_relation_filters;
 pub mod filter_regression;
+pub mod filter_unwrap;
 pub mod filters;
+pub mod insensitive_filters;
 pub mod json;
 pub mod where_unique;
 
