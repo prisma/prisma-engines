@@ -252,8 +252,18 @@ fn scalar_list_filter(filter: ScalarListFilter, invert: bool) -> crate::Result<M
                 doc! { field.db_name(): (&field, val).into_bson()? }
             }
 
+            connector_interface::ScalarListCondition::ContainsEvery(vals) if vals.is_empty() => {
+                // Empty hasEvery: Return all records.
+                doc! { "_id": { "$exists": 1 }}
+            }
+
             connector_interface::ScalarListCondition::ContainsEvery(vals) => {
                 doc! { field.db_name(): { "$all": (&field, PrismaValue::List(vals)).into_bson()? }}
+            }
+
+            connector_interface::ScalarListCondition::ContainsSome(vals) if vals.is_empty() => {
+                // Empty hasSome: Return no records.
+                doc! { "_id": { "$exists": 0 }}
             }
 
             connector_interface::ScalarListCondition::ContainsSome(vals) => {
