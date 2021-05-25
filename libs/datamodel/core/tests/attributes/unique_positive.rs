@@ -143,3 +143,77 @@ fn unique_attributes_must_serialize_to_valid_dml() {
 
     assert!(datamodel::parse_datamodel(&render_datamodel_to_string(&schema)).is_ok());
 }
+
+#[test]
+fn mapped_multi_field_unique_must_work() {
+    let dml = r#"
+    model Model {
+        a String
+        b Int
+        @@unique([a,b], map:"dbname")
+    }
+    "#;
+
+    let datamodel = parse(dml);
+    let user_model = datamodel.assert_has_model("Model");
+    user_model.assert_has_index(IndexDefinition {
+        name_in_client: None,
+        name_in_db: "dbname".to_string(),
+        name_in_db_matches_default: false,
+        fields: vec!["a".to_string(), "b".to_string()],
+        tpe: IndexType::Unique,
+    });
+}
+
+#[test]
+fn mapped_singular_unique_must_work() {
+    let dml = r#"
+    model Model {
+        a String @unique("test")
+    }
+    
+    model Model2 {
+        a String @unique(map: "test2")
+    }
+    "#;
+
+    let datamodel = parse(dml);
+    let model = datamodel.assert_has_model("Model");
+    model.assert_has_index(IndexDefinition {
+        name_in_client: None,
+        name_in_db: "test".to_string(),
+        name_in_db_matches_default: false,
+        fields: vec!["a".to_string()],
+        tpe: IndexType::Unique,
+    });
+
+    let model2 = datamodel.assert_has_model("Model2");
+    model2.assert_has_index(IndexDefinition {
+        name_in_client: None,
+        name_in_db: "test2".to_string(),
+        name_in_db_matches_default: false,
+        fields: vec!["a".to_string()],
+        tpe: IndexType::Unique,
+    });
+}
+
+#[test]
+fn named_and_mapped_multi_field_unique_must_work() {
+    let dml = r#"
+    model Model {
+        a String
+        b Int
+        @@unique([a,b], name: "compoundId", map:"dbname")
+    }
+    "#;
+
+    let datamodel = parse(dml);
+    let model = datamodel.assert_has_model("Model");
+    model.assert_has_index(IndexDefinition {
+        name_in_client: Some("compoundId".to_string()),
+        name_in_db: "dbname".to_string(),
+        name_in_db_matches_default: false,
+        fields: vec!["a".to_string(), "b".to_string()],
+        tpe: IndexType::Unique,
+    });
+}

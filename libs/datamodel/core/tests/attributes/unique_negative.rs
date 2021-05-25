@@ -160,3 +160,22 @@ fn stringified_field_names_in_unique_return_nice_error() {
         span: Span::new(136, 147),
     });
 }
+
+#[test]
+fn invalid_name_for_compound_unique_must_error() {
+    let dml = r#"
+    model User {
+        name           String            
+        identification Int
+
+        @@unique([name, identification], name: "Test.User")
+    }
+    "#;
+
+    let errors = parse_error(dml);
+    errors.assert_is(DatamodelError::new_model_validation_error(
+        "The `name` property within the `@@unique` attribute only allows for the following characters: `_a-zA-Z0-9`.",
+        "User",
+        Span::new(98, 147),
+    ));
+}

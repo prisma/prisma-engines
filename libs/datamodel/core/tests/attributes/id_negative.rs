@@ -139,3 +139,65 @@ fn stringified_field_names_in_id_return_nice_error() {
         span: Span::new(99, 110),
     });
 }
+
+#[test]
+fn relation_field_as_id_must_error() {
+    let dml = r#"
+    model User {
+        identification Identification @relation(references:[id]) @id
+    }
+    
+    model Identification {
+        id Int @id
+    }
+    "#;
+
+    let errors = parse_error(dml);
+    errors.assert_is(DatamodelError::new_attribute_validation_error(
+        "The field `identification` is a relation field and cannot be marked with `@id`. Only scalar fields can be declared as id.",
+        "id",
+        Span::new(84, 86),
+    ));
+}
+
+#[test]
+fn relation_fields_as_part_of_compound_id_must_error() {
+    let dml = r#"
+    model User {
+        name           String            
+        identification Identification @relation(references:[id])
+
+        @@id([name, identification])
+    }
+    
+    model Identification {
+        id Int @id
+    }
+    "#;
+
+    let errors = parse_error(dml);
+    errors.assert_is(DatamodelError::new_model_validation_error(
+        "The id definition refers to the relation fields identification. Id definitions must reference only scalar fields.",
+        "User",
+        Span::new(136, 162),
+    ));
+}
+
+#[test]
+fn invalid_name_for_compound_id_must_error() {
+    let dml = r#"
+    model User {
+        name           String            
+        identification Int
+
+        @@id([name, identification], name: "Test.User")
+    }
+    "#;
+
+    let errors = parse_error(dml);
+    errors.assert_is(DatamodelError::new_model_validation_error(
+        "The `name` property within the `@@id` attribute only allows for the following characters: `_a-zA-Z0-9`.",
+        "User",
+        Span::new(98, 143),
+    ));
+}

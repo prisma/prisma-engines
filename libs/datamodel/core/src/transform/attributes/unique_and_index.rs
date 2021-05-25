@@ -4,6 +4,8 @@ use super::{super::helpers::Arguments, AttributeValidator};
 use crate::common::ConstraintNames;
 use crate::transform::attributes::field_array;
 use crate::{ast, diagnostics::DatamodelError, dml, transform::helpers::ValueValidator, IndexDefinition, IndexType};
+use once_cell::sync::Lazy;
+use regex::Regex;
 use std::cmp::Ordering;
 use std::collections::HashMap;
 
@@ -190,6 +192,18 @@ trait IndexAttributeBase<T>: AttributeValidator<T> {
             (None, Some((map, _))) => (None, map.to_owned()),
             (None, None) => (None, default_name.clone()),
         };
+
+        static RE: Lazy<Regex> = Lazy::new(|| Regex::new("[^_a-zA-Z0-9]").unwrap());
+
+        if let Some(name) = &name_in_client {
+            if RE.is_match(&name) {
+                return Err(DatamodelError::new_model_validation_error(
+                    "The `name` property within the `@@unique` attribute only allows for the following characters: `_a-zA-Z0-9`.",
+                    &obj.name,
+                    args.span(),
+                ));
+            }
+        }
 
         let index_def = IndexDefinition {
             name_in_client,

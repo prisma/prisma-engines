@@ -1,6 +1,4 @@
 use crate::common::*;
-use datamodel::ast::Span;
-use datamodel::diagnostics::DatamodelError;
 use datamodel::dml::*;
 use prisma_value::PrismaValue;
 
@@ -161,44 +159,51 @@ fn named_multi_field_ids_must_work() {
 }
 
 #[test]
-fn relation_field_as_id_must_error() {
+fn mapped_multi_field_ids_must_work() {
     let dml = r#"
-    model User {
-        identification Identification @relation(references:[id]) @id
-    }
-    
-    model Identification {
-        id Int @id
+    model Model {
+        a String
+        b Int
+        @@id([a,b], map:"dbname")
     }
     "#;
 
-    let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_attribute_validation_error(
-        "The field `identification` is a relation field and cannot be marked with `@id`. Only scalar fields can be declared as id.",
-        "id",
-        Span::new(84, 86),
-    ));
+    let datamodel = parse(dml);
+    let user_model = datamodel.assert_has_model("Model");
+    user_model.assert_has_id_fields(&["a", "b"]);
 }
 
 #[test]
-fn relation_fields_as_part_of_compound_id_must_error() {
+fn mapped_singular_id_must_work() {
     let dml = r#"
-    model User {
-        name           String            
-        identification Identification @relation(references:[id])
-
-        @@id([name, identification])
+    model Model {
+        a String @id("test")
     }
     
-    model Identification {
-        id Int @id
+    model Model2 {
+        a String @id(map: "test")
     }
     "#;
 
-    let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_model_validation_error(
-        "The id definition refers to the relation fields identification. Id definitions must reference only scalar fields.",
-        "User",
-        Span::new(136, 162),
-    ));
+    let datamodel = parse(dml);
+    let model = datamodel.assert_has_model("Model");
+    model.assert_has_id_fields(&["a"]);
+
+    let model2 = datamodel.assert_has_model("Model2");
+    model2.assert_has_id_fields(&["a"]);
+}
+
+#[test]
+fn named_and_mapped_multi_field_ids_must_work() {
+    let dml = r#"
+    model Model {
+        a String
+        b Int
+        @@id([a,b], name: "compoundId", map:"dbname")
+    }
+    "#;
+
+    let datamodel = parse(dml);
+    let user_model = datamodel.assert_has_model("Model");
+    user_model.assert_has_id_fields(&["a", "b"]);
 }

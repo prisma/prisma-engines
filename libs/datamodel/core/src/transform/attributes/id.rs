@@ -3,6 +3,8 @@ use crate::common::ConstraintNames;
 use crate::diagnostics::DatamodelError;
 use crate::transform::attributes::field_array;
 use crate::{ast, dml, PrimaryKeyDefinition};
+use once_cell::sync::Lazy;
+use regex::Regex;
 
 /// Prismas builtin `@primary` attribute.
 pub struct IdAttributeValidator {}
@@ -89,6 +91,18 @@ impl AttributeValidator<dml::Model> for ModelLevelIdAttributeValidator {
             (None, Some(db_name)) => (db_name == default_name, None, Some(db_name)),
             (None, None) => (true, None, Some(default_name)),
         };
+
+        static RE: Lazy<Regex> = Lazy::new(|| Regex::new("[^_a-zA-Z0-9]").unwrap());
+
+        if let Some(name) = &name_in_client {
+            if RE.is_match(&name) {
+                return Err(DatamodelError::new_model_validation_error(
+                    "The `name` property within the `@@id` attribute only allows for the following characters: `_a-zA-Z0-9`.",
+                    &obj.name,
+                    args.span(),
+                ));
+            }
+        }
 
         obj.primary_key = Some(PrimaryKeyDefinition {
             name_in_client,
