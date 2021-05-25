@@ -1,9 +1,9 @@
-use migration_engine_tests::sql::*;
-use quaint::{prelude::Insert, prelude::Queryable, Value};
+use migration_engine_tests::sync_test_api::*;
+use quaint::{prelude::Insert, Value};
 use sql_schema_describer::DefaultValue;
 
 #[test_connector(tags(Sqlite))]
-async fn changing_a_column_from_optional_to_required_with_a_default_is_safe(api: &TestApi) -> TestResult {
+fn changing_a_column_from_optional_to_required_with_a_default_is_safe(api: TestApi) {
     let dm = r#"
         model Test {
             id String @id @default(cuid())
@@ -11,14 +11,14 @@ async fn changing_a_column_from_optional_to_required_with_a_default_is_safe(api:
         }
     "#;
 
-    api.schema_push(dm).send().await?.assert_green()?;
+    api.schema_push(dm).send_sync().assert_green_bang();
 
     let insert = Insert::multi_into(api.render_table_name("Test"), &["id", "age"])
         .values(("a", 12))
         .values(("b", 22))
         .values(("c", Value::Integer(None)));
 
-    api.database().query(insert.into()).await.unwrap();
+    api.query(insert.into());
 
     let dm2 = r#"
         model Test {
@@ -27,19 +27,19 @@ async fn changing_a_column_from_optional_to_required_with_a_default_is_safe(api:
         }
     "#;
 
-    api.schema_push(dm2).force(true).send().await?.assert_green()?;
+    api.schema_push(dm2).force(true).send_sync().assert_green_bang();
 
-    api.assert_schema().await?.assert_table("Test", |table| {
+    api.assert_schema().assert_table_bang("Test", |table| {
         table.assert_column("age", |column| {
             column
                 .assert_default(Some(DefaultValue::value(30)))?
                 .assert_is_required()
         })
-    })?;
+    });
 
     // Check that no data was lost.
     {
-        let data = api.dump_table("Test").await?;
+        let data = api.dump_table("Test");
         assert_eq!(data.len(), 3);
         let ages: Vec<Option<i64>> = data.into_iter().map(|row| row.get("age").unwrap().as_i64()).collect();
 
@@ -47,6 +47,4 @@ async fn changing_a_column_from_optional_to_required_with_a_default_is_safe(api:
         // process), we should have a more specific warning for this.
         assert_eq!(ages, &[Some(12), Some(22), Some(30)]);
     }
-
-    Ok(())
 }

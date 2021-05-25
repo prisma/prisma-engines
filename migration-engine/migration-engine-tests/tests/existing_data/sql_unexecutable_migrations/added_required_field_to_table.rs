@@ -93,7 +93,7 @@ fn adding_a_required_field_with_a_default_to_an_existing_table_works(api: TestAp
 
     api.dump_table("Test").assert_single_row(|row| {
         row.assert_text_value("id", "abc")
-            .assert_text_value("name", "George")
+            .assert_text_value("name", "george")
             .assert_int_value("age", 45)
     });
 }

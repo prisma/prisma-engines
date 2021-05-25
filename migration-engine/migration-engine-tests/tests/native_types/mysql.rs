@@ -662,7 +662,7 @@ fn expand_cases<'a, 'b>(
     for (idx, _) in std::iter::repeat(()).enumerate().take(to_types.len()) {
         writeln!(
             dm1,
-            "{colname} {scalar_type}{nullability} @test_db.{native_type}",
+            "{colname} {scalar_type}{nullability} @db.{native_type}",
             colname = colnames[idx],
             scalar_type = native_type_name_to_prisma_scalar_type_name(from_type),
             native_type = from_type,
@@ -674,7 +674,7 @@ fn expand_cases<'a, 'b>(
     for (idx, to_type) in to_types.iter().enumerate() {
         writeln!(
             dm2,
-            "{colname} {scalar_type}{nullability} @test_db.{native_type}",
+            "{colname} {scalar_type}{nullability} @db.{native_type}",
             colname = colnames[idx],
             scalar_type = native_type_name_to_prisma_scalar_type_name(to_type),
             native_type = to_type,
@@ -956,18 +956,18 @@ fn typescript_starter_schema_with_native_types_is_idempotent(api: TestApi) {
         {}
 
         model Post {{
-            id        Int     @id @default(autoincrement()) @test_db.Int
-            title     String  @test_db.VarChar(191)
-            content   String? @test_db.VarChar(191)
-            published Boolean @default(false) @test_db.TinyInt
+            id        Int     @id @default(autoincrement()) @db.Int
+            title     String  @db.VarChar(191)
+            content   String? @db.VarChar(191)
+            published Boolean @default(false) @db.TinyInt
             author    User?   @relation(fields: [authorId], references: [id])
-            authorId  Int?    @test_db.Int
+            authorId  Int?    @db.Int
         }}
 
         model User {{
-            id    Int     @id @default(autoincrement()) @test_db.Int
-            email String  @unique @test_db.VarChar(191)
-            name  String? @test_db.VarChar(191)
+            id    Int     @id @default(autoincrement()) @db.Int
+            email String  @unique @db.VarChar(191)
+            name  String? @db.VarChar(191)
             posts Post[]
         }}
 
@@ -1023,18 +1023,18 @@ fn typescript_starter_schema_with_differnt_native_types_is_idempotent(api: TestA
         {}
 
         model Post {{
-            id        Int     @id @default(autoincrement()) @test_db.Int
-            title     String  @test_db.VarChar(100)
-            content   String? @test_db.VarChar(100)
-            published Boolean @default(false) @test_db.TinyInt
+            id        Int     @id @default(autoincrement()) @db.Int
+            title     String  @db.VarChar(100)
+            content   String? @db.VarChar(100)
+            published Boolean @default(false) @db.TinyInt
             author    User?   @relation(fields: [authorId], references: [id])
-            authorId  Int?    @test_db.Int
+            authorId  Int?    @db.Int
         }}
 
         model User {{
-            id    Int     @id @default(autoincrement()) @test_db.Int
-            email String  @unique @test_db.VarChar(100)
-            name  String? @test_db.VarChar(100)
+            id    Int     @id @default(autoincrement()) @db.Int
+            email String  @unique @db.VarChar(100)
+            name  String? @db.VarChar(100)
             posts Post[]
         }}
     "#,
