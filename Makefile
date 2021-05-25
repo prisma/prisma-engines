@@ -63,6 +63,13 @@ start-postgres13:
 dev-postgres13: start-postgres13
 	echo 'postgres13' > current_connector
 	cp $(CONFIG_PATH)/postgres13 $(CONFIG_FILE)
+	
+start-citus:
+	docker-compose -f docker-compose.yml up -d --remove-orphans citus
+
+dev-citus: start-citus
+	echo 'citus' > current_connector
+	cp $(CONFIG_PATH)/citus $(CONFIG_FILE)
 
 dev-pgbouncer:
 	docker-compose -f docker-compose.yml up -d --remove-orphans pgbouncer postgres11
