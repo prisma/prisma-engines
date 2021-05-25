@@ -2,31 +2,27 @@ mod sql_unexecutable_migrations;
 mod sqlite_existing_data_tests;
 mod type_migration_tests;
 
-use migration_engine_tests::sql::*;
+use migration_engine_tests::sync_test_api::*;
 use pretty_assertions::assert_eq;
 use prisma_value::PrismaValue;
-use quaint::{
-    ast::*,
-    prelude::{Queryable, SqlFamily},
-};
+use quaint::ast::*;
 use sql_schema_describer::DefaultValue;
 
 #[test_connector]
-async fn dropping_a_table_with_rows_should_warn(api: &TestApi) -> TestResult {
+fn dropping_a_table_with_rows_should_warn(api: TestApi) {
     let dm = r#"
         model Test {
             id String @id @default(cuid())
         }
     "#;
 
-    api.schema_push(dm).send().await?.assert_green()?;
+    api.schema_push(dm).send_sync().assert_green_bang();
 
-    let original_database_schema = api.assert_schema().await?.into_schema();
+    let original_database_schema = api.assert_schema().into_schema();
 
-    let conn = api.database();
     let insert = Insert::single_into(api.render_table_name("Test")).value("id", "test");
 
-    conn.query(insert.into()).await.unwrap();
+    api.query(insert.into());
 
     let dm = "";
 
@@ -35,17 +31,15 @@ async fn dropping_a_table_with_rows_should_warn(api: &TestApi) -> TestResult {
         api.normalize_identifier("Test")
     );
 
-    api.schema_push(dm).send().await?.assert_warnings(&[warn.into()])?;
+    api.schema_push(dm).send_sync().assert_warnings(&[warn.into()]);
 
     // The schema should not change because the migration should not run if there are warnings
     // and the force flag isn't passed.
-    api.assert_schema().await?.assert_equals(&original_database_schema)?;
-
-    Ok(())
+    api.assert_schema().assert_equals(&original_database_schema).unwrap();
 }
 
 #[test_connector]
-async fn dropping_a_column_with_non_null_values_should_warn(api: &TestApi) -> TestResult {
+fn dropping_a_column_with_non_null_values_should_warn(api: TestApi) {
     let dm = r#"
         model Test {
             id String @id @default(cuid())
@@ -53,15 +47,15 @@ async fn dropping_a_column_with_non_null_values_should_warn(api: &TestApi) -> Te
         }
     "#;
 
-    api.schema_push(dm).send().await?.assert_green()?;
+    api.schema_push(dm).send_sync().assert_green_bang();
 
-    let original_database_schema = api.assert_schema().await?.into_schema();
+    let original_database_schema = api.assert_schema().into_schema();
 
     let insert = Insert::multi_into(api.render_table_name("Test"), &["id", "puppiesCount"])
         .values(("a", 7))
         .values(("b", 8));
 
-    api.database().query(insert.into()).await.unwrap();
+    api.query(insert.into());
 
     // Drop the `favouriteAnimal` column.
     let dm = r#"
@@ -75,17 +69,15 @@ async fn dropping_a_column_with_non_null_values_should_warn(api: &TestApi) -> Te
         api.normalize_identifier("Test")
     );
 
-    api.schema_push(dm).send().await?.assert_warnings(&[warn.into()])?;
+    api.schema_push(dm).send_sync().assert_warnings(&[warn.into()]);
 
     // The schema should not change because the migration should not run if there are warnings
     // and the force flag isn't passed.
-    api.assert_schema().await?.assert_equals(&original_database_schema)?;
-
-    Ok(())
+    api.assert_schema().assert_equals(&original_database_schema).unwrap();
 }
 
 #[test_connector]
-async fn altering_a_column_without_non_null_values_should_not_warn(api: &TestApi) -> TestResult {
+fn altering_a_column_without_non_null_values_should_not_warn(api: TestApi) {
     let dm = r#"
         model Test {
             id String @id @default(cuid())
@@ -93,15 +85,15 @@ async fn altering_a_column_without_non_null_values_should_not_warn(api: &TestApi
         }
     "#;
 
-    api.schema_push(dm).send().await?.assert_green()?;
+    api.schema_push(dm).send_sync().assert_green_bang();
 
-    let original_database_schema = api.assert_schema().await?.into_schema();
+    let original_database_schema = api.assert_schema().into_schema();
 
     let insert = Insert::multi_into(api.render_table_name("Test"), &["id"])
         .values(("a",))
         .values(("b",));
 
-    api.database().query(insert.into()).await.unwrap();
+    api.query(insert.into());
 
     let dm2 = r#"
         model Test {
@@ -110,15 +102,13 @@ async fn altering_a_column_without_non_null_values_should_not_warn(api: &TestApi
         }
     "#;
 
-    api.schema_push(dm2).send().await?.assert_warnings(&[])?;
+    api.schema_push(dm2).send_sync().assert_warnings(&[]);
 
-    api.assert_schema().await?.assert_ne(&original_database_schema)?;
-
-    Ok(())
+    api.assert_schema().assert_ne(&original_database_schema).unwrap();
 }
 
 #[test_connector]
-async fn altering_a_column_with_non_null_values_should_warn(api: &TestApi) -> TestResult {
+fn altering_a_column_with_non_null_values_should_warn(api: TestApi) {
     let dm = r#"
         model Test {
             id String @id @default(cuid())
@@ -126,14 +116,14 @@ async fn altering_a_column_with_non_null_values_should_warn(api: &TestApi) -> Te
         }
     "#;
 
-    api.schema_push(dm).send().await?.assert_green()?;
-    let original_database_schema = api.assert_schema().await?.into_schema();
+    api.schema_push(dm).send_sync().assert_green_bang();
+    let original_database_schema = api.assert_schema().into_schema();
 
     let insert = Insert::multi_into(api.render_table_name("Test"), vec!["id", "age"])
         .values(("a", 12))
         .values(("b", 22));
 
-    api.database().query(insert.into()).await.unwrap();
+    api.query(insert.into());
 
     let dm2 = r#"
         model Test {
@@ -142,29 +132,35 @@ async fn altering_a_column_with_non_null_values_should_warn(api: &TestApi) -> Te
         }
     "#;
 
-    api.schema_push(dm2).send().await?.assert_warnings(&[
-        match api.sql_family() {
-            SqlFamily::Postgres => "The `age` column on the `Test` table would be dropped and recreated. This will lead to data loss.",
-            SqlFamily::Mssql => "You are about to alter the column `age` on the `Test` table, which contains 2 non-null values. The data in that column will be cast from `NVarChar(1000)` to `Int`.",
-            SqlFamily::Mysql if api.lower_case_identifiers() => "You are about to alter the column `age` on the `test` table, which contains 2 non-null values. The data in that column will be cast from `VarChar(191)` to `Int`.",
-            SqlFamily::Mysql => "You are about to alter the column `age` on the `Test` table, which contains 2 non-null values. The data in that column will be cast from `VarChar(191)` to `Int`.",
-            _ => "You are about to alter the column `age` on the `Test` table, which contains 2 non-null values. The data in that column will be cast from `String` to `Int`.",
+    api.schema_push(dm2).send_sync().assert_warnings(&[
+        if api.is_postgres() {
+             "The `age` column on the `Test` table would be dropped and recreated. This will lead to data loss.".into()
+        } else if api.is_mssql() {
+             "You are about to alter the column `age` on the `Test` table, which contains 2 non-null values. The data in that column will be cast from `NVarChar(1000)` to `Int`.".into()
+
+        } else if api.is_mysql() {
+            if api.lower_cases_table_names() {
+
+                 "You are about to alter the column `age` on the `test` table, which contains 2 non-null values. The data in that column will be cast from `VarChar(191)` to `Int`.".into()
+            } else {
+
+                 "You are about to alter the column `age` on the `Test` table, which contains 2 non-null values. The data in that column will be cast from `VarChar(191)` to `Int`.".into()
+            }
+        } else {
+             "You are about to alter the column `age` on the `Test` table, which contains 2 non-null values. The data in that column will be cast from `String` to `Int`.".into()
+
         }
-            .into(),
-    ])?;
+    ]);
 
     // The schema should not change because the migration should not run if there are warnings
     // and the force flag isn't passed.
-    api.assert_schema().await?.assert_equals(&original_database_schema)?;
+    api.assert_schema().assert_equals(&original_database_schema).unwrap();
 
-    let data = api.dump_table("Test").await?;
-    assert_eq!(data.len(), 2);
-
-    Ok(())
+    assert_eq!(api.dump_table("Test").len(), 2);
 }
 
 #[test_connector]
-async fn column_defaults_can_safely_be_changed(api: &TestApi) -> TestResult {
+fn column_defaults_can_safely_be_changed(api: TestApi) {
     let combinations = &[
         ("Meow", Some(PrismaValue::String("Cats".to_string())), None),
         ("Freedom", None, Some(PrismaValue::String("Braveheart".to_string()))),
@@ -196,9 +192,9 @@ async fn column_defaults_can_safely_be_changed(api: &TestApi) -> TestResult {
                     .unwrap_or_else(String::new)
             );
 
-            api.schema_push(dm1).force(true).send().await?;
+            api.schema_push(dm1).force(true).send_sync();
 
-            api.assert_schema().await?.assert_table(model_name, |table| {
+            api.assert_schema().assert_table_bang(model_name, |table| {
                 table.assert_column("name", |column| {
                     if let Some(first_default) = first_default.as_ref() {
                         column.assert_default_value(first_default)
@@ -206,7 +202,7 @@ async fn column_defaults_can_safely_be_changed(api: &TestApi) -> TestResult {
                         column.assert_has_no_default()
                     }
                 })
-            })?;
+            });
         }
 
         // Insert data
@@ -216,15 +212,15 @@ async fn column_defaults_can_safely_be_changed(api: &TestApi) -> TestResult {
 
             let query = Insert::single_into(api.render_table_name(model_name)).value("id", "abc");
 
-            api.database().query(query.into()).await?;
+            api.query(query.into());
 
             let query = Insert::single_into(api.render_table_name(model_name))
                 .value("id", "def")
                 .value("name", "Waterworld");
 
-            api.database().query(query.into()).await?;
+            api.query(query.into());
 
-            let data = api.dump_table(model_name).await?;
+            let data = api.dump_table(model_name);
             let names: Vec<PrismaValue> = data
                 .into_iter()
                 .filter_map(|row| {
@@ -258,12 +254,12 @@ async fn column_defaults_can_safely_be_changed(api: &TestApi) -> TestResult {
                     .unwrap_or_else(String::new)
             );
 
-            api.schema_push(dm2).send().await?.assert_green()?;
+            api.schema_push(dm2).send_sync().assert_green_bang();
         }
 
         // Check that the data is still there
         {
-            let data = api.dump_table(model_name).await?;
+            let data = api.dump_table(model_name);
             let names: Vec<PrismaValue> = data
                 .into_iter()
                 .filter_map(|row| {
@@ -279,7 +275,7 @@ async fn column_defaults_can_safely_be_changed(api: &TestApi) -> TestResult {
                 names.as_slice()
             );
 
-            api.assert_schema().await?.assert_table(model_name, |table| {
+            api.assert_schema().assert_table_bang(model_name, |table| {
                 table.assert_column("name", |column| {
                     if let Some(second_default) = second_default.as_ref() {
                         column.assert_default_value(second_default)
@@ -287,15 +283,13 @@ async fn column_defaults_can_safely_be_changed(api: &TestApi) -> TestResult {
                         column.assert_has_no_default()
                     }
                 })
-            })?;
+            });
         }
     }
-
-    Ok(())
 }
 
 #[test_connector]
-async fn changing_a_column_from_required_to_optional_should_work(api: &TestApi) -> TestResult {
+fn changing_a_column_from_required_to_optional_should_work(api: TestApi) {
     let dm = r#"
         model Test {
             id String @id @default(cuid())
@@ -303,14 +297,14 @@ async fn changing_a_column_from_required_to_optional_should_work(api: &TestApi) 
         }
     "#;
 
-    api.schema_push(dm).send().await?.assert_green()?;
-    let original_database_schema = api.assert_schema().await?.into_schema();
+    api.schema_push(dm).send_sync().assert_green_bang();
+    let original_database_schema = api.assert_schema().into_schema();
 
     let insert = Insert::multi_into(api.render_table_name("Test"), &["id", "age"])
         .values(("a", 12))
         .values(("b", 22));
 
-    api.database().query(insert.into()).await.unwrap();
+    api.query(insert.into());
 
     let dm2 = r#"
         model Test {
@@ -319,13 +313,13 @@ async fn changing_a_column_from_required_to_optional_should_work(api: &TestApi) 
         }
     "#;
 
-    api.schema_push(dm2).send().await?.assert_green()?;
+    api.schema_push(dm2).send_sync().assert_green_bang();
 
-    api.assert_schema().await?.assert_ne(&original_database_schema)?;
+    api.assert_schema().assert_ne(&original_database_schema).unwrap();
 
     // Check that no data was lost.
     {
-        let data = api.dump_table("Test").await?;
+        let data = api.dump_table("Test");
         assert_eq!(data.len(), 2);
         let ages: Vec<i64> = data
             .into_iter()
@@ -334,12 +328,10 @@ async fn changing_a_column_from_required_to_optional_should_work(api: &TestApi) 
 
         assert_eq!(ages, &[12, 22]);
     }
-
-    Ok(())
 }
 
 #[test_connector(exclude(Sqlite))]
-async fn changing_a_column_from_optional_to_required_is_unexecutable(api: &TestApi) -> TestResult {
+fn changing_a_column_from_optional_to_required_is_unexecutable(api: TestApi) {
     let dm = r#"
         model Test {
             id String @id @default(cuid())
@@ -347,15 +339,15 @@ async fn changing_a_column_from_optional_to_required_is_unexecutable(api: &TestA
         }
     "#;
 
-    api.schema_push(dm).send().await?.assert_green()?;
-    let original_database_schema = api.assert_schema().await?.into_schema();
+    api.schema_push(dm).send_sync().assert_green_bang();
+    let original_database_schema = api.assert_schema().into_schema();
 
     let insert = Insert::multi_into(api.render_table_name("Test"), &["id", "age"])
         .values(("a", 12))
         .values(("b", 22))
         .values(("c", Value::Integer(None)));
 
-    api.database().query(insert.into()).await.unwrap();
+    api.query(insert.into());
 
     let dm2 = r#"
         model Test {
@@ -370,29 +362,26 @@ async fn changing_a_column_from_optional_to_required_is_unexecutable(api: &TestA
     );
 
     api.schema_push(dm2)
-        .send()
-        .await?
+        .send_sync()
         .assert_no_warning()
-        .assert_unexecutable(&[error])?;
+        .assert_unexecutable(&[error]);
 
     // The schema should not change because the migration should not run if there are warnings
     // and the force flag isn't passed.
-    api.assert_schema().await?.assert_equals(&original_database_schema)?;
+    api.assert_schema().assert_equals(&original_database_schema).unwrap();
 
     // Check that no data was lost.
     {
-        let data = api.dump_table("Test").await?;
+        let data = api.dump_table("Test");
         assert_eq!(data.len(), 3);
         let ages: Vec<Option<i64>> = data.into_iter().map(|row| row.get("age").unwrap().as_i64()).collect();
 
         assert_eq!(ages, &[Some(12), Some(22), None]);
     }
-
-    Ok(())
 }
 
 #[test_connector]
-async fn dropping_a_table_referenced_by_foreign_keys_must_work(api: &TestApi) -> TestResult {
+fn dropping_a_table_referenced_by_foreign_keys_must_work(api: TestApi) {
     use quaint::ast::*;
 
     let dm1 = r#"
@@ -409,26 +398,25 @@ async fn dropping_a_table_referenced_by_foreign_keys_must_work(api: &TestApi) ->
         }
     "#;
 
-    api.schema_push(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send_sync().assert_green_bang();
 
     api.assert_schema()
-        .await?
-        .assert_table("Category", |table| table.assert_columns_count(2))?
-        .assert_table("Recipe", |table| {
+        .assert_table_bang("Category", |table| table.assert_columns_count(2))
+        .assert_table_bang("Recipe", |table| {
             table.assert_fk_on_columns(&["categoryId"], |fk| fk.assert_references("Category", &["id"]))
-        })?;
+        });
 
     let id: i32 = 1;
 
     let insert = Insert::single_into(api.render_table_name("Category"))
         .value("name", "desserts")
         .value("id", id);
-    api.database().query(insert.into()).await?;
+    api.query(insert.into());
 
     let insert = Insert::single_into(api.render_table_name("Recipe"))
         .value("categoryId", id)
         .value("id", id);
-    api.database().query(insert.into()).await?;
+    api.query(insert.into());
 
     let dm2 = r#"
         model Recipe {
@@ -436,18 +424,16 @@ async fn dropping_a_table_referenced_by_foreign_keys_must_work(api: &TestApi) ->
         }
     "#;
 
-    api.schema_push(dm2).force(true).send().await?;
+    api.schema_push(dm2).force(true).send_sync();
 
     api.assert_schema()
-        .await?
-        .assert_tables_count(1)?
-        .assert_table("Recipe", |table| table.assert_foreign_keys_count(0))?;
-
-    Ok(())
+        .assert_tables_count(1)
+        .unwrap()
+        .assert_table_bang("Recipe", |table| table.assert_foreign_keys_count(0));
 }
 
 #[test_connector]
-async fn string_columns_do_not_get_arbitrarily_migrated(api: &TestApi) -> TestResult {
+fn string_columns_do_not_get_arbitrarily_migrated(api: TestApi) {
     use quaint::ast::*;
 
     let dm1 = r#"
@@ -459,7 +445,7 @@ async fn string_columns_do_not_get_arbitrarily_migrated(api: &TestApi) -> TestRe
         }
     "#;
 
-    api.schema_push(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send_sync().assert_green_bang();
 
     let insert = Insert::single_into(api.render_table_name("User"))
         .value("id", "the-id")
@@ -467,7 +453,7 @@ async fn string_columns_do_not_get_arbitrarily_migrated(api: &TestApi) -> TestRe
         .value("email", "george@prisma.io")
         .value("kindle_email", "george+kindle@prisma.io");
 
-    api.database().query(insert.into()).await?;
+    api.query(insert.into());
 
     let dm2 = r#"
         model User {
@@ -479,7 +465,7 @@ async fn string_columns_do_not_get_arbitrarily_migrated(api: &TestApi) -> TestRe
         }
     "#;
 
-    api.schema_push(dm2).send().await?.assert_green()?.assert_green()?;
+    api.schema_push(dm2).send_sync().assert_green_bang().assert_green_bang();
 
     // Check that the string values are still there.
     let select = Select::from_table(api.render_table_name("User"))
@@ -487,7 +473,7 @@ async fn string_columns_do_not_get_arbitrarily_migrated(api: &TestApi) -> TestRe
         .column("kindle_email")
         .column("email");
 
-    let counts = api.database().query(select.into()).await?;
+    let counts = api.query(select.into());
 
     let row = counts.get(0).unwrap();
 
@@ -497,12 +483,10 @@ async fn string_columns_do_not_get_arbitrarily_migrated(api: &TestApi) -> TestRe
         "george+kindle@prisma.io"
     );
     assert_eq!(row.get("email").unwrap().as_str().unwrap(), "george@prisma.io");
-
-    Ok(())
 }
 
 #[test_connector]
-async fn altering_the_type_of_a_column_in_an_empty_table_should_not_warn(api: &TestApi) -> TestResult {
+fn altering_the_type_of_a_column_in_an_empty_table_should_not_warn(api: TestApi) {
     let dm1 = r#"
         model User {
             id String @id @default(cuid())
@@ -511,7 +495,7 @@ async fn altering_the_type_of_a_column_in_an_empty_table_should_not_warn(api: &T
         }
     "#;
 
-    api.schema_push(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send_sync().assert_green_bang();
 
     let dm2 = r#"
         model User {
@@ -521,17 +505,15 @@ async fn altering_the_type_of_a_column_in_an_empty_table_should_not_warn(api: &T
         }
     "#;
 
-    api.schema_push(dm2).send().await?.assert_green()?;
+    api.schema_push(dm2).send_sync().assert_green_bang();
 
-    api.assert_schema().await?.assert_table("User", |table| {
+    api.assert_schema().assert_table_bang("User", |table| {
         table.assert_column("dogs", |col| col.assert_type_is_string()?.assert_is_required())
-    })?;
-
-    Ok(())
+    });
 }
 
 #[test_connector]
-async fn making_a_column_required_in_an_empty_table_should_not_warn(api: &TestApi) -> TestResult {
+fn making_a_column_required_in_an_empty_table_should_not_warn(api: TestApi) {
     let dm1 = r#"
         model User {
             id String @id @default(cuid())
@@ -540,7 +522,7 @@ async fn making_a_column_required_in_an_empty_table_should_not_warn(api: &TestAp
         }
     "#;
 
-    api.schema_push(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send_sync().assert_green_bang();
 
     let dm2 = r#"
         model User {
@@ -550,17 +532,15 @@ async fn making_a_column_required_in_an_empty_table_should_not_warn(api: &TestAp
         }
     "#;
 
-    api.schema_push(dm2).send().await?.assert_green()?;
+    api.schema_push(dm2).send_sync().assert_green_bang();
 
-    api.assert_schema().await?.assert_table("User", |table| {
+    api.assert_schema().assert_table_bang("User", |table| {
         table.assert_column("dogs", |col| col.assert_type_is_int()?.assert_is_required())
-    })?;
-
-    Ok(())
+    });
 }
 
 #[test_connector(capabilities(Enums))]
-async fn enum_variants_can_be_added_without_data_loss(api: &TestApi) -> TestResult {
+fn enum_variants_can_be_added_without_data_loss(api: TestApi) {
     let dm1 = r#"
         model Cat {
             id String @id
@@ -580,16 +560,15 @@ async fn enum_variants_can_be_added_without_data_loss(api: &TestApi) -> TestResu
 
     api.schema_push(dm1)
         .migration_id(Some("initial-setup"))
-        .send()
-        .await?
-        .assert_green()?;
+        .send_sync()
+        .assert_green_bang();
 
     {
         let cat_inserts = quaint::ast::Insert::multi_into(api.render_table_name("Cat"), vec!["id", "mood"])
             .values((Value::text("felix"), Value::enum_variant("HUNGRY")))
             .values((Value::text("mittens"), Value::enum_variant("HAPPY")));
 
-        api.database().query(cat_inserts.into()).await?;
+        api.query(cat_inserts.into());
     }
 
     let dm2 = r#"
@@ -612,13 +591,12 @@ async fn enum_variants_can_be_added_without_data_loss(api: &TestApi) -> TestResu
 
     api.schema_push(dm2)
         .migration_id(Some("add-absolutely-fabulous-variant"))
-        .send()
-        .await?
-        .assert_green()?;
+        .send_sync()
+        .assert_green_bang();
 
     // Assertions
     {
-        let cat_data = api.dump_table("Cat").await?;
+        let cat_data = api.dump_table("Cat");
         let cat_data: Vec<Vec<quaint::ast::Value>> =
             cat_data.into_iter().map(|row| row.into_iter().collect()).collect();
 
@@ -643,32 +621,33 @@ async fn enum_variants_can_be_added_without_data_loss(api: &TestApi) -> TestResu
 
         assert_eq!(cat_data, expected_cat_data);
 
-        let human_data = api.dump_table("Human").await?;
+        let human_data = api.dump_table("Human");
         let human_data: Vec<Vec<Value>> = human_data.into_iter().map(|row| row.into_iter().collect()).collect();
         let expected_human_data: Vec<Vec<Value>> = Vec::new();
         assert_eq!(human_data, expected_human_data);
 
-        if api.sql_family().is_mysql() {
+        if api.is_mysql() {
             api.assert_schema()
-                .await?
                 .assert_enum(&api.normalize_identifier("Cat_mood"), |enm| {
                     enm.assert_values(&["HAPPY", "HUNGRY", "ABSOLUTELY_FABULOUS"])
-                })?
+                })
+                .unwrap()
                 .assert_enum(&api.normalize_identifier("Human_mood"), |enm| {
                     enm.assert_values(&["HAPPY", "HUNGRY", "ABSOLUTELY_FABULOUS"])
-                })?;
+                })
+                .unwrap();
         } else {
-            api.assert_schema().await?.assert_enum("Mood", |enm| {
-                enm.assert_values(&["HAPPY", "HUNGRY", "ABSOLUTELY_FABULOUS"])
-            })?;
+            api.assert_schema()
+                .assert_enum("Mood", |enm| {
+                    enm.assert_values(&["HAPPY", "HUNGRY", "ABSOLUTELY_FABULOUS"])
+                })
+                .unwrap();
         };
     }
-
-    Ok(())
 }
 
 #[test_connector(capabilities(Enums))]
-async fn enum_variants_can_be_dropped_without_data_loss(api: &TestApi) -> TestResult {
+fn enum_variants_can_be_dropped_without_data_loss(api: TestApi) {
     let dm1 = r#"
         model Cat {
             id String @id
@@ -689,16 +668,15 @@ async fn enum_variants_can_be_dropped_without_data_loss(api: &TestApi) -> TestRe
 
     api.schema_push(dm1)
         .migration_id(Some("initial-setup"))
-        .send()
-        .await?
-        .assert_green()?;
+        .send_sync()
+        .assert_green_bang();
 
     {
         let cat_inserts = quaint::ast::Insert::multi_into(api.render_table_name("Cat"), &["id", "mood"])
             .values((Value::text("felix"), Value::enum_variant("HUNGRY")))
             .values((Value::text("mittens"), Value::enum_variant("HAPPY")));
 
-        api.database().query(cat_inserts.into()).await?;
+        api.query(cat_inserts.into());
     }
 
     let dm2 = r#"
@@ -722,18 +700,17 @@ async fn enum_variants_can_be_dropped_without_data_loss(api: &TestApi) -> TestRe
         .schema_push(dm2)
         .migration_id(Some("add-absolutely-fabulous-variant"))
         .force(true)
-        .send()
-        .await?;
+        .send_sync();
 
-    if api.sql_family().is_mysql() {
-        res.assert_warnings(&["The values [OUTRAGED] on the enum `Cat_mood` will be removed. If these variants are still used in the database, this will fail.".into(), "The values [OUTRAGED] on the enum `Human_mood` will be removed. If these variants are still used in the database, this will fail.".into()])?;
+    if api.is_mysql() {
+        res.assert_warnings(&["The values [OUTRAGED] on the enum `Cat_mood` will be removed. If these variants are still used in the database, this will fail.".into(), "The values [OUTRAGED] on the enum `Human_mood` will be removed. If these variants are still used in the database, this will fail.".into()]);
     } else {
-        res.assert_warnings(&["The values [OUTRAGED] on the enum `Mood` will be removed. If these variants are still used in the database, this will fail.".into()])?;
+        res.assert_warnings(&["The values [OUTRAGED] on the enum `Mood` will be removed. If these variants are still used in the database, this will fail.".into()]);
     }
 
     // Assertions
     {
-        let cat_data = api.dump_table("Cat").await?;
+        let cat_data = api.dump_table("Cat");
         let cat_data: Vec<Vec<quaint::ast::Value>> =
             cat_data.into_iter().map(|row| row.into_iter().collect()).collect();
 
@@ -758,32 +735,31 @@ async fn enum_variants_can_be_dropped_without_data_loss(api: &TestApi) -> TestRe
 
         assert_eq!(cat_data, expected_cat_data);
 
-        let human_data = api.dump_table("Human").await?;
+        let human_data = api.dump_table("Human");
         let human_data: Vec<Vec<Value>> = human_data.into_iter().map(|row| row.into_iter().collect()).collect();
         let expected_human_data: Vec<Vec<Value>> = Vec::new();
         assert_eq!(human_data, expected_human_data);
 
-        if api.sql_family().is_mysql() {
+        if api.is_mysql() {
             api.assert_schema()
-                .await?
                 .assert_enum(&api.normalize_identifier("Cat_mood"), |enm| {
                     enm.assert_values(&["HAPPY", "HUNGRY"])
-                })?
+                })
+                .unwrap()
                 .assert_enum(&api.normalize_identifier("Human_mood"), |enm| {
                     enm.assert_values(&["HAPPY", "HUNGRY"])
-                })?;
+                })
+                .unwrap();
         } else {
             api.assert_schema()
-                .await?
-                .assert_enum("Mood", |enm| enm.assert_values(&["HAPPY", "HUNGRY"]))?;
+                .assert_enum("Mood", |enm| enm.assert_values(&["HAPPY", "HUNGRY"]))
+                .unwrap();
         };
     }
-
-    Ok(())
 }
 
 #[test_connector]
-async fn set_default_current_timestamp_on_existing_column_works(api: &TestApi) -> TestResult {
+fn set_default_current_timestamp_on_existing_column_works(api: TestApi) {
     let dm1 = r#"
         model User {
             id Int @id
@@ -791,14 +767,13 @@ async fn set_default_current_timestamp_on_existing_column_works(api: &TestApi) -
         }
     "#;
 
-    api.schema_push(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send_sync().assert_green_bang();
 
-    let conn = api.database();
     let insert = Insert::single_into(api.render_table_name("User")).value("id", 5).value(
         "created_at",
         Value::DateTime(Some("2020-06-15T14:50:00Z".parse().unwrap())),
     );
-    conn.execute(insert.into()).await?;
+    api.query(insert.into());
 
     let dm2 = r#"
         model User {
@@ -809,20 +784,17 @@ async fn set_default_current_timestamp_on_existing_column_works(api: &TestApi) -
 
     api.schema_push(dm2)
         .force(true)
-        .send()
-        .await?
+        .send_sync()
         .assert_executable()
         .assert_no_warning();
 
-    api.assert_schema().await?.assert_table("User", |table| {
+    api.assert_schema().assert_table_bang("User", |table| {
         table.assert_column("created_at", |column| column.assert_default(Some(DefaultValue::now())))
-    })?;
-
-    Ok(())
+    });
 }
 
 #[test_connector]
-async fn primary_key_migrations_do_not_cause_data_loss(api: &TestApi) -> TestResult {
+fn primary_key_migrations_do_not_cause_data_loss(api: TestApi) {
     let dm1 = r#"
         model Dog {
             name            String
@@ -840,20 +812,18 @@ async fn primary_key_migrations_do_not_cause_data_loss(api: &TestApi) -> TestRes
         }
     "#;
 
-    api.schema_push(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send_sync().assert_green_bang();
 
     api.insert("Dog")
         .value("name", "Marnie")
         .value("passportNumber", 8000)
-        .result_raw()
-        .await?;
+        .result_raw();
 
     api.insert("Puppy")
         .value("id", "12345")
         .value("motherName", "Marnie")
         .value("motherPassportNumber", 8000)
-        .result_raw()
-        .await?;
+        .result_raw();
 
     // Make Dog#passportNumber a String.
     let dm2 = r#"
@@ -881,27 +851,20 @@ async fn primary_key_migrations_do_not_cause_data_loss(api: &TestApi) -> TestRes
 
     api.schema_push(dm2)
         .force(true)
-        .send()
-        .await?
+        .send_sync()
         .assert_executable()
-        .assert_warnings(&[warn.into()])?;
+        .assert_warnings(&[warn.into()]);
 
-    api.assert_schema().await?.assert_table("Dog", |table| {
+    api.assert_schema().assert_table_bang("Dog", |table| {
         table.assert_pk(|pk| pk.assert_columns(&["name", "passportNumber"]))
-    })?;
+    });
 
-    let dog = api.select("Dog").column("name").column("passportNumber").send().await?;
+    let dog = api.dump_table("Dog");
     let dog_row: Vec<quaint::Value> = dog.into_single().unwrap().into_iter().collect();
 
     assert_eq!(dog_row, &[Value::text("Marnie"), Value::text("8000")]);
 
-    let puppy = api
-        .select("Puppy")
-        .column("id")
-        .column("motherName")
-        .column("motherPassportNumber")
-        .send()
-        .await?;
+    let puppy = api.dump_table("Puppy");
 
     let puppy_row: Vec<quaint::Value> = puppy.into_single().unwrap().into_iter().collect();
 
@@ -909,12 +872,10 @@ async fn primary_key_migrations_do_not_cause_data_loss(api: &TestApi) -> TestRes
         puppy_row,
         &[Value::text("12345"), Value::text("Marnie"), Value::text("8000")]
     );
-
-    Ok(())
 }
 
 #[test_connector(tags(Postgres))]
-async fn failing_enum_migrations_should_not_be_partially_applied(api: &TestApi) -> TestResult {
+fn failing_enum_migrations_should_not_be_partially_applied(api: TestApi) {
     let dm1 = r#"
         model Cat {
             id String @id
@@ -929,16 +890,15 @@ async fn failing_enum_migrations_should_not_be_partially_applied(api: &TestApi) 
 
     api.schema_push(dm1)
         .migration_id(Some("initial-setup"))
-        .send()
-        .await?
-        .assert_green()?;
+        .send_sync()
+        .assert_green_bang();
 
     {
         let cat_inserts = quaint::ast::Insert::multi_into(api.render_table_name("Cat"), &["id", "mood"])
             .values((Value::text("felix"), Value::enum_variant("HUNGRY")))
             .values((Value::text("mittens"), Value::enum_variant("HAPPY")));
 
-        api.database().query(cat_inserts.into()).await?;
+        api.query(cat_inserts.into());
     }
 
     let dm2 = r#"
@@ -952,43 +912,34 @@ async fn failing_enum_migrations_should_not_be_partially_applied(api: &TestApi) 
         }
     "#;
 
-    let res = api
-        .schema_push(dm2)
+    api.schema_push(dm2)
         .migration_id(Some("remove-used-variant"))
         .force(true)
-        .send()
-        .await;
+        .send_unwrap_err();
 
     // Assertions
     {
-        match res {
-            Ok(_) => assert_eq!(1, 0),
-            Err(_) => {
-                api.database().raw_cmd("Rollback").await.expect("Did not work");
+        api.raw_cmd("ROLLBACK");
 
-                let cat_data = api.dump_table("Cat").await?;
-                let cat_data: Vec<Vec<quaint::ast::Value>> =
-                    cat_data.into_iter().map(|row| row.into_iter().collect()).collect();
+        let cat_data = api.dump_table("Cat");
+        let cat_data: Vec<Vec<quaint::ast::Value>> =
+            cat_data.into_iter().map(|row| row.into_iter().collect()).collect();
 
-                let expected_cat_data = vec![
-                    vec![Value::text("felix"), Value::enum_variant("HUNGRY")],
-                    vec![Value::text("mittens"), Value::enum_variant("HAPPY")],
-                ];
+        let expected_cat_data = vec![
+            vec![Value::text("felix"), Value::enum_variant("HUNGRY")],
+            vec![Value::text("mittens"), Value::enum_variant("HAPPY")],
+        ];
 
-                assert_eq!(cat_data, expected_cat_data);
+        assert_eq!(cat_data, expected_cat_data);
 
-                if api.sql_family().is_mysql() {
-                    api.assert_schema()
-                        .await?
-                        .assert_enum("Cat_mood", |enm| enm.assert_values(&["HAPPY", "HUNGRY"]))?;
-                } else {
-                    api.assert_schema()
-                        .await?
-                        .assert_enum("Mood", |enm| enm.assert_values(&["HAPPY", "HUNGRY"]))?;
-                };
-            }
-        }
+        if api.is_mysql() {
+            api.assert_schema()
+                .assert_enum("Cat_mood", |enm| enm.assert_values(&["HAPPY", "HUNGRY"]))
+                .unwrap();
+        } else {
+            api.assert_schema()
+                .assert_enum("Mood", |enm| enm.assert_values(&["HAPPY", "HUNGRY"]))
+                .unwrap();
+        };
     }
-
-    Ok(())
 }

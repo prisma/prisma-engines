@@ -225,7 +225,6 @@ fn variants_can_be_removed_from_an_existing_enum(api: TestApi) {
         .force(true)
         .send_sync()
         .assert_warnings(&[warning.into()])
-        .unwrap()
         .assert_executable();
 
     api.assert_schema()
@@ -251,8 +250,7 @@ fn models_with_enum_values_can_be_dropped(api: TestApi) {
         .force(true)
         .send_sync()
         .assert_executable()
-        .assert_warnings(&[warn.into()])
-        .unwrap();
+        .assert_warnings(&[warn.into()]);
 
     api.assert_schema().assert_tables_count(0).unwrap();
 }
@@ -340,8 +338,7 @@ fn string_field_to_enum_field_works(api: TestApi) {
         .force(true)
         .send_sync()
         .assert_executable()
-        .assert_warnings(&[warn.into()])
-        .unwrap();
+        .assert_warnings(&[warn.into()]);
 
     api.assert_schema()
         .assert_table("Cat", |table| {
@@ -437,7 +434,7 @@ fn enums_used_in_default_can_be_changed(api: TestApi) {
             .send_sync()
             .assert_executable()
             .assert_warnings(&["The values [HUNGRY] on the enum `CatMood` will be removed. If these variants are still used in the database, this will fail.".into()]
-            ).unwrap();
+            );
     } else {
         api.schema_push(dm2)
             .force(true)
@@ -445,7 +442,7 @@ fn enums_used_in_default_can_be_changed(api: TestApi) {
             .assert_executable()
             .assert_warnings(& ["The values [HUNGRY] on the enum `Panther_mood` will be removed. If these variants are still used in the database, this will fail.".into(),
                 "The values [HUNGRY] on the enum `Tiger_mood` will be removed. If these variants are still used in the database, this will fail.".into(),]
-            ).unwrap();
+            );
     };
 
     api.assert_schema().assert_tables_count(5).unwrap();

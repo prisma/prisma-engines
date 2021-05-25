@@ -959,11 +959,7 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
             datasource_block = datasource_block,
         );
 
-        api.schema_push(&dm2)
-            .force(true)
-            .send_sync()
-            .assert_warnings(&warnings)
-            .unwrap();
+        api.schema_push(&dm2).force(true).send_sync().assert_warnings(&warnings);
 
         //second assertions same as first
         api.assert_schema().assert_table_bang("A", |table| {
@@ -1074,7 +1070,7 @@ fn not_castable_with_existing_data_should_warn(api: TestApi) {
 
         // todo we could force here and then check that the db really returns not castable
         // then we would again need to have separate calls per mapping
-        api.schema_push(&dm2).send_sync().assert_warnings(&warnings).unwrap();
+        api.schema_push(&dm2).send_sync().assert_warnings(&warnings);
 
         //second assertions same as first
         api.assert_schema().assert_table_bang("A", |table| {

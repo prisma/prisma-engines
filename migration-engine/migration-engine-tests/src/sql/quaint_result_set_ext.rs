@@ -93,15 +93,19 @@ impl<'a> RowAssertion<'a> {
         self
     }
 
+    #[track_caller]
     pub fn assert_text_value(self, column_name: &str, expected_value: &str) -> Self {
-        let actual_value = self.0.get(column_name).and_then(|col: &Value<'_>| (*col).to_string());
+        let value = self.0.get(column_name).expect("Expected a value, found none");
+        let value_text: &str = match value {
+            Value::Text(val) | Value::Enum(val) => val.as_deref(),
+            _ => None,
+        }
+        .expect("Expected a string value");
 
-        assert!(
-            actual_value.as_deref() == Some(expected_value),
+        assert_eq!(
+            value_text, expected_value,
             "Value assertion failed for {}. Expected: {:?}, got: {:?}",
-            column_name,
-            expected_value,
-            actual_value,
+            column_name, expected_value, value_text,
         );
 
         self

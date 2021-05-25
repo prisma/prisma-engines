@@ -1,10 +1,9 @@
-use migration_engine_tests::sql::*;
-use quaint::prelude::Queryable;
+use migration_engine_tests::sync_test_api::*;
 use sql_schema_describer::ColumnTypeFamily;
 use std::fmt::Write;
 
 #[test_connector(tags(Postgres))]
-async fn enums_can_be_dropped_on_postgres(api: &TestApi) -> TestResult {
+fn enums_can_be_dropped_on_postgres(api: TestApi) {
     let dm1 = r#"
         model Cat {
             id String @id
@@ -19,10 +18,10 @@ async fn enums_can_be_dropped_on_postgres(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.schema_push(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send_sync().assert_green_bang();
     api.assert_schema()
-        .await?
-        .assert_enum("CatMood", |r#enum| r#enum.assert_values(&["ANGRY", "HUNGRY", "CUDDLY"]))?;
+        .assert_enum("CatMood", |r#enum| r#enum.assert_values(&["ANGRY", "HUNGRY", "CUDDLY"]))
+        .unwrap();
 
     let dm2 = r#"
         model Cat {
@@ -31,14 +30,12 @@ async fn enums_can_be_dropped_on_postgres(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.schema_push(dm2).send().await?.assert_green()?;
-    api.assert_schema().await?.assert_has_no_enum("CatMood")?;
-
-    Ok(())
+    api.schema_push(dm2).send_sync().assert_green_bang();
+    api.assert_schema().assert_has_no_enum("CatMood").unwrap();
 }
 
 #[test_connector(capabilities(ScalarLists))]
-async fn adding_a_scalar_list_for_a_model_with_id_type_int_must_work(api: &TestApi) -> TestResult {
+fn adding_a_scalar_list_for_a_model_with_id_type_int_must_work(api: TestApi) {
     let dm1 = r#"
         datasource pg {
             provider = "postgres"
@@ -57,49 +54,50 @@ async fn adding_a_scalar_list_for_a_model_with_id_type_int_must_work(api: &TestA
         }
     "#;
 
-    api.schema_push(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send_sync().assert_green_bang();
 
-    api.assert_schema().await?.assert_table("A", |table| {
+    api.assert_schema().assert_table_bang("A", |table| {
         table
             .assert_column("strings", |col| col.assert_is_list()?.assert_type_is_string())?
             .assert_column("enums", |col| {
                 col.assert_type_family(ColumnTypeFamily::Enum("Status".into()))?
                     .assert_is_list()
             })
-    })?;
-
-    Ok(())
+    });
 }
 
 // Reference for the tables created by PostGIS: https://postgis.net/docs/manual-1.4/ch04.html#id418599
 #[test_connector(tags(Postgres))]
-async fn existing_postgis_tables_must_not_be_migrated(api: &TestApi) -> TestResult {
+fn existing_postgis_tables_must_not_be_migrated(api: TestApi) {
     let create_spatial_ref_sys_table = "CREATE TABLE IF NOT EXISTS \"spatial_ref_sys\" ( id SERIAL PRIMARY KEY )";
     // The capitalized Geometry is intentional here, because we want the matching to be case-insensitive.
     let create_geometry_columns_table = "CREATE TABLE IF NOT EXiSTS \"Geometry_columns\" ( id SERIAL PRIMARY KEY )";
 
-    api.database().execute_raw(create_spatial_ref_sys_table, &[]).await?;
-    api.database().execute_raw(create_geometry_columns_table, &[]).await?;
+    api.raw_cmd(create_spatial_ref_sys_table);
+    api.raw_cmd(create_geometry_columns_table);
 
     api.assert_schema()
-        .await?
-        .assert_has_table("spatial_ref_sys")?
-        .assert_has_table("Geometry_columns")?;
+        .assert_has_table("spatial_ref_sys")
+        .unwrap()
+        .assert_has_table("Geometry_columns")
+        .unwrap();
 
     let schema = "";
 
-    api.schema_push(schema).send().await?.assert_green()?.assert_no_steps();
+    api.schema_push(schema)
+        .send_sync()
+        .assert_green_bang()
+        .assert_no_steps();
 
     api.assert_schema()
-        .await?
-        .assert_has_table("spatial_ref_sys")?
-        .assert_has_table("Geometry_columns")?;
-
-    Ok(())
+        .assert_has_table("spatial_ref_sys")
+        .unwrap()
+        .assert_has_table("Geometry_columns")
+        .unwrap();
 }
 
 #[test_connector(tags(Postgres))]
-async fn native_type_columns_can_be_created(api: &TestApi) -> TestResult {
+fn native_type_columns_can_be_created(api: TestApi) {
     let types = &[
         ("smallint", "Int", "SmallInt", "int2"),
         ("int", "Int", "Integer", "int4"),
@@ -144,58 +142,56 @@ async fn native_type_columns_can_be_created(api: &TestApi) -> TestResult {
     .to_owned();
 
     for (field_name, prisma_type, native_type, _) in types {
-        writeln!(&mut dm, "    {} {} @pg.{}", field_name, prisma_type, native_type)?;
+        writeln!(&mut dm, "    {} {} @pg.{}", field_name, prisma_type, native_type).unwrap();
     }
 
     dm.push_str("}\n");
 
-    api.schema_push(&dm).send().await?.assert_green()?;
+    api.schema_push(&dm).send_sync().assert_green_bang();
 
-    api.assert_schema().await?.assert_table("A", |table| {
+    api.assert_schema().assert_table_bang("A", |table| {
         types.iter().fold(
             Ok(table),
             |table, (field_name, _prisma_type, _native_type, database_type)| {
                 table.and_then(|table| table.assert_column(field_name, |col| col.assert_full_data_type(database_type)))
             },
         )
-    })?;
+    });
 
-    api.schema_push(dm).send().await?.assert_green()?.assert_no_steps();
-
-    Ok(())
+    api.schema_push(dm).send_sync().assert_green_bang().assert_no_steps();
 }
 
 #[test_connector(tags(Postgres))]
-async fn uuids_do_not_generate_drift_issue_5282(api: &TestApi) -> TestResult {
-    api.database().raw_cmd(
+fn uuids_do_not_generate_drift_issue_5282(api: TestApi) {
+    api.raw_cmd(
         r#"
         CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
         CREATE TABLE a (id uuid DEFAULT uuid_generate_v4() primary key);
         CREATE TABLE b (id uuid DEFAULT uuid_generate_v4() primary key, a_id uuid, CONSTRAINT aaa FOREIGN KEY (a_id) REFERENCES a(id));
         "#
-    ).await?;
+    );
 
-    let dm = api.native_types_datamodel(
+    let dm = format!(
         r#"
-        model a {
-            id String @id @default(dbgenerated("uuid_generate_v4()")) @test_db.Uuid
-            b  b[]
-        }
+        {}
 
-        model b {
-            id   String  @id @default(dbgenerated("uuid_generate_v4()")) @test_db.Uuid
-            a_id String? @test_db.Uuid
+        model a {{
+            id String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+            b  b[]
+        }}
+
+        model b {{
+            id   String  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+            a_id String? @db.Uuid
             a    a?      @relation(fields: [a_id], references: [id])
-        }
+        }}
         "#,
+        api.datasource_block()
     );
 
     api.schema_push(&dm)
         .migration_id(Some("first"))
-        .send()
-        .await?
-        .assert_green()?
+        .send_sync()
+        .assert_green_bang()
         .assert_no_steps();
-
-    Ok(())
 }

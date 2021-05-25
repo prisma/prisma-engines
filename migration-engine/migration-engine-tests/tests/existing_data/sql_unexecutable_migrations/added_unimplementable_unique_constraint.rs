@@ -1,7 +1,7 @@
-use migration_engine_tests::sql::*;
+use migration_engine_tests::{sql::ResultSetExt, sync_test_api::*};
 
 #[test_connector]
-async fn adding_a_unique_constraint_should_warn(api: &TestApi) -> TestResult {
+fn adding_a_unique_constraint_should_warn(api: TestApi) {
     let dm1 = r#"
         model Test {
             id String @id
@@ -9,20 +9,18 @@ async fn adding_a_unique_constraint_should_warn(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.schema_push(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send_sync().assert_green_bang();
 
     {
         api.insert("Test")
             .value("id", "abc")
             .value("name", "george")
-            .result_raw()
-            .await?;
+            .result_raw();
 
         api.insert("Test")
             .value("id", "def")
             .value("name", "george")
-            .result_raw()
-            .await?;
+            .result_raw();
     }
 
     let dm2 = r#"
@@ -34,25 +32,20 @@ async fn adding_a_unique_constraint_should_warn(api: &TestApi) -> TestResult {
 
     api.schema_push(dm2)
         .force(false)
-        .send()
-        .await?
-        .assert_warnings(&["A unique constraint covering the columns `[name]` on the table `Test` will be added. If there are existing duplicate values, this will fail.".into()])?;
+        .send_sync()
+        .assert_warnings(&["A unique constraint covering the columns `[name]` on the table `Test` will be added. If there are existing duplicate values, this will fail.".into()]);
 
-    let rows = api.select("Test").column("id").column("name").send_debug().await?;
-
-    assert_eq!(
-        rows,
-        &[
-            &[r#"Text(Some("abc"))"#, r#"Text(Some("george"))"#],
-            &[r#"Text(Some("def"))"#, r#"Text(Some("george"))"#]
-        ]
-    );
-
-    Ok(())
+    api.dump_table("Test")
+        .assert_row(0, |row| {
+            row.assert_text_value("id", "abc").assert_text_value("name", "george")
+        })
+        .assert_row(1, |row| {
+            row.assert_text_value("id", "def").assert_text_value("name", "george")
+        });
 }
 
 #[test_connector(tags(Mysql, Postgres))]
-async fn dropping_enum_values_should_warn(api: &TestApi) -> TestResult {
+fn dropping_enum_values_should_warn(api: TestApi) {
     let dm1 = r#"
         model Test {
             id String @id
@@ -67,24 +60,22 @@ async fn dropping_enum_values_should_warn(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.schema_push(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send_sync().assert_green_bang();
 
     {
         api.insert("Test")
             .value("id", "abc")
             .value("name", "george")
-            .result_raw()
-            .await?;
+            .result_raw();
 
         api.insert("Test")
             .value("id", "def")
             .value("name", "george")
-            .result_raw()
-            .await?;
+            .result_raw();
     }
 
     let dm2 = r#"
-             model Test {
+        model Test {
             id String @id
             name Test_name
         }
@@ -98,35 +89,20 @@ async fn dropping_enum_values_should_warn(api: &TestApi) -> TestResult {
 
     api.schema_push(dm2)
         .force(false)
-        .send()
-        .await?
-        .assert_warnings(&["The values [george] on the enum `Test_name` will be removed. If these variants are still used in the database, this will fail.".into()])?;
+        .send_sync()
+        .assert_warnings(&["The values [george] on the enum `Test_name` will be removed. If these variants are still used in the database, this will fail.".into()]);
 
-    let rows = api.select("Test").column("id").column("name").send_debug().await?;
-
-    if api.is_mysql() {
-        assert_eq!(
-            rows,
-            &[
-                &[r#"Text(Some("abc"))"#, r#"Text(Some("george"))"#],
-                &[r#"Text(Some("def"))"#, r#"Text(Some("george"))"#]
-            ]
-        );
-    } else {
-        assert_eq!(
-            rows,
-            &[
-                &[r#"Text(Some("abc"))"#, r#"Enum(Some("george"))"#],
-                &[r#"Text(Some("def"))"#, r#"Enum(Some("george"))"#]
-            ]
-        );
-    }
-
-    Ok(())
+    api.dump_table("Test")
+        .assert_row(0, |row| {
+            row.assert_text_value("id", "abc").assert_text_value("name", "george")
+        })
+        .assert_row(1, |row| {
+            row.assert_text_value("id", "def").assert_text_value("name", "george")
+        });
 }
 
 #[test_connector]
-async fn adding_a_unique_constraint_when_existing_data_respects_it_works(api: &TestApi) -> TestResult {
+fn adding_a_unique_constraint_when_existing_data_respects_it_works(api: TestApi) {
     let dm1 = r#"
         model Test {
             id String @id
@@ -134,19 +110,17 @@ async fn adding_a_unique_constraint_when_existing_data_respects_it_works(api: &T
         }
     "#;
 
-    api.schema_push(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send_sync().assert_green_bang();
 
     api.insert("Test")
         .value("id", "abc")
         .value("name", "george")
-        .result_raw()
-        .await?;
+        .result_raw();
 
     api.insert("Test")
         .value("id", "def")
         .value("name", "georgina")
-        .result_raw()
-        .await?;
+        .result_raw();
 
     let dm2 = r#"
         model Test {
@@ -157,18 +131,14 @@ async fn adding_a_unique_constraint_when_existing_data_respects_it_works(api: &T
 
     api.schema_push(dm2)
         .force(true)
-        .send()
-        .await?
-        .assert_warnings(&["A unique constraint covering the columns `[name]` on the table `Test` will be added. If there are existing duplicate values, this will fail.".into()])?;
+        .send_sync()
+        .assert_warnings(&["A unique constraint covering the columns `[name]` on the table `Test` will be added. If there are existing duplicate values, this will fail.".into()]);
 
-    let rows = api.select("Test").column("id").column("name").send_debug().await?;
-    assert_eq!(
-        rows,
-        &[
-            &[r#"Text(Some("abc"))"#, r#"Text(Some("george"))"#],
-            &[r#"Text(Some("def"))"#, r#"Text(Some("georgina"))"#]
-        ]
-    );
-
-    Ok(())
+    api.dump_table("Test")
+        .assert_row(0, |row| {
+            row.assert_text_value("id", "abc").assert_text_value("name", "george")
+        })
+        .assert_row(1, |row| {
+            row.assert_text_value("id", "def").assert_text_value("name", "georgina")
+        });
 }

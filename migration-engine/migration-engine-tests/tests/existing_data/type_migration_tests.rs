@@ -36,11 +36,9 @@ fn altering_the_type_of_a_column_in_a_non_empty_table_warns(api: TestApi) {
         } else {
             "You are about to alter the column `dogs` on the `User` table, which contains 1 non-null values. The data in that column will be cast from `BigInt` to `Int`.".into()
         }
-    ]).unwrap();
+    ]);
 
-    api.select("User")
-        .column("dogs")
-        .send()
+    api.dump_table("User")
         .assert_single_row(|row| row.assert_int_value("dogs", 7));
 
     api.assert_schema().assert_table_bang("User", |table| {
@@ -130,15 +128,11 @@ fn changing_a_string_array_column_to_scalar_is_fine(api: TestApi) {
         table.assert_column("mainProtagonist", |column| column.assert_is_required())
     });
 
-    api.select("Film")
-        .column("id")
-        .column("mainProtagonist")
-        .send()
-        .assert_single_row(|row| {
-            row.assert_text_value("id", "film1")
-                // the array got cast to a string by postgres
-                .assert_text_value("mainProtagonist", "{\"giant shark\",\"jason statham\"}")
-        });
+    api.dump_table("Film").assert_single_row(|row| {
+        row.assert_text_value("id", "film1")
+            // the array got cast to a string by postgres
+            .assert_text_value("mainProtagonist", "{\"giant shark\",\"jason statham\"}")
+    });
 }
 
 #[test_connector(capabilities(ScalarLists))]
@@ -180,20 +174,16 @@ fn changing_an_int_array_column_to_scalar_is_not_possible(api: TestApi) {
         .force(true)
         .send_sync()
         .assert_no_warning()
-        .assert_unexecutable(&["Changed the type of `mainProtagonist` on the `Film` table. No cast exists, the column would be dropped and recreated, which cannot be done since the column is required and there is data in the table.".into()]).unwrap();
+        .assert_unexecutable(&["Changed the type of `mainProtagonist` on the `Film` table. No cast exists, the column would be dropped and recreated, which cannot be done since the column is required and there is data in the table.".into()]);
 
     api.assert_schema().assert_table_bang("Film", |table| {
         table.assert_column("mainProtagonist", |column| column.assert_is_list())
     });
 
-    api.select("Film")
-        .column("id")
-        .column("mainProtagonist")
-        .send()
-        .assert_single_row(|row| {
-            row.assert_text_value("id", "film1")
-                .assert_array_value("mainProtagonist", &[7.into(), 11.into()])
-        });
+    api.dump_table("Film").assert_single_row(|row| {
+        row.assert_text_value("id", "film1")
+            .assert_array_value("mainProtagonist", &[7.into(), 11.into()])
+    });
 }
 
 #[test_connector]
@@ -251,7 +241,7 @@ fn string_to_int_conversions_are_risky(api: TestApi) {
             .force(true)
             .send_sync()
             .assert_no_warning()
-            .assert_unexecutable(&["Changed the type of `tag` on the `Cat` table. No cast exists, the column would be dropped and recreated, which cannot be done since the column is required and there is data in the table.".into()]).unwrap();
+            .assert_unexecutable(&["Changed the type of `tag` on the `Cat` table. No cast exists, the column would be dropped and recreated, which cannot be done since the column is required and there is data in the table.".into()]);
     } else if api.is_mysql() {
         // Executable, conditionally.
         if api.lower_cases_table_names() {
@@ -260,7 +250,7 @@ fn string_to_int_conversions_are_risky(api: TestApi) {
             .send_sync()
             .assert_warnings(&[
                 "You are about to alter the column `tag` on the `cat` table, which contains 1 non-null values. The data in that column will be cast from `VarChar(191)` to `Int`.".into()
-            ]).unwrap()
+            ])
             .assert_executable()
             .assert_has_executed_steps();
 
@@ -273,7 +263,7 @@ fn string_to_int_conversions_are_risky(api: TestApi) {
                 .send_sync()
                 .assert_warnings(&[
                     "You are about to alter the column `tag` on the `Cat` table, which contains 1 non-null values. The data in that column will be cast from `VarChar(191)` to `Int`.".into()
-                ]).unwrap()
+                ])
                 .assert_executable()
                 .assert_has_executed_steps();
 
@@ -286,7 +276,7 @@ fn string_to_int_conversions_are_risky(api: TestApi) {
         .send_sync()
         .assert_warnings(&[
             "You are about to alter the column `tag` on the `Cat` table, which contains 1 non-null values. The data in that column will be cast from `NVarChar(1000)` to `Int`.".into()
-        ]).unwrap()
+        ])
         .assert_executable()
         .assert_has_executed_steps();
 
@@ -298,7 +288,7 @@ fn string_to_int_conversions_are_risky(api: TestApi) {
             .send_sync()
             .assert_warnings(&[
                 "You are about to alter the column `tag` on the `Cat` table, which contains 1 non-null values. The data in that column will be cast from `String` to `Int`.".into()
-            ]).unwrap()
+            ])
             .assert_executable()
             .assert_has_executed_steps();
 
@@ -337,7 +327,6 @@ fn datetime_to_float_conversions_are_impossible(api: TestApi) {
             "The `birthday` column on the `Cat` table would be dropped and recreated. This will lead to data loss."
                 .into(),
         ])
-        .unwrap()
         .assert_executable()
         .assert_no_steps();
 
@@ -351,7 +340,6 @@ fn datetime_to_float_conversions_are_impossible(api: TestApi) {
             "The `birthday` column on the `Cat` table would be dropped and recreated. This will lead to data loss."
                 .into(),
         ])
-        .unwrap()
         .assert_executable()
         .assert_has_executed_steps();
 

@@ -1,10 +1,9 @@
-use migration_engine_tests::sql::*;
+use migration_engine_tests::sync_test_api::*;
 use prisma_value::PrismaValue;
-use quaint::prelude::SqlFamily;
 use sql_schema_describer::ColumnTypeFamily;
 
 #[test_connector(tags(Postgres))]
-async fn adding_an_unsupported_type_must_work(api: &TestApi) -> TestResult {
+fn adding_an_unsupported_type_must_work(api: TestApi) {
     let dm = r#"
         model Post {
             id            Int                     @id @default(autoincrement())
@@ -21,9 +20,9 @@ async fn adding_an_unsupported_type_must_work(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.schema_push(dm).send().await?.assert_green()?;
+    api.schema_push(dm).send_sync().assert_green_bang();
 
-    api.assert_schema().await?.assert_table("Post", |table| {
+    api.assert_schema().assert_table_bang("Post", |table| {
         table
             .assert_columns_count(2)?
             .assert_column("id", |c| {
@@ -33,9 +32,9 @@ async fn adding_an_unsupported_type_must_work(api: &TestApi) -> TestResult {
                 c.assert_is_required()?
                     .assert_type_family(ColumnTypeFamily::Unsupported("cidr".to_string()))
             })
-    })?;
+    });
 
-    api.assert_schema().await?.assert_table("User", |table| {
+    api.assert_schema().assert_table_bang("User", |table| {
         table
             .assert_columns_count(2)?
             .assert_column("id", |c| {
@@ -45,13 +44,11 @@ async fn adding_an_unsupported_type_must_work(api: &TestApi) -> TestResult {
                 c.assert_is_required()?
                     .assert_type_family(ColumnTypeFamily::Unsupported("cidr".to_string()))
             })
-    })?;
-
-    Ok(())
+    });
 }
 
 #[test_connector(tags(Postgres))]
-async fn switching_an_unsupported_type_to_supported_must_work(api: &TestApi) -> TestResult {
+fn switching_an_unsupported_type_to_supported_must_work(api: TestApi) {
     let dm1 = r#"
         model Post {
             id            Int                     @id @default(autoincrement())
@@ -60,9 +57,9 @@ async fn switching_an_unsupported_type_to_supported_must_work(api: &TestApi) -> 
         }
     "#;
 
-    api.schema_push(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send_sync().assert_green_bang();
 
-    api.assert_schema().await?.assert_table("Post", |table| {
+    api.assert_schema().assert_table_bang("Post", |table| {
         table
             .assert_columns_count(3)?
             .assert_column("id", |c| {
@@ -76,7 +73,7 @@ async fn switching_an_unsupported_type_to_supported_must_work(api: &TestApi) -> 
                 c.assert_is_required()?
                     .assert_type_family(ColumnTypeFamily::Unsupported("point".to_string()))
             })
-    })?;
+    });
 
     let dm2 = r#"
         model Post {
@@ -86,9 +83,9 @@ async fn switching_an_unsupported_type_to_supported_must_work(api: &TestApi) -> 
         }
     "#;
 
-    api.schema_push(dm2).send().await?.assert_green()?;
+    api.schema_push(dm2).send_sync().assert_green_bang();
 
-    api.assert_schema().await?.assert_table("Post", |table| {
+    api.assert_schema().assert_table_bang("Post", |table| {
         table
             .assert_columns_count(3)?
             .assert_column("id", |c| {
@@ -100,12 +97,11 @@ async fn switching_an_unsupported_type_to_supported_must_work(api: &TestApi) -> 
             .assert_column("user_location", |c| {
                 c.assert_is_required()?.assert_type_family(ColumnTypeFamily::String)
             })
-    })?;
-    Ok(())
+    });
 }
 
 #[test_connector(tags(Postgres))]
-async fn adding_and_removing_properties_on_unsupported_should_work(api: &TestApi) -> TestResult {
+fn adding_and_removing_properties_on_unsupported_should_work(api: TestApi) {
     let dm1 = r#"
         model Post {
             id               Int    @id @default(autoincrement())
@@ -120,9 +116,9 @@ async fn adding_and_removing_properties_on_unsupported_should_work(api: &TestApi
         }
     "#;
 
-    api.schema_push(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send_sync().assert_green_bang();
 
-    api.assert_schema().await?.assert_table("Post", |table| {
+    api.assert_schema().assert_table_bang("Post", |table| {
         table
             .assert_columns_count(2)?
             .assert_column("id", |c| {
@@ -132,9 +128,9 @@ async fn adding_and_removing_properties_on_unsupported_should_work(api: &TestApi
                 c.assert_is_required()?
                     .assert_type_family(ColumnTypeFamily::Unsupported("cidr".to_string()))
             })
-    })?;
+    });
 
-    api.assert_schema().await?.assert_table("Blog", |table| {
+    api.assert_schema().assert_table_bang("Blog", |table| {
         table
             .assert_columns_count(4)?
             .assert_column("id", |c| {
@@ -155,7 +151,7 @@ async fn adding_and_removing_properties_on_unsupported_should_work(api: &TestApi
                     .assert_type_family(ColumnTypeFamily::Unsupported("point".to_string()))?
                     .assert_dbgenerated("point((0)::double precision, (0)::double precision)")
             })
-    })?;
+    });
 
     let dm2 = r#"
         model Post {
@@ -164,9 +160,9 @@ async fn adding_and_removing_properties_on_unsupported_should_work(api: &TestApi
         }
     "#;
 
-    api.schema_push(dm2).force(true).send().await?.assert_warnings(&["A unique constraint covering the columns `[user_ip]` on the table `Post` will be added. If there are existing duplicate values, this will fail.".into()])?;
+    api.schema_push(dm2).force(true).send_sync().assert_warnings(&["A unique constraint covering the columns `[user_ip]` on the table `Post` will be added. If there are existing duplicate values, this will fail.".into()]);
 
-    api.assert_schema().await?.assert_table("Post", |table| {
+    api.assert_schema().assert_table_bang("Post", |table| {
         table
             .assert_columns_count(2)?
             .assert_index_on_columns(&["user_ip"], |index| index.assert_is_unique())?
@@ -177,7 +173,7 @@ async fn adding_and_removing_properties_on_unsupported_should_work(api: &TestApi
                 c.assert_is_nullable()?
                     .assert_type_family(ColumnTypeFamily::Unsupported("cidr".to_string()))
             })
-    })?;
+    });
 
     let dm3 = r#"
         model Post {
@@ -186,9 +182,9 @@ async fn adding_and_removing_properties_on_unsupported_should_work(api: &TestApi
         }
     "#;
 
-    api.schema_push(dm3).send().await?.assert_green()?;
+    api.schema_push(dm3).send_sync().assert_green_bang();
 
-    api.assert_schema().await?.assert_table("Post", |table| {
+    api.assert_schema().assert_table_bang("Post", |table| {
         table
             .assert_columns_count(2)?
             .assert_column("id", |c| {
@@ -199,31 +195,35 @@ async fn adding_and_removing_properties_on_unsupported_should_work(api: &TestApi
                     .assert_type_family(ColumnTypeFamily::Unsupported("cidr".to_string()))?
                     .assert_dbgenerated("'10.1.2.3/32'::cidr")
             })
-    })?;
-
-    Ok(())
+    });
 }
 
 #[test_connector]
-async fn using_unsupported_and_ignore_should_work(api: &TestApi) -> TestResult {
-    let unsupported_type = match api.sql_family() {
-        SqlFamily::Sqlite => "some random string",
-        SqlFamily::Postgres => "macaddr",
-        SqlFamily::Mssql => "money",
-        SqlFamily::Mysql => "point",
+fn using_unsupported_and_ignore_should_work(api: TestApi) {
+    let unsupported_type = if api.is_sqlite() {
+        "some random string"
+    } else if api.is_postgres() {
+        "macaddr"
+    } else if api.is_mysql() {
+        "point"
+    } else if api.is_mssql() {
+        "money"
+    } else {
+        unreachable!()
     };
 
-    let dm = api.native_types_datamodel(&format!(
+    let dm = format!(
         r#"
-            model UnsupportedModel {{
-                field Unsupported("{}")?
-                @@ignore
+        {}
+
+        model UnsupportedModel {{
+            field Unsupported("{}")?
+            @@ignore
         }}
      "#,
+        api.datasource_block(),
         unsupported_type
-    ));
+    );
 
-    api.schema_push(dm).send().await?.assert_green()?;
-
-    Ok(())
+    api.schema_push(dm).send_sync().assert_green_bang();
 }
