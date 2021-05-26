@@ -99,11 +99,11 @@ impl<'a> LiftAstToDml<'a> {
         }
         {
             if matches!(&model.primary_key, Some(pk) if pk.name_in_db.is_some() && !supports_named_pks) {
-                errors.push_error(DatamodelError::new_validation_error(
+                errors.push_error(DatamodelError::new_model_validation_error(
                     &format!(
-                        "You defined a database name for the primary key on the model `{}`. This is not supported by the provider.",
-                        &ast_model.name.name
+                        "You defined a database name for the primary key on the model. This is not supported by the provider.",
                     ),
+                    &ast_model.name.name,
                     ast_model.span,
                 ));
                 return Err(errors);

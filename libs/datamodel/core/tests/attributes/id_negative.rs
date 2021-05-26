@@ -220,7 +220,7 @@ fn mapped_id_must_error_on_mysql() {
 
     let errors = parse_error(dml);
     errors.assert_is(DatamodelError::new_model_validation_error(
-        "You defined a database name for the primary key on the model `User`. This is not supported by the provider.",
+        "You defined a database name for the primary key on the model. This is not supported by the provider.",
         "User",
         Span::new(134, 286),
     ));
