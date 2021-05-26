@@ -11,6 +11,7 @@ pub mod insensitive_filters;
 pub mod json;
 pub mod json_path;
 pub mod list_filters;
+pub mod many_relation;
 pub mod where_unique;
 
 /// Creates test data used by filter tests using the `common_nullable_types` schema.
