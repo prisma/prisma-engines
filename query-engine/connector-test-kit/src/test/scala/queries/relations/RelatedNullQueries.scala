@@ -3,6 +3,7 @@ package queries.relations
 import org.scalatest.{FlatSpec, Matchers}
 import util.{ApiSpecBase, IgnoreMsSql, ProjectDsl}
 
+// RS: Ported
 class RelatedNullQueries extends FlatSpec with Matchers with ApiSpecBase {
   "Querying a single-field 1:n relation with nulls" should "ignore related records connected with null" taggedAs (IgnoreMsSql) in {
     val project = ProjectDsl.fromString {

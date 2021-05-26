@@ -25,6 +25,7 @@ mod order_by_mutation {
         schema.to_owned()
     }
 
+    // "Using a field in the order by that is not part of the selected fields" should "work"
     #[connector_test]
     async fn order_by_not_selected(runner: &Runner) -> TestResult<()> {
         insta::assert_snapshot!(

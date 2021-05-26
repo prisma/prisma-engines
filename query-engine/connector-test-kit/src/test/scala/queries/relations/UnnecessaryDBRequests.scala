@@ -3,6 +3,7 @@ package queries.relations
 import org.scalatest.{FlatSpec, Matchers}
 import util.{ApiSpecBase, ProjectDsl}
 
+// RS: Will port later. Needs a way to count the amount of requests sent for a query in rust
 class UnnecessaryDBRequests extends FlatSpec with Matchers with ApiSpecBase {
   "One to Many relations" should "not create unnecessary roundtrips" in {
     val project = ProjectDsl.fromString {
