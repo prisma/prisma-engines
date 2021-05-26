@@ -201,3 +201,27 @@ fn invalid_name_for_compound_id_must_error() {
         Span::new(98, 143),
     ));
 }
+
+#[test]
+fn mapped_id_must_error_on_mysql() {
+    let dml = r#"
+    datasource test {
+        provider = "mysql"
+        url = "mysql://root:prisma@127.0.0.1:3309/NoNamedPKsOnMysql"
+    }
+    
+    model User {
+        name           String            
+        identification Int
+
+        @@id([name, identification], map: "Valid.But.Unwanted")
+    }
+    "#;
+
+    let errors = parse_error(dml);
+    errors.assert_is(DatamodelError::new_model_validation_error(
+        "You defined a database name for the primary key on the model `User`. This is not supported by the provider.",
+        "User",
+        Span::new(134, 286),
+    ));
+}

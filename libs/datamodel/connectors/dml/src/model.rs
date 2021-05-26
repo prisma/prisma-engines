@@ -61,6 +61,20 @@ pub struct PrimaryKeyDefinition {
     pub fields: Vec<String>,
 }
 
+impl PrimaryKeyDefinition {
+    pub fn default_name_if_necessary(&self, default_name: String) -> Self {
+        let name_in_db = self.name_in_db.clone().or_else(|| Some(default_name.clone()));
+        let name_in_db_is_default = name_in_db == Some(default_name);
+        PrimaryKeyDefinition {
+            name_in_db,
+            name_in_db_is_default,
+            name_in_client: self.name_in_client.clone(),
+
+            fields: self.fields.clone(),
+        }
+    }
+}
+
 /// A unique criteria is a set of fields through which a record can be uniquely identified.
 #[derive(Debug)]
 pub struct UniqueCriteria<'a> {

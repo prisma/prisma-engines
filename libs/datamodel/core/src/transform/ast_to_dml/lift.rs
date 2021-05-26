@@ -75,13 +75,19 @@ impl<'a> LiftAstToDml<'a> {
         }
 
         // transfer primary keys from field level to model level and name them
+        //make sure only supported connectors name primary keys at the db level
+        let supports_named_pks = match self.source {
+            Some(source) => source.combined_connector.supports_named_primary_keys(),
+            None => true,
+        };
+
         if model.singular_id_fields().next().is_some() {
             let model_name = model.name.clone();
             {
                 if let Some(f) = model.scalar_fields_mut().find(|f| f.is_id()) {
                     if let Some(mut pk) = f.primary_key.as_mut() {
                         let default_name = ConstraintNames::primary_key_name(&model_name);
-                        if pk.name_in_db.is_none() {
+                        if pk.name_in_db.is_none() && supports_named_pks {
                             pk.name_in_db = Some(default_name.clone())
                         }
                         pk.name_in_db_is_default = pk.name_in_db == Some(default_name);
@@ -91,6 +97,28 @@ impl<'a> LiftAstToDml<'a> {
             let id_field = model.scalar_fields_mut().find(|f| f.is_id());
             model.primary_key = id_field.and_then(|f| f.primary_key.clone());
         }
+        {
+            if matches!(&model.primary_key, Some(pk) if pk.name_in_db.is_some() && !supports_named_pks) {
+                errors.push_error(DatamodelError::new_validation_error(
+                    &format!(
+                        "You defined a database name for the primary key on the model `{}`. This is not supported by the provider.",
+                        &ast_model.name.name
+                    ),
+                    ast_model.span,
+                ));
+                return Err(errors);
+            }
+        }
+        {
+            if supports_named_pks {
+                let model_name = model.name.clone();
+                let pk = model
+                    .primary_key
+                    .map(|pk| pk.default_name_if_necessary(ConstraintNames::primary_key_name(&model_name)));
+                model.primary_key = pk;
+            }
+        }
+
         // transfer indexes from field level to model level and name them if names is empty
         let mut indices_to_copy = vec![];
         {

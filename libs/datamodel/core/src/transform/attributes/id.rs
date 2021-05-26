@@ -1,5 +1,4 @@
 use super::{super::helpers::*, AttributeValidator};
-use crate::common::ConstraintNames;
 use crate::diagnostics::DatamodelError;
 use crate::transform::attributes::field_array;
 use crate::{ast, dml, PrimaryKeyDefinition};
@@ -80,16 +79,14 @@ impl AttributeValidator<dml::Model> for ModelLevelIdAttributeValidator {
             .map(|f| f.as_constant_literal())
             .collect::<Result<Vec<_>, _>>()?;
 
-        let default_name = ConstraintNames::primary_key_name(&obj.name);
-
-        let (name_in_db_is_default, name_in_client, name_in_db) = match (
+        let (name_in_client, name_in_db) = match (
             args.optional_arg("name").map(|v| v.as_str().unwrap()),
             args.optional_arg("map").map(|v| v.as_str().unwrap()),
         ) {
-            (Some(client_name), Some(db_name)) => (db_name == default_name, Some(client_name), Some(db_name)),
-            (Some(client_name), None) => (true, Some(client_name), Some(default_name)),
-            (None, Some(db_name)) => (db_name == default_name, None, Some(db_name)),
-            (None, None) => (true, None, Some(default_name)),
+            (Some(client_name), Some(db_name)) => (Some(client_name), Some(db_name)),
+            (Some(client_name), None) => (Some(client_name), None),
+            (None, Some(db_name)) => (None, Some(db_name)),
+            (None, None) => (None, None),
         };
 
         static RE: Lazy<Regex> = Lazy::new(|| Regex::new("[^_a-zA-Z0-9]").unwrap());
@@ -106,7 +103,7 @@ impl AttributeValidator<dml::Model> for ModelLevelIdAttributeValidator {
 
         obj.primary_key = Some(PrimaryKeyDefinition {
             name_in_client,
-            name_in_db_is_default,
+            name_in_db_is_default: false,
             name_in_db,
             fields: fields.clone(),
         });

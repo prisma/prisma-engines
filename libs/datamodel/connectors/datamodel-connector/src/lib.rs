@@ -74,6 +74,10 @@ pub trait Connector: Send + Sync {
         self.has_capability(ConnectorCapability::Enums)
     }
 
+    fn supports_named_primary_keys(&self) -> bool {
+        self.has_capability(ConnectorCapability::NamedPrimaryKeys)
+    }
+
     fn supports_json(&self) -> bool {
         self.has_capability(ConnectorCapability::Json)
     }
@@ -131,6 +135,7 @@ pub enum ConnectorCapability {
     AutoIncrementMultipleAllowed,
     AutoIncrementNonIndexedAllowed,
     RelationFieldsInArbitraryOrder,
+    NamedPrimaryKeys,
 
     // start of Query Engine Capabilities
     InsensitiveFilters,
