@@ -5,7 +5,7 @@ use crate::{
         Datamodel, DefaultValue, Enum, EnumValue, FieldArity, FieldType, IndexDefinition, Model, ScalarField,
         WithDatabaseName,
     },
-    NativeTypeInstance, RelationField,
+    NativeTypeInstance, PrimaryKeyDefinition, RelationField,
 };
 use dml::scalars::ScalarType;
 use itertools::Itertools;
@@ -59,6 +59,10 @@ impl<'a> ModelWalker<'a> {
 
     pub fn db_name(&self) -> &str {
         self.get().final_database_name()
+    }
+
+    pub fn primary_key(&self) -> Option<&PrimaryKeyDefinition> {
+        self.get().primary_key.as_ref()
     }
 
     fn get(&self) -> &'a Model {

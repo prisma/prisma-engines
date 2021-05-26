@@ -507,55 +507,188 @@ async fn no_additional_unique_created(api: &TestApi) -> TestResult {
 
     Ok(())
 }
-// todo just for testing, figure out whether to keep it qq
-// #[test_each_connector]
-// async fn index_tests(api: &TestApi) -> TestResult {
-//     let dm = r#"
-//         model A {
-//           id   Int    @id
-//           name String @unique
-//           a    String
-//           b    String
-//           B    B[]    @relation("AtoB")
-//
-//           @@unique([a, b], name: "compound", map:"1")
-//           @@unique([a, b], map:"2")
-//           @@index([a])
-//         }
-//
-//         model B {
-//           a   String
-//           b   String
-//           aId Int
-//           A   A      @relation("AtoB", fields: [aId], references: [id])
-//
-//           @@index([a,b])
-//           @@id([a, b])
-//         }
-//
-//           model CIsVeryVeryVeryVeryVeryVeryVeryVeryVeryLong {
-//           aIsAlsoWayWayWayTooLong    String
-//           bIsAlsoWayWayWayTooLong    String
-//
-//           @@unique([aIsAlsoWayWayWayTooLong, bIsAlsoWayWayWayTooLong])
-//         }
-//     "#;
-//
-//     let dir = api.create_migrations_directory()?;
-//
-//     api.create_migration("setup", dm, &dir)
-//         .send()
-//         .await?
-//         .assert_migration_directories_count(1)?
-//         .assert_migration("setup", |migration| {
-//             let expected_script = indoc! {
-//                 r#"
-//
-//                         "#
-//             };
-//
-//             migration.assert_contents(expected_script)
-//         })?;
-//
-//     Ok(())
-// }
+// todo just for testing, figure out whether to keep it
+#[test_each_connector]
+async fn index_tests(api: &TestApi) -> TestResult {
+    let dm = r#"
+        model A {
+          id   Int    @id
+          name String @unique
+          a    String
+          b    String
+          B    B[]    @relation("AtoB")
+
+          @@unique([a, b], name: "compound", map:"1")
+          @@unique([a, b], map:"2")
+          @@index([a])
+        }
+
+        model B {
+          a   String
+          b   String
+          aId Int
+          A   A      @relation("AtoB", fields: [aId], references: [id])
+
+          @@index([a,b])
+          @@id([a, b], map: "custom")
+        }
+    "#;
+
+    let dir = api.create_migrations_directory()?;
+
+    api.create_migration("setup", dm, &dir)
+        .send()
+        .await?
+        .assert_migration_directories_count(1)?
+        .assert_migration("setup", |migration| {
+            let expected_script = if api.sql_family().is_mssql() {
+                indoc! {
+                    r#"
+                    -- CreateTable
+                    CREATE TABLE [index_tests].[A] (
+                        [id] INT NOT NULL,
+                        [name] NVARCHAR(1000) NOT NULL,
+                        [a] NVARCHAR(1000) NOT NULL,
+                        [b] NVARCHAR(1000) NOT NULL,
+                    
+                        CONSTRAINT [A_pkey] PRIMARY KEY ([id]),
+                        CONSTRAINT [1] UNIQUE ([a],[b]),
+                        CONSTRAINT [2] UNIQUE ([a],[b]),
+                        CONSTRAINT [A_name_key] UNIQUE ([name])
+                    );
+                    
+                    -- CreateTable
+                    CREATE TABLE [index_tests].[B] (
+                        [a] NVARCHAR(1000) NOT NULL,
+                        [b] NVARCHAR(1000) NOT NULL,
+                        [aId] INT NOT NULL,
+                    
+                        CONSTRAINT [custom] PRIMARY KEY ([a],[b])
+                    );
+                    
+                    -- CreateIndex
+                    CREATE INDEX [A_a_idx] ON [index_tests].[A]([a]);
+                    
+                    -- CreateIndex
+                    CREATE INDEX [B_a_b_idx] ON [index_tests].[B]([a], [b]);
+                    
+                    -- AddForeignKey
+                    ALTER TABLE [index_tests].[B] ADD CONSTRAINT [FK__B__aId] FOREIGN KEY ([aId]) REFERENCES [index_tests].[A]([id]) ON DELETE CASCADE ON UPDATE CASCADE;
+                "#
+                }
+            } else if api.sql_family().is_postgres() {
+                indoc! {
+                    r#"
+                    -- CreateTable
+                    CREATE TABLE "A" (
+                        "id" INTEGER NOT NULL,
+                        "name" TEXT NOT NULL,
+                        "a" TEXT NOT NULL,
+                        "b" TEXT NOT NULL,
+
+                        CONSTRAINT "A_pkey" PRIMARY KEY ("id")
+                    );
+
+                    -- CreateTable
+                    CREATE TABLE "B" (
+                        "a" TEXT NOT NULL,
+                        "b" TEXT NOT NULL,
+                        "aId" INTEGER NOT NULL,
+                    
+                        CONSTRAINT "custom" PRIMARY KEY ("a","b")
+                    );
+                    
+                    -- CreateIndex
+                    CREATE UNIQUE INDEX "1" ON "A"("a", "b");
+                    
+                    -- CreateIndex
+                    CREATE UNIQUE INDEX "2" ON "A"("a", "b");
+                    
+                    -- CreateIndex
+                    CREATE INDEX "A_a_idx" ON "A"("a");
+                    
+                    -- CreateIndex
+                    CREATE UNIQUE INDEX "A_name_key" ON "A"("name");
+                    
+                    -- CreateIndex
+                    CREATE INDEX "B_a_b_idx" ON "B"("a", "b");
+                    
+                    -- AddForeignKey
+                    ALTER TABLE "B" ADD FOREIGN KEY ("aId") REFERENCES "A"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+                "#
+                }
+            } else if api.sql_family().is_mysql(){
+                indoc! {
+                    r#"
+                -- CreateTable
+                CREATE TABLE `A` (
+                    `id` INTEGER NOT NULL,
+                    `name` VARCHAR(191) NOT NULL,
+                    `a` VARCHAR(191) NOT NULL,
+                    `b` VARCHAR(191) NOT NULL,
+                    UNIQUE INDEX `1`(`a`, `b`),
+                    UNIQUE INDEX `2`(`a`, `b`),
+                    INDEX `A_a_idx`(`a`),
+                    UNIQUE INDEX `A_name_key`(`name`),
+                
+                    PRIMARY KEY (`id`)
+                ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+                
+                -- CreateTable
+                CREATE TABLE `B` (
+                    `a` VARCHAR(191) NOT NULL,
+                    `b` VARCHAR(191) NOT NULL,
+                    `aId` INTEGER NOT NULL,
+                    INDEX `B_a_b_idx`(`a`, `b`),
+                
+                    PRIMARY KEY (`a`,`b`)
+                ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+                
+                -- AddForeignKey
+                ALTER TABLE `B` ADD FOREIGN KEY (`aId`) REFERENCES `A`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+                "#
+                }
+            }else if api.sql_family().is_sqlite(){
+                indoc!{r#"
+                -- CreateTable
+                CREATE TABLE "A" (
+                    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+                    "name" TEXT NOT NULL,
+                    "a" TEXT NOT NULL,
+                    "b" TEXT NOT NULL
+                );
+                
+                -- CreateTable
+                CREATE TABLE "B" (
+                    "a" TEXT NOT NULL,
+                    "b" TEXT NOT NULL,
+                    "aId" INTEGER NOT NULL,
+                
+                    PRIMARY KEY ("a", "b"),
+                    FOREIGN KEY ("aId") REFERENCES "A" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+                );
+                
+                -- CreateIndex
+                CREATE UNIQUE INDEX "1" ON "A"("a", "b");
+                
+                -- CreateIndex
+                CREATE UNIQUE INDEX "2" ON "A"("a", "b");
+                
+                -- CreateIndex
+                CREATE INDEX "A_a_idx" ON "A"("a");
+                
+                -- CreateIndex
+                CREATE UNIQUE INDEX "A_name_key" ON "A"("name");
+                
+                -- CreateIndex
+                CREATE INDEX "B_a_b_idx" ON "B"("a", "b");
+                "#
+            }} else {
+                ""
+            };
+
+            migration.assert_contents(expected_script)
+        })?;
+
+    Ok(())
+}

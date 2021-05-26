@@ -332,14 +332,17 @@ impl SqlRenderer for PostgresFlavour {
     fn render_create_table_as(&self, table: &TableWalker<'_>, table_name: &str) -> String {
         let columns: String = table.columns().map(|column| self.render_column(&column)).join(",\n");
 
-        let primary_columns = table.primary_key_column_names();
-        let pk_column_names = primary_columns
-            .into_iter()
-            .flat_map(|cols| cols.iter())
-            .map(|col| self.quote(col))
-            .join(",");
-        let pk = if !pk_column_names.is_empty() {
-            format!(",\n\n{}PRIMARY KEY ({})", SQL_INDENTATION, pk_column_names)
+        let pk = if let Some(pk) = table.primary_key() {
+            format!(
+                ",\n\n{}CONSTRAINT {} PRIMARY KEY ({})",
+                SQL_INDENTATION,
+                self.quote(pk.constraint_name.as_ref().unwrap()),
+                pk.columns
+                    .as_slice()
+                    .into_iter()
+                    .map(|col| self.quote(col.as_ref()))
+                    .join(",")
+            )
         } else {
             String::new()
         };

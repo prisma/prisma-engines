@@ -35,12 +35,11 @@ fn calculate_model_tables<'a>(
             .map(|field| column_for_scalar_field(&field, flavour))
             .collect();
 
-        let primary_key = Some(sql::PrimaryKey {
+        let primary_key = model.primary_key().map(|pk| sql::PrimaryKey {
             columns: model.id_fields().map(|field| field.db_name().to_owned()).collect(),
             sequence: None,
-            constraint_name: None,
-        })
-        .filter(|pk| !pk.columns.is_empty());
+            constraint_name: pk.name_in_db.clone(),
+        });
 
         let indices = model
             .indexes()

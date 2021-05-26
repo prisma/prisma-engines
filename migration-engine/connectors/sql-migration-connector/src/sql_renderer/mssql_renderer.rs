@@ -147,16 +147,15 @@ impl SqlRenderer for MssqlFlavour {
             .map(|column| self.render_column(&column))
             .join(",\n    ");
 
-        let primary_columns = table.primary_key_column_names();
-
-        let primary_key = if let Some(primary_columns) = primary_columns.as_ref().filter(|cols| !cols.is_empty()) {
-            let index_name = format!("PK__{}__{}", table.name(), primary_columns.iter().join("_"));
-            let column_names = primary_columns.iter().map(|col| self.quote(&col)).join(",");
-
+        let primary_key = if let Some(pk) = table.primary_key() {
             format!(
-                ",\n    CONSTRAINT {} PRIMARY KEY ({})",
-                self.quote(&index_name),
-                column_names
+                ",\n\n    CONSTRAINT {} PRIMARY KEY ({})",
+                self.quote(pk.constraint_name.as_ref().unwrap()),
+                pk.columns
+                    .as_slice()
+                    .into_iter()
+                    .map(|col| self.quote(col.as_ref()))
+                    .join(",")
             )
         } else {
             String::new()
