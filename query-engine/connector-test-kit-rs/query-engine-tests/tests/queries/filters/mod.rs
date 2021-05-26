@@ -12,6 +12,7 @@ pub mod json;
 pub mod json_path;
 pub mod list_filters;
 pub mod many_relation;
+pub mod one2one_regression;
 pub mod one_relation;
 pub mod where_unique;
 
