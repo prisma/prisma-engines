@@ -153,7 +153,7 @@ impl SqlRenderer for MssqlFlavour {
                 self.quote(pk.constraint_name.as_ref().unwrap()),
                 pk.columns
                     .as_slice()
-                    .into_iter()
+                    .iter()
                     .map(|col| self.quote(col.as_ref()))
                     .join(",")
             )
