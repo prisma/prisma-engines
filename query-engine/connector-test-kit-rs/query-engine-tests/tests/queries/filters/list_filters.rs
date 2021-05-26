@@ -22,7 +22,7 @@ mod lists {
             Some(1),
         )
         .await?;
-]
+
         Ok(())
     }
 
@@ -116,7 +116,6 @@ mod lists {
             None,
         )
         .await?;
-
 
         Ok(())
     }
@@ -297,8 +296,26 @@ mod json_lists {
     }
 }
 
-#[test_suite(schema(common_list_types), capabilities(Enums))]
+#[test_suite(schema(schema), capabilities(Enums))]
 mod enum_lists {
+    fn schema() -> String {
+        let schema = indoc! {
+            r#"
+            model TestModel {
+              #id(id, Int, @id)
+              enum TestEnum[]
+            }
+
+            enum TestEnum {
+                A
+                B
+            }
+            "#
+        };
+
+        schema.to_owned()
+    }
+
     #[connector_test]
     async fn equality(runner: &Runner) -> TestResult<()> {
         test_data(runner).await?;
