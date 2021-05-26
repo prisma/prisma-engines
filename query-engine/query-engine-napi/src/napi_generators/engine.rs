@@ -10,13 +10,15 @@ pub fn constructor(ctx: CallContext) -> napi::Result<JsUndefined> {
 
     let params: ConstructorOptions = ctx.env.from_js_value(options)?;
 
-    let mut log_callback = ctx
-        .env
-        .create_threadsafe_function(&callback, 0, |ctx: ThreadSafeCallContext<String>| {
-            ctx.env
-                .create_string_from_std(ctx.value)
-                .map(|js_string| vec![js_string])
-        })?;
+    let mut log_callback =
+        ctx.env
+            .create_threadsafe_function(&callback, 0, |mut ctx: ThreadSafeCallContext<String>| {
+                ctx.env.adjust_external_memory(ctx.value.len() as i64)?;
+
+                ctx.env
+                    .create_string_from_std(ctx.value)
+                    .map(|js_string| vec![js_string])
+            })?;
 
     log_callback.unref(&ctx.env)?;
 
@@ -34,7 +36,7 @@ pub fn connect(ctx: CallContext) -> napi::Result<JsObject> {
     let engine: QueryEngine = engine.clone();
 
     ctx.env
-        .execute_tokio_future(async move { Ok(engine.connect().await?) }, |&mut env, ()| {
+        .execute_tokio_future(async move { Ok(engine.connect().await?) }, |env, ()| {
             env.get_undefined()
         })
 }
@@ -46,7 +48,7 @@ pub fn disconnect(ctx: CallContext) -> napi::Result<JsObject> {
     let engine: QueryEngine = engine.clone();
 
     ctx.env
-        .execute_tokio_future(async move { Ok(engine.disconnect().await?) }, |&mut env, ()| {
+        .execute_tokio_future(async move { Ok(engine.disconnect().await?) }, |env, ()| {
             env.get_undefined()
         })
 }
@@ -63,10 +65,12 @@ pub fn query(ctx: CallContext) -> napi::Result<JsObject> {
     let body = ctx.env.from_js_value(query)?;
     let trace = ctx.env.from_js_value(trace)?;
 
-    ctx.env.execute_tokio_future(
-        async move { Ok(engine.query(body, trace).await?) },
-        |&mut env, response| env.create_string(&serde_json::to_string(&response).unwrap()),
-    )
+    ctx.env
+        .execute_tokio_future(async move { Ok(engine.query(body, trace).await?) }, |env, response| {
+            let res = serde_json::to_string(&response).unwrap();
+            env.adjust_external_memory(res.len() as i64)?;
+            env.create_string(&res)
+        })
 }
 
 #[js_function(0)]
@@ -76,7 +80,9 @@ pub fn sdl_schema(ctx: CallContext) -> napi::Result<JsObject> {
     let engine: QueryEngine = engine.clone();
 
     ctx.env
-        .execute_tokio_future(async move { Ok(engine.sdl_schema().await?) }, |&mut env, schema| {
-            env.create_string(&serde_json::to_string(&schema).unwrap())
+        .execute_tokio_future(async move { Ok(engine.sdl_schema().await?) }, |env, schema| {
+            let res = serde_json::to_string(&schema).unwrap();
+            env.adjust_external_memory(res.len() as i64)?;
+            env.create_string(&res)
         })
 }

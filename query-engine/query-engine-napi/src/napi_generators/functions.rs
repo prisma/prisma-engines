@@ -54,6 +54,8 @@ pub fn dmmf(ctx: CallContext) -> napi::Result<JsString> {
 
     let dmmf = dmmf::render_dmmf(&datamodel.subject, query_schema);
     let dmmf_string = serde_json::to_string(&dmmf).unwrap();
+
+    ctx.env.adjust_external_memory(dmmf_string.len() as i64)?;
     ctx.env.create_string(&dmmf_string)
 }
 
@@ -90,5 +92,8 @@ pub fn get_config(ctx: CallContext) -> napi::Result<JsUnknown> {
     }
 
     let serialized = datamodel::json::mcf::config_to_mcf_json_value(&config);
+    let s = serde_json::to_string(&serialized).unwrap();
+
+    ctx.env.adjust_external_memory(s.len() as i64)?;
     ctx.env.to_js_value(&serialized)
 }
