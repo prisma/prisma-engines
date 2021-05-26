@@ -5,6 +5,7 @@ import util.ConnectorCapability.JoinRelationLinksCapability
 import util.ConnectorTag.PostgresConnectorTag
 import util._
 
+// RS: Ported
 class ListFilterSpec extends FlatSpec with Matchers with ApiSpecBase with ConnectorAwareTest {
   override def runOnlyForConnectors: Set[ConnectorTag] = Set(PostgresConnectorTag)
 
