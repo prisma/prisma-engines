@@ -14,6 +14,7 @@ pub mod list_filters;
 pub mod many_relation;
 pub mod one2one_regression;
 pub mod one_relation;
+pub mod relation_null;
 pub mod where_unique;
 
 /// Creates test data used by filter tests using the `common_nullable_types` schema.
