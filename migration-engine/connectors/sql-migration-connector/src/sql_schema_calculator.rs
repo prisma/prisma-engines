@@ -3,7 +3,7 @@ mod sql_schema_calculator_flavour;
 pub(super) use sql_schema_calculator_flavour::SqlSchemaCalculatorFlavour;
 
 use crate::{flavour::SqlFlavour, sql_renderer::IteratorJoin};
-use datamodel::walkers::RelationFieldWalker;
+use datamodel::{walkers::RelationFieldWalker, Configuration};
 use datamodel::{
     walkers::{walk_models, walk_relations, ModelWalker, ScalarFieldWalker, TypeWalker},
     Datamodel, DefaultValue, FieldArity, IndexDefinition, IndexType, ScalarType,
@@ -11,7 +11,10 @@ use datamodel::{
 use prisma_value::PrismaValue;
 use sql_schema_describer::{self as sql, walkers::SqlSchemaExt, ColumnType, ForeignKeyAction};
 
-pub(crate) fn calculate_sql_schema(datamodel: &Datamodel, flavour: &dyn SqlFlavour) -> sql::SqlSchema {
+pub(crate) fn calculate_sql_schema(
+    (configuration, datamodel): (&Configuration, &Datamodel),
+    flavour: &dyn SqlFlavour,
+) -> sql::SqlSchema {
     let mut schema = sql::SqlSchema::empty();
 
     schema.enums = flavour.calculate_enums(datamodel);
@@ -21,6 +24,14 @@ pub(crate) fn calculate_sql_schema(datamodel: &Datamodel, flavour: &dyn SqlFlavo
 
     let relation_tables: Vec<_> = calculate_relation_tables(datamodel, flavour, &schema).collect();
     schema.tables.extend(relation_tables.into_iter());
+
+    // TODO: Don't generate the foreign keys in the first place, instead of
+    // removing them after the fact.
+    if configuration.planet_scale_mode() {
+        for table in &mut schema.tables {
+            table.foreign_keys.clear();
+        }
+    }
 
     schema
 }

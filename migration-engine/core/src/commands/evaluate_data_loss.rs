@@ -1,5 +1,5 @@
 use super::MigrationCommand;
-use crate::{parse_datamodel, CoreResult};
+use crate::{parse_schema, CoreResult};
 use migration_connector::{list_migrations, MigrationConnector};
 use serde::{Deserialize, Serialize};
 
@@ -58,10 +58,10 @@ impl MigrationCommand for EvaluateDataLoss {
         migration_connector::error_on_changed_provider(&input.migrations_directory_path, connector.connector_type())?;
 
         let migrations_from_directory = list_migrations(input.migrations_directory_path.as_ref())?;
-        let target_schema = parse_datamodel(&input.prisma_schema)?;
+        let target_schema = parse_schema(&input.prisma_schema)?;
 
         let migration = inferrer
-            .infer_next_migration(&migrations_from_directory, &target_schema)
+            .infer_next_migration(&migrations_from_directory, (&target_schema.0, &target_schema.1))
             .await?;
 
         let rendered_migration_steps = applier

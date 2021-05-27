@@ -27,7 +27,7 @@ pub async fn run(prisma_schema: &str, flags: BitFlags<QueryEngineFlags>) -> Core
 
     let api: Box<dyn GenericApi> = match &source.active_provider {
         _ if flags.contains(QueryEngineFlags::DatabaseCreationNotAllowed) => {
-            let api = SqlMigrationConnector::new(source, &url, None).await?;
+            let api = SqlMigrationConnector::new(&url, None).await?;
             api.reset().await?;
 
             Box::new(api)
@@ -43,7 +43,7 @@ pub async fn run(prisma_schema: &str, flags: BitFlags<QueryEngineFlags>) -> Core
         {
             // 1. creates schema & database
             SqlMigrationConnector::qe_setup(&url).await?;
-            Box::new(SqlMigrationConnector::new(source, &url, None).await?)
+            Box::new(SqlMigrationConnector::new(&url, None).await?)
         }
         #[cfg(feature = "mongodb")]
         provider if provider == MONGODB_SOURCE_NAME => {

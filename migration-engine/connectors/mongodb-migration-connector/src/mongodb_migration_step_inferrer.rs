@@ -1,3 +1,4 @@
+use datamodel::{Configuration, Datamodel};
 use migration_connector::DatabaseMigrationInferrer;
 
 use crate::{
@@ -7,12 +8,19 @@ use crate::{
 
 #[async_trait::async_trait]
 impl DatabaseMigrationInferrer<MongoDbMigration> for MongoDbMigrationConnector {
-    async fn infer(&self, next: &datamodel::Datamodel) -> migration_connector::ConnectorResult<MongoDbMigration> {
+    async fn infer(
+        &self,
+        next: (&Configuration, &Datamodel),
+    ) -> migration_connector::ConnectorResult<MongoDbMigration> {
         self.infer_from_empty(next)
     }
 
-    fn infer_from_empty(&self, next: &datamodel::Datamodel) -> migration_connector::ConnectorResult<MongoDbMigration> {
+    fn infer_from_empty(
+        &self,
+        next: (&Configuration, &Datamodel),
+    ) -> migration_connector::ConnectorResult<MongoDbMigration> {
         let steps = next
+            .1
             .models()
             .map(|model| {
                 let name = model.database_name.as_ref().unwrap_or(&model.name).to_owned();
@@ -26,7 +34,7 @@ impl DatabaseMigrationInferrer<MongoDbMigration> for MongoDbMigrationConnector {
     async fn infer_next_migration(
         &self,
         _previous_migrations: &[migration_connector::MigrationDirectory],
-        _target_schema: &datamodel::Datamodel,
+        _target_schema: (&Configuration, &Datamodel),
     ) -> migration_connector::ConnectorResult<MongoDbMigration> {
         todo!()
     }

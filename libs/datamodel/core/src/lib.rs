@@ -91,31 +91,47 @@ pub use crate::dml::*;
 pub use configuration::*;
 
 use crate::ast::SchemaAst;
-use crate::diagnostics::{ValidatedConfiguration, ValidatedDatamodel, ValidatedDatasources};
+use crate::diagnostics::{Validated, ValidatedConfiguration, ValidatedDatamodel, ValidatedDatasources};
 use transform::{
     ast_to_dml::{DatasourceLoader, GeneratorLoader, ValidationPipeline},
     dml_to_ast::{DatasourceSerializer, GeneratorSerializer, LowerDmlToAst},
 };
 
+/// Parse and validate the whole schema
+pub fn parse_schema(schema_str: &str) -> Result<Validated<(Configuration, Datamodel)>, diagnostics::Diagnostics> {
+    parse_datamodel_internal(schema_str, false)
+}
+
 /// Parses and validates a datamodel string, using core attributes only.
 pub fn parse_datamodel(datamodel_string: &str) -> Result<ValidatedDatamodel, diagnostics::Diagnostics> {
-    parse_datamodel_internal(datamodel_string, false)
+    parse_datamodel_internal(datamodel_string, false).map(|validated| Validated {
+        subject: validated.subject.1,
+        warnings: validated.warnings,
+    })
 }
 
 pub fn parse_datamodel_for_formatter(datamodel_string: &str) -> Result<ValidatedDatamodel, diagnostics::Diagnostics> {
-    parse_datamodel_internal(datamodel_string, true)
+    parse_datamodel_internal(datamodel_string, true).map(|validated| Validated {
+        subject: validated.subject.1,
+        warnings: validated.warnings,
+    })
 }
 
 /// Parses and validates a datamodel string, using core attributes only.
 /// In case of an error, a pretty, colorful string is returned.
 pub fn parse_datamodel_or_pretty_error(datamodel_string: &str, file_name: &str) -> Result<ValidatedDatamodel, String> {
-    parse_datamodel_internal(datamodel_string, false).map_err(|err| err.to_pretty_string(file_name, datamodel_string))
+    parse_datamodel_internal(datamodel_string, false)
+        .map_err(|err| err.to_pretty_string(file_name, datamodel_string))
+        .map(|validated| Validated {
+            subject: validated.subject.1,
+            warnings: validated.warnings,
+        })
 }
 
 fn parse_datamodel_internal(
     datamodel_string: &str,
     transform: bool,
-) -> Result<ValidatedDatamodel, diagnostics::Diagnostics> {
+) -> Result<Validated<(Configuration, Datamodel)>, diagnostics::Diagnostics> {
     let mut diagnostics = diagnostics::Diagnostics::new();
     let ast = ast::parse_schema(datamodel_string)?;
 
@@ -129,7 +145,16 @@ fn parse_datamodel_internal(
     match validator.validate(&ast, transform) {
         Ok(mut src) => {
             src.warnings.append(&mut diagnostics.warnings);
-            Ok(src)
+            Ok(Validated {
+                subject: (
+                    Configuration {
+                        generators: generators.subject,
+                        datasources: sources.subject,
+                    },
+                    src.subject,
+                ),
+                warnings: src.warnings,
+            })
         }
         Err(mut err) => {
             diagnostics.append(&mut err);

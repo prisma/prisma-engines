@@ -15,7 +15,7 @@ pub use core_error::{CoreError, CoreResult};
 use datamodel::{
     common::provider_names::{MSSQL_SOURCE_NAME, MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME},
     dml::Datamodel,
-    Datasource,
+    Configuration, Datasource,
 };
 use migration_connector::ConnectorError;
 use sql_migration_connector::SqlMigrationConnector;
@@ -58,13 +58,13 @@ pub async fn migration_api(datamodel: &str) -> CoreResult<Box<dyn api::GenericAp
                 u.query_pairs_mut().append_pair("statement_cache_size", "0");
             }
 
-            let connector = SqlMigrationConnector::new(source, u.as_str(), shadow_database_url).await?;
+            let connector = SqlMigrationConnector::new(u.as_str(), shadow_database_url).await?;
 
             Ok(Box::new(connector))
         }
         #[cfg(feature = "sql")]
         MYSQL_SOURCE_NAME | SQLITE_SOURCE_NAME | MSSQL_SOURCE_NAME => {
-            let connector = SqlMigrationConnector::new(source, &url, shadow_database_url).await?;
+            let connector = SqlMigrationConnector::new(&url, shadow_database_url).await?;
 
             Ok(Box::new(connector))
         }
@@ -136,8 +136,8 @@ fn parse_configuration(datamodel: &str) -> CoreResult<(Datasource, String, Optio
     Ok((source, url, shadow_database_url))
 }
 
-fn parse_datamodel(datamodel: &str) -> CoreResult<Datamodel> {
-    datamodel::parse_datamodel(&datamodel)
+fn parse_schema(schema: &str) -> CoreResult<(Configuration, Datamodel)> {
+    datamodel::parse_schema(&schema)
         .map(|d| d.subject)
-        .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", datamodel)))
+        .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", schema)))
 }
