@@ -90,8 +90,9 @@ pub mod walkers;
 pub use crate::dml::*;
 pub use configuration::*;
 
-use crate::ast::SchemaAst;
 use crate::diagnostics::{Validated, ValidatedConfiguration, ValidatedDatamodel, ValidatedDatasources};
+use crate::{ast::SchemaAst, common::preview_features::PreviewFeature};
+use std::collections::HashSet;
 use transform::{
     ast_to_dml::{DatasourceLoader, GeneratorLoader, ValidationPipeline},
     dml_to_ast::{DatasourceSerializer, GeneratorSerializer, LowerDmlToAst},
@@ -135,8 +136,9 @@ fn parse_datamodel_internal(
     let mut diagnostics = diagnostics::Diagnostics::new();
     let ast = ast::parse_schema(datamodel_string)?;
 
-    let sources = load_sources(&ast)?;
     let generators = GeneratorLoader::load_generators_from_ast(&ast)?;
+    let preview_features = generators.preview_features();
+    let sources = load_sources(&ast, &&preview_features)?;
     let validator = ValidationPipeline::new(&sources.subject);
 
     diagnostics.append_warning_vec(sources.warnings);
@@ -171,8 +173,9 @@ pub fn parse_schema_ast(datamodel_string: &str) -> Result<SchemaAst, diagnostics
 pub fn parse_configuration(schema: &str) -> Result<ValidatedConfiguration, diagnostics::Diagnostics> {
     let mut warnings = Vec::new();
     let ast = ast::parse_schema(schema)?;
-    let mut validated_sources = load_sources(&ast)?;
     let mut validated_generators = GeneratorLoader::load_generators_from_ast(&ast)?;
+    let preview_features = validated_generators.preview_features();
+    let mut validated_sources = load_sources(&ast, &preview_features)?;
 
     warnings.append(&mut validated_generators.warnings);
     warnings.append(&mut validated_sources.warnings);
@@ -186,9 +189,12 @@ pub fn parse_configuration(schema: &str) -> Result<ValidatedConfiguration, diagn
     })
 }
 
-fn load_sources(schema_ast: &SchemaAst) -> Result<ValidatedDatasources, diagnostics::Diagnostics> {
+fn load_sources(
+    schema_ast: &SchemaAst,
+    preview_features: &HashSet<&PreviewFeature>,
+) -> Result<ValidatedDatasources, diagnostics::Diagnostics> {
     let source_loader = DatasourceLoader::new();
-    source_loader.load_datasources_from_ast(&schema_ast)
+    source_loader.load_datasources_from_ast(&schema_ast, preview_features)
 }
 
 //

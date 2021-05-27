@@ -1,4 +1,4 @@
-pub mod datasources;
-pub mod generators;
+mod datasources;
+mod generators;
 mod nice_warnings;
-pub mod sources;
+mod sources;

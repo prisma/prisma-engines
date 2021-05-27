@@ -1,5 +1,3 @@
-use std::fmt::Write;
-
 pub use super::TestResult;
 pub use test_setup::{BitFlags, Capabilities, Tags};
 
@@ -12,6 +10,7 @@ use quaint::{prelude::SqlFamily, single::Quaint};
 use sql_introspection_connector::SqlIntrospectionConnector;
 use sql_migration_connector::SqlMigrationConnector;
 use sql_schema_describer::SqlSchema;
+use std::fmt::Write;
 use test_setup::{sqlite_test_url, DatasourceBlock, TestApiArgs};
 use tracing::Instrument;
 

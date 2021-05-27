@@ -5,7 +5,7 @@ use PreviewFeature::*;
 
 macro_rules! features {
     ($( $variant:ident $(,)? ),*) => {
-        #[derive(Debug, Copy, Clone, PartialEq)]
+        #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
         pub enum PreviewFeature {
             $(
                 $variant,

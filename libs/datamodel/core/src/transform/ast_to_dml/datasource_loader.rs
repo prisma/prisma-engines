@@ -6,10 +6,16 @@ use super::{
     },
     datasource_provider::DatasourceProvider,
 };
-use crate::diagnostics::{DatamodelError, Diagnostics, ValidatedDatasource, ValidatedDatasources};
-use crate::{ast, Datasource};
-use crate::{ast::Span, configuration::StringFromEnvVar};
-use std::collections::HashMap;
+use crate::{
+    ast::SourceConfig,
+    diagnostics::{DatamodelError, Diagnostics, ValidatedDatasource, ValidatedDatasources},
+};
+use crate::{ast::Span, common::preview_features::PreviewFeature, configuration::StringFromEnvVar};
+use crate::{
+    ast::{self},
+    Datasource,
+};
+use std::collections::{HashMap, HashSet};
 
 const PREVIEW_FEATURES_KEY: &str = "previewFeatures";
 const SHADOW_DATABASE_URL_KEY: &str = "shadowDatabaseUrl";
@@ -31,12 +37,16 @@ impl DatasourceLoader {
     /// Loads all datasources from the provided schema AST.
     /// - `ignore_datasource_urls`: datasource URLs are not parsed. They are replaced with dummy values.
     /// - `datasource_url_overrides`: datasource URLs are not parsed and overridden with the provided ones.
-    pub fn load_datasources_from_ast(&self, ast_schema: &ast::SchemaAst) -> Result<ValidatedDatasources, Diagnostics> {
+    pub fn load_datasources_from_ast(
+        &self,
+        ast_schema: &ast::SchemaAst,
+        preview_features: &HashSet<&PreviewFeature>,
+    ) -> Result<ValidatedDatasources, Diagnostics> {
         let mut sources = vec![];
         let mut diagnostics = Diagnostics::new();
 
         for src in &ast_schema.sources() {
-            match self.lift_datasource(&src) {
+            match self.lift_datasource(&src, preview_features) {
                 Ok(loaded_src) => {
                     diagnostics.append_warning_vec(loaded_src.warnings);
                     sources.push(loaded_src.subject)
@@ -82,7 +92,11 @@ impl DatasourceLoader {
         }
     }
 
-    fn lift_datasource(&self, ast_source: &ast::SourceConfig) -> Result<ValidatedDatasource, Diagnostics> {
+    fn lift_datasource(
+        &self,
+        ast_source: &ast::SourceConfig,
+        preview_features: &HashSet<&PreviewFeature>,
+    ) -> Result<ValidatedDatasource, Diagnostics> {
         let source_name = &ast_source.name.name;
         let args: HashMap<_, _> = ast_source
             .properties
@@ -174,7 +188,7 @@ impl DatasourceLoader {
                 documentation,
                 active_connector: datasource_provider.connector(),
                 shadow_database_url,
-                planet_scale_mode: get_planet_scale_mode_arg(&args)?,
+                planet_scale_mode: get_planet_scale_mode_arg(&args, preview_features, ast_source)?,
             },
             warnings: diagnostics.warnings,
         })
@@ -198,10 +212,40 @@ fn get_builtin_datasource_providers() -> Vec<Box<dyn DatasourceProvider>> {
     ]
 }
 
-fn get_planet_scale_mode_arg(args: &HashMap<&str, ValueValidator>) -> Result<bool, DatamodelError> {
-    args.get("planetScaleMode")
-        .map(|value| value.as_bool())
-        .unwrap_or(Ok(false))
+const PLANET_SCALE_PREVIEW_FEATURE_ERR: &str = r#"
+The `planetScaleMode` option can only be set if the preview feature is enabled in a generator block.
+
+Example:
+
+generator client {
+    provider = "prisma-client-js"
+    previewFeatures = ["planetScaleMode"]
+}
+"#;
+
+fn get_planet_scale_mode_arg(
+    args: &HashMap<&str, ValueValidator>,
+    preview_features: &HashSet<&PreviewFeature>,
+    source: &SourceConfig,
+) -> Result<bool, DatamodelError> {
+    let arg = args.get("planetScaleMode");
+
+    match arg {
+        None => Ok(false),
+        Some(value) => {
+            let mode_enabled = value.as_bool()?;
+
+            if mode_enabled && !preview_features.contains(&PreviewFeature::PlanetScaleMode) {
+                return Err(DatamodelError::new_source_validation_error(
+                    PLANET_SCALE_PREVIEW_FEATURE_ERR,
+                    &source.name.name,
+                    value.span(),
+                ));
+            }
+
+            Ok(mode_enabled)
+        }
+    }
 }
 
 fn preview_features_guardrail(args: &HashMap<&str, ValueValidator>) -> Result<(), DatamodelError> {
