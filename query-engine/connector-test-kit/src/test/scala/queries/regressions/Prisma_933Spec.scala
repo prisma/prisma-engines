@@ -4,6 +4,7 @@ import org.scalatest.{FlatSpec, Matchers}
 import util.ConnectorCapability.JoinRelationLinksCapability
 import util._
 
+// RS: Ported
 class Prisma_933Spec extends FlatSpec with Matchers with ApiSpecBase {
   // validates fix for
   //https://github.com/prisma/prisma-client-js/issues/933

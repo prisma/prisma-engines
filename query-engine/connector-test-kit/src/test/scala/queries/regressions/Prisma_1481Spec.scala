@@ -4,6 +4,7 @@ import org.scalatest.{FlatSpec, Matchers}
 import util.ConnectorTag.SQLiteConnectorTag
 import util._
 
+// RS: Ported
 class Prisma_1481Spec extends FlatSpec with Matchers with ApiSpecBase {
   override def runOnlyForConnectors: Set[ConnectorTag] = Set(SQLiteConnectorTag)
 

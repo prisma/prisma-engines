@@ -4,6 +4,7 @@ import org.scalatest.{FlatSpec, Matchers}
 import util.ConnectorCapability.JoinRelationLinksCapability
 import util._
 
+//RS: Won't port? Doesn't seem to do anything?
 class Prisma_5067Spec extends FlatSpec with Matchers with ApiSpecBase with SchemaBaseV11 {
   // validates fix for
   // https://github.com/prisma/prisma/issues/4146
