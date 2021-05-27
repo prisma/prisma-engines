@@ -572,11 +572,11 @@ fn index_tests(api: TestApi) {
                     `name` VARCHAR(191) NOT NULL,
                     `a` VARCHAR(191) NOT NULL,
                     `b` VARCHAR(191) NOT NULL,
+                
                     UNIQUE INDEX `1`(`a`, `b`),
                     UNIQUE INDEX `2`(`a`, `b`),
                     INDEX `A_a_idx`(`a`),
                     UNIQUE INDEX `A_name_key`(`name`),
-                
                     PRIMARY KEY (`id`)
                 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
                 
@@ -585,9 +585,9 @@ fn index_tests(api: TestApi) {
                     `a` VARCHAR(191) NOT NULL,
                     `b` VARCHAR(191) NOT NULL,
                     `aId` INTEGER NOT NULL,
-                    INDEX `B_a_b_idx`(`a`, `b`),
                 
-                    PRIMARY KEY (`a`,`b`)
+                    INDEX `B_a_b_idx`(`a`, `b`),
+                    PRIMARY KEY (`a`, `b`)
                 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
                 
                 -- AddForeignKey

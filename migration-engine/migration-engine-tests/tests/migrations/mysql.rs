@@ -248,12 +248,11 @@ fn native_type_columns_can_be_created(api: TestApi) {
         r#"
         model A {
             id Int @id
-        }
         "#,
     );
 
     for (field_name, prisma_type, native_type, _) in types {
-        writeln!(&mut dm, "    {} {} @mysql.{}", field_name, prisma_type, native_type).unwrap();
+        writeln!(&mut dm, "    {} {} @db.{}", field_name, prisma_type, native_type).unwrap();
     }
 
     dm.push_str("}\n");
@@ -281,7 +280,7 @@ fn default_current_timestamp_precision_follows_column_precision(api: TestApi) {
         r#"
             model A {
                 id Int @id
-                createdAt DateTime @test_db.DateTime(7) @default(now())
+                createdAt DateTime @db.DateTime(7) @default(now())
             }
         "#,
     );
