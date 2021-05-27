@@ -1,9 +1,8 @@
 use crate::{
     connect, connection_wrapper::Connection, error::quaint_error_to_connector_error, SqlFlavour, SqlMigrationConnector,
 };
-use enumflags2::BitFlags;
 use indoc::indoc;
-use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory, MigrationFeature};
+use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
 use quaint::{connector::PostgresUrl, error::ErrorKind as QuaintKind};
 use sql_schema_describer::{DescriberErrorKind, SqlSchema, SqlSchemaDescriberBackend};
 use std::collections::HashMap;
@@ -18,21 +17,17 @@ const ADVISORY_LOCK_TIMEOUT: std::time::Duration = std::time::Duration::from_sec
 
 pub(crate) struct PostgresFlavour {
     url: PostgresUrl,
-    features: BitFlags<MigrationFeature>,
 }
 
 impl std::fmt::Debug for PostgresFlavour {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("PostgresFlavour")
-            .field("features", &self.features)
-            .field("url", &"<REDACTED>")
-            .finish()
+        f.debug_struct("PostgresFlavour").field("url", &"<REDACTED>").finish()
     }
 }
 
 impl PostgresFlavour {
-    pub fn new(url: PostgresUrl, features: BitFlags<MigrationFeature>) -> Self {
-        Self { url, features }
+    pub fn new(url: PostgresUrl) -> Self {
+        Self { url }
     }
 
     pub(crate) fn schema_name(&self) -> &str {
@@ -95,19 +90,24 @@ impl SqlFlavour for PostgresFlavour {
     async fn acquire_lock(&self, connection: &Connection) -> ConnectorResult<()> {
         // https://www.postgresql.org/docs/current/explicit-locking.html#ADVISORY-LOCKS
 
+        // 72707369 is a unique number we chose to identify Migrate. It does not
+        // have any meaning, but it should not be used by any other tool.
         tokio::time::timeout(
             ADVISORY_LOCK_TIMEOUT,
             connection.raw_cmd("SELECT pg_advisory_lock(72707369)"),
         )
         .await
         .map_err(|_elapsed| {
-            ConnectorError::user_facing_error(user_facing_errors::common::DatabaseTimeout {
+            ConnectorError::user_facing(user_facing_errors::common::DatabaseTimeout {
                 database_host: connection.connection_info().host().to_owned(),
                 database_port: connection
                     .connection_info()
                     .port()
                     .map(|port| port.to_string())
                     .unwrap_or_else(|| "<unknown>".into()),
+                context: format!(
+                    "Timed out trying to acquire a postgres advisory lock (SELECT pg_advisory_lock(72707369)). Elapsed: {}ms. See https://pris.ly/d/migrate-advisory-locking for details.", ADVISORY_LOCK_TIMEOUT.as_millis()
+                ),
             })
         })??;
 
@@ -172,7 +172,7 @@ impl SqlFlavour for PostgresFlavour {
     }
 
     async fn describe_schema<'a>(&'a self, connection: &Connection) -> ConnectorResult<SqlSchema> {
-        sql_schema_describer::postgres::SqlSchemaDescriber::new(connection.quaint().clone())
+        sql_schema_describer::postgres::SqlSchemaDescriber::new(connection.quaint().clone(), Default::default())
             .describe(connection.connection_info().schema_name())
             .await
             .map_err(|err| match err.into_kind() {
@@ -326,10 +326,6 @@ impl SqlFlavour for PostgresFlavour {
 
         sql_schema_result
     }
-
-    fn features(&self) -> BitFlags<MigrationFeature> {
-        self.features
-    }
 }
 
 fn strip_schema_param_from_url(url: &mut Url) {
@@ -371,7 +367,7 @@ async fn create_postgres_admin_conn(mut url: Url) -> ConnectorResult<Connection>
     }
 
     let conn = conn.ok_or_else(|| {
-        ConnectorError::user_facing_error(migration_engine::DatabaseCreationFailed { database_error: "Prisma could not connect to a default database (`postgres` or `template1`), it cannot create the specified database.".to_owned() })
+        ConnectorError::user_facing(migration_engine::DatabaseCreationFailed { database_error: "Prisma could not connect to a default database (`postgres` or `template1`), it cannot create the specified database.".to_owned() })
     })??;
 
     Ok(conn)
@@ -385,7 +381,7 @@ mod tests {
     fn debug_impl_does_not_leak_connection_info() {
         let url = "postgresql://myname:mypassword@myserver:8765/mydbname";
 
-        let flavour = PostgresFlavour::new(PostgresUrl::new(url.parse().unwrap()).unwrap(), BitFlags::default());
+        let flavour = PostgresFlavour::new(PostgresUrl::new(url.parse().unwrap()).unwrap());
         let debugged = format!("{:?}", flavour);
 
         let words = &["myname", "mypassword", "myserver", "8765", "mydbname"];

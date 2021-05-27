@@ -1,4 +1,4 @@
-use crate::constants::inputs::args;
+use crate::constants::args::*;
 
 use super::*;
 use datamodel_connector::ConnectorCapability;
@@ -102,9 +102,9 @@ fn create_execute_raw_field() -> OutputField {
     field(
         "executeRaw",
         vec![
-            input_field(args::QUERY, InputType::string(), None),
+            input_field(QUERY, InputType::string(), None),
             input_field(
-                args::PARAMETERS,
+                PARAMETERS,
                 InputType::json_list(),
                 Some(dml::DefaultValue::Single(PrismaValue::String("[]".into()))),
             )
@@ -122,9 +122,9 @@ fn create_query_raw_field() -> OutputField {
     field(
         "queryRaw",
         vec![
-            input_field(args::QUERY, InputType::string(), None),
+            input_field(QUERY, InputType::string(), None),
             input_field(
-                args::PARAMETERS,
+                PARAMETERS,
                 InputType::json_list(),
                 Some(dml::DefaultValue::Single(PrismaValue::String("[]".into()))),
             )

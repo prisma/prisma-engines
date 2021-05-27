@@ -3,10 +3,33 @@ use indoc::formatdoc;
 use indoc::indoc;
 use introspection_engine_tests::test_api::*;
 use quaint::prelude::Queryable;
-use test_macros::test_each_connector;
+use test_macros::test_connector;
 
-#[test_each_connector]
-async fn remapping_fields_with_invalid_characters(api: &TestApi) -> crate::TestResult {
+#[test_connector(tags(Postgres))]
+async fn should_not_remap_if_renaming_would_lead_to_duplicate_names(api: &TestApi) -> TestResult {
+    api.database()
+        .raw_cmd("CREATE TABLE nodes(id serial primary key)")
+        .await?;
+
+    api.database()
+        .raw_cmd(
+            "CREATE TABLE _nodes(
+                node_a int not null,
+                node_b int not null,
+                constraint _nodes_node_a_fkey foreign key(node_a) references nodes(id) on delete cascade on update cascade,
+                constraint _nodes_node_b_fkey foreign key(node_b) references nodes(id) on delete cascade on update cascade
+            )
+        ",
+        )
+        .await?;
+
+    assert!(api.introspect().await.is_ok());
+
+    Ok(())
+}
+
+#[test_connector]
+async fn remapping_fields_with_invalid_characters(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -51,8 +74,8 @@ async fn remapping_fields_with_invalid_characters(api: &TestApi) -> crate::TestR
     Ok(())
 }
 
-#[test_each_connector]
-async fn remapping_tables_with_invalid_characters(api: &TestApi) -> crate::TestResult {
+#[test_connector]
+async fn remapping_tables_with_invalid_characters(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("?User", |t| {
@@ -86,8 +109,8 @@ async fn remapping_tables_with_invalid_characters(api: &TestApi) -> crate::TestR
     Ok(())
 }
 
-#[test_each_connector]
-async fn remapping_models_in_relations(api: &TestApi) -> crate::TestResult {
+#[test_connector]
+async fn remapping_models_in_relations(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User with Space", |t| {
@@ -127,8 +150,8 @@ async fn remapping_models_in_relations(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector]
-async fn remapping_models_in_relations_should_not_map_virtual_fields(api: &TestApi) -> crate::TestResult {
+#[test_connector]
+async fn remapping_models_in_relations_should_not_map_virtual_fields(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -169,8 +192,8 @@ async fn remapping_models_in_relations_should_not_map_virtual_fields(api: &TestA
     Ok(())
 }
 
-#[test_each_connector]
-async fn remapping_models_in_compound_relations(api: &TestApi) -> crate::TestResult {
+#[test_connector]
+async fn remapping_models_in_compound_relations(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
             migration.create_table("User with Space", move |t| {
@@ -222,8 +245,8 @@ async fn remapping_models_in_compound_relations(api: &TestApi) -> crate::TestRes
     Ok(())
 }
 
-#[test_each_connector]
-async fn remapping_fields_in_compound_relations(api: &TestApi) -> crate::TestResult {
+#[test_connector]
+async fn remapping_fields_in_compound_relations(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
             migration.create_table("User", move |t| {
@@ -274,13 +297,13 @@ async fn remapping_fields_in_compound_relations(api: &TestApi) -> crate::TestRes
     Ok(())
 }
 
-#[test_each_connector(capabilities("enums"))]
-async fn remapping_enum_names(api: &TestApi) -> crate::TestResult {
+#[test_connector(capabilities(Enums))]
+async fn remapping_enum_names(api: &TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
     if sql_family.is_postgres() {
         api.database()
-            .execute_raw("CREATE TYPE \"123color\" AS ENUM ('black')", &[])
+            .raw_cmd("CREATE TYPE \"123color\" AS ENUM ('black')")
             .await?;
     }
 
@@ -330,8 +353,8 @@ async fn remapping_enum_names(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector(capabilities("enums"))]
-async fn remapping_enum_values(api: &TestApi) -> crate::TestResult {
+#[test_connector(capabilities(Enums))]
+async fn remapping_enum_values(api: &TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
     if sql_family.is_postgres() {
@@ -378,8 +401,8 @@ async fn remapping_enum_values(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector(capabilities("enums"))]
-async fn remapping_enum_default_values(api: &TestApi) -> crate::TestResult {
+#[test_connector(capabilities(Enums))]
+async fn remapping_enum_default_values(api: &TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
     if sql_family.is_postgres() {
@@ -426,8 +449,8 @@ async fn remapping_enum_default_values(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector]
-async fn remapping_compound_primary_keys(api: &TestApi) -> crate::TestResult {
+#[test_connector]
+async fn remapping_compound_primary_keys(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -451,12 +474,9 @@ async fn remapping_compound_primary_keys(api: &TestApi) -> crate::TestResult {
 
     Ok(())
 }
-//todo
-//invalid names for compound index
-//invalid names for compound id
 
-#[test_each_connector]
-async fn not_automatically_remapping_invalid_compound_unique_key_names(api: &TestApi) -> crate::TestResult {
+#[test_connector]
+async fn not_automatically_remapping_invalid_compound_unique_key_names(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -487,8 +507,8 @@ async fn not_automatically_remapping_invalid_compound_unique_key_names(api: &Tes
     Ok(())
 }
 
-#[test_each_connector]
-async fn not_automatically_remapping_invalid_compound_primary_key_names(api: &TestApi) -> crate::TestResult {
+#[test_connector]
+async fn not_automatically_remapping_invalid_compound_primary_key_names(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -518,6 +538,5 @@ async fn not_automatically_remapping_invalid_compound_primary_key_names(api: &Te
     "#, pk_name};
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);
-
     Ok(())
 }

@@ -13,9 +13,11 @@ impl AttributeValidator<dml::Field> for IdAttributeValidator {
         &"id"
     }
 
-    fn validate_and_apply(&self, args: &mut Arguments, obj: &mut dml::Field) -> Result<(), DatamodelError> {
+    fn validate_and_apply(&self, args: &mut Arguments<'_>, obj: &mut dml::Field) -> Result<(), DatamodelError> {
         if let dml::Field::ScalarField(sf) = obj {
-            let name_in_db = args.optional_default_arg("map")?.map(|v| v.as_str().unwrap());
+            let name_in_db = args
+                .optional_default_arg("map")?
+                .map(|v| v.as_str().unwrap().to_string());
 
             sf.primary_key = Some(PrimaryKeyDefinition {
                 // if this is none, the default name needs to be set one level higher since we do not have the model name here -.-
@@ -63,7 +65,7 @@ impl AttributeValidator<dml::Model> for ModelLevelIdAttributeValidator {
         "id"
     }
 
-    fn validate_and_apply(&self, args: &mut Arguments, obj: &mut dml::Model) -> Result<(), DatamodelError> {
+    fn validate_and_apply(&self, args: &mut Arguments<'_>, obj: &mut dml::Model) -> Result<(), DatamodelError> {
         if obj.fields.iter().any(|f| f.is_id()) {
             return Err(DatamodelError::new_model_validation_error(
                 "Each model must have at most one id criteria. You can't have `@id` and `@@id` at the same time.",
@@ -80,8 +82,8 @@ impl AttributeValidator<dml::Model> for ModelLevelIdAttributeValidator {
             .collect::<Result<Vec<_>, _>>()?;
 
         let (name_in_client, name_in_db) = match (
-            args.optional_arg("name").map(|v| v.as_str().unwrap()),
-            args.optional_arg("map").map(|v| v.as_str().unwrap()),
+            args.optional_arg("name").map(|v| v.as_str().unwrap().to_string()),
+            args.optional_arg("map").map(|v| v.as_str().unwrap().to_string()),
         ) {
             (Some(client_name), Some(db_name)) => (Some(client_name), Some(db_name)),
             (Some(client_name), None) => (Some(client_name), None),

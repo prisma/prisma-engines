@@ -18,8 +18,6 @@ pub mod type_names {
     pub const DATE: &str = "Date";
     pub const TIMESTAMP: &str = "Timestamp";
     pub const DECIMAL: &str = "Decimal";
-    pub const MIN_KEY: &str = "MinKey";
-    pub const MAX_KEY: &str = "MaxKey";
 }
 
 lazy_static! {
@@ -33,7 +31,6 @@ lazy_static! {
             (ScalarType::String, MongoDbType::String),
             (ScalarType::DateTime, MongoDbType::Timestamp),
             (ScalarType::Bytes, MongoDbType::BinData),
-            (ScalarType::Json, MongoDbType::Object), // Not really correct. Can be array or object.
         ]
         .into_iter()
         .collect()
@@ -60,8 +57,6 @@ pub(crate) fn available_types() -> Vec<NativeTypeConstructor> {
         NativeTypeConstructor::without_args(DATE, vec![ScalarType::DateTime]),
         NativeTypeConstructor::without_args(TIMESTAMP, vec![ScalarType::DateTime]),
         NativeTypeConstructor::without_args(DECIMAL, vec![ScalarType::Decimal]),
-        NativeTypeConstructor::without_args(MIN_KEY, vec![ScalarType::Int]),
-        NativeTypeConstructor::without_args(MAX_KEY, vec![ScalarType::Int]),
         NativeTypeConstructor::with_args(ARRAY, 1, all_types()),
     ]
 }
@@ -79,8 +74,6 @@ pub(crate) fn mongo_type_from_input(name: &str, args: &[String]) -> crate::Resul
         DATE => MongoDbType::Date,
         TIMESTAMP => MongoDbType::Timestamp,
         DECIMAL => MongoDbType::Decimal,
-        MIN_KEY => MongoDbType::MinKey,
-        MAX_KEY => MongoDbType::MaxKey,
         name => {
             return Err(ConnectorError {
                 kind: ErrorKind::NativeTypeNameUnknown {

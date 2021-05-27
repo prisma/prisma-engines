@@ -21,6 +21,7 @@ impl PrismaValueExtensions for PrismaValue {
             (val @ PrismaValue::DateTime(_), TypeIdentifier::DateTime) => val,
             (val @ PrismaValue::Enum(_), TypeIdentifier::Enum(_)) => val,
             (val @ PrismaValue::Uuid(_), TypeIdentifier::UUID) => val,
+            (val @ PrismaValue::BigInt(_), TypeIdentifier::BigInt) => val,
 
             // Valid String coercions
             (PrismaValue::Int(i), TypeIdentifier::String) => PrismaValue::String(format!("{}", i)),
@@ -40,6 +41,10 @@ impl PrismaValueExtensions for PrismaValue {
                 }
             },
             (PrismaValue::Float(f), TypeIdentifier::Int) => PrismaValue::Int(f.to_i64().unwrap()),
+            (PrismaValue::BigInt(i), TypeIdentifier::Int) => PrismaValue::Int(i),
+
+            // Valid BigInt coersions
+            (PrismaValue::Int(i), TypeIdentifier::BigInt) => PrismaValue::BigInt(i),
 
             // Todo other coercions here
 

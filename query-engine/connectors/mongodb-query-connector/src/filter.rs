@@ -140,6 +140,7 @@ fn default_scalar_filter(field: &ScalarFieldRef, condition: ScalarCondition) -> 
         ScalarCondition::NotIn(vals) => {
             doc! { "$nin": vals.into_iter().map(|val| (field, val).into_bson()).collect::<crate::Result<Vec<_>>>()? }
         }
+        ScalarCondition::JsonCompare(_) => unimplemented!("JSON filtering is not yet supported on MongoDB"),
     })
 }
 
@@ -182,6 +183,7 @@ fn insensitive_scalar_filter(field: &ScalarFieldRef, condition: ScalarCondition)
         ScalarCondition::NotIn(vals) => {
             doc! { "$nin": to_regex_list(field, "^", vals, "$", true)? }
         }
+        ScalarCondition::JsonCompare(_) => unimplemented!("JSON filtering is not yet supported on MongoDB"),
     })
 }
 

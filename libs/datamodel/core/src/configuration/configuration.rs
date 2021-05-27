@@ -1,6 +1,8 @@
 use super::{Datasource, Generator};
-use crate::diagnostics::{DatamodelError, Diagnostics};
-use crate::preview_features::PreviewFeatures;
+use crate::{
+    common::preview_features::PreviewFeature,
+    diagnostics::{DatamodelError, Diagnostics},
+};
 
 pub struct Configuration {
     pub generators: Vec<Generator>,
@@ -20,9 +22,24 @@ impl Configuration {
         }
     }
 
-    pub fn preview_features(&self) -> impl Iterator<Item = &str> {
+    pub fn preview_features(&self) -> impl Iterator<Item = &PreviewFeature> {
         self.generators
             .iter()
-            .flat_map(|generator| generator.preview_features().iter().map(|feat| feat.as_str()))
+            .flat_map(|generator| generator.preview_features.iter())
+    }
+
+    pub fn resolve_datasource_urls_from_env(&mut self, url_overrides: &[(String, String)]) -> Result<(), Diagnostics> {
+        for datasource in &mut self.datasources {
+            if let Some((_, url)) = url_overrides.iter().find(|(name, _url)| name == &datasource.name) {
+                datasource.url.value = Some(url.clone());
+                datasource.url.from_env_var = None;
+            }
+
+            if datasource.url.from_env_var.is_some() && datasource.url.value.is_none() {
+                datasource.url.value = Some(datasource.load_url()?);
+            }
+        }
+
+        Ok(())
     }
 }

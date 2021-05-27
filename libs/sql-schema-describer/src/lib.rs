@@ -7,7 +7,8 @@ pub use error::{DescriberError, DescriberErrorKind, DescriberResult};
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
-use std::{borrow::Cow, fmt::Debug};
+use serde::{Deserialize, Serialize};
+use std::fmt::Debug;
 use walkers::{EnumWalker, TableWalker, UserDefinedTypeWalker, ViewWalker};
 
 pub mod getters;
@@ -16,7 +17,6 @@ pub mod mysql;
 pub mod postgres;
 pub mod sqlite;
 pub mod walkers;
-use serde::{Deserialize, Serialize};
 
 pub(crate) mod common;
 mod error;
@@ -58,14 +58,12 @@ pub struct SqlSchema {
     pub procedures: Vec<Procedure>,
     /// The user-defined types procedures.
     pub user_defined_types: Vec<UserDefinedType>,
-    /// The database lowercases all identifiers.
-    pub lower_case_identifiers: bool,
 }
 
 impl SqlSchema {
     /// Get a table.
     pub fn get_table(&self, name: &str) -> Option<&Table> {
-        self.tables.iter().find(|x| x.name == self.normalize(name).as_ref())
+        self.tables.iter().find(|x| x.name == name)
     }
 
     /// Get a view.
@@ -104,7 +102,7 @@ impl SqlSchema {
     }
 
     pub fn table(&self, name: &str) -> core::result::Result<&Table, String> {
-        match self.tables.iter().find(|t| t.name == self.normalize(name).as_ref()) {
+        match self.tables.iter().find(|t| t.name == name) {
             Some(t) => Ok(t),
             None => Err(name.to_string()),
         }
@@ -140,14 +138,6 @@ impl SqlSchema {
             schema: self,
             enum_index,
         })
-    }
-
-    fn normalize<'a>(&self, s: &'a str) -> Cow<'a, str> {
-        if self.lower_case_identifiers {
-            s.to_lowercase().into()
-        } else {
-            s.into()
-        }
     }
 }
 
@@ -370,22 +360,15 @@ pub enum ColumnTypeFamily {
 }
 
 impl ColumnTypeFamily {
-    /// Lower-cased variants
-    pub fn normalized(self, table_name: &str) -> Self {
-        match self {
-            Self::Enum(s) if s.starts_with(table_name) => {
-                let e = s.replacen(table_name, &table_name.to_lowercase(), 1);
-                Self::Enum(e)
-            }
-            _ => self,
-        }
-    }
-
     pub fn as_enum(&self) -> Option<&str> {
         match self {
             ColumnTypeFamily::Enum(name) => Some(name),
             _ => None,
         }
+    }
+
+    pub fn is_bigint(&self) -> bool {
+        matches!(self, ColumnTypeFamily::BigInt)
     }
 
     pub fn is_boolean(&self) -> bool {
@@ -406,6 +389,10 @@ impl ColumnTypeFamily {
 
     pub fn is_json(&self) -> bool {
         matches!(self, ColumnTypeFamily::Json)
+    }
+
+    pub fn is_string(&self) -> bool {
+        matches!(self, ColumnTypeFamily::String)
     }
 }
 
@@ -456,6 +443,12 @@ pub enum ForeignKeyAction {
     /// referenced table matching the default values, if they are not null, or the operation
     /// will fail).
     SetDefault,
+}
+
+impl ForeignKeyAction {
+    pub fn is_cascade(&self) -> bool {
+        matches!(self, ForeignKeyAction::Cascade)
+    }
 }
 
 /// A foreign key.

@@ -3,7 +3,7 @@ use crate::introspection::introspect;
 use crate::introspection_helpers::*;
 use crate::prisma_1_defaults::*;
 use crate::re_introspection::enrich;
-use crate::sanitize_datamodel_names::sanitize_datamodel_names;
+use crate::sanitize_datamodel_names::{sanitization_leads_to_duplicate_names, sanitize_datamodel_names};
 use crate::version_checker::VersionChecker;
 use crate::SqlIntrospectionResult;
 use datamodel::Datamodel;
@@ -26,8 +26,10 @@ pub fn calculate_datamodel(
     // 1to1 translation of the sql schema
     introspect(schema, &mut version_check, &mut data_model, *family)?;
 
-    // our opinionation about valid names
-    sanitize_datamodel_names(&mut data_model, family);
+    if !sanitization_leads_to_duplicate_names(&data_model) {
+        // our opinionation about valid names
+        sanitize_datamodel_names(&mut data_model, family);
+    }
 
     // deduplicating relation field names
     deduplicate_relation_field_names(&mut data_model);
@@ -51,8 +53,8 @@ pub fn calculate_datamodel(
     debug!("Done calculating data model {:?}", data_model);
     Ok(IntrospectionResult {
         data_model,
-        version,
         warnings,
+        version,
     })
 }
 
@@ -158,7 +160,6 @@ mod tests {
             sequences: vec![],
             views: vec![],
             user_defined_types: vec![],
-            lower_case_identifiers: false,
         };
         let introspection_result =
             calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new()).expect("calculate data model");
@@ -304,7 +305,6 @@ mod tests {
         };
 
         let schema = SqlSchema {
-            lower_case_identifiers: false,
             procedures: vec![],
             tables: vec![
                 Table {
@@ -435,7 +435,6 @@ mod tests {
         };
 
         let schema = SqlSchema {
-            lower_case_identifiers: false,
             views: vec![],
             procedures: vec![],
             tables: vec![Table {
@@ -645,7 +644,6 @@ mod tests {
         };
 
         let schema = SqlSchema {
-            lower_case_identifiers: false,
             views: vec![],
             procedures: vec![],
             tables: vec![
@@ -827,7 +825,6 @@ mod tests {
         };
 
         let schema = SqlSchema {
-            lower_case_identifiers: false,
             views: vec![],
             procedures: vec![],
             tables: vec![Table {
@@ -1032,7 +1029,6 @@ mod tests {
         };
 
         let schema = SqlSchema {
-            lower_case_identifiers: false,
             views: vec![],
             procedures: vec![],
             tables: vec![
@@ -1159,7 +1155,6 @@ mod tests {
             }],
             sequences: vec![],
             user_defined_types: vec![],
-            lower_case_identifiers: false,
         };
         let introspection_result =
             calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new()).expect("calculate data model");

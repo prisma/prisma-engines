@@ -1,5 +1,7 @@
 use anyhow::Context;
-use migration_core::{commands::CreateMigrationInput, commands::CreateMigrationOutput, CoreResult, GenericApi};
+use migration_core::{
+    commands::CreateMigrationInput, commands::CreateMigrationOutput, CoreError, CoreResult, GenericApi,
+};
 use pretty_assertions::assert_eq;
 use std::path::Path;
 use tempfile::TempDir;
@@ -12,6 +14,7 @@ pub struct CreateMigration<'a> {
     migrations_directory: &'a TempDir,
     draft: bool,
     name: &'a str,
+    rt: Option<&'a tokio::runtime::Runtime>,
 }
 
 impl<'a> CreateMigration<'a> {
@@ -22,7 +25,20 @@ impl<'a> CreateMigration<'a> {
             migrations_directory,
             draft: false,
             name,
+            rt: None,
         }
+    }
+
+    pub fn new_sync(
+        api: &'a dyn GenericApi,
+        name: &'a str,
+        schema: &'a str,
+        migrations_directory: &'a TempDir,
+        rt: &'a tokio::runtime::Runtime,
+    ) -> Self {
+        let mut initial = Self::new(api, name, schema, migrations_directory);
+        initial.rt = Some(rt);
+        initial
     }
 
     pub fn draft(mut self, draft: bool) -> Self {
@@ -48,6 +64,16 @@ impl<'a> CreateMigration<'a> {
             migrations_directory: self.migrations_directory,
         })
     }
+
+    #[track_caller]
+    pub fn send_sync(self) -> CreateMigrationAssertion<'a> {
+        self.rt.unwrap().block_on(self.send()).unwrap()
+    }
+
+    #[track_caller]
+    pub fn send_unwrap_err(self) -> CoreError {
+        self.rt.unwrap().block_on(self.send()).unwrap_err()
+    }
 }
 
 pub struct CreateMigrationAssertion<'a> {
@@ -65,13 +91,15 @@ impl std::fmt::Debug for CreateMigrationAssertion<'_> {
 impl<'a> CreateMigrationAssertion<'a> {
     /// Assert that there are `expected_count` migrations in the migrations directory.
     #[tracing::instrument(skip(self))]
-    pub fn assert_migration_directories_count(self, expected_count: usize) -> AssertionResult<Self> {
+    #[track_caller]
+    pub fn assert_migration_directories_count(self, expected_count: usize) -> Self {
         let mut count = 0;
 
         for entry in std::fs::read_dir(self.migrations_directory.path())
-            .context("Counting directories in migrations directory.")?
+            .context("Counting directories in migrations directory.")
+            .unwrap()
         {
-            let entry = entry?;
+            let entry = entry.unwrap();
 
             if entry.path().file_name().and_then(|s| s.to_str()) == Some("migration_lock.toml") {
                 continue;
@@ -80,7 +108,7 @@ impl<'a> CreateMigrationAssertion<'a> {
             count += 1;
         }
 
-        anyhow::ensure!(
+        assert!(
             // the lock file is counted as an entry
             expected_count == count,
             "Assertion failed. Expected {expected} migrations in the migrations directory, found {actual}.",
@@ -88,16 +116,17 @@ impl<'a> CreateMigrationAssertion<'a> {
             actual = count
         );
 
-        Ok(self)
+        self
     }
 
     /// Assert that there is one migration with `name_matcher` contained in its name present in the migration directory.
-    pub fn assert_migration<F>(self, name_matcher: &str, assertions: F) -> AssertionResult<Self>
+    pub fn assert_migration<F>(self, name_matcher: &str, assertions: F) -> Self
     where
         F: for<'b> FnOnce(MigrationAssertion<'b>) -> AssertionResult<MigrationAssertion<'b>>,
     {
         let migration = std::fs::read_dir(self.migrations_directory.path())
-            .context("Reading migrations directory for named migration.")?
+            .context("Reading migrations directory for named migration.")
+            .unwrap()
             .find_map(|entry| {
                 let entry = entry.unwrap();
                 let name = entry.file_name();
@@ -114,22 +143,23 @@ impl<'a> CreateMigrationAssertion<'a> {
                 let path = migration.path();
                 let assertion = MigrationAssertion { path: path.as_ref() };
 
-                assertions(assertion)?;
+                assertions(assertion).unwrap();
             }
-            None => anyhow::bail!(
+            None => panic!(
                 "Assertion error. Could not find migration with name matching `{}`",
                 name_matcher
             ),
         }
 
-        Ok(self)
+        self
     }
 
     pub fn output(&self) -> &CreateMigrationOutput {
         &self.output
     }
 
-    pub fn modify_migration<F>(self, modify: F) -> AssertionResult<Self>
+    #[track_caller]
+    pub fn modify_migration<F>(self, modify: F) -> Self
     where
         F: FnOnce(&mut String),
     {
@@ -142,17 +172,19 @@ impl<'a> CreateMigrationAssertion<'a> {
             .join("migration.sql");
 
         let new_contents = {
-            let mut contents = std::fs::read_to_string(&migration_script_path).context("Reading migration script")?;
+            let mut contents = std::fs::read_to_string(&migration_script_path)
+                .context("Reading migration script")
+                .unwrap();
 
             modify(&mut contents);
 
             contents
         };
 
-        let mut file = std::fs::File::create(&migration_script_path)?;
-        write!(file, "{}", new_contents)?;
+        let mut file = std::fs::File::create(&migration_script_path).unwrap();
+        write!(file, "{}", new_contents).unwrap();
 
-        Ok(self)
+        self
     }
 
     pub fn into_output(self) -> CreateMigrationOutput {

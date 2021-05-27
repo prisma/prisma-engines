@@ -1,7 +1,7 @@
 use super::*;
 use std::convert::identity;
 
-use crate::constants::outputs::fields;
+use crate::constants::{aggregations::*, output_fields::*};
 use prisma_models::ScalarFieldRef;
 
 /// Initializes model output object type cache on the context.
@@ -30,7 +30,7 @@ pub(crate) fn initialize_model_object_type_cache(ctx: &mut BuilderContext) {
             let obj: ObjectTypeWeakRef = output_objects::map_model_object_type(ctx, &model);
             let mut fields = compute_model_object_type_fields(ctx, &model);
 
-            if feature_flags::get().selectRelationCount {
+            if ctx.has_feature(&PreviewFeature::SelectRelationCount) {
                 // Only include to-many fields
                 let relation_fields = model.fields().relation().into_iter().filter(|f| f.is_list).collect();
 
@@ -38,7 +38,7 @@ pub(crate) fn initialize_model_object_type_cache(ctx: &mut BuilderContext) {
                     &mut fields,
                     aggregation_relation_field(
                         ctx,
-                        fields::UNDERSCORE_COUNT,
+                        UNDERSCORE_COUNT,
                         &model,
                         relation_fields,
                         |_, _| OutputType::int(),
@@ -140,7 +140,7 @@ pub(crate) fn affected_records_object_type(ctx: &mut BuilderContext) -> ObjectTy
 
     let object_type = Arc::new(object_type(
         ident.clone(),
-        vec![field(fields::COUNT, vec![], OutputType::int(), None)],
+        vec![field(AFFECTED_COUNT, vec![], OutputType::int(), None)],
         None,
     ));
 

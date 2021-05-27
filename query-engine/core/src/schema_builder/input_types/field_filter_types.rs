@@ -1,5 +1,5 @@
 use super::*;
-use constants::inputs::filters;
+use constants::{aggregations, deprecation, filters};
 use datamodel_connector::ConnectorCapability;
 use prisma_models::{dml::DefaultValue, PrismaValue};
 
@@ -163,7 +163,18 @@ fn full_scalar_filter_type(
             .chain(alphanumeric_filters(mapped_scalar_type.clone()))
             .collect(),
 
-        TypeIdentifier::Boolean | TypeIdentifier::Json | TypeIdentifier::Xml | TypeIdentifier::Bytes => {
+        TypeIdentifier::Json => {
+            if ctx.has_feature(&PreviewFeature::FilterJson) {
+                equality_filters(mapped_scalar_type.clone(), nullable)
+                    .chain(alphanumeric_filters(mapped_scalar_type.clone()))
+                    .chain(json_filters(ctx))
+                    .collect()
+            } else {
+                equality_filters(mapped_scalar_type.clone(), nullable).collect()
+            }
+        }
+
+        TypeIdentifier::Boolean | TypeIdentifier::Xml | TypeIdentifier::Bytes => {
             equality_filters(mapped_scalar_type.clone(), nullable).collect()
         }
 
@@ -196,21 +207,85 @@ fn full_scalar_filter_type(
     if include_aggregates {
         fields.push(aggregate_filter_field(
             ctx,
-            filters::COUNT,
+            aggregations::UNDERSCORE_COUNT,
             &TypeIdentifier::Int,
             nullable,
             list,
         ));
 
+        fields.push(
+            aggregate_filter_field(ctx, aggregations::COUNT, &TypeIdentifier::Int, nullable, list).deprecate(
+                deprecation::AGGR_DEPRECATION,
+                "2.23",
+                None,
+            ),
+        );
+
         if typ.is_numeric() {
             let avg_type = map_avg_type_ident(typ.clone());
-            fields.push(aggregate_filter_field(ctx, filters::AVG, &avg_type, nullable, list));
-            fields.push(aggregate_filter_field(ctx, filters::SUM, typ, nullable, list));
+            fields.push(aggregate_filter_field(
+                ctx,
+                aggregations::UNDERSCORE_AVG,
+                &avg_type,
+                nullable,
+                list,
+            ));
+
+            fields.push(
+                aggregate_filter_field(ctx, aggregations::AVG, &avg_type, nullable, list).deprecate(
+                    deprecation::AGGR_DEPRECATION,
+                    "2.23",
+                    None,
+                ),
+            );
+
+            fields.push(aggregate_filter_field(
+                ctx,
+                aggregations::UNDERSCORE_SUM,
+                typ,
+                nullable,
+                list,
+            ));
+
+            fields.push(
+                aggregate_filter_field(ctx, aggregations::SUM, typ, nullable, list).deprecate(
+                    deprecation::AGGR_DEPRECATION,
+                    "2.23",
+                    None,
+                ),
+            );
         }
 
         if !list {
-            fields.push(aggregate_filter_field(ctx, filters::MIN, typ, nullable, list));
-            fields.push(aggregate_filter_field(ctx, filters::MAX, typ, nullable, list));
+            fields.push(aggregate_filter_field(
+                ctx,
+                aggregations::UNDERSCORE_MIN,
+                typ,
+                nullable,
+                list,
+            ));
+            fields.push(
+                aggregate_filter_field(ctx, aggregations::MIN, typ, nullable, list).deprecate(
+                    deprecation::AGGR_DEPRECATION,
+                    "2.23",
+                    None,
+                ),
+            );
+
+            fields.push(aggregate_filter_field(
+                ctx,
+                aggregations::UNDERSCORE_MAX,
+                typ,
+                nullable,
+                list,
+            ));
+            fields.push(
+                aggregate_filter_field(ctx, aggregations::MAX, typ, nullable, list).deprecate(
+                    deprecation::AGGR_DEPRECATION,
+                    "2.23",
+                    None,
+                ),
+            );
         }
     }
 
@@ -252,6 +327,29 @@ fn string_filters(mapped_type: InputType) -> impl Iterator<Item = InputField> {
         input_field(filters::CONTAINS, mapped_type.clone(), None).optional(),
         input_field(filters::STARTS_WITH, mapped_type.clone(), None).optional(),
         input_field(filters::ENDS_WITH, mapped_type, None).optional(),
+    ]
+    .into_iter()
+}
+
+fn json_filters(ctx: &mut BuilderContext) -> impl Iterator<Item = InputField> {
+    // TODO: also add json-specific "keys" filters
+    // TODO: add json_type filter
+    let path_type = if ctx.capabilities.contains(ConnectorCapability::JsonFilteringJsonPath) {
+        InputType::string()
+    } else if ctx.capabilities.contains(ConnectorCapability::JsonFilteringArrayPath) {
+        InputType::list(InputType::string())
+    } else {
+        unreachable!()
+    };
+
+    vec![
+        input_field(filters::PATH, vec![path_type], None).optional(),
+        input_field(filters::STRING_CONTAINS, InputType::string(), None).optional(),
+        input_field(filters::STRING_STARTS_WITH, InputType::string(), None).optional(),
+        input_field(filters::STRING_ENDS_WITH, InputType::string(), None).optional(),
+        input_field(filters::ARRAY_CONTAINS, InputType::json(), None).optional(),
+        input_field(filters::ARRAY_STARTS_WITH, InputType::json(), None).optional(),
+        input_field(filters::ARRAY_ENDS_WITH, InputType::json(), None).optional(),
     ]
     .into_iter()
 }

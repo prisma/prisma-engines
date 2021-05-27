@@ -35,10 +35,12 @@ impl IrSerializer {
                     } else {
                         match self.output_field.field_type.borrow() {
                             OutputType::List(_) => Item::list(Vec::new()),
-                            other => return Err(CoreError::SerializationError(format!(
-                                "Invalid response data: the query result was required, but an empty {:?} was returned instead.",
-                                other
-                            ))),
+                            _ => {
+                                return Err(CoreError::SerializationError(format!(
+                                    "Query {} is required to return data, but found no record(s).",
+                                    self.output_field.name
+                                )))
+                            }
                         }
                     }
                 } else {
@@ -49,12 +51,9 @@ impl IrSerializer {
                 Ok(ResponseData::new(self.key.clone(), result))
             }
 
-            ExpressionResult::Empty => panic!("Domain logic error: Attempted to serialize empty result."),
+            ExpressionResult::Empty => panic!("Internal error: Attempted to serialize empty result."),
 
-            _ => panic!(
-                "Domain logic error: Attempted to serialize non-query result {:?}.",
-                result
-            ),
+            _ => panic!("Internal error: Attempted to serialize non-query result {:?}.", result),
         }
     }
 }

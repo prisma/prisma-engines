@@ -1,6 +1,6 @@
 use crate::{
     error::MongoError,
-    queries::{aggregate, read, write},
+    root_queries::{aggregate, read, write},
     MongoDbTransaction,
 };
 use async_trait::async_trait;

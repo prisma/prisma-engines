@@ -240,13 +240,7 @@ fn extract_aggregation_rows_from_scalars(
         .field_names
         .iter()
         .enumerate()
-        .filter_map(|(i, field_name)| {
-            if let Some(aggr_sel) = aggr_field_names.get(field_name) {
-                Some((i, *aggr_sel))
-            } else {
-                None
-            }
-        })
+        .filter_map(|(i, field_name)| aggr_field_names.get(field_name).map(|aggr_sel| (i, *aggr_sel)))
         .collect();
 
     let mut aggregation_rows: Vec<RelAggregationRow> = vec![];

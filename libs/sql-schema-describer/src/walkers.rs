@@ -300,6 +300,11 @@ impl<'a> TableWalker<'a> {
         })
     }
 
+    /// The number of indexes on the table.
+    pub fn indexes_count(&self) -> usize {
+        self.table().indices.len()
+    }
+
     /// Traverse the foreign keys on the table.
     pub fn foreign_keys(&self) -> impl Iterator<Item = ForeignKeyWalker<'a>> {
         let table_index = self.table_index;
@@ -489,7 +494,7 @@ impl<'a> fmt::Debug for IndexWalker<'a> {
 
 impl<'a> IndexWalker<'a> {
     /// The names of the indexed columns.
-    pub fn column_names(&self) -> &[String] {
+    pub fn column_names(&self) -> &'a [String] {
         &self.get().columns
     }
 
@@ -517,12 +522,12 @@ impl<'a> IndexWalker<'a> {
     }
 
     /// The IndexType
-    pub fn index_type(&self) -> &IndexType {
+    pub fn index_type(&self) -> &'a IndexType {
         &self.get().tpe
     }
 
     /// The name of the index.
-    pub fn name(&self) -> &str {
+    pub fn name(&self) -> &'a str {
         &self.get().name
     }
 

@@ -92,8 +92,6 @@ pub struct ConstructorOptions {
     #[serde(default)]
     datasource_overrides: BTreeMap<String, String>,
     #[serde(default)]
-    feature_flags_overrides: Option<Vec<String>>,
-    #[serde(default)]
     telemetry: TelemetryOptions,
     config_dir: PathBuf,
 }
@@ -122,32 +120,27 @@ impl QueryEngine {
             datamodel,
             log_level,
             datasource_overrides,
-            feature_flags_overrides,
             telemetry,
             config_dir,
         } = opts;
 
         let overrides: Vec<(_, _)> = datasource_overrides.into_iter().collect();
-        let mut config = datamodel::parse_configuration_with_config_dir(&datamodel, overrides.clone(), &config_dir)
-            .map_err(|errors| ApiError::conversion(errors, &datamodel))?;
+        let mut config =
+            datamodel::parse_configuration(&datamodel).map_err(|errors| ApiError::conversion(errors, &datamodel))?;
 
         config.subject = config
             .subject
             .validate_that_one_datasource_is_provided()
             .map_err(|errors| ApiError::conversion(errors, &datamodel))?;
 
+        config
+            .subject
+            .resolve_datasource_urls_from_env(&overrides)
+            .map_err(|errors| ApiError::conversion(errors, &datamodel))?;
+
         let ast = datamodel::parse_datamodel(&datamodel)
             .map_err(|errors| ApiError::conversion(errors, &datamodel))?
             .subject;
-
-        let flags: Vec<_> = match feature_flags_overrides {
-            Some(overrides) => overrides,
-            None => config.subject.preview_features().map(|s| s.to_string()).collect(),
-        };
-
-        if feature_flags::initialize(&flags).is_err() {
-            eprintln!("We currently cannot change the feature flags more than once per process.");
-        }
 
         let datamodel = EngineDatamodel {
             ast,
@@ -162,8 +155,8 @@ impl QueryEngine {
         };
 
         let builder = EngineBuilder {
-            config,
             datamodel,
+            config,
             logger,
             config_dir,
         };
@@ -185,7 +178,7 @@ impl QueryEngine {
                     .with_logging(|| async move {
                         let template = DatamodelConverter::convert(&builder.datamodel.ast);
 
-                        // We only support one data source at the moment, so take the first one (default not exposed yet).
+                        // We only support one data source & generator at the moment, so take the first one (default not exposed yet).
                         let data_source = builder
                             .config
                             .subject
@@ -193,7 +186,12 @@ impl QueryEngine {
                             .first()
                             .ok_or_else(|| ApiError::configuration("No valid data source found"))?;
 
-                        let (db_name, executor) = exec_loader::load(&data_source).await?;
+                        let preview_features: Vec<_> = builder.config.subject.preview_features().cloned().collect();
+                        let url = data_source
+                            .load_url_with_config_dir(&builder.config_dir)
+                            .map_err(|err| crate::error::ApiError::Conversion(err, builder.datamodel.raw.clone()))?;
+
+                        let (db_name, executor) = exec_loader::load(&data_source, &preview_features, &url).await?;
                         let connector = executor.primary_connector();
                         connector.get_connection().await?;
 
@@ -205,6 +203,7 @@ impl QueryEngine {
                             BuildMode::Modern,
                             true, // enable raw queries
                             data_source.capabilities(),
+                            preview_features,
                         );
 
                         let config = datamodel::json::mcf::config_to_mcf_json_value(&builder.config);
@@ -234,12 +233,8 @@ impl QueryEngine {
 
         match *inner {
             Inner::Connected(ref engine) => {
-                let config = datamodel::parse_configuration_with_config_dir(
-                    &engine.datamodel.raw,
-                    engine.datamodel.datasource_overrides.clone(),
-                    &engine.config_dir,
-                )
-                .map_err(|errors| ApiError::conversion(errors, &engine.datamodel.raw))?;
+                let config = datamodel::parse_configuration(&engine.datamodel.raw)
+                    .map_err(|errors| ApiError::conversion(errors, &engine.datamodel.raw))?;
 
                 let builder = EngineBuilder {
                     datamodel: engine.datamodel.clone(),

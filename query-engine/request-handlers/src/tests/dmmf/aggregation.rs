@@ -17,7 +17,7 @@ fn nullable_fields_should_be_nullable_in_group_by_output_types() {
         }
 
         model Blog {
-            required_id           String @id
+            required_id       String @id
             optional_string   String?
             required_string   String
             optional_int      Int?

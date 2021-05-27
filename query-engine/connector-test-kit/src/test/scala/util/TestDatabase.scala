@@ -3,6 +3,7 @@ package util
 case class TestDatabase() {
   def setup(project: Project): Unit = {
     val engine = MigrationEngine(project)
+
     engine.resetAndSetupDatabase()
   }
 
@@ -19,7 +20,14 @@ case class MigrationEngine(project: Project) {
 
   def resetAndSetupDatabase(): Unit = {
     import scala.sys.process._
-    val cmd = List(EnvVars.migrationEngineBinaryPath, "cli", "-d", project.fullDatamodelBase64Encoded, "qe-setup")
+    val config = ConnectorConfig.instance
+
+    val flags = config.provider match {
+      case "vitess" => "database_creation_not_allowed"
+      case _ => ""
+    }
+
+    val cmd = List(EnvVars.migrationEngineBinaryPath, "cli", "-f", flags, "-d", project.fullDatamodelBase64Encoded, "qe-setup")
 
     cmd.!
   }

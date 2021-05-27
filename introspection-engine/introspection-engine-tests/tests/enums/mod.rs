@@ -1,11 +1,11 @@
 use barrel::types;
 use indoc::indoc;
-use introspection_engine_tests::test_api::*;
+use introspection_engine_tests::{test_api::*, TestResult};
 use quaint::prelude::{Queryable, SqlFamily};
-use test_macros::test_each_connector;
+use test_macros::test_connector;
 
-#[test_each_connector(capabilities("enums"))]
-async fn a_table_with_enums(api: &TestApi) -> crate::TestResult {
+#[test_connector(capabilities(Enums))]
+async fn a_table_with_enums(api: &TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
     if sql_family.is_postgres() {
@@ -36,7 +36,6 @@ async fn a_table_with_enums(api: &TestApi) -> crate::TestResult {
         .await?;
 
     let color = if sql_family.is_mysql() { "Book_color" } else { "color" };
-
     let color2 = if sql_family.is_mysql() { "Book_color2" } else { "color2" };
 
     let dm = format!(
@@ -57,7 +56,7 @@ async fn a_table_with_enums(api: &TestApi) -> crate::TestResult {
             white2
         }}
     "#,
-        color, color2
+        color, color2,
     );
 
     for _ in 0..4 {
@@ -67,8 +66,8 @@ async fn a_table_with_enums(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector(capabilities("enums"))]
-async fn a_table_with_an_enum_default_value_that_is_an_empty_string(api: &TestApi) -> crate::TestResult {
+#[test_connector(capabilities(Enums))]
+async fn a_table_with_an_enum_default_value_that_is_an_empty_string(api: &TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
     if sql_family.is_postgres() {
@@ -107,7 +106,7 @@ async fn a_table_with_an_enum_default_value_that_is_an_empty_string(api: &TestAp
             EMPTY_ENUM_VALUE @map("")
         }}
     "#,
-        color
+        color,
     );
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);
@@ -115,8 +114,8 @@ async fn a_table_with_an_enum_default_value_that_is_an_empty_string(api: &TestAp
     Ok(())
 }
 
-#[test_each_connector(capabilities("enums"))]
-async fn a_table_enums_should_return_alphabetically_even_when_in_different_order(api: &TestApi) -> crate::TestResult {
+#[test_connector(capabilities(Enums))]
+async fn a_table_enums_should_return_alphabetically_even_when_in_different_order(api: &TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
     if sql_family.is_postgres() {
@@ -167,7 +166,7 @@ async fn a_table_enums_should_return_alphabetically_even_when_in_different_order
             white2
         }}
     "#,
-        color2, color
+        color2, color,
     );
 
     for _ in 0..4 {
@@ -177,8 +176,8 @@ async fn a_table_enums_should_return_alphabetically_even_when_in_different_order
     Ok(())
 }
 
-#[test_each_connector(capabilities("enums"))]
-async fn a_table_with_enum_default_values(api: &TestApi) -> crate::TestResult {
+#[test_connector(capabilities(Enums))]
+async fn a_table_with_enum_default_values(api: &TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
     if sql_family.is_postgres() {
@@ -217,7 +216,7 @@ async fn a_table_with_enum_default_values(api: &TestApi) -> crate::TestResult {
             white
         }}
     "#,
-        enum_name
+        enum_name,
     );
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);
@@ -225,8 +224,8 @@ async fn a_table_with_enum_default_values(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector(capabilities("enums", "scalar_lists"))]
-async fn a_table_enums_array(api: &TestApi) -> crate::TestResult {
+#[test_connector(capabilities(Enums, ScalarLists))]
+async fn a_table_enums_array(api: &TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
     match sql_family {
@@ -247,7 +246,8 @@ async fn a_table_enums_array(api: &TestApi) -> crate::TestResult {
         })
         .await?;
 
-    let dm = indoc! {r#"
+    let dm = indoc! {
+        r#"
         model Book {
             id      Int     @id @default(autoincrement())
             color   color[]
@@ -257,7 +257,8 @@ async fn a_table_enums_array(api: &TestApi) -> crate::TestResult {
             black
             white
         }
-    "#};
+        "#,
+    };
 
     let result = api.introspect().await?;
 
@@ -266,8 +267,8 @@ async fn a_table_enums_array(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector(capabilities("enums"))]
-async fn a_table_with_enum_default_values_that_look_like_booleans(api: &TestApi) -> crate::TestResult {
+#[test_connector(capabilities(Enums))]
+async fn a_table_with_enum_default_values_that_look_like_booleans(api: &TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
     if sql_family.is_postgres() {
@@ -311,7 +312,7 @@ async fn a_table_with_enum_default_values_that_look_like_booleans(api: &TestApi)
             rumor
         }}
     "#,
-        enum_name
+        enum_name,
     );
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);

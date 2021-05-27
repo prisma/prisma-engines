@@ -8,7 +8,7 @@ use super::{
 use crate::ast::*;
 use crate::diagnostics::{DatamodelError, Diagnostics};
 
-pub fn parse_model(token: &Token) -> Result<Model, Diagnostics> {
+pub fn parse_model(token: &Token<'_>) -> Result<Model, Diagnostics> {
     let mut errors = Diagnostics::new();
     let mut name: Option<Identifier> = None;
     let mut attributes: Vec<Attribute> = vec![];

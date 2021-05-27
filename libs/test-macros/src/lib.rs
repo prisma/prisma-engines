@@ -1,37 +1,178 @@
 extern crate proc_macro;
 
-mod test_each_connector;
-
 use proc_macro::TokenStream;
-use syn::ItemFn;
+use proc_macro2::{Delimiter, TokenTree};
+use quote::quote;
+use syn::{parse_macro_input, AttributeArgs, Meta, MetaList, NestedMeta, Signature};
 
 #[proc_macro_attribute]
-pub fn test_each_connector(attr: TokenStream, input: TokenStream) -> TokenStream {
-    test_each_connector::test_each_connector_impl(attr, input)
+pub fn test_connector(attr: TokenStream, input: TokenStream) -> TokenStream {
+    let attributes_meta: syn::AttributeArgs = parse_macro_input!(attr as AttributeArgs);
+    let input = proc_macro2::TokenStream::from(input);
+
+    // First the attributes
+    let mut attrs = TestConnectorAttrs::default();
+
+    for meta in attributes_meta {
+        match meta {
+            NestedMeta::Meta(Meta::List(list)) => {
+                if let Err(err) = attrs.ingest_meta_list(list) {
+                    return err.to_compile_error().into();
+                }
+            }
+            other => {
+                return syn::Error::new_spanned(other, "Unexpected argument")
+                    .into_compile_error()
+                    .into()
+            }
+        }
+    }
+
+    // Then the function body
+    // We take advantage of the function body being the last token tree (surrounded by braces).
+    let (sig, body): (syn::Signature, proc_macro2::TokenStream) = {
+        let sig_tokens = input
+            .clone()
+            .into_iter()
+            .take_while(|t| !matches!(t, TokenTree::Group(g) if matches!(g.delimiter(), Delimiter::Brace)))
+            .collect();
+
+        let body = input.into_iter().last().expect("Failed to find function body");
+
+        match syn::parse2(sig_tokens) {
+            Ok(sig) => (sig, body.into()),
+            Err(err) => return err.into_compile_error().into(),
+        }
+    };
+
+    // Generate the final function
+    let include_tagged = &attrs.include_tagged;
+    let exclude_tagged = &attrs.exclude_tagged;
+    let capabilities = &attrs.capabilities;
+    let test_function_name = &sig.ident;
+    let test_function_name_lit = sig.ident.to_string();
+    let (arg_name, arg_type) = match extract_api_arg(&sig) {
+        Ok(args) => args,
+        Err(err) => return err.to_compile_error().into(),
+    };
+
+    let tokens = if sig.asyncness.is_some() {
+        let (return_ty, unwrap) = match sig.output {
+            syn::ReturnType::Default => (quote!(()), quote!()),
+            syn::ReturnType::Type(_, ref ty) => (quote!(#ty), quote!(.unwrap())),
+        };
+
+        quote! {
+            #[test]
+            fn #test_function_name() {
+                let args = test_setup::TestApiArgs::new(#test_function_name_lit);
+
+                if test_setup::should_skip_test(
+                    &args,
+                    BitFlags::empty() #(| Tags::#include_tagged)*,
+                    BitFlags::empty() #(| Tags::#exclude_tagged)*,
+                    BitFlags::empty() #(| Capabilities::#capabilities)*,
+                ) { return }
+
+                test_setup::runtime::run_with_tokio::<#return_ty, _>(async {
+                    let #arg_name = &#arg_type::new(args).await;
+
+                    #body
+
+                })#unwrap;
+            }
+        }
+    } else {
+        quote! {
+            #[test]
+            fn #test_function_name() {
+                let args = test_setup::TestApiArgs::new(#test_function_name_lit);
+
+                if test_setup::should_skip_test(
+                    &args,
+                    BitFlags::empty() #(| Tags::#include_tagged)*,
+                    BitFlags::empty() #(| Tags::#exclude_tagged)*,
+                    BitFlags::empty() #(| Capabilities::#capabilities)*,
+                ) { return }
+
+                let #arg_name = #arg_type::new(args);
+
+                #body
+            }
+        }
+    };
+
+    tokens.into()
 }
 
-#[proc_macro_attribute]
-pub fn test_connectors(attr: TokenStream, input: TokenStream) -> TokenStream {
-    test_each_connector::test_connectors_impl(attr, input)
+#[derive(Default)]
+struct TestConnectorAttrs {
+    include_tagged: Vec<syn::Path>,
+    exclude_tagged: Vec<syn::Path>,
+    capabilities: Vec<syn::Path>,
 }
 
-fn function_returns_result(func: &ItemFn) -> bool {
-    match func.sig.output {
-        syn::ReturnType::Default => false,
-        // just assume it's a result
-        syn::ReturnType::Type(_, _) => true,
+impl TestConnectorAttrs {
+    fn ingest_meta_list(&mut self, list: MetaList) -> Result<(), syn::Error> {
+        let target: &mut Vec<_> = match list.path {
+            p if p.is_ident("tags") => &mut self.include_tagged,
+            p if p.is_ident("exclude") => &mut self.exclude_tagged,
+            p if p.is_ident("capabilities") => &mut self.capabilities,
+            p if p.is_ident("logs") => return Ok(()), // TODO
+            other => return Err(syn::Error::new_spanned(other, "Unexpected argument")),
+        };
+
+        target.reserve(list.nested.len());
+
+        for item in list.nested {
+            match item {
+                NestedMeta::Meta(Meta::Path(p)) if p.get_ident().is_some() => {
+                    target.push(p);
+                }
+                other => return Err(syn::Error::new_spanned(other, "Unexpected argument")),
+            }
+        }
+
+        Ok(())
     }
 }
 
-/// We do this because Intellij only recognizes functions annotated with #[test]
-/// *before* macro expansion as tests. This way we can add it manually, and the
-/// test macro will strip it.
-fn strip_test_attribute(function: &mut ItemFn) {
-    let new_attrs = function
-        .attrs
-        .drain(..)
-        .filter(|attr| attr.path.segments.iter().last().unwrap().ident != "test")
-        .collect();
+fn extract_api_arg(sig: &Signature) -> Result<(&syn::Ident, &syn::Ident), syn::Error> {
+    use syn::spanned::Spanned;
 
-    function.attrs = new_attrs;
+    let err = |span| {
+        Err(syn::Error::new(
+            span,
+            &format!(
+                "Unsupported syntax. Arguments to test functions should be of the form `fn test_fn(api: {}TestApi)`",
+                if sig.asyncness.is_some() { "&" } else { "" }
+            ),
+        ))
+    };
+
+    match (sig.inputs.first(), sig.inputs.len()) {
+        (Some(syn::FnArg::Typed(pattype)), 1) => {
+            let arg_name = match pattype.pat.as_ref() {
+                syn::Pat::Ident(ident) => &ident.ident,
+                other => return err(other.span()),
+            };
+
+            let arg_type = match pattype.ty.as_ref() {
+                syn::Type::Reference(syn::TypeReference {
+                    mutability: None, elem, ..
+                }) if sig.asyncness.is_some() => match elem.as_ref() {
+                    syn::Type::Path(ident) => ident.path.get_ident().unwrap(),
+                    other => return err(other.span()),
+                },
+                syn::Type::Path(ident) => ident.path.get_ident().unwrap(),
+                other => return err(other.span()),
+            };
+
+            Ok((arg_name, arg_type))
+        }
+        (_, n) => Err(syn::Error::new_spanned(
+            &sig.inputs,
+            &format!("Test functions should take one argument, not {}", n),
+        )),
+    }
 }

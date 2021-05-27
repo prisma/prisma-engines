@@ -2,6 +2,7 @@
 
 use super::*;
 use crate::{getters::Getter, parsers::Parser};
+use enumflags2::BitFlags;
 use indoc::indoc;
 use native_types::{NativeType, PostgresType};
 use quaint::{connector::ResultRow, prelude::Queryable, single::Quaint};
@@ -10,9 +11,16 @@ use serde_json::from_str;
 use std::{borrow::Cow, collections::HashMap, convert::TryInto};
 use tracing::trace;
 
+#[derive(BitFlags, Clone, Copy, Debug)]
+#[repr(u8)]
+pub enum Circumstances {
+    Cockroach = 1 << 0,
+}
+
 #[derive(Debug)]
 pub struct SqlSchemaDescriber {
     conn: Quaint,
+    circumstances: BitFlags<Circumstances>,
 }
 
 #[async_trait::async_trait]
@@ -31,7 +39,6 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
         })
     }
 
-    #[tracing::instrument]
     async fn describe(&self, schema: &str) -> DescriberResult<SqlSchema> {
         let sequences = self.get_sequences(schema).await?;
         let enums = self.get_enums(schema).await?;
@@ -56,7 +63,6 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
             views,
             procedures,
             user_defined_types: vec![],
-            lower_case_identifiers: false,
         })
     }
 
@@ -81,8 +87,12 @@ impl Parser for SqlSchemaDescriber {
 
 impl SqlSchemaDescriber {
     /// Constructor.
-    pub fn new(conn: Quaint) -> SqlSchemaDescriber {
-        SqlSchemaDescriber { conn }
+    pub fn new(conn: Quaint, circumstances: BitFlags<Circumstances>) -> SqlSchemaDescriber {
+        SqlSchemaDescriber { conn, circumstances }
+    }
+
+    fn is_cockroach(&self) -> bool {
+        self.circumstances.contains(Circumstances::Cockroach)
     }
 
     #[tracing::instrument]
@@ -101,6 +111,10 @@ impl SqlSchemaDescriber {
 
     #[tracing::instrument]
     async fn get_procedures(&self, schema: &str) -> DescriberResult<Vec<Procedure>> {
+        if self.is_cockroach() {
+            return Ok(Vec::new());
+        }
+
         let sql = r#"
             SELECT p.proname AS name,
                 CASE WHEN l.lanname = 'internal' THEN p.prosrc
@@ -146,6 +160,10 @@ impl SqlSchemaDescriber {
 
     #[tracing::instrument]
     async fn get_size(&self, schema: &str) -> DescriberResult<usize> {
+        if self.circumstances.contains(Circumstances::Cockroach) {
+            return Ok(0); // TODO
+        }
+
         let sql =
             "SELECT SUM(pg_total_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename)))::BIGINT as size
              FROM pg_tables
@@ -243,21 +261,24 @@ impl SqlSchemaDescriber {
             let table_name = col.get_expect_string("table_name");
             let name = col.get_expect_string("column_name");
 
-            let is_identity_str = col.get_expect_string("is_identity").to_lowercase();
-
-            let is_identity = match is_identity_str.as_str() {
-                "no" => false,
-                "yes" => true,
-                _ => panic!("unrecognized is_identity variant '{}'", is_identity_str),
+            let is_identity = match col.get_string("is_identity") {
+                Some(is_id) if is_id.eq_ignore_ascii_case("yes") => true,
+                Some(is_id) if is_id.eq_ignore_ascii_case("no") => false,
+                Some(is_identity_str) => panic!("unrecognized is_identity variant '{}'", is_identity_str),
+                None => false,
             };
 
-            let tpe = get_column_type(&col, enums);
             let data_type = col.get_expect_string("data_type");
+            let tpe = get_column_type(&col, enums);
+            let default = Self::get_default_value(&col, &data_type, &tpe, sequences, schema);
 
-            let default = Self::get_default_value(&col, &tpe, &data_type, sequences);
-
-            let auto_increment =
-                is_identity || matches!(default.as_ref().map(|d| d.kind()), Some(DefaultKind::Sequence(_)));
+            let auto_increment = is_identity
+                || matches!(default.as_ref().map(|d| d.kind()), Some(DefaultKind::Sequence(_)))
+                || (self.is_cockroach()
+                    && matches!(
+                        default.as_ref().map(|d| d.kind()),
+                        Some(DefaultKind::DbGenerated(s)) if s == "unique_rowid()"
+                    ));
 
             let col = Column {
                 name,
@@ -386,8 +407,12 @@ impl SqlSchemaDescriber {
             let referenced_table = row.get_expect_string("parent_table");
             let referenced_column = row.get_expect_string("parent_column");
             let table_name = row.get_expect_string("table_name");
-            let confdeltype = row.get_expect_char("confdeltype");
-            let confupdtype = row.get_expect_char("confupdtype");
+            let confdeltype = row
+                .get_char("confdeltype")
+                .unwrap_or_else(|| row.get_expect_string("confdeltype").chars().next().unwrap());
+            let confupdtype = row
+                .get_char("confupdtype")
+                .unwrap_or_else(|| row.get_expect_string("confupdtype").chars().next().unwrap());
             let constraint_name = row.get_expect_string("constraint_name");
 
             let referenced_schema_name = row.get_expect_string("referenced_schema_name");
@@ -627,9 +652,10 @@ impl SqlSchemaDescriber {
 
     fn get_default_value(
         col: &ResultRow,
-        tpe: &ColumnType,
         data_type: &str,
+        tpe: &ColumnType,
         sequences: &[Sequence],
+        schema: &str,
     ) -> Option<DefaultValue> {
         match col.get("column_default") {
             None => None,
@@ -638,20 +664,26 @@ impl SqlSchemaDescriber {
                 Some(x) if x.starts_with("NULL") => None,
                 Some(default_string) => {
                     Some(match &tpe.family {
-                        ColumnTypeFamily::Int => match Self::parse_int(&default_string) {
-                            Some(int_value) => DefaultValue::value(int_value),
-                            None => match is_autoincrement(&default_string, sequences) {
-                                Some(seq) => DefaultValue::sequence(seq),
-                                None => DefaultValue::db_generated(default_string),
-                            },
-                        },
-                        ColumnTypeFamily::BigInt => match Self::parse_big_int(&default_string) {
-                            Some(int_value) => DefaultValue::value(int_value),
-                            None => match is_autoincrement(&default_string, sequences) {
-                                Some(seq) => DefaultValue::sequence(seq),
-                                None => DefaultValue::db_generated(default_string),
-                            },
-                        },
+                        ColumnTypeFamily::Int | ColumnTypeFamily::BigInt => {
+                            let default_expr = unsuffix_default_literal(
+                                &default_string,
+                                &[data_type, &tpe.full_data_type, "integer", "INT8", "INT4"],
+                            )
+                            .unwrap_or_else(|| default_string.as_str().into());
+                            let default_expr = process_string_literal(&default_expr);
+
+                            match default_expr.parse::<i64>().ok() {
+                                Some(int_value) => DefaultValue::value(if tpe.family.is_int() {
+                                    PrismaValue::Int(int_value)
+                                } else {
+                                    PrismaValue::BigInt(int_value)
+                                }),
+                                None => match is_autoincrement(&default_string, sequences) {
+                                    Some(seq) => DefaultValue::sequence(seq),
+                                    None => DefaultValue::db_generated(default_string),
+                                },
+                            }
+                        }
                         ColumnTypeFamily::Float => match Self::parse_float(&default_string) {
                             Some(float_value) => DefaultValue::value(float_value),
                             None => DefaultValue::db_generated(default_string),
@@ -664,14 +696,22 @@ impl SqlSchemaDescriber {
                             Some(bool_value) => DefaultValue::value(bool_value),
                             None => DefaultValue::db_generated(default_string),
                         },
-                        ColumnTypeFamily::String => {
-                            match unsuffix_default_literal(&default_string, data_type, &tpe.full_data_type) {
-                                Some(default_literal) => {
-                                    DefaultValue::value(process_string_literal(default_literal.as_ref()).into_owned())
+                        ColumnTypeFamily::String => match fetch_dbgenerated(&default_string) {
+                            Some(fun) => DefaultValue::db_generated(fun),
+                            None => {
+                                let literal = unsuffix_default_literal(
+                                    &default_string,
+                                    &[data_type, &tpe.full_data_type, "STRING"],
+                                );
+
+                                match literal {
+                                    Some(default_literal) => DefaultValue::value(
+                                        process_string_literal(default_literal.as_ref()).into_owned(),
+                                    ),
+                                    None => DefaultValue::db_generated(default_string),
                                 }
-                                None => DefaultValue::db_generated(default_string),
                             }
-                        }
+                        },
                         ColumnTypeFamily::DateTime => {
                             match default_string.to_lowercase().as_str() {
                                 "now()" | "current_timestamp" => DefaultValue::now(),
@@ -680,24 +720,21 @@ impl SqlSchemaDescriber {
                         }
                         ColumnTypeFamily::Binary => DefaultValue::db_generated(default_string),
                         // JSON/JSONB defaults come in the '{}'::jsonb form.
-                        ColumnTypeFamily::Json => unsuffix_default_literal(&default_string, "jsonb", "jsonb")
-                            .or_else(|| unsuffix_default_literal(&default_string, "json", "json"))
-                            .map(|default| DefaultValue::value(PrismaValue::Json(unquote_string(&default))))
-                            .unwrap_or_else(move || DefaultValue::db_generated(default_string)),
+                        ColumnTypeFamily::Json => {
+                            unsuffix_default_literal(&default_string, &[data_type, &tpe.full_data_type])
+                                .map(|default| DefaultValue::value(PrismaValue::Json(unquote_string(&default))))
+                                .unwrap_or_else(move || DefaultValue::db_generated(default_string))
+                        }
                         ColumnTypeFamily::Uuid => DefaultValue::db_generated(default_string),
                         ColumnTypeFamily::Enum(enum_name) => {
-                            let enum_suffix_without_quotes = format!("::{}", enum_name);
-                            let enum_suffix_with_quotes = format!("::\"{}\"", enum_name);
-                            if default_string.ends_with(&enum_suffix_with_quotes) {
-                                DefaultValue::value(PrismaValue::Enum(Self::unquote_string(
-                                    &default_string.replace(&enum_suffix_with_quotes, ""),
-                                )))
-                            } else if default_string.ends_with(&enum_suffix_without_quotes) {
-                                DefaultValue::value(PrismaValue::Enum(Self::unquote_string(
-                                    &default_string.replace(&enum_suffix_without_quotes, ""),
-                                )))
-                            } else {
-                                DefaultValue::db_generated(default_string)
+                            let expected_suffixes: &[Cow<'_, str>] = &[
+                                Cow::Borrowed(enum_name),
+                                Cow::Owned(format!("\"{}\"", enum_name)),
+                                Cow::Owned(format!("{}.{}", schema, enum_name)),
+                            ];
+                            match unsuffix_default_literal(&default_string, expected_suffixes) {
+                                Some(value) => DefaultValue::value(PrismaValue::Enum(Self::unquote_string(&value))),
+                                None => DefaultValue::db_generated(default_string),
                             }
                         }
                         ColumnTypeFamily::Unsupported(_) => DefaultValue::db_generated(default_string),
@@ -780,6 +817,7 @@ fn get_column_type(row: &ResultRow, enums: &[Enum]) -> ColumnType {
         "lseg" | "_lseg" => unsupported_type(),
         "path" | "_path" => unsupported_type(),
         "polygon" | "_polygon" => unsupported_type(),
+        name if enum_exists(name) => (Enum(name.to_owned()), None),
         _ => unsupported_type(),
     };
 
@@ -812,32 +850,51 @@ fn is_autoincrement(value: &str, sequences: &[Sequence]) -> Option<String> {
     })
 }
 
-fn unsuffix_default_literal<'a>(literal: &'a str, data_type: &str, full_data_type: &str) -> Option<Cow<'a, str>> {
+fn fetch_dbgenerated(value: &str) -> Option<String> {
+    static POSTGRES_DB_GENERATED_RE: Lazy<Regex> =
+        Lazy::new(|| Regex::new(r#"(^\((.*)\)):{2,3}(\\")?(.*)(\\")?$"#).unwrap());
+
+    if !POSTGRES_DB_GENERATED_RE.is_match(value) {
+        None
+    } else {
+        let captures = POSTGRES_DB_GENERATED_RE.captures(value)?;
+        let fun = captures.get(1).unwrap().as_str();
+        let suffix = captures.get(4).unwrap().as_str();
+
+        Some(format!("{}::{}", fun, suffix))
+    }
+}
+
+fn unsuffix_default_literal<'a, T: AsRef<str>>(literal: &'a str, expected_suffixes: &[T]) -> Option<Cow<'a, str>> {
+    // Tries to match expressions of the form <expr> or <expr>::<type> or <expr>:::<type>.
     static POSTGRES_DATA_TYPE_SUFFIX_RE: Lazy<Regex> =
-        Lazy::new(|| Regex::new(r#"(?ms)^(.*)::(\\")?(.*)(\\")?$"#).unwrap());
+        Lazy::new(|| Regex::new(r#"(?ms)^(.*?):{2,3}(\\")?(.*)(\\")?$"#).unwrap());
 
     let captures = POSTGRES_DATA_TYPE_SUFFIX_RE.captures(literal)?;
     let suffix = captures.get(3).unwrap().as_str();
 
-    if suffix != data_type && suffix != full_data_type {
+    if !expected_suffixes.iter().any(|expected| expected.as_ref() == suffix) {
         return None;
     }
 
     let first_capture = captures.get(1).unwrap().as_str();
 
-    Some(first_capture.into())
+    Some(Cow::Borrowed(first_capture))
 }
 
 // See https://www.postgresql.org/docs/9.3/sql-syntax-lexical.html
 fn process_string_literal(literal: &str) -> Cow<'_, str> {
-    static POSTGRES_STRING_DEFAULT_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"(?ms)^B?'(.*)'$"#).unwrap());
+    // B'...' or e'...' or '...'
+    static POSTGRES_STRING_DEFAULT_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"(?ms)^(?:B|e)?'(.*)'$"#).unwrap());
     static POSTGRES_DEFAULT_QUOTE_UNESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"'(')"#).unwrap());
     static POSTGRES_DEFAULT_BACKSLASH_UNESCAPE_RE: Lazy<Regex> =
         Lazy::new(|| Regex::new(r#"\\(["']|\\[^\\])"#).unwrap());
+    static COCKROACH_DEFAULT_BACKSLASH_UNESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\\\\(["']|\\)"#).unwrap());
     static POSTGRES_STRING_DEFAULTS_PIPELINE: &[(&Lazy<Regex>, &str)] = &[
         (&POSTGRES_STRING_DEFAULT_RE, "$1"),
         (&POSTGRES_DEFAULT_QUOTE_UNESCAPE_RE, "$1"),
         (&POSTGRES_DEFAULT_BACKSLASH_UNESCAPE_RE, "$1"),
+        (&COCKROACH_DEFAULT_BACKSLASH_UNESCAPE_RE, "$1"),
     ];
 
     chain_replaces(literal, POSTGRES_STRING_DEFAULTS_PIPELINE)

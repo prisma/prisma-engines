@@ -1,12 +1,12 @@
 use indoc::indoc;
-use migration_engine_tests::sql::*;
+use migration_engine_tests::sync_test_api::*;
 use std::fmt::Write as _;
 
-/// We need to test this specifically for mysql, because foreign keys are indexes, and they are
-/// inferred as both foreign key and index by the sql-schema-describer. We do not want to
-/// create/delete a second index.
-#[test_each_connector(tags("mysql"))]
-async fn indexes_on_foreign_key_fields_are_not_created_twice(api: &TestApi) -> TestResult {
+// We need to test this specifically for mysql, because foreign keys are indexes, and they are
+// inferred as both foreign key and index by the sql-schema-describer. We do not want to
+// create/delete a second index.
+#[test_connector(tags(Mysql))]
+fn indexes_on_foreign_key_fields_are_not_created_twice(api: TestApi) {
     let schema = r#"
         model Human {
             id String @id
@@ -21,36 +21,32 @@ async fn indexes_on_foreign_key_fields_are_not_created_twice(api: &TestApi) -> T
         }
     "#;
 
-    api.schema_push(schema).send().await?;
+    api.schema_push(schema).send_sync();
 
     let sql_schema = api
         .assert_schema()
-        .await?
-        .assert_table("Human", |table| {
+        .assert_table_bang("Human", |table| {
             table
                 .assert_foreign_keys_count(1)?
                 .assert_fk_on_columns(&["catname"], |fk| fk.assert_references("Cat", &["name"]))?
                 .assert_indexes_count(1)?
                 .assert_index_on_columns(&["catname"], |idx| idx.assert_is_not_unique())
-        })?
+        })
         .into_schema();
 
     // Test that after introspection, we do not migrate further.
     api.schema_push(schema)
         .force(true)
-        .send()
-        .await?
-        .assert_green()?
-        .assert_no_steps()?;
+        .send_sync()
+        .assert_green_bang()
+        .assert_no_steps();
 
-    api.assert_schema().await?.assert_equals(&sql_schema)?;
-
-    Ok(())
+    api.assert_schema().assert_equals(&sql_schema).unwrap();
 }
 
 // We have to test this because one enum on MySQL can map to multiple enums in the database.
-#[test_each_connector(tags("mysql"))]
-async fn enum_creation_is_idempotent(api: &TestApi) -> TestResult {
+#[test_connector(tags(Mysql))]
+fn enum_creation_is_idempotent(api: TestApi) {
     let dm1 = r#"
         model Cat {
             id String @id
@@ -68,15 +64,12 @@ async fn enum_creation_is_idempotent(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.schema_push(dm1).send().await?.assert_green()?;
-
-    api.schema_push(dm1).send().await?.assert_green()?.assert_no_steps()?;
-
-    Ok(())
+    api.schema_push(dm1).send_sync().assert_green_bang();
+    api.schema_push(dm1).send_sync().assert_green_bang().assert_no_steps();
 }
 
-#[test_each_connector(tags("mysql"))]
-async fn enums_work_when_table_name_is_remapped(api: &TestApi) -> TestResult {
+#[test_connector(tags(Mysql))]
+fn enums_work_when_table_name_is_remapped(api: TestApi) {
     let schema = r#"
     model User {
         id         String     @default(uuid()) @id
@@ -92,13 +85,11 @@ async fn enums_work_when_table_name_is_remapped(api: &TestApi) -> TestResult {
     }
     "#;
 
-    api.schema_push(schema).send().await?.assert_green()?;
-
-    Ok(())
+    api.schema_push(schema).send_sync().assert_green_bang();
 }
 
-#[test_each_connector(tags("mysql"))]
-async fn arity_of_enum_columns_can_be_changed(api: &TestApi) -> TestResult {
+#[test_connector(tags(Mysql))]
+fn arity_of_enum_columns_can_be_changed(api: TestApi) {
     let dm1 = r#"
         enum Color {
             RED
@@ -113,13 +104,13 @@ async fn arity_of_enum_columns_can_be_changed(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.schema_push(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send_sync().assert_green_bang();
 
-    api.assert_schema().await?.assert_table("A", |table| {
+    api.assert_schema().assert_table_bang("A", |table| {
         table
             .assert_column("primaryColor", |col| col.assert_is_required())?
             .assert_column("secondaryColor", |col| col.assert_is_nullable())
-    })?;
+    });
 
     let dm2 = r#"
         enum Color {
@@ -135,19 +126,17 @@ async fn arity_of_enum_columns_can_be_changed(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.schema_push(dm2).send().await?.assert_green()?;
+    api.schema_push(dm2).send_sync().assert_green_bang();
 
-    api.assert_schema().await?.assert_table("A", |table| {
+    api.assert_schema().assert_table_bang("A", |table| {
         table
             .assert_column("primaryColor", |col| col.assert_is_nullable())?
             .assert_column("secondaryColor", |col| col.assert_is_required())
-    })?;
-
-    Ok(())
+    });
 }
 
-#[test_each_connector(tags("mysql"))]
-async fn arity_is_preserved_by_alter_enum(api: &TestApi) -> TestResult {
+#[test_connector(tags(Mysql))]
+fn arity_is_preserved_by_alter_enum(api: TestApi) {
     let dm1 = r#"
         enum Color {
             RED
@@ -162,13 +151,13 @@ async fn arity_is_preserved_by_alter_enum(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.schema_push(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send_sync().assert_green_bang();
 
-    api.assert_schema().await?.assert_table("A", |table| {
+    api.assert_schema().assert_table_bang("A", |table| {
         table
             .assert_column("primaryColor", |col| col.assert_is_required())?
             .assert_column("secondaryColor", |col| col.assert_is_nullable())
-    })?;
+    });
 
     let dm2 = r#"
         enum Color {
@@ -186,22 +175,19 @@ async fn arity_is_preserved_by_alter_enum(api: &TestApi) -> TestResult {
 
     api.schema_push(dm2)
         .force(true)
-        .send()
-        .await?
-        .assert_executable()?
-        .assert_has_executed_steps()?;
+        .send_sync()
+        .assert_executable()
+        .assert_has_executed_steps();
 
-    api.assert_schema().await?.assert_table("A", |table| {
+    api.assert_schema().assert_table_bang("A", |table| {
         table
             .assert_column("primaryColor", |col| col.assert_is_required())?
             .assert_column("secondaryColor", |col| col.assert_is_nullable())
-    })?;
-
-    Ok(())
+    });
 }
 
-#[test_each_connector(tags("mysql"))]
-async fn native_type_columns_can_be_created(api: &TestApi) -> TestResult {
+#[test_connector(tags(Mysql))]
+fn native_type_columns_can_be_created(api: TestApi) {
     let types = &[
         ("int", "Int", "Int", if api.is_mysql_8() { "int" } else { "int(11)" }),
         (
@@ -258,43 +244,38 @@ async fn native_type_columns_can_be_created(api: &TestApi) -> TestResult {
         ("year", "Int", "Year", if api.is_mysql_8() { "year" } else { "year(4)" }),
     ];
 
-    let mut dm = r#"
-        datasource mysql {
-            provider = "mysql"
-            url = "mysql://localhost/test"
-        }
-
+    let mut dm = api.datamodel_with_provider(
+        r#"
         model A {
             id Int @id
-    "#
-    .to_owned();
+        }
+        "#,
+    );
 
     for (field_name, prisma_type, native_type, _) in types {
-        writeln!(&mut dm, "    {} {} @mysql.{}", field_name, prisma_type, native_type)?;
+        writeln!(&mut dm, "    {} {} @mysql.{}", field_name, prisma_type, native_type).unwrap();
     }
 
     dm.push_str("}\n");
 
-    api.schema_push(&dm).send().await?.assert_green()?;
+    api.schema_push(&dm).send_sync().assert_green_bang();
 
-    api.assert_schema().await?.assert_table("A", |table| {
+    api.assert_schema().assert_table_bang("A", |table| {
         types.iter().fold(
             Ok(table),
             |table, (field_name, _prisma_type, _native_type, database_type)| {
                 table.and_then(|table| table.assert_column(field_name, |col| col.assert_full_data_type(database_type)))
             },
         )
-    })?;
+    });
 
     // Check that the migration is idempotent
-    api.schema_push(dm).send().await?.assert_green()?.assert_no_steps()?;
-
-    Ok(())
+    api.schema_push(dm).send_sync().assert_green_bang().assert_no_steps();
 }
 
-#[test_each_connector(tags("mysql"))]
-async fn default_current_timestamp_precision_follows_column_precision(api: &TestApi) -> TestResult {
-    let migrations_directory = api.create_migrations_directory()?;
+#[test_connector(tags(Mysql))]
+fn default_current_timestamp_precision_follows_column_precision(api: TestApi) {
+    let migrations_directory = api.create_migrations_directory();
 
     let dm = api.datamodel_with_provider(
         r#"
@@ -318,9 +299,6 @@ async fn default_current_timestamp_precision_follows_column_precision(api: &Test
     );
 
     api.create_migration("01init", &dm, &migrations_directory)
-        .send()
-        .await?
-        .assert_migration("01init", |migration| migration.assert_contents(expected_migration))?;
-
-    Ok(())
+        .send_sync()
+        .assert_migration("01init", |migration| migration.assert_contents(expected_migration));
 }

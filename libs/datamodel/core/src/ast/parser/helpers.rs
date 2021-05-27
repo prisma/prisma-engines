@@ -3,7 +3,7 @@ use crate::ast::{Identifier, Span};
 
 pub type Token<'a> = pest::iterators::Pair<'a, Rule>;
 
-pub fn parsing_catch_all(token: &Token, kind: &str) {
+pub fn parsing_catch_all(token: &Token<'_>, kind: &str) {
     match token.as_rule() {
         Rule::comment | Rule::comment_and_new_line | Rule::comment_block | Rule::doc_comment_and_new_line => {}
         x => unreachable!(
@@ -32,11 +32,11 @@ impl ToIdentifier for pest::iterators::Pair<'_, Rule> {
 pub trait TokenExtensions {
     /// Gets the first child token that is relevant.
     /// Irrelevant Tokens are e.g. new lines which we do not want to match during parsing.
-    fn first_relevant_child(&self) -> Token;
+    fn first_relevant_child(&self) -> Token<'_>;
 
     /// Returns all child token of this Token that are relevant.
     /// Irrelevant Tokens are e.g. new lines which we do not want to match during parsing.
-    fn relevant_children(&self) -> Vec<Token>;
+    fn relevant_children(&self) -> Vec<Token<'_>>;
 }
 
 // this is not implemented for Token because auto completion does not work then
@@ -48,7 +48,7 @@ impl TokenExtensions for pest::iterators::Pair<'_, Rule> {
             .unwrap_or_else(|| panic!("Token `{}` had no children.", &self))
     }
 
-    fn relevant_children(&self) -> Vec<Token> {
+    fn relevant_children(&self) -> Vec<Token<'_>> {
         self.clone()
             .into_inner()
             .filter(|rule| {

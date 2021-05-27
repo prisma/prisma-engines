@@ -1,23 +1,17 @@
 use crate::PreviewFeaturesOpts;
-use datamodel::common::preview_features::{
-    DATASOURCE_PREVIEW_FEATURES, DEPRECATED_GENERATOR_PREVIEW_FEATURES, GENERATOR_PREVIEW_FEATURES,
-};
+use datamodel::common::preview_features::{DATASOURCE, GENERATOR};
 
 pub fn run(opts: PreviewFeaturesOpts) {
-    let result: Vec<&str> = if opts.datasource_only {
-        DATASOURCE_PREVIEW_FEATURES.to_vec()
+    let features = if opts.datasource_only {
+        DATASOURCE.active_features()
     } else {
-        GENERATOR_PREVIEW_FEATURES
-            .iter()
-            .filter(|pf| !DEPRECATED_GENERATOR_PREVIEW_FEATURES.contains(pf))
-            .copied()
-            .collect()
+        GENERATOR.active_features()
     };
 
-    if result.is_empty() {
+    if features.is_empty() {
         print!("[]")
     } else {
-        let json = serde_json::to_string(&result).expect("Failed to render JSON");
+        let json = serde_json::to_string(&features).expect("Failed to render JSON");
 
         print!("{}", json)
     }

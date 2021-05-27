@@ -7,7 +7,10 @@ use connector::Connector;
 use std::str::FromStr;
 
 use datamodel::{
-    common::provider_names::{MSSQL_SOURCE_NAME, MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME},
+    common::{
+        preview_features::PreviewFeature,
+        provider_names::{MSSQL_SOURCE_NAME, MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME},
+    },
     Datasource,
 };
 use std::collections::HashMap;
@@ -23,14 +26,18 @@ use mongodb_connector::MongoDb;
 const DEFAULT_SQLITE_DB_NAME: &str = "main";
 
 #[tracing::instrument(name = "exec_loader", skip(source))]
-pub async fn load(source: &Datasource) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
+pub async fn load(
+    source: &Datasource,
+    features: &[PreviewFeature],
+    url: &str,
+) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
     match source.active_provider.as_str() {
-        SQLITE_SOURCE_NAME => sqlite(source).await,
-        MYSQL_SOURCE_NAME => mysql(source).await,
-        POSTGRES_SOURCE_NAME => postgres(source).await,
+        SQLITE_SOURCE_NAME => sqlite(source, url).await,
+        MYSQL_SOURCE_NAME => mysql(source, url).await,
+        POSTGRES_SOURCE_NAME => postgres(source, url).await,
 
         MSSQL_SOURCE_NAME => {
-            if !feature_flags::get().microsoftSqlServer {
+            if !features.contains(&PreviewFeature::MicrosoftSqlServer) {
                 let error = CoreError::UnsupportedFeatureError(
                     "Microsoft SQL Server (experimental feature, needs to be enabled)".into(),
                 );
@@ -38,12 +45,12 @@ pub async fn load(source: &Datasource) -> crate::Result<(String, Box<dyn QueryEx
                 return Err(error);
             }
 
-            mssql(source).await
+            mssql(source, url).await
         }
 
         #[cfg(feature = "mongodb")]
         MONGODB_SOURCE_NAME => {
-            if !feature_flags::get().mongodb {
+            if !features.contains(&PreviewFeature::MongoDb) {
                 let error = CoreError::UnsupportedFeatureError(
                     "MongoDB query connector (experimental feature, needs to be enabled)".into(),
                 );
@@ -51,7 +58,7 @@ pub async fn load(source: &Datasource) -> crate::Result<(String, Box<dyn QueryEx
                 return Err(error);
             }
 
-            mongodb(source).await
+            mongodb(source, url).await
         }
 
         x => Err(CoreError::ConfigurationError(format!(
@@ -61,21 +68,21 @@ pub async fn load(source: &Datasource) -> crate::Result<(String, Box<dyn QueryEx
     }
 }
 
-async fn sqlite(source: &Datasource) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
+async fn sqlite(source: &Datasource, url: &str) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
     trace!("Loading SQLite query connector...");
 
-    let sqlite = Sqlite::from_source(source).await?;
+    let sqlite = Sqlite::from_source(source, url).await?;
     let db_name = DEFAULT_SQLITE_DB_NAME.to_owned();
 
     trace!("Loaded SQLite query connector.");
     Ok((db_name, sql_executor(sqlite, false)))
 }
 
-async fn postgres(source: &Datasource) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
+async fn postgres(source: &Datasource, url: &str) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
     trace!("Loading Postgres query connector...");
 
-    let database_str = &source.url().value;
-    let psql = PostgreSql::from_source(source).await?;
+    let database_str = url;
+    let psql = PostgreSql::from_source(source, url).await?;
 
     let url = Url::parse(database_str)?;
     let params: HashMap<String, String> = url.query_pairs().into_owned().collect();
@@ -94,13 +101,12 @@ async fn postgres(source: &Datasource) -> crate::Result<(String, Box<dyn QueryEx
     Ok((db_name, sql_executor(psql, force_transactions)))
 }
 
-async fn mysql(source: &Datasource) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
+async fn mysql(source: &Datasource, url: &str) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
     trace!("Loading MySQL query connector...");
 
-    let mysql = Mysql::from_source(source).await?;
-    let database_str = &source.url().value;
+    let mysql = Mysql::from_source(source, url).await?;
 
-    let url = Url::parse(database_str)?;
+    let url = Url::parse(url)?;
     let err_str = "No database found in connection string";
 
     let mut db_name = url
@@ -113,12 +119,12 @@ async fn mysql(source: &Datasource) -> crate::Result<(String, Box<dyn QueryExecu
     Ok((db_name, sql_executor(mysql, false)))
 }
 
-async fn mssql(source: &Datasource) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
+async fn mssql(source: &Datasource, url: &str) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
     trace!("Loading SQL Server query connector...");
 
-    let mssql = Mssql::from_source(source).await?;
+    let mssql = Mssql::from_source(source, url).await?;
 
-    let mut conn = JdbcString::from_str(&format!("jdbc:{}", &source.url().value))?;
+    let mut conn = JdbcString::from_str(&format!("jdbc:{}", url))?;
     let db_name = conn
         .properties_mut()
         .remove("schema")
@@ -136,10 +142,10 @@ where
 }
 
 #[cfg(feature = "mongodb")]
-async fn mongodb(source: &Datasource) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
+async fn mongodb(source: &Datasource, url: &str) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
     trace!("Loading MongoDB query connector...");
 
-    let mongo = MongoDb::new(source).await?;
+    let mongo = MongoDb::new(source, url).await?;
     let db_name = mongo.db_name();
 
     trace!("Loaded MongoDB query connector.");

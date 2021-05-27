@@ -5,7 +5,9 @@ pub use mongodb_renderer::*;
 pub use sql_renderer::*;
 
 use crate::{templating, ConnectorTagInterface, DatamodelFragment, IdFragment, M2mFragment, TestConfig};
+use datamodel::common::preview_features::GENERATOR;
 use indoc::indoc;
+use itertools::Itertools;
 use lazy_static::lazy_static;
 use regex::Regex;
 
@@ -30,6 +32,13 @@ pub trait DatamodelRenderer {
 /// Render the complete datamodel with all bells and whistles.
 pub fn render_test_datamodel(config: &TestConfig, test_database: &str, template: String) -> String {
     let tag = config.test_connector_tag().unwrap();
+    let all_features = GENERATOR
+        .active_features()
+        .iter()
+        .chain(GENERATOR.hidden_features())
+        .map(|f| format!(r#""{}""#, f.to_string()))
+        .join(", ");
+
     let datasource_with_generator = format!(
         indoc! {r#"
             datasource test {{
@@ -39,11 +48,12 @@ pub fn render_test_datamodel(config: &TestConfig, test_database: &str, template:
 
             generator client {{
                 provider = "prisma-client-js"
-                previewFeatures = ["microsoftSqlServer"]
+                previewFeatures = [{}]
             }}
         "#},
         tag.datamodel_provider(),
-        tag.connection_string(test_database, config.is_ci())
+        tag.connection_string(test_database, config.is_ci()),
+        all_features
     );
 
     let renderer = tag.datamodel_renderer();

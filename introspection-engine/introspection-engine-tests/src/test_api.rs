@@ -1,56 +1,51 @@
-use crate::BarrelMigrationExecutor;
+pub use super::TestResult;
+pub use test_setup::{BitFlags, Capabilities, Tags};
+
+use crate::{BarrelMigrationExecutor, Result};
 use datamodel::{Configuration, Datamodel};
-use enumflags2::BitFlags;
-use eyre::{Context, Report, Result};
 use introspection_connector::{DatabaseMetadata, IntrospectionConnector, Version};
 use introspection_core::rpc::RpcImpl;
-use quaint::{
-    prelude::{ConnectionInfo, SqlFamily},
-    single::Quaint,
-};
+use migration_connector::MigrationConnector;
+use quaint::{prelude::SqlFamily, single::Quaint};
 use sql_introspection_connector::SqlIntrospectionConnector;
-use sql_schema_describer::{mssql, mysql, postgres, sqlite, SqlSchema, SqlSchemaDescriberBackend};
-use test_setup::{connectors::Tags, *};
+use sql_migration_connector::SqlMigrationConnector;
+use sql_schema_describer::SqlSchema;
+use test_setup::{sqlite_test_url, TestApiArgs};
 use tracing::Instrument;
 
 pub struct TestApi {
     api: SqlIntrospectionConnector,
+    database: Quaint,
     args: TestApiArgs,
     connection_string: String,
-    db_name: &'static str,
-    database: Quaint,
 }
 
 impl TestApi {
     pub async fn new(args: TestApiArgs) -> Self {
-        let tags = args.connector_tags;
+        let tags = args.tags();
+        let connection_string = args.database_url();
 
-        let db_name = if args.connector_tags.contains(Tags::Mysql) {
-            test_setup::mysql_safe_identifier(args.test_function_name)
-        } else {
-            args.test_function_name
-        };
+        let (database, connection_string): (Quaint, String) = if tags.intersects(Tags::Vitess) {
+            let me = SqlMigrationConnector::new(&connection_string, None).await.unwrap();
+            me.reset().await.unwrap();
 
-        let connection_string = (args.url_fn)(db_name);
-
-        let database = if tags.contains(Tags::Mysql) {
-            create_mysql_database(&connection_string.parse().unwrap())
-                .await
-                .unwrap()
+            (
+                Quaint::new(&connection_string).await.unwrap(),
+                connection_string.to_owned(),
+            )
+        } else if tags.contains(Tags::Mysql) {
+            let (_, cs) = args.create_mysql_database().await;
+            (Quaint::new(&cs).await.unwrap(), cs)
         } else if tags.contains(Tags::Postgres) {
-            create_postgres_database(&connection_string.parse().unwrap())
+            let (_, q, cs) = args.create_postgres_database().await;
+            (q, cs)
+        } else if tags.contains(Tags::Mssql) {
+            test_setup::init_mssql_database(args.database_url(), args.test_function_name())
                 .await
                 .unwrap()
-        } else if tags.contains(Tags::Mssql) {
-            let conn = Quaint::new(&connection_string).await.unwrap();
-
-            test_setup::connectors::mssql::reset_schema(&conn, db_name)
-                .await
-                .unwrap();
-
-            conn
         } else if tags.contains(Tags::Sqlite) {
-            Quaint::new(&connection_string).await.unwrap()
+            let url = sqlite_test_url(args.test_function_name());
+            (Quaint::new(&url).await.unwrap(), url)
         } else {
             unreachable!()
         };
@@ -59,10 +54,9 @@ impl TestApi {
 
         TestApi {
             api,
+            database,
             args,
             connection_string,
-            database,
-            db_name,
         }
     }
 
@@ -75,40 +69,7 @@ impl TestApi {
     }
 
     pub async fn describe_schema(&self) -> Result<SqlSchema> {
-        match &self.database.connection_info() {
-            ConnectionInfo::Mssql(url) => {
-                let sql_schema = mssql::SqlSchemaDescriber::new(self.database.clone())
-                    .describe(url.schema())
-                    .await?;
-
-                Ok(sql_schema)
-            }
-            ConnectionInfo::Postgres(url) => {
-                let sql_schema = postgres::SqlSchemaDescriber::new(self.database.clone())
-                    .describe(url.schema())
-                    .await?;
-
-                Ok(sql_schema)
-            }
-            ConnectionInfo::Mysql(_url) => {
-                let sql_schema = mysql::SqlSchemaDescriber::new(self.database.clone())
-                    .describe(self.database.connection_info().schema_name())
-                    .await?;
-
-                Ok(sql_schema)
-            }
-            ConnectionInfo::Sqlite {
-                file_path: _,
-                db_name: _,
-            }
-            | ConnectionInfo::InMemorySqlite { .. } => {
-                let sql_schema = sqlite::SqlSchemaDescriber::new(self.database.clone())
-                    .describe(self.database.connection_info().schema_name())
-                    .await?;
-
-                Ok(sql_schema)
-            }
-        }
+        Ok(self.api.describe().await?)
     }
 
     pub async fn introspect(&self) -> Result<String> {
@@ -119,10 +80,15 @@ impl TestApi {
         ))
     }
 
+    pub fn is_cockroach(&self) -> bool {
+        self.tags().contains(Tags::Cockroach)
+    }
+
     #[tracing::instrument(skip(self, data_model_string))]
+    #[track_caller]
     pub async fn re_introspect(&self, data_model_string: &str) -> Result<String> {
         let config = self.configuration();
-        let data_model = parse_datamodel(data_model_string).context("parsing datamodel")?;
+        let data_model = parse_datamodel(data_model_string);
 
         let introspection_result = self
             .api
@@ -138,7 +104,7 @@ impl TestApi {
     }
 
     pub async fn re_introspect_warnings(&self, data_model_string: &str) -> Result<String> {
-        let data_model = parse_datamodel(data_model_string)?;
+        let data_model = parse_datamodel(data_model_string);
         let introspection_result = self.api.introspect(&data_model).await?;
 
         Ok(serde_json::to_string(&introspection_result.warnings)?)
@@ -186,14 +152,20 @@ impl TestApi {
                 SqlFamily::Sqlite => barrel::SqlVariant::Sqlite,
                 SqlFamily::Mssql => barrel::SqlVariant::Mssql,
             },
+            tags: self.tags(),
         }
     }
 
     pub fn db_name(&self) -> &str {
-        self.db_name
+        if self.tags().intersects(Tags::Vitess) {
+            "test"
+        } else {
+            self.args.test_function_name()
+        }
     }
+
     pub fn tags(&self) -> BitFlags<Tags> {
-        self.args.connector_tags
+        self.args.tags()
     }
 
     pub fn datasource_block(&self) -> String {
@@ -206,6 +178,7 @@ impl TestApi {
             .subject
     }
 
+    #[track_caller]
     pub fn assert_eq_datamodels(&self, expected_without_header: &str, result_with_header: &str) {
         let parsed_expected = datamodel::parse_datamodel(&self.dm_with_sources(expected_without_header))
             .unwrap()
@@ -230,9 +203,7 @@ impl TestApi {
     }
 }
 
-fn parse_datamodel(dm: &str) -> Result<Datamodel> {
-    match RpcImpl::parse_datamodel(dm) {
-        Ok(dm) => Ok(dm),
-        Err(e) => Err(Report::msg(serde_json::to_string_pretty(&e.data).unwrap())),
-    }
+#[track_caller]
+fn parse_datamodel(dm: &str) -> Datamodel {
+    RpcImpl::parse_datamodel(dm).unwrap()
 }

@@ -1,10 +1,10 @@
 use barrel::types;
 use indoc::indoc;
-use introspection_engine_tests::test_api::*;
-use test_macros::test_each_connector;
+use introspection_engine_tests::{test_api::*, TestResult};
+use test_macros::test_connector;
 
-#[test_each_connector(capabilities("scalar_lists"))]
-async fn scalar_list_types(api: &TestApi) -> crate::TestResult {
+#[test_connector(capabilities(ScalarLists))]
+async fn scalar_list_types(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Post", |t| {
@@ -19,7 +19,7 @@ async fn scalar_list_types(api: &TestApi) -> crate::TestResult {
 
     let dm = indoc! {r#"
          model Post {
-            id      Int @id @default(autoincrement())
+            id       Int @id @default(autoincrement())
             ints     Int []
             bools    Boolean []
             strings  String []
@@ -29,7 +29,7 @@ async fn scalar_list_types(api: &TestApi) -> crate::TestResult {
 
     let result = api.introspect().await?;
 
-    api.assert_eq_datamodels(dm, &result);
+    api.assert_eq_datamodels(&dm, &result);
 
     Ok(())
 }

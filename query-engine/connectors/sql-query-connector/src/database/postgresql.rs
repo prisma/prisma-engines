@@ -16,8 +16,8 @@ pub struct PostgreSql {
 
 #[async_trait]
 impl FromSource for PostgreSql {
-    async fn from_source(source: &Datasource) -> connector_interface::Result<Self> {
-        let database_str = &source.url().value;
+    async fn from_source(_source: &Datasource, url: &str) -> connector_interface::Result<Self> {
+        let database_str = url;
 
         let connection_info = ConnectionInfo::from_url(database_str).map_err(|err| {
             ConnectorError::from_kind(ErrorKind::InvalidDatabaseUrl {
@@ -26,7 +26,7 @@ impl FromSource for PostgreSql {
             })
         })?;
 
-        let mut builder = Quaint::builder(&source.url().value)
+        let mut builder = Quaint::builder(url)
             .map_err(SqlError::from)
             .map_err(|sql_error| sql_error.into_connector_error(&connection_info))?;
 

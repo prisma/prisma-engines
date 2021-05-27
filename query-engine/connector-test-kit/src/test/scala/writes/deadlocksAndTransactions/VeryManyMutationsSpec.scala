@@ -8,6 +8,7 @@ import scala.concurrent.Future
 
 class VeryManyMutationsSpec extends FlatSpec with Matchers with ApiSpecBase with AwaitUtils {
 
+  override def doNotRunForConnectors: Set[ConnectorTag] = Set(ConnectorTag.VitessConnectorTag)
   override def runOnlyForCapabilities = Set(JoinRelationLinksCapability)
 
   //Postgres has a limit of 32678 parameters to a query
@@ -29,8 +30,7 @@ class VeryManyMutationsSpec extends FlatSpec with Matchers with ApiSpecBase with
   """
   }
 
-  override protected def beforeAll(): Unit = {
-    super.beforeAll()
+  override protected def beforeEach(): Unit = {
     database.setup(project)
 
     def createTop(int: Int): Unit = {

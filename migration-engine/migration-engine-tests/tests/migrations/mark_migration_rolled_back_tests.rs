@@ -1,30 +1,25 @@
-use migration_engine_tests::sql::*;
+use migration_engine_tests::sync_test_api::*;
 use pretty_assertions::assert_eq;
-use test_macros::test_each_connector;
+use test_macros::test_connector;
 use user_facing_errors::UserFacingError;
 
-#[test_each_connector]
-async fn mark_migration_rolled_back_on_an_empty_database_errors(api: &TestApi) -> TestResult {
-    let err = api.mark_migration_rolled_back("anything").send().await.unwrap_err();
+#[test_connector]
+fn mark_migration_rolled_back_on_an_empty_database_errors(api: TestApi) {
+    let err = api.mark_migration_rolled_back("anything").send_unwrap_err();
 
-    assert_eq!(
-        err.to_string(),
-        "Invariant violation: called markMigrationRolledBack on a database without migrations table."
-    );
-
-    Ok(())
+    assert!(err
+        .to_string()
+        .starts_with("Invariant violation: called markMigrationRolledBack on a database without migrations table.\n"));
 }
 
-#[test_each_connector]
-async fn mark_migration_rolled_back_on_a_database_with_migrations_table_errors(api: &TestApi) -> TestResult {
-    api.migration_persistence().initialize().await?;
+#[test_connector]
+fn mark_migration_rolled_back_on_a_database_with_migrations_table_errors(api: TestApi) {
+    api.block_on(api.migration_persistence().initialize()).unwrap();
 
     let err = api
         .mark_migration_rolled_back("anything")
-        .send()
-        .await
-        .unwrap_err()
-        .render_user_facing()
+        .send_unwrap_err()
+        .to_user_facing()
         .unwrap_known();
 
     assert_eq!(
@@ -36,13 +31,11 @@ async fn mark_migration_rolled_back_on_a_database_with_migrations_table_errors(a
         err.message,
         "Migration `anything` cannot be rolled back because it was never applied to the database. Hint: did you pass in the whole migration name? (example: \"20201207184859_initial_migration\")"
     );
-
-    Ok(())
 }
 
-#[test_each_connector]
-async fn mark_migration_rolled_back_with_a_failed_migration_works(api: &TestApi) -> TestResult {
-    let migrations_directory = api.create_migrations_directory()?;
+#[test_connector]
+fn mark_migration_rolled_back_with_a_failed_migration_works(api: TestApi) {
+    let migrations_directory = api.create_migrations_directory();
     let persistence = api.migration_persistence();
 
     // Create and apply a first migration
@@ -55,8 +48,7 @@ async fn mark_migration_rolled_back_with_a_failed_migration_works(api: &TestApi)
 
         let output_initial_migration = api
             .create_migration("01init", dm1, &migrations_directory)
-            .send()
-            .await?
+            .send_sync()
             .into_output();
 
         output_initial_migration.generated_migration_name.unwrap()
@@ -77,22 +69,21 @@ async fn mark_migration_rolled_back_with_a_failed_migration_works(api: &TestApi)
 
         let output_second_migration = api
             .create_migration("02migration", dm2, &migrations_directory)
-            .send()
-            .await?
+            .send_sync()
             .modify_migration(|migration| {
                 migration.clear();
                 migration.push_str("\nSELECT YOLO;");
-            })?
+            })
             .into_output();
 
         output_second_migration.generated_migration_name.unwrap()
     };
 
-    api.apply_migrations(&migrations_directory).send().await.ok();
+    api.apply_migrations(&migrations_directory).send_unwrap_err();
 
     // Check that the second migration failed.
     {
-        let applied_migrations = persistence.list_migrations().await?.unwrap();
+        let applied_migrations = api.block_on(persistence.list_migrations()).unwrap().unwrap();
 
         assert_eq!(applied_migrations.len(), 2);
         assert!(
@@ -107,9 +98,9 @@ async fn mark_migration_rolled_back_with_a_failed_migration_works(api: &TestApi)
 
     // Mark the second migration as rolled back.
 
-    api.mark_migration_rolled_back(&second_migration_name).send().await?;
+    api.mark_migration_rolled_back(&second_migration_name).send();
 
-    let applied_migrations = persistence.list_migrations().await?.unwrap();
+    let applied_migrations = api.block_on(persistence.list_migrations()).unwrap().unwrap();
 
     assert_eq!(applied_migrations.len(), 2);
     assert_eq!(&applied_migrations[0].migration_name, &initial_migration_name);
@@ -118,13 +109,11 @@ async fn mark_migration_rolled_back_with_a_failed_migration_works(api: &TestApi)
     assert_eq!(&applied_migrations[1].migration_name, &second_migration_name);
     assert!(&applied_migrations[1].finished_at.is_none());
     assert!(&applied_migrations[1].rolled_back_at.is_some());
-
-    Ok(())
 }
 
-#[test_each_connector]
-async fn mark_migration_rolled_back_with_a_successful_migration_errors(api: &TestApi) -> TestResult {
-    let migrations_directory = api.create_migrations_directory()?;
+#[test_connector]
+fn mark_migration_rolled_back_with_a_successful_migration_errors(api: TestApi) {
+    let migrations_directory = api.create_migrations_directory();
     let persistence = api.migration_persistence();
 
     // Create and apply a first migration
@@ -137,8 +126,7 @@ async fn mark_migration_rolled_back_with_a_successful_migration_errors(api: &Tes
 
         let output_initial_migration = api
             .create_migration("01init", dm1, &migrations_directory)
-            .send()
-            .await?
+            .send_sync()
             .into_output();
 
         output_initial_migration.generated_migration_name.unwrap()
@@ -159,18 +147,17 @@ async fn mark_migration_rolled_back_with_a_successful_migration_errors(api: &Tes
 
         let output_second_migration = api
             .create_migration("02migration", dm2, &migrations_directory)
-            .send()
-            .await?
+            .send_sync()
             .into_output();
 
         output_second_migration.generated_migration_name.unwrap()
     };
 
-    api.apply_migrations(&migrations_directory).send().await.ok();
+    api.apply_migrations(&migrations_directory).send_sync();
 
-    // Check that the second migration failed.
+    // Check that the second migration succeeded.
     {
-        let applied_migrations = persistence.list_migrations().await?.unwrap();
+        let applied_migrations = api.block_on(persistence.list_migrations()).unwrap().unwrap();
 
         assert_eq!(applied_migrations.len(), 2);
         assert!(applied_migrations[1].finished_at.is_some(),);
@@ -179,21 +166,14 @@ async fn mark_migration_rolled_back_with_a_successful_migration_errors(api: &Tes
 
     // Mark the second migration as rolled back.
 
-    let err = api
-        .mark_migration_rolled_back(&second_migration_name)
-        .send()
-        .await
-        .unwrap_err();
+    let err = api.mark_migration_rolled_back(&second_migration_name).send_unwrap_err();
 
-    assert_eq!(
-        err.to_string(),
-        format!(
-            "Migration `{}` cannot be rolled back because it is not in a failed state.",
-            second_migration_name
-        )
-    );
+    assert!(err.to_string().starts_with(&format!(
+        "Migration `{}` cannot be rolled back because it is not in a failed state.\n",
+        second_migration_name
+    )));
 
-    let applied_migrations = persistence.list_migrations().await?.unwrap();
+    let applied_migrations = api.block_on(persistence.list_migrations()).unwrap().unwrap();
 
     assert_eq!(applied_migrations.len(), 2);
     assert_eq!(&applied_migrations[0].migration_name, &initial_migration_name);
@@ -202,13 +182,11 @@ async fn mark_migration_rolled_back_with_a_successful_migration_errors(api: &Tes
     assert_eq!(&applied_migrations[1].migration_name, &second_migration_name);
     assert!(&applied_migrations[1].finished_at.is_some());
     assert!(&applied_migrations[1].rolled_back_at.is_none());
-
-    Ok(())
 }
 
-#[test_each_connector]
-async fn rolling_back_applying_again_then_rolling_back_again_should_error(api: &TestApi) -> TestResult {
-    let migrations_directory = api.create_migrations_directory()?;
+#[test_connector]
+fn rolling_back_applying_again_then_rolling_back_again_should_error(api: TestApi) {
+    let migrations_directory = api.create_migrations_directory();
     let persistence = api.migration_persistence();
 
     // Create and apply a first migration
@@ -221,8 +199,7 @@ async fn rolling_back_applying_again_then_rolling_back_again_should_error(api: &
 
         let output_initial_migration = api
             .create_migration("01init", dm1, &migrations_directory)
-            .send()
-            .await?
+            .send_sync()
             .into_output();
 
         output_initial_migration.generated_migration_name.unwrap()
@@ -243,12 +220,11 @@ async fn rolling_back_applying_again_then_rolling_back_again_should_error(api: &
 
         let output_second_migration = api
             .create_migration("02migration", dm2, &migrations_directory)
-            .send()
-            .await?
+            .send_sync()
             .modify_migration(|migration| {
                 migration.clear();
                 migration.push_str("\nSELECT YOLO;");
-            })?;
+            });
 
         (
             output_second_migration
@@ -260,11 +236,11 @@ async fn rolling_back_applying_again_then_rolling_back_again_should_error(api: &
         )
     };
 
-    api.apply_migrations(&migrations_directory).send().await.ok();
+    api.apply_migrations(&migrations_directory).send_unwrap_err();
 
     // Check that the second migration failed.
     {
-        let applied_migrations = persistence.list_migrations().await?.unwrap();
+        let applied_migrations = api.block_on(persistence.list_migrations()).unwrap().unwrap();
 
         assert_eq!(applied_migrations.len(), 2);
         assert!(applied_migrations[1].finished_at.is_none());
@@ -272,18 +248,18 @@ async fn rolling_back_applying_again_then_rolling_back_again_should_error(api: &
     }
 
     // Mark the second migration as rolled back.
-    api.mark_migration_rolled_back(&second_migration_name).send().await?;
+    api.mark_migration_rolled_back(&second_migration_name).send();
 
     // Fix the migration
     second_migration_assertions.modify_migration(|migration| {
         migration.clear();
         migration.push_str("SELECT 'YOLO'");
-    })?;
+    });
 
     // Reapply migration 2
-    api.apply_migrations(&migrations_directory).send().await?;
+    api.apply_migrations(&migrations_directory).send_sync();
 
-    let applied_migrations = persistence.list_migrations().await?.unwrap();
+    let applied_migrations = api.block_on(persistence.list_migrations()).unwrap().unwrap();
 
     assert_eq!(applied_migrations.len(), 3);
     assert_eq!(&applied_migrations[0].migration_name, &initial_migration_name);
@@ -298,9 +274,9 @@ async fn rolling_back_applying_again_then_rolling_back_again_should_error(api: &
     assert!(&applied_migrations[2].rolled_back_at.is_none());
 
     // Try to mark the second migration as rolled back again.
-    api.mark_migration_rolled_back(&second_migration_name).send().await?;
+    api.mark_migration_rolled_back(&second_migration_name).send();
 
-    let final_migrations = persistence.list_migrations().await?.unwrap();
+    let final_migrations = api.block_on(persistence.list_migrations()).unwrap().unwrap();
 
     // Assert that the last two migration records did not change, except for things like checksums.
     assert_eq!(&final_migrations[1].migration_name, &second_migration_name);
@@ -316,6 +292,4 @@ async fn rolling_back_applying_again_then_rolling_back_again_should_error(api: &
         &final_migrations[2].rolled_back_at,
         &applied_migrations[2].rolled_back_at
     );
-
-    Ok(())
 }

@@ -1,8 +1,57 @@
-use migration_engine_tests::sql::*;
-use quaint::prelude::Queryable;
+use migration_engine_tests::sync_test_api::*;
 
-#[test_each_connector(tags("sql"))]
-async fn creating_tables_without_primary_key_must_work(api: &TestApi) -> TestResult {
+#[test_connector]
+fn can_handle_reserved_sql_keywords_for_model_name(api: TestApi) {
+    let dm1 = r#"
+        model Group {
+            id String @id @default(cuid())
+            field String
+        }
+    "#;
+
+    api.schema_push(dm1).send_sync().assert_green_bang();
+    api.assert_schema()
+        .assert_table_bang("Group", |t| t.assert_column("field", |c| c.assert_type_is_string()));
+
+    let dm2 = r#"
+        model Group {
+            id String @id @default(cuid())
+            field Int
+        }
+    "#;
+
+    api.schema_push(dm2).send_sync().assert_green_bang();
+    api.assert_schema()
+        .assert_table_bang("Group", |t| t.assert_column("field", |c| c.assert_type_is_int()));
+}
+
+#[test_connector]
+fn can_handle_reserved_sql_keywords_for_field_name(api: TestApi) {
+    let dm1 = r#"
+        model Test {
+            id String @id @default(cuid())
+            Group String
+        }
+    "#;
+
+    api.schema_push(dm1).send_sync().assert_green_bang();
+    api.assert_schema()
+        .assert_table_bang("Test", |t| t.assert_column("Group", |c| c.assert_type_is_string()));
+
+    let dm2 = r#"
+        model Test {
+            id String @id @default(cuid())
+            Group Int
+        }
+    "#;
+
+    api.schema_push(dm2).send_sync().assert_green_bang();
+    api.assert_schema()
+        .assert_table_bang("Test", |t| t.assert_column("Group", |c| c.assert_type_is_int()));
+}
+
+#[test_connector]
+fn creating_tables_without_primary_key_must_work(api: TestApi) {
     let dm = r#"
         model Pair {
             index Int
@@ -13,19 +62,17 @@ async fn creating_tables_without_primary_key_must_work(api: &TestApi) -> TestRes
         }
     "#;
 
-    api.schema_push(dm).send().await?.assert_green()?;
+    api.schema_push(dm).send_sync().assert_green_bang();
 
-    api.assert_schema().await?.assert_table("Pair", |table| {
+    api.assert_schema().assert_table_bang("Pair", |table| {
         table
             .assert_has_no_pk()?
             .assert_index_on_columns(&["index", "name"], |idx| idx.assert_is_unique())
-    })?;
-
-    Ok(())
+    });
 }
 
-#[test_each_connector(tags("sql"))]
-async fn relations_to_models_without_a_primary_key_work(api: &TestApi) -> TestResult {
+#[test_connector]
+fn relations_to_models_without_a_primary_key_work(api: TestApi) {
     let dm = r#"
         model Pair {
             index Int
@@ -44,24 +91,21 @@ async fn relations_to_models_without_a_primary_key_work(api: &TestApi) -> TestRe
         }
     "#;
 
-    api.schema_push(dm).send().await?.assert_green()?;
+    api.schema_push(dm).send_sync().assert_green_bang();
 
     api.assert_schema()
-        .await?
-        .assert_table("Pair", |table| table.assert_has_no_pk())?
-        .assert_table("PairMetadata", |table| {
+        .assert_table_bang("Pair", |table| table.assert_has_no_pk())
+        .assert_table_bang("PairMetadata", |table| {
             table
                 .assert_pk(|pk| pk.assert_columns(&["id"]))?
                 .assert_fk_on_columns(&["pairidx", "pairname"], |fk| {
                     fk.assert_references("Pair", &["index", "name"])
                 })
-        })?;
-
-    Ok(())
+        });
 }
 
-#[test_each_connector(tags("sql"))]
-async fn relations_to_models_with_no_pk_and_a_single_unique_required_field_work(api: &TestApi) -> TestResult {
+#[test_connector]
+fn relations_to_models_with_no_pk_and_a_single_unique_required_field_work(api: TestApi) {
     let dm = r#"
         model Pair {
             index Int
@@ -77,22 +121,19 @@ async fn relations_to_models_with_no_pk_and_a_single_unique_required_field_work(
         }
     "#;
 
-    api.schema_push(dm).send().await?.assert_green()?;
+    api.schema_push(dm).send_sync().assert_green_bang();
 
     api.assert_schema()
-        .await?
-        .assert_table("Pair", |table| table.assert_has_no_pk())?
-        .assert_table("PairMetadata", |table| {
+        .assert_table_bang("Pair", |table| table.assert_has_no_pk())
+        .assert_table_bang("PairMetadata", |table| {
             table
                 .assert_pk(|pk| pk.assert_columns(&["id"]))?
                 .assert_fk_on_columns(&["pweight"], |fk| fk.assert_references("Pair", &["weight"]))
-        })?;
-
-    Ok(())
+        });
 }
 
-#[test_each_connector(capabilities("enums"), tags("sql"))]
-async fn enum_value_with_database_names_must_work(api: &TestApi) -> TestResult {
+#[test_connector(capabilities(Enums))]
+fn enum_value_with_database_names_must_work(api: TestApi) {
     let dm = r##"
         model Cat {
             id String @id
@@ -107,20 +148,19 @@ async fn enum_value_with_database_names_must_work(api: &TestApi) -> TestResult {
 
     api.schema_push(dm)
         .migration_id(Some("initial"))
-        .send()
-        .await?
-        .assert_green()?;
+        .send_sync()
+        .assert_green_bang();
 
     if api.is_mysql() {
         api.assert_schema()
-            .await?
             .assert_enum(&api.normalize_identifier("Cat_mood"), |enm| {
                 enm.assert_values(&["ANGRY", "hongry"])
-            })?;
+            })
+            .unwrap();
     } else {
         api.assert_schema()
-            .await?
-            .assert_enum("CatMood", |enm| enm.assert_values(&["ANGRY", "hongry"]))?;
+            .assert_enum("CatMood", |enm| enm.assert_values(&["ANGRY", "hongry"]))
+            .unwrap();
     }
 
     let dm = r##"
@@ -136,25 +176,23 @@ async fn enum_value_with_database_names_must_work(api: &TestApi) -> TestResult {
     "##;
 
     if api.is_mysql() {
-        api.schema_push(dm).force(true).send().await?.assert_warnings(&["The values [hongry] on the enum `Cat_mood` will be removed. If these variants are still used in the database, this will fail.".into()])?;
+        api.schema_push(dm).force(true).send_sync().assert_warnings(&["The values [hongry] on the enum `Cat_mood` will be removed. If these variants are still used in the database, this will fail.".into()]);
 
         api.assert_schema()
-            .await?
             .assert_enum(&api.normalize_identifier("Cat_mood"), |enm| {
                 enm.assert_values(&["ANGRY", "hongery"])
-            })?;
+            })
+            .unwrap();
     } else {
-        api.schema_push(dm).force(true).send().await?.assert_warnings(&["The values [hongry] on the enum `CatMood` will be removed. If these variants are still used in the database, this will fail.".into()])?;
+        api.schema_push(dm).force(true).send_sync().assert_warnings(&["The values [hongry] on the enum `CatMood` will be removed. If these variants are still used in the database, this will fail.".into()]);
         api.assert_schema()
-            .await?
-            .assert_enum("CatMood", |enm| enm.assert_values(&["ANGRY", "hongery"]))?;
+            .assert_enum("CatMood", |enm| enm.assert_values(&["ANGRY", "hongery"]))
+            .unwrap();
     }
-
-    Ok(())
 }
 
-#[test_each_connector(capabilities("enums"), tags("sql"))]
-async fn enum_defaults_must_work(api: &TestApi) -> TestResult {
+#[test_connector(capabilities(Enums))]
+fn enum_defaults_must_work(api: TestApi) {
     let dm = r##"
         model Cat {
             id String @id
@@ -170,15 +208,13 @@ async fn enum_defaults_must_work(api: &TestApi) -> TestResult {
 
     api.schema_push(dm)
         .migration_id(Some("initial"))
-        .send()
-        .await?
-        .assert_green()?;
+        .send_sync()
+        .assert_green_bang();
 
     let insert = quaint::ast::Insert::single_into(api.render_table_name("Cat")).value("id", "the-id");
-    api.database().execute(insert.into()).await?;
+    api.query(insert.into());
 
     let row = api
-        .database()
         .query(
             quaint::ast::Select::from_table(api.render_table_name("Cat"))
                 .column("id")
@@ -186,8 +222,8 @@ async fn enum_defaults_must_work(api: &TestApi) -> TestResult {
                 .column("previousMood")
                 .into(),
         )
-        .await?
-        .into_single()?;
+        .into_single()
+        .unwrap();
 
     assert_eq!(row.get("id").unwrap().to_string().unwrap(), "the-id");
     assert_eq!(
@@ -206,12 +242,10 @@ async fn enum_defaults_must_work(api: &TestApi) -> TestResult {
         },
         "ANGRY"
     );
-
-    Ok(())
 }
 
-#[test_each_connector(tags("sql"))]
-async fn id_as_part_of_relation_must_work(api: &TestApi) -> TestResult {
+#[test_connector]
+fn id_as_part_of_relation_must_work(api: TestApi) {
     let dm = r##"
         model Cat {
             nemesis_id String @id
@@ -224,19 +258,17 @@ async fn id_as_part_of_relation_must_work(api: &TestApi) -> TestResult {
         }
     "##;
 
-    api.schema_push(dm).send().await?.assert_green()?;
+    api.schema_push(dm).send_sync().assert_green_bang();
 
-    api.assert_schema().await?.assert_table("Cat", |table| {
+    api.assert_schema().assert_table_bang("Cat", |table| {
         table
             .assert_pk(|pk| pk.assert_columns(&["nemesis_id"]))?
             .assert_fk_on_columns(&["nemesis_id"], |fk| fk.assert_references("Dog", &["id"]))
-    })?;
-
-    Ok(())
+    });
 }
 
-#[test_each_connector(tags("sql"))]
-async fn multi_field_id_as_part_of_relation_must_work(api: &TestApi) -> TestResult {
+#[test_connector]
+fn multi_field_id_as_part_of_relation_must_work(api: TestApi) {
     let dm = r##"
         model Cat {
             nemesis_name String
@@ -256,21 +288,19 @@ async fn multi_field_id_as_part_of_relation_must_work(api: &TestApi) -> TestResu
         }
     "##;
 
-    api.schema_push(dm).send().await?.assert_green()?;
+    api.schema_push(dm).send_sync().assert_green_bang();
 
-    api.assert_schema().await?.assert_table("Cat", |table| {
+    api.assert_schema().assert_table_bang("Cat", |table| {
         table
             .assert_pk(|pk| pk.assert_columns(&["nemesis_name", "nemesis_weight"]))?
             .assert_fk_on_columns(&["nemesis_name", "nemesis_weight"], |fk| {
                 fk.assert_references("Dog", &["name", "weight"])
             })
-    })?;
-
-    Ok(())
+    });
 }
 
-#[test_each_connector(tags("sql"))]
-async fn remapped_multi_field_id_as_part_of_relation_must_work(api: &TestApi) -> TestResult {
+#[test_connector]
+fn remapped_multi_field_id_as_part_of_relation_must_work(api: TestApi) {
     let dm = r##"
         model Cat {
             nemesis_name String @map("dogname")
@@ -289,21 +319,19 @@ async fn remapped_multi_field_id_as_part_of_relation_must_work(api: &TestApi) ->
         }
     "##;
 
-    api.schema_push(dm).send().await?.assert_green()?;
+    api.schema_push(dm).send_sync().assert_green_bang();
 
-    api.assert_schema().await?.assert_table("Cat", |table| {
+    api.assert_schema().assert_table_bang("Cat", |table| {
         table
             .assert_pk(|pk| pk.assert_columns(&["dogname", "dogweight"]))?
             .assert_fk_on_columns(&["dogname", "dogweight"], |fk| {
                 fk.assert_references("Dog", &["name", "weight"])
             })
-    })?;
-
-    Ok(())
+    });
 }
 
-#[test_each_connector(tags("sql"))]
-async fn unique_constraints_on_composite_relation_fields(api: &TestApi) -> TestResult {
+#[test_connector]
+fn unique_constraints_on_composite_relation_fields(api: TestApi) {
     let dm = r##"
         model Parent {
             id    Int    @id
@@ -324,17 +352,15 @@ async fn unique_constraints_on_composite_relation_fields(api: &TestApi) -> TestR
         }
     "##;
 
-    api.schema_push(dm).send().await?.assert_green()?;
+    api.schema_push(dm).send_sync().assert_green_bang();
 
-    api.assert_schema().await?.assert_table("Parent", |table| {
+    api.assert_schema().assert_table_bang("Parent", |table| {
         table.assert_index_on_columns(&["chiid", "chic"], |idx| idx.assert_is_unique())
-    })?;
-
-    Ok(())
+    });
 }
 
-#[test_each_connector(tags("sql"))]
-async fn indexes_on_composite_relation_fields(api: &TestApi) -> TestResult {
+#[test_connector]
+fn indexes_on_composite_relation_fields(api: TestApi) {
     let dm = r##"
         model User {
           id                  Int       @id
@@ -355,17 +381,15 @@ async fn indexes_on_composite_relation_fields(api: &TestApi) -> TestResult {
         }
     "##;
 
-    api.schema_push(dm).send().await?.assert_green()?;
+    api.schema_push(dm).send_sync().assert_green_bang();
 
-    api.assert_schema().await?.assert_table("SpamList", |table| {
+    api.assert_schema().assert_table_bang("SpamList", |table| {
         table.assert_index_on_columns(&["ufn", "uln"], |idx| idx.assert_is_not_unique())
-    })?;
-
-    Ok(())
+    });
 }
 
-#[test_each_connector(tags("sql"), ignore("mssql"))]
-async fn dropping_mutually_referencing_tables_works(api: &TestApi) -> TestResult {
+#[test_connector(exclude(Mssql))]
+fn dropping_mutually_referencing_tables_works(api: TestApi) {
     let dm1 = r#"
     model A {
         id Int @id
@@ -398,11 +422,9 @@ async fn dropping_mutually_referencing_tables_works(api: &TestApi) -> TestResult
     }
     "#;
 
-    api.schema_push(dm1).send().await?.assert_green()?;
-    api.assert_schema().await?.assert_tables_count(3)?;
+    api.schema_push(dm1).send_sync().assert_green_bang();
+    api.assert_schema().assert_tables_count(3).unwrap();
 
-    api.schema_push("").send().await?.assert_green()?;
-    api.assert_schema().await?.assert_tables_count(0)?;
-
-    Ok(())
+    api.schema_push("").send_sync().assert_green_bang();
+    api.assert_schema().assert_tables_count(0).unwrap();
 }

@@ -1,8 +1,6 @@
 use super::*;
 use crate::{
-    constants::inputs::args,
-    constants::inputs::filters,
-    constants::inputs::ordering,
+    constants::{aggregations, args, ordering},
     query_document::{ParsedArgument, ParsedInputMap},
     QueryGraphBuilderError, QueryGraphBuilderResult,
 };
@@ -11,7 +9,7 @@ use prisma_models::{
     Field, ModelProjection, ModelRef, OrderBy, PrismaValue, RecordProjection, RelationFieldRef, ScalarFieldRef,
     SortAggregation, SortOrder,
 };
-use std::convert::{identity, TryInto};
+use std::convert::TryInto;
 
 /// Expects the caller to know that it is structurally guaranteed that query arguments can be extracted,
 /// e.g. that the query schema guarantees that required fields are present.
@@ -80,7 +78,7 @@ fn extract_order_by(model: &ModelRef, value: ParsedInputValue) -> QueryGraphBuil
                 Ok(process_order_object(model, object, vec![], None)?)
             })
             .collect::<QueryGraphBuilderResult<Vec<_>>>()
-            .map(|results| results.into_iter().filter_map(identity).collect()),
+            .map(|results| results.into_iter().flatten().collect()),
 
         ParsedInputValue::Map(map) => Ok(match process_order_object(model, map, vec![], None)? {
             Some(order) => vec![order],
@@ -155,11 +153,11 @@ fn process_order_object(
 
 fn extract_sort_aggregation(field_name: &str) -> QueryGraphBuilderResult<SortAggregation> {
     match field_name {
-        filters::COUNT | filters::UNDERSCORE_COUNT => Ok(SortAggregation::Count),
-        filters::UNDERSCORE_AVG => Ok(SortAggregation::Avg),
-        filters::UNDERSCORE_SUM => Ok(SortAggregation::Sum),
-        filters::UNDERSCORE_MIN => Ok(SortAggregation::Min),
-        filters::UNDERSCORE_MAX => Ok(SortAggregation::Max),
+        aggregations::COUNT | aggregations::UNDERSCORE_COUNT => Ok(SortAggregation::Count),
+        aggregations::UNDERSCORE_AVG => Ok(SortAggregation::Avg),
+        aggregations::UNDERSCORE_SUM => Ok(SortAggregation::Sum),
+        aggregations::UNDERSCORE_MIN => Ok(SortAggregation::Min),
+        aggregations::UNDERSCORE_MAX => Ok(SortAggregation::Max),
         _ => Err(QueryGraphBuilderError::InputError(
             "No aggregation operation could be found. This should not happen".to_string(),
         )),

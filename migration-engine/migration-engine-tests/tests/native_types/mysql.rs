@@ -1,5 +1,4 @@
-use migration_engine_tests::sql::*;
-use quaint::prelude::Queryable;
+use migration_engine_tests::sync_test_api::*;
 use std::{borrow::Cow, fmt::Write};
 
 /// (source native type, test value to insert, target native type)
@@ -656,14 +655,14 @@ fn expand_cases<'a, 'b>(
 
     for dm in std::iter::once(&mut *dm1).chain(std::iter::once(&mut *dm2)) {
         dm.clear();
-        api.write_native_types_datamodel_header(dm);
+        api.write_datasource_block(dm);
         dm.push_str("model Test {\nid Int @id @default(autoincrement())\n");
     }
 
     for (idx, _) in std::iter::repeat(()).enumerate().take(to_types.len()) {
         writeln!(
             dm1,
-            "{colname} {scalar_type}{nullability} @test_db.{native_type}",
+            "{colname} {scalar_type}{nullability} @db.{native_type}",
             colname = colnames[idx],
             scalar_type = native_type_name_to_prisma_scalar_type_name(from_type),
             native_type = from_type,
@@ -675,7 +674,7 @@ fn expand_cases<'a, 'b>(
     for (idx, to_type) in to_types.iter().enumerate() {
         writeln!(
             dm2,
-            "{colname} {scalar_type}{nullability} @test_db.{native_type}",
+            "{colname} {scalar_type}{nullability} @db.{native_type}",
             colname = colnames[idx],
             scalar_type = native_type_name_to_prisma_scalar_type_name(to_type),
             native_type = to_type,
@@ -749,25 +748,24 @@ fn filter_to_types(api: &TestApi, to_types: &'static [&'static str]) -> Cow<'sta
     to_types.into()
 }
 
-#[test_each_connector(tags("mysql"))]
-async fn safe_casts_with_existing_data_should_work(api: &TestApi) -> TestResult {
+#[test_connector(tags(Mysql))]
+fn safe_casts_with_existing_data_should_work(api: TestApi) {
     let connector = sql_datamodel_connector::MySqlDatamodelConnector::new();
     let mut dm1 = String::with_capacity(256);
     let mut dm2 = String::with_capacity(256);
     let colnames = colnames_for_cases(SAFE_CASTS);
-    let conn = api.database();
-    let safe_casts = filter_from_types(api, SAFE_CASTS);
+    let safe_casts = filter_from_types(&api, SAFE_CASTS);
 
     for (from_type, test_value, to_types) in safe_casts.iter() {
         let span = tracing::info_span!("SafeCasts", from = %from_type, to = ?to_types);
         let _span = span.enter();
 
-        let to_types = filter_to_types(api, &to_types);
+        let to_types = filter_to_types(&api, &to_types);
 
         tracing::info!("initial migration");
 
         let insert = expand_cases(
-            api,
+            &api,
             from_type,
             test_value,
             (to_types.as_ref(), false),
@@ -776,14 +774,14 @@ async fn safe_casts_with_existing_data_should_work(api: &TestApi) -> TestResult 
             &colnames,
         );
 
-        api.schema_push(&dm1).send().await?.assert_green()?;
+        api.schema_push(&dm1).send_sync().assert_green_bang();
 
-        conn.insert(insert.into()).await?;
+        api.query(insert.into());
 
         tracing::info!("cast migration");
-        api.schema_push(&dm2).send().await?.assert_green()?;
+        api.schema_push(&dm2).send_sync().assert_green_bang();
 
-        api.assert_schema().await?.assert_table("Test", |table| {
+        api.assert_schema().assert_table_bang("Test", |table| {
             to_types.iter().enumerate().fold(
                 table.assert_columns_count(to_types.len() + 1),
                 |result, (idx, to_type)| {
@@ -792,34 +790,31 @@ async fn safe_casts_with_existing_data_should_work(api: &TestApi) -> TestResult 
                     })
                 },
             )
-        })?;
+        });
 
-        conn.raw_cmd("DROP TABLE `Test`").await?;
+        api.raw_cmd("DROP TABLE `Test`");
     }
-
-    Ok(())
 }
 
-#[test_each_connector(tags("mysql"))]
-async fn risky_casts_with_existing_data_should_warn(api: &TestApi) -> TestResult {
+#[test_connector(tags(Mysql))]
+fn risky_casts_with_existing_data_should_warn(api: TestApi) {
     let connector = sql_datamodel_connector::MySqlDatamodelConnector::new();
     let mut dm1 = String::with_capacity(256);
     let mut dm2 = String::with_capacity(256);
     let colnames = colnames_for_cases(RISKY_CASTS);
     let mut warnings: Vec<Cow<'_, str>> = Vec::with_capacity(6);
-    let conn = api.database();
-    let risky_casts = filter_from_types(api, RISKY_CASTS);
+    let risky_casts = filter_from_types(&api, RISKY_CASTS);
 
     for (from_type, test_value, to_types) in risky_casts.iter() {
         let span = tracing::info_span!("RiskyCasts", from = %from_type, to = ?to_types);
         let _span = span.enter();
 
-        let to_types = filter_to_types(api, to_types);
+        let to_types = filter_to_types(&api, to_types);
 
         tracing::info!("initial migration");
 
         let insert = expand_cases(
-            api,
+            &api,
             from_type,
             test_value,
             (to_types.as_ref(), false),
@@ -842,53 +837,49 @@ async fn risky_casts_with_existing_data_should_warn(api: &TestApi) -> TestResult
             ).into());
         }
 
-        api.schema_push(&dm1).send().await?.assert_green()?;
+        api.schema_push(&dm1).send_sync().assert_green_bang();
 
-        conn.insert(insert.into()).await?;
+        api.query(insert.into());
 
         tracing::info!("cast migration");
 
         api.schema_push(&dm2)
             .force(true)
-            .send()
-            .await?
-            .assert_executable()?
-            .assert_warnings(&warnings)?;
+            .send_sync()
+            .assert_executable()
+            .assert_warnings(&warnings);
 
-        api.assert_schema().await?.assert_table("Test", |table| {
+        api.assert_schema().assert_table_bang("Test", |table| {
             to_types.iter().enumerate().fold(Ok(table), |result, (idx, to_type)| {
                 result.and_then(|table| {
                     table.assert_column(&colnames[idx], |col| col.assert_native_type(to_type, &connector))
                 })
             })
-        })?;
+        });
 
-        conn.raw_cmd("DROP TABLE `Test`").await?;
+        api.raw_cmd("DROP TABLE `Test`");
     }
-
-    Ok(())
 }
 
-#[test_each_connector(tags("mysql"))]
-async fn impossible_casts_with_existing_data_should_warn(api: &TestApi) -> TestResult {
+#[test_connector(tags(Mysql))]
+fn impossible_casts_with_existing_data_should_warn(api: TestApi) {
     let connector = sql_datamodel_connector::MySqlDatamodelConnector::new();
     let mut dm1 = String::with_capacity(256);
     let mut dm2 = String::with_capacity(256);
     let colnames = colnames_for_cases(IMPOSSIBLE_CASTS);
     let mut warnings: Vec<Cow<'_, str>> = Vec::with_capacity(6);
-    let conn = api.database();
-    let impossible_casts = filter_from_types(api, IMPOSSIBLE_CASTS);
+    let impossible_casts = filter_from_types(&api, IMPOSSIBLE_CASTS);
 
     for (from_type, test_value, to_types) in impossible_casts.iter() {
         let span = tracing::info_span!("ImpossibleCasts", from = %from_type, to = ?to_types);
         let _span = span.enter();
 
-        let to_types = filter_to_types(api, to_types);
+        let to_types = filter_to_types(&api, to_types);
 
         tracing::info!("initial migration");
 
         let insert = expand_cases(
-            api,
+            &api,
             from_type,
             test_value,
             (to_types.as_ref(), true),
@@ -911,35 +902,32 @@ async fn impossible_casts_with_existing_data_should_warn(api: &TestApi) -> TestR
             ).into());
         }
 
-        api.schema_push(&dm1).send().await?.assert_green()?;
+        api.schema_push(&dm1).send_sync().assert_green_bang();
 
-        conn.insert(insert.into()).await?;
+        api.query(insert.into());
 
         tracing::info!("cast migration");
 
         api.schema_push(&dm2)
             .force(true)
-            .send()
-            .await?
-            .assert_executable()?
-            .assert_warnings(&warnings)?;
+            .send_sync()
+            .assert_executable()
+            .assert_warnings(&warnings);
 
-        api.assert_schema().await?.assert_table("Test", |table| {
+        api.assert_schema().assert_table_bang("Test", |table| {
             to_types.iter().enumerate().fold(Ok(table), |result, (idx, to_type)| {
                 result.and_then(|table| {
                     table.assert_column(&colnames[idx], |col| col.assert_native_type(to_type, &connector))
                 })
             })
-        })?;
+        });
 
-        conn.raw_cmd("DROP TABLE `Test`").await?;
+        api.raw_cmd("DROP TABLE `Test`");
     }
-
-    Ok(())
 }
 
-#[test_each_connector(tags("mysql"))]
-async fn typescript_starter_schema_with_native_types_is_idempotent(api: &TestApi) -> TestResult {
+#[test_connector(tags(Mysql))]
+fn typescript_starter_schema_with_native_types_is_idempotent(api: TestApi) {
     let dm = api.datamodel_with_provider(
         r#"
         model Post {
@@ -963,18 +951,18 @@ async fn typescript_starter_schema_with_native_types_is_idempotent(api: &TestApi
     let dm2 = api.datamodel_with_provider(
         r#"
         model Post {
-            id        Int     @id @default(autoincrement()) @test_db.Int
-            title     String  @test_db.VarChar(191)
-            content   String? @test_db.VarChar(191)
-            published Boolean @default(false) @test_db.TinyInt
+            id        Int     @id @default(autoincrement()) @db.Int
+            title     String  @db.VarChar(191)
+            content   String? @db.VarChar(191)
+            published Boolean @default(false) @db.TinyInt
             author    User?   @relation(fields: [authorId], references: [id])
-            authorId  Int?    @test_db.Int
+            authorId  Int?    @db.Int
         }
 
         model User {
-            id    Int     @id @default(autoincrement()) @test_db.Int
-            email String  @unique @test_db.VarChar(191)
-            name  String? @test_db.VarChar(191)
+            id    Int     @id @default(autoincrement()) @db.Int
+            email String  @unique @db.VarChar(191)
+            name  String? @db.VarChar(191)
             posts Post[]
         }
 
@@ -983,28 +971,23 @@ async fn typescript_starter_schema_with_native_types_is_idempotent(api: &TestApi
 
     api.schema_push(&dm)
         .migration_id(Some("first"))
-        .send()
-        .await?
-        .assert_green()?
-        .assert_has_executed_steps()?;
+        .send_sync()
+        .assert_green_bang()
+        .assert_has_executed_steps();
     api.schema_push(&dm)
         .migration_id(Some("second"))
-        .send()
-        .await?
-        .assert_green()?
-        .assert_no_steps()?;
+        .send_sync()
+        .assert_green_bang()
+        .assert_no_steps();
     api.schema_push(&dm2)
         .migration_id(Some("third"))
-        .send()
-        .await?
-        .assert_green()?
-        .assert_no_steps()?;
-
-    Ok(())
+        .send_sync()
+        .assert_green_bang()
+        .assert_no_steps();
 }
 
-#[test_each_connector(log = "debug", tags("mysql"))]
-async fn typescript_starter_schema_with_differnt_native_types_is_idempotent(api: &TestApi) -> TestResult {
+#[test_connector(tags(Mysql))]
+fn typescript_starter_schema_with_differnt_native_types_is_idempotent(api: TestApi) {
     let dm = api.datamodel_with_provider(
         r#"
         model Post {
@@ -1028,49 +1011,42 @@ async fn typescript_starter_schema_with_differnt_native_types_is_idempotent(api:
     let dm2 = api.datamodel_with_provider(
         r#"
         model Post {
-            id        Int     @id @default(autoincrement()) @test_db.Int
-            title     String  @test_db.VarChar(100)
-            content   String? @test_db.VarChar(100)
-            published Boolean @default(false) @test_db.TinyInt
+            id        Int     @id @default(autoincrement()) @db.Int
+            title     String  @db.VarChar(100)
+            content   String? @db.VarChar(100)
+            published Boolean @default(false) @db.TinyInt
             author    User?   @relation(fields: [authorId], references: [id])
-            authorId  Int?    @test_db.Int
+            authorId  Int?    @db.Int
         }
 
         model User {
-            id    Int     @id @default(autoincrement()) @test_db.Int
-            email String  @unique @test_db.VarChar(100)
-            name  String? @test_db.VarChar(100)
+            id    Int     @id @default(autoincrement()) @db.Int
+            email String  @unique @db.VarChar(100)
+            name  String? @db.VarChar(100)
             posts Post[]
         }
-
     "#,
     );
 
     api.schema_push(&dm)
         .migration_id(Some("first"))
-        .send()
-        .await?
-        .assert_green()?
-        .assert_has_executed_steps()?;
+        .send_sync()
+        .assert_green_bang()
+        .assert_has_executed_steps();
     api.schema_push(&dm)
         .migration_id(Some("second"))
-        .send()
-        .await?
-        .assert_green()?
-        .assert_no_steps()?;
+        .send_sync()
+        .assert_green_bang()
+        .assert_no_steps();
 
     api.schema_push(&dm2)
         .migration_id(Some("third"))
-        .send()
-        .await?
-        .assert_green()?
-        .assert_has_executed_steps()?;
+        .send_sync()
+        .assert_green_bang()
+        .assert_has_executed_steps();
     api.schema_push(&dm2)
         .migration_id(Some("third"))
-        .send()
-        .await?
-        .assert_green()?
-        .assert_no_steps()?;
-
-    Ok(())
+        .send_sync()
+        .assert_green_bang()
+        .assert_no_steps();
 }

@@ -71,14 +71,14 @@ pub enum DatamodelError {
   #[error("Function not known: \"{}\".", function_name)]
   FunctionNotKnownError { function_name: String, span: Span },
 
-  #[error("Datasource provider not known: \"{}\".", source_name)]
-  DatasourceProviderNotKnownError { source_name: String, span: Span },
+  #[error("Datasource provider not known: \"{}\".", provider)]
+  DatasourceProviderNotKnownError { provider: String, span: Span },
 
   #[error("shadowDatabaseUrl is the same as url for datasource \"{}\". Please specify a different database as shadow database.", source_name)]
   ShadowDatabaseUrlIsSameAsMainUrl { source_name: String, span: Span },
 
   #[error("The preview feature \"{}\" is not known. Expected one of: {}", preview_feature, expected_preview_features)]
-  PreviewFeatureNotKnownError { preview_feature: String, expected_preview_features: String,  span: Span },
+  PreviewFeatureNotKnownError { preview_feature: String, expected_preview_features: String, span: Span },
 
   #[error("\"{}\" is not a valid value for {}.", raw_value, literal_type)]
   LiteralParseError { literal_type: String, raw_value: String, span: Span },
@@ -335,8 +335,8 @@ impl DatamodelError {
     DatamodelError::FunctionalEvaluationError { message: String::from(message), span }
   }
 
-  pub fn new_environment_functional_evaluation_error(var_name: &str, span: Span) -> DatamodelError {
-    DatamodelError::EnvironmentFunctionalEvaluationError { var_name: String::from(var_name), span }
+  pub fn new_environment_functional_evaluation_error(var_name: String, span: Span) -> DatamodelError {
+    DatamodelError::EnvironmentFunctionalEvaluationError { var_name, span }
   }
 
   pub fn new_type_not_found_error(type_name: &str, span: Span) -> DatamodelError {
@@ -355,16 +355,16 @@ impl DatamodelError {
     DatamodelError::FunctionNotKnownError { function_name: String::from(function_name), span }
   }
 
-  pub fn new_datasource_provider_not_known_error(source_name: &str, span: Span) -> DatamodelError {
-    DatamodelError::DatasourceProviderNotKnownError { source_name: String::from(source_name), span }
+  pub fn new_datasource_provider_not_known_error(provider: &str, span: Span) -> DatamodelError {
+    DatamodelError::DatasourceProviderNotKnownError { provider: String::from(provider), span }
   }
 
   pub fn new_shadow_database_is_same_as_main_url_error(source_name: String, span: Span) -> DatamodelError {
     DatamodelError::ShadowDatabaseUrlIsSameAsMainUrl { source_name, span }
   }
 
-  pub fn new_preview_feature_not_known_error(preview_feature: &str, expected_preview_features: Vec<&str>, span: Span) -> DatamodelError {
-    DatamodelError::PreviewFeatureNotKnownError { preview_feature: String::from(preview_feature), expected_preview_features:  expected_preview_features.join(", "), span}
+  pub fn new_preview_feature_not_known_error(preview_feature: &str, expected_preview_features: String, span: Span) -> DatamodelError {
+    DatamodelError::PreviewFeatureNotKnownError { preview_feature: String::from(preview_feature), expected_preview_features, span}
   }
 
   pub fn new_value_parser_error(expected_type: &str, parser_error: &str, raw: &str, span: Span) -> DatamodelError {

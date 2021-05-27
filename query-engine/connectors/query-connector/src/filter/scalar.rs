@@ -1,5 +1,5 @@
 use super::Filter;
-use crate::{compare::ScalarCompare, MAX_BATCH_SIZE};
+use crate::{compare::ScalarCompare, JsonFilterPath, JsonTargetType, MAX_BATCH_SIZE};
 use prisma_models::{ModelProjection, PrismaListValue, PrismaValue, ScalarFieldRef};
 use std::{collections::BTreeSet, sync::Arc};
 
@@ -130,6 +130,14 @@ pub enum ScalarCondition {
     GreaterThanOrEquals(PrismaValue),
     In(PrismaListValue),
     NotIn(PrismaListValue),
+    JsonCompare(JsonCondition),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct JsonCondition {
+    pub condition: Box<ScalarCondition>,
+    pub path: Option<JsonFilterPath>,
+    pub target_type: Option<JsonTargetType>,
 }
 
 impl ScalarCondition {
@@ -150,6 +158,15 @@ impl ScalarCondition {
                 Self::GreaterThanOrEquals(v) => Self::LessThan(v),
                 Self::In(v) => Self::NotIn(v),
                 Self::NotIn(v) => Self::In(v),
+                Self::JsonCompare(json_compare) => {
+                    let inverted_cond = json_compare.condition.invert(true);
+
+                    Self::JsonCompare(JsonCondition {
+                        condition: Box::new(inverted_cond),
+                        path: json_compare.path,
+                        target_type: json_compare.target_type,
+                    })
+                }
             }
         } else {
             self

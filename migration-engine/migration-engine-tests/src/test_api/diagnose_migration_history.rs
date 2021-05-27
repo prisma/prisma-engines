@@ -1,5 +1,6 @@
 use migration_core::{
-    commands::DiagnoseMigrationHistoryInput, commands::DiagnoseMigrationHistoryOutput, CoreResult, GenericApi,
+    commands::DiagnoseMigrationHistoryInput, commands::DiagnoseMigrationHistoryOutput, CoreError, CoreResult,
+    GenericApi,
 };
 use tempfile::TempDir;
 
@@ -8,6 +9,7 @@ pub struct DiagnoseMigrationHistory<'a> {
     api: &'a dyn GenericApi,
     migrations_directory: &'a TempDir,
     opt_in_to_shadow_database: bool,
+    rt: Option<&'a tokio::runtime::Runtime>,
 }
 
 impl<'a> DiagnoseMigrationHistory<'a> {
@@ -16,7 +18,18 @@ impl<'a> DiagnoseMigrationHistory<'a> {
             api,
             migrations_directory,
             opt_in_to_shadow_database: false,
+            rt: None,
         }
+    }
+
+    pub fn new_sync(
+        api: &'a dyn GenericApi,
+        migrations_directory: &'a TempDir,
+        rt: &'a tokio::runtime::Runtime,
+    ) -> Self {
+        let mut dmh = Self::new(api, migrations_directory);
+        dmh.rt = Some(rt);
+        dmh
     }
 
     pub fn opt_in_to_shadow_database(mut self, opt_in_to_shadow_database: bool) -> Self {
@@ -39,6 +52,16 @@ impl<'a> DiagnoseMigrationHistory<'a> {
             _api: self.api,
             _migrations_directory: self.migrations_directory,
         })
+    }
+
+    #[track_caller]
+    pub fn send_sync(self) -> DiagnoseMigrationHistoryAssertions<'a> {
+        self.rt.unwrap().block_on(self.send()).unwrap()
+    }
+
+    #[track_caller]
+    pub fn send_unwrap_err(self) -> CoreError {
+        self.rt.unwrap().block_on(self.send()).unwrap_err()
     }
 }
 

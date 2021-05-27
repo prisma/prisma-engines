@@ -106,7 +106,6 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
             enums: vec![],
             sequences: vec![],
             user_defined_types,
-            lower_case_identifiers: false,
         })
     }
 

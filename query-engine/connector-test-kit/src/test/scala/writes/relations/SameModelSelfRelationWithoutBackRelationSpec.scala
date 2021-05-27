@@ -7,7 +7,8 @@ import util._
 class SameModelSelfRelationWithoutBackRelationSpec extends FlatSpec with Matchers with ApiSpecBase {
   override def runOnlyForCapabilities = Set(JoinRelationLinksCapability)
 
-  "A Many to Many Self Relation" should "be accessible from only one side" in {
+  // Bring back sql server when cascading rules can be set!
+  "A Many to Many Self Relation" should "be accessible from only one side" taggedAs (IgnoreMsSql) in {
     val testDataModels = {
       val dm1 = """model Post {
                     id         String @id @default(cuid())

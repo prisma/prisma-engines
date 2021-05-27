@@ -4,15 +4,22 @@ use indoc::indoc;
 use quaint::ast::*;
 use quaint::connector::{ConnectionInfo, SqlFamily};
 use serde_json::json;
-use test_macros::test_each_connector;
+use test_macros::test_connector;
 
-static TODO: &str = indoc! {"
+type TestResult = anyhow::Result<()>;
+
+static TODO: &str = indoc! {r#"
+    generator js {
+        provider = "prisma-client-js"
+        previewFeatures = ["microsoftSqlServer", "mongodb", "orderByRelation", "napi", "selectRelationCount", "orderByAggregateGroup"]
+    }
+
     model Todo {
         id String @id @default(cuid())
         title String
         dt DateTime?
     }
-"};
+"#};
 
 fn execute_raw(query: &str, params: Vec<Value>) -> String {
     let params: Vec<serde_json::Value> = params
@@ -46,9 +53,8 @@ fn query_raw(query: &str, params: Vec<Value>) -> String {
     )
 }
 
-#[test_each_connector]
-async fn select_1(api: &TestApi) -> anyhow::Result<()> {
-    feature_flags::initialize(&[String::from("all")]).unwrap();
+#[test_connector]
+async fn select_1(api: &TestApi) -> TestResult {
     let query_engine = api.create_engine(&TODO).await?;
 
     let query = indoc! {r#"
@@ -71,9 +77,8 @@ async fn select_1(api: &TestApi) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[test_each_connector]
-async fn parameterized_queries(api: &TestApi) -> anyhow::Result<()> {
-    feature_flags::initialize(&[String::from("all")]).unwrap();
+#[test_connector]
+async fn parameterized_queries(api: &TestApi) -> TestResult {
     let query_engine = api.create_engine(&TODO).await?;
 
     let query = match api.connection_info() {
@@ -121,9 +126,8 @@ async fn parameterized_queries(api: &TestApi) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[test_each_connector]
-async fn querying_model_tables(api: &TestApi) -> anyhow::Result<()> {
-    feature_flags::initialize(&[String::from("all")]).unwrap();
+#[test_connector]
+async fn querying_model_tables(api: &TestApi) -> TestResult {
     let query_engine = api.create_engine(&TODO).await?;
 
     let mutation = indoc! {r#"
@@ -151,9 +155,8 @@ async fn querying_model_tables(api: &TestApi) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[test_each_connector]
-async fn inserting_into_model_table(api: &TestApi) -> anyhow::Result<()> {
-    feature_flags::initialize(&[String::from("all")]).unwrap();
+#[test_connector]
+async fn inserting_into_model_table(api: &TestApi) -> TestResult {
     let query_engine = api.create_engine(&TODO).await?;
 
     let dt = DateTime::parse_from_rfc3339("1996-12-19T16:39:57+00:00")?;
@@ -208,9 +211,8 @@ async fn inserting_into_model_table(api: &TestApi) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[test_each_connector]
-async fn querying_model_tables_with_alias(api: &TestApi) -> anyhow::Result<()> {
-    feature_flags::initialize(&[String::from("all")]).unwrap();
+#[test_connector]
+async fn querying_model_tables_with_alias(api: &TestApi) -> TestResult {
     let query_engine = api.create_engine(&TODO).await?;
 
     let mutation = indoc! {r#"
@@ -237,9 +239,8 @@ async fn querying_model_tables_with_alias(api: &TestApi) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[test_each_connector]
-async fn querying_the_same_column_name_twice_with_aliasing(api: &TestApi) -> anyhow::Result<()> {
-    feature_flags::initialize(&[String::from("all")]).unwrap();
+#[test_connector]
+async fn querying_the_same_column_name_twice_with_aliasing(api: &TestApi) -> TestResult {
     let query_engine = api.create_engine(&TODO).await?;
 
     let mutation = indoc! {r#"
@@ -268,9 +269,8 @@ async fn querying_the_same_column_name_twice_with_aliasing(api: &TestApi) -> any
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"))]
-async fn arrays(api: &TestApi) -> anyhow::Result<()> {
-    feature_flags::initialize(&[String::from("all")]).unwrap();
+#[test_connector(tags(Postgres))]
+async fn arrays(api: &TestApi) -> TestResult {
     let query_engine = api.create_engine(&TODO).await?;
 
     let query = "SELECT ARRAY_AGG(columnInfos.attname) AS postgres_array FROM pg_attribute columnInfos";
@@ -284,9 +284,8 @@ async fn arrays(api: &TestApi) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[test_each_connector]
-async fn syntactic_errors_bubbling_through_to_the_user(api: &TestApi) -> anyhow::Result<()> {
-    feature_flags::initialize(&[String::from("all")]).unwrap();
+#[test_connector]
+async fn syntactic_errors_bubbling_through_to_the_user(api: &TestApi) -> TestResult {
     let query_engine = api.create_engine(&TODO).await?;
     let result = query_engine.request(query_raw("SELECT * FROM ", vec![])).await;
     let error_code = result["errors"][0]["user_facing_error"]["meta"]["code"].as_str();
@@ -301,9 +300,8 @@ async fn syntactic_errors_bubbling_through_to_the_user(api: &TestApi) -> anyhow:
     Ok(())
 }
 
-#[test_each_connector]
-async fn other_errors_bubbling_through_to_the_user(api: &TestApi) -> anyhow::Result<()> {
-    feature_flags::initialize(&[String::from("all")]).unwrap();
+#[test_connector]
+async fn other_errors_bubbling_through_to_the_user(api: &TestApi) -> TestResult {
     let query_engine = api.create_engine(&TODO).await?;
 
     let mutation = indoc! {r#"
@@ -333,9 +331,8 @@ async fn other_errors_bubbling_through_to_the_user(api: &TestApi) -> anyhow::Res
     Ok(())
 }
 
-#[test_each_connector]
+#[test_connector]
 async fn parameter_escaping(api: &TestApi) -> anyhow::Result<()> {
-    feature_flags::initialize(&[String::from("all")]).unwrap();
     let query_engine = api.create_engine(&TODO).await?;
 
     let query = match api.connection_info() {

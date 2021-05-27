@@ -96,9 +96,6 @@ pub struct PrismaOpt {
 
     #[structopt(subcommand)]
     pub subcommand: Option<Subcommand>,
-
-    #[structopt(long = "enable-experimental", use_delimiter = true)]
-    pub raw_feature_flags: Vec<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -122,14 +119,10 @@ impl PrismaOpt {
         Ok(res)
     }
 
-    pub fn datamodel(&self, ignore_data_sources: bool) -> PrismaResult<Datamodel> {
+    pub fn datamodel(&self) -> PrismaResult<Datamodel> {
         let datamodel_str = self.datamodel_str()?;
 
-        let datamodel = if ignore_data_sources {
-            datamodel::parse_datamodel_and_ignore_datasource_urls(datamodel_str)
-        } else {
-            datamodel::parse_datamodel(datamodel_str)
-        };
+        let datamodel = datamodel::parse_datamodel(datamodel_str);
 
         match datamodel {
             Err(errors) => Err(PrismaError::ConversionError(errors, datamodel_str.to_string())),
@@ -148,9 +141,15 @@ impl PrismaOpt {
         };
 
         let config_result = if ignore_env_errors {
-            datamodel::parse_configuration_and_ignore_datasource_urls(datamodel_str)
+            datamodel::parse_configuration(datamodel_str)
         } else {
-            datamodel::parse_configuration_with_url_overrides(datamodel_str, datasource_url_overrides)
+            datamodel::parse_configuration(datamodel_str).and_then(|mut config| {
+                config
+                    .subject
+                    .resolve_datasource_urls_from_env(&datasource_url_overrides)?;
+
+                Ok(config)
+            })
         };
         config_result.map_err(|errors| PrismaError::ConversionError(errors, datamodel_str.to_string()))
     }

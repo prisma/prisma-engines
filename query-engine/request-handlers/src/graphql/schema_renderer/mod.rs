@@ -40,7 +40,10 @@ impl QuerySchemaRenderer<String> for GraphQLSchemaRenderer {
         query_schema.into_renderer().render(&mut context);
 
         // Add custom scalar types (required for graphql.js implementations)
-        format!("{}\n\nscalar DateTime\nscalar Json\nscalar UUID", context.format())
+        format!(
+            "{}\n\nscalar DateTime\nscalar Json\nscalar UUID\nscalar BigInt",
+            context.format()
+        )
     }
 }
 

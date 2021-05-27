@@ -108,18 +108,25 @@ pub enum AggregationSelection {
 }
 
 impl AggregationSelection {
-    pub fn identifiers(&self) -> Vec<(TypeIdentifier, FieldArity)> {
+    /// Returns (<field db name>, TypeIdentifier, FieldArity)
+    pub fn identifiers(&self) -> Vec<(String, TypeIdentifier, FieldArity)> {
         match self {
-            AggregationSelection::Field(field) => vec![(field.type_identifier.clone(), FieldArity::Required)],
+            AggregationSelection::Field(field) => vec![(
+                field.db_name().to_owned(),
+                field.type_identifier.clone(),
+                FieldArity::Required,
+            )],
+
             AggregationSelection::Count { all, fields } => {
                 let mut mapped = Self::map_field_types(&fields, Some(TypeIdentifier::Int));
 
                 if *all {
-                    mapped.push((TypeIdentifier::Int, FieldArity::Required));
+                    mapped.push(("all".to_owned(), TypeIdentifier::Int, FieldArity::Required));
                 }
 
                 mapped
             }
+
             AggregationSelection::Average(fields) => Self::map_field_types(&fields, Some(TypeIdentifier::Float)),
             AggregationSelection::Sum(fields) => Self::map_field_types(&fields, None),
             AggregationSelection::Min(fields) => Self::map_field_types(&fields, None),
@@ -130,11 +137,12 @@ impl AggregationSelection {
     fn map_field_types(
         fields: &[ScalarFieldRef],
         fixed_type: Option<TypeIdentifier>,
-    ) -> Vec<(TypeIdentifier, FieldArity)> {
+    ) -> Vec<(String, TypeIdentifier, FieldArity)> {
         fields
             .iter()
             .map(|f| {
                 (
+                    f.db_name().to_owned(),
                     fixed_type.clone().unwrap_or_else(|| f.type_identifier.clone()),
                     FieldArity::Required,
                 )

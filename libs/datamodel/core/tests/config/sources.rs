@@ -1,5 +1,5 @@
 use crate::common::*;
-use datamodel::{ast::Span, diagnostics::DatamodelError, StringFromEnvVar};
+use datamodel::{ast::Span, common::preview_features::*, diagnostics::DatamodelError, StringFromEnvVar};
 use pretty_assertions::assert_eq;
 use serial_test::serial;
 
@@ -77,11 +77,12 @@ fn must_error_for_empty_urls() {
             url = ""
         }
     "#;
-    let config = datamodel::parse_configuration(schema);
-    assert!(config.is_err());
-    let diagnostics = config.err().expect("This must error");
+
+    let config = datamodel::parse_configuration(schema).unwrap();
+    let diagnostics = config.subject.datasources[0].load_url().unwrap_err();
+
     diagnostics.assert_is(DatamodelError::new_source_validation_error(
-        "You must provide a nonempty URL for the datasource `myds`.",
+        "You must provide a nonempty URL",
         "myds",
         Span::new(77, 79),
     ));
@@ -115,11 +116,12 @@ fn must_error_for_empty_urls_derived_from_env_vars() {
             url = env("DB_URL")
         }
     "#;
-    let config = datamodel::parse_configuration(schema);
-    assert!(config.is_err());
-    let diagnostics = config.err().expect("This must error");
+
+    let config = datamodel::parse_configuration(schema).unwrap();
+    let diagnostics = config.subject.datasources[0].load_url().unwrap_err();
+
     diagnostics.assert_is(DatamodelError::new_source_validation_error(
-        "You must provide a nonempty URL for the datasource `myds`. The environment variable `DB_URL` resolved to an empty string.",
+        "You must provide a nonempty URL. The environment variable `DB_URL` resolved to an empty string.",
         "myds",
         Span::new(77, 90),
     ));
@@ -133,11 +135,12 @@ fn must_error_if_wrong_protocol_is_used_for_mysql() {
             url = "postgresql://"
         }
     "#;
-    let config = datamodel::parse_configuration(schema);
-    assert!(config.is_err());
-    let diagnostics = config.err().expect("This must error");
+
+    let config = datamodel::parse_configuration(schema).unwrap();
+    let diagnostics = config.subject.datasources[0].load_url().unwrap_err();
+
     diagnostics.assert_is(DatamodelError::new_source_validation_error(
-        "The URL for datasource `myds` must start with the protocol `mysql://`.",
+        "the URL must start with the protocol `mysql://`.",
         "myds",
         Span::new(76, 91),
     ));
@@ -153,12 +156,11 @@ fn must_error_if_wrong_protocol_is_used_for_mysql_shadow_database_url() {
         }
     "#;
 
-    let config = datamodel::parse_configuration(schema);
-
-    let diagnostics = config.err().expect("This must error");
+    let config = datamodel::parse_configuration(schema).unwrap();
+    let diagnostics = config.subject.datasources[0].load_shadow_database_url().unwrap_err();
 
     diagnostics.assert_is(DatamodelError::new_source_validation_error(
-        "The shadow database URL for datasource `myds` must start with the protocol `mysql://`.",
+        "the shadow database URL must start with the protocol `mysql://`.",
         "myds",
         Span::new(119, 134),
     ));
@@ -178,8 +180,9 @@ fn must_not_error_for_empty_shadow_database_urls_derived_from_env_vars() {
     "#;
 
     let config = datamodel::parse_configuration(schema).unwrap();
+    let shadow_database_url = config.subject.datasources[0].load_shadow_database_url().unwrap();
 
-    assert!(config.subject.datasources[0].shadow_database_url.is_none());
+    assert!(shadow_database_url.is_none());
 }
 
 #[test]
@@ -193,8 +196,9 @@ fn must_not_error_for_shadow_database_urls_derived_from_missing_env_vars() {
     "#;
 
     let config = datamodel::parse_configuration(schema).unwrap();
+    let shadow_database_url = config.subject.datasources[0].load_shadow_database_url().unwrap();
 
-    assert!(config.subject.datasources[0].shadow_database_url.is_none());
+    assert!(shadow_database_url.is_none());
 }
 
 #[test]
@@ -205,11 +209,12 @@ fn must_error_if_wrong_protocol_is_used_for_postgresql() {
             url = "mysql://"
         }
     "#;
-    let config = datamodel::parse_configuration(schema);
-    assert!(config.is_err());
-    let diagnostics = config.err().expect("This must error");
+
+    let config = datamodel::parse_configuration(schema).unwrap();
+    let diagnostics = config.subject.datasources[0].load_url().unwrap_err();
+
     diagnostics.assert_is(DatamodelError::new_source_validation_error(
-        "The URL for datasource `myds` must start with the protocol `postgresql://`.",
+        "the URL must start with the protocol `postgresql://` or `postgres://`.",
         "myds",
         Span::new(81, 91),
     ));
@@ -224,11 +229,12 @@ fn must_error_if_wrong_protocol_is_used_for_postgresql_shadow_database_url() {
             shadowDatabaseUrl = "mysql://"
         }
     "#;
-    let config = datamodel::parse_configuration(schema);
-    assert!(config.is_err());
-    let diagnostics = config.err().expect("This must error");
+
+    let config = datamodel::parse_configuration(schema).unwrap();
+    let diagnostics = config.subject.datasources[0].load_shadow_database_url().unwrap_err();
+
     diagnostics.assert_is(DatamodelError::new_source_validation_error(
-        "The shadow database URL for datasource `myds` must start with the protocol `postgresql://`.",
+        "the shadow database URL must start with the protocol `postgresql://` or `postgres://`.",
         "myds",
         Span::new(129, 139),
     ));
@@ -242,11 +248,12 @@ fn must_error_if_wrong_protocol_is_used_for_sqlite() {
             url = "mysql://"
         }
     "#;
-    let config = datamodel::parse_configuration(schema);
-    assert!(config.is_err());
-    let diagnostics = config.err().expect("This must error");
+
+    let config = datamodel::parse_configuration(schema).unwrap();
+    let diagnostics = config.subject.datasources[0].load_url().unwrap_err();
+
     diagnostics.assert_is(DatamodelError::new_source_validation_error(
-        "The URL for datasource `myds` must start with the protocol `file:`.",
+        "the URL must start with the protocol `file:`.",
         "myds",
         Span::new(77, 87),
     ));
@@ -292,11 +299,11 @@ fn must_error_if_env_var_is_missing() {
         }
     "#;
 
-    let result = datamodel::parse_configuration(schema);
-    assert!(result.is_err());
-    let diagnostics = result.err().unwrap();
+    let config = datamodel::parse_configuration(schema).unwrap();
+    let diagnostics = config.subject.datasources[0].load_url().unwrap_err();
+
     diagnostics.assert_is(DatamodelError::new_environment_functional_evaluation_error(
-        "DATABASE_URL",
+        "DATABASE_URL".into(),
         Span::new(75, 94),
     ));
 }
@@ -313,14 +320,14 @@ fn must_succeed_if_env_var_is_missing_but_override_was_provided() {
 
     let url = "postgres://localhost";
     let overrides = vec![("ds".to_string(), url.to_string())];
-    let config = parse_configuration_with_url_overrides(schema, overrides);
+    let mut config = parse_configuration(schema);
+    config.resolve_datasource_urls_from_env(&overrides).unwrap();
     let data_source = config.datasources.first().unwrap();
 
     data_source.assert_name("ds");
     data_source.assert_url(StringFromEnvVar {
-        name: "url",
+        value: Some(url.to_string()),
         from_env_var: None,
-        value: url.to_string(),
     });
 }
 
@@ -337,15 +344,12 @@ fn must_succeed_if_env_var_exists_and_override_was_provided() {
 
     let url = "postgres://hostbar";
     let overrides = vec![("ds".to_string(), url.to_string())];
-    let config = parse_configuration_with_url_overrides(schema, overrides);
+    let mut config = parse_configuration(schema);
+    config.resolve_datasource_urls_from_env(&overrides).unwrap();
     let data_source = config.datasources.first().unwrap();
 
     data_source.assert_name("ds");
-    data_source.assert_url(StringFromEnvVar {
-        name: "url",
-        from_env_var: None,
-        value: url.to_string(),
-    });
+    assert_eq!(data_source.url.value.as_deref(), Some(url));
 
     // make sure other tests that run afterwards are not run in a modified environment
     std::env::remove_var("DATABASE_URL");
@@ -363,15 +367,13 @@ fn must_succeed_with_overrides() {
 
     let url = "postgres://hostbar";
     let overrides = vec![("ds".to_string(), url.to_string())];
-    let config = parse_configuration_with_url_overrides(schema, overrides);
+    let mut config = parse_configuration(schema);
+    config.resolve_datasource_urls_from_env(&overrides).unwrap();
+
     let data_source = config.datasources.first().unwrap();
 
     data_source.assert_name("ds");
-    data_source.assert_url(StringFromEnvVar {
-        name: "url",
-        from_env_var: None,
-        value: url.to_string(),
-    });
+    assert_eq!(data_source.url.value.as_deref(), Some(url));
 }
 
 #[test]
@@ -385,14 +387,12 @@ fn fail_to_load_sources_for_invalid_source() {
     "#;
     let res = datamodel::parse_configuration(invalid_datamodel);
 
-    if let Err(diagnostics) = res {
-        diagnostics.assert_is(DatamodelError::DatasourceProviderNotKnownError {
-            source_name: String::from("AStrangeHalfMongoDatabase"),
+    res.err()
+        .unwrap()
+        .assert_is(DatamodelError::DatasourceProviderNotKnownError {
+            provider: String::from("AStrangeHalfMongoDatabase"),
             span: datamodel::ast::Span::new(49, 76),
         });
-    } else {
-        panic!("Expected error.")
-    }
 }
 
 #[test]
@@ -446,7 +446,7 @@ fn microsoft_sql_server_preview_feature_must_work() {
     let config = parse_configuration(schema);
     let generator = config.generators.first().unwrap();
 
-    assert!(generator.preview_features.contains(&String::from("microsoftSqlServer")));
+    assert!(generator.preview_features.contains(&PreviewFeature::MicrosoftSqlServer));
 }
 
 fn assert_eq_json(a: &str, b: &str) {

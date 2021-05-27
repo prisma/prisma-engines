@@ -5,6 +5,7 @@ build/
 current_connector
 prisma-gpg-private.asc
 .test_config
+*.pending-snap
 
 *.class
 *.log

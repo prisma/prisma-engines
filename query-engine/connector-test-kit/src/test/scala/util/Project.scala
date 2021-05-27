@@ -19,20 +19,24 @@ case class Project(
   val dataSourceConfig: String = {
     val config = ConnectorConfig.instance
 
+    val provider = config.provider.stripSuffix("56") match {
+      case "vitess" => "mysql"
+      case provider => provider
+    }
+
     s"""
            |datasource test {
-           |  provider = "${config.provider.stripSuffix("56")}"
+           |  provider = "${provider}"
            |  url = "$dataSourceUrl"
            |}
     """.stripMargin
   }
 
-  // Completely useless, but required since previewFeatures are a complete mess.
   val generatorBlock: String = {
     s"""
        |generator client {
        |  provider = "prisma-client-js"
-       |  previewFeatures = ["microsoftSqlServer"]
+       |  previewFeatures = ["microsoftSqlServer", "mongodb", "orderByRelation", "napi", "selectRelationCount", "orderByAggregateGroup"]
        |}
     """.stripMargin
   }

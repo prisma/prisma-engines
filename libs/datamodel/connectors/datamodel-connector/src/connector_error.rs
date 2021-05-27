@@ -1,11 +1,23 @@
 use dml::native_type_instance::NativeTypeInstance;
+use std::{error::Error as StdError, fmt::Display};
 use thiserror::Error;
 
-#[derive(Debug, Error, Clone)]
-#[error("{}", kind)]
+#[derive(Debug, Clone)]
 pub struct ConnectorError {
     /// The error information for internal use.
     pub kind: ErrorKind,
+}
+
+impl Display for ConnectorError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        Display::fmt(&self.kind, f)
+    }
+}
+
+impl StdError for ConnectorError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        self.kind.source()
+    }
 }
 
 pub struct ConnectorErrorFactory {
@@ -77,6 +89,14 @@ impl ConnectorErrorFactory {
             native_type: self.native_type,
             connector_name: self.connector,
         }))
+    }
+
+    pub fn native_type_invalid_param(self, expected: &str, got: &str) -> ConnectorError {
+        ConnectorError::from_kind(ErrorKind::InvalidArgumentError {
+            native_type: self.native_type,
+            expected: expected.into(),
+            got: got.into(),
+        })
     }
 }
 
@@ -242,6 +262,13 @@ pub enum ErrorKind {
         native_type: String,
         connector_name: String,
         message: String,
+    },
+
+    #[error("Invalid argument for type {}: {}. Allowed values: {}.", native_type, got, expected)]
+    InvalidArgumentError {
+        native_type: String,
+        expected: String,
+        got: String,
     },
 
     #[error("Error validating field '{}': {}", field, message)]

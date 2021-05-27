@@ -18,7 +18,17 @@ pub use sqlite::*;
 
 #[async_trait]
 pub trait FromSource {
-    async fn from_source(source: &Datasource) -> connector_interface::Result<Self>
+    /// Instantiate a query connector from a Datasource.
+    ///
+    /// The resolved url is passed distinctly from the datasource for two
+    /// reasons:
+    ///
+    /// 1. Extracting the final url from the datasource involves resolving env
+    ///    vars and validating, which can fail with a schema parser error. We
+    ///    want to handle this as early as possible and in a single place.
+    ///
+    /// 2. The url may be modified with the config dir, in the case of NAPI.
+    async fn from_source(source: &Datasource, url: &str) -> connector_interface::Result<Self>
     where
         Self: Connector + Sized;
 }

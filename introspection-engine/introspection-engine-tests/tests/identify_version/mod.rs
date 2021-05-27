@@ -1,12 +1,12 @@
 use barrel::types;
 use introspection_connector::Version;
-use introspection_engine_tests::test_api::*;
+use introspection_engine_tests::{test_api::*, TestResult};
 use pretty_assertions::assert_eq;
-use test_macros::test_each_connector;
+use test_macros::test_connector;
 
 //Sqlite
-#[test_each_connector(tags("sqlite"))]
-async fn introspect_sqlite_non_prisma(api: &TestApi) -> crate::TestResult {
+#[test_connector(tags(Sqlite))]
+async fn introspect_sqlite_non_prisma(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Book", |t| {
@@ -20,8 +20,8 @@ async fn introspect_sqlite_non_prisma(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("sqlite"))]
-async fn sqlite_non_prisma_due_to_types(api: &TestApi) -> crate::TestResult {
+#[test_connector(tags(Sqlite))]
+async fn sqlite_non_prisma_due_to_types(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("_Migration", |t| {
@@ -49,8 +49,8 @@ async fn sqlite_non_prisma_due_to_types(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("sqlite"))]
-async fn introspect_sqlite_prisma2(api: &TestApi) -> crate::TestResult {
+#[test_connector(tags(Sqlite))]
+async fn introspect_sqlite_prisma2(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("_Migration", |t| {
@@ -79,13 +79,13 @@ async fn introspect_sqlite_prisma2(api: &TestApi) -> crate::TestResult {
 
 //Postgres
 
-#[test_each_connector(tags("postgres"))]
-async fn introspect_postgres_non_prisma(api: &TestApi) -> crate::TestResult {
+#[test_connector(tags(Postgres))]
+async fn introspect_postgres_non_prisma(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Book", |t| {
                 t.add_column("id", types::primary());
-                t.inject_custom("location   point");
+                t.inject_custom("location   INT2");
             });
         })
         .await?;
@@ -95,8 +95,8 @@ async fn introspect_postgres_non_prisma(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"))]
-async fn introspect_postgres_prisma_1(api: &TestApi) -> crate::TestResult {
+#[test_connector(tags(Postgres))]
+async fn introspect_postgres_prisma_1(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Book", |t| {
@@ -122,13 +122,17 @@ async fn introspect_postgres_prisma_1(api: &TestApi) -> crate::TestResult {
         })
         .await?;
 
-    assert_eq!(Version::Prisma1, api.introspect_version().await?);
+    if api.is_cockroach() {
+        assert_eq!(Version::NonPrisma, api.introspect_version().await?);
+    } else {
+        assert_eq!(Version::Prisma1, api.introspect_version().await?);
+    }
 
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"))]
-async fn introspect_postgres_prisma_1_1(api: &TestApi) -> crate::TestResult {
+#[test_connector(tags(Postgres))]
+async fn introspect_postgres_prisma_1_1(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Book", |t| {
@@ -148,13 +152,17 @@ async fn introspect_postgres_prisma_1_1(api: &TestApi) -> crate::TestResult {
         })
         .await?;
 
-    assert_eq!(Version::Prisma11, api.introspect_version().await?);
+    if api.is_cockroach() {
+        assert_eq!(Version::NonPrisma, api.introspect_version().await?);
+    } else {
+        assert_eq!(Version::Prisma11, api.introspect_version().await?);
+    }
 
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"))]
-async fn introspect_postgres_prisma2(api: &TestApi) -> crate::TestResult {
+#[test_connector(tags(Postgres))]
+async fn introspect_postgres_prisma2(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("_Migration", |t| {
@@ -176,15 +184,19 @@ async fn introspect_postgres_prisma2(api: &TestApi) -> crate::TestResult {
         })
         .await?;
 
-    assert_eq!(Version::Prisma2, api.introspect_version().await?);
+    if api.is_cockroach() {
+        assert_eq!(Version::NonPrisma, api.introspect_version().await?);
+    } else {
+        assert_eq!(Version::Prisma2, api.introspect_version().await?);
+    }
 
     Ok(())
 }
 
 //Mysql
 
-#[test_each_connector(tags("mysql"))]
-async fn introspect_mysql_non_prisma(api: &TestApi) -> crate::TestResult {
+#[test_connector(tags(Mysql))]
+async fn introspect_mysql_non_prisma(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Book", |t| {
@@ -199,8 +211,8 @@ async fn introspect_mysql_non_prisma(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("mysql"))]
-async fn introspect_mysql_prisma_1(api: &TestApi) -> crate::TestResult {
+#[test_connector(tags(Mysql))]
+async fn introspect_mysql_prisma_1(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Book", |t| {
@@ -224,8 +236,8 @@ async fn introspect_mysql_prisma_1(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("mysql"))]
-async fn introspect_mysql_prisma_1_1_if_not_for_default_value(api: &TestApi) -> crate::TestResult {
+#[test_connector(tags(Mysql))]
+async fn introspect_mysql_prisma_1_1_if_not_for_default_value(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Book", |t| {
@@ -243,8 +255,8 @@ async fn introspect_mysql_prisma_1_1_if_not_for_default_value(api: &TestApi) -> 
     Ok(())
 }
 
-#[test_each_connector(tags("mysql"))]
-async fn introspect_mysql_prisma_1_1(api: &TestApi) -> crate::TestResult {
+#[test_connector(tags(Mysql))]
+async fn introspect_mysql_prisma_1_1(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Book", |t| {
@@ -263,8 +275,8 @@ async fn introspect_mysql_prisma_1_1(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("mysql"))]
-async fn introspect_mysql_prisma2(api: &TestApi) -> crate::TestResult {
+#[test_connector(tags(Mysql))]
+async fn introspect_mysql_prisma2(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("_Migration", |t| {
@@ -291,8 +303,8 @@ async fn introspect_mysql_prisma2(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("mysql"))]
-async fn introspect_mysql_non_prisma_empty(api: &TestApi) -> crate::TestResult {
+#[test_connector(tags(Mysql))]
+async fn introspect_mysql_non_prisma_empty(api: &TestApi) -> TestResult {
     api.barrel().execute(|_migration| {}).await?;
 
     assert_eq!(Version::NonPrisma, api.introspect_version().await?);
@@ -300,8 +312,8 @@ async fn introspect_mysql_non_prisma_empty(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("mssql_2017", "mssql_2019"))]
-async fn introspect_mssql_non_prisma_empty(api: &TestApi) -> crate::TestResult {
+#[test_connector(tags(Mssql))]
+async fn introspect_mssql_non_prisma_empty(api: &TestApi) -> TestResult {
     api.barrel().execute(|_migration| {}).await?;
 
     assert_eq!(Version::NonPrisma, api.introspect_version().await?);

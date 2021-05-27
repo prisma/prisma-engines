@@ -1,7 +1,7 @@
-use migration_engine_tests::sql::*;
+use migration_engine_tests::sync_test_api::*;
 
-#[test_each_connector]
-async fn typescript_starter_schema_is_idempotent_without_native_type_annotations(api: &TestApi) -> TestResult {
+#[test_connector]
+fn typescript_starter_schema_is_idempotent_without_native_type_annotations(api: TestApi) {
     let dm = api.datamodel_with_provider(
         r#"
         model Post {
@@ -23,17 +23,15 @@ async fn typescript_starter_schema_is_idempotent_without_native_type_annotations
     );
 
     api.schema_push(&dm)
-        .send()
-        .await?
-        .assert_green()?
-        .assert_has_executed_steps()?;
-    api.schema_push(&dm).send().await?.assert_green()?.assert_no_steps()?;
-    api.schema_push(&dm).send().await?.assert_green()?.assert_no_steps()?;
-
-    Ok(())
+        .send_sync()
+        .assert_green_bang()
+        .assert_has_executed_steps();
+    api.schema_push(&dm).send_sync().assert_green_bang().assert_no_steps();
+    api.schema_push(&dm).send_sync().assert_green_bang().assert_no_steps();
 }
-#[test_each_connector]
-async fn typescript_starter_schema_starting_without_native_types_is_idempotent(api: &TestApi) -> TestResult {
+
+#[test_connector]
+fn typescript_starter_schema_starting_without_native_types_is_idempotent(api: TestApi) {
     let dm = r#"
         model Post {
             id        Int     @id @default(autoincrement())
@@ -53,30 +51,26 @@ async fn typescript_starter_schema_starting_without_native_types_is_idempotent(a
     "#;
 
     let dm2 = api.datamodel_with_provider(dm);
-
     api.schema_push(dm)
-        .send()
-        .await?
-        .assert_green()?
-        .assert_has_executed_steps()?;
-    api.schema_push(dm).send().await?.assert_green()?.assert_no_steps()?;
-    api.schema_push(&dm2).send().await?.assert_green()?.assert_no_steps()?;
-
-    Ok(())
+        .send_sync()
+        .assert_green_bang()
+        .assert_has_executed_steps();
+    api.schema_push(dm).send_sync().assert_green_bang().assert_no_steps();
+    api.schema_push(&dm2).send_sync().assert_green_bang().assert_no_steps();
 }
 
-#[test_each_connector(tags("postgres", "mysql", "mssql"))]
-async fn bigint_primary_keys_are_idempotent(api: &TestApi) -> TestResult {
-    let dm1 = api.datamodel_with_provider(
+#[test_connector(tags(Postgres, Mysql, Mssql))]
+fn bigint_primary_keys_are_idempotent(api: TestApi) {
+    let dm = api.datamodel_with_provider(
         r#"
             model Cat {
-                id BigInt @id @default(autoincrement()) @test_db.BigInt
+                id BigInt @id @default(autoincrement()) @db.BigInt
             }
-            "#,
+        "#,
     );
 
-    api.schema_push(&dm1).send().await?.assert_green()?;
-    api.schema_push(dm1).send().await?.assert_green()?.assert_no_steps()?;
+    api.schema_push(&dm).send_sync().assert_green_bang();
+    api.schema_push(&dm).send_sync().assert_green_bang().assert_no_steps();
 
     let dm2 = api.datamodel_with_provider(
         r#"
@@ -86,8 +80,6 @@ async fn bigint_primary_keys_are_idempotent(api: &TestApi) -> TestResult {
         "#,
     );
 
-    api.schema_push(&dm2).send().await?.assert_green()?;
-    api.schema_push(dm2).send().await?.assert_green()?.assert_no_steps()?;
-
-    Ok(())
+    api.schema_push(&dm2).send_sync().assert_green_bang();
+    api.schema_push(dm2).send_sync().assert_green_bang().assert_no_steps();
 }

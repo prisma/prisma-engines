@@ -86,10 +86,11 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
             if ConnectorTag::should_run(&config, &enabled_connectors, &capabilities, #test_name) {
                 let template = #handler();
                 let datamodel = query_tests_setup::render_test_datamodel(config, #test_database, template);
+                let connector = config.test_connector_tag().unwrap();
 
                 query_tests_setup::run_with_tokio(async move {
                     tracing::debug!("Used datamodel:\n {}", datamodel.clone().yellow());
-                    let runner = Runner::load(config.runner(), datamodel.clone()).await.unwrap();
+                    let runner = Runner::load(config.runner(), datamodel.clone(), connector).await.unwrap();
                     query_tests_setup::setup_project(&datamodel).await.unwrap();
                     #runner_fn_ident(&runner).await.unwrap();
                 }.with_subscriber(test_tracing_subscriber(std::env::var("LOG_LEVEL").unwrap_or("info".to_string()))));

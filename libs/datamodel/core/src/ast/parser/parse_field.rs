@@ -8,16 +8,16 @@ use super::{
 use crate::ast::*;
 use crate::diagnostics::DatamodelError;
 
-pub fn parse_field(model_name: &str, token: &Token) -> Result<Field, DatamodelError> {
+pub fn parse_field(model_name: &str, token: &Token<'_>) -> Result<Field, DatamodelError> {
     let mut name: Option<Identifier> = None;
     let mut attributes: Vec<Attribute> = Vec::new();
-    let mut field_type: Option<((FieldArity, String), Span)> = None;
+    let mut field_type: Option<(FieldArity, FieldType)> = None;
     let mut comments: Vec<String> = Vec::new();
 
     for current in token.relevant_children() {
         match current.as_rule() {
             Rule::non_empty_identifier => name = Some(current.to_id()),
-            Rule::field_type => field_type = Some((parse_field_type(&current)?, Span::from_pest(current.as_span()))),
+            Rule::field_type => field_type = Some(parse_field_type(&current)?),
             Rule::LEGACY_COLON => {
                 return Err(DatamodelError::new_legacy_parser_error(
                     "Field declarations don't require a `:`.",
@@ -32,11 +32,8 @@ pub fn parse_field(model_name: &str, token: &Token) -> Result<Field, DatamodelEr
     }
 
     match (name, field_type) {
-        (Some(name), Some(((arity, field_type), field_type_span))) => Ok(Field {
-            field_type: Identifier {
-                name: field_type,
-                span: field_type_span,
-            },
+        (Some(name), Some((arity, field_type))) => Ok(Field {
+            field_type,
             name,
             arity,
             attributes,

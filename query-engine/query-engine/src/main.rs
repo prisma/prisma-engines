@@ -48,8 +48,6 @@ async fn main() -> Result<(), AnyError> {
         // The guard needs to be in scope for the whole lifetime of the service.
         let _guard = logger.install().unwrap();
 
-        feature_flags::initialize(opts.raw_feature_flags.as_slice())?;
-
         match CliCommand::from_opt(&opts)? {
             Some(cmd) => cmd.execute().await?,
             None => {
