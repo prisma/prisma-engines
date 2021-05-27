@@ -2,7 +2,7 @@
 
 use crate::api::GenericApi;
 use crate::commands::SchemaPushInput;
-use crate::core_error::{CoreError, CoreResult};
+use crate::core_error::CoreResult;
 #[cfg(feature = "mongodb")]
 use datamodel::common::provider_names::MONGODB_SOURCE_NAME;
 use datamodel::common::provider_names::{
@@ -23,15 +23,11 @@ pub enum QueryEngineFlags {
 
 /// Database setup for connector-test-kit.
 pub async fn run(prisma_schema: &str, flags: BitFlags<QueryEngineFlags>) -> CoreResult<()> {
-    let (config, url, _shadow_database_url) = super::parse_configuration(prisma_schema)?;
-    let source = config
-        .datasources
-        .first()
-        .ok_or_else(|| CoreError::from_msg("There is no datasource in the schema.".into()))?;
+    let (source, url, _shadow_database_url) = super::parse_configuration(prisma_schema)?;
 
     let api: Box<dyn GenericApi> = match &source.active_provider {
         _ if flags.contains(QueryEngineFlags::DatabaseCreationNotAllowed) => {
-            let api = SqlMigrationConnector::new(&url, None).await?;
+            let api = SqlMigrationConnector::new(source, &url, None).await?;
             api.reset().await?;
 
             Box::new(api)
@@ -47,7 +43,7 @@ pub async fn run(prisma_schema: &str, flags: BitFlags<QueryEngineFlags>) -> Core
         {
             // 1. creates schema & database
             SqlMigrationConnector::qe_setup(&url).await?;
-            Box::new(SqlMigrationConnector::new(&url, None).await?)
+            Box::new(SqlMigrationConnector::new(source, &url, None).await?)
         }
         #[cfg(feature = "mongodb")]
         provider if provider == MONGODB_SOURCE_NAME => {
