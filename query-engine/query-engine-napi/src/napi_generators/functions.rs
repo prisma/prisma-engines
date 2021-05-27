@@ -56,7 +56,7 @@ pub fn dmmf(ctx: CallContext) -> napi::Result<JsString> {
     let dmmf_string = serde_json::to_string(&dmmf).unwrap();
 
     ctx.env.adjust_external_memory(dmmf_string.len() as i64)?;
-    ctx.env.create_string(&dmmf_string)
+    ctx.env.create_string_from_std(dmmf_string)
 }
 
 #[js_function(1)]

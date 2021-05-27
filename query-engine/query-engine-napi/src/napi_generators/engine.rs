@@ -1,4 +1,6 @@
-use napi::{threadsafe_function::ThreadSafeCallContext, CallContext, JsFunction, JsObject, JsUndefined, JsUnknown};
+use napi::{
+    threadsafe_function::ThreadSafeCallContext, CallContext, JsFunction, JsObject, JsString, JsUndefined, JsUnknown,
+};
 use napi_derive::js_function;
 
 use crate::engine::{ConstructorOptions, QueryEngine};
@@ -59,17 +61,18 @@ pub fn query(ctx: CallContext) -> napi::Result<JsObject> {
     let engine: &QueryEngine = ctx.env.unwrap(&this)?;
     let engine: QueryEngine = engine.clone();
 
-    let query = ctx.get::<JsObject>(0)?;
-    let trace = ctx.get::<JsObject>(1)?;
+    let body = ctx.get::<JsString>(0)?.into_utf8()?.into_owned()?;
+    let body = serde_json::from_str(&body)?;
 
-    let body = ctx.env.from_js_value(query)?;
-    let trace = ctx.env.from_js_value(trace)?;
+    let trace = ctx.get::<JsString>(1)?.into_utf8()?.into_owned()?;
+    let trace = serde_json::from_str(&trace)?;
 
     ctx.env
         .execute_tokio_future(async move { Ok(engine.query(body, trace).await?) }, |env, response| {
             let res = serde_json::to_string(&response).unwrap();
+
             env.adjust_external_memory(res.len() as i64)?;
-            env.create_string(&res)
+            env.create_string_from_std(res)
         })
 }
 
@@ -83,6 +86,6 @@ pub fn sdl_schema(ctx: CallContext) -> napi::Result<JsObject> {
         .execute_tokio_future(async move { Ok(engine.sdl_schema().await?) }, |env, schema| {
             let res = serde_json::to_string(&schema).unwrap();
             env.adjust_external_memory(res.len() as i64)?;
-            env.create_string(&res)
+            env.create_string_from_std(res)
         })
 }
