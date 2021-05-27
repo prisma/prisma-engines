@@ -8,6 +8,10 @@ use query_engine_tests::*;
 // naming of the relationfields since this fed into the RelationSide logic. This tests traversal from both sides as well
 // as switching the lexicographic order of the relation fields.
 
+// /!\ rel_filter_1_1_a and rel_filter_1_1_z must always expect the same results
+// /!\ rel_filter_1_m_a and rel_filter_1_m_z must always expect the same results
+// /!\ rel_filter_n_m_a and rel_filter_n_m_z must always expect the same results
+
 // TODO: Figure out what's the "JoinRelationLinksCapability". Doesn't exist
 // TODO: Figure out if excluding MongoDb/SqlServer is fine for now
 // TODO: Bring back SqlServer when cascading rules can be set!

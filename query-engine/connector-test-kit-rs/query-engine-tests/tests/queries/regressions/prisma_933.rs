@@ -46,14 +46,18 @@ mod prisma_933_spec {
     }
 
     async fn create_test_data(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{ name: "Foo", sales: { create: [{}, {}] }}"#).await?;
+        create_row(
+            runner,
+            r#"{ buyer_id: 1, name: "Foo", sales: { create: [{ sale_id: 1 }, { sale_id: 2 }] }}"#,
+        )
+        .await?;
 
         Ok(())
     }
 
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOneBuyer(data: {}) {{ id }} }}", data))
+            .query(format!("mutation {{ createOneBuyer(data: {}) {{ buyer_id }} }}", data))
             .await?
             .assert_success();
         Ok(())
