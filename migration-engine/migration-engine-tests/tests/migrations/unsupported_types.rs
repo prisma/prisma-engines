@@ -213,7 +213,7 @@ async fn using_unsupported_and_ignore_should_work(api: &TestApi) -> TestResult {
         SqlFamily::Mysql => "point",
     };
 
-    let dm = api.native_types_datamodel(&format!(
+    let dm = api.datamodel_with_provider(&format!(
         r#"
             model UnsupportedModel {{
                 field Unsupported("{}")?

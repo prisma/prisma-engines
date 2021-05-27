@@ -27,7 +27,7 @@ async fn basic_create_migration_works(api: &TestApi) -> TestResult {
                             "id" INTEGER NOT NULL,
                             "name" TEXT NOT NULL,
 
-                            PRIMARY KEY ("id")
+                            CONSTRAINT "Cat_pkey" PRIMARY KEY ("id")
                         );
                         "#
                     }
@@ -63,7 +63,8 @@ async fn basic_create_migration_works(api: &TestApi) -> TestResult {
                         CREATE TABLE [basic_create_migration_works].[Cat] (
                             [id] INT NOT NULL,
                             [name] NVARCHAR(1000) NOT NULL,
-                            CONSTRAINT [PK__Cat__id] PRIMARY KEY ([id])
+                        
+                            CONSTRAINT [Cat_pkey] PRIMARY KEY ([id])
                         );
                         "#
                     }
@@ -118,7 +119,7 @@ async fn creating_a_second_migration_should_have_the_previous_sql_schema_as_base
                             "id" INTEGER NOT NULL,
                             "name" TEXT NOT NULL,
 
-                            PRIMARY KEY ("id")
+                            CONSTRAINT "Dog_pkey" PRIMARY KEY ("id")
                         );
                         "#
                     }
@@ -154,7 +155,8 @@ async fn creating_a_second_migration_should_have_the_previous_sql_schema_as_base
                         CREATE TABLE [creating_a_second_migration_should_have_the_previous_sql_schema_as_baseline].[Dog] (
                             [id] INT NOT NULL,
                             [name] NVARCHAR(1000) NOT NULL,
-                            CONSTRAINT [PK__Dog__id] PRIMARY KEY ([id])
+                        
+                            CONSTRAINT [Dog_pkey] PRIMARY KEY ([id])
                         );
                         "#
                     }
@@ -288,13 +290,8 @@ async fn creating_a_migration_with_a_non_existent_migrations_directory_should_wo
 
 #[test_each_connector(tags("mysql", "postgres"))]
 async fn create_enum_step_only_rendered_when_needed(api: &TestApi) -> TestResult {
-    let dm = r#"
-        datasource test {
-          provider = "mysql"
-          url = "mysql://root:prisma@127.0.0.1:3306/SelfRelationFilterBugSpec?connection_limit=1"
-        }
-
-
+    let dm = api.datamodel_with_provider(
+        r#"
         model Cat {
             id      Int @id
             mood    Mood
@@ -304,11 +301,12 @@ async fn create_enum_step_only_rendered_when_needed(api: &TestApi) -> TestResult
             HUNGRY
             SLEEPY
         }
-    "#;
+    "#,
+    );
 
     let dir = api.create_migrations_directory()?;
 
-    api.create_migration("create-cats", dm, &dir)
+    api.create_migration("create-cats", &dm, &dir)
         .send()
         .await?
         .assert_migration_directories_count(1)?
@@ -325,7 +323,7 @@ async fn create_enum_step_only_rendered_when_needed(api: &TestApi) -> TestResult
                             "id" INTEGER NOT NULL,
                             "mood" "Mood" NOT NULL,
 
-                            PRIMARY KEY ("id")
+                            CONSTRAINT "Cat_pkey" PRIMARY KEY ("id")
                         );
                         "#
                     }
@@ -354,12 +352,8 @@ async fn create_enum_step_only_rendered_when_needed(api: &TestApi) -> TestResult
 
 #[test_each_connector(tags("postgres"))]
 async fn create_enum_renders_correctly(api: &TestApi) -> TestResult {
-    let dm = r#"
-        datasource test {
-          provider = "postgresql"
-          url = "postgresql://unreachable:unreachable@example.com/unreachable"
-        }
-
+    let dm = api.datamodel_with_provider(
+        r#"
         model Cat {
             id      Int @id
             mood    Mood
@@ -369,11 +363,12 @@ async fn create_enum_renders_correctly(api: &TestApi) -> TestResult {
             HUNGRY
             SLEEPY
         }
-    "#;
+    "#,
+    );
 
     let dir = api.create_migrations_directory()?;
 
-    api.create_migration("create-cats", dm, &dir)
+    api.create_migration("create-cats", &dm, &dir)
         .send()
         .await?
         .assert_migration_directories_count(1)?
@@ -390,7 +385,7 @@ async fn create_enum_renders_correctly(api: &TestApi) -> TestResult {
                             "id" INTEGER NOT NULL,
                             "mood" "Mood" NOT NULL,
 
-                            PRIMARY KEY ("id")
+                            CONSTRAINT "Cat_pkey" PRIMARY KEY ("id")
                         );
                         "#
                     }
@@ -406,21 +401,18 @@ async fn create_enum_renders_correctly(api: &TestApi) -> TestResult {
 
 #[test_each_connector(tags("postgres"))]
 async fn unsupported_type_renders_correctly(api: &TestApi) -> TestResult {
-    let dm = r#"
-        datasource test {
-          provider = "postgresql"
-          url = "postgresql://unreachable:unreachable@example.com/unreachable"
-        }
-
+    let dm = api.datamodel_with_provider(
+        r#"
         model Cat {
             id      Int @id
             home    Unsupported("point")
         }
-    "#;
+    "#,
+    );
 
     let dir = api.create_migrations_directory()?;
 
-    api.create_migration("create-cats", dm, &dir)
+    api.create_migration("create-cats", &dm, &dir)
         .send()
         .await?
         .assert_migration_directories_count(1)?
@@ -434,7 +426,7 @@ async fn unsupported_type_renders_correctly(api: &TestApi) -> TestResult {
                             "id" INTEGER NOT NULL,
                             "home" point NOT NULL,
 
-                            PRIMARY KEY ("id")
+                            CONSTRAINT "Cat_pkey" PRIMARY KEY ("id")
                         );
                         "#
                     }
@@ -450,12 +442,8 @@ async fn unsupported_type_renders_correctly(api: &TestApi) -> TestResult {
 
 #[test_each_connector(tags("postgres"))]
 async fn no_additional_unique_created(api: &TestApi) -> TestResult {
-    let dm = r#"
-        datasource test {
-          provider = "postgresql"
-          url = "postgresql://unreachable:unreachable@example.com/unreachable"
-        }
-
+    let dm = api.datamodel_with_provider(
+        r#"
         model Cat {
             id      Int @id
             collar  Collar?
@@ -465,13 +453,12 @@ async fn no_additional_unique_created(api: &TestApi) -> TestResult {
             id      Int @id
             cat     Cat @relation(fields:[id], references: [id])
         }
-
-
-    "#;
+    "#,
+    );
 
     let dir = api.create_migrations_directory()?;
 
-    api.create_migration("create-cats", dm, &dir)
+    api.create_migration("create-cats", &dm, &dir)
         .send()
         .await?
         .assert_migration_directories_count(1)?
@@ -484,14 +471,14 @@ async fn no_additional_unique_created(api: &TestApi) -> TestResult {
                         CREATE TABLE "Cat" (
                             "id" INTEGER NOT NULL,
 
-                            PRIMARY KEY ("id")
+                            CONSTRAINT "Cat_pkey" PRIMARY KEY ("id")
                         );
 
                         -- CreateTable
                         CREATE TABLE "Collar" (
                             "id" INTEGER NOT NULL,
 
-                            PRIMARY KEY ("id")
+                            CONSTRAINT "Collar_pkey" PRIMARY KEY ("id")
                         );
 
                         -- AddForeignKey

@@ -2,7 +2,7 @@ use migration_engine_tests::sql::*;
 
 #[test_each_connector]
 async fn typescript_starter_schema_is_idempotent_without_native_type_annotations(api: &TestApi) -> TestResult {
-    let dm = api.native_types_datamodel(
+    let dm = api.datamodel_with_provider(
         r#"
         model Post {
             id        Int     @id @default(autoincrement())
@@ -52,7 +52,7 @@ async fn typescript_starter_schema_starting_without_native_types_is_idempotent(a
         }
     "#;
 
-    let dm2 = api.native_types_datamodel(dm);
+    let dm2 = api.datamodel_with_provider(dm);
 
     api.schema_push(dm)
         .send()
@@ -67,7 +67,7 @@ async fn typescript_starter_schema_starting_without_native_types_is_idempotent(a
 
 #[test_each_connector(tags("postgres", "mysql", "mssql"))]
 async fn bigint_primary_keys_are_idempotent(api: &TestApi) -> TestResult {
-    let dm1 = api.native_types_datamodel(
+    let dm1 = api.datamodel_with_provider(
         r#"
             model Cat {
                 id BigInt @id @default(autoincrement()) @test_db.BigInt
@@ -78,7 +78,7 @@ async fn bigint_primary_keys_are_idempotent(api: &TestApi) -> TestResult {
     api.schema_push(&dm1).send().await?.assert_green()?;
     api.schema_push(dm1).send().await?.assert_green()?.assert_no_steps()?;
 
-    let dm2 = api.native_types_datamodel(
+    let dm2 = api.datamodel_with_provider(
         r#"
         model Cat {
             id BigInt @id @default(autoincrement())

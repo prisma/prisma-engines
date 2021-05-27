@@ -319,7 +319,7 @@ impl TestApi {
         .unwrap();
     }
 
-    pub fn native_types_datamodel(&self, schema: &str) -> String {
+    pub fn datamodel_with_provider(&self, schema: &str) -> String {
         let mut out = String::with_capacity(320 + schema.len());
 
         self.write_native_types_datamodel_header(&mut out);

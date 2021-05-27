@@ -296,7 +296,7 @@ async fn native_type_columns_can_be_created(api: &TestApi) -> TestResult {
 async fn default_current_timestamp_precision_follows_column_precision(api: &TestApi) -> TestResult {
     let migrations_directory = api.create_migrations_directory()?;
 
-    let dm = api.native_types_datamodel(
+    let dm = api.datamodel_with_provider(
         r#"
             model A {
                 id Int @id

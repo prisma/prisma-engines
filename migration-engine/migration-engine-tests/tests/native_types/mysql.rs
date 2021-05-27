@@ -940,7 +940,7 @@ async fn impossible_casts_with_existing_data_should_warn(api: &TestApi) -> TestR
 
 #[test_each_connector(tags("mysql"))]
 async fn typescript_starter_schema_with_native_types_is_idempotent(api: &TestApi) -> TestResult {
-    let dm = api.native_types_datamodel(
+    let dm = api.datamodel_with_provider(
         r#"
         model Post {
             id        Int     @id @default(autoincrement())
@@ -960,7 +960,7 @@ async fn typescript_starter_schema_with_native_types_is_idempotent(api: &TestApi
     "#,
     );
 
-    let dm2 = api.native_types_datamodel(
+    let dm2 = api.datamodel_with_provider(
         r#"
         model Post {
             id        Int     @id @default(autoincrement()) @test_db.Int
@@ -1005,7 +1005,7 @@ async fn typescript_starter_schema_with_native_types_is_idempotent(api: &TestApi
 
 #[test_each_connector(log = "debug", tags("mysql"))]
 async fn typescript_starter_schema_with_differnt_native_types_is_idempotent(api: &TestApi) -> TestResult {
-    let dm = api.native_types_datamodel(
+    let dm = api.datamodel_with_provider(
         r#"
         model Post {
             id        Int     @id @default(autoincrement())
@@ -1025,7 +1025,7 @@ async fn typescript_starter_schema_with_differnt_native_types_is_idempotent(api:
     "#,
     );
 
-    let dm2 = api.native_types_datamodel(
+    let dm2 = api.datamodel_with_provider(
         r#"
         model Post {
             id        Int     @id @default(autoincrement()) @test_db.Int

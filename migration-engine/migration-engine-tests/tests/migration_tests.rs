@@ -19,7 +19,7 @@ use sql_schema_describer::*;
 
 #[test_each_connector]
 async fn adding_a_scalar_field_must_work(api: &TestApi) -> TestResult {
-    let dm = api.native_types_datamodel(
+    let dm = api.datamodel_with_provider(
         r#"
         model Test {
             id          String @id @default(cuid())
@@ -2146,31 +2146,26 @@ async fn join_tables_between_models_with_mapped_compound_primary_keys_must_work(
 
 #[test_each_connector]
 async fn switching_databases_must_work(api: &TestApi) -> TestResult {
-    let dm1 = r#"
-        datasource db {
-            provider = "sqlite"
-            url = "file:dev.db"
-        }
-
+    let dm1 = api.datamodel_with_provider(
+        r#"
         model Test {
             id String @id
             name String
         }
-    "#;
+    "#,
+    );
 
     api.schema_push(dm1).send().await?.assert_green()?;
 
-    let dm2 = r#"
-        datasource db {
-            provider = "sqlite"
-            url = "file:hiya.db"
-        }
-
+    //todo modify connection string
+    let dm2 = api.datamodel_with_provider(
+        r#"
         model Test {
             id String @id
             name String
         }
-    "#;
+    "#,
+    );
 
     api.schema_push(dm2)
         .migration_id(Some("mig2"))

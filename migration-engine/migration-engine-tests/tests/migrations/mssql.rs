@@ -26,7 +26,7 @@ async fn shared_default_constraints_are_ignored_issue_5423(api: &TestApi) -> Tes
         ))
         .await?;
 
-    let dm = api.native_types_datamodel(
+    let dm = api.datamodel_with_provider(
         r#"
         model cats {
             id Int @id @default(autoincrement())
