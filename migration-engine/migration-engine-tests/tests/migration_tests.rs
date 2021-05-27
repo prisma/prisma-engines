@@ -3,7 +3,6 @@ mod create_migration;
 mod errors;
 mod evaluate_data_loss;
 mod existing_data;
-mod existing_databases;
 mod initialization;
 mod list_migration_directories;
 mod migrations;

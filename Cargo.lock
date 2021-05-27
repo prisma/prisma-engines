@@ -2344,7 +2344,6 @@ name = "migration-engine-tests"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "barrel",
  "bigdecimal",
  "chrono",
  "connection-string",

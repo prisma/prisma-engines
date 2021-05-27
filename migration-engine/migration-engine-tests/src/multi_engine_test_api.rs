@@ -15,7 +15,7 @@ use quaint::{
 use sql_migration_connector::SqlMigrationConnector;
 use std::future::Future;
 use tempfile::TempDir;
-use test_setup::TestApiArgs;
+use test_setup::{DatasourceBlock, TestApiArgs};
 
 /// The multi-engine test API.
 pub struct TestApi {
@@ -98,8 +98,8 @@ impl TestApi {
     }
 
     /// Render a valid datasource block, including database URL.
-    pub fn datasource_block(&self) -> String {
-        self.args.datasource_block(self.args.database_url())
+    pub fn datasource_block(&self) -> DatasourceBlock<'_> {
+        self.args.datasource_block(self.args.database_url(), &[])
     }
 
     /// Returns true only when testing on MSSQL.

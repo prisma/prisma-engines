@@ -10,7 +10,7 @@ pub struct Configuration {
 }
 
 impl Configuration {
-    pub fn validate_that_one_datasource_is_provided(self) -> Result<Self, Diagnostics> {
+    pub fn validate_that_one_datasource_is_provided(&self) -> Result<(), Diagnostics> {
         if self.datasources.is_empty() {
             Err(DatamodelError::new_validation_error(
                 "You defined no datasource. You must define exactly one datasource.",
@@ -18,8 +18,16 @@ impl Configuration {
             )
             .into())
         } else {
-            Ok(self)
+            Ok(())
         }
+    }
+
+    /// Returns true if PlanetScale mode is enabled
+    pub fn planet_scale_mode(&self) -> bool {
+        self.datasources
+            .first()
+            .map(|source| source.planet_scale_mode)
+            .unwrap_or(false)
     }
 
     pub fn preview_features(&self) -> impl Iterator<Item = &PreviewFeature> {

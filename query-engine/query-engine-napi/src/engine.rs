@@ -128,7 +128,7 @@ impl QueryEngine {
         let mut config =
             datamodel::parse_configuration(&datamodel).map_err(|errors| ApiError::conversion(errors, &datamodel))?;
 
-        config.subject = config
+        config
             .subject
             .validate_that_one_datasource_is_provided()
             .map_err(|errors| ApiError::conversion(errors, &datamodel))?;

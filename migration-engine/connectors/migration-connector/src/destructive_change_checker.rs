@@ -1,6 +1,5 @@
 use crate::ConnectorResult;
 use serde::{Deserialize, Serialize};
-use std::marker::PhantomData;
 
 /// Implementors of this trait are responsible for checking whether a migration
 /// could lead to data loss, or if it would be potentially unexecutable.
@@ -66,24 +65,4 @@ pub struct UnexecutableMigration {
     pub description: String,
     /// The index of the step in the migration that this message applies to.
     pub step_index: usize,
-}
-
-/// An implementor of [DestructiveChangeChecker](trait.DestructiveChangeChecker.html) that performs no check.
-#[derive(Default)]
-pub struct EmptyDestructiveChangeChecker<T> {
-    database_migration: PhantomData<T>,
-}
-
-#[async_trait::async_trait]
-impl<T> DestructiveChangeChecker<T> for EmptyDestructiveChangeChecker<T>
-where
-    T: Send + Sync + 'static,
-{
-    async fn check(&self, _database_migration: &T) -> ConnectorResult<DestructiveChangeDiagnostics> {
-        Ok(DestructiveChangeDiagnostics::new())
-    }
-
-    fn pure_check(&self, _database_migration: &T) -> DestructiveChangeDiagnostics {
-        DestructiveChangeDiagnostics::new()
-    }
 }

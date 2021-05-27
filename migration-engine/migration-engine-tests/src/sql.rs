@@ -1,5 +1,3 @@
-pub(crate) mod barrel_migration_executor;
-
 mod quaint_result_set_ext;
 
 pub use super::{assertions::*, test_api::*, TestResult};

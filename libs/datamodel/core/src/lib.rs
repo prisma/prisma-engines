@@ -90,37 +90,55 @@ pub mod walkers;
 pub use crate::dml::*;
 pub use configuration::*;
 
-use crate::ast::SchemaAst;
-use crate::diagnostics::{ValidatedConfiguration, ValidatedDatamodel, ValidatedDatasources};
+use crate::diagnostics::{Validated, ValidatedConfiguration, ValidatedDatamodel, ValidatedDatasources};
+use crate::{ast::SchemaAst, common::preview_features::PreviewFeature};
+use std::collections::HashSet;
 use transform::{
     ast_to_dml::{DatasourceLoader, GeneratorLoader, ValidationPipeline},
     dml_to_ast::{DatasourceSerializer, GeneratorSerializer, LowerDmlToAst},
 };
 
+/// Parse and validate the whole schema
+pub fn parse_schema(schema_str: &str) -> Result<Validated<(Configuration, Datamodel)>, diagnostics::Diagnostics> {
+    parse_datamodel_internal(schema_str, false)
+}
+
 /// Parses and validates a datamodel string, using core attributes only.
 pub fn parse_datamodel(datamodel_string: &str) -> Result<ValidatedDatamodel, diagnostics::Diagnostics> {
-    parse_datamodel_internal(datamodel_string, false)
+    parse_datamodel_internal(datamodel_string, false).map(|validated| Validated {
+        subject: validated.subject.1,
+        warnings: validated.warnings,
+    })
 }
 
 pub fn parse_datamodel_for_formatter(datamodel_string: &str) -> Result<ValidatedDatamodel, diagnostics::Diagnostics> {
-    parse_datamodel_internal(datamodel_string, true)
+    parse_datamodel_internal(datamodel_string, true).map(|validated| Validated {
+        subject: validated.subject.1,
+        warnings: validated.warnings,
+    })
 }
 
 /// Parses and validates a datamodel string, using core attributes only.
 /// In case of an error, a pretty, colorful string is returned.
 pub fn parse_datamodel_or_pretty_error(datamodel_string: &str, file_name: &str) -> Result<ValidatedDatamodel, String> {
-    parse_datamodel_internal(datamodel_string, false).map_err(|err| err.to_pretty_string(file_name, datamodel_string))
+    parse_datamodel_internal(datamodel_string, false)
+        .map_err(|err| err.to_pretty_string(file_name, datamodel_string))
+        .map(|validated| Validated {
+            subject: validated.subject.1,
+            warnings: validated.warnings,
+        })
 }
 
 fn parse_datamodel_internal(
     datamodel_string: &str,
     transform: bool,
-) -> Result<ValidatedDatamodel, diagnostics::Diagnostics> {
+) -> Result<Validated<(Configuration, Datamodel)>, diagnostics::Diagnostics> {
     let mut diagnostics = diagnostics::Diagnostics::new();
     let ast = ast::parse_schema(datamodel_string)?;
 
-    let sources = load_sources(&ast)?;
     let generators = GeneratorLoader::load_generators_from_ast(&ast)?;
+    let preview_features = generators.preview_features();
+    let sources = load_sources(&ast, &&preview_features)?;
     let validator = ValidationPipeline::new(&sources.subject);
 
     diagnostics.append_warning_vec(sources.warnings);
@@ -129,7 +147,16 @@ fn parse_datamodel_internal(
     match validator.validate(&ast, transform) {
         Ok(mut src) => {
             src.warnings.append(&mut diagnostics.warnings);
-            Ok(src)
+            Ok(Validated {
+                subject: (
+                    Configuration {
+                        generators: generators.subject,
+                        datasources: sources.subject,
+                    },
+                    src.subject,
+                ),
+                warnings: src.warnings,
+            })
         }
         Err(mut err) => {
             diagnostics.append(&mut err);
@@ -146,8 +173,9 @@ pub fn parse_schema_ast(datamodel_string: &str) -> Result<SchemaAst, diagnostics
 pub fn parse_configuration(schema: &str) -> Result<ValidatedConfiguration, diagnostics::Diagnostics> {
     let mut warnings = Vec::new();
     let ast = ast::parse_schema(schema)?;
-    let mut validated_sources = load_sources(&ast)?;
     let mut validated_generators = GeneratorLoader::load_generators_from_ast(&ast)?;
+    let preview_features = validated_generators.preview_features();
+    let mut validated_sources = load_sources(&ast, &preview_features)?;
 
     warnings.append(&mut validated_generators.warnings);
     warnings.append(&mut validated_sources.warnings);
@@ -161,9 +189,12 @@ pub fn parse_configuration(schema: &str) -> Result<ValidatedConfiguration, diagn
     })
 }
 
-fn load_sources(schema_ast: &SchemaAst) -> Result<ValidatedDatasources, diagnostics::Diagnostics> {
+fn load_sources(
+    schema_ast: &SchemaAst,
+    preview_features: &HashSet<&PreviewFeature>,
+) -> Result<ValidatedDatasources, diagnostics::Diagnostics> {
     let source_loader = DatasourceLoader::new();
-    source_loader.load_datasources_from_ast(&schema_ast)
+    source_loader.load_datasources_from_ast(&schema_ast, preview_features)
 }
 
 //
