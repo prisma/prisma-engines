@@ -23,6 +23,13 @@ macro_rules! run_query {
 }
 
 #[macro_export]
+macro_rules! run_query_json {
+    ($runner:expr, $q:expr) => {
+        serde_json::from_str::<serde_json::Value>($runner.query($q).await?.to_string().as_str()).unwrap()
+    };
+}
+
+#[macro_export]
 macro_rules! assert_error {
     ($runner:expr, $q:expr, $code:expr) => {
         $runner.query($q).await?.assert_failure($code, None);
