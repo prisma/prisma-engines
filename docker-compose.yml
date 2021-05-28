@@ -154,6 +154,8 @@ services:
       KEYSPACES: "test"
       NUM_SHARDS: "1"
       MYSQL_BIND_HOST: "0.0.0.0"
+      FOREIGN_KEY_MODE: disallow 
+      ENABLE_DIRECT_DDL: false # disable DDL to simulate PlanetScale `main` branch
 
   vitess-test-8_0:
     image: vitess/vttestserver:mysql80
@@ -165,6 +167,8 @@ services:
       KEYSPACES: "test"
       NUM_SHARDS: "1"
       MYSQL_BIND_HOST: "0.0.0.0"
+      FOREIGN_KEY_MODE: disallow
+      ENABLE_DIRECT_DDL: false
 
   vitess-shadow-5_7:
     image: vitess/vttestserver:mysql57
@@ -176,6 +180,8 @@ services:
       KEYSPACES: "shadow"
       NUM_SHARDS: "1"
       MYSQL_BIND_HOST: "0.0.0.0"
+      FOREIGN_KEY_MODE: disallow
+      ENABLE_DIRECT_DDL: true # enable (!) DDL to simulate PlanetScale non production branch, e.g. `shadow`
 
   vitess-shadow-8_0:
     image: vitess/vttestserver:mysql80
@@ -187,6 +193,8 @@ services:
       KEYSPACES: "shadow"
       NUM_SHARDS: "1"
       MYSQL_BIND_HOST: "0.0.0.0"
+      FOREIGN_KEY_MODE: disallow
+      ENABLE_DIRECT_DDL: true # enable (!) DDL to simulate PlanetScale non production branch, e.g. `shadow`
 
   mssql-2019:
     image: mcr.microsoft.com/mssql/server:2019-latest
