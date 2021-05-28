@@ -7,7 +7,7 @@ pub fn simple_m2m() -> String {
             id    String   @id
             manyB ModelB[]
           }
-          
+
           model ModelB {
             id    String   @id
             manyA ModelA[]

@@ -154,7 +154,7 @@ mod parser_tests {
     #[test]
     // Valid m2m fragment
     fn basic_m2m_fragment_parsing() {
-        let fragment = r#"#m2m(posts, Post[], String, @relation(fields: [field]))"#;
+        let fragment = r#"#m2m(posts, Post[], String, some_name)"#;
         let fragment = parse_fragment(fragment);
 
         assert_eq!(
@@ -165,10 +165,7 @@ mod parser_tests {
                     field_name: String::from("posts"),
                     field_type: String::from("Post[]"),
                     opposing_type: String::from("String"),
-                    directives: vec![Directive {
-                        ident: String::from("relation"),
-                        args: vec![String::from("fields: [field]")]
-                    }]
+                    relation_name: Some(String::from("some_name")),
                 })
             ))
         );
@@ -177,7 +174,7 @@ mod parser_tests {
     #[test]
     #[should_panic]
     fn invalid_m2m_fragment() {
-        let fragment = r#"#m2m(name, Type, @relation(...))"#;
+        let fragment = r#"#m2m(name, Type)"#;
 
         parse_fragment(fragment).unwrap();
     }

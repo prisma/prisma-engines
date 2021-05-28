@@ -1,6 +1,5 @@
 use super::*;
 use crate::Directive;
-use itertools::Itertools;
 
 #[derive(Debug, Default)]
 pub struct MongoDbSchemaRenderer {}
@@ -32,13 +31,14 @@ impl DatamodelRenderer for MongoDbSchemaRenderer {
         let additional_fk_field = format!("{} {}[]", fk_field_name, m2m.opposing_type);
 
         // Add @relation directive that specifies the local array to hold the FKs.
+        let relation_directive = match m2m.relation_name {
+            Some(name) => format!(r#"@relation(name: "{}", fields: [{}])"#, name, fk_field_name),
+            None => format!(r#"@relation(fields: [{}])"#, fk_field_name),
+        };
+
         format!(
-            "{}\n{} {} @relation(fields: [{}]) {}",
-            additional_fk_field,
-            m2m.field_name,
-            m2m.field_type,
-            fk_field_name,
-            m2m.directives.iter().map(ToString::to_string).join(" "),
+            "{}\n{} {} {}",
+            additional_fk_field, m2m.field_name, m2m.field_type, relation_directive,
         )
     }
 }
@@ -82,7 +82,7 @@ mod mongo_render_tests {
             field_name: "posts".to_owned(),
             field_type: "Post[]".to_owned(),
             opposing_type: "String".to_owned(),
-            directives: vec![],
+            relation_name: Some("test".to_owned()),
         };
 
         let renderer = MongoDbSchemaRenderer::new();
@@ -90,7 +90,7 @@ mod mongo_render_tests {
 
         assert_eq!(
             rendered.trim(),
-            "posts_ids String[]\nposts Post[] @relation(fields: [posts_ids])"
+            "posts_ids String[]\nposts Post[] @relation(name: \"test\", fields: [posts_ids])"
         )
     }
 }

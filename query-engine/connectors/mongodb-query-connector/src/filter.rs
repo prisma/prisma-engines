@@ -313,7 +313,11 @@ fn relation_filter(filter: RelationFilter, invert: bool) -> crate::Result<MongoF
 
     let filter_doc = match filter.condition {
         connector_interface::RelationCondition::EveryRelatedRecord => {
-            doc! { "$not": { "$all": [{ "$elemMatch": nested_filter }] }}
+            if is_empty {
+                doc! { "$not": { "$all": [{ "$elemMatch": { "_id": { "$exists": 0 }} }] }}
+            } else {
+                doc! { "$not": { "$all": [{ "$elemMatch": nested_filter }] }}
+            }
         }
         connector_interface::RelationCondition::AtLeastOneRelatedRecord => {
             doc! { "$elemMatch": nested_filter }
