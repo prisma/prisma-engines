@@ -2603,9 +2603,9 @@ dependencies = [
 
 [[package]]
 name = "napi"
-version = "1.3.4"
+version = "1.7.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "367b5bffa0f6669f1511b4f1b96beb70b14d9ae79379e70de6bcd1ce16476c42"
+checksum = "650d066af7b13cf35f0a84e89c7c652c566c0c38c7c1d63857e27b0b9a443c59"
 dependencies = [
  "futures 0.3.13",
  "napi-build",
@@ -2619,9 +2619,9 @@ dependencies = [
 
 [[package]]
 name = "napi-build"
-version = "1.0.1"
+version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f12ae7b330beeeb0b4ebfcd691e29270869717a9145e1ea8e82c9244d6abe27a"
+checksum = "3039ed15066300360660239cab9a6071a0ed899547c49e40952d87ded49b29b8"
 dependencies = [
  "cfg-if 1.0.0",
  "ureq",
@@ -2629,9 +2629,9 @@ dependencies = [
 
 [[package]]
 name = "napi-derive"
-version = "1.0.1"
+version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d458195ad9062d1f6f5c1dfb6cd7cd15280a95ae265157870face34a3f589e92"
+checksum = "8e7ed160148f94ee17936f00288029cb0cfb37c08bbace9f514f735dcd869ed7"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2640,9 +2640,9 @@ dependencies = [
 
 [[package]]
 name = "napi-sys"
-version = "1.0.0"
+version = "1.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3de3dc74e996f41f18007ec42d96944f32353a3c9edd4ba3e7a1ff6efee5f6d4"
+checksum = "43563506c466587478849d80f46383d859b91bbec586580dadeb3639588f2f7e"
 
 [[package]]
 name = "native-tls"
@@ -3390,7 +3390,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.13"
-source = "git+https://github.com/prisma/quaint#7d3e8d6a93bcf44546f2e46d8026bd7c98c8a13e"
+source = "git+https://github.com/prisma/quaint?branch=log-queries-param#3f05e94bd17d763d8624b9588e401346d0b63c78"
 dependencies = [
  "async-trait",
  "base64 0.12.3",
@@ -3411,7 +3411,6 @@ dependencies = [
  "native-tls",
  "num-bigint",
  "num_cpus",
- "once_cell",
  "percent-encoding 2.1.0",
  "postgres-native-tls",
  "postgres-types",
@@ -3494,7 +3493,6 @@ dependencies = [
  "connection-string",
  "datamodel",
  "datamodel-connector",
- "enumflags2 0.6.4",
  "futures 0.3.13",
  "graphql-parser",
  "indexmap",
@@ -3541,6 +3539,7 @@ version = "0.1.0"
 dependencies = [
  "connection-string",
  "datamodel",
+ "datamodel-connector",
  "napi",
  "napi-build",
  "napi-derive",
@@ -4121,7 +4120,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e0bccbcf40c8938196944a3da0e133e031a33f4d6b72db3bda3cc556e361905d"
 dependencies = [
  "lazy_static",
- "parking_lot 0.11.1",
+ "parking_lot 0.10.2",
  "serial_test_derive",
 ]
 
@@ -4671,9 +4670,9 @@ dependencies = [
 
 [[package]]
 name = "tiberius"
-version = "0.5.12"
+version = "0.5.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ee9ddebd5ca7ae5561d3c6289f724c3a5eeaed8d9e1a3f4e4865b31b39d6bff6"
+checksum = "6b11a7feb537ff9ade0faaf4048ddc4575ca4d2e58461148903810a51d19567f"
 dependencies = [
  "async-native-tls",
  "async-stream 0.2.1",
@@ -4685,7 +4684,7 @@ dependencies = [
  "chrono",
  "connection-string",
  "encoding",
- "enumflags2 0.6.4",
+ "enumflags2 0.7.1",
  "futures 0.3.13",
  "futures-sink",
  "futures-util",

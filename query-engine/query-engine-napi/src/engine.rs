@@ -4,19 +4,15 @@ use napi::threadsafe_function::ThreadsafeFunction;
 use opentelemetry::global;
 use prisma_models::DatamodelConverter;
 use query_core::{exec_loader, schema_builder, BuildMode, QueryExecutor, QuerySchema, QuerySchemaRenderer};
-use request_handlers::{
-    dmmf::{self, DataModelMetaFormat},
-    GraphQLSchemaRenderer, GraphQlBody, GraphQlHandler, PrismaResponse,
-};
-use serde::{Deserialize, Deserializer, Serialize};
+use request_handlers::{GraphQLSchemaRenderer, GraphQlBody, GraphQlHandler, PrismaResponse};
+use serde::{Deserialize, Serialize};
 use std::{
     collections::{BTreeMap, HashMap},
     path::PathBuf,
-    str::FromStr,
     sync::Arc,
 };
 use tokio::sync::RwLock;
-use tracing::{metadata::LevelFilter, Level};
+use tracing::Level;
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 /// The main engine, that can be cloned between threads when using JavaScript
@@ -54,7 +50,6 @@ pub struct EngineBuilder {
 /// Internal structure for querying and reconnecting with the engine.
 pub struct ConnectedEngine {
     datamodel: EngineDatamodel,
-    config: serde_json::Value,
     query_schema: Arc<QuerySchema>,
     executor: crate::Executor,
     logger: ChannelLogger,
@@ -87,13 +82,16 @@ impl ConnectedEngine {
 #[serde(rename_all = "camelCase")]
 pub struct ConstructorOptions {
     datamodel: String,
-    #[serde(deserialize_with = "deserialize_log_level")]
-    log_level: LevelFilter,
+    log_level: String,
+    #[serde(default)]
+    log_queries: bool,
     #[serde(default)]
     datasource_overrides: BTreeMap<String, String>,
     #[serde(default)]
     telemetry: TelemetryOptions,
     config_dir: PathBuf,
+    #[serde(default)]
+    ignore_env_var_errors: bool,
 }
 
 #[derive(Debug, Deserialize, Default)]
@@ -101,14 +99,6 @@ pub struct ConstructorOptions {
 pub struct TelemetryOptions {
     enabled: bool,
     endpoint: Option<String>,
-}
-
-fn deserialize_log_level<'de, D>(deserializer: D) -> Result<LevelFilter, D::Error>
-where
-    D: Deserializer<'de>,
-{
-    let buf = String::deserialize(deserializer)?;
-    LevelFilter::from_str(&buf).map_err(serde::de::Error::custom)
 }
 
 impl QueryEngine {
@@ -119,23 +109,29 @@ impl QueryEngine {
         let ConstructorOptions {
             datamodel,
             log_level,
+            log_queries,
             datasource_overrides,
             telemetry,
             config_dir,
+            ignore_env_var_errors,
         } = opts;
 
         let overrides: Vec<(_, _)> = datasource_overrides.into_iter().collect();
-        let mut config =
-            datamodel::parse_configuration(&datamodel).map_err(|errors| ApiError::conversion(errors, &datamodel))?;
+
+        let config = if ignore_env_var_errors {
+            datamodel::parse_configuration(&datamodel).map_err(|errors| ApiError::conversion(errors, &datamodel))?
+        } else {
+            datamodel::parse_configuration(&datamodel)
+                .and_then(|mut config| {
+                    config.subject.resolve_datasource_urls_from_env(&overrides)?;
+                    Ok(config)
+                })
+                .map_err(|errors| ApiError::conversion(errors, &datamodel))?
+        };
 
         config
             .subject
             .validate_that_one_datasource_is_provided()
-            .map_err(|errors| ApiError::conversion(errors, &datamodel))?;
-
-        config
-            .subject
-            .resolve_datasource_urls_from_env(&overrides)
             .map_err(|errors| ApiError::conversion(errors, &datamodel))?;
 
         let ast = datamodel::parse_datamodel(&datamodel)
@@ -151,7 +147,7 @@ impl QueryEngine {
         let logger = if telemetry.enabled {
             ChannelLogger::new_with_telemetry(log_callback, telemetry.endpoint)
         } else {
-            ChannelLogger::new(log_level, log_callback)
+            ChannelLogger::new(&log_level, log_queries, log_callback)
         };
 
         let builder = EngineBuilder {
@@ -206,14 +202,11 @@ impl QueryEngine {
                             preview_features,
                         );
 
-                        let config = datamodel::json::mcf::config_to_mcf_json_value(&builder.config);
-
                         Ok(ConnectedEngine {
                             datamodel: builder.datamodel.clone(),
                             query_schema: Arc::new(query_schema),
                             logger: builder.logger.clone(),
                             executor,
-                            config,
                             config_dir: builder.config_dir.clone(),
                         })
                     })
@@ -277,45 +270,6 @@ impl QueryEngine {
         match *self.inner.read().await {
             Inner::Connected(ref engine) => Ok(GraphQLSchemaRenderer::render(engine.query_schema().clone())),
             Inner::Builder(_) => Err(ApiError::NotConnected),
-        }
-    }
-
-    /// Loads the DMMF. Only available when connected.
-    pub async fn dmmf(&self) -> crate::Result<DataModelMetaFormat> {
-        match *self.inner.read().await {
-            Inner::Connected(ref engine) => {
-                let dmmf = dmmf::render_dmmf(&engine.datamodel.ast, engine.query_schema().clone());
-
-                Ok(dmmf)
-            }
-            Inner::Builder(_) => Err(ApiError::NotConnected),
-        }
-    }
-
-    /// Loads the configuration.
-    pub async fn get_config(&self) -> crate::Result<serde_json::Value> {
-        match *self.inner.read().await {
-            Inner::Connected(ref engine) => Ok(engine.config.clone()),
-            Inner::Builder(ref builder) => {
-                let value = datamodel::json::mcf::config_to_mcf_json_value(&builder.config);
-                Ok(value)
-            }
-        }
-    }
-
-    /// Info about the runnings server.
-    pub async fn server_info(&self) -> crate::Result<ServerInfo> {
-        match *self.inner.read().await {
-            Inner::Connected(ref engine) => Ok(ServerInfo {
-                commit: env!("GIT_HASH").into(),
-                version: env!("CARGO_PKG_VERSION").into(),
-                primary_connector: Some(engine.executor().primary_connector().name()),
-            }),
-            Inner::Builder(_) => Ok(ServerInfo {
-                commit: env!("GIT_HASH").into(),
-                version: env!("CARGO_PKG_VERSION").into(),
-                primary_connector: None,
-            }),
         }
     }
 }

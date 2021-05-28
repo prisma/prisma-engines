@@ -138,6 +138,7 @@ impl CliCommand {
             .enable_raw_queries(request.enable_raw_queries)
             .build()
             .await?;
+
         let cx = Arc::new(cx);
 
         let handler = GraphQlHandler::new(&*cx.executor, cx.query_schema());

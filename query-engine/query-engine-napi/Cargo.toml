@@ -18,7 +18,7 @@ user-facing-errors = { path = "../../libs/user-facing-errors" }
 datamodel = { path = "../../libs/datamodel/core" }
 sql-connector = { path = "../connectors/sql-query-connector", package = "sql-query-connector" }
 prisma-models = { path = "../../libs/prisma-models" }
-napi = { version = "1.3.4", default-features = false, features = ["napi4", "tokio_rt", "serde-json"] }
+napi = { version = "1.7.3", default-features = false, features = ["napi4", "tokio_rt", "serde-json"] }
 napi-derive = "1"
 thiserror = "1"
 connection-string = "0.1"
@@ -29,6 +29,7 @@ tracing = "0.1"
 tracing-subscriber = "0.2"
 tracing-futures = "0.2"
 tracing-opentelemetry = "0.11"
+datamodel-connector = { path = "../../libs/datamodel/connectors/datamodel-connector" }
 opentelemetry = "0.12"
 opentelemetry-otlp = { version = "0.5", features = ["tls", "tls-roots"] }
 tokio = { version = "1", features = ["sync"] }

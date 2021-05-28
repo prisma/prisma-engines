@@ -17,6 +17,7 @@ pub struct Logger<'a> {
     service_name: &'static str,
     log_format: LogFormat,
     enable_telemetry: bool,
+    log_queries: bool,
     telemetry_endpoint: Option<&'a str>,
 }
 
@@ -27,6 +28,7 @@ impl<'a> Logger<'a> {
             service_name,
             log_format: LogFormat::Json,
             enable_telemetry: false,
+            log_queries: false,
             telemetry_endpoint: None,
         }
     }
@@ -34,6 +36,11 @@ impl<'a> Logger<'a> {
     /// Sets the STDOUT log output format. Default: Json.
     pub fn log_format(&mut self, log_format: LogFormat) {
         self.log_format = log_format;
+    }
+
+    /// Enable query logging. Default: false.
+    pub fn log_queries(&mut self, log_queries: bool) {
+        self.log_queries = log_queries;
     }
 
     /// Enables Jaeger telemetry.
@@ -50,12 +57,16 @@ impl<'a> Logger<'a> {
     /// instance. The returned guard value needs to stay in scope for the whole
     /// lifetime of the service.
     pub fn install(self) -> LoggerResult<Option<Uninstall>> {
-        let filter = EnvFilter::from_default_env()
+        let mut filter = EnvFilter::from_default_env()
             .add_directive("tide=error".parse().unwrap())
             .add_directive("tonic=error".parse().unwrap())
             .add_directive("h2=error".parse().unwrap())
             .add_directive("hyper=error".parse().unwrap())
             .add_directive("tower=error".parse().unwrap());
+
+        if self.log_queries {
+            filter = filter.add_directive("quaint[{is_query}]=trace".parse().unwrap());
+        }
 
         match self.log_format {
             LogFormat::Text => {
@@ -66,7 +77,7 @@ impl<'a> Logger<'a> {
 
                     self.finalize(subscriber)
                 } else {
-                    let subscriber = FmtSubscriber::builder().with_max_level(tracing::Level::TRACE).finish();
+                    let subscriber = FmtSubscriber::builder().with_env_filter(filter).compact().finish();
                     self.finalize(subscriber)
                 }
             }

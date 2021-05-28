@@ -1,25 +1,25 @@
+use std::sync::Arc;
+
 use super::visitor::JsonVisitor;
 use napi::threadsafe_function::{ThreadsafeFunction, ThreadsafeFunctionCallMode};
 use serde_json::{Map, Value};
-use tracing::{metadata::LevelFilter, Event, Subscriber};
-use tracing_subscriber::{layer::Context, registry::LookupSpan, Layer};
+use tracing::{Event, Subscriber};
+use tracing_subscriber::{layer::Context, registry::LookupSpan, EnvFilter, Layer};
 
 #[derive(Clone)]
 pub struct EventChannel {
     callback: ThreadsafeFunction<String>,
-    level_filter: LevelFilter,
+    telemetry: bool,
+    filter: Arc<EnvFilter>,
 }
 
 impl EventChannel {
-    pub fn new(callback: ThreadsafeFunction<String>) -> Self {
+    pub fn new(callback: ThreadsafeFunction<String>, filter: EnvFilter, telemetry: bool) -> Self {
         Self {
             callback,
-            level_filter: LevelFilter::OFF,
+            telemetry,
+            filter: Arc::new(filter),
         }
-    }
-
-    pub fn filter_level(&mut self, level_filter: LevelFilter) {
-        self.level_filter = level_filter;
     }
 }
 
@@ -48,10 +48,6 @@ where
     }
 
     fn enabled(&self, metadata: &tracing::Metadata<'_>, ctx: Context<'_, S>) -> bool {
-        self.level_filter.enabled(metadata, ctx)
-    }
-
-    fn max_level_hint(&self) -> Option<LevelFilter> {
-        Some(self.level_filter)
+        self.telemetry || (!metadata.is_span() && self.filter.enabled(metadata, ctx))
     }
 }

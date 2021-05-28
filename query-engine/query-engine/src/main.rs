@@ -42,6 +42,7 @@ async fn main() -> Result<(), AnyError> {
 
         let mut logger = Logger::new("query-engine-http");
         logger.log_format(opts.log_format());
+        logger.log_queries(opts.log_queries());
         logger.enable_telemetry(opts.open_telemetry);
         logger.telemetry_endpoint(&opts.open_telemetry_endpoint);
 
