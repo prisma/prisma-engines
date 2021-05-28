@@ -11,7 +11,7 @@ mod dup_col_regr {
             }
             
             model TranscriberCompetency {
-              id            String      @id
+              #id(id, String, @id)
               transcriber   Transcriber @relation(fields: [transcriberId], references: [id])
               transcriberId String
               competency    Competency  @relation(fields: [competencyId], references: [id])

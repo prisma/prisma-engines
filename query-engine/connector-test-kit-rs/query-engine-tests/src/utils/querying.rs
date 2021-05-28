@@ -11,7 +11,13 @@ macro_rules! assert_query_many {
     ($runner:expr, $q:expr, $result:expr) => {
         let q_result = $runner.query($q).await?.to_string();
 
-        assert_eq!($result.contains(&q_result.as_str()), true);
+        assert_eq!(
+            $result.contains(&q_result.as_str()),
+            true,
+            "Query result: {} is not part of the expected results: {}",
+            q_result,
+            $result
+        );
     };
 }
 

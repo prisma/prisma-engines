@@ -13,7 +13,8 @@ use query_engine_tests::*;
 // /!\ rel_filter_n_m_a and rel_filter_n_m_z must always expect the same results
 
 // TODO: Bring back SqlServer when cascading rules can be set!
-#[test_suite]
+// TODO(dom): Not working on mongo. Explicitly "not implemented yet"
+#[test_suite(exclude(MongoDb))]
 mod prisma_3078 {
     use indoc::indoc;
     use query_engine_tests::run_query;

@@ -3,6 +3,8 @@ use query_engine_tests::*;
 
 #[test_suite(schema(schema))]
 mod order_by_dependent_pag {
+    use query_engine_tests::assert_query_many;
+
     fn schema() -> String {
         let schema = indoc! {
             r#"model ModelA {
@@ -287,7 +289,7 @@ mod order_by_dependent_pag {
     fn multiple_rel_same_model() -> String {
         let schema = indoc! {
           r#"model ModelA {
-          id    Int     @id
+          #id(id, Int, @id)
         
           b1_id Int?
           b1    ModelB? @relation(fields: [b1_id], references: [id], name: "1")
@@ -297,7 +299,7 @@ mod order_by_dependent_pag {
         }
         
         model ModelB {
-          id Int     @id
+          #id(id, Int, @id)
         
           a1 ModelA[] @relation("1")
           a2 ModelA[] @relation("2")

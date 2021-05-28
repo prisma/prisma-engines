@@ -8,12 +8,12 @@ mod paging_one2m_stable_order {
         let schema = indoc! {
             r#"
             model TestModel {
-              id      Int @id
+              #id(id, Int, @id)
               related RelatedTestModel[]
             }
             
             model RelatedTestModel {
-              id Int @id
+              #id(id, Int, @id)
               fieldA String
               fieldB String
               fieldC String
@@ -145,12 +145,12 @@ mod paging_one2m_unstable_order {
         let schema = indoc! {
             r#"
             model TestModel {
-              id      Int @id
+              #id(id, Int, @id)
               related RelatedTestModel[]
             }
             
             model RelatedTestModel {
-              id Int @id
+              #id(id, Int, @id)
               fieldA String
               fieldB String
               fieldC String

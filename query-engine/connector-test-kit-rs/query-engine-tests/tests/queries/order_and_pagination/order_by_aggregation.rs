@@ -1,7 +1,8 @@
 use indoc::indoc;
 use query_engine_tests::*;
 
-#[test_suite(schema(schema))]
+// TODO(dom): Not working on mongo
+#[test_suite(schema(schema), exclude(MongoDb))]
 mod order_by_aggr {
     fn schema() -> String {
         let schema = indoc! {

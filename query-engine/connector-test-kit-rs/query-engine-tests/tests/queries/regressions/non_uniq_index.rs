@@ -8,7 +8,7 @@ mod non_uniq_index {
     fn schema() -> String {
         let schema = indoc! {
             r#"model TestModel {
-              id    Int     @id
+              #id(id, Int, @id)
               field String?
             
               @@index([field], name: "test_index")

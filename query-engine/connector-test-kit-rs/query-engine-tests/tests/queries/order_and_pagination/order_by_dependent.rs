@@ -285,7 +285,7 @@ mod order_by_dependent {
     fn multiple_rel_same_model() -> String {
         let schema = indoc! {
           r#"model ModelA {
-          id    Int     @id
+          #id(id, Int, @id)
         
           b1_id Int?
           b1    ModelB? @relation(fields: [b1_id], references: [id], name: "1")
@@ -295,7 +295,7 @@ mod order_by_dependent {
         }
         
         model ModelB {
-          id Int     @id
+          #id(id, Int, @id)
         
           a1 ModelA[] @relation("1")
           a2 ModelA[] @relation("2")
@@ -339,13 +339,13 @@ mod order_by_dependent {
         let schema = indoc! {
           r#"
         model ModelA {
-          id   Int     @id
+          #id(id, Int, @id)
           b_id Int?
           b    ModelB? @relation(fields: [b_id], references: [id])
         }
         
         model ModelB {
-          id Int     @id
+          #id(id, Int, @id)
           a  ModelA?
         
           c_id Int?
@@ -353,7 +353,7 @@ mod order_by_dependent {
         }
         
         model ModelC {
-          id   Int     @id
+          #id(id, Int, @id)
           b    ModelB?
         }
         "#
