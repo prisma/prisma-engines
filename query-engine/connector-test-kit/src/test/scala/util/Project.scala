@@ -24,10 +24,16 @@ case class Project(
       case provider => provider
     }
 
+    val planetScaleMode = config.provider.stripSuffix("56") match {
+      case "vitess" => "planetScaleMode = true"
+      case provider => ""
+    }
+
     s"""
            |datasource test {
            |  provider = "${provider}"
            |  url = "$dataSourceUrl"
+           |  ${planetScaleMode}
            |}
     """.stripMargin
   }
