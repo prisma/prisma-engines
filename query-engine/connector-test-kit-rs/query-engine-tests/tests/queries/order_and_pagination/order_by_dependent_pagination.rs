@@ -372,7 +372,7 @@ mod order_by_dependent_pag {
             Some(id) => format!(
                 "c: {{ create: {{ id: {} \n {} }} }}",
                 id,
-                inline.unwrap_or("".to_string())
+                inline.unwrap_or_else(|| "".to_string())
             ),
             None => "".to_string(),
         };
