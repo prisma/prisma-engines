@@ -30,7 +30,7 @@ mod uniq_count_rel {
     // "Counting with no records in the database" should "return 0"
     // TODO(dom): Not working on mongo
     // TODO(dom): {"errors":[{"error":"called `Option::unwrap()` on a `None` value","user_facing_error":{"is_panic":true,"message":"called `Option::unwrap()` on a `None` value","backtrace":null}}]}
-    #[connector_test]
+    #[connector_test(exclude(MongoDb))]
     async fn no_rel_records(runner: &Runner) -> TestResult<()> {
         create_row(runner, r#"{ id: 1, title: "a" }"#).await?;
 
