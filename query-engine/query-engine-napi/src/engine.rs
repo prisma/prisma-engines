@@ -117,20 +117,22 @@ impl QueryEngine {
         } = opts;
 
         let overrides: Vec<(_, _)> = datasource_overrides.into_iter().collect();
-        let mut config =
-            datamodel::parse_configuration(&datamodel).map_err(|errors| ApiError::conversion(errors, &datamodel))?;
+
+        let config = if ignore_env_var_errors {
+            datamodel::parse_configuration(&datamodel).map_err(|errors| ApiError::conversion(errors, &datamodel))?
+        } else {
+            datamodel::parse_configuration(&datamodel)
+                .and_then(|mut config| {
+                    config.subject.resolve_datasource_urls_from_env(&overrides)?;
+                    Ok(config)
+                })
+                .map_err(|errors| ApiError::conversion(errors, &datamodel))?
+        };
 
         config
             .subject
             .validate_that_one_datasource_is_provided()
             .map_err(|errors| ApiError::conversion(errors, &datamodel))?;
-
-        if !ignore_env_var_errors {
-            config
-                .subject
-                .resolve_datasource_urls_from_env(&overrides)
-                .map_err(|errors| ApiError::conversion(errors, &datamodel))?;
-        }
 
         let ast = datamodel::parse_datamodel(&datamodel)
             .map_err(|errors| ApiError::conversion(errors, &datamodel))?
