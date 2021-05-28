@@ -14,7 +14,7 @@ use query_engine_tests::*;
 
 // TODO: Bring back SqlServer when cascading rules can be set!
 // TODO(dom): Not working on mongo. Explicitly "not implemented yet"
-#[test_suite(exclude(MongoDb))]
+#[test_suite(exclude(MongoDb, SqlServer))]
 mod prisma_3078 {
     use indoc::indoc;
     use query_engine_tests::run_query;
