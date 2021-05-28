@@ -18,8 +18,8 @@ user-facing-errors = { path = "../../libs/user-facing-errors" }
 datamodel = { path = "../../libs/datamodel/core" }
 sql-connector = { path = "../connectors/sql-query-connector", package = "sql-query-connector" }
 prisma-models = { path = "../../libs/prisma-models" }
-napi = { git = "https://github.com/pimeys/napi-rs", branch = "handle-manual-drop-leaks", default-features = false, features = ["napi4", "tokio_rt", "serde-json"] }
-napi-derive = { git = "https://github.com/pimeys/napi-rs", branch = "handle-manual-drop-leaks" }
+napi = { version = "1.7.3", default-features = false, features = ["napi4", "tokio_rt", "serde-json"] }
+napi-derive = "1"
 thiserror = "1"
 connection-string = "0.1"
 url = "2"
@@ -35,4 +35,4 @@ opentelemetry-otlp = { version = "0.5", features = ["tls", "tls-roots"] }
 tokio = { version = "1", features = ["sync"] }
 
 [build-dependencies]
-napi-build = { git = "https://github.com/pimeys/napi-rs", branch = "handle-manual-drop-leaks" }
+napi-build = "1"

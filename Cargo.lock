@@ -2620,7 +2620,8 @@ dependencies = [
 [[package]]
 name = "napi-build"
 version = "1.0.2"
-source = "git+https://github.com/pimeys/napi-rs?branch=handle-manual-drop-leaks#3db5c56fbf5b97226efacd2a0dd92f7cdac5de6a"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3039ed15066300360660239cab9a6071a0ed899547c49e40952d87ded49b29b8"
 dependencies = [
  "cfg-if 1.0.0",
  "ureq",
@@ -2629,7 +2630,8 @@ dependencies = [
 [[package]]
 name = "napi-derive"
 version = "1.1.0"
-source = "git+https://github.com/pimeys/napi-rs?branch=handle-manual-drop-leaks#3db5c56fbf5b97226efacd2a0dd92f7cdac5de6a"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8e7ed160148f94ee17936f00288029cb0cfb37c08bbace9f514f735dcd869ed7"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2639,7 +2641,8 @@ dependencies = [
 [[package]]
 name = "napi-sys"
 version = "1.1.1"
-source = "git+https://github.com/pimeys/napi-rs?branch=handle-manual-drop-leaks#3db5c56fbf5b97226efacd2a0dd92f7cdac5de6a"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "43563506c466587478849d80f46383d859b91bbec586580dadeb3639588f2f7e"
 
 [[package]]
 name = "native-tls"
@@ -4117,7 +4120,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e0bccbcf40c8938196944a3da0e133e031a33f4d6b72db3bda3cc556e361905d"
 dependencies = [
  "lazy_static",
- "parking_lot 0.10.2",
+ "parking_lot 0.11.1",
  "serial_test_derive",
 ]
 
