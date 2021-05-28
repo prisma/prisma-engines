@@ -267,7 +267,7 @@ mod create {
     fn schema_datetime() -> String {
         let schema = indoc! {
             r#"model A {
-              timestamp DateTime @id
+              #id(timestamp, DateTime, @id)
             }"#
         };
 
