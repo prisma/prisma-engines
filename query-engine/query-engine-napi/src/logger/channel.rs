@@ -9,13 +9,15 @@ use tracing_subscriber::{layer::Context, registry::LookupSpan, EnvFilter, Layer}
 #[derive(Clone)]
 pub struct EventChannel {
     callback: ThreadsafeFunction<String>,
+    telemetry: bool,
     filter: Arc<EnvFilter>,
 }
 
 impl EventChannel {
-    pub fn new(callback: ThreadsafeFunction<String>, filter: EnvFilter) -> Self {
+    pub fn new(callback: ThreadsafeFunction<String>, filter: EnvFilter, telemetry: bool) -> Self {
         Self {
             callback,
+            telemetry,
             filter: Arc::new(filter),
         }
     }
@@ -46,6 +48,6 @@ where
     }
 
     fn enabled(&self, metadata: &tracing::Metadata<'_>, ctx: Context<'_, S>) -> bool {
-        self.filter.enabled(metadata, ctx)
+        self.telemetry || (!metadata.is_span() && self.filter.enabled(metadata, ctx))
     }
 }

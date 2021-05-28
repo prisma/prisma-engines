@@ -44,7 +44,7 @@ impl ChannelLogger {
             filter = filter.add_directive("quaint[{is_query}]".parse().unwrap());
         }
 
-        let javascript_cb = EventChannel::new(callback, filter);
+        let javascript_cb = EventChannel::new(callback, filter, false);
         let subscriber = EventRegistry::new().with(javascript_cb);
 
         let subscriber = Subscriber::Normal(subscriber);
@@ -58,7 +58,7 @@ impl ChannelLogger {
     /// Creates a new instance of a logger with the `trace` minimum level.
     /// Enables tracing events to OTLP endpoint.
     pub fn new_with_telemetry(callback: ThreadsafeFunction<String>, endpoint: Option<String>) -> Self {
-        let javascript_cb = EventChannel::new(callback, EnvFilter::new("trace"));
+        let javascript_cb = EventChannel::new(callback, EnvFilter::new("trace"), true);
 
         global::set_text_map_propagator(TraceContextPropagator::new());
 
