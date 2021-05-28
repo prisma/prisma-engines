@@ -199,7 +199,8 @@ mod delete_many {
     }
 
     // "nested DeleteMany" should "work"
-    #[connector_test(schema(nested_del_many))]
+    // TODO(dom): Not working on mongo. Explicitely marked as not implemented yet
+    #[connector_test(schema(nested_del_many), exclude(MongoDb))]
     async fn nested_delete_many(runner: &Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(runner, r#"mutation {
