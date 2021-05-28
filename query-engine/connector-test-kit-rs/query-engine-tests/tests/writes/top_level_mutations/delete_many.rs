@@ -32,7 +32,7 @@ mod delete_many {
         run_query!(
             runner,
             r#"mutation {
-        createChild(data: {
+        createOneChild(data: {
           id: 1,
           c: "c1"
           parentReq: {
@@ -47,7 +47,7 @@ mod delete_many {
         assert_error!(
           runner,
           r#"mutation {
-            deleteManyParents(
+            deleteManyParent(
               where: { p: { equals: "p1" }}
             ){
               count
@@ -66,7 +66,7 @@ mod delete_many {
         run_query!(
             runner,
             r#"mutation {
-          createChild(data: {
+          createOneChild(data: {
             id: 1,
             c: "c1"
             parentReq: {
@@ -81,7 +81,7 @@ mod delete_many {
         assert_error!(
           runner,
           r#"mutation {
-            deleteManyParents(where: {}){
+            deleteManyParent(where: {}){
               count
             }
           }"#,

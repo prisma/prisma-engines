@@ -6,7 +6,7 @@ mod dup_col_regr {
     fn schema() -> String {
         let schema = indoc! {
             r#"model Transcriber {
-              id               String                       @id
+              #id(id, String, @id)
               competencies     TranscriberCompetency[]
             }
             
@@ -20,7 +20,7 @@ mod dup_col_regr {
             }
             
             model Competency {
-              id                          String                       @id
+              #id(id, String, @id)
               transcriberCompetencies     TranscriberCompetency[]
             }"#
         };

@@ -6,25 +6,25 @@ mod order_by_aggr {
     fn schema() -> String {
         let schema = indoc! {
             r#"model User {
-              id    Int    @id
+              #id(id, Int, @id)
               name  String
               posts Post[]
-              categories Category[]
+              #m2m(categories, Category[], Int)
             }
             
             model Post {
-              id     Int    @id
+              #id(id, Int, @id)
               title  String
               user   User   @relation(fields: [userId], references: [id])
               userId Int
-              categories Category[]
+              #m2m(categories, Category[], Int)
             }
             
             model Category {
-              id     Int    @id
+              #id(id, Int, @id)
               name   String
-              posts  Post[]
-              users  User[]
+              #m2m(posts, Post[], Int)
+              #m2m(users, User[], Int)
             }"#
         };
 

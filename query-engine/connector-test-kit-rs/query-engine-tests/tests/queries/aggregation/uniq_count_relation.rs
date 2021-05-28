@@ -9,7 +9,7 @@ mod uniq_count_rel {
               #id(id, Int, @id)
               title      String
               comments   Comment[]
-              categories Category[]
+              #m2m(categories, Category[], Int)
             }
             
             model Comment {
@@ -20,7 +20,7 @@ mod uniq_count_rel {
             
             model Category {
               #id(id, Int, @id)
-              posts Post[]
+              #m2m(posts, Post[], Int)
             }"#
         };
 

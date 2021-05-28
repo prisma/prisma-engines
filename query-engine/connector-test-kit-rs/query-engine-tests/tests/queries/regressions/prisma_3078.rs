@@ -22,9 +22,9 @@ mod prisma_3078 {
         let schema = indoc! {
             r#"model User {
               #id(id, Int, @id)
-              name            String?
-              field_b         User?      @relation("UserfriendOf")
-              field_a      User?     @relation("UserfriendOf", fields: [field_aId], references: [id])
+              name       String?
+              field_b    User?    @relation("UserfriendOf")
+              field_a    User?    @relation("UserfriendOf", fields: [field_aId], references: [id])
               field_aId  Int?
             }"#
         };
@@ -36,9 +36,9 @@ mod prisma_3078 {
         let schema = indoc! {
             r#"model User {
             #id(id, Int, @id)
-            name            String?
-            field_b         User?      @relation("UserfriendOf")
-            field_z      User?     @relation("UserfriendOf", fields: [field_zId], references: [id])
+            name       String?
+            field_b    User?    @relation("UserfriendOf")
+            field_z    User?    @relation("UserfriendOf", fields: [field_zId], references: [id])
             field_zId  Int?
           }"#
         };
@@ -50,9 +50,9 @@ mod prisma_3078 {
         let schema = indoc! {
             r#"model User {
               #id(id, Int, @id)
-              name       String?
-              field_b    User[]  @relation("UserfriendOf")
-              field_a   User?    @relation("UserfriendOf", fields: [field_aId], references: [id])
+              name      String?
+              field_b   User[]  @relation("UserfriendOf")
+              field_a   User?   @relation("UserfriendOf", fields: [field_aId], references: [id])
               field_aId Int?
             }"#
         };
@@ -64,9 +64,9 @@ mod prisma_3078 {
         let schema = indoc! {
             r#"model User {
             #id(id, Int, @id)
-            name       String?
-            field_b    User[]  @relation("UserfriendOf")
-            field_z   User?    @relation("UserfriendOf", fields: [field_zId], references: [id])
+            name      String?
+            field_b   User[]  @relation("UserfriendOf")
+            field_z   User?   @relation("UserfriendOf", fields: [field_zId], references: [id])
             field_zId Int?
           }"#
         };
@@ -80,7 +80,7 @@ mod prisma_3078 {
             #id(id, Int, @id)
             name       String?
             field_b    User[]  @relation("UserfriendOf")
-            field_a    User[] @relation("UserfriendOf")
+            field_a    User[]  @relation("UserfriendOf")
             field_aId  Int?
           }"#
         };
@@ -94,7 +94,7 @@ mod prisma_3078 {
           #id(id, Int, @id)
           name       String?
           field_b    User[]  @relation("UserfriendOf")
-          field_z    User[] @relation("UserfriendOf")
+          field_z    User[]  @relation("UserfriendOf")
           field_zId  Int?
         }"#
         };
