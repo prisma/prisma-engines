@@ -1,8 +1,10 @@
-use indoc::indoc;
 use query_engine_tests::*;
 
 #[test_suite(schema(schema))]
 mod order_by_dependent {
+    use indoc::indoc;
+    use query_engine_tests::{assert_query_many, run_query};
+
     fn schema() -> String {
         let schema = indoc! {
             r#"model ModelA {

@@ -2,6 +2,8 @@ use query_engine_tests::*;
 
 #[test_suite(schema(schemas::common_text_and_numeric_types))]
 mod aggregation_max {
+    use query_engine_tests::run_query;
+
     #[connector_test]
     async fn max_no_records(runner: &Runner) -> TestResult<()> {
         insta::assert_snapshot!(

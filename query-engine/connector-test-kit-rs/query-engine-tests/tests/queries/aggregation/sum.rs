@@ -2,6 +2,7 @@ use query_engine_tests::*;
 
 #[test_suite(schema(schemas::common_numeric_types))]
 mod aggregation_sum {
+    use query_engine_tests::run_query;
 
     // TODO: remove exclude once fixed for mongo
     #[connector_test(exclude(MongoDb))]

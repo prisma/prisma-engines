@@ -248,7 +248,6 @@ class DeleteManySpec extends FlatSpec with Matchers with ApiSpecBase {
       project
     )
     result.pathAsSeq("data.todoes").size should be(int)
-
   }
 
   def createTodo(title: String): Unit = {

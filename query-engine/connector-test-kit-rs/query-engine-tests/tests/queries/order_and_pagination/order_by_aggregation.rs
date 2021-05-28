@@ -1,9 +1,11 @@
-use indoc::indoc;
 use query_engine_tests::*;
 
 // TODO(dom): Not working on mongo
 #[test_suite(schema(schema), exclude(MongoDb))]
 mod order_by_aggr {
+    use indoc::indoc;
+    use query_engine_tests::{assert_query_many, run_query};
+
     fn schema() -> String {
         let schema = indoc! {
             r#"model User {

@@ -1,8 +1,10 @@
-use indoc::indoc;
 use query_engine_tests::*;
 
 #[test_suite(schema(schema))]
 mod uniq_count_rel {
+    use indoc::indoc;
+    use query_engine_tests::run_query;
+
     fn schema() -> String {
         let schema = indoc! {
             r#"model Post {

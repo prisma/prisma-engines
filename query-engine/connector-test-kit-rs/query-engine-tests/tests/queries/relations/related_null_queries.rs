@@ -1,8 +1,10 @@
-use indoc::indoc;
 use query_engine_tests::*;
 
 #[test_suite]
 mod inline_relation {
+    use indoc::indoc;
+    use query_engine_tests::run_query;
+
     fn schema_1() -> String {
         let schema = indoc! {
             r#"model ModelA {

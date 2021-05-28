@@ -1,9 +1,11 @@
-use indoc::indoc;
 use query_engine_tests::*;
 
 // "Paging on an 1:m relation with a multi-field orderBy with stable ordering" should "work as expected"
 #[test_suite(schema(schema))]
 mod paging_one2m_stable_order {
+    use indoc::indoc;
+    use query_engine_tests::run_query;
+
     fn schema() -> String {
         let schema = indoc! {
             r#"
@@ -141,6 +143,9 @@ mod paging_one2m_stable_order {
 // "Paging on an 1:m relation with a multi-field orderBy WITHOUT stable ordering" should "work as expected"
 #[test_suite(schema(schema))]
 mod paging_one2m_unstable_order {
+    use indoc::indoc;
+    use query_engine_tests::assert_query_many;
+
     fn schema() -> String {
         let schema = indoc! {
             r#"

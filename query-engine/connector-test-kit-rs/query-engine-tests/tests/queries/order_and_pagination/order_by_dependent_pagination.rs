@@ -1,9 +1,9 @@
-use indoc::indoc;
 use query_engine_tests::*;
 
 #[test_suite(schema(schema))]
 mod order_by_dependent_pag {
-    use query_engine_tests::assert_query_many;
+    use indoc::indoc;
+    use query_engine_tests::{assert_query_many, run_query};
 
     fn schema() -> String {
         let schema = indoc! {

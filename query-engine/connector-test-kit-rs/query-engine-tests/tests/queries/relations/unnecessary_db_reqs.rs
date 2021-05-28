@@ -1,9 +1,12 @@
-use indoc::indoc;
 use query_engine_tests::*;
 
-//TODO: Needs a way to count the amount of requests sent for a query
+// TODO: Finish porting this suite.
+// TODO: Needs a way to count the amount of requests sent for a query
 #[test_suite(schema(schema))]
 mod unnecessary_db_reqs {
+    use indoc::indoc;
+    use query_engine_tests::run_query;
+
     fn schema_1() -> String {
         let schema = indoc! {
             r#"model Top {
