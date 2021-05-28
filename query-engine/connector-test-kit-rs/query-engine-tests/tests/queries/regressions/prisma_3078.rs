@@ -12,10 +12,8 @@ use query_engine_tests::*;
 // /!\ rel_filter_1_m_a and rel_filter_1_m_z must always expect the same results
 // /!\ rel_filter_n_m_a and rel_filter_n_m_z must always expect the same results
 
-// TODO: Figure out what's the "JoinRelationLinksCapability". Doesn't exist
-// TODO: Figure out if excluding MongoDb/SqlServer is fine for now
 // TODO: Bring back SqlServer when cascading rules can be set!
-#[test_suite(exclude(MongoDb, SqlServer))]
+#[test_suite]
 mod prisma_3078 {
     use indoc::indoc;
     use query_engine_tests::run_query;
