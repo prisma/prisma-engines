@@ -14,7 +14,7 @@ macro_rules! assert_query_many {
         assert_eq!(
             $result.contains(&q_result.as_str()),
             true,
-            "Query result: {} is not part of the expected results: {}",
+            "Query result: {} is not part of the expected results: {:?}",
             q_result,
             $result
         );
