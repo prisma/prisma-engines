@@ -4,6 +4,7 @@ import org.scalatest._
 import util.ConnectorCapability.JoinRelationLinksCapability
 import util._
 
+// RS: Ported
 class ExtendedRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
 
   override def runOnlyForCapabilities = Set(JoinRelationLinksCapability)

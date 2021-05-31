@@ -14,9 +14,11 @@ use opentelemetry_otlp::Uninstall;
 use registry::EventRegistry;
 use std::{future::Future, sync::Arc};
 use telemetry::WithTelemetry;
-use tracing::level_filters::LevelFilter;
 use tracing_futures::WithSubscriber;
-use tracing_subscriber::layer::{Layered, SubscriberExt};
+use tracing_subscriber::{
+    layer::{Layered, SubscriberExt},
+    EnvFilter,
+};
 
 #[derive(Clone)]
 enum Subscriber {
@@ -30,21 +32,25 @@ enum Subscriber {
 #[derive(Clone)]
 pub struct ChannelLogger {
     subscriber: Subscriber,
-    level: LevelFilter,
     guard: Option<Arc<Uninstall>>,
 }
 
 impl ChannelLogger {
     /// Creates a new instance of a logger with the minimum log level.
-    pub fn new(level: LevelFilter, callback: ThreadsafeFunction<String>) -> Self {
-        let mut javascript_cb = EventChannel::new(callback);
-        javascript_cb.filter_level(level);
+    pub fn new(level: &str, log_queries: bool, callback: ThreadsafeFunction<String>) -> Self {
+        let mut filter = EnvFilter::new(level);
 
-        let subscriber = Subscriber::Normal(EventRegistry::new().with(javascript_cb));
+        if log_queries {
+            filter = filter.add_directive("quaint[{is_query}]".parse().unwrap());
+        }
+
+        let javascript_cb = EventChannel::new(callback, filter, false);
+        let subscriber = EventRegistry::new().with(javascript_cb);
+
+        let subscriber = Subscriber::Normal(subscriber);
 
         Self {
             subscriber,
-            level,
             guard: None,
         }
     }
@@ -52,8 +58,7 @@ impl ChannelLogger {
     /// Creates a new instance of a logger with the `trace` minimum level.
     /// Enables tracing events to OTLP endpoint.
     pub fn new_with_telemetry(callback: ThreadsafeFunction<String>, endpoint: Option<String>) -> Self {
-        let mut javascript_cb = EventChannel::new(callback);
-        javascript_cb.filter_level(LevelFilter::TRACE);
+        let javascript_cb = EventChannel::new(callback, EnvFilter::new("trace"), true);
 
         global::set_text_map_propagator(TraceContextPropagator::new());
 
@@ -77,7 +82,6 @@ impl ChannelLogger {
 
         Self {
             subscriber,
-            level: LevelFilter::TRACE,
             guard: Some(Arc::new(guard)),
         }
     }

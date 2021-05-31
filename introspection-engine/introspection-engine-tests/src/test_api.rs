@@ -10,7 +10,8 @@ use quaint::{prelude::SqlFamily, single::Quaint};
 use sql_introspection_connector::SqlIntrospectionConnector;
 use sql_migration_connector::SqlMigrationConnector;
 use sql_schema_describer::SqlSchema;
-use test_setup::{sqlite_test_url, TestApiArgs};
+use std::fmt::Write;
+use test_setup::{sqlite_test_url, DatasourceBlock, TestApiArgs};
 use tracing::Instrument;
 
 pub struct TestApi {
@@ -168,12 +169,12 @@ impl TestApi {
         self.args.tags()
     }
 
-    pub fn datasource_block(&self) -> String {
-        self.args.datasource_block(&self.connection_string)
+    pub fn datasource_block(&self) -> DatasourceBlock<'_> {
+        self.args.datasource_block(&self.connection_string, &[])
     }
 
     pub fn configuration(&self) -> Configuration {
-        datamodel::parse_configuration(&self.datasource_block())
+        datamodel::parse_configuration(&self.datasource_block().to_string())
             .unwrap()
             .subject
     }
@@ -196,8 +197,7 @@ impl TestApi {
     pub fn dm_with_sources(&self, schema: &str) -> String {
         let mut out = String::with_capacity(320 + schema.len());
 
-        out.push_str(&self.datasource_block());
-        out.push_str(schema);
+        write!(out, "{}\n{}", self.datasource_block(), schema).unwrap();
 
         out
     }

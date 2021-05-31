@@ -57,7 +57,6 @@ rustc_version = "0.2.3"
 [dev-dependencies]
 anyhow = "1"
 chrono = "0.4"
-enumflags2 = "0.6"
 indoc = "1"
 migration-connector = { path = "../../migration-engine/connectors/migration-connector" }
 migration-core = { path = "../../migration-engine/core" }

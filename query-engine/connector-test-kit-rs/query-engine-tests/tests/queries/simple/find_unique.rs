@@ -2,6 +2,8 @@ use query_engine_tests::*;
 
 #[test_suite(schema(schemas::user))]
 mod find_unique {
+    use query_engine_tests::assert_query;
+
     #[connector_test]
     async fn fetch_unique_by_id(runner: &Runner) -> TestResult<()> {
         test_user(runner).await?;

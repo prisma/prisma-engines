@@ -5,6 +5,7 @@ import util.ConnectorCapability.JoinRelationLinksCapability
 import util.ConnectorTag.{DocumentConnectorTag, RelationalConnectorTag}
 import util._
 
+// RS: Ported
 class SelfRelationFilterBugSpec extends FlatSpec with Matchers with ApiSpecBase {
   override def runOnlyForCapabilities = Set(JoinRelationLinksCapability)
 

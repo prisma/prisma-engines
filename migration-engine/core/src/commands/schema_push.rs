@@ -1,5 +1,5 @@
 use super::MigrationCommand;
-use crate::{parse_datamodel, CoreResult};
+use crate::{parse_schema, CoreResult};
 use migration_connector::{ConnectorError, MigrationConnector};
 use serde::{Deserialize, Serialize};
 
@@ -13,18 +13,18 @@ impl MigrationCommand for SchemaPushCommand {
     type Output = SchemaPushOutput;
 
     async fn execute<C: MigrationConnector>(input: &Self::Input, connector: &C) -> CoreResult<Self::Output> {
-        let schema = parse_datamodel(&input.schema)?;
+        let schema = parse_schema(&input.schema)?;
         let inferrer = connector.database_migration_inferrer();
         let applier = connector.database_migration_step_applier();
         let checker = connector.destructive_change_checker();
 
         let database_migration = if input.assume_empty {
-            inferrer.infer_from_empty(&schema)?
+            inferrer.infer_from_empty((&schema.0, &schema.1))?
         } else {
-            inferrer.infer(&schema).await?
+            inferrer.infer((&schema.0, &schema.1)).await?
         };
 
-        if let Some(err) = connector.check_database_version_compatibility(&schema) {
+        if let Some(err) = connector.check_database_version_compatibility(&schema.1) {
             return Err(ConnectorError::user_facing(err));
         };
 

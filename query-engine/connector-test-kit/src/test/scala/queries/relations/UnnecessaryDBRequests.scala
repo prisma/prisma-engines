@@ -3,6 +3,7 @@ package queries.relations
 import org.scalatest.{FlatSpec, Matchers}
 import util.{ApiSpecBase, ProjectDsl}
 
+// RS: Will port later. Needs a way to count the amount of requests sent for a query in rust
 class UnnecessaryDBRequests extends FlatSpec with Matchers with ApiSpecBase {
   "One to Many relations" should "not create unnecessary roundtrips" in {
     val project = ProjectDsl.fromString {
@@ -304,7 +305,7 @@ class UnnecessaryDBRequests extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   def assert_request_count(lines: Vector[String], desired_count: Int): Unit = {
-    lines.count(l => l.contains("quaint::connector::metrics: query=\"SELECT")) should be(desired_count)
+    lines.count(l => l.contains("quaint::connector::metrics:query=\"SELECT")) should be(desired_count)
   }
 
 }

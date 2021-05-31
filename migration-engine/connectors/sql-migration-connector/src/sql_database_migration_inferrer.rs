@@ -4,25 +4,25 @@ use crate::{
     sql_migration::{SqlMigration, SqlMigrationStep},
     sql_schema_calculator, sql_schema_differ, SqlMigrationConnector,
 };
-use datamodel::{walkers::walk_models, Datamodel};
+use datamodel::{walkers::walk_models, Configuration, Datamodel};
 use migration_connector::{ConnectorResult, DatabaseMigrationInferrer, MigrationConnector, MigrationDirectory};
 use sql_schema_describer::{walkers::SqlSchemaExt, SqlSchema};
 
 #[async_trait::async_trait]
 impl DatabaseMigrationInferrer<SqlMigration> for SqlMigrationConnector {
-    async fn infer(&self, next: &Datamodel) -> ConnectorResult<SqlMigration> {
+    async fn infer(&self, next: (&Configuration, &Datamodel)) -> ConnectorResult<SqlMigration> {
         let current_database_schema: SqlSchema = self.describe_schema().await?;
         let expected_database_schema = sql_schema_calculator::calculate_sql_schema(next, self.flavour());
         Ok(infer(
             current_database_schema,
             expected_database_schema,
             self.flavour(),
-            next,
+            next.1,
         ))
     }
 
     /// Infer the database migration steps, skipping the schema describer and assuming an empty database.
-    fn infer_from_empty(&self, next: &Datamodel) -> ConnectorResult<SqlMigration> {
+    fn infer_from_empty(&self, next: (&Configuration, &Datamodel)) -> ConnectorResult<SqlMigration> {
         let current_database_schema = SqlSchema::empty();
         let expected_database_schema = sql_schema_calculator::calculate_sql_schema(next, self.flavour());
 
@@ -30,7 +30,7 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlMigrationConnector {
             current_database_schema,
             expected_database_schema,
             self.flavour(),
-            next,
+            next.1,
         ))
     }
 
@@ -38,7 +38,7 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlMigrationConnector {
     async fn infer_next_migration(
         &self,
         previous_migrations: &[MigrationDirectory],
-        target_schema: &Datamodel,
+        target_schema: (&Configuration, &Datamodel),
     ) -> ConnectorResult<SqlMigration> {
         let current_database_schema = self
             .flavour()
@@ -50,7 +50,7 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlMigrationConnector {
             current_database_schema,
             expected_database_schema,
             self.flavour(),
-            target_schema,
+            target_schema.1,
         ))
     }
 

@@ -2,6 +2,9 @@ use query_engine_tests::*;
 
 #[test_suite(schema(schemas::user_posts))]
 mod distinct {
+    use indoc::indoc;
+    use query_engine_tests::assert_query;
+
     #[connector_test]
     async fn empty_database(runner: &Runner) -> TestResult<()> {
         assert_query!(

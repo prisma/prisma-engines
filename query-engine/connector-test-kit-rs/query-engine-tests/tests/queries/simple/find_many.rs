@@ -2,6 +2,8 @@ use query_engine_tests::*;
 
 #[test_suite(schema(schemas::generic))]
 mod find_many {
+    use query_engine_tests::assert_query;
+
     #[connector_test]
     async fn return_empty(runner: &Runner) -> TestResult<()> {
         assert_query!(

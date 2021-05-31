@@ -82,6 +82,10 @@ pub struct PrismaOpt {
     #[structopt(long = "debug", short = "d")]
     pub enable_debug_mode: bool,
 
+    /// Enable query logging [env: LOG_QUERIES=y]
+    #[structopt(long, short = "o")]
+    pub log_queries: bool,
+
     /// Set the log format.
     #[structopt(long = "log-format", env = "RUST_LOG_FORMAT")]
     pub log_format: Option<String>,
@@ -165,6 +169,11 @@ impl PrismaOpt {
     /// The unix path to listen on.
     pub(crate) fn unix_path(&self) -> Option<&String> {
         self.unix_path.as_ref()
+    }
+
+    /// Enable query logging
+    pub(crate) fn log_queries(&self) -> bool {
+        std::env::var("LOG_QUERIES").map(|_| true).unwrap_or(self.log_queries)
     }
 }
 

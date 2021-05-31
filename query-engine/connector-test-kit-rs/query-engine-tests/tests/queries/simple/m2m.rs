@@ -2,6 +2,8 @@ use query_engine_tests::*;
 
 #[test_suite(schema(schemas::posts_categories))]
 mod m2m {
+    use query_engine_tests::assert_query;
+
     #[connector_test]
     async fn fetch_only_associated(runner: &Runner) -> TestResult<()> {
         test_data(runner).await?;

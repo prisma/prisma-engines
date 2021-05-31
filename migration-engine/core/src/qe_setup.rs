@@ -2,7 +2,7 @@
 
 use crate::api::GenericApi;
 use crate::commands::SchemaPushInput;
-use crate::core_error::{CoreError, CoreResult};
+use crate::core_error::CoreResult;
 #[cfg(feature = "mongodb")]
 use datamodel::common::provider_names::MONGODB_SOURCE_NAME;
 use datamodel::common::provider_names::{
@@ -14,7 +14,8 @@ use mongodb_migration_connector::MongoDbMigrationConnector;
 use sql_migration_connector::SqlMigrationConnector;
 
 /// Flags from Query Engine to define the underlying database features.
-#[derive(Debug, Clone, Copy, BitFlags)]
+#[enumflags2::bitflags]
+#[derive(Debug, Clone, Copy)]
 #[repr(u8)]
 pub enum QueryEngineFlags {
     /// We cannot `CREATE` (or `DROP`) databases.
@@ -23,11 +24,7 @@ pub enum QueryEngineFlags {
 
 /// Database setup for connector-test-kit.
 pub async fn run(prisma_schema: &str, flags: BitFlags<QueryEngineFlags>) -> CoreResult<()> {
-    let (config, url, _shadow_database_url) = super::parse_configuration(prisma_schema)?;
-    let source = config
-        .datasources
-        .first()
-        .ok_or_else(|| CoreError::from_msg("There is no datasource in the schema.".into()))?;
+    let (source, url, _shadow_database_url) = super::parse_configuration(prisma_schema)?;
 
     let api: Box<dyn GenericApi> = match &source.active_provider {
         _ if flags.contains(QueryEngineFlags::DatabaseCreationNotAllowed) => {

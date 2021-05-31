@@ -1,5 +1,5 @@
 use super::MigrationCommand;
-use crate::{parse_datamodel, CoreError, CoreResult};
+use crate::{parse_schema, CoreError, CoreResult};
 use migration_connector::{DatabaseMigrationMarker, MigrationConnector};
 use serde::{Deserialize, Serialize};
 use std::path::Path;
@@ -51,10 +51,10 @@ impl<'a> MigrationCommand for CreateMigrationCommand {
 
         // Infer the migration.
         let previous_migrations = migration_connector::list_migrations(&Path::new(&input.migrations_directory_path))?;
-        let target_schema = parse_datamodel(&input.prisma_schema)?;
+        let target_schema = parse_schema(&input.prisma_schema)?;
 
         let migration = database_migration_inferrer
-            .infer_next_migration(&previous_migrations, &target_schema)
+            .infer_next_migration(&previous_migrations, (&target_schema.0, &target_schema.1))
             .await?;
 
         if migration.is_empty() && !input.draft {

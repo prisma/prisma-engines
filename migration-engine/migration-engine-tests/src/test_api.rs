@@ -20,7 +20,7 @@ pub use mark_migration_rolled_back::MarkMigrationRolledBack;
 pub use reset::Reset;
 pub use schema_push::SchemaPush;
 
-use crate::{assertions::SchemaAssertion, sql::barrel_migration_executor::BarrelMigrationExecutor, AssertionResult};
+use crate::{assertions::SchemaAssertion, AssertionResult};
 use migration_connector::{ConnectorError, MigrationRecord};
 use migration_core::GenericApi;
 use quaint::{
@@ -30,7 +30,7 @@ use quaint::{
 use sql_migration_connector::SqlMigrationConnector;
 use std::{borrow::Cow, fmt::Write as _};
 use tempfile::TempDir;
-use test_setup::{sqlite_test_url, BitFlags, Tags, TestApiArgs};
+use test_setup::{sqlite_test_url, BitFlags, DatasourceBlock, Tags, TestApiArgs};
 
 /// A handle to all the context needed for end-to-end testing of the migration engine across
 /// connectors.
@@ -151,8 +151,8 @@ impl TestApi {
         self.args.tags()
     }
 
-    pub fn datasource(&self) -> String {
-        self.args.datasource_block(&self.connection_string)
+    pub fn datasource(&self) -> DatasourceBlock<'_> {
+        self.args.datasource_block(&self.connection_string, &[])
     }
 
     /// Render a table name with the required prefixing for use with quaint query building.
@@ -199,18 +199,6 @@ impl TestApi {
 
     pub fn schema_push(&self, dm: impl Into<String>) -> SchemaPush<'_> {
         SchemaPush::new(&self.api, dm.into())
-    }
-
-    pub fn barrel(&self) -> BarrelMigrationExecutor<'_> {
-        BarrelMigrationExecutor {
-            api: self,
-            sql_variant: match self.sql_family() {
-                SqlFamily::Mysql => barrel::SqlVariant::Mysql,
-                SqlFamily::Postgres => barrel::SqlVariant::Pg,
-                SqlFamily::Sqlite => barrel::SqlVariant::Sqlite,
-                SqlFamily::Mssql => barrel::SqlVariant::Mssql,
-            },
-        }
     }
 
     pub async fn assert_schema(&self) -> Result<SchemaAssertion, ConnectorError> {

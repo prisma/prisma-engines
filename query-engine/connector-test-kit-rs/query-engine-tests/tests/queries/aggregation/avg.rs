@@ -2,6 +2,8 @@ use query_engine_tests::*;
 
 #[test_suite(schema(schemas::common_numeric_types))]
 mod aggregation_avg {
+    use query_engine_tests::run_query;
+
     #[connector_test]
     async fn avg_no_records(runner: &Runner) -> TestResult<()> {
         insta::assert_snapshot!(

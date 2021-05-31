@@ -1,0 +1,291 @@
+use query_engine_tests::*;
+
+#[test_suite(schema(schema), capabilities(Enums))]
+mod create {
+    use indoc::indoc;
+    use query_engine_tests::{assert_error, run_query, TROUBLE_CHARS};
+
+    fn schema() -> String {
+        let schema = indoc! {
+            r#"model ScalarModel {
+              #id(id, String, @id)
+              optString   String?
+              optInt      Int?
+              optFloat    Float?
+              optBoolean  Boolean?
+              optEnum     MyEnum?
+              optDateTime DateTime?
+              optUnique   String? @unique
+              createdAt   DateTime @default(now())
+              relId       String?
+              optRel      RelatedModel? @relation(fields: [relId], references: [id])
+          }
+
+          model RelatedModel {
+            #id(id, String, @id)
+              m  ScalarModel[]
+          }
+
+          enum MyEnum {
+             A
+             B
+          }"#
+        };
+
+        schema.to_owned()
+    }
+
+    // "A Create Mutation" should "create and return item"
+    #[connector_test]
+    async fn create_should_work(runner: &Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(
+            runner,
+            format!(
+                r#"mutation {{
+                  createOneScalarModel(data: {{
+                    id: "1",
+                    optString: "lala{}",
+                    optInt: 1337,
+                    optFloat: 1.234,
+                    optBoolean: true,
+                    optEnum: A,
+                    optDateTime: "2016-07-31T23:59:01.000Z"
+                  }}) {{
+                    id, optString, optInt, optFloat, optBoolean, optEnum, optDateTime
+                  }}
+                }}"#,
+                TROUBLE_CHARS
+            )
+        ),
+          @r###"{"data":{"createOneScalarModel":{"id":"1","optString":"lala¥฿😀😁😂😃😄😅😆😇😈😉😊😋😌😍😎😏😐😑😒😓😔😕😖😗😘😙😚😛😜😝😞😟😠😡😢😣😤😥😦😧😨😩😪😫😬😭😮😯😰😱😲😳😴😵😶😷😸😹😺😻😼😽😾😿🙀🙁🙂🙃🙄🙅🙆🙇🙈🙉🙊🙋🙌🙍🙎🙏ऀँंःऄअआइईउऊऋऌऍऎएऐऑऒओऔकखगघङचछजझञटठडढणतथदधनऩपफबभमयर€₭₮₯₰₱₲₳₴₵₶₷₸₹₺₻₼₽₾₿⃀","optInt":1337,"optFloat":1.234,"optBoolean":true,"optEnum":"A","optDateTime":"2016-07-31T23:59:01.000Z"}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{ findManyScalarModel{ optString, optInt, optFloat, optBoolean, optEnum, optDateTime }}"#),
+          @r###"{"data":{"findManyScalarModel":[{"optString":"lala¥฿😀😁😂😃😄😅😆😇😈😉😊😋😌😍😎😏😐😑😒😓😔😕😖😗😘😙😚😛😜😝😞😟😠😡😢😣😤😥😦😧😨😩😪😫😬😭😮😯😰😱😲😳😴😵😶😷😸😹😺😻😼😽😾😿🙀🙁🙂🙃🙄🙅🙆🙇🙈🙉🙊🙋🙌🙍🙎🙏ऀँंःऄअआइईउऊऋऌऍऎएऐऑऒओऔकखगघङचछजझञटठडढणतथदधनऩपफबभमयर€₭₮₯₰₱₲₳₴₵₶₷₸₹₺₻₼₽₾₿⃀","optInt":1337,"optFloat":1.234,"optBoolean":true,"optEnum":"A","optDateTime":"2016-07-31T23:59:01.000Z"}]}}"###
+        );
+
+        Ok(())
+    }
+
+    // "A Create Mutation" should "create and return item with empty string"
+    #[connector_test]
+    async fn return_item_empty_str(runner: &Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(runner, r#"mutation {
+            createOneScalarModel(data: {
+              id: "1",
+              optString: ""
+            }){
+              optString, optInt, optFloat, optBoolean, optEnum
+            }
+          }"#),
+          @r###"{"data":{"createOneScalarModel":{"optString":"","optInt":null,"optFloat":null,"optBoolean":null,"optEnum":null}}}"###
+        );
+
+        Ok(())
+    }
+
+    // "A Create Mutation" should "create and return item with explicit null attributes"
+    #[connector_test]
+    async fn return_item_explicit_null_attrs(runner: &Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(runner, r#"mutation {
+            createOneScalarModel(data: {
+              id: "1",
+              optString: null, optInt: null, optBoolean: null, optEnum: null, optFloat: null
+            }){
+              optString, optInt, optFloat, optBoolean, optEnum
+            }
+          }"#),
+          @r###"{"data":{"createOneScalarModel":{"optString":null,"optInt":null,"optFloat":null,"optBoolean":null,"optEnum":null}}}"###
+        );
+
+        Ok(())
+    }
+
+    // "A Create Mutation" should "create and return item with explicit null attributes when other mutation has explicit non-null values"
+    #[connector_test]
+    async fn return_item_explicit_null_attrs_other_mut(runner: &Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(runner, r#"mutation {
+            createOneScalarModel(
+              data: { id: "1", optString: "lala", optInt: 123, optBoolean: true, optEnum: A, optFloat: 1.23}
+            ) {
+              optString, optInt, optFloat, optBoolean, optEnum
+            }
+           }"#),
+          @r###"{"data":{"createOneScalarModel":{"optString":"lala","optInt":123,"optFloat":1.23,"optBoolean":true,"optEnum":"A"}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"mutation {
+            createOneScalarModel(
+              data: { id: "2", optString: null, optInt: null, optBoolean: null, optEnum: null, optFloat: null}
+            ) {
+              optString, optInt, optFloat, optBoolean, optEnum
+            }
+           }"#),
+          @r###"{"data":{"createOneScalarModel":{"optString":null,"optInt":null,"optFloat":null,"optBoolean":null,"optEnum":null}}}"###
+        );
+
+        Ok(())
+    }
+
+    // "A Create Mutation" should "create and return item with implicit null attributes and createdAt should be set"
+    #[connector_test]
+    async fn return_item_implicit_null_attr(runner: &Runner) -> TestResult<()> {
+        // if the query succeeds createdAt did work. If would not have been set we would get a NullConstraintViolation.
+        insta::assert_snapshot!(
+          run_query!(runner, r#"mutation {
+            createOneScalarModel(data:{ id: "1" }){
+              optString, optInt, optFloat, optBoolean, optEnum
+            }
+          }"#),
+          @r###"{"data":{"createOneScalarModel":{"optString":null,"optInt":null,"optFloat":null,"optBoolean":null,"optEnum":null}}}"###
+        );
+
+        Ok(())
+    }
+
+    // "A Create Mutation" should "fail when a DateTime is invalid"
+    #[connector_test]
+    async fn fail_when_datetime_invalid(runner: &Runner) -> TestResult<()> {
+        assert_error!(runner, r#"mutation {
+          createOneScalarModel(data:{
+            id: "1",
+            optString: "test",
+            optInt: 1337,
+            optFloat: 1.234,
+            optBoolean: true,
+            optEnum: A,
+            optDateTime: "2016-0B-31T23:59:01.000Z"
+          }) {
+              optString, optInt, optFloat, optBoolean, optEnum, optDateTime
+            }
+          }"#,
+          2009,
+          "`Mutation.createOneScalarModel.data.ScalarModelCreateInput.optDateTime`: Error parsing value: Invalid DateTime: '2016-0B-31T23:59:01.000Z' (must be ISO 8601 compatible). Underlying error: input contains invalid characters."
+        );
+
+        Ok(())
+    }
+
+    // "A Create Mutation" should "fail when an Int is invalid"
+    #[connector_test]
+    async fn fail_when_int_invalid(runner: &Runner) -> TestResult<()> {
+        assert_error!(
+          runner,
+          r#"mutation {
+            createOneScalarModel(data: {
+              id: "1",
+              optString: "test",
+              optInt: B,
+              optFloat: 1.234,
+              optBoolean: true,
+              optEnum: A,
+              optDateTime: "2016-07-31T23:59:01.000Z"
+            }
+          ){ optString, optInt, optFloat, optBoolean, optEnum, optDateTime }}"#,
+          2009,
+          "Query parsing/validation error at `Mutation.createOneScalarModel.data.ScalarModelCreateInput.optInt`: Value types mismatch. Have: Enum(\"B\"), want: Int"
+        );
+
+        Ok(())
+    }
+
+    // "A Create Mutation" should "gracefully fail when a unique violation occurs"
+    // TODO(dom): Not working on mongo
+    // TODO(dom): 'Expected result to return an error, but found success: {"data":{"createOneScalarModel":{"optUnique":"test"}}}'
+    // Comment(dom): Expected, we're not enforcing uniqueness for the test setup yet.
+    #[connector_test(exclude(MongoDb))]
+    async fn gracefully_fails_when_uniq_violation(runner: &Runner) -> TestResult<()> {
+        run_query!(
+            runner,
+            r#"mutation {createOneScalarModel(data: { id: "1", optUnique: "test"}){optUnique}}"#
+        );
+
+        assert_error!(
+            runner,
+            r#"mutation {createOneScalarModel(data: { id: "2", optUnique: "test"}){optUnique}}"#,
+            2002
+        );
+        Ok(())
+    }
+
+    // "A Create Mutation" should "create and return an item with enums passed as strings"
+    #[connector_test]
+    async fn return_enums_passed_as_strings(runner: &Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(runner, r#"mutation {createOneScalarModel(data: {id: "1", optEnum: "A"}){ optEnum }}"#),
+          @r###"{"data":{"createOneScalarModel":{"optEnum":"A"}}}"###
+        );
+
+        Ok(())
+    }
+
+    // "A Create Mutation" should "fail if an item with enums passed as strings doesn't match and enum value"
+    #[connector_test]
+    async fn fail_if_string_dont_match_enum_val(runner: &Runner) -> TestResult<()> {
+        assert_error!(
+          runner,
+          r#"mutation {createOneScalarModel(data: {id: "1", optEnum: "NOPE"}){ optEnum }}"#,
+          2009,
+          "Query parsing/validation error at `Mutation.createOneScalarModel.data.ScalarModelCreateInput.optEnum`: Error parsing value: Enum value 'NOPE' is invalid for enum type MyEnum."
+        );
+
+        Ok(())
+    }
+
+    // "A Create Mutation" should "reject an optional relation set to null."
+    #[connector_test]
+    async fn reject_opt_rel_set_to_null(runner: &Runner) -> TestResult<()> {
+        assert_error!(
+            runner,
+            r#"mutation { createOneScalarModel(data: { id: "1", optRel: null }){ relId }}"#,
+            2009,
+            "`Mutation.createOneScalarModel.data.ScalarModelCreateInput.optRel`: A value is required but not set"
+        );
+
+        Ok(())
+    }
+
+    // "A Create Mutation" should "create with an optional relation omitted."
+    #[connector_test]
+    async fn create_with_opt_rel_omitted(runner: &Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(runner, r#"mutation {
+            createOneScalarModel(data: {id: "1"}) {
+              relId
+            }}"#),
+          @r###"{"data":{"createOneScalarModel":{"relId":null}}}"###
+        );
+
+        Ok(())
+    }
+
+    fn schema_datetime() -> String {
+        let schema = indoc! {
+            r#"model A {
+              #id(timestamp, DateTime, @id)
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    // "A Create Mutation with datetime as identifier" should "work"
+    #[connector_test(schema(schema_datetime))]
+    async fn create_with_datetime_ident(runner: &Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(runner, r#"mutation {
+            createOneA(data: { timestamp: "1999-05-01T00:00:00.000Z" }) {
+              timestamp
+            }}"#),
+          @r###"{"data":{"createOneA":{"timestamp":"1999-05-01T00:00:00.000Z"}}}"###
+        );
+
+        Ok(())
+    }
+}

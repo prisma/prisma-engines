@@ -655,7 +655,7 @@ fn expand_cases<'a, 'b>(
 
     for dm in std::iter::once(&mut *dm1).chain(std::iter::once(&mut *dm2)) {
         dm.clear();
-        api.write_datasource_block(dm);
+        write!(dm, "{}", api.datasource_block()).unwrap();
         dm.push_str("model Test {\nid Int @id @default(autoincrement())\n");
     }
 

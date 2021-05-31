@@ -3,6 +3,7 @@ package queries.orderAndPagination
 import org.scalatest.{FlatSpec, Matchers}
 import util._
 
+// RS: TODO: Port this suite once mongo supports @@id
 class OrderBySpec extends FlatSpec with Matchers with ApiSpecBase {
 
   val project = SchemaDsl.fromStringV11() {

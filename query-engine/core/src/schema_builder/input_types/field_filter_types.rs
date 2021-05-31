@@ -164,7 +164,10 @@ fn full_scalar_filter_type(
             .collect(),
 
         TypeIdentifier::Json => {
-            if ctx.has_feature(&PreviewFeature::FilterJson) {
+            if ctx.has_feature(&PreviewFeature::FilterJson)
+                && (ctx.capabilities.contains(ConnectorCapability::JsonFilteringJsonPath)
+                    || ctx.capabilities.contains(ConnectorCapability::JsonFilteringArrayPath))
+            {
                 equality_filters(mapped_scalar_type.clone(), nullable)
                     .chain(alphanumeric_filters(mapped_scalar_type.clone()))
                     .chain(json_filters(ctx))

@@ -9,9 +9,6 @@ pub enum Expression {
     BooleanValue(String, Span),
     /// Any string value.
     StringValue(String, Span),
-    /// A ducktyped string value, used as function return values which can be ducktyped.
-    /// Can be any scalar type, array or function is not possible.
-    Any(String, Span),
     /// Any literal constant, basically a string which was not inside "...".
     /// This is used for representing builtin enums.
     ConstantValue(String, Span),
@@ -44,7 +41,6 @@ impl Expression {
                 v.iter().map(|elem| elem.with_lifted_span(offset)).collect(),
                 s.lift_span(offset),
             ),
-            Expression::Any(v, s) => Expression::Any(v.clone(), s.lift_span(offset)),
         }
     }
 
@@ -57,7 +53,6 @@ impl Expression {
             Self::NumericValue(_, span) => *span,
             Self::BooleanValue(_, span) => *span,
             Self::StringValue(_, span) => *span,
-            Self::Any(_, span) => *span,
             Self::ConstantValue(_, span) => *span,
             Self::Function(_, _, span) => *span,
             Self::Array(_, span) => *span,
@@ -80,7 +75,6 @@ impl Expression {
             Expression::ConstantValue(_, _) => "literal",
             Expression::Function(_, _, _) => "functional",
             Expression::Array(_, _) => "array",
-            Expression::Any(_, _) => "any",
         }
     }
 
@@ -98,7 +92,6 @@ impl ToString for Expression {
             Expression::ConstantValue(x, _) => x.clone(),
             Expression::Function(x, _, _) => x.clone(),
             Expression::Array(_, _) => String::from("(array)"),
-            Expression::Any(x, _) => x.clone(),
         }
     }
 }

@@ -4,6 +4,7 @@ import org.scalatest.{FlatSpec, Matchers}
 import util.ConnectorCapability.UuidIdCapability
 import util._
 
+// RS: Won't port, obsolete test.
 class UUIDFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
   override def runOnlyForCapabilities = Set(UuidIdCapability)
 

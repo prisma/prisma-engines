@@ -3,6 +3,7 @@ package queries.orderAndPagination
 import org.scalatest.{FlatSpec, Matchers}
 import util._
 
+// RS: Ported
 class PaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
   val project = SchemaDsl.fromStringV11() {
     """
@@ -584,6 +585,8 @@ class PaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
 
     data.toString() should be("""{"data":{"findManyTestModel":[{"id":8},{"id":7}]}}""")
   }
+
+  // TODO: Continue porting tests below
 
   /*************************************************
     * Cursor + Take + Skip + Multiple OrderBy tests. *

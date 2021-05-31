@@ -53,7 +53,7 @@ impl TestApi {
 
         TestApi {
             migration_api,
-            config: args.datasource_block(&url),
+            config: args.datasource_block(&url, &[]).to_string(),
         }
     }
 

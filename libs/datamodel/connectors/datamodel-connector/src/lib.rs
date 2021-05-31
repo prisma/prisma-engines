@@ -130,6 +130,10 @@ pub trait Connector: Send + Sync {
         self.has_capability(ConnectorCapability::AutoIncrementNonIndexedAllowed)
     }
 
+    fn supports_compound_ids(&self) -> bool {
+        self.has_capability(ConnectorCapability::CompoundIds)
+    }
+
     fn allows_relation_fields_in_arbitrary_order(&self) -> bool {
         self.has_capability(ConnectorCapability::RelationFieldsInArbitraryOrder)
     }
@@ -183,8 +187,10 @@ pub enum ConnectorCapability {
     WritableAutoincField,
     CreateSkipDuplicates,
     UpdateableId,
+    JsonFiltering,
     JsonFilteringJsonPath,
     JsonFilteringArrayPath,
+    CompoundIds,
 }
 
 /// Contains all capabilities that the connector is able to serve.

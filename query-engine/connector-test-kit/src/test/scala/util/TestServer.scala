@@ -123,13 +123,13 @@ case class TestServer() extends PlayJsonExtensions with LogSupport {
       env_overrides: Map[String, String] = Map() // Overrides existing env keys, else additive.
   ): (JsValue, Vector[String]) = {
     val encoded_query    = UTF8Base64.encode(Json.stringify(request))
-    val binaryLogLevel   = "RUST_LOG" -> s"query_engine=$logLevel,quaint=$logLevel,query_core=$logLevel,query_connector=$logLevel,sql_query_connector=$logLevel,prisma_models=$logLevel,sql_introspection_connector=$logLevel"
-    val log_requests_env = if (log_requests) { "LOG_QUERIES" -> "y" } else { ("", "") }
+    val binaryLogLevel   = "RUST_LOG" -> s"query_engine=$logLevel,query_core=$logLevel,query_connector=$logLevel,sql_query_connector=$logLevel,prisma_models=$logLevel,sql_introspection_connector=$logLevel"
 
     val params = legacy match {
       case true =>
         Seq(
           EnvVars.prismaBinaryPath,
+          "--log-queries",
           "--enable-raw-queries",
           "--datamodel",
           encodedDataModel,
@@ -142,6 +142,7 @@ case class TestServer() extends PlayJsonExtensions with LogSupport {
       case false =>
         Seq(
           EnvVars.prismaBinaryPath,
+          "--log-queries",
           "--enable-raw-queries",
           "--datamodel",
           encodedDataModel,
@@ -154,7 +155,6 @@ case class TestServer() extends PlayJsonExtensions with LogSupport {
     val env = Seq(
       "QUERY_BATCH_SIZE" -> batchSize.toString,
       binaryLogLevel,
-      log_requests_env,
     )
 
     val process = if (EnvVars.isWindows) {

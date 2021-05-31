@@ -28,12 +28,15 @@ pub struct OneRelationIsNullFilter {
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub enum RelationCondition {
     /// Every single related record needs to fulfill a condition.
+    /// `every` query condition.
     EveryRelatedRecord,
 
     /// At least one related record needs to fulfill a condition.
+    /// `some` query condition.
     AtLeastOneRelatedRecord,
 
     /// No related record must to fulfill a condition.
+    /// `none` query condition.
     NoRelatedRecord,
 
     /// To-one relation only - the related record must fulfill a condition.

@@ -14,6 +14,7 @@ mod migrate_lock;
 mod migration_persistence_tests;
 mod mssql;
 mod mysql;
+mod planetscale_mode;
 mod postgres;
 mod relations;
 mod reset_tests;

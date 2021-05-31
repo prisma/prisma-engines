@@ -1,5 +1,5 @@
 use crate::{migrations_directory::MigrationDirectory, ConnectorResult};
-use datamodel::Datamodel;
+use datamodel::{Configuration, Datamodel};
 
 /// The component responsible for generating a
 /// [DatabaseMigration](trait.MigrationConnector.html#associatedtype.DatabaseMigration)
@@ -11,18 +11,18 @@ use datamodel::Datamodel;
 #[async_trait::async_trait]
 pub trait DatabaseMigrationInferrer<T>: Send + Sync {
     /// Infer the database migration to the passed in Prisma schema.
-    async fn infer(&self, next: &Datamodel) -> ConnectorResult<T>;
+    async fn infer(&self, next: (&Configuration, &Datamodel)) -> ConnectorResult<T>;
 
     /// Infer the database migration steps assuming an empty schema on a new
     /// database as a starting point.
-    fn infer_from_empty(&self, next: &Datamodel) -> ConnectorResult<T>;
+    fn infer_from_empty(&self, next: (&Configuration, &Datamodel)) -> ConnectorResult<T>;
 
     /// Look at the previous migrations and the target Prisma schema, and infer
     /// a database migration taking the database to the target Prisma schema.
     async fn infer_next_migration(
         &self,
         previous_migrations: &[MigrationDirectory],
-        target_schema: &Datamodel,
+        target_schema: (&Configuration, &Datamodel),
     ) -> ConnectorResult<T>;
 
     /// Check that the current local database's schema matches its expected

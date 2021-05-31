@@ -69,6 +69,13 @@ impl Top {
         }
     }
 
+    pub fn as_generator(&self) -> Option<&GeneratorConfig> {
+        match self {
+            Top::Generator(gen) => Some(gen),
+            _ => None,
+        }
+    }
+
     pub fn as_type_alias(&self) -> Option<&Field> {
         match self {
             Top::Type(r#type) => Some(r#type),

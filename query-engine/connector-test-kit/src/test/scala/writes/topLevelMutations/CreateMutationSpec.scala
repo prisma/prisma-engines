@@ -5,6 +5,7 @@ import play.api.libs.json.JsValue
 import util.ConnectorCapability.EnumCapability
 import util._
 
+// RS: Ported
 class CreateMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
 
   override def runOnlyForCapabilities = Set(EnumCapability)

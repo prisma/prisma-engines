@@ -106,6 +106,7 @@ fn test_dmmf_cli_command(schema: &str) -> PrismaResult<()> {
         enable_playground: false,
         legacy: false,
         log_format: None,
+        log_queries: true,
         overwrite_datasources: None,
         port: 123,
         unix_path: None,

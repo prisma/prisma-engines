@@ -356,7 +356,6 @@ fn must_succeed_if_env_var_exists_and_override_was_provided() {
 }
 
 #[test]
-#[serial]
 fn must_succeed_with_overrides() {
     let schema = r#"
         datasource ds {
@@ -366,9 +365,9 @@ fn must_succeed_with_overrides() {
     "#;
 
     let url = "postgres://hostbar";
-    let overrides = vec![("ds".to_string(), url.to_string())];
+    let overrides = &[("ds".to_string(), url.to_string())];
     let mut config = parse_configuration(schema);
-    config.resolve_datasource_urls_from_env(&overrides).unwrap();
+    config.resolve_datasource_urls_from_env(overrides).unwrap();
 
     let data_source = config.datasources.first().unwrap();
 
@@ -377,7 +376,6 @@ fn must_succeed_with_overrides() {
 }
 
 #[test]
-#[serial]
 fn fail_to_load_sources_for_invalid_source() {
     let invalid_datamodel: &str = r#"
         datasource pg1 {
@@ -449,29 +447,67 @@ fn microsoft_sql_server_preview_feature_must_work() {
     assert!(generator.preview_features.contains(&PreviewFeature::MicrosoftSqlServer));
 }
 
+#[test]
+fn planet_scale_mode_without_preview_feature_errors() {
+    let schema_1 = r#"
+    datasource ps {
+        provider = "mysql"
+        planetScaleMode = true
+        url = "mysql://root:prisma@localhost:3306/mydb"
+    }
+    "#;
+
+    let schema_2 = r#"
+    datasource ps {
+        provider = "sqlserver"
+        planetScaleMode = true
+        url = "mysql://root:prisma@localhost:3306/mydb"
+    }
+
+    generator client {
+        provider = "prisma-client-js"
+    }
+    "#;
+
+    for schema in &[schema_1, schema_2] {
+        let err = parse_error(schema);
+
+        assert!(
+            err.errors
+                .first()
+                .unwrap()
+                .to_string()
+                .starts_with("Error validating datasource `ps`: \nThe `planetScaleMode` option can only be set if the preview feature is enabled"),
+            "{}",
+            err.errors.first().unwrap()
+        );
+    }
+}
+
+#[test]
+fn planet_scale_mode_with_preview_feature_works() {
+    let schema = r#"
+    datasource ps {
+        provider = "sqlserver"
+        planetScaleMode = true
+        url = "mysql://root:prisma@localhost:3306/mydb"
+    }
+
+    generator client {
+        provider = "prisma-client-js"
+        previewFeatures = ["planetScaleMode"]
+    }
+    "#;
+
+    let config = parse_configuration(schema);
+
+    assert!(config.datasources[0].planet_scale_mode);
+    assert!(config.planet_scale_mode());
+}
+
 fn assert_eq_json(a: &str, b: &str) {
     let json_a: serde_json::Value = serde_json::from_str(a).expect("The String a was not valid JSON.");
     let json_b: serde_json::Value = serde_json::from_str(b).expect("The String b was not valid JSON.");
 
     assert_eq!(json_a, json_b);
 }
-
-// Temporarily disabled because of processing/hacks on URLs that make comparing the two URLs unreliable.
-// #[test]
-// fn must_error_when_both_url_and_shadow_database_url_are_the_same() {
-//     let schema = r#"
-//         datasource redmond {
-//             provider = "postgres"
-//             url = "postgresql://abcd"
-//             shadowDatabaseUrl = "postgresql://abcd"
-//         }
-//     "#;
-
-//     let config = datamodel::parse_configuration(schema);
-//     assert!(config.is_err());
-//     let diagnostics = config.err().expect("This must error");
-//     diagnostics.assert_is(DatamodelError::new_shadow_database_is_same_as_main_url_error(
-//         "redmond".into(),
-//         Span::new(134, 153),
-//     ));
-// }

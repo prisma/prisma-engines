@@ -15,7 +15,7 @@ pub use core_error::{CoreError, CoreResult};
 use datamodel::{
     common::provider_names::{MSSQL_SOURCE_NAME, MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME},
     dml::Datamodel,
-    Configuration,
+    Configuration, Datasource,
 };
 use migration_connector::ConnectorError;
 use sql_migration_connector::SqlMigrationConnector;
@@ -28,15 +28,11 @@ use mongodb_migration_connector::MongoDbMigrationConnector;
 
 /// Top-level constructor for the migration engine API.
 pub async fn migration_api(datamodel: &str) -> CoreResult<Box<dyn api::GenericApi>> {
-    let (config, url, shadow_database_url) = parse_configuration(datamodel)?;
-    let source = config
-        .datasources
-        .first()
-        .ok_or_else(|| CoreError::from_msg("There is no datasource in the schema.".into()))?;
+    let (source, url, shadow_database_url) = parse_configuration(datamodel)?;
 
-    match &source.active_provider {
+    match source.active_provider.as_str() {
         #[cfg(feature = "sql")]
-        provider if POSTGRES_SOURCE_NAME == provider => {
+        POSTGRES_SOURCE_NAME => {
             let mut u = url::Url::parse(&url).map_err(|err| {
                 let details = user_facing_errors::quaint::invalid_url_description(&format!(
                     "Error parsing connection string: {}",
@@ -67,28 +63,20 @@ pub async fn migration_api(datamodel: &str) -> CoreResult<Box<dyn api::GenericAp
             Ok(Box::new(connector))
         }
         #[cfg(feature = "sql")]
-        provider if [MYSQL_SOURCE_NAME, SQLITE_SOURCE_NAME, MSSQL_SOURCE_NAME].contains(&provider.as_str()) => {
+        MYSQL_SOURCE_NAME | SQLITE_SOURCE_NAME | MSSQL_SOURCE_NAME => {
             let connector = SqlMigrationConnector::new(&url, shadow_database_url).await?;
 
             Ok(Box::new(connector))
         }
         #[cfg(feature = "mongodb")]
-        provider if provider.as_str() == MONGODB_SOURCE_NAME => {
-            let connector = MongoDbMigrationConnector::new(&url).await?;
-            Ok(Box::new(connector))
-        }
+        MONGODB_SOURCE_NAME => Ok(Box::new(MongoDbMigrationConnector::new(&url).await?)),
         x => unimplemented!("Connector {} is not supported yet", x),
     }
 }
 
 /// Create the database referenced by the passed in Prisma schema.
 pub async fn create_database(schema: &str) -> CoreResult<String> {
-    let (config, url, _shadow_database_url) = parse_configuration(schema)?;
-
-    let source = config
-        .datasources
-        .first()
-        .ok_or_else(|| CoreError::from_msg("There is no datasource in the schema.".into()))?;
+    let (source, url, _shadow_database_url) = parse_configuration(schema)?;
 
     match &source.active_provider {
         provider
@@ -108,12 +96,7 @@ pub async fn create_database(schema: &str) -> CoreResult<String> {
 
 /// Drop the database referenced by the passed in Prisma schema.
 pub async fn drop_database(schema: &str) -> CoreResult<()> {
-    let (config, url, _shadow_database_url) = parse_configuration(schema)?;
-
-    let source = config
-        .datasources
-        .first()
-        .ok_or_else(|| CoreError::from_msg("There is no datasource in the schema.".into()))?;
+    let (source, url, _shadow_database_url) = parse_configuration(schema)?;
 
     match &source.active_provider {
         provider
@@ -131,7 +114,7 @@ pub async fn drop_database(schema: &str) -> CoreResult<()> {
     }
 }
 
-fn parse_configuration(datamodel: &str) -> CoreResult<(Configuration, String, Option<String>)> {
+fn parse_configuration(datamodel: &str) -> CoreResult<(Datasource, String, Option<String>)> {
     let config = datamodel::parse_configuration(&datamodel)
         .map(|validated_config| validated_config.subject)
         .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", datamodel)))?;
@@ -144,11 +127,17 @@ fn parse_configuration(datamodel: &str) -> CoreResult<(Configuration, String, Op
         .load_shadow_database_url()
         .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", datamodel)))?;
 
-    Ok((config, url, shadow_database_url))
+    let source = config
+        .datasources
+        .into_iter()
+        .next()
+        .ok_or_else(|| CoreError::from_msg("There is no datasource in the schema.".into()))?;
+
+    Ok((source, url, shadow_database_url))
 }
 
-fn parse_datamodel(datamodel: &str) -> CoreResult<Datamodel> {
-    datamodel::parse_datamodel(&datamodel)
+fn parse_schema(schema: &str) -> CoreResult<(Configuration, Datamodel)> {
+    datamodel::parse_schema(&schema)
         .map(|d| d.subject)
-        .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", datamodel)))
+        .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", schema)))
 }

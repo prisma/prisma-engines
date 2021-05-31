@@ -20,7 +20,7 @@ pub use enumflags2::BitFlags;
 pub use mssql::{init_mssql_database, reset_schema as reset_mssql_schema};
 pub use sqlite::sqlite_test_url;
 pub use tags::Tags;
-pub use test_api_args::TestApiArgs;
+pub use test_api_args::{DatasourceBlock, TestApiArgs};
 
 type AnyError = Box<dyn std::error::Error + Send + Sync + 'static>;
 

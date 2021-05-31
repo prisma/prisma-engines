@@ -50,8 +50,9 @@ impl PostgresFlavour {
             }
 
             tracing::info!(
-                "Connecting to user-provided shadow database at {}",
-                shadow_database_connection_string
+                "Connecting to user-provided shadow database at {}.{:?}",
+                shadow_conninfo.host(),
+                shadow_conninfo.dbname()
             );
 
             if self.reset(&conn).await.is_err() {
