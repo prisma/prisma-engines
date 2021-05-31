@@ -11,10 +11,11 @@ use serde_json::from_str;
 use std::{borrow::Cow, collections::HashMap, convert::TryInto};
 use tracing::trace;
 
-#[derive(BitFlags, Clone, Copy, Debug)]
+#[enumflags2::bitflags]
+#[derive(Clone, Copy, Debug)]
 #[repr(u8)]
 pub enum Circumstances {
-    Cockroach = 1 << 0,
+    Cockroach,
 }
 
 #[derive(Debug)]

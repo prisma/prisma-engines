@@ -14,7 +14,8 @@ use mongodb_migration_connector::MongoDbMigrationConnector;
 use sql_migration_connector::SqlMigrationConnector;
 
 /// Flags from Query Engine to define the underlying database features.
-#[derive(Debug, Clone, Copy, BitFlags)]
+#[enumflags2::bitflags]
+#[derive(Debug, Clone, Copy)]
 #[repr(u8)]
 pub enum QueryEngineFlags {
     /// We cannot `CREATE` (or `DROP`) databases.
