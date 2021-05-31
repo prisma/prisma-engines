@@ -236,22 +236,29 @@ impl ValueValidator {
     }
 }
 
-pub(crate) trait ValueListValidator {
+pub trait ValueListValidator {
     fn to_str_vec(&self) -> Result<Vec<String>, DatamodelError>;
-    fn to_string_from_env_var_vec(&self) -> Result<Vec<StringFromEnvVar>, DatamodelError>;
     fn to_literal_vec(&self) -> Result<Vec<String>, DatamodelError>;
 }
 
 impl ValueListValidator for Vec<ValueValidator> {
-    fn to_string_from_env_var_vec(&self) -> Result<Vec<StringFromEnvVar>, DatamodelError> {
-        self.iter().map(|val| val.as_str_from_env()).collect()
-    }
-
     fn to_str_vec(&self) -> Result<Vec<String>, DatamodelError> {
-        self.iter().map(|val| Ok(val.as_str()?.to_owned())).collect()
+        let mut res: Vec<String> = Vec::new();
+
+        for val in self {
+            res.push(val.as_str()?.to_owned());
+        }
+
+        Ok(res)
     }
 
     fn to_literal_vec(&self) -> Result<Vec<String>, DatamodelError> {
-        self.iter().map(|val| val.as_constant_literal()).collect()
+        let mut res: Vec<String> = Vec::new();
+
+        for val in self {
+            res.push(val.as_constant_literal()?);
+        }
+
+        Ok(res)
     }
 }

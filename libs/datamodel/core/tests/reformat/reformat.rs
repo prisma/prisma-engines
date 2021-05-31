@@ -1,5 +1,6 @@
 use indoc::indoc;
 use pretty_assertions::assert_eq;
+use std::str;
 
 #[test]
 fn must_add_new_line_to_end_of_schema() {
@@ -844,7 +845,7 @@ fn unsupported_is_allowed() {
 fn ignore_is_allowed() {
     let input = r#"model Post {
   id Int @id
-  @@ignore
+  @@ignore  
 }
 "#;
 
