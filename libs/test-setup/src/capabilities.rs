@@ -1,7 +1,6 @@
-use enumflags2::BitFlags;
-
 /// Test-relevant connector capabilities.
-#[derive(BitFlags, Copy, Clone, Debug, PartialEq)]
+#[enumflags2::bitflags]
+#[derive(Copy, Clone, Debug, PartialEq)]
 #[repr(u8)]
 pub enum Capabilities {
     ScalarLists = 0b0001,

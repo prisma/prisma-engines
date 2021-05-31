@@ -1,7 +1,6 @@
-use enumflags2::BitFlags;
-
 /// Test-relevant connector tags.
-#[derive(BitFlags, Copy, Clone, Debug, PartialEq)]
+#[enumflags2::bitflags]
+#[derive(Copy, Clone, Debug, PartialEq)]
 #[repr(u16)]
 pub enum Tags {
     LowerCasesTableNames = 1 << 0,

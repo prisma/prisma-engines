@@ -1198,31 +1198,11 @@ dependencies = [
 
 [[package]]
 name = "enumflags2"
-version = "0.6.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "83c8d82922337cd23a15f88b70d8e4ef5f11da38dd7cdb55e84dd5de99695da0"
-dependencies = [
- "enumflags2_derive 0.6.4",
-]
-
-[[package]]
-name = "enumflags2"
 version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a8672257d642ffdd235f6e9c723c2326ac1253c8f3c022e7cfd2e57da55b1131"
 dependencies = [
- "enumflags2_derive 0.7.0",
-]
-
-[[package]]
-name = "enumflags2_derive"
-version = "0.6.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "946ee94e3dbf58fdd324f9ce245c7b238d46a66f00e86a020b71996349e46cce"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
+ "enumflags2_derive",
 ]
 
 [[package]]
@@ -1917,7 +1897,7 @@ dependencies = [
  "barrel",
  "datamodel",
  "datamodel-connector",
- "enumflags2 0.6.4",
+ "enumflags2",
  "indoc",
  "introspection-connector",
  "introspection-core",
@@ -2285,7 +2265,7 @@ dependencies = [
  "async-trait",
  "chrono",
  "datamodel",
- "enumflags2 0.6.4",
+ "enumflags2",
  "serde",
  "serde_json",
  "sha2 0.9.3",
@@ -2301,7 +2281,7 @@ dependencies = [
  "async-trait",
  "chrono",
  "datamodel",
- "enumflags2 0.6.4",
+ "enumflags2",
  "jsonrpc-core",
  "migration-connector",
  "mongodb-migration-connector",
@@ -2320,7 +2300,7 @@ name = "migration-engine-cli"
 version = "0.1.0"
 dependencies = [
  "base64 0.13.0",
- "enumflags2 0.6.4",
+ "enumflags2",
  "futures 0.3.13",
  "json-rpc-stdio",
  "migration-connector",
@@ -2349,7 +2329,7 @@ dependencies = [
  "connection-string",
  "datamodel",
  "datamodel-connector",
- "enumflags2 0.6.4",
+ "enumflags2",
  "indoc",
  "migration-connector",
  "migration-core",
@@ -2491,7 +2471,7 @@ dependencies = [
  "connection-string",
  "datamodel",
  "datamodel-connector",
- "enumflags2 0.6.4",
+ "enumflags2",
  "indoc",
  "migration-connector",
  "mongodb",
@@ -3601,7 +3581,7 @@ dependencies = [
  "datamodel",
  "datamodel-connector",
  "enum_dispatch",
- "enumflags2 0.6.4",
+ "enumflags2",
  "indoc",
  "itertools 0.10.0",
  "lazy_static",
@@ -4330,7 +4310,7 @@ dependencies = [
  "connection-string",
  "datamodel",
  "datamodel-connector",
- "enumflags2 0.7.1",
+ "enumflags2",
  "indoc",
  "migration-connector",
  "native-types",
@@ -4384,7 +4364,7 @@ dependencies = [
  "async-trait",
  "barrel",
  "bigdecimal",
- "enumflags2 0.6.4",
+ "enumflags2",
  "indoc",
  "native-types",
  "once_cell",
@@ -4595,7 +4575,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "colored 1.9.3",
- "enumflags2 0.6.4",
+ "enumflags2",
  "introspection-core",
  "migration-core",
  "serde_json",
@@ -4620,7 +4600,7 @@ name = "test-setup"
 version = "0.1.0"
 dependencies = [
  "connection-string",
- "enumflags2 0.6.4",
+ "enumflags2",
  "once_cell",
  "quaint",
  "tokio",
@@ -4684,7 +4664,7 @@ dependencies = [
  "chrono",
  "connection-string",
  "encoding",
- "enumflags2 0.7.1",
+ "enumflags2",
  "futures 0.3.13",
  "futures-sink",
  "futures-util",
