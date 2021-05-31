@@ -24,6 +24,10 @@ impl MssqlFlavour {
         Self { url }
     }
 
+    fn is_running_on_azure_sql(&self) -> bool {
+        self.url.host().contains(".database.windows.net")
+    }
+
     pub(crate) fn schema_name(&self) -> &str {
         self.url.schema()
     }
@@ -67,6 +71,14 @@ impl MssqlFlavour {
             }
 
             return Ok(conn);
+        }
+
+        // See https://github.com/prisma/prisma/issues/6371 for the rationale on
+        // this conditional.
+        if self.is_running_on_azure_sql() {
+            return Err(ConnectorError::user_facing(
+                user_facing_errors::migration_engine::AzureMssqlShadowDb,
+            ));
         }
 
         let database_name = shadow_database_name.unwrap();

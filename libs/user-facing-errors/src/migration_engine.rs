@@ -248,6 +248,13 @@ pub struct ProviderSwitchedError {
     pub expected_provider: String,
 }
 
+#[derive(Debug, Serialize, UserFacingError)]
+#[user_facing(
+    code = "P3020",
+    message = "The automatic creation of shadow databases is disabled on Azure SQL. Please set up a shadow database using the `shadowDatabaseUrl` datasource attribute.\nRead the docs page for more details: https://pris.ly/d/migrate-shadow"
+)]
+pub struct AzureMssqlShadowDb;
+
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -25,8 +25,6 @@ pub(crate) fn calculate_sql_schema(
     let relation_tables: Vec<_> = calculate_relation_tables(datamodel, flavour, &schema).collect();
     schema.tables.extend(relation_tables.into_iter());
 
-    // TODO: Don't generate the foreign keys in the first place, instead of
-    // removing them after the fact.
     if configuration.planet_scale_mode() {
         for table in &mut schema.tables {
             table.foreign_keys.clear();
