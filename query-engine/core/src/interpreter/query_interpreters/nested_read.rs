@@ -25,11 +25,12 @@ pub async fn m2m<'a, 'b>(
                 .projections(&parent_model_id)?
         }
     };
+
     if parent_ids.is_empty() {
         return Ok(ManyRecords::empty(&query.selected_fields));
     }
-    let ids = tx.get_related_m2m_record_ids(&query.parent_field, &parent_ids).await?;
 
+    let ids = tx.get_related_m2m_record_ids(&query.parent_field, &parent_ids).await?;
     if ids.is_empty() {
         return Ok(ManyRecords::empty(&query.selected_fields));
     }
@@ -55,6 +56,7 @@ pub async fn m2m<'a, 'b>(
             Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
             None => Some(filter),
         };
+
         tx.get_many_records(&query.parent_field.related_model(), args, &query.selected_fields, &[])
             .await?
     };
@@ -66,7 +68,10 @@ pub async fn m2m<'a, 'b>(
         match id_map.get_mut(&child_id) {
             Some(v) => v.push(parent_id),
             None => {
-                id_map.insert(child_id, vec![parent_id]);
+                id_map.insert(
+                    child_id.ensure_type_coherence(),
+                    vec![parent_id.ensure_type_coherence()],
+                );
             }
         };
     }
