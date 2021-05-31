@@ -108,9 +108,8 @@ mod delete_many {
         Ok(())
     }
 
-    // "The delete many Mutation" should "delete items using  OR"
-    // TODO(dom): Not working on mongo
-    #[connector_test(exclude(MongoDb))]
+    // "The delete many Mutation" should "delete items using OR"
+    #[connector_test]
     async fn should_delete_using_or(runner: &Runner) -> TestResult<()> {
         create_row(runner, r#"{ id: 1, title: "title1" }"#).await?;
         create_row(runner, r#"{ id: 2, title: "title2" }"#).await?;
@@ -119,7 +118,7 @@ mod delete_many {
         insta::assert_snapshot!(
           run_query!(runner, r#"query {
             findManyTodo(
-              where: { OR: [{title: { equals: "title1" }}, { title: { equals: "title2" }}]}
+              where: { OR: [{ title: { equals: "title1" } }, { title: { equals: "title2" }}]}
             ) {
               title
             }
@@ -184,10 +183,10 @@ mod delete_many {
               name     String? @unique
               test     String?
               parentId String?
-          
+
               parent Parent? @relation(fields: [parentId], references: [id])
           }
-          
+
           model Parent{
               #id(id, String, @id)
               name     String? @unique
@@ -199,8 +198,7 @@ mod delete_many {
     }
 
     // "nested DeleteMany" should "work"
-    // TODO(dom): Not working on mongo. Explicitely marked as not implemented yet
-    #[connector_test(schema(nested_del_many), exclude(MongoDb))]
+    #[connector_test(schema(nested_del_many))]
     async fn nested_delete_many(runner: &Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(runner, r#"mutation {

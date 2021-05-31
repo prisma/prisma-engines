@@ -58,9 +58,7 @@ mod prisma_4088 {
     }
 
     // "FindMany queries with an OR condition and no filters" should "return an empty list"
-    // TODO(dom): Not working on mongo
-    // TODO(dom): {"errors":[{"error":"Error occurred during query execution:\nConnectorError(ConnectorError { user_facing_error: None, kind: RawError { code: \"unknown\", message: \"Command failed (BadValue): $and/$or/$nor must be a nonempty array)\" } })","user_facing_error":{"is_panic":false,"message":"Error occurred during query execution:\nConnectorError(ConnectorError { user_facing_error: None, kind: RawError { code: \"unknown\", message: \"Command failed (BadValue): $and/$or/$nor must be a nonempty array)\" } })","backtrace":null}}]}
-    #[connector_test(exclude(MongoDb))]
+    #[connector_test]
     async fn find_many_or_cond_no_filter(runner: &Runner) -> TestResult<()> {
         create_test_data(runner).await?;
 
@@ -79,9 +77,7 @@ mod prisma_4088 {
     }
 
     // "FindMany queries with an AND condition and no filters" should "return all items"
-    // TODO(dom): Not working on mongo
-    // TODO(dom): {"errors":[{"error":"Error occurred during query execution:\nConnectorError(ConnectorError { user_facing_error: None, kind: RawError { code: \"unknown\", message: \"Command failed (BadValue): $and/$or/$nor must be a nonempty array)\" } })","user_facing_error":{"is_panic":false,"message":"Error occurred during query execution:\nConnectorError(ConnectorError { user_facing_error: None, kind: RawError { code: \"unknown\", message: \"Command failed (BadValue): $and/$or/$nor must be a nonempty array)\" } })","backtrace":null}}]}
-    #[connector_test(exclude(MongoDb))]
+    #[connector_test]
     async fn find_many_and_cond_no_filter(runner: &Runner) -> TestResult<()> {
         create_test_data(runner).await?;
 
@@ -138,9 +134,7 @@ mod prisma_4088 {
     }
 
     // "FindMany queries with an NOT condition and no filters" should "return all items"
-    // TODO(dom): Not working on mongo
-    // TODO(dom): {"errors":[{"error":"Error occurred during query execution:\nConnectorError(ConnectorError { user_facing_error: None, kind: RawError { code: \"unknown\", message: \"Command failed (BadValue): $and/$or/$nor must be a nonempty array)\" } })","user_facing_error":{"is_panic":false,"message":"Error occurred during query execution:\nConnectorError(ConnectorError { user_facing_error: None, kind: RawError { code: \"unknown\", message: \"Command failed (BadValue): $and/$or/$nor must be a nonempty array)\" } })","backtrace":null}}]}
-    #[connector_test(exclude(MongoDb))]
+    #[connector_test]
     async fn find_many_not_cond_no_filter(runner: &Runner) -> TestResult<()> {
         create_test_data(runner).await?;
 
