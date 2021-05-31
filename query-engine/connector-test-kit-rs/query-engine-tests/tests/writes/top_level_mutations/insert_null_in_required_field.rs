@@ -25,9 +25,12 @@ mod insert_null {
         let is_mysql_56 = match runner.connector() {
             query_engine_tests::ConnectorTag::MySql(conn) => {
                 let (_, version) = conn.as_parse_pair();
-                let is_56 = if let Some(v) = version { v == "5.6" } else { false };
 
-                is_56
+                if let Some(v) = version {
+                    v == "5.6"
+                } else {
+                    false
+                }
             }
             _ => false,
         };
