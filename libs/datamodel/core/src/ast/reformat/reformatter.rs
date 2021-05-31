@@ -715,7 +715,6 @@ impl<'a> Reformatter<'a> {
             ast::Expression::NumericValue(val, _) => target.write(&val),
             ast::Expression::StringValue(val, _) => Self::render_str(target, &val),
             ast::Expression::Function(name, args, _) => Self::render_func(target, &name, &args),
-            ast::Expression::Any(_, _) => unimplemented!("Value of 'Any' type cannot be rendered."),
         };
     }
     fn render_array(target: &mut StringBuilder, vals: &[ast::Expression]) {
