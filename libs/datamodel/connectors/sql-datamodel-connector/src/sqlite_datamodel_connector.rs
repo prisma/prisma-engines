@@ -96,6 +96,10 @@ impl Connector for SqliteDatamodelConnector {
 
         Ok(())
     }
+
+    fn constraint_name_length(&self) -> usize {
+        10000
+    }
 }
 
 impl Default for SqliteDatamodelConnector {

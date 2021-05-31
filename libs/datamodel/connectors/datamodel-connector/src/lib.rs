@@ -55,6 +55,8 @@ pub trait Connector: Send + Sync {
     /// powers IE
     fn introspect_native_type(&self, native_type: serde_json::Value) -> Result<NativeTypeInstance, ConnectorError>;
 
+    fn constraint_name_length(&self) -> usize;
+
     fn set_config_dir<'a>(&self, config_dir: &std::path::Path, url: &'a str) -> Cow<'a, str> {
         let set_root = |path: &str| {
             let path = std::path::Path::new(path);

@@ -76,18 +76,18 @@ impl<'a> LiftAstToDml<'a> {
         }
 
         // transfer primary keys from field level to model level and name them
-        //make sure only supported connectors name primary keys at the db level
-        let supports_named_pks = match self.source {
-            Some(source) => source.active_connector.supports_named_primary_keys(),
-            None => true,
-        };
+        let connector = self.source.map(|s| s.active_connector.as_ref());
+        let supports_named_pks = self
+            .source
+            .map(|s| s.active_connector.supports_named_primary_keys())
+            .unwrap_or(true);
 
         if model.singular_id_fields().next().is_some() {
             let model_name = model.name.clone();
             {
                 if let Some(f) = model.scalar_fields_mut().find(|f| f.is_id()) {
                     if let Some(mut pk) = f.primary_key.as_mut() {
-                        let default_name = ConstraintNames::primary_key_name(&model_name);
+                        let default_name = ConstraintNames::primary_key_name(&model_name, connector);
                         if pk.name_in_db.is_none() && supports_named_pks {
                             pk.name_in_db = Some(default_name.clone())
                         }
@@ -112,10 +112,22 @@ impl<'a> LiftAstToDml<'a> {
         {
             if supports_named_pks {
                 let model_name = model.name.clone();
-                let pk = model
-                    .primary_key
-                    .map(|pk| pk.default_name_if_necessary(ConstraintNames::primary_key_name(&model_name)));
+                let pk = model.primary_key.map(|pk| {
+                    pk.named_with_default_name_if_necessary(ConstraintNames::primary_key_name(&model_name, connector))
+                });
                 model.primary_key = pk;
+            }
+        }
+
+        {
+            let model_name = model.name.clone();
+            for mut index in &mut model.indices {
+                if index.name_in_db.is_empty() {
+                    let default_name =
+                        ConstraintNames::index_name(&model_name, index.fields.clone(), index.tpe, connector);
+                    index.name_in_db = default_name.clone();
+                    index.name_in_db_matches_default = index.name_in_db == default_name;
+                }
             }
         }
 
@@ -125,8 +137,12 @@ impl<'a> LiftAstToDml<'a> {
             let model_name = model.name.clone();
             for field in model.scalar_fields_mut() {
                 if let Some(index) = &mut field.is_unique {
-                    let default_name =
-                        ConstraintNames::index_name(&model_name, vec![field.name.clone()], IndexType::Unique);
+                    let default_name = ConstraintNames::index_name(
+                        &model_name,
+                        vec![field.name.clone()],
+                        IndexType::Unique,
+                        connector,
+                    );
 
                     if index.name_in_db.is_empty() {
                         index.name_in_db = default_name.clone()
@@ -137,6 +153,9 @@ impl<'a> LiftAstToDml<'a> {
                 }
             }
         }
+
+        //todo fk names need to be handled here as well
+        //todo default value names as well for mssql
 
         model.indices.append(&mut indices_to_copy);
         errors.errors_or(model)

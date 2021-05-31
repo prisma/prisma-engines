@@ -420,6 +420,10 @@ impl Connector for MySqlDatamodelConnector {
 
         Ok(())
     }
+
+    fn constraint_name_length(&self) -> usize {
+        64
+    }
 }
 
 impl Default for MySqlDatamodelConnector {

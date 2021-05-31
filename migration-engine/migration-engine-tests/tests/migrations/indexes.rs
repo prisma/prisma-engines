@@ -380,10 +380,10 @@ fn dropping_a_model_with_a_multi_field_unique_index_must_work(api: TestApi) {
     api.schema_push("").send_sync().assert_green_bang();
 }
 
-//todo error in this case during datamodel parsing
-#[test_connector(tags(Postgres, Mysql))]
+#[test_connector]
 fn indexes_with_an_automatically_truncated_name_are_idempotent(api: TestApi) {
-    let dm = r#"
+    let dm = api.datamodel_with_provider(
+        r#"
         model TestModelWithALongName {
             id Int @id
             looooooooooooongfield String
@@ -392,9 +392,10 @@ fn indexes_with_an_automatically_truncated_name_are_idempotent(api: TestApi) {
 
             @@index([looooooooooooongfield, evenLongerFieldNameWth, omgWhatEvenIsThatLongFieldName])
         }
-    "#;
+    "#,
+    );
 
-    api.schema_push(dm).send_sync().assert_green_bang();
+    api.schema_push(&dm).send_sync().assert_green_bang();
 
     api.assert_schema()
         .assert_table_bang("TestModelWithALongName", |table| {
@@ -408,9 +409,11 @@ fn indexes_with_an_automatically_truncated_name_are_idempotent(api: TestApi) {
                     idx.assert_name(if api.is_mysql() {
                         // The size limit of identifiers is 64 bytes on MySQL
                         // and 63 on Postgres.
-                        "TestModelWithALongName_looooooooooooongfield_evenLongerFieldName"
+                        "TestModelWithALongName_looooooooooooongfield_evenLongerField_idx"
+                    } else if api.is_postgres() {
+                        "TestModelWithALongName_looooooooooooongfield_evenLongerFiel_idx"
                     } else {
-                        "TestModelWithALongName_looooooooooooongfield_evenLongerFieldNam"
+                        "TestModelWithALongName_looooooooooooongfield_evenLongerFieldNameWth_omgWhatEvenIsThatLongFieldName_idx"
                     })
                 },
             )

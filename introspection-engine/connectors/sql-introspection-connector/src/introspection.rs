@@ -8,7 +8,9 @@ use crate::Dedup;
 use crate::SqlError;
 use datamodel::common::ConstraintNames;
 use datamodel::{dml, walkers::find_model_by_db_name, Datamodel, Field, Model, PrimaryKeyDefinition, RelationField};
+use datamodel_connector::Connector;
 use quaint::connector::SqlFamily;
+use sql_datamodel_connector::SqlDatamodelConnectors;
 use sql_schema_describer::{SqlSchema, Table};
 use tracing::debug;
 
@@ -18,6 +20,13 @@ pub fn introspect(
     data_model: &mut Datamodel,
     sql_family: SqlFamily,
 ) -> Result<(), SqlError> {
+    let connector: Box<dyn Connector> = match sql_family {
+        SqlFamily::Mysql => Box::new(SqlDatamodelConnectors::mysql()),
+        SqlFamily::Postgres => Box::new(SqlDatamodelConnectors::postgres()),
+        SqlFamily::Sqlite => Box::new(SqlDatamodelConnectors::sqlite()),
+        SqlFamily::Mssql => Box::new(SqlDatamodelConnectors::mssql()),
+    };
+
     for table in schema
         .tables
         .iter()
@@ -32,7 +41,7 @@ pub fn introspect(
 
         for column in &table.columns {
             version_check.check_column_for_type_and_default_value(&column);
-            let field = calculate_scalar_field(&table, &column, &sql_family);
+            let field = calculate_scalar_field(&table, &column, connector.as_ref());
             model.add_field(Field::ScalarField(field));
         }
 
@@ -47,11 +56,11 @@ pub fn introspect(
         }
 
         for index in table.indices.iter() {
-            model.add_index(calculate_index(table.name.clone(), index));
+            model.add_index(calculate_index(table.name.clone(), index, connector.as_ref()));
         }
 
         model.primary_key = table.primary_key.as_ref().map(|pk| {
-            let default_name = ConstraintNames::primary_key_name(&table.name);
+            let default_name = ConstraintNames::primary_key_name(&table.name, Some(connector.as_ref()));
 
             //We do not populate name in client by default. It increases datamodel noise,
             //and we would need to sanitize it. Users can give their own names if they want

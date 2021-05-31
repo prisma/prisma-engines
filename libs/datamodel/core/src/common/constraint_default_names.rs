@@ -1,4 +1,5 @@
 use crate::IndexType;
+use datamodel_connector::Connector;
 
 pub struct ConstraintNames {}
 
@@ -20,7 +21,7 @@ impl ConstraintNames {
     /// idx for any other kind of index
     /// fkey for a Foreign key
     ///
-    /// addditional for SQLServer:
+    /// additional for SQLServer:
     /// dflt for Default Constraint
     ///
     /// not used for now:
@@ -28,14 +29,40 @@ impl ConstraintNames {
     /// excl for an Exclusion constraint
     /// seq for sequences
 
-    pub fn primary_key_name(table_name: &str) -> String {
-        format!("{}_pkey", table_name)
+    pub fn primary_key_name(table_name: &str, connector: Option<&dyn Connector>) -> String {
+        let suffix = "_pkey";
+        let limit = connector.map(|c| c.constraint_name_length()).unwrap_or(1000);
+
+        let trimmed = if table_name.len() >= limit - 5 {
+            table_name.split_at(limit - 5).0
+        } else {
+            table_name
+        };
+
+        format!("{}{}", trimmed, suffix)
     }
 
-    pub fn index_name(table_name: &str, column_names: Vec<String>, tpe: IndexType) -> String {
+    pub fn index_name(
+        table_name: &str,
+        column_names: Vec<String>,
+        tpe: IndexType,
+        connector: Option<&dyn Connector>,
+    ) -> String {
+        let index_suffix = "_idx";
+        let unique_suffix = "_key";
+        let limit = connector.map(|c| c.constraint_name_length()).unwrap_or(1000);
+
+        let joined = format!("{}_{}", table_name, column_names.join("_"));
+
+        let trimmed = if joined.len() >= limit - 4 {
+            joined.split_at(limit - 4).0
+        } else {
+            joined.as_str()
+        };
+
         match tpe {
-            IndexType::Unique => format!("{}_{}_key", table_name, column_names.join("_")),
-            IndexType::Normal => format!("{}_{}_idx", table_name, column_names.join("_")),
+            IndexType::Unique => format!("{}{}", trimmed, unique_suffix),
+            IndexType::Normal => format!("{}{}", trimmed, index_suffix),
         }
     }
 

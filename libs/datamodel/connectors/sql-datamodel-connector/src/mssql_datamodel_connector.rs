@@ -378,6 +378,10 @@ impl Connector for MsSqlDatamodelConnector {
 
         Ok(())
     }
+
+    fn constraint_name_length(&self) -> usize {
+        128
+    }
 }
 
 impl Default for MsSqlDatamodelConnector {

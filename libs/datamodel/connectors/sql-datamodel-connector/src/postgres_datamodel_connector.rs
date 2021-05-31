@@ -323,6 +323,10 @@ impl Connector for PostgresDatamodelConnector {
 
         Ok(())
     }
+
+    fn constraint_name_length(&self) -> usize {
+        63
+    }
 }
 
 impl Default for PostgresDatamodelConnector {

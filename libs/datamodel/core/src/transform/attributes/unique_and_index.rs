@@ -1,7 +1,6 @@
 #![deny(missing_docs)]
 
 use super::{super::helpers::Arguments, AttributeValidator};
-use crate::common::ConstraintNames;
 use crate::transform::attributes::field_array;
 use crate::{ast, diagnostics::DatamodelError, dml, transform::helpers::ValueValidator, IndexDefinition, IndexType};
 use once_cell::sync::Lazy;
@@ -159,8 +158,6 @@ trait IndexAttributeBase<T>: AttributeValidator<T> {
             .map(|f| f.as_constant_literal())
             .collect::<Result<Vec<_>, _>>()?;
 
-        let default_name = ConstraintNames::index_name(&obj.name, fields.clone(), index_type);
-
         let (name_in_client, name_in_db) = match (
             args.optional_arg("name")
                 .as_ref()
@@ -186,9 +183,9 @@ trait IndexAttributeBase<T>: AttributeValidator<T> {
             (Some((name, _)), Some((map, _))) => (Some(name.to_owned()), map.to_owned()),
             //backwards compatibility, accept name arg on normal indexes and use it as map arg
             (Some((name, _)), None) if matches!(index_type, IndexType::Normal) => (None, name.to_owned()),
-            (Some((name, _)), None) => (Some(name.to_owned()), default_name.clone()),
+            (Some((name, _)), None) => (Some(name.to_owned()), "".to_string()),
             (None, Some((map, _))) => (None, map.to_owned()),
-            (None, None) => (None, default_name.clone()),
+            (None, None) => (None, "".to_string()),
         };
 
         static RE: Lazy<Regex> = Lazy::new(|| Regex::new("[^_a-zA-Z0-9]").unwrap());
@@ -205,7 +202,7 @@ trait IndexAttributeBase<T>: AttributeValidator<T> {
 
         let index_def = IndexDefinition {
             name_in_client,
-            name_in_db_matches_default: name_in_db == default_name,
+            name_in_db_matches_default: false,
             name_in_db,
             fields,
             tpe: index_type,

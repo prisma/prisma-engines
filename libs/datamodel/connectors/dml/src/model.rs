@@ -62,7 +62,7 @@ pub struct PrimaryKeyDefinition {
 }
 
 impl PrimaryKeyDefinition {
-    pub fn default_name_if_necessary(&self, default_name: String) -> Self {
+    pub fn named_with_default_name_if_necessary(&self, default_name: String) -> Self {
         let name_in_db = self.name_in_db.clone().or_else(|| Some(default_name.clone()));
         let name_in_db_is_default = name_in_db == Some(default_name);
         PrimaryKeyDefinition {
