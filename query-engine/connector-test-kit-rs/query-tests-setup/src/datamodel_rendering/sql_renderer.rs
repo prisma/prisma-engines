@@ -1,5 +1,4 @@
 use super::*;
-use itertools::Itertools;
 
 #[derive(Debug, Default)]
 pub struct SqlDatamodelRenderer {}
@@ -16,11 +15,11 @@ impl DatamodelRenderer for SqlDatamodelRenderer {
     }
 
     fn render_m2m(&self, m2m: M2mFragment) -> String {
-        format!(
-            "{} {} {}",
-            m2m.field_name,
-            m2m.field_type,
-            m2m.directives.iter().map(ToString::to_string).join(" ")
-        )
+        let relation_directive = match m2m.relation_name {
+            Some(name) => format!(r#"@relation(name: "{}")"#, name),
+            None => "".to_owned(),
+        };
+
+        format!("{} {} {}", m2m.field_name, m2m.field_type, relation_directive)
     }
 }

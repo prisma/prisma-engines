@@ -3,6 +3,8 @@ use query_engine_tests::*;
 /// New test to check that SQL Server doesn't allow writing autoincrement IDs.
 #[test_suite(schema(autoinc_id), only(SqlServer))]
 mod sql_server {
+    use query_engine_tests::{assert_error, run_query};
+
     #[connector_test]
     async fn disallow_sql_server(runner: &Runner) -> TestResult<()> {
         assert_error!(
@@ -23,6 +25,8 @@ mod sql_server {
 
 #[test_suite(schema(autoinc_id), capabilities(AutoIncrement))]
 mod single_col {
+    use query_engine_tests::run_query;
+
     #[connector_test]
     async fn foo(runner: &Runner) -> TestResult<()> {
         insta::assert_snapshot!(

@@ -66,13 +66,17 @@ impl<'a> Validator<'a> {
                 }
             }
 
-            if let Err(err) = self.validate_model_has_strict_unique_criteria(
-                ast_schema.find_model(&model.name).expect(STATE_ERROR),
-                model,
-            ) {
+            let ast_model = ast_schema.find_model(&model.name).expect(STATE_ERROR);
+
+            if let Err(err) = self.validate_model_compound_ids(ast_model, model) {
                 errors_for_model.push_error(err);
             }
-            if let Err(err) = self.validate_model_name(ast_schema.find_model(&model.name).expect(STATE_ERROR), model) {
+
+            if let Err(err) = self.validate_model_has_strict_unique_criteria(ast_model, model) {
+                errors_for_model.push_error(err);
+            }
+
+            if let Err(err) = self.validate_model_name(ast_model, model) {
                 errors_for_model.push_error(err);
             }
 
@@ -80,55 +84,35 @@ impl<'a> Validator<'a> {
                 errors_for_model.push_error(err);
             }
 
-            if let Err(ref mut the_errors) =
-                self.validate_field_arities(ast_schema.find_model(&model.name).expect(STATE_ERROR), model)
-            {
+            if let Err(ref mut the_errors) = self.validate_field_arities(ast_model, model) {
                 errors_for_model.append(the_errors);
             }
 
-            if let Err(ref mut the_errors) =
-                self.validate_field_types(ast_schema.find_model(&model.name).expect(STATE_ERROR), model)
-            {
+            if let Err(ref mut the_errors) = self.validate_field_types(ast_model, model) {
                 errors_for_model.append(the_errors);
             }
 
-            if let Err(ref mut the_errors) =
-                self.validate_field_connector_specific(ast_schema.find_model(&model.name).expect(STATE_ERROR), model)
-            {
+            if let Err(ref mut the_errors) = self.validate_field_connector_specific(ast_model, model) {
                 errors_for_model.append(the_errors)
             }
 
-            if let Err(ref mut the_errors) =
-                self.validate_model_connector_specific(ast_schema.find_model(&model.name).expect(STATE_ERROR), model)
-            {
+            if let Err(ref mut the_errors) = self.validate_model_connector_specific(ast_model, model) {
                 errors_for_model.append(the_errors)
             }
 
-            if let Err(ref mut the_errors) =
-                self.validate_enum_default_values(schema, ast_schema.find_model(&model.name).expect(STATE_ERROR), model)
-            {
+            if let Err(ref mut the_errors) = self.validate_enum_default_values(schema, ast_model, model) {
                 errors_for_model.append(the_errors);
             }
 
-            if let Err(ref mut the_errors) =
-                self.validate_auto_increment(ast_schema.find_model(&model.name).expect(STATE_ERROR), model)
-            {
+            if let Err(ref mut the_errors) = self.validate_auto_increment(ast_model, model) {
                 errors_for_model.append(the_errors);
             }
 
-            if let Err(ref mut the_errors) = self.validate_base_fields_for_relation(
-                schema,
-                ast_schema.find_model(&model.name).expect(STATE_ERROR),
-                model,
-            ) {
+            if let Err(ref mut the_errors) = self.validate_base_fields_for_relation(schema, ast_model, model) {
                 errors_for_model.append(the_errors);
             }
 
-            if let Err(ref mut the_errors) = self.validate_referenced_fields_for_relation(
-                schema,
-                ast_schema.find_model(&model.name).expect(STATE_ERROR),
-                model,
-            ) {
+            if let Err(ref mut the_errors) = self.validate_referenced_fields_for_relation(schema, ast_model, model) {
                 errors_for_model.append(the_errors);
             }
 
@@ -457,6 +441,28 @@ impl<'a> Validator<'a> {
         }
 
         Ok(())
+    }
+
+    fn validate_model_compound_ids(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), DatamodelError> {
+        if let Some(source) = self.source {
+            if !model.id_fields.is_empty() && !source.active_connector.supports_compound_ids() {
+                let ast_attr = ast_model
+                    .attributes()
+                    .iter()
+                    .find(|attr| &attr.name.name == "id")
+                    .unwrap();
+
+                Err(DatamodelError::new_model_validation_error(
+                    "The current connector does not support compound ids.",
+                    &model.name,
+                    ast_attr.span,
+                ))
+            } else {
+                Ok(())
+            }
+        } else {
+            Ok(())
+        }
     }
 
     fn validate_model_name(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), DatamodelError> {

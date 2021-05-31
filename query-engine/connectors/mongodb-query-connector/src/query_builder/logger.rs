@@ -118,14 +118,14 @@ fn fmt_val(buffer: &mut String, val: &Bson, depth: usize) -> std::fmt::Result {
         Bson::DateTime(dt) => write!(buffer, "\"{}\"", dt.to_rfc3339()),
         Bson::Null => write!(buffer, "null"),
         Bson::Undefined => write!(buffer, "undefined"),
+        Bson::RegularExpression(reg) => write!(buffer, r#""{}", $options: "{}""#, reg.pattern, reg.options),
+        Bson::Decimal128(dec) => write!(buffer, "{}", dec),
 
         Bson::Symbol(_) => todo!(),
-        Bson::Decimal128(_) => todo!(),
         Bson::Timestamp(_) => todo!(),
         Bson::MaxKey => todo!(),
         Bson::MinKey => todo!(),
         Bson::DbPointer(_) => todo!(),
-        Bson::RegularExpression(_) => todo!(),
         Bson::JavaScriptCode(_) => todo!(),
         Bson::JavaScriptCodeWithScope(_) => todo!(),
     }

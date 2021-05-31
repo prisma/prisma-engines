@@ -139,7 +139,7 @@ impl FragmentArgument {
     }
 }
 
-/// M2m field definition, e.g. `#m2m(posts, Post[], vec![])`
+/// M2m field definition, e.g. `#m2m(posts, Post[], String, "name")`
 #[derive(Debug, PartialEq)]
 pub struct M2mFragment {
     /// Field name of the m2m field.
@@ -152,12 +152,12 @@ pub struct M2mFragment {
     //// Required info for some connectors to render.
     pub opposing_type: String,
 
-    /// Optional directives on the m2m field.
-    pub directives: Vec<Directive>,
+    /// M2m relations can be named as well for disambiguation,
+    /// usually for self-relations.
+    pub relation_name: Option<String>,
 }
 
 impl M2mFragment {
-    // Todo code can be merged with id fragment, resulting in a FieldDefinitionFragment or something.
     fn from_args(args: Vec<FragmentArgument>) -> TemplatingResult<Self> {
         if args.len() < 3 {
             return Err(TemplatingError::num_args("m2m", 3, args.len()));
@@ -166,20 +166,17 @@ impl M2mFragment {
         let mut args = args.into_iter();
         let (field_name, field_type) = args.next_tuple().unwrap();
         let opposing_type = args.next().unwrap();
+        let relation_name = args.next().map(|v| v.into_value_string().unwrap());
 
         let field_name = field_name.into_value_string()?;
         let field_type = field_type.into_value_string()?;
         let opposing_type = opposing_type.into_value_string()?;
-        let directives = args
-            .into_iter()
-            .map(|arg| arg.into_directive())
-            .collect::<TemplatingResult<Vec<_>>>()?;
 
         Ok(Self {
             field_name,
             field_type,
             opposing_type,
-            directives,
+            relation_name,
         })
     }
 }

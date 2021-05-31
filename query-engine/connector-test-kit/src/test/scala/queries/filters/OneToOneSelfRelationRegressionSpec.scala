@@ -3,6 +3,7 @@ package queries.filters
 import org.scalatest.{FlatSpec, Matchers}
 import util.{ApiSpecBase, IgnoreMsSql, ProjectDsl}
 
+// RS: Ported
 class OneToOneSelfRelationRegressionSpec extends FlatSpec with Matchers with ApiSpecBase {
   // Bring back sql server when cascading rules can be set!
   "Querying a 1:1 self relation with nulls" should "work on both sides" taggedAs IgnoreMsSql in {

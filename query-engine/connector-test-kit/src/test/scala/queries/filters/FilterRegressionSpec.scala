@@ -3,6 +3,7 @@ package queries.filters
 import org.scalatest.{FlatSpec, Matchers}
 import util.{ApiSpecBase, ProjectDsl}
 
+// RS: Ported
 class FilterRegressionSpec extends FlatSpec with Matchers with ApiSpecBase {
   "Querying 1:M with relation filters" should "work in the presence of nulls" in {
     val project = ProjectDsl.fromString {

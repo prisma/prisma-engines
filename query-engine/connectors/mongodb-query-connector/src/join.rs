@@ -94,27 +94,45 @@ impl JoinStage {
         let left_field = left_scalars.pop().unwrap();
         let left_name = left_field.db_name();
 
+        let right_ref = format!("${}", right_name);
         let op = if relation.is_many_to_many() {
+            // For m-n join stages: Add an `$addFields` stage that adds an empty array if not present (required to make joins work).
+            pipeline.push(doc! {
+                "$addFields": {
+                    right_name: {
+                        "$cond": {
+                            "if": {
+                                "$ne": [ { "$type": right_ref.clone() }, "array" ]
+                            },
+                            "then": [],
+                            "else": right_ref.clone(),
+                        }
+                    }
+                }
+            });
+
             if right_field.is_list {
-                doc! { "$in": ["$$left", format!("${}", right_name)] }
+                doc! { "$in": ["$$left", right_ref] }
             } else {
-                doc! { "$in": [format!("${}", right_name), "$$left"] }
+                doc! { "$in": [right_ref, "$$left"] }
             }
         } else {
-            doc! { "$eq": [format!("${}", right_name), "$$left"] }
+            doc! { "$eq": [right_ref, "$$left"] }
         };
 
         pipeline.push(doc! { "$match": { "$expr": op }});
         pipeline.extend(nested_stages);
 
+        // Todo: Temporarily disabled.
         // If the field is a to-one, add and unwind stage.
-        let unwind_stage = if !from_field.is_list {
-            Some(doc! {
-                "$unwind": { "path": format!("${}", as_name), "preserveNullAndEmptyArrays": true }
-            })
-        } else {
-            None
-        };
+        // let unwind_stage = if !from_field.is_list {
+        //     Some(doc! {
+        //         "$unwind": { "path": format!("${}", as_name), "preserveNullAndEmptyArrays": true }
+        //     })
+        // } else {
+        //     None
+        // };
+        let unwind_stage = None;
 
         let join_stage = doc! {
             "$lookup": {

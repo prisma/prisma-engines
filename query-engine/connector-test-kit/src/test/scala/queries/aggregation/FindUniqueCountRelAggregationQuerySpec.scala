@@ -3,6 +3,7 @@ package queries.aggregation
 import org.scalatest.{FlatSpec, Matchers}
 import util._
 
+// RS: Ported
 class FindUniqueCountRelAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
   val project = SchemaDsl.fromStringV11() {
     """

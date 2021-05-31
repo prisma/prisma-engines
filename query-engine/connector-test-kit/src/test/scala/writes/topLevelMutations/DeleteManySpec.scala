@@ -3,6 +3,7 @@ package writes.topLevelMutations
 import org.scalatest.{FlatSpec, Matchers}
 import util._
 
+// RS: Ported
 class DeleteManySpec extends FlatSpec with Matchers with ApiSpecBase {
 
   val project = ProjectDsl.fromString {
@@ -248,7 +249,6 @@ class DeleteManySpec extends FlatSpec with Matchers with ApiSpecBase {
       project
     )
     result.pathAsSeq("data.todoes").size should be(int)
-
   }
 
   def createTodo(title: String): Unit = {

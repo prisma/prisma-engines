@@ -2,6 +2,8 @@ pub mod avg;
 pub mod count;
 pub mod group_by;
 pub mod group_by_having;
+pub mod many_count_relation;
 pub mod max;
 pub mod min;
 pub mod sum;
+pub mod uniq_count_relation;

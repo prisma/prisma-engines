@@ -3,6 +3,7 @@ package queries.orderAndPagination
 import org.scalatest.{FlatSpec, Matchers}
 import util._
 
+// RS: Ported
 class OrderByDependentPaginationModelSpec extends FlatSpec with Matchers with ApiSpecBase {
   // Take this out when cascading rules can be set.
   override def doNotRunForConnectors: Set[ConnectorTag] = Set(ConnectorTag.MsSqlConnectorTag)
@@ -350,6 +351,7 @@ class OrderByDependentPaginationModelSpec extends FlatSpec with Matchers with Ap
     result.toString() should be("""{"data":{"findManyModelA":[{"id":1,"b1":{"id":1},"b2":{"id":10}},{"id":2,"b1":{"id":1},"b2":{"id":5}},{"id":3,"b1":{"id":2},"b2":{"id":7}}]}}""")
   }
 
+  // Test not ported to rust, duplicate living in OrderByDependentModel
   // Minimal tests specifically for covering the basics in SQL server (no double nulls allowed).
   "Simple orderBy relation" should "work" in {
     implicit val project: Project = SchemaDsl.fromStringV11() {
@@ -397,6 +399,7 @@ class OrderByDependentPaginationModelSpec extends FlatSpec with Matchers with Ap
     result.toString should be("""{"data":{"findManyModelA":[{"id":1,"b":{"id":2}},{"id":4,"b":{"id":5}}]}}""")
   }
 
+  // Test not ported to rust, duplicate living in OrderByDependentModel
   "Simple orderBy relation with two hops" should "work" in {
     implicit val project: Project = SchemaDsl.fromStringV11() {
       """
@@ -440,8 +443,6 @@ class OrderByDependentPaginationModelSpec extends FlatSpec with Matchers with Ap
 
     result.toString should be("""{"data":{"findManyModelA":[{"id":1,"b":{"c":{"id":3}}},{"id":4,"b":{"c":{"id":6}}}]}}""")
   }
-
-
 
   def createRecord(a_id: Int, b_id: Option[Int], c_id: Option[Int], cToA: Option[Int] = None)(implicit project: Project): Unit = {
     val (followUp, inline) = cToA match {

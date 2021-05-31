@@ -4,6 +4,7 @@ import org.scalatest.{FlatSpec, Matchers}
 import util.ConnectorCapability.EnumCapability
 import util._
 
+// RS: Ported
 class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
   override def runOnlyForCapabilities = Set(EnumCapability)
 

@@ -3,6 +3,7 @@ package queries.orderAndPagination
 import org.scalatest.{FlatSpec, Matchers}
 import util._
 
+// RS: Ported
 class OrderByDependentModelSpec extends FlatSpec with Matchers with ApiSpecBase {
   implicit val project: Project = SchemaDsl.fromStringV11() {
     """
