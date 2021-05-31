@@ -1,8 +1,8 @@
-use crate::common::{parse_configuration, ErrorAsserts};
+use crate::common::parse_configuration;
+use crate::common::ErrorAsserts;
 use datamodel::common::preview_features::GENERATOR;
 use datamodel::diagnostics::DatamodelError;
 use itertools::Itertools;
-use pretty_assertions::assert_eq;
 
 #[test]
 fn serialize_generators_to_cmf() {
@@ -39,7 +39,7 @@ generator go {
         "value": "go"
     },
     "output": null,
-    "binaryTargets": [{ "value": "a", "fromEnvVar": null }, { "value": "b", "fromEnvVar": null }],
+    "binaryTargets": ["a","b"],
     "previewFeatures": [],
     "config": {}
   }
@@ -159,7 +159,7 @@ fn new_lines_in_generator_must_work() {
             "value": "go"
           },
           "output": null,
-          "binaryTargets": [{ "value": "b", "fromEnvVar": null }, { "value": "c", "fromEnvVar": null }],
+          "binaryTargets": ["b","c"],
           "previewFeatures": [],
           "config": {}
         }
@@ -212,47 +212,10 @@ fn nice_error_for_unknown_generator_preview_feature() {
 }
 
 #[test]
-fn binary_targets_from_env_var_should_work() {
-    let schema = r#"
-    datasource db {
-        provider = "mysql"
-        url      = env("DATABASE_URL")
-    }
-
-    generator client {
-        provider      = "prisma-client-js"
-        binaryTargets = env("BINARY_TARGETS")
-    }
-
-    model User {
-        id Int @id
-    }
-    "#;
-
-    let expected_dmmf = r#"[
-        {
-          "name": "client",
-          "provider": {
-            "fromEnvVar": null,
-            "value": "prisma-client-js"
-          },
-          "output": null,
-          "binaryTargets": [
-            {
-                "fromEnvVar": "BINARY_TARGETS",
-                "value": null
-            }
-          ],
-          "previewFeatures": [],
-          "config": {}
-        }
-      ]"#;
-
-    assert_mcf(schema, expected_dmmf);
-}
-
-#[test]
 fn retain_env_var_definitions_in_generator_block() {
+    std::env::set_var("PROVIDER", "postgres");
+    std::env::set_var("OUTPUT", "~/home/prisma/");
+
     let schema1 = r#"
     generator js1 {
         provider = env("PROVIDER")
