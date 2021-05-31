@@ -1,4 +1,4 @@
-use crate::{ast, configuration::Generator};
+use crate::{ast, configuration::Generator, transform::dml_to_ast::lower_string_from_env_var};
 
 pub struct GeneratorSerializer {}
 
@@ -36,7 +36,7 @@ impl GeneratorSerializer {
         let platform_values: Vec<ast::Expression> = generator
             .binary_targets
             .iter()
-            .map(|p| ast::Expression::StringValue(p.to_string(), ast::Span::empty()))
+            .map(|p| lower_string_from_env_var("binaryTargets", p).value)
             .collect();
         if !platform_values.is_empty() {
             arguments.push(ast::Argument::new_array("binaryTargets", platform_values));
