@@ -16,7 +16,6 @@ indoc = "1"
 
 [dependencies.quaint]
 git = "https://github.com/prisma/quaint"
-branch = "log-queries-param"
 features = ["mysql", "postgresql", "sqlite", "mssql"]
 optional = true
 

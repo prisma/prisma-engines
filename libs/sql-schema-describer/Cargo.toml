@@ -22,7 +22,6 @@ tracing-futures = "0.2.4"
 
 [dependencies.quaint]
 git = "https://github.com/prisma/quaint"
-branch = "log-queries-param"
 features = [
     "chrono",
     "sqlite",

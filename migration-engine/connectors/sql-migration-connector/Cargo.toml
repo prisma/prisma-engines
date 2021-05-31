@@ -31,7 +31,6 @@ uuid = { version = "0.8", features = ["v4"] }
 
 [dependencies.quaint]
 git = "https://github.com/prisma/quaint"
-branch = "log-queries-param"
 features = [
     "json",
     "uuid",

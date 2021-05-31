@@ -41,6 +41,5 @@ connection-string = "0.1.13"
 
 [dependencies.quaint]
 git = "https://github.com/prisma/quaint"
-branch = "log-queries-param"
 optional = true
 features = ["vendored-openssl"]
