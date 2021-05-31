@@ -208,7 +208,13 @@ pub fn value_from_bson(bson: Bson, meta: &OutputMeta) -> crate::Result<PrismaVal
         },
 
         // Null catch-all.
-        (_, Bson::Null) => PrismaValue::Null,
+        (_, Bson::Null) => {
+            if let Some(ref dv) = meta.default {
+                dv.clone()
+            } else {
+                PrismaValue::Null
+            }
+        }
 
         // String + UUID + Enum
         (TypeIdentifier::String, Bson::String(s)) => PrismaValue::String(s),

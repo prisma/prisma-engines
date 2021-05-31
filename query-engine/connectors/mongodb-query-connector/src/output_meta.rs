@@ -1,6 +1,6 @@
 use connector_interface::AggregationSelection;
 use datamodel::FieldArity;
-use prisma_models::{ModelProjection, ScalarFieldRef, TypeIdentifier};
+use prisma_models::{ModelProjection, PrismaValue, ScalarFieldRef, TypeIdentifier};
 use std::collections::HashMap;
 
 // let mut idents = selected_fields.type_identifiers_with_arities();
@@ -10,6 +10,7 @@ pub type OutputMetaMapping = HashMap<String, OutputMeta>;
 
 pub struct OutputMeta {
     pub ident: TypeIdentifier,
+    pub default: Option<PrismaValue>,
     pub list: bool,
 }
 
@@ -17,6 +18,7 @@ impl OutputMeta {
     pub fn strip_list(&self) -> OutputMeta {
         OutputMeta {
             ident: self.ident.clone(),
+            default: self.default.clone(),
             list: false,
         }
     }
@@ -35,8 +37,15 @@ pub fn from_selected_fields(selected_fields: &ModelProjection) -> OutputMetaMapp
 pub fn from_field(field: &ScalarFieldRef) -> OutputMeta {
     let (ident, field_arity) = field.type_identifier_with_arity();
 
+    // Only add a possible default return if the field is required.
+    let default = field.default_value.clone().and_then(|dv| match dv {
+        datamodel::DefaultValue::Single(pv) if field.is_required => Some(pv),
+        _ => None,
+    });
+
     OutputMeta {
         ident,
+        default,
         list: matches!(field_arity, FieldArity::List),
     }
 }
@@ -51,6 +60,7 @@ pub fn from_aggregation_selection(selection: &AggregationSelection) -> OutputMet
             name,
             OutputMeta {
                 ident,
+                default: None,
                 list: matches!(field_arity, FieldArity::List),
             },
         );
