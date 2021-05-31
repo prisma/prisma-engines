@@ -278,12 +278,4 @@ mod non_embedded_upsert {
             _ => unreachable!(),
         }
     }
-
-    async fn create_row(runner: &Runner, name: &str, data: &str) -> TestResult<()> {
-        runner
-            .query(format!("mutation {{ createOne{}(data: {}) {{ id }} }}", name, data))
-            .await?
-            .assert_success();
-        Ok(())
-    }
 }
