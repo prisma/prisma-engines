@@ -66,8 +66,7 @@
 //!   `BEGIN` to avoid possible collisions with statements created in other
 //!   sessions.
 //! - `statement_cache_size`, number of prepared statements kept cached.
-//!   Defaults to 500, which means caching is off. If `pgbouncer` mode is enabled,
-//!   caching is always off.
+//!   Defaults to 500. If `pgbouncer` mode is enabled, caching is always off.
 //!
 //! ## MySQL
 //!
@@ -88,6 +87,8 @@
 //! - `pool_timeout` defined in seconds. If all connections are in use, the
 //!   database will return a `PoolTimeout` error after waiting for the given time.
 //!   If set to zero, no timeout.
+//! - `statement_cache_size`, number of prepared statements kept cached.
+//!   Defaults to 32. Set to 0 to disable caching.
 //!
 //! ## Microsoft SQL Server
 //!

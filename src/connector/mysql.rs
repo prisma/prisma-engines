@@ -68,6 +68,12 @@ impl MysqlUrl {
         }
     }
 
+    /// The number of statements to cache. If not set, uses `mysql_async`
+    /// default (32). Setting to 0 disables cache.
+    pub fn statement_cache_size(&self) -> Option<usize> {
+        self.query_params.statement_cache_size
+    }
+
     /// The percent-decoded database password.
     pub fn password(&self) -> Option<Cow<str>> {
         match self
@@ -140,6 +146,7 @@ impl MysqlUrl {
         let mut pool_timeout = Some(Duration::from_secs(10));
         let mut max_connection_lifetime = None;
         let mut max_idle_connection_lifetime = Some(Duration::from_secs(300));
+        let mut statement_cache_size = None;
 
         for (k, v) in url.query_pairs() {
             match k.as_ref() {
@@ -149,6 +156,12 @@ impl MysqlUrl {
                         .map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
 
                     connection_limit = Some(as_int);
+                }
+                "statement_cache_size" => {
+                    let as_int = v
+                        .parse()
+                        .map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
+                    statement_cache_size = Some(as_int);
                 }
                 "sslcert" => {
                     use_ssl = true;
@@ -243,6 +256,7 @@ impl MysqlUrl {
             pool_timeout,
             max_connection_lifetime,
             max_idle_connection_lifetime,
+            statement_cache_size,
         })
     }
 
@@ -253,6 +267,7 @@ impl MysqlUrl {
 
     pub(crate) fn to_opts_builder(&self) -> my::OptsBuilder {
         let mut config = my::OptsBuilder::default()
+            .stmt_cache_size(self.statement_cache_size())
             .user(Some(self.username()))
             .pass(self.password())
             .db_name(Some(self.dbname()));
@@ -266,7 +281,6 @@ impl MysqlUrl {
             }
         }
 
-        config = config.stmt_cache_size(Some(1000));
         config = config.conn_ttl(Some(Duration::from_secs(5)));
 
         if self.query_params.use_ssl {
@@ -288,6 +302,7 @@ pub(crate) struct MysqlUrlQueryParams {
     pool_timeout: Option<Duration>,
     max_connection_lifetime: Option<Duration>,
     max_idle_connection_lifetime: Option<Duration>,
+    statement_cache_size: Option<usize>,
 }
 
 impl Mysql {
