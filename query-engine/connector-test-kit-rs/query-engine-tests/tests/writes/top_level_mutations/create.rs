@@ -20,12 +20,12 @@ mod create {
               relId       String?
               optRel      RelatedModel? @relation(fields: [relId], references: [id])
           }
-          
+
           model RelatedModel {
             #id(id, String, @id)
               m  ScalarModel[]
           }
-          
+
           enum MyEnum {
              A
              B
@@ -198,6 +198,7 @@ mod create {
     // "A Create Mutation" should "gracefully fail when a unique violation occurs"
     // TODO(dom): Not working on mongo
     // TODO(dom): 'Expected result to return an error, but found success: {"data":{"createOneScalarModel":{"optUnique":"test"}}}'
+    // Comment(dom): Expected, we're not enforcing uniqueness for the test setup yet.
     #[connector_test(exclude(MongoDb))]
     async fn gracefully_fails_when_uniq_violation(runner: &Runner) -> TestResult<()> {
         run_query!(

@@ -13,8 +13,7 @@ use query_engine_tests::*;
 // /!\ rel_filter_n_m_a and rel_filter_n_m_z must always expect the same results
 
 // TODO: Bring back SqlServer when cascading rules can be set!
-// TODO(dom): Not working on mongo. Explicitly "not implemented yet"
-#[test_suite(exclude(MongoDb, SqlServer))]
+#[test_suite(exclude(SqlServer))]
 mod prisma_3078 {
     use indoc::indoc;
     use query_engine_tests::run_query;
@@ -76,12 +75,14 @@ mod prisma_3078 {
     }
 
     fn rel_filter_n_m_a() -> String {
+        // field_b    User[]  @relation("UserfriendOf")
+        // field_a    User[]  @relation("UserfriendOf")
         let schema = indoc! {
             r#"model User {
             #id(id, Int, @id)
             name       String?
-            field_b    User[]  @relation("UserfriendOf")
-            field_a    User[]  @relation("UserfriendOf")
+            #m2m(field_b, User[], Int, UserfriendOf)
+            #m2m(field_a, User[], Int, UserfriendOf)
             field_aId  Int?
           }"#
         };
@@ -90,14 +91,16 @@ mod prisma_3078 {
     }
 
     fn rel_filter_n_m_z() -> String {
+        // field_b    User[]  @relation("UserfriendOf")
+        // field_z    User[]  @relation("UserfriendOf")
         let schema = indoc! {
             r#"model User {
-          #id(id, Int, @id)
-          name       String?
-          field_b    User[]  @relation("UserfriendOf")
-          field_z    User[]  @relation("UserfriendOf")
-          field_zId  Int?
-        }"#
+              #id(id, Int, @id)
+              name       String?
+              #m2m(field_b, User[], Int, UserfriendOf)
+              #m2m(field_z, User[], Int, UserfriendOf)
+              field_zId  Int?
+            }"#
         };
 
         schema.to_owned()

@@ -50,7 +50,6 @@ mod create_many {
     }
 
     // Covers: AutoIncrement ID working with basic functionality.
-    // TODO(dom): Not working on mongo. Expected I guess? Marking it anyway just in case.
     #[connector_test(schema(schema_2), exclude(Sqlite, SqlServer, MongoDb))]
     async fn basic_create_many_autoincrement(runner: &Runner) -> TestResult<()> {
         insta::assert_snapshot!(
