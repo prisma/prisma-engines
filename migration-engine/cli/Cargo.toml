@@ -31,7 +31,6 @@ url = "2.1.1"
 
 [dev-dependencies.quaint]
 git = "https://github.com/prisma/quaint"
-branch = "log-queries-param"
 
 [features]
 default = ["sql"]
