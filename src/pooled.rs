@@ -88,7 +88,7 @@
 //!   database will return a `PoolTimeout` error after waiting for the given time.
 //!   If set to zero, no timeout.
 //! - `statement_cache_size`, number of prepared statements kept cached.
-//!   Defaults to 32. Set to 0 to disable caching.
+//!   Defaults to 1000. Set to 0 to disable caching.
 //!
 //! ## Microsoft SQL Server
 //!
