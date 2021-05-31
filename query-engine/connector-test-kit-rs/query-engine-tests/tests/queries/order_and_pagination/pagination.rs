@@ -1,9 +1,11 @@
-use indoc::indoc;
 use query_engine_tests::*;
 use std::cmp;
 
 #[test_suite(schema(schema))]
 mod pagination {
+    use indoc::indoc;
+    use query_engine_tests::{assert_query_many, run_query};
+
     fn schema() -> String {
         let schema = indoc! {
             r#"model TestModel {

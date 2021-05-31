@@ -4,13 +4,13 @@ pub fn simple_m2m() -> String {
     let schema = indoc! {
         r#"
         model ModelA {
-            id    String   @id
-            manyB ModelB[]
+            #id(id, String, @id)
+            #m2m(manyB, ModelB[], String)
           }
 
           model ModelB {
-            id    String   @id
-            manyA ModelA[]
+            #id(id, String, @id)
+            #m2m(manyA, ModelA[], String)
           }
         "#
     };

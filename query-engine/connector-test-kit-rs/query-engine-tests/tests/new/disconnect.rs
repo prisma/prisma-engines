@@ -5,6 +5,8 @@ use query_engine_tests::*;
 /// that we're only disconnecting records that were previously connected to the parent.
 #[test_suite]
 mod disconnect_security {
+    use query_engine_tests::assert_query;
+
     #[connector_test(schema(schemas::a1_to_bm_opt))]
     async fn must_honor_connect_scope_one2m(runner: &Runner) -> TestResult<()> {
         one_to_many_test_data(runner).await?;

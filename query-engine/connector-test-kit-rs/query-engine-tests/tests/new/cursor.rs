@@ -1,9 +1,10 @@
-use indoc::indoc;
 use query_engine_tests::*;
 
 /// Regression test for https://github.com/prisma/prisma/issues/6337
 #[test_suite(schema(bigint_schema))]
 mod bigint_cursor {
+    use indoc::indoc;
+    use query_engine_tests::run_query;
 
     fn bigint_schema() -> String {
         let schema = indoc! {"

@@ -1,11 +1,10 @@
-use indoc::indoc;
 use query_engine_tests::*;
 
 /// Note regarding Scala port: Lots of tests omitted (obsolete tests), added additional types.
 #[test_suite(schema(schemas::common_list_types), capabilities(ScalarLists))]
 mod scalar_list {
-    use indoc::formatdoc;
-    use query_engine_tests::string_to_base64;
+    use indoc::{formatdoc, indoc};
+    use query_engine_tests::{assert_query, string_to_base64};
 
     #[connector_test]
     async fn empty_lists(runner: &Runner) -> TestResult<()> {

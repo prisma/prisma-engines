@@ -3,6 +3,7 @@ package queries.relations
 import org.scalatest.{FlatSpec, Matchers}
 import util.{ApiSpecBase, ProjectDsl}
 
+// RS: Ported
 class InlineRelationSpec extends FlatSpec with Matchers with ApiSpecBase {
   "Querying the scalar field that backs a relation and the relation itself" should "work" in {
     val project = ProjectDsl.fromString {

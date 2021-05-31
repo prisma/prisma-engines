@@ -4,6 +4,7 @@ import org.scalatest.{FlatSpec, Matchers}
 import util.ConnectorCapability.JoinRelationLinksCapability
 import util._
 
+// RS: Ported
 class NonUniqueIndexUsageSpec extends FlatSpec with Matchers with ApiSpecBase with SchemaBaseV11 {
   // Validates fix for
   // https://github.com/prisma/prisma/issues/3869

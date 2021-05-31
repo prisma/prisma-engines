@@ -1,8 +1,10 @@
-use indoc::indoc;
 use query_engine_tests::*;
 
 #[test_suite(schema(schema))]
 mod order_by_mutation {
+    use indoc::indoc;
+    use query_engine_tests::run_query;
+
     fn schema() -> String {
         let schema = indoc! {
             "model Foo {
@@ -25,6 +27,7 @@ mod order_by_mutation {
         schema.to_owned()
     }
 
+    // "Using a field in the order by that is not part of the selected fields" should "work"
     #[connector_test]
     async fn order_by_not_selected(runner: &Runner) -> TestResult<()> {
         insta::assert_snapshot!(
