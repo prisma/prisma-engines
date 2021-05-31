@@ -118,7 +118,6 @@ impl ValueValidator {
     pub fn as_int(&self) -> Result<i64, DatamodelError> {
         match &self.value {
             ast::Expression::NumericValue(value, _) => self.wrap_error_from_result(value.parse::<i64>(), "numeric"),
-            ast::Expression::Any(value, _) => self.wrap_error_from_result(value.parse::<i64>(), "numeric"),
             _ => Err(self.construct_type_mismatch_error("numeric")),
         }
     }
@@ -132,7 +131,6 @@ impl ValueValidator {
             ast::Expression::NumericValue(value, _) => {
                 self.wrap_error_from_result(value.parse::<BigDecimal>(), "numeric")
             }
-            ast::Expression::Any(value, _) => self.wrap_error_from_result(value.parse::<BigDecimal>(), "numeric"),
             _ => Err(self.construct_type_mismatch_error("numeric")),
         }
     }
@@ -141,7 +139,6 @@ impl ValueValidator {
     pub fn as_bool(&self) -> Result<bool, DatamodelError> {
         match &self.value {
             ast::Expression::BooleanValue(value, _) => self.wrap_error_from_result(value.parse::<bool>(), "boolean"),
-            ast::Expression::Any(value, _) => self.wrap_error_from_result(value.parse::<bool>(), "boolean"),
             // this case is just here because `as_bool_from_env` passes a StringValue
             ast::Expression::StringValue(value, _) => self.wrap_error_from_result(value.parse::<bool>(), "boolean"),
             _ => Err(self.construct_type_mismatch_error("boolean")),
@@ -154,24 +151,20 @@ impl ValueValidator {
             ast::Expression::StringValue(value, _) => {
                 self.wrap_error_from_result(DateTime::parse_from_rfc3339(value), "datetime")
             }
-            ast::Expression::Any(value, _) => {
-                self.wrap_error_from_result(DateTime::parse_from_rfc3339(value), "datetime")
-            }
             _ => Err(self.construct_type_mismatch_error("dateTime")),
         }
     }
 
-    /// Unwraps the wrapped value as a constant literal..
+    /// Unwraps the wrapped value as a constant literal.
     pub fn as_constant_literal(&self) -> Result<String, DatamodelError> {
         match &self.value {
             ast::Expression::ConstantValue(value, _) => Ok(value.to_string()),
             ast::Expression::BooleanValue(value, _) => Ok(value.to_string()),
-            ast::Expression::Any(value, _) => Ok(value.to_string()),
             _ => Err(self.construct_type_mismatch_error("constant literal")),
         }
     }
 
-    /// Unwraps the wrapped value as a constant literal..
+    /// Unwraps the wrapped value as an array literal.
     pub fn as_array(&self) -> Vec<ValueValidator> {
         match &self.value {
             ast::Expression::Array(values, _) => {
