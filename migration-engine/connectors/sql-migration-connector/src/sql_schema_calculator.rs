@@ -9,7 +9,7 @@ use datamodel::{
     Datamodel, DefaultValue, FieldArity, IndexDefinition, IndexType, ScalarType,
 };
 use prisma_value::PrismaValue;
-use sql_schema_describer::{self as sql, walkers::SqlSchemaExt, ColumnType, ForeignKeyAction};
+use sql_schema_describer::{self as sql, walkers::SqlSchemaExt, ColumnType, ForeignKeyAction, Index};
 
 pub(crate) fn calculate_sql_schema(datamodel: &Datamodel, flavour: &dyn SqlFlavour) -> sql::SqlSchema {
     let mut schema = sql::SqlSchema::empty();
@@ -41,7 +41,7 @@ fn calculate_model_tables<'a>(
             constraint_name: pk.name_in_db.clone(),
         });
 
-        let indices = model
+        let mut indices: Vec<Index> = model
             .indexes()
             .map(|index_definition: &IndexDefinition| {
                 let referenced_fields: Vec<ScalarFieldWalker<'_>> = index_definition
@@ -71,6 +71,8 @@ fn calculate_model_tables<'a>(
                 }
             })
             .collect();
+
+        indices.sort_by_key(|id| id.columns.len());
 
         let mut table = sql::Table {
             name: model.database_name().to_owned(),

@@ -254,7 +254,7 @@ impl Model {
 
         // second candidate: any unique constraint where all fields are required
         {
-            let unique_field_combi: Vec<UniqueCriteria> = self
+            let mut unique_field_combi: Vec<UniqueCriteria> = self
                 .indices
                 .iter()
                 .filter(|id| id.tpe == IndexType::Unique)
@@ -266,6 +266,8 @@ impl Model {
                         .then(|| UniqueCriteria::new(fields))
                 })
                 .collect();
+
+            unique_field_combi.sort_by_key(|c| c.fields.len());
 
             result.extend(unique_field_combi)
         }
