@@ -202,7 +202,7 @@ mod lists {
     }
 }
 
-#[test_suite(schema(schema), capabilities(Json))]
+#[test_suite(schema(schema), capabilities(ScalarLists, Json))]
 mod json_lists {
     fn schema() -> String {
         let schema = indoc! {
@@ -296,7 +296,7 @@ mod json_lists {
     }
 }
 
-#[test_suite(schema(schema), capabilities(Enums))]
+#[test_suite(schema(schema), capabilities(ScalarLists, Enums))]
 mod enum_lists {
     fn schema() -> String {
         let schema = indoc! {

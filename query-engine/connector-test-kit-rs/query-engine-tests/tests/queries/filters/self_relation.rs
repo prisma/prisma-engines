@@ -51,7 +51,7 @@ mod self_relation_filters {
         insta::assert_snapshot!(
           run_query!(runner, indoc! { r#"
             query {
-              findManySong(where: { creator: { is: { name: { equals: "kurt" } } } }) {
+              findManySong(where: { creator: { is: { name: { equals: "kurt" }}}}, orderBy: { title: desc }) {
                 title
               }
             }

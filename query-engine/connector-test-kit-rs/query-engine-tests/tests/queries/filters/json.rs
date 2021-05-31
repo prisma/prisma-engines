@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(json_opt), capabilities(Json))]
+#[test_suite(schema(json_opt), capabilities(Json), exclude(MySQL(5.6)))]
 mod json {
     use query_engine_tests::assert_error;
 
