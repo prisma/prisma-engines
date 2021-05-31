@@ -120,7 +120,7 @@ fn hidden_preview_features_setting_must_work() {
 fn back_slashes_in_providers_must_work() {
     let schema = r#"
         generator mygen {
-          provider = "../folder\ with\ space/my\ generator.js"
+          provider = "../folder\ with\\ space/my\ generator.js"
         }
     "#;
 
@@ -129,7 +129,7 @@ fn back_slashes_in_providers_must_work() {
           "name": "mygen",
           "provider":{
             "fromEnvVar": null,
-            "value": "../folder\\ with\\ space/my\\ generator.js"
+            "value": "../folder with\\ space/my generator.js"
           },
           "output": null,
           "binaryTargets": [],
