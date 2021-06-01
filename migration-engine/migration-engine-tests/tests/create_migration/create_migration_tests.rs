@@ -498,9 +498,9 @@ fn index_tests(api: TestApi) {
                         [b] NVARCHAR(1000) NOT NULL,
                     
                         CONSTRAINT [A_pkey] PRIMARY KEY ([id]),
+                        CONSTRAINT [A_name_key] UNIQUE ([name]),
                         CONSTRAINT [1] UNIQUE ([a],[b]),
-                        CONSTRAINT [2] UNIQUE ([a],[b]),
-                        CONSTRAINT [A_name_key] UNIQUE ([name])
+                        CONSTRAINT [2] UNIQUE ([a],[b])
                     );
                     
                     -- CreateTable
@@ -545,16 +545,16 @@ fn index_tests(api: TestApi) {
                     );
                     
                     -- CreateIndex
-                    CREATE UNIQUE INDEX "1" ON "A"("a", "b");
-                    
-                    -- CreateIndex
-                    CREATE UNIQUE INDEX "2" ON "A"("a", "b");
-                    
-                    -- CreateIndex
                     CREATE INDEX "A_a_idx" ON "A"("a");
                     
                     -- CreateIndex
                     CREATE UNIQUE INDEX "A_name_key" ON "A"("name");
+                    
+                    -- CreateIndex
+                    CREATE UNIQUE INDEX "1" ON "A"("a", "b");
+                    
+                    -- CreateIndex
+                    CREATE UNIQUE INDEX "2" ON "A"("a", "b");
                     
                     -- CreateIndex
                     CREATE INDEX "B_a_b_idx" ON "B"("a", "b");
@@ -573,10 +573,10 @@ fn index_tests(api: TestApi) {
                     `a` VARCHAR(191) NOT NULL,
                     `b` VARCHAR(191) NOT NULL,
                 
-                    UNIQUE INDEX `1`(`a`, `b`),
-                    UNIQUE INDEX `2`(`a`, `b`),
                     INDEX `A_a_idx`(`a`),
                     UNIQUE INDEX `A_name_key`(`name`),
+                    UNIQUE INDEX `1`(`a`, `b`),
+                    UNIQUE INDEX `2`(`a`, `b`),
                     PRIMARY KEY (`id`)
                 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
                 
@@ -615,16 +615,16 @@ fn index_tests(api: TestApi) {
                 );
                 
                 -- CreateIndex
-                CREATE UNIQUE INDEX "1" ON "A"("a", "b");
-                
-                -- CreateIndex
-                CREATE UNIQUE INDEX "2" ON "A"("a", "b");
-                
-                -- CreateIndex
                 CREATE INDEX "A_a_idx" ON "A"("a");
                 
                 -- CreateIndex
                 CREATE UNIQUE INDEX "A_name_key" ON "A"("name");
+
+                -- CreateIndex
+                CREATE UNIQUE INDEX "1" ON "A"("a", "b");
+                
+                -- CreateIndex
+                CREATE UNIQUE INDEX "2" ON "A"("a", "b");
                 
                 -- CreateIndex
                 CREATE INDEX "B_a_b_idx" ON "B"("a", "b");
