@@ -22,7 +22,7 @@ mod update_many {
     // TODO(dom): Not working on Mongo (second snapshot)
     // -{"data":{"findManyTestModel":[{"optStr":"str1new","optInt":1,"optFloat":null},{"optStr":"str2","optInt":null,"optFloat":null}]}}
     // +{"data":{"findManyTestModel":[{"optStr":"str1new","optInt":1,"optFloat":0.0},{"optStr":"str2","optInt":null,"optFloat":null}]}}
-    #[connector_test(exclude(MondoDb))]
+    #[connector_test(exclude(MongoDb))]
     async fn update_recs_matching_where(runner: &Runner) -> TestResult<()> {
         create_row(runner, r#"{ id: 1, optStr: "str1" }"#).await?;
         create_row(runner, r#"{ id: 2, optStr: "str2" }"#).await?;
