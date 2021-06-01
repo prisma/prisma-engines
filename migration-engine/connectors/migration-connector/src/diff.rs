@@ -1,6 +1,5 @@
-use std::fmt::Debug;
-
 use crate::MigrationDirectory;
+use std::fmt::Debug;
 
 /// Diffable things
 pub enum DiffTarget<'a> {

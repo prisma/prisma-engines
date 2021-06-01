@@ -41,7 +41,8 @@ pub trait MigrationConnector: Send + Sync + 'static {
     /// the connector name. The SQL connector for example can return "postgresql", "mysql" or "sqlite".
     fn connector_type(&self) -> &'static str;
 
-    /// Diff.
+    /// Create a migration by comparing two database schemas. See
+    /// [DiffTarget](/enum.DiffTarget.html) for possible inputs.
     async fn diff(&self, from: DiffTarget<'_>, to: DiffTarget<'_>) -> ConnectorResult<Self::DatabaseMigration>;
 
     /// The version of the underlying database.

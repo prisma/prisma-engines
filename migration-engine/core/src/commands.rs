@@ -4,7 +4,6 @@
 mod apply_migrations;
 mod command;
 mod create_migration;
-mod debug_panic;
 mod dev_diagnostic;
 mod diagnose_migration_history;
 mod evaluate_data_loss;
@@ -17,8 +16,8 @@ mod schema_push;
 pub use apply_migrations::{ApplyMigrationsCommand, ApplyMigrationsInput, ApplyMigrationsOutput};
 pub use command::MigrationCommand;
 pub use create_migration::{CreateMigrationCommand, CreateMigrationInput, CreateMigrationOutput};
-pub use debug_panic::DebugPanicCommand;
-pub use dev_diagnostic::{DevAction, DevDiagnosticCommand, DevDiagnosticInput, DevDiagnosticOutput};
+pub(crate) use dev_diagnostic::dev_diagnostic;
+pub use dev_diagnostic::{DevAction, DevDiagnosticInput, DevDiagnosticOutput};
 pub use diagnose_migration_history::{
     DiagnoseMigrationHistoryCommand, DiagnoseMigrationHistoryInput, DiagnoseMigrationHistoryOutput, DriftDiagnostic,
     HistoryDiagnostic,

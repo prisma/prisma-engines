@@ -34,13 +34,6 @@ impl DestructiveChangeDiagnostics {
         Default::default()
     }
 
-    /// Add a warning to the diagnostics.
-    pub fn add_warning<T: Into<Option<MigrationWarning>>>(&mut self, warning: T) {
-        if let Some(warning) = warning.into() {
-            self.warnings.push(warning)
-        }
-    }
-
     /// Is there any warning to be rendered?
     pub fn has_warnings(&self) -> bool {
         !self.warnings.is_empty()
@@ -49,7 +42,7 @@ impl DestructiveChangeDiagnostics {
 
 /// A warning emitted by [DestructiveChangeChecker](trait.DestructiveChangeChecker.html). Warnings will
 /// prevent a migration from being applied, unless the `force` flag is passed.
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct MigrationWarning {
     /// The user-facing warning description.
     pub description: String,
