@@ -11,7 +11,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
   lazy val isMySQL                    = connectorTag == ConnectorTag.MySqlConnectorTag
 
   "a PM to C1!  relation with a child already in a relation" should "work with create" in {
-    schemaWithRelation(onParent = ChildList, onChild = ParentReq).test(18) { t =>
+    schemaWithRelation(onParent = ChildList, onChild = ParentReq).test { t =>
       val project = SchemaDsl.fromStringV11() {
         t.datamodel
       }
@@ -60,8 +60,6 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
       )
 
       res.toString should be("""{"data":{"updateParent":{"childrenOpt":[{"c":"c1"},{"c":"c2"}]}}}""")
-
-      true should be(false)
 
     }
   }
