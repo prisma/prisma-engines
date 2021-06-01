@@ -49,7 +49,12 @@ pub fn collect_selected_fields(
 pub fn collect_nested_queries(from: Vec<FieldPair>, model: &ModelRef) -> QueryGraphBuilderResult<Vec<ReadQuery>> {
     from.into_iter()
         .filter_map(|pair| {
+            if is_aggr_selection(&pair) {
+                return None;
+            }
+
             let model_field = model.fields().find_from_all(&pair.parsed_field.name).unwrap();
+
             match model_field {
                 Field::Scalar(_) => None,
                 Field::Relation(ref rf) => {

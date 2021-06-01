@@ -111,6 +111,7 @@ where
         parent_projections: None,
         args: (child_model, filter).into(),
         selected_fields,
+        aggregation_selections: vec![],
         nested: vec![],
         selection_order: vec![],
     })));

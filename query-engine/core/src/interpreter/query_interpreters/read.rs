@@ -139,7 +139,7 @@ fn read_related<'a, 'b>(
         let is_m2m = relation.is_many_to_many();
         let processor = InMemoryRecordProcessor::new_from_query_args(&mut query.args);
 
-        let scalars = if is_m2m {
+        let (scalars, aggregation_rows) = if is_m2m {
             nested_read::m2m(tx, &query, parent_result, processor).await?
         } else {
             nested_read::one2m(
@@ -149,6 +149,7 @@ fn read_related<'a, 'b>(
                 parent_result,
                 query.args.clone(),
                 &query.selected_fields,
+                query.aggregation_selections,
                 processor,
             )
             .await?
@@ -165,7 +166,7 @@ fn read_related<'a, 'b>(
             model_id,
             scalars,
             nested,
-            aggregation_rows: None,
+            aggregation_rows,
         }
         .into())
     };
@@ -223,7 +224,7 @@ fn process_nested<'a, 'b>(
 /// This means the SQL result we get back from the database contains additional aggregation data that needs to be remapped according to the shema
 /// This function takes care of removing the aggregation data from the database result and collects it separately
 /// so that it can be serialized separately later according to the schema
-fn extract_aggregation_rows_from_scalars(
+pub fn extract_aggregation_rows_from_scalars(
     mut scalars: ManyRecords,
     aggr_selections: Vec<RelAggregationSelection>,
 ) -> (ManyRecords, Option<Vec<RelAggregationRow>>) {
