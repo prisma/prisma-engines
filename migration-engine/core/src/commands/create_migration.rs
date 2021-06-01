@@ -1,6 +1,6 @@
 use super::MigrationCommand;
 use crate::{parse_schema, CoreError, CoreResult};
-use migration_connector::{DatabaseMigrationMarker, MigrationConnector};
+use migration_connector::{DatabaseMigrationMarker, DiffTarget, MigrationConnector};
 use serde::{Deserialize, Serialize};
 use std::path::Path;
 use user_facing_errors::migration_engine::MigrationNameTooLong;
@@ -37,7 +37,6 @@ impl<'a> MigrationCommand for CreateMigrationCommand {
     type Output = CreateMigrationOutput;
 
     async fn execute<C: MigrationConnector>(input: &Self::Input, connector: &C) -> CoreResult<Self::Output> {
-        let database_migration_inferrer = connector.database_migration_inferrer();
         let applier = connector.database_migration_step_applier();
         let checker = connector.destructive_change_checker();
         let connector_type = connector.connector_type();
@@ -53,8 +52,11 @@ impl<'a> MigrationCommand for CreateMigrationCommand {
         let previous_migrations = migration_connector::list_migrations(&Path::new(&input.migrations_directory_path))?;
         let target_schema = parse_schema(&input.prisma_schema)?;
 
-        let migration = database_migration_inferrer
-            .infer_next_migration(&previous_migrations, (&target_schema.0, &target_schema.1))
+        let migration = connector
+            .diff(
+                DiffTarget::Migrations(&previous_migrations),
+                DiffTarget::Datamodel((&target_schema.0, &target_schema.1)),
+            )
             .await?;
 
         if migration.is_empty() && !input.draft {

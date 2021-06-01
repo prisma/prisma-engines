@@ -5,10 +5,9 @@ mod mongodb_destructive_change_checker;
 mod mongodb_migration;
 mod mongodb_migration_persistence;
 mod mongodb_migration_step_applier;
-mod mongodb_migration_step_inferrer;
 
 use error::IntoConnectorResult;
-use migration_connector::{ConnectorError, ConnectorResult, MigrationConnector};
+use migration_connector::{ConnectorError, ConnectorResult, DiffTarget, MigrationConnector};
 use mongodb::{
     options::{ClientOptions, WriteConcern},
     Client,
@@ -73,6 +72,23 @@ impl MigrationConnector for MongoDbMigrationConnector {
         todo!()
     }
 
+    async fn diff(&self, from: DiffTarget<'_>, to: DiffTarget<'_>) -> ConnectorResult<Self::DatabaseMigration> {
+        match (from, to) {
+            (DiffTarget::Empty, DiffTarget::Datamodel((_, datamodel))) => {
+                let steps = datamodel
+                    .models()
+                    .map(|model| {
+                        let name = model.database_name.as_ref().unwrap_or(&model.name).to_owned();
+                        MongoDbMigrationStep::CreateCollection(name)
+                    })
+                    .collect();
+
+                Ok(MongoDbMigration { steps })
+            }
+            _ => todo!(),
+        }
+    }
+
     async fn reset(&self) -> migration_connector::ConnectorResult<()> {
         self.client
             .database(&self.db_name)
@@ -82,12 +98,6 @@ impl MigrationConnector for MongoDbMigrationConnector {
     }
 
     fn migration_persistence(&self) -> &dyn migration_connector::MigrationPersistence {
-        self
-    }
-
-    fn database_migration_inferrer(
-        &self,
-    ) -> &dyn migration_connector::DatabaseMigrationInferrer<Self::DatabaseMigration> {
         self
     }
 
@@ -105,5 +115,12 @@ impl MigrationConnector for MongoDbMigrationConnector {
 
     async fn acquire_lock(&self) -> ConnectorResult<()> {
         todo!()
+    }
+
+    async fn validate_migrations(
+        &self,
+        _migrations: &[migration_connector::MigrationDirectory],
+    ) -> migration_connector::ConnectorResult<()> {
+        Ok(())
     }
 }
