@@ -57,10 +57,6 @@ impl<'a> Validator<'a> {
                 errors_for_model.push_error(err);
             }
 
-            if let Err(err) = self.validate_model_has_strict_unique_criteria(ast_model, model) {
-                errors_for_model.push_error(err);
-            }
-
             if let Err(err) = self.validate_model_name(ast_model, model) {
                 errors_for_model.push_error(err);
             }
