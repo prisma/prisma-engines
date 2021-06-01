@@ -56,7 +56,7 @@ pub enum IndexType {
 #[derive(Debug, PartialEq, Clone)]
 pub struct PrimaryKeyDefinition {
     pub name_in_db: Option<String>,
-    pub name_in_db_is_default: bool,
+    pub name_in_db_matches_default: bool,
     pub name_in_client: Option<String>,
     pub fields: Vec<String>,
 }
@@ -67,7 +67,7 @@ impl PrimaryKeyDefinition {
         let name_in_db_is_default = name_in_db == Some(default_name);
         PrimaryKeyDefinition {
             name_in_db,
-            name_in_db_is_default,
+            name_in_db_matches_default: name_in_db_is_default,
             name_in_client: self.name_in_client.clone(),
 
             fields: self.fields.clone(),

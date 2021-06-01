@@ -96,7 +96,7 @@ mod tests {
                         is_unique: None,
                         primary_key: Some(PrimaryKeyDefinition {
                             name_in_client: None,
-                            name_in_db_is_default: false,
+                            name_in_db_matches_default: false,
                             name_in_db: None,
                             fields: vec!["required".to_string()],
                         }),
@@ -116,7 +116,7 @@ mod tests {
                 indices: vec![],
                 primary_key: Some(PrimaryKeyDefinition {
                     name_in_db: None,
-                    name_in_db_is_default: false,
+                    name_in_db_matches_default: false,
                     name_in_client: None,
                     fields: vec!["required".to_string()],
                 }),
@@ -195,7 +195,7 @@ mod tests {
                         is_unique: None,
                         primary_key: Some(PrimaryKeyDefinition {
                             name_in_client: None,
-                            name_in_db_is_default: false,
+                            name_in_db_matches_default: false,
                             name_in_db: None,
                             fields: vec!["primary".to_string()],
                         }),
@@ -209,7 +209,7 @@ mod tests {
                     indices: vec![],
                     primary_key: Some(PrimaryKeyDefinition {
                         name_in_db: None,
-                        name_in_db_is_default: false,
+                        name_in_db_matches_default: false,
                         name_in_client: None,
                         fields: vec!["primary".to_string()],
                     }),
@@ -238,7 +238,7 @@ mod tests {
                         is_unique: None,
                         primary_key: Some(PrimaryKeyDefinition {
                             name_in_client: None,
-                            name_in_db_is_default: false,
+                            name_in_db_matches_default: false,
                             name_in_db: None,
                             fields: vec!["primary".to_string()],
                         }),
@@ -252,7 +252,7 @@ mod tests {
                     indices: vec![],
                     primary_key: Some(PrimaryKeyDefinition {
                         name_in_db: None,
-                        name_in_db_is_default: false,
+                        name_in_db_matches_default: false,
                         name_in_client: None,
                         fields: vec!["primary".to_string()],
                     }),
@@ -281,7 +281,7 @@ mod tests {
                         is_unique: None,
                         primary_key: Some(PrimaryKeyDefinition {
                             name_in_client: None,
-                            name_in_db_is_default: false,
+                            name_in_db_matches_default: false,
                             name_in_db: None,
                             fields: vec!["primary".to_string()],
                         }),
@@ -295,7 +295,7 @@ mod tests {
                     indices: vec![],
                     primary_key: Some(PrimaryKeyDefinition {
                         name_in_db: None,
-                        name_in_db_is_default: false,
+                        name_in_db_matches_default: false,
                         name_in_client: None,
                         fields: vec!["primary".to_string()],
                     }),
@@ -499,7 +499,7 @@ mod tests {
                             is_unique: None,
                             primary_key: Some(PrimaryKeyDefinition {
                                 name_in_client: None,
-                                name_in_db_is_default: false,
+                                name_in_db_matches_default: false,
                                 name_in_db: None,
                                 fields: vec!["id".to_string()],
                             }),
@@ -537,7 +537,7 @@ mod tests {
                     indices: vec![],
                     primary_key: Some(PrimaryKeyDefinition {
                         name_in_client: None,
-                        name_in_db_is_default: false,
+                        name_in_db_matches_default: false,
                         name_in_db: None,
                         fields: vec!["id".to_string()],
                     }),
@@ -566,7 +566,7 @@ mod tests {
                             is_unique: None,
                             primary_key: Some(PrimaryKeyDefinition {
                                 name_in_client: None,
-                                name_in_db_is_default: false,
+                                name_in_db_matches_default: false,
                                 name_in_db: None,
                                 fields: vec!["id".to_string()],
                             }),
@@ -634,7 +634,7 @@ mod tests {
                     indices: vec![],
                     primary_key: Some(PrimaryKeyDefinition {
                         name_in_client: None,
-                        name_in_db_is_default: false,
+                        name_in_db_matches_default: false,
                         name_in_db: None,
                         fields: vec!["id".to_string()],
                     }),
@@ -771,7 +771,7 @@ mod tests {
                         is_unique: None,
                         primary_key: Some(PrimaryKeyDefinition {
                             name_in_client: None,
-                            name_in_db_is_default: false,
+                            name_in_db_matches_default: false,
                             name_in_db: None,
                             fields: vec!["id".to_string()],
                         }),
@@ -816,7 +816,7 @@ mod tests {
                 }],
                 primary_key: Some(PrimaryKeyDefinition {
                     name_in_client: None,
-                    name_in_db_is_default: false,
+                    name_in_db_matches_default: false,
                     name_in_db: None,
                     fields: vec!["id".to_string()],
                 }),
@@ -914,7 +914,7 @@ mod tests {
                             is_unique: None,
                             primary_key: Some(PrimaryKeyDefinition {
                                 name_in_client: None,
-                                name_in_db_is_default: false,
+                                name_in_db_matches_default: false,
                                 name_in_db: None,
                                 fields: vec!["id".to_string()],
                             }),
@@ -952,7 +952,7 @@ mod tests {
                     indices: vec![],
                     primary_key: Some(PrimaryKeyDefinition {
                         name_in_client: None,
-                        name_in_db_is_default: false,
+                        name_in_db_matches_default: false,
                         name_in_db: None,
                         fields: vec!["id".to_string()],
                     }),
@@ -981,7 +981,7 @@ mod tests {
                             is_unique: None,
                             primary_key: Some(PrimaryKeyDefinition {
                                 name_in_client: None,
-                                name_in_db_is_default: false,
+                                name_in_db_matches_default: false,
                                 name_in_db: None,
                                 fields: vec!["id".to_string()],
                             }),
@@ -1019,7 +1019,7 @@ mod tests {
                     indices: vec![],
                     primary_key: Some(PrimaryKeyDefinition {
                         name_in_client: None,
-                        name_in_db_is_default: false,
+                        name_in_db_matches_default: false,
                         name_in_db: None,
                         fields: vec!["id".to_string()],
                     }),

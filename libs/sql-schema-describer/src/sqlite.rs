@@ -426,8 +426,6 @@ impl SqlSchemaDescriber {
         trace!("Got indices description results: {:?}", result_set);
 
         let mut indices = Vec::new();
-
-        //todo this is currently unsorted? maybe sort by sequence number to fix tests?
         let filtered_rows = result_set
             .into_iter()
             // Exclude primary keys, they are inferred separately.

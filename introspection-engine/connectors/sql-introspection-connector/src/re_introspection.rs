@@ -91,7 +91,7 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family
             }
         }
 
-        //change field name
+        //change primary key names
         for changed_primary_key_name in &changed_primary_key_names {
             let pk = new_data_model
                 .find_model_mut(&changed_primary_key_name.0.model)

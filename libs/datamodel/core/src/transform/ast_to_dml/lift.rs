@@ -91,7 +91,7 @@ impl<'a> LiftAstToDml<'a> {
                         if pk.name_in_db.is_none() && supports_named_pks {
                             pk.name_in_db = Some(default_name.clone())
                         }
-                        pk.name_in_db_is_default = pk.name_in_db == Some(default_name);
+                        pk.name_in_db_matches_default = pk.name_in_db == Some(default_name);
                     }
                 }
             }

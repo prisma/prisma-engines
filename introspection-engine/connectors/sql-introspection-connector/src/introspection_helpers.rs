@@ -279,7 +279,7 @@ pub(crate) fn is_id(column: &Column, table: &Table, connector: &dyn Connector) -
             let default_name = ConstraintNames::primary_key_name(&table.name, Some(connector));
             Some(PrimaryKeyDefinition {
                 name_in_client: None,
-                name_in_db_is_default: pk.constraint_name == Some(default_name),
+                name_in_db_matches_default: pk.constraint_name == Some(default_name),
                 name_in_db: pk.constraint_name.clone(),
                 fields: pk.columns.clone(),
             })

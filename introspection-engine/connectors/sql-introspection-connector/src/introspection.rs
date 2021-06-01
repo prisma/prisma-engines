@@ -67,7 +67,7 @@ pub fn introspect(
             //and re-introspection will keep them.
             PrimaryKeyDefinition {
                 name_in_client: None,
-                name_in_db_is_default: pk.constraint_name == Some(default_name),
+                name_in_db_matches_default: pk.constraint_name == Some(default_name),
                 name_in_db: pk.constraint_name.clone(),
                 fields: pk.columns.clone(),
             }

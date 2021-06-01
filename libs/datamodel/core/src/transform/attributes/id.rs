@@ -22,7 +22,7 @@ impl AttributeValidator<dml::Field> for IdAttributeValidator {
             sf.primary_key = Some(PrimaryKeyDefinition {
                 // if this is none, the default name needs to be set one level higher since we do not have the model name here -.-
                 name_in_db,
-                name_in_db_is_default: false,
+                name_in_db_matches_default: false,
                 name_in_client: None,
                 fields: vec![sf.name.clone()],
             });
@@ -42,7 +42,7 @@ impl AttributeValidator<dml::Field> for IdAttributeValidator {
     fn serialize(&self, field: &dml::Field, _datamodel: &dml::Datamodel) -> Vec<ast::Attribute> {
         if let dml::Field::ScalarField(sf) = field {
             if let Some(pk) = &sf.primary_key {
-                let arguments = if !pk.name_in_db_is_default && pk.name_in_db.is_some() {
+                let arguments = if !pk.name_in_db_matches_default && pk.name_in_db.is_some() {
                     vec![ast::Argument::new_unnamed(ast::Expression::StringValue(
                         pk.name_in_db.clone().unwrap(),
                         ast::Span::empty(),
@@ -105,7 +105,7 @@ impl AttributeValidator<dml::Model> for ModelLevelIdAttributeValidator {
 
         obj.primary_key = Some(PrimaryKeyDefinition {
             name_in_client,
-            name_in_db_is_default: false,
+            name_in_db_matches_default: false,
             name_in_db,
             fields: fields.clone(),
         });
@@ -186,7 +186,7 @@ impl AttributeValidator<dml::Model> for ModelLevelIdAttributeValidator {
                 }
 
                 if let Some(name) = &pk.name_in_db {
-                    if !pk.name_in_db_is_default {
+                    if !pk.name_in_db_matches_default {
                         args.push(ast::Argument::new(
                             "map",
                             ast::Expression::StringValue(name.to_string(), ast::Span::empty()),

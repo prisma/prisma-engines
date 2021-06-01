@@ -321,10 +321,11 @@ pub struct ScalarField {
     /// The default value.
     pub default_value: Option<DefaultValue>,
 
+    //todo idealy we get rid of this on the field level and only have it on the model level or only have it as a bool
     /// Indicates if the field is unique.
     pub is_unique: Option<IndexDefinition>,
 
-    //todo make private??
+    //todo idealy we get rid of this on the field level and only have it on the model level  or only have it as a bool
     /// The Primary Key definition if the PK covers only this field .
     pub primary_key: Option<PrimaryKeyDefinition>,
 
