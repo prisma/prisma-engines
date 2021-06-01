@@ -1,5 +1,4 @@
 use crate::ConnectorResult;
-use serde::{Deserialize, Serialize};
 
 /// Implementors of this trait are responsible for checking whether a migration
 /// could lead to data loss, or if it would be potentially unexecutable.
@@ -50,7 +49,7 @@ impl DestructiveChangeDiagnostics {
 
 /// A warning emitted by [DestructiveChangeChecker](trait.DestructiveChangeChecker.html). Warnings will
 /// prevent a migration from being applied, unless the `force` flag is passed.
-#[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
+#[derive(Debug, Clone)]
 pub struct MigrationWarning {
     /// The user-facing warning description.
     pub description: String,
@@ -59,7 +58,7 @@ pub struct MigrationWarning {
 }
 
 /// An unexecutable migration step detected by the DestructiveChangeChecker.
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Debug)]
 pub struct UnexecutableMigration {
     /// The user-facing problem description.
     pub description: String,
