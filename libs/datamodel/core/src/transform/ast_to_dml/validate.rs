@@ -100,37 +100,6 @@ impl<'a> Validator<'a> {
             if let Err(the_errors) = self.validate_referenced_fields_for_relation(schema, ast_model, model) {
                 errors_for_model.extend(the_errors);
             }
-            if let Err(ref mut the_errors) = self.validate_field_arities(ast_model, model) {
-                errors_for_model.append(the_errors);
-            }
-
-            if let Err(ref mut the_errors) = self.validate_field_types(ast_model, model) {
-                errors_for_model.append(the_errors);
-            }
-
-            if let Err(ref mut the_errors) = self.validate_field_connector_specific(ast_model, model) {
-                errors_for_model.append(the_errors)
-            }
-
-            if let Err(ref mut the_errors) = self.validate_model_connector_specific(ast_model, model) {
-                errors_for_model.append(the_errors)
-            }
-
-            if let Err(ref mut the_errors) = self.validate_enum_default_values(schema, ast_model, model) {
-                errors_for_model.append(the_errors);
-            }
-
-            if let Err(ref mut the_errors) = self.validate_auto_increment(ast_model, model) {
-                errors_for_model.append(the_errors);
-            }
-
-            if let Err(ref mut the_errors) = self.validate_base_fields_for_relation(ast_model, model) {
-                errors_for_model.append(the_errors);
-            }
-
-            if let Err(ref mut the_errors) = self.validate_referenced_fields_for_relation(schema, ast_model, model) {
-                errors_for_model.append(the_errors);
-            }
             all_errors.extend(errors_for_model);
         }
 
