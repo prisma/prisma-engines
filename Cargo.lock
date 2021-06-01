@@ -985,11 +985,9 @@ dependencies = [
  "dml",
  "indoc",
  "itertools 0.8.2",
- "lazy_static",
  "mongodb-datamodel-connector",
  "native-types",
  "once_cell",
- "paste",
  "pest",
  "pest_derive",
  "pretty_assertions",
@@ -999,7 +997,6 @@ dependencies = [
  "serde_json",
  "sql-datamodel-connector",
  "thiserror",
- "url 2.2.1",
 ]
 
 [[package]]
@@ -2927,12 +2924,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "paste"
-version = "1.0.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "acbf547ad0c65e31259204bd90935776d1c693cec2f4ff7abb7a1bbbd40dfe58"
-
-[[package]]
 name = "pbkdf2"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4098,7 +4089,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e0bccbcf40c8938196944a3da0e133e031a33f4d6b72db3bda3cc556e361905d"
 dependencies = [
  "lazy_static",
- "parking_lot 0.10.2",
+ "parking_lot 0.11.1",
  "serial_test_derive",
 ]
 
