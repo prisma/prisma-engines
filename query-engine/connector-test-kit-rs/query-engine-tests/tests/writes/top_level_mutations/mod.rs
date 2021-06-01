@@ -9,3 +9,4 @@ mod insert_null_in_required_field;
 mod non_embedded_upsert;
 mod update;
 mod update_many;
+mod upsert;
