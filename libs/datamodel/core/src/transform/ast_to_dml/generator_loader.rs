@@ -73,7 +73,10 @@ impl GeneratorLoader {
 
         let mut properties: HashMap<String, String> = HashMap::new();
 
-        let binary_targets = match args.get(BINARY_TARGETS_KEY).map(|v| v.as_array().to_str_vec()) {
+        let binary_targets = match args
+            .get(BINARY_TARGETS_KEY)
+            .map(|v| v.as_array().to_string_from_env_var_vec())
+        {
             Some(Ok(val)) => val,
             Some(Err(err)) => {
                 diagnostics.push_error(err);
