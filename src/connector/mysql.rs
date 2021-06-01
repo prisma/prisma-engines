@@ -2,6 +2,7 @@ mod conversion;
 mod error;
 
 use async_trait::async_trait;
+use lru_cache::LruCache;
 use mysql_async::{
     self as my,
     prelude::{Query as _, Queryable as _},
@@ -32,6 +33,7 @@ pub struct Mysql {
     pub(crate) url: MysqlUrl,
     socket_timeout: Option<Duration>,
     is_healthy: AtomicBool,
+    statement_cache: Mutex<LruCache<String, my::Statement>>,
 }
 
 /// Wraps a connection url and exposes the parsing logic used by quaint, including default values.
@@ -66,12 +68,6 @@ impl MysqlUrl {
                 self.url.username().into()
             }
         }
-    }
-
-    /// The number of statements to cache. If not set, uses `mysql_async`
-    /// default (32). Setting to 0 disables cache.
-    pub fn statement_cache_size(&self) -> Option<usize> {
-        self.query_params.statement_cache_size
     }
 
     /// The percent-decoded database password.
@@ -134,6 +130,14 @@ impl MysqlUrl {
         self.query_params.max_idle_connection_lifetime
     }
 
+    fn statement_cache_size(&self) -> usize {
+        self.query_params.statement_cache_size
+    }
+
+    pub(crate) fn cache(&self) -> LruCache<String, my::Statement> {
+        LruCache::new(self.query_params.statement_cache_size)
+    }
+
     fn parse_query_params(url: &Url) -> Result<MysqlUrlQueryParams, Error> {
         let mut ssl_opts = my::SslOpts::default();
         ssl_opts = ssl_opts.with_danger_accept_invalid_certs(true);
@@ -146,7 +150,7 @@ impl MysqlUrl {
         let mut pool_timeout = Some(Duration::from_secs(10));
         let mut max_connection_lifetime = None;
         let mut max_idle_connection_lifetime = Some(Duration::from_secs(300));
-        let mut statement_cache_size = Some(1000);
+        let mut statement_cache_size = 1000;
 
         for (k, v) in url.query_pairs() {
             match k.as_ref() {
@@ -158,10 +162,9 @@ impl MysqlUrl {
                     connection_limit = Some(as_int);
                 }
                 "statement_cache_size" => {
-                    let as_int = v
+                    statement_cache_size = v
                         .parse()
                         .map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
-                    statement_cache_size = Some(as_int);
                 }
                 "sslcert" => {
                     use_ssl = true;
@@ -267,7 +270,7 @@ impl MysqlUrl {
 
     pub(crate) fn to_opts_builder(&self) -> my::OptsBuilder {
         let mut config = my::OptsBuilder::default()
-            .stmt_cache_size(self.statement_cache_size())
+            .stmt_cache_size(Some(0))
             .user(Some(self.username()))
             .pass(self.password())
             .db_name(Some(self.dbname()));
@@ -302,7 +305,7 @@ pub(crate) struct MysqlUrlQueryParams {
     pool_timeout: Option<Duration>,
     max_connection_lifetime: Option<Duration>,
     max_idle_connection_lifetime: Option<Duration>,
-    statement_cache_size: Option<usize>,
+    statement_cache_size: usize,
 }
 
 impl Mysql {
@@ -314,21 +317,94 @@ impl Mysql {
         Ok(Self {
             socket_timeout: url.query_params.socket_timeout,
             conn: Mutex::new(conn),
+            statement_cache: Mutex::new(url.cache()),
             url,
             is_healthy: AtomicBool::new(true),
         })
     }
 
-    async fn perform_io<F, T>(&self, fut: F) -> crate::Result<T>
+    async fn perform_io<F, U, T>(&self, op: U) -> crate::Result<T>
     where
-        F: Future<Output = Result<T, my::Error>>,
+        F: Future<Output = crate::Result<T>>,
+        U: FnOnce() -> F,
     {
-        match super::timeout::socket(self.socket_timeout, fut).await {
+        match super::timeout::socket(self.socket_timeout, op()).await {
             Err(e) if e.is_closed() => {
                 self.is_healthy.store(false, Ordering::SeqCst);
                 Err(e)
             }
-            res => res,
+            res => Ok(res?),
+        }
+    }
+
+    async fn prepared<F, U, T>(&self, sql: &str, op: U) -> crate::Result<T>
+    where
+        F: Future<Output = crate::Result<T>>,
+        U: Fn(my::Statement) -> F,
+    {
+        if self.url.statement_cache_size() == 0 {
+            self.perform_io(|| async move {
+                let stmt = {
+                    let mut conn = self.conn.lock().await;
+                    conn.prep(sql).await?
+                };
+
+                let res = op(stmt.clone()).await;
+
+                {
+                    let mut conn = self.conn.lock().await;
+                    conn.close(stmt).await?;
+                }
+
+                res
+            })
+            .await
+        } else {
+            self.perform_io(|| async move {
+                let stmt = self.fetch_cached(sql).await?;
+                op(stmt).await
+            })
+            .await
+        }
+    }
+
+    #[tracing::instrument(skip(self))]
+    async fn fetch_cached(&self, sql: &str) -> crate::Result<my::Statement> {
+        let mut cache = self.statement_cache.lock().await;
+        let capacity = cache.capacity();
+        let stored = cache.len();
+
+        match cache.get_mut(sql) {
+            Some(stmt) => {
+                tracing::trace!(
+                    message = "CACHE HIT!",
+                    query = sql,
+                    capacity = capacity,
+                    stored = stored,
+                );
+
+                Ok(stmt.clone()) // arc'd
+            }
+            None => {
+                tracing::trace!(
+                    message = "CACHE MISS!",
+                    query = sql,
+                    capacity = capacity,
+                    stored = stored,
+                );
+
+                let mut conn = self.conn.lock().await;
+                if cache.capacity() == cache.len() {
+                    if let Some((_, stmt)) = cache.remove_lru() {
+                        conn.close(stmt).await?;
+                    }
+                }
+
+                let stmt = conn.prep(sql).await?;
+                cache.insert(sql.to_string(), stmt.clone());
+
+                Ok(stmt)
+            }
         }
     }
 }
@@ -350,27 +426,25 @@ impl Queryable for Mysql {
     #[tracing::instrument(skip(self, params))]
     async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet> {
         metrics::query("mysql.query_raw", sql, params, move || async move {
-            let mut conn = self.conn.lock().await;
-            let stmt = self.perform_io(conn.prep(sql)).await?;
+            self.prepared(sql, |stmt| async move {
+                let mut conn = self.conn.lock().await;
+                let rows: Vec<my::Row> = conn.exec(&stmt, conversion::conv_params(params)?).await?;
+                let columns = stmt.columns().iter().map(|s| s.name_str().into_owned()).collect();
 
-            let rows: Vec<my::Row> = self
-                .perform_io(conn.exec(&stmt, conversion::conv_params(params)?))
-                .await?;
+                let last_id = conn.last_insert_id();
+                let mut result_set = ResultSet::new(columns, Vec::new());
 
-            let columns = stmt.columns().iter().map(|s| s.name_str().into_owned()).collect();
+                for mut row in rows {
+                    result_set.rows.push(row.take_result_row()?);
+                }
 
-            let last_id = conn.last_insert_id();
-            let mut result_set = ResultSet::new(columns, Vec::new());
+                if let Some(id) = last_id {
+                    result_set.set_last_insert_id(id);
+                };
 
-            for mut row in rows {
-                result_set.rows.push(row.take_result_row()?);
-            }
-
-            if let Some(id) = last_id {
-                result_set.set_last_insert_id(id);
-            };
-
-            Ok(result_set)
+                Ok(result_set)
+            })
+            .await
         })
         .await
     }
@@ -378,11 +452,13 @@ impl Queryable for Mysql {
     #[tracing::instrument(skip(self, params))]
     async fn execute_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<u64> {
         metrics::query("mysql.execute_raw", sql, params, move || async move {
-            let mut conn = self.conn.lock().await;
-            self.perform_io(conn.exec_drop(sql, conversion::conv_params(params)?))
-                .await?;
+            self.prepared(sql, |stmt| async move {
+                let mut conn = self.conn.lock().await;
+                conn.exec_drop(stmt, conversion::conv_params(params)?).await?;
 
-            Ok(conn.affected_rows())
+                Ok(conn.affected_rows())
+            })
+            .await
         })
         .await
     }
@@ -390,9 +466,8 @@ impl Queryable for Mysql {
     #[tracing::instrument(skip(self))]
     async fn raw_cmd(&self, cmd: &str) -> crate::Result<()> {
         metrics::query("mysql.raw_cmd", cmd, &[], move || async move {
-            let mut conn = self.conn.lock().await;
-
-            let fut = async {
+            self.perform_io(|| async move {
+                let mut conn = self.conn.lock().await;
                 let mut result = cmd.run(&mut *conn).await?;
 
                 loop {
@@ -405,11 +480,8 @@ impl Queryable for Mysql {
                 }
 
                 Ok(())
-            };
-
-            self.perform_io(fut).await?;
-
-            Ok(())
+            })
+            .await
         })
         .await
     }
