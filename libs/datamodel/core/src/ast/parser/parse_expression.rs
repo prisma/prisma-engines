@@ -1,9 +1,3 @@
-#![allow(clippy::trivial_regex)]
-
-use once_cell::sync::Lazy;
-use regex::Regex;
-use std::borrow::Cow;
-
 use super::helpers::{parsing_catch_all, Token, TokenExtensions};
 use super::Rule;
 use crate::ast::*;
@@ -66,29 +60,34 @@ pub fn parse_arg_value(token: &Token<'_>) -> Expression {
 
 fn parse_string_literal(token: &Token<'_>) -> String {
     let current = token.first_relevant_child();
-    match current.as_rule() {
-        Rule::string_content => unescape_string_literal(current.as_str()).into_owned(),
-        _ => unreachable!(
-            "Encountered impossible string content during parsing: {:?}",
-            current.tokens()
-        ),
-    }
-}
+    assert!(current.as_rule() == Rule::string_content);
 
-#[allow(clippy::trivial_regex)]
-fn unescape_string_literal(original: &str) -> Cow<'_, str> {
-    static STRING_LITERAL_UNESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\\(")"#).unwrap());
-    static STRING_LITERAL_BACKSLASHES_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\\\\"#).unwrap());
-    static STRING_LITERAL_NEWLINE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\\n"#).unwrap());
+    // this will overallocate a bit for strings with escaped characters, but it
+    // shouldn't make a dramatic difference.
+    let mut out = String::with_capacity(current.as_str().len());
 
-    match STRING_LITERAL_UNESCAPE_RE.replace_all(original, "\"") {
-        Cow::Owned(s) => match STRING_LITERAL_NEWLINE_RE.replace_all(&s, "\n") {
-            Cow::Owned(s) => STRING_LITERAL_BACKSLASHES_RE.replace_all(&s, "\\").into_owned().into(),
-            Cow::Borrowed(s) => STRING_LITERAL_BACKSLASHES_RE.replace_all(s, "\\").into_owned().into(),
-        },
-        Cow::Borrowed(s) => match STRING_LITERAL_NEWLINE_RE.replace_all(s, "\n") {
-            Cow::Owned(s) => STRING_LITERAL_BACKSLASHES_RE.replace_all(&s, "\\").into_owned().into(),
-            Cow::Borrowed(s) => STRING_LITERAL_BACKSLASHES_RE.replace_all(s, "\\").into_owned().into(),
-        },
+    for pair in current.into_inner() {
+        match pair.as_rule() {
+            Rule::string_raw => {
+                out.push_str(pair.as_str());
+            }
+            Rule::string_escape => {
+                let escaped = pair.into_inner().next().unwrap();
+                assert!(escaped.as_rule() == Rule::string_escaped_predefined);
+
+                let unescaped = match escaped.as_str() {
+                    "n" => "\n",
+                    "r" => "\r",
+                    "t" => "\t",
+                    "0" => "\0",
+                    other => other,
+                };
+
+                out.push_str(unescaped);
+            }
+            _ => unreachable!("Encountered impossible string content during parsing: {:?}", pair),
+        }
     }
+
+    out
 }
