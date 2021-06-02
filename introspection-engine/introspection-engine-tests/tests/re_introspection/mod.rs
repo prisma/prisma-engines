@@ -122,7 +122,10 @@ async fn mapped_model_and_field_name(api: &TestApi) -> TestResult {
                 t.add_constraint("Post_pkey", types::primary_constraint(&["id"]));
                 t.add_column("user_id", types::integer().nullable(false));
                 t.add_index("Post_user_id_idx", types::index(&["user_id"]));
-                t.add_foreign_key(&["user_id"], "User", &["id"]);
+                t.add_constraint(
+                    "Post_user_id_fkey",
+                    types::foreign_constraint(&["user_id"], "User", &["id"], None, None),
+                );
             });
 
             migration.create_table("Unrelated", |t| {

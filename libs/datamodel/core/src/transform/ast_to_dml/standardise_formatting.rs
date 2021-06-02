@@ -213,6 +213,8 @@ impl StandardiserForFormatting {
                         references: vec![],
                         name: rel_info.name.clone(),
                         on_delete: OnDeleteStrategy::None,
+                        fk_name: None,
+                        fk_name_matches_default: false,
                     };
                     let mut opposite_relation_field =
                         dml::RelationField::new_generated(&model.name, relation_info, false);
@@ -290,6 +292,8 @@ impl StandardiserForFormatting {
                         references: unique_criteria_field_names,
                         name: rel_info.name.clone(),
                         on_delete: OnDeleteStrategy::None,
+                        fk_name: None,
+                        fk_name_matches_default: false,
                     };
 
                     let is_required = all_existing_underlying_fields_on_opposite_model_are_required

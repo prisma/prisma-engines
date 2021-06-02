@@ -51,7 +51,7 @@ pub fn introspect(
         for foreign_key in &foreign_keys_copy {
             version_check.has_inline_relations(table);
             version_check.uses_on_delete(foreign_key, table);
-            let relation_field = calculate_relation_field(schema, table, foreign_key)?;
+            let relation_field = calculate_relation_field(schema, table, foreign_key, connector.as_ref())?;
             model.add_field(Field::RelationField(relation_field));
         }
 

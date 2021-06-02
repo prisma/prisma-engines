@@ -33,6 +33,19 @@ impl AttributeValidator<dml::Field> for RelationAttributeValidator {
                 rf.relation_info.fields = base_fields.as_array().to_literal_vec()?;
             }
 
+            if let Ok(map_arg) = args.default_arg("map") {
+                let map = map_arg.as_str()?;
+
+                if map.is_empty() {
+                    return self.new_attribute_validation_error(
+                        "A relation cannot have an empty map property.",
+                        map_arg.span(),
+                    );
+                }
+
+                rf.relation_info.fk_name = Some(map.to_owned());
+            }
+
             Ok(())
         } else {
             self.new_attribute_validation_error("Invalid field type, not a relation.", args.span())
@@ -91,6 +104,12 @@ impl AttributeValidator<dml::Field> for RelationAttributeValidator {
                     "onDelete",
                     &relation_info.on_delete.to_string(),
                 ));
+            }
+
+            if let Some(name) = &relation_info.fk_name {
+                if !relation_info.fk_name_matches_default {
+                    args.push(ast::Argument::new_string("map", name));
+                }
             }
 
             if !args.is_empty() {

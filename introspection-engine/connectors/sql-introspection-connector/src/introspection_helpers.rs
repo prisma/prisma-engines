@@ -107,6 +107,8 @@ pub fn calculate_many_to_many_field(
         to: opposite_foreign_key.referenced_table.clone(),
         references: opposite_foreign_key.referenced_columns.clone(),
         on_delete: OnDeleteStrategy::None,
+        fk_name: None,
+        fk_name_matches_default: false,
     };
 
     let basename = opposite_foreign_key.referenced_table.clone();
@@ -184,8 +186,12 @@ pub(crate) fn calculate_relation_field(
     schema: &SqlSchema,
     table: &Table,
     foreign_key: &ForeignKey,
+    connector: &dyn Connector,
 ) -> Result<RelationField, SqlError> {
     debug!("Handling foreign key  {:?}", foreign_key);
+
+    let fk_default_name =
+        ConstraintNames::foreign_key_constraint_name(&table.name.clone(), foreign_key.columns.clone(), Some(connector));
 
     let relation_info = RelationInfo {
         name: calculate_relation_name(schema, foreign_key, table)?,
@@ -193,6 +199,8 @@ pub(crate) fn calculate_relation_field(
         to: foreign_key.referenced_table.clone(),
         references: foreign_key.referenced_columns.clone(),
         on_delete: OnDeleteStrategy::None,
+        fk_name: foreign_key.constraint_name.clone(),
+        fk_name_matches_default: Some(fk_default_name) == foreign_key.constraint_name,
     };
 
     let columns: Vec<&Column> = foreign_key
@@ -227,6 +235,8 @@ pub(crate) fn calculate_backrelation_field(
                 fields: vec![],
                 references: vec![],
                 on_delete: OnDeleteStrategy::None,
+                fk_name: None,
+                fk_name_matches_default: false,
             };
 
             // unique or id

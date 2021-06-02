@@ -16,7 +16,10 @@ async fn a_table_without_uniques_should_ignore(api: &TestApi) -> TestResult {
                 t.add_column("id", types::integer());
                 t.add_column("user_id", types::boolean().nullable(false));
                 t.add_index("Post_user_id_idx", types::index(&["user_id"]));
-                t.add_foreign_key(&["user_id"], "User", &["id"]);
+                t.add_constraint(
+                    "Post_user_id_fkey",
+                    types::foreign_constraint(&["user_id"], "User", &["id"], None, None),
+                );
             });
         })
         .await?;

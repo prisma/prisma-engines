@@ -66,8 +66,23 @@ impl ConstraintNames {
         }
     }
 
-    pub fn foreign_key_constraint_name(table_name: &str, column_names: Vec<String>) -> String {
-        format!("{}_{}_fkey", table_name, column_names.join("_"))
+    pub fn foreign_key_constraint_name(
+        table_name: &str,
+        column_names: Vec<String>,
+        connector: Option<&dyn Connector>,
+    ) -> String {
+        let fk_suffix = "_fkey";
+        let limit = connector.map(|c| c.constraint_name_length()).unwrap_or(1000);
+
+        let joined = format!("{}_{}", table_name, column_names.join("_"));
+
+        let trimmed = if joined.len() >= limit - 5 {
+            joined.split_at(limit - 5).0
+        } else {
+            joined.as_str()
+        };
+
+        format!("{}{}", trimmed, fk_suffix)
     }
 
     pub fn default_constraint_name(table_name: &str, column_name: &str) -> String {

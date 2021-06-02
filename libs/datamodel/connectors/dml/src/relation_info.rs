@@ -1,4 +1,8 @@
 /// Holds information about a relation field.
+/// todo once we handle M2M cleanly this should really become more typed
+/// both relation fields of a relation have a Relationinfo but only one has
+/// a foreign key. only that side needs fields, references, onDelete and fk_name
+/// and for that side none of these are optional
 #[derive(Debug, Clone)]
 pub struct RelationInfo {
     /// The target model of the relation.
@@ -12,6 +16,10 @@ pub struct RelationInfo {
     /// A strategy indicating what happens when
     /// a related node is deleted.
     pub on_delete: OnDeleteStrategy,
+    /// Foreign Key Constraint Name if there is one
+    pub fk_name: Option<String>,
+    /// Whether the Foreign Key Name matches the default for the db
+    pub fk_name_matches_default: bool,
 }
 
 impl PartialEq for RelationInfo {
@@ -34,6 +42,8 @@ impl RelationInfo {
             references: Vec::new(),
             name: String::new(),
             on_delete: OnDeleteStrategy::None,
+            fk_name: None,
+            fk_name_matches_default: false,
         }
     }
 }
