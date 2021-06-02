@@ -1,6 +1,6 @@
 use super::MigrationCommand;
 use crate::{parse_schema, CoreResult};
-use migration_connector::{list_migrations, MigrationConnector};
+use migration_connector::{list_migrations, DiffTarget, MigrationConnector};
 use serde::{Deserialize, Serialize};
 
 /// Development command for migrations. Evaluate the data loss induced by the
@@ -51,7 +51,6 @@ impl MigrationCommand for EvaluateDataLoss {
     type Output = EvaluateDataLossOutput;
 
     async fn execute<C: MigrationConnector>(input: &Self::Input, connector: &C) -> CoreResult<Self::Output> {
-        let inferrer = connector.database_migration_inferrer();
         let applier = connector.database_migration_step_applier();
         let checker = connector.destructive_change_checker();
 
@@ -60,8 +59,11 @@ impl MigrationCommand for EvaluateDataLoss {
         let migrations_from_directory = list_migrations(input.migrations_directory_path.as_ref())?;
         let target_schema = parse_schema(&input.prisma_schema)?;
 
-        let migration = inferrer
-            .infer_next_migration(&migrations_from_directory, (&target_schema.0, &target_schema.1))
+        let migration = connector
+            .diff(
+                DiffTarget::Migrations(&migrations_from_directory),
+                DiffTarget::Datamodel((&target_schema.0, &target_schema.1)),
+            )
             .await?;
 
         let rendered_migration_steps = applier

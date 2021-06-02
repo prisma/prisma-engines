@@ -3,7 +3,8 @@ use std::path::Path;
 use super::MigrationCommand;
 use crate::CoreResult;
 use migration_connector::{
-    ConnectorError, MigrationConnector, MigrationDirectory, MigrationRecord, PersistenceNotInitializedError,
+    ConnectorError, DatabaseMigrationMarker, DiffTarget, MigrationConnector, MigrationDirectory, MigrationRecord,
+    PersistenceNotInitializedError,
 };
 use serde::{Deserialize, Serialize};
 
@@ -73,7 +74,6 @@ impl<'a> MigrationCommand for DiagnoseMigrationHistoryCommand {
 
     async fn execute<C: MigrationConnector>(input: &Self::Input, connector: &C) -> CoreResult<Self::Output> {
         let migration_persistence = connector.migration_persistence();
-        let migration_inferrer = connector.database_migration_inferrer();
 
         tracing::debug!("Diagnosing migration history");
 
@@ -137,18 +137,23 @@ impl<'a> MigrationCommand for DiagnoseMigrationHistoryCommand {
 
         let (drift, error_in_unapplied_migration) = {
             if input.opt_in_to_shadow_database {
-                let drift = match migration_inferrer.calculate_drift(&applied_migrations).await {
-                    Ok(Some(rollback)) => Some(DriftDiagnostic::DriftDetected { rollback }),
+                let drift = match connector
+                    .diff(DiffTarget::Database, DiffTarget::Migrations(&applied_migrations))
+                    .await
+                    .map(|mig| if mig.is_empty() { None } else { Some(mig) })
+                {
+                    Ok(Some(rollback)) => Some(DriftDiagnostic::DriftDetected {
+                        rollback: connector
+                            .database_migration_step_applier()
+                            .render_script(&rollback, &connector.destructive_change_checker().pure_check(&rollback)),
+                    }),
                     Err(error) => Some(DriftDiagnostic::MigrationFailedToApply { error }),
                     _ => None,
                 };
 
                 let error_in_unapplied_migration =
                     if !matches!(drift, Some(DriftDiagnostic::MigrationFailedToApply { .. })) {
-                        migration_inferrer
-                            .validate_migrations(&migrations_from_filesystem)
-                            .await
-                            .err()
+                        connector.validate_migrations(&migrations_from_filesystem).await.err()
                     } else {
                         None
                     };
