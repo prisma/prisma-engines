@@ -49,9 +49,7 @@ impl AttributeValidator<dml::Field> for RelationAttributeValidator {
     fn serialize(&self, field: &dml::Field, datamodel: &dml::Datamodel) -> Vec<ast::Attribute> {
         if let dml::Field::RelationField(rf) = field {
             let mut args = Vec::new();
-
             let relation_info = &rf.relation_info;
-
             let parent_model = datamodel.find_model_by_relation_field_ref(rf).unwrap();
 
             let related_model = datamodel
@@ -104,15 +102,22 @@ impl AttributeValidator<dml::Field> for RelationAttributeValidator {
             }
 
             if let Some(ref_action) = relation_info.on_delete {
-                let expression = ast::Expression::ConstantValue(ref_action.to_string(), ast::Span::empty());
+                let is_default = rf
+                    .default_on_delete_action()
+                    .map(|default| default == ref_action)
+                    .unwrap_or(false);
 
-                args.push(ast::Argument::new("onDelete", expression));
+                if !is_default {
+                    let expression = ast::Expression::ConstantValue(ref_action.to_string(), ast::Span::empty());
+                    args.push(ast::Argument::new("onDelete", expression));
+                }
             }
 
             if let Some(ref_action) = relation_info.on_update {
-                let expression = ast::Expression::ConstantValue(ref_action.to_string(), ast::Span::empty());
-
-                args.push(ast::Argument::new("onUpdate", expression));
+                if rf.default_on_update_action() != ref_action {
+                    let expression = ast::Expression::ConstantValue(ref_action.to_string(), ast::Span::empty());
+                    args.push(ast::Argument::new("onUpdate", expression));
+                }
             }
 
             if !args.is_empty() {

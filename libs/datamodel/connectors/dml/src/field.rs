@@ -1,8 +1,11 @@
 use super::*;
-use crate::default_value::{DefaultValue, ValueGenerator};
 use crate::native_type_instance::NativeTypeInstance;
 use crate::scalars::ScalarType;
 use crate::traits::{Ignorable, WithDatabaseName, WithName};
+use crate::{
+    default_value::{DefaultValue, ValueGenerator},
+    relation_info::ReferentialAction,
+};
 use std::hash::Hash;
 
 /// Arity of a Field in a Model.
@@ -72,6 +75,10 @@ impl FieldType {
 
     pub fn is_string(&self) -> bool {
         self.scalar_type().map(|st| st.is_string()).unwrap_or(false)
+    }
+
+    pub fn is_enum(&self, name: &str) -> bool {
+        matches!(self, Self::Enum(this) if this == name)
     }
 
     pub fn scalar_type(&self) -> Option<ScalarType> {
@@ -230,7 +237,7 @@ impl WithDatabaseName for Field {
 }
 
 /// Represents a relation field in a model.
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, Clone)]
 pub struct RelationField {
     /// Name of the field.
     pub name: String,
@@ -252,6 +259,45 @@ pub struct RelationField {
 
     /// Indicates if this field has to be ignored by the Client.
     pub is_ignored: bool,
+
+    /// Is `ON DELETE/UPDATE RESTRICT` allowed.
+    pub supports_restrict_action: Option<bool>,
+}
+
+impl PartialEq for RelationField {
+    //ignores the relation name for reintrospection
+    fn eq(&self, other: &Self) -> bool {
+        let this_matches = self.name == other.name
+            && self.arity == other.arity
+            && self.documentation == other.documentation
+            && self.is_generated == other.is_generated
+            && self.is_commented_out == other.is_commented_out
+            && self.is_ignored == other.is_ignored
+            && self.relation_info == other.relation_info;
+
+        let this_on_delete = self.relation_info.on_delete.or_else(|| self.default_on_delete_action());
+
+        let other_on_delete = other
+            .relation_info
+            .on_delete
+            .or_else(|| other.default_on_delete_action());
+
+        let on_delete_matches = this_on_delete == other_on_delete;
+
+        let this_on_update = self
+            .relation_info
+            .on_update
+            .unwrap_or_else(|| self.default_on_update_action());
+
+        let other_on_update = other
+            .relation_info
+            .on_update
+            .unwrap_or_else(|| other.default_on_update_action());
+
+        let on_update_matches = this_on_update == other_on_update;
+
+        this_matches && on_delete_matches && on_update_matches
+    }
 }
 
 impl RelationField {
@@ -265,8 +311,15 @@ impl RelationField {
             is_generated: false,
             is_commented_out: false,
             is_ignored: false,
+            supports_restrict_action: None,
         }
     }
+
+    /// The default `onDelete` can be `Restrict`.
+    pub fn supports_restrict_action(&mut self, value: bool) {
+        self.supports_restrict_action = Some(value);
+    }
+
     /// Creates a new field with the given name and type, marked as generated and optional.
     pub fn new_generated(name: &str, info: RelationInfo, required: bool) -> Self {
         let arity = if required {
@@ -299,6 +352,21 @@ impl RelationField {
 
     pub fn is_optional(&self) -> bool {
         self.arity.is_optional()
+    }
+
+    pub fn default_on_delete_action(&self) -> Option<ReferentialAction> {
+        self.supports_restrict_action.map(|restrict_ok| match self.arity {
+            FieldArity::Required if restrict_ok => ReferentialAction::Restrict,
+            FieldArity::Required => ReferentialAction::NoAction,
+            _ => ReferentialAction::SetNull,
+        })
+    }
+
+    pub fn default_on_update_action(&self) -> ReferentialAction {
+        match self.arity {
+            FieldArity::Required => ReferentialAction::Cascade,
+            _ => ReferentialAction::SetNull,
+        }
     }
 }
 

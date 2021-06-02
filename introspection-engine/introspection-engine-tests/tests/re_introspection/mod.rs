@@ -1752,3 +1752,144 @@ async fn do_not_try_to_keep_custom_many_to_many_self_relation_names(api: &TestAp
 
     Ok(())
 }
+
+#[test_connector(tags(Postgres, Mysql, Sqlite))]
+async fn default_required_actions_with_restrict(api: &TestApi) -> TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("a", |t| {
+                t.add_column("id", types::primary());
+            });
+
+            migration.create_table("b", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("a_id", types::integer().nullable(false));
+                t.inject_custom(
+                    "CONSTRAINT asdf FOREIGN KEY (a_id) REFERENCES a(id) ON DELETE RESTRICT ON UPDATE CASCADE",
+                );
+            });
+        })
+        .await?;
+
+    let extra_index = if api.sql_family().is_mysql() {
+        r#"@@index([a_id], name: "asdf")"#
+    } else {
+        ""
+    };
+
+    let input_dm = formatdoc! {r#"
+        model a {{
+            id Int @id @default(autoincrement())
+            bs b[]
+        }}
+
+        model b {{
+            id Int @id @default(autoincrement())
+            a_id Int
+            a a @relation(fields: [a_id], references: [id])
+            {}
+        }}
+    "#, extra_index};
+
+    api.assert_eq_datamodels(&input_dm, &api.re_introspect(&input_dm).await?);
+
+    Ok(())
+}
+
+#[test_connector(tags(Mssql))]
+async fn default_required_actions_without_restrict(api: &TestApi) -> TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("a", |t| {
+                t.add_column("id", types::primary());
+            });
+
+            migration.create_table("b", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("a_id", types::integer().nullable(false));
+                t.inject_custom(
+                    "CONSTRAINT asdf FOREIGN KEY (a_id) REFERENCES default_required_actions_without_restrict.a(id) ON DELETE NO ACTION ON UPDATE CASCADE",
+                );
+            });
+        })
+        .await?;
+
+    let extra_index = if api.sql_family().is_mysql() {
+        r#"@@index([a_id], name: "asdf")"#
+    } else {
+        ""
+    };
+
+    let input_dm = formatdoc! {r#"
+        model a {{
+            id Int @id @default(autoincrement())
+            bs b[]
+        }}
+
+        model b {{
+            id Int @id @default(autoincrement())
+            a_id Int
+            a a @relation(fields: [a_id], references: [id])
+            {}
+        }}
+    "#, extra_index};
+
+    api.assert_eq_datamodels(&input_dm, &api.re_introspect(&input_dm).await?);
+
+    Ok(())
+}
+
+#[test_connector]
+async fn default_optional_actions(api: &TestApi) -> TestResult {
+    let family = api.sql_family();
+
+    api.barrel()
+        .execute(move |migration| {
+            migration.create_table("a", |t| {
+                t.add_column("id", types::primary());
+            });
+
+            migration.create_table("b", move |t| {
+                t.add_column("id", types::primary());
+                t.add_column("a_id", types::integer().nullable(true));
+
+                match family {
+                    SqlFamily::Mssql => {
+                        t.inject_custom(
+                            "CONSTRAINT asdf FOREIGN KEY (a_id) REFERENCES default_optional_actions.a(id) ON DELETE SET NULL ON UPDATE SET NULL",
+                        );
+                    }
+                    _ => {
+                        t.inject_custom(
+                            "CONSTRAINT asdf FOREIGN KEY (a_id) REFERENCES a(id) ON DELETE SET NULL ON UPDATE SET NULL",
+                        );
+                    }
+                }
+            });
+        })
+        .await?;
+
+    let extra_index = if api.sql_family().is_mysql() {
+        r#"@@index([a_id], name: "asdf")"#
+    } else {
+        ""
+    };
+
+    let input_dm = formatdoc! {r#"
+        model a {{
+            id Int @id @default(autoincrement())
+            bs b[]
+        }}
+
+        model b {{
+            id Int @id @default(autoincrement())
+            a_id Int?
+            a a? @relation(fields: [a_id], references: [id])
+            {}
+        }}
+    "#, extra_index};
+
+    api.assert_eq_datamodels(&input_dm, &api.re_introspect(&input_dm).await?);
+
+    Ok(())
+}

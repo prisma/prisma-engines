@@ -8,6 +8,7 @@ use crate::{
     diagnostics::{DatamodelError, Diagnostics},
 };
 use crate::{dml::ScalarType, Datasource};
+use ::dml::relation_info::ReferentialAction;
 use datamodel_connector::connector_error::{ConnectorError, ErrorKind};
 use itertools::Itertools;
 use once_cell::sync::Lazy;
@@ -157,6 +158,15 @@ impl<'a> LiftAstToDml<'a> {
             FieldType::Relation(info) => {
                 let arity = self.lift_field_arity(&ast_field.arity);
                 let mut field = dml::RelationField::new(&ast_field.name.name, arity, info);
+
+                if let Some(ref source) = self.source {
+                    field.supports_restrict_action(
+                        source
+                            .active_connector
+                            .supports_referential_action(ReferentialAction::Restrict),
+                    );
+                }
+
                 field.documentation = ast_field.documentation.clone().map(|comment| comment.text);
                 Field::RelationField(field)
             }
