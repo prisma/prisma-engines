@@ -3,7 +3,7 @@ extern crate proc_macro;
 use proc_macro::TokenStream;
 use proc_macro2::{Delimiter, TokenTree};
 use quote::quote;
-use syn::{parse_macro_input, AttributeArgs, Meta, MetaList, NestedMeta, Signature};
+use syn::{parse_macro_input, AttributeArgs, Lit, LitStr, Meta, MetaList, MetaNameValue, NestedMeta, Signature};
 
 #[proc_macro_attribute]
 pub fn test_connector(attr: TokenStream, input: TokenStream) -> TokenStream {
@@ -20,6 +20,11 @@ pub fn test_connector(attr: TokenStream, input: TokenStream) -> TokenStream {
                     return err.to_compile_error().into();
                 }
             }
+            NestedMeta::Meta(Meta::NameValue(MetaNameValue {
+                lit: Lit::Str(litstr),
+                eq_token: _,
+                path,
+            })) if path.is_ident("ignore") => attrs.ignore_reason = Some(litstr),
             other => {
                 return syn::Error::new_spanned(other, "Unexpected argument")
                     .into_compile_error()
@@ -55,6 +60,7 @@ pub fn test_connector(attr: TokenStream, input: TokenStream) -> TokenStream {
         Ok(args) => args,
         Err(err) => return err.to_compile_error().into(),
     };
+    let ignore_attr = attrs.ignore_reason.map(|reason| quote!(#[ignore = #reason]));
 
     let tokens = if sig.asyncness.is_some() {
         let (return_ty, unwrap) = match sig.output {
@@ -64,6 +70,7 @@ pub fn test_connector(attr: TokenStream, input: TokenStream) -> TokenStream {
 
         quote! {
             #[test]
+            #ignore_attr
             fn #test_function_name() {
                 let args = test_setup::TestApiArgs::new(#test_function_name_lit);
 
@@ -85,6 +92,7 @@ pub fn test_connector(attr: TokenStream, input: TokenStream) -> TokenStream {
     } else {
         quote! {
             #[test]
+            #ignore_attr
             fn #test_function_name() {
                 let args = test_setup::TestApiArgs::new(#test_function_name_lit);
 
@@ -110,6 +118,7 @@ struct TestConnectorAttrs {
     include_tagged: Vec<syn::Path>,
     exclude_tagged: Vec<syn::Path>,
     capabilities: Vec<syn::Path>,
+    ignore_reason: Option<LitStr>,
 }
 
 impl TestConnectorAttrs {
