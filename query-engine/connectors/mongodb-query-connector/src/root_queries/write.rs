@@ -150,6 +150,7 @@ pub async fn update_records(
 
     for (field_name, write_expr) in args.args {
         let DatasourceFieldName(name) = field_name;
+
         // Todo: This is inefficient.
         let field = fields.iter().find(|f| f.db_name() == name).unwrap();
 
@@ -162,11 +163,15 @@ pub async fn update_records(
             WriteExpression::Divide(rhs) => ("$mul", (field, (PrismaValue::new_float(1.0) / rhs)).into_bson()?),
         };
 
+        dbg!(&val);
+
         let entry = update_doc.entry(op_key.to_owned()).or_insert(Document::new().into());
         entry.as_document_mut().unwrap().insert(name, val);
     }
 
     if !update_doc.is_empty() {
+        dbg!(&filter);
+        dbg!(&update_doc);
         coll.update_many(filter, update_doc, None).await?;
     }
 

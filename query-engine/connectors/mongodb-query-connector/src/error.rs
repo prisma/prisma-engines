@@ -111,7 +111,11 @@ impl MongoError {
                         errors.push(kind);
                     };
 
-                    ConnectorError::from_kind(ErrorKind::MultiError(MultiError { errors }))
+                    if errors.len() == 1 {
+                        ConnectorError::from_kind(errors.into_iter().next().unwrap())
+                    } else {
+                        ConnectorError::from_kind(ErrorKind::MultiError(MultiError { errors }))
+                    }
                 }
 
                 mongodb::error::ErrorKind::BsonDecode(err) => ConnectorError::from_kind(
