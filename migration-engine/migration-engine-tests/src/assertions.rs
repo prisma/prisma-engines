@@ -114,18 +114,19 @@ impl SchemaAssertion {
         Ok(self)
     }
 
-    pub fn assert_tables_count(self, expected_count: usize) -> AssertionResult<Self> {
+    #[track_caller]
+    pub fn assert_tables_count(self, expected_count: usize) -> Self {
         let actual_count = self.schema.tables.len();
 
-        anyhow::ensure!(
-            actual_count == expected_count,
+        assert_eq!(
+            actual_count, expected_count,
             "Assertion failed. Expected the schema to have {expected_count} tables, found {actual_count}. ({table_names:?})",
             expected_count = expected_count,
             actual_count = actual_count,
             table_names = self.schema.tables.iter().map(|t| t.name.as_str()).collect::<Vec<&str>>(),
         );
 
-        Ok(self)
+        self
     }
 
     pub fn debug_print(self) -> Self {

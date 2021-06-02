@@ -62,9 +62,7 @@ impl MssqlFlavour {
             let shadow_conninfo = conn.connection_info();
             let main_conninfo = main_connection.connection_info();
 
-            if shadow_conninfo.host() == main_conninfo.host() && shadow_conninfo.dbname() == main_conninfo.dbname() {
-                return Err(ConnectorError::from_msg("The shadow database you configured appears to be the same as as the main database. Please specify another shadow database.".into()));
-            }
+            super::validate_connection_infos_do_not_match((&shadow_conninfo, &main_conninfo))?;
 
             if self.reset(&conn).await.is_err() {
                 connector.best_effort_reset(&conn).await?;

@@ -423,8 +423,8 @@ fn dropping_mutually_referencing_tables_works(api: TestApi) {
     "#;
 
     api.schema_push(dm1).send_sync().assert_green_bang();
-    api.assert_schema().assert_tables_count(3).unwrap();
+    api.assert_schema().assert_tables_count(3);
 
     api.schema_push("").send_sync().assert_green_bang();
-    api.assert_schema().assert_tables_count(0).unwrap();
+    api.assert_schema().assert_tables_count(0);
 }
