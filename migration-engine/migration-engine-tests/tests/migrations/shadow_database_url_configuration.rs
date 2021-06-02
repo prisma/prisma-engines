@@ -106,3 +106,44 @@ fn shadow_db_url_can_be_configured_on_postgres(api: TestApi) {
             .assert_table_bang("Cat", |table| table.assert_has_column("meowFrequency"));
     }
 }
+
+#[test_connector(tags(Postgres))]
+fn shadow_db_url_must_not_match_main_url(api: TestApi) {
+    let migrations_directory = api.create_migrations_directory();
+    let schema = r#"
+        model Cat {
+            id Int @id
+            litterConsumption Int
+            hungry Boolean @default(true)
+        }
+    "#;
+
+    // URLs match -> error
+    {
+        let engine =
+            api.new_engine_with_connection_strings(api.connection_string(), Some(api.connection_string().to_owned()));
+
+        let err = engine
+            .create_migration("01init", schema, &migrations_directory)
+            .send_unwrap_err()
+            .to_string();
+
+        assert!(err.contains("The shadow database you configured appears to be the same as the main database. Please specify another shadow database."));
+    }
+
+    // Database name is different -> fine
+    {
+        api.raw_cmd("DROP DATABASE IF EXISTS testshadowdb0002");
+        api.raw_cmd("CREATE DATABASE testshadowdb0002");
+
+        let mut url: url::Url = api.connection_string().parse().unwrap();
+        url.set_path("/testshadowdb0002");
+
+        let engine = api.new_engine_with_connection_strings(api.connection_string(), Some(url.to_string()));
+
+        engine
+            .create_migration("01init", schema, &migrations_directory)
+            .send_sync()
+            .assert_migration_directories_count(1);
+    }
+}

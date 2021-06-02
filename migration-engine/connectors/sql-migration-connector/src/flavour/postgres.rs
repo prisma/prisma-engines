@@ -45,9 +45,7 @@ impl PostgresFlavour {
             let shadow_conninfo = conn.connection_info();
             let main_conninfo = main_connection.connection_info();
 
-            if shadow_conninfo.host() == main_conninfo.host() && shadow_conninfo.dbname() == main_conninfo.dbname() {
-                return Err(ConnectorError::from_msg("The shadow database you configured appears to be the same as as the main database. Please specify another shadow database.".into()));
-            }
+            super::validate_connection_infos_do_not_match((&shadow_conninfo, &main_conninfo))?;
 
             tracing::info!(
                 "Connecting to user-provided shadow database at {}.{:?}",
