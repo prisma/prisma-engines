@@ -23,5 +23,6 @@ mod soft_resets;
 mod sql;
 mod sqlite;
 mod squashing_tests;
+mod timeouts;
 mod types;
 mod unsupported_types;
