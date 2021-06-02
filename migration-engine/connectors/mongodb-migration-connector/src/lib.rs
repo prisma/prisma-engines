@@ -38,7 +38,7 @@ impl MongoDbMigrationConnector {
             .database(&db_name)
             .drop(Some(
                 mongodb::options::DropDatabaseOptions::builder()
-                    .write_concern(WriteConcern::builder().journal(Some(true)).build())
+                    .write_concern(WriteConcern::builder().journal(true).build())
                     .build(),
             ))
             .await
