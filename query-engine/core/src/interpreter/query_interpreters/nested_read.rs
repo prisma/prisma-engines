@@ -48,7 +48,10 @@ pub async fn m2m<'a, 'b>(
         })
         .collect::<std::result::Result<Vec<_>, _>>()?;
 
-    // a roundtrip can be avoided if: there is no additional filter AND the selection set is the child_link_id
+    // a roundtrip can be avoided if:
+    // - there is no additional filter
+    // - there is no aggregation selection
+    // - the selection set is the child_link_id
     let scalars =
         if query.args.do_nothing() && query.aggregation_selections.is_empty() && child_link_id == query.selected_fields
         {
@@ -193,7 +196,10 @@ pub async fn one2m<'a, 'b>(
         return Ok((ManyRecords::empty(selected_fields), None));
     }
 
-    // a roundtrip can be avoided if: there is no additional filter AND the selection set is the child_link_id
+    // a roundtrip can be avoided if:
+    // - there is no additional filter
+    // - there is no aggregation selection
+    // - the selection set is the child_link_id
     let scalars = if query_args.do_nothing() && aggr_selections.is_empty() && &child_link_id == selected_fields {
         ManyRecords::from_projection(uniq_projections, selected_fields).with_unique_records()
     } else {
