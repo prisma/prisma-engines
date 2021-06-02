@@ -1,6 +1,9 @@
-use super::inmemory_record_processor::InMemoryRecordProcessor;
+use super::{inmemory_record_processor::InMemoryRecordProcessor, read};
 use crate::{interpreter::InterpretationResult, query_ast::*};
-use connector::{self, filter::Filter, ConnectionLike, QueryArguments, ReadOperations, ScalarCompare};
+use connector::{
+    self, filter::Filter, ConnectionLike, QueryArguments, ReadOperations, RelAggregationRow, RelAggregationSelection,
+    ScalarCompare,
+};
 use prisma_models::{ManyRecords, ModelProjection, Record, RecordProjection, RelationFieldRef};
 use prisma_value::PrismaValue;
 use std::collections::HashMap;
@@ -11,7 +14,7 @@ pub async fn m2m<'a, 'b>(
     query: &RelatedRecordsQuery,
     parent_result: Option<&'a ManyRecords>,
     processor: InMemoryRecordProcessor,
-) -> InterpretationResult<ManyRecords> {
+) -> InterpretationResult<(ManyRecords, Option<Vec<RelAggregationRow>>)> {
     let parent_field = &query.parent_field;
     let child_link_id = parent_field.related_field().linking_fields();
 
@@ -27,12 +30,12 @@ pub async fn m2m<'a, 'b>(
     };
 
     if parent_ids.is_empty() {
-        return Ok(ManyRecords::empty(&query.selected_fields));
+        return Ok((ManyRecords::empty(&query.selected_fields), None));
     }
 
     let ids = tx.get_related_m2m_record_ids(&query.parent_field, &parent_ids).await?;
     if ids.is_empty() {
-        return Ok(ManyRecords::empty(&query.selected_fields));
+        return Ok((ManyRecords::empty(&query.selected_fields), None));
     }
 
     let child_model_id = query.parent_field.related_model().primary_identifier();
@@ -45,21 +48,34 @@ pub async fn m2m<'a, 'b>(
         })
         .collect::<std::result::Result<Vec<_>, _>>()?;
 
-    // a roundtrip can be avoided if: there is no additional filter AND the selection set is the child_link_id
-    let mut scalars = if query.args.do_nothing() && child_link_id == query.selected_fields {
-        ManyRecords::from_projection(child_ids, &query.selected_fields).with_unique_records()
-    } else {
-        let mut args = query.args.clone();
-        let filter = child_link_id.is_in(child_ids);
+    // a roundtrip can be avoided if:
+    // - there is no additional filter
+    // - there is no aggregation selection
+    // - the selection set is the child_link_id
+    let scalars =
+        if query.args.do_nothing() && query.aggregation_selections.is_empty() && child_link_id == query.selected_fields
+        {
+            ManyRecords::from_projection(child_ids, &query.selected_fields).with_unique_records()
+        } else {
+            let mut args = query.args.clone();
+            let filter = child_link_id.is_in(child_ids);
 
-        args.filter = match args.filter {
-            Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
-            None => Some(filter),
+            args.filter = match args.filter {
+                Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
+                None => Some(filter),
+            };
+
+            tx.get_many_records(
+                &query.parent_field.related_model(),
+                args,
+                &query.selected_fields,
+                &query.aggregation_selections,
+            )
+            .await?
         };
 
-        tx.get_many_records(&query.parent_field.related_model(), args, &query.selected_fields, &[])
-            .await?
-    };
+    let (mut scalars, aggregation_rows) =
+        read::extract_aggregation_rows_from_scalars(scalars.clone(), query.aggregation_selections.clone());
 
     // Child id to parent ids
     let mut id_map: HashMap<RecordProjection, Vec<RecordProjection>> = HashMap::new();
@@ -109,7 +125,7 @@ pub async fn m2m<'a, 'b>(
         }
     }
 
-    Ok(processor.apply(scalars))
+    Ok((processor.apply(scalars), aggregation_rows))
 }
 
 // [DTODO] This is implemented in an inefficient fashion, e.g. too much Arc cloning going on.
@@ -129,8 +145,9 @@ pub async fn one2m<'a, 'b>(
     parent_result: Option<&'a ManyRecords>,
     query_args: QueryArguments,
     selected_fields: &ModelProjection,
+    aggr_selections: Vec<RelAggregationSelection>,
     processor: InMemoryRecordProcessor,
-) -> InterpretationResult<ManyRecords> {
+) -> InterpretationResult<(ManyRecords, Option<Vec<RelAggregationRow>>)> {
     let parent_model_id = parent_field.model().primary_identifier();
     let parent_link_id = parent_field.linking_fields();
     let child_link_id = parent_field.related_field().linking_fields();
@@ -176,11 +193,14 @@ pub async fn one2m<'a, 'b>(
         .collect();
 
     if uniq_projections.is_empty() {
-        return Ok(ManyRecords::empty(selected_fields));
+        return Ok((ManyRecords::empty(selected_fields), None));
     }
 
-    // a roundtrip can be avoided if: there is no additional filter AND the selection set is the child_link_id
-    let mut scalars = if query_args.do_nothing() && &child_link_id == selected_fields {
+    // a roundtrip can be avoided if:
+    // - there is no additional filter
+    // - there is no aggregation selection
+    // - the selection set is the child_link_id
+    let scalars = if query_args.do_nothing() && aggr_selections.is_empty() && &child_link_id == selected_fields {
         ManyRecords::from_projection(uniq_projections, selected_fields).with_unique_records()
     } else {
         let filter = child_link_id.is_in(uniq_projections);
@@ -190,9 +210,11 @@ pub async fn one2m<'a, 'b>(
             Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
             None => Some(filter),
         };
-        tx.get_many_records(&parent_field.related_model(), args, selected_fields, &[])
+        tx.get_many_records(&parent_field.related_model(), args, selected_fields, &aggr_selections)
             .await?
     };
+
+    let (mut scalars, aggregation_rows) = read::extract_aggregation_rows_from_scalars(scalars.clone(), aggr_selections);
 
     // Inlining is done on the parent, this means that we need to write the primary parent ID
     // into the child records that we retrieved. The matching is done based on the parent link values.
@@ -240,5 +262,5 @@ pub async fn one2m<'a, 'b>(
         );
     }
 
-    Ok(processor.apply(scalars))
+    Ok((processor.apply(scalars), aggregation_rows))
 }
