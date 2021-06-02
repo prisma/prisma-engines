@@ -101,10 +101,8 @@ fn shadow_db_url_can_be_configured_on_postgres(api: TestApi) {
         engine
             .assert_schema()
             .assert_tables_count(2)
-            .unwrap()
             .assert_has_table("_prisma_migrations")
             .unwrap()
-            .assert_table("Cat", |table| table.assert_has_column("meowFrequency"))
-            .unwrap();
+            .assert_table_bang("Cat", |table| table.assert_has_column("meowFrequency"));
     }
 }

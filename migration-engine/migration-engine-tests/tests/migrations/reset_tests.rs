@@ -11,17 +11,17 @@ fn reset_works(api: TestApi) {
 
     api.schema_push(dm).send_sync();
 
-    api.assert_schema().assert_tables_count(1).unwrap();
+    api.assert_schema().assert_tables_count(1);
 
     api.insert("Cat").value("id", 1).value("name", "Garfield").result_raw();
 
     api.reset().send_sync();
 
-    api.assert_schema().assert_tables_count(0).unwrap();
+    api.assert_schema().assert_tables_count(0);
 
     api.schema_push(dm).send_sync();
 
-    api.assert_schema().assert_tables_count(1).unwrap();
+    api.assert_schema().assert_tables_count(1);
 }
 
 #[test_connector]
@@ -39,7 +39,6 @@ fn reset_then_apply_with_migrations_directory_works(api: TestApi) {
 
     api.assert_schema()
         .assert_tables_count(2)
-        .unwrap()
         .assert_has_table("Cat")
         .unwrap()
         .assert_has_table("_prisma_migrations")
@@ -49,13 +48,12 @@ fn reset_then_apply_with_migrations_directory_works(api: TestApi) {
 
     api.reset().send_sync();
 
-    api.assert_schema().assert_tables_count(0).unwrap();
+    api.assert_schema().assert_tables_count(0);
 
     api.apply_migrations(&dir).send_sync();
 
     api.assert_schema()
         .assert_tables_count(2)
-        .unwrap()
         .assert_has_table("Cat")
         .unwrap()
         .assert_has_table("_prisma_migrations")
@@ -77,7 +75,6 @@ fn reset_then_diagnostics_with_migrations_directory_works(api: TestApi) {
 
     api.assert_schema()
         .assert_tables_count(2)
-        .unwrap()
         .assert_has_table("Cat")
         .unwrap()
         .assert_has_table("_prisma_migrations")
@@ -87,7 +84,7 @@ fn reset_then_diagnostics_with_migrations_directory_works(api: TestApi) {
 
     api.reset().send_sync();
 
-    api.assert_schema().assert_tables_count(0).unwrap();
+    api.assert_schema().assert_tables_count(0);
 
     api.diagnose_migration_history(&dir).send_sync();
     api.evaluate_data_loss(&dir, dm.into()).send();
@@ -95,7 +92,6 @@ fn reset_then_diagnostics_with_migrations_directory_works(api: TestApi) {
 
     api.assert_schema()
         .assert_tables_count(2)
-        .unwrap()
         .assert_has_table("Cat")
         .unwrap()
         .assert_has_table("_prisma_migrations")
