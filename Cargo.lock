@@ -634,12 +634,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "chunked_transfer"
-version = "1.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fff857943da45f546682664a79488be82e69e43c1a7a2307679ab9afb3a66d2e"
-
-[[package]]
 name = "cipher"
 version = "0.2.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2575,12 +2569,10 @@ dependencies = [
 
 [[package]]
 name = "napi"
-version = "1.7.3"
+version = "1.7.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "650d066af7b13cf35f0a84e89c7c652c566c0c38c7c1d63857e27b0b9a443c59"
+checksum = "59cd02f5de365f9bd6e85f1d11176a9ea70ff63ce55ea4412cb4e00fd5a0fe6c"
 dependencies = [
- "futures 0.3.13",
- "napi-build",
  "napi-sys",
  "once_cell",
  "serde",
@@ -2591,13 +2583,9 @@ dependencies = [
 
 [[package]]
 name = "napi-build"
-version = "1.0.2"
+version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3039ed15066300360660239cab9a6071a0ed899547c49e40952d87ded49b29b8"
-dependencies = [
- "cfg-if 1.0.0",
- "ureq",
-]
+checksum = "9fbe11972c601a48aa12a0e2aa032e9e251655ce6c6836cac26e5c0b3b5a5dcc"
 
 [[package]]
 name = "napi-derive"
@@ -5211,22 +5199,6 @@ name = "untrusted"
 version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a156c684c91ea7d62626509bce3cb4e1d9ed5c4d978f7b4352658f96a4c26b4a"
-
-[[package]]
-name = "ureq"
-version = "2.0.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6585dcbf3483242f77b502864478ede62431baf3442b99367d3456ec20c1707b"
-dependencies = [
- "base64 0.13.0",
- "chunked_transfer",
- "log",
- "once_cell",
- "rustls",
- "url 2.2.1",
- "webpki",
- "webpki-roots 0.21.0",
-]
 
 [[package]]
 name = "url"
