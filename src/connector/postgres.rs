@@ -15,6 +15,7 @@ use percent_encoding::percent_decode;
 use postgres_native_tls::MakeTlsConnector;
 use std::{
     borrow::{Borrow, Cow},
+    fmt::{Debug, Display},
     fs,
     future::Future,
     sync::atomic::{AtomicBool, Ordering},
@@ -28,17 +29,17 @@ pub(crate) const DEFAULT_SCHEMA: &str = "public";
 #[derive(Clone)]
 struct Hidden<T>(T);
 
-impl<T> std::fmt::Debug for Hidden<T> {
+impl<T> Debug for Hidden<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "<HIDDEN>")
+        f.write_str("<HIDDEN>")
     }
 }
 
 struct PostgresClient(Client);
 
-impl std::fmt::Debug for PostgresClient {
+impl Debug for PostgresClient {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "PostgresClient")
+        f.write_str("PostgresClient")
     }
 }
 
@@ -212,7 +213,7 @@ impl PostgresUrl {
 
     /// The database schema, defaults to `public`.
     pub fn schema(&self) -> &str {
-        &self.query_params.schema
+        self.query_params.schema.as_deref().unwrap_or(DEFAULT_SCHEMA)
     }
 
     /// Whether the pgbouncer mode is enabled.
@@ -255,7 +256,7 @@ impl PostgresUrl {
 
     fn parse_query_params(url: &Url) -> Result<PostgresUrlQueryParams, Error> {
         let mut connection_limit = None;
-        let mut schema = String::from(DEFAULT_SCHEMA);
+        let mut schema = None;
         let mut certificate_file = None;
         let mut identity_file = None;
         let mut identity_password = None;
@@ -320,7 +321,7 @@ impl PostgresUrl {
                     };
                 }
                 "schema" => {
-                    schema = v.to_string();
+                    schema = Some(v.to_string());
                 }
                 "connection_limit" => {
                     let as_int: usize = v
@@ -441,7 +442,7 @@ impl PostgresUrl {
 pub(crate) struct PostgresUrlQueryParams {
     ssl_params: SslParams,
     connection_limit: Option<usize>,
-    schema: String,
+    schema: Option<String>,
     ssl_mode: SslMode,
     pg_bouncer: bool,
     host: Option<String>,
@@ -486,18 +487,16 @@ impl PostgreSql {
             }
         }));
 
-        let schema = url.schema();
-
         // SET NAMES sets the client text encoding. It needs to be explicitly set for automatic
         // conversion to and from UTF-8 to happen server-side.
         //
         // Relevant docs: https://www.postgresql.org/docs/current/multibyte.html
         let session_variables = format!(
             r##"
-            SET search_path = "{schema}";
+            {set_search_path}
             SET NAMES 'UTF8';
             "##,
-            schema = schema
+            set_search_path = SetSearchPath(url.query_params.schema.as_deref())
         );
 
         client.simple_query(session_variables.as_str()).await?;
@@ -554,6 +553,21 @@ impl PostgreSql {
             }
             res => res,
         }
+    }
+}
+
+// A SetSearchPath statement (Display-impl) for connection initialization.
+struct SetSearchPath<'a>(Option<&'a str>);
+
+impl Display for SetSearchPath<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        if let Some(schema) = self.0 {
+            f.write_str("SET search_path = \"")?;
+            f.write_str(schema)?;
+            f.write_str("\";\n")?;
+        }
+
+        Ok(())
     }
 }
 
