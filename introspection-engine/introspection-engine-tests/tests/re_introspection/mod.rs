@@ -790,9 +790,16 @@ async fn multiple_changed_relation_names(api: &TestApi) -> TestResult {
                 t.add_constraint("Schedule_pkey", types::primary_constraint(&["id"]));
                 t.add_column("morningEmployeeId", types::integer().nullable(false));
                 t.add_column("eveningEmployeeId", types::integer().nullable(false));
-
-                t.add_foreign_key(&["morningEmployeeId"], "Employee", &["id"]);
-                t.add_foreign_key(&["eveningEmployeeId"], "Employee", &["id"]);
+                t.add_index("Schedule_eveningEmployeeId_idx", types::index(&["eveningEmployeeId"]));
+                t.add_index("Schedule_morningEmployeeId_idx", types::index(&["morningEmployeeId"]));
+                t.add_constraint(
+                    "Schedule_morningEmployeeId_fkey",
+                    types::foreign_constraint(&["morningEmployeeId"], "Employee", &["id"], None, None),
+                );
+                t.add_constraint(
+                    "Schedule_eveningEmployeeId_fkey",
+                    types::foreign_constraint(&["eveningEmployeeId"], "Employee", &["id"], None, None),
+                );
             });
 
             migration.create_table("Unrelated", |t| {
@@ -802,60 +809,47 @@ async fn multiple_changed_relation_names(api: &TestApi) -> TestResult {
         })
         .await?;
 
-    let (idx1, idx2) = if api.sql_family().is_mysql() {
-        (
-            r#"@@index([eveningEmployeeId], name: "eveningEmployeeId")"#,
-            r#"@@index([morningEmployeeId], name: "morningEmployeeId")"#,
-        )
-    } else {
-        ("", "")
-    };
-
-    let input_dm = format!(
-        r#"
-        model Employee {{
+    let input_dm = r#"
+        model Employee {
             id                                            Int         @id @default(autoincrement())
             A                                             Schedule[]  @relation("EmployeeToSchedule_eveningEmployeeId")
             Schedule_EmployeeToSchedule_morningEmployeeId Schedule[]  @relation("EmployeeToSchedule_morningEmployeeId")
-        }}
+        }
 
-        model Schedule {{
+        model Schedule {
             id                                            Int         @id @default(autoincrement())
             morningEmployeeId                             Int
             eveningEmployeeId                             Int
             Employee_EmployeeToSchedule_eveningEmployeeId Employee    @relation("EmployeeToSchedule_eveningEmployeeId", fields: [eveningEmployeeId], references: [id])
             Employee_EmployeeToSchedule_morningEmployeeId Employee    @relation("EmployeeToSchedule_morningEmployeeId", fields: [morningEmployeeId], references: [id])
-            {}
-            {}
-        }}
-    "#,
-        idx1, idx2
-    );
+            
+            @@index([eveningEmployeeId])
+            @@index([morningEmployeeId])
+        }
+    "#;
 
-    let final_dm = format!(
-        r#"
-        model Employee {{
+    let final_dm = r#"
+        model Employee {
             id                                            Int         @id @default(autoincrement())
             A                                             Schedule[]  @relation("EmployeeToSchedule_eveningEmployeeId")
             Schedule_EmployeeToSchedule_morningEmployeeId Schedule[]  @relation("EmployeeToSchedule_morningEmployeeId")
-        }}
+        }
 
-        model Schedule {{
+        model Schedule {
             id                                            Int         @id @default(autoincrement())
             morningEmployeeId                             Int
             eveningEmployeeId                             Int
             Employee_EmployeeToSchedule_eveningEmployeeId Employee    @relation("EmployeeToSchedule_eveningEmployeeId", fields: [eveningEmployeeId], references: [id])
             Employee_EmployeeToSchedule_morningEmployeeId Employee    @relation("EmployeeToSchedule_morningEmployeeId", fields: [morningEmployeeId], references: [id])
-            {}
-            {}
-        }}
+            
+            @@index([eveningEmployeeId])
+            @@index([morningEmployeeId])
+        }
 
-        model Unrelated {{
+        model Unrelated {
             id               Int @id @default(autoincrement())
-        }}
-    "#,
-        idx1, idx2
-    );
+        }
+    "#;
 
     api.assert_eq_datamodels(&final_dm, &api.re_introspect(&input_dm).await?);
 
@@ -1123,8 +1117,14 @@ async fn multiple_changed_relation_names_due_to_mapped_models(api: &TestApi) -> 
                 t.add_column("user_id2", types::integer().nullable(false));
                 t.add_index("Post_user_id2_key", types::index(&["user_id2"]).unique(true));
 
-                t.add_foreign_key(&["user_id"], "User", &["id"]);
-                t.add_foreign_key(&["user_id2"], "User", &["id"]);
+                t.add_constraint(
+                    "Post_user_id_fkey",
+                    types::foreign_constraint(&["user_id"], "User", &["id"], None, None),
+                );
+                t.add_constraint(
+                    "Post_user_id2_fkey",
+                    types::foreign_constraint(&["user_id2"], "User", &["id"], None, None),
+                );
             });
 
             migration.create_table("Unrelated", |t| {

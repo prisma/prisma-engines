@@ -418,17 +418,23 @@ async fn a_many_to_many_relation_with_an_id(api: &TestApi) -> TestResult {
                     t.add_column("user_id", types::integer().nullable(false));
                     t.add_column("post_id", types::integer().nullable(false));
 
-                    t.add_foreign_key(&["user_id"], "User", &["id"]);
-                    t.add_foreign_key(&["post_id"], "Post", &["id"]);
+                    t.add_index("PostsToUsers_post_id_idx", types::index(&["post_id"]));
+                    t.add_index("PostsToUsers_user_id_idx", types::index(&["user_id"]));
+                    t.add_constraint(
+                        "PostsToUsers_user_id_fkey",
+                        types::foreign_constraint(&["user_id"], "User", &["id"], None, None),
+                    );
+                    t.add_constraint(
+                        "PostsToUsers_post_id_fkey",
+                        types::foreign_constraint(&["post_id"], "Post", &["id"], None, None),
+                    );
                 });
             },
             api.schema_name(),
         )
         .await?;
 
-    let dm = match api.sql_family() {
-        SqlFamily::Mysql => {
-            indoc! {r##"
+    let dm = indoc! {r#"
                 model Post {
                     id           Int            @id @default(autoincrement())
                     PostsToUsers PostsToUsers[]
@@ -440,37 +446,15 @@ async fn a_many_to_many_relation_with_an_id(api: &TestApi) -> TestResult {
                     post_id Int
                     Post    Post @relation(fields: [post_id], references: [id])
                     User    User @relation(fields: [user_id], references: [id])
-                    @@index([post_id], name: "post_id")
-                    @@index([user_id], name: "user_id")
+                    @@index([post_id])
+                    @@index([user_id])
                 }
 
                 model User {
                     id           Int            @id @default(autoincrement())
                     PostsToUsers PostsToUsers[]
                 }
-            "##}
-        }
-        _ => {
-            indoc! {r##"
-                model Post {
-                    id           Int            @id @default(autoincrement())
-                    PostsToUsers PostsToUsers[]
-                }
-
-                model PostsToUsers {
-                    id      Int  @id @default(autoincrement())
-                    user_id Int
-                    post_id Int
-                    Post    Post @relation(fields: [post_id], references: [id])
-                    User    User @relation(fields: [user_id], references: [id])
-                }
-
-                model User {
-                    id           Int            @id @default(autoincrement())
-                    PostsToUsers PostsToUsers[]
-                }
-            "##}
-        }
+            "#
     };
 
     api.assert_eq_datamodels(dm, &api.introspect().await?);
