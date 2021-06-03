@@ -141,10 +141,6 @@ impl Model {
             .collect()
     }
 
-    pub fn id_index(&self) -> Option<&Index> {
-        self.indexes().iter().find(|index| index.typ == IndexType::Normal)
-    }
-
     pub fn is_legacy(&self) -> bool {
         self.internal_data_model().is_legacy()
     }
