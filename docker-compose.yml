@@ -77,17 +77,16 @@ services:
     tmpfs: /pgtmpfs12
 
   postgres13:
-    image: postgres:13
+    image: cockroachdb/cockroach-unstable:v21.1.0-beta.5
     restart: always
-    command: postgres -c 'max_connections=1000'
-    environment:
-      POSTGRES_PASSWORD: "prisma"
-      PGDATA: "/pgtmpfs13"
+    command: start-single-node --insecure
     ports:
-      - "5435:5432"
+      - "5435:26257"
     networks:
       - databases
-    tmpfs: /pgtmpfs12
+    environment:
+      POSTGRES_PASSWORD: "prisma"
+      PGDATA: "/pgtmpfs13"  
 
   mysql-5-6:
     image: mysql:5.6.50
