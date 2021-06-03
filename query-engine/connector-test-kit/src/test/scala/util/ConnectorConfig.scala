@@ -48,7 +48,7 @@ object ConnectorConfig {
         ConnectorConfig("postgresql", s"postgresql://postgres:prisma@$postgres_12_Host:$postgres_12_Port/db?schema=$$DB&connection_limit=1", "postgres12")
 
       case "postgres13" | "postgresql13" =>
-        ConnectorConfig("postgresql", s"postgresql://postgres:prisma@$postgres_13_Host:$postgres_13_Port/db?schema=$$DB&connection_limit=1", "postgres13")
+        ConnectorConfig("postgresql", s"postgresql://root@$postgres_13_Host:$postgres_13_Port/db?schema=$$DB&connection_limit=1", "postgres13")
 
       case "pgbouncer" =>
         ConnectorConfig("postgresql",
