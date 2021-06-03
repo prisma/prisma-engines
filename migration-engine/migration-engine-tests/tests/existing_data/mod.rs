@@ -428,7 +428,6 @@ fn dropping_a_table_referenced_by_foreign_keys_must_work(api: TestApi) {
 
     api.assert_schema()
         .assert_tables_count(1)
-        .unwrap()
         .assert_table_bang("Recipe", |table| table.assert_foreign_keys_count(0));
 }
 

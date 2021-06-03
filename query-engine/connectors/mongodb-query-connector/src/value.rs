@@ -32,7 +32,7 @@ impl IntoBson for (MongoDbType, PrismaValue) {
     fn into_bson(self) -> crate::Result<Bson> {
         Ok(match self {
             // ObjectId
-            (MongoDbType::ObjectId, PrismaValue::String(s)) => Bson::ObjectId(ObjectId::with_string(&s)?),
+            (MongoDbType::ObjectId, PrismaValue::String(s)) => Bson::ObjectId(ObjectId::parse_str(&s)?),
             (MongoDbType::ObjectId, PrismaValue::Bytes(b)) => {
                 if b.len() != 12 {
                     return Err(MongoError::MalformedObjectId(format!(
@@ -44,7 +44,7 @@ impl IntoBson for (MongoDbType, PrismaValue) {
                 let mut bytes: [u8; 12] = [0x0; 12];
                 bytes.iter_mut().set_from(b.into_iter());
 
-                Bson::ObjectId(ObjectId::with_bytes(bytes))
+                Bson::ObjectId(ObjectId::from_bytes(bytes))
             }
 
             // String
@@ -256,7 +256,7 @@ pub fn value_from_bson(bson: Bson, meta: &OutputMeta) -> crate::Result<PrismaVal
         }
 
         // DateTime
-        (TypeIdentifier::DateTime, Bson::DateTime(dt)) => PrismaValue::DateTime(dt.into()),
+        (TypeIdentifier::DateTime, Bson::DateTime(dt)) => PrismaValue::DateTime(dt.to_chrono().into()),
         (TypeIdentifier::DateTime, Bson::Timestamp(ts)) => {
             PrismaValue::DateTime(Utc.timestamp(ts.time as i64, 0).into())
         }

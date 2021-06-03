@@ -236,7 +236,7 @@ fn variants_can_be_removed_from_an_existing_enum(api: TestApi) {
 fn models_with_enum_values_can_be_dropped(api: TestApi) {
     api.schema_push(BASIC_ENUM_DM).send_sync().assert_green_bang();
 
-    api.assert_schema().assert_tables_count(1).unwrap();
+    api.assert_schema().assert_tables_count(1);
 
     api.insert("Cat").value("id", 1).value("mood", "HAPPY").result_raw();
 
@@ -252,7 +252,7 @@ fn models_with_enum_values_can_be_dropped(api: TestApi) {
         .assert_executable()
         .assert_warnings(&[warn.into()]);
 
-    api.assert_schema().assert_tables_count(0).unwrap();
+    api.assert_schema().assert_tables_count(0);
 }
 
 #[test_connector(capabilities(Enums))]
@@ -388,7 +388,7 @@ fn enums_used_in_default_can_be_changed(api: TestApi) {
 
     api.schema_push(dm1).send_sync().assert_green_bang();
 
-    api.assert_schema().assert_tables_count(5).unwrap();
+    api.assert_schema().assert_tables_count(5);
 
     let dm2 = r#"
         model Panther {
@@ -445,7 +445,7 @@ fn enums_used_in_default_can_be_changed(api: TestApi) {
             );
     };
 
-    api.assert_schema().assert_tables_count(5).unwrap();
+    api.assert_schema().assert_tables_count(5);
 }
 
 #[test_connector(capabilities(Enums))]

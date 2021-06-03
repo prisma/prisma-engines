@@ -1,6 +1,6 @@
 use super::MigrationCommand;
 use crate::{parse_schema, CoreResult};
-use migration_connector::{ConnectorError, MigrationConnector};
+use migration_connector::{ConnectorError, DiffTarget, MigrationConnector};
 use serde::{Deserialize, Serialize};
 
 /// Command to bring the local database in sync with the prisma schema, without
@@ -14,19 +14,22 @@ impl MigrationCommand for SchemaPushCommand {
 
     async fn execute<C: MigrationConnector>(input: &Self::Input, connector: &C) -> CoreResult<Self::Output> {
         let schema = parse_schema(&input.schema)?;
-        let inferrer = connector.database_migration_inferrer();
         let applier = connector.database_migration_step_applier();
         let checker = connector.destructive_change_checker();
-
-        let database_migration = if input.assume_empty {
-            inferrer.infer_from_empty((&schema.0, &schema.1))?
-        } else {
-            inferrer.infer((&schema.0, &schema.1)).await?
-        };
 
         if let Some(err) = connector.check_database_version_compatibility(&schema.1) {
             return Err(ConnectorError::user_facing(err));
         };
+
+        let from = if input.assume_empty {
+            DiffTarget::Empty
+        } else {
+            DiffTarget::Database
+        };
+
+        let database_migration = connector
+            .diff(from, DiffTarget::Datamodel((&schema.0, &schema.1)))
+            .await?;
 
         let checks = checker.check(&database_migration).await?;
 
