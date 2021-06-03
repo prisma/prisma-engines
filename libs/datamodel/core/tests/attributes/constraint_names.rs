@@ -3,8 +3,9 @@ use datamodel::render_datamodel_to_string;
 use indoc::indoc;
 
 #[test]
+//todo add foreign keys to this
 fn constraint_names() {
-    let dml = indoc! {r#"
+    let input = indoc! {r#"
     /// explicit different dbnames
     model A {
       id   Int    @id("CustomDBId")
@@ -89,12 +90,98 @@ fn constraint_names() {
     }
     "#};
 
-    let res = parse(dml);
+    let expected = indoc! {r#"
+    /// explicit different dbnames
+    model A {
+      id   Int    @id("CustomDBId")
+      name String @unique("CustomDBUnique")
+    }
+    
+    model B {
+      a String
+      b String
+   
+      @@id([a, b], name: "clientId", map: "CustomCompoundDBId")
+      @@unique([a, b], name: "clientUnique", map: "CustomCompoundDBUnique")
+      @@index([a], map: "CustomDBIndex")
+    }
+    
+    /// explicit same dbnames
+    model A2 {
+      id   Int    @id
+      name String @unique
+    }
+    
+    model B2 {
+      a String
+      b String
+   
+      @@id([a, b], name: "clientId")
+      @@unique([a, b], name: "clientUnique")
+      @@index([a])
+    }
+    
+    /// only explicit different dbnames
+    model A3 {
+      id   Int    @id("CustomDBId2")
+      name String @unique("CustomDBUnique2")
+    }
+    
+    model B3 {
+      a String
+      b String
+   
+      @@id([a, b], map: "CustomCompoundDBId2")
+      @@unique([a, b], map: "CustomCompoundDBUnique2")
+      @@index([a], map: "CustomCompoundDBIndex2")
+    }
+    
+    /// no db names
+    model A4 {
+      id   Int    @id
+      name String @unique
+    }
+    
+    model B4 {
+      a String
+      b String
+   
+      @@id([a, b], name: "clientId")
+      @@unique([a, b], name: "clientUnique")
+      @@index([a])
+    }
+    
+    /// no names
+    model A5 {
+      id   Int    @id
+      name String @unique
+    }
+   
+    model B5 {
+      a String
+      b String
+   
+      @@id([a, b])
+      @@unique([a, b])
+      @@index([a])
+    }
+    
+    /// backwards compatibility
+    model B6 {
+      a String @id
+      b String
+   
+      @@index([a], map: "shouldChangeToMap")
+    }
+    "#};
+
+    let res = parse(input);
 
     let rendered = render_datamodel_to_string(&res);
 
-    println!("{}", rendered);
+    println!("Rendered \n {}", rendered);
+    println!("Expected \n {}", expected);
 
     //todo can't be exactly the same since explicit default names will be suppressed when rerendering
-    assert_eq!(rendered, dml);
+    assert_eq!(rendered, expected);
 }

@@ -119,15 +119,15 @@ impl<'a> LiftAstToDml<'a> {
             }
         }
 
+        // model level index definitions
         {
             let model_name = model.name.clone();
             for mut index in &mut model.indices {
+                let default_name = ConstraintNames::index_name(&model_name, index.fields.clone(), index.tpe, connector);
                 if index.name_in_db.is_empty() {
-                    let default_name =
-                        ConstraintNames::index_name(&model_name, index.fields.clone(), index.tpe, connector);
                     index.name_in_db = default_name.clone();
-                    index.name_in_db_matches_default = index.name_in_db == default_name;
                 }
+                index.name_in_db_matches_default = index.name_in_db == default_name;
             }
         }
 

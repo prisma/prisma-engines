@@ -18,7 +18,10 @@ async fn compound_foreign_keys_for_one_to_one_relations(api: &TestApi) -> TestRe
                 t.add_constraint("Post_pkey", types::primary_constraint(&["id"]));
                 t.add_column("user_id", types::integer().nullable(true));
                 t.add_column("user_age", types::integer().nullable(true));
-                t.add_foreign_key(&["user_id", "user_age"], "User", &["id", "age"]);
+                t.add_constraint(
+                    "Post_user_id_user_age_fkey",
+                    types::foreign_constraint(&["user_id", "user_age"], "User", &["id", "age"], None, None),
+                );
                 t.add_index(
                     "Post_user_id_user_age_key",
                     types::index(vec!["user_id", "user_age"]).unique(true),
@@ -67,7 +70,10 @@ async fn compound_foreign_keys_for_required_one_to_one_relations(api: &TestApi) 
                 t.add_constraint("Post_pkey", types::primary_constraint(&["id"]));
                 t.add_column("user_id", types::integer());
                 t.add_column("user_age", types::integer());
-                t.add_foreign_key(&["user_id", "user_age"], "User", &["id", "age"]);
+                t.add_constraint(
+                    "Post_user_id_user_age_fkey",
+                    types::foreign_constraint(&["user_id", "user_age"], "User", &["id", "age"], None, None),
+                );
                 t.add_index(
                     "Post_user_id_user_age_key",
                     types::index(vec!["user_id", "user_age"]).unique(true),
@@ -117,7 +123,10 @@ async fn compound_foreign_keys_for_one_to_many_relations(api: &TestApi) -> TestR
                 t.add_column("user_id", types::integer().nullable(true));
                 t.add_column("user_age", types::integer().nullable(true));
                 t.add_index("Post_user_id_user_age_idx", types::index(vec!["user_id", "user_age"]));
-                t.add_foreign_key(&["user_id", "user_age"], "User", &["id", "age"]);
+                t.add_constraint(
+                    "Post_user_id_user_age_fkey",
+                    types::foreign_constraint(&["user_id", "user_age"], "User", &["id", "age"], None, None),
+                );
             });
         })
         .await?;
@@ -164,7 +173,10 @@ async fn compound_foreign_keys_for_one_to_many_relations_with_mixed_requiredness
                 t.add_column("user_age", types::integer().nullable(true));
                 t.add_index("Post_index", types::index(vec!["user_id", "user_age"]));
 
-                t.add_foreign_key(&["user_id", "user_age"], "User", &["id", "age"]);
+                t.add_constraint(
+                    "Post_user_id_user_age_fkey",
+                    types::foreign_constraint(&["user_id", "user_age"], "User", &["id", "age"], None, None),
+                );
             });
         })
         .await?;
@@ -209,7 +221,10 @@ async fn compound_foreign_keys_for_required_one_to_many_relations(api: &TestApi)
                 t.add_column("user_id", types::integer());
                 t.add_column("user_age", types::integer());
                 t.add_index("Post_user_id_user_age_idx", types::index(&["user_id", "user_age"]));
-                t.add_foreign_key(&["user_id", "user_age"], "User", &["id", "age"]);
+                t.add_constraint(
+                    "Post_user_id_user_age_fkey",
+                    types::foreign_constraint(&["user_id", "user_age"], "User", &["id", "age"], None, None),
+                );
             });
         })
         .await?;
@@ -259,8 +274,12 @@ async fn compound_foreign_keys_for_required_self_relations(api: &TestApi) -> Tes
 
     api.barrel()
         .execute(move |migration| {
+            //todo alter table does not seem to correctly implement add constraint
             migration.change_table("Person", move |t| {
-                t.add_foreign_key(&["partner_id", "partner_age"], "Person", &["id", "age"]);
+                t.add_constraint(
+                    "Person_partner_id_partner_age_fkey",
+                    types::foreign_constraint(&["partner_id", "partner_age"], "Person", &["id", "age"], None, None),
+                );
             })
         })
         .await?;
@@ -294,21 +313,21 @@ async fn compound_foreign_keys_for_self_relations(api: &TestApi) -> TestResult {
                 t.add_column("age", types::integer());
                 t.add_column("partner_id", types::integer().nullable(true));
                 t.add_column("partner_age", types::integer().nullable(true));
-                t.add_constraint("sqlite_autoindex_Person_1", types::unique_constraint(vec!["id", "age"]));
-                t.add_foreign_key(&["partner_id", "partner_age"], "Person", &["id", "age"]);
+                t.add_constraint("Person_id_age_key", types::unique_constraint(vec!["id", "age"]));
+                t.add_index(
+                    "Person_partner_id_partner_age_idx",
+                    types::index(vec!["partner_id", "partner_age"]),
+                );
+                t.add_constraint(
+                    "Person_partner_id_partner_age_fkey",
+                    types::foreign_constraint(&["partner_id", "partner_age"], "Person", &["id", "age"], None, None),
+                );
             });
         })
         .await?;
 
-    let extra_index = if api.sql_family().is_mysql() {
-        r#"@@index([partner_id, partner_age], name: "partner_id")"#
-    } else {
-        ""
-    };
-
-    let dm = format!(
-        r#"
-        model Person {{
+    let dm = r#"
+        model Person {
             id           Int      @id @default(autoincrement())
             age          Int
             partner_id   Int?
@@ -316,12 +335,10 @@ async fn compound_foreign_keys_for_self_relations(api: &TestApi) -> TestResult {
             Person       Person?  @relation("PersonToPerson_partner_id_partner_age", fields: [partner_id, partner_age], references: [id, age])
             other_Person Person[] @relation("PersonToPerson_partner_id_partner_age")
 
-            @@unique([id, age], map: "sqlite_autoindex_Person_1")
-            {}
-        }}
-    "#,
-        extra_index
-    );
+            @@unique([id, age])
+            @@index([partner_id, partner_age])
+    }
+    "#;
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
@@ -342,8 +359,11 @@ async fn compound_foreign_keys_with_defaults(api: &TestApi) -> TestResult {
                     "Person_partner_id_partner_age_idx",
                     types::index(vec!["partner_id", "partner_age"]).unique(false),
                 );
-                t.add_constraint("sqlite_autoindex_Person_1", types::unique_constraint(vec!["id", "age"]));
-                t.add_foreign_key(&["partner_id", "partner_age"], "Person", &["id", "age"]);
+                t.add_constraint("Person_id_age_key", types::unique_constraint(vec!["id", "age"]));
+                t.add_constraint(
+                    "Person_partner_id_partner_age_fkey",
+                    types::foreign_constraint(&["partner_id", "partner_age"], "Person", &["id", "age"], None, None),
+                );
             });
         })
         .await?;
@@ -357,7 +377,7 @@ async fn compound_foreign_keys_with_defaults(api: &TestApi) -> TestResult {
             Person       Person   @relation("PersonToPerson_partner_id_partner_age", fields: [partner_id, partner_age], references: [id, age])
             other_Person Person[] @relation("PersonToPerson_partner_id_partner_age")
 
-            @@unique([id, age], map: "sqlite_autoindex_Person_1")
+            @@unique([id, age])
             @@index([partner_id, partner_age])   
         }
     "#;
@@ -385,7 +405,10 @@ async fn compound_foreign_keys_for_one_to_many_relations_with_non_unique_index(a
                 t.add_column("user_id", types::integer());
                 t.add_column("user_age", types::integer());
                 t.add_index("Post_user_id_user_age_idx", types::index(&["user_id", "user_age"]));
-                t.add_foreign_key(&["user_id", "user_age"], "User", &["id", "age"]);
+                t.add_constraint(
+                    "Post_user_id_user_age_fkey",
+                    types::foreign_constraint(&["user_id", "user_age"], "User", &["id", "age"], None, None),
+                );
             });
         })
         .await?;
@@ -430,7 +453,10 @@ async fn repro_matt_references_on_wrong_side(api: &TestApi) -> TestResult {
                 t.add_column("one", types::integer().nullable(false));
                 t.add_column("two", types::integer().nullable(false));
                 t.add_index("b_one_two_idx", types::index(&["one", "two"]));
-                t.add_foreign_key(&["one", "two"], "a", &["one", "two"])
+                t.add_constraint(
+                    "b_one_two_fkey",
+                    types::foreign_constraint(&["one", "two"], "a", &["one", "two"], None, None),
+                )
             });
         })
         .await?;
@@ -473,7 +499,10 @@ async fn a_compound_fk_pk_with_overlapping_primary_key(api: &TestApi) -> TestRes
                 t.add_column("one", types::integer().nullable(false));
                 t.add_column("two", types::integer().nullable(false));
                 t.add_index("b_one_two_idx", types::index(&["one", "two"]));
-                t.add_foreign_key(&["one", "two"], "a", &["one", "two"]);
+                t.add_constraint(
+                    "b_one_two_fkey",
+                    types::foreign_constraint(&["one", "two"], "a", &["one", "two"], None, None),
+                );
                 t.add_constraint("b_pkey", types::primary_constraint(&["dummy", "one", "two"]));
             });
         })
@@ -528,8 +557,14 @@ async fn compound_foreign_keys_for_duplicate_one_to_many_relations(api: &TestApi
                     types::index(&["other_user_id", "other_user_age"]),
                 );
                 t.add_index("Post_user_id_user_age_idx", types::index(&["user_id", "user_age"]));
-                t.add_foreign_key(&["user_id", "user_age"], "User", &["id", "age"]);
-                t.add_foreign_key(&["other_user_id", "other_user_age"], "User", &["id", "age"]);
+                t.add_constraint(
+                    "Post_user_id_user_age_fkey",
+                    types::foreign_constraint(&["user_id", "user_age"], "User", &["id", "age"], None, None),
+                );
+                t.add_constraint(
+                    "Post_other_user_id_other_user_age_fkey",
+                    types::foreign_constraint(&["other_user_id", "other_user_age"], "User", &["id", "age"], None, None),
+                );
             });
         })
         .await?;

@@ -123,7 +123,10 @@ async fn remapping_models_in_relations(api: &TestApi) -> TestResult {
                 t.add_constraint("Post_pkey", types::primary_constraint(&["id"]));
                 t.add_column("user_id", types::integer());
                 t.add_index("Post_user_id_key", types::index(vec!["user_id"]).unique(true));
-                t.add_foreign_key(&["user_id"], "User with Space", &["id"]);
+                t.add_constraint(
+                    "Post_user_id_fkey",
+                    types::foreign_constraint(&["user_id"], "User with Space", &["id"], None, None),
+                );
             });
         })
         .await?;
@@ -167,7 +170,10 @@ async fn remapping_models_in_relations_should_not_map_virtual_fields(api: &TestA
                     "Post With Space_user_id_key",
                     types::index(vec!["user_id"]).unique(true),
                 );
-                t.add_foreign_key(&["user_id"], "User", &["id"]);
+                t.add_constraint(
+                    "Post With Space_user_id_fkey",
+                    types::foreign_constraint(&["user_id"], "User", &["id"], None, None),
+                );
             });
         })
         .await?;
@@ -211,7 +217,10 @@ async fn remapping_models_in_compound_relations(api: &TestApi) -> TestResult {
                 t.add_constraint("Post_pkey", types::primary_constraint(&["id"]));
                 t.add_column("user_id", types::integer());
                 t.add_column("user_age", types::integer());
-                t.add_foreign_key(&["user_id", "user_age"], "User with Space", &["id", "age"]);
+                t.add_constraint(
+                    "Post_user_id_user_age_fkey",
+                    types::foreign_constraint(&["user_id", "user_age"], "User with Space", &["id", "age"], None, None),
+                );
                 t.add_index(
                     "Post_user_id_user_age_key",
                     types::index(vec!["user_id", "user_age"]).unique(true),
@@ -264,7 +273,16 @@ async fn remapping_fields_in_compound_relations(api: &TestApi) -> TestResult {
                 t.add_constraint("Post_pkey", types::primary_constraint(&["id"]));
                 t.add_column("user_id", types::integer());
                 t.add_column("user_age", types::integer());
-                t.add_foreign_key(&["user_id", "user_age"], "User", &["id", "age-that-is-invalid"]);
+                t.add_constraint(
+                    "Post_user_id_user_age_fkey",
+                    types::foreign_constraint(
+                        &["user_id", "user_age"],
+                        "User",
+                        &["id", "age-that-is-invalid"],
+                        None,
+                        None,
+                    ),
+                );
                 t.add_index(
                     "Post_user_id_user_age_key",
                     types::index(vec!["user_id", "user_age"]).unique(true),
