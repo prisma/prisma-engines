@@ -33,7 +33,7 @@ jobs:
           - name: postgres12
             url: "postgresql://postgres:prisma@localhost:5434"
           - name: postgres13
-            url: "postgresql://postgres:prisma@localhost:5435"
+            url: "postgresql://root@localhost:5435"
           - name: sqlite
             url: sqlite
           - name: vitess_5_7
