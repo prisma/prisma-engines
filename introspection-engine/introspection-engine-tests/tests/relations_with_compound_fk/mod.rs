@@ -252,7 +252,6 @@ async fn compound_foreign_keys_for_required_one_to_many_relations(api: &TestApi)
     Ok(())
 }
 
-//todo sqlite syntax error in fk creation
 #[test_connector(exclude(Sqlite))]
 async fn compound_foreign_keys_for_required_self_relations(api: &TestApi) -> TestResult {
     api.barrel()
@@ -267,20 +266,12 @@ async fn compound_foreign_keys_for_required_self_relations(api: &TestApi) -> Tes
                     "Person_partner_id_partner_age_idx",
                     types::index(&["partner_id", "partner_age"]),
                 );
-                t.add_index("Person_id_age_key", types::index(vec!["id", "age"]).unique(true));
-            });
-        })
-        .await?;
-
-    api.barrel()
-        .execute(move |migration| {
-            //todo alter table does not seem to correctly implement add constraint
-            migration.change_table("Person", move |t| {
+                t.add_constraint("Person_id_age_key", types::unique_constraint(vec!["id", "age"]));
                 t.add_constraint(
                     "Person_partner_id_partner_age_fkey",
                     types::foreign_constraint(&["partner_id", "partner_age"], "Person", &["id", "age"], None, None),
                 );
-            })
+            });
         })
         .await?;
 
@@ -303,7 +294,8 @@ async fn compound_foreign_keys_for_required_self_relations(api: &TestApi) -> Tes
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(exclude(Sqlite))]
+//just excluded due to test setup problems
 async fn compound_foreign_keys_for_self_relations(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
@@ -345,7 +337,8 @@ async fn compound_foreign_keys_for_self_relations(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(exclude(Sqlite))]
+// excluded due to test setup problems around uniques and fks on sqlite
 async fn compound_foreign_keys_with_defaults(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {

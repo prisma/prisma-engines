@@ -485,8 +485,17 @@ async fn a_self_relation(api: &TestApi) -> TestResult {
         )
         .await?;
 
-    let dm = indoc! {r##"
-                model User {
+    let indices = if api.sql_family().is_sqlite() {
+        "@@index([recruited_by])
+         @@index([direct_report])"
+    } else {
+        "@@index([direct_report])
+        @@index([recruited_by])"
+    };
+
+    let dm = format!(
+        r##"
+                model User {{
                     id                                  Int    @id @default(autoincrement())
                     recruited_by                        Int?
                     direct_report                       Int?
@@ -494,12 +503,13 @@ async fn a_self_relation(api: &TestApi) -> TestResult {
                     User_UserToUser_recruited_by        User?  @relation("UserToUser_recruited_by", fields: [recruited_by], references: [id])
                     other_User_UserToUser_direct_report User[] @relation("UserToUser_direct_report")
                     other_User_UserToUser_recruited_by  User[] @relation("UserToUser_recruited_by")
-                    @@index([direct_report])
-                    @@index([recruited_by])
-                }
-            "##};
+                    {}
+                }}
+            "##,
+        indices
+    );
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
