@@ -163,16 +163,12 @@ pub async fn update_records(
             WriteExpression::Divide(rhs) => ("$mul", (field, (PrismaValue::new_float(1.0) / rhs)).into_bson()?),
         };
 
-        dbg!(&val);
-
         let entry = update_doc.entry(op_key.to_owned()).or_insert(Document::new().into());
         entry.as_document_mut().unwrap().insert(name, val);
     }
 
     if !update_doc.is_empty() {
-        dbg!(&filter);
-        dbg!(&update_doc);
-        dbg!(coll.update_many(filter, update_doc, None).await?);
+        coll.update_many(filter, update_doc, None).await?;
     }
 
     let ids = ids

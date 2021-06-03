@@ -4,7 +4,7 @@ use query_engine_tests::*;
 #[test_suite(schema(schema))]
 mod update_many {
     use indoc::indoc;
-    use query_engine_tests::{run_query, run_query_json};
+    use query_engine_tests::{run_query, run_query_json, ConnectorTag};
 
     fn schema() -> String {
         let schema = indoc! {
@@ -135,25 +135,24 @@ mod update_many {
         create_row(runner, r#"{ id: 2, optStr: "str2", optInt: 2 }"#).await?;
         create_row(runner, r#"{ id: 3, optStr: "str3", optInt: 3, optFloat: 3.1 }"#).await?;
 
-        let inc_result = query_number_operation(runner, "optInt", "increment", "10").await?;
         is_one_of!(
-            inc_result,
+            query_number_operation(runner, "optInt", "increment", "10").await?,
             vec![
                 r#"{"data":{"findManyTestModel":[{"optInt":null},{"optInt":12},{"optInt":13}]}}"#,
                 r#"{"data":{"findManyTestModel":[{"optInt":10},{"optInt":12},{"optInt":13}]}}"#
             ]
         );
 
-        // optInts before this op are now: 10/0, 12, 13
-        let dec_result = query_number_operation(runner, "optInt", "decrement", "10").await?;
+        // optInts before this op are now: null/10, 12, 13
         is_one_of!(
-            dec_result,
+            query_number_operation(runner, "optInt", "decrement", "10").await?,
             vec![
                 r#"{"data":{"findManyTestModel":[{"optInt":null},{"optInt":2},{"optInt":3}]}}"#,
                 r#"{"data":{"findManyTestModel":[{"optInt":0},{"optInt":2},{"optInt":3}]}}"#
             ]
         );
 
+        // optInts before this op are now: null/0, 2, 3
         is_one_of!(
             query_number_operation(runner, "optInt", "multiply", "2").await?,
             vec![
@@ -162,29 +161,33 @@ mod update_many {
             ]
         );
 
-        // is_one_of!(
-        //     query_number_operation(runner, "optInt", "divide", "3").await?,
-        //     vec![
-        //         r#"{"data":{"findManyTestModel":[{"optInt":null},{"optInt":1},{"optInt":2}]}}"#,
-        //         r#"{"data":{"findManyTestModel":[{"optInt":0},{"optInt":1},{"optInt":2}]}}"#
-        //     ]
-        // );
+        // Todo: Mongo divisions are broken
+        if !matches!(runner.connector(), ConnectorTag::MongoDb(_)) {
+            // optInts before this op are now: null/0, 4, 6
+            is_one_of!(
+                query_number_operation(runner, "optInt", "divide", "3").await?,
+                vec![
+                    r#"{"data":{"findManyTestModel":[{"optInt":null},{"optInt":1},{"optInt":2}]}}"#,
+                    r#"{"data":{"findManyTestModel":[{"optInt":0},{"optInt":1},{"optInt":2}]}}"#
+                ]
+            );
+        }
 
-        // is_one_of!(
-        //     query_number_operation(runner, "optInt", "set", "5").await?,
-        //     vec![
-        //         r#"{"data":{"findManyTestModel":[{"optInt":5},{"optInt":5},{"optInt":5}]}}"#,
-        //         r#"{"data":{"findManyTestModel":[{"optInt":5},{"optInt":5},{"optInt":5}]}}"#
-        //     ]
-        // );
+        is_one_of!(
+            query_number_operation(runner, "optInt", "set", "5").await?,
+            vec![
+                r#"{"data":{"findManyTestModel":[{"optInt":5},{"optInt":5},{"optInt":5}]}}"#,
+                r#"{"data":{"findManyTestModel":[{"optInt":5},{"optInt":5},{"optInt":5}]}}"#
+            ]
+        );
 
-        // is_one_of!(
-        //     query_number_operation(runner, "optInt", "set", "null").await?,
-        //     vec![
-        //         r#"{"data":{"findManyTestModel":[{"optInt":null},{"optInt":null},{"optInt":null}]}}"#,
-        //         r#"{"data":{"findManyTestModel":[{"optInt":null},{"optInt":null},{"optInt":null}]}}"#
-        //     ]
-        // );
+        is_one_of!(
+            query_number_operation(runner, "optInt", "set", "null").await?,
+            vec![
+                r#"{"data":{"findManyTestModel":[{"optInt":null},{"optInt":null},{"optInt":null}]}}"#,
+                r#"{"data":{"findManyTestModel":[{"optInt":null},{"optInt":null},{"optInt":null}]}}"#
+            ]
+        );
 
         Ok(())
     }
