@@ -84,9 +84,18 @@ impl Connector for MongoDbDatamodelConnector {
         if !matches!(field.field_type(), FieldType::NativeType(_, _))
             && matches!(field.default_value(), Some(DefaultValue::Expression(expr)) if expr.is_dbgenerated())
         {
+            let message = if field.is_id() {
+                format!(
+                    "MongoDB `@default(dbgenerated())` IDs must have an `ObjectID` native type annotation. `{}` is an ID field, so you probably want `ObjectId` as your native type.",
+                    field.name()
+                )
+            } else {
+                "MongoDB `@default(dbgenerated())` fields must have a native type annotation.".to_owned()
+            };
+
             return Err(ConnectorError::from_kind(ErrorKind::FieldValidationError {
                 field: field.name().to_owned(),
-                message: "MongoDB `@default(dbgenerated())` fields must have a native type annotation.".to_owned(),
+                message,
             }));
         }
 
