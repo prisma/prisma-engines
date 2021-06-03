@@ -420,30 +420,40 @@ async fn a_many_to_many_relation_with_an_id(api: &TestApi) -> TestResult {
         )
         .await?;
 
-    let dm = indoc! {r#"
-                model Post {
+    let indices = if api.sql_family().is_sqlite() {
+        "@@index([user_id])
+         @@index([post_id])"
+    } else {
+        "@@index([post_id])
+         @@index([user_id])"
+    };
+
+    let dm = format!(
+        r#"
+                model Post {{
                     id           Int            @id @default(autoincrement())
                     PostsToUsers PostsToUsers[]
-                }
+                }}
 
-                model PostsToUsers {
+                model PostsToUsers {{
                     id      Int  @id @default(autoincrement())
                     user_id Int
                     post_id Int
                     Post    Post @relation(fields: [post_id], references: [id])
                     User    User @relation(fields: [user_id], references: [id])
-                    @@index([post_id])
-                    @@index([user_id])
-                }
+                    
+                    {}
+                }}
 
-                model User {
+                model User {{
                     id           Int            @id @default(autoincrement())
                     PostsToUsers PostsToUsers[]
-                }
-            "#
-    };
+                }}
+            "#,
+        indices
+    );
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }

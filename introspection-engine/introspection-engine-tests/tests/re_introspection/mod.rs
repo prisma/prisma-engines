@@ -828,28 +828,38 @@ async fn multiple_changed_relation_names(api: &TestApi) -> TestResult {
         }
     "#;
 
-    let final_dm = r#"
-        model Employee {
+    let indices = if api.sql_family().is_sqlite() {
+        "@@index([morningEmployeeId])
+         @@index([eveningEmployeeId])"
+    } else {
+        "@@index([eveningEmployeeId])
+         @@index([morningEmployeeId])"
+    };
+
+    let final_dm = format!(
+        r#"
+        model Employee {{
             id                                            Int         @id @default(autoincrement())
             A                                             Schedule[]  @relation("EmployeeToSchedule_eveningEmployeeId")
             Schedule_EmployeeToSchedule_morningEmployeeId Schedule[]  @relation("EmployeeToSchedule_morningEmployeeId")
-        }
+        }}
 
-        model Schedule {
+        model Schedule {{
             id                                            Int         @id @default(autoincrement())
             morningEmployeeId                             Int
             eveningEmployeeId                             Int
             Employee_EmployeeToSchedule_eveningEmployeeId Employee    @relation("EmployeeToSchedule_eveningEmployeeId", fields: [eveningEmployeeId], references: [id])
             Employee_EmployeeToSchedule_morningEmployeeId Employee    @relation("EmployeeToSchedule_morningEmployeeId", fields: [morningEmployeeId], references: [id])
             
-            @@index([eveningEmployeeId])
-            @@index([morningEmployeeId])
-        }
+        {}    
+        }}
 
-        model Unrelated {
+        model Unrelated {{
             id               Int @id @default(autoincrement())
-        }
-    "#;
+        }}
+    "#,
+        indices
+    );
 
     api.assert_eq_datamodels(&final_dm, &api.re_introspect(&input_dm).await?);
 
