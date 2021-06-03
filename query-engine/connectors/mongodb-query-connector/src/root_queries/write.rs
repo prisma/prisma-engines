@@ -172,7 +172,7 @@ pub async fn update_records(
     if !update_doc.is_empty() {
         dbg!(&filter);
         dbg!(&update_doc);
-        coll.update_many(filter, update_doc, None).await?;
+        dbg!(coll.update_many(filter, update_doc, None).await?);
     }
 
     let ids = ids

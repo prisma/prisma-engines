@@ -92,9 +92,6 @@ mod update_many {
     }
 
     // "An updateMany mutation" should "update all items if the where clause is empty"
-    // TODO(dom): Not working on Mongo (second snapshot)
-    // -{"data":{"findManyTestModel":[{"optStr":"updated","optInt":null,"optFloat":null},{"optStr":"updated","optInt":1,"optFloat":null},{"optStr":"updated","optInt":2,"optFloat":1.55}]}}
-    // +
     #[connector_test(exclude(MongoDb))]
     async fn update_all_items_if_where_empty(runner: &Runner) -> TestResult<()> {
         create_row(runner, r#"{ id: 1, optStr: "str1" }"#).await?;
@@ -116,12 +113,12 @@ mod update_many {
         assert_query_many!(
             runner,
             r#"{
-            findManyTestModel {
-              optStr
-              optInt
-              optFloat
-            }
-          }"#,
+              findManyTestModel {
+                optStr
+                optInt
+                optFloat
+              }
+            }"#,
             vec![
                 r#"{"data":{"findManyTestModel":[{"optStr":"updated","optInt":null,"optFloat":null},{"optStr":"updated","optInt":1,"optFloat":null},{"optStr":"updated","optInt":2,"optFloat":1.55}]}}"#,
                 r#"{"data":{"findManyTestModel":[{"optStr":"updated","optInt":-1,"optFloat":0.0},{"optStr":"updated","optInt":1,"optFloat":0.0},{"optStr":"updated","optInt":2,"optFloat":1.55}]}}"#
@@ -138,8 +135,9 @@ mod update_many {
         create_row(runner, r#"{ id: 2, optStr: "str2", optInt: 2 }"#).await?;
         create_row(runner, r#"{ id: 3, optStr: "str3", optInt: 3, optFloat: 3.1 }"#).await?;
 
+        let inc_result = query_number_operation(runner, "optInt", "increment", "10").await?;
         is_one_of!(
-            query_number_operation(runner, "optInt", "increment", "10").await?,
+            inc_result,
             vec![
                 r#"{"data":{"findManyTestModel":[{"optInt":null},{"optInt":12},{"optInt":13}]}}"#,
                 r#"{"data":{"findManyTestModel":[{"optInt":10},{"optInt":12},{"optInt":13}]}}"#
@@ -147,21 +145,22 @@ mod update_many {
         );
 
         // optInts before this op are now: 10/0, 12, 13
+        let dec_result = query_number_operation(runner, "optInt", "decrement", "10").await?;
         is_one_of!(
-            query_number_operation(runner, "optInt", "decrement", "2").await?,
+            dec_result,
             vec![
                 r#"{"data":{"findManyTestModel":[{"optInt":null},{"optInt":2},{"optInt":3}]}}"#,
-                //r#"{"data":{"findManyTestModel":[{"optInt":-10},{"optInt":-8},{"optInt":-7}]}}"#
+                r#"{"data":{"findManyTestModel":[{"optInt":0},{"optInt":2},{"optInt":3}]}}"#
             ]
         );
 
-        // is_one_of!(
-        //     query_number_operation(runner, "optInt", "multiply", "2").await?,
-        //     vec![
-        //         r#"{"data":{"findManyTestModel":[{"optInt":null},{"optInt":4},{"optInt":6}]}}"#,
-        //         r#"{"data":{"findManyTestModel":[{"optInt":0},{"optInt":4},{"optInt":6}]}}"#
-        //     ]
-        // );
+        is_one_of!(
+            query_number_operation(runner, "optInt", "multiply", "2").await?,
+            vec![
+                r#"{"data":{"findManyTestModel":[{"optInt":null},{"optInt":4},{"optInt":6}]}}"#,
+                r#"{"data":{"findManyTestModel":[{"optInt":0},{"optInt":4},{"optInt":6}]}}"#
+            ]
+        );
 
         // is_one_of!(
         //     query_number_operation(runner, "optInt", "divide", "3").await?,
@@ -248,12 +247,11 @@ mod update_many {
                 field, op, value
             )
         );
-        let count = &res["data"]["updateManyTestModel"]["count"];
 
+        let count = &res["data"]["updateManyTestModel"]["count"];
         assert_eq!(count, 3);
 
         let res = run_query!(runner, format!(r#"{{ findManyTestModel {{ {} }} }}"#, field));
-
         Ok(res)
     }
 
@@ -262,6 +260,7 @@ mod update_many {
             .query(format!("mutation {{ createOneTestModel(data: {}) {{ id }} }}", data))
             .await?
             .assert_success();
+
         Ok(())
     }
 }
