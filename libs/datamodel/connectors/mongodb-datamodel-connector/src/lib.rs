@@ -5,7 +5,8 @@ use datamodel_connector::{
     Connector, ConnectorCapability,
 };
 use dml::{
-    native_type_constructor::NativeTypeConstructor, native_type_instance::NativeTypeInstance, traits::WithDatabaseName,
+    default_value::DefaultValue, field::FieldType, native_type_constructor::NativeTypeConstructor,
+    native_type_instance::NativeTypeInstance, traits::WithDatabaseName,
 };
 use mongodb_types::*;
 use native_types::MongoDbType;
@@ -77,6 +78,16 @@ impl Connector for MongoDbDatamodelConnector {
                     message: "MongoDB model IDs must have a @map(\"_id\") annotations.".to_owned(),
                 })),
             }?;
+        }
+
+        // If the field is _not_ a native-type-annotated field and it has a `dbgenerated` defult, we error.
+        if !matches!(field.field_type(), FieldType::NativeType(_, _))
+            && matches!(field.default_value(), Some(DefaultValue::Expression(expr)) if expr.is_dbgenerated())
+        {
+            return Err(ConnectorError::from_kind(ErrorKind::FieldValidationError {
+                field: field.name().to_owned(),
+                message: "MongoDB `@default(dbgenerated())` fields must have a native type annotation.".to_owned(),
+            }));
         }
 
         Ok(())
