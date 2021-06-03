@@ -154,6 +154,7 @@ services:
       KEYSPACES: "test"
       NUM_SHARDS: "1"
       MYSQL_BIND_HOST: "0.0.0.0"
+      MYSQL_MAX_CONNECTIONS: "2500"
 
   vitess-test-8_0:
     image: vitess/vttestserver:mysql80
@@ -165,28 +166,7 @@ services:
       KEYSPACES: "test"
       NUM_SHARDS: "1"
       MYSQL_BIND_HOST: "0.0.0.0"
-
-  vitess-shadow-5_7:
-    image: vitess/vttestserver:mysql57
-    restart: always
-    ports:
-      - 33578:33577
-    environment:
-      PORT: 33574
-      KEYSPACES: "shadow"
-      NUM_SHARDS: "1"
-      MYSQL_BIND_HOST: "0.0.0.0"
-
-  vitess-shadow-8_0:
-    image: vitess/vttestserver:mysql80
-    restart: always
-    ports:
-      - 33808:33807
-    environment:
-      PORT: 33804
-      KEYSPACES: "shadow"
-      NUM_SHARDS: "1"
-      MYSQL_BIND_HOST: "0.0.0.0"
+      MYSQL_MAX_CONNECTIONS: "2500"
 
   mssql-2019:
     image: mcr.microsoft.com/mssql/server:2019-latest
