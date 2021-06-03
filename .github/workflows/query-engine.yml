@@ -13,8 +13,7 @@ jobs:
       fail-fast: false
       matrix:
         database:
-          - vitess_5_7
-          - vitess_8_0
+          - postgres13
 
     env:
       TEST_CONNECTOR: ${{ matrix.database }}
@@ -59,8 +58,7 @@ jobs:
       fail-fast: false
       matrix:
         database:
-          - "vitess_5_7"
-          - "vitess_8_0"
+          - postgres13
 
     env:
       LOG_LEVEL: "info"
