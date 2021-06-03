@@ -119,17 +119,12 @@ pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext, model: &ModelRe
         .collect();
 
     // @@id compound field (there can be only one per model).
-    let id_fields = model.fields().id();
-    let compound_id_field: Option<InputField> = if id_fields.as_ref().map(|f| f.len() > 1).unwrap_or(false) {
-        id_fields.map(|fields| {
-            let name = compound_id_field_name(&fields.iter().map(|f| f.name.as_ref()).collect::<Vec<&str>>());
-            let typ = compound_field_unique_object_type(ctx, model, None, fields);
+    let compound_id_field = model.fields().compound_id().map(|pk| {
+        let name = compound_id_field_name(pk);
+        let typ = compound_field_unique_object_type(ctx, model, pk.alias.as_ref(), pk.fields());
 
-            input_field(name, InputType::object(typ), None).optional()
-        })
-    } else {
-        None
-    };
+        input_field(name, InputType::object(typ), None).optional()
+    });
 
     fields.extend(compound_unique_fields);
     fields.extend(compound_id_field);

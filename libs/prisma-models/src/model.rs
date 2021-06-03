@@ -1,4 +1,4 @@
-use crate::prelude::*;
+use crate::{prelude::*, PrimaryKeyTemplate};
 use once_cell::sync::OnceCell;
 use std::{
     fmt::Debug,
@@ -15,7 +15,7 @@ pub struct ModelTemplate {
     pub is_embedded: bool,
     pub fields: Vec<FieldTemplate>,
     pub manifestation: Option<String>,
-    pub id_field_names: Vec<String>,
+    pub primary_key: Option<PrimaryKeyTemplate>,
     pub indexes: Vec<IndexTemplate>,
     pub supports_create_operation: bool,
     pub dml_model: datamodel::Model,
@@ -64,14 +64,13 @@ impl ModelTemplate {
             supports_create_operation: self.supports_create_operation,
         });
 
-        let fields = Fields::new(
-            self.fields
-                .into_iter()
-                .map(|ft| ft.build(Arc::downgrade(&model)))
-                .collect(),
-            Arc::downgrade(&model),
-            self.id_field_names,
-        );
+        let all_fields: Vec<_> = self
+            .fields
+            .into_iter()
+            .map(|ft| ft.build(Arc::downgrade(&model)))
+            .collect();
+        let pk = self.primary_key.map(|pk| pk.build(&all_fields));
+        let fields = Fields::new(all_fields, Arc::downgrade(&model), pk);
 
         let indexes = self.indexes.into_iter().map(|i| i.build(&fields.scalar())).collect();
 
@@ -140,6 +139,10 @@ impl Model {
             .iter()
             .filter(|index| index.typ == IndexType::Unique)
             .collect()
+    }
+
+    pub fn id_index(&self) -> Option<&Index> {
+        self.indexes().iter().find(|index| index.typ == IndexType::Normal)
     }
 
     pub fn is_legacy(&self) -> bool {
