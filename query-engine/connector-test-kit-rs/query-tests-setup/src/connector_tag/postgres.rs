@@ -63,7 +63,7 @@ impl ConnectorTagInterface for PostgresConnectorTag {
                 database
             ),
             Some(PostgresVersion::V13) => format!(
-                "postgresql://postgres:prisma@127.0.0.1:5434/db?schema={}&connection_limit=1",
+                "postgresql://postgres:prisma@127.0.0.1:5435/db?schema={}&connection_limit=1",
                 database
             ),
             Some(PostgresVersion::PgBouncer) => format!(
