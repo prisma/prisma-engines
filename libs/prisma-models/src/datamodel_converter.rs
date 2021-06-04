@@ -62,7 +62,7 @@ impl<'a> DatamodelConverter<'a> {
                 is_embedded: model.is_embedded,
                 fields: self.convert_fields(&model),
                 manifestation: model.database_name().map(|s| s.to_owned()),
-                id_field_names: model.primary_key.as_ref().map_or(vec![], |pk| pk.fields.clone()),
+                primary_key: self.convert_pk(&model),
                 indexes: self.convert_indexes(&model),
                 supports_create_operation: model.supports_create_operation(),
                 dml_model: model.clone(),
@@ -155,6 +155,13 @@ impl<'a> DatamodelConverter<'a> {
                 },
             })
             .collect()
+    }
+
+    fn convert_pk(&self, model: &dml::Model) -> Option<PrimaryKeyTemplate> {
+        model.primary_key.as_ref().map(|pk| PrimaryKeyTemplate {
+            fields: pk.fields.to_owned(),
+            alias: pk.name_in_client.to_owned(),
+        })
     }
 
     pub fn calculate_relations(datamodel: &dml::Datamodel) -> Vec<TempRelationHolder> {
