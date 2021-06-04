@@ -324,6 +324,10 @@ impl<'a> RelationFieldWalker<'a> {
         self.get().relation_info.name.as_ref()
     }
 
+    pub fn constraint_name(&self) -> Option<String> {
+        self.get().relation_info.fk_name.clone()
+    }
+
     pub fn referenced_model(&self) -> ModelWalker<'a> {
         ModelWalker {
             datamodel: &self.datamodel,

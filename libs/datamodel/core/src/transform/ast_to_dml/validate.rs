@@ -96,6 +96,12 @@ impl<'a> Validator<'a> {
             if let Err(the_errors) = self.validate_referenced_fields_for_relation(schema, ast_model, model) {
                 errors_for_model.extend(the_errors);
             }
+
+            // todo validate that there are no duplicate client names for compound uniques /ids
+            // and also that no field names are reused
+
+            // todo validate that the length limits for constraint names are not violated
+
             all_errors.extend(errors_for_model);
         }
 

@@ -10,6 +10,9 @@ fn constraint_names() {
     model A {
       id   Int    @id("CustomDBId")
       name String @unique("CustomDBUnique")
+      b_a  String
+      b_b  String
+      B    B      @relation(fields:[b_a, b_b], references: [a, b])     
     }
     
     model B {

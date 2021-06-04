@@ -456,7 +456,7 @@ fn no_additional_unique_created(api: TestApi) {
 }
 // todo just for testing, figure out whether to keep it
 #[test_connector]
-fn index_tests(api: TestApi) {
+fn constraint_name_tests(api: TestApi) {
     let dm = r#"
         model A {
           id   Int    @id
@@ -560,7 +560,7 @@ fn index_tests(api: TestApi) {
                     CREATE INDEX "B_a_b_idx" ON "B"("a", "b");
                     
                     -- AddForeignKey
-                    ALTER TABLE "B" ADD FOREIGN KEY ("aId") REFERENCES "A"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+                    ALTER TABLE "B" ADD CONSTRAINT "B_aId_fkey" FOREIGN KEY ("aId") REFERENCES "A"("id") ON DELETE CASCADE ON UPDATE CASCADE;
                 "#
                 }
             } else if api.is_mysql(){
@@ -591,7 +591,7 @@ fn index_tests(api: TestApi) {
                 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
                 
                 -- AddForeignKey
-                ALTER TABLE `B` ADD FOREIGN KEY (`aId`) REFERENCES `A`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+                ALTER TABLE `B` ADD CONSTRAINT `B_aId_fkey` FOREIGN KEY (`aId`) REFERENCES `A`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
                 "#
                 }
             }else if api.is_sqlite(){
@@ -611,7 +611,7 @@ fn index_tests(api: TestApi) {
                     "aId" INTEGER NOT NULL,
                 
                     PRIMARY KEY ("a", "b"),
-                    FOREIGN KEY ("aId") REFERENCES "A" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+                    CONSTRAINT "B_aId_fkey" FOREIGN KEY ("aId") REFERENCES "A" ("id") ON DELETE CASCADE ON UPDATE CASCADE
                 );
                 
                 -- CreateIndex

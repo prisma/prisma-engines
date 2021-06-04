@@ -154,7 +154,21 @@ impl<'a> LiftAstToDml<'a> {
             }
         }
 
-        //todo fk names need to be handled here as well
+        {
+            let model_name = model.name.clone();
+            for rf in model.relation_fields_mut() {
+                let default_name = ConstraintNames::foreign_key_constraint_name(
+                    &model_name,
+                    rf.relation_info.fields.clone(),
+                    connector,
+                );
+                if !rf.relation_info.fields.is_empty() && rf.relation_info.fk_name.is_none() {
+                    rf.relation_info.fk_name = Some(default_name.clone());
+                }
+                rf.relation_info.fk_name_matches_default = rf.relation_info.fk_name == Some(default_name);
+            }
+        }
+
         //todo default value names as well for mssql
 
         model.indices.append(&mut indices_to_copy);
