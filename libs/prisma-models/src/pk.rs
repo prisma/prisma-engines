@@ -33,6 +33,6 @@ pub struct PrimaryKey {
 
 impl PrimaryKey {
     pub fn fields(&self) -> Vec<ScalarFieldRef> {
-        self.fields.iter().map(|field| field.upgrade().expect("")).collect()
+        self.fields.iter().map(|field| field.upgrade().unwrap()).collect()
     }
 }

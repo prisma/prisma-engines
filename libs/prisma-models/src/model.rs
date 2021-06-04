@@ -69,6 +69,7 @@ impl ModelTemplate {
             .into_iter()
             .map(|ft| ft.build(Arc::downgrade(&model)))
             .collect();
+
         let pk = self.primary_key.map(|pk| pk.build(&all_fields));
         let fields = Fields::new(all_fields, Arc::downgrade(&model), pk);
 
