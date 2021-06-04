@@ -10,7 +10,7 @@ use std::{
 pub struct Fields {
     pub all: Vec<Field>,
     id: OnceCell<Option<Vec<ScalarFieldRef>>>,
-    id_field_names: Vec<String>,
+    primary_key: Option<PrimaryKey>,
     scalar: OnceCell<Vec<ScalarFieldWeak>>,
     relation: OnceCell<Vec<RelationFieldWeak>>,
     model: ModelWeakRef,
@@ -19,11 +19,11 @@ pub struct Fields {
 }
 
 impl Fields {
-    pub fn new(all: Vec<Field>, model: ModelWeakRef, id_field_names: Vec<String>) -> Fields {
+    pub fn new(all: Vec<Field>, model: ModelWeakRef, primary_key: Option<PrimaryKey>) -> Fields {
         Fields {
             all,
             id: OnceCell::new(),
-            id_field_names,
+            primary_key,
             scalar: OnceCell::new(),
             relation: OnceCell::new(),
             created_at: OnceCell::new(),
@@ -68,9 +68,22 @@ impl Fields {
             .get_or_init(|| {
                 self.find_singular_id()
                     .map(|x| vec![x])
-                    .or_else(|| self.find_multipart_id())
+                    .or_else(|| self.find_multipart_id().map(|pk| pk.fields()))
             })
             .clone()
+    }
+
+    pub fn compound_id(&self) -> Option<&PrimaryKey> {
+        if self
+            .primary_key
+            .as_ref()
+            .map(|pk| pk.fields().len() > 1)
+            .unwrap_or(false)
+        {
+            self.primary_key.as_ref()
+        } else {
+            None
+        }
     }
 
     pub fn created_at(&self) -> &Option<ScalarFieldRef> {
@@ -223,23 +236,8 @@ impl Fields {
     }
 
     /// Attempts to resolve a compound ID field on the model (supplied with @@id on scalar fields).
-    fn find_multipart_id(&self) -> Option<Vec<ScalarFieldRef>> {
-        if !self.id_field_names.is_empty() {
-            let fields = self
-                .id_field_names
-                .iter()
-                .map(|f| {
-                    self.scalar()
-                        .into_iter()
-                        .find(|field| &field.name == f)
-                        .unwrap_or_else(|| panic!("Expected ID field {} to be present on the model", f))
-                })
-                .collect();
-
-            Some(fields)
-        } else {
-            None
-        }
+    fn find_multipart_id(&self) -> Option<&PrimaryKey> {
+        self.primary_key.as_ref()
     }
 
     pub fn db_names(&self) -> impl Iterator<Item = String> + '_ {

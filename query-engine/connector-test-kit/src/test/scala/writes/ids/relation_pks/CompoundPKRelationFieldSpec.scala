@@ -279,6 +279,140 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
     res10.toString() should be("{\"data\":{\"updateChild\":{\"id\":3,\"parent\":null}}}")
   }
 
+  "Using a compound ID with custom name that includes a 1!:1 single-field relation" should "work" in {
+    val project = ProjectDsl.fromString {
+      s"""
+         |model Parent {
+         |  name     String
+         |  age      Int
+         |  child_id Int
+         |
+         |  child Child  @relation(fields: [child_id], references: [id])
+         |  @@id([name, child_id], name: "compound_id")
+         |}
+         |
+         |model Child {
+         |  id      Int    @id
+         |  name    String
+         |  parent  Parent?
+         |}
+       """
+    }
+    database.setup(project)
+
+    val res1 = server.query(
+      """
+        |mutation {
+        |  createParent(data: { name: "Paul" , age: 40, child: { create: { id: 1, name: "Panther" }}}) {
+        |    name
+        |    age
+        |    child{
+        |       id
+        |       name
+        |    }
+        |  }
+        |}
+      """,
+      project
+    )
+
+    res1.toString() should be("{\"data\":{\"createParent\":{\"name\":\"Paul\",\"age\":40,\"child\":{\"id\":1,\"name\":\"Panther\"}}}}")
+
+    val res2 = server.query(
+      """
+        |mutation {
+        |  updateParent(
+        |    where: {
+        |      compound_id: {
+        |        name: "Paul"
+        |        child_id: 1
+        |      }
+        |    }
+        |    data: { age: { set: 41 }}
+        |  ) {
+        |    name
+        |    age
+        |  }
+        |}
+      """,
+      project
+    )
+
+    res2.toString() should be("{\"data\":{\"updateParent\":{\"name\":\"Paul\",\"age\":41}}}")
+
+    val res3 = server.query(
+      """
+        |mutation {
+        |  updateChild(where: { id: 1 } data: { parent: { update: { age: { set: 42 }}}}) {
+        |    parent { age }
+        |  }
+        |}
+      """,
+      project
+    )
+
+    res3.toString() should be("{\"data\":{\"updateChild\":{\"parent\":{\"age\":42}}}}")
+
+    val res4 = server.query(
+      """
+        |mutation {
+        |  upsertParent(
+        |    where: {
+        |      compound_id: {
+        |        name: "Paul"
+        |        child_id: 2
+        |      }
+        |    }
+        |    update: { name: { set: "Milutin" }, age: { set: 43 }}
+        |    create: { name: "Milutin", age: 43, child: { create: { id: 2, name: "Nikola" } } }
+        |  ) {
+        |    age
+        |  }
+        |}
+        |
+      """,
+      project
+    )
+
+    res4.toString() should be("{\"data\":{\"upsertParent\":{\"age\":43}}}")
+
+    val res5 = server.query(
+      """
+        |query {
+        | findUniqueParent(where:{ compound_id: { name: "Milutin", child_id: 2 } }) {
+        |   name
+        |   age
+        | }
+        |}
+        |""",
+      project,
+      legacy = false
+    )
+
+    res5.toString() should be("{\"data\":{\"findUniqueParent\":{\"name\":\"Milutin\",\"age\":43}}}")
+
+    val res6 = server.query(
+      """
+        |mutation {
+        |  deleteParent(
+        |    where: {
+        |      compound_id: {
+        |        name: "Milutin"
+        |        child_id: 2
+        |      }
+        |    }
+        |  ) {
+        |    name
+        |  }
+        |}
+        |
+      """,
+      project
+    )
+
+    res6.toString() should be("{\"data\":{\"deleteParent\":{\"name\":\"Milutin\"}}}")
+  }
+
   // Mutations in this test:
   //  create         | root   | checked
   //  update         | root   | checked
