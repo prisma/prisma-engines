@@ -50,6 +50,7 @@ pub fn nested_delete(
         let find_child_records_node =
             utils::insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, or_filter)?;
 
+        // Todo [RA]
         utils::insert_deletion_checks(graph, child_model, &find_child_records_node, &delete_many_node)?;
 
         let relation_name = parent_relation_field.relation().name.clone();
@@ -147,6 +148,8 @@ pub fn nested_delete_many(
         });
 
         let delete_many_node = graph.create_node(Query::Write(delete_many));
+
+        // Todo [RA]
         utils::insert_deletion_checks(graph, child_model, &find_child_records_node, &delete_many_node)?;
 
         graph.create_edge(

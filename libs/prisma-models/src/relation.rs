@@ -11,8 +11,6 @@ pub type RelationWeakRef = Weak<Relation>;
 #[derive(Debug)]
 pub struct RelationTemplate {
     pub name: String,
-    pub model_a_on_delete: OnDelete,
-    pub model_b_on_delete: OnDelete,
     pub manifestation: RelationLinkManifestation,
     pub model_a_name: String,
     pub model_b_name: String,
@@ -25,9 +23,6 @@ pub struct Relation {
 
     model_a_name: String,
     model_b_name: String,
-
-    pub model_a_on_delete: OnDelete,
-    pub model_b_on_delete: OnDelete,
 
     model_a: OnceCell<ModelWeakRef>,
     model_b: OnceCell<ModelWeakRef>,
@@ -46,8 +41,6 @@ impl Debug for Relation {
             .field("name", &self.name)
             .field("model_a_name", &self.model_a_name)
             .field("model_b_name", &self.model_b_name)
-            .field("model_a_on_delete", &self.model_a_on_delete)
-            .field("model_b_on_delete", &self.model_b_on_delete)
             .field("model_a", &self.model_a)
             .field("model_b", &self.model_b)
             .field("field_a", &self.field_a)
@@ -76,28 +69,6 @@ pub struct RelationTable {
     pub model_b_column: String,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum OnDelete {
-    SetNull,
-    Cascade,
-}
-
-impl OnDelete {
-    pub fn is_cascade(self) -> bool {
-        match self {
-            OnDelete::Cascade => true,
-            OnDelete::SetNull => false,
-        }
-    }
-
-    pub fn is_set_null(self) -> bool {
-        match self {
-            OnDelete::Cascade => false,
-            OnDelete::SetNull => true,
-        }
-    }
-}
-
 impl RelationTemplate {
     pub fn build(self, internal_data_model: InternalDataModelWeakRef) -> RelationRef {
         let relation = Relation {
@@ -105,8 +76,6 @@ impl RelationTemplate {
             manifestation: self.manifestation,
             model_a_name: self.model_a_name,
             model_b_name: self.model_b_name,
-            model_a_on_delete: self.model_a_on_delete,
-            model_b_on_delete: self.model_b_on_delete,
             model_a: OnceCell::new(),
             model_b: OnceCell::new(),
             field_a: OnceCell::new(),
