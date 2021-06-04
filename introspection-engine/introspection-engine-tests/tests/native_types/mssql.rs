@@ -45,18 +45,15 @@ async fn native_type_columns_feature_on(api: &TestApi) -> TestResult {
         .collect();
 
     api.barrel()
-        .execute_with_schema(
-            move |migration| {
-                migration.create_table("Blog", move |t| {
-                    t.add_column("id", types::integer().increments(true).nullable(false));
-                    t.add_constraint("Blog_pkey", types::primary_constraint(&["id"]));
-                    for column in &columns {
-                        t.inject_custom(column);
-                    }
-                });
-            },
-            api.db_name(),
-        )
+        .execute(move |migration| {
+            migration.create_table("Blog", move |t| {
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("Blog_pkey", types::primary_constraint(&["id"]));
+                for column in &columns {
+                    t.inject_custom(column);
+                }
+            });
+        })
         .await?;
 
     let types = indoc! {r#"

@@ -8,20 +8,17 @@ use test_macros::test_connector;
 #[test_connector]
 async fn a_simple_table_with_gql_types(api: &TestApi) -> TestResult {
     api.barrel()
-        .execute_with_schema(
-            |migration| {
-                migration.create_table("Blog", move |t| {
-                    t.add_column("bool", types::boolean());
-                    t.add_column("float", types::float());
-                    t.add_column("date", types::datetime());
-                    t.add_column("id", types::integer().increments(true).nullable(false));
-                    t.add_constraint("Blog_pkey", types::primary_constraint(&["id"]));
-                    t.add_column("int", types::integer());
-                    t.add_column("string", types::text());
-                });
-            },
-            api.schema_name(),
-        )
+        .execute(|migration| {
+            migration.create_table("Blog", move |t| {
+                t.add_column("bool", types::boolean());
+                t.add_column("float", types::float());
+                t.add_column("date", types::datetime());
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("Blog_pkey", types::primary_constraint(&["id"]));
+                t.add_column("int", types::integer());
+                t.add_column("string", types::text());
+            });
+        })
         .await?;
 
     let float_native = if api.sql_family().is_mssql() {
@@ -64,45 +61,42 @@ async fn a_simple_table_with_gql_types(api: &TestApi) -> TestResult {
 #[test_connector]
 async fn should_ignore_prisma_helper_tables(api: &TestApi) -> TestResult {
     api.barrel()
-        .execute_with_schema(
-            |migration| {
-                migration.create_table("Blog", move |t| {
-                    t.add_column("id", types::integer().increments(true));
-                    t.add_constraint("Blog_pkey", types::primary_constraint(&["id"]));
-                });
+        .execute(|migration| {
+            migration.create_table("Blog", move |t| {
+                t.add_column("id", types::integer().increments(true));
+                t.add_constraint("Blog_pkey", types::primary_constraint(&["id"]));
+            });
 
-                migration.create_table("_RelayId", move |t| {
-                    t.add_column("id", types::primary());
-                    t.add_column("stablemodelidentifier", types::text());
-                });
+            migration.create_table("_RelayId", move |t| {
+                t.add_column("id", types::primary());
+                t.add_column("stablemodelidentifier", types::text());
+            });
 
-                migration.create_table("_Migration", move |t| {
-                    t.add_column("revision", types::text());
-                    t.add_column("name", types::text());
-                    t.add_column("datamodel", types::text());
-                    t.add_column("status", types::text());
-                    t.add_column("applied", types::text());
-                    t.add_column("rolled_back", types::text());
-                    t.add_column("datamodel_steps", types::text());
-                    t.add_column("database_migration", types::text());
-                    t.add_column("errors", types::text());
-                    t.add_column("started_at", types::text());
-                    t.add_column("finished_at", types::text());
-                });
+            migration.create_table("_Migration", move |t| {
+                t.add_column("revision", types::text());
+                t.add_column("name", types::text());
+                t.add_column("datamodel", types::text());
+                t.add_column("status", types::text());
+                t.add_column("applied", types::text());
+                t.add_column("rolled_back", types::text());
+                t.add_column("datamodel_steps", types::text());
+                t.add_column("database_migration", types::text());
+                t.add_column("errors", types::text());
+                t.add_column("started_at", types::text());
+                t.add_column("finished_at", types::text());
+            });
 
-                migration.create_table("_prisma_migrations", move |t| {
-                    t.add_column("id", types::primary());
-                    t.add_column("checksum", types::text());
-                    t.add_column("finished_at", types::text());
-                    t.add_column("migration_name", types::text());
-                    t.add_column("logs", types::text());
-                    t.add_column("rolled_back_at", types::text());
-                    t.add_column("started_at", types::text());
-                    t.add_column("applied_steps_count", types::text());
-                });
-            },
-            api.schema_name(),
-        )
+            migration.create_table("_prisma_migrations", move |t| {
+                t.add_column("id", types::primary());
+                t.add_column("checksum", types::text());
+                t.add_column("finished_at", types::text());
+                t.add_column("migration_name", types::text());
+                t.add_column("logs", types::text());
+                t.add_column("rolled_back_at", types::text());
+                t.add_column("started_at", types::text());
+                t.add_column("applied_steps_count", types::text());
+            });
+        })
         .await?;
 
     let dm = indoc! {r##"
@@ -119,16 +113,13 @@ async fn should_ignore_prisma_helper_tables(api: &TestApi) -> TestResult {
 #[test_connector]
 async fn a_table_with_compound_primary_keys(api: &TestApi) -> TestResult {
     api.barrel()
-        .execute_with_schema(
-            |migration| {
-                migration.create_table("Blog", |t| {
-                    t.add_column("id", types::integer());
-                    t.add_column("authorId", types::integer());
-                    t.add_constraint("Blog_pkey", types::primary_constraint(&["id", "authorId"]));
-                });
-            },
-            api.schema_name(),
-        )
+        .execute(|migration| {
+            migration.create_table("Blog", |t| {
+                t.add_column("id", types::integer());
+                t.add_column("authorId", types::integer());
+                t.add_constraint("Blog_pkey", types::primary_constraint(&["id", "authorId"]));
+            });
+        })
         .await?;
 
     let dm = indoc! {r##"
@@ -147,17 +138,14 @@ async fn a_table_with_compound_primary_keys(api: &TestApi) -> TestResult {
 #[test_connector]
 async fn a_table_with_unique_index(api: &TestApi) -> TestResult {
     api.barrel()
-        .execute_with_schema(
-            |migration| {
-                migration.create_table("Blog", |t| {
-                    t.add_column("id", types::integer().increments(true).nullable(false));
-                    t.add_constraint("Blog_pkey", types::primary_constraint(&["id"]));
-                    t.add_column("authorId", types::integer());
-                    t.add_index("test", types::index(vec!["authorId"]).unique(true));
-                });
-            },
-            api.schema_name(),
-        )
+        .execute(|migration| {
+            migration.create_table("Blog", |t| {
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("Blog_pkey", types::primary_constraint(&["id"]));
+                t.add_column("authorId", types::integer());
+                t.add_index("test", types::index(vec!["authorId"]).unique(true));
+            });
+        })
         .await?;
 
     let dm = indoc! {r##"
@@ -175,18 +163,15 @@ async fn a_table_with_unique_index(api: &TestApi) -> TestResult {
 #[test_connector]
 async fn a_table_with_multi_column_unique_index(api: &TestApi) -> TestResult {
     api.barrel()
-        .execute_with_schema(
-            |migration| {
-                migration.create_table("User", |t| {
-                    t.add_column("id", types::integer().increments(true).nullable(false));
-                    t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
-                    t.add_column("firstname", types::integer());
-                    t.add_column("lastname", types::integer());
-                    t.add_index("test", types::index(vec!["firstname", "lastname"]).unique(true));
-                });
-            },
-            api.schema_name(),
-        )
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
+                t.add_column("firstname", types::integer());
+                t.add_column("lastname", types::integer());
+                t.add_index("test", types::index(vec!["firstname", "lastname"]).unique(true));
+            });
+        })
         .await?;
 
     let dm = indoc! {r##"
@@ -206,17 +191,14 @@ async fn a_table_with_multi_column_unique_index(api: &TestApi) -> TestResult {
 #[test_connector]
 async fn a_table_with_required_and_optional_columns(api: &TestApi) -> TestResult {
     api.barrel()
-        .execute_with_schema(
-            |migration| {
-                migration.create_table("User", |t| {
-                    t.add_column("id", types::integer().increments(true).nullable(false));
-                    t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
-                    t.add_column("requiredname", types::integer().nullable(false));
-                    t.add_column("optionalname", types::integer().nullable(true));
-                });
-            },
-            api.schema_name(),
-        )
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
+                t.add_column("requiredname", types::integer().nullable(false));
+                t.add_column("optionalname", types::integer().nullable(true));
+            });
+        })
         .await?;
 
     let dm = indoc! {r##"
@@ -235,20 +217,17 @@ async fn a_table_with_required_and_optional_columns(api: &TestApi) -> TestResult
 #[test_connector]
 async fn a_table_with_default_values(api: &TestApi) -> TestResult {
     api.barrel()
-        .execute_with_schema(
-            |migration| {
-                migration.create_table("User", |t| {
-                    t.add_column("id", types::integer().increments(true).nullable(false));
-                    t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
-                    t.add_column("bool", types::boolean().default(false));
-                    t.add_column("bool2", types::boolean().default(true));
-                    t.add_column("float", types::float().default(5.3));
-                    t.add_column("int", types::integer().default(5));
-                    t.add_column("string", types::char(4).default("Test"));
-                });
-            },
-            api.schema_name(),
-        )
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
+                t.add_column("bool", types::boolean().default(false));
+                t.add_column("bool2", types::boolean().default(true));
+                t.add_column("float", types::float().default(5.3));
+                t.add_column("int", types::integer().default(5));
+                t.add_column("string", types::char(4).default("Test"));
+            });
+        })
         .await?;
 
     let native_string = if !api.sql_family().is_sqlite() {
@@ -283,17 +262,14 @@ async fn a_table_with_default_values(api: &TestApi) -> TestResult {
 #[test_connector]
 async fn a_table_with_a_non_unique_index(api: &TestApi) -> TestResult {
     api.barrel()
-        .execute_with_schema(
-            |migration| {
-                migration.create_table("User", |t| {
-                    t.add_column("a", types::integer());
-                    t.add_column("id", types::integer().increments(true).nullable(false));
-                    t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
-                    t.add_index("test", types::index(vec!["a"]));
-                });
-            },
-            api.schema_name(),
-        )
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("a", types::integer());
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
+                t.add_index("test", types::index(vec!["a"]));
+            });
+        })
         .await?;
 
     let dm = indoc! {r##"
@@ -313,18 +289,15 @@ async fn a_table_with_a_non_unique_index(api: &TestApi) -> TestResult {
 #[test_connector]
 async fn a_table_with_a_multi_column_non_unique_index(api: &TestApi) -> TestResult {
     api.barrel()
-        .execute_with_schema(
-            |migration| {
-                migration.create_table("User", |t| {
-                    t.add_column("a", types::integer());
-                    t.add_column("b", types::integer());
-                    t.add_column("id", types::integer().increments(true).nullable(false));
-                    t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
-                    t.add_index("test", types::index(vec!["a", "b"]));
-                });
-            },
-            api.schema_name(),
-        )
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("a", types::integer());
+                t.add_column("b", types::integer());
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
+                t.add_index("test", types::index(vec!["a", "b"]));
+            });
+        })
         .await?;
 
     let dm = indoc! { r##"
@@ -346,17 +319,14 @@ async fn a_table_with_a_multi_column_non_unique_index(api: &TestApi) -> TestResu
 #[test_connector(exclude(Sqlite))]
 async fn a_table_with_non_id_autoincrement(api: &TestApi) -> TestResult {
     api.barrel()
-        .execute_with_schema(
-            |migration| {
-                migration.create_table("Test", |t| {
-                    t.add_column("id", types::integer().nullable(false));
-                    t.add_constraint("Test_pkey", types::primary_constraint(&["id"]));
-                    t.add_column("authorId", types::integer().increments(true));
-                    t.add_constraint("Test_authorId_key", types::unique_constraint(vec!["authorId"]));
-                });
-            },
-            api.schema_name(),
-        )
+        .execute(|migration| {
+            migration.create_table("Test", |t| {
+                t.add_column("id", types::integer().nullable(false));
+                t.add_constraint("Test_pkey", types::primary_constraint(&["id"]));
+                t.add_column("authorId", types::integer().increments(true));
+                t.add_constraint("Test_authorId_key", types::unique_constraint(vec!["authorId"]));
+            });
+        })
         .await?;
 
     let dm = indoc! {r#"
@@ -374,34 +344,31 @@ async fn a_table_with_non_id_autoincrement(api: &TestApi) -> TestResult {
 #[test_connector]
 async fn default_values(api: &TestApi) -> TestResult {
     api.barrel()
-        .execute_with_schema(
-            |migration| {
-                migration.create_table("Test", move |t| {
-                    t.add_column("id", types::integer().increments(true).nullable(false));
-                    t.add_constraint("Test_pkey", types::primary_constraint(&["id"]));
-                    t.add_column(
-                        "string_static_char",
-                        types::custom("char(5)").default("test").nullable(true),
-                    );
-                    t.add_column(
-                        "string_static_char_null",
-                        types::r#char(5).default(types::null()).nullable(true),
-                    );
-                    t.add_column(
-                        "string_static_varchar",
-                        types::varchar(5).default("test").nullable(true),
-                    );
-                    t.add_column("int_static", types::integer().default(2).nullable(true));
-                    t.add_column("float_static", types::float().default(1.43).nullable(true));
-                    t.add_column("boolean_static", types::boolean().default(true).nullable(true));
-                    t.add_column(
-                        "datetime_now",
-                        types::datetime().default(functions::current_timestamp()).nullable(true),
-                    );
-                });
-            },
-            api.schema_name(),
-        )
+        .execute(|migration| {
+            migration.create_table("Test", move |t| {
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("Test_pkey", types::primary_constraint(&["id"]));
+                t.add_column(
+                    "string_static_char",
+                    types::custom("char(5)").default("test").nullable(true),
+                );
+                t.add_column(
+                    "string_static_char_null",
+                    types::r#char(5).default(types::null()).nullable(true),
+                );
+                t.add_column(
+                    "string_static_varchar",
+                    types::varchar(5).default("test").nullable(true),
+                );
+                t.add_column("int_static", types::integer().default(2).nullable(true));
+                t.add_column("float_static", types::float().default(1.43).nullable(true));
+                t.add_column("boolean_static", types::boolean().default(true).nullable(true));
+                t.add_column(
+                    "datetime_now",
+                    types::datetime().default(functions::current_timestamp()).nullable(true),
+                );
+            });
+        })
         .await?;
 
     let char_native = if !api.sql_family().is_sqlite() {
@@ -517,17 +484,14 @@ async fn my_default_value_as_dbgenerated(api: &TestApi) -> TestResult {
 #[test_connector(tags(Mysql8))]
 async fn a_table_with_an_index_that_contains_expressions_should_be_ignored(api: &TestApi) -> TestResult {
     api.barrel()
-        .execute_with_schema(
-            |migration| {
-                migration.create_table("Test", |t| {
-                    t.add_column("id", types::integer().primary(true));
-                    t.add_column("parentId", types::integer().nullable(true));
-                    t.add_column("name", types::varchar(45).nullable(true));
-                    t.inject_custom("UNIQUE KEY `SampleTableUniqueIndexName` (`name`,(ifnull(`parentId`,-(1))))");
-                });
-            },
-            api.schema_name(),
-        )
+        .execute(|migration| {
+            migration.create_table("Test", |t| {
+                t.add_column("id", types::integer().primary(true));
+                t.add_column("parentId", types::integer().nullable(true));
+                t.add_column("name", types::varchar(45).nullable(true));
+                t.inject_custom("UNIQUE KEY `SampleTableUniqueIndexName` (`name`,(ifnull(`parentId`,-(1))))");
+            });
+        })
         .await?;
 
     let dm = indoc! {r#"
@@ -633,25 +597,18 @@ async fn introspecting_a_table_with_json_type_must_work(api: &TestApi) -> TestRe
 #[test_connector(tags(Mariadb))]
 async fn different_default_values_should_work(api: &TestApi) -> TestResult {
     api.barrel()
-        .execute_with_schema(
-            |migration| {
-                migration.create_table("Blog", move |t| {
-                    t.add_column("id", types::integer().increments(true).nullable(false));
-                    t.add_constraint("Blog_pkey", types::primary_constraint(&["id"]));
-                    t.inject_custom("text Text Default \"one\"");
-                    t.inject_custom(
-                        "`tinytext_string` tinytext COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT \"twelve\"",
-                    );
-                    t.inject_custom(
-                        "`tinytext_number_string` tinytext COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT \"1\"",
-                    );
-                    t.inject_custom("`tinytext_number` tinytext COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 10");
-                    t.inject_custom("`tinytext_float` tinytext COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 1.0");
-                    t.inject_custom("`tinytext_short` tinytext COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 1");
-                });
-            },
-            api.schema_name(),
-        )
+        .execute(|migration| {
+            migration.create_table("Blog", move |t| {
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("Blog_pkey", types::primary_constraint(&["id"]));
+                t.inject_custom("text Text Default \"one\"");
+                t.inject_custom("`tinytext_string` tinytext COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT \"twelve\"");
+                t.inject_custom("`tinytext_number_string` tinytext COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT \"1\"");
+                t.inject_custom("`tinytext_number` tinytext COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 10");
+                t.inject_custom("`tinytext_float` tinytext COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 1.0");
+                t.inject_custom("`tinytext_short` tinytext COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 1");
+            });
+        })
         .await?;
 
     let dm = indoc! {r##"
@@ -674,21 +631,18 @@ async fn different_default_values_should_work(api: &TestApi) -> TestResult {
 #[test_connector(exclude(Sqlite))]
 async fn negative_default_values_should_work(api: &TestApi) -> TestResult {
     api.barrel()
-        .execute_with_schema(
-            |migration| {
-                migration.create_table("Blog", move |t| {
-                    t.add_column("id", types::integer().increments(true).nullable(false));
-                    t.add_constraint("Blog_pkey", types::primary_constraint(&["id"]));
-                    t.add_column("int", types::integer().default(1));
-                    t.add_column("neg_int", types::integer().default(-1));
-                    t.add_column("float", types::float().default(2.1));
-                    t.add_column("neg_float", types::float().default(-2.1));
-                    t.add_column("big_int", types::custom("bigint").default(3));
-                    t.add_column("neg_big_int", types::custom("bigint").default(-3));
-                });
-            },
-            api.schema_name(),
-        )
+        .execute(|migration| {
+            migration.create_table("Blog", move |t| {
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("Blog_pkey", types::primary_constraint(&["id"]));
+                t.add_column("int", types::integer().default(1));
+                t.add_column("neg_int", types::integer().default(-1));
+                t.add_column("float", types::float().default(2.1));
+                t.add_column("neg_float", types::float().default(-2.1));
+                t.add_column("big_int", types::custom("bigint").default(3));
+                t.add_column("neg_big_int", types::custom("bigint").default(-3));
+            });
+        })
         .await?;
 
     let float_native = if api.sql_family().is_mysql() {
@@ -719,19 +673,16 @@ async fn negative_default_values_should_work(api: &TestApi) -> TestResult {
 #[test_connector(tags(Mysql))]
 async fn partial_indexes_should_be_ignored_on_mysql(api: &TestApi) -> TestResult {
     api.barrel()
-        .execute_with_schema(
-            |migration| {
-                migration.create_table("Blog", move |t| {
-                    t.add_column("id", types::integer().increments(true).nullable(false));
-                    t.add_constraint("Blog_pkey", types::primary_constraint(&["id"]));
-                    t.add_column("int_col", types::integer());
-                    t.inject_custom("blob_col mediumblob");
-                    t.inject_custom("Index `partial_blob_col_index` (blob_col(10))");
-                    t.inject_custom("Index `partial_compound` (blob_col(10), int_col)");
-                });
-            },
-            api.schema_name(),
-        )
+        .execute(|migration| {
+            migration.create_table("Blog", move |t| {
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("Blog_pkey", types::primary_constraint(&["id"]));
+                t.add_column("int_col", types::integer());
+                t.inject_custom("blob_col mediumblob");
+                t.inject_custom("Index `partial_blob_col_index` (blob_col(10))");
+                t.inject_custom("Index `partial_compound` (blob_col(10), int_col)");
+            });
+        })
         .await?;
 
     let dm = indoc! {r##"
@@ -751,17 +702,14 @@ async fn partial_indexes_should_be_ignored_on_mysql(api: &TestApi) -> TestResult
 #[test_connector(tags(Sqlite))]
 async fn expression_indexes_should_be_ignored_on_sqlite(api: &TestApi) -> TestResult {
     api.barrel()
-        .execute_with_schema(
-            |migration| {
-                migration.create_table("Blog", move |t| {
-                    t.add_column("id", types::integer().increments(true).nullable(false));
-                    t.add_constraint("Blog_pkey", types::primary_constraint(&["id"]));
-                    t.add_column("author", types::text());
-                });
-                migration.inject_custom("CREATE INDEX author_lowercase_index ON Blog(LOWER(author));")
-            },
-            api.schema_name(),
-        )
+        .execute(|migration| {
+            migration.create_table("Blog", move |t| {
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("Blog_pkey", types::primary_constraint(&["id"]));
+                t.add_column("author", types::text());
+            });
+            migration.inject_custom("CREATE INDEX author_lowercase_index ON Blog(LOWER(author));")
+        })
         .await?;
 
     let dm = indoc! {r##"
@@ -780,24 +728,21 @@ async fn expression_indexes_should_be_ignored_on_sqlite(api: &TestApi) -> TestRe
 #[test_connector(tags(Mysql))]
 async fn casing_should_not_lead_to_mix_ups(api: &TestApi) -> TestResult {
     api.barrel()
-        .execute_with_schema(
-            |migration| {
-                migration.create_table("address", move |t| {
-                    t.inject_custom("addressid INT NOT NULL");
-                    t.inject_custom("PRIMARY KEY(addressid)");
-                });
+        .execute(|migration| {
+            migration.create_table("address", move |t| {
+                t.inject_custom("addressid INT NOT NULL");
+                t.inject_custom("PRIMARY KEY(addressid)");
+            });
 
-                migration.create_table("ADDRESS", move |t| {
-                    t.inject_custom("ADDRESSID INT NOT NULL");
-                    t.inject_custom("PRIMARY KEY(ADDRESSID)");
-                });
-                migration.create_table("Address", move |t| {
-                    t.inject_custom("AddressID INT NOT NULL AUTO_INCREMENT");
-                    t.inject_custom("PRIMARY KEY(AddressID)");
-                });
-            },
-            api.schema_name(),
-        )
+            migration.create_table("ADDRESS", move |t| {
+                t.inject_custom("ADDRESSID INT NOT NULL");
+                t.inject_custom("PRIMARY KEY(ADDRESSID)");
+            });
+            migration.create_table("Address", move |t| {
+                t.inject_custom("AddressID INT NOT NULL AUTO_INCREMENT");
+                t.inject_custom("PRIMARY KEY(AddressID)");
+            });
+        })
         .await?;
 
     let dm = indoc! {r##"
@@ -826,25 +771,22 @@ async fn casing_should_not_lead_to_mix_ups(api: &TestApi) -> TestResult {
 async fn primary_key_is_unnamed(api: &TestApi) -> TestResult {
     let sqlite = api.sql_family().is_sqlite();
     api.barrel()
-        .execute_with_schema(
-            |migration| {
-                migration.create_table("Single", move |t| {
-                    if sqlite {
-                        t.inject_custom("id Integer Primary Key AUTOINCREMENT");
-                    } else {
-                        t.inject_custom("id Int Auto_Increment");
-                        t.inject_custom("Constraint name_not_persisted Primary Key(id)");
-                    }
-                });
+        .execute(|migration| {
+            migration.create_table("Single", move |t| {
+                if sqlite {
+                    t.inject_custom("id Integer Primary Key AUTOINCREMENT");
+                } else {
+                    t.inject_custom("id Int Auto_Increment");
+                    t.inject_custom("Constraint name_not_persisted Primary Key(id)");
+                }
+            });
 
-                migration.create_table("Compound", move |t| {
-                    t.add_column("id_1", types::integer());
-                    t.add_column("id_2", types::integer());
-                    t.inject_custom("Constraint name_not_persisted Primary Key(id_1, id_2)");
-                });
-            },
-            api.schema_name(),
-        )
+            migration.create_table("Compound", move |t| {
+                t.add_column("id_1", types::integer());
+                t.add_column("id_2", types::integer());
+                t.inject_custom("Constraint name_not_persisted Primary Key(id_1, id_2)");
+            });
+        })
         .await?;
 
     let dm = indoc! {r##"
@@ -870,26 +812,23 @@ async fn primary_key_is_unnamed(api: &TestApi) -> TestResult {
 async fn primary_key_is_named(api: &TestApi) -> TestResult {
     let postgres = api.sql_family().is_sqlite();
     api.barrel()
-        .execute_with_schema(
-            |migration| {
-                migration.create_table("Single", move |t| {
-                    if postgres {
-                        t.inject_custom("id Integer ");
-                        t.inject_custom("Constraint name_persisted Primary Key(id)");
-                    } else {
-                        t.inject_custom("id Int");
-                        t.inject_custom("Constraint name_persisted Primary Key(id)");
-                    }
-                });
+        .execute(|migration| {
+            migration.create_table("Single", move |t| {
+                if postgres {
+                    t.inject_custom("id Integer ");
+                    t.inject_custom("Constraint name_persisted Primary Key(id)");
+                } else {
+                    t.inject_custom("id Int");
+                    t.inject_custom("Constraint name_persisted Primary Key(id)");
+                }
+            });
 
-                migration.create_table("Compound", move |t| {
-                    t.add_column("id_1", types::integer());
-                    t.add_column("id_2", types::integer());
-                    t.inject_custom("Constraint name_persisted_2 Primary Key(id_1, id_2)");
-                });
-            },
-            api.schema_name(),
-        )
+            migration.create_table("Compound", move |t| {
+                t.add_column("id_1", types::integer());
+                t.add_column("id_2", types::integer());
+                t.inject_custom("Constraint name_persisted_2 Primary Key(id_1, id_2)");
+            });
+        })
         .await?;
 
     let dm = indoc! {r##"

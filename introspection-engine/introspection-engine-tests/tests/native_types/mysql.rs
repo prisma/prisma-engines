@@ -52,16 +52,13 @@ async fn native_type_columns_feature_on(api: &TestApi) -> TestResult {
         .collect();
 
     api.barrel()
-        .execute_with_schema(
-            move |migration| {
-                migration.create_table("Blog", move |t| {
-                    for column in &columns {
-                        t.inject_custom(column);
-                    }
-                });
-            },
-            api.db_name(),
-        )
+        .execute(move |migration| {
+            migration.create_table("Blog", move |t| {
+                for column in &columns {
+                    t.inject_custom(column);
+                }
+            });
+        })
         .await?;
 
     let (json, default) = match api {

@@ -18,6 +18,7 @@ fn constraint_names() {
     model B {
       a String
       b String
+      A A?
    
       @@id([a, b], name: "clientId", map: "CustomCompoundDBId")
       @@unique([a, b], name: "clientUnique", map: "CustomCompoundDBUnique")

@@ -307,17 +307,14 @@ async fn remapping_field_names_to_empty(api: &TestApi) -> TestResult {
 #[test_connector(tags(Postgres), exclude(Cockroach))]
 async fn dbgenerated_in_unsupported(api: &TestApi) -> TestResult {
     api.barrel()
-        .execute_with_schema(
-            |migration| {
-                migration.create_table("Blog", move |t| {
-                    t.add_column("id", types::primary());
-                    t.inject_custom("number Integer Default 1");
-                    t.inject_custom("bigger_number Integer DEFAULT sqrt(4)");
-                    t.inject_custom("point Point DEFAULT Point(0, 0)");
-                });
-            },
-            api.schema_name(),
-        )
+        .execute(|migration| {
+            migration.create_table("Blog", move |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("number Integer Default 1");
+                t.inject_custom("bigger_number Integer DEFAULT sqrt(4)");
+                t.inject_custom("point Point DEFAULT Point(0, 0)");
+            });
+        })
         .await?;
 
     let dm = indoc! {r##"
