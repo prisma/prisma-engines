@@ -3,6 +3,7 @@ mod basic;
 mod defaults;
 mod dev_diagnostic_tests;
 mod diagnose_migration_history_tests;
+mod drift_summary;
 mod enums;
 mod foreign_keys;
 mod indexes;

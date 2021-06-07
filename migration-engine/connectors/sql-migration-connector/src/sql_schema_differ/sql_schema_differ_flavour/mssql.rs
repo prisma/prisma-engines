@@ -1,7 +1,7 @@
 use super::SqlSchemaDifferFlavour;
 use crate::{
     flavour::MssqlFlavour,
-    sql_migration::{AlterTable, CreateIndex, DropIndex},
+    sql_migration::{AlterTable, CreateIndex, SqlMigrationStep},
     sql_schema_differ::{
         column::{ColumnDiffer, ColumnTypeChange},
         SqlSchemaDiffer,
@@ -56,8 +56,7 @@ impl SqlSchemaDifferFlavour for MssqlFlavour {
     fn push_index_changes_for_column_changes(
         &self,
         alter_tables: &[AlterTable],
-        drop_indexes: &mut Vec<DropIndex>,
-        create_indexes: &mut Vec<CreateIndex>,
+        steps: &mut Vec<SqlMigrationStep>,
         differ: &SqlSchemaDiffer<'_>,
     ) {
         for table in alter_tables {
@@ -78,7 +77,7 @@ impl SqlSchemaDifferFlavour for MssqlFlavour {
                         .columns()
                         .any(|col| col.column_index() == *column.column_index.previous())
                 }) {
-                    drop_indexes.push(DropIndex {
+                    steps.push(SqlMigrationStep::DropIndex {
                         table_index: table.previous().table_index(),
                         index_index: dropped_index.previous().index(),
                     })
@@ -89,11 +88,11 @@ impl SqlSchemaDifferFlavour for MssqlFlavour {
                         .columns()
                         .any(|col| col.column_index() == *column.column_index.next())
                 }) {
-                    create_indexes.push(CreateIndex {
+                    steps.push(SqlMigrationStep::CreateIndex(CreateIndex {
                         table_index: table.next().table_index(),
                         index_index: created_index.next().index(),
                         caused_by_create_table: true,
-                    })
+                    }))
                 }
             }
         }
