@@ -113,8 +113,8 @@ impl SqlMigrationConnector {
 
                     for change in changes {
                         match change {
-                            TableChange::DropColumn(ref drop_column) => {
-                                let column = tables.previous().column_at(drop_column.index);
+                            TableChange::DropColumn { column_index } => {
+                                let column = tables.previous().column_at(*column_index);
 
                                 self.check_column_drop(&column, &mut plan, step_index);
                             }
@@ -124,8 +124,8 @@ impl SqlMigrationConnector {
                                 self.flavour()
                                     .check_alter_column(&alter_column, &columns, &mut plan, step_index)
                             }
-                            TableChange::AddColumn(ref add_column) => {
-                                let column = tables.next().column_at(add_column.column_index);
+                            TableChange::AddColumn { column_index } => {
+                                let column = tables.next().column_at(*column_index);
 
                                 self.check_add_column(&column, &mut plan, step_index, migration)
                             }

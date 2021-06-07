@@ -5,7 +5,7 @@ use super::{
 use crate::{
     flavour::PostgresFlavour,
     pair::Pair,
-    sql_migration::{AddColumn, AlterColumn, AlterEnum, AlterTable, DropColumn, RedefineTable, TableChange},
+    sql_migration::{AlterColumn, AlterEnum, AlterTable, RedefineTable, TableChange},
     sql_schema_differ::{ColumnChange, ColumnChanges},
 };
 use native_types::PostgresType;
@@ -254,14 +254,14 @@ impl SqlRenderer for PostgresFlavour {
                     "ADD PRIMARY KEY ({})",
                     columns.iter().map(|colname| self.quote(colname)).join(", ")
                 )),
-                TableChange::AddColumn(AddColumn { column_index }) => {
+                TableChange::AddColumn { column_index } => {
                     let column = tables.next().column_at(*column_index);
                     let col_sql = self.render_column(&column);
 
                     lines.push(format!("ADD COLUMN {}", col_sql));
                 }
-                TableChange::DropColumn(DropColumn { index }) => {
-                    let name = self.quote(tables.previous().column_at(*index).name());
+                TableChange::DropColumn { column_index } => {
+                    let name = self.quote(tables.previous().column_at(*column_index).name());
                     lines.push(format!("DROP COLUMN {}", name));
                 }
                 TableChange::AlterColumn(AlterColumn {

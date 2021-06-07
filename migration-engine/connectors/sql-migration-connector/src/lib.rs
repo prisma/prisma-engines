@@ -16,7 +16,7 @@ mod sql_schema_calculator;
 mod sql_schema_differ;
 
 use connection_wrapper::Connection;
-use datamodel::{walkers::walk_models, Datamodel};
+use datamodel::{walkers::walk_models, Configuration, Datamodel};
 use error::quaint_error_to_connector_error;
 use flavour::SqlFlavour;
 use migration_connector::*;
@@ -149,6 +149,26 @@ impl SqlMigrationConnector {
         }
 
         Ok(())
+    }
+
+    /// For tests.
+    pub fn migration_from_schemas(
+        from: (&Configuration, &Datamodel),
+        to: (&Configuration, &Datamodel),
+    ) -> SqlMigration {
+        let connection_info = ConnectionInfo::from_url(&from.0.datasources[0].load_url().unwrap()).unwrap();
+        let flavour = flavour::from_connection_info(&connection_info);
+        let from_sql = sql_schema_calculator::calculate_sql_schema(from, flavour.as_ref());
+        let to_sql = sql_schema_calculator::calculate_sql_schema(to, flavour.as_ref());
+
+        let steps = sql_schema_differ::calculate_steps(Pair::new(&from_sql, &to_sql), flavour.as_ref());
+
+        SqlMigration {
+            before: from_sql,
+            after: to_sql,
+            added_columns_with_virtual_defaults: Vec::new(),
+            steps,
+        }
     }
 
     /// Generate a name for a temporary (shadow) database, _if_ there is no user-configured shadow database url.
@@ -309,7 +329,7 @@ fn walk_added_columns(steps: &[SqlMigrationStep]) -> impl Iterator<Item = (usize
                 .changes
                 .iter()
                 .filter_map(|change| change.as_add_column())
-                .map(move |column| -> (usize, usize) { (*alter_table.table_index.next(), column.column_index) })
+                .map(move |column_index| -> (usize, usize) { (*alter_table.table_index.next(), column_index) })
         })
         .chain(
             steps
