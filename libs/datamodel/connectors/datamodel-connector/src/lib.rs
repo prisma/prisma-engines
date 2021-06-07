@@ -197,7 +197,7 @@ pub enum ConnectorCapability {
 /// Contains all capabilities that the connector is able to serve.
 #[derive(Debug)]
 pub struct ConnectorCapabilities {
-    capabilities: Vec<ConnectorCapability>,
+    pub capabilities: Vec<ConnectorCapability>,
 }
 
 impl ConnectorCapabilities {

@@ -87,6 +87,7 @@ use std::{convert::TryInto, sync::Arc};
 #[tracing::instrument(skip(graph, parent_node, parent_relation_field, value))]
 pub fn nested_upsert(
     graph: &mut QueryGraph,
+    connector_ctx: &ConnectorContext,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
     value: ParsedInputValue,
@@ -117,9 +118,11 @@ pub fn nested_upsert(
             utils::insert_find_children_by_parent_node(graph, &parent_node, parent_relation_field, filter)?;
 
         let if_node = graph.create_node(Flow::default_if());
-        let create_node = create::create_record_node(graph, Arc::clone(&child_model), create_input.try_into()?)?;
+        let create_node =
+            create::create_record_node(graph, connector_ctx, Arc::clone(&child_model), create_input.try_into()?)?;
         let update_node = update::update_record_node(
             graph,
+            connector_ctx,
             Filter::empty(),
             Arc::clone(&child_model),
             update_input.try_into()?,

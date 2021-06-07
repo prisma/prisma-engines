@@ -23,6 +23,7 @@ use std::{convert::TryInto, sync::Arc};
 #[tracing::instrument(skip(graph, parent_node, parent_relation_field, value, child_model))]
 pub fn nested_delete(
     graph: &mut QueryGraph,
+    connector_ctx: &ConnectorContext,
     parent_node: &NodeRef,
     parent_relation_field: &RelationFieldRef,
     value: ParsedInputValue,
@@ -128,6 +129,7 @@ pub fn nested_delete(
 #[tracing::instrument(skip(graph, parent, parent_relation_field, value, child_model))]
 pub fn nested_delete_many(
     graph: &mut QueryGraph,
+    connector_ctx: &ConnectorContext,
     parent: &NodeRef,
     parent_relation_field: &RelationFieldRef,
     value: ParsedInputValue,

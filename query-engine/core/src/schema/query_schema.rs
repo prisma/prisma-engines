@@ -1,4 +1,6 @@
 use super::*;
+use datamodel::common::preview_features::PreviewFeature;
+use datamodel_connector::ConnectorCapability;
 use fmt::Debug;
 use prisma_models::{InternalDataModelRef, ModelRef};
 use std::{borrow::Borrow, fmt};
@@ -18,16 +20,39 @@ use std::{borrow::Borrow, fmt};
 /// Using a QuerySchema should never involve dealing with the strong references.
 #[derive(Debug)]
 pub struct QuerySchema {
+    /// Root query object (read queries).
     pub query: OutputTypeRef,
+
+    /// Root mutation object (write queries).
     pub mutation: OutputTypeRef,
 
-    /// Stores all strong refs to the input object types.
+    /// Internal abstraction over the datamodel AST.
+    pub internal_data_model: InternalDataModelRef,
+
+    /// Information about the connector this schema was build for.
+    pub context: ConnectorContext,
+
+    /// Internal. Stores all strong Arc refs to the input object types.
     input_object_types: Vec<InputObjectTypeStrongRef>,
 
-    /// Stores all strong refs to the output object types.
+    /// Internal. Stores all strong Arc refs to the output object types.
     output_object_types: Vec<ObjectTypeStrongRef>,
+}
 
-    pub internal_data_model: InternalDataModelRef,
+/// Connector meta information, to be used in query execution if necessary.
+#[derive(Debug)]
+pub struct ConnectorContext {
+    /// Capabilities of the provider.
+    pub capabilities: Vec<ConnectorCapability>,
+
+    /// Enabled preview features.
+    pub features: Vec<PreviewFeature>,
+}
+
+impl ConnectorContext {
+    pub fn new(capabilities: Vec<ConnectorCapability>, features: Vec<PreviewFeature>) -> Self {
+        Self { capabilities, features }
+    }
 }
 
 impl QuerySchema {
@@ -37,6 +62,8 @@ impl QuerySchema {
         input_object_types: Vec<InputObjectTypeStrongRef>,
         output_object_types: Vec<ObjectTypeStrongRef>,
         internal_data_model: InternalDataModelRef,
+        capabilities: Vec<ConnectorCapability>,
+        features: Vec<PreviewFeature>,
     ) -> Self {
         QuerySchema {
             query,
@@ -44,6 +71,7 @@ impl QuerySchema {
             input_object_types,
             output_object_types,
             internal_data_model,
+            context: ConnectorContext::new(capabilities, features),
         }
     }
 
@@ -75,6 +103,10 @@ impl QuerySchema {
             OutputType::Object(ref o) => o.into_arc(),
             _ => unreachable!(),
         }
+    }
+
+    pub fn context(&self) -> &ConnectorContext {
+        &self.context
     }
 }
 

@@ -53,6 +53,7 @@ features!(
     OrderByAggregateGroup,
     FilterJson,
     PlanetScaleMode,
+    ReferentialActions,
 );
 
 // Mapping of which active, deprecated and hidden
@@ -69,6 +70,7 @@ pub static GENERATOR: Lazy<FeatureMap> = Lazy::new(|| {
             OrderByAggregateGroup,
             FilterJson,
             PlanetScaleMode,
+            ReferentialActions,
         ])
         .with_hidden(vec![MongoDb])
         .with_deprecated(vec![
