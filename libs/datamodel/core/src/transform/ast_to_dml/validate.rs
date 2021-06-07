@@ -1,4 +1,4 @@
-use crate::ast::Model;
+use crate::ast::{Model, Span};
 use crate::{
     ast, configuration,
     diagnostics::{DatamodelError, Diagnostics},
@@ -47,6 +47,8 @@ impl<'a> Validator<'a> {
             let ast_model = ast_schema.find_model(&model.name).expect(STATE_ERROR);
 
             self.validate_optional_id_only_on_ignored_models(&mut errors_for_model, &model, ast_model);
+
+            self.validate_name_collisions_with_compound_client_names(&mut errors_for_model, model, ast_model);
 
             if let Err(err) = self.validate_model_has_strict_unique_criteria(ast_model, model) {
                 errors_for_model.push_error(err);
@@ -97,10 +99,8 @@ impl<'a> Validator<'a> {
                 errors_for_model.extend(the_errors);
             }
 
-            // todo validate that there are no duplicate client names for compound uniques /ids
-            // and also that no field names are reused
-
             // todo validate that the length limits for constraint names are not violated
+            // id, unique, index, foreign key
 
             all_errors.extend(errors_for_model);
         }
@@ -142,6 +142,37 @@ impl<'a> Validator<'a> {
                     "id",
                     span,
                 ));
+            }
+        }
+    }
+
+    pub fn validate_name_collisions_with_compound_client_names(
+        &self,
+        errors_for_model: &mut Diagnostics,
+        model: &dml::Model,
+        ast_model: &Model,
+    ) {
+        let model_span = ast_model.span;
+
+        if let Some(pk) = &model.primary_key {
+            if let Some(name) = &pk.name_in_client {
+                for field in model.scalar_fields() {
+                    custom_name_reused(errors_for_model, name, &field.name, &model.name, "@@id", model_span)
+                }
+                for field in model.relation_fields() {
+                    custom_name_reused(errors_for_model, name, &field.name, &model.name, "@@id", model_span)
+                }
+            }
+        }
+
+        for index in model.indices.iter().filter(|i| i.is_unique() && i.fields.len() > 1) {
+            if let Some(name) = &index.name_in_client {
+                for field in model.scalar_fields() {
+                    custom_name_reused(errors_for_model, name, &field.name, &model.name, "@@unique", model_span)
+                }
+                for field in model.relation_fields() {
+                    custom_name_reused(errors_for_model, name, &field.name, &model.name, "@@unique", model_span)
+                }
             }
         }
     }
@@ -1074,5 +1105,22 @@ fn validate_name_collisions_with_map(schema: &dml::Datamodel, ast: &ast::SchemaA
                 ast.find_model(model.name()).unwrap().span,
             ));
         }
+    }
+}
+
+fn custom_name_reused(
+    diagnostics: &mut Diagnostics,
+    custom_name: &String,
+    field_name: &str,
+    model_name: &str,
+    attribute: &str,
+    span: Span,
+) {
+    if field_name == custom_name {
+        diagnostics.push_error(DatamodelError::new_model_validation_error(
+            &format!("The custom name specified for the `{}` attribute is already used as a name for a field. Please choose a different name.", attribute),
+            model_name,
+            span,
+        ));
     }
 }

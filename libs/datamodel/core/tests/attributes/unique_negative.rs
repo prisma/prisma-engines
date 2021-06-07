@@ -179,3 +179,52 @@ fn invalid_name_for_compound_unique_must_error() {
         Span::new(98, 147),
     ));
 }
+
+#[test]
+fn naming_unique_to_a_field_name_should_error() {
+    let dml = r#"
+    model User {
+        used           Int
+        name           String            
+        identification Int
+
+        @@unique([name, identification], name: "used")
+    }
+    "#;
+
+    let errors = parse_error(dml);
+    errors.assert_is(DatamodelError::new_model_validation_error(
+        "The custom name specified for the `@@unique` attribute is already used as a name for a field. Please choose a different name.",
+        "User",
+        Span::new(5, 175),
+    ));
+}
+
+#[test]
+fn mapping_unique_with_a_name_that_is_too_long_should_error() {
+    let dml = r#"
+        datasource test {
+        provider = "postgresql"
+        url = "postgresql://root:prisma@127.0.0.1:3309/postgres"
+    }
+    
+    model User {
+        name           String            
+        identification Int
+
+        @@unique([name, identification], map: "IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimits")
+    }
+    
+    model User1 {
+        name           String @unique("IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimitsHereAsWell")            
+        identification Int      
+    }
+    "#;
+
+    let errors = parse_error(dml);
+    errors.assert_is(DatamodelError::new_model_validation_error(
+        "You defined a database name for the primary key on the model. This is not supported by the provider.",
+        "User",
+        Span::new(134, 286),
+    ));
+}
