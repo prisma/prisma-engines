@@ -15,8 +15,8 @@ impl SqlDatamodelConnectors {
         PostgresDatamodelConnector::new()
     }
 
-    pub fn mysql() -> MySqlDatamodelConnector {
-        MySqlDatamodelConnector::new()
+    pub fn mysql(is_planetscale: bool) -> MySqlDatamodelConnector {
+        MySqlDatamodelConnector::new(is_planetscale)
     }
 
     pub fn sqlite() -> SqliteDatamodelConnector {

@@ -65,7 +65,7 @@ pub struct MySqlDatamodelConnector {
 }
 
 impl MySqlDatamodelConnector {
-    pub fn new() -> MySqlDatamodelConnector {
+    pub fn new(is_planetscale: bool) -> MySqlDatamodelConnector {
         use ReferentialAction::*;
 
         let capabilities = vec![
@@ -158,7 +158,11 @@ impl MySqlDatamodelConnector {
             json,
         ];
 
-        let referential_actions = Restrict | Cascade | SetNull | NoAction | SetDefault;
+        let referential_actions = if is_planetscale {
+            EmulateRestrict | EmulateSetNull
+        } else {
+            Restrict | Cascade | SetNull | NoAction | SetDefault
+        };
 
         MySqlDatamodelConnector {
             capabilities,
@@ -443,6 +447,6 @@ impl Connector for MySqlDatamodelConnector {
 
 impl Default for MySqlDatamodelConnector {
     fn default() -> Self {
-        Self::new()
+        Self::new(false)
     }
 }

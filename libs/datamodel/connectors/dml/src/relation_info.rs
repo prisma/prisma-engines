@@ -1,4 +1,4 @@
-use enumflags2::BitFlags;
+use enumflags2::bitflags;
 use std::fmt;
 
 /// Holds information about a relation field.
@@ -44,32 +44,37 @@ impl RelationInfo {
 
 /// Describes what happens when related nodes are deleted.
 #[repr(u8)]
-#[derive(Debug, Copy, PartialEq, Clone, BitFlags)]
+#[bitflags]
+#[derive(Debug, Copy, PartialEq, Clone)]
 pub enum ReferentialAction {
     /// Deletes record if dependent record is deleted. Updates relation scalar
     /// fields if referenced scalar fields of the dependent record are updated.
     /// Prevents operation (both updates and deletes) from succeeding if any
     /// records are connected. This behavior will always result in a runtime
     /// error for required relations.
-    Cascade = 1 << 0,
+    Cascade,
     /// Prevents operation (both updates and deletes) from succeeding if any
     /// records are connected. This behavior will always result in a runtime
     /// error for required relations.
-    Restrict = 1 << 1,
+    Restrict,
     /// Behavior is database specific. Either defers throwing an integrity check
     /// error until the end of the transaction or errors immediately. If
     /// deferred, this makes it possible to temporarily violate integrity in a
     /// transaction while making sure that subsequent operations in the
     /// transaction restore integrity.
-    NoAction = 1 << 2,
+    NoAction,
     /// Sets relation scalar fields to null if the relation is deleted or
     /// updated. This will always result in a runtime error if one or more of the
     /// relation scalar fields are required.
-    SetNull = 1 << 3,
+    SetNull,
     /// Sets relation scalar fields to their default values on update or delete
     /// of relation. Will always result in a runtime error if no defaults are
     /// provided for any relation scalar fields.
-    SetDefault = 1 << 4,
+    SetDefault,
+    /// An emulated version of `SetNull` for databases without foreign keys.
+    EmulateSetNull,
+    /// An emulated version of `Restrict` for databases without foreign keys.
+    EmulateRestrict,
 }
 
 impl fmt::Display for ReferentialAction {
@@ -80,6 +85,8 @@ impl fmt::Display for ReferentialAction {
             ReferentialAction::NoAction => write!(f, "NoAction"),
             ReferentialAction::SetNull => write!(f, "SetNull"),
             ReferentialAction::SetDefault => write!(f, "SetDefault"),
+            ReferentialAction::EmulateSetNull => write!(f, "EmulateSetNull"),
+            ReferentialAction::EmulateRestrict => write!(f, "EmulateRestrict"),
         }
     }
 }

@@ -18,10 +18,13 @@ type Result<T> = std::result::Result<T, ConnectorError>;
 pub struct MongoDbDatamodelConnector {
     capabilities: Vec<ConnectorCapability>,
     native_types: Vec<NativeTypeConstructor>,
+    referential_actions: BitFlags<ReferentialAction>,
 }
 
 impl MongoDbDatamodelConnector {
     pub fn new() -> Self {
+        use ReferentialAction::*;
+
         let capabilities = vec![
             ConnectorCapability::RelationsOverNonUniqueCriteria,
             ConnectorCapability::Json,
@@ -35,10 +38,12 @@ impl MongoDbDatamodelConnector {
         ];
 
         let native_types = mongodb_types::available_types();
+        let referential_actions = EmulateRestrict | EmulateSetNull;
 
         Self {
             capabilities,
             native_types,
+            referential_actions,
         }
     }
 }
@@ -59,7 +64,7 @@ impl Connector for MongoDbDatamodelConnector {
     }
 
     fn referential_actions(&self) -> BitFlags<ReferentialAction> {
-        BitFlags::empty()
+        self.referential_actions
     }
 
     fn validate_field(&self, field: &dml::field::Field) -> Result<()> {
