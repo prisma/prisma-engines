@@ -350,7 +350,7 @@ pub(crate) fn calculate_scalar_field_type_with_native_types(column: &Column, fam
 
     //fixme move this out of function
     let connector: Box<dyn Connector> = match family {
-        SqlFamily::Mysql => Box::new(SqlDatamodelConnectors::mysql()),
+        SqlFamily::Mysql => Box::new(SqlDatamodelConnectors::mysql(false)),
         SqlFamily::Postgres => Box::new(SqlDatamodelConnectors::postgres()),
         SqlFamily::Sqlite => Box::new(SqlDatamodelConnectors::sqlite()),
         SqlFamily::Mssql => Box::new(SqlDatamodelConnectors::mssql()),
