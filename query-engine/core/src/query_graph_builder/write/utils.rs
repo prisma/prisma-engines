@@ -6,6 +6,7 @@ use crate::{
 use connector::{Filter, WriteArgs};
 use datamodel::common::preview_features::PreviewFeature;
 use itertools::Itertools;
+use once_cell::sync::OnceCell;
 use prisma_models::{ModelProjection, ModelRef, RelationFieldRef};
 use std::sync::Arc;
 
@@ -318,8 +319,10 @@ pub fn insert_deletion_checks(
     let relation_fields = internal_model.fields_requiring_model(model);
     let mut check_nodes = vec![];
 
+    let once = OnceCell::new();
+
     if !relation_fields.is_empty() {
-        let noop_node = graph.create_node(Node::Empty);
+        // let noop_node = graph.create_node(Node::Empty);
 
         // We know that the relation can't be a list and must be required on the related model for `model` (see fields_requiring_model).
         // For all requiring models (RM), we use the field on `model` to query for existing RM records and error out if at least one exists.
@@ -330,6 +333,7 @@ pub fn insert_deletion_checks(
                 }
             }
 
+            let noop_node = once.get_or_init(|| graph.create_node(Node::Empty));
             let relation_field = rf.related_field();
             let child_model_identifier = relation_field.related_model().primary_identifier();
             let read_node = insert_find_children_by_parent_node(graph, parent_node, &relation_field, Filter::empty())?;
@@ -362,7 +366,9 @@ pub fn insert_deletion_checks(
         });
 
         // Edge from empty node to the child (delete).
-        graph.create_edge(&noop_node, child_node, QueryGraphDependency::ExecutionOrder)?;
+        if let Some(noop_node) = once.get() {
+            graph.create_edge(&noop_node, child_node, QueryGraphDependency::ExecutionOrder)?;
+        }
     }
 
     Ok(())

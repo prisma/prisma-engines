@@ -6,7 +6,6 @@ use crate::{
     ArgumentListLookup, ConnectorContext, FilteredQuery, ParsedField,
 };
 use connector::filter::Filter;
-use datamodel::common::preview_features::PreviewFeature;
 use prisma_models::ModelRef;
 use std::{convert::TryInto, sync::Arc};
 
@@ -86,7 +85,8 @@ pub fn delete_many_records(
     let delete_many_node = graph.create_node(Query::Write(delete_many));
 
     // Todo [RA]
-    utils::insert_deletion_checks(graph, &model, &read_query_node, &delete_many_node)?;
+    utils::insert_deletion_checks(graph, connector_ctx, &model, &read_query_node, &delete_many_node)?;
+
     graph.create_edge(
         &read_query_node,
         &delete_many_node,
