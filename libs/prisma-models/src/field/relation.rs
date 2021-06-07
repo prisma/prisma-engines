@@ -1,5 +1,5 @@
 use crate::prelude::*;
-use datamodel::{FieldArity, RelationInfo};
+use datamodel::{FieldArity, ReferentialAction, RelationInfo};
 use once_cell::sync::OnceCell;
 use std::{
     fmt::Debug,
@@ -298,5 +298,9 @@ impl RelationField {
 
     pub fn db_names(&self) -> impl Iterator<Item = String> {
         self.scalar_fields().into_iter().map(|f| f.db_name().to_owned())
+    }
+
+    pub fn on_delete(&self) -> Option<&ReferentialAction> {
+        self.relation_info.on_delete.as_ref()
     }
 }

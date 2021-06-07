@@ -1,4 +1,5 @@
 use crate::prelude::*;
+use datamodel::ReferentialAction;
 use once_cell::sync::OnceCell;
 use std::{
     fmt::Debug,
@@ -180,5 +181,13 @@ impl Relation {
         self.internal_data_model
             .upgrade()
             .expect("InternalDataModel does not exist anymore. Parent internal_data_model is deleted without deleting the child internal_data_model.")
+    }
+
+    /// Retrieves the onDelete policy for this relation.
+    pub fn on_delete(&self) -> ReferentialAction {
+        let a = self.field_a().on_delete().cloned();
+        let b = self.field_b().on_delete().cloned();
+
+        a.or(b).expect("No referential action found for relation.")
     }
 }

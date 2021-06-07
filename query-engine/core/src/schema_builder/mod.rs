@@ -166,6 +166,7 @@ pub fn build(
         capabilities,
         preview_features.clone(),
     );
+
     output_types::output_objects::initialize_model_object_type_cache(&mut ctx);
 
     let (query_type, query_object_ref) = output_types::query_type::build(&mut ctx);

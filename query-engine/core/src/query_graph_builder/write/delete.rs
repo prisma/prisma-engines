@@ -36,11 +36,7 @@ pub fn delete_record(
     let delete_node = graph.create_node(delete_query);
 
     // Todo [RA]
-    if connector_ctx.features.contains(&PreviewFeature::ReferentialActions) {
-        todo!()
-    } else {
-        utils::insert_deletion_checks(graph, &model, &read_node, &delete_node)?;
-    }
+    utils::insert_deletion_checks(graph, connector_ctx, &model, &read_node, &delete_node)?;
 
     graph.create_edge(
         &read_node,

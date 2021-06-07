@@ -1,9 +1,10 @@
 use crate::{
     query_ast::*,
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
-    ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult,
+    ConnectorContext, ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult,
 };
 use connector::{Filter, WriteArgs};
+use datamodel::common::preview_features::PreviewFeature;
 use itertools::Itertools;
 use prisma_models::{ModelProjection, ModelRef, RelationFieldRef};
 use std::sync::Arc;
@@ -308,6 +309,7 @@ pub fn insert_existing_1to1_related_model_checks(
 #[tracing::instrument(skip(graph, model, parent_node, child_node))]
 pub fn insert_deletion_checks(
     graph: &mut QueryGraph,
+    connector_ctx: &ConnectorContext,
     model: &ModelRef,
     parent_node: &NodeRef,
     child_node: &NodeRef,
@@ -322,6 +324,12 @@ pub fn insert_deletion_checks(
         // We know that the relation can't be a list and must be required on the related model for `model` (see fields_requiring_model).
         // For all requiring models (RM), we use the field on `model` to query for existing RM records and error out if at least one exists.
         for rf in relation_fields {
+            if connector_ctx.features.contains(&PreviewFeature::ReferentialActions) {
+                if !matches!(rf.relation().on_delete(), datamodel::ReferentialAction::EmulateRestrict) {
+                    continue;
+                }
+            }
+
             let relation_field = rf.related_field();
             let child_model_identifier = relation_field.related_model().primary_identifier();
             let read_node = insert_find_children_by_parent_node(graph, parent_node, &relation_field, Filter::empty())?;
