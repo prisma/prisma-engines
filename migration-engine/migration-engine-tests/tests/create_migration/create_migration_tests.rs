@@ -425,8 +425,7 @@ fn no_additional_unique_created(api: TestApi) {
         .send_sync()
         .assert_migration_directories_count(1)
         .assert_migration("create-cats", |migration| {
-            let expected_script = if api.is_postgres() {
-
+            let expected_script =
                     indoc! {
                         r#"
                         -- CreateTable
@@ -444,17 +443,14 @@ fn no_additional_unique_created(api: TestApi) {
                         );
 
                         -- AddForeignKey
-                        ALTER TABLE "Collar" ADD FOREIGN KEY ("id") REFERENCES "Cat"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+                        ALTER TABLE "Collar" ADD CONSTRAINT "Collar_id_fkey" FOREIGN KEY ("id") REFERENCES "Cat"("id") ON DELETE CASCADE ON UPDATE CASCADE;
                         "#
-                    }
-                }
-                else { unreachable!()
-            };
+                   };
 
             migration.assert_contents(expected_script)
         });
 }
-// todo just for testing, figure out whether to keep it
+
 #[test_connector]
 fn constraint_name_tests(api: TestApi) {
     let dm = r#"
@@ -491,7 +487,7 @@ fn constraint_name_tests(api: TestApi) {
                 indoc! {
                     r#"
                     -- CreateTable
-                    CREATE TABLE [index_tests].[A] (
+                    CREATE TABLE [constraint_name_tests].[A] (
                         [id] INT NOT NULL,
                         [name] NVARCHAR(1000) NOT NULL,
                         [a] NVARCHAR(1000) NOT NULL,
@@ -504,7 +500,7 @@ fn constraint_name_tests(api: TestApi) {
                     );
                     
                     -- CreateTable
-                    CREATE TABLE [index_tests].[B] (
+                    CREATE TABLE [constraint_name_tests].[B] (
                         [a] NVARCHAR(1000) NOT NULL,
                         [b] NVARCHAR(1000) NOT NULL,
                         [aId] INT NOT NULL,
@@ -513,13 +509,13 @@ fn constraint_name_tests(api: TestApi) {
                     );
                     
                     -- CreateIndex
-                    CREATE INDEX [A_a_idx] ON [index_tests].[A]([a]);
+                    CREATE INDEX [A_a_idx] ON [constraint_name_tests].[A]([a]);
                     
                     -- CreateIndex
-                    CREATE INDEX [B_a_b_idx] ON [index_tests].[B]([a], [b]);
+                    CREATE INDEX [B_a_b_idx] ON [constraint_name_tests].[B]([a], [b]);
                     
                     -- AddForeignKey
-                    ALTER TABLE [index_tests].[B] ADD CONSTRAINT [FK__B__aId] FOREIGN KEY ([aId]) REFERENCES [index_tests].[A]([id]) ON DELETE CASCADE ON UPDATE CASCADE;
+                    ALTER TABLE [constraint_name_tests].[B] ADD CONSTRAINT [B_aId_fkey] FOREIGN KEY ([aId]) REFERENCES [constraint_name_tests].[A]([id]) ON DELETE CASCADE ON UPDATE CASCADE;
                 "#
                 }
             } else if api.is_postgres() {

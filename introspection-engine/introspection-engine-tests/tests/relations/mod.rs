@@ -887,7 +887,7 @@ async fn many_to_many_relation_field_names_do_not_conflict_with_themselves(api: 
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(exclude(Sqlite))]
 async fn one_to_one_req_relation_with_custom_fk_name(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
