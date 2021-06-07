@@ -12,7 +12,7 @@ fn constraint_names() {
       name String @unique("CustomDBUnique")
       b_a  String
       b_b  String
-      B    B      @relation(fields:[b_a, b_b], references: [a, b])     
+      B    B      @relation(fields: [b_a, b_b], references: [a, b], map: "CustomDBFK")
     }
     
     model B {
@@ -99,11 +99,15 @@ fn constraint_names() {
     model A {
       id   Int    @id("CustomDBId")
       name String @unique("CustomDBUnique")
+      b_a  String
+      b_b  String
+      B    B      @relation(fields: [b_a, b_b], references: [a, b], map: "CustomDBFK")
     }
     
     model B {
       a String
       b String
+      A A?
    
       @@id([a, b], name: "clientId", map: "CustomCompoundDBId")
       @@unique([a, b], name: "clientUnique", map: "CustomCompoundDBUnique")
