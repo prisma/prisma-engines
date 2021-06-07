@@ -2300,7 +2300,6 @@ dependencies = [
 name = "migration-engine-tests"
 version = "0.1.0"
 dependencies = [
- "anyhow",
  "bigdecimal",
  "chrono",
  "connection-string",

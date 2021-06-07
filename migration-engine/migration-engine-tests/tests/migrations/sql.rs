@@ -11,7 +11,7 @@ fn can_handle_reserved_sql_keywords_for_model_name(api: TestApi) {
 
     api.schema_push(dm1).send_sync().assert_green_bang();
     api.assert_schema()
-        .assert_table_bang("Group", |t| t.assert_column("field", |c| c.assert_type_is_string()));
+        .assert_table("Group", |t| t.assert_column("field", |c| c.assert_type_is_string()));
 
     let dm2 = r#"
         model Group {
@@ -22,7 +22,7 @@ fn can_handle_reserved_sql_keywords_for_model_name(api: TestApi) {
 
     api.schema_push(dm2).send_sync().assert_green_bang();
     api.assert_schema()
-        .assert_table_bang("Group", |t| t.assert_column("field", |c| c.assert_type_is_int()));
+        .assert_table("Group", |t| t.assert_column("field", |c| c.assert_type_is_int()));
 }
 
 #[test_connector]
@@ -36,7 +36,7 @@ fn can_handle_reserved_sql_keywords_for_field_name(api: TestApi) {
 
     api.schema_push(dm1).send_sync().assert_green_bang();
     api.assert_schema()
-        .assert_table_bang("Test", |t| t.assert_column("Group", |c| c.assert_type_is_string()));
+        .assert_table("Test", |t| t.assert_column("Group", |c| c.assert_type_is_string()));
 
     let dm2 = r#"
         model Test {
@@ -47,7 +47,7 @@ fn can_handle_reserved_sql_keywords_for_field_name(api: TestApi) {
 
     api.schema_push(dm2).send_sync().assert_green_bang();
     api.assert_schema()
-        .assert_table_bang("Test", |t| t.assert_column("Group", |c| c.assert_type_is_int()));
+        .assert_table("Test", |t| t.assert_column("Group", |c| c.assert_type_is_int()));
 }
 
 #[test_connector]
@@ -64,9 +64,9 @@ fn creating_tables_without_primary_key_must_work(api: TestApi) {
 
     api.schema_push(dm).send_sync().assert_green_bang();
 
-    api.assert_schema().assert_table_bang("Pair", |table| {
+    api.assert_schema().assert_table("Pair", |table| {
         table
-            .assert_has_no_pk()?
+            .assert_has_no_pk()
             .assert_index_on_columns(&["index", "name"], |idx| idx.assert_is_unique())
     });
 }
@@ -94,10 +94,10 @@ fn relations_to_models_without_a_primary_key_work(api: TestApi) {
     api.schema_push(dm).send_sync().assert_green_bang();
 
     api.assert_schema()
-        .assert_table_bang("Pair", |table| table.assert_has_no_pk())
-        .assert_table_bang("PairMetadata", |table| {
+        .assert_table("Pair", |table| table.assert_has_no_pk())
+        .assert_table("PairMetadata", |table| {
             table
-                .assert_pk(|pk| pk.assert_columns(&["id"]))?
+                .assert_pk(|pk| pk.assert_columns(&["id"]))
                 .assert_fk_on_columns(&["pairidx", "pairname"], |fk| {
                     fk.assert_references("Pair", &["index", "name"])
                 })
@@ -124,10 +124,10 @@ fn relations_to_models_with_no_pk_and_a_single_unique_required_field_work(api: T
     api.schema_push(dm).send_sync().assert_green_bang();
 
     api.assert_schema()
-        .assert_table_bang("Pair", |table| table.assert_has_no_pk())
-        .assert_table_bang("PairMetadata", |table| {
+        .assert_table("Pair", |table| table.assert_has_no_pk())
+        .assert_table("PairMetadata", |table| {
             table
-                .assert_pk(|pk| pk.assert_columns(&["id"]))?
+                .assert_pk(|pk| pk.assert_columns(&["id"]))
                 .assert_fk_on_columns(&["pweight"], |fk| fk.assert_references("Pair", &["weight"]))
         });
 }
@@ -155,12 +155,10 @@ fn enum_value_with_database_names_must_work(api: TestApi) {
         api.assert_schema()
             .assert_enum(&api.normalize_identifier("Cat_mood"), |enm| {
                 enm.assert_values(&["ANGRY", "hongry"])
-            })
-            .unwrap();
+            });
     } else {
         api.assert_schema()
-            .assert_enum("CatMood", |enm| enm.assert_values(&["ANGRY", "hongry"]))
-            .unwrap();
+            .assert_enum("CatMood", |enm| enm.assert_values(&["ANGRY", "hongry"]));
     }
 
     let dm = r##"
@@ -181,13 +179,11 @@ fn enum_value_with_database_names_must_work(api: TestApi) {
         api.assert_schema()
             .assert_enum(&api.normalize_identifier("Cat_mood"), |enm| {
                 enm.assert_values(&["ANGRY", "hongery"])
-            })
-            .unwrap();
+            });
     } else {
         api.schema_push(dm).force(true).send_sync().assert_warnings(&["The values [hongry] on the enum `CatMood` will be removed. If these variants are still used in the database, this will fail.".into()]);
         api.assert_schema()
-            .assert_enum("CatMood", |enm| enm.assert_values(&["ANGRY", "hongery"]))
-            .unwrap();
+            .assert_enum("CatMood", |enm| enm.assert_values(&["ANGRY", "hongery"]));
     }
 }
 
@@ -260,9 +256,9 @@ fn id_as_part_of_relation_must_work(api: TestApi) {
 
     api.schema_push(dm).send_sync().assert_green_bang();
 
-    api.assert_schema().assert_table_bang("Cat", |table| {
+    api.assert_schema().assert_table("Cat", |table| {
         table
-            .assert_pk(|pk| pk.assert_columns(&["nemesis_id"]))?
+            .assert_pk(|pk| pk.assert_columns(&["nemesis_id"]))
             .assert_fk_on_columns(&["nemesis_id"], |fk| fk.assert_references("Dog", &["id"]))
     });
 }
@@ -290,9 +286,9 @@ fn multi_field_id_as_part_of_relation_must_work(api: TestApi) {
 
     api.schema_push(dm).send_sync().assert_green_bang();
 
-    api.assert_schema().assert_table_bang("Cat", |table| {
+    api.assert_schema().assert_table("Cat", |table| {
         table
-            .assert_pk(|pk| pk.assert_columns(&["nemesis_name", "nemesis_weight"]))?
+            .assert_pk(|pk| pk.assert_columns(&["nemesis_name", "nemesis_weight"]))
             .assert_fk_on_columns(&["nemesis_name", "nemesis_weight"], |fk| {
                 fk.assert_references("Dog", &["name", "weight"])
             })
@@ -321,9 +317,9 @@ fn remapped_multi_field_id_as_part_of_relation_must_work(api: TestApi) {
 
     api.schema_push(dm).send_sync().assert_green_bang();
 
-    api.assert_schema().assert_table_bang("Cat", |table| {
+    api.assert_schema().assert_table("Cat", |table| {
         table
-            .assert_pk(|pk| pk.assert_columns(&["dogname", "dogweight"]))?
+            .assert_pk(|pk| pk.assert_columns(&["dogname", "dogweight"]))
             .assert_fk_on_columns(&["dogname", "dogweight"], |fk| {
                 fk.assert_references("Dog", &["name", "weight"])
             })
@@ -354,7 +350,7 @@ fn unique_constraints_on_composite_relation_fields(api: TestApi) {
 
     api.schema_push(dm).send_sync().assert_green_bang();
 
-    api.assert_schema().assert_table_bang("Parent", |table| {
+    api.assert_schema().assert_table("Parent", |table| {
         table.assert_index_on_columns(&["chiid", "chic"], |idx| idx.assert_is_unique())
     });
 }
@@ -383,7 +379,7 @@ fn indexes_on_composite_relation_fields(api: TestApi) {
 
     api.schema_push(dm).send_sync().assert_green_bang();
 
-    api.assert_schema().assert_table_bang("SpamList", |table| {
+    api.assert_schema().assert_table("SpamList", |table| {
         table.assert_index_on_columns(&["ufn", "uln"], |idx| idx.assert_is_not_unique())
     });
 }

@@ -41,8 +41,8 @@ fn altering_the_type_of_a_column_in_a_non_empty_table_warns(api: TestApi) {
     api.dump_table("User")
         .assert_single_row(|row| row.assert_int_value("dogs", 7));
 
-    api.assert_schema().assert_table_bang("User", |table| {
-        table.assert_column("dogs", |col| col.assert_type_is_bigint()?.assert_is_required())
+    api.assert_schema().assert_table("User", |table| {
+        table.assert_column("dogs", |col| col.assert_type_is_bigint().assert_is_required())
     });
 }
 
@@ -74,7 +74,7 @@ fn migrating_a_required_column_from_int_to_string_should_cast(api: TestApi) {
 
     api.schema_push(dm2).send_sync().assert_green_bang();
 
-    api.assert_schema().assert_table_bang("Test", |table| {
+    api.assert_schema().assert_table("Test", |table| {
         table.assert_column("serialNumber", |col| col.assert_type_is_string())
     });
 
@@ -124,7 +124,7 @@ fn changing_a_string_array_column_to_scalar_is_fine(api: TestApi) {
 
     api.schema_push(&dm2).force(true).send_sync().assert_green_bang();
 
-    api.assert_schema().assert_table_bang("Film", |table| {
+    api.assert_schema().assert_table("Film", |table| {
         table.assert_column("mainProtagonist", |column| column.assert_is_required())
     });
 
@@ -176,7 +176,7 @@ fn changing_an_int_array_column_to_scalar_is_not_possible(api: TestApi) {
         .assert_no_warning()
         .assert_unexecutable(&["Changed the type of `mainProtagonist` on the `Film` table. No cast exists, the column would be dropped and recreated, which cannot be done since the column is required and there is data in the table.".into()]);
 
-    api.assert_schema().assert_table_bang("Film", |table| {
+    api.assert_schema().assert_table("Film", |table| {
         table.assert_column("mainProtagonist", |column| column.assert_is_list())
     });
 

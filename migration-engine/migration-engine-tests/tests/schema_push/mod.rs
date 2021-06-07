@@ -23,10 +23,10 @@ fn schema_push_happy_path(api: TestApi) {
         .assert_has_executed_steps();
 
     api.assert_schema()
-        .assert_table_bang("Cat", |table| {
+        .assert_table("Cat", |table| {
             table.assert_column("boxId", |col| col.assert_type_family(ColumnTypeFamily::Int))
         })
-        .assert_table_bang("Box", |table| {
+        .assert_table("Box", |table| {
             table.assert_column("material", |col| col.assert_type_family(ColumnTypeFamily::String))
         });
 
@@ -51,12 +51,12 @@ fn schema_push_happy_path(api: TestApi) {
         .assert_has_executed_steps();
 
     api.assert_schema()
-        .assert_table_bang("Cat", |table| {
+        .assert_table("Cat", |table| {
             table.assert_column("boxId", |col| col.assert_type_family(ColumnTypeFamily::Int))
         })
-        .assert_table_bang("Box", |table| {
+        .assert_table("Box", |table| {
             table
-                .assert_columns_count(3)?
+                .assert_columns_count(3)
                 .assert_column("texture", |col| col.assert_type_family(ColumnTypeFamily::String))
         });
 }

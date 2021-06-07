@@ -29,22 +29,20 @@ fn adding_an_enum_field_must_work(api: TestApi) {
 
     api.schema_push(dm).send_sync().assert_green_bang();
 
-    api.assert_schema()
-        .assert_table("Test", |table| {
-            table.assert_columns_count(2)?.assert_column("enum", |c| {
-                if api.is_postgres() {
-                    c.assert_is_required()?
-                        .assert_type_family(ColumnTypeFamily::Enum("MyEnum".to_owned()))
-                } else if api.is_mysql() {
-                    c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Enum(
-                        api.normalize_identifier("Test_enum").into_owned(),
-                    ))
-                } else {
-                    c.assert_is_required()?.assert_type_is_string()
-                }
-            })
+    api.assert_schema().assert_table("Test", |table| {
+        table.assert_columns_count(2).assert_column("enum", |c| {
+            if api.is_postgres() {
+                c.assert_is_required()
+                    .assert_type_family(ColumnTypeFamily::Enum("MyEnum".to_owned()))
+            } else if api.is_mysql() {
+                c.assert_is_required().assert_type_family(ColumnTypeFamily::Enum(
+                    api.normalize_identifier("Test_enum").into_owned(),
+                ))
+            } else {
+                c.assert_is_required().assert_type_is_string()
+            }
         })
-        .unwrap();
+    });
 
     // Check that the migration is idempotent.
     api.schema_push(dm).send_sync().assert_no_steps();
@@ -66,21 +64,19 @@ fn adding_an_enum_field_must_work_with_native_types_off(api: TestApi) {
 
     api.schema_push(dm).send_sync().assert_green_bang();
 
-    api.assert_schema()
-        .assert_table("Test", |table| {
-            table.assert_columns_count(2)?.assert_column("enum", |c| {
-                if api.is_postgres() {
-                    c.assert_is_required()?
-                        .assert_type_family(ColumnTypeFamily::Enum("MyEnum".to_owned()))
-                } else if api.is_mysql() {
-                    c.assert_is_required()?
-                        .assert_type_family(ColumnTypeFamily::Enum(api.normalize_identifier("Test_enum").into()))
-                } else {
-                    c.assert_is_required()?.assert_type_is_string()
-                }
-            })
+    api.assert_schema().assert_table("Test", |table| {
+        table.assert_columns_count(2).assert_column("enum", |c| {
+            if api.is_postgres() {
+                c.assert_is_required()
+                    .assert_type_family(ColumnTypeFamily::Enum("MyEnum".to_owned()))
+            } else if api.is_mysql() {
+                c.assert_is_required()
+                    .assert_type_family(ColumnTypeFamily::Enum(api.normalize_identifier("Test_enum").into()))
+            } else {
+                c.assert_is_required().assert_type_is_string()
+            }
         })
-        .unwrap();
+    });
 
     // Check that the migration is idempotent.
     api.schema_push(dm).send_sync().assert_no_steps();
@@ -99,7 +95,7 @@ fn an_enum_can_be_turned_into_a_model(api: TestApi) {
     };
 
     #[allow(clippy::redundant_closure)]
-    api.assert_schema().assert_enum(enum_name, |enm| Ok(enm)).unwrap();
+    api.assert_schema().assert_enum(enum_name, |enm| enm);
 
     let dm2 = r#"
         model Cat {
@@ -119,14 +115,9 @@ fn an_enum_can_be_turned_into_a_model(api: TestApi) {
     api.schema_push(dm2).send_sync().assert_green_bang();
 
     api.assert_schema()
-        .assert_table("Cat", |table| {
-            table.assert_columns_count(2)?.assert_column("moodId", Ok)
-        })
-        .unwrap()
+        .assert_table("Cat", |table| table.assert_columns_count(2).assert_has_column("moodId"))
         .assert_table("CatMood", |table| table.assert_column_count(3))
-        .unwrap()
-        .assert_has_no_enum("CatMood")
-        .unwrap();
+        .assert_has_no_enum("CatMood");
 }
 
 #[test_connector(capabilities(Enums))]
@@ -153,8 +144,7 @@ fn variants_can_be_added_to_an_existing_enum(api: TestApi) {
     };
 
     api.assert_schema()
-        .assert_enum(enum_name, |enm| enm.assert_values(&["HUNGRY"]))
-        .unwrap();
+        .assert_enum(enum_name, |enm| enm.assert_values(&["HUNGRY"]));
 
     let dm2 = r#"
         model Cat {
@@ -172,8 +162,7 @@ fn variants_can_be_added_to_an_existing_enum(api: TestApi) {
     api.schema_push(dm2).send_sync().assert_green_bang();
 
     api.assert_schema()
-        .assert_enum(enum_name, |enm| enm.assert_values(&["HUNGRY", "HAPPY", "JOYJOY"]))
-        .unwrap();
+        .assert_enum(enum_name, |enm| enm.assert_values(&["HUNGRY", "HAPPY", "JOYJOY"]));
 }
 
 #[test_connector(capabilities(Enums))]
@@ -201,8 +190,7 @@ fn variants_can_be_removed_from_an_existing_enum(api: TestApi) {
     };
 
     api.assert_schema()
-        .assert_enum(enum_name, |enm| enm.assert_values(&["HAPPY", "HUNGRY"]))
-        .unwrap();
+        .assert_enum(enum_name, |enm| enm.assert_values(&["HAPPY", "HUNGRY"]));
 
     let dm2 = r#"
         model Cat {
@@ -228,8 +216,7 @@ fn variants_can_be_removed_from_an_existing_enum(api: TestApi) {
         .assert_executable();
 
     api.assert_schema()
-        .assert_enum(enum_name, |enm| enm.assert_values(&["HUNGRY"]))
-        .unwrap();
+        .assert_enum(enum_name, |enm| enm.assert_values(&["HUNGRY"]));
 }
 
 #[test_connector(capabilities(Enums))]
@@ -271,11 +258,9 @@ fn enum_field_to_string_field_works(api: TestApi) {
 
     api.schema_push(dm1).send_sync().assert_green_bang();
 
-    api.assert_schema()
-        .assert_table("Cat", |table| {
-            table.assert_column("mood", |col| col.assert_type_is_enum())
-        })
-        .unwrap();
+    api.assert_schema().assert_table("Cat", |table| {
+        table.assert_column("mood", |col| col.assert_type_is_enum())
+    });
 
     api.insert("Cat").value("id", 1).value("mood", "HAPPY").result_raw();
 
@@ -288,11 +273,9 @@ fn enum_field_to_string_field_works(api: TestApi) {
 
     api.schema_push(dm2).force(true).send_sync().assert_executable();
 
-    api.assert_schema()
-        .assert_table("Cat", |table| {
-            table.assert_column("mood", |col| col.assert_type_is_string())
-        })
-        .unwrap();
+    api.assert_schema().assert_table("Cat", |table| {
+        table.assert_column("mood", |col| col.assert_type_is_string())
+    });
 }
 
 #[test_connector(capabilities(Enums))]
@@ -306,11 +289,9 @@ fn string_field_to_enum_field_works(api: TestApi) {
 
     api.schema_push(dm1).send_sync().assert_green_bang();
 
-    api.assert_schema()
-        .assert_table("Cat", |table| {
-            table.assert_column("mood", |col| col.assert_type_is_string())
-        })
-        .unwrap();
+    api.assert_schema().assert_table("Cat", |table| {
+        table.assert_column("mood", |col| col.assert_type_is_string())
+    });
 
     api.insert("Cat").value("id", 1).value("mood", "HAPPY").result_raw();
 
@@ -340,11 +321,9 @@ fn string_field_to_enum_field_works(api: TestApi) {
         .assert_executable()
         .assert_warnings(&[warn.into()]);
 
-    api.assert_schema()
-        .assert_table("Cat", |table| {
-            table.assert_column("mood", |col| col.assert_type_is_enum())
-        })
-        .unwrap();
+    api.assert_schema().assert_table("Cat", |table| {
+        table.assert_column("mood", |col| col.assert_type_is_enum())
+    });
 }
 
 #[test_connector(capabilities(Enums))]
@@ -488,11 +467,9 @@ fn changing_all_values_of_enums_used_in_defaults_works(api: TestApi) {
 
     api.schema_push(dm2).force(true).send_sync();
 
-    api.assert_schema()
-        .assert_table("Cat", |table| {
-            table.assert_column("eveningMood", |col| Ok(col.assert_enum_default("MEOWMEOW")))
-        })
-        .unwrap();
+    api.assert_schema().assert_table("Cat", |table| {
+        table.assert_column("eveningMood", |col| col.assert_enum_default("MEOWMEOW"))
+    });
 }
 
 #[test_connector(tags(Postgres))]

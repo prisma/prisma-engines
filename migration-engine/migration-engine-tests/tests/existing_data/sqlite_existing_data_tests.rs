@@ -29,10 +29,10 @@ fn changing_a_column_from_optional_to_required_with_a_default_is_safe(api: TestA
 
     api.schema_push(dm2).force(true).send_sync().assert_green_bang();
 
-    api.assert_schema().assert_table_bang("Test", |table| {
+    api.assert_schema().assert_table("Test", |table| {
         table.assert_column("age", |column| {
             column
-                .assert_default(Some(DefaultValue::value(30)))?
+                .assert_default(Some(DefaultValue::value(30)))
                 .assert_is_required()
         })
     });
