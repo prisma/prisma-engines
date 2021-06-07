@@ -35,6 +35,7 @@ impl MongoDbDatamodelConnector {
             ConnectorCapability::CreateSkipDuplicates,
             ConnectorCapability::ScalarLists,
             ConnectorCapability::InsensitiveFilters,
+            ConnectorCapability::ReferentialActions,
         ];
 
         let native_types = mongodb_types::available_types();
@@ -65,6 +66,10 @@ impl Connector for MongoDbDatamodelConnector {
 
     fn referential_actions(&self) -> BitFlags<ReferentialAction> {
         self.referential_actions
+    }
+
+    fn virtual_referential_actions(&self) -> bool {
+        true
     }
 
     fn validate_field(&self, field: &dml::field::Field) -> Result<()> {
