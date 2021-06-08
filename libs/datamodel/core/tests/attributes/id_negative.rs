@@ -268,9 +268,16 @@ fn mapping_id_with_a_name_that_is_too_long_should_error() {
     "#;
 
     let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_model_validation_error(
-        "You defined a database name for the primary key on the model. This is not supported by the provider.",
-        "User",
-        Span::new(134, 286),
-    ));
+    errors.assert_are(&[
+        DatamodelError::new_model_validation_error(
+            "The name specified for the `id` constraint `IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimits` is too long for your chosen provider. The maximum allowed length is 63 bytes.",
+            "User",
+            Span::new(135, 388),
+        ),
+        DatamodelError::new_model_validation_error(
+            "The name specified for the `id` constraint `IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimitsHereAsWell` is too long for your chosen provider. The maximum allowed length is 63 bytes.",
+            "User1",
+            Span::new(398, 629),
+        ),
+    ]);
 }

@@ -572,8 +572,8 @@ fn mapping_foreign_keys_with_a_name_that_is_too_long_should_error() {
 
     let errors = parse_error(dml);
     errors.assert_is(DatamodelError::new_model_validation_error(
-        "You defined a database name for the primary key on the model. This is not supported by the provider.",
-        "User",
-        Span::new(134, 286),
+        "The name specified for the `@relation` constraint `IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimits` is too long for your chosen provider. The maximum allowed length is 63 bytes.",
+        "Post",
+        Span::new(208, 470),
     ));
 }

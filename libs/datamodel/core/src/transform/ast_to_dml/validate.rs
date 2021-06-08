@@ -4,7 +4,7 @@ use crate::{
     diagnostics::{DatamodelError, Diagnostics},
     dml,
     walkers::ModelWalker,
-    DefaultValue, FieldType,
+    DefaultValue, FieldType, IndexType,
 };
 use crate::{ast::WithAttributes, walkers::walk_models};
 use itertools::Itertools;
@@ -49,6 +49,8 @@ impl<'a> Validator<'a> {
             self.validate_optional_id_only_on_ignored_models(&mut errors_for_model, &model, ast_model);
 
             self.validate_name_collisions_with_compound_client_names(&mut errors_for_model, model, ast_model);
+
+            self.validate_constraint_name_lengths(&mut errors_for_model, model, ast_model);
 
             if let Err(err) = self.validate_model_has_strict_unique_criteria(ast_model, model) {
                 errors_for_model.push_error(err);
@@ -98,9 +100,6 @@ impl<'a> Validator<'a> {
             if let Err(the_errors) = self.validate_referenced_fields_for_relation(schema, ast_model, model) {
                 errors_for_model.extend(the_errors);
             }
-
-            // todo validate that the length limits for constraint names are not violated
-            // id, unique, index, foreign key
 
             all_errors.extend(errors_for_model);
         }
@@ -173,6 +172,53 @@ impl<'a> Validator<'a> {
                 for field in model.relation_fields() {
                     custom_name_reused(errors_for_model, name, &field.name, &model.name, "@@unique", model_span)
                 }
+            }
+        }
+    }
+
+    pub fn validate_constraint_name_lengths(
+        &self,
+        errors_for_model: &mut Diagnostics,
+        model: &dml::Model,
+        ast_model: &Model,
+    ) {
+        let length_limit = self
+            .source
+            .map(|ds| ds.active_connector.constraint_name_length())
+            .unwrap_or(10000);
+        let model_span = ast_model.span;
+
+        if let Some(pk) = &model.primary_key {
+            if let Some(name) = &pk.name_in_db {
+                constraint_name_length_violated(errors_for_model, name, &model.name, "id", length_limit, model_span)
+            }
+        }
+
+        for index in &model.indices {
+            let attribute = match index.tpe {
+                IndexType::Unique => "@unique",
+                IndexType::Normal => "@@index",
+            };
+            constraint_name_length_violated(
+                errors_for_model,
+                &index.name_in_db,
+                &model.name,
+                attribute,
+                length_limit,
+                model_span,
+            );
+        }
+
+        for rf in model.relation_fields() {
+            if let Some(fk_name) = &rf.relation_info.fk_name {
+                constraint_name_length_violated(
+                    errors_for_model,
+                    fk_name,
+                    &model.name,
+                    "@relation",
+                    length_limit,
+                    model_span,
+                );
             }
         }
     }
@@ -1110,7 +1156,7 @@ fn validate_name_collisions_with_map(schema: &dml::Datamodel, ast: &ast::SchemaA
 
 fn custom_name_reused(
     diagnostics: &mut Diagnostics,
-    custom_name: &String,
+    custom_name: &str,
     field_name: &str,
     model_name: &str,
     attribute: &str,
@@ -1119,6 +1165,23 @@ fn custom_name_reused(
     if field_name == custom_name {
         diagnostics.push_error(DatamodelError::new_model_validation_error(
             &format!("The custom name specified for the `{}` attribute is already used as a name for a field. Please choose a different name.", attribute),
+            model_name,
+            span,
+        ));
+    }
+}
+
+fn constraint_name_length_violated(
+    diagnostics: &mut Diagnostics,
+    constraint_name: &str,
+    model_name: &str,
+    attribute: &str,
+    length_limit: usize,
+    span: Span,
+) {
+    if constraint_name.len() > length_limit {
+        diagnostics.push_error(DatamodelError::new_model_validation_error(
+            &format!("The name specified for the `{}` constraint `{}` is too long for your chosen provider. The maximum allowed length is {} bytes.", attribute, constraint_name, length_limit),
             model_name,
             span,
         ));
