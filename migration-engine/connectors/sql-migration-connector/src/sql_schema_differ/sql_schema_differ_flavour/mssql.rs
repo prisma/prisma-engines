@@ -1,7 +1,7 @@
 use super::SqlSchemaDifferFlavour;
 use crate::{
     flavour::MssqlFlavour,
-    sql_migration::{AlterTable, CreateIndex, SqlMigrationStep},
+    sql_migration::{AlterTable, SqlMigrationStep},
     sql_schema_differ::{
         column::{ColumnDiffer, ColumnTypeChange},
         SqlSchemaDiffer,
@@ -88,11 +88,10 @@ impl SqlSchemaDifferFlavour for MssqlFlavour {
                         .columns()
                         .any(|col| col.column_index() == *column.column_index.next())
                 }) {
-                    steps.push(SqlMigrationStep::CreateIndex(CreateIndex {
-                        table_index: table.next().table_index(),
+                    steps.push(SqlMigrationStep::CreateIndex {
+                        table_index: (None, table.next().table_index()),
                         index_index: created_index.next().index(),
-                        caused_by_create_table: true,
-                    }))
+                    })
                 }
             }
         }
