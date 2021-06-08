@@ -1856,12 +1856,12 @@ async fn default_optional_actions(api: &TestApi) -> TestResult {
                 match family {
                     SqlFamily::Mssql => {
                         t.inject_custom(
-                            "CONSTRAINT asdf FOREIGN KEY (a_id) REFERENCES default_optional_actions.a(id) ON DELETE SET NULL ON UPDATE SET NULL",
+                            "CONSTRAINT asdf FOREIGN KEY (a_id) REFERENCES default_optional_actions.a(id) ON DELETE SET NULL ON UPDATE CASCADE",
                         );
                     }
                     _ => {
                         t.inject_custom(
-                            "CONSTRAINT asdf FOREIGN KEY (a_id) REFERENCES a(id) ON DELETE SET NULL ON UPDATE SET NULL",
+                            "CONSTRAINT asdf FOREIGN KEY (a_id) REFERENCES a(id) ON DELETE SET NULL ON UPDATE CASCADE",
                         );
                     }
                 }

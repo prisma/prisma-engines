@@ -380,9 +380,8 @@ impl RelationField {
 
         match self.arity {
             FieldArity::Required if is_virtual => ReferentialAction::EmulateRestrict,
-            FieldArity::Required => ReferentialAction::Cascade,
             _ if is_virtual => ReferentialAction::EmulateSetNull,
-            _ => ReferentialAction::SetNull,
+            _ => ReferentialAction::Cascade,
         }
     }
 }
