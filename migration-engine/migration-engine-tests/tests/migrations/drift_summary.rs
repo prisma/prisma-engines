@@ -391,13 +391,13 @@ fn multiple_changed_tables_and_enums() {
             [*] Changed the `Cat` table
               [-] Removed column `color`
               [+] Added column `vaccinated`
-              [+] Added unique index on columns (weight)
 
             [*] Changed the `Dog` table
               [-] Dropped the primary key on columns (id)
               [-] Removed column `name`
               [+] Added column `weight`
-              [*] Altered column `isGoodDog` (ColumnChanges { changes: BitFlags<ColumnChange>(0b110, Arity | Default) })
+              [*] Altered column `isGoodDog` (arity changed, default changed)
+              [+] Added unique index on columns (weight)
         "#]],
     );
 }

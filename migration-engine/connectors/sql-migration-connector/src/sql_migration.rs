@@ -1,4 +1,8 @@
-use crate::{pair::Pair, sql_schema_differ::ColumnChanges};
+use crate::{
+    pair::Pair,
+    sql_renderer::IteratorJoin,
+    sql_schema_differ::{ColumnChange, ColumnChanges},
+};
 use migration_connector::DatabaseMigrationMarker;
 use sql_schema_describer::{walkers::SqlSchemaExt, SqlSchema};
 use std::{collections::BTreeSet, fmt::Write as _};
@@ -24,7 +28,7 @@ impl SqlMigration {
     ///
     /// Rendering of the drift summary proceeds in two steps:
     ///
-    /// - For each step, compute a _prefix_ (DriftItem, u32) containing the
+    /// - For each step, compute a _prefix_ (DriftItem, &str) containing the
     ///   _type_ of change it is (so we can order between added tables and
     ///   changed enums, for example), and then in which section of the summary
     ///   they appear, when relevant (e.g. changed tables).
@@ -46,64 +50,104 @@ impl SqlMigration {
             ChangedTable,
         }
 
-        // (sort key, item index, step index)
-        let mut drift_items: BTreeSet<(DriftType, u32, u32)> = BTreeSet::new();
+        // (sort key, item name, step index)
+        let mut drift_items: BTreeSet<(DriftType, &str, u32)> = BTreeSet::new();
 
         for (idx, step) in self.steps.iter().enumerate() {
             let idx = idx as u32;
             match step {
                 SqlMigrationStep::DropView(drop_view) => {
-                    drift_items.insert((DriftType::RemovedView, drop_view.view_index as u32, idx));
+                    drift_items.insert((
+                        DriftType::RemovedView,
+                        self.schemas().previous().view_walker_at(drop_view.view_index).name(),
+                        idx,
+                    ));
                 }
                 SqlMigrationStep::DropUserDefinedType(drop_udt) => {
-                    drift_items.insert((DriftType::RemovedUdt, drop_udt.udt_index as u32, idx));
+                    drift_items.insert((
+                        DriftType::RemovedUdt,
+                        self.schemas().previous().udt_walker_at(drop_udt.udt_index).name(),
+                        idx,
+                    ));
                 }
                 SqlMigrationStep::CreateEnum { .. } => {
-                    drift_items.insert((DriftType::AddedEnum, 0, idx));
+                    drift_items.insert((DriftType::AddedEnum, "", idx));
                 }
                 SqlMigrationStep::AlterEnum(alter_enum) => {
-                    drift_items.insert((DriftType::ChangedEnum, *alter_enum.index.previous() as u32, idx));
+                    drift_items.insert((
+                        DriftType::ChangedEnum,
+                        self.schemas().enums(&alter_enum.index).previous().name(),
+                        idx,
+                    ));
                 }
                 SqlMigrationStep::DropForeignKey { table_index, .. } => {
-                    drift_items.insert((DriftType::ChangedTable, *table_index as u32, idx));
+                    drift_items.insert((
+                        DriftType::ChangedTable,
+                        self.schemas().previous().table_walker_at(*table_index).name(),
+                        idx,
+                    ));
                 }
                 SqlMigrationStep::DropIndex { table_index, .. } => {
-                    drift_items.insert((DriftType::ChangedTable, *table_index as u32, idx));
+                    drift_items.insert((
+                        DriftType::ChangedTable,
+                        self.schemas().previous().table_walker_at(*table_index).name(),
+                        idx,
+                    ));
                 }
                 SqlMigrationStep::AlterTable(alter_table) => {
-                    drift_items.insert((DriftType::ChangedTable, *alter_table.table_index.previous() as u32, idx));
+                    drift_items.insert((
+                        DriftType::ChangedTable,
+                        self.schemas().tables(&alter_table.table_index).previous().name(),
+                        idx,
+                    ));
                 }
                 SqlMigrationStep::DropTable { .. } => {
-                    drift_items.insert((DriftType::RemovedTable, 0, idx));
+                    drift_items.insert((DriftType::RemovedTable, "", idx));
                 }
                 SqlMigrationStep::DropEnum { .. } => {
-                    drift_items.insert((DriftType::RemovedEnum, 0, idx));
+                    drift_items.insert((DriftType::RemovedEnum, "", idx));
                 }
                 SqlMigrationStep::CreateTable { .. } => {
-                    drift_items.insert((DriftType::AddedTable, 0, idx));
+                    drift_items.insert((DriftType::AddedTable, "", idx));
                 }
                 SqlMigrationStep::RedefineTables(redefines) => {
                     for redefine in redefines {
-                        drift_items.insert((DriftType::RedefinedTable, *redefine.table_index.previous() as u32, idx));
+                        drift_items.insert((
+                            DriftType::RedefinedTable,
+                            self.schemas().tables(&redefine.table_index).previous().name(),
+                            idx,
+                        ));
                     }
                 }
                 SqlMigrationStep::CreateIndex(create_index) => {
-                    drift_items.insert((DriftType::ChangedTable, create_index.table_index as u32, idx));
+                    drift_items.insert((
+                        DriftType::ChangedTable,
+                        self.schemas().next().table_walker_at(create_index.table_index).name(),
+                        idx,
+                    ));
                 }
                 SqlMigrationStep::AddForeignKey { table_index, .. } => {
-                    drift_items.insert((DriftType::ChangedTable, *table_index as u32, idx));
+                    drift_items.insert((
+                        DriftType::ChangedTable,
+                        self.schemas().next().table_walker_at(*table_index).name(),
+                        idx,
+                    ));
                 }
                 SqlMigrationStep::AlterIndex { table, .. } | SqlMigrationStep::RedefineIndex { table, .. } => {
-                    drift_items.insert((DriftType::ChangedTable, *table.previous() as u32, idx));
+                    drift_items.insert((
+                        DriftType::ChangedTable,
+                        self.schemas().tables(table).previous().name(),
+                        idx,
+                    ));
                 }
             };
         }
 
         let mut out = String::with_capacity(self.steps.len() * 20);
-        let mut render_state = (DriftType::AddedEnum, 0);
+        let mut render_state = (DriftType::AddedEnum, "");
 
-        for (line_idx, (new_state, item_idx, step_idx)) in drift_items.iter().enumerate() {
-            if render_state != (*new_state, *item_idx) || line_idx == 0 {
+        for (line_idx, (new_state, item_name, step_idx)) in drift_items.iter().enumerate() {
+            if render_state != (*new_state, item_name) || line_idx == 0 {
                 match new_state {
                     DriftType::AddedEnum => {
                         out.push_str("\n[+] Added enums\n");
@@ -118,18 +162,18 @@ impl SqlMigration {
                     DriftType::RedefinedTable => out.push_str("\n[*] Redefined tables\n"),
                     DriftType::ChangedEnum => {
                         out.push_str("\n[*] Changed the `");
-                        out.push_str(self.schemas().previous().enum_walker_at(*item_idx as usize).name());
+                        out.push_str(item_name);
                         out.push_str("` enum\n");
                     }
                     DriftType::ChangedTable => {
                         out.push_str("\n[*] Changed the `");
-                        out.push_str(self.schemas().previous().table_walker_at(*item_idx as usize).name());
+                        out.push_str(item_name);
                         out.push_str("` table\n");
                     }
                 }
             }
 
-            render_state = (*new_state, *item_idx);
+            render_state = (*new_state, *item_name);
 
             match &self.steps[*step_idx as usize] {
                 SqlMigrationStep::DropView(_) => {}
@@ -152,8 +196,19 @@ impl SqlMigration {
                         out.push_str("`\n");
                     }
                 }
-                SqlMigrationStep::DropForeignKey { .. } => {
-                    todo!()
+                SqlMigrationStep::DropForeignKey {
+                    foreign_key_index,
+                    table_index,
+                } => {
+                    let fk = self
+                        .schemas()
+                        .previous()
+                        .table_walker_at(*table_index)
+                        .foreign_key_at(*foreign_key_index);
+
+                    out.push_str("  [-] Removed foreign key on columns (");
+                    out.push_str(&fk.constrained_column_names().join(", "));
+                    out.push_str(")\n")
                 }
                 SqlMigrationStep::DropIndex {
                     table_index,
@@ -187,13 +242,14 @@ impl SqlMigration {
                             }
                             TableChange::AlterColumn(alter_column) => {
                                 out.push_str("  [*] Altered column `");
-                                writeln!(
+                                write!(
                                     out,
-                                    "{}` ({:?})",
+                                    "{}` ",
                                     tables.next().column_at(*alter_column.column_index.next()).name(),
-                                    alter_column.changes
                                 )
                                 .unwrap();
+                                render_column_changes(&alter_column.changes, &mut out);
+                                out.push('\n');
                             }
                             TableChange::DropColumn { column_index } => {
                                 out.push_str("  [-] Removed column `");
@@ -202,13 +258,14 @@ impl SqlMigration {
                             }
                             TableChange::DropAndRecreateColumn { column_index, changes } => {
                                 out.push_str("  [*] Column `");
-                                writeln!(
+                                write!(
                                     out,
-                                    "{}` would be dropped and recreated ({:?})",
+                                    "{}` would be dropped and recreated",
                                     tables.next().column_at(*column_index.next()).name(),
-                                    changes
                                 )
                                 .unwrap();
+                                render_column_changes(changes, &mut out);
+                                out.push('\n');
                             }
                             TableChange::DropPrimaryKey => {
                                 out.push_str("  [-] Dropped the primary key on columns (");
@@ -291,6 +348,23 @@ impl SqlMigration {
 
         out
     }
+}
+
+fn render_column_changes(changes: &ColumnChanges, sink: &mut String) {
+    let readable_changes = changes
+        .iter()
+        .map(|change| match change {
+            ColumnChange::Renaming => "column was renamed",
+            ColumnChange::Arity => "arity changed",
+            ColumnChange::Default => "default changed",
+            ColumnChange::TypeChanged => "type changed",
+            ColumnChange::Sequence => "sequence changed",
+        })
+        .join(", ");
+
+    sink.push('(');
+    sink.push_str(&readable_changes);
+    sink.push(')');
 }
 
 impl DatabaseMigrationMarker for SqlMigration {
