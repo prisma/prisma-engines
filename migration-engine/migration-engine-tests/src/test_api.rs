@@ -20,7 +20,7 @@ pub use mark_migration_rolled_back::MarkMigrationRolledBack;
 pub use reset::Reset;
 pub use schema_push::SchemaPush;
 
-use crate::{assertions::SchemaAssertion, AssertionResult};
+use crate::assertions::SchemaAssertion;
 use migration_connector::{ConnectorError, MigrationRecord};
 use migration_core::GenericApi;
 use quaint::{
@@ -272,8 +272,8 @@ impl<'a> SingleRowInsert<'a> {
         self
     }
 
-    pub async fn result_raw(self) -> Result<quaint::connector::ResultSet, anyhow::Error> {
-        Ok(self.api.database().query(self.insert.into()).await?)
+    pub async fn result_raw(self) -> Result<quaint::connector::ResultSet, quaint::error::Error> {
+        self.api.database().query(self.insert.into()).await
     }
 }
 
@@ -307,48 +307,42 @@ impl<'a> TestApiSelect<'a> {
 }
 
 pub trait MigrationsAssertions: Sized {
-    fn assert_applied_steps_count(self, count: u32) -> AssertionResult<Self>;
-    fn assert_checksum(self, expected: &str) -> AssertionResult<Self>;
-    fn assert_failed(self) -> AssertionResult<Self>;
-    fn assert_logs(self, expected: &str) -> AssertionResult<Self>;
-    fn assert_migration_name(self, expected: &str) -> AssertionResult<Self>;
-    fn assert_success(self) -> AssertionResult<Self>;
+    fn assert_applied_steps_count(self, count: u32) -> Self;
+    fn assert_checksum(self, expected: &str) -> Self;
+    fn assert_failed(self) -> Self;
+    fn assert_logs(self, expected: &str) -> Self;
+    fn assert_migration_name(self, expected: &str) -> Self;
+    fn assert_success(self) -> Self;
 }
 
 impl MigrationsAssertions for MigrationRecord {
-    fn assert_checksum(self, expected: &str) -> AssertionResult<Self> {
+    fn assert_checksum(self, expected: &str) -> Self {
         assert_eq!(self.checksum, expected);
-
-        Ok(self)
+        self
     }
 
-    fn assert_migration_name(self, expected: &str) -> AssertionResult<Self> {
+    fn assert_migration_name(self, expected: &str) -> Self {
         assert_eq!(&self.migration_name[15..], expected);
-
-        Ok(self)
+        self
     }
 
-    fn assert_logs(self, expected: &str) -> AssertionResult<Self> {
+    fn assert_logs(self, expected: &str) -> Self {
         assert_eq!(self.logs.as_deref(), Some(expected));
-
-        Ok(self)
+        self
     }
 
-    fn assert_applied_steps_count(self, count: u32) -> AssertionResult<Self> {
+    fn assert_applied_steps_count(self, count: u32) -> Self {
         assert_eq!(self.applied_steps_count, count);
-
-        Ok(self)
+        self
     }
 
-    fn assert_success(self) -> AssertionResult<Self> {
+    fn assert_success(self) -> Self {
         assert!(self.finished_at.is_some());
-
-        Ok(self)
+        self
     }
 
-    fn assert_failed(self) -> AssertionResult<Self> {
+    fn assert_failed(self) -> Self {
         assert!(self.finished_at.is_none() && self.rolled_back_at.is_none());
-
-        Ok(self)
+        self
     }
 }

@@ -20,8 +20,7 @@ fn enums_can_be_dropped_on_postgres(api: TestApi) {
 
     api.schema_push(dm1).send_sync().assert_green_bang();
     api.assert_schema()
-        .assert_enum("CatMood", |r#enum| r#enum.assert_values(&["ANGRY", "HUNGRY", "CUDDLY"]))
-        .unwrap();
+        .assert_enum("CatMood", |r#enum| r#enum.assert_values(&["ANGRY", "HUNGRY", "CUDDLY"]));
 
     let dm2 = r#"
         model Cat {
@@ -31,7 +30,7 @@ fn enums_can_be_dropped_on_postgres(api: TestApi) {
     "#;
 
     api.schema_push(dm2).send_sync().assert_green_bang();
-    api.assert_schema().assert_has_no_enum("CatMood").unwrap();
+    api.assert_schema().assert_has_no_enum("CatMood");
 }
 
 #[test_connector(capabilities(ScalarLists))]
@@ -56,11 +55,11 @@ fn adding_a_scalar_list_for_a_model_with_id_type_int_must_work(api: TestApi) {
 
     api.schema_push(dm1).send_sync().assert_green_bang();
 
-    api.assert_schema().assert_table_bang("A", |table| {
+    api.assert_schema().assert_table("A", |table| {
         table
-            .assert_column("strings", |col| col.assert_is_list()?.assert_type_is_string())?
+            .assert_column("strings", |col| col.assert_is_list().assert_type_is_string())
             .assert_column("enums", |col| {
-                col.assert_type_family(ColumnTypeFamily::Enum("Status".into()))?
+                col.assert_type_family(ColumnTypeFamily::Enum("Status".into()))
                     .assert_is_list()
             })
     });
@@ -78,9 +77,7 @@ fn existing_postgis_tables_must_not_be_migrated(api: TestApi) {
 
     api.assert_schema()
         .assert_has_table("spatial_ref_sys")
-        .unwrap()
-        .assert_has_table("Geometry_columns")
-        .unwrap();
+        .assert_has_table("Geometry_columns");
 
     let schema = "";
 
@@ -91,9 +88,7 @@ fn existing_postgis_tables_must_not_be_migrated(api: TestApi) {
 
     api.assert_schema()
         .assert_has_table("spatial_ref_sys")
-        .unwrap()
-        .assert_has_table("Geometry_columns")
-        .unwrap();
+        .assert_has_table("Geometry_columns");
 }
 
 #[test_connector(tags(Postgres))]
@@ -149,11 +144,11 @@ fn native_type_columns_can_be_created(api: TestApi) {
 
     api.schema_push(&dm).send_sync().assert_green_bang();
 
-    api.assert_schema().assert_table_bang("A", |table| {
+    api.assert_schema().assert_table("A", |table| {
         types.iter().fold(
-            Ok(table),
+            table,
             |table, (field_name, _prisma_type, _native_type, database_type)| {
-                table.and_then(|table| table.assert_column(field_name, |col| col.assert_full_data_type(database_type)))
+                table.assert_column(field_name, |col| col.assert_full_data_type(database_type))
             },
         )
     });

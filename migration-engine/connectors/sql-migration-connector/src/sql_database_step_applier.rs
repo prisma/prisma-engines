@@ -163,11 +163,14 @@ fn render_raw_sql(
 
             vec![renderer.render_add_foreign_key(&foreign_key)]
         }
-        SqlMigrationStep::DropForeignKey(drop_foreign_key) => {
+        SqlMigrationStep::DropForeignKey {
+            table_index,
+            foreign_key_index,
+        } => {
             let foreign_key = schemas
                 .previous()
-                .table_walker_at(drop_foreign_key.table_index)
-                .foreign_key_at(drop_foreign_key.foreign_key_index);
+                .table_walker_at(*table_index)
+                .foreign_key_at(*foreign_key_index);
 
             vec![renderer.render_drop_foreign_key(&foreign_key)]
         }

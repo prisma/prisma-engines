@@ -24,10 +24,10 @@ fn index_on_compound_relation_fields_must_work(api: TestApi) {
 
     api.schema_push(dm).send_sync().assert_green_bang();
 
-    api.assert_schema().assert_table_bang("Post", |table| {
+    api.assert_schema().assert_table("Post", |table| {
         table
-            .assert_has_column("authorName")?
-            .assert_has_column("authorEmail")?
+            .assert_has_column("authorName")
+            .assert_has_column("authorEmail")
             .assert_index_on_columns(&["authorEmail", "authorName"], |idx| idx.assert_name("testIndex"))
     });
 }
@@ -46,11 +46,11 @@ fn index_settings_must_be_migrated(api: TestApi) {
 
     api.schema_push(dm).send_sync().assert_green_bang();
 
-    api.assert_schema().assert_table_bang("Test", |table| {
+    api.assert_schema().assert_table("Test", |table| {
         table
-            .assert_indexes_count(1)?
+            .assert_indexes_count(1)
             .assert_index_on_columns(&["name", "followersCount"], |idx| {
-                idx.assert_is_not_unique()?.assert_name("nameAndFollowers")
+                idx.assert_is_not_unique().assert_name("nameAndFollowers")
             })
     });
 
@@ -69,11 +69,11 @@ fn index_settings_must_be_migrated(api: TestApi) {
         .send_sync()
         .assert_warnings(&["A unique constraint covering the columns `[name,followersCount]` on the table `Test` will be added. If there are existing duplicate values, this will fail.".into()]);
 
-    api.assert_schema().assert_table_bang("Test", |table| {
+    api.assert_schema().assert_table("Test", |table| {
         table
-            .assert_indexes_count(1)?
+            .assert_indexes_count(1)
             .assert_index_on_columns(&["name", "followersCount"], |idx| {
-                idx.assert_is_unique()?.assert_name("nameAndFollowers")
+                idx.assert_is_unique().assert_name("nameAndFollowers")
             })
     });
 }
@@ -99,7 +99,7 @@ fn unique_directive_on_required_one_to_one_relation_creates_one_index(api: TestA
     api.schema_push(dm).send_sync().assert_green_bang();
 
     api.assert_schema()
-        .assert_table_bang("Cat", |table| table.assert_indexes_count(1));
+        .assert_table("Cat", |table| table.assert_indexes_count(1));
 }
 
 // TODO: Enable SQL Server when cascading rules are in PSL.
@@ -118,13 +118,13 @@ fn one_to_many_self_relations_do_not_create_a_unique_index(api: TestApi) {
 
     if api.is_mysql() {
         // MySQL creates an index for the FK.
-        api.assert_schema().assert_table_bang("Location", |t| {
-            t.assert_indexes_count(1)?
+        api.assert_schema().assert_table("Location", |t| {
+            t.assert_indexes_count(1)
                 .assert_index_on_columns(&["parent"], |idx| idx.assert_is_not_unique())
         });
     } else {
         api.assert_schema()
-            .assert_table_bang("Location", |t| t.assert_indexes_count(0));
+            .assert_table("Location", |t| t.assert_indexes_count(0));
     }
 }
 
@@ -163,7 +163,7 @@ fn model_with_multiple_indexes_works(api: TestApi) {
 
     api.schema_push(dm).send_sync().assert_green_bang();
     api.assert_schema()
-        .assert_table_bang("Like", |table| table.assert_indexes_count(3));
+        .assert_table("Like", |table| table.assert_indexes_count(3));
 }
 
 #[test_connector]
@@ -180,7 +180,7 @@ fn removing_multi_field_unique_index_must_work(api: TestApi) {
 
     api.schema_push(dm1).send_sync().assert_green_bang();
 
-    api.assert_schema().assert_table_bang("A", |table| {
+    api.assert_schema().assert_table("A", |table| {
         table.assert_index_on_columns(&["field", "secondField"], |idx| idx.assert_is_unique())
     });
 
@@ -195,7 +195,7 @@ fn removing_multi_field_unique_index_must_work(api: TestApi) {
     api.schema_push(dm2).send_sync().assert_green_bang();
 
     api.assert_schema()
-        .assert_table_bang("A", |table| table.assert_indexes_count(0));
+        .assert_table("A", |table| table.assert_indexes_count(0));
 }
 
 #[test_connector]
@@ -213,13 +213,13 @@ fn index_renaming_must_work(api: TestApi) {
 
     api.schema_push(dm1).send_sync().assert_green_bang();
 
-    api.assert_schema().assert_table_bang("A", |table| {
+    api.assert_schema().assert_table("A", |table| {
         table
             .assert_index_on_columns(&["field", "secondField"], |idx| {
-                idx.assert_is_unique()?.assert_name("customName")
-            })?
+                idx.assert_is_unique().assert_name("customName")
+            })
             .assert_index_on_columns(&["secondField", "field"], |idx| {
-                idx.assert_is_not_unique()?.assert_name("customNameNonUnique")
+                idx.assert_is_not_unique().assert_name("customNameNonUnique")
             })
     });
 
@@ -236,14 +236,14 @@ fn index_renaming_must_work(api: TestApi) {
 
     api.schema_push(dm2).send_sync().assert_green_bang();
 
-    api.assert_schema().assert_table_bang("A", |table| {
+    api.assert_schema().assert_table("A", |table| {
         table
-            .assert_indexes_count(2)?
+            .assert_indexes_count(2)
             .assert_index_on_columns(&["field", "secondField"], |idx| {
-                idx.assert_is_unique()?.assert_name("customNameA")
-            })?
+                idx.assert_is_unique().assert_name("customNameA")
+            })
             .assert_index_on_columns(&["secondField", "field"], |idx| {
-                idx.assert_is_not_unique()?.assert_name("customNameNonUniqueA")
+                idx.assert_is_not_unique().assert_name("customNameNonUniqueA")
             })
     });
 }
@@ -261,7 +261,7 @@ fn index_renaming_must_work_when_renaming_to_default(api: TestApi) {
     "#;
 
     api.schema_push(dm1).send_sync().assert_green_bang();
-    api.assert_schema().assert_table_bang("A", |t| {
+    api.assert_schema().assert_table("A", |t| {
         t.assert_index_on_columns(&["field", "secondField"], |idx| idx.assert_is_unique())
     });
 
@@ -276,9 +276,9 @@ fn index_renaming_must_work_when_renaming_to_default(api: TestApi) {
     "#;
 
     api.schema_push(dm2).send_sync();
-    api.assert_schema().assert_table_bang("A", |t| {
+    api.assert_schema().assert_table("A", |t| {
         t.assert_index_on_columns(&["field", "secondField"], |idx| {
-            idx.assert_is_unique()?.assert_name("A.field_secondField_unique")
+            idx.assert_is_unique().assert_name("A.field_secondField_unique")
         })
     });
 }
@@ -297,9 +297,9 @@ fn index_renaming_must_work_when_renaming_to_custom(api: TestApi) {
 
     api.schema_push(dm1).send_sync().assert_green_bang();
 
-    api.assert_schema().assert_table_bang("A", |table| {
+    api.assert_schema().assert_table("A", |table| {
         table
-            .assert_indexes_count(1)?
+            .assert_indexes_count(1)
             .assert_index_on_columns(&["field", "secondField"], |idx| idx.assert_is_unique())
     });
 
@@ -315,11 +315,11 @@ fn index_renaming_must_work_when_renaming_to_custom(api: TestApi) {
 
     api.schema_push(dm2).send_sync().assert_green_bang();
 
-    api.assert_schema().assert_table_bang("A", |table| {
+    api.assert_schema().assert_table("A", |table| {
         table
-            .assert_indexes_count(1)?
+            .assert_indexes_count(1)
             .assert_index_on_columns(&["field", "secondField"], |idx| {
-                idx.assert_name("somethingCustom")?.assert_is_unique()
+                idx.assert_name("somethingCustom").assert_is_unique()
             })
     });
 }
@@ -337,7 +337,7 @@ fn index_updates_with_rename_must_work(api: TestApi) {
     "#;
 
     api.schema_push(dm1).send_sync().assert_green_bang();
-    api.assert_schema().assert_table_bang("A", |t| {
+    api.assert_schema().assert_table("A", |t| {
         t.assert_index_on_columns(&["field", "secondField"], |idx| idx.assert_is_unique())
     });
 
@@ -353,8 +353,9 @@ fn index_updates_with_rename_must_work(api: TestApi) {
 
     api.schema_push(dm2).force(true).send_sync().assert_executable();
 
-    api.assert_schema().assert_table_bang("A", |t| {
-        t.assert_indexes_count(1)?.assert_index_on_columns(&["field", "id"], Ok)
+    api.assert_schema().assert_table("A", |t| {
+        t.assert_indexes_count(1)
+            .assert_index_on_columns(&["field", "id"], |idx| idx)
     });
 }
 
@@ -371,9 +372,9 @@ fn dropping_a_model_with_a_multi_field_unique_index_must_work(api: TestApi) {
     "#;
 
     api.schema_push(dm1).send_sync().assert_green_bang();
-    api.assert_schema().assert_table_bang("A", |t| {
+    api.assert_schema().assert_table("A", |t| {
         t.assert_index_on_columns(&["field", "secondField"], |idx| {
-            idx.assert_name("customName")?.assert_is_unique()
+            idx.assert_name("customName").assert_is_unique()
         })
     });
 
@@ -395,25 +396,24 @@ fn indexes_with_an_automatically_truncated_name_are_idempotent(api: TestApi) {
 
     api.schema_push(dm).send_sync().assert_green_bang();
 
-    api.assert_schema()
-        .assert_table_bang("TestModelWithALongName", |table| {
-            table.assert_index_on_columns(
-                &[
-                    "looooooooooooongfield",
-                    "evenLongerFieldNameWth",
-                    "omgWhatEvenIsThatLongFieldName",
-                ],
-                |idx| {
-                    idx.assert_name(if api.is_mysql() {
-                        // The size limit of identifiers is 64 bytes on MySQL
-                        // and 63 on Postgres.
-                        "TestModelWithALongName.looooooooooooongfield_evenLongerFieldName"
-                    } else {
-                        "TestModelWithALongName.looooooooooooongfield_evenLongerFieldNam"
-                    })
-                },
-            )
-        });
+    api.assert_schema().assert_table("TestModelWithALongName", |table| {
+        table.assert_index_on_columns(
+            &[
+                "looooooooooooongfield",
+                "evenLongerFieldNameWth",
+                "omgWhatEvenIsThatLongFieldName",
+            ],
+            |idx| {
+                idx.assert_name(if api.is_mysql() {
+                    // The size limit of identifiers is 64 bytes on MySQL
+                    // and 63 on Postgres.
+                    "TestModelWithALongName.looooooooooooongfield_evenLongerFieldName"
+                } else {
+                    "TestModelWithALongName.looooooooooooongfield_evenLongerFieldNam"
+                })
+            },
+        )
+    });
 
     api.schema_push(dm).send_sync().assert_green_bang().assert_no_steps();
 }
@@ -444,7 +444,7 @@ fn new_index_with_same_name_as_index_from_dropped_table_works(api: TestApi) {
 
     api.schema_push(dm1).send_sync().assert_green_bang();
 
-    api.assert_schema().assert_table_bang("Cat", |table| {
+    api.assert_schema().assert_table("Cat", |table| {
         table.assert_column("ownerid", |col| col.assert_is_required())
     });
 
@@ -465,7 +465,7 @@ fn new_index_with_same_name_as_index_from_dropped_table_works(api: TestApi) {
 
     api.schema_push(dm2).send_sync().assert_green_bang();
 
-    api.assert_schema().assert_table_bang("Owner", |table| {
+    api.assert_schema().assert_table("Owner", |table| {
         table.assert_column("ownerid", |col| col.assert_is_required())
     });
 }
@@ -499,8 +499,8 @@ fn column_type_migrations_should_not_implicitly_drop_indexes(api: TestApi) {
 
     api.apply_migrations(&migrations_directory).send_sync();
 
-    api.assert_schema().assert_table_bang("Cat", |cat| {
-        cat.assert_indexes_count(1)?
+    api.assert_schema().assert_table("Cat", |cat| {
+        cat.assert_indexes_count(1)
             .assert_index_on_columns(&["name"], |idx| idx.assert_is_not_unique())
     });
 }
@@ -536,8 +536,8 @@ fn column_type_migrations_should_not_implicitly_drop_compound_indexes(api: TestA
 
     api.apply_migrations(&migrations_directory).send_sync();
 
-    api.assert_schema().assert_table_bang("Cat", |cat| {
-        cat.assert_indexes_count(1)?
+    api.assert_schema().assert_table("Cat", |cat| {
+        cat.assert_indexes_count(1)
             .assert_index_on_columns(&["name", "age"], |idx| idx.assert_is_not_unique())
     });
 }

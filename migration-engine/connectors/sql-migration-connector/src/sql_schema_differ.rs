@@ -12,8 +12,7 @@ use self::differ_database::DifferDatabase;
 use crate::{
     pair::Pair,
     sql_migration::{
-        self, AlterColumn, AlterEnum, AlterTable, CreateIndex, DropForeignKey, RedefineTable, SqlMigrationStep,
-        TableChange,
+        self, AlterColumn, AlterEnum, AlterTable, CreateIndex, RedefineTable, SqlMigrationStep, TableChange,
     },
     SqlFlavour, SqlSchema,
 };
@@ -41,8 +40,8 @@ pub(crate) fn calculate_steps(schemas: Pair<&SqlSchema>, flavour: &dyn SqlFlavou
         std::mem::replace(&mut alter_indexes, Vec::new())
     };
 
-    let (drop_tables, mut drop_foreign_keys) = differ.drop_tables();
-    differ.drop_foreign_keys(&mut drop_foreign_keys, &tables_to_redefine);
+    differ.drop_tables(&mut steps);
+    differ.drop_foreign_keys(&tables_to_redefine, &mut steps);
 
     differ.drop_indexes(&tables_to_redefine, &mut steps);
     differ.push_create_indexes(&tables_to_redefine, &mut steps);
@@ -68,13 +67,7 @@ pub(crate) fn calculate_steps(schemas: Pair<&SqlSchema>, flavour: &dyn SqlFlavou
         alter_enums
             .into_iter()
             .map(SqlMigrationStep::AlterEnum)
-            .chain(drop_foreign_keys.into_iter().map(SqlMigrationStep::DropForeignKey))
             .chain(alter_tables.into_iter().map(SqlMigrationStep::AlterTable))
-            .chain(
-                drop_tables
-                    .into_iter()
-                    .map(|table_index| SqlMigrationStep::DropTable { table_index }),
-            )
             .chain(redefine_tables)
             .chain(alter_indexes.into_iter().map(|idxs| SqlMigrationStep::AlterIndex {
                 table: idxs.as_ref().map(|(table, _)| *table),
@@ -121,33 +114,23 @@ impl<'schema> SqlSchemaDiffer<'schema> {
 
     // We drop the foreign keys of dropped tables first, so we can drop tables in whatever order we
     // please later.
-    fn drop_tables(&self) -> (Vec<usize>, Vec<DropForeignKey>) {
-        let (dropped_tables_count, dropped_fks_count) = self.dropped_tables().fold((0, 0), |(tables, fks), item| {
-            (tables + 1, fks + item.foreign_key_count())
-        });
-
-        let mut dropped_tables = Vec::with_capacity(dropped_tables_count);
-        let mut dropped_foreign_keys = Vec::with_capacity(dropped_fks_count);
-
+    fn drop_tables(&self, steps: &mut Vec<SqlMigrationStep>) {
         for dropped_table in self.dropped_tables() {
-            dropped_tables.push(dropped_table.table_index());
+            steps.push(SqlMigrationStep::DropTable {
+                table_index: dropped_table.table_index(),
+            });
 
-            for (fk, fk_name) in dropped_table
-                .foreign_keys()
-                .filter_map(|fk| fk.constraint_name().map(|name| (fk, name)))
-            {
-                let drop_foreign_key = DropForeignKey {
+            if !self.flavour.should_drop_foreign_keys_from_dropped_tables() {
+                continue;
+            }
+
+            for fk in dropped_table.foreign_keys() {
+                steps.push(SqlMigrationStep::DropForeignKey {
                     table_index: dropped_table.table_index(),
                     foreign_key_index: fk.foreign_key_index(),
-                    table: dropped_table.name().to_owned(),
-                    constraint_name: fk_name.to_owned(),
-                };
-
-                dropped_foreign_keys.push(drop_foreign_key);
+                });
             }
         }
-
-        (dropped_tables, dropped_foreign_keys)
     }
 
     fn push_add_foreign_keys(&self, tables_to_redefine: &HashSet<String>, steps: &mut Vec<SqlMigrationStep>) {
@@ -245,20 +228,15 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         alter_columns
     }
 
-    fn drop_foreign_keys(&self, drop_foreign_keys: &mut Vec<DropForeignKey>, tables_to_redefine: &HashSet<String>) {
+    fn drop_foreign_keys(&self, tables_to_redefine: &HashSet<String>, steps: &mut Vec<SqlMigrationStep>) {
         for differ in self
             .table_pairs()
             .filter(|tables| !tables_to_redefine.contains(tables.next().name()))
         {
-            for (dropped_fk, dropped_foreign_key_name) in differ
-                .dropped_foreign_keys()
-                .filter_map(|foreign_key| foreign_key.constraint_name().map(|name| (foreign_key, name)))
-            {
-                drop_foreign_keys.push(DropForeignKey {
+            for dropped_fk in differ.dropped_foreign_keys() {
+                steps.push(SqlMigrationStep::DropForeignKey {
                     table_index: differ.previous().table_index(),
-                    table: differ.previous().name().to_owned(),
                     foreign_key_index: dropped_fk.foreign_key_index(),
-                    constraint_name: dropped_foreign_key_name.to_owned(),
                 })
             }
         }

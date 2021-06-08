@@ -81,6 +81,12 @@ pub(crate) trait SqlSchemaDifferFlavour {
         false
     }
 
+    /// Whether the foreign keys of dropped tables should be dropped before the table
+    /// is dropped.
+    fn should_drop_foreign_keys_from_dropped_tables(&self) -> bool {
+        true
+    }
+
     /// Whether to skip diffing JSON defaults.
     fn should_ignore_json_defaults(&self) -> bool {
         false

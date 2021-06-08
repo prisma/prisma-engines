@@ -64,8 +64,8 @@ impl SqlMigration {
                 SqlMigrationStep::AlterEnum(alter_enum) => {
                     drift_items.insert((DriftType::ChangedEnum, *alter_enum.index.previous() as u32, idx));
                 }
-                SqlMigrationStep::DropForeignKey(dropfk) => {
-                    drift_items.insert((DriftType::ChangedTable, dropfk.table_index as u32, idx));
+                SqlMigrationStep::DropForeignKey { table_index, .. } => {
+                    drift_items.insert((DriftType::ChangedTable, *table_index as u32, idx));
                 }
                 SqlMigrationStep::DropIndex { table_index, .. } => {
                     drift_items.insert((DriftType::ChangedTable, *table_index as u32, idx));
@@ -152,7 +152,9 @@ impl SqlMigration {
                         out.push_str("`\n");
                     }
                 }
-                SqlMigrationStep::DropForeignKey(_) => {}
+                SqlMigrationStep::DropForeignKey { .. } => {
+                    todo!()
+                }
                 SqlMigrationStep::DropIndex {
                     table_index,
                     index_index,
@@ -311,7 +313,10 @@ pub(crate) enum SqlMigrationStep {
         enum_index: usize,
     },
     AlterEnum(AlterEnum),
-    DropForeignKey(DropForeignKey),
+    DropForeignKey {
+        table_index: usize,
+        foreign_key_index: usize,
+    },
     DropIndex {
         table_index: usize,
         index_index: usize,
@@ -378,7 +383,7 @@ impl SqlMigrationStep {
             SqlMigrationStep::CreateTable { .. } => "CreateTable",
             SqlMigrationStep::AlterTable(_) => "AlterTable",
             SqlMigrationStep::RedefineIndex { .. } => "RedefineIndex",
-            SqlMigrationStep::DropForeignKey(_) => "DropForeignKey",
+            SqlMigrationStep::DropForeignKey { .. } => "DropForeignKey",
             SqlMigrationStep::DropTable { .. } => "DropTable",
             SqlMigrationStep::RedefineTables { .. } => "RedefineTables",
             SqlMigrationStep::CreateIndex(_) => "CreateIndex",
@@ -476,14 +481,6 @@ pub(crate) enum ColumnTypeChange {
     RiskyCast,
     SafeCast,
     NotCastable,
-}
-
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
-pub(crate) struct DropForeignKey {
-    pub table: String,
-    pub table_index: usize,
-    pub foreign_key_index: usize,
-    pub constraint_name: String,
 }
 
 #[derive(Debug, Eq, Ord, PartialEq, PartialOrd)]
