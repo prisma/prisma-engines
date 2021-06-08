@@ -229,9 +229,8 @@ fn should_fail_on_too_many_type_params() {
 
 macro_rules! test_type {
     ($name:ident($(($input:expr, $output:expr)),+ $(,)?)) => {
-        paste::item! {
             #[test]
-            fn [< test_type_mapping_ $name >] () {
+            fn $name () {
                 $(
                     let dml = format!(r#"
                         datasource db {{
@@ -259,81 +258,84 @@ macro_rules! test_type {
                 )+
             }
         }
-    };
 }
 
-test_type!(tinyint(("Int @db.TinyInt", MsSqlType::TinyInt)));
-test_type!(smallint(("Int @db.SmallInt", MsSqlType::SmallInt)));
-test_type!(int(("Int @db.Int", MsSqlType::Int)));
-test_type!(money(("Float @db.Money", MsSqlType::Money)));
-test_type!(smallmoney(("Float @db.SmallMoney", MsSqlType::SmallMoney)));
-test_type!(real(("Float @db.Real", MsSqlType::Real)));
-test_type!(date(("DateTime @db.Date", MsSqlType::Date)));
-test_type!(time(("DateTime @db.Time", MsSqlType::Time)));
-test_type!(datetime(("DateTime @db.DateTime", MsSqlType::DateTime)));
-test_type!(datetime2(("DateTime @db.DateTime2", MsSqlType::DateTime2)));
-test_type!(text(("String @db.Text", MsSqlType::Text)));
-test_type!(ntext(("String @db.NText", MsSqlType::NText)));
-test_type!(image(("Bytes @db.Image", MsSqlType::Image)));
-test_type!(xml(("String @db.Xml", MsSqlType::Xml)));
+mod test_type_mapping {
+    use super::*;
 
-test_type!(datetimeoffset((
-    "DateTime @db.DateTimeOffset",
-    MsSqlType::DateTimeOffset
-)));
+    test_type!(tinyint(("Int @db.TinyInt", MsSqlType::TinyInt)));
+    test_type!(smallint(("Int @db.SmallInt", MsSqlType::SmallInt)));
+    test_type!(int(("Int @db.Int", MsSqlType::Int)));
+    test_type!(money(("Float @db.Money", MsSqlType::Money)));
+    test_type!(smallmoney(("Float @db.SmallMoney", MsSqlType::SmallMoney)));
+    test_type!(real(("Float @db.Real", MsSqlType::Real)));
+    test_type!(date(("DateTime @db.Date", MsSqlType::Date)));
+    test_type!(time(("DateTime @db.Time", MsSqlType::Time)));
+    test_type!(datetime(("DateTime @db.DateTime", MsSqlType::DateTime)));
+    test_type!(datetime2(("DateTime @db.DateTime2", MsSqlType::DateTime2)));
+    test_type!(text(("String @db.Text", MsSqlType::Text)));
+    test_type!(ntext(("String @db.NText", MsSqlType::NText)));
+    test_type!(image(("Bytes @db.Image", MsSqlType::Image)));
+    test_type!(xml(("String @db.Xml", MsSqlType::Xml)));
 
-test_type!(smalldatetime(("DateTime @db.SmallDateTime", MsSqlType::SmallDateTime)));
+    test_type!(datetimeoffset((
+        "DateTime @db.DateTimeOffset",
+        MsSqlType::DateTimeOffset
+    )));
 
-test_type!(binary(
-    ("Bytes @db.Binary", MsSqlType::Binary(None)),
-    ("Bytes @db.Binary(4000)", MsSqlType::Binary(Some(4000)))
-));
+    test_type!(smalldatetime(("DateTime @db.SmallDateTime", MsSqlType::SmallDateTime)));
 
-test_type!(varbinary(
-    ("Bytes @db.VarBinary", MsSqlType::VarBinary(None)),
-    ("Bytes @db.VarBinary(4000)", MsSqlType::VarBinary(Some(Number(4000)))),
-    ("Bytes @db.VarBinary(Max)", MsSqlType::VarBinary(Some(Max))),
-));
+    test_type!(binary(
+        ("Bytes @db.Binary", MsSqlType::Binary(None)),
+        ("Bytes @db.Binary(4000)", MsSqlType::Binary(Some(4000)))
+    ));
 
-test_type!(char(
-    ("String @db.Char", MsSqlType::Char(None)),
-    ("String @db.Char(4000)", MsSqlType::Char(Some(4000)))
-));
+    test_type!(varbinary(
+        ("Bytes @db.VarBinary", MsSqlType::VarBinary(None)),
+        ("Bytes @db.VarBinary(4000)", MsSqlType::VarBinary(Some(Number(4000)))),
+        ("Bytes @db.VarBinary(Max)", MsSqlType::VarBinary(Some(Max))),
+    ));
 
-test_type!(nchar(
-    ("String @db.NChar", MsSqlType::NChar(None)),
-    ("String @db.NChar(4000)", MsSqlType::NChar(Some(4000)))
-));
+    test_type!(char(
+        ("String @db.Char", MsSqlType::Char(None)),
+        ("String @db.Char(4000)", MsSqlType::Char(Some(4000)))
+    ));
 
-test_type!(varchar(
-    ("String @db.VarChar", MsSqlType::VarChar(None)),
-    ("String @db.VarChar(8000)", MsSqlType::VarChar(Some(Number(8000)))),
-    ("String @db.VarChar(Max)", MsSqlType::VarChar(Some(Max))),
-));
+    test_type!(nchar(
+        ("String @db.NChar", MsSqlType::NChar(None)),
+        ("String @db.NChar(4000)", MsSqlType::NChar(Some(4000)))
+    ));
 
-test_type!(nvarchar(
-    ("String @db.NVarChar", MsSqlType::NVarChar(None)),
-    ("String @db.NVarChar(4000)", MsSqlType::NVarChar(Some(Number(4000)))),
-    ("String @db.NVarChar(Max)", MsSqlType::NVarChar(Some(Max))),
-));
+    test_type!(varchar(
+        ("String @db.VarChar", MsSqlType::VarChar(None)),
+        ("String @db.VarChar(8000)", MsSqlType::VarChar(Some(Number(8000)))),
+        ("String @db.VarChar(Max)", MsSqlType::VarChar(Some(Max))),
+    ));
 
-test_type!(boolean(
-    ("Boolean @db.Bit", MsSqlType::Bit),
-    ("Int @db.Bit", MsSqlType::Bit),
-));
+    test_type!(nvarchar(
+        ("String @db.NVarChar", MsSqlType::NVarChar(None)),
+        ("String @db.NVarChar(4000)", MsSqlType::NVarChar(Some(Number(4000)))),
+        ("String @db.NVarChar(Max)", MsSqlType::NVarChar(Some(Max))),
+    ));
 
-test_type!(decimal(
-    ("Decimal @db.Decimal", MsSqlType::Decimal(None)),
-    ("Decimal @db.Decimal(32,16)", MsSqlType::Decimal(Some((32, 16)))),
-));
+    test_type!(boolean(
+        ("Boolean @db.Bit", MsSqlType::Bit),
+        ("Int @db.Bit", MsSqlType::Bit),
+    ));
 
-test_type!(number(
-    ("Decimal @db.Decimal", MsSqlType::Decimal(None)),
-    ("Decimal @db.Decimal(32,16)", MsSqlType::Decimal(Some((32, 16)))),
-));
+    test_type!(decimal(
+        ("Decimal @db.Decimal", MsSqlType::Decimal(None)),
+        ("Decimal @db.Decimal(32,16)", MsSqlType::Decimal(Some((32, 16)))),
+    ));
 
-test_type!(float(
-    ("Float @db.Float", MsSqlType::Float(None)),
-    ("Float @db.Float(24)", MsSqlType::Float(Some(24))),
-    ("Float @db.Float(53)", MsSqlType::Float(Some(53))),
-));
+    test_type!(number(
+        ("Decimal @db.Decimal", MsSqlType::Decimal(None)),
+        ("Decimal @db.Decimal(32,16)", MsSqlType::Decimal(Some((32, 16)))),
+    ));
+
+    test_type!(float(
+        ("Float @db.Float", MsSqlType::Float(None)),
+        ("Float @db.Float(24)", MsSqlType::Float(Some(24))),
+        ("Float @db.Float(53)", MsSqlType::Float(Some(53))),
+    ));
+}

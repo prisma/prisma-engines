@@ -1,5 +1,5 @@
 use super::ModelProjection;
-use crate::{DomainError, ModelRef, PrismaValue, ScalarFieldRef};
+use crate::{DomainError, ModelRef, PrismaValue, PrismaValueExtensions, ScalarFieldRef};
 use std::{collections::HashMap, convert::TryFrom};
 
 /// Represents a (sub)set of fields to value pairs from a single record.
@@ -77,6 +77,21 @@ impl RecordProjection {
                     .into()
             })
             .collect()
+    }
+
+    /// Ensures that the contained values match the type identifier.
+    pub fn ensure_type_coherence(self) -> Self {
+        let pairs = self
+            .pairs
+            .into_iter()
+            .map(|(field, value)| {
+                let value = value.coerce(&field.type_identifier).unwrap();
+
+                (field, value)
+            })
+            .collect();
+
+        Self { pairs }
     }
 }
 

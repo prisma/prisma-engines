@@ -73,7 +73,7 @@ fn float_to_decimal_works(api: TestApi) {
 
     api.schema_push(dm1).send_sync().assert_green_bang();
 
-    api.assert_schema().assert_table_bang("Cat", |table| {
+    api.assert_schema().assert_table("Cat", |table| {
         table.assert_column("meowFrequency", |col| col.assert_type_family(ColumnTypeFamily::Float))
     });
 
@@ -94,7 +94,7 @@ fn float_to_decimal_works(api: TestApi) {
         .assert_green_bang()
         .assert_has_executed_steps();
 
-    api.assert_schema().assert_table_bang("Cat", |table| {
+    api.assert_schema().assert_table("Cat", |table| {
         table.assert_column("meowFrequency", |col| col.assert_type_family(ColumnTypeFamily::Decimal))
     });
 }
@@ -115,7 +115,7 @@ fn decimal_to_float_works(api: TestApi) {
 
     api.schema_push(&dm1).send_sync().assert_green_bang();
 
-    api.assert_schema().assert_table_bang("Cat", |table| {
+    api.assert_schema().assert_table("Cat", |table| {
         table.assert_column("meowFrequency", |col| col.assert_type_family(ColumnTypeFamily::Decimal))
     });
 
@@ -131,7 +131,7 @@ fn decimal_to_float_works(api: TestApi) {
         .assert_green_bang()
         .assert_has_executed_steps();
 
-    api.assert_schema().assert_table_bang("Cat", |table| {
+    api.assert_schema().assert_table("Cat", |table| {
         table.assert_column("meowFrequency", |col| col.assert_type_family(ColumnTypeFamily::Float))
     });
 }
@@ -152,7 +152,7 @@ fn bytes_to_string_works(api: TestApi) {
 
     api.schema_push(&dm1).send_sync().assert_green_bang();
 
-    api.assert_schema().assert_table_bang("Cat", |table| {
+    api.assert_schema().assert_table("Cat", |table| {
         table.assert_column("meowData", |col| col.assert_type_is_bytes())
     });
 
@@ -168,7 +168,7 @@ fn bytes_to_string_works(api: TestApi) {
         .assert_green_bang()
         .assert_has_executed_steps();
 
-    api.assert_schema().assert_table_bang("Cat", |table| {
+    api.assert_schema().assert_table("Cat", |table| {
         table.assert_column("meowData", |col| col.assert_type_is_string())
     });
 }
@@ -189,7 +189,7 @@ fn string_to_bytes_works(api: TestApi) {
 
     api.schema_push(&dm1).send_sync().assert_green_bang();
 
-    api.assert_schema().assert_table_bang("Cat", |table| {
+    api.assert_schema().assert_table("Cat", |table| {
         table.assert_column("meowData", |col| col.assert_type_is_bytes())
     });
 
@@ -205,7 +205,7 @@ fn string_to_bytes_works(api: TestApi) {
         .assert_green_bang()
         .assert_has_executed_steps();
 
-    api.assert_schema().assert_table_bang("Cat", |table| {
+    api.assert_schema().assert_table("Cat", |table| {
         table.assert_column("meowData", |col| col.assert_type_is_string())
     });
 }
@@ -221,8 +221,8 @@ fn decimal_to_decimal_array_works(api: TestApi) {
 
     api.schema_push(dm1).send_sync().assert_green_bang();
 
-    api.assert_schema().assert_table_bang("Test", |table| {
-        table.assert_column("decFloat", |col| col.assert_type_is_decimal()?.assert_is_required())
+    api.assert_schema().assert_table("Test", |table| {
+        table.assert_column("decFloat", |col| col.assert_type_is_decimal().assert_is_required())
     });
 
     let dm2 = format!(
@@ -242,14 +242,14 @@ fn decimal_to_decimal_array_works(api: TestApi) {
         .assert_green_bang()
         .assert_has_executed_steps();
 
-    api.assert_schema().assert_table_bang("Test", |table| {
-        table.assert_column("decFloat", |col| col.assert_type_is_decimal()?.assert_is_list())
+    api.assert_schema().assert_table("Test", |table| {
+        table.assert_column("decFloat", |col| col.assert_type_is_decimal().assert_is_list())
     });
 
     api.schema_push(dm1).send_sync().assert_green_bang();
 
-    api.assert_schema().assert_table_bang("Test", |table| {
-        table.assert_column("decFloat", |col| col.assert_type_is_decimal()?.assert_is_required())
+    api.assert_schema().assert_table("Test", |table| {
+        table.assert_column("decFloat", |col| col.assert_type_is_decimal().assert_is_required())
     });
 }
 
@@ -269,8 +269,8 @@ fn bytes_to_bytes_array_works(api: TestApi) {
 
     api.schema_push(&dm1).send_sync().assert_green_bang();
 
-    api.assert_schema().assert_table_bang("Test", |table| {
-        table.assert_column("bytesCol", |col| col.assert_type_is_bytes()?.assert_is_required())
+    api.assert_schema().assert_table("Test", |table| {
+        table.assert_column("bytesCol", |col| col.assert_type_is_bytes().assert_is_required())
     });
 
     let dm2 = format!(
@@ -290,13 +290,13 @@ fn bytes_to_bytes_array_works(api: TestApi) {
         .assert_green_bang()
         .assert_has_executed_steps();
 
-    api.assert_schema().assert_table_bang("Test", |table| {
-        table.assert_column("bytesCol", |col| col.assert_type_is_bytes()?.assert_is_list())
+    api.assert_schema().assert_table("Test", |table| {
+        table.assert_column("bytesCol", |col| col.assert_type_is_bytes().assert_is_list())
     });
 
     api.schema_push(&dm1).send_sync().assert_green_bang();
 
-    api.assert_schema().assert_table_bang("Test", |table| {
-        table.assert_column("bytesCol", |col| col.assert_type_is_bytes()?.assert_is_required())
+    api.assert_schema().assert_table("Test", |table| {
+        table.assert_column("bytesCol", |col| col.assert_type_is_bytes().assert_is_required())
     });
 }

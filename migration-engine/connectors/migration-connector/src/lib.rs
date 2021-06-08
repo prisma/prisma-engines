@@ -2,18 +2,18 @@
 
 //! This crate defines the API exposed by the connectors to the migration engine core. The entry point for this API is the [MigrationConnector](trait.MigrationConnector.html) trait.
 
-mod database_migration_inferrer;
 mod database_migration_step_applier;
 mod destructive_change_checker;
+mod diff;
 mod error;
 mod migration_persistence;
 mod migrations_directory;
 
-pub use database_migration_inferrer::DatabaseMigrationInferrer;
 pub use database_migration_step_applier::{DatabaseMigrationStepApplier, PrettyDatabaseMigrationStep};
 pub use destructive_change_checker::{
     DestructiveChangeChecker, DestructiveChangeDiagnostics, MigrationWarning, UnexecutableMigration,
 };
+pub use diff::DiffTarget;
 pub use error::ConnectorError;
 pub use migration_persistence::{MigrationPersistence, MigrationRecord, PersistenceNotInitializedError, Timestamp};
 pub use migrations_directory::{
@@ -41,6 +41,10 @@ pub trait MigrationConnector: Send + Sync + 'static {
     /// the connector name. The SQL connector for example can return "postgresql", "mysql" or "sqlite".
     fn connector_type(&self) -> &'static str;
 
+    /// Create a migration by comparing two database schemas. See
+    /// [DiffTarget](/enum.DiffTarget.html) for possible inputs.
+    async fn diff(&self, from: DiffTarget<'_>, to: DiffTarget<'_>) -> ConnectorResult<Self::DatabaseMigration>;
+
     /// The version of the underlying database.
     async fn version(&self) -> ConnectorResult<String>;
 
@@ -62,14 +66,14 @@ pub trait MigrationConnector: Send + Sync + 'static {
     /// See [MigrationPersistence](trait.MigrationPersistence.html).
     fn migration_persistence(&self) -> &dyn MigrationPersistence;
 
-    /// See [DatabaseMigrationInferrer](trait.DatabaseMigrationInferrer.html).
-    fn database_migration_inferrer(&self) -> &dyn DatabaseMigrationInferrer<Self::DatabaseMigration>;
-
     /// See [DatabaseMigrationStepApplier](trait.DatabaseMigrationStepApplier.html).
     fn database_migration_step_applier(&self) -> &dyn DatabaseMigrationStepApplier<Self::DatabaseMigration>;
 
     /// See [DestructiveChangeChecker](trait.DestructiveChangeChecker.html).
     fn destructive_change_checker(&self) -> &dyn DestructiveChangeChecker<Self::DatabaseMigration>;
+
+    /// If possible, check that the passed in migrations apply cleanly.
+    async fn validate_migrations(&self, _migrations: &[MigrationDirectory]) -> ConnectorResult<()>;
 }
 
 /// Marker for the associated migration type for a connector.

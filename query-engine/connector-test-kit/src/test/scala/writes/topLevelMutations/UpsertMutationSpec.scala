@@ -3,6 +3,7 @@ package writes.topLevelMutations
 import org.scalatest.{FlatSpec, Matchers}
 import util._
 
+// RS: Ported
 class UpsertMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
 
   val project = ProjectDsl.fromString {
@@ -299,6 +300,7 @@ class UpsertMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
     todoCount should be(1)
   }
 
+  // RS: Won't port? Test is a copy of the one above?
   "Inputvaluevalidations" should "fire if an ID is too long" in {
     val todoAlias = server
       .query(

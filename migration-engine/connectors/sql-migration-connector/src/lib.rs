@@ -7,7 +7,6 @@ mod connection_wrapper;
 mod error;
 mod flavour;
 mod pair;
-mod sql_database_migration_inferrer;
 mod sql_database_step_applier;
 mod sql_destructive_change_checker;
 mod sql_migration;
@@ -17,7 +16,7 @@ mod sql_schema_calculator;
 mod sql_schema_differ;
 
 use connection_wrapper::Connection;
-use datamodel::Datamodel;
+use datamodel::{walkers::walk_models, Configuration, Datamodel};
 use error::quaint_error_to_connector_error;
 use flavour::SqlFlavour;
 use migration_connector::*;
@@ -152,6 +151,26 @@ impl SqlMigrationConnector {
         Ok(())
     }
 
+    /// For tests.
+    pub fn migration_from_schemas(
+        from: (&Configuration, &Datamodel),
+        to: (&Configuration, &Datamodel),
+    ) -> SqlMigration {
+        let connection_info = ConnectionInfo::from_url(&from.0.datasources[0].load_url().unwrap()).unwrap();
+        let flavour = flavour::from_connection_info(&connection_info);
+        let from_sql = sql_schema_calculator::calculate_sql_schema(from, flavour.as_ref());
+        let to_sql = sql_schema_calculator::calculate_sql_schema(to, flavour.as_ref());
+
+        let steps = sql_schema_differ::calculate_steps(Pair::new(&from_sql, &to_sql), flavour.as_ref());
+
+        SqlMigration {
+            before: from_sql,
+            after: to_sql,
+            added_columns_with_virtual_defaults: Vec::new(),
+            steps,
+        }
+    }
+
     /// Generate a name for a temporary (shadow) database, _if_ there is no user-configured shadow database url.
     fn shadow_database_name(&self) -> Option<String> {
         if self.shadow_database_connection_string.is_some() {
@@ -159,6 +178,22 @@ impl SqlMigrationConnector {
         }
 
         Some(format!("prisma_migrate_shadow_db_{}", uuid::Uuid::new_v4()))
+    }
+
+    async fn sql_schema_from_diff_target(&self, target: &DiffTarget<'_>) -> ConnectorResult<SqlSchema> {
+        match target {
+            DiffTarget::Datamodel(schema) => Ok(sql_schema_calculator::calculate_sql_schema(
+                (schema.0, schema.1),
+                self.flavour.as_ref(),
+            )),
+            DiffTarget::Migrations(migrations) => {
+                self.flavour()
+                    .sql_schema_from_migration_history(migrations, &self.connection, self)
+                    .await
+            }
+            DiffTarget::Database => self.describe_schema().await,
+            DiffTarget::Empty => Ok(SqlSchema::empty()),
+        }
     }
 }
 
@@ -186,6 +221,48 @@ impl MigrationConnector for SqlMigrationConnector {
         Self::create_database(database_str).await
     }
 
+    async fn diff(&self, from: DiffTarget<'_>, to: DiffTarget<'_>) -> ConnectorResult<Self::DatabaseMigration> {
+        let previous_schema = self.sql_schema_from_diff_target(&from).await?;
+        let next_schema = self.sql_schema_from_diff_target(&to).await?;
+
+        let steps =
+            sql_schema_differ::calculate_steps(Pair::new(&previous_schema, &next_schema), self.flavour.as_ref());
+
+        let added_columns_with_virtual_defaults: Vec<(usize, usize)> =
+            if let Some((_, next_datamodel)) = to.as_datamodel() {
+                walk_added_columns(&steps)
+                    .map(|(table_index, column_index)| {
+                        let table = next_schema.table_walker_at(table_index);
+                        let column = table.column_at(column_index);
+
+                        (table, column)
+                    })
+                    .filter(|(table, column)| {
+                        walk_models(next_datamodel)
+                            .find(|model| model.database_name() == table.name())
+                            .and_then(|model| model.find_scalar_field(column.name()))
+                            .filter(|field| {
+                                field
+                                    .default_value()
+                                    .map(|default| default.is_uuid() || default.is_cuid())
+                                    .unwrap_or(false)
+                            })
+                            .is_some()
+                    })
+                    .map(move |(table, column)| (table.table_index(), column.column_index()))
+                    .collect()
+            } else {
+                Vec::new()
+            };
+
+        Ok(SqlMigration {
+            before: previous_schema,
+            after: next_schema,
+            added_columns_with_virtual_defaults,
+            steps,
+        })
+    }
+
     async fn reset(&self) -> ConnectorResult<()> {
         if self.flavour.reset(self.conn()).await.is_err() {
             self.best_effort_reset(self.conn()).await?;
@@ -203,10 +280,6 @@ impl MigrationConnector for SqlMigrationConnector {
         self.flavour.check_database_version_compatibility(datamodel)
     }
 
-    fn database_migration_inferrer(&self) -> &dyn DatabaseMigrationInferrer<SqlMigration> {
-        self
-    }
-
     fn database_migration_step_applier(&self) -> &dyn DatabaseMigrationStepApplier<SqlMigration> {
         self
     }
@@ -217,6 +290,15 @@ impl MigrationConnector for SqlMigrationConnector {
 
     fn migration_persistence(&self) -> &dyn MigrationPersistence {
         self
+    }
+
+    #[tracing::instrument(skip(self, migrations))]
+    async fn validate_migrations(&self, migrations: &[MigrationDirectory]) -> ConnectorResult<()> {
+        self.flavour()
+            .sql_schema_from_migration_history(migrations, self.conn(), self)
+            .await?;
+
+        Ok(())
     }
 }
 
@@ -231,4 +313,34 @@ async fn connect(database_str: &str) -> ConnectorResult<Connection> {
         .map_err(|err| quaint_error_to_connector_error(err, &connection_info))?;
 
     Ok(Connection::new(connection))
+}
+
+/// List all the columns added in the migration, either by alter table steps or
+/// redefine table steps.
+///
+/// The return value should be interpreted as an iterator over `(table_index,
+/// column_index)` in the `next` schema.
+fn walk_added_columns(steps: &[SqlMigrationStep]) -> impl Iterator<Item = (usize, usize)> + '_ {
+    steps
+        .iter()
+        .filter_map(|step| step.as_alter_table())
+        .flat_map(move |alter_table| {
+            alter_table
+                .changes
+                .iter()
+                .filter_map(|change| change.as_add_column())
+                .map(move |column_index| -> (usize, usize) { (*alter_table.table_index.next(), column_index) })
+        })
+        .chain(
+            steps
+                .iter()
+                .filter_map(|step| step.as_redefine_tables())
+                .flat_map(|redefine_tables| redefine_tables)
+                .flat_map(move |table| {
+                    table
+                        .added_columns
+                        .iter()
+                        .map(move |column_index| (*table.table_index.next(), *column_index))
+                }),
+        )
 }

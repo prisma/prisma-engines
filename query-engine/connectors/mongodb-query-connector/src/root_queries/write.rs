@@ -17,7 +17,7 @@ pub async fn create_record(
     model: &ModelRef,
     mut args: WriteArgs,
 ) -> crate::Result<RecordProjection> {
-    let coll = database.collection(model.db_name());
+    let coll = database.collection::<Document>(model.db_name());
 
     // Mongo only allows a singular ID.
     let mut id_fields = model.primary_identifier().scalar_fields().collect::<Vec<_>>();
@@ -61,7 +61,7 @@ pub async fn create_records(
     args: Vec<WriteArgs>,
     skip_duplicates: bool,
 ) -> crate::Result<usize> {
-    let coll = database.collection(model.db_name());
+    let coll = database.collection::<Document>(model.db_name());
     let num_records = args.len();
     let fields = model.fields().scalar();
 
@@ -87,12 +87,12 @@ pub async fn create_records(
 
     // Ordered = false (inverse of `skip_duplicates`) will ignore errors while executing
     // the operation and throw an error afterwards that we must handle.
-    let options = Some(InsertManyOptions::builder().ordered(Some(!skip_duplicates)).build());
+    let options = Some(InsertManyOptions::builder().ordered(!skip_duplicates).build());
 
     match coll.insert_many(docs, options).await {
         Ok(insert_result) => Ok(insert_result.inserted_ids.len()),
         Err(err) if skip_duplicates => match err.kind.as_ref() {
-            ErrorKind::BulkWriteError(ref failure) => match failure.write_errors {
+            ErrorKind::BulkWrite(ref failure) => match failure.write_errors {
                 Some(ref errs) if !errs.iter().any(|err| err.code != 11000) => Ok(num_records - errs.len()),
                 _ => Err(err.into()),
             },
@@ -110,7 +110,7 @@ pub async fn update_records(
     record_filter: RecordFilter,
     args: WriteArgs,
 ) -> crate::Result<Vec<RecordProjection>> {
-    let coll = database.collection(model.db_name());
+    let coll = database.collection::<Document>(model.db_name());
 
     // We need to load ids of documents to be updated first because Mongo doesn't
     // return ids on update, requiring us to follow the same approach as the SQL
@@ -189,7 +189,7 @@ pub async fn delete_records(
     model: &ModelRef,
     record_filter: RecordFilter,
 ) -> crate::Result<usize> {
-    let coll = database.collection(model.db_name());
+    let coll = database.collection::<Document>(model.db_name());
 
     let filter = if let Some(selectors) = record_filter.selectors {
         let id_field = model.primary_identifier().scalar_fields().next().unwrap();
@@ -219,8 +219,8 @@ pub async fn m2m_connect(
     let parent_model = field.model();
     let child_model = field.related_model();
 
-    let parent_coll = database.collection(parent_model.db_name());
-    let child_coll = database.collection(child_model.db_name());
+    let parent_coll = database.collection::<Document>(parent_model.db_name());
+    let child_coll = database.collection::<Document>(child_model.db_name());
 
     let parent_id = parent_id.values().next().unwrap();
     let parent_id_field = parent_model.primary_identifier().scalar_fields().next().unwrap();
@@ -259,8 +259,8 @@ pub async fn m2m_disconnect(
     let parent_model = field.model();
     let child_model = field.related_model();
 
-    let parent_coll = database.collection(parent_model.db_name());
-    let child_coll = database.collection(child_model.db_name());
+    let parent_coll = database.collection::<Document>(parent_model.db_name());
+    let child_coll = database.collection::<Document>(child_model.db_name());
 
     let parent_id = parent_id.values().next().unwrap();
     let parent_id_field = parent_model.primary_identifier().scalar_fields().next().unwrap();

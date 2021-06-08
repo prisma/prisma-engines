@@ -16,12 +16,10 @@ fn foreign_keys_of_inline_one_to_one_relations_have_a_unique_constraint(api: Tes
     "#;
 
     api.schema_push(dm).send_sync().assert_green_bang();
-    api.assert_schema().assert_table_bang("Box", |t| {
-        t.assert_indexes_count(1)
-            .unwrap()
-            .assert_index_on_columns(&["cat_id"], |idx| {
-                idx.assert_is_unique().unwrap().assert_name("Box_cat_id_unique")
-            })
+    api.assert_schema().assert_table("Box", |t| {
+        t.assert_indexes_count(1).assert_index_on_columns(&["cat_id"], |idx| {
+            idx.assert_is_unique().assert_name("Box_cat_id_unique")
+        })
     });
 }
 
@@ -42,8 +40,7 @@ fn foreign_keys_are_added_on_existing_tables(api: TestApi) -> TestResult {
 
     api.assert_schema()
         // There should be no foreign keys yet.
-        .assert_table("Account", |table| table.assert_foreign_keys_count(0))
-        .unwrap();
+        .assert_table("Account", |table| table.assert_foreign_keys_count(0));
 
     let dm2 = r#"
         model User {
@@ -61,10 +58,9 @@ fn foreign_keys_are_added_on_existing_tables(api: TestApi) -> TestResult {
 
     api.schema_push(dm2).send_sync().assert_green_bang();
 
-    api.assert_schema().assert_table_bang("Account", |table| {
+    api.assert_schema().assert_table("Account", |table| {
         table
             .assert_foreign_keys_count(1)
-            .unwrap()
             .assert_fk_on_columns(&["user_email"], |fk| fk.assert_references("User", &["email"]))
     });
 }
@@ -87,8 +83,7 @@ fn foreign_keys_can_be_added_on_existing_columns(api: TestApi) -> TestResult {
 
     api.assert_schema()
         // There should be no foreign keys yet.
-        .assert_table("Account", |table| table.assert_foreign_keys_count(0))
-        .unwrap();
+        .assert_table("Account", |table| table.assert_foreign_keys_count(0));
 
     let dm2 = r#"
         model User {
@@ -106,10 +101,9 @@ fn foreign_keys_can_be_added_on_existing_columns(api: TestApi) -> TestResult {
 
     api.schema_push(dm2).send_sync().assert_green_bang();
 
-    api.assert_schema().assert_table_bang("Account", |table| {
+    api.assert_schema().assert_table("Account", |table| {
         table
             .assert_foreign_keys_count(1)
-            .unwrap()
             .assert_fk_on_columns(&["user_email"], |fk| fk.assert_references("User", &["email"]))
     });
 }
@@ -132,14 +126,11 @@ fn foreign_keys_can_be_dropped_on_existing_columns(api: TestApi) {
 
     api.schema_push(dm1).send_sync().assert_green_bang();
 
-    api.assert_schema()
-        .assert_table("Account", |table| {
-            table
-                .assert_foreign_keys_count(1)
-                .unwrap()
-                .assert_fk_on_columns(&["user_email"], |fk| fk.assert_references("User", &["email"]))
-        })
-        .unwrap();
+    api.assert_schema().assert_table("Account", |table| {
+        table
+            .assert_foreign_keys_count(1)
+            .assert_fk_on_columns(&["user_email"], |fk| fk.assert_references("User", &["email"]))
+    });
 
     let dm2 = r#"
         model User {
@@ -156,7 +147,7 @@ fn foreign_keys_can_be_dropped_on_existing_columns(api: TestApi) {
     api.schema_push(dm2).send_sync().assert_green_bang();
 
     api.assert_schema()
-        .assert_table_bang("Account", |table| table.assert_foreign_keys_count(0));
+        .assert_table("Account", |table| table.assert_foreign_keys_count(0));
 }
 
 #[test_connector]
@@ -173,13 +164,11 @@ fn changing_a_scalar_field_to_a_relation_field_must_work(api: TestApi) {
     "#;
 
     api.schema_push(dm1).send_sync().assert_green_bang();
-    api.assert_schema()
-        .assert_table("A", |t| {
-            t.assert_column("b", |c| c.assert_type_is_string())?
-                .assert_foreign_keys_count(0)?
-                .assert_indexes_count(0)
-        })
-        .unwrap();
+    api.assert_schema().assert_table("A", |t| {
+        t.assert_column("b", |c| c.assert_type_is_string())
+            .assert_foreign_keys_count(0)
+            .assert_indexes_count(0)
+    });
 
     let dm2 = r#"
         model A {
@@ -200,9 +189,9 @@ fn changing_a_scalar_field_to_a_relation_field_must_work(api: TestApi) {
         .assert_executable()
         .assert_has_executed_steps();
 
-    api.assert_schema().assert_table_bang("A", |table| {
+    api.assert_schema().assert_table("A", |table| {
         table
-            .assert_column("b", |col| col.assert_type_is_int())?
+            .assert_column("b", |col| col.assert_type_is_int())
             .assert_fk_on_columns(&["b"], |fk| fk.assert_references("B", &["id"]))
     });
 }
@@ -223,18 +212,14 @@ fn changing_a_relation_field_to_a_scalar_field_must_work(api: TestApi) {
 
     api.schema_push(dm1).send_sync().assert_green_bang();
 
-    api.assert_schema()
-        .assert_table("A", |table| {
-            table
-                .assert_column("b", |col| col.assert_type_is_int())
-                .unwrap()
-                .assert_foreign_keys_count(1)
-                .unwrap()
-                .assert_fk_on_columns(&["b"], |fk| {
-                    fk.assert_references("B", &["id"])?.assert_cascades_on_delete()
-                })
-        })
-        .unwrap();
+    api.assert_schema().assert_table("A", |table| {
+        table
+            .assert_column("b", |col| col.assert_type_is_int())
+            .assert_foreign_keys_count(1)
+            .assert_fk_on_columns(&["b"], |fk| {
+                fk.assert_references("B", &["id"]).assert_cascades_on_delete()
+            })
+    });
 
     let dm2 = r#"
         model A {
@@ -248,13 +233,11 @@ fn changing_a_relation_field_to_a_scalar_field_must_work(api: TestApi) {
 
     api.schema_push(dm2).send_sync().assert_green_bang();
 
-    api.assert_schema()
-        .assert_table("A", |table| {
-            table
-                .assert_column("b", |col| col.assert_type_is_string())?
-                .assert_foreign_keys_count(0)
-        })
-        .unwrap();
+    api.assert_schema().assert_table("A", |table| {
+        table
+            .assert_column("b", |col| col.assert_type_is_string())
+            .assert_foreign_keys_count(0)
+    });
 }
 
 #[test_connector]

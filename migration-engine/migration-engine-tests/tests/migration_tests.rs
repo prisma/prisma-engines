@@ -9,7 +9,7 @@ mod migrations;
 mod native_types;
 mod schema_push;
 
-use migration_engine_tests::{sql::*, TestResult};
+use migration_engine_tests::sql::*;
 use pretty_assertions::assert_eq;
 use prisma_value::PrismaValue;
 use quaint::connector::SqlFamily;
@@ -35,39 +35,39 @@ async fn adding_a_scalar_field_must_work(api: &TestApi) -> TestResult {
     "#,
     );
 
-    api.schema_push(&dm).send().await?.assert_green()?;
+    api.schema_push(&dm).send().await?.assert_green_bang();
 
     api.assert_schema().await?.assert_table("Test", |table| {
         table
-            .assert_columns_count(9)?
+            .assert_columns_count(9)
             .assert_column("int", |c| {
-                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Int)
-            })?
-            .assert_column("bigInt", |c| {
-                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::BigInt)
-            })?
-            .assert_column("float", |c| {
-                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Float)
-            })?
-            .assert_column("boolean", |c| {
-                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Boolean)
-            })?
-            .assert_column("string", |c| {
-                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::String)
-            })?
-            .assert_column("dateTime", |c| {
-                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::DateTime)
-            })?
-            .assert_column("decimal", |c| {
-                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Decimal)
-            })?
-            .assert_column("bytes", |c| {
-                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Binary)
+                c.assert_is_required().assert_type_family(ColumnTypeFamily::Int)
             })
-    })?;
+            .assert_column("bigInt", |c| {
+                c.assert_is_required().assert_type_family(ColumnTypeFamily::BigInt)
+            })
+            .assert_column("float", |c| {
+                c.assert_is_required().assert_type_family(ColumnTypeFamily::Float)
+            })
+            .assert_column("boolean", |c| {
+                c.assert_is_required().assert_type_family(ColumnTypeFamily::Boolean)
+            })
+            .assert_column("string", |c| {
+                c.assert_is_required().assert_type_family(ColumnTypeFamily::String)
+            })
+            .assert_column("dateTime", |c| {
+                c.assert_is_required().assert_type_family(ColumnTypeFamily::DateTime)
+            })
+            .assert_column("decimal", |c| {
+                c.assert_is_required().assert_type_family(ColumnTypeFamily::Decimal)
+            })
+            .assert_column("bytes", |c| {
+                c.assert_is_required().assert_type_family(ColumnTypeFamily::Binary)
+            })
+    });
 
     // Check that the migration is idempotent.
-    api.schema_push(dm).send().await?.assert_green()?.assert_no_steps();
+    api.schema_push(dm).send().await?.assert_green_bang().assert_no_steps();
     Ok(())
 }
 
@@ -85,21 +85,21 @@ async fn adding_an_enum_field_must_work(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.schema_push(dm).send().await?.assert_green()?;
+    api.schema_push(dm).send().await?.assert_green_bang();
 
     api.assert_schema().await?.assert_table("Test", |table| {
         table
-            .assert_columns_count(2)?
+            .assert_columns_count(2)
             .assert_column("enum", |c| match api.sql_family() {
                 SqlFamily::Postgres => c
-                    .assert_is_required()?
+                    .assert_is_required()
                     .assert_type_family(ColumnTypeFamily::Enum("MyEnum".to_owned())),
-                SqlFamily::Mysql => c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Enum(
+                SqlFamily::Mysql => c.assert_is_required().assert_type_family(ColumnTypeFamily::Enum(
                     api.normalize_identifier("Test_enum").into_owned(),
                 )),
-                _ => c.assert_is_required()?.assert_type_is_string(),
+                _ => c.assert_is_required().assert_type_is_string(),
             })
-    })?;
+    });
 
     // Check that the migration is idempotent.
     api.schema_push(dm).send().await?.assert_no_steps();
@@ -121,21 +121,21 @@ async fn adding_an_enum_field_must_work_with_native_types_off(api: &TestApi) -> 
         }
     "#;
 
-    api.schema_push(dm).send().await?.assert_green()?;
+    api.schema_push(dm).send().await?.assert_green_bang();
 
     api.assert_schema().await?.assert_table("Test", |table| {
         table
-            .assert_columns_count(2)?
+            .assert_columns_count(2)
             .assert_column("enum", |c| match api.sql_family() {
                 SqlFamily::Postgres => c
-                    .assert_is_required()?
+                    .assert_is_required()
                     .assert_type_family(ColumnTypeFamily::Enum("MyEnum".to_owned())),
                 SqlFamily::Mysql => c
-                    .assert_is_required()?
+                    .assert_is_required()
                     .assert_type_family(ColumnTypeFamily::Enum(api.normalize_identifier("Test_enum").into())),
-                _ => c.assert_is_required()?.assert_type_is_string(),
+                _ => c.assert_is_required().assert_type_is_string(),
             })
-    })?;
+    });
 
     // Check that the migration is idempotent.
     api.schema_push(dm).send().await?.assert_no_steps();
@@ -157,20 +157,20 @@ async fn json_fields_can_be_created(api: &TestApi) -> TestResult {
         api.datasource()
     );
 
-    api.schema_push(&dm).send().await?.assert_green()?;
+    api.schema_push(&dm).send().await?.assert_green_bang();
 
     api.assert_schema().await?.assert_table("Test", |table| {
         table.assert_column("javaScriptObjectNotation", |c| {
             if api.is_mariadb() {
                 // JSON is an alias for LONGTEXT on MariaDB - https://mariadb.com/kb/en/json-data-type/
-                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::String)
+                c.assert_is_required().assert_type_family(ColumnTypeFamily::String)
             } else {
-                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Json)
+                c.assert_is_required().assert_type_family(ColumnTypeFamily::Json)
             }
         })
-    })?;
+    });
 
-    api.schema_push(&dm).send().await?.assert_green()?.assert_no_steps();
+    api.schema_push(&dm).send().await?.assert_green_bang().assert_no_steps();
 
     Ok(())
 }
@@ -184,10 +184,10 @@ async fn adding_an_optional_field_must_work(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.schema_push(dm2).send().await?.assert_green()?;
+    api.schema_push(dm2).send().await?.assert_green_bang();
     api.assert_schema().await?.assert_table("Test", |table| {
-        table.assert_column("field", |column| column.assert_default(None)?.assert_is_nullable())
-    })?;
+        table.assert_column("field", |column| column.assert_default(None).assert_is_nullable())
+    });
 
     Ok(())
 }
@@ -200,11 +200,11 @@ async fn adding_an_id_field_with_a_special_name_must_work(api: &TestApi) -> Test
         }
     "#;
 
-    api.schema_push(dm2).send().await?.assert_green()?;
+    api.schema_push(dm2).send().await?.assert_green_bang();
 
     api.assert_schema()
         .await?
-        .assert_table("Test", |table| table.assert_has_column("specialName"))?;
+        .assert_table("Test", |table| table.assert_has_column("specialName"));
 
     Ok(())
 }
@@ -218,11 +218,11 @@ async fn adding_an_id_field_of_type_int_must_work(api: TestApi) -> TestResult {
         }
     "#;
 
-    api.schema_push(dm2).send().await?.assert_green()?;
+    api.schema_push(dm2).send().await?.assert_green_bang();
 
     api.assert_schema().await?.assert_table("Test", |table| {
         table.assert_column("myId", |col| col.assert_no_auto_increment())
-    })?;
+    });
 
     Ok(())
 }
@@ -236,11 +236,11 @@ async fn adding_an_id_field_of_type_int_must_work_for_sqlite(api: &TestApi) -> T
         }
     "#;
 
-    api.schema_push(dm2).send().await?.assert_green()?;
+    api.schema_push(dm2).send().await?.assert_green_bang();
 
     api.assert_schema().await?.assert_table("Test", |table| {
         table.assert_column("myId", |col| col.assert_auto_increments())
-    })?;
+    });
 
     Ok(())
 }
@@ -254,7 +254,7 @@ async fn adding_an_id_field_of_type_int_with_autoincrement_works(api: &TestApi) 
         }
     "#;
 
-    api.schema_push(dm2).send().await?.assert_green()?;
+    api.schema_push(dm2).send().await?.assert_green_bang();
     api.assert_schema().await?.assert_table("Test", |t| {
         t.assert_column("myId", |c| {
             if api.is_postgres() {
@@ -263,10 +263,12 @@ async fn adding_an_id_field_of_type_int_with_autoincrement_works(api: &TestApi) 
                 c.assert_auto_increments()
             }
         })
-    })?;
+    });
 
     Ok(())
 }
+
+type TestResult = Result<(), Box<dyn std::error::Error + Send + Sync + 'static>>;
 
 // Ignoring sqlite is OK, because sqlite integer primary keys are always auto-incrementing.
 #[test_connector(exclude(Sqlite))]
@@ -284,11 +286,11 @@ async fn making_an_existing_id_field_autoincrement_works(api: &TestApi) -> TestR
         }
     "#;
 
-    api.schema_push(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send().await?.assert_green_bang();
 
     api.assert_schema().await?.assert_table("Post", |model| {
-        model.assert_pk(|pk| pk.assert_columns(&["id"])?.assert_has_no_autoincrement())
-    })?;
+        model.assert_pk(|pk| pk.assert_columns(&["id"]).assert_has_no_autoincrement())
+    });
 
     // MySQL cannot add autoincrement property to a column that already has data.
     if !api.sql_family().is_mysql() {
@@ -321,14 +323,14 @@ async fn making_an_existing_id_field_autoincrement_works(api: &TestApi) -> TestR
         }
     "#;
 
-    api.schema_push(dm2).send().await?.assert_green()?;
+    api.schema_push(dm2).send().await?.assert_green_bang();
 
     api.assert_schema().await?.assert_table("Post", |model| {
-        model.assert_pk(|pk| pk.assert_columns(&["id"])?.assert_has_autoincrement())
-    })?;
+        model.assert_pk(|pk| pk.assert_columns(&["id"]).assert_has_autoincrement())
+    });
 
     // Check that the migration is idempotent.
-    api.schema_push(dm2).send().await?.assert_green()?.assert_no_steps();
+    api.schema_push(dm2).send().await?.assert_green_bang().assert_no_steps();
 
     // MySQL cannot add autoincrement property to a column that already has data.
     if !api.sql_family().is_mysql() {
@@ -360,11 +362,11 @@ async fn removing_autoincrement_from_an_existing_field_works(api: &TestApi) -> T
         }
     "#;
 
-    api.schema_push(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send().await?.assert_green_bang();
 
     api.assert_schema().await?.assert_table("Post", |model| {
-        model.assert_pk(|pk| pk.assert_columns(&["id"])?.assert_has_autoincrement())
-    })?;
+        model.assert_pk(|pk| pk.assert_columns(&["id"]).assert_has_autoincrement())
+    });
 
     // Data to see we don't lose anything in the translation.
     for content in &["A", "B", "C"] {
@@ -391,18 +393,18 @@ async fn removing_autoincrement_from_an_existing_field_works(api: &TestApi) -> T
         }
     "#;
 
-    api.schema_push(dm2).send().await?.assert_green()?;
+    api.schema_push(dm2).send().await?.assert_green_bang();
 
     api.assert_schema().await?.assert_table("Post", |model| {
-        model.assert_pk(|pk| pk.assert_columns(&["id"])?.assert_has_no_autoincrement())
-    })?;
+        model.assert_pk(|pk| pk.assert_columns(&["id"]).assert_has_no_autoincrement())
+    });
 
     // Check that the migration is idempotent.
     api.schema_push(dm2)
         .migration_id(Some("idempotency-check"))
         .send()
         .await?
-        .assert_green()?
+        .assert_green_bang()
         .assert_no_steps();
 
     assert_eq!(
@@ -429,13 +431,13 @@ async fn making_an_existing_id_field_autoincrement_works_with_indices(api: &Test
         }
     "#;
 
-    api.schema_push(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send().await?.assert_green_bang();
 
     api.assert_schema().await?.assert_table("Post", |model| {
         model
-            .assert_pk(|pk| pk.assert_columns(&["id"])?.assert_has_no_autoincrement())?
+            .assert_pk(|pk| pk.assert_columns(&["id"]).assert_has_no_autoincrement())
             .assert_indexes_count(1)
-    })?;
+    });
 
     // Data to see we don't lose anything in the translation.
     for (i, content) in (&["A", "B", "C"]).iter().enumerate() {
@@ -463,16 +465,16 @@ async fn making_an_existing_id_field_autoincrement_works_with_indices(api: &Test
         }
     "#;
 
-    api.schema_push(dm2).send().await?.assert_green()?;
+    api.schema_push(dm2).send().await?.assert_green_bang();
 
     api.assert_schema().await?.assert_table("Post", |model| {
         model
-            .assert_pk(|pk| pk.assert_columns(&["id"])?.assert_has_autoincrement())?
+            .assert_pk(|pk| pk.assert_columns(&["id"]).assert_has_autoincrement())
             .assert_indexes_count(1)
-    })?;
+    });
 
     // Check that the migration is idempotent.
-    api.schema_push(dm2).send().await?.assert_green()?.assert_no_steps();
+    api.schema_push(dm2).send().await?.assert_green_bang().assert_no_steps();
 
     assert_eq!(
         3,
@@ -514,11 +516,11 @@ async fn making_an_existing_id_field_autoincrement_works_with_foreign_keys(api: 
         }
     "#;
 
-    api.schema_push(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send().await?.assert_green_bang();
 
     api.assert_schema().await?.assert_table("Post", |model| {
-        model.assert_pk(|pk| pk.assert_columns(&["id"])?.assert_has_no_autoincrement())
-    })?;
+        model.assert_pk(|pk| pk.assert_columns(&["id"]).assert_has_no_autoincrement())
+    });
 
     // Data to see we don't lose anything in the translation.
     for (i, content) in (&["A", "B", "C"]).iter().enumerate() {
@@ -578,15 +580,15 @@ async fn making_an_existing_id_field_autoincrement_works_with_foreign_keys(api: 
         }
     "#;
 
-    api.schema_push(dm2).send().await?.assert_green()?;
+    api.schema_push(dm2).send().await?.assert_green_bang();
 
     api.assert_schema().await?.assert_table("Post", |model| {
-        model.assert_pk(|pk| pk.assert_columns(&["id"])?.assert_has_autoincrement())
-    })?;
+        model.assert_pk(|pk| pk.assert_columns(&["id"]).assert_has_autoincrement())
+    });
 
     // TODO: Why not empty?
     // Check that the migration is idempotent.
-    //api.schema_push(dm2).send().await?.assert_green()?.assert_no_steps();
+    //api.schema_push(dm2).send().await?.assert_green_bang().assert_no_steps();
 
     assert_eq!(
         3,
@@ -616,11 +618,11 @@ async fn flipping_autoincrement_on_and_off_works(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.schema_push(dm_with).send().await?.assert_green()?;
-    api.schema_push(dm_without).send().await?.assert_green()?;
-    api.schema_push(dm_with).send().await?.assert_green()?;
-    api.schema_push(dm_without).send().await?.assert_green()?;
-    api.schema_push(dm_with).send().await?.assert_green()?;
+    api.schema_push(dm_with).send().await?.assert_green_bang();
+    api.schema_push(dm_without).send().await?.assert_green_bang();
+    api.schema_push(dm_with).send().await?.assert_green_bang();
+    api.schema_push(dm_without).send().await?.assert_green_bang();
+    api.schema_push(dm_with).send().await?.assert_green_bang();
 
     Ok(())
 }
@@ -639,11 +641,11 @@ async fn making_an_autoincrement_default_an_expression_then_autoincrement_again_
         .migration_id(Some("apply_dm1"))
         .send()
         .await?
-        .assert_green()?;
+        .assert_green_bang();
 
     api.assert_schema().await?.assert_table("Post", |model| {
-        model.assert_pk(|pk| pk.assert_columns(&["id"])?.assert_has_autoincrement())
-    })?;
+        model.assert_pk(|pk| pk.assert_columns(&["id"]).assert_has_autoincrement())
+    });
 
     let dm2 = r#"
         model Post {
@@ -656,26 +658,26 @@ async fn making_an_autoincrement_default_an_expression_then_autoincrement_again_
         .migration_id(Some("apply_dm2"))
         .send()
         .await?
-        .assert_green()?;
+        .assert_green_bang();
 
     api.assert_schema().await?.assert_table("Post", |model| {
         model
-            .assert_pk(|pk| pk.assert_columns(&["id"])?.assert_has_no_autoincrement())?
+            .assert_pk(|pk| pk.assert_columns(&["id"]).assert_has_no_autoincrement())
             .assert_column("id", |column| {
                 column.assert_default(Some(DefaultValue::value(PrismaValue::Int(3))))
             })
-    })?;
+    });
 
     // Now re-apply the sequence.
     api.schema_push(dm1)
         .migration_id(Some("apply_dm1_again"))
         .send()
         .await?
-        .assert_green()?;
+        .assert_green_bang();
 
     api.assert_schema().await?.assert_table("Post", |model| {
-        model.assert_pk(|pk| pk.assert_columns(&["id"])?.assert_has_autoincrement())
-    })?;
+        model.assert_pk(|pk| pk.assert_columns(&["id"]).assert_has_autoincrement())
+    });
 
     Ok(())
 }
@@ -689,11 +691,11 @@ async fn removing_a_scalar_field_must_work(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.schema_push(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send().await?.assert_green_bang();
 
-    api.assert_schema().await?.assert_table("Test", |table| {
-        table.assert_columns_count(2)?.assert_has_column("field")
-    })?;
+    api.assert_schema()
+        .await?
+        .assert_table("Test", |table| table.assert_columns_count(2).assert_has_column("field"));
 
     let dm2 = r#"
         model Test {
@@ -701,11 +703,11 @@ async fn removing_a_scalar_field_must_work(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.schema_push(dm2).send().await?.assert_green()?;
+    api.schema_push(dm2).send().await?.assert_green_bang();
 
     api.assert_schema()
         .await?
-        .assert_table("Test", |table| table.assert_column_count(1))?;
+        .assert_table("Test", |table| table.assert_column_count(1));
 
     Ok(())
 }
@@ -719,11 +721,11 @@ async fn update_type_of_scalar_field_must_work(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.schema_push(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send().await?.assert_green_bang();
 
     api.assert_schema().await?.assert_table("Test", |table| {
         table.assert_column("field", |column| column.assert_type_is_string())
-    })?;
+    });
 
     let dm2 = r#"
         model Test {
@@ -732,11 +734,11 @@ async fn update_type_of_scalar_field_must_work(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.schema_push(dm2).send().await?.assert_green()?;
+    api.schema_push(dm2).send().await?.assert_green_bang();
 
     api.assert_schema().await?.assert_table("Test", |table| {
         table.assert_column("field", |column| column.assert_type_is_int())
-    })?;
+    });
 
     Ok(())
 }
@@ -756,13 +758,13 @@ async fn changing_the_type_of_an_id_field_must_work(api: &TestApi) -> TestResult
         }
     "#;
 
-    api.schema_push(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send().await?.assert_green_bang();
 
     api.assert_schema().await?.assert_table("A", |table| {
         table
-            .assert_column("b_id", |col| col.assert_type_family(ColumnTypeFamily::Int))?
+            .assert_column("b_id", |col| col.assert_type_family(ColumnTypeFamily::Int))
             .assert_fk_on_columns(&["b_id"], |fk| fk.assert_references("B", &["id"]))
-    })?;
+    });
 
     let dm2 = r#"
         model A {
@@ -778,13 +780,13 @@ async fn changing_the_type_of_an_id_field_must_work(api: &TestApi) -> TestResult
         }
     "#;
 
-    api.schema_push(dm2).send().await?.assert_green()?;
+    api.schema_push(dm2).send().await?.assert_green_bang();
 
     api.assert_schema().await?.assert_table("A", |table| {
         table
-            .assert_column("b_id", |col| col.assert_type_family(ColumnTypeFamily::String))?
+            .assert_column("b_id", |col| col.assert_type_family(ColumnTypeFamily::String))
             .assert_fk_on_columns(&["b_id"], |fk| fk.assert_references("B", &["id"]))
-    })?;
+    });
 
     Ok(())
 }
@@ -805,13 +807,13 @@ async fn changing_the_type_of_a_field_referenced_by_a_fk_must_work(api: &TestApi
         }
     "#;
 
-    api.schema_push(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send().await?.assert_green_bang();
 
     api.assert_schema().await?.assert_table("A", |table| {
         table
-            .assert_column("b_id", |col| col.assert_type_family(ColumnTypeFamily::Int))?
+            .assert_column("b_id", |col| col.assert_type_family(ColumnTypeFamily::Int))
             .assert_fk_on_columns(&["b_id"], |fk| fk.assert_references("B", &["uniq"]))
-    })?;
+    });
 
     let dm2 = r#"
         model A {
@@ -827,13 +829,13 @@ async fn changing_the_type_of_a_field_referenced_by_a_fk_must_work(api: &TestApi
         }
     "#;
 
-    api.schema_push(dm2).send().await?.assert_green()?;
+    api.schema_push(dm2).send().await?.assert_green_bang();
 
     api.assert_schema().await?.assert_table("A", |table| {
         table
-            .assert_column("b_id", |col| col.assert_type_family(ColumnTypeFamily::String))?
+            .assert_column("b_id", |col| col.assert_type_family(ColumnTypeFamily::String))
             .assert_fk_on_columns(&["b_id"], |fk| fk.assert_references("B", &["uniq"]))
-    })?;
+    });
 
     Ok(())
 }
@@ -847,10 +849,10 @@ async fn updating_db_name_of_a_scalar_field_must_work(api: &TestApi) -> TestResu
         }
     "#;
 
-    api.schema_push(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send().await?.assert_green_bang();
     api.assert_schema()
         .await?
-        .assert_table("A", |table| table.assert_has_column("name1"))?;
+        .assert_table("A", |table| table.assert_has_column("name1"));
 
     let dm2 = r#"
         model A {
@@ -859,12 +861,12 @@ async fn updating_db_name_of_a_scalar_field_must_work(api: &TestApi) -> TestResu
         }
     "#;
 
-    api.schema_push(dm2).send().await?.assert_green()?;
+    api.schema_push(dm2).send().await?.assert_green_bang();
     api.assert_schema().await?.assert_table("A", |t| {
-        t.assert_columns_count(2)?
-            .assert_has_column("id")?
+        t.assert_columns_count(2)
+            .assert_has_column("id")
             .assert_has_column("name2")
-    })?;
+    });
 
     Ok(())
 }
@@ -878,11 +880,11 @@ async fn adding_a_new_unique_field_must_work(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.schema_push(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send().await?.assert_green_bang();
 
     api.assert_schema().await?.assert_table("A", |table| {
         table.assert_index_on_columns(&["field"], |index| index.assert_is_unique())
-    })?;
+    });
 
     Ok(())
 }
@@ -899,10 +901,10 @@ async fn adding_new_fields_with_multi_column_unique_must_work(api: &TestApi) -> 
         }
     "#;
 
-    api.schema_push(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send().await?.assert_green_bang();
     api.assert_schema().await?.assert_table("A", |t| {
         t.assert_index_on_columns(&["field", "secondField"], |idx| idx.assert_is_unique())
-    })?;
+    });
 
     Ok(())
 }
@@ -916,10 +918,10 @@ async fn unique_in_conjunction_with_custom_column_name_must_work(api: &TestApi) 
         }
     "#;
 
-    api.schema_push(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send().await?.assert_green_bang();
     api.assert_schema().await?.assert_table("A", |t| {
         t.assert_index_on_columns(&["custom_field_name"], |idx| idx.assert_is_unique())
-    })?;
+    });
 
     Ok(())
 }
@@ -936,12 +938,12 @@ async fn multi_column_unique_in_conjunction_with_custom_column_name_must_work(ap
         }
     "#;
 
-    api.schema_push(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send().await?.assert_green_bang();
     api.assert_schema().await?.assert_table("A", |t| {
         t.assert_index_on_columns(&["custom_field_name", "second_custom_field_name"], |idx| {
             idx.assert_is_unique()
         })
-    })?;
+    });
 
     Ok(())
 }
@@ -955,10 +957,10 @@ async fn removing_an_existing_unique_field_must_work(api: &TestApi) -> TestResul
         }
     "#;
 
-    api.schema_push(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send().await?.assert_green_bang();
     api.assert_schema().await?.assert_table("A", |table| {
         table.assert_index_on_columns(&["field"], |idx| idx.assert_is_unique())
-    })?;
+    });
 
     let dm2 = r#"
         model A {
@@ -966,13 +968,13 @@ async fn removing_an_existing_unique_field_must_work(api: &TestApi) -> TestResul
         }
     "#;
 
-    api.schema_push(dm2).send().await?.assert_green()?;
+    api.schema_push(dm2).send().await?.assert_green_bang();
 
     api.assert_schema().await?.assert_table("A", |t| {
-        t.assert_indexes_count(0)?
-            .assert_columns_count(1)?
+        t.assert_indexes_count(0)
+            .assert_columns_count(1)
             .assert_has_column("id")
-    })?;
+    });
 
     Ok(())
 }
@@ -986,11 +988,11 @@ async fn adding_unique_to_an_existing_field_must_work(api: &TestApi) -> TestResu
         }
     "#;
 
-    api.schema_push(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send().await?.assert_green_bang();
 
     api.assert_schema()
         .await?
-        .assert_table("A", |table| table.assert_indexes_count(0))?;
+        .assert_table("A", |table| table.assert_indexes_count(0));
 
     let dm2 = r#"
         model A {
@@ -1008,9 +1010,9 @@ async fn adding_unique_to_an_existing_field_must_work(api: &TestApi) -> TestResu
 
     api.assert_schema().await?.assert_table("A", |table| {
         table
-            .assert_indexes_count(1)?
+            .assert_indexes_count(1)
             .assert_index_on_columns(&["field"], |idx| idx.assert_is_unique())
-    })?;
+    });
 
     Ok(())
 }
@@ -1024,10 +1026,10 @@ async fn removing_unique_from_an_existing_field_must_work(api: &TestApi) -> Test
         }
     "#;
 
-    api.schema_push(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send().await?.assert_green_bang();
     api.assert_schema().await?.assert_table("A", |t| {
         t.assert_index_on_columns(&["field"], |idx| idx.assert_is_unique())
-    })?;
+    });
 
     let dm2 = r#"
         model A {
@@ -1036,10 +1038,10 @@ async fn removing_unique_from_an_existing_field_must_work(api: &TestApi) -> Test
         }
     "#;
 
-    api.schema_push(dm2).send().await?.assert_green()?;
+    api.schema_push(dm2).send().await?.assert_green_bang();
     api.assert_schema()
         .await?
-        .assert_table("A", |t| t.assert_indexes_count(0))?;
+        .assert_table("A", |t| t.assert_indexes_count(0));
 
     Ok(())
 }
@@ -1057,11 +1059,11 @@ async fn reserved_sql_key_words_must_work(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.schema_push(dm).send().await?.assert_green()?;
+    api.schema_push(dm).send().await?.assert_green_bang();
 
     api.assert_schema().await?.assert_table("Group", |table| {
         table.assert_fk_on_columns(&["parent_id"], |fk| fk.assert_references("Group", &["id"]))
-    })?;
+    });
 
     Ok(())
 }
@@ -1088,10 +1090,10 @@ async fn migrations_with_many_to_many_related_models_must_not_recreate_indexes(a
         }
     "#;
 
-    api.schema_push(dm_1).send().await?.assert_green()?;
+    api.schema_push(dm_1).send().await?.assert_green_bang();
     api.assert_schema().await?.assert_table("_ProfileToSkill", |t| {
         t.assert_index_on_columns(&["A", "B"], |idx| idx.assert_is_unique())
-    })?;
+    });
 
     let dm_2 = r#"
         model User {
@@ -1116,9 +1118,9 @@ async fn migrations_with_many_to_many_related_models_must_not_recreate_indexes(a
     api.schema_push(dm_2).send().await?;
     api.assert_schema().await?.assert_table("_ProfileToSkill", |table| {
         table.assert_index_on_columns(&["A", "B"], |idx| {
-            idx.assert_is_unique()?.assert_name("_ProfileToSkill_AB_unique")
+            idx.assert_is_unique().assert_name("_ProfileToSkill_AB_unique")
         })
-    })?;
+    });
 
     Ok(())
 }
@@ -1139,11 +1141,11 @@ async fn removing_a_relation_field_must_work(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.schema_push(dm_1).send().await?.assert_green()?;
+    api.schema_push(dm_1).send().await?.assert_green_bang();
 
     api.assert_schema()
         .await?
-        .assert_table("User", |table| table.assert_has_column("address_name"))?;
+        .assert_table("User", |table| table.assert_has_column("address_name"));
 
     let dm_2 = r#"
         model User {
@@ -1156,11 +1158,11 @@ async fn removing_a_relation_field_must_work(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.schema_push(dm_2).send().await?.assert_green()?;
+    api.schema_push(dm_2).send().await?.assert_green_bang();
 
     api.assert_schema()
         .await?
-        .assert_table("User", |table| table.assert_does_not_have_column("address_name"))?;
+        .assert_table("User", |table| table.assert_does_not_have_column("address_name"));
 
     Ok(())
 }
@@ -1176,7 +1178,7 @@ async fn simple_type_aliases_in_migrations_must_work(api: &TestApi) -> TestResul
         }
     "#;
 
-    api.schema_push(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send().await?.assert_green_bang();
 
     Ok(())
 }
@@ -1196,7 +1198,7 @@ async fn created_at_does_not_get_arbitrarily_migrated(api: &TestApi) -> TestResu
     api.schema_push(dm1).send().await?;
     api.assert_schema().await?.assert_table("Fruit", |t| {
         t.assert_column("createdAt", |c| c.assert_default(Some(DefaultValue::now())))
-    })?;
+    });
 
     let insert = Insert::single_into(api.render_table_name("Fruit")).value("name", "banana");
     api.database().query(insert.into()).await.unwrap();
@@ -1209,7 +1211,7 @@ async fn created_at_does_not_get_arbitrarily_migrated(api: &TestApi) -> TestResu
         }
     "#;
 
-    api.schema_push(dm2).send().await?.assert_green()?.assert_no_steps();
+    api.schema_push(dm2).send().await?.assert_green_bang().assert_no_steps();
 
     Ok(())
 }
@@ -1227,7 +1229,7 @@ async fn renaming_a_datasource_works(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.schema_push(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send().await?.assert_green_bang();
 
     let dm2 = r#"
         datasource db2 {
@@ -1256,11 +1258,11 @@ async fn basic_compound_primary_keys_must_work(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.schema_push(dm).send().await?.assert_green()?;
+    api.schema_push(dm).send().await?.assert_green_bang();
 
     api.assert_schema().await?.assert_table("User", |table| {
         table.assert_pk(|pk| pk.assert_columns(&["lastName", "firstName"]))
-    })?;
+    });
 
     Ok(())
 }
@@ -1276,11 +1278,11 @@ async fn compound_primary_keys_on_mapped_columns_must_work(api: &TestApi) -> Tes
         }
     "#;
 
-    api.schema_push(dm).send().await?.assert_green()?;
+    api.schema_push(dm).send().await?.assert_green_bang();
 
     api.assert_schema().await?.assert_table("User", |table| {
         table.assert_pk(|pk| pk.assert_columns(&["first_name", "family_name"]))
-    })?;
+    });
 
     Ok(())
 }
@@ -1305,18 +1307,18 @@ async fn references_to_models_with_compound_primary_keys_must_work(api: &TestApi
         }
     "#;
 
-    api.schema_push(dm).send().await?.assert_green()?;
+    api.schema_push(dm).send().await?.assert_green_bang();
 
     api.assert_schema().await?.assert_table("Pet", |table| {
         table
-            .assert_has_column("id")?
-            .assert_has_column("human_firstName")?
-            .assert_has_column("human_lastName")?
-            .assert_foreign_keys_count(1)?
+            .assert_has_column("id")
+            .assert_has_column("human_firstName")
+            .assert_has_column("human_lastName")
+            .assert_foreign_keys_count(1)
             .assert_fk_on_columns(&["human_firstName", "human_lastName"], |fk| {
                 fk.assert_references("User", &["firstName", "lastName"])
             })
-    })?;
+    });
 
     Ok(())
 }
@@ -1350,26 +1352,26 @@ async fn join_tables_between_models_with_compound_primary_keys_must_work(api: &T
         }
     "#;
 
-    api.schema_push(dm).send().await?.assert_green()?;
+    api.schema_push(dm).send().await?.assert_green_bang();
 
     api.assert_schema().await?.assert_table("HumanToCat", |table| {
         table
-            .assert_has_column("human_firstName")?
-            .assert_has_column("human_lastName")?
-            .assert_has_column("cat_id")?
+            .assert_has_column("human_firstName")
+            .assert_has_column("human_lastName")
+            .assert_has_column("cat_id")
             .assert_fk_on_columns(&["human_firstName", "human_lastName"], |fk| {
-                fk.assert_references("Human", &["firstName", "lastName"])?
+                fk.assert_references("Human", &["firstName", "lastName"])
                     .assert_cascades_on_delete()
-            })?
+            })
             .assert_fk_on_columns(&["cat_id"], |fk| {
-                fk.assert_references("Cat", &["id"])?.assert_cascades_on_delete()
-            })?
-            .assert_indexes_count(2)?
+                fk.assert_references("Cat", &["id"]).assert_cascades_on_delete()
+            })
+            .assert_indexes_count(2)
             .assert_index_on_columns(&["cat_id", "human_firstName", "human_lastName"], |idx| {
                 idx.assert_is_unique()
-            })?
+            })
             .assert_index_on_columns(&["human_firstName", "human_lastName"], |idx| idx.assert_is_not_unique())
-    })?;
+    });
 
     Ok(())
 }
@@ -1403,19 +1405,19 @@ async fn join_tables_between_models_with_mapped_compound_primary_keys_must_work(
         }
     "#;
 
-    api.schema_push(dm).send().await?.assert_green()?;
+    api.schema_push(dm).send().await?.assert_green_bang();
 
     api.assert_schema().await?.assert_table("HumanToCat", |table| {
         table
-            .assert_has_column("human_the_first_name")?
-            .assert_has_column("human_the_last_name")?
-            .assert_has_column("cat_id")?
+            .assert_has_column("human_the_first_name")
+            .assert_has_column("human_the_last_name")
+            .assert_has_column("cat_id")
             .assert_fk_on_columns(&["human_the_first_name", "human_the_last_name"], |fk| {
                 fk.assert_references("Human", &["the_first_name", "the_last_name"])
-            })?
-            .assert_fk_on_columns(&["cat_id"], |fk| fk.assert_references("Cat", &["id"]))?
+            })
+            .assert_fk_on_columns(&["cat_id"], |fk| fk.assert_references("Cat", &["id"]))
             .assert_indexes_count(2)
-    })?;
+    });
 
     Ok(())
 }
@@ -1431,7 +1433,7 @@ async fn switching_databases_must_work(api: &TestApi) -> TestResult {
     "#,
     );
 
-    api.schema_push(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send().await?.assert_green_bang();
 
     //todo modify connection string
     let dm2 = api.datamodel_with_provider(
@@ -1447,7 +1449,7 @@ async fn switching_databases_must_work(api: &TestApi) -> TestResult {
         .migration_id(Some("mig2"))
         .send()
         .await?
-        .assert_green()?;
+        .assert_green_bang();
 
     Ok(())
 }
@@ -1465,7 +1467,7 @@ async fn adding_mutual_references_on_existing_tables_works(api: &TestApi) -> Tes
         }
     "#;
 
-    api.schema_push(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send().await?.assert_green_bang();
 
     let dm2 = r#"
         model A {
@@ -1488,7 +1490,7 @@ async fn adding_mutual_references_on_existing_tables_works(api: &TestApi) -> Tes
     let res = api.schema_push(dm2).force(true).send().await?;
 
     if api.sql_family().is_sqlite() {
-        res.assert_green()?;
+        res.assert_green_bang();
     } else {
         res.assert_warnings(&["A unique constraint covering the columns `[name]` on the table `A` will be added. If there are existing duplicate values, this will fail.".into(), "A unique constraint covering the columns `[email]` on the table `B` will be added. If there are existing duplicate values, this will fail.".into()]);
     };
@@ -1516,19 +1518,19 @@ async fn models_with_an_autoincrement_field_as_part_of_a_multi_field_id_can_be_c
         }
     "#;
 
-    api.schema_push(dm).send().await?.assert_green()?;
+    api.schema_push(dm).send().await?.assert_green_bang();
 
     api.assert_schema().await?.assert_table("Todo", |table| {
         table
-            .assert_pk(|pk| pk.assert_columns(&["id", "uTodo"]))?
+            .assert_pk(|pk| pk.assert_columns(&["id", "uTodo"]))
             .assert_column("id", |col| {
                 if api.is_sqlite() {
-                    Ok(col)
+                    col
                 } else {
                     col.assert_auto_increments()
                 }
             })
-    })?;
+    });
 
     Ok(())
 }
@@ -1547,13 +1549,13 @@ async fn migrating_a_unique_constraint_to_a_primary_key_works(api: &TestApi) -> 
         }
     "#;
 
-    api.schema_push(dm).send().await?.assert_green()?;
+    api.schema_push(dm).send().await?.assert_green_bang();
 
     api.assert_schema().await?.assert_table("model1", |table| {
         table
-            .assert_pk(|pk| pk.assert_columns(&["id"]))?
+            .assert_pk(|pk| pk.assert_columns(&["id"]))
             .assert_index_on_columns(&["a", "b", "c"], |idx| idx.assert_is_unique())
-    })?;
+    });
 
     api.insert("model1")
         .value("id", "the-id")
@@ -1583,7 +1585,7 @@ async fn migrating_a_unique_constraint_to_a_primary_key_works(api: &TestApi) -> 
 
     api.assert_schema().await?.assert_table("model1", |table| {
         table.assert_pk(|pk| pk.assert_columns(&["a", "b", "c"]))
-    })?;
+    });
 
     Ok(())
 }
@@ -1596,7 +1598,7 @@ async fn adding_multiple_optional_fields_to_an_existing_model_works(api: &TestAp
         }
     "#;
 
-    api.schema_push(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send().await?.assert_green_bang();
 
     let dm2 = r#"
         model Cat {
@@ -1606,13 +1608,13 @@ async fn adding_multiple_optional_fields_to_an_existing_model_works(api: &TestAp
         }
     "#;
 
-    api.schema_push(dm2).send().await?.assert_green()?;
+    api.schema_push(dm2).send().await?.assert_green_bang();
 
     api.assert_schema().await?.assert_table("Cat", |table| {
         table
-            .assert_column("name", |col| col.assert_is_nullable())?
+            .assert_column("name", |col| col.assert_is_nullable())
             .assert_column("age", |col| col.assert_is_nullable())
-    })?;
+    });
 
     Ok(())
 }
@@ -1643,7 +1645,7 @@ async fn reordering_and_altering_models_at_the_same_time_works(api: &TestApi) ->
         }
     "#;
 
-    api.schema_push(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send().await?.assert_green_bang();
 
     let dm2 = r#"
         model C {
@@ -1668,7 +1670,7 @@ async fn reordering_and_altering_models_at_the_same_time_works(api: &TestApi) ->
         }
     "#;
 
-    api.schema_push(dm2).send().await?.assert_green()?;
+    api.schema_push(dm2).send().await?.assert_green_bang();
 
     Ok(())
 }
@@ -1682,7 +1684,7 @@ async fn a_table_recreation_with_noncastable_columns_should_trigger_warnings(api
         }
     "#;
 
-    api.schema_push(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send().await?.assert_green_bang();
 
     // Removing autoincrement requires us to recreate the table.
     let dm2 = r#"
@@ -1712,7 +1714,7 @@ async fn a_table_recreation_with_noncastable_columns_should_trigger_warnings(api
 //         }
 //     "#;
 //
-//     api.schema_push(dm1).send().await?.assert_green()?;
+//     api.schema_push(dm1).send().await?.assert_green_bang();
 //     let insert = Insert::single_into((api.schema_name(), "Blog"))
 //         .value("id", 1)
 //         .value("float", Value::double(7.5));

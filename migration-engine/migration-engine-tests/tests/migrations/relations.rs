@@ -16,16 +16,16 @@ fn adding_a_many_to_many_relation_must_result_in_a_prisma_style_relation_table(a
 
     api.schema_push(dm1).send_sync().assert_green_bang();
 
-    api.assert_schema().assert_table_bang("_AToB", |table| {
+    api.assert_schema().assert_table("_AToB", |table| {
         table
-            .assert_columns_count(2)?
-            .assert_column("A", |col| col.assert_type_is_int())?
-            .assert_column("B", |col| col.assert_type_is_string())?
+            .assert_columns_count(2)
+            .assert_column("A", |col| col.assert_type_is_int())
+            .assert_column("B", |col| col.assert_type_is_string())
             .assert_fk_on_columns(&["A"], |fk| {
-                fk.assert_references("A", &["id"])?.assert_cascades_on_delete()
-            })?
+                fk.assert_references("A", &["id"]).assert_cascades_on_delete()
+            })
             .assert_fk_on_columns(&["B"], |fk| {
-                fk.assert_references("B", &["id"])?.assert_cascades_on_delete()
+                fk.assert_references("B", &["id"]).assert_cascades_on_delete()
             })
     });
 }
@@ -45,13 +45,13 @@ fn adding_a_many_to_many_relation_with_custom_name_must_work(api: TestApi) {
 
     api.schema_push(dm1).send_sync().assert_green_bang();
 
-    api.assert_schema().assert_table_bang("_my_relation", |table| {
+    api.assert_schema().assert_table("_my_relation", |table| {
         table
-            .assert_columns_count(2)?
-            .assert_column("A", |col| col.assert_type_is_int())?
-            .assert_column("B", |col| col.assert_type_is_int())?
-            .assert_foreign_keys_count(2)?
-            .assert_fk_on_columns(&["A"], |fk| fk.assert_references("A", &["id"]))?
+            .assert_columns_count(2)
+            .assert_column("A", |col| col.assert_type_is_int())
+            .assert_column("B", |col| col.assert_type_is_int())
+            .assert_foreign_keys_count(2)
+            .assert_fk_on_columns(&["A"], |fk| fk.assert_references("A", &["id"]))
             .assert_fk_on_columns(&["B"], |fk| fk.assert_references("B", &["id"]))
     });
 }
@@ -79,13 +79,13 @@ fn adding_an_inline_relation_must_result_in_a_foreign_key_in_the_model_table(api
     "#;
 
     api.schema_push(dm1).send_sync().assert_green_bang();
-    api.assert_schema().assert_table_bang("A", |t| {
-        t.assert_column("bid", |c| c.assert_type_is_int()?.assert_is_required())?
-            .assert_column("cid", |c| c.assert_type_is_int()?.assert_is_nullable())?
-            .assert_foreign_keys_count(2)?
+    api.assert_schema().assert_table("A", |t| {
+        t.assert_column("bid", |c| c.assert_type_is_int().assert_is_required())
+            .assert_column("cid", |c| c.assert_type_is_int().assert_is_nullable())
+            .assert_foreign_keys_count(2)
             .assert_fk_on_columns(&["bid"], |fk| {
-                fk.assert_references("B", &["id"])?.assert_cascades_on_delete()
-            })?
+                fk.assert_references("B", &["id"]).assert_cascades_on_delete()
+            })
             .assert_fk_on_columns(&["cid"], |fk| fk.assert_references("C", &["id"]))
     });
 }
@@ -106,9 +106,9 @@ fn specifying_a_db_name_for_an_inline_relation_must_work(api: TestApi) {
     "#;
 
     api.schema_push(dm1).send_sync().assert_green_bang();
-    api.assert_schema().assert_table_bang("A", |t| {
-        t.assert_column("b_column", |c| c.assert_type_is_int())?
-            .assert_foreign_keys_count(1)?
+    api.assert_schema().assert_table("A", |t| {
+        t.assert_column("b_column", |c| c.assert_type_is_int())
+            .assert_foreign_keys_count(1)
             .assert_fk_on_columns(&["b_column"], |fk| fk.assert_references("B", &["id"]))
     });
 }
@@ -129,11 +129,11 @@ fn adding_an_inline_relation_to_a_model_with_an_exotic_id_type(api: TestApi) {
     "#;
 
     api.schema_push(dm1).send_sync().assert_green_bang();
-    api.assert_schema().assert_table_bang("A", |t| {
-        t.assert_column("b_id", |c| c.assert_type_is_string())?
-            .assert_foreign_keys_count(1)?
+    api.assert_schema().assert_table("A", |t| {
+        t.assert_column("b_id", |c| c.assert_type_is_string())
+            .assert_foreign_keys_count(1)
             .assert_fk_on_columns(&["b_id"], |fk| {
-                fk.assert_references("B", &["id"])?.assert_cascades_on_delete()
+                fk.assert_references("B", &["id"]).assert_cascades_on_delete()
             })
     });
 }
@@ -156,7 +156,7 @@ fn removing_an_inline_relation_must_work(api: TestApi) {
     api.schema_push(dm1).send_sync().assert_green_bang();
 
     api.assert_schema()
-        .assert_table_bang("A", |table| table.assert_has_column("b_id"));
+        .assert_table("A", |table| table.assert_has_column("b_id"));
 
     let dm2 = r#"
             model A {
@@ -170,10 +170,10 @@ fn removing_an_inline_relation_must_work(api: TestApi) {
 
     api.schema_push(dm2).send_sync().assert_green_bang();
 
-    api.assert_schema().assert_table_bang("A", |table| {
+    api.assert_schema().assert_table("A", |table| {
         table
-            .assert_foreign_keys_count(0)?
-            .assert_indexes_count(0)?
+            .assert_foreign_keys_count(0)
+            .assert_indexes_count(0)
             .assert_does_not_have_column("b")
     });
 }
@@ -200,10 +200,10 @@ fn compound_foreign_keys_should_work_in_correct_order(api: TestApi) {
 
     api.schema_push(dm1).send_sync().assert_green_bang();
 
-    api.assert_schema().assert_table_bang("A", |t| {
-        t.assert_foreign_keys_count(1)?
+    api.assert_schema().assert_table("A", |t| {
+        t.assert_foreign_keys_count(1)
             .assert_fk_on_columns(&["a", "b", "d"], |fk| {
-                fk.assert_cascades_on_delete()?
+                fk.assert_cascades_on_delete()
                     .assert_references("B", &["a_id", "b_id", "d_id"])
             })
     });
@@ -225,9 +225,9 @@ fn moving_an_inline_relation_to_the_other_side_must_work(api: TestApi) {
     "#;
 
     api.schema_push(dm1).send_sync().assert_green_bang();
-    api.assert_schema().assert_table_bang("A", |t| {
-        t.assert_foreign_keys_count(1)?.assert_fk_on_columns(&["b_id"], |fk| {
-            fk.assert_cascades_on_delete()?.assert_references("B", &["id"])
+    api.assert_schema().assert_table("A", |t| {
+        t.assert_foreign_keys_count(1).assert_fk_on_columns(&["b_id"], |fk| {
+            fk.assert_cascades_on_delete().assert_references("B", &["id"])
         })
     });
 
@@ -246,14 +246,14 @@ fn moving_an_inline_relation_to_the_other_side_must_work(api: TestApi) {
 
     api.schema_push(dm2).send_sync().assert_green_bang();
     api.assert_schema()
-        .assert_table_bang("B", |table| {
+        .assert_table("B", |table| {
             table
-                .assert_foreign_keys_count(1)?
+                .assert_foreign_keys_count(1)
                 .assert_fk_on_columns(&["a_id"], |fk| {
-                    fk.assert_references("A", &["id"])?.assert_cascades_on_delete()
+                    fk.assert_references("A", &["id"]).assert_cascades_on_delete()
                 })
         })
-        .assert_table_bang("A", |table| table.assert_foreign_keys_count(0)?.assert_indexes_count(0));
+        .assert_table("A", |table| table.assert_foreign_keys_count(0).assert_indexes_count(0));
 }
 
 #[test_connector]
@@ -273,8 +273,8 @@ fn relations_can_reference_arbitrary_unique_fields(api: TestApi) {
     "#;
 
     api.schema_push(dm).send_sync().assert_green_bang();
-    api.assert_schema().assert_table_bang("Account", |t| {
-        t.assert_foreign_keys_count(1)?
+    api.assert_schema().assert_table("Account", |t| {
+        t.assert_foreign_keys_count(1)
             .assert_fk_on_columns(&["uem"], |fk| fk.assert_references("User", &["email"]))
     });
 }
@@ -299,9 +299,9 @@ fn relations_can_reference_arbitrary_unique_fields_with_maps(api: TestApi) {
 
     api.schema_push(dm).send_sync().assert_green_bang();
 
-    api.assert_schema().assert_table_bang("Account", |table| {
+    api.assert_schema().assert_table("Account", |table| {
         table
-            .assert_foreign_keys_count(1)?
+            .assert_foreign_keys_count(1)
             .assert_fk_on_columns(&["user-id"], |fk| fk.assert_references("users", &["emergency-mail"]))
     });
 }
@@ -328,9 +328,9 @@ fn relations_can_reference_multiple_fields(api: TestApi) {
 
     api.schema_push(dm).send_sync().assert_green_bang();
 
-    api.assert_schema().assert_table_bang("Account", |table| {
+    api.assert_schema().assert_table("Account", |table| {
         table
-            .assert_foreign_keys_count(1)?
+            .assert_foreign_keys_count(1)
             .assert_fk_on_columns(&["usermail", "userage"], |fk| {
                 fk.assert_references("User", &["email", "age"])
             })
@@ -361,9 +361,9 @@ fn a_relation_with_mappings_on_both_sides_can_reference_multiple_fields(api: Tes
 
     api.schema_push(dm).send_sync().assert_green_bang();
 
-    api.assert_schema().assert_table_bang("Account", |table| {
+    api.assert_schema().assert_table("Account", |table| {
         table
-            .assert_foreign_keys_count(1)?
+            .assert_foreign_keys_count(1)
             .assert_fk_on_columns(&["emergency-mail-fk-1", "age-fk2"], |fk| {
                 fk.assert_references("users", &["emergency-mail", "birthdays-count"])
             })
@@ -393,9 +393,9 @@ fn relations_with_mappings_on_referenced_side_can_reference_multiple_fields(api:
 
     api.schema_push(dm).send_sync().assert_green_bang();
 
-    api.assert_schema().assert_table_bang("Account", |table| {
+    api.assert_schema().assert_table("Account", |table| {
         table
-            .assert_foreign_keys_count(1)?
+            .assert_foreign_keys_count(1)
             .assert_fk_on_columns(&["useremail", "userage"], |fk| {
                 fk.assert_references("users", &["emergency-mail", "birthdays-count"])
             })
@@ -425,9 +425,9 @@ fn relations_with_mappings_on_referencing_side_can_reference_multiple_fields(api
 
     api.schema_push(dm).send_sync().assert_green_bang();
 
-    api.assert_schema().assert_table_bang("Account", |table| {
+    api.assert_schema().assert_table("Account", |table| {
         table
-            .assert_foreign_keys_count(1)?
+            .assert_foreign_keys_count(1)
             .assert_fk_on_columns(&["emergency-mail-fk1", "age-fk2"], |fk| {
                 fk.assert_references("users", &["email", "age"])
             })

@@ -125,6 +125,7 @@ pub struct RelatedRecordsQuery {
     pub selected_fields: ModelProjection,
     pub nested: Vec<ReadQuery>,
     pub selection_order: Vec<String>,
+    pub aggregation_selections: Vec<RelAggregationSelection>,
 
     /// Fields and values of the parent to satisfy the relation query without
     /// relying on the parent result passed by the interpreter.

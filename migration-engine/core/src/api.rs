@@ -7,6 +7,7 @@ pub use rpc::RpcApi;
 
 use crate::{commands::*, CoreResult};
 use migration_connector::MigrationConnector;
+use std::path::Path;
 use tracing_futures::Instrument;
 
 /// The programmatic, generic, fantastic migration engine API.
@@ -85,13 +86,11 @@ impl<C: MigrationConnector> GenericApi for C {
     }
 
     async fn debug_panic(&self) -> CoreResult<()> {
-        DebugPanicCommand::execute(&(), self)
-            .instrument(tracing::info_span!("DebugPanic"))
-            .await
+        panic!("This is the debugPanic artificial panic")
     }
 
     async fn dev_diagnostic(&self, input: &DevDiagnosticInput) -> CoreResult<DevDiagnosticOutput> {
-        DevDiagnosticCommand::execute(input, self)
+        dev_diagnostic(input, self)
             .instrument(tracing::info_span!("DevDiagnostic"))
             .await
     }
@@ -115,9 +114,15 @@ impl<C: MigrationConnector> GenericApi for C {
         &self,
         input: &ListMigrationDirectoriesInput,
     ) -> CoreResult<ListMigrationDirectoriesOutput> {
-        ListMigrationDirectoriesCommand::execute(input, self)
-            .instrument(tracing::info_span!("ListMigrationDirectories"))
-            .await
+        let migrations_from_filesystem =
+            migration_connector::list_migrations(&Path::new(&input.migrations_directory_path))?;
+
+        let migrations = migrations_from_filesystem
+            .iter()
+            .map(|migration| migration.migration_name().to_string())
+            .collect();
+
+        Ok(ListMigrationDirectoriesOutput { migrations })
     }
 
     async fn mark_migration_applied(

@@ -147,19 +147,13 @@ fn migrations_should_fail_when_the_script_is_invalid(api: TestApi) {
 
     first
         .assert_migration_name("initial")
-        .unwrap()
         .assert_applied_steps_count(1)
-        .unwrap()
-        .assert_success()
-        .unwrap();
+        .assert_success();
 
     second
         .assert_migration_name("second-migration")
-        .unwrap()
         .assert_applied_steps_count(0)
-        .unwrap()
-        .assert_failed()
-        .unwrap();
+        .assert_failed();
 }
 
 #[test_connector]

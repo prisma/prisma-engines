@@ -53,7 +53,7 @@ fn squashing_whole_migration_history_works(api: TestApi) {
         initial_migration_names
     };
 
-    let initial_schema = api.assert_schema().assert_tables_count(3).unwrap().into_schema();
+    let initial_schema = api.assert_schema().assert_tables_count(3).into_schema();
 
     // Squash the files, mark migration applied, assert the schema is the same.
 
@@ -82,7 +82,7 @@ fn squashing_whole_migration_history_works(api: TestApi) {
         migration_file.write_all(squashed_migration.as_bytes()).unwrap();
     }
 
-    api.assert_schema().assert_tables_count(3).unwrap();
+    api.assert_schema().assert_tables_count(3);
 
     let DiagnoseMigrationHistoryOutput {
         drift,
@@ -169,7 +169,7 @@ fn squashing_whole_migration_history_works(api: TestApi) {
     assert!(has_migrations_table);
     assert!(error_in_unapplied_migration.is_none());
 
-    api.assert_schema().assert_equals(&initial_schema).unwrap();
+    api.assert_schema().assert_equals(&initial_schema);
 
     // The following does not work because we validate that migrations are failed before marking them as rolled back.
     //
@@ -249,9 +249,7 @@ fn squashing_migrations_history_at_the_start_works(api: TestApi) {
     let initial_schema = api
         .assert_schema()
         .assert_tables_count(3)
-        .unwrap()
         .assert_has_table("Hyena")
-        .unwrap()
         .into_schema();
 
     // Squash the files, mark migration applied, assert the schema is the same.
@@ -291,7 +289,7 @@ fn squashing_migrations_history_at_the_start_works(api: TestApi) {
         migration_file.write_all(squashed_migration.as_bytes()).unwrap();
     }
 
-    api.assert_schema().assert_tables_count(3).unwrap();
+    api.assert_schema().assert_tables_count(3);
     api.mark_migration_applied("0000_initial", &directory).send();
 
     let DiagnoseMigrationHistoryOutput {
@@ -346,7 +344,7 @@ fn squashing_migrations_history_at_the_start_works(api: TestApi) {
     assert!(has_migrations_table);
     assert!(error_in_unapplied_migration.is_none());
 
-    api.assert_schema().assert_equals(&initial_schema).unwrap();
+    api.assert_schema().assert_equals(&initial_schema);
 }
 
 #[test_connector]
@@ -403,9 +401,7 @@ fn squashing_migrations_history_at_the_end_works(api: TestApi) {
     let initial_schema = api
         .assert_schema()
         .assert_tables_count(3)
-        .unwrap()
         .assert_has_table("Hyena")
-        .unwrap()
         .into_schema();
 
     // Squash the files, mark migration applied, assert the schema is the same.
@@ -445,7 +441,7 @@ fn squashing_migrations_history_at_the_end_works(api: TestApi) {
         migration_file.write_all(squashed_migration.as_bytes()).unwrap();
     }
 
-    api.assert_schema().assert_tables_count(3).unwrap();
+    api.assert_schema().assert_tables_count(3);
     api.mark_migration_applied("0000_initial", &directory).send();
 
     let DiagnoseMigrationHistoryOutput {
@@ -500,5 +496,5 @@ fn squashing_migrations_history_at_the_end_works(api: TestApi) {
     assert!(has_migrations_table);
     assert!(error_in_unapplied_migration.is_none());
 
-    api.assert_schema().assert_equals(&initial_schema).unwrap();
+    api.assert_schema().assert_equals(&initial_schema);
 }

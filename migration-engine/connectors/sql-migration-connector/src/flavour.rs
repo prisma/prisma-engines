@@ -18,7 +18,7 @@ use crate::{
     sql_schema_differ::SqlSchemaDifferFlavour, SqlMigrationConnector,
 };
 use datamodel::Datamodel;
-use migration_connector::{ConnectorResult, MigrationDirectory};
+use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
 use quaint::prelude::{ConnectionInfo, Table};
 use sql_schema_describer::SqlSchema;
 use std::fmt::Debug;
@@ -100,5 +100,14 @@ pub(crate) trait SqlFlavour:
     /// Table to store applied migrations.
     fn migrations_table(&self) -> Table<'_> {
         self.migrations_table_name().into()
+    }
+}
+
+// Utility function shared by multiple flavours to compare shadow database and main connection.
+fn validate_connection_infos_do_not_match((previous, next): (&ConnectionInfo, &ConnectionInfo)) -> ConnectorResult<()> {
+    if previous.host() == next.host() && previous.dbname() == next.dbname() && previous.port() == next.port() {
+        Err(ConnectorError::from_msg("The shadow database you configured appears to be the same as the main database. Please specify another shadow database.".into()))
+    } else {
+        Ok(())
     }
 }

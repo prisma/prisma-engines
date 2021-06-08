@@ -113,6 +113,108 @@ mod many_count_rel {
         Ok(())
     }
 
+    fn schema_nested() -> String {
+        let schema = indoc! {
+            r#"model User {
+              #id(id, Int, @id)
+              name  String
+              posts Post[]
+            }
+            
+            model Post {
+              #id(id, Int, @id)
+              title    String
+              user     User      @relation(fields: [userId], references: [id])
+              userId   Int
+              #m2m(comments, Comment[], Int)
+              #m2m(tags, Tag[], Int)
+            }
+            
+            model Comment {
+              #id(id, Int, @id)
+              body   String
+              post   Post   @relation(fields: [postId], references: [id])
+              postId Int
+              #m2m(tags, Tag[], Int)
+            }
+            
+            model Tag {
+              #id(id, Int, @id)
+              name     String
+              #m2m(posts, Post[], Int)
+              #m2m(comments, Comment[], Int)
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    // Counting nested one2m and m2m should work
+    // TODO(dom): Not working on mongo
+    #[connector_test(schema(schema_nested), exclude(MongoDb))]
+    async fn nested_count_one2m_m2m(runner: &Runner) -> TestResult<()> {
+        run_query!(
+            runner,
+            r#"mutation {
+          createOneUser(
+            data: {
+              id: 1,
+              name: "Bob"
+              posts: {
+                create: {
+                  id: 1,
+                  title: "Wooow!"
+                  comments: {
+                    create: {
+                      id: 1,
+                      body: "Amazing",
+                      tags: { create: [{ id: 1, name: "LALA" }, { id: 2, name: "LOLO" }] } }
+                  },
+                  tags: {
+                    create: [{ id: 3, name: "A"}, {id: 4, name: "B"}, {id: 5, name: "C"}]
+                  }
+                }
+              }
+            }
+          ) {
+            id
+          }
+        }
+        "#
+        );
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"{ findManyUser {
+            name
+            posts {
+              title
+              comments {
+                body
+                tags {
+                  name
+                }
+                _count {
+                  tags
+                }
+              }
+              tags {
+                name
+              }
+              _count {
+                comments
+                tags
+              }
+            }
+            _count {
+              posts
+            }
+          } }"#),
+          @r###"{"data":{"findManyUser":[{"name":"Bob","posts":[{"title":"Wooow!","comments":[{"body":"Amazing","tags":[{"name":"LALA"},{"name":"LOLO"}],"_count":{"tags":2}}],"tags":[{"name":"A"},{"name":"B"},{"name":"C"}],"_count":{"comments":1,"tags":3}}],"_count":{"posts":1}}]}}"###
+        );
+
+        Ok(())
+    }
+
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
             .query(format!("mutation {{ createOnePost(data: {}) {{ id }} }}", data))

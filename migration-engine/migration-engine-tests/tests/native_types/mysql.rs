@@ -781,13 +781,11 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
         tracing::info!("cast migration");
         api.schema_push(&dm2).send_sync().assert_green_bang();
 
-        api.assert_schema().assert_table_bang("Test", |table| {
+        api.assert_schema().assert_table("Test", |table| {
             to_types.iter().enumerate().fold(
                 table.assert_columns_count(to_types.len() + 1),
-                |result, (idx, to_type)| {
-                    result.and_then(|table| {
-                        table.assert_column(&colnames[idx], |col| col.assert_native_type(to_type, &connector))
-                    })
+                |table, (idx, to_type)| {
+                    table.assert_column(&colnames[idx], |col| col.assert_native_type(to_type, &connector))
                 },
             )
         });
@@ -849,11 +847,9 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
             .assert_executable()
             .assert_warnings(&warnings);
 
-        api.assert_schema().assert_table_bang("Test", |table| {
-            to_types.iter().enumerate().fold(Ok(table), |result, (idx, to_type)| {
-                result.and_then(|table| {
-                    table.assert_column(&colnames[idx], |col| col.assert_native_type(to_type, &connector))
-                })
+        api.assert_schema().assert_table("Test", |table| {
+            to_types.iter().enumerate().fold(table, |table, (idx, to_type)| {
+                table.assert_column(&colnames[idx], |col| col.assert_native_type(to_type, &connector))
             })
         });
 
@@ -914,11 +910,9 @@ fn impossible_casts_with_existing_data_should_warn(api: TestApi) {
             .assert_executable()
             .assert_warnings(&warnings);
 
-        api.assert_schema().assert_table_bang("Test", |table| {
-            to_types.iter().enumerate().fold(Ok(table), |result, (idx, to_type)| {
-                result.and_then(|table| {
-                    table.assert_column(&colnames[idx], |col| col.assert_native_type(to_type, &connector))
-                })
+        api.assert_schema().assert_table("Test", |table| {
+            to_types.iter().enumerate().fold(table, |table, (idx, to_type)| {
+                table.assert_column(&colnames[idx], |col| col.assert_native_type(to_type, &connector))
             })
         });
 

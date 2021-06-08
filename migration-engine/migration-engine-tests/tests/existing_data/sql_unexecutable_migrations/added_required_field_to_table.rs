@@ -120,5 +120,5 @@ fn adding_a_required_field_without_default_to_an_existing_table_without_data_wor
     api.schema_push(dm2).send_sync().assert_green_bang();
 
     api.assert_schema()
-        .assert_table_bang("Test", |table| table.assert_has_column("age"));
+        .assert_table("Test", |table| table.assert_has_column("age"));
 }

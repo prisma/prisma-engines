@@ -67,31 +67,22 @@ fn soft_resets_work_on_postgres(api: TestApi) {
         engine
             .assert_schema()
             .assert_tables_count(2)
-            .unwrap()
             .assert_has_table("_prisma_migrations")
-            .unwrap()
-            .assert_has_table("Cat")
-            .unwrap();
+            .assert_has_table("Cat");
 
         engine.reset().send_sync();
-        engine.assert_schema().assert_tables_count(0).unwrap();
+        engine.assert_schema().assert_tables_count(0);
 
         engine
             .schema_push(dm)
             .send_sync()
             .assert_has_executed_steps()
-            .assert_green()
-            .unwrap();
+            .assert_green_bang();
 
-        engine
-            .assert_schema()
-            .assert_tables_count(1)
-            .unwrap()
-            .assert_has_table("Cat")
-            .unwrap();
+        engine.assert_schema().assert_tables_count(1).assert_has_table("Cat");
 
         engine.reset().send_sync();
-        engine.assert_schema().assert_tables_count(0).unwrap();
+        engine.assert_schema().assert_tables_count(0);
     }
 }
 
@@ -199,33 +190,23 @@ fn soft_resets_work_on_sql_server(api: TestApi) {
         engine
             .assert_schema()
             .assert_tables_count(3)
-            .unwrap()
             .assert_has_table("_prisma_migrations")
-            .unwrap()
             .assert_has_table("specialLitter")
-            .unwrap()
-            .assert_has_table("Cat")
-            .unwrap();
+            .assert_has_table("Cat");
 
         engine.reset().send_sync();
-        engine.assert_schema().assert_tables_count(0).unwrap();
+        engine.assert_schema().assert_tables_count(0);
 
         engine
             .schema_push(dm)
             .send_sync()
             .assert_has_executed_steps()
-            .assert_green()
-            .unwrap();
+            .assert_green_bang();
 
-        engine
-            .assert_schema()
-            .assert_tables_count(1)
-            .unwrap()
-            .assert_has_table("Cat")
-            .unwrap();
+        engine.assert_schema().assert_tables_count(1).assert_has_table("Cat");
 
         engine.reset().send_sync();
-        engine.assert_schema().assert_tables_count(0).unwrap();
+        engine.assert_schema().assert_tables_count(0);
     }
 }
 
@@ -257,11 +238,8 @@ fn soft_resets_work_on_mysql(api: TestApi) {
         engine
             .assert_schema()
             .assert_tables_count(2)
-            .unwrap()
             .assert_has_table("_prisma_migrations")
-            .unwrap()
-            .assert_has_table("Cat")
-            .unwrap();
+            .assert_has_table("Cat");
     }
 
     {
@@ -304,23 +282,17 @@ fn soft_resets_work_on_mysql(api: TestApi) {
         let engine = api.new_engine_with_connection_strings(&test_user_connection_string, None);
 
         engine.reset().send_sync();
-        engine.assert_schema().assert_tables_count(0).unwrap();
+        engine.assert_schema().assert_tables_count(0);
 
         engine
             .schema_push(dm)
             .send_sync()
             .assert_has_executed_steps()
-            .assert_green()
-            .unwrap();
+            .assert_green_bang();
 
-        engine
-            .assert_schema()
-            .assert_tables_count(1)
-            .unwrap()
-            .assert_has_table("Cat")
-            .unwrap();
+        engine.assert_schema().assert_tables_count(1).assert_has_table("Cat");
 
         engine.reset().send_sync();
-        engine.assert_schema().assert_tables_count(0).unwrap();
+        engine.assert_schema().assert_tables_count(0);
     }
 }

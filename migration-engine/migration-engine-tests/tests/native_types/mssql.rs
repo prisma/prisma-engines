@@ -1918,9 +1918,9 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
             let insert = Insert::single_into((api.connection_info().schema_name(), "A")).value("x", seed.clone());
             api.query(insert.into());
 
-            api.assert_schema().assert_table_bang("A", |table| {
-                table.assert_columns_count(2)?.assert_column("x", |c| {
-                    c.assert_is_required()?
+            api.assert_schema().assert_table("A", |table| {
+                table.assert_columns_count(2).assert_column("x", |c| {
+                    c.assert_is_required()
                         .assert_full_data_type(&with_params(from).to_lowercase())
                 })
             });
@@ -1940,9 +1940,9 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
 
             api.schema_push(&dm2).send_sync().assert_green_bang();
 
-            api.assert_schema().assert_table_bang("A", |table| {
-                table.assert_columns_count(2)?.assert_column("x", |c| {
-                    c.assert_is_required()?
+            api.assert_schema().assert_table("A", |table| {
+                table.assert_columns_count(2).assert_column("x", |c| {
+                    c.assert_is_required()
                         .assert_full_data_type(&with_params(to).to_lowercase())
                 })
             });
@@ -1976,9 +1976,9 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
             let insert = Insert::single_into((api.connection_info().schema_name(), "A")).value("x", seed.clone());
             api.query(insert.into());
 
-            api.assert_schema().assert_table_bang("A", |table| {
-                table.assert_columns_count(2)?.assert_column("x", |c| {
-                    c.assert_is_required()?
+            api.assert_schema().assert_table("A", |table| {
+                table.assert_columns_count(2).assert_column("x", |c| {
+                    c.assert_is_required()
                         .assert_full_data_type(&with_params(from).to_lowercase())
                 })
             });
@@ -2004,9 +2004,9 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
 
             api.schema_push(&dm2).send_sync().assert_warnings(&[warning.into()]);
 
-            api.assert_schema().assert_table_bang("A", |table| {
-                table.assert_columns_count(2)?.assert_column("x", |c| {
-                    c.assert_is_required()?
+            api.assert_schema().assert_table("A", |table| {
+                table.assert_columns_count(2).assert_column("x", |c| {
+                    c.assert_is_required()
                         .assert_full_data_type(&with_params(from).to_lowercase())
                 })
             });
@@ -2043,9 +2043,9 @@ fn not_castable_with_existing_data_should_warn(api: TestApi) {
             let insert = Insert::single_into((api.connection_info().schema_name(), "A")).value("x", seed.clone());
             api.query(insert.into());
 
-            api.assert_schema().assert_table_bang("A", |table| {
-                table.assert_columns_count(2)?.assert_column("x", |c| {
-                    c.assert_is_required()?
+            api.assert_schema().assert_table("A", |table| {
+                table.assert_columns_count(2).assert_column("x", |c| {
+                    c.assert_is_required()
                         .assert_full_data_type(&with_params(from).to_lowercase())
                 })
             });
@@ -2067,9 +2067,9 @@ fn not_castable_with_existing_data_should_warn(api: TestApi) {
 
             api.schema_push(&dm2).send_sync().assert_unexecutable(&[warning.into()]);
 
-            api.assert_schema().assert_table_bang("A", |table| {
-                table.assert_columns_count(2)?.assert_column("x", |c| {
-                    c.assert_is_required()?
+            api.assert_schema().assert_table("A", |table| {
+                table.assert_columns_count(2).assert_column("x", |c| {
+                    c.assert_is_required()
                         .assert_full_data_type(&with_params(from).to_lowercase())
                 })
             });
