@@ -38,7 +38,7 @@
         }
       ],
       "isGenerated": false,
-      "idFields": [],
+      "idFields": ["id"],
       "uniqueFields": [],
       "uniqueIndexes": []
     },
@@ -96,7 +96,7 @@
         }
       ],
       "isGenerated": false,
-      "idFields": [],
+      "idFields": ["id"],
       "uniqueFields": [],
       "uniqueIndexes": []
     }

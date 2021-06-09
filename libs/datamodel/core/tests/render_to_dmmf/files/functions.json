@@ -55,9 +55,12 @@
         }
       ],
       "isGenerated": false,
-      "idFields": [],
-      "uniqueFields": [],
-      "uniqueIndexes": []
+      "idFields": ["id"],
+      "uniqueFields": [["someId"]],
+      "uniqueIndexes": [{
+        "name": "User_someId_key",
+        "fields": ["someId"]
+      }]
     }
   ]
 }
