@@ -138,14 +138,12 @@ impl<'a> MigrationCommand for DiagnoseMigrationHistoryCommand {
         let (drift, error_in_unapplied_migration) = {
             if input.opt_in_to_shadow_database {
                 let drift = match connector
-                    .diff(DiffTarget::Database, DiffTarget::Migrations(&applied_migrations))
+                    .diff(DiffTarget::Migrations(&applied_migrations), DiffTarget::Database)
                     .await
                     .map(|mig| if mig.is_empty() { None } else { Some(mig) })
                 {
                     Ok(Some(rollback)) => Some(DriftDiagnostic::DriftDetected {
-                        rollback: connector
-                            .database_migration_step_applier()
-                            .render_script(&rollback, &connector.destructive_change_checker().pure_check(&rollback)),
+                        summary: rollback.summary(),
                     }),
                     Err(error) => Some(DriftDiagnostic::MigrationFailedToApply { error }),
                     _ => None,
@@ -290,8 +288,8 @@ pub enum DriftDiagnostic {
     /// The database schema of the current database does not match what would be
     /// expected at its stage in the migration history.
     DriftDetected {
-        /// A database script to correct the drift by reverting to the expected schema.
-        rollback: String,
+        /// The human-readable contents of the drift.
+        summary: String,
     },
     /// When a migration fails to apply cleanly to a shadow database.
     MigrationFailedToApply {
@@ -304,7 +302,7 @@ impl DriftDiagnostic {
     /// For tests.
     pub fn unwrap_drift_detected(self) -> String {
         match self {
-            DriftDiagnostic::DriftDetected { rollback } => rollback,
+            DriftDiagnostic::DriftDetected { summary } => summary,
             other => panic!("unwrap_drift_detected on {:?}", other),
         }
     }

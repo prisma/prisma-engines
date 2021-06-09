@@ -75,11 +75,10 @@ fn check_for_reset_conditions(output: &DiagnoseMigrationHistoryOutput) -> Option
         ))
     }
 
-    if let Some(DriftDiagnostic::DriftDetected { rollback }) = &output.drift {
-        tracing::info!(rollback = rollback.as_str(), "DriftDetected diagnostic");
-
-        reset_reasons
-            .push("Drift detected: Your database schema is not in sync with your migration history.".to_owned())
+    if let Some(DriftDiagnostic::DriftDetected { summary }) = &output.drift {
+        let mut reason = format!("Drift detected: Your database schema is not in sync with your migration history.\n");
+        reason.push_str(summary);
+        reset_reasons.push(reason);
     }
 
     match &output.history {

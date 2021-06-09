@@ -75,10 +75,8 @@ fn dev_diagnostic_detects_drift(api: TestApi) {
 
     let DevDiagnosticOutput { action } = api.dev_diagnostic(&directory).send().into_output();
 
-    assert_eq!(
-        action.as_reset(),
-        Some("Drift detected: Your database schema is not in sync with your migration history.")
-    );
+    let expected_start = "Drift detected: Your database schema is not in sync with your migration history.";
+    assert!(action.as_reset().unwrap().starts_with(expected_start));
 }
 
 #[test_connector(exclude(Postgres, Mssql))]
@@ -128,7 +126,7 @@ fn dev_diagnostic_calculates_drift_in_presence_of_failed_migrations(api: TestApi
         migration_two_name, migration_two_name,
     );
 
-    assert_eq!(action.as_reset(), Some(expected_message.as_str()));
+    assert!(action.as_reset().unwrap().starts_with(&expected_message));
 }
 
 #[test_connector]
@@ -200,7 +198,12 @@ fn dev_diagnostic_can_detect_when_the_migrations_directory_is_behind(api: TestAp
 
     let DevDiagnosticOutput { action } = api.dev_diagnostic(&directory).send().into_output();
 
-    assert_eq!(action.as_reset(), Some(format!("- Drift detected: Your database schema is not in sync with your migration history.\n- The following migration(s) are applied to the database but missing from the local migrations directory: {}\n", name)).as_deref());
+    let message = action.as_reset().unwrap();
+    assert!(message.contains("- Drift detected: Your database schema is not in sync with your migration history"));
+    assert!(message.contains(&format!(
+        "The following migration(s) are applied to the database but missing from the local migrations directory: {}",
+        name
+    )));
 }
 
 #[test_connector]
@@ -258,13 +261,10 @@ fn dev_diagnostic_can_detect_when_history_diverges(api: TestApi) {
 
     let DevDiagnosticOutput { action } = api.dev_diagnostic(&directory).send().into_output();
 
-    let expected_message = format!(
-        "- Drift detected: Your database schema is not in sync with your migration history.\n- The migrations recorded in the database diverge from the local migrations directory. Last common migration: `{}`. Migrations applied to the database but absent from the migrations directory are: {}\n",
-        first_migration_name,
-        deleted_migration_name,
-    );
+    let message = action.as_reset().unwrap();
 
-    assert_eq!(action.as_reset(), Some(expected_message.as_str()));
+    assert!(message.contains("Drift detected: Your database schema is not in sync with your migration history"));
+    assert!(message.contains(&format!("- The migrations recorded in the database diverge from the local migrations directory. Last common migration: `{}`. Migrations applied to the database but absent from the migrations directory are: {}", first_migration_name, deleted_migration_name)));
 }
 
 #[test_connector]
@@ -462,7 +462,7 @@ fn with_an_invalid_unapplied_migration_should_report_it(api: TestApi) {
 }
 
 #[test_connector(tags(Postgres))]
-fn drift_can_be_detected_without_migrations_table(api: TestApi) {
+fn drift_can_be_detected_without_migrations_table_dev(api: TestApi) {
     let directory = api.create_migrations_directory();
 
     api.raw_cmd("CREATE TABLE \"cat\" (\nid SERIAL PRIMARY KEY\n);");
@@ -477,10 +477,14 @@ fn drift_can_be_detected_without_migrations_table(api: TestApi) {
 
     let DevDiagnosticOutput { action } = api.dev_diagnostic(&directory).send().into_output();
 
-    assert_eq!(
-        action.as_reset(),
-        Some("Drift detected: Your database schema is not in sync with your migration history.")
-    );
+    let expect = expect![[r#"
+        Drift detected: Your database schema is not in sync with your migration history.
+
+        [+] Added tables
+          - cat
+    "#]];
+
+    expect.assert_eq(action.as_reset().unwrap());
 }
 
 #[test_connector(tags(Mysql8), exclude(Vitess))]
