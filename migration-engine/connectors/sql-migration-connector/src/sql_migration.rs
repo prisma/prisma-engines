@@ -3,7 +3,6 @@ use crate::{
     sql_renderer::IteratorJoin,
     sql_schema_differ::{ColumnChange, ColumnChanges},
 };
-use migration_connector::DatabaseMigrationMarker;
 use sql_schema_describer::{walkers::SqlSchemaExt, SqlSchema};
 use std::{collections::BTreeSet, fmt::Write as _};
 
@@ -375,18 +374,6 @@ fn render_column_changes(changes: &ColumnChanges, sink: &mut String) {
     sink.push('(');
     sink.push_str(&readable_changes);
     sink.push(')');
-}
-
-impl DatabaseMigrationMarker for SqlMigration {
-    const FILE_EXTENSION: &'static str = "sql";
-
-    fn is_empty(&self) -> bool {
-        self.steps.is_empty()
-    }
-
-    fn summary(&self) -> String {
-        self.drift_summary()
-    }
 }
 
 // The order of the variants matters for sorting. The steps are sorted _first_

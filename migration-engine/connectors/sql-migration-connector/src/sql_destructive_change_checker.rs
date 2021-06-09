@@ -28,7 +28,7 @@ use crate::{
     SqlMigration, SqlMigrationConnector,
 };
 use destructive_check_plan::DestructiveCheckPlan;
-use migration_connector::{ConnectorResult, DestructiveChangeChecker, DestructiveChangeDiagnostics};
+use migration_connector::{ConnectorResult, DestructiveChangeChecker, DestructiveChangeDiagnostics, Migration};
 use sql_schema_describer::{
     walkers::{ColumnWalker, SqlSchemaExt},
     ColumnArity,
@@ -280,15 +280,15 @@ impl SqlMigrationConnector {
 }
 
 #[async_trait::async_trait]
-impl DestructiveChangeChecker<SqlMigration> for SqlMigrationConnector {
-    async fn check(&self, database_migration: &SqlMigration) -> ConnectorResult<DestructiveChangeDiagnostics> {
-        let plan = self.plan(&database_migration);
+impl DestructiveChangeChecker for SqlMigrationConnector {
+    async fn check(&self, migration: &Migration) -> ConnectorResult<DestructiveChangeDiagnostics> {
+        let plan = self.plan(migration.downcast_ref());
 
         plan.execute(self.conn()).await
     }
 
-    fn pure_check(&self, database_migration: &SqlMigration) -> DestructiveChangeDiagnostics {
-        let plan = self.plan(&database_migration);
+    fn pure_check(&self, migration: &Migration) -> DestructiveChangeDiagnostics {
+        let plan = self.plan(migration.downcast_ref());
 
         plan.pure_check()
     }

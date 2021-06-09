@@ -70,13 +70,13 @@ impl<C: MigrationConnector> GenericApi for C {
     }
 
     async fn apply_migrations(&self, input: &ApplyMigrationsInput) -> CoreResult<ApplyMigrationsOutput> {
-        ApplyMigrationsCommand::execute(input, self)
+        apply_migrations(input, self)
             .instrument(tracing::info_span!("ApplyMigrations"))
             .await
     }
 
     async fn create_migration(&self, input: &CreateMigrationInput) -> CoreResult<CreateMigrationOutput> {
-        CreateMigrationCommand::execute(input, self)
+        create_migration(input, self)
             .instrument(tracing::info_span!(
                 "CreateMigration",
                 migration_name = input.migration_name.as_str(),
@@ -105,7 +105,7 @@ impl<C: MigrationConnector> GenericApi for C {
     }
 
     async fn evaluate_data_loss(&self, input: &EvaluateDataLossInput) -> CoreResult<EvaluateDataLossOutput> {
-        EvaluateDataLoss::execute(input, self)
+        evaluate_data_loss(input, self)
             .instrument(tracing::info_span!("EvaluateDataLoss"))
             .await
     }
@@ -129,7 +129,7 @@ impl<C: MigrationConnector> GenericApi for C {
         &self,
         input: &MarkMigrationAppliedInput,
     ) -> CoreResult<MarkMigrationAppliedOutput> {
-        MarkMigrationAppliedCommand::execute(input, self)
+        mark_migration_applied(input, self)
             .instrument(tracing::info_span!(
                 "MarkMigrationApplied",
                 migration_name = input.migration_name.as_str()
@@ -162,7 +162,7 @@ impl<C: MigrationConnector> GenericApi for C {
     }
 
     async fn schema_push(&self, input: &SchemaPushInput) -> CoreResult<SchemaPushOutput> {
-        SchemaPushCommand::execute(input, self)
+        schema_push(input, self)
             .instrument(tracing::info_span!("SchemaPush"))
             .await
     }
