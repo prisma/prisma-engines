@@ -163,7 +163,7 @@ pub(crate) fn calculate_scalar_field(table: &Table, column: &Column, connector: 
     let is_unique = table
         .indices
         .iter()
-        .find(|index| index.tpe == IndexType::Unique && index.columns == vec![column.name.to_string()])
+        .find(|index| index.tpe == IndexType::Unique && index.columns == [column.name.to_string()])
         .map(|index| calculate_index(table_name, index, connector));
 
     ScalarField {

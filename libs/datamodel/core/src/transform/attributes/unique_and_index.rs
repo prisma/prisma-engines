@@ -188,6 +188,8 @@ trait IndexAttributeBase<T>: AttributeValidator<T> {
             (None, None) => (None, "".to_string()),
         };
 
+        //only Alphanumeric characters and underscore are allowed due to this making its way into the client API
+        //todo move this into the pest grammar at some point
         static RE: Lazy<Regex> = Lazy::new(|| Regex::new("[^_a-zA-Z0-9]").unwrap());
 
         if let Some(name) = &name_in_client {
