@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use super::{Datasource, Generator};
 use crate::{
     common::preview_features::PreviewFeature,
@@ -36,7 +38,23 @@ impl Configuration {
             .flat_map(|generator| generator.preview_features.iter())
     }
 
+    pub fn resolve_datasource_urls_from_virtual_env(
+        &mut self,
+        env: &HashMap<String, String>,
+        url_overrides: &[(String, String)],
+    ) -> Result<(), Diagnostics> {
+        self.resolve(url_overrides, Some(env))
+    }
+
     pub fn resolve_datasource_urls_from_env(&mut self, url_overrides: &[(String, String)]) -> Result<(), Diagnostics> {
+        self.resolve(url_overrides, None)
+    }
+
+    fn resolve(
+        &mut self,
+        url_overrides: &[(String, String)],
+        env: Option<&HashMap<String, String>>,
+    ) -> Result<(), Diagnostics> {
         for datasource in &mut self.datasources {
             if let Some((_, url)) = url_overrides.iter().find(|(name, _url)| name == &datasource.name) {
                 datasource.url.value = Some(url.clone());
@@ -44,7 +62,12 @@ impl Configuration {
             }
 
             if datasource.url.from_env_var.is_some() && datasource.url.value.is_none() {
-                datasource.url.value = Some(datasource.load_url()?);
+                let url = match env {
+                    Some(env) => datasource.load_url_with_env(&env)?,
+                    None => datasource.load_url()?,
+                };
+
+                datasource.url.value = Some(url);
             }
         }
 

@@ -4,7 +4,8 @@ use crate::{
     StringFromEnvVar,
 };
 use datamodel_connector::{Connector, ConnectorCapabilities};
-use std::path::Path;
+use once_cell::sync::Lazy;
+use std::{collections::HashMap, path::Path};
 
 /// a `datasource` from the prisma schema.
 pub struct Datasource {
@@ -44,8 +45,16 @@ impl Datasource {
         ConnectorCapabilities::new(capabilities)
     }
 
-    /// Load the database URL, validating it and resolving env vars in the process. Also see `load_url_with_config_dir()`.
+    /// Load the database URL, validating it and resolving env vars in the
+    /// process. Also see `load_url_with_config_dir()`.
     pub fn load_url(&self) -> Result<String, Diagnostics> {
+        static ENV: Lazy<HashMap<String, String>> = Lazy::new(|| std::env::vars().collect());
+        self.load_url_with_env(&*ENV)
+    }
+
+    /// Same as `load_url()`, but allows passing a virtal environment for
+    /// variable substitution.
+    pub fn load_url_with_env(&self, env: &HashMap<String, String>) -> Result<String, Diagnostics> {
         let url = match (&self.url.value, &self.url.from_env_var) {
             (Some(lit), _) if lit.trim().is_empty() => {
                 let msg = "You must provide a nonempty URL";
@@ -53,8 +62,8 @@ impl Datasource {
                 return Err(DatamodelError::new_source_validation_error(&msg, &self.name, self.url_span).into());
             }
             (Some(lit), _) => lit.clone(),
-            (None, Some(env_var)) => match std::env::var(env_var) {
-                Ok(var) if var.trim().is_empty() => {
+            (None, Some(env_var)) => match env.get(env_var) {
+                Some(var) if var.trim().is_empty() => {
                     return Err(DatamodelError::new_source_validation_error(
                         &format!(
                         "You must provide a nonempty URL. The environment variable `{}` resolved to an empty string.",
@@ -65,8 +74,8 @@ impl Datasource {
                     )
                     .into())
                 }
-                Ok(var) => var,
-                Err(_) => {
+                Some(var) => var.clone(),
+                None => {
                     return Err(DatamodelError::new_environment_functional_evaluation_error(
                         env_var.to_owned(),
                         self.url_span,

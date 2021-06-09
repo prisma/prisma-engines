@@ -88,6 +88,8 @@ pub struct ConstructorOptions {
     #[serde(default)]
     datasource_overrides: BTreeMap<String, String>,
     #[serde(default)]
+    env: HashMap<String, String>,
+    #[serde(default)]
     telemetry: TelemetryOptions,
     config_dir: PathBuf,
     #[serde(default)]
@@ -111,6 +113,7 @@ impl QueryEngine {
             log_level,
             log_queries,
             datasource_overrides,
+            env,
             telemetry,
             config_dir,
             ignore_env_var_errors,
@@ -123,7 +126,9 @@ impl QueryEngine {
         } else {
             datamodel::parse_configuration(&datamodel)
                 .and_then(|mut config| {
-                    config.subject.resolve_datasource_urls_from_env(&overrides)?;
+                    config
+                        .subject
+                        .resolve_datasource_urls_from_virtual_env(&env, &overrides)?;
                     Ok(config)
                 })
                 .map_err(|errors| ApiError::conversion(errors, &datamodel))?
