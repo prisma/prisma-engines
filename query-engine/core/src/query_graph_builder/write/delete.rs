@@ -33,8 +33,6 @@ pub fn delete_record(
     }));
 
     let delete_node = graph.create_node(delete_query);
-
-    // Todo [RA]
     utils::insert_deletion_checks(graph, connector_ctx, &model, &read_node, &delete_node)?;
 
     graph.create_edge(
@@ -84,7 +82,6 @@ pub fn delete_many_records(
     let read_query_node = graph.create_node(read_query);
     let delete_many_node = graph.create_node(Query::Write(delete_many));
 
-    // Todo [RA]
     utils::insert_deletion_checks(graph, connector_ctx, &model, &read_query_node, &delete_many_node)?;
 
     graph.create_edge(

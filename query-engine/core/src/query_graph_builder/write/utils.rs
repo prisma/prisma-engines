@@ -322,16 +322,16 @@ pub fn insert_deletion_checks(
     let once = OnceCell::new();
 
     if !relation_fields.is_empty() {
-        // let noop_node = graph.create_node(Node::Empty);
+        let noop_node = graph.create_node(Node::Empty);
 
         // We know that the relation can't be a list and must be required on the related model for `model` (see fields_requiring_model).
         // For all requiring models (RM), we use the field on `model` to query for existing RM records and error out if at least one exists.
         for rf in relation_fields {
-            if connector_ctx.features.contains(&PreviewFeature::ReferentialActions) {
-                if !matches!(rf.relation().on_delete(), datamodel::ReferentialAction::EmulateRestrict) {
-                    continue;
-                }
-            }
+            // if connector_ctx.features.contains(&PreviewFeature::ReferentialActions) {
+            //     if !matches!(rf.relation().on_delete(), datamodel::ReferentialAction::EmulateRestrict) {
+            //         continue;
+            //     }
+            // }
 
             let noop_node = once.get_or_init(|| graph.create_node(Node::Empty));
             let relation_field = rf.related_field();
@@ -366,9 +366,9 @@ pub fn insert_deletion_checks(
         });
 
         // Edge from empty node to the child (delete).
-        if let Some(noop_node) = once.get() {
-            graph.create_edge(&noop_node, child_node, QueryGraphDependency::ExecutionOrder)?;
-        }
+        // if let Some(noop_node) = once.get() {
+        graph.create_edge(&noop_node, child_node, QueryGraphDependency::ExecutionOrder)?;
+        // }
     }
 
     Ok(())
