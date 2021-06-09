@@ -22,10 +22,13 @@ impl SqlSchemaCalculatorFlavour for MssqlFlavour {
     }
 
     fn on_delete_action(&self, rf: &RelationFieldWalker<'_>) -> sql::ForeignKeyAction {
-        let default = || match rf.arity() {
-            FieldArity::Required => sql::ForeignKeyAction::NoAction,
-            FieldArity::Optional => sql::ForeignKeyAction::SetNull,
-            FieldArity::List => unreachable!(),
+        let default = || {
+            rf.default_on_delete_action()
+                .map(super::convert_referential_action)
+                .unwrap_or_else(|| match rf.arity() {
+                    FieldArity::Required => sql::ForeignKeyAction::NoAction,
+                    _ => sql::ForeignKeyAction::SetNull,
+                })
         };
 
         rf.on_delete_action()

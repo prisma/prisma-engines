@@ -262,6 +262,9 @@ pub struct RelationField {
 
     /// Is `ON DELETE/UPDATE RESTRICT` allowed.
     pub supports_restrict_action: Option<bool>,
+
+    /// Do we run the referential actions in the core instead of the database.
+    pub virtual_referential_actions: Option<bool>,
 }
 
 impl PartialEq for RelationField {
@@ -312,12 +315,18 @@ impl RelationField {
             is_commented_out: false,
             is_ignored: false,
             supports_restrict_action: None,
+            virtual_referential_actions: None,
         }
     }
 
     /// The default `onDelete` can be `Restrict`.
     pub fn supports_restrict_action(&mut self, value: bool) {
         self.supports_restrict_action = Some(value);
+    }
+
+    /// The referential actions should be handled by the core.
+    pub fn virtual_referential_actions(&mut self, value: bool) {
+        self.virtual_referential_actions = Some(value);
     }
 
     /// Creates a new field with the given name and type, marked as generated and optional.
@@ -355,17 +364,24 @@ impl RelationField {
     }
 
     pub fn default_on_delete_action(&self) -> Option<ReferentialAction> {
+        let is_virtual = self.virtual_referential_actions.unwrap_or(false);
+
         self.supports_restrict_action.map(|restrict_ok| match self.arity {
+            FieldArity::Required if is_virtual => ReferentialAction::EmulateRestrict,
             FieldArity::Required if restrict_ok => ReferentialAction::Restrict,
             FieldArity::Required => ReferentialAction::NoAction,
+            _ if is_virtual => ReferentialAction::EmulateSetNull,
             _ => ReferentialAction::SetNull,
         })
     }
 
     pub fn default_on_update_action(&self) -> ReferentialAction {
+        let is_virtual = self.virtual_referential_actions.unwrap_or(false);
+
         match self.arity {
-            FieldArity::Required => ReferentialAction::Cascade,
-            _ => ReferentialAction::SetNull,
+            FieldArity::Required if is_virtual => ReferentialAction::EmulateRestrict,
+            _ if is_virtual => ReferentialAction::EmulateSetNull,
+            _ => ReferentialAction::Cascade,
         }
     }
 }

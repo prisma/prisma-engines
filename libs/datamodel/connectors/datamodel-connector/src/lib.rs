@@ -24,6 +24,10 @@ pub trait Connector: Send + Sync {
         self.referential_actions().contains(action)
     }
 
+    fn virtual_referential_actions(&self) -> bool {
+        false
+    }
+
     fn validate_field(&self, field: &Field) -> Result<(), ConnectorError>;
 
     fn validate_model(&self, model: &Model) -> Result<(), ConnectorError>;

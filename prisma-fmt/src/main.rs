@@ -1,3 +1,4 @@
+mod actions;
 mod format;
 mod lint;
 mod native;
@@ -45,6 +46,8 @@ pub enum FmtOpts {
     Format(FormatOpts),
     /// Specifies Native Types mode
     NativeTypes,
+    /// List of available referential actions
+    ReferentialActions,
     /// Specifies preview features mode
     PreviewFeatures(PreviewFeaturesOpts),
 }
@@ -62,6 +65,7 @@ fn main() {
         FmtOpts::Lint(opts) => lint::run(opts),
         FmtOpts::Format(opts) => format::run(opts),
         FmtOpts::NativeTypes => native::run(),
+        FmtOpts::ReferentialActions => actions::run(),
         FmtOpts::PreviewFeatures(opts) => preview::run(opts),
     }
 }

@@ -349,6 +349,14 @@ impl<'a> RelationFieldWalker<'a> {
     pub fn on_delete_action(&self) -> Option<ReferentialAction> {
         self.get().relation_info.on_delete
     }
+
+    pub fn default_on_update_action(&self) -> ReferentialAction {
+        self.get().default_on_update_action()
+    }
+
+    pub fn default_on_delete_action(&self) -> Option<ReferentialAction> {
+        self.get().default_on_delete_action()
+    }
 }
 
 #[derive(Debug, Clone, Copy)]

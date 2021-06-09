@@ -62,6 +62,7 @@ pub struct MySqlDatamodelConnector {
     capabilities: Vec<ConnectorCapability>,
     constructors: Vec<NativeTypeConstructor>,
     referential_actions: BitFlags<ReferentialAction>,
+    is_planetscale: bool,
 }
 
 impl MySqlDatamodelConnector {
@@ -168,6 +169,7 @@ impl MySqlDatamodelConnector {
             capabilities,
             constructors,
             referential_actions,
+            is_planetscale,
         }
     }
 }
@@ -195,6 +197,10 @@ impl Connector for MySqlDatamodelConnector {
 
     fn referential_actions(&self) -> BitFlags<ReferentialAction> {
         self.referential_actions
+    }
+
+    fn virtual_referential_actions(&self) -> bool {
+        self.is_planetscale
     }
 
     fn scalar_type_for_native_type(&self, native_type: serde_json::Value) -> ScalarType {

@@ -39,22 +39,19 @@ pub(crate) trait SqlSchemaCalculatorFlavour {
     }
 
     fn on_update_action(&self, rf: &RelationFieldWalker<'_>) -> sql::ForeignKeyAction {
-        let default = || match rf.arity() {
-            FieldArity::Required => sql::ForeignKeyAction::Cascade,
-            FieldArity::Optional => sql::ForeignKeyAction::SetNull,
-            FieldArity::List => unreachable!(),
-        };
-
         rf.on_update_action()
             .map(convert_referential_action)
-            .unwrap_or_else(default)
+            .unwrap_or_else(|| convert_referential_action(rf.default_on_update_action()))
     }
 
     fn on_delete_action(&self, rf: &RelationFieldWalker<'_>) -> sql::ForeignKeyAction {
-        let default = || match rf.arity() {
-            FieldArity::Required => sql::ForeignKeyAction::Restrict,
-            FieldArity::Optional => sql::ForeignKeyAction::SetNull,
-            FieldArity::List => unreachable!(),
+        let default = || {
+            rf.default_on_delete_action()
+                .map(convert_referential_action)
+                .unwrap_or_else(|| match rf.arity() {
+                    FieldArity::Required => sql::ForeignKeyAction::Restrict,
+                    _ => sql::ForeignKeyAction::SetNull,
+                })
         };
 
         rf.on_delete_action()
