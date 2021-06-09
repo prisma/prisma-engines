@@ -169,7 +169,7 @@ fn squashing_whole_migration_history_works(api: TestApi) {
     assert!(has_migrations_table);
     assert!(error_in_unapplied_migration.is_none());
 
-    api.assert_schema().assert_equals(&initial_schema).unwrap();
+    api.assert_schema().assert_equals(&initial_schema);
 
     // The following does not work because we validate that migrations are failed before marking them as rolled back.
     //
@@ -250,7 +250,6 @@ fn squashing_migrations_history_at_the_start_works(api: TestApi) {
         .assert_schema()
         .assert_tables_count(3)
         .assert_has_table("Hyena")
-        .unwrap()
         .into_schema();
 
     // Squash the files, mark migration applied, assert the schema is the same.
@@ -345,7 +344,7 @@ fn squashing_migrations_history_at_the_start_works(api: TestApi) {
     assert!(has_migrations_table);
     assert!(error_in_unapplied_migration.is_none());
 
-    api.assert_schema().assert_equals(&initial_schema).unwrap();
+    api.assert_schema().assert_equals(&initial_schema);
 }
 
 #[test_connector]
@@ -403,7 +402,6 @@ fn squashing_migrations_history_at_the_end_works(api: TestApi) {
         .assert_schema()
         .assert_tables_count(3)
         .assert_has_table("Hyena")
-        .unwrap()
         .into_schema();
 
     // Squash the files, mark migration applied, assert the schema is the same.
@@ -498,5 +496,5 @@ fn squashing_migrations_history_at_the_end_works(api: TestApi) {
     assert!(has_migrations_table);
     assert!(error_in_unapplied_migration.is_none());
 
-    api.assert_schema().assert_equals(&initial_schema).unwrap();
+    api.assert_schema().assert_equals(&initial_schema);
 }

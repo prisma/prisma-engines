@@ -2,8 +2,8 @@ use super::render_default;
 use crate::{
     flavour::MssqlFlavour,
     pair::Pair,
+    sql_migration::AlterColumn,
     sql_migration::TableChange,
-    sql_migration::{AddColumn, AlterColumn, DropColumn},
     sql_renderer::{common::IteratorJoin, SqlRenderer},
     sql_schema_differ::ColumnChanges,
 };
@@ -54,11 +54,11 @@ impl<'a> AlterTableConstructor<'a> {
                 TableChange::AddPrimaryKey { columns } => {
                     self.add_primary_key(&columns);
                 }
-                TableChange::AddColumn(AddColumn { column_index }) => {
+                TableChange::AddColumn { column_index } => {
                     self.add_column(*column_index);
                 }
-                TableChange::DropColumn(DropColumn { index }) => {
-                    self.drop_column(*index);
+                TableChange::DropColumn { column_index } => {
+                    self.drop_column(*column_index);
                 }
                 TableChange::DropAndRecreateColumn { column_index, .. } => {
                     self.drop_and_recreate_column(*column_index);

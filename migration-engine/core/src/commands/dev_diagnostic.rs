@@ -1,6 +1,6 @@
 use super::{
-    DiagnoseMigrationHistoryCommand, DiagnoseMigrationHistoryInput, DiagnoseMigrationHistoryOutput, DriftDiagnostic,
-    HistoryDiagnostic, MigrationCommand,
+    diagnose_migration_history, DiagnoseMigrationHistoryInput, DiagnoseMigrationHistoryOutput, DriftDiagnostic,
+    HistoryDiagnostic,
 };
 use migration_connector::{ConnectorResult, MigrationConnector};
 use serde::{Deserialize, Serialize};
@@ -33,8 +33,7 @@ pub(crate) async fn dev_diagnostic<C: MigrationConnector>(
         opt_in_to_shadow_database: true,
     };
 
-    let diagnose_migration_history_output =
-        DiagnoseMigrationHistoryCommand::execute(&diagnose_input, connector).await?;
+    let diagnose_migration_history_output = diagnose_migration_history(&diagnose_input, connector).await?;
 
     check_for_broken_migrations(&diagnose_migration_history_output)?;
 
@@ -75,11 +74,11 @@ fn check_for_reset_conditions(output: &DiagnoseMigrationHistoryOutput) -> Option
         ))
     }
 
-    if let Some(DriftDiagnostic::DriftDetected { rollback }) = &output.drift {
-        tracing::info!(rollback = rollback.as_str(), "DriftDetected diagnostic");
-
-        reset_reasons
-            .push("Drift detected: Your database schema is not in sync with your migration history.".to_owned())
+    if let Some(DriftDiagnostic::DriftDetected { summary }) = &output.drift {
+        let mut reason =
+            "Drift detected: Your database schema is not in sync with your migration history.\n".to_owned();
+        reason.push_str(summary);
+        reset_reasons.push(reason);
     }
 
     match &output.history {

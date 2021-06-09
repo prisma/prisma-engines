@@ -40,9 +40,7 @@ fn reset_then_apply_with_migrations_directory_works(api: TestApi) {
     api.assert_schema()
         .assert_tables_count(2)
         .assert_has_table("Cat")
-        .unwrap()
-        .assert_has_table("_prisma_migrations")
-        .unwrap();
+        .assert_has_table("_prisma_migrations");
 
     api.insert("Cat").value("id", 1).value("name", "Garfield").result_raw();
 
@@ -55,9 +53,7 @@ fn reset_then_apply_with_migrations_directory_works(api: TestApi) {
     api.assert_schema()
         .assert_tables_count(2)
         .assert_has_table("Cat")
-        .unwrap()
-        .assert_has_table("_prisma_migrations")
-        .unwrap();
+        .assert_has_table("_prisma_migrations");
 }
 
 #[test_connector]
@@ -76,9 +72,7 @@ fn reset_then_diagnostics_with_migrations_directory_works(api: TestApi) {
     api.assert_schema()
         .assert_tables_count(2)
         .assert_has_table("Cat")
-        .unwrap()
-        .assert_has_table("_prisma_migrations")
-        .unwrap();
+        .assert_has_table("_prisma_migrations");
 
     api.insert("Cat").value("id", 1).value("name", "Garfield").result_raw();
 
@@ -93,7 +87,5 @@ fn reset_then_diagnostics_with_migrations_directory_works(api: TestApi) {
     api.assert_schema()
         .assert_tables_count(2)
         .assert_has_table("Cat")
-        .unwrap()
-        .assert_has_table("_prisma_migrations")
-        .unwrap();
+        .assert_has_table("_prisma_migrations");
 }

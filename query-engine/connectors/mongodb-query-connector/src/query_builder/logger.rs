@@ -115,7 +115,7 @@ fn fmt_val(buffer: &mut String, val: &Bson, depth: usize) -> std::fmt::Result {
         Bson::Int32(i) => write!(buffer, "{}", i),
         Bson::Int64(i) => write!(buffer, "{}", i),
         Bson::Binary(bin) => write!(buffer, "{:02x}", bin.bytes.iter().format(" ")),
-        Bson::DateTime(dt) => write!(buffer, "\"{}\"", dt.to_rfc3339()),
+        Bson::DateTime(dt) => write!(buffer, "\"{}\"", dt.to_chrono().to_rfc3339()),
         Bson::Null => write!(buffer, "null"),
         Bson::Undefined => write!(buffer, "undefined"),
         Bson::RegularExpression(reg) => write!(buffer, r#""{}", $options: "{}""#, reg.pattern, reg.options),

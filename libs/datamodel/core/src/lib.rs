@@ -99,8 +99,10 @@ use transform::{
 };
 
 /// Parse and validate the whole schema
-pub fn parse_schema(schema_str: &str) -> Result<Validated<(Configuration, Datamodel)>, diagnostics::Diagnostics> {
+pub fn parse_schema(schema_str: &str) -> Result<(Configuration, Datamodel), String> {
     parse_datamodel_internal(schema_str, false)
+        .map_err(|err| err.to_pretty_string("schema.prisma", schema_str))
+        .map(|v| v.subject)
 }
 
 /// Parses and validates a datamodel string, using core attributes only.

@@ -2,7 +2,7 @@ use super::{common::*, SqlRenderer};
 use crate::{
     flavour::SqliteFlavour,
     pair::Pair,
-    sql_migration::{AddColumn, AlterEnum, AlterTable, RedefineTable, TableChange},
+    sql_migration::{AlterEnum, AlterTable, RedefineTable, TableChange},
 };
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
@@ -54,7 +54,7 @@ impl SqlRenderer for SqliteFlavour {
 
         for change in changes {
             match change {
-                TableChange::AddColumn(AddColumn { column_index }) => {
+                TableChange::AddColumn { column_index } => {
                     let column = tables.next().column_at(*column_index);
                     let col_sql = render_column(&column);
 
@@ -67,7 +67,7 @@ impl SqlRenderer for SqliteFlavour {
                 TableChange::AddPrimaryKey { .. } => unreachable!("AddPrimaryKey on SQLite"),
                 TableChange::AlterColumn(_) => unreachable!("AlterColumn on SQLite"),
                 TableChange::DropAndRecreateColumn { .. } => unreachable!("DropAndRecreateColumn on SQLite"),
-                TableChange::DropColumn(_) => unreachable!("DropColumn on SQLite"),
+                TableChange::DropColumn { .. } => unreachable!("DropColumn on SQLite"),
                 TableChange::DropPrimaryKey { .. } => unreachable!("DropPrimaryKey on SQLite"),
             };
         }

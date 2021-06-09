@@ -830,13 +830,11 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
         api.query(insert.into());
 
         // first assertions
-        api.assert_schema().assert_table_bang("A", |table| {
+        api.assert_schema().assert_table("A", |table| {
             previous_assertions.iter().fold(
                 table.assert_column_count(previous_assertions.len() + 1),
-                |acc, (column_name, expected)| {
-                    acc.and_then(|table| {
-                        table.assert_column(column_name, |c| c.assert_native_type(expected, &connector))
-                    })
+                |table, (column_name, expected)| {
+                    table.assert_column(column_name, |c| c.assert_native_type(expected, &connector))
                 },
             )
         });
@@ -857,12 +855,10 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
         api.schema_push(&dm2).send_sync().assert_green_bang();
 
         // second assertions
-        api.assert_schema().assert_table_bang("A", |table| {
+        api.assert_schema().assert_table("A", |table| {
             next_assertions.iter().fold(
                 table.assert_column_count(next_assertions.len() + 1),
-                |acc, (name, expected)| {
-                    acc.and_then(|table| table.assert_column(name, |c| c.assert_native_type(expected, &connector)))
-                },
+                |table, (name, expected)| table.assert_column(name, |c| c.assert_native_type(expected, &connector)),
             )
         });
 
@@ -935,13 +931,11 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
 
         // first assertions
 
-        api.assert_schema().assert_table_bang("A", |table| {
+        api.assert_schema().assert_table("A", |table| {
             previous_assertions.iter().fold(
                 table.assert_column_count(previous_assertions.len() + 1),
-                |acc, (column_name, expected)| {
-                    acc.and_then(|table| {
-                        table.assert_column(column_name, |c| c.assert_native_type(expected, &connector))
-                    })
+                |table, (column_name, expected)| {
+                    table.assert_column(column_name, |c| c.assert_native_type(expected, &connector))
                 },
             )
         });
@@ -962,13 +956,11 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
         api.schema_push(&dm2).force(true).send_sync().assert_warnings(&warnings);
 
         //second assertions same as first
-        api.assert_schema().assert_table_bang("A", |table| {
+        api.assert_schema().assert_table("A", |table| {
             next_assertions.iter().fold(
                 table.assert_column_count(next_assertions.len() + 1),
-                |acc, (column_name, expected)| {
-                    acc.and_then(|table| {
-                        table.assert_column(column_name, |c| c.assert_native_type(expected, &connector))
-                    })
+                |table, (column_name, expected)| {
+                    table.assert_column(column_name, |c| c.assert_native_type(expected, &connector))
                 },
             )
         });
@@ -1044,13 +1036,11 @@ fn not_castable_with_existing_data_should_warn(api: TestApi) {
         api.query(insert.into());
 
         // first assertions
-        api.assert_schema().assert_table_bang("A", |table| {
+        api.assert_schema().assert_table("A", |table| {
             previous_assertions.iter().fold(
                 table.assert_column_count(previous_assertions.len() + 1),
-                |acc, (column_name, expected)| {
-                    acc.and_then(|table| {
-                        table.assert_column(column_name, |c| c.assert_native_type(expected, &connector))
-                    })
+                |table, (column_name, expected)| {
+                    table.assert_column(column_name, |c| c.assert_native_type(expected, &connector))
                 },
             )
         });
@@ -1073,13 +1063,11 @@ fn not_castable_with_existing_data_should_warn(api: TestApi) {
         api.schema_push(&dm2).send_sync().assert_warnings(&warnings);
 
         //second assertions same as first
-        api.assert_schema().assert_table_bang("A", |table| {
+        api.assert_schema().assert_table("A", |table| {
             previous_assertions.iter().fold(
                 table.assert_column_count(previous_assertions.len() + 1),
-                |acc, (column_name, expected)| {
-                    acc.and_then(|table| {
-                        table.assert_column(column_name, |c| c.assert_native_type(expected, &connector))
-                    })
+                |table, (column_name, expected)| {
+                    table.assert_column(column_name, |c| c.assert_native_type(expected, &connector))
                 },
             )
         });
@@ -1230,13 +1218,11 @@ fn safe_casts_from_array_with_existing_data_should_work(api: TestApi) {
         api.query(insert.into());
 
         // first assertions
-        api.assert_schema().assert_table_bang("A", |table| {
+        api.assert_schema().assert_table("A", |table| {
             previous_assertions.iter().fold(
                 table.assert_column_count(previous_assertions.len() + 1),
-                |acc, (column_name, expected)| {
-                    acc.and_then(|table| {
-                        table.assert_column(column_name, |c| c.assert_native_type(expected, &connector))
-                    })
+                |table, (column_name, expected)| {
+                    table.assert_column(column_name, |c| c.assert_native_type(expected, &connector))
                 },
             )
         });
@@ -1257,12 +1243,10 @@ fn safe_casts_from_array_with_existing_data_should_work(api: TestApi) {
         api.schema_push(&dm2).send_sync().assert_green_bang();
 
         //second assertions
-        api.assert_schema().assert_table_bang("A", |table| {
+        api.assert_schema().assert_table("A", |table| {
             next_assertions.iter().fold(
                 table.assert_column_count(next_assertions.len() + 1),
-                |acc, (name, expected)| {
-                    acc.and_then(|table| table.assert_column(name, |c| c.assert_native_type(expected, &connector)))
-                },
+                |table, (name, expected)| table.assert_column(name, |c| c.assert_native_type(expected, &connector)),
             )
         });
 

@@ -24,7 +24,7 @@ mod warning_check;
 pub(crate) use destructive_change_checker_flavour::DestructiveChangeCheckerFlavour;
 
 use crate::{
-    sql_migration::{AlterEnum, AlterTable, ColumnTypeChange, CreateIndex, SqlMigrationStep, TableChange},
+    sql_migration::{AlterEnum, AlterTable, ColumnTypeChange, SqlMigrationStep, TableChange},
     SqlMigration, SqlMigrationConnector,
 };
 use destructive_check_plan::DestructiveCheckPlan;
@@ -113,8 +113,8 @@ impl SqlMigrationConnector {
 
                     for change in changes {
                         match change {
-                            TableChange::DropColumn(ref drop_column) => {
-                                let column = tables.previous().column_at(drop_column.index);
+                            TableChange::DropColumn { column_index } => {
+                                let column = tables.previous().column_at(*column_index);
 
                                 self.check_column_drop(&column, &mut plan, step_index);
                             }
@@ -124,8 +124,8 @@ impl SqlMigrationConnector {
                                 self.flavour()
                                     .check_alter_column(&alter_column, &columns, &mut plan, step_index)
                             }
-                            TableChange::AddColumn(ref add_column) => {
-                                let column = tables.next().column_at(add_column.column_index);
+                            TableChange::AddColumn { column_index } => {
+                                let column = tables.next().column_at(*column_index);
 
                                 self.check_add_column(&column, &mut plan, step_index, migration)
                             }
@@ -236,11 +236,10 @@ impl SqlMigrationConnector {
                         step_index,
                     );
                 }
-                SqlMigrationStep::CreateIndex(CreateIndex {
-                    table_index,
+                SqlMigrationStep::CreateIndex {
+                    table_index: (Some(_), table_index),
                     index_index,
-                    caused_by_create_table: false,
-                }) => {
+                } => {
                     let index = schemas.next().table_walker_at(*table_index).index_at(*index_index);
 
                     if index.index_type().is_unique() {

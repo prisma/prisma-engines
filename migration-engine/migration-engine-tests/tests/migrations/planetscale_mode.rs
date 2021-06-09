@@ -39,9 +39,9 @@ fn schema_push_planetscale_mode_works(api: TestApi) {
     api.schema_push(dm).send_sync().assert_green_bang().assert_no_steps(); // idempotence
 
     api.assert_schema()
-        .assert_table_bang("Post", |table| table.assert_foreign_keys_count(0))
-        .assert_table_bang("User", |table| table.assert_foreign_keys_count(0))
-        .assert_table_bang("Comment", |table| table.assert_foreign_keys_count(0));
+        .assert_table("Post", |table| table.assert_foreign_keys_count(0))
+        .assert_table("User", |table| table.assert_foreign_keys_count(0))
+        .assert_table("Comment", |table| table.assert_foreign_keys_count(0));
 }
 
 #[test_connector]
@@ -104,7 +104,7 @@ fn create_migration_planetscale_mode_works(api: TestApi) {
     assert!(diagnostic.drift.is_none());
 
     api.assert_schema()
-        .assert_table_bang("Post", |table| table.assert_foreign_keys_count(0))
-        .assert_table_bang("User", |table| table.assert_foreign_keys_count(0))
-        .assert_table_bang("Comment", |table| table.assert_foreign_keys_count(0));
+        .assert_table("Post", |table| table.assert_foreign_keys_count(0))
+        .assert_table("User", |table| table.assert_foreign_keys_count(0))
+        .assert_table("Comment", |table| table.assert_foreign_keys_count(0));
 }
