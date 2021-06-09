@@ -119,10 +119,13 @@ impl SqlMigration {
                         ));
                     }
                 }
-                SqlMigrationStep::CreateIndex(create_index) => {
+                SqlMigrationStep::CreateIndex {
+                    table_index: (_, table_index),
+                    ..
+                } => {
                     drift_items.insert((
                         DriftType::ChangedTable,
-                        self.schemas().next().table_walker_at(create_index.table_index).name(),
+                        self.schemas().next().table_walker_at(*table_index).name(),
                         idx,
                     ));
                 }
@@ -296,12 +299,15 @@ impl SqlMigration {
                     out.push('\n');
                 }
                 SqlMigrationStep::RedefineTables(_) => {}
-                SqlMigrationStep::CreateIndex(create_index) => {
+                SqlMigrationStep::CreateIndex {
+                    table_index: (_, table_index),
+                    index_index,
+                } => {
                     let index = self
                         .schemas()
                         .next()
-                        .table_walker_at(create_index.table_index)
-                        .index_at(create_index.index_index);
+                        .table_walker_at(*table_index)
+                        .index_at(*index_index);
 
                     out.push_str("  [+] Added ");
 
@@ -417,7 +423,10 @@ pub(crate) enum SqlMigrationStep {
     RedefineTables(Vec<RedefineTable>),
     // Order matters: we must create indexes after ALTER TABLEs because the indexes can be
     // on fields that are dropped/created there.
-    CreateIndex(CreateIndex),
+    CreateIndex {
+        table_index: (Option<usize>, usize),
+        index_index: usize,
+    },
     // Order matters: this needs to come after create_indexes, because the foreign keys can depend on unique
     // indexes created there.
     AddForeignKey {
@@ -460,7 +469,7 @@ impl SqlMigrationStep {
             SqlMigrationStep::DropForeignKey { .. } => "DropForeignKey",
             SqlMigrationStep::DropTable { .. } => "DropTable",
             SqlMigrationStep::RedefineTables { .. } => "RedefineTables",
-            SqlMigrationStep::CreateIndex(_) => "CreateIndex",
+            SqlMigrationStep::CreateIndex { .. } => "CreateIndex",
             SqlMigrationStep::DropIndex { .. } => "DropIndex",
             SqlMigrationStep::AlterIndex { .. } => "AlterIndex",
             SqlMigrationStep::CreateEnum { .. } => "CreateEnum",
@@ -555,14 +564,6 @@ pub(crate) enum ColumnTypeChange {
     RiskyCast,
     SafeCast,
     NotCastable,
-}
-
-#[derive(Debug, Eq, Ord, PartialEq, PartialOrd)]
-pub(crate) struct CreateIndex {
-    /// The index of the table in the next schema.
-    pub table_index: usize,
-    pub index_index: usize,
-    pub caused_by_create_table: bool,
 }
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]

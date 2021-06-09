@@ -11,9 +11,7 @@ pub(crate) use sql_schema_differ_flavour::SqlSchemaDifferFlavour;
 use self::differ_database::DifferDatabase;
 use crate::{
     pair::Pair,
-    sql_migration::{
-        self, AlterColumn, AlterEnum, AlterTable, CreateIndex, RedefineTable, SqlMigrationStep, TableChange,
-    },
+    sql_migration::{self, AlterColumn, AlterEnum, AlterTable, RedefineTable, SqlMigrationStep, TableChange},
     SqlFlavour, SqlSchema,
 };
 use column::ColumnTypeChange;
@@ -303,12 +301,9 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                 .created_tables()
                 .flat_map(|table| table.indexes())
                 .filter(|index| !self.flavour.should_skip_index_for_new_table(index))
-                .map(|index| {
-                    SqlMigrationStep::CreateIndex(CreateIndex {
-                        table_index: index.table().table_index(),
-                        index_index: index.index(),
-                        caused_by_create_table: true,
-                    })
+                .map(|index| SqlMigrationStep::CreateIndex {
+                    table_index: (None, index.table().table_index()),
+                    index_index: index.index(),
                 });
 
             steps.extend(create_indexes_from_created_tables);
@@ -319,11 +314,10 @@ impl<'schema> SqlSchemaDiffer<'schema> {
             .filter(|tables| !tables_to_redefine.contains(tables.next().name()))
         {
             for index in tables.created_indexes() {
-                steps.push(SqlMigrationStep::CreateIndex(CreateIndex {
-                    table_index: index.table().table_index(),
+                steps.push(SqlMigrationStep::CreateIndex {
+                    table_index: (Some(tables.previous().table_index()), tables.next().table_index()),
                     index_index: index.index(),
-                    caused_by_create_table: false,
-                }))
+                })
             }
 
             if self.flavour.indexes_should_be_recreated_after_column_drop() {
@@ -339,11 +333,10 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                         .columns()
                         .any(|col| dropped_and_recreated_column_indexes_next.contains(&col.column_index()))
                 }) {
-                    steps.push(SqlMigrationStep::CreateIndex(CreateIndex {
-                        table_index: tables.next().table_index(),
+                    steps.push(SqlMigrationStep::CreateIndex {
+                        table_index: (Some(tables.previous().table_index()), tables.next().table_index()),
                         index_index: index.next().index(),
-                        caused_by_create_table: false,
-                    }))
+                    })
                 }
             }
         }

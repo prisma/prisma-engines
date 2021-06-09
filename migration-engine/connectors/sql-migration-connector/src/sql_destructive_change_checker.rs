@@ -24,7 +24,7 @@ mod warning_check;
 pub(crate) use destructive_change_checker_flavour::DestructiveChangeCheckerFlavour;
 
 use crate::{
-    sql_migration::{AlterEnum, AlterTable, ColumnTypeChange, CreateIndex, SqlMigrationStep, TableChange},
+    sql_migration::{AlterEnum, AlterTable, ColumnTypeChange, SqlMigrationStep, TableChange},
     SqlMigration, SqlMigrationConnector,
 };
 use destructive_check_plan::DestructiveCheckPlan;
@@ -236,11 +236,10 @@ impl SqlMigrationConnector {
                         step_index,
                     );
                 }
-                SqlMigrationStep::CreateIndex(CreateIndex {
-                    table_index,
+                SqlMigrationStep::CreateIndex {
+                    table_index: (Some(_), table_index),
                     index_index,
-                    caused_by_create_table: false,
-                }) => {
+                } => {
                     let index = schemas.next().table_walker_at(*table_index).index_at(*index_index);
 
                     if index.index_type().is_unique() {

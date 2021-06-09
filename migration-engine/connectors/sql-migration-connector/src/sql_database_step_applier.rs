@@ -175,12 +175,10 @@ fn render_raw_sql(
             vec![renderer.render_drop_foreign_key(&foreign_key)]
         }
         SqlMigrationStep::AlterTable(alter_table) => renderer.render_alter_table(alter_table, &schemas),
-        SqlMigrationStep::CreateIndex(create_index) => vec![renderer.render_create_index(
-            &schemas
-                .next()
-                .table_walker_at(create_index.table_index)
-                .index_at(create_index.index_index),
-        )],
+        SqlMigrationStep::CreateIndex {
+            table_index: (_, table_index),
+            index_index,
+        } => vec![renderer.render_create_index(&schemas.next().table_walker_at(*table_index).index_at(*index_index))],
         SqlMigrationStep::DropIndex {
             table_index,
             index_index,
