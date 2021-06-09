@@ -83,6 +83,9 @@ pub trait DatabaseMigrationMarker: Debug + Send + Sync {
 
     /// Is the migration empty?
     fn is_empty(&self) -> bool;
+
+    /// Render a human-readable summary of the migrations content, for drift diagnostics.
+    fn summary(&self) -> String;
 }
 
 /// Shorthand for a [Result](https://doc.rust-lang.org/std/result/enum.Result.html) where the error

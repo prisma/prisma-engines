@@ -162,7 +162,11 @@ impl SqlMigration {
                     DriftType::RemovedTable => out.push_str("\n[-] Removed tables\n"),
                     DriftType::RemovedUdt => out.push_str("\n[-] Removed UDTs\n"),
                     DriftType::RemovedView => out.push_str("\n[-] Removed views\n"),
-                    DriftType::RedefinedTable => out.push_str("\n[*] Redefined tables\n"),
+                    DriftType::RedefinedTable => {
+                        out.push_str("\n[*] Redefined table `");
+                        out.push_str(item_name);
+                        out.push_str("`\n")
+                    }
                     DriftType::ChangedEnum => {
                         out.push_str("\n[*] Changed the `");
                         out.push_str(item_name);
@@ -378,6 +382,10 @@ impl DatabaseMigrationMarker for SqlMigration {
 
     fn is_empty(&self) -> bool {
         self.steps.is_empty()
+    }
+
+    fn summary(&self) -> String {
+        self.drift_summary()
     }
 }
 
