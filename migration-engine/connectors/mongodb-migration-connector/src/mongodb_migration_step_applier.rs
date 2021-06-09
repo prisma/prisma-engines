@@ -1,5 +1,5 @@
 use crate::IntoConnectorResult;
-use migration_connector::{DatabaseMigrationStepApplier, Migration};
+use migration_connector::{DatabaseMigrationStepApplier, DestructiveChangeDiagnostics, Migration};
 use mongodb_migration::MongoDbMigrationStep;
 
 use crate::{
@@ -25,18 +25,11 @@ impl DatabaseMigrationStepApplier for MongoDbMigrationConnector {
         Ok(migration.steps.len() as u32)
     }
 
-    fn render_steps_pretty(
-        &self,
-        _migration: &Migration,
-    ) -> migration_connector::ConnectorResult<Vec<migration_connector::PrettyDatabaseMigrationStep>> {
+    fn render_steps(&self, _migration: &Migration) -> Vec<String> {
         todo!()
     }
 
-    fn render_script(
-        &self,
-        _migration: &Migration,
-        _diagnostics: &migration_connector::DestructiveChangeDiagnostics,
-    ) -> String {
+    fn render_script(&self, _migration: &Migration, _diagnostics: &DestructiveChangeDiagnostics) -> String {
         todo!()
     }
 

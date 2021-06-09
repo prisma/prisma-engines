@@ -5,7 +5,6 @@ use crate::{
 };
 use migration_connector::{
     ConnectorError, ConnectorResult, DatabaseMigrationStepApplier, DestructiveChangeDiagnostics, Migration,
-    PrettyDatabaseMigrationStep,
 };
 use sql_schema_describer::{walkers::SqlSchemaExt, SqlSchema};
 use user_facing_errors::migration_engine::ApplyMigrationError;
@@ -27,13 +26,10 @@ impl DatabaseMigrationStepApplier for SqlMigrationConnector {
         Ok(migration.steps.len() as u32)
     }
 
-    fn render_steps_pretty(&self, migration: &Migration) -> ConnectorResult<Vec<PrettyDatabaseMigrationStep>> {
+    fn render_steps(&self, migration: &Migration) -> Vec<String> {
         let mut steps = Vec::new();
         render_steps(migration.downcast_ref(), self.flavour(), &mut steps);
-        Ok(steps
-            .into_iter()
-            .map(|step| PrettyDatabaseMigrationStep { raw: step })
-            .collect())
+        steps
     }
 
     fn render_script(&self, migration: &Migration, diagnostics: &DestructiveChangeDiagnostics) -> String {

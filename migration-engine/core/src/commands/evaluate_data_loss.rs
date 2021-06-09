@@ -61,12 +61,7 @@ pub(crate) async fn evaluate_data_loss(
         )
         .await?;
 
-    let rendered_migration_steps = applier
-        .render_steps_pretty(&migration)?
-        .into_iter()
-        .map(|pretty_step| pretty_step.raw)
-        .collect();
-
+    let rendered_migration_steps = applier.render_steps(&migration);
     let diagnostics = checker.check(&migration).await?;
 
     let warnings = diagnostics

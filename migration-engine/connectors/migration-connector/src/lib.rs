@@ -9,7 +9,7 @@ mod error;
 mod migration_persistence;
 mod migrations_directory;
 
-pub use database_migration_step_applier::{DatabaseMigrationStepApplier, PrettyDatabaseMigrationStep};
+pub use database_migration_step_applier::DatabaseMigrationStepApplier;
 pub use destructive_change_checker::{
     DestructiveChangeChecker, DestructiveChangeDiagnostics, MigrationWarning, UnexecutableMigration,
 };
