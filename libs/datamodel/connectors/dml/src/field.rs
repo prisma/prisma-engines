@@ -368,9 +368,11 @@ impl RelationField {
 
         self.supports_restrict_action.map(|restrict_ok| match self.arity {
             FieldArity::Required if is_virtual => ReferentialAction::EmulateRestrict,
+            FieldArity::Optional if is_virtual => ReferentialAction::EmulateSetNull,
+
             FieldArity::Required if restrict_ok => ReferentialAction::Restrict,
             FieldArity::Required => ReferentialAction::NoAction,
-            _ if is_virtual => ReferentialAction::EmulateSetNull,
+
             _ => ReferentialAction::SetNull,
         })
     }
@@ -379,8 +381,7 @@ impl RelationField {
         let is_virtual = self.virtual_referential_actions.unwrap_or(false);
 
         match self.arity {
-            FieldArity::Required if is_virtual => ReferentialAction::EmulateRestrict,
-            _ if is_virtual => ReferentialAction::EmulateSetNull,
+            _ if is_virtual => ReferentialAction::EmulateNoAction,
             _ => ReferentialAction::Cascade,
         }
     }

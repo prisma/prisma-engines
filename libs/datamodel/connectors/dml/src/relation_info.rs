@@ -75,6 +75,8 @@ pub enum ReferentialAction {
     EmulateSetNull,
     /// An emulated version of `Restrict` for databases without foreign keys.
     EmulateRestrict,
+    /// An emulated version of `NoAction` for databases without foreign keys.
+    EmulateNoAction,
 }
 
 impl fmt::Display for ReferentialAction {
@@ -87,6 +89,7 @@ impl fmt::Display for ReferentialAction {
             ReferentialAction::SetDefault => write!(f, "SetDefault"),
             ReferentialAction::EmulateSetNull => write!(f, "EmulateSetNull"),
             ReferentialAction::EmulateRestrict => write!(f, "EmulateRestrict"),
+            ReferentialAction::EmulateNoAction => write!(f, "EmulateNoAction"),
         }
     }
 }
