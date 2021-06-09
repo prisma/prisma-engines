@@ -28,11 +28,9 @@ fn datetime_defaults_work(api: TestApi) {
         DefaultValue::db_generated("'2018-01-27 08:00:00 +00:00'")
     };
 
-    api.assert_schema()
-        .assert_table("Cat", |table| {
-            table.assert_column("birthday", |col| col.assert_default(Some(expected_default)))
-        })
-        .unwrap();
+    api.assert_schema().assert_table("Cat", |table| {
+        table.assert_column("birthday", |col| col.assert_default(Some(expected_default)))
+    });
 }
 
 #[test_connector(tags(Mariadb, Mysql8), exclude(Vitess))]
@@ -45,13 +43,11 @@ fn function_expressions_as_dbgenerated_work(api: TestApi) {
 
     api.schema_push(dm).send_sync().assert_green_bang();
 
-    api.assert_schema()
-        .assert_table("Cat", |table| {
-            table.assert_column("id", |col| {
-                col.assert_default(Some(DefaultValue::db_generated("(left(uuid(),8))")))
-            })
+    api.assert_schema().assert_table("Cat", |table| {
+        table.assert_column("id", |col| {
+            col.assert_default(Some(DefaultValue::db_generated("(left(uuid(),8))")))
         })
-        .unwrap();
+    });
 }
 
 #[test_connector(tags(Postgres))]
@@ -64,13 +60,11 @@ fn default_dbgenerated_with_type_definitions_should_work(api: TestApi) {
 
     api.schema_push(dm).send_sync().assert_green_bang();
 
-    api.assert_schema()
-        .assert_table("A", |table| {
-            table.assert_column("id", |col| {
-                col.assert_default(Some(DefaultValue::db_generated("(now())::text")))
-            })
+    api.assert_schema().assert_table("A", |table| {
+        table.assert_column("id", |col| {
+            col.assert_default(Some(DefaultValue::db_generated("(now())::text")))
         })
-        .unwrap();
+    });
 }
 
 #[test_connector(tags(Postgres))]
@@ -83,13 +77,11 @@ fn default_dbgenerated_should_work(api: TestApi) {
 
     api.schema_push(dm).send_sync().assert_green_bang();
 
-    api.assert_schema()
-        .assert_table("A", |table| {
-            table.assert_column("id", |col| {
-                col.assert_default(Some(DefaultValue::db_generated("now()")))
-            })
+    api.assert_schema().assert_table("A", |table| {
+        table.assert_column("id", |col| {
+            col.assert_default(Some(DefaultValue::db_generated("now()")))
         })
-        .unwrap();
+    });
 }
 
 #[test_connector(tags(Postgres))]
@@ -103,13 +95,11 @@ fn uuid_default(api: TestApi) {
 
     api.schema_push(dm).send_sync().assert_green_bang();
 
-    api.assert_schema()
-        .assert_table("A", |table| {
-            table.assert_column("uuid", |col| {
-                col.assert_default(Some(DefaultValue::value("00000000-0000-0000-0016-000000000004")))
-            })
+    api.assert_schema().assert_table("A", |table| {
+        table.assert_column("uuid", |col| {
+            col.assert_default(Some(DefaultValue::value("00000000-0000-0000-0016-000000000004")))
         })
-        .unwrap();
+    });
 }
 
 #[test_connector]
@@ -199,13 +189,11 @@ fn column_defaults_must_be_migrated(api: TestApi) {
 
     api.schema_push(dm1).send_sync().assert_green_bang();
 
-    api.assert_schema()
-        .assert_table("Fruit", |table| {
-            table.assert_column("name", |col| {
-                col.assert_default(Some(DefaultValue::value(PrismaValue::String("banana".to_string()))))
-            })
+    api.assert_schema().assert_table("Fruit", |table| {
+        table.assert_column("name", |col| {
+            col.assert_default(Some(DefaultValue::value(PrismaValue::String("banana".to_string()))))
         })
-        .unwrap();
+    });
 
     let dm2 = r#"
         model Fruit {
@@ -216,11 +204,9 @@ fn column_defaults_must_be_migrated(api: TestApi) {
 
     api.schema_push(dm2).send_sync().assert_green_bang();
 
-    api.assert_schema()
-        .assert_table("Fruit", |table| {
-            table.assert_column("name", |col| col.assert_default(Some(DefaultValue::value("mango"))))
-        })
-        .unwrap();
+    api.assert_schema().assert_table("Fruit", |table| {
+        table.assert_column("name", |col| col.assert_default(Some(DefaultValue::value("mango"))))
+    });
 }
 
 #[test_connector]
@@ -240,8 +226,7 @@ fn escaped_string_defaults_are_not_arbitrarily_migrated(api: TestApi) {
     api.schema_push(dm1)
         .migration_id(Some("first migration"))
         .send_sync()
-        .assert_green()
-        .unwrap();
+        .assert_green_bang();
 
     let insert = Insert::single_into(api.render_table_name("Fruit"))
         .value("id", "apple-id")
@@ -254,8 +239,7 @@ fn escaped_string_defaults_are_not_arbitrarily_migrated(api: TestApi) {
     api.schema_push(dm1)
         .migration_id(Some("second migration"))
         .send_sync()
-        .assert_green()
-        .unwrap()
+        .assert_green_bang()
         .assert_no_steps();
 
     let sql_schema = api.assert_schema().into_schema();

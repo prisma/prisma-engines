@@ -167,7 +167,9 @@ impl ConnectorError {
 
     /// Construct an UrlParseError.
     pub fn url_parse_error(err: impl Display) -> Self {
-        Self::from_msg(format!("{} in database URL", err))
+        Self::user_facing(user_facing_errors::common::InvalidDatabaseString {
+            details: err.to_string(),
+        })
     }
 }
 

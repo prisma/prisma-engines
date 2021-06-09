@@ -137,7 +137,5 @@ fn parse_configuration(datamodel: &str) -> CoreResult<(Datasource, String, Optio
 }
 
 fn parse_schema(schema: &str) -> CoreResult<(Configuration, Datamodel)> {
-    datamodel::parse_schema(&schema)
-        .map(|d| d.subject)
-        .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", schema)))
+    datamodel::parse_schema(&schema).map_err(CoreError::new_schema_parser_error)
 }

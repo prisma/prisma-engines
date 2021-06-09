@@ -4,7 +4,7 @@ use itertools::Itertools;
 use prisma_models::*;
 use prisma_value::PrismaValue;
 use quaint::error::ErrorKind;
-use std::{collections::HashSet, convert::TryFrom, usize};
+use std::{collections::HashSet, convert::TryFrom, ops::Deref, usize};
 use tracing::log::trace;
 use user_facing_errors::query_engine::DatabaseConstraint;
 
@@ -92,7 +92,14 @@ pub async fn create_records(
 
     let affected_fields: HashSet<ScalarFieldRef> = fields
         .into_iter()
-        .map(|dsfn| model.fields().find_from_scalar(&dsfn).unwrap())
+        .map(|dsfn| {
+            model
+                .fields()
+                .scalar()
+                .into_iter()
+                .find(|sf| sf.db_name() == dsfn.deref())
+                .unwrap()
+        })
         .collect();
 
     if affected_fields.is_empty() {

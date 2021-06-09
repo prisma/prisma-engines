@@ -39,6 +39,10 @@ impl SqlSchemaDifferFlavour for SqliteFlavour {
             .collect()
     }
 
+    fn should_drop_foreign_keys_from_dropped_tables(&self) -> bool {
+        false
+    }
+
     fn should_push_foreign_keys_from_created_tables(&self) -> bool {
         false
     }
