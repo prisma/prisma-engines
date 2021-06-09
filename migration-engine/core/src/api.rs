@@ -54,7 +54,7 @@ pub trait GenericApi: Send + Sync + 'static {
     ) -> CoreResult<MarkMigrationRolledBackOutput>;
 
     /// Prepare to create a migration.
-    async fn plan_migration(&self, input: &PlanMigrationInput) -> CoreResult<PlanMigrationOutput>;
+    async fn plan_migration(&self) -> CoreResult<()>;
 
     /// Reset a database to an empty state (no data, no schema).
     async fn reset(&self) -> CoreResult<()>;
@@ -99,7 +99,7 @@ impl<C: MigrationConnector> GenericApi for C {
         &self,
         input: &DiagnoseMigrationHistoryInput,
     ) -> CoreResult<DiagnoseMigrationHistoryOutput> {
-        DiagnoseMigrationHistoryCommand::execute(input, self)
+        diagnose_migration_history(input, self)
             .instrument(tracing::info_span!("DiagnoseMigrationHistory"))
             .await
     }
@@ -149,10 +149,8 @@ impl<C: MigrationConnector> GenericApi for C {
             .await
     }
 
-    async fn plan_migration(&self, input: &PlanMigrationInput) -> CoreResult<PlanMigrationOutput> {
-        PlanMigrationCommand::execute(input, self)
-            .instrument(tracing::info_span!("PlanMigration"))
-            .await
+    async fn plan_migration(&self) -> CoreResult<()> {
+        unreachable!("PlanMigration command")
     }
 
     async fn reset(&self) -> CoreResult<()> {

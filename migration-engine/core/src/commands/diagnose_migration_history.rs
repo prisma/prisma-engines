@@ -1,12 +1,10 @@
-use std::path::Path;
-
-use super::MigrationCommand;
 use crate::CoreResult;
 use migration_connector::{
     ConnectorError, DatabaseMigrationMarker, DiffTarget, MigrationConnector, MigrationDirectory, MigrationRecord,
     PersistenceNotInitializedError,
 };
 use serde::{Deserialize, Serialize};
+use std::path::Path;
 
 /// The input to the `DiagnoseMigrationHistory` command.
 #[derive(Deserialize, Debug)]
@@ -65,112 +63,107 @@ impl DiagnoseMigrationHistoryOutput {
 /// Read the contents of the migrations directory and the migrations table, and
 /// returns their relative statuses. At this stage, the migration engine only
 /// reads, it does not write to the dev database nor the migrations directory.
-pub struct DiagnoseMigrationHistoryCommand;
+pub(crate) async fn diagnose_migration_history<C: MigrationConnector>(
+    input: &DiagnoseMigrationHistoryInput,
+    connector: &C,
+) -> CoreResult<DiagnoseMigrationHistoryOutput> {
+    let migration_persistence = connector.migration_persistence();
 
-#[async_trait::async_trait]
-impl<'a> MigrationCommand for DiagnoseMigrationHistoryCommand {
-    type Input = DiagnoseMigrationHistoryInput;
-    type Output = DiagnoseMigrationHistoryOutput;
+    tracing::debug!("Diagnosing migration history");
 
-    async fn execute<C: MigrationConnector>(input: &Self::Input, connector: &C) -> CoreResult<Self::Output> {
-        let migration_persistence = connector.migration_persistence();
+    migration_connector::error_on_changed_provider(&input.migrations_directory_path, connector.connector_type())?;
 
-        tracing::debug!("Diagnosing migration history");
+    // Load the migrations.
+    let migrations_from_filesystem =
+        migration_connector::list_migrations(&Path::new(&input.migrations_directory_path))?;
 
-        migration_connector::error_on_changed_provider(&input.migrations_directory_path, connector.connector_type())?;
+    let (migrations_from_database, has_migrations_table) = match migration_persistence.list_migrations().await? {
+        Ok(migrations) => (migrations, true),
+        Err(PersistenceNotInitializedError {}) => (vec![], false),
+    };
 
-        // Load the migrations.
-        let migrations_from_filesystem =
-            migration_connector::list_migrations(&Path::new(&input.migrations_directory_path))?;
+    let mut diagnostics = Diagnostics::new(&migrations_from_filesystem);
 
-        let (migrations_from_database, has_migrations_table) = match migration_persistence.list_migrations().await? {
-            Ok(migrations) => (migrations, true),
-            Err(PersistenceNotInitializedError {}) => (vec![], false),
-        };
-
-        let mut diagnostics = Diagnostics::new(&migrations_from_filesystem);
-
-        // Check filesystem history against database history.
-        for (index, fs_migration) in migrations_from_filesystem.iter().enumerate() {
-            let corresponding_db_migration = migrations_from_database
-                .iter()
-                .find(|db_migration| db_migration.migration_name == fs_migration.migration_name());
-
-            match corresponding_db_migration {
-                Some(db_migration)
-                    if !fs_migration
-                        .matches_checksum(&db_migration.checksum)
-                        .map_err(ConnectorError::from)? =>
-                {
-                    diagnostics.edited_migrations.push(db_migration);
-                }
-                Some(_) => (),
-                None => diagnostics.fs_migrations_not_in_db.push((index, fs_migration)),
-            }
-        }
-
-        for (index, db_migration) in migrations_from_database.iter().enumerate() {
-            let corresponding_fs_migration = migrations_from_filesystem
-                .iter()
-                .find(|fs_migration| db_migration.migration_name == fs_migration.migration_name());
-
-            if db_migration.finished_at.is_none() && db_migration.rolled_back_at.is_none() {
-                diagnostics.failed_migrations.push(db_migration);
-            }
-
-            if corresponding_fs_migration.is_none() {
-                diagnostics.db_migrations_not_in_fs.push((index, db_migration))
-            }
-        }
-
-        // Detect drift
-        let applied_migrations: Vec<_> = migrations_from_filesystem
+    // Check filesystem history against database history.
+    for (index, fs_migration) in migrations_from_filesystem.iter().enumerate() {
+        let corresponding_db_migration = migrations_from_database
             .iter()
-            .filter(|fs_migration| {
-                migrations_from_database
-                    .iter()
-                    .filter(|db_migration| db_migration.finished_at.is_some() && db_migration.rolled_back_at.is_none())
-                    .any(|db_migration| db_migration.migration_name == fs_migration.migration_name())
-            })
-            .cloned()
-            .collect();
+            .find(|db_migration| db_migration.migration_name == fs_migration.migration_name());
 
-        let (drift, error_in_unapplied_migration) = {
-            if input.opt_in_to_shadow_database {
-                let drift = match connector
-                    .diff(DiffTarget::Migrations(&applied_migrations), DiffTarget::Database)
-                    .await
-                    .map(|mig| if mig.is_empty() { None } else { Some(mig) })
-                {
-                    Ok(Some(rollback)) => Some(DriftDiagnostic::DriftDetected {
-                        summary: rollback.summary(),
-                    }),
-                    Err(error) => Some(DriftDiagnostic::MigrationFailedToApply { error }),
-                    _ => None,
-                };
-
-                let error_in_unapplied_migration =
-                    if !matches!(drift, Some(DriftDiagnostic::MigrationFailedToApply { .. })) {
-                        connector.validate_migrations(&migrations_from_filesystem).await.err()
-                    } else {
-                        None
-                    };
-
-                (drift, error_in_unapplied_migration)
-            } else {
-                (None, None)
+        match corresponding_db_migration {
+            Some(db_migration)
+                if !fs_migration
+                    .matches_checksum(&db_migration.checksum)
+                    .map_err(ConnectorError::from)? =>
+            {
+                diagnostics.edited_migrations.push(db_migration);
             }
-        };
-
-        Ok(DiagnoseMigrationHistoryOutput {
-            drift,
-            history: diagnostics.history(),
-            failed_migration_names: diagnostics.failed_migration_names(),
-            edited_migration_names: diagnostics.edited_migration_names(),
-            error_in_unapplied_migration,
-            has_migrations_table,
-        })
+            Some(_) => (),
+            None => diagnostics.fs_migrations_not_in_db.push((index, fs_migration)),
+        }
     }
+
+    for (index, db_migration) in migrations_from_database.iter().enumerate() {
+        let corresponding_fs_migration = migrations_from_filesystem
+            .iter()
+            .find(|fs_migration| db_migration.migration_name == fs_migration.migration_name());
+
+        if db_migration.finished_at.is_none() && db_migration.rolled_back_at.is_none() {
+            diagnostics.failed_migrations.push(db_migration);
+        }
+
+        if corresponding_fs_migration.is_none() {
+            diagnostics.db_migrations_not_in_fs.push((index, db_migration))
+        }
+    }
+
+    // Detect drift
+    let applied_migrations: Vec<_> = migrations_from_filesystem
+        .iter()
+        .filter(|fs_migration| {
+            migrations_from_database
+                .iter()
+                .filter(|db_migration| db_migration.finished_at.is_some() && db_migration.rolled_back_at.is_none())
+                .any(|db_migration| db_migration.migration_name == fs_migration.migration_name())
+        })
+        .cloned()
+        .collect();
+
+    let (drift, error_in_unapplied_migration) = {
+        if input.opt_in_to_shadow_database {
+            let drift = match connector
+                .diff(DiffTarget::Migrations(&applied_migrations), DiffTarget::Database)
+                .await
+                .map(|mig| if mig.is_empty() { None } else { Some(mig) })
+            {
+                Ok(Some(rollback)) => Some(DriftDiagnostic::DriftDetected {
+                    summary: rollback.summary(),
+                }),
+                Err(error) => Some(DriftDiagnostic::MigrationFailedToApply { error }),
+                _ => None,
+            };
+
+            let error_in_unapplied_migration = if !matches!(drift, Some(DriftDiagnostic::MigrationFailedToApply { .. }))
+            {
+                connector.validate_migrations(&migrations_from_filesystem).await.err()
+            } else {
+                None
+            };
+
+            (drift, error_in_unapplied_migration)
+        } else {
+            (None, None)
+        }
+    };
+
+    Ok(DiagnoseMigrationHistoryOutput {
+        drift,
+        history: diagnostics.history(),
+        failed_migration_names: diagnostics.failed_migration_names(),
+        edited_migration_names: diagnostics.edited_migration_names(),
+        error_in_unapplied_migration,
+        has_migrations_table,
+    })
 }
 
 #[derive(Debug)]
