@@ -1,14 +1,6 @@
-use super::MigrationCommand;
 use crate::{parse_schema, CoreResult};
 use migration_connector::{list_migrations, DiffTarget, MigrationConnector};
 use serde::{Deserialize, Serialize};
-
-/// Development command for migrations. Evaluate the data loss induced by the
-/// next migration the engine would generate on the main database.
-///
-/// At this stage, the engine does not create or mutate anything in the database
-/// nor in the migrations directory.
-pub struct EvaluateDataLoss;
 
 /// The input to the `evaluateDataLoss` command.
 #[derive(Deserialize, Debug)]
@@ -45,57 +37,59 @@ pub struct MigrationFeedback {
     pub step_index: usize,
 }
 
-#[async_trait::async_trait]
-impl MigrationCommand for EvaluateDataLoss {
-    type Input = EvaluateDataLossInput;
-    type Output = EvaluateDataLossOutput;
+/// Development command for migrations. Evaluate the data loss induced by the
+/// next migration the engine would generate on the main database.
+///
+/// At this stage, the engine does not create or mutate anything in the database
+/// nor in the migrations directory.
+pub(crate) async fn evaluate_data_loss<C: MigrationConnector>(
+    input: &EvaluateDataLossInput,
+    connector: &C,
+) -> CoreResult<EvaluateDataLossOutput> {
+    let applier = connector.database_migration_step_applier();
+    let checker = connector.destructive_change_checker();
 
-    async fn execute<C: MigrationConnector>(input: &Self::Input, connector: &C) -> CoreResult<Self::Output> {
-        let applier = connector.database_migration_step_applier();
-        let checker = connector.destructive_change_checker();
+    migration_connector::error_on_changed_provider(&input.migrations_directory_path, connector.connector_type())?;
 
-        migration_connector::error_on_changed_provider(&input.migrations_directory_path, connector.connector_type())?;
+    let migrations_from_directory = list_migrations(input.migrations_directory_path.as_ref())?;
+    let target_schema = parse_schema(&input.prisma_schema)?;
 
-        let migrations_from_directory = list_migrations(input.migrations_directory_path.as_ref())?;
-        let target_schema = parse_schema(&input.prisma_schema)?;
+    let migration = connector
+        .diff(
+            DiffTarget::Migrations(&migrations_from_directory),
+            DiffTarget::Datamodel((&target_schema.0, &target_schema.1)),
+        )
+        .await?;
 
-        let migration = connector
-            .diff(
-                DiffTarget::Migrations(&migrations_from_directory),
-                DiffTarget::Datamodel((&target_schema.0, &target_schema.1)),
-            )
-            .await?;
+    let rendered_migration_steps = applier
+        .render_steps_pretty(&migration)?
+        .into_iter()
+        .map(|pretty_step| pretty_step.raw)
+        .collect();
 
-        let rendered_migration_steps = applier
-            .render_steps_pretty(&migration)?
-            .into_iter()
-            .map(|pretty_step| pretty_step.raw)
-            .collect();
+    let diagnostics = checker.check(&migration).await?;
 
-        let diagnostics = checker.check(&migration).await?;
-
-        let warnings = diagnostics
-            .warnings
-            .into_iter()
-            .map(|warning| MigrationFeedback {
-                message: warning.description,
-                step_index: warning.step_index,
-            })
-            .collect();
-
-        let unexecutable_steps = diagnostics
-            .unexecutable_migrations
-            .into_iter()
-            .map(|unexecutable| MigrationFeedback {
-                message: unexecutable.description,
-                step_index: unexecutable.step_index,
-            })
-            .collect();
-
-        Ok(EvaluateDataLossOutput {
-            migration_steps: rendered_migration_steps,
-            warnings,
-            unexecutable_steps,
+    let warnings = diagnostics
+        .warnings
+        .into_iter()
+        .map(|warning| MigrationFeedback {
+            message: warning.description,
+            step_index: warning.step_index,
         })
-    }
+        .collect();
+
+    let unexecutable_steps = diagnostics
+        .unexecutable_migrations
+        .into_iter()
+        .map(|unexecutable| MigrationFeedback {
+            message: unexecutable.description,
+            step_index: unexecutable.step_index,
+        })
+        .collect();
+
+    Ok(EvaluateDataLossOutput {
+        migration_steps: rendered_migration_steps,
+        warnings,
+        unexecutable_steps,
+    })
 }
