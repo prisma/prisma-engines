@@ -5,9 +5,9 @@ use serde::{Deserialize, Serialize};
 /// Command to bring the local database in sync with the prisma schema, without
 /// interacting with the migrations directory nor the migrations table.
 
-pub(crate) async fn schema_push<C: MigrationConnector>(
+pub(crate) async fn schema_push(
     input: &SchemaPushInput,
-    connector: &C,
+    connector: &dyn MigrationConnector,
 ) -> CoreResult<SchemaPushOutput> {
     let schema = parse_schema(&input.schema)?;
     let applier = connector.database_migration_step_applier();

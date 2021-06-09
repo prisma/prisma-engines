@@ -4,55 +4,45 @@ use crate::{
     SqlFlavour, SqlMigrationConnector,
 };
 use migration_connector::{
-    ConnectorError, ConnectorResult, DatabaseMigrationMarker, DatabaseMigrationStepApplier,
-    DestructiveChangeDiagnostics, PrettyDatabaseMigrationStep,
+    ConnectorError, ConnectorResult, DatabaseMigrationStepApplier, DestructiveChangeDiagnostics, Migration,
+    PrettyDatabaseMigrationStep,
 };
 use sql_schema_describer::{walkers::SqlSchemaExt, SqlSchema};
 use user_facing_errors::migration_engine::ApplyMigrationError;
 
 #[async_trait::async_trait]
-impl DatabaseMigrationStepApplier<SqlMigration> for SqlMigrationConnector {
-    #[tracing::instrument(skip(self, database_migration))]
-    async fn apply_migration(&self, database_migration: &SqlMigration) -> ConnectorResult<u32> {
-        tracing::debug!("{} steps to execute", database_migration.steps.len());
+impl DatabaseMigrationStepApplier for SqlMigrationConnector {
+    #[tracing::instrument(skip(self, migration))]
+    async fn apply_migration(&self, migration: &Migration) -> ConnectorResult<u32> {
+        let migration: &SqlMigration = migration.downcast_ref();
+        tracing::debug!("{} steps to execute", migration.steps.len());
 
-        for (index, step) in database_migration.steps.iter().enumerate() {
-            for sql_string in render_raw_sql(
-                &step,
-                self.flavour(),
-                Pair::new(&database_migration.before, &database_migration.after),
-            ) {
+        for (index, step) in migration.steps.iter().enumerate() {
+            for sql_string in render_raw_sql(&step, self.flavour(), Pair::new(&migration.before, &migration.after)) {
                 tracing::debug!(index, %sql_string);
                 self.conn().raw_cmd(&sql_string).await?;
             }
         }
 
-        Ok(database_migration.steps.len() as u32)
+        Ok(migration.steps.len() as u32)
     }
 
-    fn render_steps_pretty(
-        &self,
-        database_migration: &SqlMigration,
-    ) -> ConnectorResult<Vec<PrettyDatabaseMigrationStep>> {
-        let mut steps = Vec::with_capacity(database_migration.steps.len());
-
-        for step in &database_migration.steps {
-            let sql = render_raw_sql(&step, self.flavour(), database_migration.schemas()).join(";\n");
-
-            if !sql.is_empty() {
-                steps.push(PrettyDatabaseMigrationStep { raw: sql });
-            }
-        }
-
-        Ok(steps)
+    fn render_steps_pretty(&self, migration: &Migration) -> ConnectorResult<Vec<PrettyDatabaseMigrationStep>> {
+        let mut steps = Vec::new();
+        render_steps(migration.downcast_ref(), self.flavour(), &mut steps);
+        Ok(steps
+            .into_iter()
+            .map(|step| PrettyDatabaseMigrationStep { raw: step })
+            .collect())
     }
 
-    fn render_script(&self, database_migration: &SqlMigration, diagnostics: &DestructiveChangeDiagnostics) -> String {
-        if database_migration.is_empty() {
+    fn render_script(&self, migration: &Migration, diagnostics: &DestructiveChangeDiagnostics) -> String {
+        let migration: &SqlMigration = migration.downcast_ref();
+        if migration.steps.is_empty() {
             return "-- This is an empty migration.".to_string();
         }
 
-        let mut script = String::with_capacity(40 * database_migration.steps.len());
+        let mut script = String::with_capacity(40 * migration.steps.len());
 
         // Note: it would be much nicer if we could place the warnings next to
         // the SQL for the steps that triggered them.
@@ -79,12 +69,9 @@ impl DatabaseMigrationStepApplier<SqlMigration> for SqlMigrationConnector {
         // some steps don't render anything.
         let mut is_first_step = true;
 
-        for step in &database_migration.steps {
-            let statements: Vec<String> = render_raw_sql(
-                step,
-                self.flavour(),
-                Pair::new(&database_migration.before, &database_migration.after),
-            );
+        for step in &migration.steps {
+            let statements: Vec<String> =
+                render_raw_sql(step, self.flavour(), Pair::new(&migration.before, &migration.after));
 
             if !statements.is_empty() {
                 if is_first_step {
@@ -124,6 +111,22 @@ impl DatabaseMigrationStepApplier<SqlMigration> for SqlMigrationConnector {
                     .unwrap_or_else(|| ConnectorError::from(quaint_error).to_string()),
             })
         })
+    }
+}
+
+pub(crate) fn render_steps(
+    migration: &SqlMigration,
+    flavour: &(dyn SqlFlavour + Send + Sync),
+    steps: &mut Vec<String>,
+) {
+    steps.reserve(migration.steps.len());
+
+    for step in &migration.steps {
+        let sql = render_raw_sql(&step, flavour, migration.schemas()).join(";\n");
+
+        if !sql.is_empty() {
+            steps.push(sql);
+        }
     }
 }
 

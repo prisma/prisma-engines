@@ -1,5 +1,5 @@
 use crate::{parse_schema, CoreError, CoreResult};
-use migration_connector::{DatabaseMigrationMarker, DiffTarget, MigrationConnector};
+use migration_connector::{DiffTarget, MigrationConnector};
 use serde::{Deserialize, Serialize};
 use std::path::Path;
 use user_facing_errors::migration_engine::MigrationNameTooLong;
@@ -27,9 +27,9 @@ pub struct CreateMigrationOutput {
 }
 
 /// Create a new migration.
-pub async fn create_migration<C: MigrationConnector>(
+pub async fn create_migration(
     input: &CreateMigrationInput,
-    connector: &C,
+    connector: &dyn MigrationConnector,
 ) -> CoreResult<CreateMigrationOutput> {
     let applier = connector.database_migration_step_applier();
     let checker = connector.destructive_change_checker();
@@ -53,7 +53,7 @@ pub async fn create_migration<C: MigrationConnector>(
         )
         .await?;
 
-    if migration.is_empty() && !input.draft {
+    if connector.migration_is_empty(&migration) && !input.draft {
         tracing::info!("Database is up-to-date, returning without creating new migration.");
 
         return Ok(CreateMigrationOutput {
@@ -73,7 +73,7 @@ pub async fn create_migration<C: MigrationConnector>(
     .map_err(|_| CoreError::from_msg("Failed to create a new migration directory.".into()))?;
 
     directory
-        .write_migration_script(&migration_script, C::DatabaseMigration::FILE_EXTENSION)
+        .write_migration_script(&migration_script, connector.migration_file_extension())
         .map_err(|err| {
             CoreError::from_msg(format!(
                 "Failed to write the migration script to `{:?}`\n{}",

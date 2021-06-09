@@ -22,9 +22,9 @@ pub struct DevDiagnosticOutput {
 
 /// Method called at the beginning of `migrate dev` to decide the course of
 /// action based on the current state of the workspace.
-pub(crate) async fn dev_diagnostic<C: MigrationConnector>(
+pub(crate) async fn dev_diagnostic(
     input: &DevDiagnosticInput,
-    connector: &C,
+    connector: &dyn MigrationConnector,
 ) -> ConnectorResult<DevDiagnosticOutput> {
     migration_connector::error_on_changed_provider(&input.migrations_directory_path, connector.connector_type())?;
 

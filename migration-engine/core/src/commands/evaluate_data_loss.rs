@@ -42,9 +42,9 @@ pub struct MigrationFeedback {
 ///
 /// At this stage, the engine does not create or mutate anything in the database
 /// nor in the migrations directory.
-pub(crate) async fn evaluate_data_loss<C: MigrationConnector>(
+pub(crate) async fn evaluate_data_loss(
     input: &EvaluateDataLossInput,
-    connector: &C,
+    connector: &dyn MigrationConnector,
 ) -> CoreResult<EvaluateDataLossOutput> {
     let applier = connector.database_migration_step_applier();
     let checker = connector.destructive_change_checker();

@@ -18,9 +18,9 @@ pub struct MarkMigrationAppliedInput {
 pub type MarkMigrationAppliedOutput = HashMap<(), ()>;
 
 /// Mark a migration as applied.
-pub async fn mark_migration_applied<C: MigrationConnector>(
+pub async fn mark_migration_applied(
     input: &MarkMigrationAppliedInput,
-    connector: &C,
+    connector: &dyn MigrationConnector,
 ) -> CoreResult<MarkMigrationAppliedOutput> {
     let persistence = connector.migration_persistence();
 

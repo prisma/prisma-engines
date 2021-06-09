@@ -1,17 +1,17 @@
-use crate::{destructive_change_checker::DestructiveChangeDiagnostics, ConnectorResult};
+use crate::{destructive_change_checker::DestructiveChangeDiagnostics, ConnectorResult, Migration};
 
 /// Apply a single migration step to the connector's database. At this level, we are working with database migrations,
 /// i.e. the [associated type on MigrationConnector](trait.MigrationConnector.html#associatedtype.DatabaseMigration).
 #[async_trait::async_trait]
-pub trait DatabaseMigrationStepApplier<T>: Send + Sync {
+pub trait DatabaseMigrationStepApplier: Send + Sync {
     /// Applies the migration to the database. Returns the number of executed steps.
-    async fn apply_migration(&self, database_migration: &T) -> ConnectorResult<u32>;
+    async fn apply_migration(&self, migration: &Migration) -> ConnectorResult<u32>;
 
     /// Render steps for the CLI. Each step will contain the raw field.
-    fn render_steps_pretty(&self, database_migration: &T) -> ConnectorResult<Vec<PrettyDatabaseMigrationStep>>;
+    fn render_steps_pretty(&self, migration: &Migration) -> ConnectorResult<Vec<PrettyDatabaseMigrationStep>>;
 
     /// Render the migration to a runnable script.
-    fn render_script(&self, database_migration: &T, diagnostics: &DestructiveChangeDiagnostics) -> String;
+    fn render_script(&self, migration: &Migration, diagnostics: &DestructiveChangeDiagnostics) -> String;
 
     /// Apply a migration script to the database. The migration persistence is
     /// managed by the core.
