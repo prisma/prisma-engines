@@ -17,7 +17,7 @@ bigdecimal = "0.2"
 serde = "1.0"
 serde_derive = "1.0"
 serde_json = { version = "1.0", features = ["float_roundtrip"] }
-uuid = { version = "0.8", features = ["serde", "v4"] }
+uuid = { version = "0.8", features = ["serde"] }
 
 [dependencies.quaint]
 features = ["uuid", "json", "chrono", "bigdecimal", "postgresql"]

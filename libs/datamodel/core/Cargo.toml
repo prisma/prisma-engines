@@ -31,3 +31,4 @@ pretty_assertions = "0.6.1"
 
 [features]
 default = []
+default_generators = ["dml/default_generators"]
