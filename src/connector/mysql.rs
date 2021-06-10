@@ -120,6 +120,11 @@ impl MysqlUrl {
         self.query_params.socket_timeout
     }
 
+    /// Prefer socket connection
+    pub fn prefer_socket(&self) -> Option<bool> {
+        self.query_params.prefer_socket
+    }
+
     /// The maximum connection lifetime
     pub fn max_connection_lifetime(&self) -> Option<Duration> {
         self.query_params.max_connection_lifetime
@@ -150,6 +155,7 @@ impl MysqlUrl {
         let mut pool_timeout = Some(Duration::from_secs(10));
         let mut max_connection_lifetime = None;
         let mut max_idle_connection_lifetime = Some(Duration::from_secs(300));
+        let mut prefer_socket = None;
         let mut statement_cache_size = 1000;
 
         for (k, v) in url.query_pairs() {
@@ -186,6 +192,12 @@ impl MysqlUrl {
                         .parse()
                         .map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
                     socket_timeout = Some(Duration::from_secs(as_int));
+                }
+                "prefer_socket" => {
+                    let as_bool = v
+                        .parse::<bool>()
+                        .map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
+                    prefer_socket = Some(as_bool)
                 }
                 "connect_timeout" => {
                     let as_int = v
@@ -259,6 +271,7 @@ impl MysqlUrl {
             pool_timeout,
             max_connection_lifetime,
             max_idle_connection_lifetime,
+            prefer_socket,
             statement_cache_size,
         })
     }
@@ -290,6 +303,10 @@ impl MysqlUrl {
             config = config.ssl_opts(Some(self.query_params.ssl_opts.clone()));
         }
 
+        if self.query_params.prefer_socket.is_some() {
+            config = config.prefer_socket(self.query_params.prefer_socket);
+        }
+
         config
     }
 }
@@ -305,6 +322,7 @@ pub(crate) struct MysqlUrlQueryParams {
     pool_timeout: Option<Duration>,
     max_connection_lifetime: Option<Duration>,
     max_idle_connection_lifetime: Option<Duration>,
+    prefer_socket: Option<bool>,
     statement_cache_size: usize,
 }
 
@@ -515,6 +533,13 @@ mod tests {
         let url = MysqlUrl::new(Url::parse("mysql://root@localhost/dbname?socket=(/tmp/mysql.sock)").unwrap()).unwrap();
         assert_eq!("dbname", url.dbname());
         assert_eq!(&Some(String::from("/tmp/mysql.sock")), url.socket());
+    }
+
+    #[test]
+    fn should_parse_prefer_socket() {
+        let url =
+            MysqlUrl::new(Url::parse("mysql://root:root@localhost:3307/testdb?prefer_socket=false").unwrap()).unwrap();
+        assert_eq!(false, url.prefer_socket().unwrap());
     }
 
     #[tokio::test]
