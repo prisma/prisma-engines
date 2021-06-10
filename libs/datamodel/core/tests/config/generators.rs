@@ -2,6 +2,7 @@ use crate::common::parse_configuration;
 use crate::common::ErrorAsserts;
 use datamodel::common::preview_features::GENERATOR;
 use datamodel::diagnostics::DatamodelError;
+use expect_test::expect;
 use itertools::Itertools;
 
 #[test]
@@ -213,9 +214,6 @@ fn nice_error_for_unknown_generator_preview_feature() {
 
 #[test]
 fn retain_env_var_definitions_in_generator_block() {
-    std::env::set_var("PROVIDER", "postgres");
-    std::env::set_var("OUTPUT", "~/home/prisma/");
-
     let schema1 = r#"
     generator js1 {
         provider = env("PROVIDER")
@@ -241,6 +239,44 @@ fn retain_env_var_definitions_in_generator_block() {
 ]"#;
 
     assert_mcf(schema1, expected_dmmf_1);
+}
+
+#[test]
+fn env_in_preview_features_must_be_rejected() {
+    let schema_1 = r#"
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = [env("MY_PREVIEW_FEATURE")]
+        }
+    "#;
+
+    let schema_2 = r#"
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = env("MY_PREVIEW_FEATURE")
+        }
+    "#;
+
+    let expect_1 = expect![[r#"
+        [1;91merror[0m: [1mExpected a String value, but received functional value "env".[0m
+          [1;94m-->[0m  [4mschema.prisma:4[0m
+        [1;94m   | [0m
+        [1;94m 3 | [0m            provider = "prisma-client-js"
+        [1;94m 4 | [0m            previewFeatures = [[1;91menv("MY_PREVIEW_FEATURE")[0m]
+        [1;94m   | [0m
+    "#]];
+
+    let expect_2 = expect![[r#"
+        [1;91merror[0m: [1mExpected a String value, but received functional value "env".[0m
+          [1;94m-->[0m  [4mschema.prisma:4[0m
+        [1;94m   | [0m
+        [1;94m 3 | [0m            provider = "prisma-client-js"
+        [1;94m 4 | [0m            previewFeatures = [1;91menv("MY_PREVIEW_FEATURE")[0m
+        [1;94m   | [0m
+    "#]];
+
+    expect_1.assert_eq(&datamodel::parse_schema(schema_1).map(drop).unwrap_err());
+    expect_2.assert_eq(&datamodel::parse_schema(schema_2).map(drop).unwrap_err());
 }
 
 fn assert_mcf(schema: &str, expected_mcf: &str) {
