@@ -1,4 +1,7 @@
-use std::{collections::BTreeMap, sync::Arc};
+use std::{
+    collections::{BTreeMap, HashMap},
+    sync::Arc,
+};
 
 use datamodel_connector::ConnectorCapabilities;
 use napi::{CallContext, JsString, JsUnknown};
@@ -69,6 +72,8 @@ pub fn get_config(ctx: CallContext) -> napi::Result<JsUnknown> {
         ignore_env_var_errors: bool,
         #[serde(default)]
         datasource_overrides: BTreeMap<String, String>,
+        #[serde(default)]
+        env: HashMap<String, String>,
     }
 
     let options = ctx.get::<JsUnknown>(0)?;
@@ -78,6 +83,7 @@ pub fn get_config(ctx: CallContext) -> napi::Result<JsUnknown> {
         datamodel,
         ignore_env_var_errors,
         datasource_overrides,
+        env,
     } = options;
 
     let overrides: Vec<(_, _)> = datasource_overrides.into_iter().collect();
@@ -87,7 +93,7 @@ pub fn get_config(ctx: CallContext) -> napi::Result<JsUnknown> {
     if !ignore_env_var_errors {
         config
             .subject
-            .resolve_datasource_urls_from_env(&overrides)
+            .resolve_datasource_urls_from_env(&overrides, |key| env.get(key).map(ToString::to_string))
             .map_err(|errors| ApiError::conversion(errors, &datamodel))?;
     }
 

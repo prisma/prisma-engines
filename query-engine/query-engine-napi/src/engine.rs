@@ -45,6 +45,7 @@ pub struct EngineBuilder {
     config: ValidatedConfiguration,
     logger: ChannelLogger,
     config_dir: PathBuf,
+    env: HashMap<String, String>,
 }
 
 /// Internal structure for querying and reconnecting with the engine.
@@ -54,6 +55,7 @@ pub struct ConnectedEngine {
     executor: crate::Executor,
     logger: ChannelLogger,
     config_dir: PathBuf,
+    env: HashMap<String, String>,
 }
 
 /// Returned from the `serverInfo` method in javascript.
@@ -128,7 +130,8 @@ impl QueryEngine {
                 .and_then(|mut config| {
                     config
                         .subject
-                        .resolve_datasource_urls_from_virtual_env(&env, &overrides)?;
+                        .resolve_datasource_urls_from_env(&overrides, |key| env.get(key).map(ToString::to_string))?;
+
                     Ok(config)
                 })
                 .map_err(|errors| ApiError::conversion(errors, &datamodel))?
@@ -160,6 +163,7 @@ impl QueryEngine {
             config,
             logger,
             config_dir,
+            env,
         };
 
         Ok(Self {
@@ -189,7 +193,9 @@ impl QueryEngine {
 
                         let preview_features: Vec<_> = builder.config.subject.preview_features().cloned().collect();
                         let url = data_source
-                            .load_url_with_config_dir(&builder.config_dir)
+                            .load_url_with_config_dir(&builder.config_dir, |key| {
+                                builder.env.get(key).map(ToString::to_string)
+                            })
                             .map_err(|err| crate::error::ApiError::Conversion(err, builder.datamodel.raw.clone()))?;
 
                         let (db_name, executor) = exec_loader::load(&data_source, &preview_features, &url).await?;
@@ -213,6 +219,7 @@ impl QueryEngine {
                             logger: builder.logger.clone(),
                             executor,
                             config_dir: builder.config_dir.clone(),
+                            env: builder.env.clone(),
                         })
                     })
                     .await?;
@@ -239,6 +246,7 @@ impl QueryEngine {
                     logger: engine.logger.clone(),
                     config,
                     config_dir: engine.config_dir.clone(),
+                    env: engine.env.clone(),
                 };
 
                 *inner = Inner::Builder(builder);

@@ -4,8 +4,7 @@ use crate::{
     StringFromEnvVar,
 };
 use datamodel_connector::{Connector, ConnectorCapabilities};
-use once_cell::sync::Lazy;
-use std::{collections::HashMap, path::Path};
+use std::path::Path;
 
 /// a `datasource` from the prisma schema.
 pub struct Datasource {
@@ -47,14 +46,10 @@ impl Datasource {
 
     /// Load the database URL, validating it and resolving env vars in the
     /// process. Also see `load_url_with_config_dir()`.
-    pub fn load_url(&self) -> Result<String, Diagnostics> {
-        static ENV: Lazy<HashMap<String, String>> = Lazy::new(|| std::env::vars().collect());
-        self.load_url_with_env(&*ENV)
-    }
-
-    /// Same as `load_url()`, but allows passing a virtal environment for
-    /// variable substitution.
-    pub fn load_url_with_env(&self, env: &HashMap<String, String>) -> Result<String, Diagnostics> {
+    pub fn load_url<F>(&self, env: F) -> Result<String, Diagnostics>
+    where
+        F: Fn(&str) -> Option<String>,
+    {
         let url = match (&self.url.value, &self.url.from_env_var) {
             (Some(lit), _) if lit.trim().is_empty() => {
                 let msg = "You must provide a nonempty URL";
@@ -62,7 +57,7 @@ impl Datasource {
                 return Err(DatamodelError::new_source_validation_error(&msg, &self.name, self.url_span).into());
             }
             (Some(lit), _) => lit.clone(),
-            (None, Some(env_var)) => match env.get(env_var) {
+            (None, Some(env_var)) => match env(env_var) {
                 Some(var) if var.trim().is_empty() => {
                     return Err(DatamodelError::new_source_validation_error(
                         &format!(
@@ -74,7 +69,7 @@ impl Datasource {
                     )
                     .into())
                 }
-                Some(var) => var.clone(),
+                Some(var) => var,
                 None => {
                     return Err(DatamodelError::new_environment_functional_evaluation_error(
                         env_var.to_owned(),
@@ -104,8 +99,11 @@ impl Datasource {
     /// context of NAPI integration.
     ///
     /// P.S. Don't forget to add new parameters here if needed!
-    pub fn load_url_with_config_dir(&self, config_dir: &Path) -> Result<String, Diagnostics> {
-        let url = self.load_url()?;
+    pub fn load_url_with_config_dir<F>(&self, config_dir: &Path, env: F) -> Result<String, Diagnostics>
+    where
+        F: Fn(&str) -> Option<String>,
+    {
+        let url = self.load_url(env)?;
         let url = self.active_connector.set_config_dir(config_dir, &url);
 
         Ok(url.into_owned())

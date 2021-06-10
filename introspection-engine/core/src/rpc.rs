@@ -69,7 +69,7 @@ impl RpcImpl {
             .datasources
             .first()
             .ok_or_else(|| Error::Generic("There is no datasource in the schema.".into()))?
-            .load_url()
+            .load_url(|key| std::env::var(key).ok())
             .map_err(|diagnostics| Error::DatamodelError(diagnostics.to_pretty_string("schema.prisma", schema)))?;
 
         Ok((
