@@ -8,7 +8,7 @@ version = "0.1.0"
 datamodel-connector = { path = "../connectors/datamodel-connector" }
 dml = { path = "../connectors/dml" }
 mongodb-datamodel-connector = { path = "../connectors/mongodb-datamodel-connector" }
-prisma-value = { path = "../../prisma-value", default_features = false }
+prisma-value = { path = "../../prisma-value" }
 sql-datamodel-connector = { path = "../connectors/sql-datamodel-connector" }
 
 bigdecimal = "0.2"
