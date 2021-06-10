@@ -632,7 +632,7 @@ impl<'a> ToSql for Value<'a> {
             #[cfg(feature = "json")]
             (Value::Text(string), &PostgresType::JSON) | (Value::Text(string), &PostgresType::JSONB) => string
                 .as_ref()
-                .map(|string| serde_json::from_str::<serde_json::Value>(&string)?.to_sql(ty, out)),
+                .map(|string| serde_json::from_str::<serde_json::Value>(string)?.to_sql(ty, out)),
             (Value::Text(string), &PostgresType::BIT) | (Value::Text(string), &PostgresType::VARBIT) => {
                 string.as_ref().map(|string| {
                     let bits: BitVec = string_to_bits(string)?;

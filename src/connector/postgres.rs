@@ -128,7 +128,7 @@ impl SslParams {
                 .build()
             })?;
             let password = self.identity_password.0.as_deref().unwrap_or("");
-            let identity = Identity::from_pkcs12(&db, &password)?;
+            let identity = Identity::from_pkcs12(&db, password)?;
 
             auth.identity(identity);
         }

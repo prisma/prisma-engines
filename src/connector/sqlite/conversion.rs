@@ -183,13 +183,13 @@ impl<'a> GetRow for SqliteRow<'a> {
                     });
 
                     parse_res.and_then(|s| {
-                        chrono::NaiveDateTime::parse_from_str(&s, "%Y-%m-%d %H:%M:%S")
+                        chrono::NaiveDateTime::parse_from_str(s, "%Y-%m-%d %H:%M:%S")
                             .map(|nd| chrono::DateTime::<chrono::Utc>::from_utc(nd, chrono::Utc))
                             .or_else(|_| {
-                                chrono::DateTime::parse_from_rfc3339(&s).map(|dt| dt.with_timezone(&chrono::Utc))
+                                chrono::DateTime::parse_from_rfc3339(s).map(|dt| dt.with_timezone(&chrono::Utc))
                             })
                             .or_else(|_| {
-                                chrono::DateTime::parse_from_rfc2822(&s).map(|dt| dt.with_timezone(&chrono::Utc))
+                                chrono::DateTime::parse_from_rfc2822(s).map(|dt| dt.with_timezone(&chrono::Utc))
                             })
                             .map(Value::datetime)
                             .map_err(|chrono_error| {

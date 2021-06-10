@@ -85,7 +85,7 @@ impl Manager for QuaintManager {
             QuaintManager::Sqlite { url, .. } => {
                 use crate::connector::Sqlite;
 
-                let conn = Sqlite::new(&url)?;
+                let conn = Sqlite::new(url)?;
 
                 Ok(Box::new(conn) as Self::Connection)
             }

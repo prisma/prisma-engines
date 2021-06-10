@@ -76,7 +76,7 @@ impl<'a> Table<'a> {
         let mut result = ConditionTree::NegativeCondition;
 
         let join_cond = |column: &Column<'a>| {
-            let cond = if !inserted_columns.contains(&column) {
+            let cond = if !inserted_columns.contains(column) {
                 match column.default.clone() {
                     Some(DefaultValue::Provided(val)) => Some(column.clone().equals(val).into()),
                     Some(DefaultValue::Generated) => None,
@@ -98,7 +98,7 @@ impl<'a> Table<'a> {
         for index in self.index_definitions.iter() {
             match index {
                 IndexDefinition::Single(column) => {
-                    if let Some(right_cond) = join_cond(&column)? {
+                    if let Some(right_cond) = join_cond(column)? {
                         match result {
                             ConditionTree::NegativeCondition => result = right_cond,
                             left_cond => result = left_cond.or(right_cond),
@@ -109,7 +109,7 @@ impl<'a> Table<'a> {
                     let mut sub_result = ConditionTree::NoCondition;
 
                     for right in cols.iter() {
-                        let right_cond = join_cond(&right)?.unwrap_or(ConditionTree::NegativeCondition);
+                        let right_cond = join_cond(right)?.unwrap_or(ConditionTree::NegativeCondition);
 
                         match sub_result {
                             ConditionTree::NoCondition => sub_result = right_cond,
