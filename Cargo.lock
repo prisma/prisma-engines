@@ -971,6 +971,7 @@ dependencies = [
  "colored 1.9.3",
  "datamodel-connector",
  "dml",
+ "expect-test",
  "indoc",
  "itertools 0.8.2",
  "mongodb-datamodel-connector",
