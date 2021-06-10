@@ -87,8 +87,8 @@ impl MigrationConnector for MongoDbMigrationConnector {
         "mongo"
     }
 
-    fn migration_is_empty(&self, migration: &Migration) -> bool {
-        migration.downcast_ref::<MongoDbMigration>().is_empty()
+    fn migration_len(&self, migration: &Migration) -> usize {
+        migration.downcast_ref::<MongoDbMigration>().steps.len()
     }
 
     fn migration_summary(&self, migration: &Migration) -> String {

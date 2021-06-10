@@ -18,18 +18,13 @@ impl DatabaseMigrationStepApplier for SqlMigrationConnector {
 
         for (index, step) in migration.steps.iter().enumerate() {
             for sql_string in render_raw_sql(&step, self.flavour(), Pair::new(&migration.before, &migration.after)) {
+                assert!(!sql_string.is_empty());
                 tracing::debug!(index, %sql_string);
                 self.conn().raw_cmd(&sql_string).await?;
             }
         }
 
         Ok(migration.steps.len() as u32)
-    }
-
-    fn render_steps(&self, migration: &Migration) -> Vec<String> {
-        let mut steps = Vec::new();
-        render_steps(migration.downcast_ref(), self.flavour(), &mut steps);
-        steps
     }
 
     fn render_script(&self, migration: &Migration, diagnostics: &DestructiveChangeDiagnostics) -> String {
@@ -107,22 +102,6 @@ impl DatabaseMigrationStepApplier for SqlMigrationConnector {
                     .unwrap_or_else(|| ConnectorError::from(quaint_error).to_string()),
             })
         })
-    }
-}
-
-pub(crate) fn render_steps(
-    migration: &SqlMigration,
-    flavour: &(dyn SqlFlavour + Send + Sync),
-    steps: &mut Vec<String>,
-) {
-    steps.reserve(migration.steps.len());
-
-    for step in &migration.steps {
-        let sql = render_raw_sql(&step, flavour, migration.schemas()).join(";\n");
-
-        if !sql.is_empty() {
-            steps.push(sql);
-        }
     }
 }
 
