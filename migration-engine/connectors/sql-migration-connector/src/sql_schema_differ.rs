@@ -525,6 +525,7 @@ fn push_previous_usages_as_defaults_in_altered_enums(differ: &SqlSchemaDiffer<'_
 /// Compare two [ForeignKey](/sql-schema-describer/struct.ForeignKey.html)s and return whether they
 /// should be considered equivalent for schema diffing purposes.
 fn foreign_keys_match(fks: Pair<&ForeignKeyWalker<'_>>, flavour: &dyn SqlFlavour) -> bool {
+    let names_match = fks.previous().constraint_name() == fks.next().constraint_name();
     let references_same_table = flavour.table_names_match(fks.map(|fk| fk.referenced_table().name()));
     let references_same_column_count =
         fks.previous().referenced_columns_count() == fks.next().referenced_columns_count();
@@ -549,7 +550,8 @@ fn foreign_keys_match(fks: Pair<&ForeignKeyWalker<'_>>, flavour: &dyn SqlFlavour
         .interleave(|fk| fk.referenced_column_names())
         .all(|pair| pair.previous() == pair.next());
 
-    references_same_table
+    names_match
+        && references_same_table
         && references_same_column_count
         && constrains_same_column_count
         && constrains_same_columns
