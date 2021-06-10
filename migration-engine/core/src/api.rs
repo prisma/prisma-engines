@@ -1,9 +1,8 @@
 //! The external facing programmatic API to the migration engine.
 
-mod error_rendering;
 mod rpc;
 
-pub use rpc::RpcApi;
+pub use rpc::rpc_api;
 
 use crate::{commands::*, CoreResult};
 use migration_connector::MigrationConnector;

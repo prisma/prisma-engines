@@ -2,16 +2,14 @@
 
 //! The top-level library crate for the migration engine.
 
-pub mod api;
+mod api;
+
 pub mod commands;
 pub mod qe_setup;
 
 mod core_error;
 
-use std::env;
-
-pub use api::GenericApi;
-pub use commands::SchemaPushInput;
+pub use api::{rpc_api, GenericApi};
 pub use core_error::{CoreError, CoreResult};
 
 use datamodel::{
@@ -21,6 +19,7 @@ use datamodel::{
 };
 use migration_connector::ConnectorError;
 use sql_migration_connector::SqlMigrationConnector;
+use std::env;
 use user_facing_errors::{common::InvalidDatabaseString, KnownError};
 
 #[cfg(feature = "mongodb")]

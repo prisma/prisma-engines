@@ -9,11 +9,7 @@ jobs:
     name: "WebAssembly build ${{ github.event.ref }} for commit ${{ github.event.inputs.commit }}"
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout ${{ github.event.inputs.commit }}
-        uses: actions/checkout@v2
-        with:
-          ref: ${{ github.event.inputs.commit }}
-
+      - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable

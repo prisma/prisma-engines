@@ -1,7 +1,7 @@
 pub use test_setup::{BitFlags, Capabilities, Tags};
 
 use crate::context::PrismaContext;
-use migration_core::{api::GenericApi, commands::SchemaPushInput};
+use migration_core::{commands::SchemaPushInput, GenericApi};
 use quaint::{
     ast::*,
     connector::ConnectionInfo,
