@@ -26,8 +26,6 @@ use sql_migration::{DropUserDefinedType, DropView, SqlMigration, SqlMigrationSte
 use sql_schema_describer::{walkers::SqlSchemaExt, SqlSchema};
 use user_facing_errors::{common::InvalidDatabaseString, KnownError};
 
-use crate::sql_database_step_applier::render_steps;
-
 /// The top-level SQL migration connector.
 pub struct SqlMigrationConnector {
     connection: Connection,
@@ -146,12 +144,12 @@ impl SqlMigrationConnector {
             self.flavour.drop_migrations_table(connection).await?;
         }
 
-        let mut steps = Vec::new();
-        render_steps(&migration, self.flavour(), &mut steps);
-
-        for step in steps {
-            connection.raw_cmd(&step).await?;
+        if migration.steps.is_empty() {
+            return Ok(());
         }
+
+        let migration = self.render_script(&Migration::new(migration), &DestructiveChangeDiagnostics::default());
+        connection.raw_cmd(&migration).await?;
 
         Ok(())
     }
@@ -266,8 +264,8 @@ impl MigrationConnector for SqlMigrationConnector {
         "sql"
     }
 
-    fn migration_is_empty(&self, migration: &Migration) -> bool {
-        migration.downcast_ref::<SqlMigration>().steps.is_empty()
+    fn migration_len(&self, migration: &Migration) -> usize {
+        migration.downcast_ref::<SqlMigration>().steps.len()
     }
 
     async fn reset(&self) -> ConnectorResult<()> {

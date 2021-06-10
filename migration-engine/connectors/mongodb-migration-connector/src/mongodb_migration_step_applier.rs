@@ -25,10 +25,6 @@ impl DatabaseMigrationStepApplier for MongoDbMigrationConnector {
         Ok(migration.steps.len() as u32)
     }
 
-    fn render_steps(&self, _migration: &Migration) -> Vec<String> {
-        todo!()
-    }
-
     fn render_script(&self, _migration: &Migration, _diagnostics: &DestructiveChangeDiagnostics) -> String {
         todo!()
     }

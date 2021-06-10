@@ -74,7 +74,13 @@ pub trait MigrationConnector: Send + Sync + 'static {
     fn migration_file_extension(&self) -> &'static str;
 
     /// Return whether the migration is empty.
-    fn migration_is_empty(&self, migration: &Migration) -> bool;
+    fn migration_is_empty(&self, migration: &Migration) -> bool {
+        self.migration_len(migration) == 0
+    }
+
+    /// Return the number of steps in the migration.
+    /// Invariant: migration_is_empty() == true iff migration_len() == 0.
+    fn migration_len(&self, migration: &Migration) -> usize;
 
     /// See [MigrationPersistence](trait.MigrationPersistence.html).
     fn migration_persistence(&self) -> &dyn MigrationPersistence;

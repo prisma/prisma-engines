@@ -4,10 +4,6 @@ pub struct MongoDbMigration {
 }
 
 impl MongoDbMigration {
-    pub(crate) fn is_empty(&self) -> bool {
-        self.steps.is_empty()
-    }
-
     pub(crate) fn summary(&self) -> String {
         let mut out = String::with_capacity(self.steps.len() * 10);
 

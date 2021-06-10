@@ -16,8 +16,8 @@ pub struct EvaluateDataLossInput {
 #[derive(Serialize, Debug, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct EvaluateDataLossOutput {
-    /// The migration steps the engine would generate.
-    pub migration_steps: Vec<String>,
+    /// The number of migration steps the engine would generate.
+    pub migration_steps: usize,
     /// Destructive change warnings for the local database. These are the
     /// warnings *for the migration that would be generated*. This does not
     /// include other potentially yet unapplied migrations.
@@ -46,7 +46,6 @@ pub(crate) async fn evaluate_data_loss(
     input: &EvaluateDataLossInput,
     connector: &dyn MigrationConnector,
 ) -> CoreResult<EvaluateDataLossOutput> {
-    let applier = connector.database_migration_step_applier();
     let checker = connector.destructive_change_checker();
 
     migration_connector::error_on_changed_provider(&input.migrations_directory_path, connector.connector_type())?;
@@ -61,7 +60,7 @@ pub(crate) async fn evaluate_data_loss(
         )
         .await?;
 
-    let rendered_migration_steps = applier.render_steps(&migration);
+    let migration_steps = connector.migration_len(&migration);
     let diagnostics = checker.check(&migration).await?;
 
     let warnings = diagnostics
@@ -83,7 +82,7 @@ pub(crate) async fn evaluate_data_loss(
         .collect();
 
     Ok(EvaluateDataLossOutput {
-        migration_steps: rendered_migration_steps,
+        migration_steps,
         warnings,
         unexecutable_steps,
     })

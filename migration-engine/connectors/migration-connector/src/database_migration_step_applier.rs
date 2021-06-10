@@ -7,9 +7,6 @@ pub trait DatabaseMigrationStepApplier: Send + Sync {
     /// Applies the migration to the database. Returns the number of executed steps.
     async fn apply_migration(&self, migration: &Migration) -> ConnectorResult<u32>;
 
-    /// Render steps for the CLI. Each step will contain the raw field.
-    fn render_steps(&self, migration: &Migration) -> Vec<String>;
-
     /// Render the migration to a runnable script.
     fn render_script(&self, migration: &Migration, diagnostics: &DestructiveChangeDiagnostics) -> String;
 
