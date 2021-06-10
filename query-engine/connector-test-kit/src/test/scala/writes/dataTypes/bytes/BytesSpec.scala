@@ -3,6 +3,7 @@ package writes.dataTypes.bytes
 import org.scalatest.{FlatSpec, Matchers}
 import util._
 
+// RS: Ported
 class BytesSpec extends FlatSpec with Matchers with ApiSpecBase {
   "Using a bytes field" should "work" in {
     val project = ProjectDsl.fromString {

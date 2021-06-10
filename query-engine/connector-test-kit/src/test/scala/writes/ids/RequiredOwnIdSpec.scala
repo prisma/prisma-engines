@@ -3,6 +3,7 @@ package writes.ids
 import org.scalatest.{FlatSpec, Matchers}
 import util._
 
+// RS: Ported
 class RequiredOwnIdSpec extends FlatSpec with Matchers with ApiSpecBase {
   val schema =
     """

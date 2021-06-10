@@ -4,6 +4,7 @@ import org.scalatest.{FlatSpec, Matchers}
 import util.ConnectorTag.PostgresConnectorTag
 import util._
 
+// RS: Ported
 class PostgresNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase with ConnectorAwareTest {
   override def runOnlyForConnectors: Set[ConnectorTag] = Set(PostgresConnectorTag)
 

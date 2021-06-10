@@ -4,6 +4,7 @@ import org.scalatest.{FlatSpec, Matchers}
 import util.ConnectorTag.MsSqlConnectorTag
 import util.{ApiSpecBase, ConnectorAwareTest, ConnectorTag, ProjectDsl}
 
+// RS: Ported
 class SqlServerNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase with ConnectorAwareTest {
   override def runOnlyForConnectors: Set[ConnectorTag] = Set(MsSqlConnectorTag)
 

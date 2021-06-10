@@ -3529,6 +3529,7 @@ dependencies = [
  "serde_json",
  "tracing",
  "tracing-futures",
+ "uuid",
 ]
 
 [[package]]
