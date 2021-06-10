@@ -2,6 +2,7 @@ use crate::{error::PrismaError, PrismaResult};
 use datamodel::diagnostics::ValidatedConfiguration;
 use datamodel::Datamodel;
 use serde::Deserialize;
+use std::env;
 use std::{ffi::OsStr, fs::File, io::Read};
 use structopt::StructOpt;
 
@@ -150,7 +151,7 @@ impl PrismaOpt {
             datamodel::parse_configuration(datamodel_str).and_then(|mut config| {
                 config
                     .subject
-                    .resolve_datasource_urls_from_env(&datasource_url_overrides)?;
+                    .resolve_datasource_urls_from_env(&datasource_url_overrides, |key| env::var(key).ok())?;
 
                 Ok(config)
             })

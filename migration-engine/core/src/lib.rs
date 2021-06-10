@@ -8,6 +8,8 @@ pub mod qe_setup;
 
 mod core_error;
 
+use std::env;
+
 pub use api::GenericApi;
 pub use commands::SchemaPushInput;
 pub use core_error::{CoreError, CoreResult};
@@ -120,7 +122,7 @@ fn parse_configuration(datamodel: &str) -> CoreResult<(Datasource, String, Optio
         .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", datamodel)))?;
 
     let url = config.datasources[0]
-        .load_url()
+        .load_url(|key| env::var(key).ok())
         .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", datamodel)))?;
 
     let shadow_database_url = config.datasources[0]

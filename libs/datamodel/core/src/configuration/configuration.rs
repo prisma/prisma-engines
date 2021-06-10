@@ -36,7 +36,14 @@ impl Configuration {
             .flat_map(|generator| generator.preview_features.iter())
     }
 
-    pub fn resolve_datasource_urls_from_env(&mut self, url_overrides: &[(String, String)]) -> Result<(), Diagnostics> {
+    pub fn resolve_datasource_urls_from_env<F>(
+        &mut self,
+        url_overrides: &[(String, String)],
+        env: F,
+    ) -> Result<(), Diagnostics>
+    where
+        F: Fn(&str) -> Option<String> + Copy,
+    {
         for datasource in &mut self.datasources {
             if let Some((_, url)) = url_overrides.iter().find(|(name, _url)| name == &datasource.name) {
                 datasource.url.value = Some(url.clone());
@@ -44,7 +51,7 @@ impl Configuration {
             }
 
             if datasource.url.from_env_var.is_some() && datasource.url.value.is_none() {
-                datasource.url.value = Some(datasource.load_url()?);
+                datasource.url.value = Some(datasource.load_url(env)?);
             }
         }
 

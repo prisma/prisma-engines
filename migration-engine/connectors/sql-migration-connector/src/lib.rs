@@ -15,6 +15,8 @@ mod sql_renderer;
 mod sql_schema_calculator;
 mod sql_schema_differ;
 
+use std::env;
+
 use connection_wrapper::Connection;
 use datamodel::{walkers::walk_models, Configuration, Datamodel};
 use error::quaint_error_to_connector_error;
@@ -161,7 +163,8 @@ impl SqlMigrationConnector {
         from: (&Configuration, &Datamodel),
         to: (&Configuration, &Datamodel),
     ) -> SqlMigration {
-        let connection_info = ConnectionInfo::from_url(&from.0.datasources[0].load_url().unwrap()).unwrap();
+        let connection_info =
+            ConnectionInfo::from_url(&from.0.datasources[0].load_url(|key| env::var(key).ok()).unwrap()).unwrap();
         let flavour = flavour::from_connection_info(&connection_info);
         let from_sql = sql_schema_calculator::calculate_sql_schema(from, flavour.as_ref());
         let to_sql = sql_schema_calculator::calculate_sql_schema(to, flavour.as_ref());
