@@ -161,9 +161,16 @@ fn uuids_do_not_generate_drift_issue_5282(api: TestApi) {
     api.raw_cmd(
         r#"
         CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-        CREATE TABLE a (id uuid DEFAULT uuid_generate_v4() primary key);
-        CREATE TABLE b (id uuid DEFAULT uuid_generate_v4() primary key, a_id uuid, CONSTRAINT aaa FOREIGN KEY (a_id) REFERENCES a(id));
-        "#
+        CREATE TABLE a (
+         id uuid DEFAULT uuid_generate_v4(),
+         Constraint a_pkey Primary Key (id)
+        );
+        CREATE TABLE b (
+         id uuid DEFAULT uuid_generate_v4(),
+         a_id uuid, 
+         Constraint b_pkey Primary Key (id),
+         CONSTRAINT B_a_id_fkey FOREIGN KEY (a_id) REFERENCES a(id));
+        "#,
     );
 
     let dm = api.datamodel_with_provider(

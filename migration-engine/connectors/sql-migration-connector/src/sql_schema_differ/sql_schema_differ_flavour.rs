@@ -128,4 +128,9 @@ pub(crate) trait SqlSchemaDifferFlavour {
     fn table_should_be_ignored(&self, _table_name: &str) -> bool {
         false
     }
+
+    /// Supports named Foreign Keys.
+    fn has_unnamed_foreign_keys(&self) -> bool {
+        false
+    }
 }

@@ -46,4 +46,8 @@ impl SqlSchemaDifferFlavour for SqliteFlavour {
     fn should_push_foreign_keys_from_created_tables(&self) -> bool {
         false
     }
+
+    fn has_unnamed_foreign_keys(&self) -> bool {
+        true
+    }
 }

@@ -17,6 +17,7 @@ impl ConstraintNames {
     /// pkey for a Primary Key constraint
     ///
     /// Including column names: {tablename}_{columnname(s)}_{suffix}
+    /// column names are joined with an _ if there are multiple
     /// key for a Unique constraint
     /// idx for any other kind of index
     /// fkey for a Foreign key
