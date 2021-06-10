@@ -309,7 +309,9 @@ fn must_succeed_if_env_var_is_missing_but_override_was_provided() {
     let url = "postgres://localhost";
     let overrides = vec![("ds".to_string(), url.to_string())];
     let mut config = parse_configuration(schema);
-    config.resolve_datasource_urls_from_env(&overrides, load_env_var).unwrap();
+    config
+        .resolve_datasource_urls_from_env(&overrides, load_env_var)
+        .unwrap();
     let data_source = config.datasources.first().unwrap();
 
     data_source.assert_name("ds");
@@ -332,7 +334,9 @@ fn must_succeed_if_env_var_exists_and_override_was_provided() {
     let url = "postgres://hostbar";
     let overrides = vec![("ds".to_string(), url.to_string())];
     let mut config = parse_configuration(schema);
-    config.resolve_datasource_urls_from_env(&overrides, load_env_var).unwrap();
+    config
+        .resolve_datasource_urls_from_env(&overrides, load_env_var)
+        .unwrap();
     let data_source = config.datasources.first().unwrap();
 
     data_source.assert_name("ds");
@@ -354,7 +358,9 @@ fn must_succeed_with_overrides() {
     let url = "postgres://hostbar";
     let overrides = &[("ds".to_string(), url.to_string())];
     let mut config = parse_configuration(schema);
-    config.resolve_datasource_urls_from_env(overrides, load_env_var).unwrap();
+    config
+        .resolve_datasource_urls_from_env(overrides, load_env_var)
+        .unwrap();
 
     let data_source = config.datasources.first().unwrap();
 
