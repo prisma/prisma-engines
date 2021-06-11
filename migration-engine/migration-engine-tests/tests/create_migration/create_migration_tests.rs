@@ -768,7 +768,6 @@ fn alter_constraint_name_tests(api: TestApi) {
                 
                 -- AlterIndex
                 ALTER TABLE `B` RENAME INDEX `B_a_b_idx` TO `AnotherCustomIndex`;
-                
                 "#
                 }
             }else if api.is_sqlite(){

@@ -149,9 +149,9 @@ pub(crate) fn calculate_scalar_field(table: &Table, column: &Column, connector: 
 
     let field_type = calculate_scalar_field_type_with_native_types(column, connector);
 
-    let is_id = is_id(&column, &table, connector);
+    let primary_key = primary_key(&column, &table, connector);
     let arity = match column.tpe.arity {
-        _ if is_id.is_some() && column.auto_increment => FieldArity::Required,
+        _ if primary_key.is_some() && column.auto_increment => FieldArity::Required,
         ColumnArity::Required => FieldArity::Required,
         ColumnArity::Nullable => FieldArity::Optional,
         ColumnArity::List => FieldArity::List,
@@ -173,7 +173,7 @@ pub(crate) fn calculate_scalar_field(table: &Table, column: &Column, connector: 
         database_name: None,
         default_value,
         is_unique,
-        primary_key: is_id,
+        primary_key,
         documentation: None,
         is_generated: false,
         is_updated_at: false,
@@ -283,7 +283,7 @@ pub(crate) fn calculate_default(table: &Table, column: &Column, arity: &FieldAri
     }
 }
 
-pub(crate) fn is_id(column: &Column, table: &Table, connector: &dyn Connector) -> Option<PrimaryKeyDefinition> {
+pub(crate) fn primary_key(column: &Column, table: &Table, connector: &dyn Connector) -> Option<PrimaryKeyDefinition> {
     match &table.primary_key {
         Some(pk) if pk.columns.len() == 1 && pk.columns.first().unwrap() == &column.name => {
             let default_name = ConstraintNames::primary_key_name(&table.name, Some(connector));

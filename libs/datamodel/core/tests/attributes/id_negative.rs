@@ -214,16 +214,62 @@ fn mapped_id_must_error_on_mysql() {
         name           String            
         identification Int
 
-        @@id([name, identification], map: "Valid.But.Unwanted")
+        @@id([name, identification], map: "NotSupportedByProvider")
+    }
+    
+    model User1 {
+        name           String @id("NotSupportedByProvider")
     }
     "#;
 
     let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_model_validation_error(
-        "You defined a database name for the primary key on the model. This is not supported by the provider.",
-        "User",
-        Span::new(134, 286),
-    ));
+    errors.assert_are(&[
+        DatamodelError::new_model_validation_error(
+            "You defined a database name for the primary key on the model. This is not supported by the provider.",
+            "User",
+            Span::new(134, 290),
+        ),
+        DatamodelError::new_model_validation_error(
+            "You defined a database name for the primary key on the model. This is not supported by the provider.",
+            "User1",
+            Span::new(300, 379),
+        ),
+    ]);
+}
+
+#[test]
+fn mapped_id_must_error_on_sqlite() {
+    let dml = r#"
+    datasource test {
+        provider = "sqlite"
+        url = "file://...."
+    }
+    
+   model User {
+        name           String            
+        identification Int
+
+        @@id([name, identification], map: "NotSupportedByProvider")
+    }
+    
+    model User1 {
+        name           String @id("NotSupportedByProvider")
+    }
+    "#;
+
+    let errors = parse_error(dml);
+    errors.assert_are(&[
+        DatamodelError::new_model_validation_error(
+            "You defined a database name for the primary key on the model. This is not supported by the provider.",
+            "User",
+            Span::new(93, 249),
+        ),
+        DatamodelError::new_model_validation_error(
+            "You defined a database name for the primary key on the model. This is not supported by the provider.",
+            "User1",
+            Span::new(259, 338),
+        ),
+    ]);
 }
 
 #[test]
