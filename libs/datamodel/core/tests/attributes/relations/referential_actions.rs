@@ -318,3 +318,33 @@ fn on_delete_cannot_be_defined_on_the_wrong_side() {
         Span::new(92, 129),
     )]);
 }
+
+#[test]
+fn on_update_cannot_be_defined_on_the_wrong_side() {
+    let dml = indoc! { r#"
+        datasource db {
+            provider = "mysql"
+            url = "mysql://"
+        }
+
+        model A {
+            id Int @id
+            bs B[] @relation(onUpdate: Restrict)
+        }
+
+        model B {
+            id Int @id
+            aId Int
+            a A @relation(fields: [aId], references: [id], onUpdate: Restrict)
+        }
+    "#};
+
+    let message =
+        "The relation field `bs` on Model `A` must not specify the `onDelete` or `onUpdate` argument in the @relation attribute. You must only specify it on the opposite field `a` on model `B`, or in case of a many to many relation, in an explicit join table.";
+
+    parse_error(dml).assert_are(&[DatamodelError::new_attribute_validation_error(
+        &message,
+        "relation",
+        Span::new(92, 129),
+    )]);
+}
