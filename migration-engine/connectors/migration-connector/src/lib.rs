@@ -7,7 +7,8 @@ mod destructive_change_checker;
 mod diff;
 mod error;
 mod migration_persistence;
-mod migrations_directory;
+
+pub mod migrations_directory;
 
 pub use database_migration_step_applier::DatabaseMigrationStepApplier;
 pub use destructive_change_checker::{
@@ -16,15 +17,12 @@ pub use destructive_change_checker::{
 pub use diff::DiffTarget;
 pub use error::ConnectorError;
 pub use migration_persistence::{MigrationPersistence, MigrationRecord, PersistenceNotInitializedError, Timestamp};
-pub use migrations_directory::{
-    create_migration_directory, error_on_changed_provider, list_migrations, write_migration_lock_file,
-    ListMigrationsError, MigrationDirectory,
-};
 
+use migrations_directory::MigrationDirectory;
 use sha2::{Digest, Sha256};
 
 /// A boxed migration, opaque to the migration engine core. The connectors are
-/// sole responsible for producing and undirstanding migrations — the core just
+/// sole responsible for producing and understanding migrations — the core just
 /// orchestrates.
 pub struct Migration(Box<dyn std::any::Any + Send + Sync>);
 
@@ -116,7 +114,7 @@ const CHECKSUM_STR_LEN: usize = 64;
 
 /// Format a checksum to a hexadecimal string. This is used to checksum
 /// migration scripts with Sha256.
-pub trait FormatChecksum {
+trait FormatChecksum {
     /// Format a checksum to a hexadecimal string.
     fn format_checksum(&self) -> String;
     /// Obsolete checksum method, should only be used for compatibility.

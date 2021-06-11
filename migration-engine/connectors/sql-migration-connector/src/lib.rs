@@ -21,7 +21,7 @@ use connection_wrapper::Connection;
 use datamodel::{walkers::walk_models, Configuration, Datamodel};
 use error::quaint_error_to_connector_error;
 use flavour::SqlFlavour;
-use migration_connector::*;
+use migration_connector::{migrations_directory::MigrationDirectory, *};
 use pair::Pair;
 use quaint::{prelude::ConnectionInfo, single::Quaint};
 use sql_migration::{DropUserDefinedType, DropView, SqlMigration, SqlMigrationStep};

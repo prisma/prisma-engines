@@ -18,7 +18,7 @@ use crate::{
     sql_schema_differ::SqlSchemaDifferFlavour, SqlMigrationConnector,
 };
 use datamodel::Datamodel;
-use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
+use migration_connector::{migrations_directory::MigrationDirectory, ConnectorError, ConnectorResult};
 use quaint::prelude::{ConnectionInfo, Table};
 use sql_schema_describer::SqlSchema;
 use std::fmt::Debug;
