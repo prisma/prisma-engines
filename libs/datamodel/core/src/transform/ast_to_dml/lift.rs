@@ -1,6 +1,7 @@
 use std::str::FromStr;
 
 use super::super::attributes::AllAttributes;
+use super::names::Names;
 use crate::transform::helpers::ValueValidator;
 use crate::{ast, configuration, dml, Field, FieldType};
 use crate::{
@@ -20,6 +21,7 @@ use regex::Regex;
 pub struct LiftAstToDml<'a> {
     attributes: AllAttributes,
     source: Option<&'a configuration::Datasource>,
+    names: &'a Names<'a>,
 }
 
 impl<'a> LiftAstToDml<'a> {
@@ -27,10 +29,11 @@ impl<'a> LiftAstToDml<'a> {
     /// the attributes defined by the given sources registered.
     ///
     /// The attributes defined by the given sources will be namespaced.
-    pub fn new(source: Option<&'a configuration::Datasource>) -> LiftAstToDml<'a> {
+    pub(crate) fn new(source: Option<&'a configuration::Datasource>, names: &'a Names<'a>) -> LiftAstToDml<'a> {
         LiftAstToDml {
             attributes: AllAttributes::new(),
             source,
+            names,
         }
     }
 
@@ -333,7 +336,7 @@ impl<'a> LiftAstToDml<'a> {
             }
         } else if ast_schema.find_model(type_name).is_some() {
             Ok((dml::FieldType::Relation(dml::RelationInfo::new(type_name)), vec![]))
-        } else if ast_schema.find_enum(type_name).is_some() {
+        } else if self.names.get_enum(type_name, ast_schema).is_some() {
             Ok((dml::FieldType::Enum(type_name.clone()), vec![]))
         } else {
             self.resolve_custom_type(ast_field, ast_schema, checked_types)

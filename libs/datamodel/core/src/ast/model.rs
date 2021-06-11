@@ -1,5 +1,8 @@
 use super::*;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub(crate) struct FieldId(u32);
+
 /// A model declaration.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Model {
@@ -18,6 +21,13 @@ pub struct Model {
 }
 
 impl Model {
+    pub(crate) fn iter_fields(&self) -> impl Iterator<Item = (FieldId, &Field)> {
+        self.fields
+            .iter()
+            .enumerate()
+            .map(|(idx, field)| (FieldId(idx as u32), field))
+    }
+
     pub fn find_field(&self, name: &str) -> &Field {
         self.fields
             .iter()
