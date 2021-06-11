@@ -487,7 +487,7 @@ fn create_constraint_name_tests(api: TestApi) {
                 indoc! {
                     r#"
                     -- CreateTable
-                    CREATE TABLE [constraint_name_tests].[A] (
+                    CREATE TABLE [create_constraint_name_tests].[A] (
                         [id] INT NOT NULL,
                         [name] NVARCHAR(1000) NOT NULL,
                         [a] NVARCHAR(1000) NOT NULL,
@@ -500,7 +500,7 @@ fn create_constraint_name_tests(api: TestApi) {
                     );
                     
                     -- CreateTable
-                    CREATE TABLE [constraint_name_tests].[B] (
+                    CREATE TABLE [create_constraint_name_tests].[B] (
                         [a] NVARCHAR(1000) NOT NULL,
                         [b] NVARCHAR(1000) NOT NULL,
                         [aId] INT NOT NULL,
@@ -509,13 +509,13 @@ fn create_constraint_name_tests(api: TestApi) {
                     );
                     
                     -- CreateIndex
-                    CREATE INDEX [A_a_idx] ON [constraint_name_tests].[A]([a]);
+                    CREATE INDEX [A_a_idx] ON [create_constraint_name_tests].[A]([a]);
                     
                     -- CreateIndex
-                    CREATE INDEX [B_a_b_idx] ON [constraint_name_tests].[B]([a], [b]);
+                    CREATE INDEX [B_a_b_idx] ON [create_constraint_name_tests].[B]([a], [b]);
                     
                     -- AddForeignKey
-                    ALTER TABLE [constraint_name_tests].[B] ADD CONSTRAINT [B_aId_fkey] FOREIGN KEY ([aId]) REFERENCES [constraint_name_tests].[A]([id]) ON DELETE CASCADE ON UPDATE CASCADE;
+                    ALTER TABLE [create_constraint_name_tests].[B] ADD CONSTRAINT [B_aId_fkey] FOREIGN KEY ([aId]) REFERENCES [create_constraint_name_tests].[A]([id]) ON DELETE CASCADE ON UPDATE CASCADE;
                 "#
                 }
             } else if api.is_postgres() {
@@ -771,6 +771,8 @@ fn alter_constraint_name_tests(api: TestApi) {
                 "#
                 }
             }else if api.is_sqlite(){
+
+                //todo why is this a complete recreate???
                 indoc!{r#"
                 -- RedefineTables
                 PRAGMA foreign_keys=OFF;
@@ -800,7 +802,6 @@ fn alter_constraint_name_tests(api: TestApi) {
                 CREATE UNIQUE INDEX "CustomCompoundUnique" ON "A"("a", "b");
                 PRAGMA foreign_key_check;
                 PRAGMA foreign_keys=ON;
-                                                    
                 "#
             }} else {
                 ""
