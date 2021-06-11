@@ -5,9 +5,8 @@ import util._
 
 // RS: Ported
 class SettingNodeSelectorToNullSpec extends FlatSpec with Matchers with ApiSpecBase {
-
+  "Setting a where value to null " should " work when there is no further nesting " in {
     val project = ProjectDsl.fromString {
-      "Setting a where value to null " should " work when there is no further nesting " in {
         """
         |model A {
         |  id  String  @id @default(cuid())

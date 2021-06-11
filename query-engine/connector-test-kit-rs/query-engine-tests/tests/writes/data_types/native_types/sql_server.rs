@@ -41,10 +41,12 @@ mod sql_server {
         let schema = indoc! {
             r#"model Model {
             #id(inc_sInt, Int, @id, @default(autoincrement()) @test.SmallInt)
-            int  Int    @test.Int
-            sInt Int    @test.SmallInt
-            mInt Int    @test.MediumInt
-            bInt BigInt @test.BigInt
+            int  Int     @test.Int
+            sInt Int     @test.SmallInt
+            tInt Int     @test.TinyInt
+            bInt BigInt  @test.BigInt
+            bit  Int     @test.Bit
+            bool Boolean @test.Bit
           }"#
         };
 
@@ -90,7 +92,7 @@ mod sql_server {
               inc_int
             }
           }"#),
-          @r###"{"data":{"createOneModel":{"int":2147483647,"sInt":32767,"tInt":12,"bInt":"5294967295","bit": 1,"bool": false,"inc_int":1}}}"###
+          @r###"{"data":{"createOneModel":{"int":2147483647,"sInt":32767,"tInt":12,"bInt":"5294967295","bit":1,"bool":false,"inc_int":1}}}"###
         );
 
         Ok(())
@@ -119,7 +121,7 @@ mod sql_server {
             inc_tInt
           }
         }"#),
-          @r###"{"data":{"createOneModel":{"int":2147483647,"sInt":32767,"tInt":12,"bInt":"5294967295","bit": 1,"bool": false,"inc_tInt":1}}}"###
+          @r###"{"data":{"createOneModel":{"int":2147483647,"sInt":32767,"tInt":12,"bInt":"5294967295","bit":1,"bool":false,"inc_tInt":1}}}"###
         );
 
         Ok(())
@@ -148,7 +150,7 @@ mod sql_server {
             inc_sInt
           }
         }"#),
-          @r###"{"data":{"createOneModel":{"int":2147483647,"sInt":32767,"tInt":12,"bInt":"5294967295","bit": 1,"bool": false,"inc_sInt":1}}}"###
+          @r###"{"data":{"createOneModel":{"int":2147483647,"sInt":32767,"tInt":12,"bInt":"5294967295","bit":1,"bool":false,"inc_sInt":1}}}"###
         );
 
         Ok(())
@@ -177,7 +179,7 @@ mod sql_server {
             inc_bInt
           }
         }"#),
-          @r###"{"data":{"createOneModel":{"int":2147483647,"sInt":32767,"tInt":12,"bInt":"5294967295","bit": 1,"bool": false,"bInt":"1"}}}"###
+          @r###"{"data":{"createOneModel":{"int":2147483647,"sInt":32767,"tInt":12,"bInt":"5294967295","bit":1,"bool":false,"inc_bInt":"1"}}}"###
         );
 
         Ok(())
