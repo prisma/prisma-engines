@@ -68,6 +68,7 @@ impl<'schema, 'b> TableDiffer<'schema, 'b> {
 
     pub(crate) fn index_pairs<'a>(&'a self) -> impl Iterator<Item = Pair<IndexWalker<'schema>>> + 'a {
         let singular_indexes = self.previous_indexes().filter(move |left| {
+            // todo can this go???
             // Renaming an index in a situation where we have multiple indexes
             // with the same columns, but a different name, is highly unstable.
             // We do not rename them for now.

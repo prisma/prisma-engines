@@ -534,6 +534,12 @@ pub struct PrimaryKeyAssertion<'a> {
 }
 
 impl<'a> PrimaryKeyAssertion<'a> {
+    pub fn assert_constraint_name(self, constraint_name: Option<String>) -> Self {
+        assert_eq!(self.pk.constraint_name, constraint_name);
+
+        self
+    }
+
     pub fn assert_columns(self, column_names: &[&str]) -> Self {
         assert_eq!(self.pk.columns, column_names);
 

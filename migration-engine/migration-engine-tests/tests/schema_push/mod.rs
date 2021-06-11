@@ -159,3 +159,68 @@ fn multi_column_indexes_and_unique_constraints_on_the_same_fields_do_not_collide
 
     api.schema_push(dm).send_sync().assert_green_bang();
 }
+
+#[test_connector]
+fn alter_constraint_name_push(api: TestApi) {
+    let plain_dm = r#"
+        model A {
+          id   Int    @id
+          name String @unique
+          a    String
+          b    String
+          B    B[]    @relation("AtoB")
+
+          @@unique([a, b])
+          @@index([a])
+        }
+
+        model B {
+          a   String
+          b   String
+          aId Int
+          A   A      @relation("AtoB", fields: [aId], references: [id])
+
+          @@index([a,b])
+          @@id([a, b])
+        }
+    "#;
+
+    api.schema_push(plain_dm).send_sync().assert_green_bang();
+
+    let custom_dm = r#"
+        model A {
+          id   Int    @id("CustomId")
+          name String @unique("CustomUnique")
+          a    String
+          b    String
+          B    B[]    @relation("AtoB")
+
+          @@unique([a, b], name: "compound", map:"CustomCompoundUnique")
+          @@index([a], map: "CustomIndex")
+        }
+
+        model B {
+          a   String
+          b   String
+          aId Int
+          A   A      @relation("AtoB", fields: [aId], references: [id], map: "CustomFK")
+
+          @@index([a,b], map: "AnotherCustomIndex")
+          @@id([a, b], map: "CustomCompoundId")
+        }
+    "#;
+
+    api.schema_push(custom_dm).send_sync().assert_green_bang();
+
+    api.assert_schema().assert_table("A", |table| {
+        table.assert_pk(|pk| pk.assert_constraint_name(Some("CustomId".into())))
+        //2 uniques
+        //1 index
+    });
+
+    api.assert_schema().assert_table("B", |table| {
+        table.assert_pk(|pk| pk.assert_constraint_name(Some("CustomCompoundId".into())))
+        //1 index
+        //1 fk
+    });
+}

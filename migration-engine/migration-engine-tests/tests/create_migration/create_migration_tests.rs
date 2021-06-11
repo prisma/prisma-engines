@@ -452,7 +452,7 @@ fn no_additional_unique_created(api: TestApi) {
 }
 
 #[test_connector]
-fn constraint_name_tests(api: TestApi) {
+fn create_constraint_name_tests(api: TestApi) {
     let dm = r#"
         model A {
           id   Int    @id
@@ -624,6 +624,184 @@ fn constraint_name_tests(api: TestApi) {
                 
                 -- CreateIndex
                 CREATE INDEX "B_a_b_idx" ON "B"("a", "b");
+                "#
+            }} else {
+                ""
+            };
+
+            migration.assert_contents(expected_script)
+        });
+}
+
+#[test_connector]
+fn alter_constraint_name_tests(api: TestApi) {
+    let plain_dm = r#"
+        model A {
+          id   Int    @id
+          name String @unique
+          a    String
+          b    String
+          B    B[]    @relation("AtoB")
+
+          @@unique([a, b])
+          @@index([a])
+        }
+
+        model B {
+          a   String
+          b   String
+          aId Int
+          A   A      @relation("AtoB", fields: [aId], references: [id])
+
+          @@index([a,b])
+          @@id([a, b])
+        }
+    "#;
+
+    let dir = api.create_migrations_directory();
+    api.create_migration("plain", plain_dm, &dir).send_sync();
+
+    let custom_dm = r#"
+        model A {
+          id   Int    @id("CustomId")
+          name String @unique("CustomUnique")
+          a    String
+          b    String
+          B    B[]    @relation("AtoB")
+
+          @@unique([a, b], name: "compound", map:"CustomCompoundUnique")
+          @@index([a], map: "CustomIndex")
+        }
+
+        model B {
+          a   String
+          b   String
+          aId Int
+          A   A      @relation("AtoB", fields: [aId], references: [id], map: "CustomFK")
+
+          @@index([a,b], map: "AnotherCustomIndex")
+          @@id([a, b], map: "CustomCompoundId")
+        }
+    "#;
+
+    api.create_migration("custom", custom_dm, &dir)
+        .send_sync()
+        .assert_migration_directories_count(2)
+        .assert_migration("custom", |migration| {
+            let expected_script = if api.is_mssql() {
+
+                //todo use rename foreign key here instead of drop and recreate
+                indoc! {
+                    r#"
+                    -- DropForeignKey
+                    ALTER TABLE [alter_constraint_name_tests].[B] DROP CONSTRAINT [B_aId_fkey];
+                    
+                    -- AlterTable
+                    EXEC SP_RENAME N'alter_constraint_name_tests.A_pkey', N'CustomId';
+                    
+                    -- AlterTable
+                    EXEC SP_RENAME N'alter_constraint_name_tests.B_pkey', N'CustomCompoundId';
+                    
+                    -- AddForeignKey
+                    ALTER TABLE [alter_constraint_name_tests].[B] ADD CONSTRAINT [CustomFK] FOREIGN KEY ([aId]) REFERENCES [alter_constraint_name_tests].[A]([id]) ON DELETE CASCADE ON UPDATE CASCADE;
+                    
+                    -- AlterIndex
+                    EXEC SP_RENAME N'alter_constraint_name_tests.A.A_a_b_key', N'CustomCompoundUnique', N'INDEX';
+                    
+                    -- AlterIndex
+                    EXEC SP_RENAME N'alter_constraint_name_tests.A.A_a_idx', N'CustomIndex', N'INDEX';
+                    
+                    -- AlterIndex
+                    EXEC SP_RENAME N'alter_constraint_name_tests.A.A_name_key', N'CustomUnique', N'INDEX';
+                    
+                    -- AlterIndex
+                    EXEC SP_RENAME N'alter_constraint_name_tests.B.B_a_b_idx', N'AnotherCustomIndex', N'INDEX';
+                "#
+                }
+            } else if api.is_postgres() {
+
+                //Todo postgres use rename constraint for foreign keys as well
+                indoc! {
+                    r#"
+                    -- DropForeignKey
+                    ALTER TABLE "B" DROP CONSTRAINT "B_aId_fkey";
+                    
+                    -- AlterTable
+                    ALTER TABLE "A" RENAME CONSTRAINT "A_pkey" TO "CustomId";
+                    
+                    -- AlterTable
+                    ALTER TABLE "B" RENAME CONSTRAINT "B_pkey" TO "CustomCompoundId";
+                    
+                    -- AddForeignKey
+                    ALTER TABLE "B" ADD CONSTRAINT "CustomFK" FOREIGN KEY ("aId") REFERENCES "A"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+                    
+                    -- AlterIndex
+                    ALTER INDEX "A_a_b_key" RENAME TO "CustomCompoundUnique";
+                    
+                    -- AlterIndex
+                    ALTER INDEX "A_a_idx" RENAME TO "CustomIndex";
+                    
+                    -- AlterIndex
+                    ALTER INDEX "A_name_key" RENAME TO "CustomUnique";
+                    
+                    -- AlterIndex
+                    ALTER INDEX "B_a_b_idx" RENAME TO "AnotherCustomIndex";
+                "#
+                }
+            } else if api.is_mysql(){
+                indoc! {
+                    r#"
+                -- DropForeignKey
+                ALTER TABLE `B` DROP FOREIGN KEY `B_aId_fkey`;
+                
+                -- AddForeignKey
+                ALTER TABLE `B` ADD CONSTRAINT `CustomFK` FOREIGN KEY (`aId`) REFERENCES `A`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+                
+                -- AlterIndex
+                ALTER TABLE `A` RENAME INDEX `A_a_b_key` TO `CustomCompoundUnique`;
+                
+                -- AlterIndex
+                ALTER TABLE `A` RENAME INDEX `A_a_idx` TO `CustomIndex`;
+                
+                -- AlterIndex
+                ALTER TABLE `A` RENAME INDEX `A_name_key` TO `CustomUnique`;
+                
+                -- AlterIndex
+                ALTER TABLE `B` RENAME INDEX `B_a_b_idx` TO `AnotherCustomIndex`;
+                
+                "#
+                }
+            }else if api.is_sqlite(){
+                indoc!{r#"
+                -- RedefineTables
+                PRAGMA foreign_keys=OFF;
+                CREATE TABLE "new_B" (
+                    "a" TEXT NOT NULL,
+                    "b" TEXT NOT NULL,
+                    "aId" INTEGER NOT NULL,
+                            
+                    PRIMARY KEY ("a", "b"),
+                    CONSTRAINT "CustomFK" FOREIGN KEY ("aId") REFERENCES "A" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+                );
+                INSERT INTO "new_B" ("a", "aId", "b") SELECT "a", "aId", "b" FROM "B";
+                DROP TABLE "B";
+                ALTER TABLE "new_B" RENAME TO "B";
+                CREATE INDEX "AnotherCustomIndex" ON "B"("a", "b");
+                CREATE TABLE "new_A" (
+                    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+                    "name" TEXT NOT NULL,
+                    "a" TEXT NOT NULL,
+                    "b" TEXT NOT NULL
+                );
+                INSERT INTO "new_A" ("a", "b", "id", "name") SELECT "a", "b", "id", "name" FROM "A";
+                DROP TABLE "A";
+                ALTER TABLE "new_A" RENAME TO "A";
+                CREATE INDEX "CustomIndex" ON "A"("a");
+                CREATE UNIQUE INDEX "CustomUnique" ON "A"("name");
+                CREATE UNIQUE INDEX "CustomCompoundUnique" ON "A"("a", "b");
+                PRAGMA foreign_key_check;
+                PRAGMA foreign_keys=ON;
+                                                    
                 "#
             }} else {
                 ""

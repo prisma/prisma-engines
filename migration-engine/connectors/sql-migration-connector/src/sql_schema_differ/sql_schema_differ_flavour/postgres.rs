@@ -63,6 +63,7 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
         // Implements correct comparison for truncated index names.
         let (previous_name, next_name) = pair.as_ref().map(|idx| idx.name()).into_tuple();
 
+        //todo can this go now after the addition of explicit constraint names??? we now have length validation in the datamodel
         if previous_name.len() == POSTGRES_IDENTIFIER_SIZE_LIMIT && next_name.len() > POSTGRES_IDENTIFIER_SIZE_LIMIT {
             previous_name[0..POSTGRES_IDENTIFIER_SIZE_LIMIT] != next_name[0..POSTGRES_IDENTIFIER_SIZE_LIMIT]
         } else {

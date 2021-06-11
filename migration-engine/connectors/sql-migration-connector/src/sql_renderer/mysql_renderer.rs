@@ -108,6 +108,7 @@ impl SqlRenderer for MysqlFlavour {
         for change in changes {
             match change {
                 TableChange::DropPrimaryKey => lines.push(sql_ddl::mysql::AlterTableClause::DropPrimaryKey.to_string()),
+                TableChange::RenamePrimaryKey => unreachable!("No Renaming Primary Keys on Mysql"),
                 TableChange::AddPrimaryKey { columns } => lines.push(format!(
                     "ADD PRIMARY KEY ({})",
                     columns.iter().map(|colname| self.quote(colname)).join(", ")

@@ -9,6 +9,7 @@ pub(crate) use column::{ColumnChange, ColumnChanges};
 pub(crate) use sql_schema_differ_flavour::SqlSchemaDifferFlavour;
 
 use self::differ_database::DifferDatabase;
+use crate::sql_migration::TableChange::RenamePrimaryKey;
 use crate::{
     pair::Pair,
     sql_migration::{
@@ -157,6 +158,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                 // Order matters.
                 let changes: Vec<TableChange> = SqlSchemaDiffer::drop_primary_key(&differ)
                     .into_iter()
+                    .chain(SqlSchemaDiffer::rename_primary_key(&differ))
                     .chain(SqlSchemaDiffer::drop_columns(&differ))
                     .chain(SqlSchemaDiffer::add_columns(&differ))
                     .chain(SqlSchemaDiffer::alter_columns(&differ).into_iter())
@@ -295,6 +297,22 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         } else {
             from_psl_change
         }
+    }
+
+    fn rename_primary_key(differ: &TableDiffer<'_, '_>) -> Option<TableChange> {
+        if let Some(previous_pk) = differ.tables.previous().primary_key() {
+            if let Some(next_pk) = differ.tables.next().primary_key() {
+                if let Some(previous_name) = &previous_pk.constraint_name {
+                    if let Some(next_name) = &next_pk.constraint_name {
+                        if previous_name != next_name {
+                            return Some(RenamePrimaryKey);
+                        }
+                    }
+                }
+            }
+        }
+
+        None
     }
 
     fn push_create_indexes(&self, tables_to_redefine: &HashSet<String>, steps: &mut Vec<SqlMigrationStep>) {

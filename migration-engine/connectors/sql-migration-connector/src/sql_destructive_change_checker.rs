@@ -142,6 +142,7 @@ impl SqlMigrationConnector {
                                     .check_drop_and_recreate_column(&columns, changes, &mut plan, step_index)
                             }
                             TableChange::AddPrimaryKey { .. } => (),
+                            TableChange::RenamePrimaryKey { .. } => (),
                         }
                     }
                 }

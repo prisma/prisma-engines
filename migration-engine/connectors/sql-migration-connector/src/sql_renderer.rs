@@ -37,6 +37,10 @@ pub(crate) trait SqlRenderer {
         unreachable!("unreachable render_alter_index")
     }
 
+    fn render_alter_primary_key(&self, _tables: Pair<&TableWalker<'_>>) -> Vec<String> {
+        unreachable!("unreachable render_alter_index")
+    }
+
     fn render_alter_table(&self, alter_table: &AlterTable, schemas: &Pair<&SqlSchema>) -> Vec<String>;
 
     /// Render a `CreateEnum` step.

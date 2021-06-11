@@ -1,4 +1,5 @@
 use super::render_default;
+use crate::sql_renderer::common::Quoted;
 use crate::{
     flavour::MssqlFlavour,
     pair::Pair,
@@ -25,6 +26,7 @@ pub(crate) fn create_statements(
         changes,
         drop_constraints: BTreeSet::new(),
         add_constraints: BTreeSet::new(),
+        rename_primary_key: false,
         add_columns: Vec::new(),
         drop_columns: Vec::new(),
         column_mods: Vec::new(),
@@ -38,6 +40,7 @@ struct AlterTableConstructor<'a> {
     tables: Pair<TableWalker<'a>>,
     changes: &'a [TableChange],
     drop_constraints: BTreeSet<String>,
+    rename_primary_key: bool,
     add_constraints: BTreeSet<String>,
     add_columns: Vec<String>,
     drop_columns: Vec<String>,
@@ -50,6 +53,9 @@ impl<'a> AlterTableConstructor<'a> {
             match change {
                 TableChange::DropPrimaryKey => {
                     self.drop_primary_key();
+                }
+                TableChange::RenamePrimaryKey => {
+                    self.rename_primary_key = true;
                 }
                 TableChange::AddPrimaryKey { columns } => {
                     self.add_primary_key(&columns);
@@ -81,6 +87,34 @@ impl<'a> AlterTableConstructor<'a> {
                 "ALTER TABLE {} DROP CONSTRAINT {}",
                 self.renderer.quote_with_schema(self.tables.previous().name()),
                 self.drop_constraints.iter().join(",\n"),
+            ));
+        }
+
+        if self.rename_primary_key {
+            let with_schema = format!(
+                "{}.{}",
+                self.renderer.schema_name(),
+                self.tables
+                    .previous()
+                    .primary_key()
+                    .unwrap()
+                    .constraint_name
+                    .as_ref()
+                    .unwrap()
+            );
+
+            statements.push(format!(
+                "EXEC SP_RENAME N{}, N{}",
+                Quoted::Single(with_schema),
+                Quoted::Single(
+                    self.tables
+                        .next()
+                        .primary_key()
+                        .unwrap()
+                        .constraint_name
+                        .as_ref()
+                        .unwrap()
+                ),
             ));
         }
 
@@ -135,6 +169,7 @@ impl<'a> AlterTableConstructor<'a> {
             quoted_columns.push(format!("{}", self.renderer.quote(colname)));
         }
 
+        //todo this naming looks off, why is this not using the constraint name???
         self.add_constraints.insert(format!(
             "CONSTRAINT PK__{}__{} PRIMARY KEY ({})",
             self.tables.next().name(),

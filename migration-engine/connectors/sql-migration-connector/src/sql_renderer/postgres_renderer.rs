@@ -250,6 +250,24 @@ impl SqlRenderer for PostgresFlavour {
                             .expect("Missing constraint name for DROP CONSTRAINT on Postgres.")
                     )
                 )),
+
+                TableChange::RenamePrimaryKey => lines.push(format!(
+                    "RENAME CONSTRAINT {} TO {}",
+                    Quoted::postgres_ident(
+                        tables
+                            .previous()
+                            .primary_key()
+                            .and_then(|pk| pk.constraint_name.as_ref())
+                            .expect("Missing constraint name for DROP CONSTRAINT on Postgres.")
+                    ),
+                    Quoted::postgres_ident(
+                        tables
+                            .next()
+                            .primary_key()
+                            .and_then(|pk| pk.constraint_name.as_ref())
+                            .expect("Missing constraint name for DROP CONSTRAINT on Postgres.")
+                    )
+                )),
                 TableChange::AddPrimaryKey { columns } => lines.push(format!(
                     "ADD PRIMARY KEY ({})",
                     columns.iter().map(|colname| self.quote(colname)).join(", ")
