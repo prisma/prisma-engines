@@ -89,8 +89,9 @@ pub mod walkers;
 
 pub use crate::dml::*;
 pub use configuration::*;
+use diagnostics::Diagnostics;
 
-use crate::diagnostics::{Validated, ValidatedConfiguration, ValidatedDatamodel, ValidatedDatasources};
+use crate::diagnostics::{Validated, ValidatedConfiguration, ValidatedDatamodel};
 use crate::{ast::SchemaAst, common::preview_features::PreviewFeature};
 use std::collections::HashSet;
 use transform::{
@@ -138,13 +139,12 @@ fn parse_datamodel_internal(
     let mut diagnostics = diagnostics::Diagnostics::new();
     let ast = ast::parse_schema(datamodel_string)?;
 
-    let generators = GeneratorLoader::load_generators_from_ast(&ast)?;
-    let preview_features = generators.preview_features();
-    let sources = load_sources(&ast, &&preview_features)?;
-    let validator = ValidationPipeline::new(&sources.subject);
+    let generators = GeneratorLoader::load_generators_from_ast(&ast, &mut diagnostics);
+    let preview_features = preview_features(&generators);
+    let datasources = load_sources(&ast, &preview_features, &mut &mut diagnostics);
+    let validator = ValidationPipeline::new(&datasources);
 
-    diagnostics.append_warning_vec(sources.warnings);
-    diagnostics.append_warning_vec(generators.warnings);
+    diagnostics.to_result()?;
 
     match validator.validate(&ast, transform) {
         Ok(mut src) => {
@@ -152,8 +152,8 @@ fn parse_datamodel_internal(
             Ok(Validated {
                 subject: (
                     Configuration {
-                        generators: generators.subject,
-                        datasources: sources.subject,
+                        generators,
+                        datasources,
                     },
                     src.subject,
                 ),
@@ -173,30 +173,30 @@ pub fn parse_schema_ast(datamodel_string: &str) -> Result<SchemaAst, diagnostics
 
 /// Loads all configuration blocks from a datamodel using the built-in source definitions.
 pub fn parse_configuration(schema: &str) -> Result<ValidatedConfiguration, diagnostics::Diagnostics> {
-    let mut warnings = Vec::new();
     let ast = ast::parse_schema(schema)?;
-    let mut validated_generators = GeneratorLoader::load_generators_from_ast(&ast)?;
-    let preview_features = validated_generators.preview_features();
-    let mut validated_sources = load_sources(&ast, &preview_features)?;
+    let mut diagnostics = Diagnostics::default();
+    let generators = GeneratorLoader::load_generators_from_ast(&ast, &mut diagnostics);
+    let preview_features = preview_features(&generators);
+    let datasources = load_sources(&ast, &preview_features, &mut diagnostics);
 
-    warnings.append(&mut validated_generators.warnings);
-    warnings.append(&mut validated_sources.warnings);
+    diagnostics.to_result()?;
 
     Ok(ValidatedConfiguration {
         subject: Configuration {
-            datasources: validated_sources.subject,
-            generators: validated_generators.subject,
+            datasources,
+            generators,
         },
-        warnings,
+        warnings: diagnostics.warnings,
     })
 }
 
 fn load_sources(
     schema_ast: &SchemaAst,
     preview_features: &HashSet<&PreviewFeature>,
-) -> Result<ValidatedDatasources, diagnostics::Diagnostics> {
+    diagnostics: &mut Diagnostics,
+) -> Vec<Datasource> {
     let source_loader = DatasourceLoader::new();
-    source_loader.load_datasources_from_ast(&schema_ast, preview_features)
+    source_loader.load_datasources_from_ast(&schema_ast, preview_features, diagnostics)
 }
 
 //
@@ -259,4 +259,8 @@ fn render_datamodel_and_config_to(
 fn render_schema_ast_to(stream: &mut dyn std::fmt::Write, schema: &ast::SchemaAst, ident_width: usize) {
     let mut renderer = ast::Renderer::new(stream, ident_width);
     renderer.render(schema);
+}
+
+fn preview_features(generators: &[Generator]) -> HashSet<&PreviewFeature> {
+    generators.iter().flat_map(|gen| gen.preview_features.iter()).collect()
 }
