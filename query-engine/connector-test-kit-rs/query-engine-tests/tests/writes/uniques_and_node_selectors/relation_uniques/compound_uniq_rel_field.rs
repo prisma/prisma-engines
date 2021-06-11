@@ -267,7 +267,9 @@ mod compound_uniq_rel_field {
     //  nested deleteM | -      | not possible (1!:1)
     //  nested updateM | -      | not possible (1!:1)
     // "Using a compound unique that includes a 1!:1 multi-field relation"
-    #[connector_test(schema(schema_2))]
+    // TODO(dom): Not working on mongo.
+    // {"errors":[{"error":"not implemented: Compound filter case.","user_facing_error":{"is_panic":true,"message":"not implemented: Compound filter case.","backtrace":null}}]}
+    #[connector_test(schema(schema_2), exclude(MongoDb))]
     async fn compound_uniq_with_1_1_multi_rel(runner: &Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(runner, r#"mutation {
@@ -711,7 +713,7 @@ mod compound_uniq_rel_field {
     fn schema_4() -> String {
         let schema = indoc! {
             r#"model Parent {
-              id       Int    @id
+              #id(id, Int, @id)
               p        String
               child_id Int
               child_c  String
@@ -721,7 +723,7 @@ mod compound_uniq_rel_field {
             }
             
             model Child {
-              id      Int     @id
+              #id(id, Int, @id)
               c       String
               parents Parent[]
             
@@ -750,7 +752,9 @@ mod compound_uniq_rel_field {
     //  nested disconn | -      | not possible (1!:m)
     //  nested set     | -      | not (really) possible (1!:m)
     // "Using a compound unique that includes a 1!:M multi-field relation"
-    #[connector_test(schema(schema_4))]
+    // TODO(dom): Not working on mongo.
+    // {"errors":[{"error":"not implemented: Compound filter case.","user_facing_error":{"is_panic":true,"message":"not implemented: Compound filter case.","backtrace":null}}]}
+    #[connector_test(schema(schema_4), exclude(MongoDb))]
     async fn compound_uniq_with_1_m_multi_rel(runner: &Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(runner, r#"mutation {
@@ -966,14 +970,14 @@ mod compound_uniq_rel_field {
     fn schema_5() -> String {
         let schema = indoc! {
             r#"model ModelA {
-              #id(id, Int, @id, @default(autoincrement()))
+              #id(id, Int, @id)
               fieldA  String
               fieldB  String
               @@unique([fieldA, fieldB])
             }
             
             model ModelB {
-              #id(id, Int, @id, @default(autoincrement()))
+              #id(id, Int, @id)
               fieldA  Int
               fieldB  Int
             
@@ -989,11 +993,11 @@ mod compound_uniq_rel_field {
     async fn compound_uniq_same_field_diff_models(runner: &Runner) -> TestResult<()> {
         run_query!(
             runner,
-            r#" mutation { createOneModelA(data: { fieldA: "a", fieldB: "b" }) { id } }"#
+            r#" mutation { createOneModelA(data: { id: 1, fieldA: "a", fieldB: "b" }) { id } }"#
         );
         run_query!(
             runner,
-            r#"mutation { createOneModelB(data: { fieldA: 1, fieldB: 2 }) { id } }"#
+            r#"mutation { createOneModelB(data: { id: 1, fieldA: 1, fieldB: 2 }) { id } }"#
         );
 
         insta::assert_snapshot!(

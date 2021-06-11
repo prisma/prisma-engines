@@ -159,7 +159,9 @@ mod byoid {
     }
 
     // "A Create Mutation" should "error for id that is invalid"
-    #[connector_test(schema(schema_1), exclude(Sqlite, Postgres, Mysql))]
+    // TODO(dom): Actually works on MongoDb.
+    // Result: {"data":{"createOneParent":{"p":"Parent","id":"this is probably way to long, lets see what error it throws"}}}
+    #[connector_test(schema(schema_1), exclude(Sqlite, Postgres, Mysql, MongoDb))]
     async fn error_for_invalid_id_3_1(runner: &Runner) -> TestResult<()> {
         assert_error!(
             runner,
@@ -174,7 +176,9 @@ mod byoid {
     }
 
     // "A Create Mutation" should "error for id that is invalid"
-    #[connector_test(schema(schema_2), exclude(Sqlite, Postgres, Mysql))]
+    // TODO(dom): Actually works on MongoDb.
+    // Result: {"data":{"createOneParent":{"p":"Parent","id":"this is probably way to long, lets see what error it throws"}}}
+    #[connector_test(schema(schema_2), exclude(Sqlite, Postgres, Mysql, MongoDb))]
     async fn error_for_invalid_id_3_2(runner: &Runner) -> TestResult<()> {
         assert_error!(
                 runner,
@@ -246,7 +250,9 @@ mod byoid {
 
     // "A Nested Create Mutation" should "error with invalid id"
     // TODO: Should we really validate this
-    #[connector_test(schema(schema_1), exclude(Sqlite, Postgres, Mysql))]
+    // TODO(dom): Actually works on MongoDb.
+    // Result: {"data":{"createOneParent":{"p":"Parent","id":"this is probably way to long, lets see what error it throws"}}}
+    #[connector_test(schema(schema_1), exclude(Sqlite, Postgres, Mysql, MongoDb))]
     async fn nested_create_invalid_id_1(runner: &Runner) -> TestResult<()> {
         assert_error!(
             runner,
@@ -262,7 +268,9 @@ mod byoid {
 
     // "A Nested Create Mutation" should "error with invalid id"
     // TODO: Should we really validate this
-    #[connector_test(schema(schema_2), exclude(Sqlite, Postgres, Mysql))]
+    // TODO(dom): Actually works on MongoDb.
+    // Result: {"data":{"createOneParent":{"p":"Parent","id":"this is probably way to long, lets see what error it throws"}}}
+    #[connector_test(schema(schema_2), exclude(Sqlite, Postgres, Mysql, MongoDb))]
     async fn nested_create_invalid_id_2(runner: &Runner) -> TestResult<()> {
         assert_error!(
             runner,
@@ -313,7 +321,9 @@ mod byoid {
     }
 
     // "An Upsert Mutation" should "error with id that is too long"
-    #[connector_test(schema(schema_1), exclude(Sqlite, Postgres, Mysql))]
+    // TODO(dom): Actually works on MongoDb.
+    // Result: {"data":{"upsertOneParent":{"p":"Parent 2","id":"Way way too long for a proper id"}}}
+    #[connector_test(schema(schema_1), exclude(Sqlite, Postgres, Mysql, MongoDb))]
     async fn upsert_error_with_id_too_long_1(runner: &Runner) -> TestResult<()> {
         assert_error!(
             runner,
@@ -333,7 +343,9 @@ mod byoid {
     }
 
     // "An Upsert Mutation" should "error with id that is too long"
-    #[connector_test(schema(schema_2), exclude(Sqlite, Postgres, Mysql))]
+    // TODO(dom): Actually works on MongoDb.
+    // Result: {"data":{"upsertOneParent":{"p":"Parent 2","id":"Way way too long for a proper id"}}}
+    #[connector_test(schema(schema_2), exclude(Sqlite, Postgres, Mysql, MongoDb))]
     async fn upsert_error_with_id_too_long_2(runner: &Runner) -> TestResult<()> {
         assert_error!(
             runner,

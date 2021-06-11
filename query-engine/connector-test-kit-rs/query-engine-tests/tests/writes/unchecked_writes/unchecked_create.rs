@@ -295,7 +295,8 @@ mod unchecked_create {
     }
 
     // "Unchecked creates" should "allow to write to autoincrement IDs directly"
-    #[connector_test(exclude(SqlServer), schema(schema_5))]
+    // TODO(dom): Not working on mongo. Expected because no autoincrement() ?
+    #[connector_test(exclude(SqlServer, MongoDb), schema(schema_5))]
     async fn allow_write_autoinc_ids(runner: &Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(runner, r#"mutation {

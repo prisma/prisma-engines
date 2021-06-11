@@ -155,7 +155,7 @@ mod mysql {
               inc_bInt
             }
           }"#),
-          @r###"{"data":{"createOneModel":{"int":2147483647,"sInt":32767,"mInt":8388607,"bInt":"5294967295","int_bInt":"1"}}}"###
+          @r###"{"data":{"createOneModel":{"int":2147483647,"sInt":32767,"mInt":8388607,"bInt":"5294967295","inc_bInt":"1"}}}"###
         );
 
         Ok(())
@@ -348,8 +348,6 @@ mod mysql {
     // "Other MySQL native types" should "work"
     #[connector_test(schema(schema_other_native_types))]
     async fn other_native_types(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
-
         insta::assert_snapshot!(
           run_query!(runner, r#"mutation {
             createOneModel(
@@ -401,20 +399,6 @@ mod mysql {
           @r###"{"data":{"createOneModelA":{"id":"1234","b":{"id":"4321"}}}}"###
         );
 
-        Ok(())
-    }
-
-    async fn create_test_data(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{ uniqueField: 1, nonUniqFieldA: "A", nonUniqFieldB: "A"}"#).await?;
-
-        Ok(())
-    }
-
-    async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
-        runner
-            .query(format!("mutation {{ createOneTestModel(data: {}) {{ id }} }}", data))
-            .await?
-            .assert_success();
         Ok(())
     }
 }

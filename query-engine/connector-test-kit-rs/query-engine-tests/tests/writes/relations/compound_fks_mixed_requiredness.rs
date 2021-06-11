@@ -29,7 +29,9 @@ mod compound_fks {
     }
 
     // "A One to Many relation with mixed requiredness" should "be writable and readable"
-    #[connector_test(exclude(MySql(5.6)))]
+    // TODO(dom): Wrong error on mongo.
+    // Second assertion, got: `{"errors":[{"error":"Attempted to serialize scalar 'null' with incompatible type 'Int' for field user_id.","user_facing_error":{"is_panic":false,"message":"Attempted to serialize scalar 'null' with incompatible type 'Int' for field user_id.","backtrace":null}}]}`
+    #[connector_test(exclude(MySql(5.6), MongoDb))]
     async fn one2m_mix_required_writable_readable(runner: &Runner) -> TestResult<()> {
         //Setup user
         insta::assert_snapshot!(

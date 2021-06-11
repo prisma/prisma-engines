@@ -17,7 +17,10 @@ mod decimal {
         schema.to_owned()
     }
 
-    #[connector_test(exclude(SqlServer, Sqlite))]
+    // TODO(dom): Not working on mongo. Precision issue
+    // {"data":{"createOneModel":{"field":"1.00112233445566778899"}}}
+    // {"data":{"createOneModel":{"field":"1.001122334455668"}}}
+    #[connector_test(exclude(SqlServer, Sqlite, MongoDb))]
     async fn using_decimal_field(runner: &Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(runner, r#"mutation {

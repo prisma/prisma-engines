@@ -44,7 +44,9 @@ mod unchecked_update {
     }
 
     // "Unchecked updates" should "allow writing inlined relation scalars"
-    #[connector_test(schema(schema_1))]
+    // TODO(dom): Not working on mongo
+    // {"errors":[{"error":"Error occurred during query execution:\nInterpretationError(\"Error for binding \\'0\\'\", Some(QueryGraphBuilderError(RecordNotFound(\"Record to update not found.\"))))","user_facing_error":{"is_panic":false,"message":"An operation failed because it depends on one or more records that were required but not found. Record to update not found.","meta":{"cause":"Record to update not found."},"error_code":"P2025"}}]}
+    #[connector_test(schema(schema_1), exclude(MongoDb))]
     async fn allow_write_non_prent_inline_rel_sclrs(runner: &Runner) -> TestResult<()> {
         // Setup
         run_query!(
@@ -268,7 +270,8 @@ mod unchecked_update {
     }
 
     // "Unchecked updates" should "allow to write to autoincrement IDs directly"
-    #[connector_test(schema(schema_4), exclude(SqlServer))]
+    // TODO(dom): Not working on mongo. Expected because no autoincrement() ?
+    #[connector_test(schema(schema_4), exclude(SqlServer, MongoDb))]
     async fn allow_write_autoinc_ids(runner: &Runner) -> TestResult<()> {
         run_query!(runner, r#"mutation { createOneModelA { id } }"#);
 

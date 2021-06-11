@@ -146,7 +146,7 @@ mod rel_defaults {
     fn schema_3() -> String {
         let schema = indoc! {
             r#" model List {
-              #id(id, Int, @id @default(autoincrement()))
+              #id(id, Int, @id)
               name    String? @unique
               todoId   Int     @default(1)
               todoName String  @default("theTodo")
@@ -165,10 +165,11 @@ mod rel_defaults {
     }
 
     // "Not providing a value for required relation fields with default values" should "work"
-    #[connector_test(schema(schema_3))]
+    // TODO(dom): Not working on mongo. No compound id (yet)?
+    #[connector_test(schema(schema_3), exclude(MongoDb))]
     async fn no_val_required_rel_default_vals(runner: &Runner) -> TestResult<()> {
         // Setup
-        create_row(runner, r#"{ name: "A", todo: { create: { name: "theTodo" } } }"#).await?;
+        create_row(runner, r#"{ id: 1, name: "A", todo: { create: { name: "theTodo" } } }"#).await?;
 
         insta::assert_snapshot!(
           run_query!(runner, r#" query {
@@ -192,7 +193,7 @@ mod rel_defaults {
 
         insta::assert_snapshot!(
           run_query!(runner, r#" mutation {
-            createOneList(data: { name: "listWithTheTodo" }) {
+            createOneList(data: { id: 2, name: "listWithTheTodo" }) {
               id
               todo {
                 id

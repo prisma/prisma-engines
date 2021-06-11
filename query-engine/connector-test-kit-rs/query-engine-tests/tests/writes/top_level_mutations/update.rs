@@ -190,7 +190,7 @@ mod update {
     }
 
     // "An updateOne mutation" should "update enums"
-    #[connector_test(schema(schema_3), exclude(SqlServer))]
+    #[connector_test(schema(schema_3), exclude(SqlServer, Sqlite))]
     async fn update_enums(runner: &Runner) -> TestResult<()> {
         create_row(runner, r#"{ id: 1 }"#).await?;
 
