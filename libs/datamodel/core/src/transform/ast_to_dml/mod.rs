@@ -6,13 +6,14 @@ mod datasource_loader;
 mod datasource_provider;
 mod generator_loader;
 mod lift;
-mod precheck;
+mod names;
 mod standardise_formatting;
 mod standardise_parsing;
 mod validate;
 mod validation_pipeline;
 
 use lift::*;
+use names::Names;
 use standardise_formatting::*;
 use validate::*;
 

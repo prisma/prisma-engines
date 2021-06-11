@@ -1,3 +1,4 @@
+use super::Names;
 use crate::{
     ast, configuration,
     diagnostics::{DatamodelError, Diagnostics},
@@ -25,11 +26,16 @@ const PRISMA_FORMAT_HINT: &str = "You can run `prisma format` to fix this automa
 
 impl<'a> Validator<'a> {
     /// Creates a new instance, with all builtin attributes registered.
-    pub fn new(source: Option<&'a configuration::Datasource>) -> Validator<'a> {
+    pub(crate) fn new(source: Option<&'a configuration::Datasource>) -> Validator<'a> {
         Self { source }
     }
 
-    pub fn validate(&self, ast_schema: &ast::SchemaAst, schema: &mut dml::Datamodel) -> Result<(), Diagnostics> {
+    pub(crate) fn validate(
+        &self,
+        ast_schema: &ast::SchemaAst,
+        names: &Names<'_>,
+        schema: &mut dml::Datamodel,
+    ) -> Result<(), Diagnostics> {
         let mut all_errors = Diagnostics::new();
 
         if let Err(ref mut errs) = self.validate_names(ast_schema) {
@@ -125,7 +131,7 @@ impl<'a> Validator<'a> {
         for declared_enum in schema.enums() {
             let mut errors_for_enum = Diagnostics::new();
             if let Err(err) = self.validate_enum_name(
-                ast_schema.find_enum(&declared_enum.name).expect(STATE_ERROR),
+                names.get_enum(&declared_enum.name, ast_schema).expect(STATE_ERROR),
                 declared_enum,
             ) {
                 errors_for_enum.push_error(err);
