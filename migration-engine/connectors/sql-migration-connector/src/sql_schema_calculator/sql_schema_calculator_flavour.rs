@@ -45,18 +45,9 @@ pub(crate) trait SqlSchemaCalculatorFlavour {
     }
 
     fn on_delete_action(&self, rf: &RelationFieldWalker<'_>) -> sql::ForeignKeyAction {
-        let default = || {
-            rf.default_on_delete_action()
-                .map(convert_referential_action)
-                .unwrap_or_else(|| match rf.arity() {
-                    FieldArity::Required => sql::ForeignKeyAction::Restrict,
-                    _ => sql::ForeignKeyAction::SetNull,
-                })
-        };
-
         rf.on_delete_action()
             .map(convert_referential_action)
-            .unwrap_or_else(default)
+            .unwrap_or_else(|| convert_referential_action(rf.default_on_delete_action()))
     }
 
     fn m2m_foreign_key_action(&self, _model_a: &ModelWalker<'_>, _model_b: &ModelWalker<'_>) -> sql::ForeignKeyAction {
@@ -76,8 +67,5 @@ fn convert_referential_action(action: ReferentialAction) -> sql::ForeignKeyActio
         ReferentialAction::NoAction => sql::ForeignKeyAction::NoAction,
         ReferentialAction::SetNull => sql::ForeignKeyAction::SetNull,
         ReferentialAction::SetDefault => sql::ForeignKeyAction::SetDefault,
-        // These will be only used for databases with no foreign keys.
-        ReferentialAction::EmulateSetNull => unreachable!("EmulateSetNull conversion"),
-        ReferentialAction::EmulateRestrict => unreachable!("EmulateRestrict conversion"),
     }
 }

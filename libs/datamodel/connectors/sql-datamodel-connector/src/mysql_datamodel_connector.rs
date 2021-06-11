@@ -69,7 +69,7 @@ impl MySqlDatamodelConnector {
     pub fn new(is_planetscale: bool) -> MySqlDatamodelConnector {
         use ReferentialAction::*;
 
-        let capabilities = vec![
+        let mut capabilities = vec![
             ConnectorCapability::RelationsOverNonUniqueCriteria,
             ConnectorCapability::Enums,
             ConnectorCapability::Json,
@@ -84,8 +84,11 @@ impl MySqlDatamodelConnector {
             ConnectorCapability::CreateManyWriteableAutoIncId,
             ConnectorCapability::AutoIncrement,
             ConnectorCapability::CompoundIds,
-            ConnectorCapability::ReferentialActions,
         ];
+
+        if !is_planetscale {
+            capabilities.push(ConnectorCapability::ForeignKeys);
+        }
 
         let int = NativeTypeConstructor::without_args(INT_TYPE_NAME, vec![ScalarType::Int]);
         let unsigned_int = NativeTypeConstructor::without_args(UNSIGNED_INT_TYPE_NAME, vec![ScalarType::Int]);
@@ -160,7 +163,7 @@ impl MySqlDatamodelConnector {
         ];
 
         let referential_actions = if is_planetscale {
-            EmulateRestrict | EmulateSetNull
+            Restrict | SetNull
         } else {
             Restrict | Cascade | SetNull | NoAction | SetDefault
         };

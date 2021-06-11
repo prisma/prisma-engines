@@ -21,7 +21,7 @@ impl SqliteDatamodelConnector {
             ConnectorCapability::UpdateableId,
             ConnectorCapability::AutoIncrement,
             ConnectorCapability::CompoundIds,
-            ConnectorCapability::ReferentialActions,
+            ConnectorCapability::ForeignKeys,
         ];
 
         let constructors: Vec<NativeTypeConstructor> = vec![];

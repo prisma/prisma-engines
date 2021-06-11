@@ -2,7 +2,7 @@ use super::SqlSchemaCalculatorFlavour;
 use crate::flavour::MssqlFlavour;
 use datamodel::{
     walkers::{ModelWalker, RelationFieldWalker},
-    FieldArity, ScalarType,
+    ScalarType,
 };
 use datamodel_connector::Connector;
 use sql_schema_describer::{self as sql, ForeignKeyAction};
@@ -22,18 +22,16 @@ impl SqlSchemaCalculatorFlavour for MssqlFlavour {
     }
 
     fn on_delete_action(&self, rf: &RelationFieldWalker<'_>) -> sql::ForeignKeyAction {
-        let default = || {
-            rf.default_on_delete_action()
-                .map(super::convert_referential_action)
-                .unwrap_or_else(|| match rf.arity() {
-                    FieldArity::Required => sql::ForeignKeyAction::NoAction,
-                    _ => sql::ForeignKeyAction::SetNull,
-                })
-        };
-
-        rf.on_delete_action()
+        let action = rf
+            .on_delete_action()
             .map(super::convert_referential_action)
-            .unwrap_or_else(default)
+            .unwrap_or_else(|| super::convert_referential_action(rf.default_on_delete_action()));
+
+        if action == ForeignKeyAction::Restrict {
+            ForeignKeyAction::NoAction
+        } else {
+            action
+        }
     }
 
     fn single_field_index_name(&self, model_name: &str, field_name: &str) -> String {

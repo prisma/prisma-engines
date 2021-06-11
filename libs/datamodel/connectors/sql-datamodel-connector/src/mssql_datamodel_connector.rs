@@ -65,7 +65,7 @@ impl MsSqlDatamodelConnector {
             ConnectorCapability::MultipleIndexesWithSameName,
             ConnectorCapability::AutoIncrement,
             ConnectorCapability::CompoundIds,
-            ConnectorCapability::ReferentialActions,
+            ConnectorCapability::ForeignKeys,
         ];
 
         let constructors: Vec<NativeTypeConstructor> = vec![

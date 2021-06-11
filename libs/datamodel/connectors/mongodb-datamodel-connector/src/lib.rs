@@ -35,11 +35,10 @@ impl MongoDbDatamodelConnector {
             ConnectorCapability::CreateSkipDuplicates,
             ConnectorCapability::ScalarLists,
             ConnectorCapability::InsensitiveFilters,
-            ConnectorCapability::ReferentialActions,
         ];
 
         let native_types = mongodb_types::available_types();
-        let referential_actions = EmulateRestrict | EmulateSetNull;
+        let referential_actions = Restrict | SetNull;
 
         Self {
             capabilities,

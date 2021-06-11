@@ -43,6 +43,7 @@ pub fn introspect(
             version_check.uses_on_delete(foreign_key, table);
 
             let mut relation_field = calculate_relation_field(schema, table, foreign_key)?;
+
             relation_field.supports_restrict_action(!sql_family.is_mssql());
 
             model.add_field(Field::RelationField(relation_field));
