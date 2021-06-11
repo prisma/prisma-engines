@@ -27,3 +27,4 @@ mod squashing_tests;
 mod timeouts;
 mod types;
 mod unsupported_types;
+mod id;

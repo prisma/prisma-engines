@@ -2,7 +2,7 @@ use migration_engine_tests::sync_test_api::*;
 use sql_schema_describer::{ColumnTypeFamily, DefaultValue};
 
 #[test_connector]
-fn adding_an_id_field_of_type_int_with_autoincrement_works(api: TestApi) -> TestResult {
+fn adding_an_id_field_of_type_int_with_autoincrement_works(api: TestApi) {
     let dm2 = r#"
         model Test {
             myId Int @id @default(autoincrement())
@@ -19,6 +19,33 @@ fn adding_an_id_field_of_type_int_with_autoincrement_works(api: TestApi) -> Test
                 c.assert_auto_increments()
             }
         })
+    });
+}
+
+#[test_connector]
+fn adding_multiple_optional_fields_to_an_existing_model_works(api: TestApi) {
+    let dm1 = r#"
+        model Cat {
+            id Int @id
+        }
+    "#;
+
+    api.schema_push(dm1).send_sync().assert_green_bang();
+
+    let dm2 = r#"
+        model Cat {
+            id   Int @id
+            name String?
+            age  Int?
+        }
+    "#;
+
+    api.schema_push(dm2).send_sync().assert_green_bang();
+
+    api.assert_schema().assert_table("Cat", |table| {
+        table
+            .assert_column("name", |col| col.assert_is_nullable())
+            .assert_column("age", |col| col.assert_is_nullable())
     });
 }
 

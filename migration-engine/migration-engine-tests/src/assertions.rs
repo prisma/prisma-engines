@@ -340,6 +340,10 @@ impl<'a> ColumnAssertion<'a> {
         self.assert_default(None)
     }
 
+    pub fn assert_int_default(self, expected: i64) -> Self {
+        self.assert_default(Some(DefaultValue::value(expected)))
+    }
+
     pub fn assert_default_value(self, expected: &prisma_value::PrismaValue) -> Self {
         let found = &self.column.default;
 
