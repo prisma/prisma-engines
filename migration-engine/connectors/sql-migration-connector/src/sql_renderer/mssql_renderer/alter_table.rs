@@ -57,8 +57,11 @@ impl<'a> AlterTableConstructor<'a> {
                 TableChange::RenamePrimaryKey => {
                     self.rename_primary_key = true;
                 }
-                TableChange::AddPrimaryKey { columns } => {
-                    self.add_primary_key(&columns);
+                TableChange::AddPrimaryKey {
+                    columns,
+                    constraint_name,
+                } => {
+                    self.add_primary_key(&columns, constraint_name);
                 }
                 TableChange::AddColumn { column_index } => {
                     self.add_column(*column_index);
@@ -161,7 +164,7 @@ impl<'a> AlterTableConstructor<'a> {
             .insert(format!("{}", self.renderer.quote(constraint)));
     }
 
-    fn add_primary_key(&mut self, columns: &[String]) {
+    fn add_primary_key(&mut self, columns: &[String], constraint_name: &Option<String>) {
         let non_quoted_columns = columns.iter();
         let mut quoted_columns = Vec::with_capacity(columns.len());
 
@@ -169,11 +172,15 @@ impl<'a> AlterTableConstructor<'a> {
             quoted_columns.push(format!("{}", self.renderer.quote(colname)));
         }
 
+        let name = match constraint_name {
+            Some(name) => name.to_owned(),
+            None => format!("PK__{}__{}", self.tables.next().name(), non_quoted_columns.join("__"),),
+        };
+
         //todo this naming looks off, why is this not using the constraint name???
         self.add_constraints.insert(format!(
-            "CONSTRAINT PK__{}__{} PRIMARY KEY ({})",
-            self.tables.next().name(),
-            non_quoted_columns.join("__"),
+            "CONSTRAINT [{}] PRIMARY KEY ({})",
+            name,
             quoted_columns.join(","),
         ));
     }

@@ -174,3 +174,27 @@ fn adding_an_id_field_of_type_int_must_work_for_sqlite(api: TestApi) {
         table.assert_column("myId", |col| col.assert_auto_increments())
     });
 }
+
+#[test_connector(exclude(Sqlite, Mysql))]
+fn adding_a_primary_key_must_work(api: TestApi) {
+    let dm = r#"
+        model Test {
+            myId  Int
+            other Int @unique
+        }
+    "#;
+
+    api.schema_push(dm).send_sync().assert_green_bang();
+    let dm2 = r#"
+        model Test {
+            myId  Int @id
+            other Int @unique
+        }
+    "#;
+
+    api.schema_push(dm2).send_sync().assert_green_bang();
+
+    api.assert_schema().assert_table("Test", |t| {
+        t.assert_pk(|pk| pk.assert_constraint_name(Some("Test_pkey".into())))
+    });
+}

@@ -268,10 +268,21 @@ impl SqlRenderer for PostgresFlavour {
                             .expect("Missing constraint name for DROP CONSTRAINT on Postgres.")
                     )
                 )),
-                TableChange::AddPrimaryKey { columns } => lines.push(format!(
-                    "ADD PRIMARY KEY ({})",
-                    columns.iter().map(|colname| self.quote(colname)).join(", ")
-                )),
+                TableChange::AddPrimaryKey {
+                    columns,
+                    constraint_name,
+                } => lines.push({
+                    let named = match constraint_name {
+                        Some(name) => format!("CONSTRAINT {} ", self.quote(name)),
+                        None => "".into(),
+                    };
+
+                    format!(
+                        "ADD {}PRIMARY KEY ({})",
+                        named,
+                        columns.iter().map(|colname| self.quote(colname)).join(", ")
+                    )
+                }),
                 TableChange::AddColumn { column_index } => {
                     let column = tables.next().column_at(*column_index);
                     let col_sql = self.render_column(&column);

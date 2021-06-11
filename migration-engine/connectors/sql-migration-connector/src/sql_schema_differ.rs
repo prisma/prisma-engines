@@ -248,6 +248,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
             .filter(|pk| !pk.columns.is_empty())
             .map(|pk| TableChange::AddPrimaryKey {
                 columns: pk.columns.clone(),
+                constraint_name: pk.constraint_name.clone(),
             });
 
         if differ.flavour.should_recreate_the_primary_key_on_column_recreate() {
@@ -263,6 +264,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                 if from_recreate {
                     Some(TableChange::AddPrimaryKey {
                         columns: differ.previous().table().primary_key_columns(),
+                        constraint_name: differ.previous().primary_key().unwrap().constraint_name.clone(),
                     })
                 } else {
                     None
