@@ -87,7 +87,7 @@ impl SqlRenderer for MysqlFlavour {
         unreachable!("render_alter_enum on MySQL")
     }
 
-    fn render_alter_index(&self, indexes: Pair<&IndexWalker<'_>>) -> Vec<String> {
+    fn render_rename_index(&self, indexes: Pair<&IndexWalker<'_>>) -> Vec<String> {
         vec![ddl::AlterTable {
             table_name: indexes.previous().table().name().into(),
             changes: vec![sql_ddl::mysql::AlterTableClause::RenameIndex {

@@ -101,7 +101,7 @@ impl SqlRenderer for MssqlFlavour {
         unreachable!("render_alter_enum on Microsoft SQL Server")
     }
 
-    fn render_alter_index(&self, indexes: Pair<&IndexWalker<'_>>) -> Vec<String> {
+    fn render_rename_index(&self, indexes: Pair<&IndexWalker<'_>>) -> Vec<String> {
         let index_with_table = format!(
             "{}.{}.{}",
             self.schema_name(),

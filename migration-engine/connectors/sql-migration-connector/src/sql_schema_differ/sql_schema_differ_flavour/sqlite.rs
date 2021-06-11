@@ -9,6 +9,10 @@ use crate::{
 use std::collections::HashSet;
 
 impl SqlSchemaDifferFlavour for SqliteFlavour {
+    fn can_alter_index(&self) -> bool {
+        false
+    }
+
     fn column_type_change(&self, differ: &ColumnDiffer<'_>) -> Option<ColumnTypeChange> {
         match (differ.previous.column_type_family(), differ.next.column_type_family()) {
             (a, b) if a == b => None,
@@ -29,9 +33,9 @@ impl SqlSchemaDifferFlavour for SqliteFlavour {
                     || differ.dropped_primary_key().is_some()
                     || differ.dropped_columns().next().is_some()
                     || differ.added_columns().any(|col| col.arity().is_required())
-                    || differ.column_pairs().any(|columns| columns.all_changes().0.differs_in_something())
-                    // ALTER INDEX does not exist on SQLite
-                    || differ.index_pairs().any(|pair| self.index_should_be_renamed(&pair))
+                    || differ
+                        .column_pairs()
+                        .any(|columns| columns.all_changes().0.differs_in_something())
                     || differ.created_foreign_keys().next().is_some()
                     || differ.dropped_foreign_keys().next().is_some()
             })

@@ -748,7 +748,36 @@ fn alter_constraint_name_tests(api: TestApi) {
                     ALTER INDEX "B_a_b_idx" RENAME TO "AnotherCustomIndex";
                 "#
                 }
-            } else if api.is_mysql(){
+            } else if api.is_mysql_5_6() || api.is_mariadb(){
+            indoc! {
+                    r#"
+                -- DropForeignKey
+                ALTER TABLE `B` DROP FOREIGN KEY `B_aId_fkey`;
+                
+                -- AddForeignKey
+                ALTER TABLE `B` ADD CONSTRAINT `CustomFK` FOREIGN KEY (`aId`) REFERENCES `A`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+                
+                -- RedefineIndex
+                CREATE UNIQUE INDEX `CustomCompoundUnique` ON `A`(`a`, `b`);
+                DROP INDEX `A_a_b_key` ON `A`;
+                
+                -- RedefineIndex
+                CREATE INDEX `CustomIndex` ON `A`(`a`);
+                DROP INDEX `A_a_idx` ON `A`;
+                
+                -- RedefineIndex
+                CREATE UNIQUE INDEX `CustomUnique` ON `A`(`name`);
+                DROP INDEX `A_name_key` ON `A`;
+                
+                -- RedefineIndex
+                CREATE INDEX `AnotherCustomIndex` ON `B`(`a`, `b`);
+                DROP INDEX `B_a_b_idx` ON `B`;
+                "#
+                }
+        }
+
+
+            else if api.is_mysql(){
                 indoc! {
                     r#"
                 -- DropForeignKey
@@ -771,37 +800,22 @@ fn alter_constraint_name_tests(api: TestApi) {
                 "#
                 }
             }else if api.is_sqlite(){
-
-                //todo why is this a complete recreate???
                 indoc!{r#"
-                -- RedefineTables
-                PRAGMA foreign_keys=OFF;
-                CREATE TABLE "new_B" (
-                    "a" TEXT NOT NULL,
-                    "b" TEXT NOT NULL,
-                    "aId" INTEGER NOT NULL,
-                            
-                    PRIMARY KEY ("a", "b"),
-                    CONSTRAINT "CustomFK" FOREIGN KEY ("aId") REFERENCES "A" ("id") ON DELETE CASCADE ON UPDATE CASCADE
-                );
-                INSERT INTO "new_B" ("a", "aId", "b") SELECT "a", "aId", "b" FROM "B";
-                DROP TABLE "B";
-                ALTER TABLE "new_B" RENAME TO "B";
-                CREATE INDEX "AnotherCustomIndex" ON "B"("a", "b");
-                CREATE TABLE "new_A" (
-                    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-                    "name" TEXT NOT NULL,
-                    "a" TEXT NOT NULL,
-                    "b" TEXT NOT NULL
-                );
-                INSERT INTO "new_A" ("a", "b", "id", "name") SELECT "a", "b", "id", "name" FROM "A";
-                DROP TABLE "A";
-                ALTER TABLE "new_A" RENAME TO "A";
-                CREATE INDEX "CustomIndex" ON "A"("a");
-                CREATE UNIQUE INDEX "CustomUnique" ON "A"("name");
+                -- RedefineIndex
+                DROP INDEX "A_a_b_key";
                 CREATE UNIQUE INDEX "CustomCompoundUnique" ON "A"("a", "b");
-                PRAGMA foreign_key_check;
-                PRAGMA foreign_keys=ON;
+                
+                -- RedefineIndex
+                DROP INDEX "A_name_key";
+                CREATE UNIQUE INDEX "CustomUnique" ON "A"("name");
+                
+                -- RedefineIndex
+                DROP INDEX "A_a_idx";
+                CREATE INDEX "CustomIndex" ON "A"("a");
+                
+                -- RedefineIndex
+                DROP INDEX "B_a_b_idx";
+                CREATE INDEX "AnotherCustomIndex" ON "B"("a", "b");
                 "#
             }} else {
                 ""

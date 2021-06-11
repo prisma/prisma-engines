@@ -237,7 +237,9 @@ fn alter_constraint_name_push(api: TestApi) {
         if !no_named_pk {
             table.assert_pk(|pk| pk.assert_constraint_name(Some("CustomCompoundId".into())));
         };
-        table.assert_fk_with_name("CustomFK");
+        if !api.is_sqlite() {
+            table.assert_fk_with_name("CustomFK");
+        }
         table.assert_has_index_name_and_type("AnotherCustomIndex", false)
     });
 }

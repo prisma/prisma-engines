@@ -127,6 +127,13 @@ impl SqlRenderer for SqliteFlavour {
         format!("DROP INDEX {}", self.quote(index.name()))
     }
 
+    fn render_drop_and_recreate_index(&self, _indexes: Pair<&IndexWalker<'_>>) -> Vec<String> {
+        vec![
+            self.render_drop_index(*_indexes.previous()),
+            self.render_create_index(*_indexes.next()),
+        ]
+    }
+
     fn render_drop_table(&self, table_name: &str) -> Vec<String> {
         // Turning off the pragma is safe, because schema validation would forbid foreign keys
         // to a non-existent model. There appears to be no other way to deal with cyclic

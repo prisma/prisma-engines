@@ -221,7 +221,7 @@ impl SqlRenderer for PostgresFlavour {
         stmts
     }
 
-    fn render_alter_index(&self, indexes: Pair<&IndexWalker<'_>>) -> Vec<String> {
+    fn render_rename_index(&self, indexes: Pair<&IndexWalker<'_>>) -> Vec<String> {
         vec![format!(
             "ALTER INDEX {} RENAME TO {}",
             self.quote(indexes.previous().name()),
