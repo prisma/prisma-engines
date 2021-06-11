@@ -79,5 +79,6 @@ fn convert_referential_action(action: ReferentialAction) -> sql::ForeignKeyActio
         // These will be only used for databases with no foreign keys.
         ReferentialAction::EmulateSetNull => unreachable!("EmulateSetNull conversion"),
         ReferentialAction::EmulateRestrict => unreachable!("EmulateRestrict conversion"),
+        ReferentialAction::EmulateNoAction => unreachable!("EmulateRestrict conversion"),
     }
 }

@@ -267,7 +267,7 @@ pub fn insert_existing_1to1_related_model_checks(
     Ok(read_existing_children)
 }
 
-/// Inserts checks into the graph that check all required, non-list relations pointing to
+/// Inserts emulated restrict checks into the graph that checks all _required_ marked relations pointing to
 /// the given `model`. Those checks fail at runtime (edges to the `Empty` node) if one or more
 /// records are found. Checks are inserted between `parent_node` and `child_node`.
 ///
@@ -308,7 +308,7 @@ pub fn insert_existing_1to1_related_model_checks(
 ///    └────────────────────┘
 /// ```
 #[tracing::instrument(skip(graph, model, parent_node, child_node))]
-pub fn insert_deletion_checks(
+pub fn insert_deletion_restrict_checks(
     graph: &mut QueryGraph,
     connector_ctx: &ConnectorContext,
     model: &ModelRef,
@@ -322,16 +322,16 @@ pub fn insert_deletion_checks(
     let once = OnceCell::new();
 
     if !relation_fields.is_empty() {
-        let noop_node = graph.create_node(Node::Empty);
+        // let noop_node = graph.create_node(Node::Empty);
 
         // We know that the relation can't be a list and must be required on the related model for `model` (see fields_requiring_model).
         // For all requiring models (RM), we use the field on `model` to query for existing RM records and error out if at least one exists.
         for rf in relation_fields {
-            // if connector_ctx.features.contains(&PreviewFeature::ReferentialActions) {
-            //     if !matches!(rf.relation().on_delete(), datamodel::ReferentialAction::EmulateRestrict) {
-            //         continue;
-            //     }
-            // }
+            if dbg!(connector_ctx.features.contains(&PreviewFeature::ReferentialActions)) {
+                if !matches!(rf.relation().on_delete(), datamodel::ReferentialAction::EmulateRestrict) {
+                    continue;
+                }
+            }
 
             let noop_node = once.get_or_init(|| graph.create_node(Node::Empty));
             let relation_field = rf.related_field();
@@ -366,9 +366,9 @@ pub fn insert_deletion_checks(
         });
 
         // Edge from empty node to the child (delete).
-        // if let Some(noop_node) = once.get() {
-        graph.create_edge(&noop_node, child_node, QueryGraphDependency::ExecutionOrder)?;
-        // }
+        if let Some(noop_node) = once.get() {
+            graph.create_edge(&noop_node, child_node, QueryGraphDependency::ExecutionOrder)?;
+        }
     }
 
     Ok(())

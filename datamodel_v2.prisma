@@ -29,6 +29,12 @@ model B {
 model C {
   id  String  @id
   gql String?
+  ds  D[]     @relation(onDelete: Cascade)
 
   a A?
+}
+
+model D {
+  id String @id
+  cs C[]
 }

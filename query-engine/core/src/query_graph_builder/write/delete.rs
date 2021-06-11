@@ -33,7 +33,7 @@ pub fn delete_record(
     }));
 
     let delete_node = graph.create_node(delete_query);
-    utils::insert_deletion_checks(graph, connector_ctx, &model, &read_node, &delete_node)?;
+    utils::insert_deletion_restrict_checks(graph, connector_ctx, &model, &read_node, &delete_node)?;
 
     graph.create_edge(
         &read_node,
@@ -82,7 +82,7 @@ pub fn delete_many_records(
     let read_query_node = graph.create_node(read_query);
     let delete_many_node = graph.create_node(Query::Write(delete_many));
 
-    utils::insert_deletion_checks(graph, connector_ctx, &model, &read_query_node, &delete_many_node)?;
+    utils::insert_deletion_restrict_checks(graph, connector_ctx, &model, &read_query_node, &delete_many_node)?;
 
     graph.create_edge(
         &read_query_node,
