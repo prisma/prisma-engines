@@ -1,7 +1,6 @@
 use crate::{destructive_change_checker::DestructiveChangeDiagnostics, ConnectorResult, Migration};
 
-/// Apply a single migration step to the connector's database. At this level, we are working with database migrations,
-/// i.e. the [associated type on MigrationConnector](trait.MigrationConnector.html#associatedtype.DatabaseMigration).
+/// Apply a single migration step to the connector's database.
 #[async_trait::async_trait]
 pub trait DatabaseMigrationStepApplier: Send + Sync {
     /// Applies the migration to the database. Returns the number of executed steps.

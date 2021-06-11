@@ -51,7 +51,7 @@ pub fn create_migration_directory(
     Ok(MigrationDirectory { path: directory_path })
 }
 
-/// Write the migration script to the directory.
+/// Write the migration_lock file to the directory.
 #[tracing::instrument]
 pub fn write_migration_lock_file(migrations_directory_path: &str, provider: &str) -> std::io::Result<()> {
     let directory_path = Path::new(migrations_directory_path);
@@ -162,6 +162,7 @@ pub struct MigrationDirectory {
     path: PathBuf,
 }
 
+/// Error while reading a migration script.
 #[derive(Debug)]
 pub struct ReadMigrationScriptError(pub(crate) io::Error, pub(crate) SpanTrace, pub(crate) String);
 

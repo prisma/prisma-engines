@@ -2,7 +2,7 @@ use super::{
     diagnose_migration_history, DiagnoseMigrationHistoryInput, DiagnoseMigrationHistoryOutput, DriftDiagnostic,
     HistoryDiagnostic,
 };
-use migration_connector::{ConnectorResult, MigrationConnector};
+use migration_connector::{migrations_directory, ConnectorResult, MigrationConnector};
 use serde::{Deserialize, Serialize};
 
 /// The `devDiagnostic` input.
@@ -26,7 +26,7 @@ pub(crate) async fn dev_diagnostic(
     input: &DevDiagnosticInput,
     connector: &dyn MigrationConnector,
 ) -> ConnectorResult<DevDiagnosticOutput> {
-    migration_connector::error_on_changed_provider(&input.migrations_directory_path, connector.connector_type())?;
+    migrations_directory::error_on_changed_provider(&input.migrations_directory_path, connector.connector_type())?;
 
     let diagnose_input = DiagnoseMigrationHistoryInput {
         migrations_directory_path: input.migrations_directory_path.clone(),

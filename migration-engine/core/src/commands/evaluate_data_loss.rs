@@ -1,5 +1,5 @@
 use crate::{parse_schema, CoreResult};
-use migration_connector::{list_migrations, DiffTarget, MigrationConnector};
+use migration_connector::{migrations_directory::*, DiffTarget, MigrationConnector};
 use serde::{Deserialize, Serialize};
 
 /// The input to the `evaluateDataLoss` command.
@@ -48,7 +48,7 @@ pub(crate) async fn evaluate_data_loss(
 ) -> CoreResult<EvaluateDataLossOutput> {
     let checker = connector.destructive_change_checker();
 
-    migration_connector::error_on_changed_provider(&input.migrations_directory_path, connector.connector_type())?;
+    error_on_changed_provider(&input.migrations_directory_path, connector.connector_type())?;
 
     let migrations_from_directory = list_migrations(input.migrations_directory_path.as_ref())?;
     let target_schema = parse_schema(&input.prisma_schema)?;

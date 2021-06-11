@@ -3,7 +3,7 @@ use crate::{
 };
 use connection_string::JdbcString;
 use indoc::formatdoc;
-use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
+use migration_connector::{migrations_directory::MigrationDirectory, ConnectorError, ConnectorResult};
 use quaint::{connector::MssqlUrl, prelude::Table};
 use sql_schema_describer::{DescriberErrorKind, SqlSchema, SqlSchemaDescriberBackend};
 use std::str::FromStr;

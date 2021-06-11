@@ -1,6 +1,7 @@
 use crate::CoreResult;
 use migration_connector::{
-    ConnectorError, DiffTarget, MigrationConnector, MigrationDirectory, MigrationRecord, PersistenceNotInitializedError,
+    migrations_directory::*, ConnectorError, DiffTarget, MigrationConnector, MigrationRecord,
+    PersistenceNotInitializedError,
 };
 use serde::{Deserialize, Serialize};
 use std::path::Path;
@@ -70,11 +71,10 @@ pub(crate) async fn diagnose_migration_history(
 
     tracing::debug!("Diagnosing migration history");
 
-    migration_connector::error_on_changed_provider(&input.migrations_directory_path, connector.connector_type())?;
+    error_on_changed_provider(&input.migrations_directory_path, connector.connector_type())?;
 
     // Load the migrations.
-    let migrations_from_filesystem =
-        migration_connector::list_migrations(&Path::new(&input.migrations_directory_path))?;
+    let migrations_from_filesystem = list_migrations(&Path::new(&input.migrations_directory_path))?;
 
     let (migrations_from_database, has_migrations_table) = match migration_persistence.list_migrations().await? {
         Ok(migrations) => (migrations, true),

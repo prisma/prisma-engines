@@ -8,7 +8,7 @@ use crate::{
 use datamodel::{walkers::walk_scalar_fields, Datamodel};
 use enumflags2::BitFlags;
 use indoc::indoc;
-use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
+use migration_connector::{migrations_directory::MigrationDirectory, ConnectorError, ConnectorResult};
 use once_cell::sync::Lazy;
 use quaint::connector::MysqlUrl;
 use regex::{Regex, RegexSet};

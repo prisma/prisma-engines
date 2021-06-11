@@ -1,5 +1,5 @@
 use crate::{parse_schema, CoreError, CoreResult};
-use migration_connector::{DiffTarget, MigrationConnector};
+use migration_connector::{migrations_directory::*, DiffTarget, MigrationConnector};
 use serde::{Deserialize, Serialize};
 use std::path::Path;
 use user_facing_errors::migration_engine::MigrationNameTooLong;
@@ -40,10 +40,10 @@ pub async fn create_migration(
     }
 
     // Check for provider switch
-    migration_connector::error_on_changed_provider(&input.migrations_directory_path, connector_type)?;
+    error_on_changed_provider(&input.migrations_directory_path, connector_type)?;
 
     // Infer the migration.
-    let previous_migrations = migration_connector::list_migrations(&Path::new(&input.migrations_directory_path))?;
+    let previous_migrations = list_migrations(&Path::new(&input.migrations_directory_path))?;
     let target_schema = parse_schema(&input.prisma_schema)?;
 
     let migration = connector
@@ -66,11 +66,8 @@ pub async fn create_migration(
     let migration_script = applier.render_script(&migration, &destructive_change_diagnostics);
 
     // Write the migration script to a file.
-    let directory = migration_connector::create_migration_directory(
-        &Path::new(&input.migrations_directory_path),
-        &input.migration_name,
-    )
-    .map_err(|_| CoreError::from_msg("Failed to create a new migration directory.".into()))?;
+    let directory = create_migration_directory(&Path::new(&input.migrations_directory_path), &input.migration_name)
+        .map_err(|_| CoreError::from_msg("Failed to create a new migration directory.".into()))?;
 
     directory
         .write_migration_script(&migration_script, connector.migration_file_extension())
@@ -82,14 +79,12 @@ pub async fn create_migration(
             ))
         })?;
 
-    migration_connector::write_migration_lock_file(&input.migrations_directory_path, connector_type).map_err(
-        |err| {
-            CoreError::from_msg(format!(
-                "Failed to write the migration lock file to `{:?}`\n{}",
-                &input.migrations_directory_path, err
-            ))
-        },
-    )?;
+    write_migration_lock_file(&input.migrations_directory_path, connector_type).map_err(|err| {
+        CoreError::from_msg(format!(
+            "Failed to write the migration lock file to `{:?}`\n{}",
+            &input.migrations_directory_path, err
+        ))
+    })?;
 
     Ok(CreateMigrationOutput {
         generated_migration_name: Some(directory.migration_name().to_owned()),

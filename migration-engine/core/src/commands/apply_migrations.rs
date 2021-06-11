@@ -1,5 +1,8 @@
 use crate::{CoreError, CoreResult};
-use migration_connector::{ConnectorError, MigrationDirectory, MigrationRecord, PersistenceNotInitializedError};
+use migration_connector::{
+    migrations_directory::{error_on_changed_provider, list_migrations, MigrationDirectory},
+    ConnectorError, MigrationRecord, PersistenceNotInitializedError,
+};
 use serde::{Deserialize, Serialize};
 use std::path::Path;
 use user_facing_errors::migration_engine::FoundFailedMigrations;
@@ -33,14 +36,13 @@ where
     let applier = connector.database_migration_step_applier();
     let migration_persistence = connector.migration_persistence();
 
-    migration_connector::error_on_changed_provider(&input.migrations_directory_path, connector.connector_type())?;
+    error_on_changed_provider(&input.migrations_directory_path, connector.connector_type())?;
 
     connector.acquire_lock().await?;
 
     migration_persistence.initialize().await?;
 
-    let migrations_from_filesystem =
-        migration_connector::list_migrations(&Path::new(&input.migrations_directory_path))?;
+    let migrations_from_filesystem = list_migrations(&Path::new(&input.migrations_directory_path))?;
     let migrations_from_database = migration_persistence
         .list_migrations()
         .await?

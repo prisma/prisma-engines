@@ -1,5 +1,8 @@
 use crate::{CoreError, CoreResult};
-use migration_connector::{MigrationConnector, MigrationDirectory};
+use migration_connector::{
+    migrations_directory::{error_on_changed_provider, MigrationDirectory},
+    MigrationConnector,
+};
 use serde::Deserialize;
 use std::{collections::HashMap, path::Path};
 use user_facing_errors::migration_engine::{MigrationAlreadyApplied, MigrationToMarkAppliedNotFound};
@@ -24,7 +27,7 @@ pub async fn mark_migration_applied(
 ) -> CoreResult<MarkMigrationAppliedOutput> {
     let persistence = connector.migration_persistence();
 
-    migration_connector::error_on_changed_provider(&input.migrations_directory_path, connector.connector_type())?;
+    error_on_changed_provider(&input.migrations_directory_path, connector.connector_type())?;
 
     connector.acquire_lock().await?;
 
