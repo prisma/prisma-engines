@@ -2,7 +2,7 @@ use migration_engine_tests::sync_test_api::*;
 use sql_schema_describer::{ColumnTypeFamily, DefaultValue};
 
 #[test_connector]
-fn adding_an_id_field_of_type_int_with_autoincrement_works(api: TestApi) -> TestResult {
+fn adding_an_id_field_of_type_int_with_autoincrement_works(api: TestApi) {
     let dm2 = r#"
         model Test {
             myId Int @id @default(autoincrement())
@@ -19,6 +19,33 @@ fn adding_an_id_field_of_type_int_with_autoincrement_works(api: TestApi) -> Test
                 c.assert_auto_increments()
             }
         })
+    });
+}
+
+#[test_connector]
+fn adding_multiple_optional_fields_to_an_existing_model_works(api: TestApi) {
+    let dm1 = r#"
+        model Cat {
+            id Int @id
+        }
+    "#;
+
+    api.schema_push(dm1).send_sync().assert_green_bang();
+
+    let dm2 = r#"
+        model Cat {
+            id   Int @id
+            name String?
+            age  Int?
+        }
+    "#;
+
+    api.schema_push(dm2).send_sync().assert_green_bang();
+
+    api.assert_schema().assert_table("Cat", |table| {
+        table
+            .assert_column("name", |col| col.assert_is_nullable())
+            .assert_column("age", |col| col.assert_is_nullable())
     });
 }
 
@@ -172,5 +199,88 @@ fn adding_an_id_field_of_type_int_must_work_for_sqlite(api: TestApi) {
 
     api.assert_schema().assert_table("Test", |table| {
         table.assert_column("myId", |col| col.assert_auto_increments())
+    });
+}
+
+#[test_connector]
+fn removing_a_scalar_field_must_work(api: TestApi) {
+    let dm1 = r#"
+        model Test {
+            id String @id @default(cuid())
+            field String
+        }
+    "#;
+
+    api.schema_push(dm1).send_sync().assert_green_bang();
+
+    api.assert_schema()
+        .assert_table("Test", |table| table.assert_columns_count(2).assert_has_column("field"));
+
+    let dm2 = r#"
+        model Test {
+            id String @id @default(cuid())
+        }
+    "#;
+
+    api.schema_push(dm2).send_sync().assert_green_bang();
+
+    api.assert_schema()
+        .assert_table("Test", |table| table.assert_column_count(1));
+}
+
+#[test_connector]
+fn update_type_of_scalar_field_must_work(api: TestApi) {
+    let dm1 = r#"
+        model Test {
+            id String @id @default(cuid())
+            field String
+        }
+    "#;
+
+    api.schema_push(dm1).send_sync().assert_green_bang();
+
+    api.assert_schema().assert_table("Test", |table| {
+        table.assert_column("field", |column| column.assert_type_is_string())
+    });
+
+    let dm2 = r#"
+        model Test {
+            id String @id @default(cuid())
+            field Int
+        }
+    "#;
+
+    api.schema_push(dm2).send_sync().assert_green_bang();
+
+    api.assert_schema().assert_table("Test", |table| {
+        table.assert_column("field", |column| column.assert_type_is_int())
+    });
+}
+
+#[test_connector]
+fn updating_db_name_of_a_scalar_field_must_work(api: TestApi) {
+    let dm1 = r#"
+        model A {
+            id String @id @default(cuid())
+            field String @map(name:"name1")
+        }
+    "#;
+
+    api.schema_push(dm1).send_sync().assert_green_bang();
+    api.assert_schema()
+        .assert_table("A", |table| table.assert_has_column("name1"));
+
+    let dm2 = r#"
+        model A {
+            id String @id @default(cuid())
+            field String @map(name:"name2")
+        }
+    "#;
+
+    api.schema_push(dm2).send_sync().assert_green_bang();
+    api.assert_schema().assert_table("A", |t| {
+        t.assert_columns_count(2)
+            .assert_has_column("id")
+            .assert_has_column("name2")
     });
 }

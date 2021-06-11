@@ -1,3 +1,5 @@
+#![allow(clippy::needless_borrow)]
+
 mod engine;
 mod error;
 mod logger;

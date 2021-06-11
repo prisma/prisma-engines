@@ -6,6 +6,7 @@ mod diagnose_migration_history_tests;
 mod drift_summary;
 mod enums;
 mod foreign_keys;
+mod id;
 mod indexes;
 mod json;
 mod mariadb;
