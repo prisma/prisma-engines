@@ -213,14 +213,15 @@ fn alter_constraint_name_push(api: TestApi) {
     api.schema_push(custom_dm).send_sync().assert_green_bang();
 
     api.assert_schema().assert_table("A", |table| {
-        table.assert_pk(|pk| pk.assert_constraint_name(Some("CustomId".into())))
-        //2 uniques
-        //1 index
+        table.assert_pk(|pk| pk.assert_constraint_name(Some("CustomId".into())));
+        table.assert_has_index_name_and_type("CustomUnique", true);
+        table.assert_has_index_name_and_type("CustomCompoundUnique", true);
+        table.assert_has_index_name_and_type("CustomIndex", false)
     });
 
     api.assert_schema().assert_table("B", |table| {
-        table.assert_pk(|pk| pk.assert_constraint_name(Some("CustomCompoundId".into())))
-        //1 index
-        //1 fk
+        table.assert_pk(|pk| pk.assert_constraint_name(Some("CustomCompoundId".into())));
+        table.assert_fk_with_name("CustomFK");
+        table.assert_has_index_name_and_type("AnotherCustomIndex", false)
     });
 }

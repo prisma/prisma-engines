@@ -171,6 +171,16 @@ impl<'a> TableAssertion<'a> {
         self
     }
 
+    pub fn assert_fk_with_name(self, name: &str) -> Self {
+        let matching_fk = self
+            .table
+            .foreign_keys
+            .iter()
+            .any(|found| found.constraint_name == Some(name.to_string()));
+        assert!(matching_fk, "Assertion failed. Could not find fk with name.");
+        self
+    }
+
     pub fn assert_fk_on_columns<F>(self, columns: &[&str], fk_assertions: F) -> Self
     where
         F: FnOnce(ForeignKeyAssertion<'a>) -> ForeignKeyAssertion<'a>,
@@ -271,6 +281,19 @@ impl<'a> TableAssertion<'a> {
         }
 
         self
+    }
+
+    pub fn assert_has_index_name_and_type(self, name: &str, unique: bool) -> Self {
+        if self
+            .table
+            .indices
+            .iter()
+            .any(|idx| idx.name == name && idx.is_unique() == unique)
+        {
+            self
+        } else {
+            panic!("Could not find index with name {} and correct type", name);
+        }
     }
 
     pub fn debug_print(self) -> Self {
