@@ -3,8 +3,10 @@ use crate::{
     sql_renderer::IteratorJoin,
     sql_schema_differ::{ColumnChange, ColumnChanges},
 };
-use migration_connector::DatabaseMigrationMarker;
-use sql_schema_describer::{walkers::SqlSchemaExt, SqlSchema};
+use sql_schema_describer::{
+    walkers::{ColumnWalker, SqlSchemaExt},
+    SqlSchema,
+};
 use std::{collections::BTreeSet, fmt::Write as _};
 
 /// The database migration type for SqlMigrationConnector.
@@ -119,10 +121,13 @@ impl SqlMigration {
                         ));
                     }
                 }
-                SqlMigrationStep::CreateIndex(create_index) => {
+                SqlMigrationStep::CreateIndex {
+                    table_index: (_, table_index),
+                    ..
+                } => {
                     drift_items.insert((
                         DriftType::ChangedTable,
-                        self.schemas().next().table_walker_at(create_index.table_index).name(),
+                        self.schemas().next().table_walker_at(*table_index).name(),
                         idx,
                     ));
                 }
@@ -159,7 +164,11 @@ impl SqlMigration {
                     DriftType::RemovedTable => out.push_str("\n[-] Removed tables\n"),
                     DriftType::RemovedUdt => out.push_str("\n[-] Removed UDTs\n"),
                     DriftType::RemovedView => out.push_str("\n[-] Removed views\n"),
-                    DriftType::RedefinedTable => out.push_str("\n[*] Redefined tables\n"),
+                    DriftType::RedefinedTable => {
+                        out.push_str("\n[*] Redefined table `");
+                        out.push_str(item_name);
+                        out.push_str("`\n")
+                    }
                     DriftType::ChangedEnum => {
                         out.push_str("\n[*] Changed the `");
                         out.push_str(item_name);
@@ -248,7 +257,11 @@ impl SqlMigration {
                                     tables.next().column_at(*alter_column.column_index.next()).name(),
                                 )
                                 .unwrap();
-                                render_column_changes(&alter_column.changes, &mut out);
+                                render_column_changes(
+                                    tables.columns(&alter_column.column_index),
+                                    &alter_column.changes,
+                                    &mut out,
+                                );
                                 out.push('\n');
                             }
                             TableChange::DropColumn { column_index } => {
@@ -264,7 +277,7 @@ impl SqlMigration {
                                     tables.next().column_at(*column_index.next()).name(),
                                 )
                                 .unwrap();
-                                render_column_changes(changes, &mut out);
+                                render_column_changes(tables.columns(column_index), changes, &mut out);
                                 out.push('\n');
                             }
                             TableChange::DropPrimaryKey => {
@@ -301,12 +314,15 @@ impl SqlMigration {
                     out.push('\n');
                 }
                 SqlMigrationStep::RedefineTables(_) => {}
-                SqlMigrationStep::CreateIndex(create_index) => {
+                SqlMigrationStep::CreateIndex {
+                    table_index: (_, table_index),
+                    index_index,
+                } => {
                     let index = self
                         .schemas()
                         .next()
-                        .table_walker_at(create_index.table_index)
-                        .index_at(create_index.index_index);
+                        .table_walker_at(*table_index)
+                        .index_at(*index_index);
 
                     out.push_str("  [+] Added ");
 
@@ -355,29 +371,29 @@ impl SqlMigration {
     }
 }
 
-fn render_column_changes(changes: &ColumnChanges, sink: &mut String) {
+fn render_column_changes(columns: Pair<ColumnWalker<'_>>, changes: &ColumnChanges, sink: &mut String) {
     let readable_changes = changes
         .iter()
         .map(|change| match change {
-            ColumnChange::Renaming => "column was renamed",
-            ColumnChange::Arity => "arity changed",
-            ColumnChange::Default => "default changed",
-            ColumnChange::TypeChanged => "type changed",
-            ColumnChange::Sequence => "sequence changed",
+            ColumnChange::Renaming => "column was renamed".to_owned(),
+            ColumnChange::Arity => format!(
+                "arity changed from {:?} to {:?}",
+                columns.previous().arity(),
+                columns.next().arity()
+            ),
+            ColumnChange::Default => format!(
+                "default changed from `{:?}` to `{:?}`",
+                columns.previous().default().map(|d| d.kind()),
+                columns.next().default().map(|d| d.kind())
+            ),
+            ColumnChange::TypeChanged => "type changed".to_owned(),
+            ColumnChange::Sequence => "sequence changed".to_owned(),
         })
         .join(", ");
 
     sink.push('(');
     sink.push_str(&readable_changes);
     sink.push(')');
-}
-
-impl DatabaseMigrationMarker for SqlMigration {
-    const FILE_EXTENSION: &'static str = "sql";
-
-    fn is_empty(&self) -> bool {
-        self.steps.is_empty()
-    }
 }
 
 // The order of the variants matters for sorting. The steps are sorted _first_
@@ -422,7 +438,10 @@ pub(crate) enum SqlMigrationStep {
     RedefineTables(Vec<RedefineTable>),
     // Order matters: we must create indexes after ALTER TABLEs because the indexes can be
     // on fields that are dropped/created there.
-    CreateIndex(CreateIndex),
+    CreateIndex {
+        table_index: (Option<usize>, usize),
+        index_index: usize,
+    },
     // Order matters: this needs to come after create_indexes, because the foreign keys can depend on unique
     // indexes created there.
     AddForeignKey {
@@ -465,7 +484,7 @@ impl SqlMigrationStep {
             SqlMigrationStep::DropForeignKey { .. } => "DropForeignKey",
             SqlMigrationStep::DropTable { .. } => "DropTable",
             SqlMigrationStep::RedefineTables { .. } => "RedefineTables",
-            SqlMigrationStep::CreateIndex(_) => "CreateIndex",
+            SqlMigrationStep::CreateIndex { .. } => "CreateIndex",
             SqlMigrationStep::DropIndex { .. } => "DropIndex",
             SqlMigrationStep::AlterIndex { .. } => "AlterIndex",
             SqlMigrationStep::CreateEnum { .. } => "CreateEnum",
@@ -561,14 +580,6 @@ pub(crate) enum ColumnTypeChange {
     RiskyCast,
     SafeCast,
     NotCastable,
-}
-
-#[derive(Debug, Eq, Ord, PartialEq, PartialOrd)]
-pub(crate) struct CreateIndex {
-    /// The index of the table in the next schema.
-    pub table_index: usize,
-    pub index_index: usize,
-    pub caused_by_create_table: bool,
 }
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]

@@ -3,7 +3,7 @@
 mod commands;
 mod logger;
 
-use migration_core::api::RpcApi;
+use migration_core::rpc_api;
 use structopt::StructOpt;
 use user_facing_errors::{common::SchemaParserError, UserFacingError};
 
@@ -66,9 +66,9 @@ async fn start_engine(datamodel_location: &str) -> ! {
     let mut datamodel = String::new();
     file.read_to_string(&mut datamodel).unwrap();
 
-    match RpcApi::new(&datamodel).await {
+    match rpc_api(&datamodel).await {
         // Block the thread and handle IO in async until EOF.
-        Ok(api) => json_rpc_stdio::run(api.io_handler()).await.unwrap(),
+        Ok(api) => json_rpc_stdio::run(&api).await.unwrap(),
         Err(err) => {
             let user_facing_error = err.to_user_facing();
             let exit_code =

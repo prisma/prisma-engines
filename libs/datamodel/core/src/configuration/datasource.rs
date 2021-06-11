@@ -44,8 +44,12 @@ impl Datasource {
         ConnectorCapabilities::new(capabilities)
     }
 
-    /// Load the database URL, validating it and resolving env vars in the process. Also see `load_url_with_config_dir()`.
-    pub fn load_url(&self) -> Result<String, Diagnostics> {
+    /// Load the database URL, validating it and resolving env vars in the
+    /// process. Also see `load_url_with_config_dir()`.
+    pub fn load_url<F>(&self, env: F) -> Result<String, Diagnostics>
+    where
+        F: Fn(&str) -> Option<String>,
+    {
         let url = match (&self.url.value, &self.url.from_env_var) {
             (Some(lit), _) if lit.trim().is_empty() => {
                 let msg = "You must provide a nonempty URL";
@@ -53,8 +57,8 @@ impl Datasource {
                 return Err(DatamodelError::new_source_validation_error(&msg, &self.name, self.url_span).into());
             }
             (Some(lit), _) => lit.clone(),
-            (None, Some(env_var)) => match std::env::var(env_var) {
-                Ok(var) if var.trim().is_empty() => {
+            (None, Some(env_var)) => match env(env_var) {
+                Some(var) if var.trim().is_empty() => {
                     return Err(DatamodelError::new_source_validation_error(
                         &format!(
                         "You must provide a nonempty URL. The environment variable `{}` resolved to an empty string.",
@@ -65,8 +69,8 @@ impl Datasource {
                     )
                     .into())
                 }
-                Ok(var) => var,
-                Err(_) => {
+                Some(var) => var,
+                None => {
                     return Err(DatamodelError::new_environment_functional_evaluation_error(
                         env_var.to_owned(),
                         self.url_span,
@@ -95,8 +99,11 @@ impl Datasource {
     /// context of NAPI integration.
     ///
     /// P.S. Don't forget to add new parameters here if needed!
-    pub fn load_url_with_config_dir(&self, config_dir: &Path) -> Result<String, Diagnostics> {
-        let url = self.load_url()?;
+    pub fn load_url_with_config_dir<F>(&self, config_dir: &Path, env: F) -> Result<String, Diagnostics>
+    where
+        F: Fn(&str) -> Option<String>,
+    {
+        let url = self.load_url(env)?;
         let url = self.active_connector.set_config_dir(config_dir, &url);
 
         Ok(url.into_owned())

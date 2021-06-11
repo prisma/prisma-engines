@@ -15,11 +15,13 @@ mod sql_renderer;
 mod sql_schema_calculator;
 mod sql_schema_differ;
 
+use std::env;
+
 use connection_wrapper::Connection;
 use datamodel::{walkers::walk_models, Configuration, Datamodel};
 use error::quaint_error_to_connector_error;
 use flavour::SqlFlavour;
-use migration_connector::*;
+use migration_connector::{migrations_directory::MigrationDirectory, *};
 use pair::Pair;
 use quaint::{prelude::ConnectionInfo, single::Quaint};
 use sql_migration::{DropUserDefinedType, DropView, SqlMigration, SqlMigrationStep};
@@ -144,9 +146,12 @@ impl SqlMigrationConnector {
             self.flavour.drop_migrations_table(connection).await?;
         }
 
-        for step in self.render_steps_pretty(&migration)? {
-            connection.raw_cmd(&step.raw).await?;
+        if migration.steps.is_empty() {
+            return Ok(());
         }
+
+        let migration = self.render_script(&Migration::new(migration), &DestructiveChangeDiagnostics::default());
+        connection.raw_cmd(&migration).await?;
 
         Ok(())
     }
@@ -156,7 +161,8 @@ impl SqlMigrationConnector {
         from: (&Configuration, &Datamodel),
         to: (&Configuration, &Datamodel),
     ) -> SqlMigration {
-        let connection_info = ConnectionInfo::from_url(&from.0.datasources[0].load_url().unwrap()).unwrap();
+        let connection_info =
+            ConnectionInfo::from_url(&from.0.datasources[0].load_url(|key| env::var(key).ok()).unwrap()).unwrap();
         let flavour = flavour::from_connection_info(&connection_info);
         let from_sql = sql_schema_calculator::calculate_sql_schema(from, flavour.as_ref());
         let to_sql = sql_schema_calculator::calculate_sql_schema(to, flavour.as_ref());
@@ -199,8 +205,6 @@ impl SqlMigrationConnector {
 
 #[async_trait::async_trait]
 impl MigrationConnector for SqlMigrationConnector {
-    type DatabaseMigration = SqlMigration;
-
     fn connector_type(&self) -> &'static str {
         self.connection.connection_info().sql_family().as_str()
     }
@@ -217,11 +221,7 @@ impl MigrationConnector for SqlMigrationConnector {
             .unwrap_or_else(|| "Database version information not available.".into()))
     }
 
-    async fn create_database(database_str: &str) -> ConnectorResult<String> {
-        Self::create_database(database_str).await
-    }
-
-    async fn diff(&self, from: DiffTarget<'_>, to: DiffTarget<'_>) -> ConnectorResult<Self::DatabaseMigration> {
+    async fn diff(&self, from: DiffTarget<'_>, to: DiffTarget<'_>) -> ConnectorResult<Migration> {
         let previous_schema = self.sql_schema_from_diff_target(&from).await?;
         let next_schema = self.sql_schema_from_diff_target(&to).await?;
 
@@ -255,12 +255,20 @@ impl MigrationConnector for SqlMigrationConnector {
                 Vec::new()
             };
 
-        Ok(SqlMigration {
+        Ok(Migration::new(SqlMigration {
             before: previous_schema,
             after: next_schema,
             added_columns_with_virtual_defaults,
             steps,
-        })
+        }))
+    }
+
+    fn migration_file_extension(&self) -> &'static str {
+        "sql"
+    }
+
+    fn migration_len(&self, migration: &Migration) -> usize {
+        migration.downcast_ref::<SqlMigration>().steps.len()
     }
 
     async fn reset(&self) -> ConnectorResult<()> {
@@ -269,6 +277,10 @@ impl MigrationConnector for SqlMigrationConnector {
         }
 
         Ok(())
+    }
+
+    fn migration_summary(&self, migration: &Migration) -> String {
+        migration.downcast_ref::<SqlMigration>().drift_summary()
     }
 
     /// Optionally check that the features implied by the provided datamodel are all compatible with
@@ -280,11 +292,11 @@ impl MigrationConnector for SqlMigrationConnector {
         self.flavour.check_database_version_compatibility(datamodel)
     }
 
-    fn database_migration_step_applier(&self) -> &dyn DatabaseMigrationStepApplier<SqlMigration> {
+    fn database_migration_step_applier(&self) -> &dyn DatabaseMigrationStepApplier {
         self
     }
 
-    fn destructive_change_checker(&self) -> &dyn DestructiveChangeChecker<SqlMigration> {
+    fn destructive_change_checker(&self) -> &dyn DestructiveChangeChecker {
         self
     }
 

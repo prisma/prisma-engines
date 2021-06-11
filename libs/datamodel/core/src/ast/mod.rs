@@ -52,7 +52,7 @@ pub(crate) use renderer::Renderer;
 #[derive(Debug, Clone, PartialEq)]
 pub struct SchemaAst {
     /// All models, enums, datasources, generators or type aliases
-    pub tops: Vec<Top>,
+    pub(crate) tops: Vec<Top>,
 }
 
 impl SchemaAst {

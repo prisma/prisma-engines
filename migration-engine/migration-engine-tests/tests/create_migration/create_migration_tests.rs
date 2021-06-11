@@ -218,7 +218,6 @@ fn migration_name_length_is_validated(api: TestApi) {
 
     api.create_migration("a-migration-with-a-name-that-is-way-too-long-a-migration-with-a-name-that-is-way-too-long-a-migration-with-a-name-that-is-way-too-long-a-migration-with-a-name-that-is-way-too-long", dm, &dir)
         .send_sync()
-
         .assert_migration_directories_count(1);
 }
 
