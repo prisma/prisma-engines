@@ -1,7 +1,8 @@
+//! MySQL doesn't support SetDefault for InnoDB (which is our only supported engine at the moment).
 use indoc::indoc;
 use query_engine_tests::*;
 
-#[test_suite(suite = "setdefault_onD_1to1_req", exclude(MongoDb))]
+#[test_suite(suite = "setdefault_onD_1to1_req", exclude(MongoDb, MySQL))]
 mod one2one_req {
     fn required_with_default() -> String {
         let schema = indoc! {
