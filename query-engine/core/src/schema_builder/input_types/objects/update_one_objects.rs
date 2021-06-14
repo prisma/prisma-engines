@@ -121,12 +121,12 @@ pub(super) fn scalar_input_fields_for_unchecked_update(
         .into_iter()
         .filter(|sf| !linking_fields.contains(sf))
         .filter(|sf| {
-            if let Some(ref id_fields) = id_fields {
+            if let Some(ref id_fields) = &id_fields {
                 // Exclude @@id or @id fields if not updatable
                 if id_fields.contains(sf) {
                     ctx.capabilities.contains(ConnectorCapability::UpdateableId)
                 } else {
-                    false
+                    true
                 }
             } else {
                 true

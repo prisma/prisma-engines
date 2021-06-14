@@ -901,7 +901,7 @@ impl<'a> Validator<'a> {
 
                 if field.is_list()
                     && !related_field.is_list()
-                    && (!rel_info.on_delete.is_none() || !rel_info.on_update.is_none())
+                    && (rel_info.on_delete.is_some() || rel_info.on_update.is_some())
                 {
                     errors.push_error(DatamodelError::new_attribute_validation_error(
                     &format!(
