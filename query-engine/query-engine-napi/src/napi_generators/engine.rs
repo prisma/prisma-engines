@@ -14,7 +14,7 @@ pub fn constructor(ctx: CallContext) -> napi::Result<JsUndefined> {
 
     let mut log_callback =
         ctx.env
-            .create_threadsafe_function(&callback, 10000, |mut ctx: ThreadSafeCallContext<String>| {
+            .create_threadsafe_function(&callback, 0, |mut ctx: ThreadSafeCallContext<String>| {
                 ctx.env.adjust_external_memory(ctx.value.len() as i64)?;
 
                 ctx.env
