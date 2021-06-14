@@ -5,7 +5,7 @@ use crate::{ast, configuration, diagnostics::Diagnostics, ValidatedDatamodel};
 /// Is responsible for loading and validating the Datamodel defined in an AST.
 /// Wrapper for all lift and validation steps
 pub struct ValidationPipeline<'a> {
-    lifter: LiftAstToDml<'a>,
+    source: Option<&'a configuration::Datasource>,
     validator: Validator<'a>,
     standardiser_for_parsing: StandardiserForParsing,
     standardiser_for_formatting: StandardiserForFormatting,
@@ -15,7 +15,7 @@ impl<'a, 'b> ValidationPipeline<'a> {
     pub fn new(sources: &'a [configuration::Datasource]) -> ValidationPipeline<'a> {
         let source = sources.first();
         ValidationPipeline {
-            lifter: LiftAstToDml::new(source),
+            source,
             validator: Validator::new(source),
             standardiser_for_formatting: StandardiserForFormatting::new(),
             standardiser_for_parsing: StandardiserForParsing::new(),
@@ -40,16 +40,16 @@ impl<'a, 'b> ValidationPipeline<'a> {
         // Phase 0 is parsing.
         // Phase 1 is source block loading.
 
-        // Phase 2: Prechecks.
-        if let Err(err) = precheck::Precheck::precheck(&ast_schema) {
-            diagnostics.extend(err);
-        }
+        // Phase 2: Name resolution.
+        let names = Names::new(ast_schema, &mut diagnostics);
 
         // Early return so that the validator does not have to deal with invalid schemas
         diagnostics.make_result()?;
 
         // Phase 3: Lift AST to DML.
-        let mut schema = match self.lifter.lift(ast_schema) {
+        let lifter = LiftAstToDml::new(self.source, &names);
+
+        let mut schema = match lifter.lift(ast_schema) {
             Err(err) => {
                 // Cannot continue on lifter error.
                 diagnostics.extend(err);
@@ -59,7 +59,7 @@ impl<'a, 'b> ValidationPipeline<'a> {
         };
 
         // Phase 4: Validation
-        if let Err(err) = self.validator.validate(ast_schema, &mut schema) {
+        if let Err(err) = self.validator.validate(ast_schema, &names, &mut schema) {
             diagnostics.extend(err);
         }
 

@@ -1,3 +1,4 @@
+use super::Names;
 use crate::ast::{Model, Span};
 use crate::{
     ast, configuration,
@@ -26,15 +27,20 @@ const PRISMA_FORMAT_HINT: &str = "You can run `prisma format` to fix this automa
 
 impl<'a> Validator<'a> {
     /// Creates a new instance, with all builtin attributes registered.
-    pub fn new(source: Option<&'a configuration::Datasource>) -> Validator<'a> {
+    pub(crate) fn new(source: Option<&'a configuration::Datasource>) -> Validator<'a> {
         Self { source }
     }
 
-    pub fn validate(&self, ast_schema: &ast::SchemaAst, schema: &mut dml::Datamodel) -> Result<(), Diagnostics> {
+    pub(crate) fn validate(
+        &self,
+        ast_schema: &ast::SchemaAst,
+        names: &Names<'_>,
+        schema: &mut dml::Datamodel,
+    ) -> Result<(), Diagnostics> {
         let mut all_errors = Diagnostics::new();
 
         //todo use this pattern everywhere instead of the if let result dance?
-        self.validate_names(&mut all_errors, ast_schema);
+        self.validate_names(&mut all_errors, ast_schema, names);
 
         if let Err(errs) = self.validate_names_for_indexes(ast_schema, schema) {
             all_errors.extend(errs);
@@ -110,7 +116,7 @@ impl<'a> Validator<'a> {
         for declared_enum in schema.enums() {
             let mut errors_for_enum = Diagnostics::new();
             if let Err(err) = self.validate_enum_name(
-                ast_schema.find_enum(&declared_enum.name).expect(STATE_ERROR),
+                names.get_enum(&declared_enum.name, ast_schema).expect(STATE_ERROR),
                 declared_enum,
             ) {
                 errors_for_enum.push_error(err);
@@ -250,7 +256,7 @@ impl<'a> Validator<'a> {
         all_errors.make_result()
     }
 
-    fn validate_names(&self, errors: &mut Diagnostics, ast_schema: &ast::SchemaAst) {
+    fn validate_names(&self, errors: &mut Diagnostics, ast_schema: &ast::SchemaAst, names: &Names<'_>) {
         for model in ast_schema.models() {
             errors.push_opt_error(model.name.validate("Model").err());
             errors.extend(model.validate_attributes());
@@ -261,7 +267,7 @@ impl<'a> Validator<'a> {
             }
         }
 
-        for enum_decl in ast_schema.enums() {
+        for (_, enum_decl) in names.iter_enums(ast_schema) {
             errors.push_opt_error(enum_decl.name.validate("Enum").err());
             errors.extend(enum_decl.validate_attributes());
 

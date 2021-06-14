@@ -212,7 +212,7 @@ pub fn render_datamodel_to_string(datamodel: &dml::Datamodel) -> String {
 
 /// Renders an AST to a string.
 pub fn render_schema_ast_to_string(schema: &SchemaAst) -> String {
-    let mut writable_string = String::with_capacity(schema.models().len() * 20);
+    let mut writable_string = String::with_capacity(schema.tops.len() * 20);
 
     render_schema_ast_to(&mut writable_string, &schema, 2);
 
