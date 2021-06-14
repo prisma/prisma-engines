@@ -54,12 +54,27 @@ The validated and standardised **Datamodel** structure is the primary output of 
 
 For a parsed, validated and standardised datamodel, the following guarantees hold:
 
-- Each referred model or enum does exist.
+- Each referenced model or enum does exist.
 - Each related field has a backwards related field on the related type with equal relation name. If the user did not specify any, a backwards field will be generated.
-- All relations are be named.
+- All relations are named.
 - All relations have a valid list of `to_fields` on the referencing side. An empty list indicates the back relation field. If the user does not give any `references` argument, the `to_fields` will point to the related types id fields.
 
 **These Guarantees do not hold if a datamodel is loaded from DMMF**
+
+## Error handling
+
+The datamodel parser strives to provide good error diagnostics to schema
+authors. As such, it has to be capable of dealing with partially broken input
+and keep validating. The validation process can however not proceed to the
+validating models in presence of a broken datasource, for example, because that
+would lead to a cascade of misleading errors. Like other parsers, we introduce
+*cutoff points* where validation will stop in the presence of errors.
+
+These are:
+
+- AST parsing stage. Syntax errors.
+- Configuration validation
+- Datamodel validation
 
 ## Usage
 
