@@ -28,7 +28,7 @@ impl GeneratorLoader {
     pub fn load_generators_from_ast(ast_schema: &ast::SchemaAst, diagnostics: &mut Diagnostics) -> Vec<Generator> {
         let mut generators: Vec<Generator> = Vec::new();
 
-        for gen in &ast_schema.generators() {
+        for gen in ast_schema.generators() {
             if let Some(generator) = Self::lift_generator(&gen, diagnostics) {
                 generators.push(generator)
             }

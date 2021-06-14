@@ -1,3 +1,4 @@
+use super::Names;
 use crate::{
     ast, configuration,
     diagnostics::{DatamodelError, Diagnostics},
@@ -25,14 +26,19 @@ const PRISMA_FORMAT_HINT: &str = "You can run `prisma format` to fix this automa
 
 impl<'a> Validator<'a> {
     /// Creates a new instance, with all builtin attributes registered.
-    pub fn new(source: Option<&'a configuration::Datasource>) -> Validator<'a> {
+    pub(crate) fn new(source: Option<&'a configuration::Datasource>) -> Validator<'a> {
         Self { source }
     }
 
-    pub fn validate(&self, ast_schema: &ast::SchemaAst, schema: &mut dml::Datamodel) -> Result<(), Diagnostics> {
+    pub(crate) fn validate(
+        &self,
+        ast_schema: &ast::SchemaAst,
+        names: &Names<'_>,
+        schema: &mut dml::Datamodel,
+    ) -> Result<(), Diagnostics> {
         let mut all_errors = Diagnostics::new();
 
-        if let Err(ref mut errs) = self.validate_names(ast_schema) {
+        if let Err(ref mut errs) = self.validate_names(ast_schema, names) {
             all_errors.append(errs);
         }
 
@@ -49,7 +55,6 @@ impl<'a> Validator<'a> {
                 if !model.is_ignored {
                     let span = ast_schema
                         .models()
-                        .iter()
                         .find(|ast_model| ast_model.name.name == model.name)
                         .unwrap()
                         .fields
@@ -125,7 +130,7 @@ impl<'a> Validator<'a> {
         for declared_enum in schema.enums() {
             let mut errors_for_enum = Diagnostics::new();
             if let Err(err) = self.validate_enum_name(
-                ast_schema.find_enum(&declared_enum.name).expect(STATE_ERROR),
+                names.get_enum(&declared_enum.name, ast_schema).expect(STATE_ERROR),
                 declared_enum,
             ) {
                 errors_for_enum.push_error(err);
@@ -172,7 +177,7 @@ impl<'a> Validator<'a> {
         }
     }
 
-    fn validate_names(&self, ast_schema: &ast::SchemaAst) -> Result<(), Diagnostics> {
+    fn validate_names(&self, ast_schema: &ast::SchemaAst, names: &Names<'_>) -> Result<(), Diagnostics> {
         let mut errors = Diagnostics::new();
 
         for model in ast_schema.models() {
@@ -185,7 +190,7 @@ impl<'a> Validator<'a> {
             }
         }
 
-        for enum_decl in ast_schema.enums() {
+        for (_, enum_decl) in names.iter_enums(ast_schema) {
             errors.push_opt_error(enum_decl.name.validate("Enum").err());
             errors.append(&mut enum_decl.validate_attributes());
 

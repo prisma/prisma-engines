@@ -45,14 +45,14 @@ impl DatasourceLoader {
     ) -> Vec<Datasource> {
         let mut sources = Vec::new();
 
-        for src in &ast_schema.sources() {
+        for src in ast_schema.sources() {
             if let Some(source) = self.lift_datasource(&src, preview_features, diagnostics) {
                 sources.push(source)
             }
         }
 
         if sources.len() > 1 {
-            for src in &ast_schema.sources() {
+            for src in ast_schema.sources() {
                 diagnostics.push_error(DatamodelError::new_source_validation_error(
                     &"You defined more than one datasource. This is not allowed yet because support for multiple databases has not been implemented yet.".to_string(),
                     &src.name.name,
