@@ -1,7 +1,7 @@
 use indoc::indoc;
 use query_engine_tests::*;
 
-#[test_suite(schema(required), exclude(MongoDb))]
+#[test_suite(suite = "noaction_onD_1to1_req", schema(required), exclude(MongoDb))]
 mod one2one_req {
     fn required() -> String {
         let schema = indoc! {
@@ -46,7 +46,7 @@ mod one2one_req {
     }
 }
 
-#[test_suite(schema(optional), exclude(MongoDb))]
+#[test_suite(suite = "noaction_onD_1to1_opt", schema(optional), exclude(MongoDb))]
 mod one2one_opt {
     fn optional() -> String {
         let schema = indoc! {
@@ -117,7 +117,7 @@ mod one2one_opt {
     }
 }
 
-#[test_suite(schema(required), exclude(MongoDb))]
+#[test_suite(suite = "noaction_onD_1toM_req", schema(required), exclude(MongoDb))]
 mod one2many_req {
     fn required() -> String {
         let schema = indoc! {
@@ -188,7 +188,7 @@ mod one2many_req {
     }
 }
 
-#[test_suite(schema(optional), exclude(MongoDb))]
+#[test_suite(suite = "noaction_onD_1toM_opt", schema(optional), exclude(MongoDb))]
 mod one2many_opt {
     fn optional() -> String {
         let schema = indoc! {
