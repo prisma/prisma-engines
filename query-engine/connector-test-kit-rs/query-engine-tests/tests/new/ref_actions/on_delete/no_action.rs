@@ -1,5 +1,3 @@
-//! SQL Server doesn't support Restrict.
-
 use indoc::indoc;
 use query_engine_tests::*;
 
