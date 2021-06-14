@@ -101,11 +101,6 @@ impl GeneratorLoader {
             let (features, mut diag) = parse_and_validate_preview_features(raw_preview_features, &GENERATOR, span);
             diagnostics.append(&mut diag);
 
-<<<<<<< HEAD
-            diagnostics.make_result()?;
-
-=======
->>>>>>> master
             features
         } else {
             vec![]
