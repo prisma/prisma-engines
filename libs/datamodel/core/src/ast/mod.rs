@@ -59,15 +59,15 @@ impl SchemaAst {
         SchemaAst { tops: Vec::new() }
     }
 
-    pub fn find_model(&self, model: &str) -> Option<&Model> {
+    pub(crate) fn find_model(&self, model: &str) -> Option<&Model> {
         self.models().into_iter().find(|m| m.name.name == model)
     }
 
-    pub fn find_type_alias(&self, type_name: &str) -> Option<&Field> {
-        self.types().into_iter().find(|t| t.name.name == type_name)
+    pub(crate) fn find_type_alias(&self, type_name: &str) -> Option<&Field> {
+        self.types().find(|t| t.name.name == type_name)
     }
 
-    pub fn find_field(&self, model: &str, field: &str) -> Option<&Field> {
+    pub(crate) fn find_field(&self, model: &str, field: &str) -> Option<&Field> {
         self.find_model(model)?.fields.iter().find(|f| f.name.name == field)
     }
 
@@ -78,41 +78,25 @@ impl SchemaAst {
             .map(|(top_idx, top)| (TopId(top_idx as u32), top))
     }
 
-    pub fn types(&self) -> Vec<&Field> {
-        self.tops
-            .iter()
-            .filter_map(|top| match top {
-                Top::Type(x) => Some(x),
-                _ => None,
-            })
-            .collect()
+    pub(crate) fn types(&self) -> impl Iterator<Item = &Field> {
+        self.tops.iter().filter_map(|top| top.as_type_alias())
     }
 
-    pub fn models(&self) -> Vec<&Model> {
-        self.tops
-            .iter()
-            .filter_map(|top| match top {
-                Top::Model(x) => Some(x),
-                _ => None,
-            })
-            .collect()
+    pub(crate) fn models(&self) -> impl Iterator<Item = &Model> {
+        self.tops.iter().filter_map(|top| top.as_model())
     }
 
-    pub fn sources(&self) -> impl Iterator<Item = &SourceConfig> {
-        self.tops.iter().filter_map(|top| match top {
-            Top::Source(x) => Some(x),
-            _ => None,
-        })
+    pub(crate) fn sources(&self) -> impl Iterator<Item = &SourceConfig> {
+        self.tops.iter().filter_map(|top| top.as_source())
     }
 
-    pub fn generators(&self) -> impl Iterator<Item = &GeneratorConfig> {
-        self.tops.iter().filter_map(|top| match top {
-            Top::Generator(x) => Some(x),
-            _ => None,
-        })
+    pub(crate) fn generators(&self) -> impl Iterator<Item = &GeneratorConfig> {
+        self.tops.iter().filter_map(|top| top.as_generator())
     }
 }
 
+/// An opaque identifier for a top-level item in a schema AST. Use the
+/// `schema[top_id]` syntax to resolve the id to an `ast::Top`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) struct TopId(u32);
 

@@ -9,8 +9,17 @@ use std::{
 };
 
 /// Resolved names for use in the validation process.
+///
+/// `Names::new()` is also responsible for validating that there are no name
+/// collisions in the following namespaces:
+///
+/// - Model, enum and type alias names
+/// - Generators
+/// - Datasources
+/// - Model fields for each model
+/// - Enum variants for each enum
 pub(crate) struct Names<'ast> {
-    /// Models and enums
+    /// Models, enums and type aliases
     tops: HashMap<&'ast str, TopId>,
     /// Generators have their own namespace.
     generators: HashMap<&'ast str, TopId>,

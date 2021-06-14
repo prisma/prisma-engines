@@ -55,7 +55,6 @@ impl<'a> Validator<'a> {
                 if !model.is_ignored {
                     let span = ast_schema
                         .models()
-                        .iter()
                         .find(|ast_model| ast_model.name.name == model.name)
                         .unwrap()
                         .fields
