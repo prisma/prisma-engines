@@ -5,6 +5,7 @@ use crate::{
 };
 use connector::{Filter, WriteArgs};
 use datamodel::common::preview_features::PreviewFeature;
+use datamodel_connector::ConnectorCapability;
 use itertools::Itertools;
 use once_cell::sync::OnceCell;
 use prisma_models::{ModelProjection, ModelRef, RelationFieldRef};
@@ -327,11 +328,14 @@ pub fn insert_deletion_restrict_checks(
         // We know that the relation can't be a list and must be required on the related model for `model` (see fields_requiring_model).
         // For all requiring models (RM), we use the field on `model` to query for existing RM records and error out if at least one exists.
         for rf in relation_fields {
-            // if dbg!(connector_ctx.features.contains(&PreviewFeature::ReferentialActions)) {
-            //     if !matches!(rf.relation().on_delete(), datamodel::ReferentialAction::EmulateRestrict) {
-            //         continue;
-            //     }
-            // }
+            if connector_ctx.features.contains(&PreviewFeature::ReferentialActions) {
+                // If the connector supports foreign keys, we do not do any emulation.
+                if connector_ctx.capabilities.contains(&ConnectorCapability::ForeignKeys)
+                // && !matches!(rf.relation().on_delete(), datamodel::ReferentialAction::Restrict)
+                {
+                    continue;
+                }
+            }
 
             let noop_node = once.get_or_init(|| graph.create_node(Node::Empty));
             let relation_field = rf.related_field();
