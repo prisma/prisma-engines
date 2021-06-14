@@ -45,14 +45,13 @@ pub(crate) use renderer::Renderer;
 /// during validation of a schema, especially when implementing custom attributes.
 ///
 /// The AST is not validated, also fields and attributes are not resolved. Every node is
-/// annotated with it's location in the text representation.
+/// annotated with its location in the text representation.
 /// Basically, the AST is an object oriented representation of the datamodel's text.
-/// A prisma schema.
 /// Schema = Datamodel + Generators + Datasources
 #[derive(Debug, Clone, PartialEq)]
 pub struct SchemaAst {
     /// All models, enums, datasources, generators or type aliases
-    pub(crate) tops: Vec<Top>,
+    pub(super) tops: Vec<Top>,
 }
 
 impl SchemaAst {
@@ -66,13 +65,6 @@ impl SchemaAst {
 
     pub fn find_type_alias(&self, type_name: &str) -> Option<&Field> {
         self.types().into_iter().find(|t| t.name.name == type_name)
-    }
-
-    pub fn find_enum_mut(&mut self, enum_name: &str) -> Option<&mut Enum> {
-        self.tops.iter_mut().find_map(|top| match top {
-            Top::Enum(r#enum) if r#enum.name.name == enum_name => Some(r#enum),
-            _ => None,
-        })
     }
 
     pub fn find_field(&self, model: &str, field: &str) -> Option<&Field> {
@@ -96,16 +88,6 @@ impl SchemaAst {
             .collect()
     }
 
-    pub fn enums(&self) -> Vec<&Enum> {
-        self.tops
-            .iter()
-            .filter_map(|top| match top {
-                Top::Enum(x) => Some(x),
-                _ => None,
-            })
-            .collect()
-    }
-
     pub fn models(&self) -> Vec<&Model> {
         self.tops
             .iter()
@@ -116,24 +98,18 @@ impl SchemaAst {
             .collect()
     }
 
-    pub fn sources(&self) -> Vec<&SourceConfig> {
-        self.tops
-            .iter()
-            .filter_map(|top| match top {
-                Top::Source(x) => Some(x),
-                _ => None,
-            })
-            .collect()
+    pub fn sources(&self) -> impl Iterator<Item = &SourceConfig> {
+        self.tops.iter().filter_map(|top| match top {
+            Top::Source(x) => Some(x),
+            _ => None,
+        })
     }
 
-    pub fn generators(&self) -> Vec<&GeneratorConfig> {
-        self.tops
-            .iter()
-            .filter_map(|top| match top {
-                Top::Generator(x) => Some(x),
-                _ => None,
-            })
-            .collect()
+    pub fn generators(&self) -> impl Iterator<Item = &GeneratorConfig> {
+        self.tops.iter().filter_map(|top| match top {
+            Top::Generator(x) => Some(x),
+            _ => None,
+        })
     }
 }
 

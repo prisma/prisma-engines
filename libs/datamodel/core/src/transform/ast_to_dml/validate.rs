@@ -38,7 +38,7 @@ impl<'a> Validator<'a> {
     ) -> Result<(), Diagnostics> {
         let mut all_errors = Diagnostics::new();
 
-        if let Err(ref mut errs) = self.validate_names(ast_schema) {
+        if let Err(ref mut errs) = self.validate_names(ast_schema, names) {
             all_errors.append(errs);
         }
 
@@ -178,7 +178,7 @@ impl<'a> Validator<'a> {
         }
     }
 
-    fn validate_names(&self, ast_schema: &ast::SchemaAst) -> Result<(), Diagnostics> {
+    fn validate_names(&self, ast_schema: &ast::SchemaAst, names: &Names<'_>) -> Result<(), Diagnostics> {
         let mut errors = Diagnostics::new();
 
         for model in ast_schema.models() {
@@ -191,7 +191,7 @@ impl<'a> Validator<'a> {
             }
         }
 
-        for enum_decl in ast_schema.enums() {
+        for (_, enum_decl) in names.iter_enums(ast_schema) {
             errors.push_opt_error(enum_decl.name.validate("Enum").err());
             errors.append(&mut enum_decl.validate_attributes());
 
