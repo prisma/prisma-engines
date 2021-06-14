@@ -6,7 +6,6 @@ use crate::{
     DefaultValue, FieldType,
 };
 use crate::{ast::WithAttributes, walkers::walk_models};
-use datamodel_connector::ConnectorCapability;
 use itertools::Itertools;
 use prisma_value::PrismaValue;
 use std::collections::{HashMap, HashSet};
@@ -517,13 +516,7 @@ impl<'a> Validator<'a> {
                     let actions = &[rf.relation_info.on_delete, rf.relation_info.on_update];
 
                     actions.iter().flatten().for_each(|action| {
-                        if !connector.has_capability(ConnectorCapability::ReferentialActions) {
-                            diagnostics.push_error(DatamodelError::new_attribute_validation_error(
-                                "Referential actions are not supported for current connector.",
-                                "relation",
-                                ast_model.find_field(field.name()).span,
-                            ));
-                        } else if !connector.supports_referential_action(*action) {
+                        if !connector.supports_referential_action(*action) {
                             let allowed_values: Vec<_> = connector
                                 .referential_actions()
                                 .iter()
@@ -899,6 +892,20 @@ impl<'a> Validator<'a> {
                     errors.push_error(DatamodelError::new_attribute_validation_error(
                     &format!(
                         "The relation field `{}` on Model `{}` must not specify the `fields` or `references` argument in the {} attribute. You must only specify it on the opposite field `{}` on model `{}`.",
+                        &field.name, &model.name, RELATION_ATTRIBUTE_NAME_WITH_AT, &related_field.name, &related_model.name
+                            ),
+                    RELATION_ATTRIBUTE_NAME,
+                    field_span,
+                        ));
+                }
+
+                if field.is_list()
+                    && !related_field.is_list()
+                    && (!rel_info.on_delete.is_none() || !rel_info.on_update.is_none())
+                {
+                    errors.push_error(DatamodelError::new_attribute_validation_error(
+                    &format!(
+                        "The relation field `{}` on Model `{}` must not specify the `onDelete` or `onUpdate` argument in the {} attribute. You must only specify it on the opposite field `{}` on model `{}`, or in case of a many to many relation, in an explicit join table.",
                         &field.name, &model.name, RELATION_ATTRIBUTE_NAME_WITH_AT, &related_field.name, &related_model.name
                             ),
                     RELATION_ATTRIBUTE_NAME,

@@ -278,12 +278,15 @@ impl PartialEq for RelationField {
             && self.is_ignored == other.is_ignored
             && self.relation_info == other.relation_info;
 
-        let this_on_delete = self.relation_info.on_delete.or_else(|| self.default_on_delete_action());
+        let this_on_delete = self
+            .relation_info
+            .on_delete
+            .unwrap_or_else(|| self.default_on_delete_action());
 
         let other_on_delete = other
             .relation_info
             .on_delete
-            .or_else(|| other.default_on_delete_action());
+            .unwrap_or_else(|| other.default_on_delete_action());
 
         let on_delete_matches = this_on_delete == other_on_delete;
 
@@ -363,26 +366,23 @@ impl RelationField {
         self.arity.is_optional()
     }
 
-    pub fn default_on_delete_action(&self) -> Option<ReferentialAction> {
-        let is_virtual = self.virtual_referential_actions.unwrap_or(false);
+    pub fn default_on_delete_action(&self) -> ReferentialAction {
+        use ReferentialAction::*;
 
-        self.supports_restrict_action.map(|restrict_ok| match self.arity {
-            FieldArity::Required if is_virtual => ReferentialAction::EmulateRestrict,
-            FieldArity::Optional if is_virtual => ReferentialAction::EmulateSetNull,
-
-            FieldArity::Required if restrict_ok => ReferentialAction::Restrict,
-            FieldArity::Required => ReferentialAction::NoAction,
-
-            _ => ReferentialAction::SetNull,
-        })
+        match self.arity {
+            FieldArity::Required if self.supports_restrict_action.unwrap_or(true) => Restrict,
+            FieldArity::Required => NoAction,
+            _ => SetNull,
+        }
     }
 
     pub fn default_on_update_action(&self) -> ReferentialAction {
-        let is_virtual = self.virtual_referential_actions.unwrap_or(false);
+        use ReferentialAction::*;
 
         match self.arity {
-            _ if is_virtual => ReferentialAction::EmulateNoAction,
-            _ => ReferentialAction::Cascade,
+            _ if !self.virtual_referential_actions.unwrap_or(false) => Cascade,
+            FieldArity::Required => Restrict,
+            _ => SetNull,
         }
     }
 }

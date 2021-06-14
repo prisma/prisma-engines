@@ -59,8 +59,8 @@ fn on_update_actions() {
 }
 
 #[test]
-fn virtual_actions_on_mongo() {
-    let actions = &[EmulateRestrict, EmulateSetNull];
+fn actions_on_mongo() {
+    let actions = &[Restrict, SetNull];
 
     for action in actions {
         let dml = formatdoc!(
@@ -93,8 +93,8 @@ fn virtual_actions_on_mongo() {
 }
 
 #[test]
-fn virtual_actions_on_planetscale() {
-    let actions = &[EmulateRestrict, EmulateSetNull];
+fn actions_on_planetscale() {
+    let actions = &[Restrict, SetNull];
 
     for action in actions {
         let dml = formatdoc!(
@@ -207,13 +207,7 @@ fn restrict_should_not_work_on_sql_server() {
 
 #[test]
 fn concrete_actions_should_not_work_on_mongo() {
-    let actions = &[
-        (Cascade, 237),
-        (Restrict, 238),
-        (NoAction, 238),
-        (SetNull, 237),
-        (SetDefault, 240),
-    ];
+    let actions = &[(Cascade, 237), (NoAction, 238), (SetDefault, 240)];
 
     for (action, span) in actions {
         let dml = formatdoc!(
@@ -238,7 +232,7 @@ fn concrete_actions_should_not_work_on_mongo() {
         );
 
         let message = format!(
-            "Invalid referential action: `{}`. Allowed values: (`EmulateSetNull`, `EmulateRestrict`)",
+            "Invalid referential action: `{}`. Allowed values: (`Restrict`, `SetNull`)",
             action
         );
 
@@ -252,13 +246,7 @@ fn concrete_actions_should_not_work_on_mongo() {
 
 #[test]
 fn concrete_actions_should_not_work_on_planetscale() {
-    let actions = &[
-        (Cascade, 389),
-        (Restrict, 390),
-        (NoAction, 390),
-        (SetNull, 389),
-        (SetDefault, 392),
-    ];
+    let actions = &[(Cascade, 389), (NoAction, 390), (SetDefault, 392)];
 
     for (action, span) in actions {
         let dml = formatdoc!(
@@ -289,7 +277,7 @@ fn concrete_actions_should_not_work_on_planetscale() {
         );
 
         let message = format!(
-            "Invalid referential action: `{}`. Allowed values: (`EmulateSetNull`, `EmulateRestrict`)",
+            "Invalid referential action: `{}`. Allowed values: (`Restrict`, `SetNull`)",
             action
         );
 
@@ -299,4 +287,64 @@ fn concrete_actions_should_not_work_on_planetscale() {
             Span::new(323, *span),
         )]);
     }
+}
+
+#[test]
+fn on_delete_cannot_be_defined_on_the_wrong_side() {
+    let dml = indoc! { r#"
+        datasource db {
+            provider = "mysql"
+            url = "mysql://"
+        }
+
+        model A {
+            id Int @id
+            bs B[] @relation(onDelete: Restrict)
+        }
+
+        model B {
+            id Int @id
+            aId Int
+            a A @relation(fields: [aId], references: [id], onDelete: Restrict)
+        }
+    "#};
+
+    let message =
+        "The relation field `bs` on Model `A` must not specify the `onDelete` or `onUpdate` argument in the @relation attribute. You must only specify it on the opposite field `a` on model `B`, or in case of a many to many relation, in an explicit join table.";
+
+    parse_error(dml).assert_are(&[DatamodelError::new_attribute_validation_error(
+        &message,
+        "relation",
+        Span::new(92, 129),
+    )]);
+}
+
+#[test]
+fn on_update_cannot_be_defined_on_the_wrong_side() {
+    let dml = indoc! { r#"
+        datasource db {
+            provider = "mysql"
+            url = "mysql://"
+        }
+
+        model A {
+            id Int @id
+            bs B[] @relation(onUpdate: Restrict)
+        }
+
+        model B {
+            id Int @id
+            aId Int
+            a A @relation(fields: [aId], references: [id], onUpdate: Restrict)
+        }
+    "#};
+
+    let message =
+        "The relation field `bs` on Model `A` must not specify the `onDelete` or `onUpdate` argument in the @relation attribute. You must only specify it on the opposite field `a` on model `B`, or in case of a many to many relation, in an explicit join table.";
+
+    parse_error(dml).assert_are(&[DatamodelError::new_attribute_validation_error(
+        &message,
+        "relation",
+        Span::new(92, 129),
+    )]);
 }

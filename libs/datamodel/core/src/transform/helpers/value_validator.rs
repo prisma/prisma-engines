@@ -173,8 +173,6 @@ impl ValueValidator {
             "NoAction" => Ok(ReferentialAction::NoAction),
             "SetNull" => Ok(ReferentialAction::SetNull),
             "SetDefault" => Ok(ReferentialAction::SetDefault),
-            "EmulateRestrict" => Ok(ReferentialAction::EmulateRestrict),
-            "EmulateSetNull" => Ok(ReferentialAction::EmulateSetNull),
             s => {
                 let message = format!("Invalid referential action: `{}`", s);
 

@@ -71,12 +71,6 @@ pub enum ReferentialAction {
     /// of relation. Will always result in a runtime error if no defaults are
     /// provided for any relation scalar fields.
     SetDefault,
-    /// An emulated version of `SetNull` for databases without foreign keys.
-    EmulateSetNull,
-    /// An emulated version of `Restrict` for databases without foreign keys.
-    EmulateRestrict,
-    /// An emulated version of `NoAction` for databases without foreign keys.
-    EmulateNoAction,
 }
 
 impl fmt::Display for ReferentialAction {
@@ -87,9 +81,6 @@ impl fmt::Display for ReferentialAction {
             ReferentialAction::NoAction => write!(f, "NoAction"),
             ReferentialAction::SetNull => write!(f, "SetNull"),
             ReferentialAction::SetDefault => write!(f, "SetDefault"),
-            ReferentialAction::EmulateSetNull => write!(f, "EmulateSetNull"),
-            ReferentialAction::EmulateRestrict => write!(f, "EmulateRestrict"),
-            ReferentialAction::EmulateNoAction => write!(f, "EmulateNoAction"),
         }
     }
 }

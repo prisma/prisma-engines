@@ -102,12 +102,7 @@ impl AttributeValidator<dml::Field> for RelationAttributeValidator {
             }
 
             if let Some(ref_action) = relation_info.on_delete {
-                let is_default = rf
-                    .default_on_delete_action()
-                    .map(|default| default == ref_action)
-                    .unwrap_or(false);
-
-                if !is_default {
+                if rf.default_on_delete_action() != ref_action {
                     let expression = ast::Expression::ConstantValue(ref_action.to_string(), ast::Span::empty());
                     args.push(ast::Argument::new("onDelete", expression));
                 }

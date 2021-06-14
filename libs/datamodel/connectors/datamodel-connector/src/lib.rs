@@ -183,7 +183,7 @@ pub enum ConnectorCapability {
     AutoIncrementMultipleAllowed,
     AutoIncrementNonIndexedAllowed,
     RelationFieldsInArbitraryOrder,
-    ReferentialActions,
+    ForeignKeys,
 
     // start of Query Engine Capabilities
     InsensitiveFilters,
