@@ -632,7 +632,8 @@ fn create_constraint_name_tests(api: TestApi) {
         });
 }
 
-#[test_connector]
+//todo switch this to exclude Windows as soon as the test setup has that capability
+#[test_connector(exclude(Mysql))]
 fn alter_constraint_name_tests(api: TestApi) {
     let plain_dm = r#"
         model A {
