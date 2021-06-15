@@ -4,7 +4,7 @@ use crate::{
     ConnectorContext, ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult,
 };
 use connector::{Filter, WriteArgs};
-use datamodel::common::preview_features::PreviewFeature;
+use datamodel::{common::preview_features::PreviewFeature, ReferentialAction};
 use datamodel_connector::ConnectorCapability;
 use itertools::Itertools;
 use once_cell::sync::OnceCell;
@@ -316,10 +316,16 @@ pub fn insert_deletion_restrict_checks(
     parent_node: &NodeRef,
     child_node: &NodeRef,
 ) -> QueryGraphBuilderResult<()> {
-    let internal_model = model.internal_data_model();
-    let relation_fields = internal_model.fields_requiring_model(model);
-    let mut check_nodes = vec![];
+    let has_fks = connector_ctx.capabilities.contains(&ConnectorCapability::ForeignKeys);
+    // If the connector supports foreign keys, we do not do any checks / emulation.
+    if connector_ctx.features.contains(&PreviewFeature::ReferentialActions) && has_fks {
+        return Ok(());
+    }
 
+    // If it's non-fk dbs, then the emulation will kick in. If it has Fks, then preserve the old behavior (only required ones).
+    let internal_model = model.internal_data_model();
+    let relation_fields = internal_model.fields_pointing_to_model(model, has_fks);
+    let mut check_nodes = vec![];
     let once = OnceCell::new();
 
     if !relation_fields.is_empty() {
@@ -328,13 +334,9 @@ pub fn insert_deletion_restrict_checks(
         // We know that the relation can't be a list and must be required on the related model for `model` (see fields_requiring_model).
         // For all requiring models (RM), we use the field on `model` to query for existing RM records and error out if at least one exists.
         for rf in relation_fields {
-            if connector_ctx.features.contains(&PreviewFeature::ReferentialActions) {
-                // If the connector supports foreign keys, we do not do any emulation.
-                if connector_ctx.capabilities.contains(&ConnectorCapability::ForeignKeys)
-                // && !matches!(rf.relation().on_delete(), datamodel::ReferentialAction::Restrict)
-                {
-                    continue;
-                }
+            // We're only looking to emulate restrict here.
+            if rf.relation().on_delete() != ReferentialAction::Restrict {
+                continue;
             }
 
             let noop_node = once.get_or_init(|| graph.create_node(Node::Empty));

@@ -3,7 +3,7 @@
 use indoc::indoc;
 use query_engine_tests::*;
 
-#[test_suite(suite = "restrict_onD_1to1_req", schema(required), exclude(MongoDb, SqlServer))]
+#[test_suite(suite = "restrict_onD_1to1_req", schema(required), exclude(SqlServer))]
 mod one2one_req {
     fn required() -> String {
         let schema = indoc! {
@@ -30,25 +30,26 @@ mod one2one_req {
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
-        assert_error!(
-            runner,
-            "mutation { deleteOneParent(where: { id: 1 }) { id }}",
-            2003,
-            "Foreign key constraint failed on the field"
-        );
-
-        assert_error!(
-            runner,
-            "mutation { deleteManyParent(where: { id: 1 }) { count }}",
-            2003,
-            "Foreign key constraint failed on the field"
-        );
+        match runner.connector() {
+            ConnectorTag::MongoDb(_) => assert_error!(
+                runner,
+                "mutation { deleteOneParent(where: { id: 1 }) { id }}",
+                2014,
+                "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
+            ),
+            _ => assert_error!(
+                runner,
+                "mutation { deleteOneParent(where: { id: 1 }) { id }}",
+                2003,
+                "Foreign key constraint failed on the field"
+            ),
+        };
 
         Ok(())
     }
 }
 
-#[test_suite(suite = "restrict_onD_1to1_opt", schema(optional), exclude(MongoDb, SqlServer))]
+#[test_suite(suite = "restrict_onD_1to1_opt", schema(optional), exclude(SqlServer))]
 mod one2one_opt {
     fn optional() -> String {
         let schema = indoc! {
@@ -75,19 +76,20 @@ mod one2one_opt {
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
-        assert_error!(
-            runner,
-            "mutation { deleteOneParent(where: { id: 1 }) { id }}",
-            2003,
-            "Foreign key constraint failed on the field"
-        );
-
-        assert_error!(
-            runner,
-            "mutation { deleteManyParent(where: { id: 1 }) { count }}",
-            2003,
-            "Foreign key constraint failed on the field"
-        );
+        match runner.connector() {
+            ConnectorTag::MongoDb(_) => assert_error!(
+                runner,
+                "mutation { deleteOneParent(where: { id: 1 }) { id }}",
+                2014,
+                "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
+            ),
+            _ => assert_error!(
+                runner,
+                "mutation { deleteOneParent(where: { id: 1 }) { id }}",
+                2003,
+                "Foreign key constraint failed on the field"
+            ),
+        };
 
         Ok(())
     }
@@ -119,7 +121,7 @@ mod one2one_opt {
     }
 }
 
-#[test_suite(suite = "restrict_onD_1toM_req", schema(required), exclude(MongoDb, SqlServer))]
+#[test_suite(suite = "restrict_onD_1toM_req", schema(required), exclude(SqlServer))]
 mod one2many_req {
     fn required() -> String {
         let schema = indoc! {
@@ -146,19 +148,20 @@ mod one2many_req {
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
-        assert_error!(
-            runner,
-            "mutation { deleteOneParent(where: { id: 1 }) { id }}",
-            2003,
-            "Foreign key constraint failed on the field"
-        );
-
-        assert_error!(
-            runner,
-            "mutation { deleteManyParent(where: { id: 1 }) { count }}",
-            2003,
-            "Foreign key constraint failed on the field"
-        );
+        match runner.connector() {
+            ConnectorTag::MongoDb(_) => assert_error!(
+                runner,
+                "mutation { deleteOneParent(where: { id: 1 }) { id }}",
+                2014,
+                "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
+            ),
+            _ => assert_error!(
+                runner,
+                "mutation { deleteOneParent(where: { id: 1 }) { id }}",
+                2003,
+                "Foreign key constraint failed on the field"
+            ),
+        };
 
         Ok(())
     }
@@ -190,7 +193,7 @@ mod one2many_req {
     }
 }
 
-#[test_suite(suite = "restrict_onD_1toM_opt", schema(optional), exclude(MongoDb, SqlServer))]
+#[test_suite(suite = "restrict_onD_1toM_opt", schema(optional), exclude(SqlServer))]
 mod one2many_opt {
     fn optional() -> String {
         let schema = indoc! {
@@ -217,19 +220,20 @@ mod one2many_opt {
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
-        assert_error!(
-            runner,
-            "mutation { deleteOneParent(where: { id: 1 }) { id }}",
-            2003,
-            "Foreign key constraint failed on the field"
-        );
-
-        assert_error!(
-            runner,
-            "mutation { deleteManyParent(where: { id: 1 }) { count }}",
-            2003,
-            "Foreign key constraint failed on the field"
-        );
+        match runner.connector() {
+            ConnectorTag::MongoDb(_) => assert_error!(
+                runner,
+                "mutation { deleteOneParent(where: { id: 1 }) { id }}",
+                2014,
+                "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
+            ),
+            _ => assert_error!(
+                runner,
+                "mutation { deleteOneParent(where: { id: 1 }) { id }}",
+                2003,
+                "Foreign key constraint failed on the field"
+            ),
+        };
 
         Ok(())
     }

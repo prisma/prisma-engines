@@ -147,12 +147,15 @@ impl InternalDataModel {
         self.version.is_none()
     }
 
-    pub fn fields_requiring_model(&self, model: &ModelRef) -> Vec<RelationFieldRef> {
+    /// Finds all non-list relation fields pointing to the given model.
+    /// `required` may narrow down the returned fields to required fields only. Returns all on `false`.
+    pub fn fields_pointing_to_model(&self, model: &ModelRef, required: bool) -> Vec<RelationFieldRef> {
         self.relation_fields()
             .iter()
-            .filter(|rf| &rf.related_model() == model)
-            .filter(|f| f.is_required && !f.is_list)
-            .map(|f| Arc::clone(f))
+            .filter(|rf| &rf.related_model() == model) // All relation fields pointing to `model`.
+            .filter(|rf| !rf.is_list) // Not a list.
+            .filter(|rf| (required && rf.is_required) || !required) // If only required fields should be returned
+            .map(Arc::clone)
             .collect()
     }
 
