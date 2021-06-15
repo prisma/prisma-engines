@@ -1,7 +1,5 @@
-use std::str::FromStr;
-
 use super::super::attributes::AllAttributes;
-use super::names::Names;
+use super::db::ParserDatabase;
 use crate::transform::helpers::ValueValidator;
 use crate::{ast, configuration, dml, Field, FieldType};
 use crate::{
@@ -13,6 +11,7 @@ use datamodel_connector::connector_error::{ConnectorError, ErrorKind};
 use itertools::Itertools;
 use once_cell::sync::Lazy;
 use regex::Regex;
+use std::str::FromStr;
 
 /// Helper for lifting a datamodel.
 ///
@@ -21,7 +20,7 @@ use regex::Regex;
 pub struct LiftAstToDml<'a> {
     attributes: AllAttributes,
     source: Option<&'a configuration::Datasource>,
-    names: &'a Names<'a>,
+    db: &'a ParserDatabase<'a>,
 }
 
 impl<'a> LiftAstToDml<'a> {
@@ -29,16 +28,17 @@ impl<'a> LiftAstToDml<'a> {
     /// the attributes defined by the given sources registered.
     ///
     /// The attributes defined by the given sources will be namespaced.
-    pub(crate) fn new(source: Option<&'a configuration::Datasource>, names: &'a Names<'a>) -> LiftAstToDml<'a> {
+    pub(crate) fn new(source: Option<&'a configuration::Datasource>, db: &'a ParserDatabase<'a>) -> LiftAstToDml<'a> {
         LiftAstToDml {
             attributes: AllAttributes::new(),
             source,
-            names,
+            db,
         }
     }
 
-    pub fn lift(&self, ast_schema: &ast::SchemaAst) -> Result<dml::Datamodel, Diagnostics> {
+    pub fn lift(&self) -> Result<dml::Datamodel, Diagnostics> {
         let mut schema = dml::Datamodel::new();
+        let ast_schema = self.db.ast();
         let mut errors = Diagnostics::new();
 
         for ast_obj in &ast_schema.tops {
@@ -336,7 +336,7 @@ impl<'a> LiftAstToDml<'a> {
             }
         } else if ast_schema.find_model(type_name).is_some() {
             Ok((dml::FieldType::Relation(dml::RelationInfo::new(type_name)), vec![]))
-        } else if self.names.get_enum(type_name, ast_schema).is_some() {
+        } else if self.db.get_enum(type_name).is_some() {
             Ok((dml::FieldType::Enum(type_name.clone()), vec![]))
         } else {
             self.resolve_custom_type(ast_field, ast_schema, checked_types)

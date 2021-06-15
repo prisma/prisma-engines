@@ -1,3 +1,4 @@
+use super::db::ParserDatabase;
 use super::*;
 use crate::transform::ast_to_dml::standardise_parsing::StandardiserForParsing;
 use crate::{ast, configuration, diagnostics::Diagnostics, ValidatedDatamodel};
@@ -41,7 +42,7 @@ impl<'a, 'b> ValidationPipeline<'a> {
         // Phase 1 is source block loading.
 
         // Phase 2: Name resolution.
-        let names = Names::new(ast_schema, &mut diagnostics);
+        let db = ParserDatabase::new(ast_schema, &mut diagnostics);
 
         // Early return so that the validator does not have to deal with invalid schemas
         if diagnostics.has_errors() {
@@ -49,9 +50,9 @@ impl<'a, 'b> ValidationPipeline<'a> {
         }
 
         // Phase 3: Lift AST to DML.
-        let lifter = LiftAstToDml::new(self.source, &names);
+        let lifter = LiftAstToDml::new(self.source, &db);
 
-        let mut schema = match lifter.lift(ast_schema) {
+        let mut schema = match lifter.lift() {
             Err(mut err) => {
                 // Cannot continue on lifter error.
                 diagnostics.append(&mut err);
@@ -61,7 +62,7 @@ impl<'a, 'b> ValidationPipeline<'a> {
         };
 
         // Phase 4: Validation
-        if let Err(mut err) = self.validator.validate(ast_schema, &names, &mut schema) {
+        if let Err(mut err) = self.validator.validate(&db, &mut schema) {
             diagnostics.append(&mut err);
         }
 

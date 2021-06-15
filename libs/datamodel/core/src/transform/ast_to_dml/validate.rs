@@ -1,4 +1,4 @@
-use super::Names;
+use super::db::ParserDatabase;
 use crate::{
     ast, configuration,
     diagnostics::{DatamodelError, Diagnostics},
@@ -30,15 +30,11 @@ impl<'a> Validator<'a> {
         Self { source }
     }
 
-    pub(crate) fn validate(
-        &self,
-        ast_schema: &ast::SchemaAst,
-        names: &Names<'_>,
-        schema: &mut dml::Datamodel,
-    ) -> Result<(), Diagnostics> {
+    pub(crate) fn validate(&self, db: &ParserDatabase<'_>, schema: &mut dml::Datamodel) -> Result<(), Diagnostics> {
         let mut all_errors = Diagnostics::new();
+        let ast_schema = db.ast();
 
-        if let Err(ref mut errs) = self.validate_names(ast_schema, names) {
+        if let Err(ref mut errs) = self.validate_names(db) {
             all_errors.append(errs);
         }
 
@@ -129,10 +125,9 @@ impl<'a> Validator<'a> {
         // Enum level validations.
         for declared_enum in schema.enums() {
             let mut errors_for_enum = Diagnostics::new();
-            if let Err(err) = self.validate_enum_name(
-                names.get_enum(&declared_enum.name, ast_schema).expect(STATE_ERROR),
-                declared_enum,
-            ) {
+            if let Err(err) =
+                self.validate_enum_name(db.get_enum(&declared_enum.name).expect(STATE_ERROR), declared_enum)
+            {
                 errors_for_enum.push_error(err);
             }
 
@@ -177,10 +172,10 @@ impl<'a> Validator<'a> {
         }
     }
 
-    fn validate_names(&self, ast_schema: &ast::SchemaAst, names: &Names<'_>) -> Result<(), Diagnostics> {
+    fn validate_names(&self, db: &ParserDatabase<'_>) -> Result<(), Diagnostics> {
         let mut errors = Diagnostics::new();
 
-        for model in ast_schema.models() {
+        for model in db.ast().models() {
             errors.push_opt_error(model.name.validate("Model").err());
             errors.append(&mut model.validate_attributes());
 
@@ -190,7 +185,7 @@ impl<'a> Validator<'a> {
             }
         }
 
-        for (_, enum_decl) in names.iter_enums(ast_schema) {
+        for (_, enum_decl) in db.iter_enums() {
             errors.push_opt_error(enum_decl.name.validate("Enum").err());
             errors.append(&mut enum_decl.validate_attributes());
 
