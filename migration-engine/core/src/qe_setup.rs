@@ -1,8 +1,6 @@
 //! Query Engine test setup.
 
-use crate::api::GenericApi;
-use crate::commands::SchemaPushInput;
-use crate::core_error::CoreResult;
+use crate::{api::GenericApi, commands::SchemaPushInput, core_error::CoreResult};
 #[cfg(feature = "mongodb")]
 use datamodel::common::provider_names::MONGODB_SOURCE_NAME;
 use datamodel::common::provider_names::{

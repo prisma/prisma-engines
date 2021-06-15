@@ -4,14 +4,16 @@
 //! The top-level library crate for the migration engine.
 
 mod api;
+mod rpc;
 
 pub mod commands;
 pub mod qe_setup;
 
 mod core_error;
 
-pub use api::{rpc_api, GenericApi};
+pub use api::GenericApi;
 pub use core_error::{CoreError, CoreResult};
+pub use rpc::rpc_api;
 
 use datamodel::{
     common::{
