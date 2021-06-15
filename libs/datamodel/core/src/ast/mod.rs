@@ -97,7 +97,7 @@ impl SchemaAst {
 
 /// An opaque identifier for a top-level item in a schema AST. Use the
 /// `schema[top_id]` syntax to resolve the id to an `ast::Top`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub(crate) struct TopId(u32);
 
 impl std::ops::Index<TopId> for SchemaAst {
