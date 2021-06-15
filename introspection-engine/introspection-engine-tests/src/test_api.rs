@@ -27,7 +27,9 @@ impl TestApi {
         let connection_string = args.database_url();
 
         let (database, connection_string): (Quaint, String) = if tags.intersects(Tags::Vitess) {
-            let me = SqlMigrationConnector::new(&connection_string, None).await.unwrap();
+            let me = SqlMigrationConnector::new(&connection_string, BitFlags::all(), None)
+                .await
+                .unwrap();
             me.reset().await.unwrap();
 
             (

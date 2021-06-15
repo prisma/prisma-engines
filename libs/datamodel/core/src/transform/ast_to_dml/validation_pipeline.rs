@@ -1,24 +1,32 @@
+use std::collections::HashSet;
+
 use super::*;
-use crate::transform::ast_to_dml::standardise_parsing::StandardiserForParsing;
-use crate::{ast, configuration, diagnostics::Diagnostics, ValidatedDatamodel};
+use crate::{
+    ast, common::preview_features::PreviewFeature, configuration, diagnostics::Diagnostics,
+    transform::ast_to_dml::standardise_parsing::StandardiserForParsing, ValidatedDatamodel,
+};
 
 /// Is responsible for loading and validating the Datamodel defined in an AST.
 /// Wrapper for all lift and validation steps
 pub struct ValidationPipeline<'a> {
     lifter: LiftAstToDml<'a>,
     validator: Validator<'a>,
-    standardiser_for_parsing: StandardiserForParsing,
     standardiser_for_formatting: StandardiserForFormatting,
+    standardiser_for_parsing: StandardiserForParsing<'a>,
 }
 
 impl<'a, 'b> ValidationPipeline<'a> {
-    pub fn new(sources: &'a [configuration::Datasource]) -> ValidationPipeline<'a> {
+    pub fn new(
+        sources: &'a [configuration::Datasource],
+        preview_features: &'a HashSet<PreviewFeature>,
+    ) -> ValidationPipeline<'a> {
         let source = sources.first();
+
         ValidationPipeline {
-            lifter: LiftAstToDml::new(source),
-            validator: Validator::new(source),
+            lifter: LiftAstToDml::new(source, preview_features),
+            validator: Validator::new(source, preview_features),
             standardiser_for_formatting: StandardiserForFormatting::new(),
-            standardiser_for_parsing: StandardiserForParsing::new(),
+            standardiser_for_parsing: StandardiserForParsing::new(preview_features),
         }
     }
 

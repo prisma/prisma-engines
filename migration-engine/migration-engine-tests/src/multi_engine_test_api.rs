@@ -3,6 +3,7 @@
 //! A TestApi that is initialized without IO or async code and can instantiate
 //! multiple migration engines.
 
+use datamodel::common::preview_features::PreviewFeature;
 pub use test_macros::test_connector;
 pub use test_setup::{BitFlags, Capabilities, Tags};
 
@@ -35,9 +36,16 @@ impl TestApi {
             let (_, q, cs) = rt.block_on(args.create_postgres_database());
             (q, cs)
         } else if tags.contains(Tags::Vitess) {
+            let preview_features = args
+                .preview_features()
+                .into_iter()
+                .flat_map(|s| PreviewFeature::parse_opt(s))
+                .collect();
+
             let conn = rt
                 .block_on(SqlMigrationConnector::new(
                     args.database_url(),
+                    preview_features,
                     args.shadow_database_url().map(String::from),
                 ))
                 .unwrap();
@@ -164,6 +172,7 @@ impl TestApi {
             .rt
             .block_on(SqlMigrationConnector::new(
                 &connection_string,
+                BitFlags::empty(),
                 shadow_db_connection_string,
             ))
             .unwrap();

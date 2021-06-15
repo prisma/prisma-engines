@@ -18,10 +18,10 @@ pub type ValidatedGenerators = Validated<Vec<Generator>>;
 pub type ValidatedMissingFields = Validated<Vec<MissingField>>;
 
 impl ValidatedGenerators {
-    pub(crate) fn preview_features(&self) -> HashSet<&PreviewFeature> {
+    pub(crate) fn preview_features(&self) -> HashSet<PreviewFeature> {
         self.subject
             .iter()
-            .flat_map(|gen| gen.preview_features.iter())
+            .flat_map(|gen| gen.preview_features.iter().map(Clone::clone))
             .collect()
     }
 }

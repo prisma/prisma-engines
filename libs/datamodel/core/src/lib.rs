@@ -139,9 +139,9 @@ fn parse_datamodel_internal(
     let ast = ast::parse_schema(datamodel_string)?;
 
     let generators = GeneratorLoader::load_generators_from_ast(&ast)?;
-    let preview_features = generators.preview_features();
-    let sources = load_sources(&ast, &&preview_features)?;
-    let validator = ValidationPipeline::new(&sources.subject);
+    let sources = load_sources(&ast, &generators.preview_features())?;
+    let features = generators.preview_features();
+    let validator = ValidationPipeline::new(&sources.subject, &features);
 
     diagnostics.append_warning_vec(sources.warnings);
     diagnostics.append_warning_vec(generators.warnings);
@@ -193,7 +193,7 @@ pub fn parse_configuration(schema: &str) -> Result<ValidatedConfiguration, diagn
 
 fn load_sources(
     schema_ast: &SchemaAst,
-    preview_features: &HashSet<&PreviewFeature>,
+    preview_features: &HashSet<PreviewFeature>,
 ) -> Result<ValidatedDatasources, diagnostics::Diagnostics> {
     let source_loader = DatasourceLoader::new();
     source_loader.load_datasources_from_ast(&schema_ast, preview_features)
@@ -225,7 +225,7 @@ pub fn render_datamodel_to(
     datamodel: &dml::Datamodel,
     datasource: Option<&Datasource>,
 ) {
-    let lowered = LowerDmlToAst::new(datasource).lower(datamodel);
+    let lowered = LowerDmlToAst::new(datasource, &HashSet::new()).lower(datamodel);
     render_schema_ast_to(stream, &lowered, 2);
 }
 
@@ -247,7 +247,8 @@ fn render_datamodel_and_config_to(
     datamodel: &dml::Datamodel,
     config: &configuration::Configuration,
 ) {
-    let mut lowered = LowerDmlToAst::new(config.datasources.first()).lower(datamodel);
+    let features = config.preview_features().map(Clone::clone).collect();
+    let mut lowered = LowerDmlToAst::new(config.datasources.first(), &features).lower(datamodel);
 
     DatasourceSerializer::add_sources_to_ast(config.datasources.as_slice(), &mut lowered);
     GeneratorSerializer::add_generators_to_ast(&config.generators, &mut lowered);

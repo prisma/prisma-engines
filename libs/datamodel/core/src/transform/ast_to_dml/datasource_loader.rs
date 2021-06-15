@@ -37,7 +37,7 @@ impl DatasourceLoader {
     pub fn load_datasources_from_ast(
         &self,
         ast_schema: &ast::SchemaAst,
-        preview_features: &HashSet<&PreviewFeature>,
+        preview_features: &HashSet<PreviewFeature>,
     ) -> Result<ValidatedDatasources, Diagnostics> {
         let mut sources = vec![];
         let mut diagnostics = Diagnostics::new();
@@ -92,7 +92,7 @@ impl DatasourceLoader {
     fn lift_datasource(
         &self,
         ast_source: &ast::SourceConfig,
-        preview_features: &HashSet<&PreviewFeature>,
+        preview_features: &HashSet<PreviewFeature>,
     ) -> Result<ValidatedDatasource, Diagnostics> {
         let source_name = &ast_source.name.name;
         let args: HashMap<_, _> = ast_source
@@ -215,7 +215,7 @@ generator client {
 
 fn get_planet_scale_mode_arg(
     args: &HashMap<&str, ValueValidator>,
-    preview_features: &HashSet<&PreviewFeature>,
+    preview_features: &HashSet<PreviewFeature>,
     source: &SourceConfig,
 ) -> Result<bool, DatamodelError> {
     let arg = args.get("planetScaleMode");
