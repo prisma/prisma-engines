@@ -159,6 +159,18 @@ impl InternalDataModel {
             .collect()
     }
 
+    /// Finds all relation fields where the foreign key refers to the given field (as either singular or compound).
+    pub fn fields_refering_to_field(&self, field: &ScalarFieldRef) -> Vec<RelationFieldRef> {
+        let model_name = &field.model().name;
+
+        self.relation_fields()
+            .iter()
+            .filter(|rf| &rf.relation_info.to == model_name)
+            .filter(|rf| rf.relation_info.references.contains(&field.name))
+            .map(Arc::clone)
+            .collect()
+    }
+
     pub fn relation_fields(&self) -> &[RelationFieldRef] {
         self.relation_fields
             .get_or_init(|| {

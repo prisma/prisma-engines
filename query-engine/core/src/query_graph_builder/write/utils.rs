@@ -268,48 +268,18 @@ pub fn insert_existing_1to1_related_model_checks(
     Ok(read_existing_children)
 }
 
-/// Inserts emulated restrict checks into the graph that checks all _required_ marked relations pointing to
-/// the given `model`. Those checks fail at runtime (edges to the `Empty` node) if one or more
-/// records are found. Checks are inserted between `parent_node` and `child_node`.
+/// Inserts emulated referential actions for `onDelete` into the graph.
+/// All relations that refer to the `model` row(s) being deleted are checked for their desired emulation and inserted accordingly.
+/// Right now, supported modes are `Restrict` and `SetNull` (cascade will follow).
+/// Those checks fail at runtime and are inserted between `parent_node` and `child_node`.
 ///
 /// This function is usually part of a delete (`deleteOne` or `deleteMany`).
 /// Expects `parent_node` to return one or more IDs (for records of `model`) to be checked.
 ///
-/// ## Example for a standard delete scenario
-/// - We have 2 relations, from `A` and `B` to `model`.
-/// - This function inserts the nodes and edges in between `Find Record IDs` (`parent_node`) and
-///   `Delete` (`child_node`) into the graph (but not the edge from `Find` to `Delete`, assumed already existing here).
-///
-/// ```text
-///    ┌────────────────────┐
-///    │ Find Record IDs to │
-/// ┌──│       Delete       │
-/// │  └────────────────────┘
-/// │             │
-/// │             ▼
-/// │  ┌────────────────────┐
-/// ├─▶│Find Connected Model│
-/// │  │         A          │──┐
-/// │  └────────────────────┘  │
-/// │             │            │
-/// │             ▼            │
-/// │  ┌────────────────────┐  │
-/// ├─▶│Find Connected Model│  │ Fail if > 0
-/// │  │         B          │  │
-/// │  └────────────────────┘  │
-/// │             │Fail if > 0 │
-/// │             ▼            │
-/// │  ┌────────────────────┐  │
-/// ├─▶│       Empty        │◀─┘
-/// │  └────────────────────┘
-/// │             │
-/// │             ▼
-/// │  ┌────────────────────┐
-/// └─▶│       Delete       │
-///    └────────────────────┘
-/// ```
+/// The old behavior (pre-referential actions) is preserved for if the ReferentialActions feature flag is disabled,
+/// which was basically only the `Restrict` part of
 #[tracing::instrument(skip(graph, model, parent_node, child_node))]
-pub fn insert_deletion_restrict_checks(
+pub fn insert_emulated_on_delete(
     graph: &mut QueryGraph,
     connector_ctx: &ConnectorContext,
     model: &ModelRef,
@@ -317,14 +287,25 @@ pub fn insert_deletion_restrict_checks(
     child_node: &NodeRef,
 ) -> QueryGraphBuilderResult<()> {
     let has_fks = connector_ctx.capabilities.contains(&ConnectorCapability::ForeignKeys);
-    // If the connector supports foreign keys, we do not do any checks / emulation.
+
+    // If the connector supports foreign keys and the new mode is enabled (preview feature), we do not do any checks / emulation.
     if connector_ctx.features.contains(&PreviewFeature::ReferentialActions) && has_fks {
         return Ok(());
     }
 
-    // If it's non-fk dbs, then the emulation will kick in. If it has Fks, then preserve the old behavior (only required ones).
+    // If it's non-fk dbs, then the emulation will kick in. If it has Fks, then preserve the old behavior (`has_fks` -> only required ones).
     let internal_model = model.internal_data_model();
     let relation_fields = internal_model.fields_pointing_to_model(model, has_fks);
+
+    for rf in relation_fields {
+        match rf.relation().on_delete() {
+            ReferentialAction::Restrict => emulate_restrict(graph, &rf, connector_ctx, model, parent_node, child_node),
+            ReferentialAction::SetNull => todo!(),
+            ReferentialAction::Cascade => todo!(),
+            x => panic!("Unsupported referential action emulation: {}", x),
+        };
+    }
+
     let mut check_nodes = vec![];
     let once = OnceCell::new();
 
@@ -378,4 +359,15 @@ pub fn insert_deletion_restrict_checks(
     }
 
     Ok(())
+}
+
+pub fn emulate_restrict(
+    graph: &mut QueryGraph,
+    relation_field: &RelationFieldRef,
+    connector_ctx: &ConnectorContext,
+    model: &ModelRef,
+    parent_node: &NodeRef,
+    child_node: &NodeRef,
+) -> QueryGraphBuilderResult<()> {
+    todo!()
 }
