@@ -3,7 +3,7 @@ use crate::{
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
     ConnectorContext, ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult,
 };
-use connector::{Filter, WriteArgs};
+use connector::{Filter, RecordFilter, WriteArgs};
 use datamodel::{common::preview_features::PreviewFeature, ReferentialAction};
 use datamodel_connector::ConnectorCapability;
 use itertools::Itertools;
@@ -278,84 +278,49 @@ pub fn insert_existing_1to1_related_model_checks(
 ///
 /// The old behavior (pre-referential actions) is preserved for if the ReferentialActions feature flag is disabled,
 /// which was basically only the `Restrict` part of
-#[tracing::instrument(skip(graph, model, parent_node, child_node))]
+#[tracing::instrument(skip(graph, model_to_delete, parent_node, child_node))]
 pub fn insert_emulated_on_delete(
     graph: &mut QueryGraph,
     connector_ctx: &ConnectorContext,
-    model: &ModelRef,
+    model_to_delete: &ModelRef,
     parent_node: &NodeRef,
     child_node: &NodeRef,
 ) -> QueryGraphBuilderResult<()> {
     let has_fks = connector_ctx.capabilities.contains(&ConnectorCapability::ForeignKeys);
+    let has_ra_feature = connector_ctx.features.contains(&PreviewFeature::ReferentialActions);
 
     // If the connector supports foreign keys and the new mode is enabled (preview feature), we do not do any checks / emulation.
-    if connector_ctx.features.contains(&PreviewFeature::ReferentialActions) && has_fks {
+    if has_ra_feature && has_fks {
         return Ok(());
     }
 
     // If it's non-fk dbs, then the emulation will kick in. If it has Fks, then preserve the old behavior (`has_fks` -> only required ones).
-    let internal_model = model.internal_data_model();
-    let relation_fields = internal_model.fields_pointing_to_model(model, has_fks);
+    let internal_model = model_to_delete.internal_data_model();
+    let relation_fields = internal_model.fields_pointing_to_model(model_to_delete, has_fks);
 
     for rf in relation_fields {
         match rf.relation().on_delete() {
-            ReferentialAction::Restrict => emulate_restrict(graph, &rf, connector_ctx, model, parent_node, child_node),
-            ReferentialAction::SetNull => todo!(),
-            ReferentialAction::Cascade => todo!(),
-            x => panic!("Unsupported referential action emulation: {}", x),
-        };
-    }
-
-    let mut check_nodes = vec![];
-    let once = OnceCell::new();
-
-    if !relation_fields.is_empty() {
-        // let noop_node = graph.create_node(Node::Empty);
-
-        // We know that the relation can't be a list and must be required on the related model for `model` (see fields_requiring_model).
-        // For all requiring models (RM), we use the field on `model` to query for existing RM records and error out if at least one exists.
-        for rf in relation_fields {
-            // We're only looking to emulate restrict here.
-            if rf.relation().on_delete() != ReferentialAction::Restrict {
-                continue;
+            // old behavior was to only insert restrict checks.
+            _ if !has_ra_feature => {
+                emulate_restrict(graph, &rf, connector_ctx, model_to_delete, parent_node, child_node)?
             }
 
-            let noop_node = once.get_or_init(|| graph.create_node(Node::Empty));
-            let relation_field = rf.related_field();
-            let child_model_identifier = relation_field.related_model().primary_identifier();
-            let read_node = insert_find_children_by_parent_node(graph, parent_node, &relation_field, Filter::empty())?;
+            ReferentialAction::Cascade => {
+                emulate_cascade(graph, &rf, connector_ctx, model_to_delete, parent_node, child_node)?
+            }
 
-            graph.create_edge(
-                &read_node,
-                &noop_node,
-                QueryGraphDependency::ParentProjection(
-                    child_model_identifier,
-                    Box::new(move |noop_node, child_ids| {
-                        if !child_ids.is_empty() {
-                            return Err(QueryGraphBuilderError::RelationViolation((relation_field).into()));
-                        }
+            ReferentialAction::Restrict => {
+                emulate_restrict(graph, &rf, connector_ctx, model_to_delete, parent_node, child_node)?
+            }
 
-                        Ok(noop_node)
-                    }),
-                ),
-            )?;
+            ReferentialAction::SetNull => {
+                emulate_set_null(graph, &rf, connector_ctx, model_to_delete, parent_node, child_node)?
+            }
 
-            check_nodes.push(read_node);
-        }
+            ReferentialAction::NoAction => continue, // Explicitly do nothing.
 
-        // Connects all `Find Connected Model` nodes with execution order dependency from the example in the docs.
-        check_nodes.into_iter().fold1(|prev, next| {
-            graph
-                .create_edge(&prev, &next, QueryGraphDependency::ExecutionOrder)
-                .unwrap();
-
-            next
-        });
-
-        // Edge from empty node to the child (delete).
-        if let Some(noop_node) = once.get() {
-            graph.create_edge(&noop_node, child_node, QueryGraphDependency::ExecutionOrder)?;
-        }
+            x => panic!("Unsupported referential action emulation: {}", x),
+        };
     }
 
     Ok(())
@@ -364,10 +329,99 @@ pub fn insert_emulated_on_delete(
 pub fn emulate_restrict(
     graph: &mut QueryGraph,
     relation_field: &RelationFieldRef,
-    connector_ctx: &ConnectorContext,
-    model: &ModelRef,
+    _connector_ctx: &ConnectorContext,
+    _model: &ModelRef,
     parent_node: &NodeRef,
     child_node: &NodeRef,
 ) -> QueryGraphBuilderResult<()> {
-    todo!()
+    let noop_node = graph.create_node(Node::Empty);
+    let relation_field = relation_field.related_field();
+    let child_model_identifier = relation_field.related_model().primary_identifier();
+    let read_node = insert_find_children_by_parent_node(graph, parent_node, &relation_field, Filter::empty())?;
+
+    graph.create_edge(
+        &read_node,
+        &noop_node,
+        QueryGraphDependency::ParentProjection(
+            child_model_identifier,
+            Box::new(move |noop_node, child_ids| {
+                if !child_ids.is_empty() {
+                    return Err(QueryGraphBuilderError::RelationViolation((relation_field).into()));
+                }
+
+                Ok(noop_node)
+            }),
+        ),
+    )?;
+
+    // Edge from empty node to the child (delete).
+    graph.create_edge(&noop_node, child_node, QueryGraphDependency::ExecutionOrder)?;
+
+    Ok(())
+}
+
+pub fn emulate_cascade(
+    graph: &mut QueryGraph,
+    relation_field: &RelationFieldRef, // This is the field _on the other model_ for cascade.
+    connector_ctx: &ConnectorContext,
+    _model: &ModelRef,
+    parent_node: &NodeRef,
+    child_node: &NodeRef,
+) -> QueryGraphBuilderResult<()> {
+    let dependent_model = relation_field.model();
+    let parent_relation_field = relation_field.related_field();
+    let child_model_identifier = relation_field.related_model().primary_identifier();
+
+    // Records that need to be deleted for the cascade.
+    let dependent_records_node =
+        insert_find_children_by_parent_node(graph, parent_node, &parent_relation_field, Filter::empty())?;
+
+    let delete_query = WriteQuery::DeleteManyRecords(DeleteManyRecords {
+        model: dependent_model.clone(),
+        record_filter: RecordFilter::empty(),
+    });
+
+    let delete_dependents_node = graph.create_node(Query::Write(delete_query));
+
+    insert_emulated_on_delete(
+        graph,
+        connector_ctx,
+        &dependent_model,
+        &dependent_records_node,
+        &delete_dependents_node,
+    )?;
+
+    graph.create_edge(
+        &dependent_records_node,
+        &delete_dependents_node,
+        QueryGraphDependency::ParentProjection(
+            child_model_identifier.clone(),
+            Box::new(move |mut delete_dependents_node, dependent_ids| {
+                if let Node::Query(Query::Write(WriteQuery::DeleteManyRecords(ref mut dmr))) = delete_dependents_node {
+                    dmr.record_filter = dependent_ids.into();
+                }
+
+                Ok(delete_dependents_node)
+            }),
+        ),
+    )?;
+
+    graph.create_edge(
+        &delete_dependents_node,
+        child_node,
+        QueryGraphDependency::ExecutionOrder,
+    )?;
+
+    Ok(())
+}
+
+pub fn emulate_set_null(
+    graph: &mut QueryGraph,
+    relation_field: &RelationFieldRef,
+    _connector_ctx: &ConnectorContext,
+    _model: &ModelRef,
+    parent_node: &NodeRef,
+    child_node: &NodeRef,
+) -> QueryGraphBuilderResult<()> {
+    Ok(())
 }

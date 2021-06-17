@@ -38,7 +38,7 @@ impl MongoDbDatamodelConnector {
         ];
 
         let native_types = mongodb_types::available_types();
-        let referential_actions = Restrict | SetNull | NoAction;
+        let referential_actions = Restrict | SetNull | NoAction | Cascade;
 
         Self {
             capabilities,

@@ -1,7 +1,7 @@
 use indoc::indoc;
 use query_engine_tests::*;
 
-#[test_suite(suite = "cascade_onD_1to1_req", schema(required), exclude(MongoDb))]
+#[test_suite(suite = "cascade_onD_1to1_req", schema(required))]
 mod one2one_req {
     fn required() -> String {
         let schema = indoc! {
@@ -24,8 +24,8 @@ mod one2one_req {
     #[connector_test]
     async fn delete_parent(runner: &Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation { createOneParent(data: { id: 1, child: { create: { id: 1 }}}) { id }}"#),
-          @r###"{"data":{"createOneParent":{"id":1}}}"###
+            run_query!(runner, r#"mutation { createOneParent(data: { id: 1, child: { create: { id: 1 }}}) { id }}"#),
+            @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
         insta::assert_snapshot!(
@@ -42,7 +42,7 @@ mod one2one_req {
     }
 }
 
-#[test_suite(suite = "cascade_onD_1to1_opt", schema(optional), exclude(MongoDb))]
+#[test_suite(suite = "cascade_onD_1to1_opt", schema(optional))]
 mod one2one_opt {
     fn optional() -> String {
         let schema = indoc! {
@@ -83,7 +83,7 @@ mod one2one_opt {
     }
 }
 
-#[test_suite(suite = "cascade_onD_1toM_req", schema(required), exclude(MongoDb))]
+#[test_suite(suite = "cascade_onD_1toM_req", schema(required))]
 mod one2many_req {
     fn required() -> String {
         let schema = indoc! {
@@ -124,7 +124,7 @@ mod one2many_req {
     }
 }
 
-#[test_suite(suite = "cascade_onD_1toM_opt", schema(optional), exclude(MongoDb))]
+#[test_suite(suite = "cascade_onD_1toM_opt", schema(optional))]
 mod one2many_opt {
     fn optional() -> String {
         let schema = indoc! {
