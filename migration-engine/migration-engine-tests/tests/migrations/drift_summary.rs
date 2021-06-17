@@ -396,7 +396,7 @@ fn multiple_changed_tables_and_enums() {
               [-] Dropped the primary key on columns (id)
               [-] Removed column `name`
               [+] Added column `weight`
-              [*] Altered column `isGoodDog` (arity changed from Nullable to Required, default changed from `None` to `Some(Value(Boolean(true)))`)
+              [*] Altered column `isGoodDog` (changed from Nullable to Required, default changed from `None` to `Some(Value(Boolean(true)))`)
               [+] Added unique index on columns (weight)
         "#]],
     );

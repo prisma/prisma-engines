@@ -372,7 +372,7 @@ fn render_column_changes(columns: Pair<ColumnWalker<'_>>, changes: &ColumnChange
         .map(|change| match change {
             ColumnChange::Renaming => "column was renamed".to_owned(),
             ColumnChange::Arity => format!(
-                "arity changed from {:?} to {:?}",
+                "changed from {:?} to {:?}",
                 columns.previous().arity(),
                 columns.next().arity()
             ),
