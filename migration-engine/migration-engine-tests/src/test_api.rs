@@ -24,10 +24,7 @@ pub use schema_push::SchemaPush;
 use crate::assertions::SchemaAssertion;
 use migration_connector::{ConnectorError, MigrationRecord};
 use migration_core::GenericApi;
-use quaint::{
-    prelude::{ConnectionInfo, Queryable, SqlFamily},
-    single::Quaint,
-};
+use quaint::prelude::{ConnectionInfo, Queryable, SqlFamily};
 use sql_migration_connector::SqlMigrationConnector;
 use std::{borrow::Cow, fmt::Write as _};
 use tempfile::TempDir;
@@ -88,7 +85,7 @@ impl TestApi {
 
         if tags.contains(Tags::Mysql) {
             let val = api
-                .quaint()
+                .queryable()
                 .query_raw("SELECT @@lower_case_table_names", &[])
                 .await
                 .ok()
@@ -109,11 +106,11 @@ impl TestApi {
     }
 
     pub fn schema_name(&self) -> &str {
-        self.connection_info().schema_name()
+        self.api.schema_name()
     }
 
-    pub fn database(&self) -> &Quaint {
-        self.api.quaint()
+    pub fn database(&self) -> &dyn Queryable {
+        self.api.queryable()
     }
 
     pub fn is_sqlite(&self) -> bool {
@@ -148,8 +145,8 @@ impl TestApi {
         self.tags().contains(Tags::Postgres)
     }
 
-    pub fn connection_info(&self) -> &ConnectionInfo {
-        self.database().connection_info()
+    pub fn connection_info(&self) -> ConnectionInfo {
+        self.api.connection_info()
     }
 
     pub fn sql_family(&self) -> SqlFamily {
@@ -169,7 +166,7 @@ impl TestApi {
         if self.is_sqlite() {
             table_name.into()
         } else {
-            (self.connection_info().schema_name(), table_name).into()
+            (self.api.schema_name(), table_name).into()
         }
     }
 

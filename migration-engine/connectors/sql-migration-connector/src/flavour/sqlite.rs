@@ -25,6 +25,15 @@ impl SqlFlavour for SqliteFlavour {
         Ok(())
     }
 
+    async fn apply_migration_script(
+        &self,
+        migration_name: &str,
+        script: &str,
+        conn: &Connection,
+    ) -> ConnectorResult<()> {
+        super::generic_apply_migration_script(migration_name, script, conn).await
+    }
+
     async fn create_database(&self, database_str: &str) -> ConnectorResult<String> {
         let path = Path::new(&self.file_path);
 
@@ -62,12 +71,12 @@ impl SqlFlavour for SqliteFlavour {
     }
 
     async fn describe_schema<'a>(&'a self, connection: &Connection) -> ConnectorResult<SqlSchema> {
-        sql_schema_describer::sqlite::SqlSchemaDescriber::new(connection.quaint())
+        sql_schema_describer::sqlite::SqlSchemaDescriber::new(connection.queryable())
             .describe(connection.connection_info().schema_name())
             .await
             .map_err(|err| match err.into_kind() {
                 DescriberErrorKind::QuaintError(err) => {
-                    quaint_error_to_connector_error(err, connection.connection_info())
+                    quaint_error_to_connector_error(err, &connection.connection_info())
                 }
                 DescriberErrorKind::CrossSchemaReference { .. } => {
                     unreachable!("No schemas in SQLite")
@@ -106,7 +115,8 @@ impl SqlFlavour for SqliteFlavour {
     }
 
     async fn reset(&self, connection: &Connection) -> ConnectorResult<()> {
-        let file_path = connection.connection_info().file_path().unwrap();
+        let connection_info = connection.connection_info();
+        let file_path = connection_info.file_path().unwrap();
 
         connection.raw_cmd("PRAGMA main.locking_mode=NORMAL").await?;
         connection.raw_cmd("PRAGMA main.quick_check").await?;
@@ -135,7 +145,7 @@ impl SqlFlavour for SqliteFlavour {
                 },
             )
         })?;
-        let conn = Connection::new(quaint);
+        let conn = Connection::new_generic(quaint);
 
         for migration in migrations {
             let script = migration.read_migration_script()?;

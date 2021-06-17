@@ -3,11 +3,8 @@ use crate::{
     sql_migration::{SqlMigration, SqlMigrationStep},
     SqlFlavour, SqlMigrationConnector,
 };
-use migration_connector::{
-    ConnectorError, ConnectorResult, DatabaseMigrationStepApplier, DestructiveChangeDiagnostics, Migration,
-};
+use migration_connector::{ConnectorResult, DatabaseMigrationStepApplier, DestructiveChangeDiagnostics, Migration};
 use sql_schema_describer::{walkers::SqlSchemaExt, SqlSchema};
-use user_facing_errors::migration_engine::ApplyMigrationError;
 
 #[async_trait::async_trait]
 impl DatabaseMigrationStepApplier for SqlMigrationConnector {
@@ -91,17 +88,9 @@ impl DatabaseMigrationStepApplier for SqlMigrationConnector {
 
     async fn apply_script(&self, migration_name: &str, script: &str) -> ConnectorResult<()> {
         self.flavour.scan_migration_script(script);
-
-        self.conn().raw_cmd(script).await.map_err(|quaint_error| {
-            ConnectorError::user_facing(ApplyMigrationError {
-                migration_name: migration_name.to_owned(),
-                database_error_code: String::from(quaint_error.original_code().unwrap_or("none")),
-                database_error: quaint_error
-                    .original_message()
-                    .map(String::from)
-                    .unwrap_or_else(|| ConnectorError::from(quaint_error).to_string()),
-            })
-        })
+        self.flavour
+            .apply_migration_script(migration_name, script, self.conn())
+            .await
     }
 }
 

@@ -81,8 +81,8 @@ impl TestApi {
         })
     }
 
-    pub fn connection_info(&self) -> &ConnectionInfo {
-        self.migration_api.quaint().connection_info()
+    pub fn connection_info(&self) -> ConnectionInfo {
+        self.migration_api.connection_info()
     }
 
     pub fn to_sql_string<'a>(&'a self, query: impl Into<Query<'a>>) -> quaint::Result<(String, Vec<Value>)> {
@@ -96,7 +96,7 @@ impl TestApi {
 
     pub fn table_name<'a>(&'a self, name: &'a str) -> quaint::ast::Table<'a> {
         match self.connection_info() {
-            ConnectionInfo::Mssql(url) => (url.schema(), name).into(),
+            ConnectionInfo::Mssql(_url) => (self.migration_api.schema_name(), name).into(),
             _ => name.into(),
         }
     }

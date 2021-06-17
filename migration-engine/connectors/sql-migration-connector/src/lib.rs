@@ -24,7 +24,10 @@ use error::quaint_error_to_connector_error;
 use flavour::SqlFlavour;
 use migration_connector::{migrations_directory::MigrationDirectory, *};
 use pair::Pair;
-use quaint::{prelude::ConnectionInfo, single::Quaint};
+use quaint::{
+    prelude::{ConnectionInfo, Queryable},
+    single::Quaint,
+};
 use sql_migration::{DropUserDefinedType, DropView, SqlMigration, SqlMigrationStep};
 use sql_schema_describer::{walkers::SqlSchemaExt, SqlSchema};
 use user_facing_errors::{common::InvalidDatabaseString, KnownError};
@@ -44,7 +47,7 @@ impl SqlMigrationConnector {
         shadow_database_connection_string: Option<String>,
     ) -> ConnectorResult<Self> {
         let connection = connect(connection_string).await?;
-        let flavour = flavour::from_connection_info(connection.connection_info(), preview_features);
+        let flavour = flavour::from_connection_info(&connection.connection_info(), preview_features);
 
         flavour.ensure_connection_validity(&connection).await?;
 
@@ -88,8 +91,18 @@ impl SqlMigrationConnector {
     }
 
     /// Made public for tests.
-    pub fn quaint(&self) -> &Quaint {
-        self.connection.quaint()
+    pub fn queryable(&self) -> &dyn Queryable {
+        self.connection.queryable()
+    }
+
+    /// Made public for tests.
+    pub fn connection_info(&self) -> ConnectionInfo {
+        self.connection.connection_info()
+    }
+
+    /// Made public for tests.
+    pub fn schema_name(&self) -> &str {
+        self.connection.schema_name()
     }
 
     /// Made public for tests.
@@ -322,11 +335,18 @@ async fn connect(database_str: &str) -> ConnectorResult<Connection> {
         KnownError::new(InvalidDatabaseString { details })
     })?;
 
+    if let ConnectionInfo::Postgres(url) = &connection_info {
+        return quaint::connector::PostgreSql::new(url.clone())
+            .await
+            .map(|conn| Connection::new_postgres(conn, url.clone()))
+            .map_err(|err| quaint_error_to_connector_error(err, &connection_info));
+    }
+
     let connection = Quaint::new(database_str)
         .await
         .map_err(|err| quaint_error_to_connector_error(err, &connection_info))?;
 
-    Ok(Connection::new(connection))
+    Ok(Connection::new_generic(connection))
 }
 
 /// List all the columns added in the migration, either by alter table steps or
