@@ -395,21 +395,6 @@ pub fn parse_configuration(datamodel_string: &str) -> Configuration {
     }
 }
 
-pub fn parse_with_diagnostics(datamodel_string: &str) -> ValidatedDatamodel {
-    match datamodel::parse_datamodel(datamodel_string) {
-        Ok(s) => s,
-        Err(errs) => {
-            for err in errs.to_error_iter() {
-                err.pretty_print(&mut std::io::stderr().lock(), "", datamodel_string)
-                    .unwrap();
-            }
-
-            panic!("Datamodel parsing failed. Please see error above.")
-        }
-    }
-}
-
-#[allow(dead_code)] // Not sure why the compiler thinks this is never used.
 pub fn parse_error(datamodel_string: &str) -> Diagnostics {
     match datamodel::parse_datamodel(datamodel_string) {
         Ok(_) => panic!("Expected an error when parsing schema."),
