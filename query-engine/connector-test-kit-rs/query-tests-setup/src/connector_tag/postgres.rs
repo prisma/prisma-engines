@@ -187,5 +187,5 @@ impl ToString for PostgresVersion {
 
 fn postgres_capabilities() -> Vec<ConnectorCapability> {
     let dm_connector = PostgresDatamodelConnector::new();
-    dm_connector.capabilities().clone()
+    dm_connector.capabilities().to_owned()
 }
