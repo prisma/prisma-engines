@@ -1,6 +1,10 @@
 pub mod connector_error;
 pub mod helper;
 
+mod empty_connector;
+
+pub use empty_connector::EmptyDatamodelConnector;
+
 use crate::connector_error::{ConnectorError, ConnectorErrorFactory, ErrorKind};
 use dml::{
     field::Field, model::Model, native_type_constructor::NativeTypeConstructor,
@@ -9,9 +13,9 @@ use dml::{
 use std::{borrow::Cow, collections::BTreeMap};
 
 pub trait Connector: Send + Sync {
-    fn name(&self) -> String;
+    fn name(&self) -> &str;
 
-    fn capabilities(&self) -> &Vec<ConnectorCapability>;
+    fn capabilities(&self) -> &[ConnectorCapability];
 
     fn has_capability(&self, capability: ConnectorCapability) -> bool {
         self.capabilities().contains(&capability)
@@ -134,14 +138,14 @@ pub trait Connector: Send + Sync {
 
     fn native_instance_error(&self, instance: NativeTypeInstance) -> ConnectorErrorFactory {
         ConnectorErrorFactory {
-            connector: self.name(),
+            connector: self.name().to_owned(),
             native_type: instance.render(),
         }
     }
 
     fn native_str_error(&self, native_str: &str) -> ConnectorErrorFactory {
         ConnectorErrorFactory {
-            connector: self.name(),
+            connector: self.name().to_owned(),
             native_type: native_str.to_string(),
         }
     }
@@ -149,7 +153,7 @@ pub trait Connector: Send + Sync {
     fn native_types_not_supported(&self) -> Result<NativeTypeInstance, ConnectorError> {
         Err(ConnectorError::from_kind(
             ErrorKind::ConnectorNotSupportedForNativeTypes {
-                connector_name: self.name(),
+                connector_name: self.name().to_owned(),
             },
         ))
     }

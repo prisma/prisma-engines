@@ -140,11 +140,11 @@ const SCALAR_TYPE_DEFAULTS: &[(ScalarType, PostgresType)] = &[
 ];
 
 impl Connector for PostgresDatamodelConnector {
-    fn name(&self) -> String {
-        "Postgres".to_string()
+    fn name(&self) -> &str {
+        "Postgres"
     }
 
-    fn capabilities(&self) -> &Vec<ConnectorCapability> {
+    fn capabilities(&self) -> &[ConnectorCapability] {
         &self.capabilities
     }
 

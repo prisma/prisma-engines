@@ -29,10 +29,10 @@ impl SqliteDatamodelConnector {
 }
 
 impl Connector for SqliteDatamodelConnector {
-    fn name(&self) -> String {
-        "sqlite".to_string()
+    fn name(&self) -> &str {
+        "sqlite"
     }
-    fn capabilities(&self) -> &Vec<ConnectorCapability> {
+    fn capabilities(&self) -> &[ConnectorCapability] {
         &self.capabilities
     }
 
