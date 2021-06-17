@@ -152,7 +152,7 @@ impl SqlFlavour for MssqlFlavour {
     }
 
     async fn describe_schema<'a>(&'a self, connection: &Connection) -> ConnectorResult<SqlSchema> {
-        sql_schema_describer::mssql::SqlSchemaDescriber::new(connection.quaint().clone())
+        sql_schema_describer::mssql::SqlSchemaDescriber::new(connection.quaint())
             .describe(connection.connection_info().schema_name())
             .await
             .map_err(|err| match err.into_kind() {
