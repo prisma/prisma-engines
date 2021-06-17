@@ -25,6 +25,9 @@ features = ["docs", "all"]
 [features]
 default = []
 docs = []
+# Expose the underlying database drivers when a connector is enabled. This is a
+# way to access database-specific methods when you need extra control.
+expose-drivers = []
 
 all = [
   "chrono",

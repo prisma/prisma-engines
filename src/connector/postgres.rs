@@ -26,6 +26,11 @@ use url::Url;
 
 pub(crate) const DEFAULT_SCHEMA: &str = "public";
 
+/// The underlying postgres driver. Only available with the `expose-drivers`
+/// Cargo feature.
+#[cfg(feature = "expose-drivers")]
+pub use tokio_postgres;
+
 #[derive(Clone)]
 struct Hidden<T>(T);
 
@@ -508,6 +513,14 @@ impl PostgreSql {
             statement_cache: Mutex::new(url.cache()),
             is_healthy: AtomicBool::new(true),
         })
+    }
+
+    /// The underlying tokio_postgres::Client. Only available with the
+    /// `expose-drivers` Cargo feature. This is a lower level API when you need
+    /// to get into database specific features.
+    #[cfg(feature = "expose-drivers")]
+    pub fn client(&self) -> &tokio_postgres::Client {
+        &self.client.0
     }
 
     #[tracing::instrument(skip(self))]
