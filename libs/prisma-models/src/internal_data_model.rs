@@ -154,7 +154,7 @@ impl InternalDataModel {
             .iter()
             .filter(|rf| &rf.related_model() == model) // All relation fields pointing to `model`.
             .filter(|rf| rf.is_inlined_on_enclosing_model()) // Not a list, not a virtual field.
-            .filter(|rf| (required && rf.is_required) || !required) // If only required fields should be returned
+            .filter(|rf| !required || rf.is_required) // If only required fields should be returned
             .map(Arc::clone)
             .collect()
     }

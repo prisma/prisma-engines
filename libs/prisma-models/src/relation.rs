@@ -188,7 +188,7 @@ impl Relation {
         self.field_a()
             .on_delete()
             .cloned()
-            .or(self.field_b().on_delete().cloned())
+            .or_else(|| self.field_b().on_delete().cloned())
             .unwrap_or(self.field_a().on_delete_default)
     }
 }
