@@ -94,6 +94,7 @@ use diagnostics::Diagnostics;
 
 use crate::diagnostics::{Validated, ValidatedConfiguration, ValidatedDatamodel};
 use crate::{ast::SchemaAst, common::preview_features::PreviewFeature};
+use datamodel_connector::EmptyDatamodelConnector;
 use std::collections::HashSet;
 use transform::{
     ast_to_dml::{DatasourceLoader, GeneratorLoader, ValidationPipeline},
@@ -141,14 +142,19 @@ fn parse_datamodel_internal(
     let ast = ast::parse_schema(datamodel_string)?;
 
     let generators = GeneratorLoader::load_generators_from_ast(&ast, &mut diagnostics);
-    let preview_features = preview_features(&generators);
+    let preview_features: HashSet<&PreviewFeature> = preview_features(&generators);
     let datasources = load_sources(&ast, &preview_features, &mut &mut diagnostics);
-    let datasources2 = load_sources(&ast, &preview_features, &mut &mut diagnostics);
-    // let preview_features: Vec<PreviewFeature> = preview_features.iter().map(|f| f.to_owned()).collect();
-    let preview_features: Vec<PreviewFeature> = vec![];
+
+    let first_source = load_sources(&ast, &preview_features, &mut &mut diagnostics)
+        .into_iter()
+        .next();
+    let preview_features: Vec<PreviewFeature> = preview_features.into_iter().map(|f| f.to_owned()).collect();
 
     let ctx = DatamodelContext {
-        connector: datasources2.into_iter().next().map(|f| f.active_connector),
+        source_name: first_source.as_ref().map(|s| s.name.to_owned()),
+        connector: first_source
+            .map(|f| f.active_connector)
+            .unwrap_or(Box::new(EmptyDatamodelConnector)),
         preview_features,
     };
 

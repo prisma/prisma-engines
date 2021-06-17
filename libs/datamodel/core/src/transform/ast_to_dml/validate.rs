@@ -189,12 +189,7 @@ impl<'a> Validator<'a> {
         model: &dml::Model,
         ast_model: &Model,
     ) {
-        let length_limit = self
-            .context
-            .connector
-            .as_ref()
-            .map(|connector| connector.constraint_name_length())
-            .unwrap_or(10000);
+        let length_limit = self.context.connector.constraint_name_length();
         let model_span = ast_model.span;
 
         if let Some(pk) = &model.primary_key {
@@ -289,29 +284,24 @@ impl<'a> Validator<'a> {
         let mut errors = Diagnostics::new();
         let mut index_names = HashSet::new();
 
-        let multiple_indexes_with_same_name_are_supported = self
-            .context
-            .connector
-            .as_ref()
-            .map(|connector| connector.supports_multiple_indexes_with_same_name())
-            .unwrap_or(false);
+        if !self.context.connector.supports_multiple_indexes_with_same_name() {
+            for model in schema.models() {
+                if let Some(ast_model) = ast_schema.find_model(&model.name) {
+                    for index in &model.indices {
+                        if index_names.contains(&index.name_in_db) {
+                            let ast_index = ast_model
+                                .attributes
+                                .iter()
+                                .find(|attribute| attribute.is_index())
+                                .unwrap();
 
-        for model in schema.models() {
-            if let Some(ast_model) = ast_schema.find_model(&model.name) {
-                for index in model.indices.iter() {
-                    if index_names.contains(&index.name_in_db) && !multiple_indexes_with_same_name_are_supported {
-                        let ast_index = ast_model
-                            .attributes
-                            .iter()
-                            .find(|attribute| attribute.is_index())
-                            .unwrap();
-
-                        errors.push_error(DatamodelError::new_multiple_indexes_with_same_name_are_not_supported(
-                            &index.name_in_db,
-                            ast_index.span,
-                        ));
+                            errors.push_error(DatamodelError::new_multiple_indexes_with_same_name_are_not_supported(
+                                &index.name_in_db,
+                                ast_index.span,
+                            ));
+                        }
+                        index_names.insert(&index.name_in_db);
                     }
-                    index_names.insert(&index.name_in_db);
                 }
             }
         }
@@ -322,14 +312,8 @@ impl<'a> Validator<'a> {
     fn validate_field_arities(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), Diagnostics> {
         let mut errors = Diagnostics::new();
 
-        // TODO: this is really ugly
-        let scalar_lists_are_supported = match &self.context.connector {
-            Some(connector) => connector.supports_scalar_lists(),
-            None => false,
-        };
-
-        for field in model.scalar_fields() {
-            if field.is_list() && !scalar_lists_are_supported {
+        if !self.context.connector.supports_scalar_lists() {
+            for field in model.scalar_fields().filter(|f| f.is_list()) {
                 errors.push_error(DatamodelError::new_scalar_list_fields_are_not_supported(
                     &model.name,
                     &field.name,
@@ -344,21 +328,17 @@ impl<'a> Validator<'a> {
     fn validate_field_types(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), Diagnostics> {
         let mut errors = Diagnostics::new();
 
-        for field in model.scalar_fields() {
-            if let Some(dml::ScalarType::Json) = field.field_type.scalar_type() {
-                // TODO: this is really ugly
-                let supports_json_type = match &self.context.connector {
-                    Some(connector) => connector.supports_json(),
-                    None => false,
-                };
-                if !supports_json_type {
-                    errors.push_error(DatamodelError::new_field_validation_error(
+        if !self.context.connector.supports_json() {
+            for field in model
+                .scalar_fields()
+                .filter(|f| matches!(f.field_type.scalar_type(), Some(dml::ScalarType::Json)))
+            {
+                errors.push_error(DatamodelError::new_field_validation_error(
                         &format!("Field `{}` in model `{}` can't be of type Json. The current connector does not support the Json type.", &field.name, &model.name),
                         &model.name,
                         &field.name,
                         ast_model.find_field_bang(&field.name).span,
                     ));
-                }
             }
         }
 
@@ -396,51 +376,49 @@ impl<'a> Validator<'a> {
     fn validate_auto_increment(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), Diagnostics> {
         let mut errors = Diagnostics::new();
 
-        if let Some(connector) = &self.context.connector {
-            let autoinc_fields = model.auto_increment_fields().collect_vec();
+        let autoinc_fields = model.auto_increment_fields().collect_vec();
 
-            // First check if the provider supports autoincrement at all, if yes, proceed with the detailed checks.
-            if !autoinc_fields.is_empty() && !connector.supports_auto_increment() {
-                for field in &autoinc_fields {
-                    let ast_field = ast_model.find_field_bang(&field.name);
+        // First check if the provider supports autoincrement at all, if yes, proceed with the detailed checks.
+        if !autoinc_fields.is_empty() && !self.context.connector.supports_auto_increment() {
+            for field in &autoinc_fields {
+                let ast_field = ast_model.find_field_bang(&field.name);
 
-                    // Add an error for all autoincrement fields on the model.
-                    errors.push_error(DatamodelError::new_attribute_validation_error(
-                        &"The `autoincrement()` default value is used with a datasource that does not support it."
-                            .to_string(),
-                        "default",
-                        ast_field.span,
-                    ));
-                }
-            }
-
-            if !connector.supports_multiple_auto_increment() && model.auto_increment_fields().count() > 1 {
+                // Add an error for all autoincrement fields on the model.
                 errors.push_error(DatamodelError::new_attribute_validation_error(
+                    &"The `autoincrement()` default value is used with a datasource that does not support it."
+                        .to_string(),
+                    "default",
+                    ast_field.span,
+                ));
+            }
+        }
+
+        if !self.context.connector.supports_multiple_auto_increment() && model.auto_increment_fields().count() > 1 {
+            errors.push_error(DatamodelError::new_attribute_validation_error(
                     &"The `autoincrement()` default value is used multiple times on this model even though the underlying datasource only supports one instance per table.".to_string(),
                     "default",
                     ast_model.span,
                 ))
-            }
+        }
 
-            // go over all fields
-            for field in &autoinc_fields {
-                let ast_field = ast_model.find_field_bang(&field.name);
+        // go over all fields
+        for field in &autoinc_fields {
+            let ast_field = ast_model.find_field_bang(&field.name);
 
-                if !field.is_id() && !connector.supports_non_id_auto_increment() {
-                    errors.push_error(DatamodelError::new_attribute_validation_error(
+            if !field.is_id() && !self.context.connector.supports_non_id_auto_increment() {
+                errors.push_error(DatamodelError::new_attribute_validation_error(
                             &"The `autoincrement()` default value is used on a non-id field even though the datasource does not support this.".to_string(),
                             "default",
                             ast_field.span,
                         ))
-                }
+            }
 
-                if !model.field_is_indexed(&field.name) && !connector.supports_non_indexed_auto_increment() {
-                    errors.push_error(DatamodelError::new_attribute_validation_error(
+            if !model.field_is_indexed(&field.name) && !self.context.connector.supports_non_indexed_auto_increment() {
+                errors.push_error(DatamodelError::new_attribute_validation_error(
                             &"The `autoincrement()` default value is used on a non-indexed field even though the datasource does not support this.".to_string(),
                             "default",
                             ast_field.span,
                         ))
-                }
             }
         }
 
@@ -492,22 +470,18 @@ impl<'a> Validator<'a> {
     }
 
     fn validate_model_compound_ids(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), DatamodelError> {
-        if let Some(connector) = &self.context.connector {
-            if model.has_compound_id() && !connector.supports_compound_ids() {
-                let ast_attr = ast_model
-                    .attributes()
-                    .iter()
-                    .find(|attr| &attr.name.name == "id")
-                    .unwrap();
+        if model.has_compound_id() && !self.context.connector.supports_compound_ids() {
+            let ast_attr = ast_model
+                .attributes()
+                .iter()
+                .find(|attr| &attr.name.name == "id")
+                .unwrap();
 
-                Err(DatamodelError::new_model_validation_error(
-                    "The current connector does not support compound ids.",
-                    &model.name,
-                    ast_attr.span,
-                ))
-            } else {
-                Ok(())
-            }
+            Err(DatamodelError::new_model_validation_error(
+                "The current connector does not support compound ids.",
+                &model.name,
+                ast_attr.span,
+            ))
         } else {
             Ok(())
         }
@@ -550,14 +524,12 @@ impl<'a> Validator<'a> {
     fn validate_field_connector_specific(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), Diagnostics> {
         let mut diagnostics = Diagnostics::new();
 
-        if let Some(connector) = &self.context.connector {
-            for field in model.fields.iter() {
-                if let Err(err) = connector.validate_field(field) {
-                    diagnostics.push_error(DatamodelError::new_connector_error(
-                        &err.to_string(),
-                        ast_model.find_field_bang(&field.name()).span,
-                    ));
-                }
+        for field in model.fields.iter() {
+            if let Err(err) = self.context.connector.validate_field(field) {
+                diagnostics.push_error(DatamodelError::new_connector_error(
+                    &err.to_string(),
+                    ast_model.find_field_bang(&field.name()).span,
+                ));
             }
         }
 
@@ -567,10 +539,8 @@ impl<'a> Validator<'a> {
     fn validate_model_connector_specific(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), Diagnostics> {
         let mut diagnostics = Diagnostics::new();
 
-        if let Some(connector) = &self.context.connector {
-            if let Err(err) = connector.validate_model(model) {
-                diagnostics.push_error(DatamodelError::new_connector_error(&err.to_string(), ast_model.span))
-            }
+        if let Err(err) = self.context.connector.validate_model(model) {
+            diagnostics.push_error(DatamodelError::new_connector_error(&err.to_string(), ast_model.span))
         }
 
         diagnostics.make_result()
@@ -672,19 +642,19 @@ impl<'a> Validator<'a> {
                         // Try harder to see if the final type is not the same.
                         // This check needs the connector, so it can't be in the dml
                         // crate.
-                        if let Some(connector) = &self.context.connector {
+                        if !self.context.connector.is_empty_default() {
                             let base_native_type = base_field.field_type().as_native_type().map(|(scalar, native)| (*scalar, native.serialized_native_type.clone())).or_else(|| -> Option<_> {
                                 let field_type = base_field.field_type();
                                 let scalar_type = field_type.as_base()?;
 
-                                Some((*scalar_type, connector.default_native_type_for_scalar_type(scalar_type)))
+                                Some((*scalar_type, self.context.connector.default_native_type_for_scalar_type(scalar_type)))
                             });
 
                             let referenced_native_type = referenced_field.field_type().as_native_type().map(|(scalar, native)| (*scalar, native.serialized_native_type.clone())).or_else(|| -> Option<_> {
                                 let field_type = referenced_field.field_type();
                                 let scalar_type = field_type.as_base()?;
 
-                                Some((*scalar_type, connector.default_native_type_for_scalar_type(scalar_type)))
+                                Some((*scalar_type, self.context.connector.default_native_type_for_scalar_type(scalar_type)))
                             });
 
                             if base_native_type.is_some() && base_native_type == referenced_native_type {
@@ -725,12 +695,7 @@ impl<'a> Validator<'a> {
             }
 
             if !rel_info.references.is_empty() && !errors.has_errors() {
-                let strict_relation_field_order = self
-                    .context
-                    .connector
-                    .as_ref()
-                    .map(|s| !s.allows_relation_fields_in_arbitrary_order())
-                    .unwrap_or(false);
+                let strict_relation_field_order = self.context.connector.allows_relation_fields_in_arbitrary_order();
 
                 // when we have other errors already don't push this error additionally
                 let references_unique_criteria = related_model.loose_unique_criterias().iter().any(|criteria| {
@@ -774,10 +739,8 @@ impl<'a> Validator<'a> {
                     }
                 };
 
-                let must_reference_unique_criteria = match &self.context.connector {
-                    Some(connector) => !connector.supports_relations_over_non_unique_criteria(),
-                    None => true,
-                };
+                let must_reference_unique_criteria =
+                    self.context.connector.supports_relations_over_non_unique_criteria();
 
                 if !references_unique_criteria && must_reference_unique_criteria {
                     errors.push_error(DatamodelError::new_validation_error(

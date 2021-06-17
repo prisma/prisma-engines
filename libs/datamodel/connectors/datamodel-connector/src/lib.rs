@@ -15,6 +15,10 @@ use std::{borrow::Cow, collections::BTreeMap};
 pub trait Connector: Send + Sync {
     fn name(&self) -> &str;
 
+    fn is_empty_default(&self) -> bool {
+        true
+    }
+
     fn capabilities(&self) -> &[ConnectorCapability];
 
     fn has_capability(&self, capability: ConnectorCapability) -> bool {

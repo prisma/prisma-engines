@@ -9,9 +9,6 @@ use crate::SqlError;
 use datamodel::common::datamodel_context::DatamodelContext;
 use datamodel::common::ConstraintNames;
 use datamodel::{dml, walkers::find_model_by_db_name, Datamodel, Field, Model, PrimaryKeyDefinition, RelationField};
-use datamodel_connector::Connector;
-use quaint::connector::SqlFamily;
-use sql_datamodel_connector::SqlDatamodelConnectors;
 use sql_schema_describer::{SqlSchema, Table};
 use tracing::debug;
 
@@ -19,20 +16,8 @@ pub fn introspect(
     schema: &SqlSchema,
     version_check: &mut VersionChecker,
     data_model: &mut Datamodel,
-    sql_family: SqlFamily,
+    ctx: &DatamodelContext,
 ) -> Result<(), SqlError> {
-    let connector: Box<dyn Connector> = match sql_family {
-        SqlFamily::Mysql => Box::new(SqlDatamodelConnectors::mysql()),
-        SqlFamily::Postgres => Box::new(SqlDatamodelConnectors::postgres()),
-        SqlFamily::Sqlite => Box::new(SqlDatamodelConnectors::sqlite()),
-        SqlFamily::Mssql => Box::new(SqlDatamodelConnectors::mssql()),
-    };
-
-    let ctx = DatamodelContext {
-        connector: Some(connector),
-        preview_features: vec![],
-    };
-
     for table in schema
         .tables
         .iter()

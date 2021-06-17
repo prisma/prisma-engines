@@ -144,7 +144,9 @@ impl Connector for PostgresDatamodelConnector {
     fn name(&self) -> &str {
         "Postgres"
     }
-
+    fn is_empty_default(&self) -> bool {
+        false
+    }
     fn capabilities(&self) -> &[ConnectorCapability] {
         &self.capabilities
     }

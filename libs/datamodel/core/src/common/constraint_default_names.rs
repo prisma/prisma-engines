@@ -50,11 +50,7 @@ impl ConstraintNames {
             None
         } else {
             let suffix = "_pkey";
-            let limit = ctx
-                .connector
-                .as_ref()
-                .map(|c| c.constraint_name_length())
-                .unwrap_or(1000);
+            let limit = ctx.connector.constraint_name_length();
 
             let trimmed = if table_name.len() >= limit - 5 {
                 table_name.split_at(limit - 5).0
@@ -73,11 +69,7 @@ impl ConstraintNames {
         } else {
             let index_suffix = "_idx";
             let unique_suffix = "_key";
-            let limit = ctx
-                .connector
-                .as_ref()
-                .map(|c| c.constraint_name_length())
-                .unwrap_or(1000);
+            let limit = ctx.connector.constraint_name_length();
 
             let joined = format!("{}_{}", table_name, column_names.join("_"));
 
@@ -100,11 +92,7 @@ impl ConstraintNames {
             "".into()
         } else {
             let fk_suffix = "_fkey";
-            let limit = ctx
-                .connector
-                .as_ref()
-                .map(|c| c.constraint_name_length())
-                .unwrap_or(1000);
+            let limit = ctx.connector.constraint_name_length();
 
             let joined = format!("{}_{}", table_name, column_names.join("_"));
 

@@ -172,7 +172,9 @@ impl Connector for MySqlDatamodelConnector {
     fn name(&self) -> &str {
         "MySQL"
     }
-
+    fn is_empty_default(&self) -> bool {
+        false
+    }
     fn capabilities(&self) -> &[ConnectorCapability] {
         &self.capabilities
     }

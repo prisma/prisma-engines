@@ -5,8 +5,8 @@ use crate::prisma_1_defaults::*;
 use crate::re_introspection::enrich;
 use crate::sanitize_datamodel_names::{sanitization_leads_to_duplicate_names, sanitize_datamodel_names};
 use crate::version_checker::VersionChecker;
-use crate::PreviewFeature;
 use crate::SqlIntrospectionResult;
+use datamodel::common::datamodel_context::DatamodelContext;
 use datamodel::Datamodel;
 use introspection_connector::IntrospectionResult;
 use quaint::connector::SqlFamily;
@@ -16,21 +16,28 @@ use tracing::debug;
 /// Calculate a data model from a database schema.
 pub fn calculate_datamodel(
     schema: &SqlSchema,
-    family: &SqlFamily,
-    preview_features: Vec<PreviewFeature>,
     previous_data_model: &Datamodel,
+    ctx: &DatamodelContext,
 ) -> SqlIntrospectionResult<IntrospectionResult> {
     debug!("Calculating data model.");
 
-    let mut version_check = VersionChecker::new(*family, schema);
+    let family = match ctx.connector.name() {
+        "Postgres" => SqlFamily::Postgres,
+        "sqlite" => SqlFamily::Sqlite,
+        "SQL Server" => SqlFamily::Mssql,
+        "MySQL" => SqlFamily::Mysql,
+        name => unreachable!(format!("The name `{}` for the datamodel connector is not known", name)),
+    };
+
+    let mut version_check = VersionChecker::new(family, schema);
     let mut data_model = Datamodel::new();
 
     // 1to1 translation of the sql schema
-    introspect(schema, &mut version_check, &mut data_model, *family)?;
+    introspect(schema, &mut version_check, &mut data_model, ctx)?;
 
     if !sanitization_leads_to_duplicate_names(&data_model) {
         // our opinionation about valid names
-        sanitize_datamodel_names(&mut data_model, family);
+        sanitize_datamodel_names(&mut data_model, &family);
     }
 
     // deduplicating relation field names
@@ -38,18 +45,18 @@ pub fn calculate_datamodel(
 
     let mut warnings = vec![];
     if !previous_data_model.is_empty() {
-        warnings.append(&mut enrich(previous_data_model, &mut data_model, family));
+        warnings.append(&mut enrich(previous_data_model, &mut data_model, &family));
         tracing::debug!("Enriching datamodel is done: {:?}", data_model);
     }
 
     // commenting out models, fields, enums, enum values
-    warnings.append(&mut commenting_out_guardrails(&mut data_model, family));
+    warnings.append(&mut commenting_out_guardrails(&mut data_model, &family));
 
     // try to identify whether the schema was created by a previous Prisma version
     let version = version_check.version(&warnings, &data_model);
 
     // if based on a previous Prisma version add id default opinionations
-    add_prisma_1_id_defaults(family, &version, &mut data_model, schema, &mut warnings);
+    add_prisma_1_id_defaults(&family, &version, &mut data_model, schema, &mut warnings);
 
     // renderer -> parser -> validator, is_commented_out gets lost between renderer and parser
     debug!("Done calculating data model {:?}", data_model);
@@ -71,7 +78,15 @@ mod tests {
     };
     use native_types::{NativeType, PostgresType};
     use pretty_assertions::assert_eq;
-    use quaint::connector::SqlFamily;
+    use sql_datamodel_connector::PostgresDatamodelConnector;
+
+    fn ctx() -> DatamodelContext {
+        DatamodelContext {
+            source_name: Some("Postgres".into()),
+            preview_features: vec![],
+            connector: Box::new(PostgresDatamodelConnector::new()),
+        }
+    }
 
     #[test]
     fn arity_is_preserved_when_generating_data_model_from_a_schema() {
@@ -163,8 +178,8 @@ mod tests {
             views: vec![],
             user_defined_types: vec![],
         };
-        let introspection_result = calculate_datamodel(&schema, &SqlFamily::Postgres, vec![], &Datamodel::new())
-            .expect("calculate data model");
+        let introspection_result =
+            calculate_datamodel(&schema, &Datamodel::new(), &ctx()).expect("calculate data model");
 
         assert_eq!(introspection_result.data_model, ref_data_model);
     }
@@ -380,8 +395,8 @@ mod tests {
             views: vec![],
             user_defined_types: vec![],
         };
-        let introspection_result = calculate_datamodel(&schema, &SqlFamily::Postgres, vec![], &Datamodel::new())
-            .expect("calculate data model");
+        let introspection_result =
+            calculate_datamodel(&schema, &Datamodel::new(), &ctx()).expect("calculate data model");
 
         assert_eq!(introspection_result.data_model, ref_data_model);
     }
@@ -467,8 +482,8 @@ mod tests {
             sequences: vec![],
             user_defined_types: vec![],
         };
-        let introspection_result = calculate_datamodel(&schema, &SqlFamily::Postgres, vec![], &Datamodel::new())
-            .expect("calculate data model");
+        let introspection_result =
+            calculate_datamodel(&schema, &Datamodel::new(), &ctx()).expect("calculate data model");
 
         assert_eq!(introspection_result.data_model, ref_data_model);
     }
@@ -744,8 +759,8 @@ mod tests {
             sequences: vec![],
             user_defined_types: vec![],
         };
-        let introspection_result = calculate_datamodel(&schema, &SqlFamily::Postgres, vec![], &Datamodel::new())
-            .expect("calculate data model");
+        let introspection_result =
+            calculate_datamodel(&schema, &Datamodel::new(), &ctx()).expect("calculate data model");
 
         assert_eq!(introspection_result.data_model, expected_data_model);
     }
@@ -886,8 +901,8 @@ mod tests {
             sequences: vec![],
             user_defined_types: vec![],
         };
-        let introspection_result = calculate_datamodel(&schema, &SqlFamily::Postgres, vec![], &Datamodel::new())
-            .expect("calculate data model");
+        let introspection_result =
+            calculate_datamodel(&schema, &Datamodel::new(), &ctx()).expect("calculate data model");
 
         assert_eq!(introspection_result.data_model, ref_data_model);
     }
@@ -1122,8 +1137,8 @@ mod tests {
             sequences: vec![],
             user_defined_types: vec![],
         };
-        let introspection_result = calculate_datamodel(&schema, &SqlFamily::Postgres, vec![], &Datamodel::new())
-            .expect("calculate data model");
+        let introspection_result =
+            calculate_datamodel(&schema, &Datamodel::new(), &ctx()).expect("calculate data model");
 
         assert_eq!(introspection_result.data_model, ref_data_model);
     }
@@ -1166,8 +1181,8 @@ mod tests {
             sequences: vec![],
             user_defined_types: vec![],
         };
-        let introspection_result = calculate_datamodel(&schema, &SqlFamily::Postgres, vec![], &Datamodel::new())
-            .expect("calculate data model");
+        let introspection_result =
+            calculate_datamodel(&schema, &Datamodel::new(), &ctx()).expect("calculate data model");
 
         assert_eq!(introspection_result.data_model, ref_data_model);
     }

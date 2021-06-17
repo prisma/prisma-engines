@@ -3,13 +3,14 @@ pub use test_setup::{BitFlags, Capabilities, Tags};
 
 use crate::{BarrelMigrationExecutor, Result};
 use datamodel::{Configuration, Datamodel};
-use introspection_connector::{DatabaseMetadata, IntrospectionConnector, Version};
+use introspection_connector::{
+    ConnectorResult, DatabaseMetadata, IntrospectionConnector, IntrospectionResult, Version,
+};
 use introspection_core::rpc::RpcImpl;
 use migration_connector::MigrationConnector;
 use quaint::{prelude::SqlFamily, single::Quaint};
 use sql_introspection_connector::SqlIntrospectionConnector;
 use sql_migration_connector::SqlMigrationConnector;
-use sql_schema_describer::SqlSchema;
 use std::fmt::Write;
 use test_setup::{sqlite_test_url, DatasourceBlock, TestApiArgs};
 use tracing::Instrument;
@@ -73,12 +74,8 @@ impl TestApi {
         &self.database
     }
 
-    pub async fn describe_schema(&self) -> Result<SqlSchema> {
-        Ok(self.api.describe().await?)
-    }
-
     pub async fn introspect(&self) -> Result<String> {
-        let introspection_result = self.api.introspect(&Datamodel::new()).await?;
+        let introspection_result = self.test_introspect_internal(Datamodel::new()).await?;
         Ok(datamodel::render_datamodel_and_config_to_string(
             &introspection_result.data_model,
             &self.configuration(),
@@ -95,11 +92,7 @@ impl TestApi {
         let config = self.configuration();
         let data_model = parse_datamodel(data_model_string);
 
-        let introspection_result = self
-            .api
-            .introspect(&data_model)
-            .instrument(tracing::info_span!("introspect"))
-            .await?;
+        let introspection_result = self.test_introspect_internal(data_model).await?;
 
         let rendering_span = tracing::info_span!("render_datamodel after introspection");
         let _span = rendering_span.enter();
@@ -108,21 +101,33 @@ impl TestApi {
         Ok(dm)
     }
 
+    #[tracing::instrument(skip(self))]
+    #[track_caller]
+    async fn test_introspect_internal(&self, data_model: Datamodel) -> ConnectorResult<IntrospectionResult> {
+        let config = self.configuration();
+        let first_source = config.datasources.into_iter().next().unwrap();
+
+        self.api
+            .introspect(&data_model, first_source.name, first_source.active_connector)
+            .instrument(tracing::info_span!("introspect"))
+            .await
+    }
+
     pub async fn re_introspect_warnings(&self, data_model_string: &str) -> Result<String> {
         let data_model = parse_datamodel(data_model_string);
-        let introspection_result = self.api.introspect(&data_model).await?;
+        let introspection_result = self.test_introspect_internal(data_model).await?;
 
         Ok(serde_json::to_string(&introspection_result.warnings)?)
     }
 
     pub async fn introspect_version(&self) -> Result<Version> {
-        let introspection_result = self.api.introspect(&Datamodel::new()).await?;
+        let introspection_result = self.test_introspect_internal(Datamodel::new()).await?;
 
         Ok(introspection_result.version)
     }
 
     pub async fn introspection_warnings(&self) -> Result<String> {
-        let introspection_result = self.api.introspect(&Datamodel::new()).await?;
+        let introspection_result = self.test_introspect_internal(Datamodel::new()).await?;
 
         Ok(serde_json::to_string(&introspection_result.warnings)?)
     }
@@ -177,7 +182,7 @@ impl TestApi {
         self.args.datasource_block(&self.connection_string, &[])
     }
 
-    pub fn configuration(&self) -> Configuration {
+    fn configuration(&self) -> Configuration {
         datamodel::parse_configuration(&self.datasource_block().to_string())
             .unwrap()
             .subject

@@ -139,6 +139,10 @@ impl Connector for MsSqlDatamodelConnector {
         "SQL Server"
     }
 
+    fn is_empty_default(&self) -> bool {
+        false
+    }
+
     fn capabilities(&self) -> &[ConnectorCapability] {
         &self.capabilities
     }

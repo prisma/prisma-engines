@@ -14,7 +14,25 @@ impl Connector for EmptyDatamodelConnector {
     }
 
     fn capabilities(&self) -> &[ConnectorCapability] {
-        &[]
+        &[
+            ConnectorCapability::ScalarLists,
+            ConnectorCapability::Enums,
+            ConnectorCapability::Json,
+            ConnectorCapability::AutoIncrementMultipleAllowed,
+            ConnectorCapability::AutoIncrementAllowedOnNonId,
+            ConnectorCapability::AutoIncrementNonIndexedAllowed,
+            ConnectorCapability::InsensitiveFilters,
+            ConnectorCapability::RelationFieldsInArbitraryOrder,
+            ConnectorCapability::CreateMany,
+            ConnectorCapability::WritableAutoincField,
+            ConnectorCapability::CreateSkipDuplicates,
+            ConnectorCapability::UpdateableId,
+            ConnectorCapability::NamedPrimaryKeys,
+            ConnectorCapability::JsonFilteringArrayPath,
+            ConnectorCapability::CreateManyWriteableAutoIncId,
+            ConnectorCapability::AutoIncrement,
+            ConnectorCapability::CompoundIds,
+        ]
     }
 
     fn validate_field(&self, _field: &dml::field::Field) -> Result<(), ConnectorError> {

@@ -90,7 +90,8 @@ impl RpcImpl {
     }
 
     pub async fn introspect_internal(schema: String, force: bool) -> RpcResult<IntrospectionResultOutput> {
-        let (config, url, connector) = RpcImpl::load_connector(&schema).await?;
+        let (config, url, connector) = RpcImpl::load_connector(&schema).await?; //todo
+        let (config2, _, _) = RpcImpl::load_connector(&schema).await?;
 
         let input_data_model = if !force {
             Self::parse_datamodel(&schema)?
@@ -98,7 +99,12 @@ impl RpcImpl {
             Datamodel::new()
         };
 
-        let result = match connector.introspect(&input_data_model).await {
+        let first_source = config2.datasources.into_iter().next().unwrap();
+
+        let result = match connector
+            .introspect(&input_data_model, first_source.name, first_source.active_connector)
+            .await
+        {
             Ok(introspection_result) => {
                 if introspection_result.data_model.is_empty() {
                     Err(Error::IntrospectionResultEmpty(url.to_string()))

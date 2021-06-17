@@ -80,12 +80,7 @@ impl<'a> LiftAstToDml<'a> {
         }
 
         // transfer primary keys from field level to model level and name them
-        let supports_named_pks = self
-            .context
-            .connector
-            .as_ref()
-            .map(|connector| connector.supports_named_primary_keys())
-            .unwrap_or(true);
+        let supports_named_pks = self.context.connector.supports_named_primary_keys();
 
         if model.singular_id_fields().next().is_some() {
             let model_name = model.database_name.as_ref().unwrap_or(&model.name).clone();
@@ -195,11 +190,7 @@ impl<'a> LiftAstToDml<'a> {
     fn lift_enum(&self, ast_enum: &ast::Enum) -> Result<dml::Enum, Diagnostics> {
         let mut errors = Diagnostics::new();
 
-        let supports_enums = match &self.context.connector {
-            Some(connector) => connector.supports_enums(),
-            None => true,
-        };
-        if !supports_enums {
+        if !self.context.connector.supports_enums() {
             errors.push_error(DatamodelError::new_validation_error(
                 &format!(
                     "You defined the enum `{}`. But the current connector does not support enums.",
@@ -306,8 +297,8 @@ impl<'a> LiftAstToDml<'a> {
         let type_name = &type_ident.name;
 
         if let Ok(scalar_type) = ScalarType::from_str(type_name) {
-            if let Some(connector) = &self.context.connector {
-                let prefix = format!("{}{}", connector.name(), "."); //todo this is probably wrong this is not Postgres but db.
+            if !self.context.connector.is_empty_default() {
+                let prefix = format!("{}{}", self.context.source_name.as_ref().unwrap(), ".");
 
                 let type_specifications_with_invalid_datasource_name = ast_field
                     .attributes
@@ -323,7 +314,7 @@ impl<'a> LiftAstToDml<'a> {
                     return Err(DatamodelError::new_connector_error(
                         &ConnectorError::from_kind(ErrorKind::InvalidPrefixForNativeTypes {
                             given_prefix: String::from(given_prefix),
-                            expected_prefix: connector.name(),
+                            expected_prefix: self.context.source_name.as_ref().unwrap().clone(),
                             suggestion: format!("{}{}", prefix, type_specification_name_split.next().unwrap()),
                         })
                         .to_string(),
@@ -358,13 +349,13 @@ impl<'a> LiftAstToDml<'a> {
                 };
 
                 if let Some(x) = type_specification.map(|dir| dir.name.name.trim_start_matches(&prefix)) {
-                    let constructor = if let Some(cons) = connector.find_native_type_constructor(x) {
+                    let constructor = if let Some(cons) = self.context.connector.find_native_type_constructor(x) {
                         cons
                     } else {
                         return Err(DatamodelError::new_connector_error(
                             &ConnectorError::from_kind(ErrorKind::NativeTypeNameUnknown {
                                 native_type: x.parse().unwrap(),
-                                connector_name: connector.name(),
+                                connector_name: self.context.connector.name().to_string(),
                             })
                             .to_string(),
                             type_specification.unwrap().span,
@@ -409,7 +400,7 @@ impl<'a> LiftAstToDml<'a> {
                         ));
                     }
 
-                    let parse_native_type_result = connector.parse_native_type(x, args);
+                    let parse_native_type_result = self.context.connector.parse_native_type(x, args);
                     match parse_native_type_result {
                         Err(connector_error) => Err(DatamodelError::new_connector_error(
                             &connector_error.to_string(),
@@ -492,7 +483,7 @@ impl<'a> LiftAstToDml<'a> {
     "#).unwrap()
         });
 
-        if let Some(connector) = &self.context.connector {
+        if !self.context.connector.is_empty_default() {
             if let Some(captures) = TYPE_REGEX.captures(unsupported_lit) {
                 let prefix = captures.name("prefix").unwrap().as_str().trim();
 
@@ -502,12 +493,15 @@ impl<'a> LiftAstToDml<'a> {
                     Some(params) => params.as_str().split(',').map(|s| s.trim().to_string()).collect(),
                 };
 
-                if let Ok(native_type) = connector.parse_native_type(prefix, args) {
-                    let prisma_type = connector.scalar_type_for_native_type(native_type.serialized_native_type.clone());
+                if let Ok(native_type) = self.context.connector.parse_native_type(prefix, args) {
+                    let prisma_type = self
+                        .context
+                        .connector
+                        .scalar_type_for_native_type(native_type.serialized_native_type.clone());
 
                     let msg = format!(
                         "The type `Unsupported(\"{}\")` you specified in the type definition for the field `{}` is supported as a native type by Prisma. Please use the native type notation `{} @{}.{}` for full support.",
-                        unsupported_lit, ast_field.name.name, prisma_type.to_string(), connector.name(), native_type.render()
+                        unsupported_lit, ast_field.name.name, prisma_type.to_string(), self.context.connector.name(), native_type.render()
                     );
 
                     return Err(DatamodelError::new_validation_error(&msg, ast_field.span));
