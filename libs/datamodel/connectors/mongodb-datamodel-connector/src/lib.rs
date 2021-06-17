@@ -49,11 +49,11 @@ impl Default for MongoDbDatamodelConnector {
 }
 
 impl Connector for MongoDbDatamodelConnector {
-    fn name(&self) -> String {
-        "MongoDB".to_owned()
+    fn name(&self) -> &str {
+        "MongoDB"
     }
 
-    fn capabilities(&self) -> &Vec<ConnectorCapability> {
+    fn capabilities(&self) -> &[ConnectorCapability] {
         &self.capabilities
     }
 

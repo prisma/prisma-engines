@@ -135,11 +135,11 @@ const SCALAR_TYPE_DEFAULTS: &[(ScalarType, MsSqlType)] = &[
 ];
 
 impl Connector for MsSqlDatamodelConnector {
-    fn name(&self) -> String {
-        "SQL Server".to_string()
+    fn name(&self) -> &str {
+        "SQL Server"
     }
 
-    fn capabilities(&self) -> &Vec<ConnectorCapability> {
+    fn capabilities(&self) -> &[ConnectorCapability] {
         &self.capabilities
     }
 
