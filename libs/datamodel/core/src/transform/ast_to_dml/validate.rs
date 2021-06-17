@@ -1,4 +1,4 @@
-use super::Names;
+use super::db::ParserDatabase;
 use crate::ast::{Model, Span};
 use crate::common::datamodel_context::DatamodelContext;
 use crate::{
@@ -32,16 +32,12 @@ impl<'a> Validator<'a> {
         Self { context }
     }
 
-    pub(crate) fn validate(
-        &self,
-        ast_schema: &ast::SchemaAst,
-        names: &Names<'_>,
-        schema: &mut dml::Datamodel,
-    ) -> Result<(), Diagnostics> {
+    pub(crate) fn validate(&self, db: &ParserDatabase<'_>, schema: &mut dml::Datamodel) -> Result<(), Diagnostics> {
         let mut all_errors = Diagnostics::new();
+        let ast_schema = db.ast();
 
         //todo use this pattern everywhere instead of the if let result dance?
-        self.validate_names(&mut all_errors, ast_schema, names);
+        self.validate_names(&mut all_errors, db);
 
         if let Err(errs) = self.validate_names_for_indexes(ast_schema, schema) {
             all_errors.extend(errs);
@@ -116,10 +112,9 @@ impl<'a> Validator<'a> {
         // Enum level validations.
         for declared_enum in schema.enums() {
             let mut errors_for_enum = Diagnostics::new();
-            if let Err(err) = self.validate_enum_name(
-                names.get_enum(&declared_enum.name, ast_schema).expect(STATE_ERROR),
-                declared_enum,
-            ) {
+            if let Err(err) =
+                self.validate_enum_name(db.get_enum(&declared_enum.name).expect(STATE_ERROR), declared_enum)
+            {
                 errors_for_enum.push_error(err);
             }
 
@@ -254,8 +249,8 @@ impl<'a> Validator<'a> {
         all_errors.make_result()
     }
 
-    fn validate_names(&self, errors: &mut Diagnostics, ast_schema: &ast::SchemaAst, names: &Names<'_>) {
-        for model in ast_schema.models() {
+    fn validate_names(&self, errors: &mut Diagnostics, db: &ParserDatabase<'_>) {
+        for model in db.ast().models() {
             errors.push_opt_error(model.name.validate("Model").err());
             errors.extend(model.validate_attributes());
 
@@ -265,7 +260,7 @@ impl<'a> Validator<'a> {
             }
         }
 
-        for (_, enum_decl) in names.iter_enums(ast_schema) {
+        for (_, enum_decl) in db.iter_enums() {
             errors.push_opt_error(enum_decl.name.validate("Enum").err());
             errors.extend(enum_decl.validate_attributes());
 

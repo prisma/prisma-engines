@@ -18,14 +18,14 @@ use std::{
 /// - Datasources
 /// - Model fields for each model
 /// - Enum variants for each enum
-pub(crate) struct Names<'ast> {
+pub(super) struct Names<'ast> {
     /// Models, enums and type aliases
-    tops: HashMap<&'ast str, TopId>,
+    pub(super) tops: HashMap<&'ast str, TopId>,
     /// Generators have their own namespace.
-    generators: HashMap<&'ast str, TopId>,
+    pub(super) generators: HashMap<&'ast str, TopId>,
     /// Datasources have their own namespace.
-    datasources: HashMap<&'ast str, TopId>,
-    model_fields: BTreeMap<(TopId, &'ast str), FieldId>,
+    pub(super) datasources: HashMap<&'ast str, TopId>,
+    pub(super) model_fields: BTreeMap<(TopId, &'ast str), FieldId>,
 }
 
 impl<'ast> Names<'ast> {
@@ -89,16 +89,6 @@ impl<'ast> Names<'ast> {
         }
 
         names
-    }
-
-    pub(crate) fn get_enum(&self, name: &str, schema: &'ast ast::SchemaAst) -> Option<&'ast ast::Enum> {
-        self.tops.get(name).and_then(|top_id| schema[*top_id].as_enum())
-    }
-
-    pub(crate) fn iter_enums(&self, schema: &'ast SchemaAst) -> impl Iterator<Item = (TopId, &'ast ast::Enum)> + '_ {
-        self.tops
-            .values()
-            .filter_map(move |topid| schema[*topid].as_enum().map(|enm| (*topid, enm)))
     }
 }
 
