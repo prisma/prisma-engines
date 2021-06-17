@@ -1,22 +1,22 @@
 use super::*;
+use crate::common::datamodel_context::DatamodelContext;
 use crate::transform::ast_to_dml::standardise_parsing::StandardiserForParsing;
-use crate::{ast, configuration, diagnostics::Diagnostics, ValidatedDatamodel};
+use crate::{ast, diagnostics::Diagnostics, ValidatedDatamodel};
 
 /// Is responsible for loading and validating the Datamodel defined in an AST.
 /// Wrapper for all lift and validation steps
 pub struct ValidationPipeline<'a> {
-    source: Option<&'a configuration::Datasource>,
+    context: &'a DatamodelContext,
     validator: Validator<'a>,
     standardiser_for_parsing: StandardiserForParsing,
     standardiser_for_formatting: StandardiserForFormatting,
 }
 
 impl<'a, 'b> ValidationPipeline<'a> {
-    pub fn new(sources: &'a [configuration::Datasource]) -> ValidationPipeline<'a> {
-        let source = sources.first();
+    pub fn new(context: &'a DatamodelContext) -> ValidationPipeline<'a> {
         ValidationPipeline {
-            source,
-            validator: Validator::new(source),
+            context,
+            validator: Validator::new(&context),
             standardiser_for_formatting: StandardiserForFormatting::new(),
             standardiser_for_parsing: StandardiserForParsing::new(),
         }
@@ -47,7 +47,7 @@ impl<'a, 'b> ValidationPipeline<'a> {
         diagnostics.make_result()?;
 
         // Phase 3: Lift AST to DML.
-        let lifter = LiftAstToDml::new(self.source, &names);
+        let lifter = LiftAstToDml::new(&self.context, &names);
 
         let mut schema = match lifter.lift(ast_schema) {
             Err(err) => {

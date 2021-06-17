@@ -1,11 +1,11 @@
 use crate::Dedup;
 use crate::SqlError;
+use datamodel::common::datamodel_context::DatamodelContext;
 use datamodel::common::ConstraintNames;
 use datamodel::{
     common::RelationNames, Datamodel, DefaultValue as DMLDef, FieldArity, FieldType, IndexDefinition, Model,
     OnDeleteStrategy, PrimaryKeyDefinition, RelationField, RelationInfo, ScalarField, ScalarType, ValueGenerator as VG,
 };
-use datamodel_connector::Connector;
 use sql_schema_describer::DefaultKind;
 use sql_schema_describer::{Column, ColumnArity, ColumnTypeFamily, ForeignKey, Index, IndexType, SqlSchema, Table};
 use tracing::debug;
@@ -121,14 +121,14 @@ pub fn calculate_many_to_many_field(
     RelationField::new(&name, FieldArity::List, relation_info)
 }
 
-pub(crate) fn calculate_index(table_name: String, index: &Index, connector: &dyn Connector) -> IndexDefinition {
+pub(crate) fn calculate_index(table_name: String, index: &Index, ctx: &DatamodelContext) -> IndexDefinition {
     debug!("Handling index  {:?}", index);
 
     let tpe = match index.tpe {
         IndexType::Unique => datamodel::dml::IndexType::Unique,
         IndexType::Normal => datamodel::dml::IndexType::Normal,
     };
-    let default_name = ConstraintNames::index_name(&table_name, index.columns.clone(), tpe, Some(connector));
+    let default_name = ConstraintNames::index_name(&table_name, index.columns.clone(), tpe, ctx);
 
     //We do not populate name in client by default. It increases datamodel noise,
     //and we would need to sanitize it. Users can give their own names if they want
@@ -144,12 +144,12 @@ pub(crate) fn calculate_index(table_name: String, index: &Index, connector: &dyn
     }
 }
 
-pub(crate) fn calculate_scalar_field(table: &Table, column: &Column, connector: &dyn Connector) -> ScalarField {
+pub(crate) fn calculate_scalar_field(table: &Table, column: &Column, ctx: &DatamodelContext) -> ScalarField {
     debug!("Handling column {:?}", column);
 
-    let field_type = calculate_scalar_field_type_with_native_types(column, connector);
+    let field_type = calculate_scalar_field_type_with_native_types(column, ctx);
 
-    let primary_key = primary_key(&column, &table, connector);
+    let primary_key = primary_key(&column, &table, ctx);
     let arity = match column.tpe.arity {
         _ if primary_key.is_some() && column.auto_increment => FieldArity::Required,
         ColumnArity::Required => FieldArity::Required,
@@ -164,7 +164,7 @@ pub(crate) fn calculate_scalar_field(table: &Table, column: &Column, connector: 
         .indices
         .iter()
         .find(|index| index.tpe == IndexType::Unique && index.columns == [column.name.to_string()])
-        .map(|index| calculate_index(table_name, index, connector));
+        .map(|index| calculate_index(table_name, index, ctx));
 
     ScalarField {
         name: column.name.clone(),
@@ -186,12 +186,12 @@ pub(crate) fn calculate_relation_field(
     schema: &SqlSchema,
     table: &Table,
     foreign_key: &ForeignKey,
-    connector: &dyn Connector,
+    ctx: &DatamodelContext,
 ) -> Result<RelationField, SqlError> {
     debug!("Handling foreign key  {:?}", foreign_key);
 
     let fk_default_name =
-        ConstraintNames::foreign_key_constraint_name(&table.name.clone(), foreign_key.columns.clone(), Some(connector));
+        ConstraintNames::foreign_key_constraint_name(&table.name.clone(), foreign_key.columns.clone(), ctx);
 
     let relation_info = RelationInfo {
         name: calculate_relation_name(schema, foreign_key, table)?,
@@ -283,13 +283,15 @@ pub(crate) fn calculate_default(table: &Table, column: &Column, arity: &FieldAri
     }
 }
 
-pub(crate) fn primary_key(column: &Column, table: &Table, connector: &dyn Connector) -> Option<PrimaryKeyDefinition> {
+pub(crate) fn primary_key(column: &Column, table: &Table, ctx: &DatamodelContext) -> Option<PrimaryKeyDefinition> {
     match &table.primary_key {
         Some(pk) if pk.columns.len() == 1 && pk.columns.first().unwrap() == &column.name => {
-            let default_name = ConstraintNames::primary_key_name(&table.name, Some(connector));
+            let name_in_db_matches_default =
+                ConstraintNames::primary_key_name_matches(pk.constraint_name.clone(), &table.name, ctx);
+
             Some(PrimaryKeyDefinition {
                 name_in_client: None,
-                name_in_db_matches_default: pk.constraint_name == Some(default_name),
+                name_in_db_matches_default,
                 name_in_db: pk.constraint_name.clone(),
                 fields: pk.columns.clone(),
             })
@@ -363,7 +365,7 @@ pub(crate) fn calculate_scalar_field_type_for_native_type(column: &Column) -> Fi
     }
 }
 
-pub(crate) fn calculate_scalar_field_type_with_native_types(column: &Column, connector: &dyn Connector) -> FieldType {
+pub(crate) fn calculate_scalar_field_type_with_native_types(column: &Column, context: &DatamodelContext) -> FieldType {
     debug!("Calculating native field type for '{}'", column.name);
     let scalar_type = calculate_scalar_field_type_for_native_type(column);
 
@@ -371,7 +373,12 @@ pub(crate) fn calculate_scalar_field_type_with_native_types(column: &Column, con
         FieldType::Base(scal_type, _) => match &column.tpe.native_type {
             None => scalar_type,
             Some(native_type) => {
-                let native_type_instance = connector.introspect_native_type(native_type.clone()).unwrap();
+                let native_type_instance = context
+                    .connector
+                    .as_ref()
+                    .unwrap()
+                    .introspect_native_type(native_type.clone())
+                    .unwrap();
                 FieldType::NativeType(scal_type, native_type_instance)
             }
         },

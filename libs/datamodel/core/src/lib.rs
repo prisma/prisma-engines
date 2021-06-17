@@ -86,6 +86,7 @@ pub mod dml;
 pub mod json;
 pub mod transform;
 pub mod walkers;
+use crate::common::datamodel_context::DatamodelContext;
 
 pub use crate::dml::*;
 pub use configuration::*;
@@ -142,7 +143,16 @@ fn parse_datamodel_internal(
     let generators = GeneratorLoader::load_generators_from_ast(&ast, &mut diagnostics);
     let preview_features = preview_features(&generators);
     let datasources = load_sources(&ast, &preview_features, &mut &mut diagnostics);
-    let validator = ValidationPipeline::new(&datasources);
+    let datasources2 = load_sources(&ast, &preview_features, &mut &mut diagnostics);
+    // let preview_features: Vec<PreviewFeature> = preview_features.iter().map(|f| f.to_owned()).collect();
+    let preview_features: Vec<PreviewFeature> = vec![];
+
+    let ctx = DatamodelContext {
+        connector: datasources2.into_iter().next().map(|f| f.active_connector),
+        preview_features,
+    };
+
+    let validator = ValidationPipeline::new(&ctx);
 
     diagnostics.make_result()?;
 

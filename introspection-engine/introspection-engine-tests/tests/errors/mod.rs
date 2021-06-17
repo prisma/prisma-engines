@@ -17,7 +17,7 @@ async fn connection_string_problems_give_a_nice_error() {
     ];
 
     for provider in providers {
-        let error = SqlIntrospectionConnector::new(provider.1).await.unwrap_err();
+        let error = SqlIntrospectionConnector::new(provider.1, vec![]).await.unwrap_err();
         let error = error.user_facing_error().cloned().unwrap();
         let error = user_facing_errors::Error::from(error);
         let json_error = serde_json::to_value(&error).unwrap();

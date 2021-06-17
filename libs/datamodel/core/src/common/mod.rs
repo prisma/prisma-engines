@@ -4,6 +4,7 @@ mod name_normalizer;
 mod relation_default_names;
 
 mod constraint_default_names;
+pub mod datamodel_context;
 pub mod preview_features;
 pub mod provider_names;
 

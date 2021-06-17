@@ -5,6 +5,7 @@ use crate::prisma_1_defaults::*;
 use crate::re_introspection::enrich;
 use crate::sanitize_datamodel_names::{sanitization_leads_to_duplicate_names, sanitize_datamodel_names};
 use crate::version_checker::VersionChecker;
+use crate::PreviewFeature;
 use crate::SqlIntrospectionResult;
 use datamodel::Datamodel;
 use introspection_connector::IntrospectionResult;
@@ -16,6 +17,7 @@ use tracing::debug;
 pub fn calculate_datamodel(
     schema: &SqlSchema,
     family: &SqlFamily,
+    preview_features: Vec<PreviewFeature>,
     previous_data_model: &Datamodel,
 ) -> SqlIntrospectionResult<IntrospectionResult> {
     debug!("Calculating data model.");
@@ -161,8 +163,8 @@ mod tests {
             views: vec![],
             user_defined_types: vec![],
         };
-        let introspection_result =
-            calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new()).expect("calculate data model");
+        let introspection_result = calculate_datamodel(&schema, &SqlFamily::Postgres, vec![], &Datamodel::new())
+            .expect("calculate data model");
 
         assert_eq!(introspection_result.data_model, ref_data_model);
     }
@@ -378,8 +380,8 @@ mod tests {
             views: vec![],
             user_defined_types: vec![],
         };
-        let introspection_result =
-            calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new()).expect("calculate data model");
+        let introspection_result = calculate_datamodel(&schema, &SqlFamily::Postgres, vec![], &Datamodel::new())
+            .expect("calculate data model");
 
         assert_eq!(introspection_result.data_model, ref_data_model);
     }
@@ -465,8 +467,8 @@ mod tests {
             sequences: vec![],
             user_defined_types: vec![],
         };
-        let introspection_result =
-            calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new()).expect("calculate data model");
+        let introspection_result = calculate_datamodel(&schema, &SqlFamily::Postgres, vec![], &Datamodel::new())
+            .expect("calculate data model");
 
         assert_eq!(introspection_result.data_model, ref_data_model);
     }
@@ -742,8 +744,8 @@ mod tests {
             sequences: vec![],
             user_defined_types: vec![],
         };
-        let introspection_result =
-            calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new()).expect("calculate data model");
+        let introspection_result = calculate_datamodel(&schema, &SqlFamily::Postgres, vec![], &Datamodel::new())
+            .expect("calculate data model");
 
         assert_eq!(introspection_result.data_model, expected_data_model);
     }
@@ -884,8 +886,8 @@ mod tests {
             sequences: vec![],
             user_defined_types: vec![],
         };
-        let introspection_result =
-            calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new()).expect("calculate data model");
+        let introspection_result = calculate_datamodel(&schema, &SqlFamily::Postgres, vec![], &Datamodel::new())
+            .expect("calculate data model");
 
         assert_eq!(introspection_result.data_model, ref_data_model);
     }
@@ -1120,8 +1122,8 @@ mod tests {
             sequences: vec![],
             user_defined_types: vec![],
         };
-        let introspection_result =
-            calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new()).expect("calculate data model");
+        let introspection_result = calculate_datamodel(&schema, &SqlFamily::Postgres, vec![], &Datamodel::new())
+            .expect("calculate data model");
 
         assert_eq!(introspection_result.data_model, ref_data_model);
     }
@@ -1164,8 +1166,8 @@ mod tests {
             sequences: vec![],
             user_defined_types: vec![],
         };
-        let introspection_result =
-            calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new()).expect("calculate data model");
+        let introspection_result = calculate_datamodel(&schema, &SqlFamily::Postgres, vec![], &Datamodel::new())
+            .expect("calculate data model");
 
         assert_eq!(introspection_result.data_model, ref_data_model);
     }

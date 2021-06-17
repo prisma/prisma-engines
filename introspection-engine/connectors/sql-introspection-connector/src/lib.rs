@@ -12,6 +12,7 @@ mod schema_describer_loading;
 mod version_checker;
 mod warnings;
 
+use datamodel::common::preview_features::*;
 use datamodel::Datamodel;
 pub use error::*;
 use introspection_connector::{
@@ -27,6 +28,7 @@ pub type SqlIntrospectionResult<T> = core::result::Result<T, SqlError>;
 pub struct SqlIntrospectionConnector {
     connection_info: ConnectionInfo,
     describer: Box<dyn SqlSchemaDescriberBackend>,
+    preview_features: Vec<PreviewFeature>,
 }
 
 impl fmt::Debug for SqlIntrospectionConnector {
@@ -39,7 +41,7 @@ impl fmt::Debug for SqlIntrospectionConnector {
 }
 
 impl SqlIntrospectionConnector {
-    pub async fn new(url: &str) -> ConnectorResult<SqlIntrospectionConnector> {
+    pub async fn new(url: &str, preview_features: Vec<PreviewFeature>) -> ConnectorResult<SqlIntrospectionConnector> {
         let (describer, connection_info) = schema_describer_loading::load_describer(&url)
             .instrument(tracing::debug_span!("Loading describer"))
             .await
@@ -54,6 +56,7 @@ impl SqlIntrospectionConnector {
         Ok(SqlIntrospectionConnector {
             connection_info,
             describer,
+            preview_features,
         })
     }
 
@@ -115,10 +118,14 @@ impl IntrospectionConnector for SqlIntrospectionConnector {
     async fn introspect(&self, previous_data_model: &Datamodel) -> ConnectorResult<IntrospectionResult> {
         let sql_schema = self.catch(self.describe()).await?;
         tracing::debug!("SQL Schema Describer is done: {:?}", sql_schema);
-        let family = self.connection_info.sql_family();
+        let sql_family = self.connection_info.sql_family();
+        let preview_features = self.preview_features.clone();
 
-        let introspection_result = calculate_datamodel::calculate_datamodel(&sql_schema, &family, &previous_data_model)
-            .map_err(|sql_introspection_error| sql_introspection_error.into_connector_error(&self.connection_info))?;
+        let introspection_result =
+            calculate_datamodel::calculate_datamodel(&sql_schema, &sql_family, preview_features, &previous_data_model)
+                .map_err(|sql_introspection_error| {
+                    sql_introspection_error.into_connector_error(&self.connection_info)
+                })?;
 
         tracing::debug!("Calculating datamodel is done: {:?}", introspection_result.data_model);
 

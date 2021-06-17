@@ -6,6 +6,7 @@ use crate::introspection_helpers::{
 use crate::version_checker::VersionChecker;
 use crate::Dedup;
 use crate::SqlError;
+use datamodel::common::datamodel_context::DatamodelContext;
 use datamodel::common::ConstraintNames;
 use datamodel::{dml, walkers::find_model_by_db_name, Datamodel, Field, Model, PrimaryKeyDefinition, RelationField};
 use datamodel_connector::Connector;
@@ -27,6 +28,11 @@ pub fn introspect(
         SqlFamily::Mssql => Box::new(SqlDatamodelConnectors::mssql()),
     };
 
+    let ctx = DatamodelContext {
+        connector: Some(connector),
+        preview_features: vec![],
+    };
+
     for table in schema
         .tables
         .iter()
@@ -41,7 +47,7 @@ pub fn introspect(
 
         for column in &table.columns {
             version_check.check_column_for_type_and_default_value(&column);
-            let field = calculate_scalar_field(&table, &column, connector.as_ref());
+            let field = calculate_scalar_field(&table, &column, &ctx);
             model.add_field(Field::ScalarField(field));
         }
 
@@ -51,23 +57,24 @@ pub fn introspect(
         for foreign_key in &foreign_keys_copy {
             version_check.has_inline_relations(table);
             version_check.uses_on_delete(foreign_key, table);
-            let relation_field = calculate_relation_field(schema, table, foreign_key, connector.as_ref())?;
+            let relation_field = calculate_relation_field(schema, table, foreign_key, &ctx)?;
             model.add_field(Field::RelationField(relation_field));
         }
 
         for index in table.indices.iter() {
-            model.add_index(calculate_index(table.name.clone(), index, connector.as_ref()));
+            model.add_index(calculate_index(table.name.clone(), index, &ctx));
         }
 
         model.primary_key = table.primary_key.as_ref().map(|pk| {
-            let default_name = ConstraintNames::primary_key_name(&table.name, Some(connector.as_ref()));
+            let name_in_db_matches_default =
+                ConstraintNames::primary_key_name_matches(pk.constraint_name.clone(), &table.name, &ctx);
 
             //We do not populate name in client by default. It increases datamodel noise,
             //and we would need to sanitize it. Users can give their own names if they want
             //and re-introspection will keep them.
             PrimaryKeyDefinition {
                 name_in_client: None,
-                name_in_db_matches_default: pk.constraint_name == Some(default_name),
+                name_in_db_matches_default,
                 name_in_db: pk.constraint_name.clone(),
                 fields: pk.columns.clone(),
             }

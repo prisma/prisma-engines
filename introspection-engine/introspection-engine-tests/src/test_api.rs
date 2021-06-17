@@ -51,7 +51,11 @@ impl TestApi {
             unreachable!()
         };
 
-        let api = SqlIntrospectionConnector::new(&connection_string).await.unwrap();
+        let preview_features = vec![];
+
+        let api = SqlIntrospectionConnector::new(&connection_string, preview_features)
+            .await
+            .unwrap();
 
         TestApi {
             api,

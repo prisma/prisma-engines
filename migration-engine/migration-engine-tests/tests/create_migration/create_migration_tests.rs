@@ -24,6 +24,75 @@ fn basic_create_migration_works(api: TestApi) {
                             "id" INTEGER NOT NULL,
                             "name" TEXT NOT NULL,
 
+                            PRIMARY KEY ("id")
+                        );
+                        "#
+                }
+            } else if api.is_mysql() {
+                indoc! {
+                    r#"
+                        -- CreateTable
+                        CREATE TABLE `Cat` (
+                            `id` INTEGER NOT NULL,
+                            `name` VARCHAR(191) NOT NULL,
+
+                            PRIMARY KEY (`id`)
+                        ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+                        "#
+                }
+            } else if api.is_sqlite() {
+                indoc! {
+                    r#"
+                        -- CreateTable
+                        CREATE TABLE "Cat" (
+                            "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+                            "name" TEXT NOT NULL
+                        );
+                        "#
+                }
+            } else if api.is_mssql() {
+                indoc! {
+                    r#"
+                        -- CreateTable
+                        CREATE TABLE [basic_create_migration_works].[Cat] (
+                            [id] INT NOT NULL,
+                            [name] NVARCHAR(1000) NOT NULL,
+                        
+                            CONSTRAINT [Cat_pkey] PRIMARY KEY ([id])
+                        );
+                        "#
+                }
+            } else {
+                unreachable!()
+            };
+
+            migration.assert_contents(expected_script)
+        });
+}
+
+#[test_connector]
+fn basic_create_migration_works_w_constraint_flag(api: TestApi) {
+    let dm = r#"
+        model Cat {
+            id      Int @id
+            name    String
+        }
+    "#;
+
+    let dir = api.create_migrations_directory();
+
+    api.create_migration("create-cats", dm, &dir)
+        .send_sync()
+        .assert_migration_directories_count(1)
+        .assert_migration("create-cats", |migration| {
+            let expected_script = if api.is_postgres() {
+                indoc! {
+                    r#"
+                        -- CreateTable
+                        CREATE TABLE "Cat" (
+                            "id" INTEGER NOT NULL,
+                            "name" TEXT NOT NULL,
+
                             CONSTRAINT "Cat_pkey" PRIMARY KEY ("id")
                         );
                         "#
@@ -111,7 +180,7 @@ fn creating_a_second_migration_should_have_the_previous_sql_schema_as_baseline(a
                             "id" INTEGER NOT NULL,
                             "name" TEXT NOT NULL,
 
-                            CONSTRAINT "Dog_pkey" PRIMARY KEY ("id")
+                            PRIMARY KEY ("id")
                         );
                         "#
                     }
@@ -296,7 +365,7 @@ fn create_enum_step_only_rendered_when_needed(api: TestApi) {
                             "id" INTEGER NOT NULL,
                             "mood" "Mood" NOT NULL,
 
-                            CONSTRAINT "Cat_pkey" PRIMARY KEY ("id")
+                            PRIMARY KEY ("id")
                         );
                         "#
                 }
@@ -353,7 +422,7 @@ fn create_enum_renders_correctly(api: TestApi) {
                             "id" INTEGER NOT NULL,
                             "mood" "Mood" NOT NULL,
 
-                            CONSTRAINT "Cat_pkey" PRIMARY KEY ("id")
+                            PRIMARY KEY ("id")
                         );
                         "#
                 }
@@ -390,7 +459,7 @@ fn unsupported_type_renders_correctly(api: TestApi) {
                             "id" INTEGER NOT NULL,
                             "home" point NOT NULL,
 
-                            CONSTRAINT "Cat_pkey" PRIMARY KEY ("id")
+                            PRIMARY KEY ("id")
                         );
                         "#
                 }
@@ -431,14 +500,14 @@ fn no_additional_unique_created(api: TestApi) {
                         CREATE TABLE "Cat" (
                             "id" INTEGER NOT NULL,
 
-                            CONSTRAINT "Cat_pkey" PRIMARY KEY ("id")
+                            PRIMARY KEY ("id")
                         );
 
                         -- CreateTable
                         CREATE TABLE "Collar" (
                             "id" INTEGER NOT NULL,
 
-                            CONSTRAINT "Collar_pkey" PRIMARY KEY ("id")
+                            PRIMARY KEY ("id")
                         );
 
                         -- AddForeignKey
@@ -452,6 +521,188 @@ fn no_additional_unique_created(api: TestApi) {
 
 #[test_connector]
 fn create_constraint_name_tests(api: TestApi) {
+    let dm = r#"
+        model A {
+          id   Int    @id
+          name String @unique
+          a    String
+          b    String
+          B    B[]    @relation("AtoB")
+
+          @@unique([a, b], name: "compound", map:"1")
+          @@unique([a, b], map:"2")
+          @@index([a])
+        }
+
+        model B {
+          a   String
+          b   String
+          aId Int
+          A   A      @relation("AtoB", fields: [aId], references: [id])
+
+          @@index([a,b])
+          @@id([a, b])
+        }
+    "#;
+
+    let dir = api.create_migrations_directory();
+
+    api.create_migration("setup", dm, &dir)
+        .send_sync()
+        .assert_migration_directories_count(1)
+        .assert_migration("setup", |migration| {
+            let expected_script = if api.is_mssql() {
+                indoc! {
+                    r#"
+                    -- CreateTable
+                    CREATE TABLE [create_constraint_name_tests].[A] (
+                        [id] INT NOT NULL,
+                        [name] NVARCHAR(1000) NOT NULL,
+                        [a] NVARCHAR(1000) NOT NULL,
+                        [b] NVARCHAR(1000) NOT NULL,
+                    
+                        CONSTRAINT [A_pkey] PRIMARY KEY ([id]),
+                        CONSTRAINT [A_name_key] UNIQUE ([name]),
+                        CONSTRAINT [1] UNIQUE ([a],[b]),
+                        CONSTRAINT [2] UNIQUE ([a],[b])
+                    );
+                    
+                    -- CreateTable
+                    CREATE TABLE [create_constraint_name_tests].[B] (
+                        [a] NVARCHAR(1000) NOT NULL,
+                        [b] NVARCHAR(1000) NOT NULL,
+                        [aId] INT NOT NULL,
+                    
+                        CONSTRAINT [custom] PRIMARY KEY ([a],[b])
+                    );
+                    
+                    -- CreateIndex
+                    CREATE INDEX [A_a_idx] ON [create_constraint_name_tests].[A]([a]);
+                    
+                    -- CreateIndex
+                    CREATE INDEX [B_a_b_idx] ON [create_constraint_name_tests].[B]([a], [b]);
+                    
+                    -- AddForeignKey
+                    ALTER TABLE [create_constraint_name_tests].[B] ADD CONSTRAINT [B_aId_fkey] FOREIGN KEY ([aId]) REFERENCES [create_constraint_name_tests].[A]([id]) ON DELETE CASCADE ON UPDATE CASCADE;
+                "#
+                }
+            } else if api.is_postgres() {
+                indoc! {
+                    r#"
+                    -- CreateTable
+                    CREATE TABLE "A" (
+                        "id" INTEGER NOT NULL,
+                        "name" TEXT NOT NULL,
+                        "a" TEXT NOT NULL,
+                        "b" TEXT NOT NULL,
+
+                        PRIMARY KEY ("id")
+                    );
+
+                    -- CreateTable
+                    CREATE TABLE "B" (
+                        "a" TEXT NOT NULL,
+                        "b" TEXT NOT NULL,
+                        "aId" INTEGER NOT NULL,
+                    
+                        PRIMARY KEY ("a","b")
+                    );
+                    
+                    -- CreateIndex
+                    CREATE INDEX "A_a_idx" ON "A"("a");
+                    
+                    -- CreateIndex
+                    CREATE UNIQUE INDEX "A_name_key" ON "A"("name");
+                    
+                    -- CreateIndex
+                    CREATE UNIQUE INDEX "1" ON "A"("a", "b");
+                    
+                    -- CreateIndex
+                    CREATE UNIQUE INDEX "2" ON "A"("a", "b");
+                    
+                    -- CreateIndex
+                    CREATE INDEX "B_a_b_idx" ON "B"("a", "b");
+                    
+                    -- AddForeignKey
+                    ALTER TABLE "B" ADD CONSTRAINT "B_aId_fkey" FOREIGN KEY ("aId") REFERENCES "A"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+                "#
+                }
+            } else if api.is_mysql(){
+                indoc! {
+                    r#"
+                -- CreateTable
+                CREATE TABLE `A` (
+                    `id` INTEGER NOT NULL,
+                    `name` VARCHAR(191) NOT NULL,
+                    `a` VARCHAR(191) NOT NULL,
+                    `b` VARCHAR(191) NOT NULL,
+                
+                    INDEX `A_a_idx`(`a`),
+                    UNIQUE INDEX `A_name_key`(`name`),
+                    UNIQUE INDEX `1`(`a`, `b`),
+                    UNIQUE INDEX `2`(`a`, `b`),
+                    PRIMARY KEY (`id`)
+                ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+                
+                -- CreateTable
+                CREATE TABLE `B` (
+                    `a` VARCHAR(191) NOT NULL,
+                    `b` VARCHAR(191) NOT NULL,
+                    `aId` INTEGER NOT NULL,
+                
+                    INDEX `B_a_b_idx`(`a`, `b`),
+                    PRIMARY KEY (`a`, `b`)
+                ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+                
+                -- AddForeignKey
+                ALTER TABLE `B` ADD CONSTRAINT `B_aId_fkey` FOREIGN KEY (`aId`) REFERENCES `A`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+                "#
+                }
+            }else if api.is_sqlite(){
+                indoc!{r#"
+                -- CreateTable
+                CREATE TABLE "A" (
+                    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+                    "name" TEXT NOT NULL,
+                    "a" TEXT NOT NULL,
+                    "b" TEXT NOT NULL
+                );
+                
+                -- CreateTable
+                CREATE TABLE "B" (
+                    "a" TEXT NOT NULL,
+                    "b" TEXT NOT NULL,
+                    "aId" INTEGER NOT NULL,
+                
+                    PRIMARY KEY ("a", "b"),
+                    CONSTRAINT "B_aId_fkey" FOREIGN KEY ("aId") REFERENCES "A" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+                );
+                
+                -- CreateIndex
+                CREATE INDEX "A_a_idx" ON "A"("a");
+                
+                -- CreateIndex
+                CREATE UNIQUE INDEX "A_name_key" ON "A"("name");
+
+                -- CreateIndex
+                CREATE UNIQUE INDEX "1" ON "A"("a", "b");
+                
+                -- CreateIndex
+                CREATE UNIQUE INDEX "2" ON "A"("a", "b");
+                
+                -- CreateIndex
+                CREATE INDEX "B_a_b_idx" ON "B"("a", "b");
+                "#
+            }} else {
+                ""
+            };
+
+            migration.assert_contents(expected_script)
+        });
+}
+
+#[test_connector]
+fn create_constraint_name_tests_w_constraint_flag(api: TestApi) {
     let dm = r#"
         model A {
           id   Int    @id

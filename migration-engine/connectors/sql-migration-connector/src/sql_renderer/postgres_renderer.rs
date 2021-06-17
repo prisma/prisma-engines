@@ -362,10 +362,15 @@ impl SqlRenderer for PostgresFlavour {
         let columns: String = table.columns().map(|column| self.render_column(&column)).join(",\n");
 
         let pk = if let Some(pk) = table.primary_key() {
+            let named_constraint = match &pk.constraint_name {
+                Some(name) => format!("CONSTRAINT {} ", self.quote(name)),
+                None => "".into(),
+            };
+
             format!(
-                ",\n\n{}CONSTRAINT {} PRIMARY KEY ({})",
+                ",\n\n{}{}PRIMARY KEY ({})",
                 SQL_INDENTATION,
-                self.quote(pk.constraint_name.as_ref().unwrap()),
+                named_constraint,
                 pk.columns
                     .as_slice()
                     .iter()

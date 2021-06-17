@@ -1,4 +1,5 @@
 use crate::error::Error;
+use datamodel::common::preview_features::PreviewFeature;
 use datamodel::{Configuration, Datamodel};
 use introspection_connector::{ConnectorResult, DatabaseMetadata, IntrospectionConnector, IntrospectionResultOutput};
 use jsonrpc_core::BoxFuture;
@@ -64,6 +65,8 @@ impl RpcImpl {
         let config = datamodel::parse_configuration(&schema)
             .map_err(|diagnostics| Error::DatamodelError(diagnostics.to_pretty_string("schema.prisma", schema)))?;
 
+        let preview_features: Vec<PreviewFeature> = config.subject.preview_features().map(|x| x.to_owned()).collect();
+
         let url = config
             .subject
             .datasources
@@ -75,7 +78,7 @@ impl RpcImpl {
         Ok((
             config.subject,
             url.clone(),
-            Box::new(SqlIntrospectionConnector::new(&url).await?),
+            Box::new(SqlIntrospectionConnector::new(&url, preview_features).await?),
         ))
     }
 
