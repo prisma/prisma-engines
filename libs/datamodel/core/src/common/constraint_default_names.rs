@@ -1,5 +1,7 @@
 use crate::common::datamodel_context::DatamodelContext;
 use crate::IndexType;
+use crate::PreviewFeature::NamedConstraints;
+
 pub struct ConstraintNames {}
 
 impl ConstraintNames {
@@ -30,25 +32,16 @@ impl ConstraintNames {
     /// seq for sequences
     ///
 
-    fn legacy() -> bool {
-        true
-    }
-
     pub fn primary_key_name_matches(constraint_name: Option<String>, table_name: &str, ctx: &DatamodelContext) -> bool {
-        if ConstraintNames::legacy() {
-            true
-        } else {
+        if ctx.preview_features.contains(&NamedConstraints) {
             constraint_name == ConstraintNames::primary_key_name(table_name, ctx)
+        } else {
+            true
         }
     }
 
     pub fn primary_key_name(table_name: &str, ctx: &DatamodelContext) -> Option<String> {
-        if ConstraintNames::legacy() {
-            //SQLServer             let index_name = format!("PK__{}__{}", table.name(), primary_columns.iter().join("_"));
-            // postgres             the default name
-
-            None
-        } else {
+        if ctx.preview_features.contains(&NamedConstraints) {
             let suffix = "_pkey";
             let limit = ctx.connector.constraint_name_length();
 
@@ -59,14 +52,17 @@ impl ConstraintNames {
             };
 
             Some(format!("{}{}", trimmed, suffix))
+        } else {
+            //SQLServer             let index_name = format!("PK__{}__{}", table.name(), primary_columns.iter().join("_"));
+
+            // postgres             the default name
+
+            None
         }
     }
 
     pub fn index_name(table_name: &str, column_names: Vec<String>, tpe: IndexType, ctx: &DatamodelContext) -> String {
-        // if ConstraintNames::legacy() {
-        if false {
-            "".into()
-        } else {
+        if ctx.preview_features.contains(&NamedConstraints) {
             let index_suffix = "_idx";
             let unique_suffix = "_key";
             let limit = ctx.connector.constraint_name_length();
@@ -83,14 +79,13 @@ impl ConstraintNames {
                 IndexType::Unique => format!("{}{}", trimmed, unique_suffix),
                 IndexType::Normal => format!("{}{}", trimmed, index_suffix),
             }
+        } else {
+            "".into()
         }
     }
 
     pub fn foreign_key_constraint_name(table_name: &str, column_names: Vec<String>, ctx: &DatamodelContext) -> String {
-        if false {
-            // if ConstraintNames::legacy() {
-            "".into()
-        } else {
+        if ctx.preview_features.contains(&NamedConstraints) {
             let fk_suffix = "_fkey";
             let limit = ctx.connector.constraint_name_length();
 
@@ -103,6 +98,8 @@ impl ConstraintNames {
             };
 
             format!("{}{}", trimmed, fk_suffix)
+        } else {
+            "".into()
         }
     }
 

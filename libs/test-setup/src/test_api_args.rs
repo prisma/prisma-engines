@@ -146,6 +146,17 @@ impl TestApiArgs {
         }
     }
 
+    pub fn generator_block(features: &[&str]) -> String {
+        let features: Vec<String> = features.iter().map(|f| format!("\"{}\"", f)).collect();
+        format!(
+            r#"generator client {{
+            provider = "prisma-client-js"
+            previewFeatures = [{}]
+        }}"#,
+            features.join(",")
+        )
+    }
+
     pub fn provider(&self) -> &str {
         self.db.provider
     }

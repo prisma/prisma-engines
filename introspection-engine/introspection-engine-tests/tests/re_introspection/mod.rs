@@ -1858,7 +1858,8 @@ async fn re_introspecting_custom_compound_id_names(api: &TestApi) -> TestResult 
         ", map: \"User.something@invalid-and/weird\""
     };
 
-    let input_dm = format! {r#"
+    let input_dm = api.dm_with_sources_and_generator(
+        &format! {r#"
         model User {{
             first  Int
             last   Int
@@ -1872,9 +1873,11 @@ async fn re_introspecting_custom_compound_id_names(api: &TestApi) -> TestResult 
 
             @@id([first, last], name: "compound")
         }}
-    "#, map};
+    "#, map},
+        &["NamedConstraints"],
+    );
 
-    let final_dm = format! {r#"
+    let final_dm = &format! {r#"
         model User {{
             first  Int
             last   Int

@@ -210,6 +210,21 @@ impl TestApi {
 
         out
     }
+
+    pub fn dm_with_sources_and_generator(&self, schema: &str, flags: &[&str]) -> String {
+        let mut out = String::with_capacity(320 + schema.len());
+
+        write!(
+            out,
+            "{}\n{}\n{}",
+            self.datasource_block(),
+            TestApiArgs::generator_block(flags),
+            schema
+        )
+        .unwrap();
+
+        out
+    }
 }
 
 #[track_caller]
