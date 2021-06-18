@@ -1245,9 +1245,7 @@ fn constraints_from_other_databases_should_not_be_introspected(api: TestApi) {
     let full_sql = other_migration.make::<barrel::backend::MySql>();
     api.raw_cmd(&full_sql);
 
-    let schema = api
-        .block_on(api.describer().describe(&"other_schema"))
-        .expect("describing");
+    let schema = api.describe_with_schema(&"other_schema");
     let table = schema.table_bang("Post");
 
     let fks = &table.foreign_keys;

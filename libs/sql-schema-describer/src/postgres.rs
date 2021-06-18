@@ -5,10 +5,10 @@ use crate::{getters::Getter, parsers::Parser};
 use enumflags2::BitFlags;
 use indoc::indoc;
 use native_types::{NativeType, PostgresType};
-use quaint::{connector::ResultRow, prelude::Queryable, single::Quaint};
+use quaint::{connector::ResultRow, prelude::Queryable};
 use regex::Regex;
 use serde_json::from_str;
-use std::{borrow::Cow, collections::HashMap, convert::TryInto};
+use std::{any::type_name, borrow::Cow, collections::HashMap, convert::TryInto};
 use tracing::trace;
 
 #[enumflags2::bitflags]
@@ -18,14 +18,21 @@ pub enum Circumstances {
     Cockroach,
 }
 
-#[derive(Debug)]
-pub struct SqlSchemaDescriber {
-    conn: Quaint,
+pub struct SqlSchemaDescriber<'a> {
+    conn: &'a dyn Queryable,
     circumstances: BitFlags<Circumstances>,
 }
 
+impl Debug for SqlSchemaDescriber<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct(type_name::<SqlSchemaDescriber>())
+            .field("circumstances", &self.circumstances)
+            .finish()
+    }
+}
+
 #[async_trait::async_trait]
-impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
+impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
     async fn list_databases(&self) -> DescriberResult<Vec<String>> {
         Ok(self.get_databases().await?)
     }
@@ -76,7 +83,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
 static PG_RE_NUM: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?(-?\d+)('::.*)?$").expect("compile regex"));
 static PG_RE_FLOAT: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?([^']+)('::.*)?$").expect("compile regex"));
 
-impl Parser for SqlSchemaDescriber {
+impl Parser for SqlSchemaDescriber<'_> {
     fn re_num() -> &'static Regex {
         &PG_RE_NUM
     }
@@ -86,9 +93,9 @@ impl Parser for SqlSchemaDescriber {
     }
 }
 
-impl SqlSchemaDescriber {
+impl<'a> SqlSchemaDescriber<'a> {
     /// Constructor.
-    pub fn new(conn: Quaint, circumstances: BitFlags<Circumstances>) -> SqlSchemaDescriber {
+    pub fn new(conn: &'a dyn Queryable, circumstances: BitFlags<Circumstances>) -> SqlSchemaDescriber<'a> {
         SqlSchemaDescriber { conn, circumstances }
     }
 
