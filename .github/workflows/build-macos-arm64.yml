@@ -42,7 +42,7 @@ jobs:
           command: build
           args: --target=aarch64-apple-darwin --release
 
-      -run: ls ${{ github.workspace }}/target/release/
+      - run: ls ${{ github.workspace }}/target/release/
       
 #      - uses: actions/upload-artifact@v2
 #        with:
