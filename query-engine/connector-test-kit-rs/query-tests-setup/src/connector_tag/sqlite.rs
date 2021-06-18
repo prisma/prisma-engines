@@ -55,5 +55,5 @@ impl SqliteConnectorTag {
 
 fn sqlite_capabilities() -> Vec<ConnectorCapability> {
     let dm_connector = SqliteDatamodelConnector::new();
-    dm_connector.capabilities().clone()
+    dm_connector.capabilities().to_owned()
 }

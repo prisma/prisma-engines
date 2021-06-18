@@ -113,5 +113,5 @@ impl Display for VitessVersion {
 
 fn vitess_capabilities() -> Vec<ConnectorCapability> {
     let dm_connector = MySqlDatamodelConnector::new();
-    dm_connector.capabilities().clone()
+    dm_connector.capabilities().to_owned()
 }

@@ -169,11 +169,11 @@ const SCALAR_TYPE_DEFAULTS: &[(ScalarType, MySqlType)] = &[
 ];
 
 impl Connector for MySqlDatamodelConnector {
-    fn name(&self) -> String {
-        "MySQL".to_string()
+    fn name(&self) -> &str {
+        "MySQL"
     }
 
-    fn capabilities(&self) -> &Vec<ConnectorCapability> {
+    fn capabilities(&self) -> &[ConnectorCapability] {
         &self.capabilities
     }
 
