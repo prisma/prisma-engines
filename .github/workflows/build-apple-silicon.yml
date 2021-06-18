@@ -37,10 +37,9 @@ jobs:
 #            target
 #          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
-      - uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: --target=aarch64-apple-darwin --release
+      - run: SDKROOT=$(xcrun -sdk macosx11.0 --show-sdk-path) \
+              MACOSX_DEPLOYMENT_TARGET=$(xcrun -sdk macosx11.0 --show-sdk-platform-version) \
+              cargo build  --target=aarch64-apple-darwin --release
 
       - run: ls ${{ github.workspace }}/target/release/
       
