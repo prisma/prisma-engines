@@ -23,7 +23,7 @@ jobs:
 
       - uses: actions-rs/toolchain@v1
         with:
-          toolchain: latest
+          toolchain: stable
           default: true
 
       - name: Install aarch64 toolchain
