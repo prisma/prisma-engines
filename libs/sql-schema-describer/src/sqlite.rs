@@ -4,17 +4,22 @@ use crate::{
     ColumnTypeFamily, DefaultValue, DescriberResult, ForeignKey, ForeignKeyAction, Index, IndexType, Lazy, PrimaryKey,
     PrismaValue, Regex, SqlMetadata, SqlSchema, SqlSchemaDescriberBackend, Table, View,
 };
-use quaint::{ast::Value, prelude::Queryable, single::Quaint};
-use std::{borrow::Cow, collections::HashMap, convert::TryInto};
+use quaint::{ast::Value, prelude::Queryable};
+use std::{any::type_name, borrow::Cow, collections::HashMap, convert::TryInto, fmt::Debug};
 use tracing::trace;
 
-#[derive(Debug)]
-pub struct SqlSchemaDescriber {
-    conn: Quaint,
+pub struct SqlSchemaDescriber<'a> {
+    conn: &'a dyn Queryable,
+}
+
+impl Debug for SqlSchemaDescriber<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct(type_name::<SqlSchemaDescriber>()).finish()
+    }
 }
 
 #[async_trait::async_trait]
-impl SqlSchemaDescriberBackend for SqlSchemaDescriber {
+impl SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
     async fn list_databases(&self) -> DescriberResult<Vec<String>> {
         Ok(self.get_databases().await?)
     }
@@ -80,11 +85,11 @@ impl SqlSchemaDescriberBackend for SqlSchemaDescriber {
     }
 }
 
-impl Parser for SqlSchemaDescriber {}
+impl Parser for SqlSchemaDescriber<'_> {}
 
-impl SqlSchemaDescriber {
+impl<'a> SqlSchemaDescriber<'a> {
     /// Constructor.
-    pub fn new(conn: Quaint) -> SqlSchemaDescriber {
+    pub fn new(conn: &'a dyn Queryable) -> SqlSchemaDescriber<'a> {
         SqlSchemaDescriber { conn }
     }
 

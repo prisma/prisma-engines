@@ -72,9 +72,10 @@ impl PostgresFlavour {
 
         let mut shadow_database_url = self.url.url().clone();
         shadow_database_url.set_path(&format!("/{}", database_name));
+        let host = shadow_database_url.host();
         let shadow_database_url = shadow_database_url.to_string();
 
-        tracing::debug!("Connecting to shadow database at {}", shadow_database_url);
+        tracing::debug!("Connecting to shadow database at {:?}/{}", host, database_name);
 
         let shadow_database_conn = crate::connect(&shadow_database_url).await?;
 
@@ -171,7 +172,7 @@ impl SqlFlavour for PostgresFlavour {
     }
 
     async fn describe_schema<'a>(&'a self, connection: &Connection) -> ConnectorResult<SqlSchema> {
-        sql_schema_describer::postgres::SqlSchemaDescriber::new(connection.quaint().clone(), Default::default())
+        sql_schema_describer::postgres::SqlSchemaDescriber::new(connection.quaint(), Default::default())
             .describe(connection.connection_info().schema_name())
             .await
             .map_err(|err| match err.into_kind() {

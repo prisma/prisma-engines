@@ -175,6 +175,7 @@ impl Connector for MySqlDatamodelConnector {
     fn is_empty_default(&self) -> bool {
         false
     }
+
     fn capabilities(&self) -> &[ConnectorCapability] {
         &self.capabilities
     }
