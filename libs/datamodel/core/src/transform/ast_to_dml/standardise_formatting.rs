@@ -212,6 +212,7 @@ impl StandardiserForFormatting {
                         name: rel_info.name.clone(),
                         on_delete: None,
                         on_update: None,
+                        legacy_referential_actions: false,
                     };
                     let mut opposite_relation_field =
                         dml::RelationField::new_generated(&model.name, relation_info, false);
@@ -290,6 +291,7 @@ impl StandardiserForFormatting {
                         name: rel_info.name.clone(),
                         on_delete: None,
                         on_update: None,
+                        legacy_referential_actions: false,
                     };
 
                     let is_required = all_existing_underlying_fields_on_opposite_model_are_required

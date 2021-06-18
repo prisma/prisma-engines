@@ -1,13 +1,16 @@
+use std::collections::HashSet;
 use std::str::FromStr;
 
 use super::super::attributes::AllAttributes;
-use crate::transform::helpers::ValueValidator;
-use crate::{ast, configuration, dml, Field, FieldType};
 use crate::{
-    ast::Identifier,
+    ast::{self, Identifier},
+    common::preview_features::PreviewFeature,
+    configuration,
     diagnostics::{DatamodelError, Diagnostics},
+    dml::{self, ScalarType},
+    transform::helpers::ValueValidator,
+    Datasource, Field, FieldType,
 };
-use crate::{dml::ScalarType, Datasource};
 use ::dml::relation_info::ReferentialAction;
 use datamodel_connector::connector_error::{ConnectorError, ErrorKind};
 use itertools::Itertools;
@@ -28,9 +31,12 @@ impl<'a> LiftAstToDml<'a> {
     /// the attributes defined by the given sources registered.
     ///
     /// The attributes defined by the given sources will be namespaced.
-    pub fn new(source: Option<&'a configuration::Datasource>) -> LiftAstToDml<'a> {
+    pub fn new(
+        source: Option<&'a configuration::Datasource>,
+        preview_features: &HashSet<PreviewFeature>,
+    ) -> LiftAstToDml<'a> {
         LiftAstToDml {
-            attributes: AllAttributes::new(),
+            attributes: AllAttributes::new(preview_features),
             source,
         }
     }

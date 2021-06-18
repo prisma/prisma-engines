@@ -1,10 +1,23 @@
+use std::collections::HashSet;
+
 use super::{super::helpers::*, AttributeValidator};
-use crate::common::RelationNames;
-use crate::diagnostics::DatamodelError;
-use crate::{ast, dml, Field};
+use crate::{
+    ast,
+    common::{preview_features::PreviewFeature, RelationNames},
+    diagnostics::DatamodelError,
+    dml, Field,
+};
 
 /// Prismas builtin `@relation` attribute.
-pub struct RelationAttributeValidator {}
+pub struct RelationAttributeValidator {
+    preview_features: HashSet<PreviewFeature>,
+}
+
+impl RelationAttributeValidator {
+    pub fn new(preview_features: HashSet<PreviewFeature>) -> Self {
+        Self { preview_features }
+    }
+}
 
 impl AttributeValidator<dml::Field> for RelationAttributeValidator {
     fn attribute_name(&self) -> &'static str {
@@ -101,17 +114,19 @@ impl AttributeValidator<dml::Field> for RelationAttributeValidator {
                 }
             }
 
-            if let Some(ref_action) = relation_info.on_delete {
-                if rf.default_on_delete_action() != ref_action {
-                    let expression = ast::Expression::ConstantValue(ref_action.to_string(), ast::Span::empty());
-                    args.push(ast::Argument::new("onDelete", expression));
+            if self.preview_features.contains(&PreviewFeature::ReferentialActions) {
+                if let Some(ref_action) = relation_info.on_delete {
+                    if rf.default_on_delete_action() != ref_action {
+                        let expression = ast::Expression::ConstantValue(ref_action.to_string(), ast::Span::empty());
+                        args.push(ast::Argument::new("onDelete", expression));
+                    }
                 }
-            }
 
-            if let Some(ref_action) = relation_info.on_update {
-                if rf.default_on_update_action() != ref_action {
-                    let expression = ast::Expression::ConstantValue(ref_action.to_string(), ast::Span::empty());
-                    args.push(ast::Argument::new("onUpdate", expression));
+                if let Some(ref_action) = relation_info.on_update {
+                    if rf.default_on_update_action() != ref_action {
+                        let expression = ast::Expression::ConstantValue(ref_action.to_string(), ast::Span::empty());
+                        args.push(ast::Argument::new("onUpdate", expression));
+                    }
                 }
             }
 

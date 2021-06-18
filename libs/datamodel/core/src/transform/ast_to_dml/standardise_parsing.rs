@@ -1,21 +1,64 @@
+use std::collections::HashSet;
+
+use ::dml::{field::FieldArity, relation_info::ReferentialAction};
+
 use super::common::*;
-use crate::{common::RelationNames, diagnostics::Diagnostics, dml, Field};
+use crate::{
+    common::{preview_features::PreviewFeature, RelationNames},
+    diagnostics::Diagnostics,
+    dml, Field,
+};
 
 /// Helper for standardising a datamodel during parsing.
 ///
 /// This will add relation names and M2M references contents
-pub struct StandardiserForParsing {}
+pub struct StandardiserForParsing<'a> {
+    preview_features: &'a HashSet<PreviewFeature>,
+}
 
-impl StandardiserForParsing {
+impl<'a> StandardiserForParsing<'a> {
     /// Creates a new instance, with all builtin attributes registered.
-    pub fn new() -> Self {
-        StandardiserForParsing {}
+    pub fn new(preview_features: &'a HashSet<PreviewFeature>) -> Self {
+        Self { preview_features }
     }
 
     pub fn standardise(&self, schema: &mut dml::Datamodel) -> Result<(), Diagnostics> {
         self.name_unnamed_relations(schema);
         self.set_relation_to_field_to_id_if_missing_for_m2m_relations(schema);
+        self.set_default_referential_actions(schema);
+
         Ok(())
+    }
+
+    fn set_default_referential_actions(&self, schema: &mut dml::Datamodel) {
+        if self.preview_features.contains(&PreviewFeature::ReferentialActions) {
+            return;
+        }
+
+        for model in schema.models_mut() {
+            for field in model.fields_mut() {
+                match field {
+                    Field::RelationField(field) if field.is_singular() => {
+                        if field.relation_info.on_delete.is_some() || field.relation_info.on_update.is_some() {
+                            continue;
+                        }
+
+                        field.relation_info.on_update = Some(ReferentialAction::Cascade);
+                        field.relation_info.on_delete = Some({
+                            match field.arity {
+                                FieldArity::Required => ReferentialAction::Cascade,
+                                _ => ReferentialAction::SetNull,
+                            }
+                        });
+                        // So our validator won't get a stroke when seeing the
+                        // values set without having the preview feature
+                        // enabled. Remove this before GA.
+                        field.relation_info.legacy_referential_actions();
+                    }
+                    _ => (),
+                }
+            }
+        }
     }
 
     /// For M2M relations set the references to the @id fields of the foreign model.

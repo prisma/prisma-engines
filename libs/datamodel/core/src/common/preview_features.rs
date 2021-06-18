@@ -4,6 +4,8 @@ use PreviewFeature::*;
 
 macro_rules! features {
     ($( $variant:ident $(,)? ),*) => {
+        #[enumflags2::bitflags]
+        #[repr(u32)]
         #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
         pub enum PreviewFeature {
             $(

@@ -65,6 +65,11 @@ fn adding_a_many_to_many_relation_with_custom_name_must_work(api: TestApi) {
 #[test_connector]
 fn adding_an_inline_relation_must_result_in_a_foreign_key_in_the_model_table(api: TestApi) {
     let dm1 = r#"
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialActions"]
+        }
+
         model A {
             id Int @id
             bid Int
@@ -124,6 +129,11 @@ fn specifying_a_db_name_for_an_inline_relation_must_work(api: TestApi) {
 #[test_connector]
 fn adding_an_inline_relation_to_a_model_with_an_exotic_id_type(api: TestApi) {
     let dm1 = r#"
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialActions"]
+        }
+
         model A {
             id Int @id
             b_id String
@@ -191,6 +201,11 @@ fn removing_an_inline_relation_must_work(api: TestApi) {
 #[test_connector]
 fn compound_foreign_keys_should_work_in_correct_order(api: TestApi) {
     let dm1 = r#"
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialActions"]
+        }
+
         model A {
             id Int @id
             b Int
@@ -223,6 +238,11 @@ fn compound_foreign_keys_should_work_in_correct_order(api: TestApi) {
 #[test_connector]
 fn moving_an_inline_relation_to_the_other_side_must_work(api: TestApi) {
     let dm1 = r#"
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialActions"]
+        }
+
         model A {
             id Int @id
             b_id Int
@@ -245,6 +265,11 @@ fn moving_an_inline_relation_to_the_other_side_must_work(api: TestApi) {
     });
 
     let dm2 = r#"
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialActions"]
+        }
+
         model A {
             id Int @id
             b  B[]
@@ -460,6 +485,11 @@ fn on_delete_referential_actions_should_work(api: TestApi) {
     for (ra, fka) in actions {
         let dm = format!(
             r#"
+            generator client {{
+                provider = "prisma-client-js"
+                previewFeatures = ["referentialActions"]
+            }}
+
             model A {{
                 id Int @id @default(autoincrement())
                 b      B[]
@@ -492,6 +522,11 @@ fn on_delete_referential_actions_should_work(api: TestApi) {
 #[test_connector(exclude(Mysql56, Mysql57, Mariadb, Mssql))]
 fn on_delete_set_default_should_work(api: TestApi) {
     let dm = r#"
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialActions"]
+        }
+
         model A {
             id Int @id
             b      B[]
@@ -517,6 +552,11 @@ fn on_delete_set_default_should_work(api: TestApi) {
 #[test_connector(exclude(Mssql))]
 fn on_delete_restrict_should_work(api: TestApi) {
     let dm = r#"
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialActions"]
+        }
+
         model A {
             id Int @id
             b      B[]
@@ -542,14 +582,19 @@ fn on_delete_restrict_should_work(api: TestApi) {
 #[test_connector]
 fn on_update_referential_actions_should_work(api: TestApi) {
     let actions = &[
-        (ReferentialAction::Cascade, ForeignKeyAction::Cascade),
         (ReferentialAction::NoAction, ForeignKeyAction::NoAction),
         (ReferentialAction::SetNull, ForeignKeyAction::SetNull),
+        (ReferentialAction::Cascade, ForeignKeyAction::Cascade),
     ];
 
     for (ra, fka) in actions {
         let dm = format!(
             r#"
+            generator client {{
+                provider = "prisma-client-js"
+                previewFeatures = ["referentialActions"]
+            }}
+
             model A {{
                 id Int @id @default(autoincrement())
                 b      B[]
@@ -580,6 +625,11 @@ fn on_update_referential_actions_should_work(api: TestApi) {
 #[test_connector(exclude(Mysql56, Mysql57, Mariadb, Mssql))]
 fn on_update_set_default_should_work(api: TestApi) {
     let dm = r#"
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialActions"]
+        }
+
         model A {
             id Int @id
             b      B[]
@@ -605,6 +655,11 @@ fn on_update_set_default_should_work(api: TestApi) {
 #[test_connector(exclude(Mssql))]
 fn on_update_restrict_should_work(api: TestApi) {
     let dm = r#"
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialActions"]
+        }
+
         model A {
             id Int @id
             b      B[]

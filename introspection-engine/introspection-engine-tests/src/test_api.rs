@@ -27,7 +27,9 @@ impl TestApi {
         let connection_string = args.database_url();
 
         let (database, connection_string): (Quaint, String) = if tags.intersects(Tags::Vitess) {
-            let me = SqlMigrationConnector::new(&connection_string, None).await.unwrap();
+            let me = SqlMigrationConnector::new(&connection_string, BitFlags::all(), None)
+                .await
+                .unwrap();
             me.reset().await.unwrap();
 
             (
@@ -185,9 +187,10 @@ impl TestApi {
 
     #[track_caller]
     pub fn assert_eq_datamodels(&self, expected_without_header: &str, result_with_header: &str) {
-        let parsed_expected = datamodel::parse_datamodel(&self.dm_with_sources(expected_without_header))
+        let parsed_expected = datamodel::parse_datamodel(&self.dm_with_sources(dbg!(expected_without_header)))
             .unwrap()
             .subject;
+
         let parsed_result = datamodel::parse_datamodel(result_with_header).unwrap().subject;
 
         let reformatted_expected =

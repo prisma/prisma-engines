@@ -18,6 +18,8 @@ pub struct RelationInfo {
     /// A strategy indicating what happens when
     /// a related node is deleted.
     pub on_update: Option<ReferentialAction>,
+    /// Set true if referential actions feature is not in use.
+    pub legacy_referential_actions: bool,
 }
 
 impl PartialEq for RelationInfo {
@@ -38,7 +40,14 @@ impl RelationInfo {
             name: String::new(),
             on_delete: None,
             on_update: None,
+            legacy_referential_actions: false,
         }
+    }
+
+    /// Set referential action legacy mode, skipping the validation errors on
+    /// automatically set actions.
+    pub fn legacy_referential_actions(&mut self) {
+        self.legacy_referential_actions = true;
     }
 }
 

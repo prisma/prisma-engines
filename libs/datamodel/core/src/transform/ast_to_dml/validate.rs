@@ -1,5 +1,7 @@
 use crate::{
-    ast, configuration,
+    ast,
+    common::preview_features::PreviewFeature,
+    configuration,
     diagnostics::{DatamodelError, Diagnostics},
     dml,
     walkers::ModelWalker,
@@ -15,6 +17,7 @@ use std::collections::{HashMap, HashSet};
 /// When validating, we check if the datamodel is valid, and generate errors otherwise.
 pub struct Validator<'a> {
     source: Option<&'a configuration::Datasource>,
+    preview_features: &'a HashSet<PreviewFeature>,
 }
 
 /// State error message. Seeing this error means something went really wrong internally. It's the datamodel equivalent of a bluescreen.
@@ -25,8 +28,14 @@ const PRISMA_FORMAT_HINT: &str = "You can run `prisma format` to fix this automa
 
 impl<'a> Validator<'a> {
     /// Creates a new instance, with all builtin attributes registered.
-    pub fn new(source: Option<&'a configuration::Datasource>) -> Validator<'a> {
-        Self { source }
+    pub fn new(
+        source: Option<&'a configuration::Datasource>,
+        preview_features: &'a HashSet<PreviewFeature>,
+    ) -> Validator<'a> {
+        Self {
+            source,
+            preview_features,
+        }
     }
 
     pub fn validate(&self, ast_schema: &ast::SchemaAst, schema: &mut dml::Datamodel) -> Result<(), Diagnostics> {
@@ -899,18 +908,34 @@ impl<'a> Validator<'a> {
                         ));
                 }
 
-                if field.is_list()
+                if !self.preview_features.contains(&PreviewFeature::ReferentialActions)
+                    && (rel_info.on_delete.is_some() || rel_info.on_update.is_some())
+                    && !rel_info.legacy_referential_actions
+                {
+                    let message = &format!(
+                        "The relation field `{}` on Model `{}` must not specify the `onDelete` or `onUpdate` argument in the {} attribute without enabling the `referentialActions` preview feature.",
+                        &field.name, &model.name, RELATION_ATTRIBUTE_NAME_WITH_AT
+                    );
+
+                    errors.push_error(DatamodelError::new_attribute_validation_error(
+                        message,
+                        RELATION_ATTRIBUTE_NAME,
+                        field_span,
+                    ))
+                } else if field.is_list()
                     && !related_field.is_list()
                     && (rel_info.on_delete.is_some() || rel_info.on_update.is_some())
                 {
-                    errors.push_error(DatamodelError::new_attribute_validation_error(
-                    &format!(
+                    let message = &format!(
                         "The relation field `{}` on Model `{}` must not specify the `onDelete` or `onUpdate` argument in the {} attribute. You must only specify it on the opposite field `{}` on model `{}`, or in case of a many to many relation, in an explicit join table.",
                         &field.name, &model.name, RELATION_ATTRIBUTE_NAME_WITH_AT, &related_field.name, &related_model.name
-                            ),
-                    RELATION_ATTRIBUTE_NAME,
-                    field_span,
-                        ));
+                    );
+
+                    errors.push_error(DatamodelError::new_attribute_validation_error(
+                        message,
+                        RELATION_ATTRIBUTE_NAME,
+                        field_span,
+                    ));
                 }
 
                 // ONE TO ONE

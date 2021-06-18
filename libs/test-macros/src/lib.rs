@@ -35,7 +35,7 @@ pub fn test_connector(attr: TokenStream, input: TokenStream) -> TokenStream {
 
     // Then the function body
     // We take advantage of the function body being the last token tree (surrounded by braces).
-    let (sig, body): (syn::Signature, proc_macro2::TokenStream) = {
+    let (sig, body): (Signature, proc_macro2::TokenStream) = {
         let sig_tokens = input
             .clone()
             .into_iter()
@@ -54,6 +54,7 @@ pub fn test_connector(attr: TokenStream, input: TokenStream) -> TokenStream {
     let include_tagged = &attrs.include_tagged;
     let exclude_tagged = &attrs.exclude_tagged;
     let capabilities = &attrs.capabilities;
+
     let test_function_name = &sig.ident;
     let test_function_name_lit = sig.ident.to_string();
     let (arg_name, arg_type) = match extract_api_arg(&sig) {

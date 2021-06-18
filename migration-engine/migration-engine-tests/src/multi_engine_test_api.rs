@@ -38,6 +38,7 @@ impl TestApi {
             let conn = rt
                 .block_on(SqlMigrationConnector::new(
                     args.database_url(),
+                    BitFlags::all(),
                     args.shadow_database_url().map(String::from),
                 ))
                 .unwrap();
@@ -164,6 +165,7 @@ impl TestApi {
             .rt
             .block_on(SqlMigrationConnector::new(
                 &connection_string,
+                BitFlags::all(),
                 shadow_db_connection_string,
             ))
             .unwrap();
