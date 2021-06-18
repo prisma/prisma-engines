@@ -11,7 +11,7 @@ jobs:
     env:
       SQLITE_MAX_VARIABLE_NUMBER: 250000
       SQLITE_MAX_EXPR_DEPTH: 10000
-    runs-on: macos-11.0
+    runs-on: macos-latest
     
     steps:
       - name: Output link to real commit
@@ -38,9 +38,10 @@ jobs:
 #            target
 #          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
+      - run: xcodebuild -showsdks
       - run: SDKROOT=$(xcrun -sdk macosx11.0 --show-sdk-path) \
               MACOSX_DEPLOYMENT_TARGET=$(xcrun -sdk macosx11.0 --show-sdk-platform-version) \
-              cargo build  --target=aarch64-apple-darwin --release
+              cargo build --target=aarch64-apple-darwin --release
 
       - run: ls ${{ github.workspace }}/target/release/
       
