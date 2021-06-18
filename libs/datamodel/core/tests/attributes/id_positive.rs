@@ -171,6 +171,7 @@ fn mapped_multi_field_ids_must_work() {
     let datamodel = parse(dml);
     let user_model = datamodel.assert_has_model("Model");
     user_model.assert_has_id_fields(&["a", "b"]);
+    user_model.assert_has_named_pk("dbname");
 }
 
 #[test]
@@ -181,16 +182,18 @@ fn mapped_singular_id_must_work() {
     }
     
     model Model2 {
-        a String @id(map: "test")
+        a String @id(map: "test2")
     }
     "#;
 
     let datamodel = parse(dml);
     let model = datamodel.assert_has_model("Model");
     model.assert_has_id_fields(&["a"]);
+    model.assert_has_named_pk("test");
 
     let model2 = datamodel.assert_has_model("Model2");
     model2.assert_has_id_fields(&["a"]);
+    model2.assert_has_named_pk("test2");
 }
 
 #[test]
@@ -206,4 +209,5 @@ fn named_and_mapped_multi_field_ids_must_work() {
     let datamodel = parse(dml);
     let user_model = datamodel.assert_has_model("Model");
     user_model.assert_has_id_fields(&["a", "b"]);
+    user_model.assert_has_named_pk("dbname");
 }

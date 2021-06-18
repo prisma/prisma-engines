@@ -48,6 +48,7 @@ pub trait ModelAsserts {
     fn assert_with_documentation(&self, t: &str) -> &Self;
     fn assert_has_index(&self, def: IndexDefinition) -> &Self;
     fn assert_has_id_fields(&self, fields: &[&str]) -> &Self;
+    fn assert_has_named_pk(&self, name: &str) -> &Self;
     fn assert_ignored(&self, state: bool) -> &Self;
 }
 
@@ -278,6 +279,11 @@ impl ModelAsserts for dml::Model {
 
     fn assert_has_id_fields(&self, fields: &[&str]) -> &Self {
         assert_eq!(self.primary_key.as_ref().unwrap().fields, fields);
+        self
+    }
+
+    fn assert_has_named_pk(&self, name: &str) -> &Self {
+        assert_eq!(self.primary_key.as_ref().unwrap().name_in_db, Some(name.to_string()));
         self
     }
 
