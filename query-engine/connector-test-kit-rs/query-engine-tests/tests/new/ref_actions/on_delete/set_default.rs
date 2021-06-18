@@ -193,8 +193,13 @@ mod one2one_opt {
         );
 
         insta::assert_snapshot!(
+          run_query!(runner, r#"mutation { deleteOneParent(where: { id: 1 }) { id }}"#),
+          @r###"{"data":{"deleteOneParent":{"id":1}}}"###
+        );
+
+        insta::assert_snapshot!(
           run_query!(runner, r#"query { findManyChild(where: { id: 1 }) { id parent_id }}"#),
-          @r###"{"data":{"findManyChild":[{"id":1,"parent_id":1}]}}"###
+          @r###"{"data":{"findManyChild":[{"id":1,"parent_id":null}]}}"###
         );
 
         Ok(())
@@ -313,8 +318,8 @@ mod one2many_opt {
 
             model Child {
                 #id(id, Int, @id)
-                parent_id Int    @default(2)
-                parent    Parent @relation(fields: [parent_id], references: [id], onDelete: SetDefault)
+                parent_id Int?    @default(2)
+                parent    Parent? @relation(fields: [parent_id], references: [id], onDelete: SetDefault)
             }"#
         };
 
@@ -330,8 +335,8 @@ mod one2many_opt {
 
             model Child {
                 #id(id, Int, @id)
-                parent_id Int
-                parent    Parent @relation(fields: [parent_id], references: [id], onDelete: SetDefault)
+                parent_id Int?
+                parent    Parent? @relation(fields: [parent_id], references: [id], onDelete: SetDefault)
             }"#
         };
 
@@ -392,8 +397,13 @@ mod one2many_opt {
         );
 
         insta::assert_snapshot!(
+          run_query!(runner, r#"mutation { deleteOneParent(where: { id: 1 }) { id }}"#),
+          @r###"{"data":{"deleteOneParent":{"id":1}}}"###
+        );
+
+        insta::assert_snapshot!(
           run_query!(runner, r#"query { findManyChild(where: { id: 1 }) { id parent_id }}"#),
-          @r###"{"data":{"findManyChild":[{"id":1,"parent_id":1}]}}"###
+          @r###"{"data":{"findManyChild":[{"id":1,"parent_id":null}]}}"###
         );
 
         Ok(())
