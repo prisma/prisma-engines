@@ -910,9 +910,10 @@ impl<'a> Validator<'a> {
 
                 if !self.preview_features.contains(&PreviewFeature::ReferentialActions)
                     && (rel_info.on_delete.is_some() || rel_info.on_update.is_some())
+                    && !rel_info.legacy_referential_actions
                 {
                     let message = &format!(
-                        "The relation field `{}` on Model `{}` must not specify the `onDelete` or `onUpdate` argument in the {} attribute without enabling the referentialActions preview feature.",
+                        "The relation field `{}` on Model `{}` must not specify the `onDelete` or `onUpdate` argument in the {} attribute without enabling the `referentialActions` preview feature.",
                         &field.name, &model.name, RELATION_ATTRIBUTE_NAME_WITH_AT
                     );
 

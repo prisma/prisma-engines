@@ -39,13 +39,21 @@ impl<'a> StandardiserForParsing<'a> {
             for field in model.fields_mut() {
                 match field {
                     Field::RelationField(field) if field.is_singular() => {
+                        if field.relation_info.on_delete.is_some() || field.relation_info.on_update.is_some() {
+                            continue;
+                        }
+
                         field.relation_info.on_update = Some(ReferentialAction::Cascade);
                         field.relation_info.on_delete = Some({
                             match field.arity {
                                 FieldArity::Required => ReferentialAction::Cascade,
                                 _ => ReferentialAction::SetNull,
                             }
-                        })
+                        });
+                        // So our validator won't get a stroke when seeing the
+                        // values set without having the preview feature
+                        // enabled. Remove this before GA.
+                        field.relation_info.legacy_referential_actions();
                     }
                     _ => (),
                 }

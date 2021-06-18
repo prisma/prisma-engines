@@ -9,6 +9,11 @@ fn on_delete_actions() {
     for action in actions {
         let dml = formatdoc!(
             r#"
+            generator client {{
+                provider = "prisma-client-js"
+                previewFeatures = ["referentialActions"]
+            }}
+
             model A {{
                 id Int @id
                 bs B[]
@@ -37,6 +42,11 @@ fn on_update_actions() {
     for action in actions {
         let dml = formatdoc!(
             r#"
+            generator client {{
+                provider = "prisma-client-js"
+                previewFeatures = ["referentialActions"]
+            }}
+
             model A {{
                 id Int @id
                 bs B[]
@@ -68,6 +78,11 @@ fn actions_on_mongo() {
             datasource db {{
                 provider = "mongodb"
                 url = "mongodb://"
+            }}
+
+            generator client {{
+                provider = "prisma-client-js"
+                previewFeatures = ["referentialActions"]
             }}
 
             model A {{
@@ -107,7 +122,7 @@ fn actions_on_planetscale() {
 
             generator client {{
                 provider = "prisma-client-js"
-                previewFeatures = ["planetScaleMode"]
+                previewFeatures = ["planetScaleMode", "referentialActions"]
             }}
 
             model A {{
@@ -135,6 +150,11 @@ fn actions_on_planetscale() {
 #[test]
 fn invalid_on_delete_action() {
     let dml = indoc! { r#"
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialActions"]
+        }
+
         model A {
             id Int @id
             bs B[]
@@ -150,13 +170,18 @@ fn invalid_on_delete_action() {
     parse_error(dml).assert_is(DatamodelError::new_attribute_validation_error(
         "Invalid referential action: `MeowMeow`",
         "relation",
-        Span::new(137, 145),
+        Span::new(238, 246),
     ));
 }
 
 #[test]
 fn invalid_on_update_action() {
     let dml = indoc! { r#"
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialActions"]
+        }
+
         model A {
             id Int @id
             bs B[]
@@ -172,7 +197,7 @@ fn invalid_on_update_action() {
     parse_error(dml).assert_is(DatamodelError::new_attribute_validation_error(
         "Invalid referential action: `MeowMeow`",
         "relation",
-        Span::new(137, 145),
+        Span::new(238, 246),
     ));
 }
 
@@ -182,6 +207,11 @@ fn restrict_should_not_work_on_sql_server() {
         datasource db {
             provider = "sqlserver"
             url = "sqlserver://"
+        }
+
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialActions"]
         }
 
         model A {
@@ -200,14 +230,14 @@ fn restrict_should_not_work_on_sql_server() {
         "Invalid referential action: `Restrict`. Allowed values: (`Cascade`, `NoAction`, `SetNull`, `SetDefault`)";
 
     parse_error(dml).assert_are(&[
-        DatamodelError::new_attribute_validation_error(&message, "relation", Span::new(151, 238)),
-        DatamodelError::new_attribute_validation_error(&message, "relation", Span::new(151, 238)),
+        DatamodelError::new_attribute_validation_error(&message, "relation", Span::new(252, 339)),
+        DatamodelError::new_attribute_validation_error(&message, "relation", Span::new(252, 339)),
     ]);
 }
 
 #[test]
-fn concrete_actions_should_not_work_on_mongo() {
-    let actions = &[(Cascade, 237), (NoAction, 238), (SetDefault, 240)];
+fn non_emulated_actions_should_not_work_on_mongo() {
+    let actions = &[(Cascade, 338), (SetDefault, 341)];
 
     for (action, span) in actions {
         let dml = formatdoc!(
@@ -215,6 +245,11 @@ fn concrete_actions_should_not_work_on_mongo() {
             datasource db {{
                 provider = "mongodb"
                 url = "mongodb://"
+            }}
+
+            generator client {{
+                provider = "prisma-client-js"
+                previewFeatures = ["referentialActions"]
             }}
 
             model A {{
@@ -232,21 +267,21 @@ fn concrete_actions_should_not_work_on_mongo() {
         );
 
         let message = format!(
-            "Invalid referential action: `{}`. Allowed values: (`Restrict`, `SetNull`)",
+            "Invalid referential action: `{}`. Allowed values: (`Restrict`, `NoAction`, `SetNull`)",
             action
         );
 
         parse_error(&dml).assert_are(&[DatamodelError::new_attribute_validation_error(
             &message,
             "relation",
-            Span::new(171, *span),
+            Span::new(272, *span),
         )]);
     }
 }
 
 #[test]
 fn concrete_actions_should_not_work_on_planetscale() {
-    let actions = &[(Cascade, 389), (NoAction, 390), (SetDefault, 392)];
+    let actions = &[(Cascade, 411), (NoAction, 412), (SetDefault, 414)];
 
     for (action, span) in actions {
         let dml = formatdoc!(
@@ -259,7 +294,7 @@ fn concrete_actions_should_not_work_on_planetscale() {
 
             generator client {{
                 provider = "prisma-client-js"
-                previewFeatures = ["planetScaleMode"]
+                previewFeatures = ["planetScaleMode", "referentialActions"]
             }}
 
             model A {{
@@ -284,7 +319,7 @@ fn concrete_actions_should_not_work_on_planetscale() {
         parse_error(&dml).assert_are(&[DatamodelError::new_attribute_validation_error(
             &message,
             "relation",
-            Span::new(323, *span),
+            Span::new(345, *span),
         )]);
     }
 }
@@ -295,6 +330,11 @@ fn on_delete_cannot_be_defined_on_the_wrong_side() {
         datasource db {
             provider = "mysql"
             url = "mysql://"
+        }
+
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialActions"]
         }
 
         model A {
@@ -315,7 +355,7 @@ fn on_delete_cannot_be_defined_on_the_wrong_side() {
     parse_error(dml).assert_are(&[DatamodelError::new_attribute_validation_error(
         &message,
         "relation",
-        Span::new(92, 129),
+        Span::new(193, 230),
     )]);
 }
 
@@ -325,6 +365,11 @@ fn on_update_cannot_be_defined_on_the_wrong_side() {
         datasource db {
             provider = "mysql"
             url = "mysql://"
+        }
+
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialActions"]
         }
 
         model A {
@@ -345,6 +390,30 @@ fn on_update_cannot_be_defined_on_the_wrong_side() {
     parse_error(dml).assert_are(&[DatamodelError::new_attribute_validation_error(
         &message,
         "relation",
-        Span::new(92, 129),
+        Span::new(193, 230),
+    )]);
+}
+
+#[test]
+fn referential_actions_without_preview_feature_should_error() {
+    let dml = indoc! { r#"
+        model A {
+            id Int @id
+            bs B[]
+        }
+
+        model B {
+            id Int @id
+            aId Int
+            a A @relation(fields: [aId], references: [id], onUpdate: Restrict)
+        }
+    "#};
+
+    let message = "The relation field `a` on Model `B` must not specify the `onDelete` or `onUpdate` argument in the @relation attribute without enabling the `referentialActions` preview feature.";
+
+    parse_error(dml).assert_are(&[DatamodelError::new_attribute_validation_error(
+        &message,
+        "relation",
+        Span::new(80, 147),
     )]);
 }

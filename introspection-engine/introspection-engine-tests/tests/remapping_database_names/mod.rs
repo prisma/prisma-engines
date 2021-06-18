@@ -1,9 +1,8 @@
 use barrel::types;
-use datamodel::ReferentialAction;
 use indoc::formatdoc;
 use indoc::indoc;
 use introspection_engine_tests::test_api::*;
-use quaint::prelude::{Queryable, SqlFamily};
+use quaint::prelude::Queryable;
 use test_macros::test_connector;
 
 #[test_connector(tags(Postgres))]
@@ -128,17 +127,12 @@ async fn remapping_models_in_relations(api: &TestApi) -> TestResult {
         })
         .await?;
 
-    let action = match api.sql_family() {
-        SqlFamily::Mysql if !api.is_mysql8() => ReferentialAction::Restrict,
-        _ => ReferentialAction::NoAction,
-    };
-
     let dm = formatdoc!(
         r#"
         model Post {{
             id              Int             @id @default(autoincrement())
             user_id         Int             @unique
-            User_with_Space User_with_Space @relation(fields: [user_id], references: [id], onDelete: {action}, onUpdate: {action})
+            User_with_Space User_with_Space @relation(fields: [user_id], references: [id])
         }}
 
         model User_with_Space {{
@@ -148,7 +142,6 @@ async fn remapping_models_in_relations(api: &TestApi) -> TestResult {
             @@map("User with Space")
         }}
     "#,
-        action = action
     );
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);
@@ -174,17 +167,12 @@ async fn remapping_models_in_relations_should_not_map_virtual_fields(api: &TestA
         })
         .await?;
 
-    let action = match api.sql_family() {
-        SqlFamily::Mysql if !api.is_mysql8() => ReferentialAction::Restrict,
-        _ => ReferentialAction::NoAction,
-    };
-
     let dm = formatdoc!(
         r#"
         model Post_With_Space {{
             id      Int  @id @default(autoincrement())
             user_id Int  @unique
-            User    User @relation(fields: [user_id], references: [id], onDelete: {action}, onUpdate: {action})
+            User    User @relation(fields: [user_id], references: [id])
 
             @@map("Post With Space")
         }}
@@ -194,7 +182,6 @@ async fn remapping_models_in_relations_should_not_map_virtual_fields(api: &TestA
             Post_With_Space Post_With_Space?
         }}
     "#,
-        action = action
     );
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);
@@ -240,18 +227,13 @@ async fn remapping_models_in_compound_relations(api: &TestApi) -> TestResult {
         })
         .await?;
 
-    let action = match api.sql_family() {
-        SqlFamily::Mysql if !api.is_mysql8() => ReferentialAction::Restrict,
-        _ => ReferentialAction::NoAction,
-    };
-
     let dm = format!(
         r#"
         model Post {{
             id              Int             @id @default(autoincrement())
             user_id         Int
             user_age        Int
-            User_with_Space User_with_Space @relation(fields: [user_id, user_age], references: [id, age], onDelete: {action}, onUpdate: {action})
+            User_with_Space User_with_Space @relation(fields: [user_id, user_age], references: [id, age])
 
             @@unique([user_id, user_age], name: "{post_constraint}")
         }}
@@ -267,7 +249,6 @@ async fn remapping_models_in_compound_relations(api: &TestApi) -> TestResult {
     "#,
         post_constraint = post_constraint,
         user_constraint = user_constraint,
-        action = action
     );
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);
@@ -316,18 +297,13 @@ async fn remapping_fields_in_compound_relations(api: &TestApi) -> TestResult {
         })
         .await?;
 
-    let action = match api.sql_family() {
-        SqlFamily::Mysql if !api.is_mysql8() => ReferentialAction::Restrict,
-        _ => ReferentialAction::NoAction,
-    };
-
     let dm = format!(
         r#"
         model Post {{
             id       Int  @id @default(autoincrement())
             user_id  Int
             user_age Int
-            User     User @relation(fields: [user_id, user_age], references: [id, age_that_is_invalid], onDelete: {action}, onUpdate: {action})
+            User     User @relation(fields: [user_id, user_age], references: [id, age_that_is_invalid])
 
             @@unique([user_id, user_age], name: "{user_post_constraint}")
         }}
@@ -342,7 +318,6 @@ async fn remapping_fields_in_compound_relations(api: &TestApi) -> TestResult {
     "#,
         user_post_constraint = user_post_constraint,
         user_constraint = user_constraint,
-        action = action
     );
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);

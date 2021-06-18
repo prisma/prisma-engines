@@ -109,6 +109,7 @@ pub fn calculate_many_to_many_field(
         references: opposite_foreign_key.referenced_columns.clone(),
         on_delete: None,
         on_update: None,
+        legacy_referential_actions: false,
     };
 
     let basename = opposite_foreign_key.referenced_table.clone();
@@ -190,6 +191,7 @@ pub(crate) fn calculate_relation_field(
         references: foreign_key.referenced_columns.clone(),
         on_delete: Some(map_action(foreign_key.on_delete_action)),
         on_update: Some(map_action(foreign_key.on_update_action)),
+        legacy_referential_actions: false,
     };
 
     let columns: Vec<&Column> = foreign_key
@@ -225,6 +227,7 @@ pub(crate) fn calculate_backrelation_field(
                 references: vec![],
                 on_delete: None,
                 on_update: None,
+                legacy_referential_actions: false,
             };
 
             // unique or id
