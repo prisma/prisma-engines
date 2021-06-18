@@ -54,7 +54,6 @@ pub fn test_connector(attr: TokenStream, input: TokenStream) -> TokenStream {
     let include_tagged = &attrs.include_tagged;
     let exclude_tagged = &attrs.exclude_tagged;
     let capabilities = &attrs.capabilities;
-    let preview_features = &attrs.preview_features;
 
     let test_function_name = &sig.ident;
     let test_function_name_lit = sig.ident.to_string();
@@ -74,8 +73,7 @@ pub fn test_connector(attr: TokenStream, input: TokenStream) -> TokenStream {
             #[test]
             #ignore_attr
             fn #test_function_name() {
-                let preview_features = &[#(#preview_features,)*];
-                let args = test_setup::TestApiArgs::new(#test_function_name_lit, preview_features);
+                let args = test_setup::TestApiArgs::new(#test_function_name_lit);
 
                 if test_setup::should_skip_test(
                     &args,
@@ -97,8 +95,7 @@ pub fn test_connector(attr: TokenStream, input: TokenStream) -> TokenStream {
             #[test]
             #ignore_attr
             fn #test_function_name() {
-                let preview_features = &[#(#preview_features,)*];
-                let args = test_setup::TestApiArgs::new(#test_function_name_lit, preview_features);
+                let args = test_setup::TestApiArgs::new(#test_function_name_lit);
 
                 if test_setup::should_skip_test(
                     &args,
@@ -122,7 +119,6 @@ struct TestConnectorAttrs {
     include_tagged: Vec<syn::Path>,
     exclude_tagged: Vec<syn::Path>,
     capabilities: Vec<syn::Path>,
-    preview_features: Vec<syn::LitStr>,
     ignore_reason: Option<LitStr>,
 }
 
@@ -132,18 +128,6 @@ impl TestConnectorAttrs {
             p if p.is_ident("tags") => &mut self.include_tagged,
             p if p.is_ident("exclude") => &mut self.exclude_tagged,
             p if p.is_ident("capabilities") => &mut self.capabilities,
-            p if p.is_ident("preview_features") => {
-                self.preview_features.reserve(list.nested.len());
-
-                for item in list.nested {
-                    match item {
-                        NestedMeta::Lit(Lit::Str(s)) => self.preview_features.push(s),
-                        other => return Err(syn::Error::new_spanned(other, "Unexpected argument")),
-                    }
-                }
-
-                return Ok(());
-            }
             p if p.is_ident("logs") => return Ok(()), // TODO
             other => return Err(syn::Error::new_spanned(other, "Unexpected argument")),
         };

@@ -581,6 +581,7 @@ impl<'a> ForeignKeyAssertion<'a> {
         Self { fk, tags }
     }
 
+    #[track_caller]
     pub fn assert_references(self, table: &str, columns: &[&str]) -> Self {
         assert!(
             self.is_same_table_name(&self.fk.referenced_table, table) && self.fk.referenced_columns == columns,
@@ -594,6 +595,7 @@ impl<'a> ForeignKeyAssertion<'a> {
         self
     }
 
+    #[track_caller]
     pub fn assert_referential_action_on_delete(self, action: ForeignKeyAction) -> Self {
         assert!(
             self.fk.on_delete_action == action,
@@ -605,6 +607,7 @@ impl<'a> ForeignKeyAssertion<'a> {
         self
     }
 
+    #[track_caller]
     pub fn assert_referential_action_on_update(self, action: ForeignKeyAction) -> Self {
         assert!(
             self.fk.on_update_action == action,
