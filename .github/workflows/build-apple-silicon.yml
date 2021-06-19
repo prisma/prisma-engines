@@ -41,7 +41,7 @@ jobs:
 
       - run: xcodebuild -showsdks
 
-      # Remove Xcode Command Line Tools so old version can not be used in build
+      # Remove Xcode Command Line Tools so old version can not be used in build via https://github.com/prisma/prisma/issues/5245#issuecomment-864356168
       - run: sudo rm -Rf /Library/Developer/CommandLineTools/SDKs/*;
 
       # Activate newest available Xcode
