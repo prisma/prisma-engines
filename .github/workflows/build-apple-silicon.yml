@@ -40,10 +40,13 @@ jobs:
 
       - run: xcodebuild -showsdks
       - run: ls /Library/Developer/CommandLineTools/SDKs/
-      
+      - run: sudo rm -Rf /Library/Developer/CommandLineTools/SDKs/*;
+
       - uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: latest-stable
+
+      - run: ls /Library/Developer/CommandLineTools/SDKs/
 
       - run: | 
           SDKROOT=$(xcrun -sdk macosx11.1 --show-sdk-path)
