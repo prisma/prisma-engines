@@ -4,7 +4,7 @@ on:
     inputs:
       commit:
         description: "Commit on the given branch to build"
-        required: true
+        required: false
 
 jobs:
   build:
