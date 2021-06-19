@@ -61,7 +61,5 @@ jobs:
         with:
           name: binaries
           path: |
-            ${{ github.workspace }}/target/release/build/query-engine*
-            ${{ github.workspace }}/target/release/build/migration-engine-cli*
-            ${{ github.workspace }}/target/release/build/introspection-core*
-            ${{ github.workspace }}/target/release/build/prisma-fmt*
+            ${{ github.workspace }}/target/release/*
+
