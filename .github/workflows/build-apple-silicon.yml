@@ -54,8 +54,6 @@ jobs:
           SDKROOT=$(xcrun -sdk macosx11.1 --show-sdk-path)
           MACOSX_DEPLOYMENT_TARGET=$(xcrun -sdk macosx11.1 --show-sdk-platform-version)
           cargo build --target=aarch64-apple-darwin --release
-
-      - run: ls ${{ github.workspace }}/target/release/build/
       
       - uses: actions/upload-artifact@v2
         with:
@@ -66,4 +64,3 @@ jobs:
             ${{ github.workspace }}/target/aarch64-apple-darwin/release/prisma-fmt
             ${{ github.workspace }}/target/aarch64-apple-darwin/release/query-engine
             ${{ github.workspace }}/target/aarch64-apple-darwin/release/libquery_engine_napi.dylib
-
