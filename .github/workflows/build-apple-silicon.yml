@@ -1,4 +1,5 @@
 on:
+  push:
   workflow_dispatch:
     inputs:
       commit:
@@ -53,7 +54,7 @@ jobs:
           MACOSX_DEPLOYMENT_TARGET=$(xcrun -sdk macosx11.1 --show-sdk-platform-version)
           cargo build --target=aarch64-apple-darwin --release
 
-      - run: ls ${{ github.workspace }}/target/release/
+      - run: ls ${{ github.workspace }}/target/release/build/
       
 #      - uses: actions/upload-artifact@v2
 #        with:
