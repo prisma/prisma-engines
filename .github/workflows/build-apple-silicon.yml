@@ -39,6 +39,7 @@ jobs:
 #          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - run: xcodebuild -showsdks
+      - run: ls /Library/Developer/CommandLineTools/SDKs/
       
       - run: | 
           SDKROOT=$(xcrun -sdk macosx11.1 --show-sdk-path)
