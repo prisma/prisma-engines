@@ -82,7 +82,7 @@ pub async fn listen(opts: PrismaOpt) -> PrismaResult<()> {
         None => app.bind(format!("{}:{}", opts.host.as_str(), opts.port)).await?,
     };
 
-    info!("Started http server on {}", listener);
+    info!("Started query engine http server on {}", listener);
     listener.accept().await?;
     Ok(())
 }
