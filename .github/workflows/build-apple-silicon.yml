@@ -41,6 +41,10 @@ jobs:
       - run: xcodebuild -showsdks
       - run: ls /Library/Developer/CommandLineTools/SDKs/
       
+      - run: |
+          sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
+          sudo xcodebuild -runFirstLaunch
+
       - run: | 
           SDKROOT=$(xcrun -sdk macosx11.1 --show-sdk-path)
           MACOSX_DEPLOYMENT_TARGET=$(xcrun -sdk macosx11.1 --show-sdk-platform-version)
