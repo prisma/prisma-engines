@@ -61,7 +61,5 @@ jobs:
         with:
           name: binaries
           path: |
-            ${{ github.workspace }}/target/release/*
-  
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
+            ${{ github.workspace }}/target/aarch64-apple-darwin/release/*
+
