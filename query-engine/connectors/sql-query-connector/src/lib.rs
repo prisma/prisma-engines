@@ -1,7 +1,9 @@
 #![allow(
     clippy::wrong_self_convention,
-    clippy::clippy::upper_case_acronyms,
-    clippy::needless_question_mark
+    clippy::upper_case_acronyms,
+    clippy::needless_question_mark,
+    clippy::branches_sharing_code,
+    clippy::mem_replace_with_default
 )]
 
 mod column_metadata;

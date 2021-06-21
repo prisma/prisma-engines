@@ -42,7 +42,7 @@ impl<'a> Reformatter<'a> {
             let ast_model = schema_ast.find_model(&model.name).unwrap();
 
             for field in model.fields() {
-                if ast_model.fields.iter().find(|f| f.name.name == field.name()).is_none() {
+                if !ast_model.fields.iter().any(|f| f.name.name == field.name()) {
                     let ast_field = lowerer.lower_field(&field, &validated_datamodel.subject);
 
                     result.push(MissingField {
@@ -77,11 +77,10 @@ impl<'a> Reformatter<'a> {
 
                 if let Some(original_field) = ast_model.fields.iter().find(|f| f.name.name == field.name()) {
                     for attribute in new_ast_field.attributes {
-                        if original_field
+                        if !original_field
                             .attributes
                             .iter()
-                            .find(|d| d.name.name == attribute.name.name)
-                            .is_none()
+                            .any(|d| d.name.name == attribute.name.name)
                         {
                             missing_field_attributes.push(MissingFieldAttribute {
                                 model: model.name.clone(),
@@ -121,11 +120,10 @@ impl<'a> Reformatter<'a> {
                         {
                             for arg in &attribute.arguments {
                                 if !arg.name.name.is_empty()
-                                    && original_attribute
+                                    && !original_attribute
                                         .arguments
                                         .iter()
-                                        .find(|d| d.name.name == arg.name.name)
-                                        .is_none()
+                                        .any(|d| d.name.name == arg.name.name)
                                 {
                                     missing_relation_attribute_args.push(MissingRelationAttributeArg {
                                         model: model.name.clone(),

@@ -4,9 +4,9 @@ version = 3
 
 [[package]]
 name = "addr2line"
-version = "0.14.1"
+version = "0.15.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a55f82cfe485775d02112886f4169bde0c5894d75e79ead7eafe7e40a25e45f7"
+checksum = "03345e98af8f3d786b6d9f656ccfa6ac316d954e92bc4841f0bba20789d5fb5a"
 dependencies = [
  "gimli",
 ]
@@ -419,11 +419,12 @@ checksum = "cdb031dd78e28731d87d56cc8ffef4a8f36ca26c38fe2de700543e627f8a464a"
 
 [[package]]
 name = "backtrace"
-version = "0.3.56"
+version = "0.3.59"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9d117600f438b1707d4e4ae15d3595657288f8235a0eb593e80ecc98ab34e1bc"
+checksum = "4717cfcbfaa661a0fd48f8453951837ae7e8f81e481fbb136e3202d72805a744"
 dependencies = [
  "addr2line",
+ "cc",
  "cfg-if 1.0.0",
  "libc",
  "miniz_oxide",
@@ -661,17 +662,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ddfc5b9aa5d4507acaf872de71051dfd0e309860e88966e1051e462a077aac4f"
 dependencies = [
  "bitflags",
-]
-
-[[package]]
-name = "colored"
-version = "1.9.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f4ffc801dacf156c5854b9df4f425a626539c3a6ef7893cc0c5084a23f0b6c59"
-dependencies = [
- "atty",
- "lazy_static",
- "winapi",
 ]
 
 [[package]]
@@ -970,12 +960,12 @@ dependencies = [
  "bigdecimal",
  "chrono",
  "clap",
- "colored 1.9.3",
+ "colored",
  "datamodel-connector",
  "dml",
  "expect-test",
  "indoc",
- "itertools 0.8.2",
+ "itertools 0.10.0",
  "mongodb-datamodel-connector",
  "native-types",
  "once_cell",
@@ -995,7 +985,7 @@ name = "datamodel-connector"
 version = "0.1.0"
 dependencies = [
  "dml",
- "itertools 0.8.2",
+ "itertools 0.10.0",
  "serde_json",
  "thiserror",
  "url 2.2.1",
@@ -1505,9 +1495,9 @@ dependencies = [
 
 [[package]]
 name = "gimli"
-version = "0.23.0"
+version = "0.24.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f6503fe142514ca4799d4c26297c4248239fe8838d827db6bd6065c6ed29a6ce"
+checksum = "0e4075386626662786ddb0ec9081e7c7eeb1ba31951f447ca780ef9f5d568189"
 
 [[package]]
 name = "gloo-timers"
@@ -2086,9 +2076,9 @@ dependencies = [
 
 [[package]]
 name = "libc"
-version = "0.2.91"
+version = "0.2.95"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8916b1f6ca17130ec6568feccee27c156ad12037880833a3b842a823236502e7"
+checksum = "789da6d93f1b866ffe175afc5322a4d76c038605a1c3319bb57b06967ca98a36"
 
 [[package]]
 name = "libsqlite3-sys"
@@ -2279,14 +2269,13 @@ dependencies = [
 name = "migration-engine-cli"
 version = "0.1.0"
 dependencies = [
+ "backtrace",
  "base64 0.13.0",
  "enumflags2",
- "futures 0.3.13",
  "json-rpc-stdio",
  "migration-connector",
  "migration-core",
  "quaint",
- "serde_json",
  "structopt",
  "tempfile",
  "test-macros",
@@ -2483,7 +2472,7 @@ dependencies = [
  "cuid",
  "datamodel",
  "futures 0.3.13",
- "itertools 0.8.2",
+ "itertools 0.10.0",
  "mongodb",
  "native-types",
  "prisma-models",
@@ -2702,9 +2691,9 @@ dependencies = [
 
 [[package]]
 name = "object"
-version = "0.23.0"
+version = "0.24.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a9a7ab5d64814df0fe4a4b5ead45ed6c5f181ee3ff04ba344313a6c80446c5d4"
+checksum = "1a5b3dd1c072ee7963717671d1ca129f1048fda25edea6b752bfc71ac8854170"
 
 [[package]]
 name = "once_cell"
@@ -3182,7 +3171,7 @@ dependencies = [
  "chrono",
  "cuid",
  "datamodel",
- "itertools 0.8.2",
+ "itertools 0.10.0",
  "once_cell",
  "prisma-value",
  "quaint",
@@ -3386,7 +3375,7 @@ dependencies = [
  "async-trait",
  "chrono",
  "futures 0.3.13",
- "itertools 0.8.2",
+ "itertools 0.10.0",
  "once_cell",
  "prisma-models",
  "prisma-value",
@@ -3412,7 +3401,7 @@ dependencies = [
  "futures 0.3.13",
  "im",
  "indexmap",
- "itertools 0.8.2",
+ "itertools 0.10.0",
  "mongodb-query-connector",
  "once_cell",
  "petgraph 0.4.13",
@@ -3448,7 +3437,7 @@ dependencies = [
  "graphql-parser",
  "indexmap",
  "indoc",
- "itertools 0.8.2",
+ "itertools 0.10.0",
  "migration-connector",
  "migration-core",
  "mongodb-query-connector",
@@ -3520,7 +3509,7 @@ dependencies = [
  "anyhow",
  "base64 0.13.0",
  "chrono",
- "colored 2.0.0",
+ "colored",
  "datamodel-connector",
  "indoc",
  "insta",
@@ -3548,7 +3537,7 @@ name = "query-tests-setup"
 version = "0.1.0"
 dependencies = [
  "async-trait",
- "colored 2.0.0",
+ "colored",
  "datamodel",
  "datamodel-connector",
  "enum_dispatch",
@@ -3738,7 +3727,7 @@ dependencies = [
  "futures 0.3.13",
  "graphql-parser",
  "indexmap",
- "itertools 0.8.2",
+ "itertools 0.10.0",
  "prisma-models",
  "query-core",
  "serde",
@@ -4303,7 +4292,7 @@ dependencies = [
  "cuid",
  "datamodel",
  "futures 0.3.13",
- "itertools 0.8.2",
+ "itertools 0.10.0",
  "prisma-models",
  "prisma-value",
  "quaint",
@@ -4530,7 +4519,7 @@ name = "test-cli"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "colored 1.9.3",
+ "colored",
  "enumflags2",
  "introspection-core",
  "migration-core",

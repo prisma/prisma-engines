@@ -19,7 +19,7 @@ use sql_migration_connector::SqlMigrationConnector;
 #[repr(u8)]
 pub enum QueryEngineFlags {
     /// We cannot `CREATE` (or `DROP`) databases.
-    DatabaseCreationNotAllowed = 0x01,
+    DatabaseCreationNotAllowed,
 }
 
 /// Database setup for connector-test-kit.
