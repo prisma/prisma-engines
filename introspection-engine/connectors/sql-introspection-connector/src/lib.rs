@@ -1,4 +1,4 @@
-#![allow(clippy::clippy::vec_init_then_push)]
+#![allow(clippy::vec_init_then_push)]
 
 pub mod calculate_datamodel; // only exported to be able to unit test it
 mod commenting_out_guardrails;

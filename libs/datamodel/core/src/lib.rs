@@ -183,8 +183,8 @@ pub fn parse_configuration(schema: &str) -> Result<ValidatedConfiguration, diagn
 
     Ok(ValidatedConfiguration {
         subject: Configuration {
-            datasources,
             generators,
+            datasources,
         },
         warnings: diagnostics.warnings,
     })
