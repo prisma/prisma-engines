@@ -10,7 +10,7 @@ edition = "2018"
 query-core = { path = "../core" }
 user-facing-errors = { path = "../../libs/user-facing-errors" }
 datamodel = { path = "../../libs/datamodel/core" }
-itertools = "0.8"
+itertools = "0.10"
 graphql-parser = { git = "https://github.com/prisma/graphql-parser" }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1"
