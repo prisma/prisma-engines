@@ -9,7 +9,9 @@
     clippy::from_over_into,
     clippy::or_fun_call,
     clippy::needless_question_mark,
-    clippy::ptr_arg
+    clippy::ptr_arg,
+    clippy::mem_replace_with_default,
+    clippy::clone_on_copy
 )]
 #![warn(warnings)] // Todo deny warnings once done
 

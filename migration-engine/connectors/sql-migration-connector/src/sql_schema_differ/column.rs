@@ -172,11 +172,11 @@ impl ColumnChanges {
     }
 
     pub(crate) fn only_default_changed(&self) -> bool {
-        self.changes == BitFlags::from(ColumnChange::Default)
+        self.changes == ColumnChange::Default
     }
 
     pub(crate) fn only_type_changed(&self) -> bool {
-        self.changes == BitFlags::from(ColumnChange::TypeChanged)
+        self.changes == ColumnChange::TypeChanged
     }
 
     pub(crate) fn column_was_renamed(&self) -> bool {

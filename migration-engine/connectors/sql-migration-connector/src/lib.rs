@@ -347,7 +347,7 @@ fn walk_added_columns(steps: &[SqlMigrationStep]) -> impl Iterator<Item = (usize
             steps
                 .iter()
                 .filter_map(|step| step.as_redefine_tables())
-                .flat_map(|redefine_tables| redefine_tables)
+                .flatten()
                 .flat_map(move |table| {
                     table
                         .added_columns

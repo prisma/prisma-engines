@@ -1,4 +1,8 @@
-#![allow(clippy::upper_case_acronyms)]
+#![allow(
+    clippy::upper_case_acronyms,
+    clippy::bool_assert_comparison,
+    clippy::mem_replace_with_default
+)]
 
 pub mod dmmf;
 mod error;
