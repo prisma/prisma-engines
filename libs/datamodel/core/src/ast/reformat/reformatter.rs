@@ -1,6 +1,7 @@
 use super::helpers::*;
 use crate::ast::helper::get_sort_index_of_attribute;
-use crate::diagnostics::ValidatedMissingFields;
+use crate::ast::SchemaAst;
+use crate::diagnostics::{ValidatedDatamodel, ValidatedMissingFields};
 use crate::{ast, ast::parser::*, ast::renderer::*};
 use pest::iterators::Pair;
 use pest::Parser;
@@ -9,34 +10,37 @@ pub struct Reformatter<'a> {
     input: &'a str,
     missing_fields: Result<ValidatedMissingFields, crate::diagnostics::Diagnostics>,
     missing_field_attributes: Result<Vec<MissingFieldAttribute>, crate::diagnostics::Diagnostics>,
-    missing_field_attribute_args: Result<Vec<MissingRelationAttributeArg>, crate::diagnostics::Diagnostics>,
+    missing_relation_attribute_args: Result<Vec<MissingRelationAttributeArg>, crate::diagnostics::Diagnostics>,
 }
 
 impl<'a> Reformatter<'a> {
     pub fn new(input: &'a str) -> Self {
-        //todo don't run parsing and validating of the string in every step
-        let missing_fields = Self::find_all_missing_fields(&input);
-        let missing_field_attributes = Self::find_all_missing_attributes(&input);
-        let missing_relation_attribute_args = Self::find_all_missing_relation_attribute_args(&input);
+        let schema_ast = crate::parse_schema_ast(input).unwrap();
+        let validated_datamodel = crate::parse_datamodel_for_formatter(input).unwrap();
+        let missing_fields = Self::find_all_missing_fields(&schema_ast, &validated_datamodel);
+        let missing_field_attributes = Self::find_all_missing_attributes(&schema_ast, &validated_datamodel);
+        let missing_relation_attribute_args =
+            Self::find_all_missing_relation_attribute_args(&schema_ast, &validated_datamodel);
 
         Reformatter {
             input,
             missing_fields,
             missing_field_attributes,
-            missing_field_attribute_args: missing_relation_attribute_args,
+            missing_relation_attribute_args,
         }
     }
 
     // this finds all auto generated fields, that are added during auto generation AND are missing from the original input.
-    fn find_all_missing_fields(schema_string: &str) -> Result<ValidatedMissingFields, crate::diagnostics::Diagnostics> {
+    fn find_all_missing_fields(
+        schema_ast: &SchemaAst,
+        validated_datamodel: &ValidatedDatamodel,
+    ) -> Result<ValidatedMissingFields, crate::diagnostics::Diagnostics> {
         let mut diagnostics = crate::diagnostics::Diagnostics::new();
-        let schema_ast = crate::parse_schema_ast(&schema_string)?;
-        let validated_datamodel = crate::parse_datamodel_for_formatter(&schema_string)?;
 
         let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(None);
         let mut result = Vec::new();
 
-        diagnostics.append_warning_vec(validated_datamodel.warnings);
+        diagnostics.append_warning_vec(validated_datamodel.warnings.clone());
 
         for model in validated_datamodel.subject.models() {
             let ast_model = schema_ast.find_model(&model.name).unwrap();
@@ -60,13 +64,12 @@ impl<'a> Reformatter<'a> {
     }
 
     fn find_all_missing_attributes(
-        schema_string: &str,
+        schema_ast: &SchemaAst,
+        validated_datamodel: &ValidatedDatamodel,
     ) -> Result<Vec<MissingFieldAttribute>, crate::diagnostics::Diagnostics> {
         let mut diagnostics = crate::diagnostics::Diagnostics::new();
-        let schema_ast = crate::parse_schema_ast(&schema_string)?;
-        let validated_datamodel = crate::parse_datamodel_for_formatter(&schema_string)?;
 
-        diagnostics.append_warning_vec(validated_datamodel.warnings);
+        diagnostics.append_warning_vec(validated_datamodel.warnings.clone());
         let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(None);
 
         let mut missing_field_attributes = Vec::new();
@@ -97,13 +100,12 @@ impl<'a> Reformatter<'a> {
     }
 
     fn find_all_missing_relation_attribute_args(
-        schema_string: &str,
+        schema_ast: &SchemaAst,
+        validated_datamodel: &ValidatedDatamodel,
     ) -> Result<Vec<MissingRelationAttributeArg>, crate::diagnostics::Diagnostics> {
         let mut diagnostics = crate::diagnostics::Diagnostics::new();
-        let schema_ast = crate::parse_schema_ast(&schema_string)?;
-        let validated_datamodel = crate::parse_datamodel_for_formatter(&schema_string)?;
 
-        diagnostics.append_warning_vec(validated_datamodel.warnings);
+        diagnostics.append_warning_vec(validated_datamodel.warnings.clone());
         let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(None);
 
         let mut missing_relation_attribute_args = Vec::new();
@@ -497,10 +499,9 @@ impl<'a> Reformatter<'a> {
                 Rule::field_type => {
                     target.write(&Self::reformat_field_type(&current));
                 }
-                //todo special case field attribute to pass model and field name and probably attribute name  and down to the args
                 Rule::attribute => {
-                    if let Ok(missing_field_attribute_args) = self.missing_field_attribute_args.as_ref() {
-                        let missing_relation_args: Vec<&MissingRelationAttributeArg> = missing_field_attribute_args
+                    if let Ok(missing_relation_attribute_args) = self.missing_relation_attribute_args.as_ref() {
+                        let missing_relation_args: Vec<&MissingRelationAttributeArg> = missing_relation_attribute_args
                             .iter()
                             .filter(|arg| arg.model == model_name && arg.field == *field_name)
                             .collect();
