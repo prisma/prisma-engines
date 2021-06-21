@@ -1,5 +1,8 @@
+#![deny(missing_docs)]
 // TODO: remove this once we use all this information in lift.rs
 #![allow(unused)]
+
+//! See the docs on [ParserDatabase](/struct.ParserDatabase.html).
 
 mod names;
 mod relations;
@@ -7,14 +10,19 @@ mod types;
 
 use self::relations::RelationField;
 use crate::{
-    ast::{self, FieldId, TopId},
+    ast,
     diagnostics::{DatamodelError, Diagnostics},
 };
 use names::Names;
 use std::str::FromStr;
 
-/// Information gathered during schema validation. Each validation steps
-/// enriches the database with information that can be used in later steps.
+/// ParserDatabase is a container for a Schema AST, together with information
+/// gathered during schema validation. Each validation step enriches the
+/// database with information that can be used to work with the schema, without
+/// changing the AST. Instantiating with `ParserDatabase::new()` will performa a
+/// number of validations and make sure the schema makes sense, but it cannot
+/// fail. In case the schema is invalid, diagnostics will be created and the
+/// resolved information will be incomplete.
 pub(crate) struct ParserDatabase<'a> {
     ast: &'a ast::SchemaAst,
     names: Names<'a>,
@@ -23,6 +31,7 @@ pub(crate) struct ParserDatabase<'a> {
 }
 
 impl<'ast> ParserDatabase<'ast> {
+    /// See the docs on [ParserDatabase](/struct.ParserDatabase.html).
     pub(super) fn new(ast: &'ast ast::SchemaAst, diagnostics: &mut Diagnostics) -> Self {
         let mut db = ParserDatabase {
             ast,
@@ -53,24 +62,7 @@ impl<'ast> ParserDatabase<'ast> {
                         )),
                     };
                 }
-                ast::Top::Model(model) => {
-                    for (field_id, field) in model.iter_fields() {
-                        match field_type(field, &db.names, ast) {
-                            Ok(FieldType::Model(referenced_model)) => {
-                                db.relations
-                                    .relation_fields
-                                    .insert((top_id, field_id), relations::RelationField { referenced_model });
-                            }
-                            Ok(FieldType::Scalar(scalar_field_type)) => {
-                                db.types.scalar_fields.insert((top_id, field_id), scalar_field_type);
-                            }
-                            Err(supported) => diagnostics.push_error(DatamodelError::new_type_not_found_error(
-                                supported,
-                                field.field_type.span(),
-                            )),
-                        }
-                    }
-                }
+                ast::Top::Model(model) => db.visit_model(top_id, model, ast, diagnostics),
                 ast::Top::Source(_) | ast::Top::Generator(_) | ast::Top::Enum(_) => (),
             }
         }
@@ -84,49 +76,78 @@ impl<'ast> ParserDatabase<'ast> {
         self.ast
     }
 
-    pub(crate) fn iter_enums(&self) -> impl Iterator<Item = (TopId, &'ast ast::Enum)> + '_ {
+    pub(crate) fn iter_enums(&self) -> impl Iterator<Item = (ast::TopId, &'ast ast::Enum)> + '_ {
         self.names
             .tops
             .values()
             .filter_map(move |topid| self.ast[*topid].as_enum().map(|enm| (*topid, enm)))
     }
 
+    /// Iterate all the relation fields in a given model in the order they were
+    /// defined. Note that these are the fields that were actually written in
+    /// the schema.
     pub(crate) fn iter_model_relation_fields(
         &self,
-        model_id: TopId,
-    ) -> impl Iterator<Item = (FieldId, &RelationField)> + '_ {
+        model_id: ast::TopId,
+    ) -> impl Iterator<Item = (ast::FieldId, &RelationField)> + '_ {
         self.relations
             .relation_fields
-            .range((model_id, FieldId::ZERO)..=(model_id, FieldId::MAX))
+            .range((model_id, ast::FieldId::ZERO)..=(model_id, ast::FieldId::MAX))
             .map(|((_, field_id), rf)| (*field_id, rf))
     }
 
+    /// Iterate all the scalar fields in a given model in the order they were defined.
     pub(crate) fn iter_model_scalar_fields(
         &self,
-        model_id: TopId,
-    ) -> impl Iterator<Item = (FieldId, &ScalarFieldType)> + '_ {
+        model_id: ast::TopId,
+    ) -> impl Iterator<Item = (ast::FieldId, &ScalarFieldType)> + '_ {
         self.types
             .scalar_fields
-            .range((model_id, FieldId::ZERO)..=(model_id, FieldId::MAX))
+            .range((model_id, ast::FieldId::ZERO)..=(model_id, ast::FieldId::MAX))
             .map(|((_, field_id), scalar_type)| (*field_id, scalar_type))
     }
 
     pub(super) fn get_enum(&self, name: &str) -> Option<&'ast ast::Enum> {
         self.names.tops.get(name).and_then(|top_id| self.ast[*top_id].as_enum())
     }
+
+    fn visit_model(
+        &mut self,
+        top_id: ast::TopId,
+        model: &ast::Model,
+        ast: &ast::SchemaAst,
+        diagnostics: &mut Diagnostics,
+    ) {
+        for (field_id, field) in model.iter_fields() {
+            match field_type(field, &self.names, ast) {
+                Ok(FieldType::Model(referenced_model)) => {
+                    self.relations
+                        .relation_fields
+                        .insert((top_id, field_id), relations::RelationField { referenced_model });
+                }
+                Ok(FieldType::Scalar(scalar_field_type)) => {
+                    self.types.scalar_fields.insert((top_id, field_id), scalar_field_type);
+                }
+                Err(supported) => diagnostics.push_error(DatamodelError::new_type_not_found_error(
+                    supported,
+                    field.field_type.span(),
+                )),
+            }
+        }
+    }
 }
 
 #[derive(Debug)]
 enum FieldType {
-    Model(TopId),
+    Model(ast::TopId),
     Scalar(ScalarFieldType),
 }
 
 #[derive(Debug)]
 pub(crate) enum ScalarFieldType {
-    Enum(TopId),
+    Enum(ast::TopId),
     BuiltInScalar,
-    Alias(TopId),
+    Alias(ast::TopId),
     Unsupported,
 }
 
