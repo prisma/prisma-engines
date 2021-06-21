@@ -8,7 +8,7 @@ use datamodel::{common::preview_features::PreviewFeature, ReferentialAction};
 use datamodel_connector::ConnectorCapability;
 use itertools::Itertools;
 use once_cell::sync::OnceCell;
-use prisma_models::{ModelProjection, ModelRef, RelationFieldRef};
+use prisma_models::{InternalDataModelRef, ModelProjection, ModelRef, RelationFieldRef};
 use std::sync::Arc;
 
 /// Coerces single values (`ParsedInputValue::Single` and `ParsedInputValue::Map`) into a vector.
@@ -277,7 +277,41 @@ pub fn insert_existing_1to1_related_model_checks(
 /// Expects `parent_node` to return one or more IDs (for records of `model`) to be checked.
 ///
 /// The old behavior (pre-referential actions) is preserved for if the ReferentialActions feature flag is disabled,
-/// which was basically only the `Restrict` part of
+/// which was basically only the `Restrict` part of this code.
+///
+/// Resulting graph (all emulations):
+/// ```text
+///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+///            Parent       │
+/// ┌ ─│  (ids to delete)    ─────────────────┬─────────────────────────────┬────────────────────────────────────────┐
+///     ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘                 │                             │                                        │
+/// │             │                           │                             │                                        │
+///               ▼                           ▼                             ▼                                        ▼
+/// │  ┌────────────────────┐      ┌────────────────────┐        ┌────────────────────┐                   ┌────────────────────┐
+///    │Find Connected Model│      │Find Connected Model│        │Find Connected Model│                   │Find Connected Model│
+/// │  │    A (Restrict)    │      │    B (Restrict)    │     ┌──│    C (SetNull)     │                ┌──│    D (Cascade)     │
+///    └────────────────────┘      └────────────────────┘     │  └────────────────────┘                │  └────────────────────┘
+/// │             │                           │               │             │                          │             │
+///        Fail if│> 0                 Fail if│> 0            │             ▼                          │             │
+/// │             │                           │               │┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─               │             ▼
+///               ▼                           ▼               │  ┌────────────────────┐ │              │┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+/// │  ┌────────────────────┐      ┌────────────────────┐     ││ │  Insert onUpdate   │                │  ┌────────────────────┐ │
+///    │       Empty        │      │       Empty        │     │  │ emulation subtree  │ │              ││ │  Insert onDelete   │
+/// │  └────────────────────┘      └────────────────────┘     ││ │for relations using │                │  │ emulation subtree  │ │
+///               │                           │               │  │the foreign key that│ │              ││ │ for all relations  │
+/// │             │                           │               ││ │    was updated.    │                │  │   pointing to D.   │ │
+///               │                           │               │  └────────────────────┘ │              ││ └────────────────────┘
+/// │             │                           │               │└ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─               │ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
+///               │                           │               │             │                          │             │
+/// │             │                           │               │             │                          │             │
+///               ▼                           │               │             ▼                          │             ▼
+/// │  ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─                  │               │  ┌────────────────────┐                │  ┌────────────────────┐
+///  ─▶        Delete       │◀────────────────┘               │  │ Update Cs (set FK  │                └─▶│     Delete Cs      │
+///    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─                                  └─▶│       null)        │                   └────────────────────┘
+///               ▲                                              └────────────────────┘                              │
+///               │                                                         │                                        │
+///               └─────────────────────────────────────────────────────────┴────────────────────────────────────────┘
+/// ```
 #[tracing::instrument(skip(graph, model_to_delete, parent_node, child_node))]
 pub fn insert_emulated_on_delete(
     graph: &mut QueryGraph,
@@ -301,23 +335,17 @@ pub fn insert_emulated_on_delete(
     for rf in relation_fields {
         match rf.relation().on_delete() {
             // old behavior was to only insert restrict checks.
-            _ if !has_ra_feature => {
-                emulate_restrict(graph, &rf, connector_ctx, model_to_delete, parent_node, child_node)?
-            }
+            _ if !has_ra_feature => emulate_restrict(graph, &rf, parent_node, child_node)?,
+            ReferentialAction::Restrict => emulate_restrict(graph, &rf, parent_node, child_node)?,
+            ReferentialAction::NoAction => continue, // Explicitly do nothing.
 
             ReferentialAction::Cascade => {
-                emulate_cascade(graph, &rf, connector_ctx, model_to_delete, parent_node, child_node)?
-            }
-
-            ReferentialAction::Restrict => {
-                emulate_restrict(graph, &rf, connector_ctx, model_to_delete, parent_node, child_node)?
+                emulate_on_delete_cascade(graph, &rf, connector_ctx, model_to_delete, parent_node, child_node)?
             }
 
             ReferentialAction::SetNull => {
                 emulate_set_null(graph, &rf, connector_ctx, model_to_delete, parent_node, child_node)?
             }
-
-            ReferentialAction::NoAction => continue, // Explicitly do nothing.
 
             x => panic!("Unsupported referential action emulation: {}", x),
         };
@@ -326,11 +354,37 @@ pub fn insert_emulated_on_delete(
     Ok(())
 }
 
+/// Inserts restrict emulations into the graph between `parent_node` and `child_node`.
+/// `relation_field` is the relation field pointing to the model to be deleted/updated.
+///
+///
+/// ```text
+///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+///            Parent       │
+/// ┌ ─│  (ids to del/upd)
+///     ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
+/// │             │
+///               ▼
+/// │  ┌────────────────────┐
+///    │Find Connected Model│
+/// │  │     (Restrict)     │
+///    └────────────────────┘
+/// │             │
+///        Fail if│> 0
+/// │             │
+///               ▼
+/// │  ┌────────────────────┐
+///    │       Empty        │
+/// │  └────────────────────┘
+///               │
+/// │             ▼
+///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+/// └ ▶   Delete / Update   │
+///    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+/// ```
 pub fn emulate_restrict(
     graph: &mut QueryGraph,
     relation_field: &RelationFieldRef,
-    _connector_ctx: &ConnectorContext,
-    _model: &ModelRef,
     parent_node: &NodeRef,
     child_node: &NodeRef,
 ) -> QueryGraphBuilderResult<()> {
@@ -360,7 +414,43 @@ pub fn emulate_restrict(
     Ok(())
 }
 
-pub fn emulate_cascade(
+/// Inserts cascade emulations into the graph between `parent_node` and `child_node`.
+/// `relation_field` is the relation field pointing to the model to be deleted.
+/// Recurses into the deletion emulation to ensure that subsequent deletions are handled correctly as well.
+///
+/// ```text
+///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+///            Parent       │
+///    │  (ids to delete)    ─ ┐
+///     ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
+///               │            │
+///               ▼
+///    ┌────────────────────┐  │
+///    │Find Connected Model│
+/// ┌──│     (Cascade)      │  │
+/// │  └────────────────────┘
+/// │             │            │
+/// │             ▼
+/// │┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ │
+/// │  ┌────────────────────┐ │
+/// ││ │  Insert onDelete   │  │
+/// │  │ emulation subtree  │ │
+/// ││ │ for all relations  │  │
+/// │  │   pointing to D.   │ │
+/// ││ └────────────────────┘  │
+/// │ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
+/// │             │            │
+/// │             ▼
+/// │  ┌────────────────────┐  │
+/// └─▶│  Delete children   │
+///    └────────────────────┘  │
+///               │
+///               ▼            │
+///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+///            Delete       │◀ ┘
+///    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+/// ```
+pub fn emulate_on_delete_cascade(
     graph: &mut QueryGraph,
     relation_field: &RelationFieldRef, // This is the field _on the other model_ for cascade.
     connector_ctx: &ConnectorContext,
@@ -415,13 +505,286 @@ pub fn emulate_cascade(
     Ok(())
 }
 
+/// Inserts set null emulations into the graph between `parent_node` and `child_node`.
+/// `relation_field` is the relation field pointing to the model to be deleted.
+/// Recurses into the deletion emulation to ensure that subsequent deletions are handled correctly as well.
+///
+/// ```text
+///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+///            Parent       │
+///    │  (ids to del/upd)   ─ ┐
+///     ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
+///               │            │
+///               ▼
+///    ┌────────────────────┐  │
+///    │Find Connected Model│
+/// ┌──│     (SetNull)      │  │
+/// │  └────────────────────┘
+/// │             │            │
+/// │             ▼
+/// │┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ │
+/// │  ┌────────────────────┐ │
+/// ││ │  Insert onUpdate   │  │
+/// │  │ emulation subtree  │ │
+/// ││ │for relations using │  │
+/// │  │the foreign key that│ │
+/// ││ │    was updated.    │  │
+/// │  └────────────────────┘ │
+/// │└ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ │
+/// │             │
+/// │             ▼            │
+/// │  ┌────────────────────┐
+/// │  │Update children (set│  │
+/// └─▶│      FK null)      │
+///    └────────────────────┘  │
+///               │
+///               ▼            │
+///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+///       Delete / Update   │◀ ┘
+///    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+/// ```
 pub fn emulate_set_null(
     graph: &mut QueryGraph,
     relation_field: &RelationFieldRef,
-    _connector_ctx: &ConnectorContext,
+    connector_ctx: &ConnectorContext,
+    model: &ModelRef,
+    parent_node: &NodeRef,
+    child_node: &NodeRef,
+) -> QueryGraphBuilderResult<()> {
+    // let dependent_model = relation_field.model();
+    // let parent_relation_field = relation_field.related_field();
+    // let child_model_identifier = relation_field.related_model().primary_identifier();
+
+    // // Records that need to be deleted for the cascade.
+    // let dependent_records_node =
+    //     insert_find_children_by_parent_node(graph, parent_node, &parent_relation_field, Filter::empty())?;
+
+    // let delete_query = WriteQuery::DeleteManyRecords(DeleteManyRecords {
+    //     model: dependent_model.clone(),
+    //     record_filter: RecordFilter::empty(),
+    // });
+
+    // let delete_dependents_node = graph.create_node(Query::Write(delete_query));
+
+    // insert_emulated_on_delete(
+    //     graph,
+    //     connector_ctx,
+    //     &dependent_model,
+    //     &dependent_records_node,
+    //     &delete_dependents_node,
+    // )?;
+
+    // graph.create_edge(
+    //     &dependent_records_node,
+    //     &delete_dependents_node,
+    //     QueryGraphDependency::ParentProjection(
+    //         child_model_identifier.clone(),
+    //         Box::new(move |mut delete_dependents_node, dependent_ids| {
+    //             if let Node::Query(Query::Write(WriteQuery::DeleteManyRecords(ref mut dmr))) = delete_dependents_node {
+    //                 dmr.record_filter = dependent_ids.into();
+    //             }
+
+    //             Ok(delete_dependents_node)
+    //         }),
+    //     ),
+    // )?;
+
+    // graph.create_edge(
+    //     &delete_dependents_node,
+    //     child_node,
+    //     QueryGraphDependency::ExecutionOrder,
+    // )?;
+
+    Ok(())
+}
+
+/// Inserts emulated referential actions for `onUpdate` into the graph.
+/// All relations that refer to the `model` row(s) being deleted are checked for their desired emulation and inserted accordingly.
+/// Right now, supported modes are `Restrict` and `SetNull` (cascade will follow).
+/// Those checks fail at runtime and are inserted between `parent_node` and `child_node`.
+///
+/// This function is usually part of a delete (`deleteOne` or `deleteMany`).
+/// Expects `parent_node` to return one or more IDs (for records of `model`) to be checked.
+///
+/// The old behavior (pre-referential actions) is preserved for if the ReferentialActions feature flag is disabled,
+/// which was basically only the `Restrict` part of this code.
+///
+/// Resulting graph (all emulations):
+/// ```text
+///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+///            Parent       │
+/// ┌ ─│  (ids to update)    ─────────────────┬─────────────────────────────┬────────────────────────────────────────┐
+///     ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘                 │                             │                                        │
+/// │             │                           │                             │                                        │
+///               ▼                           ▼                             ▼                                        ▼
+/// │  ┌────────────────────┐      ┌────────────────────┐        ┌────────────────────┐                   ┌────────────────────┐
+///    │Find Connected Model│      │Find Connected Model│        │Find Connected Model│                   │Find Connected Model│
+/// │  │    A (Restrict)    │      │    B (Restrict)    │     ┌──│    C (SetNull)     │                ┌──│    D (Cascade)     │
+///    └────────────────────┘      └────────────────────┘     │  └────────────────────┘                │  └────────────────────┘
+/// │             │                           │               │             │                          │             │
+///        Fail if│> 0                 Fail if│> 0            │             ▼                          │             │
+/// │             │                           │               │┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─               │             ▼
+///               ▼                           ▼               │  ┌────────────────────┐ │              │┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+/// │  ┌────────────────────┐      ┌────────────────────┐     ││ │  Insert onUpdate   │                │  ┌────────────────────┐ │
+///    │       Empty        │      │       Empty        │     │  │ emulation subtree  │ │              ││ │  Insert onUpdate   │
+/// │  └────────────────────┘      └────────────────────┘     ││ │for relations using │                │  │ emulation subtree  │ │
+///               │                           │               │  │the foreign key that│ │              ││ │ for all relations  │
+/// │             │                           │               ││ │    was updated.    │                │  │   pointing to D.   │ │
+///               │                           │               │  └────────────────────┘ │              ││ └────────────────────┘
+/// │             │                           │               │└ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─               │ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
+///               │                           │               │             │                          │             │
+/// │             │                           │               │             │                          │             │
+///               ▼                           │               │             ▼                          │             ▼
+/// │  ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─                  │               │  ┌────────────────────┐                │  ┌────────────────────┐
+///  ─▶        Update       │◀────────────────┘               │  │ Update Cs (set FK  │                └─▶│     Update Cs      │
+///    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─                                  └─▶│       null)        │                   └────────────────────┘
+///               ▲                                              └────────────────────┘                              │
+///               │                                                         │                                        │
+///               └─────────────────────────────────────────────────────────┴────────────────────────────────────────┘
+/// ```
+#[tracing::instrument(skip(graph, model_to_update, parent_node, child_node))]
+pub fn insert_emulated_on_update(
+    graph: &mut QueryGraph,
+    connector_ctx: &ConnectorContext,
+    model_to_update: &ModelRef,
+    parent_node: &NodeRef,
+    child_node: &NodeRef,
+) -> QueryGraphBuilderResult<()> {
+    let has_fks = connector_ctx.capabilities.contains(&ConnectorCapability::ForeignKeys);
+    let has_ra_feature = connector_ctx.features.contains(&PreviewFeature::ReferentialActions);
+
+    // If the connector supports foreign keys and the new mode is enabled (preview feature), we do not do any checks / emulation.
+    if has_ra_feature && has_fks {
+        return Ok(());
+    }
+
+    // If it's non-fk dbs, then the emulation will kick in. If it has Fks, then preserve the old behavior (`has_fks` -> only required ones).
+    let internal_model = model_to_update.internal_data_model();
+    let relation_fields = internal_model.fields_pointing_to_model(model_to_update, has_fks);
+
+    // Unwraps are safe as in this stage, no node content can be replaced.
+    let parent_update_args = extract_update_args(graph.node_content(parent_node).unwrap());
+
+    for rf in relation_fields {
+        match rf.relation().on_delete() {
+            ReferentialAction::Restrict => emulate_restrict(graph, &rf, parent_node, child_node)?,
+            ReferentialAction::NoAction => continue, // Explicitly do nothing.
+
+            ReferentialAction::Cascade => {
+                emulate_on_update_cascade(graph, &rf, connector_ctx, model_to_update, parent_node, child_node)?
+            }
+
+            ReferentialAction::SetNull => {
+                emulate_set_null(graph, &rf, connector_ctx, model_to_update, parent_node, child_node)?
+            }
+
+            x => panic!("Unsupported referential action emulation: {}", x),
+        };
+    }
+
+    Ok(())
+}
+
+fn extract_update_args(parent_node: &Node) -> &WriteArgs {
+    if let Node::Query(Query::Write(q)) = parent_node {
+        match q {
+            WriteQuery::UpdateRecord(one) => &one.args,
+            WriteQuery::UpdateManyRecords(many) => &many.args,
+            _ => panic!("Parent operation for update emulation is not an update."),
+        }
+    } else {
+        panic!("Parent operation for update emulation is not a query.")
+    }
+}
+
+/// Inserts cascade emulations into the graph between `parent_node` and `child_node`.
+/// `relation_field` is the relation field pointing to the model to be deleted.
+/// Recurses into the deletion emulation to ensure that subsequent deletions are handled correctly as well.
+///
+/// ```text
+///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+///            Parent       │
+///    │  (ids to update)    ─ ┐
+///     ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
+///               │            │
+///               ▼
+///    ┌────────────────────┐  │
+///    │Find Connected Model│
+/// ┌──│     (Cascade)      │  │
+/// │  └────────────────────┘
+/// │             │            │
+/// │             ▼
+/// │┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ │
+/// │  ┌────────────────────┐ │
+/// ││ │  Insert onUpdate   │  │
+/// │  │ emulation subtree  │ │
+/// ││ │ for all relations  │  │
+/// │  │   pointing to D.   │ │
+/// ││ └────────────────────┘  │
+/// │ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
+/// │             │            │
+/// │             ▼
+/// │  ┌────────────────────┐  │
+/// └─▶│  Update children   │
+///    └────────────────────┘  │
+///               │
+///               ▼            │
+///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+///            Update       │◀ ┘
+///    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+/// ```
+pub fn emulate_on_update_cascade(
+    graph: &mut QueryGraph,
+    relation_field: &RelationFieldRef, // This is the field _on the other model_ for cascade.
+    connector_ctx: &ConnectorContext,
     _model: &ModelRef,
     parent_node: &NodeRef,
     child_node: &NodeRef,
 ) -> QueryGraphBuilderResult<()> {
+    let dependent_model = relation_field.model();
+    let parent_relation_field = relation_field.related_field();
+    let child_model_identifier = relation_field.related_model().primary_identifier();
+
+    // Records that need to be deleted for the cascade.
+    let dependent_records_node =
+        insert_find_children_by_parent_node(graph, parent_node, &parent_relation_field, Filter::empty())?;
+
+    let update_query = WriteQuery::UpdateManyRecords(UpdateManyRecords {
+        model: dependent_model.clone(),
+        record_filter: RecordFilter::empty(),
+        args: (),
+    });
+
+    let update_dependents_node = graph.create_node(Query::Write(delete_query));
+
+    insert_emulated_on_update(
+        graph,
+        connector_ctx,
+        &dependent_model,
+        &dependent_records_node,
+        &update_dependents_node,
+    )?;
+
+    graph.create_edge(
+        &dependent_records_node,
+        &update_dependents_node,
+        QueryGraphDependency::ParentProjection(
+            child_model_identifier.clone(),
+            Box::new(move |mut update_dependents_node, dependent_ids| {
+                if let Node::Query(Query::Write(WriteQuery::DeleteManyRecords(ref mut dmr))) = delete_dependents_node {
+                    dmr.record_filter = dependent_ids.into();
+                }
+
+                Ok(delete_dependents_node)
+            }),
+        ),
+    )?;
+
+    graph.create_edge(
+        &delete_dependents_node,
+        child_node,
+        QueryGraphDependency::ExecutionOrder,
+    )?;
+
     Ok(())
 }
