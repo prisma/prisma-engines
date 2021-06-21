@@ -8,7 +8,7 @@ use datamodel::{common::preview_features::PreviewFeature, ReferentialAction};
 use datamodel_connector::ConnectorCapability;
 use itertools::Itertools;
 use once_cell::sync::OnceCell;
-use prisma_models::{ModelProjection, ModelRef, RelationFieldRef};
+use prisma_models::{InternalDataModelRef, ModelProjection, ModelRef, RelationFieldRef};
 use std::sync::Arc;
 
 /// Coerces single values (`ParsedInputValue::Single` and `ParsedInputValue::Map`) into a vector.
@@ -662,6 +662,9 @@ pub fn insert_emulated_on_update(
     let internal_model = model_to_update.internal_data_model();
     let relation_fields = internal_model.fields_pointing_to_model(model_to_update, has_fks);
 
+    // Unwraps are safe as in this stage, no node content can be replaced.
+    let parent_update_args = extract_update_args(graph.node_content(parent_node).unwrap());
+
     for rf in relation_fields {
         match rf.relation().on_delete() {
             ReferentialAction::Restrict => emulate_restrict(graph, &rf, parent_node, child_node)?,
@@ -680,6 +683,18 @@ pub fn insert_emulated_on_update(
     }
 
     Ok(())
+}
+
+fn extract_update_args(parent_node: &Node) -> &WriteArgs {
+    if let Node::Query(Query::Write(q)) = parent_node {
+        match q {
+            WriteQuery::UpdateRecord(one) => &one.args,
+            WriteQuery::UpdateManyRecords(many) => &many.args,
+            _ => panic!("Parent operation for update emulation is not an update."),
+        }
+    } else {
+        panic!("Parent operation for update emulation is not a query.")
+    }
 }
 
 /// Inserts cascade emulations into the graph between `parent_node` and `child_node`.
@@ -737,6 +752,7 @@ pub fn emulate_on_update_cascade(
     let update_query = WriteQuery::UpdateManyRecords(UpdateManyRecords {
         model: dependent_model.clone(),
         record_filter: RecordFilter::empty(),
+        args: (),
     });
 
     let update_dependents_node = graph.create_node(Query::Write(delete_query));
