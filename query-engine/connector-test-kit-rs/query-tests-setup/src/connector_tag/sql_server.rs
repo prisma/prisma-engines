@@ -117,5 +117,5 @@ impl ToString for SqlServerVersion {
 
 fn sql_server_capabilities() -> Vec<ConnectorCapability> {
     let dm_connector = MsSqlDatamodelConnector::new();
-    dm_connector.capabilities().clone()
+    dm_connector.capabilities().to_owned()
 }

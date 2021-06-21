@@ -190,3 +190,27 @@ fn uuids_do_not_generate_drift_issue_5282(api: TestApi) {
         .assert_green_bang()
         .assert_no_steps();
 }
+
+#[test_connector(tags(Postgres))]
+fn functions_with_schema_prefix_in_dbgenerated_are_idempotent(api: TestApi) {
+    api.raw_cmd(r#"CREATE SCHEMA "myschema"; CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA "myschema";"#);
+
+    dbg!(api.connection_info());
+
+    let dm = format!(
+        r#"
+        {}
+
+        model Koala {{
+            id String @id @db.Uuid @default(dbgenerated("myschema.uuid_generate_v4()"))
+        }}
+        "#,
+        api.datasource_block()
+    );
+
+    api.schema_push(dm.clone())
+        .send_sync()
+        .assert_green_bang()
+        .assert_has_executed_steps();
+    api.schema_push(dm).send_sync().assert_green_bang().assert_no_steps();
+}

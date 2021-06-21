@@ -63,10 +63,9 @@ impl<'a> EvaluateDataLossAssertion<'a> {
     #[track_caller]
     pub fn assert_steps_count(self, count: usize) -> Self {
         assert!(
-            self.output.migration_steps.len() == count,
-            "Assertion failed. Expected evaluateDataLoss to return {} steps, found {}.\n{:?}",
+            self.output.migration_steps == count,
+            "Assertion failed. Expected evaluateDataLoss to return {} steps, found {}",
             count,
-            self.output.migration_steps.len(),
             self.output.migration_steps,
         );
 

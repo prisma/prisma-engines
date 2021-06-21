@@ -2,14 +2,14 @@
 
 //! The top-level library crate for the migration engine.
 
-pub mod api;
+mod api;
+
 pub mod commands;
 pub mod qe_setup;
 
 mod core_error;
 
-pub use api::GenericApi;
-pub use commands::SchemaPushInput;
+pub use api::{rpc_api, GenericApi};
 pub use core_error::{CoreError, CoreResult};
 
 use datamodel::{
@@ -23,6 +23,7 @@ use datamodel::{
 use enumflags2::BitFlags;
 use migration_connector::ConnectorError;
 use sql_migration_connector::SqlMigrationConnector;
+use std::env;
 use user_facing_errors::{common::InvalidDatabaseString, KnownError};
 
 #[cfg(feature = "mongodb")]
@@ -124,7 +125,7 @@ fn parse_configuration(datamodel: &str) -> CoreResult<(Datasource, String, BitFl
         .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", datamodel)))?;
 
     let url = config.datasources[0]
-        .load_url()
+        .load_url(|key| env::var(key).ok())
         .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", datamodel)))?;
 
     let shadow_database_url = config.datasources[0]

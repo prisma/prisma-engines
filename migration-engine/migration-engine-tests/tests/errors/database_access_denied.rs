@@ -23,10 +23,7 @@ fn database_access_denied_must_return_a_proper_error_in_rpc(api: TestApi) {
         url,
     );
 
-    let error = api
-        .block_on(migration_core::api::RpcApi::new(&dm))
-        .map(|_| ())
-        .unwrap_err();
+    let error = api.block_on(migration_core::rpc_api(&dm)).map(|_| ()).unwrap_err();
     let json_error = serde_json::to_value(&error.to_user_facing()).unwrap();
 
     let expected = json!({

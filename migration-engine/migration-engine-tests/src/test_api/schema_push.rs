@@ -1,7 +1,6 @@
 use migration_core::{
-    api::GenericApi,
     commands::{SchemaPushInput, SchemaPushOutput},
-    CoreError, CoreResult,
+    CoreError, CoreResult, GenericApi,
 };
 use std::{borrow::Cow, fmt::Debug};
 use tracing_futures::Instrument;

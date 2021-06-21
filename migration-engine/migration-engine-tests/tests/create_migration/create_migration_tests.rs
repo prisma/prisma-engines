@@ -216,7 +216,6 @@ fn migration_name_length_is_validated(api: TestApi) {
 
     api.create_migration("a-migration-with-a-name-that-is-way-too-long-a-migration-with-a-name-that-is-way-too-long-a-migration-with-a-name-that-is-way-too-long-a-migration-with-a-name-that-is-way-too-long", dm, &dir)
         .send_sync()
-
         .assert_migration_directories_count(1);
 }
 
@@ -428,8 +427,6 @@ fn no_additional_unique_created(api: TestApi) {
             id      Int @id
             cat     Cat @relation(fields:[id], references: [id])
         }
-
-
     "#;
 
     let dir = api.create_migrations_directory();

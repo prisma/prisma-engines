@@ -5,7 +5,7 @@ use crate::{
 use datamodel::common::preview_features::PreviewFeature;
 use enumflags2::BitFlags;
 use indoc::indoc;
-use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
+use migration_connector::{migrations_directory::MigrationDirectory, ConnectorError, ConnectorResult};
 use quaint::prelude::ConnectionInfo;
 use sql_schema_describer::{DescriberErrorKind, SqlSchema, SqlSchemaDescriberBackend};
 use std::path::Path;
@@ -62,7 +62,7 @@ impl SqlFlavour for SqliteFlavour {
     }
 
     async fn describe_schema<'a>(&'a self, connection: &Connection) -> ConnectorResult<SqlSchema> {
-        sql_schema_describer::sqlite::SqlSchemaDescriber::new(connection.quaint().clone())
+        sql_schema_describer::sqlite::SqlSchemaDescriber::new(connection.quaint())
             .describe(connection.connection_info().schema_name())
             .await
             .map_err(|err| match err.into_kind() {

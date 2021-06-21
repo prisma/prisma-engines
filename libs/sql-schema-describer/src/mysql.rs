@@ -4,7 +4,7 @@ use bigdecimal::ToPrimitive;
 use common::purge_dangling_foreign_keys;
 use indoc::indoc;
 use native_types::{MySqlType, NativeType};
-use quaint::{prelude::Queryable, single::Quaint, Value};
+use quaint::{prelude::Queryable, Value};
 use serde_json::from_str;
 use std::{
     borrow::Cow,
@@ -31,12 +31,12 @@ impl Flavour {
     }
 }
 
-pub struct SqlSchemaDescriber {
-    conn: Quaint,
+pub struct SqlSchemaDescriber<'a> {
+    conn: &'a dyn Queryable,
 }
 
 #[async_trait::async_trait]
-impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
+impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
     async fn list_databases(&self) -> DescriberResult<Vec<String>> {
         self.get_databases().await
     }
@@ -61,9 +61,9 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
 
         let table_names = self.get_table_names(schema).await?;
         let mut tables = Vec::with_capacity(table_names.len());
-        let mut columns = Self::get_all_columns(&self.conn, schema, &flavour).await?;
-        let mut indexes = Self::get_all_indexes(&self.conn, schema).await?;
-        let mut fks = Self::get_foreign_keys(&self.conn, schema).await?;
+        let mut columns = Self::get_all_columns(self.conn, schema, &flavour).await?;
+        let mut indexes = Self::get_all_indexes(self.conn, schema).await?;
+        let mut fks = Self::get_foreign_keys(self.conn, schema).await?;
 
         let mut enums = vec![];
         for table_name in &table_names {
@@ -93,11 +93,11 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
     }
 }
 
-impl Parser for SqlSchemaDescriber {}
+impl Parser for SqlSchemaDescriber<'_> {}
 
-impl SqlSchemaDescriber {
+impl<'a> SqlSchemaDescriber<'a> {
     /// Constructor.
-    pub fn new(conn: Quaint) -> SqlSchemaDescriber {
+    pub fn new(conn: &'a dyn Queryable) -> SqlSchemaDescriber<'a> {
         SqlSchemaDescriber { conn }
     }
 

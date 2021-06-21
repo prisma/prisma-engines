@@ -152,10 +152,6 @@ fn comments_in_a_datasource_must_work() {
             url      = env("PARCEL_PG_URL")
         }
     "#;
-    std::env::set_var(
-        "PARCEL_PG_URL",
-        "postgresql://user:password@localhost:5432/database/schema",
-    );
 
     // must not crash
     let _ = parse(dml);

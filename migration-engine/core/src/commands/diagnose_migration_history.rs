@@ -1,6 +1,6 @@
 use crate::CoreResult;
 use migration_connector::{
-    ConnectorError, DatabaseMigrationMarker, DiffTarget, MigrationConnector, MigrationDirectory, MigrationRecord,
+    migrations_directory::*, ConnectorError, DiffTarget, MigrationConnector, MigrationRecord,
     PersistenceNotInitializedError,
 };
 use serde::{Deserialize, Serialize};
@@ -63,19 +63,18 @@ impl DiagnoseMigrationHistoryOutput {
 /// Read the contents of the migrations directory and the migrations table, and
 /// returns their relative statuses. At this stage, the migration engine only
 /// reads, it does not write to the dev database nor the migrations directory.
-pub(crate) async fn diagnose_migration_history<C: MigrationConnector>(
+pub(crate) async fn diagnose_migration_history(
     input: &DiagnoseMigrationHistoryInput,
-    connector: &C,
+    connector: &dyn MigrationConnector,
 ) -> CoreResult<DiagnoseMigrationHistoryOutput> {
     let migration_persistence = connector.migration_persistence();
 
     tracing::debug!("Diagnosing migration history");
 
-    migration_connector::error_on_changed_provider(&input.migrations_directory_path, connector.connector_type())?;
+    error_on_changed_provider(&input.migrations_directory_path, connector.connector_type())?;
 
     // Load the migrations.
-    let migrations_from_filesystem =
-        migration_connector::list_migrations(&Path::new(&input.migrations_directory_path))?;
+    let migrations_from_filesystem = list_migrations(&Path::new(&input.migrations_directory_path))?;
 
     let (migrations_from_database, has_migrations_table) = match migration_persistence.list_migrations().await? {
         Ok(migrations) => (migrations, true),
@@ -134,10 +133,15 @@ pub(crate) async fn diagnose_migration_history<C: MigrationConnector>(
             let drift = match connector
                 .diff(DiffTarget::Migrations(&applied_migrations), DiffTarget::Database)
                 .await
-                .map(|mig| if mig.is_empty() { None } else { Some(mig) })
-            {
-                Ok(Some(rollback)) => Some(DriftDiagnostic::DriftDetected {
-                    summary: rollback.summary(),
+                .map(|mig| {
+                    if connector.migration_is_empty(&mig) {
+                        None
+                    } else {
+                        Some(mig)
+                    }
+                }) {
+                Ok(Some(drift)) => Some(DriftDiagnostic::DriftDetected {
+                    summary: connector.migration_summary(&drift),
                 }),
                 Err(error) => Some(DriftDiagnostic::MigrationFailedToApply { error }),
                 _ => None,

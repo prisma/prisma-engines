@@ -1,3 +1,4 @@
+use expect_test::expect;
 use migration_engine_tests::multi_engine_test_api::*;
 use quaint::{prelude::Queryable, single::Quaint};
 use test_macros::test_connector;
@@ -145,4 +146,48 @@ fn shadow_db_url_must_not_match_main_url(api: TestApi) {
             .send_sync()
             .assert_migration_directories_count(1);
     }
+}
+
+#[test_connector(tags(Postgres, Mysql))]
+fn shadow_db_not_reachable_error_must_have_the_right_connection_info(api: TestApi) {
+    let migrations_directory = api.create_migrations_directory();
+    let schema = r#"
+        model Cat {
+            id Int @id
+            litterConsumption Int
+            hungry Boolean @default(true)
+        }
+    "#;
+
+    let mut url: url::Url = api.connection_string().parse().unwrap();
+    url.set_port(Some(39824)).unwrap(); // let's assume no database is running on that port
+
+    let engine = api.new_engine_with_connection_strings(api.connection_string(), Some(url.to_string()));
+
+    let err = engine
+        .create_migration("01init", schema, &migrations_directory)
+        .send_unwrap_err()
+        .to_user_facing();
+
+    let assertion = expect![[r#"
+        Error {
+            is_panic: false,
+            inner: Known(
+                KnownError {
+                    message: "Can\'t reach database server at `localhost`:`39824`\n\nPlease make sure your database server is running at `localhost`:`39824`.",
+                    meta: Object({
+                        "database_host": String(
+                            "localhost",
+                        ),
+                        "database_port": Number(
+                            39824,
+                        ),
+                    }),
+                    error_code: "P1001",
+                },
+            ),
+        }
+    "#]];
+
+    assertion.assert_debug_eq(&err);
 }

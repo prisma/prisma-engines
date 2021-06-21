@@ -1,18 +1,10 @@
-use migration_connector::DatabaseMigrationMarker;
-
 #[derive(Debug)]
 pub struct MongoDbMigration {
     pub(crate) steps: Vec<MongoDbMigrationStep>,
 }
 
-impl DatabaseMigrationMarker for MongoDbMigration {
-    const FILE_EXTENSION: &'static str = "mongo";
-
-    fn is_empty(&self) -> bool {
-        self.steps.is_empty()
-    }
-
-    fn summary(&self) -> String {
+impl MongoDbMigration {
+    pub(crate) fn summary(&self) -> String {
         let mut out = String::with_capacity(self.steps.len() * 10);
 
         for step in &self.steps {

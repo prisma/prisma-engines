@@ -3,8 +3,10 @@ use crate::{
     sql_renderer::IteratorJoin,
     sql_schema_differ::{ColumnChange, ColumnChanges},
 };
-use migration_connector::DatabaseMigrationMarker;
-use sql_schema_describer::{walkers::SqlSchemaExt, SqlSchema};
+use sql_schema_describer::{
+    walkers::{ColumnWalker, SqlSchemaExt},
+    SqlSchema,
+};
 use std::{collections::BTreeSet, fmt::Write as _};
 
 /// The database migration type for SqlMigrationConnector.
@@ -255,7 +257,11 @@ impl SqlMigration {
                                     tables.next().column_at(*alter_column.column_index.next()).name(),
                                 )
                                 .unwrap();
-                                render_column_changes(&alter_column.changes, &mut out);
+                                render_column_changes(
+                                    tables.columns(&alter_column.column_index),
+                                    &alter_column.changes,
+                                    &mut out,
+                                );
                                 out.push('\n');
                             }
                             TableChange::DropColumn { column_index } => {
@@ -271,7 +277,7 @@ impl SqlMigration {
                                     tables.next().column_at(*column_index.next()).name(),
                                 )
                                 .unwrap();
-                                render_column_changes(changes, &mut out);
+                                render_column_changes(tables.columns(column_index), changes, &mut out);
                                 out.push('\n');
                             }
                             TableChange::DropPrimaryKey => {
@@ -360,33 +366,29 @@ impl SqlMigration {
     }
 }
 
-fn render_column_changes(changes: &ColumnChanges, sink: &mut String) {
+fn render_column_changes(columns: Pair<ColumnWalker<'_>>, changes: &ColumnChanges, sink: &mut String) {
     let readable_changes = changes
         .iter()
         .map(|change| match change {
-            ColumnChange::Renaming => "column was renamed",
-            ColumnChange::Arity => "arity changed",
-            ColumnChange::Default => "default changed",
-            ColumnChange::TypeChanged => "type changed",
-            ColumnChange::Sequence => "sequence changed",
+            ColumnChange::Renaming => "column was renamed".to_owned(),
+            ColumnChange::Arity => format!(
+                "changed from {:?} to {:?}",
+                columns.previous().arity(),
+                columns.next().arity()
+            ),
+            ColumnChange::Default => format!(
+                "default changed from `{:?}` to `{:?}`",
+                columns.previous().default().map(|d| d.kind()),
+                columns.next().default().map(|d| d.kind())
+            ),
+            ColumnChange::TypeChanged => "type changed".to_owned(),
+            ColumnChange::Sequence => "sequence changed".to_owned(),
         })
         .join(", ");
 
     sink.push('(');
     sink.push_str(&readable_changes);
     sink.push(')');
-}
-
-impl DatabaseMigrationMarker for SqlMigration {
-    const FILE_EXTENSION: &'static str = "sql";
-
-    fn is_empty(&self) -> bool {
-        self.steps.is_empty()
-    }
-
-    fn summary(&self) -> String {
-        self.drift_summary()
-    }
 }
 
 // The order of the variants matters for sorting. The steps are sorted _first_
