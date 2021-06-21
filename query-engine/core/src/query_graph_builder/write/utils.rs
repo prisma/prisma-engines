@@ -6,9 +6,7 @@ use crate::{
 use connector::{Filter, RecordFilter, WriteArgs};
 use datamodel::{common::preview_features::PreviewFeature, ReferentialAction};
 use datamodel_connector::ConnectorCapability;
-use itertools::Itertools;
-use once_cell::sync::OnceCell;
-use prisma_models::{InternalDataModelRef, ModelProjection, ModelRef, RelationFieldRef};
+use prisma_models::{ModelProjection, ModelRef, RelationFieldRef};
 use std::sync::Arc;
 
 /// Coerces single values (`ParsedInputValue::Single` and `ParsedInputValue::Map`) into a vector.
@@ -734,57 +732,12 @@ fn extract_update_args(parent_node: &Node) -> &WriteArgs {
 ///    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
 /// ```
 pub fn emulate_on_update_cascade(
-    graph: &mut QueryGraph,
-    relation_field: &RelationFieldRef, // This is the field _on the other model_ for cascade.
-    connector_ctx: &ConnectorContext,
+    _graph: &mut QueryGraph,
+    _relation_field: &RelationFieldRef, // This is the field _on the other model_ for cascade.
+    _connector_ctx: &ConnectorContext,
     _model: &ModelRef,
-    parent_node: &NodeRef,
-    child_node: &NodeRef,
+    _parent_node: &NodeRef,
+    _child_node: &NodeRef,
 ) -> QueryGraphBuilderResult<()> {
-    let dependent_model = relation_field.model();
-    let parent_relation_field = relation_field.related_field();
-    let child_model_identifier = relation_field.related_model().primary_identifier();
-
-    // Records that need to be deleted for the cascade.
-    let dependent_records_node =
-        insert_find_children_by_parent_node(graph, parent_node, &parent_relation_field, Filter::empty())?;
-
-    let update_query = WriteQuery::UpdateManyRecords(UpdateManyRecords {
-        model: dependent_model.clone(),
-        record_filter: RecordFilter::empty(),
-        args: (),
-    });
-
-    let update_dependents_node = graph.create_node(Query::Write(delete_query));
-
-    insert_emulated_on_update(
-        graph,
-        connector_ctx,
-        &dependent_model,
-        &dependent_records_node,
-        &update_dependents_node,
-    )?;
-
-    graph.create_edge(
-        &dependent_records_node,
-        &update_dependents_node,
-        QueryGraphDependency::ParentProjection(
-            child_model_identifier.clone(),
-            Box::new(move |mut update_dependents_node, dependent_ids| {
-                if let Node::Query(Query::Write(WriteQuery::DeleteManyRecords(ref mut dmr))) = delete_dependents_node {
-                    dmr.record_filter = dependent_ids.into();
-                }
-
-                Ok(delete_dependents_node)
-            }),
-        ),
-    )?;
-
-    graph.create_edge(
-        &delete_dependents_node,
-        child_node,
-        QueryGraphDependency::ExecutionOrder,
-    )?;
-
     Ok(())
 }
