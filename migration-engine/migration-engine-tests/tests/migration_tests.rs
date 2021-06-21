@@ -1087,8 +1087,8 @@ async fn join_tables_between_models_with_compound_primary_keys_must_work(api: &T
             human_lastName String
             cat_id String
 
-            cat Cat @relation(fields: [cat_id], references: [id], onDelete: Cascade)
-            human Human @relation(fields: [human_firstName, human_lastName], references: [firstName, lastName], onDelete: Cascade)
+            cat Cat @relation(fields: [cat_id], references: [id])
+            human Human @relation(fields: [human_firstName, human_lastName], references: [firstName, lastName])
 
             @@unique([cat_id, human_firstName, human_lastName], name: "joinTableUnique")
             @@index([human_firstName, human_lastName], name: "joinTableIndex")

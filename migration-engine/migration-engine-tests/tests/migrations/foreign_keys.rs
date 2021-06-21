@@ -203,7 +203,7 @@ fn changing_a_relation_field_to_a_scalar_field_must_work(api: TestApi) {
         model A {
             id Int @id
             b Int
-            b_rel B @relation(fields: [b], references: [id], onDelete: Cascade)
+            b_rel B @relation(fields: [b], references: [id])
         }
 
         model B {
