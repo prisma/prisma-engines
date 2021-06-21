@@ -42,10 +42,7 @@ impl<'a, 'b> ValidationPipeline<'a> {
         // Phase 1 is source block loading.
 
         // Phase 2: Name resolution.
-        let db = match ParserDatabase::new(ast_schema, &mut diagnostics) {
-            Some(db) => db,
-            None => return Err(diagnostics),
-        };
+        let db = ParserDatabase::new(ast_schema, &mut diagnostics);
 
         // Early return so that the validator does not have to deal with invalid schemas
         diagnostics.to_result()?;

@@ -1,3 +1,4 @@
+// TODO: remove this once we use all this information in lift.rs
 #![allow(unused)]
 
 mod names;
@@ -22,22 +23,25 @@ pub(crate) struct ParserDatabase<'a> {
 }
 
 impl<'ast> ParserDatabase<'ast> {
-    pub(super) fn new(ast: &'ast ast::SchemaAst, diagnostics: &mut Diagnostics) -> Option<Self> {
-        let names = Names::new(ast, diagnostics);
+    pub(super) fn new(ast: &'ast ast::SchemaAst, diagnostics: &mut Diagnostics) -> Self {
+        let mut db = ParserDatabase {
+            ast,
+            names: Names::new(ast, diagnostics),
+            types: types::Types::default(),
+            relations: relations::Relations::default(),
+        };
 
+        // Abort early on name resolution errors.
         if diagnostics.has_errors() {
-            return None;
+            return db;
         }
-
-        let mut types = types::Types::default();
-        let mut relations = relations::Relations::default();
 
         for (top_id, top) in ast.iter_tops() {
             match top {
                 ast::Top::Type(type_alias) => {
-                    match field_type(type_alias, &names, ast) {
+                    match field_type(type_alias, &db.names, ast) {
                         Ok(FieldType::Scalar(scalar_field_type)) => {
-                            types.type_aliases.insert(top_id, scalar_field_type);
+                            db.types.type_aliases.insert(top_id, scalar_field_type);
                         }
                         Ok(FieldType::Model(_)) => diagnostics.push_error(DatamodelError::new_validation_error(
                             "Only scalar types can be used for defining custom types.",
@@ -51,14 +55,14 @@ impl<'ast> ParserDatabase<'ast> {
                 }
                 ast::Top::Model(model) => {
                     for (field_id, field) in model.iter_fields() {
-                        match field_type(field, &names, ast) {
+                        match field_type(field, &db.names, ast) {
                             Ok(FieldType::Model(referenced_model)) => {
-                                relations
+                                db.relations
                                     .relation_fields
                                     .insert((top_id, field_id), relations::RelationField { referenced_model });
                             }
                             Ok(FieldType::Scalar(scalar_field_type)) => {
-                                types.scalar_fields.insert((top_id, field_id), scalar_field_type);
+                                db.types.scalar_fields.insert((top_id, field_id), scalar_field_type);
                             }
                             Err(supported) => diagnostics.push_error(DatamodelError::new_type_not_found_error(
                                 supported,
@@ -71,14 +75,9 @@ impl<'ast> ParserDatabase<'ast> {
             }
         }
 
-        types.detect_alias_cycles(ast, diagnostics);
+        db.types.detect_alias_cycles(ast, diagnostics);
 
-        Some(ParserDatabase {
-            ast,
-            names,
-            types,
-            relations,
-        })
+        db
     }
 
     pub(super) fn ast(&self) -> &'ast ast::SchemaAst {
@@ -94,11 +93,11 @@ impl<'ast> ParserDatabase<'ast> {
 
     pub(crate) fn iter_model_relation_fields(
         &self,
-        top_id: TopId,
+        model_id: TopId,
     ) -> impl Iterator<Item = (FieldId, &RelationField)> + '_ {
         self.relations
             .relation_fields
-            .range((top_id, FieldId::ZERO)..=(top_id, FieldId::MAX))
+            .range((model_id, FieldId::ZERO)..=(model_id, FieldId::MAX))
             .map(|((_, field_id), rf)| (*field_id, rf))
     }
 
