@@ -11,7 +11,6 @@ mod sanitize_datamodel_names;
 mod schema_describer_loading;
 mod version_checker;
 mod warnings;
-
 use datamodel::common::datamodel_context::DatamodelContext;
 use datamodel::common::preview_features::*;
 use datamodel::Datamodel;
@@ -24,7 +23,6 @@ use quaint::{prelude::ConnectionInfo, single::Quaint};
 use schema_describer_loading::load_describer;
 use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend};
 use std::future::Future;
-use core::fmt;
 
 pub type SqlIntrospectionResult<T> = core::result::Result<T, SqlError>;
 
@@ -32,15 +30,6 @@ pub type SqlIntrospectionResult<T> = core::result::Result<T, SqlError>;
 pub struct SqlIntrospectionConnector {
     connection: Quaint,
     preview_features: Vec<PreviewFeature>,
-}
-
-impl fmt::Debug for SqlIntrospectionConnector {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("SqlIntrospectionConnector")
-            .field("connection_info", &self.connection_info)
-            .field("describer", &"Box<dyn SqlSchemaDescriberBackend>")
-            .finish()
-    }
 }
 
 impl SqlIntrospectionConnector {
@@ -53,7 +42,10 @@ impl SqlIntrospectionConnector {
 
         tracing::debug!("SqlIntrospectionConnector initialized.");
 
-        Ok(SqlIntrospectionConnector { connection , preview_features})
+        Ok(SqlIntrospectionConnector {
+            connection,
+            preview_features,
+        })
     }
 
     async fn catch<O>(&self, fut: impl Future<Output = Result<O, SqlError>>) -> ConnectorResult<O> {
@@ -133,7 +125,6 @@ impl IntrospectionConnector for SqlIntrospectionConnector {
     ) -> ConnectorResult<IntrospectionResult> {
         let sql_schema = self.catch(self.describe()).await?;
         tracing::debug!("SQL Schema Describer is done: {:?}", sql_schema);
-<<<<<<< HEAD
         let preview_features = self.preview_features.clone();
 
         let ctx = DatamodelContext {
@@ -143,15 +134,9 @@ impl IntrospectionConnector for SqlIntrospectionConnector {
         };
 
         let introspection_result = calculate_datamodel::calculate_datamodel(&sql_schema, &previous_data_model, &ctx)
-            .map_err(|sql_introspection_error| sql_introspection_error.into_connector_error(&self.connection_info))?;
-=======
-        let family = self.connection.connection_info().sql_family();
-
-        let introspection_result = calculate_datamodel::calculate_datamodel(&sql_schema, &family, &previous_data_model)
             .map_err(|sql_introspection_error| {
                 sql_introspection_error.into_connector_error(&self.connection.connection_info())
             })?;
->>>>>>> master
 
         tracing::debug!("Calculating datamodel is done: {:?}", introspection_result.data_model);
 
