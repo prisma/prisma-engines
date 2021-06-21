@@ -81,7 +81,7 @@ pub async fn get_many_records(
     // The should_batch has been adjusted to reflect that as a band-aid, but deeper investigation is necessary.
     if query_arguments.should_batch() {
         // We don't need to order in the database due to us ordering in this function.
-        let order = std::mem::replace(&mut query_arguments.order_by, vec![]);
+        let order = std::mem::take(&mut query_arguments.order_by);
 
         let batches = query_arguments.batched();
         let mut futures = FuturesUnordered::new();

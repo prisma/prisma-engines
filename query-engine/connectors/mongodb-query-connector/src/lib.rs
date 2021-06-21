@@ -1,4 +1,4 @@
-#![allow(clippy::clippy::vec_init_then_push)]
+#![allow(clippy::vec_init_then_push)]
 
 mod cursor;
 mod error;

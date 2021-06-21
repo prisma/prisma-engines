@@ -1,6 +1,6 @@
 #![allow(
     clippy::wrong_self_convention,
-    clippy::clippy::upper_case_acronyms,
+    clippy::upper_case_acronyms,
     clippy::needless_question_mark
 )]
 
