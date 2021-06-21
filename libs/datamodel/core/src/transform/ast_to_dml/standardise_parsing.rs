@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use ::dml::{field::FieldArity, relation_info::ReferentialAction};
+use ::dml::relation_info::ReferentialAction;
 
 use super::common::*;
 use crate::{
@@ -35,29 +35,48 @@ impl<'a> StandardiserForParsing<'a> {
             return;
         }
 
-        for model in schema.models_mut() {
-            for field in model.fields_mut() {
+        let mut modifications = Vec::new();
+
+        for (model_id, model) in schema.models().enumerate() {
+            for (field_id, field) in model.fields().enumerate() {
                 match field {
                     Field::RelationField(field) if field.is_singular() => {
                         if field.relation_info.on_delete.is_some() || field.relation_info.on_update.is_some() {
                             continue;
                         }
 
-                        field.relation_info.on_update = Some(ReferentialAction::Cascade);
-                        field.relation_info.on_delete = Some({
-                            match field.arity {
-                                FieldArity::Required => ReferentialAction::Cascade,
-                                _ => ReferentialAction::SetNull,
-                            }
-                        });
-                        // So our validator won't get a stroke when seeing the
-                        // values set without having the preview feature
-                        // enabled. Remove this before GA.
-                        field.relation_info.legacy_referential_actions();
+                        let some_required = field
+                            .relation_info
+                            .fields
+                            .iter()
+                            .flat_map(|name| model.find_field(name))
+                            .any(|field| field.arity().is_required());
+
+                        let on_delete = if some_required {
+                            ReferentialAction::Cascade
+                        } else {
+                            ReferentialAction::SetNull
+                        };
+
+                        modifications.push((model_id, field_id, on_delete));
                     }
                     _ => (),
                 }
             }
+        }
+
+        for (model_id, field_id, on_delete) in modifications {
+            let mut field = schema.models[model_id].fields[field_id]
+                .as_relation_field_mut()
+                .unwrap();
+
+            field.relation_info.on_update = Some(ReferentialAction::Cascade);
+            field.relation_info.on_delete = Some(on_delete);
+
+            // So our validator won't get a stroke when seeing the
+            // values set without having the preview feature
+            // enabled. Remove this before GA.
+            field.relation_info.legacy_referential_actions();
         }
     }
 

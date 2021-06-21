@@ -112,6 +112,13 @@ impl Field {
         }
     }
 
+    pub fn as_relation_field_mut(&mut self) -> Option<&mut RelationField> {
+        match self {
+            Field::RelationField(ref mut rf) => Some(rf),
+            _ => None,
+        }
+    }
+
     pub fn as_scalar_field(&self) -> Option<&ScalarField> {
         match self {
             Field::ScalarField(sf) => Some(sf),
