@@ -10,27 +10,34 @@ type AnnotationId = u32;
 
 #[derive(Debug, Default)]
 pub(super) struct Types {
-    pub(super) type_aliases: BTreeMap<TopId, ScalarFieldType>,
+    pub(super) type_aliases: HashMap<TopId, ScalarFieldType>,
     pub(super) scalar_fields: BTreeMap<(TopId, FieldId), ScalarFieldType>,
     annotations: Vec<ModelAnnotation>,
     // Storage for annotation fields, i.e. the fields referenced in `@(@)index`,
     // `@(@)unique` and `@(@)id`. The type should be understood as (model_id,
-    // annotation_id, order_key_in_annotation, field_id)
+    // annotation_id, sort_key_, field_id), where the sort key is the index of
+    // the field in the annotation.
     annotation_fields: BTreeSet<(TopId, AnnotationId, u16, FieldId)>,
 }
 
 impl Types {
-    /// Detect self-referencing type aliases (possibly indirectly).
+    /// Detect self-referencing type aliases, possibly indirectly. We loop
+    /// through each type alias in the schema. If it references another type
+    /// alias — which may in turn reference another type alias —, we check that
+    /// it is not self-referencing. If a type alias ends up transitively
+    /// referencing itself, we create an error diagnostic.
     pub(super) fn detect_alias_cycles(&self, ast: &SchemaAst, diagnostics: &mut Diagnostics) {
+        // The IDs of the type aliases we traversed to get to the current type alias.
         let mut path = Vec::new();
         // We accumulate the errors here because we want to sort them at the end.
         let mut errors: Vec<(TopId, DatamodelError)> = Vec::new();
 
         for (top_id, ty) in &self.type_aliases {
+            // Loop variable. This is the "tip" of the sequence of type aliases.
             let mut current = (*top_id, ty);
             path.clear();
 
-            // Follow the chain.
+            // Follow the chain of type aliases referencing other type aliases.
             while let ScalarFieldType::Alias(next_alias_id) = current.1 {
                 path.push(current.0);
                 let next_alias = ast[*next_alias_id].unwrap_type_alias();
@@ -53,9 +60,9 @@ impl Types {
                     break;
                 }
 
-                // Detect a cycle anywhere else in the chain of native
-                // types. In that case, the error will be reported somewhere
-                // else, and we can just abort.
+                // We detect a cycle anywhere else in the chain of type aliases.
+                // In that case, the error will be reported somewhere else, and
+                // we can just move on from this alias.
                 if path.contains(next_alias_id) {
                     break;
                 }
@@ -65,8 +72,8 @@ impl Types {
                         current = (*next_alias_id, next_alias_type);
                     }
                     // A missing alias at this point means that there was an
-                    // error resolving the type of the next alias. We should
-                    // stop validation here.
+                    // error resolving the type of the next alias. We stop
+                    // validation here.
                     None => break,
                 }
             }
