@@ -15,18 +15,35 @@ pub struct Reformatter<'a> {
 
 impl<'a> Reformatter<'a> {
     pub fn new(input: &'a str) -> Self {
-        let schema_ast = crate::parse_schema_ast(input).unwrap();
-        let validated_datamodel = crate::parse_datamodel_for_formatter(input).unwrap();
-        let missing_fields = Self::find_all_missing_fields(&schema_ast, &validated_datamodel);
-        let missing_field_attributes = Self::find_all_missing_attributes(&schema_ast, &validated_datamodel);
-        let missing_relation_attribute_args =
-            Self::find_all_missing_relation_attribute_args(&schema_ast, &validated_datamodel);
+        match (
+            crate::parse_schema_ast(input),
+            crate::parse_datamodel_for_formatter(input),
+        ) {
+            (Ok(schema_ast), Ok(validated_datamodel)) => {
+                let missing_fields = Self::find_all_missing_fields(&schema_ast, &validated_datamodel);
+                let missing_field_attributes = Self::find_all_missing_attributes(&schema_ast, &validated_datamodel);
+                let missing_relation_attribute_args =
+                    Self::find_all_missing_relation_attribute_args(&schema_ast, &validated_datamodel);
+                Reformatter {
+                    input,
+                    missing_fields,
+                    missing_field_attributes,
+                    missing_relation_attribute_args,
+                }
+            }
+            (Err(diagnostics), _) => Reformatter {
+                input,
+                missing_field_attributes: Err(diagnostics.clone()),
+                missing_relation_attribute_args: Err(diagnostics.clone()),
+                missing_fields: Err(diagnostics),
+            },
 
-        Reformatter {
-            input,
-            missing_fields,
-            missing_field_attributes,
-            missing_relation_attribute_args,
+            (Ok(_), Err(diagnostics)) => Reformatter {
+                input,
+                missing_field_attributes: Err(diagnostics.clone()),
+                missing_relation_attribute_args: Err(diagnostics.clone()),
+                missing_fields: Err(diagnostics),
+            },
         }
     }
 
