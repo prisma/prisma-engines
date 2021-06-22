@@ -1,11 +1,10 @@
-use crate::commenting_out_guardrails::commenting_out_guardrails;
-use crate::introspection::introspect;
 use crate::introspection_helpers::*;
 use crate::prisma_1_defaults::*;
 use crate::re_introspection::enrich;
 use crate::sanitize_datamodel_names::{sanitization_leads_to_duplicate_names, sanitize_datamodel_names};
 use crate::version_checker::VersionChecker;
 use crate::SqlIntrospectionResult;
+use crate::{commenting_out_guardrails::commenting_out_guardrails, introspection::introspect};
 use datamodel::Datamodel;
 use introspection_connector::IntrospectionResult;
 use quaint::connector::SqlFamily;
@@ -63,7 +62,7 @@ mod tests {
     use super::*;
     use datamodel::{
         dml, Datamodel, DefaultValue as DMLDefault, Field, FieldArity, FieldType, Model, NativeTypeInstance,
-        OnDeleteStrategy, RelationField, RelationInfo, ScalarField, ScalarType, ValueGenerator,
+        ReferentialAction, RelationField, RelationInfo, ScalarField, ScalarType, ValueGenerator,
     };
     use native_types::{NativeType, PostgresType};
     use pretty_assertions::assert_eq;
@@ -470,12 +469,15 @@ mod tests {
                         Field::RelationField(RelationField::new(
                             "User",
                             FieldArity::List,
+                            FieldArity::List,
                             RelationInfo {
                                 to: "User".to_string(),
                                 fields: vec![],
                                 references: vec![],
                                 name: "CityToUser".to_string(),
-                                on_delete: OnDeleteStrategy::None,
+                                on_delete: None,
+                                on_update: None,
+                                legacy_referential_actions: false,
                             },
                         )),
                     ],
@@ -557,17 +559,26 @@ mod tests {
                             is_commented_out: false,
                             is_ignored: false,
                         }),
-                        Field::RelationField(RelationField::new(
-                            "City",
-                            FieldArity::Required,
-                            RelationInfo {
+                        Field::RelationField(RelationField {
+                            name: "City".into(),
+                            arity: FieldArity::Required,
+                            referential_arity: FieldArity::Required,
+                            documentation: None,
+                            is_generated: false,
+                            is_commented_out: false,
+                            is_ignored: false,
+                            supports_restrict_action: Some(true),
+                            emulates_referential_actions: None,
+                            relation_info: RelationInfo {
                                 name: "CityToUser".to_string(),
                                 to: "City".to_string(),
                                 fields: vec!["city_id".to_string(), "city_name".to_string()],
                                 references: vec!["id".to_string(), "name".to_string()],
-                                on_delete: OnDeleteStrategy::None,
+                                on_delete: Some(ReferentialAction::NoAction),
+                                on_update: Some(ReferentialAction::NoAction),
+                                legacy_referential_actions: false,
                             },
-                        )),
+                        }),
                     ],
                     is_generated: false,
                     indices: vec![],
@@ -862,12 +873,15 @@ mod tests {
                         Field::RelationField(RelationField::new(
                             "User",
                             FieldArity::List,
+                            FieldArity::List,
                             RelationInfo {
                                 to: "User".to_string(),
                                 fields: vec![],
                                 references: vec![],
                                 name: "CityToUser".to_string(),
-                                on_delete: OnDeleteStrategy::None,
+                                on_delete: None,
+                                on_update: None,
+                                legacy_referential_actions: false,
                             },
                         )),
                     ],
@@ -918,17 +932,26 @@ mod tests {
                                 }),
                             ),
                         )),
-                        Field::RelationField(RelationField::new(
-                            "City",
-                            FieldArity::Required,
-                            RelationInfo {
+                        Field::RelationField(RelationField {
+                            name: "City".into(),
+                            arity: FieldArity::Required,
+                            referential_arity: FieldArity::Required,
+                            documentation: None,
+                            is_generated: false,
+                            is_commented_out: false,
+                            is_ignored: false,
+                            supports_restrict_action: Some(true),
+                            emulates_referential_actions: None,
+                            relation_info: RelationInfo {
                                 name: "CityToUser".to_string(),
                                 to: "City".to_string(),
                                 fields: vec!["city_id".to_string()],
                                 references: vec!["id".to_string()],
-                                on_delete: OnDeleteStrategy::None,
+                                on_delete: Some(ReferentialAction::NoAction),
+                                on_update: Some(ReferentialAction::NoAction),
+                                legacy_referential_actions: false,
                             },
-                        )),
+                        }),
                     ],
                     is_generated: false,
                     indices: vec![],

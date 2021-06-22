@@ -1,29 +1,36 @@
 use datamodel_connector::{connector_error::ConnectorError, Connector, ConnectorCapability};
-use dml::model::Model;
-use dml::native_type_constructor::NativeTypeConstructor;
-use dml::native_type_instance::NativeTypeInstance;
-use dml::{field::Field, scalars::ScalarType};
+use dml::{
+    field::Field, model::Model, native_type_constructor::NativeTypeConstructor,
+    native_type_instance::NativeTypeInstance, relation_info::ReferentialAction, scalars::ScalarType,
+};
+use enumflags2::BitFlags;
 use std::borrow::Cow;
 
 pub struct SqliteDatamodelConnector {
     capabilities: Vec<ConnectorCapability>,
     constructors: Vec<NativeTypeConstructor>,
+    referential_actions: BitFlags<ReferentialAction>,
 }
 
 impl SqliteDatamodelConnector {
     pub fn new() -> SqliteDatamodelConnector {
+        use ReferentialAction::*;
+
         let capabilities = vec![
             ConnectorCapability::RelationFieldsInArbitraryOrder,
             ConnectorCapability::UpdateableId,
             ConnectorCapability::AutoIncrement,
             ConnectorCapability::CompoundIds,
+            ConnectorCapability::ForeignKeys,
         ];
 
         let constructors: Vec<NativeTypeConstructor> = vec![];
+        let referential_actions = SetNull | SetDefault | Cascade | Restrict | NoAction;
 
         SqliteDatamodelConnector {
             capabilities,
             constructors,
+            referential_actions,
         }
     }
 }
@@ -32,8 +39,13 @@ impl Connector for SqliteDatamodelConnector {
     fn name(&self) -> &str {
         "sqlite"
     }
+
     fn capabilities(&self) -> &[ConnectorCapability] {
         &self.capabilities
+    }
+
+    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
+        self.referential_actions
     }
 
     fn scalar_type_for_native_type(&self, _native_type: serde_json::Value) -> ScalarType {

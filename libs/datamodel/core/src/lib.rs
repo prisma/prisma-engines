@@ -142,7 +142,7 @@ fn parse_datamodel_internal(
     let generators = GeneratorLoader::load_generators_from_ast(&ast, &mut diagnostics);
     let preview_features = preview_features(&generators);
     let datasources = load_sources(&ast, &preview_features, &mut &mut diagnostics);
-    let validator = ValidationPipeline::new(&datasources);
+    let validator = ValidationPipeline::new(&datasources, &preview_features);
 
     diagnostics.to_result()?;
 
@@ -192,7 +192,7 @@ pub fn parse_configuration(schema: &str) -> Result<ValidatedConfiguration, diagn
 
 fn load_sources(
     schema_ast: &SchemaAst,
-    preview_features: &HashSet<&PreviewFeature>,
+    preview_features: &HashSet<PreviewFeature>,
     diagnostics: &mut Diagnostics,
 ) -> Vec<Datasource> {
     let source_loader = DatasourceLoader::new();
@@ -225,7 +225,7 @@ pub fn render_datamodel_to(
     datamodel: &dml::Datamodel,
     datasource: Option<&Datasource>,
 ) {
-    let lowered = LowerDmlToAst::new(datasource).lower(datamodel);
+    let lowered = LowerDmlToAst::new(datasource, &HashSet::new()).lower(datamodel);
     render_schema_ast_to(stream, &lowered, 2);
 }
 
@@ -247,7 +247,8 @@ fn render_datamodel_and_config_to(
     datamodel: &dml::Datamodel,
     config: &configuration::Configuration,
 ) {
-    let mut lowered = LowerDmlToAst::new(config.datasources.first()).lower(datamodel);
+    let features = config.preview_features().map(Clone::clone).collect();
+    let mut lowered = LowerDmlToAst::new(config.datasources.first(), &features).lower(datamodel);
 
     DatasourceSerializer::add_sources_to_ast(config.datasources.as_slice(), &mut lowered);
     GeneratorSerializer::add_generators_to_ast(&config.generators, &mut lowered);
@@ -261,6 +262,9 @@ fn render_schema_ast_to(stream: &mut dyn std::fmt::Write, schema: &ast::SchemaAs
     renderer.render(schema);
 }
 
-fn preview_features(generators: &[Generator]) -> HashSet<&PreviewFeature> {
-    generators.iter().flat_map(|gen| gen.preview_features.iter()).collect()
+fn preview_features(generators: &[Generator]) -> HashSet<PreviewFeature> {
+    generators
+        .iter()
+        .flat_map(|gen| gen.preview_features.iter().cloned())
+        .collect()
 }

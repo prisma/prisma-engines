@@ -1,10 +1,23 @@
+use std::collections::HashSet;
+
 use super::{super::helpers::*, AttributeValidator};
-use crate::common::RelationNames;
-use crate::diagnostics::DatamodelError;
-use crate::{ast, dml, Field};
+use crate::{
+    ast,
+    common::{preview_features::PreviewFeature, RelationNames},
+    diagnostics::DatamodelError,
+    dml, Field,
+};
 
 /// Prismas builtin `@relation` attribute.
-pub struct RelationAttributeValidator {}
+pub struct RelationAttributeValidator {
+    preview_features: HashSet<PreviewFeature>,
+}
+
+impl RelationAttributeValidator {
+    pub fn new(preview_features: HashSet<PreviewFeature>) -> Self {
+        Self { preview_features }
+    }
+}
 
 impl AttributeValidator<dml::Field> for RelationAttributeValidator {
     fn attribute_name(&self) -> &'static str {
@@ -32,6 +45,14 @@ impl AttributeValidator<dml::Field> for RelationAttributeValidator {
                 rf.relation_info.fields = base_fields.as_array().to_literal_vec()?;
             }
 
+            if let Ok(on_delete) = args.arg("onDelete") {
+                rf.relation_info.on_delete = Some(on_delete.as_referential_action()?);
+            }
+
+            if let Ok(on_update) = args.arg("onUpdate") {
+                rf.relation_info.on_update = Some(on_update.as_referential_action()?);
+            }
+
             Ok(())
         } else {
             self.new_attribute_validation_error("Invalid field type, not a relation.", args.span())
@@ -41,9 +62,7 @@ impl AttributeValidator<dml::Field> for RelationAttributeValidator {
     fn serialize(&self, field: &dml::Field, datamodel: &dml::Datamodel) -> Vec<ast::Attribute> {
         if let dml::Field::RelationField(rf) = field {
             let mut args = Vec::new();
-
             let relation_info = &rf.relation_info;
-
             let parent_model = datamodel.find_model_by_relation_field_ref(rf).unwrap();
 
             let related_model = datamodel
@@ -95,11 +114,20 @@ impl AttributeValidator<dml::Field> for RelationAttributeValidator {
                 }
             }
 
-            if relation_info.on_delete != dml::OnDeleteStrategy::None {
-                args.push(ast::Argument::new_constant(
-                    "onDelete",
-                    &relation_info.on_delete.to_string(),
-                ));
+            if self.preview_features.contains(&PreviewFeature::ReferentialActions) {
+                if let Some(ref_action) = relation_info.on_delete {
+                    if rf.default_on_delete_action() != ref_action {
+                        let expression = ast::Expression::ConstantValue(ref_action.to_string(), ast::Span::empty());
+                        args.push(ast::Argument::new("onDelete", expression));
+                    }
+                }
+
+                if let Some(ref_action) = relation_info.on_update {
+                    if rf.default_on_update_action() != ref_action {
+                        let expression = ast::Expression::ConstantValue(ref_action.to_string(), ast::Span::empty());
+                        args.push(ast::Argument::new("onUpdate", expression));
+                    }
+                }
             }
 
             if !args.is_empty() {

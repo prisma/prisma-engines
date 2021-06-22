@@ -581,6 +581,7 @@ impl<'a> ForeignKeyAssertion<'a> {
         Self { fk, tags }
     }
 
+    #[track_caller]
     pub fn assert_references(self, table: &str, columns: &[&str]) -> Self {
         assert!(
             self.is_same_table_name(&self.fk.referenced_table, table) && self.fk.referenced_columns == columns,
@@ -594,10 +595,25 @@ impl<'a> ForeignKeyAssertion<'a> {
         self
     }
 
-    pub fn assert_cascades_on_delete(self) -> Self {
+    #[track_caller]
+    pub fn assert_referential_action_on_delete(self, action: ForeignKeyAction) -> Self {
         assert!(
-            self.fk.on_delete_action == ForeignKeyAction::Cascade,
-            "Assertion failed: expected foreign key to cascade on delete."
+            self.fk.on_delete_action == action,
+            "Assertion failed: expected foreign key to {:?} on delete, but got {:?}.",
+            action,
+            self.fk.on_delete_action
+        );
+
+        self
+    }
+
+    #[track_caller]
+    pub fn assert_referential_action_on_update(self, action: ForeignKeyAction) -> Self {
+        assert!(
+            self.fk.on_update_action == action,
+            "Assertion failed: expected foreign key to {:?} on update, but got {:?}.",
+            action,
+            self.fk.on_update_action
         );
 
         self

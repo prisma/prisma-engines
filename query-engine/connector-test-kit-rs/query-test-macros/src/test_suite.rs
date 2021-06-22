@@ -1,3 +1,5 @@
+use std::collections::hash_map::Entry;
+
 use crate::{attr_map::NestedAttrMap, ConnectorTestArgs};
 use darling::{FromMeta, ToTokens};
 use proc_macro::TokenStream;
@@ -54,7 +56,10 @@ pub fn test_suite_impl(attr: TokenStream, input: TokenStream) -> TokenStream {
 
     let suite_meta: Meta = parse_quote! { suite = #module_name };
     let suite_nested_meta = NestedMeta::from(suite_meta);
-    module_attrs.insert("suite".to_owned(), suite_nested_meta);
+
+    if let Entry::Vacant(entry) = module_attrs.entry("suite".to_owned()) {
+        entry.insert(suite_nested_meta);
+    };
 
     if let Some((_, ref mut items)) = test_module.content {
         add_module_imports(items);

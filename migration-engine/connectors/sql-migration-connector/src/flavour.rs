@@ -7,6 +7,7 @@ mod mysql;
 mod postgres;
 mod sqlite;
 
+use enumflags2::BitFlags;
 pub(crate) use mssql::MssqlFlavour;
 pub(crate) use mysql::MysqlFlavour;
 pub(crate) use postgres::PostgresFlavour;
@@ -17,7 +18,7 @@ use crate::{
     sql_renderer::SqlRenderer, sql_schema_calculator::SqlSchemaCalculatorFlavour,
     sql_schema_differ::SqlSchemaDifferFlavour, SqlMigrationConnector,
 };
-use datamodel::Datamodel;
+use datamodel::{common::preview_features::PreviewFeature, Datamodel};
 use migration_connector::{migrations_directory::MigrationDirectory, ConnectorError, ConnectorResult};
 use quaint::prelude::{ConnectionInfo, Table};
 use sql_schema_describer::SqlSchema;
@@ -28,15 +29,19 @@ use std::fmt::Debug;
 /// reference: https://dev.mysql.com/doc/refman/5.7/en/identifier-length.html
 pub(crate) const MYSQL_IDENTIFIER_SIZE_LIMIT: usize = 64;
 
-pub(crate) fn from_connection_info(connection_info: &ConnectionInfo) -> Box<dyn SqlFlavour + Send + Sync + 'static> {
+pub(crate) fn from_connection_info(
+    connection_info: &ConnectionInfo,
+    preview_features: BitFlags<PreviewFeature>,
+) -> Box<dyn SqlFlavour + Send + Sync + 'static> {
     match connection_info {
-        ConnectionInfo::Mysql(url) => Box::new(MysqlFlavour::new(url.clone())),
-        ConnectionInfo::Postgres(url) => Box::new(PostgresFlavour::new(url.clone())),
+        ConnectionInfo::Mysql(url) => Box::new(MysqlFlavour::new(url.clone(), preview_features)),
+        ConnectionInfo::Postgres(url) => Box::new(PostgresFlavour::new(url.clone(), preview_features)),
         ConnectionInfo::Sqlite { file_path, db_name } => Box::new(SqliteFlavour {
             file_path: file_path.clone(),
             attached_name: db_name.clone(),
+            preview_features,
         }),
-        ConnectionInfo::Mssql(url) => Box::new(MssqlFlavour::new(url.clone())),
+        ConnectionInfo::Mssql(url) => Box::new(MssqlFlavour::new(url.clone(), preview_features)),
         ConnectionInfo::InMemorySqlite { .. } => unreachable!("SqlFlavour for in-memory SQLite"),
     }
 }
@@ -91,6 +96,9 @@ pub(crate) trait SqlFlavour:
         connection: &Connection,
         connector: &SqlMigrationConnector,
     ) -> ConnectorResult<SqlSchema>;
+
+    /// The preview features in use.
+    fn preview_features(&self) -> BitFlags<PreviewFeature>;
 
     /// Table to store applied migrations, the name part.
     fn migrations_table_name(&self) -> &'static str {

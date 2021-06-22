@@ -18,7 +18,8 @@ mod sql_schema_differ;
 use std::env;
 
 use connection_wrapper::Connection;
-use datamodel::{walkers::walk_models, Configuration, Datamodel};
+use datamodel::{common::preview_features::PreviewFeature, walkers::walk_models, Configuration, Datamodel};
+use enumflags2::BitFlags;
 use error::quaint_error_to_connector_error;
 use flavour::SqlFlavour;
 use migration_connector::{migrations_directory::MigrationDirectory, *};
@@ -39,10 +40,11 @@ impl SqlMigrationConnector {
     /// Construct and initialize the SQL migration connector.
     pub async fn new(
         connection_string: &str,
+        preview_features: BitFlags<PreviewFeature>,
         shadow_database_connection_string: Option<String>,
     ) -> ConnectorResult<Self> {
         let connection = connect(connection_string).await?;
-        let flavour = flavour::from_connection_info(connection.connection_info());
+        let flavour = flavour::from_connection_info(connection.connection_info(), preview_features);
 
         flavour.ensure_connection_validity(&connection).await?;
 
@@ -56,14 +58,14 @@ impl SqlMigrationConnector {
     /// Create the database corresponding to the connection string, without initializing the connector.
     pub async fn create_database(database_str: &str) -> ConnectorResult<String> {
         let connection_info = ConnectionInfo::from_url(database_str).map_err(ConnectorError::url_parse_error)?;
-        let flavour = flavour::from_connection_info(&connection_info);
+        let flavour = flavour::from_connection_info(&connection_info, BitFlags::empty());
         flavour.create_database(database_str).await
     }
 
     /// Drop the database corresponding to the connection string, without initializing the connector.
     pub async fn drop_database(database_str: &str) -> ConnectorResult<()> {
         let connection_info = ConnectionInfo::from_url(database_str).map_err(ConnectorError::url_parse_error)?;
-        let flavour = flavour::from_connection_info(&connection_info);
+        let flavour = flavour::from_connection_info(&connection_info, BitFlags::empty());
 
         flavour.drop_database(database_str).await
     }
@@ -72,7 +74,7 @@ impl SqlMigrationConnector {
     pub async fn qe_setup(database_str: &str) -> ConnectorResult<()> {
         let connection_info = ConnectionInfo::from_url(database_str).map_err(ConnectorError::url_parse_error)?;
 
-        let flavour = flavour::from_connection_info(&connection_info);
+        let flavour = flavour::from_connection_info(&connection_info, BitFlags::empty());
 
         flavour.qe_setup(database_str).await
     }
@@ -109,7 +111,6 @@ impl SqlMigrationConnector {
 
         let source_schema = self.flavour.describe_schema(connection).await?;
         let target_schema = SqlSchema::empty();
-
         let mut steps = Vec::new();
 
         // We drop views here, not in the normal migration process to not
@@ -163,7 +164,8 @@ impl SqlMigrationConnector {
     ) -> SqlMigration {
         let connection_info =
             ConnectionInfo::from_url(&from.0.datasources[0].load_url(|key| env::var(key).ok()).unwrap()).unwrap();
-        let flavour = flavour::from_connection_info(&connection_info);
+
+        let flavour = flavour::from_connection_info(&connection_info, BitFlags::empty());
         let from_sql = sql_schema_calculator::calculate_sql_schema(from, flavour.as_ref());
         let to_sql = sql_schema_calculator::calculate_sql_schema(to, flavour.as_ref());
 

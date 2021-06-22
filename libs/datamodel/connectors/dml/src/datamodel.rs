@@ -1,4 +1,4 @@
-use crate::field::{Field, FieldType, RelationField, ScalarField};
+use crate::field::{Field, RelationField, ScalarField};
 use crate::model::Model;
 use crate::r#enum::Enum;
 use crate::relation_info::RelationInfo;
@@ -117,7 +117,7 @@ impl Datamodel {
         let mut fields = vec![];
         for model in self.models() {
             for field in model.scalar_fields() {
-                if FieldType::Enum(enum_name.to_owned()) == field.field_type {
+                if field.field_type.is_enum(enum_name) {
                     fields.push((model.name.clone(), field.name.clone()))
                 }
             }

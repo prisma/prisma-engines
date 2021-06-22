@@ -6,8 +6,9 @@ use datamodel_connector::{
 };
 use dml::{
     default_value::DefaultValue, field::FieldType, native_type_constructor::NativeTypeConstructor,
-    native_type_instance::NativeTypeInstance, traits::WithDatabaseName,
+    native_type_instance::NativeTypeInstance, relation_info::ReferentialAction, traits::WithDatabaseName,
 };
+use enumflags2::BitFlags;
 use mongodb_types::*;
 use native_types::MongoDbType;
 use std::result::Result as StdResult;
@@ -17,10 +18,13 @@ type Result<T> = std::result::Result<T, ConnectorError>;
 pub struct MongoDbDatamodelConnector {
     capabilities: Vec<ConnectorCapability>,
     native_types: Vec<NativeTypeConstructor>,
+    referential_actions: BitFlags<ReferentialAction>,
 }
 
 impl MongoDbDatamodelConnector {
     pub fn new() -> Self {
+        use ReferentialAction::*;
+
         let capabilities = vec![
             ConnectorCapability::RelationsOverNonUniqueCriteria,
             ConnectorCapability::Json,
@@ -34,10 +38,12 @@ impl MongoDbDatamodelConnector {
         ];
 
         let native_types = mongodb_types::available_types();
+        let referential_actions = Restrict | SetNull | NoAction | Cascade;
 
         Self {
             capabilities,
             native_types,
+            referential_actions,
         }
     }
 }
@@ -55,6 +61,14 @@ impl Connector for MongoDbDatamodelConnector {
 
     fn capabilities(&self) -> &[ConnectorCapability] {
         &self.capabilities
+    }
+
+    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
+        self.referential_actions
+    }
+
+    fn emulates_referential_actions(&self) -> bool {
+        true
     }
 
     fn validate_field(&self, field: &dml::field::Field) -> Result<()> {

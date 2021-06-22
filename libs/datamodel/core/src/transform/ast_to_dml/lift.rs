@@ -1,12 +1,16 @@
-use super::super::attributes::AllAttributes;
-use super::db::ParserDatabase;
-use crate::transform::helpers::ValueValidator;
-use crate::{ast, configuration, dml, Field, FieldType};
+use std::collections::HashSet;
+
+use super::{super::attributes::AllAttributes, db::ParserDatabase};
 use crate::{
-    ast::Identifier,
+    ast::{self, Identifier},
+    common::preview_features::PreviewFeature,
+    configuration,
     diagnostics::{DatamodelError, Diagnostics},
+    dml::{self, ScalarType},
+    transform::helpers::ValueValidator,
+    Datasource, Field, FieldType,
 };
-use crate::{dml::ScalarType, Datasource};
+use ::dml::relation_info::ReferentialAction;
 use datamodel_connector::connector_error::{ConnectorError, ErrorKind};
 use itertools::Itertools;
 use once_cell::sync::Lazy;
@@ -28,9 +32,13 @@ impl<'a> LiftAstToDml<'a> {
     /// the attributes defined by the given sources registered.
     ///
     /// The attributes defined by the given sources will be namespaced.
-    pub(crate) fn new(source: Option<&'a configuration::Datasource>, db: &'a ParserDatabase<'a>) -> LiftAstToDml<'a> {
+    pub(crate) fn new(
+        source: Option<&'a configuration::Datasource>,
+        preview_features: &HashSet<PreviewFeature>,
+        db: &'a ParserDatabase<'a>,
+    ) -> LiftAstToDml<'a> {
         LiftAstToDml {
-            attributes: AllAttributes::new(),
+            attributes: AllAttributes::new(preview_features),
             source,
             db,
         }
@@ -158,7 +166,19 @@ impl<'a> LiftAstToDml<'a> {
         let mut field = match field_type {
             FieldType::Relation(info) => {
                 let arity = self.lift_field_arity(&ast_field.arity);
-                let mut field = dml::RelationField::new(&ast_field.name.name, arity, info);
+
+                let mut field = dml::RelationField::new(&ast_field.name.name, arity, arity, info);
+
+                if let Some(ref source) = self.source {
+                    field.supports_restrict_action(
+                        source
+                            .active_connector
+                            .supports_referential_action(ReferentialAction::Restrict),
+                    );
+
+                    field.emulates_referential_actions(source.active_connector.emulates_referential_actions());
+                }
+
                 field.documentation = ast_field.documentation.clone().map(|comment| comment.text);
                 Field::RelationField(field)
             }

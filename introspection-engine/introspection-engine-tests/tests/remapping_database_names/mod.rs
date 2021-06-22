@@ -127,24 +127,24 @@ async fn remapping_models_in_relations(api: &TestApi) -> TestResult {
         })
         .await?;
 
-    let dm = {
+    let dm = formatdoc!(
         r#"
-        model Post {
+        model Post {{
             id              Int             @id @default(autoincrement())
             user_id         Int             @unique
             User_with_Space User_with_Space @relation(fields: [user_id], references: [id])
-        }
+        }}
 
-        model User_with_Space {
+        model User_with_Space {{
             id   Int    @id @default(autoincrement())
             Post Post?
 
             @@map("User with Space")
-        }
-    "#
-    };
+        }}
+    "#,
+    );
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -167,22 +167,24 @@ async fn remapping_models_in_relations_should_not_map_virtual_fields(api: &TestA
         })
         .await?;
 
-    let dm = indoc! {r#"
-        model Post_With_Space {
+    let dm = formatdoc!(
+        r#"
+        model Post_With_Space {{
             id      Int  @id @default(autoincrement())
             user_id Int  @unique
             User    User @relation(fields: [user_id], references: [id])
 
             @@map("Post With Space")
-        }
+        }}
 
-        model User {
+        model User {{
             id              Int              @id @default(autoincrement())
             Post_With_Space Post_With_Space?
-        }
-    "#};
+        }}
+    "#,
+    );
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -233,7 +235,7 @@ async fn remapping_models_in_compound_relations(api: &TestApi) -> TestResult {
             user_age        Int
             User_with_Space User_with_Space @relation(fields: [user_id, user_age], references: [id, age])
 
-            @@unique([user_id, user_age], name: "{}")
+            @@unique([user_id, user_age], name: "{post_constraint}")
         }}
 
         model User_with_Space {{
@@ -242,10 +244,11 @@ async fn remapping_models_in_compound_relations(api: &TestApi) -> TestResult {
             Post Post?
 
             @@map("User with Space")
-            @@unique([id, age], name: "{}")
+            @@unique([id, age], name: "{user_constraint}")
         }}
     "#,
-        post_constraint, user_constraint
+        post_constraint = post_constraint,
+        user_constraint = user_constraint,
     );
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);
@@ -302,7 +305,7 @@ async fn remapping_fields_in_compound_relations(api: &TestApi) -> TestResult {
             user_age Int
             User     User @relation(fields: [user_id, user_age], references: [id, age_that_is_invalid])
 
-            @@unique([user_id, user_age], name: "{}")
+            @@unique([user_id, user_age], name: "{user_post_constraint}")
         }}
 
         model User {{
@@ -310,10 +313,11 @@ async fn remapping_fields_in_compound_relations(api: &TestApi) -> TestResult {
             age_that_is_invalid Int   @map("age-that-is-invalid")
             Post                Post?
 
-            @@unique([id, age_that_is_invalid], name: "{}")
+            @@unique([id, age_that_is_invalid], name: "{user_constraint}")
         }}
     "#,
-        user_post_constraint, user_constraint
+        user_post_constraint = user_post_constraint,
+        user_constraint = user_constraint,
     );
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);

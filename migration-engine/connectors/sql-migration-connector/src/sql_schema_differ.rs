@@ -6,6 +6,7 @@ mod sql_schema_differ_flavour;
 mod table;
 
 pub(crate) use column::{ColumnChange, ColumnChanges};
+use datamodel::common::preview_features::PreviewFeature;
 pub(crate) use sql_schema_differ_flavour::SqlSchemaDifferFlavour;
 
 use self::differ_database::DifferDatabase;
@@ -542,11 +543,20 @@ fn foreign_keys_match(fks: Pair<&ForeignKeyWalker<'_>>, flavour: &dyn SqlFlavour
         .interleave(|fk| fk.referenced_column_names())
         .all(|pair| pair.previous() == pair.next());
 
-    references_same_table
+    let matches = references_same_table
         && references_same_column_count
         && constrains_same_column_count
         && constrains_same_columns
-        && references_same_columns
+        && references_same_columns;
+
+    if flavour.preview_features().contains(PreviewFeature::ReferentialActions) {
+        let same_on_delete_action = fks.previous().on_delete_action() == fks.next().on_delete_action();
+        let same_on_update_action = fks.previous().on_update_action() == fks.next().on_update_action();
+
+        matches && same_on_delete_action && same_on_update_action
+    } else {
+        matches
+    }
 }
 
 fn enums_match(previous: &EnumWalker<'_>, next: &EnumWalker<'_>) -> bool {

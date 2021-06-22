@@ -750,7 +750,7 @@ fn filter_to_types(api: &TestApi, to_types: &'static [&'static str]) -> Cow<'sta
 
 #[test_connector(tags(Mysql))]
 fn safe_casts_with_existing_data_should_work(api: TestApi) {
-    let connector = sql_datamodel_connector::MySqlDatamodelConnector::new();
+    let connector = sql_datamodel_connector::MySqlDatamodelConnector::new(false);
     let mut dm1 = String::with_capacity(256);
     let mut dm2 = String::with_capacity(256);
     let colnames = colnames_for_cases(SAFE_CASTS);
@@ -796,7 +796,7 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
 
 #[test_connector(tags(Mysql))]
 fn risky_casts_with_existing_data_should_warn(api: TestApi) {
-    let connector = sql_datamodel_connector::MySqlDatamodelConnector::new();
+    let connector = sql_datamodel_connector::MySqlDatamodelConnector::new(false);
     let mut dm1 = String::with_capacity(256);
     let mut dm2 = String::with_capacity(256);
     let colnames = colnames_for_cases(RISKY_CASTS);
@@ -859,7 +859,7 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
 
 #[test_connector(tags(Mysql))]
 fn impossible_casts_with_existing_data_should_warn(api: TestApi) {
-    let connector = sql_datamodel_connector::MySqlDatamodelConnector::new();
+    let connector = sql_datamodel_connector::MySqlDatamodelConnector::new(false);
     let mut dm1 = String::with_capacity(256);
     let mut dm2 = String::with_capacity(256);
     let colnames = colnames_for_cases(IMPOSSIBLE_CASTS);

@@ -2,13 +2,13 @@ use crate::Dedup;
 use crate::SqlError;
 use datamodel::{
     common::RelationNames, Datamodel, DefaultValue as DMLDef, FieldArity, FieldType, IndexDefinition, Model,
-    OnDeleteStrategy, RelationField, RelationInfo, ScalarField, ScalarType, ValueGenerator as VG,
+    ReferentialAction, RelationField, RelationInfo, ScalarField, ScalarType, ValueGenerator as VG,
 };
 use datamodel_connector::Connector;
 use quaint::connector::SqlFamily;
 use sql_datamodel_connector::SqlDatamodelConnectors;
-use sql_schema_describer::DefaultKind;
 use sql_schema_describer::{Column, ColumnArity, ColumnTypeFamily, ForeignKey, Index, IndexType, SqlSchema, Table};
+use sql_schema_describer::{DefaultKind, ForeignKeyAction};
 use tracing::debug;
 
 //checks
@@ -107,7 +107,9 @@ pub fn calculate_many_to_many_field(
         fields: vec![],
         to: opposite_foreign_key.referenced_table.clone(),
         references: opposite_foreign_key.referenced_columns.clone(),
-        on_delete: OnDeleteStrategy::None,
+        on_delete: None,
+        on_update: None,
+        legacy_referential_actions: false,
     };
 
     let basename = opposite_foreign_key.referenced_table.clone();
@@ -117,7 +119,7 @@ pub fn calculate_many_to_many_field(
         false => basename,
     };
 
-    RelationField::new(&name, FieldArity::List, relation_info)
+    RelationField::new(&name, FieldArity::List, FieldArity::List, relation_info)
 }
 
 pub(crate) fn calculate_index(index: &Index) -> IndexDefinition {
@@ -174,12 +176,22 @@ pub(crate) fn calculate_relation_field(
 ) -> Result<RelationField, SqlError> {
     debug!("Handling foreign key  {:?}", foreign_key);
 
+    let map_action = |action: ForeignKeyAction| match action {
+        ForeignKeyAction::NoAction => ReferentialAction::NoAction,
+        ForeignKeyAction::Restrict => ReferentialAction::Restrict,
+        ForeignKeyAction::Cascade => ReferentialAction::Cascade,
+        ForeignKeyAction::SetNull => ReferentialAction::SetNull,
+        ForeignKeyAction::SetDefault => ReferentialAction::SetDefault,
+    };
+
     let relation_info = RelationInfo {
         name: calculate_relation_name(schema, foreign_key, table)?,
         fields: foreign_key.columns.clone(),
         to: foreign_key.referenced_table.clone(),
         references: foreign_key.referenced_columns.clone(),
-        on_delete: OnDeleteStrategy::None,
+        on_delete: Some(map_action(foreign_key.on_delete_action)),
+        on_update: Some(map_action(foreign_key.on_update_action)),
+        legacy_referential_actions: false,
     };
 
     let columns: Vec<&Column> = foreign_key
@@ -193,7 +205,17 @@ pub(crate) fn calculate_relation_field(
         false => FieldArity::Required,
     };
 
-    Ok(RelationField::new(&foreign_key.referenced_table, arity, relation_info))
+    let calculated_arity = match columns.iter().any(|c| c.is_required()) {
+        true => FieldArity::Required,
+        false => arity,
+    };
+
+    Ok(RelationField::new(
+        &foreign_key.referenced_table,
+        arity,
+        calculated_arity,
+        relation_info,
+    ))
 }
 
 pub(crate) fn calculate_backrelation_field(
@@ -213,7 +235,9 @@ pub(crate) fn calculate_backrelation_field(
                 to: model.name.clone(),
                 fields: vec![],
                 references: vec![],
-                on_delete: OnDeleteStrategy::None,
+                on_delete: None,
+                on_update: None,
+                legacy_referential_actions: false,
             };
 
             // unique or id
@@ -236,7 +260,7 @@ pub(crate) fn calculate_backrelation_field(
                 model.name.clone()
             };
 
-            Ok(RelationField::new(&name, arity, new_relation_info))
+            Ok(RelationField::new(&name, arity, arity, new_relation_info))
         }
     }
 }
@@ -339,7 +363,7 @@ pub(crate) fn calculate_scalar_field_type_with_native_types(column: &Column, fam
 
     //fixme move this out of function
     let connector: Box<dyn Connector> = match family {
-        SqlFamily::Mysql => Box::new(SqlDatamodelConnectors::mysql()),
+        SqlFamily::Mysql => Box::new(SqlDatamodelConnectors::mysql(false)),
         SqlFamily::Postgres => Box::new(SqlDatamodelConnectors::postgres()),
         SqlFamily::Sqlite => Box::new(SqlDatamodelConnectors::sqlite()),
         SqlFamily::Mssql => Box::new(SqlDatamodelConnectors::mssql()),

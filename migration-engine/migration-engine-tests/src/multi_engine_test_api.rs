@@ -3,6 +3,7 @@
 //! A TestApi that is initialized without IO or async code and can instantiate
 //! multiple migration engines.
 
+use datamodel::common::preview_features::PreviewFeature;
 pub use test_macros::test_connector;
 pub use test_setup::{BitFlags, Capabilities, Tags};
 
@@ -23,6 +24,7 @@ pub struct TestApi {
     connection_string: String,
     pub(crate) admin_conn: Quaint,
     pub(crate) rt: tokio::runtime::Runtime,
+    preview_features: BitFlags<PreviewFeature>,
 }
 
 impl TestApi {
@@ -31,6 +33,12 @@ impl TestApi {
         let rt = test_setup::runtime::test_tokio_runtime();
         let tags = args.tags();
 
+        let preview_features = args
+            .preview_features()
+            .iter()
+            .flat_map(|f| PreviewFeature::parse_opt(f))
+            .collect();
+
         let (admin_conn, connection_string) = if tags.contains(Tags::Postgres) {
             let (_, q, cs) = rt.block_on(args.create_postgres_database());
             (q, cs)
@@ -38,6 +46,7 @@ impl TestApi {
             let conn = rt
                 .block_on(SqlMigrationConnector::new(
                     args.database_url(),
+                    preview_features,
                     args.shadow_database_url().map(String::from),
                 ))
                 .unwrap();
@@ -69,6 +78,7 @@ impl TestApi {
             connection_string,
             admin_conn,
             rt,
+            preview_features,
         }
     }
 
@@ -164,6 +174,7 @@ impl TestApi {
             .rt
             .block_on(SqlMigrationConnector::new(
                 &connection_string,
+                self.preview_features,
                 shadow_db_connection_string,
             ))
             .unwrap();

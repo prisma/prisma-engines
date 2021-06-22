@@ -1,3 +1,6 @@
+use dml::relation_info::ReferentialAction;
+use enumflags2::BitFlags;
+
 use crate::{connector_error::ConnectorError, Connector, ConnectorCapability};
 
 /// A [Connector](/trait.Connector.html) implementor meant to
@@ -7,6 +10,10 @@ pub struct EmptyDatamodelConnector;
 impl Connector for EmptyDatamodelConnector {
     fn name(&self) -> &str {
         std::any::type_name::<EmptyDatamodelConnector>()
+    }
+
+    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
+        BitFlags::empty()
     }
 
     fn capabilities(&self) -> &[ConnectorCapability] {

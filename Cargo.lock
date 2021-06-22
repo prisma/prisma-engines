@@ -435,7 +435,7 @@ dependencies = [
 [[package]]
 name = "barrel"
 version = "0.6.6-alpha.0"
-source = "git+https://github.com/prisma/barrel.git?branch=mssql-support#5d6a731665acdab0d459be23843c2c54112ff099"
+source = "git+https://github.com/prisma/barrel.git?branch=mssql-support#4e84cf3d5013b4c92eb81d7ba90cd1c1c01c6805"
 
 [[package]]
 name = "base-x"
@@ -963,6 +963,7 @@ dependencies = [
  "colored",
  "datamodel-connector",
  "dml",
+ "enumflags2",
  "expect-test",
  "indoc",
  "itertools 0.10.0",
@@ -985,6 +986,7 @@ name = "datamodel-connector"
 version = "0.1.0"
 dependencies = [
  "dml",
+ "enumflags2",
  "itertools 0.10.0",
  "serde_json",
  "thiserror",
@@ -1056,6 +1058,7 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "cuid",
+ "enumflags2",
  "native-types",
  "prisma-value",
  "serde",
@@ -2428,6 +2431,7 @@ version = "0.1.0"
 dependencies = [
  "datamodel-connector",
  "dml",
+ "enumflags2",
  "lazy_static",
  "native-types",
  "once_cell",
@@ -4050,7 +4054,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e0bccbcf40c8938196944a3da0e133e031a33f4d6b72db3bda3cc556e361905d"
 dependencies = [
  "lazy_static",
- "parking_lot 0.10.2",
+ "parking_lot 0.11.1",
  "serial_test_derive",
 ]
 
@@ -4212,6 +4216,7 @@ version = "0.1.0"
 dependencies = [
  "datamodel-connector",
  "dml",
+ "enumflags2",
  "native-types",
  "once_cell",
  "regex",

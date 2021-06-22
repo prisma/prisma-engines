@@ -523,7 +523,7 @@ impl QueryGraph {
             trace!("[Graph][Swap] Before shape: {}", self);
         }
 
-        let mut marked = std::mem::replace(&mut self.marked_node_pairs, vec![]);
+        let mut marked = std::mem::take(&mut self.marked_node_pairs);
         marked.reverse(); // Todo: Marked operation order is currently breaking if done bottom-up. Investigate how to fix it.
 
         for (parent_node, child_node) in marked {

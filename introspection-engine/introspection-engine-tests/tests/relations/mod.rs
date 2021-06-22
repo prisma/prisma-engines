@@ -24,20 +24,20 @@ async fn one_to_one_req_relation(api: &TestApi) -> TestResult {
         )
         .await?;
 
-    let dm = indoc! {r##"
-        model Post {
+    let dm = formatdoc! {r##"
+        model Post {{
             id       Int @id @default(autoincrement())
             user_id  Int  @unique
             User     User @relation(fields: [user_id], references: [id])
-        }
+        }}
 
-        model User {
+        model User {{
             id      Int @id @default(autoincrement())
             Post Post?
-        }
+        }}
     "##};
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -60,19 +60,19 @@ async fn one_to_one_relation_on_a_singular_primary_key(api: &TestApi) -> TestRes
         )
         .await?;
 
-    let dm = indoc! {r##"
-        model Post {
+    let dm = formatdoc! {r##"
+        model Post {{
             id   Int  @unique
             User User @relation(fields: [id], references: [id])
-        }
+        }}
 
-        model User {
+        model User {{
             id   Int   @id @default(autoincrement())
             Post Post?
-        }
+        }}
     "##};
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -115,23 +115,23 @@ async fn two_one_to_one_relations_between_the_same_models(api: &TestApi) -> Test
         )
         .await?;
 
-    let dm = indoc! {r##"
-        model Post {
+    let dm = formatdoc! {r##"
+        model Post {{
             id                      Int   @id @default(autoincrement())
             user_id                 Int   @unique
             User_Post_user_idToUser User  @relation("Post_user_idToUser", fields: [user_id], references: [id])
             User_PostToUser_post_id User? @relation("PostToUser_post_id")
-        }
+        }}
 
-        model User {
+        model User {{
             id                      Int   @id @default(autoincrement())
             post_id                 Int   @unique
             Post_PostToUser_post_id Post  @relation("PostToUser_post_id", fields: [post_id], references: [id])
             Post_Post_user_idToUser Post? @relation("Post_user_idToUser")
-        }
+        }}
     "##};
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -155,20 +155,20 @@ async fn a_one_to_one_relation(api: &TestApi) -> TestResult {
         )
         .await?;
 
-    let dm = indoc! {r##"
-        model Post {
+    let dm = formatdoc! {r##"
+        model Post {{
             id      Int  @id @default(autoincrement())
             user_id Int?  @unique
             User    User? @relation(fields: [user_id], references: [id])
-        }
+        }}
 
-        model User {
+        model User {{
             id   Int   @id @default(autoincrement())
             Post Post?
-        }
+        }}
     "##};
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -202,16 +202,16 @@ async fn a_one_to_one_relation_referencing_non_id(api: &TestApi) -> TestResult {
     let dm = formatdoc! {r##"
         model Post {{
             id         Int     @id @default(autoincrement())
-            user_email String? @unique {}
+            user_email String? @unique {native_type}
             User       User?   @relation(fields: [user_email], references: [email])
         }}
 
         model User {{
             id    Int     @id @default(autoincrement())
-            email String? @unique {}
+            email String? @unique {native_type}
             Post  Post?
         }}
-    "##, native_type, native_type};
+    "##, native_type = native_type};
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
@@ -239,37 +239,37 @@ async fn a_one_to_many_relation(api: &TestApi) -> TestResult {
 
     let dm = match api.sql_family() {
         SqlFamily::Mysql => {
-            indoc! {r##"
-                model Post {
+            formatdoc! {r##"
+                model Post {{
                     id      Int   @id @default(autoincrement())
                     user_id Int?
                     User    User? @relation(fields: [user_id], references: [id])
                     @@index([user_id], name: "user_id")
-                }
+                }}
 
-                model User {
+                model User {{
                     id   Int    @id @default(autoincrement())
                     Post Post[]
-                }
+                }}
             "##}
         }
         _ => {
-            indoc! {r##"
-                model Post {
+            formatdoc! {r##"
+                model Post {{
                     id      Int   @id @default(autoincrement())
                     user_id Int?
                     User    User? @relation(fields: [user_id], references: [id])
-                }
+                }}
 
-                model User {
+                model User {{
                     id   Int    @id @default(autoincrement())
                     Post Post[]
-                }
+                }}
             "##}
         }
     };
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -295,37 +295,37 @@ async fn a_one_req_to_many_relation(api: &TestApi) -> TestResult {
 
     let dm = match api.sql_family() {
         SqlFamily::Mysql => {
-            indoc! {r##"
-                model Post {
+            formatdoc! {r##"
+                model Post {{
                     id      Int   @id @default(autoincrement())
                     user_id Int
                     User    User @relation(fields: [user_id], references: [id])
                     @@index([user_id], name: "user_id")
-                }
+                }}
 
-                model User {
+                model User {{
                     id   Int    @id @default(autoincrement())
                     Post Post[]
-                }
+                }}
             "##}
         }
         _ => {
-            indoc! {r##"
-                model Post {
+            formatdoc! {r##"
+                model Post {{
                     id      Int   @id @default(autoincrement())
                     user_id Int
                     User    User @relation(fields: [user_id], references: [id])
-                }
+                }}
 
-                model User {
+                model User {{
                     id   Int    @id @default(autoincrement())
                     Post Post[]
-                }
+                }}
             "##}
         }
     };
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -403,13 +403,13 @@ async fn a_many_to_many_relation_with_an_id(api: &TestApi) -> TestResult {
 
     let dm = match api.sql_family() {
         SqlFamily::Mysql => {
-            indoc! {r##"
-                model Post {
+            formatdoc! {r##"
+                model Post {{
                     id           Int            @id @default(autoincrement())
                     PostsToUsers PostsToUsers[]
-                }
+                }}
 
-                model PostsToUsers {
+                model PostsToUsers {{
                     id      Int  @id @default(autoincrement())
                     user_id Int
                     post_id Int
@@ -417,38 +417,38 @@ async fn a_many_to_many_relation_with_an_id(api: &TestApi) -> TestResult {
                     User    User @relation(fields: [user_id], references: [id])
                     @@index([post_id], name: "post_id")
                     @@index([user_id], name: "user_id")
-                }
+                }}
 
-                model User {
+                model User {{
                     id           Int            @id @default(autoincrement())
                     PostsToUsers PostsToUsers[]
-                }
+                }}
             "##}
         }
         _ => {
-            indoc! {r##"
-                model Post {
+            formatdoc! {r##"
+                model Post {{
                     id           Int            @id @default(autoincrement())
                     PostsToUsers PostsToUsers[]
-                }
+                }}
 
-                model PostsToUsers {
+                model PostsToUsers {{
                     id      Int  @id @default(autoincrement())
                     user_id Int
                     post_id Int
                     Post    Post @relation(fields: [post_id], references: [id])
                     User    User @relation(fields: [user_id], references: [id])
-                }
+                }}
 
-                model User {
+                model User {{
                     id           Int            @id @default(autoincrement())
                     PostsToUsers PostsToUsers[]
-                }
+                }}
             "##}
         }
     };
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -473,8 +473,8 @@ async fn a_self_relation(api: &TestApi) -> TestResult {
 
     let dm = match api.sql_family() {
         SqlFamily::Mysql => {
-            indoc! {r##"
-                model User {
+            formatdoc! {r##"
+                model User {{
                     id                                  Int    @id @default(autoincrement())
                     recruited_by                        Int?
                     direct_report                       Int?
@@ -484,12 +484,12 @@ async fn a_self_relation(api: &TestApi) -> TestResult {
                     other_User_UserToUser_recruited_by  User[] @relation("UserToUser_recruited_by")
                     @@index([direct_report], name: "direct_report")
                     @@index([recruited_by], name: "recruited_by")
-                }
+                }}
             "##}
         }
         _ => {
-            indoc! {r##"
-                model User {
+            formatdoc! {r##"
+                model User {{
                     id                                  Int    @id @default(autoincrement())
                     recruited_by                        Int?
                     direct_report                       Int?
@@ -497,12 +497,12 @@ async fn a_self_relation(api: &TestApi) -> TestResult {
                     User_UserToUser_recruited_by        User?  @relation("UserToUser_recruited_by", fields: [recruited_by], references: [id])
                     other_User_UserToUser_direct_report User[] @relation("UserToUser_direct_report")
                     other_User_UserToUser_recruited_by  User[] @relation("UserToUser_recruited_by")
-                }
+                }}
             "##}
         }
     };
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -526,19 +526,19 @@ async fn id_fields_with_foreign_key(api: &TestApi) -> TestResult {
         )
         .await?;
 
-    let dm = indoc! {r##"
-        model Post {
+    let dm = formatdoc! {r##"
+        model Post {{
             user_id Int    @id
             User    User   @relation(fields: [user_id], references: [id])
-        }
+        }}
 
-        model User {
+        model User {{
             id   Int    @id @default(autoincrement())
             Post Post?
-        }
+        }}
     "##};
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -569,37 +569,37 @@ async fn duplicate_fks_should_ignore_one_of_them(api: &TestApi) -> TestResult {
 
     let dm = match api.sql_family() {
         SqlFamily::Mysql => {
-            indoc! {r##"
-                model Post {
+            formatdoc! {r##"
+                model Post {{
                     id      Int   @id @default(autoincrement())
                     user_id Int?
                     User    User? @relation(fields: [user_id], references: [id])
                     @@index([user_id], name: "user_id")
-                }
+                }}
 
-                model User {
+                model User {{
                     id   Int    @id @default(autoincrement())
                     Post Post[]
-                }
+                }}
             "##}
         }
         _ => {
-            indoc! {r##"
-                model Post {
+            formatdoc! {r##"
+                model Post {{
                     id      Int   @id @default(autoincrement())
                     user_id Int?
                     User    User? @relation(fields: [user_id], references: [id])
-                }
+                }}
 
-                model User {
+                model User {{
                     id   Int    @id @default(autoincrement())
                     Post Post[]
-                }
+                }}
             "##}
         }
     };
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -619,20 +619,20 @@ async fn default_values_on_relations(api: &TestApi) -> TestResult {
         })
         .await?;
 
-    let dm = indoc! {r##"
-        model Post {
+    let dm = formatdoc! {r##"
+        model Post {{
             id      Int   @id @default(autoincrement())
             user_id Int?  @default(0)
             User    User? @relation(fields: [user_id], references: [id])
-        }
+        }}
 
-        model User {
+        model User {{
             id   Int    @id @default(autoincrement())
             Post Post[]
-        }
+        }}
     "##};
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -705,54 +705,54 @@ async fn relations_should_avoid_name_clashes(api: &TestApi) -> TestResult {
 
     let dm = match api.sql_family() {
         SqlFamily::Sqlite => {
-            indoc! {r##"
-                model x {
+            formatdoc! {r##"
+                model x {{
                     id Int @id @default(autoincrement())
                     y  Int
                     y_xToy  y      @relation(fields: [y], references: [id])
-                }
+                }}
 
-                model y {
+                model y {{
                     id Int @id @default(autoincrement())
                     x  Int
                     x_xToy  x[]
-                }
+                }}
             "##}
         }
         SqlFamily::Mysql => {
-            indoc! {r##"
-                model x {
+            formatdoc! {r##"
+                model x {{
                     id Int @id
                     y  Int
                     y_xToy  y      @relation(fields: [y], references: [id])
                     @@index([y], name: "y")
-                }
+                }}
 
-                model y {
+                model y {{
                     id Int @id
                     x  Int
                     x_xToy  x[]
-                }
+                }}
             "##}
         }
         _ => {
-            indoc! {r##"
-                model x {
+            formatdoc! {r##"
+                model x {{
                     id Int @id
                     y  Int
                     y_xToy  y      @relation(fields: [y], references: [id])
-                }
+                }}
 
-                model y {
+                model y {{
                     id Int @id
                     x  Int
                     x_xToy  x[]
-                }
+                }}
             "##}
         }
     };
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -800,17 +800,17 @@ async fn relations_should_avoid_name_clashes_2(api: &TestApi) -> TestResult {
 
     let dm = match sql_family {
         SqlFamily::Mysql => {
-            indoc! { r##"
-                model x {
+            formatdoc! { r##"
+                model x {{
                     id                   Int @id @default(autoincrement())
                     y                    Int
                     y_x_yToy             y   @relation("x_yToy", fields: [y], references: [id])
                     y_xToy_fk_x_1_fk_x_2 y[] @relation("xToy_fk_x_1_fk_x_2")
                     @@unique([id, y], name: "unique_y_id")
                     @@index([y], name: "y")
-                }
+                }}
 
-                model y {
+                model y {{
                     id                   Int @id @default(autoincrement())
                     x                    Int
                     fk_x_1               Int
@@ -818,32 +818,32 @@ async fn relations_should_avoid_name_clashes_2(api: &TestApi) -> TestResult {
                     x_xToy_fk_x_1_fk_x_2 x   @relation("xToy_fk_x_1_fk_x_2", fields: [fk_x_1, fk_x_2], references: [id, y])
                     x_x_yToy             x[] @relation("x_yToy")
                     @@index([fk_x_1, fk_x_2], name: "fk_x_1")
-                }
+                }}
             "##}
         }
         _ => {
-            indoc! { r##"
-                model x {
+            formatdoc! { r##"
+                model x {{
                     id                   Int @id @default(autoincrement())
                     y                    Int
                     y_x_yToy             y   @relation("x_yToy", fields: [y], references: [id])
                     y_xToy_fk_x_1_fk_x_2 y[] @relation("xToy_fk_x_1_fk_x_2")
                     @@unique([id, y], name: "unique_y_id")
-                }
+                }}
 
-                model y {
+                model y {{
                     id                   Int @id @default(autoincrement())
                     x                    Int
                     fk_x_1               Int
                     fk_x_2               Int
                     x_xToy_fk_x_1_fk_x_2 x   @relation("xToy_fk_x_1_fk_x_2", fields: [fk_x_1, fk_x_2], references: [id, y])
                     x_x_yToy             x[] @relation("x_yToy")
-                }
+                }}
             "##}
         }
     };
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -897,7 +897,7 @@ async fn one_to_many_relation_field_names_do_not_conflict_with_many_to_many_rela
                 host_id                      Int
                 User_EventToUser             User   @relation(fields: [host_id], references: [id])
                 User_EventToUserManyToMany   User[] @relation("EventToUserManyToMany")
-                {}
+                {extra_index}
             }}
 
             model User {{
@@ -906,7 +906,7 @@ async fn one_to_many_relation_field_names_do_not_conflict_with_many_to_many_rela
                 Event_EventToUserManyToMany  Event[] @relation("EventToUserManyToMany")
             }}
         "#,
-        extra_index
+        extra_index = extra_index,
     );
 
     api.assert_eq_datamodels(&expected_dm, &api.introspect().await?);

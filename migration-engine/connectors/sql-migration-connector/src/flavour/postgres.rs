@@ -1,6 +1,8 @@
 use crate::{
     connect, connection_wrapper::Connection, error::quaint_error_to_connector_error, SqlFlavour, SqlMigrationConnector,
 };
+use datamodel::common::preview_features::PreviewFeature;
+use enumflags2::BitFlags;
 use indoc::indoc;
 use migration_connector::{migrations_directory::MigrationDirectory, ConnectorError, ConnectorResult};
 use quaint::{connector::PostgresUrl, error::ErrorKind as QuaintKind};
@@ -17,6 +19,7 @@ const ADVISORY_LOCK_TIMEOUT: std::time::Duration = std::time::Duration::from_sec
 
 pub(crate) struct PostgresFlavour {
     url: PostgresUrl,
+    preview_features: BitFlags<PreviewFeature>,
 }
 
 impl std::fmt::Debug for PostgresFlavour {
@@ -26,8 +29,8 @@ impl std::fmt::Debug for PostgresFlavour {
 }
 
 impl PostgresFlavour {
-    pub fn new(url: PostgresUrl) -> Self {
-        Self { url }
+    pub fn new(url: PostgresUrl, preview_features: BitFlags<PreviewFeature>) -> Self {
+        Self { url, preview_features }
     }
 
     pub(crate) fn schema_name(&self) -> &str {
@@ -276,6 +279,10 @@ impl SqlFlavour for PostgresFlavour {
         Ok(())
     }
 
+    fn preview_features(&self) -> BitFlags<PreviewFeature> {
+        self.preview_features
+    }
+
     #[tracing::instrument(skip(self, migrations, connection, connector))]
     async fn sql_schema_from_migration_history(
         &self,
@@ -381,7 +388,7 @@ mod tests {
     fn debug_impl_does_not_leak_connection_info() {
         let url = "postgresql://myname:mypassword@myserver:8765/mydbname";
 
-        let flavour = PostgresFlavour::new(PostgresUrl::new(url.parse().unwrap()).unwrap());
+        let flavour = PostgresFlavour::new(PostgresUrl::new(url.parse().unwrap()).unwrap(), BitFlags::all());
         let debugged = format!("{:?}", flavour);
 
         let words = &["myname", "mypassword", "myserver", "8765", "mydbname"];

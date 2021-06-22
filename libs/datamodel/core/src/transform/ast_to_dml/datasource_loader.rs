@@ -10,9 +10,10 @@ use crate::{
     ast::SourceConfig,
     diagnostics::{DatamodelError, Diagnostics},
 };
-use crate::{ast::Span, common::preview_features::PreviewFeature, configuration::StringFromEnvVar};
 use crate::{
-    ast::{self},
+    ast::{self, Span},
+    common::{preview_features::PreviewFeature, provider_names::*},
+    configuration::StringFromEnvVar,
     Datasource,
 };
 use std::collections::{HashMap, HashSet};
@@ -22,16 +23,12 @@ const SHADOW_DATABASE_URL_KEY: &str = "shadowDatabaseUrl";
 const URL_KEY: &str = "url";
 
 /// Is responsible for loading and validating Datasources defined in an AST.
-pub struct DatasourceLoader {
-    source_definitions: Vec<Box<dyn DatasourceProvider>>,
-}
+pub struct DatasourceLoader {}
 
 impl DatasourceLoader {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        Self {
-            source_definitions: get_builtin_datasource_providers(),
-        }
+        Self {}
     }
 
     /// Loads all datasources from the provided schema AST.
@@ -40,7 +37,7 @@ impl DatasourceLoader {
     pub fn load_datasources_from_ast(
         &self,
         ast_schema: &ast::SchemaAst,
-        preview_features: &HashSet<&PreviewFeature>,
+        preview_features: &HashSet<PreviewFeature>,
         diagnostics: &mut Diagnostics,
     ) -> Vec<Datasource> {
         let mut sources = Vec::new();
@@ -67,7 +64,7 @@ impl DatasourceLoader {
     fn lift_datasource(
         &self,
         ast_source: &ast::SourceConfig,
-        preview_features: &HashSet<&PreviewFeature>,
+        preview_features: &HashSet<PreviewFeature>,
         diagnostics: &mut Diagnostics,
     ) -> Option<Datasource> {
         let source_name = &ast_source.name.name;
@@ -161,14 +158,22 @@ impl DatasourceLoader {
         preview_features_guardrail(&args, diagnostics);
 
         let documentation = ast_source.documentation.as_ref().map(|comment| comment.text.clone());
+        let planet_scale_mode = get_planet_scale_mode_arg(&args, preview_features, ast_source, diagnostics);
 
-        let datasource_provider = match self.get_datasource_provider(&provider) {
-            Some(provider) => provider,
-            None => {
+        let datasource_provider: Box<dyn DatasourceProvider> = match provider {
+            p if p == MYSQL_SOURCE_NAME => Box::new(MySqlDatasourceProvider::new(planet_scale_mode)),
+            p if p == POSTGRES_SOURCE_NAME || p == POSTGRES_SOURCE_NAME_HEROKU => {
+                Box::new(PostgresDatasourceProvider::new())
+            }
+            p if p == SQLITE_SOURCE_NAME => Box::new(SqliteDatasourceProvider::new()),
+            p if p == MSSQL_SOURCE_NAME => Box::new(MsSqlDatasourceProvider::new()),
+            p if p == MONGODB_SOURCE_NAME => Box::new(MongoDbDatasourceProvider::new()),
+            _ => {
                 diagnostics.push_error(DatamodelError::new_datasource_provider_not_known_error(
                     provider,
                     provider_arg.span(),
                 ));
+
                 return None;
             }
         };
@@ -182,26 +187,9 @@ impl DatasourceLoader {
             documentation,
             active_connector: datasource_provider.connector(),
             shadow_database_url,
-            planet_scale_mode: get_planet_scale_mode_arg(&args, preview_features, ast_source, diagnostics),
+            planet_scale_mode,
         })
     }
-
-    fn get_datasource_provider(&self, provider: &str) -> Option<&dyn DatasourceProvider> {
-        self.source_definitions
-            .iter()
-            .find(|sd| sd.is_provider(provider))
-            .map(|b| b.as_ref())
-    }
-}
-
-fn get_builtin_datasource_providers() -> Vec<Box<dyn DatasourceProvider>> {
-    vec![
-        Box::new(MySqlDatasourceProvider::new()),
-        Box::new(PostgresDatasourceProvider::new()),
-        Box::new(SqliteDatasourceProvider::new()),
-        Box::new(MsSqlDatasourceProvider::new()),
-        Box::new(MongoDbDatasourceProvider::new()),
-    ]
 }
 
 const PLANET_SCALE_PREVIEW_FEATURE_ERR: &str = r#"
@@ -217,7 +205,7 @@ generator client {
 
 fn get_planet_scale_mode_arg(
     args: &HashMap<&str, ValueValidator>,
-    preview_features: &HashSet<&PreviewFeature>,
+    preview_features: &HashSet<PreviewFeature>,
     source: &SourceConfig,
     diagnostics: &mut Diagnostics,
 ) -> bool {

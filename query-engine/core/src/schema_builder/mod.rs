@@ -164,8 +164,9 @@ pub fn build(
         internal_data_model,
         enable_raw_queries,
         capabilities,
-        preview_features,
+        preview_features.clone(),
     );
+
     output_types::output_objects::initialize_model_object_type_cache(&mut ctx);
 
     let (query_type, query_object_ref) = output_types::query_type::build(&mut ctx);
@@ -185,6 +186,8 @@ pub fn build(
         input_objects,
         output_objects,
         ctx.internal_data_model,
+        ctx.capabilities.capabilities,
+        preview_features,
     )
 }
 

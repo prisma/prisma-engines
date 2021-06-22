@@ -2,6 +2,8 @@ use crate::{
     connect, connection_wrapper::Connection, error::quaint_error_to_connector_error, flavour::SqlFlavour,
     SqlMigrationConnector,
 };
+use datamodel::common::preview_features::PreviewFeature;
+use enumflags2::BitFlags;
 use indoc::indoc;
 use migration_connector::{migrations_directory::MigrationDirectory, ConnectorError, ConnectorResult};
 use quaint::prelude::ConnectionInfo;
@@ -12,6 +14,7 @@ use std::path::Path;
 pub(crate) struct SqliteFlavour {
     pub(super) file_path: String,
     pub(super) attached_name: String,
+    pub(super) preview_features: BitFlags<PreviewFeature>,
 }
 
 #[async_trait::async_trait]
@@ -153,5 +156,9 @@ impl SqlFlavour for SqliteFlavour {
         let sql_schema = self.describe_schema(&conn).await?;
 
         Ok(sql_schema)
+    }
+
+    fn preview_features(&self) -> BitFlags<PreviewFeature> {
+        self.preview_features
     }
 }

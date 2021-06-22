@@ -23,6 +23,7 @@ use std::{convert::TryInto, sync::Arc};
 #[tracing::instrument(skip(graph, parent_node, parent_relation_field, value, child_model))]
 pub fn nested_delete(
     graph: &mut QueryGraph,
+    connector_ctx: &ConnectorContext,
     parent_node: &NodeRef,
     parent_relation_field: &RelationFieldRef,
     value: ParsedInputValue,
@@ -50,7 +51,13 @@ pub fn nested_delete(
         let find_child_records_node =
             utils::insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, or_filter)?;
 
-        utils::insert_deletion_checks(graph, child_model, &find_child_records_node, &delete_many_node)?;
+        utils::insert_emulated_on_delete(
+            graph,
+            connector_ctx,
+            child_model,
+            &find_child_records_node,
+            &delete_many_node,
+        )?;
 
         let relation_name = parent_relation_field.relation().name.clone();
         let parent_name = parent_relation_field.model().name.clone();
@@ -91,7 +98,13 @@ pub fn nested_delete(
                 record_filter: None,
             })));
 
-            utils::insert_deletion_checks(graph, child_model, &find_child_records_node, &delete_record_node)?;
+            utils::insert_emulated_on_delete(
+                graph,
+                connector_ctx,
+                child_model,
+                &find_child_records_node,
+                &delete_record_node,
+            )?;
 
             let relation_name = parent_relation_field.relation().name.clone();
             let child_model_name = child_model.name.clone();
@@ -127,6 +140,7 @@ pub fn nested_delete(
 #[tracing::instrument(skip(graph, parent, parent_relation_field, value, child_model))]
 pub fn nested_delete_many(
     graph: &mut QueryGraph,
+    connector_ctx: &ConnectorContext,
     parent: &NodeRef,
     parent_relation_field: &RelationFieldRef,
     value: ParsedInputValue,
@@ -147,7 +161,13 @@ pub fn nested_delete_many(
         });
 
         let delete_many_node = graph.create_node(Query::Write(delete_many));
-        utils::insert_deletion_checks(graph, child_model, &find_child_records_node, &delete_many_node)?;
+        utils::insert_emulated_on_delete(
+            graph,
+            connector_ctx,
+            child_model,
+            &find_child_records_node,
+            &delete_many_node,
+        )?;
 
         graph.create_edge(
             &find_child_records_node,

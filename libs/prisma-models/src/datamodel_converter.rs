@@ -98,6 +98,8 @@ impl<'a> DatamodelConverter<'a> {
                         relation_name: relation.name.clone(),
                         relation_side: relation.relation_side(rf),
                         relation_info: rf.relation_info.clone(),
+                        on_delete_default: rf.default_on_delete_action(),
+                        on_update_default: rf.default_on_update_action(),
                     }))
                 }
                 dml::Field::ScalarField(sf) => {
@@ -132,8 +134,6 @@ impl<'a> DatamodelConverter<'a> {
             .filter(|r| r.model_a.is_relation_supported(&r.field_a) && r.model_b.is_relation_supported(&r.field_b))
             .map(|r| RelationTemplate {
                 name: r.name(),
-                model_a_on_delete: OnDelete::SetNull,
-                model_b_on_delete: OnDelete::SetNull,
                 manifestation: r.manifestation(),
                 model_a_name: r.model_a.name.clone(),
                 model_b_name: r.model_b.name.clone(),

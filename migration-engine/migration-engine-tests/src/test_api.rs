@@ -11,6 +11,7 @@ mod schema_push;
 
 pub use apply_migrations::ApplyMigrations;
 pub use create_migration::CreateMigration;
+use datamodel::common::preview_features::PreviewFeature;
 pub use dev_diagnostic::DevDiagnostic;
 pub use diagnose_migration_history::DiagnoseMigrationHistory;
 pub use evaluate_data_loss::EvaluateDataLoss;
@@ -44,13 +45,21 @@ impl TestApi {
     pub async fn new(args: TestApiArgs) -> Self {
         let tags = args.tags();
 
+        let shadow_database_url = args.shadow_database_url().map(String::from);
+
+        let preview_features = args
+            .preview_features()
+            .iter()
+            .flat_map(|f| PreviewFeature::parse_opt(f))
+            .collect();
+
         let connection_string = if tags.contains(Tags::Mysql | Tags::Vitess) {
             let connector =
-                SqlMigrationConnector::new(args.database_url(), args.shadow_database_url().map(String::from))
+                SqlMigrationConnector::new(args.database_url(), preview_features, shadow_database_url.clone())
                     .await
                     .unwrap();
-            connector.reset().await.unwrap();
 
+            connector.reset().await.unwrap();
             args.database_url().to_owned()
         } else if tags.contains(Tags::Mysql) {
             args.create_mysql_database().await.1
@@ -67,7 +76,7 @@ impl TestApi {
             unreachable!()
         };
 
-        let api = SqlMigrationConnector::new(&connection_string, args.shadow_database_url().map(String::from))
+        let api = SqlMigrationConnector::new(&connection_string, preview_features, shadow_database_url)
             .await
             .unwrap();
 

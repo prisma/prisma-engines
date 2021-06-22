@@ -139,6 +139,7 @@ pub async fn m2m<'a, 'b>(
     selected_fields,
     processor
 ))]
+#[allow(clippy::too_many_arguments)]
 pub async fn one2m<'a, 'b>(
     tx: &'a ConnectionLike<'a, 'b>,
     parent_field: &RelationFieldRef,

@@ -351,7 +351,7 @@ fn ignored_models_should_be_filtered() {
     let mutation = find_output_type(&dmmf, PRISMA_NAMESPACE, "Mutation");
     let has_no_inputs = dmmf.schema.input_object_types.get(PRISMA_NAMESPACE).is_none();
 
-    assert_eq!(has_no_inputs, true);
+    assert!(has_no_inputs);
     assert_eq!(query.fields.len(), 0);
     assert_eq!(mutation.fields.len(), 0);
 }
