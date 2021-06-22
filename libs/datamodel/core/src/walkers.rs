@@ -175,8 +175,8 @@ impl<'a> ScalarFieldWalker<'a> {
                 datamodel: self.datamodel,
                 r#enum: self.datamodel.find_enum(name).unwrap(),
             }),
-            FieldType::Base(scalar_type, _) => TypeWalker::Base(*scalar_type),
-            FieldType::NativeType(scalar_type, native_type) => TypeWalker::NativeType(*scalar_type, native_type),
+            FieldType::Scalar(scalar_type, _, None) => TypeWalker::Base(*scalar_type),
+            FieldType::Scalar(scalar_type, _, Some(nt)) => TypeWalker::NativeType(*scalar_type, nt),
             FieldType::Unsupported(description) => TypeWalker::Unsupported(description.clone()),
             FieldType::Relation(_) => unreachable!("FieldType::Relation in ScalarFieldWalker"),
         }

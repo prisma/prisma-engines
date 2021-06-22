@@ -442,19 +442,8 @@ impl DatamodelFieldExtensions for dml::ScalarField {
         match &self.field_type {
             dml::FieldType::Enum(x) => TypeIdentifier::Enum(x.clone()),
             dml::FieldType::Relation(_) => TypeIdentifier::String, // Todo: Unused
-            dml::FieldType::Base(scalar, _) => match scalar {
-                dml::ScalarType::Boolean => TypeIdentifier::Boolean,
-                dml::ScalarType::DateTime => TypeIdentifier::DateTime,
-                dml::ScalarType::Float => TypeIdentifier::Float,
-                dml::ScalarType::Decimal => TypeIdentifier::Decimal,
-                dml::ScalarType::Int => TypeIdentifier::Int,
-                dml::ScalarType::String => TypeIdentifier::String,
-                dml::ScalarType::Json => TypeIdentifier::Json,
-                dml::ScalarType::Bytes => TypeIdentifier::Bytes,
-                dml::ScalarType::BigInt => TypeIdentifier::BigInt,
-            },
+            dml::FieldType::Scalar(scalar, _, _) => (*scalar).into(),
             dml::FieldType::Unsupported(_) => TypeIdentifier::Unsupported,
-            dml::FieldType::NativeType(scalar_type, _) => (*scalar_type).into(),
         }
     }
 
@@ -513,7 +502,7 @@ impl DatamodelFieldExtensions for dml::ScalarField {
 
     fn native_type(&self) -> Option<NativeTypeInstance> {
         match &self.field_type {
-            datamodel::FieldType::NativeType(_, nt) => Some(nt.clone()),
+            datamodel::FieldType::Scalar(_, _, nt) => nt.clone(),
             _ => None,
         }
     }

@@ -81,7 +81,7 @@ impl Connector for MongoDbDatamodelConnector {
         }
 
         // If the field is _not_ a native-type-annotated field and it has a `dbgenerated` defult, we error.
-        if !matches!(field.field_type(), FieldType::NativeType(_, _))
+        if !matches!(field.field_type(), FieldType::Scalar(_, _, Some(_)))
             && matches!(field.default_value(), Some(DefaultValue::Expression(expr)) if expr.is_dbgenerated())
         {
             let message = if field.is_id() {
