@@ -318,16 +318,16 @@ pub(crate) fn calculate_scalar_field_type_for_native_type(column: &Column) -> Fi
     let fdt = column.tpe.full_data_type.to_owned();
 
     match &column.tpe.family {
-        ColumnTypeFamily::Int => FieldType::Base(ScalarType::Int, None),
-        ColumnTypeFamily::BigInt => FieldType::Base(ScalarType::BigInt, None),
-        ColumnTypeFamily::Float => FieldType::Base(ScalarType::Float, None),
-        ColumnTypeFamily::Decimal => FieldType::Base(ScalarType::Decimal, None),
-        ColumnTypeFamily::Boolean => FieldType::Base(ScalarType::Boolean, None),
-        ColumnTypeFamily::String => FieldType::Base(ScalarType::String, None),
-        ColumnTypeFamily::DateTime => FieldType::Base(ScalarType::DateTime, None),
-        ColumnTypeFamily::Json => FieldType::Base(ScalarType::Json, None),
-        ColumnTypeFamily::Uuid => FieldType::Base(ScalarType::String, None),
-        ColumnTypeFamily::Binary => FieldType::Base(ScalarType::Bytes, None),
+        ColumnTypeFamily::Int => FieldType::Scalar(ScalarType::Int, None, None),
+        ColumnTypeFamily::BigInt => FieldType::Scalar(ScalarType::BigInt, None, None),
+        ColumnTypeFamily::Float => FieldType::Scalar(ScalarType::Float, None, None),
+        ColumnTypeFamily::Decimal => FieldType::Scalar(ScalarType::Decimal, None, None),
+        ColumnTypeFamily::Boolean => FieldType::Scalar(ScalarType::Boolean, None, None),
+        ColumnTypeFamily::String => FieldType::Scalar(ScalarType::String, None, None),
+        ColumnTypeFamily::DateTime => FieldType::Scalar(ScalarType::DateTime, None, None),
+        ColumnTypeFamily::Json => FieldType::Scalar(ScalarType::Json, None, None),
+        ColumnTypeFamily::Uuid => FieldType::Scalar(ScalarType::String, None, None),
+        ColumnTypeFamily::Binary => FieldType::Scalar(ScalarType::Bytes, None, None),
         ColumnTypeFamily::Enum(name) => FieldType::Enum(name.to_owned()),
         ColumnTypeFamily::Unsupported(_) => FieldType::Unsupported(fdt),
     }
@@ -346,11 +346,11 @@ pub(crate) fn calculate_scalar_field_type_with_native_types(column: &Column, fam
     };
 
     match scalar_type {
-        FieldType::Base(scal_type, _) => match &column.tpe.native_type {
+        FieldType::Scalar(scal_type, _, _) => match &column.tpe.native_type {
             None => scalar_type,
             Some(native_type) => {
                 let native_type_instance = connector.introspect_native_type(native_type.clone()).unwrap();
-                FieldType::NativeType(scal_type, native_type_instance)
+                FieldType::Scalar(scal_type, None, Some(native_type_instance))
             }
         },
         field_type => field_type,

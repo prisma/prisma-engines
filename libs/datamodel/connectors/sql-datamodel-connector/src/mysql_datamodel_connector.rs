@@ -248,7 +248,7 @@ impl Connector for MySqlDatamodelConnector {
 
     fn validate_field(&self, field: &Field) -> Result<(), ConnectorError> {
         match field.field_type() {
-            FieldType::NativeType(scalar_type, native_type_instance) => {
+            FieldType::Scalar(scalar_type, _, Some(native_type_instance)) => {
                 let native_type_name = native_type_instance.name.as_str();
                 let native_type: MySqlType = native_type_instance.deserialize_native_type();
                 let error = self.native_instance_error(native_type_instance.clone());
@@ -290,7 +290,7 @@ impl Connector for MySqlDatamodelConnector {
         for index_definition in model.indices.iter() {
             let fields = index_definition.fields.iter().map(|f| model.find_field(f).unwrap());
             for f in fields {
-                if let FieldType::NativeType(_, native_type) = f.field_type() {
+                if let FieldType::Scalar(_, _, Some(native_type)) = f.field_type() {
                     let native_type_name = native_type.name.as_str();
 
                     if NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type_name) {
@@ -307,7 +307,7 @@ impl Connector for MySqlDatamodelConnector {
         }
         for id_field in model.id_fields.iter() {
             let field = model.find_field(id_field).unwrap();
-            if let FieldType::NativeType(_, native_type) = field.field_type() {
+            if let FieldType::Scalar(_, _, Some(native_type)) = field.field_type() {
                 let native_type_name = native_type.name.as_str();
                 if NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type_name) {
                     return self

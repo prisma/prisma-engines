@@ -109,7 +109,7 @@ impl FieldAsserts for dml::ScalarField {
 
 impl ScalarFieldAsserts for dml::ScalarField {
     fn assert_base_type(&self, t: &ScalarType) -> &Self {
-        if let dml::FieldType::Base(base_type, _) = &self.field_type {
+        if let dml::FieldType::Scalar(base_type, _, None) = &self.field_type {
             assert_eq!(base_type, t);
         } else {
             panic!("Scalar expected, but found {:?}", self.field_type);
@@ -136,7 +136,7 @@ impl ScalarFieldAsserts for dml::ScalarField {
     }
 
     fn assert_native_type(&self) -> &NativeTypeInstance {
-        if let dml::FieldType::NativeType(_, t) = &self.field_type {
+        if let dml::FieldType::Scalar(_, _, Some(t)) = &self.field_type {
             &t
         } else {
             panic!("Native Type expected, but found {:?}", self.field_type);
