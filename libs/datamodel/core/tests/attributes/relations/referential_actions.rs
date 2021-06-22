@@ -236,50 +236,6 @@ fn restrict_should_not_work_on_sql_server() {
 }
 
 #[test]
-fn non_emulated_actions_should_not_work_on_mongo() {
-    let actions = &[(Cascade, 338), (SetDefault, 341)];
-
-    for (action, span) in actions {
-        let dml = formatdoc!(
-            r#"
-            datasource db {{
-                provider = "mongodb"
-                url = "mongodb://"
-            }}
-
-            generator client {{
-                provider = "prisma-client-js"
-                previewFeatures = ["referentialActions"]
-            }}
-
-            model A {{
-                id Int @id @map("_id")
-                bs B[]
-            }}
-
-            model B {{
-                id Int @id @map("_id")
-                aId Int
-                a A @relation(fields: [aId], references: [id], onDelete: {})
-            }}
-        "#,
-            action
-        );
-
-        let message = format!(
-            "Invalid referential action: `{}`. Allowed values: (`Restrict`, `NoAction`, `SetNull`)",
-            action
-        );
-
-        parse_error(&dml).assert_are(&[DatamodelError::new_attribute_validation_error(
-            &message,
-            "relation",
-            Span::new(272, *span),
-        )]);
-    }
-}
-
-#[test]
 fn concrete_actions_should_not_work_on_planetscale() {
     let actions = &[(Cascade, 411), (NoAction, 412), (SetDefault, 414)];
 
