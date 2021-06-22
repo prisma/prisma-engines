@@ -314,11 +314,11 @@ impl PartialEq for RelationField {
 
 impl RelationField {
     /// Creates a new field with the given name and type.
-    pub fn new(name: &str, arity: FieldArity, calculated_arity: FieldArity, relation_info: RelationInfo) -> Self {
+    pub fn new(name: &str, arity: FieldArity, referential_arity: FieldArity, relation_info: RelationInfo) -> Self {
         RelationField {
             name: String::from(name),
             arity,
-            referential_arity: calculated_arity,
+            referential_arity,
             relation_info,
             documentation: None,
             is_generated: false,
