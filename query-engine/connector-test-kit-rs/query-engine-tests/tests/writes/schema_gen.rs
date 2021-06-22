@@ -3,10 +3,7 @@ use query_engine_tests::*;
 #[test_suite]
 mod schema_gen {
     use query_engine_tests::{
-        relation_field::RelationField,
-        run_query, run_query_json,
-        schema_with_relation::{schema_with_relation, DatamodelWithParams},
-        Runner,
+        run_query, run_query_json, schema_with_relation::DatamodelWithParams, ConnectorCapability, Runner,
     };
     use query_test_macros::connector_schema_gen;
 
@@ -45,8 +42,6 @@ mod schema_gen {
             ),
             &["data", "createOneParent", "childOpt"],
         );
-
-        dbg!(&params.index, &child_1);
 
         insta::assert_snapshot!(
           run_query!(runner, format!(r#"mutation {{

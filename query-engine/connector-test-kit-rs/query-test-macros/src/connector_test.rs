@@ -5,6 +5,7 @@ use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
 use query_tests_setup::{schema_with_relation::*, ConnectorTag, ConnectorTagInterface};
 use quote::quote;
+use std::convert::TryInto;
 use syn::{parse_macro_input, AttributeArgs, ItemFn};
 
 pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream {
@@ -127,7 +128,8 @@ pub fn connector_schema_gen_impl(attr: TokenStream, input: TokenStream) -> Token
         }
     });
     let schem_gen = args.gen.unwrap();
-    let datamodels: Vec<_> = schema_with_relation(schem_gen.on_parent, schem_gen.on_child, schem_gen.without_parent);
+    let (datamodels, required_capabilities) =
+        schema_with_relation(schem_gen.on_parent, schem_gen.on_child, schem_gen.without_parent);
 
     let mut test_function = parse_macro_input!(input as ItemFn);
 
@@ -172,7 +174,8 @@ pub fn connector_schema_gen_impl(attr: TokenStream, input: TokenStream) -> Token
         // The shell function retains the name of the original test definition.
         let test_fn_ident = Ident::new(&format!("{}_{}", test_fn_ident.to_string(), i), Span::call_site());
         let datamodel: proc_macro2::TokenStream = format!(r#""{}""#, dm.datamodel).parse().unwrap();
-        let dm_with_params: String = dm.into();
+        let dm_with_params: String = dm.try_into().expect("Could not serialize json");
+        let required_capabilities = required_capabilities.get(i).unwrap().iter().map(|cap| format!("{}", cap)).collect::<Vec<_>>();
         let test_database = format!("{}_{}_{}", suite_name, test_name, i);
 
         let ts = quote! {
@@ -183,11 +186,22 @@ pub fn connector_schema_gen_impl(attr: TokenStream, input: TokenStream) -> Token
                     #connectors
                 ];
 
-                let capabilities: Vec<ConnectorCapability> = vec![
+                let mut capabilities: Vec<ConnectorCapability> = vec![
                     #(#capabilities),*
                 ];
+
+                let required_capabilities: Vec<&str> = vec![#(#required_capabilities),*];
+                let mut required_capabilities = required_capabilities
+                    .into_iter()
+                    .map(|cap| cap.parse::<ConnectorCapability>().unwrap())
+                    .collect::<Vec<_>>();
+
+                if !required_capabilities.is_empty() {
+                    capabilities.append(&mut required_capabilities);
+                }
+
                 let template = #datamodel.to_string();
-                let dm_with_params_json = #dm_with_params.to_string();
+                let dm_with_params_json: DatamodelWithParams = #dm_with_params.parse().unwrap();
 
                 if ConnectorTag::should_run(&config, &enabled_connectors, &capabilities, #test_name) {
                     let datamodel = query_tests_setup::render_test_datamodel(config, #test_database, template);

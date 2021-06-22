@@ -1,23 +1,29 @@
+use std::{convert::TryFrom, str::FromStr};
+
 use crate::{constants::*, query_params::*, references::*, relation_field::*, utils::*};
+use datamodel_connector::ConnectorCapability;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DatamodelWithParams {
-    pub index: u32,
     pub datamodel: String,
     pub parent: QueryParams,
     pub child: QueryParams,
 }
 
-impl From<DatamodelWithParams> for String {
-    fn from(from: DatamodelWithParams) -> Self {
-        serde_json::to_string(&from).unwrap()
+impl FromStr for DatamodelWithParams {
+    type Err = serde_json::Error;
+
+    fn from_str(from: &str) -> Result<Self, Self::Err> {
+        serde_json::from_str(from)
     }
 }
 
-impl From<String> for DatamodelWithParams {
-    fn from(from: String) -> Self {
-        serde_json::from_str(from.as_str()).unwrap()
+impl TryFrom<DatamodelWithParams> for String {
+    type Error = serde_json::Error;
+
+    fn try_from(from: DatamodelWithParams) -> Result<Self, Self::Error> {
+        serde_json::to_string(&from)
     }
 }
 
@@ -25,7 +31,7 @@ pub fn schema_with_relation(
     on_parent: RelationField,
     on_child: RelationField,
     without_params: bool,
-) -> Vec<DatamodelWithParams> {
+) -> (Vec<DatamodelWithParams>, Vec<Vec<ConnectorCapability>>) {
     let is_required_1to1 = on_parent.is_required() && on_child.is_required();
 
     if is_required_1to1 {
@@ -90,7 +96,7 @@ pub fn schema_with_relation(
     // TODO: How to configure simple mode??
     let simple = false;
     let mut datamodels: Vec<DatamodelWithParams> = vec![];
-    let mut index = 0;
+    let mut required_capabilities: Vec<Vec<ConnectorCapability>> = vec![];
 
     for parent_id in id_options.iter() {
         for child_id in id_options.iter() {
@@ -164,14 +170,17 @@ pub fn schema_with_relation(
                                 child_id = child_id
                             };
 
+                            if *parent_id == COMPOUND_ID || *child_id == COMPOUND_ID {
+                                required_capabilities.push(vec![ConnectorCapability::CompoundIds]);
+                            } else {
+                                required_capabilities.push(vec![]);
+                            }
+
                             datamodels.push(DatamodelWithParams {
-                                index,
                                 datamodel,
                                 parent: parent_param.clone(),
                                 child: child_param.clone(),
                             });
-
-                            index += 1;
                         }
                     }
                 }
@@ -179,5 +188,5 @@ pub fn schema_with_relation(
         }
     }
 
-    datamodels
+    (datamodels, required_capabilities)
 }

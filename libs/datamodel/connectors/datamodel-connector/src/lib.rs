@@ -11,7 +11,7 @@ use dml::{
     native_type_instance::NativeTypeInstance, relation_info::ReferentialAction, scalars::ScalarType,
 };
 use enumflags2::BitFlags;
-use std::{borrow::Cow, collections::BTreeMap};
+use std::{borrow::Cow, collections::BTreeMap, str::FromStr};
 
 pub trait Connector: Send + Sync {
     fn name(&self) -> &str;
@@ -219,5 +219,66 @@ impl ConnectorCapabilities {
 
     pub fn contains(&self, capability: ConnectorCapability) -> bool {
         self.capabilities.contains(&capability)
+    }
+}
+
+impl std::fmt::Display for ConnectorCapability {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let name = match self {
+            ConnectorCapability::ScalarLists => "ScalarLists",
+            ConnectorCapability::RelationsOverNonUniqueCriteria => "RelationsOverNonUniqueCriteria",
+            ConnectorCapability::MultipleIndexesWithSameName => "MultipleIndexesWithSameName",
+            ConnectorCapability::Enums => "Enums",
+            ConnectorCapability::Json => "Json",
+            ConnectorCapability::AutoIncrement => "AutoIncrement",
+            ConnectorCapability::AutoIncrementAllowedOnNonId => "AutoIncrementAllowedOnNonId",
+            ConnectorCapability::AutoIncrementMultipleAllowed => "AutoIncrementMultipleAllowed",
+            ConnectorCapability::AutoIncrementNonIndexedAllowed => "AutoIncrementNonIndexedAllowed",
+            ConnectorCapability::RelationFieldsInArbitraryOrder => "RelationFieldsInArbitraryOrder",
+            ConnectorCapability::InsensitiveFilters => "InsensitiveFilters",
+            ConnectorCapability::CreateMany => "CreateMany",
+            ConnectorCapability::CreateManyWriteableAutoIncId => "CreateManyWriteableAutoIncId",
+            ConnectorCapability::WritableAutoincField => "WritableAutoincField",
+            ConnectorCapability::CreateSkipDuplicates => "CreateSkipDuplicates",
+            ConnectorCapability::UpdateableId => "UpdateableId",
+            ConnectorCapability::JsonFiltering => "JsonFiltering",
+            ConnectorCapability::JsonFilteringJsonPath => "JsonFilteringJsonPath",
+            ConnectorCapability::JsonFilteringArrayPath => "JsonFilteringArrayPath",
+            ConnectorCapability::CompoundIds => "CompoundIds",
+            ConnectorCapability::ForeignKeys => "ForeignKeys",
+        };
+
+        write!(f, "{}", name)
+    }
+}
+
+impl FromStr for ConnectorCapability {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "ScalarLists" => Ok(ConnectorCapability::ScalarLists),
+            "RelationsOverNonUniqueCriteria" => Ok(ConnectorCapability::RelationsOverNonUniqueCriteria),
+            "MultipleIndexesWithSameName" => Ok(ConnectorCapability::MultipleIndexesWithSameName),
+            "Enums" => Ok(ConnectorCapability::Enums),
+            "Json" => Ok(ConnectorCapability::Json),
+            "AutoIncrement" => Ok(ConnectorCapability::AutoIncrement),
+            "AutoIncrementAllowedOnNonId" => Ok(ConnectorCapability::AutoIncrementAllowedOnNonId),
+            "AutoIncrementMultipleAllowed" => Ok(ConnectorCapability::AutoIncrementMultipleAllowed),
+            "AutoIncrementNonIndexedAllowed" => Ok(ConnectorCapability::AutoIncrementNonIndexedAllowed),
+            "RelationFieldsInArbitraryOrder" => Ok(ConnectorCapability::RelationFieldsInArbitraryOrder),
+            "InsensitiveFilters" => Ok(ConnectorCapability::InsensitiveFilters),
+            "CreateMany" => Ok(ConnectorCapability::CreateMany),
+            "CreateManyWriteableAutoIncId" => Ok(ConnectorCapability::CreateManyWriteableAutoIncId),
+            "WritableAutoincField" => Ok(ConnectorCapability::WritableAutoincField),
+            "CreateSkipDuplicates" => Ok(ConnectorCapability::CreateSkipDuplicates),
+            "UpdateableId" => Ok(ConnectorCapability::UpdateableId),
+            "JsonFiltering" => Ok(ConnectorCapability::JsonFiltering),
+            "JsonFilteringJsonPath" => Ok(ConnectorCapability::JsonFilteringJsonPath),
+            "JsonFilteringArrayPath" => Ok(ConnectorCapability::JsonFilteringArrayPath),
+            "CompoundIds" => Ok(ConnectorCapability::CompoundIds),
+            "ForeignKeys" => Ok(ConnectorCapability::ForeignKeys),
+            _ => Err(format!("{} is not a known connector capability.", s)),
+        }
     }
 }
