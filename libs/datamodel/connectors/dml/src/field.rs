@@ -41,7 +41,7 @@ pub enum FieldType {
 }
 
 impl FieldType {
-    pub fn as_base(&self) -> Option<&ScalarType> {
+    pub fn as_scalar(&self) -> Option<&ScalarType> {
         match self {
             FieldType::Scalar(scalar_type, _, _) => Some(scalar_type),
             _ => None,

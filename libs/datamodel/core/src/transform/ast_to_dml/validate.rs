@@ -646,14 +646,14 @@ impl<'a> Validator<'a> {
                         if let Some(connector) = self.source.map(|source| &source.active_connector) {
                             let base_native_type = base_field.field_type().as_native_type().map(|(scalar, native)| (*scalar, native.serialized_native_type.clone())).or_else(|| -> Option<_> {
                                 let field_type = base_field.field_type();
-                                let scalar_type = field_type.as_base()?;
+                                let scalar_type = field_type.as_scalar()?;
 
                                 Some((*scalar_type, connector.default_native_type_for_scalar_type(scalar_type)))
                             });
 
                             let referenced_native_type = referenced_field.field_type().as_native_type().map(|(scalar, native)| (*scalar, native.serialized_native_type.clone())).or_else(|| -> Option<_> {
                                 let field_type = referenced_field.field_type();
-                                let scalar_type = field_type.as_base()?;
+                                let scalar_type = field_type.as_scalar()?;
 
                                 Some((*scalar_type, connector.default_native_type_for_scalar_type(scalar_type)))
                             });
