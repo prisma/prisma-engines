@@ -89,4 +89,9 @@ impl Top {
             _ => None,
         }
     }
+
+    #[track_caller]
+    pub fn unwrap_type_alias(&self) -> &Field {
+        self.as_type_alias().unwrap()
+    }
 }

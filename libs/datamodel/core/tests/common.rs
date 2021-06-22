@@ -5,6 +5,8 @@ use datamodel::{
 };
 use pretty_assertions::assert_eq;
 
+pub use expect_test::expect;
+
 pub trait DatasourceAsserts {
     fn assert_name(&self, name: &str) -> &Self;
     fn assert_url(&self, url: StringFromEnvVar) -> &Self;

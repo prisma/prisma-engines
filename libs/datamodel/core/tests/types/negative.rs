@@ -58,12 +58,29 @@ fn should_fail_on_endless_recursive_type_def() {
     }
     "#;
 
-    let error = parse_error(dml);
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError validating: Recursive type definitions are not allowed. Recursive path was: MyString -> ID -> MyStringWithDefault -> MyString.[0m
+          [1;94m-->[0m  [4mschema.prisma:2[0m
+        [1;94m   | [0m
+        [1;94m 1 | [0m
+        [1;94m 2 | [0m    type MyString = [1;91mID[0m
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError validating: Recursive type definitions are not allowed. Recursive path was: MyStringWithDefault -> MyString -> ID -> MyStringWithDefault.[0m
+          [1;94m-->[0m  [4mschema.prisma:3[0m
+        [1;94m   | [0m
+        [1;94m 2 | [0m    type MyString = ID
+        [1;94m 3 | [0m    type MyStringWithDefault = [1;91mMyString[0m
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError validating: Recursive type definitions are not allowed. Recursive path was: ID -> MyStringWithDefault -> MyString -> ID.[0m
+          [1;94m-->[0m  [4mschema.prisma:4[0m
+        [1;94m   | [0m
+        [1;94m 3 | [0m    type MyStringWithDefault = MyString
+        [1;94m 4 | [0m    type ID = [1;91mMyStringWithDefault[0m
+        [1;94m   | [0m
+    "#]];
 
-    error.assert_is(DatamodelError::new_validation_error(
-        "Recursive type definitions are not allowed. Recursive path was: ID -> MyStringWithDefault -> MyString -> ID.",
-        ast::Span::new(21, 23),
-    ));
+    expectation.assert_eq(&error);
 }
 
 #[test]

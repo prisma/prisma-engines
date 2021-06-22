@@ -45,9 +45,7 @@ impl<'a, 'b> ValidationPipeline<'a> {
         let db = ParserDatabase::new(ast_schema, &mut diagnostics);
 
         // Early return so that the validator does not have to deal with invalid schemas
-        if diagnostics.has_errors() {
-            return Err(diagnostics);
-        }
+        diagnostics.to_result()?;
 
         // Phase 3: Lift AST to DML.
         let lifter = LiftAstToDml::new(self.source, &db);

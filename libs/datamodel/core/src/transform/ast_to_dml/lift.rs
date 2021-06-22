@@ -38,16 +38,15 @@ impl<'a> LiftAstToDml<'a> {
 
     pub fn lift(&self) -> Result<dml::Datamodel, Diagnostics> {
         let mut schema = dml::Datamodel::new();
-        let ast_schema = self.db.ast();
         let mut errors = Diagnostics::new();
 
-        for ast_obj in &ast_schema.tops {
+        for (_, ast_obj) in self.db.ast().iter_tops() {
             match ast_obj {
                 ast::Top::Enum(en) => match self.lift_enum(&en) {
                     Ok(en) => schema.add_enum(en),
                     Err(mut err) => errors.append(&mut err),
                 },
-                ast::Top::Model(ty) => match self.lift_model(&ty, ast_schema) {
+                ast::Top::Model(ty) => match self.lift_model(&ty) {
                     Ok(md) => schema.add_model(md),
                     Err(mut err) => errors.append(&mut err),
                 },
@@ -66,14 +65,14 @@ impl<'a> LiftAstToDml<'a> {
     }
 
     /// Internal: Validates a model AST node and lifts it to a DML model.
-    fn lift_model(&self, ast_model: &ast::Model, ast_schema: &ast::SchemaAst) -> Result<dml::Model, Diagnostics> {
+    fn lift_model(&self, ast_model: &ast::Model) -> Result<dml::Model, Diagnostics> {
         let mut model = dml::Model::new(ast_model.name.name.clone(), None);
         model.documentation = ast_model.documentation.clone().map(|comment| comment.text);
 
         let mut errors = Diagnostics::new();
 
         for ast_field in &ast_model.fields {
-            match self.lift_field(ast_field, ast_schema) {
+            match self.lift_field(ast_field) {
                 Ok(field) => model.add_field(field),
                 Err(mut err) => errors.append(&mut err),
             }
@@ -151,10 +150,10 @@ impl<'a> LiftAstToDml<'a> {
     }
 
     /// Internal: Lift a field AST node to a DML field.
-    fn lift_field(&self, ast_field: &ast::Field, ast_schema: &ast::SchemaAst) -> Result<dml::Field, Diagnostics> {
+    fn lift_field(&self, ast_field: &ast::Field) -> Result<dml::Field, Diagnostics> {
         let mut errors = Diagnostics::new();
         // If we cannot parse the field type, we exit right away.
-        let (field_type, extra_attributes) = self.lift_field_type(&ast_field, None, ast_schema, &mut Vec::new())?;
+        let (field_type, extra_attributes) = self.lift_field_type(&ast_field, None, &mut Vec::new())?;
 
         let mut field = match field_type {
             FieldType::Relation(info) => {
@@ -200,7 +199,6 @@ impl<'a> LiftAstToDml<'a> {
         &self,
         ast_field: &ast::Field,
         type_alias: Option<String>,
-        ast_schema: &ast::SchemaAst,
         checked_types: &mut Vec<String>,
     ) -> Result<(dml::FieldType, Vec<ast::Attribute>), DatamodelError> {
         let type_ident: &Identifier = match &ast_field.field_type {
@@ -335,19 +333,18 @@ impl<'a> LiftAstToDml<'a> {
             } else {
                 Ok((dml::FieldType::Scalar(scalar_type, type_alias, None), vec![]))
             }
-        } else if ast_schema.find_model(type_name).is_some() {
+        } else if self.db.ast().find_model(type_name).is_some() {
             Ok((dml::FieldType::Relation(dml::RelationInfo::new(type_name)), vec![]))
         } else if self.db.get_enum(type_name).is_some() {
             Ok((dml::FieldType::Enum(type_name.clone()), vec![]))
         } else {
-            self.resolve_custom_type(ast_field, ast_schema, checked_types)
+            self.resolve_custom_type(ast_field, checked_types)
         }
     }
 
     fn resolve_custom_type(
         &self,
         ast_field: &ast::Field,
-        ast_schema: &ast::SchemaAst,
         checked_types: &mut Vec<String>,
     ) -> Result<(dml::FieldType, Vec<ast::Attribute>), DatamodelError> {
         let field_type = ast_field.field_type.unwrap_supported();
@@ -365,10 +362,10 @@ impl<'a> LiftAstToDml<'a> {
             ));
         }
 
-        if let Some(custom_type) = ast_schema.find_type_alias(&type_name) {
+        if let Some(custom_type) = self.db.ast().find_type_alias(&type_name) {
             checked_types.push(custom_type.name.name.clone());
             let (field_type, mut attrs) =
-                self.lift_field_type(custom_type, Some(type_name.to_owned()), ast_schema, checked_types)?;
+                self.lift_field_type(custom_type, Some(type_name.to_owned()), checked_types)?;
 
             if let dml::FieldType::Relation(_) = field_type {
                 return Err(DatamodelError::new_validation_error(

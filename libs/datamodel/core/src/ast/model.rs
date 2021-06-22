@@ -1,7 +1,14 @@
 use super::*;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub(crate) struct FieldId(u32);
+
+impl FieldId {
+    /// Used for range bounds when iterating over BTreeMaps.
+    pub(crate) const ZERO: FieldId = FieldId(0);
+    /// Used for range bounds when iterating over BTreeMaps.
+    pub(crate) const MAX: FieldId = FieldId(u32::MAX);
+}
 
 /// A model declaration.
 #[derive(Debug, Clone, PartialEq)]
