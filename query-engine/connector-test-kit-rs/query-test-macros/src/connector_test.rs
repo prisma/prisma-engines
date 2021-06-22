@@ -131,10 +131,10 @@ pub fn connector_schema_gen_impl(attr: TokenStream, input: TokenStream) -> Token
 
     let mut test_function = parse_macro_input!(input as ItemFn);
 
-    if test_function.sig.inputs.len() != 1 {
+    if test_function.sig.inputs.len() != 2 {
         return syn::Error::new_spanned(
             test_function.sig,
-            "connector test functions must take exactly one argument: `runner: &Runner`.",
+            "connector test functions must take exactly two arguments: `runner: &Runner, dm: &DatamodelWithParams`.",
         )
         .to_compile_error()
         .into();
@@ -172,6 +172,7 @@ pub fn connector_schema_gen_impl(attr: TokenStream, input: TokenStream) -> Token
         // The shell function retains the name of the original test definition.
         let test_fn_ident = Ident::new(&format!("{}_{}", test_fn_ident.to_string(), i), Span::call_site());
         let datamodel: proc_macro2::TokenStream = format!(r#""{}""#, dm.datamodel).parse().unwrap();
+        let dm_with_params: String = dm.into();
         let test_database = format!("{}_{}_{}", suite_name, test_name, i);
 
         let ts = quote! {
@@ -186,6 +187,7 @@ pub fn connector_schema_gen_impl(attr: TokenStream, input: TokenStream) -> Token
                     #(#capabilities),*
                 ];
                 let template = #datamodel.to_string();
+                let dm_with_params_json = #dm_with_params.to_string();
 
                 if ConnectorTag::should_run(&config, &enabled_connectors, &capabilities, #test_name) {
                     let datamodel = query_tests_setup::render_test_datamodel(config, #test_database, template);
@@ -194,8 +196,9 @@ pub fn connector_schema_gen_impl(attr: TokenStream, input: TokenStream) -> Token
                     query_tests_setup::run_with_tokio(async move {
                         tracing::debug!("Used datamodel:\n {}", datamodel.clone().yellow());
                         let runner = Runner::load(config.runner(), datamodel.clone(), connector).await.unwrap();
+                        let dm_with_params = DatamodelWithParams::from(dm_with_params_json);
                         query_tests_setup::setup_project(&datamodel).await.unwrap();
-                        #runner_fn_ident(&runner).await.unwrap();
+                        #runner_fn_ident(&runner, &dm_with_params).await.unwrap();
                     }.with_subscriber(test_tracing_subscriber(std::env::var("LOG_LEVEL").unwrap_or("info".to_string()))));
                 }
             }

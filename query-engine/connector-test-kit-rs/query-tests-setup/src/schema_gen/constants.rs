@@ -1,4 +1,4 @@
-pub const SIMPLE_ID: &str = "id            String    @id @default(cuid())";
+pub const SIMPLE_ID: &str = "#id(id, String, @id, @default(cuid()))";
 pub const COMPOUND_ID: &str = "id_1          String        @default(cuid())\n
 id_2          String        @default(cuid())\n
 @@id([id_1, id_2])";

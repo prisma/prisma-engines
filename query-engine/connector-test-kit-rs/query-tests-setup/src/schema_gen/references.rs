@@ -1,5 +1,6 @@
 use crate::constants::*;
 use crate::relation_field::RelationField;
+use crate::utils::*;
 
 #[derive(Debug, Clone)]
 pub enum RelationReference<'a> {
@@ -153,16 +154,10 @@ pub fn full_child_references<'a>(
         match parent_id {
             _ if on_child.is_list() && !on_parent.is_list() => vec![RelationReference::NoRef],
             SIMPLE_ID => {
-                let mut refs = vec![RelationReference::SimpleParentId(on_child)];
-                refs.append(&mut common_parent_references(on_child));
-                refs
+                vec![RelationReference::SimpleParentId(on_child)].clone_append(&mut common_parent_references(on_child))
             }
-            COMPOUND_ID => {
-                let mut refs = vec![RelationReference::CompoundParentId(on_child)];
-                refs.append(&mut common_parent_references(on_child));
-
-                refs
-            }
+            COMPOUND_ID => vec![RelationReference::CompoundParentId(on_child)]
+                .clone_append(&mut common_parent_references(on_child)),
             _ => common_parent_references(on_child),
         }
     } else {
@@ -217,28 +212,21 @@ pub fn full_parent_references<'a>(
         match (child_id, child_reference) {
             (_, _) if on_parent.is_list() && !on_child.is_list() => vec![RelationReference::NoRef],
             (SIMPLE_ID, RelationReference::NoRef) => {
-                let mut refs = vec![RelationReference::SimpleChildId(on_parent)];
-                refs.append(&mut common_child_references(on_parent));
-
-                refs
+                vec![RelationReference::SimpleChildId(on_parent)].clone_append(&mut common_child_references(on_parent))
             }
             (SIMPLE_ID, _) if on_parent.is_list() && on_child.is_list() => {
-                let mut refs = vec![RelationReference::SimpleChildId(on_parent)];
-                refs.append(&mut common_child_references(on_parent));
+                let mut refs = vec![RelationReference::SimpleChildId(on_parent)]
+                    .clone_append(&mut common_child_references(on_parent));
                 refs.push(RelationReference::NoRef);
 
                 refs
             }
             (SIMPLE_ID, _) => vec![RelationReference::NoRef],
-            (COMPOUND_ID, RelationReference::NoRef) => {
-                let mut refs = vec![RelationReference::CompoundChildId(on_parent)];
-                refs.append(&mut common_child_references(on_parent));
-
-                refs
-            }
+            (COMPOUND_ID, RelationReference::NoRef) => vec![RelationReference::CompoundChildId(on_parent)]
+                .clone_append(&mut common_child_references(on_parent)),
             (COMPOUND_ID, _) if on_parent.is_list() && on_child.is_list() => {
-                let mut refs = vec![RelationReference::CompoundChildId(on_parent)];
-                refs.append(&mut common_child_references(on_parent));
+                let mut refs = vec![RelationReference::CompoundChildId(on_parent)]
+                    .clone_append(&mut common_child_references(on_parent));
                 refs.push(RelationReference::NoRef);
 
                 refs
@@ -246,10 +234,7 @@ pub fn full_parent_references<'a>(
             (COMPOUND_ID, _) => vec![RelationReference::NoRef],
             (NO_ID, &RelationReference::NoRef) => common_child_references(on_parent),
             (NO_ID, _) if on_parent.is_list() && on_child.is_list() => {
-                let mut refs = common_child_references(on_parent);
-                refs.push(RelationReference::NoRef);
-
-                refs
+                common_child_references(on_parent).clone_push(&RelationReference::NoRef)
             }
             (NO_ID, _) => vec![RelationReference::NoRef],
             (_, _) => vec![],
