@@ -119,7 +119,7 @@ pub fn calculate_many_to_many_field(
         false => basename,
     };
 
-    RelationField::new(&name, FieldArity::List, relation_info)
+    RelationField::new(&name, FieldArity::List, FieldArity::List, relation_info)
 }
 
 pub(crate) fn calculate_index(index: &Index) -> IndexDefinition {
@@ -205,7 +205,17 @@ pub(crate) fn calculate_relation_field(
         false => FieldArity::Required,
     };
 
-    Ok(RelationField::new(&foreign_key.referenced_table, arity, relation_info))
+    let calculated_arity = match columns.iter().any(|c| c.is_required()) {
+        true => FieldArity::Required,
+        false => arity,
+    };
+
+    Ok(RelationField::new(
+        &foreign_key.referenced_table,
+        arity,
+        calculated_arity,
+        relation_info,
+    ))
 }
 
 pub(crate) fn calculate_backrelation_field(
@@ -250,7 +260,7 @@ pub(crate) fn calculate_backrelation_field(
                 model.name.clone()
             };
 
-            Ok(RelationField::new(&name, arity, new_relation_info))
+            Ok(RelationField::new(&name, arity, arity, new_relation_info))
         }
     }
 }

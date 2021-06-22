@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use ::dml::relation_info::ReferentialAction;
+use ::dml::{field::FieldArity, relation_info::ReferentialAction};
 
 use super::common::*;
 use crate::{
@@ -25,26 +25,19 @@ impl<'a> StandardiserForParsing<'a> {
     pub fn standardise(&self, schema: &mut dml::Datamodel) -> Result<(), Diagnostics> {
         self.name_unnamed_relations(schema);
         self.set_relation_to_field_to_id_if_missing_for_m2m_relations(schema);
+        self.set_referential_arities(schema);
         self.set_default_referential_actions(schema);
 
         Ok(())
     }
 
-    fn set_default_referential_actions(&self, schema: &mut dml::Datamodel) {
-        if self.preview_features.contains(&PreviewFeature::ReferentialActions) {
-            return;
-        }
-
+    fn set_referential_arities(&self, schema: &mut dml::Datamodel) {
         let mut modifications = Vec::new();
 
         for (model_id, model) in schema.models().enumerate() {
             for (field_id, field) in model.fields().enumerate() {
                 match field {
                     Field::RelationField(field) if field.is_singular() => {
-                        if field.relation_info.on_delete.is_some() || field.relation_info.on_update.is_some() {
-                            continue;
-                        }
-
                         let some_required = field
                             .relation_info
                             .fields
@@ -52,31 +45,55 @@ impl<'a> StandardiserForParsing<'a> {
                             .flat_map(|name| model.find_field(name))
                             .any(|field| field.arity().is_required());
 
-                        let on_delete = if some_required {
-                            ReferentialAction::Cascade
+                        let arity = if some_required {
+                            FieldArity::Required
                         } else {
-                            ReferentialAction::SetNull
+                            field.arity
                         };
 
-                        modifications.push((model_id, field_id, on_delete));
+                        modifications.push((model_id, field_id, arity));
                     }
                     _ => (),
                 }
             }
         }
 
-        for (model_id, field_id, on_delete) in modifications {
+        for (model_id, field_id, arity) in modifications {
             let mut field = schema.models[model_id].fields[field_id]
                 .as_relation_field_mut()
                 .unwrap();
 
-            field.relation_info.on_update = Some(ReferentialAction::Cascade);
-            field.relation_info.on_delete = Some(on_delete);
+            field.referential_arity = arity;
+        }
+    }
 
-            // So our validator won't get a stroke when seeing the
-            // values set without having the preview feature
-            // enabled. Remove this before GA.
-            field.relation_info.legacy_referential_actions();
+    fn set_default_referential_actions(&self, schema: &mut dml::Datamodel) {
+        if self.preview_features.contains(&PreviewFeature::ReferentialActions) {
+            return;
+        }
+
+        for model in schema.models_mut() {
+            for field in model.fields_mut() {
+                match field {
+                    Field::RelationField(field) if field.is_singular() => {
+                        if field.relation_info.on_delete.is_some() || field.relation_info.on_update.is_some() {
+                            continue;
+                        }
+
+                        field.relation_info.on_update = Some(ReferentialAction::Cascade);
+                        field.relation_info.on_delete = Some(match field.referential_arity {
+                            FieldArity::Required => ReferentialAction::Cascade,
+                            _ => ReferentialAction::SetNull,
+                        });
+
+                        // So our validator won't get a stroke when seeing the
+                        // values set without having the preview feature
+                        // enabled. Remove this before GA.
+                        field.relation_info.legacy_referential_actions();
+                    }
+                    _ => (),
+                }
+            }
         }
     }
 

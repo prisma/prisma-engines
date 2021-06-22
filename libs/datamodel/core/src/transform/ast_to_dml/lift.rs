@@ -167,7 +167,8 @@ impl<'a> LiftAstToDml<'a> {
         let mut field = match field_type {
             FieldType::Relation(info) => {
                 let arity = self.lift_field_arity(&ast_field.arity);
-                let mut field = dml::RelationField::new(&ast_field.name.name, arity, info);
+
+                let mut field = dml::RelationField::new(&ast_field.name.name, arity, arity, info);
 
                 if let Some(ref source) = self.source {
                     field.supports_restrict_action(

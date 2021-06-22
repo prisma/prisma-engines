@@ -255,6 +255,9 @@ pub struct RelationField {
     /// The field's arity.
     pub arity: FieldArity,
 
+    /// The arity of underlying fields for referential actions.
+    pub referential_arity: FieldArity,
+
     /// Comments associated with this field.
     pub documentation: Option<String>,
 
@@ -279,6 +282,7 @@ impl PartialEq for RelationField {
     fn eq(&self, other: &Self) -> bool {
         let this_matches = self.name == other.name
             && self.arity == other.arity
+            && self.referential_arity == other.referential_arity
             && self.documentation == other.documentation
             && self.is_generated == other.is_generated
             && self.is_commented_out == other.is_commented_out
@@ -315,10 +319,11 @@ impl PartialEq for RelationField {
 
 impl RelationField {
     /// Creates a new field with the given name and type.
-    pub fn new(name: &str, arity: FieldArity, relation_info: RelationInfo) -> Self {
+    pub fn new(name: &str, arity: FieldArity, calculated_arity: FieldArity, relation_info: RelationInfo) -> Self {
         RelationField {
             name: String::from(name),
             arity,
+            referential_arity: calculated_arity,
             relation_info,
             documentation: None,
             is_generated: false,
@@ -347,7 +352,7 @@ impl RelationField {
             FieldArity::Optional
         };
 
-        let mut field = Self::new(name, arity, info);
+        let mut field = Self::new(name, arity, arity, info);
         field.is_generated = true;
 
         field
@@ -376,7 +381,7 @@ impl RelationField {
     pub fn default_on_delete_action(&self) -> ReferentialAction {
         use ReferentialAction::*;
 
-        match self.arity {
+        match self.referential_arity {
             FieldArity::Required if self.supports_restrict_action.unwrap_or(true) => Restrict,
             FieldArity::Required => NoAction,
             _ => SetNull,
@@ -386,7 +391,7 @@ impl RelationField {
     pub fn default_on_update_action(&self) -> ReferentialAction {
         use ReferentialAction::*;
 
-        match self.arity {
+        match self.referential_arity {
             _ if !self.virtual_referential_actions.unwrap_or(false) => Cascade,
             FieldArity::Required => Restrict,
             _ => SetNull,

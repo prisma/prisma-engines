@@ -1729,6 +1729,61 @@ async fn do_not_try_to_keep_custom_many_to_many_self_relation_names(api: &TestAp
 }
 
 #[test_connector]
+async fn legacy_referential_actions(api: &TestApi) -> TestResult {
+    let family = api.sql_family();
+
+    api.barrel()
+        .execute(move |migration| {
+            migration.create_table("a", |t| {
+                t.add_column("id", types::primary());
+            });
+
+            migration.create_table("b", move |t| {
+                t.add_column("id", types::primary());
+                t.add_column("a_id", types::integer().nullable(false));
+
+                match family {
+                    SqlFamily::Mssql => {
+                        t.inject_custom(
+                            "CONSTRAINT asdf FOREIGN KEY (a_id) REFERENCES legacy_referential_actions.a(id) ON DELETE NO ACTION ON UPDATE NO ACTION",
+                        );
+                    }
+                    _ => {
+                        t.inject_custom(
+                            "CONSTRAINT asdf FOREIGN KEY (a_id) REFERENCES a(id) ON DELETE NO ACTION ON UPDATE NO ACTION",
+                        );
+                    }
+                }
+            });
+        })
+        .await?;
+
+    let extra_index = if api.sql_family().is_mysql() {
+        r#"@@index([a_id], name: "asdf")"#
+    } else {
+        ""
+    };
+
+    let input_dm = formatdoc! {r#"
+        model a {{
+            id Int @id @default(autoincrement())
+            bs b[] @relation("changed")
+        }}
+
+        model b {{
+            id Int @id @default(autoincrement())
+            a_id Int
+            a a @relation("changed", fields: [a_id], references: [id])
+            {}
+        }}
+    "#, extra_index};
+
+    api.assert_eq_datamodels(&input_dm, &api.re_introspect(&input_dm).await?);
+
+    Ok(())
+}
+
+#[test_connector]
 async fn referential_actions(api: &TestApi) -> TestResult {
     let family = api.sql_family();
 

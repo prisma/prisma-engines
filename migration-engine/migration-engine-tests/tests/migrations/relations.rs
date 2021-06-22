@@ -121,18 +121,13 @@ fn specifying_a_db_name_for_an_inline_relation_must_work(api: TestApi) {
     });
 }
 
-#[test_connector(preview_features("referentialActions"))]
+#[test_connector]
 fn adding_an_inline_relation_to_a_model_with_an_exotic_id_type(api: TestApi) {
     let dm1 = r#"
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
-        }
-
         model A {
             id Int @id
             b_id String
-            b B @relation(fields: [b_id], references: [id], onDelete: NoAction)
+            b B @relation(fields: [b_id], references: [id])
         }
 
         model B {
@@ -148,7 +143,7 @@ fn adding_an_inline_relation_to_a_model_with_an_exotic_id_type(api: TestApi) {
             .assert_fk_on_columns(&["b_id"], |fk| {
                 fk.assert_references("B", &["id"])
                     .assert_referential_action_on_update(ForeignKeyAction::Cascade)
-                    .assert_referential_action_on_delete(ForeignKeyAction::NoAction)
+                    .assert_referential_action_on_delete(ForeignKeyAction::Cascade)
             })
     });
 }
@@ -658,6 +653,261 @@ fn on_update_restrict_should_work(api: TestApi) {
         table.assert_foreign_keys_count(1).assert_fk_on_columns(&["aId"], |fk| {
             fk.assert_references("A", &["id"])
                 .assert_referential_action_on_update(ForeignKeyAction::Restrict)
+        })
+    });
+}
+
+#[test_connector(exclude(Mssql), preview_features("referentialActions"))]
+fn on_delete_required_default_action(api: TestApi) {
+    let dm = r#"
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialActions"]
+        }
+
+        model A {
+            id Int @id
+            b      B[]
+        }
+
+        model B {
+            id   Int @id
+            aId  Int
+            a    A    @relation(fields: [aId], references: [id])
+        }
+    "#;
+
+    api.schema_push(dm).send_sync().assert_green_bang();
+
+    api.assert_schema().assert_table("B", |table| {
+        table.assert_foreign_keys_count(1).assert_fk_on_columns(&["aId"], |fk| {
+            fk.assert_references("A", &["id"])
+                .assert_referential_action_on_delete(ForeignKeyAction::Restrict)
+        })
+    });
+}
+
+#[test_connector(tags(Mssql), preview_features("referentialActions"))]
+fn on_delete_required_default_action_with_no_restrict(api: TestApi) {
+    let dm = r#"
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialActions"]
+        }
+
+        model A {
+            id Int @id
+            b      B[]
+        }
+
+        model B {
+            id   Int @id
+            aId  Int
+            a    A    @relation(fields: [aId], references: [id])
+        }
+    "#;
+
+    api.schema_push(dm).send_sync().assert_green_bang();
+
+    api.assert_schema().assert_table("B", |table| {
+        table.assert_foreign_keys_count(1).assert_fk_on_columns(&["aId"], |fk| {
+            fk.assert_references("A", &["id"])
+                .assert_referential_action_on_delete(ForeignKeyAction::NoAction)
+        })
+    });
+}
+
+#[test_connector(preview_features("referentialActions"))]
+fn on_delete_optional_default_action(api: TestApi) {
+    let dm = r#"
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialActions"]
+        }
+
+        model A {
+            id Int @id
+            b      B[]
+        }
+
+        model B {
+            id   Int @id
+            aId  Int?
+            a    A?    @relation(fields: [aId], references: [id])
+        }
+    "#;
+
+    api.schema_push(dm).send_sync().assert_green_bang();
+
+    api.assert_schema().assert_table("B", |table| {
+        table.assert_foreign_keys_count(1).assert_fk_on_columns(&["aId"], |fk| {
+            fk.assert_references("A", &["id"])
+                .assert_referential_action_on_delete(ForeignKeyAction::SetNull)
+        })
+    });
+}
+
+#[test_connector(preview_features("referentialActions"))]
+fn on_delete_compound_optional_optional_default_action(api: TestApi) {
+    let dm = r#"
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialActions"]
+        }
+
+        model A {
+            id  Int @id
+            id2 Int
+            b      B[]
+            @@unique([id, id2])
+        }
+
+        model B {
+            id    Int @id
+            aId1  Int?
+            aId2  Int?
+            a     A?    @relation(fields: [aId1, aId2], references: [id, id2])
+        }
+    "#;
+
+    api.schema_push(dm).send_sync().assert_green_bang();
+
+    api.assert_schema().assert_table("B", |table| {
+        table
+            .assert_foreign_keys_count(1)
+            .assert_fk_on_columns(&["aId1", "aId2"], |fk| {
+                fk.assert_references("A", &["id", "id2"])
+                    .assert_referential_action_on_delete(ForeignKeyAction::SetNull)
+            })
+    });
+}
+
+#[test_connector(exclude(Mssql), preview_features("referentialActions"))]
+fn on_delete_compound_required_optional_default_action_with_restrict(api: TestApi) {
+    let dm = r#"
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialActions"]
+        }
+
+        model A {
+            id  Int @id
+            id2 Int
+            b      B[]
+            @@unique([id, id2])
+        }
+
+        model B {
+            id    Int @id
+            aId1  Int?
+            aId2  Int
+            a     A?    @relation(fields: [aId1, aId2], references: [id, id2])
+        }
+    "#;
+
+    api.schema_push(dm).send_sync().assert_green_bang();
+
+    api.assert_schema().assert_table("B", |table| {
+        table
+            .assert_foreign_keys_count(1)
+            .assert_fk_on_columns(&["aId1", "aId2"], |fk| {
+                fk.assert_references("A", &["id", "id2"])
+                    .assert_referential_action_on_delete(ForeignKeyAction::Restrict)
+            })
+    });
+}
+
+#[test_connector(tags(Mssql), preview_features("referentialActions"))]
+fn on_delete_compound_required_optional_default_action_without_restrict(api: TestApi) {
+    let dm = r#"
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialActions"]
+        }
+
+        model A {
+            id  Int @id
+            id2 Int
+            b      B[]
+            @@unique([id, id2])
+        }
+
+        model B {
+            id    Int @id
+            aId1  Int?
+            aId2  Int
+            a     A?    @relation(fields: [aId1, aId2], references: [id, id2])
+        }
+    "#;
+
+    api.schema_push(dm).send_sync().assert_green_bang();
+
+    api.assert_schema().assert_table("B", |table| {
+        table
+            .assert_foreign_keys_count(1)
+            .assert_fk_on_columns(&["aId1", "aId2"], |fk| {
+                fk.assert_references("A", &["id", "id2"])
+                    .assert_referential_action_on_delete(ForeignKeyAction::NoAction)
+            })
+    });
+}
+
+#[test_connector(preview_features("referentialActions"))]
+fn on_update_optional_default_action(api: TestApi) {
+    let dm = r#"
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialActions"]
+        }
+
+        model A {
+            id Int @id
+            b      B[]
+        }
+
+        model B {
+            id   Int @id
+            aId  Int?
+            a    A?    @relation(fields: [aId], references: [id])
+        }
+    "#;
+
+    api.schema_push(dm).send_sync().assert_green_bang();
+
+    api.assert_schema().assert_table("B", |table| {
+        table.assert_foreign_keys_count(1).assert_fk_on_columns(&["aId"], |fk| {
+            fk.assert_references("A", &["id"])
+                .assert_referential_action_on_update(ForeignKeyAction::Cascade)
+        })
+    });
+}
+
+#[test_connector(preview_features("referentialActions"))]
+fn on_update_required_default_action(api: TestApi) {
+    let dm = r#"
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialActions"]
+        }
+
+        model A {
+            id Int @id
+            b      B[]
+        }
+
+        model B {
+            id   Int @id
+            aId  Int
+            a    A    @relation(fields: [aId], references: [id])
+        }
+    "#;
+
+    api.schema_push(dm).send_sync().assert_green_bang();
+
+    api.assert_schema().assert_table("B", |table| {
+        table.assert_foreign_keys_count(1).assert_fk_on_columns(&["aId"], |fk| {
+            fk.assert_references("A", &["id"])
+                .assert_referential_action_on_update(ForeignKeyAction::Cascade)
         })
     });
 }
