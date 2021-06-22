@@ -32,6 +32,7 @@ impl Connector for EmptyDatamodelConnector {
             ConnectorCapability::CreateManyWriteableAutoIncId,
             ConnectorCapability::AutoIncrement,
             ConnectorCapability::CompoundIds,
+            ConnectorCapability::MultipleIndexesWithSameName,
         ]
     }
 

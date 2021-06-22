@@ -23,6 +23,7 @@ pub trait IntrospectionConnector: Send + Sync + 'static {
         &self,
         existing_data_model: &Datamodel,
         source_name: String,
+        active_provider: String,
         connector: Box<dyn Connector>,
     ) -> ConnectorResult<IntrospectionResult>;
 }

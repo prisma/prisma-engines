@@ -102,7 +102,12 @@ impl RpcImpl {
         let first_source = config2.datasources.into_iter().next().unwrap();
 
         let result = match connector
-            .introspect(&input_data_model, first_source.name, first_source.active_connector)
+            .introspect(
+                &input_data_model,
+                first_source.name,
+                first_source.active_provider,
+                first_source.active_connector,
+            )
             .await
         {
             Ok(introspection_result) => {

@@ -135,7 +135,7 @@ async fn a_table_without_fully_required_compound_unique(api: &TestApi) -> TestRe
           opt_unique Int?
           req_unique Int
 
-          @@unique([opt_unique, req_unique])
+          @@unique([opt_unique, req_unique], name: "Post_opt_unique_req_unique_key")
           @@ignore
         }
     "#};

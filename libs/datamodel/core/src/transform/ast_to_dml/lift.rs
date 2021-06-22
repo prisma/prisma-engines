@@ -298,7 +298,7 @@ impl<'a> LiftAstToDml<'a> {
 
         if let Ok(scalar_type) = ScalarType::from_str(type_name) {
             if !self.context.connector.is_empty_default() {
-                let prefix = format!("{}{}", self.context.source_name.as_ref().unwrap(), ".");
+                let prefix = format!("{}.", self.context.source_name.as_ref().unwrap());
 
                 let type_specifications_with_invalid_datasource_name = ast_field
                     .attributes
@@ -355,7 +355,7 @@ impl<'a> LiftAstToDml<'a> {
                         return Err(DatamodelError::new_connector_error(
                             &ConnectorError::from_kind(ErrorKind::NativeTypeNameUnknown {
                                 native_type: x.parse().unwrap(),
-                                connector_name: self.context.connector.name().to_string(),
+                                connector_name: self.context.active_provider.as_ref().unwrap().clone(),
                             })
                             .to_string(),
                             type_specification.unwrap().span,
@@ -501,7 +501,7 @@ impl<'a> LiftAstToDml<'a> {
 
                     let msg = format!(
                         "The type `Unsupported(\"{}\")` you specified in the type definition for the field `{}` is supported as a native type by Prisma. Please use the native type notation `{} @{}.{}` for full support.",
-                        unsupported_lit, ast_field.name.name, prisma_type.to_string(), self.context.connector.name(), native_type.render()
+                        unsupported_lit, ast_field.name.name, prisma_type.to_string(), self.context.source_name.as_ref().unwrap().clone(), native_type.render()
                     );
 
                     return Err(DatamodelError::new_validation_error(&msg, ast_field.span));

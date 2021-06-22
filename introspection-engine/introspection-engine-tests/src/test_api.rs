@@ -2,7 +2,7 @@ pub use super::TestResult;
 pub use test_setup::{BitFlags, Capabilities, Tags};
 
 use crate::{BarrelMigrationExecutor, Result};
-use datamodel::{Configuration, Datamodel};
+use datamodel::{Configuration, Datamodel, PreviewFeature};
 use introspection_connector::{
     ConnectorResult, DatabaseMetadata, IntrospectionConnector, IntrospectionResult, Version,
 };
@@ -52,6 +52,7 @@ impl TestApi {
             unreachable!()
         };
 
+        // let preview_features = vec![PreviewFeature::NamedConstraints];
         let preview_features = vec![];
 
         let api = SqlIntrospectionConnector::new(&connection_string, preview_features)
@@ -108,7 +109,12 @@ impl TestApi {
         let first_source = config.datasources.into_iter().next().unwrap();
 
         self.api
-            .introspect(&data_model, first_source.name, first_source.active_connector)
+            .introspect(
+                &data_model,
+                first_source.name,
+                first_source.active_provider,
+                first_source.active_connector,
+            )
             .instrument(tracing::info_span!("introspect"))
             .await
     }

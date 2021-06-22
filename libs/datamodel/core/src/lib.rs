@@ -93,7 +93,7 @@ pub use configuration::*;
 use diagnostics::Diagnostics;
 
 use crate::diagnostics::{Validated, ValidatedConfiguration, ValidatedDatamodel};
-use crate::{ast::SchemaAst, common::preview_features::PreviewFeature};
+pub use crate::{ast::SchemaAst, common::preview_features::PreviewFeature};
 use datamodel_connector::EmptyDatamodelConnector;
 use std::collections::HashSet;
 use transform::{
@@ -145,13 +145,14 @@ fn parse_datamodel_internal(
     let preview_features: HashSet<&PreviewFeature> = preview_features(&generators);
     let datasources = load_sources(&ast, &preview_features, &mut &mut diagnostics);
 
-    let first_source = load_sources(&ast, &preview_features, &mut &mut diagnostics)
+    let first_source = load_sources(&ast, &preview_features, &mut diagnostics::Diagnostics::new())
         .into_iter()
         .next();
     let preview_features: Vec<PreviewFeature> = preview_features.into_iter().map(|f| f.to_owned()).collect();
 
     let ctx = DatamodelContext {
-        source_name: first_source.as_ref().map(|s| s.name.to_owned()),
+        source_name: first_source.as_ref().map(|s| s.name.to_string()),
+        active_provider: first_source.as_ref().map(|s| s.active_provider.to_string()),
         connector: first_source
             .map(|f| f.active_connector)
             .unwrap_or(Box::new(EmptyDatamodelConnector)),
@@ -176,8 +177,8 @@ fn parse_datamodel_internal(
                 warnings: src.warnings,
             })
         }
-        Err(mut err) => {
-            diagnostics.append(&mut err);
+        Err(err) => {
+            diagnostics.extend(err);
             Err(diagnostics)
         }
     }

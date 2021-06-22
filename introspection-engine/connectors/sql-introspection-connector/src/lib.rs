@@ -121,6 +121,7 @@ impl IntrospectionConnector for SqlIntrospectionConnector {
         &self,
         previous_data_model: &Datamodel,
         source_name: String,
+        active_provider: String,
         connector: Box<dyn Connector>,
     ) -> ConnectorResult<IntrospectionResult> {
         let sql_schema = self.catch(self.describe()).await?;
@@ -129,6 +130,7 @@ impl IntrospectionConnector for SqlIntrospectionConnector {
 
         let ctx = DatamodelContext {
             source_name: Some(source_name),
+            active_provider: Some(active_provider),
             preview_features,
             connector,
         };

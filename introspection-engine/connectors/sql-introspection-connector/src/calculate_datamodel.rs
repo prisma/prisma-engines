@@ -82,7 +82,8 @@ mod tests {
 
     fn ctx() -> DatamodelContext {
         DatamodelContext {
-            source_name: Some("Postgres".into()),
+            source_name: Some("pg".into()),
+            active_provider: Some("Postgres".into()),
             preview_features: vec![],
             connector: Box::new(PostgresDatamodelConnector::new()),
         }
