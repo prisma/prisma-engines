@@ -62,7 +62,7 @@ mod tests {
     use super::*;
     use datamodel::{
         dml, Datamodel, DefaultValue as DMLDefault, Field, FieldArity, FieldType, Model, NativeTypeInstance,
-        RelationField, RelationInfo, ScalarField, ScalarType, ValueGenerator,
+        ReferentialAction, RelationField, RelationInfo, ScalarField, ScalarType, ValueGenerator,
     };
     use native_types::{NativeType, PostgresType};
     use pretty_assertions::assert_eq;
@@ -551,20 +551,26 @@ mod tests {
                             is_commented_out: false,
                             is_ignored: false,
                         }),
-                        Field::RelationField(RelationField::new(
-                            "City",
-                            FieldArity::Required,
-                            FieldArity::Required,
-                            RelationInfo {
+                        Field::RelationField(RelationField {
+                            name: "City".into(),
+                            arity: FieldArity::Required,
+                            referential_arity: FieldArity::Required,
+                            documentation: None,
+                            is_generated: false,
+                            is_commented_out: false,
+                            is_ignored: false,
+                            supports_restrict_action: Some(true),
+                            virtual_referential_actions: None,
+                            relation_info: RelationInfo {
                                 name: "CityToUser".to_string(),
                                 to: "City".to_string(),
                                 fields: vec!["city_id".to_string(), "city_name".to_string()],
                                 references: vec!["id".to_string(), "name".to_string()],
-                                on_delete: None,
-                                on_update: None,
+                                on_delete: Some(ReferentialAction::NoAction),
+                                on_update: Some(ReferentialAction::NoAction),
                                 legacy_referential_actions: false,
                             },
-                        )),
+                        }),
                     ],
                     is_generated: false,
                     indices: vec![],
@@ -911,20 +917,26 @@ mod tests {
                                 },
                             ),
                         )),
-                        Field::RelationField(RelationField::new(
-                            "City",
-                            FieldArity::Required,
-                            FieldArity::Required,
-                            RelationInfo {
+                        Field::RelationField(RelationField {
+                            name: "City".into(),
+                            arity: FieldArity::Required,
+                            referential_arity: FieldArity::Required,
+                            documentation: None,
+                            is_generated: false,
+                            is_commented_out: false,
+                            is_ignored: false,
+                            supports_restrict_action: Some(true),
+                            virtual_referential_actions: None,
+                            relation_info: RelationInfo {
                                 name: "CityToUser".to_string(),
                                 to: "City".to_string(),
                                 fields: vec!["city_id".to_string()],
                                 references: vec!["id".to_string()],
-                                on_delete: None,
-                                on_update: None,
+                                on_delete: Some(ReferentialAction::NoAction),
+                                on_update: Some(ReferentialAction::NoAction),
                                 legacy_referential_actions: false,
                             },
-                        )),
+                        }),
                     ],
                     is_generated: false,
                     indices: vec![],
