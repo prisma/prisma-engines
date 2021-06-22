@@ -236,6 +236,43 @@ fn restrict_should_not_work_on_sql_server() {
 }
 
 #[test]
+fn actions_should_be_defined_only_from_one_side() {
+    let dml = indoc! { r#"
+        datasource db {
+            provider = "sqlserver"
+            url = "sqlserver://"
+        }
+
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialActions"]
+        }
+
+        model A {
+            id Int @id
+            b B? @relation(onUpdate: NoAction, onDelete: NoAction)
+        }
+
+        model B {
+            id Int @id
+            aId Int
+            a A @relation(fields: [aId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+        }
+    "#};
+
+    let message1 =
+        "The relation fields `b` on Model `A` and `a` on Model `B` both provide the `onDelete` or `onUpdate` argument in the @relation attribute. You have to provide it only on one of the two fields.";
+
+    let message2 =
+        "The relation fields `a` on Model `B` and `b` on Model `A` both provide the `onDelete` or `onUpdate` argument in the @relation attribute. You have to provide it only on one of the two fields.";
+
+    parse_error(dml).assert_are(&[
+        DatamodelError::new_attribute_validation_error(&message1, "relation", Span::new(201, 256)),
+        DatamodelError::new_attribute_validation_error(&message2, "relation", Span::new(300, 387)),
+    ]);
+}
+
+#[test]
 fn concrete_actions_should_not_work_on_planetscale() {
     let actions = &[(Cascade, 411), (NoAction, 412), (SetDefault, 414)];
 

@@ -973,6 +973,22 @@ impl<'a> Validator<'a> {
                         ));
                     }
 
+                    if self.preview_features.contains(&PreviewFeature::ReferentialActions)
+                        && (rel_info.on_delete.is_some() || rel_info.on_update.is_some())
+                        && (related_field_rel_info.on_delete.is_some() || related_field_rel_info.on_update.is_some())
+                    {
+                        let message = format!(
+                            "The relation fields `{}` on Model `{}` and `{}` on Model `{}` both provide the `onDelete` or `onUpdate` argument in the {} attribute. You have to provide it only on one of the two fields.",
+                            &field.name, &model.name, &related_field.name, &related_model.name, RELATION_ATTRIBUTE_NAME_WITH_AT
+                        );
+
+                        errors.push_error(DatamodelError::new_attribute_validation_error(
+                            &message,
+                            RELATION_ATTRIBUTE_NAME,
+                            field_span,
+                        ));
+                    }
+
                     if !rel_info.fields.is_empty() && !related_field_rel_info.fields.is_empty() {
                         errors.push_error(DatamodelError::new_attribute_validation_error(
                         &format!(
