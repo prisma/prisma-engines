@@ -27,8 +27,6 @@ impl FieldArity {
     }
 }
 
-// TODO: when progressing with the native types implementation we should consider merging the variants `NativeType` and `Base`
-//Agreed
 /// Datamodel field type.
 #[derive(Debug, PartialEq, Clone)]
 pub enum FieldType {
@@ -36,32 +34,30 @@ pub enum FieldType {
     Enum(String),
     /// This is a relation field.
     Relation(RelationInfo),
-    /// native field type.
-    NativeType(ScalarType, NativeTypeInstance),
     /// This is a field with an unsupported datatype. The content is the db's description of the type, it should enable migrate to create the type.
     Unsupported(String),
-    /// The option is Some(x) if the scalar type is based upon a type alias.
-    Base(ScalarType, Option<String>),
+    /// The first option is Some(x) if the scalar type is based upon a type alias.
+    Scalar(ScalarType, Option<String>, Option<NativeTypeInstance>),
 }
 
 impl FieldType {
     pub fn as_base(&self) -> Option<&ScalarType> {
         match self {
-            FieldType::Base(scalar_type, _) => Some(scalar_type),
+            FieldType::Scalar(scalar_type, _, _) => Some(scalar_type),
             _ => None,
         }
     }
 
     pub fn as_native_type(&self) -> Option<(&ScalarType, &NativeTypeInstance)> {
         match self {
-            FieldType::NativeType(a, b) => Some((a, b)),
+            FieldType::Scalar(a, _, Some(b)) => Some((a, b)),
             _ => None,
         }
     }
 
     pub fn is_compatible_with(&self, other: &FieldType) -> bool {
         match (self, other) {
-            (Self::Base(a, _), Self::Base(b, _)) => a == b, // the name of the type alias is not important for the comparison
+            (Self::Scalar(a, _, nta), Self::Scalar(b, _, ntb)) => a == b && nta == ntb, // the name of the type alias is not important for the comparison
             (a, b) => a == b,
         }
     }
@@ -76,15 +72,14 @@ impl FieldType {
 
     pub fn scalar_type(&self) -> Option<ScalarType> {
         match self {
-            FieldType::NativeType(st, _) => Some(*st),
-            FieldType::Base(st, _) => Some(*st),
+            FieldType::Scalar(st, _, _) => Some(*st),
             _ => None,
         }
     }
 
     pub fn native_type(&self) -> Option<&NativeTypeInstance> {
         match self {
-            FieldType::NativeType(_, nt) => Some(nt),
+            FieldType::Scalar(_, _, Some(nt)) => Some(nt),
             _ => None,
         }
     }

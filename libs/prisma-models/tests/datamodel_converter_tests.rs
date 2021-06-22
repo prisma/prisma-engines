@@ -5,9 +5,9 @@ use std::sync::Arc;
 #[test]
 fn an_empty_datamodel_must_work() {
     let datamodel = convert("");
-    assert_eq!(datamodel.enums.is_empty(), true);
-    assert_eq!(datamodel.models().is_empty(), true);
-    assert_eq!(datamodel.relations().is_empty(), true);
+    assert!(datamodel.enums.is_empty());
+    assert!(datamodel.models().is_empty());
+    assert!(datamodel.relations().is_empty());
 }
 
 #[test]
@@ -196,7 +196,7 @@ fn multi_field_id_with_1_field_must_be_transformed_to_is_id_on_field() {
         r#"
             model Test {
                 a String
-                
+
                 @@id([a])
             }
         "#,

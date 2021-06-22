@@ -35,7 +35,7 @@ pub(crate) fn calculate_steps(schemas: Pair<&SqlSchema>, flavour: &dyn SqlFlavou
     let redefine_indexes = if differ.flavour.can_alter_index() {
         Vec::new()
     } else {
-        std::mem::replace(&mut alter_indexes, Vec::new())
+        std::mem::take(&mut alter_indexes)
     };
 
     differ.drop_tables(&mut steps);

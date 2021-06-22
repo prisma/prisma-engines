@@ -324,15 +324,16 @@ impl<'a> LiftAstToDml<'a> {
                             &connector_error.to_string(),
                             type_specification.unwrap().span,
                         )),
-                        Ok(parsed_native_type) => {
-                            Ok((dml::FieldType::NativeType(scalar_type, parsed_native_type), vec![]))
-                        }
+                        Ok(parsed_native_type) => Ok((
+                            dml::FieldType::Scalar(scalar_type, None, Some(parsed_native_type)),
+                            vec![],
+                        )),
                     }
                 } else {
-                    Ok((dml::FieldType::Base(scalar_type, type_alias), vec![]))
+                    Ok((dml::FieldType::Scalar(scalar_type, type_alias, None), vec![]))
                 }
             } else {
-                Ok((dml::FieldType::Base(scalar_type, type_alias), vec![]))
+                Ok((dml::FieldType::Scalar(scalar_type, type_alias, None), vec![]))
             }
         } else if ast_schema.find_model(type_name).is_some() {
             Ok((dml::FieldType::Relation(dml::RelationInfo::new(type_name)), vec![]))

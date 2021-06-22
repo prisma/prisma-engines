@@ -13,7 +13,7 @@ prisma-models = { path = "../../../libs/prisma-models" }
 prisma-value = { path = "../../../libs/prisma-value" }
 thiserror = "1.0"
 uuid = "0.8"
-itertools = "0.8"
+itertools = "0.10"
 chrono = { version = "0.4", features = ["serde"] }
 futures = "0.3"
 user-facing-errors = { path = "../../../libs/user-facing-errors" }

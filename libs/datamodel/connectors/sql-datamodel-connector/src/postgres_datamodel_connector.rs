@@ -211,7 +211,7 @@ impl Connector for PostgresDatamodelConnector {
 
     fn validate_field(&self, field: &Field) -> Result<(), ConnectorError> {
         match field.field_type() {
-            FieldType::NativeType(_scalar_type, native_type_instance) => {
+            FieldType::Scalar(_scalar_type, _, Some(native_type_instance)) => {
                 let native_type: PostgresType = native_type_instance.deserialize_native_type();
                 let error = self.native_instance_error(native_type_instance);
 

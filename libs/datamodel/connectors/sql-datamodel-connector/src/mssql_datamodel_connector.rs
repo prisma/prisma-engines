@@ -210,7 +210,7 @@ impl Connector for MsSqlDatamodelConnector {
 
     fn validate_field(&self, field: &Field) -> Result<(), ConnectorError> {
         match field.field_type() {
-            FieldType::NativeType(_, native_type) => {
+            FieldType::Scalar(_, _, Some(native_type)) => {
                 let r#type: MsSqlType = native_type.deserialize_native_type();
                 let error = self.native_instance_error(native_type);
 
@@ -258,7 +258,7 @@ impl Connector for MsSqlDatamodelConnector {
             let fields = index_definition.fields.iter().map(|f| model.find_field(f).unwrap());
 
             for field in fields {
-                if let FieldType::NativeType(_, native_type) = field.field_type() {
+                if let FieldType::Scalar(_, _, Some(native_type)) = field.field_type() {
                     let r#type: MsSqlType = native_type.deserialize_native_type();
                     let error = self.native_instance_error(native_type);
 
@@ -276,7 +276,7 @@ impl Connector for MsSqlDatamodelConnector {
         for id_field in model.id_fields.iter() {
             let field = model.find_field(id_field).unwrap();
 
-            if let FieldType::NativeType(_, native_type) = field.field_type() {
+            if let FieldType::Scalar(_, _, Some(native_type)) = field.field_type() {
                 let r#type: MsSqlType = native_type.deserialize_native_type();
 
                 if heap_allocated_types().contains(&r#type) {
