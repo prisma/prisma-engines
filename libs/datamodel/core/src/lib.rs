@@ -265,6 +265,6 @@ fn render_schema_ast_to(stream: &mut dyn std::fmt::Write, schema: &ast::SchemaAs
 fn preview_features(generators: &[Generator]) -> HashSet<PreviewFeature> {
     generators
         .iter()
-        .flat_map(|gen| gen.preview_features.iter().map(Clone::clone))
+        .flat_map(|gen| gen.preview_features.iter().cloned())
         .collect()
 }
