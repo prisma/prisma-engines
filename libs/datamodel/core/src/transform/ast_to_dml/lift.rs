@@ -1,21 +1,20 @@
-use std::collections::HashSet;
-
-use super::{super::attributes::AllAttributes, db::ParserDatabase};
+use super::super::attributes::AllAttributes;
 use crate::{
-    ast::{self, Identifier},
+    ast,
     common::preview_features::PreviewFeature,
-    configuration,
     diagnostics::{DatamodelError, Diagnostics},
-    dml::{self, ScalarType},
-    transform::helpers::ValueValidator,
-    Datasource, Field, FieldType,
+    dml,
+    transform::{
+        ast_to_dml::db::{ParserDatabase, ScalarFieldType},
+        helpers::ValueValidator,
+    },
+    Datasource,
 };
-use ::dml::relation_info::ReferentialAction;
 use datamodel_connector::connector_error::{ConnectorError, ErrorKind};
 use itertools::Itertools;
 use once_cell::sync::Lazy;
 use regex::Regex;
-use std::str::FromStr;
+use std::collections::{HashMap, HashSet};
 
 /// Helper for lifting a datamodel.
 ///
@@ -23,7 +22,6 @@ use std::str::FromStr;
 /// semantics are attached.
 pub struct LiftAstToDml<'a> {
     attributes: AllAttributes,
-    source: Option<&'a configuration::Datasource>,
     db: &'a ParserDatabase<'a>,
 }
 
@@ -32,101 +30,120 @@ impl<'a> LiftAstToDml<'a> {
     /// the attributes defined by the given sources registered.
     ///
     /// The attributes defined by the given sources will be namespaced.
-    pub(crate) fn new(
-        source: Option<&'a configuration::Datasource>,
-        preview_features: &HashSet<PreviewFeature>,
-        db: &'a ParserDatabase<'a>,
-    ) -> LiftAstToDml<'a> {
+    pub(crate) fn new(preview_features: &HashSet<PreviewFeature>, db: &'a ParserDatabase<'a>) -> LiftAstToDml<'a> {
         LiftAstToDml {
             attributes: AllAttributes::new(preview_features),
-            source,
             db,
         }
     }
 
-    pub fn lift(&self) -> Result<dml::Datamodel, Diagnostics> {
+    pub fn lift(&self, diagnostics: &mut Diagnostics) -> dml::Datamodel {
         let mut schema = dml::Datamodel::new();
-        let mut errors = Diagnostics::new();
 
-        for (_, ast_obj) in self.db.ast().iter_tops() {
+        for (top_id, ast_obj) in self.db.ast().iter_tops() {
             match ast_obj {
-                ast::Top::Enum(en) => match self.lift_enum(&en) {
-                    Ok(en) => schema.add_enum(en),
-                    Err(mut err) => errors.append(&mut err),
-                },
-                ast::Top::Model(ty) => match self.lift_model(&ty) {
-                    Ok(md) => schema.add_model(md),
-                    Err(mut err) => errors.append(&mut err),
-                },
+                ast::Top::Enum(en) => schema.add_enum(self.lift_enum(&en, diagnostics)),
+                ast::Top::Model(ty) => schema.add_model(self.lift_model(top_id, &ty, diagnostics)),
                 ast::Top::Source(_) => { /* Source blocks are explicitly ignored by the validator */ }
                 ast::Top::Generator(_) => { /* Generator blocks are explicitly ignored by the validator */ }
-                // TODO: For now, type blocks are never checked on their own.
                 ast::Top::Type(_) => { /* Type blocks are inlined */ }
             }
         }
 
-        if errors.has_errors() {
-            Err(errors)
-        } else {
-            Ok(schema)
-        }
+        schema
     }
 
     /// Internal: Validates a model AST node and lifts it to a DML model.
-    fn lift_model(&self, ast_model: &ast::Model) -> Result<dml::Model, Diagnostics> {
+    fn lift_model(&self, model_id: ast::TopId, ast_model: &ast::Model, diagnostics: &mut Diagnostics) -> dml::Model {
         let mut model = dml::Model::new(ast_model.name.name.clone(), None);
         model.documentation = ast_model.documentation.clone().map(|comment| comment.text);
 
-        let mut errors = Diagnostics::new();
+        let active_connector = self.db.active_connector();
+        let mut field_ids_for_sorting: HashMap<&str, ast::FieldId> = HashMap::with_capacity(ast_model.fields.len());
 
-        for ast_field in &ast_model.fields {
-            match self.lift_field(ast_field) {
-                Ok(field) => model.add_field(field),
-                Err(mut err) => errors.append(&mut err),
+        for (field_id, scalar_field_type) in self.db.iter_model_scalar_fields(model_id) {
+            let ast_field = &ast_model[field_id];
+            let arity = self.lift_field_arity(&ast_field.arity);
+            let mut attributes = Vec::with_capacity(ast_field.attributes.len());
+
+            let field_type =
+                lift_scalar_field_type(ast_field, scalar_field_type, &mut attributes, &self.db, diagnostics);
+
+            attributes.extend(ast_field.attributes.iter().cloned());
+
+            let mut field = dml::ScalarField::new(&ast_field.name.name, arity, field_type);
+            field.documentation = ast_field.documentation.clone().map(|comment| comment.text);
+            let mut field = dml::Field::ScalarField(field);
+
+            if let Err(mut errs) = self.attributes.field.validate_and_apply(&attributes, &mut field) {
+                diagnostics.append(&mut errs);
             }
+            field_ids_for_sorting.insert(&ast_field.name.name, field_id);
+            model.add_field(field);
         }
+
+        for (field_id, relation_field) in self.db.iter_model_relation_fields(model_id) {
+            let ast_field = &ast_model[field_id];
+            let arity = self.lift_field_arity(&ast_field.arity);
+            let target_model = &self.db.ast()[relation_field.referenced_model].as_model().unwrap();
+            let relation_info = dml::RelationInfo::new(&target_model.name.name);
+
+            let mut field = dml::RelationField::new(&ast_field.name.name, arity, arity, relation_info);
+
+            field.supports_restrict_action(
+                active_connector.supports_referential_action(dml::ReferentialAction::Restrict),
+            );
+            field.emulates_referential_actions(active_connector.emulates_referential_actions());
+
+            field.documentation = ast_field.documentation.clone().map(|comment| comment.text);
+            let mut field = dml::Field::RelationField(field);
+
+            if let Err(mut errs) = self.attributes.field.validate_and_apply(ast_field, &mut field) {
+                diagnostics.append(&mut errs);
+            }
+
+            field_ids_for_sorting.insert(&ast_field.name.name, field_id);
+            model.add_field(field)
+        }
+
+        model.fields.sort_by_key(|f| field_ids_for_sorting.get(f.name()));
 
         if let Err(mut err) = self.attributes.model.validate_and_apply(ast_model, &mut model) {
-            errors.append(&mut err);
+            diagnostics.append(&mut err);
         }
 
-        if errors.has_errors() {
-            return Err(errors);
-        }
-
-        Ok(model)
+        model
     }
 
     /// Internal: Validates an enum AST node.
-    fn lift_enum(&self, ast_enum: &ast::Enum) -> Result<dml::Enum, Diagnostics> {
-        let mut errors = Diagnostics::new();
+    fn lift_enum(&self, ast_enum: &ast::Enum, diagnostics: &mut Diagnostics) -> dml::Enum {
+        let mut en = dml::Enum::new(&ast_enum.name.name, vec![]);
 
-        let supports_enums = match self.source {
+        let supports_enums = match self.db.datasource() {
             Some(source) => source.active_connector.supports_enums(),
             None => true,
         };
+
         if !supports_enums {
-            errors.push_error(DatamodelError::new_validation_error(
+            diagnostics.push_error(DatamodelError::new_validation_error(
                 &format!(
                     "You defined the enum `{}`. But the current connector does not support enums.",
                     &ast_enum.name.name
                 ),
                 ast_enum.span,
             ));
-            return Err(errors);
+            return en;
         }
-
-        let mut en = dml::Enum::new(&ast_enum.name.name, vec![]);
 
         for ast_enum_value in &ast_enum.values {
             match self.lift_enum_value(ast_enum_value) {
                 Ok(value) => en.add_value(value),
-                Err(mut err) => errors.append(&mut err),
+                Err(mut err) => diagnostics.append(&mut err),
             }
         }
 
         if en.values.is_empty() {
-            errors.push_error(DatamodelError::new_validation_error(
+            diagnostics.push_error(DatamodelError::new_validation_error(
                 "An enum must have at least one value.",
                 ast_enum.span,
             ))
@@ -135,14 +152,10 @@ impl<'a> LiftAstToDml<'a> {
         en.documentation = ast_enum.documentation.clone().map(|comment| comment.text);
 
         if let Err(mut err) = self.attributes.enm.validate_and_apply(ast_enum, &mut en) {
-            errors.append(&mut err);
+            diagnostics.append(&mut err);
         }
 
-        if errors.has_errors() {
-            Err(errors)
-        } else {
-            Ok(en)
-        }
+        en
     }
 
     /// Internal: Validates an enum value AST node.
@@ -157,53 +170,6 @@ impl<'a> LiftAstToDml<'a> {
         Ok(enum_value)
     }
 
-    /// Internal: Lift a field AST node to a DML field.
-    fn lift_field(&self, ast_field: &ast::Field) -> Result<dml::Field, Diagnostics> {
-        let mut errors = Diagnostics::new();
-        // If we cannot parse the field type, we exit right away.
-        let (field_type, extra_attributes) = self.lift_field_type(&ast_field, None, &mut Vec::new())?;
-
-        let mut field = match field_type {
-            FieldType::Relation(info) => {
-                let arity = self.lift_field_arity(&ast_field.arity);
-
-                let mut field = dml::RelationField::new(&ast_field.name.name, arity, arity, info);
-
-                if let Some(ref source) = self.source {
-                    field.supports_restrict_action(
-                        source
-                            .active_connector
-                            .supports_referential_action(ReferentialAction::Restrict),
-                    );
-
-                    field.emulates_referential_actions(source.active_connector.emulates_referential_actions());
-                }
-
-                field.documentation = ast_field.documentation.clone().map(|comment| comment.text);
-                Field::RelationField(field)
-            }
-            x => {
-                let arity = self.lift_field_arity(&ast_field.arity);
-                let mut field = dml::ScalarField::new(&ast_field.name.name, arity, x);
-                field.documentation = ast_field.documentation.clone().map(|comment| comment.text);
-                Field::ScalarField(field)
-            }
-        };
-
-        // We merge attributes so we can fail on duplicates.
-        let attributes = [&extra_attributes[..], &ast_field.attributes[..]].concat();
-
-        if let Err(mut err) = self.attributes.field.validate_and_apply(&attributes, &mut field) {
-            errors.append(&mut err);
-        }
-
-        if errors.has_errors() {
-            Err(errors)
-        } else {
-            Ok(field)
-        }
-    }
-
     /// Internal: Lift a field's arity.
     fn lift_field_arity(&self, ast_field: &ast::FieldArity) -> dml::FieldArity {
         match ast_field {
@@ -212,196 +178,172 @@ impl<'a> LiftAstToDml<'a> {
             ast::FieldArity::List => dml::FieldArity::List,
         }
     }
+}
 
-    /// Internal: Lift a field's type.
-    /// Auto resolves custom types and gathers attributes, but without a stack overflow please.
-    fn lift_field_type(
-        &self,
-        ast_field: &ast::Field,
-        type_alias: Option<String>,
-        checked_types: &mut Vec<String>,
-    ) -> Result<(dml::FieldType, Vec<ast::Attribute>), DatamodelError> {
-        let type_ident: &Identifier = match &ast_field.field_type {
-            ast::FieldType::Supported(ident) => ident,
-            ast::FieldType::Unsupported(unsupported_lit, _) => {
-                return lift_unsupported_field_type(ast_field, unsupported_lit, self.source)
-            }
-        };
-
-        let type_name = &type_ident.name;
-
-        if let Ok(scalar_type) = ScalarType::from_str(type_name) {
-            if let Some(source) = self.source {
-                let connector = &source.active_connector;
-
-                let prefix = format!("{}{}", source.name, ".");
-
-                let type_specifications_with_invalid_datasource_name = ast_field
-                    .attributes
-                    .iter()
-                    .filter(|dir| dir.name.name.contains('.') && !dir.name.name.starts_with(&prefix))
-                    .collect_vec();
-
-                if !type_specifications_with_invalid_datasource_name.is_empty() {
-                    let incorrect_type_specification =
-                        type_specifications_with_invalid_datasource_name.first().unwrap();
-                    let mut type_specification_name_split = incorrect_type_specification.name.name.split('.');
-                    let given_prefix = type_specification_name_split.next().unwrap();
-                    return Err(DatamodelError::new_connector_error(
-                        &ConnectorError::from_kind(ErrorKind::InvalidPrefixForNativeTypes {
-                            given_prefix: String::from(given_prefix),
-                            expected_prefix: source.name.clone(),
-                            suggestion: format!("{}{}", prefix, type_specification_name_split.next().unwrap()),
-                        })
-                        .to_string(),
-                        incorrect_type_specification.span,
-                    ));
-                }
-
-                let type_specifications = ast_field
-                    .attributes
-                    .iter()
-                    .filter(|dir| dir.name.name.starts_with(&prefix))
-                    .collect_vec();
-
-                let type_specification = type_specifications.first();
-
-                if type_specifications.len() > 1 {
-                    return Err(DatamodelError::new_duplicate_attribute_error(
-                        &prefix,
-                        type_specification.unwrap().span,
-                    ));
-                }
-
-                // convert arguments to string if possible
-                let number_args = type_specification.map(|dir| dir.arguments.clone());
-                let args = if let Some(number) = number_args {
-                    number
-                        .iter()
-                        .map(|arg| ValueValidator::new(&arg.value).raw())
-                        .collect_vec()
-                } else {
-                    vec![]
-                };
-
-                if let Some(x) = type_specification.map(|dir| dir.name.name.trim_start_matches(&prefix)) {
-                    let constructor = if let Some(cons) = connector.find_native_type_constructor(x) {
-                        cons
-                    } else {
-                        return Err(DatamodelError::new_connector_error(
-                            &ConnectorError::from_kind(ErrorKind::NativeTypeNameUnknown {
-                                native_type: x.parse().unwrap(),
-                                connector_name: source.active_provider.clone(),
-                            })
-                            .to_string(),
-                            type_specification.unwrap().span,
-                        ));
-                    };
-
-                    let number_of_args = args.len();
-                    if number_of_args < constructor._number_of_args
-                        || ((number_of_args > constructor._number_of_args) && constructor._number_of_optional_args == 0)
-                    {
-                        return Err(DatamodelError::new_argument_count_missmatch_error(
-                            x,
-                            constructor._number_of_args,
-                            number_of_args,
-                            type_specification.unwrap().span,
-                        ));
-                    }
-                    if number_of_args > constructor._number_of_args + constructor._number_of_optional_args
-                        && constructor._number_of_optional_args > 0
-                    {
-                        return Err(DatamodelError::new_connector_error(
-                            &ConnectorError::from_kind(ErrorKind::OptionalArgumentCountMismatchError {
-                                native_type: x.parse().unwrap(),
-                                optional_count: constructor._number_of_optional_args,
-                                given_count: number_of_args,
-                            })
-                            .to_string(),
-                            type_specification.unwrap().span,
-                        ));
-                    }
-
-                    // check for compatibility with scalar type
-                    if !constructor.prisma_types.contains(&scalar_type) {
-                        return Err(DatamodelError::new_connector_error(
-                            &ConnectorError::from_kind(ErrorKind::IncompatibleNativeType {
-                                native_type: x.parse().unwrap(),
-                                field_type: scalar_type.to_string(),
-                                expected_types: constructor.prisma_types.iter().map(|s| s.to_string()).join(" or "),
-                            })
-                            .to_string(),
-                            type_specification.unwrap().span,
-                        ));
-                    }
-
-                    let parse_native_type_result = connector.parse_native_type(x, args);
-                    match parse_native_type_result {
-                        Err(connector_error) => Err(DatamodelError::new_connector_error(
-                            &connector_error.to_string(),
-                            type_specification.unwrap().span,
-                        )),
-                        Ok(parsed_native_type) => Ok((
-                            dml::FieldType::Scalar(scalar_type, None, Some(parsed_native_type)),
-                            vec![],
-                        )),
-                    }
-                } else {
-                    Ok((dml::FieldType::Scalar(scalar_type, type_alias, None), vec![]))
-                }
-            } else {
-                Ok((dml::FieldType::Scalar(scalar_type, type_alias, None), vec![]))
-            }
-        } else if self.db.ast().find_model(type_name).is_some() {
-            Ok((dml::FieldType::Relation(dml::RelationInfo::new(type_name)), vec![]))
-        } else if self.db.get_enum(type_name).is_some() {
-            Ok((dml::FieldType::Enum(type_name.clone()), vec![]))
-        } else {
-            self.resolve_custom_type(ast_field, checked_types)
+fn lift_scalar_field_type(
+    ast_field: &ast::Field,
+    scalar_field_type: &ScalarFieldType,
+    collected_attributes: &mut Vec<ast::Attribute>,
+    db: &ParserDatabase<'_>,
+    diagnostics: &mut Diagnostics,
+) -> dml::FieldType {
+    match scalar_field_type {
+        ScalarFieldType::Enum(enum_id) => {
+            let enum_name = &db.ast()[*enum_id].as_enum().unwrap().name.name;
+            dml::FieldType::Enum(enum_name.to_owned())
+        }
+        ScalarFieldType::Unsupported => lift_unsupported_field_type(
+            ast_field,
+            ast_field.field_type.as_unsupported().unwrap().0,
+            db.datasource(),
+            diagnostics,
+        ),
+        ScalarFieldType::Alias(top_id) => {
+            let alias = db.ast()[*top_id].as_type_alias().unwrap();
+            collected_attributes.extend(alias.attributes.iter().cloned());
+            lift_scalar_field_type(
+                alias,
+                db.alias_scalar_field_type(top_id),
+                collected_attributes,
+                db,
+                diagnostics,
+            )
+        }
+        ScalarFieldType::BuiltInScalar => {
+            let scalar_type: dml::ScalarType = ast_field.field_type.unwrap_supported().name.parse().unwrap();
+            let native_type = db
+                .datasource()
+                .and_then(|datasource| lift_native_type(ast_field, &scalar_type, datasource, diagnostics));
+            dml::FieldType::Scalar(scalar_type, None, native_type)
         }
     }
+}
 
-    fn resolve_custom_type(
-        &self,
-        ast_field: &ast::Field,
-        checked_types: &mut Vec<String>,
-    ) -> Result<(dml::FieldType, Vec<ast::Attribute>), DatamodelError> {
-        let field_type = ast_field.field_type.unwrap_supported();
-        let type_name = &field_type.name;
+fn lift_native_type(
+    ast_field: &ast::Field,
+    scalar_type: &dml::ScalarType,
+    datasource: &Datasource,
+    diagnostics: &mut Diagnostics,
+) -> Option<dml::NativeTypeInstance> {
+    let connector = &datasource.active_connector;
+    let prefix = format!("{}{}", datasource.name, ".");
 
-        if checked_types.iter().any(|x| x == type_name) {
-            // Recursive type.
-            return Err(DatamodelError::new_validation_error(
-                &format!(
-                    "Recursive type definitions are not allowed. Recursive path was: {} -> {}.",
-                    checked_types.join(" -> "),
-                    type_name
-                ),
-                field_type.span,
+    let type_specifications_with_invalid_datasource_name = ast_field
+        .attributes
+        .iter()
+        .filter(|dir| dir.name.name.contains('.') && !dir.name.name.starts_with(&prefix))
+        .collect_vec();
+
+    if !type_specifications_with_invalid_datasource_name.is_empty() {
+        let incorrect_type_specification = type_specifications_with_invalid_datasource_name.first().unwrap();
+        let mut type_specification_name_split = incorrect_type_specification.name.name.split('.');
+        let given_prefix = type_specification_name_split.next().unwrap();
+        diagnostics.push_error(DatamodelError::new_connector_error(
+            &ConnectorError::from_kind(ErrorKind::InvalidPrefixForNativeTypes {
+                given_prefix: String::from(given_prefix),
+                expected_prefix: datasource.name.clone(),
+                suggestion: format!("{}{}", prefix, type_specification_name_split.next().unwrap()),
+            })
+            .to_string(),
+            incorrect_type_specification.span,
+        ));
+        return None;
+    }
+
+    let type_specifications = ast_field
+        .attributes
+        .iter()
+        .filter(|dir| dir.name.name.starts_with(&prefix))
+        .collect_vec();
+
+    let type_specification = type_specifications.first();
+
+    if type_specifications.len() > 1 {
+        diagnostics.push_error(DatamodelError::new_duplicate_attribute_error(
+            &prefix,
+            type_specification.unwrap().span,
+        ));
+        return None;
+    }
+
+    // convert arguments to string if possible
+    let number_args = type_specification.map(|dir| dir.arguments.clone());
+    let args = if let Some(number) = number_args {
+        number
+            .iter()
+            .map(|arg| ValueValidator::new(&arg.value).raw())
+            .collect_vec()
+    } else {
+        vec![]
+    };
+
+    let x = type_specification.map(|dir| dir.name.name.trim_start_matches(&prefix))?;
+    let constructor = if let Some(cons) = connector.find_native_type_constructor(x) {
+        cons
+    } else {
+        diagnostics.push_error(DatamodelError::new_connector_error(
+            &ConnectorError::from_kind(ErrorKind::NativeTypeNameUnknown {
+                native_type: x.parse().unwrap(),
+                connector_name: datasource.active_provider.clone(),
+            })
+            .to_string(),
+            type_specification.unwrap().span,
+        ));
+        return None;
+    };
+
+    let number_of_args = args.len();
+
+    if number_of_args < constructor._number_of_args
+        || ((number_of_args > constructor._number_of_args) && constructor._number_of_optional_args == 0)
+    {
+        diagnostics.push_error(DatamodelError::new_argument_count_missmatch_error(
+            x,
+            constructor._number_of_args,
+            number_of_args,
+            type_specification.unwrap().span,
+        ));
+        return None;
+    }
+
+    if number_of_args > constructor._number_of_args + constructor._number_of_optional_args
+        && constructor._number_of_optional_args > 0
+    {
+        diagnostics.push_error(DatamodelError::new_connector_error(
+            &ConnectorError::from_kind(ErrorKind::OptionalArgumentCountMismatchError {
+                native_type: x.parse().unwrap(),
+                optional_count: constructor._number_of_optional_args,
+                given_count: number_of_args,
+            })
+            .to_string(),
+            type_specification.unwrap().span,
+        ));
+        return None;
+    }
+
+    // check for compatibility with scalar type
+    if !constructor.prisma_types.contains(&scalar_type) {
+        diagnostics.push_error(DatamodelError::new_connector_error(
+            &ConnectorError::from_kind(ErrorKind::IncompatibleNativeType {
+                native_type: x.parse().unwrap(),
+                field_type: scalar_type.to_string(),
+                expected_types: constructor.prisma_types.iter().map(|s| s.to_string()).join(" or "),
+            })
+            .to_string(),
+            type_specification.unwrap().span,
+        ));
+        return None;
+    }
+
+    match connector.parse_native_type(x, args) {
+        Err(connector_error) => {
+            diagnostics.push_error(DatamodelError::new_connector_error(
+                &connector_error.to_string(),
+                type_specification.unwrap().span,
             ));
+            None
         }
-
-        if let Some(custom_type) = self.db.ast().find_type_alias(&type_name) {
-            checked_types.push(custom_type.name.name.clone());
-            let (field_type, mut attrs) =
-                self.lift_field_type(custom_type, Some(type_name.to_owned()), checked_types)?;
-
-            if let dml::FieldType::Relation(_) = field_type {
-                return Err(DatamodelError::new_validation_error(
-                    "Only scalar types can be used for defining custom types.",
-                    custom_type.field_type.span(),
-                ));
-            }
-
-            attrs.append(&mut custom_type.attributes.clone());
-            Ok((field_type, attrs))
-        } else {
-            Err(DatamodelError::new_type_not_found_error(
-                type_name,
-                ast_field.field_type.span(),
-            ))
-        }
+        Ok(parsed_native_type) => Some(parsed_native_type),
     }
 }
 
@@ -409,7 +351,8 @@ fn lift_unsupported_field_type(
     ast_field: &ast::Field,
     unsupported_lit: &str,
     source: Option<&Datasource>,
-) -> Result<(dml::FieldType, Vec<ast::Attribute>), DatamodelError> {
+    diagnostics: &mut Diagnostics,
+) -> dml::FieldType {
     static TYPE_REGEX: Lazy<Regex> = Lazy::new(|| {
         Regex::new(r#"(?x)
     ^                           # beginning of the string
@@ -440,10 +383,10 @@ fn lift_unsupported_field_type(
                         unsupported_lit, ast_field.name.name, prisma_type.to_string(), &source.name, native_type.render()
                     );
 
-                return Err(DatamodelError::new_validation_error(&msg, ast_field.span));
+                diagnostics.push_error(DatamodelError::new_validation_error(&msg, ast_field.span));
             }
         }
     }
 
-    Ok((dml::FieldType::Unsupported(unsupported_lit.into()), vec![]))
+    dml::FieldType::Unsupported(unsupported_lit.into())
 }

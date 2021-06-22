@@ -59,8 +59,7 @@ impl<'a> Validator<'a> {
             if let Some(sf) = model.scalar_fields().find(|f| f.is_id && !f.is_required()) {
                 if !model.is_ignored {
                     let span = ast_schema
-                        .models()
-                        .find(|ast_model| ast_model.name.name == model.name)
+                        .find_model(&model.name)
                         .unwrap()
                         .fields
                         .iter()

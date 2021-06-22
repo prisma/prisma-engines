@@ -1,5 +1,7 @@
 use super::*;
 
+/// An opaque identifier for a field in an AST model. Use the
+/// `model[field_id]` syntax to resolve the id to an `ast::Field`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub(crate) struct FieldId(u32);
 
@@ -8,6 +10,14 @@ impl FieldId {
     pub(crate) const ZERO: FieldId = FieldId(0);
     /// Used for range bounds when iterating over BTreeMaps.
     pub(crate) const MAX: FieldId = FieldId(u32::MAX);
+}
+
+impl std::ops::Index<FieldId> for Model {
+    type Output = Field;
+
+    fn index(&self, index: FieldId) -> &Self::Output {
+        &self.fields[index.0 as usize]
+    }
 }
 
 /// A model declaration.
