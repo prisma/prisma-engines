@@ -22,6 +22,11 @@ pub fn connector_test(attr: TokenStream, input: TokenStream) -> TokenStream {
     connector_test_impl(attr, input)
 }
 
+#[proc_macro_attribute]
+pub fn connector_schema_gen(attr: TokenStream, input: TokenStream) -> TokenStream {
+    connector_schema_gen_impl(attr, input)
+}
+
 trait IntoDarlingError<T> {
     fn into_darling_error(self, span: &Span) -> std::result::Result<T, darling::Error>;
 }

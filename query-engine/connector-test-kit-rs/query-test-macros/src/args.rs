@@ -2,7 +2,7 @@ use crate::IntoDarlingError;
 use darling::FromMeta;
 use proc_macro::TokenStream;
 use proc_macro2::Span;
-use query_tests_setup::ConnectorTag;
+use query_tests_setup::{relation_field::RelationField, ConnectorTag};
 use quote::quote;
 use std::convert::TryFrom;
 use syn::{spanned::Spanned, Ident, Meta, Path};
@@ -23,6 +23,127 @@ pub struct ConnectorTestArgs {
 
     #[darling(default)]
     pub capabilities: RunOnlyForCapabilities,
+}
+
+#[derive(Debug, FromMeta)]
+pub struct ConnectorTestGenArgs {
+    #[darling(default)]
+    pub suite: Option<String>,
+
+    #[darling(default)]
+    pub only: OnlyConnectorTags,
+
+    // TODO: Option is only there to fulfill the default requirement, because `Path` don't
+    #[darling(default)]
+    pub gen: Option<SchemaGen>,
+
+    #[darling(default)]
+    pub exclude: ExcludeConnectorTags,
+
+    #[darling(default)]
+    pub capabilities: RunOnlyForCapabilities,
+}
+
+impl ConnectorTestGenArgs {
+    pub fn validate(&self, on_module: bool) -> Result<(), darling::Error> {
+        if !self.only.is_empty() && !self.exclude.is_empty() && !on_module {
+            return Err(darling::Error::custom(
+                "Only one of `only` and `exclude` can be specified for a connector test.",
+            ));
+        }
+
+        if self.suite.is_none() && !on_module {
+            return Err(darling::Error::custom(
+                "A test suite name annotation on either the test mod (#[test_suite]) or the test (suite = \"name\") is required.",
+            ));
+        }
+
+        if self.gen.is_none() {
+            // TODO: improve error message
+            return Err(darling::Error::custom("A gen attribute is required"));
+        }
+
+        Ok(())
+    }
+
+    /// Returns all the connectors that the test is valid for.
+    pub fn connectors_to_test(&self) -> Vec<ConnectorTag> {
+        if !self.only.is_empty() {
+            self.only.tags.clone()
+        } else if !self.exclude.is_empty() {
+            let all = ConnectorTag::all();
+            let exclude = self.exclude.tags();
+
+            all.into_iter().filter(|tag| !exclude.contains(tag)).collect()
+        } else {
+            ConnectorTag::all()
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct SchemaGen {
+    pub on_parent: RelationField,
+    pub on_child: RelationField,
+    pub without_parent: bool,
+}
+
+impl darling::FromMeta for SchemaGen {
+    fn from_list(items: &[syn::NestedMeta]) -> Result<Self, darling::Error> {
+        if items.len() != 3 {
+            return Err(darling::Error::unsupported_shape(
+                "Expected `gen` to contain exactly 2 RelationField and a boolean.",
+            )
+            .with_span(&Span::call_site()));
+        }
+
+        let mut items_iter = items.into_iter();
+
+        // TODO: Refactor logic below to use a function
+        let on_parent = match items_iter.next().unwrap() {
+            syn::NestedMeta::Meta(meta) => match meta {
+                Meta::Path(p) => {
+                    let tag = tag_string_from_path(p)?;
+                    RelationField::try_from(tag.as_str()).into_darling_error(&p.span())?
+                }
+                // TODO: Provide better errors
+                _ => unimplemented!(),
+            },
+            // TODO: Provide better errors
+            _ => unimplemented!(),
+        };
+
+        // TODO: Refactor logic below to use a function
+        let on_child = match items_iter.next().unwrap() {
+            syn::NestedMeta::Meta(meta) => match meta {
+                Meta::Path(p) => {
+                    let tag = tag_string_from_path(p)?;
+                    RelationField::try_from(tag.as_str()).into_darling_error(&p.span())?
+                }
+                // TODO: Provide better errors
+                _ => unimplemented!(),
+            },
+            // TODO: Provide better errors
+            _ => unimplemented!(),
+        };
+
+        let without_parent = match items_iter.next().unwrap() {
+            syn::NestedMeta::Meta(Meta::NameValue(name_value)) => match &name_value.lit {
+                syn::Lit::Bool(b) => Ok(b.value),
+                _ => todo!(),
+            },
+            x => Err(
+                darling::Error::unsupported_shape("Expected `gen` third param to be a name value").with_span(&x.span()),
+            ),
+        }
+        .unwrap();
+
+        Ok(Self {
+            on_child,
+            on_parent,
+            without_parent,
+        })
+    }
 }
 
 impl ConnectorTestArgs {

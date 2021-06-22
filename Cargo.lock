@@ -3529,6 +3529,7 @@ name = "query-test-macros"
 version = "0.1.0"
 dependencies = [
  "darling 0.12.2",
+ "indoc",
  "itertools 0.10.0",
  "proc-macro2",
  "query-tests-setup",

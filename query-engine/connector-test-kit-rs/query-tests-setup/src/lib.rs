@@ -5,6 +5,7 @@ mod error;
 mod logging;
 mod query_result;
 mod runner;
+mod schema_gen;
 mod templating;
 
 pub use config::*;
@@ -14,6 +15,7 @@ pub use error::*;
 pub use logging::*;
 pub use query_result::*;
 pub use runner::*;
+pub use schema_gen::*;
 pub use templating::*;
 
 use lazy_static::lazy_static;
