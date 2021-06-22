@@ -67,7 +67,7 @@ impl Connector for MongoDbDatamodelConnector {
         self.referential_actions
     }
 
-    fn virtual_referential_actions(&self) -> bool {
+    fn emulates_referential_actions(&self) -> bool {
         true
     }
 

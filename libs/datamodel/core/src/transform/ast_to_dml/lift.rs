@@ -177,7 +177,7 @@ impl<'a> LiftAstToDml<'a> {
                             .supports_referential_action(ReferentialAction::Restrict),
                     );
 
-                    field.virtual_referential_actions(source.active_connector.virtual_referential_actions());
+                    field.emulates_referential_actions(source.active_connector.emulates_referential_actions());
                 }
 
                 field.documentation = ast_field.documentation.clone().map(|comment| comment.text);

@@ -16,9 +16,10 @@ pub struct RelationInfo {
     /// a related node is deleted.
     pub on_delete: Option<ReferentialAction>,
     /// A strategy indicating what happens when
-    /// a related node is deleted.
+    /// a related node is updated.
     pub on_update: Option<ReferentialAction>,
     /// Set true if referential actions feature is not in use.
+    /// This prevents the datamodel validator nagging about the missing preview feature, when automatically setting the values.
     pub legacy_referential_actions: bool,
 }
 
@@ -59,8 +60,7 @@ pub enum ReferentialAction {
     /// Deletes record if dependent record is deleted. Updates relation scalar
     /// fields if referenced scalar fields of the dependent record are updated.
     /// Prevents operation (both updates and deletes) from succeeding if any
-    /// records are connected. This behavior will always result in a runtime
-    /// error for required relations.
+    /// records are connected.
     Cascade,
     /// Prevents operation (both updates and deletes) from succeeding if any
     /// records are connected. This behavior will always result in a runtime

@@ -202,7 +202,7 @@ impl Connector for MySqlDatamodelConnector {
         self.referential_actions
     }
 
-    fn virtual_referential_actions(&self) -> bool {
+    fn emulates_referential_actions(&self) -> bool {
         self.is_planetscale
     }
 
@@ -451,11 +451,5 @@ impl Connector for MySqlDatamodelConnector {
         }
 
         Ok(())
-    }
-}
-
-impl Default for MySqlDatamodelConnector {
-    fn default() -> Self {
-        Self::new(false)
     }
 }

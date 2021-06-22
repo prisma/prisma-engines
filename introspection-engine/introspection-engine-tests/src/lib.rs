@@ -64,7 +64,7 @@ impl BarrelMigrationExecutor {
             return Ok(());
         }
 
-        self.database.raw_cmd(dbg!(&full_sql)).await?;
+        self.database.raw_cmd(&full_sql).await?;
 
         Ok(())
     }

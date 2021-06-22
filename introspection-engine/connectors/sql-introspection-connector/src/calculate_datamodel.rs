@@ -568,7 +568,7 @@ mod tests {
                             is_commented_out: false,
                             is_ignored: false,
                             supports_restrict_action: Some(true),
-                            virtual_referential_actions: None,
+                            emulates_referential_actions: None,
                             relation_info: RelationInfo {
                                 name: "CityToUser".to_string(),
                                 to: "City".to_string(),
@@ -941,7 +941,7 @@ mod tests {
                             is_commented_out: false,
                             is_ignored: false,
                             supports_restrict_action: Some(true),
-                            virtual_referential_actions: None,
+                            emulates_referential_actions: None,
                             relation_info: RelationInfo {
                                 name: "CityToUser".to_string(),
                                 to: "City".to_string(),

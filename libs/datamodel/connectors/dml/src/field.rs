@@ -269,7 +269,7 @@ pub struct RelationField {
     pub supports_restrict_action: Option<bool>,
 
     /// Do we run the referential actions in the core instead of the database.
-    pub virtual_referential_actions: Option<bool>,
+    pub emulates_referential_actions: Option<bool>,
 }
 
 impl PartialEq for RelationField {
@@ -325,7 +325,7 @@ impl RelationField {
             is_commented_out: false,
             is_ignored: false,
             supports_restrict_action: None,
-            virtual_referential_actions: None,
+            emulates_referential_actions: None,
         }
     }
 
@@ -335,8 +335,8 @@ impl RelationField {
     }
 
     /// The referential actions should be handled by the core.
-    pub fn virtual_referential_actions(&mut self, value: bool) {
-        self.virtual_referential_actions = Some(value);
+    pub fn emulates_referential_actions(&mut self, value: bool) {
+        self.emulates_referential_actions = Some(value);
     }
 
     /// Creates a new field with the given name and type, marked as generated and optional.
@@ -387,7 +387,7 @@ impl RelationField {
         use ReferentialAction::*;
 
         match self.referential_arity {
-            _ if !self.virtual_referential_actions.unwrap_or(false) => Cascade,
+            _ if !self.emulates_referential_actions.unwrap_or(false) => Cascade,
             FieldArity::Required => Restrict,
             _ => SetNull,
         }

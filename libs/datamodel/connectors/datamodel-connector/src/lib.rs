@@ -28,7 +28,7 @@ pub trait Connector: Send + Sync {
         self.referential_actions().contains(action)
     }
 
-    fn virtual_referential_actions(&self) -> bool {
+    fn emulates_referential_actions(&self) -> bool {
         false
     }
 
