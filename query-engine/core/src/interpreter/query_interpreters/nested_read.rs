@@ -129,6 +129,7 @@ pub async fn m2m<'a, 'b>(
 }
 
 // [DTODO] This is implemented in an inefficient fashion, e.g. too much Arc cloning going on.
+#[allow(clippy::too_many_arguments)]
 #[tracing::instrument(skip(
     tx,
     parent_field,

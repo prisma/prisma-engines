@@ -196,7 +196,7 @@ fn multi_field_id_with_1_field_must_be_transformed_to_is_id_on_field() {
         r#"
             model Test {
                 a String
-                
+
                 @@id([a])
             }
         "#,

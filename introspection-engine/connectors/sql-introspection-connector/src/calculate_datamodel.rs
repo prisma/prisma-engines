@@ -464,6 +464,7 @@ mod tests {
                         Field::RelationField(RelationField::new(
                             "User",
                             FieldArity::List,
+                            FieldArity::List,
                             RelationInfo {
                                 to: "User".to_string(),
                                 fields: vec![],
@@ -552,6 +553,7 @@ mod tests {
                         }),
                         Field::RelationField(RelationField::new(
                             "City",
+                            FieldArity::Required,
                             FieldArity::Required,
                             RelationInfo {
                                 name: "CityToUser".to_string(),
@@ -852,6 +854,7 @@ mod tests {
                         Field::RelationField(RelationField::new(
                             "User",
                             FieldArity::List,
+                            FieldArity::List,
                             RelationInfo {
                                 to: "User".to_string(),
                                 fields: vec![],
@@ -910,6 +913,7 @@ mod tests {
                         )),
                         Field::RelationField(RelationField::new(
                             "City",
+                            FieldArity::Required,
                             FieldArity::Required,
                             RelationInfo {
                                 name: "CityToUser".to_string(),

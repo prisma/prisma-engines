@@ -13,8 +13,8 @@ sql-datamodel-connector = { path = "../connectors/sql-datamodel-connector" }
 
 bigdecimal = "0.2"
 chrono = { version = "0.4.6", features = ["serde"] }
-colored = "1.8.0"
-itertools = "0.8"
+colored = "2"
+itertools = "0.10"
 once_cell = "1.3.1"
 pest = "2.1.3"
 pest_derive = "2.1.0"
