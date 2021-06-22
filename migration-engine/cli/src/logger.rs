@@ -18,10 +18,15 @@ pub(crate) fn init_logger() {
 }
 
 pub(crate) fn log_error_and_exit(error: ConnectorError) -> ! {
+    let message: &dyn std::fmt::Display = match error.known_error() {
+        Some(known_error) => &known_error.message,
+        _ => &error,
+    };
+
     tracing::error!(
         is_panic = false,
         error_code = error.error_code().unwrap_or(""),
-        message = %error,
+        message = %message,
     );
 
     std::process::exit(1)
