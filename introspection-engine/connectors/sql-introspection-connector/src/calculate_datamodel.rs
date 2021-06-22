@@ -82,12 +82,12 @@ mod tests {
                     Field::ScalarField(ScalarField::new(
                         "optional",
                         FieldArity::Optional,
-                        FieldType::Base(ScalarType::Int, None),
+                        FieldType::Scalar(ScalarType::Int, None, None),
                     )),
                     Field::ScalarField(ScalarField {
                         name: "required".to_string(),
                         arity: FieldArity::Required,
-                        field_type: FieldType::Base(ScalarType::Int, None),
+                        field_type: FieldType::Scalar(ScalarType::Int, None, None),
                         database_name: None,
                         default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
                         is_unique: false,
@@ -101,7 +101,7 @@ mod tests {
                     Field::ScalarField(ScalarField::new(
                         "list",
                         FieldArity::List,
-                        FieldType::Base(ScalarType::Int, None),
+                        FieldType::Scalar(ScalarType::Int, None, None),
                     )),
                 ],
                 is_generated: false,
@@ -169,13 +169,14 @@ mod tests {
                     fields: vec![Field::ScalarField(ScalarField {
                         name: "primary".to_string(),
                         arity: FieldArity::Required,
-                        field_type: FieldType::NativeType(
+                        field_type: FieldType::Scalar(
                             ScalarType::Int,
-                            NativeTypeInstance {
+                            None,
+                            Some(NativeTypeInstance {
                                 name: "Integer".into(),
                                 serialized_native_type: PostgresType::Integer.to_json(),
                                 args: Vec::new(),
-                            },
+                            }),
                         ),
                         database_name: None,
                         default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
@@ -202,13 +203,14 @@ mod tests {
                     fields: vec![Field::ScalarField(ScalarField {
                         name: "primary".to_string(),
                         arity: FieldArity::Required,
-                        field_type: FieldType::NativeType(
+                        field_type: FieldType::Scalar(
                             ScalarType::Int,
-                            NativeTypeInstance {
+                            None,
+                            Some(NativeTypeInstance {
                                 name: "Integer".into(),
                                 serialized_native_type: PostgresType::Integer.to_json(),
                                 args: Vec::new(),
-                            },
+                            }),
                         ),
                         database_name: None,
                         default_value: None,
@@ -235,13 +237,14 @@ mod tests {
                     fields: vec![Field::ScalarField(ScalarField {
                         name: "primary".to_string(),
                         arity: FieldArity::Required,
-                        field_type: FieldType::NativeType(
+                        field_type: FieldType::Scalar(
                             ScalarType::Int,
-                            NativeTypeInstance {
+                            None,
+                            Some(NativeTypeInstance {
                                 name: "Integer".into(),
                                 serialized_native_type: PostgresType::Integer.to_json(),
                                 args: Vec::new(),
-                            },
+                            }),
                         ),
                         database_name: None,
                         default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
@@ -355,12 +358,12 @@ mod tests {
                     Field::ScalarField(ScalarField::new(
                         "non_unique",
                         FieldArity::Optional,
-                        FieldType::Base(ScalarType::Int, None),
+                        FieldType::Scalar(ScalarType::Int, None, None),
                     )),
                     Field::ScalarField(ScalarField {
                         name: "unique".to_string(),
                         arity: FieldArity::Required,
-                        field_type: FieldType::Base(ScalarType::Int, None),
+                        field_type: FieldType::Scalar(ScalarType::Int, None, None),
                         database_name: None,
                         default_value: None,
                         is_unique: true,
@@ -431,13 +434,14 @@ mod tests {
                         Field::ScalarField(ScalarField {
                             name: "id".to_string(),
                             arity: FieldArity::Required,
-                            field_type: FieldType::NativeType(
+                            field_type: FieldType::Scalar(
                                 ScalarType::Int,
-                                NativeTypeInstance {
+                                None,
+                                Some(NativeTypeInstance {
                                     name: "Integer".into(),
                                     serialized_native_type: PostgresType::Integer.to_json(),
                                     args: Vec::new(),
-                                },
+                                }),
                             ),
                             database_name: None,
                             default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
@@ -452,13 +456,14 @@ mod tests {
                         Field::ScalarField(ScalarField::new(
                             "name",
                             FieldArity::Required,
-                            FieldType::NativeType(
+                            FieldType::Scalar(
                                 ScalarType::String,
-                                NativeTypeInstance {
+                                None,
+                                Some(NativeTypeInstance {
                                     name: "Text".into(),
                                     args: Vec::new(),
                                     serialized_native_type: PostgresType::Text.to_json(),
-                                },
+                                }),
                             ),
                         )),
                         Field::RelationField(RelationField::new(
@@ -491,13 +496,14 @@ mod tests {
                         Field::ScalarField(ScalarField {
                             name: "id".to_string(),
                             arity: FieldArity::Required,
-                            field_type: FieldType::NativeType(
+                            field_type: FieldType::Scalar(
                                 ScalarType::Int,
-                                NativeTypeInstance {
+                                None,
+                                Some(NativeTypeInstance {
                                     name: "Integer".into(),
                                     serialized_native_type: PostgresType::Integer.to_json(),
                                     args: Vec::new(),
-                                },
+                                }),
                             ),
                             database_name: None,
                             default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
@@ -512,13 +518,14 @@ mod tests {
                         Field::ScalarField(ScalarField {
                             name: "city_id".to_string(),
                             arity: FieldArity::Required,
-                            field_type: FieldType::NativeType(
+                            field_type: FieldType::Scalar(
                                 ScalarType::Int,
-                                NativeTypeInstance {
+                                None,
+                                Some(NativeTypeInstance {
                                     name: "Integer".into(),
                                     serialized_native_type: PostgresType::Integer.to_json(),
                                     args: Vec::new(),
-                                },
+                                }),
                             ),
                             database_name: Some("city-id".to_string()),
                             default_value: None,
@@ -532,13 +539,14 @@ mod tests {
                         }),
                         Field::ScalarField(ScalarField {
                             name: "city_name".to_string(),
-                            field_type: FieldType::NativeType(
+                            field_type: FieldType::Scalar(
                                 ScalarType::String,
-                                NativeTypeInstance {
+                                None,
+                                Some(NativeTypeInstance {
                                     name: "Text".into(),
                                     args: Vec::new(),
                                     serialized_native_type: PostgresType::Text.to_json(),
-                                },
+                                }),
                             ),
                             arity: FieldArity::Required,
                             database_name: Some("city-name".to_string()),
@@ -696,13 +704,14 @@ mod tests {
                     Field::ScalarField(ScalarField {
                         name: "id".to_string(),
                         arity: FieldArity::Required,
-                        field_type: FieldType::NativeType(
+                        field_type: FieldType::Scalar(
                             ScalarType::Int,
-                            NativeTypeInstance {
+                            None,
+                            Some(NativeTypeInstance {
                                 name: "Integer".into(),
                                 serialized_native_type: PostgresType::Integer.to_json(),
                                 args: Vec::new(),
-                            },
+                            }),
                         ),
                         database_name: None,
                         default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
@@ -717,25 +726,27 @@ mod tests {
                     Field::ScalarField(ScalarField::new(
                         "name",
                         FieldArity::Required,
-                        FieldType::NativeType(
+                        FieldType::Scalar(
                             ScalarType::String,
-                            NativeTypeInstance {
+                            None,
+                            Some(NativeTypeInstance {
                                 name: "Text".into(),
                                 args: Vec::new(),
                                 serialized_native_type: PostgresType::Text.to_json(),
-                            },
+                            }),
                         ),
                     )),
                     Field::ScalarField(ScalarField::new(
                         "lastname",
                         FieldArity::Required,
-                        FieldType::NativeType(
+                        FieldType::Scalar(
                             ScalarType::String,
-                            NativeTypeInstance {
+                            None,
+                            Some(NativeTypeInstance {
                                 name: "Text".into(),
                                 args: Vec::new(),
                                 serialized_native_type: PostgresType::Text.to_json(),
-                            },
+                            }),
                         ),
                     )),
                 ],
@@ -827,13 +838,14 @@ mod tests {
                         Field::ScalarField(ScalarField {
                             name: "id".to_string(),
                             arity: FieldArity::Required,
-                            field_type: FieldType::NativeType(
+                            field_type: FieldType::Scalar(
                                 ScalarType::Int,
-                                NativeTypeInstance {
+                                None,
+                                Some(NativeTypeInstance {
                                     name: "Integer".into(),
                                     serialized_native_type: PostgresType::Integer.to_json(),
                                     args: Vec::new(),
-                                },
+                                }),
                             ),
                             database_name: None,
                             default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
@@ -848,13 +860,14 @@ mod tests {
                         Field::ScalarField(ScalarField::new(
                             "name",
                             FieldArity::Required,
-                            FieldType::NativeType(
+                            FieldType::Scalar(
                                 ScalarType::String,
-                                NativeTypeInstance {
+                                None,
+                                Some(NativeTypeInstance {
                                     name: "Text".into(),
                                     args: Vec::new(),
                                     serialized_native_type: PostgresType::Text.to_json(),
-                                },
+                                }),
                             ),
                         )),
                         Field::RelationField(RelationField::new(
@@ -887,13 +900,14 @@ mod tests {
                         Field::ScalarField(ScalarField {
                             name: "id".to_string(),
                             arity: FieldArity::Required,
-                            field_type: FieldType::NativeType(
+                            field_type: FieldType::Scalar(
                                 ScalarType::Int,
-                                NativeTypeInstance {
+                                None,
+                                Some(NativeTypeInstance {
                                     name: "Integer".into(),
                                     serialized_native_type: PostgresType::Integer.to_json(),
                                     args: Vec::new(),
-                                },
+                                }),
                             ),
                             database_name: None,
                             default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
@@ -908,13 +922,14 @@ mod tests {
                         Field::ScalarField(ScalarField::new(
                             "city_id",
                             FieldArity::Required,
-                            FieldType::NativeType(
+                            FieldType::Scalar(
                                 ScalarType::Int,
-                                NativeTypeInstance {
+                                None,
+                                Some(NativeTypeInstance {
                                     name: "Integer".into(),
                                     serialized_native_type: PostgresType::Integer.to_json(),
                                     args: Vec::new(),
-                                },
+                                }),
                             ),
                         )),
                         Field::RelationField(RelationField {

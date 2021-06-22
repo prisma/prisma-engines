@@ -123,8 +123,7 @@ fn get_field_kind(field: &dml::Field) -> String {
     match field.field_type() {
         dml::FieldType::Relation(_) => String::from("object"),
         dml::FieldType::Enum(_) => String::from("enum"),
-        dml::FieldType::Base(_, _) => String::from("scalar"),
-        dml::FieldType::NativeType(_, _) => String::from("scalar"),
+        dml::FieldType::Scalar(_, _, _) => String::from("scalar"),
         dml::FieldType::Unsupported(_) => String::from("unsupported"),
     }
 }
@@ -172,8 +171,7 @@ fn get_field_type(field: &dml::Field) -> String {
         dml::FieldType::Relation(relation_info) => relation_info.to.clone(),
         dml::FieldType::Enum(t) => t.clone(),
         dml::FieldType::Unsupported(t) => t.clone(),
-        dml::FieldType::Base(t, _) => type_to_string(t),
-        dml::FieldType::NativeType(t, _) => type_to_string(t),
+        dml::FieldType::Scalar(t, _, _) => type_to_string(t),
     }
 }
 
