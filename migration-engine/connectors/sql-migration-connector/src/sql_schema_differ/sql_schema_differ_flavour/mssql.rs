@@ -10,7 +10,7 @@ use crate::{
     },
 };
 use native_types::{MsSqlType, MsSqlTypeParameter};
-use sql_schema_describer::{walkers::IndexWalker, ColumnTypeFamily};
+use sql_schema_describer::{walkers::IndexWalker, ColumnId, ColumnTypeFamily};
 use std::collections::HashSet;
 
 impl SqlSchemaDifferFlavour for MssqlFlavour {
@@ -58,7 +58,7 @@ impl SqlSchemaDifferFlavour for MssqlFlavour {
     fn push_index_changes_for_column_changes(
         &self,
         table: &TableDiffer<'_, '_>,
-        column_index: Pair<usize>,
+        column_id: Pair<ColumnId>,
         column_changes: ColumnChanges,
         steps: &mut Vec<SqlMigrationStep>,
     ) {
@@ -69,21 +69,20 @@ impl SqlSchemaDifferFlavour for MssqlFlavour {
         for dropped_index in table.index_pairs().filter(|pair| {
             pair.previous()
                 .columns()
-                .any(|col| col.column_index() == *column_index.previous())
+                .any(|col| col.column_id() == *column_id.previous())
         }) {
             steps.push(SqlMigrationStep::DropIndex {
-                table_index: table.previous().table_index(),
+                table_id: table.previous().table_id(),
                 index_index: dropped_index.previous().index(),
             })
         }
 
-        for created_index in table.index_pairs().filter(|pair| {
-            pair.next()
-                .columns()
-                .any(|col| col.column_index() == *column_index.next())
-        }) {
+        for created_index in table
+            .index_pairs()
+            .filter(|pair| pair.next().columns().any(|col| col.column_id() == *column_id.next()))
+        {
             steps.push(SqlMigrationStep::CreateIndex {
-                table_index: (None, table.next().table_index()),
+                table_id: (None, table.next().table_id()),
                 index_index: created_index.next().index(),
             })
         }

@@ -92,7 +92,10 @@ impl SqlRenderer for MssqlFlavour {
     }
 
     fn render_alter_table(&self, alter_table: &AlterTable, schemas: &Pair<&SqlSchema>) -> Vec<String> {
-        let AlterTable { table_index, changes } = alter_table;
+        let AlterTable {
+            table_ids: table_index,
+            changes,
+        } = alter_table;
         let tables = schemas.tables(table_index);
 
         alter_table::create_statements(self, tables, changes)
@@ -228,7 +231,7 @@ impl SqlRenderer for MssqlFlavour {
         let mut result = vec!["BEGIN TRANSACTION".to_string()];
 
         for redefine_table in tables {
-            let tables = schemas.tables(&redefine_table.table_index);
+            let tables = schemas.tables(&redefine_table.table_ids);
             // This is a copy of our new modified table.
             let temporary_table_name = format!("_prisma_new_{}", &tables.next().name());
 

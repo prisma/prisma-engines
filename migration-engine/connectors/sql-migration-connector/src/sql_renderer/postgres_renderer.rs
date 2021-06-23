@@ -230,7 +230,10 @@ impl SqlRenderer for PostgresFlavour {
     }
 
     fn render_alter_table(&self, alter_table: &AlterTable, schemas: &Pair<&SqlSchema>) -> Vec<String> {
-        let AlterTable { changes, table_index } = alter_table;
+        let AlterTable {
+            changes,
+            table_ids: table_index,
+        } = alter_table;
 
         let mut lines = Vec::new();
         let mut before_statements = Vec::new();
@@ -254,22 +257,22 @@ impl SqlRenderer for PostgresFlavour {
                     "ADD PRIMARY KEY ({})",
                     columns.iter().map(|colname| self.quote(colname)).join(", ")
                 )),
-                TableChange::AddColumn { column_index } => {
-                    let column = tables.next().column_at(*column_index);
+                TableChange::AddColumn { column_id } => {
+                    let column = tables.next().column_at(*column_id);
                     let col_sql = self.render_column(&column);
 
                     lines.push(format!("ADD COLUMN {}", col_sql));
                 }
-                TableChange::DropColumn { column_index } => {
-                    let name = self.quote(tables.previous().column_at(*column_index).name());
+                TableChange::DropColumn { column_id } => {
+                    let name = self.quote(tables.previous().column_at(*column_id).name());
                     lines.push(format!("DROP COLUMN {}", name));
                 }
                 TableChange::AlterColumn(AlterColumn {
-                    column_index,
+                    column_id,
                     changes,
                     type_change: _,
                 }) => {
-                    let columns = tables.columns(column_index);
+                    let columns = tables.columns(column_id);
 
                     render_alter_column(
                         &columns,
@@ -279,11 +282,8 @@ impl SqlRenderer for PostgresFlavour {
                         &mut after_statements,
                     );
                 }
-                TableChange::DropAndRecreateColumn {
-                    column_index,
-                    changes: _,
-                } => {
-                    let columns = tables.columns(column_index);
+                TableChange::DropAndRecreateColumn { column_id, changes: _ } => {
+                    let columns = tables.columns(column_id);
                     let name = self.quote(columns.previous().name());
 
                     lines.push(format!("DROP COLUMN {}", name));

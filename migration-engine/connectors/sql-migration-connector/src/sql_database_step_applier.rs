@@ -119,48 +119,47 @@ fn render_raw_sql(
         SqlMigrationStep::DropEnum { enum_index } => {
             renderer.render_drop_enum(&schemas.previous().enum_walker_at(*enum_index))
         }
-        SqlMigrationStep::CreateTable { table_index } => {
-            let table = schemas.next().table_walker_at(*table_index);
+        SqlMigrationStep::CreateTable { table_id } => {
+            let table = schemas.next().table_walker_at(*table_id);
 
             vec![renderer.render_create_table(&table)]
         }
-        SqlMigrationStep::DropTable { table_index } => {
-            renderer.render_drop_table(schemas.previous().table_walker_at(*table_index).name())
+        SqlMigrationStep::DropTable { table_id } => {
+            renderer.render_drop_table(schemas.previous().table_walker_at(*table_id).name())
         }
         SqlMigrationStep::RedefineIndex { table, index } => {
             renderer.render_drop_and_recreate_index(schemas.tables(table).indexes(index).as_ref())
         }
         SqlMigrationStep::AddForeignKey {
-            table_index,
+            table_id,
             foreign_key_index,
         } => {
             let foreign_key = schemas
                 .next()
-                .table_walker_at(*table_index)
+                .table_walker_at(*table_id)
                 .foreign_key_at(*foreign_key_index);
 
             vec![renderer.render_add_foreign_key(&foreign_key)]
         }
         SqlMigrationStep::DropForeignKey {
-            table_index,
+            table_id,
             foreign_key_index,
         } => {
             let foreign_key = schemas
                 .previous()
-                .table_walker_at(*table_index)
+                .table_walker_at(*table_id)
                 .foreign_key_at(*foreign_key_index);
 
             vec![renderer.render_drop_foreign_key(&foreign_key)]
         }
         SqlMigrationStep::AlterTable(alter_table) => renderer.render_alter_table(alter_table, &schemas),
         SqlMigrationStep::CreateIndex {
-            table_index: (_, table_index),
+            table_id: (_, table_id),
             index_index,
-        } => vec![renderer.render_create_index(&schemas.next().table_walker_at(*table_index).index_at(*index_index))],
-        SqlMigrationStep::DropIndex {
-            table_index,
-            index_index,
-        } => vec![renderer.render_drop_index(&schemas.previous().table_walker_at(*table_index).index_at(*index_index))],
+        } => vec![renderer.render_create_index(&schemas.next().table_walker_at(*table_id).index_at(*index_index))],
+        SqlMigrationStep::DropIndex { table_id, index_index } => {
+            vec![renderer.render_drop_index(&schemas.previous().table_walker_at(*table_id).index_at(*index_index))]
+        }
         SqlMigrationStep::AlterIndex { table, index } => {
             renderer.render_alter_index(schemas.tables(table).indexes(index).as_ref())
         }
