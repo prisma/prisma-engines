@@ -18,11 +18,19 @@ pub trait Connector: Send + Sync {
 
     fn capabilities(&self) -> &[ConnectorCapability];
 
+    /// The maximum length of constraint names in bytes. Connectors without a
+    /// limit should return usize::MAX.
+    fn constraint_name_length(&self) -> usize;
+
     fn has_capability(&self, capability: ConnectorCapability) -> bool {
         self.capabilities().contains(&capability)
     }
 
     fn referential_actions(&self) -> BitFlags<ReferentialAction>;
+
+    fn supports_named_primary_keys(&self) -> bool {
+        self.has_capability(ConnectorCapability::NamedPrimaryKeys)
+    }
 
     fn supports_referential_action(&self, action: ReferentialAction) -> bool {
         self.referential_actions().contains(action)
@@ -188,6 +196,7 @@ pub enum ConnectorCapability {
     AutoIncrementNonIndexedAllowed,
     RelationFieldsInArbitraryOrder,
     ForeignKeys,
+    NamedPrimaryKeys,
 
     // start of Query Engine Capabilities
     InsensitiveFilters,
