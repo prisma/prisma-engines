@@ -63,6 +63,10 @@ impl Connector for MongoDbDatamodelConnector {
         &self.capabilities
     }
 
+    fn constraint_name_length(&self) -> usize {
+        127
+    }
+
     fn referential_actions(&self) -> BitFlags<ReferentialAction> {
         self.referential_actions
     }
