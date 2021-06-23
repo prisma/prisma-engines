@@ -174,8 +174,43 @@ pub trait Connector: Send + Sync {
 
 /// Not all Databases are created equal. Hence connectors for our datasources support different capabilities.
 /// These are used during schema validation. E.g. if a connector does not support enums an error will be raised.
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub enum ConnectorCapability {
+macro_rules! capabilities {
+    ($( $variant:ident $(,)? ),*) => {
+        #[derive(Debug, Clone, Copy, PartialEq)]
+        pub enum ConnectorCapability {
+            $(
+                $variant,
+            )*
+        }
+
+        impl std::fmt::Display for ConnectorCapability {
+            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                let name = match self {
+                    $(
+                        Self::$variant => stringify!($variant),
+                    )*
+                };
+
+                write!(f, "{}", name)
+            }
+        }
+
+        impl FromStr for ConnectorCapability {
+            type Err = String;
+
+            fn from_str(s: &str) -> Result<Self, Self::Err> {
+                match s {
+                    $(
+                        stringify!($variant) => Ok(Self::$variant),
+                    )*
+                    _ => Err(format!("{} is not a known connector capability.", s)),
+                }
+            }
+        }
+    };
+}
+
+capabilities!(
     // start of General Schema Capabilities
     ScalarLists,
     RelationsOverNonUniqueCriteria,
@@ -188,7 +223,6 @@ pub enum ConnectorCapability {
     AutoIncrementNonIndexedAllowed,
     RelationFieldsInArbitraryOrder,
     ForeignKeys,
-
     // start of Query Engine Capabilities
     InsensitiveFilters,
     CreateMany,
@@ -199,8 +233,8 @@ pub enum ConnectorCapability {
     JsonFiltering,
     JsonFilteringJsonPath,
     JsonFilteringArrayPath,
-    CompoundIds,
-}
+    CompoundIds
+);
 
 /// Contains all capabilities that the connector is able to serve.
 #[derive(Debug)]
@@ -219,66 +253,5 @@ impl ConnectorCapabilities {
 
     pub fn contains(&self, capability: ConnectorCapability) -> bool {
         self.capabilities.contains(&capability)
-    }
-}
-
-impl std::fmt::Display for ConnectorCapability {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let name = match self {
-            ConnectorCapability::ScalarLists => "ScalarLists",
-            ConnectorCapability::RelationsOverNonUniqueCriteria => "RelationsOverNonUniqueCriteria",
-            ConnectorCapability::MultipleIndexesWithSameName => "MultipleIndexesWithSameName",
-            ConnectorCapability::Enums => "Enums",
-            ConnectorCapability::Json => "Json",
-            ConnectorCapability::AutoIncrement => "AutoIncrement",
-            ConnectorCapability::AutoIncrementAllowedOnNonId => "AutoIncrementAllowedOnNonId",
-            ConnectorCapability::AutoIncrementMultipleAllowed => "AutoIncrementMultipleAllowed",
-            ConnectorCapability::AutoIncrementNonIndexedAllowed => "AutoIncrementNonIndexedAllowed",
-            ConnectorCapability::RelationFieldsInArbitraryOrder => "RelationFieldsInArbitraryOrder",
-            ConnectorCapability::InsensitiveFilters => "InsensitiveFilters",
-            ConnectorCapability::CreateMany => "CreateMany",
-            ConnectorCapability::CreateManyWriteableAutoIncId => "CreateManyWriteableAutoIncId",
-            ConnectorCapability::WritableAutoincField => "WritableAutoincField",
-            ConnectorCapability::CreateSkipDuplicates => "CreateSkipDuplicates",
-            ConnectorCapability::UpdateableId => "UpdateableId",
-            ConnectorCapability::JsonFiltering => "JsonFiltering",
-            ConnectorCapability::JsonFilteringJsonPath => "JsonFilteringJsonPath",
-            ConnectorCapability::JsonFilteringArrayPath => "JsonFilteringArrayPath",
-            ConnectorCapability::CompoundIds => "CompoundIds",
-            ConnectorCapability::ForeignKeys => "ForeignKeys",
-        };
-
-        write!(f, "{}", name)
-    }
-}
-
-impl FromStr for ConnectorCapability {
-    type Err = String;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "ScalarLists" => Ok(ConnectorCapability::ScalarLists),
-            "RelationsOverNonUniqueCriteria" => Ok(ConnectorCapability::RelationsOverNonUniqueCriteria),
-            "MultipleIndexesWithSameName" => Ok(ConnectorCapability::MultipleIndexesWithSameName),
-            "Enums" => Ok(ConnectorCapability::Enums),
-            "Json" => Ok(ConnectorCapability::Json),
-            "AutoIncrement" => Ok(ConnectorCapability::AutoIncrement),
-            "AutoIncrementAllowedOnNonId" => Ok(ConnectorCapability::AutoIncrementAllowedOnNonId),
-            "AutoIncrementMultipleAllowed" => Ok(ConnectorCapability::AutoIncrementMultipleAllowed),
-            "AutoIncrementNonIndexedAllowed" => Ok(ConnectorCapability::AutoIncrementNonIndexedAllowed),
-            "RelationFieldsInArbitraryOrder" => Ok(ConnectorCapability::RelationFieldsInArbitraryOrder),
-            "InsensitiveFilters" => Ok(ConnectorCapability::InsensitiveFilters),
-            "CreateMany" => Ok(ConnectorCapability::CreateMany),
-            "CreateManyWriteableAutoIncId" => Ok(ConnectorCapability::CreateManyWriteableAutoIncId),
-            "WritableAutoincField" => Ok(ConnectorCapability::WritableAutoincField),
-            "CreateSkipDuplicates" => Ok(ConnectorCapability::CreateSkipDuplicates),
-            "UpdateableId" => Ok(ConnectorCapability::UpdateableId),
-            "JsonFiltering" => Ok(ConnectorCapability::JsonFiltering),
-            "JsonFilteringJsonPath" => Ok(ConnectorCapability::JsonFilteringJsonPath),
-            "JsonFilteringArrayPath" => Ok(ConnectorCapability::JsonFilteringArrayPath),
-            "CompoundIds" => Ok(ConnectorCapability::CompoundIds),
-            "ForeignKeys" => Ok(ConnectorCapability::ForeignKeys),
-            _ => Err(format!("{} is not a known connector capability.", s)),
-        }
     }
 }
