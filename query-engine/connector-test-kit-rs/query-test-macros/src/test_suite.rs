@@ -68,9 +68,7 @@ pub fn test_suite_impl(attr: TokenStream, input: TokenStream) -> TokenStream {
             if let syn::Item::Fn(ref mut f) = item {
                 // Check if the function is marked as `connector_test`.
                 if let Some(ref mut attr) = f.attrs.iter_mut().find(|attr| match attr.path.get_ident() {
-                    Some(ident) => {
-                        &ident.to_string() == "connector_test" || &ident.to_string() == "connector_test_gen"
-                    }
+                    Some(ident) => &ident.to_string() == "connector_test" || &ident.to_string() == "connector_test_gen",
                     None => false,
                 }) {
                     let meta = attr.parse_meta().expect("Invalid attribute meta.");

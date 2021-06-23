@@ -259,10 +259,8 @@ pub struct ConnectorTestGenArgs {
     #[darling(default)]
     pub only: OnlyConnectorTags,
 
-    // TODO: Option is only there to fulfill the default requirement, because `Path` don't
     // TODO: Find a better name
-    #[darling(default)]
-    pub gen: Option<SchemaGen>,
+    pub gen: SchemaGen,
 
     #[darling(default)]
     pub exclude: ExcludeConnectorTags,
@@ -282,12 +280,6 @@ impl ConnectorTestGenArgs {
         if self.suite.is_none() && !on_module {
             return Err(darling::Error::custom(
                 "A test suite name annotation on either the test mod (#[test_suite]) or the test (suite = \"name\") is required.",
-            ));
-        }
-
-        if self.gen.is_none() && !on_module {
-            return Err(darling::Error::custom(
-                "A gen annotation is required on the test macro #[connector_schema_gen(gen())]",
             ));
         }
 

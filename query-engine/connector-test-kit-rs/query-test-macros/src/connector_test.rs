@@ -117,18 +117,12 @@ pub fn connector_test_gen_impl(attr: TokenStream, input: TokenStream) -> TokenSt
     };
 
     let connectors = args.connectors_to_test();
-    // let handler = args.schema.unwrap().handler_path;
-
     // Renders the connectors as list to use in the code.
     let connectors = connectors.into_iter().map(quote_connector).fold1(|aggr, next| {
         quote! {
             #aggr, #next
         }
     });
-    let schem_gen = args.gen.unwrap();
-    let dms_and_required_capabilities =
-        schema_with_relation(schem_gen.on_parent, schem_gen.on_child, schem_gen.without_parent);
-
     let mut test_function = parse_macro_input!(input as ItemFn);
 
     if test_function.sig.inputs.len() != 2 {
@@ -167,6 +161,9 @@ pub fn connector_test_gen_impl(attr: TokenStream, input: TokenStream) -> TokenSt
             }
         })
         .collect();
+    // Generates multiple datamodels and their associated required capabilities
+    let dms_and_required_capabilities =
+        schema_with_relation(args.gen.on_parent, args.gen.on_child, args.gen.without_parent);
 
     generate_test_functions(
         dms_and_required_capabilities,
@@ -180,6 +177,38 @@ pub fn connector_test_gen_impl(attr: TokenStream, input: TokenStream) -> TokenSt
     )
 }
 
+/// Generates a test shell function for each datamodels. Each of these test shells function will call the original test function.
+/// Below is a representation in pseudo-code of the final generated code:
+///
+/// Original code:
+/// ```rust
+/// #[connector_test_gen(gen(ChildOpt, ParentOpt))]
+/// async fn my_fancy_test(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
+///   assert_eq!(true, true);
+/// }    
+/// ```
+/// Generated code:
+///  ```rust
+///  #[test]
+/// async fn my_fancy_test_1() -> {
+///   setup_database().await?;
+///   run_my_fancy_test(runner, t).await?;
+/// }
+/// #[test]
+/// async fn my_fancy_test_2() -> {
+///   setup_database().await?;
+///   run_my_fancy_test(runner, t).await?;
+/// }
+/// #[test]
+/// async fn my_fancy_test_n() -> {
+///   setup_database().await?;
+///   run_my_fancy_test(runner, t).await?;
+/// }
+/// async fn run_my_fancy_test(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
+///   assert_eq!(true, true);
+/// }
+/// ```
+///
 fn generate_test_functions(
     dms_and_required_capabilities: DatamodelsAndCapabilities,
     connectors: Option<proc_macro2::TokenStream>,
