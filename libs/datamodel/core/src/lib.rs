@@ -178,7 +178,7 @@ fn parse_datamodel_internal(
             })
         }
         Err(err) => {
-            diagnostics.extend(err);
+            diagnostics.append(&mut err);
             Err(diagnostics)
         }
     }

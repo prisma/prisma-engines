@@ -49,15 +49,17 @@ pub struct MsSqlDatamodelConnector {
 impl MsSqlDatamodelConnector {
     pub fn new() -> MsSqlDatamodelConnector {
         let capabilities = vec![
+            ConnectorCapability::AutoIncrement,
             ConnectorCapability::AutoIncrementAllowedOnNonId,
             ConnectorCapability::AutoIncrementMultipleAllowed,
             ConnectorCapability::AutoIncrementNonIndexedAllowed,
             ConnectorCapability::NamedPrimaryKeys,
-            ConnectorCapability::CreateMany,
-            ConnectorCapability::UpdateableId,
-            ConnectorCapability::MultipleIndexesWithSameName,
-            ConnectorCapability::AutoIncrement,
             ConnectorCapability::CompoundIds,
+            ConnectorCapability::CreateMany,
+            ConnectorCapability::ForeignKeys,
+            ConnectorCapability::MultipleIndexesWithSameName,
+            ConnectorCapability::NamedPrimaryKeys,
+            ConnectorCapability::UpdateableId,
         ];
 
         let constructors: Vec<NativeTypeConstructor> = vec![
@@ -145,6 +147,10 @@ impl Connector for MsSqlDatamodelConnector {
 
     fn capabilities(&self) -> &[ConnectorCapability] {
         &self.capabilities
+    }
+
+    fn constraint_name_length(&self) -> usize {
+        128
     }
 
     fn scalar_type_for_native_type(&self, native_type: serde_json::Value) -> ScalarType {
@@ -382,10 +388,6 @@ impl Connector for MsSqlDatamodelConnector {
         }
 
         Ok(())
-    }
-
-    fn constraint_name_length(&self) -> usize {
-        128
     }
 }
 

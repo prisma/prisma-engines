@@ -57,6 +57,14 @@ impl Connector for MongoDbDatamodelConnector {
         &self.capabilities
     }
 
+    fn constraint_name_length(&self) -> usize {
+        127
+    }
+
+    fn emulates_referential_actions(&self) -> bool {
+        true
+    }
+
     fn validate_field(&self, field: &dml::field::Field) -> Result<()> {
         // WIP, I don't really know what I'm doing with the dml.
 
@@ -157,9 +165,5 @@ impl Connector for MongoDbDatamodelConnector {
         }
 
         Ok(())
-    }
-
-    fn constraint_name_length(&self) -> usize {
-        127
     }
 }

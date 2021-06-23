@@ -153,6 +153,10 @@ impl Connector for PostgresDatamodelConnector {
         &self.capabilities
     }
 
+    fn constraint_name_length(&self) -> usize {
+        63
+    }
+
     fn scalar_type_for_native_type(&self, native_type: serde_json::Value) -> ScalarType {
         let native_type: PostgresType = serde_json::from_value(native_type).unwrap();
 
@@ -327,10 +331,6 @@ impl Connector for PostgresDatamodelConnector {
         }
 
         Ok(())
-    }
-
-    fn constraint_name_length(&self) -> usize {
-        63
     }
 }
 

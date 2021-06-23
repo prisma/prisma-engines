@@ -41,6 +41,10 @@ impl Connector for SqliteDatamodelConnector {
         &self.capabilities
     }
 
+    fn constraint_name_length(&self) -> usize {
+        10000
+    }
+
     fn scalar_type_for_native_type(&self, _native_type: serde_json::Value) -> ScalarType {
         unreachable!("No native types on Sqlite");
     }
@@ -101,10 +105,6 @@ impl Connector for SqliteDatamodelConnector {
         }
 
         Ok(())
-    }
-
-    fn constraint_name_length(&self) -> usize {
-        10000
     }
 }
 

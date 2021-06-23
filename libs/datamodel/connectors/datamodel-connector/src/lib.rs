@@ -21,8 +21,16 @@ pub trait Connector: Send + Sync {
 
     fn capabilities(&self) -> &[ConnectorCapability];
 
+    /// The maximum length of constraint names in bytes. Connectors without a
+    /// limit should return usize::MAX.
+    fn constraint_name_length(&self) -> usize;
+
     fn has_capability(&self, capability: ConnectorCapability) -> bool {
         self.capabilities().contains(&capability)
+    }
+
+    fn emulates_referential_actions(&self) -> bool {
+        false
     }
 
     fn validate_field(&self, field: &Field) -> Result<(), ConnectorError>;
@@ -62,8 +70,6 @@ pub trait Connector: Send + Sync {
     /// This function is used during introspection to turn an introspected native type into an instance that can be put into the Prisma schema.
     /// powers IE
     fn introspect_native_type(&self, native_type: serde_json::Value) -> Result<NativeTypeInstance, ConnectorError>;
-
-    fn constraint_name_length(&self) -> usize;
 
     fn set_config_dir<'a>(&self, config_dir: &std::path::Path, url: &'a str) -> Cow<'a, str> {
         let set_root = |path: &str| {
@@ -186,6 +192,7 @@ pub enum ConnectorCapability {
     AutoIncrementMultipleAllowed,
     AutoIncrementNonIndexedAllowed,
     RelationFieldsInArbitraryOrder,
+    ForeignKeys,
     NamedPrimaryKeys,
 
     // start of Query Engine Capabilities

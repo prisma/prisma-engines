@@ -9,10 +9,6 @@ impl Connector for EmptyDatamodelConnector {
         std::any::type_name::<EmptyDatamodelConnector>()
     }
 
-    fn constraint_name_length(&self) -> usize {
-        usize::MAX
-    }
-
     fn capabilities(&self) -> &[ConnectorCapability] {
         &[
             ConnectorCapability::ScalarLists,
@@ -34,6 +30,10 @@ impl Connector for EmptyDatamodelConnector {
             ConnectorCapability::CompoundIds,
             ConnectorCapability::MultipleIndexesWithSameName,
         ]
+    }
+
+    fn constraint_name_length(&self) -> usize {
+        usize::MAX
     }
 
     fn validate_field(&self, _field: &dml::field::Field) -> Result<(), ConnectorError> {

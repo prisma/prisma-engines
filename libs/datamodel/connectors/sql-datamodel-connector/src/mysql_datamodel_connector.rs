@@ -180,6 +180,10 @@ impl Connector for MySqlDatamodelConnector {
         &self.capabilities
     }
 
+    fn constraint_name_length(&self) -> usize {
+        64
+    }
+
     fn scalar_type_for_native_type(&self, native_type: serde_json::Value) -> ScalarType {
         let native_type: MySqlType = serde_json::from_value(native_type).unwrap();
 
@@ -423,10 +427,6 @@ impl Connector for MySqlDatamodelConnector {
         }
 
         Ok(())
-    }
-
-    fn constraint_name_length(&self) -> usize {
-        64
     }
 }
 
