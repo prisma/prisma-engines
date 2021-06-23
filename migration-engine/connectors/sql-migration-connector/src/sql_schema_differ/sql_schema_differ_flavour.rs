@@ -1,7 +1,8 @@
 use super::{column::ColumnDiffer, ColumnTypeChange, SqlSchemaDiffer};
 use crate::{
     pair::Pair,
-    sql_migration::{AlterEnum, AlterTable, SqlMigrationStep},
+    sql_migration::{AlterEnum, SqlMigrationStep},
+    sql_schema_differ,
 };
 use sql_schema_describer::walkers::IndexWalker;
 use std::collections::HashSet;
@@ -63,9 +64,10 @@ pub(crate) trait SqlSchemaDifferFlavour {
     /// Evaluate indexes/constraints that need to be dropped and re-created based on other changes in the schema
     fn push_index_changes_for_column_changes(
         &self,
-        _alter_tables: &[AlterTable],
+        _table: &sql_schema_differ::TableDiffer<'_, '_>,
+        _column_index: Pair<usize>,
+        _column_changes: sql_schema_differ::ColumnChanges,
         _steps: &mut Vec<SqlMigrationStep>,
-        _differ: &SqlSchemaDiffer<'_>,
     ) {
     }
 

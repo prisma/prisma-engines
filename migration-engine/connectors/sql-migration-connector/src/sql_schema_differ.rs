@@ -40,15 +40,11 @@ pub(crate) fn calculate_steps(schemas: Pair<&SqlSchema>, flavour: &dyn SqlFlavou
     };
 
     differ.drop_tables(&mut steps);
-    differ.drop_foreign_keys(&tables_to_redefine, &mut steps);
 
     differ.drop_indexes(&tables_to_redefine, &mut steps);
     differ.push_create_indexes(&tables_to_redefine, &mut steps);
 
-    let mut alter_tables = differ.alter_tables(&tables_to_redefine).collect::<Vec<_>>();
-    alter_tables.sort_by_key(|at| at.table_index);
-
-    flavour.push_index_changes_for_column_changes(&alter_tables, &mut steps, &differ);
+    differ.push_altered_tables(&tables_to_redefine, &mut steps);
 
     let redefine_tables = differ.redefine_tables(&tables_to_redefine);
     let mut alter_enums = flavour.alter_enums(&differ);
@@ -58,7 +54,6 @@ pub(crate) fn calculate_steps(schemas: Pair<&SqlSchema>, flavour: &dyn SqlFlavou
         .filter(|tables| !tables.is_empty())
         .map(SqlMigrationStep::RedefineTables);
 
-    differ.push_add_foreign_keys(&tables_to_redefine, &mut steps);
     flavour.create_enums(&differ, &mut steps);
     flavour.drop_enums(&differ, &mut steps);
 
@@ -66,7 +61,6 @@ pub(crate) fn calculate_steps(schemas: Pair<&SqlSchema>, flavour: &dyn SqlFlavou
         alter_enums
             .into_iter()
             .map(SqlMigrationStep::AlterEnum)
-            .chain(alter_tables.into_iter().map(SqlMigrationStep::AlterTable))
             .chain(redefine_tables)
             .chain(alter_indexes.into_iter().map(|idxs| SqlMigrationStep::AlterIndex {
                 table: idxs.as_ref().map(|(table, _)| *table),
@@ -132,43 +126,53 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         }
     }
 
-    fn push_add_foreign_keys(&self, tables_to_redefine: &HashSet<String>, steps: &mut Vec<SqlMigrationStep>) {
-        for table in self
+    fn push_altered_tables(&self, tables_to_redefine: &HashSet<String>, steps: &mut Vec<SqlMigrationStep>) {
+        let tables = self
             .table_pairs()
-            .filter(|tables| !tables_to_redefine.contains(tables.next().name()))
-        {
+            .filter(move |tables| !tables_to_redefine.contains(tables.next().name()));
+
+        for table in tables {
             for created_fk in table.created_foreign_keys() {
                 steps.push(SqlMigrationStep::AddForeignKey {
                     table_index: created_fk.table().table_index(),
                     foreign_key_index: created_fk.foreign_key_index(),
                 })
             }
+
+            for dropped_fk in table.dropped_foreign_keys() {
+                steps.push(SqlMigrationStep::DropForeignKey {
+                    table_index: table.previous().table_index(),
+                    foreign_key_index: dropped_fk.foreign_key_index(),
+                })
+            }
+
+            // Order matters.
+            let changes: Vec<TableChange> = SqlSchemaDiffer::drop_primary_key(&table)
+                .into_iter()
+                .chain(SqlSchemaDiffer::drop_columns(&table))
+                .chain(SqlSchemaDiffer::add_columns(&table))
+                .chain(SqlSchemaDiffer::alter_columns(&table).into_iter())
+                .chain(SqlSchemaDiffer::add_primary_key(&table))
+                .collect();
+
+            if changes.is_empty() {
+                continue;
+            }
+
+            for column in table.column_pairs() {
+                self.flavour.push_index_changes_for_column_changes(
+                    &table,
+                    column.as_pair().map(|c| c.column_index()),
+                    column.all_changes().0,
+                    steps,
+                );
+            }
+
+            steps.push(SqlMigrationStep::AlterTable(AlterTable {
+                table_index: table.tables.map(|t| t.table_index()),
+                changes,
+            }));
         }
-    }
-
-    fn alter_tables<'a, 'b: 'a>(
-        &'a self,
-        tables_to_redefine: &'b HashSet<String>,
-    ) -> impl Iterator<Item = AlterTable> + 'a {
-        self.table_pairs()
-            .filter(move |tables| !tables_to_redefine.contains(tables.next().name()))
-            .filter_map(|differ| {
-                // Order matters.
-                let changes: Vec<TableChange> = SqlSchemaDiffer::drop_primary_key(&differ)
-                    .into_iter()
-                    .chain(SqlSchemaDiffer::drop_columns(&differ))
-                    .chain(SqlSchemaDiffer::add_columns(&differ))
-                    .chain(SqlSchemaDiffer::alter_columns(&differ).into_iter())
-                    .chain(SqlSchemaDiffer::add_primary_key(&differ))
-                    .collect();
-
-                Some(changes)
-                    .filter(|changes| !changes.is_empty())
-                    .map(|changes| AlterTable {
-                        table_index: differ.tables.map(|t| t.table_index()),
-                        changes,
-                    })
-            })
     }
 
     fn drop_columns<'a>(differ: &'a TableDiffer<'schema, 'a>) -> impl Iterator<Item = TableChange> + 'a {
@@ -225,20 +229,6 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         });
 
         alter_columns
-    }
-
-    fn drop_foreign_keys(&self, tables_to_redefine: &HashSet<String>, steps: &mut Vec<SqlMigrationStep>) {
-        for differ in self
-            .table_pairs()
-            .filter(|tables| !tables_to_redefine.contains(tables.next().name()))
-        {
-            for dropped_fk in differ.dropped_foreign_keys() {
-                steps.push(SqlMigrationStep::DropForeignKey {
-                    table_index: differ.previous().table_index(),
-                    foreign_key_index: dropped_fk.foreign_key_index(),
-                })
-            }
-        }
     }
 
     fn add_primary_key(differ: &TableDiffer<'_, '_>) -> Option<TableChange> {

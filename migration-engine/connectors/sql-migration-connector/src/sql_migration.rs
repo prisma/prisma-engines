@@ -526,13 +526,6 @@ impl TableChange {
             _ => None,
         }
     }
-
-    pub(crate) fn as_alter_column(&self) -> Option<&AlterColumn> {
-        match self {
-            TableChange::AlterColumn(col) => Some(col),
-            _ => None,
-        }
-    }
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
