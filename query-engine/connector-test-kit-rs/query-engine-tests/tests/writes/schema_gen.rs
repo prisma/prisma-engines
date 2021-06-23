@@ -7,21 +7,9 @@ mod schema_gen {
     };
     use query_test_macros::connector_schema_gen;
 
-    //
-    // #[connector_test(schema(generic))]
-    // async fn toto(_runner: &Runner) -> TestResult<()> {
-    //     let _res = schema_with_relation(
-    //         RelationField::try_from("ChildOpt").unwrap(),
-    //         RelationField::try_from("ParentOpt").unwrap(),
-    //         false,
-    //     );
-
-    //     Ok(())
-    // }
-
-    #[connector_schema_gen(gen(ChildOpt, ParentOpt, without_params = false))]
-    async fn schema_gen(runner: &Runner, params: &DatamodelWithParams) -> TestResult<()> {
-        let child_1 = params.child.qp_where.parse(
+    #[connector_schema_gen(gen(ChildOpt, ParentOpt))]
+    async fn schema_gen(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
+        let child_1 = t.child().wher().parse(
             run_query_json!(
                 runner,
                 format!(
@@ -37,11 +25,11 @@ mod schema_gen {
                           }}
                         }}
                     }}"#,
-                    selection = params.child.selection()
+                    selection = t.child().selection()
                 )
             ),
             &["data", "createOneParent", "childOpt"],
-        );
+        )?;
 
         insta::assert_snapshot!(
           run_query!(runner, format!(r#"mutation {{

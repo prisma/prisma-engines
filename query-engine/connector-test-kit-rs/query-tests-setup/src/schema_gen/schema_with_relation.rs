@@ -1,14 +1,30 @@
-use std::{convert::TryFrom, str::FromStr};
-
 use crate::{constants::*, query_params::*, references::*, relation_field::*, utils::*};
 use datamodel_connector::ConnectorCapability;
 use serde::{Deserialize, Serialize};
+use std::{convert::TryFrom, str::FromStr};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DatamodelWithParams {
-    pub datamodel: String,
-    pub parent: QueryParams,
-    pub child: QueryParams,
+    datamodel: String,
+    parent: QueryParams,
+    child: QueryParams,
+}
+
+impl DatamodelWithParams {
+    /// Get a reference to the datamodel with params's datamodel.
+    pub fn datamodel(&self) -> &str {
+        self.datamodel.as_str()
+    }
+
+    /// Get a reference to the datamodel with params's parent.
+    pub fn parent(&self) -> &QueryParams {
+        &self.parent
+    }
+
+    /// Get a reference to the datamodel with params's child.
+    pub fn child(&self) -> &QueryParams {
+        &self.child
+    }
 }
 
 impl FromStr for DatamodelWithParams {
@@ -27,11 +43,13 @@ impl TryFrom<DatamodelWithParams> for String {
     }
 }
 
+pub type DatamodelsAndCapabilities = (Vec<DatamodelWithParams>, Vec<Vec<ConnectorCapability>>);
+
 pub fn schema_with_relation(
     on_parent: RelationField,
     on_child: RelationField,
     without_params: bool,
-) -> (Vec<DatamodelWithParams>, Vec<Vec<ConnectorCapability>>) {
+) -> DatamodelsAndCapabilities {
     let is_required_1to1 = on_parent.is_required() && on_child.is_required();
 
     if is_required_1to1 {
@@ -42,7 +60,7 @@ pub fn schema_with_relation(
     let id_param = QueryParams::new(
         "id",
         QueryParamsWhere::identifier("id"),
-        QueryParamsWhereMulti::multi("id"),
+        QueryParamsWhereMany::many_ids("id"),
     );
     let compound_id_param = {
         let fields = vec!["id_1", "id_2"];
@@ -50,14 +68,14 @@ pub fn schema_with_relation(
         QueryParams::new(
             "id_1, id_2",
             QueryParamsWhere::compound_identifier(fields.clone(), arg_name),
-            QueryParamsWhereMulti::multi_compound(fields, arg_name),
+            QueryParamsWhereMany::many_compounds(fields, arg_name),
         )
     };
     let parent_unique_params = vec![
         QueryParams::new(
             "p",
             QueryParamsWhere::identifier("p"),
-            QueryParamsWhereMulti::multi("p"),
+            QueryParamsWhereMany::many_ids("p"),
         ),
         {
             let fields = vec!["p_1", "p_2"];
@@ -65,7 +83,7 @@ pub fn schema_with_relation(
             QueryParams::new(
                 "p_1, p_2",
                 QueryParamsWhere::compound_identifier(fields.clone(), arg_name),
-                QueryParamsWhereMulti::multi_compound(fields, arg_name),
+                QueryParamsWhereMany::many_compounds(fields, arg_name),
             )
         },
     ];
@@ -73,7 +91,7 @@ pub fn schema_with_relation(
         QueryParams::new(
             "c",
             QueryParamsWhere::identifier("c"),
-            QueryParamsWhereMulti::multi("c"),
+            QueryParamsWhereMany::many_ids("c"),
         ),
         {
             let fields = vec!["c_1", "c_2"];
@@ -81,7 +99,7 @@ pub fn schema_with_relation(
             QueryParams::new(
                 "c_1, c_2",
                 QueryParamsWhere::compound_identifier(fields.clone(), arg_name),
-                QueryParamsWhereMulti::multi_compound(fields, arg_name),
+                QueryParamsWhereMany::many_compounds(fields, arg_name),
             )
         },
     ];

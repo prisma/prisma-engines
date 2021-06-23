@@ -1,4 +1,4 @@
-use crate::{args::ConnectorTestGenArgs, ConnectorTestArgs};
+use crate::{ConnectorTestArgs, ConnectorTestGenArgs};
 use darling::FromMeta;
 use itertools::Itertools;
 use proc_macro::TokenStream;
@@ -116,8 +116,6 @@ pub fn connector_schema_gen_impl(attr: TokenStream, input: TokenStream) -> Token
         return err.write_errors().into();
     };
 
-    dbg!(&args);
-
     let connectors = args.connectors_to_test();
     // let handler = args.schema.unwrap().handler_path;
 
@@ -128,7 +126,7 @@ pub fn connector_schema_gen_impl(attr: TokenStream, input: TokenStream) -> Token
         }
     });
     let schem_gen = args.gen.unwrap();
-    let (datamodels, required_capabilities) =
+    let dms_and_required_capabilities =
         schema_with_relation(schem_gen.on_parent, schem_gen.on_child, schem_gen.without_parent);
 
     let mut test_function = parse_macro_input!(input as ItemFn);
@@ -170,10 +168,33 @@ pub fn connector_schema_gen_impl(attr: TokenStream, input: TokenStream) -> Token
         })
         .collect();
 
+    generate_test_functions(
+        dms_and_required_capabilities,
+        connectors,
+        capabilities,
+        test_function,
+        test_fn_ident,
+        runner_fn_ident,
+        suite_name,
+        test_name,
+    )
+}
+
+fn generate_test_functions(
+    dms_and_required_capabilities: DatamodelsAndCapabilities,
+    connectors: Option<proc_macro2::TokenStream>,
+    capabilities: Vec<proc_macro2::TokenStream>,
+    test_function: ItemFn,
+    test_fn_ident: Ident,
+    runner_fn_ident: Ident,
+    suite_name: String,
+    test_name: String,
+) -> TokenStream {
+    let (datamodels, required_capabilities) = dms_and_required_capabilities;
     let test_shells: Vec<proc_macro2::TokenStream> = datamodels.into_iter().enumerate().map(|(i, dm)| {
         // The shell function retains the name of the original test definition.
         let test_fn_ident = Ident::new(&format!("{}_{}", test_fn_ident.to_string(), i), Span::call_site());
-        let datamodel: proc_macro2::TokenStream = format!(r#""{}""#, dm.datamodel).parse().unwrap();
+        let datamodel: proc_macro2::TokenStream = format!(r#""{}""#, dm.datamodel()).parse().unwrap();
         let dm_with_params: String = dm.try_into().expect("Could not serialize json");
         let required_capabilities = required_capabilities.get(i).unwrap().iter().map(|cap| format!("{}", cap)).collect::<Vec<_>>();
         let test_database = format!("{}_{}_{}", suite_name, test_name, i);
@@ -218,10 +239,8 @@ pub fn connector_schema_gen_impl(attr: TokenStream, input: TokenStream) -> Token
             }
         };
 
-        ts.into()
+        ts
     }).collect();
-
-    // Expand all test shell functions
     let all_funcs: proc_macro2::TokenStream = test_shells
         .into_iter()
         .fold1(|aggr, next| {
@@ -231,10 +250,7 @@ pub fn connector_schema_gen_impl(attr: TokenStream, input: TokenStream) -> Token
                 #next
             }
         })
-        .unwrap()
-        .into();
-
-    // Expand the actual test runner
+        .unwrap();
     let all_funcs_with_original_func = quote! {
         #all_funcs
 
