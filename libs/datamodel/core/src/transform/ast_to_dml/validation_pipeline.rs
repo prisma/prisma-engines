@@ -58,9 +58,7 @@ impl<'a, 'b> ValidationPipeline<'a> {
         diagnostics.to_result()?;
 
         // Phase 3: Lift AST to DML.
-        let lifter = LiftAstToDml::new(&self.preview_features, &db);
-
-        let mut schema = lifter.lift(&mut diagnostics);
+        let mut schema = LiftAstToDml::new(&self.preview_features, &db, &mut diagnostics).lift();
 
         // Cannot continue on lifter error.
         diagnostics.to_result()?;

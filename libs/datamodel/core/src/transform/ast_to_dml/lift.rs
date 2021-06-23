@@ -23,6 +23,7 @@ use std::collections::{HashMap, HashSet};
 pub struct LiftAstToDml<'a> {
     attributes: AllAttributes,
     db: &'a ParserDatabase<'a>,
+    diagnostics: &'a mut Diagnostics,
 }
 
 impl<'a> LiftAstToDml<'a> {
@@ -30,20 +31,25 @@ impl<'a> LiftAstToDml<'a> {
     /// the attributes defined by the given sources registered.
     ///
     /// The attributes defined by the given sources will be namespaced.
-    pub(crate) fn new(preview_features: &HashSet<PreviewFeature>, db: &'a ParserDatabase<'a>) -> LiftAstToDml<'a> {
+    pub(crate) fn new(
+        preview_features: &HashSet<PreviewFeature>,
+        db: &'a ParserDatabase<'a>,
+        diagnostics: &'a mut Diagnostics,
+    ) -> LiftAstToDml<'a> {
         LiftAstToDml {
             attributes: AllAttributes::new(preview_features),
             db,
+            diagnostics,
         }
     }
 
-    pub fn lift(&self, diagnostics: &mut Diagnostics) -> dml::Datamodel {
+    pub fn lift(&mut self) -> dml::Datamodel {
         let mut schema = dml::Datamodel::new();
 
         for (top_id, ast_obj) in self.db.ast().iter_tops() {
             match ast_obj {
-                ast::Top::Enum(en) => schema.add_enum(self.lift_enum(&en, diagnostics)),
-                ast::Top::Model(ty) => schema.add_model(self.lift_model(top_id, &ty, diagnostics)),
+                ast::Top::Enum(en) => schema.add_enum(self.lift_enum(&en)),
+                ast::Top::Model(ty) => schema.add_model(self.lift_model(top_id, &ty)),
                 ast::Top::Source(_) => { /* Source blocks are explicitly ignored by the validator */ }
                 ast::Top::Generator(_) => { /* Generator blocks are explicitly ignored by the validator */ }
                 ast::Top::Type(_) => { /* Type blocks are inlined */ }
@@ -54,7 +60,7 @@ impl<'a> LiftAstToDml<'a> {
     }
 
     /// Internal: Validates a model AST node and lifts it to a DML model.
-    fn lift_model(&self, model_id: ast::TopId, ast_model: &ast::Model, diagnostics: &mut Diagnostics) -> dml::Model {
+    fn lift_model(&mut self, model_id: ast::TopId, ast_model: &ast::Model) -> dml::Model {
         let mut model = dml::Model::new(ast_model.name.name.clone(), None);
         model.documentation = ast_model.documentation.clone().map(|comment| comment.text);
 
@@ -66,8 +72,7 @@ impl<'a> LiftAstToDml<'a> {
             let arity = self.lift_field_arity(&ast_field.arity);
             let mut attributes = Vec::with_capacity(ast_field.attributes.len());
 
-            let field_type =
-                lift_scalar_field_type(ast_field, scalar_field_type, &mut attributes, &self.db, diagnostics);
+            let field_type = self.lift_scalar_field_type(ast_field, scalar_field_type, &mut attributes);
 
             attributes.extend(ast_field.attributes.iter().cloned());
 
@@ -76,7 +81,7 @@ impl<'a> LiftAstToDml<'a> {
             let mut field = dml::Field::ScalarField(field);
 
             if let Err(mut errs) = self.attributes.field.validate_and_apply(&attributes, &mut field) {
-                diagnostics.append(&mut errs);
+                self.diagnostics.append(&mut errs);
             }
             field_ids_for_sorting.insert(&ast_field.name.name, field_id);
             model.add_field(field);
@@ -99,7 +104,7 @@ impl<'a> LiftAstToDml<'a> {
             let mut field = dml::Field::RelationField(field);
 
             if let Err(mut errs) = self.attributes.field.validate_and_apply(ast_field, &mut field) {
-                diagnostics.append(&mut errs);
+                self.diagnostics.append(&mut errs);
             }
 
             field_ids_for_sorting.insert(&ast_field.name.name, field_id);
@@ -109,14 +114,14 @@ impl<'a> LiftAstToDml<'a> {
         model.fields.sort_by_key(|f| field_ids_for_sorting.get(f.name()));
 
         if let Err(mut err) = self.attributes.model.validate_and_apply(ast_model, &mut model) {
-            diagnostics.append(&mut err);
+            self.diagnostics.append(&mut err);
         }
 
         model
     }
 
     /// Internal: Validates an enum AST node.
-    fn lift_enum(&self, ast_enum: &ast::Enum, diagnostics: &mut Diagnostics) -> dml::Enum {
+    fn lift_enum(&mut self, ast_enum: &ast::Enum) -> dml::Enum {
         let mut en = dml::Enum::new(&ast_enum.name.name, vec![]);
 
         let supports_enums = match self.db.datasource() {
@@ -125,7 +130,7 @@ impl<'a> LiftAstToDml<'a> {
         };
 
         if !supports_enums {
-            diagnostics.push_error(DatamodelError::new_validation_error(
+            self.diagnostics.push_error(DatamodelError::new_validation_error(
                 &format!(
                     "You defined the enum `{}`. But the current connector does not support enums.",
                     &ast_enum.name.name
@@ -138,12 +143,12 @@ impl<'a> LiftAstToDml<'a> {
         for ast_enum_value in &ast_enum.values {
             match self.lift_enum_value(ast_enum_value) {
                 Ok(value) => en.add_value(value),
-                Err(mut err) => diagnostics.append(&mut err),
+                Err(mut err) => self.diagnostics.append(&mut err),
             }
         }
 
         if en.values.is_empty() {
-            diagnostics.push_error(DatamodelError::new_validation_error(
+            self.diagnostics.push_error(DatamodelError::new_validation_error(
                 "An enum must have at least one value.",
                 ast_enum.span,
             ))
@@ -152,7 +157,7 @@ impl<'a> LiftAstToDml<'a> {
         en.documentation = ast_enum.documentation.clone().map(|comment| comment.text);
 
         if let Err(mut err) = self.attributes.enm.validate_and_apply(ast_enum, &mut en) {
-            diagnostics.append(&mut err);
+            self.diagnostics.append(&mut err);
         }
 
         en
@@ -178,43 +183,37 @@ impl<'a> LiftAstToDml<'a> {
             ast::FieldArity::List => dml::FieldArity::List,
         }
     }
-}
 
-fn lift_scalar_field_type(
-    ast_field: &ast::Field,
-    scalar_field_type: &ScalarFieldType,
-    collected_attributes: &mut Vec<ast::Attribute>,
-    db: &ParserDatabase<'_>,
-    diagnostics: &mut Diagnostics,
-) -> dml::FieldType {
-    match scalar_field_type {
-        ScalarFieldType::Enum(enum_id) => {
-            let enum_name = &db.ast()[*enum_id].as_enum().unwrap().name.name;
-            dml::FieldType::Enum(enum_name.to_owned())
-        }
-        ScalarFieldType::Unsupported => lift_unsupported_field_type(
-            ast_field,
-            ast_field.field_type.as_unsupported().unwrap().0,
-            db.datasource(),
-            diagnostics,
-        ),
-        ScalarFieldType::Alias(top_id) => {
-            let alias = db.ast()[*top_id].as_type_alias().unwrap();
-            collected_attributes.extend(alias.attributes.iter().cloned());
-            lift_scalar_field_type(
-                alias,
-                db.alias_scalar_field_type(top_id),
-                collected_attributes,
-                db,
-                diagnostics,
-            )
-        }
-        ScalarFieldType::BuiltInScalar => {
-            let scalar_type: dml::ScalarType = ast_field.field_type.unwrap_supported().name.parse().unwrap();
-            let native_type = db
-                .datasource()
-                .and_then(|datasource| lift_native_type(ast_field, &scalar_type, datasource, diagnostics));
-            dml::FieldType::Scalar(scalar_type, None, native_type)
+    fn lift_scalar_field_type(
+        &mut self,
+        ast_field: &ast::Field,
+        scalar_field_type: &ScalarFieldType,
+        collected_attributes: &mut Vec<ast::Attribute>,
+    ) -> dml::FieldType {
+        match scalar_field_type {
+            ScalarFieldType::Enum(enum_id) => {
+                let enum_name = &self.db.ast()[*enum_id].as_enum().unwrap().name.name;
+                dml::FieldType::Enum(enum_name.to_owned())
+            }
+            ScalarFieldType::Unsupported => lift_unsupported_field_type(
+                ast_field,
+                ast_field.field_type.as_unsupported().unwrap().0,
+                self.db.datasource(),
+                self.diagnostics,
+            ),
+            ScalarFieldType::Alias(top_id) => {
+                let alias = self.db.ast()[*top_id].as_type_alias().unwrap();
+                collected_attributes.extend(alias.attributes.iter().cloned());
+                self.lift_scalar_field_type(alias, self.db.alias_scalar_field_type(top_id), collected_attributes)
+            }
+            ScalarFieldType::BuiltInScalar => {
+                let scalar_type: dml::ScalarType = ast_field.field_type.unwrap_supported().name.parse().unwrap();
+                let native_type = self
+                    .db
+                    .datasource()
+                    .and_then(|datasource| lift_native_type(ast_field, &scalar_type, datasource, self.diagnostics));
+                dml::FieldType::Scalar(scalar_type, None, native_type)
+            }
         }
     }
 }
