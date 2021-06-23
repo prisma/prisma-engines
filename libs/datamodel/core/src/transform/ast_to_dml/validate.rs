@@ -121,7 +121,7 @@ impl<'a> Validator<'a> {
             all_errors.extend(errors_for_enum);
         }
 
-        all_errors.make_result()
+        all_errors.to_result()
     }
 
     pub fn validate_optional_id_only_on_ignored_models(
@@ -246,7 +246,7 @@ impl<'a> Validator<'a> {
             all_errors.extend(errors_for_model);
         }
 
-        all_errors.make_result()
+        all_errors.to_result()
     }
 
     fn validate_names(&self, errors: &mut Diagnostics, db: &ParserDatabase<'_>) {
@@ -301,7 +301,7 @@ impl<'a> Validator<'a> {
             }
         }
 
-        errors.make_result()
+        errors.to_result()
     }
 
     fn validate_field_arities(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), Diagnostics> {
@@ -317,7 +317,7 @@ impl<'a> Validator<'a> {
             }
         }
 
-        errors.make_result()
+        errors.to_result()
     }
 
     fn validate_field_types(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), Diagnostics> {
@@ -337,7 +337,7 @@ impl<'a> Validator<'a> {
             }
         }
 
-        errors.make_result()
+        errors.to_result()
     }
 
     fn validate_enum_default_values(
@@ -365,7 +365,7 @@ impl<'a> Validator<'a> {
             }
         }
 
-        errors.make_result()
+        errors.to_result()
     }
 
     fn validate_auto_increment(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), Diagnostics> {
@@ -417,7 +417,7 @@ impl<'a> Validator<'a> {
             }
         }
 
-        errors.make_result()
+        errors.to_result()
     }
 
     fn validate_model_has_strict_unique_criteria(
@@ -528,7 +528,7 @@ impl<'a> Validator<'a> {
             }
         }
 
-        diagnostics.make_result()
+        diagnostics.to_result()
     }
 
     fn validate_model_connector_specific(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), Diagnostics> {
@@ -538,7 +538,7 @@ impl<'a> Validator<'a> {
             diagnostics.push_error(DatamodelError::new_connector_error(&err.to_string(), ast_model.span))
         }
 
-        diagnostics.make_result()
+        diagnostics.to_result()
     }
 
     fn validate_base_fields_for_relation(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), Diagnostics> {
@@ -594,7 +594,7 @@ impl<'a> Validator<'a> {
             }
         }
 
-        errors.make_result()
+        errors.to_result()
     }
 
     fn validate_referenced_fields_for_relation(
@@ -784,7 +784,7 @@ impl<'a> Validator<'a> {
             }
         }
 
-        errors.make_result()
+        errors.to_result()
     }
 
     fn validate_relation_arguments_bla(

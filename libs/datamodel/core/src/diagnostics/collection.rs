@@ -33,14 +33,7 @@ impl Diagnostics {
         }
     }
 
-    pub fn merge_error(mut self, err: DatamodelError) -> Diagnostics {
-        self.push_error(err);
-
-        self
-    }
-
-    /// Returns true, if there is at least one error
-    /// in this collection.
+    /// Returns true, if there is at least one error in this collection.
     pub fn has_errors(&self) -> bool {
         !self.errors.is_empty()
     }
@@ -65,21 +58,11 @@ impl Diagnostics {
         self.warnings.append(&mut err_and_warn.warnings)
     }
 
-    /// Extends the collection with all errors and warnings from another collection.
-    pub fn extend(&mut self, err_and_warn: Diagnostics) {
-        self.errors.extend(err_and_warn.errors);
-        self.warnings.extend(err_and_warn.warnings)
-    }
-
-    pub fn append_error_vec(&mut self, mut errors: Vec<DatamodelError>) {
-        self.errors.append(&mut errors)
-    }
-
     pub fn append_warning_vec(&mut self, mut warnings: Vec<DatamodelWarning>) {
         self.warnings.append(&mut warnings);
     }
 
-    pub fn make_result(&self) -> Result<(), Diagnostics> {
+    pub fn to_result(&self) -> Result<(), Diagnostics> {
         if self.has_errors() {
             Err(self.clone())
         } else {
@@ -96,14 +79,6 @@ impl Diagnostics {
         }
 
         String::from_utf8_lossy(&message).into_owned()
-    }
-
-    pub fn errors_or<T>(self, obj: T) -> Result<T, Diagnostics> {
-        if self.has_errors() {
-            Err(self)
-        } else {
-            Ok(obj)
-        }
     }
 }
 

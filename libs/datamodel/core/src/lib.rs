@@ -161,7 +161,7 @@ fn parse_datamodel_internal(
 
     let validator = ValidationPipeline::new(&ctx);
 
-    diagnostics.make_result()?;
+    diagnostics.to_result()?;
 
     match validator.validate(&ast, transform) {
         Ok(mut src) => {
@@ -196,7 +196,7 @@ pub fn parse_configuration(schema: &str) -> Result<ValidatedConfiguration, diagn
     let preview_features = preview_features(&generators);
     let datasources = load_sources(&ast, &preview_features, &mut diagnostics);
 
-    diagnostics.make_result()?;
+    diagnostics.to_result()?;
 
     Ok(ValidatedConfiguration {
         subject: Configuration {

@@ -22,22 +22,10 @@ pub fn parse_schema(datamodel_string: &str) -> Result<SchemaAst, Diagnostics> {
             let mut top_level_definitions: Vec<Top> = vec![];
             for current in datamodel.relevant_children() {
                 match current.as_rule() {
-                    Rule::model_declaration => match parse_model(&current) {
-                        Ok(model) => top_level_definitions.push(Top::Model(model)),
-                        Err(err) => errors.extend(err),
-                    },
-                    Rule::enum_declaration => match parse_enum(&current) {
-                        Ok(enm) => top_level_definitions.push(Top::Enum(enm)),
-                        Err(err) => errors.extend(err),
-                    },
-                    Rule::source_block => match parse_source(&current) {
-                        Ok(source) => top_level_definitions.push(Top::Source(source)),
-                        Err(err) => errors.extend(err),
-                    },
-                    Rule::generator_block => match parse_generator(&current) {
-                        Ok(generator) => top_level_definitions.push(Top::Generator(generator)),
-                        Err(err) => errors.extend(err),
-                    },
+                    Rule::model_declaration => top_level_definitions.push(Top::Model(parse_model(&current, &mut errors))),
+                    Rule::enum_declaration => top_level_definitions.push(Top::Enum(parse_enum(&current, &mut errors))),
+                    Rule::source_block => top_level_definitions.push(Top::Source(parse_source(&current, &mut errors))),
+                    Rule::generator_block => top_level_definitions.push(Top::Generator(parse_generator(&current, &mut errors))),
                     Rule::type_alias => top_level_definitions.push(Top::Type(parse_type_alias(&current))),
                     Rule::comment_block => (),
                     Rule::EOI => {}
@@ -53,7 +41,7 @@ pub fn parse_schema(datamodel_string: &str) -> Result<SchemaAst, Diagnostics> {
                 }
             }
 
-            errors.make_result()?;
+            errors.to_result()?;
 
             Ok(SchemaAst {
                 tops: top_level_definitions,

@@ -26,7 +26,7 @@ pub fn parse_source(token: &Token<'_>) -> Result<SourceConfig, Diagnostics> {
         }
     }
 
-    errors.make_result()?;
+    errors.to_result()?;
 
     match name {
         Some(name) => Ok(SourceConfig {
@@ -62,7 +62,7 @@ pub fn parse_generator(token: &Token<'_>) -> Result<GeneratorConfig, Diagnostics
         }
     }
 
-    errors.make_result()?;
+    errors.to_result()?;
 
     match name {
         Some(name) => Ok(GeneratorConfig {
