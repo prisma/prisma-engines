@@ -1,4 +1,6 @@
-use crate::{constants::*, query_params::*, references::*, relation_field::*, utils::*};
+use crate::{
+    constants::*, query_params::*, references::*, relation_field::*, schema_gen::identifiers::Identifier, utils::*,
+};
 use datamodel_connector::ConnectorCapability;
 use serde::{Deserialize, Serialize};
 use std::{convert::TryFrom, str::FromStr};
@@ -111,7 +113,7 @@ pub fn schema_with_relation(
         FULL_ID_OPTIONS.to_vec()
     };
 
-    // TODO: How to configure simple mode??
+    // TODO: Remove if we're sure we don't ever wanna keep the simple mode
     let simple = false;
     let mut datamodels: Vec<DatamodelWithParams> = vec![];
     let mut required_capabilities: Vec<Vec<ConnectorCapability>> = vec![];
@@ -119,13 +121,13 @@ pub fn schema_with_relation(
     for parent_id in id_options.iter() {
         for child_id in id_options.iter() {
             // Based on Id and relation fields
-            for child_reference_to_parent in child_references(simple, parent_id, &on_parent, &on_child) {
-                for parent_reference_to_child in
-                    parent_references(simple, child_id, &child_reference_to_parent, &on_parent, &on_child)
+            for child_ref_to_parent in child_references(simple, parent_id, &on_parent, &on_child) {
+                for parent_ref_to_child in
+                    parent_references(simple, child_id, &child_ref_to_parent, &on_parent, &on_child)
                 {
                     // TODO: The RelationReference.render() equality is a hack. Implement PartialEq instead
-                    let is_virtual_req_rel_field = on_parent.is_required()
-                        && parent_reference_to_child.render() == RelationReference::NoRef.render();
+                    let is_virtual_req_rel_field =
+                        on_parent.is_required() && parent_ref_to_child.render() == RelationReference::NoRef.render();
 
                     // skip required virtual relation fields as those are disallowed in a Prisma Schema
                     if is_virtual_req_rel_field {
@@ -137,10 +139,9 @@ pub fn schema_with_relation(
                         vec![id_param.clone()]
                     } else {
                         match *parent_id {
-                            SIMPLE_ID => parent_unique_params.clone_push(&id_param),
-                            COMPOUND_ID => parent_unique_params.clone_push(&compound_id_param),
-                            NO_ID => parent_unique_params.clone(),
-                            _ => unimplemented!(),
+                            Identifier::Simple => parent_unique_params.clone_push(&id_param),
+                            Identifier::Compound => parent_unique_params.clone_push(&compound_id_param),
+                            Identifier::None => parent_unique_params.clone(),
                         }
                     };
 
@@ -148,47 +149,50 @@ pub fn schema_with_relation(
                         vec![id_param.clone()]
                     } else {
                         match *child_id {
-                            SIMPLE_ID => child_unique_params.clone_push(&id_param),
-                            COMPOUND_ID => child_unique_params.clone_push(&compound_id_param),
-                            NO_ID => child_unique_params.clone(),
-                            _ => unimplemented!(),
+                            Identifier::Simple => child_unique_params.clone_push(&id_param),
+                            Identifier::Compound => child_unique_params.clone_push(&compound_id_param),
+                            Identifier::None => child_unique_params.clone(),
                         }
                     };
 
                     for parent_param in parent_params.iter() {
                         for child_param in child_params.iter() {
+                            let (parent_field, child_field) = render_relation_fields(
+                                &on_parent,
+                                &parent_ref_to_child,
+                                &on_child,
+                                &child_ref_to_parent,
+                            );
                             let datamodel = indoc::formatdoc! {"
-                                model Parent {{
-                                    p             String    @unique
-                                    p_1           String
-                                    p_2           String
-                                    {parent_field}         {parent_reference_to_child}
-                                    non_unique    String?
-                                    {parent_id}
-                
-                                    @@unique([p_1, p_2])
-                                }}
-                
-                                model Child {{
-                                    c              String    @unique
-                                    c_1            String
-                                    c_2            String
-                                    {child_field}          {child_reference_to_parent}
-                                    non_unique     String?
-                                    {child_id}
-                
-                                    @@unique([c_1, c_2])
-                                }}
-                                ",
-                                parent_field = on_parent.field(),
-                                parent_reference_to_child = parent_reference_to_child.render(),
+                            model Parent {{
+                                p             String    @unique
+                                p_1           String
+                                p_2           String
+                                {parent_field}
+                                non_unique    String?
+                                {parent_id}
+            
+                                @@unique([p_1, p_2])
+                            }}
+            
+                            model Child {{
+                                c              String    @unique
+                                c_1            String
+                                c_2            String
+                                {child_field}
+                                non_unique     String?
+                                {child_id}
+            
+                                @@unique([c_1, c_2])
+                            }}
+                            ",
+                                parent_field = parent_field,
                                 parent_id = parent_id,
-                                child_field = on_child.field(),
-                                child_reference_to_parent = child_reference_to_parent.render(),
+                                child_field = child_field,
                                 child_id = child_id
                             };
 
-                            if *parent_id == COMPOUND_ID || *child_id == COMPOUND_ID {
+                            if *parent_id == Identifier::Compound || *child_id == Identifier::Compound {
                                 required_capabilities.push(vec![ConnectorCapability::CompoundIds]);
                             } else {
                                 required_capabilities.push(vec![]);
@@ -207,4 +211,33 @@ pub fn schema_with_relation(
     }
 
     (datamodels, required_capabilities)
+}
+
+fn render_relation_fields(
+    parent: &RelationField,
+    parent_ref_to_child: &RelationReference,
+    child: &RelationField,
+    child_ref_to_parent: &RelationReference,
+) -> (String, String) {
+    if parent.is_list() && child.is_list() {
+        let rendered_parent = format!("#m2m({}, {}, String)", parent.field_name(), parent.type_name());
+        let rendered_child = format!("#m2m({}, {}, String)", child.field_name(), child.type_name());
+
+        (rendered_parent, rendered_child)
+    } else {
+        let rendered_parent = format!(
+            "{} {} {}",
+            parent.field_name(),
+            parent.type_name(),
+            parent_ref_to_child.render()
+        );
+        let rendered_child = format!(
+            "{} {} {}",
+            child.field_name(),
+            child.type_name(),
+            child_ref_to_parent.render()
+        );
+
+        (rendered_parent, rendered_child)
+    }
 }

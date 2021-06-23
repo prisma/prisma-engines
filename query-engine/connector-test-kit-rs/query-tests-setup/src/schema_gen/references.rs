@@ -1,4 +1,4 @@
-use crate::constants::*;
+use super::identifiers::Identifier;
 use crate::relation_field::RelationField;
 use crate::utils::*;
 
@@ -54,9 +54,9 @@ impl<'a> RelationReference<'a> {
 
     fn render_compound_parent_id(&self, rf: &RelationField) -> String {
         match rf.is_list() {
-      true => "@relation(references: [id_1, id_2])".to_string(),
-      false => format!("@relation(fields: [parent_id_1, parent_id_2], references: [id_1, id_2]) \n parent_id_1 String{}\n parent_id_2 String{}", rf.optional_suffix(), rf.optional_suffix())
-    }
+            true => "@relation(references: [id_1, id_2])".to_string(),
+            false => format!("@relation(fields: [parent_id_1, parent_id_2], references: [id_1, id_2]) \n parent_id_1 String{}\n parent_id_2 String{}", rf.optional_suffix(), rf.optional_suffix())
+        }
     }
 
     fn render_compound_child_id(&self, rf: &RelationField) -> String {
@@ -79,7 +79,7 @@ impl<'a> RelationReference<'a> {
     fn render_compound_p_reference(&self, rf: &RelationField) -> String {
         match rf.is_list() {
           true => "@relation(references: [p_1, p_2])".to_string(),
-          false => format!("@relation(fields: [parent_p_1, parent_p_2], references: [p_1, p_2])\n parent_p_1 String{}\n parent_p_2 String{}", rf.optional_suffix(), rf.optional_suffix()),
+          false => format!("@relation(fields: [parent_p_1, parent_p_2], references: [p_1, p_2])\nparent_p_1 String{}\n parent_p_2 String{}", rf.optional_suffix(), rf.optional_suffix()),
       }
     }
 
@@ -87,7 +87,7 @@ impl<'a> RelationReference<'a> {
         match rf.is_list() {
             true => "@relation(references: [c])".to_string(),
             false => format!(
-                "@relation(fields:[parent_c], references: [c]) \nparent_c String{}",
+                "@relation(fields:[parent_c], references: [c])\nparent_c String{}",
                 rf.optional_suffix()
             ),
         }
@@ -118,7 +118,7 @@ pub fn common_child_references(rf: &RelationField) -> Vec<RelationReference> {
 
 pub fn child_references<'a>(
     simple: bool,
-    parent_id: &str,
+    parent_id: &Identifier,
     on_parent: &'a RelationField,
     on_child: &'a RelationField,
 ) -> Vec<RelationReference<'a>> {
@@ -130,40 +130,39 @@ pub fn child_references<'a>(
 }
 
 pub fn simple_child_references<'a>(
-    parent_id: &str,
+    parent_id: &Identifier,
     on_parent: &'a RelationField,
     on_child: &'a RelationField,
 ) -> Vec<RelationReference<'a>> {
-    match parent_id {
+    match *parent_id {
         _ if on_child.is_list() && !on_parent.is_list() => vec![(RelationReference::NoRef)],
-        SIMPLE_ID => vec![RelationReference::SimpleParentId(on_child)],
-        COMPOUND_ID => vec![RelationReference::CompoundParentId(on_child)],
-        NO_ID => vec![RelationReference::PReference(on_child)],
-        _ => panic!("Should not happen"),
+        Identifier::Simple => vec![RelationReference::SimpleParentId(on_child)],
+        Identifier::Compound => vec![RelationReference::CompoundParentId(on_child)],
+        Identifier::None => vec![RelationReference::PReference(on_child)],
     }
 }
 
 pub fn full_child_references<'a>(
-    parent_id: &str,
+    parent_id: &Identifier,
     on_parent: &'a RelationField,
     on_child: &'a RelationField,
 ) -> Vec<RelationReference<'a>> {
     let is_m2m = on_parent.is_list() && on_child.is_list();
 
     if !is_m2m {
-        match parent_id {
+        match *parent_id {
             _ if on_child.is_list() && !on_parent.is_list() => vec![RelationReference::NoRef],
-            SIMPLE_ID => {
+            Identifier::Simple => {
                 vec![RelationReference::SimpleParentId(on_child)].clone_append(&mut common_parent_references(on_child))
             }
-            COMPOUND_ID => vec![RelationReference::CompoundParentId(on_child)]
+            Identifier::Compound => vec![RelationReference::CompoundParentId(on_child)]
                 .clone_append(&mut common_parent_references(on_child)),
             _ => common_parent_references(on_child),
         }
     } else {
-        match parent_id {
-            SIMPLE_ID => vec![RelationReference::SimpleParentId(on_child)],
-            COMPOUND_ID => vec![RelationReference::CompoundParentId(on_child)],
+        match *parent_id {
+            Identifier::Simple => vec![RelationReference::SimpleParentId(on_child)],
+            Identifier::Compound => vec![RelationReference::CompoundParentId(on_child)],
             _ => vec![RelationReference::PReference(on_child)],
         }
     }
@@ -171,7 +170,7 @@ pub fn full_child_references<'a>(
 
 pub fn parent_references<'a>(
     simple: bool,
-    child_id: &str,
+    child_id: &Identifier,
     child_reference: &'a RelationReference,
     on_parent: &'a RelationField,
     on_child: &'a RelationField,
@@ -184,24 +183,23 @@ pub fn parent_references<'a>(
 }
 
 pub fn simple_parent_references<'a>(
-    child_id: &str,
+    child_id: &Identifier,
     child_reference: &'a RelationReference,
     on_parent: &'a RelationField,
     on_child: &'a RelationField,
 ) -> Vec<RelationReference<'a>> {
     let is_m2m = on_parent.is_list() && on_child.is_list();
 
-    match child_id {
+    match *child_id {
         _ if child_reference.render() != RelationReference::NoRef.render() && !is_m2m => vec![RelationReference::NoRef],
-        SIMPLE_ID => vec![RelationReference::SimpleChildId(on_parent)],
-        COMPOUND_ID => vec![RelationReference::CompoundChildId(on_parent)],
-        NO_ID => vec![RelationReference::CReference(on_parent)],
-        _ => panic!("should not happen"),
+        Identifier::Simple => vec![RelationReference::SimpleChildId(on_parent)],
+        Identifier::Compound => vec![RelationReference::CompoundChildId(on_parent)],
+        Identifier::None => vec![RelationReference::CReference(on_parent)],
     }
 }
 
 pub fn full_parent_references<'a>(
-    child_id: &str,
+    child_id: &Identifier,
     child_reference: &'a RelationReference,
     on_parent: &'a RelationField,
     on_child: &'a RelationField,
@@ -211,38 +209,37 @@ pub fn full_parent_references<'a>(
     if !is_m2m {
         match (child_id, child_reference) {
             (_, _) if on_parent.is_list() && !on_child.is_list() => vec![RelationReference::NoRef],
-            (SIMPLE_ID, RelationReference::NoRef) => {
+            (&Identifier::Simple, RelationReference::NoRef) => {
                 vec![RelationReference::SimpleChildId(on_parent)].clone_append(&mut common_child_references(on_parent))
             }
-            (SIMPLE_ID, _) if on_parent.is_list() && on_child.is_list() => {
+            (&Identifier::Simple, _) if on_parent.is_list() && on_child.is_list() => {
                 let mut refs = vec![RelationReference::SimpleChildId(on_parent)]
                     .clone_append(&mut common_child_references(on_parent));
                 refs.push(RelationReference::NoRef);
 
                 refs
             }
-            (SIMPLE_ID, _) => vec![RelationReference::NoRef],
-            (COMPOUND_ID, RelationReference::NoRef) => vec![RelationReference::CompoundChildId(on_parent)]
+            (&Identifier::Simple, _) => vec![RelationReference::NoRef],
+            (&Identifier::Compound, RelationReference::NoRef) => vec![RelationReference::CompoundChildId(on_parent)]
                 .clone_append(&mut common_child_references(on_parent)),
-            (COMPOUND_ID, _) if on_parent.is_list() && on_child.is_list() => {
+            (&Identifier::Compound, _) if on_parent.is_list() && on_child.is_list() => {
                 let mut refs = vec![RelationReference::CompoundChildId(on_parent)]
                     .clone_append(&mut common_child_references(on_parent));
                 refs.push(RelationReference::NoRef);
 
                 refs
             }
-            (COMPOUND_ID, _) => vec![RelationReference::NoRef],
-            (NO_ID, &RelationReference::NoRef) => common_child_references(on_parent),
-            (NO_ID, _) if on_parent.is_list() && on_child.is_list() => {
+            (&Identifier::Compound, _) => vec![RelationReference::NoRef],
+            (&Identifier::None, &RelationReference::NoRef) => common_child_references(on_parent),
+            (&Identifier::None, _) if on_parent.is_list() && on_child.is_list() => {
                 common_child_references(on_parent).clone_push(&RelationReference::NoRef)
             }
-            (NO_ID, _) => vec![RelationReference::NoRef],
-            (_, _) => vec![],
+            (&Identifier::None, _) => vec![RelationReference::NoRef],
         }
     } else {
         match child_id {
-            SIMPLE_ID => vec![RelationReference::SimpleChildId(on_parent)],
-            COMPOUND_ID => vec![RelationReference::CompoundChildId(on_parent)],
+            Identifier::Simple => vec![RelationReference::SimpleChildId(on_parent)],
+            Identifier::Compound => vec![RelationReference::CompoundChildId(on_parent)],
             _ => vec![RelationReference::CReference(on_parent)],
         }
     }

@@ -104,6 +104,37 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
     test.into()
 }
 
+/// Generates a test shell function for each datamodels. Each of these test shells function will call the original test function.
+/// Below is a representation in pseudo-code of the final generated code:
+///
+/// Original code:
+/// ```rust
+/// #[connector_test_gen(gen(ChildOpt, ParentOpt))]
+/// async fn my_fancy_test(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
+///   assert_eq!(true, true);
+/// }    
+/// ```
+/// Generated code:
+///  ```rust
+///  #[test]
+/// async fn my_fancy_test_1() -> {
+///   setup_database().await?;
+///   run_my_fancy_test(runner, t).await?;
+/// }
+/// #[test]
+/// async fn my_fancy_test_2() -> {
+///   setup_database().await?;
+///   run_my_fancy_test(runner, t).await?;
+/// }
+/// #[test]
+/// async fn my_fancy_test_n() -> {
+///   setup_database().await?;
+///   run_my_fancy_test(runner, t).await?;
+/// }
+/// async fn run_my_fancy_test(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
+///   assert_eq!(true, true);
+/// }
+/// ```
 pub fn connector_test_gen_impl(attr: TokenStream, input: TokenStream) -> TokenStream {
     let attributes_meta: syn::AttributeArgs = parse_macro_input!(attr as AttributeArgs);
     let args = ConnectorTestGenArgs::from_list(&attributes_meta);
@@ -162,64 +193,8 @@ pub fn connector_test_gen_impl(attr: TokenStream, input: TokenStream) -> TokenSt
         })
         .collect();
     // Generates multiple datamodels and their associated required capabilities
-    let dms_and_required_capabilities =
+    let (datamodels, required_capabilities) =
         schema_with_relation(args.gen.on_parent, args.gen.on_child, args.gen.without_parent);
-
-    generate_test_functions(
-        dms_and_required_capabilities,
-        connectors,
-        capabilities,
-        test_function,
-        test_fn_ident,
-        runner_fn_ident,
-        suite_name,
-        test_name,
-    )
-}
-
-/// Generates a test shell function for each datamodels. Each of these test shells function will call the original test function.
-/// Below is a representation in pseudo-code of the final generated code:
-///
-/// Original code:
-/// ```rust
-/// #[connector_test_gen(gen(ChildOpt, ParentOpt))]
-/// async fn my_fancy_test(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
-///   assert_eq!(true, true);
-/// }    
-/// ```
-/// Generated code:
-///  ```rust
-///  #[test]
-/// async fn my_fancy_test_1() -> {
-///   setup_database().await?;
-///   run_my_fancy_test(runner, t).await?;
-/// }
-/// #[test]
-/// async fn my_fancy_test_2() -> {
-///   setup_database().await?;
-///   run_my_fancy_test(runner, t).await?;
-/// }
-/// #[test]
-/// async fn my_fancy_test_n() -> {
-///   setup_database().await?;
-///   run_my_fancy_test(runner, t).await?;
-/// }
-/// async fn run_my_fancy_test(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
-///   assert_eq!(true, true);
-/// }
-/// ```
-///
-fn generate_test_functions(
-    dms_and_required_capabilities: DatamodelsAndCapabilities,
-    connectors: Option<proc_macro2::TokenStream>,
-    capabilities: Vec<proc_macro2::TokenStream>,
-    test_function: ItemFn,
-    test_fn_ident: Ident,
-    runner_fn_ident: Ident,
-    suite_name: String,
-    test_name: String,
-) -> TokenStream {
-    let (datamodels, required_capabilities) = dms_and_required_capabilities;
     let test_shells: Vec<proc_macro2::TokenStream> = datamodels.into_iter().enumerate().map(|(i, dm)| {
         // The shell function retains the name of the original test definition.
         let test_fn_ident = Ident::new(&format!("{}_{}", test_fn_ident.to_string(), i), Span::call_site());

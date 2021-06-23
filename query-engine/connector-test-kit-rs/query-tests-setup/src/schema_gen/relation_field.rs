@@ -34,7 +34,7 @@ impl RelationField {
         }
     }
 
-    pub fn field(&self) -> String {
+    pub fn field_name(&self) -> String {
         match self {
             RelationField::ParentOpt(x) => x.field.to_owned(),
             RelationField::ParentReq(x) => x.field.to_owned(),
@@ -45,10 +45,21 @@ impl RelationField {
         }
     }
 
-    pub fn optional_suffix(&self) -> &str {
-        let field = self.field();
+    pub fn type_name(&self) -> String {
+        match self {
+            RelationField::ParentOpt(x) => x.typ.to_owned(),
+            RelationField::ParentReq(x) => x.typ.to_owned(),
+            RelationField::ParentList(x) => x.typ.to_owned(),
+            RelationField::ChildOpt(x) => x.typ.to_owned(),
+            RelationField::ChildReq(x) => x.typ.to_owned(),
+            RelationField::ChildList(x) => x.typ.to_owned(),
+        }
+    }
 
-        if field.ends_with('?') {
+    pub fn optional_suffix(&self) -> &str {
+        let type_name = self.type_name();
+
+        if type_name.ends_with('?') {
             "?"
         } else {
             ""
@@ -77,6 +88,7 @@ impl TryFrom<&str> for RelationField {
 #[derive(Debug, Clone, Default)]
 pub struct ParentList {
     pub field: String,
+    pub typ: String,
     pub is_list: bool,
     pub is_required: bool,
 }
@@ -84,7 +96,8 @@ pub struct ParentList {
 impl ParentList {
     pub fn new() -> Self {
         Self {
-            field: "parentsOpt Parent[]".to_string(),
+            field: "parentsOpt".to_string(),
+            typ: "Parent[]".to_string(),
             is_list: true,
             is_required: false,
         }
@@ -94,6 +107,7 @@ impl ParentList {
 #[derive(Debug, Clone, Default)]
 pub struct ChildList {
     pub field: String,
+    pub typ: String,
     pub is_list: bool,
     pub is_required: bool,
 }
@@ -101,7 +115,8 @@ pub struct ChildList {
 impl ChildList {
     pub fn new() -> Self {
         Self {
-            field: "childrenOpt Child[]".to_string(),
+            field: "childrenOpt".to_string(),
+            typ: "Child[]".to_string(),
             is_list: true,
             is_required: false,
         }
@@ -111,6 +126,7 @@ impl ChildList {
 #[derive(Debug, Clone, Default)]
 pub struct ChildReq {
     pub field: String,
+    pub typ: String,
     pub is_list: bool,
     pub is_required: bool,
 }
@@ -118,7 +134,8 @@ pub struct ChildReq {
 impl ChildReq {
     pub fn new() -> Self {
         Self {
-            field: "childReq Child".to_string(),
+            field: "childReq".to_string(),
+            typ: "Child".to_string(),
             is_list: false,
             is_required: true,
         }
@@ -128,6 +145,7 @@ impl ChildReq {
 #[derive(Debug, Clone, Default)]
 pub struct ChildOpt {
     pub field: String,
+    pub typ: String,
     pub is_list: bool,
     pub is_required: bool,
 }
@@ -135,7 +153,8 @@ pub struct ChildOpt {
 impl ChildOpt {
     pub fn new() -> Self {
         Self {
-            field: "childOpt Child?".to_string(),
+            field: "childOpt".to_string(),
+            typ: "Child?".to_string(),
             is_list: false,
             is_required: false,
         }
@@ -145,6 +164,7 @@ impl ChildOpt {
 #[derive(Debug, Clone, Default)]
 pub struct ParentOpt {
     pub field: String,
+    pub typ: String,
     pub is_list: bool,
     pub is_required: bool,
 }
@@ -152,7 +172,8 @@ pub struct ParentOpt {
 impl ParentOpt {
     pub fn new() -> Self {
         Self {
-            field: "parentOpt Parent?".to_string(),
+            field: "parentOpt".to_string(),
+            typ: "Parent?".to_string(),
             is_list: false,
             is_required: false,
         }
@@ -162,6 +183,7 @@ impl ParentOpt {
 #[derive(Debug, Clone, Default)]
 pub struct ParentReq {
     pub field: String,
+    pub typ: String,
     pub is_list: bool,
     pub is_required: bool,
 }
@@ -169,7 +191,8 @@ pub struct ParentReq {
 impl ParentReq {
     pub fn new() -> Self {
         Self {
-            field: "parentReq Parent".to_string(),
+            field: "parentReq".to_string(),
+            typ: "Parent".to_string(),
             is_list: false,
             is_required: true,
         }
