@@ -8,8 +8,7 @@ use crate::ast::parser::helpers::TokenExtensions;
 use crate::ast::*;
 use crate::diagnostics::{DatamodelError, Diagnostics};
 
-pub fn parse_enum(token: &Token<'_>) -> Result<Enum, Diagnostics> {
-    let mut errors = Diagnostics::new();
+pub fn parse_enum(token: &Token<'_>, diagnostics: &mut Diagnostics) -> Enum {
     let mut name: Option<Identifier> = None;
     let mut attributes: Vec<Attribute> = vec![];
     let mut values: Vec<EnumValue> = vec![];
@@ -21,10 +20,10 @@ pub fn parse_enum(token: &Token<'_>) -> Result<Enum, Diagnostics> {
             Rule::block_level_attribute => attributes.push(parse_attribute(&current)),
             Rule::enum_value_declaration => match parse_enum_value(&name.as_ref().unwrap().name, &current) {
                 Ok(enum_value) => values.push(enum_value),
-                Err(err) => errors.push_error(err),
+                Err(err) => diagnostics.push_error(err),
             },
             Rule::comment_block => comment = parse_comment_block(&current),
-            Rule::BLOCK_LEVEL_CATCH_ALL => errors.push_error(DatamodelError::new_validation_error(
+            Rule::BLOCK_LEVEL_CATCH_ALL => diagnostics.push_error(DatamodelError::new_validation_error(
                 "This line is not an enum value definition.",
                 Span::from_pest(current.as_span()),
             )),
@@ -32,16 +31,14 @@ pub fn parse_enum(token: &Token<'_>) -> Result<Enum, Diagnostics> {
         }
     }
 
-    errors.to_result()?;
-
     match name {
-        Some(name) => Ok(Enum {
+        Some(name) => Enum {
             name,
             values,
             attributes,
             documentation: comment,
             span: Span::from_pest(token.as_span()),
-        }),
+        },
         _ => panic!(
             "Encountered impossible enum declaration during parsing, name is missing: {:?}",
             token.as_str()
