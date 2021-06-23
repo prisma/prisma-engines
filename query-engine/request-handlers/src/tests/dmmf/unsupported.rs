@@ -250,7 +250,7 @@ fn no_nested_create_upsert_exist_with_unsupported_field_without_default_value() 
     let dmmf = crate::dmmf::render_dmmf(&datamodel, Arc::new(query_schema));
 
     let post_nested_create_input = find_input_type(&dmmf, PRISMA_NAMESPACE, "UserCreateInput");
-    iterate_input_type_fields(&post_nested_create_input, &dmmf, &|_, field, parent_type| {
+    iterate_input_type_fields(post_nested_create_input, &dmmf, &|_, field, parent_type| {
         if parent_type.name.contains("Post") {
             assert_ne!(
                 field.name, "create",
@@ -266,7 +266,7 @@ fn no_nested_create_upsert_exist_with_unsupported_field_without_default_value() 
     });
 
     let post_nested_update_input = find_input_type(&dmmf, PRISMA_NAMESPACE, "UserUpdateInput");
-    iterate_input_type_fields(&post_nested_update_input, &dmmf, &|_, field, parent_type| {
+    iterate_input_type_fields(post_nested_update_input, &dmmf, &|_, field, parent_type| {
         if parent_type.name.contains("Post") {
             assert_ne!(
                 field.name, "create",

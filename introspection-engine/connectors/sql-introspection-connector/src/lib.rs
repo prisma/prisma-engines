@@ -31,7 +31,7 @@ pub struct SqlIntrospectionConnector {
 
 impl SqlIntrospectionConnector {
     pub async fn new(url: &str) -> ConnectorResult<SqlIntrospectionConnector> {
-        let connection = Quaint::new(&url).await.map_err(|error| {
+        let connection = Quaint::new(url).await.map_err(|error| {
             ConnectionInfo::from_url(url)
                 .map(|connection_info| SqlError::from(error).into_connector_error(&connection_info))
                 .unwrap_or_else(ConnectorError::url_parse_error)
@@ -44,7 +44,7 @@ impl SqlIntrospectionConnector {
 
     async fn catch<O>(&self, fut: impl Future<Output = Result<O, SqlError>>) -> ConnectorResult<O> {
         fut.await.map_err(|sql_introspection_error| {
-            sql_introspection_error.into_connector_error(&self.connection.connection_info())
+            sql_introspection_error.into_connector_error(self.connection.connection_info())
         })
     }
 
@@ -116,9 +116,9 @@ impl IntrospectionConnector for SqlIntrospectionConnector {
         tracing::debug!("SQL Schema Describer is done: {:?}", sql_schema);
         let family = self.connection.connection_info().sql_family();
 
-        let introspection_result = calculate_datamodel::calculate_datamodel(&sql_schema, &family, &previous_data_model)
+        let introspection_result = calculate_datamodel::calculate_datamodel(&sql_schema, &family, previous_data_model)
             .map_err(|sql_introspection_error| {
-                sql_introspection_error.into_connector_error(&self.connection.connection_info())
+                sql_introspection_error.into_connector_error(self.connection.connection_info())
             })?;
 
         tracing::debug!("Calculating datamodel is done: {:?}", introspection_result.data_model);

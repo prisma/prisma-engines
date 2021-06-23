@@ -23,7 +23,7 @@ pub fn derive_user_facing_error(input: TokenStream) -> TokenStream {
 }
 
 fn user_error_derive_on_struct(input: &DeriveInput) -> TokenStream {
-    let input = match UserErrorDeriveInput::from_derive_input(&input) {
+    let input = match UserErrorDeriveInput::from_derive_input(input) {
         Ok(input) => input,
         Err(err) => return err.write_errors().into(),
     };
@@ -54,7 +54,7 @@ fn user_error_derive_on_struct(input: &DeriveInput) -> TokenStream {
 }
 
 fn user_error_derive_on_enum(input: &DeriveInput, data: &syn::DataEnum) -> TokenStream {
-    let attributes = match UserErrorEnumDeriveInput::from_derive_input(&input) {
+    let attributes = match UserErrorEnumDeriveInput::from_derive_input(input) {
         Ok(attributes) => attributes,
         Err(err) => return err.write_errors().into(),
     };
@@ -153,7 +153,7 @@ const MESSAGE_VARIABLE_REGEX_PATTERN: &str = r##"(?x)
 static MESSAGE_VARIABLE_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(MESSAGE_VARIABLE_REGEX_PATTERN).unwrap());
 
 fn message_template_variables(template: &str, span: &Span) -> BTreeSet<Ident> {
-    let captures = MESSAGE_VARIABLE_REGEX.captures_iter(&template);
+    let captures = MESSAGE_VARIABLE_REGEX.captures_iter(template);
 
     captures
         // The unwrap is safe because we know this regex has one capture group.

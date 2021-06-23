@@ -187,7 +187,7 @@ fn database_already_exists_must_return_a_proper_error(api: TestApi) {
 fn bad_postgres_url_must_return_a_good_error(api: TestApi) {
     let url = "postgresql://postgres:prisma@localhost:543`/mydb?schema=public";
 
-    let error = api.get_cli_error(&["migration-engine", "cli", "--datasource", &url, "create-database"]);
+    let error = api.get_cli_error(&["migration-engine", "cli", "--datasource", url, "create-database"]);
 
     assert_eq!(
         error.to_string(),

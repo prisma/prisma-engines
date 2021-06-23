@@ -46,7 +46,7 @@ fn shadow_db_url_can_be_configured_on_postgres(api: TestApi) {
             GRANT ALL PRIVILEGES ON DATABASE "testshadowdb0001" TO shadowdbconfigtestuser;
         "#;
 
-        api.raw_cmd(&create_user);
+        api.raw_cmd(create_user);
 
         let mut shadow_db_url = url.clone();
         shadow_db_url.set_path("testshadowdb0001");

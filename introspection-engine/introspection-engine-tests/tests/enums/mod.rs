@@ -262,7 +262,7 @@ async fn a_table_enums_array(api: &TestApi) -> TestResult {
 
     let result = api.introspect().await?;
 
-    api.assert_eq_datamodels(&dm, &result);
+    api.assert_eq_datamodels(dm, &result);
 
     Ok(())
 }

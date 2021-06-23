@@ -30,7 +30,7 @@ impl Inflector {
 
     pub fn new(mode: Mode) -> Inflector {
         // Rules for words that do not inflect in the plural (such as fish, travois, chassis, nationality endings
-        let mut rules = vec![Self::category_rule("", "", &exceptions::UNCOUNTABLE)];
+        let mut rules = vec![Self::category_rule("", "", exceptions::UNCOUNTABLE)];
 
         // Handle standard irregular plurals (mongooses, oxen, etc.)
         exceptions::STANDARD_IRREGULAR.iter().for_each(|irr| {
@@ -48,7 +48,7 @@ impl Inflector {
             Self::irregular(irr.0, irr.1).into_iter().for_each(|r| rules.push(r));
         });
 
-        rules.push(Self::category_rule("", "s", &categories::CATEGORY_MAN_MANS));
+        rules.push(Self::category_rule("", "s", categories::CATEGORY_MAN_MANS));
 
         // Handle irregular inflections for common suffixes
         exceptions::IRREGULAR_SUFFIX_INFLECTIONS
@@ -58,11 +58,11 @@ impl Inflector {
             });
 
         // Handle fully assimilated classical inflections
-        rules.push(Self::category_rule("ex", "ices", &categories::CATEGORY_EX_ICES));
-        rules.push(Self::category_rule("ix", "ices", &categories::CATEGORY_IX_ICES));
-        rules.push(Self::category_rule("um", "a", &categories::CATEGORY_UM_A));
-        rules.push(Self::category_rule("on", "a", &categories::CATEGORY_ON_A));
-        rules.push(Self::category_rule("a", "ae", &categories::CATEGORY_A_AE));
+        rules.push(Self::category_rule("ex", "ices", categories::CATEGORY_EX_ICES));
+        rules.push(Self::category_rule("ix", "ices", categories::CATEGORY_IX_ICES));
+        rules.push(Self::category_rule("um", "a", categories::CATEGORY_UM_A));
+        rules.push(Self::category_rule("on", "a", categories::CATEGORY_ON_A));
+        rules.push(Self::category_rule("a", "ae", categories::CATEGORY_A_AE));
 
         // Handle classical variants of modern inflections
         if mode == Mode::Classical {
@@ -72,24 +72,24 @@ impl Inflector {
                     rules.push(Self::regex_rule(singular, plural));
                 });
 
-            rules.push(Self::category_rule("en", "ina", &categories::CATEGORY_EN_INA));
-            rules.push(Self::category_rule("a", "ata", &categories::CATEGORY_A_ATA));
-            rules.push(Self::category_rule("is", "ides", &categories::CATEGORY_IS_IDES));
-            rules.push(Self::category_rule("", "", &categories::CATEGORY_US_US));
-            rules.push(Self::category_rule("o", "i", &categories::CATEGORY_O_I));
-            rules.push(Self::category_rule("", "i", &categories::CATEGORY_NONE_I));
-            rules.push(Self::category_rule("", "im", &categories::CATEGORY_NONE_IM));
-            rules.push(Self::category_rule("ex", "ices", &categories::CATEGORY_EX_EXES));
-            rules.push(Self::category_rule("ix", "ices", &categories::CATEGORY_IX_IXES));
+            rules.push(Self::category_rule("en", "ina", categories::CATEGORY_EN_INA));
+            rules.push(Self::category_rule("a", "ata", categories::CATEGORY_A_ATA));
+            rules.push(Self::category_rule("is", "ides", categories::CATEGORY_IS_IDES));
+            rules.push(Self::category_rule("", "", categories::CATEGORY_US_US));
+            rules.push(Self::category_rule("o", "i", categories::CATEGORY_O_I));
+            rules.push(Self::category_rule("", "i", categories::CATEGORY_NONE_I));
+            rules.push(Self::category_rule("", "im", categories::CATEGORY_NONE_IM));
+            rules.push(Self::category_rule("ex", "ices", categories::CATEGORY_EX_EXES));
+            rules.push(Self::category_rule("ix", "ices", categories::CATEGORY_IX_IXES));
         };
 
-        rules.push(Self::category_rule("us", "i", &categories::CATEGORY_US_I));
+        rules.push(Self::category_rule("us", "i", categories::CATEGORY_US_I));
         rules.push(Self::regex_rule("([zx])$", "${1}es"));
-        rules.push(Self::category_rule("", "es", &categories::CATEGORY_S_ES));
-        rules.push(Self::category_rule("", "es", &categories::CATEGORY_IS_IDES));
-        rules.push(Self::category_rule("", "es", &categories::CATEGORY_US_US));
+        rules.push(Self::category_rule("", "es", categories::CATEGORY_S_ES));
+        rules.push(Self::category_rule("", "es", categories::CATEGORY_IS_IDES));
+        rules.push(Self::category_rule("", "es", categories::CATEGORY_US_US));
         rules.push(Self::regex_rule("(us)$", "${1}es"));
-        rules.push(Self::category_rule("", "s", &categories::CATEGORY_A_ATA));
+        rules.push(Self::category_rule("", "s", categories::CATEGORY_A_ATA));
 
         exceptions::ADDITIONAL_SUFFIX_INFLECTIONS
             .iter()
@@ -98,14 +98,14 @@ impl Inflector {
             });
 
         // Some words ending in -o take -os (including does preceded by a vowel)
-        rules.push(Self::category_rule("o", "os", &categories::CATEGORY_O_I));
-        rules.push(Self::category_rule("o", "os", &categories::CATEGORY_O_OS));
+        rules.push(Self::category_rule("o", "os", categories::CATEGORY_O_I));
+        rules.push(Self::category_rule("o", "os", categories::CATEGORY_O_OS));
         rules.push(Self::regex_rule("([aeiou])o$", "${1}os"));
 
         // The rest take -oes
         rules.push(Self::regex_rule("o$", "oes"));
         rules.push(Self::regex_rule("ulum", "ula"));
-        rules.push(Self::category_rule("", "es", &categories::CATEGORY_A_ATA));
+        rules.push(Self::category_rule("", "es", categories::CATEGORY_A_ATA));
         rules.push(Self::regex_rule("s$", "ses"));
 
         // Global fallback, just assume that the plural adds -s

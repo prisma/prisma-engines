@@ -760,7 +760,7 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
         let span = tracing::info_span!("SafeCasts", from = %from_type, to = ?to_types);
         let _span = span.enter();
 
-        let to_types = filter_to_types(&api, &to_types);
+        let to_types = filter_to_types(&api, to_types);
 
         tracing::info!("initial migration");
 

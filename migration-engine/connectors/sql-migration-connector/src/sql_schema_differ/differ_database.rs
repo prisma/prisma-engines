@@ -20,7 +20,7 @@ impl<'a> DifferDatabase<'a> {
         let mut columns = BTreeMap::<(Pair<usize>, &'a str), Pair<Option<usize>>>::new();
         let mut columns_cache = HashMap::new();
         let table_is_ignored =
-            |table_name: &str| table_name == "_prisma_migrations" || flavour.table_should_be_ignored(&table_name);
+            |table_name: &str| table_name == "_prisma_migrations" || flavour.table_should_be_ignored(table_name);
 
         for table in schemas
             .previous()

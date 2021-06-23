@@ -43,7 +43,7 @@ pub async fn create_migration(
     error_on_changed_provider(&input.migrations_directory_path, connector_type)?;
 
     // Infer the migration.
-    let previous_migrations = list_migrations(&Path::new(&input.migrations_directory_path))?;
+    let previous_migrations = list_migrations(Path::new(&input.migrations_directory_path))?;
     let target_schema = parse_schema(&input.prisma_schema)?;
 
     let migration = connector
@@ -66,7 +66,7 @@ pub async fn create_migration(
     let migration_script = applier.render_script(&migration, &destructive_change_diagnostics);
 
     // Write the migration script to a file.
-    let directory = create_migration_directory(&Path::new(&input.migrations_directory_path), &input.migration_name)
+    let directory = create_migration_directory(Path::new(&input.migrations_directory_path), &input.migration_name)
         .map_err(|_| CoreError::from_msg("Failed to create a new migration directory.".into()))?;
 
     directory

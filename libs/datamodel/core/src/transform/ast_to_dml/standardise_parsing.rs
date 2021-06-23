@@ -128,7 +128,7 @@ impl<'a> StandardiserForParsing<'a> {
     }
 
     fn name_unnamed_relations(&self, datamodel: &mut dml::Datamodel) {
-        let unnamed_relations = self.find_unnamed_relations(&datamodel);
+        let unnamed_relations = self.find_unnamed_relations(datamodel);
 
         for (model_name, field_name, rel_info) in unnamed_relations {
             // Embedding side.

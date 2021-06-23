@@ -116,7 +116,7 @@ impl TestApiArgs {
     }
 
     pub fn preview_features(&self) -> &'static [&'static str] {
-        &self.preview_features
+        self.preview_features
     }
 
     pub fn test_function_name(&self) -> &'static str {

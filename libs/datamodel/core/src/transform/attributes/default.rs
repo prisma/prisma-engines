@@ -11,7 +11,7 @@ pub struct DefaultAttributeValidator;
 
 impl AttributeValidator<dml::Field> for DefaultAttributeValidator {
     fn attribute_name(&self) -> &'static str {
-        &"default"
+        "default"
     }
 
     fn validate_and_apply(&self, args: &mut Arguments<'_>, field: &mut dml::Field) -> Result<(), DatamodelError> {

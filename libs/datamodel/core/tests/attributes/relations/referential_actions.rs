@@ -230,8 +230,8 @@ fn restrict_should_not_work_on_sql_server() {
         "Invalid referential action: `Restrict`. Allowed values: (`Cascade`, `NoAction`, `SetNull`, `SetDefault`)";
 
     parse_error(dml).assert_are(&[
-        DatamodelError::new_attribute_validation_error(&message, "relation", Span::new(252, 339)),
-        DatamodelError::new_attribute_validation_error(&message, "relation", Span::new(252, 339)),
+        DatamodelError::new_attribute_validation_error(message, "relation", Span::new(252, 339)),
+        DatamodelError::new_attribute_validation_error(message, "relation", Span::new(252, 339)),
     ]);
 }
 
@@ -267,8 +267,8 @@ fn actions_should_be_defined_only_from_one_side() {
         "The relation fields `a` on Model `B` and `b` on Model `A` both provide the `onDelete` or `onUpdate` argument in the @relation attribute. You have to provide it only on one of the two fields.";
 
     parse_error(dml).assert_are(&[
-        DatamodelError::new_attribute_validation_error(&message1, "relation", Span::new(201, 256)),
-        DatamodelError::new_attribute_validation_error(&message2, "relation", Span::new(300, 387)),
+        DatamodelError::new_attribute_validation_error(message1, "relation", Span::new(201, 256)),
+        DatamodelError::new_attribute_validation_error(message2, "relation", Span::new(300, 387)),
     ]);
 }
 
@@ -346,7 +346,7 @@ fn on_delete_cannot_be_defined_on_the_wrong_side() {
         "The relation field `bs` on Model `A` must not specify the `onDelete` or `onUpdate` argument in the @relation attribute. You must only specify it on the opposite field `a` on model `B`, or in case of a many to many relation, in an explicit join table.";
 
     parse_error(dml).assert_are(&[DatamodelError::new_attribute_validation_error(
-        &message,
+        message,
         "relation",
         Span::new(193, 230),
     )]);
@@ -381,7 +381,7 @@ fn on_update_cannot_be_defined_on_the_wrong_side() {
         "The relation field `bs` on Model `A` must not specify the `onDelete` or `onUpdate` argument in the @relation attribute. You must only specify it on the opposite field `a` on model `B`, or in case of a many to many relation, in an explicit join table.";
 
     parse_error(dml).assert_are(&[DatamodelError::new_attribute_validation_error(
-        &message,
+        message,
         "relation",
         Span::new(193, 230),
     )]);
@@ -405,7 +405,7 @@ fn referential_actions_without_preview_feature_should_error() {
     let message = "The relation field `a` on Model `B` must not specify the `onDelete` or `onUpdate` argument in the @relation attribute without enabling the `referentialActions` preview feature.";
 
     parse_error(dml).assert_are(&[DatamodelError::new_attribute_validation_error(
-        &message,
+        message,
         "relation",
         Span::new(80, 147),
     )]);

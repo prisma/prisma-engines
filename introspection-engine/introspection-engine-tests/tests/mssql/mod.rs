@@ -23,7 +23,7 @@ async fn geometry_should_be_unsupported(api: &TestApi) -> TestResult {
         }
     "#};
 
-    api.assert_eq_datamodels(&dm, &result);
+    api.assert_eq_datamodels(dm, &result);
 
     Ok(())
 }
@@ -49,7 +49,7 @@ async fn user_defined_type_aliases_should_map_to_the_system_type(api: &TestApi) 
 
     let result = api.introspect().await?;
 
-    api.assert_eq_datamodels(&dm, &result);
+    api.assert_eq_datamodels(dm, &result);
 
     Ok(())
 }

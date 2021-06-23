@@ -144,7 +144,7 @@ impl<'a> ModelWalker<'a> {
             .map(move |index| IndexWalker {
                 model: *self,
                 index,
-                datamodel: &self.datamodel,
+                datamodel: self.datamodel,
             })
     }
 }
@@ -327,7 +327,7 @@ impl<'a> RelationFieldWalker<'a> {
 
     pub fn referenced_model(&self) -> ModelWalker<'a> {
         ModelWalker {
-            datamodel: &self.datamodel,
+            datamodel: self.datamodel,
             model_idx: self
                 .datamodel
                 .models

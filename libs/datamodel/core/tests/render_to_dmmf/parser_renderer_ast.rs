@@ -320,7 +320,7 @@ fn test_parser_renderer_with_ignore() {
 }
 
 fn assert_rendered(input: &str, expected: &str) {
-    let ast = parse_to_ast(&input).expect("failed to parse");
+    let ast = parse_to_ast(input).expect("failed to parse");
     let rendered = datamodel::render_schema_ast_to_string(&ast);
     assert_eq!(rendered, expected);
 }

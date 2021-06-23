@@ -141,7 +141,7 @@ pub(crate) fn calculate_scalar_field(table: &Table, column: &Column, family: &Sq
 
     let field_type = calculate_scalar_field_type_with_native_types(column, family);
 
-    let is_id = is_id(&column, &table);
+    let is_id = is_id(column, table);
     let arity = match column.tpe.arity {
         _ if is_id && column.auto_increment => FieldArity::Required,
         ColumnArity::Required => FieldArity::Required,
@@ -149,7 +149,7 @@ pub(crate) fn calculate_scalar_field(table: &Table, column: &Column, family: &Sq
         ColumnArity::List => FieldArity::List,
     };
 
-    let default_value = calculate_default(table, &column, &arity);
+    let default_value = calculate_default(table, column, &arity);
 
     let is_unique = table.is_column_unique(&column.name) && !is_id;
 
@@ -320,13 +320,12 @@ pub(crate) fn calculate_relation_name(schema: &SqlSchema, fk: &ForeignKey, table
             explanation: format!("Table {} not found.", table_name),
         }),
         Ok(other_table) => {
-            let fk_from_other_model_to_this: Vec<&ForeignKey> = other_table
+            let fk_from_other_model_to_this_exist = other_table
                 .foreign_keys
                 .iter()
-                .filter(|fk| &fk.referenced_table == model_with_fk)
-                .collect();
+                .any(|fk| &fk.referenced_table == model_with_fk);
 
-            let name = if fk_to_same_model.len() < 2 && fk_from_other_model_to_this.is_empty() {
+            let name = if fk_to_same_model.len() < 2 && !fk_from_other_model_to_this_exist {
                 RelationNames::name_for_unambiguous_relation(model_with_fk, referenced_model)
             } else {
                 RelationNames::name_for_ambiguous_relation(model_with_fk, referenced_model, &fk_column_name)

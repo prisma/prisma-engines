@@ -42,8 +42,8 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
     }
 
     async fn get_metadata(&self, schema: &str) -> DescriberResult<SqlMetadata> {
-        let table_count = self.get_table_names(&schema).await?.len();
-        let size_in_bytes = self.get_size(&schema).await?;
+        let table_count = self.get_table_names(schema).await?.len();
+        let size_in_bytes = self.get_size(schema).await?;
 
         Ok(SqlMetadata {
             table_count,
@@ -406,7 +406,7 @@ impl<'a> SqlSchemaDescriber<'a> {
         } else {
             let mut introspected_default = String::with_capacity(default_string.len());
             introspected_default.push('(');
-            introspected_default.push_str(&default_string);
+            introspected_default.push_str(default_string);
             introspected_default.push(')');
             DefaultValue::db_generated(introspected_default)
         }

@@ -65,7 +65,7 @@ impl MssqlFlavour {
             let shadow_conninfo = conn.connection_info();
             let main_conninfo = main_connection.connection_info();
 
-            super::validate_connection_infos_do_not_match((&shadow_conninfo, &main_conninfo))?;
+            super::validate_connection_infos_do_not_match((shadow_conninfo, main_conninfo))?;
 
             if self.reset(&conn).await.is_err() {
                 connector.best_effort_reset(&conn).await?;
@@ -391,7 +391,7 @@ mod tests {
     fn debug_impl_does_not_leak_connection_info() {
         let url = "sqlserver://myserver:8765;database=master;schema=mydbname;user=SA;password=<mypassword>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED";
 
-        let flavour = MssqlFlavour::new(MssqlUrl::new(&url).unwrap(), BitFlags::empty());
+        let flavour = MssqlFlavour::new(MssqlUrl::new(url).unwrap(), BitFlags::empty());
         let debugged = format!("{:?}", flavour);
 
         let words = &["myname", "mypassword", "myserver", "8765", "mydbname"];

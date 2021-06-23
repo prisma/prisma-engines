@@ -27,13 +27,13 @@ impl TestApi {
         let connection_string = args.database_url();
 
         let (database, connection_string): (Quaint, String) = if tags.intersects(Tags::Vitess) {
-            let me = SqlMigrationConnector::new(&connection_string, BitFlags::all(), None)
+            let me = SqlMigrationConnector::new(connection_string, BitFlags::all(), None)
                 .await
                 .unwrap();
             me.reset().await.unwrap();
 
             (
-                Quaint::new(&connection_string).await.unwrap(),
+                Quaint::new(connection_string).await.unwrap(),
                 connection_string.to_owned(),
             )
         } else if tags.contains(Tags::Mysql) {

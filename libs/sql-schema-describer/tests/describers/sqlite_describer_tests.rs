@@ -142,7 +142,7 @@ async fn sqlite_foreign_key_on_delete_must_be_handled() {
             city_set_default INTEGER REFERENCES City(id) ON DELETE SET DEFAULT,
             city_set_null INTEGER REFERENCES City(id) ON DELETE SET NULL
         )";
-    let schema = describe_sqlite(&sql).await;
+    let schema = describe_sqlite(sql).await;
     let mut table = schema.get_table("User").expect("get User table").to_owned();
     table.foreign_keys.sort_unstable_by_key(|fk| fk.columns.clone());
 

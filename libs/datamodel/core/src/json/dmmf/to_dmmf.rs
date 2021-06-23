@@ -20,11 +20,11 @@ fn schema_to_dmmf(schema: &dml::Datamodel) -> Datamodel {
     };
 
     for enum_model in schema.enums() {
-        datamodel.enums.push(enum_to_dmmf(&enum_model));
+        datamodel.enums.push(enum_to_dmmf(enum_model));
     }
 
     for model in schema.models().filter(|model| !model.is_ignored) {
-        datamodel.models.push(model_to_dmmf(&model));
+        datamodel.models.push(model_to_dmmf(model));
     }
 
     datamodel

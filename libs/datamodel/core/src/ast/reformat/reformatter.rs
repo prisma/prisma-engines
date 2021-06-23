@@ -17,9 +17,9 @@ pub struct Reformatter<'a> {
 impl<'a> Reformatter<'a> {
     pub fn new(input: &'a str) -> Self {
         //todo don't run parsing and validating of the string in every step
-        let missing_fields = Self::find_all_missing_fields(&input);
-        let missing_field_attributes = Self::find_all_missing_attributes(&input);
-        let missing_relation_attribute_args = Self::find_all_missing_relation_attribute_args(&input);
+        let missing_fields = Self::find_all_missing_fields(input);
+        let missing_field_attributes = Self::find_all_missing_attributes(input);
+        let missing_relation_attribute_args = Self::find_all_missing_relation_attribute_args(input);
 
         Reformatter {
             input,
@@ -32,8 +32,8 @@ impl<'a> Reformatter<'a> {
     // this finds all auto generated fields, that are added during auto generation AND are missing from the original input.
     fn find_all_missing_fields(schema_string: &str) -> Result<ValidatedMissingFields, crate::diagnostics::Diagnostics> {
         let mut diagnostics = crate::diagnostics::Diagnostics::new();
-        let schema_ast = crate::parse_schema_ast(&schema_string)?;
-        let validated_datamodel = crate::parse_datamodel_for_formatter(&schema_string)?;
+        let schema_ast = crate::parse_schema_ast(schema_string)?;
+        let validated_datamodel = crate::parse_datamodel_for_formatter(schema_string)?;
 
         let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(None, &HashSet::new());
         let mut result = Vec::new();
@@ -45,7 +45,7 @@ impl<'a> Reformatter<'a> {
 
             for field in model.fields() {
                 if !ast_model.fields.iter().any(|f| f.name.name == field.name()) {
-                    let ast_field = lowerer.lower_field(&field, &validated_datamodel.subject);
+                    let ast_field = lowerer.lower_field(field, &validated_datamodel.subject);
 
                     result.push(MissingField {
                         model: model.name.clone(),
@@ -65,8 +65,8 @@ impl<'a> Reformatter<'a> {
         schema_string: &str,
     ) -> Result<Vec<MissingFieldAttribute>, crate::diagnostics::Diagnostics> {
         let mut diagnostics = crate::diagnostics::Diagnostics::new();
-        let schema_ast = crate::parse_schema_ast(&schema_string)?;
-        let validated_datamodel = crate::parse_datamodel_for_formatter(&schema_string)?;
+        let schema_ast = crate::parse_schema_ast(schema_string)?;
+        let validated_datamodel = crate::parse_datamodel_for_formatter(schema_string)?;
 
         diagnostics.append_warning_vec(validated_datamodel.warnings);
         let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(None, &HashSet::new());
@@ -75,7 +75,7 @@ impl<'a> Reformatter<'a> {
         for model in validated_datamodel.subject.models() {
             let ast_model = schema_ast.find_model(&model.name).unwrap();
             for field in model.fields() {
-                let new_ast_field = lowerer.lower_field(&field, &validated_datamodel.subject);
+                let new_ast_field = lowerer.lower_field(field, &validated_datamodel.subject);
 
                 if let Some(original_field) = ast_model.fields.iter().find(|f| f.name.name == field.name()) {
                     for attribute in new_ast_field.attributes {
@@ -101,8 +101,8 @@ impl<'a> Reformatter<'a> {
         schema_string: &str,
     ) -> Result<Vec<MissingRelationAttributeArg>, crate::diagnostics::Diagnostics> {
         let mut diagnostics = crate::diagnostics::Diagnostics::new();
-        let schema_ast = crate::parse_schema_ast(&schema_string)?;
-        let validated_datamodel = crate::parse_datamodel_for_formatter(&schema_string)?;
+        let schema_ast = crate::parse_schema_ast(schema_string)?;
+        let validated_datamodel = crate::parse_datamodel_for_formatter(schema_string)?;
 
         diagnostics.append_warning_vec(validated_datamodel.warnings);
         let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(None, &HashSet::new());
@@ -111,7 +111,7 @@ impl<'a> Reformatter<'a> {
         for model in validated_datamodel.subject.models() {
             let ast_model = schema_ast.find_model(&model.name).unwrap();
             for field in model.fields() {
-                let new_ast_field = lowerer.lower_field(&field, &validated_datamodel.subject);
+                let new_ast_field = lowerer.lower_field(field, &validated_datamodel.subject);
 
                 if let Some(original_field) = ast_model.fields.iter().find(|f| f.name.name == field.name()) {
                     for attribute in new_ast_field.attributes.iter().filter(|a| a.name.name == "relation") {
@@ -238,8 +238,8 @@ impl<'a> Reformatter<'a> {
             target,
             token,
             Box::new(|table, _, token, _| match token.as_rule() {
-                Rule::key_value => Self::reformat_key_value(table, &token),
-                _ => Self::reformat_generic_token(table, &token),
+                Rule::key_value => Self::reformat_key_value(table, token),
+                _ => Self::reformat_generic_token(table, token),
             }),
         );
     }
@@ -252,8 +252,8 @@ impl<'a> Reformatter<'a> {
             Box::new(|table, _, token, _| {
                 //
                 match token.as_rule() {
-                    Rule::key_value => Self::reformat_key_value(table, &token),
-                    _ => Self::reformat_generic_token(table, &token),
+                    Rule::key_value => Self::reformat_key_value(table, token),
+                    _ => Self::reformat_generic_token(table, token),
                 }
             }),
         );
@@ -281,16 +281,16 @@ impl<'a> Reformatter<'a> {
         self.reformat_block_element_internal(
             "model",
             target,
-            &token,
+            token,
             Box::new(|table, renderer, token, model_name| {
                 match token.as_rule() {
                     Rule::block_level_attribute => {
                         // model level attributes reset the table. -> .render() does that
                         table.render(renderer);
-                        Self::reformat_attribute(renderer, &token, "@@", vec![]);
+                        Self::reformat_attribute(renderer, token, "@@", vec![]);
                     }
-                    Rule::field_declaration => self.reformat_field(table, &token, model_name),
-                    _ => Self::reformat_generic_token(table, &token),
+                    Rule::field_declaration => self.reformat_field(table, token, model_name),
+                    _ => Self::reformat_generic_token(table, token),
                 }
             }),
             Box::new(|table, _, model_name| {
@@ -352,7 +352,7 @@ impl<'a> Reformatter<'a> {
                     }
 
                     for d in &attributes {
-                        the_fn(&mut table, renderer, &d, block_name);
+                        the_fn(&mut table, renderer, d, block_name);
                         // New line after each block attribute
                         table.render(renderer);
                         table = TableFormat::new();
@@ -551,7 +551,7 @@ impl<'a> Reformatter<'a> {
                     target.write("type");
                     target.write(&identifier.clone().expect("Unknown field identifier."));
                     target.write("=");
-                    target.write(&Self::get_identifier(current));
+                    target.write(Self::get_identifier(current));
                 }
                 Rule::attribute => {
                     Self::reformat_attribute(&mut target.column_locked_writer_for(4), &current, "@", vec![]);
@@ -573,14 +573,14 @@ impl<'a> Reformatter<'a> {
         for current in token.clone().into_inner() {
             match current.as_rule() {
                 Rule::optional_type => {
-                    builder.write(&Self::get_identifier(current));
+                    builder.write(Self::get_identifier(current));
                     builder.write("?");
                 }
                 Rule::base_type => {
-                    builder.write(&Self::get_identifier(current));
+                    builder.write(Self::get_identifier(current));
                 }
                 Rule::list_type => {
-                    builder.write(&Self::get_identifier(current));
+                    builder.write(Self::get_identifier(current));
                     builder.write("[]");
                 }
                 _ => Self::reformat_generic_token(&mut builder, &current),
@@ -694,7 +694,7 @@ impl<'a> Reformatter<'a> {
                     builder.write(", ");
                 }
                 builder.write(&arg.arg.name.name);
-                builder.write(&": ");
+                builder.write(": ");
                 Self::render_value(&mut builder, &arg.arg.value);
             }
         }
@@ -709,23 +709,23 @@ impl<'a> Reformatter<'a> {
     //duplicated from renderer -.-
     fn render_value(target: &mut StringBuilder, val: &ast::Expression) {
         match val {
-            ast::Expression::Array(vals, _) => Self::render_array(target, &vals),
-            ast::Expression::BooleanValue(val, _) => target.write(&val),
-            ast::Expression::ConstantValue(val, _) => target.write(&val),
-            ast::Expression::NumericValue(val, _) => target.write(&val),
-            ast::Expression::StringValue(val, _) => Self::render_str(target, &val),
-            ast::Expression::Function(name, args, _) => Self::render_func(target, &name, &args),
+            ast::Expression::Array(vals, _) => Self::render_array(target, vals),
+            ast::Expression::BooleanValue(val, _) => target.write(val),
+            ast::Expression::ConstantValue(val, _) => target.write(val),
+            ast::Expression::NumericValue(val, _) => target.write(val),
+            ast::Expression::StringValue(val, _) => Self::render_str(target, val),
+            ast::Expression::Function(name, args, _) => Self::render_func(target, name, args),
         };
     }
     fn render_array(target: &mut StringBuilder, vals: &[ast::Expression]) {
-        target.write(&"[");
+        target.write("[");
         for (idx, arg) in vals.iter().enumerate() {
             if idx > 0 {
-                target.write(&", ");
+                target.write(", ");
             }
             Self::render_value(target, arg);
         }
-        target.write(&"]");
+        target.write("]");
     }
     fn render_func(target: &mut StringBuilder, name: &str, vals: &[ast::Expression]) {
         target.write(name);

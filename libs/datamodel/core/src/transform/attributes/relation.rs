@@ -21,7 +21,7 @@ impl RelationAttributeValidator {
 
 impl AttributeValidator<dml::Field> for RelationAttributeValidator {
     fn attribute_name(&self) -> &'static str {
-        &"relation"
+        "relation"
     }
 
     fn validate_and_apply(&self, args: &mut Arguments<'_>, field: &mut dml::Field) -> Result<(), DatamodelError> {
@@ -95,7 +95,7 @@ impl AttributeValidator<dml::Field> for RelationAttributeValidator {
             if !relation_info.references.is_empty() {
                 let is_many_to_many = match &field {
                     Field::RelationField(relation_field) => {
-                        let (_, related_field) = datamodel.find_related_field(&relation_field).unwrap();
+                        let (_, related_field) = datamodel.find_related_field(relation_field).unwrap();
                         relation_field.arity.is_list() && related_field.arity.is_list()
                     }
                     _ => false,

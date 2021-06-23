@@ -17,7 +17,7 @@ pub async fn get_single_record(
     selected_fields: &ModelProjection,
     aggr_selections: &[RelAggregationSelection],
 ) -> crate::Result<Option<SingleRecord>> {
-    let query = read::get_records(&model, selected_fields.as_columns(), aggr_selections, filter);
+    let query = read::get_records(model, selected_fields.as_columns(), aggr_selections, filter);
 
     let mut field_names: Vec<_> = selected_fields.db_names().collect();
     let mut aggr_field_names: Vec<_> = aggr_selections.iter().map(|aggr_sel| aggr_sel.db_alias()).collect();

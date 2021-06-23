@@ -40,7 +40,7 @@ async fn mapped_model_name(api: &TestApi) -> TestResult {
         }
     "#};
 
-    api.assert_eq_datamodels(&final_dm, &api.re_introspect(input_dm).await?);
+    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
 
     let expected = json!([{
         "code": 7,
@@ -1443,7 +1443,7 @@ async fn multiple_many_to_many_on_same_model(api: &TestApi) -> TestResult {
         }
     "#};
 
-    api.assert_eq_datamodels(&final_dm, &api.re_introspect(&input_dm).await?);
+    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
 
     Ok(())
 }

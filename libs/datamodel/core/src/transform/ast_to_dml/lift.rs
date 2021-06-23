@@ -48,8 +48,8 @@ impl<'a> LiftAstToDml<'a> {
 
         for (top_id, ast_obj) in self.db.ast().iter_tops() {
             match ast_obj {
-                ast::Top::Enum(en) => schema.add_enum(self.lift_enum(&en)),
-                ast::Top::Model(ty) => schema.add_model(self.lift_model(top_id, &ty)),
+                ast::Top::Enum(en) => schema.add_enum(self.lift_enum(en)),
+                ast::Top::Model(ty) => schema.add_model(self.lift_model(top_id, ty)),
                 ast::Top::Source(_) => { /* Source blocks are explicitly ignored by the validator */ }
                 ast::Top::Generator(_) => { /* Generator blocks are explicitly ignored by the validator */ }
                 ast::Top::Type(_) => { /* Type blocks are inlined */ }
@@ -325,7 +325,7 @@ fn lift_native_type(
     }
 
     // check for compatibility with scalar type
-    if !constructor.prisma_types.contains(&scalar_type) {
+    if !constructor.prisma_types.contains(scalar_type) {
         diagnostics.push_error(DatamodelError::new_connector_error(
             &ConnectorError::from_kind(ErrorKind::IncompatibleNativeType {
                 native_type: x.parse().unwrap(),

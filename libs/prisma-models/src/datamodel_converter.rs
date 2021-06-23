@@ -60,10 +60,10 @@ impl<'a> DatamodelConverter<'a> {
             .map(|model| ModelTemplate {
                 name: model.name.clone(),
                 is_embedded: model.is_embedded,
-                fields: self.convert_fields(&model),
+                fields: self.convert_fields(model),
                 manifestation: model.database_name().map(|s| s.to_owned()),
                 id_field_names: model.id_fields.clone(),
-                indexes: self.convert_indexes(&model),
+                indexes: self.convert_indexes(model),
                 supports_create_operation: model.supports_create_operation(),
                 dml_model: model.clone(),
             })
@@ -112,8 +112,8 @@ impl<'a> DatamodelConverter<'a> {
                         type_identifier: sf.type_identifier(),
                         is_required: sf.is_required(),
                         is_list: sf.is_list(),
-                        is_unique: sf.is_unique(&model),
-                        is_id: sf.is_id(&model),
+                        is_unique: sf.is_unique(model),
+                        is_id: sf.is_id(model),
                         is_auto_generated_int_id: sf.is_auto_generated_int_id(),
                         is_autoincrement: sf.is_auto_increment(),
                         behaviour: sf.behaviour(),
@@ -166,10 +166,10 @@ impl<'a> DatamodelConverter<'a> {
                 } = &field.relation_info;
 
                 let related_model = datamodel
-                    .find_model(&to)
+                    .find_model(to)
                     .unwrap_or_else(|| panic!("Related model {} not found", to));
 
-                let (_, related_field) = datamodel.find_related_field_bang(&field);
+                let (_, related_field) = datamodel.find_related_field_bang(field);
 
                 let related_field_info: &dml::RelationInfo = &related_field.relation_info;
 

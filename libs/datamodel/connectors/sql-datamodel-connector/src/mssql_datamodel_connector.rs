@@ -118,8 +118,8 @@ impl MsSqlDatamodelConnector {
 
         match args {
             [] => Ok(None),
-            [s] if MAX_REGEX.is_match(&s) => Ok(Some(MsSqlTypeParameter::Max)),
-            [s] if NUM_REGEX.is_match(&s) => Ok(s.trim().parse().map(MsSqlTypeParameter::Number).ok()),
+            [s] if MAX_REGEX.is_match(s) => Ok(Some(MsSqlTypeParameter::Max)),
+            [s] if NUM_REGEX.is_match(s) => Ok(s.trim().parse().map(MsSqlTypeParameter::Number).ok()),
             s => Err(self
                 .native_str_error(r#type)
                 .native_type_invalid_param("a number or `Max`", &s.join(","))),

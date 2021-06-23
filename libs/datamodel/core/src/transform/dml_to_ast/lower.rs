@@ -84,7 +84,7 @@ impl<'a> LowerDmlToAst<'a> {
         }
 
         ast::Field {
-            name: ast::Identifier::new(&field.name()),
+            name: ast::Identifier::new(field.name()),
             arity: self.lower_field_arity(field.arity()),
             attributes,
             field_type: self.lower_type(&field.field_type()),
@@ -107,9 +107,9 @@ impl<'a> LowerDmlToAst<'a> {
     fn lower_type(&self, field_type: &dml::FieldType) -> ast::FieldType {
         match field_type {
             dml::FieldType::Scalar(tpe, custom_type_name, _) => ast::FieldType::Supported(ast::Identifier::new(
-                &custom_type_name.as_ref().unwrap_or(&tpe.to_string()),
+                custom_type_name.as_ref().unwrap_or(&tpe.to_string()),
             )),
-            dml::FieldType::Enum(tpe) => ast::FieldType::Supported(ast::Identifier::new(&tpe)),
+            dml::FieldType::Enum(tpe) => ast::FieldType::Supported(ast::Identifier::new(tpe)),
             dml::FieldType::Unsupported(tpe) => ast::FieldType::Unsupported(tpe.clone(), Span::empty()),
             dml::FieldType::Relation(rel) => ast::FieldType::Supported(ast::Identifier::new(&rel.to)),
         }

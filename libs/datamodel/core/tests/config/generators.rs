@@ -46,7 +46,7 @@ generator go {
   }
 ]"#;
 
-    assert_mcf(&schema, &expected);
+    assert_mcf(schema, expected);
 }
 
 #[test]
@@ -89,7 +89,7 @@ fn preview_features_setting_must_work() {
   }
 ]"#;
 
-    assert_mcf(&schema, &expected);
+    assert_mcf(schema, expected);
 }
 
 #[test]
@@ -115,7 +115,7 @@ fn hidden_preview_features_setting_must_work() {
   }
 ]"#;
 
-    assert_mcf(&schema, &expected);
+    assert_mcf(schema, expected);
 }
 #[test]
 fn back_slashes_in_providers_must_work() {
@@ -139,7 +139,7 @@ fn back_slashes_in_providers_must_work() {
         }
     ]"#;
 
-    assert_mcf(&schema, &expected);
+    assert_mcf(schema, expected);
 }
 
 #[test]
@@ -166,7 +166,7 @@ fn new_lines_in_generator_must_work() {
         }
     ]"#;
 
-    assert_mcf(&schema, &expected);
+    assert_mcf(schema, expected);
 }
 
 #[test]
