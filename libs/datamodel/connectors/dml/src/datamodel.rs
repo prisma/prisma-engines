@@ -69,7 +69,7 @@ impl Datamodel {
 
     /// Finds parent  model for a field reference.
     pub fn find_model_by_relation_field_ref(&self, field: &RelationField) -> Option<&Model> {
-        self.find_model(&self.find_related_field_bang(&field).1.relation_info.to)
+        self.find_model(&self.find_related_field_bang(field).1.relation_info.to)
     }
 
     /// Finds a mutable field reference by a model and field name.

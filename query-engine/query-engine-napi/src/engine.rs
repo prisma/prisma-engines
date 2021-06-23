@@ -198,7 +198,7 @@ impl QueryEngine {
                             })
                             .map_err(|err| crate::error::ApiError::Conversion(err, builder.datamodel.raw.clone()))?;
 
-                        let (db_name, executor) = exec_loader::load(&data_source, &preview_features, &url).await?;
+                        let (db_name, executor) = exec_loader::load(data_source, &preview_features, &url).await?;
                         let connector = executor.primary_connector();
                         connector.get_connection().await?;
 

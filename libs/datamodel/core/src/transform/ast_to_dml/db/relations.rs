@@ -9,5 +9,5 @@ pub(super) struct Relations {
 }
 
 pub(crate) struct RelationField {
-    pub(super) referenced_model: TopId,
+    pub(crate) referenced_model: TopId,
 }

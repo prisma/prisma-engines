@@ -13,7 +13,7 @@ impl Connector for EmptyDatamodelConnector {
     }
 
     fn referential_actions(&self) -> BitFlags<ReferentialAction> {
-        BitFlags::empty()
+        BitFlags::all()
     }
 
     fn capabilities(&self) -> &[ConnectorCapability] {

@@ -118,7 +118,7 @@ impl AggregationSelection {
             )],
 
             AggregationSelection::Count { all, fields } => {
-                let mut mapped = Self::map_field_types(&fields, Some(TypeIdentifier::Int));
+                let mut mapped = Self::map_field_types(fields, Some(TypeIdentifier::Int));
 
                 if *all {
                     mapped.push(("all".to_owned(), TypeIdentifier::Int, FieldArity::Required));
@@ -127,10 +127,10 @@ impl AggregationSelection {
                 mapped
             }
 
-            AggregationSelection::Average(fields) => Self::map_field_types(&fields, Some(TypeIdentifier::Float)),
-            AggregationSelection::Sum(fields) => Self::map_field_types(&fields, None),
-            AggregationSelection::Min(fields) => Self::map_field_types(&fields, None),
-            AggregationSelection::Max(fields) => Self::map_field_types(&fields, None),
+            AggregationSelection::Average(fields) => Self::map_field_types(fields, Some(TypeIdentifier::Float)),
+            AggregationSelection::Sum(fields) => Self::map_field_types(fields, None),
+            AggregationSelection::Min(fields) => Self::map_field_types(fields, None),
+            AggregationSelection::Max(fields) => Self::map_field_types(fields, None),
         }
     }
 

@@ -63,10 +63,6 @@ impl SchemaAst {
         self.models().into_iter().find(|m| m.name.name == model)
     }
 
-    pub(crate) fn find_type_alias(&self, type_name: &str) -> Option<&Field> {
-        self.types().find(|t| t.name.name == type_name)
-    }
-
     pub(crate) fn find_field(&self, model: &str, field: &str) -> Option<&Field> {
         self.find_model(model)?.fields.iter().find(|f| f.name.name == field)
     }
@@ -76,10 +72,6 @@ impl SchemaAst {
             .iter()
             .enumerate()
             .map(|(top_idx, top)| (TopId(top_idx as u32), top))
-    }
-
-    pub(crate) fn types(&self) -> impl Iterator<Item = &Field> {
-        self.tops.iter().filter_map(|top| top.as_type_alias())
     }
 
     pub(crate) fn models(&self) -> impl Iterator<Item = &Model> {

@@ -173,7 +173,7 @@ impl TestApi {
         let connector = self
             .rt
             .block_on(SqlMigrationConnector::new(
-                &connection_string,
+                connection_string,
                 self.preview_features,
                 shadow_db_connection_string,
             ))
@@ -207,7 +207,7 @@ pub struct EngineTestApi<'a> {
 impl EngineTestApi<'_> {
     /// Plan an `applyMigrations` command
     pub fn apply_migrations<'a>(&'a self, migrations_directory: &'a TempDir) -> ApplyMigrations<'a> {
-        ApplyMigrations::new_sync(&self.connector, migrations_directory, &self.rt)
+        ApplyMigrations::new_sync(&self.connector, migrations_directory, self.rt)
     }
 
     /// Plan a `createMigration` command
@@ -217,7 +217,7 @@ impl EngineTestApi<'_> {
         schema: &'a str,
         migrations_directory: &'a TempDir,
     ) -> CreateMigration<'a> {
-        CreateMigration::new_sync(&self.connector, name, schema, migrations_directory, &self.rt)
+        CreateMigration::new_sync(&self.connector, name, schema, migrations_directory, self.rt)
     }
 
     /// Builder and assertions to call the DiagnoseMigrationHistory command.
@@ -237,12 +237,12 @@ impl EngineTestApi<'_> {
 
     /// Plan a `reset` command
     pub fn reset(&self) -> Reset<'_> {
-        Reset::new_sync(&self.connector, &self.rt)
+        Reset::new_sync(&self.connector, self.rt)
     }
 
     /// Plan a `schemaPush` command
     pub fn schema_push(&self, dm: impl Into<String>) -> SchemaPush<'_> {
-        SchemaPush::new_sync(&self.connector, dm.into(), &self.rt)
+        SchemaPush::new_sync(&self.connector, dm.into(), self.rt)
     }
 
     /// The schema name of the current connected database.

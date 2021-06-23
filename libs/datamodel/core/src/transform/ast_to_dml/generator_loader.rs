@@ -29,7 +29,7 @@ impl GeneratorLoader {
         let mut generators: Vec<Generator> = Vec::new();
 
         for gen in ast_schema.generators() {
-            if let Some(generator) = Self::lift_generator(&gen, diagnostics) {
+            if let Some(generator) = Self::lift_generator(gen, diagnostics) {
                 generators.push(generator)
             }
         }

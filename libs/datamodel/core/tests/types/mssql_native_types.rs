@@ -89,7 +89,7 @@ fn test_block_attribute_support(native_type: &str, scalar_type: &str, attribute_
         attribute_name = attribute_name
     );
 
-    test_native_types_compatibility(&dml, &error_msg, MSSQL_SOURCE);
+    test_native_types_compatibility(&dml, error_msg, MSSQL_SOURCE);
 }
 
 #[test]

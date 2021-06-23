@@ -22,7 +22,7 @@ impl PostgresFlavour {
     fn render_column(&self, column: &ColumnWalker<'_>) -> String {
         let column_name = self.quote(column.name());
         let tpe_str = render_column_type(column);
-        let nullability_str = render_nullability(&column);
+        let nullability_str = render_nullability(column);
         let default_str = column
             .default()
             .map(|default| render_default(default))
@@ -618,7 +618,7 @@ fn render_default(default: &DefaultValue) -> Cow<'_, str> {
     match default.kind() {
         DefaultKind::DbGenerated(val) => val.as_str().into(),
         DefaultKind::Value(PrismaValue::String(val)) | DefaultKind::Value(PrismaValue::Enum(val)) => {
-            format!("E'{}'", escape_string_literal(&val)).into()
+            format!("E'{}'", escape_string_literal(val)).into()
         }
         DefaultKind::Value(PrismaValue::Bytes(b)) => Quoted::postgres_string(format_hex(b)).to_string().into(),
         DefaultKind::Now => "CURRENT_TIMESTAMP".into(),

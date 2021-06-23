@@ -48,7 +48,7 @@ impl PostgresFlavour {
             let shadow_conninfo = conn.connection_info();
             let main_conninfo = main_connection.connection_info();
 
-            super::validate_connection_infos_do_not_match((&shadow_conninfo, &main_conninfo))?;
+            super::validate_connection_infos_do_not_match((shadow_conninfo, main_conninfo))?;
 
             tracing::info!(
                 "Connecting to user-provided shadow database at {}.{:?}",

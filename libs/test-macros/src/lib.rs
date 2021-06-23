@@ -142,7 +142,6 @@ impl TestConnectorAttrs {
 
                 return Ok(());
             }
-            p if p.is_ident("logs") => return Ok(()), // TODO
             other => return Err(syn::Error::new_spanned(other, "Unexpected argument")),
         };
 

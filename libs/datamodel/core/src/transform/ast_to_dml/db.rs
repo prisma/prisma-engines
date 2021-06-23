@@ -1,6 +1,4 @@
 #![deny(missing_docs)]
-// TODO: remove this once we use all this information in lift.rs
-#![allow(unused)]
 
 //! See the docs on [ParserDatabase](/struct.ParserDatabase.html).
 
@@ -12,7 +10,9 @@ use self::relations::RelationField;
 use crate::{
     ast,
     diagnostics::{DatamodelError, Diagnostics},
+    Datasource,
 };
+use datamodel_connector::{Connector, EmptyDatamodelConnector};
 use names::Names;
 use std::str::FromStr;
 
@@ -25,6 +25,7 @@ use std::str::FromStr;
 /// resolved information will be incomplete.
 pub(crate) struct ParserDatabase<'a> {
     ast: &'a ast::SchemaAst,
+    datasource: Option<&'a Datasource>,
     names: Names<'a>,
     types: types::Types,
     relations: relations::Relations,
@@ -32,9 +33,14 @@ pub(crate) struct ParserDatabase<'a> {
 
 impl<'ast> ParserDatabase<'ast> {
     /// See the docs on [ParserDatabase](/struct.ParserDatabase.html).
-    pub(super) fn new(ast: &'ast ast::SchemaAst, diagnostics: &mut Diagnostics) -> Self {
+    pub(super) fn new(
+        ast: &'ast ast::SchemaAst,
+        datasource: Option<&'ast Datasource>,
+        diagnostics: &mut Diagnostics,
+    ) -> Self {
         let mut db = ParserDatabase {
             ast,
+            datasource,
             names: Names::new(ast, diagnostics),
             types: types::Types::default(),
             relations: relations::Relations::default(),
@@ -72,8 +78,22 @@ impl<'ast> ParserDatabase<'ast> {
         db
     }
 
+    pub(super) fn alias_scalar_field_type(&self, alias_id: &ast::TopId) -> &ScalarFieldType {
+        self.types.type_aliases.get(alias_id).unwrap()
+    }
+
     pub(super) fn ast(&self) -> &'ast ast::SchemaAst {
         self.ast
+    }
+
+    pub(super) fn datasource(&self) -> Option<&'ast Datasource> {
+        self.datasource
+    }
+
+    pub(super) fn active_connector(&self) -> &dyn Connector {
+        self.datasource
+            .map(|datasource| datasource.active_connector.as_ref())
+            .unwrap_or(&EmptyDatamodelConnector)
     }
 
     pub(crate) fn iter_enums(&self) -> impl Iterator<Item = (ast::TopId, &'ast ast::Enum)> + '_ {

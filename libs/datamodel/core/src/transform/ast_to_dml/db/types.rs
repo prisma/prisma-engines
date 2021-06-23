@@ -4,20 +4,11 @@ use crate::{
     diagnostics::{DatamodelError, Diagnostics},
 };
 use itertools::Itertools;
-use std::collections::{BTreeMap, BTreeSet, HashMap};
-
-type AnnotationId = u32;
-
+use std::collections::{BTreeMap, HashMap};
 #[derive(Debug, Default)]
 pub(super) struct Types {
     pub(super) type_aliases: HashMap<TopId, ScalarFieldType>,
     pub(super) scalar_fields: BTreeMap<(TopId, FieldId), ScalarFieldType>,
-    annotations: Vec<ModelAnnotation>,
-    // Storage for annotation fields, i.e. the fields referenced in `@(@)index`,
-    // `@(@)unique` and `@(@)id`. The type should be understood as (model_id,
-    // annotation_id, sort_key_, field_id), where the sort key is the index of
-    // the field in the annotation.
-    annotation_fields: BTreeSet<(TopId, AnnotationId, u16, FieldId)>,
 }
 
 impl Types {
@@ -84,12 +75,4 @@ impl Types {
             diagnostics.push_error(error);
         }
     }
-}
-
-#[derive(Debug)]
-pub(crate) enum ModelAnnotation {
-    Id,
-    Index,
-    Unique,
-    Ignore,
 }

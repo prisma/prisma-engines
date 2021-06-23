@@ -110,7 +110,7 @@ async fn drop_database(database_str: &str) -> Result<String, ConnectorError> {
 }
 
 async fn qe_setup(prisma_schema: &str, flags: BitFlags<QueryEngineFlags>) -> Result<(), ConnectorError> {
-    migration_core::qe_setup::run(&prisma_schema, flags).await?;
+    migration_core::qe_setup::run(prisma_schema, flags).await?;
 
     Ok(())
 }

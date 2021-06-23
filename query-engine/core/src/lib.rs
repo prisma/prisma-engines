@@ -11,7 +11,9 @@
     clippy::needless_question_mark,
     clippy::ptr_arg,
     clippy::mem_replace_with_default,
-    clippy::clone_on_copy
+    clippy::clone_on_copy,
+    clippy::needless_borrow,
+    clippy::needless_collect
 )]
 #![warn(warnings)] // Todo deny warnings once done
 

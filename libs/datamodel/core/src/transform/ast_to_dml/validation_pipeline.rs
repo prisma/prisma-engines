@@ -52,22 +52,16 @@ impl<'a, 'b> ValidationPipeline<'a> {
         // Phase 1 is source block loading.
 
         // Phase 2: Name resolution.
-        let db = ParserDatabase::new(ast_schema, &mut diagnostics);
+        let db = ParserDatabase::new(ast_schema, self.source, &mut diagnostics);
 
         // Early return so that the validator does not have to deal with invalid schemas
         diagnostics.to_result()?;
 
         // Phase 3: Lift AST to DML.
-        let lifter = LiftAstToDml::new(self.source, self.preview_features, &db);
+        let mut schema = LiftAstToDml::new(self.preview_features, &db, &mut diagnostics).lift();
 
-        let mut schema = match lifter.lift() {
-            Err(mut err) => {
-                // Cannot continue on lifter error.
-                diagnostics.append(&mut err);
-                return Err(diagnostics);
-            }
-            Ok(schema) => schema,
-        };
+        // Cannot continue on lifter error.
+        diagnostics.to_result()?;
 
         // Phase 4: Validation
         if let Err(mut err) = self.validator.validate(&db, &mut schema) {

@@ -13,7 +13,7 @@ impl SqlSchemaCalculatorFlavour for MysqlFlavour {
         // each enum is used at least once).
         let mut enums = Vec::with_capacity(datamodel.enums().len());
 
-        let enum_fields = walk_scalar_fields(&datamodel)
+        let enum_fields = walk_scalar_fields(datamodel)
             .filter_map(|field| field.field_type().as_enum().map(|enum_walker| (field, enum_walker)));
 
         for (field, enum_tpe) in enum_fields {

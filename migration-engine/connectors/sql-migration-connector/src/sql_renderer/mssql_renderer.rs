@@ -47,7 +47,7 @@ impl MssqlFlavour {
         let column_name = self.quote(column.name());
 
         let r#type = render_column_type(column);
-        let nullability = common::render_nullability(&column);
+        let nullability = common::render_nullability(column);
 
         let default = if column.is_autoincrement() {
             Cow::Borrowed(" IDENTITY(1,1)")
@@ -78,10 +78,10 @@ impl MssqlFlavour {
 
         format!(
             " REFERENCES {}({}) ON DELETE {} ON UPDATE {}",
-            self.quote_with_schema(&foreign_key.referenced_table().name()),
+            self.quote_with_schema(foreign_key.referenced_table().name()),
             cols,
-            render_referential_action(&foreign_key.on_delete_action()),
-            render_referential_action(&foreign_key.on_update_action()),
+            render_referential_action(foreign_key.on_delete_action()),
+            render_referential_action(foreign_key.on_update_action()),
         )
     }
 }
@@ -95,7 +95,7 @@ impl SqlRenderer for MssqlFlavour {
         let AlterTable { table_index, changes } = alter_table;
         let tables = schemas.tables(table_index);
 
-        alter_table::create_statements(&self, tables, changes)
+        alter_table::create_statements(self, tables, changes)
     }
 
     fn render_alter_enum(&self, _: &AlterEnum, _: &Pair<&SqlSchema>) -> Vec<String> {
@@ -152,7 +152,7 @@ impl SqlRenderer for MssqlFlavour {
 
         let primary_key = if let Some(primary_columns) = primary_columns.as_ref().filter(|cols| !cols.is_empty()) {
             let index_name = format!("PK__{}__{}", table.name(), primary_columns.iter().join("_"));
-            let column_names = primary_columns.iter().map(|col| self.quote(&col)).join(",");
+            let column_names = primary_columns.iter().map(|col| self.quote(col)).join(",");
 
             format!(
                 ",\n    CONSTRAINT {} PRIMARY KEY ({})",
@@ -384,7 +384,7 @@ impl SqlRenderer for MssqlFlavour {
     }
 
     fn render_drop_table(&self, table_name: &str) -> Vec<String> {
-        vec![format!("DROP TABLE {}", self.quote_with_schema(&table_name))]
+        vec![format!("DROP TABLE {}", self.quote_with_schema(table_name))]
     }
 
     fn render_drop_view(&self, view: &ViewWalker<'_>) -> String {
@@ -460,7 +460,7 @@ fn render_default(default: &DefaultValue) -> Cow<'_, str> {
     match default.kind() {
         DefaultKind::DbGenerated(val) => val.as_str().into(),
         DefaultKind::Value(PrismaValue::String(val)) | DefaultKind::Value(PrismaValue::Enum(val)) => {
-            Quoted::mssql_string(escape_string_literal(&val)).to_string().into()
+            Quoted::mssql_string(escape_string_literal(val)).to_string().into()
         }
         DefaultKind::Value(PrismaValue::Bytes(b)) => format!("0x{}", common::format_hex(b)).into(),
         DefaultKind::Now => "CURRENT_TIMESTAMP".into(),

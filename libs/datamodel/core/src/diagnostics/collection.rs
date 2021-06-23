@@ -33,14 +33,7 @@ impl Diagnostics {
         }
     }
 
-    pub fn merge_error(mut self, err: DatamodelError) -> Diagnostics {
-        self.push_error(err);
-
-        self
-    }
-
-    /// Returns true, if there is at least one error
-    /// in this collection.
+    /// Returns true, if there is at least one error in this collection.
     pub fn has_errors(&self) -> bool {
         !self.errors.is_empty()
     }

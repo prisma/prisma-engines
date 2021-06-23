@@ -43,7 +43,7 @@ impl DatasourceLoader {
         let mut sources = Vec::new();
 
         for src in ast_schema.sources() {
-            if let Some(source) = self.lift_datasource(&src, preview_features, diagnostics) {
+            if let Some(source) = self.lift_datasource(src, preview_features, diagnostics) {
                 sources.push(source)
             }
         }

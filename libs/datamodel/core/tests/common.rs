@@ -84,12 +84,12 @@ pub trait WarningAsserts {
 impl DatasourceAsserts for datamodel::Datasource {
     fn assert_name(&self, name: &str) -> &Self {
         assert_eq!(&self.name, name);
-        &self
+        self
     }
 
     fn assert_url(&self, url: StringFromEnvVar) -> &Self {
         assert_eq!(self.url, url);
-        &self
+        self
     }
 }
 
@@ -140,7 +140,7 @@ impl ScalarFieldAsserts for dml::ScalarField {
 
     fn assert_native_type(&self) -> &NativeTypeInstance {
         if let dml::FieldType::Scalar(_, _, Some(t)) = &self.field_type {
-            &t
+            t
         } else {
             panic!("Native Type expected, but found {:?}", self.field_type);
         }

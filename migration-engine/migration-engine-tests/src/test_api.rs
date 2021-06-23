@@ -113,7 +113,7 @@ impl TestApi {
     }
 
     pub fn database(&self) -> &Quaint {
-        &self.api.quaint()
+        self.api.quaint()
     }
 
     pub fn is_sqlite(&self) -> bool {
@@ -149,7 +149,7 @@ impl TestApi {
     }
 
     pub fn connection_info(&self) -> &ConnectionInfo {
-        &self.database().connection_info()
+        self.database().connection_info()
     }
 
     pub fn sql_family(&self) -> SqlFamily {

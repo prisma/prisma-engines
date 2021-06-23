@@ -23,7 +23,7 @@ impl MysqlFlavour {
         ddl::Column {
             column_name: col.name().into(),
             not_null: col.arity().is_required(),
-            column_type: render_column_type(&col),
+            column_type: render_column_type(col),
             default: col
                 .default()
                 .filter(|default| {
@@ -35,7 +35,7 @@ impl MysqlFlavour {
                     // they are not supported by MySQL.
                     && !matches!(col.column_type_family(), ColumnTypeFamily::Binary)
                 })
-                .map(|default| render_default(&col, default)),
+                .map(|default| render_default(col, default)),
             auto_increment: col.is_autoincrement(),
             ..Default::default()
         }
@@ -130,7 +130,7 @@ impl SqlRenderer for MysqlFlavour {
                     type_change: _,
                 }) => {
                     let columns = tables.columns(column_index);
-                    let expanded = MysqlAlterColumn::new(&columns, &changes);
+                    let expanded = MysqlAlterColumn::new(&columns, changes);
 
                     match expanded {
                         MysqlAlterColumn::DropDefault => lines.push(format!(
@@ -199,7 +199,7 @@ impl SqlRenderer for MysqlFlavour {
                     index_name: if index.name().len() > MYSQL_IDENTIFIER_SIZE_LIMIT {
                         Some(Cow::Borrowed(&index.name()[0..MYSQL_IDENTIFIER_SIZE_LIMIT]))
                     } else {
-                        Some(Cow::Borrowed(&index.name()))
+                        Some(Cow::Borrowed(index.name()))
                     },
                     unique: index.index_type().is_unique(),
                     columns: index.column_names().iter().map(Cow::from).collect(),
@@ -299,10 +299,10 @@ fn render_mysql_modify(
 
     let column_type = column_type
         .map(Cow::Owned)
-        .unwrap_or_else(|| render_column_type(&next_column));
+        .unwrap_or_else(|| render_column_type(next_column));
 
     let default = new_default
-        .map(|default| render_default(&next_column, &default))
+        .map(|default| render_default(next_column, default))
         .filter(|expr| !expr.is_empty())
         .map(|expression| format!(" DEFAULT {}", expression))
         .unwrap_or_else(String::new);
@@ -329,7 +329,7 @@ fn render_column_type(column: &ColumnWalker<'_>) -> Cow<'static, str> {
     if let ColumnTypeFamily::Enum(enum_name) = column.column_type_family() {
         let r#enum = column
             .schema()
-            .get_enum(&enum_name)
+            .get_enum(enum_name)
             .unwrap_or_else(|| panic!("Could not render the variants of enum `{}`", enum_name));
 
         let variants: String = r#enum.values.iter().map(Quoted::mysql_string).join(", ");
@@ -452,7 +452,7 @@ fn render_default<'a>(column: &ColumnWalker<'a>, default: &'a DefaultValue) -> C
     match default.kind() {
         DefaultKind::DbGenerated(val) => val.as_str().into(),
         DefaultKind::Value(PrismaValue::String(val)) | DefaultKind::Value(PrismaValue::Enum(val)) => {
-            Quoted::mysql_string(escape_string_literal(&val)).to_string().into()
+            Quoted::mysql_string(escape_string_literal(val)).to_string().into()
         }
         DefaultKind::Now => {
             let precision = column

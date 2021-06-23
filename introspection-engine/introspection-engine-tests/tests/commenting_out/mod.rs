@@ -54,7 +54,7 @@ async fn a_table_without_uniques_should_ignore(api: &TestApi) -> TestResult {
         "#}
     };
 
-    api.assert_eq_datamodels(&dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -308,7 +308,7 @@ async fn remapping_field_names_to_empty(api: &TestApi) -> TestResult {
         }
     "#};
 
-    api.assert_eq_datamodels(&dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }

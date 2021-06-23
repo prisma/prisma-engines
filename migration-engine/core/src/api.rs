@@ -114,7 +114,7 @@ impl<C: MigrationConnector> GenericApi for C {
         input: &ListMigrationDirectoriesInput,
     ) -> CoreResult<ListMigrationDirectoriesOutput> {
         let migrations_from_filesystem =
-            migrations_directory::list_migrations(&Path::new(&input.migrations_directory_path))?;
+            migrations_directory::list_migrations(Path::new(&input.migrations_directory_path))?;
 
         let migrations = migrations_from_filesystem
             .iter()

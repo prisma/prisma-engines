@@ -226,7 +226,7 @@ impl Model {
             let id_fields: Vec<_> = self
                 .id_fields
                 .iter()
-                .map(|f| self.find_scalar_field(&f).unwrap())
+                .map(|f| self.find_scalar_field(f).unwrap())
                 .collect();
 
             if !id_fields.is_empty()
@@ -256,7 +256,7 @@ impl Model {
                 .iter()
                 .filter(|id| id.tpe == IndexType::Unique)
                 .filter_map(|id| {
-                    let fields: Vec<_> = id.fields.iter().map(|f| self.find_scalar_field(&f).unwrap()).collect();
+                    let fields: Vec<_> = id.fields.iter().map(|f| self.find_scalar_field(f).unwrap()).collect();
                     let no_fields_are_commented_out = !fields.iter().any(|f| in_eligible(f));
                     let all_fields_are_required = fields.iter().all(|f| f.is_required());
                     if (all_fields_are_required || allow_optional) && no_fields_are_commented_out {

@@ -21,8 +21,8 @@ pub(crate) fn calculate_sql_schema(
     // Two types of tables: model tables and implicit M2M relation tables (a.k.a. join tables.).
     schema.tables.extend(calculate_model_tables(datamodel, flavour));
 
-    let relation_tables: Vec<_> = calculate_relation_tables(datamodel, flavour, &schema).collect();
-    schema.tables.extend(relation_tables.into_iter());
+    let mut relation_tables: Vec<_> = calculate_relation_tables(datamodel, flavour, &schema).collect();
+    schema.tables.append(&mut relation_tables);
 
     if configuration.planet_scale_mode() {
         for table in &mut schema.tables {

@@ -1,4 +1,5 @@
 #![deny(rust_2018_idioms, unsafe_code, missing_docs)]
+#![allow(clippy::needless_collect)] // the implementation of that rule is way too eager, it rejects necessary collects
 
 //! The top-level library crate for the migration engine.
 
@@ -120,7 +121,7 @@ pub async fn drop_database(schema: &str) -> CoreResult<()> {
 }
 
 fn parse_configuration(datamodel: &str) -> CoreResult<(Datasource, String, BitFlags<PreviewFeature>, Option<String>)> {
-    let config = datamodel::parse_configuration(&datamodel)
+    let config = datamodel::parse_configuration(datamodel)
         .map(|validated_config| validated_config.subject)
         .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", datamodel)))?;
 
@@ -144,5 +145,5 @@ fn parse_configuration(datamodel: &str) -> CoreResult<(Datasource, String, BitFl
 }
 
 fn parse_schema(schema: &str) -> CoreResult<(Configuration, Datamodel)> {
-    datamodel::parse_schema(&schema).map_err(CoreError::new_schema_parser_error)
+    datamodel::parse_schema(schema).map_err(CoreError::new_schema_parser_error)
 }

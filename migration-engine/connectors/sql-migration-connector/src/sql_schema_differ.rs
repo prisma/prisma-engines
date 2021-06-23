@@ -350,7 +350,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
             for index in tables.dropped_indexes() {
                 // On MySQL, foreign keys automatically create indexes. These foreign-key-created
                 // indexes should only be dropped as part of the foreign key.
-                if self.flavour.should_skip_fk_indexes() && index::index_covers_fk(&tables.previous(), &index) {
+                if self.flavour.should_skip_fk_indexes() && index::index_covers_fk(tables.previous(), &index) {
                     continue;
                 }
 
@@ -425,7 +425,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         {
             for pair in differ
                 .index_pairs()
-                .filter(|pair| self.flavour.index_should_be_renamed(&pair))
+                .filter(|pair| self.flavour.index_should_be_renamed(pair))
             {
                 steps.push(pair.as_ref().map(|i| (i.table().table_index(), i.index())));
             }
@@ -449,7 +449,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
     fn enum_pairs(&self) -> impl Iterator<Item = EnumDiffer<'_>> {
         self.previous_enums().filter_map(move |previous| {
             self.next_enums()
-                .find(|next| enums_match(&previous, &next))
+                .find(|next| enums_match(&previous, next))
                 .map(|next| EnumDiffer {
                     enums: Pair::new(previous, next),
                 })

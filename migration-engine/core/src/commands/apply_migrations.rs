@@ -42,7 +42,7 @@ where
 
     migration_persistence.initialize().await?;
 
-    let migrations_from_filesystem = list_migrations(&Path::new(&input.migrations_directory_path))?;
+    let migrations_from_filesystem = list_migrations(Path::new(&input.migrations_directory_path))?;
     let migrations_from_database = migration_persistence
         .list_migrations()
         .await?

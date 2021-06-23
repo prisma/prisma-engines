@@ -122,7 +122,7 @@ impl SqlMigrationConnector {
                                 let columns = tables.columns(&alter_column.column_index);
 
                                 self.flavour()
-                                    .check_alter_column(&alter_column, &columns, &mut plan, step_index)
+                                    .check_alter_column(alter_column, &columns, &mut plan, step_index)
                             }
                             TableChange::AddColumn { column_index } => {
                                 let column = tables.next().column_at(*column_index);

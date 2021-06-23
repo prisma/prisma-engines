@@ -109,7 +109,7 @@ impl SqlSchema {
     }
 
     pub fn table_bang(&self, name: &str) -> &Table {
-        self.table(&name).unwrap()
+        self.table(name).unwrap()
     }
 
     /// Get a sequence.

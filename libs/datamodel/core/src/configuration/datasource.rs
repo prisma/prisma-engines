@@ -54,7 +54,7 @@ impl Datasource {
             (Some(lit), _) if lit.trim().is_empty() => {
                 let msg = "You must provide a nonempty URL";
 
-                return Err(DatamodelError::new_source_validation_error(&msg, &self.name, self.url_span).into());
+                return Err(DatamodelError::new_source_validation_error(msg, &self.name, self.url_span).into());
             }
             (Some(lit), _) => lit.clone(),
             (None, Some(env_var)) => match env(env_var) {

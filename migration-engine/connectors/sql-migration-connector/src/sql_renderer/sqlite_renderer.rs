@@ -139,7 +139,7 @@ impl SqlRenderer for SqliteFlavour {
         // constraints on SQLite.
         vec![
             "PRAGMA foreign_keys=off".to_string(),
-            format!("DROP TABLE {}", self.quote(&table_name)),
+            format!("DROP TABLE {}", self.quote(table_name)),
             "PRAGMA foreign_keys=on".to_string(),
         ]
     }
@@ -282,7 +282,7 @@ fn render_default(default: &DefaultValue) -> Cow<'_, str> {
     match default.kind() {
         DefaultKind::DbGenerated(val) => val.as_str().into(),
         DefaultKind::Value(PrismaValue::String(val)) | DefaultKind::Value(PrismaValue::Enum(val)) => {
-            Quoted::sqlite_string(escape_quotes(&val)).to_string().into()
+            Quoted::sqlite_string(escape_quotes(val)).to_string().into()
         }
         DefaultKind::Value(PrismaValue::Bytes(b)) => Quoted::sqlite_string(format_hex(b)).to_string().into(),
         DefaultKind::Now => "CURRENT_TIMESTAMP".into(),

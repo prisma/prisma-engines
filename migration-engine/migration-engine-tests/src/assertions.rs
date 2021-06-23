@@ -94,7 +94,7 @@ impl SchemaAssertion {
             None => panic!("Assertion failed. Enum `{}` not found", enum_name),
         };
 
-        enum_assertions(EnumAssertion(&r#enum));
+        enum_assertions(EnumAssertion(r#enum));
         self
     }
 

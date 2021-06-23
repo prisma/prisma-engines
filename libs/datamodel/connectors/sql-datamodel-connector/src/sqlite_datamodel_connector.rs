@@ -95,7 +95,7 @@ impl Connector for SqliteDatamodelConnector {
             }
         };
 
-        if let Some(path) = set_root(&url.trim_start_matches("file:")) {
+        if let Some(path) = set_root(url.trim_start_matches("file:")) {
             return format!("file:{}", path).into();
         };
 

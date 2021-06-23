@@ -10,7 +10,7 @@ pub struct FieldLevelUniqueAttributeValidator {}
 
 impl AttributeValidator<dml::Field> for FieldLevelUniqueAttributeValidator {
     fn attribute_name(&self) -> &'static str {
-        &"unique"
+        "unique"
     }
 
     fn validate_and_apply(&self, args: &mut Arguments<'_>, obj: &mut dml::Field) -> Result<(), DatamodelError> {
@@ -83,7 +83,7 @@ impl AttributeValidator<dml::Model> for ModelLevelUniqueAttributeValidator {
     }
 
     fn serialize(&self, model: &dml::Model, _datamodel: &dml::Datamodel) -> Vec<ast::Attribute> {
-        self.serialize_index_definitions(&model, IndexType::Unique)
+        self.serialize_index_definitions(model, IndexType::Unique)
     }
 }
 
@@ -108,7 +108,7 @@ impl AttributeValidator<dml::Model> for ModelLevelIndexAttributeValidator {
     }
 
     fn serialize(&self, model: &dml::Model, _datamodel: &dml::Datamodel) -> Vec<ast::Attribute> {
-        self.serialize_index_definitions(&model, IndexType::Normal)
+        self.serialize_index_definitions(model, IndexType::Normal)
     }
 }
 
@@ -167,7 +167,7 @@ trait IndexAttributeBase<T>: AttributeValidator<T> {
             .fields
             .iter()
             .filter_map(|field| {
-                if obj.find_field(&field).is_none() {
+                if obj.find_field(field).is_none() {
                     Some(field.to_string())
                 } else {
                     None
@@ -178,7 +178,7 @@ trait IndexAttributeBase<T>: AttributeValidator<T> {
         let referenced_relation_fields: Vec<String> = index_def
             .fields
             .iter()
-            .filter(|field| obj.find_relation_field(&field).is_some())
+            .filter(|field| obj.find_relation_field(field).is_some())
             .map(|f| f.to_owned())
             .collect();
 
@@ -199,14 +199,14 @@ trait IndexAttributeBase<T>: AttributeValidator<T> {
             let mut had_successful_replacement = false;
 
             for f in &index_def.fields {
-                if let Some(rf) = obj.find_relation_field(&f) {
+                if let Some(rf) = obj.find_relation_field(f) {
                     for underlying_field in &rf.relation_info.fields {
                         suggested_fields.push(underlying_field.to_owned());
                         had_successful_replacement = true;
                     }
                 }
 
-                if let Some(sf) = obj.find_scalar_field(&f) {
+                if let Some(sf) = obj.find_scalar_field(f) {
                     suggested_fields.push(sf.name.clone());
                 }
             }
@@ -252,7 +252,7 @@ trait IndexAttributeBase<T>: AttributeValidator<T> {
                 )];
 
                 if let Some(name) = &index_def.name {
-                    args.push(ast::Argument::new_string("name", &name));
+                    args.push(ast::Argument::new_string("name", name));
                 }
 
                 ast::Attribute::new(self.attribute_name(), args)

@@ -59,8 +59,7 @@ impl<'a> Validator<'a> {
             if let Some(sf) = model.scalar_fields().find(|f| f.is_id && !f.is_required()) {
                 if !model.is_ignored {
                     let span = ast_schema
-                        .models()
-                        .find(|ast_model| ast_model.name.name == model.name)
+                        .find_model(&model.name)
                         .unwrap()
                         .fields
                         .iter()
@@ -310,7 +309,7 @@ impl<'a> Validator<'a> {
         for field in model.scalar_fields() {
             if let Some(DefaultValue::Single(PrismaValue::Enum(enum_value))) = &field.default_value {
                 if let FieldType::Enum(enum_name) = &field.field_type {
-                    if let Some(dml_enum) = data_model.find_enum(&enum_name) {
+                    if let Some(dml_enum) = data_model.find_enum(enum_name) {
                         if !dml_enum.values.iter().any(|value| &value.name == enum_value) {
                             errors.push_error(DatamodelError::new_attribute_validation_error(
                                 &"The defined default value is not a valid value of the enum specified for the field."
@@ -517,7 +516,7 @@ impl<'a> Validator<'a> {
                 if let Err(err) = connector.validate_field(field) {
                     diagnostics.push_error(DatamodelError::new_connector_error(
                         &err.to_string(),
-                        ast_model.find_field(&field.name()).span,
+                        ast_model.find_field(field.name()).span,
                     ));
                 }
 
@@ -588,21 +587,21 @@ impl<'a> Validator<'a> {
             let unknown_fields: Vec<String> = rel_info
                 .fields
                 .iter()
-                .filter(|base_field| model.find_field(&base_field).is_none())
+                .filter(|base_field| model.find_field(base_field).is_none())
                 .cloned()
                 .collect();
 
             let referenced_relation_fields: Vec<String> = rel_info
                 .fields
                 .iter()
-                .filter(|base_field| model.find_relation_field(&base_field).is_some())
+                .filter(|base_field| model.find_relation_field(base_field).is_some())
                 .cloned()
                 .collect();
 
             let at_least_one_underlying_field_is_optional = rel_info
                 .fields
                 .iter()
-                .filter_map(|base_field| model.find_scalar_field(&base_field))
+                .filter_map(|base_field| model.find_scalar_field(base_field))
                 .any(|f| f.is_optional());
 
             if !unknown_fields.is_empty() {
@@ -655,21 +654,21 @@ impl<'a> Validator<'a> {
             let unknown_fields: Vec<String> = rel_info
                 .references
                 .iter()
-                .filter(|referenced_field| related_model.find_field(&referenced_field).is_none())
+                .filter(|referenced_field| related_model.find_field(referenced_field).is_none())
                 .cloned()
                 .collect();
 
             let referenced_relation_fields: Vec<String> = rel_info
                 .references
                 .iter()
-                .filter(|base_field| related_model.find_relation_field(&base_field).is_some())
+                .filter(|base_field| related_model.find_relation_field(base_field).is_some())
                 .cloned()
                 .collect();
 
             let fields_with_wrong_type: Vec<DatamodelError> = rel_info.fields.iter().zip(rel_info.references.iter())
                     .filter_map(|(base_field, referenced_field)| {
-                        let base_field = model.find_field(&base_field)?;
-                        let referenced_field = related_model.find_field(&referenced_field)?;
+                        let base_field = model.find_field(base_field)?;
+                        let referenced_field = related_model.find_field(referenced_field)?;
 
                         if base_field.field_type().is_compatible_with(&referenced_field.field_type()) {
                             return None
@@ -764,7 +763,7 @@ impl<'a> Validator<'a> {
                 let references_singular_id_field = if rel_info.references.len() == 1 {
                     let field_name = rel_info.references.first().unwrap();
                     // the unwrap is safe. We error out earlier if an unknown field is referenced.
-                    let referenced_field = related_model.find_scalar_field(&field_name).unwrap();
+                    let referenced_field = related_model.find_scalar_field(field_name).unwrap();
                     referenced_field.is_id
                 } else {
                     false
@@ -772,7 +771,7 @@ impl<'a> Validator<'a> {
 
                 let is_many_to_many = {
                     // Back relation fields have not been added yet. So we must calculate this on our own.
-                    match datamodel.find_related_field(&field) {
+                    match datamodel.find_related_field(field) {
                         Some((_, related_field)) => field.is_list() && related_field.is_list(),
                         None => false,
                     }
@@ -855,7 +854,7 @@ impl<'a> Validator<'a> {
 
             let rel_info = &field.relation_info;
             let related_model = datamodel.find_model(&rel_info.to).expect(STATE_ERROR);
-            if let Some((_rel_field_idx, related_field)) = datamodel.find_related_field(&field) {
+            if let Some((_rel_field_idx, related_field)) = datamodel.find_related_field(field) {
                 let related_field_rel_info = &related_field.relation_info;
 
                 if related_model.is_ignored && !field.is_ignored && !model.is_ignored {

@@ -196,7 +196,7 @@ fn load_sources(
     diagnostics: &mut Diagnostics,
 ) -> Vec<Datasource> {
     let source_loader = DatasourceLoader::new();
-    source_loader.load_datasources_from_ast(&schema_ast, preview_features, diagnostics)
+    source_loader.load_datasources_from_ast(schema_ast, preview_features, diagnostics)
 }
 
 //
@@ -214,7 +214,7 @@ pub fn render_datamodel_to_string(datamodel: &dml::Datamodel) -> String {
 pub fn render_schema_ast_to_string(schema: &SchemaAst) -> String {
     let mut writable_string = String::with_capacity(schema.tops.len() * 20);
 
-    render_schema_ast_to(&mut writable_string, &schema, 2);
+    render_schema_ast_to(&mut writable_string, schema, 2);
 
     writable_string
 }

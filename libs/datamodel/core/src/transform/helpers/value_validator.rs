@@ -65,7 +65,7 @@ impl ValueValidator {
             ScalarType::String => self.as_str().map(String::from).map(PrismaValue::String),
             ScalarType::Json => self.as_str().map(String::from).map(PrismaValue::String),
             ScalarType::Bytes => self.as_str().and_then(|s| {
-                prisma_value::decode_bytes(&s).map(PrismaValue::Bytes).map_err(|_| {
+                prisma_value::decode_bytes(s).map(PrismaValue::Bytes).map_err(|_| {
                     DatamodelError::new_validation_error(&format!("Invalid base64 string '{}'.", s), self.span())
                 })
             }),
@@ -214,7 +214,7 @@ impl ValueValidator {
                     [] => vec![],
                     _ => return Err(DatamodelError::new_validation_error(&format!("DefaultValue function parsing failed. The function arg should only be empty or a single String. Got: `{:?}`. You can read about the available functions here: https://pris.ly/d/attribute-functions", args), self.span())),
                 };
-                let generator = self.get_value_generator(&name, prisma_args)?;
+                let generator = self.get_value_generator(name, prisma_args)?;
 
                 generator
                     .check_compatibility_with_scalar_type(scalar_type)
@@ -245,7 +245,7 @@ impl ValueValidator {
                     [] => vec![],
                     _ => panic!("Should only be empty or single String."),
                 };
-                self.get_value_generator(&name, prisma_args)
+                self.get_value_generator(name, prisma_args)
             }
             _ => Err(self.construct_type_mismatch_error("function")),
         }

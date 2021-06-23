@@ -52,7 +52,7 @@ impl<'a> AlterTableConstructor<'a> {
                     self.drop_primary_key();
                 }
                 TableChange::AddPrimaryKey { columns } => {
-                    self.add_primary_key(&columns);
+                    self.add_primary_key(columns);
                 }
                 TableChange::AddColumn { column_index } => {
                     self.add_column(*column_index);
@@ -68,7 +68,7 @@ impl<'a> AlterTableConstructor<'a> {
                     changes,
                     type_change: _,
                 }) => {
-                    self.alter_column(*column_index, &changes);
+                    self.alter_column(*column_index, changes);
                 }
             };
         }
@@ -195,7 +195,7 @@ impl<'a> AlterTableConstructor<'a> {
                     self.column_mods.push(format!(
                         "ALTER TABLE {table} ALTER COLUMN {column_name} {column_type} {nullability}",
                         table = self.renderer.quote_with_schema(self.tables.previous().name()),
-                        column_name = self.renderer.quote(&columns.next().name()),
+                        column_name = self.renderer.quote(columns.next().name()),
                         column_type = super::render_column_type(columns.next()),
                         nullability = nullability,
                     ));

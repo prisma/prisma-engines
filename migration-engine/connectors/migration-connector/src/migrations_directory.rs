@@ -256,7 +256,7 @@ impl MigrationDirectory {
     #[tracing::instrument]
     pub fn read_migration_script(&self) -> Result<String, ReadMigrationScriptError> {
         let path = self.path.join("migration.sql"); // todo why is it hardcoded here?
-        Ok(std::fs::read_to_string(&path).map_err(|ioerr| ReadMigrationScriptError::new(ioerr, &path))?)
+        std::fs::read_to_string(&path).map_err(|ioerr| ReadMigrationScriptError::new(ioerr, &path))
     }
 
     /// The filesystem path to the directory.

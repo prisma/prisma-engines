@@ -17,7 +17,7 @@ fn main() {
     let file_name = matches.value_of("INPUT").unwrap();
     let file = fs::read_to_string(&file_name).unwrap_or_else(|_| panic!("Unable to open file {}", file_name));
 
-    let validated = datamodel::parse_datamodel_or_pretty_error(&file, &file_name);
+    let validated = datamodel::parse_datamodel_or_pretty_error(&file, file_name);
 
     match &validated {
         Err(formatted) => {
