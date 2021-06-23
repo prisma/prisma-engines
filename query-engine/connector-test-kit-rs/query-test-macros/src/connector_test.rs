@@ -104,7 +104,7 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
     test.into()
 }
 
-pub fn connector_schema_gen_impl(attr: TokenStream, input: TokenStream) -> TokenStream {
+pub fn connector_test_gen_impl(attr: TokenStream, input: TokenStream) -> TokenStream {
     let attributes_meta: syn::AttributeArgs = parse_macro_input!(attr as AttributeArgs);
     let args = ConnectorTestGenArgs::from_list(&attributes_meta);
     let args = match args {

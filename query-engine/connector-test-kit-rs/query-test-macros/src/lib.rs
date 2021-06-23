@@ -23,8 +23,8 @@ pub fn connector_test(attr: TokenStream, input: TokenStream) -> TokenStream {
 }
 
 #[proc_macro_attribute]
-pub fn connector_schema_gen(attr: TokenStream, input: TokenStream) -> TokenStream {
-    connector_schema_gen_impl(attr, input)
+pub fn connector_test_gen(attr: TokenStream, input: TokenStream) -> TokenStream {
+    connector_test_gen_impl(attr, input)
 }
 
 trait IntoDarlingError<T> {

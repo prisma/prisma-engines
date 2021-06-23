@@ -5,9 +5,9 @@ mod schema_gen {
     use query_engine_tests::{
         run_query, run_query_json, schema_with_relation::DatamodelWithParams, ConnectorCapability, Runner,
     };
-    use query_test_macros::connector_schema_gen;
+    use query_test_macros::connector_test_gen;
 
-    #[connector_schema_gen(gen(ChildOpt, ParentOpt))]
+    #[connector_test_gen(gen(ChildOpt, ParentOpt))]
     async fn schema_gen(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let child_1 = t.child().wher().parse(
             run_query_json!(
