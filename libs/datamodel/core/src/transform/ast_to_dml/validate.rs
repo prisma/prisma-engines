@@ -823,9 +823,11 @@ impl<'a> Validator<'a> {
                 ));
             }
 
-            if !fields_with_wrong_type.is_empty() && !errors.has_errors() {
+            if !errors.has_errors() {
                 // don't output too much errors
-                errors.append_error_vec(fields_with_wrong_type);
+                for err in fields_with_wrong_type {
+                    errors.push_error(err);
+                }
             }
         }
 

@@ -8,8 +8,7 @@ use super::{
 use crate::ast::*;
 use crate::diagnostics::{DatamodelError, Diagnostics};
 
-pub fn parse_model(token: &Token<'_>) -> Result<Model, Diagnostics> {
-    let mut errors = Diagnostics::new();
+pub fn parse_model(token: &Token<'_>, diagnostics: &mut Diagnostics) -> Model {
     let mut name: Option<Identifier> = None;
     let mut attributes: Vec<Attribute> = vec![];
     let mut fields: Vec<Field> = vec![];
@@ -17,7 +16,7 @@ pub fn parse_model(token: &Token<'_>) -> Result<Model, Diagnostics> {
 
     for current in token.relevant_children() {
         match current.as_rule() {
-            Rule::TYPE_KEYWORD => errors.push_error(DatamodelError::new_legacy_parser_error(
+            Rule::TYPE_KEYWORD => diagnostics.push_error(DatamodelError::new_legacy_parser_error(
                 "Model declarations have to be indicated with the `model` keyword.",
                 Span::from_pest(current.as_span()),
             )),
@@ -25,10 +24,10 @@ pub fn parse_model(token: &Token<'_>) -> Result<Model, Diagnostics> {
             Rule::block_level_attribute => attributes.push(parse_attribute(&current)),
             Rule::field_declaration => match parse_field(&name.as_ref().unwrap().name, &current) {
                 Ok(field) => fields.push(field),
-                Err(err) => errors.push_error(err),
+                Err(err) => diagnostics.push_error(err),
             },
             Rule::comment_block => comment = parse_comment_block(&current),
-            Rule::BLOCK_LEVEL_CATCH_ALL => errors.push_error(DatamodelError::new_validation_error(
+            Rule::BLOCK_LEVEL_CATCH_ALL => diagnostics.push_error(DatamodelError::new_validation_error(
                 "This line is not a valid field or attribute definition.",
                 Span::from_pest(current.as_span()),
             )),
@@ -36,17 +35,15 @@ pub fn parse_model(token: &Token<'_>) -> Result<Model, Diagnostics> {
         }
     }
 
-    errors.to_result()?;
-
     match name {
-        Some(name) => Ok(Model {
+        Some(name) => Model {
             name,
             fields,
             attributes,
             documentation: comment,
             span: Span::from_pest(token.as_span()),
             commented_out: false,
-        }),
+        },
         _ => panic!(
             "Encountered impossible model declaration during parsing: {:?}",
             token.as_str()
