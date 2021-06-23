@@ -1,6 +1,6 @@
 use datamodel::ReferentialAction;
 use migration_engine_tests::sync_test_api::*;
-use sql_schema_describer::ForeignKeyAction;
+use sql_schema_describer::{ColumnTypeFamily, ForeignKeyAction};
 
 #[test_connector]
 fn adding_a_many_to_many_relation_must_result_in_a_prisma_style_relation_table(api: TestApi) {
@@ -118,6 +118,53 @@ fn specifying_a_db_name_for_an_inline_relation_must_work(api: TestApi) {
         t.assert_column("b_column", |c| c.assert_type_is_int())
             .assert_foreign_keys_count(1)
             .assert_fk_on_columns(&["b_column"], |fk| fk.assert_references("B", &["id"]))
+    });
+}
+
+#[test_connector]
+fn changing_the_type_of_a_field_referenced_by_a_fk_must_work(api: TestApi) {
+    let dm1 = r#"
+        model A {
+            id Int @id
+            b_id Int
+            b  B   @relation(fields: [b_id], references: [uniq])
+        }
+
+        model B {
+            uniq Int @unique
+            name String
+            a    A[]
+        }
+    "#;
+
+    api.schema_push(dm1).send_sync().assert_green_bang();
+
+    api.assert_schema().assert_table("A", |table| {
+        table
+            .assert_column("b_id", |col| col.assert_type_family(ColumnTypeFamily::Int))
+            .assert_fk_on_columns(&["b_id"], |fk| fk.assert_references("B", &["uniq"]))
+    });
+
+    let dm2 = r#"
+        model A {
+            id Int @id
+            b_id String
+            b  B   @relation(fields: [b_id], references: [uniq])
+        }
+
+        model B {
+            uniq String @unique @default(cuid())
+            name String
+            a    A[]
+        }
+    "#;
+
+    api.schema_push(dm2).send_sync().assert_green_bang();
+
+    api.assert_schema().assert_table("A", |table| {
+        table
+            .assert_column("b_id", |col| col.assert_type_family(ColumnTypeFamily::String))
+            .assert_fk_on_columns(&["b_id"], |fk| fk.assert_references("B", &["uniq"]))
     });
 }
 
@@ -910,4 +957,46 @@ fn on_update_required_default_action(api: TestApi) {
                 .assert_referential_action_on_update(ForeignKeyAction::Cascade)
         })
     });
+}
+
+// TODO: Enable SQL Server when cascading rules are in PSL.
+#[test_connector(exclude(Mssql))]
+fn adding_mutual_references_on_existing_tables_works(api: TestApi) {
+    let dm1 = r#"
+        model A {
+            id Int @id
+        }
+
+        model B {
+            id Int @id
+        }
+    "#;
+
+    api.schema_push(dm1).send_sync().assert_green_bang();
+
+    let dm2 = r#"
+        model A {
+            id Int
+            name String @unique
+            b_email String
+            brel B @relation("AtoB", fields: [b_email], references: [email])
+            b    B[] @relation("BtoA")
+        }
+
+        model B {
+            id Int
+            email String @unique
+            a_name String
+            arel A @relation("BtoA", fields: [a_name], references: [name])
+            a    A[] @relation("AtoB")
+        }
+    "#;
+
+    let res = api.schema_push(dm2).force(true).send_sync();
+
+    if api.is_sqlite() {
+        res.assert_green_bang();
+    } else {
+        res.assert_warnings(&["A unique constraint covering the columns `[name]` on the table `A` will be added. If there are existing duplicate values, this will fail.".into(), "A unique constraint covering the columns `[email]` on the table `B` will be added. If there are existing duplicate values, this will fail.".into()]);
+    };
 }

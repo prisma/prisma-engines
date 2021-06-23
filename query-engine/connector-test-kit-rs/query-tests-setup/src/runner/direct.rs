@@ -24,7 +24,7 @@ impl RunnerInterface for DirectRunner {
         let data_source = config.datasources.first().expect("No valid data source found");
         let preview_features: Vec<_> = config.preview_features().cloned().collect();
         let url = data_source.load_url(|key| env::var(key).ok()).unwrap();
-        let (db_name, executor) = exec_loader::load(&data_source, &preview_features, &url).await?;
+        let (db_name, executor) = exec_loader::load(data_source, &preview_features, &url).await?;
         let internal_data_model = internal_datamodel.build(db_name);
 
         let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(
