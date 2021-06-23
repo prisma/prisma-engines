@@ -65,6 +65,10 @@ impl<'a> LiftAstToDml<'a> {
         model.documentation = ast_model.documentation.clone().map(|comment| comment.text);
 
         let active_connector = self.db.active_connector();
+
+        // We iterate over scalar fields, then relation fields, but we want the
+        // order of fields in the dml::Model to match the order of the fields in
+        // the AST, so we need this bit of extra bookkeeping.
         let mut field_ids_for_sorting: HashMap<&str, ast::FieldId> = HashMap::with_capacity(ast_model.fields.len());
 
         for (field_id, scalar_field_type) in self.db.iter_model_scalar_fields(model_id) {
