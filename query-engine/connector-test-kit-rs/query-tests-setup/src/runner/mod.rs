@@ -1,10 +1,10 @@
 mod binary;
 mod direct;
-mod napi;
+mod node_api;
 
 pub use binary::*;
 pub use direct::*;
-pub use napi::*;
+pub use node_api::*;
 
 use crate::{ConnectorTag, QueryResult, TestError, TestResult};
 use colored::*;
@@ -22,7 +22,7 @@ pub enum Runner {
     Direct(DirectRunner),
 
     /// Using a NodeJS runner.
-    NApi(NApiRunner),
+    NodeApi(NodeApiRunner),
 
     /// Using the HTTP bridge
     Binary(BinaryRunner),
@@ -32,7 +32,7 @@ impl Runner {
     pub async fn load(ident: &str, datamodel: String, connector_tag: ConnectorTag) -> TestResult<Self> {
         match ident {
             "direct" => Self::direct(datamodel, connector_tag).await,
-            "napi" => Ok(Self::NApi(NApiRunner {})),
+            "node-api" => Ok(Self::NodeApi(NodeApiRunner {})),
             "binary" => Ok(Self::Binary(BinaryRunner {})),
             unknown => Err(TestError::parse_error(format!("Unknown test runner '{}'", unknown))),
         }
@@ -47,7 +47,7 @@ impl Runner {
 
         let response = match self {
             Runner::Direct(r) => r.query(gql_query).await,
-            Runner::NApi(_) => todo!(),
+            Runner::NodeApi(_) => todo!(),
             Runner::Binary(_) => todo!(),
         }?;
 
@@ -67,7 +67,7 @@ impl Runner {
     {
         match self {
             Runner::Direct(r) => r.batch(gql_queries.map(Into::into).collect(), transaction).await,
-            Runner::NApi(_) => todo!(),
+            Runner::NodeApi(_) => todo!(),
             Runner::Binary(_) => todo!(),
         }
     }
@@ -81,7 +81,7 @@ impl Runner {
     pub fn connector(&self) -> &ConnectorTag {
         match self {
             Runner::Direct(r) => r.connector(),
-            Runner::NApi(_) => todo!(),
+            Runner::NodeApi(_) => todo!(),
             Runner::Binary(_) => todo!(),
         }
     }
