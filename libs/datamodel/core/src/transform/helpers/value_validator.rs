@@ -156,6 +156,18 @@ impl ValueValidator {
         }
     }
 
+    /// Unwraps the value as an array of constants.
+    pub fn as_constant_array(&self) -> Result<Vec<String>, DatamodelError> {
+        if let ast::Expression::Array(values, _) = &self.value {
+            values
+                .iter()
+                .map(|val| ValueValidator::new(val).as_constant_literal())
+                .collect()
+        } else {
+            Err(self.construct_type_mismatch_error("Array of constants"))
+        }
+    }
+
     /// Unwraps the wrapped value as a constant literal.
     pub fn as_constant_literal(&self) -> Result<String, DatamodelError> {
         match &self.value {

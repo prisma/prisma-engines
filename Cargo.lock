@@ -924,7 +924,6 @@ version = "0.1.0"
 dependencies = [
  "bigdecimal",
  "chrono",
- "clap",
  "colored",
  "datamodel-connector",
  "dml",

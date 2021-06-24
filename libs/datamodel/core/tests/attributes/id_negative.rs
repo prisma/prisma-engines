@@ -95,7 +95,30 @@ fn id_must_error_when_multi_field_is_referring_to_undefined_fields() {
     errors.assert_is(DatamodelError::new_model_validation_error(
         "The multi field id declaration refers to the unknown fields c.",
         "Model",
-        Span::new(58, 67),
+        Span::new(61, 66),
+    ));
+}
+
+#[test]
+fn relation_fields_as_part_of_compound_id_must_error() {
+    let dml = r#"
+    model User {
+        name           String
+        identification Identification @relation(references:[id])
+
+        @@id([name, identification])
+    }
+
+    model Identification {
+        id Int @id
+    }
+    "#;
+
+    let errors = parse_error(dml);
+    errors.assert_is(DatamodelError::new_model_validation_error(
+        "The id definition refers to the relation fields identification. Id definitions must reference only scalar fields.",
+        "User",
+        Span::new(136, 162),
     ));
 }
 
