@@ -33,7 +33,7 @@ pub fn test_connector(attr: TokenStream, input: TokenStream) -> TokenStream {
         }
     }
 
-    // Then the function body
+    // Then the function item
     // We take advantage of the function body being the last token tree (surrounded by braces).
     let (sig, body): (Signature, proc_macro2::TokenStream) = {
         let sig_tokens = input
