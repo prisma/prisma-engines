@@ -5,7 +5,7 @@ use prisma_value::PrismaValue;
 #[async_trait]
 impl<'conn, 'tx> ReadOperations for ConnectionLike<'conn, 'tx> {
     async fn get_single_record(
-        &self,
+        &mut self,
         model: &ModelRef,
         filter: &Filter,
         selected_fields: &ModelProjection,
@@ -24,7 +24,7 @@ impl<'conn, 'tx> ReadOperations for ConnectionLike<'conn, 'tx> {
     }
 
     async fn get_many_records(
-        &self,
+        &mut self,
         model: &ModelRef,
         query_arguments: QueryArguments,
         selected_fields: &ModelProjection,
@@ -43,7 +43,7 @@ impl<'conn, 'tx> ReadOperations for ConnectionLike<'conn, 'tx> {
     }
 
     async fn get_related_m2m_record_ids(
-        &self,
+        &mut self,
         from_field: &RelationFieldRef,
         from_record_ids: &[RecordProjection],
     ) -> crate::Result<Vec<(RecordProjection, RecordProjection)>> {
@@ -54,7 +54,7 @@ impl<'conn, 'tx> ReadOperations for ConnectionLike<'conn, 'tx> {
     }
 
     async fn aggregate_records(
-        &self,
+        &mut self,
         model: &ModelRef,
         query_arguments: QueryArguments,
         selections: Vec<AggregationSelection>,
@@ -76,7 +76,7 @@ impl<'conn, 'tx> ReadOperations for ConnectionLike<'conn, 'tx> {
 
 #[async_trait]
 impl<'conn, 'tx> WriteOperations for ConnectionLike<'conn, 'tx> {
-    async fn create_record(&self, model: &ModelRef, args: WriteArgs) -> crate::Result<RecordProjection> {
+    async fn create_record(&mut self, model: &ModelRef, args: WriteArgs) -> crate::Result<RecordProjection> {
         match self {
             Self::Connection(c) => c.create_record(model, args).await,
             Self::Transaction(tx) => tx.create_record(model, args).await,
@@ -84,7 +84,7 @@ impl<'conn, 'tx> WriteOperations for ConnectionLike<'conn, 'tx> {
     }
 
     async fn create_records(
-        &self,
+        &mut self,
         model: &ModelRef,
         args: Vec<WriteArgs>,
         skip_duplicates: bool,
@@ -96,7 +96,7 @@ impl<'conn, 'tx> WriteOperations for ConnectionLike<'conn, 'tx> {
     }
 
     async fn update_records(
-        &self,
+        &mut self,
         model: &ModelRef,
         record_filter: RecordFilter,
         args: WriteArgs,
@@ -107,7 +107,7 @@ impl<'conn, 'tx> WriteOperations for ConnectionLike<'conn, 'tx> {
         }
     }
 
-    async fn delete_records(&self, model: &ModelRef, record_filter: RecordFilter) -> crate::Result<usize> {
+    async fn delete_records(&mut self, model: &ModelRef, record_filter: RecordFilter) -> crate::Result<usize> {
         match self {
             Self::Connection(c) => c.delete_records(model, record_filter).await,
             Self::Transaction(tx) => tx.delete_records(model, record_filter).await,
@@ -115,7 +115,7 @@ impl<'conn, 'tx> WriteOperations for ConnectionLike<'conn, 'tx> {
     }
 
     async fn m2m_connect(
-        &self,
+        &mut self,
         field: &RelationFieldRef,
         parent_id: &RecordProjection,
         child_ids: &[RecordProjection],
@@ -127,7 +127,7 @@ impl<'conn, 'tx> WriteOperations for ConnectionLike<'conn, 'tx> {
     }
 
     async fn m2m_disconnect(
-        &self,
+        &mut self,
         field: &RelationFieldRef,
         parent_id: &RecordProjection,
         child_ids: &[RecordProjection],
@@ -138,14 +138,14 @@ impl<'conn, 'tx> WriteOperations for ConnectionLike<'conn, 'tx> {
         }
     }
 
-    async fn query_raw(&self, query: String, parameters: Vec<PrismaValue>) -> crate::Result<serde_json::Value> {
+    async fn query_raw(&mut self, query: String, parameters: Vec<PrismaValue>) -> crate::Result<serde_json::Value> {
         match self {
             Self::Connection(c) => c.query_raw(query, parameters).await,
             Self::Transaction(tx) => tx.query_raw(query, parameters).await,
         }
     }
 
-    async fn execute_raw(&self, query: String, parameters: Vec<PrismaValue>) -> crate::Result<usize> {
+    async fn execute_raw(&mut self, query: String, parameters: Vec<PrismaValue>) -> crate::Result<usize> {
         match self {
             Self::Connection(c) => c.execute_raw(query, parameters).await,
             Self::Transaction(tx) => tx.execute_raw(query, parameters).await,

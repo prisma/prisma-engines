@@ -5,15 +5,16 @@ use mongodb::{
     bson::{doc, Document},
     error::ErrorKind,
     options::{FindOptions, InsertManyOptions},
-    Database,
+    ClientSession, Database,
 };
 use prisma_models::{ModelRef, PrismaValue, RecordProjection};
 use std::convert::TryInto;
 
 /// Create a single record to the database resulting in a
 /// `RecordProjection` as an identifier pointing to the just-created document.
-pub async fn create_record(
+pub async fn create_record<'conn>(
     database: &Database,
+    session: &mut ClientSession,
     model: &ModelRef,
     mut args: WriteArgs,
 ) -> crate::Result<RecordProjection> {
@@ -49,14 +50,15 @@ pub async fn create_record(
         doc.insert(field.db_name().to_owned(), bson);
     }
 
-    let insert_result = coll.insert_one(doc, None).await?;
+    let insert_result = coll.insert_one_with_session(doc, None, session).await?;
     let id_value = value_from_bson(insert_result.inserted_id, &id_meta)?;
 
     Ok(RecordProjection::from((id_field, id_value)))
 }
 
-pub async fn create_records(
+pub async fn create_records<'conn>(
     database: &Database,
+    session: &mut ClientSession,
     model: &ModelRef,
     args: Vec<WriteArgs>,
     skip_duplicates: bool,
@@ -89,7 +91,7 @@ pub async fn create_records(
     // the operation and throw an error afterwards that we must handle.
     let options = Some(InsertManyOptions::builder().ordered(!skip_duplicates).build());
 
-    match coll.insert_many(docs, options).await {
+    match coll.insert_many_with_session(docs, options, session).await {
         Ok(insert_result) => Ok(insert_result.inserted_ids.len()),
         Err(err) if skip_duplicates => match err.kind.as_ref() {
             ErrorKind::BulkWrite(ref failure) => match failure.write_errors {
@@ -104,8 +106,9 @@ pub async fn create_records(
     }
 }
 
-pub async fn update_records(
+pub async fn update_records<'conn>(
     database: &Database,
+    session: &mut ClientSession,
     model: &ModelRef,
     record_filter: RecordFilter,
     args: WriteArgs,
@@ -132,9 +135,11 @@ pub async fn update_records(
             .projection(doc! { id_field.db_name(): 1 })
             .build();
 
-        let cursor = coll.find(Some(filter), Some(find_options)).await?;
-        let docs = vacuum_cursor(cursor).await?;
+        let cursor = coll
+            .find_with_session(Some(filter), Some(find_options), session)
+            .await?;
 
+        let docs = vacuum_cursor(cursor, session).await?;
         docs.into_iter()
             .map(|mut doc| doc.remove(id_field.db_name()).unwrap())
             .collect()
@@ -167,7 +172,7 @@ pub async fn update_records(
     }
 
     if !update_doc.is_empty() {
-        coll.update_many(filter, update_doc, None).await?;
+        coll.update_many_with_session(filter, update_doc, None, session).await?;
     }
 
     let ids = ids
@@ -184,8 +189,9 @@ pub async fn update_records(
 }
 
 // todo joins
-pub async fn delete_records(
+pub async fn delete_records<'conn>(
     database: &Database,
+    session: &mut ClientSession,
     model: &ModelRef,
     record_filter: RecordFilter,
 ) -> crate::Result<usize> {
@@ -204,14 +210,16 @@ pub async fn delete_records(
         filter
     };
 
-    let delete_result = coll.delete_many(filter, None).await?;
+    let delete_result = coll.delete_many_with_session(filter, None, session).await?;
+
     Ok(delete_result.deleted_count as usize)
 }
 
 /// Connect relations defined in `child_ids` to a parent defined in `parent_id`.
 /// The relation information is in the `RelationFieldRef`.
-pub async fn m2m_connect(
+pub async fn m2m_connect<'conn>(
     database: &Database,
+    session: &mut ClientSession,
     field: &RelationFieldRef,
     parent_id: &RecordProjection,
     child_ids: &[RecordProjection],
@@ -239,19 +247,25 @@ pub async fn m2m_connect(
     let parent_update = doc! { "$addToSet": { parent_ids_scalar_field_name: { "$each": child_ids.clone() } } };
 
     // First update the parent and add all child IDs to the m:n scalar field.
-    parent_coll.update_one(parent_filter, parent_update, None).await?;
+    parent_coll
+        .update_one_with_session(parent_filter, parent_update, None, session)
+        .await?;
 
     // Then update all children and add the parent
     let child_filter = doc! { "_id": { "$in": child_ids } };
     let child_ids_scalar_field_name = field.related_field().relation_info.fields.get(0).unwrap().clone();
     let child_update = doc! { "$addToSet": { child_ids_scalar_field_name: parent_id } };
 
-    child_coll.update_many(child_filter, child_update, None).await?;
+    child_coll
+        .update_many_with_session(child_filter, child_update, None, session)
+        .await?;
+
     Ok(())
 }
 
-pub async fn m2m_disconnect(
+pub async fn m2m_disconnect<'conn>(
     database: &Database,
+    session: &mut ClientSession,
     field: &RelationFieldRef,
     parent_id: &RecordProjection,
     child_ids: &[RecordProjection],
@@ -279,14 +293,18 @@ pub async fn m2m_disconnect(
     let parent_update = doc! { "$pullAll": { parent_ids_scalar_field_name: child_ids.clone() } };
 
     // First update the parent and remove all child IDs to the m:n scalar field.
-    parent_coll.update_one(parent_filter, parent_update, None).await?;
+    parent_coll
+        .update_one_with_session(parent_filter, parent_update, None, session)
+        .await?;
 
     // Then update all children and add the parent
     let child_filter = doc! { "_id": { "$in": child_ids } };
     let child_ids_scalar_field_name = field.related_field().relation_info.fields.get(0).unwrap().clone();
 
     let child_update = doc! { "$pull": { child_ids_scalar_field_name: parent_id } };
-    child_coll.update_many(child_filter, child_update, None).await?;
+    child_coll
+        .update_many_with_session(child_filter, child_update, None, session)
+        .await?;
 
     Ok(())
 }

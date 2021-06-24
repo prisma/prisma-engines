@@ -10,7 +10,7 @@ use std::collections::HashMap;
 
 #[tracing::instrument(skip(tx, query, parent_result, processor))]
 pub async fn m2m<'a, 'b>(
-    tx: &'a ConnectionLike<'a, 'b>,
+    tx: &'a mut ConnectionLike<'a, 'b>,
     query: &RelatedRecordsQuery,
     parent_result: Option<&'a ManyRecords>,
     processor: InMemoryRecordProcessor,
@@ -140,7 +140,7 @@ pub async fn m2m<'a, 'b>(
     processor
 ))]
 pub async fn one2m<'a, 'b>(
-    tx: &'a ConnectionLike<'a, 'b>,
+    tx: &'a mut ConnectionLike<'a, 'b>,
     parent_field: &RelationFieldRef,
     parent_projections: Option<Vec<RecordProjection>>,
     parent_result: Option<&'a ManyRecords>,

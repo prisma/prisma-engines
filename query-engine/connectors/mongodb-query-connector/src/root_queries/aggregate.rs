@@ -1,10 +1,11 @@
 use crate::{output_meta, query_builder::MongoReadQueryBuilder, value::value_from_bson};
 use connector_interface::*;
-use mongodb::{bson::Document, Database};
+use mongodb::{bson::Document, ClientSession, Database};
 use prisma_models::prelude::*;
 
-pub async fn aggregate(
+pub async fn aggregate<'conn>(
     database: &Database,
+    session: &mut ClientSession,
     model: &ModelRef,
     query_arguments: QueryArguments,
     selections: Vec<AggregationSelection>,
@@ -17,7 +18,7 @@ pub async fn aggregate(
         .with_having(having)?
         .build()?;
 
-    let docs = query.execute(coll).await?;
+    let docs = query.execute(coll, session).await?;
     if docs.is_empty() {
         Ok(empty_aggregation(selections))
     } else {

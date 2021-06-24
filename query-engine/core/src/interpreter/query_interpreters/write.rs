@@ -7,7 +7,7 @@ use connector::{ConnectionLike, WriteOperations};
 use prisma_value::PrismaValue;
 
 pub async fn execute<'a, 'b>(
-    tx: &'a ConnectionLike<'a, 'b>,
+    tx: &'a mut ConnectionLike<'a, 'b>,
     write_query: WriteQuery,
 ) -> InterpretationResult<QueryResult> {
     match write_query {
@@ -25,7 +25,7 @@ pub async fn execute<'a, 'b>(
 }
 
 async fn query_raw<'a, 'b>(
-    tx: &'a ConnectionLike<'a, 'b>,
+    tx: &'a mut ConnectionLike<'a, 'b>,
     query: String,
     parameters: Vec<PrismaValue>,
 ) -> InterpretationResult<QueryResult> {
@@ -34,7 +34,7 @@ async fn query_raw<'a, 'b>(
 }
 
 async fn execute_raw<'a, 'b>(
-    tx: &'a ConnectionLike<'a, 'b>,
+    tx: &'a mut ConnectionLike<'a, 'b>,
     query: String,
     parameters: Vec<PrismaValue>,
 ) -> InterpretationResult<QueryResult> {
@@ -44,14 +44,14 @@ async fn execute_raw<'a, 'b>(
     Ok(QueryResult::Json(num))
 }
 
-async fn create_one<'a, 'b>(tx: &'a ConnectionLike<'a, 'b>, q: CreateRecord) -> InterpretationResult<QueryResult> {
+async fn create_one<'a, 'b>(tx: &'a mut ConnectionLike<'a, 'b>, q: CreateRecord) -> InterpretationResult<QueryResult> {
     let res = tx.create_record(&q.model, q.args).await?;
 
     Ok(QueryResult::Id(Some(res)))
 }
 
 async fn create_many<'a, 'b>(
-    tx: &'a ConnectionLike<'a, 'b>,
+    tx: &'a mut ConnectionLike<'a, 'b>,
     q: CreateManyRecords,
 ) -> InterpretationResult<QueryResult> {
     let affected_records = tx.create_records(&q.model, q.args, q.skip_duplicates).await?;
@@ -59,13 +59,13 @@ async fn create_many<'a, 'b>(
     Ok(QueryResult::Count(affected_records))
 }
 
-async fn update_one<'a, 'b>(tx: &'a ConnectionLike<'a, 'b>, q: UpdateRecord) -> InterpretationResult<QueryResult> {
+async fn update_one<'a, 'b>(tx: &'a mut ConnectionLike<'a, 'b>, q: UpdateRecord) -> InterpretationResult<QueryResult> {
     let mut res = tx.update_records(&q.model, q.record_filter, q.args).await?;
 
     Ok(QueryResult::Id(res.pop()))
 }
 
-async fn delete_one<'a, 'b>(tx: &'a ConnectionLike<'a, 'b>, q: DeleteRecord) -> InterpretationResult<QueryResult> {
+async fn delete_one<'a, 'b>(tx: &'a mut ConnectionLike<'a, 'b>, q: DeleteRecord) -> InterpretationResult<QueryResult> {
     // We need to ensure that we have a record finder, else we delete everything (conversion to empty filter).
     let filter = match q.record_filter {
         Some(f) => Ok(f),
@@ -81,7 +81,7 @@ async fn delete_one<'a, 'b>(tx: &'a ConnectionLike<'a, 'b>, q: DeleteRecord) -> 
 }
 
 async fn update_many<'a, 'b>(
-    tx: &'a ConnectionLike<'a, 'b>,
+    tx: &'a mut ConnectionLike<'a, 'b>,
     q: UpdateManyRecords,
 ) -> InterpretationResult<QueryResult> {
     let res = tx.update_records(&q.model, q.record_filter, q.args).await?;
@@ -90,7 +90,7 @@ async fn update_many<'a, 'b>(
 }
 
 async fn delete_many<'a, 'b>(
-    tx: &'a ConnectionLike<'a, 'b>,
+    tx: &'a mut ConnectionLike<'a, 'b>,
     q: DeleteManyRecords,
 ) -> InterpretationResult<QueryResult> {
     let res = tx.delete_records(&q.model, q.record_filter).await?;
@@ -98,7 +98,7 @@ async fn delete_many<'a, 'b>(
     Ok(QueryResult::Count(res))
 }
 
-async fn connect<'a, 'b>(tx: &'a ConnectionLike<'a, 'b>, q: ConnectRecords) -> InterpretationResult<QueryResult> {
+async fn connect<'a, 'b>(tx: &'a mut ConnectionLike<'a, 'b>, q: ConnectRecords) -> InterpretationResult<QueryResult> {
     tx.m2m_connect(
         &q.relation_field,
         &q.parent_id.expect("Expected parent record ID to be set for connect"),
@@ -109,7 +109,10 @@ async fn connect<'a, 'b>(tx: &'a ConnectionLike<'a, 'b>, q: ConnectRecords) -> I
     Ok(QueryResult::Unit)
 }
 
-async fn disconnect<'a, 'b>(tx: &'a ConnectionLike<'a, 'b>, q: DisconnectRecords) -> InterpretationResult<QueryResult> {
+async fn disconnect<'a, 'b>(
+    tx: &'a mut ConnectionLike<'a, 'b>,
+    q: DisconnectRecords,
+) -> InterpretationResult<QueryResult> {
     tx.m2m_disconnect(
         &q.relation_field,
         &q.parent_id.expect("Expected parent record ID to be set for disconnect"),

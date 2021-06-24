@@ -7,7 +7,7 @@ use prisma_models::ManyRecords;
 use std::collections::HashMap;
 
 pub fn execute<'a, 'b>(
-    tx: &'a ConnectionLike<'a, 'b>,
+    tx: &'a mut ConnectionLike<'a, 'b>,
     query: ReadQuery,
     parent_result: Option<&'a ManyRecords>,
 ) -> BoxFuture<'a, InterpretationResult<QueryResult>> {
@@ -25,7 +25,7 @@ pub fn execute<'a, 'b>(
 
 /// Queries a single record.
 fn read_one<'conn, 'tx>(
-    tx: &'conn ConnectionLike<'conn, 'tx>,
+    tx: &'conn mut ConnectionLike<'conn, 'tx>,
     query: RecordQuery,
 ) -> BoxFuture<'conn, InterpretationResult<QueryResult>> {
     let fut = async move {
@@ -77,7 +77,7 @@ fn read_one<'conn, 'tx>(
 ///    are distinct by definition if a unique is in the selection set.
 /// -> Unstable cursors can't reliably be fetched by the underlying datasource, so we need to process part of it in-memory.
 fn read_many<'a, 'b>(
-    tx: &'a ConnectionLike<'a, 'b>,
+    tx: &'a mut ConnectionLike<'a, 'b>,
     mut query: ManyRecordsQuery,
 ) -> BoxFuture<'a, InterpretationResult<QueryResult>> {
     let fut = async move {
@@ -130,7 +130,7 @@ fn read_many<'a, 'b>(
 
 /// Queries related records for a set of parent IDs.
 fn read_related<'a, 'b>(
-    tx: &'a ConnectionLike<'a, 'b>,
+    tx: &'a mut ConnectionLike<'a, 'b>,
     mut query: RelatedRecordsQuery,
     parent_result: Option<&'a ManyRecords>,
 ) -> BoxFuture<'a, InterpretationResult<QueryResult>> {
@@ -175,7 +175,7 @@ fn read_related<'a, 'b>(
 }
 
 async fn aggregate<'a, 'b>(
-    tx: &'a ConnectionLike<'a, 'b>,
+    tx: &'a mut ConnectionLike<'a, 'b>,
     query: AggregateRecordsQuery,
 ) -> InterpretationResult<QueryResult> {
     let selection_order = query.selection_order;
@@ -191,7 +191,7 @@ async fn aggregate<'a, 'b>(
 }
 
 fn process_nested<'a, 'b>(
-    tx: &'a ConnectionLike<'a, 'b>,
+    tx: &'a mut ConnectionLike<'a, 'b>,
     nested: Vec<ReadQuery>,
     parent_result: Option<&'a ManyRecords>,
 ) -> BoxFuture<'a, InterpretationResult<Vec<QueryResult>>> {

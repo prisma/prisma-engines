@@ -17,21 +17,21 @@ pub trait Connector {
 
 #[async_trait]
 pub trait Connection: ReadOperations + WriteOperations + Send + Sync {
-    async fn start_transaction<'a>(&'a self) -> crate::Result<Box<dyn Transaction + 'a>>;
+    async fn start_transaction<'a>(&'a mut self) -> crate::Result<Box<dyn Transaction + 'a>>;
 }
 
 #[async_trait]
 pub trait Transaction: ReadOperations + WriteOperations + Send + Sync {
-    async fn commit(&self) -> crate::Result<()>;
-    async fn rollback(&self) -> crate::Result<()>;
+    async fn commit(&mut self) -> crate::Result<()>;
+    async fn rollback(&mut self) -> crate::Result<()>;
 }
 
 pub enum ConnectionLike<'conn, 'tx>
 where
     'tx: 'conn,
 {
-    Connection(&'conn (dyn Connection + 'conn)),
-    Transaction(&'conn (dyn Transaction + 'tx)),
+    Connection(&'conn mut (dyn Connection + 'conn)),
+    Transaction(&'conn mut (dyn Transaction + 'tx)),
 }
 
 /// A wrapper struct allowing to either filter for records or for the core to
@@ -216,7 +216,7 @@ pub trait ReadOperations {
     ///   defined to filter at most one item by the core.
     /// - The `SelectedFields` defines the values to be returned.
     async fn get_single_record(
-        &self,
+        &mut self,
         model: &ModelRef,
         filter: &Filter,
         selected_fields: &ModelProjection,
@@ -230,7 +230,7 @@ pub trait ReadOperations {
     /// - The `SelectedFields` defines the fields (e.g. columns or document fields)
     ///   to be returned as a projection of fields of the model it queries.
     async fn get_many_records(
-        &self,
+        &mut self,
         model: &ModelRef,
         query_arguments: QueryArguments,
         selected_fields: &ModelProjection,
@@ -245,7 +245,7 @@ pub trait ReadOperations {
     /// database. The IDs returned will be used to perform a in-memory join
     /// between two datasets.
     async fn get_related_m2m_record_ids(
-        &self,
+        &mut self,
         from_field: &RelationFieldRef,
         from_record_ids: &[RecordProjection],
     ) -> crate::Result<Vec<(RecordProjection, RecordProjection)>>;
@@ -256,7 +256,7 @@ pub trait ReadOperations {
     /// discretion of the implementing connector.
     /// `having` can only be a scalar filter. Relation elements can be safely ignored.
     async fn aggregate_records(
-        &self,
+        &mut self,
         model: &ModelRef,
         query_arguments: QueryArguments,
         selections: Vec<AggregationSelection>,
@@ -268,11 +268,11 @@ pub trait ReadOperations {
 #[async_trait]
 pub trait WriteOperations {
     /// Insert a single record to the database.
-    async fn create_record(&self, model: &ModelRef, args: WriteArgs) -> crate::Result<RecordProjection>;
+    async fn create_record(&mut self, model: &ModelRef, args: WriteArgs) -> crate::Result<RecordProjection>;
 
     /// Inserts many records at once into the database.
     async fn create_records(
-        &self,
+        &mut self,
         model: &ModelRef,
         args: Vec<WriteArgs>,
         skip_duplicates: bool,
@@ -281,20 +281,20 @@ pub trait WriteOperations {
     /// Update records in the `Model` with the given `WriteArgs` filtered by the
     /// `Filter`.
     async fn update_records(
-        &self,
+        &mut self,
         model: &ModelRef,
         record_filter: RecordFilter,
         args: WriteArgs,
     ) -> crate::Result<Vec<RecordProjection>>;
 
     /// Delete records in the `Model` with the given `Filter`.
-    async fn delete_records(&self, model: &ModelRef, record_filter: RecordFilter) -> crate::Result<usize>;
+    async fn delete_records(&mut self, model: &ModelRef, record_filter: RecordFilter) -> crate::Result<usize>;
 
     // We plan to remove the methods below in the future. We want emulate them with the ones above. Those should suffice.
 
     /// Connect the children to the parent (m2m relation only).
     async fn m2m_connect(
-        &self,
+        &mut self,
         field: &RelationFieldRef,
         parent_id: &RecordProjection,
         child_ids: &[RecordProjection],
@@ -302,7 +302,7 @@ pub trait WriteOperations {
 
     /// Disconnect the children from the parent (m2m relation only).
     async fn m2m_disconnect(
-        &self,
+        &mut self,
         field: &RelationFieldRef,
         parent_id: &RecordProjection,
         child_ids: &[RecordProjection],
@@ -312,11 +312,11 @@ pub trait WriteOperations {
     /// parameterized values for databases that support prepared statements.
     ///
     /// Returns the number of rows affected.
-    async fn execute_raw(&self, query: String, parameters: Vec<PrismaValue>) -> crate::Result<usize>;
+    async fn execute_raw(&mut self, query: String, parameters: Vec<PrismaValue>) -> crate::Result<usize>;
 
     /// Execute the raw query in the database as-is. The `parameters` are
     /// parameterized values for databases that support prepared statements.
     ///
     /// Returns resulting rows as JSON.
-    async fn query_raw(&self, query: String, parameters: Vec<PrismaValue>) -> crate::Result<serde_json::Value>;
+    async fn query_raw(&mut self, query: String, parameters: Vec<PrismaValue>) -> crate::Result<serde_json::Value>;
 }

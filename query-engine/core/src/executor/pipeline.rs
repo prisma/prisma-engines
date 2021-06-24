@@ -16,7 +16,7 @@ impl<'conn, 'tx> QueryPipeline<'conn, 'tx> {
         }
     }
 
-    pub async fn execute(self) -> crate::Result<ResponseData> {
+    pub async fn execute(mut self) -> crate::Result<ResponseData> {
         let serializer = self.serializer;
         let expr = Expressionista::translate(self.graph)?;
         let result = self.interpreter.interpret(expr, Env::default(), 0).await;

@@ -34,11 +34,11 @@ pub trait FromSource {
 }
 
 async fn catch<O>(
-    connection_info: &quaint::prelude::ConnectionInfo,
+    connection_info: quaint::prelude::ConnectionInfo,
     fut: impl std::future::Future<Output = Result<O, crate::SqlError>>,
 ) -> Result<O, ConnectorError> {
     match fut.await {
         Ok(o) => Ok(o),
-        Err(err) => Err(err.into_connector_error(connection_info)),
+        Err(err) => Err(err.into_connector_error(&connection_info)),
     }
 }

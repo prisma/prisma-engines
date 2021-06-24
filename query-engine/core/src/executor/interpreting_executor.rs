@@ -1,3 +1,5 @@
+use std::borrow::BorrowMut;
+
 use super::{pipeline::QueryPipeline, QueryExecutor};
 use crate::{Operation, QueryGraphBuilder, QueryInterpreter, QuerySchemaRef, ResponseData};
 use async_trait::async_trait;
@@ -29,7 +31,7 @@ where
     #[tracing::instrument(skip(operation, conn, force_transactions, query_schema))]
     async fn execute_single_operation(
         operation: Operation,
-        conn: Box<dyn Connection>,
+        conn: Box<&mut dyn Connection>,
         force_transactions: bool,
         query_schema: QuerySchemaRef,
     ) -> crate::Result<ResponseData> {
@@ -38,8 +40,8 @@ where
         let is_transactional = force_transactions || query_graph.needs_transaction();
 
         if is_transactional {
-            let tx = conn.start_transaction().await?;
-            let interpreter = QueryInterpreter::new(ConnectionLike::Transaction(tx.as_ref()));
+            let mut tx = conn.start_transaction().await?;
+            let interpreter = QueryInterpreter::new(ConnectionLike::Transaction(tx.borrow_mut()));
             let result = QueryPipeline::new(query_graph, interpreter, serializer).execute().await;
 
             if result.is_ok() {
@@ -50,7 +52,7 @@ where
 
             result
         } else {
-            let interpreter = QueryInterpreter::new(ConnectionLike::Connection(conn.as_ref()));
+            let interpreter = QueryInterpreter::new(ConnectionLike::Connection(*conn));
             QueryPipeline::new(query_graph, interpreter, serializer).execute().await
         }
     }
@@ -90,7 +92,7 @@ where
             let mut results = Vec::with_capacity(queries.len());
 
             for (query, info) in queries {
-                let interpreter = QueryInterpreter::new(ConnectionLike::Transaction(tx.as_ref()));
+                let interpreter = QueryInterpreter::new(ConnectionLike::Transaction(tx.borrow_mut()));
                 let result = QueryPipeline::new(query, interpreter, info).execute().await;
 
                 if result.is_err() {
@@ -106,10 +108,13 @@ where
             let mut futures = Vec::with_capacity(operations.len());
 
             for operation in operations {
-                let conn = self.connector.get_connection().await?;
+                let mut conn = self.connector.get_connection().await?;
+                // let wat = *conn;
+                // let conn_mut_ref = Box::new(conn.as_mut());
+
                 futures.push(tokio::spawn(Self::execute_single_operation(
                     operation,
-                    conn,
+                    Box::new(conn.as_mut()),
                     self.force_transactions,
                     query_schema.clone(),
                 )));
@@ -128,7 +133,14 @@ where
     /// Executes a single operation. Execution will be inside of a transaction or not depending on the needs of the query.
     async fn execute(&self, operation: Operation, query_schema: QuerySchemaRef) -> crate::Result<ResponseData> {
         let conn = self.connector.get_connection().await?;
-        Self::execute_single_operation(operation, conn, self.force_transactions, query_schema.clone()).await
+
+        Self::execute_single_operation(
+            operation,
+            Box::new(conn.as_mut()),
+            self.force_transactions,
+            query_schema.clone(),
+        )
+        .await
     }
 
     fn primary_connector(&self) -> &(dyn Connector + Send + Sync) {

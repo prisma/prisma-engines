@@ -154,7 +154,7 @@ where
 
     #[tracing::instrument(skip(self, exp, env, level))]
     pub fn interpret(
-        &'conn self,
+        &'conn mut self,
         exp: Expression,
         env: Env,
         level: usize,
@@ -213,14 +213,16 @@ where
                 match *query {
                     Query::Read(read) => {
                         self.log_line(level, || format!("READ {}", read));
-                        Ok(read::execute(&self.conn, read, None)
+                        Ok(read::execute(&mut self.conn, read, None)
                             .await
                             .map(ExpressionResult::Query)?)
                     }
 
                     Query::Write(write) => {
                         self.log_line(level, || format!("WRITE {}", write));
-                        Ok(write::execute(&self.conn, write).await.map(ExpressionResult::Query)?)
+                        Ok(write::execute(&mut self.conn, write)
+                            .await
+                            .map(ExpressionResult::Query)?)
                     }
                 }
             }),
