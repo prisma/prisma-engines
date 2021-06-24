@@ -8,7 +8,7 @@ use crate::{
     MarkMigrationRolledBack, Reset, SchemaAssertion, SchemaPush,
 };
 use migration_connector::MigrationPersistence;
-use quaint::prelude::{ConnectionInfo, Queryable, ResultSet};
+use quaint::prelude::{ConnectionInfo, ResultSet};
 use sql_migration_connector::SqlMigrationConnector;
 use std::{borrow::Cow, future::Future};
 use tempfile::TempDir;
@@ -37,8 +37,12 @@ impl TestApi {
         self.root.connection_string()
     }
 
-    pub fn connection_info(&self) -> &ConnectionInfo {
-        self.connector.quaint().connection_info()
+    pub fn connection_info(&self) -> ConnectionInfo {
+        self.connector.connection_info()
+    }
+
+    pub fn schema_name(&self) -> &str {
+        self.connector.schema_name()
     }
 
     /// Plan a `createMigration` command
@@ -192,13 +196,13 @@ impl TestApi {
     /// Like quaint::Queryable::query()
     #[track_caller]
     pub fn query(&self, q: quaint::ast::Query<'_>) -> ResultSet {
-        self.root.block_on(self.connector.quaint().query(q)).unwrap()
+        self.root.block_on(self.connector.queryable().query(q)).unwrap()
     }
 
     /// Send a SQL command to the database, and expect it to succeed.
     #[track_caller]
     pub fn raw_cmd(&self, sql: &str) {
-        self.root.block_on(self.connector.quaint().raw_cmd(sql)).unwrap()
+        self.root.block_on(self.connector.queryable().raw_cmd(sql)).unwrap()
     }
 
     /// Render a table name with the required prefixing for use with quaint query building.
@@ -206,7 +210,7 @@ impl TestApi {
         if self.root.is_sqlite() {
             table_name.into()
         } else {
-            (self.connector.quaint().connection_info().schema_name(), table_name).into()
+            (self.connector.schema_name(), table_name).into()
         }
     }
 

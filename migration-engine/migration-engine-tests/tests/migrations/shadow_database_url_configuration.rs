@@ -2,6 +2,7 @@ use expect_test::expect;
 use migration_engine_tests::multi_engine_test_api::*;
 use quaint::{prelude::Queryable, single::Quaint};
 use test_macros::test_connector;
+use user_facing_errors::UserFacingError;
 
 #[test_connector(tags(Postgres))]
 fn shadow_db_url_can_be_configured_on_postgres(api: TestApi) {
@@ -170,24 +171,14 @@ fn shadow_db_not_reachable_error_must_have_the_right_connection_info(api: TestAp
         .to_user_facing();
 
     let assertion = expect![[r#"
-        Error {
-            is_panic: false,
-            inner: Known(
-                KnownError {
-                    message: "Can\'t reach database server at `localhost`:`39824`\n\nPlease make sure your database server is running at `localhost`:`39824`.",
-                    meta: Object({
-                        "database_host": String(
-                            "localhost",
-                        ),
-                        "database_port": Number(
-                            39824,
-                        ),
-                    }),
-                    error_code: "P1001",
-                },
-            ),
-        }
-    "#]];
+        Can't reach database server at `localhost`:`39824`
 
-    assertion.assert_debug_eq(&err);
+        Please make sure your database server is running at `localhost`:`39824`."#]];
+
+    assertion.assert_eq(err.message());
+
+    assert_eq!(
+        err.unwrap_known().error_code,
+        user_facing_errors::common::DatabaseNotReachable::ERROR_CODE
+    );
 }

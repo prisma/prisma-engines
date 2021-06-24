@@ -12,6 +12,7 @@ pub(crate) use mssql::MssqlFlavour;
 pub(crate) use mysql::MysqlFlavour;
 pub(crate) use postgres::PostgresFlavour;
 pub(crate) use sqlite::SqliteFlavour;
+use user_facing_errors::migration_engine::ApplyMigrationError;
 
 use crate::{
     connection_wrapper::Connection, sql_destructive_change_checker::DestructiveChangeCheckerFlavour,
@@ -51,6 +52,13 @@ pub(crate) trait SqlFlavour:
     DestructiveChangeCheckerFlavour + SqlRenderer + SqlSchemaDifferFlavour + SqlSchemaCalculatorFlavour + Debug
 {
     async fn acquire_lock(&self, connection: &Connection) -> ConnectorResult<()>;
+
+    async fn apply_migration_script(
+        &self,
+        migration_name: &str,
+        script: &str,
+        conn: &Connection,
+    ) -> ConnectorResult<()>;
 
     fn check_database_version_compatibility(
         &self,
@@ -118,4 +126,17 @@ fn validate_connection_infos_do_not_match((previous, next): (&ConnectionInfo, &C
     } else {
         Ok(())
     }
+}
+
+async fn generic_apply_migration_script(migration_name: &str, script: &str, conn: &Connection) -> ConnectorResult<()> {
+    conn.raw_cmd(script).await.map_err(|quaint_error| {
+        ConnectorError::user_facing(ApplyMigrationError {
+            migration_name: migration_name.to_owned(),
+            database_error_code: String::from(quaint_error.original_code().unwrap_or("none")),
+            database_error: quaint_error
+                .original_message()
+                .map(String::from)
+                .unwrap_or_else(|| ConnectorError::from(quaint_error).to_string()),
+        })
+    })
 }

@@ -247,12 +247,12 @@ impl EngineTestApi<'_> {
 
     /// The schema name of the current connected database.
     pub fn schema_name(&self) -> &str {
-        self.connector.quaint().connection_info().schema_name()
+        self.connector.schema_name()
     }
 
     /// Execute a raw SQL command and expect it to succeed.
     #[track_caller]
     pub fn raw_cmd(&self, cmd: &str) {
-        self.rt.block_on(self.connector.quaint().raw_cmd(cmd)).unwrap()
+        self.rt.block_on(self.connector.queryable().raw_cmd(cmd)).unwrap()
     }
 }
