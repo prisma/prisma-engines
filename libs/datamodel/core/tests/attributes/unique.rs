@@ -193,6 +193,54 @@ fn multiple_unique_must_work() {
 }
 
 #[test]
+fn dbgenerated_default_errors_must_not_cascade_into_other_errors() {
+    let dml = r#"
+    datasource ds {
+        provider = "mysql"
+        url = "mysql://"
+    }
+
+    model User {
+        id        Int    @id
+        role      Bytes
+        role2     Bytes @ds.VarBinary(40) @default(dbgenerated(""))
+
+        @@unique([role2, role])
+    }
+    "#;
+
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@default": dbgenerated() takes either no argument, or a single nonempty string argument.[0m
+          [1;94m-->[0m  [4mschema.prisma:10[0m
+        [1;94m   | [0m
+        [1;94m 9 | [0m        role      Bytes
+        [1;94m10 | [0m        role2     Bytes @ds.VarBinary(40) @[1;91mdefault(dbgenerated(""))[0m
+        [1;94m   | [0m
+    "#]];
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn multi_field_unique_on_native_type_fields_fields_must_work() {
+    let dml = r#"
+    datasource ds {
+        provider = "mysql"
+        url = "mysql://"
+    }
+
+    model User {
+        id        Int    @id
+        role      Bytes
+        role2     Bytes @ds.VarBinary(40)
+
+        @@unique([role2, role])
+    }
+    "#;
+    parse(dml);
+}
+
+#[test]
 fn multi_field_unique_indexes_on_enum_fields_must_work() {
     let dml = r#"
     model User {
