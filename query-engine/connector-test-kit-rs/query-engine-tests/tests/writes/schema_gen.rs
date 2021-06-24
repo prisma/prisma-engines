@@ -1,8 +1,49 @@
 use query_engine_tests::*;
 #[test_suite]
 mod schema_gen {
-    use query_engine_tests::run_query;
+    use query_engine_tests::{run_query, run_query_json, DatamodelWithParams};
     use query_test_macros::relation_link_test;
+
+    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneOpt")]
+    async fn schema_gen(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
+        let child_1 = t.child().parse(
+            run_query_json!(
+                runner,
+                format!(
+                    r#"mutation {{
+                        createOneParent(data: {{
+                            p: "p1", p_1:"p", p_2: "1",
+                            childOpt: {{
+                                create: {{c: "c1", c_1:"c", c_2: "1"}}
+                            }}
+                        }}) {{
+                          childOpt{{
+                            {selection}
+                          }}
+                        }}
+                    }}"#,
+                    selection = t.child().selection()
+                )
+            ),
+            &["data", "createOneParent", "childOpt"],
+        )?;
+
+        insta::assert_snapshot!(
+          run_query!(runner, format!(r#"mutation {{
+            createOneParent(data:{{
+              p: "p2", p_1:"p", p_2: "2",
+              childOpt: {{ connect: {child} }}
+            }}){{
+              childOpt {{
+                c
+              }}
+            }}
+          }}"#, child = child_1)),
+          @r###"{"data":{"createOneParent":{"childOpt":{"c":"c1"}}}}"###
+        );
+
+        Ok(())
+    }
 
     #[relation_link_test(on_parent = "ToMany", on_child = "ToMany")]
     async fn m2m(runner: &Runner, _t: &DatamodelWithParams) -> TestResult<()> {
