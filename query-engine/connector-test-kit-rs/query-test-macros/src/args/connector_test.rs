@@ -1,8 +1,9 @@
+use super::*;
 use crate::IntoDarlingError;
 use darling::FromMeta;
 use proc_macro::TokenStream;
 use proc_macro2::Span;
-use query_tests_setup::{relation_field::RelationField, ConnectorTag};
+use query_tests_setup::ConnectorTag;
 use quote::quote;
 use std::convert::TryFrom;
 use syn::{spanned::Spanned, Ident, Meta, Path};
@@ -27,21 +28,12 @@ pub struct ConnectorTestArgs {
 
 impl ConnectorTestArgs {
     pub fn validate(&self, on_module: bool) -> Result<(), darling::Error> {
-        if !self.only.is_empty() && !self.exclude.is_empty() && !on_module {
-            return Err(darling::Error::custom(
-                "Only one of `only` and `exclude` can be specified for a connector test.",
-            ));
-        }
+        validate_only_exclude(&self.only, &self.exclude, on_module)?;
+        validate_suite(&self.suite, on_module)?;
 
         if self.schema.is_none() && !on_module {
             return Err(darling::Error::custom(
                 "A schema annotation on either the test mod (#[test_suite(schema(handler))]) or the test (schema(handler)) is required.",
-            ));
-        }
-
-        if self.suite.is_none() && !on_module {
-            return Err(darling::Error::custom(
-                "A test suite name annotation on either the test mod (#[test_suite]) or the test (suite = \"name\") is required.",
             ));
         }
 
@@ -50,16 +42,7 @@ impl ConnectorTestArgs {
 
     /// Returns all the connectors that the test is valid for.
     pub fn connectors_to_test(&self) -> Vec<ConnectorTag> {
-        if !self.only.is_empty() {
-            self.only.tags.clone()
-        } else if !self.exclude.is_empty() {
-            let all = ConnectorTag::all();
-            let exclude = self.exclude.tags();
-
-            all.into_iter().filter(|tag| !exclude.contains(tag)).collect()
-        } else {
-            ConnectorTag::all()
-        }
+        connectors_to_test(&self.only, &self.exclude)
     }
 }
 
@@ -100,6 +83,10 @@ pub struct OnlyConnectorTags {
 impl OnlyConnectorTags {
     pub fn is_empty(&self) -> bool {
         self.tags.is_empty()
+    }
+
+    pub fn tags(&self) -> &[ConnectorTag] {
+        self.tags.as_slice()
     }
 }
 
@@ -248,128 +235,5 @@ impl darling::FromMeta for RunOnlyForCapabilities {
         }
 
         Ok(Self { idents })
-    }
-}
-
-#[derive(Debug, FromMeta)]
-pub struct ConnectorTestGenArgs {
-    #[darling(default)]
-    pub suite: Option<String>,
-
-    #[darling(default)]
-    pub only: OnlyConnectorTags,
-
-    // TODO: Find a better name
-    pub gen: SchemaGen,
-
-    #[darling(default)]
-    pub exclude: ExcludeConnectorTags,
-
-    #[darling(default)]
-    pub capabilities: RunOnlyForCapabilities,
-}
-
-impl ConnectorTestGenArgs {
-    pub fn validate(&self, on_module: bool) -> Result<(), darling::Error> {
-        if !self.only.is_empty() && !self.exclude.is_empty() && !on_module {
-            return Err(darling::Error::custom(
-                "Only one of `only` and `exclude` can be specified for a connector test.",
-            ));
-        }
-
-        if self.suite.is_none() && !on_module {
-            return Err(darling::Error::custom(
-                "A test suite name annotation on either the test mod (#[test_suite]) or the test (suite = \"name\") is required.",
-            ));
-        }
-
-        Ok(())
-    }
-
-    /// Returns all the connectors that the test is valid for.
-    pub fn connectors_to_test(&self) -> Vec<ConnectorTag> {
-        if !self.only.is_empty() {
-            self.only.tags.clone()
-        } else if !self.exclude.is_empty() {
-            let all = ConnectorTag::all();
-            let exclude = self.exclude.tags();
-
-            all.into_iter().filter(|tag| !exclude.contains(tag)).collect()
-        } else {
-            ConnectorTag::all()
-        }
-    }
-}
-
-#[derive(Debug)]
-pub struct SchemaGen {
-    pub on_parent: RelationField,
-    pub on_child: RelationField,
-    pub without_parent: bool,
-}
-
-impl darling::FromMeta for SchemaGen {
-    fn from_list(items: &[syn::NestedMeta]) -> Result<Self, darling::Error> {
-        if items.len() < 2 {
-            return Err(darling::Error::unsupported_shape(
-                "Expected `gen` to contain at least 2 RelationField and an optional third param boolean field",
-            )
-            .with_span(&Span::call_site()));
-        }
-
-        let mut items_iter = items.iter();
-
-        let on_parent = get_next_relation_field(&mut items_iter, "first")?;
-        let on_child = get_next_relation_field(&mut items_iter, "second")?;
-
-        // Accepts both x = <bool> or <bool>
-        // If no value provided, defaults to false
-        let without_parent = match items_iter.next() {
-            Some(next) => match next {
-                syn::NestedMeta::Meta(Meta::NameValue(name_value)) => match &name_value.lit {
-                    syn::Lit::Bool(b) => Ok(b.value),
-                    x => Err(darling::Error::unsupported_shape(
-                        "Expected `gen` third param to be a NameValue of value boolean (eg: `without_params = <bool>`) or just a boolean `<bool>`",
-                    )
-                    .with_span(&x.span())),
-                },
-                syn::NestedMeta::Lit(syn::Lit::Bool(b)) => Ok(b.value),
-                x => Err(darling::Error::unsupported_shape(
-                    "Expected `gen` third param to be a NameValue of value boolean (eg: `without_params = <bool>`) or just a boolean `<bool>`",
-                )
-                .with_span(&x.span())),
-            }?,
-            None => false,
-        };
-
-        Ok(Self {
-            on_child,
-            on_parent,
-            without_parent,
-        })
-    }
-}
-
-fn get_next_relation_field(
-    items: &mut std::slice::Iter<syn::NestedMeta>,
-    position: &str,
-) -> Result<RelationField, darling::Error> {
-    let err: darling::Error = darling::Error::custom(format!(
-        "Expected `gen` {} param to be a list of idents (RelationField variants). eg: ParentReq",
-        position
-    ));
-
-    match items.next().unwrap() {
-        syn::NestedMeta::Meta(Meta::Path(p)) => {
-            let tag = if let Some(ident) = p.get_ident() {
-                let name = ident.to_string();
-                Ok(name)
-            } else {
-                Err(err)
-            }?;
-
-            RelationField::try_from(tag.as_str()).into_darling_error(&p.span())
-        }
-        _ => Err(err),
     }
 }

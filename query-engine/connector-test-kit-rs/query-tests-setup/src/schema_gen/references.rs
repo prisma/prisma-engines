@@ -1,6 +1,4 @@
-use super::identifiers::Identifier;
-use crate::relation_field::RelationField;
-use crate::utils::*;
+use super::*;
 
 #[derive(Debug, Clone)]
 pub enum RelationReference<'a> {
@@ -8,10 +6,10 @@ pub enum RelationReference<'a> {
     SimpleParentId(&'a RelationField),
     CompoundParentId(&'a RelationField),
     CompoundChildId(&'a RelationField),
-    PReference(&'a RelationField),
-    CompoundPReference(&'a RelationField),
-    CReference(&'a RelationField),
-    CompoundCReference(&'a RelationField),
+    ParentReference(&'a RelationField),
+    CompoundParentReference(&'a RelationField),
+    ChildReference(&'a RelationField),
+    CompoundChildReference(&'a RelationField),
     IdReference,
     NoRef,
 }
@@ -23,10 +21,10 @@ impl<'a> RelationReference<'a> {
             RelationReference::SimpleParentId(rf) => self.render_simple_parent_id(rf),
             RelationReference::CompoundParentId(rf) => self.render_compound_parent_id(rf),
             RelationReference::CompoundChildId(rf) => self.render_compound_child_id(rf),
-            RelationReference::PReference(rf) => self.render_p_reference(rf),
-            RelationReference::CompoundPReference(rf) => self.render_compound_p_reference(rf),
-            RelationReference::CReference(rf) => self.render_c_reference(rf),
-            RelationReference::CompoundCReference(rf) => self.render_compound_c_reference(rf),
+            RelationReference::ParentReference(rf) => self.render_parent_ref(rf),
+            RelationReference::CompoundParentReference(rf) => self.render_compound_parent_ref(rf),
+            RelationReference::ChildReference(rf) => self.render_child_ref(rf),
+            RelationReference::CompoundChildReference(rf) => self.render_compound_child_ref(rf),
             RelationReference::NoRef => "".to_string(),
             RelationReference::IdReference => "@relation(references: [id])".to_string(),
         }
@@ -66,7 +64,7 @@ impl<'a> RelationReference<'a> {
       }
     }
 
-    fn render_p_reference(&self, rf: &RelationField) -> String {
+    fn render_parent_ref(&self, rf: &RelationField) -> String {
         match rf.is_list() {
             true => "@relation(references: [p])".to_string(),
             false => format!(
@@ -76,14 +74,14 @@ impl<'a> RelationReference<'a> {
         }
     }
 
-    fn render_compound_p_reference(&self, rf: &RelationField) -> String {
+    fn render_compound_parent_ref(&self, rf: &RelationField) -> String {
         match rf.is_list() {
           true => "@relation(references: [p_1, p_2])".to_string(),
           false => format!("@relation(fields: [parent_p_1, parent_p_2], references: [p_1, p_2])\nparent_p_1 String{}\n parent_p_2 String{}", rf.optional_suffix(), rf.optional_suffix()),
       }
     }
 
-    fn render_c_reference(&self, rf: &RelationField) -> String {
+    fn render_child_ref(&self, rf: &RelationField) -> String {
         match rf.is_list() {
             true => "@relation(references: [c])".to_string(),
             false => format!(
@@ -93,7 +91,7 @@ impl<'a> RelationReference<'a> {
         }
     }
 
-    fn render_compound_c_reference(&self, rf: &RelationField) -> String {
+    fn render_compound_child_ref(&self, rf: &RelationField) -> String {
         //"@relation(references: [c_1, c_2]) @map([\"child_c_1\", \"child_c_2\"])"
         match rf.is_list() {
           true => "@relation(references: [c_1, c_2])".to_string(),
@@ -104,15 +102,15 @@ impl<'a> RelationReference<'a> {
 
 pub fn common_parent_references(rf: &RelationField) -> Vec<RelationReference> {
     vec![
-        RelationReference::PReference(rf),
-        RelationReference::CompoundPReference(rf),
+        RelationReference::ParentReference(rf),
+        RelationReference::CompoundParentReference(rf),
     ]
 }
 
 pub fn common_child_references(rf: &RelationField) -> Vec<RelationReference> {
     vec![
-        RelationReference::CReference(rf),
-        RelationReference::CompoundCReference(rf),
+        RelationReference::ChildReference(rf),
+        RelationReference::CompoundChildReference(rf),
     ]
 }
 
@@ -138,7 +136,7 @@ pub fn simple_child_references<'a>(
         _ if on_child.is_list() && !on_parent.is_list() => vec![(RelationReference::NoRef)],
         Identifier::Simple => vec![RelationReference::SimpleParentId(on_child)],
         Identifier::Compound => vec![RelationReference::CompoundParentId(on_child)],
-        Identifier::None => vec![RelationReference::PReference(on_child)],
+        Identifier::None => vec![RelationReference::ParentReference(on_child)],
     }
 }
 
@@ -163,7 +161,7 @@ pub fn full_child_references<'a>(
         match *parent_id {
             Identifier::Simple => vec![RelationReference::SimpleParentId(on_child)],
             Identifier::Compound => vec![RelationReference::CompoundParentId(on_child)],
-            _ => vec![RelationReference::PReference(on_child)],
+            _ => vec![RelationReference::ParentReference(on_child)],
         }
     }
 }
@@ -194,7 +192,7 @@ pub fn simple_parent_references<'a>(
         _ if child_reference.render() != RelationReference::NoRef.render() && !is_m2m => vec![RelationReference::NoRef],
         Identifier::Simple => vec![RelationReference::SimpleChildId(on_parent)],
         Identifier::Compound => vec![RelationReference::CompoundChildId(on_parent)],
-        Identifier::None => vec![RelationReference::CReference(on_parent)],
+        Identifier::None => vec![RelationReference::ChildReference(on_parent)],
     }
 }
 
@@ -240,7 +238,7 @@ pub fn full_parent_references<'a>(
         match child_id {
             Identifier::Simple => vec![RelationReference::SimpleChildId(on_parent)],
             Identifier::Compound => vec![RelationReference::CompoundChildId(on_parent)],
-            _ => vec![RelationReference::CReference(on_parent)],
+            _ => vec![RelationReference::ChildReference(on_parent)],
         }
     }
 }

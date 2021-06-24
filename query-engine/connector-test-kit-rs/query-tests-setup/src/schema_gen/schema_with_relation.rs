@@ -1,6 +1,4 @@
-use crate::{
-    constants::*, query_params::*, references::*, relation_field::*, schema_gen::identifiers::Identifier, utils::*,
-};
+use super::*;
 use datamodel_connector::ConnectorCapability;
 use serde::{Deserialize, Serialize};
 use std::{convert::TryFrom, str::FromStr};
@@ -48,9 +46,9 @@ impl TryFrom<DatamodelWithParams> for String {
 pub type DatamodelsAndCapabilities = (Vec<DatamodelWithParams>, Vec<Vec<ConnectorCapability>>);
 
 pub fn schema_with_relation(
-    on_parent: RelationField,
-    on_child: RelationField,
-    without_params: bool,
+    on_parent: &RelationField,
+    on_child: &RelationField,
+    id_only: bool,
 ) -> DatamodelsAndCapabilities {
     let is_required_1to1 = on_parent.is_required() && on_child.is_required();
 
@@ -64,15 +62,18 @@ pub fn schema_with_relation(
         QueryParamsWhere::identifier("id"),
         QueryParamsWhereMany::many_ids("id"),
     );
+
     let compound_id_param = {
         let fields = vec!["id_1", "id_2"];
         let arg_name = "id_1_id_2";
+
         QueryParams::new(
             "id_1, id_2",
             QueryParamsWhere::compound_identifier(fields.clone(), arg_name),
             QueryParamsWhereMany::many_compounds(fields, arg_name),
         )
     };
+
     let parent_unique_params = vec![
         QueryParams::new(
             "p",
@@ -82,6 +83,7 @@ pub fn schema_with_relation(
         {
             let fields = vec!["p_1", "p_2"];
             let arg_name = "p_1_p_2";
+
             QueryParams::new(
                 "p_1, p_2",
                 QueryParamsWhere::compound_identifier(fields.clone(), arg_name),
@@ -98,6 +100,7 @@ pub fn schema_with_relation(
         {
             let fields = vec!["c_1", "c_2"];
             let arg_name = "c_1_c_2";
+
             QueryParams::new(
                 "c_1, c_2",
                 QueryParamsWhere::compound_identifier(fields.clone(), arg_name),
@@ -121,9 +124,9 @@ pub fn schema_with_relation(
     for parent_id in id_options.iter() {
         for child_id in id_options.iter() {
             // Based on Id and relation fields
-            for child_ref_to_parent in child_references(simple, parent_id, &on_parent, &on_child) {
+            for child_ref_to_parent in child_references(simple, parent_id, on_parent, on_child) {
                 for parent_ref_to_child in
-                    parent_references(simple, child_id, &child_ref_to_parent, &on_parent, &on_child)
+                    parent_references(simple, child_id, &child_ref_to_parent, on_parent, on_child)
                 {
                     // TODO: The RelationReference.render() equality is a hack. Implement PartialEq instead
                     let is_virtual_req_rel_field =
@@ -135,7 +138,7 @@ pub fn schema_with_relation(
                     }
 
                     // Only based on id
-                    let parent_params = if without_params {
+                    let parent_params = if id_only {
                         vec![id_param.clone()]
                     } else {
                         match *parent_id {
@@ -145,7 +148,7 @@ pub fn schema_with_relation(
                         }
                     };
 
-                    let child_params = if without_params {
+                    let child_params = if id_only {
                         vec![id_param.clone()]
                     } else {
                         match *child_id {
@@ -157,34 +160,31 @@ pub fn schema_with_relation(
 
                     for parent_param in parent_params.iter() {
                         for child_param in child_params.iter() {
-                            let (parent_field, child_field) = render_relation_fields(
-                                &on_parent,
-                                &parent_ref_to_child,
-                                &on_child,
-                                &child_ref_to_parent,
-                            );
+                            let (parent_field, child_field) =
+                                render_relation_fields(on_parent, &parent_ref_to_child, on_child, &child_ref_to_parent);
+
                             let datamodel = indoc::formatdoc! {"
-                            model Parent {{
-                                p             String    @unique
-                                p_1           String
-                                p_2           String
-                                {parent_field}
-                                non_unique    String?
-                                {parent_id}
-            
-                                @@unique([p_1, p_2])
-                            }}
-            
-                            model Child {{
-                                c              String    @unique
-                                c_1            String
-                                c_2            String
-                                {child_field}
-                                non_unique     String?
-                                {child_id}
-            
-                                @@unique([c_1, c_2])
-                            }}
+                                model Parent {{
+                                    p             String    @unique
+                                    p_1           String
+                                    p_2           String
+                                    {parent_field}
+                                    non_unique    String?
+                                    {parent_id}
+                
+                                    @@unique([p_1, p_2])
+                                }}
+                
+                                model Child {{
+                                    c              String    @unique
+                                    c_1            String
+                                    c_2            String
+                                    {child_field}
+                                    non_unique     String?
+                                    {child_id}
+                
+                                    @@unique([c_1, c_2])
+                                }}
                             ",
                                 parent_field = parent_field,
                                 parent_id = parent_id,
