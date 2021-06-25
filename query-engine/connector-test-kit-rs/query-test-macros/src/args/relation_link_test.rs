@@ -110,7 +110,7 @@ fn parse_relation_field(lit_str: &syn::LitStr, child: bool) -> Result<RelationFi
     } else {
         Err(darling::Error::custom(format!(
             "Expected `{}` to be a list of idents (ConnectorTag variants), not paths.",
-            if child == true { "on_child" } else { "on_parent" }
+            if child { "on_child" } else { "on_parent" }
         )))
     }?;
 

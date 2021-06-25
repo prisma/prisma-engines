@@ -50,8 +50,8 @@ impl RelationField {
                 false => "Child?",
             },
             RelationField::ToOneReq { child } => match child {
-                true => "Child",
-                false => "Parent",
+                true => "Parent",
+                false => "Child",
             },
             RelationField::ToMany { child } => match child {
                 true => "Parent[]",

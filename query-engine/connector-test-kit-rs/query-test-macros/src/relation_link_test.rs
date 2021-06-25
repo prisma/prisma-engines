@@ -104,56 +104,41 @@ pub fn relation_link_test_impl(attr: TokenStream, input: TokenStream) -> TokenSt
         args.on_child.relation_field(),
         args.id_only,
     );
-    let test_shells: Vec<proc_macro2::TokenStream> = datamodels.into_iter().enumerate().map(|(i, dm)| {
-      // The shell function retains the name of the original test definition.
-      let test_fn_ident = Ident::new(&format!("{}_{}", test_fn_ident.to_string(), i), Span::call_site());
-      let datamodel: proc_macro2::TokenStream = format!(r#""{}""#, dm.datamodel()).parse().unwrap();
-      let dm_with_params: String = dm.try_into().expect("Could not serialize json");
-      let required_capabilities = required_capabilities.get(i).unwrap().iter().map(|cap| format!("{}", cap)).collect::<Vec<_>>();
-      let test_database = format!("{}_{}_{}", suite_name, test_name, i);
+    let test_shells: Vec<proc_macro2::TokenStream> = datamodels
+        .into_iter()
+        .enumerate()
+        .map(|(i, dm)| {
+            // The shell function retains the name of the original test definition.
+            let test_fn_ident = Ident::new(&format!("{}_{}", test_fn_ident.to_string(), i), Span::call_site());
+            let datamodel: proc_macro2::TokenStream = format!(r#""{}""#, dm.datamodel()).parse().unwrap();
+            let dm_with_params: String = dm.try_into().expect("Could not serialize json");
+            let required_capabilities = required_capabilities
+                .get(i)
+                .unwrap()
+                .iter()
+                .map(|cap| format!("{}", cap))
+                .collect::<Vec<_>>();
+            let test_database = format!("{}_{}_{}", suite_name, test_name, i);
 
-      let ts = quote! {
-          #[test]
-          fn #test_fn_ident() {
-              let config = &query_tests_setup::CONFIG;
-              let enabled_connectors = vec![
-                  #connectors
-              ];
+            let ts = quote! {
+                #[test]
+                fn #test_fn_ident() {
+                  query_tests_setup::run_relation_link_test(
+                      vec![#connectors],
+                      &mut vec![#(#capabilities),*],
+                      vec![#(#required_capabilities),*],
+                      #datamodel,
+                      #dm_with_params,
+                      #test_name,
+                      #test_database,
+                      #runner_fn_ident
+                    )
+                }
+            };
 
-              let mut capabilities: Vec<ConnectorCapability> = vec![
-                  #(#capabilities),*
-              ];
-
-              let required_capabilities: Vec<&str> = vec![#(#required_capabilities),*];
-              let mut required_capabilities = required_capabilities
-                  .into_iter()
-                  .map(|cap| cap.parse::<ConnectorCapability>().unwrap())
-                  .collect::<Vec<_>>();
-
-              if !required_capabilities.is_empty() {
-                  capabilities.append(&mut required_capabilities);
-              }
-
-              let template = #datamodel.to_string();
-              let dm_with_params_json: DatamodelWithParams = #dm_with_params.parse().unwrap();
-
-              if ConnectorTag::should_run(&config, &enabled_connectors, &capabilities, #test_name) {
-                  let datamodel = query_tests_setup::render_test_datamodel(config, #test_database, template);
-                  let connector = config.test_connector_tag().unwrap();
-
-                  query_tests_setup::run_with_tokio(async move {
-                      tracing::debug!("Used datamodel:\n {}", datamodel.clone().yellow());
-                      let runner = Runner::load(config.runner(), datamodel.clone(), connector).await.unwrap();
-                      let dm_with_params = DatamodelWithParams::from(dm_with_params_json);
-                      query_tests_setup::setup_project(&datamodel).await.unwrap();
-                      #runner_fn_ident(&runner, &dm_with_params).await.unwrap();
-                  }.with_subscriber(test_tracing_subscriber(std::env::var("LOG_LEVEL").unwrap_or("info".to_string()))));
-              }
-          }
-      };
-
-      ts
-  }).collect();
+            ts
+        })
+        .collect();
 
     let all_funcs: proc_macro2::TokenStream = test_shells
         .into_iter()
