@@ -1,2 +1,2 @@
-mod schema_gen;
+mod nested_mutations;
 mod top_level_mutations;

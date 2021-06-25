@@ -4,9 +4,11 @@ import org.scalatest.{FlatSpec, Matchers}
 import util.ConnectorCapability.JoinRelationLinksCapability
 import util._
 
+// RS: Ported
 class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with ApiSpecBase with SchemaBaseV11 {
   override def runOnlyForCapabilities: Set[ConnectorCapability] = Set(JoinRelationLinksCapability)
 
+  // Doesn't generate any datamodels
   "a P1! to C1 relation with the child already in a relation" should "should fail on existing old parent" in {
     schemaWithRelation(onParent = ChildReq, onChild = ParentOpt).test { t =>
       val project = SchemaDsl.fromStringV11() {
@@ -54,6 +56,7 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
     }
   }
 
+  // Doesn't generate any datamodels
   "a P1! to C1  relation with the child not in a relation" should "be connectable through a nested mutation by id" taggedAs (IgnoreMsSql) in {
     schemaWithRelation(onParent = ChildReq, onChild = ParentOpt).test { t =>
       val project = SchemaDsl.fromStringV11() {
