@@ -1,7 +1,9 @@
-mod dispatch;
+// mod dispatch;
+
+// pub use dispatch::*;
+
 use crate::{coerce_null_to_zero_value, Filter, QueryArguments, WriteArgs};
 use async_trait::async_trait;
-pub use dispatch::*;
 use dml::FieldArity;
 use prisma_models::*;
 use prisma_value::PrismaValue;
@@ -16,23 +18,40 @@ pub trait Connector {
 }
 
 #[async_trait]
-pub trait Connection: ReadOperations + WriteOperations + Send + Sync {
+pub trait Connection: ConnectionLike {
     async fn start_transaction<'a>(&'a mut self) -> crate::Result<Box<dyn Transaction + 'a>>;
+
+    /// Explicit upcast.
+    fn as_connection_like(&mut self) -> &mut dyn ConnectionLike;
 }
 
 #[async_trait]
-pub trait Transaction: ReadOperations + WriteOperations + Send + Sync {
+pub trait Transaction: ConnectionLike {
     async fn commit(&mut self) -> crate::Result<()>;
     async fn rollback(&mut self) -> crate::Result<()>;
+
+    /// Explicit upcast.
+    fn as_connection_like(&mut self) -> &mut dyn ConnectionLike;
 }
 
-pub enum ConnectionLike<'conn, 'tx>
-where
-    'tx: 'conn,
-{
-    Connection(&'conn mut (dyn Connection + 'conn)),
-    Transaction(&'conn mut (dyn Transaction + 'tx)),
-}
+// pub enum ConnectionLike<'conn, 'tx>
+// where
+//     'tx: 'conn,
+// {
+//     Connection(&'conn mut (dyn Connection + 'conn)),
+//     Transaction(&'conn mut (dyn Transaction + 'tx)),
+// }
+
+// pub enum ConnectionLike<'a> {
+//     Connection(Box<dyn Connection>),
+//     Transaction(Box<dyn Transaction + 'a>),
+// }
+
+pub trait ConnectionLike: ReadOperations + WriteOperations + Send + Sync {}
+
+// impl ConnectionLike for dyn Connection {}
+
+// impl ConnectionLike for dyn Transaction {}
 
 /// A wrapper struct allowing to either filter for records or for the core to
 /// communicate already known record selectors to connectors.

@@ -1,14 +1,14 @@
 use crate::{Env, Expressionista, IrSerializer, QueryGraph, QueryInterpreter, ResponseData};
 
 #[derive(Debug)]
-pub struct QueryPipeline<'conn, 'tx> {
+pub struct QueryPipeline<'a> {
     graph: QueryGraph,
-    interpreter: QueryInterpreter<'conn, 'tx>,
+    interpreter: QueryInterpreter<'a>,
     serializer: IrSerializer,
 }
 
-impl<'conn, 'tx> QueryPipeline<'conn, 'tx> {
-    pub fn new(graph: QueryGraph, interpreter: QueryInterpreter<'conn, 'tx>, serializer: IrSerializer) -> Self {
+impl<'a> QueryPipeline<'a> {
+    pub fn new(graph: QueryGraph, interpreter: QueryInterpreter<'a>, serializer: IrSerializer) -> Self {
         Self {
             graph,
             interpreter,

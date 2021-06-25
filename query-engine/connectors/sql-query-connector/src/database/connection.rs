@@ -1,7 +1,7 @@
 use super::{catch, transaction::SqlConnectorTransaction};
 use crate::{database::operations::*, sql_info::SqlInfo, QueryExt, SqlError};
 use async_trait::async_trait;
-use connector::RelAggregationSelection;
+use connector::{ConnectionLike, RelAggregationSelection};
 use connector_interface::{
     self as connector, filter::Filter, AggregationRow, AggregationSelection, Connection, QueryArguments,
     ReadOperations, RecordFilter, Transaction, WriteArgs, WriteOperations,
@@ -25,6 +25,8 @@ where
     }
 }
 
+impl<C> ConnectionLike for SqlConnection<C> where C: QueryExt + TransactionCapable + Send + Sync + 'static {}
+
 #[async_trait]
 impl<C> Connection for SqlConnection<C>
 where
@@ -40,6 +42,10 @@ where
             Ok(Box::new(SqlConnectorTransaction::new(tx, &connection_info)) as Box<dyn Transaction>)
         })
         .await
+    }
+
+    fn as_connection_like(&mut self) -> &mut dyn ConnectionLike {
+        self
     }
 }
 

@@ -1,7 +1,7 @@
 use crate::SqlError;
 use crate::{database::operations::*, sql_info::SqlInfo};
 use async_trait::async_trait;
-use connector::RelAggregationSelection;
+use connector::{ConnectionLike, RelAggregationSelection};
 use connector_interface::{
     self as connector, filter::Filter, AggregationRow, AggregationSelection, QueryArguments, ReadOperations,
     RecordFilter, Transaction, WriteArgs, WriteOperations,
@@ -27,6 +27,8 @@ impl<'tx> SqlConnectorTransaction<'tx> {
     }
 }
 
+impl<'tx> ConnectionLike for SqlConnectorTransaction<'tx> {}
+
 #[async_trait]
 impl<'tx> Transaction for SqlConnectorTransaction<'tx> {
     #[tracing::instrument(skip(self))]
@@ -43,6 +45,10 @@ impl<'tx> Transaction for SqlConnectorTransaction<'tx> {
             Ok(self.inner.rollback().await.map_err(SqlError::from)?)
         })
         .await
+    }
+
+    fn as_connection_like(&mut self) -> &mut dyn ConnectionLike {
+        self
     }
 }
 

@@ -3,7 +3,7 @@ use crate::{
     error::MongoError,
     root_queries::{aggregate, read, write},
 };
-use connector_interface::{ReadOperations, RelAggregationSelection, Transaction, WriteOperations};
+use connector_interface::{ConnectionLike, ReadOperations, RelAggregationSelection, Transaction, WriteOperations};
 use mongodb::options::{Acknowledgment, ReadConcern, TransactionOptions, WriteConcern};
 
 /// Not really a transaction right now, just something to
@@ -11,6 +11,8 @@ use mongodb::options::{Acknowledgment, ReadConcern, TransactionOptions, WriteCon
 pub struct MongoDbTransaction<'conn> {
     connection: &'conn mut MongoDbConnection,
 }
+
+impl<'conn> ConnectionLike for MongoDbTransaction<'conn> {}
 
 impl<'conn> MongoDbTransaction<'conn> {
     pub(crate) async fn new(
@@ -41,6 +43,10 @@ impl<'conn> Transaction for MongoDbTransaction<'conn> {
     async fn rollback(&mut self) -> connector_interface::Result<()> {
         // Totally rolled back.
         Ok(())
+    }
+
+    fn as_connection_like(&mut self) -> &mut dyn ConnectionLike {
+        self
     }
 }
 

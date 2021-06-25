@@ -6,7 +6,7 @@ use crate::{
 };
 use async_trait::async_trait;
 use connector_interface::{
-    Connection, ReadOperations, RelAggregationSelection, Transaction, WriteArgs, WriteOperations,
+    Connection, ConnectionLike, ReadOperations, RelAggregationSelection, Transaction, WriteArgs, WriteOperations,
 };
 use mongodb::{ClientSession, Database};
 use prisma_models::prelude::*;
@@ -19,6 +19,8 @@ pub struct MongoDbConnection {
     pub(crate) database: Database,
 }
 
+impl ConnectionLike for MongoDbConnection {}
+
 #[async_trait]
 impl Connection for MongoDbConnection {
     async fn start_transaction<'a>(
@@ -27,6 +29,10 @@ impl Connection for MongoDbConnection {
         let tx = Box::new(MongoDbTransaction::new(self).await?);
 
         Ok(tx as Box<dyn Transaction>)
+    }
+
+    fn as_connection_like(&mut self) -> &mut dyn ConnectionLike {
+        self
     }
 }
 

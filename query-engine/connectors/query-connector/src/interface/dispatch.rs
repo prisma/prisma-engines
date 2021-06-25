@@ -3,7 +3,7 @@ use async_trait::async_trait;
 use prisma_value::PrismaValue;
 
 #[async_trait]
-impl<'conn, 'tx> ReadOperations for ConnectionLike<'conn, 'tx> {
+impl<'a> ReadOperations for ConnectionLike<'a> {
     async fn get_single_record(
         &mut self,
         model: &ModelRef,
@@ -75,7 +75,7 @@ impl<'conn, 'tx> ReadOperations for ConnectionLike<'conn, 'tx> {
 }
 
 #[async_trait]
-impl<'conn, 'tx> WriteOperations for ConnectionLike<'conn, 'tx> {
+impl<'a> WriteOperations for ConnectionLike<'a> {
     async fn create_record(&mut self, model: &ModelRef, args: WriteArgs) -> crate::Result<RecordProjection> {
         match self {
             Self::Connection(c) => c.create_record(model, args).await,

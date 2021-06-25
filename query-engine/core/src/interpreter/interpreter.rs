@@ -123,26 +123,23 @@ impl Env {
     }
 }
 
-pub struct QueryInterpreter<'conn, 'tx> {
-    pub(crate) conn: ConnectionLike<'conn, 'tx>,
+pub struct QueryInterpreter<'a> {
+    pub(crate) conn: &'a mut dyn ConnectionLike,
     log: SegQueue<String>,
 }
 
-impl<'conn, 'tx> fmt::Debug for QueryInterpreter<'conn, 'tx> {
+impl<'a> fmt::Debug for QueryInterpreter<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("QueryInterpreter").finish()
     }
 }
 
-impl<'conn, 'tx> QueryInterpreter<'conn, 'tx>
-where
-    'tx: 'conn,
-{
+impl<'a> QueryInterpreter<'a> {
     fn log_enabled() -> bool {
         tracing::level_filters::STATIC_MAX_LEVEL == tracing::level_filters::LevelFilter::TRACE
     }
 
-    pub fn new(conn: ConnectionLike<'conn, 'tx>) -> QueryInterpreter<'conn, 'tx> {
+    pub fn new(conn: &'a mut dyn ConnectionLike) -> QueryInterpreter {
         let log = SegQueue::new();
 
         if Self::log_enabled() {
@@ -154,11 +151,11 @@ where
 
     #[tracing::instrument(skip(self, exp, env, level))]
     pub fn interpret(
-        &'conn mut self,
+        &mut self,
         exp: Expression,
         env: Env,
         level: usize,
-    ) -> BoxFuture<'conn, InterpretationResult<ExpressionResult>> {
+    ) -> BoxFuture<'_, InterpretationResult<ExpressionResult>> {
         match exp {
             Expression::Func { func } => {
                 let expr = func(env.clone());
@@ -213,16 +210,14 @@ where
                 match *query {
                     Query::Read(read) => {
                         self.log_line(level, || format!("READ {}", read));
-                        Ok(read::execute(&mut self.conn, read, None)
+                        Ok(read::execute(self.conn, read, None)
                             .await
                             .map(ExpressionResult::Query)?)
                     }
 
                     Query::Write(write) => {
                         self.log_line(level, || format!("WRITE {}", write));
-                        Ok(write::execute(&mut self.conn, write)
-                            .await
-                            .map(ExpressionResult::Query)?)
+                        Ok(write::execute(self.conn, write).await.map(ExpressionResult::Query)?)
                     }
                 }
             }),

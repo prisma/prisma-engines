@@ -1,18 +1,17 @@
 use super::{inmemory_record_processor::InMemoryRecordProcessor, read};
 use crate::{interpreter::InterpretationResult, query_ast::*};
 use connector::{
-    self, filter::Filter, ConnectionLike, QueryArguments, ReadOperations, RelAggregationRow, RelAggregationSelection,
-    ScalarCompare,
+    self, filter::Filter, ConnectionLike, QueryArguments, RelAggregationRow, RelAggregationSelection, ScalarCompare,
 };
 use prisma_models::{ManyRecords, ModelProjection, Record, RecordProjection, RelationFieldRef};
 use prisma_value::PrismaValue;
 use std::collections::HashMap;
 
 #[tracing::instrument(skip(tx, query, parent_result, processor))]
-pub async fn m2m<'a, 'b>(
-    tx: &'a mut ConnectionLike<'a, 'b>,
+pub async fn m2m(
+    tx: &mut dyn ConnectionLike,
     query: &RelatedRecordsQuery,
-    parent_result: Option<&'a ManyRecords>,
+    parent_result: Option<&ManyRecords>,
     processor: InMemoryRecordProcessor,
 ) -> InterpretationResult<(ManyRecords, Option<Vec<RelAggregationRow>>)> {
     let parent_field = &query.parent_field;
@@ -139,11 +138,11 @@ pub async fn m2m<'a, 'b>(
     selected_fields,
     processor
 ))]
-pub async fn one2m<'a, 'b>(
-    tx: &'a mut ConnectionLike<'a, 'b>,
+pub async fn one2m<'a>(
+    tx: &mut dyn ConnectionLike,
     parent_field: &RelationFieldRef,
     parent_projections: Option<Vec<RecordProjection>>,
-    parent_result: Option<&'a ManyRecords>,
+    parent_result: Option<&ManyRecords>,
     query_args: QueryArguments,
     selected_fields: &ModelProjection,
     aggr_selections: Vec<RelAggregationSelection>,
