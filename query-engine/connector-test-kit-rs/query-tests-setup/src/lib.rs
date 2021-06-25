@@ -10,7 +10,6 @@ mod templating;
 
 pub use config::*;
 pub use connector_tag::*;
-use datamodel_connector::ConnectorCapability;
 pub use datamodel_rendering::*;
 pub use error::*;
 pub use logging::*;
@@ -20,6 +19,7 @@ pub use schema_gen::*;
 pub use templating::*;
 
 use colored::Colorize;
+use datamodel_connector::ConnectorCapability;
 use lazy_static::lazy_static;
 use std::future::Future;
 use tokio::runtime::Builder;
@@ -46,6 +46,8 @@ pub fn run_with_tokio<O, F: std::future::Future<Output = O>>(fut: F) -> O {
         .block_on(fut)
 }
 
+/// Taken from Reddit. Enables taking an async function pointer which takes references as param
+/// https://www.reddit.com/r/rust/comments/jvqorj/hrtb_with_async_functions/
 pub trait AsyncFn<'a, A: 'a, B: 'a, T> {
     type Fut: Future<Output = T> + 'a;
 
