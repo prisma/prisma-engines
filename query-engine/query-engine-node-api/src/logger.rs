@@ -63,7 +63,7 @@ impl ChannelLogger {
         global::set_text_map_propagator(TraceContextPropagator::new());
 
         // A special parameter for Jaeger to set the service name in spans.
-        let resource = Resource::new(vec![KeyValue::new("service.name", "query-engine-napi")]);
+        let resource = Resource::new(vec![KeyValue::new("service.name", "query-engine-node-api")]);
         let config = Config::default().with_resource(resource);
 
         let mut builder = opentelemetry_otlp::new_pipeline().with_trace_config(config);
