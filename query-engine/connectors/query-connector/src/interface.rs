@@ -34,24 +34,9 @@ pub trait Transaction: ConnectionLike {
     fn as_connection_like(&mut self) -> &mut dyn ConnectionLike;
 }
 
-// pub enum ConnectionLike<'conn, 'tx>
-// where
-//     'tx: 'conn,
-// {
-//     Connection(&'conn mut (dyn Connection + 'conn)),
-//     Transaction(&'conn mut (dyn Transaction + 'tx)),
-// }
-
-// pub enum ConnectionLike<'a> {
-//     Connection(Box<dyn Connection>),
-//     Transaction(Box<dyn Transaction + 'a>),
-// }
-
+/// Marker trait required by the query core executor to abstract connections and
+/// transactions into something that can is capable of writing to or reading from the database.
 pub trait ConnectionLike: ReadOperations + WriteOperations + Send + Sync {}
-
-// impl ConnectionLike for dyn Connection {}
-
-// impl ConnectionLike for dyn Transaction {}
 
 /// A wrapper struct allowing to either filter for records or for the core to
 /// communicate already known record selectors to connectors.
