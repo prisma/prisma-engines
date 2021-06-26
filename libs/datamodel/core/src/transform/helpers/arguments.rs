@@ -78,7 +78,7 @@ impl<'a> Arguments<'a> {
         match (self.args.remove(name), self.args.remove("")) {
             (Some(arg), None) => Ok(ValueValidator::new(&arg.value)),
             (None, Some(arg)) => Ok(ValueValidator::new(&arg.value)),
-            (Some(arg), Some(_)) => Err(DatamodelError::new_duplicate_default_argument_error(&name, arg.span)),
+            (Some(arg), Some(_)) => Err(DatamodelError::new_duplicate_default_argument_error(name, arg.span)),
             (None, None) => Err(DatamodelError::new_argument_not_found_error(name, self.span)),
         }
     }

@@ -9,7 +9,7 @@ fn views_can_be_described(api: TestApi) {
         CREATE VIEW ab AS SELECT a_id FROM a UNION ALL SELECT b_id FROM b;
     "#;
 
-    api.raw_cmd(&full_sql);
+    api.raw_cmd(full_sql);
     let result = api.describe();
     let view = result.get_view("ab").expect("couldn't get ab view").to_owned();
 

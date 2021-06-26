@@ -91,7 +91,7 @@ fn to_aggregation_rows(
                     let field_val = id_key_doc.as_document_mut().unwrap().remove(f.db_name()).unwrap();
                     let meta = selection_meta.get(f.db_name()).unwrap();
 
-                    row.push(AggregationResult::Field(f.clone(), value_from_bson(field_val, &meta)?));
+                    row.push(AggregationResult::Field(f.clone(), value_from_bson(field_val, meta)?));
                 }
                 AggregationSelection::Count { all, fields } => {
                     if *all {
@@ -113,7 +113,7 @@ fn to_aggregation_rows(
                     for field in fields {
                         let meta = selection_meta.get(field.db_name()).unwrap();
                         let bson = doc.remove(&format!("avg_{}", field.db_name())).unwrap();
-                        let field_val = value_from_bson(bson, &meta)?;
+                        let field_val = value_from_bson(bson, meta)?;
 
                         row.push(AggregationResult::Average(field.clone(), field_val));
                     }
@@ -122,7 +122,7 @@ fn to_aggregation_rows(
                     for field in fields {
                         let meta = selection_meta.get(field.db_name()).unwrap();
                         let bson = doc.remove(&format!("sum_{}", field.db_name())).unwrap();
-                        let field_val = value_from_bson(bson, &meta)?;
+                        let field_val = value_from_bson(bson, meta)?;
 
                         row.push(AggregationResult::Sum(field.clone(), field_val));
                     }
@@ -131,7 +131,7 @@ fn to_aggregation_rows(
                     for field in fields {
                         let meta = selection_meta.get(field.db_name()).unwrap();
                         let bson = doc.remove(&format!("min_{}", field.db_name())).unwrap();
-                        let field_val = value_from_bson(bson, &meta)?;
+                        let field_val = value_from_bson(bson, meta)?;
 
                         row.push(AggregationResult::Min(field.clone(), field_val));
                     }
@@ -140,7 +140,7 @@ fn to_aggregation_rows(
                     for field in fields {
                         let meta = selection_meta.get(field.db_name()).unwrap();
                         let bson = doc.remove(&format!("max_{}", field.db_name())).unwrap();
-                        let field_val = value_from_bson(bson, &meta)?;
+                        let field_val = value_from_bson(bson, meta)?;
 
                         row.push(AggregationResult::Max(field.clone(), field_val));
                     }

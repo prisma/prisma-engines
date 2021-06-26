@@ -6,6 +6,7 @@ use query_core::CoreError;
 use thiserror::Error;
 
 #[derive(Debug, Error)]
+#[allow(clippy::enum_variant_names)]
 pub enum PrismaError {
     #[error("{}", _0)]
     SerializationError(String),

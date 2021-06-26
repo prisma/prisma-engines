@@ -25,7 +25,7 @@ impl SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
     }
 
     async fn get_metadata(&self, schema: &str) -> DescriberResult<SqlMetadata> {
-        let table_count = self.get_table_names(&schema).await?.len();
+        let table_count = self.get_table_names(schema).await?.len();
         let size_in_bytes = self.get_size().await?;
 
         Ok(SqlMetadata {
@@ -40,7 +40,7 @@ impl SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
 
         let mut tables = Vec::with_capacity(table_names.len());
 
-        for table_name in table_names.iter().filter(|table| !is_system_table(&table)) {
+        for table_name in table_names.iter().filter(|table| !is_system_table(table)) {
             tables.push(self.get_table(schema, table_name).await?)
         }
 
@@ -116,7 +116,7 @@ impl<'a> SqlSchemaDescriber<'a> {
         let sql = r#"SELECT name FROM sqlite_master WHERE type='table' ORDER BY name ASC"#;
         trace!("describing table names with query: '{}'", sql);
 
-        let result_set = self.conn.query_raw(&sql, &[]).await?;
+        let result_set = self.conn.query_raw(sql, &[]).await?;
 
         let names = result_set
             .into_iter()
@@ -132,7 +132,7 @@ impl<'a> SqlSchemaDescriber<'a> {
     #[tracing::instrument]
     async fn get_size(&self) -> DescriberResult<usize> {
         let sql = r#"SELECT page_count * page_size as size FROM pragma_page_count(), pragma_page_size();"#;
-        let result = self.conn.query_raw(&sql, &[]).await?;
+        let result = self.conn.query_raw(sql, &[]).await?;
         let size: i64 = result
             .first()
             .map(|row| row.get("size").and_then(|x| x.as_i64()).unwrap_or(0))

@@ -33,7 +33,7 @@ pub async fn create_record<'conn>(
         .fields()
         .scalar()
         .into_iter()
-        .filter(|field| args.has_arg_for(&field.db_name()))
+        .filter(|field| args.has_arg_for(field.db_name()))
         .collect();
 
     let mut doc = Document::new();

@@ -7,7 +7,7 @@ impl GeneratorSerializer {
         let mut tops: Vec<ast::Top> = Vec::new();
 
         for generator in generators {
-            tops.push(ast::Top::Generator(Self::lower_generator(&generator)))
+            tops.push(ast::Top::Generator(Self::lower_generator(generator)))
         }
 
         // Do this dance so that generators come before other top elements
@@ -20,7 +20,7 @@ impl GeneratorSerializer {
         let mut arguments: Vec<ast::Argument> = vec![super::lower_string_from_env_var("provider", &generator.provider)];
 
         if let Some(output) = &generator.output {
-            arguments.push(super::lower_string_from_env_var("output", &output));
+            arguments.push(super::lower_string_from_env_var("output", output));
         }
 
         if !&generator.preview_features.is_empty() {
@@ -43,7 +43,7 @@ impl GeneratorSerializer {
         }
 
         for (key, value) in &generator.config {
-            arguments.push(ast::Argument::new_string(&key, &value));
+            arguments.push(ast::Argument::new_string(key, value));
         }
 
         ast::GeneratorConfig {

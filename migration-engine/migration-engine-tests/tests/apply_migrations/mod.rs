@@ -125,14 +125,19 @@ fn migrations_should_fail_when_the_script_is_invalid(api: TestApi) {
                 t if t.contains(Tags::Mariadb) => "You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near \'^.^)_n\' at line 1",
                 t if t.contains(Tags::Mysql) => "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near \'^.^)_n\' at line 1",
                 t if t.contains(Tags::Mssql) => "Incorrect syntax near \'^\'.",
-                t if t.contains(Tags::Postgres) => "db error: ERROR: syntax error at or near \"^\"",
+                t if t.contains(Tags::Postgres) => "ERROR: syntax error at or near \"^\"",
                 t if t.contains(Tags::Sqlite) => "unrecognized token: \"^\"",
                 _ => todo!(),
             },
         );
 
         assert_eq!(error.error_code, ApplyMigrationError::ERROR_CODE);
-        assert_eq!(error.message, expected_error_message);
+        assert!(
+            error.message.starts_with(&expected_error_message),
+            "Actual:\n{}\n\nExpected:\n{}",
+            error.message,
+            expected_error_message
+        );
     }
 
     let mut migrations = api

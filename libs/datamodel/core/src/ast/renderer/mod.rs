@@ -150,7 +150,7 @@ impl<'a> Renderer<'a> {
 
         target.write("type ");
         target.write(&field.name.name);
-        target.write(&" = ");
+        target.write(" = ");
         Self::render_field_type(target, &field.field_type);
 
         // Attributes
@@ -186,7 +186,7 @@ impl<'a> Renderer<'a> {
         let mut field_formatter = TableFormat::new();
 
         for field in &model.fields {
-            Self::render_field(&mut field_formatter, &field, model.commented_out);
+            Self::render_field(&mut field_formatter, field, model.commented_out);
         }
 
         field_formatter.render(self);
@@ -237,8 +237,8 @@ impl<'a> Renderer<'a> {
                 let mut attributes_builder = StringBuilder::new();
 
                 for attribute in &value.attributes {
-                    attributes_builder.write(&" ");
-                    Self::render_field_attribute(&mut attributes_builder, &attribute);
+                    attributes_builder.write(" ");
+                    Self::render_field_attribute(&mut attributes_builder, attribute);
                 }
 
                 self.write(&attributes_builder.to_string());
@@ -292,7 +292,7 @@ impl<'a> Renderer<'a> {
 
             let attributes = Self::sort_attributes(field.attributes.clone(), true);
             for attribute in attributes {
-                attributes_builder.write(&" ");
+                attributes_builder.write(" ");
                 Self::render_field_attribute(&mut attributes_builder, &attribute);
             }
 
@@ -328,7 +328,7 @@ impl<'a> Renderer<'a> {
             }
             ast::FieldType::Unsupported(lit, _) => {
                 target.write("Unsupported(\"");
-                target.write(&lit);
+                target.write(lit);
                 target.write("\")");
             }
         }
@@ -350,7 +350,7 @@ impl<'a> Renderer<'a> {
     fn render_arguments(target: &mut dyn LineWriteable, args: &[ast::Argument]) {
         for (idx, arg) in args.iter().enumerate() {
             if idx > 0 {
-                target.write(&", ");
+                target.write(", ");
             }
             Self::render_argument(target, arg);
         }
@@ -359,7 +359,7 @@ impl<'a> Renderer<'a> {
     fn render_argument(target: &mut dyn LineWriteable, args: &ast::Argument) {
         if !args.name.name.is_empty() {
             target.write(&args.name.name);
-            target.write(&": ");
+            target.write(": ");
         }
 
         Self::render_value(target, &args.value);
@@ -373,12 +373,12 @@ impl<'a> Renderer<'a> {
 
     fn render_value(target: &mut dyn LineWriteable, val: &ast::Expression) {
         match val {
-            ast::Expression::Array(vals, _) => Self::render_array(target, &vals),
-            ast::Expression::BooleanValue(val, _) => target.write(&val),
-            ast::Expression::ConstantValue(val, _) => target.write(&val),
-            ast::Expression::NumericValue(val, _) => target.write(&val),
-            ast::Expression::StringValue(val, _) => Self::render_str(target, &val),
-            ast::Expression::Function(name, args, _) => Self::render_func(target, &name, &args),
+            ast::Expression::Array(vals, _) => Self::render_array(target, vals),
+            ast::Expression::BooleanValue(val, _) => target.write(val),
+            ast::Expression::ConstantValue(val, _) => target.write(val),
+            ast::Expression::NumericValue(val, _) => target.write(val),
+            ast::Expression::StringValue(val, _) => Self::render_str(target, val),
+            ast::Expression::Function(name, args, _) => Self::render_func(target, name, args),
         };
     }
 
@@ -407,14 +407,14 @@ impl<'a> Renderer<'a> {
     }
 
     fn render_array(target: &mut dyn LineWriteable, vals: &[ast::Expression]) {
-        target.write(&"[");
+        target.write("[");
         for (idx, arg) in vals.iter().enumerate() {
             if idx > 0 {
-                target.write(&", ");
+                target.write(", ");
             }
             Self::render_value(target, arg);
         }
-        target.write(&"]");
+        target.write("]");
     }
 
     fn render_str(target: &mut dyn LineWriteable, param: &str) {

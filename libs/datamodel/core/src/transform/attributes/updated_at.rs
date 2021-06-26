@@ -7,7 +7,7 @@ pub struct UpdatedAtAttributeValidator {}
 
 impl AttributeValidator<dml::Field> for UpdatedAtAttributeValidator {
     fn attribute_name(&self) -> &'static str {
-        &"updatedAt"
+        "updatedAt"
     }
 
     fn validate_and_apply(&self, args: &mut Arguments<'_>, obj: &mut dml::Field) -> Result<(), DatamodelError> {

@@ -74,7 +74,7 @@ pub(crate) async fn diagnose_migration_history(
     error_on_changed_provider(&input.migrations_directory_path, connector.connector_type())?;
 
     // Load the migrations.
-    let migrations_from_filesystem = list_migrations(&Path::new(&input.migrations_directory_path))?;
+    let migrations_from_filesystem = list_migrations(Path::new(&input.migrations_directory_path))?;
 
     let (migrations_from_database, has_migrations_table) = match migration_persistence.list_migrations().await? {
         Ok(migrations) => (migrations, true),

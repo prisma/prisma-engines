@@ -7,7 +7,7 @@ pub struct IdAttributeValidator {}
 
 impl AttributeValidator<dml::Field> for IdAttributeValidator {
     fn attribute_name(&self) -> &'static str {
-        &"id"
+        "id"
     }
 
     fn validate_and_apply(&self, args: &mut Arguments<'_>, obj: &mut dml::Field) -> Result<(), DatamodelError> {
@@ -58,7 +58,7 @@ impl AttributeValidator<dml::Model> for ModelLevelIdAttributeValidator {
             .id_fields
             .iter()
             .filter_map(|field| {
-                if obj.find_field(&field).is_none() {
+                if obj.find_field(field).is_none() {
                     Some(field.to_string())
                 } else {
                     None
@@ -69,7 +69,7 @@ impl AttributeValidator<dml::Model> for ModelLevelIdAttributeValidator {
         let referenced_relation_fields: Vec<String> = obj
             .id_fields
             .iter()
-            .filter(|field| match obj.find_field(&field) {
+            .filter(|field| match obj.find_field(field) {
                 Some(field) => field.is_relation(),
                 None => false,
             })
@@ -102,7 +102,7 @@ impl AttributeValidator<dml::Model> for ModelLevelIdAttributeValidator {
         let fields_that_are_not_required: Vec<_> = obj
             .id_fields
             .iter()
-            .filter(|field| !obj.find_field(&field).unwrap().arity().is_required())
+            .filter(|field| !obj.find_field(field).unwrap().arity().is_required())
             .map(|field| field.to_string())
             .collect();
 

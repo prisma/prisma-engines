@@ -128,7 +128,6 @@ pub async fn m2m(
 }
 
 // [DTODO] This is implemented in an inefficient fashion, e.g. too much Arc cloning going on.
-#[allow(clippy::too_many_arguments)]
 #[tracing::instrument(skip(
     tx,
     parent_field,
@@ -138,7 +137,8 @@ pub async fn m2m(
     selected_fields,
     processor
 ))]
-pub async fn one2m<'a>(
+#[allow(clippy::too_many_arguments)]
+pub async fn one2m(
     tx: &mut dyn ConnectionLike,
     parent_field: &RelationFieldRef,
     parent_projections: Option<Vec<RecordProjection>>,

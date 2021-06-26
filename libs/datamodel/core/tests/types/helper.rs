@@ -41,7 +41,7 @@ pub fn test_native_types_with_field_attribute_support(
         attribute_name = attribute_name
     );
 
-    test_native_types_compatibility(&dml, &error_msg, datasource);
+    test_native_types_compatibility(&dml, error_msg, datasource);
 }
 
 pub fn test_native_types_without_attributes(native_type: &str, scalar_type: &str, error_msg: &str, datasource: &str) {
@@ -56,5 +56,5 @@ pub fn test_native_types_without_attributes(native_type: &str, scalar_type: &str
         scalar_type = scalar_type,
     );
 
-    test_native_types_compatibility(&dml, &error_msg, datasource);
+    test_native_types_compatibility(&dml, error_msg, datasource);
 }

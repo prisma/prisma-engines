@@ -14,7 +14,7 @@ pub(crate) struct TableDiffer<'a, 'b> {
 impl<'schema, 'b> TableDiffer<'schema, 'b> {
     pub(crate) fn column_pairs<'a>(&'a self) -> impl Iterator<Item = ColumnDiffer<'schema>> + 'a {
         self.db
-            .column_pairs(self.tables.map(|t| t.table_index()))
+            .column_pairs(self.tables.map(|t| t.table_id()))
             .map(move |colidxs| ColumnDiffer {
                 flavour: self.flavour,
                 previous: self.tables.previous().column_at(*colidxs.previous()),
@@ -24,13 +24,13 @@ impl<'schema, 'b> TableDiffer<'schema, 'b> {
 
     pub(crate) fn dropped_columns<'a>(&'a self) -> impl Iterator<Item = ColumnWalker<'schema>> + 'a {
         self.db
-            .dropped_columns(self.tables.map(|t| t.table_index()))
+            .dropped_columns(self.tables.map(|t| t.table_id()))
             .map(move |idx| self.tables.previous().column_at(idx))
     }
 
     pub(crate) fn added_columns<'a>(&'a self) -> impl Iterator<Item = ColumnWalker<'schema>> + 'a {
         self.db
-            .created_columns(self.tables.map(|t| t.table_index()))
+            .created_columns(self.tables.map(|t| t.table_id()))
             .map(move |idx| self.tables.next().column_at(idx))
     }
 

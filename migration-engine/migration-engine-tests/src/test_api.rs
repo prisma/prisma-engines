@@ -11,6 +11,7 @@ mod schema_push;
 
 pub use apply_migrations::ApplyMigrations;
 pub use create_migration::CreateMigration;
+use datamodel::common::preview_features::PreviewFeature;
 pub use dev_diagnostic::DevDiagnostic;
 pub use diagnose_migration_history::DiagnoseMigrationHistory;
 pub use evaluate_data_loss::EvaluateDataLoss;
@@ -23,10 +24,7 @@ pub use schema_push::SchemaPush;
 use crate::assertions::SchemaAssertion;
 use migration_connector::{ConnectorError, MigrationRecord};
 use migration_core::GenericApi;
-use quaint::{
-    prelude::{ConnectionInfo, Queryable, SqlFamily},
-    single::Quaint,
-};
+use quaint::prelude::{ConnectionInfo, Queryable, SqlFamily};
 use sql_migration_connector::SqlMigrationConnector;
 use std::{borrow::Cow, fmt::Write as _};
 use tempfile::TempDir;
@@ -44,13 +42,21 @@ impl TestApi {
     pub async fn new(args: TestApiArgs) -> Self {
         let tags = args.tags();
 
+        let shadow_database_url = args.shadow_database_url().map(String::from);
+
+        let preview_features = args
+            .preview_features()
+            .iter()
+            .flat_map(|f| PreviewFeature::parse_opt(f))
+            .collect();
+
         let connection_string = if tags.contains(Tags::Mysql | Tags::Vitess) {
             let connector =
-                SqlMigrationConnector::new(args.database_url(), args.shadow_database_url().map(String::from))
+                SqlMigrationConnector::new(args.database_url(), preview_features, shadow_database_url.clone())
                     .await
                     .unwrap();
-            connector.reset().await.unwrap();
 
+            connector.reset().await.unwrap();
             args.database_url().to_owned()
         } else if tags.contains(Tags::Mysql) {
             args.create_mysql_database().await.1
@@ -67,7 +73,7 @@ impl TestApi {
             unreachable!()
         };
 
-        let api = SqlMigrationConnector::new(&connection_string, args.shadow_database_url().map(String::from))
+        let api = SqlMigrationConnector::new(&connection_string, preview_features, shadow_database_url)
             .await
             .unwrap();
 
@@ -79,7 +85,7 @@ impl TestApi {
 
         if tags.contains(Tags::Mysql) {
             let val = api
-                .quaint()
+                .queryable()
                 .query_raw("SELECT @@lower_case_table_names", &[])
                 .await
                 .ok()
@@ -100,11 +106,11 @@ impl TestApi {
     }
 
     pub fn schema_name(&self) -> &str {
-        self.connection_info().schema_name()
+        self.api.schema_name()
     }
 
-    pub fn database(&self) -> &Quaint {
-        &self.api.quaint()
+    pub fn database(&self) -> &dyn Queryable {
+        self.api.queryable()
     }
 
     pub fn is_sqlite(&self) -> bool {
@@ -139,8 +145,8 @@ impl TestApi {
         self.tags().contains(Tags::Postgres)
     }
 
-    pub fn connection_info(&self) -> &ConnectionInfo {
-        &self.database().connection_info()
+    pub fn connection_info(&self) -> ConnectionInfo {
+        self.api.connection_info()
     }
 
     pub fn sql_family(&self) -> SqlFamily {
@@ -160,7 +166,7 @@ impl TestApi {
         if self.is_sqlite() {
             table_name.into()
         } else {
-            (self.connection_info().schema_name(), table_name).into()
+            (self.api.schema_name(), table_name).into()
         }
     }
 

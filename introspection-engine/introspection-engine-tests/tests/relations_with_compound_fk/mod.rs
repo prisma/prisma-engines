@@ -40,7 +40,7 @@ async fn compound_foreign_keys_for_one_to_one_relations(api: &TestApi) -> TestRe
             user_age Int?
             User     User? @relation(fields: [user_id, user_age], references: [id, age])
 
-            @@unique([user_id, user_age], name: "{}")
+            @@unique([user_id, user_age], name: "{constraint_name}")
         }}
 
         model User {{
@@ -51,7 +51,7 @@ async fn compound_foreign_keys_for_one_to_one_relations(api: &TestApi) -> TestRe
             @@unique([id, age], name: "user_unique")
         }}
     "#,
-        constraint_name
+        constraint_name = constraint_name,
     );
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);
@@ -96,7 +96,7 @@ async fn compound_foreign_keys_for_required_one_to_one_relations(api: &TestApi) 
             user_age Int
             User     User @relation(fields: [user_id, user_age], references: [id, age])
 
-            @@unique([user_id, user_age], name: "{}")
+            @@unique([user_id, user_age], name: "{constraint_name}")
         }}
 
         model User {{
@@ -107,7 +107,7 @@ async fn compound_foreign_keys_for_required_one_to_one_relations(api: &TestApi) 
             @@unique([id, age], name: "user_unique")
         }}
     "#,
-        constraint_name
+        constraint_name = constraint_name,
     );
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);
@@ -149,7 +149,7 @@ async fn compound_foreign_keys_for_one_to_many_relations(api: &TestApi) -> TestR
             user_id  Int?
             user_age Int?
             User     User? @relation(fields: [user_id, user_age], references: [id, age])
-            {}
+            {extra_index}
         }}
 
         model User {{
@@ -160,7 +160,7 @@ async fn compound_foreign_keys_for_one_to_many_relations(api: &TestApi) -> TestR
             @@unique([id, age], name: "user_unique")
         }}
     "#,
-        extra_index
+        extra_index = extra_index,
     );
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);
@@ -202,7 +202,7 @@ async fn compound_foreign_keys_for_one_to_many_relations_with_mixed_requiredness
             user_id  Int
             user_age Int?
             User     User? @relation(fields: [user_id, user_age], references: [id, age])
-            {}
+            {extra_index}
         }}
 
         model User {{
@@ -213,7 +213,7 @@ async fn compound_foreign_keys_for_one_to_many_relations_with_mixed_requiredness
             @@unique([id, age], name: "user_unique")
         }}
     "#,
-        extra_index
+        extra_index = extra_index,
     );
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);
@@ -255,7 +255,7 @@ async fn compound_foreign_keys_for_required_one_to_many_relations(api: &TestApi)
             user_id  Int
             user_age Int
             User     User @relation(fields: [user_id, user_age], references: [id, age])
-            {}
+            {extra_index}
         }}
 
         model User {{
@@ -266,7 +266,7 @@ async fn compound_foreign_keys_for_required_one_to_many_relations(api: &TestApi)
             @@unique([id, age], name: "user_unique")
         }}
     "#,
-        extra_index
+        extra_index = extra_index
     );
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);
@@ -312,11 +312,12 @@ async fn compound_foreign_keys_for_required_self_relations(api: &TestApi) -> Tes
             Person       Person   @relation("PersonToPerson_partner_id_partner_age", fields: [partner_id, partner_age], references: [id, age])
             other_Person Person[] @relation("PersonToPerson_partner_id_partner_age")
 
-            @@unique([id, age], name: "{}")
-            {}
+            @@unique([id, age], name: "{constraint_name}")
+            {extra_index}
         }}
     "#,
-        constraint_name, extra_index,
+        constraint_name = constraint_name,
+        extra_index = extra_index,
     );
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);
@@ -362,11 +363,12 @@ async fn compound_foreign_keys_for_self_relations(api: &TestApi) -> TestResult {
             Person       Person?  @relation("PersonToPerson_partner_id_partner_age", fields: [partner_id, partner_age], references: [id, age])
             other_Person Person[] @relation("PersonToPerson_partner_id_partner_age")
 
-            @@unique([id, age], name: "{}")
-            {}
+            @@unique([id, age], name: "{constraint_name}")
+            {extra_index}
         }}
     "#,
-        constraint_name, extra_index
+        constraint_name = constraint_name,
+        extra_index = extra_index
     );
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);
@@ -412,11 +414,12 @@ async fn compound_foreign_keys_with_defaults(api: &TestApi) -> TestResult {
             Person       Person   @relation("PersonToPerson_partner_id_partner_age", fields: [partner_id, partner_age], references: [id, age])
             other_Person Person[] @relation("PersonToPerson_partner_id_partner_age")
 
-            @@unique([id, age], name: "{}")
-            {}
+            @@unique([id, age], name: "{constraint_name}")
+            {extra_index}
         }}
     "#,
-        constraint_name, extra_index
+        constraint_name = constraint_name,
+        extra_index = extra_index
     );
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);
@@ -464,7 +467,7 @@ async fn compound_foreign_keys_for_one_to_many_relations_with_non_unique_index(a
             user_id  Int
             user_age Int
             User     User @relation(fields: [user_id, user_age], references: [id, age])
-            {}
+            {extra_index}
         }}
 
         model User {{
@@ -472,10 +475,11 @@ async fn compound_foreign_keys_for_one_to_many_relations_with_non_unique_index(a
             age  Int
             Post Post[]
 
-            @@unique([id, age], name: "{}")
+            @@unique([id, age], name: "{constraint_name}")
         }}
     "#,
-        extra_index, constraint_name
+        extra_index = extra_index,
+        constraint_name = constraint_name
     );
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);
@@ -524,10 +528,10 @@ async fn repro_matt_references_on_wrong_side(api: &TestApi) -> TestResult {
             two Int
 
             a   a   @relation(fields: [one, two], references: [one, two])
-            {}
+            {extra_index}
         }}
     "#,
-        extra_index
+        extra_index = extra_index,
     );
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);
@@ -579,10 +583,10 @@ async fn a_compound_fk_pk_with_overlapping_primary_key(api: &TestApi) -> TestRes
             a     a   @relation(fields: [one, two], references: [one, two])
 
             @@id([dummy, one, two])
-            {}
+            {extra_index}
         }}
     "#,
-        extra_index
+        extra_index = extra_index,
     );
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);
@@ -639,7 +643,7 @@ async fn compound_foreign_keys_for_duplicate_one_to_many_relations(api: &TestApi
             other_user_age                                   Int?
             User_Post_other_user_id_other_user_ageToUser     User? @relation("Post_other_user_id_other_user_ageToUser", fields: [other_user_id, other_user_age], references: [id, age])
             User_Post_user_id_user_ageToUser                 User? @relation("Post_user_id_user_ageToUser", fields: [user_id, user_age], references: [id, age])
-            {}
+            {extra_index}
         }}
 
         model User {{
@@ -648,10 +652,11 @@ async fn compound_foreign_keys_for_duplicate_one_to_many_relations(api: &TestApi
             Post_Post_other_user_id_other_user_ageToUser    Post[] @relation("Post_other_user_id_other_user_ageToUser")
             Post_Post_user_id_user_ageToUser                Post[] @relation("Post_user_id_user_ageToUser")
 
-            @@unique([id, age], name: "{}")
+            @@unique([id, age], name: "{constraint_name}")
         }}
     "#,
-        extra_index, constraint_name
+        extra_index = extra_index,
+        constraint_name = constraint_name
     );
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);

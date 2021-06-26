@@ -113,21 +113,6 @@ impl Fields {
         self.relation_weak().iter().map(|f| f.upgrade().unwrap()).collect()
     }
 
-    pub fn cascading_relation(&self) -> Vec<Arc<RelationField>> {
-        self.relation_weak()
-            .iter()
-            .map(|f| f.upgrade().unwrap())
-            .fold(Vec::new(), |mut acc, rf| {
-                match rf.relation_side {
-                    RelationSide::A if rf.relation().model_a_on_delete.is_cascade() => acc.push(rf),
-                    RelationSide::B if rf.relation().model_b_on_delete.is_cascade() => acc.push(rf),
-                    _ => (),
-                }
-
-                acc
-            })
-    }
-
     fn relation_weak(&self) -> &[Weak<RelationField>] {
         self.relation
             .get_or_init(|| self.all.iter().fold(Vec::new(), Self::relation_filter))

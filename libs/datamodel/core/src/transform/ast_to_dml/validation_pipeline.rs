@@ -1,25 +1,35 @@
+use std::collections::HashSet;
+
 use super::db::ParserDatabase;
 use super::*;
-use crate::transform::ast_to_dml::standardise_parsing::StandardiserForParsing;
-use crate::{ast, configuration, diagnostics::Diagnostics, ValidatedDatamodel};
+use crate::{
+    ast, common::preview_features::PreviewFeature, configuration, diagnostics::Diagnostics,
+    transform::ast_to_dml::standardise_parsing::StandardiserForParsing, ValidatedDatamodel,
+};
 
 /// Is responsible for loading and validating the Datamodel defined in an AST.
 /// Wrapper for all lift and validation steps
 pub struct ValidationPipeline<'a> {
     source: Option<&'a configuration::Datasource>,
+    preview_features: &'a HashSet<PreviewFeature>,
     validator: Validator<'a>,
-    standardiser_for_parsing: StandardiserForParsing,
     standardiser_for_formatting: StandardiserForFormatting,
+    standardiser_for_parsing: StandardiserForParsing<'a>,
 }
 
 impl<'a, 'b> ValidationPipeline<'a> {
-    pub fn new(sources: &'a [configuration::Datasource]) -> ValidationPipeline<'a> {
+    pub fn new(
+        sources: &'a [configuration::Datasource],
+        preview_features: &'a HashSet<PreviewFeature>,
+    ) -> ValidationPipeline<'a> {
         let source = sources.first();
+
         ValidationPipeline {
             source,
-            validator: Validator::new(source),
+            preview_features,
+            validator: Validator::new(source, preview_features),
             standardiser_for_formatting: StandardiserForFormatting::new(),
-            standardiser_for_parsing: StandardiserForParsing::new(),
+            standardiser_for_parsing: StandardiserForParsing::new(preview_features),
         }
     }
 
@@ -42,24 +52,16 @@ impl<'a, 'b> ValidationPipeline<'a> {
         // Phase 1 is source block loading.
 
         // Phase 2: Name resolution.
-        let db = ParserDatabase::new(ast_schema, &mut diagnostics);
+        let db = ParserDatabase::new(ast_schema, self.source, &mut diagnostics);
 
         // Early return so that the validator does not have to deal with invalid schemas
-        if diagnostics.has_errors() {
-            return Err(diagnostics);
-        }
+        diagnostics.to_result()?;
 
         // Phase 3: Lift AST to DML.
-        let lifter = LiftAstToDml::new(self.source, &db);
+        let mut schema = LiftAstToDml::new(self.preview_features, &db, &mut diagnostics).lift();
 
-        let mut schema = match lifter.lift() {
-            Err(mut err) => {
-                // Cannot continue on lifter error.
-                diagnostics.append(&mut err);
-                return Err(diagnostics);
-            }
-            Ok(schema) => schema,
-        };
+        // Cannot continue on lifter error.
+        diagnostics.to_result()?;
 
         // Phase 4: Validation
         if let Err(mut err) = self.validator.validate(&db, &mut schema) {

@@ -924,7 +924,7 @@ model bill {
 
 fn assert_reformat(schema: &str, expected_result: &str) {
     println!("schema: {:?}", schema);
-    let result = datamodel::ast::reformat::Reformatter::new(&schema).reformat_to_string();
+    let result = datamodel::ast::reformat::Reformatter::new(schema).reformat_to_string();
     println!("result: {}", result);
     assert_eq!(result, expected_result);
 }

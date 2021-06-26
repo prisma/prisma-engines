@@ -8,7 +8,7 @@ impl DatasourceSerializer {
         let mut tops: Vec<ast::Top> = Vec::with_capacity(ast_datamodel.tops.len() + sources.len());
 
         for source in sources {
-            tops.push(ast::Top::Source(Self::lower_datasource(&source)))
+            tops.push(ast::Top::Source(Self::lower_datasource(source)))
         }
 
         // Prepend sources.

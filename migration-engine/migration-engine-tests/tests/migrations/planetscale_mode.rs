@@ -81,12 +81,12 @@ fn create_migration_planetscale_mode_works(api: TestApi) {
         datasource = api.datasource_block_with(&[("planetScaleMode", "true")]),
     );
 
-    api.create_migration("01init", &dm, &&migrations_directory)
+    api.create_migration("01init", &dm, &migrations_directory)
         .send_sync()
         .assert_migration_directories_count(1);
 
     // Check that the migration is idempotent
-    api.create_migration("02second", &dm, &&migrations_directory)
+    api.create_migration("02second", &dm, &migrations_directory)
         .send_sync()
         .assert_migration_directories_count(1);
 

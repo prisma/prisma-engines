@@ -7,17 +7,19 @@ mod mysql;
 mod postgres;
 mod sqlite;
 
+use enumflags2::BitFlags;
 pub(crate) use mssql::MssqlFlavour;
 pub(crate) use mysql::MysqlFlavour;
 pub(crate) use postgres::PostgresFlavour;
 pub(crate) use sqlite::SqliteFlavour;
+use user_facing_errors::migration_engine::ApplyMigrationError;
 
 use crate::{
     connection_wrapper::Connection, sql_destructive_change_checker::DestructiveChangeCheckerFlavour,
     sql_renderer::SqlRenderer, sql_schema_calculator::SqlSchemaCalculatorFlavour,
     sql_schema_differ::SqlSchemaDifferFlavour, SqlMigrationConnector,
 };
-use datamodel::Datamodel;
+use datamodel::{common::preview_features::PreviewFeature, Datamodel};
 use migration_connector::{migrations_directory::MigrationDirectory, ConnectorError, ConnectorResult};
 use quaint::prelude::{ConnectionInfo, Table};
 use sql_schema_describer::SqlSchema;
@@ -28,15 +30,19 @@ use std::fmt::Debug;
 /// reference: https://dev.mysql.com/doc/refman/5.7/en/identifier-length.html
 pub(crate) const MYSQL_IDENTIFIER_SIZE_LIMIT: usize = 64;
 
-pub(crate) fn from_connection_info(connection_info: &ConnectionInfo) -> Box<dyn SqlFlavour + Send + Sync + 'static> {
+pub(crate) fn from_connection_info(
+    connection_info: &ConnectionInfo,
+    preview_features: BitFlags<PreviewFeature>,
+) -> Box<dyn SqlFlavour + Send + Sync + 'static> {
     match connection_info {
-        ConnectionInfo::Mysql(url) => Box::new(MysqlFlavour::new(url.clone())),
-        ConnectionInfo::Postgres(url) => Box::new(PostgresFlavour::new(url.clone())),
+        ConnectionInfo::Mysql(url) => Box::new(MysqlFlavour::new(url.clone(), preview_features)),
+        ConnectionInfo::Postgres(url) => Box::new(PostgresFlavour::new(url.clone(), preview_features)),
         ConnectionInfo::Sqlite { file_path, db_name } => Box::new(SqliteFlavour {
             file_path: file_path.clone(),
             attached_name: db_name.clone(),
+            preview_features,
         }),
-        ConnectionInfo::Mssql(url) => Box::new(MssqlFlavour::new(url.clone())),
+        ConnectionInfo::Mssql(url) => Box::new(MssqlFlavour::new(url.clone(), preview_features)),
         ConnectionInfo::InMemorySqlite { .. } => unreachable!("SqlFlavour for in-memory SQLite"),
     }
 }
@@ -46,6 +52,13 @@ pub(crate) trait SqlFlavour:
     DestructiveChangeCheckerFlavour + SqlRenderer + SqlSchemaDifferFlavour + SqlSchemaCalculatorFlavour + Debug
 {
     async fn acquire_lock(&self, connection: &Connection) -> ConnectorResult<()>;
+
+    async fn apply_migration_script(
+        &self,
+        migration_name: &str,
+        script: &str,
+        conn: &Connection,
+    ) -> ConnectorResult<()>;
 
     fn check_database_version_compatibility(
         &self,
@@ -92,6 +105,9 @@ pub(crate) trait SqlFlavour:
         connector: &SqlMigrationConnector,
     ) -> ConnectorResult<SqlSchema>;
 
+    /// The preview features in use.
+    fn preview_features(&self) -> BitFlags<PreviewFeature>;
+
     /// Table to store applied migrations, the name part.
     fn migrations_table_name(&self) -> &'static str {
         "_prisma_migrations"
@@ -110,4 +126,17 @@ fn validate_connection_infos_do_not_match((previous, next): (&ConnectionInfo, &C
     } else {
         Ok(())
     }
+}
+
+async fn generic_apply_migration_script(migration_name: &str, script: &str, conn: &Connection) -> ConnectorResult<()> {
+    conn.raw_cmd(script).await.map_err(|quaint_error| {
+        ConnectorError::user_facing(ApplyMigrationError {
+            migration_name: migration_name.to_owned(),
+            database_error_code: String::from(quaint_error.original_code().unwrap_or("none")),
+            database_error: quaint_error
+                .original_message()
+                .map(String::from)
+                .unwrap_or_else(|| ConnectorError::from(quaint_error).to_string()),
+        })
+    })
 }

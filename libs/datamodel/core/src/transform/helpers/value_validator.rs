@@ -8,6 +8,7 @@ use crate::{
 };
 use bigdecimal::BigDecimal;
 use chrono::{DateTime, FixedOffset};
+use dml::relation_info::ReferentialAction;
 use dml::scalars::ScalarType;
 use prisma_value::PrismaValue;
 use std::error;
@@ -64,7 +65,7 @@ impl ValueValidator {
             ScalarType::String => self.as_str().map(String::from).map(PrismaValue::String),
             ScalarType::Json => self.as_str().map(String::from).map(PrismaValue::String),
             ScalarType::Bytes => self.as_str().and_then(|s| {
-                prisma_value::decode_bytes(&s).map(PrismaValue::Bytes).map_err(|_| {
+                prisma_value::decode_bytes(s).map(PrismaValue::Bytes).map_err(|_| {
                     DatamodelError::new_validation_error(&format!("Invalid base64 string '{}'.", s), self.span())
                 })
             }),
@@ -164,7 +165,27 @@ impl ValueValidator {
         }
     }
 
-    /// Unwraps the wrapped value as an array literal.
+    /// Unwraps the wrapped value as a referential action.
+    pub fn as_referential_action(&self) -> Result<ReferentialAction, DatamodelError> {
+        match self.as_constant_literal()?.as_str() {
+            "Cascade" => Ok(ReferentialAction::Cascade),
+            "Restrict" => Ok(ReferentialAction::Restrict),
+            "NoAction" => Ok(ReferentialAction::NoAction),
+            "SetNull" => Ok(ReferentialAction::SetNull),
+            "SetDefault" => Ok(ReferentialAction::SetDefault),
+            s => {
+                let message = format!("Invalid referential action: `{}`", s);
+
+                Err(DatamodelError::AttributeValidationError {
+                    message,
+                    attribute_name: String::from("relation"),
+                    span: self.span(),
+                })
+            }
+        }
+    }
+
+    /// Unwraps the wrapped value as a constant literal..
     pub fn as_array(&self) -> Vec<ValueValidator> {
         match &self.value {
             ast::Expression::Array(values, _) => {
@@ -193,7 +214,7 @@ impl ValueValidator {
                     [] => vec![],
                     _ => return Err(DatamodelError::new_validation_error(&format!("DefaultValue function parsing failed. The function arg should only be empty or a single String. Got: `{:?}`. You can read about the available functions here: https://pris.ly/d/attribute-functions", args), self.span())),
                 };
-                let generator = self.get_value_generator(&name, prisma_args)?;
+                let generator = self.get_value_generator(name, prisma_args)?;
 
                 generator
                     .check_compatibility_with_scalar_type(scalar_type)
@@ -224,7 +245,7 @@ impl ValueValidator {
                     [] => vec![],
                     _ => panic!("Should only be empty or single String."),
                 };
-                self.get_value_generator(&name, prisma_args)
+                self.get_value_generator(name, prisma_args)
             }
             _ => Err(self.construct_type_mismatch_error("function")),
         }

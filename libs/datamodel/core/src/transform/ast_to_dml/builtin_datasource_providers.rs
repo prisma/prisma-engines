@@ -48,11 +48,13 @@ impl DatasourceProvider for PostgresDatasourceProvider {
     }
 }
 
-pub struct MySqlDatasourceProvider {}
+pub struct MySqlDatasourceProvider {
+    is_planetscale: bool,
+}
 
 impl MySqlDatasourceProvider {
-    pub fn new() -> Self {
-        Self {}
+    pub fn new(is_planetscale: bool) -> Self {
+        Self { is_planetscale }
     }
 }
 
@@ -66,7 +68,7 @@ impl DatasourceProvider for MySqlDatasourceProvider {
     }
 
     fn connector(&self) -> Box<dyn Connector> {
-        Box::new(SqlDatamodelConnectors::mysql())
+        Box::new(SqlDatamodelConnectors::mysql(self.is_planetscale))
     }
 }
 

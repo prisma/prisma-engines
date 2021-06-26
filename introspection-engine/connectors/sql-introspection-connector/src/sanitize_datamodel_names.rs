@@ -77,7 +77,7 @@ fn sanitize_models(datamodel: &mut Datamodel, family: &SqlFamily) -> HashMap<Str
                                 (format!("{}_{}", model_name, sf.name()), Some(enum_name.to_owned()))
                             }
                         } else {
-                            let sanitized = sanitize_string(&enum_name);
+                            let sanitized = sanitize_string(enum_name);
 
                             if &sanitized != enum_name {
                                 (sanitized, Some(enum_name.to_owned()))

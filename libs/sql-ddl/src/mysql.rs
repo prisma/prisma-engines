@@ -111,7 +111,7 @@ impl<'a> Display for ForeignKey<'a> {
 #[derive(Debug)]
 pub enum ForeignKeyAction {
     Cascade,
-    DoNothing,
+    NoAction,
     Restrict,
     SetDefault,
     SetNull,
@@ -122,7 +122,7 @@ impl Display for ForeignKeyAction {
         let s = match self {
             ForeignKeyAction::Cascade => "CASCADE",
             ForeignKeyAction::Restrict => "RESTRICT",
-            ForeignKeyAction::DoNothing => "DO NOTHING",
+            ForeignKeyAction::NoAction => "NO ACTION",
             ForeignKeyAction::SetNull => "SET NULL",
             ForeignKeyAction::SetDefault => "SET DEFAULT",
         };
@@ -310,14 +310,14 @@ mod tests {
             changes: vec![AlterTableClause::AddForeignKey(ForeignKey {
                 constrained_columns: vec!["bestFriendId".into()],
                 constraint_name: Some("myfk".into()),
-                on_delete: Some(ForeignKeyAction::DoNothing),
+                on_delete: Some(ForeignKeyAction::NoAction),
                 on_update: Some(ForeignKeyAction::SetNull),
                 referenced_columns: vec!["id".into()],
                 referenced_table: "Dog".into(),
             })],
         };
 
-        let expected = "ALTER TABLE `Cat` ADD CONSTRAINT `myfk` FOREIGN KEY (`bestFriendId`) REFERENCES `Dog`(`id`) ON DELETE DO NOTHING ON UPDATE SET NULL";
+        let expected = "ALTER TABLE `Cat` ADD CONSTRAINT `myfk` FOREIGN KEY (`bestFriendId`) REFERENCES `Dog`(`id`) ON DELETE NO ACTION ON UPDATE SET NULL";
 
         assert_eq!(alter_table.to_string(), expected);
     }

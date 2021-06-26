@@ -20,11 +20,11 @@ fn schema_to_dmmf(schema: &dml::Datamodel) -> Datamodel {
     };
 
     for enum_model in schema.enums() {
-        datamodel.enums.push(enum_to_dmmf(&enum_model));
+        datamodel.enums.push(enum_to_dmmf(enum_model));
     }
 
     for model in schema.models().filter(|model| !model.is_ignored) {
-        datamodel.models.push(model_to_dmmf(&model));
+        datamodel.models.push(model_to_dmmf(model));
     }
 
     datamodel
@@ -202,7 +202,7 @@ fn get_relation_to_fields(field: &dml::Field) -> Option<Vec<String>> {
 
 fn get_relation_delete_strategy(field: &dml::Field) -> Option<String> {
     match &field {
-        dml::Field::RelationField(rf) => Some(rf.relation_info.on_delete.to_string()),
+        dml::Field::RelationField(rf) => rf.relation_info.on_delete.map(|ri| ri.to_string()),
         _ => None,
     }
 }

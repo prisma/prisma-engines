@@ -1,3 +1,6 @@
+use dml::relation_info::ReferentialAction;
+use enumflags2::BitFlags;
+
 use crate::{connector_error::ConnectorError, Connector, ConnectorCapability};
 
 /// A [Connector](/trait.Connector.html) implementor meant to
@@ -9,8 +12,16 @@ impl Connector for EmptyDatamodelConnector {
         std::any::type_name::<EmptyDatamodelConnector>()
     }
 
+    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
+        BitFlags::all()
+    }
+
     fn capabilities(&self) -> &[ConnectorCapability] {
         &[]
+    }
+
+    fn constraint_name_length(&self) -> usize {
+        usize::MAX
     }
 
     fn validate_field(&self, _field: &dml::field::Field) -> Result<(), ConnectorError> {

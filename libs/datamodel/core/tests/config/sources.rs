@@ -16,7 +16,7 @@ datasource db2 {
 }
 "#;
 
-    let diagnostics = parse_error(&schema);
+    let diagnostics = parse_error(schema);
     diagnostics.assert_length(2);
     diagnostics.assert_is_at(
         0,

@@ -7,7 +7,7 @@ use crate::{
     },
     NativeTypeInstance, RelationField,
 };
-use dml::scalars::ScalarType;
+use dml::{relation_info::ReferentialAction, scalars::ScalarType};
 use itertools::Itertools;
 
 /// Iterator over all the models in the schema.
@@ -144,7 +144,7 @@ impl<'a> ModelWalker<'a> {
             .map(move |index| IndexWalker {
                 model: *self,
                 index,
-                datamodel: &self.datamodel,
+                datamodel: self.datamodel,
             })
     }
 }
@@ -327,7 +327,7 @@ impl<'a> RelationFieldWalker<'a> {
 
     pub fn referenced_model(&self) -> ModelWalker<'a> {
         ModelWalker {
-            datamodel: &self.datamodel,
+            datamodel: self.datamodel,
             model_idx: self
                 .datamodel
                 .models
@@ -340,6 +340,22 @@ impl<'a> RelationFieldWalker<'a> {
                     )
                 }),
         }
+    }
+
+    pub fn on_update_action(&self) -> Option<ReferentialAction> {
+        self.get().relation_info.on_update
+    }
+
+    pub fn on_delete_action(&self) -> Option<ReferentialAction> {
+        self.get().relation_info.on_delete
+    }
+
+    pub fn default_on_update_action(&self) -> ReferentialAction {
+        self.get().default_on_update_action()
+    }
+
+    pub fn default_on_delete_action(&self) -> ReferentialAction {
+        self.get().default_on_delete_action()
     }
 }
 

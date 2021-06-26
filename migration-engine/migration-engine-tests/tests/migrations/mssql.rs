@@ -2,7 +2,7 @@ use migration_engine_tests::sync_test_api::*;
 
 #[test_connector(tags(Mssql))]
 fn shared_default_constraints_are_ignored_issue_5423(api: TestApi) {
-    let schema = api.connection_info().schema_name();
+    let schema = api.schema_name();
 
     api.raw_cmd(&format!("CREATE DEFAULT [{}].catcat AS 'musti'", schema));
 

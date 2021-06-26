@@ -1,9 +1,5 @@
 //! The external facing programmatic API to the migration engine.
 
-mod rpc;
-
-pub use rpc::rpc_api;
-
 use crate::{commands::*, CoreResult};
 use migration_connector::{migrations_directory, MigrationConnector};
 use std::path::Path;
@@ -114,7 +110,7 @@ impl<C: MigrationConnector> GenericApi for C {
         input: &ListMigrationDirectoriesInput,
     ) -> CoreResult<ListMigrationDirectoriesOutput> {
         let migrations_from_filesystem =
-            migrations_directory::list_migrations(&Path::new(&input.migrations_directory_path))?;
+            migrations_directory::list_migrations(Path::new(&input.migrations_directory_path))?;
 
         let migrations = migrations_from_filesystem
             .iter()

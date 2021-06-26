@@ -2,6 +2,7 @@ use introspection_connector::{ConnectorError, ErrorKind};
 use std::fmt::Display;
 
 #[derive(Debug)]
+#[allow(clippy::enum_variant_names)]
 pub enum Error {
     ConnectorError(ConnectorError),
     /// When there was a bad datamodel as part of the input.

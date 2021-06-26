@@ -1,14 +1,19 @@
 use datamodel_connector::connector_error::ConnectorError;
 use datamodel_connector::helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32};
 use datamodel_connector::{Connector, ConnectorCapability};
-use dml::field::{Field, FieldType};
-use dml::model::{IndexType, Model};
-use dml::native_type_constructor::NativeTypeConstructor;
-use dml::native_type_instance::NativeTypeInstance;
-use dml::scalars::ScalarType;
+use dml::{
+    field::{Field, FieldType},
+    model::{IndexType, Model},
+    native_type_constructor::NativeTypeConstructor,
+    native_type_instance::NativeTypeInstance,
+    relation_info::ReferentialAction,
+    scalars::ScalarType,
+};
+use enumflags2::BitFlags;
 use native_types::{MsSqlType, MsSqlTypeParameter};
 use once_cell::sync::Lazy;
 use std::borrow::Cow;
+
 use MsSqlType::*;
 use MsSqlTypeParameter::*;
 
@@ -44,19 +49,24 @@ const UNIQUE_IDENTIFIER_TYPE_NAME: &str = "UniqueIdentifier";
 pub struct MsSqlDatamodelConnector {
     capabilities: Vec<ConnectorCapability>,
     constructors: Vec<NativeTypeConstructor>,
+    referential_actions: BitFlags<ReferentialAction>,
 }
 
 impl MsSqlDatamodelConnector {
     pub fn new() -> MsSqlDatamodelConnector {
+        use ReferentialAction::*;
+
         let capabilities = vec![
+            ConnectorCapability::AutoIncrement,
             ConnectorCapability::AutoIncrementAllowedOnNonId,
             ConnectorCapability::AutoIncrementMultipleAllowed,
             ConnectorCapability::AutoIncrementNonIndexedAllowed,
-            ConnectorCapability::CreateMany,
-            ConnectorCapability::UpdateableId,
-            ConnectorCapability::MultipleIndexesWithSameName,
-            ConnectorCapability::AutoIncrement,
             ConnectorCapability::CompoundIds,
+            ConnectorCapability::CreateMany,
+            ConnectorCapability::ForeignKeys,
+            ConnectorCapability::MultipleIndexesWithSameName,
+            ConnectorCapability::NamedPrimaryKeys,
+            ConnectorCapability::UpdateableId,
         ];
 
         let constructors: Vec<NativeTypeConstructor> = vec![
@@ -90,9 +100,12 @@ impl MsSqlDatamodelConnector {
             NativeTypeConstructor::without_args(UNIQUE_IDENTIFIER_TYPE_NAME, vec![ScalarType::String]),
         ];
 
+        let referential_actions = NoAction | Cascade | SetNull | SetDefault;
+
         MsSqlDatamodelConnector {
             capabilities,
             constructors,
+            referential_actions,
         }
     }
 
@@ -106,8 +119,8 @@ impl MsSqlDatamodelConnector {
 
         match args {
             [] => Ok(None),
-            [s] if MAX_REGEX.is_match(&s) => Ok(Some(MsSqlTypeParameter::Max)),
-            [s] if NUM_REGEX.is_match(&s) => Ok(s.trim().parse().map(MsSqlTypeParameter::Number).ok()),
+            [s] if MAX_REGEX.is_match(s) => Ok(Some(MsSqlTypeParameter::Max)),
+            [s] if NUM_REGEX.is_match(s) => Ok(s.trim().parse().map(MsSqlTypeParameter::Number).ok()),
             s => Err(self
                 .native_str_error(r#type)
                 .native_type_invalid_param("a number or `Max`", &s.join(","))),
@@ -140,6 +153,14 @@ impl Connector for MsSqlDatamodelConnector {
 
     fn capabilities(&self) -> &[ConnectorCapability] {
         &self.capabilities
+    }
+
+    fn constraint_name_length(&self) -> usize {
+        128
+    }
+
+    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
+        self.referential_actions
     }
 
     fn scalar_type_for_native_type(&self, native_type: serde_json::Value) -> ScalarType {
