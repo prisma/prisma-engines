@@ -40,6 +40,7 @@ pub async fn get_single_record<'conn>(
 
 // Checklist:
 // - [x] OrderBy scalar.
+// - [ ] OrderBy relation.
 // - [x] Skip, take
 // - [ ] Cursor
 // - [x] Distinct select (inherently given from core).
