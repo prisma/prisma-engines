@@ -123,23 +123,23 @@ impl Env {
     }
 }
 
-pub struct QueryInterpreter<'a> {
-    pub(crate) conn: &'a mut dyn ConnectionLike,
+pub struct QueryInterpreter<'conn> {
+    pub(crate) conn: &'conn mut dyn ConnectionLike,
     log: SegQueue<String>,
 }
 
-impl<'a> fmt::Debug for QueryInterpreter<'a> {
+impl<'conn> fmt::Debug for QueryInterpreter<'conn> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("QueryInterpreter").finish()
     }
 }
 
-impl<'a> QueryInterpreter<'a> {
+impl<'conn> QueryInterpreter<'conn> {
     fn log_enabled() -> bool {
         tracing::level_filters::STATIC_MAX_LEVEL == tracing::level_filters::LevelFilter::TRACE
     }
 
-    pub fn new(conn: &'a mut dyn ConnectionLike) -> QueryInterpreter {
+    pub fn new(conn: &'conn mut dyn ConnectionLike) -> QueryInterpreter {
         let log = SegQueue::new();
 
         if Self::log_enabled() {
