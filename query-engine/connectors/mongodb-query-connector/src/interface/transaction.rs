@@ -29,6 +29,12 @@ impl<'conn> MongoDbTransaction<'conn> {
             .await
             .map_err(|err| MongoError::from(err).into_connector_error())?;
 
+        // println!(
+        //     "Opened transaction {} on server session {}",
+        //     connection.session.txn_number(),
+        //     connection.session.server_session.id
+        // );
+
         Ok(Self { connection })
     }
 }
@@ -36,12 +42,22 @@ impl<'conn> MongoDbTransaction<'conn> {
 #[async_trait]
 impl<'conn> Transaction for MongoDbTransaction<'conn> {
     async fn commit(&mut self) -> connector_interface::Result<()> {
-        // Totally committed.
+        self.connection
+            .session
+            .commit_transaction()
+            .await
+            .map_err(|err| MongoError::from(err).into_connector_error())?;
+
         Ok(())
     }
 
     async fn rollback(&mut self) -> connector_interface::Result<()> {
-        // Totally rolled back.
+        self.connection
+            .session
+            .abort_transaction()
+            .await
+            .map_err(|err| MongoError::from(err).into_connector_error())?;
+
         Ok(())
     }
 
