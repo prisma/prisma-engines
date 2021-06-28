@@ -74,7 +74,7 @@ pub(super) fn model_id(id_args: &mut Arguments<'_>, model_id: ast::TopId, ctx: &
 /// Takes an attribute argument, validates it as an array of constants, then
 /// resolves  the constant as field names on the model.
 fn resolve_field_array(
-    values: &ValueValidator,
+    values: &ValueValidator<'_>,
     model_id: ast::TopId,
     ctx: &mut Context<'_, '_>,
 ) -> Result<Vec<ast::FieldId>, Option<Vec<String>>> {
