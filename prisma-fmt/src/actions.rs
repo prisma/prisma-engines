@@ -1,5 +1,7 @@
 use std::io::{self, Read};
 
+use datamodel::common::preview_features::PreviewFeature;
+
 pub fn run() {
     let mut datamodel_string = String::new();
 
@@ -14,16 +16,24 @@ pub fn run() {
             if validated_configuration.subject.datasources.len() != 1 {
                 print!("[]")
             } else if let Some(datasource) = validated_configuration.subject.datasources.first() {
-                let available_referential_actions = datasource
-                    .active_connector
-                    .referential_actions()
-                    .iter()
-                    .map(|act| format!("{:?}", act))
-                    .collect::<Vec<_>>();
+                if validated_configuration
+                    .subject
+                    .preview_features()
+                    .any(|f| *f == PreviewFeature::ReferentialActions)
+                {
+                    let available_referential_actions = datasource
+                        .active_connector
+                        .referential_actions()
+                        .iter()
+                        .map(|act| format!("{:?}", act))
+                        .collect::<Vec<_>>();
 
-                let json = serde_json::to_string(&available_referential_actions).expect("Failed to render JSON");
+                    let json = serde_json::to_string(&available_referential_actions).expect("Failed to render JSON");
 
-                print!("{}", json)
+                    print!("{}", json)
+                } else {
+                    print!("[]")
+                }
             } else {
                 print!("[]")
             }
