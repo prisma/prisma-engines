@@ -45,77 +45,7 @@ impl AttributeValidator<dml::Model> for ModelLevelIdAttributeValidator {
     }
 
     fn validate_and_apply(&self, args: &mut Arguments<'_>, obj: &mut dml::Model) -> Result<(), DatamodelError> {
-        let fields = args
-            .default_arg("fields")?
-            .as_array()
-            .iter()
-            .map(|f| f.as_constant_literal())
-            .collect::<Result<Vec<_>, _>>()?;
-
-        obj.id_fields = fields;
-
-        let undefined_fields: Vec<String> = obj
-            .id_fields
-            .iter()
-            .filter_map(|field| {
-                if obj.find_field(field).is_none() {
-                    Some(field.to_string())
-                } else {
-                    None
-                }
-            })
-            .collect();
-
-        let referenced_relation_fields: Vec<String> = obj
-            .id_fields
-            .iter()
-            .filter(|field| match obj.find_field(field) {
-                Some(field) => field.is_relation(),
-                None => false,
-            })
-            .map(|f| f.to_owned())
-            .collect();
-
-        if !undefined_fields.is_empty() {
-            return Err(DatamodelError::new_model_validation_error(
-                &format!(
-                    "The multi field id declaration refers to the unknown fields {}.",
-                    undefined_fields.join(", ")
-                ),
-                &obj.name,
-                args.span(),
-            ));
-        }
-
-        if !referenced_relation_fields.is_empty() {
-            return Err(DatamodelError::new_model_validation_error(
-                &format!(
-                    "The id definition refers to the relation fields {}. Id definitions must reference only scalar fields.",
-                    referenced_relation_fields.join(", ")
-                ),
-                &obj.name,
-                args.span(),
-            ));
-        }
-
-        // the unwrap is safe because we error on undefined fields before
-        let fields_that_are_not_required: Vec<_> = obj
-            .id_fields
-            .iter()
-            .filter(|field| !obj.find_field(field).unwrap().arity().is_required())
-            .map(|field| field.to_string())
-            .collect();
-
-        if !fields_that_are_not_required.is_empty() {
-            return Err(DatamodelError::new_model_validation_error(
-                &format!(
-                    "The id definition refers to the optional fields {}. Id definitions must reference only required fields.",
-                    fields_that_are_not_required.join(", ")
-                ),
-                &obj.name,
-                args.span(),
-            ));
-        }
+        obj.id_fields = args.default_arg("fields")?.as_constant_array()?;
 
         Ok(())
     }
