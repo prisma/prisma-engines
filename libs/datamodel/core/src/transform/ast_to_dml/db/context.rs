@@ -27,16 +27,26 @@ impl<'a, 'ast> Context<'a, 'ast> {
         self.diagnostics.has_errors()
     }
 
-    /// All attribute validation should go through `validate_attributes()`. It
-    /// lets us enforce some rules, for example that certain attributes should
-    /// not be repeated, and make sure that _all_ attributes are visited during
-    /// the validation process, returning unknown attribute errors when it is
-    /// not the case.
-    pub(super) fn visit_attributes(&mut self, attributes: &'ast [ast::Attribute]) -> Attributes<'ast> {
-        Attributes {
+    /// All attribute validation should go through `visit_attributes()`. It lets
+    /// us enforce some rules, for example that certain attributes should not be
+    /// repeated, and make sure that _all_ attributes are visited during the
+    /// validation process, returning unknown attribute errors when it is not
+    /// the case.
+    ///
+    /// This takes a closure so we can better manage ownership of the validation
+    /// context and, more importantly, so we can validate at the end of the
+    /// closure that all attributes were validated.
+    pub(super) fn visit_attributes(
+        &mut self,
+        attributes: &'ast [ast::Attribute],
+        f: impl FnOnce(&'_ mut Attributes<'ast>, &'_ mut Context<'a, 'ast>),
+    ) {
+        let mut attrs = Attributes {
             attributes,
             used_attributes: HashSet::with_capacity(attributes.len()),
-        }
+        };
+
+        f(&mut attrs, self);
     }
 
     /// Implementation detail. Used by `Attributes`.

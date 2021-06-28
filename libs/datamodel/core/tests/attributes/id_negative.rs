@@ -118,7 +118,7 @@ fn relation_fields_as_part_of_compound_id_must_error() {
     errors.assert_is(DatamodelError::new_model_validation_error(
         "The id definition refers to the relation fields identification. Id definitions must reference only scalar fields.",
         "User",
-        Span::new(136, 162),
+        Span::new(124, 150),
     ));
 }
 
@@ -136,7 +136,7 @@ fn must_error_when_multi_field_is_referring_fields_that_are_not_required() {
     let errors = parse_error(dml);
 
     errors.assert_is(DatamodelError::new_model_validation_error(
-        "The id definition refers to the optional fields b, c. Id definitions must reference only required fields.",
+        "The id definition refers to the optional fields b, c. ID definitions must reference only required fields.",
         "Model",
         Span::new(75, 86),
     ));

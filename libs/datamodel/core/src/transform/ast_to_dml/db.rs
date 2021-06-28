@@ -168,11 +168,11 @@ fn visit_model<'ast>(top_id: ast::TopId, model: &'ast ast::Model, ctx: &mut Cont
         }
     }
 
-    let mut attributes = ctx.visit_attributes(&model.attributes);
-
-    if let Some(mut id_args) = attributes.get_optional_single("id", ctx) {
-        attributes::model_id(&mut id_args, top_id, ctx);
-    }
+    ctx.visit_attributes(&model.attributes, |attributes, ctx| {
+        if let Some(mut id_args) = attributes.get_optional_single("id", ctx) {
+            attributes::model_id(&mut id_args, top_id, ctx);
+        }
+    });
 }
 
 #[derive(Debug)]
