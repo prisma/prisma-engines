@@ -62,7 +62,7 @@ impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
         aggr_selections: &[RelAggregationSelection],
     ) -> connector::Result<Option<SingleRecord>> {
         catch(self.connection_info.clone(), async move {
-            read::get_single_record(&mut self.inner, model, filter, selected_fields, aggr_selections).await
+            read::get_single_record(&self.inner, model, filter, selected_fields, aggr_selections).await
         })
         .await
     }
@@ -75,14 +75,7 @@ impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
         aggr_selections: &[RelAggregationSelection],
     ) -> connector::Result<ManyRecords> {
         catch(self.connection_info.clone(), async move {
-            read::get_many_records(
-                &mut self.inner,
-                model,
-                query_arguments,
-                selected_fields,
-                aggr_selections,
-            )
-            .await
+            read::get_many_records(&self.inner, model, query_arguments, selected_fields, aggr_selections).await
         })
         .await
     }
@@ -93,7 +86,7 @@ impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
         from_record_ids: &[RecordProjection],
     ) -> connector::Result<Vec<(RecordProjection, RecordProjection)>> {
         catch(self.connection_info.clone(), async move {
-            read::get_related_m2m_record_ids(&mut self.inner, from_field, from_record_ids).await
+            read::get_related_m2m_record_ids(&self.inner, from_field, from_record_ids).await
         })
         .await
     }
@@ -107,7 +100,7 @@ impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
         having: Option<Filter>,
     ) -> connector::Result<Vec<AggregationRow>> {
         catch(self.connection_info.clone(), async move {
-            read::aggregate(&mut self.inner, model, query_arguments, selections, group_by, having).await
+            read::aggregate(&self.inner, model, query_arguments, selections, group_by, having).await
         })
         .await
     }
@@ -117,7 +110,7 @@ impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
 impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
     async fn create_record(&mut self, model: &ModelRef, args: WriteArgs) -> connector::Result<RecordProjection> {
         catch(self.connection_info.clone(), async move {
-            write::create_record(&mut self.inner, model, args).await
+            write::create_record(&self.inner, model, args).await
         })
         .await
     }
@@ -130,7 +123,7 @@ impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
     ) -> connector::Result<usize> {
         catch(self.connection_info.clone(), async move {
             write::create_records(
-                &mut self.inner,
+                &self.inner,
                 SqlInfo::from(&self.connection_info),
                 model,
                 args,
@@ -148,14 +141,14 @@ impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
         args: WriteArgs,
     ) -> connector::Result<Vec<RecordProjection>> {
         catch(self.connection_info.clone(), async move {
-            write::update_records(&mut self.inner, model, record_filter, args).await
+            write::update_records(&self.inner, model, record_filter, args).await
         })
         .await
     }
 
     async fn delete_records(&mut self, model: &ModelRef, record_filter: RecordFilter) -> connector::Result<usize> {
         catch(self.connection_info.clone(), async move {
-            write::delete_records(&mut self.inner, model, record_filter).await
+            write::delete_records(&self.inner, model, record_filter).await
         })
         .await
     }
@@ -167,7 +160,7 @@ impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
         child_ids: &[RecordProjection],
     ) -> connector::Result<()> {
         catch(self.connection_info.clone(), async move {
-            write::m2m_connect(&mut self.inner, field, parent_id, child_ids).await
+            write::m2m_connect(&self.inner, field, parent_id, child_ids).await
         })
         .await
     }
@@ -179,21 +172,21 @@ impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
         child_ids: &[RecordProjection],
     ) -> connector::Result<()> {
         catch(self.connection_info.clone(), async move {
-            write::m2m_disconnect(&mut self.inner, field, parent_id, child_ids).await
+            write::m2m_disconnect(&self.inner, field, parent_id, child_ids).await
         })
         .await
     }
 
     async fn execute_raw(&mut self, query: String, parameters: Vec<PrismaValue>) -> connector::Result<usize> {
         catch(self.connection_info.clone(), async move {
-            write::execute_raw(&mut self.inner, query, parameters).await
+            write::execute_raw(&self.inner, query, parameters).await
         })
         .await
     }
 
     async fn query_raw(&mut self, query: String, parameters: Vec<PrismaValue>) -> connector::Result<serde_json::Value> {
         catch(self.connection_info.clone(), async move {
-            write::query_raw(&mut self.inner, query, parameters).await
+            write::query_raw(&self.inner, query, parameters).await
         })
         .await
     }
