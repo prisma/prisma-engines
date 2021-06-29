@@ -141,7 +141,7 @@ mod create_many {
     }
 
     // "createMany" should "not error on duplicates with skipDuplicates true"
-    #[connector_test(schema(schema_4), exclude(Sqlite, SqlServer))]
+    #[connector_test(schema(schema_4), exclude(Sqlite, SqlServer, MongoDb))]
     async fn create_many_no_error_skip_dup(runner: &Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(runner, r#"mutation {

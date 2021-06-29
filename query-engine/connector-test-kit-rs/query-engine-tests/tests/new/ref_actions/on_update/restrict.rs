@@ -38,6 +38,10 @@ mod one2one_req {
             //     2014,
             //     "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
             // ),
+            ConnectorTag::Sqlite(_) => insta::assert_snapshot!(
+                run_query!(runner, r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#),
+                @r###"{"errors":[{"error":"Error occurred during query execution:\nConnectorError(ConnectorError { user_facing_error: None, kind: QueryError(SqliteFailure(Error { code: ConstraintViolation, extended_code: 1811 }, Some(\"FOREIGN KEY constraint failed\"))) })","user_facing_error":{"is_panic":false,"message":"Error occurred during query execution:\nConnectorError(ConnectorError { user_facing_error: None, kind: QueryError(SqliteFailure(Error { code: ConstraintViolation, extended_code: 1811 }, Some(\"FOREIGN KEY constraint failed\"))) })","backtrace":null}}]}"###
+            ),
             _ => assert_error!(
                 runner,
                 r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#,
@@ -85,6 +89,10 @@ mod one2one_opt {
             //     2014,
             //     "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
             // ),
+            ConnectorTag::Sqlite(_) => insta::assert_snapshot!(
+                run_query!(runner, r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#),
+                @r###"{"errors":[{"error":"Error occurred during query execution:\nConnectorError(ConnectorError { user_facing_error: None, kind: QueryError(SqliteFailure(Error { code: ConstraintViolation, extended_code: 1811 }, Some(\"FOREIGN KEY constraint failed\"))) })","user_facing_error":{"is_panic":false,"message":"Error occurred during query execution:\nConnectorError(ConnectorError { user_facing_error: None, kind: QueryError(SqliteFailure(Error { code: ConstraintViolation, extended_code: 1811 }, Some(\"FOREIGN KEY constraint failed\"))) })","backtrace":null}}]}"###
+            ),
             _ => assert_error!(
                 runner,
                 r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#,
@@ -158,6 +166,10 @@ mod one2many_req {
             //     2014,
             //     "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
             // ),
+            ConnectorTag::Sqlite(_) => insta::assert_snapshot!(
+                run_query!(runner, r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#),
+                @r###"{"errors":[{"error":"Error occurred during query execution:\nConnectorError(ConnectorError { user_facing_error: None, kind: QueryError(SqliteFailure(Error { code: ConstraintViolation, extended_code: 1811 }, Some(\"FOREIGN KEY constraint failed\"))) })","user_facing_error":{"is_panic":false,"message":"Error occurred during query execution:\nConnectorError(ConnectorError { user_facing_error: None, kind: QueryError(SqliteFailure(Error { code: ConstraintViolation, extended_code: 1811 }, Some(\"FOREIGN KEY constraint failed\"))) })","backtrace":null}}]}"###
+            ),
             _ => assert_error!(
                 runner,
                 r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#,
@@ -231,6 +243,10 @@ mod one2many_opt {
             //     2014,
             //     "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
             // ),
+            ConnectorTag::Sqlite(_) => insta::assert_snapshot!(
+                run_query!(runner, r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#),
+                @r###"{"errors":[{"error":"Error occurred during query execution:\nConnectorError(ConnectorError { user_facing_error: None, kind: QueryError(SqliteFailure(Error { code: ConstraintViolation, extended_code: 1811 }, Some(\"FOREIGN KEY constraint failed\"))) })","user_facing_error":{"is_panic":false,"message":"Error occurred during query execution:\nConnectorError(ConnectorError { user_facing_error: None, kind: QueryError(SqliteFailure(Error { code: ConstraintViolation, extended_code: 1811 }, Some(\"FOREIGN KEY constraint failed\"))) })","backtrace":null}}]}"###
+            ),
             _ => assert_error!(
                 runner,
                 r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#,
