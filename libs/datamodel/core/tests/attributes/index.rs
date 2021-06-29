@@ -111,7 +111,7 @@ fn empty_index_names_are_rejected() {
     err.assert_is(DatamodelError::AttributeValidationError {
         message: "The `name` argument cannot be an empty string.".into(),
         attribute_name: "index".into(),
-        span: Span::new(142, 144),
+        span: Span::new(108, 145),
     });
 }
 
@@ -132,7 +132,7 @@ fn empty_unique_index_names_are_rejected() {
     err.assert_is(DatamodelError::AttributeValidationError {
         message: "The `name` argument cannot be an empty string.".into(),
         attribute_name: "unique".into(),
-        span: Span::new(143, 145),
+        span: Span::new(108, 146),
     });
 }
 

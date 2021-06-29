@@ -298,7 +298,7 @@ fn must_error_when_using_the_same_field_multiple_times() {
     let errors = parse_error(dml);
 
     errors.assert_is(DatamodelError::new_model_validation_error(
-        "The unique index definition refers to the fields email multiple times.",
+        "The unique index definition refers to the field email multiple times.",
         "User",
         Span::new(83, 105),
     ));

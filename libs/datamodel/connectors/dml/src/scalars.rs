@@ -28,6 +28,10 @@ impl ScalarType {
         matches!(self, ScalarType::Float)
     }
 
+    pub fn is_json(&self) -> bool {
+        matches!(self, ScalarType::Json)
+    }
+
     pub fn is_string(&self) -> bool {
         matches!(self, ScalarType::String)
     }

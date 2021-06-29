@@ -53,6 +53,12 @@ pub enum FieldArity {
     List,
 }
 
+impl FieldArity {
+    pub fn is_list(&self) -> bool {
+        matches!(self, &FieldArity::List)
+    }
+}
+
 #[derive(Debug, Clone, PartialEq)]
 pub enum FieldType {
     Supported(Identifier),
@@ -71,13 +77,6 @@ impl FieldType {
         match self {
             FieldType::Unsupported(name, span) => Some((name, span)),
             FieldType::Supported(_) => None,
-        }
-    }
-
-    pub(crate) fn unwrap_supported(&self) -> &Identifier {
-        match self {
-            FieldType::Supported(ident) => ident,
-            FieldType::Unsupported(_, _) => panic!("Unsupported in unwrap_supported()"),
         }
     }
 }

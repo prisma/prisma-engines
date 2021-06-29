@@ -40,7 +40,7 @@ fn map_must_error_for_relation_fields() {
         fooId Int
         relationField  Foo @relation(fields: [fooId], references: [id]) @map("custom_name")
     }
-    
+
     model Foo {
         id Int @id
     }

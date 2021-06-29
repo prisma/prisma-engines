@@ -11,18 +11,11 @@ fn id_should_error_if_the_field_is_not_required() {
 
     let errors = parse_error(dml);
 
-    errors.assert_are(&[
-        DatamodelError::new_attribute_validation_error(
-            "Fields that are marked as id must be required.",
-            "id",
-            Span::new(36, 38),
-        ),
-        DatamodelError::new_model_validation_error(
-            "Each model must have at least one unique criteria that has only required fields. Either mark a single field with `@id`, `@unique` or add a multi field criterion with `@@id([])` or `@@unique([])` to the model. The following unique criterias were not considered as they contain fields that are not required:\n- id",
-            "Model",
-            Span::new(5, 44),
-        ),
-    ]);
+    errors.assert_are(&[DatamodelError::new_attribute_validation_error(
+        "Fields that are marked as id must be required.",
+        "id",
+        Span::new(36, 38),
+    )]);
 }
 
 #[test]
@@ -116,7 +109,7 @@ fn relation_fields_as_part_of_compound_id_must_error() {
 
     let errors = parse_error(dml);
     errors.assert_is(DatamodelError::new_model_validation_error(
-        "The id definition refers to the relation fields identification. Id definitions must reference only scalar fields.",
+        "The id definition refers to the relation fields identification. ID definitions must reference only scalar fields.",
         "User",
         Span::new(124, 150),
     ));
