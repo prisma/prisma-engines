@@ -160,6 +160,10 @@ impl Connector for PostgresDatamodelConnector {
         &self.capabilities
     }
 
+    fn constraint_name_length(&self) -> usize {
+        63
+    }
+
     fn referential_actions(&self) -> BitFlags<ReferentialAction> {
         self.referential_actions
     }

@@ -214,3 +214,117 @@ fn functions_with_schema_prefix_in_dbgenerated_are_idempotent(api: TestApi) {
         .assert_has_executed_steps();
     api.schema_push(dm).send_sync().assert_green_bang().assert_no_steps();
 }
+
+#[test_connector(tags(Postgres))]
+fn postgres_apply_migrations_errors_give_precise_location(api: TestApi) {
+    let dm = "";
+    let migrations_directory = api.create_migrations_directory();
+
+    let migration = r#"
+        CREATE TABLE "Cat" (
+            id INTEGER PRIMARY KEY,
+            name TEXT NOT NULL
+        );
+
+        SELECT id FROM "Dog";
+
+        CREATE TABLE "Emu" (
+            size INTEGER
+        );
+    "#;
+
+    let migration_name = api
+        .create_migration("01init", dm, &migrations_directory)
+        .draft(true)
+        .send_sync()
+        .modify_migration(|contents| {
+            contents.clear();
+            contents.push_str(migration);
+        })
+        .into_output()
+        .generated_migration_name
+        .unwrap();
+
+    let err = api
+        .apply_migrations(&migrations_directory)
+        .send_unwrap_err()
+        .to_string()
+        .replace(&migration_name, "<migration-name>");
+
+    let expectation = expect![[r#"
+        A migration failed to apply. New migrations can not be applied before the error is recovered from. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve
+
+        Migration name: <migration-name>
+
+        Database error code: 42P01
+
+        Database error:
+        ERROR: relation "Dog" does not exist
+
+        Position:
+        [1m  2[0m         CREATE TABLE "Cat" (
+        [1m  3[0m             id INTEGER PRIMARY KEY,
+        [1m  4[0m             name TEXT NOT NULL
+        [1m  5[0m         );
+        [1m  6[0m
+        [1m  7[1;31m         SELECT id FROM "Dog";[0m
+
+    "#]];
+    let first_segment = err.split_terminator("DbError {").next().unwrap();
+    expectation.assert_eq(first_segment)
+}
+
+#[test_connector(tags(Postgres))]
+fn postgres_apply_migrations_errors_give_precise_location_at_the_beginning_of_files(api: TestApi) {
+    let dm = "";
+    let migrations_directory = api.create_migrations_directory();
+
+    let migration = r#"
+        CREATE TABLE "Cat" ( id INTEGER PRIMARY KEY );
+
+        SELECT id FROM "Dog";
+
+        CREATE TABLE "Emu" (
+            size INTEGER
+        );
+    "#;
+
+    let migration_name = api
+        .create_migration("01init", dm, &migrations_directory)
+        .draft(true)
+        .send_sync()
+        .modify_migration(|contents| {
+            contents.clear();
+            contents.push_str(migration);
+        })
+        .into_output()
+        .generated_migration_name
+        .unwrap();
+
+    let err = api
+        .apply_migrations(&migrations_directory)
+        .send_unwrap_err()
+        .to_string()
+        .replace(&migration_name, "<migration-name>");
+
+    let expectation = expect![[r#"
+        A migration failed to apply. New migrations can not be applied before the error is recovered from. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve
+
+        Migration name: <migration-name>
+
+        Database error code: 42P01
+
+        Database error:
+        ERROR: relation "Dog" does not exist
+
+        Position:
+        [1m  0[0m
+        [1m  1[0m
+        [1m  2[0m         CREATE TABLE "Cat" ( id INTEGER PRIMARY KEY );
+        [1m  3[0m
+        [1m  4[1;31m         SELECT id FROM "Dog";[0m
+
+    "#]];
+    let first_segment = err.split_terminator("DbError {").next().unwrap();
+    expectation.assert_eq(first_segment)
+}

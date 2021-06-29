@@ -13,10 +13,9 @@ mod root_queries;
 mod value;
 
 use error::MongoError;
-use futures::stream::StreamExt;
 use mongodb::{
     bson::{Bson, Document},
-    Cursor,
+    ClientSession, SessionCursor,
 };
 
 pub use interface::*;
@@ -46,10 +45,13 @@ impl BsonTransform for Bson {
 
 // Todo: Move to approriate place
 /// Consumes a cursor stream until exhausted.
-async fn vacuum_cursor(mut cursor: Cursor<Document>) -> crate::Result<Vec<Document>> {
+async fn vacuum_cursor(
+    mut cursor: SessionCursor<Document>,
+    session: &mut ClientSession,
+) -> crate::Result<Vec<Document>> {
     let mut docs = vec![];
 
-    while let Some(result) = cursor.next().await {
+    while let Some(result) = cursor.next(session).await {
         match result {
             Ok(document) => docs.push(document),
             Err(e) => return Err(e.into()),

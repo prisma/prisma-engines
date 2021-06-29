@@ -44,6 +44,10 @@ impl Connector for SqliteDatamodelConnector {
         &self.capabilities
     }
 
+    fn constraint_name_length(&self) -> usize {
+        10000
+    }
+
     fn referential_actions(&self) -> BitFlags<ReferentialAction> {
         self.referential_actions
     }

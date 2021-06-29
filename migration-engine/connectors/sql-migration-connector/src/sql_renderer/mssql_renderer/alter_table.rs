@@ -9,7 +9,7 @@ use crate::{
 };
 use sql_schema_describer::{
     walkers::{ColumnWalker, TableWalker},
-    DefaultValue,
+    ColumnId, DefaultValue,
 };
 use std::collections::BTreeSet;
 
@@ -54,21 +54,21 @@ impl<'a> AlterTableConstructor<'a> {
                 TableChange::AddPrimaryKey { columns } => {
                     self.add_primary_key(columns);
                 }
-                TableChange::AddColumn { column_index } => {
-                    self.add_column(*column_index);
+                TableChange::AddColumn { column_id } => {
+                    self.add_column(*column_id);
                 }
-                TableChange::DropColumn { column_index } => {
-                    self.drop_column(*column_index);
+                TableChange::DropColumn { column_id } => {
+                    self.drop_column(*column_id);
                 }
-                TableChange::DropAndRecreateColumn { column_index, .. } => {
-                    self.drop_and_recreate_column(*column_index);
+                TableChange::DropAndRecreateColumn { column_id, .. } => {
+                    self.drop_and_recreate_column(*column_id);
                 }
                 TableChange::AlterColumn(AlterColumn {
-                    column_index,
+                    column_id,
                     changes,
                     type_change: _,
                 }) => {
-                    self.alter_column(*column_index, changes);
+                    self.alter_column(*column_id, changes);
                 }
             };
         }
@@ -143,20 +143,18 @@ impl<'a> AlterTableConstructor<'a> {
         ));
     }
 
-    fn add_column(&mut self, column_index: usize) {
-        let column = self.tables.next().column_at(column_index);
+    fn add_column(&mut self, column_id: ColumnId) {
+        let column = self.tables.next().column_at(column_id);
         self.add_columns.push(self.renderer.render_column(&column));
     }
 
-    fn drop_column(&mut self, column_index: usize) {
-        let name = self
-            .renderer
-            .quote(self.tables.previous().column_at(column_index).name());
+    fn drop_column(&mut self, column_id: ColumnId) {
+        let name = self.renderer.quote(self.tables.previous().column_at(column_id).name());
 
         self.drop_columns.push(format!("{}", name));
     }
 
-    fn drop_and_recreate_column(&mut self, columns: Pair<usize>) {
+    fn drop_and_recreate_column(&mut self, columns: Pair<ColumnId>) {
         let columns = self.tables.columns(&columns);
 
         self.drop_columns
@@ -165,7 +163,7 @@ impl<'a> AlterTableConstructor<'a> {
         self.add_columns.push(self.renderer.render_column(columns.next()));
     }
 
-    fn alter_column(&mut self, columns: Pair<usize>, changes: &ColumnChanges) {
+    fn alter_column(&mut self, columns: Pair<ColumnId>, changes: &ColumnChanges) {
         let columns = self.tables.columns(&columns);
         let expanded = expand_alter_column(&columns, changes);
 

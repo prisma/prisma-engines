@@ -1,7 +1,7 @@
 use crate::SqlError;
 use crate::{database::operations::*, sql_info::SqlInfo};
 use async_trait::async_trait;
-use connector::RelAggregationSelection;
+use connector::{ConnectionLike, RelAggregationSelection};
 use connector_interface::{
     self as connector, filter::Filter, AggregationRow, AggregationSelection, QueryArguments, ReadOperations,
     RecordFilter, Transaction, WriteArgs, WriteOperations,
@@ -9,6 +9,8 @@ use connector_interface::{
 use prisma_models::prelude::*;
 use prisma_value::PrismaValue;
 use quaint::prelude::ConnectionInfo;
+
+use super::catch;
 
 pub struct SqlConnectorTransaction<'tx> {
     inner: quaint::connector::Transaction<'tx>,
@@ -23,99 +25,103 @@ impl<'tx> SqlConnectorTransaction<'tx> {
             connection_info,
         }
     }
-
-    async fn catch<O>(
-        &self,
-        fut: impl std::future::Future<Output = Result<O, SqlError>>,
-    ) -> Result<O, connector_interface::error::ConnectorError> {
-        match fut.await {
-            Ok(o) => Ok(o),
-            Err(err) => Err(err.into_connector_error(&self.connection_info)),
-        }
-    }
 }
+
+impl<'tx> ConnectionLike for SqlConnectorTransaction<'tx> {}
 
 #[async_trait]
 impl<'tx> Transaction for SqlConnectorTransaction<'tx> {
     #[tracing::instrument(skip(self))]
-    async fn commit(&self) -> connector::Result<()> {
-        self.catch(async move { Ok(self.inner.commit().await.map_err(SqlError::from)?) })
-            .await
+    async fn commit(&mut self) -> connector::Result<()> {
+        catch(self.connection_info.clone(), async move {
+            Ok(self.inner.commit().await.map_err(SqlError::from)?)
+        })
+        .await
     }
 
     #[tracing::instrument(skip(self))]
-    async fn rollback(&self) -> connector::Result<()> {
-        self.catch(async move { Ok(self.inner.rollback().await.map_err(SqlError::from)?) })
-            .await
+    async fn rollback(&mut self) -> connector::Result<()> {
+        catch(self.connection_info.clone(), async move {
+            Ok(self.inner.rollback().await.map_err(SqlError::from)?)
+        })
+        .await
+    }
+
+    fn as_connection_like(&mut self) -> &mut dyn ConnectionLike {
+        self
     }
 }
 
 #[async_trait]
 impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
     async fn get_single_record(
-        &self,
+        &mut self,
         model: &ModelRef,
         filter: &Filter,
         selected_fields: &ModelProjection,
         aggr_selections: &[RelAggregationSelection],
     ) -> connector::Result<Option<SingleRecord>> {
-        self.catch(async move {
+        catch(self.connection_info.clone(), async move {
             read::get_single_record(&self.inner, model, filter, selected_fields, aggr_selections).await
         })
         .await
     }
 
     async fn get_many_records(
-        &self,
+        &mut self,
         model: &ModelRef,
         query_arguments: QueryArguments,
         selected_fields: &ModelProjection,
         aggr_selections: &[RelAggregationSelection],
     ) -> connector::Result<ManyRecords> {
-        self.catch(async move {
+        catch(self.connection_info.clone(), async move {
             read::get_many_records(&self.inner, model, query_arguments, selected_fields, aggr_selections).await
         })
         .await
     }
 
     async fn get_related_m2m_record_ids(
-        &self,
+        &mut self,
         from_field: &RelationFieldRef,
         from_record_ids: &[RecordProjection],
     ) -> connector::Result<Vec<(RecordProjection, RecordProjection)>> {
-        self.catch(async move { read::get_related_m2m_record_ids(&self.inner, from_field, from_record_ids).await })
-            .await
+        catch(self.connection_info.clone(), async move {
+            read::get_related_m2m_record_ids(&self.inner, from_field, from_record_ids).await
+        })
+        .await
     }
 
     async fn aggregate_records(
-        &self,
+        &mut self,
         model: &ModelRef,
         query_arguments: QueryArguments,
         selections: Vec<AggregationSelection>,
         group_by: Vec<ScalarFieldRef>,
         having: Option<Filter>,
     ) -> connector::Result<Vec<AggregationRow>> {
-        self.catch(
-            async move { read::aggregate(&self.inner, model, query_arguments, selections, group_by, having).await },
-        )
+        catch(self.connection_info.clone(), async move {
+            read::aggregate(&self.inner, model, query_arguments, selections, group_by, having).await
+        })
         .await
     }
 }
 
 #[async_trait]
 impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
-    async fn create_record(&self, model: &ModelRef, args: WriteArgs) -> connector::Result<RecordProjection> {
-        self.catch(async move { write::create_record(&self.inner, model, args).await })
-            .await
+    async fn create_record(&mut self, model: &ModelRef, args: WriteArgs) -> connector::Result<RecordProjection> {
+        catch(self.connection_info.clone(), async move {
+            write::create_record(&self.inner, model, args).await
+        })
+        .await
     }
 
     async fn create_records(
-        &self,
+        &mut self,
         model: &ModelRef,
         args: Vec<WriteArgs>,
         skip_duplicates: bool,
     ) -> connector::Result<usize> {
-        self.catch(async move {
+        catch(self.connection_info.clone(), async move {
             write::create_records(
                 &self.inner,
                 SqlInfo::from(&self.connection_info),
@@ -129,47 +135,59 @@ impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
     }
 
     async fn update_records(
-        &self,
+        &mut self,
         model: &ModelRef,
         record_filter: RecordFilter,
         args: WriteArgs,
     ) -> connector::Result<Vec<RecordProjection>> {
-        self.catch(async move { write::update_records(&self.inner, model, record_filter, args).await })
-            .await
+        catch(self.connection_info.clone(), async move {
+            write::update_records(&self.inner, model, record_filter, args).await
+        })
+        .await
     }
 
-    async fn delete_records(&self, model: &ModelRef, record_filter: RecordFilter) -> connector::Result<usize> {
-        self.catch(async move { write::delete_records(&self.inner, model, record_filter).await })
-            .await
+    async fn delete_records(&mut self, model: &ModelRef, record_filter: RecordFilter) -> connector::Result<usize> {
+        catch(self.connection_info.clone(), async move {
+            write::delete_records(&self.inner, model, record_filter).await
+        })
+        .await
     }
 
     async fn m2m_connect(
-        &self,
+        &mut self,
         field: &RelationFieldRef,
         parent_id: &RecordProjection,
         child_ids: &[RecordProjection],
     ) -> connector::Result<()> {
-        self.catch(async move { write::m2m_connect(&self.inner, field, parent_id, child_ids).await })
-            .await
+        catch(self.connection_info.clone(), async move {
+            write::m2m_connect(&self.inner, field, parent_id, child_ids).await
+        })
+        .await
     }
 
     async fn m2m_disconnect(
-        &self,
+        &mut self,
         field: &RelationFieldRef,
         parent_id: &RecordProjection,
         child_ids: &[RecordProjection],
     ) -> connector::Result<()> {
-        self.catch(async move { write::m2m_disconnect(&self.inner, field, parent_id, child_ids).await })
-            .await
+        catch(self.connection_info.clone(), async move {
+            write::m2m_disconnect(&self.inner, field, parent_id, child_ids).await
+        })
+        .await
     }
 
-    async fn execute_raw(&self, query: String, parameters: Vec<PrismaValue>) -> connector::Result<usize> {
-        self.catch(async move { write::execute_raw(&self.inner, query, parameters).await })
-            .await
+    async fn execute_raw(&mut self, query: String, parameters: Vec<PrismaValue>) -> connector::Result<usize> {
+        catch(self.connection_info.clone(), async move {
+            write::execute_raw(&self.inner, query, parameters).await
+        })
+        .await
     }
 
-    async fn query_raw(&self, query: String, parameters: Vec<PrismaValue>) -> connector::Result<serde_json::Value> {
-        self.catch(async move { write::query_raw(&self.inner, query, parameters).await })
-            .await
+    async fn query_raw(&mut self, query: String, parameters: Vec<PrismaValue>) -> connector::Result<serde_json::Value> {
+        catch(self.connection_info.clone(), async move {
+            write::query_raw(&self.inner, query, parameters).await
+        })
+        .await
     }
 }

@@ -40,4 +40,5 @@ features = [
     "postgresql",
     "mysql",
     "mssql",
+    "expose-drivers",
 ]

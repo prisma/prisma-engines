@@ -1,21 +1,25 @@
 use std::fs;
 
-use clap::{App, Arg};
+const HELP_TEXT: &str = r#"
+Prisma Datamodel v2 to DMMF
+
+Converts a datamodel v2 file to the MCF JSON representation.
+
+USAGE:
+
+    dml-to-mcf <INPUT>
+
+<INPUT>: Sets the input datamodel file to use
+"#;
 
 fn main() {
-    let matches = App::new("Prisma Datamodel v2 to DMMF")
-        .version("0.1")
-        .author("Emanuel Jöbstl <emanuel.joebstl@gmail.com>")
-        .about("Converts a datamodel v2 file to the MCF JSON representation.")
-        .arg(
-            Arg::with_name("INPUT")
-                .help("Sets the input datamodel file to use")
-                .required(true)
-                .index(1),
-        )
-        .get_matches();
+    let args: Vec<String> = std::env::args().skip(1).collect();
 
-    let file_name = matches.value_of("INPUT").unwrap();
+    if args.len() != 1 {
+        eprintln!("{}", HELP_TEXT);
+    }
+
+    let file_name = &args[0];
     let file = fs::read_to_string(&file_name).unwrap_or_else(|_| panic!("Unable to open file {}", file_name));
 
     let res = datamodel::parse_configuration(&file);

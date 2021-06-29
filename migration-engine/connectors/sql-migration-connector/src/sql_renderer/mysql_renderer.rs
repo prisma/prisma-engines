@@ -99,7 +99,10 @@ impl SqlRenderer for MysqlFlavour {
     }
 
     fn render_alter_table(&self, alter_table: &AlterTable, schemas: &Pair<&SqlSchema>) -> Vec<String> {
-        let AlterTable { table_index, changes } = alter_table;
+        let AlterTable {
+            table_ids: table_index,
+            changes,
+        } = alter_table;
 
         let tables = schemas.tables(table_index);
 
@@ -112,24 +115,24 @@ impl SqlRenderer for MysqlFlavour {
                     "ADD PRIMARY KEY ({})",
                     columns.iter().map(|colname| self.quote(colname)).join(", ")
                 )),
-                TableChange::AddColumn { column_index } => {
-                    let column = tables.next().column_at(*column_index);
+                TableChange::AddColumn { column_id } => {
+                    let column = tables.next().column_at(*column_id);
                     let col_sql = self.render_column(&column);
 
                     lines.push(format!("ADD COLUMN {}", col_sql));
                 }
-                TableChange::DropColumn { column_index } => lines.push(
+                TableChange::DropColumn { column_id } => lines.push(
                     sql_ddl::mysql::AlterTableClause::DropColumn {
-                        column_name: tables.previous().column_at(*column_index).name().into(),
+                        column_name: tables.previous().column_at(*column_id).name().into(),
                     }
                     .to_string(),
                 ),
                 TableChange::AlterColumn(AlterColumn {
                     changes,
-                    column_index,
+                    column_id,
                     type_change: _,
                 }) => {
-                    let columns = tables.columns(column_index);
+                    let columns = tables.columns(column_id);
                     let expanded = MysqlAlterColumn::new(&columns, changes);
 
                     match expanded {
@@ -142,11 +145,8 @@ impl SqlRenderer for MysqlFlavour {
                         }
                     };
                 }
-                TableChange::DropAndRecreateColumn {
-                    column_index,
-                    changes: _,
-                } => {
-                    let columns = tables.columns(column_index);
+                TableChange::DropAndRecreateColumn { column_id, changes: _ } => {
+                    let columns = tables.columns(column_id);
                     lines.push(format!("DROP COLUMN `{}`", columns.previous().name()));
                     lines.push(format!("ADD COLUMN {}", self.render_column(columns.next())));
                 }

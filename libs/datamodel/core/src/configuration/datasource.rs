@@ -96,7 +96,7 @@ impl Datasource {
     /// config_dir.
     ///
     /// This is, at the time of this writing (2021-05-05), only used in the
-    /// context of NAPI integration.
+    /// context of Node-API integration.
     ///
     /// P.S. Don't forget to add new parameters here if needed!
     pub fn load_url_with_config_dir<F>(&self, config_dir: &Path, env: F) -> Result<String, Diagnostics>

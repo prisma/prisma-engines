@@ -1,11 +1,12 @@
 [package]
-name = "query-engine-napi"
+name = "query-engine-node-api"
 version = "0.1.0"
 authors = ["Julius de Bruijn <bruijn@prisma.io>"]
 edition = "2018"
 
 [lib]
 crate-type = ["cdylib"]
+name = "query_engine"
 
 [features]
 vendored-openssl = ["sql-connector/vendored-openssl"]

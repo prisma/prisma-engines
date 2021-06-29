@@ -542,12 +542,12 @@ pub fn emulate_on_delete_cascade(
 ///    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
 /// ```
 pub fn emulate_set_null(
-    graph: &mut QueryGraph,
-    relation_field: &RelationFieldRef,
-    connector_ctx: &ConnectorContext,
-    model: &ModelRef,
-    parent_node: &NodeRef,
-    child_node: &NodeRef,
+    _graph: &mut QueryGraph,
+    _relation_field: &RelationFieldRef,
+    _connector_ctx: &ConnectorContext,
+    _model: &ModelRef,
+    _parent_node: &NodeRef,
+    _child_node: &NodeRef,
 ) -> QueryGraphBuilderResult<()> {
     // let dependent_model = relation_field.model();
     // let parent_relation_field = relation_field.related_field();
@@ -661,7 +661,7 @@ pub fn insert_emulated_on_update(
     let relation_fields = internal_model.fields_pointing_to_model(model_to_update, has_fks);
 
     // Unwraps are safe as in this stage, no node content can be replaced.
-    let parent_update_args = extract_update_args(graph.node_content(parent_node).unwrap());
+    let _parent_update_args = extract_update_args(graph.node_content(parent_node).unwrap());
 
     for rf in relation_fields {
         match rf.relation().on_delete() {

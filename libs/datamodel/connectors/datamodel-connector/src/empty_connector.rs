@@ -20,6 +20,10 @@ impl Connector for EmptyDatamodelConnector {
         &[]
     }
 
+    fn constraint_name_length(&self) -> usize {
+        usize::MAX
+    }
+
     fn validate_field(&self, _field: &dml::field::Field) -> Result<(), ConnectorError> {
         Ok(())
     }

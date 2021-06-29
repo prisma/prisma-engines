@@ -62,19 +62,19 @@ impl<'a> Arguments<'a> {
     }
 
     /// Gets the arg with the given name.
-    pub(crate) fn arg(&mut self, name: &str) -> Result<ValueValidator, DatamodelError> {
+    pub(crate) fn arg(&mut self, name: &str) -> Result<ValueValidator<'a>, DatamodelError> {
         self.optional_arg(name)
             .ok_or_else(|| DatamodelError::new_argument_not_found_error(name, self.span))
     }
 
-    pub(crate) fn optional_arg(&mut self, name: &str) -> Option<ValueValidator> {
+    pub(crate) fn optional_arg(&mut self, name: &str) -> Option<ValueValidator<'a>> {
         self.args.remove(name).map(|arg| ValueValidator::new(&arg.value))
     }
 
     /// Gets the arg with the given name, or if it is not found, the first unnamed argument.
     ///
     /// Use this to implement unnamed argument behavior.
-    pub fn default_arg(&mut self, name: &str) -> Result<ValueValidator, DatamodelError> {
+    pub fn default_arg(&mut self, name: &str) -> Result<ValueValidator<'a>, DatamodelError> {
         match (self.args.remove(name), self.args.remove("")) {
             (Some(arg), None) => Ok(ValueValidator::new(&arg.value)),
             (None, Some(arg)) => Ok(ValueValidator::new(&arg.value)),

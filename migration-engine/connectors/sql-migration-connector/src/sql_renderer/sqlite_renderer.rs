@@ -43,7 +43,10 @@ impl SqlRenderer for SqliteFlavour {
     }
 
     fn render_alter_table(&self, alter_table: &AlterTable, schemas: &Pair<&SqlSchema>) -> Vec<String> {
-        let AlterTable { changes, table_index } = alter_table;
+        let AlterTable {
+            changes,
+            table_ids: table_index,
+        } = alter_table;
 
         let tables = schemas.tables(table_index);
 
@@ -54,8 +57,8 @@ impl SqlRenderer for SqliteFlavour {
 
         for change in changes {
             match change {
-                TableChange::AddColumn { column_index } => {
-                    let column = tables.next().column_at(*column_index);
+                TableChange::AddColumn { column_id } => {
+                    let column = tables.next().column_at(*column_id);
                     let col_sql = render_column(&column);
 
                     statements.push(format!(
@@ -149,7 +152,7 @@ impl SqlRenderer for SqliteFlavour {
         let mut result = vec!["PRAGMA foreign_keys=OFF".to_string()];
 
         for redefine_table in tables {
-            let tables = schemas.tables(&redefine_table.table_index);
+            let tables = schemas.tables(&redefine_table.table_ids);
             let temporary_table_name = format!("new_{}", &tables.next().name());
 
             result.push(self.render_create_table_as(tables.next(), &temporary_table_name));
@@ -229,10 +232,10 @@ fn copy_current_table_into_new_table(
     let destination_columns = redefine_table
         .column_pairs
         .iter()
-        .map(|(column_indexes, _, _)| tables.next().column_at(*column_indexes.next()).name());
+        .map(|(column_ides, _, _)| tables.next().column_at(*column_ides.next()).name());
 
-    let source_columns = redefine_table.column_pairs.iter().map(|(column_indexes, changes, _)| {
-        let columns = tables.columns(column_indexes);
+    let source_columns = redefine_table.column_pairs.iter().map(|(column_ides, changes, _)| {
+        let columns = tables.columns(column_ides);
 
         let col_became_required_with_a_default =
             changes.arity_changed() && columns.next().arity().is_required() && columns.next().default().is_some();

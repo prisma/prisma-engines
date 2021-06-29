@@ -32,7 +32,6 @@ impl MongoDbDatamodelConnector {
             ConnectorCapability::MultipleIndexesWithSameName,
             ConnectorCapability::RelationFieldsInArbitraryOrder,
             ConnectorCapability::CreateMany,
-            ConnectorCapability::CreateSkipDuplicates,
             ConnectorCapability::ScalarLists,
             ConnectorCapability::InsensitiveFilters,
         ];
@@ -61,6 +60,10 @@ impl Connector for MongoDbDatamodelConnector {
 
     fn capabilities(&self) -> &[ConnectorCapability] {
         &self.capabilities
+    }
+
+    fn constraint_name_length(&self) -> usize {
+        127
     }
 
     fn referential_actions(&self) -> BitFlags<ReferentialAction> {

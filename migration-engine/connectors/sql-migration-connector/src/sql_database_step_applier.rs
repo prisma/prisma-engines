@@ -3,11 +3,8 @@ use crate::{
     sql_migration::{SqlMigration, SqlMigrationStep},
     SqlFlavour, SqlMigrationConnector,
 };
-use migration_connector::{
-    ConnectorError, ConnectorResult, DatabaseMigrationStepApplier, DestructiveChangeDiagnostics, Migration,
-};
+use migration_connector::{ConnectorResult, DatabaseMigrationStepApplier, DestructiveChangeDiagnostics, Migration};
 use sql_schema_describer::{walkers::SqlSchemaExt, SqlSchema};
-use user_facing_errors::migration_engine::ApplyMigrationError;
 
 #[async_trait::async_trait]
 impl DatabaseMigrationStepApplier for SqlMigrationConnector {
@@ -91,17 +88,9 @@ impl DatabaseMigrationStepApplier for SqlMigrationConnector {
 
     async fn apply_script(&self, migration_name: &str, script: &str) -> ConnectorResult<()> {
         self.flavour.scan_migration_script(script);
-
-        self.conn().raw_cmd(script).await.map_err(|quaint_error| {
-            ConnectorError::user_facing(ApplyMigrationError {
-                migration_name: migration_name.to_owned(),
-                database_error_code: String::from(quaint_error.original_code().unwrap_or("none")),
-                database_error: quaint_error
-                    .original_message()
-                    .map(String::from)
-                    .unwrap_or_else(|| ConnectorError::from(quaint_error).to_string()),
-            })
-        })
+        self.flavour
+            .apply_migration_script(migration_name, script, self.conn())
+            .await
     }
 }
 
@@ -119,48 +108,47 @@ fn render_raw_sql(
         SqlMigrationStep::DropEnum { enum_index } => {
             renderer.render_drop_enum(&schemas.previous().enum_walker_at(*enum_index))
         }
-        SqlMigrationStep::CreateTable { table_index } => {
-            let table = schemas.next().table_walker_at(*table_index);
+        SqlMigrationStep::CreateTable { table_id } => {
+            let table = schemas.next().table_walker_at(*table_id);
 
             vec![renderer.render_create_table(&table)]
         }
-        SqlMigrationStep::DropTable { table_index } => {
-            renderer.render_drop_table(schemas.previous().table_walker_at(*table_index).name())
+        SqlMigrationStep::DropTable { table_id } => {
+            renderer.render_drop_table(schemas.previous().table_walker_at(*table_id).name())
         }
         SqlMigrationStep::RedefineIndex { table, index } => {
             renderer.render_drop_and_recreate_index(schemas.tables(table).indexes(index).as_ref())
         }
         SqlMigrationStep::AddForeignKey {
-            table_index,
+            table_id,
             foreign_key_index,
         } => {
             let foreign_key = schemas
                 .next()
-                .table_walker_at(*table_index)
+                .table_walker_at(*table_id)
                 .foreign_key_at(*foreign_key_index);
 
             vec![renderer.render_add_foreign_key(&foreign_key)]
         }
         SqlMigrationStep::DropForeignKey {
-            table_index,
+            table_id,
             foreign_key_index,
         } => {
             let foreign_key = schemas
                 .previous()
-                .table_walker_at(*table_index)
+                .table_walker_at(*table_id)
                 .foreign_key_at(*foreign_key_index);
 
             vec![renderer.render_drop_foreign_key(&foreign_key)]
         }
         SqlMigrationStep::AlterTable(alter_table) => renderer.render_alter_table(alter_table, &schemas),
         SqlMigrationStep::CreateIndex {
-            table_index: (_, table_index),
+            table_id: (_, table_id),
             index_index,
-        } => vec![renderer.render_create_index(&schemas.next().table_walker_at(*table_index).index_at(*index_index))],
-        SqlMigrationStep::DropIndex {
-            table_index,
-            index_index,
-        } => vec![renderer.render_drop_index(&schemas.previous().table_walker_at(*table_index).index_at(*index_index))],
+        } => vec![renderer.render_create_index(&schemas.next().table_walker_at(*table_id).index_at(*index_index))],
+        SqlMigrationStep::DropIndex { table_id, index_index } => {
+            vec![renderer.render_drop_index(&schemas.previous().table_walker_at(*table_id).index_at(*index_index))]
+        }
         SqlMigrationStep::AlterIndex { table, index } => {
             renderer.render_alter_index(schemas.tables(table).indexes(index).as_ref())
         }

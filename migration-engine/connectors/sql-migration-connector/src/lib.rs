@@ -24,9 +24,12 @@ use error::quaint_error_to_connector_error;
 use flavour::SqlFlavour;
 use migration_connector::{migrations_directory::MigrationDirectory, *};
 use pair::Pair;
-use quaint::{prelude::ConnectionInfo, single::Quaint};
+use quaint::{
+    prelude::{ConnectionInfo, Queryable},
+    single::Quaint,
+};
 use sql_migration::{DropUserDefinedType, DropView, SqlMigration, SqlMigrationStep};
-use sql_schema_describer::{walkers::SqlSchemaExt, SqlSchema};
+use sql_schema_describer::{walkers::SqlSchemaExt, ColumnId, SqlSchema, TableId};
 use user_facing_errors::{common::InvalidDatabaseString, KnownError};
 
 /// The top-level SQL migration connector.
@@ -44,7 +47,7 @@ impl SqlMigrationConnector {
         shadow_database_connection_string: Option<String>,
     ) -> ConnectorResult<Self> {
         let connection = connect(connection_string).await?;
-        let flavour = flavour::from_connection_info(connection.connection_info(), preview_features);
+        let flavour = flavour::from_connection_info(&connection.connection_info(), preview_features);
 
         flavour.ensure_connection_validity(&connection).await?;
 
@@ -88,8 +91,18 @@ impl SqlMigrationConnector {
     }
 
     /// Made public for tests.
-    pub fn quaint(&self) -> &Quaint {
-        self.connection.quaint()
+    pub fn queryable(&self) -> &dyn Queryable {
+        self.connection.queryable()
+    }
+
+    /// Made public for tests.
+    pub fn connection_info(&self) -> ConnectionInfo {
+        self.connection.connection_info()
+    }
+
+    /// Made public for tests.
+    pub fn schema_name(&self) -> &str {
+        self.connection.schema_name()
     }
 
     /// Made public for tests.
@@ -230,7 +243,7 @@ impl MigrationConnector for SqlMigrationConnector {
         let steps =
             sql_schema_differ::calculate_steps(Pair::new(&previous_schema, &next_schema), self.flavour.as_ref());
 
-        let added_columns_with_virtual_defaults: Vec<(usize, usize)> =
+        let added_columns_with_virtual_defaults: Vec<(TableId, ColumnId)> =
             if let Some((_, next_datamodel)) = to.as_datamodel() {
                 walk_added_columns(&steps)
                     .map(|(table_index, column_index)| {
@@ -251,7 +264,7 @@ impl MigrationConnector for SqlMigrationConnector {
                             })
                             .is_some()
                     })
-                    .map(move |(table, column)| (table.table_index(), column.column_index()))
+                    .map(move |(table, column)| (table.table_id(), column.column_id()))
                     .collect()
             } else {
                 Vec::new()
@@ -322,11 +335,18 @@ async fn connect(database_str: &str) -> ConnectorResult<Connection> {
         KnownError::new(InvalidDatabaseString { details })
     })?;
 
+    if let ConnectionInfo::Postgres(url) = &connection_info {
+        return quaint::connector::PostgreSql::new(url.clone())
+            .await
+            .map(|conn| Connection::new_postgres(conn, url.clone()))
+            .map_err(|err| quaint_error_to_connector_error(err, &connection_info));
+    }
+
     let connection = Quaint::new(database_str)
         .await
         .map_err(|err| quaint_error_to_connector_error(err, &connection_info))?;
 
-    Ok(Connection::new(connection))
+    Ok(Connection::new_generic(connection))
 }
 
 /// List all the columns added in the migration, either by alter table steps or
@@ -334,7 +354,7 @@ async fn connect(database_str: &str) -> ConnectorResult<Connection> {
 ///
 /// The return value should be interpreted as an iterator over `(table_index,
 /// column_index)` in the `next` schema.
-fn walk_added_columns(steps: &[SqlMigrationStep]) -> impl Iterator<Item = (usize, usize)> + '_ {
+fn walk_added_columns(steps: &[SqlMigrationStep]) -> impl Iterator<Item = (TableId, ColumnId)> + '_ {
     steps
         .iter()
         .filter_map(|step| step.as_alter_table())
@@ -343,7 +363,7 @@ fn walk_added_columns(steps: &[SqlMigrationStep]) -> impl Iterator<Item = (usize
                 .changes
                 .iter()
                 .filter_map(|change| change.as_add_column())
-                .map(move |column_index| -> (usize, usize) { (*alter_table.table_index.next(), column_index) })
+                .map(move |column_index| -> (TableId, ColumnId) { (*alter_table.table_ids.next(), column_index) })
         })
         .chain(
             steps
@@ -354,7 +374,7 @@ fn walk_added_columns(steps: &[SqlMigrationStep]) -> impl Iterator<Item = (usize
                     table
                         .added_columns
                         .iter()
-                        .map(move |column_index| (*table.table_index.next(), *column_index))
+                        .map(move |column_index| (*table.table_ids.next(), *column_index))
                 }),
         )
 }
