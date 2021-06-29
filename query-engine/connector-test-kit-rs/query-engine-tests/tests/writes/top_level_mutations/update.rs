@@ -38,7 +38,7 @@ mod update {
               #id(id, Int, @id)
               optEnum MyEnum?
             }
-            
+
             enum MyEnum {
               A
               ABCD
@@ -91,7 +91,7 @@ mod update {
               id1  Float
               id2  Int
               uniq Int @unique
-              
+
               @@id([id1, id2])
             }"#
         };
@@ -190,7 +190,7 @@ mod update {
     }
 
     // "An updateOne mutation" should "update enums"
-    #[connector_test(schema(schema_3), exclude(SqlServer))]
+    #[connector_test(schema(schema_3), capabilities(Enums))]
     async fn update_enums(runner: &Runner) -> TestResult<()> {
         create_row(runner, r#"{ id: 1 }"#).await?;
 
