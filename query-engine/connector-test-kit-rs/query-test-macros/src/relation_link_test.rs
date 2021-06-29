@@ -14,10 +14,10 @@ use syn::{parse_macro_input, AttributeArgs, ItemFn};
 ///
 /// Original code:
 /// ```rust
-/// #[connector_test_gen(gen(ChildOpt, ParentOpt))]
+/// #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneOpt")]
 /// async fn my_fancy_test(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
 ///   assert_eq!(true, true);
-/// }    
+/// }
 /// ```
 /// Generated code:
 ///  ```rust

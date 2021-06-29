@@ -247,10 +247,9 @@ mod connect_inside_create {
 
     // "a PM to C1 relation with a child without a relation" should "error if also trying to connect to a non-existing node"
     // TODO: Remove when transactions are back
-    // TODO(dom): Fix the assertion. Scala uses 0 without any error name assertion, not sure if it's even testing anything
     #[relation_link_test(on_parent = "ToMany", on_child = "ToOneOpt")]
     async fn pm_to_c1_rel_fail_connect_no_node(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
-        let _child = t.child().parse(
+        let child = t.child().parse(
             run_query_json!(
                 runner,
                 format!(
@@ -266,25 +265,24 @@ mod connect_inside_create {
             &["data", "createOneChild"],
         )?;
 
-        // assert_error!(
-        //     runner,
-        //     format!(
-        //         r#"mutation {{
-        //       createOneParent(data:{{
-        //         p: "p2"
-        //         childrenOpt: {{connect: [{child}, {{c: "DOES NOT EXIST", c_1: "no", c_2: "no"}}]}}
-        //       }}){{
-        //         childrenOpt {{
-        //           c
-        //         }}
-        //       }}
-        //     }}"#,
-        //         child = child
-        //     ),
-        //     // TODO: This fails differently with different relation setups
-        //     0, // 2018 for the first failures, used to be 3039,
-        //     "RecordNotFound"
-        // );
+        assert_error!(
+            runner,
+            format!(
+                r#"mutation {{
+                  createOneParent(data:{{
+                    p: "p2"
+                    childrenOpt: {{connect: [{child}, {{c: "DOES NOT EXIST", c_1: "no", c_2: "no"}}]}}
+                  }}){{
+                    childrenOpt {{
+                      c
+                    }}
+                  }}
+                }}"#,
+                child = child
+            ),
+            0,
+            "RecordNotFound"
+        );
 
         Ok(())
     }
@@ -550,53 +548,6 @@ mod connect_inside_create {
 
         Ok(())
     }
-
-    // fn schema_1() -> String {
-    //     let schema = indoc! {
-    //         r#"model Role {
-    //           #id(id, String, @id, @default(cuid()))
-    //           r  String @unique
-    //          }
-
-    //          model User {
-    //           #id(id, String, @id, @default(cuid()))
-    //           u     String @unique
-    //           roles Role[]
-    //          }"#
-    //     };
-
-    //     schema.to_owned()
-    // }
-
-    // TODO: ignored test. check whether this is already covered
-    // "a PM to CM  relation without a backrelation" should "be connectable through a nested mutation by unique"
-    // #[connector_test(schema(schema_1))]
-    // async fn test_14(runner: &Runner) -> TestResult<()> {
-    //     run_query!(
-    //         runner,
-    //         r#"mutation {
-    //       createOneRole(data: {r: "r1"}){
-    //            r
-    //       }
-    //     }"#
-    //     );
-
-    //     insta::assert_snapshot!(
-    //       run_query!(runner, r#"mutation {
-    //         createOneUser(data:{
-    //           u: "u2"
-    //           roles: {connect: {r: "r1"}}
-    //         }){
-    //           roles {
-    //             r
-    //           }
-    //         }
-    //       }"#),
-    //       @r###"{"data":{"createOneUser":{"roles":[{"r":"r1"}]}}}"###
-    //     );
-
-    //     Ok(())
-    // }
 
     fn schema_2() -> String {
         let schema = indoc! {
