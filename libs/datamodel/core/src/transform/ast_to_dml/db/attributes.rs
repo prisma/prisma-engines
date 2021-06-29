@@ -6,7 +6,7 @@ use crate::{
 };
 
 /// @@id on models
-pub(super) fn model_id(id_args: &mut Arguments<'_>, model_id: ast::TopId, ctx: &mut Context<'_, '_>) {
+pub(super) fn model_id(id_args: &mut Arguments<'_>, model_id: ast::ModelId, ctx: &mut Context<'_, '_>) {
     let resolved_fields = match id_args.default_arg("fields") {
         Ok(value) => match resolve_field_array(&value, model_id, ctx) {
             Ok(fields) => fields,
@@ -16,7 +16,7 @@ pub(super) fn model_id(id_args: &mut Arguments<'_>, model_id: ast::TopId, ctx: &
                         "The multi field id declaration refers to the unknown fields {}.",
                         unresolved_fields.join(", "),
                     ),
-                    ctx.db.ast[model_id].name(),
+                    &ctx.db.ast[model_id].name.name,
                     value.span(),
                 ));
             }
@@ -27,14 +27,14 @@ pub(super) fn model_id(id_args: &mut Arguments<'_>, model_id: ast::TopId, ctx: &
         }
     };
 
-    let model_name = ctx.db.ast()[model_id].name();
+    let model_name = &ctx.db.ast()[model_id].name.name;
 
     // ID fields must reference only required (1) scalar (2) fields.
 
     // (1)
     let fields_that_are_not_required: Vec<&str> = resolved_fields
         .iter()
-        .map(|field_id| &ctx.db.ast[model_id].as_model().unwrap()[*field_id])
+        .map(|field_id| &ctx.db.ast[model_id][*field_id])
         .filter(|field| !matches!(field.arity, ast::FieldArity::Required))
         .map(|field| field.name.name.as_str())
         .collect();
@@ -54,7 +54,7 @@ pub(super) fn model_id(id_args: &mut Arguments<'_>, model_id: ast::TopId, ctx: &
     let referenced_relation_fields: Vec<&str> = resolved_fields
         .iter()
         .filter(|field_id| ctx.db.relations.relation_fields.contains_key(&(model_id, **field_id)))
-        .map(|field_id| ctx.db.ast[model_id].as_model().unwrap()[*field_id].name.name.as_str())
+        .map(|field_id| ctx.db.ast[model_id][*field_id].name.name.as_str())
         .collect();
 
     if !referenced_relation_fields.is_empty() {
@@ -75,7 +75,7 @@ pub(super) fn model_id(id_args: &mut Arguments<'_>, model_id: ast::TopId, ctx: &
 /// resolves  the constant as field names on the model.
 fn resolve_field_array(
     values: &ValueValidator<'_>,
-    model_id: ast::TopId,
+    model_id: ast::ModelId,
     ctx: &mut Context<'_, '_>,
 ) -> Result<Vec<ast::FieldId>, Option<Vec<String>>> {
     let constant_array = match values.as_constant_array() {

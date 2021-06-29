@@ -27,7 +27,7 @@ pub(super) struct Names<'ast> {
     pub(super) generators: HashMap<&'ast str, TopId>,
     /// Datasources have their own namespace.
     pub(super) datasources: HashMap<&'ast str, TopId>,
-    pub(super) model_fields: BTreeMap<(TopId, &'ast str), FieldId>,
+    pub(super) model_fields: BTreeMap<(ast::ModelId, &'ast str), FieldId>,
 }
 
 pub(super) fn resolve_names(ctx: &mut Context<'_, '_>) {
@@ -37,8 +37,8 @@ pub(super) fn resolve_names(ctx: &mut Context<'_, '_>) {
     for (top_id, top) in ctx.db.ast.iter_tops() {
         assert_is_not_a_reserved_scalar_type(top, ctx);
 
-        let namespace = match top {
-            ast::Top::Enum(ast_enum) => {
+        let namespace = match (top_id, top) {
+            (_, ast::Top::Enum(ast_enum)) => {
                 tmp_names.clear();
 
                 for value in &ast_enum.values {
@@ -53,11 +53,11 @@ pub(super) fn resolve_names(ctx: &mut Context<'_, '_>) {
 
                 &mut names.tops
             }
-            ast::Top::Model(model) => {
+            (ast::TopId::Model(model_id), ast::Top::Model(model)) => {
                 for (field_id, field) in model.iter_fields() {
                     if names
                         .model_fields
-                        .insert((top_id, &field.name.name), field_id)
+                        .insert((model_id, &field.name.name), field_id)
                         .is_some()
                     {
                         ctx.push_error(DatamodelError::new_duplicate_field_error(
@@ -70,15 +70,16 @@ pub(super) fn resolve_names(ctx: &mut Context<'_, '_>) {
 
                 &mut names.tops
             }
-            ast::Top::Source(datasource) => {
+            (_, ast::Top::Source(datasource)) => {
                 check_for_duplicate_properties(top, &datasource.properties, &mut tmp_names, ctx);
                 &mut names.datasources
             }
-            ast::Top::Generator(generator) => {
+            (_, ast::Top::Generator(generator)) => {
                 check_for_duplicate_properties(top, &generator.properties, &mut tmp_names, ctx);
                 &mut names.generators
             }
-            ast::Top::Type(_) => &mut names.tops,
+            (_, ast::Top::Type(_)) => &mut names.tops,
+            _ => unreachable!(),
         };
 
         insert_name(top_id, top, namespace, ctx)
@@ -107,7 +108,7 @@ fn duplicate_top_error(existing: &ast::Top, duplicate: &ast::Top) -> DatamodelEr
     )
 }
 
-fn assert_is_not_a_reserved_scalar_type(top: &ast::Top, ctx: &mut Context<'_, '_>) {
+fn assert_is_not_a_reserved_scalar_type(top: &dyn WithIdentifier, ctx: &mut Context<'_, '_>) {
     let ident = top.identifier();
     if ScalarType::from_str(&ident.name).is_ok() {
         ctx.push_error(DatamodelError::new_reserved_scalar_type_error(&ident.name, ident.span));

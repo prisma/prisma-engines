@@ -1,14 +1,15 @@
 use super::ScalarFieldType;
 use crate::{
-    ast::{FieldId, SchemaAst, TopId},
+    ast,
     diagnostics::{DatamodelError, Diagnostics},
 };
 use itertools::Itertools;
 use std::collections::{BTreeMap, HashMap};
+
 #[derive(Debug, Default)]
 pub(super) struct Types {
-    pub(super) type_aliases: HashMap<TopId, ScalarFieldType>,
-    pub(super) scalar_fields: BTreeMap<(TopId, FieldId), ScalarFieldType>,
+    pub(super) type_aliases: HashMap<ast::AliasId, ScalarFieldType>,
+    pub(super) scalar_fields: BTreeMap<(ast::ModelId, ast::FieldId), ScalarFieldType>,
 }
 
 impl Types {
@@ -17,32 +18,30 @@ impl Types {
     /// alias — which may in turn reference another type alias —, we check that
     /// it is not self-referencing. If a type alias ends up transitively
     /// referencing itself, we create an error diagnostic.
-    pub(super) fn detect_alias_cycles(&self, ast: &SchemaAst, diagnostics: &mut Diagnostics) {
+    pub(super) fn detect_alias_cycles(&self, ast: &ast::SchemaAst, diagnostics: &mut Diagnostics) {
         // The IDs of the type aliases we traversed to get to the current type alias.
         let mut path = Vec::new();
         // We accumulate the errors here because we want to sort them at the end.
-        let mut errors: Vec<(TopId, DatamodelError)> = Vec::new();
+        let mut errors: Vec<(ast::AliasId, DatamodelError)> = Vec::new();
 
-        for (top_id, ty) in &self.type_aliases {
+        for (alias_id, ty) in &self.type_aliases {
             // Loop variable. This is the "tip" of the sequence of type aliases.
-            let mut current = (*top_id, ty);
+            let mut current = (*alias_id, ty);
             path.clear();
 
             // Follow the chain of type aliases referencing other type aliases.
             while let ScalarFieldType::Alias(next_alias_id) = current.1 {
                 path.push(current.0);
-                let next_alias = ast[*next_alias_id].unwrap_type_alias();
+                let next_alias = &ast[*next_alias_id];
                 // Detect a cycle where next type is also the root. In that
                 // case, we want to report an error.
                 if path.len() > 1 && &path[0] == next_alias_id {
                     errors.push((
-                        *top_id,
+                        *alias_id,
                         DatamodelError::new_validation_error(
                             &format!(
                                 "Recursive type definitions are not allowed. Recursive path was: {} -> {}.",
-                                path.iter()
-                                    .map(|id| &ast[*id].unwrap_type_alias().name.name)
-                                    .join(" -> "),
+                                path.iter().map(|id| &ast[*id].name.name).join(" -> "),
                                 &next_alias.name.name,
                             ),
                             next_alias.field_type.span(),
