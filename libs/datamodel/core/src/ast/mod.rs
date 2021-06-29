@@ -68,10 +68,17 @@ impl SchemaAst {
     }
 
     pub(crate) fn iter_tops(&self) -> impl Iterator<Item = (TopId, &Top)> {
-        self.tops
-            .iter()
-            .enumerate()
-            .map(|(top_idx, top)| (TopId(top_idx as u32), top))
+        self.tops.iter().enumerate().map(|(top_idx, top)| {
+            let top_id = match top {
+                Top::Enum(_) => TopId::Enum(EnumId(top_idx as u32)),
+                Top::Model(_) => TopId::Model(ModelId(top_idx as u32)),
+                Top::Source(_) => TopId::Source(SourceId(top_idx as u32)),
+                Top::Generator(_) => TopId::Generator(GeneratorId(top_idx as u32)),
+                Top::Type(_) => TopId::Alias(AliasId(top_idx as u32)),
+            };
+
+            (top_id, top)
+        })
     }
 
     pub(crate) fn models(&self) -> impl Iterator<Item = &Model> {
@@ -87,15 +94,67 @@ impl SchemaAst {
     }
 }
 
-/// An opaque identifier for a top-level item in a schema AST. Use the
-/// `schema[top_id]` syntax to resolve the id to an `ast::Top`.
+/// An opaque identifier for a model in a schema AST. Use the
+/// `schema[model_id]` syntax to resolve the id to an `ast::Model`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub(crate) struct TopId(u32);
+pub(crate) struct ModelId(u32);
+
+impl std::ops::Index<ModelId> for SchemaAst {
+    type Output = Model;
+
+    fn index(&self, index: ModelId) -> &Self::Output {
+        self.tops[index.0 as usize].as_model().unwrap()
+    }
+}
+
+/// An opaque identifier for an enum in a schema AST.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub(crate) struct EnumId(u32);
+
+/// An opaque identifier for a type alias in a schema AST. Use the
+/// `schema[alias_id]` syntax to resolve the id to an `ast::Field`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub(crate) struct AliasId(u32);
+
+impl std::ops::Index<AliasId> for SchemaAst {
+    type Output = Field;
+
+    fn index(&self, index: AliasId) -> &Self::Output {
+        self.tops[index.0 as usize].as_type_alias().unwrap()
+    }
+}
+
+/// An opaque identifier for a generator block in a schema AST.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub(crate) struct GeneratorId(u32);
+
+/// An opaque identifier for a datasource blèck in a schema AST.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub(crate) struct SourceId(u32);
+
+/// An identifier for a top-level item in a schema AST. Use the `schema[top_id]`
+/// syntax to resolve the id to an `ast::Top`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub(crate) enum TopId {
+    Model(ModelId),
+    Enum(EnumId),
+    Alias(AliasId),
+    Generator(GeneratorId),
+    Source(SourceId),
+}
 
 impl std::ops::Index<TopId> for SchemaAst {
     type Output = Top;
 
     fn index(&self, index: TopId) -> &Self::Output {
-        &self.tops[index.0 as usize]
+        let idx = match index {
+            TopId::Model(ModelId(idx)) => idx,
+            TopId::Enum(EnumId(idx)) => idx,
+            TopId::Alias(AliasId(idx)) => idx,
+            TopId::Generator(GeneratorId(idx)) => idx,
+            TopId::Source(SourceId(idx)) => idx,
+        };
+
+        &self.tops[idx as usize]
     }
 }
