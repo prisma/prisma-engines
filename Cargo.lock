@@ -3493,6 +3493,7 @@ name = "query-test-macros"
 version = "0.1.0"
 dependencies = [
  "darling",
+ "indoc",
  "itertools 0.10.0",
  "proc-macro2",
  "query-tests-setup",
@@ -3528,6 +3529,7 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-error",
+ "tracing-futures",
  "tracing-subscriber",
 ]
 
