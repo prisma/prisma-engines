@@ -16,17 +16,17 @@ use std::error;
 /// Wraps a value and provides convenience methods for
 /// parsing it.
 #[derive(Debug)]
-pub struct ValueValidator {
-    value: ast::Expression,
+pub struct ValueValidator<'a> {
+    value: &'a ast::Expression,
 }
 
-impl ValueValidator {
+impl<'a> ValueValidator<'a> {
     /// Creates a new instance by wrapping a value.
     ///
     /// If the value is a function expression, it is evaluated
     /// recursively.
-    pub fn new(value: &ast::Expression) -> ValueValidator {
-        ValueValidator { value: value.clone() }
+    pub fn new(value: &'a ast::Expression) -> ValueValidator<'a> {
+        ValueValidator { value }
     }
 
     /// Creates a new type mismatch error for the
@@ -107,7 +107,7 @@ impl ValueValidator {
     }
 
     pub fn as_env_function(&self) -> Result<EnvFunction, DatamodelError> {
-        EnvFunction::from_ast(&self.value)
+        EnvFunction::from_ast(self.value)
     }
 
     /// returns true if this argument is derived from an env() function
@@ -156,6 +156,18 @@ impl ValueValidator {
         }
     }
 
+    /// Unwraps the value as an array of constants.
+    pub fn as_constant_array(&self) -> Result<Vec<String>, DatamodelError> {
+        if let ast::Expression::Array(values, _) = &self.value {
+            values
+                .iter()
+                .map(|val| ValueValidator::new(val).as_constant_literal())
+                .collect()
+        } else {
+            Err(self.construct_type_mismatch_error("Array of constants"))
+        }
+    }
+
     /// Unwraps the wrapped value as a constant literal.
     pub fn as_constant_literal(&self) -> Result<String, DatamodelError> {
         match &self.value {
@@ -186,10 +198,10 @@ impl ValueValidator {
     }
 
     /// Unwraps the wrapped value as a constant literal..
-    pub fn as_array(&self) -> Vec<ValueValidator> {
+    pub fn as_array(&self) -> Vec<ValueValidator<'a>> {
         match &self.value {
             ast::Expression::Array(values, _) => {
-                let mut validators: Vec<ValueValidator> = Vec::new();
+                let mut validators: Vec<ValueValidator<'_>> = Vec::new();
 
                 for value in values {
                     validators.push(ValueValidator::new(value));
@@ -197,9 +209,7 @@ impl ValueValidator {
 
                 validators
             }
-            _ => vec![ValueValidator {
-                value: self.value.clone(),
-            }],
+            _ => vec![ValueValidator { value: self.value }],
         }
     }
 
@@ -223,7 +233,7 @@ impl ValueValidator {
                 Ok(DefaultValue::Expression(generator))
             }
             _ => {
-                let x = ValueValidator::new(&self.value).as_type(scalar_type)?;
+                let x = ValueValidator::new(self.value).as_type(scalar_type)?;
                 Ok(DefaultValue::Single(x))
             }
         }
@@ -263,7 +273,7 @@ pub(crate) trait ValueListValidator {
     fn to_literal_vec(&self) -> Result<Vec<String>, DatamodelError>;
 }
 
-impl ValueListValidator for Vec<ValueValidator> {
+impl ValueListValidator for Vec<ValueValidator<'_>> {
     fn to_string_from_env_var_vec(&self) -> Result<Vec<StringFromEnvVar>, DatamodelError> {
         self.iter().map(|val| val.as_str_from_env()).collect()
     }

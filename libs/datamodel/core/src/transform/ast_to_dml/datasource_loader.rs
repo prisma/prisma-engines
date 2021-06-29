@@ -204,7 +204,7 @@ generator client {
 "#;
 
 fn get_planet_scale_mode_arg(
-    args: &HashMap<&str, ValueValidator>,
+    args: &HashMap<&str, ValueValidator<'_>>,
     preview_features: &HashSet<PreviewFeature>,
     source: &SourceConfig,
     diagnostics: &mut Diagnostics,
@@ -236,7 +236,7 @@ fn get_planet_scale_mode_arg(
     }
 }
 
-fn preview_features_guardrail(args: &HashMap<&str, ValueValidator>, diagnostics: &mut Diagnostics) {
+fn preview_features_guardrail(args: &HashMap<&str, ValueValidator<'_>>, diagnostics: &mut Diagnostics) {
     let arg = args.get(PREVIEW_FEATURES_KEY);
 
     if let Some(val) = arg {
