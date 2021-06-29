@@ -40,7 +40,7 @@ pub(crate) struct ParserDatabase<'ast> {
     types: types::Types,
     relations: relations::Relations,
     /// model id -> id fields id
-    ids: HashMap<ast::TopId, Vec<ast::FieldId>>,
+    ids: HashMap<ast::ModelId, Vec<ast::FieldId>>,
 }
 
 impl<'ast> ParserDatabase<'ast> {
@@ -69,11 +69,11 @@ impl<'ast> ParserDatabase<'ast> {
         }
 
         for (top_id, top) in ast.iter_tops() {
-            match top {
-                ast::Top::Type(type_alias) => {
+            match (top_id, top) {
+                (ast::TopId::Alias(alias_id), ast::Top::Type(type_alias)) => {
                     match field_type(type_alias, &mut ctx) {
                         Ok(FieldType::Scalar(scalar_field_type)) => {
-                            ctx.db.types.type_aliases.insert(top_id, scalar_field_type);
+                            ctx.db.types.type_aliases.insert(alias_id, scalar_field_type);
                         }
                         Ok(FieldType::Model(_)) => ctx.push_error(DatamodelError::new_validation_error(
                             "Only scalar types can be used for defining custom types.",
@@ -85,8 +85,9 @@ impl<'ast> ParserDatabase<'ast> {
                         )),
                     };
                 }
-                ast::Top::Model(model) => visit_model(top_id, model, &mut ctx),
-                ast::Top::Source(_) | ast::Top::Generator(_) | ast::Top::Enum(_) => (),
+                (ast::TopId::Model(model_id), ast::Top::Model(model)) => visit_model(model_id, model, &mut ctx),
+                (_, ast::Top::Source(_)) | (_, ast::Top::Generator(_)) | (_, ast::Top::Enum(_)) => (),
+                _ => unreachable!(),
             }
         }
 
@@ -95,7 +96,7 @@ impl<'ast> ParserDatabase<'ast> {
         db
     }
 
-    pub(super) fn alias_scalar_field_type(&self, alias_id: &ast::TopId) -> &ScalarFieldType {
+    pub(super) fn alias_scalar_field_type(&self, alias_id: &ast::AliasId) -> &ScalarFieldType {
         self.types.type_aliases.get(alias_id).unwrap()
     }
 
@@ -125,7 +126,7 @@ impl<'ast> ParserDatabase<'ast> {
     /// the schema.
     pub(crate) fn iter_model_relation_fields(
         &self,
-        model_id: ast::TopId,
+        model_id: ast::ModelId,
     ) -> impl Iterator<Item = (ast::FieldId, &RelationField)> + '_ {
         self.relations
             .relation_fields
@@ -136,7 +137,7 @@ impl<'ast> ParserDatabase<'ast> {
     /// Iterate all the scalar fields in a given model in the order they were defined.
     pub(crate) fn iter_model_scalar_fields(
         &self,
-        model_id: ast::TopId,
+        model_id: ast::ModelId,
     ) -> impl Iterator<Item = (ast::FieldId, &ScalarFieldType)> + '_ {
         self.types
             .scalar_fields
@@ -149,17 +150,20 @@ impl<'ast> ParserDatabase<'ast> {
     }
 }
 
-fn visit_model<'ast>(top_id: ast::TopId, model: &'ast ast::Model, ctx: &mut Context<'_, 'ast>) {
+fn visit_model<'ast>(model_id: ast::ModelId, model: &'ast ast::Model, ctx: &mut Context<'_, 'ast>) {
     for (field_id, field) in model.iter_fields() {
         match field_type(field, ctx) {
             Ok(FieldType::Model(referenced_model)) => {
                 ctx.db
                     .relations
                     .relation_fields
-                    .insert((top_id, field_id), relations::RelationField { referenced_model });
+                    .insert((model_id, field_id), relations::RelationField { referenced_model });
             }
             Ok(FieldType::Scalar(scalar_field_type)) => {
-                ctx.db.types.scalar_fields.insert((top_id, field_id), scalar_field_type);
+                ctx.db
+                    .types
+                    .scalar_fields
+                    .insert((model_id, field_id), scalar_field_type);
             }
             Err(supported) => ctx.push_error(DatamodelError::new_type_not_found_error(
                 supported,
@@ -170,14 +174,14 @@ fn visit_model<'ast>(top_id: ast::TopId, model: &'ast ast::Model, ctx: &mut Cont
 
     ctx.visit_attributes(&model.attributes, |attributes, ctx| {
         if let Some(mut id_args) = attributes.get_optional_single("id", ctx) {
-            attributes::model_id(&mut id_args, top_id, ctx);
+            attributes::model_id(&mut id_args, model_id, ctx);
         }
     });
 }
 
 #[derive(Debug)]
 enum FieldType {
-    Model(ast::TopId),
+    Model(ast::ModelId),
     Scalar(ScalarFieldType),
 }
 
@@ -185,7 +189,7 @@ enum FieldType {
 pub(crate) enum ScalarFieldType {
     Enum(ast::TopId),
     BuiltInScalar,
-    Alias(ast::TopId),
+    Alias(ast::AliasId),
     Unsupported,
 }
 
@@ -206,10 +210,11 @@ fn field_type<'ast>(field: &'ast ast::Field, ctx: &mut Context<'_, 'ast>) -> Res
         .get(supported.as_str())
         .map(|id| (*id, &ctx.db.ast[*id]))
     {
-        Some((id, ast::Top::Model(_))) => Ok(FieldType::Model(id)),
+        Some((ast::TopId::Model(model_id), ast::Top::Model(_))) => Ok(FieldType::Model(model_id)),
         Some((id, ast::Top::Enum(_))) => Ok(FieldType::Scalar(ScalarFieldType::Enum(id))),
-        Some((id, ast::Top::Type(_))) => Ok(FieldType::Scalar(ScalarFieldType::Alias(id))),
+        Some((ast::TopId::Alias(id), ast::Top::Type(_))) => Ok(FieldType::Scalar(ScalarFieldType::Alias(id))),
         Some((_, ast::Top::Generator(_))) | Some((_, ast::Top::Source(_))) => unreachable!(),
         None => Err(supported),
+        _ => unreachable!(),
     }
 }

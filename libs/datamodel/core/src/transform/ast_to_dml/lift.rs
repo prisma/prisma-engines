@@ -47,12 +47,13 @@ impl<'a> LiftAstToDml<'a> {
         let mut schema = dml::Datamodel::new();
 
         for (top_id, ast_obj) in self.db.ast().iter_tops() {
-            match ast_obj {
-                ast::Top::Enum(en) => schema.add_enum(self.lift_enum(en)),
-                ast::Top::Model(ty) => schema.add_model(self.lift_model(top_id, ty)),
-                ast::Top::Source(_) => { /* Source blocks are explicitly ignored by the validator */ }
-                ast::Top::Generator(_) => { /* Generator blocks are explicitly ignored by the validator */ }
-                ast::Top::Type(_) => { /* Type blocks are inlined */ }
+            match (top_id, ast_obj) {
+                (_, ast::Top::Enum(en)) => schema.add_enum(self.lift_enum(en)),
+                (ast::TopId::Model(model_id), ast::Top::Model(ty)) => schema.add_model(self.lift_model(model_id, ty)),
+                (_, ast::Top::Source(_)) => { /* Source blocks are explicitly ignored by the validator */ }
+                (_, ast::Top::Generator(_)) => { /* Generator blocks are explicitly ignored by the validator */ }
+                (_, ast::Top::Type(_)) => { /* Type blocks are inlined */ }
+                _ => unreachable!(),
             }
         }
 
@@ -60,7 +61,7 @@ impl<'a> LiftAstToDml<'a> {
     }
 
     /// Internal: Validates a model AST node and lifts it to a DML model.
-    fn lift_model(&mut self, model_id: ast::TopId, ast_model: &ast::Model) -> dml::Model {
+    fn lift_model(&mut self, model_id: ast::ModelId, ast_model: &ast::Model) -> dml::Model {
         let mut model = dml::Model::new(ast_model.name.name.clone(), None);
         model.documentation = ast_model.documentation.clone().map(|comment| comment.text);
 
@@ -94,7 +95,7 @@ impl<'a> LiftAstToDml<'a> {
         for (field_id, relation_field) in self.db.iter_model_relation_fields(model_id) {
             let ast_field = &ast_model[field_id];
             let arity = self.lift_field_arity(&ast_field.arity);
-            let target_model = &self.db.ast()[relation_field.referenced_model].as_model().unwrap();
+            let target_model = &self.db.ast()[relation_field.referenced_model];
             let relation_info = dml::RelationInfo::new(&target_model.name.name);
 
             let mut field = dml::RelationField::new(&ast_field.name.name, arity, arity, relation_info);
@@ -206,7 +207,7 @@ impl<'a> LiftAstToDml<'a> {
                 self.diagnostics,
             ),
             ScalarFieldType::Alias(top_id) => {
-                let alias = self.db.ast()[*top_id].as_type_alias().unwrap();
+                let alias = &self.db.ast()[*top_id];
                 collected_attributes.extend(alias.attributes.iter().cloned());
                 self.lift_scalar_field_type(alias, self.db.alias_scalar_field_type(top_id), collected_attributes)
             }
