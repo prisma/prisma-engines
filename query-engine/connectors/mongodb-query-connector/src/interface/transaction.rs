@@ -6,8 +6,6 @@ use crate::{
 use connector_interface::{ConnectionLike, ReadOperations, RelAggregationSelection, Transaction, WriteOperations};
 use mongodb::options::{Acknowledgment, ReadConcern, TransactionOptions, WriteConcern};
 
-/// Not really a transaction right now, just something to
-/// satisfy the core interface until we figure something out.
 pub struct MongoDbTransaction<'conn> {
     connection: &'conn mut MongoDbConnection,
 }
