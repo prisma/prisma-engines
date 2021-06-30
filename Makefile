@@ -18,7 +18,15 @@ test-qe:
 	cargo test --package query-engine-tests
 
 test-qe-verbose:
-	cargo test --package query-engine-tests -- --nocapture
+	cargo test --package query-engine-tests -- --nocapture --test-threads 1
+
+# Single threaded thread execution.
+test-qe-st:
+	cargo test --package query-engine-tests
+
+# Single threaded thread execution, verbose.
+test-qe-verbose:
+	cargo test --package query-engine-tests -- --nocapture --test-threads 1
 
 all-dbs:
 	docker-compose -f docker-compose.yml up  -d --remove-orphans

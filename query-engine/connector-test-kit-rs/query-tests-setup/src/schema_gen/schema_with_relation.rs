@@ -192,11 +192,19 @@ pub fn schema_with_relation(
                                 child_id = child_id
                             };
 
-                            if *parent_id == Identifier::Compound || *child_id == Identifier::Compound {
-                                required_capabilities.push(vec![ConnectorCapability::CompoundIds]);
-                            } else {
-                                required_capabilities.push(vec![]);
+                            let mut required_capabilities_for_dm = vec![];
+
+                            match (parent_id, child_id) {
+                                (Identifier::Compound, _) | (_, &Identifier::Compound) => {
+                                    required_capabilities_for_dm.push(ConnectorCapability::CompoundIds)
+                                }
+                                (Identifier::None, _) | (_, &Identifier::None) => {
+                                    required_capabilities_for_dm.push(ConnectorCapability::AnyId)
+                                }
+                                _ => (),
                             }
+
+                            required_capabilities.push(required_capabilities_for_dm);
 
                             datamodels.push(DatamodelWithParams {
                                 datamodel,

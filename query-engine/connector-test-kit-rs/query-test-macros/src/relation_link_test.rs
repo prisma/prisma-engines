@@ -56,15 +56,15 @@ pub fn relation_link_test_impl(attr: TokenStream, input: TokenStream) -> TokenSt
         return err.write_errors().into();
     };
 
-    let connectors = args.connectors_to_test();
     // Renders the connectors as list to use in the code.
+    let connectors = args.connectors_to_test();
     let connectors = connectors.into_iter().map(quote_connector).fold1(|aggr, next| {
         quote! {
             #aggr, #next
         }
     });
-    let mut test_function = parse_macro_input!(input as ItemFn);
 
+    let mut test_function = parse_macro_input!(input as ItemFn);
     if test_function.sig.inputs.len() != 2 {
         return syn::Error::new_spanned(
             test_function.sig,
@@ -108,6 +108,7 @@ pub fn relation_link_test_impl(attr: TokenStream, input: TokenStream) -> TokenSt
         args.on_child.relation_field(),
         args.id_only,
     );
+
     let test_shells: Vec<proc_macro2::TokenStream> = datamodels
         .into_iter()
         .enumerate()
