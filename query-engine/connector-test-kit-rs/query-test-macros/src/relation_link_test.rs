@@ -13,33 +13,32 @@ use syn::{parse_macro_input, AttributeArgs, ItemFn};
 /// Below is a representation in pseudo-code of the final generated code:
 ///
 /// Original code:
-/// ```rust
-/// # use query_engine_tests::*;
-///
+/// ```ignore
 /// #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneOpt")]
 /// async fn my_fancy_test(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
 ///   assert_eq!(true, true);
 /// }
 /// ```
 /// Generated code:
-///  ```rust
-/// # use query_engine_tests::*;
-///
-///  #[test]
+///  ```ignore
+/// #[test]
 /// async fn my_fancy_test_1() -> {
 ///   setup_database().await?;
 ///   run_my_fancy_test(runner, t).await?;
 /// }
+///
 /// #[test]
 /// async fn my_fancy_test_2() -> {
 ///   setup_database().await?;
 ///   run_my_fancy_test(runner, t).await?;
 /// }
+///
 /// #[test]
 /// async fn my_fancy_test_n() -> {
 ///   setup_database().await?;
 ///   run_my_fancy_test(runner, t).await?;
 /// }
+///
 /// async fn run_my_fancy_test(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
 ///   assert_eq!(true, true);
 /// }
