@@ -18,11 +18,11 @@ test-qe:
 	cargo test --package query-engine-tests
 
 test-qe-verbose:
-	cargo test --package query-engine-tests -- --nocapture --test-threads 1
+	cargo test --package query-engine-tests -- --nocapture
 
 # Single threaded thread execution.
 test-qe-st:
-	cargo test --package query-engine-tests
+	cargo test --package query-engine-tests -- --test-threads 1
 
 # Single threaded thread execution, verbose.
 test-qe-verbose:
