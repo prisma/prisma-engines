@@ -24,6 +24,7 @@ itertools = "0.10"
 regex = "1"
 serde = "1.0"
 tracing = "0.1.12"
+tracing-futures = "0.2.1"
 tracing-subscriber = { version = "0.2", features = ["fmt"] }
 tracing-error = "0.1.2"
 colored = "2"

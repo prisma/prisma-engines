@@ -11,7 +11,7 @@ use dml::{
     native_type_instance::NativeTypeInstance, relation_info::ReferentialAction, scalars::ScalarType,
 };
 use enumflags2::BitFlags;
-use std::{borrow::Cow, collections::BTreeMap};
+use std::{borrow::Cow, collections::BTreeMap, str::FromStr};
 
 pub trait Connector: Send + Sync {
     fn name(&self) -> &str;
@@ -182,9 +182,46 @@ pub trait Connector: Send + Sync {
 
 /// Not all Databases are created equal. Hence connectors for our datasources support different capabilities.
 /// These are used during schema validation. E.g. if a connector does not support enums an error will be raised.
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub enum ConnectorCapability {
-    // start of General Schema Capabilities
+macro_rules! capabilities {
+    ($( $variant:ident $(,)? ),*) => {
+        #[derive(Debug, Clone, Copy, PartialEq)]
+        pub enum ConnectorCapability {
+            $(
+                $variant,
+            )*
+        }
+
+        impl std::fmt::Display for ConnectorCapability {
+            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                let name = match self {
+                    $(
+                        Self::$variant => stringify!($variant),
+                    )*
+                };
+
+                write!(f, "{}", name)
+            }
+        }
+
+        impl FromStr for ConnectorCapability {
+            type Err = String;
+
+            fn from_str(s: &str) -> Result<Self, Self::Err> {
+                match s {
+                    $(
+                        stringify!($variant) => Ok(Self::$variant),
+                    )*
+                    _ => Err(format!("{} is not a known connector capability.", s)),
+                }
+            }
+        }
+    };
+}
+
+// Capabilities describe what functoinality connectors are able to provide.
+// Some are used only by the query engine, some are used only by the datamodel parser.
+capabilities!(
+    // General capabilities, not specific to any part of Prisma.
     ScalarLists,
     RelationsOverNonUniqueCriteria,
     MultipleIndexesWithSameName,
@@ -197,8 +234,7 @@ pub enum ConnectorCapability {
     RelationFieldsInArbitraryOrder,
     ForeignKeys,
     NamedPrimaryKeys,
-
-    // start of Query Engine Capabilities
+    // Start of query-engine-only Capabilities
     InsensitiveFilters,
     CreateMany,
     CreateManyWriteableAutoIncId,
@@ -209,7 +245,8 @@ pub enum ConnectorCapability {
     JsonFilteringJsonPath,
     JsonFilteringArrayPath,
     CompoundIds,
-}
+    AnyId, // Any (or combination of) uniques and not only id fields can constitute an id for a model.
+);
 
 /// Contains all capabilities that the connector is able to serve.
 #[derive(Debug)]

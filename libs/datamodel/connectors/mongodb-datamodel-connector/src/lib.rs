@@ -119,8 +119,13 @@ impl Connector for MongoDbDatamodelConnector {
         Ok(())
     }
 
-    fn validate_model(&self, _model: &dml::model::Model) -> Result<()> {
-        // Todo
+    fn validate_model(&self, model: &dml::model::Model) -> Result<()> {
+        if model.id_field_names().is_empty() {
+            return Err(ConnectorError::from_kind(ErrorKind::InvalidModelError {
+                message: "MongoDB models require exactly one identity field annotated with @id".to_owned(),
+            }));
+        }
+
         Ok(())
     }
 

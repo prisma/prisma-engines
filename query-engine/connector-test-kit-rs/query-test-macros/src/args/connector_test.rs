@@ -1,3 +1,4 @@
+use super::*;
 use crate::IntoDarlingError;
 use darling::FromMeta;
 use proc_macro::TokenStream;
@@ -27,21 +28,12 @@ pub struct ConnectorTestArgs {
 
 impl ConnectorTestArgs {
     pub fn validate(&self, on_module: bool) -> Result<(), darling::Error> {
-        if !self.only.is_empty() && !self.exclude.is_empty() && !on_module {
-            return Err(darling::Error::custom(
-                "Only one of `only` and `exclude` can be specified for a connector test.",
-            ));
-        }
+        validate_only_exclude(&self.only, &self.exclude, on_module)?;
+        validate_suite(&self.suite, on_module)?;
 
         if self.schema.is_none() && !on_module {
             return Err(darling::Error::custom(
                 "A schema annotation on either the test mod (#[test_suite(schema(handler))]) or the test (schema(handler)) is required.",
-            ));
-        }
-
-        if self.suite.is_none() && !on_module {
-            return Err(darling::Error::custom(
-                "A test suite name annotation on either the test mod (#[test_suite]) or the test (suite = \"name\") is required.",
             ));
         }
 
@@ -50,16 +42,7 @@ impl ConnectorTestArgs {
 
     /// Returns all the connectors that the test is valid for.
     pub fn connectors_to_test(&self) -> Vec<ConnectorTag> {
-        if !self.only.is_empty() {
-            self.only.tags.clone()
-        } else if !self.exclude.is_empty() {
-            let all = ConnectorTag::all();
-            let exclude = self.exclude.tags();
-
-            all.into_iter().filter(|tag| !exclude.contains(tag)).collect()
-        } else {
-            ConnectorTag::all()
-        }
+        connectors_to_test(&self.only, &self.exclude)
     }
 }
 
@@ -100,6 +83,10 @@ pub struct OnlyConnectorTags {
 impl OnlyConnectorTags {
     pub fn is_empty(&self) -> bool {
         self.tags.is_empty()
+    }
+
+    pub fn tags(&self) -> &[ConnectorTag] {
+        self.tags.as_slice()
     }
 }
 

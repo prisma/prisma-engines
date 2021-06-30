@@ -103,7 +103,9 @@ fn scalar_filter(filter: ScalarFilter, invert: bool, include_field_wrapper: bool
     let field = match filter.projection {
         connector_interface::ScalarProjection::Single(sf) => sf,
         connector_interface::ScalarProjection::Compound(mut c) if c.len() == 1 => c.pop().unwrap(),
-        connector_interface::ScalarProjection::Compound(_) => unimplemented!("Compound filter case."),
+        connector_interface::ScalarProjection::Compound(_) => {
+            unimplemented!("Compound filter case.")
+        }
     };
 
     let filter = match filter.mode {
