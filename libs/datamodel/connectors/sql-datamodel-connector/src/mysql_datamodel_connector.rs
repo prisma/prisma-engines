@@ -84,6 +84,7 @@ impl MySqlDatamodelConnector {
             ConnectorCapability::CreateManyWriteableAutoIncId,
             ConnectorCapability::AutoIncrement,
             ConnectorCapability::CompoundIds,
+            ConnectorCapability::AnyId,
         ];
 
         if !is_planetscale {

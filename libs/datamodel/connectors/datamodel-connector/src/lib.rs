@@ -218,8 +218,10 @@ macro_rules! capabilities {
     };
 }
 
+// Capabilities describe what functoinality connectors are able to provide.
+// Some are used only by the query engine, some are used only by the datamodel parser.
 capabilities!(
-    // start of General Schema Capabilities
+    // General capabilities, not specific to any part of Prisma.
     ScalarLists,
     RelationsOverNonUniqueCriteria,
     MultipleIndexesWithSameName,
@@ -232,7 +234,7 @@ capabilities!(
     RelationFieldsInArbitraryOrder,
     ForeignKeys,
     NamedPrimaryKeys,
-    // start of Query Engine Capabilities
+    // Start of query-engine-only Capabilities
     InsensitiveFilters,
     CreateMany,
     CreateManyWriteableAutoIncId,
@@ -242,7 +244,8 @@ capabilities!(
     JsonFiltering,
     JsonFilteringJsonPath,
     JsonFilteringArrayPath,
-    CompoundIds
+    CompoundIds,
+    AnyId, // Any (or combination of) uniques and not only id fields can constitute an id for a model.
 );
 
 /// Contains all capabilities that the connector is able to serve.

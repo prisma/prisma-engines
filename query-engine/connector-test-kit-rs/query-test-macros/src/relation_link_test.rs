@@ -116,13 +116,13 @@ pub fn relation_link_test_impl(attr: TokenStream, input: TokenStream) -> TokenSt
             let test_fn_ident = Ident::new(&format!("{}_{}", test_fn_ident.to_string(), i), Span::call_site());
             let datamodel: proc_macro2::TokenStream = format!(r#""{}""#, dm.datamodel()).parse().unwrap();
             let dm_with_params: String = dm.try_into().expect("Could not serialize json");
+            let test_database = format!("{}_{}_{}", suite_name, test_name, i);
             let required_capabilities = required_capabilities
                 .get(i)
                 .unwrap()
                 .iter()
                 .map(|cap| format!("{}", cap))
                 .collect::<Vec<_>>();
-            let test_database = format!("{}_{}_{}", suite_name, test_name, i);
 
             let ts = quote! {
                 #[test]
