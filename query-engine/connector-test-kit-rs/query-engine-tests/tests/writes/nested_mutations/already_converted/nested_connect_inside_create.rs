@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(exclude(MongoDb))]
+#[test_suite]
 mod connect_inside_create {
     use indoc::indoc;
     use query_engine_tests::{assert_error, run_query, run_query_json, DatamodelWithParams};
