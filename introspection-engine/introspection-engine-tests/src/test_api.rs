@@ -27,11 +27,13 @@ impl TestApi {
         let connection_string = args.database_url();
 
         let (database, connection_string): (Quaint, String) = if tags.intersects(Tags::Vitess) {
-            let me = SqlMigrationConnector::new(&connection_string, None).await.unwrap();
+            let me = SqlMigrationConnector::new(connection_string, BitFlags::all(), None)
+                .await
+                .unwrap();
             me.reset().await.unwrap();
 
             (
-                Quaint::new(&connection_string).await.unwrap(),
+                Quaint::new(connection_string).await.unwrap(),
                 connection_string.to_owned(),
             )
         } else if tags.contains(Tags::Mysql) {
@@ -83,6 +85,10 @@ impl TestApi {
 
     pub fn is_cockroach(&self) -> bool {
         self.tags().contains(Tags::Cockroach)
+    }
+
+    pub fn is_mysql8(&self) -> bool {
+        self.tags().contains(Tags::Mysql8)
     }
 
     #[tracing::instrument(skip(self, data_model_string))]
@@ -184,6 +190,7 @@ impl TestApi {
         let parsed_expected = datamodel::parse_datamodel(&self.dm_with_sources(expected_without_header))
             .unwrap()
             .subject;
+
         let parsed_result = datamodel::parse_datamodel(result_with_header).unwrap().subject;
 
         let reformatted_expected =

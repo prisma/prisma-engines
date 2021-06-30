@@ -1,5 +1,8 @@
+use super::db::ParserDatabase;
 use crate::{
-    ast, configuration,
+    ast,
+    common::preview_features::PreviewFeature,
+    configuration,
     diagnostics::{DatamodelError, Diagnostics},
     dml,
     walkers::ModelWalker,
@@ -15,6 +18,7 @@ use std::collections::{HashMap, HashSet};
 /// When validating, we check if the datamodel is valid, and generate errors otherwise.
 pub struct Validator<'a> {
     source: Option<&'a configuration::Datasource>,
+    preview_features: &'a HashSet<PreviewFeature>,
 }
 
 /// State error message. Seeing this error means something went really wrong internally. It's the datamodel equivalent of a bluescreen.
@@ -25,14 +29,21 @@ const PRISMA_FORMAT_HINT: &str = "You can run `prisma format` to fix this automa
 
 impl<'a> Validator<'a> {
     /// Creates a new instance, with all builtin attributes registered.
-    pub fn new(source: Option<&'a configuration::Datasource>) -> Validator<'a> {
-        Self { source }
+    pub fn new(
+        source: Option<&'a configuration::Datasource>,
+        preview_features: &'a HashSet<PreviewFeature>,
+    ) -> Validator<'a> {
+        Self {
+            source,
+            preview_features,
+        }
     }
 
-    pub fn validate(&self, ast_schema: &ast::SchemaAst, schema: &mut dml::Datamodel) -> Result<(), Diagnostics> {
+    pub(crate) fn validate(&self, db: &ParserDatabase<'_>, schema: &mut dml::Datamodel) -> Result<(), Diagnostics> {
         let mut all_errors = Diagnostics::new();
+        let ast_schema = db.ast();
 
-        if let Err(ref mut errs) = self.validate_names(ast_schema) {
+        if let Err(ref mut errs) = self.validate_names(db) {
             all_errors.append(errs);
         }
 
@@ -48,9 +59,7 @@ impl<'a> Validator<'a> {
             if let Some(sf) = model.scalar_fields().find(|f| f.is_id && !f.is_required()) {
                 if !model.is_ignored {
                     let span = ast_schema
-                        .models()
-                        .iter()
-                        .find(|ast_model| ast_model.name.name == model.name)
+                        .find_model(&model.name)
                         .unwrap()
                         .fields
                         .iter()
@@ -124,10 +133,9 @@ impl<'a> Validator<'a> {
         // Enum level validations.
         for declared_enum in schema.enums() {
             let mut errors_for_enum = Diagnostics::new();
-            if let Err(err) = self.validate_enum_name(
-                ast_schema.find_enum(&declared_enum.name).expect(STATE_ERROR),
-                declared_enum,
-            ) {
+            if let Err(err) =
+                self.validate_enum_name(db.get_enum(&declared_enum.name).expect(STATE_ERROR), declared_enum)
+            {
                 errors_for_enum.push_error(err);
             }
 
@@ -172,10 +180,10 @@ impl<'a> Validator<'a> {
         }
     }
 
-    fn validate_names(&self, ast_schema: &ast::SchemaAst) -> Result<(), Diagnostics> {
+    fn validate_names(&self, db: &ParserDatabase<'_>) -> Result<(), Diagnostics> {
         let mut errors = Diagnostics::new();
 
-        for model in ast_schema.models() {
+        for model in db.ast().models() {
             errors.push_opt_error(model.name.validate("Model").err());
             errors.append(&mut model.validate_attributes());
 
@@ -185,7 +193,7 @@ impl<'a> Validator<'a> {
             }
         }
 
-        for enum_decl in ast_schema.enums() {
+        for (_, enum_decl) in db.iter_enums() {
             errors.push_opt_error(enum_decl.name.validate("Enum").err());
             errors.append(&mut enum_decl.validate_attributes());
 
@@ -301,7 +309,7 @@ impl<'a> Validator<'a> {
         for field in model.scalar_fields() {
             if let Some(DefaultValue::Single(PrismaValue::Enum(enum_value))) = &field.default_value {
                 if let FieldType::Enum(enum_name) = &field.field_type {
-                    if let Some(dml_enum) = data_model.find_enum(&enum_name) {
+                    if let Some(dml_enum) = data_model.find_enum(enum_name) {
                         if !dml_enum.values.iter().any(|value| &value.name == enum_value) {
                             errors.push_error(DatamodelError::new_attribute_validation_error(
                                 &"The defined default value is not a valid value of the enum specified for the field."
@@ -508,8 +516,34 @@ impl<'a> Validator<'a> {
                 if let Err(err) = connector.validate_field(field) {
                     diagnostics.push_error(DatamodelError::new_connector_error(
                         &err.to_string(),
-                        ast_model.find_field(&field.name()).span,
+                        ast_model.find_field(field.name()).span,
                     ));
+                }
+
+                if let dml::Field::RelationField(ref rf) = field {
+                    let actions = &[rf.relation_info.on_delete, rf.relation_info.on_update];
+
+                    actions.iter().flatten().for_each(|action| {
+                        if !connector.supports_referential_action(*action) {
+                            let allowed_values: Vec<_> = connector
+                                .referential_actions()
+                                .iter()
+                                .map(|f| format!("`{}`", f))
+                                .collect();
+
+                            let message = format!(
+                                "Invalid referential action: `{}`. Allowed values: ({})",
+                                action,
+                                allowed_values.join(", "),
+                            );
+
+                            diagnostics.push_error(DatamodelError::new_attribute_validation_error(
+                                &message,
+                                "relation",
+                                ast_model.find_field(field.name()).span,
+                            ));
+                        }
+                    });
                 }
             }
         }
@@ -553,21 +587,21 @@ impl<'a> Validator<'a> {
             let unknown_fields: Vec<String> = rel_info
                 .fields
                 .iter()
-                .filter(|base_field| model.find_field(&base_field).is_none())
+                .filter(|base_field| model.find_field(base_field).is_none())
                 .cloned()
                 .collect();
 
             let referenced_relation_fields: Vec<String> = rel_info
                 .fields
                 .iter()
-                .filter(|base_field| model.find_relation_field(&base_field).is_some())
+                .filter(|base_field| model.find_relation_field(base_field).is_some())
                 .cloned()
                 .collect();
 
             let at_least_one_underlying_field_is_optional = rel_info
                 .fields
                 .iter()
-                .filter_map(|base_field| model.find_scalar_field(&base_field))
+                .filter_map(|base_field| model.find_scalar_field(base_field))
                 .any(|f| f.is_optional());
 
             if !unknown_fields.is_empty() {
@@ -620,21 +654,21 @@ impl<'a> Validator<'a> {
             let unknown_fields: Vec<String> = rel_info
                 .references
                 .iter()
-                .filter(|referenced_field| related_model.find_field(&referenced_field).is_none())
+                .filter(|referenced_field| related_model.find_field(referenced_field).is_none())
                 .cloned()
                 .collect();
 
             let referenced_relation_fields: Vec<String> = rel_info
                 .references
                 .iter()
-                .filter(|base_field| related_model.find_relation_field(&base_field).is_some())
+                .filter(|base_field| related_model.find_relation_field(base_field).is_some())
                 .cloned()
                 .collect();
 
             let fields_with_wrong_type: Vec<DatamodelError> = rel_info.fields.iter().zip(rel_info.references.iter())
                     .filter_map(|(base_field, referenced_field)| {
-                        let base_field = model.find_field(&base_field)?;
-                        let referenced_field = related_model.find_field(&referenced_field)?;
+                        let base_field = model.find_field(base_field)?;
+                        let referenced_field = related_model.find_field(referenced_field)?;
 
                         if base_field.field_type().is_compatible_with(&referenced_field.field_type()) {
                             return None
@@ -646,14 +680,14 @@ impl<'a> Validator<'a> {
                         if let Some(connector) = self.source.map(|source| &source.active_connector) {
                             let base_native_type = base_field.field_type().as_native_type().map(|(scalar, native)| (*scalar, native.serialized_native_type.clone())).or_else(|| -> Option<_> {
                                 let field_type = base_field.field_type();
-                                let scalar_type = field_type.as_base()?;
+                                let scalar_type = field_type.as_scalar()?;
 
                                 Some((*scalar_type, connector.default_native_type_for_scalar_type(scalar_type)))
                             });
 
                             let referenced_native_type = referenced_field.field_type().as_native_type().map(|(scalar, native)| (*scalar, native.serialized_native_type.clone())).or_else(|| -> Option<_> {
                                 let field_type = referenced_field.field_type();
-                                let scalar_type = field_type.as_base()?;
+                                let scalar_type = field_type.as_scalar()?;
 
                                 Some((*scalar_type, connector.default_native_type_for_scalar_type(scalar_type)))
                             });
@@ -729,7 +763,7 @@ impl<'a> Validator<'a> {
                 let references_singular_id_field = if rel_info.references.len() == 1 {
                     let field_name = rel_info.references.first().unwrap();
                     // the unwrap is safe. We error out earlier if an unknown field is referenced.
-                    let referenced_field = related_model.find_scalar_field(&field_name).unwrap();
+                    let referenced_field = related_model.find_scalar_field(field_name).unwrap();
                     referenced_field.is_id
                 } else {
                     false
@@ -737,7 +771,7 @@ impl<'a> Validator<'a> {
 
                 let is_many_to_many = {
                     // Back relation fields have not been added yet. So we must calculate this on our own.
-                    match datamodel.find_related_field(&field) {
+                    match datamodel.find_related_field(field) {
                         Some((_, related_field)) => field.is_list() && related_field.is_list(),
                         None => false,
                     }
@@ -789,9 +823,11 @@ impl<'a> Validator<'a> {
                 ));
             }
 
-            if !fields_with_wrong_type.is_empty() && !errors.has_errors() {
+            if !errors.has_errors() {
                 // don't output too much errors
-                errors.append_error_vec(fields_with_wrong_type);
+                for err in fields_with_wrong_type {
+                    errors.push_error(err);
+                }
             }
         }
 
@@ -820,7 +856,7 @@ impl<'a> Validator<'a> {
 
             let rel_info = &field.relation_info;
             let related_model = datamodel.find_model(&rel_info.to).expect(STATE_ERROR);
-            if let Some((_rel_field_idx, related_field)) = datamodel.find_related_field(&field) {
+            if let Some((_rel_field_idx, related_field)) = datamodel.find_related_field(field) {
                 let related_field_rel_info = &related_field.relation_info;
 
                 if related_model.is_ignored && !field.is_ignored && !model.is_ignored {
@@ -873,6 +909,36 @@ impl<'a> Validator<'a> {
                         ));
                 }
 
+                if !self.preview_features.contains(&PreviewFeature::ReferentialActions)
+                    && (rel_info.on_delete.is_some() || rel_info.on_update.is_some())
+                    && !rel_info.legacy_referential_actions
+                {
+                    let message = &format!(
+                        "The relation field `{}` on Model `{}` must not specify the `onDelete` or `onUpdate` argument in the {} attribute without enabling the `referentialActions` preview feature.",
+                        &field.name, &model.name, RELATION_ATTRIBUTE_NAME_WITH_AT
+                    );
+
+                    errors.push_error(DatamodelError::new_attribute_validation_error(
+                        message,
+                        RELATION_ATTRIBUTE_NAME,
+                        field_span,
+                    ))
+                } else if field.is_list()
+                    && !related_field.is_list()
+                    && (rel_info.on_delete.is_some() || rel_info.on_update.is_some())
+                {
+                    let message = &format!(
+                        "The relation field `{}` on Model `{}` must not specify the `onDelete` or `onUpdate` argument in the {} attribute. You must only specify it on the opposite field `{}` on model `{}`, or in case of a many to many relation, in an explicit join table.",
+                        &field.name, &model.name, RELATION_ATTRIBUTE_NAME_WITH_AT, &related_field.name, &related_model.name
+                    );
+
+                    errors.push_error(DatamodelError::new_attribute_validation_error(
+                        message,
+                        RELATION_ATTRIBUTE_NAME,
+                        field_span,
+                    ));
+                }
+
                 // ONE TO ONE
                 if field.is_singular() && related_field.is_singular() {
                     if rel_info.fields.is_empty() && related_field_rel_info.fields.is_empty() {
@@ -905,6 +971,22 @@ impl<'a> Validator<'a> {
                             ),
                         RELATION_ATTRIBUTE_NAME,
                         field_span,
+                        ));
+                    }
+
+                    if self.preview_features.contains(&PreviewFeature::ReferentialActions)
+                        && (rel_info.on_delete.is_some() || rel_info.on_update.is_some())
+                        && (related_field_rel_info.on_delete.is_some() || related_field_rel_info.on_update.is_some())
+                    {
+                        let message = format!(
+                            "The relation fields `{}` on Model `{}` and `{}` on Model `{}` both provide the `onDelete` or `onUpdate` argument in the {} attribute. You have to provide it only on one of the two fields.",
+                            &field.name, &model.name, &related_field.name, &related_model.name, RELATION_ATTRIBUTE_NAME_WITH_AT
+                        );
+
+                        errors.push_error(DatamodelError::new_attribute_validation_error(
+                            &message,
+                            RELATION_ATTRIBUTE_NAME,
+                            field_span,
                         ));
                     }
 

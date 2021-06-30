@@ -1,13 +1,18 @@
-use datamodel_connector::connector_error::ConnectorError;
-use datamodel_connector::helper::{args_vec_from_opt, parse_one_opt_u32, parse_one_u32, parse_two_opt_u32};
-use datamodel_connector::{Connector, ConnectorCapability};
-use dml::field::{Field, FieldType};
-use dml::model::{IndexType, Model};
-use dml::native_type_constructor::NativeTypeConstructor;
-use dml::native_type_instance::NativeTypeInstance;
-use dml::scalars::ScalarType;
-use native_types::MySqlType;
-use native_types::MySqlType::*;
+use datamodel_connector::{
+    connector_error::ConnectorError,
+    helper::{args_vec_from_opt, parse_one_opt_u32, parse_one_u32, parse_two_opt_u32},
+    Connector, ConnectorCapability,
+};
+use dml::{
+    field::{Field, FieldType},
+    model::{IndexType, Model},
+    native_type_constructor::NativeTypeConstructor,
+    native_type_instance::NativeTypeInstance,
+    relation_info::ReferentialAction,
+    scalars::ScalarType,
+};
+use enumflags2::BitFlags;
+use native_types::MySqlType::{self, *};
 
 const INT_TYPE_NAME: &str = "Int";
 const UNSIGNED_INT_TYPE_NAME: &str = "UnsignedInt";
@@ -56,11 +61,15 @@ const NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION: &[&str] = &[
 pub struct MySqlDatamodelConnector {
     capabilities: Vec<ConnectorCapability>,
     constructors: Vec<NativeTypeConstructor>,
+    referential_actions: BitFlags<ReferentialAction>,
+    is_planetscale: bool,
 }
 
 impl MySqlDatamodelConnector {
-    pub fn new() -> MySqlDatamodelConnector {
-        let capabilities = vec![
+    pub fn new(is_planetscale: bool) -> MySqlDatamodelConnector {
+        use ReferentialAction::*;
+
+        let mut capabilities = vec![
             ConnectorCapability::RelationsOverNonUniqueCriteria,
             ConnectorCapability::Enums,
             ConnectorCapability::Json,
@@ -75,7 +84,12 @@ impl MySqlDatamodelConnector {
             ConnectorCapability::CreateManyWriteableAutoIncId,
             ConnectorCapability::AutoIncrement,
             ConnectorCapability::CompoundIds,
+            ConnectorCapability::AnyId,
         ];
+
+        if !is_planetscale {
+            capabilities.push(ConnectorCapability::ForeignKeys);
+        }
 
         let int = NativeTypeConstructor::without_args(INT_TYPE_NAME, vec![ScalarType::Int]);
         let unsigned_int = NativeTypeConstructor::without_args(UNSIGNED_INT_TYPE_NAME, vec![ScalarType::Int]);
@@ -149,9 +163,17 @@ impl MySqlDatamodelConnector {
             json,
         ];
 
+        let referential_actions = if is_planetscale {
+            Restrict | SetNull
+        } else {
+            Restrict | Cascade | SetNull | NoAction | SetDefault
+        };
+
         MySqlDatamodelConnector {
             capabilities,
             constructors,
+            referential_actions,
+            is_planetscale,
         }
     }
 }
@@ -169,12 +191,24 @@ const SCALAR_TYPE_DEFAULTS: &[(ScalarType, MySqlType)] = &[
 ];
 
 impl Connector for MySqlDatamodelConnector {
-    fn name(&self) -> String {
-        "MySQL".to_string()
+    fn name(&self) -> &str {
+        "MySQL"
     }
 
-    fn capabilities(&self) -> &Vec<ConnectorCapability> {
+    fn capabilities(&self) -> &[ConnectorCapability] {
         &self.capabilities
+    }
+
+    fn constraint_name_length(&self) -> usize {
+        64
+    }
+
+    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
+        self.referential_actions
+    }
+
+    fn emulates_referential_actions(&self) -> bool {
+        self.is_planetscale
     }
 
     fn scalar_type_for_native_type(&self, native_type: serde_json::Value) -> ScalarType {
@@ -248,7 +282,7 @@ impl Connector for MySqlDatamodelConnector {
 
     fn validate_field(&self, field: &Field) -> Result<(), ConnectorError> {
         match field.field_type() {
-            FieldType::NativeType(scalar_type, native_type_instance) => {
+            FieldType::Scalar(scalar_type, _, Some(native_type_instance)) => {
                 let native_type_name = native_type_instance.name.as_str();
                 let native_type: MySqlType = native_type_instance.deserialize_native_type();
                 let error = self.native_instance_error(native_type_instance.clone());
@@ -290,7 +324,7 @@ impl Connector for MySqlDatamodelConnector {
         for index_definition in model.indices.iter() {
             let fields = index_definition.fields.iter().map(|f| model.find_field(f).unwrap());
             for f in fields {
-                if let FieldType::NativeType(_, native_type) = f.field_type() {
+                if let FieldType::Scalar(_, _, Some(native_type)) = f.field_type() {
                     let native_type_name = native_type.name.as_str();
 
                     if NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type_name) {
@@ -307,7 +341,7 @@ impl Connector for MySqlDatamodelConnector {
         }
         for id_field in model.id_fields.iter() {
             let field = model.find_field(id_field).unwrap();
-            if let FieldType::NativeType(_, native_type) = field.field_type() {
+            if let FieldType::Scalar(_, _, Some(native_type)) = field.field_type() {
                 let native_type_name = native_type.name.as_str();
                 if NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type_name) {
                     return self
@@ -422,11 +456,5 @@ impl Connector for MySqlDatamodelConnector {
         }
 
         Ok(())
-    }
-}
-
-impl Default for MySqlDatamodelConnector {
-    fn default() -> Self {
-        Self::new()
     }
 }

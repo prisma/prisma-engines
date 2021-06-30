@@ -5,10 +5,10 @@ use crate::{getters::Getter, parsers::Parser};
 use enumflags2::BitFlags;
 use indoc::indoc;
 use native_types::{NativeType, PostgresType};
-use quaint::{connector::ResultRow, prelude::Queryable, single::Quaint};
+use quaint::{connector::ResultRow, prelude::Queryable};
 use regex::Regex;
 use serde_json::from_str;
-use std::{borrow::Cow, collections::HashMap, convert::TryInto};
+use std::{any::type_name, borrow::Cow, collections::HashMap, convert::TryInto};
 use tracing::trace;
 
 #[enumflags2::bitflags]
@@ -18,21 +18,28 @@ pub enum Circumstances {
     Cockroach,
 }
 
-#[derive(Debug)]
-pub struct SqlSchemaDescriber {
-    conn: Quaint,
+pub struct SqlSchemaDescriber<'a> {
+    conn: &'a dyn Queryable,
     circumstances: BitFlags<Circumstances>,
 }
 
+impl Debug for SqlSchemaDescriber<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct(type_name::<SqlSchemaDescriber>())
+            .field("circumstances", &self.circumstances)
+            .finish()
+    }
+}
+
 #[async_trait::async_trait]
-impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
+impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
     async fn list_databases(&self) -> DescriberResult<Vec<String>> {
         Ok(self.get_databases().await?)
     }
 
     async fn get_metadata(&self, schema: &str) -> DescriberResult<SqlMetadata> {
-        let table_count = self.get_table_names(&schema).await?.len();
-        let size_in_bytes = self.get_size(&schema).await?;
+        let table_count = self.get_table_names(schema).await?.len();
+        let size_in_bytes = self.get_size(schema).await?;
 
         Ok(SqlMetadata {
             table_count,
@@ -51,7 +58,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
         let mut tables = Vec::with_capacity(table_names.len());
 
         for table_name in &table_names {
-            tables.push(self.get_table(&table_name, &mut columns, &mut foreign_keys, &mut indexes));
+            tables.push(self.get_table(table_name, &mut columns, &mut foreign_keys, &mut indexes));
         }
 
         let views = self.get_views(schema).await?;
@@ -76,7 +83,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
 static PG_RE_NUM: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?(-?\d+)('::.*)?$").expect("compile regex"));
 static PG_RE_FLOAT: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?([^']+)('::.*)?$").expect("compile regex"));
 
-impl Parser for SqlSchemaDescriber {
+impl Parser for SqlSchemaDescriber<'_> {
     fn re_num() -> &'static Regex {
         &PG_RE_NUM
     }
@@ -86,9 +93,9 @@ impl Parser for SqlSchemaDescriber {
     }
 }
 
-impl SqlSchemaDescriber {
+impl<'a> SqlSchemaDescriber<'a> {
     /// Constructor.
-    pub fn new(conn: Quaint, circumstances: BitFlags<Circumstances>) -> SqlSchemaDescriber {
+    pub fn new(conn: &'a dyn Queryable, circumstances: BitFlags<Circumstances>) -> SqlSchemaDescriber<'a> {
         SqlSchemaDescriber { conn, circumstances }
     }
 
@@ -255,7 +262,7 @@ impl SqlSchemaDescriber {
             ORDER BY ordinal_position;
         "#;
 
-        let rows = self.conn.query_raw(&sql, &[schema.into()]).await?;
+        let rows = self.conn.query_raw(sql, &[schema.into()]).await?;
 
         for col in rows {
             trace!("Got column: {:?}", col);
@@ -399,7 +406,7 @@ impl SqlSchemaDescriber {
         // One foreign key with multiple columns will be represented here as several
         // rows with the same ID, which we will have to combine into corresponding foreign key
         // objects.
-        let result_set = self.conn.query_raw(&sql, &[schema.into()]).await?;
+        let result_set = self.conn.query_raw(sql, &[schema.into()]).await?;
         let mut intermediate_fks: HashMap<i64, (String, ForeignKey)> = HashMap::new();
         for row in result_set.into_iter() {
             trace!("Got description FK row {:?}", row);
@@ -540,7 +547,7 @@ impl SqlSchemaDescriber {
         ORDER BY rawIndex.indkeyidx
         "#;
 
-        let rows = self.conn.query_raw(&sql, &[schema.into()]).await?;
+        let rows = self.conn.query_raw(sql, &[schema.into()]).await?;
 
         for row in rows {
             trace!("Got index: {:?}", row);
@@ -602,7 +609,7 @@ impl SqlSchemaDescriber {
         let sql = "SELECT sequence_name
                   FROM information_schema.sequences
                   WHERE sequence_schema = $1";
-        let rows = self.conn.query_raw(&sql, &[schema.into()]).await?;
+        let rows = self.conn.query_raw(sql, &[schema.into()]).await?;
         let sequences = rows
             .into_iter()
             .map(|seq| {
@@ -627,7 +634,7 @@ impl SqlSchemaDescriber {
             WHERE n.nspname = $1
             ORDER BY e.enumsortorder";
 
-        let rows = self.conn.query_raw(&sql, &[schema.into()]).await?;
+        let rows = self.conn.query_raw(sql, &[schema.into()]).await?;
         let mut enum_values: HashMap<String, Vec<String>> = HashMap::new();
 
         for row in rows.into_iter() {
@@ -762,7 +769,7 @@ fn get_column_type(row: &ResultRow, enums: &[Enum]) -> ColumnType {
         false => ColumnArity::Nullable,
     };
 
-    let precision = SqlSchemaDescriber::get_precision(&row);
+    let precision = SqlSchemaDescriber::get_precision(row);
     let unsupported_type = || (Unsupported(full_data_type.clone()), None);
     let enum_exists = |name| enums.iter().any(|e| e.name == name);
 

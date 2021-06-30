@@ -49,7 +49,7 @@ impl<T: 'static> AttributeListValidator<T> {
         for attribute in ast.attributes() {
             match self.known_attributes.get(&attribute.name.name) {
                 Some(validator) => {
-                    let mut arguments = Arguments::new(&attribute)?;
+                    let mut arguments = Arguments::new(attribute)?;
 
                     let attribute_count = attribute_counts.get(&attribute.name.name).unwrap();
                     if *attribute_count > 1 && !validator.is_duplicate_definition_allowed() {

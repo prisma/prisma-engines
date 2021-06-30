@@ -1,12 +1,9 @@
-use anyhow::Context;
 use migration_core::{
     commands::CreateMigrationInput, commands::CreateMigrationOutput, CoreError, CoreResult, GenericApi,
 };
 use pretty_assertions::assert_eq;
 use std::path::Path;
 use tempfile::TempDir;
-
-use crate::AssertionResult;
 
 pub struct CreateMigration<'a> {
     api: &'a dyn GenericApi,
@@ -95,9 +92,8 @@ impl<'a> CreateMigrationAssertion<'a> {
     pub fn assert_migration_directories_count(self, expected_count: usize) -> Self {
         let mut count = 0;
 
-        for entry in std::fs::read_dir(self.migrations_directory.path())
-            .context("Counting directories in migrations directory.")
-            .unwrap()
+        for entry in
+            std::fs::read_dir(self.migrations_directory.path()).expect("Counting directories in migrations directory.")
         {
             let entry = entry.unwrap();
 
@@ -122,11 +118,10 @@ impl<'a> CreateMigrationAssertion<'a> {
     /// Assert that there is one migration with `name_matcher` contained in its name present in the migration directory.
     pub fn assert_migration<F>(self, name_matcher: &str, assertions: F) -> Self
     where
-        F: for<'b> FnOnce(MigrationAssertion<'b>) -> AssertionResult<MigrationAssertion<'b>>,
+        F: for<'b> FnOnce(MigrationAssertion<'b>) -> MigrationAssertion<'b>,
     {
         let migration = std::fs::read_dir(self.migrations_directory.path())
-            .context("Reading migrations directory for named migration.")
-            .unwrap()
+            .expect("Reading migrations directory for named migration.")
             .find_map(|entry| {
                 let entry = entry.unwrap();
                 let name = entry.file_name();
@@ -143,7 +138,7 @@ impl<'a> CreateMigrationAssertion<'a> {
                 let path = migration.path();
                 let assertion = MigrationAssertion { path: path.as_ref() };
 
-                assertions(assertion).unwrap();
+                assertions(assertion);
             }
             None => panic!(
                 "Assertion error. Could not find migration with name matching `{}`",
@@ -172,9 +167,7 @@ impl<'a> CreateMigrationAssertion<'a> {
             .join("migration.sql");
 
         let new_contents = {
-            let mut contents = std::fs::read_to_string(&migration_script_path)
-                .context("Reading migration script")
-                .unwrap();
+            let mut contents = std::fs::read_to_string(&migration_script_path).expect("Reading migration script");
 
             modify(&mut contents);
 
@@ -197,13 +190,13 @@ pub struct MigrationAssertion<'a> {
 }
 
 impl MigrationAssertion<'_> {
-    pub fn assert_contents(self, expected_contents: &str) -> AssertionResult<Self> {
+    pub fn assert_contents(self, expected_contents: &str) -> Self {
         let migration_file_path = self.path.join("migration.sql");
         let contents: String = std::fs::read_to_string(&migration_file_path)
-            .with_context(|| format!("Trying to read migration file at {:?}", migration_file_path))?;
+            .map_err(|_| format!("Trying to read migration file at {:?}", migration_file_path))
+            .unwrap();
 
         assert_eq!(expected_contents, contents);
-
-        Ok(self)
+        self
     }
 }

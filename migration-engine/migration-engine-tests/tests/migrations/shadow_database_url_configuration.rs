@@ -1,6 +1,8 @@
+use expect_test::expect;
 use migration_engine_tests::multi_engine_test_api::*;
 use quaint::{prelude::Queryable, single::Quaint};
 use test_macros::test_connector;
+use user_facing_errors::UserFacingError;
 
 #[test_connector(tags(Postgres))]
 fn shadow_db_url_can_be_configured_on_postgres(api: TestApi) {
@@ -45,7 +47,7 @@ fn shadow_db_url_can_be_configured_on_postgres(api: TestApi) {
             GRANT ALL PRIVILEGES ON DATABASE "testshadowdb0001" TO shadowdbconfigtestuser;
         "#;
 
-        api.raw_cmd(&create_user);
+        api.raw_cmd(create_user);
 
         let mut shadow_db_url = url.clone();
         shadow_db_url.set_path("testshadowdb0001");
@@ -102,8 +104,7 @@ fn shadow_db_url_can_be_configured_on_postgres(api: TestApi) {
             .assert_schema()
             .assert_tables_count(2)
             .assert_has_table("_prisma_migrations")
-            .unwrap()
-            .assert_table_bang("Cat", |table| table.assert_has_column("meowFrequency"));
+            .assert_table("Cat", |table| table.assert_has_column("meowFrequency"));
     }
 }
 
@@ -146,4 +147,38 @@ fn shadow_db_url_must_not_match_main_url(api: TestApi) {
             .send_sync()
             .assert_migration_directories_count(1);
     }
+}
+
+#[test_connector(tags(Postgres, Mysql))]
+fn shadow_db_not_reachable_error_must_have_the_right_connection_info(api: TestApi) {
+    let migrations_directory = api.create_migrations_directory();
+    let schema = r#"
+        model Cat {
+            id Int @id
+            litterConsumption Int
+            hungry Boolean @default(true)
+        }
+    "#;
+
+    let mut url: url::Url = api.connection_string().parse().unwrap();
+    url.set_port(Some(39824)).unwrap(); // let's assume no database is running on that port
+
+    let engine = api.new_engine_with_connection_strings(api.connection_string(), Some(url.to_string()));
+
+    let err = engine
+        .create_migration("01init", schema, &migrations_directory)
+        .send_unwrap_err()
+        .to_user_facing();
+
+    let assertion = expect![[r#"
+        Can't reach database server at `localhost`:`39824`
+
+        Please make sure your database server is running at `localhost`:`39824`."#]];
+
+    assertion.assert_eq(err.message());
+
+    assert_eq!(
+        err.unwrap_known().error_code,
+        user_facing_errors::common::DatabaseNotReachable::ERROR_CODE
+    );
 }

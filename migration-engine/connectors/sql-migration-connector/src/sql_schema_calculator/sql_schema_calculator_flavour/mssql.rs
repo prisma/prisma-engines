@@ -1,8 +1,11 @@
 use super::SqlSchemaCalculatorFlavour;
 use crate::flavour::MssqlFlavour;
-use datamodel::{walkers::ModelWalker, ScalarType};
+use datamodel::{
+    walkers::{ModelWalker, RelationFieldWalker},
+    ScalarType,
+};
 use datamodel_connector::Connector;
-use sql_schema_describer::ForeignKeyAction;
+use sql_schema_describer::{self as sql, ForeignKeyAction};
 
 impl SqlSchemaCalculatorFlavour for MssqlFlavour {
     fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> serde_json::Value {
@@ -15,6 +18,19 @@ impl SqlSchemaCalculatorFlavour for MssqlFlavour {
             ForeignKeyAction::NoAction
         } else {
             ForeignKeyAction::Cascade
+        }
+    }
+
+    fn on_delete_action(&self, rf: &RelationFieldWalker<'_>) -> sql::ForeignKeyAction {
+        let action = rf
+            .on_delete_action()
+            .map(super::convert_referential_action)
+            .unwrap_or_else(|| super::convert_referential_action(rf.default_on_delete_action()));
+
+        if action == ForeignKeyAction::Restrict {
+            ForeignKeyAction::NoAction
+        } else {
+            action
         }
     }
 

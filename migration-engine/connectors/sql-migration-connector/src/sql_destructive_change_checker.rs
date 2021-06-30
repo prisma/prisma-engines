@@ -24,11 +24,11 @@ mod warning_check;
 pub(crate) use destructive_change_checker_flavour::DestructiveChangeCheckerFlavour;
 
 use crate::{
-    sql_migration::{AlterEnum, AlterTable, ColumnTypeChange, CreateIndex, SqlMigrationStep, TableChange},
+    sql_migration::{AlterEnum, AlterTable, ColumnTypeChange, SqlMigrationStep, TableChange},
     SqlMigration, SqlMigrationConnector,
 };
 use destructive_check_plan::DestructiveCheckPlan;
-use migration_connector::{ConnectorResult, DestructiveChangeChecker, DestructiveChangeDiagnostics};
+use migration_connector::{ConnectorResult, DestructiveChangeChecker, DestructiveChangeDiagnostics, Migration};
 use sql_schema_describer::{
     walkers::{ColumnWalker, SqlSchemaExt},
     ColumnArity,
@@ -81,7 +81,7 @@ impl SqlMigrationConnector {
                 .added_columns_with_virtual_defaults
                 .iter()
                 .any(|(table_idx, column_idx)| {
-                    *table_idx == column.table().table_index() && *column_idx == column.column_index()
+                    *table_idx == column.table().table_id() && *column_idx == column.column_id()
                 });
 
         let typed_unexecutable = if has_virtual_default {
@@ -106,26 +106,29 @@ impl SqlMigrationConnector {
 
         for (step_index, step) in steps.iter().enumerate() {
             match step {
-                SqlMigrationStep::AlterTable(AlterTable { table_index, changes }) => {
+                SqlMigrationStep::AlterTable(AlterTable {
+                    table_ids: table_id,
+                    changes,
+                }) => {
                     // The table in alter_table is the updated table, but we want to
                     // check against the current state of the table.
-                    let tables = schemas.tables(table_index);
+                    let tables = schemas.tables(table_id);
 
                     for change in changes {
                         match change {
-                            TableChange::DropColumn(ref drop_column) => {
-                                let column = tables.previous().column_at(drop_column.index);
+                            TableChange::DropColumn { column_id } => {
+                                let column = tables.previous().column_at(*column_id);
 
                                 self.check_column_drop(&column, &mut plan, step_index);
                             }
                             TableChange::AlterColumn(alter_column) => {
-                                let columns = tables.columns(&alter_column.column_index);
+                                let columns = tables.columns(&alter_column.column_id);
 
                                 self.flavour()
-                                    .check_alter_column(&alter_column, &columns, &mut plan, step_index)
+                                    .check_alter_column(alter_column, &columns, &mut plan, step_index)
                             }
-                            TableChange::AddColumn(ref add_column) => {
-                                let column = tables.next().column_at(add_column.column_index);
+                            TableChange::AddColumn { column_id } => {
+                                let column = tables.next().column_at(*column_id);
 
                                 self.check_add_column(&column, &mut plan, step_index, migration)
                             }
@@ -135,8 +138,8 @@ impl SqlMigrationConnector {
                                 },
                                 step_index,
                             ),
-                            TableChange::DropAndRecreateColumn { column_index, changes } => {
-                                let columns = tables.columns(column_index);
+                            TableChange::DropAndRecreateColumn { column_id, changes } => {
+                                let columns = tables.columns(column_id);
 
                                 self.flavour
                                     .check_drop_and_recreate_column(&columns, changes, &mut plan, step_index)
@@ -147,7 +150,7 @@ impl SqlMigrationConnector {
                 }
                 SqlMigrationStep::RedefineTables(redefine_tables) => {
                     for redefine_table in redefine_tables {
-                        let tables = schemas.tables(&redefine_table.table_index);
+                        let tables = schemas.tables(&redefine_table.table_ids);
 
                         if redefine_table.dropped_primary_key {
                             plan.push_warning(
@@ -168,8 +171,8 @@ impl SqlMigrationConnector {
                             self.check_column_drop(&column, &mut plan, step_index);
                         }
 
-                        for (column_indexes, changes, type_change) in redefine_table.column_pairs.iter() {
-                            let columns = tables.columns(column_indexes);
+                        for (column_ides, changes, type_change) in redefine_table.column_pairs.iter() {
+                            let columns = tables.columns(column_ides);
 
                             let arity_change_is_safe = match (&columns.previous().arity(), &columns.next().arity()) {
                                 // column became required
@@ -229,19 +232,18 @@ impl SqlMigrationConnector {
                         }
                     }
                 }
-                SqlMigrationStep::DropTable { table_index } => {
+                SqlMigrationStep::DropTable { table_id } => {
                     self.check_table_drop(
-                        schemas.previous().table_walker_at(*table_index).name(),
+                        schemas.previous().table_walker_at(*table_id).name(),
                         &mut plan,
                         step_index,
                     );
                 }
-                SqlMigrationStep::CreateIndex(CreateIndex {
-                    table_index,
+                SqlMigrationStep::CreateIndex {
+                    table_id: (Some(_), table_id),
                     index_index,
-                    caused_by_create_table: false,
-                }) => {
-                    let index = schemas.next().table_walker_at(*table_index).index_at(*index_index);
+                } => {
+                    let index = schemas.next().table_walker_at(*table_id).index_at(*index_index);
 
                     if index.index_type().is_unique() {
                         plan.push_warning(
@@ -281,15 +283,15 @@ impl SqlMigrationConnector {
 }
 
 #[async_trait::async_trait]
-impl DestructiveChangeChecker<SqlMigration> for SqlMigrationConnector {
-    async fn check(&self, database_migration: &SqlMigration) -> ConnectorResult<DestructiveChangeDiagnostics> {
-        let plan = self.plan(&database_migration);
+impl DestructiveChangeChecker for SqlMigrationConnector {
+    async fn check(&self, migration: &Migration) -> ConnectorResult<DestructiveChangeDiagnostics> {
+        let plan = self.plan(migration.downcast_ref());
 
         plan.execute(self.conn()).await
     }
 
-    fn pure_check(&self, database_migration: &SqlMigration) -> DestructiveChangeDiagnostics {
-        let plan = self.plan(&database_migration);
+    fn pure_check(&self, migration: &Migration) -> DestructiveChangeDiagnostics {
+        let plan = self.plan(migration.downcast_ref());
 
         plan.pure_check()
     }

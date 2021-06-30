@@ -25,11 +25,11 @@ fn indexes_on_foreign_key_fields_are_not_created_twice(api: TestApi) {
 
     let sql_schema = api
         .assert_schema()
-        .assert_table_bang("Human", |table| {
+        .assert_table("Human", |table| {
             table
-                .assert_foreign_keys_count(1)?
-                .assert_fk_on_columns(&["catname"], |fk| fk.assert_references("Cat", &["name"]))?
-                .assert_indexes_count(1)?
+                .assert_foreign_keys_count(1)
+                .assert_fk_on_columns(&["catname"], |fk| fk.assert_references("Cat", &["name"]))
+                .assert_indexes_count(1)
                 .assert_index_on_columns(&["catname"], |idx| idx.assert_is_not_unique())
         })
         .into_schema();
@@ -41,7 +41,7 @@ fn indexes_on_foreign_key_fields_are_not_created_twice(api: TestApi) {
         .assert_green_bang()
         .assert_no_steps();
 
-    api.assert_schema().assert_equals(&sql_schema).unwrap();
+    api.assert_schema().assert_equals(&sql_schema);
 }
 
 // We have to test this because one enum on MySQL can map to multiple enums in the database.
@@ -106,9 +106,9 @@ fn arity_of_enum_columns_can_be_changed(api: TestApi) {
 
     api.schema_push(dm1).send_sync().assert_green_bang();
 
-    api.assert_schema().assert_table_bang("A", |table| {
+    api.assert_schema().assert_table("A", |table| {
         table
-            .assert_column("primaryColor", |col| col.assert_is_required())?
+            .assert_column("primaryColor", |col| col.assert_is_required())
             .assert_column("secondaryColor", |col| col.assert_is_nullable())
     });
 
@@ -128,9 +128,9 @@ fn arity_of_enum_columns_can_be_changed(api: TestApi) {
 
     api.schema_push(dm2).send_sync().assert_green_bang();
 
-    api.assert_schema().assert_table_bang("A", |table| {
+    api.assert_schema().assert_table("A", |table| {
         table
-            .assert_column("primaryColor", |col| col.assert_is_nullable())?
+            .assert_column("primaryColor", |col| col.assert_is_nullable())
             .assert_column("secondaryColor", |col| col.assert_is_required())
     });
 }
@@ -153,9 +153,9 @@ fn arity_is_preserved_by_alter_enum(api: TestApi) {
 
     api.schema_push(dm1).send_sync().assert_green_bang();
 
-    api.assert_schema().assert_table_bang("A", |table| {
+    api.assert_schema().assert_table("A", |table| {
         table
-            .assert_column("primaryColor", |col| col.assert_is_required())?
+            .assert_column("primaryColor", |col| col.assert_is_required())
             .assert_column("secondaryColor", |col| col.assert_is_nullable())
     });
 
@@ -179,9 +179,9 @@ fn arity_is_preserved_by_alter_enum(api: TestApi) {
         .assert_executable()
         .assert_has_executed_steps();
 
-    api.assert_schema().assert_table_bang("A", |table| {
+    api.assert_schema().assert_table("A", |table| {
         table
-            .assert_column("primaryColor", |col| col.assert_is_required())?
+            .assert_column("primaryColor", |col| col.assert_is_required())
             .assert_column("secondaryColor", |col| col.assert_is_nullable())
     });
 }
@@ -263,11 +263,11 @@ fn native_type_columns_can_be_created(api: TestApi) {
 
     api.schema_push(&dm).send_sync().assert_green_bang();
 
-    api.assert_schema().assert_table_bang("A", |table| {
+    api.assert_schema().assert_table("A", |table| {
         types.iter().fold(
-            Ok(table),
+            table,
             |table, (field_name, _prisma_type, _native_type, database_type)| {
-                table.and_then(|table| table.assert_column(field_name, |col| col.assert_full_data_type(database_type)))
+                table.assert_column(field_name, |col| col.assert_full_data_type(database_type))
             },
         )
     });

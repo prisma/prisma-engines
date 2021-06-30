@@ -92,11 +92,11 @@ fn cursor_conditions(mut order_data: Vec<OrderByData>, reverse: bool) -> Documen
                 and_conditions.push(map_equality_condition(order_data));
             }
 
+            let order_data = tail.first().unwrap();
+
             if head.len() == num_orderings - 1 {
-                let order_data = tail.first().unwrap();
                 and_conditions.push(map_orderby_condition(order_data, reverse, true));
             } else {
-                let order_data = tail.first().unwrap();
                 and_conditions.push(map_orderby_condition(order_data, reverse, false));
             }
 

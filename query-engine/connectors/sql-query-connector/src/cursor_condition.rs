@@ -167,6 +167,8 @@ pub fn build(
                         ));
                     }
 
+                    let order_definition = tail.first().unwrap();
+
                     if head.len() == len - 1 {
                         // Special case where we build lte / gte, not lt / gt.
                         // - We use the combination of all order-by fields as comparator for the the cursor.
@@ -192,11 +194,8 @@ pub fn build(
                         //
                         // Said differently, we handle all the cases in which the prefixes are equal to len - 1 to account for possible identical comparators,
                         // but everything else must come strictly "after" the cursor.
-                        let order_definition = tail.first().unwrap();
-
                         and_conditions.push(map_orderby_condition(order_definition, reverse, true));
                     } else {
-                        let order_definition = tail.first().unwrap();
                         and_conditions.push(map_orderby_condition(order_definition, reverse, false));
                     }
 

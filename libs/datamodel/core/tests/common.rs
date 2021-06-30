@@ -5,6 +5,8 @@ use datamodel::{
 };
 use pretty_assertions::assert_eq;
 
+pub use expect_test::expect;
+
 pub trait DatasourceAsserts {
     fn assert_name(&self, name: &str) -> &Self;
     fn assert_url(&self, url: StringFromEnvVar) -> &Self;
@@ -32,7 +34,8 @@ pub trait ScalarFieldAsserts {
 pub trait RelationFieldAsserts {
     fn assert_relation_name(&self, t: &str) -> &Self;
     fn assert_relation_to(&self, t: &str) -> &Self;
-    fn assert_relation_delete_strategy(&self, t: dml::OnDeleteStrategy) -> &Self;
+    fn assert_relation_delete_strategy(&self, t: dml::ReferentialAction) -> &Self;
+    fn assert_relation_update_strategy(&self, t: dml::ReferentialAction) -> &Self;
     fn assert_relation_referenced_fields(&self, t: &[&str]) -> &Self;
     fn assert_relation_base_fields(&self, t: &[&str]) -> &Self;
     fn assert_ignored(&self, state: bool) -> &Self;
@@ -81,12 +84,12 @@ pub trait WarningAsserts {
 impl DatasourceAsserts for datamodel::Datasource {
     fn assert_name(&self, name: &str) -> &Self {
         assert_eq!(&self.name, name);
-        &self
+        self
     }
 
     fn assert_url(&self, url: StringFromEnvVar) -> &Self {
         assert_eq!(self.url, url);
-        &self
+        self
     }
 }
 
@@ -109,7 +112,7 @@ impl FieldAsserts for dml::ScalarField {
 
 impl ScalarFieldAsserts for dml::ScalarField {
     fn assert_base_type(&self, t: &ScalarType) -> &Self {
-        if let dml::FieldType::Base(base_type, _) = &self.field_type {
+        if let dml::FieldType::Scalar(base_type, _, None) = &self.field_type {
             assert_eq!(base_type, t);
         } else {
             panic!("Scalar expected, but found {:?}", self.field_type);
@@ -136,8 +139,8 @@ impl ScalarFieldAsserts for dml::ScalarField {
     }
 
     fn assert_native_type(&self) -> &NativeTypeInstance {
-        if let dml::FieldType::NativeType(_, t) = &self.field_type {
-            &t
+        if let dml::FieldType::Scalar(_, _, Some(t)) = &self.field_type {
+            t
         } else {
             panic!("Native Type expected, but found {:?}", self.field_type);
         }
@@ -202,8 +205,13 @@ impl RelationFieldAsserts for dml::RelationField {
         self
     }
 
-    fn assert_relation_delete_strategy(&self, t: dml::OnDeleteStrategy) -> &Self {
-        assert_eq!(self.relation_info.on_delete, t);
+    fn assert_relation_delete_strategy(&self, t: dml::ReferentialAction) -> &Self {
+        assert_eq!(self.relation_info.on_delete, Some(t));
+        self
+    }
+
+    fn assert_relation_update_strategy(&self, t: dml::ReferentialAction) -> &Self {
+        assert_eq!(self.relation_info.on_update, Some(t));
         self
     }
 
@@ -395,21 +403,6 @@ pub fn parse_configuration(datamodel_string: &str) -> Configuration {
     }
 }
 
-pub fn parse_with_diagnostics(datamodel_string: &str) -> ValidatedDatamodel {
-    match datamodel::parse_datamodel(datamodel_string) {
-        Ok(s) => s,
-        Err(errs) => {
-            for err in errs.to_error_iter() {
-                err.pretty_print(&mut std::io::stderr().lock(), "", datamodel_string)
-                    .unwrap();
-            }
-
-            panic!("Datamodel parsing failed. Please see error above.")
-        }
-    }
-}
-
-#[allow(dead_code)] // Not sure why the compiler thinks this is never used.
 pub fn parse_error(datamodel_string: &str) -> Diagnostics {
     match datamodel::parse_datamodel(datamodel_string) {
         Ok(_) => panic!("Expected an error when parsing schema."),

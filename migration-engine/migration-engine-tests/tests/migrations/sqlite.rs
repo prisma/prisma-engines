@@ -14,11 +14,9 @@ fn sqlite_must_recreate_indexes(api: TestApi) {
 
     api.schema_push(dm1).send_sync().assert_green_bang();
 
-    api.assert_schema()
-        .assert_table("A", |table| {
-            table.assert_index_on_columns(&["field"], |idx| idx.assert_is_unique())
-        })
-        .unwrap();
+    api.assert_schema().assert_table("A", |table| {
+        table.assert_index_on_columns(&["field"], |idx| idx.assert_is_unique())
+    });
 
     let dm2 = r#"
         model A {
@@ -30,11 +28,9 @@ fn sqlite_must_recreate_indexes(api: TestApi) {
 
     api.schema_push(dm2).send_sync().assert_green_bang();
 
-    api.assert_schema()
-        .assert_table("A", |table| {
-            table.assert_index_on_columns(&["field"], |idx| idx.assert_is_unique())
-        })
-        .unwrap();
+    api.assert_schema().assert_table("A", |table| {
+        table.assert_index_on_columns(&["field"], |idx| idx.assert_is_unique())
+    });
 }
 
 #[test_connector(tags(Sqlite))]
@@ -53,11 +49,9 @@ fn sqlite_must_recreate_multi_field_indexes(api: TestApi) {
 
     api.schema_push(dm1).send_sync().assert_green_bang();
 
-    api.assert_schema()
-        .assert_table("A", |table| {
-            table.assert_index_on_columns(&["field", "secondField"], |idx| idx.assert_is_unique())
-        })
-        .unwrap();
+    api.assert_schema().assert_table("A", |table| {
+        table.assert_index_on_columns(&["field", "secondField"], |idx| idx.assert_is_unique())
+    });
 
     let dm2 = r#"
         model A {
@@ -72,11 +66,9 @@ fn sqlite_must_recreate_multi_field_indexes(api: TestApi) {
 
     api.schema_push(dm2).send_sync().assert_green_bang();
 
-    api.assert_schema()
-        .assert_table("A", |table| {
-            table.assert_index_on_columns(&["field", "secondField"], |idx| idx.assert_is_unique())
-        })
-        .unwrap();
+    api.assert_schema().assert_table("A", |table| {
+        table.assert_index_on_columns(&["field", "secondField"], |idx| idx.assert_is_unique())
+    });
 }
 
 // This is necessary because of how INTEGER PRIMARY KEY works on SQLite. This has already caused problems.
@@ -89,9 +81,5 @@ fn creating_a_model_with_a_non_autoincrement_id_column_is_idempotent(api: TestAp
     "#;
 
     api.schema_push(dm).send_sync().assert_green_bang();
-    api.schema_push(dm)
-        .send_sync()
-        .assert_green()
-        .unwrap()
-        .assert_no_steps();
+    api.schema_push(dm).send_sync().assert_green_bang().assert_no_steps();
 }

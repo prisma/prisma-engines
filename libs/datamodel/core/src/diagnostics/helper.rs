@@ -32,7 +32,7 @@ pub(crate) fn pretty_print(f: &mut dyn std::io::Write, file_name: &str, text: &s
   writeln!(f, "{}", format_line_number_with_line(start_line_number, &file_lines))?;
   writeln!(f, "{}{}{}{}", format_line_number(start_line_number + 1), prefix, offending, suffix)?;
   if offending.len() == 0 {
-    let spacing = std::iter::repeat(" ").take(start_in_line).collect::<String>();
+    let spacing = " ".repeat(start_in_line);
     writeln!(f, "{}{}{}", format_line_number(0), spacing, "^ Unexpected token.".bold().bright_red())?;
   }
 

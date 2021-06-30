@@ -3,13 +3,13 @@ use crate::{
     filter::convert_filter, output_meta, query_builder::MongoReadQueryBuilder, vacuum_cursor, BsonTransform, IntoBson,
 };
 use connector_interface::{Filter, QueryArguments, RelAggregationSelection};
-use mongodb::Database;
-use mongodb::{bson::doc, options::FindOptions};
+use mongodb::{bson::doc, options::FindOptions, ClientSession, Database};
 use prisma_models::*;
 
 // TODO: Handle aggregation selections
-pub async fn get_single_record(
+pub async fn get_single_record<'conn>(
     database: &Database,
+    session: &mut ClientSession,
     model: &ModelRef,
     filter: &Filter,
     selected_fields: &ModelProjection,
@@ -22,9 +22,11 @@ pub async fn get_single_record(
         .projection(selected_fields.clone().into_bson()?.into_document()?)
         .build();
 
-    let cursor = coll.find(Some(filter), Some(find_options)).await?;
-    let docs = vacuum_cursor(cursor).await?;
+    let cursor = coll
+        .find_with_session(Some(filter), Some(find_options), session)
+        .await?;
 
+    let docs = vacuum_cursor(cursor, session).await?;
     if docs.is_empty() {
         Ok(None)
     } else {
@@ -43,8 +45,9 @@ pub async fn get_single_record(
 // - [ ] Cursor
 // - [x] Distinct select (inherently given from core).
 // - [ ] Relation aggregation count
-pub async fn get_many_records(
+pub async fn get_many_records<'conn>(
     database: &Database,
+    session: &mut ClientSession,
     model: &ModelRef,
     query_arguments: QueryArguments,
     selected_fields: &ModelProjection,
@@ -64,7 +67,7 @@ pub async fn get_many_records(
         .with_model_projection(selected_fields.clone())?
         .build()?;
 
-    let docs = query.execute(coll).await?;
+    let docs = query.execute(coll, session).await?;
     for doc in docs {
         let record = document_to_record(doc, &field_names, &meta_mapping)?;
         records.push(record)
@@ -77,8 +80,9 @@ pub async fn get_many_records(
     Ok(records)
 }
 
-pub async fn get_related_m2m_record_ids(
+pub async fn get_related_m2m_record_ids<'conn>(
     database: &Database,
+    session: &mut ClientSession,
     from_field: &RelationFieldRef,
     from_record_ids: &[RecordProjection],
 ) -> crate::Result<Vec<(RecordProjection, RecordProjection)>> {
@@ -104,8 +108,9 @@ pub async fn get_related_m2m_record_ids(
         .projection(doc! { id_field.db_name(): 1, relation_ids_field_name: 1 })
         .build();
 
-    let cursor = coll.find(filter, Some(find_options)).await?;
-    let docs = vacuum_cursor(cursor).await?;
+    let cursor = coll.find_with_session(filter, Some(find_options), session).await?;
+
+    let docs = vacuum_cursor(cursor, session).await?;
 
     let parent_id_meta = output_meta::from_field(&id_field);
     let id_holder_field = model.fields().find_from_scalar(relation_ids_field_name).unwrap();

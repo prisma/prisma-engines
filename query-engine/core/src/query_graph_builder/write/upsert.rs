@@ -3,14 +3,19 @@ use crate::{
     constants::args,
     query_ast::*,
     query_graph::{Flow, Node, QueryGraph, QueryGraphDependency},
-    ArgumentListLookup, ParsedField, ParsedInputMap,
+    ArgumentListLookup, ConnectorContext, ParsedField, ParsedInputMap,
 };
 use connector::IdFilter;
 use prisma_models::ModelRef;
 use std::{convert::TryInto, sync::Arc};
 
 #[tracing::instrument(skip(graph, model, field))]
-pub fn upsert_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedField) -> QueryGraphBuilderResult<()> {
+pub fn upsert_record(
+    graph: &mut QueryGraph,
+    connector_ctx: &ConnectorContext,
+    model: ModelRef,
+    mut field: ParsedField,
+) -> QueryGraphBuilderResult<()> {
     graph.flag_transactional();
 
     let where_arg: ParsedInputMap = field.arguments.lookup(args::WHERE).unwrap().value.try_into()?;
@@ -24,8 +29,20 @@ pub fn upsert_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
     let read_parent_records = utils::read_ids_infallible(model.clone(), model_id.clone(), filter.clone());
     let read_parent_records_node = graph.create_node(read_parent_records);
 
-    let create_node = create::create_record_node(graph, Arc::clone(&model), create_argument.value.try_into()?)?;
-    let update_node = update::update_record_node(graph, filter, Arc::clone(&model), update_argument.value.try_into()?)?;
+    let create_node = create::create_record_node(
+        graph,
+        connector_ctx,
+        Arc::clone(&model),
+        create_argument.value.try_into()?,
+    )?;
+
+    let update_node = update::update_record_node(
+        graph,
+        connector_ctx,
+        filter,
+        Arc::clone(&model),
+        update_argument.value.try_into()?,
+    )?;
 
     let read_query = read::find_unique(field, Arc::clone(&model))?;
     let read_node_create = graph.create_node(Query::Read(read_query.clone()));

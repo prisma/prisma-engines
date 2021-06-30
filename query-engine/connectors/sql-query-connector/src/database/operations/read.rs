@@ -17,7 +17,7 @@ pub async fn get_single_record(
     selected_fields: &ModelProjection,
     aggr_selections: &[RelAggregationSelection],
 ) -> crate::Result<Option<SingleRecord>> {
-    let query = read::get_records(&model, selected_fields.as_columns(), aggr_selections, filter);
+    let query = read::get_records(model, selected_fields.as_columns(), aggr_selections, filter);
 
     let mut field_names: Vec<_> = selected_fields.db_names().collect();
     let mut aggr_field_names: Vec<_> = aggr_selections.iter().map(|aggr_sel| aggr_sel.db_alias()).collect();
@@ -81,7 +81,7 @@ pub async fn get_many_records(
     // The should_batch has been adjusted to reflect that as a band-aid, but deeper investigation is necessary.
     if query_arguments.should_batch() {
         // We don't need to order in the database due to us ordering in this function.
-        let order = std::mem::replace(&mut query_arguments.order_by, vec![]);
+        let order = std::mem::take(&mut query_arguments.order_by);
 
         let batches = query_arguments.batched();
         let mut futures = FuturesUnordered::new();

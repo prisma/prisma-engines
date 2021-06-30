@@ -18,7 +18,7 @@ fn evaluate_data_loss_with_an_up_to_date_database_returns_no_step(api: TestApi) 
 
     let output = api.evaluate_data_loss(&directory, dm.into()).send().into_output();
     let expected_output = EvaluateDataLossOutput {
-        migration_steps: vec![],
+        migration_steps: 0,
         warnings: vec![],
         unexecutable_steps: vec![],
     };

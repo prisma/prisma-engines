@@ -8,7 +8,7 @@ use uuid::Uuid;
 #[async_trait::async_trait]
 impl MigrationPersistence for SqlMigrationConnector {
     async fn baseline_initialize(&self) -> ConnectorResult<()> {
-        self.flavour.create_migrations_table(&self.conn()).await?;
+        self.flavour.create_migrations_table(self.conn()).await?;
 
         Ok(())
     }
@@ -36,7 +36,7 @@ impl MigrationPersistence for SqlMigrationConnector {
             ));
         }
 
-        self.flavour.create_migrations_table(&self.conn()).await?;
+        self.flavour.create_migrations_table(self.conn()).await?;
 
         Ok(())
     }

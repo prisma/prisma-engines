@@ -1,9 +1,10 @@
 use super::{column::ColumnDiffer, ColumnTypeChange, SqlSchemaDiffer};
 use crate::{
     pair::Pair,
-    sql_migration::{AlterEnum, AlterTable, CreateIndex, DropIndex, SqlMigrationStep},
+    sql_migration::{AlterEnum, SqlMigrationStep},
+    sql_schema_differ,
 };
-use sql_schema_describer::walkers::IndexWalker;
+use sql_schema_describer::{walkers::IndexWalker, ColumnId};
 use std::collections::HashSet;
 
 mod mssql;
@@ -63,10 +64,10 @@ pub(crate) trait SqlSchemaDifferFlavour {
     /// Evaluate indexes/constraints that need to be dropped and re-created based on other changes in the schema
     fn push_index_changes_for_column_changes(
         &self,
-        _alter_tables: &[AlterTable],
-        _drop_indexes: &mut Vec<DropIndex>,
-        _create_indexes: &mut Vec<CreateIndex>,
-        _differ: &SqlSchemaDiffer<'_>,
+        _table: &sql_schema_differ::TableDiffer<'_, '_>,
+        _column_index: Pair<ColumnId>,
+        _column_changes: sql_schema_differ::ColumnChanges,
+        _steps: &mut Vec<SqlMigrationStep>,
     ) {
     }
 
@@ -80,6 +81,12 @@ pub(crate) trait SqlSchemaDifferFlavour {
     /// is dropped.
     fn should_drop_indexes_from_dropped_tables(&self) -> bool {
         false
+    }
+
+    /// Whether the foreign keys of dropped tables should be dropped before the table
+    /// is dropped.
+    fn should_drop_foreign_keys_from_dropped_tables(&self) -> bool {
+        true
     }
 
     /// Whether to skip diffing JSON defaults.

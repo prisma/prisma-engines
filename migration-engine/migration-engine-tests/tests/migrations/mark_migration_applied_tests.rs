@@ -42,8 +42,7 @@ fn mark_migration_applied_on_an_empty_database_works(api: TestApi) {
 
     api.assert_schema()
         .assert_tables_count(1)
-        .assert_has_table("_prisma_migrations")
-        .unwrap();
+        .assert_has_table("_prisma_migrations");
 }
 
 #[test_connector]
@@ -104,9 +103,7 @@ fn mark_migration_applied_on_a_non_empty_database_works(api: TestApi) {
     api.assert_schema()
         .assert_tables_count(2)
         .assert_has_table("_prisma_migrations")
-        .unwrap()
-        .assert_has_table("Test")
-        .unwrap();
+        .assert_has_table("Test");
 }
 
 #[test_connector]
@@ -169,11 +166,8 @@ fn mark_migration_applied_when_the_migration_is_already_applied_errors(api: Test
     api.assert_schema()
         .assert_tables_count(3)
         .assert_has_table("_prisma_migrations")
-        .unwrap()
         .assert_has_table("Cat")
-        .unwrap()
-        .assert_has_table("Test")
-        .unwrap();
+        .assert_has_table("Test");
 }
 
 #[test_connector]
@@ -251,9 +245,7 @@ fn mark_migration_applied_when_the_migration_is_failed(api: TestApi) {
     api.assert_schema()
         .assert_tables_count(2)
         .assert_has_table("_prisma_migrations")
-        .unwrap()
-        .assert_has_table("Test")
-        .unwrap();
+        .assert_has_table("Test");
 }
 
 #[test_connector]
@@ -292,9 +284,7 @@ fn baselining_should_work(api: TestApi) {
     api.assert_schema()
         .assert_tables_count(2)
         .assert_has_table("_prisma_migrations")
-        .unwrap()
-        .assert_has_table("test")
-        .unwrap();
+        .assert_has_table("test");
 }
 
 #[test_connector]

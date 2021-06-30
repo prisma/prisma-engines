@@ -12,7 +12,7 @@ pub struct Generator {
     pub config: HashMap<String, String>,
 
     #[serde(default)]
-    pub binary_targets: Vec<String>,
+    pub binary_targets: Vec<StringFromEnvVar>,
 
     #[serde(default)]
     pub preview_features: Vec<PreviewFeature>,

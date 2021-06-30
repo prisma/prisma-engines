@@ -2,8 +2,10 @@ use crate::{
     connect, connection_wrapper::Connection, error::quaint_error_to_connector_error, SqlFlavour, SqlMigrationConnector,
 };
 use connection_string::JdbcString;
+use datamodel::common::preview_features::PreviewFeature;
+use enumflags2::BitFlags;
 use indoc::formatdoc;
-use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
+use migration_connector::{migrations_directory::MigrationDirectory, ConnectorError, ConnectorResult};
 use quaint::{connector::MssqlUrl, prelude::Table};
 use sql_schema_describer::{DescriberErrorKind, SqlSchema, SqlSchemaDescriberBackend};
 use std::str::FromStr;
@@ -11,6 +13,7 @@ use user_facing_errors::{introspection_engine::DatabaseSchemaInconsistent, Known
 
 pub(crate) struct MssqlFlavour {
     url: MssqlUrl,
+    preview_features: BitFlags<PreviewFeature>,
 }
 
 impl std::fmt::Debug for MssqlFlavour {
@@ -20,8 +23,8 @@ impl std::fmt::Debug for MssqlFlavour {
 }
 
 impl MssqlFlavour {
-    pub fn new(url: MssqlUrl) -> Self {
-        Self { url }
+    pub fn new(url: MssqlUrl, preview_features: BitFlags<PreviewFeature>) -> Self {
+        Self { url, preview_features }
     }
 
     fn is_running_on_azure_sql(&self) -> bool {
@@ -114,8 +117,21 @@ impl SqlFlavour for MssqlFlavour {
             .await?)
     }
 
+    async fn apply_migration_script(
+        &self,
+        migration_name: &str,
+        script: &str,
+        conn: &Connection,
+    ) -> ConnectorResult<()> {
+        super::generic_apply_migration_script(migration_name, script, conn).await
+    }
+
     fn migrations_table(&self) -> Table<'_> {
         (self.schema_name(), self.migrations_table_name()).into()
+    }
+
+    fn preview_features(&self) -> BitFlags<PreviewFeature> {
+        self.preview_features
     }
 
     async fn create_database(&self, jdbc_string: &str) -> ConnectorResult<String> {
@@ -152,12 +168,12 @@ impl SqlFlavour for MssqlFlavour {
     }
 
     async fn describe_schema<'a>(&'a self, connection: &Connection) -> ConnectorResult<SqlSchema> {
-        sql_schema_describer::mssql::SqlSchemaDescriber::new(connection.quaint().clone())
+        sql_schema_describer::mssql::SqlSchemaDescriber::new(connection.queryable())
             .describe(connection.connection_info().schema_name())
             .await
             .map_err(|err| match err.into_kind() {
                 DescriberErrorKind::QuaintError(err) => {
-                    quaint_error_to_connector_error(err, connection.connection_info())
+                    quaint_error_to_connector_error(err, &connection.connection_info())
                 }
                 e @ DescriberErrorKind::CrossSchemaReference { .. } => {
                     let err = KnownError::new(DatabaseSchemaInconsistent {
@@ -189,7 +205,7 @@ impl SqlFlavour for MssqlFlavour {
     }
 
     async fn reset(&self, connection: &Connection) -> ConnectorResult<()> {
-        let schema_name = connection.connection_info().schema_name();
+        let schema_name = connection.schema_name();
 
         let drop_procedures = format!(
             r#"
@@ -384,7 +400,7 @@ mod tests {
     fn debug_impl_does_not_leak_connection_info() {
         let url = "sqlserver://myserver:8765;database=master;schema=mydbname;user=SA;password=<mypassword>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED";
 
-        let flavour = MssqlFlavour::new(MssqlUrl::new(&url).unwrap());
+        let flavour = MssqlFlavour::new(MssqlUrl::new(url).unwrap(), BitFlags::empty());
         let debugged = format!("{:?}", flavour);
 
         let words = &["myname", "mypassword", "myserver", "8765", "mydbname"];

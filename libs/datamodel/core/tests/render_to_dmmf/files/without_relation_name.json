@@ -32,7 +32,6 @@
           "relationName": "PostToUser",
           "relationFromFields": [],
           "relationToFields": [],
-          "relationOnDelete": "NONE",
           "isGenerated": false,
           "isUpdatedAt": false
         }
@@ -90,7 +89,7 @@
           "relationToFields": [
             "id"
           ],
-          "relationOnDelete": "NONE",
+          "relationOnDelete": "Cascade",
           "isGenerated": false,
           "isUpdatedAt": false
         }

@@ -20,8 +20,7 @@ fn enums_can_be_dropped_on_postgres(api: TestApi) {
 
     api.schema_push(dm1).send_sync().assert_green_bang();
     api.assert_schema()
-        .assert_enum("CatMood", |r#enum| r#enum.assert_values(&["ANGRY", "HUNGRY", "CUDDLY"]))
-        .unwrap();
+        .assert_enum("CatMood", |r#enum| r#enum.assert_values(&["ANGRY", "HUNGRY", "CUDDLY"]));
 
     let dm2 = r#"
         model Cat {
@@ -31,7 +30,7 @@ fn enums_can_be_dropped_on_postgres(api: TestApi) {
     "#;
 
     api.schema_push(dm2).send_sync().assert_green_bang();
-    api.assert_schema().assert_has_no_enum("CatMood").unwrap();
+    api.assert_schema().assert_has_no_enum("CatMood");
 }
 
 #[test_connector(capabilities(ScalarLists))]
@@ -56,11 +55,11 @@ fn adding_a_scalar_list_for_a_model_with_id_type_int_must_work(api: TestApi) {
 
     api.schema_push(dm1).send_sync().assert_green_bang();
 
-    api.assert_schema().assert_table_bang("A", |table| {
+    api.assert_schema().assert_table("A", |table| {
         table
-            .assert_column("strings", |col| col.assert_is_list()?.assert_type_is_string())?
+            .assert_column("strings", |col| col.assert_is_list().assert_type_is_string())
             .assert_column("enums", |col| {
-                col.assert_type_family(ColumnTypeFamily::Enum("Status".into()))?
+                col.assert_type_family(ColumnTypeFamily::Enum("Status".into()))
                     .assert_is_list()
             })
     });
@@ -78,9 +77,7 @@ fn existing_postgis_tables_must_not_be_migrated(api: TestApi) {
 
     api.assert_schema()
         .assert_has_table("spatial_ref_sys")
-        .unwrap()
-        .assert_has_table("Geometry_columns")
-        .unwrap();
+        .assert_has_table("Geometry_columns");
 
     let schema = "";
 
@@ -91,9 +88,7 @@ fn existing_postgis_tables_must_not_be_migrated(api: TestApi) {
 
     api.assert_schema()
         .assert_has_table("spatial_ref_sys")
-        .unwrap()
-        .assert_has_table("Geometry_columns")
-        .unwrap();
+        .assert_has_table("Geometry_columns");
 }
 
 #[test_connector(tags(Postgres))]
@@ -149,11 +144,11 @@ fn native_type_columns_can_be_created(api: TestApi) {
 
     api.schema_push(&dm).send_sync().assert_green_bang();
 
-    api.assert_schema().assert_table_bang("A", |table| {
+    api.assert_schema().assert_table("A", |table| {
         types.iter().fold(
-            Ok(table),
+            table,
             |table, (field_name, _prisma_type, _native_type, database_type)| {
-                table.and_then(|table| table.assert_column(field_name, |col| col.assert_full_data_type(database_type)))
+                table.assert_column(field_name, |col| col.assert_full_data_type(database_type))
             },
         )
     });
@@ -167,7 +162,7 @@ fn uuids_do_not_generate_drift_issue_5282(api: TestApi) {
         r#"
         CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
         CREATE TABLE a (id uuid DEFAULT uuid_generate_v4() primary key);
-        CREATE TABLE b (id uuid DEFAULT uuid_generate_v4() primary key, a_id uuid, CONSTRAINT aaa FOREIGN KEY (a_id) REFERENCES a(id));
+        CREATE TABLE b (id uuid DEFAULT uuid_generate_v4() primary key, a_id uuid, CONSTRAINT aaa FOREIGN KEY (a_id) REFERENCES a(id) ON DELETE SET NULL ON UPDATE CASCADE);
         "#
     );
 
@@ -194,4 +189,142 @@ fn uuids_do_not_generate_drift_issue_5282(api: TestApi) {
         .send_sync()
         .assert_green_bang()
         .assert_no_steps();
+}
+
+#[test_connector(tags(Postgres))]
+fn functions_with_schema_prefix_in_dbgenerated_are_idempotent(api: TestApi) {
+    api.raw_cmd(r#"CREATE SCHEMA "myschema"; CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA "myschema";"#);
+
+    dbg!(api.connection_info());
+
+    let dm = format!(
+        r#"
+        {}
+
+        model Koala {{
+            id String @id @db.Uuid @default(dbgenerated("myschema.uuid_generate_v4()"))
+        }}
+        "#,
+        api.datasource_block()
+    );
+
+    api.schema_push(dm.clone())
+        .send_sync()
+        .assert_green_bang()
+        .assert_has_executed_steps();
+    api.schema_push(dm).send_sync().assert_green_bang().assert_no_steps();
+}
+
+#[test_connector(tags(Postgres))]
+fn postgres_apply_migrations_errors_give_precise_location(api: TestApi) {
+    let dm = "";
+    let migrations_directory = api.create_migrations_directory();
+
+    let migration = r#"
+        CREATE TABLE "Cat" (
+            id INTEGER PRIMARY KEY,
+            name TEXT NOT NULL
+        );
+
+        SELECT id FROM "Dog";
+
+        CREATE TABLE "Emu" (
+            size INTEGER
+        );
+    "#;
+
+    let migration_name = api
+        .create_migration("01init", dm, &migrations_directory)
+        .draft(true)
+        .send_sync()
+        .modify_migration(|contents| {
+            contents.clear();
+            contents.push_str(migration);
+        })
+        .into_output()
+        .generated_migration_name
+        .unwrap();
+
+    let err = api
+        .apply_migrations(&migrations_directory)
+        .send_unwrap_err()
+        .to_string()
+        .replace(&migration_name, "<migration-name>");
+
+    let expectation = expect![[r#"
+        A migration failed to apply. New migrations can not be applied before the error is recovered from. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve
+
+        Migration name: <migration-name>
+
+        Database error code: 42P01
+
+        Database error:
+        ERROR: relation "Dog" does not exist
+
+        Position:
+        [1m  2[0m         CREATE TABLE "Cat" (
+        [1m  3[0m             id INTEGER PRIMARY KEY,
+        [1m  4[0m             name TEXT NOT NULL
+        [1m  5[0m         );
+        [1m  6[0m
+        [1m  7[1;31m         SELECT id FROM "Dog";[0m
+
+    "#]];
+    let first_segment = err.split_terminator("DbError {").next().unwrap();
+    expectation.assert_eq(first_segment)
+}
+
+#[test_connector(tags(Postgres))]
+fn postgres_apply_migrations_errors_give_precise_location_at_the_beginning_of_files(api: TestApi) {
+    let dm = "";
+    let migrations_directory = api.create_migrations_directory();
+
+    let migration = r#"
+        CREATE TABLE "Cat" ( id INTEGER PRIMARY KEY );
+
+        SELECT id FROM "Dog";
+
+        CREATE TABLE "Emu" (
+            size INTEGER
+        );
+    "#;
+
+    let migration_name = api
+        .create_migration("01init", dm, &migrations_directory)
+        .draft(true)
+        .send_sync()
+        .modify_migration(|contents| {
+            contents.clear();
+            contents.push_str(migration);
+        })
+        .into_output()
+        .generated_migration_name
+        .unwrap();
+
+    let err = api
+        .apply_migrations(&migrations_directory)
+        .send_unwrap_err()
+        .to_string()
+        .replace(&migration_name, "<migration-name>");
+
+    let expectation = expect![[r#"
+        A migration failed to apply. New migrations can not be applied before the error is recovered from. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve
+
+        Migration name: <migration-name>
+
+        Database error code: 42P01
+
+        Database error:
+        ERROR: relation "Dog" does not exist
+
+        Position:
+        [1m  0[0m
+        [1m  1[0m
+        [1m  2[0m         CREATE TABLE "Cat" ( id INTEGER PRIMARY KEY );
+        [1m  3[0m
+        [1m  4[1;31m         SELECT id FROM "Dog";[0m
+
+    "#]];
+    let first_segment = err.split_terminator("DbError {").next().unwrap();
+    expectation.assert_eq(first_segment)
 }

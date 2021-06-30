@@ -23,7 +23,7 @@ mod sql_server {
     }
 }
 
-#[test_suite(schema(autoinc_id), capabilities(AutoIncrement))]
+#[test_suite(schema(autoinc_id), capabilities(CreateMany, AutoIncrement))]
 mod single_col {
     use query_engine_tests::run_query;
 

@@ -1,6 +1,6 @@
 use super::super::helpers::*;
 use crate::{
-    ast::{self, Span},
+    ast::{self, Span, WithSpan},
     common::preview_features::GENERATOR,
     configuration::Generator,
     diagnostics::*,
@@ -25,90 +25,84 @@ const FIRST_CLASS_PROPERTIES: &[&str] = &[
 pub struct GeneratorLoader {}
 
 impl GeneratorLoader {
-    pub fn load_generators_from_ast(ast_schema: &ast::SchemaAst) -> Result<ValidatedGenerators, Diagnostics> {
-        let mut generators: Vec<Generator> = vec![];
-        let mut diagnostics = Diagnostics::new();
+    pub fn load_generators_from_ast(ast_schema: &ast::SchemaAst, diagnostics: &mut Diagnostics) -> Vec<Generator> {
+        let mut generators: Vec<Generator> = Vec::new();
 
-        for gen in &ast_schema.generators() {
-            match Self::lift_generator(&gen) {
-                Ok(loaded_gen) => {
-                    diagnostics.append_warning_vec(loaded_gen.warnings);
-                    generators.push(loaded_gen.subject)
-                }
-                // Lift error.
-                Err(err) => {
-                    for e in err.errors {
-                        match e {
-                            DatamodelError::ArgumentNotFound { argument_name, span } => {
-                                diagnostics.push_error(DatamodelError::new_generator_argument_not_found_error(
-                                    argument_name.as_str(),
-                                    gen.name.name.as_str(),
-                                    span,
-                                ));
-                            }
-                            _ => {
-                                diagnostics.push_error(e);
-                            }
-                        }
-                    }
-                    diagnostics.append_warning_vec(err.warnings)
-                }
+        for gen in ast_schema.generators() {
+            if let Some(generator) = Self::lift_generator(gen, diagnostics) {
+                generators.push(generator)
             }
         }
 
-        if diagnostics.has_errors() {
-            Err(diagnostics)
-        } else {
-            Ok(ValidatedGenerators {
-                subject: generators,
-                warnings: diagnostics.warnings,
-            })
-        }
+        generators
     }
 
-    fn lift_generator(ast_generator: &ast::GeneratorConfig) -> Result<ValidatedGenerator, Diagnostics> {
+    fn lift_generator(ast_generator: &ast::GeneratorConfig, diagnostics: &mut Diagnostics) -> Option<Generator> {
         let args: HashMap<_, _> = ast_generator
             .properties
             .iter()
             .map(|arg| (arg.name.name.as_str(), ValueValidator::new(&arg.value)))
             .collect();
-        let mut diagnostics = Diagnostics::new();
 
-        let provider = args
-            .get(PROVIDER_KEY)
-            .ok_or_else(|| DatamodelError::new_argument_not_found_error(PROVIDER_KEY, ast_generator.span))?
-            .as_str_from_env()?;
+        let provider = match args.get(PROVIDER_KEY) {
+            Some(val) => match val.as_str_from_env() {
+                Ok(val) => val,
+                Err(err) => {
+                    diagnostics.push_error(err);
+                    return None;
+                }
+            },
+            None => {
+                diagnostics.push_error(DatamodelError::new_generator_argument_not_found_error(
+                    PROVIDER_KEY,
+                    &ast_generator.name.name,
+                    *ast_generator.span(),
+                ));
+                return None;
+            }
+        };
 
-        let output = if let Some(arg) = args.get(OUTPUT_KEY) {
-            Some(arg.as_str_from_env()?)
-        } else {
-            None
+        let output = match args.get(OUTPUT_KEY).map(|v| v.as_str_from_env()) {
+            Some(Ok(val)) => Some(val),
+            Some(Err(err)) => {
+                diagnostics.push_error(err);
+                None
+            }
+            None => None,
         };
 
         let mut properties: HashMap<String, String> = HashMap::new();
 
-        let binary_targets = match args.get(BINARY_TARGETS_KEY) {
-            Some(x) => x.as_array().to_str_vec()?,
+        let binary_targets = match args
+            .get(BINARY_TARGETS_KEY)
+            .map(|v| v.as_array().to_string_from_env_var_vec())
+        {
+            Some(Ok(val)) => val,
+            Some(Err(err)) => {
+                diagnostics.push_error(err);
+                Vec::new()
+            }
             None => Vec::new(),
         };
 
         // for compatibility reasons we still accept the old experimental key
         let preview_features_arg = args
             .get(PREVIEW_FEATURES_KEY)
-            .or_else(|| args.get(EXPERIMENTAL_FEATURES_KEY));
+            .or_else(|| args.get(EXPERIMENTAL_FEATURES_KEY))
+            .map(|v| (v.as_array().to_str_vec(), v.span()));
 
         let (raw_preview_features, span) = match preview_features_arg {
-            Some(x) => (x.as_array().to_str_vec()?, x.span()),
+            Some((Ok(arr), span)) => (arr, span),
+            Some((Err(err), span)) => {
+                diagnostics.push_error(err);
+                (Vec::new(), span)
+            }
             None => (Vec::new(), Span::empty()),
         };
 
         let preview_features = if !raw_preview_features.is_empty() {
             let (features, mut diag) = parse_and_validate_preview_features(raw_preview_features, &GENERATOR, span);
             diagnostics.append(&mut diag);
-
-            if diagnostics.has_errors() {
-                return Err(diagnostics);
-            }
 
             features
         } else {
@@ -124,17 +118,14 @@ impl GeneratorLoader {
             properties.insert(prop.name.name.clone(), prop.value.to_string());
         }
 
-        Ok(ValidatedGenerator {
-            subject: Generator {
-                name: ast_generator.name.name.clone(),
-                provider,
-                output,
-                binary_targets,
-                preview_features,
-                config: properties,
-                documentation: ast_generator.documentation.clone().map(|comment| comment.text),
-            },
-            warnings: diagnostics.warnings,
+        Some(Generator {
+            name: ast_generator.name.name.clone(),
+            provider,
+            output,
+            binary_targets,
+            preview_features,
+            config: properties,
+            documentation: ast_generator.documentation.clone().map(|comment| comment.text),
         })
     }
 }

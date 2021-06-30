@@ -1,8 +1,6 @@
-use super::super::assertions::AssertionResult;
 use migration_core::{
-    api::GenericApi,
     commands::{SchemaPushInput, SchemaPushOutput},
-    CoreError, CoreResult,
+    CoreError, CoreResult, GenericApi,
 };
 use std::{borrow::Cow, fmt::Debug};
 use tracing_futures::Instrument;
@@ -91,11 +89,6 @@ impl Debug for SchemaPushAssertion<'_> {
 }
 
 impl<'a> SchemaPushAssertion<'a> {
-    /// Asserts that the command produced no warning and no unexecutable migration message.
-    pub fn assert_green(self) -> AssertionResult<Self> {
-        Ok(self.assert_no_warning().assert_executable())
-    }
-
     /// Asserts that the command produced no warning and no unexecutable migration message.
     #[track_caller]
     pub fn assert_green_bang(self) -> Self {
