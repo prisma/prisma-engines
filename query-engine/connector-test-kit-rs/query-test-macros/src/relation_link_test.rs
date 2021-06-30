@@ -14,6 +14,8 @@ use syn::{parse_macro_input, AttributeArgs, ItemFn};
 ///
 /// Original code:
 /// ```rust
+/// # use query_engine_tests::*;
+///
 /// #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneOpt")]
 /// async fn my_fancy_test(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
 ///   assert_eq!(true, true);
@@ -21,6 +23,8 @@ use syn::{parse_macro_input, AttributeArgs, ItemFn};
 /// ```
 /// Generated code:
 ///  ```rust
+/// # use query_engine_tests::*;
+///
 ///  #[test]
 /// async fn my_fancy_test_1() -> {
 ///   setup_database().await?;
