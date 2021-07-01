@@ -73,8 +73,8 @@ pub static GENERATOR: Lazy<FeatureMap> = Lazy::new(|| {
             FilterJson,
             PlanetScaleMode,
             ReferentialActions,
+            MongoDb,
         ])
-        .with_hidden(vec![MongoDb])
         .with_deprecated(vec![
             AtomicNumberOperations,
             AggregateApi,
@@ -105,6 +105,7 @@ pub struct FeatureMap {
     hidden: Vec<PreviewFeature>,
 }
 
+#[allow(dead_code)]
 impl FeatureMap {
     pub fn active_features(&self) -> &[PreviewFeature] {
         &self.active
