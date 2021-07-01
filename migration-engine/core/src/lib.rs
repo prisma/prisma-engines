@@ -27,7 +27,7 @@ use enumflags2::BitFlags;
 use migration_connector::ConnectorError;
 use sql_migration_connector::SqlMigrationConnector;
 use std::env;
-use user_facing_errors::{common::InvalidDatabaseString, KnownError};
+use user_facing_errors::{common::InvalidConnectionString, KnownError};
 
 #[cfg(feature = "mongodb")]
 use datamodel::common::provider_names::MONGODB_SOURCE_NAME;
@@ -42,12 +42,12 @@ pub async fn migration_api(datamodel: &str) -> CoreResult<Box<dyn api::GenericAp
         #[cfg(feature = "sql")]
         POSTGRES_SOURCE_NAME => {
             let mut u = url::Url::parse(&url).map_err(|err| {
-                let details = user_facing_errors::quaint::invalid_url_description(&format!(
+                let details = user_facing_errors::quaint::invalid_connection_string_description(&format!(
                     "Error parsing connection string: {}",
                     err
                 ));
 
-                ConnectorError::from(KnownError::new(InvalidDatabaseString { details }))
+                ConnectorError::from(KnownError::new(InvalidConnectionString { details }))
             })?;
 
             let params: Vec<(String, String)> = u.query_pairs().map(|(k, v)| (k.to_string(), v.to_string())).collect();

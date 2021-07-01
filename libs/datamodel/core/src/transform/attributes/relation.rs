@@ -1,5 +1,3 @@
-use std::collections::HashSet;
-
 use super::{super::helpers::*, AttributeValidator};
 use crate::{
     ast,
@@ -7,14 +5,15 @@ use crate::{
     diagnostics::DatamodelError,
     dml, Field,
 };
+use enumflags2::BitFlags;
 
 /// Prismas builtin `@relation` attribute.
 pub struct RelationAttributeValidator {
-    preview_features: HashSet<PreviewFeature>,
+    preview_features: BitFlags<PreviewFeature>,
 }
 
 impl RelationAttributeValidator {
-    pub fn new(preview_features: HashSet<PreviewFeature>) -> Self {
+    pub fn new(preview_features: BitFlags<PreviewFeature>) -> Self {
         Self { preview_features }
     }
 }
@@ -114,7 +113,7 @@ impl AttributeValidator<dml::Field> for RelationAttributeValidator {
                 }
             }
 
-            if self.preview_features.contains(&PreviewFeature::ReferentialActions) {
+            if self.preview_features.contains(PreviewFeature::ReferentialActions) {
                 if let Some(ref_action) = relation_info.on_delete {
                     if rf.default_on_delete_action() != ref_action {
                         let expression = ast::Expression::ConstantValue(ref_action.to_string(), ast::Span::empty());

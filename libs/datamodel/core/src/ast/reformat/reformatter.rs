@@ -1,10 +1,9 @@
-use std::collections::HashSet;
-
 use super::helpers::*;
 use crate::ast::helper::get_sort_index_of_attribute;
 use crate::ast::SchemaAst;
 use crate::diagnostics::{ValidatedDatamodel, ValidatedMissingFields};
 use crate::{ast, ast::parser::*, ast::renderer::*};
+use enumflags2::BitFlags;
 use pest::iterators::Pair;
 use pest::Parser;
 
@@ -55,7 +54,7 @@ impl<'a> Reformatter<'a> {
         validated_datamodel: &ValidatedDatamodel,
     ) -> Result<ValidatedMissingFields, crate::diagnostics::Diagnostics> {
         let mut diagnostics = crate::diagnostics::Diagnostics::new();
-        let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(None, &HashSet::new());
+        let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(None, BitFlags::empty());
         let mut result = Vec::new();
 
         diagnostics.append_warning_vec(validated_datamodel.warnings.clone());
@@ -88,7 +87,7 @@ impl<'a> Reformatter<'a> {
         let mut diagnostics = crate::diagnostics::Diagnostics::new();
 
         diagnostics.append_warning_vec(validated_datamodel.warnings.clone());
-        let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(None, &HashSet::new());
+        let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(None, BitFlags::empty());
 
         let mut missing_field_attributes = Vec::new();
         for model in validated_datamodel.subject.models() {
@@ -123,7 +122,7 @@ impl<'a> Reformatter<'a> {
         let mut diagnostics = crate::diagnostics::Diagnostics::new();
 
         diagnostics.append_warning_vec(validated_datamodel.warnings.clone());
-        let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(None, &HashSet::new());
+        let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(None, BitFlags::empty());
 
         let mut missing_relation_attribute_args = Vec::new();
         for model in validated_datamodel.subject.models() {

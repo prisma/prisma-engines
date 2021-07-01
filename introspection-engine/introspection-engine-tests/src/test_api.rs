@@ -2,6 +2,7 @@ pub use super::TestResult;
 pub use test_setup::{BitFlags, Capabilities, Tags};
 
 use crate::{BarrelMigrationExecutor, Result};
+use datamodel::common::preview_features::PreviewFeature;
 use datamodel::{Configuration, Datamodel};
 use introspection_connector::{DatabaseMetadata, IntrospectionConnector, Version};
 use introspection_core::rpc::RpcImpl;
@@ -25,6 +26,12 @@ impl TestApi {
     pub async fn new(args: TestApiArgs) -> Self {
         let tags = args.tags();
         let connection_string = args.database_url();
+
+        let preview_features = args
+            .preview_features()
+            .iter()
+            .flat_map(|f| PreviewFeature::parse_opt(f))
+            .collect();
 
         let (database, connection_string): (Quaint, String) = if tags.intersects(Tags::Vitess) {
             let me = SqlMigrationConnector::new(connection_string, BitFlags::all(), None)
@@ -53,7 +60,9 @@ impl TestApi {
             unreachable!()
         };
 
-        let api = SqlIntrospectionConnector::new(&connection_string).await.unwrap();
+        let api = SqlIntrospectionConnector::new(&connection_string, preview_features)
+            .await
+            .unwrap();
 
         TestApi {
             api,

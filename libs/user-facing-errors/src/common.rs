@@ -174,7 +174,7 @@ pub struct SchemaParserError {
 
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(code = "P1013", message = "The provided database string is invalid. {details}")]
-pub struct InvalidDatabaseString {
+pub struct InvalidConnectionString {
     pub details: String,
 }
 

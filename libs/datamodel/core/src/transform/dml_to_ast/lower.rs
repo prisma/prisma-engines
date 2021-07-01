@@ -1,11 +1,10 @@
-use std::collections::HashSet;
-
 use super::super::attributes::AllAttributes;
 use crate::common::preview_features::PreviewFeature;
 use crate::{
     ast::{self, Attribute, Span},
     dml, Datasource,
 };
+use enumflags2::BitFlags;
 
 pub struct LowerDmlToAst<'a> {
     attributes: AllAttributes,
@@ -14,7 +13,7 @@ pub struct LowerDmlToAst<'a> {
 
 impl<'a> LowerDmlToAst<'a> {
     /// Creates a new instance, with all builtin attributes registered.
-    pub fn new(datasource: Option<&'a Datasource>, preview_features: &HashSet<PreviewFeature>) -> Self {
+    pub fn new(datasource: Option<&'a Datasource>, preview_features: BitFlags<PreviewFeature>) -> Self {
         Self {
             attributes: AllAttributes::new(preview_features),
             datasource,

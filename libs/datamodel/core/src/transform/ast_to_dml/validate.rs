@@ -9,6 +9,7 @@ use crate::{
     DefaultValue, FieldType,
 };
 use crate::{ast::WithAttributes, walkers::walk_models};
+use enumflags2::BitFlags;
 use itertools::Itertools;
 use prisma_value::PrismaValue;
 use std::collections::{HashMap, HashSet};
@@ -18,7 +19,7 @@ use std::collections::{HashMap, HashSet};
 /// When validating, we check if the datamodel is valid, and generate errors otherwise.
 pub struct Validator<'a> {
     source: Option<&'a configuration::Datasource>,
-    preview_features: &'a HashSet<PreviewFeature>,
+    preview_features: BitFlags<PreviewFeature>,
 }
 
 /// State error message. Seeing this error means something went really wrong internally. It's the datamodel equivalent of a bluescreen.
@@ -31,7 +32,7 @@ impl<'a> Validator<'a> {
     /// Creates a new instance, with all builtin attributes registered.
     pub fn new(
         source: Option<&'a configuration::Datasource>,
-        preview_features: &'a HashSet<PreviewFeature>,
+        preview_features: BitFlags<PreviewFeature>,
     ) -> Validator<'a> {
         Self {
             source,
@@ -909,7 +910,7 @@ impl<'a> Validator<'a> {
                         ));
                 }
 
-                if !self.preview_features.contains(&PreviewFeature::ReferentialActions)
+                if !self.preview_features.contains(PreviewFeature::ReferentialActions)
                     && (rel_info.on_delete.is_some() || rel_info.on_update.is_some())
                     && !rel_info.legacy_referential_actions
                 {
@@ -974,7 +975,7 @@ impl<'a> Validator<'a> {
                         ));
                     }
 
-                    if self.preview_features.contains(&PreviewFeature::ReferentialActions)
+                    if self.preview_features.contains(PreviewFeature::ReferentialActions)
                         && (rel_info.on_delete.is_some() || rel_info.on_update.is_some())
                         && (related_field_rel_info.on_delete.is_some() || related_field_rel_info.on_update.is_some())
                     {

@@ -1,6 +1,6 @@
 use std::fmt::Display;
 use thiserror::Error;
-use user_facing_errors::{common::InvalidDatabaseString, KnownError};
+use user_facing_errors::{common::InvalidConnectionString, KnownError};
 
 #[derive(Debug, Error)]
 #[error("{}", kind)]
@@ -20,8 +20,8 @@ impl ConnectorError {
     }
 
     pub fn url_parse_error(err: impl Display) -> Self {
-        let details = user_facing_errors::quaint::invalid_url_description(&err.to_string());
-        let known = KnownError::new(InvalidDatabaseString { details });
+        let details = user_facing_errors::quaint::invalid_connection_string_description(&err.to_string());
+        let known = KnownError::new(InvalidConnectionString { details });
 
         ConnectorError {
             user_facing_error: Some(known),

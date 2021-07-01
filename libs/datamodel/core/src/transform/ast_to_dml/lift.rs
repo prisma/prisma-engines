@@ -11,10 +11,11 @@ use crate::{
     Datasource,
 };
 use datamodel_connector::connector_error::{ConnectorError, ErrorKind};
+use enumflags2::BitFlags;
 use itertools::Itertools;
 use once_cell::sync::Lazy;
 use regex::Regex;
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 
 /// Helper for lifting a datamodel.
 ///
@@ -32,7 +33,7 @@ impl<'a> LiftAstToDml<'a> {
     ///
     /// The attributes defined by the given sources will be namespaced.
     pub(crate) fn new(
-        preview_features: &HashSet<PreviewFeature>,
+        preview_features: BitFlags<PreviewFeature>,
         db: &'a ParserDatabase<'a>,
         diagnostics: &'a mut Diagnostics,
     ) -> LiftAstToDml<'a> {
