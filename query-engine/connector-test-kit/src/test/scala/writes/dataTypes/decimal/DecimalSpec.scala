@@ -3,6 +3,7 @@ package writes.dataTypes.decimal
 import org.scalatest.{FlatSpec, Matchers}
 import util._
 
+// RS: Ported
 // Ignored for MSSQL and SQLite because of low precision issues.
 class DecimalSpec extends FlatSpec with Matchers with ApiSpecBase {
   "Using a Decimal field" should "work" taggedAs (IgnoreSQLite, IgnoreMsSql) in {

@@ -3,6 +3,7 @@ package writes.dataTypes.datetime
 import org.scalatest.{FlatSpec, Matchers}
 import util._
 
+// RS: Ported
 class UpdatedAtShouldChangeSpec extends FlatSpec with Matchers with ApiSpecBase {
 
   override def runOnlyForCapabilities = Set(ConnectorCapability.ScalarListsCapability)

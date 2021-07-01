@@ -4,6 +4,7 @@ import org.scalatest.{FlatSpec, Matchers}
 import util.ConnectorTag.MongoConnectorTag
 import util.{ApiSpecBase, ConnectorTag, ProjectDsl, SchemaBaseV11}
 
+// RS: Ported
 class BringYourOwnIdMongoSpec extends FlatSpec with Matchers with ApiSpecBase with SchemaBaseV11 {
   override def runOnlyForConnectors: Set[ConnectorTag] = Set(MongoConnectorTag)
 

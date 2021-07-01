@@ -3,6 +3,7 @@ package writes.ids
 import org.scalatest.{FlatSpec, Matchers}
 import util._
 
+// RS: Ported
 class IntIdCreateSpec extends FlatSpec with Matchers with ApiSpecBase {
   "Creating an item with an id field of type Int without default" should "work" in {
     val project = ProjectDsl.fromString {

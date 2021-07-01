@@ -16,6 +16,7 @@ colored = "2"
 chrono = "0.4"
 datamodel-connector = { path = "../../../libs/datamodel/connectors/datamodel-connector" }
 base64 = "0.13"
+uuid = "0.8"
 
 [dev-dependencies]
 insta = "1.7.1"

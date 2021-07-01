@@ -1,0 +1,309 @@
+use query_engine_tests::*;
+
+#[test_suite(schema(schema), capabilities(ScalarLists))]
+mod scalar_lists {
+    use indoc::indoc;
+    use query_engine_tests::{assert_error, run_query, TROUBLE_CHARS};
+
+    fn schema() -> String {
+        let schema = indoc! {
+            r#"model ScalarModel {
+              #id(id, Int, @id)
+              strings   String[]
+              ints      Int[]
+              floats    Float[]
+              decimals  Decimal[]
+              booleans  Boolean[]
+              enums     MyEnum[]
+              dateTimes DateTime[]
+              bytes     Bytes[]
+            }
+
+            enum MyEnum {
+              A
+              B
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    // "Scalar lists" should "be behave like regular values for create and update operations"
+    // TODO(dom): Not working on mongo.
+    // {"errors":[{"error":"Error occurred during query execution:\nConnectorError(ConnectorError { user_facing_error: None, kind: RawError { code: \"14\", message: \"Cannot increment with non-numeric argument: {strings: \\\"future\\\"}\" } })","user_facing_error":{"is_panic":false,"message":"Error occurred during query execution:\nConnectorError(ConnectorError { user_facing_error: None, kind: RawError { code: \"14\", message: \"Cannot increment with non-numeric argument: {strings: \\\"future\\\"}\" } })","backtrace":null}}]}
+    #[connector_test(exclude(MongoDb))]
+    async fn behave_like_regular_val_for_create_and_update(runner: &Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(runner, format!(r#"mutation {{
+            createOneScalarModel(data: {{
+              id: 1,
+              strings:   {{ set: ["test{}"] }}
+              ints:      {{ set: [1337, 12] }}
+              floats:    {{ set: [1.234, 1.45] }}
+              decimals:  {{ set: ["1.234", "1.45"] }}
+              booleans:  {{ set: [true, false] }}
+              enums:     {{ set: [A, A] }}
+              dateTimes: {{ set: ["2016-07-31T23:59:01.000Z","2017-07-31T23:59:01.000Z"] }}
+              bytes:     {{ set: ["dGVzdA==", "dA=="] }}
+            }}) {{
+              strings
+              ints
+              floats
+              decimals
+              booleans
+              enums
+              dateTimes
+              bytes
+            }}
+          }}"#, TROUBLE_CHARS)),
+          @r###"{"data":{"createOneScalarModel":{"strings":["test¥฿😀😁😂😃😄😅😆😇😈😉😊😋😌😍😎😏😐😑😒😓😔😕😖😗😘😙😚😛😜😝😞😟😠😡😢😣😤😥😦😧😨😩😪😫😬😭😮😯😰😱😲😳😴😵😶😷😸😹😺😻😼😽😾😿🙀🙁🙂🙃🙄🙅🙆🙇🙈🙉🙊🙋🙌🙍🙎🙏ऀँंःऄअआइईउऊऋऌऍऎएऐऑऒओऔकखगघङचछजझञटठडढणतथदधनऩपफबभमयर€₭₮₯₰₱₲₳₴₵₶₷₸₹₺₻₼₽₾₿⃀"],"ints":[1337,12],"floats":[1.234,1.45],"decimals":["1.234","1.45"],"booleans":[true,false],"enums":["A","A"],"dateTimes":["2016-07-31T23:59:01.000Z","2017-07-31T23:59:01.000Z"],"bytes":["dGVzdA==","dA=="]}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"mutation {
+            updateOneScalarModel(where: { id: 1 }, data: {
+              strings:   { set: ["updated", "now"] }
+              ints:      { set: [14] }
+              floats:    { set: [1.2345678] }
+              decimals:  { set: ["1.2345678"] }
+              booleans:  { set: [false, false, true] }
+              enums:     { set: [] }
+              dateTimes: { set: ["2019-07-31T23:59:01.000Z"] }
+              bytes:     { set: ["dGVzdA=="] }
+            }) {
+              strings
+              ints
+              floats
+              decimals
+              booleans
+              enums
+              dateTimes
+              bytes
+            }
+          }"#),
+          @r###"{"data":{"updateOneScalarModel":{"strings":["updated","now"],"ints":[14],"floats":[1.2345678],"decimals":["1.2345678"],"booleans":[false,false,true],"enums":[],"dateTimes":["2019-07-31T23:59:01.000Z"],"bytes":["dGVzdA=="]}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"mutation {
+            updateOneScalarModel(where: { id: 1 }, data: {
+              strings:   { push: "future" }
+              ints:      { push: 15 }
+              floats:    { push: 2 }
+              decimals:  { push: "2" }
+              booleans:  { push: true }
+              enums:     { push: A }
+              dateTimes: { push: "2019-07-31T23:59:01.000Z" }
+              bytes:     { push: "dGVzdA==" }
+            }) {
+              strings
+              ints
+              floats
+              decimals
+              booleans
+              enums
+              dateTimes
+              bytes
+            }
+          }"#),
+          @r###"{"data":{"updateOneScalarModel":{"strings":["updated","now","future"],"ints":[14,15],"floats":[1.2345678,2.0],"decimals":["1.2345678","2"],"booleans":[false,false,true,true],"enums":["A"],"dateTimes":["2019-07-31T23:59:01.000Z","2019-07-31T23:59:01.000Z"],"bytes":["dGVzdA==","dGVzdA=="]}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"mutation {
+            updateOneScalarModel(where: { id: 1 }, data: {
+              strings:   { push: ["more", "items"] }
+              ints:      { push: [16, 17] }
+              floats:    { push: [3, 4] }
+              decimals:  { push: ["3", "4"] }
+              booleans:  { push: [false, true] }
+              enums:     { push: [B, A] }
+              dateTimes: { push: ["2019-07-31T23:59:01.000Z", "2019-07-31T23:59:01.000Z"] }
+              bytes:     { push: ["dGVzdA==", "dGVzdA=="] }
+            }) {
+              strings
+              ints
+              floats
+              decimals
+              booleans
+              enums
+              dateTimes
+              bytes
+            }
+          }"#),
+          @r###"{"data":{"updateOneScalarModel":{"strings":["updated","now","future","more","items"],"ints":[14,15,16,17],"floats":[1.2345678,2.0,3.0,4.0],"decimals":["1.2345678","2","3","4"],"booleans":[false,false,true,true,false,true],"enums":["A","B","A"],"dateTimes":["2019-07-31T23:59:01.000Z","2019-07-31T23:59:01.000Z","2019-07-31T23:59:01.000Z","2019-07-31T23:59:01.000Z"],"bytes":["dGVzdA==","dGVzdA==","dGVzdA==","dGVzdA=="]}}}"###
+        );
+
+        Ok(())
+    }
+
+    // "A Create Mutation" should "create and return items with list values with shorthand notation"
+    #[connector_test]
+    async fn create_mut_work_with_list_vals(runner: &Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(runner, format!(r#"mutation {{
+            createOneScalarModel(data: {{
+              id: 1
+              strings:   ["test{}"]
+              ints:      [1337, 12]
+              floats:    [1.234, 1.45]
+              decimals:  ["1.234", "1.45"]
+              booleans:  [true, false]
+              enums:     [A,A]
+              dateTimes: ["2016-07-31T23:59:01.000Z","2017-07-31T23:59:01.000Z"]
+              bytes:     ["dGVzdA==", "dA=="]
+            }}) {{
+              strings
+              ints
+              floats
+              decimals
+              booleans
+              enums
+              dateTimes
+              bytes
+            }}
+          }}"#, TROUBLE_CHARS)),
+          @r###"{"data":{"createOneScalarModel":{"strings":["test¥฿😀😁😂😃😄😅😆😇😈😉😊😋😌😍😎😏😐😑😒😓😔😕😖😗😘😙😚😛😜😝😞😟😠😡😢😣😤😥😦😧😨😩😪😫😬😭😮😯😰😱😲😳😴😵😶😷😸😹😺😻😼😽😾😿🙀🙁🙂🙃🙄🙅🙆🙇🙈🙉🙊🙋🙌🙍🙎🙏ऀँंःऄअआइईउऊऋऌऍऎएऐऑऒओऔकखगघङचछजझञटठडढणतथदधनऩपफबभमयर€₭₮₯₰₱₲₳₴₵₶₷₸₹₺₻₼₽₾₿⃀"],"ints":[1337,12],"floats":[1.234,1.45],"decimals":["1.234","1.45"],"booleans":[true,false],"enums":["A","A"],"dateTimes":["2016-07-31T23:59:01.000Z","2017-07-31T23:59:01.000Z"],"bytes":["dGVzdA==","dA=="]}}}"###
+        );
+
+        Ok(())
+    }
+
+    // "A Create Mutation" should "create and return items with empty list values"
+    #[connector_test]
+    async fn create_mut_return_items_with_empty_lists(runner: &Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(runner, r#"mutation {
+            createOneScalarModel(data: {
+              id: 1
+              strings:   []
+              ints:      []
+              floats:    []
+              decimals:  []
+              booleans:  []
+              enums:     []
+              dateTimes: []
+              bytes:     []
+            }) {
+              strings
+              ints
+              floats
+              decimals
+              booleans
+              enums
+              dateTimes
+              bytes
+            }
+          }"#),
+          @r###"{"data":{"createOneScalarModel":{"strings":[],"ints":[],"floats":[],"decimals":[],"booleans":[],"enums":[],"dateTimes":[],"bytes":[]}}}"###
+        );
+
+        Ok(())
+    }
+
+    // "A Create Mutation with an empty scalar list create input object" should "return a detailed error"
+    #[connector_test]
+    async fn create_mut_empty_scalar_should_fail(runner: &Runner) -> TestResult<()> {
+        assert_error!(
+          runner,
+          r#"mutation {
+            createOneScalarModel(data: {
+              id: 1
+              strings: {},
+            }){ strings, ints, floats, booleans, enums, dateTimes }
+          }"#,
+          2009,
+          "`Mutation.createOneScalarModel.data.ScalarModelCreateInput.strings.ScalarModelCreatestringsInput.set`: A value is required but not set."
+      );
+
+        Ok(())
+    }
+
+    // "An Update Mutation with an empty scalar list update input object" should "return a detailed error"
+    // TODO(dom): Not working on mongo. Error doesn't contain the message below
+    #[connector_test(exclude(MongoDb))]
+    async fn update_mut_empty_scalar_should_fail(runner: &Runner) -> TestResult<()> {
+        assert_error!(
+          runner,
+          r#"mutation {
+            updateOneScalarModel(data: {
+              id: 1
+              strings: {},
+            }){ strings, ints, floats, booleans, enums, dateTimes }
+          }"#,
+          2009,
+          "`Mutation.updateOneScalarModel.data.ScalarModelUpdateInput.strings.ScalarModelUpdatestringsInput`: Expected exactly one field to be present, got 0."
+      );
+
+        Ok(())
+    }
+
+    // "An Update Mutation that pushes to some empty scalar lists" should "work"
+    // TODO(dom): Not working on mongo.
+    // {"errors":[{"error":"Error occurred during query execution:\nConnectorError(ConnectorError { user_facing_error: None, kind: RawError { code: \"14\", message: \"Cannot increment with non-numeric argument: {booleans: true}\" } })","user_facing_error":{"is_panic":false,"message":"Error occurred during query execution:\nConnectorError(ConnectorError { user_facing_error: None, kind: RawError { code: \"14\", message: \"Cannot increment with non-numeric argument: {booleans: true}\" } })","backtrace":null}}]}
+    #[connector_test(exclude(MongoDb))]
+    async fn update_mut_push_empty_scalar_list(runner: &Runner) -> TestResult<()> {
+        create_row(runner, r#"{ id: 1 }"#).await?;
+        create_row(runner, r#"{ id: 2 }"#).await?;
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"mutation {
+            updateOneScalarModel(where: { id: 1 }, data: {
+              strings:   { push: "future" }
+              ints:      { push: 15 }
+              floats:    { push: 2 }
+              decimals:  { push: "2" }
+              booleans:  { push: true }
+              enums:     { push: A }
+              dateTimes: { push: "2019-07-31T23:59:01.000Z" }
+              bytes:     { push: "dGVzdA==" }
+            }) {
+              strings
+              ints
+              floats
+              decimals
+              booleans
+              enums
+              dateTimes
+              bytes
+            }
+          }"#),
+          @r###"{"data":{"updateOneScalarModel":{"strings":["future"],"ints":[15],"floats":[2.0],"decimals":["2"],"booleans":[true],"enums":["A"],"dateTimes":["2019-07-31T23:59:01.000Z"],"bytes":["dGVzdA=="]}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"mutation {
+            updateOneScalarModel(where: { id: 2 }, data: {
+              strings:   { push: ["present", "future"] }
+              ints:      { push: [14, 15] }
+              floats:    { push: [1, 2] }
+              decimals:  { push: ["1", "2"] }
+              booleans:  { push: [false, true] }
+              enums:     { push: [A, B] }
+              dateTimes: { push: ["2019-07-31T23:59:01.000Z", "2019-07-31T23:59:02.000Z"] }
+              bytes:     { push: ["dGVzdA==", "dGVzdA=="] }
+            }) {
+              strings
+              ints
+              floats
+              decimals
+              booleans
+              enums
+              dateTimes
+              bytes
+            }
+          }"#),
+          @r###"{"data":{"updateOneScalarModel":{"strings":["present","future"],"ints":[14,15],"floats":[1.0,2.0],"decimals":["1","2"],"booleans":[false,true],"enums":["A","B"],"dateTimes":["2019-07-31T23:59:01.000Z","2019-07-31T23:59:02.000Z"],"bytes":["dGVzdA==","dGVzdA=="]}}}"###
+        );
+
+        Ok(())
+    }
+
+    async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
+        runner
+            .query(format!("mutation {{ createOneScalarModel(data: {}) {{ id }} }}", data))
+            .await?
+            .assert_success();
+        Ok(())
+    }
+}

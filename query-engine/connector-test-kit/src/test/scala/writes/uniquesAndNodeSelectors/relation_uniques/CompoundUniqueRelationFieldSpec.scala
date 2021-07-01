@@ -3,6 +3,7 @@ package writes.uniquesAndNodeSelectors.relation_uniques
 import org.scalatest.{FlatSpec, Matchers}
 import util._
 
+// RS: Ported
 // Note: These tests changed from including the relation fields into only including the scalars as per the new relations
 // implementation. Tests are retained as they offer a good coverage over scalar + relation field usage.
 //

@@ -6,6 +6,7 @@ import org.scalatest.{FlatSpec, Matchers}
 import util.ConnectorCapability.{JoinRelationLinksCapability, UuidIdCapability}
 import util._
 
+// RS: Ported
 class UpsertPostgresUUIDSpec extends FlatSpec with Matchers with ApiSpecBase {
   override def runOnlyForCapabilities: Set[ConnectorCapability] = Set(JoinRelationLinksCapability, UuidIdCapability)
 

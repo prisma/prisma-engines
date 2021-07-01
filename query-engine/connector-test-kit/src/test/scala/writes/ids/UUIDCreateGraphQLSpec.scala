@@ -6,6 +6,7 @@ import org.scalatest.{FlatSpec, Matchers}
 import util.ConnectorCapability.UuidIdCapability
 import util._
 
+// RS: Ported
 class UUIDCreateGraphQLSpec extends FlatSpec with Matchers with ApiSpecBase {
 
   override def runOnlyForCapabilities: Set[ConnectorCapability] = Set(UuidIdCapability)

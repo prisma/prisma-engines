@@ -3,6 +3,7 @@ package writes.relations
 import org.scalatest.{FlatSpec, Matchers}
 import util._
 
+// RS: Ported
 class RelationDefaultsSpec extends FlatSpec with Matchers with ApiSpecBase with SchemaBaseV11 {
   "Not providing a value for a required relation field with a default value" should "work" in {
     val schema =

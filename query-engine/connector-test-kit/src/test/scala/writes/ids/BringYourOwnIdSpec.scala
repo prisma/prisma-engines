@@ -4,6 +4,7 @@ import org.scalatest.{FlatSpec, Matchers}
 import util.ConnectorTag._
 import util._
 
+// RS: Ported
 class BringYourOwnIdSpec extends FlatSpec with Matchers with ApiSpecBase with SchemaBaseV11 {
 
   override def runOnlyForConnectors: Set[ConnectorTag] = Set(VitessConnectorTag, MySqlConnectorTag, PostgresConnectorTag, SQLiteConnectorTag)
