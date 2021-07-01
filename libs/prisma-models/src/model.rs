@@ -164,6 +164,6 @@ impl Model {
         self.fields()
             .scalar()
             .into_iter()
-            .find_map(|field| if field.db_name() == name { Some(field) } else { None })
+            .find_map(|field| (field.db_name() == name).then(|| field))
     }
 }

@@ -204,9 +204,7 @@ impl Fields {
 
     /// Attempts to resolve a single ID field on the model (supplied with an @id on a scalar field).
     fn find_singular_id(&self) -> Option<ScalarFieldRef> {
-        self.scalar()
-            .into_iter()
-            .find_map(|field| if field.is_id() { Some(field) } else { None })
+        self.scalar().into_iter().find_map(|field| field.is_id().then(|| field))
     }
 
     /// Attempts to resolve a compound ID field on the model (supplied with @@id on scalar fields).
