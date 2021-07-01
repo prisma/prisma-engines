@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    name: "MacOS ARM64 (Apple Silicon) engines build on branch ${{ github.event.ref }} (for commit ${{ github.event.inputs.commit }})"
+    name: "MacOS ARM64 (Apple Silicon) engines build on branch ${{ github.event.ref }} for commit ${{ github.event.inputs.commit }}"
     env:
       SQLITE_MAX_VARIABLE_NUMBER: 250000
       SQLITE_MAX_EXPR_DEPTH: 10000
