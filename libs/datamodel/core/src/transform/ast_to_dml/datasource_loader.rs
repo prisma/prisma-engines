@@ -16,7 +16,8 @@ use crate::{
     configuration::StringFromEnvVar,
     Datasource,
 };
-use std::collections::{HashMap, HashSet};
+use enumflags2::BitFlags;
+use std::collections::HashMap;
 
 const PREVIEW_FEATURES_KEY: &str = "previewFeatures";
 const SHADOW_DATABASE_URL_KEY: &str = "shadowDatabaseUrl";
@@ -37,7 +38,7 @@ impl DatasourceLoader {
     pub fn load_datasources_from_ast(
         &self,
         ast_schema: &ast::SchemaAst,
-        preview_features: &HashSet<PreviewFeature>,
+        preview_features: BitFlags<PreviewFeature>,
         diagnostics: &mut Diagnostics,
     ) -> Vec<Datasource> {
         let mut sources = Vec::new();
@@ -64,7 +65,7 @@ impl DatasourceLoader {
     fn lift_datasource(
         &self,
         ast_source: &ast::SourceConfig,
-        preview_features: &HashSet<PreviewFeature>,
+        preview_features: BitFlags<PreviewFeature>,
         diagnostics: &mut Diagnostics,
     ) -> Option<Datasource> {
         let source_name = &ast_source.name.name;
@@ -205,7 +206,7 @@ generator client {
 
 fn get_planet_scale_mode_arg(
     args: &HashMap<&str, ValueValidator<'_>>,
-    preview_features: &HashSet<PreviewFeature>,
+    preview_features: BitFlags<PreviewFeature>,
     source: &SourceConfig,
     diagnostics: &mut Diagnostics,
 ) -> bool {
@@ -222,7 +223,7 @@ fn get_planet_scale_mode_arg(
                 }
             };
 
-            if mode_enabled && !preview_features.contains(&PreviewFeature::PlanetScaleMode) {
+            if mode_enabled && !preview_features.contains(PreviewFeature::PlanetScaleMode) {
                 diagnostics.push_error(DatamodelError::new_source_validation_error(
                     PLANET_SCALE_PREVIEW_FEATURE_ERR,
                     &source.name.name,

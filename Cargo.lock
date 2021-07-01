@@ -4205,6 +4205,7 @@ dependencies = [
  "bigdecimal",
  "datamodel",
  "datamodel-connector",
+ "enumflags2",
  "introspection-connector",
  "native-types",
  "once_cell",

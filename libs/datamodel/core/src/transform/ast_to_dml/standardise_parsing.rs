@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use enumflags2::BitFlags;
 
 use ::dml::{field::FieldArity, relation_info::ReferentialAction};
 
@@ -12,13 +12,13 @@ use crate::{
 /// Helper for standardising a datamodel during parsing.
 ///
 /// This will add relation names and M2M references contents
-pub struct StandardiserForParsing<'a> {
-    preview_features: &'a HashSet<PreviewFeature>,
+pub struct StandardiserForParsing {
+    preview_features: BitFlags<PreviewFeature>,
 }
 
-impl<'a> StandardiserForParsing<'a> {
+impl StandardiserForParsing {
     /// Creates a new instance, with all builtin attributes registered.
-    pub fn new(preview_features: &'a HashSet<PreviewFeature>) -> Self {
+    pub fn new(preview_features: BitFlags<PreviewFeature>) -> Self {
         Self { preview_features }
     }
 
@@ -68,7 +68,7 @@ impl<'a> StandardiserForParsing<'a> {
     }
 
     fn set_default_referential_actions(&self, schema: &mut dml::Datamodel) {
-        if self.preview_features.contains(&PreviewFeature::ReferentialActions) {
+        if self.preview_features.contains(PreviewFeature::ReferentialActions) {
             return;
         }
 

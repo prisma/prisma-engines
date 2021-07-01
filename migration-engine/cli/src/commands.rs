@@ -6,7 +6,7 @@ use enumflags2::BitFlags;
 use migration_connector::ConnectorError;
 use migration_core::{migration_api, qe_setup::QueryEngineFlags};
 use structopt::StructOpt;
-use user_facing_errors::common::{InvalidDatabaseString, SchemaParserError};
+use user_facing_errors::common::{InvalidConnectionString, SchemaParserError};
 
 #[derive(Debug, StructOpt)]
 pub(crate) struct Cli {
@@ -121,7 +121,7 @@ fn datasource_from_database_str(database_str: &str) -> Result<String, ConnectorE
         Some("file") => "sqlite",
         Some(other) => other,
         None => {
-            return Err(ConnectorError::user_facing(InvalidDatabaseString {
+            return Err(ConnectorError::user_facing(InvalidConnectionString {
                 details: String::new(),
             }))
         }

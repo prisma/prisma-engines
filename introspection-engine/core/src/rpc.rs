@@ -64,7 +64,9 @@ impl RpcImpl {
         let config = datamodel::parse_configuration(schema)
             .map_err(|diagnostics| Error::DatamodelError(diagnostics.to_pretty_string("schema.prisma", schema)))?;
 
-        let url = config
+        let preview_features = config.subject.preview_features().map(Clone::clone).collect();
+
+        let connection_string = config
             .subject
             .datasources
             .first()
@@ -74,8 +76,8 @@ impl RpcImpl {
 
         Ok((
             config.subject,
-            url.clone(),
-            Box::new(SqlIntrospectionConnector::new(&url).await?),
+            connection_string.clone(),
+            Box::new(SqlIntrospectionConnector::new(&connection_string, preview_features).await?),
         ))
     }
 

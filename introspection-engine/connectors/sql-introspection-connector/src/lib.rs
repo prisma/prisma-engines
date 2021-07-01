@@ -12,7 +12,9 @@ mod schema_describer_loading;
 mod version_checker;
 mod warnings;
 
+use datamodel::common::preview_features::PreviewFeature;
 use datamodel::Datamodel;
+use enumflags2::BitFlags;
 pub use error::*;
 use introspection_connector::{
     ConnectorError, ConnectorResult, DatabaseMetadata, IntrospectionConnector, IntrospectionResult,
@@ -27,19 +29,26 @@ pub type SqlIntrospectionResult<T> = core::result::Result<T, SqlError>;
 #[derive(Debug)]
 pub struct SqlIntrospectionConnector {
     connection: Quaint,
+    preview_features: BitFlags<PreviewFeature>,
 }
 
 impl SqlIntrospectionConnector {
-    pub async fn new(url: &str) -> ConnectorResult<SqlIntrospectionConnector> {
-        let connection = Quaint::new(url).await.map_err(|error| {
-            ConnectionInfo::from_url(url)
+    pub async fn new(
+        connection_string: &str,
+        preview_features: BitFlags<PreviewFeature>,
+    ) -> ConnectorResult<SqlIntrospectionConnector> {
+        let connection = Quaint::new(connection_string).await.map_err(|error| {
+            ConnectionInfo::from_url(connection_string)
                 .map(|connection_info| SqlError::from(error).into_connector_error(&connection_info))
                 .unwrap_or_else(ConnectorError::url_parse_error)
         })?;
 
         tracing::debug!("SqlIntrospectionConnector initialized.");
 
-        Ok(SqlIntrospectionConnector { connection })
+        Ok(SqlIntrospectionConnector {
+            connection,
+            preview_features,
+        })
     }
 
     async fn catch<O>(&self, fut: impl Future<Output = Result<O, SqlError>>) -> ConnectorResult<O> {

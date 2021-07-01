@@ -93,7 +93,7 @@ use diagnostics::Diagnostics;
 
 use crate::diagnostics::{Validated, ValidatedConfiguration, ValidatedDatamodel};
 use crate::{ast::SchemaAst, common::preview_features::PreviewFeature};
-use std::collections::HashSet;
+use enumflags2::BitFlags;
 use transform::{
     ast_to_dml::{DatasourceLoader, GeneratorLoader, ValidationPipeline},
     dml_to_ast::{DatasourceSerializer, GeneratorSerializer, LowerDmlToAst},
@@ -141,8 +141,8 @@ fn parse_datamodel_internal(
 
     let generators = GeneratorLoader::load_generators_from_ast(&ast, &mut diagnostics);
     let preview_features = preview_features(&generators);
-    let datasources = load_sources(&ast, &preview_features, &mut &mut diagnostics);
-    let validator = ValidationPipeline::new(&datasources, &preview_features);
+    let datasources = load_sources(&ast, preview_features, &mut &mut diagnostics);
+    let validator = ValidationPipeline::new(&datasources, preview_features);
 
     diagnostics.to_result()?;
 
@@ -177,7 +177,7 @@ pub fn parse_configuration(schema: &str) -> Result<ValidatedConfiguration, diagn
     let mut diagnostics = Diagnostics::default();
     let generators = GeneratorLoader::load_generators_from_ast(&ast, &mut diagnostics);
     let preview_features = preview_features(&generators);
-    let datasources = load_sources(&ast, &preview_features, &mut diagnostics);
+    let datasources = load_sources(&ast, preview_features, &mut diagnostics);
 
     diagnostics.to_result()?;
 
@@ -192,7 +192,7 @@ pub fn parse_configuration(schema: &str) -> Result<ValidatedConfiguration, diagn
 
 fn load_sources(
     schema_ast: &SchemaAst,
-    preview_features: &HashSet<PreviewFeature>,
+    preview_features: BitFlags<PreviewFeature>,
     diagnostics: &mut Diagnostics,
 ) -> Vec<Datasource> {
     let source_loader = DatasourceLoader::new();
@@ -225,7 +225,7 @@ pub fn render_datamodel_to(
     datamodel: &dml::Datamodel,
     datasource: Option<&Datasource>,
 ) {
-    let lowered = LowerDmlToAst::new(datasource, &HashSet::new()).lower(datamodel);
+    let lowered = LowerDmlToAst::new(datasource, BitFlags::empty()).lower(datamodel);
     render_schema_ast_to(stream, &lowered, 2);
 }
 
@@ -248,7 +248,7 @@ fn render_datamodel_and_config_to(
     config: &configuration::Configuration,
 ) {
     let features = config.preview_features().map(Clone::clone).collect();
-    let mut lowered = LowerDmlToAst::new(config.datasources.first(), &features).lower(datamodel);
+    let mut lowered = LowerDmlToAst::new(config.datasources.first(), features).lower(datamodel);
 
     DatasourceSerializer::add_sources_to_ast(config.datasources.as_slice(), &mut lowered);
     GeneratorSerializer::add_generators_to_ast(&config.generators, &mut lowered);
@@ -262,7 +262,7 @@ fn render_schema_ast_to(stream: &mut dyn std::fmt::Write, schema: &ast::SchemaAs
     renderer.render(schema);
 }
 
-fn preview_features(generators: &[Generator]) -> HashSet<PreviewFeature> {
+fn preview_features(generators: &[Generator]) -> BitFlags<PreviewFeature> {
     generators
         .iter()
         .flat_map(|gen| gen.preview_features.iter().cloned())

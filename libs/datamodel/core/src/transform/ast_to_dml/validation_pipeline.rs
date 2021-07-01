@@ -1,26 +1,25 @@
-use std::collections::HashSet;
-
 use super::db::ParserDatabase;
 use super::*;
 use crate::{
     ast, common::preview_features::PreviewFeature, configuration, diagnostics::Diagnostics,
     transform::ast_to_dml::standardise_parsing::StandardiserForParsing, ValidatedDatamodel,
 };
+use enumflags2::BitFlags;
 
 /// Is responsible for loading and validating the Datamodel defined in an AST.
 /// Wrapper for all lift and validation steps
 pub struct ValidationPipeline<'a> {
     source: Option<&'a configuration::Datasource>,
-    preview_features: &'a HashSet<PreviewFeature>,
+    preview_features: BitFlags<PreviewFeature>,
     validator: Validator<'a>,
     standardiser_for_formatting: StandardiserForFormatting,
-    standardiser_for_parsing: StandardiserForParsing<'a>,
+    standardiser_for_parsing: StandardiserForParsing,
 }
 
 impl<'a, 'b> ValidationPipeline<'a> {
     pub fn new(
         sources: &'a [configuration::Datasource],
-        preview_features: &'a HashSet<PreviewFeature>,
+        preview_features: BitFlags<PreviewFeature>,
     ) -> ValidationPipeline<'a> {
         let source = sources.first();
 

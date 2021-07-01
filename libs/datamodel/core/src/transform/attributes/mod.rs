@@ -11,7 +11,7 @@ mod updated_at;
 use crate::{common::preview_features::PreviewFeature, dml};
 use attribute_list_validator::AttributeListValidator;
 use attribute_validator::AttributeValidator;
-use std::collections::HashSet;
+use enumflags2::BitFlags;
 
 /// This is the facade for all attribute validations. It is used within the `ValidationPipeline`.
 pub struct AllAttributes {
@@ -22,7 +22,7 @@ pub struct AllAttributes {
 }
 
 impl AllAttributes {
-    pub fn new(preview_features: &HashSet<PreviewFeature>) -> AllAttributes {
+    pub fn new(preview_features: BitFlags<PreviewFeature>) -> AllAttributes {
         AllAttributes {
             field: new_builtin_field_attributes(preview_features),
             model: new_builtin_model_attributes(),
@@ -32,7 +32,7 @@ impl AllAttributes {
     }
 }
 
-fn new_builtin_field_attributes(preview_features: &HashSet<PreviewFeature>) -> AttributeListValidator<dml::Field> {
+fn new_builtin_field_attributes(preview_features: BitFlags<PreviewFeature>) -> AttributeListValidator<dml::Field> {
     let mut validator = AttributeListValidator::<dml::Field>::new();
 
     // this order of field attributes is used in the formatter as well
@@ -41,9 +41,7 @@ fn new_builtin_field_attributes(preview_features: &HashSet<PreviewFeature>) -> A
     validator.add(Box::new(default::DefaultAttributeValidator {}));
     validator.add(Box::new(updated_at::UpdatedAtAttributeValidator {}));
     validator.add(Box::new(map::MapAttributeValidatorForField {}));
-    validator.add(Box::new(relation::RelationAttributeValidator::new(
-        preview_features.clone(),
-    )));
+    validator.add(Box::new(relation::RelationAttributeValidator::new(preview_features)));
     validator.add(Box::new(ignore::IgnoreAttributeValidatorForField {}));
 
     validator

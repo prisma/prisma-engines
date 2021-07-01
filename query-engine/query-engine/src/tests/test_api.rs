@@ -1,6 +1,7 @@
 pub use test_setup::{BitFlags, Capabilities, Tags};
 
 use crate::context::PrismaContext;
+use datamodel::common::preview_features::PreviewFeature;
 use migration_core::{commands::SchemaPushInput, GenericApi};
 use quaint::{
     ast::*,
@@ -44,9 +45,9 @@ impl TestApi {
         } else if tags.contains(Tags::Postgres) {
             postgres_migration_connector(&args).await
         } else if tags.contains(Tags::Sqlite) {
-            sqlite_migration_connector(args.test_function_name()).await
+            sqlite_migration_connector(&args).await
         } else if tags.contains(Tags::Mssql) {
-            mssql_migration_connector(args.test_function_name(), &args).await
+            mssql_migration_connector(&args).await
         } else {
             unreachable!()
         };
@@ -105,17 +106,21 @@ impl TestApi {
 pub(super) async fn mysql_migration_connector(args: &TestApiArgs) -> (SqlMigrationConnector, String) {
     let (_db_name, url) = args.create_mysql_database().await;
     (
-        SqlMigrationConnector::new(&url, BitFlags::all(), None).await.unwrap(),
+        SqlMigrationConnector::new(&url, preview_feature_bit_flag(args), None)
+            .await
+            .unwrap(),
         url,
     )
 }
 
-pub(super) async fn mssql_migration_connector(db_name: &str, args: &TestApiArgs) -> (SqlMigrationConnector, String) {
-    let (_, url) = test_setup::init_mssql_database(args.database_url(), db_name)
+pub(super) async fn mssql_migration_connector(args: &TestApiArgs) -> (SqlMigrationConnector, String) {
+    let (_, url) = test_setup::init_mssql_database(args.database_url(), args.test_function_name())
         .await
         .unwrap();
     (
-        SqlMigrationConnector::new(&url, BitFlags::all(), None).await.unwrap(),
+        SqlMigrationConnector::new(&url, preview_feature_bit_flag(args), None)
+            .await
+            .unwrap(),
         url,
     )
 }
@@ -123,15 +128,28 @@ pub(super) async fn mssql_migration_connector(db_name: &str, args: &TestApiArgs)
 pub(super) async fn postgres_migration_connector(args: &TestApiArgs) -> (SqlMigrationConnector, String) {
     let (_db_name, _, url) = args.create_postgres_database().await;
     (
-        SqlMigrationConnector::new(&url, BitFlags::all(), None).await.unwrap(),
+        SqlMigrationConnector::new(&url, preview_feature_bit_flag(args), None)
+            .await
+            .unwrap(),
         url,
     )
 }
 
-pub(super) async fn sqlite_migration_connector(db_name: &str) -> (SqlMigrationConnector, String) {
-    let url = sqlite_test_url(db_name);
+pub(super) async fn sqlite_migration_connector(args: &TestApiArgs) -> (SqlMigrationConnector, String) {
+    let url = sqlite_test_url(args.test_function_name());
     (
-        SqlMigrationConnector::new(&url, BitFlags::all(), None).await.unwrap(),
+        SqlMigrationConnector::new(&url, preview_feature_bit_flag(args), None)
+            .await
+            .unwrap(),
         url,
     )
+}
+
+fn preview_feature_bit_flag(args: &TestApiArgs) -> BitFlags<PreviewFeature> {
+    let preview_features = args
+        .preview_features()
+        .iter()
+        .flat_map(|f| PreviewFeature::parse_opt(f))
+        .collect();
+    preview_features
 }

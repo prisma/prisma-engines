@@ -25,7 +25,7 @@ impl From<quaint::error::DatabaseConstraint> for crate::query_engine::DatabaseCo
     }
 }
 
-pub fn invalid_url_description(error_details: &str) -> String {
+pub fn invalid_connection_string_description(error_details: &str) -> String {
     let docs = r#"https://www.prisma.io/docs/reference/database-reference/connection-urls"#;
 
     let details = formatdoc! {r#"
@@ -198,7 +198,7 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
         })),
 
         (ErrorKind::DatabaseUrlIsInvalid(details), _connection_info) => {
-            Some(KnownError::new(common::InvalidDatabaseString {
+            Some(KnownError::new(common::InvalidConnectionString {
                 details: details.to_owned(),
             }))
         }

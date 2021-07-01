@@ -30,7 +30,7 @@ use quaint::{
 };
 use sql_migration::{DropUserDefinedType, DropView, SqlMigration, SqlMigrationStep};
 use sql_schema_describer::{walkers::SqlSchemaExt, ColumnId, SqlSchema, TableId};
-use user_facing_errors::{common::InvalidDatabaseString, KnownError};
+use user_facing_errors::{common::InvalidConnectionString, KnownError};
 
 /// The top-level SQL migration connector.
 pub struct SqlMigrationConnector {
@@ -329,10 +329,10 @@ impl MigrationConnector for SqlMigrationConnector {
     }
 }
 
-async fn connect(database_str: &str) -> ConnectorResult<Connection> {
-    let connection_info = ConnectionInfo::from_url(database_str).map_err(|err| {
-        let details = user_facing_errors::quaint::invalid_url_description(&err.to_string());
-        KnownError::new(InvalidDatabaseString { details })
+async fn connect(connection_string: &str) -> ConnectorResult<Connection> {
+    let connection_info = ConnectionInfo::from_url(connection_string).map_err(|err| {
+        let details = user_facing_errors::quaint::invalid_connection_string_description(&err.to_string());
+        KnownError::new(InvalidConnectionString { details })
     })?;
 
     if let ConnectionInfo::Postgres(url) = &connection_info {
@@ -342,7 +342,7 @@ async fn connect(database_str: &str) -> ConnectorResult<Connection> {
             .map_err(|err| quaint_error_to_connector_error(err, &connection_info));
     }
 
-    let connection = Quaint::new(database_str)
+    let connection = Quaint::new(connection_string)
         .await
         .map_err(|err| quaint_error_to_connector_error(err, &connection_info))?;
 
