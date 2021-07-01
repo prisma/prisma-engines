@@ -1,4 +1,5 @@
 use migration_engine_tests::sync_test_api::*;
+use quaint::Value;
 use sql_schema_describer::ColumnTypeFamily;
 
 #[test_connector]
@@ -299,4 +300,67 @@ fn bytes_to_bytes_array_works(api: TestApi) {
     api.assert_schema().assert_table("Test", |table| {
         table.assert_column("bytesCol", |col| col.assert_type_is_bytes().assert_is_required())
     });
+}
+
+#[test_connector(tags(Mssql))]
+fn a_table_recreation_with_noncastable_columns_should_trigger_warnings(api: TestApi) {
+    let dm1 = r#"
+        model Blog {
+            id Int @id @default(autoincrement())
+            title String
+        }
+    "#;
+
+    api.schema_push(dm1).send_sync().assert_green_bang();
+
+    // Removing autoincrement requires us to recreate the table.
+    let dm2 = r#"
+        model Blog {
+            id Int @id
+            title Float
+        }
+    "#;
+
+    api.insert("Blog").value("title", "3.14").result_raw();
+
+    api.schema_push(dm2)
+        .send_sync()
+        .assert_warnings(&["You are about to alter the column `title` on the `Blog` table, which contains 1 non-null values. The data in that column will be cast from `String` to `Float`.".into()]);
+}
+
+#[test_connector(tags(Postgres))]
+fn a_column_recreation_with_non_castable_type_change_should_trigger_warnings(api: TestApi) {
+    let dm1 = r#"
+        datasource pg {
+            provider = "postgres"
+            url = env("DBURL")
+        }
+
+        model Blog {
+            id      Int @id
+            float   Float
+        }
+    "#;
+
+    api.schema_push(dm1).send_sync().assert_green_bang();
+    let insert = quaint::ast::Insert::single_into((api.schema_name(), "Blog"))
+        .value("id", 1)
+        .value("float", Value::double(7.5));
+
+    api.query(insert.into());
+    let dm2 = r#"
+        datasource pg {
+            provider = "postgres"
+            url = env("DBURL")
+        }
+
+        model Blog {
+            id      Int @id
+            float   DateTime
+        }
+    "#;
+
+    api.schema_push(dm2)
+        .send_sync()
+        .assert_unexecutable(&["Changed the type of `float` on the `Blog` table. No cast exists, the column would be dropped and recreated, which cannot be done since the column is required and there is data in the table.".into()]);
 }

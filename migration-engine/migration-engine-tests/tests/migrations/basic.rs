@@ -284,3 +284,133 @@ fn updating_db_name_of_a_scalar_field_must_work(api: TestApi) {
             .assert_has_column("name2")
     });
 }
+
+#[test_connector(preview_features("referentialActions"))]
+fn reordering_and_altering_models_at_the_same_time_works(api: TestApi) {
+    let dm1 = r#"
+        generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialActions"]
+        }
+
+        model A {
+            id Int @id
+            name Int @unique
+            c C @relation(name: "atoc", fields: [name], references: [name], onUpdate: NoAction)
+            cs C[] @relation(name: "ctoa")
+        }
+
+        model B {
+            id Int @id
+            name Int @unique
+            c C @relation(name: "btoc", fields: [name], references: [name], onUpdate: NoAction)
+        }
+
+        model C {
+            id Int @id
+            name Int @unique
+            a A @relation(name: "ctoa", fields: [name], references: [name], onUpdate: NoAction)
+            as A[] @relation(name: "atoc")
+            bs B[] @relation(name: "btoc")
+        }
+    "#;
+
+    api.schema_push(dm1).send_sync().assert_green_bang();
+
+    let dm2 = r#"
+        generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialActions"]
+        }
+
+        model C {
+            id Int @id
+            a A @relation(name: "ctoa2", fields: [name], references: [name], onUpdate: NoAction)
+            name Int @unique
+            bs B[] @relation(name: "btoc2")
+            as A[] @relation(name: "atoc2")
+        }
+
+        model A {
+            id Int @id
+            name Int @unique
+            c C @relation(name: "atoc2", fields: [name], references: [name], onUpdate: NoAction)
+            cs C[] @relation(name: "ctoa2")
+        }
+
+        model B {
+            c C @relation(name: "btoc2", fields: [name], references: [name], onUpdate: NoAction)
+            name Int @unique
+            id Int @id
+        }
+    "#;
+
+    api.schema_push(dm2).send_sync().assert_green_bang();
+}
+
+#[test_connector]
+fn switching_databases_must_work(api: TestApi) {
+    let dm1 = r#"
+        datasource db {
+            provider = "sqlite"
+            url = "file:dev.db"
+        }
+
+        model Test {
+            id String @id
+            name String
+        }
+    "#;
+
+    api.schema_push(dm1).send_sync().assert_green_bang();
+
+    let dm2 = r#"
+        datasource db {
+            provider = "sqlite"
+            url = "file:hiya.db"
+        }
+
+        model Test {
+            id String @id
+            name String
+        }
+    "#;
+
+    api.schema_push(dm2)
+        .migration_id(Some("mig2"))
+        .send_sync()
+        .assert_green_bang();
+}
+
+#[test_connector(tags(Sqlite))]
+fn renaming_a_datasource_works(api: TestApi) {
+    let dm1 = r#"
+        datasource db1 {
+            provider = "sqlite"
+            url = "file:///tmp/prisma-test.db"
+        }
+
+        model User {
+            id Int @id
+        }
+    "#;
+
+    api.schema_push(dm1).send_sync().assert_green_bang();
+
+    let dm2 = r#"
+        datasource db2 {
+            provider = "sqlite"
+            url = "file:///tmp/prisma-test.db"
+        }
+
+        model User {
+            id Int @id
+        }
+    "#;
+
+    api.schema_push(dm2)
+        .migration_id(Some("mig02"))
+        .send_sync()
+        .assert_green_bang()
+        .assert_no_steps();
+}
