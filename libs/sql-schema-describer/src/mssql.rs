@@ -396,7 +396,12 @@ impl<'a> SqlSchemaDescriber<'a> {
                 AND t.is_ms_shipped = 0
                 AND ind.filter_definition IS NULL
                 AND ind.name IS NOT NULL
-
+                AND ind.type_desc IN (
+                    'CLUSTERED',
+                    'NONCLUSTERED',
+                    'CLUSTERED COLUMNSTORE',
+                    'NONCLUSTERED COLUMNSTORE'
+                )
             ORDER BY index_name, seq_in_index
         "#};
 
