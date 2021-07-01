@@ -13,10 +13,10 @@ mod non_embedded_node_sel_to_null {
               b    String? @unique
               key  String  @unique
               c_id Int?
-            
+
               c C? @relation(fields: [c_id], references: [id])
             }
-            
+
             model C {
               #id(id, Int, @id)
               c  String?

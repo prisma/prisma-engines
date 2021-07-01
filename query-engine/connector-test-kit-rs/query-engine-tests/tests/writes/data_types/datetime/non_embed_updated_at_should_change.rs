@@ -12,11 +12,11 @@ mod non_embed_updated_at {
               top       String   @unique
               createdAt DateTime @default(now())
               updatedAt DateTime @updatedAt
-            
+
               bottomId  String?
               bottom    Bottom?  @relation(fields: [bottomId], references: [id])
             }
-            
+
             model Bottom {
               #id(id, String, @id)
               bottom    String   @unique

@@ -10,16 +10,16 @@ mod multi_field_uniq_mut {
             r#"model User {
               #id(id, Int, @id)
               name String
-            
+
               blog Blog?
             }
-            
+
             model Blog {
               #id(id, Int, @id)
               title     String
               category  String
               author_id Int?
-            
+
               author   User? @relation(fields: [author_id], references: [id])
               @@unique([title, category])
             }"#
@@ -73,16 +73,16 @@ mod multi_field_uniq_mut {
             r#"model User {
               #id(id, Int, @id)
               name  String
-            
+
               blogs Blog[]
             }
-            
+
             model Blog {
               #id(id, Int, @id)
               title    String
               category String
               author_id Int?
-            
+
               author   User? @relation(fields: [author_id], references: [id])
               @@unique([title, category])
             }"#
@@ -199,7 +199,7 @@ mod multi_field_uniq_mut {
               #id(id, Int, @id)
               first_name  String
               last_name   String
-              
+
               @@unique([first_name, last_name])
             }"#
         };
@@ -239,14 +239,14 @@ mod multi_field_uniq_mut {
               name  String
               blogs Blog[]
             }
-            
+
             model Blog {
               #id(id, Int, @id)
               title     String
               category  String
               published Boolean
               author_id Int?
-            
+
               author   User? @relation(fields: [author_id], references: [id])
               @@unique([title, category])
             }"#

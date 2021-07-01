@@ -16,26 +16,26 @@ mod unchecked_update {
               b_id_2 String
               c_id_1 String?
               c_id_2 String?
-            
+
               b ModelB  @relation(fields: [b_id_1, b_id_2], references: [uniq_1, uniq_2])
               c ModelC? @relation(fields: [c_id_1, c_id_2], references: [uniq_1, uniq_2])
             }
-            
+
             model ModelB {
               uniq_1    String
               uniq_2    String
-              
+
               a ModelA[]
-            
+
               @@unique([uniq_1, uniq_2])
             }
-            
+
             model ModelC {
               uniq_1    String
               uniq_2    String
-              
+
               a ModelA[]
-            
+
               @@unique([uniq_1, uniq_2])
             }"#
         };
@@ -139,26 +139,26 @@ mod unchecked_update {
               b_id_2 String
               c_id_1 String?
               c_id_2 String?
-            
+
               b ModelB  @relation(fields: [b_id_1, b_id_2], references: [uniq_1, uniq_2])
               c ModelC? @relation(fields: [c_id_1, c_id_2], references: [uniq_1, uniq_2])
             }
-            
+
             model ModelB {
               uniq_1    String
               uniq_2    String
-            
+
               a ModelA[]
-            
+
               @@unique([uniq_1, uniq_2])
             }
-            
+
             model ModelC {
               uniq_1    String
               uniq_2    String
-            
+
               a ModelA[]
-            
+
               @@unique([uniq_1, uniq_2])
             }"#
         };
@@ -167,7 +167,7 @@ mod unchecked_update {
     }
 
     // "Unchecked updates" should "not allow writing inlined relations regularly"
-    #[connector_test(schema(schema_2))]
+    #[connector_test(schema(schema_2), capabilities(AnyId))]
     async fn disallow_write_inline_rels(runner: &Runner) -> TestResult<()> {
         // Setup
         run_query!(
@@ -209,15 +209,15 @@ mod unchecked_update {
               b    ModelB? @relation(fields: [b_id], references: [id])
               c    ModelC?
             }
-            
+
             model ModelB {
               #id(id, Int, @id)
               a  ModelA?
             }
-            
+
             model ModelC {
               #id(id, Int, @id)
-              a_id Int 
+              a_id Int
               a    ModelA @relation(fields: [a_id], references: [id])
             }"#
         };

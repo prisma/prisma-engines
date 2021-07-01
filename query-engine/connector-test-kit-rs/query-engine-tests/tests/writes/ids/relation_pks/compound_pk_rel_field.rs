@@ -23,11 +23,11 @@ mod compound_pk_rel {
               name     String
               age      Int
               child_id Int
-            
+
               child Child  @relation(fields: [child_id], references: [id])
               @@id([name, child_id])
             }
-            
+
             model Child {
               #id(id, Int, @id)
               name    String
@@ -45,17 +45,17 @@ mod compound_pk_rel {
               age       Int
               child_id  Int
               child_ssn String
-            
+
               child Child  @relation(fields: [child_id, child_ssn], references: [id, ssn])
               @@id([name, child_id, child_ssn])
             }
-            
+
             model Child {
               #id(id, Int, @id)
               ssn    String @unique
               name   String
               parent Parent?
-            
+
               @@unique([id, ssn])
             }"#
         };
@@ -69,11 +69,11 @@ mod compound_pk_rel {
               name     String
               age      Int
               child_id Int
-            
+
               child Child  @relation(fields: [child_id], references: [id])
               @@id([name, child_id])
             }
-            
+
             model Child {
               #id(id, Int, @id)
               name    String
@@ -91,17 +91,17 @@ mod compound_pk_rel {
               age       Int
               child_id  Int
               child_ssn String
-            
+
               child Child  @relation(fields: [child_id, child_ssn], references: [id, ssn])
               @@id([name, child_id, child_ssn])
             }
-            
+
             model Child {
               #id(id, Int, @id)
               ssn     String @unique
               name    String
               parents Parent[]
-            
+
               @@unique([id, ssn])
             }"#
         };

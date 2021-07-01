@@ -21,10 +21,10 @@ mod single_pk_rel_field {
               name     String
               age      Int
               #id(child_id, Int, @id)
-            
+
               child Child  @relation(fields: [child_id], references: [id])
             }
-            
+
             model Child {
               #id(id, Int, @id)
               name    String
@@ -42,17 +42,17 @@ mod single_pk_rel_field {
               age       Int
               child_id  Int
               child_ssn String
-            
+
               child Child  @relation(fields: [child_id, child_ssn], references: [id, ssn])
               @@id([child_id, child_ssn])
             }
-            
+
             model Child {
               #id(id, Int, @id)
               ssn    String @unique
               name   String
               parent Parent?
-            
+
               @@unique([id, ssn])
             }"#
         };
@@ -66,10 +66,10 @@ mod single_pk_rel_field {
               name     String
               age      Int
               #id(child_id, Int, @id)
-            
+
               child Child  @relation(fields: [child_id], references: [id])
             }
-            
+
             model Child {
               #id(id, Int, @id)
               name    String
@@ -87,17 +87,17 @@ mod single_pk_rel_field {
               age       Int
               child_id  Int
               child_ssn String
-            
+
               child Child  @relation(fields: [child_id, child_ssn], references: [id, ssn])
               @@id([child_id, child_ssn])
             }
-            
+
             model Child {
               #id(id, Int, @id)
               ssn     String @unique
               name    String
               parents Parent[]
-            
+
               @@unique([id, ssn])
             }"#
         };

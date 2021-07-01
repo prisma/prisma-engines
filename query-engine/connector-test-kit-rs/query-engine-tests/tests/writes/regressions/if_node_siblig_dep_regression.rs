@@ -10,30 +10,30 @@ mod if_node_sibling {
         let schema = indoc! {
             r#"model Container {
               #id(id, Int, @id)
-            
+
               Record Record[]
             }
-            
+
             model RecordConfig {
               #id(id, Int, @id)
-            
+
               Record Record[]
             }
-            
+
             model RecordLocation {
               #id(id, Int, @id)
               location String @unique
-            
+
               Record Record[]
             }
-            
+
             model RecordType {
               #id(id, Int, @id)
               type   String   @unique
-            
+
               Record Record[]
             }
-            
+
             model Record {
               #id(id, Int, @id)
               location     RecordLocation @relation(fields: [locationId], references: [id])

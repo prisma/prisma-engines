@@ -13,7 +13,7 @@ mod where_and_datetime {
               outerDateTime DateTime @unique
               #m2m(todos, Todo[], String)
            }
-           
+
            model Todo{
               #id(id, String, @id, @default(cuid()))
               innerString   String
@@ -62,7 +62,7 @@ mod where_and_datetime {
                       data: {{
                         outerString: {{ set: "Changed Outer String" }}
                         todos: {{
-                          update: [{{ 
+                          update: [{{
                             where: {{ innerDateTime: "{}" }},
                             data:{{ innerString: {{ set: "Changed Inner String" }} }}
                           }}]
@@ -126,7 +126,7 @@ mod where_and_datetime {
                     data: {{
                       outerString: {{ set: "Changed Outer String" }}
                       todos: {{
-                        update: [{{ 
+                        update: [{{
                           where: {{ innerDateTime: "{}" }},
                           data:{{ innerString: {{ set: "Changed Inner String" }} }}
                         }}]

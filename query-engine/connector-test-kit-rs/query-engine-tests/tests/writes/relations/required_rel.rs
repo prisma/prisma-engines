@@ -13,7 +13,7 @@ mod required_rel {
               todoId Int
               todo   Todo   @relation(fields: [todoId], references: [id])
             }
-           
+
             model Todo{
               #id(id, Int, @id)
               name   String

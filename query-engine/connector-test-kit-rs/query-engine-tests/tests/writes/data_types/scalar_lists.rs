@@ -18,7 +18,7 @@ mod scalar_lists {
               dateTimes DateTime[]
               bytes     Bytes[]
             }
-            
+
             enum MyEnum {
               A
               B

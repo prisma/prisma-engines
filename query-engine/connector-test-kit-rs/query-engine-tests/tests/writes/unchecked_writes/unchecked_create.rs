@@ -16,26 +16,26 @@ mod unchecked_create {
               b_id_2 Int
               c_id_1 Int?
               c_id_2 Int?
-            
+
               b ModelB  @relation(fields: [b_id_1, b_id_2], references: [uniq_1, uniq_2])
               c ModelC? @relation(fields: [c_id_1, c_id_2], references: [uniq_1, uniq_2])
             }
-            
+
             model ModelB {
               uniq_1    Int
               uniq_2    Int
-              
+
               a ModelA[]
-            
+
               @@unique([uniq_1, uniq_2])
             }
-            
+
             model ModelC {
               uniq_1    Int
               uniq_2    Int
-              
+
               a ModelA[]
-            
+
               @@unique([uniq_1, uniq_2])
             }"#
         };
@@ -44,7 +44,7 @@ mod unchecked_create {
     }
 
     // "Unchecked creates" should "allow writing inlined relation scalars"
-    #[connector_test(schema(schema_1))]
+    #[connector_test(schema(schema_1), capabilities(AnyId))]
     async fn allow_writing_inlined_rel_scalars(runner: &Runner) -> TestResult<()> {
         // Ensure inserted foreign keys for A are valid.
         run_query!(
@@ -127,16 +127,16 @@ mod unchecked_create {
               #id(id, Int, @id)
               b_id Int
               c_id Int?
-            
+
               b ModelB  @relation(fields: [b_id], references: [id])
               c ModelC? @relation(fields: [c_id], references: [id])
             }
-            
+
             model ModelB {
               #id(id, Int, @id)
               a  ModelA?
             }
-            
+
             model ModelC {
               #id(id, Int, @id)
               a  ModelA?
@@ -209,15 +209,15 @@ mod unchecked_create {
               b ModelB  @relation(fields: [b_id], references: [id])
               c ModelC?
             }
-            
+
             model ModelB {
               #id(id, Int, @id)
               a  ModelA?
             }
-            
+
             model ModelC {
               #id(id, Int, @id)
-              a_id Int 
+              a_id Int
               a    ModelA @relation(fields: [a_id], references: [id])
             }"#
         };
@@ -255,7 +255,7 @@ mod unchecked_create {
               b_id Int    @default(11)
               b    ModelB @relation(fields: [b_id], references: [id])
             }
-            
+
             model ModelB {
               #id(id, Int, @id)
               a  ModelA[]

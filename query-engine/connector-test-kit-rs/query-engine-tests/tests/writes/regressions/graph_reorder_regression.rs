@@ -12,12 +12,12 @@ mod graph_reorder {
               #id(id, String, @id)
               payments Payment[]
             }
-            
+
             model Visit {
               #id(id, String, @id)
               payment Payment?
             }
-            
+
             model Payment {
               #id(id, Int, @id)
               company   Company @relation(fields: [companyId], references: [id])

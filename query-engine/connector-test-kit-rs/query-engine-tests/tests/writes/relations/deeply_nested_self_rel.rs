@@ -11,7 +11,7 @@ mod deep_nested_rel {
               #id(id, Int, @id)
               name     String  @unique
               parentId Int?
-            
+
               parent   User?  @relation(name: "Users", fields: [parentId], references: [id])
               children User[] @relation(name: "Users")
             }"#

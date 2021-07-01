@@ -71,7 +71,7 @@ mod default_value {
               Yes
               No
             }
-            
+
             model Service {
               #id(id, Int, @id)
               name         String
@@ -159,7 +159,7 @@ mod default_value {
               name      Names    @default(Spiderman) @unique
               age       Int
                     }
-            
+
             enum Names {
                Spiderman @map("Peter Parker")
                Superman  @map("Clark Kent")

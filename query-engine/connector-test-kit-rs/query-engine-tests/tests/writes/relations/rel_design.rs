@@ -11,10 +11,10 @@ mod rel_design {
               #id(id, Int, @id)
               uList  String? @unique
               todoId Int?
-           
+
               todo  Todo?   @relation(fields: [todoId], references: [id])
            }
-           
+
            model Todo{
               #id(id, Int, @id)
               uTodo String? @unique

@@ -13,13 +13,13 @@ mod upsert {
               alias          String  @unique
               anotherIDField String? @unique
             }
-            
+
             model WithDefaultValue {
               #id(id, Int, @id)
               reqString String @default(value: "defaultValue")
               title     String
             }
-            
+
             model MultipleFields {
               #id(id, Int, @id)
               reqString  String

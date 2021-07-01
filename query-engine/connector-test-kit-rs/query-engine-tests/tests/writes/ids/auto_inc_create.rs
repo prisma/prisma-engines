@@ -12,7 +12,7 @@ mod auto_inc_create {
             r#"model Mail {
               id Int   @default(autoincrement())
               #id(messageId, Int, @id)
-          
+
               @@index(id)
           }"#
         };

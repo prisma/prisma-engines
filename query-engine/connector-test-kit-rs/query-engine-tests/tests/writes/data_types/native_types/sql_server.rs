@@ -397,7 +397,7 @@ mod sql_server {
               b_id String? @test.Char(16)
               b    ModelB? @relation(fields: [b_id], references: [id])
             }
-            
+
             model ModelB {
               #id(id, String, @id, @test.Char(16))
               a  ModelA?
@@ -434,7 +434,7 @@ mod sql_server {
               b_id String? @test.NChar(16)
               b    ModelB? @relation(fields: [b_id], references: [id])
             }
-            
+
             model ModelB {
               #id(id, String, @id, @test.NChar(16))
               a  ModelA?

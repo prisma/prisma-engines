@@ -18,7 +18,7 @@ mod byoi_mongo {
               childOpt Child?  @relation(fields: [childId], references: [id])
               childId  String?
           }
-    
+
           model Child {
               #id(id, String, @id, @default(cuid()))
               c         String @unique
@@ -36,7 +36,7 @@ mod byoi_mongo {
               p        String @unique
               childOpt Child?
           }
-    
+
           model Child {
               #id(id, String, @id, @default(cuid()))
               c         String  @unique

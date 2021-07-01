@@ -121,7 +121,7 @@ mod int_id_create {
               b_id Int
               b    B   @relation(fields: [b_id], references: [id])
             }
-            
+
             model B {
               #id(id, Int, @id)
               a  A[]

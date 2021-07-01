@@ -11,19 +11,19 @@ mod update_many_rel_filter {
               #id(id, Int, @id)
               top      String
               bottomId Int?
-           
+
               bottom Bottom? @relation(fields: [bottomId], references: [id])
            }
-           
+
            model Bottom{
               #id(id, Int, @id)
               bottom       String
               veryBottomId Int?
-           
+
               top        Top?
               veryBottom VeryBottom? @relation(fields: [veryBottomId], references: [id])
            }
-           
+
            model VeryBottom{
               #id(id, Int, @id)
               veryBottom String
@@ -83,7 +83,7 @@ mod update_many_rel_filter {
         create_row(
             runner,
             r#"{
-                id: 3, 
+                id: 3,
                 top: "top3"
                 bottom: {
                   create: {id: 1, bottom: "bottom1"}

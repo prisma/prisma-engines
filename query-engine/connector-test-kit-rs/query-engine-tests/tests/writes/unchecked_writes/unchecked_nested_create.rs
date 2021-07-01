@@ -16,26 +16,26 @@ mod unchecked_nested_create {
               b_id_2 Int
               c_id_1 Int?
               c_id_2 Int?
-            
+
               b ModelB  @relation(fields: [b_id_1, b_id_2], references: [uniq_1, uniq_2])
               c ModelC? @relation(fields: [c_id_1, c_id_2], references: [uniq_1, uniq_2])
             }
-            
+
             model ModelB {
               uniq_1    Int
               uniq_2    Int
-              
+
               a ModelA[]
-            
+
               @@unique([uniq_1, uniq_2])
             }
-            
+
             model ModelC {
               uniq_1    Int
               uniq_2    Int
-              
+
               a ModelA[]
-            
+
               @@unique([uniq_1, uniq_2])
             }"#
         };
@@ -131,26 +131,26 @@ mod unchecked_nested_create {
               b_id_2 Int
               c_id_1 Int
               c_id_2 Int
-            
+
               b ModelB @relation(fields: [b_id_1, b_id_2], references: [uniq_1, uniq_2])
               c ModelC @relation(fields: [c_id_1, c_id_2], references: [uniq_1, uniq_2])
             }
-            
+
             model ModelB {
               uniq_1    Int
               uniq_2    Int
-              
+
               a ModelA[]
-            
+
               @@unique([uniq_1, uniq_2])
             }
-            
+
             model ModelC {
               uniq_1    Int
               uniq_2    Int
-              
+
               a ModelA[]
-            
+
               @@unique([uniq_1, uniq_2])
             }"#
         };
@@ -159,7 +159,7 @@ mod unchecked_nested_create {
     }
 
     // "Unchecked nested creates" should "fail if required relation scalars are not provided"
-    #[connector_test(schema(schema_2))]
+    #[connector_test(schema(schema_2), capabilities(AnyId))]
     async fn fail_if_req_rel_sclr_not_provided(runner: &Runner) -> TestResult<()> {
         assert_error!(
             runner,
@@ -192,22 +192,22 @@ mod unchecked_nested_create {
               b_id Int
               c_id Int
               d_id Int
-            
+
               b ModelB @relation(fields: [b_id], references: [id])
               c ModelC @relation(fields: [c_id], references: [id])
               d ModelD @relation(fields: [d_id], references: [id])
             }
-            
+
             model ModelB {
               #id(id, Int, @id)
               a  ModelA?
             }
-            
+
             model ModelC {
               #id(id, Int, @id)
               a  ModelA?
             }
-            
+
             model ModelD {
               #id(id, Int, @id)
               a  ModelA?
@@ -253,23 +253,23 @@ mod unchecked_nested_create {
               #id(id, Int, @id)
               b_id Int
               d_id Int
-            
+
               b ModelB  @relation(fields: [b_id], references: [id])
               c ModelC?
               d ModelD  @relation(fields: [d_id], references: [id])
             }
-            
+
             model ModelB {
               #id(id, Int, @id)
               a  ModelA?
             }
-            
+
             model ModelC {
               #id(id, Int, @id)
-              a_id Int 
+              a_id Int
               a    ModelA @relation(fields: [a_id], references: [id])
             }
-            
+
             model ModelD {
               #id(id, Int, @id)
               a  ModelA?
@@ -312,17 +312,17 @@ mod unchecked_nested_create {
         let schema = indoc! {
             r#"model ModelA {
               #id(id, Int, @id)
-              b_id Int    
+              b_id Int
               c_id Int    @default(1)
               b    ModelB @relation(fields: [b_id], references: [id])
               c    ModelC @relation(fields: [c_id], references: [id])
             }
-            
+
             model ModelB {
               #id(id, Int, @id)
               a  ModelA?
             }
-            
+
             model ModelC {
               #id(id, Int, @id)
               a  ModelA[]
@@ -359,7 +359,7 @@ mod unchecked_nested_create {
               b_id Int
               b    ModelB @relation(fields: [b_id], references: [id])
             }
-            
+
             model ModelB {
               #id(id, Int, @id)
               a  ModelA?

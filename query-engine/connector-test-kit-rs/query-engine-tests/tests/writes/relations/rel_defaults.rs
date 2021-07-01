@@ -10,10 +10,10 @@ mod rel_defaults {
             r#" model List {
               #id(id, Int, @id @default(autoincrement()))
               name  String? @unique
-              todoId Int @default(1)  
+              todoId Int @default(1)
               todo  Todo   @relation(fields: [todoId], references: [id])
             }
-           
+
             model Todo{
               #id(id, Int, @id @default(autoincrement()))
               name String?
@@ -75,12 +75,12 @@ mod rel_defaults {
               todoName  String
               todo      Todo   @relation(fields: [todoId, todoName], references: [id, name])
            }
-          
+
            model Todo {
               id Int @default(autoincrement())
               name  String
               lists  List[]
-          
+
               @@id([id, name])
            }"#
         };
@@ -152,7 +152,7 @@ mod rel_defaults {
               todoName String  @default("theTodo")
               todo     Todo    @relation(fields: [todoId, todoName], references: [id, name])
             }
-           
+
             model Todo{
               id Int @default(1)
               name   String

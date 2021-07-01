@@ -11,26 +11,26 @@ mod unchecked_update_many {
               b_id_2 String
               c_id_1 String?
               c_id_2 String?
-            
+
               b ModelB  @relation(fields: [b_id_1, b_id_2], references: [uniq_1, uniq_2])
               c ModelC? @relation(fields: [c_id_1, c_id_2], references: [uniq_1, uniq_2])
             }
-            
+
             model ModelB {
               uniq_1    String
               uniq_2    String
-              
+
               a ModelA[]
-            
+
               @@unique([uniq_1, uniq_2])
             }
-            
+
             model ModelC {
               uniq_1    String
               uniq_2    String
-              
+
               a ModelA[]
-            
+
               @@unique([uniq_1, uniq_2])
             }"#
         };
@@ -100,7 +100,7 @@ mod unchecked_update_many {
             r#"model ModelA {
               #id(id, Int, @id)
               int Int @default(autoincrement())
-            
+
               @@index([int])
             }"#
         };

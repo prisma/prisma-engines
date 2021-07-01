@@ -373,7 +373,7 @@ mod mysql {
               b_id String? @test.Char(16)
               b    ModelB? @relation(fields: [b_id], references: [id])
             }
-            
+
             model ModelB {
               #id(id, String, @id, @test.Char(16))
               a  ModelA?

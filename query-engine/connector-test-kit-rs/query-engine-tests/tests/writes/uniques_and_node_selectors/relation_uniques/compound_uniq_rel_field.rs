@@ -21,16 +21,16 @@ mod compound_uniq_rel_field {
               #id(id, Int, @id)
               p        String
               child_id Int
-            
+
               child Child  @relation(fields: [child_id], references: [id])
               @@unique([child_id, p])
             }
-            
+
             model Child {
               #id(id, Int, @id)
               c      String
               parent Parent?
-            
+
               @@unique([id, c])
             }"#
         };
@@ -232,16 +232,16 @@ mod compound_uniq_rel_field {
               p        String
               child_id Int
               child_c  String
-            
+
               child Child  @relation(fields: [child_id, child_c], references: [id, c])
               @@unique([child_id, child_c, p])
             }
-            
+
             model Child {
               #id(id, Int, @id)
               c      String
               parent Parent?
-            
+
               @@unique([id, c])
             }"#
         };
@@ -459,16 +459,16 @@ mod compound_uniq_rel_field {
               #id(id, Int, @id)
               p        String
               child_id Int
-            
+
               child Child  @relation(fields: [child_id], references: [id])
               @@unique([child_id, p])
             }
-            
+
             model Child {
               #id(id, Int, @id)
               c       String
               parents Parent[]
-            
+
               @@unique([id, c])
             }"#
         };
@@ -717,16 +717,16 @@ mod compound_uniq_rel_field {
               p        String
               child_id Int
               child_c  String
-            
+
               child Child  @relation(fields: [child_id, child_c], references: [id, c])
               @@unique([child_id, child_c, p])
             }
-            
+
             model Child {
               #id(id, Int, @id)
               c       String
               parents Parent[]
-            
+
               @@unique([id, c])
             }"#
         };
@@ -975,12 +975,12 @@ mod compound_uniq_rel_field {
               fieldB  String
               @@unique([fieldA, fieldB])
             }
-            
+
             model ModelB {
               #id(id, Int, @id)
               fieldA  Int
               fieldB  Int
-            
+
               @@unique([fieldA, fieldB])
             }"#
         };
