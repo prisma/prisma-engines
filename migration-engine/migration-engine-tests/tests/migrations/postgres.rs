@@ -1,4 +1,4 @@
-use migration_engine_tests::sync_test_api::*;
+use migration_engine_tests::{sql::ResultSetExt, sync_test_api::*};
 use sql_schema_describer::ColumnTypeFamily;
 use std::fmt::Write;
 
@@ -327,4 +327,57 @@ fn postgres_apply_migrations_errors_give_precise_location_at_the_beginning_of_fi
     "#]];
     let first_segment = err.split_terminator("DbError {").next().unwrap();
     expectation.assert_eq(first_segment)
+}
+
+#[test_connector(tags(Postgres))]
+fn citext_to_text_and_back_works(api: TestApi) {
+    api.raw_cmd("CREATE EXTENSION citext;");
+
+    let dm1 = r#"
+        datasource pg {
+            provider = "postgres"
+            url = env("DBURL")
+        }
+
+        model User {
+            id Int @id @default(autoincrement())
+            name String @pg.Text
+        }
+    "#;
+
+    let dm2 = r#"
+        datasource pg {
+            provider = "postgres"
+            url = env("DBURL")
+        }
+
+        model User {
+            id Int @id @default(autoincrement())
+            name String @pg.Citext
+        }
+    "#;
+
+    api.schema_push(dm1).send_sync().assert_green_bang();
+
+    api.raw_cmd("INSERT INTO \"User\" (name) VALUES ('myCat'), ('myDog'), ('yourDog');");
+
+    // TEXT -> CITEXT
+    api.schema_push(dm2)
+        .send_sync()
+        .assert_green_bang()
+        .assert_has_executed_steps();
+
+    api.dump_table("User")
+        .assert_row_count(3)
+        .assert_first_row(|row| row.assert_text_value("name", "myCat"));
+
+    // CITEXT -> TEXT
+    api.schema_push(dm1)
+        .send_sync()
+        .assert_green_bang()
+        .assert_has_executed_steps();
+
+    api.dump_table("User")
+        .assert_row_count(3)
+        .assert_first_row(|row| row.assert_text_value("name", "myCat"));
 }

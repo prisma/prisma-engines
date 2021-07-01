@@ -316,7 +316,7 @@ fn native_type_change_riskyness(previous: PostgresType, next: PostgresType) -> O
                 _ => NotCastable,
             },
             Text => match next {
-                Text | VarChar(None) => SafeCast,
+                Text | VarChar(None) | Citext => SafeCast,
                 VarChar(_) | Char(_) => RiskyCast,
                 _ => NotCastable,
             },
