@@ -68,26 +68,16 @@ fn model_to_dmmf(model: &dml::Model) -> Model {
         unique_fields: model
             .indices
             .iter()
-            .filter_map(|i| {
-                if i.tpe == IndexType::Unique {
-                    Some(i.fields.clone())
-                } else {
-                    None
-                }
-            })
+            .filter_map(|i| (i.tpe == IndexType::Unique).then(|| i.fields.clone()))
             .collect(),
         unique_indexes: model
             .indices
             .iter()
             .filter_map(|i| {
-                if i.tpe == IndexType::Unique {
-                    Some(UniqueIndex {
-                        name: i.name.clone(),
-                        fields: i.fields.clone(),
-                    })
-                } else {
-                    None
-                }
+                (i.tpe == IndexType::Unique).then(|| UniqueIndex {
+                    name: i.name.clone(),
+                    fields: i.fields.clone(),
+                })
             })
             .collect(),
     }
