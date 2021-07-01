@@ -1,9 +1,9 @@
-use crate::ConnectorTestArgs;
+use super::*;
+use crate::utils::quote_connector;
 use darling::FromMeta;
 use itertools::Itertools;
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
-use query_tests_setup::{ConnectorTag, ConnectorTagInterface};
 use quote::quote;
 use syn::{parse_macro_input, AttributeArgs, ItemFn};
 
@@ -101,17 +101,4 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
     };
 
     test.into()
-}
-
-fn quote_connector(tag: ConnectorTag) -> proc_macro2::TokenStream {
-    let (connector, version) = tag.as_parse_pair();
-
-    match version {
-        Some(version) => quote! {
-            ConnectorTag::try_from((#connector, Some(#version))).unwrap()
-        },
-        None => quote! {
-            ConnectorTag::try_from(#connector).unwrap()
-        },
-    }
 }

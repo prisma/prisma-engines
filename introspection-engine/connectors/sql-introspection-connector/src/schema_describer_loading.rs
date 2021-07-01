@@ -1,16 +1,14 @@
-use crate::SqlError;
-use quaint::{
-    prelude::{ConnectionInfo, Queryable, SqlFamily},
-    single::Quaint,
-};
+use quaint::prelude::{ConnectionInfo, Queryable, SqlFamily};
 use sql_schema_describer::{postgres::Circumstances, SqlSchemaDescriberBackend};
 
-pub async fn load_describer(url: &str) -> Result<(Box<dyn SqlSchemaDescriberBackend>, ConnectionInfo), SqlError> {
-    let connection = Quaint::new(&url).await?;
+#[tracing::instrument(skip(connection))]
+pub async fn load_describer<'a>(
+    connection: &'a dyn Queryable,
+    connection_info: &ConnectionInfo,
+) -> Result<Box<dyn SqlSchemaDescriberBackend + 'a>, crate::SqlError> {
     let version = connection.version().await?;
-    let connection_info = connection.connection_info().to_owned();
 
-    let describer: Box<dyn SqlSchemaDescriberBackend> = match connection_info.sql_family() {
+    Ok(match connection_info.sql_family() {
         SqlFamily::Postgres => {
             let mut circumstances = Default::default();
 
@@ -21,12 +19,10 @@ pub async fn load_describer(url: &str) -> Result<(Box<dyn SqlSchemaDescriberBack
             Box::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(
                 connection,
                 circumstances,
-            ))
+            )) as Box<dyn SqlSchemaDescriberBackend>
         }
         SqlFamily::Mysql => Box::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(connection)),
         SqlFamily::Sqlite => Box::new(sql_schema_describer::sqlite::SqlSchemaDescriber::new(connection)),
         SqlFamily::Mssql => Box::new(sql_schema_describer::mssql::SqlSchemaDescriber::new(connection)),
-    };
-
-    Ok((describer, connection_info))
+    })
 }

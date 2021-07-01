@@ -114,11 +114,24 @@ pub(super) fn scalar_input_fields_for_unchecked_update(
         vec![]
     };
 
+    let id_fields = model.fields().id();
     let scalar_fields: Vec<ScalarFieldRef> = model
         .fields()
         .scalar()
         .into_iter()
         .filter(|sf| !linking_fields.contains(sf))
+        .filter(|sf| {
+            if let Some(ref id_fields) = &id_fields {
+                // Exclude @@id or @id fields if not updatable
+                if id_fields.contains(sf) {
+                    ctx.capabilities.contains(ConnectorCapability::UpdateableId)
+                } else {
+                    true
+                }
+            } else {
+                true
+            }
+        })
         .collect();
 
     input_fields::scalar_input_fields(

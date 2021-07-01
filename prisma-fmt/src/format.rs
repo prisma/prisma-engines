@@ -1,10 +1,9 @@
+use crate::FormatOpts;
 use datamodel::ast::reformat::Reformatter;
 use std::{
     fs::{self, File},
     io::{self, BufWriter, Read},
 };
-
-use crate::FormatOpts;
 
 pub fn run(opts: FormatOpts) {
     let datamodel_string = match opts.input {

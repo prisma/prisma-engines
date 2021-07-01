@@ -109,7 +109,7 @@ async fn should_ignore_prisma_helper_tables(api: &TestApi) -> TestResult {
         }
     "##};
 
-    api.assert_eq_datamodels(&dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -164,7 +164,7 @@ async fn a_table_with_unique_index(api: &TestApi) -> TestResult {
         }
     "##};
 
-    api.assert_eq_datamodels(&dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -550,7 +550,7 @@ async fn default_values_on_lists_should_be_ignored(api: &TestApi) -> TestResult 
 
     let result = api.introspect().await?;
 
-    api.assert_eq_datamodels(&dm, &result);
+    api.assert_eq_datamodels(dm, &result);
 
     Ok(())
 }
@@ -582,7 +582,7 @@ async fn a_table_with_partial_indexes_should_ignore_them(api: &TestApi) -> TestR
         "#
     };
 
-    api.assert_eq_datamodels(&dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -607,7 +607,7 @@ async fn introspecting_a_table_with_json_type_must_work(api: &TestApi) -> TestRe
 
     let result = api.introspect().await?;
 
-    api.assert_eq_datamodels(&dm, &result);
+    api.assert_eq_datamodels(dm, &result);
 
     Ok(())
 }
@@ -722,7 +722,7 @@ async fn partial_indexes_should_be_ignored_on_mysql(api: &TestApi) -> TestResult
     "##};
 
     let result = &api.introspect().await?;
-    api.assert_eq_datamodels(&dm, result);
+    api.assert_eq_datamodels(dm, result);
 
     Ok(())
 }
@@ -750,7 +750,7 @@ async fn expression_indexes_should_be_ignored_on_sqlite(api: &TestApi) -> TestRe
     "##};
 
     let result = &api.introspect().await?;
-    api.assert_eq_datamodels(&dm, result);
+    api.assert_eq_datamodels(dm, result);
 
     Ok(())
 }
@@ -793,7 +793,7 @@ async fn casing_should_not_lead_to_mix_ups(api: &TestApi) -> TestResult {
     "##};
 
     let result = &api.introspect().await?;
-    api.assert_eq_datamodels(&dm, result);
+    api.assert_eq_datamodels(dm, result);
 
     Ok(())
 }

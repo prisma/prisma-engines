@@ -1,4 +1,4 @@
-use crate::{ast, configuration::Generator};
+use crate::{ast, configuration::Generator, transform::dml_to_ast::lower_string_from_env_var};
 
 pub struct GeneratorSerializer {}
 
@@ -7,7 +7,7 @@ impl GeneratorSerializer {
         let mut tops: Vec<ast::Top> = Vec::new();
 
         for generator in generators {
-            tops.push(ast::Top::Generator(Self::lower_generator(&generator)))
+            tops.push(ast::Top::Generator(Self::lower_generator(generator)))
         }
 
         // Do this dance so that generators come before other top elements
@@ -20,7 +20,7 @@ impl GeneratorSerializer {
         let mut arguments: Vec<ast::Argument> = vec![super::lower_string_from_env_var("provider", &generator.provider)];
 
         if let Some(output) = &generator.output {
-            arguments.push(super::lower_string_from_env_var("output", &output));
+            arguments.push(super::lower_string_from_env_var("output", output));
         }
 
         if !&generator.preview_features.is_empty() {
@@ -36,14 +36,14 @@ impl GeneratorSerializer {
         let platform_values: Vec<ast::Expression> = generator
             .binary_targets
             .iter()
-            .map(|p| ast::Expression::StringValue(p.to_string(), ast::Span::empty()))
+            .map(|p| lower_string_from_env_var("binaryTargets", p).value)
             .collect();
         if !platform_values.is_empty() {
             arguments.push(ast::Argument::new_array("binaryTargets", platform_values));
         }
 
         for (key, value) in &generator.config {
-            arguments.push(ast::Argument::new_string(&key, &value));
+            arguments.push(ast::Argument::new_string(key, value));
         }
 
         ast::GeneratorConfig {

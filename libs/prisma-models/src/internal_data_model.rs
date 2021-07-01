@@ -139,7 +139,7 @@ impl InternalDataModel {
         self.relations
             .get()
             .and_then(|relations| relations.iter().find(|relation| relation.name == name))
-            .map(|relation| Arc::downgrade(&relation))
+            .map(|relation| Arc::downgrade(relation))
             .ok_or_else(|| DomainError::RelationNotFound { name: name.to_string() })
     }
 
@@ -147,12 +147,27 @@ impl InternalDataModel {
         self.version.is_none()
     }
 
-    pub fn fields_requiring_model(&self, model: &ModelRef) -> Vec<RelationFieldRef> {
+    /// Finds all non-list relation fields pointing to the given model.
+    /// `required` may narrow down the returned fields to required fields only. Returns all on `false`.
+    pub fn fields_pointing_to_model(&self, model: &ModelRef, required: bool) -> Vec<RelationFieldRef> {
         self.relation_fields()
             .iter()
-            .filter(|rf| &rf.related_model() == model)
-            .filter(|f| f.is_required && !f.is_list)
-            .map(|f| Arc::clone(f))
+            .filter(|rf| &rf.related_model() == model) // All relation fields pointing to `model`.
+            .filter(|rf| rf.is_inlined_on_enclosing_model()) // Not a list, not a virtual field.
+            .filter(|rf| !required || rf.is_required) // If only required fields should be returned
+            .map(Arc::clone)
+            .collect()
+    }
+
+    /// Finds all relation fields where the foreign key refers to the given field (as either singular or compound).
+    pub fn fields_refering_to_field(&self, field: &ScalarFieldRef) -> Vec<RelationFieldRef> {
+        let model_name = &field.model().name;
+
+        self.relation_fields()
+            .iter()
+            .filter(|rf| &rf.relation_info.to == model_name)
+            .filter(|rf| rf.relation_info.references.contains(&field.name))
+            .map(Arc::clone)
             .collect()
     }
 

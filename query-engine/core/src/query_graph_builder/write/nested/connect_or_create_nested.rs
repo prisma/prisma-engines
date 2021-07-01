@@ -16,6 +16,7 @@ use std::{convert::TryInto, sync::Arc};
 #[tracing::instrument(skip(graph, parent_node, parent_relation_field, value, child_model))]
 pub fn nested_connect_or_create(
     graph: &mut QueryGraph,
+    connector_ctx: &ConnectorContext,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
     value: ParsedInputValue,
@@ -25,11 +26,32 @@ pub fn nested_connect_or_create(
     let values = utils::coerce_vec(value);
 
     if relation.is_many_to_many() {
-        handle_many_to_many(graph, parent_node, parent_relation_field, values, child_model)
+        handle_many_to_many(
+            graph,
+            connector_ctx,
+            parent_node,
+            parent_relation_field,
+            values,
+            child_model,
+        )
     } else if relation.is_one_to_many() {
-        handle_one_to_many(graph, parent_node, parent_relation_field, values, child_model)
+        handle_one_to_many(
+            graph,
+            connector_ctx,
+            parent_node,
+            parent_relation_field,
+            values,
+            child_model,
+        )
     } else {
-        handle_one_to_one(graph, parent_node, parent_relation_field, values, child_model)
+        handle_one_to_one(
+            graph,
+            connector_ctx,
+            parent_node,
+            parent_relation_field,
+            values,
+            child_model,
+        )
     }
 }
 
@@ -70,6 +92,7 @@ pub fn nested_connect_or_create(
 #[tracing::instrument(skip(graph, parent_node, parent_relation_field, values, child_model))]
 fn handle_many_to_many(
     graph: &mut QueryGraph,
+    connector_ctx: &ConnectorContext,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
     values: Vec<ParsedInputValue>,
@@ -91,7 +114,7 @@ fn handle_many_to_many(
             filter,
         ));
 
-        let create_node = create::create_record_node(graph, Arc::clone(child_model), create_map)?;
+        let create_node = create::create_record_node(graph, connector_ctx, Arc::clone(child_model), create_map)?;
         let if_node = graph.create_node(Flow::default_if());
 
         let connect_exists_node =
@@ -127,15 +150,30 @@ fn handle_many_to_many(
 #[tracing::instrument(skip(graph, parent_node, parent_relation_field, values, child_model))]
 fn handle_one_to_many(
     graph: &mut QueryGraph,
+    connector_ctx: &ConnectorContext,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
     values: Vec<ParsedInputValue>,
     child_model: &ModelRef,
 ) -> QueryGraphBuilderResult<()> {
     if parent_relation_field.is_inlined_on_enclosing_model() {
-        one_to_many_inlined_parent(graph, parent_node, parent_relation_field, values, child_model)
+        one_to_many_inlined_parent(
+            graph,
+            connector_ctx,
+            parent_node,
+            parent_relation_field,
+            values,
+            child_model,
+        )
     } else {
-        one_to_many_inlined_child(graph, parent_node, parent_relation_field, values, child_model)
+        one_to_many_inlined_child(
+            graph,
+            connector_ctx,
+            parent_node,
+            parent_relation_field,
+            values,
+            child_model,
+        )
     }
 }
 
@@ -143,6 +181,7 @@ fn handle_one_to_many(
 #[tracing::instrument(skip(graph, parent_node, parent_relation_field, values, child_model))]
 fn handle_one_to_one(
     graph: &mut QueryGraph,
+    connector_ctx: &ConnectorContext,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
     mut values: Vec<ParsedInputValue>,
@@ -162,6 +201,7 @@ fn handle_one_to_one(
     if parent_relation_field.is_inlined_on_enclosing_model() {
         one_to_one_inlined_parent(
             graph,
+            connector_ctx,
             parent_node,
             parent_relation_field,
             filter,
@@ -171,6 +211,7 @@ fn handle_one_to_one(
     } else {
         one_to_one_inlined_child(
             graph,
+            connector_ctx,
             parent_node,
             parent_relation_field,
             filter,
@@ -212,6 +253,7 @@ fn handle_one_to_one(
 #[tracing::instrument(skip(graph, parent_node, parent_relation_field, values, child_model))]
 fn one_to_many_inlined_child(
     graph: &mut QueryGraph,
+    connector_ctx: &ConnectorContext,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
     values: Vec<ParsedInputValue>,
@@ -238,7 +280,7 @@ fn one_to_many_inlined_child(
 
         let if_node = graph.create_node(Flow::default_if());
         let update_child_node = utils::update_records_node_placeholder(graph, filter, Arc::clone(child_model));
-        let create_node = create::create_record_node(graph, Arc::clone(child_model), create_map)?;
+        let create_node = create::create_record_node(graph, connector_ctx, Arc::clone(child_model), create_map)?;
 
         graph.create_edge(&parent_node, &read_node, QueryGraphDependency::ExecutionOrder)?;
         graph.create_edge(&if_node, &update_child_node, QueryGraphDependency::Then)?;
@@ -353,6 +395,7 @@ fn one_to_many_inlined_child(
 #[tracing::instrument(skip(graph, parent_node, parent_relation_field, values, child_model))]
 fn one_to_many_inlined_parent(
     graph: &mut QueryGraph,
+    connector_ctx: &ConnectorContext,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
     mut values: Vec<ParsedInputValue>,
@@ -381,7 +424,7 @@ fn one_to_many_inlined_parent(
     graph.create_edge(&parent_node, &read_node, QueryGraphDependency::ExecutionOrder)?;
 
     let if_node = graph.create_node(Flow::default_if());
-    let create_node = create::create_record_node(graph, Arc::clone(child_model), create_map)?;
+    let create_node = create::create_record_node(graph, connector_ctx, Arc::clone(child_model), create_map)?;
     let return_existing = graph.create_node(Flow::Return(None));
     let return_create = graph.create_node(Flow::Return(None));
 
@@ -524,6 +567,7 @@ fn one_to_many_inlined_parent(
 #[tracing::instrument(skip(graph, parent_node, parent_relation_field, filter, create_data, child_model))]
 fn one_to_one_inlined_parent(
     graph: &mut QueryGraph,
+    connector_ctx: &ConnectorContext,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
     filter: Filter,
@@ -543,7 +587,7 @@ fn one_to_one_inlined_parent(
     graph.create_edge(&parent_node, &read_node, QueryGraphDependency::ExecutionOrder)?;
 
     let if_node = graph.create_node(Flow::default_if());
-    let create_node = create::create_record_node(graph, Arc::clone(child_model), create_data)?;
+    let create_node = create::create_record_node(graph, connector_ctx, Arc::clone(child_model), create_data)?;
     let return_existing = graph.create_node(Flow::Return(None));
     let return_create = graph.create_node(Flow::Return(None));
 
@@ -748,6 +792,7 @@ fn one_to_one_inlined_parent(
 #[tracing::instrument(skip(graph, parent_node, parent_relation_field, filter, create_data, child_model))]
 fn one_to_one_inlined_child(
     graph: &mut QueryGraph,
+    connector_ctx: &ConnectorContext,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
     filter: Filter,
@@ -771,7 +816,7 @@ fn one_to_one_inlined_child(
     graph.create_edge(&parent_node, &read_node, QueryGraphDependency::ExecutionOrder)?;
 
     let if_node = graph.create_node(Flow::default_if());
-    let create_node = create::create_record_node(graph, Arc::clone(child_model), create_data)?;
+    let create_node = create::create_record_node(graph, connector_ctx, Arc::clone(child_model), create_data)?;
 
     graph.create_edge(
         &read_node,

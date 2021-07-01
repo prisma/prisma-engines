@@ -3,13 +3,12 @@ mod sql_schema_calculator_flavour;
 pub(super) use sql_schema_calculator_flavour::SqlSchemaCalculatorFlavour;
 
 use crate::{flavour::SqlFlavour, sql_renderer::IteratorJoin};
-use datamodel::{walkers::RelationFieldWalker, Configuration};
 use datamodel::{
     walkers::{walk_models, walk_relations, ModelWalker, ScalarFieldWalker, TypeWalker},
-    Datamodel, DefaultValue, FieldArity, IndexDefinition, IndexType, ScalarType,
+    Configuration, Datamodel, DefaultValue, FieldArity, IndexDefinition, IndexType, ScalarType,
 };
 use prisma_value::PrismaValue;
-use sql_schema_describer::{self as sql, walkers::SqlSchemaExt, ColumnType, ForeignKeyAction};
+use sql_schema_describer::{self as sql, walkers::SqlSchemaExt, ColumnType};
 
 pub(crate) fn calculate_sql_schema(
     (configuration, datamodel): (&Configuration, &Datamodel),
@@ -22,8 +21,8 @@ pub(crate) fn calculate_sql_schema(
     // Two types of tables: model tables and implicit M2M relation tables (a.k.a. join tables.).
     schema.tables.extend(calculate_model_tables(datamodel, flavour));
 
-    let relation_tables: Vec<_> = calculate_relation_tables(datamodel, flavour, &schema).collect();
-    schema.tables.extend(relation_tables.into_iter());
+    let mut relation_tables: Vec<_> = calculate_relation_tables(datamodel, flavour, &schema).collect();
+    schema.tables.append(&mut relation_tables);
 
     if configuration.planet_scale_mode() {
         for table in &mut schema.tables {
@@ -102,13 +101,13 @@ fn calculate_model_tables<'a>(
             foreign_keys: Vec::new(),
         };
 
-        push_inline_relations(model, &mut table);
+        push_inline_relations(model, &mut table, flavour);
 
         table
     })
 }
 
-fn push_inline_relations(model: ModelWalker<'_>, table: &mut sql::Table) {
+fn push_inline_relations(model: ModelWalker<'_>, table: &mut sql::Table, flavour: &dyn SqlFlavour) {
     let relation_fields = model
         .relation_fields()
         .filter(|relation_field| !relation_field.is_virtual());
@@ -128,20 +127,12 @@ fn push_inline_relations(model: ModelWalker<'_>, table: &mut sql::Table) {
                 columns: fk_columns,
                 referenced_table: relation_field.referenced_model().database_name().to_owned(),
                 referenced_columns: relation_field.referenced_columns().map(String::from).collect(),
-                on_update_action: sql::ForeignKeyAction::Cascade,
-                on_delete_action: calculate_on_delete_action(relation_field),
+                on_update_action: flavour.on_update_action(&relation_field),
+                on_delete_action: flavour.on_delete_action(&relation_field),
             };
 
             table.foreign_keys.push(fk);
         }
-    }
-}
-
-fn calculate_on_delete_action(relation_field: RelationFieldWalker<'_>) -> ForeignKeyAction {
-    if relation_field.scalar_arities().any(|ar| ar.is_required()) {
-        sql::ForeignKeyAction::Cascade
-    } else {
-        sql::ForeignKeyAction::SetNull
     }
 }
 

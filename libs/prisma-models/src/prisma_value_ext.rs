@@ -51,7 +51,7 @@ impl PrismaValueExtensions for PrismaValue {
             // Lists
             (PrismaValue::List(list), typ) => PrismaValue::List(
                 list.into_iter()
-                    .map(|val| val.coerce(&typ))
+                    .map(|val| val.coerce(typ))
                     .collect::<crate::Result<Vec<_>>>()?,
             ),
 

@@ -2,6 +2,7 @@ pub use super::TestResult;
 pub use test_setup::{BitFlags, Capabilities, Tags};
 
 use crate::{BarrelMigrationExecutor, Result};
+use datamodel::common::preview_features::PreviewFeature;
 use datamodel::{Configuration, Datamodel};
 use introspection_connector::{DatabaseMetadata, IntrospectionConnector, Version};
 use introspection_core::rpc::RpcImpl;
@@ -26,12 +27,20 @@ impl TestApi {
         let tags = args.tags();
         let connection_string = args.database_url();
 
+        let preview_features = args
+            .preview_features()
+            .iter()
+            .flat_map(|f| PreviewFeature::parse_opt(f))
+            .collect();
+
         let (database, connection_string): (Quaint, String) = if tags.intersects(Tags::Vitess) {
-            let me = SqlMigrationConnector::new(&connection_string, None).await.unwrap();
+            let me = SqlMigrationConnector::new(connection_string, preview_features, None)
+                .await
+                .unwrap();
             me.reset().await.unwrap();
 
             (
-                Quaint::new(&connection_string).await.unwrap(),
+                Quaint::new(connection_string).await.unwrap(),
                 connection_string.to_owned(),
             )
         } else if tags.contains(Tags::Mysql) {
@@ -51,7 +60,9 @@ impl TestApi {
             unreachable!()
         };
 
-        let api = SqlIntrospectionConnector::new(&connection_string).await.unwrap();
+        let api = SqlIntrospectionConnector::new(&connection_string, preview_features)
+            .await
+            .unwrap();
 
         TestApi {
             api,
@@ -83,6 +94,10 @@ impl TestApi {
 
     pub fn is_cockroach(&self) -> bool {
         self.tags().contains(Tags::Cockroach)
+    }
+
+    pub fn is_mysql8(&self) -> bool {
+        self.tags().contains(Tags::Mysql8)
     }
 
     #[tracing::instrument(skip(self, data_model_string))]
@@ -184,6 +199,7 @@ impl TestApi {
         let parsed_expected = datamodel::parse_datamodel(&self.dm_with_sources(expected_without_header))
             .unwrap()
             .subject;
+
         let parsed_result = datamodel::parse_datamodel(result_with_header).unwrap().subject;
 
         let reformatted_expected =

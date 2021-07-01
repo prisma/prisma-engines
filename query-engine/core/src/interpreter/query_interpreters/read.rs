@@ -1,16 +1,16 @@
 use super::*;
 use crate::{interpreter::InterpretationResult, query_ast::*, result_ast::*};
-use connector::{self, ConnectionLike, QueryArguments, ReadOperations, RelAggregationRow, RelAggregationSelection};
+use connector::{self, ConnectionLike, QueryArguments, RelAggregationRow, RelAggregationSelection};
 use futures::future::{BoxFuture, FutureExt};
 use inmemory_record_processor::InMemoryRecordProcessor;
 use prisma_models::ManyRecords;
 use std::collections::HashMap;
 
-pub fn execute<'a, 'b>(
-    tx: &'a ConnectionLike<'a, 'b>,
+pub fn execute<'conn>(
+    tx: &'conn mut dyn ConnectionLike,
     query: ReadQuery,
-    parent_result: Option<&'a ManyRecords>,
-) -> BoxFuture<'a, InterpretationResult<QueryResult>> {
+    parent_result: Option<&'conn ManyRecords>,
+) -> BoxFuture<'conn, InterpretationResult<QueryResult>> {
     let fut = async move {
         match query {
             ReadQuery::RecordQuery(q) => read_one(tx, q).await,
@@ -24,10 +24,7 @@ pub fn execute<'a, 'b>(
 }
 
 /// Queries a single record.
-fn read_one<'conn, 'tx>(
-    tx: &'conn ConnectionLike<'conn, 'tx>,
-    query: RecordQuery,
-) -> BoxFuture<'conn, InterpretationResult<QueryResult>> {
+fn read_one(tx: &mut dyn ConnectionLike, query: RecordQuery) -> BoxFuture<'_, InterpretationResult<QueryResult>> {
     let fut = async move {
         let model = query.model;
         let model_id = model.primary_identifier();
@@ -76,10 +73,10 @@ fn read_one<'conn, 'tx>(
 ///    We need to select IDs / uniques alongside the distincts, which doesn't work in SQL, as all records
 ///    are distinct by definition if a unique is in the selection set.
 /// -> Unstable cursors can't reliably be fetched by the underlying datasource, so we need to process part of it in-memory.
-fn read_many<'a, 'b>(
-    tx: &'a ConnectionLike<'a, 'b>,
+fn read_many(
+    tx: &mut dyn ConnectionLike,
     mut query: ManyRecordsQuery,
-) -> BoxFuture<'a, InterpretationResult<QueryResult>> {
+) -> BoxFuture<'_, InterpretationResult<QueryResult>> {
     let fut = async move {
         let (scalars, aggregation_rows) = if query.args.requires_inmemory_processing() {
             let processor = InMemoryRecordProcessor::new_from_query_args(&mut query.args);
@@ -129,11 +126,11 @@ fn read_many<'a, 'b>(
 }
 
 /// Queries related records for a set of parent IDs.
-fn read_related<'a, 'b>(
-    tx: &'a ConnectionLike<'a, 'b>,
+fn read_related<'conn>(
+    tx: &'conn mut dyn ConnectionLike,
     mut query: RelatedRecordsQuery,
-    parent_result: Option<&'a ManyRecords>,
-) -> BoxFuture<'a, InterpretationResult<QueryResult>> {
+    parent_result: Option<&'conn ManyRecords>,
+) -> BoxFuture<'conn, InterpretationResult<QueryResult>> {
     let fut = async move {
         let relation = query.parent_field.relation();
         let is_m2m = relation.is_many_to_many();
@@ -174,10 +171,7 @@ fn read_related<'a, 'b>(
     fut.boxed()
 }
 
-async fn aggregate<'a, 'b>(
-    tx: &'a ConnectionLike<'a, 'b>,
-    query: AggregateRecordsQuery,
-) -> InterpretationResult<QueryResult> {
+async fn aggregate(tx: &mut dyn ConnectionLike, query: AggregateRecordsQuery) -> InterpretationResult<QueryResult> {
     let selection_order = query.selection_order;
 
     let results = tx
@@ -190,11 +184,11 @@ async fn aggregate<'a, 'b>(
     }))
 }
 
-fn process_nested<'a, 'b>(
-    tx: &'a ConnectionLike<'a, 'b>,
+fn process_nested<'conn>(
+    tx: &'conn mut dyn ConnectionLike,
     nested: Vec<ReadQuery>,
-    parent_result: Option<&'a ManyRecords>,
-) -> BoxFuture<'a, InterpretationResult<Vec<QueryResult>>> {
+    parent_result: Option<&'conn ManyRecords>,
+) -> BoxFuture<'conn, InterpretationResult<Vec<QueryResult>>> {
     let fut = async move {
         let results = if matches!(parent_result, Some(parent_records) if parent_records.records.is_empty()) {
             //this catches most cases where there is no parent to cause a nested query. but sometimes even with parent records,

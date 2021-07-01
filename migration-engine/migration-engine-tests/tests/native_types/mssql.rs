@@ -1918,7 +1918,7 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
 
             api.schema_push(&dm1).send_sync().assert_green_bang();
 
-            let insert = Insert::single_into((api.connection_info().schema_name(), "A")).value("x", seed.clone());
+            let insert = Insert::single_into((api.schema_name(), "A")).value("x", seed.clone());
             api.query(insert.into());
 
             api.assert_schema().assert_table("A", |table| {
@@ -1953,7 +1953,7 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
                 })
             });
 
-            api.raw_cmd(&format!("DROP TABLE [{}].[A]", api.connection_info().schema_name()));
+            api.raw_cmd(&format!("DROP TABLE [{}].[A]", api.schema_name()));
         }
     }
 }
@@ -1982,7 +1982,7 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
 
             api.schema_push(&dm1).send_sync().assert_green_bang();
 
-            let insert = Insert::single_into((api.connection_info().schema_name(), "A")).value("x", seed.clone());
+            let insert = Insert::single_into((api.schema_name(), "A")).value("x", seed.clone());
             api.query(insert.into());
 
             api.assert_schema().assert_table("A", |table| {
@@ -2023,7 +2023,7 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
                 })
             });
 
-            api.raw_cmd(&format!("DROP TABLE [{}].[A]", api.connection_info().schema_name()));
+            api.raw_cmd(&format!("DROP TABLE [{}].[A]", api.schema_name()));
         }
     }
 }
@@ -2055,7 +2055,7 @@ fn not_castable_with_existing_data_should_warn(api: TestApi) {
 
             api.schema_push(&dm1).send_sync().assert_green_bang();
 
-            let insert = Insert::single_into((api.connection_info().schema_name(), "A")).value("x", seed.clone());
+            let insert = Insert::single_into((api.schema_name(), "A")).value("x", seed.clone());
             api.query(insert.into());
 
             api.assert_schema().assert_table("A", |table| {
@@ -2092,7 +2092,7 @@ fn not_castable_with_existing_data_should_warn(api: TestApi) {
                 })
             });
 
-            api.raw_cmd(&format!("DROP TABLE [{}].[A]", api.connection_info().schema_name()));
+            api.raw_cmd(&format!("DROP TABLE [{}].[A]", api.schema_name()));
         }
     }
 }

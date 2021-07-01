@@ -1,3 +1,4 @@
+use crate::UserFacingError;
 use serde::Serialize;
 use std::fmt::Display;
 use user_facing_error_macros::*;
@@ -59,32 +60,63 @@ pub struct DatabaseTimeout {
     pub context: String,
 }
 
-#[derive(Debug, UserFacingError, Serialize)]
+#[derive(Debug, Serialize)]
 #[serde(untagged)]
-#[user_facing(code = "P1003")]
 pub enum DatabaseDoesNotExist {
-    #[user_facing(message = "Database {database_file_name} does not exist at {database_file_path}")]
     Sqlite {
         database_file_name: String,
         database_file_path: String,
     },
-    #[user_facing(
-        message = "Database `{database_name}.{database_schema_name}` does not exist on the database server at `{database_host}:{database_port}`."
-    )]
     Postgres {
         database_name: String,
         database_schema_name: String,
         database_host: String,
         database_port: u16,
     },
-    #[user_facing(
-        message = "Database `{database_name}` does not exist on the database server at `{database_host}:{database_port}`."
-    )]
     Mysql {
         database_name: String,
         database_host: String,
         database_port: u16,
     },
+}
+
+impl UserFacingError for DatabaseDoesNotExist {
+    const ERROR_CODE: &'static str = "P1003";
+
+    fn message(&self) -> String {
+        match self {
+            DatabaseDoesNotExist::Sqlite {
+                database_file_name,
+                database_file_path,
+            } => format!(
+                "Database {database_file_name} does not exist at {database_file_path}",
+                database_file_name = database_file_name,
+                database_file_path = database_file_path
+            ),
+            DatabaseDoesNotExist::Postgres {
+                database_name,
+                database_schema_name,
+                database_host,
+                database_port,
+            } => format!(
+                "Database `{database_name}.{database_schema_name}` does not exist on the database server at `{database_host}:{database_port}`.",
+                database_name = database_name,
+                database_schema_name = database_schema_name,
+                database_host = database_host,
+                database_port = database_port,
+            ),
+            DatabaseDoesNotExist::Mysql {
+                database_name,
+                database_host,
+                database_port,
+            } => format!(
+                "Database `{database_name}` does not exist on the database server at `{database_host}:{database_port}`.",
+                database_name = database_name,
+                database_host = database_host,
+                database_port = database_port,
+            ),
+        }
+    }
 }
 
 #[derive(Debug, UserFacingError, Serialize)]
@@ -142,7 +174,7 @@ pub struct SchemaParserError {
 
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(code = "P1013", message = "The provided database string is invalid. {details}")]
-pub struct InvalidDatabaseString {
+pub struct InvalidConnectionString {
     pub details: String,
 }
 

@@ -61,10 +61,12 @@ impl Rpc for RpcImpl {
 
 impl RpcImpl {
     async fn load_connector(schema: &str) -> Result<(Configuration, String, Box<dyn IntrospectionConnector>), Error> {
-        let config = datamodel::parse_configuration(&schema)
+        let config = datamodel::parse_configuration(schema)
             .map_err(|diagnostics| Error::DatamodelError(diagnostics.to_pretty_string("schema.prisma", schema)))?;
 
-        let url = config
+        let preview_features = config.subject.preview_features().map(Clone::clone).collect();
+
+        let connection_string = config
             .subject
             .datasources
             .first()
@@ -74,8 +76,8 @@ impl RpcImpl {
 
         Ok((
             config.subject,
-            url.clone(),
-            Box::new(SqlIntrospectionConnector::new(&url).await?),
+            connection_string.clone(),
+            Box::new(SqlIntrospectionConnector::new(&connection_string, preview_features).await?),
         ))
     }
 
@@ -118,9 +120,9 @@ impl RpcImpl {
 
     /// This function parses the provided schema and returns the contained Datamodel.
     pub fn parse_datamodel(schema: &str) -> RpcResult<Datamodel> {
-        let final_dm = datamodel::parse_datamodel(&schema)
+        let final_dm = datamodel::parse_datamodel(schema)
             .map(|d| d.subject)
-            .map_err(|err| Error::DatamodelError(err.to_pretty_string("schema.prisma", &schema)))?;
+            .map_err(|err| Error::DatamodelError(err.to_pretty_string("schema.prisma", schema)))?;
 
         Ok(final_dm)
     }

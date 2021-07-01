@@ -2,16 +2,6 @@
 #![allow(clippy::trivial_regex)] // this is allowed, because we want to do CoW replaces and these regexes will grow.
 #![allow(clippy::match_bool)] // we respectfully disagree that it makes the code less readable.
 
-pub use error::{DescriberError, DescriberErrorKind, DescriberResult};
-
-use once_cell::sync::Lazy;
-use prisma_value::PrismaValue;
-use regex::Regex;
-use serde::{Deserialize, Serialize};
-use std::fmt::Debug;
-use walkers::{EnumWalker, TableWalker, UserDefinedTypeWalker, ViewWalker};
-
-pub mod getters;
 pub mod mssql;
 pub mod mysql;
 pub mod postgres;
@@ -20,11 +10,23 @@ pub mod walkers;
 
 pub(crate) mod common;
 mod error;
+mod getters;
+mod ids;
 mod parsers;
+
+use once_cell::sync::Lazy;
+use prisma_value::PrismaValue;
+use regex::Regex;
+use serde::{Deserialize, Serialize};
+use std::fmt::Debug;
+use walkers::{EnumWalker, TableWalker, UserDefinedTypeWalker, ViewWalker};
+
+pub use error::{DescriberError, DescriberErrorKind, DescriberResult};
+pub use ids::{ColumnId, TableId};
 
 /// A database description connector.
 #[async_trait::async_trait]
-pub trait SqlSchemaDescriberBackend: Send + Sync + 'static {
+pub trait SqlSchemaDescriberBackend: Send + Sync {
     /// List the database's schemas.
     async fn list_databases(&self) -> DescriberResult<Vec<String>>;
 
@@ -101,6 +103,13 @@ impl SqlSchema {
         )
     }
 
+    pub fn iter_tables(&self) -> impl Iterator<Item = (TableId, &Table)> {
+        self.tables
+            .iter()
+            .enumerate()
+            .map(|(table_index, table)| (TableId(table_index as u32), table))
+    }
+
     pub fn table(&self, name: &str) -> core::result::Result<&Table, String> {
         match self.tables.iter().find(|t| t.name == name) {
             Some(t) => Ok(t),
@@ -109,7 +118,7 @@ impl SqlSchema {
     }
 
     pub fn table_bang(&self, name: &str) -> &Table {
-        self.table(&name).unwrap()
+        self.table(name).unwrap()
     }
 
     /// Get a sequence.
@@ -122,7 +131,7 @@ impl SqlSchema {
     }
 
     pub fn table_walkers(&self) -> impl Iterator<Item = TableWalker<'_>> {
-        (0..self.tables.len()).map(move |table_index| TableWalker::new(self, table_index))
+        (0..self.tables.len()).map(move |table_index| TableWalker::new(self, TableId(table_index as u32)))
     }
 
     pub fn view_walkers(&self) -> impl Iterator<Item = ViewWalker<'_>> {

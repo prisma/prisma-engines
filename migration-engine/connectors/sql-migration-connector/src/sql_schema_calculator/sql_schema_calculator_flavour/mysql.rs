@@ -13,7 +13,7 @@ impl SqlSchemaCalculatorFlavour for MysqlFlavour {
         // each enum is used at least once).
         let mut enums = Vec::with_capacity(datamodel.enums().len());
 
-        let enum_fields = walk_scalar_fields(&datamodel)
+        let enum_fields = walk_scalar_fields(datamodel)
             .filter_map(|field| field.field_type().as_enum().map(|enum_walker| (field, enum_walker)));
 
         for (field, enum_tpe) in enum_fields {
@@ -33,7 +33,7 @@ impl SqlSchemaCalculatorFlavour for MysqlFlavour {
     }
 
     fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> serde_json::Value {
-        sql_datamodel_connector::SqlDatamodelConnectors::mysql().default_native_type_for_scalar_type(scalar_type)
+        sql_datamodel_connector::SqlDatamodelConnectors::mysql(false).default_native_type_for_scalar_type(scalar_type)
     }
 
     fn enum_column_type(&self, field: &ScalarFieldWalker<'_>, _db_name: &str) -> sql::ColumnType {

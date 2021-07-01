@@ -95,7 +95,7 @@ async fn native_type_columns_feature_on(api: &TestApi) -> TestResult {
     println!("EXPECTATION: \n {:#}", types);
     println!("RESULT: \n {:#}", result);
 
-    api.assert_eq_datamodels(&types, &result);
+    api.assert_eq_datamodels(types, &result);
 
     Ok(())
 }

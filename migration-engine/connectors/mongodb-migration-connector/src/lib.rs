@@ -121,7 +121,7 @@ impl MigrationConnector for MongoDbMigrationConnector {
 
     async fn validate_migrations(
         &self,
-        _migrations: &[migration_connector::MigrationDirectory],
+        _migrations: &[migration_connector::migrations_directory::MigrationDirectory],
     ) -> migration_connector::ConnectorResult<()> {
         Ok(())
     }

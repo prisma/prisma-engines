@@ -4,23 +4,28 @@ use crate::{
     ColumnTypeFamily, DefaultValue, DescriberResult, ForeignKey, ForeignKeyAction, Index, IndexType, Lazy, PrimaryKey,
     PrismaValue, Regex, SqlMetadata, SqlSchema, SqlSchemaDescriberBackend, Table, View,
 };
-use quaint::{ast::Value, prelude::Queryable, single::Quaint};
-use std::{borrow::Cow, collections::HashMap, convert::TryInto};
+use quaint::{ast::Value, prelude::Queryable};
+use std::{any::type_name, borrow::Cow, collections::HashMap, convert::TryInto, fmt::Debug};
 use tracing::trace;
 
-#[derive(Debug)]
-pub struct SqlSchemaDescriber {
-    conn: Quaint,
+pub struct SqlSchemaDescriber<'a> {
+    conn: &'a dyn Queryable,
+}
+
+impl Debug for SqlSchemaDescriber<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct(type_name::<SqlSchemaDescriber>()).finish()
+    }
 }
 
 #[async_trait::async_trait]
-impl SqlSchemaDescriberBackend for SqlSchemaDescriber {
+impl SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
     async fn list_databases(&self) -> DescriberResult<Vec<String>> {
         Ok(self.get_databases().await?)
     }
 
     async fn get_metadata(&self, schema: &str) -> DescriberResult<SqlMetadata> {
-        let table_count = self.get_table_names(&schema).await?.len();
+        let table_count = self.get_table_names(schema).await?.len();
         let size_in_bytes = self.get_size().await?;
 
         Ok(SqlMetadata {
@@ -35,7 +40,7 @@ impl SqlSchemaDescriberBackend for SqlSchemaDescriber {
 
         let mut tables = Vec::with_capacity(table_names.len());
 
-        for table_name in table_names.iter().filter(|table| !is_system_table(&table)) {
+        for table_name in table_names.iter().filter(|table| !is_system_table(table)) {
             tables.push(self.get_table(schema, table_name).await?)
         }
 
@@ -80,11 +85,11 @@ impl SqlSchemaDescriberBackend for SqlSchemaDescriber {
     }
 }
 
-impl Parser for SqlSchemaDescriber {}
+impl Parser for SqlSchemaDescriber<'_> {}
 
-impl SqlSchemaDescriber {
+impl<'a> SqlSchemaDescriber<'a> {
     /// Constructor.
-    pub fn new(conn: Quaint) -> SqlSchemaDescriber {
+    pub fn new(conn: &'a dyn Queryable) -> SqlSchemaDescriber<'a> {
         SqlSchemaDescriber { conn }
     }
 
@@ -111,7 +116,7 @@ impl SqlSchemaDescriber {
         let sql = r#"SELECT name FROM sqlite_master WHERE type='table' ORDER BY name ASC"#;
         trace!("describing table names with query: '{}'", sql);
 
-        let result_set = self.conn.query_raw(&sql, &[]).await?;
+        let result_set = self.conn.query_raw(sql, &[]).await?;
 
         let names = result_set
             .into_iter()
@@ -127,7 +132,7 @@ impl SqlSchemaDescriber {
     #[tracing::instrument]
     async fn get_size(&self) -> DescriberResult<usize> {
         let sql = r#"SELECT page_count * page_size as size FROM pragma_page_count(), pragma_page_size();"#;
-        let result = self.conn.query_raw(&sql, &[]).await?;
+        let result = self.conn.query_raw(sql, &[]).await?;
         let size: i64 = result
             .first()
             .map(|row| row.get("size").and_then(|x| x.as_i64()).unwrap_or(0))

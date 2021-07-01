@@ -1,8 +1,10 @@
 use super::super::attributes::AllAttributes;
+use crate::common::preview_features::PreviewFeature;
 use crate::{
     ast::{self, Attribute, Span},
     dml, Datasource,
 };
+use enumflags2::BitFlags;
 
 pub struct LowerDmlToAst<'a> {
     attributes: AllAttributes,
@@ -11,9 +13,9 @@ pub struct LowerDmlToAst<'a> {
 
 impl<'a> LowerDmlToAst<'a> {
     /// Creates a new instance, with all builtin attributes registered.
-    pub fn new(datasource: Option<&'a Datasource>) -> Self {
+    pub fn new(datasource: Option<&'a Datasource>, preview_features: BitFlags<PreviewFeature>) -> Self {
         Self {
-            attributes: AllAttributes::new(),
+            attributes: AllAttributes::new(preview_features),
             datasource,
         }
     }
@@ -72,6 +74,7 @@ impl<'a> LowerDmlToAst<'a> {
 
     pub fn lower_field(&self, field: &dml::Field, datamodel: &dml::Datamodel) -> ast::Field {
         let mut attributes = self.attributes.field.serialize(field, datamodel);
+
         if let (Some((scalar_type, native_type)), Some(datasource)) = (
             field.as_scalar_field().and_then(|sf| sf.field_type.as_native_type()),
             self.datasource,
@@ -80,7 +83,7 @@ impl<'a> LowerDmlToAst<'a> {
         }
 
         ast::Field {
-            name: ast::Identifier::new(&field.name()),
+            name: ast::Identifier::new(field.name()),
             arity: self.lower_field_arity(field.arity()),
             attributes,
             field_type: self.lower_type(&field.field_type()),
@@ -102,15 +105,12 @@ impl<'a> LowerDmlToAst<'a> {
     /// Internal: Lowers a field's type.
     fn lower_type(&self, field_type: &dml::FieldType) -> ast::FieldType {
         match field_type {
-            dml::FieldType::Base(tpe, custom_type_name) => ast::FieldType::Supported(ast::Identifier::new(
-                &custom_type_name.as_ref().unwrap_or(&tpe.to_string()),
+            dml::FieldType::Scalar(tpe, custom_type_name, _) => ast::FieldType::Supported(ast::Identifier::new(
+                custom_type_name.as_ref().unwrap_or(&tpe.to_string()),
             )),
-            dml::FieldType::Enum(tpe) => ast::FieldType::Supported(ast::Identifier::new(&tpe)),
+            dml::FieldType::Enum(tpe) => ast::FieldType::Supported(ast::Identifier::new(tpe)),
             dml::FieldType::Unsupported(tpe) => ast::FieldType::Unsupported(tpe.clone(), Span::empty()),
             dml::FieldType::Relation(rel) => ast::FieldType::Supported(ast::Identifier::new(&rel.to)),
-            dml::FieldType::NativeType(prisma_tpe, _native_tpe) => {
-                ast::FieldType::Supported(ast::Identifier::new(&prisma_tpe.to_string()))
-            }
         }
     }
 

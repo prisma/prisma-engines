@@ -1,8 +1,11 @@
 use super::*;
-use crate::default_value::{DefaultValue, ValueGenerator};
 use crate::native_type_instance::NativeTypeInstance;
 use crate::scalars::ScalarType;
 use crate::traits::{Ignorable, WithDatabaseName, WithName};
+use crate::{
+    default_value::{DefaultValue, ValueGenerator},
+    relation_info::ReferentialAction,
+};
 use std::hash::Hash;
 
 /// Arity of a Field in a Model.
@@ -27,8 +30,6 @@ impl FieldArity {
     }
 }
 
-// TODO: when progressing with the native types implementation we should consider merging the variants `NativeType` and `Base`
-//Agreed
 /// Datamodel field type.
 #[derive(Debug, PartialEq, Clone)]
 pub enum FieldType {
@@ -36,32 +37,30 @@ pub enum FieldType {
     Enum(String),
     /// This is a relation field.
     Relation(RelationInfo),
-    /// native field type.
-    NativeType(ScalarType, NativeTypeInstance),
     /// This is a field with an unsupported datatype. The content is the db's description of the type, it should enable migrate to create the type.
     Unsupported(String),
-    /// The option is Some(x) if the scalar type is based upon a type alias.
-    Base(ScalarType, Option<String>),
+    /// The first option is Some(x) if the scalar type is based upon a type alias.
+    Scalar(ScalarType, Option<String>, Option<NativeTypeInstance>),
 }
 
 impl FieldType {
-    pub fn as_base(&self) -> Option<&ScalarType> {
+    pub fn as_scalar(&self) -> Option<&ScalarType> {
         match self {
-            FieldType::Base(scalar_type, _) => Some(scalar_type),
+            FieldType::Scalar(scalar_type, _, _) => Some(scalar_type),
             _ => None,
         }
     }
 
     pub fn as_native_type(&self) -> Option<(&ScalarType, &NativeTypeInstance)> {
         match self {
-            FieldType::NativeType(a, b) => Some((a, b)),
+            FieldType::Scalar(a, _, Some(b)) => Some((a, b)),
             _ => None,
         }
     }
 
     pub fn is_compatible_with(&self, other: &FieldType) -> bool {
         match (self, other) {
-            (Self::Base(a, _), Self::Base(b, _)) => a == b, // the name of the type alias is not important for the comparison
+            (Self::Scalar(a, _, nta), Self::Scalar(b, _, ntb)) => a == b && nta == ntb, // the name of the type alias is not important for the comparison
             (a, b) => a == b,
         }
     }
@@ -74,17 +73,20 @@ impl FieldType {
         self.scalar_type().map(|st| st.is_string()).unwrap_or(false)
     }
 
+    pub fn is_enum(&self, name: &str) -> bool {
+        matches!(self, Self::Enum(this) if this == name)
+    }
+
     pub fn scalar_type(&self) -> Option<ScalarType> {
         match self {
-            FieldType::NativeType(st, _) => Some(*st),
-            FieldType::Base(st, _) => Some(*st),
+            FieldType::Scalar(st, _, _) => Some(*st),
             _ => None,
         }
     }
 
     pub fn native_type(&self) -> Option<&NativeTypeInstance> {
         match self {
-            FieldType::NativeType(_, nt) => Some(nt),
+            FieldType::Scalar(_, _, Some(nt)) => Some(nt),
             _ => None,
         }
     }
@@ -101,6 +103,13 @@ impl Field {
     pub fn as_relation_field(&self) -> Option<&RelationField> {
         match self {
             Field::RelationField(sf) => Some(sf),
+            _ => None,
+        }
+    }
+
+    pub fn as_relation_field_mut(&mut self) -> Option<&mut RelationField> {
+        match self {
+            Field::RelationField(ref mut rf) => Some(rf),
             _ => None,
         }
     }
@@ -230,7 +239,7 @@ impl WithDatabaseName for Field {
 }
 
 /// Represents a relation field in a model.
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, Clone)]
 pub struct RelationField {
     /// Name of the field.
     pub name: String,
@@ -240,6 +249,9 @@ pub struct RelationField {
 
     /// The field's arity.
     pub arity: FieldArity,
+
+    /// The arity of underlying fields for referential actions.
+    pub referential_arity: FieldArity,
 
     /// Comments associated with this field.
     pub documentation: Option<String>,
@@ -252,21 +264,81 @@ pub struct RelationField {
 
     /// Indicates if this field has to be ignored by the Client.
     pub is_ignored: bool,
+
+    /// Is `ON DELETE/UPDATE RESTRICT` allowed.
+    pub supports_restrict_action: Option<bool>,
+
+    /// Do we run the referential actions in the core instead of the database.
+    pub emulates_referential_actions: Option<bool>,
+}
+
+impl PartialEq for RelationField {
+    //ignores the relation name for reintrospection
+    fn eq(&self, other: &Self) -> bool {
+        let this_matches = self.name == other.name
+            && self.arity == other.arity
+            && self.referential_arity == other.referential_arity
+            && self.documentation == other.documentation
+            && self.is_generated == other.is_generated
+            && self.is_commented_out == other.is_commented_out
+            && self.is_ignored == other.is_ignored
+            && self.relation_info == other.relation_info;
+
+        let this_on_delete = self
+            .relation_info
+            .on_delete
+            .unwrap_or_else(|| self.default_on_delete_action());
+
+        let other_on_delete = other
+            .relation_info
+            .on_delete
+            .unwrap_or_else(|| other.default_on_delete_action());
+
+        let on_delete_matches = this_on_delete == other_on_delete;
+
+        let this_on_update = self
+            .relation_info
+            .on_update
+            .unwrap_or_else(|| self.default_on_update_action());
+
+        let other_on_update = other
+            .relation_info
+            .on_update
+            .unwrap_or_else(|| other.default_on_update_action());
+
+        let on_update_matches = this_on_update == other_on_update;
+
+        this_matches && on_delete_matches && on_update_matches
+    }
 }
 
 impl RelationField {
     /// Creates a new field with the given name and type.
-    pub fn new(name: &str, arity: FieldArity, relation_info: RelationInfo) -> Self {
+    pub fn new(name: &str, arity: FieldArity, referential_arity: FieldArity, relation_info: RelationInfo) -> Self {
         RelationField {
             name: String::from(name),
             arity,
+            referential_arity,
             relation_info,
             documentation: None,
             is_generated: false,
             is_commented_out: false,
             is_ignored: false,
+            supports_restrict_action: None,
+            emulates_referential_actions: None,
         }
     }
+
+    /// The default `onDelete` can be `Restrict`.
+    pub fn supports_restrict_action(&mut self, value: bool) {
+        self.supports_restrict_action = Some(value);
+    }
+
+    /// The referential actions should be handled by the core.
+    pub fn emulates_referential_actions(&mut self, value: bool) {
+        self.emulates_referential_actions = Some(value);
+    }
+
     /// Creates a new field with the given name and type, marked as generated and optional.
     pub fn new_generated(name: &str, info: RelationInfo, required: bool) -> Self {
         let arity = if required {
@@ -275,7 +347,7 @@ impl RelationField {
             FieldArity::Optional
         };
 
-        let mut field = Self::new(name, arity, info);
+        let mut field = Self::new(name, arity, arity, info);
         field.is_generated = true;
 
         field
@@ -299,6 +371,26 @@ impl RelationField {
 
     pub fn is_optional(&self) -> bool {
         self.arity.is_optional()
+    }
+
+    pub fn default_on_delete_action(&self) -> ReferentialAction {
+        use ReferentialAction::*;
+
+        match self.referential_arity {
+            FieldArity::Required if self.supports_restrict_action.unwrap_or(true) => Restrict,
+            FieldArity::Required => NoAction,
+            _ => SetNull,
+        }
+    }
+
+    pub fn default_on_update_action(&self) -> ReferentialAction {
+        use ReferentialAction::*;
+
+        match self.referential_arity {
+            _ if !self.emulates_referential_actions.unwrap_or(false) => Cascade,
+            FieldArity::Required => Restrict,
+            _ => SetNull,
+        }
     }
 }
 

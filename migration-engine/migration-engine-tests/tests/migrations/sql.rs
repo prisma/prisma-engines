@@ -132,6 +132,26 @@ fn relations_to_models_with_no_pk_and_a_single_unique_required_field_work(api: T
         });
 }
 
+// TODO: Enable SQL Server when cascading rules are in PSL.
+#[test_connector(exclude(Mssql))]
+fn reserved_sql_key_words_must_work(api: TestApi) {
+    // Group is a reserved keyword
+    let dm = r#"
+        model Group {
+            id          String  @id @default(cuid())
+            parent_id   String?
+            parent      Group? @relation(name: "ChildGroups", fields: [parent_id], references: id)
+            childGroups Group[] @relation(name: "ChildGroups")
+        }
+    "#;
+
+    api.schema_push(dm).send_sync().assert_green_bang();
+
+    api.assert_schema().assert_table("Group", |table| {
+        table.assert_fk_on_columns(&["parent_id"], |fk| fk.assert_references("Group", &["id"]))
+    });
+}
+
 #[test_connector(capabilities(Enums))]
 fn enum_value_with_database_names_must_work(api: TestApi) {
     let dm = r##"

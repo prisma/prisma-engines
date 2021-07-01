@@ -42,7 +42,7 @@ export WORKSPACE_ROOT=/path/to/engines/repository/root
 
 Test run env vars:
 ```shell
-export TEST_RUNNER="direct" # Currently only `direct`, later `napi` and `binary` as well.
+export TEST_RUNNER="direct" # Currently only `direct`, later `node-api` and `binary` as well.
 export TEST_CONNECTOR="postgres" # One of the supported providers.
 export TEST_CONNECTOR_VERSION="10" # One of the supported versions.
 ```

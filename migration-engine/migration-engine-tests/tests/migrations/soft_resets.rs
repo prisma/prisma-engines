@@ -28,7 +28,7 @@ fn soft_resets_work_on_postgres(api: TestApi) {
             GRANT USAGE, CREATE ON SCHEMA "prisma-tests" TO softresetstestuser;
         "#;
 
-        api.raw_cmd(&create_user);
+        api.raw_cmd(create_user);
     }
 
     let test_user_connection_string = {

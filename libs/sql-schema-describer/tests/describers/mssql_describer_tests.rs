@@ -82,7 +82,7 @@ fn views_can_be_described(api: TestApi) {
 
     api.raw_cmd(&create_view);
 
-    let inspector = SqlSchemaDescriber::new(conn.clone());
+    let inspector = SqlSchemaDescriber::new(conn);
     let result = api.block_on(inspector.describe(db_name)).unwrap();
     let view = result.get_view("ab").expect("couldn't get ab view").to_owned();
 

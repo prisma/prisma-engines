@@ -2,7 +2,7 @@ use barrel::types;
 use indoc::formatdoc;
 use indoc::indoc;
 use introspection_engine_tests::{assert_eq_json, test_api::*};
-use quaint::prelude::Queryable;
+use quaint::prelude::{Queryable, SqlFamily};
 use serde_json::json;
 use test_macros::test_connector;
 
@@ -40,7 +40,7 @@ async fn mapped_model_name(api: &TestApi) -> TestResult {
         }
     "#};
 
-    api.assert_eq_datamodels(&final_dm, &api.re_introspect(input_dm).await?);
+    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
 
     let expected = json!([{
         "code": 7,
@@ -136,7 +136,7 @@ async fn mapped_model_and_field_name(api: &TestApi) -> TestResult {
             id               Int         @id @default(autoincrement())
             c_user_id        Int         @map("user_id")
             Custom_User      Custom_User @relation(fields: [c_user_id], references: [c_id])
-            {}
+            {extra_index}
         }}
 
         model Custom_User {{
@@ -146,7 +146,7 @@ async fn mapped_model_and_field_name(api: &TestApi) -> TestResult {
             @@map(name: "User")
         }}
     "#,
-        extra_index
+        extra_index = extra_index
     );
 
     let final_dm = format!(
@@ -155,7 +155,7 @@ async fn mapped_model_and_field_name(api: &TestApi) -> TestResult {
             id               Int         @id @default(autoincrement())
             c_user_id        Int         @map("user_id")
             Custom_User      Custom_User @relation(fields: [c_user_id], references: [c_id])
-            {}
+            {extra_index}
         }}
 
         model Custom_User {{
@@ -169,7 +169,7 @@ async fn mapped_model_and_field_name(api: &TestApi) -> TestResult {
             id               Int         @id @default(autoincrement())
         }}
     "#,
-        extra_index
+        extra_index = extra_index
     );
 
     api.assert_eq_datamodels(&final_dm, &api.re_introspect(&input_dm).await?);
@@ -820,11 +820,12 @@ async fn multiple_changed_relation_names(api: &TestApi) -> TestResult {
             eveningEmployeeId                             Int
             Employee_EmployeeToSchedule_eveningEmployeeId Employee    @relation("EmployeeToSchedule_eveningEmployeeId", fields: [eveningEmployeeId], references: [id])
             Employee_EmployeeToSchedule_morningEmployeeId Employee    @relation("EmployeeToSchedule_morningEmployeeId", fields: [morningEmployeeId], references: [id])
-            {}
-            {}
+            {idx1}
+            {idx2}
         }}
     "#,
-        idx1, idx2
+        idx1 = idx1,
+        idx2 = idx2,
     );
 
     let final_dm = format!(
@@ -841,15 +842,16 @@ async fn multiple_changed_relation_names(api: &TestApi) -> TestResult {
             eveningEmployeeId                             Int
             Employee_EmployeeToSchedule_eveningEmployeeId Employee    @relation("EmployeeToSchedule_eveningEmployeeId", fields: [eveningEmployeeId], references: [id])
             Employee_EmployeeToSchedule_morningEmployeeId Employee    @relation("EmployeeToSchedule_morningEmployeeId", fields: [morningEmployeeId], references: [id])
-            {}
-            {}
+            {idx1}
+            {idx2}
         }}
 
         model Unrelated {{
             id               Int @id @default(autoincrement())
         }}
     "#,
-        idx1, idx2
+        idx1 = idx1,
+        idx2 = idx2,
     );
 
     api.assert_eq_datamodels(&final_dm, &api.re_introspect(&input_dm).await?);
@@ -877,38 +879,37 @@ async fn custom_virtual_relation_field_names(api: &TestApi) -> TestResult {
         })
         .await?;
 
-    let input_dm = indoc! {r#"
-        model Post {
+    let input_dm = formatdoc! {r#"
+        model Post {{
             id               Int @id @default(autoincrement())
             user_id          Int  @unique
             custom_User      User @relation(fields: [user_id], references: [id])
-        }
+        }}
 
-        model User {
+        model User {{
             id               Int @id @default(autoincrement())
             custom_Post      Post?
-        }
+        }}
     "#};
 
-    let final_dm = indoc! {r#"
-        model Post {
+    let final_dm = formatdoc! {r#"
+        model Post {{
             id               Int @id @default(autoincrement())
             user_id          Int  @unique
             custom_User      User @relation(fields: [user_id], references: [id])
-        }
+        }}
 
-        model User {
+        model User {{
             id               Int @id @default(autoincrement())
             custom_Post      Post?
-        }
+        }}
 
-        model Unrelated {
+        model Unrelated {{
             id               Int @id @default(autoincrement())
-        }
-
+        }}
     "#};
 
-    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
+    api.assert_eq_datamodels(&final_dm, &api.re_introspect(&input_dm).await?);
 
     Ok(())
 }
@@ -1117,47 +1118,47 @@ async fn multiple_changed_relation_names_due_to_mapped_models(api: &TestApi) -> 
         })
         .await?;
 
-    let input_dm = indoc! {r#"
-        model Post {
+    let input_dm = formatdoc! {r#"
+        model Post {{
             id               Int @id @default(autoincrement())
             user_id          Int  @unique
             user_id2         Int  @unique
             custom_User      Custom_User @relation("CustomRelationName", fields: [user_id], references: [id])
             custom_User2     Custom_User @relation("AnotherCustomRelationName", fields: [user_id2], references: [id])
-        }
+        }}
 
-        model Custom_User {
+        model Custom_User {{
             id               Int @id @default(autoincrement())
             custom_Post      Post? @relation("CustomRelationName")
             custom_Post2     Post? @relation("AnotherCustomRelationName")
 
             @@map("User")
-        }
+        }}
     "#};
 
-    let final_dm = indoc! {r#"
-        model Post {
+    let final_dm = formatdoc! {r#"
+        model Post {{
             id               Int @id @default(autoincrement())
             user_id          Int  @unique
             user_id2         Int  @unique
             custom_User      Custom_User @relation("CustomRelationName", fields: [user_id], references: [id])
             custom_User2     Custom_User @relation("AnotherCustomRelationName", fields: [user_id2], references: [id])
-        }
+        }}
 
-        model Custom_User {
+        model Custom_User {{
             id               Int @id @default(autoincrement())
             custom_Post      Post? @relation("CustomRelationName")
             custom_Post2     Post? @relation("AnotherCustomRelationName")
 
             @@map("User")
-        }
+        }}
 
-        model Unrelated {
+        model Unrelated {{
             id               Int @id @default(autoincrement())
-        }
+        }}
     "#};
 
-    api.assert_eq_datamodels(final_dm, &api.re_introspect(&input_dm).await?);
+    api.assert_eq_datamodels(&final_dm, &api.re_introspect(&input_dm).await?);
 
     Ok(())
 }
@@ -1442,7 +1443,7 @@ async fn multiple_many_to_many_on_same_model(api: &TestApi) -> TestResult {
         }
     "#};
 
-    api.assert_eq_datamodels(&final_dm, &api.re_introspect(&input_dm).await?);
+    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
 
     Ok(())
 }
@@ -1723,6 +1724,277 @@ async fn do_not_try_to_keep_custom_many_to_many_self_relation_names(api: &TestAp
     "#};
 
     api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
+
+    Ok(())
+}
+
+#[test_connector]
+async fn legacy_referential_actions(api: &TestApi) -> TestResult {
+    let family = api.sql_family();
+
+    api.barrel()
+        .execute(move |migration| {
+            migration.create_table("a", |t| {
+                t.add_column("id", types::primary());
+            });
+
+            migration.create_table("b", move |t| {
+                t.add_column("id", types::primary());
+                t.add_column("a_id", types::integer().nullable(false));
+
+                match family {
+                    SqlFamily::Mssql => {
+                        t.inject_custom(
+                            "CONSTRAINT asdf FOREIGN KEY (a_id) REFERENCES legacy_referential_actions.a(id) ON DELETE NO ACTION ON UPDATE NO ACTION",
+                        );
+                    }
+                    _ => {
+                        t.inject_custom(
+                            "CONSTRAINT asdf FOREIGN KEY (a_id) REFERENCES a(id) ON DELETE NO ACTION ON UPDATE NO ACTION",
+                        );
+                    }
+                }
+            });
+        })
+        .await?;
+
+    let extra_index = if api.sql_family().is_mysql() {
+        r#"@@index([a_id], name: "asdf")"#
+    } else {
+        ""
+    };
+
+    let input_dm = formatdoc! {r#"
+        model a {{
+            id Int @id @default(autoincrement())
+            bs b[] @relation("changed")
+        }}
+
+        model b {{
+            id Int @id @default(autoincrement())
+            a_id Int
+            a a @relation("changed", fields: [a_id], references: [id])
+            {}
+        }}
+    "#, extra_index};
+
+    api.assert_eq_datamodels(&input_dm, &api.re_introspect(&input_dm).await?);
+
+    Ok(())
+}
+
+#[test_connector]
+async fn referential_actions(api: &TestApi) -> TestResult {
+    let family = api.sql_family();
+
+    api.barrel()
+        .execute(move |migration| {
+            migration.create_table("a", |t| {
+                t.add_column("id", types::primary());
+            });
+
+            migration.create_table("b", move |t| {
+                t.add_column("id", types::primary());
+                t.add_column("a_id", types::integer().nullable(false));
+
+                match family {
+                    SqlFamily::Mssql => {
+                        t.inject_custom(
+                            "CONSTRAINT asdf FOREIGN KEY (a_id) REFERENCES referential_actions.a(id) ON DELETE CASCADE ON UPDATE NO ACTION",
+                        );
+                    }
+                    _ => {
+                        t.inject_custom(
+                            "CONSTRAINT asdf FOREIGN KEY (a_id) REFERENCES a(id) ON DELETE CASCADE ON UPDATE NO ACTION",
+                        );
+                    }
+                }
+            });
+        })
+        .await?;
+
+    let extra_index = if api.sql_family().is_mysql() {
+        r#"@@index([a_id], name: "asdf")"#
+    } else {
+        ""
+    };
+
+    let input_dm = formatdoc! {r#"
+        generator client {{
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialActions"]
+        }}
+
+        model a {{
+            id Int @id @default(autoincrement())
+            bs b[]
+        }}
+
+        model b {{
+            id Int @id @default(autoincrement())
+            a_id Int
+            a a @relation(fields: [a_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+            {}
+        }}
+    "#, extra_index};
+
+    api.assert_eq_datamodels(&input_dm, &api.re_introspect(&input_dm).await?);
+
+    Ok(())
+}
+
+#[test_connector(tags(Postgres, Mysql, Sqlite))]
+async fn default_referential_actions_with_restrict(api: &TestApi) -> TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("a", |t| {
+                t.add_column("id", types::primary());
+            });
+
+            migration.create_table("b", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("a_id", types::integer().nullable(false));
+                t.inject_custom(
+                    "CONSTRAINT asdf FOREIGN KEY (a_id) REFERENCES a(id) ON DELETE RESTRICT ON UPDATE CASCADE",
+                );
+            });
+        })
+        .await?;
+
+    let extra_index = if api.sql_family().is_mysql() {
+        r#"@@index([a_id], name: "asdf")"#
+    } else {
+        ""
+    };
+
+    let input_dm = formatdoc! {r#"
+        generator client {{
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialActions"]
+        }}
+
+        model a {{
+            id Int @id @default(autoincrement())
+            bs b[]
+        }}
+
+        model b {{
+            id Int @id @default(autoincrement())
+            a_id Int
+            a a @relation(fields: [a_id], references: [id])
+            {}
+        }}
+    "#, extra_index};
+
+    api.assert_eq_datamodels(&input_dm, &api.re_introspect(&input_dm).await?);
+
+    Ok(())
+}
+
+#[test_connector(tags(Mssql))]
+async fn default_referential_actions_without_restrict(api: &TestApi) -> TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("a", |t| {
+                t.add_column("id", types::primary());
+            });
+
+            migration.create_table("b", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("a_id", types::integer().nullable(false));
+                t.inject_custom(
+                    "CONSTRAINT asdf FOREIGN KEY (a_id) REFERENCES default_referential_actions_without_restrict.a(id) ON DELETE NO ACTION ON UPDATE CASCADE",
+                );
+            });
+        })
+        .await?;
+
+    let extra_index = if api.sql_family().is_mysql() {
+        r#"@@index([a_id], name: "asdf")"#
+    } else {
+        ""
+    };
+
+    let input_dm = formatdoc! {r#"
+        generator client {{
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialActions"]
+        }}
+
+        model a {{
+            id Int @id @default(autoincrement())
+            bs b[]
+        }}
+
+        model b {{
+            id Int @id @default(autoincrement())
+            a_id Int
+            a a @relation(fields: [a_id], references: [id])
+            {}
+        }}
+    "#, extra_index};
+
+    api.assert_eq_datamodels(&input_dm, &api.re_introspect(&input_dm).await?);
+
+    Ok(())
+}
+
+#[test_connector]
+async fn default_optional_actions(api: &TestApi) -> TestResult {
+    let family = api.sql_family();
+
+    api.barrel()
+        .execute(move |migration| {
+            migration.create_table("a", |t| {
+                t.add_column("id", types::primary());
+            });
+
+            migration.create_table("b", move |t| {
+                t.add_column("id", types::primary());
+                t.add_column("a_id", types::integer().nullable(true));
+
+                match family {
+                    SqlFamily::Mssql => {
+                        t.inject_custom(
+                            "CONSTRAINT asdf FOREIGN KEY (a_id) REFERENCES default_optional_actions.a(id) ON DELETE SET NULL ON UPDATE CASCADE",
+                        );
+                    }
+                    _ => {
+                        t.inject_custom(
+                            "CONSTRAINT asdf FOREIGN KEY (a_id) REFERENCES a(id) ON DELETE SET NULL ON UPDATE CASCADE",
+                        );
+                    }
+                }
+            });
+        })
+        .await?;
+
+    let extra_index = if api.sql_family().is_mysql() {
+        r#"@@index([a_id], name: "asdf")"#
+    } else {
+        ""
+    };
+
+    let input_dm = formatdoc! {r#"
+        generator client {{
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialActions"]
+        }}
+
+        model a {{
+            id Int @id @default(autoincrement())
+            bs b[]
+        }}
+
+        model b {{
+            id Int @id @default(autoincrement())
+            a_id Int?
+            a a? @relation(fields: [a_id], references: [id])
+            {}
+        }}
+    "#, extra_index};
+
+    api.assert_eq_datamodels(&input_dm, &api.re_introspect(&input_dm).await?);
 
     Ok(())
 }

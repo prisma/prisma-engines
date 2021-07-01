@@ -29,7 +29,7 @@ impl QuerySchemaRenderer<(DmmfSchema, DmmfOperationMappings)> for DmmfQuerySchem
         ctx.mark_to_be_rendered(&query_schema);
 
         while !ctx.next_pass.is_empty() {
-            let renderers = std::mem::replace(&mut ctx.next_pass, Vec::new());
+            let renderers = std::mem::take(&mut ctx.next_pass);
 
             for renderer in renderers {
                 renderer.render(&mut ctx)

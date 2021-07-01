@@ -33,6 +33,14 @@ macro_rules! run_query_json {
     ($runner:expr, $q:expr) => {
         serde_json::from_str::<serde_json::Value>($runner.query($q).await?.to_string().as_str()).unwrap()
     };
+    ($runner:expr, $q:expr, $path: expr) => {
+        query_tests_setup::walk_json(
+            &serde_json::from_str::<serde_json::Value>($runner.query($q).await?.to_string().as_str()).unwrap(),
+            $path,
+        )
+        .unwrap()
+        .to_owned()
+    };
 }
 
 #[macro_export]

@@ -4,9 +4,9 @@ version = 3
 
 [[package]]
 name = "addr2line"
-version = "0.14.1"
+version = "0.15.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a55f82cfe485775d02112886f4169bde0c5894d75e79ead7eafe7e40a25e45f7"
+checksum = "03345e98af8f3d786b6d9f656ccfa6ac316d954e92bc4841f0bba20789d5fb5a"
 dependencies = [
  "gimli",
 ]
@@ -419,11 +419,12 @@ checksum = "cdb031dd78e28731d87d56cc8ffef4a8f36ca26c38fe2de700543e627f8a464a"
 
 [[package]]
 name = "backtrace"
-version = "0.3.56"
+version = "0.3.59"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9d117600f438b1707d4e4ae15d3595657288f8235a0eb593e80ecc98ab34e1bc"
+checksum = "4717cfcbfaa661a0fd48f8453951837ae7e8f81e481fbb136e3202d72805a744"
 dependencies = [
  "addr2line",
+ "cc",
  "cfg-if 1.0.0",
  "libc",
  "miniz_oxide",
@@ -434,7 +435,7 @@ dependencies = [
 [[package]]
 name = "barrel"
 version = "0.6.6-alpha.0"
-source = "git+https://github.com/prisma/barrel.git?branch=mssql-support#5d6a731665acdab0d459be23843c2c54112ff099"
+source = "git+https://github.com/prisma/barrel.git?branch=mssql-support#4e84cf3d5013b4c92eb81d7ba90cd1c1c01c6805"
 
 [[package]]
 name = "base-x"
@@ -665,17 +666,6 @@ dependencies = [
 
 [[package]]
 name = "colored"
-version = "1.9.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f4ffc801dacf156c5854b9df4f425a626539c3a6ef7893cc0c5084a23f0b6c59"
-dependencies = [
- "atty",
- "lazy_static",
- "winapi",
-]
-
-[[package]]
-name = "colored"
 version = "2.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b3616f750b84d8f0de8a58bda93e08e2a81ad3f523089b05f1dffecab48c6cbd"
@@ -879,36 +869,12 @@ dependencies = [
 
 [[package]]
 name = "darling"
-version = "0.10.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0d706e75d87e35569db781a9b5e2416cff1236a47ed380831f959382ccd5f858"
-dependencies = [
- "darling_core 0.10.2",
- "darling_macro 0.10.2",
-]
-
-[[package]]
-name = "darling"
 version = "0.12.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a06d4a9551359071d1890820e3571252b91229e0712e7c36b08940e603c5a8fc"
 dependencies = [
- "darling_core 0.12.2",
- "darling_macro 0.12.2",
-]
-
-[[package]]
-name = "darling_core"
-version = "0.10.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f0c960ae2da4de88a91b2d920c2a7233b400bc33cb28453a2987822d8392519b"
-dependencies = [
- "fnv",
- "ident_case",
- "proc-macro2",
- "quote",
- "strsim 0.9.3",
- "syn",
+ "darling_core",
+ "darling_macro",
 ]
 
 [[package]]
@@ -927,22 +893,11 @@ dependencies = [
 
 [[package]]
 name = "darling_macro"
-version = "0.10.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d9b5a2f4ac4969822c62224815d069952656cadc7084fdca9751e6d959189b72"
-dependencies = [
- "darling_core 0.10.2",
- "quote",
- "syn",
-]
-
-[[package]]
-name = "darling_macro"
 version = "0.12.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c0220073ce504f12a70efc4e7cdaea9e9b1b324872e7ad96a208056d7a638b81"
 dependencies = [
- "darling_core 0.12.2",
+ "darling_core",
  "quote",
  "syn",
 ]
@@ -969,13 +924,13 @@ version = "0.1.0"
 dependencies = [
  "bigdecimal",
  "chrono",
- "clap",
- "colored 1.9.3",
+ "colored",
  "datamodel-connector",
  "dml",
+ "enumflags2",
  "expect-test",
  "indoc",
- "itertools 0.8.2",
+ "itertools 0.10.0",
  "mongodb-datamodel-connector",
  "native-types",
  "once_cell",
@@ -995,7 +950,8 @@ name = "datamodel-connector"
 version = "0.1.0"
 dependencies = [
  "dml",
- "itertools 0.8.2",
+ "enumflags2",
+ "itertools 0.10.0",
  "serde_json",
  "thiserror",
  "url 2.2.1",
@@ -1066,6 +1022,7 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "cuid",
+ "enumflags2",
  "native-types",
  "prisma-value",
  "serde",
@@ -1505,9 +1462,9 @@ dependencies = [
 
 [[package]]
 name = "gimli"
-version = "0.23.0"
+version = "0.24.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f6503fe142514ca4799d4c26297c4248239fe8838d827db6bd6065c6ed29a6ce"
+checksum = "0e4075386626662786ddb0ec9081e7c7eeb1ba31951f447ca780ef9f5d568189"
 
 [[package]]
 name = "gloo-timers"
@@ -2086,9 +2043,9 @@ dependencies = [
 
 [[package]]
 name = "libc"
-version = "0.2.91"
+version = "0.2.95"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8916b1f6ca17130ec6568feccee27c156ad12037880833a3b842a823236502e7"
+checksum = "789da6d93f1b866ffe175afc5322a4d76c038605a1c3319bb57b06967ca98a36"
 
 [[package]]
 name = "libsqlite3-sys"
@@ -2279,14 +2236,13 @@ dependencies = [
 name = "migration-engine-cli"
 version = "0.1.0"
 dependencies = [
+ "backtrace",
  "base64 0.13.0",
  "enumflags2",
- "futures 0.3.13",
  "json-rpc-stdio",
  "migration-connector",
  "migration-core",
  "quaint",
- "serde_json",
  "structopt",
  "tempfile",
  "test-macros",
@@ -2439,6 +2395,7 @@ version = "0.1.0"
 dependencies = [
  "datamodel-connector",
  "dml",
+ "enumflags2",
  "lazy_static",
  "native-types",
  "once_cell",
@@ -2483,7 +2440,7 @@ dependencies = [
  "cuid",
  "datamodel",
  "futures 0.3.13",
- "itertools 0.8.2",
+ "itertools 0.10.0",
  "mongodb",
  "native-types",
  "prisma-models",
@@ -2702,9 +2659,9 @@ dependencies = [
 
 [[package]]
 name = "object"
-version = "0.23.0"
+version = "0.24.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a9a7ab5d64814df0fe4a4b5ead45ed6c5f181ee3ff04ba344313a6c80446c5d4"
+checksum = "1a5b3dd1c072ee7963717671d1ca129f1048fda25edea6b752bfc71ac8854170"
 
 [[package]]
 name = "once_cell"
@@ -3182,7 +3139,7 @@ dependencies = [
  "chrono",
  "cuid",
  "datamodel",
- "itertools 0.8.2",
+ "itertools 0.10.0",
  "once_cell",
  "prisma-value",
  "quaint",
@@ -3341,7 +3298,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.13"
-source = "git+https://github.com/prisma/quaint#ed93633f6139f522d6d1ffe6c932d446180e7507"
+source = "git+https://github.com/prisma/quaint#9f5860e2e6ac1684dd75f4e15ec3caef9a040f98"
 dependencies = [
  "async-trait",
  "base64 0.12.3",
@@ -3386,7 +3343,7 @@ dependencies = [
  "async-trait",
  "chrono",
  "futures 0.3.13",
- "itertools 0.8.2",
+ "itertools 0.10.0",
  "once_cell",
  "prisma-models",
  "prisma-value",
@@ -3412,7 +3369,7 @@ dependencies = [
  "futures 0.3.13",
  "im",
  "indexmap",
- "itertools 0.8.2",
+ "itertools 0.10.0",
  "mongodb-query-connector",
  "once_cell",
  "petgraph 0.4.13",
@@ -3448,7 +3405,7 @@ dependencies = [
  "graphql-parser",
  "indexmap",
  "indoc",
- "itertools 0.8.2",
+ "itertools 0.10.0",
  "migration-connector",
  "migration-core",
  "mongodb-query-connector",
@@ -3485,7 +3442,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "query-engine-napi"
+name = "query-engine-node-api"
 version = "0.1.0"
 dependencies = [
  "connection-string",
@@ -3520,7 +3477,7 @@ dependencies = [
  "anyhow",
  "base64 0.13.0",
  "chrono",
- "colored 2.0.0",
+ "colored",
  "datamodel-connector",
  "indoc",
  "insta",
@@ -3536,7 +3493,8 @@ dependencies = [
 name = "query-test-macros"
 version = "0.1.0"
 dependencies = [
- "darling 0.12.2",
+ "darling",
+ "indoc",
  "itertools 0.10.0",
  "proc-macro2",
  "query-tests-setup",
@@ -3549,7 +3507,7 @@ name = "query-tests-setup"
 version = "0.1.0"
 dependencies = [
  "async-trait",
- "colored 2.0.0",
+ "colored",
  "datamodel",
  "datamodel-connector",
  "enum_dispatch",
@@ -3572,6 +3530,7 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-error",
+ "tracing-futures",
  "tracing-subscriber",
 ]
 
@@ -3739,7 +3698,7 @@ dependencies = [
  "futures 0.3.13",
  "graphql-parser",
  "indexmap",
- "itertools 0.8.2",
+ "itertools 0.10.0",
  "prisma-models",
  "query-core",
  "serde",
@@ -4037,7 +3996,7 @@ version = "1.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e48b35457e9d855d3dc05ef32a73e0df1e2c0fd72c38796a4ee909160c8eeec2"
 dependencies = [
- "darling 0.12.2",
+ "darling",
  "proc-macro2",
  "quote",
  "syn",
@@ -4062,7 +4021,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e0bccbcf40c8938196944a3da0e133e031a33f4d6b72db3bda3cc556e361905d"
 dependencies = [
  "lazy_static",
- "parking_lot 0.10.2",
+ "parking_lot 0.11.1",
  "serial_test_derive",
 ]
 
@@ -4224,6 +4183,7 @@ version = "0.1.0"
 dependencies = [
  "datamodel-connector",
  "dml",
+ "enumflags2",
  "native-types",
  "once_cell",
  "regex",
@@ -4246,6 +4206,7 @@ dependencies = [
  "bigdecimal",
  "datamodel",
  "datamodel-connector",
+ "enumflags2",
  "introspection-connector",
  "native-types",
  "once_cell",
@@ -4304,7 +4265,7 @@ dependencies = [
  "cuid",
  "datamodel",
  "futures 0.3.13",
- "itertools 0.8.2",
+ "itertools 0.10.0",
  "prisma-models",
  "prisma-value",
  "quaint",
@@ -4433,12 +4394,6 @@ checksum = "8ea5119cdb4c55b55d432abb513a0429384878c15dde60cc77b1c99de1a95a6a"
 
 [[package]]
 name = "strsim"
-version = "0.9.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6446ced80d6c486436db5c078dde11a9f73d42b57fb273121e160b84f63d894c"
-
-[[package]]
-name = "strsim"
 version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "73473c0e59e6d5812c5dfe2a064a6444949f089e20eec9a2e5506596494e4623"
@@ -4531,7 +4486,7 @@ name = "test-cli"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "colored 1.9.3",
+ "colored",
  "enumflags2",
  "introspection-core",
  "migration-core",
@@ -4607,9 +4562,9 @@ dependencies = [
 
 [[package]]
 name = "tiberius"
-version = "0.5.14"
+version = "0.5.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2bad7d2cb6b881087fbebd1b1f13479656534957f076625f5fd2f6ce05fa4208"
+checksum = "c4e1b62ad625a28b77d2de6b3e353fe9b98c742eb9b7bde99d9e40a2283ed2b8"
 dependencies = [
  "async-native-tls",
  "async-stream 0.2.1",
@@ -5211,11 +5166,8 @@ dependencies = [
 name = "user-facing-error-macros"
 version = "0.1.0"
 dependencies = [
- "darling 0.10.2",
- "once_cell",
  "proc-macro2",
  "quote",
- "regex",
  "syn",
 ]
 

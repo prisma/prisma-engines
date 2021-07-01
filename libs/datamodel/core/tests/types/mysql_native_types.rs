@@ -85,7 +85,7 @@ fn test_block_attribute_support(native_type: &str, scalar_type: &str, attribute_
         attribute_name = attribute_name
     );
 
-    test_native_types_compatibility(&dml, &error_msg, MYSQL_SOURCE);
+    test_native_types_compatibility(&dml, error_msg, MYSQL_SOURCE);
 }
 
 #[test]
@@ -104,7 +104,7 @@ fn should_only_allow_bit_one_for_booleans() {
     let expected_error =
         "Argument M is out of range for Native type Bit(2) of MySQL: only Bit(1) can be used as Boolean.";
 
-    test_native_types_without_attributes("Bit(2)", "Boolean", &expected_error, MYSQL_SOURCE);
+    test_native_types_without_attributes("Bit(2)", "Boolean", expected_error, MYSQL_SOURCE);
 }
 
 #[test]

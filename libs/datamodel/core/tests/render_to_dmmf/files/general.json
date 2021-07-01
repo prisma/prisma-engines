@@ -90,7 +90,6 @@
           "relationName": "author",
           "relationFromFields": [],
           "relationToFields": [],
-          "relationOnDelete": "NONE",
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -107,7 +106,7 @@
           "relationName": "ProfileToUser",
           "relationFromFields": [],
           "relationToFields": [],
-          "relationOnDelete": "NONE",
+          "relationOnDelete": "SetNull",
           "isGenerated": false,
           "isUpdatedAt": false
         }
@@ -165,7 +164,7 @@
           "relationToFields": [
             "id"
           ],
-          "relationOnDelete": "NONE",
+          "relationOnDelete": "Cascade",
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -304,7 +303,7 @@
           "relationToFields": [
             "id"
           ],
-          "relationOnDelete": "NONE",
+          "relationOnDelete": "Cascade",
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -321,7 +320,6 @@
           "relationName": "PostToPostToCategory",
           "relationFromFields": [],
           "relationToFields": [],
-          "relationOnDelete": "NONE",
           "isGenerated": false,
           "isUpdatedAt": false
         }
@@ -378,7 +376,6 @@
           "relationName": "CategoryToPostToCategory",
           "relationFromFields": [],
           "relationToFields": [],
-          "relationOnDelete": "NONE",
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -477,7 +474,7 @@
             "title",
             "createdAt"
           ],
-          "relationOnDelete": "NONE",
+          "relationOnDelete": "Cascade",
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -498,7 +495,7 @@
           "relationToFields": [
             "id"
           ],
-          "relationOnDelete": "NONE",
+          "relationOnDelete": "Cascade",
           "isGenerated": false,
           "isUpdatedAt": false
         }
@@ -559,7 +556,7 @@
           "relationToFields": [
             "id"
           ],
-          "relationOnDelete": "NONE",
+          "relationOnDelete": "Cascade",
           "isGenerated": false,
           "isUpdatedAt": false
         }
@@ -600,7 +597,7 @@
           "relationName": "AToB",
           "relationFromFields": [],
           "relationToFields": [],
-          "relationOnDelete": "NONE",
+          "relationOnDelete": "SetNull",
           "isGenerated": false,
           "isUpdatedAt": false
         }

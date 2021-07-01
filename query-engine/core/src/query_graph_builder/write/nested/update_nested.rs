@@ -30,6 +30,7 @@ use write_args_parser::*;
 #[tracing::instrument(skip(graph, parent, parent_relation_field, value, child_model))]
 pub fn nested_update(
     graph: &mut QueryGraph,
+    connector_ctx: &ConnectorContext,
     parent: &NodeRef,
     parent_relation_field: &RelationFieldRef,
     value: ParsedInputValue,
@@ -54,8 +55,13 @@ pub fn nested_update(
         let find_child_records_node =
             utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, filter)?;
 
-        let update_node =
-            update::update_record_node(graph, Filter::empty(), Arc::clone(child_model), data.try_into()?)?;
+        let update_node = update::update_record_node(
+            graph,
+            connector_ctx,
+            Filter::empty(),
+            Arc::clone(child_model),
+            data.try_into()?,
+        )?;
 
         let child_model_identifier = parent_relation_field.related_model().primary_identifier();
 

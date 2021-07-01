@@ -28,7 +28,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
           |    }
           |  }){
           |    ${t.parent.selection}
-          |    childReq{
+          |    childReq {
           |       ${t.child.selection}
           |    }
           |  }

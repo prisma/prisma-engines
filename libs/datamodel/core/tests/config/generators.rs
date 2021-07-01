@@ -1,9 +1,9 @@
-use crate::common::parse_configuration;
-use crate::common::ErrorAsserts;
+use crate::common::{parse_configuration, ErrorAsserts};
 use datamodel::common::preview_features::GENERATOR;
 use datamodel::diagnostics::DatamodelError;
 use expect_test::expect;
 use itertools::Itertools;
+use pretty_assertions::assert_eq;
 
 #[test]
 fn serialize_generators_to_cmf() {
@@ -40,13 +40,13 @@ generator go {
         "value": "go"
     },
     "output": null,
-    "binaryTargets": ["a","b"],
+    "binaryTargets": [{ "value": "a", "fromEnvVar": null }, { "value": "b", "fromEnvVar": null }],
     "previewFeatures": [],
     "config": {}
   }
 ]"#;
 
-    assert_mcf(&schema, &expected);
+    assert_mcf(schema, expected);
 }
 
 #[test]
@@ -89,7 +89,7 @@ fn preview_features_setting_must_work() {
   }
 ]"#;
 
-    assert_mcf(&schema, &expected);
+    assert_mcf(schema, expected);
 }
 
 #[test]
@@ -115,7 +115,7 @@ fn hidden_preview_features_setting_must_work() {
   }
 ]"#;
 
-    assert_mcf(&schema, &expected);
+    assert_mcf(schema, expected);
 }
 #[test]
 fn back_slashes_in_providers_must_work() {
@@ -139,7 +139,7 @@ fn back_slashes_in_providers_must_work() {
         }
     ]"#;
 
-    assert_mcf(&schema, &expected);
+    assert_mcf(schema, expected);
 }
 
 #[test]
@@ -160,13 +160,13 @@ fn new_lines_in_generator_must_work() {
             "value": "go"
           },
           "output": null,
-          "binaryTargets": ["b","c"],
+          "binaryTargets": [{ "value": "b", "fromEnvVar": null }, { "value": "c", "fromEnvVar": null }],
           "previewFeatures": [],
           "config": {}
         }
     ]"#;
 
-    assert_mcf(&schema, &expected);
+    assert_mcf(schema, expected);
 }
 
 #[test]
@@ -210,6 +210,46 @@ fn nice_error_for_unknown_generator_preview_feature() {
     } else {
         panic!("Expected error.")
     }
+}
+
+#[test]
+fn binary_targets_from_env_var_should_work() {
+    let schema = r#"
+    datasource db {
+        provider = "mysql"
+        url      = env("DATABASE_URL")
+    }
+
+    generator client {
+        provider      = "prisma-client-js"
+        binaryTargets = env("BINARY_TARGETS")
+    }
+
+    model User {
+        id Int @id
+    }
+    "#;
+
+    let expected_dmmf = r#"[
+        {
+          "name": "client",
+          "provider": {
+            "fromEnvVar": null,
+            "value": "prisma-client-js"
+          },
+          "output": null,
+          "binaryTargets": [
+            {
+                "fromEnvVar": "BINARY_TARGETS",
+                "value": null
+            }
+          ],
+          "previewFeatures": [],
+          "config": {}
+        }
+      ]"#;
+
+    assert_mcf(schema, expected_dmmf);
 }
 
 #[test]

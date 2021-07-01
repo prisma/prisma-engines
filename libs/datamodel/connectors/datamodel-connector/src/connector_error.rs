@@ -276,4 +276,7 @@ pub enum ErrorKind {
 
     #[error("Invalid Native type {}.", native_type)]
     InvalidNativeType { native_type: String },
+
+    #[error("Invalid model: {}.", message)]
+    InvalidModelError { message: String },
 }

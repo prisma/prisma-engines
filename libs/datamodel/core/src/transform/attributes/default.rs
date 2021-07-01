@@ -11,7 +11,7 @@ pub struct DefaultAttributeValidator;
 
 impl AttributeValidator<dml::Field> for DefaultAttributeValidator {
     fn attribute_name(&self) -> &'static str {
-        &"default"
+        "default"
     }
 
     fn validate_and_apply(&self, args: &mut Arguments<'_>, field: &mut dml::Field) -> Result<(), DatamodelError> {
@@ -23,14 +23,7 @@ impl AttributeValidator<dml::Field> for DefaultAttributeValidator {
                 return self.new_attribute_validation_error("Cannot set a default value on list field.", args.span());
             }
 
-            if let dml::FieldType::Base(scalar_type, _) = sf.field_type {
-                let dv = args
-                    .default_arg("value")?
-                    .as_default_value_for_scalar_type(scalar_type)
-                    .map_err(|e| self.wrap_in_attribute_validation_error(&e))?;
-
-                sf.default_value = Some(dv);
-            } else if let dml::FieldType::NativeType(scalar_type, _) = sf.field_type {
+            if let dml::FieldType::Scalar(scalar_type, _, _) = sf.field_type {
                 let dv = args
                     .default_arg("value")?
                     .as_default_value_for_scalar_type(scalar_type)

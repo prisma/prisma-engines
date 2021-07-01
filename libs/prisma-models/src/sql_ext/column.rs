@@ -166,7 +166,7 @@ where
         };
 
         let type_family = match sf.type_identifier {
-            TypeIdentifier::String => TypeFamily::Text(parse_len(&sf)),
+            TypeIdentifier::String => TypeFamily::Text(parse_len(sf)),
             TypeIdentifier::Int => TypeFamily::Int,
             TypeIdentifier::BigInt => TypeFamily::Int,
             TypeIdentifier::Float => TypeFamily::Double,
@@ -186,7 +186,7 @@ where
             TypeIdentifier::Json => TypeFamily::Text(Some(TypeDataLength::Maximum)),
             TypeIdentifier::Xml => TypeFamily::Text(Some(TypeDataLength::Maximum)),
             TypeIdentifier::DateTime => TypeFamily::DateTime,
-            TypeIdentifier::Bytes => TypeFamily::Text(parse_len(&sf)),
+            TypeIdentifier::Bytes => TypeFamily::Text(parse_len(sf)),
             TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach that path"),
         };
 

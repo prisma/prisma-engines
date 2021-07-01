@@ -362,7 +362,7 @@ fn forward_relation_fields_must_be_added() {
         model PostableEntity {
             id String @id
         }
-         
+
         model Post {
             id        String   @id
             postableEntities PostableEntity[]
@@ -375,12 +375,12 @@ fn forward_relation_fields_must_be_added() {
            Post   Post?   @relation(fields: [postId], references: [id])
            postId String?
          }
-         
+
          model Post {
            id               String           @id
            postableEntities PostableEntity[]
          }
-         
+
 "#};
 
     assert_reformat(input, expected);
@@ -420,8 +420,8 @@ fn must_add_back_relation_fields_for_given_singular_field() {
     let input = indoc! {r#"
     model User {
         id     Int @id
-        postId Int     
-        post   Post @relation(fields: [postId], references: [post_id]) 
+        postId Int
+        post   Post @relation(fields: [postId], references: [post_id])
     }
 
     model Post {
@@ -435,7 +435,7 @@ fn must_add_back_relation_fields_for_given_singular_field() {
       postId Int
       post   Post @relation(fields: [postId], references: [post_id])
     }
-    
+
     model Post {
       post_id Int    @id
       User    User[]
@@ -451,7 +451,7 @@ fn must_add_back_relation_fields_for_self_relations() {
     model Human {
         id    Int @id
         sonId Int?
-        son   Human? @relation(fields: [sonId], references: [id]) 
+        son   Human? @relation(fields: [sonId], references: [id])
     }
     "#};
 
@@ -485,7 +485,7 @@ fn should_camel_case_back_relation_field_name() {
       id    Int    @id
       posts Post[]
     }
-    
+
     model Post {
       post_id       Int          @id
       OhWhatAUser   OhWhatAUser? @relation(fields: [ohWhatAUserId], references: [id])
@@ -503,7 +503,7 @@ fn add_backrelation_for_unambiguous_self_relations_in_presence_of_unrelated_othe
         model User {
             id          Int @id
             motherId    Int
-            mother      User @relation(fields: motherId, references: id)      
+            mother      User @relation(fields: motherId, references: id)
             subscribers Follower[]
         }
 
@@ -521,7 +521,7 @@ fn add_backrelation_for_unambiguous_self_relations_in_presence_of_unrelated_othe
       subscribers Follower[]
       User        User[]     @relation("UserToUser")
     }
-    
+
     model Follower {
       id        Int    @id
       following User[]
@@ -553,7 +553,7 @@ fn must_succeed_when_fields_argument_is_missing_for_one_to_many() {
       firstName String
       posts     Post[]
     }
-    
+
     model Post {
       id     Int  @id
       userId Int
@@ -583,7 +583,7 @@ fn must_add_referenced_fields_for_one_to_many_relations() {
       user_id Int    @id
       posts   Post[]
     }
-    
+
     model Post {
       post_id     Int  @id
       user        User @relation(fields: [userUser_id], references: [user_id])
@@ -601,7 +601,7 @@ fn must_add_referenced_fields_for_one_to_many_relations_reverse() {
       user_id Int    @id
       post    Post
     }
-    
+
     model Post {
       post_id Int    @id
       users   User[]
@@ -614,7 +614,7 @@ fn must_add_referenced_fields_for_one_to_many_relations_reverse() {
       post        Post @relation(fields: [postPost_id], references: [post_id])
       postPost_id Int
     }
-    
+
     model Post {
       post_id Int    @id
       users   User[]
@@ -635,12 +635,12 @@ fn must_add_referenced_fields_on_the_right_side_for_one_to_one_relations() {
     }
 
     model User2 {
-      id         String @id @default(cuid()) 
+      id         String @id @default(cuid())
       referenceB User1?
     }
 
     model User3 {
-      id         String @id @default(cuid()) 
+      id         String @id @default(cuid())
       referenceB User4?
     }
 
@@ -656,18 +656,18 @@ fn must_add_referenced_fields_on_the_right_side_for_one_to_one_relations() {
       referenceA User2?  @relation(fields: [user2Id], references: [id])
       user2Id    String?
     }
-    
+
     model User2 {
       id         String @id @default(cuid())
       referenceB User1?
     }
-    
+
     model User3 {
       id         String  @id @default(cuid())
       referenceB User4?  @relation(fields: [user4Id], references: [id])
       user4Id    String?
     }
-    
+
     model User4 {
       id         String @id @default(cuid())
       referenceA User3?
@@ -684,9 +684,9 @@ fn must_handle_conflicts_with_existing_fields_if_types_are_compatible() {
       id    String @id
       posts Post[]
     }
-    
+
     model Post {
-      id     String   @id      
+      id     String   @id
       blogId String?
     }
     "#};
@@ -696,7 +696,7 @@ fn must_handle_conflicts_with_existing_fields_if_types_are_compatible() {
       id    String @id
       posts Post[]
     }
-    
+
     model Post {
       id     String  @id
       blogId String?
@@ -714,10 +714,10 @@ fn must_handle_conflicts_with_existing_fields_if_types_are_incompatible() {
       id    String @id
       posts Post[]
     }
-    
+
     model Post {
-      id     String   @id      
-      blogId Int?     // this is not compatible with Blog.id  
+      id     String   @id
+      blogId Int?     // this is not compatible with Blog.id
     }
     "#};
 
@@ -726,10 +726,10 @@ fn must_handle_conflicts_with_existing_fields_if_types_are_incompatible() {
       id    String @id
       posts Post[]
     }
-    
+
     model Post {
       id                String  @id
-      blogId            Int? // this is not compatible with Blog.id  
+      blogId            Int? // this is not compatible with Blog.id
       Blog              Blog?   @relation(fields: [blogId_BlogToPost], references: [id])
       blogId_BlogToPost String?
     }
@@ -765,7 +765,7 @@ fn should_add_back_relations_for_more_complex_cases() {
         id          Int @id
         postId      Int
         categoryId  Int
-        
+
         post     Post     @relation(fields: [postId], references: [post_id])
         category Category @relation(fields: [categoryId], references: [category_id])
         @@map("post_to_category")
@@ -777,7 +777,7 @@ fn should_add_back_relations_for_more_complex_cases() {
       id    Int    @id
       posts Post[]
     }
-    
+
     model Post {
       post_id    Int              @id
       comments   Comment[]
@@ -785,23 +785,23 @@ fn should_add_back_relations_for_more_complex_cases() {
       User       User?            @relation(fields: [userId], references: [id])
       userId     Int?
     }
-    
+
     model Comment {
       comment_id  Int   @id
       Post        Post? @relation(fields: [postPost_id], references: [post_id])
       postPost_id Int?
     }
-    
+
     model Category {
       category_id Int              @id
       posts       PostToCategory[]
     }
-    
+
     model PostToCategory {
       id         Int @id
       postId     Int
       categoryId Int
-    
+
       post     Post     @relation(fields: [postId], references: [post_id])
       category Category @relation(fields: [categoryId], references: [category_id])
       @@map("post_to_category")
@@ -852,7 +852,7 @@ fn should_add_referenced_fields_on_the_correct_side_list() {
       id   Int    @id
       post Post[]
     }
-    
+
     model Post {
       post_id Int  @id
       user    User @relation(fields: [userId], references: [id])
@@ -899,7 +899,7 @@ fn should_add_referenced_fields_on_the_correct_side_tie_breaker() {
       user_id Int   @id
       post    Post?
     }
-    
+
     model Post {
       post_id     Int   @id
       user        User? @relation(fields: [userUser_id], references: [user_id])
@@ -918,13 +918,13 @@ fn should_not_get_confused_with_complicated_self_relations() {
       husbandId Int?
       fatherId  Int?
       parentId  Int?
-    
+
       wife    Human? @relation("Marrige")
       husband Human? @relation("Marrige", fields: husbandId, references: id)
-    
+
       father Human? @relation("Paternity", fields: fatherId, references: id)
       son    Human? @relation("Paternity")
-    
+
       children Human[] @relation("Offspring")
       parent   Human?  @relation("Offspring", fields: parentId, references: id)
     }
@@ -970,7 +970,7 @@ model Post {
 }
 "#;
 
-    let result = datamodel::ast::reformat::Reformatter::new(&input).reformat_to_string();
+    let result = datamodel::ast::reformat::Reformatter::new(input).reformat_to_string();
 
     assert_eq!(result, expected);
 }
@@ -984,7 +984,7 @@ fn must_handle_conflicts_with_existing_fields_if_types_are_incompatible_and_name
       id    String @id
       posts Post[]
     }
-    
+
     model Post {
       id                String @id
       blogId            Int? // this is not compatible with Blog.id
@@ -992,13 +992,13 @@ fn must_handle_conflicts_with_existing_fields_if_types_are_incompatible_and_name
     }
     "#};
 
-    let result = datamodel::ast::reformat::Reformatter::new(&input).reformat_to_string();
+    let result = datamodel::ast::reformat::Reformatter::new(input).reformat_to_string();
 
     assert_eq!(input, result);
 }
 
 fn assert_reformat(schema: &str, expected_result: &str) {
-    let result = datamodel::ast::reformat::Reformatter::new(&schema).reformat_to_string();
+    let result = datamodel::ast::reformat::Reformatter::new(schema).reformat_to_string();
     parse_datamodel(&result).unwrap();
     assert_eq!(result, expected_result);
 }
@@ -1010,38 +1010,38 @@ fn must_add_required_relation_field_if_underlying_scalar_is_required() {
       id       Int @id
       userId   Int
     }
-    
+
     model User {
       id       Int       @id
       sessions Session[]
     }
-    
+
     model Session2 {
       id         Int @id
       user2Id    Int
       user2Id2   Int
     }
-    
+
     model User2 {
       id       Int
       id2      Int
       sessions Session2[]
-    
-      @@id([id, id2])  
+
+      @@id([id, id2])
     }
-    
+
     model Session3 {
       id         Int @id
       user3Id    Int?
       user3Id2   Int
     }
-    
+
     model User3 {
       id       Int
       id2      Int
       sessions Session3[]
-    
-      @@id([id, id2])  
+
+      @@id([id, id2])
     }
     "#};
 
@@ -1051,44 +1051,44 @@ fn must_add_required_relation_field_if_underlying_scalar_is_required() {
       userId Int
       User   User @relation(fields: [userId], references: [id])
     }
-    
+
     model User {
       id       Int       @id
       sessions Session[]
     }
-    
+
     model Session2 {
       id       Int   @id
       user2Id  Int
       user2Id2 Int
       User2    User2 @relation(fields: [user2Id, user2Id2], references: [id, id2])
     }
-    
+
     model User2 {
       id       Int
       id2      Int
       sessions Session2[]
-    
+
       @@id([id, id2])
     }
-    
+
     model Session3 {
       id       Int    @id
       user3Id  Int?
       user3Id2 Int
       User3    User3? @relation(fields: [user3Id, user3Id2], references: [id, id2])
     }
-    
+
     model User3 {
       id       Int
       id2      Int
       sessions Session3[]
-    
+
       @@id([id, id2])
     }
     "#};
 
-    let result = datamodel::ast::reformat::Reformatter::new(&input).reformat_to_string();
+    let result = datamodel::ast::reformat::Reformatter::new(input).reformat_to_string();
 
     assert_eq!(result, expected);
 }

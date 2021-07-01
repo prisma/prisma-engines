@@ -3,7 +3,7 @@ use crate::{
     constants::args,
     query_ast::*,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
-    ArgumentListLookup, ParsedField, ParsedInputList, ParsedInputMap,
+    ArgumentListLookup, ConnectorContext, ParsedField, ParsedInputList, ParsedInputMap,
 };
 use connector::IdFilter;
 use prisma_models::ModelRef;
@@ -12,7 +12,12 @@ use write_args_parser::*;
 
 /// Creates a create record query and adds it to the query graph, together with it's nested queries and companion read query.
 #[tracing::instrument(skip(graph, model, field))]
-pub fn create_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedField) -> QueryGraphBuilderResult<()> {
+pub fn create_record(
+    graph: &mut QueryGraph,
+    connector_ctx: &ConnectorContext,
+    model: ModelRef,
+    mut field: ParsedField,
+) -> QueryGraphBuilderResult<()> {
     graph.flag_transactional();
 
     let data_map = match field.arguments.lookup(args::DATA) {
@@ -20,7 +25,7 @@ pub fn create_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
         None => ParsedInputMap::new(),
     };
 
-    let create_node = create::create_record_node(graph, Arc::clone(&model), data_map)?;
+    let create_node = create::create_record_node(graph, connector_ctx, Arc::clone(&model), data_map)?;
 
     // Follow-up read query on the write
     let read_query = read::find_unique(field, model.clone())?;
@@ -56,6 +61,7 @@ pub fn create_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
 #[tracing::instrument(skip(graph, model, field))]
 pub fn create_many_records(
     graph: &mut QueryGraph,
+    _connector_ctx: &ConnectorContext,
     model: ModelRef,
     mut field: ParsedField,
 ) -> QueryGraphBuilderResult<()> {
@@ -95,6 +101,7 @@ pub fn create_many_records(
 #[tracing::instrument(skip(graph, model, data_map))]
 pub fn create_record_node(
     graph: &mut QueryGraph,
+    connector_ctx: &ConnectorContext,
     model: ModelRef,
     data_map: ParsedInputMap,
 ) -> QueryGraphBuilderResult<NodeRef> {
@@ -107,7 +114,7 @@ pub fn create_record_node(
     let create_node = graph.create_node(Query::Write(WriteQuery::CreateRecord(cr)));
 
     for (relation_field, data_map) in create_args.nested {
-        nested::connect_nested_query(graph, create_node, relation_field, data_map)?;
+        nested::connect_nested_query(graph, connector_ctx, create_node, relation_field, data_map)?;
     }
 
     Ok(create_node)

@@ -67,6 +67,13 @@ impl FieldType {
         }
     }
 
+    pub(crate) fn as_unsupported(&self) -> Option<(&str, &Span)> {
+        match self {
+            FieldType::Unsupported(name, span) => Some((name, span)),
+            FieldType::Supported(_) => None,
+        }
+    }
+
     pub(crate) fn unwrap_supported(&self) -> &Identifier {
         match self {
             FieldType::Supported(ident) => ident,

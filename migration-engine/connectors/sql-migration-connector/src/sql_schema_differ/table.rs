@@ -14,7 +14,7 @@ pub(crate) struct TableDiffer<'a, 'b> {
 impl<'schema, 'b> TableDiffer<'schema, 'b> {
     pub(crate) fn column_pairs<'a>(&'a self) -> impl Iterator<Item = ColumnDiffer<'schema>> + 'a {
         self.db
-            .column_pairs(self.tables.map(|t| t.table_index()))
+            .column_pairs(self.tables.map(|t| t.table_id()))
             .map(move |colidxs| ColumnDiffer {
                 flavour: self.flavour,
                 previous: self.tables.previous().column_at(*colidxs.previous()),
@@ -24,29 +24,29 @@ impl<'schema, 'b> TableDiffer<'schema, 'b> {
 
     pub(crate) fn dropped_columns<'a>(&'a self) -> impl Iterator<Item = ColumnWalker<'schema>> + 'a {
         self.db
-            .dropped_columns(self.tables.map(|t| t.table_index()))
+            .dropped_columns(self.tables.map(|t| t.table_id()))
             .map(move |idx| self.tables.previous().column_at(idx))
     }
 
     pub(crate) fn added_columns<'a>(&'a self) -> impl Iterator<Item = ColumnWalker<'schema>> + 'a {
         self.db
-            .created_columns(self.tables.map(|t| t.table_index()))
+            .created_columns(self.tables.map(|t| t.table_id()))
             .map(move |idx| self.tables.next().column_at(idx))
     }
 
     pub(crate) fn created_foreign_keys<'a>(&'a self) -> impl Iterator<Item = ForeignKeyWalker<'schema>> + 'a {
         self.next_foreign_keys().filter(move |next_fk| {
-            self.previous_foreign_keys()
-                .find(|previous_fk| super::foreign_keys_match(Pair::new(previous_fk, next_fk), self.flavour))
-                .is_none()
+            !self
+                .previous_foreign_keys()
+                .any(|previous_fk| super::foreign_keys_match(Pair::new(&previous_fk, next_fk), self.flavour))
         })
     }
 
     pub(crate) fn dropped_foreign_keys<'a>(&'a self) -> impl Iterator<Item = ForeignKeyWalker<'schema>> + 'a {
         self.previous_foreign_keys().filter(move |previous_fk| {
-            self.next_foreign_keys()
-                .find(|next_fk| super::foreign_keys_match(Pair::new(previous_fk, next_fk), self.flavour))
-                .is_none()
+            !self
+                .next_foreign_keys()
+                .any(|next_fk| super::foreign_keys_match(Pair::new(previous_fk, &next_fk), self.flavour))
         })
     }
 
