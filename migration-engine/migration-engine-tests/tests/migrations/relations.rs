@@ -959,10 +959,14 @@ fn on_update_required_default_action(api: TestApi) {
     });
 }
 
-// TODO: Enable SQL Server when cascading rules are in PSL.
-#[test_connector(exclude(Mssql))]
+#[test_connector(preview_features("referentialActions"))]
 fn adding_mutual_references_on_existing_tables_works(api: TestApi) {
     let dm1 = r#"
+        generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialActions"]
+        }
+
         model A {
             id Int @id
         }
@@ -975,11 +979,16 @@ fn adding_mutual_references_on_existing_tables_works(api: TestApi) {
     api.schema_push(dm1).send_sync().assert_green_bang();
 
     let dm2 = r#"
+        generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialActions"]
+        }
+
         model A {
             id Int
             name String @unique
             b_email String
-            brel B @relation("AtoB", fields: [b_email], references: [email])
+            brel B @relation("AtoB", fields: [b_email], references: [email], onDelete: NoAction, onUpdate: NoAction)
             b    B[] @relation("BtoA")
         }
 
@@ -987,7 +996,7 @@ fn adding_mutual_references_on_existing_tables_works(api: TestApi) {
             id Int
             email String @unique
             a_name String
-            arel A @relation("BtoA", fields: [a_name], references: [name])
+            arel A @relation("BtoA", fields: [a_name], references: [name], onDelete: NoAction, onUpdate: NoAction)
             a    A[] @relation("AtoB")
         }
     "#;
@@ -999,4 +1008,227 @@ fn adding_mutual_references_on_existing_tables_works(api: TestApi) {
     } else {
         res.assert_warnings(&["A unique constraint covering the columns `[name]` on the table `A` will be added. If there are existing duplicate values, this will fail.".into(), "A unique constraint covering the columns `[email]` on the table `B` will be added. If there are existing duplicate values, this will fail.".into()]);
     };
+}
+
+#[test_connector]
+fn migrations_with_many_to_many_related_models_must_not_recreate_indexes(api: TestApi) {
+    // test case for https://github.com/prisma/lift/issues/148
+    let dm_1 = r#"
+        model User {
+            id        String  @id @default(cuid())
+            p         Profile[]
+        }
+
+        model Profile {
+            id        String  @id @default(cuid())
+            userId    String
+            user      User    @relation(fields: userId, references: id)
+            skills    Skill[]
+        }
+
+        model Skill {
+            id          String  @id @default(cuid())
+            profiles    Profile[]
+        }
+    "#;
+
+    api.schema_push(dm_1).send_sync().assert_green_bang();
+    api.assert_schema().assert_table("_ProfileToSkill", |t| {
+        t.assert_index_on_columns(&["A", "B"], |idx| idx.assert_is_unique())
+    });
+
+    let dm_2 = r#"
+        model User {
+            id        String  @id @default(cuid())
+            someField String?
+            p         Profile[]
+        }
+
+        model Profile {
+            id        String  @id @default(cuid())
+            userId    String
+            user      User    @relation(fields: userId, references: id)
+            skills    Skill[]
+        }
+
+        model Skill {
+            id          String  @id @default(cuid())
+            profiles    Profile[]
+        }
+    "#;
+
+    api.schema_push(dm_2).send_sync();
+    api.assert_schema().assert_table("_ProfileToSkill", |table| {
+        table.assert_index_on_columns(&["A", "B"], |idx| {
+            idx.assert_is_unique().assert_name("_ProfileToSkill_AB_unique")
+        })
+    });
+}
+
+#[test_connector]
+fn removing_a_relation_field_must_work(api: TestApi) {
+    let dm_1 = r#"
+        model User {
+            id        String  @id @default(cuid())
+            address_id String @map("address_name")
+            address   Address @relation(fields: [address_id], references: [id])
+        }
+
+        model Address {
+            id        String  @id @default(cuid())
+            street    String
+            u         User[]
+        }
+    "#;
+
+    api.schema_push(dm_1).send_sync().assert_green_bang();
+
+    api.assert_schema()
+        .assert_table("User", |table| table.assert_has_column("address_name"));
+
+    let dm_2 = r#"
+        model User {
+            id        String  @id @default(cuid())
+        }
+
+        model Address {
+            id        String  @id @default(cuid())
+            street    String
+        }
+    "#;
+
+    api.schema_push(dm_2).send_sync().assert_green_bang();
+
+    api.assert_schema()
+        .assert_table("User", |table| table.assert_does_not_have_column("address_name"));
+}
+
+#[test_connector]
+fn references_to_models_with_compound_primary_keys_must_work(api: TestApi) {
+    let dm = r#"
+        model User {
+            firstName String
+            lastName  String
+            pets      Pet[]
+
+            @@id([firstName, lastName])
+        }
+
+        model Pet {
+            id              String @id
+            human_firstName String
+            human_lastName  String
+
+            human User @relation(fields: [human_firstName, human_lastName], references: [firstName, lastName])
+        }
+    "#;
+
+    api.schema_push(dm).send_sync().assert_green_bang();
+
+    api.assert_schema().assert_table("Pet", |table| {
+        table
+            .assert_has_column("id")
+            .assert_has_column("human_firstName")
+            .assert_has_column("human_lastName")
+            .assert_foreign_keys_count(1)
+            .assert_fk_on_columns(&["human_firstName", "human_lastName"], |fk| {
+                fk.assert_references("User", &["firstName", "lastName"])
+            })
+    });
+}
+
+#[test_connector]
+fn join_tables_between_models_with_compound_primary_keys_must_work(api: TestApi) {
+    let dm = r#"
+        model Human {
+            firstName String
+            lastName String
+            cats HumanToCat[]
+
+            @@id([firstName, lastName])
+        }
+
+        model HumanToCat {
+            human_firstName String
+            human_lastName String
+            cat_id String
+
+            cat Cat @relation(fields: [cat_id], references: [id])
+            human Human @relation(fields: [human_firstName, human_lastName], references: [firstName, lastName])
+
+            @@unique([cat_id, human_firstName, human_lastName], name: "joinTableUnique")
+            @@index([human_firstName, human_lastName], name: "joinTableIndex")
+        }
+
+        model Cat {
+            id String @id
+            humans HumanToCat[]
+        }
+    "#;
+
+    api.schema_push(dm).send_sync().assert_green_bang();
+
+    api.assert_schema().assert_table("HumanToCat", |table| {
+        table
+            .assert_has_column("human_firstName")
+            .assert_has_column("human_lastName")
+            .assert_has_column("cat_id")
+            .assert_fk_on_columns(&["human_firstName", "human_lastName"], |fk| {
+                fk.assert_references("Human", &["firstName", "lastName"])
+                    .assert_referential_action_on_delete(ForeignKeyAction::Cascade)
+            })
+            .assert_fk_on_columns(&["cat_id"], |fk| {
+                fk.assert_references("Cat", &["id"])
+                    .assert_referential_action_on_delete(ForeignKeyAction::Cascade)
+            })
+            .assert_indexes_count(2)
+            .assert_index_on_columns(&["cat_id", "human_firstName", "human_lastName"], |idx| {
+                idx.assert_is_unique()
+            })
+            .assert_index_on_columns(&["human_firstName", "human_lastName"], |idx| idx.assert_is_not_unique())
+    });
+}
+
+#[test_connector]
+fn join_tables_between_models_with_mapped_compound_primary_keys_must_work(api: TestApi) {
+    let dm = r#"
+        model Human {
+            firstName String @map("the_first_name")
+            lastName String @map("the_last_name")
+            cats HumanToCat[]
+
+            @@id([firstName, lastName])
+        }
+
+        model HumanToCat {
+            human_the_first_name String
+            human_the_last_name String
+            cat_id String
+
+            cat Cat @relation(fields: [cat_id], references: [id])
+            human Human @relation(fields: [human_the_first_name, human_the_last_name], references: [firstName, lastName])
+
+            @@unique([human_the_first_name, human_the_last_name, cat_id], name: "joinTableUnique")
+            @@index([cat_id])
+        }
+
+        model Cat {
+            id String @id
+            humans HumanToCat[]
+        }
+    "#;
+
+    api.schema_push(dm).send_sync().assert_green_bang();
+
+    api.assert_schema().assert_table("HumanToCat", |table| {
+        table
+            .assert_has_column("human_the_first_name")
+            .assert_has_column("human_the_last_name")
+            .assert_has_column("cat_id")
+            .assert_fk_on_columns(&["human_the_first_name", "human_the_last_name"], |fk| {
+                fk.assert_references("Human", &["the_first_name", "the_last_name"])
+            })
+            .assert_fk_on_columns(&["cat_id"], |fk| fk.assert_references("Cat", &["id"]))
+            .assert_indexes_count(2)
+    });
 }
