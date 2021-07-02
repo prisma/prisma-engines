@@ -1,0 +1,65 @@
+on:
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: "Commit on the given branch to build"
+        required: false
+
+jobs:
+  build:
+    name: "MacOS ARM64 (Apple Silicon) engines build on branch ${{ github.event.ref }} for commit ${{ github.event.inputs.commit }}"
+    env:
+      SQLITE_MAX_VARIABLE_NUMBER: 250000
+      SQLITE_MAX_EXPR_DEPTH: 10000
+    runs-on: macos-latest
+
+    steps:
+      - name: Output link to real commit
+        run: echo ${{ github.repository }}/commit/${{ github.event.inputs.commit }}
+
+      - name: Checkout ${{ github.event.inputs.commit }}
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.inputs.commit }}
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          default: true
+
+      - name: Install aarch64 toolchain
+        run: rustup target add aarch64-apple-darwin
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - run: xcodebuild -showsdks
+
+      # Remove Xcode Command Line Tools so old version can not be used in build via https://github.com/prisma/prisma/issues/5245#issuecomment-864356168
+      - run: sudo rm -Rf /Library/Developer/CommandLineTools/SDKs/*;
+
+      # Activate newest available Xcode
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      # Build with fancy params via https://github.com/shepmaster/rust/blob/silicon/silicon/README.md
+      - run: |
+          SDKROOT=$(xcrun -sdk macosx11.1 --show-sdk-path)
+          MACOSX_DEPLOYMENT_TARGET=$(xcrun -sdk macosx11.1 --show-sdk-platform-version)
+          cargo build --target=aarch64-apple-darwin --release
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: binaries
+          path: |
+            ${{ github.workspace }}/target/aarch64-apple-darwin/release/introspection-engine
+            ${{ github.workspace }}/target/aarch64-apple-darwin/release/migration-engine
+            ${{ github.workspace }}/target/aarch64-apple-darwin/release/prisma-fmt
+            ${{ github.workspace }}/target/aarch64-apple-darwin/release/query-engine
+            ${{ github.workspace }}/target/aarch64-apple-darwin/release/libquery_engine.dylib
