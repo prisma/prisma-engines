@@ -1,3 +1,5 @@
+pub(super) use attributes::Attributes;
+
 use super::{ParserDatabase, ScalarFieldType};
 use crate::{
     ast,
@@ -9,7 +11,7 @@ use std::collections::HashSet;
 /// Validation context. This is an implementation detail of ParserDatabase. It
 /// contains the database itself, as well as context that is discarded after
 /// validation.
-pub(super) struct Context<'ast> {
+pub(crate) struct Context<'ast> {
     pub(super) db: ParserDatabase<'ast>,
     pub(super) diagnostics: Diagnostics,
     arguments: Arguments<'ast>,
@@ -53,14 +55,12 @@ impl<'ast> Context<'ast> {
         mut scalar_field_type: ScalarFieldType,
         f: impl FnOnce(&'_ mut Attributes<'ast>, &'_ mut Context<'ast>),
     ) {
-        self.attributes.attributes.clear();
         self.attributes
-            .attributes
-            .extend(self.db.ast[model_id][field_id].attributes.iter());
+            .set_attributes(&self.db.ast[model_id][field_id].attributes);
 
         while let ScalarFieldType::Alias(alias_id) = scalar_field_type {
             let alias = &self.db.ast[alias_id];
-            self.attributes.attributes.extend(alias.attributes.iter());
+            self.attributes.extend_attributes(&alias.attributes);
             scalar_field_type = self.db.types.type_aliases[&alias_id];
         }
 
@@ -81,22 +81,16 @@ impl<'ast> Context<'ast> {
         ast_attributes: &'ast [ast::Attribute],
         f: impl FnOnce(&'_ mut Attributes<'ast>, &'_ mut Context<'ast>),
     ) {
-        self.attributes.attributes.clear();
-        self.attributes.attributes.extend(ast_attributes.iter());
+        self.attributes.set_attributes(ast_attributes);
         self.visit_attributes_impl(f)
     }
 
     fn visit_attributes_impl(&mut self, f: impl FnOnce(&'_ mut Attributes<'ast>, &'_ mut Context<'ast>)) {
-        self.attributes.unused_attributes.clear();
-        self.attributes
-            .unused_attributes
-            .extend(0..self.attributes.attributes.len());
         let mut attributes = std::mem::take(&mut self.attributes);
+
         f(&mut attributes, self);
 
-        for unused_attribute in &attributes.unused_attributes {
-            let attribute = attributes.attributes[*unused_attribute];
-
+        for attribute in attributes.unused_attributes() {
             // Native types...
             if attribute.name.name.contains('.') {
                 continue;
@@ -132,58 +126,78 @@ impl<'ast> Context<'ast> {
     }
 }
 
-#[derive(Default)]
-pub(super) struct Attributes<'ast> {
-    attributes: Vec<&'ast ast::Attribute>,
-    unused_attributes: HashSet<usize>,
-}
+mod attributes {
+    use super::*;
 
-impl<'ast> Attributes<'ast> {
-    /// Validate an _optional_ attribute that should occur only once.
-    pub(super) fn visit_optional_single<'ctx>(
-        &mut self,
-        name: &str,
-        ctx: &'ctx mut Context<'ast>,
-        f: impl FnOnce(&mut Arguments<'ast>, &mut Context<'ast>),
-    ) {
-        let mut attrs = self.attributes.iter().enumerate().filter(|(_, a)| a.name.name == name);
-        let (first_idx, first) = match attrs.next() {
-            Some(first) => first,
-            None => return, // early return if absent: it's optional
-        };
-
-        if attrs.next().is_some() {
-            for (idx, attr) in self.attributes.iter().enumerate().filter(|(_, a)| a.name.name == name) {
-                ctx.push_error(DatamodelError::new_duplicate_attribute_error(
-                    &attr.name.name,
-                    attr.span,
-                ));
-                assert!(self.unused_attributes.remove(&idx));
-            }
-
-            return;
-        }
-
-        assert!(self.unused_attributes.remove(&first_idx));
-
-        ctx.with_arguments(first, f);
+    #[derive(Default)]
+    pub(crate) struct Attributes<'ast> {
+        attributes: Vec<&'ast ast::Attribute>,
+        unused_attributes: HashSet<usize>,
     }
 
-    /// Extract an attribute that can occur zero or more times. Example: @@index on models.
-    pub(super) fn visit_repeated<'ctx>(
-        &mut self,
-        name: &'static str,
-        ctx: &'ctx mut Context<'ast>,
-        mut f: impl FnMut(&mut Arguments<'ast>, &mut Context<'ast>),
-    ) {
-        for (attr_idx, attr) in self
-            .attributes
-            .iter()
-            .enumerate()
-            .filter(|(_, attr)| attr.name.name == name)
-        {
-            ctx.with_arguments(attr, &mut f);
-            assert!(self.unused_attributes.remove(&attr_idx));
+    impl<'ast> Attributes<'ast> {
+        pub(super) fn set_attributes(&mut self, ast_attributes: &'ast [ast::Attribute]) {
+            self.attributes.clear();
+            self.unused_attributes.clear();
+            self.extend_attributes(ast_attributes)
+        }
+
+        pub(super) fn extend_attributes(&mut self, ast_attributes: &'ast [ast::Attribute]) {
+            self.unused_attributes
+                .extend(self.attributes.len()..(self.attributes.len() + ast_attributes.len()));
+            self.attributes.extend(ast_attributes.iter());
+        }
+
+        pub(super) fn unused_attributes(&self) -> impl Iterator<Item = &'ast ast::Attribute> + '_ {
+            self.unused_attributes.iter().map(move |idx| self.attributes[*idx])
+        }
+
+        /// Validate an _optional_ attribute that should occur only once.
+        pub(crate) fn visit_optional_single<'ctx>(
+            &mut self,
+            name: &str,
+            ctx: &'ctx mut Context<'ast>,
+            f: impl FnOnce(&mut Arguments<'ast>, &mut Context<'ast>),
+        ) {
+            let mut attrs = self.attributes.iter().enumerate().filter(|(_, a)| a.name.name == name);
+            let (first_idx, first) = match attrs.next() {
+                Some(first) => first,
+                None => return, // early return if absent: it's optional
+            };
+
+            if attrs.next().is_some() {
+                for (idx, attr) in self.attributes.iter().enumerate().filter(|(_, a)| a.name.name == name) {
+                    ctx.push_error(DatamodelError::new_duplicate_attribute_error(
+                        &attr.name.name,
+                        attr.span,
+                    ));
+                    assert!(self.unused_attributes.remove(&idx));
+                }
+
+                return;
+            }
+
+            assert!(self.unused_attributes.remove(&first_idx));
+
+            ctx.with_arguments(first, f);
+        }
+
+        /// Extract an attribute that can occur zero or more times. Example: @@index on models.
+        pub(crate) fn visit_repeated<'ctx>(
+            &mut self,
+            name: &'static str,
+            ctx: &'ctx mut Context<'ast>,
+            mut f: impl FnMut(&mut Arguments<'ast>, &mut Context<'ast>),
+        ) {
+            for (attr_idx, attr) in self
+                .attributes
+                .iter()
+                .enumerate()
+                .filter(|(_, attr)| attr.name.name == name)
+            {
+                ctx.with_arguments(attr, &mut f);
+                assert!(self.unused_attributes.remove(&attr_idx));
+            }
         }
     }
 }
