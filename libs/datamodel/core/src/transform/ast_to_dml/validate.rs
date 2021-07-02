@@ -718,19 +718,20 @@ impl<'a> Validator<'a> {
                             attribute_span,
                         ));
                     }
-                } else if field.is_list() && !related_field.is_list() {
-                    if rel_info.on_delete.is_some() || rel_info.on_update.is_some() {
-                        let message = &format!(
+                } else if field.is_list()
+                    && !related_field.is_list()
+                    && (rel_info.on_delete.is_some() || rel_info.on_update.is_some())
+                {
+                    let message = &format!(
                             "The relation field `{}` on Model `{}` must not specify the `onDelete` or `onUpdate` argument in the {} attribute. You must only specify it on the opposite field `{}` on model `{}`, or in case of a many to many relation, in an explicit join table.",
                             &field.name, &model.name, RELATION_ATTRIBUTE_NAME_WITH_AT, &related_field.name, &related_model.name
                         );
 
-                        errors.push_error(DatamodelError::new_attribute_validation_error(
-                            message,
-                            RELATION_ATTRIBUTE_NAME,
-                            field_span,
-                        ));
-                    }
+                    errors.push_error(DatamodelError::new_attribute_validation_error(
+                        message,
+                        RELATION_ATTRIBUTE_NAME,
+                        field_span,
+                    ));
                 }
 
                 // ONE TO ONE
