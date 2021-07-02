@@ -115,7 +115,7 @@ fn visit_scalar_field_attributes<'ast>(
             match model_data.id_fields {
                 Some(_) => ctx.push_error(DatamodelError::new_model_validation_error(
                     "At most one field must be marked as the id field with the `@id` attribute.",
-                    &ast_model.name(),
+                    ast_model.name(),
                     ast_model.span,
                 )),
                 None => {
@@ -344,7 +344,7 @@ fn visit_model_id<'ast>(
     if !ctx.db.active_connector().supports_compound_ids() {
         return ctx.push_error(DatamodelError::new_model_validation_error(
             "The current connector does not support compound ids.",
-            &ctx.db.ast[model_id].name(),
+            ctx.db.ast[model_id].name(),
             id_args.span(),
         ));
     }
@@ -362,13 +362,13 @@ fn visit_model_id<'ast>(
                         "The multi field id declaration refers to the unknown fields {}.",
                         unresolvable_fields.join(", "),
                     ),
-                    &ctx.db.ast[model_id].name(),
+                    ctx.db.ast[model_id].name(),
                     fields.span(),
                 ));
             }
 
             if !relation_fields.is_empty() {
-                ctx.push_error(DatamodelError::new_model_validation_error(&format!("The id definition refers to the relation fields {}. ID definitions must reference only scalar fields.", relation_fields.iter().map(|(f, _)| f.name()).join(", ")), &ctx.db.ast[model_id].name(), id_args.span()));
+                ctx.push_error(DatamodelError::new_model_validation_error(&format!("The id definition refers to the relation fields {}. ID definitions must reference only scalar fields.", relation_fields.iter().map(|(f, _)| f.name()).join(", ")), ctx.db.ast[model_id].name(), id_args.span()));
             }
 
             return;
@@ -400,7 +400,7 @@ fn visit_model_id<'ast>(
     if model_data.id_fields.is_some() {
         ctx.push_error(DatamodelError::new_model_validation_error(
             "Each model must have at most one id criteria. You can't have `@id` and `@@id` at the same time.",
-            &model.name(),
+            model.name(),
             model.span,
         ))
     }
@@ -500,7 +500,7 @@ fn common_index_validations<'ast>(
                         if index_data.is_unique { "unique " } else { "" },
                         unresolvable_fields.join(", "),
                     ),
-                    &ctx.db.ast()[model_id].name(),
+                    ctx.db.ast()[model_id].name(),
                     args.span(),
                 ));
             }
@@ -532,7 +532,7 @@ fn common_index_validations<'ast>(
                         the_fields = relation_fields.iter().map(|(f, _)| f.name()).join(", "),
                         suggestion = suggestion
                     ),
-                    &ctx.db.ast[model_id].name(),
+                    ctx.db.ast[model_id].name(),
                     args.span(),
                 ));
             }
@@ -702,7 +702,7 @@ fn resolve_field_array<'ast>(
                     "The unique index definition refers to the field {} multiple times.",
                     ast_model[field_id].name()
                 ),
-                &ast_model.name(),
+                ast_model.name(),
                 attribute_span,
             ));
             return Err(FieldResolutionError::AlreadyDealtWith);

@@ -122,7 +122,7 @@ impl<'a> LiftAstToDml<'a> {
             let ast_field = &ast_model[field_id];
             let arity = self.lift_field_arity(&ast_field.arity);
             let target_model = &self.db.ast()[relation_field.referenced_model];
-            let relation_info = dml::RelationInfo::new(&target_model.name());
+            let relation_info = dml::RelationInfo::new(target_model.name());
 
             let mut field = dml::RelationField::new(&ast_field.name.name, arity, arity, relation_info);
 
@@ -240,7 +240,7 @@ impl<'a> LiftAstToDml<'a> {
                 let native_type = self
                     .db
                     .datasource()
-                    .and_then(|datasource| lift_native_type(ast_field, &scalar_type, datasource, self.diagnostics));
+                    .and_then(|datasource| lift_native_type(ast_field, scalar_type, datasource, self.diagnostics));
                 dml::FieldType::Scalar(*scalar_type, None, native_type)
             }
         }

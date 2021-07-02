@@ -1,3 +1,9 @@
+mod migration_assertions;
+mod quaint_result_set_ext;
+
+pub use migration_assertions::*;
+pub use quaint_result_set_ext::*;
+
 use datamodel_connector::Connector;
 use pretty_assertions::assert_eq;
 use prisma_value::PrismaValue;

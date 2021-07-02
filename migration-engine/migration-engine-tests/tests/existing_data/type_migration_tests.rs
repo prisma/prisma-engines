@@ -1,4 +1,4 @@
-use migration_engine_tests::{sql::ResultSetExt, sync_test_api::*};
+use migration_engine_tests::sync_test_api::*;
 use quaint::Value;
 
 #[test_connector]

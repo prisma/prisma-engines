@@ -1,12 +1,9 @@
+pub use crate::assertions::{MigrationsAssertions, ResultSetExt, SchemaAssertion};
 pub use expect_test::expect;
 pub use test_macros::test_connector;
 pub use test_setup::{BitFlags, Capabilities, Tags};
 
-use crate::{
-    multi_engine_test_api::TestApi as RootTestApi, ApplyMigrations, CreateMigration, DevDiagnostic,
-    DiagnoseMigrationHistory, EvaluateDataLoss, ListMigrationDirectories, MarkMigrationApplied,
-    MarkMigrationRolledBack, Reset, SchemaAssertion, SchemaPush,
-};
+use crate::{commands::*, multi_engine_test_api::TestApi as RootTestApi};
 use migration_connector::MigrationPersistence;
 use quaint::prelude::{ConnectionInfo, ResultSet};
 use sql_migration_connector::SqlMigrationConnector;

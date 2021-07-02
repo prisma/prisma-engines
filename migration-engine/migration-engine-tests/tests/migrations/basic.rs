@@ -414,3 +414,84 @@ fn renaming_a_datasource_works(api: TestApi) {
         .assert_green_bang()
         .assert_no_steps();
 }
+
+#[test_connector]
+fn simple_type_aliases_in_migrations_must_work(api: TestApi) {
+    let dm1 = r#"
+        type CUID = String @id @default(cuid())
+
+        model User {
+            id CUID
+            age Float
+        }
+    "#;
+
+    api.schema_push(dm1).send_sync().assert_green_bang();
+}
+
+#[test_connector]
+fn created_at_does_not_get_arbitrarily_migrated(api: TestApi) {
+    use quaint::ast::Insert;
+
+    let dm1 = r#"
+        model Fruit {
+            id Int @id @default(autoincrement())
+            name String
+            createdAt DateTime @default(now())
+        }
+    "#;
+
+    api.schema_push(dm1).send_sync().assert_green_bang();
+    api.assert_schema().assert_table("Fruit", |t| {
+        t.assert_column("createdAt", |c| c.assert_default(Some(DefaultValue::now())))
+    });
+
+    let insert = Insert::single_into(api.render_table_name("Fruit")).value("name", "banana");
+    api.query(insert.into());
+
+    let dm2 = r#"
+        model Fruit {
+            id Int @id @default(autoincrement())
+            name String
+            createdAt DateTime @default(now())
+        }
+    "#;
+
+    api.schema_push(dm2).send_sync().assert_green_bang().assert_no_steps();
+}
+
+#[test_connector]
+fn basic_compound_primary_keys_must_work(api: TestApi) {
+    let dm = r#"
+        model User {
+            firstName String
+            lastName String
+
+            @@id([lastName, firstName])
+        }
+    "#;
+
+    api.schema_push(dm).send_sync().assert_green_bang();
+
+    api.assert_schema().assert_table("User", |table| {
+        table.assert_pk(|pk| pk.assert_columns(&["lastName", "firstName"]))
+    });
+}
+
+#[test_connector]
+fn compound_primary_keys_on_mapped_columns_must_work(api: TestApi) {
+    let dm = r#"
+        model User {
+            firstName String @map("first_name")
+            lastName String @map("family_name")
+
+            @@id([firstName, lastName])
+        }
+    "#;
+
+    api.schema_push(dm).send_sync().assert_green_bang();
+
+    api.assert_schema().assert_table("User", |table| {
+        table.assert_pk(|pk| pk.assert_columns(&["first_name", "family_name"]))
+    });
+}

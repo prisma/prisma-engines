@@ -1,4 +1,4 @@
-use migration_engine_tests::{sql::ResultSetExt, sync_test_api::*};
+use migration_engine_tests::sync_test_api::*;
 
 #[test_connector]
 fn adding_a_unique_constraint_should_warn(api: TestApi) {

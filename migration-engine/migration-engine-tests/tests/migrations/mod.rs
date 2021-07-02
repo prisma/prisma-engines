@@ -27,4 +27,5 @@ mod sqlite;
 mod squashing_tests;
 mod timeouts;
 mod types;
+mod unique;
 mod unsupported_types;
