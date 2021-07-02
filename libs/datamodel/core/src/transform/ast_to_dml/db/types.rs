@@ -30,6 +30,24 @@ pub(super) struct Types<'ast> {
     pub(super) relation_fields: BTreeMap<(ast::ModelId, ast::FieldId), RelationField<'ast>>,
 }
 
+impl<'ast> Types<'ast> {
+    pub(super) fn take_model_data(&mut self, model_id: &ast::ModelId) -> Option<ModelData<'ast>> {
+        self.models.remove(model_id)
+    }
+
+    pub(super) fn take_scalar_field(&mut self, model_id: ast::ModelId, field_id: ast::FieldId) -> Option<ScalarField> {
+        self.scalar_fields.remove(&(model_id, field_id))
+    }
+
+    pub(super) fn take_relation_field(
+        &mut self,
+        model_id: ast::ModelId,
+        field_id: ast::FieldId,
+    ) -> Option<RelationField<'ast>> {
+        self.relation_fields.remove(&(model_id, field_id))
+    }
+}
+
 #[derive(Debug)]
 enum FieldType {
     Model(ast::ModelId),

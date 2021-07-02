@@ -53,8 +53,11 @@ impl<'a> LiftAstToDml<'a> {
     fn lift_model(&mut self, model_id: ast::ModelId, ast_model: &ast::Model) -> dml::Model {
         let mut model = dml::Model::new(ast_model.name.name.clone(), None);
         let model_data = self.db.get_model_data(&model_id).unwrap();
+
         model.documentation = ast_model.documentation.clone().map(|comment| comment.text);
         model.database_name = self.db.get_model_database_name(model_id).map(String::from);
+        model.is_ignored = model_data.is_ignored;
+
         model.id_fields = model_data
             .id_fields
             .as_ref()
@@ -66,6 +69,7 @@ impl<'a> LiftAstToDml<'a> {
                     .collect()
             })
             .unwrap_or_default();
+
         model.indices = model_data
             .indexes
             .iter()
@@ -83,7 +87,6 @@ impl<'a> LiftAstToDml<'a> {
                 },
             })
             .collect();
-        model.is_ignored = model_data.is_ignored;
 
         let active_connector = self.db.active_connector();
 
@@ -132,11 +135,14 @@ impl<'a> LiftAstToDml<'a> {
             field.relation_info.name = relation_field.name.map(String::from).unwrap_or_default();
             field.relation_info.on_delete = relation_field.on_delete;
             field.relation_info.on_update = relation_field.on_update;
+            field.is_ignored = relation_field.is_ignored;
+
             field.relation_info.references = relation_field
                 .references
                 .as_ref()
                 .map(|references| references.iter().map(|s| (*s).to_owned()).collect())
                 .unwrap_or_default();
+
             field.relation_info.fields = relation_field
                 .fields
                 .as_ref()
@@ -147,7 +153,6 @@ impl<'a> LiftAstToDml<'a> {
                         .collect()
                 })
                 .unwrap_or_default();
-            field.is_ignored = relation_field.is_ignored;
 
             field_ids_for_sorting.insert(&ast_field.name.name, field_id);
             model.add_field(dml::Field::RelationField(field))

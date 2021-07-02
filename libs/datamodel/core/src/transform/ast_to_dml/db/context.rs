@@ -50,15 +50,13 @@ impl<'ast> Context<'ast> {
         &mut self,
         model_id: ast::ModelId,
         field_id: ast::FieldId,
-        scalar_field_type: ScalarFieldType,
+        mut scalar_field_type: ScalarFieldType,
         f: impl FnOnce(&'_ mut Attributes<'ast>, &'_ mut Context<'ast>),
     ) {
         self.attributes.attributes.clear();
         self.attributes
             .attributes
             .extend(self.db.ast[model_id][field_id].attributes.iter());
-
-        let mut scalar_field_type = scalar_field_type;
 
         while let ScalarFieldType::Alias(alias_id) = scalar_field_type {
             let alias = &self.db.ast[alias_id];

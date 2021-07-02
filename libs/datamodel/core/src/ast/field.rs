@@ -57,6 +57,14 @@ impl FieldArity {
     pub fn is_list(&self) -> bool {
         matches!(self, &FieldArity::List)
     }
+
+    pub fn is_optional(&self) -> bool {
+        matches!(self, &FieldArity::Optional)
+    }
+
+    pub fn is_required(&self) -> bool {
+        matches!(self, &FieldArity::Required)
+    }
 }
 
 #[derive(Debug, Clone, PartialEq)]

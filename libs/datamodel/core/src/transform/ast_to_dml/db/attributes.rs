@@ -4,7 +4,7 @@ use super::{
     Context,
 };
 use crate::{
-    ast,
+    ast::{self, WithName},
     diagnostics::DatamodelError,
     dml,
     transform::{
@@ -15,7 +15,7 @@ use crate::{
 use itertools::Itertools;
 use prisma_value::PrismaValue;
 
-pub(super) fn visit_model_attributes<'ast>(
+pub(super) fn resolve_model_attributes<'ast>(
     model_id: ast::ModelId,
     ast_model: &'ast ast::Model,
     ctx: &mut Context<'ast>,
@@ -23,12 +23,11 @@ pub(super) fn visit_model_attributes<'ast>(
     let mut model_data = ctx
         .db
         .types
-        .models
-        .remove(&model_id)
+        .take_model_data(&model_id)
         .expect("Broken invariant: no ModelData for model in visit_model_attributes.");
 
     for (field_id, ast_field) in ast_model.iter_fields() {
-        if let Some(mut scalar_field) = ctx.db.types.scalar_fields.remove(&(model_id, field_id)) {
+        if let Some(mut scalar_field) = ctx.db.types.take_scalar_field(model_id, field_id) {
             visit_scalar_field_attributes(
                 model_id,
                 field_id,
@@ -40,13 +39,14 @@ pub(super) fn visit_model_attributes<'ast>(
             );
 
             ctx.db.types.scalar_fields.insert((model_id, field_id), scalar_field);
-        } else if let Some(mut rf) = ctx.db.types.relation_fields.remove(&(model_id, field_id)) {
+        } else if let Some(mut rf) = ctx.db.types.take_relation_field(model_id, field_id) {
             visit_relation_field_attributes(model_id, ast_field, &mut rf, ctx);
             ctx.db.types.relation_fields.insert((model_id, field_id), rf);
         } else {
             unreachable!(
                 "{}.{} is neither a scalar field nor a relation field",
-                ast_model.name.name, ast_field.name.name
+                ast_model.name(),
+                ast_field.name()
             )
         }
     }
@@ -115,7 +115,7 @@ fn visit_scalar_field_attributes<'ast>(
             match model_data.id_fields {
                 Some(_) => ctx.push_error(DatamodelError::new_model_validation_error(
                     "At most one field must be marked as the id field with the `@id` attribute.",
-                    &ast_model.name.name,
+                    &ast_model.name(),
                     ast_model.span,
                 )),
                 None => {
@@ -150,7 +150,7 @@ fn visit_scalar_field_attributes<'ast>(
 
          // @default
          attributes.visit_optional_single("default", ctx, |args, ctx| {
-                visit_field_default(args, scalar_field_data, model_id, field_id, ctx);
+            visit_field_default(args, scalar_field_data, model_id, field_id, ctx);
          });
 
          // @unique
@@ -189,7 +189,7 @@ fn visit_relation_field_attributes<'ast>(
             ctx.push_error(args.new_attribute_validation_error(
                 &format!(
                     "The field `{}` is a relation field and cannot be marked with `@id`. Only scalar fields can be declared as id.",
-                    &ast_field.name.name,
+                    &ast_field.name(),
                 ),
             ))
         });
@@ -221,7 +221,7 @@ fn visit_relation_field_attributes<'ast>(
             let mut suggested_fields = Vec::new();
 
             for underlying_field in relation_field.fields.iter().flatten() {
-                suggested_fields.push(ctx.db.ast[model_id][*underlying_field].name.name.as_str());
+                suggested_fields.push(ctx.db.ast[model_id][*underlying_field].name());
             }
 
             let suggestion = match suggested_fields.len() {
@@ -239,7 +239,7 @@ fn visit_relation_field_attributes<'ast>(
             ctx.push_error(args.new_attribute_validation_error(
                 &format!(
                     "The field `{relation_field_name}` is a relation field and cannot be marked with `unique`. Only scalar fields can be made unique.{suggestion}",
-                    relation_field_name = ast_field.name.name,
+                    relation_field_name = ast_field.name(),
                     suggestion = suggestion
                 ),
             ));
@@ -284,7 +284,7 @@ fn visit_field_default(
             ScalarFieldType::Enum(enum_id) => {
                 match value.as_constant_literal() {
                     Ok(value) => {
-                        if ctx.db.ast[enum_id].values.iter().any(|v| v.name.name == value) {
+                        if ctx.db.ast[enum_id].values.iter().any(|v| v.name() == value) {
                             field_data.default = Some(dml::DefaultValue::Single(PrismaValue::Enum(value.to_owned())))
                         } else {
                             ctx.push_error(args.new_attribute_validation_error(
@@ -344,7 +344,7 @@ fn visit_model_id<'ast>(
     if !ctx.db.active_connector().supports_compound_ids() {
         return ctx.push_error(DatamodelError::new_model_validation_error(
             "The current connector does not support compound ids.",
-            &ctx.db.ast[model_id].name.name,
+            &ctx.db.ast[model_id].name(),
             id_args.span(),
         ));
     }
@@ -362,13 +362,13 @@ fn visit_model_id<'ast>(
                         "The multi field id declaration refers to the unknown fields {}.",
                         unresolvable_fields.join(", "),
                     ),
-                    &ctx.db.ast[model_id].name.name,
+                    &ctx.db.ast[model_id].name(),
                     fields.span(),
                 ));
             }
 
             if !relation_fields.is_empty() {
-                ctx.push_error(DatamodelError::new_model_validation_error(&format!("The id definition refers to the relation fields {}. ID definitions must reference only scalar fields.", relation_fields.iter().map(|(f, _)| &f.name.name).join(", ")), &ctx.db.ast[model_id].name.name, id_args.span()));
+                ctx.push_error(DatamodelError::new_model_validation_error(&format!("The id definition refers to the relation fields {}. ID definitions must reference only scalar fields.", relation_fields.iter().map(|(f, _)| f.name()).join(", ")), &ctx.db.ast[model_id].name(), id_args.span()));
             }
 
             return;
@@ -376,14 +376,14 @@ fn visit_model_id<'ast>(
     };
 
     let model = &ctx.db.ast[model_id];
-    let model_name = &model.name.name;
+    let model_name = &model.name();
 
     // ID attribute fields must reference only required fields.
     let fields_that_are_not_required: Vec<&str> = resolved_fields
         .iter()
         .map(|field_id| &ctx.db.ast[model_id][*field_id])
-        .filter(|field| !matches!(field.arity, ast::FieldArity::Required))
-        .map(|field| field.name.name.as_str())
+        .filter(|field| !field.arity.is_required())
+        .map(|field| field.name())
         .collect();
 
     if !fields_that_are_not_required.is_empty() {
@@ -400,7 +400,7 @@ fn visit_model_id<'ast>(
     if model_data.id_fields.is_some() {
         ctx.push_error(DatamodelError::new_model_validation_error(
             "Each model must have at most one id criteria. You can't have `@id` and `@@id` at the same time.",
-            &model.name.name,
+            &model.name(),
             model.span,
         ))
     }
@@ -500,7 +500,7 @@ fn common_index_validations<'ast>(
                         if index_data.is_unique { "unique " } else { "" },
                         unresolvable_fields.join(", "),
                     ),
-                    &ctx.db.ast()[model_id].name.name,
+                    &ctx.db.ast()[model_id].name(),
                     args.span(),
                 ));
             }
@@ -511,7 +511,7 @@ fn common_index_validations<'ast>(
                 for (_, field_id) in &relation_fields {
                     let relation_field = &ctx.db.types.relation_fields[&(model_id, *field_id)];
                     for underlying_field in relation_field.fields.iter().flatten() {
-                        suggested_fields.push(ctx.db.ast[model_id][*underlying_field].name.name.as_str());
+                        suggested_fields.push(ctx.db.ast[model_id][*underlying_field].name());
                     }
                 }
 
@@ -529,10 +529,10 @@ fn common_index_validations<'ast>(
                     &format!(
                         "The {prefix}index definition refers to the relation fields {the_fields}. Index definitions must reference only scalar fields.{suggestion}",
                         prefix = if index_data.is_unique { "unique " } else { "" },
-                        the_fields = relation_fields.iter().map(|(f, _)| &f.name.name).join(", "),
+                        the_fields = relation_fields.iter().map(|(f, _)| f.name()).join(", "),
                         suggestion = suggestion
                     ),
-                    &ctx.db.ast[model_id].name.name,
+                    &ctx.db.ast[model_id].name(),
                     args.span(),
                 ));
             }
@@ -570,7 +570,7 @@ fn visit_relation<'ast>(
                 }
 
                 if !relation_fields.is_empty() {
-                    ctx.push_error(DatamodelError::new_validation_error(&format!("The argument fields must refer only to scalar fields. But it is referencing the following relation fields: {}", relation_fields.iter().map(|(f, _)| &f.name.name).join(", ")), fields.span()));
+                    ctx.push_error(DatamodelError::new_validation_error(&format!("The argument fields must refer only to scalar fields. But it is referencing the following relation fields: {}", relation_fields.iter().map(|(f, _)| f.name()).join(", ")), fields.span()));
                 }
 
                 Vec::new()
@@ -655,7 +655,7 @@ fn resolve_field_array<'ast>(
 
     for field_name in constant_array {
         // Does the field exist?
-        let field_id = if let Some(field_id) = ctx.db.names.model_fields.get(&(model_id, field_name)).cloned() {
+        let field_id = if let Some(field_id) = ctx.db.find_model_field(model_id, field_name) {
             field_id
         } else {
             unknown_fields.push(field_name);
@@ -673,9 +673,9 @@ fn resolve_field_array<'ast>(
             ctx.push_error(DatamodelError::new_model_validation_error(
                 &format!(
                     "The unique index definition refers to the field {} multiple times.",
-                    ast_model[field_id].name.name
+                    ast_model[field_id].name()
                 ),
-                &ast_model.name.name,
+                &ast_model.name(),
                 attribute_span,
             ));
             return Err(FieldResolutionError::AlreadyDealtWith);

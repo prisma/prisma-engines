@@ -82,7 +82,7 @@ impl<'ast> ParserDatabase<'ast> {
 
         // Third pass: validate model and field attributes.
         for (model_id, model) in ast.iter_models() {
-            attributes::visit_model_attributes(model_id, model, &mut ctx)
+            attributes::resolve_model_attributes(model_id, model, &mut ctx)
         }
 
         ctx.finish()
@@ -98,6 +98,10 @@ impl<'ast> ParserDatabase<'ast> {
 
     pub(super) fn datasource(&self) -> Option<&'ast Datasource> {
         self.datasource
+    }
+
+    pub(crate) fn find_model_field(&self, model_id: ast::ModelId, field_name: &str) -> Option<ast::FieldId> {
+        self.names.model_fields.get(&(model_id, field_name)).cloned()
     }
 
     pub(crate) fn get_enum_database_name(&self, enum_id: ast::EnumId) -> Option<&'ast str> {

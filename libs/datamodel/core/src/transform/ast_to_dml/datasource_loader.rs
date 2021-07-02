@@ -247,9 +247,7 @@ fn preview_features_guardrail(args: &HashMap<&str, ValueValidator<'_>>, diagnost
                 return;
             }
         }
-        diagnostics.push_error(DatamodelError::new_connector_error(
-    "Preview features are only supported in the generator block. Please move this field to the generator block.",
-    span,
-    ));
+        let msg = "Preview features are only supported in the generator block. Please move this field to the generator block.";
+        diagnostics.push_error(DatamodelError::new_connector_error(msg, span));
     }
 }
