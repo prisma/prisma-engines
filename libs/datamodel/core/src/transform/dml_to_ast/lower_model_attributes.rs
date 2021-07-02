@@ -13,11 +13,7 @@ impl<'a> LowerDmlToAst<'a> {
         if !model.id_fields.is_empty() {
             let args = vec![ast::Argument::new_array(
                 "",
-                model
-                    .id_fields
-                    .iter()
-                    .map(|f| ast::Expression::ConstantValue(f.to_string(), ast::Span::empty()))
-                    .collect(),
+                LowerDmlToAst::field_array(&model.id_fields),
             )];
 
             attributes.push(ast::Attribute::new("id", args));
@@ -31,11 +27,7 @@ impl<'a> LowerDmlToAst<'a> {
             .for_each(|index_def| {
                 let mut args = vec![ast::Argument::new_array(
                     "",
-                    index_def
-                        .fields
-                        .iter()
-                        .map(|f| ast::Expression::ConstantValue(f.to_string(), ast::Span::empty()))
-                        .collect(),
+                    LowerDmlToAst::field_array(&index_def.fields),
                 )];
 
                 if let Some(name) = &index_def.name {
@@ -53,11 +45,7 @@ impl<'a> LowerDmlToAst<'a> {
             .for_each(|index_def| {
                 let mut args = vec![ast::Argument::new_array(
                     "",
-                    index_def
-                        .fields
-                        .iter()
-                        .map(|f| ast::Expression::ConstantValue(f.to_string(), ast::Span::empty()))
-                        .collect(),
+                    LowerDmlToAst::field_array(&index_def.fields),
                 )];
 
                 if let Some(name) = &index_def.name {

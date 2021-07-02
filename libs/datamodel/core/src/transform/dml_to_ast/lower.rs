@@ -91,4 +91,11 @@ impl<'a> LowerDmlToAst<'a> {
             is_commented_out: field.is_commented_out(),
         }
     }
+
+    pub fn field_array(fields: &[String]) -> Vec<ast::Expression> {
+        fields
+            .iter()
+            .map(|f| ast::Expression::ConstantValue(f.to_string(), ast::Span::empty()))
+            .collect()
+    }
 }
