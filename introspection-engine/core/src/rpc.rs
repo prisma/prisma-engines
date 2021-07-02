@@ -74,6 +74,11 @@ impl RpcImpl {
             .load_url(|key| std::env::var(key).ok())
             .map_err(|diagnostics| Error::DatamodelError(diagnostics.to_pretty_string("schema.prisma", schema)))?;
 
+        if connection_string.starts_with("mongo") {
+            let message = r#""mongodb" provider is not supported with this command. For more info see https://www.prisma.io/docs/concepts/database-connectors/mongodb"#;
+            return Err(Error::InvalidDatabaseUrl(message.into()));
+        }
+
         Ok((
             config.subject,
             connection_string.clone(),
