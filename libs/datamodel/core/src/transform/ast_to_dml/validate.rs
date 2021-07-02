@@ -187,7 +187,7 @@ impl<'a> Validator<'a> {
             // First check if the provider supports autoincrement at all, if yes, proceed with the detailed checks.
             if !autoinc_fields.is_empty() && !data_source.active_connector.supports_auto_increment() {
                 for field in autoinc_fields {
-                    let ast_field = ast_model.find_field(&field.name);
+                    let ast_field = ast_model.find_field_bang(&field.name);
 
                     // Add an error for all autoincrement fields on the model.
                     errors.push_error(DatamodelError::new_attribute_validation_error(
@@ -210,7 +210,7 @@ impl<'a> Validator<'a> {
 
                 // go over all fields
                 for field in autoinc_fields {
-                    let ast_field = ast_model.find_field(&field.name);
+                    let ast_field = ast_model.find_field_bang(&field.name);
 
                     if !field.is_id && !data_source.active_connector.supports_non_id_auto_increment() {
                         errors.push_error(DatamodelError::new_attribute_validation_error(
@@ -342,7 +342,7 @@ impl<'a> Validator<'a> {
                 if let Err(err) = connector.validate_field(field) {
                     diagnostics.push_error(DatamodelError::new_connector_error(
                         &err.to_string(),
-                        ast_model.find_field(field.name()).span,
+                        ast_model.find_field_bang(field.name()).span,
                     ));
                 }
 
@@ -366,7 +366,7 @@ impl<'a> Validator<'a> {
                             diagnostics.push_error(DatamodelError::new_attribute_validation_error(
                                 &message,
                                 "relation",
-                                ast_model.find_field(field.name()).span,
+                                ast_model.find_field_bang(field.name()).span,
                             ));
                         }
                     });
@@ -407,7 +407,7 @@ impl<'a> Validator<'a> {
         let mut errors = Diagnostics::new();
 
         for field in model.relation_fields() {
-            let ast_field = ast_model.find_field(&field.name);
+            let ast_field = ast_model.find_field_bang(&field.name);
 
             let rel_info = &field.relation_info;
             let at_least_one_underlying_field_is_optional = rel_info
@@ -444,7 +444,7 @@ impl<'a> Validator<'a> {
         let mut errors = Diagnostics::new();
 
         for field in model.relation_fields() {
-            let ast_field = ast_model.find_field(&field.name);
+            let ast_field = ast_model.find_field_bang(&field.name);
 
             let rel_info = &field.relation_info;
             let related_model = datamodel.find_model(&rel_info.to).expect(STATE_ERROR);
@@ -1012,7 +1012,7 @@ fn validate_name_collisions_with_map(schema: &dml::Datamodel, ast: &ast::SchemaA
                 diagnostics.push_error(DatamodelError::new_duplicate_field_error(
                     model.name(),
                     field.name(),
-                    ast.find_model(model.name()).unwrap().find_field(field.name()).span,
+                    ast.find_model(model.name()).unwrap().find_field_bang(field.name()).span,
                 ));
             }
         }

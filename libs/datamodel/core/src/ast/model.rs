@@ -45,11 +45,12 @@ impl Model {
             .map(|(idx, field)| (FieldId(idx as u32), field))
     }
 
-    pub(crate) fn find_field(&self, name: &str) -> &Field {
-        self.fields
-            .iter()
-            .find(|ast_field| ast_field.name.name == name)
-            .unwrap()
+    pub(crate) fn find_field(&self, name: &str) -> Option<&Field> {
+        self.fields.iter().find(|ast_field| ast_field.name.name == name)
+    }
+
+    pub(crate) fn find_field_bang(&self, name: &str) -> &Field {
+        self.find_field(name).unwrap()
     }
 }
 
