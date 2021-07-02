@@ -10,7 +10,7 @@ use indoc::indoc;
 use native_types::{MsSqlType, MsSqlTypeParameter::*};
 
 const BLOB_TYPES: &[&str] = &["VarBinary(Max)", "Image"];
-const TEXT_TYPES: &[&str] = &["Text", "NText", "VarChar(Max)", "NVarChar(Max)"];
+const TEXT_TYPES: &[&str] = &["Text", "NText", "VarChar(Max)", "NVarChar(Max)", "Xml"];
 
 #[test]
 fn text_and_blob_data_types_should_fail_on_index() {
