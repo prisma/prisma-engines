@@ -581,10 +581,37 @@ fn visit_relation<'ast>(
     }
 
     if let Some(references) = relation_args.optional_arg("references") {
-        let references = match references.as_constant_array() {
+        let references = match resolve_field_array(
+            &references,
+            relation_args.span(),
+            relation_field.referenced_model,
+            ctx,
+        ) {
             Ok(references) => references,
-            Err(err) => {
-                return ctx.push_error(err);
+            Err(FieldResolutionError::AlreadyDealtWith) => Vec::new(),
+            Err(FieldResolutionError::ProblematicFields {
+                relation_fields,
+                unknown_fields,
+            }) => {
+                if !unknown_fields.is_empty() {
+                    let msg = format!(
+                        "The argument `references` must refer only to existing fields in the related model `{}`. The following fields do not exist in the related model: {}",
+                        ctx.db.ast[relation_field.referenced_model].name(),
+                        unknown_fields.join(", "),
+                    );
+                    ctx.push_error(DatamodelError::new_validation_error(&msg, relation_args.span()));
+                }
+
+                if !relation_fields.is_empty() {
+                    let msg = format!(
+                        "The argument `references` must refer only to scalar fields in the related model `{}`. But it is referencing the following relation fields: {}",
+                        ctx.db.ast[relation_field.referenced_model].name(),
+                        relation_fields.iter().map(|(f, _)| f.name()).join(", "),
+                    );
+                    ctx.push_error(DatamodelError::new_validation_error(&msg, relation_args.span()));
+                }
+
+                Vec::new()
             }
         };
 

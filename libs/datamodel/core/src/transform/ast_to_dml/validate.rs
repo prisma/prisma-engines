@@ -449,20 +449,6 @@ impl<'a> Validator<'a> {
             let rel_info = &field.relation_info;
             let related_model = datamodel.find_model(&rel_info.to).expect(STATE_ERROR);
 
-            let unknown_fields: Vec<String> = rel_info
-                .references
-                .iter()
-                .filter(|referenced_field| related_model.find_field(referenced_field).is_none())
-                .cloned()
-                .collect();
-
-            let referenced_relation_fields: Vec<String> = rel_info
-                .references
-                .iter()
-                .filter(|base_field| related_model.find_relation_field(base_field).is_some())
-                .cloned()
-                .collect();
-
             let fields_with_wrong_type: Vec<DatamodelError> = rel_info.fields.iter().zip(rel_info.references.iter())
                     .filter_map(|(base_field, referenced_field)| {
                         let base_field = model.find_field(base_field)?;
@@ -508,24 +494,6 @@ impl<'a> Validator<'a> {
                         ))
                     })
                     .collect();
-
-            if !unknown_fields.is_empty() {
-                errors.push_error(DatamodelError::new_validation_error(
-                        &format!("The argument `references` must refer only to existing fields in the related model `{}`. The following fields do not exist in the related model: {}",
-                                 &related_model.name,
-                                 unknown_fields.join(", ")),
-                        ast_field.span)
-                    );
-            }
-
-            if !referenced_relation_fields.is_empty() {
-                errors.push_error(DatamodelError::new_validation_error(
-                        &format!("The argument `references` must refer only to scalar fields in the related model `{}`. But it is referencing the following relation fields: {}",
-                                 &related_model.name,
-                                 referenced_relation_fields.join(", ")),
-                        ast_field.span)
-                    );
-            }
 
             if !rel_info.references.is_empty() && !errors.has_errors() {
                 let strict_relation_field_order = self

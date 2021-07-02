@@ -78,7 +78,7 @@ pub(crate) struct RelationField<'ast> {
     /// The fields _explicitly present_ in the AST.
     pub(crate) fields: Option<Vec<ast::FieldId>>,
     /// The `references` fields _explicitly present_ in the AST.
-    pub(crate) references: Option<Vec<&'ast str>>,
+    pub(crate) references: Option<Vec<ast::FieldId>>,
     /// The name _explicitly present_ in the AST.
     pub(crate) name: Option<&'ast str>,
     pub(crate) is_ignored: bool,

@@ -1,5 +1,5 @@
 use crate::{
-    ast,
+    ast::{self, WithName},
     diagnostics::{DatamodelError, Diagnostics},
     dml,
     transform::{
@@ -122,7 +122,7 @@ impl<'a> LiftAstToDml<'a> {
             let ast_field = &ast_model[field_id];
             let arity = self.lift_field_arity(&ast_field.arity);
             let target_model = &self.db.ast()[relation_field.referenced_model];
-            let relation_info = dml::RelationInfo::new(&target_model.name.name);
+            let relation_info = dml::RelationInfo::new(&target_model.name());
 
             let mut field = dml::RelationField::new(&ast_field.name.name, arity, arity, relation_info);
 
@@ -140,7 +140,7 @@ impl<'a> LiftAstToDml<'a> {
             field.relation_info.references = relation_field
                 .references
                 .as_ref()
-                .map(|references| references.iter().map(|s| (*s).to_owned()).collect())
+                .map(|references| references.iter().map(|s| target_model[*s].name().to_owned()).collect())
                 .unwrap_or_default();
 
             field.relation_info.fields = relation_field
