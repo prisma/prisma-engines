@@ -87,7 +87,7 @@ impl<'a> ValueValidator<'a> {
     }
 
     /// Tries to convert the wrapped value to a Prisma String.
-    pub fn as_str(&self) -> Result<&str, DatamodelError> {
+    pub fn as_str(&self) -> Result<&'a str, DatamodelError> {
         match &self.value {
             ast::Expression::StringValue(value, _) => Ok(value),
             _ => Err(self.construct_type_mismatch_error("String")),
@@ -106,17 +106,17 @@ impl<'a> ValueValidator<'a> {
         }
     }
 
-    pub fn as_env_function(&self) -> Result<EnvFunction, DatamodelError> {
+    pub(crate) fn as_env_function(&self) -> Result<EnvFunction, DatamodelError> {
         EnvFunction::from_ast(self.value)
     }
 
     /// returns true if this argument is derived from an env() function
-    pub fn is_from_env(&self) -> bool {
+    pub(crate) fn is_from_env(&self) -> bool {
         self.value.is_env_expression()
     }
 
     /// Tries to convert the wrapped value to a Prisma Integer.
-    pub fn as_int(&self) -> Result<i64, DatamodelError> {
+    pub(crate) fn as_int(&self) -> Result<i64, DatamodelError> {
         match &self.value {
             ast::Expression::NumericValue(value, _) => self.wrap_error_from_result(value.parse::<i64>(), "numeric"),
             _ => Err(self.construct_type_mismatch_error("numeric")),
@@ -124,7 +124,7 @@ impl<'a> ValueValidator<'a> {
     }
 
     /// Tries to convert the wrapped value to a Prisma Float.
-    pub fn as_float(&self) -> Result<BigDecimal, DatamodelError> {
+    pub(crate) fn as_float(&self) -> Result<BigDecimal, DatamodelError> {
         match &self.value {
             ast::Expression::StringValue(value, _) => {
                 self.wrap_error_from_result(value.parse::<BigDecimal>(), "numeric")
@@ -157,29 +157,30 @@ impl<'a> ValueValidator<'a> {
     }
 
     /// Unwraps the value as an array of constants.
-    pub fn as_constant_array(&self) -> Result<Vec<String>, DatamodelError> {
+    pub fn as_constant_array(&self) -> Result<Vec<&'a str>, DatamodelError> {
         if let ast::Expression::Array(values, _) = &self.value {
             values
                 .iter()
                 .map(|val| ValueValidator::new(val).as_constant_literal())
                 .collect()
         } else {
-            Err(self.construct_type_mismatch_error("Array of constants"))
+            // Single values are accepted as array literals, for example in `@relation(fields: userId)`.
+            Ok(vec![self.as_constant_literal()?])
         }
     }
 
     /// Unwraps the wrapped value as a constant literal.
-    pub fn as_constant_literal(&self) -> Result<String, DatamodelError> {
+    pub fn as_constant_literal(&self) -> Result<&'a str, DatamodelError> {
         match &self.value {
-            ast::Expression::ConstantValue(value, _) => Ok(value.to_string()),
-            ast::Expression::BooleanValue(value, _) => Ok(value.to_string()),
+            ast::Expression::ConstantValue(value, _) => Ok(value),
+            ast::Expression::BooleanValue(value, _) => Ok(value),
             _ => Err(self.construct_type_mismatch_error("constant literal")),
         }
     }
 
     /// Unwraps the wrapped value as a referential action.
     pub fn as_referential_action(&self) -> Result<ReferentialAction, DatamodelError> {
-        match self.as_constant_literal()?.as_str() {
+        match self.as_constant_literal()? {
             "Cascade" => Ok(ReferentialAction::Cascade),
             "Restrict" => Ok(ReferentialAction::Restrict),
             "NoAction" => Ok(ReferentialAction::NoAction),
@@ -253,7 +254,7 @@ impl<'a> ValueValidator<'a> {
                         vec![x]
                     }
                     [] => vec![],
-                    _ => panic!("Should only be empty or single String."),
+                    _ => return Err(self.construct_type_mismatch_error("String or empty")),
                 };
                 self.get_value_generator(name, prisma_args)
             }
@@ -283,6 +284,8 @@ impl ValueListValidator for Vec<ValueValidator<'_>> {
     }
 
     fn to_literal_vec(&self) -> Result<Vec<String>, DatamodelError> {
-        self.iter().map(|val| val.as_constant_literal()).collect()
+        self.iter()
+            .map(|val| val.as_constant_literal().map(String::from))
+            .collect()
     }
 }

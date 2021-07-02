@@ -161,13 +161,11 @@ fn json_type_must_work_for_some_connectors() {
     }
     "#;
 
-    // empty connector does not support it
-    parse_error(dml).assert_is(DatamodelError::new_field_validation_error(
-        "Field `json` in model `User` can\'t be of type Json. The current connector does not support the Json type.",
-        "User",
-        "json",
-        Span::new(50, 60),
-    ));
+    // empty connector does support it
+    parse(dml)
+        .assert_has_model("User")
+        .assert_has_scalar_field("json")
+        .assert_base_type(&ScalarType::Json);
 
     // SQLite does not support it
     parse_error(&format!("{}\n{}", SQLITE_SOURCE, dml)).assert_is(DatamodelError::new_field_validation_error(

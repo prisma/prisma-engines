@@ -241,18 +241,13 @@ fn preview_features_guardrail(args: &HashMap<&str, ValueValidator<'_>>, diagnost
     let arg = args.get(PREVIEW_FEATURES_KEY);
 
     if let Some(val) = arg {
-        match val.as_array().to_str_vec() {
-            Ok(features) => {
-                if features.is_empty() {
-                    return;
-                }
-
-                diagnostics.push_error(DatamodelError::new_connector_error(
-            "Preview features are only supported in the generator block. Please move this field to the generator block.",
-            val.span(),
-            ));
+        let span = val.span();
+        if let Ok(features) = val.as_array().to_str_vec() {
+            if features.is_empty() {
+                return;
             }
-            Err(err) => diagnostics.push_error(err),
         }
+        let msg = "Preview features are only supported in the generator block. Please move this field to the generator block.";
+        diagnostics.push_error(DatamodelError::new_connector_error(msg, span));
     }
 }

@@ -17,7 +17,11 @@ impl Connector for EmptyDatamodelConnector {
     }
 
     fn capabilities(&self) -> &[ConnectorCapability] {
-        &[]
+        &[
+            ConnectorCapability::CompoundIds,
+            ConnectorCapability::Enums,
+            ConnectorCapability::Json,
+        ]
     }
 
     fn constraint_name_length(&self) -> usize {

@@ -1,6 +1,6 @@
 use super::Context;
 use crate::{
-    ast::{self, Argument, FieldId, TopId, WithIdentifier},
+    ast::{self, Argument, FieldId, TopId, WithAttributes, WithIdentifier},
     diagnostics::DatamodelError,
 };
 use dml::scalars::ScalarType;
@@ -28,9 +28,18 @@ pub(super) struct Names<'ast> {
     /// Datasources have their own namespace.
     pub(super) datasources: HashMap<&'ast str, TopId>,
     pub(super) model_fields: BTreeMap<(ast::ModelId, &'ast str), FieldId>,
+    pub(super) mapped_names: HashMap<MappedName, &'ast str>,
 }
 
-pub(super) fn resolve_names(ctx: &mut Context<'_, '_>) {
+#[derive(PartialEq, Eq, Hash)]
+pub(super) enum MappedName {
+    Model(ast::ModelId),
+    Field(ast::ModelId, ast::FieldId),
+    Enum(ast::EnumId),
+    EnumValue(ast::EnumId, u32),
+}
+
+pub(super) fn resolve_names(ctx: &mut Context<'_>) {
     let mut tmp_names: HashSet<&str> = HashSet::new(); // throwaway container for duplicate checking
     let mut names = Names::default();
 
@@ -40,8 +49,13 @@ pub(super) fn resolve_names(ctx: &mut Context<'_, '_>) {
         let namespace = match (top_id, top) {
             (_, ast::Top::Enum(ast_enum)) => {
                 tmp_names.clear();
+                ast_enum.name.validate("Enum", &mut ctx.diagnostics);
+                ast_enum.validate_attributes(&mut ctx.diagnostics);
 
                 for value in &ast_enum.values {
+                    value.name.validate("Enum Value", &mut ctx.diagnostics);
+                    value.validate_attributes(&mut ctx.diagnostics);
+
                     if !tmp_names.insert(&value.name.name) {
                         ctx.push_error(DatamodelError::new_duplicate_enum_value_error(
                             &ast_enum.name.name,
@@ -54,7 +68,13 @@ pub(super) fn resolve_names(ctx: &mut Context<'_, '_>) {
                 &mut names.tops
             }
             (ast::TopId::Model(model_id), ast::Top::Model(model)) => {
+                model.name.validate("Model", &mut ctx.diagnostics);
+                model.validate_attributes(&mut ctx.diagnostics);
+
                 for (field_id, field) in model.iter_fields() {
+                    field.name.validate("Field", &mut ctx.diagnostics);
+                    field.validate_attributes(&mut ctx.diagnostics);
+
                     if names
                         .model_fields
                         .insert((model_id, &field.name.name), field_id)
@@ -92,7 +112,7 @@ fn insert_name<'ast>(
     top_id: TopId,
     top: &'ast ast::Top,
     namespace: &mut HashMap<&'ast str, TopId>,
-    ctx: &mut Context<'_, '_>,
+    ctx: &mut Context<'_>,
 ) {
     if let Some(existing) = namespace.insert(top.name(), top_id) {
         ctx.push_error(duplicate_top_error(&ctx.db.ast[existing], top));
@@ -108,7 +128,7 @@ fn duplicate_top_error(existing: &ast::Top, duplicate: &ast::Top) -> DatamodelEr
     )
 }
 
-fn assert_is_not_a_reserved_scalar_type(top: &dyn WithIdentifier, ctx: &mut Context<'_, '_>) {
+fn assert_is_not_a_reserved_scalar_type(top: &dyn WithIdentifier, ctx: &mut Context<'_>) {
     let ident = top.identifier();
     if ScalarType::from_str(&ident.name).is_ok() {
         ctx.push_error(DatamodelError::new_reserved_scalar_type_error(&ident.name, ident.span));
@@ -119,7 +139,7 @@ fn check_for_duplicate_properties<'a>(
     top: &ast::Top,
     props: &'a [Argument],
     tmp_names: &mut HashSet<&'a str>,
-    ctx: &mut Context<'_, '_>,
+    ctx: &mut Context<'_>,
 ) {
     tmp_names.clear();
     for arg in props {

@@ -1,5 +1,5 @@
 pub struct TypeNameValidator {
-    reserved_names: Vec<&'static str>,
+    reserved_names: &'static [&'static str],
 }
 
 impl TypeNameValidator {
@@ -7,7 +7,7 @@ impl TypeNameValidator {
     // https://github.com/prisma/prisma/blob/master/src/packages/client/src/generation/generateClient.ts#L443
     pub fn new() -> Self {
         Self {
-            reserved_names: vec![
+            reserved_names: &[
                 "PrismaClient",
                 // JavaScript keywords
                 "break",

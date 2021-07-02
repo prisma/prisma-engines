@@ -59,12 +59,21 @@ impl SchemaAst {
         SchemaAst { tops: Vec::new() }
     }
 
+    // Deprecated. Use ParserDatabase instead where possible.
     pub(crate) fn find_model(&self, model: &str) -> Option<&Model> {
-        self.models().into_iter().find(|m| m.name.name == model)
+        self.iter_models().find(|(_, m)| m.name.name == model).map(|(_, m)| m)
     }
 
+    // Deprecated. Use ParserDatabase instead where possible.
     pub(crate) fn find_field(&self, model: &str, field: &str) -> Option<&Field> {
         self.find_model(model)?.fields.iter().find(|f| f.name.name == field)
+    }
+
+    pub(crate) fn iter_models(&self) -> impl Iterator<Item = (ModelId, &Model)> {
+        self.iter_tops().filter_map(|(top_id, top)| match (top_id, top) {
+            (TopId::Model(model_id), Top::Model(model)) => Some((model_id, model)),
+            _ => None,
+        })
     }
 
     pub(crate) fn iter_tops(&self) -> impl Iterator<Item = (TopId, &Top)> {
@@ -79,10 +88,6 @@ impl SchemaAst {
 
             (top_id, top)
         })
-    }
-
-    pub(crate) fn models(&self) -> impl Iterator<Item = &Model> {
-        self.tops.iter().filter_map(|top| top.as_model())
     }
 
     pub(crate) fn sources(&self) -> impl Iterator<Item = &SourceConfig> {
@@ -110,6 +115,14 @@ impl std::ops::Index<ModelId> for SchemaAst {
 /// An opaque identifier for an enum in a schema AST.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub(crate) struct EnumId(u32);
+
+impl std::ops::Index<EnumId> for SchemaAst {
+    type Output = Enum;
+
+    fn index(&self, index: EnumId) -> &Self::Output {
+        self.tops[index.0 as usize].as_enum().unwrap()
+    }
+}
 
 /// An opaque identifier for a type alias in a schema AST. Use the
 /// `schema[alias_id]` syntax to resolve the id to an `ast::Field`.

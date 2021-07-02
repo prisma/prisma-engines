@@ -1,5 +1,4 @@
-use super::{super::helpers::*, AttributeValidator};
-use crate::diagnostics::DatamodelError;
+use super::AttributeValidator;
 use crate::{ast, dml};
 
 /// Prismas builtin `@primary` attribute.
@@ -8,22 +7,6 @@ pub struct IdAttributeValidator {}
 impl AttributeValidator<dml::Field> for IdAttributeValidator {
     fn attribute_name(&self) -> &'static str {
         "id"
-    }
-
-    fn validate_and_apply(&self, args: &mut Arguments<'_>, obj: &mut dml::Field) -> Result<(), DatamodelError> {
-        if let dml::Field::ScalarField(sf) = obj {
-            sf.is_id = true;
-            Ok(())
-        } else {
-            self.new_attribute_validation_error(
-                &format!(
-                    "The field `{}` is a relation field and cannot be marked with `@{}`. Only scalar fields can be declared as id.",
-                    &obj.name(),
-                    self.attribute_name()
-                ),
-                args.span(),
-            )
-        }
     }
 
     fn serialize(&self, field: &dml::Field, _datamodel: &dml::Datamodel) -> Vec<ast::Attribute> {
@@ -40,14 +23,8 @@ impl AttributeValidator<dml::Field> for IdAttributeValidator {
 pub struct ModelLevelIdAttributeValidator {}
 
 impl AttributeValidator<dml::Model> for ModelLevelIdAttributeValidator {
-    fn attribute_name(&self) -> &str {
+    fn attribute_name(&self) -> &'static str {
         "id"
-    }
-
-    fn validate_and_apply(&self, args: &mut Arguments<'_>, obj: &mut dml::Model) -> Result<(), DatamodelError> {
-        obj.id_fields = args.default_arg("fields")?.as_constant_array()?;
-
-        Ok(())
     }
 
     fn serialize(&self, model: &dml::Model, _datamodel: &dml::Datamodel) -> Vec<ast::Attribute> {

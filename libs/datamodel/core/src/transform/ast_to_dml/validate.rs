@@ -1,4 +1,5 @@
 use super::db::ParserDatabase;
+use crate::walkers::walk_models;
 use crate::{
     ast,
     common::preview_features::PreviewFeature,
@@ -6,12 +7,9 @@ use crate::{
     diagnostics::{DatamodelError, Diagnostics},
     dml,
     walkers::ModelWalker,
-    DefaultValue, FieldType,
 };
-use crate::{ast::WithAttributes, walkers::walk_models};
 use enumflags2::BitFlags;
 use itertools::Itertools;
-use prisma_value::PrismaValue;
 use std::collections::{HashMap, HashSet};
 
 /// Helper for validating a datamodel.
@@ -44,10 +42,6 @@ impl<'a> Validator<'a> {
         let mut all_errors = Diagnostics::new();
         let ast_schema = db.ast();
 
-        if let Err(ref mut errs) = self.validate_names(db) {
-            all_errors.append(errs);
-        }
-
         if let Err(ref mut errs) = self.validate_names_for_indexes(ast_schema, schema) {
             all_errors.append(errs);
         }
@@ -57,30 +51,7 @@ impl<'a> Validator<'a> {
             // Having a separate error collection allows checking whether any error has occurred for a model.
             let mut errors_for_model = Diagnostics::new();
 
-            if let Some(sf) = model.scalar_fields().find(|f| f.is_id && !f.is_required()) {
-                if !model.is_ignored {
-                    let span = ast_schema
-                        .find_model(&model.name)
-                        .unwrap()
-                        .fields
-                        .iter()
-                        .find(|f| f.name.name == sf.name)
-                        .map(|f| f.attributes.iter().find(|att| att.name.name == "id").unwrap().span)
-                        .unwrap_or_else(ast::Span::empty);
-
-                    all_errors.push_error(DatamodelError::new_attribute_validation_error(
-                        "Fields that are marked as id must be required.",
-                        "id",
-                        span,
-                    ));
-                }
-            }
-
             let ast_model = ast_schema.find_model(&model.name).expect(STATE_ERROR);
-
-            if let Err(err) = self.validate_model_compound_ids(ast_model, model) {
-                errors_for_model.push_error(err);
-            }
 
             if let Err(err) = self.validate_model_has_strict_unique_criteria(ast_model, model) {
                 errors_for_model.push_error(err);
@@ -94,24 +65,12 @@ impl<'a> Validator<'a> {
                 errors_for_model.push_error(err);
             }
 
-            if let Err(ref mut the_errors) = self.validate_field_arities(ast_model, model) {
-                errors_for_model.append(the_errors);
-            }
-
-            if let Err(ref mut the_errors) = self.validate_field_types(ast_model, model) {
-                errors_for_model.append(the_errors);
-            }
-
             if let Err(ref mut the_errors) = self.validate_field_connector_specific(ast_model, model) {
                 errors_for_model.append(the_errors)
             }
 
             if let Err(ref mut the_errors) = self.validate_model_connector_specific(ast_model, model) {
                 errors_for_model.append(the_errors)
-            }
-
-            if let Err(ref mut the_errors) = self.validate_enum_default_values(schema, ast_model, model) {
-                errors_for_model.append(the_errors);
             }
 
             if let Err(ref mut the_errors) = self.validate_auto_increment(ast_model, model) {
@@ -181,32 +140,6 @@ impl<'a> Validator<'a> {
         }
     }
 
-    fn validate_names(&self, db: &ParserDatabase<'_>) -> Result<(), Diagnostics> {
-        let mut errors = Diagnostics::new();
-
-        for model in db.ast().models() {
-            errors.push_opt_error(model.name.validate("Model").err());
-            errors.append(&mut model.validate_attributes());
-
-            for field in model.fields.iter() {
-                errors.push_opt_error(field.name.validate("Field").err());
-                errors.append(&mut field.validate_attributes());
-            }
-        }
-
-        for (_, enum_decl) in db.iter_enums() {
-            errors.push_opt_error(enum_decl.name.validate("Enum").err());
-            errors.append(&mut enum_decl.validate_attributes());
-
-            for enum_value in enum_decl.values.iter() {
-                errors.push_opt_error(enum_value.name.validate("Enum Value").err());
-                errors.append(&mut enum_value.validate_attributes());
-            }
-        }
-
-        errors.to_result()
-    }
-
     fn validate_names_for_indexes(
         &self,
         ast_schema: &ast::SchemaAst,
@@ -243,92 +176,6 @@ impl<'a> Validator<'a> {
         }
 
         errors.to_result()
-    }
-
-    fn validate_field_arities(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), Diagnostics> {
-        let mut errors = Diagnostics::new();
-
-        // TODO: this is really ugly
-        let scalar_lists_are_supported = match self.source {
-            Some(source) => source.active_connector.supports_scalar_lists(),
-            None => false,
-        };
-
-        for field in model.scalar_fields() {
-            if field.is_list() && !scalar_lists_are_supported {
-                errors.push_error(DatamodelError::new_scalar_list_fields_are_not_supported(
-                    &model.name,
-                    &field.name,
-                    ast_model.find_field(&field.name).span,
-                ));
-            }
-        }
-
-        if errors.has_errors() {
-            Err(errors)
-        } else {
-            Ok(())
-        }
-    }
-
-    fn validate_field_types(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), Diagnostics> {
-        let mut errors = Diagnostics::new();
-
-        for field in model.scalar_fields() {
-            if let Some(dml::ScalarType::Json) = field.field_type.scalar_type() {
-                // TODO: this is really ugly
-                let supports_json_type = match self.source {
-                    Some(source) => source.active_connector.supports_json(),
-                    None => false,
-                };
-                if !supports_json_type {
-                    errors.push_error(DatamodelError::new_field_validation_error(
-                        &format!("Field `{}` in model `{}` can't be of type Json. The current connector does not support the Json type.", &field.name, &model.name),
-                        &model.name,
-                        &field.name,
-                        ast_model.find_field(&field.name).span,
-                    ));
-                }
-            }
-        }
-
-        if errors.has_errors() {
-            Err(errors)
-        } else {
-            Ok(())
-        }
-    }
-
-    fn validate_enum_default_values(
-        &self,
-        data_model: &dml::Datamodel,
-        ast_model: &ast::Model,
-        model: &dml::Model,
-    ) -> Result<(), Diagnostics> {
-        let mut errors = Diagnostics::new();
-
-        for field in model.scalar_fields() {
-            if let Some(DefaultValue::Single(PrismaValue::Enum(enum_value))) = &field.default_value {
-                if let FieldType::Enum(enum_name) = &field.field_type {
-                    if let Some(dml_enum) = data_model.find_enum(enum_name) {
-                        if !dml_enum.values.iter().any(|value| &value.name == enum_value) {
-                            errors.push_error(DatamodelError::new_attribute_validation_error(
-                                &"The defined default value is not a valid value of the enum specified for the field."
-                                    .to_string(),
-                                "default",
-                                ast_model.find_field(&field.name).span,
-                            ))
-                        }
-                    }
-                }
-            }
-        }
-
-        if errors.has_errors() {
-            Err(errors)
-        } else {
-            Ok(())
-        }
     }
 
     fn validate_auto_increment(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), Diagnostics> {
@@ -452,28 +299,6 @@ impl<'a> Validator<'a> {
         Ok(())
     }
 
-    fn validate_model_compound_ids(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), DatamodelError> {
-        if let Some(source) = self.source {
-            if !model.id_fields.is_empty() && !source.active_connector.supports_compound_ids() {
-                let ast_attr = ast_model
-                    .attributes()
-                    .iter()
-                    .find(|attr| &attr.name.name == "id")
-                    .unwrap();
-
-                Err(DatamodelError::new_model_validation_error(
-                    "The current connector does not support compound ids.",
-                    &model.name,
-                    ast_attr.span,
-                ))
-            } else {
-                Ok(())
-            }
-        } else {
-            Ok(())
-        }
-    }
-
     fn validate_model_name(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), DatamodelError> {
         let validator = super::reserved_model_names::TypeNameValidator::new();
 
@@ -585,39 +410,11 @@ impl<'a> Validator<'a> {
             let ast_field = ast_model.find_field(&field.name);
 
             let rel_info = &field.relation_info;
-            let unknown_fields: Vec<String> = rel_info
-                .fields
-                .iter()
-                .filter(|base_field| model.find_field(base_field).is_none())
-                .cloned()
-                .collect();
-
-            let referenced_relation_fields: Vec<String> = rel_info
-                .fields
-                .iter()
-                .filter(|base_field| model.find_relation_field(base_field).is_some())
-                .cloned()
-                .collect();
-
             let at_least_one_underlying_field_is_optional = rel_info
                 .fields
                 .iter()
                 .filter_map(|base_field| model.find_scalar_field(base_field))
                 .any(|f| f.is_optional());
-
-            if !unknown_fields.is_empty() {
-                errors.push_error(DatamodelError::new_validation_error(
-                        &format!("The argument fields must refer only to existing fields. The following fields do not exist in this model: {}", unknown_fields.join(", ")),
-                        ast_field.span)
-                    );
-            }
-
-            if !referenced_relation_fields.is_empty() {
-                errors.push_error(DatamodelError::new_validation_error(
-                        &format!("The argument fields must refer only to scalar fields. But it is referencing the following relation fields: {}", referenced_relation_fields.join(", ")),
-                        ast_field.span)
-                    );
-            }
 
             if at_least_one_underlying_field_is_optional && field.is_required() {
                 errors.push_error(DatamodelError::new_validation_error(
@@ -651,20 +448,6 @@ impl<'a> Validator<'a> {
 
             let rel_info = &field.relation_info;
             let related_model = datamodel.find_model(&rel_info.to).expect(STATE_ERROR);
-
-            let unknown_fields: Vec<String> = rel_info
-                .references
-                .iter()
-                .filter(|referenced_field| related_model.find_field(referenced_field).is_none())
-                .cloned()
-                .collect();
-
-            let referenced_relation_fields: Vec<String> = rel_info
-                .references
-                .iter()
-                .filter(|base_field| related_model.find_relation_field(base_field).is_some())
-                .cloned()
-                .collect();
 
             let fields_with_wrong_type: Vec<DatamodelError> = rel_info.fields.iter().zip(rel_info.references.iter())
                     .filter_map(|(base_field, referenced_field)| {
@@ -711,24 +494,6 @@ impl<'a> Validator<'a> {
                         ))
                     })
                     .collect();
-
-            if !unknown_fields.is_empty() {
-                errors.push_error(DatamodelError::new_validation_error(
-                        &format!("The argument `references` must refer only to existing fields in the related model `{}`. The following fields do not exist in the related model: {}",
-                                 &related_model.name,
-                                 unknown_fields.join(", ")),
-                        ast_field.span)
-                    );
-            }
-
-            if !referenced_relation_fields.is_empty() {
-                errors.push_error(DatamodelError::new_validation_error(
-                        &format!("The argument `references` must refer only to scalar fields in the related model `{}`. But it is referencing the following relation fields: {}",
-                                 &related_model.name,
-                                 referenced_relation_fields.join(", ")),
-                        ast_field.span)
-                    );
-            }
 
             if !rel_info.references.is_empty() && !errors.has_errors() {
                 let strict_relation_field_order = self

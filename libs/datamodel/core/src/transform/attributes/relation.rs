@@ -1,8 +1,7 @@
-use super::{super::helpers::*, AttributeValidator};
+use super::AttributeValidator;
 use crate::{
     ast,
     common::{preview_features::PreviewFeature, RelationNames},
-    diagnostics::DatamodelError,
     dml, Field,
 };
 use enumflags2::BitFlags;
@@ -21,41 +20,6 @@ impl RelationAttributeValidator {
 impl AttributeValidator<dml::Field> for RelationAttributeValidator {
     fn attribute_name(&self) -> &'static str {
         "relation"
-    }
-
-    fn validate_and_apply(&self, args: &mut Arguments<'_>, field: &mut dml::Field) -> Result<(), DatamodelError> {
-        if let dml::Field::RelationField(rf) = field {
-            if let Ok(name_arg) = args.default_arg("name") {
-                let name = name_arg.as_str()?;
-
-                if name.is_empty() {
-                    return self
-                        .new_attribute_validation_error("A relation cannot have an empty name.", name_arg.span());
-                }
-
-                rf.relation_info.name = name.to_owned();
-            }
-
-            if let Ok(related_fields) = args.arg("references") {
-                rf.relation_info.references = related_fields.as_array().to_literal_vec()?;
-            }
-
-            if let Ok(base_fields) = args.arg("fields") {
-                rf.relation_info.fields = base_fields.as_array().to_literal_vec()?;
-            }
-
-            if let Ok(on_delete) = args.arg("onDelete") {
-                rf.relation_info.on_delete = Some(on_delete.as_referential_action()?);
-            }
-
-            if let Ok(on_update) = args.arg("onUpdate") {
-                rf.relation_info.on_update = Some(on_update.as_referential_action()?);
-            }
-
-            Ok(())
-        } else {
-            self.new_attribute_validation_error("Invalid field type, not a relation.", args.span())
-        }
     }
 
     fn serialize(&self, field: &dml::Field, datamodel: &dml::Datamodel) -> Vec<ast::Attribute> {

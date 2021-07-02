@@ -107,7 +107,7 @@ fn single_field_unique_on_relation_fields_must_error_nicely_with_many_underlying
         identificationId1 Int
         identificationId2 Int
 
-        identification Identification @relation(fields: [identificationId1, identificationId2], references:[id]) @unique
+        identification Identification @relation(fields: [identificationId1, identificationId2], references:[id1, id2]) @unique
     }
 
     model Identification {
@@ -118,7 +118,7 @@ fn single_field_unique_on_relation_fields_must_error_nicely_with_many_underlying
     "#;
 
     let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_attribute_validation_error("The field `identification` is a relation field and cannot be marked with `unique`. Only scalar fields can be made unique. Did you mean to provide `@@unique([identificationId1, identificationId2])`?", "unique", Span::new(227, 233)));
+    errors.assert_is(DatamodelError::new_attribute_validation_error("The field `identification` is a relation field and cannot be marked with `unique`. Only scalar fields can be made unique. Did you mean to provide `@@unique([identificationId1, identificationId2])`?", "unique", Span::new(233, 239)));
 }
 
 #[test]
@@ -298,7 +298,7 @@ fn must_error_when_using_the_same_field_multiple_times() {
     let errors = parse_error(dml);
 
     errors.assert_is(DatamodelError::new_model_validation_error(
-        "The unique index definition refers to the fields email multiple times.",
+        "The unique index definition refers to the field email multiple times.",
         "User",
         Span::new(83, 105),
     ));

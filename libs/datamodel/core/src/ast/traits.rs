@@ -17,12 +17,10 @@ pub trait WithIdentifier {
 pub trait WithAttributes {
     fn attributes(&self) -> &Vec<Attribute>;
 
-    fn validate_attributes(&self) -> Diagnostics {
-        let mut errors = Diagnostics::new();
+    fn validate_attributes(&self, diagnostics: &mut Diagnostics) {
         for attribute in self.attributes() {
-            errors.push_opt_error(attribute.name.validate("Attribute").err());
+            attribute.name.validate("Attribute", diagnostics);
         }
-        errors
     }
 }
 
