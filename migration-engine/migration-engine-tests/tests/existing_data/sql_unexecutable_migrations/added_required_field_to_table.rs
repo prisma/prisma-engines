@@ -1,4 +1,4 @@
-use migration_engine_tests::{sql::ResultSetExt, sync_test_api::*};
+use migration_engine_tests::sync_test_api::*;
 
 #[test_connector]
 fn adding_a_required_field_to_an_existing_table_with_data_without_a_default_is_unexecutable(api: TestApi) {

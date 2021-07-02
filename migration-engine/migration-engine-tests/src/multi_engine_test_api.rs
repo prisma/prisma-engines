@@ -5,9 +5,13 @@
 
 use datamodel::common::preview_features::PreviewFeature;
 pub use test_macros::test_connector;
+pub use test_setup::sqlite_test_url;
 pub use test_setup::{BitFlags, Capabilities, Tags};
 
-use crate::{ApplyMigrations, CreateMigration, DiagnoseMigrationHistory, Reset, SchemaAssertion, SchemaPush};
+use crate::{
+    assertions::SchemaAssertion,
+    commands::{ApplyMigrations, CreateMigration, DiagnoseMigrationHistory, Reset, SchemaPush},
+};
 use migration_core::GenericApi;
 use quaint::{
     prelude::{Queryable, ResultSet},
