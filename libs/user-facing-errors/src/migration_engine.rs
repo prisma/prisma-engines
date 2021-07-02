@@ -255,6 +255,13 @@ pub struct ProviderSwitchedError {
 )]
 pub struct AzureMssqlShadowDb;
 
+#[derive(Debug, Serialize, UserFacingError)]
+#[user_facing(
+    code = "P3021",
+    message = "Foreign keys can not be created on this database. Learn more how to handle this: https://pris.ly/d/migrate-no-foreign-keys"
+)]
+pub struct ForeignKeyCreationNotAllowed;
+
 #[cfg(test)]
 mod tests {
     use super::*;

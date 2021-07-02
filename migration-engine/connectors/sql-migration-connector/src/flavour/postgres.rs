@@ -122,6 +122,10 @@ impl SqlFlavour for PostgresFlavour {
         Ok(())
     }
 
+    async fn run_query_script(&self, sql: &str, connection: &Connection) -> ConnectorResult<()> {
+        Ok(connection.raw_cmd(sql).await?)
+    }
+
     async fn apply_migration_script(
         &self,
         migration_name: &str,
@@ -147,23 +151,27 @@ impl SqlFlavour for PostgresFlavour {
                             byte_index += line.len() + 1; // + 1 for the \n character.
 
                             if *position as usize <= byte_index {
-                                error_position = format!(
-                                    "\n\nPosition:\n{}\n\x1b[1m{:>3}\x1b[1;31m {}\x1b[0m",
-                                    previous_lines
-                                        .iter()
-                                        .enumerate()
-                                        .filter_map(|(idx, line)| line_number
+                                let numbered_lines = previous_lines
+                                    .iter()
+                                    .enumerate()
+                                    .filter_map(|(idx, line)| {
+                                        line_number
                                             .checked_sub(previous_lines.len() - idx)
-                                            .map(|idx| (idx, line)))
-                                        .map(|(idx, line)| format!(
+                                            .map(|idx| (idx, line))
+                                    })
+                                    .map(|(idx, line)| {
+                                        format!(
                                             "\x1b[1m{:>3}\x1b[0m{}{}",
                                             idx,
                                             if line.is_empty() { "" } else { " " },
                                             line
-                                        ))
-                                        .join("\n"),
-                                    line_number,
-                                    line
+                                        )
+                                    })
+                                    .join("\n");
+
+                                error_position = format!(
+                                    "\n\nPosition:\n{}\n\x1b[1m{:>3}\x1b[1;31m {}\x1b[0m",
+                                    numbered_lines, line_number, line
                                 );
                                 break;
                             } else {

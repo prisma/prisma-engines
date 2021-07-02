@@ -105,6 +105,9 @@ pub(crate) trait SqlFlavour:
         connector: &SqlMigrationConnector,
     ) -> ConnectorResult<SqlSchema>;
 
+    /// Runs a single SQL script.
+    async fn run_query_script(&self, sql: &str, connection: &Connection) -> ConnectorResult<()>;
+
     /// The preview features in use.
     fn preview_features(&self) -> BitFlags<PreviewFeature>;
 

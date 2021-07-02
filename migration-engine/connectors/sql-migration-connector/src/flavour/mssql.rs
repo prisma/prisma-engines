@@ -204,6 +204,10 @@ impl SqlFlavour for MssqlFlavour {
         Ok(())
     }
 
+    async fn run_query_script(&self, sql: &str, connection: &Connection) -> ConnectorResult<()> {
+        Ok(connection.raw_cmd(sql).await?)
+    }
+
     async fn reset(&self, connection: &Connection) -> ConnectorResult<()> {
         let schema_name = connection.schema_name();
 

@@ -342,6 +342,13 @@ async fn connect(connection_string: &str) -> ConnectorResult<Connection> {
             .map_err(|err| quaint_error_to_connector_error(err, &connection_info));
     }
 
+    if let ConnectionInfo::Mysql(url) = &connection_info {
+        return quaint::connector::Mysql::new(url.clone())
+            .await
+            .map(|conn| Connection::new_mysql(conn, url.clone()))
+            .map_err(|err| quaint_error_to_connector_error(err, &connection_info));
+    }
+
     let connection = Quaint::new(connection_string)
         .await
         .map_err(|err| quaint_error_to_connector_error(err, &connection_info))?;

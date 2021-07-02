@@ -25,6 +25,10 @@ impl SqlFlavour for SqliteFlavour {
         Ok(())
     }
 
+    async fn run_query_script(&self, sql: &str, connection: &Connection) -> ConnectorResult<()> {
+        Ok(connection.raw_cmd(sql).await?)
+    }
+
     async fn apply_migration_script(
         &self,
         migration_name: &str,

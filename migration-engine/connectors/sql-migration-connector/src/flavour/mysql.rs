@@ -10,11 +10,18 @@ use enumflags2::BitFlags;
 use indoc::indoc;
 use migration_connector::{migrations_directory::MigrationDirectory, ConnectorError, ConnectorResult};
 use once_cell::sync::Lazy;
-use quaint::connector::MysqlUrl;
+use quaint::connector::{
+    mysql_async::{self as my, prelude::Query},
+    MysqlUrl,
+};
 use regex::{Regex, RegexSet};
 use sql_schema_describer::{DescriberErrorKind, SqlSchema, SqlSchemaDescriberBackend};
 use std::sync::atomic::{AtomicU8, Ordering};
 use url::Url;
+use user_facing_errors::{
+    migration_engine::{ApplyMigrationError, ForeignKeyCreationNotAllowed},
+    UserFacingError,
+};
 
 const ADVISORY_LOCK_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(10);
 static QUALIFIED_NAME_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"`[^ ]+`\.`[^ ]+`"#).unwrap());
@@ -119,13 +126,90 @@ impl SqlFlavour for MysqlFlavour {
         Ok(connection.raw_cmd(&query).await?)
     }
 
+    async fn run_query_script(&self, sql: &str, connection: &Connection) -> ConnectorResult<()> {
+        let convert_error = |error: my::Error| match error {
+            my::Error::Server(se) if self.is_vitess() && se.code == 1317 => {
+                ConnectorError::user_facing(ForeignKeyCreationNotAllowed)
+            }
+            _ => quaint_error_to_connector_error(quaint::error::Error::from(error), &connection.connection_info()),
+        };
+
+        let (client, _url) = connection.unwrap_mysql();
+        let mut conn = client.conn().lock().await;
+
+        let mut result = sql.run(&mut *conn).await.map_err(convert_error)?;
+
+        loop {
+            match result.map(drop).await {
+                Ok(_) => {
+                    if result.is_empty() {
+                        result.map(drop).await.map_err(convert_error)?;
+                        return Ok(());
+                    }
+                }
+                Err(e) => {
+                    return Err(convert_error(e));
+                }
+            }
+        }
+    }
+
     async fn apply_migration_script(
         &self,
         migration_name: &str,
         script: &str,
-        conn: &Connection,
+        connection: &Connection,
     ) -> ConnectorResult<()> {
-        super::generic_apply_migration_script(migration_name, script, conn).await
+        let convert_error = |migration_idx: usize, error: my::Error| {
+            let position = format!(
+                "Please check the query number {} from the migration file.",
+                migration_idx + 1
+            );
+
+            let (code, error) = match error {
+                my::Error::Server(se) if self.is_vitess() && se.code == 1317 => {
+                    let message = format!("{}\n\n{}", ForeignKeyCreationNotAllowed.message(), position);
+                    (Some(se.code), message)
+                }
+                my::Error::Server(se) => {
+                    let message = format!("{}\n\n{}", se.message, position);
+                    (Some(se.code), message)
+                }
+                _ => (None, error.to_string()),
+            };
+
+            ConnectorError::user_facing(ApplyMigrationError {
+                migration_name: migration_name.to_owned(),
+                database_error_code: code.map(|c| c.to_string()).unwrap_or_else(|| String::from("none")),
+                database_error: error,
+            })
+        };
+
+        let (client, _url) = connection.unwrap_mysql();
+        let mut conn = client.conn().lock().await;
+
+        let mut migration_idx = 0_usize;
+
+        let mut result = script
+            .run(&mut *conn)
+            .await
+            .map_err(|e| convert_error(migration_idx, e))?;
+
+        loop {
+            match result.map(drop).await {
+                Ok(_) => {
+                    migration_idx += 1;
+
+                    if result.is_empty() {
+                        result.map(drop).await.map_err(|e| convert_error(migration_idx, e))?;
+                        return Ok(());
+                    }
+                }
+                Err(e) => {
+                    return Err(convert_error(migration_idx, e));
+                }
+            }
+        }
     }
 
     fn check_database_version_compatibility(
@@ -251,7 +335,7 @@ impl SqlFlavour for MysqlFlavour {
         let mut circumstances = BitFlags::<Circumstances>::default();
 
         if let Some(version) = version {
-            if version.contains("vitess") {
+            if version.contains("vitess") || version.contains("Vitess") {
                 circumstances |= Circumstances::IsVitess;
             }
         }
@@ -362,10 +446,8 @@ impl SqlFlavour for MysqlFlavour {
 
                 self.scan_migration_script(&script);
 
-                temp_database
-                    .raw_cmd(&script)
+                self.apply_migration_script(migration.migration_name(), &script, &temp_database)
                     .await
-                    .map_err(ConnectorError::from)
                     .map_err(|connector_error| {
                         connector_error.into_migration_does_not_apply_cleanly(migration.migration_name().to_owned())
                     })?;
