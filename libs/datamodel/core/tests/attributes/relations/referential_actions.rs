@@ -388,7 +388,31 @@ fn on_update_cannot_be_defined_on_the_wrong_side() {
 }
 
 #[test]
-fn referential_actions_without_preview_feature_should_error() {
+fn on_delete_without_preview_feature_should_error() {
+    let dml = indoc! { r#"
+        model A {
+            id Int @id
+            bs B[]
+        }
+
+        model B {
+            id Int @id
+            aId Int
+            a A @relation(fields: [aId], references: [id], onDelete: Restrict)
+        }
+    "#};
+
+    let message = "The relation field `a` on Model `B` must not specify the `onDelete` argument in the @relation attribute without enabling the `referentialActions` preview feature.";
+
+    parse_error(dml).assert_are(&[DatamodelError::new_attribute_validation_error(
+        message,
+        "relation",
+        Span::new(127, 145),
+    )]);
+}
+
+#[test]
+fn on_update_without_preview_feature_should_error() {
     let dml = indoc! { r#"
         model A {
             id Int @id
@@ -402,11 +426,11 @@ fn referential_actions_without_preview_feature_should_error() {
         }
     "#};
 
-    let message = "The relation field `a` on Model `B` must not specify the `onDelete` or `onUpdate` argument in the @relation attribute without enabling the `referentialActions` preview feature.";
+    let message = "The relation field `a` on Model `B` must not specify the `onUpdate` argument in the @relation attribute without enabling the `referentialActions` preview feature.";
 
     parse_error(dml).assert_are(&[DatamodelError::new_attribute_validation_error(
         message,
         "relation",
-        Span::new(80, 147),
+        Span::new(127, 145),
     )]);
 }
