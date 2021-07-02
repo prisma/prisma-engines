@@ -1,14 +1,24 @@
-use super::ValueValidator;
 use crate::ast::{self, Span};
 use crate::diagnostics::{DatamodelError, Diagnostics};
+use crate::transform::helpers::ValueValidator;
 use std::collections::HashMap;
 
 /// Represents a list of arguments.
 #[derive(Debug)]
-pub struct Arguments<'a> {
+pub(crate) struct Arguments<'a> {
     attribute_name: &'a str,
     args: HashMap<&'a str, &'a ast::Argument>, // the _remaining_ arguments
     span: ast::Span,
+}
+
+impl Default for Arguments<'_> {
+    fn default() -> Self {
+        Arguments {
+            attribute_name: "",
+            args: Default::default(),
+            span: Span::empty(),
+        }
+    }
 }
 
 impl<'a> Arguments<'a> {
@@ -81,15 +91,5 @@ impl<'a> Arguments<'a> {
 
     pub(crate) fn optional_default_arg(&mut self, name: &str) -> Option<ValueValidator<'a>> {
         self.default_arg(name).ok()
-    }
-}
-
-impl Default for Arguments<'_> {
-    fn default() -> Self {
-        Arguments {
-            attribute_name: "",
-            args: Default::default(),
-            span: Span::empty(),
-        }
     }
 }

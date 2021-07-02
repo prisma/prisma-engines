@@ -1,16 +1,13 @@
 use super::{
+    context::{Arguments, Context},
     names::MappedName,
     types::{IndexData, ModelData, RelationField, ScalarField},
-    Context,
 };
 use crate::{
     ast::{self, WithName},
     diagnostics::DatamodelError,
     dml,
-    transform::{
-        ast_to_dml::db::ScalarFieldType,
-        helpers::{Arguments, ValueValidator},
-    },
+    transform::{ast_to_dml::db::ScalarFieldType, helpers::ValueValidator},
 };
 use itertools::Itertools;
 use prisma_value::PrismaValue;
