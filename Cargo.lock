@@ -1813,6 +1813,7 @@ dependencies = [
  "anyhow",
  "async-trait",
  "datamodel",
+ "datamodel-connector",
  "serde",
  "serde_json",
  "thiserror",

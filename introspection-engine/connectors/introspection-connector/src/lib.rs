@@ -2,6 +2,7 @@ mod error;
 
 use core::fmt;
 use datamodel::Datamodel;
+use datamodel_connector::Connector;
 pub use error::{ConnectorError, ErrorKind};
 use serde::*;
 use serde_json::Value;
@@ -18,7 +19,13 @@ pub trait IntrospectionConnector: Send + Sync + 'static {
 
     async fn get_database_version(&self) -> ConnectorResult<String>;
 
-    async fn introspect(&self, existing_data_model: &Datamodel) -> ConnectorResult<IntrospectionResult>;
+    async fn introspect(
+        &self,
+        existing_data_model: &Datamodel,
+        source_name: String,
+        active_provider: String,
+        connector: Box<dyn Connector>,
+    ) -> ConnectorResult<IntrospectionResult>;
 }
 
 #[derive(Serialize, Deserialize, Debug)]

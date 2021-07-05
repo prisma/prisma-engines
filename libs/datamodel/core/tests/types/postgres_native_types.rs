@@ -6,7 +6,7 @@ use native_types::PostgresType;
 
 #[test]
 fn xml_data_type_should_fail_on_index() {
-    for attribute_name in ["index", "unique"] {
+    for attribute_name in &["index", "unique"] {
         let dml = format!(
             r#"
             model User {{
@@ -19,7 +19,7 @@ fn xml_data_type_should_fail_on_index() {
             attribute_name = attribute_name
         );
 
-        let error_msg = if attribute_name == "index" {
+        let error_msg = if *attribute_name == "index" {
             "You can not define an index on fields with Native type Xml of Postgres."
         } else {
             "Native type Xml can not be unique in Postgres."
