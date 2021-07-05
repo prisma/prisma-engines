@@ -25,6 +25,11 @@ use crate::{
     visitor::{self, Visitor},
 };
 
+/// The underlying MySQL driver. Only available with the `expose-drivers`
+/// Cargo feature.
+#[cfg(feature = "expose-drivers")]
+pub use mysql_async;
+
 /// A connector interface for the MySQL database.
 #[derive(Debug)]
 #[cfg_attr(feature = "docs", doc(cfg(feature = "mysql")))]
@@ -339,6 +344,14 @@ impl Mysql {
             url,
             is_healthy: AtomicBool::new(true),
         })
+    }
+
+    /// The underlying mysql_async::Conn. Only available with the
+    /// `expose-drivers` Cargo feature. This is a lower level API when you need
+    /// to get into database specific features.
+    #[cfg(feature = "expose-drivers")]
+    pub fn conn(&self) -> &Mutex<mysql_async::Conn> {
+        &self.conn
     }
 
     async fn perform_io<F, U, T>(&self, op: U) -> crate::Result<T>
