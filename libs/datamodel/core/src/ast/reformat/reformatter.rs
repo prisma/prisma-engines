@@ -2,6 +2,7 @@ use super::helpers::*;
 use crate::ast::helper::get_sort_index_of_attribute;
 use crate::ast::SchemaAst;
 use crate::diagnostics::{ValidatedDatamodel, ValidatedMissingFields};
+use crate::Datasource;
 use crate::{ast, ast::parser::*, ast::renderer::*};
 use enumflags2::BitFlags;
 use pest::iterators::Pair;
@@ -21,10 +22,22 @@ impl<'a> Reformatter<'a> {
             crate::parse_datamodel_for_formatter(input),
         ) {
             (Ok(schema_ast), Ok(validated_datamodel)) => {
-                let missing_fields = Self::find_all_missing_fields(&schema_ast, &validated_datamodel);
-                let missing_field_attributes = Self::find_all_missing_attributes(&schema_ast, &validated_datamodel);
-                let missing_relation_attribute_args =
-                    Self::find_all_missing_relation_attribute_args(&schema_ast, &validated_datamodel);
+                let datasource = crate::parse_configuration(input)
+                    .ok()
+                    .and_then(|mut config| config.subject.datasources.pop());
+
+                let missing_fields =
+                    Self::find_all_missing_fields(&schema_ast, &validated_datamodel, datasource.as_ref());
+
+                let missing_field_attributes =
+                    Self::find_all_missing_attributes(&schema_ast, &validated_datamodel, datasource.as_ref());
+
+                let missing_relation_attribute_args = Self::find_all_missing_relation_attribute_args(
+                    &schema_ast,
+                    &validated_datamodel,
+                    datasource.as_ref(),
+                );
+
                 Reformatter {
                     input,
                     missing_fields,
@@ -52,9 +65,10 @@ impl<'a> Reformatter<'a> {
     fn find_all_missing_fields(
         schema_ast: &SchemaAst,
         validated_datamodel: &ValidatedDatamodel,
+        datasource: Option<&Datasource>,
     ) -> Result<ValidatedMissingFields, crate::diagnostics::Diagnostics> {
         let mut diagnostics = crate::diagnostics::Diagnostics::new();
-        let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(None, BitFlags::empty());
+        let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(datasource, BitFlags::empty());
         let mut result = Vec::new();
 
         diagnostics.append_warning_vec(validated_datamodel.warnings.clone());
@@ -83,11 +97,12 @@ impl<'a> Reformatter<'a> {
     fn find_all_missing_attributes(
         schema_ast: &SchemaAst,
         validated_datamodel: &ValidatedDatamodel,
+        datasource: Option<&Datasource>,
     ) -> Result<Vec<MissingFieldAttribute>, crate::diagnostics::Diagnostics> {
         let mut diagnostics = crate::diagnostics::Diagnostics::new();
 
         diagnostics.append_warning_vec(validated_datamodel.warnings.clone());
-        let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(None, BitFlags::empty());
+        let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(datasource, BitFlags::empty());
 
         let mut missing_field_attributes = Vec::new();
         for model in validated_datamodel.subject.models() {
@@ -118,11 +133,12 @@ impl<'a> Reformatter<'a> {
     fn find_all_missing_relation_attribute_args(
         schema_ast: &SchemaAst,
         validated_datamodel: &ValidatedDatamodel,
+        datasource: Option<&Datasource>,
     ) -> Result<Vec<MissingRelationAttributeArg>, crate::diagnostics::Diagnostics> {
         let mut diagnostics = crate::diagnostics::Diagnostics::new();
 
         diagnostics.append_warning_vec(validated_datamodel.warnings.clone());
-        let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(None, BitFlags::empty());
+        let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(datasource, BitFlags::empty());
 
         let mut missing_relation_attribute_args = Vec::new();
         for model in validated_datamodel.subject.models() {
