@@ -137,8 +137,6 @@ impl IntrospectionConnector for SqlIntrospectionConnector {
         let sql_schema = self.catch(self.describe()).await?;
         tracing::debug!("SQL Schema Describer is done: {:?}", sql_schema);
 
-        let preview_features = self.preview_features.clone();
-
         let source = SourceContext {
             source_name,
             active_provider,
@@ -147,7 +145,7 @@ impl IntrospectionConnector for SqlIntrospectionConnector {
 
         let ctx = DatamodelContext {
             source: Some(source),
-            preview_features,
+            preview_features: self.preview_features,
         };
 
         let introspection_result = calculate_datamodel::calculate_datamodel(&sql_schema, previous_data_model, ctx)
