@@ -39,6 +39,7 @@ impl StandardiserForFormatting {
 
             let mut fields_to_add = vec![];
             let mut missing_field_names_to_field_names = HashMap::new();
+
             for field in model.fields_mut() {
                 if let Field::RelationField(field) = field {
                     let related_model = schema_copy.find_model(&field.relation_info.to).expect(STATE_ERROR);
@@ -100,6 +101,7 @@ impl StandardiserForFormatting {
                     }
                 }
             }
+
             for field in fields_to_add {
                 match missing_field_names_to_field_names.get(field.name()) {
                     Some(field_names) if field_names.len() > 1 => {

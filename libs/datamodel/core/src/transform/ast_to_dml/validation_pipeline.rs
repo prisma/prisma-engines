@@ -80,6 +80,7 @@ impl<'a, 'b> ValidationPipeline<'a> {
                 diagnostics.append(&mut err);
             }
         }
+
         // Early return so that the post validation does not have to deal with invalid schemas
         diagnostics.to_result()?;
 
