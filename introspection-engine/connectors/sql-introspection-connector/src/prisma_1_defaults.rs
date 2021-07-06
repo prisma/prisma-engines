@@ -1,16 +1,16 @@
 use crate::warnings::{warning_default_cuid_warning, warning_default_uuid_warning, ModelAndField};
+use crate::SqlFamilyTrait;
 use datamodel::{dml, Datamodel, ValueGenerator};
-use introspection_connector::{Version, Warning};
+use introspection_connector::{IntrospectionContext, Version, Warning};
 use native_types::{MySqlType, PostgresType};
-use quaint::connector::SqlFamily;
 use sql_schema_describer::SqlSchema;
 
 pub fn add_prisma_1_id_defaults(
-    family: &SqlFamily,
     version: &Version,
     data_model: &mut Datamodel,
     schema: &SqlSchema,
     warnings: &mut Vec<Warning>,
+    ctx: &IntrospectionContext,
 ) {
     let mut needs_to_be_changed = vec![];
 
@@ -23,7 +23,7 @@ pub fn add_prisma_1_id_defaults(
             let column = table.column(column_name).unwrap();
             let model_and_field = ModelAndField::new(&model.name, &id_field.name);
 
-            if *family == SqlFamily::Postgres {
+            if ctx.sql_family().is_postgres() {
                 if let Some(native_type) = &column.tpe.native_type {
                     let native_type: PostgresType = serde_json::from_value(native_type.clone()).unwrap();
 
@@ -33,7 +33,7 @@ pub fn add_prisma_1_id_defaults(
                         needs_to_be_changed.push((model_and_field, false))
                     }
                 }
-            } else if *family == SqlFamily::Mysql {
+            } else if ctx.sql_family().is_mysql() {
                 if let Some(native_type) = &column.tpe.native_type {
                     let native_type: MySqlType = serde_json::from_value(native_type.clone()).unwrap();
 

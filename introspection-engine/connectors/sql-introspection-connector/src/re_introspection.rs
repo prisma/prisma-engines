@@ -1,13 +1,13 @@
 use crate::introspection_helpers::replace_field_names;
 use crate::warnings::*;
+use crate::SqlFamilyTrait;
 use datamodel::{Datamodel, DefaultValue, FieldType, Ignorable, ValueGenerator};
-use introspection_connector::Warning;
+use introspection_connector::{IntrospectionContext, Warning};
 use prisma_value::PrismaValue;
-use quaint::connector::SqlFamily;
 use std::cmp::Ordering;
 use std::cmp::Ordering::{Equal, Greater, Less};
 
-pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family: &SqlFamily) -> Vec<Warning> {
+pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, ctx: &IntrospectionContext) -> Vec<Warning> {
     let mut warnings = vec![];
 
     //@@map on models
@@ -255,7 +255,7 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family
     //mysql enum names
     let mut changed_mysql_enum_names = vec![];
     {
-        if family.is_mysql() {
+        if ctx.sql_family().is_mysql() {
             for enm in new_data_model.enums() {
                 if let Some((model_name, field_name)) = &new_data_model.find_enum_fields(&enm.name).first() {
                     if let Some(old_model) = old_data_model.find_model(model_name) {

@@ -1,6 +1,7 @@
 #![allow(clippy::vec_init_then_push)]
 
 pub mod calculate_datamodel; // only exported to be able to unit test it
+mod calculate_datamodel_tests;
 mod commenting_out_guardrails;
 mod error;
 mod introspection;
@@ -17,8 +18,10 @@ use datamodel::Datamodel;
 use enumflags2::BitFlags;
 pub use error::*;
 use introspection_connector::{
-    ConnectorError, ConnectorResult, DatabaseMetadata, IntrospectionConnector, IntrospectionResult,
+    ConnectorError, ConnectorResult, DatabaseMetadata, IntrospectionConnector, IntrospectionContext,
+    IntrospectionResult,
 };
+use quaint::prelude::SqlFamily;
 use quaint::{prelude::ConnectionInfo, single::Quaint};
 use schema_describer_loading::load_describer;
 use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend};
@@ -123,12 +126,15 @@ impl IntrospectionConnector for SqlIntrospectionConnector {
         Ok(description)
     }
 
-    async fn introspect(&self, previous_data_model: &Datamodel) -> ConnectorResult<IntrospectionResult> {
+    async fn introspect(
+        &self,
+        previous_data_model: &Datamodel,
+        ctx: IntrospectionContext,
+    ) -> ConnectorResult<IntrospectionResult> {
         let sql_schema = self.catch(self.describe()).await?;
         tracing::debug!("SQL Schema Describer is done: {:?}", sql_schema);
-        let family = self.connection.connection_info().sql_family();
 
-        let introspection_result = calculate_datamodel::calculate_datamodel(&sql_schema, &family, previous_data_model)
+        let introspection_result = calculate_datamodel::calculate_datamodel(&sql_schema, previous_data_model, ctx)
             .map_err(|sql_introspection_error| {
                 sql_introspection_error.into_connector_error(self.connection.connection_info())
             })?;
@@ -153,5 +159,21 @@ impl<T: PartialEq + Clone> Dedup<T> for Vec<T> {
                 true
             }
         })
+    }
+}
+
+trait SqlFamilyTrait {
+    fn sql_family(&self) -> SqlFamily;
+}
+
+impl SqlFamilyTrait for IntrospectionContext {
+    fn sql_family(&self) -> SqlFamily {
+        match self.source.active_provider.as_str() {
+            "postgresql" => SqlFamily::Postgres,
+            "sqlite" => SqlFamily::Sqlite,
+            "sqlserver" => SqlFamily::Mssql,
+            "mysql" => SqlFamily::Mysql,
+            name => unreachable!(format!("The name `{}` for the datamodel connector is not known", name)),
+        }
     }
 }

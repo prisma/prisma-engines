@@ -4,10 +4,10 @@ use crate::introspection_helpers::{
     is_prisma_1_point_1_or_2_join_table, is_relay_table,
 };
 use crate::version_checker::VersionChecker;
-use crate::Dedup;
 use crate::SqlError;
+use crate::{Dedup, SqlFamilyTrait};
 use datamodel::{dml, walkers::find_model_by_db_name, Datamodel, Field, Model, RelationField};
-use quaint::connector::SqlFamily;
+use introspection_connector::IntrospectionContext;
 use sql_schema_describer::{SqlSchema, Table};
 use tracing::debug;
 
@@ -15,7 +15,7 @@ pub fn introspect(
     schema: &SqlSchema,
     version_check: &mut VersionChecker,
     data_model: &mut Datamodel,
-    sql_family: SqlFamily,
+    ctx: &IntrospectionContext,
 ) -> Result<(), SqlError> {
     for table in schema
         .tables
@@ -31,7 +31,7 @@ pub fn introspect(
 
         for column in &table.columns {
             version_check.check_column_for_type_and_default_value(column);
-            let field = calculate_scalar_field(table, column, &sql_family);
+            let field = calculate_scalar_field(table, column, &ctx);
             model.add_field(Field::ScalarField(field));
         }
 
@@ -44,7 +44,7 @@ pub fn introspect(
 
             let mut relation_field = calculate_relation_field(schema, table, foreign_key)?;
 
-            relation_field.supports_restrict_action(!sql_family.is_mssql());
+            relation_field.supports_restrict_action(!ctx.sql_family().is_mssql());
 
             model.add_field(Field::RelationField(relation_field));
         }

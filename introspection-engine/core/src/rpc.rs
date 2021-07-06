@@ -1,6 +1,8 @@
 use crate::error::Error;
 use datamodel::{Configuration, Datamodel};
-use introspection_connector::{ConnectorResult, DatabaseMetadata, IntrospectionConnector, IntrospectionResultOutput};
+use introspection_connector::{
+    ConnectorResult, DatabaseMetadata, IntrospectionConnector, IntrospectionContext, IntrospectionResultOutput,
+};
 use jsonrpc_core::BoxFuture;
 use jsonrpc_derive::rpc;
 use serde_derive::*;
@@ -102,7 +104,14 @@ impl RpcImpl {
             Datamodel::new()
         };
 
-        let result = match connector.introspect(&input_data_model).await {
+        let (config2, _, _) = RpcImpl::load_connector(&schema).await?;
+
+        let ctx = IntrospectionContext {
+            preview_features: config2.preview_features().map(Clone::clone).collect(),
+            source: config2.datasources.into_iter().next().unwrap(),
+        };
+
+        let result = match connector.introspect(&input_data_model, ctx).await {
             Ok(introspection_result) => {
                 if introspection_result.data_model.is_empty() {
                     Err(Error::IntrospectionResultEmpty(url.to_string()))
