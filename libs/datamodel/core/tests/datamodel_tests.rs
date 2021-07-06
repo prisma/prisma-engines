@@ -1,5 +1,3 @@
-#![allow(clippy::module_inception)]
-
 mod attributes;
 mod base;
 mod capabilities;

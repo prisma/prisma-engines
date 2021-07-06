@@ -278,9 +278,8 @@ fn relation_must_error_when_referenced_fields_are_not_a_unique_criteria() {
     errors.assert_is(DatamodelError::new_validation_error("The argument `references` must refer to a unique criteria in the related model `User`. But it is referencing the following fields that are not a unique criteria: firstName", Span::new(205, 276)));
 }
 
-#[allow(non_snake_case)]
 #[test]
-fn relation_must_NOT_error_when_referenced_fields_are_not_a_unique_criteria_on_mysql() {
+fn relation_must_not_error_when_referenced_fields_are_not_a_unique_criteria_on_mysql() {
     // MySQL allows foreign key to references a non unique criteria
     // https://stackoverflow.com/questions/588741/can-a-foreign-key-reference-a-non-unique-index
     let dml = r#"

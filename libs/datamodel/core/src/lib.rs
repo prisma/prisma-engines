@@ -71,11 +71,6 @@
 //!</pre>
 //!
 
-#![allow(
-    clippy::module_inception,
-    clippy::suspicious_operation_groupings,
-    clippy::upper_case_acronyms
-)]
 #![deny(rust_2018_idioms, unsafe_code)]
 
 pub mod ast;
@@ -195,8 +190,7 @@ fn load_sources(
     preview_features: BitFlags<PreviewFeature>,
     diagnostics: &mut Diagnostics,
 ) -> Vec<Datasource> {
-    let source_loader = DatasourceLoader::new();
-    source_loader.load_datasources_from_ast(schema_ast, preview_features, diagnostics)
+    DatasourceLoader.load_datasources_from_ast(schema_ast, preview_features, diagnostics)
 }
 
 //
