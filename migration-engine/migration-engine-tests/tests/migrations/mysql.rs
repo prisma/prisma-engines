@@ -252,7 +252,7 @@ fn native_type_columns_can_be_created(api: TestApi) {
     );
 
     for (field_name, prisma_type, native_type, _) in types {
-        writeln!(&mut dm, "    {} {} @mysql.{}", field_name, prisma_type, native_type).unwrap();
+        writeln!(&mut dm, "    {} {} @db.{}", field_name, prisma_type, native_type).unwrap();
     }
 
     dm.push_str("}\n");

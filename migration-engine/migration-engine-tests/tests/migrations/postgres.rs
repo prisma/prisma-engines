@@ -130,7 +130,7 @@ fn native_type_columns_can_be_created(api: TestApi) {
     );
 
     for (field_name, prisma_type, native_type, _) in types {
-        writeln!(&mut dm, "    {} {} @pg.{}", field_name, prisma_type, native_type).unwrap();
+        writeln!(&mut dm, "    {} {} @db.{}", field_name, prisma_type, native_type).unwrap();
     }
 
     dm.push_str("}\n");
@@ -324,7 +324,7 @@ fn citext_to_text_and_back_works(api: TestApi) {
         r#"
         model User {
             id Int @id @default(autoincrement())
-            name String @pg.Text
+            name String @db.Text
         }
     "#,
     );
@@ -333,7 +333,7 @@ fn citext_to_text_and_back_works(api: TestApi) {
         r#"
         model User {
             id Int @id @default(autoincrement())
-            name String @pg.Citext
+            name String @db.Citext
         }
     "#,
     );
