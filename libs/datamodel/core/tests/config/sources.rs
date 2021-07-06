@@ -465,13 +465,13 @@ fn planet_scale_mode_without_preview_feature_errors() {
         let err = parse_error(schema);
 
         assert!(
-            err.errors
+            err.errors()
                 .first()
                 .unwrap()
                 .to_string()
                 .starts_with("Error validating datasource `ps`: \nThe `planetScaleMode` option can only be set if the preview feature is enabled"),
             "{}",
-            err.errors.first().unwrap()
+            err.errors().first().unwrap()
         );
     }
 }

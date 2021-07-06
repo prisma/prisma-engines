@@ -330,50 +330,50 @@ impl WarningAsserts for Vec<DatamodelWarning> {
 impl ErrorAsserts for Diagnostics {
     fn assert_is(&self, error: DatamodelError) -> &Self {
         assert_eq!(
-            self.errors.len(),
+            self.errors().len(),
             1,
             "Expected exactly one validation error. Errors are: {:?}",
             &self
         );
-        assert_eq!(self.errors[0], error);
+        assert_eq!(self.errors()[0], error);
         self
     }
 
     fn assert_are(&self, errors: &[DatamodelError]) -> &Self {
-        assert_eq!(self.errors, errors);
+        assert_eq!(self.errors(), errors);
         self
     }
 
     fn assert_is_message(&self, msg: &str) -> &Self {
         assert_eq!(
-            self.errors.len(),
+            self.errors().len(),
             1,
             "Expected exactly one validation error. Errors are: {:?}",
             &self
         );
-        assert_eq!(self.errors[0].description(), msg);
+        assert_eq!(self.errors()[0].description(), msg);
         self
     }
 
     fn assert_is_at(&self, index: usize, error: DatamodelError) -> &Self {
-        assert_eq!(self.errors[index], error);
+        assert_eq!(self.errors()[index], error);
         self
     }
 
     fn assert_length(&self, length: usize) -> &Self {
         assert_eq!(
-            self.errors.len(),
+            self.errors().len(),
             length,
             "Expected exactly {} validation errors, but got {}. The errors were {:?}",
             length,
-            self.errors.len(),
-            &self.errors,
+            self.errors().len(),
+            &self.errors(),
         );
         self
     }
 
     fn assert_is_message_at(&self, index: usize, msg: &str) -> &Self {
-        assert_eq!(self.errors[index].description(), msg);
+        assert_eq!(self.errors()[index].description(), msg);
         self
     }
 }

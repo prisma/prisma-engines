@@ -145,7 +145,7 @@ fn parse_datamodel_internal(
 
     match validator.validate(&ast, transform) {
         Ok(mut src) => {
-            src.warnings.append(&mut diagnostics.warnings);
+            src.warnings.append(diagnostics.warnings_mut());
             Ok(Validated {
                 subject: (
                     Configuration {
@@ -183,7 +183,7 @@ pub fn parse_configuration(schema: &str) -> Result<ValidatedConfiguration, diagn
             generators,
             datasources,
         },
-        warnings: diagnostics.warnings,
+        warnings: diagnostics.warnings().to_owned(),
     })
 }
 

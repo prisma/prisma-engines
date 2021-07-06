@@ -7,10 +7,8 @@ use crate::diagnostics::warning::DatamodelWarning;
 /// It is used to not error out early and instead show multiple errors at once.
 #[derive(Debug, Clone)]
 pub struct Diagnostics {
-    /// TODO: these two fields are public for tests. We should strive towards
-    /// making them private.
-    pub errors: Vec<DatamodelError>,
-    pub warnings: Vec<DatamodelWarning>,
+    errors: Vec<DatamodelError>,
+    warnings: Vec<DatamodelWarning>,
 }
 
 impl Diagnostics {
@@ -19,6 +17,18 @@ impl Diagnostics {
             errors: Vec::new(),
             warnings: Vec::new(),
         }
+    }
+
+    pub fn errors(&self) -> &[DatamodelError] {
+        &self.errors
+    }
+
+    pub fn warnings(&self) -> &[DatamodelWarning] {
+        &self.warnings
+    }
+
+    pub(crate) fn warnings_mut(&mut self) -> &mut Vec<DatamodelWarning> {
+        &mut self.warnings
     }
 
     pub(crate) fn push_error(&mut self, err: DatamodelError) {
@@ -30,22 +40,8 @@ impl Diagnostics {
     }
 
     /// Returns true, if there is at least one error in this collection.
-    pub fn has_errors(&self) -> bool {
+    pub(crate) fn has_errors(&self) -> bool {
         !self.errors.is_empty()
-    }
-
-    pub fn has_warnings(&self) -> bool {
-        !self.warnings.is_empty()
-    }
-
-    /// Creates an iterator over all errors in this collection.
-    pub fn to_error_iter(&self) -> std::slice::Iter<'_, DatamodelError> {
-        self.errors.iter()
-    }
-
-    /// Creates an iterator over all warnings in this collection.
-    pub fn to_warning_iter(&self) -> std::slice::Iter<'_, DatamodelWarning> {
-        self.warnings.iter()
     }
 
     /// Appends all errors and warnings from another collection to this collection.
@@ -69,7 +65,7 @@ impl Diagnostics {
     pub fn to_pretty_string(&self, file_name: &str, datamodel_string: &str) -> String {
         let mut message: Vec<u8> = Vec::new();
 
-        for err in self.to_error_iter() {
+        for err in self.errors() {
             err.pretty_print(&mut message, file_name, datamodel_string)
                 .expect("printing datamodel error");
         }

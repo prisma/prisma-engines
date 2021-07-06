@@ -91,7 +91,7 @@ impl<'a, 'b> ValidationPipeline<'a> {
 
         Ok(ValidatedDatamodel {
             subject: schema,
-            warnings: diagnostics.warnings,
+            warnings: diagnostics.warnings().to_owned(),
         })
     }
 }

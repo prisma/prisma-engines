@@ -117,28 +117,28 @@ fn visit_scalar_field_attributes<'ast>(
                 None => return
              };
 
-                scalar_field_data.mapped_name = Some(mapped_name);
+            scalar_field_data.mapped_name = Some(mapped_name);
 
-                if ctx.mapped_model_scalar_field_names.insert((model_id, mapped_name), field_id).is_some() {
-                    ctx.push_error(DatamodelError::new_duplicate_field_error(
-                        ast_model.name(),
-                        ast_field.name(),
-                        ast_field.span,
-                    ));
-                }
+            if ctx.mapped_model_scalar_field_names.insert((model_id, mapped_name), field_id).is_some() {
+                ctx.push_error(DatamodelError::new_duplicate_field_error(
+                    ast_model.name(),
+                    ast_field.name(),
+                    ast_field.span,
+                ));
+            }
 
-                if let Some(field_id) = ctx.db.names.model_fields.get(&(model_id, mapped_name)) {
-                    // @map only conflicts with _scalar_ fields
-                    if !ctx.db.types.scalar_fields.contains_key(&(model_id, *field_id)) {
-                        return
-                    }
-                    ctx.push_error(DatamodelError::new_duplicate_field_error(
-                        ast_model.name(),
-                        ast_field.name(),
-                        ast_field.span,
-                    ));
+            if let Some(field_id) = ctx.db.names.model_fields.get(&(model_id, mapped_name)) {
+                // @map only conflicts with _scalar_ fields
+                if !ctx.db.types.scalar_fields.contains_key(&(model_id, *field_id)) {
+                    return
                 }
-            });
+                ctx.push_error(DatamodelError::new_duplicate_field_error(
+                    ast_model.name(),
+                    ast_field.name(),
+                    ast_field.span,
+                ));
+            }
+        });
 
         // @ignore
         attributes.visit_optional_single("ignore", ctx, |args, ctx| {

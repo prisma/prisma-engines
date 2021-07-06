@@ -125,7 +125,7 @@ fn multiple_indexes_with_same_name_are_not_supported_by_postgres() {
     "#;
 
     let errors = parse_error(dml);
-    for error in errors.to_error_iter() {
+    for error in errors.errors() {
         println!("DATAMODEL ERROR: {:?}", error);
     }
 
@@ -160,7 +160,7 @@ fn unique_insert_with_same_name_are_not_supported_by_postgres() {
     "#;
 
     let errors = parse_error(dml);
-    for error in errors.to_error_iter() {
+    for error in errors.errors() {
         println!("DATAMODEL ERROR: {:?}", error);
     }
 
