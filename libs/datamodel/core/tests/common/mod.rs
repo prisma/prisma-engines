@@ -5,20 +5,20 @@ use datamodel::{
 };
 use pretty_assertions::assert_eq;
 
-pub use expect_test::expect;
+pub(crate) use expect_test::expect;
 
-pub trait DatasourceAsserts {
+pub(crate) trait DatasourceAsserts {
     fn assert_name(&self, name: &str) -> &Self;
     fn assert_url(&self, url: StringFromEnvVar) -> &Self;
 }
 
-pub trait FieldAsserts {
+pub(crate) trait FieldAsserts {
     fn assert_arity(&self, arity: &dml::FieldArity) -> &Self;
     fn assert_with_documentation(&self, t: &str) -> &Self;
     fn assert_is_generated(&self, b: bool) -> &Self;
 }
 
-pub trait ScalarFieldAsserts {
+pub(crate) trait ScalarFieldAsserts {
     fn assert_base_type(&self, t: &ScalarType) -> &Self;
     fn assert_unsupported_type(&self, t: &str) -> &Self;
     fn assert_enum_type(&self, en: &str) -> &Self;
@@ -31,7 +31,7 @@ pub trait ScalarFieldAsserts {
     fn assert_ignored(&self, state: bool) -> &Self;
 }
 
-pub trait RelationFieldAsserts {
+pub(crate) trait RelationFieldAsserts {
     fn assert_relation_name(&self, t: &str) -> &Self;
     fn assert_relation_to(&self, t: &str) -> &Self;
     fn assert_relation_delete_strategy(&self, t: dml::ReferentialAction) -> &Self;
@@ -41,7 +41,7 @@ pub trait RelationFieldAsserts {
     fn assert_ignored(&self, state: bool) -> &Self;
 }
 
-pub trait ModelAsserts {
+pub(crate) trait ModelAsserts {
     fn assert_field_count(&self, count: usize) -> &Self;
     fn assert_has_scalar_field(&self, t: &str) -> &dml::ScalarField;
     fn assert_has_relation_field(&self, t: &str) -> &dml::RelationField;
@@ -53,22 +53,22 @@ pub trait ModelAsserts {
     fn assert_ignored(&self, state: bool) -> &Self;
 }
 
-pub trait EnumAsserts {
+pub(crate) trait EnumAsserts {
     fn assert_has_value(&self, t: &str) -> &dml::EnumValue;
 
     fn assert_with_documentation(&self, t: &str) -> &Self;
 }
 
-pub trait EnumValueAsserts {
+pub(crate) trait EnumValueAsserts {
     fn assert_with_documentation(&self, t: &str) -> &Self;
 }
 
-pub trait DatamodelAsserts {
+pub(crate) trait DatamodelAsserts {
     fn assert_has_model(&self, t: &str) -> &dml::Model;
     fn assert_has_enum(&self, t: &str) -> &dml::Enum;
 }
 
-pub trait ErrorAsserts {
+pub(crate) trait ErrorAsserts {
     fn assert_is(&self, error: DatamodelError) -> &Self;
     fn assert_are(&self, error: &[DatamodelError]) -> &Self;
     fn assert_is_message(&self, msg: &str) -> &Self;
@@ -77,7 +77,7 @@ pub trait ErrorAsserts {
     fn assert_is_message_at(&self, index: usize, msg: &str) -> &Self;
 }
 
-pub trait WarningAsserts {
+pub(crate) trait WarningAsserts {
     fn assert_is(&self, warning: DatamodelWarning) -> &Self;
 }
 
@@ -378,8 +378,7 @@ impl ErrorAsserts for Diagnostics {
     }
 }
 
-#[allow(dead_code)] // Not sure why the compiler thinks this is never used.
-pub fn parse(datamodel_string: &str) -> Datamodel {
+pub(crate) fn parse(datamodel_string: &str) -> Datamodel {
     match datamodel::parse_datamodel(datamodel_string) {
         Ok(s) => s.subject,
         Err(errs) => {
@@ -391,7 +390,7 @@ pub fn parse(datamodel_string: &str) -> Datamodel {
     }
 }
 
-pub fn parse_configuration(datamodel_string: &str) -> Configuration {
+pub(crate) fn parse_configuration(datamodel_string: &str) -> Configuration {
     match datamodel::parse_configuration(datamodel_string) {
         Ok(c) => c.subject,
         Err(errs) => {
@@ -414,28 +413,28 @@ pub(crate) fn parse_error(datamodel_string: &str) -> Diagnostics {
     }
 }
 
-pub const SQLITE_SOURCE: &str = r#"
+pub(crate) const SQLITE_SOURCE: &str = r#"
     datasource db {
         provider = "sqlite"
         url      = "file:dev.db"
     }
 "#;
 
-pub const POSTGRES_SOURCE: &str = r#"
+pub(crate) const POSTGRES_SOURCE: &str = r#"
     datasource db {
         provider = "postgres"
         url      = "postgresql://localhost:5432"
     }
 "#;
 
-pub const MYSQL_SOURCE: &str = r#"
+pub(crate) const MYSQL_SOURCE: &str = r#"
     datasource db {
         provider = "mysql"
         url      = "mysql://localhost:3306"
     }
 "#;
 
-pub const MSSQL_SOURCE: &str = r#"
+pub(crate) const MSSQL_SOURCE: &str = r#"
     datasource db {
         provider = "sqlserver"
         url      = "sqlserver://localhost:1433"

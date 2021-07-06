@@ -1,6 +1,5 @@
-use crate::common::{parse_and_render_error, parse_error, ErrorAsserts};
+use crate::common::*;
 use datamodel::{ast::Span, diagnostics::DatamodelError};
-use expect_test::expect;
 
 #[test]
 fn fail_on_duplicate_models() {
