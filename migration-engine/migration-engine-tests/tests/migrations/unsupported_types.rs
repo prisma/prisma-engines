@@ -212,18 +212,15 @@ fn using_unsupported_and_ignore_should_work(api: TestApi) {
         unreachable!()
     };
 
-    let dm = format!(
+    let dm = api.datamodel_with_provider(&format!(
         r#"
-        {}
-
         model UnsupportedModel {{
             field Unsupported("{}")
             @@ignore
         }}
      "#,
-        api.datasource_block(),
         unsupported_type
-    );
+    ));
 
     api.schema_push(dm).send_sync().assert_green_bang();
 }
