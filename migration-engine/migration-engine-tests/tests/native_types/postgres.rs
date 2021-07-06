@@ -863,7 +863,6 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
 #[test_connector(tags(Postgres))]
 fn risky_casts_with_existing_data_should_warn(api: TestApi) {
     let connector = SqlDatamodelConnectors::postgres();
-    let datasource_block = api.datasource_block();
 
     for (from, seed, casts) in RISKY_CASTS.iter() {
         let mut previous_columns = "".to_string();
@@ -960,7 +959,6 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
 #[test_connector(tags(Postgres))]
 fn not_castable_with_existing_data_should_warn(api: TestApi) {
     let connector = SqlDatamodelConnectors::postgres();
-    let datasource_block = api.datasource_block();
     let mut warnings = Vec::new();
 
     for (from, seed, casts) in NOT_CASTABLE.iter() {
@@ -1147,7 +1145,6 @@ static SAFE_CASTS_NON_LIST_TO_STRING: CastList = Lazy::new(|| {
 #[test_connector(tags(Postgres))]
 fn safe_casts_from_array_with_existing_data_should_work(api: TestApi) {
     let connector = SqlDatamodelConnectors::postgres();
-    let datasource_block = api.datasource_block();
 
     for (to, from) in SAFE_CASTS_NON_LIST_TO_STRING.iter() {
         let mut previous_columns = "".to_string();
@@ -1291,8 +1288,6 @@ fn typescript_starter_schema_with_native_types_is_idempotent(api: TestApi) {
 
 #[test_connector(tags(Postgres))]
 fn typescript_starter_schema_with_differnt_native_types_is_idempotent(api: TestApi) {
-    let datasource_block = api.datasource_block();
-
     let dm = api.datamodel_with_provider(
         r#"
         model Post {

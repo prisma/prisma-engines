@@ -1902,19 +1902,16 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
 
             let kind = from.split('(').next().unwrap();
 
-            let dm1 = format!(
+            let dm1 = api.datamodel_with_provider(&format!(
                 r#"
-                {}
-
-                model A {{
+               model A {{
                     id Int @id @default(autoincrement()) @db.Int
                     x  {} @db.{}
                 }}
                 "#,
-                api.datasource_block(),
                 TYPE_MAPS.get(kind).unwrap(),
                 from,
-            );
+            ));
 
             api.schema_push(&dm1).send_sync().assert_green_bang();
 
@@ -1930,19 +1927,16 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
 
             let kind = to.split('(').next().unwrap();
 
-            let dm2 = format!(
+            let dm2 = api.datamodel_with_provider(&format!(
                 r#"
-                {}
-
-                model A {{
+               model A {{
                     id Int @id @default(autoincrement()) @db.Int
                     x  {} @db.{}
                 }}
                 "#,
-                api.datasource_block(),
                 TYPE_MAPS.get(kind).unwrap(),
                 to,
-            );
+            ));
 
             api.schema_push(&dm2).send_sync().assert_green_bang();
 
@@ -1966,19 +1960,16 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
 
             let kind = from.split('(').next().unwrap();
 
-            let dm1 = format!(
+            let dm1 = api.datamodel_with_provider(&format!(
                 r#"
-                {}
-
                 model A {{
                     id Int @id @default(autoincrement()) @db.Int
                     x  {} @db.{}
                 }}
                 "#,
-                api.datasource_block(),
                 TYPE_MAPS.get(kind).unwrap(),
                 from,
-            );
+            ));
 
             api.schema_push(&dm1).send_sync().assert_green_bang();
 
@@ -1994,19 +1985,16 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
 
             let kind = to.split('(').next().unwrap();
 
-            let dm2 = format!(
+            let dm2 = api.datamodel_with_provider(&format!(
                 r#"
-                {}
-
                 model A {{
                     id Int @id @default(autoincrement()) @db.Int
                     x  {} @db.{}
                 }}
                 "#,
-                api.datasource_block(),
                 TYPE_MAPS.get(kind).unwrap(),
                 to
-            );
+            ));
 
             let warning = format!(
                 "You are about to alter the column `x` on the `A` table, which contains 1 non-null values. The data in that column will be cast from `{}` to `{}`.",
@@ -2039,19 +2027,16 @@ fn not_castable_with_existing_data_should_warn(api: TestApi) {
                 _ => unreachable!(),
             };
 
-            let dm1 = format!(
+            let dm1 = api.datamodel_with_provider(&format!(
                 r#"
-                {}
-
                 model A {{
                     id Int @id @default(autoincrement()) @db.Int
                     x  {} @db.{}
                 }}
                 "#,
-                api.datasource_block(),
                 TYPE_MAPS.get(kind).unwrap(),
                 from,
-            );
+            ));
 
             api.schema_push(&dm1).send_sync().assert_green_bang();
 
@@ -2067,19 +2052,16 @@ fn not_castable_with_existing_data_should_warn(api: TestApi) {
 
             let kind = to.split('(').next().unwrap();
 
-            let dm2 = format!(
+            let dm2 = api.datamodel_with_provider(&format!(
                 r#"
-                {}
-
                 model A {{
                     id Int @id @default(autoincrement()) @db.Int
                     x  {} @db.{}
                 }}
                 "#,
-                api.datasource_block(),
                 TYPE_MAPS.get(kind).unwrap(),
                 to
-            );
+            ));
 
             let warning = "Changed the type of `x` on the `A` table. No cast exists, the column would be dropped and recreated, which cannot be done since the column is required and there is data in the table.";
 
@@ -2099,50 +2081,44 @@ fn not_castable_with_existing_data_should_warn(api: TestApi) {
 
 #[test_connector(tags(Mssql))]
 fn typescript_starter_schema_with_native_types_is_idempotent(api: TestApi) {
-    let dm = format!(
+    let dm = api.datamodel_with_provider(
         r#"
-        {}
-
-        model Post {{
+        model Post {
             id        Int     @id @default(autoincrement())
             title     String
             content   String?
             published Boolean @default(false)
             author    User?   @relation(fields: [authorId], references: [id])
             authorId  Int?
-        }}
+        }
 
-        model User {{
+        model User {
             id    Int     @id @default(autoincrement())
             email String  @unique
             name  String?
             posts Post[]
-        }}
+        }
         "#,
-        api.datasource_block(),
     );
 
-    let dm2 = format!(
+    let dm2 = api.datamodel_with_provider(
         r#"
-        {}
-
-        model Post {{
+        model Post {
             id        Int     @id @default(autoincrement()) @db.Int
             title     String  @db.NVarChar(1000)
             content   String? @db.NVarChar(1000)
             published Boolean @default(false) @db.Bit
             author    User?   @relation(fields: [authorId], references: [id])
             authorId  Int?    @db.Int
-        }}
+        }
 
-        model User {{
+        model User {
             id    Int     @id @default(autoincrement()) @db.Int
             email String  @unique @db.NVarChar(1000)
             name  String? @db.NVarChar(1000)
             posts Post[]
-        }}
+        }
         "#,
-        api.datasource_block()
     );
 
     api.schema_push(&dm)
@@ -2164,50 +2140,44 @@ fn typescript_starter_schema_with_native_types_is_idempotent(api: TestApi) {
 
 #[test_connector(tags(Mssql))]
 fn typescript_starter_schema_with_different_native_types_is_idempotent(api: TestApi) {
-    let dm = format!(
+    let dm = api.datamodel_with_provider(
         r#"
-        {}
-
-        model Post {{
+        model Post {
             id        Int     @id @default(autoincrement())
             title     String
             content   String?
             published Boolean @default(false)
             author    User?   @relation(fields: [authorId], references: [id])
             authorId  Int?
-        }}
+        }
 
-        model User {{
+        model User {
             id    Int     @id @default(autoincrement())
             email String  @unique
             name  String?
             posts Post[]
-        }}
+        }
         "#,
-        api.datasource_block()
     );
 
-    let dm2 = format!(
+    let dm2 = api.datamodel_with_provider(
         r#"
-        {}
-
-        model Post {{
+        model Post {
             id        Int     @id @default(autoincrement()) @db.Int
             title     String  @db.NVarChar(1000)
             content   String? @db.NVarChar(MAX)
             published Boolean @default(false) @db.Bit
             author    User?   @relation(fields: [authorId], references: [id])
             authorId  Int?    @db.Int
-        }}
+        }
 
-        model User {{
+        model User {
             id    Int     @id @default(autoincrement()) @db.Int
             email String  @unique @db.NVarChar(1000)
             name  String? @db.NVarChar(100)
             posts Post[]
-        }}
+        }
         "#,
-        api.datasource_block()
     );
 
     api.schema_push(&dm)
