@@ -3,9 +3,8 @@ use crate::introspection_helpers::{
     is_prisma_1_point_1_or_2_join_table, is_relay_table,
 };
 use crate::SqlFamilyTrait;
-use datamodel::common::datamodel_context::DatamodelContext;
 use datamodel::{Datamodel, Model};
-use introspection_connector::{Version, Warning};
+use introspection_connector::{IntrospectionContext, Version, Warning};
 use native_types::{MySqlType, PostgresType};
 use quaint::connector::SqlFamily;
 use sql_schema_describer::{Column, ForeignKey, ForeignKeyAction, PrimaryKey, SqlSchema, Table};
@@ -51,7 +50,7 @@ const MYSQL_TYPES: &[MySqlType] = &[
 ];
 
 impl VersionChecker {
-    pub fn new(schema: &SqlSchema, ctx: &DatamodelContext) -> VersionChecker {
+    pub fn new(schema: &SqlSchema, ctx: &IntrospectionContext) -> VersionChecker {
         VersionChecker {
             sql_family: ctx.sql_family(),
             has_migration_table: schema.tables.iter().any(|table| is_old_migration_table(table)),

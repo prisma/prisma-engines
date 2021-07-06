@@ -5,7 +5,7 @@ use crate::{BarrelMigrationExecutor, Result};
 use datamodel::common::preview_features::PreviewFeature;
 use datamodel::{Configuration, Datamodel};
 use introspection_connector::{
-    ConnectorResult, DatabaseMetadata, IntrospectionConnector, IntrospectionResult, Version,
+    ConnectorResult, DatabaseMetadata, IntrospectionConnector, IntrospectionContext, IntrospectionResult, Version,
 };
 use introspection_core::rpc::RpcImpl;
 use migration_connector::MigrationConnector;
@@ -101,15 +101,14 @@ impl TestApi {
     #[track_caller]
     async fn test_introspect_internal(&self, data_model: Datamodel) -> ConnectorResult<IntrospectionResult> {
         let config = self.configuration();
-        let first_source = config.datasources.into_iter().next().unwrap();
+
+        let ctx = IntrospectionContext {
+            preview_features: config.preview_features().map(Clone::clone).collect(),
+            source: config.datasources.into_iter().next().unwrap(),
+        };
 
         self.api
-            .introspect(
-                &data_model,
-                first_source.name,
-                first_source.active_provider,
-                first_source.active_connector,
-            )
+            .introspect(&data_model, ctx)
             .instrument(tracing::info_span!("introspect"))
             .await
     }

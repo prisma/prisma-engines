@@ -1,14 +1,13 @@
 use crate::introspection_helpers::replace_field_names;
 use crate::warnings::*;
 use crate::SqlFamilyTrait;
-use datamodel::common::datamodel_context::DatamodelContext;
 use datamodel::{Datamodel, DefaultValue, FieldType, Ignorable, ValueGenerator};
-use introspection_connector::Warning;
+use introspection_connector::{IntrospectionContext, Warning};
 use prisma_value::PrismaValue;
 use std::cmp::Ordering;
 use std::cmp::Ordering::{Equal, Greater, Less};
 
-pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, ctx: &DatamodelContext) -> Vec<Warning> {
+pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, ctx: &IntrospectionContext) -> Vec<Warning> {
     let mut warnings = vec![];
 
     //@@map on models

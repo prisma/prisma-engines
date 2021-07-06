@@ -19,7 +19,7 @@ pub struct Datasource {
     /// the connector of the active provider
     pub active_connector: Box<dyn Connector>,
     /// An optional user-defined shadow database URL.
-    pub(crate) shadow_database_url: Option<(StringFromEnvVar, Span)>,
+    pub shadow_database_url: Option<(StringFromEnvVar, Span)>,
     /// Whether planetScaleMode = true was provided
     pub planet_scale_mode: bool,
 }

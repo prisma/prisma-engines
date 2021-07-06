@@ -13,14 +13,13 @@ mod schema_describer_loading;
 mod version_checker;
 mod warnings;
 
-use datamodel::common::datamodel_context::{DatamodelContext, SourceContext};
 use datamodel::common::preview_features::PreviewFeature;
 use datamodel::Datamodel;
-use datamodel_connector::Connector;
 use enumflags2::BitFlags;
 pub use error::*;
 use introspection_connector::{
-    ConnectorError, ConnectorResult, DatabaseMetadata, IntrospectionConnector, IntrospectionResult,
+    ConnectorError, ConnectorResult, DatabaseMetadata, IntrospectionConnector, IntrospectionContext,
+    IntrospectionResult,
 };
 use quaint::prelude::SqlFamily;
 use quaint::{prelude::ConnectionInfo, single::Quaint};
@@ -130,23 +129,10 @@ impl IntrospectionConnector for SqlIntrospectionConnector {
     async fn introspect(
         &self,
         previous_data_model: &Datamodel,
-        source_name: String,
-        active_provider: String,
-        connector: Box<dyn Connector>,
+        ctx: IntrospectionContext,
     ) -> ConnectorResult<IntrospectionResult> {
         let sql_schema = self.catch(self.describe()).await?;
         tracing::debug!("SQL Schema Describer is done: {:?}", sql_schema);
-
-        let source = SourceContext {
-            source_name,
-            active_provider,
-            connector,
-        };
-
-        let ctx = DatamodelContext {
-            source: Some(source),
-            preview_features: self.preview_features,
-        };
 
         let introspection_result = calculate_datamodel::calculate_datamodel(&sql_schema, previous_data_model, ctx)
             .map_err(|sql_introspection_error| {
@@ -180,9 +166,9 @@ trait SqlFamilyTrait {
     fn sql_family(&self) -> SqlFamily;
 }
 
-impl SqlFamilyTrait for DatamodelContext {
+impl SqlFamilyTrait for IntrospectionContext {
     fn sql_family(&self) -> SqlFamily {
-        match self.source.as_ref().unwrap().active_provider.as_str() {
+        match self.source.active_provider.as_str() {
             "postgresql" => SqlFamily::Postgres,
             "sqlite" => SqlFamily::Sqlite,
             "sqlserver" => SqlFamily::Mssql,

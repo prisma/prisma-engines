@@ -1814,6 +1814,7 @@ dependencies = [
  "async-trait",
  "datamodel",
  "datamodel-connector",
+ "enumflags2",
  "serde",
  "serde_json",
  "thiserror",

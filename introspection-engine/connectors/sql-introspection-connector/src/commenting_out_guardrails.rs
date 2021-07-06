@@ -4,11 +4,10 @@ use crate::warnings::{
     ModelAndFieldAndType,
 };
 use crate::SqlFamilyTrait;
-use datamodel::common::datamodel_context::DatamodelContext;
 use datamodel::{Datamodel, FieldType};
-use introspection_connector::Warning;
+use introspection_connector::{IntrospectionContext, Warning};
 
-pub fn commenting_out_guardrails(datamodel: &mut Datamodel, ctx: &DatamodelContext) -> Vec<Warning> {
+pub fn commenting_out_guardrails(datamodel: &mut Datamodel, ctx: &IntrospectionContext) -> Vec<Warning> {
     let mut models_without_identifiers = vec![];
     let mut models_without_columns = vec![];
     let mut fields_with_empty_names = vec![];

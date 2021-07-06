@@ -1,10 +1,10 @@
 use crate::Dedup;
 use crate::SqlError;
-use datamodel::common::datamodel_context::DatamodelContext;
 use datamodel::{
     common::RelationNames, Datamodel, DefaultValue as DMLDef, FieldArity, FieldType, IndexDefinition, Model,
     ReferentialAction, RelationField, RelationInfo, ScalarField, ScalarType, ValueGenerator as VG,
 };
+use introspection_connector::IntrospectionContext;
 use sql_schema_describer::{Column, ColumnArity, ColumnTypeFamily, ForeignKey, Index, IndexType, SqlSchema, Table};
 use sql_schema_describer::{DefaultKind, ForeignKeyAction};
 use tracing::debug;
@@ -134,7 +134,7 @@ pub(crate) fn calculate_index(index: &Index) -> IndexDefinition {
     }
 }
 
-pub(crate) fn calculate_scalar_field(table: &Table, column: &Column, ctx: &DatamodelContext) -> ScalarField {
+pub(crate) fn calculate_scalar_field(table: &Table, column: &Column, ctx: &IntrospectionContext) -> ScalarField {
     debug!("Handling column {:?}", column);
 
     let field_type = calculate_scalar_field_type_with_native_types(column, ctx);
@@ -354,17 +354,19 @@ pub(crate) fn calculate_scalar_field_type_for_native_type(column: &Column) -> Fi
     }
 }
 
-pub(crate) fn calculate_scalar_field_type_with_native_types(column: &Column, ctx: &DatamodelContext) -> FieldType {
+pub(crate) fn calculate_scalar_field_type_with_native_types(column: &Column, ctx: &IntrospectionContext) -> FieldType {
     debug!("Calculating native field type for '{}'", column.name);
     let scalar_type = calculate_scalar_field_type_for_native_type(column);
-
-    let connector = &ctx.source.as_ref().unwrap().connector;
 
     match scalar_type {
         FieldType::Scalar(scal_type, _, _) => match &column.tpe.native_type {
             None => scalar_type,
             Some(native_type) => {
-                let native_type_instance = connector.introspect_native_type(native_type.clone()).unwrap();
+                let native_type_instance = ctx
+                    .source
+                    .active_connector
+                    .introspect_native_type(native_type.clone())
+                    .unwrap();
                 FieldType::Scalar(scal_type, None, Some(native_type_instance))
             }
         },

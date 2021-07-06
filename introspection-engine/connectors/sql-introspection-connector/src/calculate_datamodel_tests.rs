@@ -1,12 +1,14 @@
 #[cfg(test)]
 mod tests {
     use crate::calculate_datamodel::calculate_datamodel;
-    use datamodel::common::datamodel_context::{DatamodelContext, SourceContext};
+    use datamodel::ast::Span;
+    use datamodel::StringFromEnvVar;
     use datamodel::{
-        dml, Datamodel, DefaultValue as DMLDefault, Field, FieldArity, FieldType, Model, NativeTypeInstance,
-        ReferentialAction, RelationField, RelationInfo, ScalarField, ScalarType, ValueGenerator,
+        dml, Datamodel, Datasource, DefaultValue as DMLDefault, Field, FieldArity, FieldType, Model,
+        NativeTypeInstance, ReferentialAction, RelationField, RelationInfo, ScalarField, ScalarType, ValueGenerator,
     };
     use enumflags2::BitFlags;
+    use introspection_connector::IntrospectionContext;
     use native_types::{NativeType, PostgresType};
     use pretty_assertions::assert_eq;
     use sql_datamodel_connector::PostgresDatamodelConnector;
@@ -15,15 +17,21 @@ mod tests {
         PrimaryKey, Sequence, SqlSchema, Table,
     };
 
-    fn postgres_context() -> DatamodelContext {
-        let source = SourceContext {
-            source_name: "Postgres".into(),
+    fn postgres_context() -> IntrospectionContext {
+        let source = Datasource {
+            name: "Postgres".to_string(),
             active_provider: "postgresql".into(),
-            connector: Box::new(PostgresDatamodelConnector::new()),
+            url: StringFromEnvVar::new_literal("test".to_string()),
+            url_span: Span::empty(),
+            documentation: None,
+            active_connector: Box::new(PostgresDatamodelConnector::new()),
+            shadow_database_url: None,
+            provider: "postgresql".to_string(),
+            planet_scale_mode: false,
         };
 
-        DatamodelContext {
-            source: Some(source),
+        IntrospectionContext {
+            source,
             preview_features: BitFlags::empty(),
         }
     }

@@ -5,9 +5,8 @@ use crate::sanitize_datamodel_names::{sanitization_leads_to_duplicate_names, san
 use crate::version_checker::VersionChecker;
 use crate::SqlIntrospectionResult;
 use crate::{commenting_out_guardrails::commenting_out_guardrails, introspection::introspect};
-use datamodel::common::datamodel_context::DatamodelContext;
 use datamodel::Datamodel;
-use introspection_connector::IntrospectionResult;
+use introspection_connector::{IntrospectionContext, IntrospectionResult};
 use sql_schema_describer::*;
 use tracing::debug;
 
@@ -15,7 +14,7 @@ use tracing::debug;
 pub fn calculate_datamodel(
     schema: &SqlSchema,
     previous_data_model: &Datamodel,
-    ctx: DatamodelContext,
+    ctx: IntrospectionContext,
 ) -> SqlIntrospectionResult<IntrospectionResult> {
     debug!("Calculating data model.");
 

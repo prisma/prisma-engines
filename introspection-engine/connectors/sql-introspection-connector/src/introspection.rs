@@ -6,8 +6,8 @@ use crate::introspection_helpers::{
 use crate::version_checker::VersionChecker;
 use crate::SqlError;
 use crate::{Dedup, SqlFamilyTrait};
-use datamodel::common::datamodel_context::DatamodelContext;
 use datamodel::{dml, walkers::find_model_by_db_name, Datamodel, Field, Model, RelationField};
+use introspection_connector::IntrospectionContext;
 use sql_schema_describer::{SqlSchema, Table};
 use tracing::debug;
 
@@ -15,7 +15,7 @@ pub fn introspect(
     schema: &SqlSchema,
     version_check: &mut VersionChecker,
     data_model: &mut Datamodel,
-    ctx: &DatamodelContext,
+    ctx: &IntrospectionContext,
 ) -> Result<(), SqlError> {
     for table in schema
         .tables
