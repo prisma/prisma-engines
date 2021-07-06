@@ -7,30 +7,26 @@ use crate::diagnostics::warning::DatamodelWarning;
 /// It is used to not error out early and instead show multiple errors at once.
 #[derive(Debug, Clone)]
 pub struct Diagnostics {
+    /// TODO: these two fields are public for tests. We should strive towards
+    /// making them private.
     pub errors: Vec<DatamodelError>,
     pub warnings: Vec<DatamodelWarning>,
 }
 
 impl Diagnostics {
-    pub fn new() -> Diagnostics {
+    pub(crate) fn new() -> Diagnostics {
         Diagnostics {
             errors: Vec::new(),
             warnings: Vec::new(),
         }
     }
 
-    pub fn push_error(&mut self, err: DatamodelError) {
+    pub(crate) fn push_error(&mut self, err: DatamodelError) {
         self.errors.push(err)
     }
 
-    pub fn push_warning(&mut self, warning: DatamodelWarning) {
+    pub(crate) fn push_warning(&mut self, warning: DatamodelWarning) {
         self.warnings.push(warning)
-    }
-
-    pub fn push_opt_error(&mut self, err: Option<DatamodelError>) {
-        if let Some(err) = err {
-            self.push_error(err);
-        }
     }
 
     /// Returns true, if there is at least one error in this collection.
@@ -53,16 +49,16 @@ impl Diagnostics {
     }
 
     /// Appends all errors and warnings from another collection to this collection.
-    pub fn append(&mut self, err_and_warn: &mut Diagnostics) {
+    pub(crate) fn append(&mut self, err_and_warn: &mut Diagnostics) {
         self.errors.append(&mut err_and_warn.errors);
         self.warnings.append(&mut err_and_warn.warnings)
     }
 
-    pub fn append_warning_vec(&mut self, mut warnings: Vec<DatamodelWarning>) {
+    pub(crate) fn append_warning_vec(&mut self, mut warnings: Vec<DatamodelWarning>) {
         self.warnings.append(&mut warnings);
     }
 
-    pub fn to_result(&self) -> Result<(), Diagnostics> {
+    pub(crate) fn to_result(&self) -> Result<(), Diagnostics> {
         if self.has_errors() {
             Err(self.clone())
         } else {
