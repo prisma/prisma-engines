@@ -1,16 +1,14 @@
 use super::db::ParserDatabase;
-use crate::walkers::walk_models;
 use crate::{
     ast,
     common::preview_features::PreviewFeature,
     configuration,
     diagnostics::{DatamodelError, Diagnostics},
     dml,
-    walkers::ModelWalker,
 };
 use enumflags2::BitFlags;
 use itertools::Itertools;
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
 
 /// Helper for validating a datamodel.
 ///
@@ -38,74 +36,52 @@ impl<'a> Validator<'a> {
         }
     }
 
-    pub(crate) fn validate(&self, db: &ParserDatabase<'_>, schema: &mut dml::Datamodel) -> Result<(), Diagnostics> {
-        let mut all_errors = Diagnostics::new();
+    pub(crate) fn validate(&self, db: &ParserDatabase<'_>, schema: &mut dml::Datamodel, diagnostics: &mut Diagnostics) {
         let ast_schema = db.ast();
 
-        if let Err(ref mut errs) = self.validate_names_for_indexes(ast_schema, schema) {
-            all_errors.append(errs);
-        }
+        self.validate_names_for_indexes(ast_schema, schema, diagnostics);
 
         // Model level validations.
         for model in schema.models() {
-            // Having a separate error collection allows checking whether any error has occurred for a model.
-            let mut errors_for_model = Diagnostics::new();
-
             let ast_model = ast_schema.find_model(&model.name).expect(STATE_ERROR);
 
             if let Err(err) = self.validate_model_has_strict_unique_criteria(ast_model, model) {
-                errors_for_model.push_error(err);
+                diagnostics.push_error(err);
             }
 
             if let Err(err) = self.validate_model_name(ast_model, model) {
-                errors_for_model.push_error(err);
+                diagnostics.push_error(err);
             }
 
             if let Err(err) = self.validate_relations_not_ambiguous(ast_schema, model) {
-                errors_for_model.push_error(err);
+                diagnostics.push_error(err);
             }
 
             if let Err(ref mut the_errors) = self.validate_field_connector_specific(ast_model, model) {
-                errors_for_model.append(the_errors)
+                diagnostics.append(the_errors)
             }
 
             if let Err(ref mut the_errors) = self.validate_model_connector_specific(ast_model, model) {
-                errors_for_model.append(the_errors)
+                diagnostics.append(the_errors)
             }
 
             if let Err(ref mut the_errors) = self.validate_auto_increment(ast_model, model) {
-                errors_for_model.append(the_errors);
+                diagnostics.append(the_errors);
             }
 
             if let Err(ref mut the_errors) = self.validate_base_fields_for_relation(schema, ast_model, model) {
-                errors_for_model.append(the_errors);
+                diagnostics.append(the_errors);
             }
 
             if let Err(ref mut the_errors) = self.validate_referenced_fields_for_relation(schema, ast_model, model) {
-                errors_for_model.append(the_errors);
+                diagnostics.append(the_errors);
             }
-
-            all_errors.append(&mut errors_for_model);
         }
-
-        validate_name_collisions_with_map(schema, ast_schema, &mut all_errors);
 
         // Enum level validations.
         for declared_enum in schema.enums() {
-            let mut errors_for_enum = Diagnostics::new();
-            if let Err(err) =
-                self.validate_enum_name(db.get_enum(&declared_enum.name).expect(STATE_ERROR), declared_enum)
-            {
-                errors_for_enum.push_error(err);
-            }
-
-            all_errors.append(&mut errors_for_enum);
-        }
-
-        if all_errors.has_errors() {
-            Err(all_errors)
-        } else {
-            Ok(())
+            let ast_enum = db.get_enum(&declared_enum.name).expect(STATE_ERROR);
+            self.validate_enum_name(ast_enum, declared_enum, diagnostics);
         }
     }
 
@@ -144,8 +120,8 @@ impl<'a> Validator<'a> {
         &self,
         ast_schema: &ast::SchemaAst,
         schema: &dml::Datamodel,
-    ) -> Result<(), Diagnostics> {
-        let mut errors = Diagnostics::new();
+        diagnostics: &mut Diagnostics,
+    ) {
         let mut index_names = HashSet::new();
 
         let multiple_indexes_with_same_name_are_supported = self
@@ -164,18 +140,17 @@ impl<'a> Validator<'a> {
                                 .find(|attribute| attribute.is_index())
                                 .unwrap();
 
-                            errors.push_error(DatamodelError::new_multiple_indexes_with_same_name_are_not_supported(
+                            let error = DatamodelError::new_multiple_indexes_with_same_name_are_not_supported(
                                 index_name,
                                 ast_index.span,
-                            ));
+                            );
+                            diagnostics.push_error(error);
                         }
                         index_names.insert(index_name);
                     }
                 }
             }
         }
-
-        errors.to_result()
     }
 
     fn validate_auto_increment(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), Diagnostics> {
@@ -233,11 +208,7 @@ impl<'a> Validator<'a> {
             }
         }
 
-        if errors.has_errors() {
-            Err(errors)
-        } else {
-            Ok(())
-        }
+        errors.to_result()
     }
 
     fn validate_model_has_strict_unique_criteria(
@@ -316,11 +287,11 @@ impl<'a> Validator<'a> {
         }
     }
 
-    fn validate_enum_name(&self, ast_enum: &ast::Enum, dml_enum: &dml::Enum) -> Result<(), DatamodelError> {
+    fn validate_enum_name(&self, ast_enum: &ast::Enum, dml_enum: &dml::Enum, diagnostics: &mut Diagnostics) {
         let validator = super::reserved_model_names::TypeNameValidator::new();
 
         if validator.is_reserved(&dml_enum.name) {
-            Err(DatamodelError::new_enum_validation_error(
+            diagnostics.push_error(DatamodelError::new_enum_validation_error(
         &format!(
           "The enum name `{}` is invalid. It is a reserved name. Please change it. Read more at https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-schema/data-model#naming-enums",
           &dml_enum.name
@@ -328,8 +299,6 @@ impl<'a> Validator<'a> {
         &dml_enum.name,
         ast_enum.span,
       ))
-        } else {
-            Ok(())
         }
     }
 
@@ -374,11 +343,7 @@ impl<'a> Validator<'a> {
             }
         }
 
-        if diagnostics.has_errors() {
-            Err(diagnostics)
-        } else {
-            Ok(())
-        }
+        diagnostics.to_result()
     }
 
     fn validate_model_connector_specific(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), Diagnostics> {
@@ -391,11 +356,7 @@ impl<'a> Validator<'a> {
             }
         }
 
-        if diagnostics.has_errors() {
-            Err(diagnostics)
-        } else {
-            Ok(())
-        }
+        diagnostics.to_result()
     }
 
     fn validate_base_fields_for_relation(
@@ -428,11 +389,7 @@ impl<'a> Validator<'a> {
             }
         }
 
-        if errors.has_errors() {
-            Err(errors)
-        } else {
-            Ok(())
-        }
+        errors.to_result()
     }
 
     fn validate_referenced_fields_for_relation(
@@ -597,11 +554,7 @@ impl<'a> Validator<'a> {
             }
         }
 
-        if errors.has_errors() {
-            Err(errors)
-        } else {
-            Ok(())
-        }
+        errors.to_result()
     }
 
     fn validate_relation_arguments_bla(
@@ -999,32 +952,5 @@ impl<'a> Validator<'a> {
         }
 
         Ok(())
-    }
-}
-
-fn validate_name_collisions_with_map(schema: &dml::Datamodel, ast: &ast::SchemaAst, diagnostics: &mut Diagnostics) {
-    let mut used_model_names: HashMap<&str, ModelWalker<'_>> = HashMap::with_capacity(schema.models.len());
-    let mut used_field_names: HashSet<&str> = HashSet::with_capacity(4);
-
-    for model in walk_models(schema) {
-        for field in model.scalar_fields() {
-            if !used_field_names.insert(field.db_name()) {
-                diagnostics.push_error(DatamodelError::new_duplicate_field_error(
-                    model.name(),
-                    field.name(),
-                    ast.find_model(model.name()).unwrap().find_field_bang(field.name()).span,
-                ));
-            }
-        }
-
-        used_field_names.clear();
-
-        if let Some(existing_model) = used_model_names.insert(model.database_name(), model) {
-            diagnostics.push_error(DatamodelError::new_duplicate_model_database_name_error(
-                model.database_name().into(),
-                existing_model.name().into(),
-                ast.find_model(model.name()).unwrap().span,
-            ));
-        }
     }
 }

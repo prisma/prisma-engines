@@ -61,9 +61,7 @@ impl<'a, 'b> ValidationPipeline<'a> {
         diagnostics.to_result()?;
 
         // Phase 4: Validation
-        if let Err(mut err) = self.validator.validate(&db, &mut schema) {
-            diagnostics.append(&mut err);
-        }
+        self.validator.validate(&db, &mut schema, &mut &mut diagnostics);
 
         // Early return so that the standardiser does not have to deal with invalid schemas
         diagnostics.to_result()?;

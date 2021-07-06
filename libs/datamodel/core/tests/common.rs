@@ -403,7 +403,11 @@ pub fn parse_configuration(datamodel_string: &str) -> Configuration {
     }
 }
 
-pub fn parse_error(datamodel_string: &str) -> Diagnostics {
+pub(crate) fn parse_and_render_error(schema: &str) -> String {
+    parse_error(schema).to_pretty_string("schema.prisma", schema)
+}
+
+pub(crate) fn parse_error(datamodel_string: &str) -> Diagnostics {
     match datamodel::parse_datamodel(datamodel_string) {
         Ok(_) => panic!("Expected an error when parsing schema."),
         Err(errs) => errs,
