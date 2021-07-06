@@ -1,5 +1,4 @@
-use super::StringFromEnvVar;
-use crate::common::preview_features::PreviewFeature;
+use crate::{common::preview_features::PreviewFeature, configuration::StringFromEnvVar};
 use serde::Serialize;
 use std::collections::HashMap;
 

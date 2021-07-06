@@ -61,7 +61,7 @@ impl<'a, 'b> ValidationPipeline<'a> {
         diagnostics.to_result()?;
 
         // Phase 4: Validation
-        self.validator.validate(&db, &mut schema, &mut &mut diagnostics);
+        self.validator.validate(&db, &mut schema, &mut diagnostics);
 
         // Early return so that the standardiser does not have to deal with invalid schemas
         diagnostics.to_result()?;

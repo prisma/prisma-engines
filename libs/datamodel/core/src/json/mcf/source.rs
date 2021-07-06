@@ -1,4 +1,4 @@
-use crate::{configuration, StringFromEnvVar};
+use crate::configuration::{self, StringFromEnvVar};
 
 #[derive(Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]

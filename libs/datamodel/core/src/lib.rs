@@ -75,19 +75,21 @@
 
 pub mod ast;
 pub mod common;
-pub mod configuration;
 pub mod diagnostics;
 pub mod dml;
 pub mod json;
-pub mod transform;
 pub mod walkers;
 
+mod configuration;
+mod transform;
+
 pub use crate::dml::*;
-pub use configuration::*;
-use diagnostics::Diagnostics;
+pub use configuration::{Configuration, Datasource, Generator, StringFromEnvVar};
+pub use transform::ast_to_dml::reserved_model_names;
 
 use crate::diagnostics::{Validated, ValidatedConfiguration, ValidatedDatamodel};
 use crate::{ast::SchemaAst, common::preview_features::PreviewFeature};
+use diagnostics::Diagnostics;
 use enumflags2::BitFlags;
 use transform::{
     ast_to_dml::{DatasourceLoader, GeneratorLoader, ValidationPipeline},
@@ -136,7 +138,7 @@ fn parse_datamodel_internal(
 
     let generators = GeneratorLoader::load_generators_from_ast(&ast, &mut diagnostics);
     let preview_features = preview_features(&generators);
-    let datasources = load_sources(&ast, preview_features, &mut &mut diagnostics);
+    let datasources = load_sources(&ast, preview_features, &mut diagnostics);
     let validator = ValidationPipeline::new(&datasources, preview_features);
 
     diagnostics.to_result()?;
