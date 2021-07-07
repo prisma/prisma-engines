@@ -235,9 +235,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         let from_psl_change = differ
             .created_primary_key()
             .filter(|pk| !pk.columns.is_empty())
-            .map(|pk| TableChange::AddPrimaryKey {
-                columns: pk.columns.clone(),
-            });
+            .map(|_| TableChange::AddPrimaryKey);
 
         if differ.flavour.should_recreate_the_primary_key_on_column_recreate() {
             from_psl_change.or_else(|| {
@@ -250,9 +248,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                 });
 
                 if from_recreate {
-                    Some(TableChange::AddPrimaryKey {
-                        columns: differ.previous().table().primary_key_columns(),
-                    })
+                    Some(TableChange::AddPrimaryKey)
                 } else {
                     None
                 }

@@ -282,9 +282,9 @@ impl SqlMigration {
                                 out.push_str(&tables.previous().primary_key_column_names().unwrap().join(", "));
                                 out.push_str(")\n");
                             }
-                            TableChange::AddPrimaryKey { columns } => {
+                            TableChange::AddPrimaryKey => {
                                 out.push_str("  [+] Added primary key on columns (");
-                                out.push_str(&columns.join(", "));
+                                out.push_str(&tables.next().primary_key_column_names().unwrap().join(", "));
                                 out.push_str(")\n");
                             }
                         }
@@ -505,9 +505,7 @@ pub(crate) enum TableChange {
         changes: ColumnChanges,
     },
     DropPrimaryKey,
-    AddPrimaryKey {
-        columns: Vec<String>,
-    },
+    AddPrimaryKey,
 }
 
 impl TableChange {

@@ -51,8 +51,8 @@ impl<'a> AlterTableConstructor<'a> {
                 TableChange::DropPrimaryKey => {
                     self.drop_primary_key();
                 }
-                TableChange::AddPrimaryKey { columns } => {
-                    self.add_primary_key(columns);
+                TableChange::AddPrimaryKey => {
+                    self.add_primary_key();
                 }
                 TableChange::AddColumn { column_id } => {
                     self.add_column(*column_id);
@@ -127,7 +127,8 @@ impl<'a> AlterTableConstructor<'a> {
             .insert(format!("{}", self.renderer.quote(constraint)));
     }
 
-    fn add_primary_key(&mut self, columns: &[String]) {
+    fn add_primary_key(&mut self) {
+        let columns = self.tables.next().primary_key_column_names().unwrap();
         let non_quoted_columns = columns.iter();
         let mut quoted_columns = Vec::with_capacity(columns.len());
 

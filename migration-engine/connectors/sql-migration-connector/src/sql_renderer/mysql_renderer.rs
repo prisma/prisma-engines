@@ -111,9 +111,15 @@ impl SqlRenderer for MysqlFlavour {
         for change in changes {
             match change {
                 TableChange::DropPrimaryKey => lines.push(sql_ddl::mysql::AlterTableClause::DropPrimaryKey.to_string()),
-                TableChange::AddPrimaryKey { columns } => lines.push(format!(
+                TableChange::AddPrimaryKey => lines.push(format!(
                     "ADD PRIMARY KEY ({})",
-                    columns.iter().map(|colname| self.quote(colname)).join(", ")
+                    tables
+                        .next()
+                        .primary_key_column_names()
+                        .iter()
+                        .flat_map(|c| c.into_iter())
+                        .map(|colname| self.quote(colname))
+                        .join(", ")
                 )),
                 TableChange::AddColumn { column_id } => {
                     let column = tables.next().column_at(*column_id);
