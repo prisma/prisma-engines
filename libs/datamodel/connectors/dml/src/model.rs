@@ -32,6 +32,7 @@ pub struct IndexDefinition {
     pub name: Option<String>,
     pub fields: Vec<String>,
     pub tpe: IndexType,
+    pub defined_on_field: bool,
 }
 
 impl IndexDefinition {

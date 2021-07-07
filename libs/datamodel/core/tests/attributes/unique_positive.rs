@@ -19,6 +19,7 @@ fn basic_unique_index_must_work() {
         name: None,
         fields: vec!["firstName".to_string(), "lastName".to_string()],
         tpe: IndexType::Unique,
+        defined_on_field: false,
     });
 }
 
@@ -95,6 +96,7 @@ fn the_name_argument_must_work() {
         name: Some("MyIndexName".to_string()),
         fields: vec!["firstName".to_string(), "lastName".to_string()],
         tpe: IndexType::Unique,
+        defined_on_field: false,
     });
 }
 
@@ -118,12 +120,14 @@ fn multiple_unique_must_work() {
         name: None,
         fields: vec!["firstName".to_string(), "lastName".to_string()],
         tpe: IndexType::Unique,
+        defined_on_field: false,
     });
 
     user_model.assert_has_index(IndexDefinition {
         name: Some("MyIndexName".to_string()),
         fields: vec!["firstName".to_string(), "lastName".to_string()],
         tpe: IndexType::Unique,
+        defined_on_field: false,
     });
 }
 
@@ -168,6 +172,31 @@ fn multi_field_unique_indexes_on_enum_fields_must_work() {
         name: None,
         fields: vec!["role".to_string()],
         tpe: IndexType::Unique,
+        defined_on_field: false,
+    });
+}
+
+#[test]
+fn single_field_unique_indexes_on_enum_fields_must_work() {
+    let dml = r#"
+    model User {
+        id        Int    @id
+        role      Role   @unique
+    }
+
+    enum Role {
+        Admin
+        Member
+    }
+    "#;
+
+    let schema = parse(dml);
+    let user_model = schema.assert_has_model("User");
+    user_model.assert_has_index(IndexDefinition {
+        name: None,
+        fields: vec!["role".to_string()],
+        tpe: IndexType::Unique,
+        defined_on_field: true,
     });
 }
 

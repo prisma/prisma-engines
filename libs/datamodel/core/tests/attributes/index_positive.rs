@@ -20,6 +20,7 @@ fn basic_index_must_work() {
         name: None,
         fields: vec!["firstName".to_string(), "lastName".to_string()],
         tpe: IndexType::Normal,
+        defined_on_field: false,
     });
 }
 
@@ -45,6 +46,7 @@ fn indexes_on_enum_fields_must_work() {
         name: None,
         fields: vec!["role".to_string()],
         tpe: IndexType::Normal,
+        defined_on_field: false,
     });
 }
 
@@ -66,6 +68,7 @@ fn the_name_argument_must_work() {
         name: Some("MyIndexName".to_string()),
         fields: vec!["firstName".to_string(), "lastName".to_string()],
         tpe: IndexType::Normal,
+        defined_on_field: false,
     });
 }
 
@@ -101,12 +104,14 @@ fn multiple_indexes_with_same_name_are_supported_by_mysql() {
         name: Some("MyIndexName".to_string()),
         fields: vec!["id".to_string()],
         tpe: IndexType::Normal,
+        defined_on_field: false,
     });
 
     post_model.assert_has_index(IndexDefinition {
         name: Some("MyIndexName".to_string()),
         fields: vec!["id".to_string()],
         tpe: IndexType::Normal,
+        defined_on_field: false,
     });
 }
 
@@ -130,12 +135,14 @@ fn multiple_index_must_work() {
         name: None,
         fields: vec!["firstName".to_string(), "lastName".to_string()],
         tpe: IndexType::Normal,
+        defined_on_field: false,
     });
 
     user_model.assert_has_index(IndexDefinition {
         name: Some("MyIndexName".to_string()),
         fields: vec!["firstName".to_string(), "lastName".to_string()],
         tpe: IndexType::Normal,
+        defined_on_field: false,
     });
 }
 

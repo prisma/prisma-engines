@@ -84,6 +84,7 @@ impl<'a> LiftAstToDml<'a> {
                     true => dml::IndexType::Unique,
                     false => dml::IndexType::Normal,
                 },
+                defined_on_field: idx.source_field.is_some(),
             })
             .collect();
 
