@@ -1,52 +1,6 @@
-use datamodel::{ast::Span, diagnostics::*, render_datamodel_to_string, IndexDefinition, IndexType};
+use datamodel::{ast::Span, diagnostics::*};
 
 use crate::common::*;
-
-#[test]
-fn basic_index_must_work() {
-    let dml = r#"
-    model User {
-        id        Int    @id
-        firstName String
-        lastName  String
-
-        @@index([firstName,lastName])
-    }
-    "#;
-
-    let schema = parse(dml);
-    let user_model = schema.assert_has_model("User");
-    user_model.assert_has_index(IndexDefinition {
-        name: None,
-        fields: vec!["firstName".to_string(), "lastName".to_string()],
-        tpe: IndexType::Normal,
-    });
-}
-
-#[test]
-fn indexes_on_enum_fields_must_work() {
-    let dml = r#"
-    model User {
-        id        Int    @id
-        role      Role
-
-        @@index([role])
-    }
-
-    enum Role {
-        Admin
-        Member
-    }
-    "#;
-
-    let schema = parse(dml);
-    let user_model = schema.assert_has_model("User");
-    user_model.assert_has_index(IndexDefinition {
-        name: None,
-        fields: vec!["role".to_string()],
-        tpe: IndexType::Normal,
-    });
-}
 
 #[test]
 fn indexes_on_relation_fields_must_error() {
@@ -71,27 +25,6 @@ fn indexes_on_relation_fields_must_error() {
         "User",
         Span::new(187,210),
     ));
-}
-
-#[test]
-fn the_name_argument_must_work() {
-    let dml = r#"
-    model User {
-        id        Int    @id
-        firstName String
-        lastName  String
-
-        @@index([firstName,lastName], name: "MyIndexName")
-    }
-    "#;
-
-    let schema = parse(dml);
-    let user_model = schema.assert_has_model("User");
-    user_model.assert_has_index(IndexDefinition {
-        name: Some("MyIndexName".to_string()),
-        fields: vec!["firstName".to_string(), "lastName".to_string()],
-        tpe: IndexType::Normal,
-    });
 }
 
 #[test]
@@ -133,47 +66,6 @@ fn empty_unique_index_names_are_rejected() {
         message: "The `name` argument cannot be an empty string.".into(),
         attribute_name: "unique".into(),
         span: Span::new(108, 146),
-    });
-}
-
-#[test]
-fn multiple_indexes_with_same_name_are_supported_by_mysql() {
-    let dml = r#"
-    datasource mysql {
-        provider = "mysql"
-        url = "mysql://asdlj"
-    }
-
-    model User {
-        id         Int @id
-        neighborId Int
-
-        @@index([id], name: "MyIndexName")
-     }
-
-     model Post {
-        id Int @id
-        optionId Int
-
-        @@index([id], name: "MyIndexName")
-     }
-    "#;
-
-    let schema = parse(dml);
-
-    let user_model = schema.assert_has_model("User");
-    let post_model = schema.assert_has_model("Post");
-
-    user_model.assert_has_index(IndexDefinition {
-        name: Some("MyIndexName".to_string()),
-        fields: vec!["id".to_string()],
-        tpe: IndexType::Normal,
-    });
-
-    post_model.assert_has_index(IndexDefinition {
-        name: Some("MyIndexName".to_string()),
-        fields: vec!["id".to_string()],
-        tpe: IndexType::Normal,
     });
 }
 
@@ -280,35 +172,6 @@ fn unique_insert_with_same_name_are_not_supported_by_postgres() {
 }
 
 #[test]
-fn multiple_index_must_work() {
-    let dml = r#"
-    model User {
-        id        Int    @id
-        firstName String
-        lastName  String
-
-        @@index([firstName,lastName])
-        @@index([firstName,lastName], name: "MyIndexName")
-    }
-    "#;
-
-    let schema = parse(dml);
-    let user_model = schema.assert_has_model("User");
-
-    user_model.assert_has_index(IndexDefinition {
-        name: None,
-        fields: vec!["firstName".to_string(), "lastName".to_string()],
-        tpe: IndexType::Normal,
-    });
-
-    user_model.assert_has_index(IndexDefinition {
-        name: Some("MyIndexName".to_string()),
-        fields: vec!["firstName".to_string(), "lastName".to_string()],
-        tpe: IndexType::Normal,
-    });
-}
-
-#[test]
 fn must_error_when_unknown_fields_are_used() {
     let dml = r#"
     model User {
@@ -325,22 +188,6 @@ fn must_error_when_unknown_fields_are_used() {
         "User",
         Span::new(48, 64),
     ));
-}
-
-#[test]
-fn index_attributes_must_serialize_to_valid_dml() {
-    let dml = r#"
-        model User {
-            id        Int    @id
-            firstName String
-            lastName  String
-
-            @@index([firstName,lastName], name: "customName")
-        }
-    "#;
-    let schema = parse(dml);
-
-    assert!(datamodel::parse_datamodel(&render_datamodel_to_string(&schema)).is_ok());
 }
 
 #[test]
