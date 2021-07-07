@@ -327,7 +327,10 @@ impl Model {
     }
 
     pub fn field_is_unique(&self, name: &str) -> bool {
-        self.scalar_fields().any(|f| f.name == name)
+        println!("{:?}", self.indices);
+        self.indices
+            .iter()
+            .any(|i| i.is_unique() && i.fields == vec![name.to_string()])
     }
 }
 

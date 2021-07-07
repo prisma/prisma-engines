@@ -73,7 +73,6 @@ impl<'a> LiftAstToDml<'a> {
         model.indices = model_data
             .indexes
             .iter()
-            .filter(|idx| idx.source_field.is_none())
             .map(|idx| dml::IndexDefinition {
                 name: idx.name.map(String::from),
                 fields: idx

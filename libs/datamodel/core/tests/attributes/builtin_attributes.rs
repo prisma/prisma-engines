@@ -24,7 +24,7 @@ fn unique_attribute() {
         .assert_has_scalar_field("unique")
         .assert_base_type(&ScalarType::String);
 
-    assert_eq!(true, test_model.field_is_unique("unique"));
+    assert!(test_model.field_is_unique("unique"));
 }
 
 #[test]

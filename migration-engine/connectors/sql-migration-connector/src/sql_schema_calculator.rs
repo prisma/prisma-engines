@@ -52,7 +52,7 @@ fn calculate_model_tables<'a>(
 
         let single_field_indexes = model
             .indexes()
-            .filter(|f| f.fields.len() == 1 && f.tpe == IndexType::Unique)
+            .filter(|f| f.fields.len() == 1 && f.is_unique())
             .map(|f| {
                 let field = model.find_scalar_field(f.fields.first().unwrap()).unwrap();
 
