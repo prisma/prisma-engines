@@ -1,5 +1,5 @@
 use crate::common::*;
-use datamodel::{ast::Span, diagnostics::*, render_datamodel_to_string, IndexDefinition, IndexType};
+use datamodel::{render_datamodel_to_string, IndexDefinition, IndexType};
 
 #[test]
 fn basic_unique_index_must_work() {
