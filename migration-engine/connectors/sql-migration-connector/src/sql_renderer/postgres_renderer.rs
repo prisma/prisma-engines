@@ -259,7 +259,7 @@ impl SqlRenderer for PostgresFlavour {
                         .next()
                         .primary_key_column_names()
                         .iter()
-                        .flat_map(|c| c.into_iter())
+                        .flat_map(|c| c.iter())
                         .map(|colname| self.quote(colname))
                         .join(", ")
                 )),

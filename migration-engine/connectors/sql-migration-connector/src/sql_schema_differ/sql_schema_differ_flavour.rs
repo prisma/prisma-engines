@@ -1,6 +1,9 @@
-use super::{column::ColumnDiffer, ColumnTypeChange, SqlSchemaDiffer};
+use super::{ColumnTypeChange, SqlSchemaDiffer};
 use crate::{pair::Pair, sql_migration::SqlMigrationStep, sql_schema_differ};
-use sql_schema_describer::{walkers::IndexWalker, ColumnId};
+use sql_schema_describer::{
+    walkers::{ColumnWalker, IndexWalker},
+    ColumnId,
+};
 use std::collections::HashSet;
 
 mod mssql;
@@ -24,7 +27,7 @@ pub(crate) trait SqlSchemaDifferFlavour {
     }
 
     /// Return whether a column's type needs to be migrated, and how.
-    fn column_type_change(&self, differ: &ColumnDiffer<'_>) -> Option<ColumnTypeChange> {
+    fn column_type_change(&self, differ: Pair<ColumnWalker<'_>>) -> Option<ColumnTypeChange> {
         if differ.previous.column_type_family() != differ.next.column_type_family() {
             Some(ColumnTypeChange::RiskyCast)
         } else {

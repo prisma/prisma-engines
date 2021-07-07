@@ -72,9 +72,8 @@ impl<'schema> SqlSchemaDiffer<'schema> {
             }
 
             if self.flavour.should_create_indexes_from_created_tables() {
-                let create_indexes_from_created_tables = self
-                    .created_tables()
-                    .flat_map(|table| table.indexes())
+                let create_indexes_from_created_tables = table
+                    .indexes()
                     .filter(|index| !self.flavour.should_skip_index_for_new_table(index))
                     .map(|index| SqlMigrationStep::CreateIndex {
                         table_id: (None, index.table().table_id()),
@@ -159,10 +158,11 @@ impl<'schema> SqlSchemaDiffer<'schema> {
             }
 
             for column in table.column_pairs() {
+                let ids = column.map(|c| c.column_id());
                 self.flavour.push_index_changes_for_column_changes(
                     &table,
-                    column.as_pair().map(|c| c.column_id()),
-                    column.all_changes().0,
+                    ids,
+                    self.db.column_changes(table.tables.map(|t| t.table_id()), ids),
                     steps,
                 );
             }
@@ -190,7 +190,10 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         let mut alter_columns: Vec<_> = table_differ
             .column_pairs()
             .filter_map(move |column_differ| {
-                let (changes, type_change) = column_differ.all_changes();
+                let changes = table_differ.db.column_changes(
+                    table_differ.tables.map(|t| t.table_id()),
+                    column_differ.map(|col| col.column_id()),
+                );
 
                 if !changes.differs_in_something() {
                     return None;
@@ -198,7 +201,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
 
                 let column_id = Pair::new(column_differ.previous.column_id(), column_differ.next.column_id());
 
-                match type_change {
+                match changes.type_change {
                     Some(ColumnTypeChange::NotCastable) => {
                         Some(TableChange::DropAndRecreateColumn { column_id, changes })
                     }
@@ -236,7 +239,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
             .filter(|pk| !pk.columns.is_empty())
             .map(|_| TableChange::AddPrimaryKey);
 
-        if differ.flavour.should_recreate_the_primary_key_on_column_recreate() {
+        if differ.db.flavour.should_recreate_the_primary_key_on_column_recreate() {
             from_psl_change.or_else(|| {
                 let from_recreate = Self::alter_columns(differ).into_iter().any(|tc| match tc {
                     TableChange::DropAndRecreateColumn { column_id, .. } => {
@@ -260,7 +263,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
     fn drop_primary_key(differ: &TableDiffer<'_, '_>) -> Option<TableChange> {
         let from_psl_change = differ.dropped_primary_key().map(|_pk| TableChange::DropPrimaryKey);
 
-        if differ.flavour.should_recreate_the_primary_key_on_column_recreate() {
+        if differ.db.flavour.should_recreate_the_primary_key_on_column_recreate() {
             from_psl_change.or_else(|| {
                 let from_recreate = Self::alter_columns(differ).into_iter().any(|tc| match tc {
                     TableChange::DropAndRecreateColumn { column_id, .. } => {
@@ -296,8 +299,13 @@ impl<'schema> SqlSchemaDiffer<'schema> {
             if self.flavour.indexes_should_be_recreated_after_column_drop() {
                 let dropped_and_recreated_column_ids_next: HashSet<ColumnId> = tables
                     .column_pairs()
-                    .filter(|columns| matches!(columns.all_changes().1, Some(ColumnTypeChange::NotCastable)))
-                    .map(|col| col.as_pair().next().column_id())
+                    .filter(|columns| {
+                        matches!(
+                            self.db.column_changes_for_walkers(*columns).type_change,
+                            Some(ColumnTypeChange::NotCastable)
+                        )
+                    })
+                    .map(|col| col.next.column_id())
                     .collect();
 
                 for index in tables.index_pairs().filter(|index| {
@@ -352,11 +360,11 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                 let column_pairs = differ
                     .column_pairs()
                     .map(|columns| {
-                        let (changes, type_change) = columns.all_changes();
+                        let changes = self.db.column_changes_for_walkers(columns);
                         (
                             Pair::new(columns.previous.column_id(), columns.next.column_id()),
                             changes,
-                            type_change.map(|tc| match tc {
+                            changes.type_change.map(|tc| match tc {
                                 ColumnTypeChange::SafeCast => sql_migration::ColumnTypeChange::SafeCast,
                                 ColumnTypeChange::RiskyCast => sql_migration::ColumnTypeChange::RiskyCast,
                                 ColumnTypeChange::NotCastable => sql_migration::ColumnTypeChange::NotCastable,
@@ -379,7 +387,6 @@ impl<'schema> SqlSchemaDiffer<'schema> {
     /// An iterator over the tables that are present in both schemas.
     fn table_pairs(&self) -> impl Iterator<Item = TableDiffer<'schema, '_>> + '_ {
         self.db.table_pairs().map(move |tables| TableDiffer {
-            flavour: self.flavour,
             tables: self.schemas.tables(&tables),
             db: &self.db,
         })
@@ -435,20 +442,19 @@ fn foreign_keys_match(fks: Pair<&ForeignKeyWalker<'_>>, flavour: &dyn SqlFlavour
     let constrains_same_column_count =
         fks.previous().constrained_columns().count() == fks.next().constrained_columns().count();
     let constrains_same_columns = fks.interleave(|fk| fk.constrained_columns()).all(|cols| {
-        let type_changed =
-            db.column_type_changed(cols.map(|col| col.table().table_id()), cols.map(|col| col.column_id()));
+        let type_changed = || db.column_changes_for_walkers(cols).type_changed();
 
         let arities_ok = flavour.can_cope_with_foreign_key_column_becoming_nonnullable()
             || (cols.previous().arity() == cols.next().arity()
                 || (cols.previous().arity().is_required() && cols.next().arity().is_nullable()));
 
-        cols.previous().name() == cols.next().name() && !type_changed && arities_ok
+        cols.previous().name() == cols.next().name() && !type_changed() && arities_ok
     });
 
     // Foreign key references different columns or the same columns in a different order.
     let references_same_columns = fks
         .interleave(|fk| fk.referenced_column_names())
-        .all(|pair| pair.previous() == pair.next());
+        .all(|pair| pair.previous == pair.next);
 
     let matches = references_same_table
         && references_same_column_count
@@ -457,8 +463,8 @@ fn foreign_keys_match(fks: Pair<&ForeignKeyWalker<'_>>, flavour: &dyn SqlFlavour
         && references_same_columns;
 
     if flavour.preview_features().contains(PreviewFeature::ReferentialActions) {
-        let same_on_delete_action = fks.previous().on_delete_action() == fks.next().on_delete_action();
-        let same_on_update_action = fks.previous().on_update_action() == fks.next().on_update_action();
+        let same_on_delete_action = fks.previous.on_delete_action() == fks.next.on_delete_action();
+        let same_on_update_action = fks.previous.on_update_action() == fks.next.on_update_action();
 
         matches && same_on_delete_action && same_on_update_action
     } else {

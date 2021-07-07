@@ -117,7 +117,7 @@ impl SqlRenderer for MysqlFlavour {
                         .next()
                         .primary_key_column_names()
                         .iter()
-                        .flat_map(|c| c.into_iter())
+                        .flat_map(|c| c.iter())
                         .map(|colname| self.quote(colname))
                         .join(", ")
                 )),
@@ -139,7 +139,7 @@ impl SqlRenderer for MysqlFlavour {
                     type_change: _,
                 }) => {
                     let columns = tables.columns(column_id);
-                    let expanded = MysqlAlterColumn::new(&columns, changes);
+                    let expanded = MysqlAlterColumn::new(&columns, *changes);
 
                     match expanded {
                         MysqlAlterColumn::DropDefault => lines.push(format!(
@@ -422,7 +422,7 @@ enum MysqlAlterColumn {
 }
 
 impl MysqlAlterColumn {
-    fn new(columns: &Pair<ColumnWalker<'_>>, changes: &ColumnChanges) -> Self {
+    fn new(columns: &Pair<ColumnWalker<'_>>, changes: ColumnChanges) -> Self {
         if changes.only_default_changed() && columns.next().default().is_none() {
             return MysqlAlterColumn::DropDefault;
         }
@@ -447,10 +447,7 @@ impl MysqlAlterColumn {
             _ => columns.next().default().cloned(),
         };
 
-        MysqlAlterColumn::Modify {
-            changes: changes.clone(),
-            new_default,
-        }
+        MysqlAlterColumn::Modify { changes, new_default }
     }
 }
 

@@ -1,20 +1,20 @@
+use super::column;
 use crate::{flavour::SqlFlavour, pair::Pair};
-use sql_schema_describer::{ColumnId, SqlSchema, TableId};
+use sql_schema_describer::{walkers::ColumnWalker, ColumnId, SqlSchema, TableId};
 use std::{
     borrow::Cow,
     collections::{BTreeMap, HashMap},
     ops::Bound,
 };
 
-use super::column::ColumnDiffer;
-
 pub(crate) struct DifferDatabase<'a> {
-    flavour: &'a dyn SqlFlavour,
-    schemas: Pair<&'a SqlSchema>,
+    pub(super) flavour: &'a dyn SqlFlavour,
     /// Table name -> table indexes.
     tables: HashMap<Cow<'a, str>, Pair<Option<TableId>>>,
     /// (table_idxs, column_name) -> column_idxs
     columns: BTreeMap<(Pair<TableId>, &'a str), Pair<Option<ColumnId>>>,
+    /// (table_idx, column_idx) -> ColumnChanges
+    column_changes: HashMap<(Pair<TableId>, Pair<ColumnId>), column::ColumnChanges>,
 }
 
 impl<'a> DifferDatabase<'a> {
@@ -24,7 +24,7 @@ impl<'a> DifferDatabase<'a> {
             flavour,
             tables: HashMap::with_capacity(table_count_lb),
             columns: BTreeMap::new(),
-            schemas,
+            column_changes: Default::default(),
         };
 
         let mut columns_cache = HashMap::new();
@@ -67,8 +67,15 @@ impl<'a> DifferDatabase<'a> {
                     *entry.next_mut() = Some(column.column_id());
                 }
 
-                for (column_name, indexes) in &columns_cache {
-                    db.columns.insert((table_pair, column_name), *indexes);
+                for (column_name, column_ids) in &columns_cache {
+                    db.columns.insert((table_pair, column_name), *column_ids);
+
+                    if let Some(column_ids) = column_ids.transpose() {
+                        let column_walkers = tables.columns(&column_ids);
+                        let changes = column::all_changes(column_walkers, flavour);
+
+                        db.column_changes.insert((table_pair, column_ids), changes);
+                    }
                 }
             }
         }
@@ -80,16 +87,12 @@ impl<'a> DifferDatabase<'a> {
         self.range_columns(table).filter_map(|(_k, v)| v.transpose())
     }
 
-    pub(crate) fn column_type_changed(&self, table: Pair<TableId>, column: Pair<ColumnId>) -> bool {
-        let cols = self.schemas.tables(&table).columns(&column);
-        ColumnDiffer {
-            flavour: self.flavour,
-            previous: *cols.previous(),
-            next: *cols.next(),
-        }
-        .all_changes()
-        .0
-        .type_changed()
+    pub(crate) fn column_changes(&self, table: Pair<TableId>, column: Pair<ColumnId>) -> column::ColumnChanges {
+        self.column_changes[&(table, column)]
+    }
+
+    pub(crate) fn column_changes_for_walkers(&self, walkers: Pair<ColumnWalker<'_>>) -> column::ColumnChanges {
+        self.column_changes(walkers.map(|c| c.table().table_id()), walkers.map(|c| c.column_id()))
     }
 
     pub(crate) fn created_columns(&self, table: Pair<TableId>) -> impl Iterator<Item = ColumnId> + '_ {

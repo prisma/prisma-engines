@@ -3,10 +3,10 @@ use sql_schema_describer::{
     ColumnId, SqlSchema, TableId,
 };
 
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub(crate) struct Pair<T> {
-    previous: T,
-    next: T,
+    pub(crate) previous: T,
+    pub(crate) next: T,
 }
 
 impl<T> Pair<T> {

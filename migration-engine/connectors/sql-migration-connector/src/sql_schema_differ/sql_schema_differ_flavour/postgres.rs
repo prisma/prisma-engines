@@ -3,15 +3,12 @@ use crate::{
     flavour::PostgresFlavour,
     pair::Pair,
     sql_migration::{AlterEnum, SqlMigrationStep},
-    sql_schema_differ::{
-        column::{ColumnDiffer, ColumnTypeChange},
-        SqlSchemaDiffer,
-    },
+    sql_schema_differ::{column::ColumnTypeChange, SqlSchemaDiffer},
 };
 use native_types::PostgresType;
 use once_cell::sync::Lazy;
 use regex::RegexSet;
-use sql_schema_describer::walkers::IndexWalker;
+use sql_schema_describer::walkers::{ColumnWalker, IndexWalker};
 
 /// The maximum length of postgres identifiers, in bytes.
 ///
@@ -77,17 +74,13 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
         POSTGRES_IGNORED_TABLES.is_match(table_name)
     }
 
-    fn column_type_change(&self, differ: &ColumnDiffer<'_>) -> Option<ColumnTypeChange> {
+    fn column_type_change(&self, differ: Pair<ColumnWalker<'_>>) -> Option<ColumnTypeChange> {
         use ColumnTypeChange::*;
         let from_list_to_scalar = differ.previous.arity().is_list() && !differ.next.arity().is_list();
         let from_scalar_to_list = !differ.previous.arity().is_list() && differ.next.arity().is_list();
 
         // Handle the enum cases first.
-        match differ
-            .as_pair()
-            .map(|col| col.column_type_family().as_enum())
-            .as_tuple()
-        {
+        match differ.map(|col| col.column_type_family().as_enum()).as_tuple() {
             (Some(previous_enum), Some(next_enum)) if previous_enum == next_enum => return None,
             (Some(_), Some(_)) => return Some(ColumnTypeChange::NotCastable),
             (None, Some(_)) | (Some(_), None) => return Some(ColumnTypeChange::NotCastable),
