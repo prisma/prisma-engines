@@ -128,8 +128,9 @@ fn should_be_able_to_handle_multiple_types() {
 
     user_model
         .assert_has_scalar_field("email")
-        .assert_is_unique(true)
         .assert_base_type(&ScalarType::String);
+
+    assert_eq!(true, user_model.field_is_unique("email"));
 
     user_model
         .assert_has_scalar_field("balance")

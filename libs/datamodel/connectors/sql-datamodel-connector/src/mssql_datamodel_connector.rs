@@ -230,7 +230,7 @@ impl Connector for MsSqlDatamodelConnector {
         Cow::Borrowed(url)
     }
 
-    fn validate_field(&self, field: &Field) -> Result<(), ConnectorError> {
+    fn validate_field(&self, model: &Model, field: &Field) -> Result<(), ConnectorError> {
         match field.field_type() {
             FieldType::Scalar(_, _, Some(native_type)) => {
                 let r#type: MsSqlType = native_type.deserialize_native_type();
@@ -249,7 +249,7 @@ impl Connector for MsSqlDatamodelConnector {
                     Float(Some(bits)) if bits == 0 || bits > 53 => {
                         error.new_argument_m_out_of_range_error("Bits can range from 1 to 53.")
                     }
-                    typ if heap_allocated_types().contains(&typ) && field.is_unique() => {
+                    typ if heap_allocated_types().contains(&typ) && model.field_is_unique(field.name()) => {
                         error.new_incompatible_native_type_with_unique()
                     }
                     typ if heap_allocated_types().contains(&typ) && field.is_id() => {

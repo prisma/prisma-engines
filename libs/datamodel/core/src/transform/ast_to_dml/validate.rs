@@ -339,7 +339,7 @@ impl<'a> Validator<'a> {
         if let Some(source) = self.source {
             let connector = &source.active_connector;
             for field in model.fields.iter() {
-                if let Err(err) = connector.validate_field(field) {
+                if let Err(err) = connector.validate_field(model, field) {
                     diagnostics.push_error(DatamodelError::new_connector_error(
                         &err.to_string(),
                         ast_model.find_field_bang(field.name()).span,

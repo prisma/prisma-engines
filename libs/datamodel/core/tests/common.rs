@@ -26,7 +26,6 @@ pub trait ScalarFieldAsserts {
     fn assert_with_db_name(&self, t: &str) -> &Self;
     fn assert_default_value(&self, t: dml::DefaultValue) -> &Self;
     fn assert_is_id(&self) -> &Self;
-    fn assert_is_unique(&self, b: bool) -> &Self;
     fn assert_is_updated_at(&self, b: bool) -> &Self;
     fn assert_ignored(&self, state: bool) -> &Self;
 }
@@ -158,11 +157,6 @@ impl ScalarFieldAsserts for dml::ScalarField {
 
     fn assert_is_id(&self) -> &Self {
         assert!(self.is_id);
-        self
-    }
-
-    fn assert_is_unique(&self, b: bool) -> &Self {
-        assert_eq!(self.is_unique, b);
         self
     }
 

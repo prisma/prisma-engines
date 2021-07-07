@@ -242,7 +242,9 @@ impl Model {
         {
             let mut unique_required_fields: Vec<_> = self
                 .scalar_fields()
-                .filter(|field| field.is_unique && (field.is_required() || allow_optional) && !in_eligible(field))
+                .filter(|field| {
+                    self.field_is_unique(&field.name) && (field.is_required() || allow_optional) && !in_eligible(field)
+                })
                 .map(|f| UniqueCriteria::new(vec![f]))
                 .collect();
 
@@ -276,7 +278,7 @@ impl Model {
     pub fn field_is_indexed(&self, field_name: &str) -> bool {
         let field = self.find_field(field_name).unwrap();
 
-        if field.is_id() || field.is_unique() {
+        if field.is_id() || self.field_is_unique(field.name()) {
             return true;
         }
 
@@ -322,6 +324,10 @@ impl Model {
         }
 
         has_field(self, "createdAt") && has_field(self, "updatedAt")
+    }
+
+    pub fn field_is_unique(&self, name: &str) -> bool {
+        self.scalar_fields().any(|f| f.name == name)
     }
 }
 

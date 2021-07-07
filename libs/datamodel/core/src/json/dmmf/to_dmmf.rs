@@ -97,7 +97,7 @@ fn field_to_dmmf(model: &dml::Model, field: &dml::Field) -> Field {
         is_read_only: a_relation_field_is_based_on_this_field,
         has_default_value: field.default_value().is_some(),
         default: default_value_to_serde(&field.default_value().cloned()),
-        is_unique: field.is_unique(),
+        is_unique: model.field_is_unique(field.name()),
         relation_name: get_relation_name(field),
         relation_from_fields: get_relation_from_fields(field),
         relation_to_fields: get_relation_to_fields(field),

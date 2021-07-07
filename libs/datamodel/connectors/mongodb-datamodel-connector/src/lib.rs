@@ -4,6 +4,7 @@ use datamodel_connector::{
     connector_error::{ConnectorError, ErrorKind},
     Connector, ConnectorCapability,
 };
+use dml::model::Model;
 use dml::{
     default_value::DefaultValue, field::FieldType, native_type_constructor::NativeTypeConstructor,
     native_type_instance::NativeTypeInstance, relation_info::ReferentialAction, traits::WithDatabaseName,
@@ -74,7 +75,7 @@ impl Connector for MongoDbDatamodelConnector {
         true
     }
 
-    fn validate_field(&self, field: &dml::field::Field) -> Result<()> {
+    fn validate_field(&self, _model: &Model, field: &dml::field::Field) -> Result<()> {
         // WIP, I don't really know what I'm doing with the dml.
 
         // The _id name check is superfluous because it's not a valid schema field at the moment.

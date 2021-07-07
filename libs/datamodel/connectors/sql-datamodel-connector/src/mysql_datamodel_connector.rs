@@ -280,7 +280,7 @@ impl Connector for MySqlDatamodelConnector {
             .any(|(st, nt)| scalar_type == st && &native_type == nt)
     }
 
-    fn validate_field(&self, field: &Field) -> Result<(), ConnectorError> {
+    fn validate_field(&self, model: &Model, field: &Field) -> Result<(), ConnectorError> {
         match field.field_type() {
             FieldType::Scalar(scalar_type, _, Some(native_type_instance)) => {
                 let native_type_name = native_type_instance.name.as_str();
@@ -311,7 +311,9 @@ impl Connector for MySqlDatamodelConnector {
                     Bit(n) if n > 1 && scalar_type.is_boolean() => {
                         error.new_argument_m_out_of_range_error("only Bit(1) can be used as Boolean.")
                     }
-                    _ if field.is_unique() && incompatible_with_key => error.new_incompatible_native_type_with_unique(),
+                    _ if model.field_is_unique(field.name()) && incompatible_with_key => {
+                        error.new_incompatible_native_type_with_unique()
+                    }
                     _ if field.is_id() && incompatible_with_key => error.new_incompatible_native_type_with_id(),
                     _ => Ok(()),
                 }

@@ -2,6 +2,7 @@ use dml::relation_info::ReferentialAction;
 use enumflags2::BitFlags;
 
 use crate::{connector_error::ConnectorError, Connector, ConnectorCapability};
+use dml::model::Model;
 
 /// A [Connector](/trait.Connector.html) implementor meant to
 /// be used as a default when no datasource is defined.
@@ -28,7 +29,7 @@ impl Connector for EmptyDatamodelConnector {
         usize::MAX
     }
 
-    fn validate_field(&self, _field: &dml::field::Field) -> Result<(), ConnectorError> {
+    fn validate_field(&self, _model: &Model, _field: &dml::field::Field) -> Result<(), ConnectorError> {
         Ok(())
     }
 

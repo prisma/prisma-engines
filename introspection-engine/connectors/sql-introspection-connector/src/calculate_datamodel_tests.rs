@@ -2,11 +2,11 @@
 mod tests {
     use crate::calculate_datamodel::calculate_datamodel;
     use datamodel::ast::Span;
-    use datamodel::StringFromEnvVar;
     use datamodel::{
         dml, Datamodel, Datasource, DefaultValue as DMLDefault, Field, FieldArity, FieldType, Model,
         NativeTypeInstance, ReferentialAction, RelationField, RelationInfo, ScalarField, ScalarType, ValueGenerator,
     };
+    use datamodel::{IndexDefinition, StringFromEnvVar};
     use enumflags2::BitFlags;
     use introspection_connector::IntrospectionContext;
     use native_types::{NativeType, PostgresType};
@@ -58,7 +58,6 @@ mod tests {
                         field_type: FieldType::Scalar(ScalarType::Int, None, None),
                         database_name: None,
                         default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
-                        is_unique: false,
                         is_id: true,
                         documentation: None,
                         is_generated: false,
@@ -148,7 +147,6 @@ mod tests {
                         ),
                         database_name: None,
                         default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
-                        is_unique: false,
                         is_id: true,
                         documentation: None,
                         is_generated: false,
@@ -182,7 +180,6 @@ mod tests {
                         ),
                         database_name: None,
                         default_value: None,
-                        is_unique: false,
                         is_id: true,
                         documentation: None,
                         is_generated: false,
@@ -216,7 +213,6 @@ mod tests {
                         ),
                         database_name: None,
                         default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
-                        is_unique: false,
                         is_id: true,
                         documentation: None,
                         is_generated: false,
@@ -334,7 +330,6 @@ mod tests {
                         field_type: FieldType::Scalar(ScalarType::Int, None, None),
                         database_name: None,
                         default_value: None,
-                        is_unique: true,
                         is_id: false,
                         documentation: None,
                         is_generated: false,
@@ -344,7 +339,11 @@ mod tests {
                     }),
                 ],
                 is_generated: false,
-                indices: vec![],
+                indices: vec![IndexDefinition {
+                    name: Some("unique_unique".to_string()),
+                    fields: vec!["unique".to_string()],
+                    tpe: dml::IndexType::Unique,
+                }],
                 id_fields: vec![],
             }],
             enums: vec![],
@@ -413,7 +412,6 @@ mod tests {
                             ),
                             database_name: None,
                             default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
-                            is_unique: false,
                             is_id: true,
                             documentation: None,
                             is_generated: false,
@@ -475,7 +473,6 @@ mod tests {
                             ),
                             database_name: None,
                             default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
-                            is_unique: false,
                             is_id: true,
                             documentation: None,
                             is_generated: false,
@@ -497,7 +494,6 @@ mod tests {
                             ),
                             database_name: Some("city-id".to_string()),
                             default_value: None,
-                            is_unique: false,
                             is_id: false,
                             documentation: None,
                             is_generated: false,
@@ -519,7 +515,6 @@ mod tests {
                             arity: FieldArity::Required,
                             database_name: Some("city-name".to_string()),
                             default_value: None,
-                            is_unique: false,
                             is_id: false,
                             documentation: None,
                             is_generated: false,
@@ -683,7 +678,6 @@ mod tests {
                         ),
                         database_name: None,
                         default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
-                        is_unique: false,
                         is_id: true,
                         documentation: None,
                         is_generated: false,
@@ -817,7 +811,6 @@ mod tests {
                             ),
                             database_name: None,
                             default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
-                            is_unique: false,
                             is_id: true,
                             documentation: None,
                             is_generated: false,
@@ -879,7 +872,6 @@ mod tests {
                             ),
                             database_name: None,
                             default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
-                            is_unique: false,
                             is_id: true,
                             documentation: None,
                             is_generated: false,

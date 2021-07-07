@@ -50,11 +50,18 @@ fn calculate_model_tables<'a>(
         })
         .filter(|pk| !pk.columns.is_empty());
 
-        let single_field_indexes = model.scalar_fields().filter(|f| f.is_unique()).map(|f| sql::Index {
-            name: flavour.single_field_index_name(model.db_name(), f.db_name()),
-            columns: vec![f.db_name().to_owned()],
-            tpe: sql::IndexType::Unique,
-        });
+        let single_field_indexes = model
+            .indexes()
+            .filter(|f| f.fields.len() == 1 && f.tpe == IndexType::Unique)
+            .map(|f| {
+                let field = model.find_scalar_field(f.fields.first().unwrap()).unwrap();
+
+                sql::Index {
+                    name: flavour.single_field_index_name(model.db_name(), field.db_name()),
+                    columns: vec![field.db_name().to_owned()],
+                    tpe: sql::IndexType::Unique,
+                }
+            });
 
         let multiple_field_indexes = model.indexes().map(|index_definition: &IndexDefinition| {
             let referenced_fields: Vec<ScalarFieldWalker<'_>> = index_definition

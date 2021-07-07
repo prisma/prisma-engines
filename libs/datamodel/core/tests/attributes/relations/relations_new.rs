@@ -278,6 +278,28 @@ fn relation_must_error_when_referenced_fields_are_not_a_unique_criteria() {
     errors.assert_is(DatamodelError::new_validation_error("The argument `references` must refer to a unique criteria in the related model `User`. But it is referencing the following fields that are not a unique criteria: firstName", Span::new(205, 276)));
 }
 
+#[test]
+fn relation_must_succeed_when_referenced_fields_are_a_unique_criteria() {
+    let dml = r#"
+    model User {
+        id        Int    @id
+        firstName String
+        posts     Post[]
+        
+        @@unique([firstName])
+    }
+
+    model Post {
+        id       Int    @id
+        text     String
+        userName String
+        user     User   @relation(fields: [userName], references: [firstName])
+    }
+    "#;
+
+    assert!(datamodel::parse_datamodel(dml).is_ok());
+}
+
 #[allow(non_snake_case)]
 #[test]
 fn relation_must_NOT_error_when_referenced_fields_are_not_a_unique_criteria_on_mysql() {
@@ -661,6 +683,41 @@ fn must_error_when_non_id_field_is_referenced_in_a_many_to_many() {
             Span::new(221, 264)
         ),
     );
+}
+
+#[test]
+fn must_succeed_when_id_field_is_referenced_in_a_many_to_many() {
+    let dml = r#"
+    model Post {
+      id         Int @id        
+      slug       Int        @unique
+      categories Category[] @relation(references: [id])
+    }
+
+   model Category {
+     id    Int    @default(autoincrement()) @id
+     posts Post[] @relation(references: [id])
+   }"#;
+
+    assert!(datamodel::parse_datamodel(dml).is_ok());
+
+    let dml2 = r#"
+    model Post {
+      id         Int
+      slug       Int        @unique
+      categories Category[] @relation(references: [id])
+
+      @@id([id])
+   }
+
+   model Category {
+     id    Int    @default(autoincrement())
+     posts Post[] @relation(references: [id])
+
+     @@id([id])
+   }"#;
+
+    assert!(datamodel::parse_datamodel(dml2).is_ok());
 }
 
 #[test]

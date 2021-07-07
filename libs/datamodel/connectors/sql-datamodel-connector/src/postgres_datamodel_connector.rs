@@ -230,7 +230,7 @@ impl Connector for PostgresDatamodelConnector {
             .any(|(st, nt)| scalar_type == st && &native_type == nt)
     }
 
-    fn validate_field(&self, field: &Field) -> Result<(), ConnectorError> {
+    fn validate_field(&self, model: &Model, field: &Field) -> Result<(), ConnectorError> {
         match field.field_type() {
             FieldType::Scalar(_scalar_type, _, Some(native_type_instance)) => {
                 let native_type: PostgresType = native_type_instance.deserialize_native_type();
@@ -248,7 +248,7 @@ impl Connector for PostgresDatamodelConnector {
                     Timestamp(Some(p)) | Timestamptz(Some(p)) | Time(Some(p)) | Timetz(Some(p)) if p > 6 => {
                         error.new_argument_m_out_of_range_error("M can range from 0 to 6.")
                     }
-                    Xml if field.is_unique() => error.new_incompatible_native_type_with_unique(),
+                    Xml if model.field_is_unique(field.name()) => error.new_incompatible_native_type_with_unique(),
                     _ => Ok(()),
                 }
             }

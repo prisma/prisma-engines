@@ -112,7 +112,7 @@ impl<'a> DatamodelConverter<'a> {
                         type_identifier: sf.type_identifier(),
                         is_required: sf.is_required(),
                         is_list: sf.is_list(),
-                        is_unique: sf.is_unique(model),
+                        is_unique: model.field_is_unique(&sf.name),
                         is_id: sf.is_id(model),
                         is_auto_generated_int_id: sf.is_auto_generated_int_id(),
                         is_autoincrement: sf.is_auto_increment(),
@@ -428,7 +428,6 @@ impl ModelConverterUtilities for dml::Model {
 
 trait DatamodelFieldExtensions {
     fn type_identifier(&self) -> TypeIdentifier;
-    fn is_unique(&self, model: &dml::Model) -> bool;
     fn is_id(&self, model: &dml::Model) -> bool;
     fn is_auto_generated_int_id(&self) -> bool;
     fn behaviour(&self) -> Option<FieldBehaviour>;
@@ -445,16 +444,6 @@ impl DatamodelFieldExtensions for dml::ScalarField {
             dml::FieldType::Scalar(scalar, _, _) => (*scalar).into(),
             dml::FieldType::Unsupported(_) => TypeIdentifier::Unsupported,
         }
-    }
-
-    fn is_unique(&self, model: &dml::Model) -> bool {
-        // transform @@unique for 1 field to is_unique
-        let is_declared_as_unique_through_multi_field_unique = model
-            .indices
-            .iter()
-            .any(|ixd| ixd.is_unique() && ixd.fields == vec![self.name.clone()]);
-
-        self.is_unique || is_declared_as_unique_through_multi_field_unique
     }
 
     fn is_id(&self, model: &dml::Model) -> bool {

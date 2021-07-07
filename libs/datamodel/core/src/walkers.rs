@@ -196,10 +196,6 @@ impl<'a> ScalarFieldWalker<'a> {
         self.get().is_required()
     }
 
-    pub fn is_unique(&self) -> bool {
-        self.get().is_unique
-    }
-
     pub fn model(&self) -> ModelWalker<'a> {
         ModelWalker {
             model_idx: self.model_idx,

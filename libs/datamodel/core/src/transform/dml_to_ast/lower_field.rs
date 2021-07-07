@@ -54,7 +54,12 @@ impl<'a> LowerDmlToAst<'a> {
     }
 
     /// Internal: Lowers a field's attributes.
-    pub(crate) fn lower_field_attributes(&self, field: &dml::Field, datamodel: &dml::Datamodel) -> Vec<ast::Attribute> {
+    pub(crate) fn lower_field_attributes(
+        &self,
+        model: &dml::Model,
+        field: &dml::Field,
+        datamodel: &dml::Datamodel,
+    ) -> Vec<ast::Attribute> {
         let mut attributes = vec![];
 
         // @id
@@ -66,7 +71,7 @@ impl<'a> LowerDmlToAst<'a> {
 
         // @unique
         if let dml::Field::ScalarField(sf) = field {
-            if sf.is_unique {
+            if model.field_is_unique(&sf.name) {
                 attributes.push(ast::Attribute::new("unique", vec![]));
             }
         }

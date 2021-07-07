@@ -149,15 +149,12 @@ pub(crate) fn calculate_scalar_field(table: &Table, column: &Column, ctx: &Intro
 
     let default_value = calculate_default(table, column, &arity);
 
-    let is_unique = table.is_column_unique(&column.name) && !is_id;
-
     ScalarField {
         name: column.name.clone(),
         arity,
         field_type,
         database_name: None,
         default_value,
-        is_unique,
         is_id,
         documentation: None,
         is_generated: false,
