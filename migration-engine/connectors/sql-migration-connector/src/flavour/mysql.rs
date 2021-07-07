@@ -19,8 +19,8 @@ use sql_schema_describer::{DescriberErrorKind, SqlSchema, SqlSchemaDescriberBack
 use std::sync::atomic::{AtomicU8, Ordering};
 use url::Url;
 use user_facing_errors::{
-    migration_engine::{ApplyMigrationError, ForeignKeyCreationNotAllowed},
-    UserFacingError,
+    migration_engine::{ApplyMigrationError, DirectDdlNotAllowed, ForeignKeyCreationNotAllowed},
+    KnownError,
 };
 
 const ADVISORY_LOCK_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(10);
@@ -116,6 +116,22 @@ impl MysqlFlavour {
 
         Ok(crate::connect(&shadow_database_url).await?)
     }
+
+    fn convert_server_error(&self, error: &my::Error) -> Option<KnownError> {
+        if self.is_vitess() {
+            match error {
+                my::Error::Server(se) if se.code == 1317 => Some(KnownError::new(ForeignKeyCreationNotAllowed)),
+                // sigh, this code is for unknown error, so we have the ddl
+                // error and other stuff, such as typos in the same category...
+                my::Error::Server(se) if se.code == 1105 && se.message == "direct DDL is disabled" => {
+                    Some(KnownError::new(DirectDdlNotAllowed))
+                }
+                _ => None,
+            }
+        } else {
+            None
+        }
+    }
 }
 
 #[async_trait::async_trait]
@@ -127,11 +143,9 @@ impl SqlFlavour for MysqlFlavour {
     }
 
     async fn run_query_script(&self, sql: &str, connection: &Connection) -> ConnectorResult<()> {
-        let convert_error = |error: my::Error| match error {
-            my::Error::Server(se) if self.is_vitess() && se.code == 1317 => {
-                ConnectorError::user_facing(ForeignKeyCreationNotAllowed)
-            }
-            _ => quaint_error_to_connector_error(quaint::error::Error::from(error), &connection.connection_info()),
+        let convert_error = |error: my::Error| match self.convert_server_error(&error) {
+            Some(e) => ConnectorError::from(e),
+            None => quaint_error_to_connector_error(quaint::error::Error::from(error), &connection.connection_info()),
         };
 
         let (client, _url) = connection.unwrap_mysql();
@@ -166,12 +180,12 @@ impl SqlFlavour for MysqlFlavour {
                 migration_idx + 1
             );
 
-            let (code, error) = match error {
-                my::Error::Server(se) if self.is_vitess() && se.code == 1317 => {
-                    let message = format!("{}\n\n{}", ForeignKeyCreationNotAllowed.message(), position);
+            let (code, error) = match (&error, self.convert_server_error(&error)) {
+                (my::Error::Server(se), Some(error)) => {
+                    let message = format!("{}\n\n{}", error.message, position);
                     (Some(se.code), message)
                 }
-                my::Error::Server(se) => {
+                (my::Error::Server(se), None) => {
                     let message = format!("{}\n\n{}", se.message, position);
                     (Some(se.code), message)
                 }
@@ -273,7 +287,7 @@ impl SqlFlavour for MysqlFlavour {
             ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
         "#};
 
-        Ok(connection.raw_cmd(sql).await?)
+        Ok(self.run_query_script(sql, connection).await?)
     }
 
     async fn describe_schema<'a>(&'a self, connection: &Connection) -> ConnectorResult<SqlSchema> {
