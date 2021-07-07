@@ -224,6 +224,25 @@ impl TestApi {
     pub fn tags(&self) -> BitFlags<Tags> {
         self.root.args.tags()
     }
+
+    /// Render a valid datasource block, including database URL.
+    pub fn write_datasource_block(&self, out: &mut dyn std::fmt::Write) {
+        write!(
+            out,
+            "{}",
+            self.root.args.datasource_block(self.root.args.database_url(), &[])
+        )
+        .unwrap()
+    }
+
+    pub fn datamodel_with_provider(&self, schema: &str) -> String {
+        let mut out = String::with_capacity(320 + schema.len());
+
+        self.write_datasource_block(&mut out);
+        out.push_str(schema);
+
+        out
+    }
 }
 
 pub struct SingleRowInsert<'a> {

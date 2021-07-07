@@ -809,18 +809,15 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
             next_assertions.push((column_name, to).clone());
         }
 
-        let dm1 = format!(
+        let dm1 = api.datamodel_with_provider(&format!(
             r#"
-                {datasource_block}
-
                model A {{
                     id Int @id @default(autoincrement()) @db.Integer
                     {columns}
                 }}
                 "#,
-            datasource_block = api.datasource_block(),
             columns = previous_columns,
-        );
+        ));
 
         tracing::info!(dm = dm1.as_str());
 
@@ -839,18 +836,15 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
             )
         });
 
-        let dm2 = format!(
+        let dm2 = api.datamodel_with_provider(&format!(
             r#"
-                {datasource_block}
-
                 model A {{
                     id Int @id @default(autoincrement()) @db.Integer
                     {columns}
                 }}
                 "#,
-            datasource_block = api.datasource_block(),
             columns = next_columns
-        );
+        ));
 
         api.schema_push(&dm2).send_sync().assert_green_bang();
 
@@ -869,7 +863,6 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
 #[test_connector(tags(Postgres))]
 fn risky_casts_with_existing_data_should_warn(api: TestApi) {
     let connector = SqlDatamodelConnectors::postgres();
-    let datasource_block = api.datasource_block();
 
     for (from, seed, casts) in RISKY_CASTS.iter() {
         let mut previous_columns = "".to_string();
@@ -911,18 +904,15 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
             next_assertions.push((column_name.clone(), *to));
         }
 
-        let dm1 = format!(
+        let dm1 = api.datamodel_with_provider(&format!(
             r#"
-                {datasource_block}
-
                 model A {{
                     id Int @id @default(autoincrement()) @db.Integer
                     {columns}
                 }}
                 "#,
             columns = previous_columns,
-            datasource_block = datasource_block,
-        );
+        ));
 
         api.schema_push(&dm1).send_sync().assert_green_bang();
 
@@ -940,18 +930,15 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
             )
         });
 
-        let dm2 = format!(
+        let dm2 = api.datamodel_with_provider(&format!(
             r#"
-                {datasource_block}
-
                 model A {{
                     id Int @id @default(autoincrement()) @db.Integer
                     {columns}
                 }}
                 "#,
             columns = next_columns,
-            datasource_block = datasource_block,
-        );
+        ));
 
         api.schema_push(&dm2).force(true).send_sync().assert_warnings(&warnings);
 
@@ -972,7 +959,6 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
 #[test_connector(tags(Postgres))]
 fn not_castable_with_existing_data_should_warn(api: TestApi) {
     let connector = SqlDatamodelConnectors::postgres();
-    let datasource_block = api.datasource_block();
     let mut warnings = Vec::new();
 
     for (from, seed, casts) in NOT_CASTABLE.iter() {
@@ -1017,18 +1003,15 @@ fn not_castable_with_existing_data_should_warn(api: TestApi) {
             previous_assertions.push((column_name, from).clone());
         }
 
-        let dm1 = format!(
+        let dm1 = api.datamodel_with_provider(&format!(
             r#"
-                {datasource_block}
-
                 model A {{
                     id Int @id @default(autoincrement()) @db.Integer
                     {columns}
                 }}
                 "#,
             columns = previous_columns,
-            datasource_block = datasource_block
-        );
+        ));
 
         api.schema_push(&dm1).send_sync().assert_green_bang();
 
@@ -1045,18 +1028,15 @@ fn not_castable_with_existing_data_should_warn(api: TestApi) {
             )
         });
 
-        let dm2 = format!(
+        let dm2 = api.datamodel_with_provider(&format!(
             r#"
-                {datasource_block}
-
                 model A {{
                     id Int @id @default(autoincrement()) @db.Integer
                     {columns}
                 }}
                 "#,
             columns = next_columns,
-            datasource_block = datasource_block,
-        );
+        ));
 
         // todo we could force here and then check that the db really returns not castable
         // then we would again need to have separate calls per mapping
@@ -1165,7 +1145,6 @@ static SAFE_CASTS_NON_LIST_TO_STRING: CastList = Lazy::new(|| {
 #[test_connector(tags(Postgres))]
 fn safe_casts_from_array_with_existing_data_should_work(api: TestApi) {
     let connector = SqlDatamodelConnectors::postgres();
-    let datasource_block = api.datasource_block();
 
     for (to, from) in SAFE_CASTS_NON_LIST_TO_STRING.iter() {
         let mut previous_columns = "".to_string();
@@ -1199,18 +1178,15 @@ fn safe_casts_from_array_with_existing_data_should_work(api: TestApi) {
             next_assertions.push((column_name, to).clone());
         }
 
-        let dm1 = format!(
+        let dm1 = api.datamodel_with_provider(&format!(
             r#"
-                {datasource_block}
-
                 model A {{
                     id Int @id @default(autoincrement()) @db.Integer
                     {columns}
                 }}
                 "#,
             columns = previous_columns,
-            datasource_block = datasource_block,
-        );
+        ));
 
         api.schema_push(&dm1).send_sync().assert_green_bang();
 
@@ -1227,18 +1203,15 @@ fn safe_casts_from_array_with_existing_data_should_work(api: TestApi) {
             )
         });
 
-        let dm2 = format!(
+        let dm2 = api.datamodel_with_provider(&format!(
             r#"
-                {datasource_block}
-
                 model A {{
                     id Int @id @default(autoincrement()) @db.Integer
                     {columns}
                 }}
                 "#,
             columns = next_columns,
-            datasource_block = api.datasource_block(),
-        );
+        ));
 
         api.schema_push(&dm2).send_sync().assert_green_bang();
 
@@ -1256,51 +1229,44 @@ fn safe_casts_from_array_with_existing_data_should_work(api: TestApi) {
 
 #[test_connector(tags(Postgres))]
 fn typescript_starter_schema_with_native_types_is_idempotent(api: TestApi) {
-    let datasource_block = api.datasource_block();
-    let dm = format!(
+    let dm = api.datamodel_with_provider(
         r#"
-        {datasource_block}
-
-        model Post {{
+        model Post {
             id        Int     @id @default(autoincrement())
             title     String
             content   String?
             published Boolean @default(false)
             author    User?   @relation(fields: [authorId], references: [id])
             authorId  Int?
-        }}
+        }
 
-        model User {{
+        model User {
             id    Int     @id @default(autoincrement())
             email String  @unique
             name  String?
             posts Post[]
-        }}
+        }
     "#,
-        datasource_block = datasource_block
     );
 
-    let dm2 = format!(
+    let dm2 = api.datamodel_with_provider(
         r#"
-        {}
-
-        model Post {{
+        model Post {
             id        Int     @id @default(autoincrement()) @db.Integer
             title     String  @db.Text
             content   String? @db.Text
             published Boolean @default(false) @db.Boolean
             author    User?   @relation(fields: [authorId], references: [id])
             authorId  Int?    @db.Integer
-        }}
+        }
 
-        model User {{
+        model User {
             id    Int     @id @default(autoincrement()) @db.Integer
             email String  @unique @db.Text
             name  String? @db.Text
             posts Post[]
-        }}
+        }
     "#,
-        datasource_block
     );
 
     api.schema_push(&dm)
@@ -1322,52 +1288,44 @@ fn typescript_starter_schema_with_native_types_is_idempotent(api: TestApi) {
 
 #[test_connector(tags(Postgres))]
 fn typescript_starter_schema_with_differnt_native_types_is_idempotent(api: TestApi) {
-    let datasource_block = api.datasource_block();
-
-    let dm = format!(
+    let dm = api.datamodel_with_provider(
         r#"
-        {}
-
-        model Post {{
+        model Post {
             id        Int     @id @default(autoincrement())
             title     String
             content   String?
             published Boolean @default(false)
             author    User?   @relation(fields: [authorId], references: [id])
             authorId  Int?
-        }}
+        }
 
-        model User {{
+        model User {
             id    Int     @id @default(autoincrement())
             email String  @unique
             name  String?
             posts Post[]
-        }}
+        }
     "#,
-        datasource_block
     );
 
-    let dm2 = format!(
+    let dm2 = api.datamodel_with_provider(
         r#"
-        {}
-
-        model Post {{
+        model Post {
             id        Int     @id @default(autoincrement()) @db.Integer
             title     String  @db.VarChar(100)
             content   String? @db.VarChar(100)
             published Boolean @default(false) @db.Boolean
             author    User?   @relation(fields: [authorId], references: [id])
             authorId  Int?    @db.Integer
-        }}
+        }
 
-        model User {{
+        model User {
             id    Int     @id @default(autoincrement()) @db.Integer
             email String  @unique @db.VarChar(100)
             name  String? @db.VarChar(100)
             posts Post[]
-        }}
+        }
     "#,
-        datasource_block
     );
 
     api.schema_push(&dm)

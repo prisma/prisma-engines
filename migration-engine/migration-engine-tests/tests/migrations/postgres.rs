@@ -35,12 +35,8 @@ fn enums_can_be_dropped_on_postgres(api: TestApi) {
 
 #[test_connector(capabilities(ScalarLists))]
 fn adding_a_scalar_list_for_a_model_with_id_type_int_must_work(api: TestApi) {
-    let dm1 = r#"
-        datasource pg {
-            provider = "postgres"
-            url = "postgres://localhost:5432"
-        }
-
+    let dm1 = api.datamodel_with_provider(
+        r#"
         model A {
             id Int @id
             strings String[]
@@ -51,7 +47,8 @@ fn adding_a_scalar_list_for_a_model_with_id_type_int_must_work(api: TestApi) {
             OK
             ERROR
         }
-    "#;
+    "#,
+    );
 
     api.schema_push(dm1).send_sync().assert_green_bang();
 
@@ -125,19 +122,15 @@ fn native_type_columns_can_be_created(api: TestApi) {
         ("oid", "Int", "Oid", "oid"),
     ];
 
-    let mut dm = r#"
-        datasource pg {
-            provider = "postgres"
-            url = "postgresql://localhost/test"
-        }
-
+    let mut dm = api.datamodel_with_provider(
+        r#"
         model A {
             id Int @id
-    "#
-    .to_owned();
+    "#,
+    );
 
     for (field_name, prisma_type, native_type, _) in types {
-        writeln!(&mut dm, "    {} {} @pg.{}", field_name, prisma_type, native_type).unwrap();
+        writeln!(&mut dm, "    {} {} @db.{}", field_name, prisma_type, native_type).unwrap();
     }
 
     dm.push_str("}\n");
@@ -166,22 +159,19 @@ fn uuids_do_not_generate_drift_issue_5282(api: TestApi) {
         "#
     );
 
-    let dm = format!(
+    let dm = api.datamodel_with_provider(
         r#"
-        {}
-
-        model a {{
+        model a {
             id String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
             b  b[]
-        }}
+        }
 
-        model b {{
+        model b {
             id   String  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
             a_id String? @db.Uuid
             a    a?      @relation(fields: [a_id], references: [id])
-        }}
+        }
         "#,
-        api.datasource_block()
     );
 
     api.schema_push(&dm)
@@ -197,15 +187,12 @@ fn functions_with_schema_prefix_in_dbgenerated_are_idempotent(api: TestApi) {
 
     dbg!(api.connection_info());
 
-    let dm = format!(
+    let dm = api.datamodel_with_provider(
         r#"
-        {}
-
-        model Koala {{
+        model Koala {
             id String @id @db.Uuid @default(dbgenerated("myschema.uuid_generate_v4()"))
-        }}
+        }
         "#,
-        api.datasource_block()
     );
 
     api.schema_push(dm.clone())
@@ -333,31 +320,25 @@ fn postgres_apply_migrations_errors_give_precise_location_at_the_beginning_of_fi
 fn citext_to_text_and_back_works(api: TestApi) {
     api.raw_cmd("CREATE EXTENSION citext;");
 
-    let dm1 = r#"
-        datasource pg {
-            provider = "postgres"
-            url = env("DBURL")
-        }
-
+    let dm1 = api.datamodel_with_provider(
+        r#"
         model User {
             id Int @id @default(autoincrement())
-            name String @pg.Text
+            name String @db.Text
         }
-    "#;
+    "#,
+    );
 
-    let dm2 = r#"
-        datasource pg {
-            provider = "postgres"
-            url = env("DBURL")
-        }
-
+    let dm2 = api.datamodel_with_provider(
+        r#"
         model User {
             id Int @id @default(autoincrement())
-            name String @pg.Citext
+            name String @db.Citext
         }
-    "#;
+    "#,
+    );
 
-    api.schema_push(dm1).send_sync().assert_green_bang();
+    api.schema_push(&dm1).send_sync().assert_green_bang();
 
     api.raw_cmd("INSERT INTO \"User\" (name) VALUES ('myCat'), ('myDog'), ('yourDog');");
 
@@ -372,7 +353,7 @@ fn citext_to_text_and_back_works(api: TestApi) {
         .assert_first_row(|row| row.assert_text_value("name", "myCat"));
 
     // CITEXT -> TEXT
-    api.schema_push(dm1)
+    api.schema_push(&dm1)
         .send_sync()
         .assert_green_bang()
         .assert_has_executed_steps();

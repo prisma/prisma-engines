@@ -922,51 +922,45 @@ fn impossible_casts_with_existing_data_should_warn(api: TestApi) {
 
 #[test_connector(tags(Mysql))]
 fn typescript_starter_schema_with_native_types_is_idempotent(api: TestApi) {
-    let dm = format!(
+    let dm = api.datamodel_with_provider(
         r#"
-        {}
-
-        model Post {{
+        model Post {
             id        Int     @id @default(autoincrement())
             title     String
             content   String?
             published Boolean @default(false)
             author    User?   @relation(fields: [authorId], references: [id])
             authorId  Int?
-        }}
+        }
 
-        model User {{
+        model User {
             id    Int     @id @default(autoincrement())
             email String  @unique
             name  String?
             posts Post[]
-        }}
+        }
     "#,
-        api.datasource_block()
     );
 
-    let dm2 = format!(
+    let dm2 = api.datamodel_with_provider(
         r#"
-        {}
-
-        model Post {{
+        model Post {
             id        Int     @id @default(autoincrement()) @db.Int
             title     String  @db.VarChar(191)
             content   String? @db.VarChar(191)
             published Boolean @default(false) @db.TinyInt
             author    User?   @relation(fields: [authorId], references: [id])
             authorId  Int?    @db.Int
-        }}
+        }
 
-        model User {{
+        model User {
             id    Int     @id @default(autoincrement()) @db.Int
             email String  @unique @db.VarChar(191)
             name  String? @db.VarChar(191)
             posts Post[]
-        }}
+        }
 
     "#,
-        api.datasource_block()
     );
 
     api.schema_push(&dm)
@@ -988,51 +982,44 @@ fn typescript_starter_schema_with_native_types_is_idempotent(api: TestApi) {
 
 #[test_connector(tags(Mysql))]
 fn typescript_starter_schema_with_differnt_native_types_is_idempotent(api: TestApi) {
-    let datasource = api.datasource_block();
-    let dm = format!(
+    let dm = api.datamodel_with_provider(
         r#"
-        {}
-
-        model Post {{
+        model Post {
             id        Int     @id @default(autoincrement())
             title     String
             content   String?
             published Boolean @default(false)
             author    User?   @relation(fields: [authorId], references: [id])
             authorId  Int?
-        }}
+        }
 
-        model User {{
+        model User {
             id    Int     @id @default(autoincrement())
             email String  @unique
             name  String?
             posts Post[]
-        }}
+        }
     "#,
-        datasource
     );
 
-    let dm2 = format!(
+    let dm2 = api.datamodel_with_provider(
         r#"
-        {}
-
-        model Post {{
+        model Post {
             id        Int     @id @default(autoincrement()) @db.Int
             title     String  @db.VarChar(100)
             content   String? @db.VarChar(100)
             published Boolean @default(false) @db.TinyInt
             author    User?   @relation(fields: [authorId], references: [id])
             authorId  Int?    @db.Int
-        }}
+        }
 
-        model User {{
+        model User {
             id    Int     @id @default(autoincrement()) @db.Int
             email String  @unique @db.VarChar(100)
             name  String? @db.VarChar(100)
             posts Post[]
-        }}
+        }
     "#,
-        datasource
     );
 
     api.schema_push(&dm)

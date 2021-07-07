@@ -244,19 +244,15 @@ fn native_type_columns_can_be_created(api: TestApi) {
         ("year", "Int", "Year", if api.is_mysql_8() { "year" } else { "year(4)" }),
     ];
 
-    let mut dm = r#"
-        datasource mysql {
-            provider = "mysql"
-            url = "mysql://localhost/test"
-        }
-
+    let mut dm = api.datamodel_with_provider(
+        r#"
         model A {
             id Int @id
-    "#
-    .to_owned();
+    "#,
+    );
 
     for (field_name, prisma_type, native_type, _) in types {
-        writeln!(&mut dm, "    {} {} @mysql.{}", field_name, prisma_type, native_type).unwrap();
+        writeln!(&mut dm, "    {} {} @db.{}", field_name, prisma_type, native_type).unwrap();
     }
 
     dm.push_str("}\n");
@@ -280,16 +276,13 @@ fn native_type_columns_can_be_created(api: TestApi) {
 fn default_current_timestamp_precision_follows_column_precision(api: TestApi) {
     let migrations_directory = api.create_migrations_directory();
 
-    let dm = format!(
+    let dm = api.datamodel_with_provider(
         "
-        {}
-
-        model A {{
+        model A {
             id Int @id
             createdAt DateTime @db.DateTime(7) @default(now())
-        }}
+        }
         ",
-        api.datasource_block()
     );
 
     let expected_migration = indoc!(
