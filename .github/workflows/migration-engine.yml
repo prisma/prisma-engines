@@ -54,7 +54,7 @@ jobs:
 
       - uses: actions-rs/toolchain@v1
         with:
-          toolchain: "1.51.0"
+          toolchain: stable
           default: true
 
       - uses: actions/cache@v2
@@ -120,7 +120,7 @@ jobs:
           - name: mariadb
             url: "mysql://root@localhost:3306?connect_timeout=20&socket_timeout=60"
         rust:
-          - "1.51.0"
+          - stable
         os:
           - windows-latest
 
