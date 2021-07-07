@@ -1,4 +1,4 @@
-use super::{attributes, context::Context, names};
+use super::{attributes, context::Context};
 use crate::{ast, diagnostics::DatamodelError};
 use itertools::Itertools;
 use std::{
@@ -23,11 +23,12 @@ pub(super) fn resolve_types(ctx: &mut Context<'_>) {
 #[derive(Debug, Default)]
 pub(super) struct Types<'ast> {
     pub(super) type_aliases: HashMap<ast::AliasId, ScalarFieldType>,
-    pub(super) scalar_fields: BTreeMap<(ast::ModelId, ast::FieldId), ScalarField>,
+    pub(super) scalar_fields: BTreeMap<(ast::ModelId, ast::FieldId), ScalarField<'ast>>,
     pub(super) models: HashMap<ast::ModelId, ModelData<'ast>>,
     /// This contains only the relation fields actually present in the schema
     /// source text.
     pub(super) relation_fields: BTreeMap<(ast::ModelId, ast::FieldId), RelationField<'ast>>,
+    pub(super) enums: HashMap<ast::EnumId, EnumData<'ast>>,
 }
 
 impl<'ast> Types<'ast> {
@@ -35,7 +36,11 @@ impl<'ast> Types<'ast> {
         self.models.remove(model_id)
     }
 
-    pub(super) fn take_scalar_field(&mut self, model_id: ast::ModelId, field_id: ast::FieldId) -> Option<ScalarField> {
+    pub(super) fn take_scalar_field(
+        &mut self,
+        model_id: ast::ModelId,
+        field_id: ast::FieldId,
+    ) -> Option<ScalarField<'ast>> {
         self.scalar_fields.remove(&(model_id, field_id))
     }
 
@@ -63,11 +68,13 @@ pub(crate) enum ScalarFieldType {
 }
 
 #[derive(Debug)]
-pub(crate) struct ScalarField {
+pub(crate) struct ScalarField<'ast> {
     pub(crate) r#type: ScalarFieldType,
     pub(crate) is_ignored: bool,
     pub(crate) is_updated_at: bool,
     pub(crate) default: Option<dml::default_value::DefaultValue>,
+    /// @map
+    pub(super) mapped_name: Option<&'ast str>,
 }
 
 #[derive(Debug)]
@@ -106,6 +113,8 @@ pub(crate) struct ModelData<'ast> {
     pub(crate) is_ignored: bool,
     /// @(@) index and @(@)unique.
     pub(crate) indexes: Vec<IndexData<'ast>>,
+    /// @@map
+    pub(super) mapped_name: Option<&'ast str>,
 }
 
 #[derive(Debug, Default)]
@@ -114,6 +123,13 @@ pub(crate) struct IndexData<'ast> {
     pub(crate) fields: Vec<ast::FieldId>,
     pub(crate) source_field: Option<ast::FieldId>,
     pub(crate) name: Option<&'ast str>,
+}
+
+#[derive(Debug, Default)]
+pub(super) struct EnumData<'ast> {
+    pub(super) mapped_name: Option<&'ast str>,
+    /// @map on enum values.
+    pub(super) mapped_values: HashMap<u32, &'ast str>,
 }
 
 fn visit_model<'ast>(model_id: ast::ModelId, ast_model: &'ast ast::Model, ctx: &mut Context<'ast>) {
@@ -136,6 +152,7 @@ fn visit_model<'ast>(model_id: ast::ModelId, ast_model: &'ast ast::Model, ctx: &
                     is_ignored: false,
                     is_updated_at: false,
                     default: None,
+                    mapped_name: None,
                 };
 
                 if matches!(scalar_field_type, ScalarFieldType::BuiltInScalar(t) if t.is_json())
@@ -232,11 +249,17 @@ fn detect_alias_cycles(ctx: &mut Context<'_>) {
 }
 
 fn visit_enum<'ast>(enum_id: ast::EnumId, enm: &'ast ast::Enum, ctx: &mut Context<'ast>) {
+    let mut enum_data = EnumData::default();
+
     for (field_idx, field) in enm.values.iter().enumerate() {
         ctx.visit_attributes(&field.attributes, |attributes, ctx| {
             // @map
             attributes.visit_optional_single("map", ctx, |map_args, ctx| {
-                attributes::visit_map(map_args, names::MappedName::EnumValue(enum_id, field_idx as u32), ctx)
+                if let Some(mapped_name) = attributes::visit_map(map_args, ctx) {
+                    enum_data.mapped_values.insert(field_idx as u32, mapped_name);
+                    ctx.mapped_enum_value_names
+                        .insert((enum_id, mapped_name), field_idx as u32);
+                }
             })
         });
     }
@@ -244,9 +267,14 @@ fn visit_enum<'ast>(enum_id: ast::EnumId, enm: &'ast ast::Enum, ctx: &mut Contex
     ctx.visit_attributes(&enm.attributes, |attributes, ctx| {
         // @@map
         attributes.visit_optional_single("map", ctx, |map_args, ctx| {
-            attributes::visit_map(map_args, names::MappedName::Enum(enum_id), ctx)
+            if let Some(mapped_name) = attributes::visit_map(map_args, ctx) {
+                enum_data.mapped_name = Some(mapped_name);
+                ctx.mapped_enum_names.insert(mapped_name, enum_id);
+            }
         })
     });
+
+    ctx.db.types.enums.insert(enum_id, enum_data);
 }
 
 fn visit_type_alias<'ast>(alias_id: ast::AliasId, alias: &'ast ast::Field, ctx: &mut Context<'ast>) {

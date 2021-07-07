@@ -105,7 +105,6 @@ pub struct FeatureMap {
     hidden: Vec<PreviewFeature>,
 }
 
-#[allow(dead_code)]
 impl FeatureMap {
     pub fn active_features(&self) -> &[PreviewFeature] {
         &self.active
@@ -120,6 +119,7 @@ impl FeatureMap {
         self
     }
 
+    #[allow(dead_code)]
     fn with_hidden(mut self, hidden: Vec<PreviewFeature>) -> Self {
         self.hidden = hidden;
         self

@@ -1,4 +1,4 @@
-use crate::common::{parse_error, ErrorAsserts};
+use crate::common::*;
 use datamodel::{ast::Span, diagnostics::DatamodelError};
 
 #[test]
@@ -37,13 +37,16 @@ fn fail_on_duplicate_models_with_map() {
         }
     "#;
 
-    let errors = parse_error(dml);
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mThe model with database name "User" could not be defined because another model with this name exists: "User"[0m
+          [1;94m-->[0m  [4mschema.prisma:5[0m
+        [1;94m   | [0m
+        [1;94m 4 | [0m
+        [1;94m 5 | [0m            @@[1;91mmap("User")[0m
+        [1;94m   | [0m
+    "#]];
 
-    errors.assert_is(DatamodelError::new_duplicate_model_database_name_error(
-        "User".into(),
-        "Customer".into(),
-        Span::new(95, 140),
-    ));
+    expectation.assert_eq(&parse_and_render_error(dml));
 }
 
 // From issue: https://github.com/prisma/prisma/issues/1988

@@ -102,13 +102,17 @@ fn unique_directive_on_required_one_to_one_relation_creates_one_index(api: TestA
         .assert_table("Cat", |table| table.assert_indexes_count(1));
 }
 
-// TODO: Enable SQL Server when cascading rules are in PSL.
-#[test_connector(exclude(Mssql))]
+#[test_connector]
 fn one_to_many_self_relations_do_not_create_a_unique_index(api: TestApi) {
     let dm = r#"
+        generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialActions"]
+        }
+
         model Location {
             id        String      @id @default(cuid())
-            parent    Location?   @relation("LocationToLocation_parent", fields:[parentId], references: [id])
+            parent    Location?   @relation("LocationToLocation_parent", fields:[parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
             parentId  String?     @map("parent")
             children  Location[]  @relation("LocationToLocation_parent")
         }

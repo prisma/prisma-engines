@@ -28,15 +28,6 @@ pub(super) struct Names<'ast> {
     /// Datasources have their own namespace.
     pub(super) datasources: HashMap<&'ast str, TopId>,
     pub(super) model_fields: BTreeMap<(ast::ModelId, &'ast str), FieldId>,
-    pub(super) mapped_names: HashMap<MappedName, &'ast str>,
-}
-
-#[derive(PartialEq, Eq, Hash)]
-pub(super) enum MappedName {
-    Model(ast::ModelId),
-    Field(ast::ModelId, ast::FieldId),
-    Enum(ast::EnumId),
-    EnumValue(ast::EnumId, u32),
 }
 
 pub(super) fn resolve_names(ctx: &mut Context<'_>) {

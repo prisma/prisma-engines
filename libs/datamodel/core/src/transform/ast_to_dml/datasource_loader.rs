@@ -24,14 +24,9 @@ const SHADOW_DATABASE_URL_KEY: &str = "shadowDatabaseUrl";
 const URL_KEY: &str = "url";
 
 /// Is responsible for loading and validating Datasources defined in an AST.
-pub struct DatasourceLoader {}
+pub struct DatasourceLoader;
 
 impl DatasourceLoader {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
-        Self {}
-    }
-
     /// Loads all datasources from the provided schema AST.
     /// - `ignore_datasource_urls`: datasource URLs are not parsed. They are replaced with dummy values.
     /// - `datasource_url_overrides`: datasource URLs are not parsed and overridden with the provided ones.

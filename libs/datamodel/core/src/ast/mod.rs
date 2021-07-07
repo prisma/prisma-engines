@@ -156,6 +156,15 @@ pub(crate) enum TopId {
     Source(SourceId),
 }
 
+impl TopId {
+    pub(crate) fn as_model_id(&self) -> Option<ModelId> {
+        match self {
+            TopId::Model(model_id) => Some(*model_id),
+            _ => None,
+        }
+    }
+}
+
 impl std::ops::Index<TopId> for SchemaAst {
     type Output = Top;
 
