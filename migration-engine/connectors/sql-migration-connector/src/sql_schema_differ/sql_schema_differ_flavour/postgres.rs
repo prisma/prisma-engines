@@ -19,35 +19,29 @@ use sql_schema_describer::walkers::IndexWalker;
 const POSTGRES_IDENTIFIER_SIZE_LIMIT: usize = 63;
 
 impl SqlSchemaDifferFlavour for PostgresFlavour {
-    fn alter_enums(&self, differ: &SqlSchemaDiffer<'_>) -> Vec<AlterEnum> {
-        differ
-            .enum_pairs()
-            .filter_map(|enum_differ| {
-                let step = AlterEnum {
-                    index: enum_differ.enums.as_ref().map(|e| e.enum_index()),
-                    created_variants: enum_differ.created_values().map(String::from).collect(),
-                    dropped_variants: enum_differ.dropped_values().map(String::from).collect(),
-                    previous_usages_as_default: Vec::new(), // this gets filled in later
-                };
+    fn push_enum_steps(&self, differ: &SqlSchemaDiffer<'_>, steps: &mut Vec<SqlMigrationStep>) {
+        for enum_differ in differ.enum_pairs() {
+            let mut alter_enum = AlterEnum {
+                index: enum_differ.enums.as_ref().map(|e| e.enum_index()),
+                created_variants: enum_differ.created_values().map(String::from).collect(),
+                dropped_variants: enum_differ.dropped_values().map(String::from).collect(),
+                previous_usages_as_default: Vec::new(), // this gets filled in later
+            };
 
-                if step.is_empty() {
-                    None
-                } else {
-                    Some(step)
-                }
-            })
-            .collect()
-    }
+            if alter_enum.is_empty() {
+                continue;
+            }
 
-    fn create_enums(&self, differ: &SqlSchemaDiffer<'_>, steps: &mut Vec<SqlMigrationStep>) {
+            push_alter_enum_previous_usages_as_default(differ, &mut alter_enum);
+            steps.push(SqlMigrationStep::AlterEnum(alter_enum));
+        }
+
         for enm in differ.created_enums() {
             steps.push(SqlMigrationStep::CreateEnum {
                 enum_index: enm.enum_index(),
             })
         }
-    }
 
-    fn drop_enums(&self, differ: &SqlSchemaDiffer<'_>, steps: &mut Vec<SqlMigrationStep>) {
         for enm in differ.dropped_enums() {
             steps.push(SqlMigrationStep::DropEnum {
                 enum_index: enm.enum_index(),
@@ -422,4 +416,44 @@ fn native_type_change_riskyness(previous: PostgresType, next: PostgresType) -> O
     } else {
         cast()
     }
+}
+
+fn push_alter_enum_previous_usages_as_default(differ: &SqlSchemaDiffer<'_>, alter_enum: &mut AlterEnum) {
+    let mut previous_usages_as_default = Vec::new();
+
+    let enum_names = differ.schemas.enums(&alter_enum.index).map(|enm| enm.name());
+
+    for table in differ.dropped_tables() {
+        for column in table
+            .columns()
+            .filter(|col| col.column_type_is_enum(enum_names.previous()) && col.default().is_some())
+        {
+            previous_usages_as_default.push(((column.table().table_id(), column.column_id()), None));
+        }
+    }
+
+    for tables in differ.table_pairs() {
+        for column in tables
+            .dropped_columns()
+            .filter(|col| col.column_type_is_enum(enum_names.previous()) && col.default().is_some())
+        {
+            previous_usages_as_default.push(((column.table().table_id(), column.column_id()), None));
+        }
+
+        for columns in tables
+            .column_pairs()
+            .filter(|col| col.previous.column_type_is_enum(enum_names.previous()) && col.previous.default().is_some())
+        {
+            let next_usage_as_default = Some(&columns.next)
+                .filter(|col| col.column_type_is_enum(enum_names.next()) && col.default().is_some())
+                .map(|col| (col.table().table_id(), col.column_id()));
+
+            previous_usages_as_default.push((
+                (columns.previous.table().table_id(), columns.previous.column_id()),
+                next_usage_as_default,
+            ));
+        }
+    }
+
+    alter_enum.previous_usages_as_default = previous_usages_as_default;
 }

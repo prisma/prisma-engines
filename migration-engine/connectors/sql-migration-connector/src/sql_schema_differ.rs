@@ -11,7 +11,7 @@ pub(crate) use sql_schema_differ_flavour::SqlSchemaDifferFlavour;
 use self::differ_database::DifferDatabase;
 use crate::{
     pair::Pair,
-    sql_migration::{self, AlterColumn, AlterEnum, AlterTable, RedefineTable, SqlMigrationStep, TableChange},
+    sql_migration::{self, AlterColumn, AlterTable, RedefineTable, SqlMigrationStep, TableChange},
     SqlFlavour, SqlSchema,
 };
 use column::ColumnTypeChange;
@@ -19,7 +19,7 @@ use datamodel::common::preview_features::PreviewFeature;
 use enums::EnumDiffer;
 use sql_schema_describer::{
     walkers::{EnumWalker, ForeignKeyWalker, SqlSchemaExt, TableWalker},
-    ColumnId, ColumnTypeFamily, TableId,
+    ColumnId, TableId,
 };
 use std::collections::HashSet;
 use table::TableDiffer;
@@ -28,53 +28,21 @@ pub(crate) fn calculate_steps(schemas: Pair<&SqlSchema>, flavour: &dyn SqlFlavou
     let db = DifferDatabase::new(schemas, flavour);
     let differ = SqlSchemaDiffer { schemas, flavour, db };
     let mut steps: Vec<SqlMigrationStep> = Vec::new();
-    differ.push_create_tables(&mut steps);
 
     let tables_to_redefine = differ.flavour.tables_to_redefine(&differ);
-    let mut alter_indexes = differ.alter_indexes(&tables_to_redefine);
 
-    let redefine_indexes = if differ.flavour.can_alter_index() {
-        Vec::new()
-    } else {
-        std::mem::take(&mut alter_indexes)
-    };
-
-    differ.drop_tables(&mut steps);
-
+    differ.push_created_tables(&mut steps);
+    differ.push_dropped_tables(&mut steps);
     differ.drop_indexes(&tables_to_redefine, &mut steps);
     differ.push_create_indexes(&tables_to_redefine, &mut steps);
-
     differ.push_altered_tables(&tables_to_redefine, &mut steps);
+    flavour.push_enum_steps(&differ, &mut steps);
 
     let redefine_tables = differ.redefine_tables(&tables_to_redefine);
-    let mut alter_enums = flavour.alter_enums(&differ);
-    push_previous_usages_as_defaults_in_altered_enums(&differ, &mut alter_enums);
 
-    let redefine_tables = Some(redefine_tables)
-        .filter(|tables| !tables.is_empty())
-        .map(SqlMigrationStep::RedefineTables);
-
-    flavour.create_enums(&differ, &mut steps);
-    flavour.drop_enums(&differ, &mut steps);
-
-    steps.extend(
-        alter_enums
-            .into_iter()
-            .map(SqlMigrationStep::AlterEnum)
-            .chain(redefine_tables)
-            .chain(alter_indexes.into_iter().map(|idxs| SqlMigrationStep::AlterIndex {
-                table: idxs.as_ref().map(|(table, _)| *table),
-                index: idxs.as_ref().map(|(_, idx)| *idx),
-            }))
-            .chain(
-                redefine_indexes
-                    .into_iter()
-                    .map(|idxs| SqlMigrationStep::RedefineIndex {
-                        table: idxs.as_ref().map(|(table, _)| *table),
-                        index: idxs.as_ref().map(|(_, idx)| *idx),
-                    }),
-            ),
-    );
+    if !redefine_tables.is_empty() {
+        steps.push(SqlMigrationStep::RedefineTables(redefine_tables));
+    }
 
     steps.sort();
 
@@ -88,7 +56,7 @@ pub(crate) struct SqlSchemaDiffer<'a> {
 }
 
 impl<'schema> SqlSchemaDiffer<'schema> {
-    fn push_create_tables(&self, steps: &mut Vec<SqlMigrationStep>) {
+    fn push_created_tables(&self, steps: &mut Vec<SqlMigrationStep>) {
         for table in self.created_tables() {
             steps.push(SqlMigrationStep::CreateTable {
                 table_id: table.table_id(),
@@ -102,12 +70,25 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                     });
                 }
             }
+
+            if self.flavour.should_create_indexes_from_created_tables() {
+                let create_indexes_from_created_tables = self
+                    .created_tables()
+                    .flat_map(|table| table.indexes())
+                    .filter(|index| !self.flavour.should_skip_index_for_new_table(index))
+                    .map(|index| SqlMigrationStep::CreateIndex {
+                        table_id: (None, index.table().table_id()),
+                        index_index: index.index(),
+                    });
+
+                steps.extend(create_indexes_from_created_tables);
+            }
         }
     }
 
     // We drop the foreign keys of dropped tables first, so we can drop tables in whatever order we
     // please later.
-    fn drop_tables(&self, steps: &mut Vec<SqlMigrationStep>) {
+    fn push_dropped_tables(&self, steps: &mut Vec<SqlMigrationStep>) {
         for dropped_table in self.dropped_tables() {
             steps.push(SqlMigrationStep::DropTable {
                 table_id: dropped_table.table_id(),
@@ -132,6 +113,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
             .filter(move |tables| !tables_to_redefine.contains(tables.next().name()));
 
         for table in tables {
+            // Foreign keys
             for created_fk in table.created_foreign_keys() {
                 steps.push(SqlMigrationStep::AddForeignKey {
                     table_id: created_fk.table().table_id(),
@@ -144,6 +126,23 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                     table_id: table.previous().table_id(),
                     foreign_key_index: dropped_fk.foreign_key_index(),
                 })
+            }
+
+            // Indexes
+            for i in table
+                .index_pairs()
+                .filter(|pair| self.flavour.index_should_be_renamed(pair))
+            {
+                let table: Pair<TableId> = table.tables.map(|t| t.table_id());
+                let index: Pair<usize> = i.map(|i| i.index());
+
+                let step = if self.flavour.can_alter_index() {
+                    SqlMigrationStep::AlterIndex { table, index }
+                } else {
+                    SqlMigrationStep::RedefineIndex { table, index }
+                };
+
+                steps.push(step);
             }
 
             // Order matters.
@@ -283,19 +282,6 @@ impl<'schema> SqlSchemaDiffer<'schema> {
     }
 
     fn push_create_indexes(&self, tables_to_redefine: &HashSet<String>, steps: &mut Vec<SqlMigrationStep>) {
-        if self.flavour.should_create_indexes_from_created_tables() {
-            let create_indexes_from_created_tables = self
-                .created_tables()
-                .flat_map(|table| table.indexes())
-                .filter(|index| !self.flavour.should_skip_index_for_new_table(index))
-                .map(|index| SqlMigrationStep::CreateIndex {
-                    table_id: (None, index.table().table_id()),
-                    index_index: index.index(),
-                });
-
-            steps.extend(create_indexes_from_created_tables);
-        }
-
         for tables in self
             .table_pairs()
             .filter(|tables| !tables_to_redefine.contains(tables.next().name()))
@@ -399,24 +385,6 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         })
     }
 
-    fn alter_indexes(&self, tables_to_redefine: &HashSet<String>) -> Vec<Pair<(TableId, usize)>> {
-        let mut steps = Vec::new();
-
-        for differ in self
-            .table_pairs()
-            .filter(|tables| !tables_to_redefine.contains(tables.next().name()))
-        {
-            for pair in differ
-                .index_pairs()
-                .filter(|pair| self.flavour.index_should_be_renamed(pair))
-            {
-                steps.push(pair.as_ref().map(|i| (i.table().table_id(), i.index())));
-            }
-        }
-
-        steps
-    }
-
     fn created_tables(&self) -> impl Iterator<Item = TableWalker<'schema>> + '_ {
         self.db
             .created_tables()
@@ -458,67 +426,23 @@ impl<'schema> SqlSchemaDiffer<'schema> {
     }
 }
 
-fn push_previous_usages_as_defaults_in_altered_enums(differ: &SqlSchemaDiffer<'_>, alter_enums: &mut [AlterEnum]) {
-    for alter_enum in alter_enums {
-        let mut previous_usages_as_default = Vec::new();
-
-        let enum_names = differ.schemas.enums(&alter_enum.index).map(|enm| enm.name());
-
-        for table in differ.dropped_tables() {
-            for column in table
-                .columns()
-                .filter(|col| col.column_type_is_enum(enum_names.previous()) && col.default().is_some())
-            {
-                previous_usages_as_default.push(((column.table().table_id(), column.column_id()), None));
-            }
-        }
-
-        for tables in differ.table_pairs() {
-            for column in tables
-                .dropped_columns()
-                .filter(|col| col.column_type_is_enum(enum_names.previous()) && col.default().is_some())
-            {
-                previous_usages_as_default.push(((column.table().table_id(), column.column_id()), None));
-            }
-
-            for columns in tables.column_pairs().filter(|col| {
-                col.previous.column_type_is_enum(enum_names.previous()) && col.previous.default().is_some()
-            }) {
-                let next_usage_as_default = Some(&columns.next)
-                    .filter(|col| col.column_type_is_enum(enum_names.next()) && col.default().is_some())
-                    .map(|col| (col.table().table_id(), col.column_id()));
-
-                previous_usages_as_default.push((
-                    (columns.previous.table().table_id(), columns.previous.column_id()),
-                    next_usage_as_default,
-                ));
-            }
-        }
-
-        alter_enum.previous_usages_as_default = previous_usages_as_default;
-    }
-}
-
 /// Compare two [ForeignKey](/sql-schema-describer/struct.ForeignKey.html)s and return whether they
 /// should be considered equivalent for schema diffing purposes.
-fn foreign_keys_match(fks: Pair<&ForeignKeyWalker<'_>>, flavour: &dyn SqlFlavour) -> bool {
+fn foreign_keys_match(fks: Pair<&ForeignKeyWalker<'_>>, flavour: &dyn SqlFlavour, db: &DifferDatabase<'_>) -> bool {
     let references_same_table = flavour.table_names_match(fks.map(|fk| fk.referenced_table().name()));
     let references_same_column_count =
         fks.previous().referenced_columns_count() == fks.next().referenced_columns_count();
     let constrains_same_column_count =
         fks.previous().constrained_columns().count() == fks.next().constrained_columns().count();
     let constrains_same_columns = fks.interleave(|fk| fk.constrained_columns()).all(|cols| {
-        let families_match = match cols.map(|col| col.column_type_family()).as_tuple() {
-            (ColumnTypeFamily::Uuid, ColumnTypeFamily::String) => true,
-            (ColumnTypeFamily::String, ColumnTypeFamily::Uuid) => true,
-            (x, y) => x == y,
-        };
+        let type_changed =
+            db.column_type_changed(cols.map(|col| col.table().table_id()), cols.map(|col| col.column_id()));
 
         let arities_ok = flavour.can_cope_with_foreign_key_column_becoming_nonnullable()
             || (cols.previous().arity() == cols.next().arity()
                 || (cols.previous().arity().is_required() && cols.next().arity().is_nullable()));
 
-        cols.previous().name() == cols.next().name() && families_match && arities_ok
+        cols.previous().name() == cols.next().name() && !type_changed && arities_ok
     });
 
     // Foreign key references different columns or the same columns in a different order.

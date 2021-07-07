@@ -38,7 +38,7 @@ impl<'schema, 'b> TableDiffer<'schema, 'b> {
         self.next_foreign_keys().filter(move |next_fk| {
             !self
                 .previous_foreign_keys()
-                .any(|previous_fk| super::foreign_keys_match(Pair::new(&previous_fk, next_fk), self.flavour))
+                .any(|previous_fk| super::foreign_keys_match(Pair::new(&previous_fk, next_fk), self.flavour, self.db))
         })
     }
 
@@ -46,7 +46,7 @@ impl<'schema, 'b> TableDiffer<'schema, 'b> {
         self.previous_foreign_keys().filter(move |previous_fk| {
             !self
                 .next_foreign_keys()
-                .any(|next_fk| super::foreign_keys_match(Pair::new(previous_fk, &next_fk), self.flavour))
+                .any(|next_fk| super::foreign_keys_match(Pair::new(previous_fk, &next_fk), self.flavour, self.db))
         })
     }
 

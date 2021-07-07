@@ -1,9 +1,5 @@
 use super::{column::ColumnDiffer, ColumnTypeChange, SqlSchemaDiffer};
-use crate::{
-    pair::Pair,
-    sql_migration::{AlterEnum, SqlMigrationStep},
-    sql_schema_differ,
-};
+use crate::{pair::Pair, sql_migration::SqlMigrationStep, sql_schema_differ};
 use sql_schema_describer::{walkers::IndexWalker, ColumnId};
 use std::collections::HashSet;
 
@@ -14,11 +10,6 @@ mod sqlite;
 
 /// Trait to specialize SQL schema diffing (resulting in migration steps) by SQL backend.
 pub(crate) trait SqlSchemaDifferFlavour {
-    /// Return potential `AlterEnum` steps.
-    fn alter_enums(&self, _differ: &SqlSchemaDiffer<'_>) -> Vec<AlterEnum> {
-        Vec::new()
-    }
-
     /// If this returns `true`, the differ will generate
     /// SqlMigrationStep::RedefineIndex steps instead of
     /// SqlMigrationStep::AlterIndex.
@@ -41,11 +32,8 @@ pub(crate) trait SqlSchemaDifferFlavour {
         }
     }
 
-    /// Return potential `CreateEnum` steps.
-    fn create_enums(&self, _differ: &SqlSchemaDiffer<'_>, _steps: &mut Vec<SqlMigrationStep>) {}
-
-    /// Return potential `DropEnum` steps.
-    fn drop_enums(&self, _differ: &SqlSchemaDiffer<'_>, _steps: &mut Vec<SqlMigrationStep>) {}
+    /// Push enum-related steps.
+    fn push_enum_steps(&self, _differ: &SqlSchemaDiffer<'_>, _steps: &mut Vec<SqlMigrationStep>) {}
 
     /// Returns whether the underlying database implicitly drops indexes on dropped (and potentially recreated) columns.
     fn indexes_should_be_recreated_after_column_drop(&self) -> bool {

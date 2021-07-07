@@ -6,7 +6,11 @@ use std::{
     ops::Bound,
 };
 
+use super::column::ColumnDiffer;
+
 pub(crate) struct DifferDatabase<'a> {
+    flavour: &'a dyn SqlFlavour,
+    schemas: Pair<&'a SqlSchema>,
     /// Table name -> table indexes.
     tables: HashMap<Cow<'a, str>, Pair<Option<TableId>>>,
     /// (table_idxs, column_name) -> column_idxs
@@ -17,8 +21,10 @@ impl<'a> DifferDatabase<'a> {
     pub(crate) fn new(schemas: Pair<&'a SqlSchema>, flavour: &'a dyn SqlFlavour) -> Self {
         let table_count_lb = std::cmp::max(schemas.previous().tables.len(), schemas.next().tables.len());
         let mut db = DifferDatabase {
+            flavour,
             tables: HashMap::with_capacity(table_count_lb),
             columns: BTreeMap::new(),
+            schemas,
         };
 
         let mut columns_cache = HashMap::new();
@@ -72,6 +78,18 @@ impl<'a> DifferDatabase<'a> {
 
     pub(crate) fn column_pairs(&self, table: Pair<TableId>) -> impl Iterator<Item = Pair<ColumnId>> + '_ {
         self.range_columns(table).filter_map(|(_k, v)| v.transpose())
+    }
+
+    pub(crate) fn column_type_changed(&self, table: Pair<TableId>, column: Pair<ColumnId>) -> bool {
+        let cols = self.schemas.tables(&table).columns(&column);
+        ColumnDiffer {
+            flavour: self.flavour,
+            previous: *cols.previous(),
+            next: *cols.next(),
+        }
+        .all_changes()
+        .0
+        .type_changed()
     }
 
     pub(crate) fn created_columns(&self, table: Pair<TableId>) -> impl Iterator<Item = ColumnId> + '_ {
