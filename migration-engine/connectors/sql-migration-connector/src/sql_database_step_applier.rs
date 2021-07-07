@@ -57,6 +57,11 @@ impl DatabaseMigrationStepApplier for SqlMigrationConnector {
         // some steps don't render anything.
         let mut is_first_step = true;
 
+        if let Some(begin) = self.flavour().render_begin_transaction() {
+            script.push_str(begin);
+            script.push_str(";\n");
+        }
+
         for step in &migration.steps {
             let statements: Vec<String> =
                 render_raw_sql(step, self.flavour(), Pair::new(&migration.before, &migration.after));
@@ -81,6 +86,11 @@ impl DatabaseMigrationStepApplier for SqlMigrationConnector {
                     script.push_str(";\n");
                 }
             }
+        }
+
+        if let Some(commit) = self.flavour().render_commit_transaction() {
+            script.push_str(commit);
+            script.push_str(";\n");
         }
 
         script

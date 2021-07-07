@@ -81,4 +81,14 @@ pub(crate) trait SqlRenderer {
 
     /// Render a drop type step.
     fn render_drop_user_defined_type(&self, udt: &UserDefinedTypeWalker<'_>) -> String;
+
+    /// Render a transaction start.
+    fn render_begin_transaction(&self) -> Option<&'static str> {
+        None
+    }
+
+    /// Render a transaction commit.
+    fn render_commit_transaction(&self) -> Option<&'static str> {
+        None
+    }
 }

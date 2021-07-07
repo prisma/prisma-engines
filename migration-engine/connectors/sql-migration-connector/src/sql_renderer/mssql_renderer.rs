@@ -397,6 +397,14 @@ impl SqlRenderer for MssqlFlavour {
     fn render_drop_user_defined_type(&self, udt: &UserDefinedTypeWalker<'_>) -> String {
         todo!("DROP TYPE {}", self.quote_with_schema(udt.name()))
     }
+
+    fn render_begin_transaction(&self) -> Option<&'static str> {
+        Some("BEGIN TRAN")
+    }
+
+    fn render_commit_transaction(&self) -> Option<&'static str> {
+        Some("COMMIT TRAN")
+    }
 }
 
 fn render_column_type(column: &ColumnWalker<'_>) -> Cow<'static, str> {
