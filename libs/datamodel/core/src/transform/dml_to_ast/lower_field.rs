@@ -64,7 +64,7 @@ impl<'a> LowerDmlToAst<'a> {
 
         // @id
         if let dml::Field::ScalarField(sf) = field {
-            if sf.is_id {
+            if model.field_is_primary(&sf.name) {
                 attributes.push(ast::Attribute::new("id", Vec::new()));
             }
         }
@@ -113,7 +113,7 @@ impl<'a> LowerDmlToAst<'a> {
                 .find_model(&relation_info.to)
                 .unwrap_or_else(|| panic!("Related model not found: {}.", relation_info.to));
 
-            let mut all_related_ids = related_model.id_field_names();
+            let mut all_related_ids = related_model.id_fields.clone();
             let has_default_name = relation_info.name
                 == RelationNames::name_for_unambiguous_relation(&relation_info.to, &parent_model.name);
 

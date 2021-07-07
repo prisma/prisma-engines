@@ -75,11 +75,11 @@ impl Connector for MongoDbDatamodelConnector {
         true
     }
 
-    fn validate_field(&self, _model: &Model, field: &dml::field::Field) -> Result<()> {
+    fn validate_field(&self, model: &Model, field: &dml::field::Field) -> Result<()> {
         // WIP, I don't really know what I'm doing with the dml.
 
         // The _id name check is superfluous because it's not a valid schema field at the moment.
-        if field.is_id() && field.name() != "_id" {
+        if model.field_is_unique(field.name()) && field.name() != "_id" {
             match field.database_name() {
                 Some(mapped_name) if mapped_name != "_id" => {
                     Err(ConnectorError::from_kind(ErrorKind::FieldValidationError {
@@ -102,7 +102,7 @@ impl Connector for MongoDbDatamodelConnector {
         if !matches!(field.field_type(), FieldType::Scalar(_, _, Some(_)))
             && matches!(field.default_value(), Some(DefaultValue::Expression(expr)) if expr.is_dbgenerated())
         {
-            let message = if field.is_id() {
+            let message = if model.field_is_unique(field.name()) {
                 format!(
                     "MongoDB `@default(dbgenerated())` IDs must have an `ObjectID` native type annotation. `{}` is an ID field, so you probably want `ObjectId` as your native type.",
                     field.name()
@@ -121,7 +121,7 @@ impl Connector for MongoDbDatamodelConnector {
     }
 
     fn validate_model(&self, model: &dml::model::Model) -> Result<()> {
-        if model.id_field_names().is_empty() {
+        if model.id_fields.is_empty() {
             return Err(ConnectorError::from_kind(ErrorKind::InvalidModelError {
                 message: "MongoDB models require exactly one identity field annotated with @id".to_owned(),
             }));

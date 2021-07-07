@@ -93,7 +93,7 @@ fn field_to_dmmf(model: &dml::Model, field: &dml::Field) -> Field {
         kind: get_field_kind(field),
         is_required: *field.arity() == dml::FieldArity::Required || *field.arity() == dml::FieldArity::List,
         is_list: *field.arity() == dml::FieldArity::List,
-        is_id: field.is_id(),
+        is_id: model.field_is_primary(field.name()),
         is_read_only: a_relation_field_is_based_on_this_field,
         has_default_value: field.default_value().is_some(),
         default: default_value_to_serde(&field.default_value().cloned()),

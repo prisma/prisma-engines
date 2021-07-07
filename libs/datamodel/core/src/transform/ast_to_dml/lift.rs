@@ -108,7 +108,6 @@ impl<'a> LiftAstToDml<'a> {
 
             field.documentation = ast_field.documentation.clone().map(|comment| comment.text);
             field.is_ignored = scalar_field_data.is_ignored;
-            field.is_id = model_data.id_source_field == Some(field_id);
             field.is_updated_at = scalar_field_data.is_updated_at;
             field.database_name = self.db.get_field_database_name(model_id, field_id).map(String::from);
             field.default_value = scalar_field_data.default.clone();

@@ -156,7 +156,6 @@ pub(crate) fn calculate_scalar_field(table: &Table, column: &Column, ctx: &Intro
         field_type,
         database_name: None,
         default_value,
-        is_id,
         documentation: None,
         is_generated: false,
         is_updated_at: false,

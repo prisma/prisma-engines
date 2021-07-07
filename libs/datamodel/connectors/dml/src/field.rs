@@ -185,13 +185,6 @@ impl Field {
         }
     }
 
-    pub fn is_id(&self) -> bool {
-        match &self {
-            Field::ScalarField(sf) => sf.is_id,
-            Field::RelationField(_) => false,
-        }
-    }
-
     pub fn is_generated(&self) -> bool {
         match &self {
             Field::ScalarField(sf) => sf.is_generated,
@@ -405,9 +398,6 @@ pub struct ScalarField {
     /// The default value.
     pub default_value: Option<DefaultValue>,
 
-    /// true if this field marked with @id.
-    pub is_id: bool,
-
     /// Comments associated with this field.
     pub documentation: Option<String>,
 
@@ -434,7 +424,6 @@ impl ScalarField {
             field_type,
             database_name: None,
             default_value: None,
-            is_id: false,
             documentation: None,
             is_generated: false,
             is_updated_at: false,
