@@ -301,3 +301,91 @@ fn default_current_timestamp_precision_follows_column_precision(api: TestApi) {
         .send_sync()
         .assert_migration("01init", |migration| migration.assert_contents(expected_migration));
 }
+
+#[test_connector(tags(Mysql))]
+fn mysql_apply_migrations_errors_gives_the_failed_sql(api: TestApi) {
+    let dm = "";
+    let migrations_directory = api.create_migrations_directory();
+
+    let migration = r#"
+        CREATE TABLE `Cat` ( id INTEGER PRIMARY KEY );
+
+        DROP TABLE `Emu`;
+
+        CREATE TABLE `Emu` (
+            size INTEGER
+        );
+    "#;
+
+    let migration_name = api
+        .create_migration("01init", dm, &migrations_directory)
+        .draft(true)
+        .send_sync()
+        .modify_migration(|contents| {
+            contents.clear();
+            contents.push_str(migration);
+        })
+        .into_output()
+        .generated_migration_name
+        .unwrap();
+
+    let err = api
+        .apply_migrations(&migrations_directory)
+        .send_unwrap_err()
+        .to_string()
+        .replace(&migration_name, "<migration-name>");
+
+    let expectation = if api.is_vitess() {
+        expect![[r#"
+            A migration failed to apply. New migrations can not be applied before the error is recovered from. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve
+
+            Migration name: <migration-name>
+
+            Database error code: 1051
+
+            Database error:
+            target: test.0.master: vttablet: rpc error: code = InvalidArgument desc = Unknown table 'vt_test_0.Emu' (errno 1051) (sqlstate 42S02) (CallerID: userData1): Sql: "drop table Emu", BindVars: {}
+
+            Please check the query number 2 from the migration file.
+
+        "#]]
+    } else if cfg!(windows) {
+        expect![[r#"
+            A migration failed to apply. New migrations can not be applied before the error is recovered from. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve
+
+            Migration name: <migration-name>
+
+            Database error code: 1051
+
+            Database error:
+            Unknown table 'mysql_apply_migrations_errors_gives_the_failed_sql.emu'
+
+            Please check the query number 2 from the migration file.
+
+        "#]]
+    } else {
+        expect![[r#"
+            A migration failed to apply. New migrations can not be applied before the error is recovered from. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve
+
+            Migration name: <migration-name>
+
+            Database error code: 1051
+
+            Database error:
+            Unknown table 'mysql_apply_migrations_errors_gives_the_failed_sql.Emu'
+
+            Please check the query number 2 from the migration file.
+
+        "#]]
+    };
+
+    let first_segment = err
+        .split_terminator("DbError {")
+        .next()
+        .unwrap()
+        .split_terminator("   0: ")
+        .next()
+        .unwrap();
+
+    expectation.assert_eq(first_segment)
+}

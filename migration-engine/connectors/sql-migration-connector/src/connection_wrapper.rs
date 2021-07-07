@@ -1,7 +1,7 @@
 use crate::error::quaint_error_to_connector_error;
 use migration_connector::ConnectorError;
 use quaint::{
-    connector::{PostgreSql, PostgresUrl},
+    connector::{Mysql, MysqlUrl, PostgreSql, PostgresUrl},
     error::{Error as QuaintError, ErrorKind as QuaintKind},
     prelude::{ConnectionInfo, Query, Queryable, ResultSet},
     single::Quaint,
@@ -17,6 +17,7 @@ pub(crate) struct Connection(ConnectionInner);
 #[derive(Clone, Debug)]
 enum ConnectionInner {
     Postgres(Arc<(quaint::connector::PostgreSql, PostgresUrl)>),
+    Mysql(Arc<(quaint::connector::Mysql, MysqlUrl)>),
     Generic(Quaint),
 }
 
@@ -57,9 +58,14 @@ impl Connection {
         Connection(ConnectionInner::Postgres(Arc::new((conn, url))))
     }
 
+    pub(crate) fn new_mysql(conn: Mysql, url: MysqlUrl) -> Self {
+        Connection(ConnectionInner::Mysql(Arc::new((conn, url))))
+    }
+
     pub(crate) fn connection_info(&self) -> ConnectionInfo {
         match &self.0 {
             ConnectionInner::Postgres(pg) => ConnectionInfo::Postgres(pg.1.clone()),
+            ConnectionInner::Mysql(my) => ConnectionInfo::Mysql(my.1.clone()),
             ConnectionInner::Generic(q) => q.connection_info().clone(),
         }
     }
@@ -77,6 +83,7 @@ impl Connection {
     pub(crate) fn queryable(&self) -> &dyn Queryable {
         match &self.0 {
             ConnectionInner::Postgres(pg) => &pg.0,
+            ConnectionInner::Mysql(my) => &my.0,
             ConnectionInner::Generic(q) => q,
         }
     }
@@ -114,6 +121,7 @@ impl Connection {
     pub(crate) fn schema_name(&self) -> &str {
         match &self.0 {
             ConnectionInner::Postgres(pg) => pg.1.schema(),
+            ConnectionInner::Mysql(my) => my.1.dbname(),
             ConnectionInner::Generic(quaint) => quaint.connection_info().schema_name(),
         }
     }
@@ -141,6 +149,13 @@ impl Connection {
         match &self.0 {
             ConnectionInner::Postgres(inner) => inner,
             other => panic!("{:?} in Connection::unwrap_postgres()", other),
+        }
+    }
+
+    pub(crate) fn unwrap_mysql(&self) -> &(Mysql, MysqlUrl) {
+        match &self.0 {
+            ConnectionInner::Mysql(inner) => &**inner,
+            other => panic!("{:?} in Connection::unwrap_mysql()", other),
         }
     }
 }

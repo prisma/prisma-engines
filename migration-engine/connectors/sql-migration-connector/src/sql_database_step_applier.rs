@@ -17,7 +17,7 @@ impl DatabaseMigrationStepApplier for SqlMigrationConnector {
             for sql_string in render_raw_sql(step, self.flavour(), Pair::new(&migration.before, &migration.after)) {
                 assert!(!sql_string.is_empty());
                 tracing::debug!(index, %sql_string);
-                self.conn().raw_cmd(&sql_string).await?;
+                self.flavour().run_query_script(&sql_string, self.conn()).await?;
             }
         }
 

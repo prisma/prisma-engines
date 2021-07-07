@@ -3,7 +3,7 @@ use common::ModelKind;
 use indoc::formatdoc;
 use quaint::{error::ErrorKind, prelude::ConnectionInfo};
 
-impl From<&quaint::error::DatabaseConstraint> for crate::query_engine::DatabaseConstraint {
+impl From<&quaint::error::DatabaseConstraint> for query_engine::DatabaseConstraint {
     fn from(other: &quaint::error::DatabaseConstraint) -> Self {
         match other {
             quaint::error::DatabaseConstraint::Fields(fields) => Self::Fields(fields.to_vec()),
@@ -14,7 +14,7 @@ impl From<&quaint::error::DatabaseConstraint> for crate::query_engine::DatabaseC
     }
 }
 
-impl From<quaint::error::DatabaseConstraint> for crate::query_engine::DatabaseConstraint {
+impl From<quaint::error::DatabaseConstraint> for query_engine::DatabaseConstraint {
     fn from(other: quaint::error::DatabaseConstraint) -> Self {
         match other {
             quaint::error::DatabaseConstraint::Fields(fields) => Self::Fields(fields.to_vec()),
