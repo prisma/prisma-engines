@@ -1,3 +1,5 @@
+#![allow(clippy::suspicious_operation_groupings)] // clippy is wrong there
+
 use super::db::ParserDatabase;
 use crate::{
     ast,
