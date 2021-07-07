@@ -238,38 +238,24 @@ impl Model {
             }
         }
 
-        // third candidate: a required scalar field with a unique index.
+        // second candidate: any unique constraint where all fields are required
         {
-            let mut unique_required_fields: Vec<_> = self
-                .scalar_fields()
-                .filter(|field| {
-                    self.field_is_unique(&field.name) && (field.is_required() || allow_optional) && !in_eligible(field)
-                })
-                .map(|f| UniqueCriteria::new(vec![f]))
-                .collect();
-
-            result.append(&mut unique_required_fields);
-        }
-
-        // fourth candidate: any multi-field unique constraint where all fields are required
-        {
-            let mut unique_field_combi = self
+            let mut unique_field_combi: Vec<UniqueCriteria> = self
                 .indices
                 .iter()
                 .filter(|id| id.tpe == IndexType::Unique)
                 .filter_map(|id| {
                     let fields: Vec<_> = id.fields.iter().map(|f| self.find_scalar_field(f).unwrap()).collect();
-                    let no_fields_are_commented_out = !fields.iter().any(|f| in_eligible(f));
+                    let no_fields_are_ineligible = !fields.iter().any(|f| in_eligible(f));
                     let all_fields_are_required = fields.iter().all(|f| f.is_required());
-                    if (all_fields_are_required || allow_optional) && no_fields_are_commented_out {
-                        Some(UniqueCriteria::new(fields))
-                    } else {
-                        None
-                    }
+                    ((all_fields_are_required || allow_optional) && no_fields_are_ineligible)
+                        .then(|| UniqueCriteria::new(fields))
                 })
                 .collect();
 
-            result.append(&mut unique_field_combi)
+            unique_field_combi.sort_by_key(|c| c.fields.len());
+
+            result.extend(unique_field_combi)
         }
 
         result
@@ -327,7 +313,6 @@ impl Model {
     }
 
     pub fn field_is_unique(&self, name: &str) -> bool {
-        println!("{:?}", self.indices);
         self.indices
             .iter()
             .any(|i| i.is_unique() && i.fields == vec![name.to_string()])
