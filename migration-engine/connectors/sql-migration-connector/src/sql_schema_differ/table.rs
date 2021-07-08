@@ -36,9 +36,9 @@ impl<'schema, 'b> TableDiffer<'schema, 'b> {
 
     pub(crate) fn created_foreign_keys<'a>(&'a self) -> impl Iterator<Item = ForeignKeyWalker<'schema>> + 'a {
         self.next_foreign_keys().filter(move |next_fk| {
-            !self.previous_foreign_keys().any(|previous_fk| {
-                super::foreign_keys_match(Pair::new(&previous_fk, next_fk), self.db.flavour, self.db)
-            })
+            !self
+                .previous_foreign_keys()
+                .any(|previous_fk| super::foreign_keys_match(Pair::new(&previous_fk, next_fk), self.db))
         })
     }
 
@@ -46,7 +46,7 @@ impl<'schema, 'b> TableDiffer<'schema, 'b> {
         self.previous_foreign_keys().filter(move |previous_fk| {
             !self
                 .next_foreign_keys()
-                .any(|next_fk| super::foreign_keys_match(Pair::new(previous_fk, &next_fk), self.db.flavour, self.db))
+                .any(|next_fk| super::foreign_keys_match(Pair::new(previous_fk, &next_fk), self.db))
         })
     }
 

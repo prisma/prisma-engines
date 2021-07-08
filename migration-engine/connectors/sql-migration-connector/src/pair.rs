@@ -5,8 +5,8 @@ use sql_schema_describer::{
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub(crate) struct Pair<T> {
-    pub(crate) previous: T,
-    pub(crate) next: T,
+    pub previous: T,
+    pub next: T,
 }
 
 impl<T> Pair<T> {

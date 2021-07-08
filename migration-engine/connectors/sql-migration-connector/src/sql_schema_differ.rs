@@ -26,10 +26,10 @@ use table::TableDiffer;
 
 pub(crate) fn calculate_steps(schemas: Pair<&SqlSchema>, flavour: &dyn SqlFlavour) -> Vec<SqlMigrationStep> {
     let db = DifferDatabase::new(schemas, flavour);
-    let differ = SqlSchemaDiffer { schemas, flavour, db };
+    let differ = SqlSchemaDiffer { schemas, db };
     let mut steps: Vec<SqlMigrationStep> = Vec::new();
 
-    let tables_to_redefine = differ.flavour.tables_to_redefine(&differ);
+    let tables_to_redefine = differ.db.flavour.tables_to_redefine(&differ);
 
     differ.push_created_tables(&mut steps);
     differ.push_dropped_tables(&mut steps);
@@ -37,12 +37,7 @@ pub(crate) fn calculate_steps(schemas: Pair<&SqlSchema>, flavour: &dyn SqlFlavou
     differ.push_create_indexes(&tables_to_redefine, &mut steps);
     differ.push_altered_tables(&tables_to_redefine, &mut steps);
     flavour.push_enum_steps(&differ, &mut steps);
-
-    let redefine_tables = differ.redefine_tables(&tables_to_redefine);
-
-    if !redefine_tables.is_empty() {
-        steps.push(SqlMigrationStep::RedefineTables(redefine_tables));
-    }
+    differ.push_redefine_tables(&tables_to_redefine, &mut steps);
 
     steps.sort();
 
@@ -51,7 +46,6 @@ pub(crate) fn calculate_steps(schemas: Pair<&SqlSchema>, flavour: &dyn SqlFlavou
 
 pub(crate) struct SqlSchemaDiffer<'a> {
     schemas: Pair<&'a SqlSchema>,
-    flavour: &'a dyn SqlFlavour,
     db: DifferDatabase<'a>,
 }
 
@@ -62,7 +56,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                 table_id: table.table_id(),
             });
 
-            if self.flavour.should_push_foreign_keys_from_created_tables() {
+            if self.db.flavour.should_push_foreign_keys_from_created_tables() {
                 for fk in table.foreign_keys() {
                     steps.push(SqlMigrationStep::AddForeignKey {
                         table_id: table.table_id(),
@@ -71,10 +65,10 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                 }
             }
 
-            if self.flavour.should_create_indexes_from_created_tables() {
+            if self.db.flavour.should_create_indexes_from_created_tables() {
                 let create_indexes_from_created_tables = table
                     .indexes()
-                    .filter(|index| !self.flavour.should_skip_index_for_new_table(index))
+                    .filter(|index| !self.db.flavour.should_skip_index_for_new_table(index))
                     .map(|index| SqlMigrationStep::CreateIndex {
                         table_id: (None, index.table().table_id()),
                         index_index: index.index(),
@@ -93,7 +87,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                 table_id: dropped_table.table_id(),
             });
 
-            if !self.flavour.should_drop_foreign_keys_from_dropped_tables() {
+            if !self.db.flavour.should_drop_foreign_keys_from_dropped_tables() {
                 continue;
             }
 
@@ -130,12 +124,12 @@ impl<'schema> SqlSchemaDiffer<'schema> {
             // Indexes
             for i in table
                 .index_pairs()
-                .filter(|pair| self.flavour.index_should_be_renamed(pair))
+                .filter(|pair| self.db.flavour.index_should_be_renamed(pair))
             {
                 let table: Pair<TableId> = table.tables.map(|t| t.table_id());
                 let index: Pair<usize> = i.map(|i| i.index());
 
-                let step = if self.flavour.can_alter_index() {
+                let step = if self.db.flavour.can_alter_index() {
                     SqlMigrationStep::AlterIndex { table, index }
                 } else {
                     SqlMigrationStep::RedefineIndex { table, index }
@@ -159,7 +153,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
 
             for column in table.column_pairs() {
                 let ids = column.map(|c| c.column_id());
-                self.flavour.push_index_changes_for_column_changes(
+                self.db.flavour.push_index_changes_for_column_changes(
                     &table,
                     ids,
                     self.db.column_changes(table.tables.map(|t| t.table_id()), ids),
@@ -296,7 +290,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                 })
             }
 
-            if self.flavour.indexes_should_be_recreated_after_column_drop() {
+            if self.db.flavour.indexes_should_be_recreated_after_column_drop() {
                 let dropped_and_recreated_column_ids_next: HashSet<ColumnId> = tables
                     .column_pairs()
                     .filter(|columns| {
@@ -330,7 +324,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
             for index in tables.dropped_indexes() {
                 // On MySQL, foreign keys automatically create indexes. These foreign-key-created
                 // indexes should only be dropped as part of the foreign key.
-                if self.flavour.should_skip_fk_indexes() && index::index_covers_fk(tables.previous(), &index) {
+                if self.db.flavour.should_skip_fk_indexes() && index::index_covers_fk(tables.previous(), &index) {
                     continue;
                 }
 
@@ -340,7 +334,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
 
         // On SQLite, we will recreate indexes in the RedefineTables step,
         // because they are needed for implementing new foreign key constraints.
-        if !tables_to_redefine.is_empty() && self.flavour.should_drop_indexes_from_dropped_tables() {
+        if !tables_to_redefine.is_empty() && self.db.flavour.should_drop_indexes_from_dropped_tables() {
             for table in self.dropped_tables() {
                 for index in table.indexes() {
                     drop_indexes.insert((index.table().table_id(), index.index()));
@@ -353,8 +347,13 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         }
     }
 
-    fn redefine_tables(&self, tables_to_redefine: &HashSet<String>) -> Vec<RedefineTable> {
-        self.table_pairs()
+    fn push_redefine_tables(&self, tables_to_redefine: &HashSet<String>, steps: &mut Vec<SqlMigrationStep>) {
+        if tables_to_redefine.is_empty() {
+            return;
+        }
+
+        let tables_to_redefine = self
+            .table_pairs()
             .filter(|tables| tables_to_redefine.contains(tables.next().name()))
             .map(|differ| {
                 let column_pairs = differ
@@ -381,7 +380,9 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                     column_pairs,
                 }
             })
-            .collect()
+            .collect();
+
+        steps.push(SqlMigrationStep::RedefineTables(tables_to_redefine))
     }
 
     /// An iterator over the tables that are present in both schemas.
@@ -435,8 +436,8 @@ impl<'schema> SqlSchemaDiffer<'schema> {
 
 /// Compare two [ForeignKey](/sql-schema-describer/struct.ForeignKey.html)s and return whether they
 /// should be considered equivalent for schema diffing purposes.
-fn foreign_keys_match(fks: Pair<&ForeignKeyWalker<'_>>, flavour: &dyn SqlFlavour, db: &DifferDatabase<'_>) -> bool {
-    let references_same_table = flavour.table_names_match(fks.map(|fk| fk.referenced_table().name()));
+fn foreign_keys_match(fks: Pair<&ForeignKeyWalker<'_>>, db: &DifferDatabase<'_>) -> bool {
+    let references_same_table = db.flavour.table_names_match(fks.map(|fk| fk.referenced_table().name()));
     let references_same_column_count =
         fks.previous().referenced_columns_count() == fks.next().referenced_columns_count();
     let constrains_same_column_count =
@@ -444,7 +445,7 @@ fn foreign_keys_match(fks: Pair<&ForeignKeyWalker<'_>>, flavour: &dyn SqlFlavour
     let constrains_same_columns = fks.interleave(|fk| fk.constrained_columns()).all(|cols| {
         let type_changed = || db.column_changes_for_walkers(cols).type_changed();
 
-        let arities_ok = flavour.can_cope_with_foreign_key_column_becoming_nonnullable()
+        let arities_ok = db.flavour.can_cope_with_foreign_key_column_becoming_nonnullable()
             || (cols.previous().arity() == cols.next().arity()
                 || (cols.previous().arity().is_required() && cols.next().arity().is_nullable()));
 
@@ -462,7 +463,11 @@ fn foreign_keys_match(fks: Pair<&ForeignKeyWalker<'_>>, flavour: &dyn SqlFlavour
         && constrains_same_columns
         && references_same_columns;
 
-    if flavour.preview_features().contains(PreviewFeature::ReferentialActions) {
+    if db
+        .flavour
+        .preview_features()
+        .contains(PreviewFeature::ReferentialActions)
+    {
         let same_on_delete_action = fks.previous.on_delete_action() == fks.next.on_delete_action();
         let same_on_update_action = fks.previous.on_update_action() == fks.next.on_update_action();
 
