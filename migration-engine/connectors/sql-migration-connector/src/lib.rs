@@ -130,6 +130,7 @@ impl SqlMigrationConnector {
         // accidentally drop something we can't describe in the data model.
         let drop_views = source_schema
             .view_walkers()
+            .filter(|view| !self.flavour.view_should_be_ignored(view.name()))
             .map(|vw| vw.view_index())
             .map(DropView::new)
             .map(SqlMigrationStep::DropView);

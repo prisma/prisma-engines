@@ -11,27 +11,17 @@ pub struct SchemaPush<'a> {
     force: bool,
     /// Purely for logging diagnostics.
     migration_id: Option<&'a str>,
-    rt: Option<&'a tokio::runtime::Runtime>,
+    rt: &'a tokio::runtime::Runtime,
 }
 
 impl<'a> SchemaPush<'a> {
-    pub fn new(api: &'a dyn GenericApi, schema: String) -> Self {
+    pub fn new(api: &'a dyn GenericApi, schema: String, rt: &'a tokio::runtime::Runtime) -> Self {
         SchemaPush {
             api,
             schema,
             force: false,
             migration_id: None,
-            rt: None,
-        }
-    }
-
-    pub fn new_sync(api: &'a dyn GenericApi, schema: String, rt: &'a tokio::runtime::Runtime) -> Self {
-        SchemaPush {
-            api,
-            schema,
-            force: false,
-            migration_id: None,
-            rt: Some(rt),
+            rt,
         }
     }
 
@@ -45,18 +35,19 @@ impl<'a> SchemaPush<'a> {
         self
     }
 
-    pub async fn send(self) -> CoreResult<SchemaPushAssertion<'a>> {
+    fn send_impl(self) -> CoreResult<SchemaPushAssertion<'a>> {
         let input = SchemaPushInput {
             schema: self.schema,
             force: self.force,
             assume_empty: false,
         };
 
-        let output = self
+        let fut = self
             .api
             .schema_push(&input)
-            .instrument(tracing::info_span!("SchemaPush", migration_id = ?self.migration_id))
-            .await?;
+            .instrument(tracing::info_span!("SchemaPush", migration_id = ?self.migration_id));
+
+        let output = self.rt.block_on(fut)?;
 
         Ok(SchemaPushAssertion {
             result: output,
@@ -66,14 +57,14 @@ impl<'a> SchemaPush<'a> {
 
     /// Execute the command and expect it to succeed.
     #[track_caller]
-    pub fn send_sync(self) -> SchemaPushAssertion<'a> {
-        self.rt.unwrap().block_on(self.send()).unwrap()
+    pub fn send(self) -> SchemaPushAssertion<'a> {
+        self.send_impl().unwrap()
     }
 
     /// Execute the command and expect it to fail, returning the error.
     #[track_caller]
     pub fn send_unwrap_err(self) -> CoreError {
-        self.rt.unwrap().block_on(self.send()).unwrap_err()
+        self.send_impl().unwrap_err()
     }
 }
 

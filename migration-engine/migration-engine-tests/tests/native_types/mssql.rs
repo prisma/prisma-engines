@@ -1913,7 +1913,7 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
                 from,
             ));
 
-            api.schema_push(&dm1).send_sync().assert_green_bang();
+            api.schema_push(&dm1).send().assert_green_bang();
 
             let insert = Insert::single_into((api.schema_name(), "A")).value("x", seed.clone());
             api.query(insert.into());
@@ -1938,7 +1938,7 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
                 to,
             ));
 
-            api.schema_push(&dm2).send_sync().assert_green_bang();
+            api.schema_push(&dm2).send().assert_green_bang();
 
             api.assert_schema().assert_table("A", |table| {
                 table.assert_columns_count(2).assert_column("x", |c| {
@@ -1971,7 +1971,7 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
                 from,
             ));
 
-            api.schema_push(&dm1).send_sync().assert_green_bang();
+            api.schema_push(&dm1).send().assert_green_bang();
 
             let insert = Insert::single_into((api.schema_name(), "A")).value("x", seed.clone());
             api.query(insert.into());
@@ -2002,7 +2002,7 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
                 to,
             );
 
-            api.schema_push(&dm2).send_sync().assert_warnings(&[warning.into()]);
+            api.schema_push(&dm2).send().assert_warnings(&[warning.into()]);
 
             api.assert_schema().assert_table("A", |table| {
                 table.assert_columns_count(2).assert_column("x", |c| {
@@ -2038,7 +2038,7 @@ fn not_castable_with_existing_data_should_warn(api: TestApi) {
                 from,
             ));
 
-            api.schema_push(&dm1).send_sync().assert_green_bang();
+            api.schema_push(&dm1).send().assert_green_bang();
 
             let insert = Insert::single_into((api.schema_name(), "A")).value("x", seed.clone());
             api.query(insert.into());
@@ -2065,7 +2065,7 @@ fn not_castable_with_existing_data_should_warn(api: TestApi) {
 
             let warning = "Changed the type of `x` on the `A` table. No cast exists, the column would be dropped and recreated, which cannot be done since the column is required and there is data in the table.";
 
-            api.schema_push(&dm2).send_sync().assert_unexecutable(&[warning.into()]);
+            api.schema_push(&dm2).send().assert_unexecutable(&[warning.into()]);
 
             api.assert_schema().assert_table("A", |table| {
                 table.assert_columns_count(2).assert_column("x", |c| {
@@ -2123,17 +2123,17 @@ fn typescript_starter_schema_with_native_types_is_idempotent(api: TestApi) {
 
     api.schema_push(&dm)
         .migration_id(Some("first"))
-        .send_sync()
+        .send()
         .assert_green_bang()
         .assert_has_executed_steps();
     api.schema_push(&dm)
         .migration_id(Some("second"))
-        .send_sync()
+        .send()
         .assert_green_bang()
         .assert_no_steps();
     api.schema_push(&dm2)
         .migration_id(Some("third"))
-        .send_sync()
+        .send()
         .assert_green_bang()
         .assert_no_steps();
 }
@@ -2182,23 +2182,23 @@ fn typescript_starter_schema_with_different_native_types_is_idempotent(api: Test
 
     api.schema_push(&dm)
         .migration_id(Some("first"))
-        .send_sync()
+        .send()
         .assert_green_bang()
         .assert_has_executed_steps();
     api.schema_push(&dm)
         .migration_id(Some("second"))
-        .send_sync()
+        .send()
         .assert_green_bang()
         .assert_no_steps();
 
     api.schema_push(&dm2)
         .migration_id(Some("third"))
-        .send_sync()
+        .send()
         .assert_green_bang()
         .assert_has_executed_steps();
     api.schema_push(&dm2)
         .migration_id(Some("fourth"))
-        .send_sync()
+        .send()
         .assert_green_bang()
         .assert_no_steps();
 }

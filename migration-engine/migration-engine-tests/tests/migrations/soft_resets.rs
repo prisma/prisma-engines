@@ -75,7 +75,7 @@ fn soft_resets_work_on_postgres(api: TestApi) {
 
         engine
             .schema_push(dm)
-            .send_sync()
+            .send()
             .assert_has_executed_steps()
             .assert_green_bang();
 
@@ -199,7 +199,7 @@ fn soft_resets_work_on_sql_server(api: TestApi) {
 
         engine
             .schema_push(dm)
-            .send_sync()
+            .send()
             .assert_has_executed_steps()
             .assert_green_bang();
 
@@ -286,7 +286,7 @@ fn soft_resets_work_on_mysql(api: TestApi) {
 
         engine
             .schema_push(dm)
-            .send_sync()
+            .send()
             .assert_has_executed_steps()
             .assert_green_bang();
 

@@ -21,7 +21,7 @@ fn indexes_on_foreign_key_fields_are_not_created_twice(api: TestApi) {
         }
     "#;
 
-    api.schema_push(schema).send_sync();
+    api.schema_push(schema).send();
 
     let sql_schema = api
         .assert_schema()
@@ -37,7 +37,7 @@ fn indexes_on_foreign_key_fields_are_not_created_twice(api: TestApi) {
     // Test that after introspection, we do not migrate further.
     api.schema_push(schema)
         .force(true)
-        .send_sync()
+        .send()
         .assert_green_bang()
         .assert_no_steps();
 
@@ -64,8 +64,8 @@ fn enum_creation_is_idempotent(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green_bang();
-    api.schema_push(dm1).send_sync().assert_green_bang().assert_no_steps();
+    api.schema_push(dm1).send().assert_green_bang();
+    api.schema_push(dm1).send().assert_green_bang().assert_no_steps();
 }
 
 #[test_connector(tags(Mysql))]
@@ -85,7 +85,7 @@ fn enums_work_when_table_name_is_remapped(api: TestApi) {
     }
     "#;
 
-    api.schema_push(schema).send_sync().assert_green_bang();
+    api.schema_push(schema).send().assert_green_bang();
 }
 
 #[test_connector(tags(Mysql))]
@@ -104,7 +104,7 @@ fn arity_of_enum_columns_can_be_changed(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green_bang();
+    api.schema_push(dm1).send().assert_green_bang();
 
     api.assert_schema().assert_table("A", |table| {
         table
@@ -126,7 +126,7 @@ fn arity_of_enum_columns_can_be_changed(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send_sync().assert_green_bang();
+    api.schema_push(dm2).send().assert_green_bang();
 
     api.assert_schema().assert_table("A", |table| {
         table
@@ -151,7 +151,7 @@ fn arity_is_preserved_by_alter_enum(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green_bang();
+    api.schema_push(dm1).send().assert_green_bang();
 
     api.assert_schema().assert_table("A", |table| {
         table
@@ -175,7 +175,7 @@ fn arity_is_preserved_by_alter_enum(api: TestApi) {
 
     api.schema_push(dm2)
         .force(true)
-        .send_sync()
+        .send()
         .assert_executable()
         .assert_has_executed_steps();
 
@@ -257,7 +257,7 @@ fn native_type_columns_can_be_created(api: TestApi) {
 
     dm.push_str("}\n");
 
-    api.schema_push(&dm).send_sync().assert_green_bang();
+    api.schema_push(&dm).send().assert_green_bang();
 
     api.assert_schema().assert_table("A", |table| {
         types.iter().fold(
@@ -269,7 +269,7 @@ fn native_type_columns_can_be_created(api: TestApi) {
     });
 
     // Check that the migration is idempotent
-    api.schema_push(dm).send_sync().assert_green_bang().assert_no_steps();
+    api.schema_push(dm).send().assert_green_bang().assert_no_steps();
 }
 
 #[test_connector(tags(Mysql))]

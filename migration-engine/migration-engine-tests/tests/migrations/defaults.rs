@@ -14,7 +14,7 @@ fn datetime_defaults_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm).send_sync().assert_green_bang();
+    api.schema_push(dm).send().assert_green_bang();
 
     let expected_default = if api.is_postgres() {
         DefaultValue::db_generated("'2018-01-27 08:00:00'::timestamp without time zone")
@@ -41,7 +41,7 @@ fn function_expressions_as_dbgenerated_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm).send_sync().assert_green_bang();
+    api.schema_push(dm).send().assert_green_bang();
 
     api.assert_schema().assert_table("Cat", |table| {
         table.assert_column("id", |col| {
@@ -58,7 +58,7 @@ fn default_dbgenerated_with_type_definitions_should_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm).send_sync().assert_green_bang();
+    api.schema_push(dm).send().assert_green_bang();
 
     api.assert_schema().assert_table("A", |table| {
         table.assert_column("id", |col| {
@@ -75,7 +75,7 @@ fn default_dbgenerated_should_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm).send_sync().assert_green_bang();
+    api.schema_push(dm).send().assert_green_bang();
 
     api.assert_schema().assert_table("A", |table| {
         table.assert_column("id", |col| {
@@ -93,7 +93,7 @@ fn uuid_default(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm).send_sync().assert_green_bang();
+    api.schema_push(dm).send().assert_green_bang();
 
     api.assert_schema().assert_table("A", |table| {
         table.assert_column("uuid", |col| {
@@ -148,7 +148,7 @@ fn schemas_with_dbgenerated_work(api: TestApi) {
     }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green_bang();
+    api.schema_push(dm1).send().assert_green_bang();
 }
 
 #[test_connector(tags(Mysql8, Mariadb), exclude(Vitess))]
@@ -175,7 +175,7 @@ fn schemas_with_dbgenerated_expressions_work(api: TestApi) {
     }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green_bang();
+    api.schema_push(dm1).send().assert_green_bang();
 }
 
 #[test_connector]
@@ -187,7 +187,7 @@ fn column_defaults_must_be_migrated(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green_bang();
+    api.schema_push(dm1).send().assert_green_bang();
 
     api.assert_schema().assert_table("Fruit", |table| {
         table.assert_column("name", |col| {
@@ -202,7 +202,7 @@ fn column_defaults_must_be_migrated(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send_sync().assert_green_bang();
+    api.schema_push(dm2).send().assert_green_bang();
 
     api.assert_schema().assert_table("Fruit", |table| {
         table.assert_column("name", |col| col.assert_default(Some(DefaultValue::value("mango"))))
@@ -225,7 +225,7 @@ fn escaped_string_defaults_are_not_arbitrarily_migrated(api: TestApi) {
 
     api.schema_push(dm1)
         .migration_id(Some("first migration"))
-        .send_sync()
+        .send()
         .assert_green_bang();
 
     let insert = Insert::single_into(api.render_table_name("Fruit"))
@@ -238,7 +238,7 @@ fn escaped_string_defaults_are_not_arbitrarily_migrated(api: TestApi) {
 
     api.schema_push(dm1)
         .migration_id(Some("second migration"))
-        .send_sync()
+        .send()
         .assert_green_bang()
         .assert_no_steps();
 
