@@ -190,6 +190,7 @@ pub struct MigrationAssertion<'a> {
 }
 
 impl MigrationAssertion<'_> {
+    #[track_caller]
     pub fn assert_contents(self, expected_contents: &str) -> Self {
         let migration_file_path = self.path.join("migration.sql");
         let contents: String = std::fs::read_to_string(&migration_file_path)
