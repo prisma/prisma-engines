@@ -113,7 +113,6 @@ impl<'a> LowerDmlToAst<'a> {
                 .find_model(&relation_info.to)
                 .unwrap_or_else(|| panic!("Related model not found: {}.", relation_info.to));
 
-            let mut all_related_ids = related_model.id_fields.clone();
             let has_default_name = relation_info.name
                 == RelationNames::name_for_unambiguous_relation(&relation_info.to, &parent_model.name);
 
@@ -124,7 +123,6 @@ impl<'a> LowerDmlToAst<'a> {
             let mut relation_fields = relation_info.references.clone();
 
             relation_fields.sort();
-            all_related_ids.sort();
 
             if !relation_info.fields.is_empty() {
                 args.push(ast::Argument::new_array(

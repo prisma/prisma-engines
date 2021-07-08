@@ -1,7 +1,7 @@
 use datamodel::{
     diagnostics::*,
     dml::{self, ScalarType},
-    Configuration, Datamodel, IndexDefinition, Model, NativeTypeInstance, StringFromEnvVar,
+    Configuration, Datamodel, IndexDefinition, Model, NativeTypeInstance, PrimaryKeyDefinition, StringFromEnvVar,
 };
 use pretty_assertions::assert_eq;
 
@@ -48,7 +48,7 @@ pub trait ModelAsserts {
     fn assert_with_db_name(&self, t: &str) -> &Self;
     fn assert_with_documentation(&self, t: &str) -> &Self;
     fn assert_has_index(&self, def: IndexDefinition) -> &Self;
-    fn assert_has_id_fields(&self, fields: &[&str]) -> &Self;
+    fn assert_has_pk(&self, pk: PrimaryKeyDefinition) -> &Self;
     fn assert_ignored(&self, state: bool) -> &Self;
 }
 
@@ -272,8 +272,8 @@ impl ModelAsserts for dml::Model {
         self
     }
 
-    fn assert_has_id_fields(&self, fields: &[&str]) -> &Self {
-        assert_eq!(self.id_fields, fields);
+    fn assert_has_pk(&self, pk: PrimaryKeyDefinition) -> &Self {
+        assert_eq!(self.primary_key, Some(pk));
         self
     }
 

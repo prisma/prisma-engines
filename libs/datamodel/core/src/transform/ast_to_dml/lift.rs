@@ -1,3 +1,4 @@
+use crate::Datasource;
 use crate::{
     ast::{self, WithName},
     diagnostics::{DatamodelError, Diagnostics},
@@ -6,7 +7,6 @@ use crate::{
         ast_to_dml::db::{ParserDatabase, ScalarFieldType},
         helpers::ValueValidator,
     },
-    Datasource,
 };
 use datamodel_connector::connector_error::{ConnectorError, ErrorKind};
 use itertools::Itertools;
@@ -58,16 +58,18 @@ impl<'a> LiftAstToDml<'a> {
         model.database_name = self.db.get_model_database_name(model_id).map(String::from);
         model.is_ignored = model_data.is_ignored;
 
-        model.id_fields = model_data
-            .id_fields
+        model.primary_key = model_data
+            .primary_key
             .as_ref()
-            .map(|fields| {
-                fields
+            .map(|pk_data| dml::PrimaryKeyDefinition {
+                name: pk_data.name.map(String::from),
+                fields: pk_data
+                    .fields
                     .iter()
                     .map(|id| self.db.ast()[model_id][*id].name.name.clone())
-                    .collect()
-            })
-            .unwrap_or_default();
+                    .collect(),
+                defined_on_field: false,
+            });
 
         model.indices = model_data
             .indexes

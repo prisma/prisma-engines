@@ -4,7 +4,8 @@ mod tests {
     use datamodel::ast::Span;
     use datamodel::{
         dml, Datamodel, Datasource, DefaultValue as DMLDefault, Field, FieldArity, FieldType, Model,
-        NativeTypeInstance, ReferentialAction, RelationField, RelationInfo, ScalarField, ScalarType, ValueGenerator,
+        NativeTypeInstance, PrimaryKeyDefinition, ReferentialAction, RelationField, RelationInfo, ScalarField,
+        ScalarType, ValueGenerator,
     };
     use datamodel::{IndexDefinition, StringFromEnvVar};
     use enumflags2::BitFlags;
@@ -72,7 +73,11 @@ mod tests {
                 ],
                 is_generated: false,
                 indices: vec![],
-                id_fields: vec!["required".to_string()],
+                primary_key: Some(PrimaryKeyDefinition {
+                    name: None,
+                    fields: vec!["required".to_string()],
+                    defined_on_field: true,
+                }),
             }],
             enums: vec![],
         };
@@ -154,7 +159,11 @@ mod tests {
                     })],
                     is_generated: false,
                     indices: vec![],
-                    id_fields: vec!["primary".to_string()],
+                    primary_key: Some(PrimaryKeyDefinition {
+                        name: None,
+                        fields: vec!["primary".to_string()],
+                        defined_on_field: true,
+                    }),
                 },
                 // Model with non-auto-incrementing primary key
                 Model {
@@ -186,7 +195,11 @@ mod tests {
                     })],
                     is_generated: false,
                     indices: vec![],
-                    id_fields: vec!["primary".to_string()],
+                    primary_key: Some(PrimaryKeyDefinition {
+                        name: None,
+                        fields: vec!["primary".to_string()],
+                        defined_on_field: true,
+                    }),
                 },
                 // Model with primary key seeded by sequence
                 Model {
@@ -218,7 +231,11 @@ mod tests {
                     })],
                     is_generated: false,
                     indices: vec![],
-                    id_fields: vec!["primary".to_string()],
+                    primary_key: Some(PrimaryKeyDefinition {
+                        name: None,
+                        fields: vec!["primary".to_string()],
+                        defined_on_field: true,
+                    }),
                 },
             ],
             enums: vec![],
@@ -340,7 +357,7 @@ mod tests {
                     tpe: dml::IndexType::Unique,
                     defined_on_field: true,
                 }],
-                id_fields: vec![],
+                primary_key: None,
             }],
             enums: vec![],
         };
@@ -444,7 +461,11 @@ mod tests {
                     ],
                     is_generated: false,
                     indices: vec![],
-                    id_fields: vec!["id".to_string()],
+                    primary_key: Some(PrimaryKeyDefinition {
+                        name: None,
+                        fields: vec!["id".to_string()],
+                        defined_on_field: true,
+                    }),
                 },
                 Model {
                     database_name: None,
@@ -537,7 +558,11 @@ mod tests {
                     ],
                     is_generated: false,
                     indices: vec![],
-                    id_fields: vec!["id".to_string()],
+                    primary_key: Some(PrimaryKeyDefinition {
+                        name: None,
+                        fields: vec!["id".to_string()],
+                        defined_on_field: true,
+                    }),
                 },
             ],
             enums: vec![],
@@ -710,7 +735,11 @@ mod tests {
                     tpe: datamodel::dml::IndexType::Unique,
                     defined_on_field: false,
                 }],
-                id_fields: vec!["id".to_string()],
+                primary_key: Some(PrimaryKeyDefinition {
+                    name: None,
+                    fields: vec!["id".to_string()],
+                    defined_on_field: true,
+                }),
             }],
             enums: vec![],
         };
@@ -839,7 +868,11 @@ mod tests {
                     ],
                     is_generated: false,
                     indices: vec![],
-                    id_fields: vec!["id".to_string()],
+                    primary_key: Some(PrimaryKeyDefinition {
+                        name: None,
+                        fields: vec!["id".to_string()],
+                        defined_on_field: true,
+                    }),
                 },
                 Model {
                     database_name: None,
@@ -905,7 +938,11 @@ mod tests {
                     ],
                     is_generated: false,
                     indices: vec![],
-                    id_fields: vec!["id".to_string()],
+                    primary_key: Some(PrimaryKeyDefinition {
+                        name: None,
+                        fields: vec!["id".to_string()],
+                        defined_on_field: true,
+                    }),
                 },
             ],
             enums: vec![],

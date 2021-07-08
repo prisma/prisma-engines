@@ -119,18 +119,20 @@ impl<'a> ModelWalker<'a> {
         let model_idx = self.model_idx;
         let datamodel = self.datamodel;
 
-        self.scalar_fields()
-            .chain(
-                self.get()
-                    .id_fields
-                    .iter()
-                    .filter_map(move |field_name| walker.find_scalar_field(field_name)),
-            )
-            .map(move |field| ScalarFieldWalker {
-                datamodel,
-                model_idx,
-                field_idx: field.field_idx,
-            })
+        let x = if let Some(pk) = &walker.get().primary_key {
+            pk.fields
+                .iter()
+                .map(|field_name| walker.find_scalar_field(field_name).unwrap())
+                .map(move |field| ScalarFieldWalker {
+                    datamodel,
+                    model_idx,
+                    field_idx: field.field_idx,
+                })
+                .collect()
+        } else {
+            vec![]
+        };
+        x.into_iter()
     }
 
     pub fn unique_indexes<'b>(&'b self) -> impl Iterator<Item = IndexWalker<'a>> + 'b {

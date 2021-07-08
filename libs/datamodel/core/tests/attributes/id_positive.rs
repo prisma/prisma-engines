@@ -142,7 +142,11 @@ fn multi_field_ids_must_work() {
 
     let datamodel = parse(dml);
     let user_model = datamodel.assert_has_model("Model");
-    user_model.assert_has_id_fields(&["a", "b"]);
+    user_model.assert_has_pk(PrimaryKeyDefinition {
+        name: None,
+        fields: vec!["a".into(), "b".into()],
+        defined_on_field: false,
+    });
 }
 
 #[test]

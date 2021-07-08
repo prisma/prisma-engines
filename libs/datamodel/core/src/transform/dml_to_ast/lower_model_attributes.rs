@@ -10,13 +10,13 @@ impl<'a> LowerDmlToAst<'a> {
         let mut attributes = vec![];
 
         // @@id
-        if !model.id_fields.is_empty() {
-            let args = vec![ast::Argument::new_array(
-                "",
-                LowerDmlToAst::field_array(&model.id_fields),
-            )];
 
-            attributes.push(ast::Attribute::new("id", args));
+        if let Some(pk) = &model.primary_key {
+            if !pk.defined_on_field {
+                let args = vec![ast::Argument::new_array("", LowerDmlToAst::field_array(&pk.fields))];
+
+                attributes.push(ast::Attribute::new("id", args));
+            }
         }
 
         // @@unique
