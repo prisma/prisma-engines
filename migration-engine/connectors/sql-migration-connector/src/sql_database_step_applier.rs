@@ -59,7 +59,7 @@ impl DatabaseMigrationStepApplier for SqlMigrationConnector {
 
         if let Some(begin) = self.flavour().render_begin_transaction() {
             script.push_str(begin);
-            script.push_str(";\n");
+            script.push('\n');
         }
 
         for step in &migration.steps {
@@ -89,8 +89,8 @@ impl DatabaseMigrationStepApplier for SqlMigrationConnector {
         }
 
         if let Some(commit) = self.flavour().render_commit_transaction() {
+            script.push('\n');
             script.push_str(commit);
-            script.push_str(";\n");
         }
 
         script

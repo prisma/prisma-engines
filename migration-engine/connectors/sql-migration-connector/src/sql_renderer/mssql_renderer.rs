@@ -9,7 +9,7 @@ use crate::{
     pair::Pair,
     sql_migration::{AlterEnum, AlterTable, RedefineTable},
 };
-use indoc::formatdoc;
+use indoc::{formatdoc, indoc};
 use native_types::{MsSqlType, MsSqlTypeParameter};
 use prisma_value::PrismaValue;
 use sql_schema_describer::{
@@ -399,11 +399,32 @@ impl SqlRenderer for MssqlFlavour {
     }
 
     fn render_begin_transaction(&self) -> Option<&'static str> {
-        Some("BEGIN TRAN")
+        let sql = indoc! { r#"
+            BEGIN TRY
+
+            BEGIN TRAN;
+        "#};
+
+        Some(sql)
     }
 
     fn render_commit_transaction(&self) -> Option<&'static str> {
-        Some("COMMIT TRAN")
+        let sql = indoc! { r#"
+            COMMIT TRAN;
+
+            END TRY
+            BEGIN CATCH
+
+            IF @@TRANCOUNT > 0
+            BEGIN 
+                ROLLBACK TRAN;
+            END;
+            THROW
+
+            END CATCH
+        "# };
+
+        Some(sql)
     }
 }
 
