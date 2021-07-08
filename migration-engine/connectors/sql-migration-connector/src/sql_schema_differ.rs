@@ -25,19 +25,16 @@ use std::collections::HashSet;
 use table::TableDiffer;
 
 pub(crate) fn calculate_steps(schemas: Pair<&SqlSchema>, flavour: &dyn SqlFlavour) -> Vec<SqlMigrationStep> {
-    let db = DifferDatabase::new(schemas, flavour);
-    let differ = SqlSchemaDiffer { schemas, db };
+    let differ = SqlSchemaDiffer::new(schemas, flavour);
     let mut steps: Vec<SqlMigrationStep> = Vec::new();
-
-    let tables_to_redefine = differ.db.flavour.tables_to_redefine(&differ);
 
     differ.push_created_tables(&mut steps);
     differ.push_dropped_tables(&mut steps);
-    differ.drop_indexes(&tables_to_redefine, &mut steps);
-    differ.push_create_indexes(&tables_to_redefine, &mut steps);
-    differ.push_altered_tables(&tables_to_redefine, &mut steps);
+    differ.drop_indexes(&mut steps);
+    differ.push_create_indexes(&mut steps);
+    differ.push_altered_tables(&mut steps);
     flavour.push_enum_steps(&differ, &mut steps);
-    differ.push_redefine_tables(&tables_to_redefine, &mut steps);
+    differ.push_redefine_tables(&mut steps);
 
     steps.sort();
 
@@ -47,9 +44,25 @@ pub(crate) fn calculate_steps(schemas: Pair<&SqlSchema>, flavour: &dyn SqlFlavou
 pub(crate) struct SqlSchemaDiffer<'a> {
     schemas: Pair<&'a SqlSchema>,
     db: DifferDatabase<'a>,
+    pub(super) tables_to_redefine: HashSet<String>,
 }
 
 impl<'schema> SqlSchemaDiffer<'schema> {
+    fn new(schemas: Pair<&'schema SqlSchema>, flavour: &'schema dyn SqlFlavour) -> Self {
+        let db = DifferDatabase::new(schemas, flavour);
+        let tables_to_redefine = HashSet::new();
+
+        let mut differ = Self {
+            schemas,
+            db,
+            tables_to_redefine,
+        };
+
+        differ.tables_to_redefine = std::mem::take(&mut flavour.tables_to_redefine(&differ));
+
+        differ
+    }
+
     fn push_created_tables(&self, steps: &mut Vec<SqlMigrationStep>) {
         for table in self.created_tables() {
             steps.push(SqlMigrationStep::CreateTable {
@@ -100,10 +113,10 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         }
     }
 
-    fn push_altered_tables(&self, tables_to_redefine: &HashSet<String>, steps: &mut Vec<SqlMigrationStep>) {
+    fn push_altered_tables(&self, steps: &mut Vec<SqlMigrationStep>) {
         let tables = self
             .table_pairs()
-            .filter(move |tables| !tables_to_redefine.contains(tables.next().name()));
+            .filter(move |tables| !self.tables_to_redefine.contains(tables.next().name()));
 
         for table in tables {
             // Foreign keys
@@ -278,10 +291,10 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         }
     }
 
-    fn push_create_indexes(&self, tables_to_redefine: &HashSet<String>, steps: &mut Vec<SqlMigrationStep>) {
+    fn push_create_indexes(&self, steps: &mut Vec<SqlMigrationStep>) {
         for tables in self
             .table_pairs()
-            .filter(|tables| !tables_to_redefine.contains(tables.next().name()))
+            .filter(|tables| !self.tables_to_redefine.contains(tables.next().name()))
         {
             for index in tables.created_indexes() {
                 steps.push(SqlMigrationStep::CreateIndex {
@@ -317,7 +330,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         }
     }
 
-    fn drop_indexes(&self, tables_to_redefine: &HashSet<String>, steps: &mut Vec<SqlMigrationStep>) {
+    fn drop_indexes(&self, steps: &mut Vec<SqlMigrationStep>) {
         let mut drop_indexes = HashSet::new();
 
         for tables in self.table_pairs() {
@@ -334,7 +347,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
 
         // On SQLite, we will recreate indexes in the RedefineTables step,
         // because they are needed for implementing new foreign key constraints.
-        if !tables_to_redefine.is_empty() && self.db.flavour.should_drop_indexes_from_dropped_tables() {
+        if !self.tables_to_redefine.is_empty() && self.db.flavour.should_drop_indexes_from_dropped_tables() {
             for table in self.dropped_tables() {
                 for index in table.indexes() {
                     drop_indexes.insert((index.table().table_id(), index.index()));
@@ -347,14 +360,14 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         }
     }
 
-    fn push_redefine_tables(&self, tables_to_redefine: &HashSet<String>, steps: &mut Vec<SqlMigrationStep>) {
-        if tables_to_redefine.is_empty() {
+    fn push_redefine_tables(&self, steps: &mut Vec<SqlMigrationStep>) {
+        if self.tables_to_redefine.is_empty() {
             return;
         }
 
         let tables_to_redefine = self
             .table_pairs()
-            .filter(|tables| tables_to_redefine.contains(tables.next().name()))
+            .filter(|tables| self.tables_to_redefine.contains(tables.next().name()))
             .map(|differ| {
                 let column_pairs = differ
                     .column_pairs()
@@ -438,10 +451,13 @@ impl<'schema> SqlSchemaDiffer<'schema> {
 /// should be considered equivalent for schema diffing purposes.
 fn foreign_keys_match(fks: Pair<&ForeignKeyWalker<'_>>, db: &DifferDatabase<'_>) -> bool {
     let references_same_table = db.flavour.table_names_match(fks.map(|fk| fk.referenced_table().name()));
+
     let references_same_column_count =
         fks.previous().referenced_columns_count() == fks.next().referenced_columns_count();
+
     let constrains_same_column_count =
         fks.previous().constrained_columns().count() == fks.next().constrained_columns().count();
+
     let constrains_same_columns = fks.interleave(|fk| fk.constrained_columns()).all(|cols| {
         let type_changed = || db.column_changes_for_walkers(cols).type_changed();
 
