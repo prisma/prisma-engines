@@ -3,14 +3,13 @@ use crate::{
     flavour::MssqlFlavour,
     pair::Pair,
     sql_migration::SqlMigrationStep,
-    sql_schema_differ::{
-        column::{ColumnDiffer, ColumnTypeChange},
-        table::TableDiffer,
-        ColumnChanges, SqlSchemaDiffer,
-    },
+    sql_schema_differ::{column::ColumnTypeChange, table::TableDiffer, ColumnChanges, SqlSchemaDiffer},
 };
 use native_types::{MsSqlType, MsSqlTypeParameter};
-use sql_schema_describer::{walkers::IndexWalker, ColumnId, ColumnTypeFamily};
+use sql_schema_describer::{
+    walkers::{ColumnWalker, IndexWalker},
+    ColumnId, ColumnTypeFamily,
+};
 use std::collections::HashSet;
 
 impl SqlSchemaDifferFlavour for MssqlFlavour {
@@ -25,14 +24,18 @@ impl SqlSchemaDifferFlavour for MssqlFlavour {
     fn tables_to_redefine(&self, differ: &SqlSchemaDiffer<'_>) -> HashSet<String> {
         let autoincrement_changed = differ
             .table_pairs()
-            .filter(|differ| differ.column_pairs().any(|c| c.autoincrement_changed()))
+            .filter(|differ| {
+                differ
+                    .column_pairs()
+                    .any(|c| differ.db.column_changes_for_walkers(c).autoincrement_changed())
+            })
             .map(|table| table.next().name().to_owned());
 
         let all_columns_of_the_table_gets_dropped = differ
             .table_pairs()
             .filter(|tables| {
                 tables.column_pairs().all(|columns| {
-                    let type_change = self.column_type_change(&columns);
+                    let type_change = self.column_type_change(columns);
                     matches!(type_change, Some(ColumnTypeChange::NotCastable))
                 })
             })
@@ -43,7 +46,7 @@ impl SqlSchemaDifferFlavour for MssqlFlavour {
             .collect()
     }
 
-    fn column_type_change(&self, differ: &ColumnDiffer<'_>) -> Option<ColumnTypeChange> {
+    fn column_type_change(&self, differ: Pair<ColumnWalker<'_>>) -> Option<ColumnTypeChange> {
         let previous_family = differ.previous.column_type_family();
         let next_family = differ.next.column_type_family();
         let previous_type: Option<MsSqlType> = differ.previous.column_native_type();

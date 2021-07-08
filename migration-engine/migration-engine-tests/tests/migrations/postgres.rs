@@ -185,8 +185,6 @@ fn uuids_do_not_generate_drift_issue_5282(api: TestApi) {
 fn functions_with_schema_prefix_in_dbgenerated_are_idempotent(api: TestApi) {
     api.raw_cmd(r#"CREATE SCHEMA "myschema"; CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA "myschema";"#);
 
-    dbg!(api.connection_info());
-
     let dm = api.datamodel_with_provider(
         r#"
         model Koala {

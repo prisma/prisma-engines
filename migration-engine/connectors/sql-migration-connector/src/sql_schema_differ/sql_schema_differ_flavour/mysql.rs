@@ -1,10 +1,12 @@
 use super::SqlSchemaDifferFlavour;
 use crate::{
-    flavour::MysqlFlavour, flavour::MYSQL_IDENTIFIER_SIZE_LIMIT, pair::Pair, sql_schema_differ::column::ColumnDiffer,
-    sql_schema_differ::ColumnTypeChange,
+    flavour::MysqlFlavour, flavour::MYSQL_IDENTIFIER_SIZE_LIMIT, pair::Pair, sql_schema_differ::ColumnTypeChange,
 };
 use native_types::MySqlType;
-use sql_schema_describer::{walkers::IndexWalker, ColumnTypeFamily};
+use sql_schema_describer::{
+    walkers::{ColumnWalker, IndexWalker},
+    ColumnTypeFamily,
+};
 
 impl SqlSchemaDifferFlavour for MysqlFlavour {
     fn can_alter_index(&self) -> bool {
@@ -15,7 +17,7 @@ impl SqlSchemaDifferFlavour for MysqlFlavour {
         false
     }
 
-    fn column_type_change(&self, differ: &ColumnDiffer<'_>) -> Option<ColumnTypeChange> {
+    fn column_type_change(&self, differ: Pair<ColumnWalker<'_>>) -> Option<ColumnTypeChange> {
         // On MariaDB, JSON is an alias for LONGTEXT. https://mariadb.com/kb/en/json-data-type/
         if self.is_mariadb() {
             match (
@@ -55,7 +57,6 @@ impl SqlSchemaDifferFlavour for MysqlFlavour {
         };
 
         if let Some(change) = differ
-            .as_pair()
             .map(|walker| walker.column_native_type())
             .transpose()
             .and_then(native_type_change)

@@ -111,9 +111,15 @@ impl SqlRenderer for MysqlFlavour {
         for change in changes {
             match change {
                 TableChange::DropPrimaryKey => lines.push(sql_ddl::mysql::AlterTableClause::DropPrimaryKey.to_string()),
-                TableChange::AddPrimaryKey { columns } => lines.push(format!(
+                TableChange::AddPrimaryKey => lines.push(format!(
                     "ADD PRIMARY KEY ({})",
-                    columns.iter().map(|colname| self.quote(colname)).join(", ")
+                    tables
+                        .next()
+                        .primary_key_column_names()
+                        .iter()
+                        .flat_map(|c| c.iter())
+                        .map(|colname| self.quote(colname))
+                        .join(", ")
                 )),
                 TableChange::AddColumn { column_id } => {
                     let column = tables.next().column_at(*column_id);
@@ -133,7 +139,7 @@ impl SqlRenderer for MysqlFlavour {
                     type_change: _,
                 }) => {
                     let columns = tables.columns(column_id);
-                    let expanded = MysqlAlterColumn::new(&columns, changes);
+                    let expanded = MysqlAlterColumn::new(&columns, *changes);
 
                     match expanded {
                         MysqlAlterColumn::DropDefault => lines.push(format!(
@@ -416,7 +422,7 @@ enum MysqlAlterColumn {
 }
 
 impl MysqlAlterColumn {
-    fn new(columns: &Pair<ColumnWalker<'_>>, changes: &ColumnChanges) -> Self {
+    fn new(columns: &Pair<ColumnWalker<'_>>, changes: ColumnChanges) -> Self {
         if changes.only_default_changed() && columns.next().default().is_none() {
             return MysqlAlterColumn::DropDefault;
         }
@@ -441,10 +447,7 @@ impl MysqlAlterColumn {
             _ => columns.next().default().cloned(),
         };
 
-        MysqlAlterColumn::Modify {
-            changes: changes.clone(),
-            new_default,
-        }
+        MysqlAlterColumn::Modify { changes, new_default }
     }
 }
 
