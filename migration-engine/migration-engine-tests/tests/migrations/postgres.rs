@@ -88,6 +88,24 @@ fn existing_postgis_tables_must_not_be_migrated(api: TestApi) {
         .assert_has_table("Geometry_columns");
 }
 
+// Reference for the tables created by PostGIS: https://postgis.net/docs/manual-1.4/ch04.html#id418599
+#[test_connector(tags(Postgres))]
+fn existing_postgis_views_must_not_be_migrated(api: TestApi) {
+    let create_spatial_ref_sys_view = "CREATE VIEW \"spatial_ref_sys\" AS SELECT 1";
+    // The capitalized Geometry is intentional here, because we want the matching to be case-insensitive.
+    let create_geometry_columns_view = "CREATE VIEW \"Geometry_columns\" AS SELECT 1";
+
+    api.raw_cmd(create_spatial_ref_sys_view);
+    api.raw_cmd(create_geometry_columns_view);
+
+    let schema = "";
+
+    api.schema_push(schema)
+        .send_sync()
+        .assert_green_bang()
+        .assert_no_steps();
+}
+
 #[test_connector(tags(Postgres))]
 fn native_type_columns_can_be_created(api: TestApi) {
     let types = &[

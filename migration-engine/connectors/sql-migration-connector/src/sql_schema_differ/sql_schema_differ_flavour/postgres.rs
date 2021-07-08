@@ -10,6 +10,16 @@ use once_cell::sync::Lazy;
 use regex::RegexSet;
 use sql_schema_describer::walkers::{ColumnWalker, IndexWalker};
 
+/// These can be tables or views, depending on the PostGIS version. In both cases, they should be ignored.
+static POSTGIS_TABLES_OR_VIEWS: Lazy<RegexSet> = Lazy::new(|| {
+    RegexSet::new(&[
+        // PostGIS. Reference: https://postgis.net/docs/manual-1.4/ch04.html#id418599
+        "(?i)^spatial_ref_sys$",
+        "(?i)^geometry_columns$",
+    ])
+    .unwrap()
+});
+
 /// The maximum length of postgres identifiers, in bytes.
 ///
 /// Reference: https://www.postgresql.org/docs/12/limits.html
@@ -62,16 +72,7 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
     }
 
     fn table_should_be_ignored(&self, table_name: &str) -> bool {
-        static POSTGRES_IGNORED_TABLES: Lazy<RegexSet> = Lazy::new(|| {
-            RegexSet::new(&[
-                // PostGIS. Reference: https://postgis.net/docs/manual-1.4/ch04.html#id418599
-                "(?i)^spatial_ref_sys$",
-                "(?i)^geometry_columns$",
-            ])
-            .unwrap()
-        });
-
-        POSTGRES_IGNORED_TABLES.is_match(table_name)
+        POSTGIS_TABLES_OR_VIEWS.is_match(table_name)
     }
 
     fn column_type_change(&self, differ: Pair<ColumnWalker<'_>>) -> Option<ColumnTypeChange> {
@@ -107,6 +108,10 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
             }
             (None, None) => Some(RiskyCast),
         }
+    }
+
+    fn view_should_be_ignored(&self, view_name: &str) -> bool {
+        POSTGIS_TABLES_OR_VIEWS.is_match(view_name)
     }
 }
 

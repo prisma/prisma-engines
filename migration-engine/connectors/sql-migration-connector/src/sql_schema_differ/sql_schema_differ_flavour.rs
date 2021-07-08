@@ -121,4 +121,8 @@ pub(crate) trait SqlSchemaDifferFlavour {
     fn table_should_be_ignored(&self, _table_name: &str) -> bool {
         false
     }
+
+    fn view_should_be_ignored(&self, _view_name: &str) -> bool {
+        false
+    }
 }
