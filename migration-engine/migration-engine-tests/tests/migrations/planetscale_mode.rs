@@ -35,8 +35,8 @@ fn schema_push_planetscale_mode_works(api: TestApi) {
         datasource = api.datasource_block_with(&[("planetScaleMode", "true")]),
     );
 
-    api.schema_push(&dm).send_sync().assert_green_bang();
-    api.schema_push(dm).send_sync().assert_green_bang().assert_no_steps(); // idempotence
+    api.schema_push(&dm).send().assert_green_bang();
+    api.schema_push(dm).send().assert_green_bang().assert_no_steps(); // idempotence
 
     api.assert_schema()
         .assert_table("Post", |table| table.assert_foreign_keys_count(0))

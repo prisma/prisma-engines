@@ -74,7 +74,7 @@ fn diagnose_migration_history_with_opt_in_to_shadow_database_calculates_drift(ap
         }
     "#;
 
-    api.schema_push(dm2).send_sync();
+    api.schema_push(dm2).send();
 
     let DiagnoseMigrationHistoryOutput {
         drift,
@@ -131,7 +131,7 @@ fn diagnose_migration_history_without_opt_in_to_shadow_database_does_not_calcula
         }
     "#;
 
-    api.schema_push(dm2).send_sync();
+    api.schema_push(dm2).send();
 
     let DiagnoseMigrationHistoryOutput {
         drift,

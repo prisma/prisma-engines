@@ -18,7 +18,7 @@ fn enums_can_be_dropped_on_postgres(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green_bang();
+    api.schema_push(dm1).send().assert_green_bang();
     api.assert_schema()
         .assert_enum("CatMood", |r#enum| r#enum.assert_values(&["ANGRY", "HUNGRY", "CUDDLY"]));
 
@@ -29,7 +29,7 @@ fn enums_can_be_dropped_on_postgres(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send_sync().assert_green_bang();
+    api.schema_push(dm2).send().assert_green_bang();
     api.assert_schema().assert_has_no_enum("CatMood");
 }
 
@@ -50,7 +50,7 @@ fn adding_a_scalar_list_for_a_model_with_id_type_int_must_work(api: TestApi) {
     "#,
     );
 
-    api.schema_push(dm1).send_sync().assert_green_bang();
+    api.schema_push(dm1).send().assert_green_bang();
 
     api.assert_schema().assert_table("A", |table| {
         table
@@ -78,10 +78,7 @@ fn existing_postgis_tables_must_not_be_migrated(api: TestApi) {
 
     let schema = "";
 
-    api.schema_push(schema)
-        .send_sync()
-        .assert_green_bang()
-        .assert_no_steps();
+    api.schema_push(schema).send().assert_green_bang().assert_no_steps();
 
     api.assert_schema()
         .assert_has_table("spatial_ref_sys")
@@ -100,10 +97,7 @@ fn existing_postgis_views_must_not_be_migrated(api: TestApi) {
 
     let schema = "";
 
-    api.schema_push(schema)
-        .send_sync()
-        .assert_green_bang()
-        .assert_no_steps();
+    api.schema_push(schema).send().assert_green_bang().assert_no_steps();
 }
 
 #[test_connector(tags(Postgres))]
@@ -153,7 +147,7 @@ fn native_type_columns_can_be_created(api: TestApi) {
 
     dm.push_str("}\n");
 
-    api.schema_push(&dm).send_sync().assert_green_bang();
+    api.schema_push(&dm).send().assert_green_bang();
 
     api.assert_schema().assert_table("A", |table| {
         types.iter().fold(
@@ -164,7 +158,7 @@ fn native_type_columns_can_be_created(api: TestApi) {
         )
     });
 
-    api.schema_push(dm).send_sync().assert_green_bang().assert_no_steps();
+    api.schema_push(dm).send().assert_green_bang().assert_no_steps();
 }
 
 #[test_connector(tags(Postgres))]
@@ -194,7 +188,7 @@ fn uuids_do_not_generate_drift_issue_5282(api: TestApi) {
 
     api.schema_push(&dm)
         .migration_id(Some("first"))
-        .send_sync()
+        .send()
         .assert_green_bang()
         .assert_no_steps();
 }
@@ -212,10 +206,10 @@ fn functions_with_schema_prefix_in_dbgenerated_are_idempotent(api: TestApi) {
     );
 
     api.schema_push(dm.clone())
-        .send_sync()
+        .send()
         .assert_green_bang()
         .assert_has_executed_steps();
-    api.schema_push(dm).send_sync().assert_green_bang().assert_no_steps();
+    api.schema_push(dm).send().assert_green_bang().assert_no_steps();
 }
 
 #[test_connector(tags(Postgres))]
@@ -354,13 +348,13 @@ fn citext_to_text_and_back_works(api: TestApi) {
     "#,
     );
 
-    api.schema_push(&dm1).send_sync().assert_green_bang();
+    api.schema_push(&dm1).send().assert_green_bang();
 
     api.raw_cmd("INSERT INTO \"User\" (name) VALUES ('myCat'), ('myDog'), ('yourDog');");
 
     // TEXT -> CITEXT
     api.schema_push(dm2)
-        .send_sync()
+        .send()
         .assert_green_bang()
         .assert_has_executed_steps();
 
@@ -370,7 +364,7 @@ fn citext_to_text_and_back_works(api: TestApi) {
 
     // CITEXT -> TEXT
     api.schema_push(&dm1)
-        .send_sync()
+        .send()
         .assert_green_bang()
         .assert_has_executed_steps();
 

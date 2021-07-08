@@ -246,7 +246,7 @@ impl EngineTestApi<'_> {
 
     /// Plan a `schemaPush` command
     pub fn schema_push(&self, dm: impl Into<String>) -> SchemaPush<'_> {
-        SchemaPush::new_sync(&self.connector, dm.into(), self.rt)
+        SchemaPush::new(&self.connector, dm.into(), self.rt)
     }
 
     /// The schema name of the current connected database.

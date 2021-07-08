@@ -29,7 +29,7 @@ fn shared_default_constraints_are_ignored_issue_5423(api: TestApi) {
 
     api.schema_push(dm)
         .migration_id(Some("first"))
-        .send_sync()
+        .send()
         .assert_green_bang()
         .assert_no_steps();
 }
