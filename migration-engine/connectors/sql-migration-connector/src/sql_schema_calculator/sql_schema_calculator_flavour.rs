@@ -34,7 +34,11 @@ pub(crate) trait SqlSchemaCalculatorFlavour {
         unreachable!("unreachable enum_column_type")
     }
 
-    fn field_is_implicit_autoincrement_primary_key(&self, _field: &ScalarFieldWalker<'_>) -> bool {
+    fn field_is_implicit_autoincrement_primary_key(
+        &self,
+        _model: &ModelWalker<'_>,
+        _field: &ScalarFieldWalker<'_>,
+    ) -> bool {
         false
     }
 

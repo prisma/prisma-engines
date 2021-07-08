@@ -16,7 +16,7 @@ fn unique_attribute() {
     test_model
         .assert_has_scalar_field("id")
         .assert_base_type(&ScalarType::Int)
-        .assert_is_id();
+        .assert_is_id(test_model);
 
     assert_eq!(false, test_model.field_is_unique("id"));
 

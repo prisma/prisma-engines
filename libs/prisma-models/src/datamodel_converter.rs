@@ -1,5 +1,5 @@
 use crate::*;
-use datamodel::{dml, DefaultValue, Ignorable, NativeTypeInstance, WithDatabaseName};
+use datamodel::{dml, Ignorable, NativeTypeInstance, WithDatabaseName};
 use itertools::Itertools;
 
 pub struct DatamodelConverter<'a> {
@@ -114,7 +114,7 @@ impl<'a> DatamodelConverter<'a> {
                         is_list: sf.is_list(),
                         is_unique: model.field_is_unique(&sf.name),
                         is_id: model.field_is_primary(&sf.name),
-                        is_auto_generated_int_id: sf.is_auto_generated_int_id(),
+                        is_auto_generated_int_id: model.field_is_auto_generated_int_id(&sf.name),
                         is_autoincrement: sf.is_auto_increment(),
                         behaviour: sf.behaviour(),
                         internal_enum: sf.internal_enum(self.datamodel),
@@ -435,7 +435,7 @@ trait DatamodelFieldExtensions {
 }
 
 impl DatamodelFieldExtensions for dml::ScalarField {
-    pub fn type_identifier(&self) -> TypeIdentifier {
+    fn type_identifier(&self) -> TypeIdentifier {
         match &self.field_type {
             dml::FieldType::Enum(x) => TypeIdentifier::Enum(x.clone()),
             dml::FieldType::Relation(_) => TypeIdentifier::String, // Todo: Unused

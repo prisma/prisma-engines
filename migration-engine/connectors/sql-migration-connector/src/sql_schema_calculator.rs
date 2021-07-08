@@ -40,7 +40,7 @@ fn calculate_model_tables<'a>(
     walk_models(datamodel).map(move |model| {
         let columns = model
             .scalar_fields()
-            .map(|field| column_for_scalar_field(&field, flavour))
+            .map(|field| column_for_scalar_field(&model, &field, flavour))
             .collect();
 
         let primary_key = Some(sql::PrimaryKey {
@@ -267,7 +267,11 @@ fn column_type_for_implicit_relation(id_field: &ScalarFieldWalker<'_>, schema: &
         .clone()
 }
 
-fn column_for_scalar_field(field: &ScalarFieldWalker<'_>, flavour: &dyn SqlFlavour) -> sql::Column {
+fn column_for_scalar_field(
+    model: &ModelWalker<'_>,
+    field: &ScalarFieldWalker<'_>,
+    flavour: &dyn SqlFlavour,
+) -> sql::Column {
     let (scalar_type, native_type) = match field.field_type() {
         // Special-case enums. Defaults and type are handled differently.
         TypeWalker::Enum(r#enum) => {
@@ -322,7 +326,7 @@ fn column_for_scalar_field(field: &ScalarFieldWalker<'_>, flavour: &dyn SqlFlavo
     };
 
     sql::Column {
-        auto_increment: has_auto_increment_default || flavour.field_is_implicit_autoincrement_primary_key(field),
+        auto_increment: has_auto_increment_default || flavour.field_is_implicit_autoincrement_primary_key(model, field),
         name: field.db_name().to_owned(),
         tpe: sql::ColumnType {
             full_data_type: String::new(),

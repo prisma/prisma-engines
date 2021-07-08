@@ -61,7 +61,6 @@ impl<'a> LiftAstToDml<'a> {
         model.id_fields = model_data
             .id_fields
             .as_ref()
-            .filter(|_| model_data.id_source_field.is_none())
             .map(|fields| {
                 fields
                     .iter()

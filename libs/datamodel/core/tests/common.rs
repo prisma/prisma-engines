@@ -1,7 +1,7 @@
 use datamodel::{
     diagnostics::*,
     dml::{self, ScalarType},
-    Configuration, Datamodel, IndexDefinition, NativeTypeInstance, StringFromEnvVar,
+    Configuration, Datamodel, IndexDefinition, Model, NativeTypeInstance, StringFromEnvVar,
 };
 use pretty_assertions::assert_eq;
 
@@ -25,7 +25,7 @@ pub trait ScalarFieldAsserts {
     fn assert_native_type(&self) -> &NativeTypeInstance;
     fn assert_with_db_name(&self, t: &str) -> &Self;
     fn assert_default_value(&self, t: dml::DefaultValue) -> &Self;
-    fn assert_is_id(&self) -> &Self;
+    fn assert_is_id(&self, model: &Model) -> &Self;
     fn assert_is_updated_at(&self, b: bool) -> &Self;
     fn assert_ignored(&self, state: bool) -> &Self;
 }
@@ -155,8 +155,8 @@ impl ScalarFieldAsserts for dml::ScalarField {
         self
     }
 
-    fn assert_is_id(&self) -> &Self {
-        assert!(self.is_id);
+    fn assert_is_id(&self, model: &Model) -> &Self {
+        assert!(model.field_is_primary(&self.name));
         self
     }
 

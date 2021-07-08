@@ -1,5 +1,6 @@
 use super::SqlSchemaCalculatorFlavour;
 use crate::flavour::SqliteFlavour;
+use datamodel::walkers::ModelWalker;
 use datamodel::{walkers::ScalarFieldWalker, ScalarType};
 use datamodel_connector::Connector;
 
@@ -9,7 +10,11 @@ impl SqlSchemaCalculatorFlavour for SqliteFlavour {
     }
 
     // Integer primary keys on SQLite are automatically assigned the rowid, which means they are automatically autoincrementing.
-    fn field_is_implicit_autoincrement_primary_key(&self, field: &ScalarFieldWalker<'_>) -> bool {
-        field.is_id() && field.field_type().is_int()
+    fn field_is_implicit_autoincrement_primary_key(
+        &self,
+        model: &ModelWalker<'_>,
+        field: &ScalarFieldWalker<'_>,
+    ) -> bool {
+        model.get().field_is_primary(field.name()) && field.field_type().is_int()
     }
 }

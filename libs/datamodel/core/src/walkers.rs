@@ -61,7 +61,7 @@ impl<'a> ModelWalker<'a> {
         self.get().final_database_name()
     }
 
-    fn get(&self) -> &'a Model {
+    pub fn get(&self) -> &'a Model {
         &self.datamodel.models[self.model_idx]
     }
 
@@ -120,9 +120,6 @@ impl<'a> ModelWalker<'a> {
         let datamodel = self.datamodel;
 
         self.scalar_fields()
-            // Single-id models
-            .filter(|field| field.is_id())
-            // Compound id models
             .chain(
                 self.get()
                     .id_fields
@@ -186,10 +183,6 @@ impl<'a> ScalarFieldWalker<'a> {
         self.datamodel.models[self.model_idx].fields[self.field_idx]
             .as_scalar_field()
             .unwrap()
-    }
-
-    pub fn is_id(&self) -> bool {
-        self.get().is_id
     }
 
     pub fn is_required(&self) -> bool {
