@@ -382,7 +382,7 @@ mod tests {
                     },
                 ],
                 indices: vec![Index {
-                    name: "unique".to_string(),
+                    name: "unique_unique".to_string(),
                     columns: vec!["unique".to_string()],
                     tpe: IndexType::Unique,
                 }],
