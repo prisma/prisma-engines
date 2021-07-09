@@ -21,7 +21,7 @@ fn indexes_on_foreign_key_fields_are_not_created_twice(api: TestApi) {
         }
     "#;
 
-    api.schema_push(schema).send_sync();
+    api.schema_push(schema).send();
 
     let sql_schema = api
         .assert_schema()
@@ -37,7 +37,7 @@ fn indexes_on_foreign_key_fields_are_not_created_twice(api: TestApi) {
     // Test that after introspection, we do not migrate further.
     api.schema_push(schema)
         .force(true)
-        .send_sync()
+        .send()
         .assert_green_bang()
         .assert_no_steps();
 
@@ -64,8 +64,8 @@ fn enum_creation_is_idempotent(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green_bang();
-    api.schema_push(dm1).send_sync().assert_green_bang().assert_no_steps();
+    api.schema_push(dm1).send().assert_green_bang();
+    api.schema_push(dm1).send().assert_green_bang().assert_no_steps();
 }
 
 #[test_connector(tags(Mysql))]
@@ -85,7 +85,7 @@ fn enums_work_when_table_name_is_remapped(api: TestApi) {
     }
     "#;
 
-    api.schema_push(schema).send_sync().assert_green_bang();
+    api.schema_push(schema).send().assert_green_bang();
 }
 
 #[test_connector(tags(Mysql))]
@@ -104,7 +104,7 @@ fn arity_of_enum_columns_can_be_changed(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green_bang();
+    api.schema_push(dm1).send().assert_green_bang();
 
     api.assert_schema().assert_table("A", |table| {
         table
@@ -126,7 +126,7 @@ fn arity_of_enum_columns_can_be_changed(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send_sync().assert_green_bang();
+    api.schema_push(dm2).send().assert_green_bang();
 
     api.assert_schema().assert_table("A", |table| {
         table
@@ -151,7 +151,7 @@ fn arity_is_preserved_by_alter_enum(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green_bang();
+    api.schema_push(dm1).send().assert_green_bang();
 
     api.assert_schema().assert_table("A", |table| {
         table
@@ -175,7 +175,7 @@ fn arity_is_preserved_by_alter_enum(api: TestApi) {
 
     api.schema_push(dm2)
         .force(true)
-        .send_sync()
+        .send()
         .assert_executable()
         .assert_has_executed_steps();
 
@@ -257,7 +257,7 @@ fn native_type_columns_can_be_created(api: TestApi) {
 
     dm.push_str("}\n");
 
-    api.schema_push(&dm).send_sync().assert_green_bang();
+    api.schema_push(&dm).send().assert_green_bang();
 
     api.assert_schema().assert_table("A", |table| {
         types.iter().fold(
@@ -269,7 +269,7 @@ fn native_type_columns_can_be_created(api: TestApi) {
     });
 
     // Check that the migration is idempotent
-    api.schema_push(dm).send_sync().assert_green_bang().assert_no_steps();
+    api.schema_push(dm).send().assert_green_bang().assert_no_steps();
 }
 
 #[test_connector(tags(Mysql))]
@@ -300,4 +300,92 @@ fn default_current_timestamp_precision_follows_column_precision(api: TestApi) {
     api.create_migration("01init", &dm, &migrations_directory)
         .send_sync()
         .assert_migration("01init", |migration| migration.assert_contents(expected_migration));
+}
+
+#[test_connector(tags(Mysql))]
+fn mysql_apply_migrations_errors_gives_the_failed_sql(api: TestApi) {
+    let dm = "";
+    let migrations_directory = api.create_migrations_directory();
+
+    let migration = r#"
+        CREATE TABLE `Cat` ( id INTEGER PRIMARY KEY );
+
+        DROP TABLE `Emu`;
+
+        CREATE TABLE `Emu` (
+            size INTEGER
+        );
+    "#;
+
+    let migration_name = api
+        .create_migration("01init", dm, &migrations_directory)
+        .draft(true)
+        .send_sync()
+        .modify_migration(|contents| {
+            contents.clear();
+            contents.push_str(migration);
+        })
+        .into_output()
+        .generated_migration_name
+        .unwrap();
+
+    let err = api
+        .apply_migrations(&migrations_directory)
+        .send_unwrap_err()
+        .to_string()
+        .replace(&migration_name, "<migration-name>");
+
+    let expectation = if api.is_vitess() {
+        expect![[r#"
+            A migration failed to apply. New migrations can not be applied before the error is recovered from. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve
+
+            Migration name: <migration-name>
+
+            Database error code: 1051
+
+            Database error:
+            target: test.0.master: vttablet: rpc error: code = InvalidArgument desc = Unknown table 'vt_test_0.Emu' (errno 1051) (sqlstate 42S02) (CallerID: userData1): Sql: "drop table Emu", BindVars: {}
+
+            Please check the query number 2 from the migration file.
+
+        "#]]
+    } else if cfg!(windows) {
+        expect![[r#"
+            A migration failed to apply. New migrations can not be applied before the error is recovered from. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve
+
+            Migration name: <migration-name>
+
+            Database error code: 1051
+
+            Database error:
+            Unknown table 'mysql_apply_migrations_errors_gives_the_failed_sql.emu'
+
+            Please check the query number 2 from the migration file.
+
+        "#]]
+    } else {
+        expect![[r#"
+            A migration failed to apply. New migrations can not be applied before the error is recovered from. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve
+
+            Migration name: <migration-name>
+
+            Database error code: 1051
+
+            Database error:
+            Unknown table 'mysql_apply_migrations_errors_gives_the_failed_sql.Emu'
+
+            Please check the query number 2 from the migration file.
+
+        "#]]
+    };
+
+    let first_segment = err
+        .split_terminator("DbError {")
+        .next()
+        .unwrap()
+        .split_terminator("   0: ")
+        .next()
+        .unwrap();
+
+    expectation.assert_eq(first_segment)
 }

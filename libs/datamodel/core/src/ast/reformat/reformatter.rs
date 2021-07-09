@@ -90,7 +90,7 @@ impl<'a> Reformatter<'a> {
 
         Ok(ValidatedMissingFields {
             subject: result,
-            warnings: diagnostics.warnings,
+            warnings: diagnostics.warnings().to_owned(),
         })
     }
 

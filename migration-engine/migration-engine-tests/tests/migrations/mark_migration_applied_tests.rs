@@ -259,7 +259,7 @@ fn baselining_should_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send_sync();
+    api.schema_push(dm1).send();
 
     // Create a first local migration that matches the db contents
     let baseline_migration_name = {

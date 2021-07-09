@@ -17,7 +17,7 @@ impl DatabaseMigrationStepApplier for SqlMigrationConnector {
             for sql_string in render_raw_sql(step, self.flavour(), Pair::new(&migration.before, &migration.after)) {
                 assert!(!sql_string.is_empty());
                 tracing::debug!(index, %sql_string);
-                self.conn().raw_cmd(&sql_string).await?;
+                self.flavour().run_query_script(&sql_string, self.conn()).await?;
             }
         }
 
@@ -57,6 +57,11 @@ impl DatabaseMigrationStepApplier for SqlMigrationConnector {
         // some steps don't render anything.
         let mut is_first_step = true;
 
+        if let Some(begin) = self.flavour().render_begin_transaction() {
+            script.push_str(begin);
+            script.push('\n');
+        }
+
         for step in &migration.steps {
             let statements: Vec<String> =
                 render_raw_sql(step, self.flavour(), Pair::new(&migration.before, &migration.after));
@@ -83,10 +88,17 @@ impl DatabaseMigrationStepApplier for SqlMigrationConnector {
             }
         }
 
+        if let Some(commit) = self.flavour().render_commit_transaction() {
+            script.push('\n');
+            script.push_str(commit);
+        }
+
         script
     }
 
+    #[tracing::instrument(skip(self, script))]
     async fn apply_script(&self, migration_name: &str, script: &str) -> ConnectorResult<()> {
+        tracing::info!(migrate_action = "log", "Applying migration `{}`", migration_name);
         self.flavour.scan_migration_script(script);
         self.flavour
             .apply_migration_script(migration_name, script, self.conn())

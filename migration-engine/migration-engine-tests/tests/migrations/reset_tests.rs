@@ -9,7 +9,7 @@ fn reset_works(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm).send_sync();
+    api.schema_push(dm).send();
 
     api.assert_schema().assert_tables_count(1);
 
@@ -19,7 +19,7 @@ fn reset_works(api: TestApi) {
 
     api.assert_schema().assert_tables_count(0);
 
-    api.schema_push(dm).send_sync();
+    api.schema_push(dm).send();
 
     api.assert_schema().assert_tables_count(1);
 }

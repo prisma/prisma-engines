@@ -203,7 +203,7 @@ fn migrations_should_fail_on_an_uninitialized_nonempty_database(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm).send_sync().assert_green_bang();
+    api.schema_push(dm).send().assert_green_bang();
 
     let directory = api.create_migrations_directory();
 

@@ -71,28 +71,25 @@
 //!</pre>
 //!
 
-#![allow(
-    clippy::module_inception,
-    clippy::suspicious_operation_groupings,
-    clippy::upper_case_acronyms
-)]
 #![deny(rust_2018_idioms, unsafe_code)]
 
 pub mod ast;
 pub mod common;
-pub mod configuration;
 pub mod diagnostics;
 pub mod dml;
 pub mod json;
-pub mod transform;
 pub mod walkers;
 
+mod configuration;
+mod transform;
+
 pub use crate::dml::*;
-pub use configuration::*;
-use diagnostics::Diagnostics;
+pub use configuration::{Configuration, Datasource, Generator, StringFromEnvVar};
+pub use transform::ast_to_dml::reserved_model_names;
 
 use crate::diagnostics::{Validated, ValidatedConfiguration, ValidatedDatamodel};
 use crate::{ast::SchemaAst, common::preview_features::PreviewFeature};
+use diagnostics::Diagnostics;
 use enumflags2::BitFlags;
 use transform::{
     ast_to_dml::{DatasourceLoader, GeneratorLoader, ValidationPipeline},
@@ -141,14 +138,14 @@ fn parse_datamodel_internal(
 
     let generators = GeneratorLoader::load_generators_from_ast(&ast, &mut diagnostics);
     let preview_features = preview_features(&generators);
-    let datasources = load_sources(&ast, preview_features, &mut &mut diagnostics);
+    let datasources = load_sources(&ast, preview_features, &mut diagnostics);
     let validator = ValidationPipeline::new(&datasources, preview_features);
 
     diagnostics.to_result()?;
 
     match validator.validate(&ast, transform) {
         Ok(mut src) => {
-            src.warnings.append(&mut diagnostics.warnings);
+            src.warnings.append(diagnostics.warnings_mut());
             Ok(Validated {
                 subject: (
                     Configuration {
@@ -186,7 +183,7 @@ pub fn parse_configuration(schema: &str) -> Result<ValidatedConfiguration, diagn
             generators,
             datasources,
         },
-        warnings: diagnostics.warnings,
+        warnings: diagnostics.warnings().to_owned(),
     })
 }
 
@@ -195,8 +192,7 @@ fn load_sources(
     preview_features: BitFlags<PreviewFeature>,
     diagnostics: &mut Diagnostics,
 ) -> Vec<Datasource> {
-    let source_loader = DatasourceLoader::new();
-    source_loader.load_datasources_from_ast(schema_ast, preview_features, diagnostics)
+    DatasourceLoader.load_datasources_from_ast(schema_ast, preview_features, diagnostics)
 }
 
 //

@@ -130,6 +130,7 @@ impl SqlMigrationConnector {
         // accidentally drop something we can't describe in the data model.
         let drop_views = source_schema
             .view_walkers()
+            .filter(|view| !self.flavour.view_should_be_ignored(view.name()))
             .map(|vw| vw.view_index())
             .map(DropView::new)
             .map(SqlMigrationStep::DropView);
@@ -339,6 +340,13 @@ async fn connect(connection_string: &str) -> ConnectorResult<Connection> {
         return quaint::connector::PostgreSql::new(url.clone())
             .await
             .map(|conn| Connection::new_postgres(conn, url.clone()))
+            .map_err(|err| quaint_error_to_connector_error(err, &connection_info));
+    }
+
+    if let ConnectionInfo::Mysql(url) = &connection_info {
+        return quaint::connector::Mysql::new(url.clone())
+            .await
+            .map(|conn| Connection::new_mysql(conn, url.clone()))
             .map_err(|err| quaint_error_to_connector_error(err, &connection_info));
     }
 

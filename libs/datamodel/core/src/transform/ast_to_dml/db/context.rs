@@ -8,7 +8,7 @@ use crate::{
     ast,
     diagnostics::{DatamodelError, Diagnostics},
 };
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 
 /// Validation context. This is an implementation detail of ParserDatabase. It
 /// contains the database itself, as well as context that is discarded after
@@ -18,6 +18,12 @@ pub(crate) struct Context<'ast> {
     pub(super) diagnostics: Diagnostics,
     arguments: Arguments<'ast>,
     attributes: Attributes<'ast>,
+
+    // @map'ed names indexes. These are not in the db because they are only used for validation.
+    pub(super) mapped_model_names: HashMap<&'ast str, ast::ModelId>,
+    pub(super) mapped_model_scalar_field_names: HashMap<(ast::ModelId, &'ast str), ast::FieldId>,
+    pub(super) mapped_enum_names: HashMap<&'ast str, ast::EnumId>,
+    pub(super) mapped_enum_value_names: HashMap<(ast::EnumId, &'ast str), u32>,
 }
 
 impl<'ast> Context<'ast> {
@@ -27,6 +33,11 @@ impl<'ast> Context<'ast> {
             diagnostics,
             arguments: Arguments::default(),
             attributes: Attributes::default(),
+
+            mapped_model_names: Default::default(),
+            mapped_model_scalar_field_names: Default::default(),
+            mapped_enum_names: Default::default(),
+            mapped_enum_value_names: Default::default(),
         }
     }
 

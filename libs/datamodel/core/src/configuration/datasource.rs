@@ -1,7 +1,7 @@
 use crate::{
     ast::Span,
+    configuration::StringFromEnvVar,
     diagnostics::{DatamodelError, Diagnostics},
-    StringFromEnvVar,
 };
 use datamodel_connector::{Connector, ConnectorCapabilities};
 use std::path::Path;

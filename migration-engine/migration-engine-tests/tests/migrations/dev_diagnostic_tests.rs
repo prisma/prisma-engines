@@ -71,7 +71,7 @@ fn dev_diagnostic_detects_drift(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send_sync();
+    api.schema_push(dm2).send();
 
     let DevDiagnosticOutput { action } = api.dev_diagnostic(&directory).send().into_output();
 
@@ -454,11 +454,13 @@ fn with_an_invalid_unapplied_migration_should_report_it(api: TestApi) {
         .to_user_facing()
         .unwrap_known();
 
-    assert_eq!(err.error_code, MigrationDoesNotApplyCleanly::ERROR_CODE);
-    assert!(err.message.starts_with(&format!(
-        "Migration `{}` failed to apply cleanly to the shadow database. \nError:",
+    let expected_msg = format!(
+        "Migration `{}` failed to apply cleanly to the shadow database. \nError",
         generated_migration_name.unwrap()
-    )));
+    );
+
+    assert_eq!(err.error_code, MigrationDoesNotApplyCleanly::ERROR_CODE);
+    assert!(err.message.starts_with(&expected_msg));
 }
 
 #[test_connector(tags(Postgres))]
@@ -479,6 +481,10 @@ fn drift_can_be_detected_without_migrations_table_dev(api: TestApi) {
 
     let expect = expect![[r#"
         Drift detected: Your database schema is not in sync with your migration history.
+
+        The following is a summary of the differences between the expected database schema given your migrations files, and the actual schema of the database.
+
+        It should be understood as the set of changes to get from the expected schema to the actual schema.
 
         [+] Added tables
           - cat

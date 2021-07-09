@@ -32,7 +32,8 @@ use names::Names;
 ///   corresponding item (model, enum, field, ...)
 /// - The AST is walked a second time to resolve types. For each field and each
 ///   type alias, we look at the type identifier and resolve what it refers to.
-/// - The AST is walked a third time to validate attributes on models and fields.
+/// - The AST is walked a third time to validate attributes on models and
+///   fields.
 ///
 /// ## Lifetimes
 ///
@@ -105,28 +106,19 @@ impl<'ast> ParserDatabase<'ast> {
     }
 
     pub(crate) fn get_enum_database_name(&self, enum_id: ast::EnumId) -> Option<&'ast str> {
-        self.names.mapped_names.get(&names::MappedName::Enum(enum_id)).cloned()
+        self.types.enums[&enum_id].mapped_name
     }
 
     pub(crate) fn get_enum_value_database_name(&self, enum_id: ast::EnumId, value_idx: u32) -> Option<&'ast str> {
-        self.names
-            .mapped_names
-            .get(&names::MappedName::EnumValue(enum_id, value_idx))
-            .cloned()
+        self.types.enums[&enum_id].mapped_values.get(&value_idx).cloned()
     }
 
     pub(crate) fn get_model_database_name(&self, model_id: ast::ModelId) -> Option<&'ast str> {
-        self.names
-            .mapped_names
-            .get(&names::MappedName::Model(model_id))
-            .cloned()
+        self.types.models[&model_id].mapped_name
     }
 
     pub(crate) fn get_field_database_name(&self, model_id: ast::ModelId, field_id: ast::FieldId) -> Option<&'ast str> {
-        self.names
-            .mapped_names
-            .get(&names::MappedName::Field(model_id, field_id))
-            .cloned()
+        self.types.scalar_fields[&(model_id, field_id)].mapped_name
     }
 
     pub(crate) fn get_model_data(&self, model_id: &ast::ModelId) -> Option<&types::ModelData<'ast>> {
@@ -156,7 +148,7 @@ impl<'ast> ParserDatabase<'ast> {
     pub(crate) fn iter_model_scalar_fields(
         &self,
         model_id: ast::ModelId,
-    ) -> impl Iterator<Item = (ast::FieldId, &ScalarField)> {
+    ) -> impl Iterator<Item = (ast::FieldId, &ScalarField<'ast>)> {
         self.types
             .scalar_fields
             .range((model_id, ast::FieldId::ZERO)..=(model_id, ast::FieldId::MAX))

@@ -37,8 +37,10 @@ interface StdErrLine {
 
 interface LogFields {
   message: string;
+  /// Hint to the CLI to log this line.
+  migrate_action?: "log";
 
-  // Only for ERROR level messages
+  /// Only for ERROR level messages
   is_panic?: boolean;
   error_code?: string;
 

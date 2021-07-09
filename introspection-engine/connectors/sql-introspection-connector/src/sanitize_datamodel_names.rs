@@ -1,8 +1,5 @@
 use crate::SqlFamilyTrait;
-use datamodel::{
-    transform::ast_to_dml::reserved_model_names, Datamodel, DefaultValue, Field, FieldType, Model, WithDatabaseName,
-    WithName,
-};
+use datamodel::{reserved_model_names, Datamodel, DefaultValue, Field, FieldType, Model, WithDatabaseName, WithName};
 use introspection_connector::IntrospectionContext;
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;

@@ -1,11 +1,10 @@
 use super::env_function::EnvFunction;
 use crate::diagnostics::DatamodelError;
-use crate::ValueGenerator;
-use crate::{ast, DefaultValue};
 use crate::{
-    ast::{Expression, Span},
-    StringFromEnvVar,
+    ast::{self, Expression, Span},
+    configuration::StringFromEnvVar,
 };
+use crate::{DefaultValue, ValueGenerator};
 use bigdecimal::BigDecimal;
 use chrono::{DateTime, FixedOffset};
 use dml::relation_info::ReferentialAction;

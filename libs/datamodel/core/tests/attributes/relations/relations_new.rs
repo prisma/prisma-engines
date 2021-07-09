@@ -302,7 +302,7 @@ fn relation_must_succeed_when_referenced_fields_are_a_unique_criteria() {
 
 #[allow(non_snake_case)]
 #[test]
-fn relation_must_NOT_error_when_referenced_fields_are_not_a_unique_criteria_on_mysql() {
+fn relation_must_not_error_when_referenced_fields_are_not_a_unique_criteria_on_mysql() {
     // MySQL allows foreign key to references a non unique criteria
     // https://stackoverflow.com/questions/588741/can-a-foreign-key-reference-a-non-unique-index
     let dml = r#"
