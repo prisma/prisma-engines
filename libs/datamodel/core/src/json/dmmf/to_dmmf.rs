@@ -53,6 +53,16 @@ fn enum_value_to_dmmf(en: &dml::EnumValue) -> EnumValue {
 }
 
 fn model_to_dmmf(model: &dml::Model) -> Model {
+    let id_fields = if let Some(pk) = &model.primary_key {
+        if !pk.defined_on_field {
+            pk.fields.clone()
+        } else {
+            vec![]
+        }
+    } else {
+        vec![]
+    };
+
     Model {
         name: model.name.clone(),
         db_name: model.database_name.clone(),
@@ -64,8 +74,7 @@ fn model_to_dmmf(model: &dml::Model) -> Model {
             .collect(),
         is_generated: Some(model.is_generated),
         documentation: model.documentation.clone(),
-        //todo
-        id_fields: vec![],
+        id_fields,
         unique_fields: model
             .indices
             .iter()
