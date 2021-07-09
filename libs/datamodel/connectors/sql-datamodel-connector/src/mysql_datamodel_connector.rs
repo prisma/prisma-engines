@@ -284,7 +284,7 @@ impl Connector for MySqlDatamodelConnector {
         match field.field_type() {
             FieldType::Scalar(scalar_type, _, Some(native_type_instance)) => {
                 let native_type: MySqlType = native_type_instance.deserialize_native_type();
-                let error = self.native_instance_error(native_type_instance.clone());
+                let error = self.native_instance_error(native_type_instance);
 
                 match native_type {
                     Decimal(Some((precision, scale))) if scale > precision => {
