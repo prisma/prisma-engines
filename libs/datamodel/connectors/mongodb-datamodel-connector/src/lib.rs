@@ -79,7 +79,7 @@ impl Connector for MongoDbDatamodelConnector {
         // WIP, I don't really know what I'm doing with the dml.
 
         // The _id name check is superfluous because it's not a valid schema field at the moment.
-        if model.field_is_unique(field.name()) && field.name() != "_id" {
+        if model.field_is_primary(field.name()) && field.name() != "_id" {
             match field.database_name() {
                 Some(mapped_name) if mapped_name != "_id" => {
                     Err(ConnectorError::from_kind(ErrorKind::FieldValidationError {
@@ -102,7 +102,7 @@ impl Connector for MongoDbDatamodelConnector {
         if !matches!(field.field_type(), FieldType::Scalar(_, _, Some(_)))
             && matches!(field.default_value(), Some(DefaultValue::Expression(expr)) if expr.is_dbgenerated())
         {
-            let message = if model.field_is_unique(field.name()) {
+            let message = if model.field_is_primary(field.name()) {
                 format!(
                     "MongoDB `@default(dbgenerated())` IDs must have an `ObjectID` native type annotation. `{}` is an ID field, so you probably want `ObjectId` as your native type.",
                     field.name()
