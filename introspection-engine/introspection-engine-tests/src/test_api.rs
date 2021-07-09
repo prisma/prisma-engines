@@ -51,9 +51,7 @@ impl TestApi {
             let (_, q, cs) = args.create_postgres_database().await;
             (q, cs)
         } else if tags.contains(Tags::Mssql) {
-            test_setup::init_mssql_database(args.database_url(), args.test_function_name())
-                .await
-                .unwrap()
+            args.create_mssql_database().await
         } else if tags.contains(Tags::Sqlite) {
             let url = sqlite_test_url(args.test_function_name());
             (Quaint::new(&url).await.unwrap(), url)

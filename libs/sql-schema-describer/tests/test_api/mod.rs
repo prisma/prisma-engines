@@ -30,12 +30,7 @@ impl TestApi {
             let (db_name, q, _) = rt.block_on(args.create_postgres_database());
             (db_name, q)
         } else if tags.contains(Tags::Mssql) {
-            let (q, _cs) = rt
-                .block_on(test_setup::init_mssql_database(
-                    args.database_url(),
-                    args.test_function_name(),
-                ))
-                .unwrap();
+            let (q, _cs) = rt.block_on(args.create_mssql_database());
             (args.test_function_name(), q)
         } else if tags.contains(Tags::Sqlite) {
             let url = sqlite_test_url(args.test_function_name());

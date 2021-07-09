@@ -127,6 +127,12 @@ impl TestApiArgs {
         self.db.capabilities
     }
 
+    pub async fn create_mssql_database(&self) -> (Quaint, String) {
+        mssql::init_mssql_database(self.database_url(), self.test_function_name)
+            .await
+            .unwrap()
+    }
+
     pub async fn create_mysql_database(&self) -> (&'static str, String) {
         mysql::create_mysql_database(self.database_url(), self.test_function_name)
             .await

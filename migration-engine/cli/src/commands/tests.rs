@@ -21,7 +21,7 @@ impl TestApi {
         } else if args.tags().contains(Tags::Sqlite) {
             sqlite_test_url(args.test_function_name())
         } else {
-            unreachable!()
+            rt.block_on(args.create_mssql_database()).1
         };
 
         TestApi { connection_string, rt }

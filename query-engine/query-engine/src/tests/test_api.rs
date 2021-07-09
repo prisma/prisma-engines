@@ -114,9 +114,7 @@ pub(super) async fn mysql_migration_connector(args: &TestApiArgs) -> (SqlMigrati
 }
 
 pub(super) async fn mssql_migration_connector(args: &TestApiArgs) -> (SqlMigrationConnector, String) {
-    let (_, url) = test_setup::init_mssql_database(args.database_url(), args.test_function_name())
-        .await
-        .unwrap();
+    let (_, url) = args.create_mssql_database().await;
     (
         SqlMigrationConnector::new(&url, preview_feature_bit_flag(args), None)
             .await
