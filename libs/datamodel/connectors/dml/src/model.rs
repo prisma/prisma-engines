@@ -301,23 +301,21 @@ impl Model {
     }
 
     pub fn field_is_unique(&self, name: &str) -> bool {
-        self.indices
-            .iter()
-            .any(|i| i.is_unique() && i.fields == vec![name.to_string()])
+        self.indices.iter().any(|i| i.is_unique() && i.fields == &[name])
     }
 
     pub fn field_is_unique_and_defined_on_field(&self, name: &str) -> bool {
         self.indices
             .iter()
-            .any(|i| i.is_unique() && i.fields == vec![name.to_string()] && i.defined_on_field)
+            .any(|i| i.is_unique() && i.fields == &[name] && i.defined_on_field)
     }
 
     pub fn field_is_primary(&self, field_name: &str) -> bool {
-        matches!(&self.primary_key, Some(PrimaryKeyDefinition{ fields, .. }) if fields == &vec![field_name.to_string()])
+        matches!(&self.primary_key, Some(PrimaryKeyDefinition{ fields, .. }) if fields == &[field_name])
     }
 
     pub fn field_is_primary_and_defined_on_field(&self, field_name: &str) -> bool {
-        matches!(&self.primary_key, Some(PrimaryKeyDefinition{ fields, defined_on_field , ..}) if fields == &vec![field_name.to_string()] && *defined_on_field)
+        matches!(&self.primary_key, Some(PrimaryKeyDefinition{ fields, defined_on_field , ..}) if fields == &[field_name] && *defined_on_field)
     }
 
     pub fn field_is_auto_generated_int_id(&self, name: &str) -> bool {
