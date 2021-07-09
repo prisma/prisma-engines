@@ -186,7 +186,7 @@ fn visit_scalar_field_attributes<'ast>(
              }
 
              if ast_field.arity.is_list() {
-                 ctx.push_error(args.new_attribute_validation_error("Fields that are marked with @updatedAt can not be lists."));
+                 ctx.push_error(args.new_attribute_validation_error("Fields that are marked with @updatedAt cannot be lists."));
              }
 
              scalar_field_data.is_updated_at = true;
@@ -252,7 +252,7 @@ fn visit_relation_field_attributes<'ast>(
         // @map
         attributes.visit_optional_single("map", ctx, |args, ctx| {
             ctx.push_error(args.new_attribute_validation_error(
-                "The attribute `@map` can not be used on relation fields.",
+                "The attribute `@map` cannot be used on relation fields.",
             ));
 
             if let Err(err) = args.default_arg("name") {

@@ -69,7 +69,7 @@ fn handle_compound_field(fields: Vec<ScalarFieldRef>, value: ParsedInputValue) -
 #[tracing::instrument(skip(value_map, model))]
 pub fn extract_filter(value_map: ParsedInputMap, model: &ModelRef) -> QueryGraphBuilderResult<Filter> {
     // We define an internal function so we can track the recursion depth. Empty
-    // filters at the root layer can not always be removed.
+    // filters at the root layer cannot always be removed.
     fn extract_filter(value_map: ParsedInputMap, model: &ModelRef, depth: usize) -> QueryGraphBuilderResult<Filter> {
         let filters = value_map
             .into_iter()

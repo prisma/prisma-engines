@@ -20,9 +20,9 @@ fn xml_data_type_should_fail_on_index() {
         );
 
         let error_msg = if *attribute_name == "index" {
-            "You can not define an index on fields with Native type Xml of Postgres."
+            "You cannot define an index on fields with Native type Xml of Postgres."
         } else {
-            "Native type Xml can not be unique in Postgres."
+            "Native type Xml cannot be unique in Postgres."
         };
 
         test_native_types_compatibility(&dml, error_msg, POSTGRES_SOURCE);

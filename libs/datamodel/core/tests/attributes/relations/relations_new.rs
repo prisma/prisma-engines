@@ -681,7 +681,7 @@ fn must_error_nicely_when_a_many_to_many_is_not_possible() {
 
     let errors = parse_error(dml);
     errors.assert_is_at(0, DatamodelError::new_field_validation_error(
-        "The relation field `posts` on Model `Category` references `Post` which does not have an `@id` field. Models without `@id` can not be part of a many to many relation. Use an explicit intermediate Model to represent this relationship.",
+        "The relation field `posts` on Model `Category` references `Post` which does not have an `@id` field. Models without `@id` cannot be part of a many to many relation. Use an explicit intermediate Model to represent this relationship.",
         "Category",
         "posts",
         Span::new(234, 277)
@@ -706,7 +706,7 @@ fn must_error_when_many_to_many_is_not_possible_due_to_missing_id() {
     errors.assert_is_at(
         0,
         DatamodelError::new_field_validation_error(
-            "The relation field `posts` on Model `Category` references `Post` which does not have an `@id` field. Models without `@id` can not be part of a many to many relation. Use an explicit intermediate Model to represent this relationship.",
+            "The relation field `posts` on Model `Category` references `Post` which does not have an `@id` field. Models without `@id` cannot be part of a many to many relation. Use an explicit intermediate Model to represent this relationship.",
             "Category",
             "posts",
             Span::new(189, 202)

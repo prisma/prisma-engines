@@ -112,7 +112,7 @@ fn must_error_if_now_function_is_used_for_fields_that_are_not_datetime() {
     let errors = parse_error(dml);
 
     errors.assert_is(DatamodelError::new_attribute_validation_error(
-        "The function `now()` can not be used on fields of type `String`.",
+        "The function `now()` cannot be used on fields of type `String`.",
         "default",
         Span::new(62, 76),
     ));
@@ -130,7 +130,7 @@ fn must_error_if_autoincrement_function_is_used_for_fields_that_are_not_int() {
     let errors = parse_error(dml);
 
     errors.assert_is(DatamodelError::new_attribute_validation_error(
-        "The function `autoincrement()` can not be used on fields of type `String`.",
+        "The function `autoincrement()` cannot be used on fields of type `String`.",
         "default",
         Span::new(62, 86),
     ));

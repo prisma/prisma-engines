@@ -16,7 +16,7 @@ const TEXT_TYPES: &[&str] = &["Text", "NText", "VarChar(Max)", "NVarChar(Max)", 
 fn text_and_blob_data_types_should_fail_on_index() {
     fn error_msg(type_name: &str) -> String {
         format!(
-            "You can not define an index on fields with Native type {} of SQL Server.",
+            "You cannot define an index on fields with Native type {} of SQL Server.",
             type_name
         )
     }
@@ -33,7 +33,7 @@ fn text_and_blob_data_types_should_fail_on_index() {
 #[test]
 fn text_and_blob_data_types_can_not_be_unique() {
     fn error_msg(type_name: &str) -> String {
-        format!("Native type {} can not be unique in SQL Server.", type_name)
+        format!("Native type {} cannot be unique in SQL Server.", type_name)
     }
 
     for tpe in BLOB_TYPES {
@@ -51,7 +51,7 @@ fn text_and_blob_data_types_can_not_be_unique() {
 fn text_and_blob_data_types_should_fail_on_id_attribute() {
     fn error_msg(type_name: &str) -> String {
         format!(
-            "Native type {} of SQL Server can not be used on a field that is `@id` or `@@id`.",
+            "Native type {} of SQL Server cannot be used on a field that is `@id` or `@@id`.",
             type_name
         )
     }

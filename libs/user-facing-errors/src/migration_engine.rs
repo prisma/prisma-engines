@@ -227,7 +227,7 @@ pub struct MigrationToMarkAppliedNotFound {
 #[derive(Debug, Serialize, UserFacingError)]
 #[user_facing(
     code = "P3018",
-    message = "A migration failed to apply. New migrations can not be applied before the error is recovered from. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve\n\nMigration name: {migration_name}\n\nDatabase error code: {database_error_code}\n\nDatabase error:\n{database_error}
+    message = "A migration failed to apply. New migrations cannot be applied before the error is recovered from. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve\n\nMigration name: {migration_name}\n\nDatabase error code: {database_error_code}\n\nDatabase error:\n{database_error}
 "
 )]
 pub struct ApplyMigrationError {
@@ -258,7 +258,7 @@ pub struct AzureMssqlShadowDb;
 #[derive(Debug, Serialize, UserFacingError)]
 #[user_facing(
     code = "P3021",
-    message = "Foreign keys can not be created on this database. Learn more how to handle this: https://pris.ly/d/migrate-no-foreign-keys"
+    message = "Foreign keys cannot be created on this database. Learn more how to handle this: https://pris.ly/d/migrate-no-foreign-keys"
 )]
 pub struct ForeignKeyCreationNotAllowed;
 
