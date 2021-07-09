@@ -40,7 +40,7 @@ pub trait Connector: Send + Sync {
         false
     }
 
-    fn validate_field(&self, model: &Model, field: &Field) -> Result<(), ConnectorError>;
+    fn validate_field(&self, field: &Field) -> Result<(), ConnectorError>;
 
     fn validate_model(&self, model: &Model) -> Result<(), ConnectorError>;
 

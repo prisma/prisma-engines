@@ -280,7 +280,7 @@ impl Connector for MySqlDatamodelConnector {
             .any(|(st, nt)| scalar_type == st && &native_type == nt)
     }
 
-    fn validate_field(&self, _model: &Model, field: &Field) -> Result<(), ConnectorError> {
+    fn validate_field(&self, field: &Field) -> Result<(), ConnectorError> {
         match field.field_type() {
             FieldType::Scalar(scalar_type, _, Some(native_type_instance)) => {
                 let native_type: MySqlType = native_type_instance.deserialize_native_type();

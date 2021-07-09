@@ -230,7 +230,7 @@ impl Connector for MsSqlDatamodelConnector {
         Cow::Borrowed(url)
     }
 
-    fn validate_field(&self, _model: &Model, field: &Field) -> Result<(), ConnectorError> {
+    fn validate_field(&self, field: &Field) -> Result<(), ConnectorError> {
         match field.field_type() {
             FieldType::Scalar(_, _, Some(native_type)) => {
                 let r#type: MsSqlType = native_type.deserialize_native_type();

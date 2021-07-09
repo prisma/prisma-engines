@@ -69,7 +69,7 @@ impl Connector for SqliteDatamodelConnector {
         false
     }
 
-    fn validate_field(&self, _model: &Model, _field: &Field) -> Result<(), ConnectorError> {
+    fn validate_field(&self, _field: &Field) -> Result<(), ConnectorError> {
         Ok(())
     }
 
