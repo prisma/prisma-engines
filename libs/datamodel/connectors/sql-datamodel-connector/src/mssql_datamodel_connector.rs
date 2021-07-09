@@ -3,7 +3,7 @@ use datamodel_connector::helper::{arg_vec_from_opt, args_vec_from_opt, parse_one
 use datamodel_connector::{Connector, ConnectorCapability};
 use dml::{
     field::{Field, FieldType},
-    model::{IndexType, Model},
+    model::Model,
     native_type_constructor::NativeTypeConstructor,
     native_type_instance::NativeTypeInstance,
     relation_info::ReferentialAction,
@@ -279,7 +279,7 @@ impl Connector for MsSqlDatamodelConnector {
                     let error = self.native_instance_error(native_type);
 
                     if heap_allocated_types().contains(&r#type) {
-                        return if index_definition.tpe == IndexType::Unique {
+                        return if index_definition.is_unique() {
                             error.new_incompatible_native_type_with_unique()
                         } else {
                             error.new_incompatible_native_type_with_index()

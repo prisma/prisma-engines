@@ -23,7 +23,7 @@ impl<'a> LowerDmlToAst<'a> {
         model
             .indices
             .iter()
-            .filter(|index| index.tpe == IndexType::Unique)
+            .filter(|index| index.is_unique() && !index.defined_on_field)
             .for_each(|index_def| {
                 let mut args = vec![ast::Argument::new_array(
                     "",

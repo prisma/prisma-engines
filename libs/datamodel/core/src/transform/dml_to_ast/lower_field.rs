@@ -64,14 +64,14 @@ impl<'a> LowerDmlToAst<'a> {
 
         // @id
         if let dml::Field::ScalarField(sf) = field {
-            if model.field_is_primary(&sf.name) {
+            if model.field_is_primary_and_defined_on_field(&sf.name) {
                 attributes.push(ast::Attribute::new("id", Vec::new()));
             }
         }
 
         // @unique
         if let dml::Field::ScalarField(sf) = field {
-            if model.field_is_unique(&sf.name) {
+            if model.field_is_unique_and_defined_on_field(&sf.name) {
                 attributes.push(ast::Attribute::new("unique", vec![]));
             }
         }

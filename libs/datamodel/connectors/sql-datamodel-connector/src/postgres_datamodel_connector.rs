@@ -5,7 +5,7 @@ use datamodel_connector::{
 };
 use dml::{
     field::{Field, FieldType},
-    model::{IndexType, Model},
+    model::Model,
     native_type_constructor::NativeTypeConstructor,
     native_type_instance::NativeTypeInstance,
     relation_info::ReferentialAction,
@@ -265,7 +265,7 @@ impl Connector for PostgresDatamodelConnector {
                     let error = self.native_instance_error(native_type);
 
                     if r#type == PostgresType::Xml {
-                        return if index_definition.tpe == IndexType::Unique {
+                        return if index_definition.is_unique() {
                             error.new_incompatible_native_type_with_unique()
                         } else {
                             error.new_incompatible_native_type_with_index()

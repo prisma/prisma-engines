@@ -1,5 +1,5 @@
 use super::{Datamodel, Enum, EnumValue, Field, Function, Model, UniqueIndex};
-use crate::{dml, FieldType, Ignorable, IndexType, ScalarType};
+use crate::{dml, FieldType, Ignorable, ScalarType};
 use bigdecimal::ToPrimitive;
 use prisma_value::PrismaValue;
 
@@ -69,13 +69,13 @@ fn model_to_dmmf(model: &dml::Model) -> Model {
         unique_fields: model
             .indices
             .iter()
-            .filter_map(|i| (i.tpe == IndexType::Unique).then(|| i.fields.clone()))
+            .filter_map(|i| (i.is_unique() && !i.defined_on_field).then(|| i.fields.clone()))
             .collect(),
         unique_indexes: model
             .indices
             .iter()
             .filter_map(|i| {
-                (i.tpe == IndexType::Unique).then(|| UniqueIndex {
+                (i.is_unique() && !i.defined_on_field).then(|| UniqueIndex {
                     name: i.name.clone(),
                     fields: i.fields.clone(),
                 })

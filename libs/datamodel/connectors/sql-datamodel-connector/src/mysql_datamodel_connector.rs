@@ -5,7 +5,7 @@ use datamodel_connector::{
 };
 use dml::{
     field::{Field, FieldType},
-    model::{IndexType, Model},
+    model::Model,
     native_type_constructor::NativeTypeConstructor,
     native_type_instance::NativeTypeInstance,
     relation_info::ReferentialAction,
@@ -323,7 +323,7 @@ impl Connector for MySqlDatamodelConnector {
                     let native_type_name = native_type.name.as_str();
 
                     if NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type_name) {
-                        return if index_definition.tpe == IndexType::Unique {
+                        return if index_definition.is_unique() {
                             self.native_instance_error(native_type.clone())
                                 .new_incompatible_native_type_with_unique()
                         } else {

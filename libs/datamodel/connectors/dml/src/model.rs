@@ -236,7 +236,7 @@ impl Model {
             let mut unique_field_combi: Vec<UniqueCriteria> = self
                 .indices
                 .iter()
-                .filter(|id| id.tpe == IndexType::Unique)
+                .filter(|id| id.is_unique())
                 .filter_map(|id| {
                     let fields: Vec<_> = id.fields.iter().map(|f| self.find_scalar_field(f).unwrap()).collect();
                     let no_fields_are_ineligible = !fields.iter().any(|f| in_eligible(f));
@@ -306,8 +306,17 @@ impl Model {
             .any(|i| i.is_unique() && i.fields == vec![name.to_string()])
     }
 
+    pub fn field_is_unique_and_defined_on_field(&self, name: &str) -> bool {
+        self.indices
+            .iter()
+            .any(|i| i.is_unique() && i.fields == vec![name.to_string()] && i.defined_on_field)
+    }
+
     pub fn field_is_primary(&self, field_name: &str) -> bool {
         matches!(&self.primary_key, Some(PrimaryKeyDefinition{ fields, .. }) if fields == &vec![field_name.to_string()])
+    }
+    pub fn field_is_primary_and_defined_on_field(&self, field_name: &str) -> bool {
+        matches!(&self.primary_key, Some(PrimaryKeyDefinition{ fields, defined_on_field , ..}) if fields == &vec![field_name.to_string()] && *defined_on_field)
     }
 
     pub fn field_is_auto_generated_int_id(&self, name: &str) -> bool {
