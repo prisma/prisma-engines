@@ -75,7 +75,7 @@ fn single_field_unique_on_enum_field_must_work() {
     let schema = parse(dml);
     let model = schema.assert_has_model("User");
     model.assert_has_scalar_field("role");
-    assert_eq!(true, model.field_is_unique("role"));
+    assert!(model.field_is_unique("role"));
 }
 
 #[test]
