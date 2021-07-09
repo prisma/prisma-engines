@@ -13,7 +13,7 @@ use crate::{
 use itertools::Itertools;
 use prisma_value::PrismaValue;
 
-pub(super) fn resolve_model_attributes<'ast>(
+pub(super) fn resolve_model_and_field_attributes<'ast>(
     model_id: ast::ModelId,
     ast_model: &'ast ast::Model,
     ctx: &mut Context<'ast>,

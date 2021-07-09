@@ -247,32 +247,6 @@ impl<'a> Validator<'a> {
         ast_model: &ast::Model,
         model: &dml::Model,
     ) -> Result<(), DatamodelError> {
-        //move this whole area to lift
-        {
-            // let multiple_single_field_id_error = Err(DatamodelError::new_model_validation_error(
-            //     "At most one field must be marked as the id field with the `@id` attribute.",
-            //     &model.name,
-            //     ast_model.span,
-            // ));
-            //
-            // let multiple_id_criteria_error = Err(DatamodelError::new_model_validation_error(
-            //     "Each model must have at most one id criteria. You can't have `@id` and `@@id` at the same time.",
-            //     &model.name,
-            //     ast_model.span,
-            // ));
-
-            //     let has_single_field_id = model.singular_id_fields().is_some();
-            //     let has_multi_field_id = !model.id_fields.is_empty();
-            //
-            // if model.singular_id_fields().count() > 1 {
-            //     return multiple_single_field_id_error;
-            // }
-            //
-            //     if has_single_field_id && has_multi_field_id {
-            //         return multiple_id_criteria_error;
-            //     }
-        }
-
         let loose_criterias = model.loose_unique_criterias();
         let suffix = if loose_criterias.is_empty() {
             "".to_string()
