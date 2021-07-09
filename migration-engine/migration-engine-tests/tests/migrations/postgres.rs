@@ -249,7 +249,7 @@ fn postgres_apply_migrations_errors_give_precise_location(api: TestApi) {
         .replace(&migration_name, "<migration-name>");
 
     let expectation = expect![[r#"
-        A migration failed to apply. New migrations can not be applied before the error is recovered from. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve
+        A migration failed to apply. New migrations cannot be applied before the error is recovered from. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve
 
         Migration name: <migration-name>
 
@@ -305,7 +305,7 @@ fn postgres_apply_migrations_errors_give_precise_location_at_the_beginning_of_fi
         .replace(&migration_name, "<migration-name>");
 
     let expectation = expect![[r#"
-        A migration failed to apply. New migrations can not be applied before the error is recovered from. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve
+        A migration failed to apply. New migrations cannot be applied before the error is recovered from. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve
 
         Migration name: <migration-name>
 

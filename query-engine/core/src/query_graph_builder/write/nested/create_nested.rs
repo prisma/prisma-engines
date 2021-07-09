@@ -278,7 +278,7 @@ fn handle_one_to_many(
 ///      └────────────┘
 /// ```
 ///
-/// Important: We can not inject from `Child Create` to `Parent` if `Parent` is a non-create, as it would cause
+/// Important: We cannot inject from `Child Create` to `Parent` if `Parent` is a non-create, as it would cause
 /// the following issue (example):
 /// - Parent is an update, doesn't have a connected child on relation x.
 /// - Parent gets injected with a child on x, because that's what the nested create is supposed to do.

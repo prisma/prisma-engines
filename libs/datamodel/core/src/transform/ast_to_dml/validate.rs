@@ -804,7 +804,7 @@ impl<'a> Validator<'a> {
                 // MANY TO MANY
                 if field.is_list() && related_field.is_list() && !related_model.has_single_id_field() {
                     let message = format!(
-                        "The relation field `{}` on Model `{}` references `{}` which does not have an `@id` field. Models without `@id` can not be part of a many to many relation. Use an explicit intermediate Model to represent this relationship.",
+                        "The relation field `{}` on Model `{}` references `{}` which does not have an `@id` field. Models without `@id` cannot be part of a many to many relation. Use an explicit intermediate Model to represent this relationship.",
                         &field.name,
                         &model.name,
                         &related_model.name,

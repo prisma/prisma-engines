@@ -171,7 +171,7 @@ case class TestServer() extends PlayJsonExtensions with LogSupport {
     val lines    = response.linesIterator.toVector
     debug(lines.mkString("\n"))
 
-    val responseMarker = "Response: " // due to race conditions the response can not always be found in the last line
+    val responseMarker = "Response: " // due to race conditions the response cannot always be found in the last line
     val responseLine   = lines.find(_.startsWith(responseMarker)).get.stripPrefix(responseMarker).stripSuffix("\n")
 
     Try(UTF8Base64.decode(responseLine)) match {
