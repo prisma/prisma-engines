@@ -131,7 +131,7 @@ pub(crate) fn calculate_index(index: &Index) -> IndexDefinition {
         name: Some(index.name.clone()),
         fields: index.columns.clone(),
         tpe,
-        defined_on_field: false,
+        defined_on_field: index.columns.len() == 1,
     }
 }
 

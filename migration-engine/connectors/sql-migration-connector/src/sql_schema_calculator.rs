@@ -69,7 +69,7 @@ fn calculate_model_tables<'a>(
                 };
 
                 let index_name = index_definition.name.clone().unwrap_or_else(|| {
-                    if index_definition.fields.len() == 1 {
+                    if index_definition.fields.len() == 1 && index_definition.is_unique() {
                         let field = model
                             .find_scalar_field(index_definition.fields.first().unwrap())
                             .unwrap();

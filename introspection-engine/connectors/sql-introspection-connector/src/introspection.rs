@@ -49,11 +49,7 @@ pub fn introspect(
             model.add_field(Field::RelationField(relation_field));
         }
 
-        for index in table
-            .indices
-            .iter()
-            .filter(|i| !(i.columns.len() == 1 && i.is_unique()))
-        {
+        for index in &table.indices {
             model.add_index(calculate_index(index));
         }
 
