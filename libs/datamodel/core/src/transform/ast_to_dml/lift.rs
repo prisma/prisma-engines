@@ -68,7 +68,7 @@ impl<'a> LiftAstToDml<'a> {
                     .iter()
                     .map(|id| self.db.ast()[model_id][*id].name.name.clone())
                     .collect(),
-                defined_on_field: false,
+                defined_on_field: pk_data.source_field.is_some(),
             });
 
         model.indices = model_data

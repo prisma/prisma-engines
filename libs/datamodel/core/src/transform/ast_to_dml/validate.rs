@@ -571,7 +571,11 @@ impl<'a> Validator<'a> {
 
                 // TODO: This error is only valid for connectors that don't support native many to manys.
                 // We only render this error if there's a singular id field. Otherwise we render a better error in a different function.
-                if is_many_to_many && !references_singular_id_field && related_model.has_single_id_field() {
+                if is_many_to_many
+                    && !references_singular_id_field
+                    && related_model.has_single_id_field()
+                    && model.has_single_id_field()
+                {
                     errors.push_error(DatamodelError::new_validation_error(
                             &format!(
                                 "Many to many relations must always reference the id field of the related model. Change the argument `references` to use the id field of the related model `{}`. But it is referencing the following fields that are not the id: {}",
