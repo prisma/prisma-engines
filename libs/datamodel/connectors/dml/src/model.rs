@@ -315,6 +315,7 @@ impl Model {
     pub fn field_is_primary(&self, field_name: &str) -> bool {
         matches!(&self.primary_key, Some(PrimaryKeyDefinition{ fields, .. }) if fields == &vec![field_name.to_string()])
     }
+
     pub fn field_is_primary_and_defined_on_field(&self, field_name: &str) -> bool {
         matches!(&self.primary_key, Some(PrimaryKeyDefinition{ fields, defined_on_field , ..}) if fields == &vec![field_name.to_string()] && *defined_on_field)
     }
