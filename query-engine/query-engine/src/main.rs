@@ -29,7 +29,7 @@ pub enum LogFormat {
 pub type PrismaResult<T> = Result<T, PrismaError>;
 type AnyError = Box<dyn Error + Send + Sync + 'static>;
 
-#[async_std::main]
+#[tokio::main]
 async fn main() -> Result<(), AnyError> {
     return main().await.map_err(|err| {
         info!("Encountered error during initialization:");
