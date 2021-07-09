@@ -689,32 +689,32 @@ fn must_error_when_non_id_field_is_referenced_in_a_many_to_many() {
 fn must_succeed_when_id_field_is_referenced_in_a_many_to_many() {
     let dml = r#"
     model Post {
-      id         Int @id        
+      id_post    Int @id        
       slug       Int        @unique
-      categories Category[] @relation(references: [id])
+      categories Category[] @relation(references: [id_category])
     }
 
    model Category {
-     id    Int    @default(autoincrement()) @id
-     posts Post[] @relation(references: [id])
+     id_category    Int    @default(autoincrement()) @id
+     posts          Post[] @relation(references: [id_post])
    }"#;
 
     assert!(datamodel::parse_datamodel(dml).is_ok());
 
     let dml2 = r#"
     model Post {
-      id         Int
-      slug       Int        @unique
-      categories Category[] @relation(references: [id])
+      id_post         Int
+      slug            Int        @unique
+      categories      Category[] @relation(references: [id_category])
 
-      @@id([id])
+      @@id([id_post])
    }
 
    model Category {
-     id    Int    @default(autoincrement())
-     posts Post[] @relation(references: [id])
+     id_category     Int    @default(autoincrement())
+     posts           Post[] @relation(references: [id_post])
 
-     @@id([id])
+     @@id([id_category])
    }"#;
 
     assert!(datamodel::parse_datamodel(dml2).is_ok());

@@ -464,14 +464,8 @@ impl<'a> Validator<'a> {
                     true
                 };
 
-                let references_singular_id_field = if rel_info.references.len() == 1 {
-                    let field_name = rel_info.references.first().unwrap();
-                    // the unwrap is safe. We error out earlier if an unknown field is referenced.
-                    let referenced_field = related_model.find_scalar_field(field_name).unwrap();
-                    model.field_is_primary(&referenced_field.name)
-                } else {
-                    false
-                };
+                let references_singular_id_field = rel_info.references.len() == 1
+                    && related_model.field_is_primary(&rel_info.references.first().unwrap());
 
                 let is_many_to_many = {
                     // Back relation fields have not been added yet. So we must calculate this on our own.
