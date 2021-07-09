@@ -34,7 +34,7 @@ pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRe
 
     create_nested_inputs(ctx);
 
-    if ctx.enable_raw_queries {
+    if ctx.enable_raw_queries && ctx.capabilities.contains(ConnectorCapability::QueryRaw) {
         fields.push(create_execute_raw_field());
         fields.push(create_query_raw_field());
     }
