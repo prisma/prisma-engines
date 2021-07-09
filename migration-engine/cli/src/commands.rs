@@ -1,6 +1,3 @@
-#[cfg(test)]
-mod tests;
-
 use crate::logger::log_error_and_exit;
 use enumflags2::BitFlags;
 use migration_connector::ConnectorError;
