@@ -8,7 +8,7 @@ pub enum ScalarProjection {
     /// A single field projection.
     Single(ScalarFieldRef),
 
-    /// A tuple projection, e.g. if (a, b) IN ((1, 2), (1, 3), ...) is supposed to be queried.
+    /// A tuple projection, e.g. if (a, b) <in> ((1, 2), (1, 3), ...) is supposed to be queried.
     Compound(Vec<ScalarFieldRef>),
 }
 
@@ -27,7 +27,7 @@ impl ScalarProjection {
 ///
 /// ```graphql
 /// findManyUser(where: { id: 5 })
-/// ````
+/// ```
 ///
 /// This translates to a projection of one column `id` with a condition where
 /// the column value equals `5`.

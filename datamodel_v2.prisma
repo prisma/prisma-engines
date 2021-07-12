@@ -20,8 +20,8 @@ model Parent {
 }
 
 model Child {
-  c          String  @unique
   id         String  @id @default(cuid()) @map("_id")
+  c          String  @unique
   c_1        String
   c_2        String
   parentOpt  Parent? @relation(fields: [parent_p_1, parent_p_2], references: [p_1, p_2])
