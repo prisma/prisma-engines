@@ -5,7 +5,10 @@ use std::{collections::BTreeSet, sync::Arc};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ScalarProjection {
+    /// A single field projection.
     Single(ScalarFieldRef),
+
+    /// A tuple projection, e.g. if (a, b) IN ((1, 2), (1, 3), ...) is supposed to be queried.
     Compound(Vec<ScalarFieldRef>),
 }
 

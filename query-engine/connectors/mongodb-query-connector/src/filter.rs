@@ -99,11 +99,12 @@ fn fold_nested(nested: Vec<(Document, Vec<JoinStage>)>) -> (Vec<Document>, Vec<J
 }
 
 fn scalar_filter(filter: ScalarFilter, invert: bool, include_field_wrapper: bool) -> crate::Result<MongoFilter> {
-    // Todo: Find out what Compound cases are really. (Guess: Relation fields with multi-field FK?)
     let field = match filter.projection {
         connector_interface::ScalarProjection::Single(sf) => sf,
         connector_interface::ScalarProjection::Compound(mut c) if c.len() == 1 => c.pop().unwrap(),
-        connector_interface::ScalarProjection::Compound(_) => {
+        connector_interface::ScalarProjection::Compound(fields) => {
+            dbg!(fields);
+            dbg!(filter.condition);
             unimplemented!("Compound filter case.")
         }
     };
