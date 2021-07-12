@@ -1,115 +1,33 @@
-datasource chinook {
-  provider = "sqlite"
-  url      = "file:./db/Chinook.db?connection_limit=1&socket_timeout=20"
+datasource test {
+  provider = "mongodb"
+  url      = "mongodb://prisma:prisma@127.0.0.1:27017/connect_inside_create_p1_c1_connect_by_id_18?authSource=admin&retryWrites=true"
 }
 
-generator js {
+generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["microsoftSqlServer", "mongodb", "orderByRelation", "napi", "selectRelationCount", "orderByAggregateGroup"]
+  previewFeatures = ["microsoftSqlServer", "orderByRelation", "nApi", "selectRelationCount", "orderByAggregateGroup", "filterJson", "planetScaleMode", "referentialActions", "mongoDb"]
 }
 
-model Album {
-  id       Int     @id @map("AlbumId")
-  Title    String  @default("TestDefaultTitle")
-  ArtistId Int
-  Tracks   Track[]
-  Artist   Artist  @relation(fields: [ArtistId], references: [id])
+model Parent {
+  id         String  @id @default(cuid()) @map("_id")
+  p          String  @unique
+  p_1        String
+  p_2        String
+  childOpt   Child?
+  non_unique String?
+
+  @@unique([p_1, p_2])
 }
 
-model Track {
-  id           Int           @id @map("TrackId")
-  Name         String
-  Composer     String?
-  Milliseconds Int
-  UnitPrice    Float
-  AlbumId      Int?
-  GenreId      Int?
-  MediaTypeId  Int
-  MediaType    MediaType     @relation(fields: [MediaTypeId], references: [id])
-  Genre        Genre?        @relation(fields: [GenreId], references: [id])
-  Album        Album?        @relation(fields: [AlbumId], references: [id])
-  InvoiceLines InvoiceLine[]
-}
+model Child {
+  id         String  @id @default(cuid()) @map("_id")
+  c          String  @unique
+  c_1        String
+  c_2        String
+  parentOpt  Parent? @relation(fields: [parent_p_1, parent_p_2], references: [p_1, p_2])
+  parent_p_1 String?
+  parent_p_2 String?
+  non_unique String?
 
-model MediaType {
-  id    Int     @id @map("MediaTypeId")
-  Name  String?
-  Track Track[]
-}
-
-model Genre {
-  id     Int     @id @map("GenreId")
-  Name   String?
-  Tracks Track[]
-}
-
-model Artist {
-  id     Int     @id @map("ArtistId")
-  Name   String?
-  Albums Album[]
-}
-
-model Customer {
-  id           Int       @id @map("CustomerId")
-  FirstName    String
-  LastName     String
-  Company      String?
-  Address      String?
-  City         String?
-  State        String?
-  Country      String?
-  PostalCode   String?
-  Phone        String?
-  Fax          String?
-  Email        String
-  SupportRepId Int?
-  SupportRep   Employee? @relation(fields: [SupportRepId], references: [id])
-  Invoices     Invoice[]
-}
-
-model Employee {
-  id         Int        @id @map("EmployeeId")
-  FirstName  String
-  LastName   String
-  Title      String?
-  BirthDate  DateTime?
-  HireDate   DateTime?
-  Address    String?
-  City       String?
-  State      String?
-  Country    String?
-  PostalCode String?
-  Phone      String?
-  Fax        String?
-  Email      String?
-  Customers  Customer[]
-}
-
-model Invoice {
-  id                Int           @id @map("InvoiceId")
-  InvoiceDate       DateTime
-  BillingAddress    String?
-  BillingCity       String?
-  BillingState      String?
-  BillingCountry    String?
-  BillingPostalCode String?
-  Total             Float
-  CustomerId        Int
-  Customer          Customer      @relation(fields: [CustomerId], references: [id])
-  Lines             InvoiceLine[]
-}
-
-model InvoiceLine {
-  id        Int     @id @map("InvoiceLineId")
-  UnitPrice Float
-  Quantity  Int
-  InvoiceId Int
-  TrackId   Int
-  Invoice   Invoice @relation(fields: [InvoiceId], references: [id])
-  Track     Track   @relation(fields: [TrackId], references: [id])
-}
-
-model Playlist {
-  id   Int     @id @map("PlaylistId")
-  Name String?
+  @@unique([c_1, c_2])
 }

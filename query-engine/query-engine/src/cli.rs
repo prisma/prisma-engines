@@ -10,7 +10,7 @@ use datamodel_connector::ConnectorCapabilities;
 use prisma_models::DatamodelConverter;
 use query_core::{schema::QuerySchemaRef, schema_builder, BuildMode};
 use request_handlers::{dmmf, GraphQlHandler};
-use std::sync::Arc;
+use std::{env, sync::Arc};
 
 pub struct ExecuteRequest {
     legacy: bool,
@@ -116,10 +116,12 @@ impl CliCommand {
         let config = &mut req.config;
 
         if !req.ignore_env_var_errors {
-            config.subject.resolve_datasource_urls_from_env(&[])?;
+            config
+                .subject
+                .resolve_datasource_urls_from_env(&[], |key| env::var(key).ok())?;
         }
 
-        let json = datamodel::json::mcf::config_to_mcf_json_value(&config);
+        let json = datamodel::json::mcf::config_to_mcf_json_value(config);
         let serialized = serde_json::to_string(&json)?;
 
         println!("{}", serialized);

@@ -7,73 +7,54 @@ use crate::diagnostics::warning::DatamodelWarning;
 /// It is used to not error out early and instead show multiple errors at once.
 #[derive(Debug, Clone)]
 pub struct Diagnostics {
-    pub errors: Vec<DatamodelError>,
-    pub warnings: Vec<DatamodelWarning>,
+    errors: Vec<DatamodelError>,
+    warnings: Vec<DatamodelWarning>,
 }
 
 impl Diagnostics {
-    pub fn new() -> Diagnostics {
+    pub(crate) fn new() -> Diagnostics {
         Diagnostics {
             errors: Vec::new(),
             warnings: Vec::new(),
         }
     }
 
-    pub fn push_error(&mut self, err: DatamodelError) {
+    pub fn errors(&self) -> &[DatamodelError] {
+        &self.errors
+    }
+
+    pub fn warnings(&self) -> &[DatamodelWarning] {
+        &self.warnings
+    }
+
+    pub(crate) fn warnings_mut(&mut self) -> &mut Vec<DatamodelWarning> {
+        &mut self.warnings
+    }
+
+    pub(crate) fn push_error(&mut self, err: DatamodelError) {
         self.errors.push(err)
     }
 
-    pub fn push_warning(&mut self, warning: DatamodelWarning) {
+    pub(crate) fn push_warning(&mut self, warning: DatamodelWarning) {
         self.warnings.push(warning)
     }
 
-    pub fn push_opt_error(&mut self, err: Option<DatamodelError>) {
-        if let Some(err) = err {
-            self.push_error(err);
-        }
-    }
-
-    pub fn merge_error(mut self, err: DatamodelError) -> Diagnostics {
-        self.push_error(err);
-
-        self
-    }
-
-    /// Returns true, if there is at least one error
-    /// in this collection.
-    pub fn has_errors(&self) -> bool {
+    /// Returns true, if there is at least one error in this collection.
+    pub(crate) fn has_errors(&self) -> bool {
         !self.errors.is_empty()
     }
 
-    pub fn has_warnings(&self) -> bool {
-        !self.warnings.is_empty()
-    }
-
-    /// Creates an iterator over all errors in this collection.
-    pub fn to_error_iter(&self) -> std::slice::Iter<'_, DatamodelError> {
-        self.errors.iter()
-    }
-
-    /// Creates an iterator over all warnings in this collection.
-    pub fn to_warning_iter(&self) -> std::slice::Iter<'_, DatamodelWarning> {
-        self.warnings.iter()
-    }
-
-    /// Appends all errors from another collection to this collection.
-    pub fn append(&mut self, err_and_warn: &mut Diagnostics) {
+    /// Appends all errors and warnings from another collection to this collection.
+    pub(crate) fn append(&mut self, err_and_warn: &mut Diagnostics) {
         self.errors.append(&mut err_and_warn.errors);
         self.warnings.append(&mut err_and_warn.warnings)
     }
 
-    pub fn append_error_vec(&mut self, mut errors: Vec<DatamodelError>) {
-        self.errors.append(&mut errors)
-    }
-
-    pub fn append_warning_vec(&mut self, mut warnings: Vec<DatamodelWarning>) {
+    pub(crate) fn append_warning_vec(&mut self, mut warnings: Vec<DatamodelWarning>) {
         self.warnings.append(&mut warnings);
     }
 
-    pub fn to_result(&self) -> Result<(), Diagnostics> {
+    pub(crate) fn to_result(&self) -> Result<(), Diagnostics> {
         if self.has_errors() {
             Err(self.clone())
         } else {
@@ -84,7 +65,7 @@ impl Diagnostics {
     pub fn to_pretty_string(&self, file_name: &str, datamodel_string: &str) -> String {
         let mut message: Vec<u8> = Vec::new();
 
-        for err in self.to_error_iter() {
+        for err in self.errors() {
             err.pretty_print(&mut message, file_name, datamodel_string)
                 .expect("printing datamodel error");
         }

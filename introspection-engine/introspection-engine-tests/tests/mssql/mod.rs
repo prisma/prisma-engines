@@ -23,7 +23,7 @@ async fn geometry_should_be_unsupported(api: &TestApi) -> TestResult {
         }
     "#};
 
-    api.assert_eq_datamodels(&dm, &result);
+    api.assert_eq_datamodels(dm, &result);
 
     Ok(())
 }
@@ -49,7 +49,41 @@ async fn user_defined_type_aliases_should_map_to_the_system_type(api: &TestApi) 
 
     let result = api.introspect().await?;
 
-    api.assert_eq_datamodels(&dm, &result);
+    api.assert_eq_datamodels(dm, &result);
+
+    Ok(())
+}
+
+#[test_connector(tags(Mssql))]
+async fn ms_xml_indexes_are_skipped(api: &TestApi) -> TestResult {
+    let create_table = format!(
+        "CREATE TABLE [{schema_name}].[xml_test] (id INT IDENTITY PRIMARY KEY, data XML)",
+        schema_name = api.schema_name()
+    );
+
+    let create_primary = format!(
+        "CREATE PRIMARY XML INDEX primaryIndex ON [{schema_name}].[xml_test] (data)",
+        schema_name = api.schema_name(),
+    );
+
+    let create_secondary = format!(
+        "CREATE XML INDEX secondaryIndex ON [{schema_name}].[xml_test] (data) USING XML INDEX primaryIndex FOR PATH",
+        schema_name = api.schema_name(),
+    );
+
+    api.database().raw_cmd(&create_table).await?;
+    api.database().raw_cmd(&create_primary).await?;
+    api.database().raw_cmd(&create_secondary).await?;
+
+    let dm = indoc! {r#"
+        model xml_test {
+          id   Int @id @default(autoincrement())
+          data String? @db.Xml
+        }
+    "#};
+
+    let result = api.introspect().await?;
+    api.assert_eq_datamodels(dm, &result);
 
     Ok(())
 }

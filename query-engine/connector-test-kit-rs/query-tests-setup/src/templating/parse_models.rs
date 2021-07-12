@@ -149,7 +149,7 @@ pub struct M2mFragment {
     pub field_type: String,
 
     /// Type of the opposing ID.
-    //// Required info for some connectors to render.
+    /// Required info for some connectors to render.
     pub opposing_type: String,
 
     /// M2m relations can be named as well for disambiguation,

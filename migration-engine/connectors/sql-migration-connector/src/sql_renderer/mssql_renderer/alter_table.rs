@@ -2,14 +2,14 @@ use super::render_default;
 use crate::{
     flavour::MssqlFlavour,
     pair::Pair,
+    sql_migration::AlterColumn,
     sql_migration::TableChange,
-    sql_migration::{AddColumn, AlterColumn, DropColumn},
     sql_renderer::{common::IteratorJoin, SqlRenderer},
     sql_schema_differ::ColumnChanges,
 };
 use sql_schema_describer::{
     walkers::{ColumnWalker, TableWalker},
-    DefaultValue,
+    ColumnId, DefaultValue,
 };
 use std::collections::BTreeSet;
 
@@ -51,24 +51,24 @@ impl<'a> AlterTableConstructor<'a> {
                 TableChange::DropPrimaryKey => {
                     self.drop_primary_key();
                 }
-                TableChange::AddPrimaryKey { columns } => {
-                    self.add_primary_key(&columns);
+                TableChange::AddPrimaryKey => {
+                    self.add_primary_key();
                 }
-                TableChange::AddColumn(AddColumn { column_index }) => {
-                    self.add_column(*column_index);
+                TableChange::AddColumn { column_id } => {
+                    self.add_column(*column_id);
                 }
-                TableChange::DropColumn(DropColumn { index }) => {
-                    self.drop_column(*index);
+                TableChange::DropColumn { column_id } => {
+                    self.drop_column(*column_id);
                 }
-                TableChange::DropAndRecreateColumn { column_index, .. } => {
-                    self.drop_and_recreate_column(*column_index);
+                TableChange::DropAndRecreateColumn { column_id, .. } => {
+                    self.drop_and_recreate_column(*column_id);
                 }
                 TableChange::AlterColumn(AlterColumn {
-                    column_index,
+                    column_id,
                     changes,
                     type_change: _,
                 }) => {
-                    self.alter_column(*column_index, &changes);
+                    self.alter_column(*column_id, changes);
                 }
             };
         }
@@ -127,7 +127,8 @@ impl<'a> AlterTableConstructor<'a> {
             .insert(format!("{}", self.renderer.quote(constraint)));
     }
 
-    fn add_primary_key(&mut self, columns: &[String]) {
+    fn add_primary_key(&mut self) {
+        let columns = self.tables.next().primary_key_column_names().unwrap();
         let non_quoted_columns = columns.iter();
         let mut quoted_columns = Vec::with_capacity(columns.len());
 
@@ -143,20 +144,18 @@ impl<'a> AlterTableConstructor<'a> {
         ));
     }
 
-    fn add_column(&mut self, column_index: usize) {
-        let column = self.tables.next().column_at(column_index);
+    fn add_column(&mut self, column_id: ColumnId) {
+        let column = self.tables.next().column_at(column_id);
         self.add_columns.push(self.renderer.render_column(&column));
     }
 
-    fn drop_column(&mut self, column_index: usize) {
-        let name = self
-            .renderer
-            .quote(self.tables.previous().column_at(column_index).name());
+    fn drop_column(&mut self, column_id: ColumnId) {
+        let name = self.renderer.quote(self.tables.previous().column_at(column_id).name());
 
         self.drop_columns.push(format!("{}", name));
     }
 
-    fn drop_and_recreate_column(&mut self, columns: Pair<usize>) {
+    fn drop_and_recreate_column(&mut self, columns: Pair<ColumnId>) {
         let columns = self.tables.columns(&columns);
 
         self.drop_columns
@@ -165,7 +164,7 @@ impl<'a> AlterTableConstructor<'a> {
         self.add_columns.push(self.renderer.render_column(columns.next()));
     }
 
-    fn alter_column(&mut self, columns: Pair<usize>, changes: &ColumnChanges) {
+    fn alter_column(&mut self, columns: Pair<ColumnId>, changes: &ColumnChanges) {
         let columns = self.tables.columns(&columns);
         let expanded = expand_alter_column(&columns, changes);
 
@@ -195,7 +194,7 @@ impl<'a> AlterTableConstructor<'a> {
                     self.column_mods.push(format!(
                         "ALTER TABLE {table} ALTER COLUMN {column_name} {column_type} {nullability}",
                         table = self.renderer.quote_with_schema(self.tables.previous().name()),
-                        column_name = self.renderer.quote(&columns.next().name()),
+                        column_name = self.renderer.quote(columns.next().name()),
                         column_type = super::render_column_type(columns.next()),
                         nullability = nullability,
                     ));

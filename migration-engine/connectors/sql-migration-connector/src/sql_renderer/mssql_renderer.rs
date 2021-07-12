@@ -1,7 +1,7 @@
 mod alter_table;
 
 use super::{
-    common::{self, render_on_delete},
+    common::{self, render_referential_action},
     IteratorJoin, Quoted, SqlRenderer,
 };
 use crate::{
@@ -9,7 +9,7 @@ use crate::{
     pair::Pair,
     sql_migration::{AlterEnum, AlterTable, RedefineTable},
 };
-use indoc::formatdoc;
+use indoc::{formatdoc, indoc};
 use native_types::{MsSqlType, MsSqlTypeParameter};
 use prisma_value::PrismaValue;
 use sql_schema_describer::{
@@ -47,7 +47,7 @@ impl MssqlFlavour {
         let column_name = self.quote(column.name());
 
         let r#type = render_column_type(column);
-        let nullability = common::render_nullability(&column);
+        let nullability = common::render_nullability(column);
 
         let default = if column.is_autoincrement() {
             Cow::Borrowed(" IDENTITY(1,1)")
@@ -77,10 +77,11 @@ impl MssqlFlavour {
             .join(",");
 
         format!(
-            " REFERENCES {}({}) {} ON UPDATE CASCADE",
-            self.quote_with_schema(&foreign_key.referenced_table().name()),
+            " REFERENCES {}({}) ON DELETE {} ON UPDATE {}",
+            self.quote_with_schema(foreign_key.referenced_table().name()),
             cols,
-            render_on_delete(&foreign_key.on_delete_action()),
+            render_referential_action(foreign_key.on_delete_action()),
+            render_referential_action(foreign_key.on_update_action()),
         )
     }
 }
@@ -91,10 +92,13 @@ impl SqlRenderer for MssqlFlavour {
     }
 
     fn render_alter_table(&self, alter_table: &AlterTable, schemas: &Pair<&SqlSchema>) -> Vec<String> {
-        let AlterTable { table_index, changes } = alter_table;
+        let AlterTable {
+            table_ids: table_index,
+            changes,
+        } = alter_table;
         let tables = schemas.tables(table_index);
 
-        alter_table::create_statements(&self, tables, changes)
+        alter_table::create_statements(self, tables, changes)
     }
 
     fn render_alter_enum(&self, _: &AlterEnum, _: &Pair<&SqlSchema>) -> Vec<String> {
@@ -151,7 +155,7 @@ impl SqlRenderer for MssqlFlavour {
 
         let primary_key = if let Some(primary_columns) = primary_columns.as_ref().filter(|cols| !cols.is_empty()) {
             let index_name = format!("PK__{}__{}", table.name(), primary_columns.iter().join("_"));
-            let column_names = primary_columns.iter().map(|col| self.quote(&col)).join(",");
+            let column_names = primary_columns.iter().map(|col| self.quote(col)).join(",");
 
             format!(
                 ",\n    CONSTRAINT {} PRIMARY KEY ({})",
@@ -227,7 +231,7 @@ impl SqlRenderer for MssqlFlavour {
         let mut result = vec!["BEGIN TRANSACTION".to_string()];
 
         for redefine_table in tables {
-            let tables = schemas.tables(&redefine_table.table_index);
+            let tables = schemas.tables(&redefine_table.table_ids);
             // This is a copy of our new modified table.
             let temporary_table_name = format!("_prisma_new_{}", &tables.next().name());
 
@@ -383,7 +387,7 @@ impl SqlRenderer for MssqlFlavour {
     }
 
     fn render_drop_table(&self, table_name: &str) -> Vec<String> {
-        vec![format!("DROP TABLE {}", self.quote_with_schema(&table_name))]
+        vec![format!("DROP TABLE {}", self.quote_with_schema(table_name))]
     }
 
     fn render_drop_view(&self, view: &ViewWalker<'_>) -> String {
@@ -392,6 +396,35 @@ impl SqlRenderer for MssqlFlavour {
 
     fn render_drop_user_defined_type(&self, udt: &UserDefinedTypeWalker<'_>) -> String {
         todo!("DROP TYPE {}", self.quote_with_schema(udt.name()))
+    }
+
+    fn render_begin_transaction(&self) -> Option<&'static str> {
+        let sql = indoc! { r#"
+            BEGIN TRY
+
+            BEGIN TRAN;
+        "#};
+
+        Some(sql)
+    }
+
+    fn render_commit_transaction(&self) -> Option<&'static str> {
+        let sql = indoc! { r#"
+            COMMIT TRAN;
+
+            END TRY
+            BEGIN CATCH
+
+            IF @@TRANCOUNT > 0
+            BEGIN 
+                ROLLBACK TRAN;
+            END;
+            THROW
+
+            END CATCH
+        "# };
+
+        Some(sql)
     }
 }
 
@@ -459,7 +492,7 @@ fn render_default(default: &DefaultValue) -> Cow<'_, str> {
     match default.kind() {
         DefaultKind::DbGenerated(val) => val.as_str().into(),
         DefaultKind::Value(PrismaValue::String(val)) | DefaultKind::Value(PrismaValue::Enum(val)) => {
-            Quoted::mssql_string(escape_string_literal(&val)).to_string().into()
+            Quoted::mssql_string(escape_string_literal(val)).to_string().into()
         }
         DefaultKind::Value(PrismaValue::Bytes(b)) => format!("0x{}", common::format_hex(b)).into(),
         DefaultKind::Now => "CURRENT_TIMESTAMP".into(),

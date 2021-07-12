@@ -146,6 +146,6 @@ impl ToString for MySqlVersion {
 }
 
 fn mysql_capabilities() -> Vec<ConnectorCapability> {
-    let dm_connector = MySqlDatamodelConnector::new();
-    dm_connector.capabilities().clone()
+    let dm_connector = MySqlDatamodelConnector::new(false);
+    dm_connector.capabilities().to_owned()
 }

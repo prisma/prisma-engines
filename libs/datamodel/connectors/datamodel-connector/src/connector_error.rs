@@ -194,14 +194,14 @@ pub enum ErrorKind {
         given_count: usize,
     },
 
-    #[error("Native type {} can not be unique in {}.", native_type, connector_name)]
+    #[error("Native type {} cannot be unique in {}.", native_type, connector_name)]
     IncompatibleNativeTypeWithUniqueAttribute {
         native_type: String,
         connector_name: String,
     },
 
     #[error(
-        "Native type {} of {} can not be used on a field that is `@id` or `@@id`.",
+        "Native type {} of {} cannot be used on a field that is `@id` or `@@id`.",
         native_type,
         connector_name
     )]
@@ -211,7 +211,7 @@ pub enum ErrorKind {
     },
 
     #[error(
-        "You can not define an index on fields with Native type {} of {}.",
+        "You cannot define an index on fields with Native type {} of {}.",
         native_type,
         connector_name
     )]
@@ -276,4 +276,7 @@ pub enum ErrorKind {
 
     #[error("Invalid Native type {}.", native_type)]
     InvalidNativeType { native_type: String },
+
+    #[error("Invalid model: {}.", message)]
+    InvalidModelError { message: String },
 }

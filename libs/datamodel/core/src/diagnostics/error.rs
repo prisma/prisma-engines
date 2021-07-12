@@ -34,7 +34,7 @@ pub enum DatamodelError {
   #[error("The model with database name \"{}\" could not be defined because another model with this name exists: \"{}\"", model_database_name, existing_model_name)]
   DuplicateModelDatabaseNameError { model_database_name: String, existing_model_name: String, span: Span },
 
-  #[error("\"{}\" is a reserved scalar type name and can not be used.", type_name)]
+  #[error("\"{}\" is a reserved scalar type name and cannot be used.", type_name)]
   ReservedScalarTypeError { type_name: String, span: Span },
 
   #[error("The {} \"{}\" cannot be defined because a {} with that name already exists.", top_type, name, existing_top_type)]

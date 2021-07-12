@@ -22,7 +22,7 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
         step_index: usize,
     ) {
         let AlterColumn {
-            column_index: _,
+            column_id: _,
             changes,
             type_change,
         } = alter_column;

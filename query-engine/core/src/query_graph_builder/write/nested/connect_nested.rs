@@ -329,7 +329,7 @@ fn handle_one_to_many(
 /// - The relation is inlined on the child record. Even if the child side is not required, we then need
 ///   to update the previous child to not point to the parent anymore ("disconnect").
 ///
-/// Important: We can not inject from `Read New Child` to `Parent` if `Parent` is a non-create, as it would cause
+/// Important: We cannot inject from `Read New Child` to `Parent` if `Parent` is a non-create, as it would cause
 /// the following issue (example):
 /// - Parent is an update, doesn't have a connected child on relation x.
 /// - Parent gets injected with a child on x, because that's what the connect is supposed to do.

@@ -1,6 +1,8 @@
 use crate::error::Error;
 use datamodel::{Configuration, Datamodel};
-use introspection_connector::{ConnectorResult, DatabaseMetadata, IntrospectionConnector, IntrospectionResultOutput};
+use introspection_connector::{
+    ConnectorResult, DatabaseMetadata, IntrospectionConnector, IntrospectionContext, IntrospectionResultOutput,
+};
 use jsonrpc_core::BoxFuture;
 use jsonrpc_derive::rpc;
 use serde_derive::*;
@@ -61,21 +63,28 @@ impl Rpc for RpcImpl {
 
 impl RpcImpl {
     async fn load_connector(schema: &str) -> Result<(Configuration, String, Box<dyn IntrospectionConnector>), Error> {
-        let config = datamodel::parse_configuration(&schema)
+        let config = datamodel::parse_configuration(schema)
             .map_err(|diagnostics| Error::DatamodelError(diagnostics.to_pretty_string("schema.prisma", schema)))?;
 
-        let url = config
+        let preview_features = config.subject.preview_features().map(Clone::clone).collect();
+
+        let connection_string = config
             .subject
             .datasources
             .first()
             .ok_or_else(|| Error::Generic("There is no datasource in the schema.".into()))?
-            .load_url()
+            .load_url(|key| std::env::var(key).ok())
             .map_err(|diagnostics| Error::DatamodelError(diagnostics.to_pretty_string("schema.prisma", schema)))?;
+
+        if connection_string.starts_with("mongo") {
+            let message = r#""mongodb" provider is not supported with this command. For more info see https://www.prisma.io/docs/concepts/database-connectors/mongodb"#;
+            return Err(Error::InvalidDatabaseUrl(message.into()));
+        }
 
         Ok((
             config.subject,
-            url.clone(),
-            Box::new(SqlIntrospectionConnector::new(&url).await?),
+            connection_string.clone(),
+            Box::new(SqlIntrospectionConnector::new(&connection_string, preview_features).await?),
         ))
     }
 
@@ -95,7 +104,14 @@ impl RpcImpl {
             Datamodel::new()
         };
 
-        let result = match connector.introspect(&input_data_model).await {
+        let (config2, _, _) = RpcImpl::load_connector(&schema).await?;
+
+        let ctx = IntrospectionContext {
+            preview_features: config2.preview_features().map(Clone::clone).collect(),
+            source: config2.datasources.into_iter().next().unwrap(),
+        };
+
+        let result = match connector.introspect(&input_data_model, ctx).await {
             Ok(introspection_result) => {
                 if introspection_result.data_model.is_empty() {
                     Err(Error::IntrospectionResultEmpty(url.to_string()))
@@ -118,9 +134,9 @@ impl RpcImpl {
 
     /// This function parses the provided schema and returns the contained Datamodel.
     pub fn parse_datamodel(schema: &str) -> RpcResult<Datamodel> {
-        let final_dm = datamodel::parse_datamodel(&schema)
+        let final_dm = datamodel::parse_datamodel(schema)
             .map(|d| d.subject)
-            .map_err(|err| Error::DatamodelError(err.to_pretty_string("schema.prisma", &schema)))?;
+            .map_err(|err| Error::DatamodelError(err.to_pretty_string("schema.prisma", schema)))?;
 
         Ok(final_dm)
     }

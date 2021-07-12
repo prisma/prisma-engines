@@ -49,7 +49,7 @@ fn diagnose_migrations_history_after_two_migrations_happy_path(api: TestApi) {
     assert!(output.is_empty());
 }
 
-#[test_connector]
+#[test_connector(tags(Postgres))]
 fn diagnose_migration_history_with_opt_in_to_shadow_database_calculates_drift(api: TestApi) {
     let directory = api.create_migrations_directory();
 
@@ -74,7 +74,7 @@ fn diagnose_migration_history_with_opt_in_to_shadow_database_calculates_drift(ap
         }
     "#;
 
-    api.schema_push(dm2).send_sync();
+    api.schema_push(dm2).send();
 
     let DiagnoseMigrationHistoryOutput {
         drift,
@@ -89,12 +89,15 @@ fn diagnose_migration_history_with_opt_in_to_shadow_database_calculates_drift(ap
         .send_sync()
         .into_output();
 
-    let expected_rollback_warnings =
-         format!("/*\n  Warnings:\n\n  - You are about to drop the column `fluffiness` on the `{}` table. All the data in the column will be lost.\n\n*/", api.normalize_identifier("Cat"));
-
     let rollback = drift.unwrap().unwrap_drift_detected();
 
-    assert!(rollback.starts_with(&expected_rollback_warnings), "{}", rollback);
+    let snapshot = expect_test::expect![[r#"
+
+        [*] Changed the `Cat` table
+          [+] Added column `fluffiness`
+    "#]];
+
+    snapshot.assert_eq(&rollback);
 
     assert!(history.is_none());
     assert!(failed_migration_names.is_empty());
@@ -128,7 +131,7 @@ fn diagnose_migration_history_without_opt_in_to_shadow_database_does_not_calcula
         }
     "#;
 
-    api.schema_push(dm2).send_sync();
+    api.schema_push(dm2).send();
 
     let DiagnoseMigrationHistoryOutput {
         drift,
@@ -197,21 +200,9 @@ fn diagnose_migration_history_calculates_drift_in_presence_of_failed_migrations(
         .send_sync()
         .into_output();
 
-    let rollback = drift.unwrap().unwrap_drift_detected();
+    let summary = drift.unwrap().unwrap_drift_detected();
 
-    let expected_rollback_warnings = indoc::formatdoc!(
-        "
-        /*
-          Warnings:
-
-          - You are about to drop the `{}` table. If the table is not empty, all the data it contains will be lost.
-
-        */
-        ",
-        api.normalize_identifier("Dog")
-    );
-
-    assert!(rollback.starts_with(&expected_rollback_warnings), "{}", rollback);
+    assert!(summary.starts_with("\n[+] Added tables"), "{}", summary);
 
     assert!(history.is_none());
     assert_eq!(failed_migration_names.len(), 1);
@@ -324,7 +315,7 @@ fn diagnose_migrations_history_can_detect_when_the_folder_is_behind(api: TestApi
 
     assert!(failed_migration_names.is_empty());
     assert!(edited_migration_names.is_empty());
-    assert!(matches!(drift, Some(DriftDiagnostic::DriftDetected { rollback: _ })));
+    assert!(matches!(drift, Some(DriftDiagnostic::DriftDetected { summary: _ })));
     assert_eq!(
         history,
         Some(HistoryDiagnostic::MigrationsDirectoryIsBehind {
@@ -407,7 +398,7 @@ fn diagnose_migrations_history_can_detect_when_history_diverges(api: TestApi) {
 
     assert!(failed_migration_names.is_empty());
     assert!(edited_migration_names.is_empty());
-    assert!(matches!(drift, Some(DriftDiagnostic::DriftDetected { rollback: _ })));
+    assert!(matches!(drift, Some(DriftDiagnostic::DriftDetected { summary: _ })));
     assert_eq!(
         history,
         Some(HistoryDiagnostic::HistoriesDiverge {
@@ -734,7 +725,7 @@ fn drift_can_be_detected_without_migrations_table(api: TestApi) {
         .send_sync()
         .into_output();
 
-    assert!(matches!(drift, Some(DriftDiagnostic::DriftDetected { rollback: _ })));
+    assert!(matches!(drift, Some(DriftDiagnostic::DriftDetected { summary: _ })));
     assert!(
         matches!(history, Some(HistoryDiagnostic::DatabaseIsBehind { unapplied_migration_names: migs }) if migs.len() == 1)
     );
@@ -856,12 +847,12 @@ fn shadow_database_creation_error_is_special_cased_mssql(api: TestApi) {
 
     api.raw_cmd(
         "
-            CREATE LOGIN prismashadowdbtestuser
-                WITH PASSWORD = '1234batmanZ';
-
-            CREATE USER prismashadowdbuser FOR LOGIN prismashadowdbtestuser;
-
-            GRANT SELECT TO prismashadowdbuser;
+            BEGIN TRY
+                CREATE LOGIN prismashadowdbtestuser WITH PASSWORD = '1234batmanZ';
+                GRANT SELECT TO prismashadowdbuser;
+            END TRY
+            BEGIN CATCH
+            END CATCH;
             ",
     );
 

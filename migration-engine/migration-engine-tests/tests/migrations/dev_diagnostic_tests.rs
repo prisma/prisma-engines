@@ -71,14 +71,12 @@ fn dev_diagnostic_detects_drift(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send_sync();
+    api.schema_push(dm2).send();
 
     let DevDiagnosticOutput { action } = api.dev_diagnostic(&directory).send().into_output();
 
-    assert_eq!(
-        action.as_reset(),
-        Some("Drift detected: Your database schema is not in sync with your migration history.")
-    );
+    let expected_start = "Drift detected: Your database schema is not in sync with your migration history.";
+    assert!(action.as_reset().unwrap().starts_with(expected_start));
 }
 
 #[test_connector(exclude(Postgres, Mssql))]
@@ -128,7 +126,7 @@ fn dev_diagnostic_calculates_drift_in_presence_of_failed_migrations(api: TestApi
         migration_two_name, migration_two_name,
     );
 
-    assert_eq!(action.as_reset(), Some(expected_message.as_str()));
+    assert!(action.as_reset().unwrap().starts_with(&expected_message));
 }
 
 #[test_connector]
@@ -200,7 +198,12 @@ fn dev_diagnostic_can_detect_when_the_migrations_directory_is_behind(api: TestAp
 
     let DevDiagnosticOutput { action } = api.dev_diagnostic(&directory).send().into_output();
 
-    assert_eq!(action.as_reset(), Some(format!("- Drift detected: Your database schema is not in sync with your migration history.\n- The following migration(s) are applied to the database but missing from the local migrations directory: {}\n", name)).as_deref());
+    let message = action.as_reset().unwrap();
+    assert!(message.contains("- Drift detected: Your database schema is not in sync with your migration history"));
+    assert!(message.contains(&format!(
+        "The following migration(s) are applied to the database but missing from the local migrations directory: {}",
+        name
+    )));
 }
 
 #[test_connector]
@@ -258,13 +261,10 @@ fn dev_diagnostic_can_detect_when_history_diverges(api: TestApi) {
 
     let DevDiagnosticOutput { action } = api.dev_diagnostic(&directory).send().into_output();
 
-    let expected_message = format!(
-        "- Drift detected: Your database schema is not in sync with your migration history.\n- The migrations recorded in the database diverge from the local migrations directory. Last common migration: `{}`. Migrations applied to the database but absent from the migrations directory are: {}\n",
-        first_migration_name,
-        deleted_migration_name,
-    );
+    let message = action.as_reset().unwrap();
 
-    assert_eq!(action.as_reset(), Some(expected_message.as_str()));
+    assert!(message.contains("Drift detected: Your database schema is not in sync with your migration history"));
+    assert!(message.contains(&format!("- The migrations recorded in the database diverge from the local migrations directory. Last common migration: `{}`. Migrations applied to the database but absent from the migrations directory are: {}", first_migration_name, deleted_migration_name)));
 }
 
 #[test_connector]
@@ -454,15 +454,17 @@ fn with_an_invalid_unapplied_migration_should_report_it(api: TestApi) {
         .to_user_facing()
         .unwrap_known();
 
-    assert_eq!(err.error_code, MigrationDoesNotApplyCleanly::ERROR_CODE);
-    assert!(err.message.starts_with(&format!(
-        "Migration `{}` failed to apply cleanly to the shadow database. \nError:",
+    let expected_msg = format!(
+        "Migration `{}` failed to apply cleanly to the shadow database. \nError",
         generated_migration_name.unwrap()
-    )));
+    );
+
+    assert_eq!(err.error_code, MigrationDoesNotApplyCleanly::ERROR_CODE);
+    assert!(err.message.starts_with(&expected_msg));
 }
 
 #[test_connector(tags(Postgres))]
-fn drift_can_be_detected_without_migrations_table(api: TestApi) {
+fn drift_can_be_detected_without_migrations_table_dev(api: TestApi) {
     let directory = api.create_migrations_directory();
 
     api.raw_cmd("CREATE TABLE \"cat\" (\nid SERIAL PRIMARY KEY\n);");
@@ -477,10 +479,18 @@ fn drift_can_be_detected_without_migrations_table(api: TestApi) {
 
     let DevDiagnosticOutput { action } = api.dev_diagnostic(&directory).send().into_output();
 
-    assert_eq!(
-        action.as_reset(),
-        Some("Drift detected: Your database schema is not in sync with your migration history.")
-    );
+    let expect = expect![[r#"
+        Drift detected: Your database schema is not in sync with your migration history.
+
+        The following is a summary of the differences between the expected database schema given your migrations files, and the actual schema of the database.
+
+        It should be understood as the set of changes to get from the expected schema to the actual schema.
+
+        [+] Added tables
+          - cat
+    "#]];
+
+    expect.assert_eq(action.as_reset().unwrap());
 }
 
 #[test_connector(tags(Mysql8), exclude(Vitess))]
@@ -531,7 +541,7 @@ fn dev_diagnostic_shadow_database_creation_error_is_special_cased_mysql(api: Tes
         .to_user_facing()
         .unwrap_known();
 
-    assert!(err.message.starts_with("Prisma Migrate could not create the shadow database. Please make sure the database user has permission to create databases. Read more at https://pris.ly/d/migrate-shadow"), "{:?}", err);
+    assert!(err.message.starts_with("Prisma Migrate could not create the shadow database. Please make sure the database user has permission to create databases. Read more about the shadow database (and workarounds) at https://pris.ly/d/migrate-shadow"), "{:?}", err);
 }
 
 #[test_connector(tags(Postgres12))]
@@ -580,7 +590,7 @@ fn dev_diagnostic_shadow_database_creation_error_is_special_cased_postgres(api: 
         .to_user_facing()
         .unwrap_known();
 
-    assert!(err.message.starts_with("Prisma Migrate could not create the shadow database. Please make sure the database user has permission to create databases. Read more at https://pris.ly/d/migrate-shadow"));
+    assert!(err.message.starts_with("Prisma Migrate could not create the shadow database. Please make sure the database user has permission to create databases. Read more about the shadow database (and workarounds) at https://pris.ly/d/migrate-shadow"));
 }
 
 // (Hopefully) Temporarily commented out because this test is flaky in CI.

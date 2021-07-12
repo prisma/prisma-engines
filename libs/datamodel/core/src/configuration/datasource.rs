@@ -1,7 +1,7 @@
 use crate::{
     ast::Span,
+    configuration::StringFromEnvVar,
     diagnostics::{DatamodelError, Diagnostics},
-    StringFromEnvVar,
 };
 use datamodel_connector::{Connector, ConnectorCapabilities};
 use std::path::Path;
@@ -19,7 +19,7 @@ pub struct Datasource {
     /// the connector of the active provider
     pub active_connector: Box<dyn Connector>,
     /// An optional user-defined shadow database URL.
-    pub(crate) shadow_database_url: Option<(StringFromEnvVar, Span)>,
+    pub shadow_database_url: Option<(StringFromEnvVar, Span)>,
     /// Whether planetScaleMode = true was provided
     pub planet_scale_mode: bool,
 }
@@ -40,21 +40,25 @@ impl std::fmt::Debug for Datasource {
 
 impl Datasource {
     pub fn capabilities(&self) -> ConnectorCapabilities {
-        let capabilities = self.active_connector.capabilities().clone();
+        let capabilities = self.active_connector.capabilities().to_owned();
         ConnectorCapabilities::new(capabilities)
     }
 
-    /// Load the database URL, validating it and resolving env vars in the process. Also see `load_url_with_config_dir()`.
-    pub fn load_url(&self) -> Result<String, Diagnostics> {
+    /// Load the database URL, validating it and resolving env vars in the
+    /// process. Also see `load_url_with_config_dir()`.
+    pub fn load_url<F>(&self, env: F) -> Result<String, Diagnostics>
+    where
+        F: Fn(&str) -> Option<String>,
+    {
         let url = match (&self.url.value, &self.url.from_env_var) {
             (Some(lit), _) if lit.trim().is_empty() => {
                 let msg = "You must provide a nonempty URL";
 
-                return Err(DatamodelError::new_source_validation_error(&msg, &self.name, self.url_span).into());
+                return Err(DatamodelError::new_source_validation_error(msg, &self.name, self.url_span).into());
             }
             (Some(lit), _) => lit.clone(),
-            (None, Some(env_var)) => match std::env::var(env_var) {
-                Ok(var) if var.trim().is_empty() => {
+            (None, Some(env_var)) => match env(env_var) {
+                Some(var) if var.trim().is_empty() => {
                     return Err(DatamodelError::new_source_validation_error(
                         &format!(
                         "You must provide a nonempty URL. The environment variable `{}` resolved to an empty string.",
@@ -65,8 +69,8 @@ impl Datasource {
                     )
                     .into())
                 }
-                Ok(var) => var,
-                Err(_) => {
+                Some(var) => var,
+                None => {
                     return Err(DatamodelError::new_environment_functional_evaluation_error(
                         env_var.to_owned(),
                         self.url_span,
@@ -92,11 +96,14 @@ impl Datasource {
     /// config_dir.
     ///
     /// This is, at the time of this writing (2021-05-05), only used in the
-    /// context of NAPI integration.
+    /// context of Node-API integration.
     ///
     /// P.S. Don't forget to add new parameters here if needed!
-    pub fn load_url_with_config_dir(&self, config_dir: &Path) -> Result<String, Diagnostics> {
-        let url = self.load_url()?;
+    pub fn load_url_with_config_dir<F>(&self, config_dir: &Path, env: F) -> Result<String, Diagnostics>
+    where
+        F: Fn(&str) -> Option<String>,
+    {
+        let url = self.load_url(env)?;
         let url = self.active_connector.set_config_dir(config_dir, &url);
 
         Ok(url.into_owned())

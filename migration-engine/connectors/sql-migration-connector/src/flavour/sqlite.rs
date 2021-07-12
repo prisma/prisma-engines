@@ -2,8 +2,10 @@ use crate::{
     connect, connection_wrapper::Connection, error::quaint_error_to_connector_error, flavour::SqlFlavour,
     SqlMigrationConnector,
 };
+use datamodel::common::preview_features::PreviewFeature;
+use enumflags2::BitFlags;
 use indoc::indoc;
-use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
+use migration_connector::{migrations_directory::MigrationDirectory, ConnectorError, ConnectorResult};
 use quaint::prelude::ConnectionInfo;
 use sql_schema_describer::{DescriberErrorKind, SqlSchema, SqlSchemaDescriberBackend};
 use std::path::Path;
@@ -12,6 +14,7 @@ use std::path::Path;
 pub(crate) struct SqliteFlavour {
     pub(super) file_path: String,
     pub(super) attached_name: String,
+    pub(super) preview_features: BitFlags<PreviewFeature>,
 }
 
 #[async_trait::async_trait]
@@ -20,6 +23,19 @@ impl SqlFlavour for SqliteFlavour {
         connection.raw_cmd("PRAGMA main.locking_mode=EXCLUSIVE").await?;
 
         Ok(())
+    }
+
+    async fn run_query_script(&self, sql: &str, connection: &Connection) -> ConnectorResult<()> {
+        Ok(connection.raw_cmd(sql).await?)
+    }
+
+    async fn apply_migration_script(
+        &self,
+        migration_name: &str,
+        script: &str,
+        conn: &Connection,
+    ) -> ConnectorResult<()> {
+        super::generic_apply_migration_script(migration_name, script, conn).await
     }
 
     async fn create_database(&self, database_str: &str) -> ConnectorResult<String> {
@@ -55,16 +71,16 @@ impl SqlFlavour for SqliteFlavour {
             );
         "#};
 
-        Ok(connection.raw_cmd(&sql).await?)
+        Ok(connection.raw_cmd(sql).await?)
     }
 
     async fn describe_schema<'a>(&'a self, connection: &Connection) -> ConnectorResult<SqlSchema> {
-        sql_schema_describer::sqlite::SqlSchemaDescriber::new(connection.quaint().clone())
+        sql_schema_describer::sqlite::SqlSchemaDescriber::new(connection.queryable())
             .describe(connection.connection_info().schema_name())
             .await
             .map_err(|err| match err.into_kind() {
                 DescriberErrorKind::QuaintError(err) => {
-                    quaint_error_to_connector_error(err, connection.connection_info())
+                    quaint_error_to_connector_error(err, &connection.connection_info())
                 }
                 DescriberErrorKind::CrossSchemaReference { .. } => {
                     unreachable!("No schemas in SQLite")
@@ -103,7 +119,8 @@ impl SqlFlavour for SqliteFlavour {
     }
 
     async fn reset(&self, connection: &Connection) -> ConnectorResult<()> {
-        let file_path = connection.connection_info().file_path().unwrap();
+        let connection_info = connection.connection_info();
+        let file_path = connection_info.file_path().unwrap();
 
         connection.raw_cmd("PRAGMA main.locking_mode=NORMAL").await?;
         connection.raw_cmd("PRAGMA main.quick_check").await?;
@@ -132,7 +149,7 @@ impl SqlFlavour for SqliteFlavour {
                 },
             )
         })?;
-        let conn = Connection::new(quaint);
+        let conn = Connection::new_generic(quaint);
 
         for migration in migrations {
             let script = migration.read_migration_script()?;
@@ -153,5 +170,9 @@ impl SqlFlavour for SqliteFlavour {
         let sql_schema = self.describe_schema(&conn).await?;
 
         Ok(sql_schema)
+    }
+
+    fn preview_features(&self) -> BitFlags<PreviewFeature> {
+        self.preview_features
     }
 }

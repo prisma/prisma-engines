@@ -48,10 +48,9 @@ impl WithDocumentation for Enum {
 pub struct EnumValue {
     /// The name of the enum value as it will be exposed by the api.
     pub name: Identifier,
-    /// The enum value as it will be stored in the database.
     pub attributes: Vec<Attribute>,
-    /// The location of this enum value in the text representation.
     pub documentation: Option<Comment>,
+    /// The location of this enum value in the text representation.
     pub span: Span,
     pub commented_out: bool,
 }

@@ -7,9 +7,10 @@ use indoc::indoc;
 use native_types::{MsSqlType, MsSqlTypeParameter, NativeType};
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
-use quaint::{prelude::Queryable, single::Quaint};
+use quaint::prelude::Queryable;
 use regex::Regex;
 use std::{
+    any::type_name,
     borrow::Cow,
     collections::{BTreeMap, HashMap, HashSet},
     convert::TryInto,
@@ -60,13 +61,18 @@ static DEFAULT_DB_GEN: Lazy<Regex> = Lazy::new(|| Regex::new(r"\((.*)\)").unwrap
 /// ```
 static DEFAULT_SHARED_CONSTRAINT: Lazy<Regex> = Lazy::new(|| Regex::new(r"^CREATE DEFAULT (.*)").unwrap());
 
-#[derive(Debug)]
-pub struct SqlSchemaDescriber {
-    conn: Quaint,
+pub struct SqlSchemaDescriber<'a> {
+    conn: &'a dyn Queryable,
+}
+
+impl std::fmt::Debug for SqlSchemaDescriber<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct(type_name::<SqlSchemaDescriber>()).finish()
+    }
 }
 
 #[async_trait::async_trait]
-impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
+impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
     async fn list_databases(&self) -> DescriberResult<Vec<String>> {
         Ok(self.get_databases().await?)
     }
@@ -115,10 +121,10 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
     }
 }
 
-impl Parser for SqlSchemaDescriber {}
+impl Parser for SqlSchemaDescriber<'_> {}
 
-impl SqlSchemaDescriber {
-    pub fn new(conn: Quaint) -> Self {
+impl<'a> SqlSchemaDescriber<'a> {
+    pub fn new(conn: &'a dyn Queryable) -> Self {
         Self { conn }
     }
 
@@ -390,7 +396,12 @@ impl SqlSchemaDescriber {
                 AND t.is_ms_shipped = 0
                 AND ind.filter_definition IS NULL
                 AND ind.name IS NOT NULL
-
+                AND ind.type_desc IN (
+                    'CLUSTERED',
+                    'NONCLUSTERED',
+                    'CLUSTERED COLUMNSTORE',
+                    'NONCLUSTERED COLUMNSTORE'
+                )
             ORDER BY index_name, seq_in_index
         "#};
 

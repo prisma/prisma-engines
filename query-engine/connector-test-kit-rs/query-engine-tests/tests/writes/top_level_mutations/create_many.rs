@@ -139,7 +139,7 @@ mod create_many {
     }
 
     // "createMany" should "not error on duplicates with skipDuplicates true"
-    #[connector_test(schema(schema_4), exclude(Sqlite, SqlServer))]
+    #[connector_test(schema(schema_4), exclude(Sqlite, SqlServer, MongoDb))]
     async fn create_many_no_error_skip_dup(runner: &Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(runner, r#"mutation {
@@ -231,6 +231,36 @@ mod create_many {
           }"#,
             2009,
             "`Field does not exist on enclosing type.` at `Mutation.createManyTest`"
+        );
+
+        Ok(())
+    }
+
+    fn schema_6() -> String {
+        let schema = indoc! {
+            r#"
+          model TestModel {
+              #id(id, Int, @id)
+              updatedAt DateTime @map("updated_at")
+          }
+          "#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(schema_6), exclude(Sqlite))]
+    async fn create_many_map_behavior(runner: &Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(runner, format!(r#"mutation {{
+              createManyTestModel(data: [
+                {{ id: 1, updatedAt: "{}" }},
+                {{ id: 2, updatedAt: "{}" }}
+              ]) {{
+                count
+              }}
+            }}"#, date_iso_string(2009, 8, 1), now())),
+          @r###"{"data":{"createManyTestModel":{"count":2}}}"###
         );
 
         Ok(())

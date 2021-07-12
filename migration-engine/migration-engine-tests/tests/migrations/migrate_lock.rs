@@ -1,5 +1,5 @@
 use indoc::indoc;
-use migration_engine_tests::{multi_engine_test_api::*, sqlite_test_url};
+use migration_engine_tests::multi_engine_test_api::*;
 use std::{fs::File, io::Write};
 use test_macros::test_connector;
 use user_facing_errors::{migration_engine::ProviderSwitchedError, UserFacingError};

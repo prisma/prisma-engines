@@ -22,7 +22,7 @@ impl TokenExtensions for Token<'_> {
 }
 
 pub fn comment(target: &mut dyn LineWriteable, comment_text: &str) {
-    let trimmed = strip_new_line(&comment_text);
+    let trimmed = strip_new_line(comment_text);
     let trimmed = trimmed.trim();
 
     target.write(trimmed);
@@ -33,6 +33,6 @@ pub fn strip_new_line(str: &str) -> &str {
     if str.ends_with('\n') {
         &str[0..str.len() - 1] // slice away line break.
     } else {
-        &str
+        str
     }
 }

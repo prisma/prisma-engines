@@ -71,36 +71,36 @@
 //!</pre>
 //!
 
-#![allow(
-    clippy::module_inception,
-    clippy::suspicious_operation_groupings,
-    clippy::upper_case_acronyms
-)]
 #![deny(rust_2018_idioms, unsafe_code)]
 
 pub mod ast;
 pub mod common;
-pub mod configuration;
 pub mod diagnostics;
 pub mod dml;
 pub mod json;
-pub mod transform;
 pub mod walkers;
 
-pub use crate::dml::*;
-pub use configuration::*;
+mod configuration;
+mod transform;
 
-use crate::diagnostics::{Validated, ValidatedConfiguration, ValidatedDatamodel, ValidatedDatasources};
+pub use crate::dml::*;
+pub use configuration::{Configuration, Datasource, Generator, StringFromEnvVar};
+pub use transform::ast_to_dml::reserved_model_names;
+
+use crate::diagnostics::{Validated, ValidatedConfiguration, ValidatedDatamodel};
 use crate::{ast::SchemaAst, common::preview_features::PreviewFeature};
-use std::collections::HashSet;
+use diagnostics::Diagnostics;
+use enumflags2::BitFlags;
 use transform::{
     ast_to_dml::{DatasourceLoader, GeneratorLoader, ValidationPipeline},
     dml_to_ast::{DatasourceSerializer, GeneratorSerializer, LowerDmlToAst},
 };
 
 /// Parse and validate the whole schema
-pub fn parse_schema(schema_str: &str) -> Result<Validated<(Configuration, Datamodel)>, diagnostics::Diagnostics> {
+pub fn parse_schema(schema_str: &str) -> Result<(Configuration, Datamodel), String> {
     parse_datamodel_internal(schema_str, false)
+        .map_err(|err| err.to_pretty_string("schema.prisma", schema_str))
+        .map(|v| v.subject)
 }
 
 /// Parses and validates a datamodel string, using core attributes only.
@@ -136,22 +136,21 @@ fn parse_datamodel_internal(
     let mut diagnostics = diagnostics::Diagnostics::new();
     let ast = ast::parse_schema(datamodel_string)?;
 
-    let generators = GeneratorLoader::load_generators_from_ast(&ast)?;
-    let preview_features = generators.preview_features();
-    let sources = load_sources(&ast, &&preview_features)?;
-    let validator = ValidationPipeline::new(&sources.subject);
+    let generators = GeneratorLoader::load_generators_from_ast(&ast, &mut diagnostics);
+    let preview_features = preview_features(&generators);
+    let datasources = load_sources(&ast, preview_features, &mut diagnostics);
+    let validator = ValidationPipeline::new(&datasources, preview_features);
 
-    diagnostics.append_warning_vec(sources.warnings);
-    diagnostics.append_warning_vec(generators.warnings);
+    diagnostics.to_result()?;
 
     match validator.validate(&ast, transform) {
         Ok(mut src) => {
-            src.warnings.append(&mut diagnostics.warnings);
+            src.warnings.append(diagnostics.warnings_mut());
             Ok(Validated {
                 subject: (
                     Configuration {
-                        generators: generators.subject,
-                        datasources: sources.subject,
+                        generators,
+                        datasources,
                     },
                     src.subject,
                 ),
@@ -171,30 +170,29 @@ pub fn parse_schema_ast(datamodel_string: &str) -> Result<SchemaAst, diagnostics
 
 /// Loads all configuration blocks from a datamodel using the built-in source definitions.
 pub fn parse_configuration(schema: &str) -> Result<ValidatedConfiguration, diagnostics::Diagnostics> {
-    let mut warnings = Vec::new();
     let ast = ast::parse_schema(schema)?;
-    let mut validated_generators = GeneratorLoader::load_generators_from_ast(&ast)?;
-    let preview_features = validated_generators.preview_features();
-    let mut validated_sources = load_sources(&ast, &preview_features)?;
+    let mut diagnostics = Diagnostics::default();
+    let generators = GeneratorLoader::load_generators_from_ast(&ast, &mut diagnostics);
+    let preview_features = preview_features(&generators);
+    let datasources = load_sources(&ast, preview_features, &mut diagnostics);
 
-    warnings.append(&mut validated_generators.warnings);
-    warnings.append(&mut validated_sources.warnings);
+    diagnostics.to_result()?;
 
     Ok(ValidatedConfiguration {
         subject: Configuration {
-            datasources: validated_sources.subject,
-            generators: validated_generators.subject,
+            generators,
+            datasources,
         },
-        warnings,
+        warnings: diagnostics.warnings().to_owned(),
     })
 }
 
 fn load_sources(
     schema_ast: &SchemaAst,
-    preview_features: &HashSet<&PreviewFeature>,
-) -> Result<ValidatedDatasources, diagnostics::Diagnostics> {
-    let source_loader = DatasourceLoader::new();
-    source_loader.load_datasources_from_ast(&schema_ast, preview_features)
+    preview_features: BitFlags<PreviewFeature>,
+    diagnostics: &mut Diagnostics,
+) -> Vec<Datasource> {
+    DatasourceLoader.load_datasources_from_ast(schema_ast, preview_features, diagnostics)
 }
 
 //
@@ -210,9 +208,9 @@ pub fn render_datamodel_to_string(datamodel: &dml::Datamodel) -> String {
 
 /// Renders an AST to a string.
 pub fn render_schema_ast_to_string(schema: &SchemaAst) -> String {
-    let mut writable_string = String::with_capacity(schema.models().len() * 20);
+    let mut writable_string = String::with_capacity(schema.tops.len() * 20);
 
-    render_schema_ast_to(&mut writable_string, &schema, 2);
+    render_schema_ast_to(&mut writable_string, schema, 2);
 
     writable_string
 }
@@ -223,7 +221,7 @@ pub fn render_datamodel_to(
     datamodel: &dml::Datamodel,
     datasource: Option<&Datasource>,
 ) {
-    let lowered = LowerDmlToAst::new(datasource).lower(datamodel);
+    let lowered = LowerDmlToAst::new(datasource, BitFlags::empty()).lower(datamodel);
     render_schema_ast_to(stream, &lowered, 2);
 }
 
@@ -245,7 +243,8 @@ fn render_datamodel_and_config_to(
     datamodel: &dml::Datamodel,
     config: &configuration::Configuration,
 ) {
-    let mut lowered = LowerDmlToAst::new(config.datasources.first()).lower(datamodel);
+    let features = config.preview_features().map(Clone::clone).collect();
+    let mut lowered = LowerDmlToAst::new(config.datasources.first(), features).lower(datamodel);
 
     DatasourceSerializer::add_sources_to_ast(config.datasources.as_slice(), &mut lowered);
     GeneratorSerializer::add_generators_to_ast(&config.generators, &mut lowered);
@@ -257,4 +256,11 @@ fn render_datamodel_and_config_to(
 fn render_schema_ast_to(stream: &mut dyn std::fmt::Write, schema: &ast::SchemaAst, ident_width: usize) {
     let mut renderer = ast::Renderer::new(stream, ident_width);
     renderer.render(schema);
+}
+
+fn preview_features(generators: &[Generator]) -> BitFlags<PreviewFeature> {
+    generators
+        .iter()
+        .flat_map(|gen| gen.preview_features.iter().cloned())
+        .collect()
 }

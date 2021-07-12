@@ -1,14 +1,15 @@
 use super::SqlSchemaDifferFlavour;
 use crate::{
     flavour::MssqlFlavour,
-    sql_migration::{AlterTable, CreateIndex, DropIndex},
-    sql_schema_differ::{
-        column::{ColumnDiffer, ColumnTypeChange},
-        SqlSchemaDiffer,
-    },
+    pair::Pair,
+    sql_migration::SqlMigrationStep,
+    sql_schema_differ::{column::ColumnTypeChange, table::TableDiffer, ColumnChanges, SqlSchemaDiffer},
 };
 use native_types::{MsSqlType, MsSqlTypeParameter};
-use sql_schema_describer::{walkers::IndexWalker, ColumnTypeFamily};
+use sql_schema_describer::{
+    walkers::{ColumnWalker, IndexWalker},
+    ColumnId, ColumnTypeFamily,
+};
 use std::collections::HashSet;
 
 impl SqlSchemaDifferFlavour for MssqlFlavour {
@@ -23,14 +24,18 @@ impl SqlSchemaDifferFlavour for MssqlFlavour {
     fn tables_to_redefine(&self, differ: &SqlSchemaDiffer<'_>) -> HashSet<String> {
         let autoincrement_changed = differ
             .table_pairs()
-            .filter(|differ| differ.column_pairs().any(|c| c.autoincrement_changed()))
+            .filter(|differ| {
+                differ
+                    .column_pairs()
+                    .any(|c| differ.db.column_changes_for_walkers(c).autoincrement_changed())
+            })
             .map(|table| table.next().name().to_owned());
 
         let all_columns_of_the_table_gets_dropped = differ
             .table_pairs()
             .filter(|tables| {
                 tables.column_pairs().all(|columns| {
-                    let type_change = self.column_type_change(&columns);
+                    let type_change = self.column_type_change(columns);
                     matches!(type_change, Some(ColumnTypeChange::NotCastable))
                 })
             })
@@ -41,7 +46,7 @@ impl SqlSchemaDifferFlavour for MssqlFlavour {
             .collect()
     }
 
-    fn column_type_change(&self, differ: &ColumnDiffer<'_>) -> Option<ColumnTypeChange> {
+    fn column_type_change(&self, differ: Pair<ColumnWalker<'_>>) -> Option<ColumnTypeChange> {
         let previous_family = differ.previous.column_type_family();
         let next_family = differ.next.column_type_family();
         let previous_type: Option<MsSqlType> = differ.previous.column_native_type();
@@ -55,47 +60,34 @@ impl SqlSchemaDifferFlavour for MssqlFlavour {
 
     fn push_index_changes_for_column_changes(
         &self,
-        alter_tables: &[AlterTable],
-        drop_indexes: &mut Vec<DropIndex>,
-        create_indexes: &mut Vec<CreateIndex>,
-        differ: &SqlSchemaDiffer<'_>,
+        table: &TableDiffer<'_, '_>,
+        column_id: Pair<ColumnId>,
+        column_changes: ColumnChanges,
+        steps: &mut Vec<SqlMigrationStep>,
     ) {
-        for table in alter_tables {
-            for column in table.changes.iter().filter_map(|change| change.as_alter_column()) {
-                if !column.changes.type_changed() {
-                    continue;
-                }
+        if !column_changes.type_changed() {
+            return;
+        }
 
-                let table = differ
-                    .table_pairs()
-                    .find(|tables| {
-                        (&tables.previous().table_index(), &tables.next().table_index()) == table.table_index.as_tuple()
-                    })
-                    .expect("Invariant violation: no table pair found for AlterTable");
+        for dropped_index in table.index_pairs().filter(|pair| {
+            pair.previous()
+                .columns()
+                .any(|col| col.column_id() == *column_id.previous())
+        }) {
+            steps.push(SqlMigrationStep::DropIndex {
+                table_id: table.previous().table_id(),
+                index_index: dropped_index.previous().index(),
+            })
+        }
 
-                for dropped_index in table.index_pairs().filter(|pair| {
-                    pair.previous()
-                        .columns()
-                        .any(|col| col.column_index() == *column.column_index.previous())
-                }) {
-                    drop_indexes.push(DropIndex {
-                        table_index: table.previous().table_index(),
-                        index_index: dropped_index.previous().index(),
-                    })
-                }
-
-                for created_index in table.index_pairs().filter(|pair| {
-                    pair.next()
-                        .columns()
-                        .any(|col| col.column_index() == *column.column_index.next())
-                }) {
-                    create_indexes.push(CreateIndex {
-                        table_index: table.next().table_index(),
-                        index_index: created_index.next().index(),
-                        caused_by_create_table: true,
-                    })
-                }
-            }
+        for created_index in table
+            .index_pairs()
+            .filter(|pair| pair.next().columns().any(|col| col.column_id() == *column_id.next()))
+        {
+            steps.push(SqlMigrationStep::CreateIndex {
+                table_id: (None, table.next().table_id()),
+                index_index: created_index.next().index(),
+            })
         }
     }
 }

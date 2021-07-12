@@ -1,13 +1,11 @@
+pub use crate::assertions::{MigrationsAssertions, ResultSetExt, SchemaAssertion};
+pub use expect_test::expect;
 pub use test_macros::test_connector;
 pub use test_setup::{BitFlags, Capabilities, Tags};
 
-use crate::{
-    multi_engine_test_api::TestApi as RootTestApi, ApplyMigrations, CreateMigration, DevDiagnostic,
-    DiagnoseMigrationHistory, EvaluateDataLoss, ListMigrationDirectories, MarkMigrationApplied,
-    MarkMigrationRolledBack, Reset, SchemaAssertion, SchemaPush,
-};
+use crate::{commands::*, multi_engine_test_api::TestApi as RootTestApi};
 use migration_connector::MigrationPersistence;
-use quaint::prelude::{ConnectionInfo, Queryable, ResultSet};
+use quaint::prelude::{ConnectionInfo, ResultSet};
 use sql_migration_connector::SqlMigrationConnector;
 use std::{borrow::Cow, future::Future};
 use tempfile::TempDir;
@@ -36,8 +34,12 @@ impl TestApi {
         self.root.connection_string()
     }
 
-    pub fn connection_info(&self) -> &ConnectionInfo {
-        self.connector.quaint().connection_info()
+    pub fn connection_info(&self) -> ConnectionInfo {
+        self.connector.connection_info()
+    }
+
+    pub fn schema_name(&self) -> &str {
+        self.connector.schema_name()
     }
 
     /// Plan a `createMigration` command
@@ -191,13 +193,13 @@ impl TestApi {
     /// Like quaint::Queryable::query()
     #[track_caller]
     pub fn query(&self, q: quaint::ast::Query<'_>) -> ResultSet {
-        self.root.block_on(self.connector.quaint().query(q)).unwrap()
+        self.root.block_on(self.connector.queryable().query(q)).unwrap()
     }
 
     /// Send a SQL command to the database, and expect it to succeed.
     #[track_caller]
     pub fn raw_cmd(&self, sql: &str) {
-        self.root.block_on(self.connector.quaint().raw_cmd(sql)).unwrap()
+        self.root.block_on(self.connector.queryable().raw_cmd(sql)).unwrap()
     }
 
     /// Render a table name with the required prefixing for use with quaint query building.
@@ -205,7 +207,7 @@ impl TestApi {
         if self.root.is_sqlite() {
             table_name.into()
         } else {
-            (self.connector.quaint().connection_info().schema_name(), table_name).into()
+            (self.connector.schema_name(), table_name).into()
         }
     }
 
@@ -216,11 +218,30 @@ impl TestApi {
 
     /// Plan a `schemaPush` command
     pub fn schema_push(&self, dm: impl Into<String>) -> SchemaPush<'_> {
-        SchemaPush::new_sync(&self.connector, dm.into(), &self.root.rt)
+        SchemaPush::new(&self.connector, dm.into(), &self.root.rt)
     }
 
     pub fn tags(&self) -> BitFlags<Tags> {
         self.root.args.tags()
+    }
+
+    /// Render a valid datasource block, including database URL.
+    pub fn write_datasource_block(&self, out: &mut dyn std::fmt::Write) {
+        write!(
+            out,
+            "{}",
+            self.root.args.datasource_block(self.root.args.database_url(), &[])
+        )
+        .unwrap()
+    }
+
+    pub fn datamodel_with_provider(&self, schema: &str) -> String {
+        let mut out = String::with_capacity(320 + schema.len());
+
+        self.write_datasource_block(&mut out);
+        out.push_str(schema);
+
+        out
     }
 }
 

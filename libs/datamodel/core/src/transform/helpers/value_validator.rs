@@ -1,13 +1,13 @@
 use super::env_function::EnvFunction;
 use crate::diagnostics::DatamodelError;
-use crate::ValueGenerator;
-use crate::{ast, DefaultValue};
 use crate::{
-    ast::{Expression, Span},
-    StringFromEnvVar,
+    ast::{self, Expression, Span},
+    configuration::StringFromEnvVar,
 };
+use crate::{DefaultValue, ValueGenerator};
 use bigdecimal::BigDecimal;
 use chrono::{DateTime, FixedOffset};
+use dml::relation_info::ReferentialAction;
 use dml::scalars::ScalarType;
 use prisma_value::PrismaValue;
 use std::error;
@@ -15,17 +15,17 @@ use std::error;
 /// Wraps a value and provides convenience methods for
 /// parsing it.
 #[derive(Debug)]
-pub struct ValueValidator {
-    value: ast::Expression,
+pub struct ValueValidator<'a> {
+    value: &'a ast::Expression,
 }
 
-impl ValueValidator {
+impl<'a> ValueValidator<'a> {
     /// Creates a new instance by wrapping a value.
     ///
     /// If the value is a function expression, it is evaluated
     /// recursively.
-    pub fn new(value: &ast::Expression) -> ValueValidator {
-        ValueValidator { value: value.clone() }
+    pub fn new(value: &'a ast::Expression) -> ValueValidator<'a> {
+        ValueValidator { value }
     }
 
     /// Creates a new type mismatch error for the
@@ -64,7 +64,7 @@ impl ValueValidator {
             ScalarType::String => self.as_str().map(String::from).map(PrismaValue::String),
             ScalarType::Json => self.as_str().map(String::from).map(PrismaValue::String),
             ScalarType::Bytes => self.as_str().and_then(|s| {
-                prisma_value::decode_bytes(&s).map(PrismaValue::Bytes).map_err(|_| {
+                prisma_value::decode_bytes(s).map(PrismaValue::Bytes).map_err(|_| {
                     DatamodelError::new_validation_error(&format!("Invalid base64 string '{}'.", s), self.span())
                 })
             }),
@@ -86,7 +86,7 @@ impl ValueValidator {
     }
 
     /// Tries to convert the wrapped value to a Prisma String.
-    pub fn as_str(&self) -> Result<&str, DatamodelError> {
+    pub fn as_str(&self) -> Result<&'a str, DatamodelError> {
         match &self.value {
             ast::Expression::StringValue(value, _) => Ok(value),
             _ => Err(self.construct_type_mismatch_error("String")),
@@ -105,17 +105,17 @@ impl ValueValidator {
         }
     }
 
-    pub fn as_env_function(&self) -> Result<EnvFunction, DatamodelError> {
-        EnvFunction::from_ast(&self.value)
+    pub(crate) fn as_env_function(&self) -> Result<EnvFunction, DatamodelError> {
+        EnvFunction::from_ast(self.value)
     }
 
     /// returns true if this argument is derived from an env() function
-    pub fn is_from_env(&self) -> bool {
+    pub(crate) fn is_from_env(&self) -> bool {
         self.value.is_env_expression()
     }
 
     /// Tries to convert the wrapped value to a Prisma Integer.
-    pub fn as_int(&self) -> Result<i64, DatamodelError> {
+    pub(crate) fn as_int(&self) -> Result<i64, DatamodelError> {
         match &self.value {
             ast::Expression::NumericValue(value, _) => self.wrap_error_from_result(value.parse::<i64>(), "numeric"),
             _ => Err(self.construct_type_mismatch_error("numeric")),
@@ -123,7 +123,7 @@ impl ValueValidator {
     }
 
     /// Tries to convert the wrapped value to a Prisma Float.
-    pub fn as_float(&self) -> Result<BigDecimal, DatamodelError> {
+    pub(crate) fn as_float(&self) -> Result<BigDecimal, DatamodelError> {
         match &self.value {
             ast::Expression::StringValue(value, _) => {
                 self.wrap_error_from_result(value.parse::<BigDecimal>(), "numeric")
@@ -155,20 +155,53 @@ impl ValueValidator {
         }
     }
 
+    /// Unwraps the value as an array of constants.
+    pub fn as_constant_array(&self) -> Result<Vec<&'a str>, DatamodelError> {
+        if let ast::Expression::Array(values, _) = &self.value {
+            values
+                .iter()
+                .map(|val| ValueValidator::new(val).as_constant_literal())
+                .collect()
+        } else {
+            // Single values are accepted as array literals, for example in `@relation(fields: userId)`.
+            Ok(vec![self.as_constant_literal()?])
+        }
+    }
+
     /// Unwraps the wrapped value as a constant literal.
-    pub fn as_constant_literal(&self) -> Result<String, DatamodelError> {
+    pub fn as_constant_literal(&self) -> Result<&'a str, DatamodelError> {
         match &self.value {
-            ast::Expression::ConstantValue(value, _) => Ok(value.to_string()),
-            ast::Expression::BooleanValue(value, _) => Ok(value.to_string()),
+            ast::Expression::ConstantValue(value, _) => Ok(value),
+            ast::Expression::BooleanValue(value, _) => Ok(value),
             _ => Err(self.construct_type_mismatch_error("constant literal")),
         }
     }
 
-    /// Unwraps the wrapped value as an array literal.
-    pub fn as_array(&self) -> Vec<ValueValidator> {
+    /// Unwraps the wrapped value as a referential action.
+    pub fn as_referential_action(&self) -> Result<ReferentialAction, DatamodelError> {
+        match self.as_constant_literal()? {
+            "Cascade" => Ok(ReferentialAction::Cascade),
+            "Restrict" => Ok(ReferentialAction::Restrict),
+            "NoAction" => Ok(ReferentialAction::NoAction),
+            "SetNull" => Ok(ReferentialAction::SetNull),
+            "SetDefault" => Ok(ReferentialAction::SetDefault),
+            s => {
+                let message = format!("Invalid referential action: `{}`", s);
+
+                Err(DatamodelError::AttributeValidationError {
+                    message,
+                    attribute_name: String::from("relation"),
+                    span: self.span(),
+                })
+            }
+        }
+    }
+
+    /// Unwraps the wrapped value as a constant literal..
+    pub fn as_array(&self) -> Vec<ValueValidator<'a>> {
         match &self.value {
             ast::Expression::Array(values, _) => {
-                let mut validators: Vec<ValueValidator> = Vec::new();
+                let mut validators: Vec<ValueValidator<'_>> = Vec::new();
 
                 for value in values {
                     validators.push(ValueValidator::new(value));
@@ -176,9 +209,7 @@ impl ValueValidator {
 
                 validators
             }
-            _ => vec![ValueValidator {
-                value: self.value.clone(),
-            }],
+            _ => vec![ValueValidator { value: self.value }],
         }
     }
 
@@ -193,7 +224,7 @@ impl ValueValidator {
                     [] => vec![],
                     _ => return Err(DatamodelError::new_validation_error(&format!("DefaultValue function parsing failed. The function arg should only be empty or a single String. Got: `{:?}`. You can read about the available functions here: https://pris.ly/d/attribute-functions", args), self.span())),
                 };
-                let generator = self.get_value_generator(&name, prisma_args)?;
+                let generator = self.get_value_generator(name, prisma_args)?;
 
                 generator
                     .check_compatibility_with_scalar_type(scalar_type)
@@ -202,7 +233,7 @@ impl ValueValidator {
                 Ok(DefaultValue::Expression(generator))
             }
             _ => {
-                let x = ValueValidator::new(&self.value).as_type(scalar_type)?;
+                let x = ValueValidator::new(self.value).as_type(scalar_type)?;
                 Ok(DefaultValue::Single(x))
             }
         }
@@ -222,9 +253,9 @@ impl ValueValidator {
                         vec![x]
                     }
                     [] => vec![],
-                    _ => panic!("Should only be empty or single String."),
+                    _ => return Err(self.construct_type_mismatch_error("String or empty")),
                 };
-                self.get_value_generator(&name, prisma_args)
+                self.get_value_generator(name, prisma_args)
             }
             _ => Err(self.construct_type_mismatch_error("function")),
         }
@@ -236,29 +267,24 @@ impl ValueValidator {
     }
 }
 
-pub trait ValueListValidator {
+pub(crate) trait ValueListValidator {
     fn to_str_vec(&self) -> Result<Vec<String>, DatamodelError>;
+    fn to_string_from_env_var_vec(&self) -> Result<Vec<StringFromEnvVar>, DatamodelError>;
     fn to_literal_vec(&self) -> Result<Vec<String>, DatamodelError>;
 }
 
-impl ValueListValidator for Vec<ValueValidator> {
+impl ValueListValidator for Vec<ValueValidator<'_>> {
+    fn to_string_from_env_var_vec(&self) -> Result<Vec<StringFromEnvVar>, DatamodelError> {
+        self.iter().map(|val| val.as_str_from_env()).collect()
+    }
+
     fn to_str_vec(&self) -> Result<Vec<String>, DatamodelError> {
-        let mut res: Vec<String> = Vec::new();
-
-        for val in self {
-            res.push(val.as_str()?.to_owned());
-        }
-
-        Ok(res)
+        self.iter().map(|val| Ok(val.as_str()?.to_owned())).collect()
     }
 
     fn to_literal_vec(&self) -> Result<Vec<String>, DatamodelError> {
-        let mut res: Vec<String> = Vec::new();
-
-        for val in self {
-            res.push(val.as_constant_literal()?);
-        }
-
-        Ok(res)
+        self.iter()
+            .map(|val| val.as_constant_literal().map(String::from))
+            .collect()
     }
 }

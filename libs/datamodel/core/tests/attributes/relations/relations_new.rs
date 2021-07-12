@@ -56,7 +56,7 @@ fn relation_must_error_when_base_field_does_not_exist() {
     "#;
 
     let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_validation_error("The argument fields must refer only to existing fields. The following fields do not exist in this model: userId", Span::new(154, 210)));
+    errors.assert_is(DatamodelError::new_validation_error("The argument fields must refer only to existing fields. The following fields do not exist in this model: userId", Span::new(182, 190)));
 }
 
 #[test]
@@ -85,8 +85,7 @@ fn relation_must_error_when_base_field_is_not_scalar() {
     "#;
 
     let errors = parse_error(dml);
-    errors.assert_is_at(0,DatamodelError::new_validation_error("The argument fields must refer only to scalar fields. But it is referencing the following relation fields: other", Span::new(194, 249)));
-    errors.assert_is_at(1,DatamodelError::new_attribute_validation_error("The type of the field `other` in the model `Post` is not matching the type of the referenced field `id` in model `User`.", "relation", Span::new(194, 249)));
+    errors.assert_is_at(0,DatamodelError::new_validation_error("The argument fields must refer only to scalar fields. But it is referencing the following relation fields: other", Span::new(222, 229)));
 }
 
 #[test]
@@ -234,7 +233,7 @@ fn relation_must_error_when_referenced_field_does_not_exist() {
     "#;
 
     let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_validation_error("The argument `references` must refer only to existing fields in the related model `User`. The following fields do not exist in the related model: fooBar", Span::new(173, 233)));
+    errors.assert_is(DatamodelError::new_validation_error("The argument `references` must refer only to existing fields in the related model `User`. The following fields do not exist in the related model: fooBar", Span::new(184, 232)));
 }
 
 #[test]
@@ -255,7 +254,7 @@ fn relation_must_error_when_referenced_field_is_not_scalar() {
     "#;
 
     let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_validation_error("The argument `references` must refer only to scalar fields in the related model `User`. But it is referencing the following relation fields: posts", Span::new(173, 232)));
+    errors.assert_is(DatamodelError::new_validation_error("The argument `references` must refer only to scalar fields in the related model `User`. But it is referencing the following relation fields: posts", Span::new(184, 231)));
 }
 
 #[test]
@@ -279,9 +278,8 @@ fn relation_must_error_when_referenced_fields_are_not_a_unique_criteria() {
     errors.assert_is(DatamodelError::new_validation_error("The argument `references` must refer to a unique criteria in the related model `User`. But it is referencing the following fields that are not a unique criteria: firstName", Span::new(205, 276)));
 }
 
-#[allow(non_snake_case)]
 #[test]
-fn relation_must_NOT_error_when_referenced_fields_are_not_a_unique_criteria_on_mysql() {
+fn relation_must_not_error_when_referenced_fields_are_not_a_unique_criteria_on_mysql() {
     // MySQL allows foreign key to references a non unique criteria
     // https://stackoverflow.com/questions/588741/can-a-foreign-key-reference-a-non-unique-index
     let dml = r#"
@@ -501,7 +499,7 @@ fn must_error_when_fields_argument_is_missing_for_one_to_one() {
     let errors = parse_error(dml);
 
     errors.assert_are(
-        &[DatamodelError::new_attribute_validation_error("The relation fields `post` on Model `User` and `user` on Model `Post` do not provide the `fields` argument in the @relation attribute. You have to provide it on one of the two fields.", "relation",Span::new(77, 93)), 
+        &[DatamodelError::new_attribute_validation_error("The relation fields `post` on Model `User` and `user` on Model `Post` do not provide the `fields` argument in the @relation attribute. You have to provide it on one of the two fields.", "relation",Span::new(77, 93)),
             DatamodelError::new_attribute_validation_error("The relation fields `user` on Model `Post` and `post` on Model `User` do not provide the `fields` argument in the @relation attribute. You have to provide it on one of the two fields.", "relation",Span::new(171, 214))],
     );
 }
@@ -683,7 +681,7 @@ fn must_error_nicely_when_a_many_to_many_is_not_possible() {
 
     let errors = parse_error(dml);
     errors.assert_is_at(0, DatamodelError::new_field_validation_error(
-        "The relation field `posts` on Model `Category` references `Post` which does not have an `@id` field. Models without `@id` can not be part of a many to many relation. Use an explicit intermediate Model to represent this relationship.",
+        "The relation field `posts` on Model `Category` references `Post` which does not have an `@id` field. Models without `@id` cannot be part of a many to many relation. Use an explicit intermediate Model to represent this relationship.",
         "Category",
         "posts",
         Span::new(234, 277)
@@ -708,7 +706,7 @@ fn must_error_when_many_to_many_is_not_possible_due_to_missing_id() {
     errors.assert_is_at(
         0,
         DatamodelError::new_field_validation_error(
-            "The relation field `posts` on Model `Category` references `Post` which does not have an `@id` field. Models without `@id` can not be part of a many to many relation. Use an explicit intermediate Model to represent this relationship.",
+            "The relation field `posts` on Model `Category` references `Post` which does not have an `@id` field. Models without `@id` cannot be part of a many to many relation. Use an explicit intermediate Model to represent this relationship.",
             "Category",
             "posts",
             Span::new(189, 202)

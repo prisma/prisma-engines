@@ -1,7 +1,9 @@
 mod error;
 
 use core::fmt;
-use datamodel::Datamodel;
+use datamodel::common::preview_features::PreviewFeature;
+use datamodel::{Datamodel, Datasource};
+use enumflags2::BitFlags;
 pub use error::{ConnectorError, ErrorKind};
 use serde::*;
 use serde_json::Value;
@@ -18,7 +20,11 @@ pub trait IntrospectionConnector: Send + Sync + 'static {
 
     async fn get_database_version(&self) -> ConnectorResult<String>;
 
-    async fn introspect(&self, existing_data_model: &Datamodel) -> ConnectorResult<IntrospectionResult>;
+    async fn introspect(
+        &self,
+        existing_data_model: &Datamodel,
+        ctx: IntrospectionContext,
+    ) -> ConnectorResult<IntrospectionResult>;
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -72,4 +78,9 @@ impl fmt::Display for IntrospectionResultOutput {
             serde_json::to_string(&self.version).unwrap(),
         )
     }
+}
+
+pub struct IntrospectionContext {
+    pub source: Datasource,
+    pub preview_features: BitFlags<PreviewFeature>,
 }

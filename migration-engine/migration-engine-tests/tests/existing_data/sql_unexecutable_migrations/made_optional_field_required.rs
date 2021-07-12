@@ -1,4 +1,4 @@
-use migration_engine_tests::{sql::ResultSetExt, sync_test_api::*};
+use migration_engine_tests::sync_test_api::*;
 use quaint::Value;
 use sql_schema_describer::DefaultValue;
 
@@ -12,7 +12,7 @@ fn making_an_optional_field_required_with_data_without_a_default_is_unexecutable
         }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green_bang();
+    api.schema_push(dm1).send().assert_green_bang();
 
     api.insert("Test")
         .value("id", "abc")
@@ -33,12 +33,12 @@ fn making_an_optional_field_required_with_data_without_a_default_is_unexecutable
     );
 
     api.schema_push(dm2)
-        .send_sync()
+        .send()
         .assert_no_warning()
         .assert_unexecutable(&[error]);
 
     api.assert_schema()
-        .assert_table_bang("Test", |table| table.assert_does_not_have_column("Int"));
+        .assert_table("Test", |table| table.assert_does_not_have_column("Int"));
 
     api.dump_table("Test")
         .assert_single_row(|row| row.assert_text_value("id", "abc").assert_text_value("name", "george"));
@@ -54,7 +54,7 @@ fn making_an_optional_field_required_with_data_with_a_default_works(api: TestApi
         }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green_bang();
+    api.schema_push(dm1).send().assert_green_bang();
 
     api.insert("Test")
         .value("id", "abc")
@@ -75,12 +75,12 @@ fn making_an_optional_field_required_with_data_with_a_default_works(api: TestApi
         }
     "#;
 
-    api.schema_push(dm2).force(true).send_sync();
+    api.schema_push(dm2).force(true).send();
 
-    api.assert_schema().assert_table_bang("Test", |table| {
+    api.assert_schema().assert_table("Test", |table| {
         table.assert_column("age", |column| {
             column
-                .assert_is_required()?
+                .assert_is_required()
                 .assert_default(Some(DefaultValue::value(84)))
         })
     });
@@ -111,7 +111,7 @@ fn making_an_optional_field_required_with_data_with_a_default_is_unexecutable(ap
         }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green_bang();
+    api.schema_push(dm1).send().assert_green_bang();
 
     let initial_schema = api.assert_schema().into_schema();
 
@@ -141,11 +141,11 @@ fn making_an_optional_field_required_with_data_with_a_default_is_unexecutable(ap
 
     api.schema_push(dm2)
         .force(false)
-        .send_sync()
+        .send()
         .assert_unexecutable(&[error])
         .assert_no_warning();
 
-    api.assert_schema().assert_equals(&initial_schema).unwrap();
+    api.assert_schema().assert_equals(&initial_schema);
 
     let rows = api.dump_table("Test");
 
@@ -170,7 +170,7 @@ fn making_an_optional_field_required_on_an_empty_table_works(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green_bang();
+    api.schema_push(dm1).send().assert_green_bang();
 
     let dm2 = r#"
         model Test {
@@ -180,10 +180,10 @@ fn making_an_optional_field_required_on_an_empty_table_works(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send_sync().assert_green_bang();
+    api.schema_push(dm2).send().assert_green_bang();
 
     api.assert_schema()
-        .assert_table_bang("Test", |table| table.assert_does_not_have_column("Int"));
+        .assert_table("Test", |table| table.assert_does_not_have_column("Int"));
 
     assert!(api.dump_table("Test").is_empty());
 }

@@ -16,7 +16,7 @@ datasource db2 {
 }
 "#;
 
-    let diagnostics = parse_error(&schema);
+    let diagnostics = parse_error(schema);
     diagnostics.assert_length(2);
     diagnostics.assert_is_at(
         0,
@@ -71,7 +71,7 @@ fn must_error_for_empty_urls() {
     "#;
 
     let config = datamodel::parse_configuration(schema).unwrap();
-    let diagnostics = config.subject.datasources[0].load_url().unwrap_err();
+    let diagnostics = config.subject.datasources[0].load_url(load_env_var).unwrap_err();
 
     diagnostics.assert_is(DatamodelError::new_source_validation_error(
         "You must provide a nonempty URL",
@@ -109,7 +109,7 @@ fn must_error_for_empty_urls_derived_from_env_vars() {
     "#;
 
     let config = datamodel::parse_configuration(schema).unwrap();
-    let diagnostics = config.subject.datasources[0].load_url().unwrap_err();
+    let diagnostics = config.subject.datasources[0].load_url(load_env_var).unwrap_err();
 
     diagnostics.assert_is(DatamodelError::new_source_validation_error(
         "You must provide a nonempty URL. The environment variable `DB_URL_EMPTY_0001` resolved to an empty string.",
@@ -128,7 +128,7 @@ fn must_error_if_wrong_protocol_is_used_for_mysql() {
     "#;
 
     let config = datamodel::parse_configuration(schema).unwrap();
-    let diagnostics = config.subject.datasources[0].load_url().unwrap_err();
+    let diagnostics = config.subject.datasources[0].load_url(load_env_var).unwrap_err();
 
     diagnostics.assert_is(DatamodelError::new_source_validation_error(
         "the URL must start with the protocol `mysql://`.",
@@ -201,7 +201,7 @@ fn must_error_if_wrong_protocol_is_used_for_postgresql() {
     "#;
 
     let config = datamodel::parse_configuration(schema).unwrap();
-    let diagnostics = config.subject.datasources[0].load_url().unwrap_err();
+    let diagnostics = config.subject.datasources[0].load_url(load_env_var).unwrap_err();
 
     diagnostics.assert_is(DatamodelError::new_source_validation_error(
         "the URL must start with the protocol `postgresql://` or `postgres://`.",
@@ -240,7 +240,7 @@ fn must_error_if_wrong_protocol_is_used_for_sqlite() {
     "#;
 
     let config = datamodel::parse_configuration(schema).unwrap();
-    let diagnostics = config.subject.datasources[0].load_url().unwrap_err();
+    let diagnostics = config.subject.datasources[0].load_url(load_env_var).unwrap_err();
 
     diagnostics.assert_is(DatamodelError::new_source_validation_error(
         "the URL must start with the protocol `file:`.",
@@ -289,7 +289,7 @@ fn must_error_if_env_var_is_missing() {
     "#;
 
     let config = datamodel::parse_configuration(schema).unwrap();
-    let diagnostics = config.subject.datasources[0].load_url().unwrap_err();
+    let diagnostics = config.subject.datasources[0].load_url(load_env_var).unwrap_err();
 
     diagnostics.assert_is(DatamodelError::new_environment_functional_evaluation_error(
         "MISSING_DATABASE_URL_0001".into(),
@@ -309,7 +309,9 @@ fn must_succeed_if_env_var_is_missing_but_override_was_provided() {
     let url = "postgres://localhost";
     let overrides = vec![("ds".to_string(), url.to_string())];
     let mut config = parse_configuration(schema);
-    config.resolve_datasource_urls_from_env(&overrides).unwrap();
+    config
+        .resolve_datasource_urls_from_env(&overrides, load_env_var)
+        .unwrap();
     let data_source = config.datasources.first().unwrap();
 
     data_source.assert_name("ds");
@@ -332,7 +334,9 @@ fn must_succeed_if_env_var_exists_and_override_was_provided() {
     let url = "postgres://hostbar";
     let overrides = vec![("ds".to_string(), url.to_string())];
     let mut config = parse_configuration(schema);
-    config.resolve_datasource_urls_from_env(&overrides).unwrap();
+    config
+        .resolve_datasource_urls_from_env(&overrides, load_env_var)
+        .unwrap();
     let data_source = config.datasources.first().unwrap();
 
     data_source.assert_name("ds");
@@ -354,7 +358,9 @@ fn must_succeed_with_overrides() {
     let url = "postgres://hostbar";
     let overrides = &[("ds".to_string(), url.to_string())];
     let mut config = parse_configuration(schema);
-    config.resolve_datasource_urls_from_env(overrides).unwrap();
+    config
+        .resolve_datasource_urls_from_env(overrides, load_env_var)
+        .unwrap();
 
     let data_source = config.datasources.first().unwrap();
 
@@ -459,13 +465,13 @@ fn planet_scale_mode_without_preview_feature_errors() {
         let err = parse_error(schema);
 
         assert!(
-            err.errors
+            err.errors()
                 .first()
                 .unwrap()
                 .to_string()
                 .starts_with("Error validating datasource `ps`: \nThe `planetScaleMode` option can only be set if the preview feature is enabled"),
             "{}",
-            err.errors.first().unwrap()
+            err.errors().first().unwrap()
         );
     }
 }
@@ -496,4 +502,8 @@ fn assert_eq_json(a: &str, b: &str) {
     let json_b: serde_json::Value = serde_json::from_str(b).expect("The String b was not valid JSON.");
 
     assert_eq!(json_a, json_b);
+}
+
+fn load_env_var(key: &str) -> Option<String> {
+    std::env::var(key).ok()
 }

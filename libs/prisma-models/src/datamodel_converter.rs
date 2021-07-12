@@ -60,10 +60,10 @@ impl<'a> DatamodelConverter<'a> {
             .map(|model| ModelTemplate {
                 name: model.name.clone(),
                 is_embedded: model.is_embedded,
-                fields: self.convert_fields(&model),
+                fields: self.convert_fields(model),
                 manifestation: model.database_name().map(|s| s.to_owned()),
                 id_field_names: model.id_fields.clone(),
-                indexes: self.convert_indexes(&model),
+                indexes: self.convert_indexes(model),
                 supports_create_operation: model.supports_create_operation(),
                 dml_model: model.clone(),
             })
@@ -98,6 +98,8 @@ impl<'a> DatamodelConverter<'a> {
                         relation_name: relation.name.clone(),
                         relation_side: relation.relation_side(rf),
                         relation_info: rf.relation_info.clone(),
+                        on_delete_default: rf.default_on_delete_action(),
+                        on_update_default: rf.default_on_update_action(),
                     }))
                 }
                 dml::Field::ScalarField(sf) => {
@@ -110,8 +112,8 @@ impl<'a> DatamodelConverter<'a> {
                         type_identifier: sf.type_identifier(),
                         is_required: sf.is_required(),
                         is_list: sf.is_list(),
-                        is_unique: sf.is_unique(&model),
-                        is_id: sf.is_id(&model),
+                        is_unique: sf.is_unique(model),
+                        is_id: sf.is_id(model),
                         is_auto_generated_int_id: sf.is_auto_generated_int_id(),
                         is_autoincrement: sf.is_auto_increment(),
                         behaviour: sf.behaviour(),
@@ -132,8 +134,6 @@ impl<'a> DatamodelConverter<'a> {
             .filter(|r| r.model_a.is_relation_supported(&r.field_a) && r.model_b.is_relation_supported(&r.field_b))
             .map(|r| RelationTemplate {
                 name: r.name(),
-                model_a_on_delete: OnDelete::SetNull,
-                model_b_on_delete: OnDelete::SetNull,
                 manifestation: r.manifestation(),
                 model_a_name: r.model_a.name.clone(),
                 model_b_name: r.model_b.name.clone(),
@@ -166,10 +166,10 @@ impl<'a> DatamodelConverter<'a> {
                 } = &field.relation_info;
 
                 let related_model = datamodel
-                    .find_model(&to)
+                    .find_model(to)
                     .unwrap_or_else(|| panic!("Related model {} not found", to));
 
-                let (_, related_field) = datamodel.find_related_field_bang(&field);
+                let (_, related_field) = datamodel.find_related_field_bang(field);
 
                 let related_field_info: &dml::RelationInfo = &related_field.relation_info;
 
@@ -442,19 +442,8 @@ impl DatamodelFieldExtensions for dml::ScalarField {
         match &self.field_type {
             dml::FieldType::Enum(x) => TypeIdentifier::Enum(x.clone()),
             dml::FieldType::Relation(_) => TypeIdentifier::String, // Todo: Unused
-            dml::FieldType::Base(scalar, _) => match scalar {
-                dml::ScalarType::Boolean => TypeIdentifier::Boolean,
-                dml::ScalarType::DateTime => TypeIdentifier::DateTime,
-                dml::ScalarType::Float => TypeIdentifier::Float,
-                dml::ScalarType::Decimal => TypeIdentifier::Decimal,
-                dml::ScalarType::Int => TypeIdentifier::Int,
-                dml::ScalarType::String => TypeIdentifier::String,
-                dml::ScalarType::Json => TypeIdentifier::Json,
-                dml::ScalarType::Bytes => TypeIdentifier::Bytes,
-                dml::ScalarType::BigInt => TypeIdentifier::BigInt,
-            },
+            dml::FieldType::Scalar(scalar, _, _) => (*scalar).into(),
             dml::FieldType::Unsupported(_) => TypeIdentifier::Unsupported,
-            dml::FieldType::NativeType(scalar_type, _) => (*scalar_type).into(),
         }
     }
 
@@ -513,7 +502,7 @@ impl DatamodelFieldExtensions for dml::ScalarField {
 
     fn native_type(&self) -> Option<NativeTypeInstance> {
         match &self.field_type {
-            datamodel::FieldType::NativeType(_, nt) => Some(nt.clone()),
+            datamodel::FieldType::Scalar(_, _, nt) => nt.clone(),
             _ => None,
         }
     }

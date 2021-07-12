@@ -151,7 +151,7 @@ fn relation_field_as_id_must_error() {
     model User {
         identification Identification @relation(references:[id]) @id
     }
-    
+
     model Identification {
         id Int @id
     }
@@ -162,28 +162,5 @@ fn relation_field_as_id_must_error() {
         "The field `identification` is a relation field and cannot be marked with `@id`. Only scalar fields can be declared as id.",
         "id",
         Span::new(84, 86),
-    ));
-}
-
-#[test]
-fn relation_fields_as_part_of_compound_id_must_error() {
-    let dml = r#"
-    model User {
-        name           String            
-        identification Identification @relation(references:[id])
-
-        @@id([name, identification])
-    }
-    
-    model Identification {
-        id Int @id
-    }
-    "#;
-
-    let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_model_validation_error(
-        "The id definition refers to the relation fields identification. Id definitions must reference only scalar fields.",
-        "User",
-        Span::new(136, 162),
     ));
 }

@@ -56,25 +56,6 @@ impl TableFormat {
         }
     }
 
-    // TODO: make a decision on whether we can remove this once i understand what this is
-    #[allow(unused)]
-    fn column_locked_writer(&mut self) -> ColumnLockedWriter<'_> {
-        if self.table.is_empty() {
-            self.start_new_line();
-            self.write("");
-        }
-
-        let index = match &self.table[self.row as usize] {
-            Row::Regular(row, _) => row.len() - 1,
-            Row::Interleaved(_) => panic!("Cannot lock col in interleaved mode"),
-        };
-
-        ColumnLockedWriter {
-            formatter: self,
-            column: index,
-        }
-    }
-
     pub fn interleave(&mut self, text: &str) {
         self.table.push(Row::Interleaved(String::from(text)));
         // We've just ended a line.

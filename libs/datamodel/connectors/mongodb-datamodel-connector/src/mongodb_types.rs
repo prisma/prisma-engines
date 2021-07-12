@@ -67,7 +67,7 @@ pub(crate) fn mongo_type_from_input(name: &str, args: &[String]) -> crate::Resul
         DOUBLE => MongoDbType::Double,
         LONG => MongoDbType::Long,
         INT => MongoDbType::Int,
-        ARRAY => parse_array_type(&args)?,
+        ARRAY => parse_array_type(args)?,
         BIN_DATA => MongoDbType::BinData,
         OBJECT_ID => MongoDbType::ObjectId,
         BOOL => MongoDbType::Bool,

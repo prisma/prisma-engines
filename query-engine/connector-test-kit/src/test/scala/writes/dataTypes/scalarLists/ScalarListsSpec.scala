@@ -5,6 +5,7 @@ import play.api.libs.json.JsValue
 import util.ConnectorCapability.ScalarListsCapability
 import util._
 
+// RS: Ported
 class ScalarListsSpec extends FlatSpec with Matchers with ApiSpecBase {
 
   override def runOnlyForCapabilities = Set(ScalarListsCapability)

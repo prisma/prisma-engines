@@ -4,6 +4,7 @@ import org.scalatest.{FlatSpec, Matchers}
 import util.ConnectorTag.MySqlConnectorTag
 import util._
 
+// RS: Ported
 class MySqlNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase with ConnectorAwareTest {
   override def runOnlyForConnectors: Set[ConnectorTag] = Set(MySqlConnectorTag)
 

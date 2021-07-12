@@ -1,4 +1,4 @@
-use migration_engine_tests::{sql::ResultSetExt, sync_test_api::*};
+use migration_engine_tests::sync_test_api::*;
 use quaint::Value;
 
 #[test_connector]
@@ -11,7 +11,7 @@ fn altering_the_type_of_a_column_in_a_non_empty_table_warns(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green_bang();
+    api.schema_push(dm1).send().assert_green_bang();
 
     let insert = quaint::ast::Insert::single_into(api.render_table_name("User"))
         .value("id", "abc")
@@ -28,7 +28,7 @@ fn altering_the_type_of_a_column_in_a_non_empty_table_warns(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send_sync().assert_warnings(&[
+    api.schema_push(dm2).send().assert_warnings(&[
         if api.is_postgres() {
             "You are about to alter the column `dogs` on the `User` table, which contains 1 non-null values. The data in that column will be cast from `BigInt` to `Integer`.".into()
         } else if api.lower_cases_table_names() {
@@ -41,8 +41,8 @@ fn altering_the_type_of_a_column_in_a_non_empty_table_warns(api: TestApi) {
     api.dump_table("User")
         .assert_single_row(|row| row.assert_int_value("dogs", 7));
 
-    api.assert_schema().assert_table_bang("User", |table| {
-        table.assert_column("dogs", |col| col.assert_type_is_bigint()?.assert_is_required())
+    api.assert_schema().assert_table("User", |table| {
+        table.assert_column("dogs", |col| col.assert_type_is_bigint().assert_is_required())
     });
 }
 
@@ -55,7 +55,7 @@ fn migrating_a_required_column_from_int_to_string_should_cast(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green_bang();
+    api.schema_push(dm1).send().assert_green_bang();
 
     api.insert("Test")
         .value("id", "abcd")
@@ -72,9 +72,9 @@ fn migrating_a_required_column_from_int_to_string_should_cast(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send_sync().assert_green_bang();
+    api.schema_push(dm2).send().assert_green_bang();
 
-    api.assert_schema().assert_table_bang("Test", |table| {
+    api.assert_schema().assert_table("Test", |table| {
         table.assert_column("serialNumber", |col| col.assert_type_is_string())
     });
 
@@ -100,7 +100,7 @@ fn changing_a_string_array_column_to_scalar_is_fine(api: TestApi) {
         datasource_block = datasource_block,
     );
 
-    api.schema_push(&dm1).send_sync().assert_green_bang();
+    api.schema_push(&dm1).send().assert_green_bang();
 
     api.insert("Film")
         .value("id", "film1")
@@ -122,9 +122,9 @@ fn changing_a_string_array_column_to_scalar_is_fine(api: TestApi) {
         datasource_block = datasource_block,
     );
 
-    api.schema_push(&dm2).force(true).send_sync().assert_green_bang();
+    api.schema_push(&dm2).force(true).send().assert_green_bang();
 
-    api.assert_schema().assert_table_bang("Film", |table| {
+    api.assert_schema().assert_table("Film", |table| {
         table.assert_column("mainProtagonist", |column| column.assert_is_required())
     });
 
@@ -151,7 +151,7 @@ fn changing_an_int_array_column_to_scalar_is_not_possible(api: TestApi) {
         datasource_block = datasource_block,
     );
 
-    api.schema_push(&dm1).send_sync().assert_green_bang();
+    api.schema_push(&dm1).send().assert_green_bang();
 
     api.insert("Film")
         .value("id", "film1")
@@ -172,11 +172,11 @@ fn changing_an_int_array_column_to_scalar_is_not_possible(api: TestApi) {
 
     api.schema_push(&dm2)
         .force(true)
-        .send_sync()
+        .send()
         .assert_no_warning()
         .assert_unexecutable(&["Changed the type of `mainProtagonist` on the `Film` table. No cast exists, the column would be dropped and recreated, which cannot be done since the column is required and there is data in the table.".into()]);
 
-    api.assert_schema().assert_table_bang("Film", |table| {
+    api.assert_schema().assert_table("Film", |table| {
         table.assert_column("mainProtagonist", |column| column.assert_is_list())
     });
 
@@ -195,7 +195,7 @@ fn int_to_string_conversions_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green_bang();
+    api.schema_push(dm1).send().assert_green_bang();
 
     api.insert("Cat").value("tag", 20).result_raw();
 
@@ -207,7 +207,7 @@ fn int_to_string_conversions_work(api: TestApi) {
     "#;
 
     api.schema_push(dm2)
-        .send_sync()
+        .send()
         .assert_green_bang()
         .assert_has_executed_steps();
 
@@ -224,7 +224,7 @@ fn string_to_int_conversions_are_risky(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green_bang();
+    api.schema_push(dm1).send().assert_green_bang();
 
     api.insert("Cat").value("tag", "20").result_raw();
 
@@ -239,7 +239,7 @@ fn string_to_int_conversions_are_risky(api: TestApi) {
         // Not executable
         api.schema_push(dm2)
             .force(true)
-            .send_sync()
+            .send()
             .assert_no_warning()
             .assert_unexecutable(&["Changed the type of `tag` on the `Cat` table. No cast exists, the column would be dropped and recreated, which cannot be done since the column is required and there is data in the table.".into()]);
     } else if api.is_mysql() {
@@ -247,7 +247,7 @@ fn string_to_int_conversions_are_risky(api: TestApi) {
         if api.lower_cases_table_names() {
             api.schema_push(dm2)
             .force(true)
-            .send_sync()
+            .send()
             .assert_warnings(&[
                 "You are about to alter the column `tag` on the `cat` table, which contains 1 non-null values. The data in that column will be cast from `VarChar(191)` to `Int`.".into()
             ])
@@ -260,7 +260,7 @@ fn string_to_int_conversions_are_risky(api: TestApi) {
             // Executable, conditionally.
             api.schema_push(dm2)
                 .force(true)
-                .send_sync()
+                .send()
                 .assert_warnings(&[
                     "You are about to alter the column `tag` on the `Cat` table, which contains 1 non-null values. The data in that column will be cast from `VarChar(191)` to `Int`.".into()
                 ])
@@ -273,7 +273,7 @@ fn string_to_int_conversions_are_risky(api: TestApi) {
     } else if api.is_mssql() {
         api.schema_push(dm2)
         .force(true)
-        .send_sync()
+        .send()
         .assert_warnings(&[
             "You are about to alter the column `tag` on the `Cat` table, which contains 1 non-null values. The data in that column will be cast from `NVarChar(1000)` to `Int`.".into()
         ])
@@ -285,7 +285,7 @@ fn string_to_int_conversions_are_risky(api: TestApi) {
     } else if api.is_sqlite() {
         api.schema_push(dm2)
             .force(true)
-            .send_sync()
+            .send()
             .assert_warnings(&[
                 "You are about to alter the column `tag` on the `Cat` table, which contains 1 non-null values. The data in that column will be cast from `String` to `Int`.".into()
             ])
@@ -308,7 +308,7 @@ fn datetime_to_float_conversions_are_impossible(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green_bang();
+    api.schema_push(dm1).send().assert_green_bang();
 
     api.insert("Cat")
         .value("birthday", Value::datetime("2018-01-18T08:01:02Z".parse().unwrap()))
@@ -322,7 +322,7 @@ fn datetime_to_float_conversions_are_impossible(api: TestApi) {
     "#;
 
     api.schema_push(dm2)
-        .send_sync()
+        .send()
         .assert_warnings(&[
             "The `birthday` column on the `Cat` table would be dropped and recreated. This will lead to data loss."
                 .into(),
@@ -335,7 +335,7 @@ fn datetime_to_float_conversions_are_impossible(api: TestApi) {
 
     api.schema_push(dm2)
         .force(true)
-        .send_sync()
+        .send()
         .assert_warnings(&[
             "The `birthday` column on the `Cat` table would be dropped and recreated. This will lead to data loss."
                 .into(),

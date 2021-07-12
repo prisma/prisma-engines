@@ -1,4 +1,4 @@
-use crate::{configuration, StringFromEnvVar};
+use crate::configuration::{self, StringFromEnvVar};
 
 #[derive(Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -25,7 +25,7 @@ fn sources_to_json_structs(sources: &[configuration::Datasource]) -> Vec<SourceC
     let mut res: Vec<SourceConfig> = Vec::new();
 
     for source in sources {
-        res.push(source_to_json_struct(&source));
+        res.push(source_to_json_struct(source));
     }
 
     res

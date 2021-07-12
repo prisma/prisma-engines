@@ -3,9 +3,9 @@
 mod commands;
 mod logger;
 
-use migration_core::api::RpcApi;
+use crate::logger::log_error_and_exit;
+use migration_core::rpc_api;
 use structopt::StructOpt;
-use user_facing_errors::{common::SchemaParserError, UserFacingError};
 
 /// When no subcommand is specified, the migration engine will default to starting as a JSON-RPC
 /// server over stdio.
@@ -37,7 +37,7 @@ impl SubCommand {
 
 #[tokio::main]
 async fn main() {
-    user_facing_errors::set_panic_hook();
+    set_panic_hook();
     logger::init_logger();
 
     let input = MigrationEngineCli::from_args();
@@ -57,7 +57,32 @@ async fn main() {
     }
 }
 
-async fn start_engine(datamodel_location: &str) -> ! {
+pub fn set_panic_hook() {
+    std::panic::set_hook(Box::new(move |panic_info| {
+        let message = panic_info
+            .payload()
+            .downcast_ref::<&str>()
+            .copied()
+            .or_else(|| panic_info.payload().downcast_ref::<String>().map(|s| s.as_str()))
+            .unwrap_or("<unknown panic>");
+
+        let location = panic_info
+            .location()
+            .map(|loc| loc.to_string())
+            .unwrap_or_else(|| "<unknown location>".to_owned());
+
+        tracing::error!(
+            is_panic = true,
+            backtrace = ?backtrace::Backtrace::new(),
+            location = %location,
+            "[{}] {}",
+            location,
+            message
+        );
+    }));
+}
+
+async fn start_engine(datamodel_location: &str) {
     use std::io::Read as _;
 
     tracing::info!(git_hash = env!("GIT_HASH"), "Starting migration engine RPC server",);
@@ -66,22 +91,11 @@ async fn start_engine(datamodel_location: &str) -> ! {
     let mut datamodel = String::new();
     file.read_to_string(&mut datamodel).unwrap();
 
-    match RpcApi::new(&datamodel).await {
+    match rpc_api(&datamodel).await {
         // Block the thread and handle IO in async until EOF.
-        Ok(api) => json_rpc_stdio::run(api.io_handler()).await.unwrap(),
+        Ok(api) => json_rpc_stdio::run(&api).await.unwrap(),
         Err(err) => {
-            let user_facing_error = err.to_user_facing();
-            let exit_code =
-                if user_facing_error.as_known().map(|err| err.error_code) == Some(SchemaParserError::ERROR_CODE) {
-                    1
-                } else {
-                    250
-                };
-
-            serde_json::to_writer(std::io::stdout().lock(), &user_facing_error).expect("failed to write to stdout");
-            std::process::exit(exit_code)
+            log_error_and_exit(err);
         }
     }
-
-    std::process::exit(0);
 }

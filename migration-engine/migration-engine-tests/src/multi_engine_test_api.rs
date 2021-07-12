@@ -3,10 +3,15 @@
 //! A TestApi that is initialized without IO or async code and can instantiate
 //! multiple migration engines.
 
+use datamodel::common::preview_features::PreviewFeature;
 pub use test_macros::test_connector;
+pub use test_setup::sqlite_test_url;
 pub use test_setup::{BitFlags, Capabilities, Tags};
 
-use crate::{ApplyMigrations, CreateMigration, DiagnoseMigrationHistory, Reset, SchemaAssertion, SchemaPush};
+use crate::{
+    assertions::SchemaAssertion,
+    commands::{ApplyMigrations, CreateMigration, DiagnoseMigrationHistory, Reset, SchemaPush},
+};
 use migration_core::GenericApi;
 use quaint::{
     prelude::{Queryable, ResultSet},
@@ -23,6 +28,7 @@ pub struct TestApi {
     connection_string: String,
     pub(crate) admin_conn: Quaint,
     pub(crate) rt: tokio::runtime::Runtime,
+    preview_features: BitFlags<PreviewFeature>,
 }
 
 impl TestApi {
@@ -31,6 +37,12 @@ impl TestApi {
         let rt = test_setup::runtime::test_tokio_runtime();
         let tags = args.tags();
 
+        let preview_features = args
+            .preview_features()
+            .iter()
+            .flat_map(|f| PreviewFeature::parse_opt(f))
+            .collect();
+
         let (admin_conn, connection_string) = if tags.contains(Tags::Postgres) {
             let (_, q, cs) = rt.block_on(args.create_postgres_database());
             (q, cs)
@@ -38,6 +50,7 @@ impl TestApi {
             let conn = rt
                 .block_on(SqlMigrationConnector::new(
                     args.database_url(),
+                    preview_features,
                     args.shadow_database_url().map(String::from),
                 ))
                 .unwrap();
@@ -69,6 +82,7 @@ impl TestApi {
             connection_string,
             admin_conn,
             rt,
+            preview_features,
         }
     }
 
@@ -163,7 +177,8 @@ impl TestApi {
         let connector = self
             .rt
             .block_on(SqlMigrationConnector::new(
-                &connection_string,
+                connection_string,
+                self.preview_features,
                 shadow_db_connection_string,
             ))
             .unwrap();
@@ -196,7 +211,7 @@ pub struct EngineTestApi<'a> {
 impl EngineTestApi<'_> {
     /// Plan an `applyMigrations` command
     pub fn apply_migrations<'a>(&'a self, migrations_directory: &'a TempDir) -> ApplyMigrations<'a> {
-        ApplyMigrations::new_sync(&self.connector, migrations_directory, &self.rt)
+        ApplyMigrations::new_sync(&self.connector, migrations_directory, self.rt)
     }
 
     /// Plan a `createMigration` command
@@ -206,7 +221,7 @@ impl EngineTestApi<'_> {
         schema: &'a str,
         migrations_directory: &'a TempDir,
     ) -> CreateMigration<'a> {
-        CreateMigration::new_sync(&self.connector, name, schema, migrations_directory, &self.rt)
+        CreateMigration::new_sync(&self.connector, name, schema, migrations_directory, self.rt)
     }
 
     /// Builder and assertions to call the DiagnoseMigrationHistory command.
@@ -226,22 +241,22 @@ impl EngineTestApi<'_> {
 
     /// Plan a `reset` command
     pub fn reset(&self) -> Reset<'_> {
-        Reset::new_sync(&self.connector, &self.rt)
+        Reset::new_sync(&self.connector, self.rt)
     }
 
     /// Plan a `schemaPush` command
     pub fn schema_push(&self, dm: impl Into<String>) -> SchemaPush<'_> {
-        SchemaPush::new_sync(&self.connector, dm.into(), &self.rt)
+        SchemaPush::new(&self.connector, dm.into(), self.rt)
     }
 
     /// The schema name of the current connected database.
     pub fn schema_name(&self) -> &str {
-        self.connector.quaint().connection_info().schema_name()
+        self.connector.schema_name()
     }
 
     /// Execute a raw SQL command and expect it to succeed.
     #[track_caller]
     pub fn raw_cmd(&self, cmd: &str) {
-        self.rt.block_on(self.connector.quaint().raw_cmd(cmd)).unwrap()
+        self.rt.block_on(self.connector.queryable().raw_cmd(cmd)).unwrap()
     }
 }

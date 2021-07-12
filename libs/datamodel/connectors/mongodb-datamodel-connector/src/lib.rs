@@ -5,8 +5,10 @@ use datamodel_connector::{
     Connector, ConnectorCapability,
 };
 use dml::{
-    native_type_constructor::NativeTypeConstructor, native_type_instance::NativeTypeInstance, traits::WithDatabaseName,
+    default_value::DefaultValue, field::FieldType, native_type_constructor::NativeTypeConstructor,
+    native_type_instance::NativeTypeInstance, relation_info::ReferentialAction, traits::WithDatabaseName,
 };
+use enumflags2::BitFlags;
 use mongodb_types::*;
 use native_types::MongoDbType;
 use std::result::Result as StdResult;
@@ -16,10 +18,13 @@ type Result<T> = std::result::Result<T, ConnectorError>;
 pub struct MongoDbDatamodelConnector {
     capabilities: Vec<ConnectorCapability>,
     native_types: Vec<NativeTypeConstructor>,
+    referential_actions: BitFlags<ReferentialAction>,
 }
 
 impl MongoDbDatamodelConnector {
     pub fn new() -> Self {
+        use ReferentialAction::*;
+
         let capabilities = vec![
             ConnectorCapability::RelationsOverNonUniqueCriteria,
             ConnectorCapability::Json,
@@ -27,16 +32,17 @@ impl MongoDbDatamodelConnector {
             ConnectorCapability::MultipleIndexesWithSameName,
             ConnectorCapability::RelationFieldsInArbitraryOrder,
             ConnectorCapability::CreateMany,
-            ConnectorCapability::CreateSkipDuplicates,
             ConnectorCapability::ScalarLists,
             ConnectorCapability::InsensitiveFilters,
         ];
 
         let native_types = mongodb_types::available_types();
+        let referential_actions = Restrict | SetNull | NoAction | Cascade;
 
         Self {
             capabilities,
             native_types,
+            referential_actions,
         }
     }
 }
@@ -48,12 +54,24 @@ impl Default for MongoDbDatamodelConnector {
 }
 
 impl Connector for MongoDbDatamodelConnector {
-    fn name(&self) -> String {
-        "MongoDB".to_owned()
+    fn name(&self) -> &str {
+        "MongoDB"
     }
 
-    fn capabilities(&self) -> &Vec<ConnectorCapability> {
+    fn capabilities(&self) -> &[ConnectorCapability] {
         &self.capabilities
+    }
+
+    fn constraint_name_length(&self) -> usize {
+        127
+    }
+
+    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
+        self.referential_actions
+    }
+
+    fn emulates_referential_actions(&self) -> bool {
+        true
     }
 
     fn validate_field(&self, field: &dml::field::Field) -> Result<()> {
@@ -79,11 +97,35 @@ impl Connector for MongoDbDatamodelConnector {
             }?;
         }
 
+        // If the field is _not_ a native-type-annotated field and it has a `dbgenerated` defult, we error.
+        if !matches!(field.field_type(), FieldType::Scalar(_, _, Some(_)))
+            && matches!(field.default_value(), Some(DefaultValue::Expression(expr)) if expr.is_dbgenerated())
+        {
+            let message = if field.is_id() {
+                format!(
+                    "MongoDB `@default(dbgenerated())` IDs must have an `ObjectID` native type annotation. `{}` is an ID field, so you probably want `ObjectId` as your native type.",
+                    field.name()
+                )
+            } else {
+                "MongoDB `@default(dbgenerated())` fields must have a native type annotation.".to_owned()
+            };
+
+            return Err(ConnectorError::from_kind(ErrorKind::FieldValidationError {
+                field: field.name().to_owned(),
+                message,
+            }));
+        }
+
         Ok(())
     }
 
-    fn validate_model(&self, _model: &dml::model::Model) -> Result<()> {
-        // Todo
+    fn validate_model(&self, model: &dml::model::Model) -> Result<()> {
+        if model.id_field_names().is_empty() {
+            return Err(ConnectorError::from_kind(ErrorKind::InvalidModelError {
+                message: "MongoDB models require exactly one identity field annotated with @id".to_owned(),
+            }));
+        }
+
         Ok(())
     }
 

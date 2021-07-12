@@ -53,12 +53,29 @@ fn basic_create_migration_works(api: TestApi) {
             } else if api.is_mssql() {
                 indoc! {
                     r#"
+                        BEGIN TRY
+
+                        BEGIN TRAN;
+
                         -- CreateTable
                         CREATE TABLE [basic_create_migration_works].[Cat] (
                             [id] INT NOT NULL,
                             [name] NVARCHAR(1000) NOT NULL,
                             CONSTRAINT [PK__Cat__id] PRIMARY KEY ([id])
                         );
+
+                        COMMIT TRAN;
+
+                        END TRY
+                        BEGIN CATCH
+
+                        IF @@TRANCOUNT > 0
+                        BEGIN 
+                            ROLLBACK TRAN;
+                        END;
+                        THROW
+
+                        END CATCH
                         "#
                 }
             } else {
@@ -142,12 +159,29 @@ fn creating_a_second_migration_should_have_the_previous_sql_schema_as_baseline(a
                 else if api.is_mssql() {
                     indoc! {
                         r#"
+                        BEGIN TRY
+
+                        BEGIN TRAN;
+
                         -- CreateTable
                         CREATE TABLE [creating_a_second_migration_should_have_the_previous_sql_schema_as_baseline].[Dog] (
                             [id] INT NOT NULL,
                             [name] NVARCHAR(1000) NOT NULL,
                             CONSTRAINT [PK__Dog__id] PRIMARY KEY ([id])
                         );
+
+                        COMMIT TRAN;
+
+                        END TRY
+                        BEGIN CATCH
+
+                        IF @@TRANCOUNT > 0
+                        BEGIN 
+                            ROLLBACK TRAN;
+                        END;
+                        THROW
+
+                        END CATCH
                         "#
                     }
                 } else {
@@ -216,7 +250,6 @@ fn migration_name_length_is_validated(api: TestApi) {
 
     api.create_migration("a-migration-with-a-name-that-is-way-too-long-a-migration-with-a-name-that-is-way-too-long-a-migration-with-a-name-that-is-way-too-long-a-migration-with-a-name-that-is-way-too-long", dm, &dir)
         .send_sync()
-
         .assert_migration_directories_count(1);
 }
 
@@ -428,8 +461,6 @@ fn no_additional_unique_created(api: TestApi) {
             id      Int @id
             cat     Cat @relation(fields:[id], references: [id])
         }
-
-
     "#;
 
     let dir = api.create_migrations_directory();

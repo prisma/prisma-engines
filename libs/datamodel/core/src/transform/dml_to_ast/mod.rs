@@ -1,12 +1,16 @@
 mod datasource_serializer;
 mod generator_serializer;
 mod lower;
+mod lower_enum_attributes;
+mod lower_enum_value_attributes;
+mod lower_field;
+mod lower_model_attributes;
 
 pub use datasource_serializer::DatasourceSerializer;
 pub use generator_serializer::GeneratorSerializer;
 pub use lower::LowerDmlToAst;
 
-use crate::{ast, StringFromEnvVar};
+use crate::{ast, configuration::StringFromEnvVar};
 
 fn lower_string_from_env_var(arg_name: &str, string_from_env: &StringFromEnvVar) -> ast::Argument {
     match string_from_env.as_env_var() {

@@ -15,7 +15,7 @@ async fn run_with_io(
     let mut output = tokio::io::BufWriter::new(output);
 
     while let Some(line) = input_lines.next_line().await? {
-        let response = handle_request(&handler, &line).await;
+        let response = handle_request(handler, &line).await;
         output.write_all(response.as_bytes()).await?;
         output.write_all(b"\n").await?;
         output.flush().await?;

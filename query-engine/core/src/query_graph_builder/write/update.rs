@@ -1,5 +1,5 @@
 use super::*;
-use crate::{constants::args, query_graph_builder::write::write_args_parser::*};
+use crate::{constants::args, query_graph_builder::write::write_args_parser::*, ConnectorContext};
 use crate::{
     query_ast::*,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
@@ -11,7 +11,12 @@ use std::{convert::TryInto, sync::Arc};
 
 /// Creates an update record query and adds it to the query graph, together with it's nested queries and companion read query.
 #[tracing::instrument(skip(graph, model, field))]
-pub fn update_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedField) -> QueryGraphBuilderResult<()> {
+pub fn update_record(
+    graph: &mut QueryGraph,
+    connector_ctx: &ConnectorContext,
+    model: ModelRef,
+    mut field: ParsedField,
+) -> QueryGraphBuilderResult<()> {
     // "where"
     let where_arg: ParsedInputMap = field.arguments.lookup(args::WHERE).unwrap().value.try_into()?;
     let filter = extract_unique_filter(where_arg, &model)?;
@@ -20,7 +25,7 @@ pub fn update_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
     let data_argument = field.arguments.lookup(args::DATA).unwrap();
     let data_map: ParsedInputMap = data_argument.value.try_into()?;
 
-    let update_node = update_record_node(graph, filter, Arc::clone(&model), data_map)?;
+    let update_node = update_record_node(graph, connector_ctx, filter, Arc::clone(&model), data_map)?;
 
     let read_query = read::find_unique(field, model.clone())?;
     let read_node = graph.create_node(Query::Read(read_query));
@@ -55,6 +60,7 @@ pub fn update_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
 #[tracing::instrument(skip(graph, model, field))]
 pub fn update_many_records(
     graph: &mut QueryGraph,
+    connector_ctx: &ConnectorContext,
     model: ModelRef,
     mut field: ParsedField,
 ) -> QueryGraphBuilderResult<()> {
@@ -87,6 +93,7 @@ pub fn update_many_records(
 #[tracing::instrument(skip(graph, filter, model, data_map))]
 pub fn update_record_node<T>(
     graph: &mut QueryGraph,
+    connector_ctx: &ConnectorContext,
     filter: T,
     model: ModelRef,
     data_map: ParsedInputMap,
@@ -111,7 +118,7 @@ where
 
     let node = graph.create_node(Query::Write(WriteQuery::UpdateRecord(ur)));
     for (relation_field, data_map) in update_args.nested {
-        nested::connect_nested_query(graph, node, relation_field, data_map)?;
+        nested::connect_nested_query(graph, connector_ctx, node, relation_field, data_map)?;
     }
 
     Ok(node)

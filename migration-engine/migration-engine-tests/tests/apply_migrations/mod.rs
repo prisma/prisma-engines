@@ -1,5 +1,5 @@
 use indoc::formatdoc;
-use migration_engine_tests::{sync_test_api::*, MigrationsAssertions};
+use migration_engine_tests::sync_test_api::*;
 use pretty_assertions::assert_eq;
 use user_facing_errors::{migration_engine::ApplyMigrationError, UserFacingError};
 
@@ -102,7 +102,7 @@ fn migrations_should_fail_when_the_script_is_invalid(api: TestApi) {
     {
         let expected_error_message = formatdoc!(
             r#"
-                A migration failed to apply. New migrations can not be applied before the error is recovered from. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve
+                A migration failed to apply. New migrations cannot be applied before the error is recovered from. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve
 
                 Migration name: {second_migration_name}
 
@@ -125,14 +125,19 @@ fn migrations_should_fail_when_the_script_is_invalid(api: TestApi) {
                 t if t.contains(Tags::Mariadb) => "You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near \'^.^)_n\' at line 1",
                 t if t.contains(Tags::Mysql) => "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near \'^.^)_n\' at line 1",
                 t if t.contains(Tags::Mssql) => "Incorrect syntax near \'^\'.",
-                t if t.contains(Tags::Postgres) => "db error: ERROR: syntax error at or near \"^\"",
+                t if t.contains(Tags::Postgres) => "ERROR: syntax error at or near \"^\"",
                 t if t.contains(Tags::Sqlite) => "unrecognized token: \"^\"",
                 _ => todo!(),
             },
         );
 
         assert_eq!(error.error_code, ApplyMigrationError::ERROR_CODE);
-        assert_eq!(error.message, expected_error_message);
+        assert!(
+            error.message.starts_with(&expected_error_message),
+            "Actual:\n{}\n\nExpected:\n{}",
+            error.message,
+            expected_error_message
+        );
     }
 
     let mut migrations = api
@@ -147,19 +152,13 @@ fn migrations_should_fail_when_the_script_is_invalid(api: TestApi) {
 
     first
         .assert_migration_name("initial")
-        .unwrap()
         .assert_applied_steps_count(1)
-        .unwrap()
-        .assert_success()
-        .unwrap();
+        .assert_success();
 
     second
         .assert_migration_name("second-migration")
-        .unwrap()
         .assert_applied_steps_count(0)
-        .unwrap()
-        .assert_failed()
-        .unwrap();
+        .assert_failed();
 }
 
 #[test_connector]
@@ -204,7 +203,7 @@ fn migrations_should_fail_on_an_uninitialized_nonempty_database(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm).send_sync().assert_green_bang();
+    api.schema_push(dm).send().assert_green_bang();
 
     let directory = api.create_migrations_directory();
 

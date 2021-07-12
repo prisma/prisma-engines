@@ -1,8 +1,8 @@
 use super::{
-    DiagnoseMigrationHistoryCommand, DiagnoseMigrationHistoryInput, DiagnoseMigrationHistoryOutput, DriftDiagnostic,
-    HistoryDiagnostic, MigrationCommand,
+    diagnose_migration_history, DiagnoseMigrationHistoryInput, DiagnoseMigrationHistoryOutput, DriftDiagnostic,
+    HistoryDiagnostic,
 };
-use migration_connector::{ConnectorResult, MigrationConnector};
+use migration_connector::{migrations_directory, ConnectorResult, MigrationConnector};
 use serde::{Deserialize, Serialize};
 
 /// The `devDiagnostic` input.
@@ -22,19 +22,18 @@ pub struct DevDiagnosticOutput {
 
 /// Method called at the beginning of `migrate dev` to decide the course of
 /// action based on the current state of the workspace.
-pub(crate) async fn dev_diagnostic<C: MigrationConnector>(
+pub(crate) async fn dev_diagnostic(
     input: &DevDiagnosticInput,
-    connector: &C,
+    connector: &dyn MigrationConnector,
 ) -> ConnectorResult<DevDiagnosticOutput> {
-    migration_connector::error_on_changed_provider(&input.migrations_directory_path, connector.connector_type())?;
+    migrations_directory::error_on_changed_provider(&input.migrations_directory_path, connector.connector_type())?;
 
     let diagnose_input = DiagnoseMigrationHistoryInput {
         migrations_directory_path: input.migrations_directory_path.clone(),
         opt_in_to_shadow_database: true,
     };
 
-    let diagnose_migration_history_output =
-        DiagnoseMigrationHistoryCommand::execute(&diagnose_input, connector).await?;
+    let diagnose_migration_history_output = diagnose_migration_history(&diagnose_input, connector).await?;
 
     check_for_broken_migrations(&diagnose_migration_history_output)?;
 
@@ -75,11 +74,10 @@ fn check_for_reset_conditions(output: &DiagnoseMigrationHistoryOutput) -> Option
         ))
     }
 
-    if let Some(DriftDiagnostic::DriftDetected { rollback }) = &output.drift {
-        tracing::info!(rollback = rollback.as_str(), "DriftDetected diagnostic");
-
-        reset_reasons
-            .push("Drift detected: Your database schema is not in sync with your migration history.".to_owned())
+    if let Some(DriftDiagnostic::DriftDetected { summary }) = &output.drift {
+        let mut reason = DRIFT_DETECTED_MESSAGE.trim_start().to_owned();
+        reason.push_str(summary);
+        reset_reasons.push(reason);
     }
 
     match &output.history {
@@ -112,6 +110,14 @@ fn check_for_reset_conditions(output: &DiagnoseMigrationHistoryOutput) -> Option
         }
     }
 }
+
+const DRIFT_DETECTED_MESSAGE: &str = r#"
+Drift detected: Your database schema is not in sync with your migration history.
+
+The following is a summary of the differences between the expected database schema given your migrations files, and the actual schema of the database.
+
+It should be understood as the set of changes to get from the expected schema to the actual schema.
+"#;
 
 /// A suggested action for the CLI `migrate dev` command.
 #[derive(Debug, Serialize)]

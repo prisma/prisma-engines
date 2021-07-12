@@ -5,12 +5,12 @@ use sql_schema_describer::*;
 
 pub const SCHEMA: &str = "DatabaseInspector-Test";
 
-pub async fn get_sqlite_describer(sql: &str) -> sqlite::SqlSchemaDescriber {
+async fn describe_sqlite(sql: &str) -> SqlSchema {
     let conn = Quaint::new_in_memory().unwrap();
 
     conn.raw_cmd(sql).await.unwrap();
 
-    sqlite::SqlSchemaDescriber::new(conn)
+    sqlite::SqlSchemaDescriber::new(&conn).describe(SCHEMA).await.unwrap()
 }
 
 #[tokio::test]
@@ -21,8 +21,7 @@ async fn views_can_be_described() {
         CREATE VIEW ab AS SELECT a_id FROM a UNION ALL SELECT b_id FROM b;
         "#;
 
-    let inspector = get_sqlite_describer(&full_sql).await;
-    let result = inspector.describe(SCHEMA).await.expect("describing");
+    let result = describe_sqlite(full_sql).await;
     let view = result.get_view("ab").expect("couldn't get ab view").to_owned();
 
     let expected_sql = "CREATE VIEW ab AS SELECT a_id FROM a UNION ALL SELECT b_id FROM b";
@@ -44,8 +43,7 @@ async fn sqlite_column_types_must_work() {
     });
 
     let full_sql = migration.make::<barrel::backend::Sqlite>();
-    let inspector = get_sqlite_describer(&full_sql).await;
-    let result = inspector.describe(SCHEMA).await.expect("describing");
+    let result = describe_sqlite(&full_sql).await;
     let table = result.get_table("User").expect("couldn't get User table");
     let expected_columns = vec![
         Column {
@@ -144,9 +142,7 @@ async fn sqlite_foreign_key_on_delete_must_be_handled() {
             city_set_default INTEGER REFERENCES City(id) ON DELETE SET DEFAULT,
             city_set_null INTEGER REFERENCES City(id) ON DELETE SET NULL
         )";
-    let inspector = get_sqlite_describer(&sql).await;
-
-    let schema = inspector.describe(SCHEMA).await.expect("describing");
+    let schema = describe_sqlite(sql).await;
     let mut table = schema.get_table("User").expect("get User table").to_owned();
     table.foreign_keys.sort_unstable_by_key(|fk| fk.columns.clone());
 
@@ -288,8 +284,7 @@ async fn sqlite_text_primary_keys_must_be_inferred_on_table_and_not_as_separate_
     });
     let full_sql = migration.make::<barrel::backend::Sqlite>();
 
-    let inspector = get_sqlite_describer(&full_sql).await;
-    let result = inspector.describe(SCHEMA).await.expect("describing");
+    let result = describe_sqlite(&full_sql).await;
 
     let table = result.get_table("User").expect("couldn't get User table");
 

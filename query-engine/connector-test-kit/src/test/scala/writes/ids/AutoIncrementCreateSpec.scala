@@ -3,6 +3,7 @@ package writes.ids
 import org.scalatest.{FlatSpec, Matchers}
 import util._
 
+// RS: Ported
 class AutoIncrementCreateSpec extends FlatSpec with Matchers with ApiSpecBase {
 
   "Creating an item with a non primary key autoincrement and index " should "work" taggedAs (IgnoreSQLite) in {

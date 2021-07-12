@@ -1,13 +1,18 @@
-use datamodel_connector::connector_error::ConnectorError;
-use datamodel_connector::helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32};
-use datamodel_connector::{Connector, ConnectorCapability};
-use dml::field::{Field, FieldType};
-use dml::model::Model;
-use dml::native_type_constructor::NativeTypeConstructor;
-use dml::native_type_instance::NativeTypeInstance;
-use dml::scalars::ScalarType;
-use native_types::PostgresType;
-use native_types::PostgresType::*;
+use datamodel_connector::{
+    connector_error::ConnectorError,
+    helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32},
+    Connector, ConnectorCapability,
+};
+use dml::{
+    field::{Field, FieldType},
+    model::{IndexType, Model},
+    native_type_constructor::NativeTypeConstructor,
+    native_type_instance::NativeTypeInstance,
+    relation_info::ReferentialAction,
+    scalars::ScalarType,
+};
+use enumflags2::BitFlags;
+use native_types::PostgresType::{self, *};
 
 const SMALL_INT_TYPE_NAME: &str = "SmallInt";
 const INTEGER_TYPE_NAME: &str = "Integer";
@@ -39,11 +44,14 @@ const JSON_B_TYPE_NAME: &str = "JsonB";
 pub struct PostgresDatamodelConnector {
     capabilities: Vec<ConnectorCapability>,
     constructors: Vec<NativeTypeConstructor>,
+    referential_actions: BitFlags<ReferentialAction>,
 }
 
 //todo should this also contain the pretty printed output for SQL rendering?
 impl PostgresDatamodelConnector {
     pub fn new() -> PostgresDatamodelConnector {
+        use ReferentialAction::*;
+
         let capabilities = vec![
             ConnectorCapability::ScalarLists,
             ConnectorCapability::Enums,
@@ -61,6 +69,8 @@ impl PostgresDatamodelConnector {
             ConnectorCapability::CreateManyWriteableAutoIncId,
             ConnectorCapability::AutoIncrement,
             ConnectorCapability::CompoundIds,
+            ConnectorCapability::ForeignKeys,
+            ConnectorCapability::AnyId,
         ];
 
         let small_int = NativeTypeConstructor::without_args(SMALL_INT_TYPE_NAME, vec![ScalarType::Int]);
@@ -120,9 +130,12 @@ impl PostgresDatamodelConnector {
             json_b,
         ];
 
+        let referential_actions = NoAction | Restrict | Cascade | SetNull | SetDefault;
+
         PostgresDatamodelConnector {
             capabilities,
             constructors,
+            referential_actions,
         }
     }
 }
@@ -140,12 +153,20 @@ const SCALAR_TYPE_DEFAULTS: &[(ScalarType, PostgresType)] = &[
 ];
 
 impl Connector for PostgresDatamodelConnector {
-    fn name(&self) -> String {
-        "Postgres".to_string()
+    fn name(&self) -> &str {
+        "Postgres"
     }
 
-    fn capabilities(&self) -> &Vec<ConnectorCapability> {
+    fn capabilities(&self) -> &[ConnectorCapability] {
         &self.capabilities
+    }
+
+    fn constraint_name_length(&self) -> usize {
+        63
+    }
+
+    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
+        self.referential_actions
     }
 
     fn scalar_type_for_native_type(&self, native_type: serde_json::Value) -> ScalarType {
@@ -211,7 +232,7 @@ impl Connector for PostgresDatamodelConnector {
 
     fn validate_field(&self, field: &Field) -> Result<(), ConnectorError> {
         match field.field_type() {
-            FieldType::NativeType(_scalar_type, native_type_instance) => {
+            FieldType::Scalar(_scalar_type, _, Some(native_type_instance)) => {
                 let native_type: PostgresType = native_type_instance.deserialize_native_type();
                 let error = self.native_instance_error(native_type_instance);
 
@@ -227,6 +248,7 @@ impl Connector for PostgresDatamodelConnector {
                     Timestamp(Some(p)) | Timestamptz(Some(p)) | Time(Some(p)) | Timetz(Some(p)) if p > 6 => {
                         error.new_argument_m_out_of_range_error("M can range from 0 to 6.")
                     }
+                    Xml if field.is_unique() => error.new_incompatible_native_type_with_unique(),
                     _ => Ok(()),
                 }
             }
@@ -234,7 +256,26 @@ impl Connector for PostgresDatamodelConnector {
         }
     }
 
-    fn validate_model(&self, _model: &Model) -> Result<(), ConnectorError> {
+    fn validate_model(&self, model: &Model) -> Result<(), ConnectorError> {
+        for index_definition in model.indices.iter() {
+            let fields = index_definition.fields.iter().map(|f| model.find_field(f).unwrap());
+
+            for field in fields {
+                if let FieldType::Scalar(_, _, Some(native_type)) = field.field_type() {
+                    let r#type: PostgresType = native_type.deserialize_native_type();
+                    let error = self.native_instance_error(native_type);
+
+                    if r#type == PostgresType::Xml {
+                        return if index_definition.tpe == IndexType::Unique {
+                            error.new_incompatible_native_type_with_unique()
+                        } else {
+                            error.new_incompatible_native_type_with_index()
+                        };
+                    }
+                }
+            }
+        }
+
         Ok(())
     }
 

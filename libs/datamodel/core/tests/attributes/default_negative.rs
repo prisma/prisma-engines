@@ -26,6 +26,11 @@ fn must_error_if_default_value_for_relation_field() {
 #[test]
 fn must_error_if_default_value_for_list() {
     let dml = r#"
+    datasource db {
+        provider = "postgres"
+        url = "postgres://"
+    }
+
     model Model {
         id Int @id
         rel String[] @default(["hello"])
@@ -37,12 +42,12 @@ fn must_error_if_default_value_for_list() {
     errors.assert_is(DatamodelError::new_attribute_validation_error(
         "Cannot set a default value on list field.",
         "default",
-        Span::new(60, 78),
+        Span::new(145, 163),
     ));
 }
 
 #[test]
-fn must_error_if_default_value_type_missmatch() {
+fn must_error_if_default_value_type_mismatch() {
     let dml = r#"
     model Model {
         id Int @id
@@ -55,7 +60,7 @@ fn must_error_if_default_value_type_missmatch() {
     errors.assert_is(DatamodelError::new_attribute_validation_error(
         "Expected a String value, but received numeric value \"3\".",
         "default",
-        Span::new(66, 67),
+        Span::new(58, 68),
     ));
 }
 
@@ -73,7 +78,7 @@ fn must_error_if_default_value_parser_error() {
     errors.assert_is(DatamodelError::new_attribute_validation_error(
         "Expected a datetime value, but failed while parsing \"Hugo\": input contains invalid characters.",
         "default",
-        Span::new(68, 74),
+        Span::new(60, 75),
     ));
 }
 
@@ -91,7 +96,7 @@ fn must_error_if_unknown_function_is_used() {
     errors.assert_is(DatamodelError::new_attribute_validation_error(
         "The function unknown_function is not a known function.",
         "default",
-        Span::new(68, 86),
+        Span::new(60, 87),
     ));
 }
 
@@ -107,9 +112,9 @@ fn must_error_if_now_function_is_used_for_fields_that_are_not_datetime() {
     let errors = parse_error(dml);
 
     errors.assert_is(DatamodelError::new_attribute_validation_error(
-        "The function `now()` can not be used on fields of type `String`.",
+        "The function `now()` cannot be used on fields of type `String`.",
         "default",
-        Span::new(70, 75),
+        Span::new(62, 76),
     ));
 }
 
@@ -125,9 +130,9 @@ fn must_error_if_autoincrement_function_is_used_for_fields_that_are_not_int() {
     let errors = parse_error(dml);
 
     errors.assert_is(DatamodelError::new_attribute_validation_error(
-        "The function `autoincrement()` can not be used on fields of type `String`.",
+        "The function `autoincrement()` cannot be used on fields of type `String`.",
         "default",
-        Span::new(70, 85),
+        Span::new(62, 86),
     ));
 }
 
@@ -149,7 +154,7 @@ fn must_error_if_default_value_for_enum_is_not_valid() {
     errors.assert_is(DatamodelError::new_attribute_validation_error(
         "The defined default value is not a valid value of the enum specified for the field.",
         "default",
-        Span::new(46, 65),
+        Span::new(54, 64),
     ));
 }
 
@@ -242,7 +247,7 @@ fn must_error_if_scalar_default_on_unsupported() {
     errors.assert_is(DatamodelError::new_attribute_validation_error(
         "Expected a function value, but received numeric value \"12\".",
         "default",
-        Span::new(191, 193),
+        Span::new(183, 194),
     ));
 }
 
@@ -260,7 +265,7 @@ fn must_error_if_non_string_expression_in_function_default() {
     errors.assert_is(DatamodelError::new_attribute_validation_error(
         "Error validating: DefaultValue function parsing failed. The function arg should only be empty or a single String. Got: `[Function(\"cuid\", [], Span { start: 86, end: 92 })]`. You can read about the available functions here: https://pris.ly/d/attribute-functions",
         "default",
-        Span::new(72, 93),
+        Span::new(64, 94),
     ));
 }
 
@@ -278,7 +283,7 @@ fn must_error_if_non_string_expression_in_function_default_2() {
     errors.assert_is(DatamodelError::new_attribute_validation_error(
         "Error validating: DefaultValue function parsing failed. The function arg should only be empty or a single String. Got: `[NumericValue(\"5\", Span { start: 84, end: 85 })]`. You can read about the available functions here: https://pris.ly/d/attribute-functions",
         "default",
-        Span::new(72, 86),
+        Span::new(64, 87),
     ));
 }
 
@@ -298,4 +303,33 @@ fn must_error_on_empty_string_in_dbgenerated() {
         "default",
         Span::new(64, 88),
     ));
+}
+
+#[test]
+fn dbgenerated_default_errors_must_not_cascade_into_other_errors() {
+    let dml = r#"
+    datasource ds {
+        provider = "mysql"
+        url = "mysql://"
+    }
+
+    model User {
+        id        Int    @id
+        role      Bytes
+        role2     Bytes @ds.VarBinary(40) @default(dbgenerated(""))
+
+        @@unique([role2, role])
+    }
+    "#;
+
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@default": dbgenerated() takes either no argument, or a single nonempty string argument.[0m
+          [1;94m-->[0m  [4mschema.prisma:10[0m
+        [1;94m   | [0m
+        [1;94m 9 | [0m        role      Bytes
+        [1;94m10 | [0m        role2     Bytes @ds.VarBinary(40) @[1;91mdefault(dbgenerated(""))[0m
+        [1;94m   | [0m
+    "#]];
+    expectation.assert_eq(&error)
 }

@@ -3,6 +3,7 @@ package writes.dataTypes.json
 import org.scalatest.{FlatSpec, Matchers}
 import util._
 
+// RS: Ported
 class JsonSpec extends FlatSpec with Matchers with ApiSpecBase {
   "Json float accuracy" should "work" taggedAs (IgnoreMsSql, IgnoreMySql, IgnoreSQLite, IgnoreMySql56) in {
     val project = ProjectDsl.fromString {

@@ -222,7 +222,7 @@ impl Display for ForeignKey<'_> {
 #[derive(Debug)]
 pub enum ForeignKeyAction {
     Cascade,
-    DoNothing,
+    NoAction,
     Restrict,
     SetDefault,
     SetNull,
@@ -233,7 +233,7 @@ impl Display for ForeignKeyAction {
         let s = match self {
             ForeignKeyAction::Cascade => "CASCADE",
             ForeignKeyAction::Restrict => "RESTRICT",
-            ForeignKeyAction::DoNothing => "DO NOTHING",
+            ForeignKeyAction::NoAction => "NO ACTION",
             ForeignKeyAction::SetNull => "SET NULL",
             ForeignKeyAction::SetDefault => "SET DEFAULT",
         };

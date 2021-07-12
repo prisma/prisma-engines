@@ -3,56 +3,34 @@ use crate::{
     sql_migration::{SqlMigration, SqlMigrationStep},
     SqlFlavour, SqlMigrationConnector,
 };
-use migration_connector::{
-    ConnectorError, ConnectorResult, DatabaseMigrationMarker, DatabaseMigrationStepApplier,
-    DestructiveChangeDiagnostics, PrettyDatabaseMigrationStep,
-};
+use migration_connector::{ConnectorResult, DatabaseMigrationStepApplier, DestructiveChangeDiagnostics, Migration};
 use sql_schema_describer::{walkers::SqlSchemaExt, SqlSchema};
-use user_facing_errors::migration_engine::ApplyMigrationError;
 
 #[async_trait::async_trait]
-impl DatabaseMigrationStepApplier<SqlMigration> for SqlMigrationConnector {
-    #[tracing::instrument(skip(self, database_migration))]
-    async fn apply_migration(&self, database_migration: &SqlMigration) -> ConnectorResult<u32> {
-        tracing::debug!("{} steps to execute", database_migration.steps.len());
+impl DatabaseMigrationStepApplier for SqlMigrationConnector {
+    #[tracing::instrument(skip(self, migration))]
+    async fn apply_migration(&self, migration: &Migration) -> ConnectorResult<u32> {
+        let migration: &SqlMigration = migration.downcast_ref();
+        tracing::debug!("{} steps to execute", migration.steps.len());
 
-        for (index, step) in database_migration.steps.iter().enumerate() {
-            for sql_string in render_raw_sql(
-                &step,
-                self.flavour(),
-                Pair::new(&database_migration.before, &database_migration.after),
-            ) {
+        for (index, step) in migration.steps.iter().enumerate() {
+            for sql_string in render_raw_sql(step, self.flavour(), Pair::new(&migration.before, &migration.after)) {
+                assert!(!sql_string.is_empty());
                 tracing::debug!(index, %sql_string);
-                self.conn().raw_cmd(&sql_string).await?;
+                self.flavour().run_query_script(&sql_string, self.conn()).await?;
             }
         }
 
-        Ok(database_migration.steps.len() as u32)
+        Ok(migration.steps.len() as u32)
     }
 
-    fn render_steps_pretty(
-        &self,
-        database_migration: &SqlMigration,
-    ) -> ConnectorResult<Vec<PrettyDatabaseMigrationStep>> {
-        let mut steps = Vec::with_capacity(database_migration.steps.len());
-
-        for step in &database_migration.steps {
-            let sql = render_raw_sql(&step, self.flavour(), database_migration.schemas()).join(";\n");
-
-            if !sql.is_empty() {
-                steps.push(PrettyDatabaseMigrationStep { raw: sql });
-            }
-        }
-
-        Ok(steps)
-    }
-
-    fn render_script(&self, database_migration: &SqlMigration, diagnostics: &DestructiveChangeDiagnostics) -> String {
-        if database_migration.is_empty() {
+    fn render_script(&self, migration: &Migration, diagnostics: &DestructiveChangeDiagnostics) -> String {
+        let migration: &SqlMigration = migration.downcast_ref();
+        if migration.steps.is_empty() {
             return "-- This is an empty migration.".to_string();
         }
 
-        let mut script = String::with_capacity(40 * database_migration.steps.len());
+        let mut script = String::with_capacity(40 * migration.steps.len());
 
         // Note: it would be much nicer if we could place the warnings next to
         // the SQL for the steps that triggered them.
@@ -79,12 +57,14 @@ impl DatabaseMigrationStepApplier<SqlMigration> for SqlMigrationConnector {
         // some steps don't render anything.
         let mut is_first_step = true;
 
-        for step in &database_migration.steps {
-            let statements: Vec<String> = render_raw_sql(
-                step,
-                self.flavour(),
-                Pair::new(&database_migration.before, &database_migration.after),
-            );
+        if let Some(begin) = self.flavour().render_begin_transaction() {
+            script.push_str(begin);
+            script.push('\n');
+        }
+
+        for step in &migration.steps {
+            let statements: Vec<String> =
+                render_raw_sql(step, self.flavour(), Pair::new(&migration.before, &migration.after));
 
             if !statements.is_empty() {
                 if is_first_step {
@@ -108,22 +88,21 @@ impl DatabaseMigrationStepApplier<SqlMigration> for SqlMigrationConnector {
             }
         }
 
+        if let Some(commit) = self.flavour().render_commit_transaction() {
+            script.push('\n');
+            script.push_str(commit);
+        }
+
         script
     }
 
+    #[tracing::instrument(skip(self, script))]
     async fn apply_script(&self, migration_name: &str, script: &str) -> ConnectorResult<()> {
+        tracing::info!(migrate_action = "log", "Applying migration `{}`", migration_name);
         self.flavour.scan_migration_script(script);
-
-        self.conn().raw_cmd(script).await.map_err(|quaint_error| {
-            ConnectorError::user_facing(ApplyMigrationError {
-                migration_name: migration_name.to_owned(),
-                database_error_code: String::from(quaint_error.original_code().unwrap_or("none")),
-                database_error: quaint_error
-                    .original_message()
-                    .map(String::from)
-                    .unwrap_or_else(|| ConnectorError::from(quaint_error).to_string()),
-            })
-        })
+        self.flavour
+            .apply_migration_script(migration_name, script, self.conn())
+            .await
     }
 }
 
@@ -141,49 +120,47 @@ fn render_raw_sql(
         SqlMigrationStep::DropEnum { enum_index } => {
             renderer.render_drop_enum(&schemas.previous().enum_walker_at(*enum_index))
         }
-        SqlMigrationStep::CreateTable { table_index } => {
-            let table = schemas.next().table_walker_at(*table_index);
+        SqlMigrationStep::CreateTable { table_id } => {
+            let table = schemas.next().table_walker_at(*table_id);
 
             vec![renderer.render_create_table(&table)]
         }
-        SqlMigrationStep::DropTable { table_index } => {
-            renderer.render_drop_table(schemas.previous().table_walker_at(*table_index).name())
+        SqlMigrationStep::DropTable { table_id } => {
+            renderer.render_drop_table(schemas.previous().table_walker_at(*table_id).name())
         }
         SqlMigrationStep::RedefineIndex { table, index } => {
             renderer.render_drop_and_recreate_index(schemas.tables(table).indexes(index).as_ref())
         }
         SqlMigrationStep::AddForeignKey {
-            table_index,
+            table_id,
             foreign_key_index,
         } => {
             let foreign_key = schemas
                 .next()
-                .table_walker_at(*table_index)
+                .table_walker_at(*table_id)
                 .foreign_key_at(*foreign_key_index);
 
             vec![renderer.render_add_foreign_key(&foreign_key)]
         }
-        SqlMigrationStep::DropForeignKey(drop_foreign_key) => {
+        SqlMigrationStep::DropForeignKey {
+            table_id,
+            foreign_key_index,
+        } => {
             let foreign_key = schemas
                 .previous()
-                .table_walker_at(drop_foreign_key.table_index)
-                .foreign_key_at(drop_foreign_key.foreign_key_index);
+                .table_walker_at(*table_id)
+                .foreign_key_at(*foreign_key_index);
 
             vec![renderer.render_drop_foreign_key(&foreign_key)]
         }
         SqlMigrationStep::AlterTable(alter_table) => renderer.render_alter_table(alter_table, &schemas),
-        SqlMigrationStep::CreateIndex(create_index) => vec![renderer.render_create_index(
-            &schemas
-                .next()
-                .table_walker_at(create_index.table_index)
-                .index_at(create_index.index_index),
-        )],
-        SqlMigrationStep::DropIndex(drop_index) => vec![renderer.render_drop_index(
-            &schemas
-                .previous()
-                .table_walker_at(drop_index.table_index)
-                .index_at(drop_index.index_index),
-        )],
+        SqlMigrationStep::CreateIndex {
+            table_id: (_, table_id),
+            index_index,
+        } => vec![renderer.render_create_index(&schemas.next().table_walker_at(*table_id).index_at(*index_index))],
+        SqlMigrationStep::DropIndex { table_id, index_index } => {
+            vec![renderer.render_drop_index(&schemas.previous().table_walker_at(*table_id).index_at(*index_index))]
+        }
         SqlMigrationStep::AlterIndex { table, index } => {
             renderer.render_alter_index(schemas.tables(table).indexes(index).as_ref())
         }

@@ -780,7 +780,7 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
 
         let mut previous_columns = "".to_string();
         let mut next_columns = "".to_string();
-        let mut insert = Insert::single_into((api.connection_info().schema_name(), "A"));
+        let mut insert = Insert::single_into((api.schema_name(), "A"));
         let mut previous_assertions = vec![];
         let mut next_assertions = vec![];
 
@@ -809,76 +809,65 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
             next_assertions.push((column_name, to).clone());
         }
 
-        let dm1 = format!(
+        let dm1 = api.datamodel_with_provider(&format!(
             r#"
-                {datasource_block}
-
                model A {{
                     id Int @id @default(autoincrement()) @db.Integer
                     {columns}
                 }}
                 "#,
-            datasource_block = api.datasource_block(),
             columns = previous_columns,
-        );
+        ));
 
         tracing::info!(dm = dm1.as_str());
 
-        api.schema_push(&dm1).send_sync().assert_green_bang();
+        api.schema_push(&dm1).send().assert_green_bang();
 
         // inserts
         api.query(insert.into());
 
         // first assertions
-        api.assert_schema().assert_table_bang("A", |table| {
+        api.assert_schema().assert_table("A", |table| {
             previous_assertions.iter().fold(
                 table.assert_column_count(previous_assertions.len() + 1),
-                |acc, (column_name, expected)| {
-                    acc.and_then(|table| {
-                        table.assert_column(column_name, |c| c.assert_native_type(expected, &connector))
-                    })
+                |table, (column_name, expected)| {
+                    table.assert_column(column_name, |c| c.assert_native_type(expected, &connector))
                 },
             )
         });
 
-        let dm2 = format!(
+        let dm2 = api.datamodel_with_provider(&format!(
             r#"
-                {datasource_block}
-
                 model A {{
                     id Int @id @default(autoincrement()) @db.Integer
                     {columns}
                 }}
                 "#,
-            datasource_block = api.datasource_block(),
             columns = next_columns
-        );
+        ));
 
-        api.schema_push(&dm2).send_sync().assert_green_bang();
+        api.schema_push(&dm2).send().assert_green_bang();
 
         // second assertions
-        api.assert_schema().assert_table_bang("A", |table| {
+        api.assert_schema().assert_table("A", |table| {
             next_assertions.iter().fold(
                 table.assert_column_count(next_assertions.len() + 1),
-                |acc, (name, expected)| {
-                    acc.and_then(|table| table.assert_column(name, |c| c.assert_native_type(expected, &connector)))
-                },
+                |table, (name, expected)| table.assert_column(name, |c| c.assert_native_type(expected, &connector)),
             )
         });
 
-        api.raw_cmd(&format!("DROP TABLE \"{}\".\"A\"", api.connection_info().schema_name()));
+        api.raw_cmd(&format!("DROP TABLE \"{}\".\"A\"", api.schema_name()));
     }
 }
 
 #[test_connector(tags(Postgres))]
 fn risky_casts_with_existing_data_should_warn(api: TestApi) {
     let connector = SqlDatamodelConnectors::postgres();
-    let datasource_block = api.datasource_block();
 
     for (from, seed, casts) in RISKY_CASTS.iter() {
         let mut previous_columns = "".to_string();
         let mut next_columns = "".to_string();
-        let mut insert = Insert::single_into((api.connection_info().schema_name(), "A"));
+        let mut insert = Insert::single_into((api.schema_name(), "A"));
         let mut previous_assertions = vec![];
         let mut next_assertions = vec![];
         let mut warnings = vec![];
@@ -915,78 +904,67 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
             next_assertions.push((column_name.clone(), *to));
         }
 
-        let dm1 = format!(
+        let dm1 = api.datamodel_with_provider(&format!(
             r#"
-                {datasource_block}
-
                 model A {{
                     id Int @id @default(autoincrement()) @db.Integer
                     {columns}
                 }}
                 "#,
             columns = previous_columns,
-            datasource_block = datasource_block,
-        );
+        ));
 
-        api.schema_push(&dm1).send_sync().assert_green_bang();
+        api.schema_push(&dm1).send().assert_green_bang();
 
         // inserts
         api.query(insert.into());
 
         // first assertions
 
-        api.assert_schema().assert_table_bang("A", |table| {
+        api.assert_schema().assert_table("A", |table| {
             previous_assertions.iter().fold(
                 table.assert_column_count(previous_assertions.len() + 1),
-                |acc, (column_name, expected)| {
-                    acc.and_then(|table| {
-                        table.assert_column(column_name, |c| c.assert_native_type(expected, &connector))
-                    })
+                |table, (column_name, expected)| {
+                    table.assert_column(column_name, |c| c.assert_native_type(expected, &connector))
                 },
             )
         });
 
-        let dm2 = format!(
+        let dm2 = api.datamodel_with_provider(&format!(
             r#"
-                {datasource_block}
-
                 model A {{
                     id Int @id @default(autoincrement()) @db.Integer
                     {columns}
                 }}
                 "#,
             columns = next_columns,
-            datasource_block = datasource_block,
-        );
+        ));
 
-        api.schema_push(&dm2).force(true).send_sync().assert_warnings(&warnings);
+        api.schema_push(&dm2).force(true).send().assert_warnings(&warnings);
 
         //second assertions same as first
-        api.assert_schema().assert_table_bang("A", |table| {
+        api.assert_schema().assert_table("A", |table| {
             next_assertions.iter().fold(
                 table.assert_column_count(next_assertions.len() + 1),
-                |acc, (column_name, expected)| {
-                    acc.and_then(|table| {
-                        table.assert_column(column_name, |c| c.assert_native_type(expected, &connector))
-                    })
+                |table, (column_name, expected)| {
+                    table.assert_column(column_name, |c| c.assert_native_type(expected, &connector))
                 },
             )
         });
 
-        api.raw_cmd(&format!("DROP TABLE \"{}\".\"A\"", api.connection_info().schema_name()));
+        api.raw_cmd(&format!("DROP TABLE \"{}\".\"A\"", api.schema_name()));
     }
 }
 
 #[test_connector(tags(Postgres))]
 fn not_castable_with_existing_data_should_warn(api: TestApi) {
     let connector = SqlDatamodelConnectors::postgres();
-    let datasource_block = api.datasource_block();
     let mut warnings = Vec::new();
 
     for (from, seed, casts) in NOT_CASTABLE.iter() {
         let mut previous_columns = "".to_string();
         let mut next_columns = "".to_string();
-        let mut insert = Insert::single_into((api.connection_info().schema_name(), "A"));
+        let mut insert = Insert::single_into((api.schema_name(), "A"));
         let mut previous_assertions = vec![];
         warnings.clear();
 
@@ -1025,66 +1003,56 @@ fn not_castable_with_existing_data_should_warn(api: TestApi) {
             previous_assertions.push((column_name, from).clone());
         }
 
-        let dm1 = format!(
+        let dm1 = api.datamodel_with_provider(&format!(
             r#"
-                {datasource_block}
-
                 model A {{
                     id Int @id @default(autoincrement()) @db.Integer
                     {columns}
                 }}
                 "#,
             columns = previous_columns,
-            datasource_block = datasource_block
-        );
+        ));
 
-        api.schema_push(&dm1).send_sync().assert_green_bang();
+        api.schema_push(&dm1).send().assert_green_bang();
 
         // inserts
         api.query(insert.into());
 
         // first assertions
-        api.assert_schema().assert_table_bang("A", |table| {
+        api.assert_schema().assert_table("A", |table| {
             previous_assertions.iter().fold(
                 table.assert_column_count(previous_assertions.len() + 1),
-                |acc, (column_name, expected)| {
-                    acc.and_then(|table| {
-                        table.assert_column(column_name, |c| c.assert_native_type(expected, &connector))
-                    })
+                |table, (column_name, expected)| {
+                    table.assert_column(column_name, |c| c.assert_native_type(expected, &connector))
                 },
             )
         });
 
-        let dm2 = format!(
+        let dm2 = api.datamodel_with_provider(&format!(
             r#"
-                {datasource_block}
-
                 model A {{
                     id Int @id @default(autoincrement()) @db.Integer
                     {columns}
                 }}
                 "#,
             columns = next_columns,
-            datasource_block = datasource_block,
-        );
+        ));
 
         // todo we could force here and then check that the db really returns not castable
         // then we would again need to have separate calls per mapping
-        api.schema_push(&dm2).send_sync().assert_warnings(&warnings);
+        api.schema_push(&dm2).send().assert_warnings(&warnings);
 
         //second assertions same as first
-        api.assert_schema().assert_table_bang("A", |table| {
+        api.assert_schema().assert_table("A", |table| {
             previous_assertions.iter().fold(
                 table.assert_column_count(previous_assertions.len() + 1),
-                |acc, (column_name, expected)| {
-                    acc.and_then(|table| {
-                        table.assert_column(column_name, |c| c.assert_native_type(expected, &connector))
-                    })
+                |table, (column_name, expected)| {
+                    table.assert_column(column_name, |c| c.assert_native_type(expected, &connector))
                 },
             )
         });
 
-        api.raw_cmd(&format!("DROP TABLE \"{}\".\"A\"", api.connection_info().schema_name()));
+        api.raw_cmd(&format!("DROP TABLE \"{}\".\"A\"", api.schema_name()));
     }
 }
 
@@ -1177,12 +1145,11 @@ static SAFE_CASTS_NON_LIST_TO_STRING: CastList = Lazy::new(|| {
 #[test_connector(tags(Postgres))]
 fn safe_casts_from_array_with_existing_data_should_work(api: TestApi) {
     let connector = SqlDatamodelConnectors::postgres();
-    let datasource_block = api.datasource_block();
 
     for (to, from) in SAFE_CASTS_NON_LIST_TO_STRING.iter() {
         let mut previous_columns = "".to_string();
         let mut next_columns = "".to_string();
-        let mut insert = Insert::single_into((api.connection_info().schema_name(), "A"));
+        let mut insert = Insert::single_into((api.schema_name(), "A"));
         let mut previous_assertions = vec![];
         let mut next_assertions = vec![];
 
@@ -1211,199 +1178,174 @@ fn safe_casts_from_array_with_existing_data_should_work(api: TestApi) {
             next_assertions.push((column_name, to).clone());
         }
 
-        let dm1 = format!(
+        let dm1 = api.datamodel_with_provider(&format!(
             r#"
-                {datasource_block}
-
                 model A {{
                     id Int @id @default(autoincrement()) @db.Integer
                     {columns}
                 }}
                 "#,
             columns = previous_columns,
-            datasource_block = datasource_block,
-        );
+        ));
 
-        api.schema_push(&dm1).send_sync().assert_green_bang();
+        api.schema_push(&dm1).send().assert_green_bang();
 
         // inserts
         api.query(insert.into());
 
         // first assertions
-        api.assert_schema().assert_table_bang("A", |table| {
+        api.assert_schema().assert_table("A", |table| {
             previous_assertions.iter().fold(
                 table.assert_column_count(previous_assertions.len() + 1),
-                |acc, (column_name, expected)| {
-                    acc.and_then(|table| {
-                        table.assert_column(column_name, |c| c.assert_native_type(expected, &connector))
-                    })
+                |table, (column_name, expected)| {
+                    table.assert_column(column_name, |c| c.assert_native_type(expected, &connector))
                 },
             )
         });
 
-        let dm2 = format!(
+        let dm2 = api.datamodel_with_provider(&format!(
             r#"
-                {datasource_block}
-
                 model A {{
                     id Int @id @default(autoincrement()) @db.Integer
                     {columns}
                 }}
                 "#,
             columns = next_columns,
-            datasource_block = api.datasource_block(),
-        );
+        ));
 
-        api.schema_push(&dm2).send_sync().assert_green_bang();
+        api.schema_push(&dm2).send().assert_green_bang();
 
         //second assertions
-        api.assert_schema().assert_table_bang("A", |table| {
+        api.assert_schema().assert_table("A", |table| {
             next_assertions.iter().fold(
                 table.assert_column_count(next_assertions.len() + 1),
-                |acc, (name, expected)| {
-                    acc.and_then(|table| table.assert_column(name, |c| c.assert_native_type(expected, &connector)))
-                },
+                |table, (name, expected)| table.assert_column(name, |c| c.assert_native_type(expected, &connector)),
             )
         });
 
-        api.raw_cmd(&format!("DROP TABLE \"{}\".\"A\"", api.connection_info().schema_name()));
+        api.raw_cmd(&format!("DROP TABLE \"{}\".\"A\"", api.schema_name()));
     }
 }
 
 #[test_connector(tags(Postgres))]
 fn typescript_starter_schema_with_native_types_is_idempotent(api: TestApi) {
-    let datasource_block = api.datasource_block();
-    let dm = format!(
+    let dm = api.datamodel_with_provider(
         r#"
-        {datasource_block}
-
-        model Post {{
+        model Post {
             id        Int     @id @default(autoincrement())
             title     String
             content   String?
             published Boolean @default(false)
             author    User?   @relation(fields: [authorId], references: [id])
             authorId  Int?
-        }}
+        }
 
-        model User {{
+        model User {
             id    Int     @id @default(autoincrement())
             email String  @unique
             name  String?
             posts Post[]
-        }}
+        }
     "#,
-        datasource_block = datasource_block
     );
 
-    let dm2 = format!(
+    let dm2 = api.datamodel_with_provider(
         r#"
-        {}
-
-        model Post {{
+        model Post {
             id        Int     @id @default(autoincrement()) @db.Integer
             title     String  @db.Text
             content   String? @db.Text
             published Boolean @default(false) @db.Boolean
             author    User?   @relation(fields: [authorId], references: [id])
             authorId  Int?    @db.Integer
-        }}
+        }
 
-        model User {{
+        model User {
             id    Int     @id @default(autoincrement()) @db.Integer
             email String  @unique @db.Text
             name  String? @db.Text
             posts Post[]
-        }}
+        }
     "#,
-        datasource_block
     );
 
     api.schema_push(&dm)
         .migration_id(Some("first"))
-        .send_sync()
+        .send()
         .assert_green_bang()
         .assert_has_executed_steps();
     api.schema_push(&dm)
         .migration_id(Some("second"))
-        .send_sync()
+        .send()
         .assert_green_bang()
         .assert_no_steps();
     api.schema_push(&dm2)
         .migration_id(Some("third"))
-        .send_sync()
+        .send()
         .assert_green_bang()
         .assert_no_steps();
 }
 
 #[test_connector(tags(Postgres))]
 fn typescript_starter_schema_with_differnt_native_types_is_idempotent(api: TestApi) {
-    let datasource_block = api.datasource_block();
-
-    let dm = format!(
+    let dm = api.datamodel_with_provider(
         r#"
-        {}
-
-        model Post {{
+        model Post {
             id        Int     @id @default(autoincrement())
             title     String
             content   String?
             published Boolean @default(false)
             author    User?   @relation(fields: [authorId], references: [id])
             authorId  Int?
-        }}
+        }
 
-        model User {{
+        model User {
             id    Int     @id @default(autoincrement())
             email String  @unique
             name  String?
             posts Post[]
-        }}
+        }
     "#,
-        datasource_block
     );
 
-    let dm2 = format!(
+    let dm2 = api.datamodel_with_provider(
         r#"
-        {}
-
-        model Post {{
+        model Post {
             id        Int     @id @default(autoincrement()) @db.Integer
             title     String  @db.VarChar(100)
             content   String? @db.VarChar(100)
             published Boolean @default(false) @db.Boolean
             author    User?   @relation(fields: [authorId], references: [id])
             authorId  Int?    @db.Integer
-        }}
+        }
 
-        model User {{
+        model User {
             id    Int     @id @default(autoincrement()) @db.Integer
             email String  @unique @db.VarChar(100)
             name  String? @db.VarChar(100)
             posts Post[]
-        }}
+        }
     "#,
-        datasource_block
     );
 
     api.schema_push(&dm)
         .migration_id(Some("first"))
-        .send_sync()
+        .send()
         .assert_green_bang()
         .assert_has_executed_steps();
     api.schema_push(&dm)
         .migration_id(Some("second"))
-        .send_sync()
+        .send()
         .assert_green_bang()
         .assert_no_steps();
     api.schema_push(&dm2)
         .migration_id(Some("third"))
-        .send_sync()
+        .send()
         .assert_green_bang()
         .assert_has_executed_steps();
     api.schema_push(&dm2)
         .migration_id(Some("fourth"))
-        .send_sync()
+        .send()
         .assert_green_bang()
         .assert_no_steps();
 }

@@ -4,6 +4,8 @@ use PreviewFeature::*;
 
 macro_rules! features {
     ($( $variant:ident $(,)? ),*) => {
+        #[enumflags2::bitflags]
+        #[repr(u32)]
         #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
         pub enum PreviewFeature {
             $(
@@ -53,6 +55,7 @@ features!(
     OrderByAggregateGroup,
     FilterJson,
     PlanetScaleMode,
+    ReferentialActions,
 );
 
 // Mapping of which active, deprecated and hidden
@@ -69,8 +72,9 @@ pub static GENERATOR: Lazy<FeatureMap> = Lazy::new(|| {
             OrderByAggregateGroup,
             FilterJson,
             PlanetScaleMode,
+            ReferentialActions,
+            MongoDb,
         ])
-        .with_hidden(vec![MongoDb])
         .with_deprecated(vec![
             AtomicNumberOperations,
             AggregateApi,
@@ -115,6 +119,7 @@ impl FeatureMap {
         self
     }
 
+    #[allow(dead_code)]
     fn with_hidden(mut self, hidden: Vec<PreviewFeature>) -> Self {
         self.hidden = hidden;
         self

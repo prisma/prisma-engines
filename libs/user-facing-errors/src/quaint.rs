@@ -3,7 +3,7 @@ use common::ModelKind;
 use indoc::formatdoc;
 use quaint::{error::ErrorKind, prelude::ConnectionInfo};
 
-impl From<&quaint::error::DatabaseConstraint> for crate::query_engine::DatabaseConstraint {
+impl From<&quaint::error::DatabaseConstraint> for query_engine::DatabaseConstraint {
     fn from(other: &quaint::error::DatabaseConstraint) -> Self {
         match other {
             quaint::error::DatabaseConstraint::Fields(fields) => Self::Fields(fields.to_vec()),
@@ -14,7 +14,7 @@ impl From<&quaint::error::DatabaseConstraint> for crate::query_engine::DatabaseC
     }
 }
 
-impl From<quaint::error::DatabaseConstraint> for crate::query_engine::DatabaseConstraint {
+impl From<quaint::error::DatabaseConstraint> for query_engine::DatabaseConstraint {
     fn from(other: quaint::error::DatabaseConstraint) -> Self {
         match other {
             quaint::error::DatabaseConstraint::Fields(fields) => Self::Fields(fields.to_vec()),
@@ -25,7 +25,7 @@ impl From<quaint::error::DatabaseConstraint> for crate::query_engine::DatabaseCo
     }
 }
 
-pub fn invalid_url_description(error_details: &str) -> String {
+pub fn invalid_connection_string_description(error_details: &str) -> String {
     let docs = r#"https://www.prisma.io/docs/reference/database-reference/connection-urls"#;
 
     let details = formatdoc! {r#"
@@ -198,7 +198,7 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
         })),
 
         (ErrorKind::DatabaseUrlIsInvalid(details), _connection_info) => {
-            Some(KnownError::new(common::InvalidDatabaseString {
+            Some(KnownError::new(common::InvalidConnectionString {
                 details: details.to_owned(),
             }))
         }

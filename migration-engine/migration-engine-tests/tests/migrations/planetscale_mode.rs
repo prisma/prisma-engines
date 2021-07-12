@@ -35,13 +35,13 @@ fn schema_push_planetscale_mode_works(api: TestApi) {
         datasource = api.datasource_block_with(&[("planetScaleMode", "true")]),
     );
 
-    api.schema_push(&dm).send_sync().assert_green_bang();
-    api.schema_push(dm).send_sync().assert_green_bang().assert_no_steps(); // idempotence
+    api.schema_push(&dm).send().assert_green_bang();
+    api.schema_push(dm).send().assert_green_bang().assert_no_steps(); // idempotence
 
     api.assert_schema()
-        .assert_table_bang("Post", |table| table.assert_foreign_keys_count(0))
-        .assert_table_bang("User", |table| table.assert_foreign_keys_count(0))
-        .assert_table_bang("Comment", |table| table.assert_foreign_keys_count(0));
+        .assert_table("Post", |table| table.assert_foreign_keys_count(0))
+        .assert_table("User", |table| table.assert_foreign_keys_count(0))
+        .assert_table("Comment", |table| table.assert_foreign_keys_count(0));
 }
 
 #[test_connector]
@@ -81,12 +81,12 @@ fn create_migration_planetscale_mode_works(api: TestApi) {
         datasource = api.datasource_block_with(&[("planetScaleMode", "true")]),
     );
 
-    api.create_migration("01init", &dm, &&migrations_directory)
+    api.create_migration("01init", &dm, &migrations_directory)
         .send_sync()
         .assert_migration_directories_count(1);
 
     // Check that the migration is idempotent
-    api.create_migration("02second", &dm, &&migrations_directory)
+    api.create_migration("02second", &dm, &migrations_directory)
         .send_sync()
         .assert_migration_directories_count(1);
 
@@ -104,7 +104,7 @@ fn create_migration_planetscale_mode_works(api: TestApi) {
     assert!(diagnostic.drift.is_none());
 
     api.assert_schema()
-        .assert_table_bang("Post", |table| table.assert_foreign_keys_count(0))
-        .assert_table_bang("User", |table| table.assert_foreign_keys_count(0))
-        .assert_table_bang("Comment", |table| table.assert_foreign_keys_count(0));
+        .assert_table("Post", |table| table.assert_foreign_keys_count(0))
+        .assert_table("User", |table| table.assert_foreign_keys_count(0))
+        .assert_table("Comment", |table| table.assert_foreign_keys_count(0));
 }

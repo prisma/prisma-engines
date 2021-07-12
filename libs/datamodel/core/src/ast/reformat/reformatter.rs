@@ -1,7 +1,10 @@
 use super::helpers::*;
 use crate::ast::helper::get_sort_index_of_attribute;
-use crate::diagnostics::ValidatedMissingFields;
+use crate::ast::SchemaAst;
+use crate::diagnostics::{ValidatedDatamodel, ValidatedMissingFields};
+use crate::Datasource;
 use crate::{ast, ast::parser::*, ast::renderer::*};
+use enumflags2::BitFlags;
 use pest::iterators::Pair;
 use pest::Parser;
 
@@ -9,41 +12,73 @@ pub struct Reformatter<'a> {
     input: &'a str,
     missing_fields: Result<ValidatedMissingFields, crate::diagnostics::Diagnostics>,
     missing_field_attributes: Result<Vec<MissingFieldAttribute>, crate::diagnostics::Diagnostics>,
-    missing_field_attribute_args: Result<Vec<MissingRelationAttributeArg>, crate::diagnostics::Diagnostics>,
+    missing_relation_attribute_args: Result<Vec<MissingRelationAttributeArg>, crate::diagnostics::Diagnostics>,
 }
 
 impl<'a> Reformatter<'a> {
     pub fn new(input: &'a str) -> Self {
-        //todo don't run parsing and validating of the string in every step
-        let missing_fields = Self::find_all_missing_fields(&input);
-        let missing_field_attributes = Self::find_all_missing_attributes(&input);
-        let missing_relation_attribute_args = Self::find_all_missing_relation_attribute_args(&input);
+        match (
+            crate::parse_schema_ast(input),
+            crate::parse_datamodel_for_formatter(input),
+        ) {
+            (Ok(schema_ast), Ok(validated_datamodel)) => {
+                let datasource = crate::parse_configuration(input)
+                    .ok()
+                    .and_then(|mut config| config.subject.datasources.pop());
 
-        Reformatter {
-            input,
-            missing_fields,
-            missing_field_attributes,
-            missing_field_attribute_args: missing_relation_attribute_args,
+                let missing_fields =
+                    Self::find_all_missing_fields(&schema_ast, &validated_datamodel, datasource.as_ref());
+
+                let missing_field_attributes =
+                    Self::find_all_missing_attributes(&schema_ast, &validated_datamodel, datasource.as_ref());
+
+                let missing_relation_attribute_args = Self::find_all_missing_relation_attribute_args(
+                    &schema_ast,
+                    &validated_datamodel,
+                    datasource.as_ref(),
+                );
+
+                Reformatter {
+                    input,
+                    missing_fields,
+                    missing_field_attributes,
+                    missing_relation_attribute_args,
+                }
+            }
+            (Err(diagnostics), _) => Reformatter {
+                input,
+                missing_field_attributes: Err(diagnostics.clone()),
+                missing_relation_attribute_args: Err(diagnostics.clone()),
+                missing_fields: Err(diagnostics),
+            },
+
+            (Ok(_), Err(diagnostics)) => Reformatter {
+                input,
+                missing_field_attributes: Err(diagnostics.clone()),
+                missing_relation_attribute_args: Err(diagnostics.clone()),
+                missing_fields: Err(diagnostics),
+            },
         }
     }
 
     // this finds all auto generated fields, that are added during auto generation AND are missing from the original input.
-    fn find_all_missing_fields(schema_string: &str) -> Result<ValidatedMissingFields, crate::diagnostics::Diagnostics> {
+    fn find_all_missing_fields(
+        schema_ast: &SchemaAst,
+        validated_datamodel: &ValidatedDatamodel,
+        datasource: Option<&Datasource>,
+    ) -> Result<ValidatedMissingFields, crate::diagnostics::Diagnostics> {
         let mut diagnostics = crate::diagnostics::Diagnostics::new();
-        let schema_ast = crate::parse_schema_ast(&schema_string)?;
-        let validated_datamodel = crate::parse_datamodel_for_formatter(&schema_string)?;
-
-        let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(None);
+        let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(datasource, BitFlags::empty());
         let mut result = Vec::new();
 
-        diagnostics.append_warning_vec(validated_datamodel.warnings);
+        diagnostics.append_warning_vec(validated_datamodel.warnings.clone());
 
         for model in validated_datamodel.subject.models() {
             let ast_model = schema_ast.find_model(&model.name).unwrap();
 
             for field in model.fields() {
-                if ast_model.fields.iter().find(|f| f.name.name == field.name()).is_none() {
-                    let ast_field = lowerer.lower_field(&field, &validated_datamodel.subject);
+                if !ast_model.fields.iter().any(|f| f.name.name == field.name()) {
+                    let ast_field = lowerer.lower_field(field, &validated_datamodel.subject);
 
                     result.push(MissingField {
                         model: model.name.clone(),
@@ -55,33 +90,32 @@ impl<'a> Reformatter<'a> {
 
         Ok(ValidatedMissingFields {
             subject: result,
-            warnings: diagnostics.warnings,
+            warnings: diagnostics.warnings().to_owned(),
         })
     }
 
     fn find_all_missing_attributes(
-        schema_string: &str,
+        schema_ast: &SchemaAst,
+        validated_datamodel: &ValidatedDatamodel,
+        datasource: Option<&Datasource>,
     ) -> Result<Vec<MissingFieldAttribute>, crate::diagnostics::Diagnostics> {
         let mut diagnostics = crate::diagnostics::Diagnostics::new();
-        let schema_ast = crate::parse_schema_ast(&schema_string)?;
-        let validated_datamodel = crate::parse_datamodel_for_formatter(&schema_string)?;
 
-        diagnostics.append_warning_vec(validated_datamodel.warnings);
-        let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(None);
+        diagnostics.append_warning_vec(validated_datamodel.warnings.clone());
+        let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(datasource, BitFlags::empty());
 
         let mut missing_field_attributes = Vec::new();
         for model in validated_datamodel.subject.models() {
             let ast_model = schema_ast.find_model(&model.name).unwrap();
             for field in model.fields() {
-                let new_ast_field = lowerer.lower_field(&field, &validated_datamodel.subject);
+                let new_ast_field = lowerer.lower_field(field, &validated_datamodel.subject);
 
                 if let Some(original_field) = ast_model.fields.iter().find(|f| f.name.name == field.name()) {
                     for attribute in new_ast_field.attributes {
-                        if original_field
+                        if !original_field
                             .attributes
                             .iter()
-                            .find(|d| d.name.name == attribute.name.name)
-                            .is_none()
+                            .any(|d| d.name.name == attribute.name.name)
                         {
                             missing_field_attributes.push(MissingFieldAttribute {
                                 model: model.name.clone(),
@@ -97,20 +131,20 @@ impl<'a> Reformatter<'a> {
     }
 
     fn find_all_missing_relation_attribute_args(
-        schema_string: &str,
+        schema_ast: &SchemaAst,
+        validated_datamodel: &ValidatedDatamodel,
+        datasource: Option<&Datasource>,
     ) -> Result<Vec<MissingRelationAttributeArg>, crate::diagnostics::Diagnostics> {
         let mut diagnostics = crate::diagnostics::Diagnostics::new();
-        let schema_ast = crate::parse_schema_ast(&schema_string)?;
-        let validated_datamodel = crate::parse_datamodel_for_formatter(&schema_string)?;
 
-        diagnostics.append_warning_vec(validated_datamodel.warnings);
-        let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(None);
+        diagnostics.append_warning_vec(validated_datamodel.warnings.clone());
+        let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(datasource, BitFlags::empty());
 
         let mut missing_relation_attribute_args = Vec::new();
         for model in validated_datamodel.subject.models() {
             let ast_model = schema_ast.find_model(&model.name).unwrap();
             for field in model.fields() {
-                let new_ast_field = lowerer.lower_field(&field, &validated_datamodel.subject);
+                let new_ast_field = lowerer.lower_field(field, &validated_datamodel.subject);
 
                 if let Some(original_field) = ast_model.fields.iter().find(|f| f.name.name == field.name()) {
                     for attribute in new_ast_field.attributes.iter().filter(|a| a.name.name == "relation") {
@@ -121,11 +155,10 @@ impl<'a> Reformatter<'a> {
                         {
                             for arg in &attribute.arguments {
                                 if !arg.name.name.is_empty()
-                                    && original_attribute
+                                    && !original_attribute
                                         .arguments
                                         .iter()
-                                        .find(|d| d.name.name == arg.name.name)
-                                        .is_none()
+                                        .any(|d| d.name.name == arg.name.name)
                                 {
                                     missing_relation_attribute_args.push(MissingRelationAttributeArg {
                                         model: model.name.clone(),
@@ -238,8 +271,8 @@ impl<'a> Reformatter<'a> {
             target,
             token,
             Box::new(|table, _, token, _| match token.as_rule() {
-                Rule::key_value => Self::reformat_key_value(table, &token),
-                _ => Self::reformat_generic_token(table, &token),
+                Rule::key_value => Self::reformat_key_value(table, token),
+                _ => Self::reformat_generic_token(table, token),
             }),
         );
     }
@@ -252,8 +285,8 @@ impl<'a> Reformatter<'a> {
             Box::new(|table, _, token, _| {
                 //
                 match token.as_rule() {
-                    Rule::key_value => Self::reformat_key_value(table, &token),
-                    _ => Self::reformat_generic_token(table, &token),
+                    Rule::key_value => Self::reformat_key_value(table, token),
+                    _ => Self::reformat_generic_token(table, token),
                 }
             }),
         );
@@ -281,16 +314,16 @@ impl<'a> Reformatter<'a> {
         self.reformat_block_element_internal(
             "model",
             target,
-            &token,
+            token,
             Box::new(|table, renderer, token, model_name| {
                 match token.as_rule() {
                     Rule::block_level_attribute => {
                         // model level attributes reset the table. -> .render() does that
                         table.render(renderer);
-                        Self::reformat_attribute(renderer, &token, "@@", vec![]);
+                        Self::reformat_attribute(renderer, token, "@@", vec![]);
                     }
-                    Rule::field_declaration => self.reformat_field(table, &token, model_name),
-                    _ => Self::reformat_generic_token(table, &token),
+                    Rule::field_declaration => self.reformat_field(table, token, model_name),
+                    _ => Self::reformat_generic_token(table, token),
                 }
             }),
             Box::new(|table, _, model_name| {
@@ -352,7 +385,7 @@ impl<'a> Reformatter<'a> {
                     }
 
                     for d in &attributes {
-                        the_fn(&mut table, renderer, &d, block_name);
+                        the_fn(&mut table, renderer, d, block_name);
                         // New line after each block attribute
                         table.render(renderer);
                         table = TableFormat::new();
@@ -499,8 +532,8 @@ impl<'a> Reformatter<'a> {
                 }
                 //todo special case field attribute to pass model and field name and probably attribute name  and down to the args
                 Rule::attribute => {
-                    if let Ok(missing_field_attribute_args) = self.missing_field_attribute_args.as_ref() {
-                        let missing_relation_args: Vec<&MissingRelationAttributeArg> = missing_field_attribute_args
+                    if let Ok(missing_relation_attribute_args) = self.missing_relation_attribute_args.as_ref() {
+                        let missing_relation_args: Vec<&MissingRelationAttributeArg> = missing_relation_attribute_args
                             .iter()
                             .filter(|arg| arg.model == model_name && arg.field == *field_name)
                             .collect();
@@ -551,7 +584,7 @@ impl<'a> Reformatter<'a> {
                     target.write("type");
                     target.write(&identifier.clone().expect("Unknown field identifier."));
                     target.write("=");
-                    target.write(&Self::get_identifier(current));
+                    target.write(Self::get_identifier(current));
                 }
                 Rule::attribute => {
                     Self::reformat_attribute(&mut target.column_locked_writer_for(4), &current, "@", vec![]);
@@ -573,14 +606,14 @@ impl<'a> Reformatter<'a> {
         for current in token.clone().into_inner() {
             match current.as_rule() {
                 Rule::optional_type => {
-                    builder.write(&Self::get_identifier(current));
+                    builder.write(Self::get_identifier(current));
                     builder.write("?");
                 }
                 Rule::base_type => {
-                    builder.write(&Self::get_identifier(current));
+                    builder.write(Self::get_identifier(current));
                 }
                 Rule::list_type => {
-                    builder.write(&Self::get_identifier(current));
+                    builder.write(Self::get_identifier(current));
                     builder.write("[]");
                 }
                 _ => Self::reformat_generic_token(&mut builder, &current),
@@ -694,7 +727,7 @@ impl<'a> Reformatter<'a> {
                     builder.write(", ");
                 }
                 builder.write(&arg.arg.name.name);
-                builder.write(&": ");
+                builder.write(": ");
                 Self::render_value(&mut builder, &arg.arg.value);
             }
         }
@@ -709,23 +742,23 @@ impl<'a> Reformatter<'a> {
     //duplicated from renderer -.-
     fn render_value(target: &mut StringBuilder, val: &ast::Expression) {
         match val {
-            ast::Expression::Array(vals, _) => Self::render_array(target, &vals),
-            ast::Expression::BooleanValue(val, _) => target.write(&val),
-            ast::Expression::ConstantValue(val, _) => target.write(&val),
-            ast::Expression::NumericValue(val, _) => target.write(&val),
-            ast::Expression::StringValue(val, _) => Self::render_str(target, &val),
-            ast::Expression::Function(name, args, _) => Self::render_func(target, &name, &args),
+            ast::Expression::Array(vals, _) => Self::render_array(target, vals),
+            ast::Expression::BooleanValue(val, _) => target.write(val),
+            ast::Expression::ConstantValue(val, _) => target.write(val),
+            ast::Expression::NumericValue(val, _) => target.write(val),
+            ast::Expression::StringValue(val, _) => Self::render_str(target, val),
+            ast::Expression::Function(name, args, _) => Self::render_func(target, name, args),
         };
     }
     fn render_array(target: &mut StringBuilder, vals: &[ast::Expression]) {
-        target.write(&"[");
+        target.write("[");
         for (idx, arg) in vals.iter().enumerate() {
             if idx > 0 {
-                target.write(&", ");
+                target.write(", ");
             }
             Self::render_value(target, arg);
         }
-        target.write(&"]");
+        target.write("]");
     }
     fn render_func(target: &mut StringBuilder, name: &str, vals: &[ast::Expression]) {
         target.write(name);

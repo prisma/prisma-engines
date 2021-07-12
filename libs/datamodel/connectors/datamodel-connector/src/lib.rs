@@ -1,20 +1,43 @@
 pub mod connector_error;
 pub mod helper;
 
+mod empty_connector;
+
+pub use empty_connector::EmptyDatamodelConnector;
+
 use crate::connector_error::{ConnectorError, ConnectorErrorFactory, ErrorKind};
 use dml::{
     field::Field, model::Model, native_type_constructor::NativeTypeConstructor,
-    native_type_instance::NativeTypeInstance, scalars::ScalarType,
+    native_type_instance::NativeTypeInstance, relation_info::ReferentialAction, scalars::ScalarType,
 };
-use std::{borrow::Cow, collections::BTreeMap};
+use enumflags2::BitFlags;
+use std::{borrow::Cow, collections::BTreeMap, str::FromStr};
 
 pub trait Connector: Send + Sync {
-    fn name(&self) -> String;
+    fn name(&self) -> &str;
 
-    fn capabilities(&self) -> &Vec<ConnectorCapability>;
+    fn capabilities(&self) -> &[ConnectorCapability];
+
+    /// The maximum length of constraint names in bytes. Connectors without a
+    /// limit should return usize::MAX.
+    fn constraint_name_length(&self) -> usize;
 
     fn has_capability(&self, capability: ConnectorCapability) -> bool {
         self.capabilities().contains(&capability)
+    }
+
+    fn referential_actions(&self) -> BitFlags<ReferentialAction>;
+
+    fn supports_named_primary_keys(&self) -> bool {
+        self.has_capability(ConnectorCapability::NamedPrimaryKeys)
+    }
+
+    fn supports_referential_action(&self, action: ReferentialAction) -> bool {
+        self.referential_actions().contains(action)
+    }
+
+    fn emulates_referential_actions(&self) -> bool {
+        false
     }
 
     fn validate_field(&self, field: &Field) -> Result<(), ConnectorError>;
@@ -134,14 +157,14 @@ pub trait Connector: Send + Sync {
 
     fn native_instance_error(&self, instance: NativeTypeInstance) -> ConnectorErrorFactory {
         ConnectorErrorFactory {
-            connector: self.name(),
+            connector: self.name().to_owned(),
             native_type: instance.render(),
         }
     }
 
     fn native_str_error(&self, native_str: &str) -> ConnectorErrorFactory {
         ConnectorErrorFactory {
-            connector: self.name(),
+            connector: self.name().to_owned(),
             native_type: native_str.to_string(),
         }
     }
@@ -149,7 +172,7 @@ pub trait Connector: Send + Sync {
     fn native_types_not_supported(&self) -> Result<NativeTypeInstance, ConnectorError> {
         Err(ConnectorError::from_kind(
             ErrorKind::ConnectorNotSupportedForNativeTypes {
-                connector_name: self.name(),
+                connector_name: self.name().to_owned(),
             },
         ))
     }
@@ -159,9 +182,46 @@ pub trait Connector: Send + Sync {
 
 /// Not all Databases are created equal. Hence connectors for our datasources support different capabilities.
 /// These are used during schema validation. E.g. if a connector does not support enums an error will be raised.
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub enum ConnectorCapability {
-    // start of General Schema Capabilities
+macro_rules! capabilities {
+    ($( $variant:ident $(,)? ),*) => {
+        #[derive(Debug, Clone, Copy, PartialEq)]
+        pub enum ConnectorCapability {
+            $(
+                $variant,
+            )*
+        }
+
+        impl std::fmt::Display for ConnectorCapability {
+            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                let name = match self {
+                    $(
+                        Self::$variant => stringify!($variant),
+                    )*
+                };
+
+                write!(f, "{}", name)
+            }
+        }
+
+        impl FromStr for ConnectorCapability {
+            type Err = String;
+
+            fn from_str(s: &str) -> Result<Self, Self::Err> {
+                match s {
+                    $(
+                        stringify!($variant) => Ok(Self::$variant),
+                    )*
+                    _ => Err(format!("{} is not a known connector capability.", s)),
+                }
+            }
+        }
+    };
+}
+
+// Capabilities describe what functoinality connectors are able to provide.
+// Some are used only by the query engine, some are used only by the datamodel parser.
+capabilities!(
+    // General capabilities, not specific to any part of Prisma.
     ScalarLists,
     RelationsOverNonUniqueCriteria,
     MultipleIndexesWithSameName,
@@ -172,8 +232,9 @@ pub enum ConnectorCapability {
     AutoIncrementMultipleAllowed,
     AutoIncrementNonIndexedAllowed,
     RelationFieldsInArbitraryOrder,
-
-    // start of Query Engine Capabilities
+    ForeignKeys,
+    NamedPrimaryKeys,
+    // Start of query-engine-only Capabilities
     InsensitiveFilters,
     CreateMany,
     CreateManyWriteableAutoIncId,
@@ -184,12 +245,13 @@ pub enum ConnectorCapability {
     JsonFilteringJsonPath,
     JsonFilteringArrayPath,
     CompoundIds,
-}
+    AnyId, // Any (or combination of) uniques and not only id fields can constitute an id for a model.
+);
 
 /// Contains all capabilities that the connector is able to serve.
 #[derive(Debug)]
 pub struct ConnectorCapabilities {
-    capabilities: Vec<ConnectorCapability>,
+    pub capabilities: Vec<ConnectorCapability>,
 }
 
 impl ConnectorCapabilities {

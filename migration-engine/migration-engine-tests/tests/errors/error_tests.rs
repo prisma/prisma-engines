@@ -1,5 +1,5 @@
 use indoc::{formatdoc, indoc};
-use migration_core::api::RpcApi;
+use migration_core::rpc_api;
 use migration_engine_tests::sync_test_api::*;
 use pretty_assertions::assert_eq;
 use quaint::prelude::Insert;
@@ -22,7 +22,7 @@ fn authentication_failure_must_return_a_known_error_on_postgres(api: TestApi) {
         db_url
     );
 
-    let error = api.block_on(RpcApi::new(&dm)).map(|_| ()).unwrap_err();
+    let error = api.block_on(rpc_api(&dm)).map(|_| ()).unwrap_err();
 
     let user = db_url.username();
     let host = db_url.host().unwrap().to_string();
@@ -57,7 +57,7 @@ fn authentication_failure_must_return_a_known_error_on_mysql(api: TestApi) {
         url
     );
 
-    let error = api.block_on(RpcApi::new(&dm)).map(|_| ()).unwrap_err();
+    let error = api.block_on(rpc_api(&dm)).map(|_| ()).unwrap_err();
 
     let user = url.username();
     let host = url.host().unwrap().to_string();
@@ -92,7 +92,7 @@ fn unreachable_database_must_return_a_proper_error_on_mysql(api: TestApi) {
         url
     );
 
-    let error = api.block_on(RpcApi::new(&dm)).map(|_| ()).unwrap_err();
+    let error = api.block_on(rpc_api(&dm)).map(|_| ()).unwrap_err();
 
     let port = url.port().unwrap();
     let host = url.host().unwrap().to_string();
@@ -127,7 +127,7 @@ fn unreachable_database_must_return_a_proper_error_on_postgres(api: TestApi) {
         url
     );
 
-    let error = api.block_on(RpcApi::new(&dm)).map(|_| ()).unwrap_err();
+    let error = api.block_on(rpc_api(&dm)).map(|_| ()).unwrap_err();
 
     let host = url.host().unwrap().to_string();
     let port = url.port().unwrap();
@@ -163,7 +163,7 @@ fn database_does_not_exist_must_return_a_proper_error(api: TestApi) {
         url
     );
 
-    let error = api.block_on(RpcApi::new(&dm)).map(|_| ()).unwrap_err();
+    let error = api.block_on(rpc_api(&dm)).map(|_| ()).unwrap_err();
 
     let json_error = serde_json::to_value(&error.to_user_facing()).unwrap();
     let expected = json!({
@@ -192,7 +192,7 @@ fn bad_datasource_url_and_provider_combinations_must_return_a_proper_error(api: 
         api.connection_string()
     );
 
-    let error = api.block_on(RpcApi::new(&dm)).map(drop).unwrap_err();
+    let error = api.block_on(rpc_api(&dm)).map(drop).unwrap_err();
 
     let json_error = serde_json::to_value(&error.to_user_facing()).unwrap();
 
@@ -236,7 +236,7 @@ fn connections_to_system_databases_must_be_rejected(api: TestApi) {
         // "mysql" is the default in Quaint.
         let name = if name == &"" { "mysql" } else { name };
 
-        let error = api.block_on(RpcApi::new(&dm)).map(drop).unwrap_err();
+        let error = api.block_on(rpc_api(&dm)).map(drop).unwrap_err();
         let json_error = serde_json::to_value(&error.to_user_facing()).unwrap();
 
         let expected = json!({
@@ -283,7 +283,7 @@ fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: TestApi
         }
     "#;
 
-    api.schema_push(dm).send_sync().assert_green_bang();
+    api.schema_push(dm).send().assert_green_bang();
 
     let insert = Insert::multi_into(api.render_table_name("Fruit"), &["name"])
         .values(("banana",))
@@ -389,7 +389,7 @@ async fn connection_string_problems_give_a_nice_error() {
             provider.1
         );
 
-        let error = RpcApi::new(&dm).await.map(|_| ()).unwrap_err();
+        let error = rpc_api(&dm).await.map(|_| ()).unwrap_err();
 
         let json_error = serde_json::to_value(&error.to_user_facing()).unwrap();
 

@@ -1,6 +1,6 @@
 //! The migration connector ConnectorError type.
 
-use crate::{migrations_directory::ReadMigrationScriptError, ListMigrationsError};
+use crate::migrations_directory::{ListMigrationsError, ReadMigrationScriptError};
 use std::{
     error::Error as StdError,
     fmt::{Debug, Display, Write},
@@ -167,7 +167,9 @@ impl ConnectorError {
 
     /// Construct an UrlParseError.
     pub fn url_parse_error(err: impl Display) -> Self {
-        Self::from_msg(format!("{} in database URL", err))
+        Self::user_facing(user_facing_errors::common::InvalidConnectionString {
+            details: err.to_string(),
+        })
     }
 }
 

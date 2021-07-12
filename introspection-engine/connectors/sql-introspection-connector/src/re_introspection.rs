@@ -1,13 +1,13 @@
 use crate::introspection_helpers::replace_field_names;
 use crate::warnings::*;
+use crate::SqlFamilyTrait;
 use datamodel::{Datamodel, DefaultValue, FieldType, Ignorable, ValueGenerator};
-use introspection_connector::Warning;
+use introspection_connector::{IntrospectionContext, Warning};
 use prisma_value::PrismaValue;
-use quaint::connector::SqlFamily;
 use std::cmp::Ordering;
 use std::cmp::Ordering::{Equal, Greater, Less};
 
-pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family: &SqlFamily) -> Vec<Warning> {
+pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, ctx: &IntrospectionContext) -> Vec<Warning> {
     let mut warnings = vec![];
 
     //@@map on models
@@ -15,7 +15,7 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family
     {
         for model in new_data_model.models() {
             if let Some(old_model) =
-                old_data_model.find_model_db_name(&model.database_name.as_ref().unwrap_or(&model.name))
+                old_data_model.find_model_db_name(model.database_name.as_ref().unwrap_or(&model.name))
             {
                 if new_data_model.find_model(&old_model.name).is_none() {
                     changed_model_names.push((Model::new(&model.name), Model::new(&old_model.name)))
@@ -50,7 +50,7 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family
             if let Some(old_model) = &old_data_model.find_model(&model.name) {
                 for field in model.scalar_fields() {
                     if let Some(old_field) =
-                        old_model.find_scalar_field_db_name(&field.database_name.as_ref().unwrap_or(&field.name))
+                        old_model.find_scalar_field_db_name(field.database_name.as_ref().unwrap_or(&field.name))
                     {
                         if model.find_scalar_field(&old_field.name).is_none() {
                             let mf = ModelAndField::new(&model.name, &field.name);
@@ -108,11 +108,11 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family
             for new_field in new_model.relation_fields() {
                 if let Some(old_model) = old_data_model.find_model(&new_model.name) {
                     for old_field in old_model.relation_fields() {
-                        let (_, old_related_field) = &old_data_model.find_related_field_bang(&old_field);
+                        let (_, old_related_field) = &old_data_model.find_related_field_bang(old_field);
                         let is_many_to_many = old_field.is_list() && old_related_field.is_list();
                         let is_self_relation = old_field.relation_info.to == old_related_field.relation_info.to;
 
-                        let (_, related_field) = &new_data_model.find_related_field_bang(&new_field);
+                        let (_, related_field) = &new_data_model.find_related_field_bang(new_field);
 
                         //the relationinfos of both sides need to be compared since the relationinfo of the
                         // non-fk side does not contain enough information to uniquely identify the correct relationfield
@@ -154,8 +154,8 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family
             for field in model.relation_fields() {
                 if let Some(old_model) = old_data_model.find_model(&model.name) {
                     for old_field in old_model.relation_fields() {
-                        let (_, related_field) = &new_data_model.find_related_field_bang(&field);
-                        let (_, old_related_field) = &old_data_model.find_related_field_bang(&old_field);
+                        let (_, related_field) = &new_data_model.find_related_field_bang(field);
+                        let (_, old_related_field) = &old_data_model.find_related_field_bang(old_field);
                         //the relationinfos of both sides need to be compared since the relationinfo of the
                         // non-fk side does not contain enough information to uniquely identify the correct relationfield
 
@@ -186,7 +186,7 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family
     let mut changed_enum_names = vec![];
     {
         for enm in new_data_model.enums() {
-            if let Some(old_enum) = old_data_model.find_enum_db_name(&enm.database_name.as_ref().unwrap_or(&enm.name)) {
+            if let Some(old_enum) = old_data_model.find_enum_db_name(enm.database_name.as_ref().unwrap_or(&enm.name)) {
                 if new_data_model.find_enum(&old_enum.name).is_none() {
                     changed_enum_names.push((Enum { enm: enm.name.clone() }, old_enum.name.clone()))
                 }
@@ -255,7 +255,7 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family
     //mysql enum names
     let mut changed_mysql_enum_names = vec![];
     {
-        if family.is_mysql() {
+        if ctx.sql_family().is_mysql() {
             for enm in new_data_model.enums() {
                 if let Some((model_name, field_name)) = &new_data_model.find_enum_fields(&enm.name).first() {
                     if let Some(old_model) = old_data_model.find_model(model_name) {
@@ -381,10 +381,10 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family
                         if old_model.documentation.is_some() {
                             re_introspected_model_comments.push((Model::new(&model.name), &old_model.documentation))
                         }
-                        if let Some(old_field) = old_model.find_field(&field.name()) {
+                        if let Some(old_field) = old_model.find_field(field.name()) {
                             if old_field.documentation().is_some() {
                                 re_introspected_field_comments.push((
-                                    ModelAndField::new(&model.name, &field.name()),
+                                    ModelAndField::new(&model.name, field.name()),
                                     old_field.documentation().map(|s| s.to_string()),
                                 ))
                             }

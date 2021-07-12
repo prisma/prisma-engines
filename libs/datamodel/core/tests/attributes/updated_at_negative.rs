@@ -22,6 +22,11 @@ fn should_fail_if_field_type_is_string() {
 #[test]
 fn should_fail_if_field_arity_is_list() {
     let dml = r#"
+    datasource db {
+        provider = "postgres"
+        url = "postgres://"
+    }
+
     model User {
         id Int @id
         lastSeen DateTime[] @updatedAt
@@ -31,8 +36,8 @@ fn should_fail_if_field_arity_is_list() {
     let errors = parse_error(dml);
 
     errors.assert_is(DatamodelError::new_attribute_validation_error(
-        "Fields that are marked with @updatedAt can not be lists.",
+        "Fields that are marked with @updatedAt cannot be lists.",
         "updatedAt",
-        Span::new(66, 75),
+        Span::new(151, 160),
     ));
 }

@@ -1,8 +1,6 @@
 use crate::scalars::ScalarType;
-use chrono::Utc;
 use prisma_value::PrismaValue;
 use std::fmt;
-use uuid::Uuid;
 
 /// Represents a default specified on a field.
 #[derive(Clone, PartialEq)]
@@ -30,6 +28,7 @@ impl DefaultValue {
 
     /// Returns either a copy of the contained single value or produces a new
     /// value as defined by the expression.
+    #[cfg(feature = "default_generators")]
     pub fn get(&self) -> Option<PrismaValue> {
         match self {
             Self::Single(v) => Some(v.clone()),
@@ -128,6 +127,7 @@ impl ValueGenerator {
         self.args.get(0).and_then(|v| v.as_string())
     }
 
+    #[cfg(feature = "default_generators")]
     pub fn generate(&self) -> Option<PrismaValue> {
         self.generator.invoke()
     }
@@ -137,7 +137,7 @@ impl ValueGenerator {
             Ok(())
         } else {
             Err(format!(
-                "The function `{}()` can not be used on fields of type `{}`.",
+                "The function `{}()` cannot be used on fields of type `{}`.",
                 &self.name,
                 scalar_type.to_string()
             ))
@@ -174,6 +174,7 @@ impl ValueGeneratorFn {
         }
     }
 
+    #[cfg(feature = "default_generators")]
     fn invoke(&self) -> Option<PrismaValue> {
         match self {
             Self::Uuid => Some(Self::generate_uuid()),
@@ -197,16 +198,19 @@ impl ValueGeneratorFn {
         }
     }
 
+    #[cfg(feature = "default_generators")]
     fn generate_cuid() -> PrismaValue {
         PrismaValue::String(cuid::cuid().unwrap())
     }
 
+    #[cfg(feature = "default_generators")]
     fn generate_uuid() -> PrismaValue {
-        PrismaValue::Uuid(Uuid::new_v4())
+        PrismaValue::Uuid(uuid::Uuid::new_v4())
     }
 
+    #[cfg(feature = "default_generators")]
     fn generate_now() -> PrismaValue {
-        PrismaValue::DateTime(Utc::now().into())
+        PrismaValue::DateTime(chrono::Utc::now().into())
     }
 }
 

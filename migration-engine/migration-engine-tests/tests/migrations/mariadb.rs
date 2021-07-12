@@ -19,17 +19,15 @@ fn foreign_keys_to_indexes_being_renamed_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green_bang();
+    api.schema_push(dm1).send().assert_green_bang();
 
     api.assert_schema()
         .assert_table("User", |table| {
             table.assert_index_on_columns(&["name"], |idx| idx.assert_name("idxname"))
         })
-        .unwrap()
         .assert_table("Post", |table| {
             table.assert_fk_on_columns(&["author"], |fk| fk.assert_references("User", &["name"]))
-        })
-        .unwrap();
+        });
 
     let insert_post = quaint_ast::Insert::single_into(api.render_table_name("Post"))
         .value("id", "the-post-id")
@@ -58,15 +56,13 @@ fn foreign_keys_to_indexes_being_renamed_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send_sync().assert_green_bang();
+    api.schema_push(dm2).send().assert_green_bang();
 
     api.assert_schema()
         .assert_table("User", |table| {
             table.assert_index_on_columns(&["name"], |idx| idx.assert_name("idxrenamed"))
         })
-        .unwrap()
         .assert_table("Post", |table| {
             table.assert_fk_on_columns(&["author"], |fk| fk.assert_references("User", &["name"]))
-        })
-        .unwrap();
+        });
 }

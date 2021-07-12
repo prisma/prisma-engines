@@ -1,52 +1,52 @@
-use super::{column::ColumnDiffer, differ_database::DifferDatabase};
-use crate::{flavour::SqlFlavour, pair::Pair};
+use super::differ_database::DifferDatabase;
+use crate::pair::Pair;
 use sql_schema_describer::{
     walkers::{ColumnWalker, ForeignKeyWalker, IndexWalker, TableWalker},
     PrimaryKey,
 };
 
 pub(crate) struct TableDiffer<'a, 'b> {
-    pub(crate) flavour: &'a dyn SqlFlavour,
     pub(crate) tables: Pair<TableWalker<'a>>,
     pub(crate) db: &'b DifferDatabase<'a>,
 }
 
 impl<'schema, 'b> TableDiffer<'schema, 'b> {
-    pub(crate) fn column_pairs<'a>(&'a self) -> impl Iterator<Item = ColumnDiffer<'schema>> + 'a {
+    pub(crate) fn column_pairs(&self) -> impl Iterator<Item = Pair<ColumnWalker<'schema>>> + '_ {
         self.db
-            .column_pairs(self.tables.map(|t| t.table_index()))
-            .map(move |colidxs| ColumnDiffer {
-                flavour: self.flavour,
-                previous: self.tables.previous().column_at(*colidxs.previous()),
-                next: self.tables.next().column_at(*colidxs.next()),
-            })
+            .column_pairs(self.tables.map(|t| t.table_id()))
+            .map(move |colids| self.tables.columns(&colids))
+    }
+
+    pub(crate) fn any_column_changed(&self) -> bool {
+        self.column_pairs()
+            .any(|col| self.db.column_changes_for_walkers(col).differs_in_something())
     }
 
     pub(crate) fn dropped_columns<'a>(&'a self) -> impl Iterator<Item = ColumnWalker<'schema>> + 'a {
         self.db
-            .dropped_columns(self.tables.map(|t| t.table_index()))
+            .dropped_columns(self.tables.map(|t| t.table_id()))
             .map(move |idx| self.tables.previous().column_at(idx))
     }
 
     pub(crate) fn added_columns<'a>(&'a self) -> impl Iterator<Item = ColumnWalker<'schema>> + 'a {
         self.db
-            .created_columns(self.tables.map(|t| t.table_index()))
+            .created_columns(self.tables.map(|t| t.table_id()))
             .map(move |idx| self.tables.next().column_at(idx))
     }
 
     pub(crate) fn created_foreign_keys<'a>(&'a self) -> impl Iterator<Item = ForeignKeyWalker<'schema>> + 'a {
         self.next_foreign_keys().filter(move |next_fk| {
-            self.previous_foreign_keys()
-                .find(|previous_fk| super::foreign_keys_match(Pair::new(previous_fk, next_fk), self.flavour))
-                .is_none()
+            !self
+                .previous_foreign_keys()
+                .any(|previous_fk| super::foreign_keys_match(Pair::new(&previous_fk, next_fk), self.db))
         })
     }
 
     pub(crate) fn dropped_foreign_keys<'a>(&'a self) -> impl Iterator<Item = ForeignKeyWalker<'schema>> + 'a {
         self.previous_foreign_keys().filter(move |previous_fk| {
-            self.next_foreign_keys()
-                .find(|next_fk| super::foreign_keys_match(Pair::new(previous_fk, next_fk), self.flavour))
-                .is_none()
+            !self
+                .next_foreign_keys()
+                .any(|next_fk| super::foreign_keys_match(Pair::new(previous_fk, &next_fk), self.db))
         })
     }
 
@@ -127,7 +127,7 @@ impl<'schema, 'b> TableDiffer<'schema, 'b> {
                     .iter()
                     .any(|pk_col| pk_col == columns.previous.name())
             })
-            .any(|columns| columns.all_changes().0.type_changed())
+            .any(|columns| self.db.column_changes_for_walkers(columns).type_changed())
     }
 
     fn previous_foreign_keys<'a>(&'a self) -> impl Iterator<Item = ForeignKeyWalker<'schema>> + 'a {

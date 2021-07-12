@@ -1,8 +1,6 @@
 use super::common::*;
 use crate::diagnostics::DatamodelError;
-use crate::{
-    ast, common::NameNormalizer, diagnostics::Diagnostics, dml, Field, OnDeleteStrategy, ScalarField, UniqueCriteria,
-};
+use crate::{ast, common::NameNormalizer, diagnostics::Diagnostics, dml, Field, ScalarField, UniqueCriteria};
 use itertools::Itertools;
 use std::collections::HashMap;
 
@@ -41,6 +39,7 @@ impl StandardiserForFormatting {
 
             let mut fields_to_add = vec![];
             let mut missing_field_names_to_field_names = HashMap::new();
+
             for field in model.fields_mut() {
                 if let Field::RelationField(field) = field {
                     let related_model = schema_copy.find_model(&field.relation_info.to).expect(STATE_ERROR);
@@ -78,7 +77,7 @@ impl StandardiserForFormatting {
 
                             // user input has precedence
                             if rel_info.fields.is_empty() && related_field_rel_info.fields.is_empty() {
-                                let unique_criteria = self.unique_criteria(&related_model);
+                                let unique_criteria = self.unique_criteria(related_model);
                                 let underlying_fields = self.underlying_fields_for_unique_criteria(
                                     &unique_criteria,
                                     &related_model.name,
@@ -102,6 +101,7 @@ impl StandardiserForFormatting {
                     }
                 }
             }
+
             for field in fields_to_add {
                 match missing_field_names_to_field_names.get(field.name()) {
                     Some(field_names) if field_names.len() > 1 => {
@@ -150,7 +150,7 @@ impl StandardiserForFormatting {
 
         let mut missing_opposite_relation_fields = Vec::new();
         for model in schema.models() {
-            let mut missing_for_model = self.find_missing_opposite_relation_fields(&model, schema, ast_schema)?;
+            let mut missing_for_model = self.find_missing_opposite_relation_fields(model, schema, ast_schema)?;
             missing_opposite_relation_fields.append(&mut missing_for_model);
         }
 
@@ -160,7 +160,7 @@ impl StandardiserForFormatting {
                 .expect(STATE_ERROR);
             let field_name = &missing_opposite_relation_field.field.name;
 
-            if model.find_relation_field(&field_name).is_some() {
+            if model.find_relation_field(field_name).is_some() {
                 let source_model = schema
                     .find_model(&missing_opposite_relation_field.related_model)
                     .expect(STATE_ERROR);
@@ -169,9 +169,9 @@ impl StandardiserForFormatting {
                     .expect(STATE_ERROR);
                 errors.push_error(field_validation_error(
                                 "Automatic related field generation would cause a naming conflict. Please add an explicit opposite relation field.",
-                                &source_model,
+                                source_model,
                                 &Field::RelationField(source_field.clone()),
-                                &ast_schema,
+                                ast_schema,
                             ));
             } else {
                 let model_mut = schema.find_model_mut(&missing_opposite_relation_field.model);
@@ -205,14 +205,16 @@ impl StandardiserForFormatting {
             let rel_info = &field.relation_info;
             let related_model = schema.find_model(&rel_info.to).expect(STATE_ERROR);
 
-            if schema.find_related_field(&field).is_none() {
+            if schema.find_related_field(field).is_none() {
                 if field.is_singular() {
                     let relation_info = dml::RelationInfo {
                         to: model.name.clone(),
                         fields: vec![],
                         references: vec![],
                         name: rel_info.name.clone(),
-                        on_delete: OnDeleteStrategy::None,
+                        on_delete: None,
+                        on_update: None,
+                        legacy_referential_actions: false,
                     };
                     let mut opposite_relation_field =
                         dml::RelationField::new_generated(&model.name, relation_info, false);
@@ -227,7 +229,7 @@ impl StandardiserForFormatting {
                         underlying_fields: vec![],
                     });
                 } else {
-                    let unique_criteria = self.unique_criteria(&model);
+                    let unique_criteria = self.unique_criteria(model);
                     let unique_criteria_field_names =
                         unique_criteria.fields.iter().map(|f| f.name.to_owned()).collect();
 
@@ -289,7 +291,9 @@ impl StandardiserForFormatting {
                         fields: underlying_field_names,
                         references: unique_criteria_field_names,
                         name: rel_info.name.clone(),
-                        on_delete: OnDeleteStrategy::None,
+                        on_delete: None,
+                        on_update: None,
+                        legacy_referential_actions: false,
                     };
 
                     let is_required = all_existing_underlying_fields_on_opposite_model_are_required

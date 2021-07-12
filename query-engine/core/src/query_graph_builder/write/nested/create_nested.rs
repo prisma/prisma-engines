@@ -16,6 +16,7 @@ use std::{convert::TryInto, sync::Arc};
 #[tracing::instrument(skip(graph, parent_node, parent_relation_field, value, child_model))]
 pub fn nested_create(
     graph: &mut QueryGraph,
+    connector_ctx: &ConnectorContext,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
     value: ParsedInputValue,
@@ -26,7 +27,7 @@ pub fn nested_create(
     // Build all create nodes upfront.
     let creates: Vec<NodeRef> = utils::coerce_vec(value)
         .into_iter()
-        .map(|value| create::create_record_node(graph, Arc::clone(child_model), value.try_into()?))
+        .map(|value| create::create_record_node(graph, connector_ctx, Arc::clone(child_model), value.try_into()?))
         .collect::<QueryGraphBuilderResult<Vec<NodeRef>>>()?;
 
     if relation.is_many_to_many() {
@@ -277,7 +278,7 @@ fn handle_one_to_many(
 ///      └────────────┘
 /// ```
 ///
-/// Important: We can not inject from `Child Create` to `Parent` if `Parent` is a non-create, as it would cause
+/// Important: We cannot inject from `Child Create` to `Parent` if `Parent` is a non-create, as it would cause
 /// the following issue (example):
 /// - Parent is an update, doesn't have a connected child on relation x.
 /// - Parent gets injected with a child on x, because that's what the nested create is supposed to do.

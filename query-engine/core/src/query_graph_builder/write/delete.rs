@@ -3,7 +3,7 @@ use crate::{
     constants::args,
     query_ast::*,
     query_graph::{QueryGraph, QueryGraphDependency},
-    ArgumentListLookup, FilteredQuery, ParsedField,
+    ArgumentListLookup, ConnectorContext, FilteredQuery, ParsedField,
 };
 use connector::filter::Filter;
 use prisma_models::ModelRef;
@@ -11,7 +11,12 @@ use std::{convert::TryInto, sync::Arc};
 
 /// Creates a top level delete record query and adds it to the query graph.
 #[tracing::instrument(skip(graph, model, field))]
-pub fn delete_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedField) -> QueryGraphBuilderResult<()> {
+pub fn delete_record(
+    graph: &mut QueryGraph,
+    connector_ctx: &ConnectorContext,
+    model: ModelRef,
+    mut field: ParsedField,
+) -> QueryGraphBuilderResult<()> {
     graph.flag_transactional();
 
     let where_arg = field.arguments.lookup(args::WHERE).unwrap();
@@ -28,7 +33,7 @@ pub fn delete_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
     }));
 
     let delete_node = graph.create_node(delete_query);
-    utils::insert_deletion_checks(graph, &model, &read_node, &delete_node)?;
+    utils::insert_emulated_on_delete(graph, connector_ctx, &model, &read_node, &delete_node)?;
 
     graph.create_edge(
         &read_node,
@@ -55,6 +60,7 @@ pub fn delete_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
 #[tracing::instrument(skip(graph, model, field))]
 pub fn delete_many_records(
     graph: &mut QueryGraph,
+    connector_ctx: &ConnectorContext,
     model: ModelRef,
     mut field: ParsedField,
 ) -> QueryGraphBuilderResult<()> {
@@ -76,7 +82,8 @@ pub fn delete_many_records(
     let read_query_node = graph.create_node(read_query);
     let delete_many_node = graph.create_node(Query::Write(delete_many));
 
-    utils::insert_deletion_checks(graph, &model, &read_query_node, &delete_many_node)?;
+    utils::insert_emulated_on_delete(graph, connector_ctx, &model, &read_query_node, &delete_many_node)?;
+
     graph.create_edge(
         &read_query_node,
         &delete_many_node,
