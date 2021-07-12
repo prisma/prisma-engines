@@ -4,9 +4,11 @@ import org.scalatest.{FlatSpec, Matchers}
 import util.ConnectorCapability.JoinRelationLinksCapability
 import util._
 
+// RS: Ported (except ignored ones)
 class NestedDeleteMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiSpecBase with SchemaBaseV11 {
   override def runOnlyForCapabilities = Set(JoinRelationLinksCapability)
 
+  // No datamodels generated
   "a P1! to C1 relation" should "always fail when trying to delete the child" in {
     schemaWithRelation(onParent = ChildReq, onChild = ParentOpt).test { t =>
       val project = SchemaDsl.fromStringV11() {
@@ -129,7 +131,7 @@ class NestedDeleteMutationInsideUpdateSpec extends FlatSpec with Matchers with A
       """,
           project
         )
-        .toString should be(s"""{"data":{"parent":{"childOpt":{"c":"existingChild"}}}}""")
+          .toString should be(s"""{"data":{"parent":{"childOpt":{"c":"existingChild"}}}}""")
     }
   }
 
@@ -343,7 +345,7 @@ class NestedDeleteMutationInsideUpdateSpec extends FlatSpec with Matchers with A
     }
   }
 
-  "a P1! to CM  relation" should "error " in {
+  "a P1! to CM  relation" should "error" in {
     schemaWithRelation(onParent = ChildReq, onChild = ParentList).test { t =>
       val project = SchemaDsl.fromStringV11() {
         t.datamodel

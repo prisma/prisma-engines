@@ -195,10 +195,10 @@ pub fn schema_with_relation(
                             let mut required_capabilities_for_dm = vec![];
 
                             match (parent_id, child_id) {
-                                (Identifier::Compound, _) | (_, &Identifier::Compound) => {
+                                (Identifier::Compound, _) | (_, Identifier::Compound) => {
                                     required_capabilities_for_dm.push(ConnectorCapability::CompoundIds)
                                 }
-                                (Identifier::None, _) | (_, &Identifier::None) => {
+                                (Identifier::None, _) | (_, Identifier::None) => {
                                     required_capabilities_for_dm.push(ConnectorCapability::AnyId)
                                 }
                                 _ => (),

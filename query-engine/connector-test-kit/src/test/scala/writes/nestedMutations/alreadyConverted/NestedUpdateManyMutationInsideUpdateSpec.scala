@@ -201,7 +201,7 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
     }
   }
 
-  "a PM to C1!  relation " should "work with empty Filter" in {
+  qz in {
     schemaWithRelation(onParent = ChildList, onChild = ParentReq).test { t =>
       val project = SchemaDsl.fromStringV11() {
         t.datamodel

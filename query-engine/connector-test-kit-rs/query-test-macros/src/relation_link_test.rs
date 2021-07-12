@@ -108,18 +108,24 @@ pub fn relation_link_test_impl(attr: TokenStream, input: TokenStream) -> TokenSt
         args.id_only,
     );
 
+    if datamodels.is_empty() {
+        panic!("No datamodel were generated")
+    }
+
     let test_shells: Vec<proc_macro2::TokenStream> = datamodels
         .into_iter()
         .enumerate()
         .map(|(i, dm)| {
             // The shell function retains the name of the original test definition.
             let test_fn_ident = Ident::new(&format!("{}_{}", test_fn_ident.to_string(), i), Span::call_site());
-            let datamodel: proc_macro2::TokenStream = format!(r#""{}""#, dm.datamodel()).parse().unwrap();
+            let datamodel: proc_macro2::TokenStream = format!(r#""{}""#, dm.datamodel())
+                .parse()
+                .expect("Could not parse the datamodel");
             let dm_with_params: String = dm.try_into().expect("Could not serialize json");
             let test_database = format!("{}_{}_{}", suite_name, test_name, i);
             let required_capabilities = required_capabilities
                 .get(i)
-                .unwrap()
+                .expect("Could not find some required capabilities")
                 .iter()
                 .map(|cap| format!("{}", cap))
                 .collect::<Vec<_>>();
