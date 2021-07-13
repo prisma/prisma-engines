@@ -160,6 +160,22 @@ pub async fn update_records<'conn>(
         let field = fields.iter().find(|f| f.db_name() == name).unwrap();
 
         let (op_key, val) = match write_expr {
+            WriteExpression::Add(rhs) if field.is_list => match rhs {
+                PrismaValue::List(vals) => {
+                    let vals = vals
+                        .into_iter()
+                        .map(|val| (field, val).into_bson())
+                        .collect::<crate::Result<Vec<_>>>()?;
+
+                    let doc = doc! {
+                        "$each": Bson::Array(vals)
+                    };
+
+                    ("$push", Bson::Document(doc))
+                }
+                val => ("$push", (field, val).into_bson()?),
+            },
+
             WriteExpression::Field(_) => unimplemented!(),
             WriteExpression::Value(rhs) => ("$set", (field, rhs).into_bson()?),
             WriteExpression::Add(rhs) => ("$inc", (field, rhs).into_bson()?),
