@@ -73,8 +73,8 @@ mod connect_inside_upsert {
     // "A P1 to CM relation" should "be connectable by unique field within an upsert in the update case"
     #[connector_test]
     async fn p1_cm_uniq_upsert_update(runner: &Runner) -> TestResult<()> {
-        run_query!(runner, r#"mutation {{ createOneChild(data: {{c:"c1"}}){{ id }} }}"#);
-        run_query!(runner, r#"mutation {{ createOneParent(data: {{p:"p1"}}){{ id }} }}"#);
+        run_query!(runner, r#"mutation { createOneChild(data: {c:"c1"}){ id } }"#);
+        run_query!(runner, r#"mutation { createOneParent(data: {p:"p1"}){ id } }"#);
 
         insta::assert_snapshot!(
           run_query!(runner, r#"mutation {
@@ -97,8 +97,8 @@ mod connect_inside_upsert {
     // "a one to many relation" should "throw the correct error for a connect by unique field within an upsert in the update case"
     #[connector_test]
     async fn one2m_fail_upsert_update(runner: &Runner) -> TestResult<()> {
-        run_query!(runner, r#"mutation {{ createOneChild(data: {{c:"c1"}}){{ id }} }}"#);
-        run_query!(runner, r#"mutation {{ createOneParent(data: {{p:"p1"}}){{ id }} }}"#);
+        run_query!(runner, r#"mutation { createOneChild(data: {c:"c1"}){ id } }"#);
+        run_query!(runner, r#"mutation { createOneParent(data: {p:"p1"}){ id } }"#);
 
         assert_error!(
             runner,
