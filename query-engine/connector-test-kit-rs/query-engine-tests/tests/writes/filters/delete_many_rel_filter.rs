@@ -35,9 +35,7 @@ mod delete_many_rel_filter {
     }
 
     // "The delete many Mutation" should "delete the items matching the where relation filter"
-    // TODO(dom): Not working on mongo.
-    // panicked at 'assertion failed: `(left == right)`| left: `3`, right: `1`', query-engine/connector-test-kit-rs/query-engine-tests/tests/writes/filters/delete_many_rel_filter.rs:66:9
-    #[connector_test(exclude(SqlServer, MongoDb))]
+    #[connector_test(exclude(SqlServer))]
     async fn delete_items_matching_where_rel_filter(runner: &Runner) -> TestResult<()> {
         create_row(runner, r#"{ id: 1, top: "top1"}"#).await?;
         create_row(runner, r#"{ id: 2, top: "top2"}"#).await?;
@@ -70,7 +68,6 @@ mod delete_many_rel_filter {
         Ok(())
     }
 
-    //
     #[connector_test]
     async fn delete_all_items_if_filter_empty(runner: &Runner) -> TestResult<()> {
         create_row(runner, r#"{ id: 1, top: "top1"}"#).await?;
@@ -100,9 +97,7 @@ mod delete_many_rel_filter {
     }
 
     // "The delete many Mutation" should "work for deeply nested filters"
-    // TODO(dom): Not working on mongo.
-    // panicked at 'assertion failed: `(left == right)` left: `3`, right: `2`', query-engine/connector-test-kit-rs/query-engine-tests/tests/writes/filters/delete_many_rel_filter.rs:133:9
-    #[connector_test(exclude(SqlServer, MongoDb))]
+    #[connector_test(exclude(SqlServer))]
     async fn works_with_deeply_nested_filters(runner: &Runner) -> TestResult<()> {
         create_row(runner, r#"{ id: 1, top: "top1"}"#).await?;
         create_row(runner, r#"{ id: 2, top: "top2"}"#).await?;

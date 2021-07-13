@@ -1,11 +1,16 @@
 use super::*;
-use crate::{filter::convert_filter, output_meta, vacuum_cursor, IntoBson};
+use crate::{
+    filter::{convert_filter, MongoFilter},
+    output_meta,
+    query_builder::MongoReadQueryBuilder,
+    vacuum_cursor, IntoBson,
+};
 use connector_interface::*;
 use mongodb::{
     bson::{doc, Document},
     error::ErrorKind,
     options::{FindOptions, InsertManyOptions},
-    ClientSession, Database,
+    ClientSession, Collection, Database,
 };
 use prisma_models::{ModelRef, PrismaValue, RecordProjection};
 use std::convert::TryInto;
@@ -205,7 +210,6 @@ pub async fn update_records<'conn>(
     Ok(ids)
 }
 
-// todo joins
 pub async fn delete_records<'conn>(
     database: &Database,
     session: &mut ClientSession,
@@ -213,9 +217,9 @@ pub async fn delete_records<'conn>(
     record_filter: RecordFilter,
 ) -> crate::Result<usize> {
     let coll = database.collection::<Document>(model.db_name());
+    let id_field = model.primary_identifier().scalar_fields().next().unwrap();
 
     let filter = if let Some(selectors) = record_filter.selectors {
-        let id_field = model.primary_identifier().scalar_fields().next().unwrap();
         let ids = selectors
             .into_iter()
             .map(|p| (&id_field, p.values().next().unwrap()).into_bson())
@@ -223,13 +227,42 @@ pub async fn delete_records<'conn>(
 
         doc! { id_field.db_name(): { "$in": ids } }
     } else {
-        let (filter, _joins) = convert_filter(record_filter.filter, false)?.render();
-        filter
+        let filter = convert_filter(record_filter.filter, false)?;
+        let ids = find_ids(coll.clone(), session, model, filter).await?;
+
+        doc! { id_field.db_name(): { "$in": ids } }
     };
 
     let delete_result = coll.delete_many_with_session(filter, None, session).await?;
 
     Ok(delete_result.deleted_count as usize)
+}
+
+/// Retrives document ids based on the given filter.
+async fn find_ids(
+    collection: Collection<Document>,
+    session: &mut ClientSession,
+    model: &ModelRef,
+    filter: MongoFilter,
+) -> crate::Result<Vec<Bson>> {
+    let id_field = model.primary_identifier();
+    let mut builder = MongoReadQueryBuilder::new(model.clone());
+
+    // If a filter comes with joins, it needs to be run _after_ the initial filter query / $matches.
+    let (filter, filter_joins) = filter.render();
+    if !filter_joins.is_empty() {
+        builder.joins = filter_joins;
+        builder.join_filters.push(filter);
+    } else {
+        builder.query = Some(filter);
+    };
+
+    let builder = builder.with_model_projection(id_field)?;
+    let query = builder.build()?;
+    let docs = query.execute(collection, session).await?;
+    let ids = docs.into_iter().map(|mut doc| doc.remove("_id").unwrap()).collect();
+
+    Ok(ids)
 }
 
 /// Connect relations defined in `child_ids` to a parent defined in `parent_id`.

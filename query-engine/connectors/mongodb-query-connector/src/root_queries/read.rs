@@ -7,6 +7,7 @@ use mongodb::{bson::doc, options::FindOptions, ClientSession, Database};
 use prisma_models::*;
 
 // TODO: Handle aggregation selections
+/// Finds a single record. Joins are not required at the moment because the selector is always a unique one.
 pub async fn get_single_record<'conn>(
     database: &Database,
     session: &mut ClientSession,
