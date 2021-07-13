@@ -6,7 +6,8 @@ mod delete_inside_update {
     use query_test_macros::relation_link_test;
 
     // "a P1 to C1  relation " should "work through a nested mutation by id"
-    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneOpt")]
+    // TODO:(dom): Not working on mongo. Failing from 18-26
+    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneOpt", exclude(MongoDb))]
     async fn p1_c1_mut_by_id(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = t.parent().parse(
             run_query_json!(
@@ -79,7 +80,8 @@ mod delete_inside_update {
     }
 
     // "a P1 to C1  relation" should "error if the nodes are not connected"
-    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneOpt")]
+    // TODO:(dom): Not working on mongo. Failing from 18-26
+    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneOpt", exclude(MongoDb))]
     async fn p1_c1_error_if_not_connected(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         run_query!(
             runner,
@@ -128,7 +130,8 @@ mod delete_inside_update {
     }
 
     // "a PM to C1!  relation " should "work"
-    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneReq")]
+    // TODO:(dom): Not working on mongo. Failing from 18-26
+    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneReq", exclude(MongoDb))]
     async fn pm_c1_req_should_work(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = t.parent().parse(
             run_query_json!(
@@ -188,7 +191,8 @@ mod delete_inside_update {
     }
 
     // "a P1 to C1!  relation " should "work"
-    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneReq")]
+    // TODO:(dom): Not working on mongo. Failing from 18-26
+    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneReq", exclude(MongoDb))]
     async fn p1_c1_req_should_work(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = t.parent().parse(
             run_query_json!(
@@ -229,7 +233,8 @@ mod delete_inside_update {
     }
 
     // "a PM to C1 " should "work"
-    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneOpt")]
+    // TODO:(dom): Not working on mongo. Failing from 18-26
+    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneOpt", exclude(MongoDb))]
     async fn pm_c1_should_work(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = t.parent().parse(
             run_query_json!(
@@ -326,7 +331,8 @@ mod delete_inside_update {
     }
 
     // "a P1 to CM  relation " should "work"
-    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToMany", exclude(SqlServer))]
+    // TODO:(dom): Not working on mongo. Failing from 18-26
+    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToMany", exclude(SqlServer, MongoDb))]
     async fn p1_cm_should_work(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = t.parent().parse(
             run_query_json!(

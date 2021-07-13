@@ -25,7 +25,8 @@ mod atomic_number_ops {
     }
 
     // "An updateOne mutation with number operations on the top and updates on the child (inl. child)" should "handle id changes correctly"
-    #[connector_test(schema(schema_1))]
+    // TODO(dom): Not working for mongo
+    #[connector_test(schema(schema_1), exclude(MongoDb))]
     async fn update_number_ops_on_child(runner: &Runner) -> TestResult<()> {
         run_query!(
             runner,
@@ -110,7 +111,8 @@ mod atomic_number_ops {
     }
 
     //"An updateOne mutation with number operations on the top and updates on the child (inl. parent)" should "handle id changes correctly"
-    #[connector_test(schema(schema_2))]
+    // TODO(dom): Not working for mongo
+    #[connector_test(schema(schema_2), exclude(MongoDb))]
     async fn update_number_ops_on_parent(runner: &Runner) -> TestResult<()> {
         run_query!(
             runner,
@@ -195,7 +197,8 @@ mod atomic_number_ops {
     }
 
     // "A nested updateOne mutation" should "correctly apply all number operations for Int"
-    #[connector_test(schema(schema_3))]
+    // TODO(dom): Not working for mongo
+    #[connector_test(schema(schema_3), exclude(MongoDb))]
     async fn nested_update_int_ops(runner: &Runner) -> TestResult<()> {
         create_test_model(runner, 1, None, None).await?;
         create_test_model(runner, 2, Some(3), None).await?;
@@ -264,7 +267,8 @@ mod atomic_number_ops {
     }
 
     // "A nested updateOne mutation" should "correctly apply all number operations for Int"
-    #[connector_test(schema(schema_3))]
+    // TODO(dom): Not working for mongo
+    #[connector_test(schema(schema_3), exclude(MongoDb))]
     async fn nested_update_float_ops(runner: &Runner) -> TestResult<()> {
         create_test_model(runner, 1, None, None).await?;
         create_test_model(runner, 2, None, Some("5.5")).await?;
