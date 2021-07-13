@@ -3,13 +3,13 @@ use crate::{
     filter::{convert_filter, MongoFilter},
     output_meta,
     query_builder::MongoReadQueryBuilder,
-    vacuum_cursor, IntoBson,
+    IntoBson,
 };
 use connector_interface::*;
 use mongodb::{
     bson::{doc, Document},
     error::ErrorKind,
-    options::{FindOptions, InsertManyOptions},
+    options::InsertManyOptions,
     ClientSession, Collection, Database,
 };
 use prisma_models::{ModelRef, PrismaValue, RecordProjection};
@@ -135,19 +135,8 @@ pub async fn update_records<'conn>(
             .map(|p| (&id_field, p.values().next().unwrap()).into_bson())
             .collect::<crate::Result<Vec<_>>>()?
     } else {
-        let (filter, _joins) = convert_filter(record_filter.filter, false)?.render();
-        let find_options = FindOptions::builder()
-            .projection(doc! { id_field.db_name(): 1 })
-            .build();
-
-        let cursor = coll
-            .find_with_session(Some(filter), Some(find_options), session)
-            .await?;
-
-        let docs = vacuum_cursor(cursor, session).await?;
-        docs.into_iter()
-            .map(|mut doc| doc.remove(id_field.db_name()).unwrap())
-            .collect()
+        let filter = convert_filter(record_filter.filter, false)?;
+        find_ids(coll.clone(), session, model, filter).await?
     };
 
     if ids.is_empty() {
