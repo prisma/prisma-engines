@@ -76,7 +76,7 @@ mod nested_create_many {
               }
             }"#,
             2002,
-            "Unique constraint failed on the fields: (`id`)"
+            "Unique constraint failed"
         );
 
         Ok(())

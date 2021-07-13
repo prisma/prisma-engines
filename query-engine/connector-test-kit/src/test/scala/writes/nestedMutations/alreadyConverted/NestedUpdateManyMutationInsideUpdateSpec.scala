@@ -4,6 +4,7 @@ import org.scalatest.{FlatSpec, Matchers}
 import util.ConnectorCapability.JoinRelationLinksCapability
 import util._
 
+// RS: Ported (except ignored ones)
 class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiSpecBase with SchemaBaseV11 {
   override def runOnlyForCapabilities = Set(JoinRelationLinksCapability)
 
@@ -201,7 +202,7 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
     }
   }
 
-  qz in {
+  "a PM to C1!  relation " should "work with empty Filter" in {
     schemaWithRelation(onParent = ChildList, onChild = ParentReq).test { t =>
       val project = SchemaDsl.fromStringV11() {
         t.datamodel

@@ -342,7 +342,7 @@ mod atomic_number_ops {
         opt_int: Option<u32>,
         opt_float: Option<&str>,
     ) -> TestResult<()> {
-        let f = opt_float.unwrap_or_else(|| "null");
+        let f = opt_float.unwrap_or("null");
         let i = opt_int.map(|i| i.to_string()).unwrap_or_else(|| "null".to_string());
 
         run_query!(
