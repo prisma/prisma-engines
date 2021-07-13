@@ -17,7 +17,7 @@ mod test_api_args;
 
 pub use capabilities::Capabilities;
 pub use enumflags2::BitFlags;
-pub use mssql::{init_mssql_database, reset_schema as reset_mssql_schema};
+pub use mssql::reset_schema as reset_mssql_schema;
 pub use sqlite::sqlite_test_url;
 pub use tags::Tags;
 pub use test_api_args::{DatasourceBlock, TestApiArgs};
