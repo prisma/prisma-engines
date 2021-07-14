@@ -726,12 +726,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "28b9d6de7f49e22cf97ad17fc4036ece69300032f45f78f30b4a4482cdc3f4a6"
 
 [[package]]
-name = "convert_case"
-version = "0.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6245d59a3e82a7fc217c5828a6692dbc6dfb63a0c8c90495621f7b9d79704a0e"
-
-[[package]]
 name = "cookie"
 version = "0.14.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -963,18 +957,6 @@ version = "2.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fcc3dd5e9e9c0b295d6e1e4d811fb6f157d5ffd784b8d202fc62eac8035a770b"
 dependencies = [
- "proc-macro2",
- "quote",
- "syn",
-]
-
-[[package]]
-name = "derive_more"
-version = "0.99.13"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f82b1b72f1263f214c0f823371768776c4f5841b942c9883aa8e5ec584fd0ba6"
-dependencies = [
- "convert_case",
  "proc-macro2",
  "quote",
  "syn",
@@ -1288,12 +1270,6 @@ checksum = "fed34cd105917e91daa4da6b3728c47b068749d6a62c59811f06ed2ac71d9da7"
 
 [[package]]
 name = "futures"
-version = "0.1.31"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3a471a38ef8ed83cd6e40aa59c1ffe17db6855c18e3604d9c4ed8c08ebc28678"
-
-[[package]]
-name = "futures"
 version = "0.3.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7f55667319111d593ba876406af7c409c0ebb44dc4be6132a783ccf163ea14c1"
@@ -1332,7 +1308,6 @@ dependencies = [
  "futures-core",
  "futures-task",
  "futures-util",
- "num_cpus",
 ]
 
 [[package]]
@@ -1394,7 +1369,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "feb5c238d27e2bf94ffdfd27b2c29e3df4a68c4193bb6427384259e2bf191967"
 dependencies = [
  "autocfg",
- "futures 0.1.31",
  "futures-channel",
  "futures-core",
  "futures-io",
@@ -1830,7 +1804,6 @@ dependencies = [
  "introspection-connector",
  "json-rpc-stdio",
  "jsonrpc-core",
- "jsonrpc-core-client",
  "jsonrpc-derive",
  "serde",
  "serde_derive",
@@ -1940,42 +1913,16 @@ dependencies = [
 ]
 
 [[package]]
-name = "jsonrpc-client-transports"
-version = "17.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "15b6c6ad01c7354d60de493148c30ac8a82b759e22ae678c8705e9b8e0c566a4"
-dependencies = [
- "derive_more",
- "futures 0.3.13",
- "jsonrpc-core",
- "jsonrpc-pubsub",
- "log",
- "serde",
- "serde_json",
- "url 1.7.2",
-]
-
-[[package]]
 name = "jsonrpc-core"
 version = "17.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "07569945133257ff557eb37b015497104cea61a2c9edaf126c1cbd6e8332397f"
 dependencies = [
- "futures 0.3.13",
+ "futures",
  "log",
  "serde",
  "serde_derive",
  "serde_json",
-]
-
-[[package]]
-name = "jsonrpc-core-client"
-version = "17.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7ac9d56dc729912796637c30f475bbf834594607b27740dfea6e5fa7ba40d1f1"
-dependencies = [
- "futures 0.3.13",
- "jsonrpc-client-transports",
 ]
 
 [[package]]
@@ -1988,21 +1935,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
-]
-
-[[package]]
-name = "jsonrpc-pubsub"
-version = "17.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0c48dbebce7a9c88ab272a4db7d6478aa4c6d9596e6c086366e89efc4e9ed89e"
-dependencies = [
- "futures 0.3.13",
- "jsonrpc-core",
- "lazy_static",
- "log",
- "parking_lot 0.11.1",
- "rand 0.7.3",
- "serde",
 ]
 
 [[package]]
@@ -2441,7 +2373,7 @@ dependencies = [
  "chrono",
  "cuid",
  "datamodel",
- "futures 0.3.13",
+ "futures",
  "itertools 0.10.0",
  "mongodb",
  "native-types",
@@ -2734,7 +2666,7 @@ checksum = "514d24875c140ed269eecc2d1b56d7b71b573716922a763c317fb1b1b4b58f15"
 dependencies = [
  "async-std",
  "async-trait",
- "futures 0.3.13",
+ "futures",
  "js-sys",
  "lazy_static",
  "percent-encoding 2.1.0",
@@ -2750,7 +2682,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ff889e68a02000126fa635a311abc329ce128c576b7dddc4cd3270f3c240afd0"
 dependencies = [
  "async-trait",
- "futures 0.3.13",
+ "futures",
  "opentelemetry",
  "prost 0.7.0",
  "thiserror",
@@ -3051,7 +2983,7 @@ name = "postgres-native-tls"
 version = "0.5.0"
 source = "git+https://github.com/pimeys/rust-postgres?branch=pgbouncer-mode#8a61d46905571ff2b530b204dfa7c56ccbace7f4"
 dependencies = [
- "futures 0.3.13",
+ "futures",
  "native-tls",
  "tokio",
  "tokio-native-tls",
@@ -3311,7 +3243,7 @@ dependencies = [
  "chrono",
  "connection-string",
  "either",
- "futures 0.3.13",
+ "futures",
  "hex",
  "libsqlite3-sys",
  "lru-cache",
@@ -3344,7 +3276,7 @@ dependencies = [
  "anyhow",
  "async-trait",
  "chrono",
- "futures 0.3.13",
+ "futures",
  "itertools 0.10.0",
  "once_cell",
  "prisma-models",
@@ -3368,7 +3300,7 @@ dependencies = [
  "crossbeam-queue",
  "datamodel",
  "datamodel-connector",
- "futures 0.3.13",
+ "futures",
  "im",
  "indexmap",
  "itertools 0.10.0",
@@ -3403,7 +3335,7 @@ dependencies = [
  "connection-string",
  "datamodel",
  "datamodel-connector",
- "futures 0.3.13",
+ "futures",
  "graphql-parser",
  "indexmap",
  "indoc",
@@ -3697,7 +3629,7 @@ dependencies = [
  "connection-string",
  "datamodel",
  "datamodel-connector",
- "futures 0.3.13",
+ "futures",
  "graphql-parser",
  "indexmap",
  "itertools 0.10.0",
@@ -4266,7 +4198,7 @@ dependencies = [
  "chrono",
  "cuid",
  "datamodel",
- "futures 0.3.13",
+ "futures",
  "itertools 0.10.0",
  "prisma-models",
  "prisma-value",
@@ -4579,7 +4511,7 @@ dependencies = [
  "connection-string",
  "encoding",
  "enumflags2",
- "futures 0.3.13",
+ "futures",
  "futures-sink",
  "futures-util",
  "num-bigint",
@@ -4745,7 +4677,7 @@ dependencies = [
  "byteorder",
  "bytes 1.0.1",
  "fallible-iterator",
- "futures 0.3.13",
+ "futures",
  "log",
  "parking_lot 0.11.1",
  "percent-encoding 2.1.0",
