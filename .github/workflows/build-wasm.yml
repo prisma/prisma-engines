@@ -35,3 +35,9 @@ jobs:
         with:
           command: build
           args: -p migration-connector --release --target=wasm32-unknown-unknown
+
+      - name: Build the migration-core crate with default features
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: -p migration-core --release --target=wasm32-unknown-unknown

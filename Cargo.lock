@@ -2227,7 +2227,6 @@ dependencies = [
  "serde",
  "serde_json",
  "sql-migration-connector",
- "tokio",
  "tracing",
  "tracing-futures",
  "url 2.2.1",
