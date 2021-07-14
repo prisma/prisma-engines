@@ -48,11 +48,12 @@ pub fn render_test_datamodel(config: &TestConfig, test_database: &str, template:
 
             generator client {{
                 provider = "prisma-client-js"
-                previewFeatures = ["microsoftSqlServer", "referentialActions"]
+                previewFeatures = [{}]
             }}
         "#},
         tag.datamodel_provider(),
         tag.connection_string(test_database, config.is_ci()),
+        all_features
     );
 
     let renderer = tag.datamodel_renderer();
