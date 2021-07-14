@@ -1,8 +1,6 @@
 use query_engine_tests::*;
 
-// TODO(dom): I assume it's expected that Mongo doens't have autoinc ids.
-// I'm adding this todo just in case it's unexpected.
-#[test_suite(schema(schema), capabilities(AutoIncrement))]
+#[test_suite(schema(schema))]
 mod auto_inc_create {
     use indoc::indoc;
     use query_engine_tests::run_query;
@@ -21,7 +19,7 @@ mod auto_inc_create {
     }
 
     // "Creating an item with a non primary key autoincrement and index " should "work"
-    #[connector_test(schema(schema_1), exclude(Sqlite, MongoDb))]
+    #[connector_test(schema(schema_1), capabilities(AutoIncrement, AutoIncrementNonIndexedAllowed))]
     async fn non_primary_key_autoinc_idx(runner: &Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(runner, r#"mutation {
@@ -39,8 +37,8 @@ mod auto_inc_create {
     fn schema_2() -> String {
         let schema = indoc! {
             r#"model Mail {
-              id Int   @default(autoincrement()) @unique
               #id(messageId, Int, @id)
+              id Int @default(autoincrement()) @unique
           }"#
         };
 
@@ -48,7 +46,7 @@ mod auto_inc_create {
     }
 
     // "Creating an item with a non primary key autoincrement and unique index " should "work"
-    #[connector_test(schema(schema_2), exclude(Sqlite, MongoDb))]
+    #[connector_test(schema(schema_2), capabilities(AutoIncrement, AutoIncrementAllowedOnNonId))]
     async fn non_primary_key_autoinc_uniq_idx(runner: &Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(runner, r#"mutation {
@@ -66,8 +64,8 @@ mod auto_inc_create {
     fn schema_3() -> String {
         let schema = indoc! {
             r#"model Mail {
-              id Int   @default(autoincrement())
               #id(messageId, Int, @id)
+              id Int   @default(autoincrement())
           }"#
         };
 
@@ -75,11 +73,14 @@ mod auto_inc_create {
     }
 
     // "Creating an item with a non primary key autoincrement without indexes" should "work"
-    #[connector_test(schema(schema_3), exclude(Sqlite, Mysql, MongoDb))]
+    #[connector_test(
+        schema(schema_3),
+        capabilities(AutoIncrement, AutoIncrementNonIndexedAllowed, AutoIncrementAllowedOnNonId)
+    )]
     async fn non_primary_key_autoinc_without_idx(runner: &Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(runner, r#"mutation {
-            createOneMail(data: { messageId:1 }){
+            createOneMail(data: { messageId: 1 }){
               id
               messageId
             }
