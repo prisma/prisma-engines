@@ -260,7 +260,7 @@ dependencies = [
  "async-std",
  "native-tls",
  "thiserror",
- "url 2.2.1",
+ "url",
 ]
 
 [[package]]
@@ -735,7 +735,7 @@ dependencies = [
  "base64 0.13.0",
  "hkdf",
  "hmac",
- "percent-encoding 2.1.0",
+ "percent-encoding",
  "rand 0.8.3",
  "sha2",
  "time 0.2.26",
@@ -948,7 +948,7 @@ dependencies = [
  "itertools 0.10.0",
  "serde_json",
  "thiserror",
- "url 2.2.1",
+ "url",
 ]
 
 [[package]]
@@ -1259,7 +1259,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5fc25a87fa4fd2094bffb06925852034d90a17f0d1e05197d4956d3555752191"
 dependencies = [
  "matches",
- "percent-encoding 2.1.0",
+ "percent-encoding",
 ]
 
 [[package]]
@@ -1637,7 +1637,7 @@ dependencies = [
  "serde_json",
  "serde_qs",
  "serde_urlencoded",
- "url 2.2.1",
+ "url",
 ]
 
 [[package]]
@@ -1696,17 +1696,6 @@ name = "ident_case"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b9e0384b61958566e926dc50660321d12159025e767c18e043daf26b70104c39"
-
-[[package]]
-name = "idna"
-version = "0.1.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "38f09e0f0b1fb55fdee1f17470ad800da77af5186a1a76c026b679358b7e844e"
-dependencies = [
- "matches",
- "unicode-bidi",
- "unicode-normalization",
-]
 
 [[package]]
 name = "idna"
@@ -2162,7 +2151,7 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-futures",
- "url 2.2.1",
+ "url",
  "user-facing-errors",
 ]
 
@@ -2185,7 +2174,7 @@ dependencies = [
  "tracing",
  "tracing-error",
  "tracing-subscriber",
- "url 2.2.1",
+ "url",
  "user-facing-errors",
 ]
 
@@ -2218,7 +2207,7 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-futures",
- "url 2.2.1",
+ "url",
  "user-facing-errors",
 ]
 
@@ -2297,7 +2286,7 @@ dependencies = [
  "md-5",
  "os_info",
  "pbkdf2",
- "percent-encoding 2.1.0",
+ "percent-encoding",
  "rand 0.8.3",
  "reqwest",
  "rustls",
@@ -2358,7 +2347,7 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-futures",
- "url 2.2.1",
+ "url",
  "user-facing-errors",
  "uuid",
 ]
@@ -2388,7 +2377,7 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-futures",
- "url 2.2.1",
+ "url",
  "user-facing-errors",
  "uuid",
 ]
@@ -2414,7 +2403,7 @@ dependencies = [
  "mysql_common",
  "native-tls",
  "pem",
- "percent-encoding 2.1.0",
+ "percent-encoding",
  "pin-project",
  "serde",
  "serde_json",
@@ -2423,7 +2412,7 @@ dependencies = [
  "tokio-native-tls",
  "tokio-util",
  "twox-hash",
- "url 2.2.1",
+ "url",
  "uuid",
 ]
 
@@ -2669,7 +2658,7 @@ dependencies = [
  "futures",
  "js-sys",
  "lazy_static",
- "percent-encoding 2.1.0",
+ "percent-encoding",
  "pin-project",
  "rand 0.8.3",
  "thiserror",
@@ -2702,7 +2691,7 @@ dependencies = [
  "openssl",
  "openssl-probe",
  "openssl-sys",
- "url 2.2.1",
+ "url",
 ]
 
 [[package]]
@@ -2793,7 +2782,7 @@ checksum = "9dfd153802fdbad158c1dfa2c5df806a86955ae6e07758af642a4faaa03310ff"
 dependencies = [
  "html-escape",
  "nom",
- "percent-encoding 2.1.0",
+ "percent-encoding",
  "thiserror",
 ]
 
@@ -2816,12 +2805,6 @@ dependencies = [
  "once_cell",
  "regex",
 ]
-
-[[package]]
-name = "percent-encoding"
-version = "1.0.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "31010dd2e1ac33d5b46a5b413495239882813e0369f8ed8a5e266f173602f831"
 
 [[package]]
 name = "percent-encoding"
@@ -3253,7 +3236,7 @@ dependencies = [
  "native-tls",
  "num-bigint",
  "num_cpus",
- "percent-encoding 2.1.0",
+ "percent-encoding",
  "postgres-native-tls",
  "postgres-types",
  "rusqlite",
@@ -3265,7 +3248,7 @@ dependencies = [
  "tokio-util",
  "tracing",
  "tracing-core",
- "url 2.2.1",
+ "url",
  "uuid",
 ]
 
@@ -3318,7 +3301,7 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-futures",
- "url 1.7.2",
+ "url",
  "user-facing-errors",
  "uuid",
 ]
@@ -3371,7 +3354,7 @@ dependencies = [
  "tracing-futures",
  "tracing-opentelemetry",
  "tracing-subscriber",
- "url 2.2.1",
+ "url",
  "user-facing-errors",
 ]
 
@@ -3400,7 +3383,7 @@ dependencies = [
  "tracing-futures",
  "tracing-opentelemetry",
  "tracing-subscriber",
- "url 2.2.1",
+ "url",
  "user-facing-errors",
 ]
 
@@ -3641,7 +3624,7 @@ dependencies = [
  "test-setup",
  "thiserror",
  "tracing",
- "url 2.2.1",
+ "url",
  "user-facing-errors",
 ]
 
@@ -3665,7 +3648,7 @@ dependencies = [
  "lazy_static",
  "log",
  "mime",
- "percent-encoding 2.1.0",
+ "percent-encoding",
  "pin-project-lite 0.2.6",
  "rustls",
  "serde",
@@ -3673,7 +3656,7 @@ dependencies = [
  "serde_urlencoded",
  "tokio",
  "tokio-rustls",
- "url 2.2.1",
+ "url",
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "web-sys",
@@ -3897,7 +3880,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5af82de3c6549b001bec34961ff2d6a54339a87bab37ce901b693401f27de6cb"
 dependencies = [
  "data-encoding",
- "percent-encoding 2.1.0",
+ "percent-encoding",
  "serde",
  "thiserror",
 ]
@@ -4183,7 +4166,7 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-futures",
- "url 2.2.1",
+ "url",
  "user-facing-errors",
  "uuid",
 ]
@@ -4453,7 +4436,7 @@ dependencies = [
  "tracing",
  "tracing-error",
  "tracing-subscriber",
- "url 2.2.1",
+ "url",
 ]
 
 [[package]]
@@ -4680,7 +4663,7 @@ dependencies = [
  "futures",
  "log",
  "parking_lot 0.11.1",
- "percent-encoding 2.1.0",
+ "percent-encoding",
  "phf",
  "pin-project-lite 0.2.6",
  "postgres-protocol",
@@ -4752,7 +4735,7 @@ dependencies = [
  "http",
  "http-body",
  "hyper",
- "percent-encoding 2.1.0",
+ "percent-encoding",
  "pin-project",
  "prost 0.7.0",
  "prost-derive 0.7.0",
@@ -4933,7 +4916,7 @@ dependencies = [
  "futures-channel",
  "futures-io",
  "futures-util",
- "idna 0.2.2",
+ "idna",
  "ipnet",
  "lazy_static",
  "log",
@@ -4942,7 +4925,7 @@ dependencies = [
  "thiserror",
  "tinyvec",
  "tokio",
- "url 2.2.1",
+ "url",
 ]
 
 [[package]]
@@ -5074,25 +5057,14 @@ checksum = "a156c684c91ea7d62626509bce3cb4e1d9ed5c4d978f7b4352658f96a4c26b4a"
 
 [[package]]
 name = "url"
-version = "1.7.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dd4e7c0d531266369519a4aa4f399d748bd37043b00bde1e4ff1f60a120b355a"
-dependencies = [
- "idna 0.1.5",
- "matches",
- "percent-encoding 1.0.1",
-]
-
-[[package]]
-name = "url"
 version = "2.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9ccd964113622c8e9322cfac19eb1004a07e636c545f325da085d5cdde6f1f8b"
 dependencies = [
  "form_urlencoded",
- "idna 0.2.2",
+ "idna",
  "matches",
- "percent-encoding 2.1.0",
+ "percent-encoding",
  "serde",
 ]
 
