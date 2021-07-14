@@ -10,6 +10,7 @@ mod unchecked_nested_um {
         let schema = indoc! {
             r#"model ModelA {
               #id(id, Int, @id)
+
               b_id_1 String
               b_id_2 String
               c_id_1 String?
@@ -20,6 +21,8 @@ mod unchecked_nested_um {
             }
 
             model ModelB {
+              #id(id, Int, @id)
+
               uniq_1    String
               uniq_2    String
 
@@ -29,6 +32,8 @@ mod unchecked_nested_um {
             }
 
             model ModelC {
+              #id(id, Int, @id)
+
               uniq_1    String
               uniq_2    String
 
@@ -42,9 +47,7 @@ mod unchecked_nested_um {
     }
 
     // "Unchecked nested many updates" should "allow writing non-parent inlined relation scalars"
-    // TODO(dom): Not working on mongo
-    // {"errors":[{"error":"Error occurred during query execution:\nInterpretationError(\"Error for binding \\'0\\'\", Some(QueryGraphBuilderError(RecordNotFound(\"Record to update not found.\"))))","user_facing_error":{"is_panic":false,"message":"An operation failed because it depends on one or more records that were required but not found. Record to update not found.","meta":{"cause":"Record to update not found."},"error_code":"P2025"}}]}
-    #[connector_test(schema(schema_1), exclude(MongoDb))]
+    #[connector_test(schema(schema_1))]
     async fn allow_write_non_prent_inline_rel_sclrs(runner: &Runner) -> TestResult<()> {
         // Setup
         // B1 -> A1 -> C1
@@ -54,12 +57,13 @@ mod unchecked_nested_um {
             runner,
             r#"mutation {
                 createOneModelB(data: {
+                  id: 1,
                   uniq_1: "b1_1"
                   uniq_2: "b1_2"
                   a: {
                     create: [
-                      { id: 1, c: { create: { uniq_1: "c1_1", uniq_2: "c1_2" }}},
-                      { id: 2, c: { create: { uniq_1: "c2_1", uniq_2: "c2_2" }}}
+                      { id: 1, c: { create: { id: 1, uniq_1: "c1_1", uniq_2: "c1_2" }}},
+                      { id: 2, c: { create: { id: 2, uniq_1: "c2_1", uniq_2: "c2_2" }}}
                     ]
                   }
                 }) {
@@ -72,6 +76,7 @@ mod unchecked_nested_um {
             runner,
             r#"mutation {
                 createOneModelC(data: {
+                  id: 3,
                   uniq_1: "c3_1"
                   uniq_2: "c3_2"
                 }) {
@@ -200,8 +205,7 @@ mod unchecked_nested_um {
     }
 
     // "Unchecked nested many updates" should "allow to write to autoincrement IDs directly"
-    // TODO(dom): Not working on mongo. Expected because no autoincrement() ?
-    #[connector_test(schema(schema_3), exclude(SqlServer, MongoDb))]
+    #[connector_test(schema(schema_3), capabilities(AutoIncrement, WritableAutoincField))]
     async fn allow_write_autoinc_id(runner: &Runner) -> TestResult<()> {
         run_query!(
             runner,
