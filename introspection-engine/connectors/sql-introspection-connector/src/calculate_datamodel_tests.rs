@@ -2,11 +2,12 @@
 mod tests {
     use crate::calculate_datamodel::calculate_datamodel;
     use datamodel::ast::Span;
-    use datamodel::StringFromEnvVar;
     use datamodel::{
         dml, Datamodel, Datasource, DefaultValue as DMLDefault, Field, FieldArity, FieldType, Model,
-        NativeTypeInstance, ReferentialAction, RelationField, RelationInfo, ScalarField, ScalarType, ValueGenerator,
+        NativeTypeInstance, PrimaryKeyDefinition, ReferentialAction, RelationField, RelationInfo, ScalarField,
+        ScalarType, ValueGenerator,
     };
+    use datamodel::{IndexDefinition, StringFromEnvVar};
     use enumflags2::BitFlags;
     use introspection_connector::IntrospectionContext;
     use native_types::{NativeType, PostgresType};
@@ -58,8 +59,6 @@ mod tests {
                         field_type: FieldType::Scalar(ScalarType::Int, None, None),
                         database_name: None,
                         default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
-                        is_unique: false,
-                        is_id: true,
                         documentation: None,
                         is_generated: false,
                         is_updated_at: false,
@@ -74,7 +73,11 @@ mod tests {
                 ],
                 is_generated: false,
                 indices: vec![],
-                id_fields: vec![],
+                primary_key: Some(PrimaryKeyDefinition {
+                    name: None,
+                    fields: vec!["required".to_string()],
+                    defined_on_field: true,
+                }),
             }],
             enums: vec![],
         };
@@ -148,8 +151,6 @@ mod tests {
                         ),
                         database_name: None,
                         default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
-                        is_unique: false,
-                        is_id: true,
                         documentation: None,
                         is_generated: false,
                         is_updated_at: false,
@@ -158,7 +159,11 @@ mod tests {
                     })],
                     is_generated: false,
                     indices: vec![],
-                    id_fields: vec![],
+                    primary_key: Some(PrimaryKeyDefinition {
+                        name: None,
+                        fields: vec!["primary".to_string()],
+                        defined_on_field: true,
+                    }),
                 },
                 // Model with non-auto-incrementing primary key
                 Model {
@@ -182,8 +187,6 @@ mod tests {
                         ),
                         database_name: None,
                         default_value: None,
-                        is_unique: false,
-                        is_id: true,
                         documentation: None,
                         is_generated: false,
                         is_updated_at: false,
@@ -192,7 +195,11 @@ mod tests {
                     })],
                     is_generated: false,
                     indices: vec![],
-                    id_fields: vec![],
+                    primary_key: Some(PrimaryKeyDefinition {
+                        name: None,
+                        fields: vec!["primary".to_string()],
+                        defined_on_field: true,
+                    }),
                 },
                 // Model with primary key seeded by sequence
                 Model {
@@ -216,8 +223,6 @@ mod tests {
                         ),
                         database_name: None,
                         default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
-                        is_unique: false,
-                        is_id: true,
                         documentation: None,
                         is_generated: false,
                         is_updated_at: false,
@@ -226,7 +231,11 @@ mod tests {
                     })],
                     is_generated: false,
                     indices: vec![],
-                    id_fields: vec![],
+                    primary_key: Some(PrimaryKeyDefinition {
+                        name: None,
+                        fields: vec!["primary".to_string()],
+                        defined_on_field: true,
+                    }),
                 },
             ],
             enums: vec![],
@@ -334,8 +343,6 @@ mod tests {
                         field_type: FieldType::Scalar(ScalarType::Int, None, None),
                         database_name: None,
                         default_value: None,
-                        is_unique: true,
-                        is_id: false,
                         documentation: None,
                         is_generated: false,
                         is_updated_at: false,
@@ -344,8 +351,13 @@ mod tests {
                     }),
                 ],
                 is_generated: false,
-                indices: vec![],
-                id_fields: vec![],
+                indices: vec![IndexDefinition {
+                    name: Some("unique_unique".to_string()),
+                    fields: vec!["unique".to_string()],
+                    tpe: dml::IndexType::Unique,
+                    defined_on_field: true,
+                }],
+                primary_key: None,
             }],
             enums: vec![],
         };
@@ -370,7 +382,7 @@ mod tests {
                     },
                 ],
                 indices: vec![Index {
-                    name: "unique".to_string(),
+                    name: "unique_unique".to_string(),
                     columns: vec!["unique".to_string()],
                     tpe: IndexType::Unique,
                 }],
@@ -413,8 +425,6 @@ mod tests {
                             ),
                             database_name: None,
                             default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
-                            is_unique: false,
-                            is_id: true,
                             documentation: None,
                             is_generated: false,
                             is_updated_at: false,
@@ -451,7 +461,11 @@ mod tests {
                     ],
                     is_generated: false,
                     indices: vec![],
-                    id_fields: vec![],
+                    primary_key: Some(PrimaryKeyDefinition {
+                        name: None,
+                        fields: vec!["id".to_string()],
+                        defined_on_field: true,
+                    }),
                 },
                 Model {
                     database_name: None,
@@ -475,8 +489,6 @@ mod tests {
                             ),
                             database_name: None,
                             default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
-                            is_unique: false,
-                            is_id: true,
                             documentation: None,
                             is_generated: false,
                             is_updated_at: false,
@@ -497,8 +509,6 @@ mod tests {
                             ),
                             database_name: Some("city-id".to_string()),
                             default_value: None,
-                            is_unique: false,
-                            is_id: false,
                             documentation: None,
                             is_generated: false,
                             is_updated_at: false,
@@ -519,8 +529,6 @@ mod tests {
                             arity: FieldArity::Required,
                             database_name: Some("city-name".to_string()),
                             default_value: None,
-                            is_unique: false,
-                            is_id: false,
                             documentation: None,
                             is_generated: false,
                             is_updated_at: false,
@@ -550,7 +558,11 @@ mod tests {
                     ],
                     is_generated: false,
                     indices: vec![],
-                    id_fields: vec![],
+                    primary_key: Some(PrimaryKeyDefinition {
+                        name: None,
+                        fields: vec!["id".to_string()],
+                        defined_on_field: true,
+                    }),
                 },
             ],
             enums: vec![],
@@ -683,8 +695,6 @@ mod tests {
                         ),
                         database_name: None,
                         default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
-                        is_unique: false,
-                        is_id: true,
                         documentation: None,
                         is_generated: false,
                         is_updated_at: false,
@@ -723,8 +733,13 @@ mod tests {
                     name: Some("name_last_name_unique".to_string()),
                     fields: vec!["name".to_string(), "lastname".to_string()],
                     tpe: datamodel::dml::IndexType::Unique,
+                    defined_on_field: false,
                 }],
-                id_fields: vec![],
+                primary_key: Some(PrimaryKeyDefinition {
+                    name: None,
+                    fields: vec!["id".to_string()],
+                    defined_on_field: true,
+                }),
             }],
             enums: vec![],
         };
@@ -817,8 +832,6 @@ mod tests {
                             ),
                             database_name: None,
                             default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
-                            is_unique: false,
-                            is_id: true,
                             documentation: None,
                             is_generated: false,
                             is_updated_at: false,
@@ -855,7 +868,11 @@ mod tests {
                     ],
                     is_generated: false,
                     indices: vec![],
-                    id_fields: vec![],
+                    primary_key: Some(PrimaryKeyDefinition {
+                        name: None,
+                        fields: vec!["id".to_string()],
+                        defined_on_field: true,
+                    }),
                 },
                 Model {
                     database_name: None,
@@ -879,8 +896,6 @@ mod tests {
                             ),
                             database_name: None,
                             default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
-                            is_unique: false,
-                            is_id: true,
                             documentation: None,
                             is_generated: false,
                             is_updated_at: false,
@@ -923,7 +938,11 @@ mod tests {
                     ],
                     is_generated: false,
                     indices: vec![],
-                    id_fields: vec![],
+                    primary_key: Some(PrimaryKeyDefinition {
+                        name: None,
+                        fields: vec!["id".to_string()],
+                        defined_on_field: true,
+                    }),
                 },
             ],
             enums: vec![],

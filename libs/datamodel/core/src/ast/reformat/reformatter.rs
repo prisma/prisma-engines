@@ -78,7 +78,7 @@ impl<'a> Reformatter<'a> {
 
             for field in model.fields() {
                 if !ast_model.fields.iter().any(|f| f.name.name == field.name()) {
-                    let ast_field = lowerer.lower_field(field, &validated_datamodel.subject);
+                    let ast_field = lowerer.lower_field(model, field, &validated_datamodel.subject);
 
                     result.push(MissingField {
                         model: model.name.clone(),
@@ -108,7 +108,7 @@ impl<'a> Reformatter<'a> {
         for model in validated_datamodel.subject.models() {
             let ast_model = schema_ast.find_model(&model.name).unwrap();
             for field in model.fields() {
-                let new_ast_field = lowerer.lower_field(field, &validated_datamodel.subject);
+                let new_ast_field = lowerer.lower_field(model, field, &validated_datamodel.subject);
 
                 if let Some(original_field) = ast_model.fields.iter().find(|f| f.name.name == field.name()) {
                     for attribute in new_ast_field.attributes {
@@ -144,7 +144,7 @@ impl<'a> Reformatter<'a> {
         for model in validated_datamodel.subject.models() {
             let ast_model = schema_ast.find_model(&model.name).unwrap();
             for field in model.fields() {
-                let new_ast_field = lowerer.lower_field(field, &validated_datamodel.subject);
+                let new_ast_field = lowerer.lower_field(model, field, &validated_datamodel.subject);
 
                 if let Some(original_field) = ast_model.fields.iter().find(|f| f.name.name == field.name()) {
                     for attribute in new_ast_field.attributes.iter().filter(|a| a.name.name == "relation") {

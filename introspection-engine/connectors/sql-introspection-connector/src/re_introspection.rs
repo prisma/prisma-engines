@@ -74,7 +74,10 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, ctx: &
         for changed_field_name in &changed_scalar_field_names {
             let model = new_data_model.find_model_mut(&changed_field_name.0.model);
 
-            replace_field_names(&mut model.id_fields, &changed_field_name.0.field, &changed_field_name.1);
+            if let Some(pk) = &mut model.primary_key {
+                replace_field_names(&mut pk.fields, &changed_field_name.0.field, &changed_field_name.1);
+            }
+
             for index in &mut model.indices {
                 replace_field_names(&mut index.fields, &changed_field_name.0.field, &changed_field_name.1);
             }

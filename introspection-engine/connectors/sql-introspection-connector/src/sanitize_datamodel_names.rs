@@ -48,7 +48,9 @@ fn sanitize_models(datamodel: &mut Datamodel, ctx: &IntrospectionContext) -> Has
         let model_name = model.name().to_owned();
         let model_db_name = model.database_name().map(|s| s.to_owned());
 
-        model.id_fields = sanitize_strings(model.id_fields.as_slice());
+        if let Some(pk) = &mut model.primary_key {
+            pk.fields = sanitize_strings(pk.fields.as_slice());
+        }
 
         for field in model.fields_mut() {
             sanitize_name(field);

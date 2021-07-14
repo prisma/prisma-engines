@@ -5,7 +5,7 @@ use datamodel_connector::{
 };
 use dml::{
     field::{Field, FieldType},
-    model::{IndexType, Model},
+    model::Model,
     native_type_constructor::NativeTypeConstructor,
     native_type_instance::NativeTypeInstance,
     relation_info::ReferentialAction,
@@ -283,11 +283,8 @@ impl Connector for MySqlDatamodelConnector {
     fn validate_field(&self, field: &Field) -> Result<(), ConnectorError> {
         match field.field_type() {
             FieldType::Scalar(scalar_type, _, Some(native_type_instance)) => {
-                let native_type_name = native_type_instance.name.as_str();
                 let native_type: MySqlType = native_type_instance.deserialize_native_type();
-                let error = self.native_instance_error(native_type_instance.clone());
-                let incompatible_with_key =
-                    NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type_name);
+                let error = self.native_instance_error(native_type_instance);
 
                 match native_type {
                     Decimal(Some((precision, scale))) if scale > precision => {
@@ -311,8 +308,6 @@ impl Connector for MySqlDatamodelConnector {
                     Bit(n) if n > 1 && scalar_type.is_boolean() => {
                         error.new_argument_m_out_of_range_error("only Bit(1) can be used as Boolean.")
                     }
-                    _ if field.is_unique() && incompatible_with_key => error.new_incompatible_native_type_with_unique(),
-                    _ if field.is_id() && incompatible_with_key => error.new_incompatible_native_type_with_id(),
                     _ => Ok(()),
                 }
             }
@@ -328,7 +323,7 @@ impl Connector for MySqlDatamodelConnector {
                     let native_type_name = native_type.name.as_str();
 
                     if NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type_name) {
-                        return if index_definition.tpe == IndexType::Unique {
+                        return if index_definition.is_unique() {
                             self.native_instance_error(native_type.clone())
                                 .new_incompatible_native_type_with_unique()
                         } else {
@@ -339,14 +334,17 @@ impl Connector for MySqlDatamodelConnector {
                 }
             }
         }
-        for id_field in model.id_fields.iter() {
-            let field = model.find_field(id_field).unwrap();
-            if let FieldType::Scalar(_, _, Some(native_type)) = field.field_type() {
-                let native_type_name = native_type.name.as_str();
-                if NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type_name) {
-                    return self
-                        .native_instance_error(native_type.clone())
-                        .new_incompatible_native_type_with_id();
+
+        if let Some(pk) = &model.primary_key {
+            for id_field in pk.fields.iter() {
+                let field = model.find_field(id_field).unwrap();
+                if let FieldType::Scalar(_, _, Some(native_type)) = field.field_type() {
+                    let native_type_name = native_type.name.as_str();
+                    if NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type_name) {
+                        return self
+                            .native_instance_error(native_type.clone())
+                            .new_incompatible_native_type_with_id();
+                    }
                 }
             }
         }

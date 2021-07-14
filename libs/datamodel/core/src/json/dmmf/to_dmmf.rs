@@ -1,5 +1,5 @@
 use super::{Datamodel, Enum, EnumValue, Field, Function, Model, UniqueIndex};
-use crate::{dml, FieldType, Ignorable, IndexType, ScalarType};
+use crate::{dml, FieldType, Ignorable, ScalarType};
 use bigdecimal::ToPrimitive;
 use prisma_value::PrismaValue;
 
@@ -53,6 +53,16 @@ fn enum_value_to_dmmf(en: &dml::EnumValue) -> EnumValue {
 }
 
 fn model_to_dmmf(model: &dml::Model) -> Model {
+    let id_fields = if let Some(pk) = &model.primary_key {
+        if !pk.defined_on_field {
+            pk.fields.clone()
+        } else {
+            vec![]
+        }
+    } else {
+        vec![]
+    };
+
     Model {
         name: model.name.clone(),
         db_name: model.database_name.clone(),
@@ -64,17 +74,17 @@ fn model_to_dmmf(model: &dml::Model) -> Model {
             .collect(),
         is_generated: Some(model.is_generated),
         documentation: model.documentation.clone(),
-        id_fields: model.id_fields.clone(),
+        id_fields,
         unique_fields: model
             .indices
             .iter()
-            .filter_map(|i| (i.tpe == IndexType::Unique).then(|| i.fields.clone()))
+            .filter_map(|i| (i.is_unique() && !i.defined_on_field).then(|| i.fields.clone()))
             .collect(),
         unique_indexes: model
             .indices
             .iter()
             .filter_map(|i| {
-                (i.tpe == IndexType::Unique).then(|| UniqueIndex {
+                (i.is_unique() && !i.defined_on_field).then(|| UniqueIndex {
                     name: i.name.clone(),
                     fields: i.fields.clone(),
                 })
@@ -93,11 +103,11 @@ fn field_to_dmmf(model: &dml::Model, field: &dml::Field) -> Field {
         kind: get_field_kind(field),
         is_required: *field.arity() == dml::FieldArity::Required || *field.arity() == dml::FieldArity::List,
         is_list: *field.arity() == dml::FieldArity::List,
-        is_id: field.is_id(),
+        is_id: model.field_is_primary(field.name()),
         is_read_only: a_relation_field_is_based_on_this_field,
         has_default_value: field.default_value().is_some(),
         default: default_value_to_serde(&field.default_value().cloned()),
-        is_unique: field.is_unique(),
+        is_unique: model.field_is_unique(field.name()),
         relation_name: get_relation_name(field),
         relation_from_fields: get_relation_from_fields(field),
         relation_to_fields: get_relation_to_fields(field),

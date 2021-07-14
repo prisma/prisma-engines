@@ -279,6 +279,28 @@ fn relation_must_error_when_referenced_fields_are_not_a_unique_criteria() {
 }
 
 #[test]
+fn relation_must_succeed_when_referenced_fields_are_a_unique_criteria() {
+    let dml = r#"
+    model User {
+        id        Int    @id
+        firstName String
+        posts     Post[]
+        
+        @@unique([firstName])
+    }
+
+    model Post {
+        id       Int    @id
+        text     String
+        userName String
+        user     User   @relation(fields: [userName], references: [firstName])
+    }
+    "#;
+
+    assert!(datamodel::parse_datamodel(dml).is_ok());
+}
+
+#[test]
 fn relation_must_not_error_when_referenced_fields_are_not_a_unique_criteria_on_mysql() {
     // MySQL allows foreign key to references a non unique criteria
     // https://stackoverflow.com/questions/588741/can-a-foreign-key-reference-a-non-unique-index
@@ -660,6 +682,41 @@ fn must_error_when_non_id_field_is_referenced_in_a_many_to_many() {
             Span::new(221, 264)
         ),
     );
+}
+
+#[test]
+fn must_succeed_when_id_field_is_referenced_in_a_many_to_many() {
+    let dml = r#"
+    model Post {
+      id_post    Int @id        
+      slug       Int        @unique
+      categories Category[] @relation(references: [id_category])
+    }
+
+   model Category {
+     id_category    Int    @default(autoincrement()) @id
+     posts          Post[] @relation(references: [id_post])
+   }"#;
+
+    assert!(datamodel::parse_datamodel(dml).is_ok());
+
+    let dml2 = r#"
+    model Post {
+      id_post         Int
+      slug            Int        @unique
+      categories      Category[] @relation(references: [id_category])
+
+      @@id([id_post])
+   }
+
+   model Category {
+     id_category     Int    @default(autoincrement())
+     posts           Post[] @relation(references: [id_post])
+
+     @@id([id_category])
+   }"#;
+
+    assert!(datamodel::parse_datamodel(dml2).is_ok());
 }
 
 #[test]

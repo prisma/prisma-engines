@@ -14,7 +14,7 @@ fn int_id_without_default_should_have_strategy_none() {
 
     let datamodel = parse(dml);
     let user_model = datamodel.assert_has_model("Model");
-    user_model.assert_has_scalar_field("id").assert_is_id();
+    user_model.assert_has_scalar_field("id").assert_is_id(user_model);
 }
 
 #[test]
@@ -27,7 +27,7 @@ fn int_id_with_default_autoincrement_should_have_strategy_auto() {
 
     let datamodel = parse(dml);
     let user_model = datamodel.assert_has_model("Model");
-    user_model.assert_has_scalar_field("id").assert_is_id();
+    user_model.assert_has_scalar_field("id").assert_is_id(user_model);
 }
 
 #[test]
@@ -43,7 +43,7 @@ fn id_should_also_work_on_embedded_types() {
 
     let datamodel = parse(dml);
     let user_model = datamodel.assert_has_model("Model");
-    user_model.assert_has_scalar_field("id").assert_is_id();
+    user_model.assert_has_scalar_field("id").assert_is_id(user_model);
 }
 
 #[test]
@@ -58,7 +58,7 @@ fn should_allow_string_ids_with_cuid() {
     let user_model = datamodel.assert_has_model("Model");
     user_model
         .assert_has_scalar_field("id")
-        .assert_is_id()
+        .assert_is_id(user_model)
         .assert_base_type(&ScalarType::String)
         .assert_default_value(DefaultValue::Expression(ValueGenerator::new_cuid()));
 }
@@ -75,7 +75,7 @@ fn should_allow_string_ids_with_uuid() {
     let user_model = datamodel.assert_has_model("Model");
     user_model
         .assert_has_scalar_field("id")
-        .assert_is_id()
+        .assert_is_id(user_model)
         .assert_base_type(&ScalarType::String)
         .assert_default_value(DefaultValue::Expression(ValueGenerator::new_uuid()));
 }
@@ -92,7 +92,7 @@ fn should_allow_string_ids_without_default() {
     let user_model = datamodel.assert_has_model("Model");
     user_model
         .assert_has_scalar_field("id")
-        .assert_is_id()
+        .assert_is_id(user_model)
         .assert_base_type(&ScalarType::String);
 }
 
@@ -108,7 +108,7 @@ fn should_allow_string_ids_with_static_default() {
     let user_model = datamodel.assert_has_model("Model");
     user_model
         .assert_has_scalar_field("id")
-        .assert_is_id()
+        .assert_is_id(user_model)
         .assert_default_value(DefaultValue::Single(PrismaValue::String(String::from(""))))
         .assert_base_type(&ScalarType::String);
 }
@@ -125,7 +125,7 @@ fn should_allow_int_ids_with_static_default() {
     let user_model = datamodel.assert_has_model("Model");
     user_model
         .assert_has_scalar_field("id")
-        .assert_is_id()
+        .assert_is_id(user_model)
         .assert_default_value(DefaultValue::Single(PrismaValue::Int(0)))
         .assert_base_type(&ScalarType::Int);
 }
@@ -142,7 +142,11 @@ fn multi_field_ids_must_work() {
 
     let datamodel = parse(dml);
     let user_model = datamodel.assert_has_model("Model");
-    user_model.assert_has_id_fields(&["a", "b"]);
+    user_model.assert_has_pk(PrimaryKeyDefinition {
+        name: None,
+        fields: vec!["a".into(), "b".into()],
+        defined_on_field: false,
+    });
 }
 
 #[test]
