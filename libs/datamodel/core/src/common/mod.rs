@@ -3,6 +3,7 @@
 mod name_normalizer;
 mod relation_names;
 
+mod constraint_names;
 pub mod preview_features;
 pub mod provider_names;
 pub mod source_context;
