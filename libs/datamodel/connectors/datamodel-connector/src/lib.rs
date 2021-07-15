@@ -246,6 +246,7 @@ capabilities!(
     JsonFilteringArrayPath,
     CompoundIds,
     AnyId, // Any (or combination of) uniques and not only id fields can constitute an id for a model.
+    QueryRaw,
 );
 
 /// Contains all capabilities that the connector is able to serve.
