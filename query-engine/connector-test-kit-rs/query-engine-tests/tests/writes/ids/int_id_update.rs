@@ -128,7 +128,7 @@ mod int_id_update {
     // "Updating a non-unique field of type Int with autoincrement" should "work"
     #[connector_test(
         schema(schema_int_non_uniq_autoinc),
-        capabilities(AutoIncrement, WritableAutoincField)
+        capabilities(AutoIncrement, AutoIncrementNonIndexedAllowed, WritableAutoincField)
     )]
     async fn update_non_uniq_int_field_autoinc(runner: &Runner) -> TestResult<()> {
         // Setup

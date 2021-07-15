@@ -12,6 +12,7 @@ mod unchecked_nested_create {
         let schema = indoc! {
             r#"model ModelA {
               #id(id, Int, @id)
+
               b_id_1 Int
               b_id_2 Int
               c_id_1 Int?
@@ -22,6 +23,8 @@ mod unchecked_nested_create {
             }
 
             model ModelB {
+              #id(id, Int, @id)
+
               uniq_1    Int
               uniq_2    Int
 
@@ -31,6 +34,8 @@ mod unchecked_nested_create {
             }
 
             model ModelC {
+              #id(id, Int, @id)
+
               uniq_1    Int
               uniq_2    Int
 
@@ -51,6 +56,7 @@ mod unchecked_nested_create {
             runner,
             r#"mutation {
           createOneModelB(data: {
+            id: 1
             uniq_1: 1
             uniq_2: 1
             a: {
@@ -71,6 +77,7 @@ mod unchecked_nested_create {
         insta::assert_snapshot!(
           run_query!(runner, r#"mutation {
             createOneModelB(data: {
+              id: 2
               uniq_1: 2
               uniq_2: 2
               a: {
@@ -93,6 +100,7 @@ mod unchecked_nested_create {
         insta::assert_snapshot!(
           run_query!(runner, r#"mutation {
             createOneModelB(data: {
+              id: 3
               uniq_1: 3
               uniq_2: 3
               a: {
@@ -125,6 +133,7 @@ mod unchecked_nested_create {
         let schema = indoc! {
             r#"model ModelA {
               #id(id, Int, @id)
+
               b_id_1 Int
               b_id_2 Int
               c_id_1 Int
@@ -135,6 +144,8 @@ mod unchecked_nested_create {
             }
 
             model ModelB {
+              #id(id, Int, @id)
+
               uniq_1    Int
               uniq_2    Int
 
@@ -144,6 +155,8 @@ mod unchecked_nested_create {
             }
 
             model ModelC {
+              #id(id, Int, @id)
+
               uniq_1    Int
               uniq_2    Int
 
@@ -157,12 +170,13 @@ mod unchecked_nested_create {
     }
 
     // "Unchecked nested creates" should "fail if required relation scalars are not provided"
-    #[connector_test(schema(schema_2), capabilities(AnyId))]
+    #[connector_test(schema(schema_2))]
     async fn fail_if_req_rel_sclr_not_provided(runner: &Runner) -> TestResult<()> {
         assert_error!(
             runner,
             r#"mutation {
               createOneModelB(data: {
+                id: 1
                 uniq_1: 1
                 uniq_2: 1
                 a: {
