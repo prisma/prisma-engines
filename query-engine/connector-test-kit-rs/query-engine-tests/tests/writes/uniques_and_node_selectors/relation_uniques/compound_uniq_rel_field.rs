@@ -267,9 +267,7 @@ mod compound_uniq_rel_field {
     //  nested deleteM | -      | not possible (1!:1)
     //  nested updateM | -      | not possible (1!:1)
     // "Using a compound unique that includes a 1!:1 multi-field relation"
-    // TODO(dom): Not working on mongo.
-    // {"errors":[{"error":"not implemented: Compound filter case.","user_facing_error":{"is_panic":true,"message":"not implemented: Compound filter case.","backtrace":null}}]}
-    #[connector_test(schema(schema_2), exclude(MongoDb))]
+    #[connector_test(schema(schema_2))]
     async fn compound_uniq_with_1_1_multi_rel(runner: &Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(runner, r#"mutation {
@@ -752,9 +750,7 @@ mod compound_uniq_rel_field {
     //  nested disconn | -      | not possible (1!:m)
     //  nested set     | -      | not (really) possible (1!:m)
     // "Using a compound unique that includes a 1!:M multi-field relation"
-    // TODO(dom): Not working on mongo.
-    // {"errors":[{"error":"not implemented: Compound filter case.","user_facing_error":{"is_panic":true,"message":"not implemented: Compound filter case.","backtrace":null}}]}
-    #[connector_test(schema(schema_4), exclude(MongoDb))]
+    #[connector_test(schema(schema_4))]
     async fn compound_uniq_with_1_m_multi_rel(runner: &Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(runner, r#"mutation {

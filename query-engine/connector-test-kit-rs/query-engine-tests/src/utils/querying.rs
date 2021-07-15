@@ -8,15 +8,28 @@ macro_rules! assert_query {
 
 #[macro_export]
 macro_rules! assert_query_many {
-    ($runner:expr, $q:expr, $result:expr) => {
-        let q_result = $runner.query($q).await?.to_string();
+    ($runner:expr, $q:expr, $potential_results:expr) => {
+        let query_result = $runner.query($q).await?.to_string();
 
         assert_eq!(
-            $result.contains(&q_result.as_str()),
+            $potential_results.contains(&query_result.as_str()),
             true,
             "Query result: {} is not part of the expected results: {:?}",
-            q_result,
-            $result
+            query_result,
+            $potential_results
+        );
+    };
+}
+
+#[macro_export]
+macro_rules! is_one_of {
+    ($result:expr, $potential_results:expr) => {
+        assert_eq!(
+            $potential_results.contains(&$result.as_str()),
+            true,
+            "Query result: {} is not part of the expected results: {:?}",
+            $result,
+            $potential_results
         );
     };
 }

@@ -25,7 +25,7 @@ test-qe-st:
 	cargo test --package query-engine-tests -- --test-threads 1
 
 # Single threaded thread execution, verbose.
-test-qe-verbose:
+test-qe-verbose-st:
 	cargo test --package query-engine-tests -- --nocapture --test-threads 1
 
 all-dbs:

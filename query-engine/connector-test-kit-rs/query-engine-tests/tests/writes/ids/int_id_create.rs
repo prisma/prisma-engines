@@ -98,8 +98,7 @@ mod int_id_create {
     }
 
     // "Creating an item with an id field of type Int with autoincrement" should "work"
-    // TODO(dom): Not working on mongo. Expected I guess?
-    #[connector_test(schema(schema_int_autoinc), exclude(MongoDb))]
+    #[connector_test(schema(schema_int_autoinc), capabilities(AutoIncrement))]
     async fn create_id_int_with_autoinc(runner: &Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(runner, r#"mutation {
@@ -132,8 +131,7 @@ mod int_id_create {
     }
 
     // "Creating an item with an id field of type Int with autoincrement and providing an id" should "error for checked inputs"
-    // TODO(dom): Not working on mongo. Expected I guess?
-    #[connector_test(schema(schema_int_autoinc_provide_id), exclude(MongoDb))]
+    #[connector_test(schema(schema_int_autoinc_provide_id), capabilities(AutoIncrement))]
     async fn create_id_int_autoinc_providing_id(runner: &Runner) -> TestResult<()> {
         assert_error!(
             runner,

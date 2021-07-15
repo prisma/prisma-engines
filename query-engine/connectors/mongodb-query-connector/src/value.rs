@@ -270,7 +270,7 @@ pub fn value_from_bson(bson: Bson, meta: &OutputMeta) -> crate::Result<PrismaVal
 
         (ident, bson) => {
             return Err(MongoError::UnhandledError(format!(
-                "Converting BSON to type {:?}. Data: '{}'",
+                "Converting BSON to type {:?}. Data: {:?}",
                 ident, bson
             )))
         }

@@ -10,9 +10,7 @@ use query_engine_tests::*;
 // - 1!:M
 //
 // 2) Checks basic cursor functionality.
-
-// TODO(dom): Not working on mongo. No compound id (yet)?
-#[test_suite(exclude(MongoDb))]
+#[test_suite(capabilities(CompoundIds))]
 mod compound_pk_rel {
     use indoc::indoc;
     use query_engine_tests::run_query;
