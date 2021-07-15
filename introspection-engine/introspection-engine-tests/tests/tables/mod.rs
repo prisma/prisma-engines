@@ -742,3 +742,27 @@ async fn casing_should_not_lead_to_mix_ups(api: &TestApi) -> TestResult {
 
     Ok(())
 }
+
+#[test_connector(tags(Mysql))]
+async fn unique_and_index_on_same_field_works(api: &TestApi) -> TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.inject_custom(
+                "create table users (
+                       id serial primary key not null
+                     );",
+            )
+        })
+        .await?;
+
+    let dm = indoc! {r##"
+        model users {
+          id BigInt @id @unique @default(autoincrement()) @db.UnsignedBigInt
+        }
+    "##};
+
+    let result = &api.introspect().await?;
+    api.assert_eq_datamodels(dm, result);
+
+    Ok(())
+}
