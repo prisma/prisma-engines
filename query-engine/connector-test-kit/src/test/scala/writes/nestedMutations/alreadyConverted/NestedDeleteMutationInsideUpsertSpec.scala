@@ -4,9 +4,11 @@ import org.scalatest.{FlatSpec, Matchers}
 import util.ConnectorCapability.JoinRelationLinksCapability
 import util._
 
+// RS: Ported (except ignored ones)
 class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with ApiSpecBase with SchemaBaseV11 {
   override def runOnlyForCapabilities = Set(JoinRelationLinksCapability)
 
+  // No datamodels generated
   "a P1! to C1 relation" should "always fail when trying to delete the child" in {
     schemaWithRelation(onParent = ChildReq, onChild = ParentOpt).test { t =>
       val project = SchemaDsl.fromStringV11() {
@@ -141,12 +143,12 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
 
       val parent1Result = server
         .query(
-          s"""mutation {
-          |  createParent(data: {p: "p1", p_1: "p", p_2: "1"})
-          |  {
-          |    ${t.parent.selection}
-          |  }
-          |}""",
+            s"""mutation {
+            |  createParent(data: {p: "p1", p_1: "p", p_2: "1"})
+            |  {
+            |    ${t.parent.selection}
+            |  }
+            |}""",
           project
         )
       val parent1Id = t.parent.where(parent1Result, "data.createParent")

@@ -4,6 +4,7 @@ import org.scalatest.{FlatSpec, Matchers}
 import util.ConnectorCapability.JoinRelationLinksCapability
 import util._
 
+// RS: Ported
 // Note: Except for m:n cases that are always resolved using the primary identifier of the models, we use different
 // relation links to ensure that the underlying QE logic correctly uses link resolvers instead of
 // only primary id resolvers.

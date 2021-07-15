@@ -6,9 +6,11 @@ import org.scalatest.{Matchers, WordSpecLike}
 import util.ConnectorCapability.JoinRelationLinksCapability
 import util._
 
+// RS: Ported (without ignored tests)
 class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers with ApiSpecBase with SchemaBaseV11 {
   override def runOnlyForCapabilities = Set(JoinRelationLinksCapability)
 
+  // Doesn't do anything
   "a P1! to C1 relation should work" in {
     schemaWithRelation(onParent = ChildReq, onChild = ParentOpt).test { t =>
       val project = SchemaDsl.fromStringV11() {

@@ -6,6 +6,7 @@ import org.scalatest.{FlatSpec, Matchers}
 import util.ConnectorCapability.JoinRelationLinksCapability
 import util._
 
+// RS: Ported (except ignored ones)
 class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiSpecBase with SchemaBaseV11 {
   override def runOnlyForCapabilities = Set(JoinRelationLinksCapability)
   lazy val isMySQL                    = connectorTag == ConnectorTag.MySqlConnectorTag

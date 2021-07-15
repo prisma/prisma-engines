@@ -1,1 +1,12 @@
 mod nested_connect_inside_create;
+mod nested_connect_inside_update;
+mod nested_create_inside_create;
+mod nested_create_inside_update;
+mod nested_delete_inside_update;
+mod nested_delete_inside_upsert;
+mod nested_delete_many_inside_update;
+mod nested_disconnect_inside_update;
+mod nested_disconnect_inside_upsert;
+mod nested_set_inside_update;
+mod nested_update_many_inside_update;
+mod nested_upsert_inside_update;

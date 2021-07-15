@@ -4,13 +4,26 @@ use crate::TestError;
 use itertools::Itertools;
 
 pub fn walk_json<'a>(json: &'a serde_json::Value, path: &[&str]) -> Result<&'a serde_json::Value, TestError> {
-    path.iter().try_fold(json, |acc, p| match acc.get(p) {
-        Some(val) => Ok(val),
-        None => Err(TestError::parse_error(format!(
-            "Could not walk the JSON value `{}`. The key `{}` does not exist",
-            json.to_string(),
-            p
-        ))),
+    path.iter().try_fold(json, |acc, p| {
+        let key = if p.starts_with('[') && p.ends_with(']') {
+            let index: String = p.chars().skip(1).take_while(|c| *c != ']').collect();
+            let index = index
+                .parse::<usize>()
+                .map_err(|err| TestError::parse_error(err.to_string()))?;
+
+            acc.get(index)
+        } else {
+            acc.get(p)
+        };
+
+        match key {
+            Some(val) => Ok(val),
+            None => Err(TestError::parse_error(format!(
+                "Could not walk the JSON value `{}`. The key `{}` does not exist",
+                json.to_string(),
+                p
+            ))),
+        }
     })
 }
 
