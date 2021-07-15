@@ -12,7 +12,7 @@ type RpcError = jsonrpc_core::Error;
 type RpcResult<T> = Result<T, RpcError>;
 type RpcFutureResult<T> = BoxFuture<RpcResult<T>>;
 
-#[rpc]
+#[rpc(server)]
 pub trait Rpc {
     #[rpc(name = "listDatabases")]
     fn list_databases(&self, input: IntrospectionInput) -> RpcFutureResult<Vec<String>>;
