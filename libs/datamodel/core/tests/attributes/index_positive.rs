@@ -18,6 +18,7 @@ fn basic_index_must_work() {
     let user_model = schema.assert_has_model("User");
     user_model.assert_has_index(IndexDefinition {
         name: None,
+        db_name: None,
         fields: vec!["firstName".to_string(), "lastName".to_string()],
         tpe: IndexType::Normal,
         defined_on_field: false,
@@ -44,6 +45,7 @@ fn indexes_on_enum_fields_must_work() {
     let user_model = schema.assert_has_model("User");
     user_model.assert_has_index(IndexDefinition {
         name: None,
+        db_name: None,
         fields: vec!["role".to_string()],
         tpe: IndexType::Normal,
         defined_on_field: false,
@@ -66,6 +68,7 @@ fn the_name_argument_must_work() {
     let user_model = schema.assert_has_model("User");
     user_model.assert_has_index(IndexDefinition {
         name: Some("MyIndexName".to_string()),
+        db_name: Some("MyIndexName".to_string()),
         fields: vec!["firstName".to_string(), "lastName".to_string()],
         tpe: IndexType::Normal,
         defined_on_field: false,
@@ -102,6 +105,7 @@ fn multiple_indexes_with_same_name_are_supported_by_mysql() {
 
     user_model.assert_has_index(IndexDefinition {
         name: Some("MyIndexName".to_string()),
+        db_name: Some("MyIndexName".to_string()),
         fields: vec!["id".to_string()],
         tpe: IndexType::Normal,
         defined_on_field: false,
@@ -109,6 +113,7 @@ fn multiple_indexes_with_same_name_are_supported_by_mysql() {
 
     post_model.assert_has_index(IndexDefinition {
         name: Some("MyIndexName".to_string()),
+        db_name: Some("MyIndexName".to_string()),
         fields: vec!["id".to_string()],
         tpe: IndexType::Normal,
         defined_on_field: false,
@@ -133,6 +138,7 @@ fn multiple_index_must_work() {
 
     user_model.assert_has_index(IndexDefinition {
         name: None,
+        db_name: None,
         fields: vec!["firstName".to_string(), "lastName".to_string()],
         tpe: IndexType::Normal,
         defined_on_field: false,
@@ -140,6 +146,7 @@ fn multiple_index_must_work() {
 
     user_model.assert_has_index(IndexDefinition {
         name: Some("MyIndexName".to_string()),
+        db_name: Some("MyIndexName".to_string()),
         fields: vec!["firstName".to_string(), "lastName".to_string()],
         tpe: IndexType::Normal,
         defined_on_field: false,

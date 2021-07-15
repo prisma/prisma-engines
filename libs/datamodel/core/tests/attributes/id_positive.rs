@@ -144,6 +144,7 @@ fn multi_field_ids_must_work() {
     let user_model = datamodel.assert_has_model("Model");
     user_model.assert_has_pk(PrimaryKeyDefinition {
         name: None,
+        db_name: None,
         fields: vec!["a".into(), "b".into()],
         defined_on_field: false,
     });

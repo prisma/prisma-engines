@@ -166,6 +166,7 @@ fn visit_scalar_field_attributes<'ast>(
                 None => {
                     model_data.primary_key = Some(PrimaryKeyData{
                         name: None,
+                        db_name: None,
                         fields: vec![field_id],
                         source_field: Some(field_id)
                     })
@@ -216,6 +217,7 @@ fn visit_scalar_field_attributes<'ast>(
                 fields: vec![field_id],
                 source_field: Some(field_id),
                 name: None,
+                db_name: None,
             })
          });
     });
@@ -457,6 +459,7 @@ fn visit_model_id<'ast>(
 
     model_data.primary_key = Some(PrimaryKeyData {
         name: None,
+        db_name: None,
         fields: resolved_fields,
         source_field: None,
     });
