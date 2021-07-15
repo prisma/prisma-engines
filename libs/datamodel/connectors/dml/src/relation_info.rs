@@ -12,6 +12,8 @@ pub struct RelationInfo {
     pub references: Vec<String>,
     /// The name of the relation. Internally, an empty string signals no name.
     pub name: String,
+    /// Foreign Key Constraint Name if there is one
+    pub fk_name: Option<String>,
     /// A strategy indicating what happens when
     /// a related node is deleted.
     pub on_delete: Option<ReferentialAction>,
@@ -39,6 +41,7 @@ impl RelationInfo {
             fields: Vec::new(),
             references: Vec::new(),
             name: String::new(),
+            fk_name: None,
             on_delete: None,
             on_update: None,
             legacy_referential_actions: false,

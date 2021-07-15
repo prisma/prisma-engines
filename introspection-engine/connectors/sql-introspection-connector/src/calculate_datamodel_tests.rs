@@ -458,6 +458,7 @@ mod tests {
                                 fields: vec![],
                                 references: vec![],
                                 name: "CityToUser".to_string(),
+                                fk_name: None,
                                 on_delete: None,
                                 on_update: None,
                                 legacy_referential_actions: false,
@@ -553,6 +554,7 @@ mod tests {
                             emulates_referential_actions: None,
                             relation_info: RelationInfo {
                                 name: "CityToUser".to_string(),
+                                fk_name: None,
                                 to: "City".to_string(),
                                 fields: vec!["city_id".to_string(), "city_name".to_string()],
                                 references: vec!["id".to_string(), "name".to_string()],
@@ -869,6 +871,7 @@ mod tests {
                                 fields: vec![],
                                 references: vec![],
                                 name: "CityToUser".to_string(),
+                                fk_name: None,
                                 on_delete: None,
                                 on_update: None,
                                 legacy_referential_actions: false,
@@ -937,6 +940,7 @@ mod tests {
                             emulates_referential_actions: None,
                             relation_info: RelationInfo {
                                 name: "CityToUser".to_string(),
+                                fk_name: None,
                                 to: "City".to_string(),
                                 fields: vec!["city_id".to_string()],
                                 references: vec!["id".to_string()],
