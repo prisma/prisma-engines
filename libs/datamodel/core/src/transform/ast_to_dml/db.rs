@@ -154,8 +154,4 @@ impl<'ast> ParserDatabase<'ast> {
             .range((model_id, ast::FieldId::ZERO)..=(model_id, ast::FieldId::MAX))
             .map(|((_, field_id), scalar_type)| (*field_id, scalar_type))
     }
-
-    pub(super) fn get_enum(&self, name: &str) -> Option<&'ast ast::Enum> {
-        self.names.tops.get(name).and_then(|top_id| self.ast[*top_id].as_enum())
-    }
 }
