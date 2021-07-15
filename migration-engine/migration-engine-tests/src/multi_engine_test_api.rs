@@ -64,11 +64,7 @@ impl TestApi {
             let (_, cs) = rt.block_on(args.create_mysql_database());
             (rt.block_on(Quaint::new(&cs)).unwrap(), cs)
         } else if tags.contains(Tags::Mssql) {
-            rt.block_on(test_setup::init_mssql_database(
-                args.database_url(),
-                args.test_function_name(),
-            ))
-            .unwrap()
+            rt.block_on(args.create_mssql_database())
         } else if tags.contains(Tags::Sqlite) {
             let url = test_setup::sqlite_test_url(args.test_function_name());
 

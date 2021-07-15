@@ -39,7 +39,7 @@ impl<'a> LowerDmlToAst<'a> {
         let mut fields: Vec<ast::Field> = Vec::new();
 
         for field in model.fields() {
-            fields.push(self.lower_field(field, datamodel))
+            fields.push(self.lower_field(model, field, datamodel))
         }
 
         ast::Model {
@@ -71,8 +71,8 @@ impl<'a> LowerDmlToAst<'a> {
         }
     }
 
-    pub fn lower_field(&self, field: &dml::Field, datamodel: &dml::Datamodel) -> ast::Field {
-        let mut attributes = self.lower_field_attributes(field, datamodel);
+    pub fn lower_field(&self, model: &dml::Model, field: &dml::Field, datamodel: &dml::Datamodel) -> ast::Field {
+        let mut attributes = self.lower_field_attributes(model, field, datamodel);
 
         let native_type = field.as_scalar_field().and_then(|sf| sf.field_type.as_native_type());
 

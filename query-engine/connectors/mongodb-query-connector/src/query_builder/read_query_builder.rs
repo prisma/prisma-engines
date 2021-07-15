@@ -129,7 +129,7 @@ pub(crate) struct MongoReadQueryBuilder {
 }
 
 impl MongoReadQueryBuilder {
-    pub fn _new(model: ModelRef) -> Self {
+    pub fn new(model: ModelRef) -> Self {
         Self {
             model,
             query: None,

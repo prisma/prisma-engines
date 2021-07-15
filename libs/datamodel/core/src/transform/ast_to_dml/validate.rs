@@ -189,7 +189,9 @@ impl<'a> Validator<'a> {
                 for field in autoinc_fields {
                     let ast_field = ast_model.find_field_bang(&field.name);
 
-                    if !field.is_id && !data_source.active_connector.supports_non_id_auto_increment() {
+                    if !model.field_is_primary(&field.name)
+                        && !data_source.active_connector.supports_non_id_auto_increment()
+                    {
                         errors.push_error(DatamodelError::new_attribute_validation_error(
                             &"The `autoincrement()` default value is used on a non-id field even though the datasource does not support this.".to_string(),
                             "default",
@@ -218,29 +220,6 @@ impl<'a> Validator<'a> {
         ast_model: &ast::Model,
         model: &dml::Model,
     ) -> Result<(), DatamodelError> {
-        let multiple_single_field_id_error = Err(DatamodelError::new_model_validation_error(
-            "At most one field must be marked as the id field with the `@id` attribute.",
-            &model.name,
-            ast_model.span,
-        ));
-
-        let multiple_id_criteria_error = Err(DatamodelError::new_model_validation_error(
-            "Each model must have at most one id criteria. You can't have `@id` and `@@id` at the same time.",
-            &model.name,
-            ast_model.span,
-        ));
-
-        let has_single_field_id = model.singular_id_fields().next().is_some();
-        let has_multi_field_id = !model.id_fields.is_empty();
-
-        if model.singular_id_fields().count() > 1 {
-            return multiple_single_field_id_error;
-        }
-
-        if has_single_field_id && has_multi_field_id {
-            return multiple_id_criteria_error;
-        }
-
         let loose_criterias = model.loose_unique_criterias();
         let suffix = if loose_criterias.is_empty() {
             "".to_string()
@@ -485,14 +464,8 @@ impl<'a> Validator<'a> {
                     true
                 };
 
-                let references_singular_id_field = if rel_info.references.len() == 1 {
-                    let field_name = rel_info.references.first().unwrap();
-                    // the unwrap is safe. We error out earlier if an unknown field is referenced.
-                    let referenced_field = related_model.find_scalar_field(field_name).unwrap();
-                    referenced_field.is_id
-                } else {
-                    false
-                };
+                let references_singular_id_field = rel_info.references.len() == 1
+                    && related_model.field_is_primary(&rel_info.references.first().unwrap());
 
                 let is_many_to_many = {
                     // Back relation fields have not been added yet. So we must calculate this on our own.
@@ -525,7 +498,11 @@ impl<'a> Validator<'a> {
 
                 // TODO: This error is only valid for connectors that don't support native many to manys.
                 // We only render this error if there's a singular id field. Otherwise we render a better error in a different function.
-                if is_many_to_many && !references_singular_id_field && related_model.has_single_id_field() {
+                if is_many_to_many
+                    && !references_singular_id_field
+                    && related_model.has_single_id_field()
+                    && model.has_single_id_field()
+                {
                     errors.push_error(DatamodelError::new_validation_error(
                             &format!(
                                 "Many to many relations must always reference the id field of the related model. Change the argument `references` to use the id field of the related model `{}`. But it is referencing the following fields that are not the id: {}",

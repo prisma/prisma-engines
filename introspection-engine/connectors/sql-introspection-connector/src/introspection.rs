@@ -6,7 +6,7 @@ use crate::introspection_helpers::{
 use crate::version_checker::VersionChecker;
 use crate::SqlError;
 use crate::{Dedup, SqlFamilyTrait};
-use datamodel::{dml, walkers::find_model_by_db_name, Datamodel, Field, Model, RelationField};
+use datamodel::{dml, walkers::find_model_by_db_name, Datamodel, Field, Model, PrimaryKeyDefinition, RelationField};
 use introspection_connector::IntrospectionContext;
 use sql_schema_describer::{SqlSchema, Table};
 use tracing::debug;
@@ -49,16 +49,16 @@ pub fn introspect(
             model.add_field(Field::RelationField(relation_field));
         }
 
-        for index in table
-            .indices
-            .iter()
-            .filter(|i| !(i.columns.len() == 1 && i.is_unique()))
-        {
+        for index in &table.indices {
             model.add_index(calculate_index(index));
         }
 
-        if table.primary_key_columns().len() > 1 {
-            model.id_fields = table.primary_key_columns();
+        if let Some(pk) = &table.primary_key {
+            model.primary_key = Some(PrimaryKeyDefinition {
+                name: None,
+                fields: pk.columns.clone(),
+                defined_on_field: pk.columns.len() == 1,
+            });
         }
 
         version_check.always_has_created_at_updated_at(table, &model);

@@ -54,19 +54,24 @@ impl<'a> LowerDmlToAst<'a> {
     }
 
     /// Internal: Lowers a field's attributes.
-    pub(crate) fn lower_field_attributes(&self, field: &dml::Field, datamodel: &dml::Datamodel) -> Vec<ast::Attribute> {
+    pub(crate) fn lower_field_attributes(
+        &self,
+        model: &dml::Model,
+        field: &dml::Field,
+        datamodel: &dml::Datamodel,
+    ) -> Vec<ast::Attribute> {
         let mut attributes = vec![];
 
         // @id
         if let dml::Field::ScalarField(sf) = field {
-            if sf.is_id {
+            if model.field_is_primary_and_defined_on_field(&sf.name) {
                 attributes.push(ast::Attribute::new("id", Vec::new()));
             }
         }
 
         // @unique
         if let dml::Field::ScalarField(sf) = field {
-            if sf.is_unique {
+            if model.field_is_unique_and_defined_on_field(&sf.name) {
                 attributes.push(ast::Attribute::new("unique", vec![]));
             }
         }
@@ -108,7 +113,6 @@ impl<'a> LowerDmlToAst<'a> {
                 .find_model(&relation_info.to)
                 .unwrap_or_else(|| panic!("Related model not found: {}.", relation_info.to));
 
-            let mut all_related_ids = related_model.id_field_names();
             let has_default_name = relation_info.name
                 == RelationNames::name_for_unambiguous_relation(&relation_info.to, &parent_model.name);
 
@@ -119,7 +123,6 @@ impl<'a> LowerDmlToAst<'a> {
             let mut relation_fields = relation_info.references.clone();
 
             relation_fields.sort();
-            all_related_ids.sort();
 
             if !relation_info.fields.is_empty() {
                 args.push(ast::Argument::new_array(

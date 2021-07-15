@@ -64,13 +64,7 @@ impl Fields {
     }
 
     pub fn id(&self) -> Option<Vec<ScalarFieldRef>> {
-        self.id
-            .get_or_init(|| {
-                self.find_singular_id()
-                    .map(|x| vec![x])
-                    .or_else(|| self.find_multipart_id())
-            })
-            .clone()
+        self.id.get_or_init(|| self.find_id()).clone()
     }
 
     pub fn created_at(&self) -> &Option<ScalarFieldRef> {
@@ -202,16 +196,10 @@ impl Fields {
         acc
     }
 
-    /// Attempts to resolve a single ID field on the model (supplied with an @id on a scalar field).
-    fn find_singular_id(&self) -> Option<ScalarFieldRef> {
-        self.scalar().into_iter().find_map(|field| field.is_id().then(|| field))
-    }
-
-    /// Attempts to resolve a compound ID field on the model (supplied with @@id on scalar fields).
-    fn find_multipart_id(&self) -> Option<Vec<ScalarFieldRef>> {
-        if !self.id_field_names.is_empty() {
-            let fields = self
-                .id_field_names
+    /// Attempts to resolve an ID on the model (supplied with @@id on the model or @id onscalar fields).
+    fn find_id(&self) -> Option<Vec<ScalarFieldRef>> {
+        (!self.id_field_names.is_empty()).then(|| {
+            self.id_field_names
                 .iter()
                 .map(|f| {
                     self.scalar()
@@ -219,12 +207,8 @@ impl Fields {
                         .find(|field| &field.name == f)
                         .unwrap_or_else(|| panic!("Expected ID field {} to be present on the model", f))
                 })
-                .collect();
-
-            Some(fields)
-        } else {
-            None
-        }
+                .collect()
+        })
     }
 
     pub fn db_names(&self) -> impl Iterator<Item = String> + '_ {

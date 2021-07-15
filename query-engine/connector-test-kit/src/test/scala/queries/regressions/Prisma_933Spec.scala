@@ -22,8 +22,6 @@ class Prisma_933Spec extends FlatSpec with Matchers with ApiSpecBase {
          |  sale_id  Int    @id @default(autoincrement())
          |  buyers   Buyer[]   @relation("BuyersOnSale", references: [buyer_id])
          |}
-         |
-         |
        """.stripMargin
     }
 

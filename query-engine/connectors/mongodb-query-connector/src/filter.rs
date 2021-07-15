@@ -1,7 +1,7 @@
 use crate::{join::JoinStage, IntoBson};
 use connector_interface::{
-    AggregationFilter, Filter, OneRelationIsNullFilter, QueryMode, RelationCondition, RelationFilter, ScalarCondition,
-    ScalarFilter, ScalarListFilter, ScalarProjection,
+    AggregationFilter, Filter, OneRelationIsNullFilter, QueryMode, RelationCondition, RelationFilter, ScalarCompare,
+    ScalarCondition, ScalarFilter, ScalarListFilter, ScalarProjection,
 };
 use mongodb::bson::{doc, Bson, Document, Regex};
 use prisma_models::{PrismaValue, ScalarFieldRef};
@@ -36,6 +36,7 @@ pub(crate) struct MongoRelationFilter {
 
 /// Builds a MongoDB query filter from a Prisma filter.
 pub(crate) fn convert_filter(filter: Filter, invert: bool) -> crate::Result<MongoFilter> {
+    let filter = fold_compounds(filter);
     let filter_pair = match filter {
         Filter::And(filters) if invert => coerce_empty(false, "$or", filters, invert)?,
         Filter::And(filters) => coerce_empty(true, "$and", filters, invert)?,
@@ -59,25 +60,51 @@ pub(crate) fn convert_filter(filter: Filter, invert: bool) -> crate::Result<Mong
     Ok(filter_pair)
 }
 
+fn fold_compounds(filter: Filter) -> Filter {
+    match filter {
+        Filter::Scalar(ScalarFilter {
+            projection: ScalarProjection::Compound(fields),
+            condition: ScalarCondition::In(value_tuples),
+            mode: _,
+        }) if fields.len() > 1 => {
+            let mut filters = vec![];
+
+            for tuple in value_tuples {
+                let values = tuple.into_list().expect("Compounds must have associated value lists.");
+
+                let equality_filters: Vec<_> = values
+                    .into_iter()
+                    .zip(fields.iter())
+                    .map(|(value, field)| field.equals(value))
+                    .collect();
+
+                filters.push(Filter::And(equality_filters));
+            }
+
+            Filter::Or(filters)
+        }
+        _ => filter,
+    }
+}
+
 fn coerce_empty(truthy: bool, operation: &str, filters: Vec<Filter>, invert: bool) -> crate::Result<MongoFilter> {
     if filters.is_empty() {
         // We need to create a truthy or falsey expression for empty AND / OR queries.
         // _id always exists. So matching on exist/not exists creates our truthy/falsey expressions.
 
-        let doc = match (truthy, invert) {
-            (true, _) => doc! { "_id": { "$exists": 1 }},
-            (false, _) => doc! { "_id": { "$exists": 0 }},
-            // (true, true) => doc! { "_id": { "$exists": 0 }},
-            // (false, true) => doc! { "_id": { "$exists": 1 }},
+        let doc = if truthy {
+            doc! { "_id": { "$exists": 1 }}
+        } else {
+            doc! { "_id": { "$exists": 0 }}
         };
 
         Ok(MongoFilter::Scalar(doc))
     } else {
-        compound_filter(operation, filters, invert)
+        fold_filters(operation, filters, invert)
     }
 }
 
-fn compound_filter(operation: &str, filters: Vec<Filter>, invert: bool) -> crate::Result<MongoFilter> {
+fn fold_filters(operation: &str, filters: Vec<Filter>, invert: bool) -> crate::Result<MongoFilter> {
     let filters = filters
         .into_iter()
         .map(|f| Ok(convert_filter(f, invert)?.render()))
@@ -99,12 +126,13 @@ fn fold_nested(nested: Vec<(Document, Vec<JoinStage>)>) -> (Vec<Document>, Vec<J
 }
 
 fn scalar_filter(filter: ScalarFilter, invert: bool, include_field_wrapper: bool) -> crate::Result<MongoFilter> {
-    // Todo: Find out what Compound cases are really. (Guess: Relation fields with multi-field FK?)
     let field = match filter.projection {
         connector_interface::ScalarProjection::Single(sf) => sf,
         connector_interface::ScalarProjection::Compound(mut c) if c.len() == 1 => c.pop().unwrap(),
         connector_interface::ScalarProjection::Compound(_) => {
-            unimplemented!("Compound filter case.")
+            unreachable!(
+                "Multi-field compound filter case hit when it should have been folded into normal filters previously."
+            )
         }
     };
 

@@ -434,7 +434,7 @@ fn test_parser_renderer_ignored_via_dml() {
 
     let config = parse_configuration(input);
     let dml = parse(input);
-    println!("{:?}", dml);
+    println!("{:#?}", dml);
     let rendered = datamodel::render_datamodel_and_config_to_string(&dml, &config);
 
     assert_eq!(rendered, input);

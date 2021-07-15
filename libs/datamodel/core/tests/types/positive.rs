@@ -18,7 +18,7 @@ fn should_apply_a_custom_type() {
     let user_model = datamodel.assert_has_model("Model");
     user_model
         .assert_has_scalar_field("id")
-        .assert_is_id()
+        .assert_is_id(user_model)
         .assert_base_type(&ScalarType::String)
         .assert_default_value(DefaultValue::Expression(ValueGenerator::new_cuid()));
 }
@@ -39,7 +39,7 @@ fn should_recursively_apply_a_custom_type() {
     let user_model = datamodel.assert_has_model("Model");
     user_model
         .assert_has_scalar_field("id")
-        .assert_is_id()
+        .assert_is_id(user_model)
         .assert_base_type(&ScalarType::String)
         .assert_default_value(DefaultValue::Expression(ValueGenerator::new_cuid()));
 }
@@ -122,14 +122,15 @@ fn should_be_able_to_handle_multiple_types() {
     let user_model = datamodel.assert_has_model("User");
     user_model
         .assert_has_scalar_field("id")
-        .assert_is_id()
+        .assert_is_id(user_model)
         .assert_base_type(&ScalarType::String)
         .assert_default_value(DefaultValue::Expression(ValueGenerator::new_cuid()));
 
     user_model
         .assert_has_scalar_field("email")
-        .assert_is_unique(true)
         .assert_base_type(&ScalarType::String);
+
+    assert!(user_model.field_is_unique("email"));
 
     user_model
         .assert_has_scalar_field("balance")

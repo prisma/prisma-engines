@@ -26,15 +26,6 @@ enum SubCommand {
     Cli(commands::Cli),
 }
 
-impl SubCommand {
-    #[cfg(test)]
-    fn unwrap_cli(self) -> commands::Cli {
-        match self {
-            SubCommand::Cli(cli) => cli,
-        }
-    }
-}
-
 #[tokio::main]
 async fn main() {
     set_panic_hook();

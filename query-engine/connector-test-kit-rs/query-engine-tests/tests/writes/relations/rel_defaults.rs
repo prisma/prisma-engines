@@ -8,16 +8,16 @@ mod rel_defaults {
     fn schema_1() -> String {
         let schema = indoc! {
             r#" model List {
-              #id(id, Int, @id @default(autoincrement()))
-              name  String? @unique
-              todoId Int @default(1)
-              todo  Todo   @relation(fields: [todoId], references: [id])
+              #id(id, Int, @id)
+              name   String? @unique
+              todoId Int     @default(1)
+              todo   Todo    @relation(fields: [todoId], references: [id])
             }
 
             model Todo{
-              #id(id, Int, @id @default(autoincrement()))
-              name String?
-              lists  List[]
+              #id(id, Int, @id)
+              name  String?
+              lists List[]
             }"#
         };
 
@@ -25,9 +25,13 @@ mod rel_defaults {
     }
 
     // "Not providing a value for a required relation field with a default value" should "work"
-    #[connector_test(schema(schema_1), exclude(MongoDb))]
+    #[connector_test(schema(schema_1))]
     async fn no_val_for_required_relation(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{ name: "A", todo: { create: { name: "B" } } }"#).await?;
+        create_row(
+            runner,
+            r#"{ id: 1, name: "A", todo: { create: { id: 1, name: "B" } } }"#,
+        )
+        .await?;
 
         insta::assert_snapshot!(
           run_query!(runner, r#"query {
@@ -51,7 +55,7 @@ mod rel_defaults {
 
         insta::assert_snapshot!(
           run_query!(runner, r#"mutation {
-            createOneList(data: { name: "listWithTodoOne" }) {
+            createOneList(data: { id: 2, name: "listWithTodoOne" }) {
               id
               todo {
                 id
@@ -69,16 +73,16 @@ mod rel_defaults {
     fn schema_2() -> String {
         let schema = indoc! {
             r#" model List {
-              #id(id, Int, @id @default(autoincrement()))
+              #id(id, Int, @id)
               name     String? @unique
-              todoId    Int @default(1)
-              todoName  String
-              todo      Todo   @relation(fields: [todoId, todoName], references: [id, name])
+              todoId   Int     @default(1)
+              todoName String
+              todo     Todo    @relation(fields: [todoId, todoName], references: [id, name])
            }
 
            model Todo {
-              id Int @default(autoincrement())
-              name  String
+              id Int
+              name   String
               lists  List[]
 
               @@id([id, name])
@@ -89,10 +93,9 @@ mod rel_defaults {
     }
 
     // "Not providing a value for a required relation with multiple fields with one default value" should "not work"
-    // We ignore SQLite because a multi-column primary key cannot have an autoincrement column on SQLite.
-    #[connector_test(schema(schema_2), exclude(MongoDb, Sqlite))]
+    #[connector_test(schema(schema_2), capabilities(CompoundIds))]
     async fn no_val_required_rel_one_default_val(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{ name: "A", todo: { create: { name: "B"}}}"#).await?;
+        create_row(runner, r#"{ id: 1, name: "A", todo: { create: { id: 1, name: "B"}}}"#).await?;
 
         insta::assert_snapshot!(
           run_query!(runner, r#"query { findManyList { name, todo { name } } }"#),
@@ -109,7 +112,7 @@ mod rel_defaults {
 
         assert_error!(
             runner,
-            r#"mutation { createOneList(data: { name: "listWithTodoOne" }) { id todo { id } } }"#,
+            r#"mutation { createOneList(data: { id: 2, name: "listWithTodoOne" }) { id todo { id } } }"#,
             2009,
             "`Mutation.createOneList.data.ListCreateInput.todo`: A value is required but not set."
         );
@@ -118,15 +121,13 @@ mod rel_defaults {
     }
 
     // "Not providing a value for one field with a default in a required relation with multiple fields" should "work"
-    // We ignore SQLite because a multi-column primary key cannot have an autoincrement column on SQLite.
-    // TODO(dom): Mongo not working (@@id)
-    #[connector_test(schema(schema_2), exclude(MongoDb, Sqlite))]
+    #[connector_test(schema(schema_2), capabilities(CompoundIds))]
     async fn no_val_required_rel_multiple_fields(runner: &Runner) -> TestResult<()> {
         // Test that we can still create with the value without default only
         insta::assert_snapshot!(
           run_query!(runner, r#"mutation {
             createOneList(
-              data: { name: "listWithTodoOne", todo: { create: { name: "abcd" } } }
+              data: { id: 1, name: "listWithTodoOne", todo: { create: { id: 1, name: "abcd" } } }
             ) {
               id
               todo {
@@ -147,7 +148,7 @@ mod rel_defaults {
         let schema = indoc! {
             r#" model List {
               #id(id, Int, @id)
-              name    String? @unique
+              name    String?  @unique
               todoId   Int     @default(1)
               todoName String  @default("theTodo")
               todo     Todo    @relation(fields: [todoId, todoName], references: [id, name])
@@ -157,6 +158,7 @@ mod rel_defaults {
               id Int @default(1)
               name   String
               lists  List[]
+
               @@id([id, name])
             }"#
         };
@@ -165,11 +167,14 @@ mod rel_defaults {
     }
 
     // "Not providing a value for required relation fields with default values" should "work"
-    // TODO(dom): Not working on mongo. No compound id (yet)?
-    #[connector_test(schema(schema_3), exclude(MongoDb))]
+    #[connector_test(schema(schema_3), capabilities(CompoundIds))]
     async fn no_val_required_rel_default_vals(runner: &Runner) -> TestResult<()> {
         // Setup
-        create_row(runner, r#"{ id: 1, name: "A", todo: { create: { name: "theTodo" } } }"#).await?;
+        create_row(
+            runner,
+            r#"{ id: 1, name: "A", todo: { create: { id: 1, name: "theTodo" } } }"#,
+        )
+        .await?;
 
         insta::assert_snapshot!(
           run_query!(runner, r#" query {

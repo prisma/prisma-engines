@@ -310,8 +310,7 @@ mod single_pk_rel_field {
     //  nested deleteM | -      | not possible (1!:1)
     //  nested updateM | -      | not possible (1!:1)
     // "Using an ID that is also a 1!:1 multi-field relation" should "work"
-    // TODO(dom): Not working on mongo. No compound id (yet)?
-    #[connector_test(schema(schema_1_1_multi_rel), exclude(MongoDb))]
+    #[connector_test(schema(schema_1_1_multi_rel), capabilities(CompoundIds))]
     async fn id_also_1_1_multi_field_rel(runner: &Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(runner, r#"mutation {
@@ -721,8 +720,7 @@ mod single_pk_rel_field {
     //  nested disconn | -      | not possible (1!:m)
     //  nested set     | -      | not (really) possible (1!:m)
     // "Using an ID that is also a 1!:M multi-field relation" should "work"
-    // TODO(dom): Not working on mongo. No compound id (yet)?
-    #[connector_test(schema(schema_1_m_multi_rel), exclude(MongoDb))]
+    #[connector_test(schema(schema_1_m_multi_rel), capabilities(CompoundIds))]
     async fn id_also_1_m_multi_field_rel(runner: &Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(runner, r#"mutation {

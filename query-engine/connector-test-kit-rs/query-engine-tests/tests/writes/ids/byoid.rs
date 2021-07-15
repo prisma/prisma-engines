@@ -101,34 +101,6 @@ mod byoid {
     }
 
     // "A Create Mutation" should "error for id that is invalid"
-    // FIXME: Does that make sense??
-    // #[connector_test(schema(schema_1))]
-    // async fn error_for_invalid_id_1_1(runner: &Runner) -> TestResult<()> {
-    //     insta::assert_snapshot!(
-    //       run_query!(runner, r#"mutation {
-    //         createOneParent(data: {p: "Parent", id: 12}){p, id}
-    //       }"#),
-    //       @r###"{"data":{"createOneParent":{"p":"Parent","id":"12"}}}"###
-    //     );
-
-    //     Ok(())
-    // }
-
-    // // "A Create Mutation" should "error for id that is invalid"
-    // // FIXME: Does that make sense??
-    // #[connector_test(schema(schema_2))]
-    // async fn error_for_invalid_id_1_2(runner: &Runner) -> TestResult<()> {
-    //     insta::assert_snapshot!(
-    //       run_query!(runner, r#"mutation {
-    //         createOneParent(data: {p: "Parent", id: 12}){p, id}
-    //       }"#),
-    //       @r###"{"data":{"createOneParent":{"p":"Parent","id":"12"}}}"###
-    //     );
-
-    //     Ok(())
-    // }
-
-    // "A Create Mutation" should "error for id that is invalid"
     #[connector_test(schema(schema_1))]
     async fn error_for_invalid_id_2_1(runner: &Runner) -> TestResult<()> {
         assert_error!(
@@ -152,40 +124,6 @@ mod byoid {
                   createOneParent(data: {p: "Parent", id: true}){p, id}
                 }"#,
                 2009,
-                "`Mutation.createOneParent.data.ParentCreateInput.id`: Value types mismatch. Have: Boolean(true), want: String"
-            );
-
-        Ok(())
-    }
-
-    // "A Create Mutation" should "error for id that is invalid"
-    // TODO(dom): Actually works on MongoDb.
-    // Result: {"data":{"createOneParent":{"p":"Parent","id":"this is probably way to long, lets see what error it throws"}}}
-    #[connector_test(schema(schema_1), exclude(Sqlite, Postgres, Mysql, MongoDb, SqlServer))]
-    async fn error_for_invalid_id_3_1(runner: &Runner) -> TestResult<()> {
-        assert_error!(
-            runner,
-            r#"mutation {
-              createOneParent(data: {p: "Parent", id: "this is probably way to long, lets see what error it throws"}){p, id}
-            }"#,
-            3007,
-            "`Mutation.createOneParent.data.ParentCreateInput.id`: Value types mismatch. Have: Boolean(true), want: String"
-        );
-
-        Ok(())
-    }
-
-    // "A Create Mutation" should "error for id that is invalid"
-    // TODO(dom): Actually works on MongoDb.
-    // Result: {"data":{"createOneParent":{"p":"Parent","id":"this is probably way to long, lets see what error it throws"}}}
-    #[connector_test(schema(schema_2), exclude(Sqlite, Postgres, Mysql, MongoDb, SqlServer))]
-    async fn error_for_invalid_id_3_2(runner: &Runner) -> TestResult<()> {
-        assert_error!(
-                runner,
-                r#"mutation {
-                  createOneParent(data: {p: "Parent", id: "this is probably way to long, lets see what error it throws"}){p, id}
-                }"#,
-                3007,
                 "`Mutation.createOneParent.data.ParentCreateInput.id`: Value types mismatch. Have: Boolean(true), want: String"
             );
 
@@ -248,42 +186,6 @@ mod byoid {
         Ok(())
     }
 
-    // "A Nested Create Mutation" should "error with invalid id"
-    // TODO: Should we really validate this
-    // TODO(dom): Actually works on MongoDb.
-    // Result: {"data":{"createOneParent":{"p":"Parent","id":"this is probably way to long, lets see what error it throws"}}}
-    #[connector_test(schema(schema_1), exclude(Sqlite, Postgres, Mysql, MongoDb, SqlServer))]
-    async fn nested_create_invalid_id_1(runner: &Runner) -> TestResult<()> {
-        assert_error!(
-            runner,
-            r#"mutation {
-              createOneParent(data: {p: "Parent 2", id: "Own Id 2", childOpt:{create:{c:"Child 2", id: "This is way too long and should error"}}}){p, id, childOpt { c, id} }
-            }"#,
-            3007,
-            "Value for field id is too long."
-        );
-
-        Ok(())
-    }
-
-    // "A Nested Create Mutation" should "error with invalid id"
-    // TODO: Should we really validate this
-    // TODO(dom): Actually works on MongoDb.
-    // Result: {"data":{"createOneParent":{"p":"Parent","id":"this is probably way to long, lets see what error it throws"}}}
-    #[connector_test(schema(schema_2), exclude(Sqlite, Postgres, Mysql, MongoDb, SqlServer))]
-    async fn nested_create_invalid_id_2(runner: &Runner) -> TestResult<()> {
-        assert_error!(
-            runner,
-            r#"mutation {
-              createOneParent(data: {p: "Parent 2", id: "Own Id 2", childOpt:{create:{c:"Child 2", id: "This is way too long and should error"}}}){p, id, childOpt { c, id} }
-            }"#,
-            3007,
-            "Value for field id is too long."
-        );
-
-        Ok(())
-    }
-
     // "An Upsert Mutation" should "work"
     #[connector_test(schema(schema_1))]
     async fn upsert_should_work_1(runner: &Runner) -> TestResult<()> {
@@ -315,50 +217,6 @@ mod byoid {
                   {p, id}
                 }"#),
           @r###"{"data":{"upsertOneParent":{"p":"Parent 2","id":"Own Id"}}}"###
-        );
-
-        Ok(())
-    }
-
-    // "An Upsert Mutation" should "error with id that is too long"
-    // TODO(dom): Actually works on MongoDb.
-    // Result: {"data":{"upsertOneParent":{"p":"Parent 2","id":"Way way too long for a proper id"}}}
-    #[connector_test(schema(schema_1), exclude(Sqlite, Postgres, Mysql, MongoDb, SqlServer))]
-    async fn upsert_error_with_id_too_long_1(runner: &Runner) -> TestResult<()> {
-        assert_error!(
-            runner,
-            r#"mutation {
-              upsertOneParent(
-                  where: {id: "Does not exist"}
-                  create: {p: "Parent 2", id: "Way way too long for a proper id"}
-                  update: {p: { set: "Parent 2" }}
-                  )
-                {p, id}
-              }"#,
-            3007,
-            "Value for field id is too long."
-        );
-
-        Ok(())
-    }
-
-    // "An Upsert Mutation" should "error with id that is too long"
-    // TODO(dom): Actually works on MongoDb.
-    // Result: {"data":{"upsertOneParent":{"p":"Parent 2","id":"Way way too long for a proper id"}}}
-    #[connector_test(schema(schema_2), exclude(Sqlite, Postgres, Mysql, MongoDb, SqlServer))]
-    async fn upsert_error_with_id_too_long_2(runner: &Runner) -> TestResult<()> {
-        assert_error!(
-            runner,
-            r#"mutation {
-                  upsertOneParent(
-                      where: {id: "Does not exist"}
-                      create: {p: "Parent 2", id: "Way way too long for a proper id"}
-                      update: {p: { set: "Parent 2" }}
-                      )
-                    {p, id}
-                  }"#,
-            3007,
-            "Value for field id is too long."
         );
 
         Ok(())

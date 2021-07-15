@@ -16,12 +16,15 @@ fn unique_attribute() {
     test_model
         .assert_has_scalar_field("id")
         .assert_base_type(&ScalarType::Int)
-        .assert_is_unique(false)
-        .assert_is_id();
+        .assert_is_id(test_model);
+
+    assert!(!test_model.field_is_unique("id"));
+
     test_model
         .assert_has_scalar_field("unique")
-        .assert_base_type(&ScalarType::String)
-        .assert_is_unique(true);
+        .assert_base_type(&ScalarType::String);
+
+    assert!(test_model.field_is_unique("unique"));
 }
 
 #[test]

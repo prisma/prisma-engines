@@ -83,7 +83,7 @@ impl<'ast> ParserDatabase<'ast> {
 
         // Third pass: validate model and field attributes.
         for (model_id, model) in ast.iter_models() {
-            attributes::resolve_model_attributes(model_id, model, &mut ctx)
+            attributes::resolve_model_and_field_attributes(model_id, model, &mut ctx)
         }
 
         ctx.finish()

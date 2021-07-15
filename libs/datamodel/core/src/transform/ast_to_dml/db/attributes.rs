@@ -2,6 +2,7 @@ use super::{
     context::{Arguments, Context},
     types::{IndexData, ModelData, RelationField, ScalarField},
 };
+use crate::transform::ast_to_dml::db::types::PrimaryKeyData;
 use crate::{
     ast::{self, WithName},
     diagnostics::DatamodelError,
@@ -11,7 +12,7 @@ use crate::{
 use itertools::Itertools;
 use prisma_value::PrismaValue;
 
-pub(super) fn resolve_model_attributes<'ast>(
+pub(super) fn resolve_model_and_field_attributes<'ast>(
     model_id: ast::ModelId,
     ast_model: &'ast ast::Model,
     ctx: &mut Context<'ast>,
@@ -156,15 +157,18 @@ fn visit_scalar_field_attributes<'ast>(
 
         // @id
         attributes.visit_optional_single("id", ctx, |args, ctx| {
-            match model_data.id_fields {
+            match model_data.primary_key {
                 Some(_) => ctx.push_error(DatamodelError::new_model_validation_error(
                     "At most one field must be marked as the id field with the `@id` attribute.",
                     ast_model.name(),
                     ast_model.span,
                 )),
                 None => {
-                    model_data.id_source_field = Some(field_id);
-                    model_data.id_fields = Some(vec![field_id])
+                    model_data.primary_key = Some(PrimaryKeyData{
+                        name: None,
+                        fields: vec![field_id],
+                        source_field: Some(field_id)
+                    })
                 },
             }
 
@@ -199,11 +203,13 @@ fn visit_scalar_field_attributes<'ast>(
 
          // @unique
          attributes.visit_optional_single("unique", ctx, |args, ctx| {
-            if model_data.id_source_field == Some(field_id) {
+             if let Some(pk) = &model_data.primary_key{
+
+            if pk.source_field == Some(field_id) {
                 ctx.push_error(args.new_attribute_validation_error(
                     "Fields that are marked as id should not have an additional @unique.",
                 ))
-            }
+            } }
 
             model_data.indexes.push(IndexData {
                 is_unique: true,
@@ -441,7 +447,7 @@ fn visit_model_id<'ast>(
         ))
     }
 
-    if model_data.id_fields.is_some() {
+    if model_data.primary_key.is_some() {
         ctx.push_error(DatamodelError::new_model_validation_error(
             "Each model must have at most one id criteria. You can't have `@id` and `@@id` at the same time.",
             model.name(),
@@ -449,7 +455,11 @@ fn visit_model_id<'ast>(
         ))
     }
 
-    model_data.id_fields = Some(resolved_fields);
+    model_data.primary_key = Some(PrimaryKeyData {
+        name: None,
+        fields: resolved_fields,
+        source_field: None,
+    });
 }
 
 fn visit_model_ignore(model_id: ast::ModelId, model_data: &mut ModelData<'_>, ctx: &mut Context<'_>) {

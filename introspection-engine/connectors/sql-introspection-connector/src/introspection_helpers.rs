@@ -76,7 +76,7 @@ fn common_prisma_m_to_n_relation_conditions(table: &Table) -> bool {
             i.columns.len() == 2
                 && is_a(&i.columns[0])
                 && is_b(&i.columns[1])
-                && i.tpe == IndexType::Unique
+                && i.is_unique()
         })
         //INDEX [B]
         && table
@@ -131,6 +131,7 @@ pub(crate) fn calculate_index(index: &Index) -> IndexDefinition {
         name: Some(index.name.clone()),
         fields: index.columns.clone(),
         tpe,
+        defined_on_field: index.columns.len() == 1,
     }
 }
 
@@ -149,16 +150,12 @@ pub(crate) fn calculate_scalar_field(table: &Table, column: &Column, ctx: &Intro
 
     let default_value = calculate_default(table, column, &arity);
 
-    let is_unique = table.is_column_unique(&column.name) && !is_id;
-
     ScalarField {
         name: column.name.clone(),
         arity,
         field_type,
         database_name: None,
         default_value,
-        is_unique,
-        is_id,
         documentation: None,
         is_generated: false,
         is_updated_at: false,
@@ -242,7 +239,7 @@ pub(crate) fn calculate_backrelation_field(
             let other_is_unique = table
                 .indices
                 .iter()
-                .any(|i| columns_match(&i.columns, &relation_info.fields) && i.tpe == IndexType::Unique)
+                .any(|i| columns_match(&i.columns, &relation_info.fields) && i.is_unique())
                 || columns_match(&table.primary_key_columns(), &relation_info.fields);
 
             let arity = match relation_field.arity {

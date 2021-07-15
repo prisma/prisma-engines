@@ -89,8 +89,7 @@ mod int_id_update {
     }
 
     // "Updating an item with an id field of type Int with autoincrement" should "work"
-    // TODO(dom): Not working on mongo. Expected I guess?
-    #[connector_test(schema(schema_int_autoinc), exclude(MongoDb))]
+    #[connector_test(schema(schema_int_autoinc), capabilities(AutoIncrement))]
     async fn update_id_int_autoinc(runner: &Runner) -> TestResult<()> {
         // Setup
         insta::assert_snapshot!(
@@ -127,8 +126,10 @@ mod int_id_update {
     }
 
     // "Updating a non-unique field of type Int with autoincrement" should "work"
-    // TODO(dom): Not working on mongo. Expected I guess?
-    #[connector_test(schema(schema_int_non_uniq_autoinc), exclude(Sqlite, Mysql, SqlServer, MongoDb))]
+    #[connector_test(
+        schema(schema_int_non_uniq_autoinc),
+        capabilities(AutoIncrement, AutoIncrementNonIndexedAllowed, WritableAutoincField)
+    )]
     async fn update_non_uniq_int_field_autoinc(runner: &Runner) -> TestResult<()> {
         // Setup
         insta::assert_snapshot!(

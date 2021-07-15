@@ -5,7 +5,7 @@ use datamodel_connector::{
 };
 use dml::{
     field::{Field, FieldType},
-    model::{IndexType, Model},
+    model::Model,
     native_type_constructor::NativeTypeConstructor,
     native_type_instance::NativeTypeInstance,
     relation_info::ReferentialAction,
@@ -71,6 +71,7 @@ impl PostgresDatamodelConnector {
             ConnectorCapability::CompoundIds,
             ConnectorCapability::ForeignKeys,
             ConnectorCapability::AnyId,
+            ConnectorCapability::QueryRaw,
         ];
 
         let small_int = NativeTypeConstructor::without_args(SMALL_INT_TYPE_NAME, vec![ScalarType::Int]);
@@ -248,7 +249,6 @@ impl Connector for PostgresDatamodelConnector {
                     Timestamp(Some(p)) | Timestamptz(Some(p)) | Time(Some(p)) | Timetz(Some(p)) if p > 6 => {
                         error.new_argument_m_out_of_range_error("M can range from 0 to 6.")
                     }
-                    Xml if field.is_unique() => error.new_incompatible_native_type_with_unique(),
                     _ => Ok(()),
                 }
             }
@@ -266,7 +266,7 @@ impl Connector for PostgresDatamodelConnector {
                     let error = self.native_instance_error(native_type);
 
                     if r#type == PostgresType::Xml {
-                        return if index_definition.tpe == IndexType::Unique {
+                        return if index_definition.is_unique() {
                             error.new_incompatible_native_type_with_unique()
                         } else {
                             error.new_incompatible_native_type_with_index()

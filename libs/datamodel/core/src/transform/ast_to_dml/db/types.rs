@@ -107,9 +107,7 @@ impl RelationField<'_> {
 
 #[derive(Default, Debug)]
 pub(crate) struct ModelData<'ast> {
-    pub(crate) id_fields: Option<Vec<ast::FieldId>>,
-    // When the id came from an @id on a single field.
-    pub(crate) id_source_field: Option<ast::FieldId>,
+    pub(crate) primary_key: Option<PrimaryKeyData<'ast>>,
     pub(crate) is_ignored: bool,
     /// @(@) index and @(@)unique.
     pub(crate) indexes: Vec<IndexData<'ast>>,
@@ -120,6 +118,13 @@ pub(crate) struct ModelData<'ast> {
 #[derive(Debug, Default)]
 pub(crate) struct IndexData<'ast> {
     pub(crate) is_unique: bool,
+    pub(crate) fields: Vec<ast::FieldId>,
+    pub(crate) source_field: Option<ast::FieldId>,
+    pub(crate) name: Option<&'ast str>,
+}
+
+#[derive(Debug, Default)]
+pub(crate) struct PrimaryKeyData<'ast> {
     pub(crate) fields: Vec<ast::FieldId>,
     pub(crate) source_field: Option<ast::FieldId>,
     pub(crate) name: Option<&'ast str>,

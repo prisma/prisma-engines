@@ -1,7 +1,7 @@
 use datamodel::{
     diagnostics::*,
     dml::{self, ScalarType},
-    Configuration, Datamodel, IndexDefinition, NativeTypeInstance, StringFromEnvVar,
+    Configuration, Datamodel, IndexDefinition, Model, NativeTypeInstance, PrimaryKeyDefinition, StringFromEnvVar,
 };
 use pretty_assertions::assert_eq;
 
@@ -25,8 +25,7 @@ pub(crate) trait ScalarFieldAsserts {
     fn assert_native_type(&self) -> &NativeTypeInstance;
     fn assert_with_db_name(&self, t: &str) -> &Self;
     fn assert_default_value(&self, t: dml::DefaultValue) -> &Self;
-    fn assert_is_id(&self) -> &Self;
-    fn assert_is_unique(&self, b: bool) -> &Self;
+    fn assert_is_id(&self, model: &Model) -> &Self;
     fn assert_is_updated_at(&self, b: bool) -> &Self;
     fn assert_ignored(&self, state: bool) -> &Self;
 }
@@ -49,7 +48,7 @@ pub(crate) trait ModelAsserts {
     fn assert_with_db_name(&self, t: &str) -> &Self;
     fn assert_with_documentation(&self, t: &str) -> &Self;
     fn assert_has_index(&self, def: IndexDefinition) -> &Self;
-    fn assert_has_id_fields(&self, fields: &[&str]) -> &Self;
+    fn assert_has_pk(&self, pk: PrimaryKeyDefinition) -> &Self;
     fn assert_ignored(&self, state: bool) -> &Self;
 }
 
@@ -156,13 +155,8 @@ impl ScalarFieldAsserts for dml::ScalarField {
         self
     }
 
-    fn assert_is_id(&self) -> &Self {
-        assert!(self.is_id);
-        self
-    }
-
-    fn assert_is_unique(&self, b: bool) -> &Self {
-        assert_eq!(self.is_unique, b);
+    fn assert_is_id(&self, model: &Model) -> &Self {
+        assert!(model.field_is_primary(&self.name));
         self
     }
 
@@ -278,8 +272,8 @@ impl ModelAsserts for dml::Model {
         self
     }
 
-    fn assert_has_id_fields(&self, fields: &[&str]) -> &Self {
-        assert_eq!(self.id_fields, fields);
+    fn assert_has_pk(&self, pk: PrimaryKeyDefinition) -> &Self {
+        assert_eq!(self.primary_key, Some(pk));
         self
     }
 
