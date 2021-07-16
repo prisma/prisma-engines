@@ -79,6 +79,11 @@ impl IntoBson for (MongoDbType, PrismaValue) {
                 )
             }
             (MongoDbType::Array(inner), val) => Bson::Array(vec![(*inner, val).into_bson()?]),
+            (typ, PrismaValue::List(vals)) => Bson::Array(
+                vals.into_iter()
+                    .map(|val| (typ.clone(), val).into_bson())
+                    .collect::<crate::Result<Vec<_>>>()?,
+            ),
 
             // BinData
             (MongoDbType::BinData, PrismaValue::Bytes(bytes)) => Bson::Binary(Binary {
