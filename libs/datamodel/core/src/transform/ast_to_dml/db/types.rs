@@ -121,6 +121,7 @@ pub(crate) struct IndexData<'ast> {
     pub(crate) fields: Vec<ast::FieldId>,
     pub(crate) source_field: Option<ast::FieldId>,
     pub(crate) name: Option<&'ast str>,
+    pub(crate) db_name: Option<&'ast str>,
 }
 
 #[derive(Debug, Default)]
@@ -128,6 +129,7 @@ pub(crate) struct PrimaryKeyData<'ast> {
     pub(crate) fields: Vec<ast::FieldId>,
     pub(crate) source_field: Option<ast::FieldId>,
     pub(crate) name: Option<&'ast str>,
+    pub(crate) db_name: Option<&'ast str>,
 }
 
 #[derive(Debug, Default)]

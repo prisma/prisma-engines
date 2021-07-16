@@ -151,9 +151,7 @@ impl SqlRenderer for MssqlFlavour {
             .map(|column| self.render_column(&column))
             .join(",\n    ");
 
-        let primary_columns = table.primary_key_column_names();
-
-        let primary_key = if let Some(primary_columns) = primary_columns.as_ref().filter(|cols| !cols.is_empty()) {
+        let primary_key = if let Some(primary_columns) = table.primary_key_column_names() {
             let index_name = format!("PK__{}__{}", table.name(), primary_columns.iter().join("_"));
             let column_names = primary_columns.iter().map(|col| self.quote(col)).join(",");
 

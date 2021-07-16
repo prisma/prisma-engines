@@ -63,6 +63,7 @@ impl<'a> LiftAstToDml<'a> {
             .as_ref()
             .map(|pk_data| dml::PrimaryKeyDefinition {
                 name: pk_data.name.map(String::from),
+                db_name: pk_data.name.map(String::from),
                 fields: pk_data
                     .fields
                     .iter()
@@ -76,6 +77,7 @@ impl<'a> LiftAstToDml<'a> {
             .iter()
             .map(|idx| dml::IndexDefinition {
                 name: idx.name.map(String::from),
+                db_name: idx.name.map(String::from),
                 fields: idx
                     .fields
                     .iter()

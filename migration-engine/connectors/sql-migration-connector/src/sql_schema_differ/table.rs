@@ -91,13 +91,7 @@ impl<'schema, 'b> TableDiffer<'schema, 'b> {
         match self.tables.as_ref().map(|t| t.primary_key()).as_tuple() {
             (None, Some(pk)) => Some(pk),
             (Some(previous_pk), Some(next_pk)) if previous_pk.columns != next_pk.columns => Some(next_pk),
-            (Some(previous_pk), Some(next_pk)) => {
-                if self.primary_key_column_changed(previous_pk) {
-                    Some(next_pk)
-                } else {
-                    None
-                }
-            }
+            (Some(previous_pk), Some(next_pk)) => self.primary_key_column_changed(previous_pk).then(|| *next_pk),
             _ => None,
         }
     }
@@ -107,13 +101,7 @@ impl<'schema, 'b> TableDiffer<'schema, 'b> {
         match self.tables.as_ref().map(|t| t.primary_key()).as_tuple() {
             (Some(pk), None) => Some(pk),
             (Some(previous_pk), Some(next_pk)) if previous_pk.columns != next_pk.columns => Some(previous_pk),
-            (Some(previous_pk), Some(_next_pk)) => {
-                if self.primary_key_column_changed(previous_pk) {
-                    Some(previous_pk)
-                } else {
-                    None
-                }
-            }
+            (Some(previous_pk), Some(_next_pk)) => self.primary_key_column_changed(previous_pk).then(|| *previous_pk),
             _ => None,
         }
     }

@@ -75,6 +75,7 @@ mod tests {
                 indices: vec![],
                 primary_key: Some(PrimaryKeyDefinition {
                     name: None,
+                    db_name: None,
                     fields: vec!["required".to_string()],
                     defined_on_field: true,
                 }),
@@ -161,6 +162,7 @@ mod tests {
                     indices: vec![],
                     primary_key: Some(PrimaryKeyDefinition {
                         name: None,
+                        db_name: None,
                         fields: vec!["primary".to_string()],
                         defined_on_field: true,
                     }),
@@ -197,6 +199,7 @@ mod tests {
                     indices: vec![],
                     primary_key: Some(PrimaryKeyDefinition {
                         name: None,
+                        db_name: None,
                         fields: vec!["primary".to_string()],
                         defined_on_field: true,
                     }),
@@ -233,6 +236,7 @@ mod tests {
                     indices: vec![],
                     primary_key: Some(PrimaryKeyDefinition {
                         name: None,
+                        db_name: None,
                         fields: vec!["primary".to_string()],
                         defined_on_field: true,
                     }),
@@ -353,6 +357,7 @@ mod tests {
                 is_generated: false,
                 indices: vec![IndexDefinition {
                     name: Some("unique_unique".to_string()),
+                    db_name: Some("unique_unique".to_string()),
                     fields: vec!["unique".to_string()],
                     tpe: dml::IndexType::Unique,
                     defined_on_field: true,
@@ -453,6 +458,7 @@ mod tests {
                                 fields: vec![],
                                 references: vec![],
                                 name: "CityToUser".to_string(),
+                                fk_name: None,
                                 on_delete: None,
                                 on_update: None,
                                 legacy_referential_actions: false,
@@ -463,6 +469,7 @@ mod tests {
                     indices: vec![],
                     primary_key: Some(PrimaryKeyDefinition {
                         name: None,
+                        db_name: None,
                         fields: vec!["id".to_string()],
                         defined_on_field: true,
                     }),
@@ -547,6 +554,7 @@ mod tests {
                             emulates_referential_actions: None,
                             relation_info: RelationInfo {
                                 name: "CityToUser".to_string(),
+                                fk_name: None,
                                 to: "City".to_string(),
                                 fields: vec!["city_id".to_string(), "city_name".to_string()],
                                 references: vec!["id".to_string(), "name".to_string()],
@@ -560,6 +568,7 @@ mod tests {
                     indices: vec![],
                     primary_key: Some(PrimaryKeyDefinition {
                         name: None,
+                        db_name: None,
                         fields: vec!["id".to_string()],
                         defined_on_field: true,
                     }),
@@ -731,12 +740,14 @@ mod tests {
                 is_generated: false,
                 indices: vec![datamodel::dml::IndexDefinition {
                     name: Some("name_last_name_unique".to_string()),
+                    db_name: Some("name_last_name_unique".to_string()),
                     fields: vec!["name".to_string(), "lastname".to_string()],
                     tpe: datamodel::dml::IndexType::Unique,
                     defined_on_field: false,
                 }],
                 primary_key: Some(PrimaryKeyDefinition {
                     name: None,
+                    db_name: None,
                     fields: vec!["id".to_string()],
                     defined_on_field: true,
                 }),
@@ -860,6 +871,7 @@ mod tests {
                                 fields: vec![],
                                 references: vec![],
                                 name: "CityToUser".to_string(),
+                                fk_name: None,
                                 on_delete: None,
                                 on_update: None,
                                 legacy_referential_actions: false,
@@ -870,6 +882,7 @@ mod tests {
                     indices: vec![],
                     primary_key: Some(PrimaryKeyDefinition {
                         name: None,
+                        db_name: None,
                         fields: vec!["id".to_string()],
                         defined_on_field: true,
                     }),
@@ -927,6 +940,7 @@ mod tests {
                             emulates_referential_actions: None,
                             relation_info: RelationInfo {
                                 name: "CityToUser".to_string(),
+                                fk_name: None,
                                 to: "City".to_string(),
                                 fields: vec!["city_id".to_string()],
                                 references: vec!["id".to_string()],
@@ -940,6 +954,7 @@ mod tests {
                     indices: vec![],
                     primary_key: Some(PrimaryKeyDefinition {
                         name: None,
+                        db_name: None,
                         fields: vec!["id".to_string()],
                         defined_on_field: true,
                     }),

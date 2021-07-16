@@ -1,6 +1,4 @@
 use crate::common::*;
-use datamodel::ast::Span;
-use datamodel::diagnostics::DatamodelError;
 use datamodel::dml::*;
 use prisma_value::PrismaValue;
 
@@ -144,27 +142,34 @@ fn multi_field_ids_must_work() {
     let user_model = datamodel.assert_has_model("Model");
     user_model.assert_has_pk(PrimaryKeyDefinition {
         name: None,
+        db_name: None,
         fields: vec!["a".into(), "b".into()],
         defined_on_field: false,
     });
 }
 
 #[test]
-fn relation_field_as_id_must_error() {
+fn should_allow_unique_and_id_on_same_field() {
     let dml = r#"
-    model User {
-        identification Identification @relation(references:[id]) @id
-    }
-
-    model Identification {
-        id Int @id
+    model Model {
+        id Int @id @unique
     }
     "#;
 
-    let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_attribute_validation_error(
-        "The field `identification` is a relation field and cannot be marked with `@id`. Only scalar fields can be declared as id.",
-        "id",
-        Span::new(84, 86),
-    ));
+    let datamodel = parse(dml);
+    let user_model = datamodel.assert_has_model("Model");
+    user_model.assert_has_pk(PrimaryKeyDefinition {
+        name: None,
+        db_name: None,
+        fields: vec!["id".into()],
+        defined_on_field: true,
+    });
+
+    user_model.assert_has_index(IndexDefinition {
+        name: None,
+        db_name: None,
+        fields: vec!["id".into()],
+        tpe: IndexType::Unique,
+        defined_on_field: true,
+    });
 }

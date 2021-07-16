@@ -742,3 +742,119 @@ async fn casing_should_not_lead_to_mix_ups(api: &TestApi) -> TestResult {
 
     Ok(())
 }
+
+#[test_connector(tags(Mysql), exclude(Mariadb))]
+async fn unique_and_index_on_same_field_works_mysql(api: &TestApi) -> TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.inject_custom(
+                "create table users (
+                       id serial primary key not null
+                     );",
+            )
+        })
+        .await?;
+
+    let dm = indoc! {r##"
+        model users {
+          id BigInt @id @unique @default(autoincrement()) @db.UnsignedBigInt
+        }
+    "##};
+
+    let result = &api.introspect().await?;
+    api.assert_eq_datamodels(dm, result);
+
+    Ok(())
+}
+
+#[test_connector(tags(Mariadb))]
+async fn unique_and_index_on_same_field_works_mariadb(api: &TestApi) -> TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.inject_custom(
+                "create table users (
+                       id Integer primary key not null,
+                       CONSTRAINT really_must_be_different UNIQUE (id)
+                     );",
+            )
+        })
+        .await?;
+
+    let dm = indoc! {r##"
+        model users {
+          id Int @id @unique
+        }
+    "##};
+
+    let result = &api.introspect().await?;
+    api.assert_eq_datamodels(dm, result);
+    Ok(())
+}
+
+#[test_connector(tags(Sqlite))]
+async fn unique_and_index_on_same_field_works_sqlite(api: &TestApi) -> TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.inject_custom(
+                "create table users (
+                       id Integer primary key not null unique
+                     );",
+            )
+        })
+        .await?;
+
+    let dm = indoc! {r##"
+        model users {
+          id Int @id @unique @default(autoincrement())
+        }
+    "##};
+
+    let result = &api.introspect().await?;
+    api.assert_eq_datamodels(dm, result);
+
+    Ok(())
+}
+
+#[test_connector(tags(Postgres))]
+// If multiple constraints are created in the create table statement Postgres seems to collapse them
+// into the first named one. So on the db level there will be one named really_must_be_different that
+// is both unique and primary. We only render it as @id then.
+// If a later alter table statement adds another unique constraint then it is persisted as its own
+// entity and can be introspected.
+async fn unique_and_index_on_same_field_works_postgres(api: &TestApi) -> TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.inject_custom(
+                "create table users (
+                       id Integer primary key not null,
+                       CONSTRAINT really_must_be_different UNIQUE (id),
+                       CONSTRAINT must_be_different UNIQUE (id)
+                     );",
+            )
+        })
+        .await?;
+
+    let dm = indoc! {r##"
+        model users {
+          id Int @id
+        }
+    "##};
+
+    let result = &api.introspect().await?;
+    api.assert_eq_datamodels(dm, result);
+
+    api.barrel()
+        .execute(|migration| migration.inject_custom("Alter table users Add Constraint z_unique Unique(id);"))
+        .await?;
+
+    let dm2 = indoc! {r##"
+        model users {
+          id Int @id @unique
+        }
+    "##};
+
+    let result = &api.introspect().await?;
+    api.assert_eq_datamodels(dm2, result);
+
+    Ok(())
+}

@@ -166,6 +166,7 @@ fn visit_scalar_field_attributes<'ast>(
                 None => {
                     model_data.primary_key = Some(PrimaryKeyData{
                         name: None,
+                        db_name: None,
                         fields: vec![field_id],
                         source_field: Some(field_id)
                     })
@@ -203,19 +204,23 @@ fn visit_scalar_field_attributes<'ast>(
 
          // @unique
          attributes.visit_optional_single("unique", ctx, |args, ctx| {
-             if let Some(pk) = &model_data.primary_key{
-
-            if pk.source_field == Some(field_id) {
-                ctx.push_error(args.new_attribute_validation_error(
-                    "Fields that are marked as id should not have an additional @unique.",
-                ))
-            } }
+             if let Some(source) = &ctx.db.datasource{
+                if source.active_provider == "sqlserver" {
+                    if let Some(pk) = &model_data.primary_key{
+                        if pk.source_field == Some(field_id) {
+                            ctx.push_error(args.new_attribute_validation_error(
+                         "SQLServer only allows either a unique or a primary key constraint on a column.", ))
+                        }
+                    }
+                }
+             }
 
             model_data.indexes.push(IndexData {
                 is_unique: true,
                 fields: vec![field_id],
                 source_field: Some(field_id),
                 name: None,
+                db_name: None,
             })
          });
     });
@@ -457,6 +462,7 @@ fn visit_model_id<'ast>(
 
     model_data.primary_key = Some(PrimaryKeyData {
         name: None,
+        db_name: None,
         fields: resolved_fields,
         source_field: None,
     });

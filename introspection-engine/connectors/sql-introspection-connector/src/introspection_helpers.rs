@@ -102,6 +102,7 @@ pub fn calculate_many_to_many_field(
 ) -> RelationField {
     let relation_info = RelationInfo {
         name: relation_name,
+        fk_name: None,
         fields: vec![],
         to: opposite_foreign_key.referenced_table.clone(),
         references: opposite_foreign_key.referenced_columns.clone(),
@@ -129,6 +130,7 @@ pub(crate) fn calculate_index(index: &Index) -> IndexDefinition {
 
     IndexDefinition {
         name: Some(index.name.clone()),
+        db_name: Some(index.name.clone()),
         fields: index.columns.clone(),
         tpe,
         defined_on_field: index.columns.len() == 1,
@@ -181,6 +183,7 @@ pub(crate) fn calculate_relation_field(
 
     let relation_info = RelationInfo {
         name: calculate_relation_name(schema, foreign_key, table)?,
+        fk_name: foreign_key.constraint_name.clone(),
         fields: foreign_key.columns.clone(),
         to: foreign_key.referenced_table.clone(),
         references: foreign_key.referenced_columns.clone(),
@@ -227,6 +230,7 @@ pub(crate) fn calculate_backrelation_field(
         Ok(table) => {
             let new_relation_info = RelationInfo {
                 name: relation_info.name.clone(),
+                fk_name: None,
                 to: model.name.clone(),
                 fields: vec![],
                 references: vec![],

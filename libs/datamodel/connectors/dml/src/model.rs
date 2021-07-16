@@ -32,6 +32,7 @@ pub struct Model {
 #[derive(Debug, PartialEq, Clone)]
 pub struct IndexDefinition {
     pub name: Option<String>,
+    pub db_name: Option<String>,
     pub fields: Vec<String>,
     pub tpe: IndexType,
     pub defined_on_field: bool,
@@ -47,6 +48,7 @@ impl IndexDefinition {
 #[derive(Debug, PartialEq, Clone)]
 pub struct PrimaryKeyDefinition {
     pub name: Option<String>,
+    pub db_name: Option<String>,
     pub fields: Vec<String>,
     pub defined_on_field: bool,
 }

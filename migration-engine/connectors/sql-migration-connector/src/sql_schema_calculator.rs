@@ -43,12 +43,15 @@ fn calculate_model_tables<'a>(
             .map(|field| column_for_scalar_field(&field, flavour))
             .collect();
 
-        let primary_key = Some(sql::PrimaryKey {
-            columns: model.id_fields().map(|field| field.db_name().to_owned()).collect(),
+        let primary_key = model.get().primary_key.as_ref().map(|pk| sql::PrimaryKey {
+            columns: pk
+                .fields
+                .iter()
+                .map(|field| model.find_scalar_field(field).unwrap().db_name().to_string())
+                .collect(),
             sequence: None,
-            constraint_name: None,
-        })
-        .filter(|pk| !pk.columns.is_empty());
+            constraint_name: pk.db_name.clone(),
+        });
 
         let indices = model
             .indexes()

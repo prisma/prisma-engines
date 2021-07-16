@@ -56,6 +56,7 @@ pub fn introspect(
         if let Some(pk) = &table.primary_key {
             model.primary_key = Some(PrimaryKeyDefinition {
                 name: None,
+                db_name: None,
                 fields: pk.columns.clone(),
                 defined_on_field: pk.columns.len() == 1,
             });

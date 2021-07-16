@@ -19,23 +19,6 @@ fn id_should_error_if_the_field_is_not_required() {
 }
 
 #[test]
-fn id_should_error_if_unique_and_id_are_specified() {
-    let dml = r#"
-    model Model {
-        id Int @id @unique
-    }
-    "#;
-
-    let errors = parse_error(dml);
-
-    errors.assert_is(DatamodelError::new_attribute_validation_error(
-        "Fields that are marked as id should not have an additional @unique.",
-        "unique",
-        Span::new(39, 45),
-    ));
-}
-
-#[test]
 fn id_should_error_multiple_ids_are_provided() {
     let dml = r#"
     model Model {
@@ -154,4 +137,46 @@ fn stringified_field_names_in_id_return_nice_error() {
         raw: "firstName".into(),
         span: Span::new(99, 110),
     });
+}
+
+#[test]
+fn relation_field_as_id_must_error() {
+    let dml = r#"
+    model User {
+        identification Identification @relation(references:[id]) @id
+    }
+
+    model Identification {
+        id Int @id
+    }
+    "#;
+
+    let errors = parse_error(dml);
+    errors.assert_is(DatamodelError::new_attribute_validation_error(
+        "The field `identification` is a relation field and cannot be marked with `@id`. Only scalar fields can be declared as id.",
+        "id",
+        Span::new(84, 86),
+    ));
+}
+
+#[test]
+fn unique_should_error_if_unique_and_id_are_specified_on_sqlserver() {
+    let dml = r#"
+    datasource test {
+         provider = "sqlserver"
+         url = "sqlserver://...."
+    }
+    
+     model Model {
+         id Int @id @unique
+     }
+     "#;
+
+    let errors = parse_error(dml);
+
+    errors.assert_is(DatamodelError::new_attribute_validation_error(
+        "SQLServer only allows either a unique or a primary key constraint on a column.",
+        "unique",
+        Span::new(140, 146),
+    ));
 }
