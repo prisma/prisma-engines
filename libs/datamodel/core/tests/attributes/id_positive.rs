@@ -162,7 +162,7 @@ fn should_allow_unique_and_id_on_same_field() {
         name: None,
         db_name: None,
         fields: vec!["id".into()],
-        defined_on_field: false,
+        defined_on_field: true,
     });
 
     user_model.assert_has_index(IndexDefinition {
@@ -170,6 +170,6 @@ fn should_allow_unique_and_id_on_same_field() {
         db_name: None,
         fields: vec!["id".into()],
         tpe: IndexType::Unique,
-        defined_on_field: false,
+        defined_on_field: true,
     });
 }
