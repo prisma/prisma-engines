@@ -3,6 +3,7 @@ use super::{
     types::{IndexData, ModelData, RelationField, ScalarField},
 };
 use crate::transform::ast_to_dml::db::types::PrimaryKeyData;
+use crate::PreviewFeature::NamedConstraints;
 use crate::{
     ast::{self, WithName},
     diagnostics::DatamodelError,
@@ -460,9 +461,33 @@ fn visit_model_id<'ast>(
         ))
     }
 
+    let (name, db_name) = if ctx.db.preview_features.contains(NamedConstraints) {
+        let name = match id_args.optional_arg("name").map(|name| name.as_str()) {
+            Some(Ok("")) => {
+                //todo should this be done at the Pest level though?
+                ctx.push_error(
+                    id_args.new_attribute_validation_error("The `name` argument cannot be an empty string."),
+                );
+                None
+            }
+            Some(Ok(name)) => {
+                //todo name validation to not contain . etc.. best done at the Pest level though
+                Some(name)
+            }
+            Some(Err(err)) => {
+                ctx.push_error(err);
+                None
+            }
+            None => None,
+        };
+        (name, None)
+    } else {
+        (None, None)
+    };
+
     model_data.primary_key = Some(PrimaryKeyData {
-        name: None,
-        db_name: None,
+        name,
+        db_name,
         fields: resolved_fields,
         source_field: None,
     });

@@ -13,8 +13,10 @@ use self::{
     context::Context,
     types::{RelationField, ScalarField, Types},
 };
+use crate::PreviewFeature;
 use crate::{ast, diagnostics::Diagnostics, Datasource};
 use datamodel_connector::{Connector, EmptyDatamodelConnector};
+use enumflags2::BitFlags;
 use names::Names;
 
 /// ParserDatabase is a container for a Schema AST, together with information
@@ -47,6 +49,7 @@ pub(crate) struct ParserDatabase<'ast> {
     datasource: Option<&'ast Datasource>,
     names: Names<'ast>,
     types: Types<'ast>,
+    preview_features: BitFlags<PreviewFeature>,
 }
 
 impl<'ast> ParserDatabase<'ast> {
@@ -55,12 +58,14 @@ impl<'ast> ParserDatabase<'ast> {
         ast: &'ast ast::SchemaAst,
         datasource: Option<&'ast Datasource>,
         diagnostics: Diagnostics,
+        preview_features: BitFlags<PreviewFeature>,
     ) -> (Self, Diagnostics) {
         let db = ParserDatabase {
             ast,
             datasource,
             names: Names::default(),
             types: Types::default(),
+            preview_features,
         };
 
         let mut ctx = Context::new(db, diagnostics);
