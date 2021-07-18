@@ -71,7 +71,8 @@ fn calculate_model_tables<'a>(
                     IndexType::Normal => sql::IndexType::Normal,
                 };
 
-                let index_name = index_definition.name.clone().unwrap_or_else(|| {
+                let index_name = index_definition.db_name.clone().unwrap_or_else(|| {
+                    //todo refactor into single function that can be moved to parser
                     if index_definition.fields.len() == 1 && index_definition.is_unique() {
                         let field = model
                             .find_scalar_field(index_definition.fields.first().unwrap())

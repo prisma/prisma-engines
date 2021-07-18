@@ -563,11 +563,8 @@ fn model_index<'ast>(
     ctx: &mut Context<'ast>,
 ) {
     let (name, db_name) = if ctx.db.preview_features.contains(NamedConstraints) {
-        //todo compatibility hack
-        // do not allow both
-
         // this is for compatibility reasons
-        let _name = match args.optional_arg("name").map(|name| name.as_str()) {
+        let name = match args.optional_arg("name").map(|name| name.as_str()) {
             Some(Ok("")) => error_on_empty_string(args, ctx, "name"),
             Some(Ok(name)) => Some(name), // todo client validation
             Some(Err(err)) => push_error(ctx, err),
@@ -583,7 +580,15 @@ fn model_index<'ast>(
             None => None,
         };
 
-        (None, db_name)
+        let (name_in_client, name_in_db) = match (name, db_name) {
+            (Some(_), Some(map)) => (None, Some(map)), //todo error here
+            //backwards compatibility, accept name arg on normal indexes and use it as map arg
+            (Some(name), None) => (None, Some(name)),
+            (None, Some(map)) => (None, Some(map)),
+            (None, None) => (None, Some("")), //todo default name generated here
+        };
+
+        (name_in_client, name_in_db)
     } else {
         let name = match args.optional_arg("name").map(|name| name.as_str()) {
             Some(Ok("")) => error_on_empty_string(args, ctx, "name"),
