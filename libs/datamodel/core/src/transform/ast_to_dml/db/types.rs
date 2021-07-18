@@ -89,6 +89,8 @@ pub(crate) struct RelationField<'ast> {
     /// The name _explicitly present_ in the AST.
     pub(crate) name: Option<&'ast str>,
     pub(crate) is_ignored: bool,
+    /// The fk_name _explicitly present_ in the AST by using the map argument.
+    pub(crate) fk_name: Option<&'ast str>,
 }
 
 impl RelationField<'_> {
@@ -101,6 +103,7 @@ impl RelationField<'_> {
             references: None,
             name: None,
             is_ignored: false,
+            fk_name: None,
         }
     }
 }

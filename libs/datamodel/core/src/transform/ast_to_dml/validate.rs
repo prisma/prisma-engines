@@ -111,11 +111,7 @@ impl<'a> Validator<'a> {
             all_errors.append(&mut errors_for_model);
         }
 
-        if all_errors.has_errors() {
-            Err(all_errors)
-        } else {
-            Ok(())
-        }
+        all_errors.to_result()
     }
 
     fn validate_names_for_indexes(
@@ -134,7 +130,7 @@ impl<'a> Validator<'a> {
         for model in schema.models() {
             if let Some(ast_model) = ast_schema.find_model(&model.name) {
                 for index in model.indices.iter() {
-                    if let Some(index_name) = &index.name {
+                    if let Some(index_name) = &index.db_name {
                         if index_names.contains(index_name) && !multiple_indexes_with_same_name_are_supported {
                             let ast_index = ast_model
                                 .attributes

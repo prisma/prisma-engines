@@ -499,7 +499,7 @@ fn visit_model_id<'ast>(
         let name = match id_args.optional_arg("name").map(|name| name.as_str()) {
             Some(Ok("")) => error_on_empty_string(id_args, ctx, "name"),
             Some(Ok(name)) => {
-                //todo name validation to not contain . etc.. best done at the Pest level though
+                //todo name validation to not contain . etc..
                 Some(name)
             }
             Some(Err(err)) => {
@@ -567,9 +567,9 @@ fn model_index<'ast>(
         // do not allow both
 
         // this is for compatibility reasons
-        let name = match args.optional_arg("name").map(|name| name.as_str()) {
+        let _name = match args.optional_arg("name").map(|name| name.as_str()) {
             Some(Ok("")) => error_on_empty_string(args, ctx, "name"),
-            Some(Ok(name)) => Some(name),
+            Some(Ok(name)) => Some(name), // todo client validation
             Some(Err(err)) => push_error(ctx, err),
             None => None,
         };
@@ -583,7 +583,7 @@ fn model_index<'ast>(
             None => None,
         };
 
-        (None, name.or(db_name))
+        (None, db_name)
     } else {
         let name = match args.optional_arg("name").map(|name| name.as_str()) {
             Some(Ok("")) => error_on_empty_string(args, ctx, "name"),
@@ -850,6 +850,25 @@ fn visit_relation<'ast>(
             Err(err) => ctx.push_error(err),
         }
     }
+
+    let fk_name = if ctx.db.preview_features.contains(NamedConstraints) {
+        match relation_args.optional_arg("map").map(|name| name.as_str()) {
+            Some(Ok("")) => error_on_empty_string(relation_args, ctx, "map"),
+            Some(Ok(name)) => {
+                //todo length validation
+                Some(name)
+            }
+            Some(Err(err)) => {
+                ctx.push_error(err);
+                None
+            }
+            None => None,
+        }
+    } else {
+        None
+    };
+
+    relation_field.fk_name = fk_name;
 }
 
 enum FieldResolutionError<'ast> {
