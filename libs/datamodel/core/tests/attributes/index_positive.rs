@@ -67,7 +67,7 @@ fn the_name_argument_must_work() {
     let schema = parse(dml);
     let user_model = schema.assert_has_model("User");
     user_model.assert_has_index(IndexDefinition {
-        name: Some("MyIndexName".to_string()),
+        name: None,
         db_name: Some("MyIndexName".to_string()),
         fields: vec!["firstName".to_string(), "lastName".to_string()],
         tpe: IndexType::Normal,
@@ -104,7 +104,7 @@ fn multiple_indexes_with_same_name_are_supported_by_mysql() {
     let post_model = schema.assert_has_model("Post");
 
     user_model.assert_has_index(IndexDefinition {
-        name: Some("MyIndexName".to_string()),
+        name: None,
         db_name: Some("MyIndexName".to_string()),
         fields: vec!["id".to_string()],
         tpe: IndexType::Normal,
@@ -112,7 +112,7 @@ fn multiple_indexes_with_same_name_are_supported_by_mysql() {
     });
 
     post_model.assert_has_index(IndexDefinition {
-        name: Some("MyIndexName".to_string()),
+        name: None,
         db_name: Some("MyIndexName".to_string()),
         fields: vec!["id".to_string()],
         tpe: IndexType::Normal,
@@ -145,7 +145,7 @@ fn multiple_index_must_work() {
     });
 
     user_model.assert_has_index(IndexDefinition {
-        name: Some("MyIndexName".to_string()),
+        name: None,
         db_name: Some("MyIndexName".to_string()),
         fields: vec!["firstName".to_string(), "lastName".to_string()],
         tpe: IndexType::Normal,
