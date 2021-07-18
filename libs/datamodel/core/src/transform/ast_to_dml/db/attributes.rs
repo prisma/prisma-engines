@@ -463,13 +463,7 @@ fn visit_model_id<'ast>(
 
     let (name, db_name) = if ctx.db.preview_features.contains(NamedConstraints) {
         let name = match id_args.optional_arg("name").map(|name| name.as_str()) {
-            Some(Ok("")) => {
-                //todo should this be done at the Pest level though?
-                ctx.push_error(
-                    id_args.new_attribute_validation_error("The `name` argument cannot be an empty string."),
-                );
-                None
-            }
+            Some(Ok("")) => error_on_empty_string(id_args, ctx, "name"),
             Some(Ok(name)) => {
                 //todo name validation to not contain . etc.. best done at the Pest level though
                 Some(name)
@@ -480,7 +474,20 @@ fn visit_model_id<'ast>(
             }
             None => None,
         };
-        (name, None)
+
+        let db_name = match id_args.optional_arg("map").map(|name| name.as_str()) {
+            Some(Ok("")) => error_on_empty_string(id_args, ctx, "map"),
+            Some(Ok(name)) => {
+                //todo length validation
+                Some(name)
+            }
+            Some(Err(err)) => {
+                ctx.push_error(err);
+                None
+            }
+            None => None,
+        };
+        (name, db_name)
     } else {
         (None, None)
     };
@@ -521,11 +528,54 @@ fn model_index<'ast>(
     model_id: ast::ModelId,
     ctx: &mut Context<'ast>,
 ) {
-    let mut index_data = IndexData::default();
+    let (name, db_name) = if ctx.db.preview_features.contains(NamedConstraints) {
+        //todo compatibility hack
+        // do not allow both
+
+        // this is for compatibility reasons
+        let name = match args.optional_arg("name").map(|name| name.as_str()) {
+            Some(Ok("")) => error_on_empty_string(args, ctx, "name"),
+            Some(Ok(name)) => Some(name),
+            Some(Err(err)) => push_error(ctx, err),
+            None => None,
+        };
+        let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
+            Some(Ok("")) => error_on_empty_string(args, ctx, "map"),
+            Some(Ok(name)) => {
+                //todo validation of length
+                Some(name)
+            }
+            Some(Err(err)) => push_error(ctx, err),
+            None => None,
+        };
+
+        (None, name.or(db_name))
+    } else {
+        let name = match args.optional_arg("name").map(|name| name.as_str()) {
+            Some(Ok("")) => error_on_empty_string(args, ctx, "name"),
+            Some(Ok(name)) => Some(name),
+            Some(Err(err)) => push_error(ctx, err),
+            None => None,
+        };
+
+        (None, name)
+    };
+
+    let mut index_data = IndexData {
+        is_unique: false,
+        name,
+        db_name,
+        ..Default::default()
+    };
 
     common_index_validations(args, &mut index_data, model_id, ctx);
 
     data.indexes.push(index_data);
+}
+
+fn push_error<'ast>(ctx: &mut Context<'ast>, err: DatamodelError) -> Option<&'ast str> {
+    ctx.push_error(err);
+    None
 }
 
 /// Validate @@unique on models.
@@ -535,14 +585,60 @@ fn model_unique<'ast>(
     model_id: ast::ModelId,
     ctx: &mut Context<'ast>,
 ) {
-    let mut index_data = IndexData {
-        is_unique: true,
-        ..Default::default()
+    let (name, db_name) = if ctx.db.preview_features.contains(NamedConstraints) {
+        //todo compatibility hack
+
+        let name = match args.optional_arg("name").map(|name| name.as_str()) {
+            Some(Ok("")) => error_on_empty_string(args, ctx, "name"),
+            Some(Ok(name)) => {
+                //todo validation for client use
+                Some(name)
+            }
+            Some(Err(err)) => push_error(ctx, err),
+            None => None,
+        };
+        let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
+            Some(Ok("")) => error_on_empty_string(args, ctx, "map"),
+            Some(Ok(name)) => {
+                //todo validation for length
+                Some(name)
+            }
+            Some(Err(err)) => push_error(ctx, err),
+            None => None,
+        };
+
+        (name, db_name)
+    } else {
+        let name = match args.optional_arg("name").map(|name| name.as_str()) {
+            Some(Ok("")) => error_on_empty_string(args, ctx, "name"),
+            Some(Ok(name)) => Some(name),
+            Some(Err(err)) => push_error(ctx, err),
+            None => None,
+        };
+
+        (name, name)
     };
 
+    let mut index_data = IndexData {
+        is_unique: true,
+        name,
+        db_name,
+        ..Default::default()
+    };
     common_index_validations(args, &mut index_data, model_id, ctx);
 
     data.indexes.push(index_data);
+}
+
+fn error_on_empty_string<'ast>(
+    args: &mut Arguments<'ast>,
+    ctx: &mut Context<'ast>,
+    attribute: &str,
+) -> Option<&'ast str> {
+    ctx.push_error(
+        args.new_attribute_validation_error(&format!("The `{}` argument cannot be an empty string.", attribute)),
+    );
+    None
 }
 
 fn common_index_validations<'ast>(
@@ -551,17 +647,6 @@ fn common_index_validations<'ast>(
     model_id: ast::ModelId,
     ctx: &mut Context<'ast>,
 ) {
-    match args.optional_arg("name").map(|name| name.as_str()) {
-        Some(Ok("")) => {
-            ctx.push_error(args.new_attribute_validation_error("The `name` argument cannot be an empty string."))
-        }
-        Some(Ok(name)) => {
-            index_data.name = Some(name);
-        }
-        Some(Err(err)) => ctx.push_error(err),
-        None => (),
-    };
-
     let fields = match args.default_arg("fields") {
         Ok(fields) => fields,
         Err(err) => {
