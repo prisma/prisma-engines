@@ -165,9 +165,26 @@ fn visit_scalar_field_attributes<'ast>(
                     ast_model.span,
                 )),
                 None => {
+                    let db_name = if ctx.db.preview_features.contains(NamedConstraints) {
+                        match args.optional_arg("map").map(|name| name.as_str()) {
+                            Some(Ok("")) => error_on_empty_string(args, ctx, "map"),
+                            Some(Ok(name)) => {
+                                //todo length validation
+                                Some(name)
+                            }
+                            Some(Err(err)) => {
+                                ctx.push_error(err);
+                                None
+                            }
+                            None => None,
+                        }
+                    } else {
+                        None
+                    };
+
                     model_data.primary_key = Some(PrimaryKeyData{
                         name: None,
-                        db_name: None,
+                        db_name,
                         fields: vec![field_id],
                         source_field: Some(field_id)
                     })
@@ -216,12 +233,29 @@ fn visit_scalar_field_attributes<'ast>(
                 }
              }
 
+             let db_name = if ctx.db.preview_features.contains(NamedConstraints) {
+                 match args.optional_arg("map").map(|name| name.as_str()) {
+                     Some(Ok("")) => error_on_empty_string(args, ctx, "map"),
+                     Some(Ok(name)) => {
+                         //todo length validation
+                         Some(name)
+                     }
+                     Some(Err(err)) => {
+                         ctx.push_error(err);
+                         None
+                     }
+                     None => None,
+                 }
+             } else {
+                 None
+             };
+
             model_data.indexes.push(IndexData {
                 is_unique: true,
                 fields: vec![field_id],
                 source_field: Some(field_id),
                 name: None,
-                db_name: None,
+                db_name,
             })
          });
     });
