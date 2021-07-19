@@ -225,8 +225,8 @@ impl<'a> LiftAstToDml<'a> {
             ),
             ScalarFieldType::Alias(top_id) => {
                 let alias = &self.db.ast()[*top_id];
-                let scalar_field_type = self.db.alias_scalar_field_type(&top_id).clone();
-                self.lift_scalar_field_type(alias, &scalar_field_type, scalar_field_data)
+                let scalar_field_type = self.db.alias_scalar_field_type(&top_id);
+                self.lift_scalar_field_type(alias, scalar_field_type, scalar_field_data)
             }
             ScalarFieldType::BuiltInScalar(scalar_type) => {
                 let native_type = scalar_field_data.native_type.as_ref().map(|(name, args)| {

@@ -1183,21 +1183,21 @@ async fn virtual_cuid_default(api: &TestApi) {
         .await
         .unwrap();
 
-    let input_dm = indoc! {r#"
-        datasource db {
-            provider = "postgres"
-            url = env("TEST_DATABASE_URL")
-        }
+    let input_dm = format!(
+        r#"
+        {datasource}
 
-        model User {
+        model User {{
             id        String    @id @default(cuid()) @db.VarChar(30)
             non_id    String    @default(cuid()) @db.VarChar(30)
-        }
+        }}
 
-        model User2 {
+        model User2 {{
             id        String    @id @default(uuid()) @db.VarChar(36)
-        }
-    "#};
+        }}
+        "#,
+        datasource = api.datasource_block()
+    );
 
     let final_dm = indoc! {r#"
         model User {
@@ -1214,7 +1214,7 @@ async fn virtual_cuid_default(api: &TestApi) {
         }
     "#};
 
-    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await.unwrap());
+    api.assert_eq_datamodels(final_dm, &api.re_introspect(&input_dm).await.unwrap());
 }
 
 #[test_connector(tags(Postgres))]
