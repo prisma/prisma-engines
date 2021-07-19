@@ -120,7 +120,7 @@ fn multiple_unique_must_work() {
 
     user_model.assert_has_index(IndexDefinition {
         name: None,
-        db_name: None,
+        db_name: Some("User.firstName_lastName_unique".to_string()),
         fields: vec!["firstName".to_string(), "lastName".to_string()],
         tpe: IndexType::Unique,
         defined_on_field: false,
@@ -225,6 +225,16 @@ fn unique_attributes_must_serialize_to_valid_dml() {
 #[test]
 fn mapped_multi_field_unique_must_work() {
     let dml = r#"
+     datasource test {
+            provider = "mysql"
+            url = "mysql://root:prisma@127.0.0.1:3309/ReproIndexNames?connection_limit=1"
+     }
+    
+     generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["NamedConstraints"]
+     }
+    
      model Model {
          a String
          b Int

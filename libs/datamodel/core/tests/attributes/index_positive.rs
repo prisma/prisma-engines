@@ -171,7 +171,7 @@ fn multiple_index_must_work() {
 
     user_model.assert_has_index(IndexDefinition {
         name: None,
-        db_name: None,
+        db_name: Some("User.firstName_lastName_index".to_string()),
         fields: vec!["firstName".to_string(), "lastName".to_string()],
         tpe: IndexType::Normal,
         defined_on_field: false,
