@@ -1,33 +1,24 @@
-use crate::Datasource;
 use crate::{
     ast::{self, WithName},
-    diagnostics::{DatamodelError, Diagnostics},
     dml,
-    transform::ast_to_dml::db::{self, ParserDatabase, ScalarFieldType},
+    transform::ast_to_dml::db,
 };
-use once_cell::sync::Lazy;
-use regex::Regex;
 use std::collections::HashMap;
 
 /// Helper for lifting a datamodel.
 ///
-/// When lifting, the AST is converted to the real datamodel, and additional
-/// semantics are attached.
-pub struct LiftAstToDml<'a> {
-    db: &'a ParserDatabase<'a>,
-    diagnostics: &'a mut Diagnostics,
+/// When lifting, the AST is converted to the Datamodel data structure, and
+/// additional semantics are attached.
+pub(crate) struct LiftAstToDml<'a> {
+    db: &'a db::ParserDatabase<'a>,
 }
 
 impl<'a> LiftAstToDml<'a> {
-    /// Creates a new instance, with all builtin attributes and
-    /// the attributes defined by the given sources registered.
-    ///
-    /// The attributes defined by the given sources will be namespaced.
-    pub(crate) fn new(db: &'a ParserDatabase<'a>, diagnostics: &'a mut Diagnostics) -> LiftAstToDml<'a> {
-        LiftAstToDml { db, diagnostics }
+    pub(crate) fn new(db: &'a db::ParserDatabase<'a>) -> LiftAstToDml<'a> {
+        LiftAstToDml { db }
     }
 
-    pub fn lift(&mut self) -> dml::Datamodel {
+    pub(crate) fn lift(&self) -> dml::Datamodel {
         let mut schema = dml::Datamodel::new();
 
         for (top_id, ast_obj) in self.db.ast().iter_tops() {
@@ -45,7 +36,7 @@ impl<'a> LiftAstToDml<'a> {
     }
 
     /// Internal: Validates a model AST node and lifts it to a DML model.
-    fn lift_model(&mut self, model_id: ast::ModelId, ast_model: &ast::Model) -> dml::Model {
+    fn lift_model(&self, model_id: ast::ModelId, ast_model: &ast::Model) -> dml::Model {
         let mut model = dml::Model::new(ast_model.name.name.clone(), None);
         let model_data = self.db.get_model_data(&model_id).unwrap();
 
@@ -155,29 +146,11 @@ impl<'a> LiftAstToDml<'a> {
     }
 
     /// Internal: Validates an enum AST node.
-    fn lift_enum(&mut self, enum_id: ast::EnumId, ast_enum: &ast::Enum) -> dml::Enum {
+    fn lift_enum(&self, enum_id: ast::EnumId, ast_enum: &ast::Enum) -> dml::Enum {
         let mut en = dml::Enum::new(&ast_enum.name.name, vec![]);
-
-        if !self.db.active_connector().supports_enums() {
-            self.diagnostics.push_error(DatamodelError::new_validation_error(
-                &format!(
-                    "You defined the enum `{}`. But the current connector does not support enums.",
-                    &ast_enum.name.name
-                ),
-                ast_enum.span,
-            ));
-            return en;
-        }
 
         for (value_idx, ast_enum_value) in ast_enum.values.iter().enumerate() {
             en.add_value(self.lift_enum_value(ast_enum_value, enum_id, value_idx as u32));
-        }
-
-        if en.values.is_empty() {
-            self.diagnostics.push_error(DatamodelError::new_validation_error(
-                "An enum must have at least one value.",
-                ast_enum.span,
-            ))
         }
 
         en.documentation = ast_enum.documentation.clone().map(|comment| comment.text);
@@ -207,28 +180,25 @@ impl<'a> LiftAstToDml<'a> {
     }
 
     fn lift_scalar_field_type(
-        &mut self,
+        &self,
         ast_field: &ast::Field,
         scalar_field_type: &db::ScalarFieldType,
         scalar_field_data: &db::ScalarField<'_>,
     ) -> dml::FieldType {
         match scalar_field_type {
-            ScalarFieldType::Enum(enum_id) => {
+            db::ScalarFieldType::Enum(enum_id) => {
                 let enum_name = &self.db.ast()[*enum_id].name.name;
                 dml::FieldType::Enum(enum_name.to_owned())
             }
-            ScalarFieldType::Unsupported => lift_unsupported_field_type(
-                ast_field,
-                ast_field.field_type.as_unsupported().unwrap().0,
-                self.db.datasource(),
-                self.diagnostics,
-            ),
-            ScalarFieldType::Alias(top_id) => {
+            db::ScalarFieldType::Unsupported => {
+                dml::FieldType::Unsupported(ast_field.field_type.as_unsupported().unwrap().0.to_owned())
+            }
+            db::ScalarFieldType::Alias(top_id) => {
                 let alias = &self.db.ast()[*top_id];
                 let scalar_field_type = self.db.alias_scalar_field_type(&top_id);
                 self.lift_scalar_field_type(alias, scalar_field_type, scalar_field_data)
             }
-            ScalarFieldType::BuiltInScalar(scalar_type) => {
+            db::ScalarFieldType::BuiltInScalar(scalar_type) => {
                 let native_type = scalar_field_data.native_type.as_ref().map(|(name, args)| {
                     self.db
                         .active_connector()
@@ -239,48 +209,4 @@ impl<'a> LiftAstToDml<'a> {
             }
         }
     }
-}
-
-fn lift_unsupported_field_type(
-    ast_field: &ast::Field,
-    unsupported_lit: &str,
-    source: Option<&Datasource>,
-    diagnostics: &mut Diagnostics,
-) -> dml::FieldType {
-    static TYPE_REGEX: Lazy<Regex> = Lazy::new(|| {
-        Regex::new(r#"(?x)
-    ^                           # beginning of the string
-    (?P<prefix>[^(]+)           # a required prefix that is any character until the first opening brace
-    (?:\((?P<params>.*?)\))?    # (optional) an opening parenthesis, a closing parenthesis and captured params in-between
-    (?P<suffix>.+)?             # (optional) captured suffix after the params until the end of the string
-    $                           # end of the string
-    "#).unwrap()
-    });
-
-    if let Some(source) = source {
-        let connector = &source.active_connector;
-
-        if let Some(captures) = TYPE_REGEX.captures(unsupported_lit) {
-            let prefix = captures.name("prefix").unwrap().as_str().trim();
-
-            let params = captures.name("params");
-            let args = match params {
-                None => vec![],
-                Some(params) => params.as_str().split(',').map(|s| s.trim().to_string()).collect(),
-            };
-
-            if let Ok(native_type) = connector.parse_native_type(prefix, args) {
-                let prisma_type = connector.scalar_type_for_native_type(native_type.serialized_native_type.clone());
-
-                let msg = format!(
-                        "The type `Unsupported(\"{}\")` you specified in the type definition for the field `{}` is supported as a native type by Prisma. Please use the native type notation `{} @{}.{}` for full support.",
-                        unsupported_lit, ast_field.name.name, prisma_type.to_string(), &source.name, native_type.render()
-                    );
-
-                diagnostics.push_error(DatamodelError::new_validation_error(&msg, ast_field.span));
-            }
-        }
-    }
-
-    dml::FieldType::Unsupported(unsupported_lit.into())
 }
