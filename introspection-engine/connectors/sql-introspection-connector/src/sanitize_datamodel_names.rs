@@ -1,5 +1,8 @@
 use crate::SqlFamilyTrait;
-use datamodel::{reserved_model_names, Datamodel, DefaultValue, Field, FieldType, Model, WithDatabaseName, WithName};
+use datamodel::{
+    reserved_model_names::is_reserved_type_name, Datamodel, DefaultValue, Field, FieldType, Model, WithDatabaseName,
+    WithName,
+};
 use introspection_connector::IntrospectionContext;
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
@@ -210,9 +213,7 @@ fn rename_reserved(model: &mut Model) {
 
 /// Reformats a reserved string as "Renamed{}"
 fn reformat_reserved_string(s: &str) -> String {
-    let validator = reserved_model_names::TypeNameValidator::new();
-
-    if validator.is_reserved(s) {
+    if is_reserved_type_name(s) {
         format!("Renamed{}", s)
     } else {
         s.to_owned()

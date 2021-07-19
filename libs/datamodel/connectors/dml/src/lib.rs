@@ -11,5 +11,3 @@ pub mod native_type_instance;
 pub mod relation_info;
 pub mod scalars;
 pub mod traits;
-
-use crate::relation_info::RelationInfo;

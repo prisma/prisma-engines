@@ -18,7 +18,7 @@ fn basic_index_must_work() {
     let user_model = schema.assert_has_model("User");
     user_model.assert_has_index(IndexDefinition {
         name: None,
-        db_name: None,
+        db_name: Some("User.firstName_lastName_index".to_string()),
         fields: vec!["firstName".to_string(), "lastName".to_string()],
         tpe: IndexType::Normal,
         defined_on_field: false,
@@ -26,7 +26,7 @@ fn basic_index_must_work() {
 }
 
 #[test]
-fn indexes_on_enum_fields_must_work() {
+fn ct() {
     let dml = r#"
     model User {
         id        Int    @id
@@ -45,7 +45,7 @@ fn indexes_on_enum_fields_must_work() {
     let user_model = schema.assert_has_model("User");
     user_model.assert_has_index(IndexDefinition {
         name: None,
-        db_name: None,
+        db_name: Some("User.role_index".to_string()),
         fields: vec!["role".to_string()],
         tpe: IndexType::Normal,
         defined_on_field: false,

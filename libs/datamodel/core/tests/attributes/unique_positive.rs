@@ -174,7 +174,7 @@ fn multi_field_unique_indexes_on_enum_fields_must_work() {
     let user_model = schema.assert_has_model("User");
     user_model.assert_has_index(IndexDefinition {
         name: None,
-        db_name: None,
+        db_name: Some("User.role_unique".to_string()),
         fields: vec!["role".to_string()],
         tpe: IndexType::Unique,
         defined_on_field: false,
@@ -199,7 +199,7 @@ fn single_field_unique_indexes_on_enum_fields_must_work() {
     let user_model = schema.assert_has_model("User");
     user_model.assert_has_index(IndexDefinition {
         name: None,
-        db_name: None,
+        db_name: Some("User.role_unique".to_string()),
         fields: vec!["role".to_string()],
         tpe: IndexType::Unique,
         defined_on_field: true,
@@ -246,6 +246,16 @@ fn mapped_multi_field_unique_must_work() {
 #[test]
 fn mapped_singular_unique_must_work() {
     let dml = r#"
+     datasource test {
+      provider = "mysql"
+      url = "mysql://root:prisma@127.0.0.1:3309/ReproIndexNames?connection_limit=1"
+    }
+    
+     generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["NamedConstraints"]
+     }
+    
      model Model {
          a String @unique(map: "test")
      }
@@ -271,13 +281,23 @@ fn mapped_singular_unique_must_work() {
         db_name: Some("test2".to_string()),
         fields: vec!["a".to_string()],
         tpe: IndexType::Unique,
-        defined_on_field: false,
+        defined_on_field: true,
     });
 }
 
 #[test]
 fn named_and_mapped_multi_field_unique_must_work() {
     let dml = r#"
+     datasource test {
+      provider = "mysql"
+      url = "mysql://root:prisma@127.0.0.1:3309/ReproIndexNames?connection_limit=1"
+    }
+    
+     generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["NamedConstraints"]
+     }
+    
      model Model {
          a String
          b Int

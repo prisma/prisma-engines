@@ -2,6 +2,7 @@ use super::Context;
 use crate::{
     ast::{self, Argument, FieldId, TopId, WithAttributes, WithIdentifier},
     diagnostics::DatamodelError,
+    reserved_model_names::{validate_enum_name, validate_model_name},
 };
 use dml::scalars::ScalarType;
 use std::{
@@ -41,6 +42,7 @@ pub(super) fn resolve_names(ctx: &mut Context<'_>) {
             (_, ast::Top::Enum(ast_enum)) => {
                 tmp_names.clear();
                 ast_enum.name.validate("Enum", &mut ctx.diagnostics);
+                validate_enum_name(ast_enum, &mut ctx.diagnostics);
                 ast_enum.validate_attributes(&mut ctx.diagnostics);
 
                 for value in &ast_enum.values {
@@ -60,6 +62,7 @@ pub(super) fn resolve_names(ctx: &mut Context<'_>) {
             }
             (ast::TopId::Model(model_id), ast::Top::Model(model)) => {
                 model.name.validate("Model", &mut ctx.diagnostics);
+                validate_model_name(model, &mut ctx.diagnostics);
                 model.validate_attributes(&mut ctx.diagnostics);
 
                 for (field_id, field) in model.iter_fields() {

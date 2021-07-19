@@ -7,11 +7,11 @@ mod context;
 mod names;
 mod types;
 
-pub(crate) use types::ScalarFieldType;
+pub(crate) use types::{ScalarField, ScalarFieldType};
 
 use self::{
     context::Context,
-    types::{RelationField, ScalarField, Types},
+    types::{RelationField, Types},
 };
 use crate::PreviewFeature;
 use crate::{ast, diagnostics::Diagnostics, Datasource};
@@ -158,9 +158,5 @@ impl<'ast> ParserDatabase<'ast> {
             .scalar_fields
             .range((model_id, ast::FieldId::ZERO)..=(model_id, ast::FieldId::MAX))
             .map(|((_, field_id), scalar_type)| (*field_id, scalar_type))
-    }
-
-    pub(super) fn get_enum(&self, name: &str) -> Option<&'ast ast::Enum> {
-        self.names.tops.get(name).and_then(|top_id| self.ast[*top_id].as_enum())
     }
 }

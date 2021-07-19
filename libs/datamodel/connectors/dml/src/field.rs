@@ -1,5 +1,5 @@
-use super::*;
 use crate::native_type_instance::NativeTypeInstance;
+use crate::relation_info::RelationInfo;
 use crate::scalars::ScalarType;
 use crate::traits::{Ignorable, WithDatabaseName, WithName};
 use crate::{
