@@ -1,11 +1,7 @@
-use crate::{
-    executor::{InterpretingExecutor, QueryExecutor},
-    CoreError,
-};
+use super::{interpreting_executor::InterpretingExecutor, QueryExecutor};
+use crate::CoreError;
 use connection_string::JdbcString;
 use connector::Connector;
-use std::str::FromStr;
-
 use datamodel::{
     common::{
         preview_features::PreviewFeature,
@@ -13,10 +9,10 @@ use datamodel::{
     },
     Datasource,
 };
-use std::collections::HashMap;
-use url::Url;
-
 use sql_connector::*;
+use std::collections::HashMap;
+use std::str::FromStr;
+use url::Url;
 
 #[cfg(feature = "mongodb")]
 use datamodel::common::provider_names::MONGODB_SOURCE_NAME;
@@ -25,6 +21,7 @@ use mongodb_connector::MongoDb;
 
 const DEFAULT_SQLITE_DB_NAME: &str = "main";
 
+/// Loads a query executor based on the parsed Prisma schema (datasource).
 #[tracing::instrument(name = "exec_loader", skip(source))]
 pub async fn load(
     source: &Datasource,

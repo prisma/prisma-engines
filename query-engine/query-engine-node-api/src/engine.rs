@@ -3,7 +3,7 @@ use datamodel::{diagnostics::ValidatedConfiguration, Datamodel};
 use napi::threadsafe_function::ThreadsafeFunction;
 use opentelemetry::global;
 use prisma_models::DatamodelConverter;
-use query_core::{exec_loader, schema_builder, BuildMode, QueryExecutor, QuerySchema, QuerySchemaRenderer};
+use query_core::{executor, schema_builder, BuildMode, QueryExecutor, QuerySchema, QuerySchemaRenderer};
 use request_handlers::{GraphQLSchemaRenderer, GraphQlBody, GraphQlHandler, PrismaResponse};
 use serde::{Deserialize, Serialize};
 use std::{
@@ -198,7 +198,7 @@ impl QueryEngine {
                             })
                             .map_err(|err| crate::error::ApiError::Conversion(err, builder.datamodel.raw.clone()))?;
 
-                        let (db_name, executor) = exec_loader::load(data_source, &preview_features, &url).await?;
+                        let (db_name, executor) = executor::load(data_source, &preview_features, &url).await?;
                         let connector = executor.primary_connector();
                         connector.get_connection().await?;
 
