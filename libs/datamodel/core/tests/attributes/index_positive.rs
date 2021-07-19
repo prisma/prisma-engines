@@ -76,6 +76,39 @@ fn the_name_argument_must_work() {
 }
 
 #[test]
+fn the_map_argument_must_work_with_preview_flag() {
+    let dml = r#"
+     datasource test {
+        provider = "mysql"
+        url = "mysql://root:prisma@127.0.0.1:3309/ReproIndexNames?connection_limit=1"
+     }
+        
+     generator js {
+        provider = "prisma-client-js"
+        previewFeatures = ["NamedConstraints"]
+     }
+    
+     model User {
+         id        Int    @id
+         firstName String
+         lastName  String
+
+         @@index([firstName,lastName], map: "MyIndexName")
+     }
+     "#;
+
+    let schema = parse(dml);
+    let user_model = schema.assert_has_model("User");
+    user_model.assert_has_index(IndexDefinition {
+        name: None,
+        db_name: Some("MyIndexName".to_string()),
+        fields: vec!["firstName".to_string(), "lastName".to_string()],
+        tpe: IndexType::Normal,
+        defined_on_field: false,
+    });
+}
+
+#[test]
 fn multiple_indexes_with_same_name_are_supported_by_mysql() {
     let dml = r#"
     datasource mysql {

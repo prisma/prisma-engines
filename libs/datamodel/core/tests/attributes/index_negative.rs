@@ -211,3 +211,22 @@ fn stringified_field_names_in_index_return_nice_error() {
         span: Span::new(135, 146),
     });
 }
+
+#[test]
+fn the_map_argument_must_be_rejected() {
+    let dml = r#"
+     model User {
+         id        Int    @id
+         firstName String
+         lastName  String
+
+         @@index([firstName,lastName], map: "MyIndexName")
+     }
+     "#;
+
+    let err = parse_error(dml);
+    err.assert_is(DatamodelError::UnusedArgumentError {
+        arg_name: "map".into(),
+        span: Span::new(141, 159),
+    });
+}
