@@ -1164,7 +1164,7 @@ async fn multiple_changed_relation_names_due_to_mapped_models(api: &TestApi) -> 
 }
 
 #[test_connector(tags(Postgres))]
-async fn virtual_cuid_default(api: &TestApi) -> TestResult {
+async fn virtual_cuid_default(api: &TestApi) {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -1180,9 +1180,15 @@ async fn virtual_cuid_default(api: &TestApi) -> TestResult {
                 t.add_column("id", types::primary());
             });
         })
-        .await?;
+        .await
+        .unwrap();
 
     let input_dm = indoc! {r#"
+        datasource db {
+            provider = "postgres"
+            url = env("TEST_DATABASE_URL")
+        }
+
         model User {
             id        String    @id @default(cuid()) @db.VarChar(30)
             non_id    String    @default(cuid()) @db.VarChar(30)
@@ -1208,9 +1214,7 @@ async fn virtual_cuid_default(api: &TestApi) -> TestResult {
         }
     "#};
 
-    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
-
-    Ok(())
+    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await.unwrap());
 }
 
 #[test_connector(tags(Postgres))]
@@ -1282,7 +1286,7 @@ async fn comments_should_be_kept(api: &TestApi) -> TestResult {
 }
 
 #[test_connector]
-async fn updated_at(api: &TestApi) -> TestResult {
+async fn updated_at(api: &TestApi) {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", move |t| {
@@ -1294,7 +1298,8 @@ async fn updated_at(api: &TestApi) -> TestResult {
                 t.add_column("id", types::primary());
             });
         })
-        .await?;
+        .await
+        .unwrap();
 
     let native_datetime = if api.sql_family().is_postgres() {
         "@db.Timestamp(6)"
@@ -1304,12 +1309,15 @@ async fn updated_at(api: &TestApi) -> TestResult {
         ""
     };
     let input_dm = formatdoc! {r#"
+        {datasource}
+
         model User {{
             id           Int @id @default(autoincrement())
             lastupdated  DateTime?  @updatedAt {native_datetime}
         }}
         "#,
         native_datetime = native_datetime,
+        datasource = api.datasource_block(),
     };
 
     let final_dm = formatdoc! {r#"
@@ -1325,13 +1333,11 @@ async fn updated_at(api: &TestApi) -> TestResult {
         native_datetime = native_datetime,
     };
 
-    api.assert_eq_datamodels(&final_dm, &api.re_introspect(&input_dm).await?);
-
-    Ok(())
+    api.assert_eq_datamodels(&final_dm, &api.re_introspect(&input_dm).await.unwrap());
 }
 
 #[test_connector(tags(Mssql))]
-async fn updated_at_with_native_types_on(api: &TestApi) -> TestResult {
+async fn updated_at_with_native_types_on(api: &TestApi) {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", move |t| {
@@ -1344,9 +1350,15 @@ async fn updated_at_with_native_types_on(api: &TestApi) -> TestResult {
                 t.add_column("id", types::primary());
             });
         })
-        .await?;
+        .await
+        .unwrap();
 
     let input_dm = indoc! {r#"
+        datasource db {
+            provider = "sqlserver"
+            url = env("TEST_DATABASE_URL")
+        }
+
         model User {
             id           Int    @id
             lastupdated  DateTime? @updatedAt
@@ -1366,9 +1378,7 @@ async fn updated_at_with_native_types_on(api: &TestApi) -> TestResult {
         }
     "#};
 
-    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
-
-    Ok(())
+    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await.unwrap());
 }
 
 #[test_connector]

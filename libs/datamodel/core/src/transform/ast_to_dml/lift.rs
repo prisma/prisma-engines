@@ -3,13 +3,8 @@ use crate::{
     ast::{self, WithName},
     diagnostics::{DatamodelError, Diagnostics},
     dml,
-    transform::{
-        ast_to_dml::db::{ParserDatabase, ScalarFieldType},
-        helpers::ValueValidator,
-    },
+    transform::ast_to_dml::db::{self, ParserDatabase, ScalarFieldType},
 };
-use datamodel_connector::connector_error::{ConnectorError, ErrorKind};
-use itertools::Itertools;
 use once_cell::sync::Lazy;
 use regex::Regex;
 use std::collections::HashMap;
@@ -101,11 +96,7 @@ impl<'a> LiftAstToDml<'a> {
         for (field_id, scalar_field_data) in self.db.iter_model_scalar_fields(model_id) {
             let ast_field = &ast_model[field_id];
             let arity = self.lift_field_arity(&ast_field.arity);
-            let mut attributes = Vec::with_capacity(ast_field.attributes.len());
-
-            let field_type = self.lift_scalar_field_type(ast_field, &scalar_field_data.r#type, &mut attributes);
-
-            attributes.extend(ast_field.attributes.iter().cloned());
+            let field_type = self.lift_scalar_field_type(ast_field, &scalar_field_data.r#type, &scalar_field_data);
 
             let mut field = dml::ScalarField::new(&ast_field.name.name, arity, field_type);
 
@@ -218,8 +209,8 @@ impl<'a> LiftAstToDml<'a> {
     fn lift_scalar_field_type(
         &mut self,
         ast_field: &ast::Field,
-        scalar_field_type: &ScalarFieldType,
-        collected_attributes: &mut Vec<ast::Attribute>,
+        scalar_field_type: &db::ScalarFieldType,
+        scalar_field_data: &db::ScalarField<'_>,
     ) -> dml::FieldType {
         match scalar_field_type {
             ScalarFieldType::Enum(enum_id) => {
@@ -234,145 +225,19 @@ impl<'a> LiftAstToDml<'a> {
             ),
             ScalarFieldType::Alias(top_id) => {
                 let alias = &self.db.ast()[*top_id];
-                collected_attributes.extend(alias.attributes.iter().cloned());
-                self.lift_scalar_field_type(alias, self.db.alias_scalar_field_type(top_id), collected_attributes)
+                let scalar_field_type = self.db.alias_scalar_field_type(&top_id).clone();
+                self.lift_scalar_field_type(alias, &scalar_field_type, scalar_field_data)
             }
             ScalarFieldType::BuiltInScalar(scalar_type) => {
-                let native_type = self
-                    .db
-                    .datasource()
-                    .and_then(|datasource| lift_native_type(ast_field, scalar_type, datasource, self.diagnostics));
-                dml::FieldType::Scalar(*scalar_type, None, native_type)
+                let native_type = scalar_field_data.native_type.as_ref().map(|(name, args)| {
+                    self.db
+                        .active_connector()
+                        .parse_native_type(name, args.clone())
+                        .unwrap()
+                });
+                dml::FieldType::Scalar(scalar_type.to_owned(), None, native_type)
             }
         }
-    }
-}
-
-fn lift_native_type(
-    ast_field: &ast::Field,
-    scalar_type: &dml::ScalarType,
-    datasource: &Datasource,
-    diagnostics: &mut Diagnostics,
-) -> Option<dml::NativeTypeInstance> {
-    let connector = &datasource.active_connector;
-    let prefix = format!("{}{}", datasource.name, ".");
-
-    let type_specifications_with_invalid_datasource_name = ast_field
-        .attributes
-        .iter()
-        .filter(|dir| dir.name.name.contains('.') && !dir.name.name.starts_with(&prefix))
-        .collect_vec();
-
-    if !type_specifications_with_invalid_datasource_name.is_empty() {
-        let incorrect_type_specification = type_specifications_with_invalid_datasource_name.first().unwrap();
-        let mut type_specification_name_split = incorrect_type_specification.name.name.split('.');
-        let given_prefix = type_specification_name_split.next().unwrap();
-        diagnostics.push_error(DatamodelError::new_connector_error(
-            &ConnectorError::from_kind(ErrorKind::InvalidPrefixForNativeTypes {
-                given_prefix: String::from(given_prefix),
-                expected_prefix: datasource.name.clone(),
-                suggestion: format!("{}{}", prefix, type_specification_name_split.next().unwrap()),
-            })
-            .to_string(),
-            incorrect_type_specification.span,
-        ));
-        return None;
-    }
-
-    let type_specifications = ast_field
-        .attributes
-        .iter()
-        .filter(|dir| dir.name.name.starts_with(&prefix))
-        .collect_vec();
-
-    let type_specification = type_specifications.first();
-
-    if type_specifications.len() > 1 {
-        diagnostics.push_error(DatamodelError::new_duplicate_attribute_error(
-            &prefix,
-            type_specification.unwrap().span,
-        ));
-        return None;
-    }
-
-    // convert arguments to string if possible
-    let number_args = type_specification.map(|dir| dir.arguments.clone());
-    let args = if let Some(number) = number_args {
-        number
-            .iter()
-            .map(|arg| ValueValidator::new(&arg.value).raw())
-            .collect_vec()
-    } else {
-        vec![]
-    };
-
-    let x = type_specification.map(|dir| dir.name.name.trim_start_matches(&prefix))?;
-    let constructor = if let Some(cons) = connector.find_native_type_constructor(x) {
-        cons
-    } else {
-        diagnostics.push_error(DatamodelError::new_connector_error(
-            &ConnectorError::from_kind(ErrorKind::NativeTypeNameUnknown {
-                native_type: x.parse().unwrap(),
-                connector_name: datasource.active_provider.clone(),
-            })
-            .to_string(),
-            type_specification.unwrap().span,
-        ));
-        return None;
-    };
-
-    let number_of_args = args.len();
-
-    if number_of_args < constructor._number_of_args
-        || ((number_of_args > constructor._number_of_args) && constructor._number_of_optional_args == 0)
-    {
-        diagnostics.push_error(DatamodelError::new_argument_count_missmatch_error(
-            x,
-            constructor._number_of_args,
-            number_of_args,
-            type_specification.unwrap().span,
-        ));
-        return None;
-    }
-
-    if number_of_args > constructor._number_of_args + constructor._number_of_optional_args
-        && constructor._number_of_optional_args > 0
-    {
-        diagnostics.push_error(DatamodelError::new_connector_error(
-            &ConnectorError::from_kind(ErrorKind::OptionalArgumentCountMismatchError {
-                native_type: x.parse().unwrap(),
-                optional_count: constructor._number_of_optional_args,
-                given_count: number_of_args,
-            })
-            .to_string(),
-            type_specification.unwrap().span,
-        ));
-        return None;
-    }
-
-    // check for compatibility with scalar type
-    if !constructor.prisma_types.contains(scalar_type) {
-        diagnostics.push_error(DatamodelError::new_connector_error(
-            &ConnectorError::from_kind(ErrorKind::IncompatibleNativeType {
-                native_type: x.parse().unwrap(),
-                field_type: scalar_type.to_string(),
-                expected_types: constructor.prisma_types.iter().map(|s| s.to_string()).join(" or "),
-            })
-            .to_string(),
-            type_specification.unwrap().span,
-        ));
-        return None;
-    }
-
-    match connector.parse_native_type(x, args) {
-        Err(connector_error) => {
-            diagnostics.push_error(DatamodelError::new_connector_error(
-                &connector_error.to_string(),
-                type_specification.unwrap().span,
-            ));
-            None
-        }
-        Ok(parsed_native_type) => Some(parsed_native_type),
     }
 }
 

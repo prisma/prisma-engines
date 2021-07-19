@@ -7,7 +7,6 @@ use datamodel::{Configuration, Datamodel};
 use introspection_connector::{
     ConnectorResult, DatabaseMetadata, IntrospectionConnector, IntrospectionContext, IntrospectionResult, Version,
 };
-use introspection_core::rpc::RpcImpl;
 use migration_connector::MigrationConnector;
 use quaint::{prelude::SqlFamily, single::Quaint};
 use sql_introspection_connector::SqlIntrospectionConnector;
@@ -203,7 +202,9 @@ impl TestApi {
 
     #[track_caller]
     pub fn assert_eq_datamodels(&self, expected_without_header: &str, result_with_header: &str) {
-        let parsed_expected = datamodel::parse_datamodel(&self.dm_with_sources(expected_without_header))
+        let expected = self.dm_with_sources(expected_without_header);
+        let parsed_expected = datamodel::parse_datamodel(&expected)
+            .map_err(|err| err.to_pretty_string("schema.prisma", &expected))
             .unwrap()
             .subject;
 
@@ -228,5 +229,7 @@ impl TestApi {
 
 #[track_caller]
 fn parse_datamodel(dm: &str) -> Datamodel {
-    RpcImpl::parse_datamodel(dm).unwrap()
+    datamodel::parse_datamodel_or_pretty_error(dm, "schema.prisma")
+        .unwrap()
+        .subject
 }

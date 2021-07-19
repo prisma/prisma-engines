@@ -75,6 +75,8 @@ pub(crate) struct ScalarField<'ast> {
     pub(crate) default: Option<dml::default_value::DefaultValue>,
     /// @map
     pub(super) mapped_name: Option<&'ast str>,
+    // Native type name and arguments
+    pub(crate) native_type: Option<(&'ast str, Vec<String>)>,
 }
 
 #[derive(Debug)]
@@ -160,6 +162,7 @@ fn visit_model<'ast>(model_id: ast::ModelId, ast_model: &'ast ast::Model, ctx: &
                     is_updated_at: false,
                     default: None,
                     mapped_name: None,
+                    native_type: None,
                 };
 
                 if matches!(scalar_field_type, ScalarFieldType::BuiltInScalar(t) if t.is_json())
