@@ -2,6 +2,7 @@ use super::{
     context::{Arguments, Context},
     types::{IndexData, ModelData, RelationField, ScalarField},
 };
+use crate::common::constraint_names::ConstraintNames;
 use crate::transform::ast_to_dml::db::types::PrimaryKeyData;
 use crate::PreviewFeature::NamedConstraints;
 use crate::{
@@ -9,9 +10,11 @@ use crate::{
     diagnostics::DatamodelError,
     dml,
     transform::{ast_to_dml::db::ScalarFieldType, helpers::ValueValidator},
+    IndexType,
 };
 use itertools::Itertools;
 use prisma_value::PrismaValue;
+use std::borrow::Cow;
 
 pub(super) fn resolve_model_and_field_attributes<'ast>(
     model_id: ast::ModelId,
@@ -233,31 +236,32 @@ fn visit_scalar_field_attributes<'ast>(
                 }
              }
 
-             let db_name = if ctx.db.preview_features.contains(NamedConstraints) {
-                 let parsed_name = match args.optional_arg("map").map(|name| name.as_str()) {
-                     Some(Ok("")) => error_on_empty_string(args, ctx, "map"),
+             let model_db_name = model_data.mapped_name.unwrap_or(&ast_model.name.name);
+             let field_db_name = scalar_field_data.mapped_name.unwrap_or(&ast_field.name.name);
+
+             let db_name : Option<Cow<'ast, str>> = if ctx.db.preview_features.contains(NamedConstraints) {
+                 let generated_name = Cow::from(ConstraintNames::index_name(model_db_name, &[field_db_name], IndexType::Unique, ctx.db.active_connector()));
+
+                 match args.optional_arg("map").map(|name| name.as_str()) {
+                     Some(Ok("")) => error_on_empty_string_cow(args, ctx, "map"),
                      Some(Ok(name)) => {
                          //todo length validation
-                         Some(name)
+                         Some(Cow::from(name))
                      }
                      Some(Err(err)) => {
                          ctx.push_error(err);
                          None
                      }
-                     None => None,
-                 };
-
-                 parsed_name.map(|n| n.into())
+                     None => Some(generated_name),
+                 }
              } else {
-                 let field_db_name = scalar_field_data.mapped_name.unwrap_or(&ast_field.name.name);
-                 let model_db_name = ctx.db.get_model_database_name(model_id).unwrap_or(&ast_model.name.name);
                  let generated_name = if ctx.is_sql_server() {
                      format!("{}_{}_unique", model_db_name, field_db_name)
                  } else {
                      format!("{}.{}_unique", model_db_name, field_db_name)
                  };
 
-                 Some(generated_name.into())
+                 Some(Cow::from(generated_name))
              };
 
 
@@ -579,6 +583,18 @@ fn model_index<'ast>(
     };
 
     common_index_validations(args, &mut index_data, model_id, ctx);
+    let ast_model = &ctx.db.ast[model_id];
+    let model_db_name = data.mapped_name.unwrap_or(&ast_model.name.name);
+
+    let field_db_names: Vec<&str> = index_data
+        .fields
+        .iter()
+        .map(|&field_id| {
+            ctx.db
+                .get_field_database_name(model_id, field_id)
+                .unwrap_or(&ast_model[field_id].name.name)
+        })
+        .collect();
 
     let (name, db_name) = if ctx.db.preview_features.contains(NamedConstraints) {
         // this is for compatibility reasons
@@ -588,25 +604,33 @@ fn model_index<'ast>(
             Some(Err(err)) => push_error(ctx, err),
             None => None,
         };
+
+        let generated_name = Cow::from(ConstraintNames::index_name(
+            model_db_name,
+            &field_db_names,
+            IndexType::Normal,
+            ctx.db.active_connector(),
+        ));
+
         let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
-            Some(Ok("")) => error_on_empty_string(args, ctx, "map"),
+            Some(Ok("")) => error_on_empty_string_cow(args, ctx, "map"),
             Some(Ok(name)) => {
                 //todo validation of length
-                Some(name)
+                Some(name.into())
             }
-            Some(Err(err)) => push_error(ctx, err),
-            None => None,
+            Some(Err(err)) => push_error_cow(ctx, err),
+            None => Some(generated_name),
         };
 
-        let (name_in_client, name_in_db) = match (name, db_name) {
-            (Some(_), Some(map)) => (None, Some(map)), //todo error here
+        let name_in_db = match (name, db_name) {
+            (Some(_), Some(map)) => Some(map), //todo error here
             //backwards compatibility, accept name arg on normal indexes and use it as map arg
-            (Some(name), None) => (None, Some(name)),
-            (None, Some(map)) => (None, Some(map)),
-            (None, None) => (None, Some("")), //todo new default name generated here
+            (Some(name), None) => Some(name.into()),
+            (None, Some(map)) => Some(map),
+            (None, None) => None,
         };
 
-        (name_in_client, name_in_db.map(|field| field.into()))
+        (None, name_in_db)
     } else {
         let name = match args.optional_arg("name").map(|name| name.as_str()) {
             Some(Ok("")) => error_on_empty_string(args, ctx, "name"),
@@ -615,20 +639,11 @@ fn model_index<'ast>(
             None => None,
         };
 
-        let ast_model = &ctx.db.ast[model_id];
-        let model_db_name = data.mapped_name.unwrap_or(&ast_model.name.name);
         //old default name logic moved from sql schema calculator
         let generated_name = format!(
             "{table}.{fields}_index",
             table = &model_db_name,
-            fields = index_data
-                .fields
-                .iter()
-                .map(|&field_id| ctx
-                    .db
-                    .get_field_database_name(model_id, field_id)
-                    .unwrap_or(&ast_model[field_id].name.name))
-                .join("_")
+            fields = field_db_names.join("_")
         );
 
         (None, name.map(|f| f.into()).or(Some(generated_name.into())))
@@ -641,6 +656,11 @@ fn model_index<'ast>(
 }
 
 fn push_error<'ast>(ctx: &mut Context<'ast>, err: DatamodelError) -> Option<&'ast str> {
+    ctx.push_error(err);
+    None
+}
+
+fn push_error_cow<'ast>(ctx: &mut Context<'ast>, err: DatamodelError) -> Option<Cow<'ast, str>> {
     ctx.push_error(err);
     None
 }
@@ -658,6 +678,19 @@ fn model_unique<'ast>(
     };
     common_index_validations(args, &mut index_data, model_id, ctx);
 
+    let ast_model = &ctx.db.ast[model_id];
+    let model_db_name = data.mapped_name.unwrap_or(&ast_model.name.name);
+
+    let field_db_names: Vec<&str> = index_data
+        .fields
+        .iter()
+        .map(|&field_id| {
+            ctx.db
+                .get_field_database_name(model_id, field_id)
+                .unwrap_or(&ast_model[field_id].name.name)
+        })
+        .collect();
+
     let (name, db_name) = if ctx.db.preview_features.contains(NamedConstraints) {
         //todo compatibility hack
 
@@ -670,17 +703,25 @@ fn model_unique<'ast>(
             Some(Err(err)) => push_error(ctx, err),
             None => None,
         };
+
+        let generated_name = Cow::from(ConstraintNames::index_name(
+            model_db_name,
+            &field_db_names,
+            IndexType::Unique,
+            ctx.db.active_connector(),
+        ));
+
         let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
-            Some(Ok("")) => error_on_empty_string(args, ctx, "map"),
+            Some(Ok("")) => error_on_empty_string_cow(args, ctx, "map"),
             Some(Ok(name)) => {
                 //todo validation for length
-                Some(name)
+                Some(name.into())
             }
-            Some(Err(err)) => push_error(ctx, err),
-            None => None,
+            Some(Err(err)) => push_error_cow(ctx, err),
+            None => Some(generated_name),
         };
 
-        (name, db_name.map(|n| n.into()))
+        (name, db_name)
     } else {
         let name = match args.optional_arg("name").map(|name| name.as_str()) {
             Some(Ok("")) => error_on_empty_string(args, ctx, "name"),
@@ -689,20 +730,11 @@ fn model_unique<'ast>(
             None => None,
         };
 
-        let ast_model = &ctx.db.ast[model_id];
-        let model_db_name = data.mapped_name.unwrap_or(&ast_model.name.name);
         //old default name logic moved from sql schema calculator
         let generated_name = format!(
             "{table}.{fields}_unique",
             table = &model_db_name,
-            fields = index_data
-                .fields
-                .iter()
-                .map(|&field_id| ctx
-                    .db
-                    .get_field_database_name(model_id, field_id)
-                    .unwrap_or(&ast_model[field_id].name.name))
-                .join("_")
+            fields = field_db_names.join("_")
         );
 
         (name, name.map(|f| f.into()).or(Some(generated_name.into())))
@@ -719,6 +751,17 @@ fn error_on_empty_string<'ast>(
     ctx: &mut Context<'ast>,
     attribute: &str,
 ) -> Option<&'ast str> {
+    ctx.push_error(
+        args.new_attribute_validation_error(&format!("The `{}` argument cannot be an empty string.", attribute)),
+    );
+    None
+}
+
+fn error_on_empty_string_cow<'ast>(
+    args: &mut Arguments<'ast>,
+    ctx: &mut Context<'ast>,
+    attribute: &str,
+) -> Option<Cow<'ast, str>> {
     ctx.push_error(
         args.new_attribute_validation_error(&format!("The `{}` argument cannot be an empty string.", attribute)),
     );

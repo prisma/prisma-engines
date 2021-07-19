@@ -72,6 +72,10 @@ impl<'a> LowerDmlToAst<'a> {
         // @unique
         if let dml::Field::ScalarField(sf) = field {
             if model.field_is_unique_and_defined_on_field(&sf.name) {
+                //check for preview flag
+                //check whether name is default
+                //then render it as map
+
                 attributes.push(ast::Attribute::new("unique", vec![]));
             }
         }
