@@ -7,11 +7,11 @@ mod context;
 mod names;
 mod types;
 
-pub(crate) use types::ScalarFieldType;
+pub(crate) use types::{ScalarField, ScalarFieldType};
 
 use self::{
     context::Context,
-    types::{RelationField, ScalarField, Types},
+    types::{RelationField, Types},
 };
 use crate::{ast, diagnostics::Diagnostics, Datasource};
 use datamodel_connector::{Connector, EmptyDatamodelConnector};

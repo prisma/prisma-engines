@@ -86,18 +86,22 @@ fn default_dbgenerated_should_work(api: TestApi) {
 
 #[test_connector(tags(Postgres))]
 fn uuid_default(api: TestApi) {
-    let dm = r#"
+    let dm = api.datamodel_with_provider(
+        r#"
         model A {
             id   String @id @db.Uuid
             uuid String @db.Uuid @default("00000000-0000-0000-0016-000000000004")
         }
-    "#;
+    "#,
+    );
 
     api.schema_push(dm).send().assert_green_bang();
 
     api.assert_schema().assert_table("A", |table| {
         table.assert_column("uuid", |col| {
-            col.assert_default(Some(DefaultValue::value("00000000-0000-0000-0016-000000000004")))
+            col.assert_default(Some(DefaultValue::db_generated(
+                "'00000000-0000-0000-0016-000000000004'::uuid",
+            )))
         })
     });
 }

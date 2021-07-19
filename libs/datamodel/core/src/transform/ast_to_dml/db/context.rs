@@ -104,11 +104,6 @@ impl<'ast> Context<'ast> {
         f(&mut attributes, self);
 
         for attribute in attributes.unused_attributes() {
-            // Native types...
-            if attribute.name.name.contains('.') {
-                continue;
-            }
-
             self.push_error(DatamodelError::new_attribute_not_known_error(
                 &attribute.name.name,
                 attribute.name.span,

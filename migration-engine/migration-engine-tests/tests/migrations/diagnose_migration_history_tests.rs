@@ -1009,14 +1009,16 @@ fn default_dbgenerated_should_not_cause_drift(api: TestApi) {
 fn default_uuid_should_not_cause_drift(api: TestApi) {
     let migrations_directory = api.create_migrations_directory();
 
-    let dm = r#"
+    let dm = api.datamodel_with_provider(
+        r#"
         model A {
             id   String @id @db.Uuid
             uuid String @db.Uuid @default("00000000-0000-0000-0016-000000000004")
         }
-    "#;
+    "#,
+    );
 
-    api.create_migration("01init", dm, &migrations_directory).send_sync();
+    api.create_migration("01init", &dm, &migrations_directory).send_sync();
 
     api.apply_migrations(&migrations_directory)
         .send_sync()

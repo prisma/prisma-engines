@@ -1,3 +1,5 @@
+mod native_types;
+
 use super::{
     context::{Arguments, Context},
     types::{IndexData, ModelData, RelationField, ScalarField},
@@ -201,6 +203,13 @@ fn visit_scalar_field_attributes<'ast>(
          attributes.visit_optional_single("default", ctx, |args, ctx| {
             visit_field_default(args, scalar_field_data, model_id, field_id, ctx);
          });
+
+        if let ScalarFieldType::BuiltInScalar(scalar_type) = scalar_field_data.r#type {
+            // native type attributes
+            attributes.visit_datasource_scoped(ctx, |type_name, args, ctx| {
+                native_types::visit_native_type_attribute(type_name, args, scalar_type, scalar_field_data, ctx)
+            });
+        }
 
          // @unique
          attributes.visit_optional_single("unique", ctx, |args, ctx| {
