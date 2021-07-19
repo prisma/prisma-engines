@@ -1,4 +1,6 @@
+use crate::common::constraint_names::ConstraintNames;
 use crate::transform::dml_to_ast::LowerDmlToAst;
+use crate::PreviewFeature::NamedConstraints;
 use crate::{
     ast::{self, Span},
     dml, Ignorable, IndexType, WithDatabaseName,
@@ -30,8 +32,26 @@ impl<'a> LowerDmlToAst<'a> {
                     LowerDmlToAst::field_array(&index_def.fields),
                 )];
 
-                if let Some(name) = &index_def.name {
-                    args.push(ast::Argument::new_string("name", name));
+                if self.preview_features.contains(NamedConstraints) {
+                    if let Some(name) = &index_def.name {
+                        args.push(ast::Argument::new_string("name", name));
+                    }
+
+                    if let Some(src) = self.datasource {
+                        if !ConstraintNames::index_name_matches(index_def, model, &*src.active_connector) {
+                            args.push(ast::Argument::new(
+                                "map",
+                                ast::Expression::StringValue(
+                                    String::from(index_def.db_name.as_ref().unwrap()),
+                                    Span::empty(),
+                                ),
+                            ));
+                        }
+                    }
+                } else {
+                    if let Some(name) = &index_def.name {
+                        args.push(ast::Argument::new_string("name", name));
+                    }
                 }
 
                 attributes.push(ast::Attribute::new("unique", args));
@@ -48,8 +68,22 @@ impl<'a> LowerDmlToAst<'a> {
                     LowerDmlToAst::field_array(&index_def.fields),
                 )];
 
-                if let Some(name) = &index_def.name {
-                    args.push(ast::Argument::new_string("name", name));
+                if self.preview_features.contains(NamedConstraints) {
+                    if let Some(src) = self.datasource {
+                        if !ConstraintNames::index_name_matches(index_def, model, &*src.active_connector) {
+                            args.push(ast::Argument::new(
+                                "map",
+                                ast::Expression::StringValue(
+                                    String::from(index_def.db_name.as_ref().unwrap()),
+                                    Span::empty(),
+                                ),
+                            ));
+                        }
+                    }
+                } else {
+                    if let Some(name) = &index_def.name {
+                        args.push(ast::Argument::new_string("name", name));
+                    }
                 }
 
                 attributes.push(ast::Attribute::new("index", args));

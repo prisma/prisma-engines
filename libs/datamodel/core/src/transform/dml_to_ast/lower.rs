@@ -6,7 +6,7 @@ use crate::{
 use enumflags2::BitFlags;
 
 pub struct LowerDmlToAst<'a> {
-    datasource: Option<&'a Datasource>,
+    pub datasource: Option<&'a Datasource>,
     pub preview_features: BitFlags<PreviewFeature>,
 }
 
@@ -72,7 +72,7 @@ impl<'a> LowerDmlToAst<'a> {
     }
 
     pub fn lower_field(&self, model: &dml::Model, field: &dml::Field, datamodel: &dml::Datamodel) -> ast::Field {
-        let mut attributes = self.lower_field_attributes(model, field, datamodel);
+        let mut attributes = self.lower_field_attributes(model, field, datamodel, self.datasource);
 
         let native_type = field.as_scalar_field().and_then(|sf| sf.field_type.as_native_type());
 

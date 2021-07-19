@@ -1,6 +1,8 @@
+use crate::common::constraint_names::ConstraintNames;
 use crate::common::preview_features::PreviewFeature;
 use crate::common::RelationNames;
 use crate::transform::dml_to_ast::LowerDmlToAst;
+use crate::PreviewFeature::NamedConstraints;
 use crate::{
     ast::{self, Attribute, Span},
     dml, Datasource, Field, Ignorable, WithDatabaseName,
@@ -59,6 +61,7 @@ impl<'a> LowerDmlToAst<'a> {
         model: &dml::Model,
         field: &dml::Field,
         datamodel: &dml::Datamodel,
+        datasource: Option<&Datasource>,
     ) -> Vec<ast::Attribute> {
         let mut attributes = vec![];
 
@@ -72,11 +75,28 @@ impl<'a> LowerDmlToAst<'a> {
         // @unique
         if let dml::Field::ScalarField(sf) = field {
             if model.field_is_unique_and_defined_on_field(&sf.name) {
-                //check for preview flag
-                //check whether name is default
-                //then render it as map
+                let mut arguments = vec![];
+                if self.preview_features.contains(NamedConstraints) {
+                    if let Some(src) = datasource {
+                        if let Some(idx) = model
+                            .indices
+                            .iter()
+                            .find(|id| id.is_unique() && id.defined_on_field && id.fields == [field.name()])
+                        {
+                            if !ConstraintNames::index_name_matches(idx, model, &*src.active_connector) {
+                                arguments.push(ast::Argument::new(
+                                    "map",
+                                    ast::Expression::StringValue(
+                                        String::from(idx.db_name.as_ref().unwrap()),
+                                        Span::empty(),
+                                    ),
+                                ));
+                            }
+                        }
+                    }
+                };
 
-                attributes.push(ast::Attribute::new("unique", vec![]));
+                attributes.push(ast::Attribute::new("unique", arguments));
             }
         }
 

@@ -1,5 +1,6 @@
-use crate::IndexType;
+use crate::{IndexType, WithDatabaseName};
 use datamodel_connector::Connector;
+use dml::model::{IndexDefinition, Model};
 
 pub struct ConstraintNames {}
 
@@ -51,6 +52,17 @@ impl ConstraintNames {
     //
     //     Some(format!("{}{}", trimmed, suffix))
     // }
+
+    pub fn index_name_matches(idx: &IndexDefinition, model: &Model, connector: &dyn Connector) -> bool {
+        let column_names: Vec<&str> = idx
+            .fields
+            .iter()
+            .map(|field_name| model.find_scalar_field(field_name).unwrap().final_database_name())
+            .collect();
+
+        idx.db_name.as_ref().unwrap()
+            == &ConstraintNames::index_name(model.final_database_name(), &column_names, idx.tpe, connector)
+    }
 
     pub fn index_name(table_name: &str, column_names: &[&str], tpe: IndexType, connector: &dyn Connector) -> String {
         let index_suffix = "_idx";

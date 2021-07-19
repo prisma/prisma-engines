@@ -1,10 +1,15 @@
 use crate::common::*;
-use datamodel::render_datamodel_to_string;
+use datamodel::render_datamodel_to_with_preview_flags;
 use indoc::indoc;
 
 #[test]
 fn constraint_names() {
     let input = indoc! {r#"
+    datasource test {
+      provider = "mysql"
+      url = "mysql://root:prisma@127.0.0.1:3309/ReproIndexNames?connection_limit=1"
+    }
+    
      generator js {
             provider = "prisma-client-js"
             previewFeatures = ["NamedConstraints"]
@@ -99,6 +104,11 @@ fn constraint_names() {
      "#};
 
     let expected = indoc! {r#"
+     datasource test {
+            provider = "mysql"
+            url = "mysql://root:prisma@127.0.0.1:3309/ReproIndexNames?connection_limit=1"
+     }
+    
      generator js {
             provider = "prisma-client-js"
             previewFeatures = ["NamedConstraints"]
@@ -192,9 +202,21 @@ fn constraint_names() {
      }
      "#};
 
-    let res = parse(input);
+    let datamodel = parse(input);
 
-    let rendered = render_datamodel_to_string(&res);
+    let preview_features = parse_configuration(input)
+        .preview_features()
+        .map(Clone::clone)
+        .collect();
+    println!("Parsed \n {:#?}", datamodel);
+
+    let mut rendered = String::new();
+    render_datamodel_to_with_preview_flags(
+        &mut rendered,
+        &datamodel,
+        parse_configuration(input).datasources.first(),
+        preview_features,
+    );
 
     println!("Rendered \n {}", rendered);
     println!("Expected \n {}", expected);
