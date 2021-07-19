@@ -137,4 +137,11 @@ impl<'ast> Context<'ast> {
 
         self.arguments = arguments;
     }
+
+    pub(crate) fn is_sql_server(&self) -> bool {
+        match self.db.datasource {
+            Some(src) if src.active_provider == "sqlserver" => true,
+            _ => false,
+        }
+    }
 }

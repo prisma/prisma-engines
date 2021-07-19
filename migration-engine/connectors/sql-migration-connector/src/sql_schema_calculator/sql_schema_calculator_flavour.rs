@@ -53,11 +53,6 @@ pub(crate) trait SqlSchemaCalculatorFlavour {
     fn m2m_foreign_key_action(&self, _model_a: &ModelWalker<'_>, _model_b: &ModelWalker<'_>) -> sql::ForeignKeyAction {
         sql::ForeignKeyAction::Cascade
     }
-
-    // TODO: Maybe we should rethink this a bit?
-    fn single_field_index_name(&self, model_name: &str, field_name: &str) -> String {
-        format!("{}.{}_unique", model_name, field_name)
-    }
 }
 
 fn convert_referential_action(action: ReferentialAction) -> sql::ForeignKeyAction {

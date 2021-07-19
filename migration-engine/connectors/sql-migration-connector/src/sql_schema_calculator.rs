@@ -2,7 +2,7 @@ mod sql_schema_calculator_flavour;
 
 pub(super) use sql_schema_calculator_flavour::SqlSchemaCalculatorFlavour;
 
-use crate::{flavour::SqlFlavour, sql_renderer::IteratorJoin};
+use crate::flavour::SqlFlavour;
 use datamodel::{
     walkers::{walk_models, walk_relations, ModelWalker, ScalarFieldWalker, TypeWalker},
     Configuration, Datamodel, DefaultValue, FieldArity, IndexDefinition, IndexType, ScalarType,
@@ -71,25 +71,8 @@ fn calculate_model_tables<'a>(
                     IndexType::Normal => sql::IndexType::Normal,
                 };
 
-                let index_name = index_definition.db_name.clone().unwrap_or_else(|| {
-                    //todo refactor into single function that can be moved to parser
-                    if index_definition.fields.len() == 1 && index_definition.is_unique() {
-                        let field = model
-                            .find_scalar_field(index_definition.fields.first().unwrap())
-                            .unwrap();
-                        flavour.single_field_index_name(model.db_name(), field.db_name())
-                    } else {
-                        format!(
-                            "{table}.{fields}_{qualifier}",
-                            table = &model.db_name(),
-                            fields = referenced_fields.iter().map(|field| field.db_name()).join("_"),
-                            qualifier = if index_type.is_unique() { "unique" } else { "index" },
-                        )
-                    }
-                });
-
                 sql::Index {
-                    name: index_name,
+                    name: index_definition.db_name.clone().unwrap(),
                     // The model index definition uses the model field names, but the SQL Index wants the column names.
                     columns: referenced_fields
                         .iter()

@@ -2,6 +2,7 @@ use super::{
     context::{Arguments, Context},
     types::{IndexData, ModelData, RelationField, ScalarField},
 };
+use crate::ast::FieldId;
 use crate::transform::ast_to_dml::db::types::PrimaryKeyData;
 use crate::PreviewFeature::NamedConstraints;
 use crate::{
@@ -255,7 +256,7 @@ fn visit_scalar_field_attributes<'ast>(
                 fields: vec![field_id],
                 source_field: Some(field_id),
                 name: None,
-                db_name,
+                db_name: db_name.map(|name| name.into()),
             })
          });
     });
@@ -562,11 +563,21 @@ fn model_index<'ast>(
     model_id: ast::ModelId,
     ctx: &mut Context<'ast>,
 ) {
+    let mut index_data = IndexData {
+        is_unique: false,
+        ..Default::default()
+    };
+
+    let ast_model = &ctx.db.ast[model_id];
+    let model_db_name = data.mapped_name.unwrap_or(&ast_model.name.name);
+
+    common_index_validations(args, &mut index_data, model_id, ctx);
+
     let (name, db_name) = if ctx.db.preview_features.contains(NamedConstraints) {
         // this is for compatibility reasons
         let name = match args.optional_arg("name").map(|name| name.as_str()) {
             Some(Ok("")) => error_on_empty_string(args, ctx, "name"),
-            Some(Ok(name)) => Some(name), // todo client validation
+            Some(Ok(name)) => Some(name),
             Some(Err(err)) => push_error(ctx, err),
             None => None,
         };
@@ -585,10 +596,10 @@ fn model_index<'ast>(
             //backwards compatibility, accept name arg on normal indexes and use it as map arg
             (Some(name), None) => (None, Some(name)),
             (None, Some(map)) => (None, Some(map)),
-            (None, None) => (None, Some("")), //todo default name generated here
+            (None, None) => (None, Some("")), //todo new default name generated here
         };
 
-        (name_in_client, name_in_db)
+        (name_in_client, name_in_db.map(|field| field.into()))
     } else {
         let name = match args.optional_arg("name").map(|name| name.as_str()) {
             Some(Ok("")) => error_on_empty_string(args, ctx, "name"),
@@ -597,17 +608,37 @@ fn model_index<'ast>(
             None => None,
         };
 
-        (None, name)
+        let field_db_name = |field_id: FieldId| {
+            ctx.db
+                .get_field_database_name(model_id, field_id)
+                .unwrap_or(&ast_model[field_id].name.name)
+        };
+
+        //old default name logic moved from sql schema calculator
+        let generated_name = if index_data.fields.len() == 1 && index_data.is_unique {
+            let field_db_name = field_db_name(*index_data.fields.first().unwrap());
+            if ctx.is_sql_server() {
+                format!("{}_{}_unique", model_db_name, field_db_name)
+            } else {
+                format!("{}.{}_unique", model_db_name, field_db_name)
+            }
+        } else {
+            format!(
+                "{table}.{fields}_index",
+                table = &model_db_name,
+                fields = index_data
+                    .fields
+                    .iter()
+                    .map(|&field_id| field_db_name(field_id))
+                    .join("_")
+            )
+        };
+
+        (None, name.map(|f| f.into()).or(Some(generated_name.into())))
     };
 
-    let mut index_data = IndexData {
-        is_unique: false,
-        name,
-        db_name,
-        ..Default::default()
-    };
-
-    common_index_validations(args, &mut index_data, model_id, ctx);
+    index_data.name = name;
+    index_data.db_name = db_name;
 
     data.indexes.push(index_data);
 }
@@ -661,7 +692,7 @@ fn model_unique<'ast>(
     let mut index_data = IndexData {
         is_unique: true,
         name,
-        db_name,
+        db_name: db_name.map(|name| name.into()),
         ..Default::default()
     };
     common_index_validations(args, &mut index_data, model_id, ctx);

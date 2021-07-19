@@ -77,7 +77,7 @@ impl<'a> LiftAstToDml<'a> {
             .iter()
             .map(|idx| dml::IndexDefinition {
                 name: idx.name.map(String::from),
-                db_name: idx.db_name.map(String::from),
+                db_name: idx.db_name.as_ref().map(|name| name.to_string()),
                 fields: idx
                     .fields
                     .iter()

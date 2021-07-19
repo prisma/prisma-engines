@@ -1,6 +1,7 @@
 use super::{attributes, context::Context};
 use crate::{ast, diagnostics::DatamodelError};
 use itertools::Itertools;
+use std::borrow::Cow;
 use std::{
     collections::{BTreeMap, HashMap},
     str::FromStr,
@@ -124,7 +125,7 @@ pub(crate) struct IndexData<'ast> {
     pub(crate) fields: Vec<ast::FieldId>,
     pub(crate) source_field: Option<ast::FieldId>,
     pub(crate) name: Option<&'ast str>,
-    pub(crate) db_name: Option<&'ast str>,
+    pub(crate) db_name: Option<Cow<'ast, str>>,
 }
 
 #[derive(Debug, Default)]
