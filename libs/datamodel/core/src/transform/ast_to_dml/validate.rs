@@ -51,10 +51,6 @@ impl<'a> Validator<'a> {
                 diagnostics.push_error(err);
             }
 
-            if let Err(err) = self.validate_model_name(ast_model, model) {
-                diagnostics.push_error(err);
-            }
-
             if let Err(err) = self.validate_relations_not_ambiguous(ast_schema, model) {
                 diagnostics.push_error(err);
             }
@@ -78,12 +74,6 @@ impl<'a> Validator<'a> {
             if let Err(ref mut the_errors) = self.validate_referenced_fields_for_relation(schema, ast_model, model) {
                 diagnostics.append(the_errors);
             }
-        }
-
-        // Enum level validations.
-        for declared_enum in schema.enums() {
-            let ast_enum = db.get_enum(&declared_enum.name).expect(STATE_ERROR);
-            self.validate_enum_name(ast_enum, declared_enum, diagnostics);
         }
     }
 
@@ -249,38 +239,6 @@ impl<'a> Validator<'a> {
         }
 
         Ok(())
-    }
-
-    fn validate_model_name(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), DatamodelError> {
-        let validator = super::reserved_model_names::TypeNameValidator::new();
-
-        if validator.is_reserved(&model.name) {
-            Err(DatamodelError::new_model_validation_error(
-                &format!(
-                    "The model name `{}` is invalid. It is a reserved name. Please change it. Read more at https://pris.ly/d/naming-models",
-                    &model.name
-                ),
-                &model.name,
-                ast_model.span,
-            ))
-        } else {
-            Ok(())
-        }
-    }
-
-    fn validate_enum_name(&self, ast_enum: &ast::Enum, dml_enum: &dml::Enum, diagnostics: &mut Diagnostics) {
-        let validator = super::reserved_model_names::TypeNameValidator::new();
-
-        if validator.is_reserved(&dml_enum.name) {
-            diagnostics.push_error(DatamodelError::new_enum_validation_error(
-        &format!(
-          "The enum name `{}` is invalid. It is a reserved name. Please change it. Read more at https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-schema/data-model#naming-enums",
-          &dml_enum.name
-        ),
-        &dml_enum.name,
-        ast_enum.span,
-      ))
-        }
     }
 
     fn validate_field_connector_specific(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), Diagnostics> {
