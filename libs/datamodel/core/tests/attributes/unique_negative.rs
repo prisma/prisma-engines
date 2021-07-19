@@ -198,3 +198,78 @@ fn must_error_when_using_the_same_field_multiple_times() {
         Span::new(83, 105),
     ));
 }
+
+#[test]
+fn invalid_name_for_compound_unique_must_error() {
+    let dml = r#"
+     model User {
+         name           String            
+         identification Int
+
+         @@unique([name, identification], name: "Test.User")
+     }
+     "#;
+
+    let errors = parse_error(dml);
+    errors.assert_is(DatamodelError::new_model_validation_error(
+        "The `name` property within the `@@unique` attribute only allows for the following characters: `_a-zA-Z0-9`.",
+        "User",
+        Span::new(98, 147),
+    ));
+}
+
+#[test]
+fn naming_unique_to_a_field_name_should_error() {
+    let dml = r#"
+     model User {
+         used           Int
+         name           String            
+         identification Int
+
+         @@unique([name, identification], name: "used")
+     }
+     "#;
+
+    let errors = parse_error(dml);
+    errors.assert_is(DatamodelError::new_model_validation_error(
+        "The custom name specified for the `@@unique` attribute is already used as a name for a field. Please choose a different name.",
+        "User",
+        Span::new(5, 175),
+    ));
+}
+
+#[test]
+fn mapping_unique_with_a_name_that_is_too_long_should_error() {
+    let dml = r#"
+         datasource test {
+         provider = "postgresql"
+         url = "postgresql://root:prisma@127.0.0.1:3309/postgres"
+     }
+     
+     model User {
+         name           String            
+         identification Int
+
+         @@unique([name, identification], map: "IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimits")
+     }
+     
+     model User1 {
+         name           String @unique("IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimitsHereAsWell")            
+         identification Int      
+     }
+     "#;
+
+    let errors = parse_error(dml);
+    errors.assert_are(&[
+        DatamodelError::new_model_validation_error(
+            "The name specified for the `@unique` constraint `IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimits` is too long for your chosen provider. The maximum allowed length is 63 bytes.",
+            "User",
+            Span::new(139, 396),
+        ),
+        DatamodelError::new_model_validation_error(
+            "The name specified for the `@unique` constraint `IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimitsHereAsWell` is too long for your chosen provider. The maximum allowed length is 63 bytes.",
+            "User1",
+            Span::new(406, 641),
+        ),
+    ]);
+}
