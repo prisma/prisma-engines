@@ -2,48 +2,48 @@
 //! engine to ensure integrity. This module contains common logic that should be
 //! used everywhere for consistency.
 
-use sha2::{Digest, Sha256};
-
-/// Compute the checksum for a migration script, and render it formatted to a
-/// human readable string.
+/// Compute the checksum for a new migration script, and render it formatted to
+/// a human readable string.
 pub(crate) fn render_checksum(script: &str) -> String {
-    let mut hasher = Sha256::new();
-
-    // Normalize line endings so checksums are identical between unix-like
-    // systems and windows.
-    //
-    // This is necessary because git messes with line endings. For background
-    // information, read
-    // https://web.archive.org/web/20150912185006/http://adaptivepatchwork.com:80/2012/03/01/mind-the-end-of-your-line/
-    if script.contains("\r\n") {}
-
-    hasher.update(script.as_bytes());
-    let checksum: [u8; 32] = hasher.finalize().into();
-    checksum.format_checksum()
+    compute_checksum(script).format_checksum()
 }
 
 /// Returns whether a migration script matches an existing checksum.
 pub(crate) fn script_matches_checksum(script: &str, checksum: &str) -> bool {
-    let script_checksum = compute_checksum(script);
+    use std::iter::{once, once_with};
 
-    // Due to an omission in a previous version of the migration engine,
-    // some migrations tables will have old migrations with checksum strings
-    // that have not been zero-padded.
+    // Checksum with potentially different line endings, so checksums will match
+    // between Unix-like systems and Windows.
     //
-    // Corresponding issue:
-    // https://github.com/prisma/prisma-engines/issues/1887
-    let script_checksum_str = if !checksum.is_empty() && checksum.len() != CHECKSUM_STR_LEN {
-        script_checksum.format_checksum_old()
-    } else {
-        script_checksum.format_checksum()
-    };
+    // This is necessary because git messes with line endings. For background
+    // information, read
+    // https://web.archive.org/web/20150912185006/http://adaptivepatchwork.com:80/2012/03/01/mind-the-end-of-your-line/
+    let mut script_checksums = once(compute_checksum(script))
+        .chain(once_with(|| compute_checksum(&script.replace("\r\n", "\n"))))
+        .chain(once_with(|| compute_checksum(&script.replace("\n", "\r\n"))));
 
-    script_checksum_str == checksum
+    script_checksums.any(|script_checksum| {
+        // Due to an omission in a previous version of the migration engine,
+        // some migrations tables will have old migrations with checksum strings
+        // that have not been zero-padded.
+        //
+        // Corresponding issue:
+        // https://github.com/prisma/prisma-engines/issues/1887
+        let script_checksum_str = if !checksum.is_empty() && checksum.len() != CHECKSUM_STR_LEN {
+            script_checksum.format_checksum_old()
+        } else {
+            script_checksum.format_checksum()
+        };
+
+        script_checksum_str == checksum
+    })
 }
 
+/// Checksumming implementation. This should be the single place where we do this.
 fn compute_checksum(script: &str) -> [u8; 32] {
+    use sha2::{Digest, Sha256};
     let mut hasher = Sha256::new();
-    hasher.update(&script);
+    hasher.update(script);
     hasher.finalize().into()
 }
 
@@ -105,5 +105,28 @@ mod tests {
             "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824"
         );
         assert_eq!(render_checksum("abcd").len(), CHECKSUM_STR_LEN);
+    }
+
+    #[test]
+    fn script_matches_checksum_is_line_ending_agnostic() {
+        let scripts = &[
+            &["ab\ncd\nef\ngh\rab", "ab\r\ncd\r\nef\r\ngh\rab"],
+            &["ab\ncd\nef\ngh\rab\n", "ab\r\ncd\r\nef\r\ngh\rab\r\n"],
+        ];
+
+        // for loops go brrrrrrrrr
+        for scripts in scripts {
+            for script in *scripts {
+                for other_script in *scripts {
+                    assert!(script_matches_checksum(script, &render_checksum(other_script)),);
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn script_matches_checksum_negative() {
+        assert!(!script_matches_checksum("abc", &render_checksum("abcd")));
+        assert!(!script_matches_checksum("abc\n", &render_checksum("abc")));
     }
 }
