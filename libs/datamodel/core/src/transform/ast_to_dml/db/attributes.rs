@@ -172,20 +172,24 @@ fn visit_scalar_field_attributes<'ast>(
                 None => {
                     let db_name = if ctx.db.preview_features.contains(NamedConstraints) {
                         match args.optional_arg("map").map(|name| name.as_str()) {
-                            Some(Ok("")) => error_on_empty_string(args, ctx, "map"),
-                            Some(Ok(name)) => {
-                                //todo length validation
-                                Some(name)
-                            }
-                            Some(Err(err)) => {
-                                ctx.push_error(err);
-                                None
-                            }
+                            Some(Ok("")) => error_on_empty_string_cow(args, ctx, "map"),
+                            Some(Ok(name)) => Some(name.into()),
+                            Some(Err(err)) => push_error_cow(ctx, err),
                             None => None,
                         }
                     } else {
                         None
                     };
+
+                    if let Some(err) = ConstraintNames::is_db_name_too_long(
+                        args.span(),
+                        &ast_model.name.name,
+                        &db_name,
+                        "@id",
+                        ctx.db.active_connector(),
+                    ) {
+                        ctx.push_error(err);
+                    }
 
                     model_data.primary_key = Some(PrimaryKeyData{
                         name: None,
@@ -455,12 +459,12 @@ fn visit_field_default(
 
 /// @@id on models
 fn visit_model_id<'ast>(
-    id_args: &mut Arguments<'ast>,
+    args: &mut Arguments<'ast>,
     model_data: &mut ModelData<'ast>,
     model_id: ast::ModelId,
     ctx: &mut Context<'ast>,
 ) {
-    let fields = match id_args.default_arg("fields") {
+    let fields = match args.default_arg("fields") {
         Ok(value) => value,
         Err(err) => return ctx.push_error(err),
     };
@@ -469,11 +473,11 @@ fn visit_model_id<'ast>(
         return ctx.push_error(DatamodelError::new_model_validation_error(
             "The current connector does not support compound ids.",
             ctx.db.ast[model_id].name(),
-            id_args.span(),
+            args.span(),
         ));
     }
 
-    let resolved_fields = match resolve_field_array(&fields, id_args.span(), model_id, ctx) {
+    let resolved_fields = match resolve_field_array(&fields, args.span(), model_id, ctx) {
         Ok(fields) => fields,
         Err(FieldResolutionError::AlreadyDealtWith) => return,
         Err(FieldResolutionError::ProblematicFields {
@@ -492,15 +496,14 @@ fn visit_model_id<'ast>(
             }
 
             if !relation_fields.is_empty() {
-                ctx.push_error(DatamodelError::new_model_validation_error(&format!("The id definition refers to the relation fields {}. ID definitions must reference only scalar fields.", relation_fields.iter().map(|(f, _)| f.name()).join(", ")), ctx.db.ast[model_id].name(), id_args.span()));
+                ctx.push_error(DatamodelError::new_model_validation_error(&format!("The id definition refers to the relation fields {}. ID definitions must reference only scalar fields.", relation_fields.iter().map(|(f, _)| f.name()).join(", ")), ctx.db.ast[model_id].name(), args.span()));
             }
 
             return;
         }
     };
 
-    let model = &ctx.db.ast[model_id];
-    let model_name = &model.name();
+    let ast_model = &ctx.db.ast[model_id];
 
     // ID attribute fields must reference only required fields.
     let fields_that_are_not_required: Vec<&str> = resolved_fields
@@ -516,26 +519,23 @@ fn visit_model_id<'ast>(
                 "The id definition refers to the optional fields {}. ID definitions must reference only required fields.",
                 fields_that_are_not_required.join(", ")
             ),
-            model_name,
-            id_args.span(),
+            &ast_model.name.name,
+            args.span(),
         ))
     }
 
     if model_data.primary_key.is_some() {
         ctx.push_error(DatamodelError::new_model_validation_error(
             "Each model must have at most one id criteria. You can't have `@id` and `@@id` at the same time.",
-            model.name(),
-            model.span,
+            ast_model.name(),
+            ast_model.span,
         ))
     }
 
     let (name, db_name) = if ctx.db.preview_features.contains(NamedConstraints) {
-        let name = match id_args.optional_arg("name").map(|name| name.as_str()) {
-            Some(Ok("")) => error_on_empty_string(id_args, ctx, "name"),
-            Some(Ok(name)) => {
-                //todo name validation to not contain . etc..
-                Some(name)
-            }
+        let name = match args.optional_arg("name").map(|name| name.as_str()) {
+            Some(Ok("")) => error_on_empty_string(args, ctx, "name"),
+            Some(Ok(name)) => Some(name),
             Some(Err(err)) => {
                 ctx.push_error(err);
                 None
@@ -543,18 +543,27 @@ fn visit_model_id<'ast>(
             None => None,
         };
 
-        let db_name = match id_args.optional_arg("map").map(|name| name.as_str()) {
-            Some(Ok("")) => error_on_empty_string(id_args, ctx, "map"),
-            Some(Ok(name)) => {
-                //todo length validation
-                Some(name)
-            }
-            Some(Err(err)) => {
-                ctx.push_error(err);
-                None
-            }
+        let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
+            Some(Ok("")) => error_on_empty_string_cow(args, ctx, "map"),
+            Some(Ok(name)) => Some(name.into()),
+            Some(Err(err)) => push_error_cow(ctx, err),
             None => None,
         };
+
+        if let Some(err) = ConstraintNames::is_client_name_valid(args.span(), &ast_model.name.name, name, "@@id") {
+            ctx.push_error(err);
+        }
+
+        if let Some(err) = ConstraintNames::is_db_name_too_long(
+            args.span(),
+            &ast_model.name.name,
+            &db_name,
+            "@@id",
+            ctx.db.active_connector(),
+        ) {
+            ctx.push_error(err);
+        }
+
         (name, db_name)
     } else {
         (None, None)
@@ -614,15 +623,10 @@ fn model_index<'ast>(
                 .unwrap_or(&ast_model[field_id].name.name)
         })
         .collect();
+    let name = get_name_argument(args, ctx);
 
     let (name, db_name) = if ctx.db.preview_features.contains(NamedConstraints) {
         // this is for compatibility reasons
-        let name = match args.optional_arg("name").map(|name| name.as_str()) {
-            Some(Ok("")) => error_on_empty_string(args, ctx, "name"),
-            Some(Ok(name)) => Some(name),
-            Some(Err(err)) => push_error(ctx, err),
-            None => None,
-        };
 
         let generated_name = Cow::from(ConstraintNames::index_name(
             model_db_name,
@@ -633,10 +637,7 @@ fn model_index<'ast>(
 
         let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
             Some(Ok("")) => error_on_empty_string_cow(args, ctx, "map"),
-            Some(Ok(name)) => {
-                //todo validation of length
-                Some(name.into())
-            }
+            Some(Ok(name)) => Some(name.into()),
             Some(Err(err)) => push_error_cow(ctx, err),
             None => Some(generated_name),
         };
@@ -661,13 +662,6 @@ fn model_index<'ast>(
 
         (None, db_name)
     } else {
-        let name = match args.optional_arg("name").map(|name| name.as_str()) {
-            Some(Ok("")) => error_on_empty_string(args, ctx, "name"),
-            Some(Ok(name)) => Some(name),
-            Some(Err(err)) => push_error(ctx, err),
-            None => None,
-        };
-
         //old default name logic moved from sql schema calculator
         let generated_name = format!(
             "{table}.{fields}_index",
@@ -675,13 +669,22 @@ fn model_index<'ast>(
             fields = field_db_names.join("_")
         );
 
-        (None, name.map(|f| f.into()).or(Some(generated_name.into())))
+        (None, name.map(|f| f.into()).or_else(|| Some(generated_name.into())))
     };
 
     index_data.name = name;
     index_data.db_name = db_name;
 
     data.indexes.push(index_data);
+}
+
+fn get_name_argument<'ast>(args: &mut Arguments<'ast>, ctx: &mut Context<'ast>) -> Option<&'ast str> {
+    match args.optional_arg("name").map(|name| name.as_str()) {
+        Some(Ok("")) => error_on_empty_string(args, ctx, "name"),
+        Some(Ok(name)) => Some(name),
+        Some(Err(err)) => push_error(ctx, err),
+        None => None,
+    }
 }
 
 fn push_error<'ast>(ctx: &mut Context<'ast>, err: DatamodelError) -> Option<&'ast str> {
@@ -720,15 +723,10 @@ fn model_unique<'ast>(
         })
         .collect();
 
+    let name = get_name_argument(args, ctx);
+
     let (name, db_name) = if ctx.db.preview_features.contains(NamedConstraints) {
         //todo compatibility hack
-
-        let name = match args.optional_arg("name").map(|name| name.as_str()) {
-            Some(Ok("")) => error_on_empty_string(args, ctx, "name"),
-            Some(Ok(name)) => Some(name),
-            Some(Err(err)) => push_error(ctx, err),
-            None => None,
-        };
 
         let generated_name = Cow::from(ConstraintNames::index_name(
             model_db_name,
@@ -760,13 +758,6 @@ fn model_unique<'ast>(
 
         (name, db_name)
     } else {
-        let name = match args.optional_arg("name").map(|name| name.as_str()) {
-            Some(Ok("")) => error_on_empty_string(args, ctx, "name"),
-            Some(Ok(name)) => Some(name),
-            Some(Err(err)) => push_error(ctx, err),
-            None => None,
-        };
-
         //old default name logic moved from sql schema calculator
         let generated_name = format!(
             "{table}.{fields}_unique",
@@ -774,7 +765,7 @@ fn model_unique<'ast>(
             fields = field_db_names.join("_")
         );
 
-        (name, name.map(|f| f.into()).or(Some(generated_name.into())))
+        (name, name.map(|f| f.into()).or_else(|| Some(generated_name.into())))
     };
 
     index_data.name = name;

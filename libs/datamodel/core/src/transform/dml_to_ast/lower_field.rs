@@ -1,11 +1,10 @@
-use crate::common::constraint_names::ConstraintNames;
 use crate::common::preview_features::PreviewFeature;
 use crate::common::RelationNames;
 use crate::transform::dml_to_ast::LowerDmlToAst;
 use crate::PreviewFeature::NamedConstraints;
 use crate::{
     ast::{self, Attribute, Span},
-    dml, Datasource, Field, Ignorable, WithDatabaseName,
+    dml, Datasource, Field, Ignorable,
 };
 use prisma_value::PrismaValue;
 
@@ -61,7 +60,6 @@ impl<'a> LowerDmlToAst<'a> {
         model: &dml::Model,
         field: &dml::Field,
         datamodel: &dml::Datamodel,
-        datasource: Option<&Datasource>,
     ) -> Vec<ast::Attribute> {
         let mut attributes = vec![];
 
@@ -77,22 +75,12 @@ impl<'a> LowerDmlToAst<'a> {
             if model.field_is_unique_and_defined_on_field(&sf.name) {
                 let mut arguments = vec![];
                 if self.preview_features.contains(NamedConstraints) {
-                    if let Some(src) = datasource {
-                        if let Some(idx) = model
-                            .indices
-                            .iter()
-                            .find(|id| id.is_unique() && id.defined_on_field && id.fields == [field.name()])
-                        {
-                            if !ConstraintNames::index_name_matches(idx, model, &*src.active_connector) {
-                                arguments.push(ast::Argument::new(
-                                    "map",
-                                    ast::Expression::StringValue(
-                                        String::from(idx.db_name.as_ref().unwrap()),
-                                        Span::empty(),
-                                    ),
-                                ));
-                            }
-                        }
+                    if let Some(idx) = model
+                        .indices
+                        .iter()
+                        .find(|id| id.is_unique() && id.defined_on_field && id.fields == [field.name()])
+                    {
+                        self.push_index_map_argument(model, idx, &mut arguments)
                     }
                 };
 
@@ -117,15 +105,7 @@ impl<'a> LowerDmlToAst<'a> {
         }
 
         // @map
-        if let Some(db_name) = field.database_name() {
-            attributes.push(ast::Attribute::new(
-                "map",
-                vec![ast::Argument::new_unnamed(ast::Expression::StringValue(
-                    String::from(db_name),
-                    Span::empty(),
-                ))],
-            ));
-        }
+        <LowerDmlToAst<'a>>::push_map_attribute(field, &mut attributes);
 
         // @relation
         if let dml::Field::RelationField(rf) = field {
