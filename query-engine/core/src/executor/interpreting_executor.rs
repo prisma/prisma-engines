@@ -12,7 +12,8 @@ pub struct InterpretingExecutor<C> {
     /// The loaded connector
     connector: C,
 
-    // tx_cache: TransactionCache<'conn, 'tx>,
+    tx_cache: TransactionCache,
+
     /// Flag that forces individual operations to run in a transaction.
     /// Does _not_ force batches to use transactions.
     force_transactions: bool,
@@ -20,47 +21,34 @@ pub struct InterpretingExecutor<C> {
 
 #[derive(Default)]
 struct TransactionCache {
-    pub cache: DashMap<TxId, CachedTx>,
+    pub cache: DashMap<TxId, Pin<Box<CachedTx>>>,
 }
 
 struct CachedTx {
     pub conn: Box<dyn Connection>,
-    pub tx: Option<Box<dyn Transaction>>,
+    pub tx: Option<Box<dyn Transaction + 'static>>,
     pub status: TxStatus,
-    _marker: PhantomPinned,
 }
 
 impl CachedTx {
     pub async fn new(conn: Box<dyn Connection>) -> crate::Result<Pin<Box<Self>>> {
-        use pin_utils::pin_mut;
-
         let c_tx = CachedTx {
             conn,
             tx: None,
             status: TxStatus::Open,
-            _marker: PhantomPinned,
         };
 
         let mut boxed = Box::pin(c_tx);
-
         unsafe {
-            let box_ref = boxed.as_mut().get_unchecked_mut();
-            box_ref.tx = Some(box_ref.conn.start_transaction().await?);
-        };
+            let transaction: Box<dyn Transaction + '_> =
+                boxed.as_mut().get_unchecked_mut().conn.start_transaction().await?;
 
-        // let tx_mut = boxed.as_mut(); //.get_mut().conn.deref_mut();
-        // let wat = tx_mut.start().await?;
-
-        // let tx = boxed.as_mut().conn.start_transaction().await?;
-        // let self_ptr: *const String = &boxed.as_ref().a;
+            let transaction: Box<dyn Transaction + 'static> = std::mem::transmute(transaction);
+            boxed.tx = Some(transaction);
+        }
 
         Ok(boxed)
-        // todo!()
     }
-
-    // async fn start<'conn>(&'conn mut self) -> crate::Result<Box<dyn Transaction + 'conn>> {
-    //     Ok(self.conn.start_transaction().await?)
-    // }
 }
 
 enum TxStatus {
@@ -77,7 +65,7 @@ where
     pub fn new(connector: C, force_transactions: bool) -> Self {
         InterpretingExecutor {
             connector,
-            // tx_cache: TransactionCache::default(),
+            tx_cache: TransactionCache::default(),
             force_transactions,
         }
     }
@@ -208,12 +196,13 @@ where
     C: Connector + Send + Sync,
 {
     async fn start_tx(&self, max_acquisition_secs: u32, valid_for_secs: u32) -> crate::Result<TxId> {
-        let cache = TransactionCache::default();
-
         let id = TxId::new();
         let mut conn = self.connector.get_connection().await?;
 
-        todo!()
+        let c_tx = CachedTx::new(conn).await?;
+        self.tx_cache.cache.insert(id.clone(), c_tx);
+
+        Ok(id)
     }
 
     async fn commit_tx(&self, tx_id: TxId) -> crate::Result<TxId> {

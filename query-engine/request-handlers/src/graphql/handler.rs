@@ -58,7 +58,7 @@ impl<'a> GraphQlHandler<'a> {
 
         match AssertUnwindSafe(
             self.executor
-                .execute_batch(queries, transactional, self.query_schema.clone()),
+                .execute_all(None, queries, transactional, self.query_schema.clone()),
         )
         .catch_unwind()
         .await
@@ -154,6 +154,6 @@ impl<'a> GraphQlHandler<'a> {
     }
 
     async fn handle_graphql(&self, query_doc: Operation) -> query_core::Result<ResponseData> {
-        self.executor.execute(query_doc, self.query_schema.clone()).await
+        self.executor.execute(None, query_doc, self.query_schema.clone()).await
     }
 }
