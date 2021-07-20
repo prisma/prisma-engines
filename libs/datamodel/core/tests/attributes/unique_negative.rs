@@ -1,3 +1,4 @@
+use crate::attributes::with_named_constraints;
 use crate::common::*;
 use datamodel::{ast::Span, diagnostics::DatamodelError};
 
@@ -271,17 +272,8 @@ fn mapping_unique_with_a_name_that_is_too_long_should_error() {
 
 #[test]
 fn naming_unique_to_a_field_name_should_error() {
-    let dml = r#"
-     datasource test {
-            provider = "mysql"
-            url = "mysql://root:prisma@127.0.0.1:3309/ReproIndexNames?connection_limit=1"
-     }
-    
-     generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["NamedConstraints"]
-     }
-    
+    let dml = with_named_constraints(
+        r#"
      model User {
          used           Int
          name           String            
@@ -289,12 +281,13 @@ fn naming_unique_to_a_field_name_should_error() {
 
          @@unique([name, identification], name: "used")
      }
-     "#;
+     "#,
+    );
 
-    let errors = parse_error(dml);
+    let errors = parse_error(&dml);
     errors.assert_is(DatamodelError::new_model_validation_error(
         "The custom name `used` specified for the `@@unique` attribute is already used as a name for a field. Please choose a different name.",
         "User",
-        Span::new(287, 462),
+        Span::new(282, 457),
     ));
 }

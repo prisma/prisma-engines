@@ -48,6 +48,24 @@ impl<'a> Validator<'a> {
         for model in schema.models() {
             let ast_model = ast_schema.find_model(&model.name).expect(STATE_ERROR);
 
+            //doing this here for now since I want to have all field names already generated
+            // it might be possible to move this
+            if let Some(pk) = &model.primary_key {
+                if let Some(name) = &pk.name {
+                    for field in model.fields() {
+                        if let Some(err) = ConstraintNames::client_name_already_in_use(
+                            name,
+                            &field.name(),
+                            &model.name,
+                            ast_model.span,
+                            "@@id",
+                        ) {
+                            diagnostics.push_error(err);
+                        }
+                    }
+                }
+            }
+
             if let Err(err) = self.validate_model_has_strict_unique_criteria(ast_model, model) {
                 diagnostics.push_error(err);
             }
