@@ -83,43 +83,37 @@ mod tests {
             enums: vec![],
         };
 
-        let schema = SqlSchema {
-            procedures: vec![],
-            tables: vec![Table {
-                name: "Table1".to_string(),
-                columns: vec![
-                    Column {
-                        name: "optional".to_string(),
-                        tpe: ColumnType::pure(ColumnTypeFamily::Int, ColumnArity::Nullable),
-                        default: None,
-                        auto_increment: false,
-                    },
-                    Column {
-                        name: "required".to_string(),
-                        tpe: ColumnType::pure(ColumnTypeFamily::Int, ColumnArity::Required),
-                        default: None,
-                        auto_increment: true,
-                    },
-                    Column {
-                        name: "list".to_string(),
-                        tpe: ColumnType::pure(ColumnTypeFamily::Int, ColumnArity::List),
-                        default: None,
-                        auto_increment: false,
-                    },
-                ],
-                indices: vec![],
-                primary_key: Some(PrimaryKey {
-                    columns: vec!["required".to_string()],
-                    sequence: None,
-                    constraint_name: None,
-                }),
-                foreign_keys: vec![],
-            }],
-            enums: vec![],
-            sequences: vec![],
-            views: vec![],
-            user_defined_types: vec![],
-        };
+        let mut schema = SqlSchema::default();
+        schema.tables = vec![Table {
+            name: "Table1".to_string(),
+            columns: vec![
+                Column {
+                    name: "optional".to_string(),
+                    tpe: ColumnType::pure(ColumnTypeFamily::Int, ColumnArity::Nullable),
+                    default: None,
+                    auto_increment: false,
+                },
+                Column {
+                    name: "required".to_string(),
+                    tpe: ColumnType::pure(ColumnTypeFamily::Int, ColumnArity::Required),
+                    default: None,
+                    auto_increment: true,
+                },
+                Column {
+                    name: "list".to_string(),
+                    tpe: ColumnType::pure(ColumnTypeFamily::Int, ColumnArity::List),
+                    default: None,
+                    auto_increment: false,
+                },
+            ],
+            indices: vec![],
+            primary_key: Some(PrimaryKey {
+                columns: vec!["required".to_string()],
+                sequence: None,
+                constraint_name: None,
+            }),
+            foreign_keys: vec![],
+        }];
         let introspection_result =
             calculate_datamodel(&schema, &Datamodel::new(), postgres_context()).expect("calculate data model");
 
@@ -245,80 +239,74 @@ mod tests {
             enums: vec![],
         };
 
-        let schema = SqlSchema {
-            procedures: vec![],
-            tables: vec![
-                Table {
-                    name: "Table1".to_string(),
-                    columns: vec![Column {
-                        name: "primary".to_string(),
-                        tpe: ColumnType {
-                            full_data_type: "integer".to_string(),
-                            family: ColumnTypeFamily::Int,
-                            arity: ColumnArity::Required,
-                            native_type: Some(PostgresType::Integer.to_json()),
-                        },
-                        default: None,
-                        auto_increment: true,
-                    }],
-                    indices: vec![],
-                    primary_key: Some(PrimaryKey {
-                        columns: vec!["primary".to_string()],
-                        sequence: None,
-                        constraint_name: None,
+        let mut schema = SqlSchema::default();
+        schema.tables = vec![
+            Table {
+                name: "Table1".to_string(),
+                columns: vec![Column {
+                    name: "primary".to_string(),
+                    tpe: ColumnType {
+                        full_data_type: "integer".to_string(),
+                        family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Required,
+                        native_type: Some(PostgresType::Integer.to_json()),
+                    },
+                    default: None,
+                    auto_increment: true,
+                }],
+                indices: vec![],
+                primary_key: Some(PrimaryKey {
+                    columns: vec!["primary".to_string()],
+                    sequence: None,
+                    constraint_name: None,
+                }),
+                foreign_keys: vec![],
+            },
+            Table {
+                name: "Table2".to_string(),
+                columns: vec![Column {
+                    name: "primary".to_string(),
+                    tpe: ColumnType {
+                        full_data_type: "integer".to_string(),
+                        family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Required,
+                        native_type: Some(PostgresType::Integer.to_json()),
+                    },
+                    default: None,
+                    auto_increment: false,
+                }],
+                indices: vec![],
+                primary_key: Some(PrimaryKey {
+                    columns: vec!["primary".to_string()],
+                    sequence: None,
+                    constraint_name: None,
+                }),
+                foreign_keys: vec![],
+            },
+            Table {
+                name: "Table3".to_string(),
+                columns: vec![Column {
+                    name: "primary".to_string(),
+                    tpe: ColumnType {
+                        full_data_type: "integer".to_string(),
+                        family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Required,
+                        native_type: Some(PostgresType::Integer.to_json()),
+                    },
+                    default: None,
+                    auto_increment: true,
+                }],
+                indices: vec![],
+                primary_key: Some(PrimaryKey {
+                    columns: vec!["primary".to_string()],
+                    sequence: Some(Sequence {
+                        name: "sequence".to_string(),
                     }),
-                    foreign_keys: vec![],
-                },
-                Table {
-                    name: "Table2".to_string(),
-                    columns: vec![Column {
-                        name: "primary".to_string(),
-                        tpe: ColumnType {
-                            full_data_type: "integer".to_string(),
-                            family: ColumnTypeFamily::Int,
-                            arity: ColumnArity::Required,
-                            native_type: Some(PostgresType::Integer.to_json()),
-                        },
-                        default: None,
-                        auto_increment: false,
-                    }],
-                    indices: vec![],
-                    primary_key: Some(PrimaryKey {
-                        columns: vec!["primary".to_string()],
-                        sequence: None,
-                        constraint_name: None,
-                    }),
-                    foreign_keys: vec![],
-                },
-                Table {
-                    name: "Table3".to_string(),
-                    columns: vec![Column {
-                        name: "primary".to_string(),
-                        tpe: ColumnType {
-                            full_data_type: "integer".to_string(),
-                            family: ColumnTypeFamily::Int,
-                            arity: ColumnArity::Required,
-                            native_type: Some(PostgresType::Integer.to_json()),
-                        },
-                        default: None,
-                        auto_increment: true,
-                    }],
-                    indices: vec![],
-                    primary_key: Some(PrimaryKey {
-                        columns: vec!["primary".to_string()],
-                        sequence: Some(Sequence {
-                            name: "sequence".to_string(),
-                        }),
-                        constraint_name: None,
-                    }),
-                    foreign_keys: vec![],
-                },
-            ],
-            enums: vec![],
-            sequences: vec![],
-            views: vec![],
-            user_defined_types: vec![],
-        };
+                    constraint_name: None,
+                }),
+                foreign_keys: vec![],
+            },
+        ];
         let introspection_result =
             calculate_datamodel(&schema, &Datamodel::new(), postgres_context()).expect("calculate data model");
 
@@ -367,37 +355,31 @@ mod tests {
             enums: vec![],
         };
 
-        let schema = SqlSchema {
-            views: vec![],
-            procedures: vec![],
-            tables: vec![Table {
-                name: "Table1".to_string(),
-                columns: vec![
-                    Column {
-                        name: "non_unique".to_string(),
-                        tpe: ColumnType::pure(ColumnTypeFamily::Int, ColumnArity::Nullable),
-                        default: None,
-                        auto_increment: false,
-                    },
-                    Column {
-                        name: "unique".to_string(),
-                        tpe: ColumnType::pure(ColumnTypeFamily::Int, ColumnArity::Required),
-                        default: None,
-                        auto_increment: false,
-                    },
-                ],
-                indices: vec![Index {
-                    name: "unique_unique".to_string(),
-                    columns: vec!["unique".to_string()],
-                    tpe: IndexType::Unique,
-                }],
-                primary_key: None,
-                foreign_keys: vec![],
+        let mut schema = SqlSchema::default();
+        schema.tables = vec![Table {
+            name: "Table1".to_string(),
+            columns: vec![
+                Column {
+                    name: "non_unique".to_string(),
+                    tpe: ColumnType::pure(ColumnTypeFamily::Int, ColumnArity::Nullable),
+                    default: None,
+                    auto_increment: false,
+                },
+                Column {
+                    name: "unique".to_string(),
+                    tpe: ColumnType::pure(ColumnTypeFamily::Int, ColumnArity::Required),
+                    default: None,
+                    auto_increment: false,
+                },
+            ],
+            indices: vec![Index {
+                name: "unique_unique".to_string(),
+                columns: vec!["unique".to_string()],
+                tpe: IndexType::Unique,
             }],
-            enums: vec![],
-            sequences: vec![],
-            user_defined_types: vec![],
-        };
+            primary_key: None,
+            foreign_keys: vec![],
+        }];
         let introspection_result =
             calculate_datamodel(&schema, &Datamodel::new(), postgres_context()).expect("calculate data model");
 
@@ -577,102 +559,96 @@ mod tests {
             enums: vec![],
         };
 
-        let schema = SqlSchema {
-            views: vec![],
-            procedures: vec![],
-            tables: vec![
-                Table {
-                    name: "City".to_string(),
-                    columns: vec![
-                        Column {
-                            name: "id".to_string(),
-                            tpe: ColumnType {
-                                full_data_type: "integer".to_string(),
-                                family: ColumnTypeFamily::Int,
-                                arity: ColumnArity::Required,
-                                native_type: Some(PostgresType::Integer.to_json()),
-                            },
-                            default: None,
-                            auto_increment: true,
+        let mut schema = SqlSchema::default();
+        schema.tables = vec![
+            Table {
+                name: "City".to_string(),
+                columns: vec![
+                    Column {
+                        name: "id".to_string(),
+                        tpe: ColumnType {
+                            full_data_type: "integer".to_string(),
+                            family: ColumnTypeFamily::Int,
+                            arity: ColumnArity::Required,
+                            native_type: Some(PostgresType::Integer.to_json()),
                         },
-                        Column {
-                            name: "name".to_string(),
-                            tpe: ColumnType {
-                                full_data_type: "text".to_string(),
-                                family: ColumnTypeFamily::String,
-                                arity: ColumnArity::Required,
-                                native_type: Some(PostgresType::Text.to_json()),
-                            },
-                            default: None,
-                            auto_increment: false,
+                        default: None,
+                        auto_increment: true,
+                    },
+                    Column {
+                        name: "name".to_string(),
+                        tpe: ColumnType {
+                            full_data_type: "text".to_string(),
+                            family: ColumnTypeFamily::String,
+                            arity: ColumnArity::Required,
+                            native_type: Some(PostgresType::Text.to_json()),
                         },
-                    ],
-                    indices: vec![],
-                    primary_key: Some(PrimaryKey {
-                        columns: vec!["id".to_string()],
-                        sequence: None,
-                        constraint_name: None,
-                    }),
-                    foreign_keys: vec![],
-                },
-                Table {
-                    name: "User".to_string(),
-                    columns: vec![
-                        Column {
-                            name: "id".to_string(),
-                            tpe: ColumnType {
-                                full_data_type: "integer".to_string(),
-                                family: ColumnTypeFamily::Int,
-                                arity: ColumnArity::Required,
-                                native_type: Some(PostgresType::Integer.to_json()),
-                            },
-                            default: None,
-                            auto_increment: true,
+                        default: None,
+                        auto_increment: false,
+                    },
+                ],
+                indices: vec![],
+                primary_key: Some(PrimaryKey {
+                    columns: vec!["id".to_string()],
+                    sequence: None,
+                    constraint_name: None,
+                }),
+                foreign_keys: vec![],
+            },
+            Table {
+                name: "User".to_string(),
+                columns: vec![
+                    Column {
+                        name: "id".to_string(),
+                        tpe: ColumnType {
+                            full_data_type: "integer".to_string(),
+                            family: ColumnTypeFamily::Int,
+                            arity: ColumnArity::Required,
+                            native_type: Some(PostgresType::Integer.to_json()),
                         },
-                        Column {
-                            name: "city-id".to_string(),
-                            tpe: ColumnType {
-                                full_data_type: "integer".to_string(),
-                                family: ColumnTypeFamily::Int,
-                                arity: ColumnArity::Required,
-                                native_type: Some(PostgresType::Integer.to_json()),
-                            },
-                            default: None,
-                            auto_increment: false,
+                        default: None,
+                        auto_increment: true,
+                    },
+                    Column {
+                        name: "city-id".to_string(),
+                        tpe: ColumnType {
+                            full_data_type: "integer".to_string(),
+                            family: ColumnTypeFamily::Int,
+                            arity: ColumnArity::Required,
+                            native_type: Some(PostgresType::Integer.to_json()),
                         },
-                        Column {
-                            name: "city-name".to_string(),
-                            tpe: ColumnType {
-                                full_data_type: "text".to_string(),
-                                family: ColumnTypeFamily::String,
-                                arity: ColumnArity::Required,
-                                native_type: Some(PostgresType::Text.to_json()),
-                            },
-                            default: None,
-                            auto_increment: false,
+                        default: None,
+                        auto_increment: false,
+                    },
+                    Column {
+                        name: "city-name".to_string(),
+                        tpe: ColumnType {
+                            full_data_type: "text".to_string(),
+                            family: ColumnTypeFamily::String,
+                            arity: ColumnArity::Required,
+                            native_type: Some(PostgresType::Text.to_json()),
                         },
-                    ],
-                    indices: vec![],
-                    primary_key: Some(PrimaryKey {
-                        columns: vec!["id".to_string()],
-                        sequence: None,
-                        constraint_name: None,
-                    }),
-                    foreign_keys: vec![ForeignKey {
-                        // what does this mean? the from columns are not targeting a specific to column?
-                        constraint_name: None,
-                        columns: vec!["city-id".to_string(), "city-name".to_string()],
-                        referenced_table: "City".to_string(),
-                        on_delete_action: ForeignKeyAction::NoAction,
-                        on_update_action: ForeignKeyAction::NoAction,
-                        referenced_columns: vec!["id".to_string(), "name".to_string()],
-                    }],
-                },
-            ],
-            enums: vec![],
-            sequences: vec![],
-            user_defined_types: vec![],
-        };
+                        default: None,
+                        auto_increment: false,
+                    },
+                ],
+                indices: vec![],
+                primary_key: Some(PrimaryKey {
+                    columns: vec!["id".to_string()],
+                    sequence: None,
+                    constraint_name: None,
+                }),
+                foreign_keys: vec![ForeignKey {
+                    // what does this mean? the from columns are not targeting a specific to column?
+                    constraint_name: None,
+                    columns: vec!["city-id".to_string(), "city-name".to_string()],
+                    referenced_table: "City".to_string(),
+                    on_delete_action: ForeignKeyAction::NoAction,
+                    on_update_action: ForeignKeyAction::NoAction,
+                    referenced_columns: vec!["id".to_string(), "name".to_string()],
+                }],
+            },
+        ];
         let introspection_result =
             calculate_datamodel(&schema, &Datamodel::new(), postgres_context()).expect("calculate data model");
 
@@ -755,62 +731,56 @@ mod tests {
             enums: vec![],
         };
 
-        let schema = SqlSchema {
-            views: vec![],
-            procedures: vec![],
-            tables: vec![Table {
-                name: "User".to_string(),
-                columns: vec![
-                    Column {
-                        name: "id".to_string(),
-                        tpe: ColumnType {
-                            full_data_type: "integer".to_string(),
-                            family: ColumnTypeFamily::Int,
-                            arity: ColumnArity::Required,
-                            native_type: Some(PostgresType::Integer.to_json()),
-                        },
-                        default: None,
-                        auto_increment: true,
+        let mut schema = SqlSchema::default();
+        schema.tables = vec![Table {
+            name: "User".to_string(),
+            columns: vec![
+                Column {
+                    name: "id".to_string(),
+                    tpe: ColumnType {
+                        full_data_type: "integer".to_string(),
+                        family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Required,
+                        native_type: Some(PostgresType::Integer.to_json()),
                     },
-                    Column {
-                        name: "name".to_string(),
-                        tpe: ColumnType {
-                            full_data_type: "text".to_string(),
-                            family: ColumnTypeFamily::String,
-                            arity: ColumnArity::Required,
-                            native_type: Some(PostgresType::Text.to_json()),
-                        },
-                        default: None,
-                        auto_increment: false,
+                    default: None,
+                    auto_increment: true,
+                },
+                Column {
+                    name: "name".to_string(),
+                    tpe: ColumnType {
+                        full_data_type: "text".to_string(),
+                        family: ColumnTypeFamily::String,
+                        arity: ColumnArity::Required,
+                        native_type: Some(PostgresType::Text.to_json()),
                     },
-                    Column {
-                        name: "lastname".to_string(),
-                        tpe: ColumnType {
-                            full_data_type: "text".to_string(),
-                            family: ColumnTypeFamily::String,
-                            arity: ColumnArity::Required,
-                            native_type: Some(PostgresType::Text.to_json()),
-                        },
-                        default: None,
-                        auto_increment: false,
+                    default: None,
+                    auto_increment: false,
+                },
+                Column {
+                    name: "lastname".to_string(),
+                    tpe: ColumnType {
+                        full_data_type: "text".to_string(),
+                        family: ColumnTypeFamily::String,
+                        arity: ColumnArity::Required,
+                        native_type: Some(PostgresType::Text.to_json()),
                     },
-                ],
-                indices: vec![Index {
-                    name: "name_last_name_unique".to_string(),
-                    columns: vec!["name".to_string(), "lastname".to_string()],
-                    tpe: IndexType::Unique,
-                }],
-                primary_key: Some(PrimaryKey {
-                    columns: vec!["id".to_string()],
-                    sequence: None,
-                    constraint_name: None,
-                }),
-                foreign_keys: vec![],
+                    default: None,
+                    auto_increment: false,
+                },
+            ],
+            indices: vec![Index {
+                name: "name_last_name_unique".to_string(),
+                columns: vec!["name".to_string(), "lastname".to_string()],
+                tpe: IndexType::Unique,
             }],
-            enums: vec![],
-            sequences: vec![],
-            user_defined_types: vec![],
-        };
+            primary_key: Some(PrimaryKey {
+                columns: vec!["id".to_string()],
+                sequence: None,
+                constraint_name: None,
+            }),
+            foreign_keys: vec![],
+        }];
         let introspection_result =
             calculate_datamodel(&schema, &Datamodel::new(), postgres_context()).expect("calculate data model");
 
@@ -963,90 +933,84 @@ mod tests {
             enums: vec![],
         };
 
-        let schema = SqlSchema {
-            views: vec![],
-            procedures: vec![],
-            tables: vec![
-                Table {
-                    name: "City".to_string(),
-                    columns: vec![
-                        Column {
-                            name: "id".to_string(),
-                            tpe: ColumnType {
-                                full_data_type: "integer".to_string(),
-                                family: ColumnTypeFamily::Int,
-                                arity: ColumnArity::Required,
-                                native_type: Some(PostgresType::Integer.to_json()),
-                            },
-                            default: None,
-                            auto_increment: true,
+        let mut schema = SqlSchema::default();
+        schema.tables = vec![
+            Table {
+                name: "City".to_string(),
+                columns: vec![
+                    Column {
+                        name: "id".to_string(),
+                        tpe: ColumnType {
+                            full_data_type: "integer".to_string(),
+                            family: ColumnTypeFamily::Int,
+                            arity: ColumnArity::Required,
+                            native_type: Some(PostgresType::Integer.to_json()),
                         },
-                        Column {
-                            name: "name".to_string(),
-                            tpe: ColumnType {
-                                full_data_type: "text".to_string(),
-                                family: ColumnTypeFamily::String,
-                                arity: ColumnArity::Required,
-                                native_type: Some(PostgresType::Text.to_json()),
-                            },
-                            default: None,
-                            auto_increment: false,
+                        default: None,
+                        auto_increment: true,
+                    },
+                    Column {
+                        name: "name".to_string(),
+                        tpe: ColumnType {
+                            full_data_type: "text".to_string(),
+                            family: ColumnTypeFamily::String,
+                            arity: ColumnArity::Required,
+                            native_type: Some(PostgresType::Text.to_json()),
                         },
-                    ],
-                    indices: vec![],
-                    primary_key: Some(PrimaryKey {
-                        columns: vec!["id".to_string()],
-                        sequence: None,
-                        constraint_name: None,
-                    }),
-                    foreign_keys: vec![],
-                },
-                Table {
-                    name: "User".to_string(),
-                    columns: vec![
-                        Column {
-                            name: "id".to_string(),
-                            tpe: ColumnType {
-                                full_data_type: "integer".to_string(),
-                                family: ColumnTypeFamily::Int,
-                                arity: ColumnArity::Required,
-                                native_type: Some(PostgresType::Integer.to_json()),
-                            },
-                            default: None,
-                            auto_increment: true,
+                        default: None,
+                        auto_increment: false,
+                    },
+                ],
+                indices: vec![],
+                primary_key: Some(PrimaryKey {
+                    columns: vec!["id".to_string()],
+                    sequence: None,
+                    constraint_name: None,
+                }),
+                foreign_keys: vec![],
+            },
+            Table {
+                name: "User".to_string(),
+                columns: vec![
+                    Column {
+                        name: "id".to_string(),
+                        tpe: ColumnType {
+                            full_data_type: "integer".to_string(),
+                            family: ColumnTypeFamily::Int,
+                            arity: ColumnArity::Required,
+                            native_type: Some(PostgresType::Integer.to_json()),
                         },
-                        Column {
-                            name: "city_id".to_string(),
-                            tpe: ColumnType {
-                                full_data_type: "integer".to_string(),
-                                family: ColumnTypeFamily::Int,
-                                arity: ColumnArity::Required,
-                                native_type: Some(PostgresType::Integer.to_json()),
-                            },
-                            default: None,
-                            auto_increment: false,
+                        default: None,
+                        auto_increment: true,
+                    },
+                    Column {
+                        name: "city_id".to_string(),
+                        tpe: ColumnType {
+                            full_data_type: "integer".to_string(),
+                            family: ColumnTypeFamily::Int,
+                            arity: ColumnArity::Required,
+                            native_type: Some(PostgresType::Integer.to_json()),
                         },
-                    ],
-                    indices: vec![],
-                    primary_key: Some(PrimaryKey {
-                        columns: vec!["id".to_string()],
-                        sequence: None,
-                        constraint_name: None,
-                    }),
-                    foreign_keys: vec![ForeignKey {
-                        constraint_name: None,
-                        columns: vec!["city_id".to_string()],
-                        referenced_table: "City".to_string(),
-                        on_delete_action: ForeignKeyAction::NoAction,
-                        on_update_action: ForeignKeyAction::NoAction,
-                        referenced_columns: vec!["id".to_string()],
-                    }],
-                },
-            ],
-            enums: vec![],
-            sequences: vec![],
-            user_defined_types: vec![],
-        };
+                        default: None,
+                        auto_increment: false,
+                    },
+                ],
+                indices: vec![],
+                primary_key: Some(PrimaryKey {
+                    columns: vec!["id".to_string()],
+                    sequence: None,
+                    constraint_name: None,
+                }),
+                foreign_keys: vec![ForeignKey {
+                    constraint_name: None,
+                    columns: vec!["city_id".to_string()],
+                    referenced_table: "City".to_string(),
+                    on_delete_action: ForeignKeyAction::NoAction,
+                    on_update_action: ForeignKeyAction::NoAction,
+                    referenced_columns: vec!["id".to_string()],
+                }],
+            },
+        ];
         let introspection_result =
             calculate_datamodel(&schema, &Datamodel::new(), postgres_context()).expect("calculate data model");
 
@@ -1080,17 +1044,11 @@ mod tests {
         };
 
         let enum_values = vec!["a".to_string(), "b".to_string()];
-        let schema = SqlSchema {
-            views: vec![],
-            procedures: vec![],
-            tables: vec![],
-            enums: vec![Enum {
-                name: "Enum".to_string(),
-                values: enum_values,
-            }],
-            sequences: vec![],
-            user_defined_types: vec![],
-        };
+        let mut schema = SqlSchema::default();
+        schema.enums = vec![Enum {
+            name: "Enum".to_string(),
+            values: enum_values,
+        }];
         let introspection_result =
             calculate_datamodel(&schema, &Datamodel::new(), postgres_context()).expect("calculate data model");
 
