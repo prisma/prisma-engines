@@ -9,6 +9,7 @@ mod tests {
     };
     use datamodel::{IndexDefinition, StringFromEnvVar};
     use enumflags2::BitFlags;
+    use expect_test::expect;
     use introspection_connector::IntrospectionContext;
     use native_types::{NativeType, PostgresType};
     use pretty_assertions::assert_eq;
@@ -39,49 +40,91 @@ mod tests {
 
     #[test]
     fn arity_is_preserved_when_generating_data_model_from_a_schema() {
-        let ref_data_model = Datamodel {
-            models: vec![Model {
-                database_name: None,
-                name: "Table1".to_string(),
-                documentation: None,
-                is_embedded: false,
-                is_commented_out: false,
-                is_ignored: false,
-                fields: vec![
-                    Field::ScalarField(ScalarField::new(
-                        "optional",
-                        FieldArity::Optional,
-                        FieldType::Scalar(ScalarType::Int, None, None),
-                    )),
-                    Field::ScalarField(ScalarField {
-                        name: "required".to_string(),
-                        arity: FieldArity::Required,
-                        field_type: FieldType::Scalar(ScalarType::Int, None, None),
-                        database_name: None,
-                        default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
+        let ref_data_model = expect![[r#"
+            Datamodel {
+                enums: [],
+                models: [
+                    Model {
+                        name: "Table1",
+                        fields: [
+                            ScalarField(
+                                ScalarField {
+                                    name: "optional",
+                                    field_type: Scalar(
+                                        Int,
+                                        None,
+                                        None,
+                                    ),
+                                    arity: Optional,
+                                    database_name: None,
+                                    default_value: None,
+                                    documentation: None,
+                                    is_generated: false,
+                                    is_updated_at: false,
+                                    is_commented_out: false,
+                                    is_ignored: false,
+                                },
+                            ),
+                            ScalarField(
+                                ScalarField {
+                                    name: "required",
+                                    field_type: Scalar(
+                                        Int,
+                                        None,
+                                        None,
+                                    ),
+                                    arity: Required,
+                                    database_name: None,
+                                    default_value: Some(
+                                        DefaultValue::Expression(autoincrement()[]),
+                                    ),
+                                    documentation: None,
+                                    is_generated: false,
+                                    is_updated_at: false,
+                                    is_commented_out: false,
+                                    is_ignored: false,
+                                },
+                            ),
+                            ScalarField(
+                                ScalarField {
+                                    name: "list",
+                                    field_type: Scalar(
+                                        Int,
+                                        None,
+                                        None,
+                                    ),
+                                    arity: List,
+                                    database_name: None,
+                                    default_value: None,
+                                    documentation: None,
+                                    is_generated: false,
+                                    is_updated_at: false,
+                                    is_commented_out: false,
+                                    is_ignored: false,
+                                },
+                            ),
+                        ],
                         documentation: None,
+                        database_name: None,
+                        is_embedded: false,
+                        indices: [],
+                        primary_key: Some(
+                            PrimaryKeyDefinition {
+                                name: None,
+                                db_name: None,
+                                fields: [
+                                    "required",
+                                ],
+                                defined_on_field: true,
+                            },
+                        ),
                         is_generated: false,
-                        is_updated_at: false,
                         is_commented_out: false,
                         is_ignored: false,
-                    }),
-                    Field::ScalarField(ScalarField::new(
-                        "list",
-                        FieldArity::List,
-                        FieldType::Scalar(ScalarType::Int, None, None),
-                    )),
+                    },
                 ],
-                is_generated: false,
-                indices: vec![],
-                primary_key: Some(PrimaryKeyDefinition {
-                    name: None,
-                    db_name: None,
-                    fields: vec!["required".to_string()],
-                    defined_on_field: true,
-                }),
-            }],
-            enums: vec![],
-        };
+            }
+        "#]];
 
         let mut schema = SqlSchema::default();
         schema.tables = vec![Table {
@@ -117,7 +160,7 @@ mod tests {
         let introspection_result =
             calculate_datamodel(&schema, &Datamodel::new(), postgres_context()).expect("calculate data model");
 
-        assert_eq!(introspection_result.data_model, ref_data_model);
+        ref_data_model.assert_debug_eq(&introspection_result.data_model);
     }
 
     #[test]
