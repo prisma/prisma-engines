@@ -128,6 +128,13 @@ pub(crate) fn calculate_index(index: &Index) -> IndexDefinition {
         IndexType::Normal => datamodel::dml::IndexType::Normal,
     };
 
+    //We do not populate name in client by default. It increases datamodel noise,
+    //and we would need to sanitize it. Users can give their own names if they want
+    //and re-introspection will keep them. This is a change in introspection behaviour,
+    //but due to re-introspection previous datamodels and clients should keep working as before.
+
+    //todo this needs to be previewflagged new behaviour would always be None for name, old behaviour needs to be figured out
+
     IndexDefinition {
         name: Some(index.name.clone()),
         db_name: Some(index.name.clone()),

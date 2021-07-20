@@ -269,10 +269,19 @@ fn mapping_unique_with_a_name_that_is_too_long_should_error() {
     ]);
 }
 
-//todo I believe this is a new error>
 #[test]
 fn naming_unique_to_a_field_name_should_error() {
     let dml = r#"
+     datasource test {
+            provider = "mysql"
+            url = "mysql://root:prisma@127.0.0.1:3309/ReproIndexNames?connection_limit=1"
+     }
+    
+     generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["NamedConstraints"]
+     }
+    
      model User {
          used           Int
          name           String            
@@ -284,8 +293,8 @@ fn naming_unique_to_a_field_name_should_error() {
 
     let errors = parse_error(dml);
     errors.assert_is(DatamodelError::new_model_validation_error(
-        "The custom name specified for the `@@unique` attribute is already used as a name for a field. Please choose a different name.",
+        "The custom name `used` specified for the `@@unique` attribute is already used as a name for a field. Please choose a different name.",
         "User",
-        Span::new(5, 175),
+        Span::new(287, 462),
     ));
 }

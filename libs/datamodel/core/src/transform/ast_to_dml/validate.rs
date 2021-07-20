@@ -1,6 +1,7 @@
 #![allow(clippy::suspicious_operation_groupings)] // clippy is wrong there
 
 use super::db::ParserDatabase;
+use crate::common::constraint_names::ConstraintNames;
 use crate::{
     ast,
     common::preview_features::PreviewFeature,
@@ -135,6 +136,23 @@ impl<'a> Validator<'a> {
                             diagnostics.push_error(error);
                         }
                         index_names.insert(index_name);
+                    }
+
+                    //doing this here for now since I want to have all field names already generated
+                    // it might be possible to move this
+                    if let Some(name) = &index.name {
+                        println!("Got HERE");
+                        for field in model.fields() {
+                            if let Some(err) = ConstraintNames::client_name_already_in_use(
+                                name,
+                                &field.name(),
+                                &model.name,
+                                ast_model.span,
+                                "@@unique",
+                            ) {
+                                diagnostics.push_error(err);
+                            }
+                        }
                     }
                 }
             }
