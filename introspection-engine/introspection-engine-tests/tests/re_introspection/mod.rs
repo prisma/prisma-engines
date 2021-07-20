@@ -2008,3 +2008,148 @@ async fn default_optional_actions(api: &TestApi) -> TestResult {
 
     Ok(())
 }
+
+#[test_connector]
+async fn re_introspecting_custom_compound_unique_names(api: &TestApi) -> TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
+                t.add_column("first", types::integer());
+                t.add_column("last", types::integer());
+                t.add_index(
+                    "User.something@invalid-and/weird",
+                    types::index(&["first", "last"]).unique(true),
+                );
+            });
+
+            migration.create_table("Unrelated", |t| {
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("Unrelated_pkey", types::primary_constraint(&["id"]));
+            });
+        })
+        .await?;
+
+    let input_dm = indoc! {r#"
+         model User {
+             id     Int @id @default(autoincrement()) 
+             first  Int
+             last   Int
+
+             @@unique([first, last], name: "compound", map: "User.something@invalid-and/weird")
+         }
+     "#};
+
+    let final_dm = indoc! {r#"
+         model User {
+             id     Int @id @default(autoincrement()) 
+             first  Int
+             last   Int
+
+             @@unique([first, last], name: "compound", map: "User.something@invalid-and/weird")
+         }
+
+         model Unrelated {
+             id    Int @id @default(autoincrement())
+         }
+     "#};
+
+    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
+
+    let expected = json!([{
+        "code": 17,
+        "message": "These Indices were enriched with custom index names taken from the previous Prisma schema.",
+        "affected" :[
+            {"model": "User", "index_db_name": "User.something@invalid-and/weird"},
+        ]
+    }]);
+
+    assert_eq_json!(expected, api.re_introspect_warnings(&input_dm).await?);
+
+    Ok(())
+}
+
+#[test_connector]
+async fn re_introspecting_custom_compound_id_names(api: &TestApi) -> TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("first", types::integer());
+                t.add_column("last", types::integer());
+                t.add_constraint(
+                    "User.something@invalid-and/weird",
+                    types::primary_constraint(&["first", "last"]),
+                );
+            });
+
+            migration.create_table("User2", |t| {
+                t.add_column("first", types::integer());
+                t.add_column("last", types::integer());
+                t.add_constraint("User2_pkey", types::primary_constraint(&["first", "last"]));
+            });
+
+            migration.create_table("Unrelated", |t| {
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("Unrelated_pkey", types::primary_constraint(&["id"]));
+            });
+        })
+        .await?;
+
+    let map = if api.sql_family().is_mysql() || api.sql_family().is_sqlite() {
+        ""
+    } else {
+        ", map: \"User.something@invalid-and/weird\""
+    };
+
+    let input_dm = api.dm_with_sources(&format! {r#"
+         model User {{
+             first  Int
+             last   Int
+
+             @@id([first, last], name: "compound"{})
+         }}
+         
+         model User2 {{
+             first  Int
+             last   Int
+
+             @@id([first, last], name: "compound")
+         }}
+     "#, map});
+
+    let final_dm = &format! {r#"
+         model User {{
+             first  Int
+             last   Int
+
+             @@id([first, last], name: "compound"{})
+         }}
+         
+         model User2 {{
+             first  Int
+             last   Int
+
+             @@id([first, last], name: "compound")
+         }}
+
+         model Unrelated {{
+             id    Int @id @default(autoincrement())
+         }}
+     "#, map};
+
+    api.assert_eq_datamodels(&final_dm, &api.re_introspect(&input_dm).await?);
+
+    let expected = json!([{
+        "code": 18,
+        "message": "These models were enriched with custom compound id names taken from the previous Prisma schema.",
+        "affected" :[
+            {"model": "User"},
+            {"model": "User2"}
+        ]
+    }]);
+
+    assert_eq_json!(expected, api.re_introspect_warnings(&input_dm).await?);
+
+    Ok(())
+}
