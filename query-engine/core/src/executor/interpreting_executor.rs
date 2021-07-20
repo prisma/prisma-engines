@@ -43,25 +43,24 @@ impl CachedTx {
 
         let mut boxed = Box::pin(c_tx);
 
+        unsafe {
+            let box_ref = boxed.as_mut().get_unchecked_mut();
+            box_ref.tx = Some(box_ref.conn.start_transaction().await?);
+        };
+
         // let tx_mut = boxed.as_mut(); //.get_mut().conn.deref_mut();
         // let wat = tx_mut.start().await?;
 
         // let tx = boxed.as_mut().conn.start_transaction().await?;
-
-        unsafe {
-            let r = boxed.as_mut().get_unchecked_mut();
-            r.tx = Some(r.conn.start_transaction().await?);
-        };
-
         // let self_ptr: *const String = &boxed.as_ref().a;
 
         Ok(boxed)
         // todo!()
     }
 
-    async fn start<'conn>(&'conn mut self) -> crate::Result<Box<dyn Transaction + 'conn>> {
-        Ok(self.conn.start_transaction().await?)
-    }
+    // async fn start<'conn>(&'conn mut self) -> crate::Result<Box<dyn Transaction + 'conn>> {
+    //     Ok(self.conn.start_transaction().await?)
+    // }
 }
 
 enum TxStatus {
