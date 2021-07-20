@@ -271,11 +271,6 @@ impl Model {
         is_first_in_index || is_first_in_primary_key
     }
 
-    /// Finds all fields defined as autoincrement
-    pub fn auto_increment_fields(&self) -> impl std::iter::Iterator<Item = &ScalarField> {
-        self.scalar_fields().filter(|x| x.is_auto_increment())
-    }
-
     /// Determines whether there is a singular primary key
     pub fn has_single_id_field(&self) -> bool {
         matches!(&self.primary_key, Some(PrimaryKeyDefinition{fields, ..}) if fields.len() ==1)

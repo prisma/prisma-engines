@@ -9,7 +9,6 @@ use crate::{
     dml,
 };
 use enumflags2::BitFlags;
-use itertools::Itertools;
 use std::collections::HashSet;
 
 /// Helper for validating a datamodel.
@@ -61,10 +60,6 @@ impl<'a> Validator<'a> {
 
             if let Err(ref mut the_errors) = self.validate_model_connector_specific(ast_model, model) {
                 diagnostics.append(the_errors)
-            }
-
-            if let Err(ref mut the_errors) = self.validate_auto_increment(ast_model, model) {
-                diagnostics.append(the_errors);
             }
 
             if let Err(ref mut the_errors) = self.validate_base_fields_for_relation(schema, ast_model, model) {
@@ -143,66 +138,6 @@ impl<'a> Validator<'a> {
                 }
             }
         }
-    }
-
-    fn validate_auto_increment(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), Diagnostics> {
-        let mut errors = Diagnostics::new();
-
-        if let Some(data_source) = self.source {
-            let autoinc_fields = model.auto_increment_fields().collect_vec();
-
-            // First check if the provider supports autoincrement at all, if yes, proceed with the detailed checks.
-            if !autoinc_fields.is_empty() && !data_source.active_connector.supports_auto_increment() {
-                for field in autoinc_fields {
-                    let ast_field = ast_model.find_field_bang(&field.name);
-
-                    // Add an error for all autoincrement fields on the model.
-                    errors.push_error(DatamodelError::new_attribute_validation_error(
-                        &"The `autoincrement()` default value is used with a datasource that does not support it."
-                            .to_string(),
-                        "default",
-                        ast_field.span,
-                    ));
-                }
-            } else {
-                if !data_source.active_connector.supports_multiple_auto_increment()
-                    && model.auto_increment_fields().count() > 1
-                {
-                    errors.push_error(DatamodelError::new_attribute_validation_error(
-                        &"The `autoincrement()` default value is used multiple times on this model even though the underlying datasource only supports one instance per table.".to_string(),
-                        "default",
-                        ast_model.span,
-                    ))
-                }
-
-                // go over all fields
-                for field in autoinc_fields {
-                    let ast_field = ast_model.find_field_bang(&field.name);
-
-                    if !model.field_is_primary(&field.name)
-                        && !data_source.active_connector.supports_non_id_auto_increment()
-                    {
-                        errors.push_error(DatamodelError::new_attribute_validation_error(
-                            &"The `autoincrement()` default value is used on a non-id field even though the datasource does not support this.".to_string(),
-                            "default",
-                            ast_field.span,
-                        ))
-                    }
-
-                    if !model.field_is_indexed(&field.name)
-                        && !data_source.active_connector.supports_non_indexed_auto_increment()
-                    {
-                        errors.push_error(DatamodelError::new_attribute_validation_error(
-                            &"The `autoincrement()` default value is used on a non-indexed field even though the datasource does not support this.".to_string(),
-                            "default",
-                            ast_field.span,
-                        ))
-                    }
-                }
-            }
-        }
-
-        errors.to_result()
     }
 
     fn validate_model_has_strict_unique_criteria(

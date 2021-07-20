@@ -1,3 +1,4 @@
+mod autoincrement;
 mod native_types;
 
 use super::{
@@ -101,6 +102,8 @@ pub(super) fn resolve_model_and_field_attributes<'ast>(
     });
 
     ctx.db.types.models.insert(model_id, model_data);
+
+    autoincrement::validate_auto_increment(model_id, ctx);
 }
 
 fn visit_scalar_field_attributes<'ast>(
