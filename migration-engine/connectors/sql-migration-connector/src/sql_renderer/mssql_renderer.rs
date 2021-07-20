@@ -130,6 +130,7 @@ impl SqlRenderer for MssqlFlavour {
             IndexType::Normal => "",
         };
 
+        //todo nice surprise, should probably be a validation instead
         let index_name = index.name().replace('.', "_");
         let index_name = self.quote(&index_name);
         let table_reference = self.quote_with_schema(index.table().name()).to_string();

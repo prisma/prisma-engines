@@ -663,9 +663,12 @@ fn model_index<'ast>(
         (None, db_name)
     } else {
         //old default name logic moved from sql schema calculator
+
+        let separator = if ctx.is_sql_server() { "_" } else { "." };
         let generated_name = format!(
-            "{table}.{fields}_index",
+            "{table}{separator}{fields}_index",
             table = &model_db_name,
+            separator = separator,
             fields = field_db_names.join("_")
         );
 
@@ -759,9 +762,12 @@ fn model_unique<'ast>(
         (name, db_name)
     } else {
         //old default name logic moved from sql schema calculator
+        let separator = if ctx.is_sql_server() { "_" } else { "." };
+
         let generated_name = format!(
-            "{table}.{fields}_unique",
+            "{table}{separator}{fields}_unique",
             table = &model_db_name,
+            separator = separator,
             fields = field_db_names.join("_")
         );
 
