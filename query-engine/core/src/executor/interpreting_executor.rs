@@ -1,7 +1,10 @@
+use std::{marker::PhantomPinned, ops::DerefMut, pin::Pin};
+
 use super::{pipeline::QueryPipeline, QueryExecutor};
-use crate::{Operation, QueryGraphBuilder, QueryInterpreter, QuerySchemaRef, ResponseData};
+use crate::{Operation, QueryGraphBuilder, QueryInterpreter, QuerySchemaRef, ResponseData, TransactionManager, TxId};
 use async_trait::async_trait;
-use connector::{Connection, Connector};
+use connector::{Connection, Connector, Transaction};
+use dashmap::DashMap;
 use futures::future;
 
 /// Central query executor and main entry point into the query core.
@@ -9,9 +12,63 @@ pub struct InterpretingExecutor<C> {
     /// The loaded connector
     connector: C,
 
+    // tx_cache: TransactionCache<'conn, 'tx>,
     /// Flag that forces individual operations to run in a transaction.
     /// Does _not_ force batches to use transactions.
     force_transactions: bool,
+}
+
+#[derive(Default)]
+struct TransactionCache {
+    pub cache: DashMap<TxId, CachedTx>,
+}
+
+struct CachedTx {
+    pub conn: Box<dyn Connection>,
+    pub tx: Option<Box<dyn Transaction>>,
+    pub status: TxStatus,
+    _marker: PhantomPinned,
+}
+
+impl CachedTx {
+    pub async fn new(conn: Box<dyn Connection>) -> crate::Result<Pin<Box<Self>>> {
+        use pin_utils::pin_mut;
+
+        let c_tx = CachedTx {
+            conn,
+            tx: None,
+            status: TxStatus::Open,
+            _marker: PhantomPinned,
+        };
+
+        let mut boxed = Box::pin(c_tx);
+
+        // let tx_mut = boxed.as_mut(); //.get_mut().conn.deref_mut();
+        // let wat = tx_mut.start().await?;
+
+        // let tx = boxed.as_mut().conn.start_transaction().await?;
+
+        unsafe {
+            let r = boxed.as_mut().get_unchecked_mut();
+            r.tx = Some(r.conn.start_transaction().await?);
+        };
+
+        // let self_ptr: *const String = &boxed.as_ref().a;
+
+        Ok(boxed)
+        // todo!()
+    }
+
+    async fn start<'conn>(&'conn mut self) -> crate::Result<Box<dyn Transaction + 'conn>> {
+        Ok(self.conn.start_transaction().await?)
+    }
+}
+
+enum TxStatus {
+    Open,
+    Committed,
+    RolledBack,
+    Expired,
 }
 
 impl<C> InterpretingExecutor<C>
@@ -21,6 +78,7 @@ where
     pub fn new(connector: C, force_transactions: bool) -> Self {
         InterpretingExecutor {
             connector,
+            // tx_cache: TransactionCache::default(),
             force_transactions,
         }
     }
@@ -62,6 +120,18 @@ impl<C> QueryExecutor for InterpretingExecutor<C>
 where
     C: Connector + Send + Sync + 'static,
 {
+    /// Executes a single operation. Execution will be inside of a transaction or not depending on the needs of the query.
+    async fn execute(
+        &self,
+        tx_id: Option<TxId>,
+        operation: Operation,
+        query_schema: QuerySchemaRef,
+    ) -> crate::Result<ResponseData> {
+        let conn = self.connector.get_connection().await?;
+
+        Self::execute_single_operation(operation, conn, self.force_transactions, query_schema.clone()).await
+    }
+
     /// Executes a batch of operations.
     ///
     /// If the batch is to be executed transactionally:
@@ -74,8 +144,9 @@ where
     /// Note that individual operations executed in non-transactional mode can still be transactions in themselves
     /// if the query (e.g. a write op) requires it.
     #[tracing::instrument(skip(self, operations, query_schema))]
-    async fn execute_batch(
+    async fn execute_all(
         &self,
+        tx_id: Option<TxId>,
         operations: Vec<Operation>,
         transactional: bool,
         query_schema: QuerySchemaRef,
@@ -127,14 +198,30 @@ where
         }
     }
 
-    /// Executes a single operation. Execution will be inside of a transaction or not depending on the needs of the query.
-    async fn execute(&self, operation: Operation, query_schema: QuerySchemaRef) -> crate::Result<ResponseData> {
-        let conn = self.connector.get_connection().await?;
-
-        Self::execute_single_operation(operation, conn, self.force_transactions, query_schema.clone()).await
-    }
-
     fn primary_connector(&self) -> &(dyn Connector + Send + Sync) {
         &self.connector
+    }
+}
+
+#[async_trait]
+impl<C> TransactionManager for InterpretingExecutor<C>
+where
+    C: Connector + Send + Sync,
+{
+    async fn start_tx(&self, max_acquisition_secs: u32, valid_for_secs: u32) -> crate::Result<TxId> {
+        let cache = TransactionCache::default();
+
+        let id = TxId::new();
+        let mut conn = self.connector.get_connection().await?;
+
+        todo!()
+    }
+
+    async fn commit_tx(&self, tx_id: TxId) -> crate::Result<TxId> {
+        todo!()
+    }
+
+    async fn rollback_tx(&self, tx_id: TxId) -> crate::Result<TxId> {
+        todo!()
     }
 }
