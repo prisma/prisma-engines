@@ -251,18 +251,28 @@ fn visit_scalar_field_attributes<'ast>(
              let db_name : Option<Cow<'ast, str>> = if ctx.db.preview_features.contains(NamedConstraints) {
                  let generated_name = Cow::from(ConstraintNames::index_name(model_db_name, &[field_db_name], IndexType::Unique, ctx.db.active_connector()));
 
-                 match args.optional_arg("map").map(|name| name.as_str()) {
+                 let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
                      Some(Ok("")) => error_on_empty_string_cow(args, ctx, "map"),
-                     Some(Ok(name)) => {
-                         //todo length validation
-                         Some(Cow::from(name))
-                     }
+                     Some(Ok(name)) => Some(Cow::from(name)),
                      Some(Err(err)) => {
                          ctx.push_error(err);
                          None
                      }
                      None => Some(generated_name),
+                 };
+
+                 if let Some(err) = ConstraintNames::is_db_name_too_long(
+                     args.span(),
+                     &ast_model.name.name,
+                     &db_name,
+                     "@unique",
+                     ctx.db.active_connector(),
+                 ) {
+                     ctx.push_error(err);
                  }
+
+                 db_name
+
              } else {
                  let generated_name = if ctx.is_sql_server() {
                      format!("{}_{}_unique", model_db_name, field_db_name)
@@ -631,7 +641,7 @@ fn model_index<'ast>(
             None => Some(generated_name),
         };
 
-        let name_in_db = match (name, db_name) {
+        let db_name = match (name, db_name) {
             (Some(_), Some(map)) => Some(map), //todo error here
             //backwards compatibility, accept name arg on normal indexes and use it as map arg
             (Some(name), None) => Some(name.into()),
@@ -639,7 +649,17 @@ fn model_index<'ast>(
             (None, None) => None,
         };
 
-        (None, name_in_db)
+        if let Some(err) = ConstraintNames::is_db_name_too_long(
+            args.span(),
+            &ast_model.name.name,
+            &db_name,
+            "@@index",
+            ctx.db.active_connector(),
+        ) {
+            ctx.push_error(err);
+        }
+
+        (None, db_name)
     } else {
         let name = match args.optional_arg("name").map(|name| name.as_str()) {
             Some(Ok("")) => error_on_empty_string(args, ctx, "name"),
@@ -705,10 +725,7 @@ fn model_unique<'ast>(
 
         let name = match args.optional_arg("name").map(|name| name.as_str()) {
             Some(Ok("")) => error_on_empty_string(args, ctx, "name"),
-            Some(Ok(name)) => {
-                //todo validation for client use
-                Some(name)
-            }
+            Some(Ok(name)) => Some(name),
             Some(Err(err)) => push_error(ctx, err),
             None => None,
         };
@@ -722,13 +739,24 @@ fn model_unique<'ast>(
 
         let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
             Some(Ok("")) => error_on_empty_string_cow(args, ctx, "map"),
-            Some(Ok(name)) => {
-                //todo validation for length
-                Some(name.into())
-            }
+            Some(Ok(name)) => Some(name.into()),
             Some(Err(err)) => push_error_cow(ctx, err),
             None => Some(generated_name),
         };
+
+        if let Some(err) = ConstraintNames::is_client_name_valid(args.span(), &ast_model.name.name, name, "@@unique") {
+            ctx.push_error(err);
+        }
+
+        if let Some(err) = ConstraintNames::is_db_name_too_long(
+            args.span(),
+            &ast_model.name.name,
+            &db_name,
+            "@@unique",
+            ctx.db.active_connector(),
+        ) {
+            ctx.push_error(err);
+        }
 
         (name, db_name)
     } else {

@@ -1,6 +1,11 @@
+use crate::ast::Span;
+use crate::diagnostics::DatamodelError;
 use crate::{IndexType, WithDatabaseName};
 use datamodel_connector::Connector;
 use dml::model::{IndexDefinition, Model};
+use once_cell::sync::Lazy;
+use regex::Regex;
+use std::borrow::Cow;
 
 pub struct ConstraintNames {}
 
@@ -81,6 +86,47 @@ impl ConstraintNames {
             IndexType::Unique => format!("{}{}", trimmed, unique_suffix),
             IndexType::Normal => format!("{}{}", trimmed, index_suffix),
         }
+    }
+
+    pub fn is_client_name_valid(
+        span: Span,
+        object_name: &str,
+        name: Option<&str>,
+        attribute: &str,
+    ) -> Option<DatamodelError> {
+        //only Alphanumeric characters and underscore are allowed due to this making its way into the client API
+        //todo what about starting with a number or underscore?
+        static RE: Lazy<Regex> = Lazy::new(|| Regex::new("[^_a-zA-Z0-9]").unwrap());
+
+        if let Some(name) = name {
+            if RE.is_match(name) {
+                return  Some(DatamodelError::new_model_validation_error(
+                    &format!("The `name` property within the `{}` attribute only allows for the following characters: `_a-zA-Z0-9`.", attribute),
+                    object_name,
+                    span,
+                ));
+            }
+        }
+        None
+    }
+
+    pub fn is_db_name_too_long<'ast>(
+        span: Span,
+        object_name: &str,
+        name: &Option<Cow<'ast, str>>,
+        attribute: &str,
+        connector: &dyn Connector,
+    ) -> Option<DatamodelError> {
+        if let Some(name) = name {
+            if name.len() > connector.constraint_name_length() {
+                return Some(DatamodelError::new_model_validation_error(
+                    &format!("The constraint name '{}' specified in the `map` argument for the `{}` constraint is too long for your chosen provider. The maximum allowed length is {} bytes.", name, attribute, connector.constraint_name_length()),
+                    object_name,
+                    span,
+                ));
+            }
+        }
+        None
     }
 
     // pub fn foreign_key_constraint_name(
