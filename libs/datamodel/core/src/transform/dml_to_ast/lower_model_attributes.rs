@@ -16,8 +16,7 @@ impl<'a> LowerDmlToAst<'a> {
 
         if let Some(pk) = &model.primary_key {
             if !pk.defined_on_field {
-                let mut args = vec![];
-                args.push(ast::Argument::new_array("", LowerDmlToAst::field_array(&pk.fields)));
+                let mut args = vec![ast::Argument::new_array("", LowerDmlToAst::field_array(&pk.fields))];
                 if self.preview_features.contains(NamedConstraints) {
                     if pk.name.is_some() {
                         args.push(ast::Argument::new(

@@ -344,6 +344,8 @@ impl SqlRenderer for PostgresFlavour {
             .flat_map(|cols| cols.iter())
             .map(|col| self.quote(col))
             .join(",");
+
+        //todo use the PK name here if feature flag is present
         let pk = if !pk_column_names.is_empty() {
             format!(",\n\n{}PRIMARY KEY ({})", SQL_INDENTATION, pk_column_names)
         } else {

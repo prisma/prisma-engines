@@ -99,8 +99,15 @@ impl TestApi {
     async fn test_introspect_internal(&self, data_model: Datamodel) -> ConnectorResult<IntrospectionResult> {
         let config = self.configuration();
 
+        let preview_features = self
+            .args
+            .preview_features()
+            .iter()
+            .flat_map(|f| PreviewFeature::parse_opt(f))
+            .collect();
+
         let ctx = IntrospectionContext {
-            preview_features: config.preview_features().map(Clone::clone).collect(),
+            preview_features,
             source: config.datasources.into_iter().next().unwrap(),
         };
 
@@ -115,7 +122,6 @@ impl TestApi {
     pub async fn re_introspect(&self, data_model_string: &str) -> Result<String> {
         let config = self.configuration();
         let data_model = parse_datamodel(data_model_string);
-
         let introspection_result = self.test_introspect_internal(data_model).await?;
 
         let rendering_span = tracing::info_span!("render_datamodel after introspection");
@@ -202,9 +208,9 @@ impl TestApi {
 
     #[track_caller]
     pub fn assert_eq_datamodels(&self, expected_without_header: &str, result_with_header: &str) {
-        let expected = self.dm_with_sources(expected_without_header);
-        let parsed_expected = datamodel::parse_datamodel(&expected)
-            .map_err(|err| err.to_pretty_string("schema.prisma", &expected))
+        let expected_with_header = self.dm_with_sources(expected_without_header);
+        let parsed_expected = datamodel::parse_datamodel(&expected_with_header)
+            .map_err(|err| err.to_pretty_string("schema.prisma", &expected_with_header))
             .unwrap()
             .subject;
 

@@ -159,7 +159,6 @@ impl<'a> Validator<'a> {
                     //doing this here for now since I want to have all field names already generated
                     // it might be possible to move this
                     if let Some(name) = &index.name {
-                        println!("Got HERE");
                         for field in model.fields() {
                             if let Some(err) = ConstraintNames::client_name_already_in_use(
                                 name,

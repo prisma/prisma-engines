@@ -2080,7 +2080,7 @@ async fn re_introspecting_custom_compound_unique_names(api: &TestApi) -> TestRes
     Ok(())
 }
 
-#[test_connector(preview_features("NamedConstraints"))]
+#[test_connector(tags(Postgres), preview_features("NamedConstraints"))]
 async fn re_introspecting_custom_compound_id_names(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -2106,59 +2106,57 @@ async fn re_introspecting_custom_compound_id_names(api: &TestApi) -> TestResult 
         })
         .await?;
 
-    let map = if api.sql_family().is_mysql() || api.sql_family().is_sqlite() {
-        ""
-    } else {
-        ", map: \"User.something@invalid-and/weird\""
-    };
-
-    let input_dm = api.dm_with_sources(&format! {r#"
-         generator js {{
+    let input_dm = api.dm_with_sources(
+        r#"
+         generator js {
             provider = "prisma-client-js"
             previewFeatures = ["NamedConstraints"]
-         }}
+         }
     
-         model User {{
+         model User {
              first  Int
              last   Int
 
-             @@id([first, last], name: "compound"{})
-         }}
+             @@id([first, last], name: "compound", map: "User.something@invalid-and/weird")
+         }
          
-         model User2 {{
+         model User2 {
              first  Int
              last   Int
 
              @@id([first, last], name: "compound")
-         }}
-     "#, map});
+         }
+     "#,
+    );
 
-    let final_dm = &format! {r#"
-         generator js {{
+    let final_dm = r#"
+         generator js {
             provider = "prisma-client-js"
             previewFeatures = ["NamedConstraints"]
-         }}
+         }
          
-         model User {{
+         model User {
              first  Int
              last   Int
 
-             @@id([first, last], name: "compound"{})
-         }}
+             @@id([first, last], name: "compound", map: "User.something@invalid-and/weird")
+         }
          
-         model User2 {{
+         model User2 {
              first  Int
              last   Int
 
              @@id([first, last], name: "compound")
-         }}
+         }
 
-         model Unrelated {{
+         model Unrelated {
              id    Int @id @default(autoincrement())
-         }}
-     "#, map};
+         }
+     "#;
 
-    api.assert_eq_datamodels(&final_dm, &api.re_introspect(&input_dm).await?);
+    let re_introspected = api.re_introspect(&input_dm).await?;
+
+    api.assert_eq_datamodels(&final_dm, &re_introspected);
 
     let expected = json!([{
         "code": 18,

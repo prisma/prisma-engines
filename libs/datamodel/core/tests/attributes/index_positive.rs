@@ -79,8 +79,8 @@ fn the_name_argument_must_work() {
 fn the_map_argument_must_work_with_preview_flag() {
     let dml = r#"
      datasource test {
-        provider = "mysql"
-        url = "mysql://root:prisma@127.0.0.1:3309/ReproIndexNames?connection_limit=1"
+        provider = "postgres"
+        url = "postgresql://..."
      }
         
      generator js {

@@ -152,6 +152,7 @@ impl SqlRenderer for MssqlFlavour {
             .map(|column| self.render_column(&column))
             .join(",\n    ");
 
+        //todo use the pk name if feature flag is set otherwise leave this generation logic in here
         let primary_key = if let Some(primary_columns) = table.primary_key_column_names() {
             let index_name = format!("PK__{}__{}", table.name(), primary_columns.iter().join("_"));
             let column_names = primary_columns.iter().map(|col| self.quote(col)).join(",");
@@ -174,6 +175,7 @@ impl SqlRenderer for MssqlFlavour {
             let constraints = constraints
                 .iter()
                 .map(|index| {
+                    //todo another nice surprise
                     let name = index.name().replace('.', "_");
                     let columns = index.columns().map(|col| self.quote(col.name()));
 

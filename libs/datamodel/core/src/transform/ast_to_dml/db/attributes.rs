@@ -171,11 +171,13 @@ fn visit_scalar_field_attributes<'ast>(
                 )),
                 None => {
                     let db_name = if ctx.db.preview_features.contains(NamedConstraints) {
+
+                        let generated_name = ConstraintNames::primary_key_name(model_data.mapped_name.unwrap_or(&ast_model.name.name), ctx.db.active_connector());
                         match args.optional_arg("map").map(|name| name.as_str()) {
                             Some(Ok("")) => error_on_empty_string_cow(args, ctx, "map"),
                             Some(Ok(name)) => Some(name.into()),
                             Some(Err(err)) => push_error_cow(ctx, err),
-                            None => None,
+                            None => Some(generated_name.into()),
                         }
                     } else {
                         None
@@ -545,18 +547,20 @@ fn visit_model_id<'ast>(
         let name = match args.optional_arg("name").map(|name| name.as_str()) {
             Some(Ok("")) => error_on_empty_string(args, ctx, "name"),
             Some(Ok(name)) => Some(name),
-            Some(Err(err)) => {
-                ctx.push_error(err);
-                None
-            }
+            Some(Err(err)) => push_error(ctx, err),
             None => None,
         };
+
+        let generated_name = ConstraintNames::primary_key_name(
+            model_data.mapped_name.unwrap_or(&ast_model.name.name),
+            ctx.db.active_connector(),
+        );
 
         let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
             Some(Ok("")) => error_on_empty_string_cow(args, ctx, "map"),
             Some(Ok(name)) => Some(name.into()),
             Some(Err(err)) => push_error_cow(ctx, err),
-            None => None,
+            None => Some(generated_name.into()),
         };
 
         if let Some(err) = ConstraintNames::is_client_name_valid(args.span(), &ast_model.name.name, name, "@@id") {
