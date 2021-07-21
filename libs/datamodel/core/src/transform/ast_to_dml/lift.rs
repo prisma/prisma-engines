@@ -49,7 +49,7 @@ impl<'a> LiftAstToDml<'a> {
             .as_ref()
             .map(|pk_data| dml::PrimaryKeyDefinition {
                 name: pk_data.name.map(String::from),
-                db_name: pk_data.name.map(String::from),
+                db_name: pk_data.db_name.as_ref().map(|n| n.to_string()),
                 fields: pk_data
                     .fields
                     .iter()
