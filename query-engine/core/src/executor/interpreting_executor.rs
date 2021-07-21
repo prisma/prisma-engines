@@ -24,6 +24,15 @@ struct TransactionCache {
     pub cache: DashMap<TxId, CachedTx>,
 }
 
+impl TransactionCache {
+    pub fn dump_keys(&self) {
+        dbg!(self.cache.len());
+        self.cache.iter().for_each(|r| {
+            dbg!(r.key());
+        });
+    }
+}
+
 struct CachedTx {
     pub conn: Box<dyn Connection>,
     pub tx: Option<Box<dyn Transaction + 'static>>,
@@ -123,6 +132,8 @@ where
         operation: Operation,
         query_schema: QuerySchemaRef,
     ) -> crate::Result<ResponseData> {
+        // self.tx_cache.dump_keys();
+
         // Parse, validate, and extract query graph from query document.
         let (query_graph, serializer) = QueryGraphBuilder::new(query_schema).build(operation)?;
 

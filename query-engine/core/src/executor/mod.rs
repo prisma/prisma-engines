@@ -24,9 +24,18 @@ impl TxId {
     }
 }
 
-impl From<String> for TxId {
-    fn from(s: String) -> Self {
-        Self(s)
+impl<T> From<T> for TxId
+where
+    T: Into<String>,
+{
+    fn from(s: T) -> Self {
+        Self(s.into())
+    }
+}
+
+impl ToString for TxId {
+    fn to_string(&self) -> String {
+        self.0.clone()
     }
 }
 

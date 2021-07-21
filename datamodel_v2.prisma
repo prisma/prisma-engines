@@ -1,6 +1,6 @@
-datasource test {
-  provider = "mongodb"
-  url      = "mongodb://prisma:prisma@127.0.0.1:27017/connect_inside_create_p1_c1_connect_by_id_18?authSource=admin&retryWrites=true"
+datasource db {
+  provider = "postgres"
+  url      = "postgresql://postgres:prisma@localhost:5432/"
 }
 
 generator client {

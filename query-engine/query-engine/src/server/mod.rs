@@ -76,6 +76,11 @@ pub async fn listen(opts: PrismaOpt) -> PrismaResult<()> {
     app.at("/server_info").get(server_info_handler);
     app.at("/status").get(|_| async move { Ok(json!({"status": "ok"})) });
 
+    // Transaction routes.
+    app.at("/transaction/start").post(transaction_start_handler);
+    app.at("/transaction/:id/commit").post(transaction_commit_handler);
+    app.at("/transaction/:id/rollback").post(transaction_rollback_handler);
+
     // Start the Tide server and log the server details.
     // NOTE: The `info!` statement is essential for the correct working of the client.
     let mut listener = match opts.unix_path() {
@@ -102,7 +107,10 @@ async fn graphql_handler(mut req: Request<State>) -> tide::Result {
     let span = tracing::span!(Level::TRACE, "graphql_handler");
     span.set_parent(cx);
 
-    let tx_id = req.header("X-transaction-id").map(ToString::to_string).map(TxId::from);
+    let tx_id = req
+        .header("X-transaction-id")
+        .map(|values| values.last().to_string())
+        .map(TxId::from);
 
     let work = async move {
         let body: GraphQlBody = req.body_json().await?;
@@ -160,6 +168,43 @@ async fn server_info_handler(req: Request<State>) -> tide::Result<impl Into<Resp
         "version": env!("CARGO_PKG_VERSION"),
         "primary_connector": req.state().cx.primary_connector(),
     }))
+}
+
+#[derive(Debug, Deserialize)]
+struct TxInput {
+    /// Maximum wait time in seconds.
+    pub max_wait: u32,
+
+    /// Time in seconds after which the transaction rolls back automatically.
+    pub timeout: u32,
+}
+
+async fn transaction_start_handler(mut req: Request<State>) -> tide::Result<impl Into<Response>> {
+    let input: TxInput = req.body_json().await?;
+    let state = req.state();
+    let tx_id = state.cx.executor.start_tx(input.max_wait, input.timeout).await?;
+
+    Ok(json!({
+        "id": tx_id.to_string(),
+    }))
+}
+
+async fn transaction_commit_handler(req: Request<State>) -> tide::Result<impl Into<Response>> {
+    let tx_id = TxId::from(req.param("id")?);
+    let state = req.state();
+
+    state.cx.executor.commit_tx(tx_id).await?;
+
+    Ok(Response::new(StatusCode::Ok))
+}
+
+async fn transaction_rollback_handler(req: Request<State>) -> tide::Result<impl Into<Response>> {
+    let tx_id = TxId::from(req.param("id")?);
+    let state = req.state();
+
+    state.cx.executor.rollback_tx(tx_id).await?;
+
+    Ok(Response::new(StatusCode::Ok))
 }
 
 /// Handle debug headers inside the main GraphQL endpoint.
