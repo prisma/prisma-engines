@@ -2009,7 +2009,7 @@ async fn default_optional_actions(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(preview_features("NamedConstraints"))]
 async fn re_introspecting_custom_compound_unique_names(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -2032,6 +2032,11 @@ async fn re_introspecting_custom_compound_unique_names(api: &TestApi) -> TestRes
         .await?;
 
     let input_dm = indoc! {r#"
+         generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["NamedConstraints"]
+         }
+         
          model User {
              id     Int @id @default(autoincrement()) 
              first  Int
@@ -2042,6 +2047,11 @@ async fn re_introspecting_custom_compound_unique_names(api: &TestApi) -> TestRes
      "#};
 
     let final_dm = indoc! {r#"
+         generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["NamedConstraints"]
+         }   
+    
          model User {
              id     Int @id @default(autoincrement()) 
              first  Int
@@ -2070,7 +2080,7 @@ async fn re_introspecting_custom_compound_unique_names(api: &TestApi) -> TestRes
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(preview_features("NamedConstraints"))]
 async fn re_introspecting_custom_compound_id_names(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -2103,6 +2113,11 @@ async fn re_introspecting_custom_compound_id_names(api: &TestApi) -> TestResult 
     };
 
     let input_dm = api.dm_with_sources(&format! {r#"
+         generator js {{
+            provider = "prisma-client-js"
+            previewFeatures = ["NamedConstraints"]
+         }}
+    
          model User {{
              first  Int
              last   Int
@@ -2119,6 +2134,11 @@ async fn re_introspecting_custom_compound_id_names(api: &TestApi) -> TestResult 
      "#, map});
 
     let final_dm = &format! {r#"
+         generator js {{
+            provider = "prisma-client-js"
+            previewFeatures = ["NamedConstraints"]
+         }}
+         
          model User {{
              first  Int
              last   Int
