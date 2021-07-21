@@ -288,6 +288,6 @@ fn naming_unique_to_a_field_name_should_error() {
     errors.assert_is(DatamodelError::new_model_validation_error(
         "The custom name `used` specified for the `@@unique` attribute is already used as a name for a field. Please choose a different name.",
         "User",
-        Span::new(282, 457),
+        Span::new(229, 404),
     ));
 }

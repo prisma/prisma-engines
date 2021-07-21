@@ -191,6 +191,15 @@ fn visit_scalar_field_attributes<'ast>(
                         ctx.push_error(err);
                     }
 
+
+                    if db_name.is_some() && !ctx.db.active_connector().supports_named_primary_keys() {
+                        ctx.push_error(DatamodelError::new_model_validation_error(
+                            "You defined a database name for the primary key on the model. This is not supported by the provider.",
+                            &ast_model.name.name,
+                            ast_model.span,
+                        ));
+                    }
+
                     model_data.primary_key = Some(PrimaryKeyData{
                         name: None,
                         db_name,
@@ -552,6 +561,14 @@ fn visit_model_id<'ast>(
 
         if let Some(err) = ConstraintNames::is_client_name_valid(args.span(), &ast_model.name.name, name, "@@id") {
             ctx.push_error(err);
+        }
+
+        if db_name.is_some() && !ctx.db.active_connector().supports_named_primary_keys() {
+            ctx.push_error(DatamodelError::new_model_validation_error(
+                "You defined a database name for the primary key on the model. This is not supported by the provider.",
+                &ast_model.name.name,
+                ast_model.span,
+            ));
         }
 
         if let Some(err) = ConstraintNames::is_db_name_too_long(

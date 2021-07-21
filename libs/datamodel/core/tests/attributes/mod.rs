@@ -21,14 +21,14 @@ mod map_positive;
 fn with_named_constraints(dm: &str) -> String {
     let header = r#"
     datasource test {
-            provider = "mysql"
-            url = "mysql://root:prisma@127.0.0.1:3309/ReproIndexNames?connection_limit=1"
-     }
+            provider = "postgres"
+            url = "postgresql://..."
+    }
     
-     generator js {
+    generator js {
             provider = "prisma-client-js"
             previewFeatures = ["NamedConstraints"]
-     }"#;
+    }"#;
 
     format!("{}\n{}", header, dm)
 }

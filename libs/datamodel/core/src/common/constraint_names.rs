@@ -1,6 +1,6 @@
 use crate::ast::Span;
 use crate::diagnostics::DatamodelError;
-use crate::{IndexType, WithDatabaseName};
+use crate::{IndexType, PrimaryKeyDefinition, WithDatabaseName};
 use datamodel_connector::Connector;
 use dml::model::{IndexDefinition, Model};
 use once_cell::sync::Lazy;
@@ -37,26 +37,22 @@ impl ConstraintNames {
     /// seq for sequences
     ///
 
-    // pub fn primary_key_name_matches(
-    //     constraint_name: Option<String>,
-    //     table_name: &str,
-    //     connector: &dyn Connector,
-    // ) -> bool {
-    //     constraint_name == ConstraintNames::primary_key_name(table_name, connector)
-    // }
-    //
-    // pub fn primary_key_name(table_name: &str, connector: &dyn Connector) -> Option<String> {
-    //     let suffix = "_pkey";
-    //     let limit = connector.constraint_name_length();
-    //
-    //     let trimmed = if table_name.len() >= limit - 5 {
-    //         table_name.split_at(limit - 5).0
-    //     } else {
-    //         table_name
-    //     };
-    //
-    //     Some(format!("{}{}", trimmed, suffix))
-    // }
+    pub fn primary_key_name_matches(pk: &PrimaryKeyDefinition, model: &Model, connector: &dyn Connector) -> bool {
+        pk.db_name.as_ref().unwrap() == &ConstraintNames::primary_key_name(model.final_database_name(), connector)
+    }
+
+    pub fn primary_key_name(table_name: &str, connector: &dyn Connector) -> String {
+        let suffix = "_pkey";
+        let limit = connector.constraint_name_length();
+
+        let trimmed = if table_name.len() >= limit - 5 {
+            table_name.split_at(limit - 5).0
+        } else {
+            table_name
+        };
+
+        format!("{}{}", trimmed, suffix)
+    }
 
     pub fn index_name_matches(idx: &IndexDefinition, model: &Model, connector: &dyn Connector) -> bool {
         let column_names: Vec<&str> = idx

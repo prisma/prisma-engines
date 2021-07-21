@@ -199,7 +199,7 @@ fn invalid_name_for_compound_id_must_error() {
     errors.assert_is(DatamodelError::new_model_validation_error(
         "The `name` property within the `@@id` attribute only allows for the following characters: `_a-zA-Z0-9`.",
         "User",
-        Span::new(366, 411),
+        Span::new(313, 358),
     ));
 }
 
@@ -210,6 +210,11 @@ fn mapped_id_must_error_on_mysql() {
          provider = "mysql"
          url = "mysql://root:prisma@127.0.0.1:3309/NoNamedPKsOnMysql"
      }
+     
+     generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["NamedConstraints"]
+    }
 
      model User {
          name           String
@@ -219,7 +224,7 @@ fn mapped_id_must_error_on_mysql() {
      }
 
      model User1 {
-         name           String @id("NotSupportedByProvider")
+         name           String @id(map: "NotSupportedByProvider")
      }
      "#;
 
@@ -228,12 +233,12 @@ fn mapped_id_must_error_on_mysql() {
         DatamodelError::new_model_validation_error(
             "You defined a database name for the primary key on the model. This is not supported by the provider.",
             "User",
-            Span::new(134, 290),
+            Span::new(260, 408),
         ),
         DatamodelError::new_model_validation_error(
             "You defined a database name for the primary key on the model. This is not supported by the provider.",
             "User1",
-            Span::new(300, 379),
+            Span::new(415, 501),
         ),
     ]);
 }
@@ -245,6 +250,11 @@ fn mapped_id_must_error_on_sqlite() {
          provider = "sqlite"
          url = "file://...."
      }
+     
+     generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["NamedConstraints"]
+    }
 
     model User {
          name           String
@@ -254,7 +264,7 @@ fn mapped_id_must_error_on_sqlite() {
      }
 
      model User1 {
-         name           String @id("NotSupportedByProvider")
+         name           String @id(map: "NotSupportedByProvider")
      }
      "#;
 
@@ -263,12 +273,12 @@ fn mapped_id_must_error_on_sqlite() {
         DatamodelError::new_model_validation_error(
             "You defined a database name for the primary key on the model. This is not supported by the provider.",
             "User",
-            Span::new(93, 249),
+            Span::new(219, 367),
         ),
         DatamodelError::new_model_validation_error(
             "You defined a database name for the primary key on the model. This is not supported by the provider.",
             "User1",
-            Span::new(259, 338),
+            Span::new(374, 460),
         ),
     ]);
 }
@@ -291,7 +301,7 @@ fn naming_id_to_a_field_name_should_error() {
     errors.assert_is(DatamodelError::new_model_validation_error(
         "The custom name `used` specified for the `@@id` attribute is already used as a name for a field. Please choose a different name.",
         "User",
-        Span::new(282, 441),
+        Span::new(229, 388),
     ));
 }
 
@@ -316,14 +326,14 @@ fn mapping_id_with_a_name_that_is_too_long_should_error() {
     let errors = parse_error(&dml);
     errors.assert_are(&[
         DatamodelError::new_model_validation_error(
-            "The constraint name 'IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimits' specified in the `map` argument for the `@@id` constraint is too long for your chosen provider. The maximum allowed length is 64 bytes.",
+            "The constraint name 'IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimits' specified in the `map` argument for the `@@id` constraint is too long for your chosen provider. The maximum allowed length is 63 bytes.",
             "User",
-            Span::new(366, 520),
+            Span::new(313, 467),
         ),
         DatamodelError::new_model_validation_error(
-            "The constraint name 'IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimitsHereAsWell' specified in the `map` argument for the `@id` constraint is too long for your chosen provider. The maximum allowed length is 64 bytes.",
+            "The constraint name 'IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimitsHereAsWell' specified in the `map` argument for the `@id` constraint is too long for your chosen provider. The maximum allowed length is 63 bytes.",
             "User1",
-            Span::new(580, 720),
+            Span::new(527, 667),
         ),
     ]);
 }

@@ -218,7 +218,7 @@ macro_rules! capabilities {
     };
 }
 
-// Capabilities describe what functoinality connectors are able to provide.
+// Capabilities describe what functionality connectors are able to provide.
 // Some are used only by the query engine, some are used only by the datamodel parser.
 capabilities!(
     // General capabilities, not specific to any part of Prisma.

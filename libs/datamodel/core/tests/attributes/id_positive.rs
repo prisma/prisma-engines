@@ -215,7 +215,7 @@ fn mapped_singular_id_must_work() {
     let dml = with_named_constraints(
         r#"
     model Model {
-        a String @id("test")
+        a String @id(map: "test")
     }
 
     model Model2 {

@@ -50,13 +50,13 @@ pub fn introspect(
         }
 
         for index in &table.indices {
-            model.add_index(calculate_index(index));
+            model.add_index(calculate_index(index, ctx));
         }
 
         if let Some(pk) = &table.primary_key {
             model.primary_key = Some(PrimaryKeyDefinition {
                 name: None,
-                db_name: None,
+                db_name: pk.constraint_name.clone(),
                 fields: pk.columns.clone(),
                 defined_on_field: pk.columns.len() == 1,
             });
