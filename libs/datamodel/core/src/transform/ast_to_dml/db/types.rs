@@ -81,6 +81,12 @@ pub(crate) struct ScalarField<'ast> {
     pub(crate) native_type: Option<(&'ast str, Vec<String>)>,
 }
 
+impl ScalarField<'_> {
+    pub(crate) fn is_autoincrement(&self) -> bool {
+        matches!(&self.default, Some(crate::dml::DefaultValue::Expression(expr)) if expr.is_autoincrement())
+    }
+}
+
 #[derive(Debug)]
 pub(crate) struct RelationField<'ast> {
     pub(crate) referenced_model: ast::ModelId,
@@ -109,14 +115,34 @@ impl RelationField<'_> {
     }
 }
 
+/// Information gathered from validating attributes on a model.
 #[derive(Default, Debug)]
 pub(crate) struct ModelData<'ast> {
+    /// @(@)id
     pub(crate) primary_key: Option<PrimaryKeyData<'ast>>,
+    /// @@ignore
     pub(crate) is_ignored: bool,
-    /// @(@) index and @(@)unique.
+    /// @@index and @(@)unique.
     pub(crate) indexes: Vec<IndexData<'ast>>,
     /// @@map
     pub(super) mapped_name: Option<&'ast str>,
+}
+
+impl ModelData<'_> {
+    /// Whether the field is the whole primary key. Will match `@id` and `@@id([fieldName])`.
+    pub(super) fn field_is_single_pk(&self, field: ast::FieldId) -> bool {
+        self.primary_key.as_ref().filter(|pk| pk.fields == [field]).is_some()
+    }
+
+    /// Whether MySQL would consider the field indexed for autoincrement purposes.
+    pub(super) fn field_is_indexed_for_autoincrement(&self, field_id: ast::FieldId) -> bool {
+        self.indexes.iter().any(|idx| idx.fields.get(0) == Some(&field_id))
+            || self
+                .primary_key
+                .as_ref()
+                .filter(|pk| pk.fields.get(0) == Some(&field_id))
+                .is_some()
+    }
 }
 
 #[derive(Debug, Default)]
