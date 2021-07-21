@@ -21,7 +21,7 @@ pub struct InterpretingExecutor<C> {
 
 #[derive(Default)]
 struct TransactionCache {
-    pub cache: DashMap<TxId, Pin<Box<CachedTx>>>,
+    pub cache: DashMap<TxId, CachedTx>,
 }
 
 struct CachedTx {
@@ -31,23 +31,22 @@ struct CachedTx {
 }
 
 impl CachedTx {
-    pub async fn new(conn: Box<dyn Connection>) -> crate::Result<Pin<Box<Self>>> {
-        let c_tx = CachedTx {
+    pub async fn new(conn: Box<dyn Connection>) -> crate::Result<Self> {
+        let mut c_tx = CachedTx {
             conn,
             tx: None,
             status: TxStatus::Open,
         };
 
-        let mut boxed = Box::pin(c_tx);
+        // Forces static lifetime for the transaction, effectively disabling the lifetime checks.
+        // Requires to be extra careful with `tx`: The lifetime is basically manual now.
+        let transaction: Box<dyn Transaction + '_> = c_tx.conn.start_transaction().await?;
         unsafe {
-            let transaction: Box<dyn Transaction + '_> =
-                boxed.as_mut().get_unchecked_mut().conn.start_transaction().await?;
-
             let transaction: Box<dyn Transaction + 'static> = std::mem::transmute(transaction);
-            boxed.tx = Some(transaction);
+            c_tx.tx = Some(transaction);
         }
 
-        Ok(boxed)
+        Ok(c_tx)
     }
 }
 
@@ -70,36 +69,46 @@ where
         }
     }
 
-    /// Async wrapper for executing an individual operation to allow code sharing with `execute_batch`.
-    #[tracing::instrument(skip(operation, conn, force_transactions, query_schema))]
-    async fn execute_single_operation(
-        operation: Operation,
-        mut conn: Box<dyn Connection>,
-        force_transactions: bool,
-        query_schema: QuerySchemaRef,
-    ) -> crate::Result<ResponseData> {
-        // Parse, validate, and extract query graph from query document.
-        let (query_graph, serializer) = QueryGraphBuilder::new(query_schema).build(operation)?;
-        let is_transactional = force_transactions || query_graph.needs_transaction();
+    // /// Async wrapper for executing an individual operation to allow code sharing with `execute_batch`.
+    // #[tracing::instrument(skip(tx_id, operation, conn, force_transactions, query_schema))]
+    // async fn execute_single_operation(
+    //     tx_id: Option<TxId>,
+    //     operation: Operation,
+    //     mut conn: Box<dyn Connection>,
+    //     force_transactions: bool,
+    //     query_schema: QuerySchemaRef,
+    // ) -> crate::Result<ResponseData> {
+    //     let (query_graph, serializer) = QueryGraphBuilder::new(query_schema).build(operation)?;
 
-        if is_transactional {
-            let mut tx = conn.start_transaction().await?;
-            let interpreter = QueryInterpreter::new(tx.as_connection_like());
-            let result = QueryPipeline::new(query_graph, interpreter, serializer).execute().await;
+    //     // If a Tx id is provided, execute on that one.
+    //     if let Some(tx_id) = tx_id {
+    //         let interpreter = QueryInterpreter::new(tx.as_connection_like());
+    //         let result = QueryPipeline::new(query_graph, interpreter, serializer).execute().await;
 
-            if result.is_ok() {
-                tx.commit().await?;
-            } else {
-                tx.rollback().await?;
-            }
+    //         result
+    //     } else {
+    //         // Parse, validate, and extract query graph from query document.
+    //         let is_transactional = force_transactions || query_graph.needs_transaction();
 
-            result
-        } else {
-            let interpreter = QueryInterpreter::new(conn.as_connection_like());
+    //         if is_transactional {
+    //             let mut tx = conn.start_transaction().await?;
+    //             let interpreter = QueryInterpreter::new(tx.as_connection_like());
+    //             let result = QueryPipeline::new(query_graph, interpreter, serializer).execute().await;
 
-            QueryPipeline::new(query_graph, interpreter, serializer).execute().await
-        }
-    }
+    //             if result.is_ok() {
+    //                 tx.commit().await?;
+    //             } else {
+    //                 tx.rollback().await?;
+    //             }
+
+    //             result
+    //         } else {
+    //             let interpreter = QueryInterpreter::new(conn.as_connection_like());
+
+    //             QueryPipeline::new(query_graph, interpreter, serializer).execute().await
+    //         }
+    //     }
+    // }
 }
 
 #[async_trait]
@@ -114,9 +123,39 @@ where
         operation: Operation,
         query_schema: QuerySchemaRef,
     ) -> crate::Result<ResponseData> {
-        let conn = self.connector.get_connection().await?;
+        // Parse, validate, and extract query graph from query document.
+        let (query_graph, serializer) = QueryGraphBuilder::new(query_schema).build(operation)?;
 
-        Self::execute_single_operation(operation, conn, self.force_transactions, query_schema.clone()).await
+        // If a Tx id is provided, execute on that one.
+        if let Some(tx_id) = tx_id {
+            let mut c_tx = self.tx_cache.cache.get_mut(&tx_id).expect("WIP Tx not found");
+
+            let interpreter = QueryInterpreter::new(c_tx.tx.as_mut().unwrap().as_connection_like());
+            let result = QueryPipeline::new(query_graph, interpreter, serializer).execute().await;
+
+            result
+        } else {
+            let mut conn = self.connector.get_connection().await?;
+            let is_transactional = self.force_transactions || query_graph.needs_transaction();
+
+            if is_transactional {
+                let mut tx = conn.start_transaction().await?;
+                let interpreter = QueryInterpreter::new(tx.as_connection_like());
+                let result = QueryPipeline::new(query_graph, interpreter, serializer).execute().await;
+
+                if result.is_ok() {
+                    tx.commit().await?;
+                } else {
+                    tx.rollback().await?;
+                }
+
+                result
+            } else {
+                let interpreter = QueryInterpreter::new(conn.as_connection_like());
+
+                QueryPipeline::new(query_graph, interpreter, serializer).execute().await
+            }
+        }
     }
 
     /// Executes a batch of operations.
@@ -167,12 +206,7 @@ where
             for operation in operations {
                 let conn = self.connector.get_connection().await?;
 
-                futures.push(tokio::spawn(Self::execute_single_operation(
-                    operation,
-                    conn,
-                    self.force_transactions,
-                    query_schema.clone(),
-                )));
+                futures.push(tokio::spawn(async move { todo!() }));
             }
 
             let responses: Vec<_> = future::join_all(futures)
@@ -197,7 +231,7 @@ where
 {
     async fn start_tx(&self, max_acquisition_secs: u32, valid_for_secs: u32) -> crate::Result<TxId> {
         let id = TxId::new();
-        let mut conn = self.connector.get_connection().await?;
+        let conn = self.connector.get_connection().await?;
 
         let c_tx = CachedTx::new(conn).await?;
         self.tx_cache.cache.insert(id.clone(), c_tx);
@@ -205,11 +239,23 @@ where
         Ok(id)
     }
 
-    async fn commit_tx(&self, tx_id: TxId) -> crate::Result<TxId> {
-        todo!()
+    async fn commit_tx(&self, tx_id: TxId) -> crate::Result<()> {
+        if let Some((_, tx)) = self.tx_cache.cache.remove(&tx_id) {
+            tx.tx.unwrap().commit().await?;
+        } else {
+            panic!("WIP Tx not found");
+        }
+
+        Ok(())
     }
 
-    async fn rollback_tx(&self, tx_id: TxId) -> crate::Result<TxId> {
-        todo!()
+    async fn rollback_tx(&self, tx_id: TxId) -> crate::Result<()> {
+        if let Some((_, tx)) = self.tx_cache.cache.remove(&tx_id) {
+            tx.tx.unwrap().rollback().await?;
+        } else {
+            panic!("WIP Tx not found");
+        }
+
+        Ok(())
     }
 }

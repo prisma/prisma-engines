@@ -7,6 +7,7 @@ use crate::PrismaResult;
 use elapsed_middleware::ElapsedMiddleware;
 use opentelemetry::{global, Context};
 use query_core::schema::QuerySchemaRenderer;
+use query_core::TxId;
 use request_handlers::{dmmf, GraphQLSchemaRenderer, GraphQlBody, GraphQlHandler};
 use serde_json::json;
 use tide::http::{mime, StatusCode};
@@ -101,12 +102,14 @@ async fn graphql_handler(mut req: Request<State>) -> tide::Result {
     let span = tracing::span!(Level::TRACE, "graphql_handler");
     span.set_parent(cx);
 
+    let tx_id = req.header("X-transaction-id").map(ToString::to_string).map(TxId::from);
+
     let work = async move {
         let body: GraphQlBody = req.body_json().await?;
         let cx = req.state().cx.clone();
 
         let handler = GraphQlHandler::new(&*cx.executor, cx.query_schema());
-        let result = handler.handle(body).await;
+        let result = handler.handle(body, tx_id).await;
 
         let mut res = Response::new(StatusCode::Ok);
         res.set_body(Body::from_json(&result)?);

@@ -270,7 +270,7 @@ impl QueryEngine {
                         span.set_parent(cx);
 
                         let handler = GraphQlHandler::new(engine.executor(), engine.query_schema());
-                        Ok(handler.handle(query).await)
+                        Ok(handler.handle(query, None).await)
                     })
                     .await
             }

@@ -24,7 +24,7 @@ impl QueryEngine {
 
         let handler = GraphQlHandler::new(&*cx.executor, cx.query_schema());
 
-        match handler.handle(body).await {
+        match handler.handle(body, None).await {
             PrismaResponse::Single(response) => serde_json::to_value(response).unwrap(),
             _ => unreachable!(),
         }
