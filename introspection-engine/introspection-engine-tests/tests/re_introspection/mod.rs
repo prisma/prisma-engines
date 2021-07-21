@@ -2009,7 +2009,7 @@ async fn default_optional_actions(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(preview_features("NamedConstraints"))]
+#[test_connector(tags(Postgres, Mssql), preview_features("NamedConstraints"))]
 async fn re_introspecting_custom_compound_unique_names(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -2080,7 +2080,7 @@ async fn re_introspecting_custom_compound_unique_names(api: &TestApi) -> TestRes
     Ok(())
 }
 
-#[test_connector(tags(Postgres), preview_features("NamedConstraints"))]
+#[test_connector(tags(Postgres, Mssql), preview_features("NamedConstraints"))]
 async fn re_introspecting_custom_compound_id_names(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {

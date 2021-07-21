@@ -171,13 +171,13 @@ fn visit_scalar_field_attributes<'ast>(
                 )),
                 None => {
                     let db_name = if ctx.db.preview_features.contains(NamedConstraints) {
-
                         let generated_name = ConstraintNames::primary_key_name(model_data.mapped_name.unwrap_or(&ast_model.name.name), ctx.db.active_connector());
                         match args.optional_arg("map").map(|name| name.as_str()) {
                             Some(Ok("")) => error_on_empty_string_cow(args, ctx, "map"),
                             Some(Ok(name)) => Some(name.into()),
                             Some(Err(err)) => push_error_cow(ctx, err),
-                            None => Some(generated_name.into()),
+                            None if ctx.db.active_connector().supports_named_primary_keys() => Some(generated_name.into()),
+                            None => None,
                         }
                     } else {
                         None
@@ -269,10 +269,7 @@ fn visit_scalar_field_attributes<'ast>(
                  let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
                      Some(Ok("")) => error_on_empty_string_cow(args, ctx, "map"),
                      Some(Ok(name)) => Some(Cow::from(name)),
-                     Some(Err(err)) => {
-                         ctx.push_error(err);
-                         None
-                     }
+                     Some(Err(err)) => push_error_cow(ctx, err),
                      None => Some(generated_name),
                  };
 
@@ -560,7 +557,8 @@ fn visit_model_id<'ast>(
             Some(Ok("")) => error_on_empty_string_cow(args, ctx, "map"),
             Some(Ok(name)) => Some(name.into()),
             Some(Err(err)) => push_error_cow(ctx, err),
-            None => Some(generated_name.into()),
+            None if ctx.db.active_connector().supports_named_primary_keys() => Some(generated_name.into()),
+            None => None,
         };
 
         if let Some(err) = ConstraintNames::is_client_name_valid(args.span(), &ast_model.name.name, name, "@@id") {
