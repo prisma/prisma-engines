@@ -29,4 +29,37 @@ mod lrt {
 
         Ok(())
     }
+
+    #[connector_test]
+    async fn basic_rollback_workflow(mut runner: Runner) -> TestResult<()> {
+        let tx_id = runner.executor().start_tx(0, 0).await?;
+        runner.set_active_tx(tx_id.clone());
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 1 }) { id }}"#),
+          @r###"{"data":{"createOneTestModel":{"id":1}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { updateOneTestModel(where: { id: 1 }, data: { field: "updated" }) { field } }"#),
+          @r###"{"data":{"updateOneTestModel":{"field":"updated"}}}"###
+        );
+
+        runner.executor().rollback_tx(tx_id).await?;
+        runner.clear_active_tx();
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel { id field }}"#),
+          @r###"{"data":{"findManyTestModel":[]}}"###
+        );
+
+        Ok(())
+    }
+
+    // Timeout / Expiration.
+    // No aquisition.
+    // Open a tx in a tx.
+    // No auto rollback on error.
+    // Batches with lrt
+    //
 }
