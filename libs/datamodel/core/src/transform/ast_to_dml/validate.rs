@@ -1,6 +1,5 @@
 #![allow(clippy::suspicious_operation_groupings)] // clippy is wrong there
 
-use super::db::ParserDatabase;
 use crate::{
     ast,
     common::preview_features::PreviewFeature,
@@ -9,7 +8,6 @@ use crate::{
     dml,
 };
 use enumflags2::BitFlags;
-use std::collections::HashSet;
 
 /// Helper for validating a datamodel.
 ///
@@ -37,20 +35,15 @@ impl<'a> Validator<'a> {
         }
     }
 
-    pub(crate) fn validate(&self, db: &ParserDatabase<'_>, schema: &mut dml::Datamodel, diagnostics: &mut Diagnostics) {
-        let ast_schema = db.ast();
-
-        self.validate_names_for_indexes(ast_schema, schema, diagnostics);
-
-        // Model level validations.
+    pub(crate) fn validate(&self, ast: &ast::SchemaAst, schema: &mut dml::Datamodel, diagnostics: &mut Diagnostics) {
         for model in schema.models() {
-            let ast_model = ast_schema.find_model(&model.name).expect(STATE_ERROR);
+            let ast_model = ast.find_model(&model.name).expect(STATE_ERROR);
 
             if let Err(err) = self.validate_model_has_strict_unique_criteria(ast_model, model) {
                 diagnostics.push_error(err);
             }
 
-            if let Err(err) = self.validate_relations_not_ambiguous(ast_schema, model) {
+            if let Err(err) = self.validate_relations_not_ambiguous(ast, model) {
                 diagnostics.push_error(err);
             }
 
@@ -76,67 +69,16 @@ impl<'a> Validator<'a> {
         &self,
         ast_schema: &ast::SchemaAst,
         schema: &mut dml::Datamodel,
-    ) -> Result<(), Diagnostics> {
-        let mut all_errors = Diagnostics::new();
-
-        // Model level validations.
-        for model in schema.models() {
-            // Having a separate error collection allows checking whether any error has occurred for a model.
-            let mut errors_for_model = Diagnostics::new();
-
-            if !errors_for_model.has_errors() {
-                let mut new_errors = self.validate_relation_arguments_bla(
-                    schema,
-                    ast_schema.find_model(&model.name).expect(STATE_ERROR),
-                    model,
-                );
-                errors_for_model.append(&mut new_errors);
-            }
-
-            all_errors.append(&mut errors_for_model);
-        }
-
-        if all_errors.has_errors() {
-            Err(all_errors)
-        } else {
-            Ok(())
-        }
-    }
-
-    fn validate_names_for_indexes(
-        &self,
-        ast_schema: &ast::SchemaAst,
-        schema: &dml::Datamodel,
         diagnostics: &mut Diagnostics,
     ) {
-        let mut index_names = HashSet::new();
-
-        let multiple_indexes_with_same_name_are_supported = self
-            .source
-            .map(|source| source.active_connector.supports_multiple_indexes_with_same_name())
-            .unwrap_or(false);
-
         for model in schema.models() {
-            if let Some(ast_model) = ast_schema.find_model(&model.name) {
-                for index in model.indices.iter() {
-                    if let Some(index_name) = &index.name {
-                        if index_names.contains(index_name) && !multiple_indexes_with_same_name_are_supported {
-                            let ast_index = ast_model
-                                .attributes
-                                .iter()
-                                .find(|attribute| attribute.is_index())
-                                .unwrap();
+            let mut new_errors = self.validate_relation_arguments_bla(
+                schema,
+                ast_schema.find_model(&model.name).expect(STATE_ERROR),
+                model,
+            );
 
-                            let error = DatamodelError::new_multiple_indexes_with_same_name_are_not_supported(
-                                index_name,
-                                ast_index.span,
-                            );
-                            diagnostics.push_error(error);
-                        }
-                        index_names.insert(index_name);
-                    }
-                }
-            }
+            diagnostics.append(&mut new_errors);
         }
     }
 

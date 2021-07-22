@@ -41,7 +41,7 @@ impl<'a> LiftAstToDml<'a> {
         let model_data = self.db.get_model_data(&model_id).unwrap();
 
         model.documentation = ast_model.documentation.clone().map(|comment| comment.text);
-        model.database_name = self.db.get_model_database_name(model_id).map(String::from);
+        model.database_name = model_data.mapped_name.map(String::from);
         model.is_ignored = model_data.is_ignored;
 
         model.primary_key = model_data
@@ -61,7 +61,7 @@ impl<'a> LiftAstToDml<'a> {
         model.indices = model_data
             .indexes
             .iter()
-            .map(|idx| dml::IndexDefinition {
+            .map(|(_, idx)| dml::IndexDefinition {
                 name: idx.name.map(String::from),
                 db_name: idx.name.map(String::from),
                 fields: idx
@@ -94,7 +94,7 @@ impl<'a> LiftAstToDml<'a> {
             field.documentation = ast_field.documentation.clone().map(|comment| comment.text);
             field.is_ignored = scalar_field_data.is_ignored;
             field.is_updated_at = scalar_field_data.is_updated_at;
-            field.database_name = self.db.get_field_database_name(model_id, field_id).map(String::from);
+            field.database_name = scalar_field_data.mapped_name.map(String::from);
             field.default_value = scalar_field_data.default.clone();
 
             field_ids_for_sorting.insert(&ast_field.name.name, field_id);
