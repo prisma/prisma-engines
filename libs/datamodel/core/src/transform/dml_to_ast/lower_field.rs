@@ -188,6 +188,19 @@ impl<'a> LowerDmlToAst<'a> {
                 }
             }
 
+            if self.preview_features.contains(NamedConstraints) {
+                if let Some(fk_name) = &relation_info.fk_name {
+                    if let Some(src) = self.datasource {
+                        if !ConstraintNames::foreign_key_name_matches(relation_info, model, &*src.active_connector) {
+                            args.push(ast::Argument::new(
+                                "map",
+                                ast::Expression::StringValue(String::from(fk_name), Span::empty()),
+                            ));
+                        }
+                    };
+                }
+            }
+
             if !args.is_empty() {
                 attributes.push(ast::Attribute::new("relation", args));
             }

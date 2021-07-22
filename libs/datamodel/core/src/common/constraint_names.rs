@@ -3,6 +3,7 @@ use crate::diagnostics::DatamodelError;
 use crate::{IndexType, PrimaryKeyDefinition, WithDatabaseName};
 use datamodel_connector::Connector;
 use dml::model::{IndexDefinition, Model};
+use dml::relation_info::RelationInfo;
 use once_cell::sync::Lazy;
 use regex::Regex;
 use std::borrow::Cow;
@@ -84,15 +85,15 @@ impl ConstraintNames {
         }
     }
 
-    pub fn foreign_key_name_matches(idx: &IndexDefinition, model: &Model, connector: &dyn Connector) -> bool {
-        let column_names: Vec<&str> = idx
+    pub fn foreign_key_name_matches(ri: &RelationInfo, model: &Model, connector: &dyn Connector) -> bool {
+        let column_names: Vec<&str> = ri
             .fields
             .iter()
             .map(|field_name| model.find_scalar_field(field_name).unwrap().final_database_name())
             .collect();
 
-        idx.db_name.as_ref().unwrap()
-            == &ConstraintNames::index_name(model.final_database_name(), &column_names, idx.tpe, connector)
+        ri.fk_name.as_ref().unwrap()
+            == &ConstraintNames::foreign_key_constraint_name(model.final_database_name(), &column_names, connector)
     }
 
     pub fn foreign_key_constraint_name(table_name: &str, column_names: &[&str], connector: &dyn Connector) -> String {

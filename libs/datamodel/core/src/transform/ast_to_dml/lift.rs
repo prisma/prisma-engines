@@ -137,6 +137,8 @@ impl<'a> LiftAstToDml<'a> {
                 })
                 .unwrap_or_default();
 
+            field.relation_info.fk_name = relation_field.fk_name.as_ref().map(|n| n.to_string());
+
             field_ids_for_sorting.insert(&ast_field.name.name, field_id);
             model.add_field(dml::Field::RelationField(field))
         }

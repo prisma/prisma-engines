@@ -979,6 +979,7 @@ fn visit_relation<'ast>(
         } else {
             None
         };
+
         //todo error when map given on the wrong side, thats why this is not dryed up
         let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
             Some(Ok("")) => error_on_empty_string_cow(args, ctx, "map"),
