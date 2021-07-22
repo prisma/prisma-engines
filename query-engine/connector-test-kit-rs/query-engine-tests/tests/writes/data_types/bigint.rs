@@ -18,9 +18,9 @@ mod bigint {
 
     // "Using a BigInt field" should "work"
     #[connector_test]
-    async fn using_bigint_field(runner: &Runner) -> TestResult<()> {
+    async fn using_bigint_field(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneModel(
               data: {
                 id: 1
@@ -33,7 +33,7 @@ mod bigint {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateOneModel(
               where: { id: 1 }
               data: {
@@ -47,7 +47,7 @@ mod bigint {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateOneModel(
               where: { id: 1 }
               data: {

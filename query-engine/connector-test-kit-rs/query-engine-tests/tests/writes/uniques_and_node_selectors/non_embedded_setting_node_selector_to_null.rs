@@ -29,20 +29,20 @@ mod non_embedded_node_sel_to_null {
 
     // "Setting a where value to null " should "should only update one if there are several nulls for the specified node selector"
     #[connector_test]
-    async fn where_val_to_null(runner: &Runner) -> TestResult<()> {
+    async fn where_val_to_null(runner: Runner) -> TestResult<()> {
         create_row(
-            runner,
+            &runner,
             r#"{ id: 1, b: "abc", key: "abc", c: { create: { id: 1, c: "C" } } }"#,
         )
         .await?;
         create_row(
-            runner,
+            &runner,
             r#"{ id: 2, b: null, key: "abc2", c: { create: { id: 2, c: "C2" } } }"#,
         )
         .await?;
 
         run_query!(
-            runner,
+            &runner,
             r#"mutation {
           updateOneA(
             where: { b: "abc" }
@@ -57,7 +57,7 @@ mod non_embedded_node_sel_to_null {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyA(orderBy: { id: asc }) {
               b
               c {

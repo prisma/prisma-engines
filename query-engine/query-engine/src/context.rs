@@ -1,7 +1,7 @@
 use crate::{PrismaError, PrismaResult};
 use datamodel::{Configuration, Datamodel};
 use prisma_models::DatamodelConverter;
-use query_core::{executor, schema::QuerySchemaRef, schema_builder, BuildMode, QueryExecutor, TransactionManager};
+use query_core::{executor, schema::QuerySchemaRef, schema_builder, BuildMode, QueryExecutor};
 use std::{env, fmt, sync::Arc};
 
 /// Prisma request context containing all immutable state of the process.

@@ -11,7 +11,7 @@ mod pagination_regr {
               #id(id, Int, @id)
               bs ModelB[]
             }
-            
+
             model ModelB {
               #id(id, String, @id)
               createdAt DateTime @default(now())
@@ -25,11 +25,11 @@ mod pagination_regr {
 
     // "[prisma/2855] Duplicate ordering keys on non-sequential IDs" should "still allow paging through records predictably"
     #[connector_test(schema(schema_2855))]
-    async fn prisma_2855(runner: &Runner) -> TestResult<()> {
-        create_test_data_2855(runner).await?;
+    async fn prisma_2855(runner: Runner) -> TestResult<()> {
+        create_test_data_2855(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyModelB(take: 5, orderBy: [{ createdAt: desc}, { id: asc }]) {
               id
               createdAt
@@ -39,7 +39,7 @@ mod pagination_regr {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyModelB(cursor: { id: "9505b8a9-45a1-4aae-a284-5bacfe9f835c" }, skip: 1, take: 5, orderBy: [{ createdAt: desc}, { id: asc }] ) {
               id
               createdAt
@@ -49,7 +49,7 @@ mod pagination_regr {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyModelB(cursor: { id: "3c0f269f-0796-427e-af67-8c1a99f3524d" }, skip: 1, take: 5, orderBy: [{ createdAt: desc}, { id: asc }] ) {
               id
               createdAt
@@ -59,7 +59,7 @@ mod pagination_regr {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyModelB(cursor: { id: "8c7a3864-285c-4f06-9c9a-273e19e19a05" }, skip: 1, take: 5, orderBy: [{ createdAt: desc}, { id: asc }] ) {
               id
               createdAt
@@ -73,17 +73,17 @@ mod pagination_regr {
 
     // "[prisma/3505][Case 1] Paging and ordering with potential null values ON a null row" should "still allow paging through records predictably"
     #[connector_test(schema(generic))]
-    async fn prisma_3505_case_1(runner: &Runner) -> TestResult<()> {
+    async fn prisma_3505_case_1(runner: Runner) -> TestResult<()> {
         // 5 records with ids 1 to 5
         // Contain some nulls for `field`.
-        create_test_data_3505_1(runner).await?;
+        create_test_data_3505_1(&runner).await?;
 
         // Selects the 2 records after ID 2.
         // There are 2 options, depending on how the underlying db orders NULLS (first or last, * ids have nulls in `field`):
         // Nulls last:  5, 3, 1*, 2*, 4* => take only 4
         // Nulls first: 1*, 2*, 4*, 5, 3 => take 4, 5
         assert_query_many!(
-            runner,
+            &runner,
             r#"{
             findManyTestModel(
               cursor: { id: 2 },
@@ -105,13 +105,13 @@ mod pagination_regr {
     // "Not on null row" means that the cursor row does not contain a null value for the ordering field, in this case row 2.
     // However, other rows might still have nulls, those must be taken into consideration.
     #[connector_test(schema(generic))]
-    async fn prisma_3505_case_2(runner: &Runner) -> TestResult<()> {
+    async fn prisma_3505_case_2(runner: Runner) -> TestResult<()> {
         // 5 records with ids 1 to 5
         // Contain some nulls for `field`.
-        create_test_data_3505_2(runner).await?;
+        create_test_data_3505_2(&runner).await?;
 
         assert_query_many!(
-            runner,
+            &runner,
             r#"{
             findManyTestModel(
               cursor: { id: 5 },

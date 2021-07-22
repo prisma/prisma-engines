@@ -34,7 +34,7 @@ mod delete_inside_upsert {
         )?;
 
         insta::assert_snapshot!(
-          run_query!(runner, format!(r#"mutation {{
+          run_query!(&runner, format!(r#"mutation {{
             upsertOneParent(
             where: {parent}
             update:{{
@@ -123,7 +123,7 @@ mod delete_inside_upsert {
         )?;
 
         insta::assert_snapshot!(
-          run_query!(runner, format!(r#"mutation {{
+          run_query!(&runner, format!(r#"mutation {{
             upsertOneParent(
               where: {parent}
               update:{{
@@ -169,7 +169,7 @@ mod delete_inside_upsert {
         )?;
 
         insta::assert_snapshot!(
-          run_query!(runner, format!(r#"mutation {{
+          run_query!(&runner, format!(r#"mutation {{
             upsertOneParent(
             where: {parent}
             update:{{
@@ -216,7 +216,7 @@ mod delete_inside_upsert {
         )?;
 
         insta::assert_snapshot!(
-          run_query!(runner, format!(r#"mutation {{
+          run_query!(&runner, format!(r#"mutation {{
             upsertOneParent(
             where: {parent}
             update:{{
@@ -322,7 +322,7 @@ mod delete_inside_upsert {
         )?;
 
         insta::assert_snapshot!(
-          run_query!(runner, format!(r#"mutation {{
+          run_query!(&runner, format!(r#"mutation {{
             upsertOneParent(
               where: {parent}
               update:{{childOpt: {{delete: true}}}}
@@ -337,7 +337,7 @@ mod delete_inside_upsert {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query{findManyChild{c, parentsOpt{p}}}"#),
+          run_query!(&runner, r#"query{findManyChild{c, parentsOpt{p}}}"#),
           @r###"{"data":{"findManyChild":[]}}"###
         );
 
@@ -371,7 +371,7 @@ mod delete_inside_upsert {
         )?;
 
         insta::assert_snapshot!(
-          run_query!(runner, format!(r#"mutation {{
+          run_query!(&runner, format!(r#"mutation {{
             upsertOneParent(
             where: {parent}
             update:{{
@@ -388,7 +388,7 @@ mod delete_inside_upsert {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query{findManyChild{c, parentsOpt{p}}}"#),
+          run_query!(&runner, r#"query{findManyChild{c, parentsOpt{p}}}"#),
           @r###"{"data":{"findManyChild":[]}}"###
         );
 

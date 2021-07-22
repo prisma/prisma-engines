@@ -15,7 +15,7 @@ use syn::{parse_macro_input, AttributeArgs, ItemFn};
 /// Original code:
 /// ```ignore
 /// #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneOpt")]
-/// async fn my_fancy_test(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
+/// async fn my_fancy_test(runner: Runner, t: &DatamodelWithParams) -> TestResult<()> {
 ///   assert_eq!(true, true);
 /// }
 /// ```
@@ -39,7 +39,7 @@ use syn::{parse_macro_input, AttributeArgs, ItemFn};
 ///   run_my_fancy_test(runner, t).await?;
 /// }
 ///
-/// async fn run_my_fancy_test(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
+/// async fn run_my_fancy_test(runner: Runner, t: &DatamodelWithParams) -> TestResult<()> {
 ///   assert_eq!(true, true);
 /// }
 /// ```
@@ -67,7 +67,7 @@ pub fn relation_link_test_impl(attr: TokenStream, input: TokenStream) -> TokenSt
     if test_function.sig.inputs.len() != 2 {
         return syn::Error::new_spanned(
             test_function.sig,
-            "connector test functions must take exactly two arguments: `runner: &Runner, dm: &DatamodelWithParams`.",
+            "connector test functions must take exactly two arguments: `runner: Runner, dm: &DatamodelWithParams`.",
         )
         .to_compile_error()
         .into();

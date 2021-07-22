@@ -10,7 +10,7 @@ mod create_inside_create {
     #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneOpt")]
     async fn p1_c1(runner: &Runner, _t: &DatamodelWithParams) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
         createOneParent(data: {
           p: "p1"
           p_1: "p_1"
@@ -38,7 +38,7 @@ mod create_inside_create {
     #[relation_link_test(on_parent = "ToMany", on_child = "ToOneOpt")]
     async fn pm_c1_req(runner: &Runner, _t: &DatamodelWithParams) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
           createOneParent(data: {
             p: "p1"
             p_1: "p_1"
@@ -70,7 +70,7 @@ mod create_inside_create {
     #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneReq")]
     async fn p1_c1_req(runner: &Runner, _t: &DatamodelWithParams) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
           createOneParent(data: {
             p: "p1"
             p_1: "p_1"
@@ -98,7 +98,7 @@ mod create_inside_create {
     #[relation_link_test(on_parent = "ToMany", on_child = "ToOneOpt")]
     async fn pm_c1(runner: &Runner, _t: &DatamodelWithParams) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneParent(data: {
               p: "p1"
               p_1: "p_1"
@@ -130,7 +130,7 @@ mod create_inside_create {
     #[relation_link_test(on_parent = "ToOneReq", on_child = "ToMany")]
     async fn p1_req_cm(runner: &Runner, _t: &DatamodelWithParams) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneParent(data: {
               p: "p1"
               p_1: "p_1"
@@ -158,7 +158,7 @@ mod create_inside_create {
     #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToMany")]
     async fn p1_cm(runner: &Runner, _t: &DatamodelWithParams) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneParent(data: {
               p: "p1"
               p_1: "p_1"
@@ -181,7 +181,7 @@ mod create_inside_create {
 
         // make sure it is traversable in the opposite direction as well
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyChild {
               parentsOpt {
                 p
@@ -198,7 +198,7 @@ mod create_inside_create {
     #[relation_link_test(on_parent = "ToMany", on_child = "ToMany")]
     async fn pm_cm(runner: &Runner, _t: &DatamodelWithParams) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneParent(data: {
               p: "p1"
               p_1: "p_1"

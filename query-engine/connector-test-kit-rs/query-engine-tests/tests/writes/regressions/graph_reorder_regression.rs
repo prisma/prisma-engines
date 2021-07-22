@@ -32,15 +32,15 @@ mod graph_reorder {
 
     // "The 1:1 relation checks" should "not null out the newly created nested item"
     #[connector_test(schema(schema))]
-    async fn test(runner: &Runner) -> TestResult<()> {
+    async fn test(runner: Runner) -> TestResult<()> {
         run_query!(
-            runner,
+            &runner,
             r#"mutation { createOneCompany(data:{ id: "company" }) { id } }"#
         );
-        run_query!(runner, r#"mutation { createOneVisit(data:{ id:"visit" }) { id } }"#);
+        run_query!(&runner, r#"mutation { createOneVisit(data:{ id:"visit" }) { id } }"#);
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateOneVisit(
               where: { id: "visit" }
               data: { payment: { create: { id: 1, company: { connect: { id: "company" }}}}}

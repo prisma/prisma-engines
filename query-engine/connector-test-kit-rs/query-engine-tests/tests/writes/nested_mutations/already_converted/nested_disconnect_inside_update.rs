@@ -34,7 +34,7 @@ mod disconnect_inside_update {
         )?;
 
         insta::assert_snapshot!(
-          run_query!(runner, format!(r#"mutation {{
+          run_query!(&runner, format!(r#"mutation {{
           updateOneParent(
             where: {parent}
             data:{{
@@ -88,7 +88,7 @@ mod disconnect_inside_update {
 
         // Disconnect is a noop
         insta::assert_snapshot!(
-          run_query!(runner, format!(r#"mutation {{
+          run_query!(&runner, format!(r#"mutation {{
             updateOneParent(
             where: {parent}
             data:{{
@@ -235,7 +235,7 @@ mod disconnect_inside_update {
         let second_child = second_child_ids.get(1).unwrap();
 
         insta::assert_snapshot!(
-          run_query!(runner, format!(r#"mutation {{
+          run_query!(&runner, format!(r#"mutation {{
             updateOneParent(
             where: {parent}
             data:{{
@@ -284,7 +284,7 @@ mod disconnect_inside_update {
         )?;
 
         insta::assert_snapshot!(
-          run_query!(runner, format!(r#"mutation {{
+          run_query!(&runner, format!(r#"mutation {{
             updateOneParent(
               where: {parent}
               data:{{
@@ -299,7 +299,7 @@ mod disconnect_inside_update {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query{findManyChild{c, parentsOpt{p}}}"#),
+          run_query!(&runner, r#"query{findManyChild{c, parentsOpt{p}}}"#),
           @r###"{"data":{"findManyChild":[{"c":"c1","parentsOpt":[]}]}}"###
         );
 
@@ -368,7 +368,7 @@ mod disconnect_inside_update {
         let other_child = other_child_ids.get(1).unwrap();
 
         insta::assert_snapshot!(
-          run_query!(runner, format!(r#"mutation {{
+          run_query!(&runner, format!(r#"mutation {{
             updateOneParent(
             where: {parent}
             data:{{
@@ -403,17 +403,17 @@ mod disconnect_inside_update {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query{findUniqueChild(where:{c:"c1"}){c, parentsOpt{p}}}"#),
+          run_query!(&runner, r#"query{findUniqueChild(where:{c:"c1"}){c, parentsOpt{p}}}"#),
           @r###"{"data":{"findUniqueChild":{"c":"c1","parentsOpt":[{"p":"otherParent"}]}}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query{findUniqueChild(where:{c:"c2"}){c, parentsOpt{p}}}"#),
+          run_query!(&runner, r#"query{findUniqueChild(where:{c:"c2"}){c, parentsOpt{p}}}"#),
           @r###"{"data":{"findUniqueChild":{"c":"c2","parentsOpt":[{"p":"p1"}]}}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query{findUniqueChild(where:{c:"otherChild"}){c, parentsOpt{p}}}"#),
+          run_query!(&runner, r#"query{findUniqueChild(where:{c:"otherChild"}){c, parentsOpt{p}}}"#),
           @r###"{"data":{"findUniqueChild":{"c":"otherChild","parentsOpt":[{"p":"otherParent"}]}}}"###
         );
 
@@ -550,7 +550,7 @@ mod disconnect_inside_update {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, format!(r#"mutation {{
+          run_query!(&runner, format!(r#"mutation {{
             updateOneParent(
               where: {parent}
               data:{{
@@ -565,17 +565,17 @@ mod disconnect_inside_update {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query{findUniqueChild(where:{c:"c1"}){c, parentsOpt{p}}}"#),
+          run_query!(&runner, r#"query{findUniqueChild(where:{c:"c1"}){c, parentsOpt{p}}}"#),
           @r###"{"data":{"findUniqueChild":{"c":"c1","parentsOpt":[{"p":"otherParent"}]}}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query{findUniqueChild(where:{c:"c2"}){c, parentsOpt{p}}}"#),
+          run_query!(&runner, r#"query{findUniqueChild(where:{c:"c2"}){c, parentsOpt{p}}}"#),
           @r###"{"data":{"findUniqueChild":{"c":"c2","parentsOpt":[{"p":"p1"}]}}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query{findUniqueChild(where:{c:"otherChild"}){c, parentsOpt{p}}}"#),
+          run_query!(&runner, r#"query{findUniqueChild(where:{c:"otherChild"}){c, parentsOpt{p}}}"#),
           @r###"{"data":{"findUniqueChild":{"c":"otherChild","parentsOpt":[{"p":"otherParent"}]}}}"###
         );
 

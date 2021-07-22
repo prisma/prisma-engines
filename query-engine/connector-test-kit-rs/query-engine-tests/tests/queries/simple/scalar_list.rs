@@ -7,9 +7,9 @@ mod scalar_list {
     use query_engine_tests::{assert_query, string_to_base64};
 
     #[connector_test]
-    async fn empty_lists(runner: &Runner) -> TestResult<()> {
+    async fn empty_lists(runner: Runner) -> TestResult<()> {
         test_data(
-            runner,
+            &runner,
             1,
             vec![],
             vec![],
@@ -45,9 +45,9 @@ mod scalar_list {
     }
 
     #[connector_test]
-    async fn non_empty_lists(runner: &Runner) -> TestResult<()> {
+    async fn non_empty_lists(runner: Runner) -> TestResult<()> {
         test_data(
-            runner,
+            &runner,
             1,
             vec!["test"],
             vec![1, 2, 3],

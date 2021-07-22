@@ -34,7 +34,7 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
     if test_function.sig.inputs.len() != 1 {
         return syn::Error::new_spanned(
             test_function.sig,
-            "connector test functions must take exactly one argument: `runner: &Runner`.",
+            "connector test functions must take exactly one argument: `runner: Runner`.",
         )
         .to_compile_error()
         .into();
@@ -92,7 +92,7 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
                     tracing::debug!("Used datamodel:\n {}", datamodel.clone().yellow());
                     let runner = Runner::load(config.runner(), datamodel.clone(), connector).await.unwrap();
                     query_tests_setup::setup_project(&datamodel).await.unwrap();
-                    #runner_fn_ident(&runner).await.unwrap();
+                    #runner_fn_ident(runner).await.unwrap();
                 }.with_subscriber(test_tracing_subscriber(std::env::var("LOG_LEVEL").unwrap_or("info".to_string()))));
             }
         }

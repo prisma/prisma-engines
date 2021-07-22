@@ -21,7 +21,7 @@ mod many_nested_muts {
     #[relation_link_test(on_parent = "ToMany", on_child = "ToMany")]
     async fn create_then_update(runner: &Runner, _t: &DatamodelWithParams) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
           createOneParent(
             data: { p: "p1", p_1: "1", p_2: "2" childrenOpt: { create: [{ c: "c1", c_1: "foo", c_2: "bar" }, { c: "c2", c_1: "q1t", c_2: "asd" }] } }
           ) {
@@ -34,7 +34,7 @@ mod many_nested_muts {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
           updateOneParent(
             where: { p: "p1" }
             data: {
@@ -53,7 +53,7 @@ mod many_nested_muts {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query{findManyChild(orderBy: { c: asc }){c, parentsOpt(orderBy: { p: asc }){p}}}"#),
+          run_query!(&runner, r#"query{findManyChild(orderBy: { c: asc }){c, parentsOpt(orderBy: { p: asc }){p}}}"#),
           @r###"{"data":{"findManyChild":[{"c":"c1","parentsOpt":[{"p":"p1"}]},{"c":"c2","parentsOpt":[{"p":"p1"}]},{"c":"c4","parentsOpt":[{"p":"p1"}]},{"c":"cUpdated","parentsOpt":[{"p":"p1"}]}]}}"###
         );
 
@@ -64,7 +64,7 @@ mod many_nested_muts {
     #[relation_link_test(on_parent = "ToMany", on_child = "ToMany")]
     async fn create_then_delete(runner: &Runner, _t: &DatamodelWithParams) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneParent(
               data: { p: "p1", p_1: "1", p_2: "2" childrenOpt: { create: [{ c: "c1", c_1: "foo", c_2: "bar" }, { c: "c2", c_1: "q1t", c_2: "asd" }] } }
             ) {
@@ -77,7 +77,7 @@ mod many_nested_muts {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateOneParent(
               where: { p: "p1" }
               data: {
@@ -96,7 +96,7 @@ mod many_nested_muts {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query{findManyChild(orderBy: { c: asc }){c, parentsOpt(orderBy: { p: asc }){p}}}"#),
+          run_query!(&runner, r#"query{findManyChild(orderBy: { c: asc }){c, parentsOpt(orderBy: { p: asc }){p}}}"#),
           @r###"{"data":{"findManyChild":[{"c":"c1","parentsOpt":[{"p":"p1"}]},{"c":"c2","parentsOpt":[{"p":"p1"}]},{"c":"c4","parentsOpt":[{"p":"p1"}]},{"c":"cUpdated","parentsOpt":[{"p":"p1"}]}]}}"###
         );
 
@@ -107,7 +107,7 @@ mod many_nested_muts {
     #[relation_link_test(on_parent = "ToMany", on_child = "ToMany")]
     async fn create_then_set(runner: &Runner, _t: &DatamodelWithParams) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneParent(
               data: { p: "p1", p_1: "1", p_2: "2", childrenOpt: { create: [{ c: "c1", c_1: "foo", c_2: "bar" }, { c: "c2", c_1: "om", c_2: "mo" }] } }
             ) {
@@ -120,7 +120,7 @@ mod many_nested_muts {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateOneParent(
               where: { p: "p1" }
               data: {
@@ -136,7 +136,7 @@ mod many_nested_muts {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query{findManyChild{c, parentsOpt{p}}}"#),
+          run_query!(&runner, r#"query{findManyChild{c, parentsOpt{p}}}"#),
           @r###"{"data":{"findManyChild":[{"c":"c1","parentsOpt":[]},{"c":"c2","parentsOpt":[]},{"c":"c3","parentsOpt":[{"p":"p1"}]},{"c":"c4","parentsOpt":[]}]}}"###
         );
 
@@ -147,7 +147,7 @@ mod many_nested_muts {
     #[relation_link_test(on_parent = "ToMany", on_child = "ToMany")]
     async fn create_then_upsert(runner: &Runner, _t: &DatamodelWithParams) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneParent(
               data: { p: "p1", p_1: "1", p_2: "2", childrenOpt: { create: [{ c: "c1", c_1: "1", c_2: "2" }, { c: "c2", c_1: "3", c_2: "4" }] } }
             ) {
@@ -160,7 +160,7 @@ mod many_nested_muts {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateOneParent(
               where: { p: "p1" }
               data: {
@@ -190,7 +190,7 @@ mod many_nested_muts {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query{findManyChild(orderBy: { c: asc }){c, parentsOpt(orderBy: { p: asc }){p}}}"#),
+          run_query!(&runner, r#"query{findManyChild(orderBy: { c: asc }){c, parentsOpt(orderBy: { p: asc }){p}}}"#),
           @r###"{"data":{"findManyChild":[{"c":"c1","parentsOpt":[{"p":"p1"}]},{"c":"c2","parentsOpt":[{"p":"p1"}]},{"c":"c4","parentsOpt":[{"p":"p1"}]},{"c":"cNew","parentsOpt":[{"p":"p1"}]},{"c":"cUpdated","parentsOpt":[{"p":"p1"}]}]}}"###
         );
 
@@ -201,7 +201,7 @@ mod many_nested_muts {
     #[relation_link_test(on_parent = "ToMany", on_child = "ToMany")]
     async fn create_then_disconnect(runner: &Runner, _t: &DatamodelWithParams) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneParent(
               data: { p: "p1", p_1: "1", p_2: "2", childrenOpt: { create: [{ c: "c1", c_1: "foo", c_2: "bar" }, { c: "c2", c_1: "asd", c_2: "qawf" }] } }
             ) {
@@ -214,7 +214,7 @@ mod many_nested_muts {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateOneParent(
               where: { p: "p1" }
               data: {
@@ -233,7 +233,7 @@ mod many_nested_muts {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query{findManyChild{c, parentsOpt{p}}}"#),
+          run_query!(&runner, r#"query{findManyChild{c, parentsOpt{p}}}"#),
           @r###"{"data":{"findManyChild":[{"c":"c1","parentsOpt":[{"p":"p1"}]},{"c":"c2","parentsOpt":[{"p":"p1"}]},{"c":"c3","parentsOpt":[]},{"c":"c4","parentsOpt":[{"p":"p1"}]}]}}"###
         );
 

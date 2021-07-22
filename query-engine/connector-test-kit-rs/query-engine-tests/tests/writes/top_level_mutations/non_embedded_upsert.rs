@@ -52,11 +52,11 @@ mod non_embedded_upsert {
 
     // "An upsert on the top level" should "execute a nested connect in the create branch"
     #[connector_test]
-    async fn nested_connect_in_create(runner: &Runner) -> TestResult<()> {
+    async fn nested_connect_in_create(runner: Runner) -> TestResult<()> {
         // Seed data
-        run_query!(runner, r#"mutation{createOneTodo(data:{id: 1, uTodo: "B"}){uTodo}}"#);
+        run_query!(&runner, r#"mutation{createOneTodo(data:{id: 1, uTodo: "B"}){uTodo}}"#);
         run_query!(
-            runner,
+            &runner,
             r#"mutation {upsertOneList(
             where:{uList: "Does not Exist"}
             create:{id: 1, uList:"A" todo: {connect: {uTodo: "B"}}}
@@ -65,29 +65,29 @@ mod non_embedded_upsert {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query{findManyList {uList, todo {uTodo}}}"#),
+          run_query!(&runner, r#"query{findManyList {uList, todo {uTodo}}}"#),
           @r###"{"data":{"findManyList":[{"uList":"A","todo":{"uTodo":"B"}}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyTodo { uTodo } }"#),
+          run_query!(&runner, r#"query { findManyTodo { uTodo } }"#),
           @r###"{"data":{"findManyTodo":[{"uTodo":"B"}]}}"###
         );
 
-        assert_eq!(count_items(runner, "findManyList").await?, 1);
-        assert_eq!(count_items(runner, "findManyTodo").await?, 1);
+        assert_eq!(count_items(&runner, "findManyList").await?, 1);
+        assert_eq!(count_items(&runner, "findManyTodo").await?, 1);
 
         Ok(())
     }
 
     // "An upsert on the top level" should "execute a nested connect in the update branch"
     #[connector_test]
-    async fn nested_connect_in_update(runner: &Runner) -> TestResult<()> {
+    async fn nested_connect_in_update(runner: Runner) -> TestResult<()> {
         // Seed data
-        run_query!(runner, r#"mutation{createOneTodo(data:{id: 1, uTodo: "B"}){uTodo}}"#);
-        run_query!(runner, r#"mutation{createOneList(data:{id: 1, uList:"A"}){uList}}"#);
+        run_query!(&runner, r#"mutation{createOneTodo(data:{id: 1, uTodo: "B"}){uTodo}}"#);
+        run_query!(&runner, r#"mutation{createOneList(data:{id: 1, uList:"A"}){uList}}"#);
         run_query!(
-            runner,
+            &runner,
             r#"mutation {upsertOneList(
                 where:{uList: "A"}
                 create:{id: 2, uList:"A" todo: {connect: {uTodo: "Should not Matter"}}}
@@ -96,31 +96,31 @@ mod non_embedded_upsert {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query{findManyList {uList, todo {uTodo}}}"#),
+          run_query!(&runner, r#"query{findManyList {uList, todo {uTodo}}}"#),
           @r###"{"data":{"findManyList":[{"uList":"A","todo":{"uTodo":"B"}}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query{findManyTodo {uTodo}}"#),
+          run_query!(&runner, r#"query{findManyTodo {uTodo}}"#),
           @r###"{"data":{"findManyTodo":[{"uTodo":"B"}]}}"###
         );
 
-        assert_eq!(count_items(runner, "findManyList").await?, 1);
-        assert_eq!(count_items(runner, "findManyTodo").await?, 1);
+        assert_eq!(count_items(&runner, "findManyList").await?, 1);
+        assert_eq!(count_items(&runner, "findManyTodo").await?, 1);
 
         Ok(())
     }
 
     // "An upsert on the top level" should "execute a nested disconnect in the update branch"
     #[connector_test]
-    async fn nested_disconnect_in_update(runner: &Runner) -> TestResult<()> {
+    async fn nested_disconnect_in_update(runner: Runner) -> TestResult<()> {
         // Seed data
         run_query!(
-            runner,
+            &runner,
             r#"mutation{createOneTodo(data:{id: 1, uTodo: "B", list: {create: {id: 1, uList:"A"}}}){uTodo}}"#
         );
         run_query!(
-            runner,
+            &runner,
             r#"mutation {upsertOneList(
           where:{uList: "A"}
           create:{id: 2, uList:"A" todo: {connect: {uTodo: "Should not Matter"}}}
@@ -129,30 +129,30 @@ mod non_embedded_upsert {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query{findManyList {uList, todo {uTodo}}}"#),
+          run_query!(&runner, r#"query{findManyList {uList, todo {uTodo}}}"#),
           @r###"{"data":{"findManyList":[{"uList":"A","todo":null}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query{findManyTodo {uTodo}}"#),
+          run_query!(&runner, r#"query{findManyTodo {uTodo}}"#),
           @r###"{"data":{"findManyTodo":[{"uTodo":"B"}]}}"###
         );
 
-        assert_eq!(count_items(runner, "findManyList").await?, 1);
-        assert_eq!(count_items(runner, "findManyTodo").await?, 1);
+        assert_eq!(count_items(&runner, "findManyList").await?, 1);
+        assert_eq!(count_items(&runner, "findManyTodo").await?, 1);
 
         Ok(())
     }
 
     // "An upsert on the top level" should "execute a nested delete in the update branch"
     #[connector_test(exclude(SqlServer))]
-    async fn nested_delete_in_update(runner: &Runner) -> TestResult<()> {
+    async fn nested_delete_in_update(runner: Runner) -> TestResult<()> {
         run_query!(
-            runner,
+            &runner,
             r#"mutation{createOneTodo(data:{id: 1, uTodo: "B", list: {create: {id: 1, uList:"A"}}}){uTodo}}"#
         );
         run_query!(
-            runner,
+            &runner,
             r#"mutation {upsertOneList(
           where:{uList: "A"}
           create:{id: 2, uList:"A" todo: {connect: {uTodo: "Should not Matter"}}}
@@ -161,27 +161,27 @@ mod non_embedded_upsert {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query{findManyList {uList, todo {uTodo}}}"#),
+          run_query!(&runner, r#"query{findManyList {uList, todo {uTodo}}}"#),
           @r###"{"data":{"findManyList":[{"uList":"A","todo":null}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query{findManyTodo {uTodo}}"#),
+          run_query!(&runner, r#"query{findManyTodo {uTodo}}"#),
           @r###"{"data":{"findManyTodo":[]}}"###
         );
 
-        assert_eq!(count_items(runner, "findManyList").await?, 1);
-        assert_eq!(count_items(runner, "findManyTodo").await?, 0);
+        assert_eq!(count_items(&runner, "findManyList").await?, 1);
+        assert_eq!(count_items(&runner, "findManyTodo").await?, 0);
 
         Ok(())
     }
 
     // "An upsert on the top level" should "only execute the nested create mutations of the correct update branch"
     #[connector_test]
-    async fn execute_nested_create_of_correct_branch(runner: &Runner) -> TestResult<()> {
-        run_query!(runner, r#"mutation {createOneList(data: {id:1, uList: "A"}){id}}"#);
+    async fn execute_nested_create_of_correct_branch(runner: Runner) -> TestResult<()> {
+        run_query!(&runner, r#"mutation {createOneList(data: {id:1, uList: "A"}){id}}"#);
         run_query!(
-            runner,
+            &runner,
             r#"mutation {upsertOneList(
                 where:{uList: "A"}
                 create:{id: 2, uList:"B"  todo: {create: {id: 1, uTodo: "B"}}}
@@ -190,28 +190,28 @@ mod non_embedded_upsert {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query{findManyList {uList, todo {uTodo}}}"#),
+          run_query!(&runner, r#"query{findManyList {uList, todo {uTodo}}}"#),
           @r###"{"data":{"findManyList":[{"uList":"C","todo":{"uTodo":"C"}}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query{findManyTodo {uTodo}}"#),
+          run_query!(&runner, r#"query{findManyTodo {uTodo}}"#),
           @r###"{"data":{"findManyTodo":[{"uTodo":"C"}]}}"###
         );
 
-        assert_eq!(count_items(runner, "findManyList").await?, 1);
-        assert_eq!(count_items(runner, "findManyTodo").await?, 1);
+        assert_eq!(count_items(&runner, "findManyList").await?, 1);
+        assert_eq!(count_items(&runner, "findManyTodo").await?, 1);
 
         Ok(())
     }
 
     // "A nested upsert" should "execute the nested connect mutations of the correct create branch"
     #[connector_test(schema(dm_pm_to_cm))]
-    async fn nested_connect_in_correct_create_branch(runner: &Runner) -> TestResult<()> {
-        run_query!(runner, r#"mutation {createOneTag(data:{id: 1, uTag: "D"}){uTag}}"#);
-        run_query!(runner, r#"mutation {createOneList(data:{id: 1, uList: "A"}){id}}"#);
+    async fn nested_connect_in_correct_create_branch(runner: Runner) -> TestResult<()> {
+        run_query!(&runner, r#"mutation {createOneTag(data:{id: 1, uTag: "D"}){uTag}}"#);
+        run_query!(&runner, r#"mutation {createOneList(data:{id: 1, uList: "A"}){id}}"#);
         run_query!(
-            runner,
+            &runner,
             r#"mutation{updateOneList(
                 where:{uList: "A"}
                 data:{todoes: {
@@ -224,28 +224,28 @@ mod non_embedded_upsert {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query{findManyList {uList, todoes {uTodo, tags {uTag }}}}"#),
+          run_query!(&runner, r#"query{findManyList {uList, todoes {uTodo, tags {uTag }}}}"#),
           @r###"{"data":{"findManyList":[{"uList":"A","todoes":[{"uTodo":"C","tags":[{"uTag":"D"}]}]}]}}"###
         );
 
-        assert_eq!(count_items(runner, "findManyList").await?, 1);
-        assert_eq!(count_items(runner, "findManyTodo").await?, 1);
-        assert_eq!(count_items(runner, "findManyTag").await?, 1);
+        assert_eq!(count_items(&runner, "findManyList").await?, 1);
+        assert_eq!(count_items(&runner, "findManyTodo").await?, 1);
+        assert_eq!(count_items(&runner, "findManyTag").await?, 1);
 
         Ok(())
     }
 
     // "A nested upsert" should "execute the nested connect mutations of the correct update branch"
     #[connector_test(schema(dm_pm_to_cm))]
-    async fn nested_connect_in_correct_update_branch(runner: &Runner) -> TestResult<()> {
+    async fn nested_connect_in_correct_update_branch(runner: Runner) -> TestResult<()> {
         // Seed data
-        run_query!(runner, r#"mutation { createOneTag(data:{id: 1, uTag: "D"}){uTag}}"#);
+        run_query!(&runner, r#"mutation { createOneTag(data:{id: 1, uTag: "D"}){uTag}}"#);
         run_query!(
-            runner,
+            &runner,
             r#"mutation {createOneList(data: {id: 1, uList: "A" todoes: {create: {id: 1, uTodo: "B"}}}){id}}"#
         );
         run_query!(
-            runner,
+            &runner,
             r#"mutation{updateOneList(
                 where:{uList: "A"}
                 data:{todoes: {
@@ -258,13 +258,13 @@ mod non_embedded_upsert {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query{findManyList {uList, todoes {uTodo, tags {uTag }}}}"#),
+          run_query!(&runner, r#"query{findManyList {uList, todoes {uTodo, tags {uTag }}}}"#),
           @r###"{"data":{"findManyList":[{"uList":"A","todoes":[{"uTodo":"C","tags":[{"uTag":"D"}]}]}]}}"###
         );
 
-        assert_eq!(count_items(runner, "findManyList").await?, 1);
-        assert_eq!(count_items(runner, "findManyTodo").await?, 1);
-        assert_eq!(count_items(runner, "findManyTag").await?, 1);
+        assert_eq!(count_items(&runner, "findManyList").await?, 1);
+        assert_eq!(count_items(&runner, "findManyTodo").await?, 1);
+        assert_eq!(count_items(&runner, "findManyTag").await?, 1);
 
         Ok(())
     }

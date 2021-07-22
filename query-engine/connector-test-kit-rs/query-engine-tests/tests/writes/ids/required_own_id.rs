@@ -18,9 +18,9 @@ mod required_own_id {
 
     // "A Create Mutation" should "create and return item"
     #[connector_test]
-    async fn create_mut_return_item(runner: &Runner) -> TestResult<()> {
+    async fn create_mut_return_item(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneScalarModel(data: {
               id: "thisismyownid"
             }){ id }
@@ -33,9 +33,9 @@ mod required_own_id {
 
     // "A Create Mutation" should "error if a required id is not provided"
     #[connector_test]
-    async fn error_if_required_id_not_provided(runner: &Runner) -> TestResult<()> {
+    async fn error_if_required_id_not_provided(runner: Runner) -> TestResult<()> {
         assert_error!(
-            runner,
+            &runner,
             r#"mutation {
                 createOneScalarModel(data: {
                   optString: "iforgotmyid"

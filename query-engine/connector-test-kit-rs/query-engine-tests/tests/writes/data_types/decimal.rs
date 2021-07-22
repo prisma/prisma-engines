@@ -21,9 +21,9 @@ mod decimal {
     // {"data":{"createOneModel":{"field":"1.00112233445566778899"}}}
     // {"data":{"createOneModel":{"field":"1.001122334455668"}}}
     #[connector_test(exclude(SqlServer, Sqlite, MongoDb))]
-    async fn using_decimal_field(runner: &Runner) -> TestResult<()> {
+    async fn using_decimal_field(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneModel(
               data: {
                 id: 1
@@ -36,7 +36,7 @@ mod decimal {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateOneModel(
               where: { id: 1 }
               data: {
@@ -50,7 +50,7 @@ mod decimal {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateOneModel(
               where: { id: 1 }
               data: {

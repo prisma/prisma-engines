@@ -19,16 +19,16 @@ mod where_and_update {
 
     // "Updating the unique value used to find an item" should "work"
     #[connector_test]
-    async fn update_unique_val(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{id: 1, unique: 1, name: "Test"}"#).await?;
+    async fn update_unique_val(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{id: 1, unique: 1, name: "Test"}"#).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query {findUniqueTest(where:{unique:1}){ unique }}"#),
+          run_query!(&runner, r#"query {findUniqueTest(where:{unique:1}){ unique }}"#),
           @r###"{"data":{"findUniqueTest":{"unique":1}}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {updateOneTest( where: { unique: 1 } data: { unique: { set: 2 }}){unique}}"#),
+          run_query!(&runner, r#"mutation {updateOneTest( where: { unique: 1 } data: { unique: { set: 2 }}){unique}}"#),
           @r###"{"data":{"updateOneTest":{"unique":2}}}"###
         );
 

@@ -38,7 +38,7 @@ mod disconnect_inside_upsert {
         let parent = t.parent().parse(res, &["data", "createOneParent"])?;
 
         insta::assert_snapshot!(
-          run_query!(runner, format!(r#"mutation {{
+          run_query!(&runner, format!(r#"mutation {{
             upsertOneParent(
               where: {parent}
               update:{{
@@ -90,7 +90,7 @@ mod disconnect_inside_upsert {
 
         // Disconnect is a noop
         insta::assert_snapshot!(
-          run_query!(runner, format!(r#"mutation {{
+          run_query!(&runner, format!(r#"mutation {{
             upsertOneParent(
               where: {parent}
               update:{{
@@ -237,7 +237,7 @@ mod disconnect_inside_upsert {
         )?;
 
         insta::assert_snapshot!(
-          run_query!(runner, format!(r#"mutation {{
+          run_query!(&runner, format!(r#"mutation {{
             upsertOneParent(
             where: {parent}
             update:{{
@@ -288,7 +288,7 @@ mod disconnect_inside_upsert {
         )?;
 
         insta::assert_snapshot!(
-          run_query!(runner, format!(r#"mutation {{
+          run_query!(&runner, format!(r#"mutation {{
             upsertOneParent(
               where: {parent}
               update:{{
@@ -305,7 +305,7 @@ mod disconnect_inside_upsert {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query{findManyChild{c, parentsOpt{p}}}"#),
+          run_query!(&runner, r#"query{findManyChild{c, parentsOpt{p}}}"#),
           @r###"{"data":{"findManyChild":[{"c":"c1","parentsOpt":[]}]}}"###
         );
 
@@ -339,7 +339,7 @@ mod disconnect_inside_upsert {
         )?;
 
         insta::assert_snapshot!(
-          run_query!(runner, format!(r#"mutation {{
+          run_query!(&runner, format!(r#"mutation {{
             upsertOneParent(
             where: {parent}
             update:{{
@@ -356,7 +356,7 @@ mod disconnect_inside_upsert {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query{findManyChild{c, parentsOpt{p}}}"#),
+          run_query!(&runner, r#"query{findManyChild{c, parentsOpt{p}}}"#),
           @r###"{"data":{"findManyChild":[{"c":"c1","parentsOpt":[]},{"c":"c2","parentsOpt":[{"p":"p1"}]}]}}"###
         );
 

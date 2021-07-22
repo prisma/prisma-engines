@@ -20,7 +20,7 @@ mod element {
     }
 
     #[connector_test]
-    async fn prisma_1481(runner: &Runner) -> TestResult<()> {
+    async fn prisma_1481(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
         runner.batch(vec![
           r#"mutation {

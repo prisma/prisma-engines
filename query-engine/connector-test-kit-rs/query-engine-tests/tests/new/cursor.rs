@@ -18,11 +18,11 @@ mod bigint_cursor {
     }
 
     #[connector_test]
-    async fn bigint_id_must_work(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn bigint_id_must_work(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-            run_query!(runner, "query { findManyTestModel(cursor: { id: 2 }, orderBy: { counter: desc }){ id counter }}"),
+            run_query!(&runner, "query { findManyTestModel(cursor: { id: 2 }, orderBy: { counter: desc }){ id counter }}"),
             @r###"{"data":{"findManyTestModel":[{"id":"2","counter":2},{"id":"1","counter":1}]}}"###
         );
 

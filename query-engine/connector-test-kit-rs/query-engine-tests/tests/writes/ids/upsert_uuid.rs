@@ -18,9 +18,9 @@ mod upsert_uuid {
 
     // "Upserting an item with an id field of model UUID" should "work"
     #[connector_test(schema(schema))]
-    async fn upsert_id_uuid_should_work(runner: &Runner) -> TestResult<()> {
+    async fn upsert_id_uuid_should_work(runner: Runner) -> TestResult<()> {
         let res = run_query_json!(
-            runner,
+            &runner,
             r#"mutation {
                 upsertOneTodo(
                   where: {id: "00000000-0000-0000-0000-000000000000"}

@@ -52,12 +52,12 @@ mod if_node_sibling {
 
     // "The if node sibling reordering" should "include all siblings that are not another if"
     #[connector_test(schema(schema))]
-    async fn test(runner: &Runner) -> TestResult<()> {
-        run_query!(runner, r#"mutation { createOneRecordConfig(data: {id: 1}) {id} }"#);
-        run_query!(runner, r#"mutation { createOneContainer(data: {id: 1}) {id} }"#);
+    async fn test(runner: Runner) -> TestResult<()> {
+        run_query!(&runner, r#"mutation { createOneRecordConfig(data: {id: 1}) {id} }"#);
+        run_query!(&runner, r#"mutation { createOneContainer(data: {id: 1}) {id} }"#);
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneRecord(data:{
               id: 1,
               container: { connect: { id: 1 }}

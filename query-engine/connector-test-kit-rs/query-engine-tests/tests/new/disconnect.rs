@@ -8,12 +8,12 @@ mod disconnect_security {
     use query_engine_tests::assert_query;
 
     #[connector_test(schema(schemas::a1_to_bm_opt))]
-    async fn must_honor_connect_scope_one2m(runner: &Runner) -> TestResult<()> {
-        one_to_many_test_data(runner).await?;
+    async fn must_honor_connect_scope_one2m(runner: Runner) -> TestResult<()> {
+        one_to_many_test_data(&runner).await?;
 
         // Diconnecting B3 from A1 (not connected) must NOT disconnect it from A2.
         assert_query! {
-            runner,
+            &runner,
             r#"mutation {
                 updateOneA(where: { id: 1 }, data: { many_b: { disconnect: { id: 3 } } }) {
                   many_b { id }
@@ -23,7 +23,7 @@ mod disconnect_security {
         }
 
         assert_query! {
-            runner,
+            &runner,
             r#"query {
                 findUniqueA(where: { id: 2 }) {
                     many_b { id }
@@ -36,12 +36,12 @@ mod disconnect_security {
     }
 
     #[connector_test(schema(schemas::posts_categories))]
-    async fn must_honor_connect_scope_m2m(runner: &Runner) -> TestResult<()> {
-        many_to_many_test_data(runner).await?;
+    async fn must_honor_connect_scope_m2m(runner: Runner) -> TestResult<()> {
+        many_to_many_test_data(&runner).await?;
 
         // Diconnecting Category3 from Post1 (not connected) must NOT disconnect it from Post2.
         assert_query! {
-            runner,
+            &runner,
             r#"mutation {
                 updateOnePost(where: { id: 1 }, data: { categories: { disconnect: { id: 3 } } }) {
                   categories { id }
@@ -51,7 +51,7 @@ mod disconnect_security {
         }
 
         assert_query! {
-            runner,
+            &runner,
             r#"query {
                 findUniquePost(where: { id: 2 }) {
                     categories { id }

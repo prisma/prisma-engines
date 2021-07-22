@@ -42,25 +42,25 @@ mod one2one_req {
 
     /// Updating the parent reconnects the child to the default.
     #[connector_test(schema(required_with_default))]
-    async fn update_parent(runner: &Runner) -> TestResult<()> {
+    async fn update_parent(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", child: { create: { id: 1 }}}) { id }}"#),
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", child: { create: { id: 1 }}}) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
         // The default
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation { createOneParent(data: { id: 2, uniq: "2" }) { id }}"#),
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 2, uniq: "2" }) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":2}}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#),
+          run_query!(&runner, r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#),
           @r###"{"data":{"updateOneParent":{"id":1}}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyChild { id parent { id } }}"#),
+          run_query!(&runner, r#"query { findManyChild { id parent { id } }}"#),
           @r###"{"data":{"findManyChild":[{"id":1,"parent":{"id":2}}]}}"###
         );
 
@@ -69,14 +69,14 @@ mod one2one_req {
 
     /// Updating the parent reconnects the child to the default and fails (the default doesn't exist).
     #[connector_test(schema(required_with_default))]
-    async fn update_parent_no_exist_fail(runner: &Runner) -> TestResult<()> {
+    async fn update_parent_no_exist_fail(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", child: { create: { id: 1 }}}) { id }}"#),
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", child: { create: { id: 1 }}}) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
         assert_error!(
-            runner,
+            &runner,
             r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#,
             2003,
             "Foreign key constraint failed on the field"
@@ -88,14 +88,14 @@ mod one2one_req {
     /// Updating the parent with no default for SetDefault fails.
     /// Only postgres allows setting no default for a SetDefault FK.
     #[connector_test(schema(required_without_default), only(Postgres))]
-    async fn update_parent_fail(runner: &Runner) -> TestResult<()> {
+    async fn update_parent_fail(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", child: { create: { id: 1 }}}) { id }}"#),
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", child: { create: { id: 1 }}}) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
         assert_error!(
-            runner,
+            &runner,
             r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#,
             2011,
             "Null constraint violation on the fields"
@@ -145,25 +145,25 @@ mod one2one_opt {
 
     /// Updating the parent reconnects the child to the default.
     #[connector_test(schema(optional_with_default))]
-    async fn update_parent(runner: &Runner) -> TestResult<()> {
+    async fn update_parent(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", child: { create: { id: 1 }}}) { id }}"#),
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", child: { create: { id: 1 }}}) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
         // The default
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation { createOneParent(data: { id: 2, uniq: "2" }) { id }}"#),
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 2, uniq: "2" }) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":2}}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#),
+          run_query!(&runner, r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#),
           @r###"{"data":{"updateOneParent":{"id":1}}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyChild { id parent { id } }}"#),
+          run_query!(&runner, r#"query { findManyChild { id parent { id } }}"#),
           @r###"{"data":{"findManyChild":[{"id":1,"parent":{"id":2}}]}}"###
         );
 
@@ -172,14 +172,14 @@ mod one2one_opt {
 
     /// Updating the parent reconnects the child to the default and fails (the default doesn't exist).
     #[connector_test(schema(optional_with_default))]
-    async fn update_parent_no_exist_fail(runner: &Runner) -> TestResult<()> {
+    async fn update_parent_no_exist_fail(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", child: { create: { id: 1 }}}) { id }}"#),
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", child: { create: { id: 1 }}}) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
         assert_error!(
-            runner,
+            &runner,
             r#"mutation { updateOneParent(where: { id: 1 } data: { uniq: "u1" }) { id }}"#,
             2003,
             "Foreign key constraint failed on the field"
@@ -190,19 +190,19 @@ mod one2one_opt {
 
     /// Updating the parent with no default for SetDefault nulls the FK.
     #[connector_test(schema(optional_without_default), only(Postgres))]
-    async fn update_parent_fail(runner: &Runner) -> TestResult<()> {
+    async fn update_parent_fail(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", child: { create: { id: 1 }}}) { id }}"#),
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", child: { create: { id: 1 }}}) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#),
+          run_query!(&runner, r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#),
           @r###"{"data":{"updateOneParent":{"id":1}}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyChild(where: { id: 1 }) { id parent_uniq }}"#),
+          run_query!(&runner, r#"query { findManyChild(where: { id: 1 }) { id parent_uniq }}"#),
           @r###"{"data":{"findManyChild":[{"id":1,"parent_uniq":null}]}}"###
         );
 
@@ -250,25 +250,25 @@ mod one2many_req {
 
     /// Updating the parent reconnects the children to the default.
     #[connector_test(schema(required_with_default))]
-    async fn update_parent(runner: &Runner) -> TestResult<()> {
+    async fn update_parent(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", children: { create: { id: 1 }}}) { id }}"#),
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", children: { create: { id: 1 }}}) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
         // The default
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation { createOneParent(data: { id: 2, uniq: "2" }) { id }}"#),
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 2, uniq: "2" }) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":2}}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#),
+          run_query!(&runner, r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#),
           @r###"{"data":{"updateOneParent":{"id":1}}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyChild { id parent { id } }}"#),
+          run_query!(&runner, r#"query { findManyChild { id parent { id } }}"#),
           @r###"{"data":{"findManyChild":[{"id":1,"parent":{"id":2}}]}}"###
         );
 
@@ -277,14 +277,14 @@ mod one2many_req {
 
     /// Updating the parent reconnects the child to the default and fails (the default doesn't exist).
     #[connector_test(schema(required_with_default))]
-    async fn update_parent_no_exist_fail(runner: &Runner) -> TestResult<()> {
+    async fn update_parent_no_exist_fail(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", children: { create: { id: 1 }}}) { id }}"#),
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", children: { create: { id: 1 }}}) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
         assert_error!(
-            runner,
+            &runner,
             r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#,
             2003,
             "Foreign key constraint failed on the field"
@@ -296,14 +296,14 @@ mod one2many_req {
     /// Updating the parent with no default for SetDefault fails.
     /// Only postgres allows setting no default for a SetDefault FK.
     #[connector_test(schema(required_without_default), only(Postgres))]
-    async fn update_parent_fail(runner: &Runner) -> TestResult<()> {
+    async fn update_parent_fail(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", children: { create: { id: 1 }}}) { id }}"#),
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", children: { create: { id: 1 }}}) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
         assert_error!(
-            runner,
+            &runner,
             r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#,
             2011,
             "Null constraint violation on the fields"
@@ -353,25 +353,25 @@ mod one2many_opt {
 
     /// Updating the parent reconnects the child to the default.
     #[connector_test(schema(optional_with_default))]
-    async fn update_parent(runner: &Runner) -> TestResult<()> {
+    async fn update_parent(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", children: { create: { id: 1 }}}) { id }}"#),
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", children: { create: { id: 1 }}}) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
         // The default
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation { createOneParent(data: { id: 2, uniq: "2" }) { id }}"#),
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 2, uniq: "2" }) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":2}}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#),
+          run_query!(&runner, r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#),
           @r###"{"data":{"updateOneParent":{"id":1}}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyChild { id parent { id } }}"#),
+          run_query!(&runner, r#"query { findManyChild { id parent { id } }}"#),
           @r###"{"data":{"findManyChild":[{"id":1,"parent":{"id":2}}]}}"###
         );
 
@@ -380,14 +380,14 @@ mod one2many_opt {
 
     /// Updating the parent reconnects the child to the default and fails (the default doesn't exist).
     #[connector_test(schema(optional_with_default))]
-    async fn update_parent_no_exist_fail(runner: &Runner) -> TestResult<()> {
+    async fn update_parent_no_exist_fail(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", children: { create: { id: 1 }}}) { id }}"#),
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", children: { create: { id: 1 }}}) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
         assert_error!(
-            runner,
+            &runner,
             r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#,
             2003,
             "Foreign key constraint failed on the field"
@@ -398,19 +398,19 @@ mod one2many_opt {
 
     /// Updating the parent with no default for SetDefault nulls the FK.
     #[connector_test(schema(optional_without_default), only(Postgres))]
-    async fn update_parent_fail(runner: &Runner) -> TestResult<()> {
+    async fn update_parent_fail(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", children: { create: { id: 1 }}}) { id }}"#),
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", children: { create: { id: 1 }}}) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#),
+          run_query!(&runner, r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#),
           @r###"{"data":{"updateOneParent":{"id":1}}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyChild(where: { id: 1 }) { id parent_uniq }}"#),
+          run_query!(&runner, r#"query { findManyChild(where: { id: 1 }) { id parent_uniq }}"#),
           @r###"{"data":{"findManyChild":[{"id":1,"parent_uniq":null}]}}"###
         );
 

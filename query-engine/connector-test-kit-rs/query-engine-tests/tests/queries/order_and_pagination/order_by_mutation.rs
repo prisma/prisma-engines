@@ -10,16 +10,16 @@ mod order_by_mutation {
             "model Foo {
               #id(id, Int, @id)
               test String?
-    
+
               bars Bar[]
           }
-    
+
           model Bar {
               #id(id, Int, @id)
               quantity   Int
               orderField Int?
               foo_id     Int
-    
+
               foo Foo @relation(fields: [foo_id], references: [id])
           }"
         };
@@ -29,9 +29,9 @@ mod order_by_mutation {
 
     // "Using a field in the order by that is not part of the selected fields" should "work"
     #[connector_test]
-    async fn order_by_not_selected(runner: &Runner) -> TestResult<()> {
+    async fn order_by_not_selected(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"
+          run_query!(&runner, r#"
             mutation {
                 createOneFoo(
                   data: {

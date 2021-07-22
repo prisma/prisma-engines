@@ -25,16 +25,16 @@ mod relation_is_null {
     }
 
     #[connector_test]
-    async fn is_null(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn is_null(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyImage(where: { message: { is: null }}) { imageName }}"#),
+          run_query!(&runner, r#"query { findManyImage(where: { message: { is: null }}) { imageName }}"#),
           @r###"{"data":{"findManyImage":[{"imageName":"image 2"}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyMessage(where: { image: { is: null }}) { messageName }}"#),
+          run_query!(&runner, r#"query { findManyMessage(where: { image: { is: null }}) { messageName }}"#),
           @r###"{"data":{"findManyMessage":[{"messageName":"message 1"}]}}"###
         );
 

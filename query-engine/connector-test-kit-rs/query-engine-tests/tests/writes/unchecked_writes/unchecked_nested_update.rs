@@ -43,10 +43,10 @@ mod nested_unchecked_update {
 
     //"Unchecked nested updates" should "allow writing non-parent inlined relation scalars"
     #[connector_test(schema(schema_1))]
-    async fn allow_write_non_prent_inline_rel_sclrs(runner: &Runner) -> TestResult<()> {
+    async fn allow_write_non_prent_inline_rel_sclrs(runner: Runner) -> TestResult<()> {
         // Setup
         run_query!(
-            runner,
+            &runner,
             r#"mutation {
                 createOneModelA(data: {
                   id: 1
@@ -58,7 +58,7 @@ mod nested_unchecked_update {
             }"#
         );
         run_query!(
-            runner,
+            &runner,
             r#"mutation {
                 createOneModelC(data: {
                   uniq_1: "c2_1"
@@ -71,7 +71,7 @@ mod nested_unchecked_update {
 
         // C can be updated for A
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateOneModelB(where: {
               uniq_1_uniq_2: {
                 uniq_1: "b1_1"
@@ -97,7 +97,7 @@ mod nested_unchecked_update {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateOneModelB(where: {
               uniq_1_uniq_2: {
                 uniq_1: "b1_1"
@@ -143,11 +143,11 @@ mod nested_unchecked_update {
 
     // "Unchecked nested updates" should "not allow writing parent inlined relation scalars"
     #[connector_test(schema(schema_2))]
-    async fn disallow_write_parent_inline_rel_sclrs(runner: &Runner) -> TestResult<()> {
+    async fn disallow_write_parent_inline_rel_sclrs(runner: Runner) -> TestResult<()> {
         // B can't be written because it's the parent.
 
         assert_error!(
-            runner,
+            &runner,
             r#"mutation {
               updateOneModelB(where: { id: 1 }, data: {
                 a: {
@@ -199,12 +199,12 @@ mod nested_unchecked_update {
 
     // "Unchecked nested updates" should "not allow writing inlined relations regularly"
     #[connector_test(schema(schema_3))]
-    async fn disallow_write_inline_rel(runner: &Runner) -> TestResult<()> {
+    async fn disallow_write_inline_rel(runner: Runner) -> TestResult<()> {
         // We need ModelD to trigger the correct input. We're coming from B, so B is out,
         // then we use C to trigger the union on the unchecked type, then we use d as a regular
         // relation in the input that must fail.
         assert_error!(
-            runner,
+            &runner,
             r#"mutation {
                 updateOneModelB(data: {
                   a: {
@@ -259,9 +259,9 @@ mod nested_unchecked_update {
 
     // "Unchecked nested updates" should "allow writing non-parent, non-inlined relations normally"
     #[connector_test(schema(schema_4))]
-    async fn disallow_write_non_parent(runner: &Runner) -> TestResult<()> {
+    async fn disallow_write_non_parent(runner: Runner) -> TestResult<()> {
         run_query!(
-            runner,
+            &runner,
             r#"mutation {
                 createOneModelA(data: {
                   id: 1
@@ -273,7 +273,7 @@ mod nested_unchecked_update {
             }"#
         );
         run_query!(
-            runner,
+            &runner,
             r#"mutation {
                 createOneModelD(data: {
                   id: 2
@@ -284,7 +284,7 @@ mod nested_unchecked_update {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateOneModelB(where: { id: 1 }, data: {
               a: {
                 update: {
@@ -324,14 +324,14 @@ mod nested_unchecked_update {
 
     // "Unchecked nested updates" should "allow to write to autoincrement IDs directly"
     #[connector_test(schema(schema_5), exclude(SqlServer))]
-    async fn allow_write_autoinc_id(runner: &Runner) -> TestResult<()> {
+    async fn allow_write_autoinc_id(runner: Runner) -> TestResult<()> {
         run_query!(
-            runner,
+            &runner,
             r#"mutation { createOneModelA(data: { b: { create: { id: 1 }} }) { id } }"#
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateOneModelB(where: { id: 1 }, data: {
               a: { update: { id: 111 }}
             }) {

@@ -24,9 +24,9 @@ mod postgres {
 
     //"Postgres native int types" should "work"
     #[connector_test(schema(schema_int))]
-    async fn native_int_types(runner: &Runner) -> TestResult<()> {
+    async fn native_int_types(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneModel(
               data: {
                 int: 2147483647
@@ -66,9 +66,9 @@ mod postgres {
 
     // "Postgres native decimal types" should "work"
     #[connector_test(schema(schema_decimal))]
-    async fn native_decimal_types(runner: &Runner) -> TestResult<()> {
+    async fn native_decimal_types(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneModel(
               data: {
                 float: 1.1
@@ -109,9 +109,9 @@ mod postgres {
 
     // "Postgres native string types" should "work"
     #[connector_test(schema(schema_string))]
-    async fn native_string(runner: &Runner) -> TestResult<()> {
+    async fn native_string(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneModel(
               data: {
                 char: "1234567890"
@@ -155,9 +155,9 @@ mod postgres {
 
     // "Other Postgres native types" should "work"
     #[connector_test(schema(schema_other_types))]
-    async fn native_other_types(runner: &Runner) -> TestResult<()> {
+    async fn native_other_types(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneModel(
               data: {
                 bool: true
@@ -202,9 +202,9 @@ mod postgres {
 
     // "Postgres native date types" should "work"
     #[connector_test(schema(schema_date))]
-    async fn native_date(runner: &Runner) -> TestResult<()> {
+    async fn native_date(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneModel(
               data: {
                 date: "2016-09-24T00:00:00.000Z"
@@ -256,9 +256,9 @@ mod postgres {
 
     // "Postgres native fixed-size char type" should "be handled correctly wrt. padding for comparisons"
     #[connector_test(schema(schema_native_fixed_size_char))]
-    async fn native_fixed_size_char(runner: &Runner) -> TestResult<()> {
+    async fn native_fixed_size_char(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneModelA(data: {
               id: "1234"
                b: { create: { id: "4321" } }

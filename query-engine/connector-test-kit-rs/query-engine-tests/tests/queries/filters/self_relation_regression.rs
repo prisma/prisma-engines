@@ -21,11 +21,11 @@ mod sr_regression {
     }
 
     #[connector_test]
-    async fn all_categories(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn all_categories(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyCategory(orderBy: { id: asc }) { name parent { name }}}"#),
+          run_query!(&runner, r#"query { findManyCategory(orderBy: { id: asc }) { name parent { name }}}"#),
           @r###"{"data":{"findManyCategory":[{"name":"Sub","parent":{"name":"Root"}},{"name":"Root","parent":null}]}}"###
         );
 
@@ -33,11 +33,11 @@ mod sr_regression {
     }
 
     #[connector_test]
-    async fn root_categories(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn root_categories(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyCategory(where: { parent: { is: null }}) { name parent { name }}}"#),
+          run_query!(&runner, r#"query { findManyCategory(where: { parent: { is: null }}) { name parent { name }}}"#),
           @r###"{"data":{"findManyCategory":[{"name":"Root","parent":null}]}}"###
         );
 
@@ -45,11 +45,11 @@ mod sr_regression {
     }
 
     #[connector_test]
-    async fn inverted_subcat(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn inverted_subcat(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyCategory(where: { NOT: [{ parent: { is: null }}] }) { name parent { name }}}"#),
+          run_query!(&runner, r#"query { findManyCategory(where: { NOT: [{ parent: { is: null }}] }) { name parent { name }}}"#),
           @r###"{"data":{"findManyCategory":[{"name":"Sub","parent":{"name":"Root"}}]}}"###
         );
 
@@ -57,11 +57,11 @@ mod sr_regression {
     }
 
     #[connector_test]
-    async fn subcat_scalar(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn subcat_scalar(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyCategory(where: { parent: { is: { name: { equals: "Root" }}}}) { name parent { name }}}"#),
+          run_query!(&runner, r#"query { findManyCategory(where: { parent: { is: { name: { equals: "Root" }}}}) { name parent { name }}}"#),
           @r###"{"data":{"findManyCategory":[{"name":"Sub","parent":{"name":"Root"}}]}}"###
         );
 

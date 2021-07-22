@@ -5,7 +5,7 @@ use query_engine_tests::*;
 mod where_unique {
 
     #[connector_test]
-    async fn no_unique_fields(runner: &Runner) -> TestResult<()> {
+    async fn no_unique_fields(runner: Runner) -> TestResult<()> {
         assert_error!(
             runner,
             "query { findUniqueUser(where: {}){ id }}",
@@ -17,8 +17,8 @@ mod where_unique {
     }
 
     #[connector_test]
-    async fn one_unique_field(runner: &Runner) -> TestResult<()> {
-        test_users(runner).await?;
+    async fn one_unique_field(runner: Runner) -> TestResult<()> {
+        test_users(&runner).await?;
         assert_query!(
             runner,
             "query { findUniqueUser(where: { id: 1 }){ id }}",
@@ -29,10 +29,10 @@ mod where_unique {
     }
 
     #[connector_test]
-    async fn more_than_one_unique_field(runner: &Runner) -> TestResult<()> {
-        test_users(runner).await?;
+    async fn more_than_one_unique_field(runner: Runner) -> TestResult<()> {
+        test_users(&runner).await?;
         assert_error!(
-            runner,
+            &runner,
             r#"query { findUniqueUser(where: { id: 1, first_name: "Elongated" }){ id }}"#,
             2009,
             "Field does not exist on enclosing type."
@@ -42,8 +42,8 @@ mod where_unique {
     }
 
     #[connector_test]
-    async fn implicit_unique_and(runner: &Runner) -> TestResult<()> {
-        test_users(runner).await?;
+    async fn implicit_unique_and(runner: Runner) -> TestResult<()> {
+        test_users(&runner).await?;
         assert_query!(
             runner,
             "query { findUniqueUser(where: { id: 1 }){ id }}",

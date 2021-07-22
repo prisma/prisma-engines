@@ -22,19 +22,19 @@ mod one2one_req {
 
     /// Deleting the parent deletes child as well.
     #[connector_test]
-    async fn delete_parent(runner: &Runner) -> TestResult<()> {
+    async fn delete_parent(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-            run_query!(runner, r#"mutation { createOneParent(data: { id: 1, child: { create: { id: 1 }}}) { id }}"#),
+            run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, child: { create: { id: 1 }}}) { id }}"#),
             @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
         insta::assert_snapshot!(
-            run_query!(runner, "mutation { deleteOneParent(where: { id: 1 }) { id }}"),
+            run_query!(&runner, "mutation { deleteOneParent(where: { id: 1 }) { id }}"),
             @r###"{"data":{"deleteOneParent":{"id":1}}}"###
         );
 
         insta::assert_snapshot!(
-            run_query!(runner, "query { findManyChild { id }}"),
+            run_query!(&runner, "query { findManyChild { id }}"),
             @r###"{"data":{"findManyChild":[]}}"###
         );
 
@@ -63,19 +63,19 @@ mod one2one_opt {
 
     /// Deleting the parent deletes child as well.
     #[connector_test]
-    async fn delete_parent(runner: &Runner) -> TestResult<()> {
+    async fn delete_parent(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation { createOneParent(data: { id: 1, child: { create: { id: 1 }}}) { id }}"#),
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, child: { create: { id: 1 }}}) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
         insta::assert_snapshot!(
-            run_query!(runner, "mutation { deleteOneParent(where: { id: 1 }) { id }}"),
+            run_query!(&runner, "mutation { deleteOneParent(where: { id: 1 }) { id }}"),
             @r###"{"data":{"deleteOneParent":{"id":1}}}"###
         );
 
         insta::assert_snapshot!(
-            run_query!(runner, "query { findManyChild { id }}"),
+            run_query!(&runner, "query { findManyChild { id }}"),
             @r###"{"data":{"findManyChild":[]}}"###
         );
 
@@ -104,19 +104,19 @@ mod one2many_req {
 
     /// Deleting the parent deletes all children.
     #[connector_test]
-    async fn delete_parent(runner: &Runner) -> TestResult<()> {
+    async fn delete_parent(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation { createOneParent(data: { id: 1, children: { create: [ { id: 1 }, { id: 2 } ] }}) { id }}"#),
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, children: { create: [ { id: 1 }, { id: 2 } ] }}) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
         insta::assert_snapshot!(
-            run_query!(runner, "mutation { deleteOneParent(where: { id: 1 }) { id }}"),
+            run_query!(&runner, "mutation { deleteOneParent(where: { id: 1 }) { id }}"),
             @r###"{"data":{"deleteOneParent":{"id":1}}}"###
         );
 
         insta::assert_snapshot!(
-            run_query!(runner, "query { findManyChild { id }}"),
+            run_query!(&runner, "query { findManyChild { id }}"),
             @r###"{"data":{"findManyChild":[]}}"###
         );
 
@@ -145,19 +145,19 @@ mod one2many_opt {
 
     /// Deleting the parent deletes all children.
     #[connector_test]
-    async fn delete_parent(runner: &Runner) -> TestResult<()> {
+    async fn delete_parent(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation { createOneParent(data: { id: 1, children: { create: [ { id: 1 }, { id: 2 } ] }}) { id }}"#),
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, children: { create: [ { id: 1 }, { id: 2 } ] }}) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
         insta::assert_snapshot!(
-            run_query!(runner, "mutation { deleteOneParent(where: { id: 1 }) { id }}"),
+            run_query!(&runner, "mutation { deleteOneParent(where: { id: 1 }) { id }}"),
             @r###"{"data":{"deleteOneParent":{"id":1}}}"###
         );
 
         insta::assert_snapshot!(
-            run_query!(runner, "query { findManyChild { id }}"),
+            run_query!(&runner, "query { findManyChild { id }}"),
             @r###"{"data":{"findManyChild":[]}}"###
         );
 

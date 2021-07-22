@@ -15,24 +15,24 @@ mod aggregation_group_by_having {
     // and are extracted and applied exactly as the already tested ones. This also extends to AND/OR/NOT combinators.
     // Consequently, subsequent tests in this file will deal exclusively with the newly added aggregation filters.
     #[connector_test(exclude(MongoDb))]
-    async fn basic_having_scalar_filter(runner: &Runner) -> TestResult<()> {
+    async fn basic_having_scalar_filter(runner: Runner) -> TestResult<()> {
         create_row(
-            runner,
+            &runner,
             r#"{ id: 1, float: 10.1, int: 5, decimal: "1.1", bInt: "12", string: "group1" }"#,
         )
         .await?;
         create_row(
-            runner,
+            &runner,
             r#"{ id: 2, float: 5.5, int: 0, decimal: "6.7", bInt: "3", string: "group1" }"#,
         )
         .await?;
         create_row(
-            runner,
+            &runner,
             r#"{ id: 3, float: 10, int: 5, decimal: "11", bInt: "3", string: "group2" }"#,
         )
         .await?;
         create_row(
-            runner,
+            &runner,
             r#"{ id: 4, float: 10, int: 5, decimal: "11", bInt: "3", string: "group3" }"#,
         )
         .await?;
@@ -63,13 +63,13 @@ mod aggregation_group_by_having {
     }
 
     #[connector_test]
-    async fn having_count_scalar_filter(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{ id: 1, int: 1, string: "group1" }"#).await?;
-        create_row(runner, r#"{ id: 2, int: 2, string: "group1" }"#).await?;
-        create_row(runner, r#"{ id: 3, int: 3, string: "group2" }"#).await?;
-        create_row(runner, r#"{ id: 4, string: "group2" }"#).await?;
-        create_row(runner, r#"{ id: 5, string: "group3" }"#).await?;
-        create_row(runner, r#"{ id: 6, string: "group3" }"#).await?;
+    async fn having_count_scalar_filter(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1, int: 1, string: "group1" }"#).await?;
+        create_row(&runner, r#"{ id: 2, int: 2, string: "group1" }"#).await?;
+        create_row(&runner, r#"{ id: 3, int: 3, string: "group2" }"#).await?;
+        create_row(&runner, r#"{ id: 4, string: "group2" }"#).await?;
+        create_row(&runner, r#"{ id: 5, string: "group3" }"#).await?;
+        create_row(&runner, r#"{ id: 6, string: "group3" }"#).await?;
 
         // Group 1 has 2, 2 has 1, 3 has 0
         insta::assert_snapshot!(
@@ -138,13 +138,13 @@ mod aggregation_group_by_having {
     }
 
     #[connector_test]
-    async fn having_avg_scalar_filter(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{ id: 1, int: 10, decimal: "10", string: "group1" }"#).await?;
-        create_row(runner, r#"{ id: 2, int: 6, decimal: "6", string: "group1" }"#).await?;
-        create_row(runner, r#"{ id: 3, int: 3, decimal: "5", string: "group2" }"#).await?;
-        create_row(runner, r#"{ id: 4, string: "group2" }"#).await?;
-        create_row(runner, r#"{ id: 5, string: "group3" }"#).await?;
-        create_row(runner, r#"{ id: 6, string: "group3" }"#).await?;
+    async fn having_avg_scalar_filter(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1, int: 10, decimal: "10", string: "group1" }"#).await?;
+        create_row(&runner, r#"{ id: 2, int: 6, decimal: "6", string: "group1" }"#).await?;
+        create_row(&runner, r#"{ id: 3, int: 3, decimal: "5", string: "group2" }"#).await?;
+        create_row(&runner, r#"{ id: 4, string: "group2" }"#).await?;
+        create_row(&runner, r#"{ id: 5, string: "group3" }"#).await?;
+        create_row(&runner, r#"{ id: 6, string: "group3" }"#).await?;
 
         // Group 1 has 8, 2 has 5, 3 has 0
         insta::assert_snapshot!(
@@ -212,17 +212,25 @@ mod aggregation_group_by_having {
     }
 
     #[connector_test(exclude(MongoDb))]
-    async fn having_sum_scalar_filter(runner: &Runner) -> TestResult<()> {
+    async fn having_sum_scalar_filter(runner: Runner) -> TestResult<()> {
         create_row(
-            runner,
+            &runner,
             r#"{ id: 1, float: 10, int: 10, decimal: "10", string: "group1" }"#,
         )
         .await?;
-        create_row(runner, r#"{ id: 2, float: 6, int: 6, decimal: "6", string: "group1" }"#).await?;
-        create_row(runner, r#"{ id: 3, float: 5, int: 5, decimal: "5", string: "group2" }"#).await?;
-        create_row(runner, r#"{ id: 4, string: "group2" }"#).await?;
-        create_row(runner, r#"{ id: 5, string: "group3" }"#).await?;
-        create_row(runner, r#"{ id: 6, string: "group3" }"#).await?;
+        create_row(
+            &runner,
+            r#"{ id: 2, float: 6, int: 6, decimal: "6", string: "group1" }"#,
+        )
+        .await?;
+        create_row(
+            &runner,
+            r#"{ id: 3, float: 5, int: 5, decimal: "5", string: "group2" }"#,
+        )
+        .await?;
+        create_row(&runner, r#"{ id: 4, string: "group2" }"#).await?;
+        create_row(&runner, r#"{ id: 5, string: "group3" }"#).await?;
+        create_row(&runner, r#"{ id: 6, string: "group3" }"#).await?;
 
         // Group 1 has 16, 2 has 6, 3 has 0
         insta::assert_snapshot!(
@@ -291,17 +299,25 @@ mod aggregation_group_by_having {
     }
 
     #[connector_test(exclude(MongoDb))]
-    async fn having_min_scalar_filter(runner: &Runner) -> TestResult<()> {
+    async fn having_min_scalar_filter(runner: Runner) -> TestResult<()> {
         create_row(
-            runner,
+            &runner,
             r#"{ id: 1, float: 10, int: 10, decimal: "10", string: "group1" }"#,
         )
         .await?;
-        create_row(runner, r#"{ id: 2, float: 0, int: 0, decimal: "0", string: "group1" }"#).await?;
-        create_row(runner, r#"{ id: 3, float: 0, int: 0, decimal: "0", string: "group2" }"#).await?;
-        create_row(runner, r#"{ id: 4, string: "group2" }"#).await?;
-        create_row(runner, r#"{ id: 5, string: "group3" }"#).await?;
-        create_row(runner, r#"{ id: 6, string: "group3" }"#).await?;
+        create_row(
+            &runner,
+            r#"{ id: 2, float: 0, int: 0, decimal: "0", string: "group1" }"#,
+        )
+        .await?;
+        create_row(
+            &runner,
+            r#"{ id: 3, float: 0, int: 0, decimal: "0", string: "group2" }"#,
+        )
+        .await?;
+        create_row(&runner, r#"{ id: 4, string: "group2" }"#).await?;
+        create_row(&runner, r#"{ id: 5, string: "group3" }"#).await?;
+        create_row(&runner, r#"{ id: 6, string: "group3" }"#).await?;
 
         // Group 1 and 2 returned
         insta::assert_snapshot!(
@@ -370,21 +386,25 @@ mod aggregation_group_by_having {
     }
 
     #[connector_test(exclude(MongoDb))]
-    async fn having_max_scalar_filter(runner: &Runner) -> TestResult<()> {
+    async fn having_max_scalar_filter(runner: Runner) -> TestResult<()> {
         create_row(
-            runner,
+            &runner,
             r#"{ id: 1, float: 10, int: 10, decimal: "10", string: "group1" }"#,
         )
         .await?;
-        create_row(runner, r#"{ id: 2, float: 0, int: 0, decimal: "0", string: "group1" }"#).await?;
         create_row(
-            runner,
+            &runner,
+            r#"{ id: 2, float: 0, int: 0, decimal: "0", string: "group1" }"#,
+        )
+        .await?;
+        create_row(
+            &runner,
             r#"{ id: 3, float: 10, int: 10, decimal: "10", string: "group2" }"#,
         )
         .await?;
-        create_row(runner, r#"{ id: 4, string: "group2" }"#).await?;
-        create_row(runner, r#"{ id: 5, string: "group3" }"#).await?;
-        create_row(runner, r#"{ id: 6, string: "group3" }"#).await?;
+        create_row(&runner, r#"{ id: 4, string: "group2" }"#).await?;
+        create_row(&runner, r#"{ id: 5, string: "group3" }"#).await?;
+        create_row(&runner, r#"{ id: 6, string: "group3" }"#).await?;
 
         // Group 1 returned
         insta::assert_snapshot!(
@@ -455,7 +475,7 @@ mod aggregation_group_by_having {
     /// Error cases
 
     #[connector_test]
-    async fn having_filter_mismatch_selection(runner: &Runner) -> TestResult<()> {
+    async fn having_filter_mismatch_selection(runner: Runner) -> TestResult<()> {
         assert_error!(
             runner,
             "query { groupByTestModel(by: [string], having: { int: { gt: 3 } }) {

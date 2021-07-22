@@ -14,7 +14,7 @@ mod connect_or_create {
               #id(id, String, @id, @default(cuid()))
               #m2m(manyB, ModelB[], String)
             }
-            
+
             model ModelB {
               #id(id, String, @id, @default(cuid()))
               #m2m(manyA, ModelA[], String)
@@ -26,10 +26,10 @@ mod connect_or_create {
 
     // "A m:n relation connectOrCreate" should "always work"
     #[connector_test(schema(schema_1))]
-    async fn m2n_connect_or_create(runner: &Runner) -> TestResult<()> {
+    async fn m2n_connect_or_create(runner: Runner) -> TestResult<()> {
         // Both records are new
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation{
+          run_query!(&runner, r#"mutation{
             createOneModelA(data: {
               id: "A1"
               manyB: {
@@ -52,7 +52,7 @@ mod connect_or_create {
 
         // New parent, connect existing child
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation{
+          run_query!(&runner, r#"mutation{
             createOneModelA(data: {
               id: "A2"
               manyB: {
@@ -75,7 +75,7 @@ mod connect_or_create {
 
         // Update a parent to connect 2 new children
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateOneModelA(
               where: { id: "A1" }
               data: {
@@ -111,14 +111,14 @@ mod connect_or_create {
             r#"model ModelA {
               #id(id, String, @id, @default(cuid()))
               b_u String
-            
+
               oneB ModelB @relation(fields: [b_u], references: [b_u])
             }
-            
+
             model ModelB {
               #id(id, String, @id, @default(cuid()))
               b_u String @unique
-            
+
               manyA ModelA[]
             }"#
         };
@@ -128,10 +128,10 @@ mod connect_or_create {
 
     // "A 1!:m relation connectOrCreate" should "work"
     #[connector_test(schema(schema_2))]
-    async fn one_req_2m_connect_or_create(runner: &Runner) -> TestResult<()> {
+    async fn one_req_2m_connect_or_create(runner: Runner) -> TestResult<()> {
         // Inlined in parent cases
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneModelA(data: {
               id: "A1"
               oneB: {
@@ -155,7 +155,7 @@ mod connect_or_create {
 
         // Create new parent, connect to existing child
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneModelA(data: {
               id: "A2"
               oneB: {
@@ -179,7 +179,7 @@ mod connect_or_create {
 
         // Inlined in child cases
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateOneModelB(
               where: { b_u: "B1" }
               data: {
@@ -209,7 +209,7 @@ mod connect_or_create {
 
         // Create new child, connect existing parent (disconnects parent from B1)
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneModelB(
               data: {
                 id: "B_id_2"
@@ -234,7 +234,7 @@ mod connect_or_create {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findUniqueModelA(where: { id: "A1" }) {
               oneB {
                 b_u
@@ -252,14 +252,14 @@ mod connect_or_create {
             r#"model ModelA {
               #id(id, String, @id, @default(cuid()))
               b_u String?
-            
+
               oneB ModelB? @relation(fields: [b_u], references: [b_u])
             }
-            
+
             model ModelB {
               #id(id, String, @id, @default(cuid()))
               b_u String @unique
-            
+
               manyA ModelA[]
             }"#
         };
@@ -269,12 +269,12 @@ mod connect_or_create {
 
     // "A 1:m relation connectOrCreate" should "work"
     #[connector_test(schema(schema_3))]
-    async fn one2m_connect_or_create(runner: &Runner) -> TestResult<()> {
+    async fn one2m_connect_or_create(runner: Runner) -> TestResult<()> {
         // Inlined in parent cases
 
         // Both records are new
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneModelA(data: {
               id: "A1"
               oneB: {
@@ -298,7 +298,7 @@ mod connect_or_create {
 
         // Create new parent, connect to existing child
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneModelA(data: {
               id: "A2"
               oneB: {
@@ -324,7 +324,7 @@ mod connect_or_create {
 
         // Connect 2 more children (ModelAs here)
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateOneModelB(
               where: { b_u: "B1" }
               data: {
@@ -354,7 +354,7 @@ mod connect_or_create {
 
         // Create new child, connect existing parent (disconnects parent from B1)
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneModelB(
               data: {
                 id: "B_id_2"
@@ -379,7 +379,7 @@ mod connect_or_create {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findUniqueModelA(where: { id: "A1" }) {
               oneB {
                 b_u
@@ -399,20 +399,20 @@ mod connect_or_create {
               fieldA String?
               A2B    A2B[]   @relation("A2_A2B")
             }
-            
+
             model B {
               #id(id, String, @id)
               fieldB String
               A2B    A2B[]  @relation("B2_A2B")
             }
-            
+
             model A2B {
               a_id    String
               b_id    String
               fieldAB Int
               a       A      @relation("A2_A2B", fields: [a_id], references: [id])
               b       B      @relation("B2_A2B", fields: [b_id], references: [id])
-            
+
               @@id([a_id, b_id])
               @@index([b_id], name: "fk_b")
               @@map("_A2B")
@@ -426,9 +426,9 @@ mod connect_or_create {
     // "Query reordering" should "not break connectOrCreate"
     // TODO(dom): Not working for mongo
     #[connector_test(schema(schema_4), exclude(MongoDb))]
-    async fn query_reordering_works(runner: &Runner) -> TestResult<()> {
+    async fn query_reordering_works(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {upsertOneA2B(
+          run_query!(&runner, r#"mutation {upsertOneA2B(
             where: {
               a_id_b_id: {
                 a_id: "a"

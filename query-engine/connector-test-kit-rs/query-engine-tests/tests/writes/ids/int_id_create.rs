@@ -18,9 +18,9 @@ mod int_id_create {
 
     // "Creating an item with an id field of type Int without default"
     #[connector_test(schema(schema_int))]
-    async fn create_id_int_without_default(runner: &Runner) -> TestResult<()> {
+    async fn create_id_int_without_default(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneTodo(data: { title: "the title", id: 10 }){
               id
               title
@@ -34,9 +34,9 @@ mod int_id_create {
 
     // "Creating an item with an id field of type Int without default without providing the id"
     #[connector_test(schema(schema_int))]
-    async fn create_id_int_without_default_without_id(runner: &Runner) -> TestResult<()> {
+    async fn create_id_int_without_default_without_id(runner: Runner) -> TestResult<()> {
         assert_error!(
-            runner,
+            &runner,
             r#"mutation {
               createOneTodo(data: { title: "the title" }){
                 id
@@ -62,9 +62,9 @@ mod int_id_create {
 
     // "Creating an item with an id field of type Int with static default"
     #[connector_test(schema(schema_int_default))]
-    async fn create_id_int_static_default(runner: &Runner) -> TestResult<()> {
+    async fn create_id_int_static_default(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneTodo(data: { title: "the title", id: 10 }){
               id
               title
@@ -74,7 +74,7 @@ mod int_id_create {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneTodo(data: { title: "the title"}){
               id
               title
@@ -99,9 +99,9 @@ mod int_id_create {
 
     // "Creating an item with an id field of type Int with autoincrement" should "work"
     #[connector_test(schema(schema_int_autoinc), capabilities(AutoIncrement))]
-    async fn create_id_int_with_autoinc(runner: &Runner) -> TestResult<()> {
+    async fn create_id_int_with_autoinc(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneTodo(data: { title: "the title"}){
               id
               title
@@ -132,9 +132,9 @@ mod int_id_create {
 
     // "Creating an item with an id field of type Int with autoincrement and providing an id" should "error for checked inputs"
     #[connector_test(schema(schema_int_autoinc_provide_id), capabilities(AutoIncrement))]
-    async fn create_id_int_autoinc_providing_id(runner: &Runner) -> TestResult<()> {
+    async fn create_id_int_autoinc_providing_id(runner: Runner) -> TestResult<()> {
         assert_error!(
-            runner,
+            &runner,
             r#"mutation {
               createOneA(data: { id: 2, b: { connect: { id: 1 }}}) {
                 id

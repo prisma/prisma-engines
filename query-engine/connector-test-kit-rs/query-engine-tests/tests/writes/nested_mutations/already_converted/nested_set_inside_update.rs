@@ -45,7 +45,7 @@ mod set_inside_update {
         )?;
 
         insta::assert_snapshot!(
-          run_query!(runner, format!(r#"mutation {{
+          run_query!(&runner, format!(r#"mutation {{
             updateOneParent(
             where: {parent}
             data:{{
@@ -96,7 +96,7 @@ mod set_inside_update {
         )?;
 
         insta::assert_snapshot!(
-          run_query!(runner, format!(r#"mutation {{
+          run_query!(&runner, format!(r#"mutation {{
             updateOneParent(
             where: {parent}
             data:{{
@@ -166,7 +166,7 @@ mod set_inside_update {
         )?;
 
         insta::assert_snapshot!(
-          run_query!(runner, format!(r#"mutation {{
+          run_query!(&runner, format!(r#"mutation {{
             updateOneParent(
               where: {parent}
               data:{{
@@ -181,7 +181,7 @@ mod set_inside_update {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query{findManyChild{c, parentsOpt{p}}}"#),
+          run_query!(&runner, r#"query{findManyChild{c, parentsOpt{p}}}"#),
           @r###"{"data":{"findManyChild":[{"c":"c1","parentsOpt":[{"p":"p1"},{"p":"p2"}]},{"c":"c2","parentsOpt":[{"p":"p1"},{"p":"p2"}]},{"c":"c3","parentsOpt":[]},{"c":"c4","parentsOpt":[]}]}}"###
         );
 
@@ -223,7 +223,7 @@ mod set_inside_update {
         )?;
 
         insta::assert_snapshot!(
-          run_query!(runner, format!(r#"mutation {{
+          run_query!(&runner, format!(r#"mutation {{
           updateOneParent(
             where: {parent}
             data:{{
@@ -238,7 +238,7 @@ mod set_inside_update {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query{findManyChild{parentsOpt{p}}}"#),
+          run_query!(&runner, r#"query{findManyChild{parentsOpt{p}}}"#),
           @r###"{"data":{"findManyChild":[{"parentsOpt":[{"p":"p1"}]}]}}"###
         );
 
@@ -294,7 +294,7 @@ mod set_inside_update {
         )?;
 
         insta::assert_snapshot!(
-          run_query!(runner, format!(r#"mutation {{
+          run_query!(&runner, format!(r#"mutation {{
             updateOneParent(
               where: {parent}
               data:{{
@@ -309,7 +309,7 @@ mod set_inside_update {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query{findManyChild(orderBy: { c: asc }){c, parentsOpt{p}}}"#),
+          run_query!(&runner, r#"query{findManyChild(orderBy: { c: asc }){c, parentsOpt{p}}}"#),
           @r###"{"data":{"findManyChild":[{"c":"c1","parentsOpt":[{"p":"p1"}]},{"c":"c2","parentsOpt":[{"p":"p1"}]},{"c":"c3","parentsOpt":[]},{"c":"c4","parentsOpt":[]}]}}"###
         );
 

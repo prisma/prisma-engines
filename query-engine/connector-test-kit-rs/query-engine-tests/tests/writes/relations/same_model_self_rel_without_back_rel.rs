@@ -22,12 +22,12 @@ mod self_rel_no_back_rel {
     // "A Many to Many Self Relation" should "be accessible from only one side"
     // Bring back sql server when cascading rules can be set!
     #[connector_test]
-    async fn m2m_self_rel(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{id: "1", identifier: 1}"#).await?;
-        create_row(runner, r#"{id: "2", identifier: 2}"#).await?;
+    async fn m2m_self_rel(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{id: "1", identifier: 1}"#).await?;
+        create_row(&runner, r#"{id: "2", identifier: 2}"#).await?;
 
         run_query!(
-            runner,
+            &runner,
             r#"mutation {
             updateOnePost (
               where:{ identifier: 1 }
@@ -45,12 +45,12 @@ mod self_rel_no_back_rel {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{findUniquePost(where:{identifier: 1}){identifier, related{identifier}}}"#),
+          run_query!(&runner, r#"{findUniquePost(where:{identifier: 1}){identifier, related{identifier}}}"#),
           @r###"{"data":{"findUniquePost":{"identifier":1,"related":[{"identifier":2}]}}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{findUniquePost(where:{identifier: 2}){identifier, related{identifier}}}"#),
+          run_query!(&runner, r#"{findUniquePost(where:{identifier: 2}){identifier, related{identifier}}}"#),
           @r###"{"data":{"findUniquePost":{"identifier":2,"related":[]}}}"###
         );
 
@@ -74,11 +74,11 @@ mod self_rel_no_back_rel {
 
     // "A One to One Self Relation" should "be accessible from only one side"
     #[connector_test(schema(schema_2))]
-    async fn one2one_self_rel(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{id: "1", identifier: 1}"#).await?;
-        create_row(runner, r#"{id: "2", identifier: 2}"#).await?;
+    async fn one2one_self_rel(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{id: "1", identifier: 1}"#).await?;
+        create_row(&runner, r#"{id: "2", identifier: 2}"#).await?;
         run_query!(
-            runner,
+            &runner,
             r#"mutation {
           updateOnePost (
             where:{identifier: 1}
@@ -96,12 +96,12 @@ mod self_rel_no_back_rel {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{findUniquePost(where:{identifier: 1}){identifier, related{identifier}}}"#),
+          run_query!(&runner, r#"{findUniquePost(where:{identifier: 1}){identifier, related{identifier}}}"#),
           @r###"{"data":{"findUniquePost":{"identifier":1,"related":{"identifier":2}}}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{findUniquePost(where:{identifier: 2}){identifier, related{identifier}}}"#),
+          run_query!(&runner, r#"{findUniquePost(where:{identifier: 2}){identifier, related{identifier}}}"#),
           @r###"{"data":{"findUniquePost":{"identifier":2,"related":null}}}"###
         );
 

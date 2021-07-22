@@ -5,6 +5,7 @@ mod node_api;
 pub use binary::*;
 pub use direct::*;
 pub use node_api::*;
+use query_core::{QueryExecutor, TxId};
 
 use crate::{ConnectorTag, QueryResult, TestError, TestResult};
 use colored::*;
@@ -14,7 +15,18 @@ pub trait RunnerInterface: Sized {
     async fn load(datamodel: String, connector_tag: ConnectorTag) -> TestResult<Self>;
     async fn query(&self, query: String) -> TestResult<QueryResult>;
     async fn batch(&self, queries: Vec<String>, transaction: bool) -> TestResult<QueryResult>;
+
+    /// The connector tag used to load this runner.
     fn connector(&self) -> &ConnectorTag;
+
+    /// Exposes the underlying executor for testing.
+    fn executor(&self) -> &dyn QueryExecutor;
+
+    /// Instructs this runner to use a specific LRT ID for queries.
+    fn set_active_tx(&mut self, tx_id: TxId);
+
+    /// Clears LRT ID for queries.
+    fn clear_active_tx(&mut self);
 }
 
 pub enum Runner {
@@ -81,6 +93,30 @@ impl Runner {
     pub fn connector(&self) -> &ConnectorTag {
         match self {
             Runner::Direct(r) => r.connector(),
+            Runner::NodeApi(_) => todo!(),
+            Runner::Binary(_) => todo!(),
+        }
+    }
+
+    pub fn executor(&self) -> &dyn QueryExecutor {
+        match self {
+            Runner::Direct(r) => r.executor(),
+            Runner::NodeApi(_) => todo!(),
+            Runner::Binary(_) => todo!(),
+        }
+    }
+
+    pub fn set_active_tx(&mut self, tx_id: TxId) {
+        match self {
+            Runner::Direct(r) => r.set_active_tx(tx_id),
+            Runner::NodeApi(_) => todo!(),
+            Runner::Binary(_) => todo!(),
+        }
+    }
+
+    pub fn clear_active_tx(&mut self) {
+        match self {
+            Runner::Direct(r) => r.clear_active_tx(),
             Runner::NodeApi(_) => todo!(),
             Runner::Binary(_) => todo!(),
         }

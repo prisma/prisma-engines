@@ -28,16 +28,16 @@ mod rel_filter_ordering {
 
     // "Using relational filters" should "return items in the specified order"
     #[connector_test]
-    async fn rel_filters(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn rel_filters(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyBlog(take: 2, orderBy: { score: desc }) { title, score }}"#),
+          run_query!(&runner, r#"query { findManyBlog(take: 2, orderBy: { score: desc }) { title, score }}"#),
           @r###"{"data":{"findManyBlog":[{"title":"blog_1","score":30},{"title":"blog_1","score":20}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyBlog (take: 2, orderBy: { score: desc }, where:{ labels: { some: { text: { equals: "x" }}}}) { title, score }}"#),
+          run_query!(&runner, r#"query { findManyBlog (take: 2, orderBy: { score: desc }, where:{ labels: { some: { text: { equals: "x" }}}}) { title, score }}"#),
           @r###"{"data":{"findManyBlog":[{"title":"blog_1","score":30},{"title":"blog_1","score":20}]}}"###
         );
 

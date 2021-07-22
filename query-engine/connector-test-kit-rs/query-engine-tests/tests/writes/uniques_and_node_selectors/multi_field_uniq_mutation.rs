@@ -32,16 +32,16 @@ mod multi_field_uniq_mut {
 
     // "A nested connect on a one-to-one relation with a multi-field unique" should "work"
     #[connector_test(schema(schema_one2one))]
-    async fn nested_connect_one2one_rel(runner: &Runner) -> TestResult<()> {
-        create_user(runner, r#"{ id: 1, name: "Thomas the Tank Engine" }"#).await?;
+    async fn nested_connect_one2one_rel(runner: Runner) -> TestResult<()> {
+        create_user(&runner, r#"{ id: 1, name: "Thomas the Tank Engine" }"#).await?;
         create_blog(
-            runner,
+            &runner,
             r#"{ id: 1, title: "Thomas has seen it all. Thomas is leaving." category: "Horror" }"#,
         )
         .await?;
 
         let res = run_query_json!(
-            runner,
+            &runner,
             r#"mutation {
                 updateOneUser(where: {
                   id: 1
@@ -93,16 +93,16 @@ mod multi_field_uniq_mut {
 
     //"A nested connect on a one-to-many relation with a multi-field unique" should "work"
     #[connector_test(schema(schema_one2m))]
-    async fn nested_connect_one2m_rel(runner: &Runner) -> TestResult<()> {
-        create_user(runner, r#"{ id: 1, name: "Thomas the Tank Engine" }"#).await?;
+    async fn nested_connect_one2m_rel(runner: Runner) -> TestResult<()> {
+        create_user(&runner, r#"{ id: 1, name: "Thomas the Tank Engine" }"#).await?;
         create_blog(
-            runner,
+            &runner,
             r#"{ id: 1, title: "Thomas has seen it all. Thomas is leaving." category: "Horror" }"#,
         )
         .await?;
 
         let res = run_query_json!(
-            runner,
+            &runner,
             r#"mutation {
           updateOneUser(where: {
             id: 1
@@ -137,9 +137,9 @@ mod multi_field_uniq_mut {
 
     // "A nested disconnect with a multi-field unique" should "work"
     #[connector_test(schema(schema_one2m))]
-    async fn nested_disconnect_multi_field_uniq(runner: &Runner) -> TestResult<()> {
+    async fn nested_disconnect_multi_field_uniq(runner: Runner) -> TestResult<()> {
         create_user(
-            runner,
+            &runner,
             r#"{
               id: 1,
               name: "Sly Marbo"
@@ -160,7 +160,7 @@ mod multi_field_uniq_mut {
         .await?;
 
         let res = run_query_json!(
-            runner,
+            &runner,
             r#"mutation {
                 updateOneUser(where: {
                   id: 1
@@ -209,11 +209,11 @@ mod multi_field_uniq_mut {
 
     // "An update with a multi-field unique" should "work"
     #[connector_test(schema(schema_multi_uniq))]
-    async fn update_multi_field_uniq(runner: &Runner) -> TestResult<()> {
-        create_user(runner, r#"{ id: 1, first_name: "Justin" last_name: "Case" }"#).await?;
+    async fn update_multi_field_uniq(runner: Runner) -> TestResult<()> {
+        create_user(&runner, r#"{ id: 1, first_name: "Justin" last_name: "Case" }"#).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateOneUser(where: {
               first_name_last_name: {
                 first_name: "Justin"
@@ -257,9 +257,9 @@ mod multi_field_uniq_mut {
 
     // "A nested update with a multi-field unique" should "work"
     #[connector_test(schema(schema_nested_multi_uniq))]
-    async fn nested_update_multi_uniq_field(runner: &Runner) -> TestResult<()> {
+    async fn nested_update_multi_uniq_field(runner: Runner) -> TestResult<()> {
         create_user(
-            runner,
+            &runner,
             r#"{
                   id: 1
                   name: "King Arthur"
@@ -276,7 +276,7 @@ mod multi_field_uniq_mut {
         .await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateOneUser(where: {
               id: 1
             }
@@ -309,11 +309,11 @@ mod multi_field_uniq_mut {
 
     //
     #[connector_test(schema(schema_multi_uniq))]
-    async fn delete_multi_field_uniq(runner: &Runner) -> TestResult<()> {
-        create_user(runner, r#"{ id: 1, first_name: "Darth", last_name: "Llama" }"#).await?;
+    async fn delete_multi_field_uniq(runner: Runner) -> TestResult<()> {
+        create_user(&runner, r#"{ id: 1, first_name: "Darth", last_name: "Llama" }"#).await?;
 
         let res = run_query_json!(
-            runner,
+            &runner,
             r#"mutation {
           deleteOneUser(where: {
             first_name_last_name: {
@@ -334,9 +334,9 @@ mod multi_field_uniq_mut {
 
     // "A nested delete with a multi-field unique" should "work"
     #[connector_test(schema(schema_one2m))]
-    async fn nested_delete_multi_field_uniq(runner: &Runner) -> TestResult<()> {
+    async fn nested_delete_multi_field_uniq(runner: Runner) -> TestResult<()> {
         create_user(
-            runner,
+            &runner,
             r#"{
                   id: 1,
                   name: "Matt Eagle"
@@ -352,7 +352,7 @@ mod multi_field_uniq_mut {
         .await?;
 
         let res = run_query_json!(
-            runner,
+            &runner,
             r#"mutation {
           updateOneUser(where: {
             id: 1
@@ -387,7 +387,7 @@ mod multi_field_uniq_mut {
 
     // "An upsert with a multi-field unique" should "work"
     #[connector_test(schema(schema_multi_uniq))]
-    async fn upsert_multi_field_uniq(runner: &Runner) -> TestResult<()> {
+    async fn upsert_multi_field_uniq(runner: Runner) -> TestResult<()> {
         let upsert_query = r#"mutation {
           upsertOneUser(where: {
             first_name_last_name: {
@@ -408,12 +408,12 @@ mod multi_field_uniq_mut {
         }"#;
 
         insta::assert_snapshot!(
-          run_query!(runner, upsert_query),
+          run_query!(&runner, upsert_query),
           @r###"{"data":{"upsertOneUser":{"id":1,"last_name":"Dude"}}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, upsert_query),
+          run_query!(&runner, upsert_query),
           @r###"{"data":{"upsertOneUser":{"id":1,"last_name":"Knight of Ni"}}}"###
         );
 
@@ -422,8 +422,8 @@ mod multi_field_uniq_mut {
 
     // "A nested upsert with a multi-field unique" should "work"
     #[connector_test(schema(schema_one2m))]
-    async fn nested_upsert_multi_field_uniq(runner: &Runner) -> TestResult<()> {
-        create_user(runner, r#"{ id: 1, name: "The Average Leddit User" }"#).await?;
+    async fn nested_upsert_multi_field_uniq(runner: Runner) -> TestResult<()> {
+        create_user(&runner, r#"{ id: 1, name: "The Average Leddit User" }"#).await?;
 
         let upsert_query = r#"mutation {
           updateOneUser(where: {
@@ -456,12 +456,12 @@ mod multi_field_uniq_mut {
         }"#;
 
         insta::assert_snapshot!(
-          run_query!(runner, upsert_query),
+          run_query!(&runner, upsert_query),
           @r###"{"data":{"updateOneUser":{"blogs":[{"id":1,"category":"Pop Culture"}]}}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, upsert_query),
+          run_query!(&runner, upsert_query),
           @r###"{"data":{"updateOneUser":{"blogs":[{"id":1,"category":"Drama"}]}}}"###
         );
 
@@ -472,13 +472,21 @@ mod multi_field_uniq_mut {
 
     // "A nested set with a multi-field unique" should "work"
     #[connector_test(schema(schema_one2m))]
-    async fn nested_set_multi_field_uniq(runner: &Runner) -> TestResult<()> {
-        create_user(runner, r#"{ id: 1, name: "Ellen Ripley" }"#).await?;
-        create_blog(runner, r#"{ id: 1, title: "Aliens bad mmmkay" category: "Education" }"#).await?;
-        create_blog(runner, r#"{ id: 2, title: "Cooking with Aliens" category: "Cooking" }"#).await?;
+    async fn nested_set_multi_field_uniq(runner: Runner) -> TestResult<()> {
+        create_user(&runner, r#"{ id: 1, name: "Ellen Ripley" }"#).await?;
+        create_blog(
+            &runner,
+            r#"{ id: 1, title: "Aliens bad mmmkay" category: "Education" }"#,
+        )
+        .await?;
+        create_blog(
+            &runner,
+            r#"{ id: 2, title: "Cooking with Aliens" category: "Cooking" }"#,
+        )
+        .await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateOneUser(
               where: {
                 id: 1

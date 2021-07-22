@@ -10,7 +10,7 @@ mod non_uniq_index {
             r#"model TestModel {
               #id(id, Int, @id)
               field String?
-            
+
               @@index([field], name: "test_index")
             }"#
         };
@@ -20,9 +20,9 @@ mod non_uniq_index {
 
     // "Non-unique indices" should "not cause unique filters for that field to show up"
     #[connector_test]
-    async fn non_uniq_indices(runner: &Runner) -> TestResult<()> {
+    async fn non_uniq_indices(runner: Runner) -> TestResult<()> {
         run_query!(
-            runner,
+            &runner,
             r#"mutation {
           createOneTestModel(data: { id: 1, field: "Test" }) {
               id
@@ -31,7 +31,7 @@ mod non_uniq_index {
         );
 
         assert_error!(
-            runner,
+            &runner,
             r#"query {
               findUniqueTestModel(where: { field: "nope" }) {
                   id

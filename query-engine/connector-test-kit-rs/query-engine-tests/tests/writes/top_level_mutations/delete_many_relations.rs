@@ -28,7 +28,7 @@ mod delete_many_rels {
 
     // // "a PM to C1! relation " should "error when deleting the parent"
     // #[connector_test(schema(schema_1))]
-    // async fn pm_c1_error_delete_parent(runner: &Runner) -> TestResult<()> {
+    // async fn pm_c1_error_delete_parent(runner: Runner) -> TestResult<()> {
     //     run_query!(
     //         runner,
     //         r#"mutation {
@@ -62,7 +62,7 @@ mod delete_many_rels {
 
     // // "a PM to C1! relation " should "error when deleting the parent with empty filter"
     // #[connector_test(schema(schema_1))]
-    // async fn pm_c1_error_delete_parent_empty_filter(runner: &Runner) -> TestResult<()> {
+    // async fn pm_c1_error_delete_parent_empty_filter(runner: Runner) -> TestResult<()> {
     //     run_query!(
     //         runner,
     //         r#"mutation {

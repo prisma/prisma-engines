@@ -2,7 +2,7 @@ use std::{env, sync::Arc};
 
 use crate::{ConnectorTag, RunnerInterface, TestResult};
 use prisma_models::DatamodelConverter;
-use query_core::{executor, schema_builder, BuildMode, QueryExecutor, QuerySchemaRef};
+use query_core::{executor, schema_builder, BuildMode, QueryExecutor, QuerySchemaRef, TxId};
 use request_handlers::{GraphQlBody, GraphQlHandler, MultiQuery};
 
 pub(crate) type Executor = Box<dyn QueryExecutor + Send + Sync>;
@@ -12,6 +12,7 @@ pub struct DirectRunner {
     executor: Executor,
     query_schema: QuerySchemaRef,
     connector_tag: ConnectorTag,
+    current_tx_id: Option<TxId>,
 }
 
 #[async_trait::async_trait]
@@ -39,6 +40,7 @@ impl RunnerInterface for DirectRunner {
             executor,
             query_schema,
             connector_tag,
+            current_tx_id: None,
         })
     }
 
@@ -46,7 +48,8 @@ impl RunnerInterface for DirectRunner {
         let handler = GraphQlHandler::new(&*self.executor, &self.query_schema);
         let query = GraphQlBody::Single(query.into());
 
-        Ok(handler.handle(query).await.into())
+        dbg!(&self.current_tx_id);
+        Ok(handler.handle(query, self.current_tx_id.clone()).await.into())
     }
 
     async fn batch(&self, queries: Vec<String>, transaction: bool) -> TestResult<crate::QueryResult> {
@@ -56,10 +59,22 @@ impl RunnerInterface for DirectRunner {
             transaction,
         ));
 
-        Ok(handler.handle(query).await.into())
+        Ok(handler.handle(query, None).await.into())
     }
 
     fn connector(&self) -> &crate::ConnectorTag {
         &self.connector_tag
+    }
+
+    fn executor(&self) -> &dyn QueryExecutor {
+        self.executor.as_ref()
+    }
+
+    fn set_active_tx(&mut self, tx_id: query_core::TxId) {
+        self.current_tx_id = Some(tx_id);
+    }
+
+    fn clear_active_tx(&mut self) {
+        self.current_tx_id = None;
     }
 }
