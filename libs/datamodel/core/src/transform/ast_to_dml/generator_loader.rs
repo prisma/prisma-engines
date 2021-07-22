@@ -22,7 +22,7 @@ const FIRST_CLASS_PROPERTIES: &[&str] = &[
 ];
 
 /// Is responsible for loading and validating Generators defined in an AST.
-pub struct GeneratorLoader {}
+pub(crate) struct GeneratorLoader;
 
 impl GeneratorLoader {
     pub fn load_generators_from_ast(ast_schema: &ast::SchemaAst, diagnostics: &mut Diagnostics) -> Vec<Generator> {
