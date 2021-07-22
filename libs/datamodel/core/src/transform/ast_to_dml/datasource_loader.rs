@@ -24,7 +24,7 @@ const SHADOW_DATABASE_URL_KEY: &str = "shadowDatabaseUrl";
 const URL_KEY: &str = "url";
 
 /// Is responsible for loading and validating Datasources defined in an AST.
-pub struct DatasourceLoader;
+pub(crate) struct DatasourceLoader;
 
 impl DatasourceLoader {
     /// Loads all datasources from the provided schema AST.

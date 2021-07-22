@@ -12,6 +12,6 @@ mod standardise_parsing;
 mod validate;
 mod validation_pipeline;
 
-pub use datasource_loader::DatasourceLoader;
-pub use generator_loader::GeneratorLoader;
-pub use validation_pipeline::ValidationPipeline;
+pub(crate) use datasource_loader::DatasourceLoader;
+pub(crate) use generator_loader::GeneratorLoader;
+pub(crate) use validation_pipeline::ValidationPipeline;
