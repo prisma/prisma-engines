@@ -1,3 +1,4 @@
+use crate::attributes::with_named_constraints;
 use crate::common::*;
 use datamodel::{ast::Span, diagnostics::DatamodelError};
 
@@ -549,31 +550,28 @@ fn should_fail_on_missing_embed_ids_on_self_relations() {
         ],
     );
 }
-//
-// #[test]
-// fn mapping_foreign_keys_with_a_name_that_is_too_long_should_error() {
-//     let dml = r#"
-//          datasource test {
-//          provider = "postgresql"
-//          url = "postgresql://root:prisma@127.0.0.1:3309/postgres"
-//      }
-//
-//      model User {
-//          id Int    @id
-//          posts   Post[]
-//      }
-//
-//      model Post {
-//          post_id Int    @id
-//          user_id Int
-//          user    User   @relation(fields:[post_id], references: [id], map: "IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimits")
-//      }
-//      "#;
-//
-//     let errors = parse_error(dml);
-//     errors.assert_is(DatamodelError::new_model_validation_error(
-//         "The name specified for the `@relation` constraint `IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimits` is too long for your chosen provider. The maximum allowed length is 63 bytes.",
-//         "Post",
-//         Span::new(208, 470),
-//     ));
-// }
+
+#[test]
+fn mapping_foreign_keys_with_a_name_that_is_too_long_should_error() {
+    let dml = with_named_constraints(
+        r#"
+     model User {
+         id Int    @id
+         posts   Post[]
+     }
+
+     model Post {
+         post_id Int    @id
+         user_id Int
+         user    User   @relation(fields:[post_id], references: [id], map: "IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimits")
+     }
+     "#,
+    );
+
+    let errors = parse_error(&dml);
+    errors.assert_is(DatamodelError::new_model_validation_error(
+        "The constraint name 'IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimits' specified in the `map` argument for the `@relation` constraint is too long for your chosen provider. The maximum allowed length is 63 bytes.",
+        "Post",
+        Span::new(389, 561),
+    ));
+}

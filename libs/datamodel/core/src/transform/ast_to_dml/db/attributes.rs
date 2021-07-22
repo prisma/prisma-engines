@@ -29,6 +29,23 @@ pub(super) fn resolve_model_and_field_attributes<'ast>(
         .take_model_data(&model_id)
         .expect("Broken invariant: no ModelData for model in visit_model_attributes.");
 
+    {
+        // set database name already if possible without validating against other names / unused args / other errors
+        let map = &ast_model.attributes.iter().find(|a| a.name.name == "map");
+        if let Some(map_attribute) = map {
+            let mapped_name = match (
+                map_attribute.arguments.iter().find(|a| a.name() == "name"),
+                map_attribute.arguments.iter().find(|a| a.name() == ""),
+            ) {
+                (Some(arg), None) => Some(ValueValidator::new(&arg.value).as_str().unwrap()),
+                (None, Some(arg)) => Some(ValueValidator::new(&arg.value).as_str().unwrap()),
+                _ => None,
+            };
+
+            model_data.mapped_name = mapped_name;
+        }
+    }
+
     for (field_id, ast_field) in ast_model.iter_fields() {
         if let Some(mut scalar_field) = ctx.db.types.take_scalar_field(model_id, field_id) {
             visit_scalar_field_attributes(
@@ -43,7 +60,7 @@ pub(super) fn resolve_model_and_field_attributes<'ast>(
 
             ctx.db.types.scalar_fields.insert((model_id, field_id), scalar_field);
         } else if let Some(mut rf) = ctx.db.types.take_relation_field(model_id, field_id) {
-            visit_relation_field_attributes(model_id, ast_field, &mut rf, ctx);
+            visit_relation_field_attributes(model_id, ast_field, &mut model_data, &mut rf, ctx);
             ctx.db.types.relation_fields.insert((model_id, field_id), rf);
         } else {
             unreachable!(
@@ -310,6 +327,7 @@ fn visit_scalar_field_attributes<'ast>(
 fn visit_relation_field_attributes<'ast>(
     model_id: ast::ModelId,
     ast_field: &'ast ast::Field,
+    model_data: &ModelData<'ast>,
     relation_field: &mut RelationField<'ast>,
     ctx: &mut Context<'ast>,
 ) {
@@ -317,7 +335,7 @@ fn visit_relation_field_attributes<'ast>(
         // @relation
         // Relation attributes are not required _yet_ at this stage. The schema has to be parseable for standardization.
         attributes.visit_optional_single("relation", ctx, |relation_args, ctx| {
-            visit_relation(relation_args, model_id, relation_field, ctx)
+            visit_relation(relation_args, model_id, model_data, relation_field, ctx)
         });
 
         // @id
@@ -902,13 +920,14 @@ pub(super) fn visit_map<'ast>(map_args: &mut Arguments<'ast>, ctx: &mut Context<
 
 /// @relation validation for relation fields.
 fn visit_relation<'ast>(
-    relation_args: &mut Arguments<'ast>,
+    args: &mut Arguments<'ast>,
     model_id: ast::ModelId,
+    model_data: &ModelData<'ast>,
     relation_field: &mut RelationField<'ast>,
     ctx: &mut Context<'ast>,
 ) {
-    if let Some(fields) = relation_args.optional_arg("fields") {
-        let fields = match resolve_field_array(&fields, relation_args.span(), model_id, ctx) {
+    if let Some(fields) = args.optional_arg("fields") {
+        let fields = match resolve_field_array(&fields, args.span(), model_id, ctx) {
             Ok(fields) => fields,
             Err(FieldResolutionError::AlreadyDealtWith) => Vec::new(),
             Err(FieldResolutionError::ProblematicFields {
@@ -930,13 +949,8 @@ fn visit_relation<'ast>(
         relation_field.fields = Some(fields);
     }
 
-    if let Some(references) = relation_args.optional_arg("references") {
-        let references = match resolve_field_array(
-            &references,
-            relation_args.span(),
-            relation_field.referenced_model,
-            ctx,
-        ) {
+    if let Some(references) = args.optional_arg("references") {
+        let references = match resolve_field_array(&references, args.span(), relation_field.referenced_model, ctx) {
             Ok(references) => references,
             Err(FieldResolutionError::AlreadyDealtWith) => Vec::new(),
             Err(FieldResolutionError::ProblematicFields {
@@ -949,7 +963,7 @@ fn visit_relation<'ast>(
                         ctx.db.ast[relation_field.referenced_model].name(),
                         unknown_fields.join(", "),
                     );
-                    ctx.push_error(DatamodelError::new_validation_error(&msg, relation_args.span()));
+                    ctx.push_error(DatamodelError::new_validation_error(&msg, args.span()));
                 }
 
                 if !relation_fields.is_empty() {
@@ -958,7 +972,7 @@ fn visit_relation<'ast>(
                         ctx.db.ast[relation_field.referenced_model].name(),
                         relation_fields.iter().map(|(f, _)| f.name()).join(", "),
                     );
-                    ctx.push_error(DatamodelError::new_validation_error(&msg, relation_args.span()));
+                    ctx.push_error(DatamodelError::new_validation_error(&msg, args.span()));
                 }
 
                 Vec::new()
@@ -968,10 +982,8 @@ fn visit_relation<'ast>(
         relation_field.references = Some(references);
     }
 
-    match relation_args.optional_default_arg("name").map(|arg| arg.as_str()) {
-        Some(Ok("")) => {
-            ctx.push_error(relation_args.new_attribute_validation_error("A relation cannot have an empty name."))
-        }
+    match args.optional_default_arg("name").map(|arg| arg.as_str()) {
+        Some(Ok("")) => ctx.push_error(args.new_attribute_validation_error("A relation cannot have an empty name.")),
         Some(Ok(name)) => {
             relation_field.name = Some(name);
         }
@@ -979,7 +991,7 @@ fn visit_relation<'ast>(
         None => (),
     }
 
-    if let Some(on_delete) = relation_args.optional_arg("onDelete") {
+    if let Some(on_delete) = args.optional_arg("onDelete") {
         match on_delete.as_referential_action() {
             Ok(action) => {
                 relation_field.on_delete = Some(action);
@@ -988,7 +1000,7 @@ fn visit_relation<'ast>(
         }
     }
 
-    if let Some(on_update) = relation_args.optional_arg("onUpdate") {
+    if let Some(on_update) = args.optional_arg("onUpdate") {
         match on_update.as_referential_action() {
             Ok(action) => {
                 relation_field.on_update = Some(action);
@@ -998,18 +1010,45 @@ fn visit_relation<'ast>(
     }
 
     let fk_name = if ctx.db.preview_features.contains(NamedConstraints) {
-        match relation_args.optional_arg("map").map(|name| name.as_str()) {
-            Some(Ok("")) => error_on_empty_string(relation_args, ctx, "map"),
-            Some(Ok(name)) => {
-                //todo length validation
-                Some(name)
-            }
-            Some(Err(err)) => {
-                ctx.push_error(err);
-                None
-            }
-            None => None,
+        let ast_model = &ctx.db.ast[model_id];
+        let generated_name = if let Some(fields) = &relation_field.fields {
+            let table_name = model_data.mapped_name.unwrap_or(&ast_model.name.name);
+            let column_names = fields
+                .iter()
+                .map(|&field_id| {
+                    ctx.db
+                        .get_field_database_name(model_id, field_id)
+                        .unwrap_or(&ast_model[field_id].name.name)
+                        .to_string()
+                })
+                .collect();
+
+            Some(
+                ConstraintNames::foreign_key_constraint_name(table_name, column_names, ctx.db.active_connector())
+                    .into(),
+            )
+        } else {
+            None
+        };
+
+        let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
+            Some(Ok("")) => error_on_empty_string_cow(args, ctx, "map"),
+            Some(Ok(name)) => Some(name.into()),
+            Some(Err(err)) => push_error_cow(ctx, err),
+            None => generated_name,
+        };
+
+        if let Some(err) = ConstraintNames::is_db_name_too_long(
+            args.span(),
+            &ast_model.name.name,
+            &db_name,
+            "@relation",
+            ctx.db.active_connector(),
+        ) {
+            ctx.push_error(err);
         }
+
+        db_name
     } else {
         None
     };
