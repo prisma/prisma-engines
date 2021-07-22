@@ -1,19 +1,22 @@
 mod autoincrement;
 mod native_types;
 
-use super::{
-    context::{Arguments, Context},
-    types::{IndexData, ModelData, RelationField, ScalarField},
-};
-use crate::transform::ast_to_dml::db::types::PrimaryKeyData;
 use crate::{
     ast::{self, WithName},
     diagnostics::DatamodelError,
     dml,
-    transform::{ast_to_dml::db::ScalarFieldType, helpers::ValueValidator},
+    transform::{
+        ast_to_dml::db::{
+            context::{Arguments, Context},
+            types::{IndexData, ModelData, PrimaryKeyData, RelationField, ScalarField},
+            ScalarFieldType,
+        },
+        helpers::ValueValidator,
+    },
 };
 use itertools::Itertools;
 use prisma_value::PrismaValue;
+use std::collections::HashSet;
 
 pub(super) fn resolve_model_and_field_attributes<'ast>(
     model_id: ast::ModelId,
@@ -104,6 +107,37 @@ pub(super) fn resolve_model_and_field_attributes<'ast>(
     ctx.db.types.models.insert(model_id, model_data);
 
     autoincrement::validate_auto_increment(model_id, ctx);
+}
+
+pub(super) fn validate_index_names(ctx: &mut Context<'_>) {
+    if ctx.db.active_connector().supports_multiple_indexes_with_same_name() {
+        return;
+    }
+
+    let mut index_names = HashSet::new();
+    let mut errors = Vec::new();
+
+    for (attr, index) in ctx
+        .db
+        .ast
+        .iter_models()
+        .flat_map(|(model_id, _)| ctx.db.types.models[&model_id].indexes.iter())
+    {
+        let index_name: &str = match index.name {
+            Some(index_name) => index_name,
+            None => continue,
+        };
+
+        if index_names.insert(index_name) {
+            continue; // true means this name hasn't been seen before
+        }
+
+        errors.push(DatamodelError::new_multiple_indexes_with_same_name_are_not_supported(
+            index_name, attr.span,
+        ))
+    }
+
+    errors.into_iter().for_each(|err| ctx.push_error(err))
 }
 
 fn visit_scalar_field_attributes<'ast>(
@@ -227,13 +261,13 @@ fn visit_scalar_field_attributes<'ast>(
                 }
              }
 
-            model_data.indexes.push(IndexData {
+            model_data.indexes.push((args.attribute(), IndexData {
                 is_unique: true,
                 fields: vec![field_id],
                 source_field: Some(field_id),
                 name: None,
                 db_name: None,
-            })
+            }))
          });
     });
 }
@@ -512,7 +546,7 @@ fn model_index<'ast>(
 
     common_index_validations(args, &mut index_data, model_id, ctx);
 
-    data.indexes.push(index_data);
+    data.indexes.push((args.attribute(), index_data));
 }
 
 /// Validate @@unique on models.
@@ -529,7 +563,7 @@ fn model_unique<'ast>(
 
     common_index_validations(args, &mut index_data, model_id, ctx);
 
-    data.indexes.push(index_data);
+    data.indexes.push((args.attribute(), index_data));
 }
 
 fn common_index_validations<'ast>(
@@ -690,6 +724,7 @@ fn visit_relation<'ast>(
         relation_field.references = Some(references);
     }
 
+    // Validate the `name` argument if present.
     match relation_args.optional_default_arg("name").map(|arg| arg.as_str()) {
         Some(Ok("")) => {
             ctx.push_error(relation_args.new_attribute_validation_error("A relation cannot have an empty name."))
@@ -700,6 +735,8 @@ fn visit_relation<'ast>(
         Some(Err(err)) => ctx.push_error(err),
         None => (),
     }
+
+    // Validate referential actions.
 
     if let Some(on_delete) = relation_args.optional_arg("onDelete") {
         match on_delete.as_referential_action() {

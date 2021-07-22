@@ -20,7 +20,7 @@ use names::Names;
 /// ParserDatabase is a container for a Schema AST, together with information
 /// gathered during schema validation. Each validation step enriches the
 /// database with information that can be used to work with the schema, without
-/// changing the AST. Instantiating with `ParserDatabase::new()` will performa a
+/// changing the AST. Instantiating with `ParserDatabase::new()` will perform a
 /// number of validations and make sure the schema makes sense, but it cannot
 /// fail. In case the schema is invalid, diagnostics will be created and the
 /// resolved information will be incomplete.
@@ -34,6 +34,8 @@ use names::Names;
 ///   type alias, we look at the type identifier and resolve what it refers to.
 /// - The AST is walked a third time to validate attributes on models and
 ///   fields.
+/// - Global validations are then performed on the mostly validated schema.
+///   Currently only index name collisions.
 ///
 /// ## Lifetimes
 ///
@@ -86,6 +88,9 @@ impl<'ast> ParserDatabase<'ast> {
             attributes::resolve_model_and_field_attributes(model_id, model, &mut ctx)
         }
 
+        // Fourth step: global validations
+        attributes::validate_index_names(&mut ctx);
+
         ctx.finish()
     }
 
@@ -111,14 +116,6 @@ impl<'ast> ParserDatabase<'ast> {
 
     pub(crate) fn get_enum_value_database_name(&self, enum_id: ast::EnumId, value_idx: u32) -> Option<&'ast str> {
         self.types.enums[&enum_id].mapped_values.get(&value_idx).cloned()
-    }
-
-    pub(crate) fn get_model_database_name(&self, model_id: ast::ModelId) -> Option<&'ast str> {
-        self.types.models[&model_id].mapped_name
-    }
-
-    pub(crate) fn get_field_database_name(&self, model_id: ast::ModelId, field_id: ast::FieldId) -> Option<&'ast str> {
-        self.types.scalar_fields[&(model_id, field_id)].mapped_name
     }
 
     pub(crate) fn get_model_data(&self, model_id: &ast::ModelId) -> Option<&types::ModelData<'ast>> {

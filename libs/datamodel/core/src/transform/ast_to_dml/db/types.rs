@@ -76,7 +76,7 @@ pub(crate) struct ScalarField<'ast> {
     pub(crate) is_updated_at: bool,
     pub(crate) default: Option<dml::default_value::DefaultValue>,
     /// @map
-    pub(super) mapped_name: Option<&'ast str>,
+    pub(crate) mapped_name: Option<&'ast str>,
     // Native type name and arguments
     pub(crate) native_type: Option<(&'ast str, Vec<String>)>,
 }
@@ -123,9 +123,9 @@ pub(crate) struct ModelData<'ast> {
     /// @@ignore
     pub(crate) is_ignored: bool,
     /// @@index and @(@)unique.
-    pub(crate) indexes: Vec<IndexData<'ast>>,
+    pub(crate) indexes: Vec<(&'ast ast::Attribute, IndexData<'ast>)>,
     /// @@map
-    pub(super) mapped_name: Option<&'ast str>,
+    pub(crate) mapped_name: Option<&'ast str>,
 }
 
 impl ModelData<'_> {
@@ -136,7 +136,7 @@ impl ModelData<'_> {
 
     /// Whether MySQL would consider the field indexed for autoincrement purposes.
     pub(super) fn field_is_indexed_for_autoincrement(&self, field_id: ast::FieldId) -> bool {
-        self.indexes.iter().any(|idx| idx.fields.get(0) == Some(&field_id))
+        self.indexes.iter().any(|(_, idx)| idx.fields.get(0) == Some(&field_id))
             || self
                 .primary_key
                 .as_ref()

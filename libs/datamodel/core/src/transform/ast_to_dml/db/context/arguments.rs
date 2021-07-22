@@ -1,4 +1,4 @@
-use crate::ast::{self, Span};
+use crate::ast;
 use crate::diagnostics::{DatamodelError, Diagnostics};
 use crate::transform::helpers::ValueValidator;
 use std::collections::HashMap;
@@ -6,27 +6,24 @@ use std::collections::HashMap;
 /// Represents a list of arguments.
 #[derive(Debug)]
 pub(crate) struct Arguments<'a> {
-    attribute_name: &'a str,
+    attribute: Option<&'a ast::Attribute>,
     args: HashMap<&'a str, &'a ast::Argument>, // the _remaining_ arguments
-    span: ast::Span,
 }
 
 impl Default for Arguments<'_> {
     fn default() -> Self {
         Arguments {
-            attribute_name: "",
+            attribute: None,
             args: Default::default(),
-            span: Span::empty(),
         }
     }
 }
 
 impl<'a> Arguments<'a> {
     /// Starts validating the arguments for an attribute, checking for duplicate arguments in the process.
-    pub fn set_attribute(&mut self, attribute: &'a ast::Attribute) -> Result<(), Diagnostics> {
+    pub(super) fn set_attribute(&mut self, attribute: &'a ast::Attribute) -> Result<(), Diagnostics> {
         let arguments = &attribute.arguments;
-        self.attribute_name = &attribute.name.name;
-        self.span = attribute.span;
+        self.attribute = Some(attribute);
         self.args.clear();
         self.args.reserve(arguments.len());
         let mut errors = Diagnostics::new();
@@ -50,11 +47,15 @@ impl<'a> Arguments<'a> {
             errors.push_error(DatamodelError::new_attribute_validation_error(
                 &format!("You provided multiple unnamed arguments. This is not possible. Did you forget the brackets? Did you mean `[{}]`?", unnamed_arguments.join(", ")),
                 attribute.name.name.as_str(),
-                self.span,
+                self.span(),
             ))
         }
 
         errors.to_result()
+    }
+
+    pub(crate) fn attribute(&self) -> &'a ast::Attribute {
+        self.attribute.unwrap()
     }
 
     /// Call this at the end of validation. It will report errors for each argument that was not used by the validators.
@@ -66,7 +67,7 @@ impl<'a> Arguments<'a> {
 
     /// Gets the span of all arguments wrapped by this instance.
     pub(crate) fn span(&self) -> ast::Span {
-        self.span
+        self.attribute().span
     }
 
     pub(crate) fn optional_arg(&mut self, name: &str) -> Option<ValueValidator<'a>> {
@@ -81,12 +82,12 @@ impl<'a> Arguments<'a> {
             (Some(arg), None) => Ok(ValueValidator::new(&arg.value)),
             (None, Some(arg)) => Ok(ValueValidator::new(&arg.value)),
             (Some(arg), Some(_)) => Err(DatamodelError::new_duplicate_default_argument_error(name, arg.span)),
-            (None, None) => Err(DatamodelError::new_argument_not_found_error(name, self.span)),
+            (None, None) => Err(DatamodelError::new_argument_not_found_error(name, self.span())),
         }
     }
 
     pub(crate) fn new_attribute_validation_error(&self, message: &str) -> DatamodelError {
-        DatamodelError::new_attribute_validation_error(message, self.attribute_name, self.span)
+        DatamodelError::new_attribute_validation_error(message, self.attribute().name(), self.span())
     }
 
     pub(crate) fn optional_default_arg(&mut self, name: &str) -> Option<ValueValidator<'a>> {
