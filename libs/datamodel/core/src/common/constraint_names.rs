@@ -95,11 +95,7 @@ impl ConstraintNames {
             == &ConstraintNames::index_name(model.final_database_name(), &column_names, idx.tpe, connector)
     }
 
-    pub fn foreign_key_constraint_name(
-        table_name: &str,
-        column_names: Vec<String>,
-        connector: &dyn Connector,
-    ) -> String {
+    pub fn foreign_key_constraint_name(table_name: &str, column_names: &[&str], connector: &dyn Connector) -> String {
         let fk_suffix = "_fkey";
         let limit = connector.constraint_name_length();
 

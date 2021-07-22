@@ -188,29 +188,13 @@ fn visit_scalar_field_attributes<'ast>(
                     ast_model.span,
                 )),
                 None => {
+
                     let db_name = if ctx.db.preview_features.contains(NamedConstraints) {
-                        let generated_name = ConstraintNames::primary_key_name(model_data.mapped_name.unwrap_or(&ast_model.name.name), ctx.db.active_connector());
-                        match args.optional_arg("map").map(|name| name.as_str()) {
-                            Some(Ok("")) => error_on_empty_string_cow(args, ctx, "map"),
-                            Some(Ok(name)) => Some(name.into()),
-                            Some(Err(err)) => push_error_cow(ctx, err),
-                            None if ctx.db.active_connector().supports_named_primary_keys() => Some(generated_name.into()),
-                            None => None,
-                        }
+                        primary_key_constraint_name(&ast_model, model_data, args, ctx, "@id")
                     } else {
                         None
                     };
 
-                    validate_db_name(&ast_model, args, ctx, &db_name, "@id");
-
-
-                    if db_name.is_some() && !ctx.db.active_connector().supports_named_primary_keys() {
-                        ctx.push_error(DatamodelError::new_model_validation_error(
-                            "You defined a database name for the primary key on the model. This is not supported by the provider.",
-                            &ast_model.name.name,
-                            ast_model.span,
-                        ));
-                    }
 
                     model_data.primary_key = Some(PrimaryKeyData{
                         name: None,
@@ -274,9 +258,9 @@ fn visit_scalar_field_attributes<'ast>(
              let field_db_name = scalar_field_data.mapped_name.unwrap_or(&ast_field.name.name);
 
              let db_name : Option<Cow<'ast, str>> = if ctx.db.preview_features.contains(NamedConstraints) {
+
                  let generated_name = ConstraintNames::index_name(model_db_name, &[field_db_name], IndexType::Unique, ctx.db.active_connector());
                  let db_name = get_map_argument(args, ctx, generated_name);
-
                  validate_db_name(&ast_model, args, ctx, &db_name, "@unique");
 
                  db_name
@@ -301,6 +285,38 @@ fn visit_scalar_field_attributes<'ast>(
             })
          });
     });
+}
+
+fn primary_key_constraint_name<'ast>(
+    ast_model: &'ast Model,
+    model_data: &mut ModelData<'ast>,
+    args: &mut Arguments<'ast>,
+    ctx: &mut Context<'ast>,
+    attribute: &'ast str,
+) -> Option<Cow<'ast, str>> {
+    let generated_name = ConstraintNames::primary_key_name(
+        model_data.mapped_name.unwrap_or(&ast_model.name.name),
+        ctx.db.active_connector(),
+    );
+
+    let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
+        Some(Ok("")) => error_on_empty_string_cow(args, ctx, "map"),
+        Some(Ok(name)) => Some(name.into()),
+        Some(Err(err)) => push_error_cow(ctx, err),
+        None if ctx.db.active_connector().supports_named_primary_keys() => Some(generated_name.into()),
+        None => None,
+    };
+
+    validate_db_name(&ast_model, args, ctx, &db_name, attribute);
+
+    if db_name.is_some() && !ctx.db.active_connector().supports_named_primary_keys() {
+        ctx.push_error(DatamodelError::new_model_validation_error(
+            "You defined a database name for the primary key on the model. This is not supported by the provider.",
+            &ast_model.name.name,
+            ast_model.span,
+        ));
+    }
+    db_name
 }
 
 fn validate_db_name<'ast>(
@@ -556,34 +572,11 @@ fn visit_model_id<'ast>(
     }
 
     let (name, db_name) = if ctx.db.preview_features.contains(NamedConstraints) {
+        let db_name = primary_key_constraint_name(&ast_model, model_data, args, ctx, "@@id");
         let name = get_name_argument(args, ctx);
-
-        let generated_name = ConstraintNames::primary_key_name(
-            model_data.mapped_name.unwrap_or(&ast_model.name.name),
-            ctx.db.active_connector(),
-        );
-
-        let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
-            Some(Ok("")) => error_on_empty_string_cow(args, ctx, "map"),
-            Some(Ok(name)) => Some(name.into()),
-            Some(Err(err)) => push_error_cow(ctx, err),
-            None if ctx.db.active_connector().supports_named_primary_keys() => Some(generated_name.into()),
-            None => None,
-        };
-
         if let Some(err) = ConstraintNames::is_client_name_valid(args.span(), &ast_model.name.name, name, "@@id") {
             ctx.push_error(err);
         }
-
-        if db_name.is_some() && !ctx.db.active_connector().supports_named_primary_keys() {
-            ctx.push_error(DatamodelError::new_model_validation_error(
-                "You defined a database name for the primary key on the model. This is not supported by the provider.",
-                &ast_model.name.name,
-                ast_model.span,
-            ));
-        }
-
-        validate_db_name(&ast_model, args, ctx, &db_name, "@@id");
 
         (name, db_name)
     } else {
@@ -639,8 +632,6 @@ fn model_index<'ast>(
     let name = get_name_argument(args, ctx);
 
     let (name, db_name) = if ctx.db.preview_features.contains(NamedConstraints) {
-        // this is for compatibility reasons
-
         let generated_name = ConstraintNames::index_name(
             model_db_name,
             &field_db_names,
@@ -649,7 +640,9 @@ fn model_index<'ast>(
         );
 
         let db_name = get_map_argument(args, ctx, generated_name);
+        validate_db_name(&ast_model, args, ctx, &db_name, "@@index");
 
+        // this is for compatibility reasons
         let db_name = match (name, db_name) {
             (Some(_), Some(map)) => Some(map), //todo error here
             //backwards compatibility, accept name arg on normal indexes and use it as map arg
@@ -657,8 +650,6 @@ fn model_index<'ast>(
             (None, Some(map)) => Some(map),
             (None, None) => None,
         };
-
-        validate_db_name(&ast_model, args, ctx, &db_name, "@@index");
 
         (None, db_name)
     } else {
@@ -747,25 +738,20 @@ fn model_unique<'ast>(
     let (name, db_name) = if ctx.db.preview_features.contains(NamedConstraints) {
         //todo compatibility hack
 
-        let generated_name = Cow::from(ConstraintNames::index_name(
+        let generated_name = ConstraintNames::index_name(
             model_db_name,
             &field_db_names,
             IndexType::Unique,
             ctx.db.active_connector(),
-        ));
+        );
 
-        let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
-            Some(Ok("")) => error_on_empty_string_cow(args, ctx, "map"),
-            Some(Ok(name)) => Some(name.into()),
-            Some(Err(err)) => push_error_cow(ctx, err),
-            None => Some(generated_name),
-        };
+        let db_name = get_map_argument(args, ctx, generated_name);
+
+        validate_db_name(&ast_model, args, ctx, &db_name, "@@unique");
 
         if let Some(err) = ConstraintNames::is_client_name_valid(args.span(), &ast_model.name.name, name, "@@unique") {
             ctx.push_error(err);
         }
-
-        validate_db_name(&ast_model, args, ctx, &db_name, "@@unique");
 
         (name, db_name)
     } else {
@@ -984,24 +970,16 @@ fn visit_relation<'ast>(
         let ast_model = &ctx.db.ast[model_id];
         let generated_name = if let Some(fields) = &relation_field.fields {
             let table_name = model_data.mapped_name.unwrap_or(&ast_model.name.name);
-            let column_names = fields
-                .iter()
-                .map(|&field_id| {
-                    ctx.db
-                        .get_field_database_name(model_id, field_id)
-                        .unwrap_or(&ast_model[field_id].name.name)
-                        .to_string()
-                })
-                .collect();
+            let column_names = get_field_db_names(model_id, fields, ctx);
 
             Some(
-                ConstraintNames::foreign_key_constraint_name(table_name, column_names, ctx.db.active_connector())
+                ConstraintNames::foreign_key_constraint_name(table_name, &column_names, ctx.db.active_connector())
                     .into(),
             )
         } else {
             None
         };
-
+        //todo error when map given on the wrong side, thats why this is not dryed up
         let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
             Some(Ok("")) => error_on_empty_string_cow(args, ctx, "map"),
             Some(Ok(name)) => Some(name.into()),
@@ -1009,15 +987,7 @@ fn visit_relation<'ast>(
             None => generated_name,
         };
 
-        if let Some(err) = ConstraintNames::is_db_name_too_long(
-            args.span(),
-            &ast_model.name.name,
-            &db_name,
-            "@relation",
-            ctx.db.active_connector(),
-        ) {
-            ctx.push_error(err);
-        }
+        validate_db_name(ast_model, args, ctx, &db_name, "@relation");
 
         db_name
     } else {
