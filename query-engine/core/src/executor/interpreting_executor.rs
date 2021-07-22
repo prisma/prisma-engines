@@ -132,14 +132,13 @@ where
         operation: Operation,
         query_schema: QuerySchemaRef,
     ) -> crate::Result<ResponseData> {
-        self.tx_cache.dump_keys();
+        // self.tx_cache.dump_keys();
 
         // Parse, validate, and extract query graph from query document.
         let (query_graph, serializer) = QueryGraphBuilder::new(query_schema).build(operation)?;
 
         // If a Tx id is provided, execute on that one.
         if let Some(tx_id) = tx_id {
-            dbg!(">>>>>> TX CASE");
             let mut c_tx = self.tx_cache.cache.get_mut(&tx_id).expect("WIP Tx not found");
 
             let interpreter = QueryInterpreter::new(c_tx.tx.as_mut().unwrap().as_connection_like());
@@ -147,7 +146,6 @@ where
 
             result
         } else {
-            dbg!(">>>>>> NON TX CASE");
             let mut conn = self.connector.get_connection().await?;
             let is_transactional = self.force_transactions || query_graph.needs_transaction();
 

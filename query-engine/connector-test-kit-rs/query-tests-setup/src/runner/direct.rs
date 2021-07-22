@@ -48,7 +48,6 @@ impl RunnerInterface for DirectRunner {
         let handler = GraphQlHandler::new(&*self.executor, &self.query_schema);
         let query = GraphQlBody::Single(query.into());
 
-        dbg!(&self.current_tx_id);
         Ok(handler.handle(query, self.current_tx_id.clone()).await.into())
     }
 
