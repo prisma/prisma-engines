@@ -4,6 +4,7 @@ use super::{
     context::{Arguments, Context},
     types::{IndexData, ModelData, RelationField, ScalarField},
 };
+use crate::ast::{FieldId, Model, ModelId};
 use crate::common::constraint_names::ConstraintNames;
 use crate::transform::ast_to_dml::db::types::PrimaryKeyData;
 use crate::PreviewFeature::NamedConstraints;
@@ -200,15 +201,7 @@ fn visit_scalar_field_attributes<'ast>(
                         None
                     };
 
-                    if let Some(err) = ConstraintNames::is_db_name_too_long(
-                        args.span(),
-                        &ast_model.name.name,
-                        &db_name,
-                        "@id",
-                        ctx.db.active_connector(),
-                    ) {
-                        ctx.push_error(err);
-                    }
+                    validate_db_name(&ast_model, args, ctx, &db_name, "@id");
 
 
                     if db_name.is_some() && !ctx.db.active_connector().supports_named_primary_keys() {
@@ -281,24 +274,10 @@ fn visit_scalar_field_attributes<'ast>(
              let field_db_name = scalar_field_data.mapped_name.unwrap_or(&ast_field.name.name);
 
              let db_name : Option<Cow<'ast, str>> = if ctx.db.preview_features.contains(NamedConstraints) {
-                 let generated_name = Cow::from(ConstraintNames::index_name(model_db_name, &[field_db_name], IndexType::Unique, ctx.db.active_connector()));
+                 let generated_name = ConstraintNames::index_name(model_db_name, &[field_db_name], IndexType::Unique, ctx.db.active_connector());
+                 let db_name = get_map_argument(args, ctx, generated_name);
 
-                 let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
-                     Some(Ok("")) => error_on_empty_string_cow(args, ctx, "map"),
-                     Some(Ok(name)) => Some(Cow::from(name)),
-                     Some(Err(err)) => push_error_cow(ctx, err),
-                     None => Some(generated_name),
-                 };
-
-                 if let Some(err) = ConstraintNames::is_db_name_too_long(
-                     args.span(),
-                     &ast_model.name.name,
-                     &db_name,
-                     "@unique",
-                     ctx.db.active_connector(),
-                 ) {
-                     ctx.push_error(err);
-                 }
+                 validate_db_name(&ast_model, args, ctx, &db_name, "@unique");
 
                  db_name
 
@@ -322,6 +301,24 @@ fn visit_scalar_field_attributes<'ast>(
             })
          });
     });
+}
+
+fn validate_db_name<'ast>(
+    ast_model: &'ast Model,
+    args: &mut Arguments<'ast>,
+    ctx: &mut Context<'ast>,
+    db_name: &Option<Cow<'ast, str>>,
+    attribute: &'ast str,
+) {
+    if let Some(err) = ConstraintNames::is_db_name_too_long(
+        args.span(),
+        &ast_model.name.name,
+        &db_name,
+        attribute,
+        ctx.db.active_connector(),
+    ) {
+        ctx.push_error(err);
+    }
 }
 
 fn visit_relation_field_attributes<'ast>(
@@ -559,12 +556,7 @@ fn visit_model_id<'ast>(
     }
 
     let (name, db_name) = if ctx.db.preview_features.contains(NamedConstraints) {
-        let name = match args.optional_arg("name").map(|name| name.as_str()) {
-            Some(Ok("")) => error_on_empty_string(args, ctx, "name"),
-            Some(Ok(name)) => Some(name),
-            Some(Err(err)) => push_error(ctx, err),
-            None => None,
-        };
+        let name = get_name_argument(args, ctx);
 
         let generated_name = ConstraintNames::primary_key_name(
             model_data.mapped_name.unwrap_or(&ast_model.name.name),
@@ -591,15 +583,7 @@ fn visit_model_id<'ast>(
             ));
         }
 
-        if let Some(err) = ConstraintNames::is_db_name_too_long(
-            args.span(),
-            &ast_model.name.name,
-            &db_name,
-            "@@id",
-            ctx.db.active_connector(),
-        ) {
-            ctx.push_error(err);
-        }
+        validate_db_name(&ast_model, args, ctx, &db_name, "@@id");
 
         (name, db_name)
     } else {
@@ -651,33 +635,20 @@ fn model_index<'ast>(
     let ast_model = &ctx.db.ast[model_id];
     let model_db_name = data.mapped_name.unwrap_or(&ast_model.name.name);
 
-    let field_db_names: Vec<&str> = index_data
-        .fields
-        .iter()
-        .map(|&field_id| {
-            ctx.db
-                .get_field_database_name(model_id, field_id)
-                .unwrap_or(&ast_model[field_id].name.name)
-        })
-        .collect();
+    let field_db_names = get_field_db_names(model_id, &index_data.fields, ctx);
     let name = get_name_argument(args, ctx);
 
     let (name, db_name) = if ctx.db.preview_features.contains(NamedConstraints) {
         // this is for compatibility reasons
 
-        let generated_name = Cow::from(ConstraintNames::index_name(
+        let generated_name = ConstraintNames::index_name(
             model_db_name,
             &field_db_names,
             IndexType::Normal,
             ctx.db.active_connector(),
-        ));
+        );
 
-        let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
-            Some(Ok("")) => error_on_empty_string_cow(args, ctx, "map"),
-            Some(Ok(name)) => Some(name.into()),
-            Some(Err(err)) => push_error_cow(ctx, err),
-            None => Some(generated_name),
-        };
+        let db_name = get_map_argument(args, ctx, generated_name);
 
         let db_name = match (name, db_name) {
             (Some(_), Some(map)) => Some(map), //todo error here
@@ -687,15 +658,7 @@ fn model_index<'ast>(
             (None, None) => None,
         };
 
-        if let Some(err) = ConstraintNames::is_db_name_too_long(
-            args.span(),
-            &ast_model.name.name,
-            &db_name,
-            "@@index",
-            ctx.db.active_connector(),
-        ) {
-            ctx.push_error(err);
-        }
+        validate_db_name(&ast_model, args, ctx, &db_name, "@@index");
 
         (None, db_name)
     } else {
@@ -718,12 +681,36 @@ fn model_index<'ast>(
     data.indexes.push(index_data);
 }
 
+fn get_field_db_names<'ast>(model_id: ModelId, fields: &[FieldId], ctx: &mut Context<'ast>) -> Vec<&'ast str> {
+    fields
+        .iter()
+        .map(|&field_id| {
+            ctx.db
+                .get_field_database_name(model_id, field_id)
+                .unwrap_or(&ctx.db.ast[model_id][field_id].name.name)
+        })
+        .collect()
+}
+
 fn get_name_argument<'ast>(args: &mut Arguments<'ast>, ctx: &mut Context<'ast>) -> Option<&'ast str> {
     match args.optional_arg("name").map(|name| name.as_str()) {
         Some(Ok("")) => error_on_empty_string(args, ctx, "name"),
         Some(Ok(name)) => Some(name),
         Some(Err(err)) => push_error(ctx, err),
         None => None,
+    }
+}
+
+fn get_map_argument<'ast>(
+    args: &mut Arguments<'ast>,
+    ctx: &mut Context<'ast>,
+    generated_name: String,
+) -> Option<Cow<'ast, str>> {
+    match args.optional_arg("map").map(|name| name.as_str()) {
+        Some(Ok("")) => error_on_empty_string_cow(args, ctx, "map"),
+        Some(Ok(name)) => Some(name.into()),
+        Some(Err(err)) => push_error_cow(ctx, err),
+        None => Some(generated_name.into()),
     }
 }
 
@@ -753,15 +740,7 @@ fn model_unique<'ast>(
     let ast_model = &ctx.db.ast[model_id];
     let model_db_name = data.mapped_name.unwrap_or(&ast_model.name.name);
 
-    let field_db_names: Vec<&str> = index_data
-        .fields
-        .iter()
-        .map(|&field_id| {
-            ctx.db
-                .get_field_database_name(model_id, field_id)
-                .unwrap_or(&ast_model[field_id].name.name)
-        })
-        .collect();
+    let field_db_names: Vec<&str> = get_field_db_names(model_id, &index_data.fields, ctx);
 
     let name = get_name_argument(args, ctx);
 
@@ -786,15 +765,7 @@ fn model_unique<'ast>(
             ctx.push_error(err);
         }
 
-        if let Some(err) = ConstraintNames::is_db_name_too_long(
-            args.span(),
-            &ast_model.name.name,
-            &db_name,
-            "@@unique",
-            ctx.db.active_connector(),
-        ) {
-            ctx.push_error(err);
-        }
+        validate_db_name(&ast_model, args, ctx, &db_name, "@@unique");
 
         (name, db_name)
     } else {
