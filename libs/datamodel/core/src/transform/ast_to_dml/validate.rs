@@ -1,6 +1,4 @@
 #![allow(clippy::suspicious_operation_groupings)] // clippy is wrong there
-
-use super::db::ParserDatabase;
 use crate::common::constraint_names::ConstraintNames;
 use crate::{
     ast,
@@ -10,8 +8,6 @@ use crate::{
     dml,
 };
 use enumflags2::BitFlags;
-use itertools::Itertools;
-use std::collections::HashSet;
 
 /// Helper for validating a datamodel.
 ///
@@ -39,14 +35,9 @@ impl<'a> Validator<'a> {
         }
     }
 
-    pub(crate) fn validate(&self, db: &ParserDatabase<'_>, schema: &mut dml::Datamodel, diagnostics: &mut Diagnostics) {
-        let ast_schema = db.ast();
-
-        self.validate_names_for_indexes(ast_schema, schema, diagnostics);
-
-        // Model level validations.
+    pub(crate) fn validate(&self, ast: &ast::SchemaAst, schema: &mut dml::Datamodel, diagnostics: &mut Diagnostics) {
         for model in schema.models() {
-            let ast_model = ast_schema.find_model(&model.name).expect(STATE_ERROR);
+            let ast_model = ast.find_model(&model.name).expect(STATE_ERROR);
 
             //doing this here for now since I want to have all field names already generated
             // it might be possible to move this
@@ -70,7 +61,7 @@ impl<'a> Validator<'a> {
                 diagnostics.push_error(err);
             }
 
-            if let Err(err) = self.validate_relations_not_ambiguous(ast_schema, model) {
+            if let Err(err) = self.validate_relations_not_ambiguous(ast, model) {
                 diagnostics.push_error(err);
             }
 
@@ -80,10 +71,6 @@ impl<'a> Validator<'a> {
 
             if let Err(ref mut the_errors) = self.validate_model_connector_specific(ast_model, model) {
                 diagnostics.append(the_errors)
-            }
-
-            if let Err(ref mut the_errors) = self.validate_auto_increment(ast_model, model) {
-                diagnostics.append(the_errors);
             }
 
             if let Err(ref mut the_errors) = self.validate_base_fields_for_relation(schema, ast_model, model) {
@@ -100,140 +87,17 @@ impl<'a> Validator<'a> {
         &self,
         ast_schema: &ast::SchemaAst,
         schema: &mut dml::Datamodel,
-    ) -> Result<(), Diagnostics> {
-        let mut all_errors = Diagnostics::new();
-
-        // Model level validations.
-        for model in schema.models() {
-            // Having a separate error collection allows checking whether any error has occurred for a model.
-            let mut errors_for_model = Diagnostics::new();
-
-            if !errors_for_model.has_errors() {
-                let mut new_errors = self.validate_relation_arguments_bla(
-                    schema,
-                    ast_schema.find_model(&model.name).expect(STATE_ERROR),
-                    model,
-                );
-                errors_for_model.append(&mut new_errors);
-            }
-
-            all_errors.append(&mut errors_for_model);
-        }
-
-        all_errors.to_result()
-    }
-
-    fn validate_names_for_indexes(
-        &self,
-        ast_schema: &ast::SchemaAst,
-        schema: &dml::Datamodel,
         diagnostics: &mut Diagnostics,
     ) {
-        let mut index_names = HashSet::new();
-
-        let multiple_indexes_with_same_name_are_supported = self
-            .source
-            .map(|source| source.active_connector.supports_multiple_indexes_with_same_name())
-            .unwrap_or(false);
-
         for model in schema.models() {
-            if let Some(ast_model) = ast_schema.find_model(&model.name) {
-                for index in model.indices.iter() {
-                    if let Some(index_name) = &index.db_name {
-                        if index_names.contains(index_name) && !multiple_indexes_with_same_name_are_supported {
-                            let ast_index = ast_model
-                                .attributes
-                                .iter()
-                                .find(|attribute| attribute.is_index())
-                                .unwrap();
+            let mut new_errors = self.validate_relation_arguments_bla(
+                schema,
+                ast_schema.find_model(&model.name).expect(STATE_ERROR),
+                model,
+            );
 
-                            let error = DatamodelError::new_multiple_indexes_with_same_name_are_not_supported(
-                                index_name,
-                                ast_index.span,
-                            );
-                            diagnostics.push_error(error);
-                        }
-                        index_names.insert(index_name);
-                    }
-
-                    //doing this here for now since I want to have all field names already generated
-                    // it might be possible to move this
-                    if let Some(name) = &index.name {
-                        for field in model.fields() {
-                            if let Some(err) = ConstraintNames::client_name_already_in_use(
-                                name,
-                                &field.name(),
-                                &model.name,
-                                ast_model.span,
-                                "@@unique",
-                            ) {
-                                diagnostics.push_error(err);
-                            }
-                        }
-                    }
-                }
-            }
+            diagnostics.append(&mut new_errors);
         }
-    }
-
-    fn validate_auto_increment(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), Diagnostics> {
-        let mut errors = Diagnostics::new();
-
-        if let Some(data_source) = self.source {
-            let autoinc_fields = model.auto_increment_fields().collect_vec();
-
-            // First check if the provider supports autoincrement at all, if yes, proceed with the detailed checks.
-            if !autoinc_fields.is_empty() && !data_source.active_connector.supports_auto_increment() {
-                for field in autoinc_fields {
-                    let ast_field = ast_model.find_field_bang(&field.name);
-
-                    // Add an error for all autoincrement fields on the model.
-                    errors.push_error(DatamodelError::new_attribute_validation_error(
-                        &"The `autoincrement()` default value is used with a datasource that does not support it."
-                            .to_string(),
-                        "default",
-                        ast_field.span,
-                    ));
-                }
-            } else {
-                if !data_source.active_connector.supports_multiple_auto_increment()
-                    && model.auto_increment_fields().count() > 1
-                {
-                    errors.push_error(DatamodelError::new_attribute_validation_error(
-                        &"The `autoincrement()` default value is used multiple times on this model even though the underlying datasource only supports one instance per table.".to_string(),
-                        "default",
-                        ast_model.span,
-                    ))
-                }
-
-                // go over all fields
-                for field in autoinc_fields {
-                    let ast_field = ast_model.find_field_bang(&field.name);
-
-                    if !model.field_is_primary(&field.name)
-                        && !data_source.active_connector.supports_non_id_auto_increment()
-                    {
-                        errors.push_error(DatamodelError::new_attribute_validation_error(
-                            &"The `autoincrement()` default value is used on a non-id field even though the datasource does not support this.".to_string(),
-                            "default",
-                            ast_field.span,
-                        ))
-                    }
-
-                    if !model.field_is_indexed(&field.name)
-                        && !data_source.active_connector.supports_non_indexed_auto_increment()
-                    {
-                        errors.push_error(DatamodelError::new_attribute_validation_error(
-                            &"The `autoincrement()` default value is used on a non-indexed field even though the datasource does not support this.".to_string(),
-                            "default",
-                            ast_field.span,
-                        ))
-                    }
-                }
-            }
-        }
-
-        errors.to_result()
     }
 
     fn validate_model_has_strict_unique_criteria(

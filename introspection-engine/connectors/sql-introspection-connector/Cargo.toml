@@ -25,7 +25,6 @@ serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1.0", features = ["float_roundtrip"] }
 sql-schema-describer = { path = "../../../libs/sql-schema-describer" }
 thiserror = "1.0.9"
-tokio = { version = "1.0", features = ["rt-multi-thread"] }
 tracing = "0.1.10"
 tracing-futures = "0.2.0"
 user-facing-errors = { path = "../../../libs/user-facing-errors", features = ["sql"] }
@@ -46,3 +45,5 @@ features = [
 
 [dev-dependencies]
 pretty_assertions = "0.6.1"
+expect-test = "1.1.0"
+

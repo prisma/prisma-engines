@@ -53,13 +53,13 @@ pub struct SqlSchema {
     /// The schema's enums.
     pub enums: Vec<Enum>,
     /// The schema's sequences, unique to Postgres.
-    pub sequences: Vec<Sequence>,
+    sequences: Vec<Sequence>,
     /// The schema's views,
-    pub views: Vec<View>,
+    views: Vec<View>,
     /// The stored procedures.
-    pub procedures: Vec<Procedure>,
+    procedures: Vec<Procedure>,
     /// The user-defined types procedures.
-    pub user_defined_types: Vec<UserDefinedType>,
+    user_defined_types: Vec<UserDefinedType>,
 }
 
 impl SqlSchema {
