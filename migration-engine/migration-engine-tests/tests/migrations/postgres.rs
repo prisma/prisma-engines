@@ -65,39 +65,33 @@ fn adding_a_scalar_list_for_a_model_with_id_type_int_must_work(api: TestApi) {
 // Reference for the tables created by PostGIS: https://postgis.net/docs/manual-1.4/ch04.html#id418599
 #[test_connector(tags(Postgres))]
 fn existing_postgis_tables_must_not_be_migrated(api: TestApi) {
-    let create_spatial_ref_sys_table = "CREATE TABLE IF NOT EXISTS \"spatial_ref_sys\" ( id SERIAL PRIMARY KEY )";
-    // The capitalized Geometry is intentional here, because we want the matching to be case-insensitive.
-    let create_geometry_columns_table = "CREATE TABLE IF NOT EXiSTS \"Geometry_columns\" ( id SERIAL PRIMARY KEY )";
+    let create_tables = r#"
+        CREATE TABLE IF NOT EXISTS "spatial_ref_sys" ( id SERIAL PRIMARY KEY );
+        /* The capitalized Geometry is intentional here, because we want the matching to be case-insensitive. */
+        CREATE TABLE IF NOT EXISTS "Geometry_columns" ( id SERIAL PRIMARY KEY );
+    "#;
 
-    api.raw_cmd(create_spatial_ref_sys_table);
-    api.raw_cmd(create_geometry_columns_table);
-
-    api.assert_schema()
-        .assert_has_table("spatial_ref_sys")
-        .assert_has_table("Geometry_columns");
-
-    let schema = "";
-
-    api.schema_push(schema).send().assert_green_bang().assert_no_steps();
+    api.raw_cmd(create_tables);
+    api.schema_push("").send().assert_green_bang().assert_no_steps();
 
     api.assert_schema()
         .assert_has_table("spatial_ref_sys")
         .assert_has_table("Geometry_columns");
 }
 
-// Reference for the tables created by PostGIS: https://postgis.net/docs/manual-1.4/ch04.html#id418599
+// Reference for the views created by PostGIS: https://postgis.net/docs/manual-1.4/ch04.html#id418599
 #[test_connector(tags(Postgres))]
 fn existing_postgis_views_must_not_be_migrated(api: TestApi) {
-    let create_spatial_ref_sys_view = "CREATE VIEW \"spatial_ref_sys\" AS SELECT 1";
-    // The capitalized Geometry is intentional here, because we want the matching to be case-insensitive.
-    let create_geometry_columns_view = "CREATE VIEW \"Geometry_columns\" AS SELECT 1";
+    let create_views = r#"
+        CREATE VIEW "spatial_ref_sys" AS SELECT 1;
+        /* The capitalized Geometry is intentional here, because we want the matching to be case-insensitive. */
+        CREATE VIEW "Geometry_columns" AS SELECT 1;
+        CREATE VIEW "PG_BUFFERCACHE" AS SELECT 1;
+    "#;
 
-    api.raw_cmd(create_spatial_ref_sys_view);
-    api.raw_cmd(create_geometry_columns_view);
+    api.raw_cmd(create_views);
 
-    let schema = "";
-
-    api.schema_push(schema).send().assert_green_bang().assert_no_steps();
+    api.schema_push("").send().assert_green_bang().assert_no_steps();
 }
 
 #[test_connector(tags(Postgres))]

@@ -20,6 +20,9 @@ static POSTGIS_TABLES_OR_VIEWS: Lazy<RegexSet> = Lazy::new(|| {
     .unwrap()
 });
 
+// https://www.postgresql.org/docs/12/pgbuffercache.html
+static EXTENSION_VIEWS: Lazy<RegexSet> = Lazy::new(|| RegexSet::new(&["(?i)^pg_buffercache$"]).unwrap());
+
 /// The maximum length of postgres identifiers, in bytes.
 ///
 /// Reference: https://www.postgresql.org/docs/12/limits.html
@@ -111,7 +114,7 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
     }
 
     fn view_should_be_ignored(&self, view_name: &str) -> bool {
-        POSTGIS_TABLES_OR_VIEWS.is_match(view_name)
+        POSTGIS_TABLES_OR_VIEWS.is_match(view_name) || EXTENSION_VIEWS.is_match(view_name)
     }
 }
 
