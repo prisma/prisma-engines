@@ -65,7 +65,7 @@ pub(super) fn resolve_model_and_field_attributes<'ast>(
 
             ctx.db.types.scalar_fields.insert((model_id, field_id), scalar_field);
         } else if let Some(mut rf) = ctx.db.types.take_relation_field(model_id, field_id) {
-            visit_relation_field_attributes(model_id, ast_field, &mut model_data, &mut rf, ctx);
+            visit_relation_field_attributes(model_id, ast_field, &model_data, &mut rf, ctx);
             ctx.db.types.relation_fields.insert((model_id, field_id), rf);
         } else {
             unreachable!(
@@ -677,7 +677,13 @@ fn model_index<'ast>(
             ctx.db.active_connector(),
         );
 
-        let db_name = get_map_argument(args, ctx, generated_name);
+        let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
+            Some(Ok("")) => error_on_empty_string_cow(args, ctx, "map"),
+            Some(Ok(name)) => Some(name.into()),
+            Some(Err(err)) => push_error_cow(ctx, err),
+            None => None,
+        };
+
         validate_db_name(&ast_model, args, ctx, &db_name, "@@index");
 
         // this is for compatibility reasons
@@ -686,7 +692,7 @@ fn model_index<'ast>(
             //backwards compatibility, accept name arg on normal indexes and use it as map arg
             (Some(name), None) => Some(name.into()),
             (None, Some(map)) => Some(map),
-            (None, None) => None,
+            (None, None) => Some(generated_name.into()),
         };
 
         (None, db_name)

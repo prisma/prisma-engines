@@ -104,16 +104,6 @@ fn constraint_names() {
      "#};
 
     let expected = indoc! {r#"
-     datasource test {
-            provider = "mysql"
-            url = "mysql://root:prisma@127.0.0.1:3309/ReproIndexNames?connection_limit=1"
-     }
-    
-     generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["NamedConstraints"]
-     }
-     
      /// explicit different dbnames
      model A {
        id   Int    @id(map: "CustomDBId")

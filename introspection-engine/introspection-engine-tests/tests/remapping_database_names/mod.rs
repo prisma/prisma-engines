@@ -503,7 +503,7 @@ async fn remapping_compound_primary_keys(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(preview_features("NamedConstraints"))]
 async fn not_automatically_remapping_invalid_compound_unique_key_names(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -521,6 +521,11 @@ async fn not_automatically_remapping_invalid_compound_unique_key_names(api: &Tes
         .await?;
 
     let dm = indoc! {r#"
+         generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["NamedConstraints"]
+         }
+         
          model User {
              id     Int @id @default(autoincrement()) 
              first  Int
@@ -535,7 +540,7 @@ async fn not_automatically_remapping_invalid_compound_unique_key_names(api: &Tes
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(preview_features("NamedConstraints"))]
 async fn not_automatically_remapping_invalid_compound_primary_key_names(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -557,6 +562,11 @@ async fn not_automatically_remapping_invalid_compound_primary_key_names(api: &Te
     };
 
     let dm = format! {r#"
+         generator js {{
+            provider = "prisma-client-js"
+            previewFeatures = ["NamedConstraints"]
+         }}
+
          model User {{
              first  Int
              last   Int

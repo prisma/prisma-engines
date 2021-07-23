@@ -57,6 +57,24 @@ impl<'a> Validator<'a> {
                 }
             }
 
+            for index in &model.indices {
+                //doing this here for now since I want to have all field names already generated
+                // it might be possible to move this
+                if let Some(name) = &index.name {
+                    for field in model.fields() {
+                        if let Some(err) = ConstraintNames::client_name_already_in_use(
+                            name,
+                            &field.name(),
+                            &model.name,
+                            ast_model.span,
+                            "@@unique",
+                        ) {
+                            diagnostics.push_error(err);
+                        }
+                    }
+                }
+            }
+
             if let Err(err) = self.validate_model_has_strict_unique_criteria(ast_model, model) {
                 diagnostics.push_error(err);
             }

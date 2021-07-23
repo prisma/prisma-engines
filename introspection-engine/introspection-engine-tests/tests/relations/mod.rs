@@ -931,7 +931,7 @@ async fn many_to_many_relation_field_names_do_not_conflict_with_themselves(api: 
     Ok(())
 }
 
-#[test_connector(exclude(Sqlite))]
+#[test_connector(exclude(Sqlite), preview_features("NamedConstraints"))]
 async fn one_to_one_req_relation_with_custom_fk_name(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
@@ -954,6 +954,11 @@ async fn one_to_one_req_relation_with_custom_fk_name(api: &TestApi) -> TestResul
         .await?;
 
     let dm = indoc! {r##"
+         generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["NamedConstraints"]
+         }
+
          model Post {
              id       Int @id @default(autoincrement())
              user_id  Int  @unique
