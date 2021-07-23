@@ -7,37 +7,15 @@
 //! - Define low level execution of queries. This is considered an implementation detail of the modules used by the executors.
 mod interpreting_executor;
 mod loader;
+mod lrt;
 mod pipeline;
 
 pub use loader::*;
+pub use lrt::*;
 
 use crate::{query_document::Operation, response_ir::ResponseData, schema::QuerySchemaRef};
 use async_trait::async_trait;
 use connector::Connector;
-
-#[derive(Debug, Clone, Hash, Eq, PartialEq)]
-pub struct TxId(String);
-
-impl TxId {
-    pub fn new() -> Self {
-        Self(cuid::cuid().unwrap())
-    }
-}
-
-impl<T> From<T> for TxId
-where
-    T: Into<String>,
-{
-    fn from(s: T) -> Self {
-        Self(s.into())
-    }
-}
-
-impl ToString for TxId {
-    fn to_string(&self) -> String {
-        self.0.clone()
-    }
-}
 
 #[async_trait]
 pub trait QueryExecutor: TransactionManager {
@@ -75,7 +53,7 @@ pub trait TransactionManager {
     /// Expected to throw an error if no transaction could be opened for `max_acquisition_secs` seconds.
     /// The new transaction must only live for `valid_for_secs` seconds before it automatically rolls back.
     /// This rollback mechanism is an implementation detail of the trait implementer.
-    async fn start_tx(&self, max_acquisition_secs: u32, valid_for_secs: u32) -> crate::Result<TxId>;
+    async fn start_tx(&self, max_acquisition_secs: u64, valid_for_secs: u64) -> crate::Result<TxId>;
 
     /// Commits a transaction.
     async fn commit_tx(&self, tx_id: TxId) -> crate::Result<()>;

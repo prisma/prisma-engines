@@ -58,7 +58,7 @@ impl<'a> GraphQlHandler<'a> {
 
         match AssertUnwindSafe(
             self.executor
-                .execute_all(None, queries, transactional, self.query_schema.clone()),
+                .execute_all(tx_id, queries, transactional, self.query_schema.clone()),
         )
         .catch_unwind()
         .await
