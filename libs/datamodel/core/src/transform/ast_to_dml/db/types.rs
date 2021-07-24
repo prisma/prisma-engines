@@ -318,7 +318,7 @@ fn visit_enum<'ast>(enum_id: ast::EnumId, enm: &'ast ast::Enum, ctx: &mut Contex
         ctx.visit_attributes(&field.attributes, |attributes, ctx| {
             // @map
             attributes.visit_optional_single("map", ctx, |map_args, ctx| {
-                if let Some(mapped_name) = attributes::visit_map(map_args, ctx) {
+                if let Some(mapped_name) = attributes::visit_map_attribute(map_args, ctx) {
                     enum_data.mapped_values.insert(field_idx as u32, mapped_name);
                     ctx.mapped_enum_value_names
                         .insert((enum_id, mapped_name), field_idx as u32);
@@ -330,7 +330,7 @@ fn visit_enum<'ast>(enum_id: ast::EnumId, enm: &'ast ast::Enum, ctx: &mut Contex
     ctx.visit_attributes(&enm.attributes, |attributes, ctx| {
         // @@map
         attributes.visit_optional_single("map", ctx, |map_args, ctx| {
-            if let Some(mapped_name) = attributes::visit_map(map_args, ctx) {
+            if let Some(mapped_name) = attributes::visit_map_attribute(map_args, ctx) {
                 enum_data.mapped_name = Some(mapped_name);
                 ctx.mapped_enum_names.insert(mapped_name, enum_id);
             }

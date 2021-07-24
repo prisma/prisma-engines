@@ -89,7 +89,7 @@ pub(super) fn resolve_model_and_field_attributes<'ast>(
 
         // @@map
         attributes.visit_optional_single("map", ctx, |map_args, ctx| {
-            let mapped_name = match visit_map(map_args, ctx) {
+            let mapped_name = match visit_map_attribute(map_args, ctx) {
                 Some(name) => name,
                 None => return,
             };
@@ -175,7 +175,7 @@ fn visit_scalar_field_attributes<'ast>(
     ctx.visit_scalar_field_attributes(model_id, field_id, scalar_field_data.r#type, |attributes, ctx| {
         // @map
          attributes.visit_optional_single("map", ctx, |map_args, ctx| {
-             let mapped_name = match visit_map(map_args, ctx) {
+             let mapped_name = match visit_map_attribute(map_args, ctx) {
                 Some(name) => name,
                 None => return
              };
@@ -338,7 +338,7 @@ fn primary_key_constraint_name<'ast>(
     );
 
     let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
-        Some(Ok("")) => error_on_empty_string_cow(args, "map", ctx),
+        Some(Ok("")) => error_on_empty_string_cow(args, ctx),
         Some(Ok(name)) => Some(name.into()),
         Some(Err(err)) => push_error_cow(err, ctx),
         None if ctx.db.active_connector().supports_named_primary_keys() => Some(generated_name.into()),
@@ -355,24 +355,6 @@ fn primary_key_constraint_name<'ast>(
         ));
     }
     db_name
-}
-
-fn validate_db_name<'ast>(
-    ast_model: &'ast Model,
-    args: &mut Arguments<'ast>,
-    db_name: &Option<Cow<'ast, str>>,
-    attribute: &'ast str,
-    ctx: &mut Context<'ast>,
-) {
-    if let Some(err) = ConstraintNames::is_db_name_too_long(
-        args.span(),
-        &ast_model.name.name,
-        &db_name,
-        attribute,
-        ctx.db.active_connector(),
-    ) {
-        ctx.push_error(err);
-    }
 }
 
 fn visit_relation_field_attributes<'ast>(
@@ -678,7 +660,7 @@ fn model_index<'ast>(
         );
 
         let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
-            Some(Ok("")) => error_on_empty_string_cow(args, "map", ctx),
+            Some(Ok("")) => error_on_empty_string_cow(args, ctx),
             Some(Ok(name)) => Some(name.into()),
             Some(Err(err)) => push_error_cow(err, ctx),
             None => None,
@@ -718,49 +700,6 @@ fn model_index<'ast>(
     index_data.db_name = db_name;
 
     data.indexes.push((args.attribute(), index_data));
-}
-
-fn get_field_db_names<'ast>(model_id: ModelId, fields: &[FieldId], ctx: &mut Context<'ast>) -> Vec<&'ast str> {
-    fields
-        .iter()
-        .map(|&field_id| {
-            ctx.db
-                .get_field_database_name(model_id, field_id)
-                .unwrap_or(&ctx.db.ast[model_id][field_id].name.name)
-        })
-        .collect()
-}
-
-fn get_name_argument<'ast>(args: &mut Arguments<'ast>, ctx: &mut Context<'ast>) -> Option<&'ast str> {
-    match args.optional_arg("name").map(|name| name.as_str()) {
-        Some(Ok("")) => error_on_empty_string(args, "name", ctx),
-        Some(Ok(name)) => Some(name),
-        Some(Err(err)) => push_error(err, ctx),
-        None => None,
-    }
-}
-
-fn get_map_argument<'ast>(
-    args: &mut Arguments<'ast>,
-    generated_name: String,
-    ctx: &mut Context<'ast>,
-) -> Option<Cow<'ast, str>> {
-    match args.optional_arg("map").map(|name| name.as_str()) {
-        Some(Ok("")) => error_on_empty_string_cow(args, "map", ctx),
-        Some(Ok(name)) => Some(name.into()),
-        Some(Err(err)) => push_error_cow(err, ctx),
-        None => Some(generated_name.into()),
-    }
-}
-
-fn push_error<'ast>(err: DatamodelError, ctx: &mut Context<'ast>) -> Option<&'ast str> {
-    ctx.push_error(err);
-    None
-}
-
-fn push_error_cow<'ast>(err: DatamodelError, ctx: &mut Context<'ast>) -> Option<Cow<'ast, str>> {
-    ctx.push_error(err);
-    None
 }
 
 /// Validate @@unique on models.
@@ -823,38 +762,6 @@ fn model_unique<'ast>(
     index_data.db_name = db_name;
 
     data.indexes.push((args.attribute(), index_data));
-}
-
-fn error_on_empty_string<'ast>(
-    args: &mut Arguments<'ast>,
-    attribute: &str,
-    ctx: &mut Context<'ast>,
-) -> Option<&'ast str> {
-    ctx.push_error(
-        args.new_attribute_validation_error(&format!("The `{}` argument cannot be an empty string.", attribute)),
-    );
-    None
-}
-
-fn error_on_empty_string_cow<'ast>(
-    args: &mut Arguments<'ast>,
-    attribute: &str,
-    ctx: &mut Context<'ast>,
-) -> Option<Cow<'ast, str>> {
-    ctx.push_error(
-        args.new_attribute_validation_error(&format!("The `{}` argument cannot be an empty string.", attribute)),
-    );
-    None
-}
-
-fn error_usage_of_both_map_and_name<'ast>(
-    args: &mut Arguments<'ast>,
-    ctx: &mut Context<'ast>,
-) -> Option<Cow<'ast, str>> {
-    ctx.push_error(
-        args.new_attribute_validation_error(&format!("The `@@index` attribute accepts the `name` argument as an alias for the `map` argument for legacy reasons. It does not accept both though. Please use the `map` argument to specify the database name of the index.")),
-    );
-    None
 }
 
 fn common_index_validations<'ast>(
@@ -924,16 +831,6 @@ fn common_index_validations<'ast>(
             }
         }
     }
-}
-
-pub(super) fn visit_map<'ast>(map_args: &mut Arguments<'ast>, ctx: &mut Context<'ast>) -> Option<&'ast str> {
-    match map_args.default_arg("name").map(|value| value.as_str()) {
-        Ok(Ok(name)) => return Some(name),
-        Err(err) => ctx.push_error(err), // not flattened for error handing legacy reasons
-        Ok(Err(err)) => ctx.push_error(map_args.new_attribute_validation_error(&err.to_string())),
-    };
-
-    None
 }
 
 /// @relation validation for relation fields.
@@ -1031,6 +928,7 @@ fn visit_relation<'ast>(
 
     let fk_name = if ctx.db.preview_features.contains(NamedConstraints) {
         let ast_model = &ctx.db.ast[model_id];
+        //TODO(matthias) when is relationfield.fields populated exactly ????
         let generated_name = if let Some(fields) = &relation_field.fields {
             let table_name = model_data.mapped_name.unwrap_or(&ast_model.name.name);
             let column_names = get_field_db_names(model_id, fields, ctx);
@@ -1042,10 +940,9 @@ fn visit_relation<'ast>(
         } else {
             None
         };
-
-        //todo error when map given on the wrong side, thats why this is not dryed up
+        //TODO(matthias) error when map given on the wrong side, thats why this is not dryed up
         let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
-            Some(Ok("")) => error_on_empty_string_cow(args, "map", ctx),
+            Some(Ok("")) => error_on_empty_string_cow(args, ctx),
             Some(Ok(name)) => Some(name.into()),
             Some(Err(err)) => push_error_cow(err, ctx),
             None => generated_name,
@@ -1131,5 +1028,92 @@ fn resolve_field_array<'ast>(
         })
     } else {
         Ok(field_ids)
+    }
+}
+
+//helpers
+pub(super) fn visit_map_attribute<'ast>(map_args: &mut Arguments<'ast>, ctx: &mut Context<'ast>) -> Option<&'ast str> {
+    match map_args.default_arg("name").map(|value| value.as_str()) {
+        Ok(Ok(name)) => return Some(name),
+        Err(err) => ctx.push_error(err), // not flattened for error handing legacy reasons
+        Ok(Err(err)) => ctx.push_error(map_args.new_attribute_validation_error(&err.to_string())),
+    };
+
+    None
+}
+
+fn get_map_argument<'ast>(
+    args: &mut Arguments<'ast>,
+    generated_name: String,
+    ctx: &mut Context<'ast>,
+) -> Option<Cow<'ast, str>> {
+    match args.optional_arg("map").map(|name| name.as_str()) {
+        Some(Ok("")) => error_on_empty_string_cow(args, ctx),
+        Some(Ok(name)) => Some(name.into()),
+        Some(Err(err)) => push_error_cow(err, ctx),
+        None => Some(generated_name.into()),
+    }
+}
+
+fn get_name_argument<'ast>(args: &mut Arguments<'ast>, ctx: &mut Context<'ast>) -> Option<&'ast str> {
+    match args.optional_arg("name").map(|name| name.as_str()) {
+        Some(Ok("")) => ctx.push_error(
+            args.new_attribute_validation_error(&format!("The `name` argument cannot be an empty string.")),
+        ),
+        Some(Err(err)) => ctx.push_error(err),
+        Some(Ok(name)) => return Some(name),
+        None => (),
+    }
+
+    None
+}
+
+fn get_field_db_names<'ast>(model_id: ModelId, fields: &[FieldId], ctx: &mut Context<'ast>) -> Vec<&'ast str> {
+    fields
+        .iter()
+        .map(|&field_id| {
+            ctx.db
+                .get_field_database_name(model_id, field_id)
+                .unwrap_or(&ctx.db.ast[model_id][field_id].name.name)
+        })
+        .collect()
+}
+
+// errors
+fn push_error_cow<'ast>(err: DatamodelError, ctx: &mut Context<'ast>) -> Option<Cow<'ast, str>> {
+    ctx.push_error(err);
+    None
+}
+
+fn error_on_empty_string_cow<'ast>(args: &mut Arguments<'ast>, ctx: &mut Context<'ast>) -> Option<Cow<'ast, str>> {
+    ctx.push_error(args.new_attribute_validation_error(&format!("The `map` argument cannot be an empty string.")));
+    None
+}
+
+fn error_usage_of_both_map_and_name<'ast>(
+    args: &mut Arguments<'ast>,
+    ctx: &mut Context<'ast>,
+) -> Option<Cow<'ast, str>> {
+    ctx.push_error(
+        args.new_attribute_validation_error(&format!("The `@@index` attribute accepts the `name` argument as an alias for the `map` argument for legacy reasons. It does not accept both though. Please use the `map` argument to specify the database name of the index.")),
+    );
+    None
+}
+
+fn validate_db_name<'ast>(
+    ast_model: &'ast Model,
+    args: &mut Arguments<'ast>,
+    db_name: &Option<Cow<'ast, str>>,
+    attribute: &'ast str,
+    ctx: &mut Context<'ast>,
+) {
+    if let Some(err) = ConstraintNames::is_db_name_too_long(
+        args.span(),
+        &ast_model.name.name,
+        &db_name,
+        attribute,
+        ctx.db.active_connector(),
+    ) {
+        ctx.push_error(err);
     }
 }
