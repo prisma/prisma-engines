@@ -1057,9 +1057,9 @@ fn get_map_argument<'ast>(
 
 fn get_name_argument<'ast>(args: &mut Arguments<'ast>, ctx: &mut Context<'ast>) -> Option<&'ast str> {
     match args.optional_arg("name").map(|name| name.as_str()) {
-        Some(Ok("")) => ctx.push_error(
-            args.new_attribute_validation_error(&format!("The `name` argument cannot be an empty string.")),
-        ),
+        Some(Ok("")) => {
+            ctx.push_error(args.new_attribute_validation_error("The `name` argument cannot be an empty string."))
+        }
         Some(Err(err)) => ctx.push_error(err),
         Some(Ok(name)) => return Some(name),
         None => (),
@@ -1086,7 +1086,7 @@ fn push_error_cow<'ast>(err: DatamodelError, ctx: &mut Context<'ast>) -> Option<
 }
 
 fn error_on_empty_string_cow<'ast>(args: &mut Arguments<'ast>, ctx: &mut Context<'ast>) -> Option<Cow<'ast, str>> {
-    ctx.push_error(args.new_attribute_validation_error(&format!("The `map` argument cannot be an empty string.")));
+    ctx.push_error(args.new_attribute_validation_error("The `map` argument cannot be an empty string."));
     None
 }
 
@@ -1095,7 +1095,7 @@ fn error_usage_of_both_map_and_name<'ast>(
     ctx: &mut Context<'ast>,
 ) -> Option<Cow<'ast, str>> {
     ctx.push_error(
-        args.new_attribute_validation_error(&format!("The `@@index` attribute accepts the `name` argument as an alias for the `map` argument for legacy reasons. It does not accept both though. Please use the `map` argument to specify the database name of the index.")),
+        args.new_attribute_validation_error("The `@@index` attribute accepts the `name` argument as an alias for the `map` argument for legacy reasons. It does not accept both though. Please use the `map` argument to specify the database name of the index."),
     );
     None
 }

@@ -337,3 +337,17 @@ fn mapping_id_with_a_name_that_is_too_long_should_error() {
         ),
     ]);
 }
+
+#[test]
+fn name_on_field_level_id_should_error() {
+    let dml = with_named_constraints(
+        r#"
+     model User {
+         invalid           Int @id(name: "THIS SHOULD BE MAP INSTEAD")
+     }
+     "#,
+    );
+
+    let errors = parse_error(&dml);
+    errors.assert_is(DatamodelError::new_unused_argument_error("name", Span::new(277, 311)));
+}
