@@ -8,7 +8,7 @@ use once_cell::sync::Lazy;
 use regex::Regex;
 use std::borrow::Cow;
 
-pub struct ConstraintNames {}
+pub(crate) struct ConstraintNames {}
 
 impl ConstraintNames {
     ///Aligned with PG, to maximize the amount of times where we do not need
@@ -38,11 +38,15 @@ impl ConstraintNames {
     /// seq for sequences
     ///
 
-    pub fn primary_key_name_matches(pk: &PrimaryKeyDefinition, model: &Model, connector: &dyn Connector) -> bool {
+    pub(crate) fn primary_key_name_matches(
+        pk: &PrimaryKeyDefinition,
+        model: &Model,
+        connector: &dyn Connector,
+    ) -> bool {
         pk.db_name.as_ref().unwrap() == &ConstraintNames::primary_key_name(model.final_database_name(), connector)
     }
 
-    pub fn primary_key_name(table_name: &str, connector: &dyn Connector) -> String {
+    pub(crate) fn primary_key_name(table_name: &str, connector: &dyn Connector) -> String {
         let suffix = "_pkey";
         let limit = connector.constraint_name_length();
 
@@ -55,7 +59,7 @@ impl ConstraintNames {
         format!("{}{}", trimmed, suffix)
     }
 
-    pub fn index_name_matches(idx: &IndexDefinition, model: &Model, connector: &dyn Connector) -> bool {
+    pub(crate) fn index_name_matches(idx: &IndexDefinition, model: &Model, connector: &dyn Connector) -> bool {
         let column_names: Vec<&str> = idx
             .fields
             .iter()
@@ -66,7 +70,12 @@ impl ConstraintNames {
             == &ConstraintNames::index_name(model.final_database_name(), &column_names, idx.tpe, connector)
     }
 
-    pub fn index_name(table_name: &str, column_names: &[&str], tpe: IndexType, connector: &dyn Connector) -> String {
+    pub(crate) fn index_name(
+        table_name: &str,
+        column_names: &[&str],
+        tpe: IndexType,
+        connector: &dyn Connector,
+    ) -> String {
         let index_suffix = "_idx";
         let unique_suffix = "_key";
         let limit = connector.constraint_name_length();
@@ -85,7 +94,7 @@ impl ConstraintNames {
         }
     }
 
-    pub fn foreign_key_name_matches(ri: &RelationInfo, model: &Model, connector: &dyn Connector) -> bool {
+    pub(crate) fn foreign_key_name_matches(ri: &RelationInfo, model: &Model, connector: &dyn Connector) -> bool {
         let column_names: Vec<&str> = ri
             .fields
             .iter()
@@ -96,7 +105,11 @@ impl ConstraintNames {
             == &ConstraintNames::foreign_key_constraint_name(model.final_database_name(), &column_names, connector)
     }
 
-    pub fn foreign_key_constraint_name(table_name: &str, column_names: &[&str], connector: &dyn Connector) -> String {
+    pub(crate) fn foreign_key_constraint_name(
+        table_name: &str,
+        column_names: &[&str],
+        connector: &dyn Connector,
+    ) -> String {
         let fk_suffix = "_fkey";
         let limit = connector.constraint_name_length();
 
@@ -111,7 +124,7 @@ impl ConstraintNames {
         format!("{}{}", trimmed, fk_suffix)
     }
 
-    pub fn is_client_name_valid(
+    pub(crate) fn is_client_name_valid(
         span: Span,
         object_name: &str,
         name: Option<&str>,
@@ -133,7 +146,7 @@ impl ConstraintNames {
         None
     }
 
-    pub fn is_db_name_too_long<'ast>(
+    pub(crate) fn is_db_name_too_long<'ast>(
         span: Span,
         object_name: &str,
         name: &Option<Cow<'ast, str>>,
@@ -152,7 +165,7 @@ impl ConstraintNames {
         None
     }
 
-    pub fn client_name_already_in_use(
+    pub(crate) fn client_name_already_in_use(
         idx_name: &str,
         field_name: &str,
         model_name: &str,
@@ -168,8 +181,4 @@ impl ConstraintNames {
         }
         None
     }
-
-    // pub fn default_constraint_name(table_name: &str, column_name: &str) -> String {
-    //     format!("{}_{}_dflt", table_name, column_name)
-    // }
 }

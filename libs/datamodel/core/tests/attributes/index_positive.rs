@@ -26,7 +26,7 @@ fn basic_index_must_work() {
 }
 
 #[test]
-fn ct() {
+fn indexes_on_enum_fields_must_work() {
     let dml = r#"
     model User {
         id        Int    @id

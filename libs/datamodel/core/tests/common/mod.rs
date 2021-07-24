@@ -38,6 +38,7 @@ pub(crate) trait RelationFieldAsserts {
     fn assert_relation_referenced_fields(&self, t: &[&str]) -> &Self;
     fn assert_relation_base_fields(&self, t: &[&str]) -> &Self;
     fn assert_ignored(&self, state: bool) -> &Self;
+    fn assert_relation_fk_name(&self, name: Option<String>) -> &Self;
 }
 
 pub(crate) trait ModelAsserts {
@@ -223,6 +224,11 @@ impl RelationFieldAsserts for dml::RelationField {
 
     fn assert_ignored(&self, state: bool) -> &Self {
         assert_eq!(self.is_ignored, state);
+        self
+    }
+
+    fn assert_relation_fk_name(&self, name: Option<String>) -> &Self {
+        assert_eq!(self.relation_info.fk_name, name);
         self
     }
 }

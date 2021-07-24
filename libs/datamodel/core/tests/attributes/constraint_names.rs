@@ -212,5 +212,9 @@ fn constraint_names() {
     println!("Expected \n {}", expected);
 
     //todo can't be exactly the same since explicit default names will be suppressed when rerendering
+    // the expected result after parsing and rendering is not exactly the same as the input.
+    // One case where a difference occurs is if you explicitly write a constraint name that happens
+    // to match the generated default. That one will not be rendered back. Also if you use the name
+    // property in @@index it will be rendered back as map instead.
     assert_eq!(rendered, expected);
 }

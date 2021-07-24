@@ -100,7 +100,7 @@ pub(crate) struct RelationField<'ast> {
     /// The name _explicitly present_ in the AST.
     pub(crate) name: Option<&'ast str>,
     pub(crate) is_ignored: bool,
-    /// The fk_name _explicitly present_ in the AST by using the map argument.
+    /// The fk_name _explicitly present_ in the AST by using the map argument or the one being generated as default.
     pub(crate) fk_name: Option<Cow<'ast, str>>,
 }
 
