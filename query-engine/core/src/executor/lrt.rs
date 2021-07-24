@@ -9,7 +9,7 @@ use tokio::{
 
 use crate::CoreError;
 
-static CACHE_EVICTION_SECS: u64 = 3;
+static CACHE_EVICTION_SECS: u64 = 300;
 
 #[derive(Debug, Error)]
 pub enum TransactionError {
@@ -75,7 +75,7 @@ impl CachedTx {
         if let Self::Open(otx) = self {
             Ok(otx)
         } else {
-            let reason = format!("Transaction is no longer valid. Last state: '{}'.", self);
+            let reason = format!("Transaction is no longer valid. Last state: '{}'", self);
             Err(CoreError::from(TransactionError::Closed { reason }))
         }
     }
@@ -85,7 +85,7 @@ impl CachedTx {
         if let Self::Open(ref mut otx) = self {
             Ok(otx)
         } else {
-            let reason = format!("Transaction is no longer valid. Last state: '{}'.", self);
+            let reason = format!("Transaction is no longer valid. Last state: '{}'", self);
             Err(CoreError::from(TransactionError::Closed { reason }))
         }
     }

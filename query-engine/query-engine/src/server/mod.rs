@@ -1,25 +1,23 @@
 #![deny(missing_docs)]
 
-use crate::context::PrismaContext;
-use crate::opt::PrismaOpt;
-use crate::PrismaResult;
+mod elapsed_middleware;
 
+use crate::{context::PrismaContext, opt::PrismaOpt, PrismaResult};
 use elapsed_middleware::ElapsedMiddleware;
 use opentelemetry::{global, Context};
-use query_core::schema::QuerySchemaRenderer;
-use query_core::TxId;
+use query_core::{schema::QuerySchemaRenderer, TxId};
 use request_handlers::{dmmf, GraphQLSchemaRenderer, GraphQlBody, GraphQlHandler};
 use serde_json::json;
-use tide::http::{mime, StatusCode};
-use tide::{prelude::*, Body, Request, Response};
+use std::{collections::HashMap, sync::Arc};
+use tide::{
+    http::{mime, StatusCode},
+    prelude::*,
+    Body, Request, Response,
+};
 use tide_server_timing::TimingMiddleware;
 use tracing::Level;
 use tracing_futures::Instrument;
 use tracing_opentelemetry::OpenTelemetrySpanExt;
-
-use std::{collections::HashMap, sync::Arc};
-
-mod elapsed_middleware;
 
 //// Shared application state.
 pub(crate) struct State {
@@ -182,29 +180,31 @@ struct TxInput {
 async fn transaction_start_handler(mut req: Request<State>) -> tide::Result<impl Into<Response>> {
     let input: TxInput = req.body_json().await?;
     let state = req.state();
-    let tx_id = state.cx.executor.start_tx(input.max_wait, input.timeout).await?;
 
-    Ok(json!({
-        "id": tx_id.to_string(),
-    }))
+    match state.cx.executor.start_tx(input.max_wait, input.timeout).await {
+        Ok(tx_id) => Ok(json!({ "id": tx_id.to_string() }).into()),
+        Err(err) => err_to_http_resp(err),
+    }
 }
 
 async fn transaction_commit_handler(req: Request<State>) -> tide::Result<impl Into<Response>> {
     let tx_id = TxId::from(req.param("id")?);
     let state = req.state();
 
-    state.cx.executor.commit_tx(tx_id).await?;
-
-    Ok(Response::new(StatusCode::Ok))
+    match state.cx.executor.commit_tx(tx_id).await {
+        Ok(_) => Ok(Response::new(StatusCode::Ok)),
+        Err(err) => err_to_http_resp(err),
+    }
 }
 
 async fn transaction_rollback_handler(req: Request<State>) -> tide::Result<impl Into<Response>> {
     let tx_id = TxId::from(req.param("id")?);
     let state = req.state();
 
-    state.cx.executor.rollback_tx(tx_id).await?;
-
-    Ok(Response::new(StatusCode::Ok))
+    match state.cx.executor.rollback_tx(tx_id).await {
+        Ok(_) => Ok(Response::new(StatusCode::Ok)),
+        Err(err) => err_to_http_resp(err),
+    }
 }
 
 /// Handle debug headers inside the main GraphQL endpoint.
@@ -221,6 +221,7 @@ async fn handle_debug_headers(req: &Request<State>) -> tide::Result<Option<impl 
     } else if req.header(DEBUG_NON_FATAL_HEADER).is_some() {
         let err = user_facing_errors::Error::from_panic_payload(Box::new("Debug panic"));
         let mut res = Response::new(200);
+
         res.set_body(Body::from_json(&err)?);
         Ok(Some(res))
     } else {
@@ -237,4 +238,25 @@ fn get_parent_span_context(req: &Request<State>) -> Context {
         .collect();
 
     global::get_text_map_propagator(|propagator| propagator.extract(&headers))
+}
+
+fn err_to_http_resp(err: query_core::CoreError) -> tide::Result<Response> {
+    let status = match err {
+        query_core::CoreError::TransactionError(ref err) => match err {
+            query_core::TransactionError::AcquisitionTimeout => 504,
+            query_core::TransactionError::AlreadyStarted => todo!(),
+            query_core::TransactionError::NotFound => 404,
+            query_core::TransactionError::Closed { reason: _ } => 422,
+        },
+
+        // All other errors are treated as 500s, most of these paths should never be hit, only connector errors may occur.
+        _ => 500,
+    };
+
+    let user_error: user_facing_errors::Error = err.into();
+    let body = Body::from_json(&user_error)?;
+    let mut resp = Response::new(status);
+
+    resp.set_body(body);
+    Ok(resp)
 }

@@ -5,11 +5,12 @@ use super::{
 };
 use crate::{
     IrSerializer, OpenTx, Operation, QueryGraph, QueryGraphBuilder, QueryInterpreter, QuerySchemaRef, ResponseData,
-    TransactionManager,
+    TransactionError, TransactionManager,
 };
 use async_trait::async_trait;
 use connector::{Connection, ConnectionLike, Connector};
 use futures::future;
+use tokio::time;
 
 /// Central query executor and main entry point into the query core.
 pub struct InterpretingExecutor<C> {
@@ -188,11 +189,18 @@ impl<C> TransactionManager for InterpretingExecutor<C>
 where
     C: Connector + Send + Sync,
 {
-    async fn start_tx(&self, _max_acquisition_secs: u64, valid_for_secs: u64) -> crate::Result<TxId> {
+    async fn start_tx(&self, max_acquisition_secs: u64, valid_for_secs: u64) -> crate::Result<TxId> {
         let id = TxId::new();
-        let conn = self.connector.get_connection().await?;
+        let conn = time::timeout(
+            time::Duration::from_secs(max_acquisition_secs),
+            self.connector.get_connection(),
+        )
+        .await;
 
+        let conn = conn.map_err(|_| TransactionError::AcquisitionTimeout)??;
+        // let conn = self.connector.get_connection().await?;
         let c_tx = OpenTx::start(conn).await?;
+
         self.tx_cache.insert(id.clone(), c_tx, valid_for_secs).await;
 
         Ok(id)
