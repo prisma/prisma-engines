@@ -1,5 +1,6 @@
 use datamodel::{render_datamodel_to_string, IndexDefinition, IndexType};
 
+use crate::attributes::with_named_constraints;
 use crate::common::*;
 
 #[test]
@@ -200,4 +201,51 @@ fn index_attributes_must_serialize_to_valid_dml() {
     let schema = parse(dml);
 
     assert!(datamodel::parse_datamodel(&render_datamodel_to_string(&schema)).is_ok());
+}
+
+#[test]
+fn index_accepts_three_different_notations() {
+    let dml = with_named_constraints(
+        r#"
+    model User {
+        id        Int    @id
+        firstName String
+        lastName  String
+
+        // compatibility
+        @@index([firstName,lastName], map: "OtherIndexName")
+        //explicit
+        @@index([firstName,lastName], name: "MyIndexName")
+        //implicit
+        @@index([firstName,lastName])
+    }
+    "#,
+    );
+
+    let schema = parse(&dml);
+    let user_model = schema.assert_has_model("User");
+
+    user_model.assert_has_index(IndexDefinition {
+        name: None,
+        db_name: Some("OtherIndexName".to_string()),
+        fields: vec!["firstName".to_string(), "lastName".to_string()],
+        tpe: IndexType::Normal,
+        defined_on_field: false,
+    });
+
+    user_model.assert_has_index(IndexDefinition {
+        name: None,
+        db_name: Some("MyIndexName".to_string()),
+        fields: vec!["firstName".to_string(), "lastName".to_string()],
+        tpe: IndexType::Normal,
+        defined_on_field: false,
+    });
+
+    user_model.assert_has_index(IndexDefinition {
+        name: None,
+        db_name: Some("User_firstName_lastName_idx".to_string()),
+        fields: vec!["firstName".to_string(), "lastName".to_string()],
+        tpe: IndexType::Normal,
+        defined_on_field: false,
+    });
 }

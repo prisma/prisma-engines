@@ -1,3 +1,4 @@
+use crate::attributes::with_named_constraints;
 use crate::common::*;
 use datamodel::{render_datamodel_to_string, IndexDefinition, IndexType};
 
@@ -223,27 +224,42 @@ fn unique_attributes_must_serialize_to_valid_dml() {
 }
 
 #[test]
+fn named_multi_field_unique_must_work() {
+    let dml = with_named_constraints(
+        r#"
+     model User {
+         a String
+         b Int
+         @@unique([a,b], name:"ClientName")
+     }
+     "#,
+    );
+
+    let datamodel = parse(&dml);
+    let user_model = datamodel.assert_has_model("User");
+    user_model.assert_has_index(IndexDefinition {
+        name: Some("ClientName".to_string()),
+        db_name: Some("User_a_b_key".to_string()),
+        fields: vec!["a".to_string(), "b".to_string()],
+        tpe: IndexType::Unique,
+        defined_on_field: false,
+    });
+}
+
+#[test]
 fn mapped_multi_field_unique_must_work() {
-    let dml = r#"
-     datasource test {
-            provider = "mysql"
-            url = "mysql://root:prisma@127.0.0.1:3309/ReproIndexNames?connection_limit=1"
-     }
-    
-     generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["NamedConstraints"]
-     }
-    
-     model Model {
+    let dml = with_named_constraints(
+        r#"
+     model User {
          a String
          b Int
          @@unique([a,b], map:"dbname")
      }
-     "#;
+     "#,
+    );
 
-    let datamodel = parse(dml);
-    let user_model = datamodel.assert_has_model("Model");
+    let datamodel = parse(&dml);
+    let user_model = datamodel.assert_has_model("User");
     user_model.assert_has_index(IndexDefinition {
         name: None,
         db_name: Some("dbname".to_string()),
@@ -255,17 +271,8 @@ fn mapped_multi_field_unique_must_work() {
 
 #[test]
 fn mapped_singular_unique_must_work() {
-    let dml = r#"
-     datasource test {
-      provider = "mysql"
-      url = "mysql://root:prisma@127.0.0.1:3309/ReproIndexNames?connection_limit=1"
-    }
-    
-     generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["NamedConstraints"]
-     }
-    
+    let dml = with_named_constraints(
+        r#"
      model Model {
          a String @unique(map: "test")
      }
@@ -273,9 +280,10 @@ fn mapped_singular_unique_must_work() {
      model Model2 {
          a String @unique(map: "test2")
      }
-     "#;
+     "#,
+    );
 
-    let datamodel = parse(dml);
+    let datamodel = parse(&dml);
     let model = datamodel.assert_has_model("Model");
     model.assert_has_index(IndexDefinition {
         name: None,
@@ -297,25 +305,17 @@ fn mapped_singular_unique_must_work() {
 
 #[test]
 fn named_and_mapped_multi_field_unique_must_work() {
-    let dml = r#"
-     datasource test {
-      provider = "mysql"
-      url = "mysql://root:prisma@127.0.0.1:3309/ReproIndexNames?connection_limit=1"
-    }
-    
-     generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["NamedConstraints"]
-     }
-    
+    let dml = with_named_constraints(
+        r#"
      model Model {
          a String
          b Int
          @@unique([a,b], name: "compoundId", map:"dbname")
      }
-     "#;
+     "#,
+    );
 
-    let datamodel = parse(dml);
+    let datamodel = parse(&dml);
     let model = datamodel.assert_has_model("Model");
     model.assert_has_index(IndexDefinition {
         name: Some("compoundId".to_string()),
