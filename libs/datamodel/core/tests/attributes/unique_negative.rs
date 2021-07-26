@@ -300,7 +300,7 @@ fn naming_field_level_unique_should_error() {
     );
 
     let errors = parse_error(&dml);
-    errors.assert_is(DatamodelError::new_unused_argument_error("name", Span::new(274, 304)));
+    errors.assert_is(DatamodelError::new_unused_argument_error("name", Span::new(278, 308)));
 }
 
 #[test]

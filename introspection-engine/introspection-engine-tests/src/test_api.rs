@@ -201,16 +201,22 @@ impl TestApi {
     }
 
     pub fn configuration(&self) -> Configuration {
-        datamodel::parse_configuration(&self.datasource_block().to_string())
-            .unwrap()
-            .subject
+        datamodel::parse_configuration(&format!(
+            "{}\n{}",
+            &self.datasource_block().to_string(),
+            &self.generator_block()
+        ))
+        .unwrap()
+        .subject
     }
 
     #[track_caller]
     pub fn assert_eq_datamodels(&self, expected_without_header: &str, result_with_header: &str) {
-        let expected_with_header = self.dm_with_sources(expected_without_header);
-        let parsed_expected = datamodel::parse_datamodel(&expected_with_header)
-            .map_err(|err| err.to_pretty_string("schema.prisma", &expected_with_header))
+        let expected_with_source = self.dm_with_sources(expected_without_header);
+        let expected_with_generator = self.dm_with_generator_and_preview_flags(&expected_with_source);
+
+        let parsed_expected = datamodel::parse_datamodel(&expected_with_generator)
+            .map_err(|err| err.to_pretty_string("schema.prisma", &expected_with_generator))
             .unwrap()
             .subject;
 
@@ -221,6 +227,9 @@ impl TestApi {
         let reformatted_result =
             datamodel::render_datamodel_and_config_to_string(&parsed_result, &self.configuration());
 
+        println!("{}", reformatted_expected);
+        println!("{}", reformatted_result);
+
         pretty_assertions::assert_eq!(reformatted_expected, reformatted_result);
     }
 
@@ -230,6 +239,37 @@ impl TestApi {
         write!(out, "{}\n{}", self.datasource_block(), schema).unwrap();
 
         out
+    }
+
+    pub fn dm_with_generator_and_preview_flags(&self, schema: &str) -> String {
+        let mut out = String::with_capacity(320 + schema.len());
+
+        write!(out, "{}\n{}", self.generator_block(), schema).unwrap();
+
+        out
+    }
+
+    fn generator_block(&self) -> String {
+        let preview_features: Vec<String> = self
+            .args
+            .preview_features()
+            .iter()
+            .map(|pf| format!(r#""{}""#, pf))
+            .collect();
+
+        let preview_feature_string = if preview_features.is_empty() {
+            "".to_string()
+        } else {
+            format!("\npreviewFeatures = [{}]", preview_features.join(", "))
+        };
+
+        let generator_block = format!(
+            r#"generator client {{
+                 provider = "prisma-client-js"{}
+               }}"#,
+            preview_feature_string
+        );
+        generator_block
     }
 }
 
