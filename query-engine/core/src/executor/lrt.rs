@@ -1,3 +1,4 @@
+use crate::CoreError;
 use connector::{Connection, ConnectionLike, Transaction};
 use dashmap::{mapref::one::RefMut, DashMap};
 use std::{fmt::Display, sync::Arc};
@@ -7,8 +8,10 @@ use tokio::{
     time::{self, Duration},
 };
 
-use crate::CoreError;
+#[cfg(test)]
+static CACHE_EVICTION_SECS: u64 = 2;
 
+#[cfg(not(test))]
 static CACHE_EVICTION_SECS: u64 = 300;
 
 #[derive(Debug, Error)]
