@@ -29,8 +29,8 @@ pub enum TransactionError {
 #[derive(Debug, Clone, Hash, Eq, PartialEq)]
 pub struct TxId(String);
 
-impl TxId {
-    pub fn new() -> Self {
+impl Default for TxId {
+    fn default() -> Self {
         Self(cuid::cuid().unwrap())
     }
 }
@@ -96,16 +96,6 @@ pub(crate) struct TransactionCache {
     cache: Arc<DashMap<TxId, CachedTx>>,
 }
 
-#[allow(dead_code)]
-impl TransactionCache {
-    pub fn dump_keys(&self) {
-        dbg!(self.cache.len());
-        self.cache.iter().for_each(|r| {
-            dbg!(r.key());
-        });
-    }
-}
-
 impl TransactionCache {
     pub async fn insert(&self, key: TxId, mut value: OpenTx, valid_for_secs: u64) {
         let cache = Arc::clone(&self.cache);
@@ -134,11 +124,7 @@ impl TransactionCache {
 
     /// Get cache entry or error with not found.
     pub fn get_or_err(&self, key: &TxId) -> crate::Result<RefMut<'_, TxId, CachedTx>> {
-        Ok(self
-            .cache
-            .get_mut(key)
-            // .map(|wat| wat.value_mut())
-            .ok_or_else(|| TransactionError::NotFound)?)
+        Ok(self.cache.get_mut(key).ok_or(TransactionError::NotFound)?)
     }
 
     /// Remove cache entry for `key` or error with not found.
@@ -147,7 +133,7 @@ impl TransactionCache {
             .cache
             .remove(key)
             .map(|(_, c_tx)| c_tx)
-            .ok_or_else(|| TransactionError::NotFound)?)
+            .ok_or(TransactionError::NotFound)?)
     }
 
     /// Replaces
@@ -206,7 +192,7 @@ fn schedule_cache_eviction(key: TxId, cache: Arc<DashMap<TxId, CachedTx>>, secs:
         time::sleep(Duration::from_secs(secs)).await;
         debug!("[{}] Evicting cache key.", key);
 
-        if let Some(_) = cache.remove(&key) {
+        if cache.remove(&key).is_some() {
             debug!("[{}] Evicted.", key);
         } else {
             debug!("[{}] Already gone.", key);

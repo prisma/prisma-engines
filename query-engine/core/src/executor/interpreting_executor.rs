@@ -190,7 +190,7 @@ where
     C: Connector + Send + Sync,
 {
     async fn start_tx(&self, max_acquisition_secs: u64, valid_for_secs: u64) -> crate::Result<TxId> {
-        let id = TxId::new();
+        let id = TxId::default();
         let conn = time::timeout(
             time::Duration::from_secs(max_acquisition_secs),
             self.connector.get_connection(),
