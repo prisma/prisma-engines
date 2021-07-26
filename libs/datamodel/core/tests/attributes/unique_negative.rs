@@ -288,3 +288,36 @@ fn naming_unique_to_a_field_name_should_error() {
         Span::new(229, 404),
     ));
 }
+
+#[test]
+fn naming_field_level_unique_should_error() {
+    let dml = with_named_constraints(
+        r#"
+     model User {
+         used           Int @unique(name: "INVALID ON FIELD LEVEL")
+     }
+     "#,
+    );
+
+    let errors = parse_error(&dml);
+    errors.assert_is(DatamodelError::new_unused_argument_error("name", Span::new(274, 304)));
+}
+
+#[test]
+fn duplicate_implicit_names_should_error() {
+    let dml = with_named_constraints(
+        r#"
+     model User {
+         used           Int @unique
+         
+         @@unique([used])
+     }
+     "#,
+    );
+
+    let errors = parse_error(&dml);
+    errors.assert_is(DatamodelError::new_multiple_indexes_with_same_name_are_not_supported(
+        "User_used_key",
+        Span::new(299, 313),
+    ));
+}
