@@ -2,10 +2,12 @@ use barrel::types;
 use enumflags2::BitFlags;
 use indoc::indoc;
 use introspection_engine_tests::test_api::TestApi;
+use introspection_engine_tests::test_api::*;
+
 use introspection_engine_tests::TestResult;
 use test_macros::test_connector;
 
-#[test_connector(preview_features("NamedConstraints"))]
+#[test_connector(preview_features("NamedConstraints"), tags(Mssql, Postgres))]
 async fn introspecting_non_default_pkey_names_works(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
