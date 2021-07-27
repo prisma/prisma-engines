@@ -121,12 +121,12 @@ where
         transactional: bool,
         query_schema: QuerySchemaRef,
     ) -> crate::Result<Vec<crate::Result<ResponseData>>> {
-        let queries = operations
-            .into_iter()
-            .map(|op| QueryGraphBuilder::new(query_schema.clone()).build(op))
-            .collect::<std::result::Result<Vec<_>, _>>()?;
-
         if let Some(tx_id) = tx_id {
+            let queries = operations
+                .into_iter()
+                .map(|op| QueryGraphBuilder::new(query_schema.clone()).build(op))
+                .collect::<std::result::Result<Vec<_>, _>>()?;
+
             let mut c_tx = self.tx_cache.get_or_err(&tx_id)?;
             let otx = c_tx.as_open()?;
             let mut results = Vec::with_capacity(queries.len());
@@ -140,6 +140,11 @@ where
 
             Ok(results)
         } else if transactional | self.force_transactions {
+            let queries = operations
+                .into_iter()
+                .map(|op| QueryGraphBuilder::new(query_schema.clone()).build(op))
+                .collect::<std::result::Result<Vec<_>, _>>()?;
+
             let mut conn = self.connector.get_connection().await?;
             let mut tx = conn.start_transaction().await?;
             let mut results = Vec::with_capacity(queries.len());
@@ -157,16 +162,24 @@ where
             tx.commit().await?;
             Ok(results)
         } else {
-            let mut futures = Vec::with_capacity(queries.len());
+            let mut futures = Vec::with_capacity(operations.len());
 
-            for (graph, serializer) in queries {
-                let conn = self.connector.get_connection().await?;
-                futures.push(tokio::spawn(Self::execute_self_contained(
-                    conn,
-                    graph,
-                    serializer,
-                    self.force_transactions,
-                )));
+            for op in operations {
+                match QueryGraphBuilder::new(query_schema.clone()).build(op) {
+                    Ok((graph, serializer)) => {
+                        let conn = self.connector.get_connection().await?;
+
+                        futures.push(tokio::spawn(Self::execute_self_contained(
+                            conn,
+                            graph,
+                            serializer,
+                            self.force_transactions,
+                        )));
+                    }
+
+                    // This looks unnecessary, but is the simplest way to preserve ordering of results for the batch.
+                    Err(err) => futures.push(tokio::spawn(async move { Err(err.into()) })),
+                }
             }
 
             let responses: Vec<_> = future::join_all(futures)

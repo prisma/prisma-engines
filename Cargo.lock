@@ -3403,6 +3403,7 @@ dependencies = [
  "query-test-macros",
  "query-tests-setup",
  "serde_json",
+ "tokio",
  "tracing",
  "tracing-futures",
  "uuid",

@@ -13,6 +13,7 @@ pub use connector_tag::*;
 pub use datamodel_rendering::*;
 pub use error::*;
 pub use logging::*;
+pub use query_core;
 pub use query_result::*;
 pub use runner::*;
 pub use schema_gen::*;

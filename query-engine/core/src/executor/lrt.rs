@@ -1,6 +1,7 @@
 use crate::CoreError;
 use connector::{Connection, ConnectionLike, Transaction};
 use dashmap::{mapref::one::RefMut, DashMap};
+use once_cell::sync::Lazy;
 use std::{fmt::Display, sync::Arc};
 use thiserror::Error;
 use tokio::{
@@ -8,13 +9,12 @@ use tokio::{
     time::{self, Duration},
 };
 
-#[cfg(test)]
-static CACHE_EVICTION_SECS: u64 = 2;
+pub static CACHE_EVICTION_SECS: Lazy<u64> = Lazy::new(|| match std::env::var("CLOSED_TX_CLEANUP") {
+    Ok(size) => size.parse().unwrap_or(300),
+    Err(_) => 300,
+});
 
-#[cfg(not(test))]
-static CACHE_EVICTION_SECS: u64 = 300;
-
-#[derive(Debug, Error)]
+#[derive(Debug, Error, PartialEq)]
 pub enum TransactionError {
     #[error("Unable to start a transaction in the given time.")]
     AcquisitionTimeout,
@@ -118,7 +118,7 @@ impl TransactionCache {
             }
 
             cache.insert(cache_key.clone(), CachedTx::Expired);
-            schedule_cache_eviction(cache_key, cache, CACHE_EVICTION_SECS);
+            schedule_cache_eviction(cache_key, cache, *CACHE_EVICTION_SECS);
         });
 
         value.expiration_timer = Some(timer_handle);
@@ -142,7 +142,7 @@ impl TransactionCache {
     /// Replaces
     pub fn finalize_tx(&self, key: TxId, with: CachedTx) {
         self.cache.insert(key.clone(), with);
-        schedule_cache_eviction(key, Arc::clone(&self.cache), CACHE_EVICTION_SECS)
+        schedule_cache_eviction(key, Arc::clone(&self.cache), *CACHE_EVICTION_SECS)
     }
 }
 

@@ -72,13 +72,9 @@ impl Runner {
         Ok(response)
     }
 
-    pub async fn batch<T, S>(&self, gql_queries: T, transaction: bool) -> TestResult<QueryResult>
-    where
-        T: Iterator<Item = S>,
-        S: Into<String>,
-    {
+    pub async fn batch(&self, queries: Vec<String>, transaction: bool) -> TestResult<QueryResult> {
         match self {
-            Runner::Direct(r) => r.batch(gql_queries.map(Into::into).collect(), transaction).await,
+            Runner::Direct(r) => r.batch(queries, transaction).await,
             Runner::NodeApi(_) => todo!(),
             Runner::Binary(_) => todo!(),
         }

@@ -67,15 +67,17 @@ impl ScalarFilter {
 
     /// If possible, converts the filter into multiple smaller filters.
     pub fn batched(self) -> Vec<ScalarFilter> {
+        dbg!(*MAX_BATCH_SIZE);
         fn inner(mut list: PrismaListValue) -> Vec<PrismaListValue> {
+            let batch_size = *MAX_BATCH_SIZE;
             let dedup_list: BTreeSet<_> = list.drain(..).collect();
 
-            let mut batches = Vec::with_capacity(list.len() % *MAX_BATCH_SIZE + 1);
-            batches.push(Vec::with_capacity(*MAX_BATCH_SIZE));
+            let mut batches = Vec::with_capacity(list.len() % batch_size + 1);
+            batches.push(Vec::with_capacity(batch_size));
 
             for (idx, item) in dedup_list.into_iter().enumerate() {
-                if idx != 0 && idx % *MAX_BATCH_SIZE == 0 {
-                    batches.push(Vec::with_capacity(*MAX_BATCH_SIZE));
+                if idx != 0 && idx % batch_size == 0 {
+                    batches.push(Vec::with_capacity(batch_size));
                 }
 
                 batches.last_mut().unwrap().push(item);
