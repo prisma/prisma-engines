@@ -575,6 +575,40 @@ fn mapping_foreign_keys_with_a_name_that_is_too_long_should_error() {
         Span::new(389, 561),
     ));
 }
+
+#[test]
+fn mapping_foreign_keys_on_sqlite_should_error() {
+    let dml = r#"
+     datasource test {
+            provider = "sqlite"
+            url = "sqlite://..."
+    }
+
+    generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["NamedConstraints"]
+    }
+
+     model User {
+         id Int    @id
+         posts   Post[]
+     }
+
+     model Post {
+         post_id Int    @id
+         user_id Int
+         user    User   @relation(fields:[post_id], references: [id], map: "NoNamedForeignKeysOnSQLite")
+     }
+     "#;
+
+    let errors = parse_error(&dml);
+    errors.assert_is(DatamodelError::new_attribute_validation_error(
+        "Your provider does not support named foreign keys.",
+        "relation",
+        Span::new(380, 459),
+    ));
+}
+
 //
 // #[test]
 // fn having_the_map_argument_on_the_wrong_side_should_error() {

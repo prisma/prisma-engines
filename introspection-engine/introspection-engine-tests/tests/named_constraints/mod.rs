@@ -276,7 +276,7 @@ async fn introspecting_default_fk_names_works(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(preview_features("NamedConstraints"))]
+#[test_connector(preview_features("NamedConstraints"), exclude(Sqlite))]
 async fn introspecting_custom_fk_names_works(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
@@ -303,6 +303,48 @@ async fn introspecting_custom_fk_names_works(api: &TestApi) -> TestResult {
             id       Int @id @default(autoincrement())
             user_id  Int
             User     User @relation(fields: [user_id], references: [id], map: "CustomFKName")
+            
+            @@index([user_id])
+        }
+
+        model User {
+            id      Int @id @default(autoincrement())
+            Post    Post[]
+        }
+    "#;
+
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
+
+    Ok(())
+}
+
+#[test_connector(preview_features("NamedConstraints"), tags(Sqlite))]
+async fn introspecting_custom_fk_names_does_not_return_them_on_sqlite(api: &TestApi) -> TestResult {
+    api.barrel()
+        .execute(move |migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
+            });
+
+            migration.create_table("Post", move |t| {
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("Post_pkey", types::primary_constraint(&["id"]));
+                t.add_column("user_id", types::integer().nullable(false));
+                t.add_index("Post_user_id_idx", types::index(&["user_id"]));
+                t.add_constraint(
+                    "CustomFKName",
+                    types::foreign_constraint(&["user_id"], "User", &["id"], None, None),
+                );
+            });
+        })
+        .await?;
+
+    let dm = r#"
+        model Post {
+            id       Int @id @default(autoincrement())
+            user_id  Int
+            User     User @relation(fields: [user_id], references: [id])
             
             @@index([user_id])
         }

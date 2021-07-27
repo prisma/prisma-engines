@@ -943,7 +943,14 @@ fn visit_relation<'ast>(
         //TODO(matthias) error when map given on the wrong side, thats why this is not dryed up
         let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
             Some(Ok("")) => error_on_empty_string_cow(args, ctx),
-            Some(Ok(name)) => Some(name.into()),
+            Some(Ok(name)) => {
+                if !ctx.db.active_connector().supports_named_foreign_keys() {
+                    ctx.push_error(
+                        args.new_attribute_validation_error("Your provider does not support named foreign keys."),
+                    )
+                }
+                Some(name.into())
+            }
             Some(Err(err)) => push_error_cow(err, ctx),
             None => generated_name,
         };
