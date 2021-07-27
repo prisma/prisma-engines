@@ -86,6 +86,7 @@ impl MySqlDatamodelConnector {
             ConnectorCapability::CompoundIds,
             ConnectorCapability::AnyId,
             ConnectorCapability::QueryRaw,
+            ConnectorCapability::ForeignKeys,
         ];
 
         if !is_planetscale {

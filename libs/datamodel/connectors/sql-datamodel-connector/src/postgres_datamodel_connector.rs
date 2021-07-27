@@ -73,6 +73,7 @@ impl PostgresDatamodelConnector {
             ConnectorCapability::AnyId,
             ConnectorCapability::QueryRaw,
             ConnectorCapability::NamedPrimaryKeys,
+            ConnectorCapability::ForeignKeys,
         ];
 
         let small_int = NativeTypeConstructor::without_args(SMALL_INT_TYPE_NAME, vec![ScalarType::Int]);

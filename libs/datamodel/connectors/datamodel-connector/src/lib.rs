@@ -32,6 +32,10 @@ pub trait Connector: Send + Sync {
         self.has_capability(ConnectorCapability::NamedPrimaryKeys)
     }
 
+    fn supports_named_foreign_keys(&self) -> bool {
+        self.has_capability(ConnectorCapability::NamedForeignKeys)
+    }
+
     fn supports_referential_action(&self, action: ReferentialAction) -> bool {
         self.referential_actions().contains(action)
     }
@@ -224,17 +228,19 @@ capabilities!(
     // General capabilities, not specific to any part of Prisma.
     ScalarLists,
     RelationsOverNonUniqueCriteria,
-    MultipleIndexesWithSameName,
     Enums,
     Json,
     AutoIncrement,
+    RelationFieldsInArbitraryOrder,
+    ForeignKeys,
+    //Start of ME/IE only capabilities
     AutoIncrementAllowedOnNonId,
     AutoIncrementMultipleAllowed,
     AutoIncrementNonIndexedAllowed,
-    RelationFieldsInArbitraryOrder,
-    ForeignKeys,
+    MultipleIndexesWithSameName,
     NamedPrimaryKeys,
-    // Start of query-engine-only Capabilities
+    NamedForeignKeys,
+    // Start of query-engine-only capabilities
     InsensitiveFilters,
     CreateMany,
     CreateManyWriteableAutoIncId,
