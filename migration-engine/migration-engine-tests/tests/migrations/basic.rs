@@ -495,3 +495,37 @@ fn compound_primary_keys_on_mapped_columns_must_work(api: TestApi) {
         table.assert_pk(|pk| pk.assert_columns(&["first_name", "family_name"]))
     });
 }
+
+#[test_connector(exclude(Sqlite, Mysql), preview_features("NamedConstraints"))]
+fn adding_a_primary_key_must_work(api: TestApi) {
+    let dm = r#"
+        generator js {
+                provider = "prisma-client-js"
+                previewFeatures = ["NamedConstraints"]
+        }
+    
+         model Test {
+             myId  Int
+             other Int @unique
+         }
+     "#;
+
+    api.schema_push(dm).send().assert_green_bang();
+    let dm2 = r#"
+         generator js {
+                provider = "prisma-client-js"
+                previewFeatures = ["NamedConstraints"]
+         }
+        
+         model Test {
+             myId  Int @id
+             other Int @unique
+         }
+     "#;
+
+    api.schema_push(dm2).send().assert_green_bang();
+
+    api.assert_schema().assert_table("Test", |t| {
+        t.assert_pk(|pk| pk.assert_constraint_name(Some("Test_pkey".into())))
+    });
+}

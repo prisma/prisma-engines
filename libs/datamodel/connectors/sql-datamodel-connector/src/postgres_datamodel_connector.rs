@@ -73,6 +73,7 @@ impl PostgresDatamodelConnector {
             ConnectorCapability::AnyId,
             ConnectorCapability::QueryRaw,
             ConnectorCapability::NamedPrimaryKeys,
+            ConnectorCapability::NamedForeignKeys,
             ConnectorCapability::ForeignKeys,
         ];
 

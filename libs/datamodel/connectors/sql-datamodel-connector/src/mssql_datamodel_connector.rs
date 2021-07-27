@@ -69,6 +69,7 @@ impl MsSqlDatamodelConnector {
             ConnectorCapability::AnyId,
             ConnectorCapability::QueryRaw,
             ConnectorCapability::NamedPrimaryKeys,
+            ConnectorCapability::NamedForeignKeys,
             ConnectorCapability::ForeignKeys,
         ];
 

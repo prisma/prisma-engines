@@ -190,6 +190,16 @@ impl<'a> TableAssertion<'a> {
         self
     }
 
+    pub fn assert_fk_with_name(self, name: &str) -> Self {
+        let matching_fk = self
+            .table
+            .foreign_keys
+            .iter()
+            .any(|found| found.constraint_name == Some(name.to_string()));
+        assert!(matching_fk, "Assertion failed. Could not find fk with name.");
+        self
+    }
+
     pub fn assert_does_not_have_column(self, column_name: &str) -> Self {
         if self.table.column(column_name).is_some() {
             panic!(
@@ -277,6 +287,19 @@ impl<'a> TableAssertion<'a> {
         }
 
         self
+    }
+
+    pub fn assert_has_index_name_and_type(self, name: &str, unique: bool) -> Self {
+        if self
+            .table
+            .indices
+            .iter()
+            .any(|idx| idx.name == name && idx.is_unique() == unique)
+        {
+            self
+        } else {
+            panic!("Could not find index with name {} and correct type", name);
+        }
     }
 
     pub fn debug_print(self) -> Self {
@@ -571,6 +594,12 @@ impl<'a> PrimaryKeyAssertion<'a> {
                 .any(|column| self.pk.columns.contains(&column.name) && column.auto_increment),
             "Assertion failed: expected no sequence on the primary key, but found one."
         );
+
+        self
+    }
+
+    pub fn assert_constraint_name(self, constraint_name: Option<String>) -> Self {
+        assert_eq!(self.pk.constraint_name, constraint_name);
 
         self
     }

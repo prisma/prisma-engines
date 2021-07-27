@@ -159,3 +159,81 @@ fn multi_column_indexes_and_unique_constraints_on_the_same_fields_do_not_collide
 
     api.schema_push(dm).send().assert_green_bang();
 }
+
+#[test_connector(preview_features("NamedConstraints"))]
+fn alter_constraint_name_push(api: TestApi) {
+    let plain_dm = api.datamodel_with_provider(
+        r#"
+         model A {
+           id   Int    @id
+           name String @unique
+           a    String
+           b    String
+           B    B[]    @relation("AtoB")
+           @@unique([a, b])
+           @@index([a])
+         }
+         model B {
+           a   String
+           b   String
+           aId Int
+           A   A      @relation("AtoB", fields: [aId], references: [id])
+           @@index([a,b])
+           @@id([a, b])
+         }
+     "#,
+    );
+
+    api.schema_push(plain_dm).send().assert_green_bang();
+    let no_named_pk = api.is_sqlite() || api.is_mysql();
+
+    let (singular_id, compound_id) = if no_named_pk {
+        ("", "")
+    } else {
+        (r#"("CustomId")"#, r#", map: "CustomCompoundId""#)
+    };
+
+    let custom_dm = api.datamodel_with_provider(&format!(
+        r#"
+         model A {{
+           id   Int    @id{}
+           name String @unique("CustomUnique")
+           a    String
+           b    String
+           B    B[]    @relation("AtoB")
+           @@unique([a, b], name: "compound", map:"CustomCompoundUnique")
+           @@index([a], map: "CustomIndex")
+         }}
+         model B {{
+           a   String
+           b   String
+           aId Int
+           A   A      @relation("AtoB", fields: [aId], references: [id], map: "CustomFK")
+           @@index([a,b], map: "AnotherCustomIndex")
+           @@id([a, b]{})
+         }}
+     "#,
+        singular_id, compound_id
+    ));
+
+    api.schema_push(custom_dm).send().assert_green_bang();
+
+    api.assert_schema().assert_table("A", |table| {
+        if !no_named_pk {
+            table.assert_pk(|pk| pk.assert_constraint_name(Some("CustomId".into())));
+        };
+        table.assert_has_index_name_and_type("CustomUnique", true);
+        table.assert_has_index_name_and_type("CustomCompoundUnique", true);
+        table.assert_has_index_name_and_type("CustomIndex", false)
+    });
+
+    api.assert_schema().assert_table("B", |table| {
+        if !no_named_pk {
+            table.assert_pk(|pk| pk.assert_constraint_name(Some("CustomCompoundId".into())));
+        };
+        if !api.is_sqlite() {
+            table.assert_fk_with_name("CustomFK");
+        }
+        table.assert_has_index_name_and_type("AnotherCustomIndex", false)
+    });
+}
