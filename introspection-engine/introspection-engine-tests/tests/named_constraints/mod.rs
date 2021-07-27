@@ -156,12 +156,12 @@ async fn introspecting_non_default_index_names_works(api: &TestApi) -> TestResul
     api.barrel()
         .execute(|migration| {
             migration.create_table("Single", move |t| {
-                t.add_column("id", types::integer().increments(true).nullable(false).unique(true));
+                t.add_column("id", types::integer().increments(true).nullable(false));
                 t.add_index("SomethingCustom", types::index(&["id"]));
             });
 
             migration.create_table("Compound", move |t| {
-                t.add_column("a", types::integer().increments(false).nullable(false).unique(true));
+                t.add_column("a", types::integer().increments(false).nullable(false));
                 t.add_column("b", types::integer().increments(false).nullable(false));
                 t.add_index("SomethingCustomCompound", types::index(&["a", "b"]));
             });
@@ -169,17 +169,20 @@ async fn introspecting_non_default_index_names_works(api: &TestApi) -> TestResul
         .await?;
 
     let dm = indoc! {r##"
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
         model Compound {
-          a Int @unique
+          a Int
           b Int
             
           @@index([a, b], map: "SomethingCustomCompound")
+          @@ignore
         }
-              
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.      
         model Single {
-          id Int  @unique @default(autoincrement())
+          id Int @default(autoincrement())
           
           @@index([id], map: "SomethingCustom")
+          @@ignore
         }
     "##};
 
@@ -194,12 +197,12 @@ async fn introspecting_default_index_names_works(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Single", move |t| {
-                t.add_column("id", types::integer().increments(true).nullable(false).unique(true));
+                t.add_column("id", types::integer().increments(true).nullable(false));
                 t.add_index("Single_id_idx", types::index(&["id"]));
             });
 
             migration.create_table("Compound", move |t| {
-                t.add_column("a", types::integer().increments(false).nullable(false).unique(true));
+                t.add_column("a", types::integer().increments(false).nullable(false));
                 t.add_column("b", types::integer().increments(false).nullable(false));
                 t.add_index("Compound_a_b_idx", types::index(&["a", "b"]));
             });
@@ -207,17 +210,21 @@ async fn introspecting_default_index_names_works(api: &TestApi) -> TestResult {
         .await?;
 
     let dm = indoc! {r##"
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.    
         model Compound {
-          a Int @unique
+          a Int
           b Int
             
           @@index([a, b])
+          @@ignore  
         }
-              
+        
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.      
         model Single {
-          id Int @unique @default(autoincrement())
+          id Int @default(autoincrement())
           
           @@index([id])
+          @@ignore
         }
     "##};
 
@@ -232,12 +239,15 @@ async fn introspecting_default_fk_names_works(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
             migration.create_table("User", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
             });
 
             migration.create_table("Post", move |t| {
-                t.add_column("id", types::primary());
-                t.add_column("user_id", types::integer().nullable(false).unique(true));
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("Post_pkey", types::primary_constraint(&["id"]));
+                t.add_column("user_id", types::integer().nullable(false));
+                t.add_index("Post_user_id_idx", types::index(&["user_id"]));
                 t.add_constraint(
                     "Post_user_id_fkey",
                     types::foreign_constraint(&["user_id"], "User", &["id"], None, None),
@@ -249,13 +259,15 @@ async fn introspecting_default_fk_names_works(api: &TestApi) -> TestResult {
     let dm = r#"
         model Post {
             id       Int @id @default(autoincrement())
-            user_id  Int  @unique
+            user_id  Int  
             User     User @relation(fields: [user_id], references: [id])
+            
+            @@index([user_id])
         }
 
         model User {
             id      Int @id @default(autoincrement())
-            Post Post?
+            Post    Post[]
         }
     "#;
 
@@ -269,12 +281,15 @@ async fn introspecting_custom_fk_names_works(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
             migration.create_table("User", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
             });
 
             migration.create_table("Post", move |t| {
-                t.add_column("id", types::primary());
-                t.add_column("user_id", types::integer().nullable(false).unique(true));
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("Post_pkey", types::primary_constraint(&["id"]));
+                t.add_column("user_id", types::integer().nullable(false));
+                t.add_index("Post_user_id_idx", types::index(&["user_id"]));
                 t.add_constraint(
                     "CustomFKName",
                     types::foreign_constraint(&["user_id"], "User", &["id"], None, None),
@@ -286,13 +301,15 @@ async fn introspecting_custom_fk_names_works(api: &TestApi) -> TestResult {
     let dm = r#"
         model Post {
             id       Int @id @default(autoincrement())
-            user_id  Int  @unique
+            user_id  Int
             User     User @relation(fields: [user_id], references: [id], map: "CustomFKName")
+            
+            @@index([user_id])
         }
 
         model User {
             id      Int @id @default(autoincrement())
-            Post Post?
+            Post    Post[]
         }
     "#;
 
