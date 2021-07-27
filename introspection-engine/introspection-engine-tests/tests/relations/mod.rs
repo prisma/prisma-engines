@@ -21,18 +21,18 @@ async fn one_to_one_req_relation(api: &TestApi) -> TestResult {
         })
         .await?;
 
-    let dm = formatdoc! {r##"
-        model Post {{
+    let dm = r#"
+        model Post {
             id       Int @id @default(autoincrement())
             user_id  Int  @unique
             User     User @relation(fields: [user_id], references: [id])
-        }}
+        }
 
-        model User {{
+        model User {
             id      Int @id @default(autoincrement())
             Post Post?
-        }}
-    "##};
+        }
+    "#;
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
