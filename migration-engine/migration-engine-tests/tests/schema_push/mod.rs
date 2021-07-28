@@ -162,8 +162,7 @@ fn multi_column_indexes_and_unique_constraints_on_the_same_fields_do_not_collide
 
 #[test_connector(preview_features("NamedConstraints"))]
 fn alter_constraint_name_push(api: TestApi) {
-    let plain_dm = api.datamodel_with_provider(
-        r#"
+    let plain_dm = r#"
          model A {
            id   Int    @id
            name String @unique
@@ -181,8 +180,7 @@ fn alter_constraint_name_push(api: TestApi) {
            @@index([a,b])
            @@id([a, b])
          }
-     "#,
-    );
+     "#;
 
     api.schema_push_w_datasource(plain_dm).send().assert_green_bang();
     let no_named_pk = api.is_sqlite() || api.is_mysql();
@@ -190,14 +188,14 @@ fn alter_constraint_name_push(api: TestApi) {
     let (singular_id, compound_id) = if no_named_pk {
         ("", "")
     } else {
-        (r#"("CustomId")"#, r#", map: "CustomCompoundId""#)
+        (r#"(map: "CustomId")"#, r#", map: "CustomCompoundId""#)
     };
 
-    let custom_dm = api.datamodel_with_provider(&format!(
+    let custom_dm = format!(
         r#"
          model A {{
            id   Int    @id{}
-           name String @unique("CustomUnique")
+           name String @unique(map: "CustomUnique")
            a    String
            b    String
            B    B[]    @relation("AtoB")
@@ -214,7 +212,7 @@ fn alter_constraint_name_push(api: TestApi) {
          }}
      "#,
         singular_id, compound_id
-    ));
+    );
 
     api.schema_push_w_datasource(custom_dm).send().assert_green_bang();
 
