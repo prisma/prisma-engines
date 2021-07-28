@@ -135,7 +135,6 @@ where
 
             for (graph, serializer) in queries {
                 let result = Self::execute_on(tx, graph, serializer).await?;
-                dbg!(">>>>>>> SUCCESS");
                 results.push(Ok(result));
             }
 

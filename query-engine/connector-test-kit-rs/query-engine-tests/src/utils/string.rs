@@ -51,9 +51,9 @@ pub fn fmt_execute_raw(query: &str, params: Vec<PrismaValue>) -> String {
 
     let params = serde_json::to_string(&params).unwrap();
 
-    dbg!(format!(
+    format!(
         r#"mutation {{ executeRaw(query: "{}", parameters: "{}") }}"#,
         query.replace("\"", "\\\""),
         params.replace("\"", "\\\"")
-    ))
+    )
 }
