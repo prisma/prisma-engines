@@ -9,7 +9,7 @@ use sql_schema_describer::{
 };
 
 impl SqlSchemaDifferFlavour for MysqlFlavour {
-    fn can_alter_index(&self) -> bool {
+    fn can_rename_index(&self) -> bool {
         !self.is_mariadb() && !self.is_mysql_5_6()
     }
 

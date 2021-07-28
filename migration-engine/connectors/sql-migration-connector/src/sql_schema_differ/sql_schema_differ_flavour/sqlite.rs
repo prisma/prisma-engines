@@ -6,6 +6,10 @@ use sql_schema_describer::{walkers::ColumnWalker, ColumnTypeFamily};
 use std::collections::HashSet;
 
 impl SqlSchemaDifferFlavour for SqliteFlavour {
+    fn can_rename_index(&self) -> bool {
+        false
+    }
+
     fn column_type_change(&self, differ: Pair<ColumnWalker<'_>>) -> Option<ColumnTypeChange> {
         match (differ.previous.column_type_family(), differ.next.column_type_family()) {
             (a, b) if a == b => None,
@@ -27,8 +31,6 @@ impl SqlSchemaDifferFlavour for SqliteFlavour {
                     || differ.dropped_columns().next().is_some()
                     || differ.added_columns().any(|col| col.arity().is_required())
                     || differ.any_column_changed()
-                    // ALTER INDEX does not exist on SQLite
-                    || differ.index_pairs().any(|pair| self.index_should_be_renamed(&pair))
                     || differ.created_foreign_keys().next().is_some()
                     || differ.dropped_foreign_keys().next().is_some()
             })
@@ -42,5 +44,9 @@ impl SqlSchemaDifferFlavour for SqliteFlavour {
 
     fn should_push_foreign_keys_from_created_tables(&self) -> bool {
         false
+    }
+
+    fn has_unnamed_foreign_keys(&self) -> bool {
+        true
     }
 }

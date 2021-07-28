@@ -113,7 +113,7 @@ fn push_inline_relations(model: ModelWalker<'_>, table: &mut sql::Table, flavour
         // Foreign key
         {
             let fk = sql::ForeignKey {
-                constraint_name: None,
+                constraint_name: relation_field.constraint_name(),
                 columns: fk_columns,
                 referenced_table: relation_field.referenced_model().database_name().to_owned(),
                 referenced_columns: relation_field.referenced_columns().map(String::from).collect(),

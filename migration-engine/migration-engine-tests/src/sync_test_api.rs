@@ -218,7 +218,7 @@ impl TestApi {
 
     /// Plan a `schemaPush` command
     pub fn schema_push(&self, dm: impl Into<String>) -> SchemaPush<'_> {
-        SchemaPush::new(&self.connector, dm.into(), &self.root.rt)
+        SchemaPush::new(&self.connector, self.datamodel_with_provider(&dm.into()), &self.root.rt)
     }
 
     pub fn tags(&self) -> BitFlags<Tags> {

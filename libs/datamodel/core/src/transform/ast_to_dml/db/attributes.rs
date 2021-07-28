@@ -230,7 +230,14 @@ fn visit_scalar_field_attributes<'ast>(
                     let db_name = if ctx.db.preview_features.contains(NamedConstraints) {
                         primary_key_constraint_name(&ast_model, model_data, args,  "@id", ctx)
                     } else {
-                        None
+                        ctx.is_sql_server().then(|| {
+                            format!(
+                                "PK__{}__{}",
+                                &ast_model.name(),
+                                scalar_field_data.mapped_name.unwrap_or(ast_field.name())
+                            )
+                                .into()
+                        })
                     };
 
 
@@ -600,7 +607,16 @@ fn visit_model_id<'ast>(
 
         (name, db_name)
     } else {
-        (None, None)
+        let db_name = ctx.is_sql_server().then(|| {
+            format!(
+                "PK__{}__{}",
+                &ast_model.name(),
+                get_field_db_names(model_id, &resolved_fields, ctx).iter().join("_")
+            )
+            .into()
+        });
+
+        (None, db_name)
     };
 
     model_data.primary_key = Some(PrimaryKeyData {

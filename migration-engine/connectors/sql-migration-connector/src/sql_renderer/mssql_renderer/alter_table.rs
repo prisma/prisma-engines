@@ -1,4 +1,5 @@
 use super::render_default;
+use crate::sql_renderer::common::Quoted;
 use crate::{
     flavour::MssqlFlavour,
     pair::Pair,
@@ -25,6 +26,7 @@ pub(crate) fn create_statements(
         changes,
         drop_constraints: BTreeSet::new(),
         add_constraints: BTreeSet::new(),
+        rename_primary_key: false,
         add_columns: Vec::new(),
         drop_columns: Vec::new(),
         column_mods: Vec::new(),
@@ -39,6 +41,7 @@ struct AlterTableConstructor<'a> {
     changes: &'a [TableChange],
     drop_constraints: BTreeSet<String>,
     add_constraints: BTreeSet<String>,
+    rename_primary_key: bool,
     add_columns: Vec<String>,
     drop_columns: Vec<String>,
     column_mods: Vec<String>,
@@ -50,6 +53,9 @@ impl<'a> AlterTableConstructor<'a> {
             match change {
                 TableChange::DropPrimaryKey => {
                     self.drop_primary_key();
+                }
+                TableChange::RenamePrimaryKey => {
+                    self.rename_primary_key = true;
                 }
                 TableChange::AddPrimaryKey => {
                     self.add_primary_key();
@@ -81,6 +87,34 @@ impl<'a> AlterTableConstructor<'a> {
                 "ALTER TABLE {} DROP CONSTRAINT {}",
                 self.renderer.quote_with_schema(self.tables.previous().name()),
                 self.drop_constraints.iter().join(",\n"),
+            ));
+        }
+
+        if self.rename_primary_key {
+            let with_schema = format!(
+                "{}.{}",
+                self.renderer.schema_name(),
+                self.tables
+                    .previous()
+                    .primary_key()
+                    .unwrap()
+                    .constraint_name
+                    .as_ref()
+                    .unwrap()
+            );
+
+            statements.push(format!(
+                "EXEC SP_RENAME N{}, N{}",
+                Quoted::Single(with_schema),
+                Quoted::Single(
+                    self.tables
+                        .next()
+                        .primary_key()
+                        .unwrap()
+                        .constraint_name
+                        .as_ref()
+                        .unwrap()
+                ),
             ));
         }
 
@@ -116,7 +150,7 @@ impl<'a> AlterTableConstructor<'a> {
     }
 
     fn drop_primary_key(&mut self) {
-        let constraint = self
+        let constraint_name = self
             .tables
             .previous()
             .primary_key()
@@ -124,12 +158,18 @@ impl<'a> AlterTableConstructor<'a> {
             .expect("Missing constraint name in DropPrimaryKey on MSSQL");
 
         self.drop_constraints
-            .insert(format!("{}", self.renderer.quote(constraint)));
+            .insert(format!("{}", self.renderer.quote(constraint_name)));
     }
 
     fn add_primary_key(&mut self) {
+        let constraint_name = self
+            .tables
+            .next()
+            .primary_key()
+            .and_then(|pk| pk.constraint_name.as_ref())
+            .expect("Missing constraint name in AddPrimaryKey on MSSQL");
+
         let columns = self.tables.next().primary_key_column_names().unwrap();
-        let non_quoted_columns = columns.iter();
         let mut quoted_columns = Vec::with_capacity(columns.len());
 
         for colname in columns {
@@ -137,9 +177,8 @@ impl<'a> AlterTableConstructor<'a> {
         }
 
         self.add_constraints.insert(format!(
-            "CONSTRAINT PK__{}__{} PRIMARY KEY ({})",
-            self.tables.next().name(),
-            non_quoted_columns.join("__"),
+            "CONSTRAINT {} PRIMARY KEY ({})",
+            constraint_name,
             quoted_columns.join(","),
         ));
     }

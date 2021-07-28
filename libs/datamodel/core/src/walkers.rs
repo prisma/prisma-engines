@@ -332,6 +332,9 @@ impl<'a> RelationFieldWalker<'a> {
                 }),
         }
     }
+    pub fn constraint_name(&self) -> Option<String> {
+        self.get().relation_info.fk_name.clone()
+    }
 
     pub fn on_update_action(&self) -> Option<ReferentialAction> {
         self.get().relation_info.on_update
