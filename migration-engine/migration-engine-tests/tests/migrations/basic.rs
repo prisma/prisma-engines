@@ -68,7 +68,7 @@ fn a_model_can_be_removed(api: TestApi) {
         }
     "#;
 
-    api.create_migration("initial", dm1, &directory).send_sync();
+    api.create_migration("initial", &dm1, &directory).send_sync();
 
     let dm2 = r#"
         model User {
@@ -77,7 +77,7 @@ fn a_model_can_be_removed(api: TestApi) {
         }
     "#;
 
-    api.create_migration("second-migration", dm2, &directory).send_sync();
+    api.create_migration("second-migration", &dm2, &directory).send_sync();
 
     api.apply_migrations(&directory)
         .send_sync()
@@ -90,11 +90,8 @@ fn a_model_can_be_removed(api: TestApi) {
 
 #[test_connector]
 fn adding_a_scalar_field_must_work(api: TestApi) {
-    let dm = format!(
-        r#"
-        {}
-
-        model Test {{
+    let dm = r#"
+        model Test {
             id          String @id @default(cuid())
             int         Int
             bigInt      BigInt
@@ -104,12 +101,10 @@ fn adding_a_scalar_field_must_work(api: TestApi) {
             dateTime    DateTime
             decimal     Decimal
             bytes       Bytes
-        }}
-    "#,
-        api.datasource_block(),
-    );
+        }
+    "#;
 
-    api.schema_push(&dm).send().assert_green_bang();
+    api.schema_push(dm).send().assert_green_bang();
 
     api.assert_schema().assert_table("Test", |table| {
         table

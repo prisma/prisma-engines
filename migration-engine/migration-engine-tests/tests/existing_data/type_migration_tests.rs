@@ -86,21 +86,14 @@ fn migrating_a_required_column_from_int_to_string_should_cast(api: TestApi) {
 
 #[test_connector(capabilities(ScalarLists))]
 fn changing_a_string_array_column_to_scalar_is_fine(api: TestApi) {
-    let datasource_block = api.datasource_block();
-
-    let dm1 = format!(
-        r#"
-        {datasource_block}
-
-        model Film {{
+    let dm1 = r#"
+        model Film {
             id String @id
             mainProtagonist String[]
-        }}
-        "#,
-        datasource_block = datasource_block,
-    );
+        }
+        "#;
 
-    api.schema_push(&dm1).send().assert_green_bang();
+    api.schema_push(dm1).send().assert_green_bang();
 
     api.insert("Film")
         .value("id", "film1")
@@ -110,19 +103,14 @@ fn changing_a_string_array_column_to_scalar_is_fine(api: TestApi) {
         )
         .result_raw();
 
-    let dm2 = format!(
-        r#"
-            {datasource_block}
-
-            model Film {{
+    let dm2 = r#"
+            model Film {
                 id String @id
                 mainProtagonist String
-            }}
-            "#,
-        datasource_block = datasource_block,
-    );
+            }
+            "#;
 
-    api.schema_push(&dm2).force(true).send().assert_green_bang();
+    api.schema_push(dm2).force(true).send().assert_green_bang();
 
     api.assert_schema().assert_table("Film", |table| {
         table.assert_column("mainProtagonist", |column| column.assert_is_required())
@@ -137,40 +125,28 @@ fn changing_a_string_array_column_to_scalar_is_fine(api: TestApi) {
 
 #[test_connector(capabilities(ScalarLists))]
 fn changing_an_int_array_column_to_scalar_is_not_possible(api: TestApi) {
-    let datasource_block = api.datasource_block();
-
-    let dm1 = format!(
-        r#"
-        {datasource_block}
-
-        model Film {{
+    let dm1 = r#"
+        model Film {
             id String @id
             mainProtagonist Int[]
-        }}
-        "#,
-        datasource_block = datasource_block,
-    );
+        }
+        "#;
 
-    api.schema_push(&dm1).send().assert_green_bang();
+    api.schema_push(dm1).send().assert_green_bang();
 
     api.insert("Film")
         .value("id", "film1")
         .value("mainProtagonist", Value::Array(Some(vec![7.into(), 11.into()])))
         .result_raw();
 
-    let dm2 = format!(
-        r#"
-            {datasource_block}
-
-            model Film {{
+    let dm2 = r#"
+            model Film {
                 id String @id
                 mainProtagonist Int
-            }}
-            "#,
-        datasource_block = datasource_block,
-    );
+            }
+            "#;
 
-    api.schema_push(&dm2)
+    api.schema_push(dm2)
         .force(true)
         .send()
         .assert_no_warning()

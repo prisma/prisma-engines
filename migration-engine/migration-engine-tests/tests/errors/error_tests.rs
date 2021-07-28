@@ -342,18 +342,12 @@ fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: TestApi
 
 #[test_connector(tags(Mysql56))]
 fn json_fields_must_be_rejected(api: TestApi) {
-    let dm = format!(
-        r#"
-        {}
-
-        model Test {{
+    let dm = r#"
+        model Test {
             id Int @id
             j Json
-        }}
-
-        "#,
-        api.datasource_block()
-    );
+        }
+        "#;
 
     let result = api.schema_push(dm).send_unwrap_err().to_user_facing().unwrap_known();
 
