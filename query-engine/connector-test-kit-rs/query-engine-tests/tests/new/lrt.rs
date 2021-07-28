@@ -1,11 +1,11 @@
-use query_engine_tests::*;
-// use indoc::indoc;
+use query_engine_tests::test_suite;
 
 /// LRT = Long-Running Transactions
 /// Note that if cache expiration tests fail, make sure `CLOSED_TX_CLEANUP` is set correctly (low value like 2) from the .envrc.
 #[test_suite(schema(generic))]
 mod lrt {
     use query_core::TransactionError;
+    use query_engine_tests::*;
     use tokio::time;
 
     #[connector_test]
@@ -133,7 +133,72 @@ mod lrt {
         Ok(())
     }
 
-    // No acquisition.
-    // Batches with lrt
-    // Raw and lrt
+    // Syntax for raw varies too much for a generic test, use postgres for basic testing.
+    #[connector_test(only(Postgres))]
+    async fn raw_queries(mut runner: Runner) -> TestResult<()> {
+        // Tx expires after five second.
+        let tx_id = runner.executor().start_tx(5, 5).await?;
+        runner.set_active_tx(tx_id.clone());
+
+        insta::assert_snapshot!(
+          run_query!(&runner, fmt_execute_raw("INSERT INTO \"TestModel\"(id, field) VALUES ($1, $2)", vec![PrismaValue::Int(1), PrismaValue::String("Test".to_owned())])),
+          @r###"{"data":{"executeRaw":1}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, fmt_query_raw("SELECT * FROM \"TestModel\"", vec![])),
+          @r###"{"data":{"queryRaw":[{"id":1,"field":"Test"}]}}"###
+        );
+
+        runner.executor().commit_tx(tx_id.clone()).await?;
+        runner.clear_active_tx();
+
+        // Data still there after commit.
+        insta::assert_snapshot!(
+          run_query!(&runner, fmt_query_raw("SELECT * FROM \"TestModel\"", vec![])),
+          @r###"{"data":{"queryRaw":[{"id":1,"field":"Test"}]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn batch_queries(mut runner: Runner) -> TestResult<()> {
+        // Tx expires after five second.
+        let tx_id = runner.executor().start_tx(5, 5).await?;
+        runner.set_active_tx(tx_id.clone());
+
+        // One dup key, will cause failure of the batch.
+        let queries = vec![
+            r#"mutation { createOneTestModel(data: { id: 1 }) { id }}"#.to_string(),
+            r#"mutation { createOneTestModel(data: { id: 2 }) { id }}"#.to_string(),
+            r#"mutation { createOneTestModel(data: { id: 2 }) { id }}"#.to_string(),
+            r#"mutation { createOneTestModel(data: { id: 3 }) { id }}"#.to_string(),
+        ];
+
+        // Tx flag is not set, but it executes on an LRT.
+        let batch_results = runner.batch(queries, false).await?;
+        batch_results.assert_failure(2002, None);
+
+        runner.executor().commit_tx(tx_id.clone()).await?;
+        runner.clear_active_tx();
+
+        let partial_data_res = run_query!(&runner, "query { findManyTestModel { id }}");
+        match runner.connector() {
+            // Postgres aborts transactions, data is lost.
+            ConnectorTag::Postgres(_) => insta::assert_snapshot!(
+              partial_data_res,
+              @r###"{"data":{"findManyTestModel":[]}}"###
+            ),
+            // Partial data still there because a batch will not be auto-rolled back by other connectors.
+            _ => insta::assert_snapshot!(
+                partial_data_res,
+                @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
+            ),
+        }
+
+        Ok(())
+    }
+
+    // No acquisition in timeframe - not easily testable, moved to client integration tests.
 }

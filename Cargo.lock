@@ -3400,6 +3400,7 @@ dependencies = [
  "datamodel-connector",
  "indoc",
  "insta",
+ "prisma-value",
  "query-test-macros",
  "query-tests-setup",
  "serde_json",

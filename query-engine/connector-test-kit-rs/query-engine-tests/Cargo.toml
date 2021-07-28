@@ -18,6 +18,7 @@ datamodel-connector = { path = "../../../libs/datamodel/connectors/datamodel-con
 base64 = "0.13"
 uuid = "0.8"
 tokio = "1.8"
+prisma-value = { path = "../../../libs/prisma-value" }
 
 [dev-dependencies]
 insta = "1.7.1"

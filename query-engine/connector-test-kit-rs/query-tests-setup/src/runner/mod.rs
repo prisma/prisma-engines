@@ -12,8 +12,13 @@ use colored::*;
 
 #[async_trait::async_trait]
 pub trait RunnerInterface: Sized {
+    /// Initializes the runner.
     async fn load(datamodel: String, connector_tag: ConnectorTag) -> TestResult<Self>;
+
+    /// Queries the engine.
     async fn query(&self, query: String) -> TestResult<QueryResult>;
+
+    /// Queries the engine with a batch.
     async fn batch(&self, queries: Vec<String>, transaction: bool) -> TestResult<QueryResult>;
 
     /// The connector tag used to load this runner.

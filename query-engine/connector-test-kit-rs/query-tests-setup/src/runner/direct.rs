@@ -58,7 +58,7 @@ impl RunnerInterface for DirectRunner {
             transaction,
         ));
 
-        Ok(handler.handle(query, None).await.into())
+        Ok(handler.handle(query, self.current_tx_id.clone()).await.into())
     }
 
     fn connector(&self) -> &crate::ConnectorTag {

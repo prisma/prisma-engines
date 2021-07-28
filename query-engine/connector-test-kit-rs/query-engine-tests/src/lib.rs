@@ -11,3 +11,4 @@ pub use std::convert::TryFrom;
 pub use tracing;
 pub use tracing_futures::WithSubscriber;
 pub use utils::*;
+pub use prisma_value::*;
