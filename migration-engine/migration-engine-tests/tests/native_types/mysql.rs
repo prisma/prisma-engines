@@ -774,12 +774,12 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
             &colnames,
         );
 
-        api.schema_push(&dm1).send().assert_green_bang();
+        api.schema_push_w_datasource(&dm1).send().assert_green_bang();
 
         api.query(insert.into());
 
         tracing::info!("cast migration");
-        api.schema_push(&dm2).send().assert_green_bang();
+        api.schema_push_w_datasource(&dm2).send().assert_green_bang();
 
         api.assert_schema().assert_table("Test", |table| {
             to_types.iter().enumerate().fold(
@@ -835,13 +835,13 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
             ).into());
         }
 
-        api.schema_push(&dm1).send().assert_green_bang();
+        api.schema_push_w_datasource(&dm1).send().assert_green_bang();
 
         api.query(insert.into());
 
         tracing::info!("cast migration");
 
-        api.schema_push(&dm2)
+        api.schema_push_w_datasource(&dm2)
             .force(true)
             .send()
             .assert_executable()
@@ -898,13 +898,13 @@ fn impossible_casts_with_existing_data_should_warn(api: TestApi) {
             ).into());
         }
 
-        api.schema_push(&dm1).send().assert_green_bang();
+        api.schema_push_w_datasource(&dm1).send().assert_green_bang();
 
         api.query(insert.into());
 
         tracing::info!("cast migration");
 
-        api.schema_push(&dm2)
+        api.schema_push_w_datasource(&dm2)
             .force(true)
             .send()
             .assert_executable()
@@ -959,17 +959,17 @@ fn typescript_starter_schema_with_native_types_is_idempotent(api: TestApi) {
 
     "#;
 
-    api.schema_push(dm)
+    api.schema_push_w_datasource(dm)
         .migration_id(Some("first"))
         .send()
         .assert_green_bang()
         .assert_has_executed_steps();
-    api.schema_push(dm)
+    api.schema_push_w_datasource(dm)
         .migration_id(Some("second"))
         .send()
         .assert_green_bang()
         .assert_no_steps();
-    api.schema_push(dm2)
+    api.schema_push_w_datasource(dm2)
         .migration_id(Some("third"))
         .send()
         .assert_green_bang()
@@ -1014,23 +1014,23 @@ fn typescript_starter_schema_with_different_native_types_is_idempotent(api: Test
         }
     "#;
 
-    api.schema_push(dm)
+    api.schema_push_w_datasource(dm)
         .migration_id(Some("first"))
         .send()
         .assert_green_bang()
         .assert_has_executed_steps();
-    api.schema_push(dm)
+    api.schema_push_w_datasource(dm)
         .migration_id(Some("second"))
         .send()
         .assert_green_bang()
         .assert_no_steps();
 
-    api.schema_push(dm2)
+    api.schema_push_w_datasource(dm2)
         .migration_id(Some("third"))
         .send()
         .assert_green_bang()
         .assert_has_executed_steps();
-    api.schema_push(dm2)
+    api.schema_push_w_datasource(dm2)
         .migration_id(Some("third")) // TODO (matthias) why does this work??
         .send()
         .assert_green_bang()

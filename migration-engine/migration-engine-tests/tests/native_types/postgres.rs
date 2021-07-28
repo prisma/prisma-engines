@@ -821,7 +821,7 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
 
         tracing::info!(dm = dm1.as_str());
 
-        api.schema_push(&dm1).send().assert_green_bang();
+        api.schema_push_w_datasource(&dm1).send().assert_green_bang();
 
         // inserts
         api.query(insert.into());
@@ -846,7 +846,7 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
             columns = next_columns
         ));
 
-        api.schema_push(&dm2).send().assert_green_bang();
+        api.schema_push_w_datasource(&dm2).send().assert_green_bang();
 
         // second assertions
         api.assert_schema().assert_table("A", |table| {
@@ -914,7 +914,7 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
             columns = previous_columns,
         ));
 
-        api.schema_push(&dm1).send().assert_green_bang();
+        api.schema_push_w_datasource(&dm1).send().assert_green_bang();
 
         // inserts
         api.query(insert.into());
@@ -940,7 +940,10 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
             columns = next_columns,
         ));
 
-        api.schema_push(&dm2).force(true).send().assert_warnings(&warnings);
+        api.schema_push_w_datasource(&dm2)
+            .force(true)
+            .send()
+            .assert_warnings(&warnings);
 
         //second assertions same as first
         api.assert_schema().assert_table("A", |table| {
@@ -1013,7 +1016,7 @@ fn not_castable_with_existing_data_should_warn(api: TestApi) {
             columns = previous_columns,
         ));
 
-        api.schema_push(&dm1).send().assert_green_bang();
+        api.schema_push_w_datasource(&dm1).send().assert_green_bang();
 
         // inserts
         api.query(insert.into());
@@ -1040,7 +1043,7 @@ fn not_castable_with_existing_data_should_warn(api: TestApi) {
 
         // todo we could force here and then check that the db really returns not castable
         // then we would again need to have separate calls per mapping
-        api.schema_push(&dm2).send().assert_warnings(&warnings);
+        api.schema_push_w_datasource(&dm2).send().assert_warnings(&warnings);
 
         //second assertions same as first
         api.assert_schema().assert_table("A", |table| {
@@ -1188,7 +1191,7 @@ fn safe_casts_from_array_with_existing_data_should_work(api: TestApi) {
             columns = previous_columns,
         ));
 
-        api.schema_push(&dm1).send().assert_green_bang();
+        api.schema_push_w_datasource(&dm1).send().assert_green_bang();
 
         // inserts
         api.query(insert.into());
@@ -1213,7 +1216,7 @@ fn safe_casts_from_array_with_existing_data_should_work(api: TestApi) {
             columns = next_columns,
         ));
 
-        api.schema_push(&dm2).send().assert_green_bang();
+        api.schema_push_w_datasource(&dm2).send().assert_green_bang();
 
         //second assertions
         api.assert_schema().assert_table("A", |table| {
@@ -1269,17 +1272,17 @@ fn typescript_starter_schema_with_native_types_is_idempotent(api: TestApi) {
     "#,
     );
 
-    api.schema_push(&dm)
+    api.schema_push_w_datasource(&dm)
         .migration_id(Some("first"))
         .send()
         .assert_green_bang()
         .assert_has_executed_steps();
-    api.schema_push(&dm)
+    api.schema_push_w_datasource(&dm)
         .migration_id(Some("second"))
         .send()
         .assert_green_bang()
         .assert_no_steps();
-    api.schema_push(&dm2)
+    api.schema_push_w_datasource(&dm2)
         .migration_id(Some("third"))
         .send()
         .assert_green_bang()
@@ -1328,22 +1331,22 @@ fn typescript_starter_schema_with_differnt_native_types_is_idempotent(api: TestA
     "#,
     );
 
-    api.schema_push(&dm)
+    api.schema_push_w_datasource(&dm)
         .migration_id(Some("first"))
         .send()
         .assert_green_bang()
         .assert_has_executed_steps();
-    api.schema_push(&dm)
+    api.schema_push_w_datasource(&dm)
         .migration_id(Some("second"))
         .send()
         .assert_green_bang()
         .assert_no_steps();
-    api.schema_push(&dm2)
+    api.schema_push_w_datasource(&dm2)
         .migration_id(Some("third"))
         .send()
         .assert_green_bang()
         .assert_has_executed_steps();
-    api.schema_push(&dm2)
+    api.schema_push_w_datasource(&dm2)
         .migration_id(Some("fourth"))
         .send()
         .assert_green_bang()

@@ -10,7 +10,7 @@ fn adding_an_id_field_of_type_int_with_autoincrement_works(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green_bang();
     api.assert_schema().assert_table("Test", |t| {
         t.assert_column("myId", |c| {
             if api.is_postgres() {
@@ -30,7 +30,7 @@ fn adding_multiple_optional_fields_to_an_existing_model_works(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green_bang();
 
     let dm2 = r#"
         model Cat {
@@ -40,7 +40,7 @@ fn adding_multiple_optional_fields_to_an_existing_model_works(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green_bang();
 
     api.assert_schema().assert_table("Cat", |table| {
         table
@@ -104,7 +104,7 @@ fn adding_a_scalar_field_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green_bang();
 
     api.assert_schema().assert_table("Test", |table| {
         table
@@ -136,7 +136,10 @@ fn adding_a_scalar_field_must_work(api: TestApi) {
     });
 
     // Check that the migration is idempotent.
-    api.schema_push(dm).send().assert_green_bang().assert_no_steps();
+    api.schema_push_w_datasource(dm)
+        .send()
+        .assert_green_bang()
+        .assert_no_steps();
 }
 
 #[test_connector]
@@ -148,7 +151,7 @@ fn adding_an_optional_field_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green_bang();
     api.assert_schema().assert_table("Test", |table| {
         table.assert_column("field", |column| column.assert_default(None).assert_is_nullable())
     });
@@ -162,7 +165,7 @@ fn adding_an_id_field_with_a_special_name_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green_bang();
     api.assert_schema()
         .assert_table("Test", |table| table.assert_has_column("specialName"));
 }
@@ -176,7 +179,7 @@ fn adding_an_id_field_of_type_int_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green_bang();
     api.assert_schema()
         .assert_table("Test", |t| t.assert_column("myId", |c| c.assert_no_auto_increment()));
 }
@@ -190,7 +193,7 @@ fn adding_an_id_field_of_type_int_must_work_for_sqlite(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green_bang();
 
     api.assert_schema().assert_table("Test", |table| {
         table.assert_column("myId", |col| col.assert_auto_increments())
@@ -206,7 +209,7 @@ fn removing_a_scalar_field_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green_bang();
 
     api.assert_schema()
         .assert_table("Test", |table| table.assert_columns_count(2).assert_has_column("field"));
@@ -217,7 +220,7 @@ fn removing_a_scalar_field_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green_bang();
 
     api.assert_schema()
         .assert_table("Test", |table| table.assert_column_count(1));
@@ -232,7 +235,7 @@ fn update_type_of_scalar_field_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green_bang();
 
     api.assert_schema().assert_table("Test", |table| {
         table.assert_column("field", |column| column.assert_type_is_string())
@@ -245,7 +248,7 @@ fn update_type_of_scalar_field_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green_bang();
 
     api.assert_schema().assert_table("Test", |table| {
         table.assert_column("field", |column| column.assert_type_is_int())
@@ -261,7 +264,7 @@ fn updating_db_name_of_a_scalar_field_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green_bang();
     api.assert_schema()
         .assert_table("A", |table| table.assert_has_column("name1"));
 
@@ -272,7 +275,7 @@ fn updating_db_name_of_a_scalar_field_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green_bang();
     api.assert_schema().assert_table("A", |t| {
         t.assert_columns_count(2)
             .assert_has_column("id")
@@ -310,7 +313,7 @@ fn reordering_and_altering_models_at_the_same_time_works(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green_bang();
 
     let dm2 = r#"
         generator js {
@@ -340,7 +343,7 @@ fn reordering_and_altering_models_at_the_same_time_works(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green_bang();
 }
 
 #[test_connector]
@@ -357,7 +360,7 @@ fn switching_databases_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green_bang();
 
     let dm2 = r#"
         datasource db {
@@ -371,7 +374,7 @@ fn switching_databases_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2)
+    api.schema_push_w_datasource(dm2)
         .migration_id(Some("mig2"))
         .send()
         .assert_green_bang();
@@ -390,7 +393,7 @@ fn renaming_a_datasource_works(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green_bang();
 
     let dm2 = r#"
         datasource db2 {
@@ -403,7 +406,7 @@ fn renaming_a_datasource_works(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2)
+    api.schema_push_w_datasource(dm2)
         .migration_id(Some("mig02"))
         .send()
         .assert_green_bang()
@@ -421,7 +424,7 @@ fn simple_type_aliases_in_migrations_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green_bang();
 }
 
 #[test_connector]
@@ -436,7 +439,7 @@ fn created_at_does_not_get_arbitrarily_migrated(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green_bang();
     api.assert_schema().assert_table("Fruit", |t| {
         t.assert_column("createdAt", |c| c.assert_default(Some(DefaultValue::now())))
     });
@@ -452,7 +455,10 @@ fn created_at_does_not_get_arbitrarily_migrated(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send().assert_green_bang().assert_no_steps();
+    api.schema_push_w_datasource(dm2)
+        .send()
+        .assert_green_bang()
+        .assert_no_steps();
 }
 
 #[test_connector]
@@ -466,7 +472,7 @@ fn basic_compound_primary_keys_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green_bang();
 
     api.assert_schema().assert_table("User", |table| {
         table.assert_pk(|pk| pk.assert_columns(&["lastName", "firstName"]))
@@ -484,7 +490,7 @@ fn compound_primary_keys_on_mapped_columns_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green_bang();
 
     api.assert_schema().assert_table("User", |table| {
         table.assert_pk(|pk| pk.assert_columns(&["first_name", "family_name"]))
@@ -505,7 +511,7 @@ fn adding_a_primary_key_must_work(api: TestApi) {
          }
      "#;
 
-    api.schema_push(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green_bang();
     let dm2 = r#"
          generator js {
                 provider = "prisma-client-js"
@@ -518,7 +524,7 @@ fn adding_a_primary_key_must_work(api: TestApi) {
          }
      "#;
 
-    api.schema_push(dm2).send().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green_bang();
 
     api.assert_schema().assert_table("Test", |t| {
         t.assert_pk(|pk| pk.assert_constraint_name(Some("Test_pkey".into())))

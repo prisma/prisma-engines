@@ -15,7 +15,7 @@ fn changing_the_type_of_an_id_field_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green_bang();
 
     api.assert_schema().assert_table("A", |table| {
         table
@@ -37,7 +37,7 @@ fn changing_the_type_of_an_id_field_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green_bang();
 
     api.assert_schema().assert_table("A", |table| {
         table
@@ -66,7 +66,7 @@ fn models_with_an_autoincrement_field_as_part_of_a_multi_field_id_can_be_created
         }
     "#;
 
-    api.schema_push(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green_bang();
 
     api.assert_schema().assert_table("Todo", |table| {
         table
@@ -97,7 +97,7 @@ fn making_an_existing_id_field_autoincrement_works(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green_bang();
 
     api.assert_schema().assert_table("Post", |model| {
         model.assert_pk(|pk| pk.assert_columns(&["id"]).assert_has_no_autoincrement())
@@ -132,14 +132,17 @@ fn making_an_existing_id_field_autoincrement_works(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green_bang();
 
     api.assert_schema().assert_table("Post", |model| {
         model.assert_pk(|pk| pk.assert_columns(&["id"]).assert_has_autoincrement())
     });
 
     // Check that the migration is idempotent.
-    api.schema_push(dm2).send().assert_green_bang().assert_no_steps();
+    api.schema_push_w_datasource(dm2)
+        .send()
+        .assert_green_bang()
+        .assert_no_steps();
 
     // MySQL cannot add autoincrement property to a column that already has data.
     if !api.is_mysql() {
@@ -167,7 +170,7 @@ fn removing_autoincrement_from_an_existing_field_works(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green_bang();
 
     api.assert_schema().assert_table("Post", |model| {
         model.assert_pk(|pk| pk.assert_columns(&["id"]).assert_has_autoincrement())
@@ -196,14 +199,14 @@ fn removing_autoincrement_from_an_existing_field_works(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green_bang();
 
     api.assert_schema().assert_table("Post", |model| {
         model.assert_pk(|pk| pk.assert_columns(&["id"]).assert_has_no_autoincrement())
     });
 
     // Check that the migration is idempotent.
-    api.schema_push(dm2)
+    api.schema_push_w_datasource(dm2)
         .migration_id(Some("idempotency-check"))
         .send()
         .assert_green_bang()
@@ -229,7 +232,7 @@ fn making_an_existing_id_field_autoincrement_works_with_indices(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green_bang();
 
     api.assert_schema().assert_table("Post", |model| {
         model
@@ -261,7 +264,7 @@ fn making_an_existing_id_field_autoincrement_works_with_indices(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green_bang();
 
     api.assert_schema().assert_table("Post", |model| {
         model
@@ -270,7 +273,10 @@ fn making_an_existing_id_field_autoincrement_works_with_indices(api: TestApi) {
     });
 
     // Check that the migration is idempotent.
-    api.schema_push(dm2).send().assert_green_bang().assert_no_steps();
+    api.schema_push_w_datasource(dm2)
+        .send()
+        .assert_green_bang()
+        .assert_no_steps();
 
     assert_eq!(
         3,
@@ -308,7 +314,7 @@ fn making_an_existing_id_field_autoincrement_works_with_foreign_keys(api: TestAp
         }
     "#;
 
-    api.schema_push(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green_bang();
 
     api.assert_schema().assert_table("Post", |model| {
         model.assert_pk(|pk| pk.assert_columns(&["id"]).assert_has_no_autoincrement())
@@ -370,7 +376,7 @@ fn making_an_existing_id_field_autoincrement_works_with_foreign_keys(api: TestAp
         }
     "#;
 
-    api.schema_push(dm2).send().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green_bang();
 
     api.assert_schema().assert_table("Post", |model| {
         model.assert_pk(|pk| pk.assert_columns(&["id"]).assert_has_autoincrement())
@@ -404,7 +410,7 @@ fn flipping_autoincrement_on_and_off_works(api: TestApi) {
     "#;
 
     for dm in [dm_with, dm_without].iter().cycle().take(5) {
-        api.schema_push(*dm).send().assert_green_bang();
+        api.schema_push_w_datasource(*dm).send().assert_green_bang();
     }
 }
 
@@ -418,7 +424,7 @@ fn making_an_autoincrement_default_an_expression_then_autoincrement_again_works(
         }
     "#;
 
-    api.schema_push(dm1)
+    api.schema_push_w_datasource(dm1)
         .migration_id(Some("apply_dm1"))
         .send()
         .assert_green_bang();
@@ -434,7 +440,7 @@ fn making_an_autoincrement_default_an_expression_then_autoincrement_again_works(
         }
     "#;
 
-    api.schema_push(dm2)
+    api.schema_push_w_datasource(dm2)
         .migration_id(Some("apply_dm2"))
         .send()
         .assert_green_bang();
@@ -446,7 +452,7 @@ fn making_an_autoincrement_default_an_expression_then_autoincrement_again_works(
     });
 
     // Now re-apply the sequence.
-    api.schema_push(dm1)
+    api.schema_push_w_datasource(dm1)
         .migration_id(Some("apply_dm1_again"))
         .send()
         .assert_green_bang();
@@ -470,7 +476,7 @@ fn migrating_a_unique_constraint_to_a_primary_key_works(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green_bang();
 
     api.assert_schema().assert_table("model1", |table| {
         table
@@ -496,7 +502,7 @@ fn migrating_a_unique_constraint_to_a_primary_key_works(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2)
+    api.schema_push_w_datasource(dm2)
         .force(true)
         .send()
         .assert_executable()

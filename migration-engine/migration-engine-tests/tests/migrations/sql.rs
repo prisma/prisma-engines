@@ -9,7 +9,7 @@ fn can_handle_reserved_sql_keywords_for_model_name(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green_bang();
     api.assert_schema()
         .assert_table("Group", |t| t.assert_column("field", |c| c.assert_type_is_string()));
 
@@ -20,7 +20,7 @@ fn can_handle_reserved_sql_keywords_for_model_name(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green_bang();
     api.assert_schema()
         .assert_table("Group", |t| t.assert_column("field", |c| c.assert_type_is_int()));
 }
@@ -34,7 +34,7 @@ fn can_handle_reserved_sql_keywords_for_field_name(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green_bang();
     api.assert_schema()
         .assert_table("Test", |t| t.assert_column("Group", |c| c.assert_type_is_string()));
 
@@ -45,7 +45,7 @@ fn can_handle_reserved_sql_keywords_for_field_name(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green_bang();
     api.assert_schema()
         .assert_table("Test", |t| t.assert_column("Group", |c| c.assert_type_is_int()));
 }
@@ -62,7 +62,7 @@ fn creating_tables_without_primary_key_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green_bang();
 
     api.assert_schema().assert_table("Pair", |table| {
         table
@@ -91,7 +91,7 @@ fn relations_to_models_without_a_primary_key_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green_bang();
 
     api.assert_schema()
         .assert_table("Pair", |table| table.assert_has_no_pk())
@@ -121,7 +121,7 @@ fn relations_to_models_with_no_pk_and_a_single_unique_required_field_work(api: T
         }
     "#;
 
-    api.schema_push(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green_bang();
 
     api.assert_schema()
         .assert_table("Pair", |table| table.assert_has_no_pk())
@@ -145,7 +145,7 @@ fn reserved_sql_key_words_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green_bang();
 
     api.assert_schema().assert_table("Group", |table| {
         table.assert_fk_on_columns(&["parent_id"], |fk| fk.assert_references("Group", &["id"]))
@@ -166,7 +166,7 @@ fn enum_value_with_database_names_must_work(api: TestApi) {
         }
     "##;
 
-    api.schema_push(dm)
+    api.schema_push_w_datasource(dm)
         .migration_id(Some("initial"))
         .send()
         .assert_green_bang();
@@ -194,14 +194,14 @@ fn enum_value_with_database_names_must_work(api: TestApi) {
     "##;
 
     if api.is_mysql() {
-        api.schema_push(dm).force(true).send().assert_warnings(&["The values [hongry] on the enum `Cat_mood` will be removed. If these variants are still used in the database, this will fail.".into()]);
+        api.schema_push_w_datasource(dm).force(true).send().assert_warnings(&["The values [hongry] on the enum `Cat_mood` will be removed. If these variants are still used in the database, this will fail.".into()]);
 
         api.assert_schema()
             .assert_enum(&api.normalize_identifier("Cat_mood"), |enm| {
                 enm.assert_values(&["ANGRY", "hongery"])
             });
     } else {
-        api.schema_push(dm).force(true).send().assert_warnings(&["The values [hongry] on the enum `CatMood` will be removed. If these variants are still used in the database, this will fail.".into()]);
+        api.schema_push_w_datasource(dm).force(true).send().assert_warnings(&["The values [hongry] on the enum `CatMood` will be removed. If these variants are still used in the database, this will fail.".into()]);
         api.assert_schema()
             .assert_enum("CatMood", |enm| enm.assert_values(&["ANGRY", "hongery"]));
     }
@@ -222,7 +222,7 @@ fn enum_defaults_must_work(api: TestApi) {
         }
     "##;
 
-    api.schema_push(dm)
+    api.schema_push_w_datasource(dm)
         .migration_id(Some("initial"))
         .send()
         .assert_green_bang();
@@ -274,7 +274,7 @@ fn id_as_part_of_relation_must_work(api: TestApi) {
         }
     "##;
 
-    api.schema_push(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green_bang();
 
     api.assert_schema().assert_table("Cat", |table| {
         table
@@ -304,7 +304,7 @@ fn multi_field_id_as_part_of_relation_must_work(api: TestApi) {
         }
     "##;
 
-    api.schema_push(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green_bang();
 
     api.assert_schema().assert_table("Cat", |table| {
         table
@@ -335,7 +335,7 @@ fn remapped_multi_field_id_as_part_of_relation_must_work(api: TestApi) {
         }
     "##;
 
-    api.schema_push(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green_bang();
 
     api.assert_schema().assert_table("Cat", |table| {
         table
@@ -368,7 +368,7 @@ fn unique_constraints_on_composite_relation_fields(api: TestApi) {
         }
     "##;
 
-    api.schema_push(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green_bang();
 
     api.assert_schema().assert_table("Parent", |table| {
         table.assert_index_on_columns(&["chiid", "chic"], |idx| idx.assert_is_unique())
@@ -397,7 +397,7 @@ fn indexes_on_composite_relation_fields(api: TestApi) {
         }
     "##;
 
-    api.schema_push(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green_bang();
 
     api.assert_schema().assert_table("SpamList", |table| {
         table.assert_index_on_columns(&["ufn", "uln"], |idx| idx.assert_is_not_unique())
@@ -438,9 +438,9 @@ fn dropping_mutually_referencing_tables_works(api: TestApi) {
     }
     "#;
 
-    api.schema_push(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green_bang();
     api.assert_schema().assert_tables_count(3);
 
-    api.schema_push("").send().assert_green_bang();
+    api.schema_push_w_datasource("").send().assert_green_bang();
     api.assert_schema().assert_tables_count(0);
 }
