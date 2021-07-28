@@ -901,27 +901,35 @@ fn alter_constraint_name_tests(api: TestApi) {
     let dir = api.create_migrations_directory();
     api.create_migration("plain", &plain_dm, &dir).send_sync();
 
-    let custom_dm = api.datamodel_with_provider(
+    let custom_dm = api.datamodel_with_provider(&format!(
         r#"
-         model A {
-           id   Int    @id(map: "CustomId")
+         model A {{
+           id   Int    @id{}
            name String @unique(map: "CustomUnique")
            a    String
            b    String
            B    B[]    @relation("AtoB")
            @@unique([a, b], name: "compound", map:"CustomCompoundUnique")
            @@index([a], map: "CustomIndex")
-         }
-         model B {
+         }}
+         
+         model B {{
            a   String
            b   String
            aId Int
-           A   A      @relation("AtoB", fields: [aId], references: [id], map: "CustomFK")
+           A   A      @relation("AtoB", fields: [aId], references: [id]{})
            @@index([a,b], map: "AnotherCustomIndex")
-           @@id([a, b], map: "CustomCompoundId")
-         }
+           @@id([a, b]{})
+         }}
      "#,
-    );
+        if api.is_sqlite() { "" } else { r#"(map: "CustomId")"# },
+        if api.is_sqlite() { "" } else { r#", map: "CustomFK""# },
+        if api.is_sqlite() {
+            ""
+        } else {
+            r#", map: "CustomCompoundId""#
+        }
+    ));
 
     api.create_migration("custom", &custom_dm, &dir)
         .send_sync()
@@ -1040,15 +1048,15 @@ fn alter_constraint_name_tests(api: TestApi) {
                  -- RedefineIndex
                  DROP INDEX "A_a_b_key";
                  CREATE UNIQUE INDEX "CustomCompoundUnique" ON "A"("a", "b");
-
-                 -- RedefineIndex
-                 DROP INDEX "A_name_key";
-                 CREATE UNIQUE INDEX "CustomUnique" ON "A"("name");
-
+                 
                  -- RedefineIndex
                  DROP INDEX "A_a_idx";
                  CREATE INDEX "CustomIndex" ON "A"("a");
-
+                 
+                 -- RedefineIndex
+                 DROP INDEX "A_name_key";
+                 CREATE UNIQUE INDEX "CustomUnique" ON "A"("name");
+                 
                  -- RedefineIndex
                  DROP INDEX "B_a_b_idx";
                  CREATE INDEX "AnotherCustomIndex" ON "B"("a", "b");
