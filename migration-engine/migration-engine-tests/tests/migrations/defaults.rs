@@ -86,14 +86,12 @@ fn default_dbgenerated_should_work(api: TestApi) {
 
 #[test_connector(tags(Postgres))]
 fn uuid_default(api: TestApi) {
-    let dm = api.datamodel_with_provider(
-        r#"
+    let dm = r#"
         model A {
             id   String @id @db.Uuid
             uuid String @db.Uuid @default("00000000-0000-0000-0016-000000000004")
         }
-    "#,
-    );
+    "#;
 
     api.schema_push_w_datasource(dm).send().assert_green_bang();
 

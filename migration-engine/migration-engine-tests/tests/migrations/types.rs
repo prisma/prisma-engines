@@ -295,11 +295,6 @@ fn a_table_recreation_with_noncastable_columns_should_trigger_warnings(api: Test
 #[test_connector(tags(Postgres))]
 fn a_column_recreation_with_non_castable_type_change_should_trigger_warnings(api: TestApi) {
     let dm1 = r#"
-        datasource pg {
-            provider = "postgres"
-            url = env("DBURL")
-        }
-
         model Blog {
             id      Int @id
             float   Float
@@ -313,11 +308,6 @@ fn a_column_recreation_with_non_castable_type_change_should_trigger_warnings(api
 
     api.query(insert.into());
     let dm2 = r#"
-        datasource pg {
-            provider = "postgres"
-            url = env("DBURL")
-        }
-
         model Blog {
             id      Int @id
             float   DateTime

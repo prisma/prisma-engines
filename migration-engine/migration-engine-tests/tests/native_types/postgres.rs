@@ -809,7 +809,7 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
             next_assertions.push((column_name, to).clone());
         }
 
-        let dm1 = api.datamodel_with_provider(&format!(
+        let dm1 = format!(
             r#"
                model A {{
                     id Int @id @default(autoincrement()) @db.Integer
@@ -817,7 +817,7 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
                 }}
                 "#,
             columns = previous_columns,
-        ));
+        );
 
         tracing::info!(dm = dm1.as_str());
 
@@ -836,7 +836,7 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
             )
         });
 
-        let dm2 = api.datamodel_with_provider(&format!(
+        let dm2 = format!(
             r#"
                 model A {{
                     id Int @id @default(autoincrement()) @db.Integer
@@ -844,7 +844,7 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
                 }}
                 "#,
             columns = next_columns
-        ));
+        );
 
         api.schema_push_w_datasource(&dm2).send().assert_green_bang();
 
@@ -904,7 +904,7 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
             next_assertions.push((column_name.clone(), *to));
         }
 
-        let dm1 = api.datamodel_with_provider(&format!(
+        let dm1 = format!(
             r#"
                 model A {{
                     id Int @id @default(autoincrement()) @db.Integer
@@ -912,7 +912,7 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
                 }}
                 "#,
             columns = previous_columns,
-        ));
+        );
 
         api.schema_push_w_datasource(&dm1).send().assert_green_bang();
 
@@ -930,7 +930,7 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
             )
         });
 
-        let dm2 = api.datamodel_with_provider(&format!(
+        let dm2 = format!(
             r#"
                 model A {{
                     id Int @id @default(autoincrement()) @db.Integer
@@ -938,7 +938,7 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
                 }}
                 "#,
             columns = next_columns,
-        ));
+        );
 
         api.schema_push_w_datasource(&dm2)
             .force(true)
@@ -1006,7 +1006,7 @@ fn not_castable_with_existing_data_should_warn(api: TestApi) {
             previous_assertions.push((column_name, from).clone());
         }
 
-        let dm1 = api.datamodel_with_provider(&format!(
+        let dm1 = format!(
             r#"
                 model A {{
                     id Int @id @default(autoincrement()) @db.Integer
@@ -1014,7 +1014,7 @@ fn not_castable_with_existing_data_should_warn(api: TestApi) {
                 }}
                 "#,
             columns = previous_columns,
-        ));
+        );
 
         api.schema_push_w_datasource(&dm1).send().assert_green_bang();
 
@@ -1031,7 +1031,7 @@ fn not_castable_with_existing_data_should_warn(api: TestApi) {
             )
         });
 
-        let dm2 = api.datamodel_with_provider(&format!(
+        let dm2 = format!(
             r#"
                 model A {{
                     id Int @id @default(autoincrement()) @db.Integer
@@ -1039,7 +1039,7 @@ fn not_castable_with_existing_data_should_warn(api: TestApi) {
                 }}
                 "#,
             columns = next_columns,
-        ));
+        );
 
         // todo we could force here and then check that the db really returns not castable
         // then we would again need to have separate calls per mapping
@@ -1181,7 +1181,7 @@ fn safe_casts_from_array_with_existing_data_should_work(api: TestApi) {
             next_assertions.push((column_name, to).clone());
         }
 
-        let dm1 = api.datamodel_with_provider(&format!(
+        let dm1 = format!(
             r#"
                 model A {{
                     id Int @id @default(autoincrement()) @db.Integer
@@ -1189,7 +1189,7 @@ fn safe_casts_from_array_with_existing_data_should_work(api: TestApi) {
                 }}
                 "#,
             columns = previous_columns,
-        ));
+        );
 
         api.schema_push_w_datasource(&dm1).send().assert_green_bang();
 
@@ -1206,7 +1206,7 @@ fn safe_casts_from_array_with_existing_data_should_work(api: TestApi) {
             )
         });
 
-        let dm2 = api.datamodel_with_provider(&format!(
+        let dm2 = format!(
             r#"
                 model A {{
                     id Int @id @default(autoincrement()) @db.Integer
@@ -1214,7 +1214,7 @@ fn safe_casts_from_array_with_existing_data_should_work(api: TestApi) {
                 }}
                 "#,
             columns = next_columns,
-        ));
+        );
 
         api.schema_push_w_datasource(&dm2).send().assert_green_bang();
 

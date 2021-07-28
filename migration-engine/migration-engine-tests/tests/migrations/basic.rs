@@ -360,7 +360,7 @@ fn switching_databases_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push(dm1).send().assert_green_bang();
 
     let dm2 = r#"
         datasource db {
@@ -374,7 +374,7 @@ fn switching_databases_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm2)
+    api.schema_push(dm2)
         .migration_id(Some("mig2"))
         .send()
         .assert_green_bang();
@@ -393,7 +393,7 @@ fn renaming_a_datasource_works(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push(dm1).send().assert_green_bang();
 
     let dm2 = r#"
         datasource db2 {
@@ -406,7 +406,7 @@ fn renaming_a_datasource_works(api: TestApi) {
         }
     "#;
 
-    api.schema_push_w_datasource(dm2)
+    api.schema_push(dm2)
         .migration_id(Some("mig02"))
         .send()
         .assert_green_bang()

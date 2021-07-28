@@ -499,17 +499,17 @@ fn no_additional_unique_created(api: TestApi) {
         });
 }
 
-#[test_connector]
-fn create_constraint_name_tests(api: TestApi) {
-    let dm = r#"
+#[test_connector(preview_features("NamedConstraints"))]
+fn create_constraint_name_tests_w_implicit_names(api: TestApi) {
+    let dm = api.datamodel_with_provider(
+        r#"
          model A {
            id   Int    @id
            name String @unique
            a    String
            b    String
            B    B[]    @relation("AtoB")
-           @@unique([a, b], name: "compound", map:"1")
-           @@unique([a, b], map:"2")
+           @@unique([a, b], name: "compound")
            @@index([a])
          }
          model B {
@@ -520,11 +520,12 @@ fn create_constraint_name_tests(api: TestApi) {
            @@index([a,b])
            @@id([a, b])
          }
-     "#;
+     "#,
+    );
 
     let dir = api.create_migrations_directory();
 
-    api.create_migration("setup", dm, &dir)
+    api.create_migration("setup", &dm, &dir)
         .send_sync()
         .assert_migration_directories_count(1)
         .assert_migration("setup", |migration| {
@@ -572,32 +573,31 @@ fn create_constraint_name_tests(api: TestApi) {
                          "name" TEXT NOT NULL,
                          "a" TEXT NOT NULL,
                          "b" TEXT NOT NULL,
-                         PRIMARY KEY ("id")
+                     
+                         CONSTRAINT "A_pkey" PRIMARY KEY ("id")
                      );
+                     
                      -- CreateTable
                      CREATE TABLE "B" (
                          "a" TEXT NOT NULL,
                          "b" TEXT NOT NULL,
                          "aId" INTEGER NOT NULL,
-
-                         PRIMARY KEY ("a","b")
+                 
+                         CONSTRAINT "B_pkey" PRIMARY KEY ("a","b")
                      );
-
-                     -- CreateIndex
-                     CREATE INDEX "A_a_idx" ON "A"("a");
-
+                     
                      -- CreateIndex
                      CREATE UNIQUE INDEX "A_name_key" ON "A"("name");
-
+                     
                      -- CreateIndex
-                     CREATE UNIQUE INDEX "1" ON "A"("a", "b");
-
+                     CREATE INDEX "A_a_idx" ON "A"("a");
+                     
                      -- CreateIndex
-                     CREATE UNIQUE INDEX "2" ON "A"("a", "b");
-
+                     CREATE UNIQUE INDEX "A_a_b_key" ON "A"("a", "b");
+                     
                      -- CreateIndex
                      CREATE INDEX "B_a_b_idx" ON "B"("a", "b");
-
+                     
                      -- AddForeignKey
                      ALTER TABLE "B" ADD CONSTRAINT "B_aId_fkey" FOREIGN KEY ("aId") REFERENCES "A"("id") ON DELETE CASCADE ON UPDATE CASCADE;
                  "#
