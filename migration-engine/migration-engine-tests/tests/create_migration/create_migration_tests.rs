@@ -675,68 +675,87 @@ fn create_constraint_name_tests(api: TestApi) {
         });
 }
 
-#[test_connector]
-fn create_constraint_name_tests_w_constraint_flag(api: TestApi) {
-    let dm = r#"
-         model A {
+#[test_connector(preview_features("NamedConstraints"))]
+fn create_constraint_name_tests_w_explicit_names(api: TestApi) {
+    let dm = api.datamodel_with_provider(&format!(
+        r#"
+         model A {{
            id   Int    @id
-           name String @unique
+           name String @unique(map: "SingleUnique")
            a    String
            b    String
            B    B[]    @relation("AtoB")
-           @@unique([a, b], name: "compound", map:"1")
-           @@unique([a, b], map:"2")
-           @@index([a])
-         }
-         model B {
+           @@unique([a, b], name: "compound", map:"NamedCompoundUnique")
+           @@unique([a, b], map:"UnNamedCompoundUnique")
+           @@index([a], map: "SingleIndex")
+         }}
+         
+         model B {{
            a   String
            b   String
            aId Int
-           A   A      @relation("AtoB", fields: [aId], references: [id])
-           @@index([a,b])
-           @@id([a, b], map: "custom")
-         }
-     "#;
+           A   A      @relation("AtoB", fields: [aId], references: [id]{})
+           @@index([a,b], map: "CompoundIndex")
+           @@id([a, b])
+         }}
+     "#,
+        if api.is_sqlite() { "" } else { r#", map: "ForeignKey""# }
+    ));
 
     let dir = api.create_migrations_directory();
 
-    api.create_migration("setup", dm, &dir)
+    api.create_migration("setup", &dm, &dir)
         .send_sync()
         .assert_migration_directories_count(1)
         .assert_migration("setup", |migration| {
             let expected_script = if api.is_mssql() {
                 indoc! {
                      r#"
+                     BEGIN TRY
+                     
+                     BEGIN TRAN;
+                     
                      -- CreateTable
-                     CREATE TABLE [create_constraint_name_tests].[A] (
+                     CREATE TABLE [create_constraint_name_tests_w_constraint_flag].[A] (
                          [id] INT NOT NULL,
                          [name] NVARCHAR(1000) NOT NULL,
                          [a] NVARCHAR(1000) NOT NULL,
                          [b] NVARCHAR(1000) NOT NULL,
-
                          CONSTRAINT [A_pkey] PRIMARY KEY ([id]),
-                         CONSTRAINT [A_name_key] UNIQUE ([name]),
-                         CONSTRAINT [1] UNIQUE ([a],[b]),
-                         CONSTRAINT [2] UNIQUE ([a],[b])
+                         CONSTRAINT [SingleUnique] UNIQUE ([name]),
+                         CONSTRAINT [NamedCompoundUnique] UNIQUE ([a],[b]),
+                         CONSTRAINT [UnNamedCompoundUnique] UNIQUE ([a],[b])
                      );
-
+                     
                      -- CreateTable
-                     CREATE TABLE [create_constraint_name_tests].[B] (
+                     CREATE TABLE [create_constraint_name_tests_w_constraint_flag].[B] (
                          [a] NVARCHAR(1000) NOT NULL,
                          [b] NVARCHAR(1000) NOT NULL,
                          [aId] INT NOT NULL,
-
-                         CONSTRAINT [custom] PRIMARY KEY ([a],[b])
+                         CONSTRAINT [B_pkey] PRIMARY KEY ([a],[b])
                      );
-
+                     
                      -- CreateIndex
-                     CREATE INDEX [A_a_idx] ON [create_constraint_name_tests].[A]([a]);
-
+                     CREATE INDEX [SingleIndex] ON [create_constraint_name_tests_w_constraint_flag].[A]([a]);
+                     
                      -- CreateIndex
-                     CREATE INDEX [B_a_b_idx] ON [create_constraint_name_tests].[B]([a], [b]);
-
+                     CREATE INDEX [CompoundIndex] ON [create_constraint_name_tests_w_constraint_flag].[B]([a], [b]);
+                     
                      -- AddForeignKey
-                     ALTER TABLE [create_constraint_name_tests].[B] ADD CONSTRAINT [B_aId_fkey] FOREIGN KEY ([aId]) REFERENCES [create_constraint_name_tests].[A]([id]) ON DELETE CASCADE ON UPDATE CASCADE;
+                     ALTER TABLE [create_constraint_name_tests_w_constraint_flag].[B] ADD CONSTRAINT [ForeignKey] FOREIGN KEY ([aId]) REFERENCES [create_constraint_name_tests_w_constraint_flag].[A]([id]) ON DELETE CASCADE ON UPDATE CASCADE;
+                     
+                     COMMIT TRAN;
+                     
+                     END TRY
+                     BEGIN CATCH
+                     
+                     IF @@TRANCOUNT > 0
+                     BEGIN 
+                         ROLLBACK TRAN;
+                     END;
+                     THROW
+                     
+                     END CATCH
                  "#
                  }
             } else if api.is_postgres() {
@@ -748,34 +767,36 @@ fn create_constraint_name_tests_w_constraint_flag(api: TestApi) {
                          "name" TEXT NOT NULL,
                          "a" TEXT NOT NULL,
                          "b" TEXT NOT NULL,
+                     
                          CONSTRAINT "A_pkey" PRIMARY KEY ("id")
                      );
+                     
                      -- CreateTable
                      CREATE TABLE "B" (
                          "a" TEXT NOT NULL,
                          "b" TEXT NOT NULL,
                          "aId" INTEGER NOT NULL,
-
-                         CONSTRAINT "custom" PRIMARY KEY ("a","b")
+                     
+                         CONSTRAINT "B_pkey" PRIMARY KEY ("a","b")
                      );
-
+                     
                      -- CreateIndex
-                     CREATE INDEX "A_a_idx" ON "A"("a");
-
+                     CREATE UNIQUE INDEX "SingleUnique" ON "A"("name");
+                     
                      -- CreateIndex
-                     CREATE UNIQUE INDEX "A_name_key" ON "A"("name");
-
+                     CREATE INDEX "SingleIndex" ON "A"("a");
+                     
                      -- CreateIndex
-                     CREATE UNIQUE INDEX "1" ON "A"("a", "b");
-
+                     CREATE UNIQUE INDEX "NamedCompoundUnique" ON "A"("a", "b");
+                     
                      -- CreateIndex
-                     CREATE UNIQUE INDEX "2" ON "A"("a", "b");
-
+                     CREATE UNIQUE INDEX "UnNamedCompoundUnique" ON "A"("a", "b");
+                     
                      -- CreateIndex
-                     CREATE INDEX "B_a_b_idx" ON "B"("a", "b");
-
+                     CREATE INDEX "CompoundIndex" ON "B"("a", "b");
+                     
                      -- AddForeignKey
-                     ALTER TABLE "B" ADD CONSTRAINT "B_aId_fkey" FOREIGN KEY ("aId") REFERENCES "A"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+                     ALTER TABLE "B" ADD CONSTRAINT "ForeignKey" FOREIGN KEY ("aId") REFERENCES "A"("id") ON DELETE CASCADE ON UPDATE CASCADE;
                  "#
                  }
             } else if api.is_mysql(){
@@ -787,26 +808,26 @@ fn create_constraint_name_tests_w_constraint_flag(api: TestApi) {
                      `name` VARCHAR(191) NOT NULL,
                      `a` VARCHAR(191) NOT NULL,
                      `b` VARCHAR(191) NOT NULL,
-
-                     INDEX `A_a_idx`(`a`),
-                     UNIQUE INDEX `A_name_key`(`name`),
-                     UNIQUE INDEX `1`(`a`, `b`),
-                     UNIQUE INDEX `2`(`a`, `b`),
+                 
+                     UNIQUE INDEX `SingleUnique`(`name`),
+                     INDEX `SingleIndex`(`a`),
+                     UNIQUE INDEX `NamedCompoundUnique`(`a`, `b`),
+                     UNIQUE INDEX `UnNamedCompoundUnique`(`a`, `b`),
                      PRIMARY KEY (`id`)
                  ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
+                 
                  -- CreateTable
                  CREATE TABLE `B` (
                      `a` VARCHAR(191) NOT NULL,
                      `b` VARCHAR(191) NOT NULL,
                      `aId` INTEGER NOT NULL,
-
-                     INDEX `B_a_b_idx`(`a`, `b`),
+                 
+                     INDEX `CompoundIndex`(`a`, `b`),
                      PRIMARY KEY (`a`, `b`)
                  ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
+                 
                  -- AddForeignKey
-                 ALTER TABLE `B` ADD CONSTRAINT `B_aId_fkey` FOREIGN KEY (`aId`) REFERENCES `A`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+                 ALTER TABLE `B` ADD CONSTRAINT `ForeignKey` FOREIGN KEY (`aId`) REFERENCES `A`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
                  "#
                  }
             }else if api.is_sqlite(){
@@ -818,30 +839,31 @@ fn create_constraint_name_tests_w_constraint_flag(api: TestApi) {
                      "a" TEXT NOT NULL,
                      "b" TEXT NOT NULL
                  );
-
+                 
                  -- CreateTable
                  CREATE TABLE "B" (
                      "a" TEXT NOT NULL,
                      "b" TEXT NOT NULL,
                      "aId" INTEGER NOT NULL,
-
+                 
                      PRIMARY KEY ("a", "b"),
                      CONSTRAINT "B_aId_fkey" FOREIGN KEY ("aId") REFERENCES "A" ("id") ON DELETE CASCADE ON UPDATE CASCADE
                  );
-
+                 
                  -- CreateIndex
-                 CREATE INDEX "A_a_idx" ON "A"("a");
-
+                 CREATE UNIQUE INDEX "SingleUnique" ON "A"("name");
+                 
                  -- CreateIndex
-                 CREATE UNIQUE INDEX "A_name_key" ON "A"("name");
+                 CREATE INDEX "SingleIndex" ON "A"("a");
+                 
                  -- CreateIndex
-                 CREATE UNIQUE INDEX "1" ON "A"("a", "b");
-
+                 CREATE UNIQUE INDEX "NamedCompoundUnique" ON "A"("a", "b");
+                 
                  -- CreateIndex
-                 CREATE UNIQUE INDEX "2" ON "A"("a", "b");
-
+                 CREATE UNIQUE INDEX "UnNamedCompoundUnique" ON "A"("a", "b");
+                 
                  -- CreateIndex
-                 CREATE INDEX "B_a_b_idx" ON "B"("a", "b");
+                 CREATE INDEX "CompoundIndex" ON "B"("a", "b");
                  "#
              }} else {
                 ""
@@ -852,9 +874,10 @@ fn create_constraint_name_tests_w_constraint_flag(api: TestApi) {
 }
 
 //todo switch this to exclude Windows as soon as the test setup has that capability
-#[test_connector(exclude(Mysql))]
+#[test_connector(exclude(Mysql), preview_features("NamedConstraints"))]
 fn alter_constraint_name_tests(api: TestApi) {
-    let plain_dm = r#"
+    let plain_dm = api.datamodel_with_provider(
+        r#"
          model A {
            id   Int    @id
            name String @unique
@@ -872,15 +895,17 @@ fn alter_constraint_name_tests(api: TestApi) {
            @@index([a,b])
            @@id([a, b])
          }
-     "#;
+     "#,
+    );
 
     let dir = api.create_migrations_directory();
-    api.create_migration("plain", plain_dm, &dir).send_sync();
+    api.create_migration("plain", &plain_dm, &dir).send_sync();
 
-    let custom_dm = r#"
+    let custom_dm = api.datamodel_with_provider(
+        r#"
          model A {
-           id   Int    @id("CustomId")
-           name String @unique("CustomUnique")
+           id   Int    @id(map: "CustomId")
+           name String @unique(map: "CustomUnique")
            a    String
            b    String
            B    B[]    @relation("AtoB")
@@ -895,9 +920,10 @@ fn alter_constraint_name_tests(api: TestApi) {
            @@index([a,b], map: "AnotherCustomIndex")
            @@id([a, b], map: "CustomCompoundId")
          }
-     "#;
+     "#,
+    );
 
-    api.create_migration("custom", custom_dm, &dir)
+    api.create_migration("custom", &custom_dm, &dir)
         .send_sync()
         .assert_migration_directories_count(2)
         .assert_migration("custom", |migration| {
@@ -917,16 +943,16 @@ fn alter_constraint_name_tests(api: TestApi) {
                      -- AddForeignKey
                      ALTER TABLE [alter_constraint_name_tests].[B] ADD CONSTRAINT [CustomFK] FOREIGN KEY ([aId]) REFERENCES [alter_constraint_name_tests].[A]([id]) ON DELETE CASCADE ON UPDATE CASCADE;
 
-                     -- AlterIndex
+                     -- RenameIndex
                      EXEC SP_RENAME N'alter_constraint_name_tests.A.A_a_b_key', N'CustomCompoundUnique', N'INDEX';
 
-                     -- AlterIndex
+                     -- RenameIndex
                      EXEC SP_RENAME N'alter_constraint_name_tests.A.A_a_idx', N'CustomIndex', N'INDEX';
 
-                     -- AlterIndex
+                     -- RenameIndex
                      EXEC SP_RENAME N'alter_constraint_name_tests.A.A_name_key', N'CustomUnique', N'INDEX';
 
-                     -- AlterIndex
+                     -- RenameIndex
                      EXEC SP_RENAME N'alter_constraint_name_tests.B.B_a_b_idx', N'AnotherCustomIndex', N'INDEX';
                  "#
                  }
@@ -947,16 +973,16 @@ fn alter_constraint_name_tests(api: TestApi) {
                      -- AddForeignKey
                      ALTER TABLE "B" ADD CONSTRAINT "CustomFK" FOREIGN KEY ("aId") REFERENCES "A"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
-                     -- AlterIndex
+                     -- RenameIndex
                      ALTER INDEX "A_a_b_key" RENAME TO "CustomCompoundUnique";
 
-                     -- AlterIndex
+                     -- RenameIndex
                      ALTER INDEX "A_a_idx" RENAME TO "CustomIndex";
 
-                     -- AlterIndex
+                     -- RenameIndex
                      ALTER INDEX "A_name_key" RENAME TO "CustomUnique";
 
-                     -- AlterIndex
+                     -- RenameIndex
                      ALTER INDEX "B_a_b_idx" RENAME TO "AnotherCustomIndex";
                  "#
                  }
@@ -996,16 +1022,16 @@ fn alter_constraint_name_tests(api: TestApi) {
                  -- AddForeignKey
                  ALTER TABLE `B` ADD CONSTRAINT `CustomFK` FOREIGN KEY (`aId`) REFERENCES `A`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
-                 -- AlterIndex
+                 -- RenameIndex
                  ALTER TABLE `A` RENAME INDEX `A_a_b_key` TO `CustomCompoundUnique`;
 
-                 -- AlterIndex
+                 -- RenameIndex
                  ALTER TABLE `A` RENAME INDEX `A_a_idx` TO `CustomIndex`;
 
-                 -- AlterIndex
+                 -- RenameIndex
                  ALTER TABLE `A` RENAME INDEX `A_name_key` TO `CustomUnique`;
 
-                 -- AlterIndex
+                 -- RenameIndex
                  ALTER TABLE `B` RENAME INDEX `B_a_b_idx` TO `AnotherCustomIndex`;
                  "#
                  }
