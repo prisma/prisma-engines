@@ -507,11 +507,6 @@ fn on_delete_referential_actions_should_work(api: TestApi) {
     for (ra, fka) in actions {
         let dm = format!(
             r#"
-            generator client {{
-                provider = "prisma-client-js"
-                previewFeatures = ["referentialActions"]
-            }}
-
             model A {{
                 id Int @id @default(autoincrement())
                 b      B[]
@@ -544,11 +539,6 @@ fn on_delete_referential_actions_should_work(api: TestApi) {
 #[test_connector(exclude(Mysql56, Mysql57, Mariadb, Mssql), preview_features("referentialActions"))]
 fn on_delete_set_default_should_work(api: TestApi) {
     let dm = r#"
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
-        }
-
         model A {
             id Int @id
             b      B[]
@@ -574,11 +564,6 @@ fn on_delete_set_default_should_work(api: TestApi) {
 #[test_connector(exclude(Mssql), preview_features("referentialActions"))]
 fn on_delete_restrict_should_work(api: TestApi) {
     let dm = r#"
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
-        }
-
         model A {
             id Int @id
             b      B[]
@@ -612,11 +597,6 @@ fn on_update_referential_actions_should_work(api: TestApi) {
     for (ra, fka) in actions {
         let dm = format!(
             r#"
-            generator client {{
-                provider = "prisma-client-js"
-                previewFeatures = ["referentialActions"]
-            }}
-
             model A {{
                 id Int @id @default(autoincrement())
                 b      B[]
@@ -647,11 +627,6 @@ fn on_update_referential_actions_should_work(api: TestApi) {
 #[test_connector(exclude(Mysql56, Mysql57, Mariadb, Mssql), preview_features("referentialActions"))]
 fn on_update_set_default_should_work(api: TestApi) {
     let dm = r#"
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
-        }
-
         model A {
             id Int @id
             b      B[]
@@ -677,11 +652,6 @@ fn on_update_set_default_should_work(api: TestApi) {
 #[test_connector(exclude(Mssql), preview_features("referentialActions"))]
 fn on_update_restrict_should_work(api: TestApi) {
     let dm = r#"
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
-        }
-
         model A {
             id Int @id
             b      B[]
@@ -707,11 +677,6 @@ fn on_update_restrict_should_work(api: TestApi) {
 #[test_connector(exclude(Mssql), preview_features("referentialActions"))]
 fn on_delete_required_default_action(api: TestApi) {
     let dm = r#"
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
-        }
-
         model A {
             id Int @id
             b      B[]
@@ -737,11 +702,6 @@ fn on_delete_required_default_action(api: TestApi) {
 #[test_connector(tags(Mssql), preview_features("referentialActions"))]
 fn on_delete_required_default_action_with_no_restrict(api: TestApi) {
     let dm = r#"
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
-        }
-
         model A {
             id Int @id
             b      B[]
@@ -767,11 +727,6 @@ fn on_delete_required_default_action_with_no_restrict(api: TestApi) {
 #[test_connector(preview_features("referentialActions"))]
 fn on_delete_optional_default_action(api: TestApi) {
     let dm = r#"
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
-        }
-
         model A {
             id Int @id
             b      B[]
@@ -797,11 +752,6 @@ fn on_delete_optional_default_action(api: TestApi) {
 #[test_connector(preview_features("referentialActions"))]
 fn on_delete_compound_optional_optional_default_action(api: TestApi) {
     let dm = r#"
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
-        }
-
         model A {
             id  Int @id
             id2 Int
@@ -832,11 +782,6 @@ fn on_delete_compound_optional_optional_default_action(api: TestApi) {
 #[test_connector(exclude(Mssql), preview_features("referentialActions"))]
 fn on_delete_compound_required_optional_default_action_with_restrict(api: TestApi) {
     let dm = r#"
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
-        }
-
         model A {
             id  Int @id
             id2 Int
@@ -867,11 +812,6 @@ fn on_delete_compound_required_optional_default_action_with_restrict(api: TestAp
 #[test_connector(tags(Mssql), preview_features("referentialActions"))]
 fn on_delete_compound_required_optional_default_action_without_restrict(api: TestApi) {
     let dm = r#"
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
-        }
-
         model A {
             id  Int @id
             id2 Int
@@ -902,11 +842,6 @@ fn on_delete_compound_required_optional_default_action_without_restrict(api: Tes
 #[test_connector(preview_features("referentialActions"))]
 fn on_update_optional_default_action(api: TestApi) {
     let dm = r#"
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
-        }
-
         model A {
             id Int @id
             b      B[]
@@ -932,11 +867,6 @@ fn on_update_optional_default_action(api: TestApi) {
 #[test_connector(preview_features("referentialActions"))]
 fn on_update_required_default_action(api: TestApi) {
     let dm = r#"
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
-        }
-
         model A {
             id Int @id
             b      B[]
@@ -962,11 +892,6 @@ fn on_update_required_default_action(api: TestApi) {
 #[test_connector(preview_features("referentialActions"))]
 fn adding_mutual_references_on_existing_tables_works(api: TestApi) {
     let dm1 = r#"
-        generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
-        }
-
         model A {
             id Int @id
         }
@@ -979,11 +904,6 @@ fn adding_mutual_references_on_existing_tables_works(api: TestApi) {
     api.schema_push_w_datasource(dm1).send().assert_green_bang();
 
     let dm2 = r#"
-        generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
-        }
-
         model A {
             id Int
             name String @unique
