@@ -1,5 +1,5 @@
-// use indoc::indoc;
 use query_engine_tests::*;
+// use indoc::indoc;
 
 /// LRT = Long-Running Transactions
 /// Note that if cache expiration tests fail, make sure `CLOSED_TX_CLEANUP` is set correctly (low value like 2) from the .envrc.
@@ -107,10 +107,33 @@ mod lrt {
         Ok(())
     }
 
-    // Timeout / Expiration.
-    // No aquisition.
-    // Open a tx in a tx.
-    // No auto rollback on error.
+    #[connector_test]
+    async fn no_auto_rollback(mut runner: Runner) -> TestResult<()> {
+        // Tx expires after five second.
+        let tx_id = runner.executor().start_tx(5, 5).await?;
+        runner.set_active_tx(tx_id.clone());
+
+        // Row is created
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 1 }) { id }}"#),
+          @r###"{"data":{"createOneTestModel":{"id":1}}}"###
+        );
+
+        // This will error.
+        assert_error!(
+            &runner,
+            r#"mutation { createOneTestModel(data: { doesnt_exist: true }) { id }}"#,
+            2009
+        );
+
+        // Commit TX, first written row must still be present.
+        let res = runner.executor().commit_tx(tx_id.clone()).await;
+        assert!(res.is_ok());
+
+        Ok(())
+    }
+
+    // No acquisition.
     // Batches with lrt
-    //
+    // Raw and lrt
 }
