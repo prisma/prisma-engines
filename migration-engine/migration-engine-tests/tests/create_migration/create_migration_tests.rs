@@ -611,24 +611,23 @@ fn create_constraint_name_tests_w_implicit_names(api: TestApi) {
                      `name` VARCHAR(191) NOT NULL,
                      `a` VARCHAR(191) NOT NULL,
                      `b` VARCHAR(191) NOT NULL,
-
-                     INDEX `A_a_idx`(`a`),
+                 
                      UNIQUE INDEX `A_name_key`(`name`),
-                     UNIQUE INDEX `1`(`a`, `b`),
-                     UNIQUE INDEX `2`(`a`, `b`),
+                     INDEX `A_a_idx`(`a`),
+                     UNIQUE INDEX `A_a_b_key`(`a`, `b`),
                      PRIMARY KEY (`id`)
                  ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
+                 
                  -- CreateTable
                  CREATE TABLE `B` (
                      `a` VARCHAR(191) NOT NULL,
                      `b` VARCHAR(191) NOT NULL,
                      `aId` INTEGER NOT NULL,
-
+                 
                      INDEX `B_a_b_idx`(`a`, `b`),
                      PRIMARY KEY (`a`, `b`)
                  ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
+                 
                  -- AddForeignKey
                  ALTER TABLE `B` ADD CONSTRAINT `B_aId_fkey` FOREIGN KEY (`aId`) REFERENCES `A`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
                  "#

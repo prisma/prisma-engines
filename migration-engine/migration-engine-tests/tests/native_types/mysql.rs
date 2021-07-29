@@ -643,7 +643,6 @@ fn colnames_for_cases(cases: Cases) -> Vec<String> {
 }
 
 fn expand_cases<'a, 'b>(
-    api: &TestApi,
     from_type: &str,
     test_value: &'a quaint::Value,
     (to_types, nullable): (&[&str], bool),
@@ -655,7 +654,6 @@ fn expand_cases<'a, 'b>(
 
     for dm in std::iter::once(&mut *dm1).chain(std::iter::once(&mut *dm2)) {
         dm.clear();
-        write!(dm, "{}", api.datasource_block()).unwrap();
         dm.push_str("model Test {\nid Int @id @default(autoincrement())\n");
     }
 
@@ -765,7 +763,6 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
         tracing::info!("initial migration");
 
         let insert = expand_cases(
-            &api,
             from_type,
             test_value,
             (to_types.as_ref(), false),
@@ -812,7 +809,6 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
         tracing::info!("initial migration");
 
         let insert = expand_cases(
-            &api,
             from_type,
             test_value,
             (to_types.as_ref(), false),
@@ -875,7 +871,6 @@ fn impossible_casts_with_existing_data_should_warn(api: TestApi) {
         tracing::info!("initial migration");
 
         let insert = expand_cases(
-            &api,
             from_type,
             test_value,
             (to_types.as_ref(), true),
