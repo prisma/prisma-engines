@@ -156,7 +156,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
             // Order matters.
             let changes: Vec<TableChange> = SqlSchemaDiffer::drop_primary_key(&table)
                 .into_iter()
-                .chain(SqlSchemaDiffer::rename_primary_key(&table))
+                .chain(self.rename_primary_key(&table))
                 .chain(SqlSchemaDiffer::drop_columns(&table))
                 .chain(SqlSchemaDiffer::add_columns(&table))
                 .chain(SqlSchemaDiffer::alter_columns(&table).into_iter())
@@ -294,20 +294,24 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         }
     }
 
-    fn rename_primary_key(differ: &TableDiffer<'_, '_>) -> Option<TableChange> {
-        if let Some(previous_pk) = differ.tables.previous().primary_key() {
-            if let Some(next_pk) = differ.tables.next().primary_key() {
-                if let Some(previous_name) = &previous_pk.constraint_name {
-                    if let Some(next_name) = &next_pk.constraint_name {
-                        if previous_name != next_name {
-                            return Some(RenamePrimaryKey);
+    fn rename_primary_key(&self, differ: &TableDiffer<'_, '_>) -> Option<TableChange> {
+        if self.db.flavour.preview_features().contains(NamedConstraints) {
+            if let Some(previous_pk) = differ.tables.previous().primary_key() {
+                if let Some(next_pk) = differ.tables.next().primary_key() {
+                    if let Some(previous_name) = &previous_pk.constraint_name {
+                        if let Some(next_name) = &next_pk.constraint_name {
+                            if previous_name != next_name {
+                                return Some(RenamePrimaryKey);
+                            }
                         }
                     }
                 }
             }
-        }
 
-        None
+            None
+        } else {
+            None
+        }
     }
 
     fn push_create_indexes(&self, steps: &mut Vec<SqlMigrationStep>) {
@@ -469,7 +473,6 @@ impl<'schema> SqlSchemaDiffer<'schema> {
 /// Compare two [ForeignKey](/sql-schema-describer/struct.ForeignKey.html)s and return whether they
 /// should be considered equivalent for schema diffing purposes.
 fn foreign_keys_match(fks: Pair<&ForeignKeyWalker<'_>>, db: &DifferDatabase<'_>) -> bool {
-
     let named_constraints_flag = db.flavour.preview_features().contains(NamedConstraints);
     let legacy_ignores_constraint_names = !named_constraints_flag && fks.next().constraint_name().is_none();
     let names_match = db.flavour.has_unnamed_foreign_keys()

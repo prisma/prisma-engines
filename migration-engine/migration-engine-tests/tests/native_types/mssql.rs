@@ -2140,8 +2140,7 @@ fn typescript_starter_schema_with_native_types_is_idempotent(api: TestApi) {
 
 #[test_connector(tags(Mssql))]
 fn typescript_starter_schema_with_different_native_types_is_idempotent(api: TestApi) {
-    let dm = api.datamodel_with_provider(
-        r#"
+    let dm = r#"
         model Post {
             id        Int     @id @default(autoincrement())
             title     String
@@ -2157,11 +2156,9 @@ fn typescript_starter_schema_with_different_native_types_is_idempotent(api: Test
             name  String?
             posts Post[]
         }
-        "#,
-    );
+        "#;
 
-    let dm2 = api.datamodel_with_provider(
-        r#"
+    let dm2 = r#"
         model Post {
             id        Int     @id @default(autoincrement()) @db.Int
             title     String  @db.NVarChar(1000)
@@ -2177,26 +2174,25 @@ fn typescript_starter_schema_with_different_native_types_is_idempotent(api: Test
             name  String? @db.NVarChar(100)
             posts Post[]
         }
-        "#,
-    );
+        "#;
 
-    api.schema_push_w_datasource(&dm)
+    api.schema_push_w_datasource(dm)
         .migration_id(Some("first"))
         .send()
         .assert_green_bang()
         .assert_has_executed_steps();
-    api.schema_push_w_datasource(&dm)
+    api.schema_push_w_datasource(dm)
         .migration_id(Some("second"))
         .send()
         .assert_green_bang()
         .assert_no_steps();
 
-    api.schema_push_w_datasource(&dm2)
+    api.schema_push_w_datasource(dm2)
         .migration_id(Some("third"))
         .send()
         .assert_green_bang()
         .assert_has_executed_steps();
-    api.schema_push_w_datasource(&dm2)
+    api.schema_push_w_datasource(dm2)
         .migration_id(Some("fourth"))
         .send()
         .assert_green_bang()
