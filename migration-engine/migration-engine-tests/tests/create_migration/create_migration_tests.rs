@@ -642,28 +642,26 @@ fn create_constraint_name_tests_w_implicit_names(api: TestApi) {
                      "a" TEXT NOT NULL,
                      "b" TEXT NOT NULL
                  );
-
+                 
                  -- CreateTable
                  CREATE TABLE "B" (
                      "a" TEXT NOT NULL,
                      "b" TEXT NOT NULL,
                      "aId" INTEGER NOT NULL,
-
+                 
                      PRIMARY KEY ("a", "b"),
                      CONSTRAINT "B_aId_fkey" FOREIGN KEY ("aId") REFERENCES "A" ("id") ON DELETE CASCADE ON UPDATE CASCADE
                  );
-
-                 -- CreateIndex
-                 CREATE INDEX "A_a_idx" ON "A"("a");
-
+                 
                  -- CreateIndex
                  CREATE UNIQUE INDEX "A_name_key" ON "A"("name");
+                 
                  -- CreateIndex
-                 CREATE UNIQUE INDEX "1" ON "A"("a", "b");
-
+                 CREATE INDEX "A_a_idx" ON "A"("a");
+                 
                  -- CreateIndex
-                 CREATE UNIQUE INDEX "2" ON "A"("a", "b");
-
+                 CREATE UNIQUE INDEX "A_a_b_key" ON "A"("a", "b");
+                 
                  -- CreateIndex
                  CREATE INDEX "B_a_b_idx" ON "B"("a", "b");
                  "#

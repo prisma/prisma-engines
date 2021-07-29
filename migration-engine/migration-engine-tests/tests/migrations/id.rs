@@ -46,7 +46,7 @@ fn changing_the_type_of_an_id_field_must_work(api: TestApi) {
     });
 }
 
-#[test_connector]
+#[test_connector(exclude(Sqlite))]
 fn models_with_an_autoincrement_field_as_part_of_a_multi_field_id_can_be_created(api: TestApi) {
     let dm = r#"
         model List {
@@ -71,13 +71,7 @@ fn models_with_an_autoincrement_field_as_part_of_a_multi_field_id_can_be_created
     api.assert_schema().assert_table("Todo", |table| {
         table
             .assert_pk(|pk| pk.assert_columns(&["id", "uTodo"]))
-            .assert_column("id", |col| {
-                if api.is_sqlite() {
-                    col
-                } else {
-                    col.assert_auto_increments()
-                }
-            })
+            .assert_column("id", |col| col.assert_auto_increments())
     });
 }
 

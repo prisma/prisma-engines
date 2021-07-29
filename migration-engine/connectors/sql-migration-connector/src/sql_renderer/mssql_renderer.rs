@@ -130,9 +130,7 @@ impl SqlRenderer for MssqlFlavour {
             IndexType::Normal => "",
         };
 
-        //todo nice surprise, should probably be a validation instead
-        let index_name = index.name().replace('.', "_");
-        let index_name = self.quote(&index_name);
+        let index_name = self.quote(&index.name());
         let table_reference = self.quote_with_schema(index.table().name()).to_string();
 
         let columns = index.columns().map(|c| self.quote(c.name()));
@@ -173,12 +171,13 @@ impl SqlRenderer for MssqlFlavour {
             let constraints = constraints
                 .iter()
                 .map(|index| {
-                    //TODO (matthias, NamedConstraints) another nice surprise that can probably be removed once
-                    // the preview flag becomes the default
-                    let name = index.name().replace('.', "_");
                     let columns = index.columns().map(|col| self.quote(col.name()));
 
-                    format!("CONSTRAINT {} UNIQUE ({})", self.quote(&name), columns.join(","))
+                    format!(
+                        "CONSTRAINT {} UNIQUE ({})",
+                        self.quote(&index.name()),
+                        columns.join(",")
+                    )
                 })
                 .join(",\n    ");
 

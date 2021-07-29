@@ -35,8 +35,9 @@ fn typescript_starter_schema_is_idempotent_without_native_type_annotations(api: 
 }
 
 #[test_connector(exclude(Mssql))]
-// todo changing towards having a provider specified in the middle of the test messes with some weird hard-coded
-// constraint name logic in mssql
+// TODO (matthias) changing towards having a provider specified in the middle of the test messes with some weird hard-coded
+// Does this test even make sense? When using the migrate CLI you cannot NOT have a provider specified. This only works in our weird
+// test setup
 fn typescript_starter_schema_starting_without_native_types_is_idempotent(api: TestApi) {
     let dm = r#"
         model Post {
@@ -56,17 +57,12 @@ fn typescript_starter_schema_starting_without_native_types_is_idempotent(api: Te
         }
     "#;
 
-    let dm2 = format!("{}\n{}", api.datasource_block(), dm);
-
-    api.schema_push_w_datasource(dm)
+    api.schema_push(dm)
         .send()
         .assert_green_bang()
         .assert_has_executed_steps();
+    api.schema_push(dm).send().assert_green_bang().assert_no_steps();
     api.schema_push_w_datasource(dm)
-        .send()
-        .assert_green_bang()
-        .assert_no_steps();
-    api.schema_push_w_datasource(&dm2)
         .send()
         .assert_green_bang()
         .assert_no_steps();

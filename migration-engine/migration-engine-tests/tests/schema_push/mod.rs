@@ -191,6 +191,8 @@ fn alter_constraint_name_push(api: TestApi) {
         (r#"(map: "CustomId")"#, r#", map: "CustomCompoundId""#)
     };
 
+    let no_named_fk = if api.is_sqlite() { "" } else { r#", map: "CustomFK""# };
+
     let custom_dm = format!(
         r#"
          model A {{
@@ -206,12 +208,12 @@ fn alter_constraint_name_push(api: TestApi) {
            a   String
            b   String
            aId Int
-           A   A      @relation("AtoB", fields: [aId], references: [id], map: "CustomFK")
+           A   A      @relation("AtoB", fields: [aId], references: [id]{})
            @@index([a,b], map: "AnotherCustomIndex")
            @@id([a, b]{})
          }}
      "#,
-        singular_id, compound_id
+        singular_id, no_named_fk, compound_id
     );
 
     api.schema_push_w_datasource(custom_dm).send().assert_green_bang();

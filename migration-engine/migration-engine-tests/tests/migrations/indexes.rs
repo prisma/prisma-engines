@@ -266,7 +266,9 @@ fn index_renaming_must_work_when_renaming_to_default(api: TestApi) {
 
     api.schema_push_w_datasource(dm1).send().assert_green_bang();
     api.assert_schema().assert_table("A", |t| {
-        t.assert_index_on_columns(&["field", "secondField"], |idx| idx.assert_is_unique())
+        t.assert_index_on_columns(&["field", "secondField"], |idx| {
+            idx.assert_is_unique().assert_name("customName")
+        })
     });
 
     let dm2 = r#"
