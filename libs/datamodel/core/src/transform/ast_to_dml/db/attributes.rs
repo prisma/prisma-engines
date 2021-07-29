@@ -234,7 +234,7 @@ fn visit_scalar_field_attributes<'ast>(
                             format!(
                                 "PK__{}__{}",
                                 &ast_model.name(),
-                                scalar_field_data.mapped_name.unwrap_or(ast_field.name())
+                                scalar_field_data.mapped_name.unwrap_or_else(|| ast_field.name())
                             )
                                 .into()
                         })
