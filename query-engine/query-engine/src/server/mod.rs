@@ -3,6 +3,7 @@
 mod elapsed_middleware;
 
 use crate::{context::PrismaContext, opt::PrismaOpt, PrismaResult};
+use datamodel::common::preview_features::PreviewFeature;
 use elapsed_middleware::ElapsedMiddleware;
 use opentelemetry::{global, Context};
 use query_core::{schema::QuerySchemaRenderer, TxId};
@@ -53,6 +54,11 @@ pub async fn listen(opts: PrismaOpt) -> PrismaResult<()> {
     let config = opts.configuration(false)?.subject;
     config.validate_that_one_datasource_is_provided()?;
 
+    let enable_lrts = config
+        .preview_features()
+        .find(|flag| *flag == &PreviewFeature::LongRunningTransactions)
+        .is_some();
+
     let datamodel = opts.datamodel()?;
     let cx = PrismaContext::builder(config, datamodel)
         .legacy(opts.legacy)
@@ -74,10 +80,12 @@ pub async fn listen(opts: PrismaOpt) -> PrismaResult<()> {
     app.at("/server_info").get(server_info_handler);
     app.at("/status").get(|_| async move { Ok(json!({"status": "ok"})) });
 
-    // Transaction routes.
-    app.at("/transaction/start").post(transaction_start_handler);
-    app.at("/transaction/:id/commit").post(transaction_commit_handler);
-    app.at("/transaction/:id/rollback").post(transaction_rollback_handler);
+    if enable_lrts {
+        // Transaction routes.
+        app.at("/transaction/start").post(transaction_start_handler);
+        app.at("/transaction/:id/commit").post(transaction_commit_handler);
+        app.at("/transaction/:id/rollback").post(transaction_rollback_handler);
+    }
 
     // Start the Tide server and log the server details.
     // NOTE: The `info!` statement is essential for the correct working of the client.
