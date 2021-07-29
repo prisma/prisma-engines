@@ -26,15 +26,17 @@ fn reset_works(api: TestApi) {
 
 #[test_connector]
 fn reset_then_apply_with_migrations_directory_works(api: TestApi) {
-    let dm = r#"
+    let dm = api.datamodel_with_provider(
+        r#"
         model Cat {
             id Int @id
             name String
         }
-    "#;
+    "#,
+    );
 
     let dir = api.create_migrations_directory();
-    api.create_migration("0-init", dm, &dir).send_sync();
+    api.create_migration("0-init", &dm, &dir).send_sync();
     api.apply_migrations(&dir).send_sync();
 
     api.assert_schema()
@@ -58,15 +60,17 @@ fn reset_then_apply_with_migrations_directory_works(api: TestApi) {
 
 #[test_connector]
 fn reset_then_diagnostics_with_migrations_directory_works(api: TestApi) {
-    let dm = r#"
+    let dm = api.datamodel_with_provider(
+        r#"
         model Cat {
             id Int @id
             name String
         }
-    "#;
+    "#,
+    );
 
     let dir = api.create_migrations_directory();
-    api.create_migration("0-init", dm, &dir).send_sync();
+    api.create_migration("0-init", &dm, &dir).send_sync();
     api.apply_migrations(&dir).send_sync();
 
     api.assert_schema()

@@ -40,14 +40,16 @@ fn mark_migration_rolled_back_with_a_failed_migration_works(api: TestApi) {
 
     // Create and apply a first migration
     let initial_migration_name = {
-        let dm1 = r#"
+        let dm1 = api.datamodel_with_provider(
+            r#"
             model Test {
                 id Int @id
             }
-        "#;
+        "#,
+        );
 
         let output_initial_migration = api
-            .create_migration("01init", dm1, &migrations_directory)
+            .create_migration("01init", &dm1, &migrations_directory)
             .send_sync()
             .into_output();
 
@@ -56,7 +58,8 @@ fn mark_migration_rolled_back_with_a_failed_migration_works(api: TestApi) {
 
     // Create a second migration
     let second_migration_name = {
-        let dm2 = r#"
+        let dm2 = api.datamodel_with_provider(
+            r#"
             model Test {
                 id Int @id
             }
@@ -65,10 +68,11 @@ fn mark_migration_rolled_back_with_a_failed_migration_works(api: TestApi) {
                 id Int @id
                 name String
             }
-        "#;
+        "#,
+        );
 
         let output_second_migration = api
-            .create_migration("02migration", dm2, &migrations_directory)
+            .create_migration("02migration", &dm2, &migrations_directory)
             .send_sync()
             .modify_migration(|migration| {
                 migration.clear();
