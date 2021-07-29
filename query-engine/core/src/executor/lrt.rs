@@ -55,6 +55,7 @@ impl Display for TxId {
 
 pub enum CachedTx {
     Open(OpenTx),
+    Aborted,
     Committed,
     RolledBack,
     Expired,
@@ -64,6 +65,7 @@ impl Display for CachedTx {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             CachedTx::Open(_) => write!(f, "Open"),
+            CachedTx::Aborted => write!(f, "Aborted"),
             CachedTx::Committed => write!(f, "Committed"),
             CachedTx::RolledBack => write!(f, "Rolled back"),
             CachedTx::Expired => write!(f, "Expired"),
@@ -130,16 +132,8 @@ impl TransactionCache {
         Ok(self.cache.get_mut(key).ok_or(TransactionError::NotFound)?)
     }
 
-    /// Remove cache entry for `key` or error with not found.
-    pub fn remove_or_err(&self, key: &TxId) -> crate::Result<CachedTx> {
-        Ok(self
-            .cache
-            .remove(key)
-            .map(|(_, c_tx)| c_tx)
-            .ok_or(TransactionError::NotFound)?)
-    }
-
-    /// Replaces
+    /// Replaces the cache entry for the tx with the specified `CachedTx`.
+    /// After `CACHE_EVICTION_SECS`, the entry is removed completely.
     pub fn finalize_tx(&self, key: TxId, with: CachedTx) {
         self.cache.insert(key.clone(), with);
         schedule_cache_eviction(key, Arc::clone(&self.cache), *CACHE_EVICTION_SECS)
@@ -154,8 +148,10 @@ pub struct OpenTx {
 
 impl OpenTx {
     pub async fn start(mut conn: Box<dyn Connection>) -> crate::Result<Self> {
-        // Forces static lifetime for the transaction, effectively disabling the lifetime checks.
-        // Requires to be extra careful with `tx`: The lifetime is basically manual now.
+        // Forces static lifetime for the transaction, disabling the lifetime checks for `tx`.
+        // Why is this okay? We store the connection the tx depends on with its lifetime next to
+        // the tx in the struct. Neither the connection nor the tx are moved out of this struct.
+        // The `OpenTx` struct is dropped as a unit.
         let transaction: Box<dyn Transaction + '_> = conn.start_transaction().await?;
         let tx = unsafe {
             let tx: Box<dyn Transaction + 'static> = std::mem::transmute(transaction);

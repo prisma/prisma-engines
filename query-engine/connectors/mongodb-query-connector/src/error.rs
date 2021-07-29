@@ -1,6 +1,6 @@
 use connector_interface::error::{ConnectorError, ErrorKind, MultiError};
 use itertools::Itertools;
-use mongodb::error::Error as DriverError;
+use mongodb::error::{CommandError, Error as DriverError};
 use regex::Regex;
 use thiserror::Error;
 use user_facing_errors::query_engine::DatabaseConstraint;
@@ -55,6 +55,13 @@ impl MongoError {
                 mongodb::error::ErrorKind::Authentication { message, .. } => {
                     // Todo this mapping is only half correct.
                     ConnectorError::from_kind(ErrorKind::AuthenticationFailed { user: message.clone() })
+                }
+
+                // Transaction aborted error.
+                mongodb::error::ErrorKind::Command(CommandError { code, message, .. }) if *code == 251 => {
+                    ConnectorError::from_kind(ErrorKind::TransactionAborted {
+                        message: message.to_owned(),
+                    })
                 }
 
                 mongodb::error::ErrorKind::Write(write_failure) => match write_failure {

@@ -8,8 +8,8 @@ use crate::{
     TransactionError, TransactionManager,
 };
 use async_trait::async_trait;
-use connector::{Connection, ConnectionLike, Connector};
-use futures::future;
+use connector::{error::ErrorKind, Connection, ConnectionLike, Connector};
+use futures::{future, Future};
 use tokio::time;
 
 /// Central query executor and main entry point into the query core.
@@ -71,6 +71,38 @@ where
         let result = QueryPipeline::new(graph, interpreter, serializer).execute().await;
 
         result
+    }
+
+    async fn finalize_tx<F>(&self, tx_id: TxId, final_state: CachedTx, finalizer: F) -> crate::Result<()>
+    where
+        // F: Fn(&mut OpenTx) -> Pin<Box<dyn Future<Output = connector::Result<()>>>> + Send + Sync,
+        F: Fn(&mut OpenTx) -> Box<dyn Future<Output = connector::Result<()>> + Unpin + Send + '_>,
+    {
+        // The references need to be dropped before finalization,
+        // or else the DashMap deadlocks with the finalization cleanup task.
+        let final_state = {
+            let mut tx = self.tx_cache.get_or_err(&tx_id)?;
+            let otx = tx.as_open()?;
+
+            // Some connectors hard-abort transactions after an error
+            // and refuse to execute any subsequent operation. Handle cleanup for those cases.
+            let state = if let Err(err) = finalizer(otx).await {
+                if let ErrorKind::TransactionAborted { message } = err.kind {
+                    debug!("[{}] Aborted with {}.", tx_id, message);
+                    CachedTx::Aborted
+                } else {
+                    return Err(err.into());
+                }
+            } else {
+                final_state
+            };
+
+            otx.cancel_expiration_timer();
+            state
+        };
+
+        self.tx_cache.finalize_tx(tx_id, final_state);
+        Ok(())
     }
 }
 
@@ -211,7 +243,6 @@ where
         .await;
 
         let conn = conn.map_err(|_| TransactionError::AcquisitionTimeout)??;
-        // let conn = self.connector.get_connection().await?;
         let c_tx = OpenTx::start(conn).await?;
 
         self.tx_cache.insert(id.clone(), c_tx, valid_for_secs).await;
@@ -220,24 +251,12 @@ where
     }
 
     async fn commit_tx(&self, tx_id: TxId) -> crate::Result<()> {
-        let mut otx = self.tx_cache.remove_or_err(&tx_id)?.into_open()?;
-
-        otx.tx.commit().await?;
-        otx.cancel_expiration_timer();
-
-        self.tx_cache.finalize_tx(tx_id, CachedTx::Committed);
-
-        Ok(())
+        self.finalize_tx(tx_id, CachedTx::Committed, |otx| Box::new(otx.tx.commit()))
+            .await
     }
 
     async fn rollback_tx(&self, tx_id: TxId) -> crate::Result<()> {
-        let mut otx = self.tx_cache.remove_or_err(&tx_id)?.into_open()?;
-
-        otx.tx.rollback().await?;
-        otx.cancel_expiration_timer();
-
-        self.tx_cache.finalize_tx(tx_id, CachedTx::RolledBack);
-
-        Ok(())
+        self.finalize_tx(tx_id, CachedTx::RolledBack, |otx| Box::new(otx.tx.rollback()))
+            .await
     }
 }

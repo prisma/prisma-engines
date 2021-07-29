@@ -71,7 +71,7 @@ mod lrt {
           @r###"{"data":{"createOneTestModel":{"id":1}}}"###
         );
 
-        time::sleep(time::Duration::from_secs(1)).await;
+        time::sleep(time::Duration::from_millis(1500)).await;
         runner.clear_active_tx();
 
         // Everything must be rolled back.
@@ -163,7 +163,57 @@ mod lrt {
     }
 
     #[connector_test]
-    async fn batch_queries(mut runner: Runner) -> TestResult<()> {
+    async fn batch_queries_success(mut runner: Runner) -> TestResult<()> {
+        // Tx expires after five second.
+        let tx_id = runner.executor().start_tx(5, 5).await?;
+        runner.set_active_tx(tx_id.clone());
+
+        let queries = vec![
+            r#"mutation { createOneTestModel(data: { id: 1 }) { id }}"#.to_string(),
+            r#"mutation { createOneTestModel(data: { id: 2 }) { id }}"#.to_string(),
+            r#"mutation { createOneTestModel(data: { id: 3 }) { id }}"#.to_string(),
+        ];
+
+        // Tx flag is not set, but it executes on an LRT.
+        runner.batch(queries, false).await?;
+        runner.executor().commit_tx(tx_id.clone()).await?;
+        runner.clear_active_tx();
+
+        insta::assert_snapshot!(
+          run_query!(&runner, "query { findManyTestModel { id }}"),
+            @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":3}]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn batch_queries_rollback(mut runner: Runner) -> TestResult<()> {
+        // Tx expires after five second.
+        let tx_id = runner.executor().start_tx(5, 5).await?;
+        runner.set_active_tx(tx_id.clone());
+
+        let queries = vec![
+            r#"mutation { createOneTestModel(data: { id: 1 }) { id }}"#.to_string(),
+            r#"mutation { createOneTestModel(data: { id: 2 }) { id }}"#.to_string(),
+            r#"mutation { createOneTestModel(data: { id: 3 }) { id }}"#.to_string(),
+        ];
+
+        // Tx flag is not set, but it executes on an LRT.
+        runner.batch(queries, false).await?;
+        runner.executor().rollback_tx(tx_id.clone()).await?;
+        runner.clear_active_tx();
+
+        insta::assert_snapshot!(
+          run_query!(&runner, "query { findManyTestModel { id }}"),
+            @r###"{"data":{"findManyTestModel":[]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn batch_queries_failure(mut runner: Runner) -> TestResult<()> {
         // Tx expires after five second.
         let tx_id = runner.executor().start_tx(5, 5).await?;
         runner.set_active_tx(tx_id.clone());
@@ -185,8 +235,8 @@ mod lrt {
 
         let partial_data_res = run_query!(&runner, "query { findManyTestModel { id }}");
         match runner.connector() {
-            // Postgres aborts transactions, data is lost.
-            ConnectorTag::Postgres(_) => insta::assert_snapshot!(
+            // Postgres and Mongo abort transactions, data is lost.
+            ConnectorTag::Postgres(_) | ConnectorTag::MongoDb(_) => insta::assert_snapshot!(
               partial_data_res,
               @r###"{"data":{"findManyTestModel":[]}}"###
             ),
@@ -199,6 +249,4 @@ mod lrt {
 
         Ok(())
     }
-
-    // No acquisition in timeframe - not easily testable, moved to client integration tests.
 }
