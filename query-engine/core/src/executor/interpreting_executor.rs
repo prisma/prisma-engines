@@ -171,7 +171,7 @@ where
             }
 
             Ok(results)
-        } else if transactional | self.force_transactions {
+        } else if transactional {
             let queries = operations
                 .into_iter()
                 .map(|op| QueryGraphBuilder::new(query_schema.clone()).build(op))
