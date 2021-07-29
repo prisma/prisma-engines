@@ -1902,7 +1902,7 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
 
             let kind = from.split('(').next().unwrap();
 
-            let dm1 = api.datamodel_with_provider(&format!(
+            let dm1 = &format!(
                 r#"
                model A {{
                     id Int @id @default(autoincrement()) @db.Int
@@ -1911,9 +1911,9 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
                 "#,
                 TYPE_MAPS.get(kind).unwrap(),
                 from,
-            ));
+            );
 
-            api.schema_push_w_datasource(&dm1).send().assert_green_bang();
+            api.schema_push_w_datasource(dm1).send().assert_green_bang();
 
             let insert = Insert::single_into((api.schema_name(), "A")).value("x", seed.clone());
             api.query(insert.into());
@@ -1927,7 +1927,7 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
 
             let kind = to.split('(').next().unwrap();
 
-            let dm2 = api.datamodel_with_provider(&format!(
+            let dm2 = &format!(
                 r#"
                model A {{
                     id Int @id @default(autoincrement()) @db.Int
@@ -1936,9 +1936,9 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
                 "#,
                 TYPE_MAPS.get(kind).unwrap(),
                 to,
-            ));
+            );
 
-            api.schema_push_w_datasource(&dm2).send().assert_green_bang();
+            api.schema_push_w_datasource(dm2).send().assert_green_bang();
 
             api.assert_schema().assert_table("A", |table| {
                 table.assert_columns_count(2).assert_column("x", |c| {
@@ -1960,7 +1960,7 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
 
             let kind = from.split('(').next().unwrap();
 
-            let dm1 = api.datamodel_with_provider(&format!(
+            let dm1 = &format!(
                 r#"
                 model A {{
                     id Int @id @default(autoincrement()) @db.Int
@@ -1969,9 +1969,9 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
                 "#,
                 TYPE_MAPS.get(kind).unwrap(),
                 from,
-            ));
+            );
 
-            api.schema_push_w_datasource(&dm1).send().assert_green_bang();
+            api.schema_push_w_datasource(dm1).send().assert_green_bang();
 
             let insert = Insert::single_into((api.schema_name(), "A")).value("x", seed.clone());
             api.query(insert.into());
@@ -1985,7 +1985,7 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
 
             let kind = to.split('(').next().unwrap();
 
-            let dm2 = api.datamodel_with_provider(&format!(
+            let dm2 = &format!(
                 r#"
                 model A {{
                     id Int @id @default(autoincrement()) @db.Int
@@ -1994,7 +1994,7 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
                 "#,
                 TYPE_MAPS.get(kind).unwrap(),
                 to
-            ));
+            );
 
             let warning = format!(
                 "You are about to alter the column `x` on the `A` table, which contains 1 non-null values. The data in that column will be cast from `{}` to `{}`.",
@@ -2002,7 +2002,7 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
                 to,
             );
 
-            api.schema_push_w_datasource(&dm2)
+            api.schema_push_w_datasource(dm2)
                 .send()
                 .assert_warnings(&[warning.into()]);
 
@@ -2029,7 +2029,7 @@ fn not_castable_with_existing_data_should_warn(api: TestApi) {
                 _ => unreachable!(),
             };
 
-            let dm1 = api.datamodel_with_provider(&format!(
+            let dm1 = &format!(
                 r#"
                 model A {{
                     id Int @id @default(autoincrement()) @db.Int
@@ -2038,9 +2038,9 @@ fn not_castable_with_existing_data_should_warn(api: TestApi) {
                 "#,
                 TYPE_MAPS.get(kind).unwrap(),
                 from,
-            ));
+            );
 
-            api.schema_push_w_datasource(&dm1).send().assert_green_bang();
+            api.schema_push_w_datasource(dm1).send().assert_green_bang();
 
             let insert = Insert::single_into((api.schema_name(), "A")).value("x", seed.clone());
             api.query(insert.into());
@@ -2054,7 +2054,7 @@ fn not_castable_with_existing_data_should_warn(api: TestApi) {
 
             let kind = to.split('(').next().unwrap();
 
-            let dm2 = api.datamodel_with_provider(&format!(
+            let dm2 = &format!(
                 r#"
                 model A {{
                     id Int @id @default(autoincrement()) @db.Int
@@ -2063,11 +2063,11 @@ fn not_castable_with_existing_data_should_warn(api: TestApi) {
                 "#,
                 TYPE_MAPS.get(kind).unwrap(),
                 to
-            ));
+            );
 
             let warning = "Changed the type of `x` on the `A` table. No cast exists, the column would be dropped and recreated, which cannot be done since the column is required and there is data in the table.";
 
-            api.schema_push_w_datasource(&dm2)
+            api.schema_push_w_datasource(dm2)
                 .send()
                 .assert_unexecutable(&[warning.into()]);
 
