@@ -116,7 +116,7 @@ fn mark_migration_applied_when_the_migration_is_already_applied_errors(api: Test
     // Create and apply a first migration
     let initial_migration_name = {
         let output_initial_migration = api
-            .create_migration("01init", BASE_DM, &migrations_directory)
+            .create_migration("01init", &api.datamodel_with_provider(BASE_DM), &migrations_directory)
             .send_sync()
             .into_output();
 
@@ -258,18 +258,20 @@ fn baselining_should_work(api: TestApi) {
     let migrations_directory = api.create_migrations_directory();
     let persistence = api.migration_persistence();
 
-    let dm1 = r#"
+    let dm1 = api.datamodel_with_provider(
+        r#"
         model test {
             id Int @id
         }
-    "#;
+    "#,
+    );
 
-    api.schema_push_w_datasource(dm1).send();
+    api.schema_push(dm1.clone()).send();
 
     // Create a first local migration that matches the db contents
     let baseline_migration_name = {
         let output_baseline_migration = api
-            .create_migration("01baseline", dm1, &migrations_directory)
+            .create_migration("01baseline", &dm1, &migrations_directory)
             .send_sync()
             .into_output();
 

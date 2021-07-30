@@ -481,8 +481,6 @@ fn new_index_with_same_name_as_index_from_dropped_table_works(api: TestApi) {
 
 #[test_connector]
 fn column_type_migrations_should_not_implicitly_drop_indexes(api: TestApi) {
-    let migrations_directory = api.create_migrations_directory();
-
     let dm1 = r#"
         model Cat {
             id Int @id @default(autoincrement())
@@ -492,7 +490,7 @@ fn column_type_migrations_should_not_implicitly_drop_indexes(api: TestApi) {
         }
     "#;
 
-    api.create_migration("01init", dm1, &migrations_directory).send_sync();
+    api.schema_push_w_datasource(dm1).send().assert_green_bang();
 
     let dm2 = r#"
         model Cat {
@@ -504,10 +502,7 @@ fn column_type_migrations_should_not_implicitly_drop_indexes(api: TestApi) {
     "#;
 
     // NOTE: we are relying on the fact that we will drop and recreate the column for that particular type migration.
-    api.create_migration("02change", dm2, &migrations_directory).send_sync();
-
-    api.apply_migrations(&migrations_directory).send_sync();
-
+    api.schema_push_w_datasource(dm2).send().assert_green_bang();
     api.assert_schema().assert_table("Cat", |cat| {
         cat.assert_indexes_count(1)
             .assert_index_on_columns(&["name"], |idx| idx.assert_is_not_unique())
@@ -516,8 +511,6 @@ fn column_type_migrations_should_not_implicitly_drop_indexes(api: TestApi) {
 
 #[test_connector]
 fn column_type_migrations_should_not_implicitly_drop_compound_indexes(api: TestApi) {
-    let migrations_directory = api.create_migrations_directory();
-
     let dm1 = r#"
         model Cat {
             id Int @id @default(autoincrement())
@@ -528,7 +521,7 @@ fn column_type_migrations_should_not_implicitly_drop_compound_indexes(api: TestA
         }
     "#;
 
-    api.create_migration("01init", dm1, &migrations_directory).send_sync();
+    api.schema_push_w_datasource(dm1).send().assert_green_bang();
 
     let dm2 = r#"
         model Cat {
@@ -541,9 +534,7 @@ fn column_type_migrations_should_not_implicitly_drop_compound_indexes(api: TestA
     "#;
 
     // NOTE: we are relying on the fact that we will drop and recreate the column for that particular type migration.
-    api.create_migration("02change", dm2, &migrations_directory).send_sync();
-
-    api.apply_migrations(&migrations_directory).send_sync();
+    api.schema_push_w_datasource(dm2).send().assert_green_bang();
 
     api.assert_schema().assert_table("Cat", |cat| {
         cat.assert_indexes_count(1)
