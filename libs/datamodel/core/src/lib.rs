@@ -139,9 +139,10 @@ fn parse_datamodel_internal(
     let generators = GeneratorLoader::load_generators_from_ast(&ast, &mut diagnostics);
     let preview_features = preview_features(&generators);
     let datasources = load_sources(&ast, preview_features, &mut diagnostics);
-    let validator = ValidationPipeline::new(&datasources, preview_features);
 
     diagnostics.to_result()?;
+
+    let validator = ValidationPipeline::new(&datasources, preview_features);
 
     match validator.validate(&ast, transform) {
         Ok(mut src) => {
