@@ -53,7 +53,8 @@ fn adding_multiple_optional_fields_to_an_existing_model_works(api: TestApi) {
 fn a_model_can_be_removed(api: TestApi) {
     let directory = api.create_migrations_directory();
 
-    let dm1 = r#"
+    let dm1 = api.datamodel_with_provider(
+        r#"
         model User {
             id   Int     @id @default(autoincrement())
             name String?
@@ -66,16 +67,19 @@ fn a_model_can_be_removed(api: TestApi) {
             User   User   @relation(fields: [userId], references: [id])
             userId Int
         }
-    "#;
+    "#,
+    );
 
     api.create_migration("initial", &dm1, &directory).send_sync();
 
-    let dm2 = r#"
+    let dm2 = api.datamodel_with_provider(
+        r#"
         model User {
             id   Int     @id @default(autoincrement())
             name String?
         }
-    "#;
+    "#,
+    );
 
     api.create_migration("second-migration", &dm2, &directory).send_sync();
 
@@ -346,7 +350,7 @@ fn reordering_and_altering_models_at_the_same_time_works(api: TestApi) {
     api.schema_push_w_datasource(dm2).send().assert_green_bang();
 }
 
-#[test_connector]
+#[test_connector(tags(Sqlite))]
 fn switching_databases_must_work(api: TestApi) {
     let dm1 = r#"
         datasource db {

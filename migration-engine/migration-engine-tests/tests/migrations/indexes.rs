@@ -284,7 +284,11 @@ fn index_renaming_must_work_when_renaming_to_default(api: TestApi) {
     api.schema_push_w_datasource(dm2).send();
     api.assert_schema().assert_table("A", |t| {
         t.assert_index_on_columns(&["field", "secondField"], |idx| {
-            idx.assert_is_unique().assert_name("A.field_secondField_unique")
+            idx.assert_is_unique().assert_name(if api.is_mssql() {
+                "A_field_secondField_unique"
+            } else {
+                "A.field_secondField_unique"
+            })
         })
     });
 }

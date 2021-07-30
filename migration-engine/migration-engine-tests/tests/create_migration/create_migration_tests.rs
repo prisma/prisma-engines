@@ -3,16 +3,18 @@ use migration_engine_tests::sync_test_api::*;
 
 #[test_connector]
 fn basic_create_migration_works(api: TestApi) {
-    let dm = r#"
+    let dm = api.datamodel_with_provider(
+        r#"
         model Cat {
             id      Int @id
             name    String
         }
-    "#;
+    "#,
+    );
 
     let dir = api.create_migrations_directory();
 
-    api.create_migration("create-cats", dm, &dir)
+    api.create_migration("create-cats", &dm, &dir)
         .send_sync()
         .assert_migration_directories_count(1)
         .assert_migration("create-cats", |migration| {
@@ -88,20 +90,23 @@ fn basic_create_migration_works(api: TestApi) {
 
 #[test_connector]
 fn creating_a_second_migration_should_have_the_previous_sql_schema_as_baseline(api: TestApi) {
-    let dm1 = r#"
+    let dm1 = api.datamodel_with_provider(
+        r#"
         model Cat {
             id      Int @id
             name    String
         }
-    "#;
+    "#,
+    );
 
     let dir = api.create_migrations_directory();
 
-    api.create_migration("create-cats", dm1, &dir)
+    api.create_migration("create-cats", &dm1, &dir)
         .send_sync()
         .assert_migration_directories_count(1);
 
-    let dm2 = r#"
+    let dm2 = api.datamodel_with_provider(
+        r#"
         model Cat {
             id      Int @id
             name    String
@@ -111,9 +116,10 @@ fn creating_a_second_migration_should_have_the_previous_sql_schema_as_baseline(a
             id      Int @id
             name    String
         }
-    "#;
+    "#,
+    );
 
-    api.create_migration("create-dogs", dm2, &dir)
+    api.create_migration("create-dogs", &dm2, &dir)
         .send_sync()
 
         .assert_migration_directories_count(2)
@@ -196,12 +202,14 @@ fn creating_a_second_migration_should_have_the_previous_sql_schema_as_baseline(a
 fn bad_migrations_should_make_the_command_fail_with_a_good_error(api: TestApi) {
     use std::io::Write as _;
 
-    let dm = r#"
+    let dm = api.datamodel_with_provider(
+        r#"
         model Cat {
             id      Int @id
             name    String
         }
-    "#;
+    "#,
+    );
 
     let dir = api.create_migrations_directory();
 
@@ -212,63 +220,69 @@ fn bad_migrations_should_make_the_command_fail_with_a_good_error(api: TestApi) {
     let mut file = std::fs::File::create(&migration_file_path).unwrap();
     write!(file, "{}", script).unwrap();
 
-    let error = api.create_migration("create-cats", dm, &dir).send_unwrap_err();
+    let error = api.create_migration("create-cats", &dm, &dir).send_unwrap_err();
 
     assert!(error.to_string().contains("syntax"), "{}", error);
 }
 
 #[test_connector]
 fn empty_migrations_should_not_be_created(api: TestApi) {
-    let dm = r#"
+    let dm = api.datamodel_with_provider(
+        r#"
         model Cat {
             id Int @id
             name String
         }
-    "#;
+    "#,
+    );
 
     let dir = api.create_migrations_directory();
 
-    api.create_migration("create-cats", dm, &dir)
+    api.create_migration("create-cats", &dm, &dir)
         .send_sync()
         .assert_migration_directories_count(1);
 
-    api.create_migration("create-cats-again", dm, &dir)
+    api.create_migration("create-cats-again", &dm, &dir)
         .send_sync()
         .assert_migration_directories_count(1);
 }
 
 #[test_connector]
 fn migration_name_length_is_validated(api: TestApi) {
-    let dm = r#"
+    let dm = api.datamodel_with_provider(
+        r#"
         model Cat {
             id Int @id
             name String
         }
-    "#;
+    "#,
+    );
 
     let dir = api.create_migrations_directory();
 
-    api.create_migration("a-migration-with-a-name-that-is-way-too-long-a-migration-with-a-name-that-is-way-too-long-a-migration-with-a-name-that-is-way-too-long-a-migration-with-a-name-that-is-way-too-long", dm, &dir)
+    api.create_migration("a-migration-with-a-name-that-is-way-too-long-a-migration-with-a-name-that-is-way-too-long-a-migration-with-a-name-that-is-way-too-long-a-migration-with-a-name-that-is-way-too-long", &dm, &dir)
         .send_sync()
         .assert_migration_directories_count(1);
 }
 
 #[test_connector]
 fn empty_migrations_should_be_created_with_the_draft_option(api: TestApi) {
-    let dm = r#"
+    let dm = api.datamodel_with_provider(
+        r#"
         model Cat {
             id Int @id
             name String
         }
-    "#;
+    "#,
+    );
 
     let dir = api.create_migrations_directory();
 
-    api.create_migration("create-cats", dm, &dir)
+    api.create_migration("create-cats", &dm, &dir)
         .send_sync()
         .assert_migration_directories_count(1);
 
-    api.create_migration("create-cats-again", dm, &dir)
+    api.create_migration("create-cats-again", &dm, &dir)
         .draft(true)
         .send_sync()
         .assert_migration_directories_count(2)
@@ -279,18 +293,20 @@ fn empty_migrations_should_be_created_with_the_draft_option(api: TestApi) {
 
 #[test_connector]
 fn creating_a_migration_with_a_non_existent_migrations_directory_should_work(api: TestApi) {
-    let dm = r#"
+    let dm = api.datamodel_with_provider(
+        r#"
         model Cat {
             id Int @id
             name String
         }
-    "#;
+    "#,
+    );
 
     let dir = api.create_migrations_directory();
 
     std::fs::remove_dir_all(&dir.path()).unwrap();
 
-    api.create_migration("create-cats", dm, &dir)
+    api.create_migration("create-cats", &dm, &dir)
         .send_sync()
         .assert_migration_directories_count(1);
 }
@@ -947,32 +963,49 @@ fn alter_constraint_name_tests(api: TestApi) {
         .assert_migration_directories_count(2)
         .assert_migration("custom", |migration| {
             let expected_script = if api.is_mssql() {
-                //todo use rename foreign key here instead of drop and recreate
+                //TODO (matthias NamedConstraints) implement rename foreign key here instead of drop and recreate
                 indoc! {
                      r#"
+                     BEGIN TRY
+                     
+                     BEGIN TRAN;
+                     
                      -- DropForeignKey
                      ALTER TABLE [alter_constraint_name_tests].[B] DROP CONSTRAINT [B_aId_fkey];
-
+                     
                      -- AlterTable
                      EXEC SP_RENAME N'alter_constraint_name_tests.A_pkey', N'CustomId';
-
+                     
                      -- AlterTable
                      EXEC SP_RENAME N'alter_constraint_name_tests.B_pkey', N'CustomCompoundId';
-
+                     
                      -- AddForeignKey
                      ALTER TABLE [alter_constraint_name_tests].[B] ADD CONSTRAINT [CustomFK] FOREIGN KEY ([aId]) REFERENCES [alter_constraint_name_tests].[A]([id]) ON DELETE CASCADE ON UPDATE CASCADE;
-
+                     
                      -- RenameIndex
                      EXEC SP_RENAME N'alter_constraint_name_tests.A.A_a_b_key', N'CustomCompoundUnique', N'INDEX';
-
+                     
                      -- RenameIndex
                      EXEC SP_RENAME N'alter_constraint_name_tests.A.A_a_idx', N'CustomIndex', N'INDEX';
-
+                     
                      -- RenameIndex
                      EXEC SP_RENAME N'alter_constraint_name_tests.A.A_name_key', N'CustomUnique', N'INDEX';
-
+                     
                      -- RenameIndex
                      EXEC SP_RENAME N'alter_constraint_name_tests.B.B_a_b_idx', N'AnotherCustomIndex', N'INDEX';
+                     
+                     COMMIT TRAN;
+                     
+                     END TRY
+                     BEGIN CATCH
+                     
+                     IF @@TRANCOUNT > 0
+                     BEGIN 
+                         ROLLBACK TRAN;
+                     END;
+                     THROW
+                     
+                     END CATCH
                  "#
                  }
             } else if api.is_postgres() {

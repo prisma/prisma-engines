@@ -194,6 +194,45 @@ impl TestApi {
     pub fn test_fn_name(&self) -> &str {
         self.args.test_function_name()
     }
+
+    /// Render a datamodel including provider and generator block.
+    pub fn datamodel_with_provider(&self, schema: &str) -> String {
+        let mut out = String::with_capacity(320 + schema.len());
+
+        self.write_datasource_block(&mut out);
+        out.push_str(&self.generator_block());
+        out.push_str(schema);
+
+        out
+    }
+
+    /// Render a valid datasource block, including database URL.
+    pub fn write_datasource_block(&self, out: &mut dyn std::fmt::Write) {
+        write!(out, "{}", self.args.datasource_block(self.args.database_url(), &[])).unwrap()
+    }
+
+    fn generator_block(&self) -> String {
+        let preview_features: Vec<String> = self
+            .args
+            .preview_features()
+            .iter()
+            .map(|pf| format!(r#""{}""#, pf))
+            .collect();
+
+        let preview_feature_string = if preview_features.is_empty() {
+            "".to_string()
+        } else {
+            format!("\npreviewFeatures = [{}]", preview_features.join(", "))
+        };
+
+        let generator_block = format!(
+            r#"generator client {{
+                 provider = "prisma-client-js"{}
+               }}"#,
+            preview_feature_string
+        );
+        generator_block
+    }
 }
 
 /// A wrapper around a migration engine instance optimized for convenience in

@@ -92,18 +92,20 @@ fn soft_resets_work_on_sql_server(api: TestApi) {
 
     let mut url: JdbcString = format!("jdbc:{}", api.connection_string()).parse().unwrap();
 
-    let dm = r#"
+    let dm = api.datamodel_with_provider(
+        r#"
         model Cat {
             id Int @id
             litterConsumption Int
             hungry Boolean @default(true)
         }
-    "#;
+    "#,
+    );
 
     // Create the database, a first migration and the test user.
     {
         api.new_engine()
-            .create_migration("01init", dm, &migrations_directory)
+            .create_migration("01init", &dm, &migrations_directory)
             .send_sync();
 
         let create_database = r#"
