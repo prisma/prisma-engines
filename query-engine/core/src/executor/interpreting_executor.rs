@@ -236,6 +236,8 @@ where
 {
     async fn start_tx(&self, max_acquisition_millis: u64, valid_for_millis: u64) -> crate::Result<TxId> {
         let id = TxId::default();
+        debug!("[{}] Started.", id);
+
         let conn = time::timeout(
             time::Duration::from_millis(max_acquisition_millis),
             self.connector.get_connection(),
@@ -246,16 +248,17 @@ where
         let c_tx = OpenTx::start(conn).await?;
 
         self.tx_cache.insert(id.clone(), c_tx, valid_for_millis).await;
-
         Ok(id)
     }
 
     async fn commit_tx(&self, tx_id: TxId) -> crate::Result<()> {
+        debug!("[{}] Committing.", tx_id);
         self.finalize_tx(tx_id, CachedTx::Committed, |otx| Box::new(otx.tx.commit()))
             .await
     }
 
     async fn rollback_tx(&self, tx_id: TxId) -> crate::Result<()> {
+        debug!("[{}] Rolling back.", tx_id);
         self.finalize_tx(tx_id, CachedTx::RolledBack, |otx| Box::new(otx.tx.rollback()))
             .await
     }

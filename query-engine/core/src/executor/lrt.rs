@@ -102,13 +102,13 @@ pub(crate) struct TransactionCache {
 }
 
 impl TransactionCache {
-    pub async fn insert(&self, key: TxId, mut value: OpenTx, valid_for_secs: u64) {
+    pub async fn insert(&self, key: TxId, mut value: OpenTx, valid_for_millis: u64) {
         let cache = Arc::clone(&self.cache);
         let cache_key = key.clone();
 
         let timer_handle = task::spawn(async move {
-            debug!("[{}] Valid for {} seconds", cache_key, valid_for_secs);
-            time::sleep(Duration::from_secs(valid_for_secs)).await;
+            debug!("[{}] Valid for {} milliseconds", cache_key, valid_for_millis);
+            time::sleep(Duration::from_millis(valid_for_millis)).await;
             debug!("[{}] Forced rollback triggered.", cache_key);
 
             if let Some(ref mut c_tx) = cache.get_mut(&cache_key) {
