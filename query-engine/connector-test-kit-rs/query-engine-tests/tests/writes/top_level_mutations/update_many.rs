@@ -254,7 +254,7 @@ mod update_many {
         let count = &res["data"]["updateManyTestModel"]["count"];
         assert_eq!(count, 3);
 
-        let res = run_query!(&runner, format!(r#"{{ findManyTestModel {{ {} }} }}"#, field));
+        let res = run_query!(runner, format!(r#"{{ findManyTestModel {{ {} }} }}"#, field));
         Ok(res)
     }
 

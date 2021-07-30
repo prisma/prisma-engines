@@ -56,8 +56,7 @@ pub async fn listen(opts: PrismaOpt) -> PrismaResult<()> {
 
     let enable_lrts = config
         .preview_features()
-        .find(|flag| *flag == &PreviewFeature::LongRunningTransactions)
-        .is_some();
+        .any(|flag| *flag == PreviewFeature::LongRunningTransactions);
 
     let datamodel = opts.datamodel()?;
     let cx = PrismaContext::builder(config, datamodel)

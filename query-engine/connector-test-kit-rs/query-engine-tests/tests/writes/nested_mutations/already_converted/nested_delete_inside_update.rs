@@ -49,7 +49,7 @@ mod delete_inside_update {
         )?;
 
         insta::assert_snapshot!(
-          run_query!(&runner, format!(r#"mutation {{
+          run_query!(runner, format!(r#"mutation {{
             updateOneParent(
             where: {parent}
             data:{{
@@ -66,7 +66,7 @@ mod delete_inside_update {
         // Verify existing data
 
         insta::assert_snapshot!(
-          run_query!(&runner, format!(r#"{{
+          run_query!(runner, format!(r#"{{
             findUniqueParent(where: {parent} ){{
               childOpt {{
                 c
@@ -172,7 +172,7 @@ mod delete_inside_update {
         )?;
 
         insta::assert_snapshot!(
-          run_query!(&runner, format!(r#"mutation {{
+          run_query!(runner, format!(r#"mutation {{
             updateOneParent(
               where: {parent}
               data:{{
@@ -215,7 +215,7 @@ mod delete_inside_update {
         )?;
 
         insta::assert_snapshot!(
-          run_query!(&runner, format!(r#"mutation {{
+          run_query!(runner, format!(r#"mutation {{
             updateOneParent(
             where: {parent}
             data:{{
@@ -271,7 +271,7 @@ mod delete_inside_update {
         )?;
 
         insta::assert_snapshot!(
-          run_query!(&runner, format!(r#"mutation {{
+          run_query!(runner, format!(r#"mutation {{
             updateOneParent(
             where: {parent}
             data:{{
@@ -355,7 +355,7 @@ mod delete_inside_update {
         )?;
 
         insta::assert_snapshot!(
-          run_query!(&runner, format!(r#"mutation {{
+          run_query!(runner, format!(r#"mutation {{
             updateOneParent(
               where: {parent}
               data:{{
@@ -370,7 +370,7 @@ mod delete_inside_update {
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query{findManyChild{c, parentsOpt{p}}}"#),
+          run_query!(runner, r#"query{findManyChild{c, parentsOpt{p}}}"#),
           @r###"{"data":{"findManyChild":[]}}"###
         );
 
@@ -452,7 +452,7 @@ mod delete_inside_update {
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, format!(r#"mutation {{
+          run_query!(runner, format!(r#"mutation {{
             updateOneParent(
               where: {parent}
               data:{{
@@ -467,12 +467,12 @@ mod delete_inside_update {
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query{findUniqueChild(where:{c:"c4"}){c, parentsOpt{p}}}"#),
+          run_query!(runner, r#"query{findUniqueChild(where:{c:"c4"}){c, parentsOpt{p}}}"#),
           @r###"{"data":{"findUniqueChild":{"c":"c4","parentsOpt":[{"p":"p2"}]}}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query{findUniqueChild(where:{c:"otherChild"}){c, parentsOpt{p}}}"#),
+          run_query!(runner, r#"query{findUniqueChild(where:{c:"otherChild"}){c, parentsOpt{p}}}"#),
           @r###"{"data":{"findUniqueChild":{"c":"otherChild","parentsOpt":[{"p":"otherParent"}]}}}"###
         );
 
@@ -560,7 +560,7 @@ mod delete_inside_update {
     #[relation_link_test(on_parent = "ToMany", on_child = "ToMany")]
     async fn pm_cm_work_correct_children(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         run_query!(
-            &runner,
+            runner,
             r#"mutation {
                 createOneParent(data: {
                   p: "otherParent", p_1: "p", p_2: "1",
@@ -617,7 +617,7 @@ mod delete_inside_update {
         )?;
 
         insta::assert_snapshot!(
-          run_query!(&runner, format!(r#"mutation {{
+          run_query!(runner, format!(r#"mutation {{
           updateOneParent(
             where: {parent}
             data:{{
@@ -632,17 +632,17 @@ mod delete_inside_update {
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query{findManyParent {p, childrenOpt{c}}}"#),
+          run_query!(runner, r#"query{findManyParent {p, childrenOpt{c}}}"#),
           @r###"{"data":{"findManyParent":[{"p":"otherParent","childrenOpt":[{"c":"otherChild"}]},{"p":"p2","childrenOpt":[{"c":"c4"}]}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query{findUniqueChild(where:{c:"c4"}){c, parentsOpt{p}}}"#),
+          run_query!(runner, r#"query{findUniqueChild(where:{c:"c4"}){c, parentsOpt{p}}}"#),
           @r###"{"data":{"findUniqueChild":{"c":"c4","parentsOpt":[{"p":"p2"}]}}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query{findUniqueChild(where:{c:"otherChild"}){c, parentsOpt{p}}}"#),
+          run_query!(runner, r#"query{findUniqueChild(where:{c:"otherChild"}){c, parentsOpt{p}}}"#),
           @r###"{"data":{"findUniqueChild":{"c":"otherChild","parentsOpt":[{"p":"otherParent"}]}}}"###
         );
 

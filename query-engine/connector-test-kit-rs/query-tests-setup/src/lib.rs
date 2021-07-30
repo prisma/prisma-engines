@@ -89,7 +89,7 @@ pub fn run_relation_link_test<F>(
     let template = datamodel.to_string();
     let dm_with_params_json: DatamodelWithParams = dm_with_params.parse().unwrap();
 
-    if ConnectorTag::should_run(&config, &enabled_connectors, &capabilities, test_name) {
+    if ConnectorTag::should_run(config, &enabled_connectors, capabilities, test_name) {
         let datamodel = render_test_datamodel(config, test_database, template);
         let connector = config.test_connector_tag().unwrap();
 

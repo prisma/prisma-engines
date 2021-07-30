@@ -31,7 +31,7 @@ pub fn introspect(
 
         for column in &table.columns {
             version_check.check_column_for_type_and_default_value(column);
-            let field = calculate_scalar_field(table, column, &ctx);
+            let field = calculate_scalar_field(table, column, ctx);
             model.add_field(Field::ScalarField(field));
         }
 

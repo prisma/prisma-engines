@@ -36,11 +36,11 @@ mod find_first_query {
     }
 
     async fn test_data(runner: &Runner) -> TestResult<()> {
-        test_row(&runner, r#"{ id: 1, field: "test1" }"#).await?;
-        test_row(&runner, r#"{ id: 2, field: "test2" }"#).await?;
-        test_row(&runner, r#"{ id: 3 }"#).await?;
-        test_row(&runner, r#"{ id: 4 }"#).await?;
-        test_row(&runner, r#"{ id: 5, field: "test3" }"#).await?;
+        test_row(runner, r#"{ id: 1, field: "test1" }"#).await?;
+        test_row(runner, r#"{ id: 2, field: "test2" }"#).await?;
+        test_row(runner, r#"{ id: 3 }"#).await?;
+        test_row(runner, r#"{ id: 4 }"#).await?;
+        test_row(runner, r#"{ id: 5, field: "test3" }"#).await?;
 
         Ok(())
     }

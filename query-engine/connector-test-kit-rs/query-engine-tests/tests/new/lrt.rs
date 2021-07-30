@@ -249,4 +249,8 @@ mod lrt {
 
         Ok(())
     }
+
+    // error on tx
+    // wait for expiration / auto rollback
+    // assert that it's expired.
 }

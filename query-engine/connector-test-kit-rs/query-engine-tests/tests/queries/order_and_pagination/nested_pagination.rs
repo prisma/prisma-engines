@@ -759,7 +759,7 @@ mod nested_pagination {
 
     async fn create_test_data(runner: &Runner) -> TestResult<()> {
         create_row(
-            &runner,
+            runner,
             r#"{id: 1, t: "T1" middles:{create:[
           {id: 1, m: "M11" bottoms:{create:[
               {id: 1, b:"B111"}
@@ -784,7 +784,7 @@ mod nested_pagination {
         .await?;
 
         create_row(
-            &runner,
+            runner,
             r#"{id: 2, t: "T2" middles:{create:[
         {id: 4, m: "M21" bottoms:{create:[
             {id: 10, b:"B211"}
@@ -809,7 +809,7 @@ mod nested_pagination {
         .await?;
 
         create_row(
-            &runner,
+            runner,
             r#"{id: 3, t: "T3" middles:{create:[
           {id: 7, m: "M31" bottoms:{create:[
               {id: 19, b:"B311"}

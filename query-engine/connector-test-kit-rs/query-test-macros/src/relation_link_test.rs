@@ -112,46 +112,41 @@ pub fn relation_link_test_impl(attr: TokenStream, input: TokenStream) -> TokenSt
         panic!("No datamodel were generated")
     }
 
-    let test_shells: Vec<proc_macro2::TokenStream> = datamodels
-        .into_iter()
-        .enumerate()
-        .map(|(i, dm)| {
-            // The shell function retains the name of the original test definition.
-            let test_fn_ident = Ident::new(&format!("{}_{}", test_fn_ident.to_string(), i), Span::call_site());
-            let datamodel: proc_macro2::TokenStream = format!(r#""{}""#, dm.datamodel())
-                .parse()
-                .expect("Could not parse the datamodel");
-            let dm_with_params: String = dm.try_into().expect("Could not serialize json");
-            let test_database = format!("{}_{}_{}", suite_name, test_name, i);
-            let required_capabilities = required_capabilities
-                .get(i)
-                .expect("Could not find some required capabilities")
-                .iter()
-                .map(|cap| format!("{}", cap))
-                .collect::<Vec<_>>();
+    let test_shells = datamodels.into_iter().enumerate().map(|(i, dm)| {
+        // The shell function retains the name of the original test definition.
+        let test_fn_ident = Ident::new(&format!("{}_{}", test_fn_ident.to_string(), i), Span::call_site());
+        let datamodel: proc_macro2::TokenStream = format!(r#""{}""#, dm.datamodel())
+            .parse()
+            .expect("Could not parse the datamodel");
+        let dm_with_params: String = dm.try_into().expect("Could not serialize json");
+        let test_database = format!("{}_{}_{}", suite_name, test_name, i);
+        let required_capabilities = required_capabilities
+            .get(i)
+            .expect("Could not find some required capabilities")
+            .iter()
+            .map(|cap| format!("{}", cap))
+            .collect::<Vec<_>>();
 
-            let ts = quote! {
-                #[test]
-                fn #test_fn_ident() {
-                  query_tests_setup::run_relation_link_test(
-                      vec![#connectors],
-                      &mut vec![#(#capabilities),*],
-                      vec![#(#required_capabilities),*],
-                      #datamodel,
-                      #dm_with_params,
-                      #test_name,
-                      #test_database,
-                      #runner_fn_ident
-                    )
-                }
-            };
+        let ts = quote! {
+            #[test]
+            fn #test_fn_ident() {
+              query_tests_setup::run_relation_link_test(
+                  vec![#connectors],
+                  &mut vec![#(#capabilities),*],
+                  vec![#(#required_capabilities),*],
+                  #datamodel,
+                  #dm_with_params,
+                  #test_name,
+                  #test_database,
+                  #runner_fn_ident
+                )
+            }
+        };
 
-            ts
-        })
-        .collect();
+        ts
+    });
 
     let all_funcs: proc_macro2::TokenStream = test_shells
-        .into_iter()
         .fold1(|aggr, next| {
             quote! {
                 #aggr

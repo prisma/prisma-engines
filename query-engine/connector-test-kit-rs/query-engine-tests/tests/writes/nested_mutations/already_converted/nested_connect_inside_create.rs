@@ -32,7 +32,7 @@ mod connect_inside_create {
         )?;
 
         insta::assert_snapshot!(
-          run_query!(&runner, format!(r#"mutation {{
+          run_query!(runner, format!(r#"mutation {{
             createOneParent(data:{{
               p: "p2", p_1:"p", p_2: "2",
               childOpt: {{ connect: {child} }}
@@ -68,7 +68,7 @@ mod connect_inside_create {
         )?;
 
         insta::assert_snapshot!(
-          run_query!(&runner, format!(r#"mutation {{
+          run_query!(runner, format!(r#"mutation {{
             createOneParent(data:{{
               p: "p1", p_1:"p", p_2: "1",
               childOpt: {{ connect: {connect} }}
@@ -110,7 +110,7 @@ mod connect_inside_create {
         )?;
 
         insta::assert_snapshot!(
-          run_query!(&runner, format!(r#"mutation {{
+          run_query!(runner, format!(r#"mutation {{
             createOneParent(data:{{
               p: "p2", p_1:"p", p_2: "2",
               childrenOpt: {{ connect: {child} }}
@@ -152,7 +152,7 @@ mod connect_inside_create {
         )?;
 
         insta::assert_snapshot!(
-          run_query!(&runner, format!(r#"mutation {{
+          run_query!(runner, format!(r#"mutation {{
             createOneParent(data:{{
               p: "p2", p_1:"p", p_2: "2",
               childOpt: {{ connect: {child} }}
@@ -172,7 +172,7 @@ mod connect_inside_create {
     #[relation_link_test(on_parent = "ToMany", on_child = "ToOneOpt")]
     async fn pm_to_c1_connect_by_uniq(runner: &Runner, _t: &DatamodelWithParams) -> TestResult<()> {
         run_query!(
-            &runner,
+            runner,
             r#"mutation {
                 createOneParent(data: {
                   p: "p1"
@@ -191,7 +191,7 @@ mod connect_inside_create {
 
         // we are even resilient against multiple identical connects here -> twice connecting to c2
         insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation {
+          run_query!(runner, r#"mutation {
             createOneParent(data:{
               p: "p2"
               p_1: "p2_1"
@@ -227,7 +227,7 @@ mod connect_inside_create {
         let child_id = t.child().parse(child_1_res, &["data", "createOneChild"])?;
 
         insta::assert_snapshot!(
-          run_query!(&runner, format!(r#"mutation {{
+          run_query!(runner, format!(r#"mutation {{
             createOneParent(data:{{
               p: "p2"
               p_1: "p2_1"
@@ -291,7 +291,7 @@ mod connect_inside_create {
     #[relation_link_test(on_parent = "ToOneReq", on_child = "ToMany")]
     async fn p1_req_to_cm_connect_by_uniq(runner: &Runner, _t: &DatamodelWithParams) -> TestResult<()> {
         run_query!(
-            &runner,
+            runner,
             r#"mutation {
                 createOneParent(data: {
                   p: "p1"
@@ -313,7 +313,7 @@ mod connect_inside_create {
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation {
+          run_query!(runner, r#"mutation {
           createOneParent(data:{
             p: "p2"
             p_1: "1_p"
@@ -329,7 +329,7 @@ mod connect_inside_create {
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query{findManyChild{parentsOpt{p}}}"#),
+          run_query!(runner, r#"query{findManyChild{parentsOpt{p}}}"#),
           @r###"{"data":{"findManyChild":[{"parentsOpt":[{"p":"p1"},{"p":"p2"}]}]}}"###
         );
 
@@ -340,7 +340,7 @@ mod connect_inside_create {
     #[relation_link_test(on_parent = "ToOneReq", on_child = "ToMany")]
     async fn p1_req_to_cm_no_rel_connect_by_uniq(runner: &Runner, _t: &DatamodelWithParams) -> TestResult<()> {
         run_query!(
-            &runner,
+            runner,
             r#"mutation {
                 createOneChild(data: {
                   c: "c1"
@@ -353,7 +353,7 @@ mod connect_inside_create {
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"
+          run_query!(runner, r#"
             mutation {
               createOneParent(data:{
                 p: "p2"
@@ -370,7 +370,7 @@ mod connect_inside_create {
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query {
+          run_query!(runner, r#"query {
             findManyChild {
               parentsOpt { p }
             }
@@ -385,7 +385,7 @@ mod connect_inside_create {
     #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToMany")]
     async fn p1_to_cm_connect_by_uniq(runner: &Runner, _t: &DatamodelWithParams) -> TestResult<()> {
         run_query!(
-            &runner,
+            runner,
             r#"mutation {
           createOneParent(data: {
             p: "p1"
@@ -407,7 +407,7 @@ mod connect_inside_create {
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation {
+          run_query!(runner, r#"mutation {
             createOneParent(data:{
               p: "p2"
               p_1: "p2_1"
@@ -423,7 +423,7 @@ mod connect_inside_create {
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query{findManyChild{parentsOpt{p}}}"#),
+          run_query!(runner, r#"query{findManyChild{parentsOpt{p}}}"#),
           @r###"{"data":{"findManyChild":[{"parentsOpt":[{"p":"p1"},{"p":"p2"}]}]}}"###
         );
 
@@ -434,7 +434,7 @@ mod connect_inside_create {
     #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToMany")]
     async fn p1_to_cm_no_rel_connect_by_uniq(runner: &Runner, _t: &DatamodelWithParams) -> TestResult<()> {
         run_query!(
-            &runner,
+            runner,
             r#"mutation {
           createOneChild(data: {
             c: "c1"
@@ -447,7 +447,7 @@ mod connect_inside_create {
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation {
+          run_query!(runner, r#"mutation {
             createOneParent(data:{
               p: "p2"
               p_1: "p2_1"
@@ -463,7 +463,7 @@ mod connect_inside_create {
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query{findManyChild{parentsOpt{p}}}"#),
+          run_query!(runner, r#"query{findManyChild{parentsOpt{p}}}"#),
           @r###"{"data":{"findManyChild":[{"parentsOpt":[{"p":"p2"}]}]}}"###
         );
 
@@ -474,7 +474,7 @@ mod connect_inside_create {
     #[relation_link_test(on_parent = "ToMany", on_child = "ToMany")]
     async fn pm_to_cm_connect_by_uniq(runner: &Runner, _t: &DatamodelWithParams) -> TestResult<()> {
         run_query!(
-            &runner,
+            runner,
             r#"mutation {
           createOneParent(data: {
             p: "p1"
@@ -492,7 +492,7 @@ mod connect_inside_create {
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation {
+          run_query!(runner, r#"mutation {
             createOneParent(data:{
               p: "p2"
               p_1: "p123"
@@ -508,7 +508,7 @@ mod connect_inside_create {
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query{findManyChild{parentsOpt{p}}}"#),
+          run_query!(runner, r#"query{findManyChild{parentsOpt{p}}}"#),
           @r###"{"data":{"findManyChild":[{"parentsOpt":[{"p":"p1"},{"p":"p2"}]},{"parentsOpt":[{"p":"p1"},{"p":"p2"}]}]}}"###
         );
 
@@ -519,7 +519,7 @@ mod connect_inside_create {
     #[relation_link_test(on_parent = "ToMany", on_child = "ToMany")]
     async fn pm_to_cm_no_rel_connect_by_uniq(runner: &Runner, _t: &DatamodelWithParams) -> TestResult<()> {
         run_query!(
-            &runner,
+            runner,
             r#"mutation {
                 createOneChild(data: {c: "c1", c_1: "foo", c_2: "bar"}){
                     c
@@ -528,7 +528,7 @@ mod connect_inside_create {
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation {
+          run_query!(runner, r#"mutation {
             createOneParent(data:{
               p: "p2" p_1: "foo" p_2: "bar"
               childrenOpt: {connect: {c: "c1"}}
@@ -542,7 +542,7 @@ mod connect_inside_create {
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query{findManyChild{parentsOpt{p}}}"#),
+          run_query!(runner, r#"query{findManyChild{parentsOpt{p}}}"#),
           @r###"{"data":{"findManyChild":[{"parentsOpt":[{"p":"p2"}]}]}}"###
         );
 
@@ -615,7 +615,7 @@ mod connect_inside_create {
     #[connector_test(schema(schema_3))]
     async fn p1_to_cm_fail_if_wrong_id_other_side(runner: Runner) -> TestResult<()> {
         assert_error!(
-          runner,
+          &runner,
           r#"mutation {
             createOneComment(data:{
               text: "bla"

@@ -36,7 +36,7 @@ mod update_inside_update {
         )?;
 
         insta::assert_snapshot!(
-          run_query!(&runner, format!(r#"mutation {{
+          run_query!(runner, format!(r#"mutation {{
             updateOneParent(
               where: {parent}
               data:{{
@@ -86,7 +86,7 @@ mod update_inside_update {
             .parse_many_first(res, &["data", "createOneParent", "childrenOpt"])?;
 
         insta::assert_snapshot!(
-          run_query!(&runner, format!(r#"mutation {{
+          run_query!(runner, format!(r#"mutation {{
             updateOneParent(
               where: {parent}
               data:{{
@@ -136,7 +136,7 @@ mod update_inside_update {
             .parse_many_first(res, &["data", "createOneParent", "childrenOpt"])?;
 
         insta::assert_snapshot!(
-          run_query!(&runner, format!(r#"mutation {{
+          run_query!(runner, format!(r#"mutation {{
             updateOneParent(
               where: {parent}
               data:{{

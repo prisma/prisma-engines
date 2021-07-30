@@ -79,7 +79,7 @@ mod um_inside_update {
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query{findManyParent{p,childrenOpt{c, non_unique}}}"#),
+          run_query!(runner, r#"query{findManyParent{p,childrenOpt{c, non_unique}}}"#),
           @r###"{"data":{"findManyParent":[{"p":"p1","childrenOpt":[{"c":"c1","non_unique":"updated"},{"c":"c2","non_unique":"updated"}]},{"p":"p2","childrenOpt":[{"c":"c3","non_unique":null},{"c":"c4","non_unique":null}]}]}}"###
         );
 
@@ -115,7 +115,7 @@ mod um_inside_update {
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query{findManyParent{p,childrenOpt{c, non_unique}}}"#),
+          run_query!(runner, r#"query{findManyParent{p,childrenOpt{c, non_unique}}}"#),
           @r###"{"data":{"findManyParent":[{"p":"p1","childrenOpt":[{"c":"c1","non_unique":"updated"},{"c":"c2","non_unique":"updated"}]},{"p":"p2","childrenOpt":[{"c":"c3","non_unique":null},{"c":"c4","non_unique":null}]}]}}"###
         );
 
@@ -150,7 +150,7 @@ mod um_inside_update {
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query{findManyParent{p,childrenOpt{c, non_unique}}}"#),
+          run_query!(runner, r#"query{findManyParent{p,childrenOpt{c, non_unique}}}"#),
           @r###"{"data":{"findManyParent":[{"p":"p1","childrenOpt":[{"c":"c1","non_unique":"updated"},{"c":"c2","non_unique":"updated"}]},{"p":"p2","childrenOpt":[{"c":"c3","non_unique":null},{"c":"c4","non_unique":null}]}]}}"###
         );
 
@@ -192,7 +192,7 @@ mod um_inside_update {
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query{findManyParent{p,childrenOpt{c, non_unique}}}"#),
+          run_query!(runner, r#"query{findManyParent{p,childrenOpt{c, non_unique}}}"#),
           @r###"{"data":{"findManyParent":[{"p":"p1","childrenOpt":[{"c":"c1","non_unique":"updated1"},{"c":"c2","non_unique":"updated2"}]},{"p":"p2","childrenOpt":[{"c":"c3","non_unique":null},{"c":"c4","non_unique":null}]}]}}"###
         );
 
@@ -230,7 +230,7 @@ mod um_inside_update {
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query{findManyParent{p,childrenOpt{c, non_unique}}}"#),
+          run_query!(runner, r#"query{findManyParent{p,childrenOpt{c, non_unique}}}"#),
           @r###"{"data":{"findManyParent":[{"p":"p1","childrenOpt":[{"c":"c1","non_unique":"updated1"},{"c":"c2","non_unique":"updated1"}]},{"p":"p2","childrenOpt":[{"c":"c3","non_unique":null},{"c":"c4","non_unique":null}]}]}}"###
         );
 
@@ -272,7 +272,7 @@ mod um_inside_update {
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query{findManyParent{p,childrenOpt{c, non_unique}}}"#),
+          run_query!(runner, r#"query{findManyParent{p,childrenOpt{c, non_unique}}}"#),
           @r###"{"data":{"findManyParent":[{"p":"p1","childrenOpt":[{"c":"c1","non_unique":null},{"c":"c2","non_unique":null}]},{"p":"p2","childrenOpt":[{"c":"c3","non_unique":null},{"c":"c4","non_unique":null}]}]}}"###
         );
 
@@ -316,7 +316,7 @@ mod um_inside_update {
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query{findManyParent{p,childrenOpt(orderBy: { c: asc }){c, non_unique}}}"#),
+          run_query!(runner, r#"query{findManyParent{p,childrenOpt(orderBy: { c: asc }){c, non_unique}}}"#),
           @r###"{"data":{"findManyParent":[{"p":"p1","childrenOpt":[{"c":"c1","non_unique":"updated2"},{"c":"c2","non_unique":"updated1"}]},{"p":"p2","childrenOpt":[{"c":"c3","non_unique":null},{"c":"c4","non_unique":null}]}]}}"###
         );
 

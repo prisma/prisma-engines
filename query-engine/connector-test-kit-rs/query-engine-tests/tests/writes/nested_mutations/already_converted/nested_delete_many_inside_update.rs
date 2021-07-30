@@ -71,7 +71,7 @@ mod delete_many_inside_update {
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query{findManyParent{p,childrenOpt{c}}}"#),
+          run_query!(runner, r#"query{findManyParent{p,childrenOpt{c}}}"#),
           @r###"{"data":{"findManyParent":[{"p":"p1","childrenOpt":[]},{"p":"p2","childrenOpt":[{"c":"c3"},{"c":"c4"}]}]}}"###
         );
 
@@ -106,7 +106,7 @@ mod delete_many_inside_update {
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query{findManyParent{p,childrenOpt{c}}}"#),
+          run_query!(runner, r#"query{findManyParent{p,childrenOpt{c}}}"#),
           @r###"{"data":{"findManyParent":[{"p":"p1","childrenOpt":[]},{"p":"p2","childrenOpt":[{"c":"c3"},{"c":"c4"}]}]}}"###
         );
 
@@ -141,7 +141,7 @@ mod delete_many_inside_update {
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query{findManyParent{p,childrenOpt{c}}}"#),
+          run_query!(runner, r#"query{findManyParent{p,childrenOpt{c}}}"#),
           @r###"{"data":{"findManyParent":[{"p":"p1","childrenOpt":[]},{"p":"p2","childrenOpt":[{"c":"c3"},{"c":"c4"}]}]}}"###
         );
 
@@ -173,7 +173,7 @@ mod delete_many_inside_update {
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query{findManyParent{p,childrenOpt{c}}}"#),
+          run_query!(runner, r#"query{findManyParent{p,childrenOpt{c}}}"#),
           @r###"{"data":{"findManyParent":[{"p":"p1","childrenOpt":[]},{"p":"p2","childrenOpt":[{"c":"c3"},{"c":"c4"}]}]}}"###
         );
 
@@ -208,7 +208,7 @@ mod delete_many_inside_update {
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query{findManyParent{p,childrenOpt{c}}}"#),
+          run_query!(runner, r#"query{findManyParent{p,childrenOpt{c}}}"#),
           @r###"{"data":{"findManyParent":[{"p":"p1","childrenOpt":[{"c":"c1"},{"c":"c2"}]},{"p":"p2","childrenOpt":[{"c":"c3"},{"c":"c4"}]}]}}"###
         );
 
