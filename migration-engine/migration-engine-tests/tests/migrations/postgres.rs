@@ -200,7 +200,7 @@ fn functions_with_schema_prefix_in_dbgenerated_are_idempotent(api: TestApi) {
         }
         "#;
 
-    api.schema_push_w_datasource(dm.clone())
+    api.schema_push_w_datasource(dm)
         .send()
         .assert_green_bang()
         .assert_has_executed_steps();

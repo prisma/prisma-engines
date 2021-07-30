@@ -18,7 +18,7 @@ fn evaluate_data_loss_with_an_up_to_date_database_returns_no_step(api: TestApi) 
     api.create_migration("initial", &dm, &directory).send_sync();
     api.apply_migrations(&directory).send_sync();
 
-    let output = api.evaluate_data_loss(&directory, dm.into()).send().into_output();
+    let output = api.evaluate_data_loss(&directory, dm).send().into_output();
     let expected_output = EvaluateDataLossOutput {
         migration_steps: 0,
         warnings: vec![],
@@ -58,7 +58,7 @@ fn evaluate_data_loss_with_up_to_date_db_and_pending_changes_returns_steps(api: 
     "#,
     );
 
-    api.evaluate_data_loss(&directory, dm2.into())
+    api.evaluate_data_loss(&directory, dm2)
         .send()
         .assert_warnings(&[])
         .assert_unexecutable(&[])
@@ -94,7 +94,7 @@ fn evaluate_data_loss_with_not_up_to_date_db_and_pending_changes_returns_the_rig
     "#,
     );
 
-    api.evaluate_data_loss(&directory, dm2.into())
+    api.evaluate_data_loss(&directory, dm2)
         .send()
         .assert_warnings(&[])
         .assert_unexecutable(&[])
