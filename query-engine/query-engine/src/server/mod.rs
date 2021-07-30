@@ -178,10 +178,10 @@ async fn server_info_handler(req: Request<State>) -> tide::Result<impl Into<Resp
 
 #[derive(Debug, Deserialize)]
 struct TxInput {
-    /// Maximum wait time in seconds.
+    /// Maximum wait time in milliseconds.
     pub max_wait: u64,
 
-    /// Time in seconds after which the transaction rolls back automatically.
+    /// Time in milliseconds after which the transaction rolls back automatically.
     pub timeout: u64,
 }
 

@@ -10,7 +10,7 @@ mod lrt {
 
     #[connector_test]
     async fn basic_commit_workflow(mut runner: Runner) -> TestResult<()> {
-        let tx_id = runner.executor().start_tx(5, 5).await?;
+        let tx_id = runner.executor().start_tx(5000, 5000).await?;
         runner.set_active_tx(tx_id.clone());
 
         insta::assert_snapshot!(
@@ -36,7 +36,7 @@ mod lrt {
 
     #[connector_test]
     async fn basic_rollback_workflow(mut runner: Runner) -> TestResult<()> {
-        let tx_id = runner.executor().start_tx(5, 5).await?;
+        let tx_id = runner.executor().start_tx(5000, 5000).await?;
         runner.set_active_tx(tx_id.clone());
 
         insta::assert_snapshot!(
@@ -63,7 +63,7 @@ mod lrt {
     #[connector_test]
     async fn tx_expiration_cycle(mut runner: Runner) -> TestResult<()> {
         // Tx expires after one second.
-        let tx_id = runner.executor().start_tx(5, 1).await?;
+        let tx_id = runner.executor().start_tx(5000, 1000).await?;
         runner.set_active_tx(tx_id.clone());
 
         insta::assert_snapshot!(
@@ -110,7 +110,7 @@ mod lrt {
     #[connector_test]
     async fn no_auto_rollback(mut runner: Runner) -> TestResult<()> {
         // Tx expires after five second.
-        let tx_id = runner.executor().start_tx(5, 5).await?;
+        let tx_id = runner.executor().start_tx(5000, 5000).await?;
         runner.set_active_tx(tx_id.clone());
 
         // Row is created
@@ -137,7 +137,7 @@ mod lrt {
     #[connector_test(only(Postgres))]
     async fn raw_queries(mut runner: Runner) -> TestResult<()> {
         // Tx expires after five second.
-        let tx_id = runner.executor().start_tx(5, 5).await?;
+        let tx_id = runner.executor().start_tx(5000, 5000).await?;
         runner.set_active_tx(tx_id.clone());
 
         insta::assert_snapshot!(
@@ -165,7 +165,7 @@ mod lrt {
     #[connector_test]
     async fn batch_queries_success(mut runner: Runner) -> TestResult<()> {
         // Tx expires after five second.
-        let tx_id = runner.executor().start_tx(5, 5).await?;
+        let tx_id = runner.executor().start_tx(5000, 5000).await?;
         runner.set_active_tx(tx_id.clone());
 
         let queries = vec![
@@ -190,7 +190,7 @@ mod lrt {
     #[connector_test]
     async fn batch_queries_rollback(mut runner: Runner) -> TestResult<()> {
         // Tx expires after five second.
-        let tx_id = runner.executor().start_tx(5, 5).await?;
+        let tx_id = runner.executor().start_tx(5000, 5000).await?;
         runner.set_active_tx(tx_id.clone());
 
         let queries = vec![
@@ -215,7 +215,7 @@ mod lrt {
     #[connector_test]
     async fn batch_queries_failure(mut runner: Runner) -> TestResult<()> {
         // Tx expires after five second.
-        let tx_id = runner.executor().start_tx(5, 5).await?;
+        let tx_id = runner.executor().start_tx(5000, 5000).await?;
         runner.set_active_tx(tx_id.clone());
 
         // One dup key, will cause failure of the batch.

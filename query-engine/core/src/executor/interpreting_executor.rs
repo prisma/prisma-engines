@@ -234,10 +234,10 @@ impl<C> TransactionManager for InterpretingExecutor<C>
 where
     C: Connector + Send + Sync,
 {
-    async fn start_tx(&self, max_acquisition_secs: u64, valid_for_secs: u64) -> crate::Result<TxId> {
+    async fn start_tx(&self, max_acquisition_millis: u64, valid_for_millis: u64) -> crate::Result<TxId> {
         let id = TxId::default();
         let conn = time::timeout(
-            time::Duration::from_secs(max_acquisition_secs),
+            time::Duration::from_millis(max_acquisition_millis),
             self.connector.get_connection(),
         )
         .await;
@@ -245,7 +245,7 @@ where
         let conn = conn.map_err(|_| TransactionError::AcquisitionTimeout)??;
         let c_tx = OpenTx::start(conn).await?;
 
-        self.tx_cache.insert(id.clone(), c_tx, valid_for_secs).await;
+        self.tx_cache.insert(id.clone(), c_tx, valid_for_millis).await;
 
         Ok(id)
     }
