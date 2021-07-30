@@ -532,36 +532,50 @@ fn create_constraint_name_tests_w_implicit_names(api: TestApi) {
             let expected_script = if api.is_mssql() {
                 indoc! {
                      r#"
+                     BEGIN TRY
+                     
+                     BEGIN TRAN;
+                     
                      -- CreateTable
-                     CREATE TABLE [create_constraint_name_tests].[A] (
+                     CREATE TABLE [create_constraint_name_tests_w_implicit_names].[A] (
                          [id] INT NOT NULL,
                          [name] NVARCHAR(1000) NOT NULL,
                          [a] NVARCHAR(1000) NOT NULL,
                          [b] NVARCHAR(1000) NOT NULL,
-
                          CONSTRAINT [A_pkey] PRIMARY KEY ([id]),
                          CONSTRAINT [A_name_key] UNIQUE ([name]),
-                         CONSTRAINT [1] UNIQUE ([a],[b]),
-                         CONSTRAINT [2] UNIQUE ([a],[b])
+                         CONSTRAINT [A_a_b_key] UNIQUE ([a],[b])
                      );
-
+                     
                      -- CreateTable
-                     CREATE TABLE [create_constraint_name_tests].[B] (
+                     CREATE TABLE [create_constraint_name_tests_w_implicit_names].[B] (
                          [a] NVARCHAR(1000) NOT NULL,
                          [b] NVARCHAR(1000) NOT NULL,
                          [aId] INT NOT NULL,
-
-                         CONSTRAINT [custom] PRIMARY KEY ([a],[b])
+                         CONSTRAINT [B_pkey] PRIMARY KEY ([a],[b])
                      );
-
+                     
                      -- CreateIndex
-                     CREATE INDEX [A_a_idx] ON [create_constraint_name_tests].[A]([a]);
-
+                     CREATE INDEX [A_a_idx] ON [create_constraint_name_tests_w_implicit_names].[A]([a]);
+                     
                      -- CreateIndex
-                     CREATE INDEX [B_a_b_idx] ON [create_constraint_name_tests].[B]([a], [b]);
-
+                     CREATE INDEX [B_a_b_idx] ON [create_constraint_name_tests_w_implicit_names].[B]([a], [b]);
+                     
                      -- AddForeignKey
-                     ALTER TABLE [create_constraint_name_tests].[B] ADD CONSTRAINT [B_aId_fkey] FOREIGN KEY ([aId]) REFERENCES [create_constraint_name_tests].[A]([id]) ON DELETE CASCADE ON UPDATE CASCADE;
+                     ALTER TABLE [create_constraint_name_tests_w_implicit_names].[B] ADD CONSTRAINT [B_aId_fkey] FOREIGN KEY ([aId]) REFERENCES [create_constraint_name_tests_w_implicit_names].[A]([id]) ON DELETE CASCADE ON UPDATE CASCADE;
+                     
+                     COMMIT TRAN;
+                     
+                     END TRY
+                     BEGIN CATCH
+                     
+                     IF @@TRANCOUNT > 0
+                     BEGIN 
+                         ROLLBACK TRAN;
+                     END;
+                     THROW
+                     
+                     END CATCH
                  "#
                  }
             } else if api.is_postgres() {
@@ -713,7 +727,7 @@ fn create_constraint_name_tests_w_explicit_names(api: TestApi) {
                      BEGIN TRAN;
                      
                      -- CreateTable
-                     CREATE TABLE [create_constraint_name_tests_w_constraint_flag].[A] (
+                     CREATE TABLE [create_constraint_name_tests_w_explicit_names].[A] (
                          [id] INT NOT NULL,
                          [name] NVARCHAR(1000) NOT NULL,
                          [a] NVARCHAR(1000) NOT NULL,
@@ -725,7 +739,7 @@ fn create_constraint_name_tests_w_explicit_names(api: TestApi) {
                      );
                      
                      -- CreateTable
-                     CREATE TABLE [create_constraint_name_tests_w_constraint_flag].[B] (
+                     CREATE TABLE [create_constraint_name_tests_w_explicit_names].[B] (
                          [a] NVARCHAR(1000) NOT NULL,
                          [b] NVARCHAR(1000) NOT NULL,
                          [aId] INT NOT NULL,
@@ -733,13 +747,13 @@ fn create_constraint_name_tests_w_explicit_names(api: TestApi) {
                      );
                      
                      -- CreateIndex
-                     CREATE INDEX [SingleIndex] ON [create_constraint_name_tests_w_constraint_flag].[A]([a]);
+                     CREATE INDEX [SingleIndex] ON [create_constraint_name_tests_w_explicit_names].[A]([a]);
                      
                      -- CreateIndex
-                     CREATE INDEX [CompoundIndex] ON [create_constraint_name_tests_w_constraint_flag].[B]([a], [b]);
+                     CREATE INDEX [CompoundIndex] ON [create_constraint_name_tests_w_explicit_names].[B]([a], [b]);
                      
                      -- AddForeignKey
-                     ALTER TABLE [create_constraint_name_tests_w_constraint_flag].[B] ADD CONSTRAINT [ForeignKey] FOREIGN KEY ([aId]) REFERENCES [create_constraint_name_tests_w_constraint_flag].[A]([id]) ON DELETE CASCADE ON UPDATE CASCADE;
+                     ALTER TABLE [create_constraint_name_tests_w_explicit_names].[B] ADD CONSTRAINT [ForeignKey] FOREIGN KEY ([aId]) REFERENCES [create_constraint_name_tests_w_explicit_names].[A]([id]) ON DELETE CASCADE ON UPDATE CASCADE;
                      
                      COMMIT TRAN;
                      
