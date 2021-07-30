@@ -199,7 +199,7 @@ async fn transaction_commit_handler(req: Request<State>) -> tide::Result<impl In
     let state = req.state();
 
     match state.cx.executor.commit_tx(tx_id).await {
-        Ok(_) => Ok(Response::new(StatusCode::Ok)),
+        Ok(_) => Ok(json!({}).into()),
         Err(err) => err_to_http_resp(err),
     }
 }
@@ -209,7 +209,7 @@ async fn transaction_rollback_handler(req: Request<State>) -> tide::Result<impl 
     let state = req.state();
 
     match state.cx.executor.rollback_tx(tx_id).await {
-        Ok(_) => Ok(Response::new(StatusCode::Ok)),
+        Ok(_) => Ok(json!({}).into()),
         Err(err) => err_to_http_resp(err),
     }
 }
