@@ -250,7 +250,43 @@ mod lrt {
         Ok(())
     }
 
-    // error on tx
-    // wait for expiration / auto rollback
-    // assert that it's expired.
+    #[connector_test]
+    async fn tx_expiration_failure_cycle(mut runner: Runner) -> TestResult<()> {
+        // Tx expires after two seconds.
+        let tx_id = runner.executor().start_tx(5000, 1000).await?;
+        runner.set_active_tx(tx_id.clone());
+
+        // Row is created
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 1 }) { id }}"#),
+          @r###"{"data":{"createOneTestModel":{"id":1}}}"###
+        );
+
+        // This will error.
+        assert_error!(
+            &runner,
+            r#"mutation { createOneTestModel(data: { id: 1 }) { id }}"#,
+            2002
+        );
+
+        // Wait for tx to expire
+        time::sleep(time::Duration::from_millis(1500)).await;
+
+        // Expect the state of the tx to be expired.
+        // Status of the tx must be `Expired`
+        let res = runner.executor().commit_tx(tx_id.clone()).await;
+
+        if let Err(query_core::CoreError::TransactionError(txe)) = res {
+            assert_eq!(
+                txe,
+                TransactionError::Closed {
+                    reason: "Transaction is no longer valid. Last state: 'Expired'".to_string()
+                }
+            );
+        } else {
+            panic!("Expected error, got success.");
+        }
+
+        Ok(())
+    }
 }
