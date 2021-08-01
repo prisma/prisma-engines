@@ -429,29 +429,57 @@ impl<'a> Validator<'a> {
 
             let on_delete = field
                 .relation_info
-                .on_update
+                .on_delete
                 .or(related_field.relation_info.on_delete)
                 .unwrap_or_else(|| field.default_on_delete_action());
 
             // a cycle has a meaning only if every relation in it triggers
             // modifications in the children
             if on_delete.triggers_modification() || on_update.triggers_modification() {
+                let error_with_default_values = |msg: &str| {
+                    let on_delete = match parent_field.relation_info.on_delete {
+                        None if parent_field.default_on_delete_action().triggers_modification() => {
+                            Some(parent_field.default_on_delete_action())
+                        }
+                        _ => None,
+                    };
+
+                    let on_update = match parent_field.relation_info.on_update {
+                        None if parent_field.default_on_update_action().triggers_modification() => {
+                            Some(parent_field.default_on_update_action())
+                        }
+                        _ => None,
+                    };
+
+                    let msg = match (on_delete, on_update) {
+                        (Some(on_delete), Some(on_update)) => {
+                            format!(
+                                "{} Caused by default `onDelete` and `onUpdate` values: `{}` and `{}`.",
+                                msg, on_delete, on_update
+                            )
+                        }
+                        (Some(on_delete), None) => {
+                            format!("{} Caused by default `onDelete` value: `{}`.", msg, on_delete)
+                        }
+                        (None, Some(on_update)) => {
+                            format!("{} Caused by default `onUpdate` value: `{}`.", msg, on_update)
+                        }
+                        (None, None) => msg.to_string(),
+                    };
+
+                    DatamodelError::new_attribute_validation_error(&msg, RELATION_ATTRIBUTE_NAME, span)
+                };
+
                 if model.name() == related_model.name() {
-                    errors.push_error(DatamodelError::new_attribute_validation_error(
-                        "A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes.",
-                        RELATION_ATTRIBUTE_NAME,
-                        span,
-                    ));
+                    let msg = "A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes.";
+                    errors.push_error(error_with_default_values(msg));
 
                     return;
                 }
 
                 if related_model.name() == parent_model.name() {
-                    errors.push_error(DatamodelError::new_attribute_validation_error(
-                        "Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`.",
-                        RELATION_ATTRIBUTE_NAME,
-                        span,
-                    ));
+                    let msg = "Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`.";
+                    errors.push_error(error_with_default_values(msg));
 
                     return;
                 }
