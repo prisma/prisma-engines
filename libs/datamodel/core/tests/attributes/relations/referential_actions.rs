@@ -803,59 +803,66 @@ fn sql_server_cascading_cyclic_hop_over_table_relations() {
 fn sql_server_cascading_cyclic_hop_over_backrelation() {
     let dml = indoc! {
         r#"
-        datasource db {
+        datasource test {
             provider = "sqlserver"
-            url = "sqlserver://"
+            url      = "sqlserver://localhost:1433;database=master;user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true"
         }
 
         generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions", "microsoftSqlServer"]
+            provider        = "prisma-client-js"
+            previewFeatures = ["microsoftSqlServer", "referentialActions"]
         }
 
-        model A {
-            id     Int  @id @default(autoincrement())
-            bId    Int
-            b      B    @relation(fields: [bId], references: [id])
-            cs     C[]
+        model User {
+            id        Int       @id @default(autoincrement())
+            comments  Comment[]
+            posts     Post[]
         }
 
-        model B {
-            id     Int  @id @default(autoincrement())
-            as     A[]
-            cs     C[]
+        model Post {
+            id        Int       @id @default(autoincrement())
+            authorId  Int
+            author    User      @relation(fields: [authorId], references: [id])
+            comments  Comment[]
+            tags      Tag[]     @relation("TagToPost")
         }
 
-        model C {
-            id     Int @id @default(autoincrement())
-            aId    Int
-            bId    Int
-            a      A   @relation(fields: [aId], references: [id])
-            b      B   @relation(fields: [bId], references: [id])
+        model Comment {
+            id          Int      @id @default(autoincrement())
+            writtenById Int
+            postId      Int
+            writtenBy   User     @relation(fields: [writtenById], references: [id])
+            post        Post     @relation(fields: [postId], references: [id])
+        }
+
+        model Tag {
+            id    Int    @id @default(autoincrement())
+            tag   String @unique
+            posts Post[] @relation("TagToPost")
         }
     "#};
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Implicit default `onUpdate` value: `Cascade`.[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
+          [1;94m-->[0m  [4mschema.prisma:20[0m
         [1;94m   | [0m
-        [1;94m13 | [0m    bId    Int
-        [1;94m14 | [0m    [1;91mb      B    @relation(fields: [bId], references: [id])[0m
-        [1;94m15 | [0m    cs     C[]
-        [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Implicit default `onUpdate` value: `Cascade`.[0m
-          [1;94m-->[0m  [4mschema.prisma:28[0m
-        [1;94m   | [0m
-        [1;94m27 | [0m    bId    Int
-        [1;94m28 | [0m    [1;91ma      A   @relation(fields: [aId], references: [id])[0m
-        [1;94m29 | [0m    b      B   @relation(fields: [bId], references: [id])
+        [1;94m19 | [0m    authorId  Int
+        [1;94m20 | [0m    [1;91mauthor    User      @relation(fields: [authorId], references: [id])[0m
+        [1;94m21 | [0m    comments  Comment[]
         [1;94m   | [0m
         [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Implicit default `onUpdate` value: `Cascade`.[0m
           [1;94m-->[0m  [4mschema.prisma:29[0m
         [1;94m   | [0m
-        [1;94m28 | [0m    a      A   @relation(fields: [aId], references: [id])
-        [1;94m29 | [0m    [1;91mb      B   @relation(fields: [bId], references: [id])[0m
-        [1;94m30 | [0m}
+        [1;94m28 | [0m    postId      Int
+        [1;94m29 | [0m    [1;91mwrittenBy   User     @relation(fields: [writtenById], references: [id])[0m
+        [1;94m30 | [0m    post        Post     @relation(fields: [postId], references: [id])
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Implicit default `onUpdate` value: `Cascade`.[0m
+          [1;94m-->[0m  [4mschema.prisma:30[0m
+        [1;94m   | [0m
+        [1;94m29 | [0m    writtenBy   User     @relation(fields: [writtenById], references: [id])
+        [1;94m30 | [0m    [1;91mpost        Post     @relation(fields: [postId], references: [id])[0m
+        [1;94m31 | [0m}
         [1;94m   | [0m
     "#]];
 
