@@ -121,6 +121,11 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         for table in tables {
             // Foreign keys
             for created_fk in table.created_foreign_keys() {
+                // these are already created when we redefine the other table
+                if self.tables_to_redefine.contains(created_fk.referenced_table().name()) {
+                    continue;
+                }
+
                 steps.push(SqlMigrationStep::AddForeignKey {
                     table_id: created_fk.table().table_id(),
                     foreign_key_index: created_fk.foreign_key_index(),

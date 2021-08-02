@@ -279,8 +279,7 @@ fn changing_a_foreign_key_constrained_column_from_nullable_to_required_and_back_
     api.schema_push(dm).send().assert_green_bang();
 }
 
-// TODO: Enable SQL Server when cascading rules are in PSL.
-#[test_connector(exclude(Mssql))]
+#[test_connector]
 fn changing_all_referenced_columns_of_foreign_key_works(api: TestApi) {
     let dm1 = r#"
        model Post {
