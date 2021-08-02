@@ -458,14 +458,14 @@ fn sql_server_cascading_on_delete_self_relations() {
     "#};
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. Caused by default `onDelete` and `onUpdate` values: `SetNull` and `Cascade`.[0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. Implicit default `onDelete` and `onUpdate` values: `SetNull` and `Cascade`.[0m
           [1;94m-->[0m  [4mschema.prisma:13[0m
         [1;94m   | [0m
         [1;94m12 | [0m    id     Int  @id @default(autoincrement())
         [1;94m13 | [0m    [1;91mchild  A?   @relation(name: "a_self_relation")[0m
         [1;94m14 | [0m    parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: Cascade)
         [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. Caused by default `onUpdate` value: `Cascade`.[0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. Implicit default `onUpdate` value: `Cascade`.[0m
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m    child  A?   @relation(name: "a_self_relation")
@@ -500,14 +500,14 @@ fn sql_server_cascading_on_update_self_relations() {
     "#};
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. Caused by default `onDelete` and `onUpdate` values: `SetNull` and `Cascade`.[0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. Implicit default `onDelete` and `onUpdate` values: `SetNull` and `Cascade`.[0m
           [1;94m-->[0m  [4mschema.prisma:13[0m
         [1;94m   | [0m
         [1;94m12 | [0m    id     Int  @id @default(autoincrement())
         [1;94m13 | [0m    [1;91mchild  A?   @relation(name: "a_self_relation")[0m
         [1;94m14 | [0m    parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: Cascade)
         [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. Caused by default `onDelete` value: `SetNull`.[0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. Implicit default `onDelete` value: `SetNull`.[0m
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m    child  A?   @relation(name: "a_self_relation")
@@ -542,14 +542,14 @@ fn sql_server_null_setting_on_delete_self_relations() {
     "#};
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. Caused by default `onDelete` and `onUpdate` values: `SetNull` and `Cascade`.[0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. Implicit default `onDelete` and `onUpdate` values: `SetNull` and `Cascade`.[0m
           [1;94m-->[0m  [4mschema.prisma:13[0m
         [1;94m   | [0m
         [1;94m12 | [0m    id     Int  @id @default(autoincrement())
         [1;94m13 | [0m    [1;91mchild  A?   @relation(name: "a_self_relation")[0m
         [1;94m14 | [0m    parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: SetNull)
         [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. Caused by default `onUpdate` value: `Cascade`.[0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. Implicit default `onUpdate` value: `Cascade`.[0m
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m    child  A?   @relation(name: "a_self_relation")
@@ -584,14 +584,14 @@ fn sql_server_null_setting_on_update_self_relations() {
     "#};
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. Caused by default `onDelete` and `onUpdate` values: `SetNull` and `Cascade`.[0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. Implicit default `onDelete` and `onUpdate` values: `SetNull` and `Cascade`.[0m
           [1;94m-->[0m  [4mschema.prisma:13[0m
         [1;94m   | [0m
         [1;94m12 | [0m    id     Int  @id @default(autoincrement())
         [1;94m13 | [0m    [1;91mchild  A?   @relation(name: "a_self_relation")[0m
         [1;94m14 | [0m    parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: SetNull)
         [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. Caused by default `onDelete` value: `SetNull`.[0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. Implicit default `onDelete` value: `SetNull`.[0m
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m    child  A?   @relation(name: "a_self_relation")
@@ -626,14 +626,14 @@ fn sql_server_default_setting_on_delete_self_relations() {
     "#};
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. Caused by default `onDelete` and `onUpdate` values: `SetNull` and `Cascade`.[0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. Implicit default `onDelete` and `onUpdate` values: `SetNull` and `Cascade`.[0m
           [1;94m-->[0m  [4mschema.prisma:13[0m
         [1;94m   | [0m
         [1;94m12 | [0m    id     Int  @id @default(autoincrement())
         [1;94m13 | [0m    [1;91mchild  A?   @relation(name: "a_self_relation")[0m
         [1;94m14 | [0m    parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: SetDefault)
         [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. Caused by default `onUpdate` value: `Cascade`.[0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. Implicit default `onUpdate` value: `Cascade`.[0m
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m    child  A?   @relation(name: "a_self_relation")
@@ -668,14 +668,14 @@ fn sql_server_default_setting_on_update_self_relations() {
     "#};
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. Caused by default `onDelete` and `onUpdate` values: `SetNull` and `Cascade`.[0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. Implicit default `onDelete` and `onUpdate` values: `SetNull` and `Cascade`.[0m
           [1;94m-->[0m  [4mschema.prisma:13[0m
         [1;94m   | [0m
         [1;94m12 | [0m    id     Int  @id @default(autoincrement())
         [1;94m13 | [0m    [1;91mchild  A?   @relation(name: "a_self_relation")[0m
         [1;94m14 | [0m    parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: SetDefault)
         [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. Caused by default `onDelete` value: `SetNull`.[0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. Implicit default `onDelete` value: `SetNull`.[0m
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m    child  A?   @relation(name: "a_self_relation")
@@ -717,7 +717,7 @@ fn sql_server_cascading_cyclic_one_hop_relations() {
     "#};
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Caused by default `onUpdate` value: `Cascade`.[0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Implicit default `onUpdate` value: `Cascade`.[0m
           [1;94m-->[0m  [4mschema.prisma:13[0m
         [1;94m   | [0m
         [1;94m12 | [0m    id     Int  @id @default(autoincrement())
@@ -773,21 +773,21 @@ fn sql_server_cascading_cyclic_hop_over_table_relations() {
     "#};
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Caused by default `onUpdate` value: `Cascade`.[0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Implicit default `onUpdate` value: `Cascade`.[0m
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m    bId    Int
         [1;94m14 | [0m    [1;91mb      B    @relation(fields: [bId], references: [id])[0m
         [1;94m15 | [0m    cs     C[]
         [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Caused by default `onUpdate` value: `Cascade`.[0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Implicit default `onUpdate` value: `Cascade`.[0m
           [1;94m-->[0m  [4mschema.prisma:22[0m
         [1;94m   | [0m
         [1;94m21 | [0m    cId    Int
         [1;94m22 | [0m    [1;91mc      C    @relation(fields: [cId], references: [id])[0m
         [1;94m23 | [0m}
         [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Caused by default `onUpdate` value: `Cascade`.[0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Implicit default `onUpdate` value: `Cascade`.[0m
           [1;94m-->[0m  [4mschema.prisma:29[0m
         [1;94m   | [0m
         [1;94m28 | [0m    aId    Int
@@ -836,21 +836,21 @@ fn sql_server_cascading_cyclic_hop_over_backrelation() {
     "#};
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Caused by default `onUpdate` value: `Cascade`.[0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Implicit default `onUpdate` value: `Cascade`.[0m
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m    bId    Int
         [1;94m14 | [0m    [1;91mb      B    @relation(fields: [bId], references: [id])[0m
         [1;94m15 | [0m    cs     C[]
         [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Caused by default `onUpdate` value: `Cascade`.[0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Implicit default `onUpdate` value: `Cascade`.[0m
           [1;94m-->[0m  [4mschema.prisma:28[0m
         [1;94m   | [0m
         [1;94m27 | [0m    bId    Int
         [1;94m28 | [0m    [1;91ma      A   @relation(fields: [aId], references: [id])[0m
         [1;94m29 | [0m    b      B   @relation(fields: [bId], references: [id])
         [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Caused by default `onUpdate` value: `Cascade`.[0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Implicit default `onUpdate` value: `Cascade`.[0m
           [1;94m-->[0m  [4mschema.prisma:29[0m
         [1;94m   | [0m
         [1;94m28 | [0m    a      A   @relation(fields: [aId], references: [id])
@@ -899,21 +899,21 @@ fn sql_server_cascading_cyclic_crossing_path_relations() {
     "#};
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Caused by default `onUpdate` value: `Cascade`.[0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Implicit default `onUpdate` value: `Cascade`.[0m
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m    bId    Int
         [1;94m14 | [0m    [1;91mb      B    @relation(fields: [bId], references: [id])[0m
         [1;94m15 | [0m    cs     C[]
         [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Caused by default `onUpdate` value: `Cascade`.[0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Implicit default `onUpdate` value: `Cascade`.[0m
           [1;94m-->[0m  [4mschema.prisma:28[0m
         [1;94m   | [0m
         [1;94m27 | [0m    bId    Int
         [1;94m28 | [0m    [1;91ma      A    @relation(fields: [aId], references: [id])[0m
         [1;94m29 | [0m    b      B    @relation(fields: [bId], references: [id])
         [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Caused by default `onUpdate` value: `Cascade`.[0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Implicit default `onUpdate` value: `Cascade`.[0m
           [1;94m-->[0m  [4mschema.prisma:29[0m
         [1;94m   | [0m
         [1;94m28 | [0m    a      A    @relation(fields: [aId], references: [id])

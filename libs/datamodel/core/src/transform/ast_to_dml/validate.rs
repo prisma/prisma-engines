@@ -466,15 +466,15 @@ impl<'a> Validator<'a> {
                     let msg = match (on_delete, on_update) {
                         (Some(on_delete), Some(on_update)) => {
                             format!(
-                                "{} Caused by default `onDelete` and `onUpdate` values: `{}` and `{}`.",
+                                "{} Implicit default `onDelete` and `onUpdate` values: `{}` and `{}`.",
                                 msg, on_delete, on_update
                             )
                         }
                         (Some(on_delete), None) => {
-                            format!("{} Caused by default `onDelete` value: `{}`.", msg, on_delete)
+                            format!("{} Implicit default `onDelete` value: `{}`.", msg, on_delete)
                         }
                         (None, Some(on_update)) => {
-                            format!("{} Caused by default `onUpdate` value: `{}`.", msg, on_update)
+                            format!("{} Implicit default `onUpdate` value: `{}`.", msg, on_update)
                         }
                         (None, None) => msg.to_string(),
                     };
