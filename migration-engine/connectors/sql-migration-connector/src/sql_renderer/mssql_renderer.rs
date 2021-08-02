@@ -393,7 +393,7 @@ impl SqlRenderer for MssqlFlavour {
     }
 
     fn render_drop_user_defined_type(&self, udt: &UserDefinedTypeWalker<'_>) -> String {
-        todo!("DROP TYPE {}", self.quote_with_schema(udt.name()))
+        format!("DROP TYPE {}", self.quote_with_schema(udt.name()))
     }
 
     fn render_begin_transaction(&self) -> Option<&'static str> {
