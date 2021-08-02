@@ -416,7 +416,7 @@ impl<'a> Validator<'a> {
 
             // skip many-to-many
             if field.is_list() && related_field.is_list() {
-                return;
+                continue;
             }
 
             // we skipped many-to-many relations, so one of the sides either has
