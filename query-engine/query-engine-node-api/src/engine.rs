@@ -3,7 +3,7 @@ use datamodel::{diagnostics::ValidatedConfiguration, Datamodel};
 use napi::threadsafe_function::ThreadsafeFunction;
 use opentelemetry::global;
 use prisma_models::DatamodelConverter;
-use query_core::{executor, schema_builder, BuildMode, QueryExecutor, QuerySchema, QuerySchemaRenderer};
+use query_core::{executor, schema_builder, BuildMode, QueryExecutor, QuerySchema, QuerySchemaRenderer, TxId};
 use request_handlers::{GraphQLSchemaRenderer, GraphQlBody, GraphQlHandler, PrismaResponse};
 use serde::{Deserialize, Serialize};
 use std::{
@@ -258,7 +258,12 @@ impl QueryEngine {
     }
 
     /// If connected, sends a query to the core and returns the response.
-    pub async fn query(&self, query: GraphQlBody, trace: HashMap<String, String>) -> crate::Result<PrismaResponse> {
+    pub async fn query(
+        &self,
+        query: GraphQlBody,
+        trace: HashMap<String, String>,
+        tx_id: Option<String>,
+    ) -> crate::Result<PrismaResponse> {
         match *self.inner.read().await {
             Inner::Connected(ref engine) => {
                 engine
@@ -270,7 +275,37 @@ impl QueryEngine {
                         span.set_parent(cx);
 
                         let handler = GraphQlHandler::new(engine.executor(), engine.query_schema());
-                        Ok(handler.handle(query, None).await)
+                        Ok(handler.handle(query, tx_id.map(TxId::from)).await)
+                    })
+                    .await
+            }
+            Inner::Builder(_) => Err(ApiError::NotConnected),
+        }
+    }
+
+    /// If connected, sends a query to the core and returns the response.
+    pub async fn start_tx(
+        &self,
+        max_acquisition_millis: u64,
+        valid_for_millis: u64,
+        trace: HashMap<String, String>,
+    ) -> crate::Result<String> {
+        match *self.inner.read().await {
+            Inner::Connected(ref engine) => {
+                engine
+                    .logger
+                    .with_logging(|| async move {
+                        let cx = global::get_text_map_propagator(|propagator| propagator.extract(&trace));
+                        let span = tracing::span!(Level::TRACE, "query");
+
+                        span.set_parent(cx);
+
+                        let tx_id = engine
+                            .executor()
+                            .start_tx(max_acquisition_millis, valid_for_millis)
+                            .await?;
+
+                        Ok(tx_id.to_string())
                     })
                     .await
             }
