@@ -1,6 +1,6 @@
 use napi::{
-    threadsafe_function::ThreadSafeCallContext, CallContext, JsFunction, JsNull, JsNumber, JsObject, JsString,
-    JsUndefined, JsUnknown,
+    threadsafe_function::ThreadSafeCallContext, CallContext, JsFunction, JsNumber, JsObject, JsString, JsUndefined,
+    JsUnknown,
 };
 use napi_derive::js_function;
 
@@ -122,4 +122,38 @@ pub fn start_transaction(ctx: CallContext) -> napi::Result<JsObject> {
             env.create_string_from_std(data)
         },
     )
+}
+
+#[js_function(2)]
+pub fn commit_transaction(ctx: CallContext) -> napi::Result<JsObject> {
+    let this: JsObject = ctx.this_unchecked();
+    let engine: &QueryEngine = ctx.env.unwrap(&this)?;
+    let engine: QueryEngine = engine.clone();
+
+    let tx_id = ctx.get::<JsString>(0)?.into_utf8()?.into_owned()?;
+
+    let trace = ctx.get::<JsString>(1)?.into_utf8()?.into_owned()?;
+    let trace = serde_json::from_str(&trace)?;
+
+    ctx.env
+        .execute_tokio_future(async move { Ok(engine.commit_tx(tx_id, trace).await?) }, |env, _| {
+            env.get_undefined()
+        })
+}
+
+#[js_function(2)]
+pub fn rollback_transaction(ctx: CallContext) -> napi::Result<JsObject> {
+    let this: JsObject = ctx.this_unchecked();
+    let engine: &QueryEngine = ctx.env.unwrap(&this)?;
+    let engine: QueryEngine = engine.clone();
+
+    let tx_id = ctx.get::<JsString>(0)?.into_utf8()?.into_owned()?;
+
+    let trace = ctx.get::<JsString>(1)?.into_utf8()?.into_owned()?;
+    let trace = serde_json::from_str(&trace)?;
+
+    ctx.env
+        .execute_tokio_future(async move { Ok(engine.rollback_tx(tx_id, trace).await?) }, |env, _| {
+            env.get_undefined()
+        })
 }

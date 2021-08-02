@@ -15,8 +15,8 @@ pub fn init(mut exports: JsObject, env: Env) -> napi::Result<()> {
             Property::new(&env, "query")?.with_method(engine::query),
             Property::new(&env, "sdlSchema")?.with_method(engine::sdl_schema),
             Property::new(&env, "startTransaction")?.with_method(engine::start_transaction),
-            // Property::new(&env, "commitTransaction")?.with_method(engine::sdl_schema),
-            // Property::new(&env, "rollbackTransaction")?.with_method(engine::sdl_schema),
+            Property::new(&env, "commitTransaction")?.with_method(engine::commit_transaction),
+            Property::new(&env, "rollbackTransaction")?.with_method(engine::rollback_transaction),
         ],
     )?;
 

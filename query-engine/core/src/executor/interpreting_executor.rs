@@ -75,7 +75,6 @@ where
 
     async fn finalize_tx<F>(&self, tx_id: TxId, final_state: CachedTx, finalizer: F) -> crate::Result<()>
     where
-        // F: Fn(&mut OpenTx) -> Pin<Box<dyn Future<Output = connector::Result<()>>>> + Send + Sync,
         F: Fn(&mut OpenTx) -> Box<dyn Future<Output = connector::Result<()>> + Unpin + Send + '_>,
     {
         // The references need to be dropped before finalization,

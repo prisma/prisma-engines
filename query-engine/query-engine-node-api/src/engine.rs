@@ -283,7 +283,7 @@ impl QueryEngine {
         }
     }
 
-    /// If connected, sends a query to the core and returns the response.
+    /// If connected, attempts to start a transaction in the core and returns its ID.
     pub async fn start_tx(
         &self,
         max_acquisition_millis: u64,
@@ -306,6 +306,46 @@ impl QueryEngine {
                             .await?;
 
                         Ok(tx_id.to_string())
+                    })
+                    .await
+            }
+            Inner::Builder(_) => Err(ApiError::NotConnected),
+        }
+    }
+
+    /// If connected, attempts to commit a transaction with id `tx_id` in the core.
+    pub async fn commit_tx(&self, tx_id: String, trace: HashMap<String, String>) -> crate::Result<()> {
+        match *self.inner.read().await {
+            Inner::Connected(ref engine) => {
+                engine
+                    .logger
+                    .with_logging(|| async move {
+                        let cx = global::get_text_map_propagator(|propagator| propagator.extract(&trace));
+                        let span = tracing::span!(Level::TRACE, "query");
+
+                        span.set_parent(cx);
+
+                        Ok(engine.executor().commit_tx(TxId::from(tx_id)).await?)
+                    })
+                    .await
+            }
+            Inner::Builder(_) => Err(ApiError::NotConnected),
+        }
+    }
+
+    /// If connected, attempts to roll back a transaction with id `tx_id` in the core.
+    pub async fn rollback_tx(&self, tx_id: String, trace: HashMap<String, String>) -> crate::Result<()> {
+        match *self.inner.read().await {
+            Inner::Connected(ref engine) => {
+                engine
+                    .logger
+                    .with_logging(|| async move {
+                        let cx = global::get_text_map_propagator(|propagator| propagator.extract(&trace));
+                        let span = tracing::span!(Level::TRACE, "query");
+
+                        span.set_parent(cx);
+
+                        Ok(engine.executor().rollback_tx(TxId::from(tx_id)).await?)
                     })
                     .await
             }
