@@ -5,7 +5,10 @@ pub use test_setup::{BitFlags, Capabilities, Tags};
 
 use crate::{commands::*, multi_engine_test_api::TestApi as RootTestApi};
 use migration_connector::MigrationPersistence;
-use quaint::prelude::{ConnectionInfo, ResultSet};
+use quaint::{
+    prelude::{ConnectionInfo, ResultSet},
+    Value,
+};
 use sql_migration_connector::SqlMigrationConnector;
 use std::{borrow::Cow, future::Future};
 use tempfile::TempDir;
@@ -194,6 +197,14 @@ impl TestApi {
     #[track_caller]
     pub fn query(&self, q: quaint::ast::Query<'_>) -> ResultSet {
         self.root.block_on(self.connector.queryable().query(q)).unwrap()
+    }
+
+    /// Like quaint::Queryable::query_raw()
+    #[track_caller]
+    pub fn query_raw(&self, q: &str, params: &[Value<'static>]) -> ResultSet {
+        self.root
+            .block_on(self.connector.queryable().query_raw(q, params))
+            .unwrap()
     }
 
     /// Send a SQL command to the database, and expect it to succeed.
