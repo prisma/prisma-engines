@@ -157,3 +157,17 @@ fn removing_unique_from_an_existing_field_must_work(api: TestApi) {
     api.schema_push(dm2).send().assert_green_bang();
     api.assert_schema().assert_table("A", |t| t.assert_indexes_count(0));
 }
+
+#[test_connector]
+fn unique_is_allowed_on_an_id_field(api: TestApi) {
+    let dm1 = r#"
+        model A {
+            id    Int    @id @unique
+        }
+    "#;
+
+    api.schema_push(dm1).send().assert_green_bang();
+    api.assert_schema().assert_table("A", |t| {
+        t.assert_index_on_columns(&["id"], |idx| idx.assert_is_unique())
+    });
+}
