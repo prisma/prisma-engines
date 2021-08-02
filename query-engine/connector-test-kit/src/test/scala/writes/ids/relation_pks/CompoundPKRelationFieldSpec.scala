@@ -1174,12 +1174,16 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
 
     res11.toString() should be("{\"data\":{\"updateChild\":{\"id\":3,\"parents\":[]}}}")
   }
-}
 
 
 "Using a compound ID with custom name that includes a 1!:1 single-field relation" should "work" in {
      val project = ProjectDsl.fromString {
        s"""
+          |generator other {
+          |  provider        = "prisma-client-js"
+          |  previewFeatures = ["NamedConstraints"]
+          |}
+          |
           |model Parent {
           |  name     String
           |  age      Int
@@ -1310,3 +1314,4 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
 
      res6.toString() should be("{\"data\":{\"deleteParent\":{\"name\":\"Milutin\"}}}")
    }
+}
