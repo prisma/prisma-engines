@@ -800,6 +800,69 @@ fn sql_server_cascading_cyclic_hop_over_table_relations() {
 }
 
 #[test]
+fn sql_server_cascading_cyclic_hop_over_backrelation() {
+    let dml = indoc! {
+        r#"
+        datasource db {
+            provider = "sqlserver"
+            url = "sqlserver://"
+        }
+
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialActions", "microsoftSqlServer"]
+        }
+
+        model A {
+            id     Int  @id @default(autoincrement())
+            bId    Int
+            b      B    @relation(fields: [bId], references: [id])
+            cs     C[]
+        }
+
+        model B {
+            id     Int  @id @default(autoincrement())
+            as     A[]
+            cs     C[]
+        }
+
+        model C {
+            id     Int @id @default(autoincrement())
+            aId    Int
+            bId    Int
+            a      A   @relation(fields: [aId], references: [id])
+            b      B   @relation(fields: [bId], references: [id])
+        }
+    "#};
+
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Caused by default `onUpdate` value: `Cascade`.[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
+        [1;94m   | [0m
+        [1;94m13 | [0m    bId    Int
+        [1;94m14 | [0m    [1;91mb      B    @relation(fields: [bId], references: [id])[0m
+        [1;94m15 | [0m    cs     C[]
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Caused by default `onUpdate` value: `Cascade`.[0m
+          [1;94m-->[0m  [4mschema.prisma:28[0m
+        [1;94m   | [0m
+        [1;94m27 | [0m    bId    Int
+        [1;94m28 | [0m    [1;91ma      A   @relation(fields: [aId], references: [id])[0m
+        [1;94m29 | [0m    b      B   @relation(fields: [bId], references: [id])
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Caused by default `onUpdate` value: `Cascade`.[0m
+          [1;94m-->[0m  [4mschema.prisma:29[0m
+        [1;94m   | [0m
+        [1;94m28 | [0m    a      A   @relation(fields: [aId], references: [id])
+        [1;94m29 | [0m    [1;91mb      B   @relation(fields: [bId], references: [id])[0m
+        [1;94m30 | [0m}
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+}
+
+#[test]
 fn sql_server_cascading_cyclic_crossing_path_relations() {
     let dml = indoc! {
         r#"

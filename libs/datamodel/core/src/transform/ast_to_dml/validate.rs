@@ -425,13 +425,25 @@ impl<'a> Validator<'a> {
                 .relation_info
                 .on_update
                 .or(related_field.relation_info.on_update)
-                .unwrap_or_else(|| field.default_on_update_action());
+                .unwrap_or_else(|| {
+                    if field.is_list() {
+                        related_field.default_on_update_action()
+                    } else {
+                        field.default_on_update_action()
+                    }
+                });
 
             let on_delete = field
                 .relation_info
                 .on_delete
                 .or(related_field.relation_info.on_delete)
-                .unwrap_or_else(|| field.default_on_delete_action());
+                .unwrap_or_else(|| {
+                    if field.is_list() {
+                        related_field.default_on_delete_action()
+                    } else {
+                        field.default_on_delete_action()
+                    }
+                });
 
             // a cycle has a meaning only if every relation in it triggers
             // modifications in the children
