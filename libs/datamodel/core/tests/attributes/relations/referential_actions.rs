@@ -434,3 +434,493 @@ fn on_update_without_preview_feature_should_error() {
         Span::new(127, 145),
     )]);
 }
+
+#[test]
+fn sql_server_cascading_on_delete_self_relations() {
+    let dml = indoc! {
+        r#"
+        datasource db {
+            provider = "sqlserver"
+            url = "sqlserver://"
+        }
+
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialActions", "microsoftSqlServer"]
+        }
+
+        model A {
+            id     Int  @id @default(autoincrement())
+            child  A?   @relation(name: "a_self_relation")
+            parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: Cascade)
+            aId    Int?
+        }
+    "#};
+
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. Implicit default `onDelete` and `onUpdate` values: `SetNull` and `Cascade`.[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
+        [1;94m   | [0m
+        [1;94m12 | [0m    id     Int  @id @default(autoincrement())
+        [1;94m13 | [0m    [1;91mchild  A?   @relation(name: "a_self_relation")[0m
+        [1;94m14 | [0m    parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: Cascade)
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. Implicit default `onUpdate` value: `Cascade`.[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
+        [1;94m   | [0m
+        [1;94m13 | [0m    child  A?   @relation(name: "a_self_relation")
+        [1;94m14 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: Cascade)[0m
+        [1;94m15 | [0m    aId    Int?
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+}
+
+#[test]
+fn sql_server_cascading_on_update_self_relations() {
+    let dml = indoc! {
+        r#"
+        datasource db {
+            provider = "sqlserver"
+            url = "sqlserver://"
+        }
+
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialActions", "microsoftSqlServer"]
+        }
+
+        model A {
+            id     Int  @id @default(autoincrement())
+            child  A?   @relation(name: "a_self_relation")
+            parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: Cascade)
+            aId    Int?
+        }
+    "#};
+
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. Implicit default `onDelete` and `onUpdate` values: `SetNull` and `Cascade`.[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
+        [1;94m   | [0m
+        [1;94m12 | [0m    id     Int  @id @default(autoincrement())
+        [1;94m13 | [0m    [1;91mchild  A?   @relation(name: "a_self_relation")[0m
+        [1;94m14 | [0m    parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: Cascade)
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. Implicit default `onDelete` value: `SetNull`.[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
+        [1;94m   | [0m
+        [1;94m13 | [0m    child  A?   @relation(name: "a_self_relation")
+        [1;94m14 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: Cascade)[0m
+        [1;94m15 | [0m    aId    Int?
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+}
+
+#[test]
+fn sql_server_null_setting_on_delete_self_relations() {
+    let dml = indoc! {
+        r#"
+        datasource db {
+            provider = "sqlserver"
+            url = "sqlserver://"
+        }
+
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialActions", "microsoftSqlServer"]
+        }
+
+        model A {
+            id     Int  @id @default(autoincrement())
+            child  A?   @relation(name: "a_self_relation")
+            parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: SetNull)
+            aId    Int?
+        }
+    "#};
+
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. Implicit default `onDelete` and `onUpdate` values: `SetNull` and `Cascade`.[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
+        [1;94m   | [0m
+        [1;94m12 | [0m    id     Int  @id @default(autoincrement())
+        [1;94m13 | [0m    [1;91mchild  A?   @relation(name: "a_self_relation")[0m
+        [1;94m14 | [0m    parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: SetNull)
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. Implicit default `onUpdate` value: `Cascade`.[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
+        [1;94m   | [0m
+        [1;94m13 | [0m    child  A?   @relation(name: "a_self_relation")
+        [1;94m14 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: SetNull)[0m
+        [1;94m15 | [0m    aId    Int?
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+}
+
+#[test]
+fn sql_server_null_setting_on_update_self_relations() {
+    let dml = indoc! {
+        r#"
+        datasource db {
+            provider = "sqlserver"
+            url = "sqlserver://"
+        }
+
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialActions", "microsoftSqlServer"]
+        }
+
+        model A {
+            id     Int  @id @default(autoincrement())
+            child  A?   @relation(name: "a_self_relation")
+            parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: SetNull)
+            aId    Int?
+        }
+    "#};
+
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. Implicit default `onDelete` and `onUpdate` values: `SetNull` and `Cascade`.[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
+        [1;94m   | [0m
+        [1;94m12 | [0m    id     Int  @id @default(autoincrement())
+        [1;94m13 | [0m    [1;91mchild  A?   @relation(name: "a_self_relation")[0m
+        [1;94m14 | [0m    parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: SetNull)
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. Implicit default `onDelete` value: `SetNull`.[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
+        [1;94m   | [0m
+        [1;94m13 | [0m    child  A?   @relation(name: "a_self_relation")
+        [1;94m14 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: SetNull)[0m
+        [1;94m15 | [0m    aId    Int?
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+}
+
+#[test]
+fn sql_server_default_setting_on_delete_self_relations() {
+    let dml = indoc! {
+        r#"
+        datasource db {
+            provider = "sqlserver"
+            url = "sqlserver://"
+        }
+
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialActions", "microsoftSqlServer"]
+        }
+
+        model A {
+            id     Int  @id @default(autoincrement())
+            child  A?   @relation(name: "a_self_relation")
+            parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: SetDefault)
+            aId    Int?
+        }
+    "#};
+
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. Implicit default `onDelete` and `onUpdate` values: `SetNull` and `Cascade`.[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
+        [1;94m   | [0m
+        [1;94m12 | [0m    id     Int  @id @default(autoincrement())
+        [1;94m13 | [0m    [1;91mchild  A?   @relation(name: "a_self_relation")[0m
+        [1;94m14 | [0m    parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: SetDefault)
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. Implicit default `onUpdate` value: `Cascade`.[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
+        [1;94m   | [0m
+        [1;94m13 | [0m    child  A?   @relation(name: "a_self_relation")
+        [1;94m14 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: SetDefault)[0m
+        [1;94m15 | [0m    aId    Int?
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+}
+
+#[test]
+fn sql_server_default_setting_on_update_self_relations() {
+    let dml = indoc! {
+        r#"
+        datasource db {
+            provider = "sqlserver"
+            url = "sqlserver://"
+        }
+
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialActions", "microsoftSqlServer"]
+        }
+
+        model A {
+            id     Int  @id @default(autoincrement())
+            child  A?   @relation(name: "a_self_relation")
+            parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: SetDefault)
+            aId    Int?
+        }
+    "#};
+
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. Implicit default `onDelete` and `onUpdate` values: `SetNull` and `Cascade`.[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
+        [1;94m   | [0m
+        [1;94m12 | [0m    id     Int  @id @default(autoincrement())
+        [1;94m13 | [0m    [1;91mchild  A?   @relation(name: "a_self_relation")[0m
+        [1;94m14 | [0m    parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: SetDefault)
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. Implicit default `onDelete` value: `SetNull`.[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
+        [1;94m   | [0m
+        [1;94m13 | [0m    child  A?   @relation(name: "a_self_relation")
+        [1;94m14 | [0m    [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onUpdate: SetDefault)[0m
+        [1;94m15 | [0m    aId    Int?
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+}
+
+#[test]
+fn sql_server_cascading_cyclic_one_hop_relations() {
+    let dml = indoc! {
+        r#"
+        datasource db {
+            provider = "sqlserver"
+            url = "sqlserver://"
+        }
+
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialActions", "microsoftSqlServer"]
+        }
+
+        model A {
+            id     Int  @id @default(autoincrement())
+            b      B    @relation(name: "foo", fields: [bId], references: [id], onDelete: Cascade)
+            bId    Int
+            bs     B[]  @relation(name: "bar")
+        }
+
+        model B {
+            id     Int @id @default(autoincrement())
+            a      A   @relation(name: "bar", fields: [aId], references: [id], onUpdate: Cascade)
+            as     A[] @relation(name: "foo")
+            aId    Int
+        }
+    "#};
+
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Implicit default `onUpdate` value: `Cascade`.[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
+        [1;94m   | [0m
+        [1;94m12 | [0m    id     Int  @id @default(autoincrement())
+        [1;94m13 | [0m    [1;91mb      B    @relation(name: "foo", fields: [bId], references: [id], onDelete: Cascade)[0m
+        [1;94m14 | [0m    bId    Int
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`.[0m
+          [1;94m-->[0m  [4mschema.prisma:20[0m
+        [1;94m   | [0m
+        [1;94m19 | [0m    id     Int @id @default(autoincrement())
+        [1;94m20 | [0m    [1;91ma      A   @relation(name: "bar", fields: [aId], references: [id], onUpdate: Cascade)[0m
+        [1;94m21 | [0m    as     A[] @relation(name: "foo")
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+}
+
+#[test]
+fn sql_server_cascading_cyclic_hop_over_table_relations() {
+    let dml = indoc! {
+        r#"
+        datasource db {
+            provider = "sqlserver"
+            url = "sqlserver://"
+        }
+
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialActions", "microsoftSqlServer"]
+        }
+
+        model A {
+            id     Int  @id @default(autoincrement())
+            bId    Int
+            b      B    @relation(fields: [bId], references: [id])
+            cs     C[]
+        }
+
+        model B {
+            id     Int  @id @default(autoincrement())
+            as     A[]
+            cId    Int
+            c      C    @relation(fields: [cId], references: [id])
+        }
+
+        model C {
+            id     Int @id @default(autoincrement())
+            bs     B[]
+            aId    Int
+            a      A   @relation(fields: [aId], references: [id])
+        }
+    "#};
+
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Implicit default `onUpdate` value: `Cascade`.[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
+        [1;94m   | [0m
+        [1;94m13 | [0m    bId    Int
+        [1;94m14 | [0m    [1;91mb      B    @relation(fields: [bId], references: [id])[0m
+        [1;94m15 | [0m    cs     C[]
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Implicit default `onUpdate` value: `Cascade`.[0m
+          [1;94m-->[0m  [4mschema.prisma:22[0m
+        [1;94m   | [0m
+        [1;94m21 | [0m    cId    Int
+        [1;94m22 | [0m    [1;91mc      C    @relation(fields: [cId], references: [id])[0m
+        [1;94m23 | [0m}
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Implicit default `onUpdate` value: `Cascade`.[0m
+          [1;94m-->[0m  [4mschema.prisma:29[0m
+        [1;94m   | [0m
+        [1;94m28 | [0m    aId    Int
+        [1;94m29 | [0m    [1;91ma      A   @relation(fields: [aId], references: [id])[0m
+        [1;94m30 | [0m}
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+}
+
+#[test]
+fn sql_server_cascading_cyclic_hop_over_backrelation() {
+    let dml = indoc! {
+        r#"
+        datasource db {
+            provider = "sqlserver"
+            url = "sqlserver://"
+        }
+
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialActions", "microsoftSqlServer"]
+        }
+
+        model A {
+            id     Int  @id @default(autoincrement())
+            bId    Int
+            b      B    @relation(fields: [bId], references: [id])
+            cs     C[]
+        }
+
+        model B {
+            id     Int  @id @default(autoincrement())
+            as     A[]
+            cs     C[]
+        }
+
+        model C {
+            id     Int @id @default(autoincrement())
+            aId    Int
+            bId    Int
+            a      A   @relation(fields: [aId], references: [id])
+            b      B   @relation(fields: [bId], references: [id])
+        }
+    "#};
+
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Implicit default `onUpdate` value: `Cascade`.[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
+        [1;94m   | [0m
+        [1;94m13 | [0m    bId    Int
+        [1;94m14 | [0m    [1;91mb      B    @relation(fields: [bId], references: [id])[0m
+        [1;94m15 | [0m    cs     C[]
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Implicit default `onUpdate` value: `Cascade`.[0m
+          [1;94m-->[0m  [4mschema.prisma:28[0m
+        [1;94m   | [0m
+        [1;94m27 | [0m    bId    Int
+        [1;94m28 | [0m    [1;91ma      A   @relation(fields: [aId], references: [id])[0m
+        [1;94m29 | [0m    b      B   @relation(fields: [bId], references: [id])
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Implicit default `onUpdate` value: `Cascade`.[0m
+          [1;94m-->[0m  [4mschema.prisma:29[0m
+        [1;94m   | [0m
+        [1;94m28 | [0m    a      A   @relation(fields: [aId], references: [id])
+        [1;94m29 | [0m    [1;91mb      B   @relation(fields: [bId], references: [id])[0m
+        [1;94m30 | [0m}
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+}
+
+#[test]
+fn sql_server_cascading_cyclic_crossing_path_relations() {
+    let dml = indoc! {
+        r#"
+        datasource db {
+            provider = "sqlserver"
+            url = "sqlserver://"
+        }
+
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialActions", "microsoftSqlServer"]
+        }
+
+        model A {
+            id     Int  @id @default(autoincrement())
+            bId    Int
+            b      B    @relation(fields: [bId], references: [id])
+            cs     C[]
+        }
+
+        model B {
+            id     Int  @id @default(autoincrement())
+            as     A[]
+            cs     C[]
+        }
+
+        model C {
+            id     Int  @id @default(autoincrement())
+            aId    Int
+            bId    Int
+            a      A    @relation(fields: [aId], references: [id])
+            b      B    @relation(fields: [bId], references: [id])
+        }
+    "#};
+
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Implicit default `onUpdate` value: `Cascade`.[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
+        [1;94m   | [0m
+        [1;94m13 | [0m    bId    Int
+        [1;94m14 | [0m    [1;91mb      B    @relation(fields: [bId], references: [id])[0m
+        [1;94m15 | [0m    cs     C[]
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Implicit default `onUpdate` value: `Cascade`.[0m
+          [1;94m-->[0m  [4mschema.prisma:28[0m
+        [1;94m   | [0m
+        [1;94m27 | [0m    bId    Int
+        [1;94m28 | [0m    [1;91ma      A    @relation(fields: [aId], references: [id])[0m
+        [1;94m29 | [0m    b      B    @relation(fields: [bId], references: [id])
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Implicit default `onUpdate` value: `Cascade`.[0m
+          [1;94m-->[0m  [4mschema.prisma:29[0m
+        [1;94m   | [0m
+        [1;94m28 | [0m    a      A    @relation(fields: [aId], references: [id])
+        [1;94m29 | [0m    [1;91mb      B    @relation(fields: [bId], references: [id])[0m
+        [1;94m30 | [0m}
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+}

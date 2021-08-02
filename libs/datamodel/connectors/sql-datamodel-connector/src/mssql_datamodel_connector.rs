@@ -69,6 +69,7 @@ impl MsSqlDatamodelConnector {
             ConnectorCapability::UpdateableId,
             ConnectorCapability::AnyId,
             ConnectorCapability::QueryRaw,
+            ConnectorCapability::ReferenceCycleDetection,
         ];
 
         let constructors: Vec<NativeTypeConstructor> = vec![

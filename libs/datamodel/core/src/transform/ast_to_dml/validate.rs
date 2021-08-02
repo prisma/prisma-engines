@@ -1,12 +1,16 @@
 #![allow(clippy::suspicious_operation_groupings)] // clippy is wrong there
 
+use std::collections::HashSet;
+
 use crate::{
-    ast,
+    ast::{self, Span},
     common::preview_features::PreviewFeature,
     configuration,
     diagnostics::{DatamodelError, Diagnostics},
     dml,
 };
+use ::dml::{datamodel::Datamodel, field::RelationField, model::Model, traits::WithName};
+use datamodel_connector::ConnectorCapability;
 use enumflags2::BitFlags;
 
 /// Helper for validating a datamodel.
@@ -371,6 +375,137 @@ impl<'a> Validator<'a> {
         errors.to_result()
     }
 
+    // In certain databases, such as SQL Server, it is not allowd to create
+    // multiple reference paths between two models, if referential actions would
+    // cause modifications to the children objects.
+    //
+    // We detect this early before letting database to give us a much more
+    // cryptic error message.
+    fn detect_referential_action_cycles(
+        &self,
+        datamodel: &Datamodel,
+        parent_model: &Model,
+        parent_field: &RelationField,
+        span: Span,
+        errors: &mut Diagnostics,
+    ) {
+        // we only do this if the referential actions preview feature is enabled
+        if !self
+            .source
+            .map(|source| &source.active_connector)
+            .map(|connector| connector.has_capability(ConnectorCapability::ReferenceCycleDetection))
+            .unwrap_or_default()
+        {
+            return;
+        }
+
+        // Keeps count on visited relations to iterate them only once.
+        let mut visited = HashSet::new();
+        // poor man's tail-recursion ;)
+        let mut next_relations = vec![(parent_model, parent_field)];
+
+        while let Some((model, field)) = next_relations.pop() {
+            // we expect to have both sides of the relation at this point...
+            let related_field = datamodel.find_related_field_bang(field).1;
+            let related_model = datamodel.find_model(&field.relation_info.to).unwrap();
+
+            // we do not visit the relation field on the other side
+            // after this run.
+            visited.insert((model.name(), field.name()));
+            visited.insert((related_model.name(), related_field.name()));
+
+            // skip many-to-many
+            if field.is_list() && related_field.is_list() {
+                return;
+            }
+
+            // we skipped many-to-many relations, so one of the sides either has
+            // referential actions set, or we can take the default actions
+            let on_update = field
+                .relation_info
+                .on_update
+                .or(related_field.relation_info.on_update)
+                .unwrap_or_else(|| {
+                    if field.is_list() {
+                        related_field.default_on_update_action()
+                    } else {
+                        field.default_on_update_action()
+                    }
+                });
+
+            let on_delete = field
+                .relation_info
+                .on_delete
+                .or(related_field.relation_info.on_delete)
+                .unwrap_or_else(|| {
+                    if field.is_list() {
+                        related_field.default_on_delete_action()
+                    } else {
+                        field.default_on_delete_action()
+                    }
+                });
+
+            // a cycle has a meaning only if every relation in it triggers
+            // modifications in the children
+            if on_delete.triggers_modification() || on_update.triggers_modification() {
+                let error_with_default_values = |msg: &str| {
+                    let on_delete = match parent_field.relation_info.on_delete {
+                        None if parent_field.default_on_delete_action().triggers_modification() => {
+                            Some(parent_field.default_on_delete_action())
+                        }
+                        _ => None,
+                    };
+
+                    let on_update = match parent_field.relation_info.on_update {
+                        None if parent_field.default_on_update_action().triggers_modification() => {
+                            Some(parent_field.default_on_update_action())
+                        }
+                        _ => None,
+                    };
+
+                    let msg = match (on_delete, on_update) {
+                        (Some(on_delete), Some(on_update)) => {
+                            format!(
+                                "{} Implicit default `onDelete` and `onUpdate` values: `{}` and `{}`.",
+                                msg, on_delete, on_update
+                            )
+                        }
+                        (Some(on_delete), None) => {
+                            format!("{} Implicit default `onDelete` value: `{}`.", msg, on_delete)
+                        }
+                        (None, Some(on_update)) => {
+                            format!("{} Implicit default `onUpdate` value: `{}`.", msg, on_update)
+                        }
+                        (None, None) => msg.to_string(),
+                    };
+
+                    DatamodelError::new_attribute_validation_error(&msg, RELATION_ATTRIBUTE_NAME, span)
+                };
+
+                if model.name() == related_model.name() {
+                    let msg = "A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes.";
+                    errors.push_error(error_with_default_values(msg));
+
+                    return;
+                }
+
+                if related_model.name() == parent_model.name() {
+                    let msg = "Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`.";
+                    errors.push_error(error_with_default_values(msg));
+
+                    return;
+                }
+
+                // bozo tail-recursion continues
+                for field in related_model.relation_fields() {
+                    if !visited.contains(&(related_model.name(), field.name())) {
+                        next_relations.push((related_model, field));
+                    }
+                }
+            }
+        }
+    }
+
     fn validate_relation_arguments_bla(
         &self,
         datamodel: &dml::Datamodel,
@@ -394,14 +529,14 @@ impl<'a> Validator<'a> {
                 let related_field_rel_info = &related_field.relation_info;
 
                 if related_model.is_ignored && !field.is_ignored && !model.is_ignored {
-                    errors.push_error(DatamodelError::new_attribute_validation_error(
-                    &format!(
+                    let message = format!(
                         "The relation field `{}` on Model `{}` must specify the `@ignore` attribute, because the model {} it is pointing to is marked ignored.",
                         &field.name, &model.name, &related_model.name
-                    ),
-                    "ignore",
-                    field_span,
-                ));
+                    );
+
+                    errors.push_error(DatamodelError::new_attribute_validation_error(
+                        &message, "ignore", field_span,
+                    ));
                 }
 
                 // ONE TO MANY
@@ -629,6 +764,10 @@ impl<'a> Validator<'a> {
                         field_span,
                     ));
                 }
+
+                if !field.is_list() && self.preview_features.contains(PreviewFeature::ReferentialActions) {
+                    self.detect_referential_action_cycles(&datamodel, &model, &field, field_span, &mut errors);
+                }
             } else {
                 let message = format!(
                     "The relation field `{}` on Model `{}` is missing an opposite relation field on the model `{}`. Either run `prisma format` or add it manually.",
@@ -666,36 +805,40 @@ impl<'a> Validator<'a> {
                         // and also no names set.
                         if rel_a.to == rel_b.to && rel_a.name == rel_b.name {
                             if rel_a.name.is_empty() {
+                                let message = format!(
+                                    "Ambiguous relation detected. The fields `{}` and `{}` in model `{}` both refer to `{}`. Please provide different relation names for them by adding `@relation(<name>).",
+                                    &field_a.name,
+                                    &field_b.name,
+                                    &model.name,
+                                    &rel_a.to
+                                );
+
                                 // unnamed relation
                                 return Err(DatamodelError::new_model_validation_error(
-                                            &format!(
-                                                "Ambiguous relation detected. The fields `{}` and `{}` in model `{}` both refer to `{}`. Please provide different relation names for them by adding `@relation(<name>).",
-                                                &field_a.name,
-                                                &field_b.name,
-                                                &model.name,
-                                                &rel_a.to
-                                            ),
-                                            &model.name,
-                                            ast_schema
-                                                .find_field(&model.name, &field_a.name)
-                                                .expect(STATE_ERROR)
-                                                .span,
-                                        ));
+                                    &message,
+                                    &model.name,
+                                    ast_schema
+                                        .find_field(&model.name, &field_a.name)
+                                        .expect(STATE_ERROR)
+                                        .span,
+                                ));
                             } else {
+                                let message = format!(
+                                    "Wrongly named relation detected. The fields `{}` and `{}` in model `{}` both use the same relation name. Please provide different relation names for them through `@relation(<name>).",
+                                    &field_a.name,
+                                    &field_b.name,
+                                    &model.name,
+                                );
+
                                 // explicitly named relation
                                 return Err(DatamodelError::new_model_validation_error(
-                                            &format!(
-                                                "Wrongly named relation detected. The fields `{}` and `{}` in model `{}` both use the same relation name. Please provide different relation names for them through `@relation(<name>).",
-                                                &field_a.name,
-                                                &field_b.name,
-                                                &model.name,
-                                            ),
-                                            &model.name,
-                                            ast_schema
-                                                .find_field(&model.name, &field_a.name)
-                                                .expect(STATE_ERROR)
-                                                .span,
-                                        ));
+                                    &message,
+                                    &model.name,
+                                    ast_schema
+                                        .find_field(&model.name, &field_a.name)
+                                        .expect(STATE_ERROR)
+                                        .span,
+                                ));
                             }
                         }
                     } else if rel_a.to == model.name && rel_b.to == model.name {
@@ -724,19 +867,19 @@ impl<'a> Validator<'a> {
                                                     ));
                                     } else {
                                         return Err(DatamodelError::new_model_validation_error(
-                                                        &format!(
-                                                        "Wrongly named self relation detected. The fields `{}`, `{}` and `{}` in model `{}` have the same relation name. At most two relation fields can belong to the same relation and therefore have the same name. Please assign a different relation name to one of them.",
-                                                            &field_a.name,
-                                                            &field_b.name,
-                                                            &field_c.name,
-                                                            &model.name
-                                                        ),
-                                                        &model.name,
-                                                        ast_schema
-                                                            .find_field(&model.name, &field_a.name)
-                                                            .expect(STATE_ERROR)
-                                                            .span,
-                                                    ));
+                                            &format!(
+                                                "Wrongly named self relation detected. The fields `{}`, `{}` and `{}` in model `{}` have the same relation name. At most two relation fields can belong to the same relation and therefore have the same name. Please assign a different relation name to one of them.",
+                                                &field_a.name,
+                                                &field_b.name,
+                                                &field_c.name,
+                                                &model.name
+                                            ),
+                                            &model.name,
+                                            ast_schema
+                                                .find_field(&model.name, &field_a.name)
+                                                .expect(STATE_ERROR)
+                                                .span,
+                                        ));
                                     }
                                 }
                             }
@@ -746,19 +889,19 @@ impl<'a> Validator<'a> {
                         if rel_a.name.is_empty() && rel_b.name.is_empty() {
                             // A self relation, but there are at least two fields without a name.
                             return Err(DatamodelError::new_model_validation_error(
-                                        &format!(
-                                            "Ambiguous self relation detected. The fields `{}` and `{}` in model `{}` both refer to `{}`. If they are part of the same relation add the same relation name for them with `@relation(<name>)`.",
-                                            &field_a.name,
-                                            &field_b.name,
-                                            &model.name,
-                                            &rel_a.to
-                                        ),
-                                        &model.name,
-                                        ast_schema
-                                            .find_field(&model.name, &field_a.name)
-                                            .expect(STATE_ERROR)
-                                            .span,
-                                    ));
+                                &format!(
+                                    "Ambiguous self relation detected. The fields `{}` and `{}` in model `{}` both refer to `{}`. If they are part of the same relation add the same relation name for them with `@relation(<name>)`.",
+                                    &field_a.name,
+                                    &field_b.name,
+                                    &model.name,
+                                    &rel_a.to
+                                ),
+                                &model.name,
+                                ast_schema
+                                    .find_field(&model.name, &field_a.name)
+                                    .expect(STATE_ERROR)
+                                    .span,
+                            ));
                         }
                     }
                 }

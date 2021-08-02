@@ -234,6 +234,7 @@ capabilities!(
     RelationFieldsInArbitraryOrder,
     ForeignKeys,
     NamedPrimaryKeys,
+    ReferenceCycleDetection,
     // Start of query-engine-only Capabilities
     InsensitiveFilters,
     CreateMany,
