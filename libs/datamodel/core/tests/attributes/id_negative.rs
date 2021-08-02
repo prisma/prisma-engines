@@ -158,25 +158,3 @@ fn relation_field_as_id_must_error() {
         Span::new(84, 86),
     ));
 }
-
-#[test]
-fn unique_should_error_if_unique_and_id_are_specified_on_sqlserver() {
-    let dml = r#"
-    datasource test {
-         provider = "sqlserver"
-         url = "sqlserver://...."
-    }
-    
-     model Model {
-         id Int @id @unique
-     }
-     "#;
-
-    let errors = parse_error(dml);
-
-    errors.assert_is(DatamodelError::new_attribute_validation_error(
-        "SQLServer only allows either a unique or a primary key constraint on a column.",
-        "unique",
-        Span::new(140, 146),
-    ));
-}
