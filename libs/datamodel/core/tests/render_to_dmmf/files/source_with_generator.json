@@ -34,7 +34,7 @@
         }
       ],
       "isGenerated": false,
-      "idFields": [],
+      "primaryKey": null,
       "uniqueFields": [],
       "uniqueIndexes": []
     }

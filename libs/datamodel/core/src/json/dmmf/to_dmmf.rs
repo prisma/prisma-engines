@@ -1,4 +1,5 @@
 use super::{Datamodel, Enum, EnumValue, Field, Function, Model, UniqueIndex};
+use crate::json::dmmf::PrimaryKey;
 use crate::{dml, FieldType, Ignorable, ScalarType};
 use bigdecimal::ToPrimitive;
 use prisma_value::PrismaValue;
@@ -53,14 +54,13 @@ fn enum_value_to_dmmf(en: &dml::EnumValue) -> EnumValue {
 }
 
 fn model_to_dmmf(model: &dml::Model) -> Model {
-    let id_fields = if let Some(pk) = &model.primary_key {
-        if !pk.defined_on_field {
-            pk.fields.clone()
-        } else {
-            vec![]
-        }
+    let primary_key = if let Some(pk) = &model.primary_key {
+        (!pk.defined_on_field).then(|| PrimaryKey {
+            name: pk.name.clone(),
+            fields: pk.fields.clone(),
+        })
     } else {
-        vec![]
+        None
     };
 
     Model {
@@ -74,7 +74,7 @@ fn model_to_dmmf(model: &dml::Model) -> Model {
             .collect(),
         is_generated: Some(model.is_generated),
         documentation: model.documentation.clone(),
-        id_fields,
+        primary_key,
         unique_fields: model
             .indices
             .iter()
