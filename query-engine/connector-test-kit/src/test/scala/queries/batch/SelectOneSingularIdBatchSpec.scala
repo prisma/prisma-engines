@@ -3,6 +3,7 @@ package queries.batch
 import org.scalatest.{FlatSpec, Matchers}
 import util.{ApiSpecBase, ProjectDsl}
 
+// RS: Ported
 class SelectOneSingularIdBatchSpec extends FlatSpec with Matchers with ApiSpecBase {
   val project = ProjectDsl.fromString {
     """model Artist {

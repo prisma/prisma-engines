@@ -34,7 +34,7 @@ pub trait QueryExecutor: TransactionManager {
     /// Implementers must honor the passed transaction ID and execute the operation on the transaction identified
     /// by `tx_id`. If `None`, implementers are free to choose how to execute the query.
     ///
-    /// Note that `transactional` is the legacy marker for transactional batches. It must be supported until the stabilization of LRTs.
+    /// Note that `transactional` is the legacy marker for transactional batches. It must be supported until the stabilization of ITXs.
     async fn execute_all(
         &self,
         tx_id: Option<TxId>,

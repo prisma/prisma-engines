@@ -17,7 +17,7 @@ mod compound_batch {
     }
 
     #[connector_test]
-    async fn one_query(runner: Runner) -> TestResult<()> {
+    async fn one_success(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
         let queries = vec![

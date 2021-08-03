@@ -1,8 +1,7 @@
 use indoc::indoc;
 use query_engine_tests::*;
 
-/// Port note: Batch size for testing is now 10 by default, not configurable.
-/// This is dicey, as all tests that are executed afterwards are affected.
+/// Port note: Batch size for testing is now 10 by default, not configurable (look at the direnv).
 #[test_suite(schema(schema))]
 mod isb {
     fn schema() -> String {
@@ -35,7 +34,6 @@ mod isb {
     // "batching of IN queries" should "work when having more than the specified amount of items"
     #[connector_test]
     async fn in_more_items(runner: Runner) -> TestResult<()> {
-        std::env::set_var("QUERY_BATCH_SIZE", "10");
         create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
@@ -52,7 +50,6 @@ mod isb {
     // "ascending ordering of batched IN queries" should "work when having more than the specified amount of items"
     #[connector_test]
     async fn asc_in_ordering(runner: Runner) -> TestResult<()> {
-        std::env::set_var("QUERY_BATCH_SIZE", "10");
         create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
@@ -69,7 +66,6 @@ mod isb {
     // "ascending ordering of batched IN queries" should "work when having more than the specified amount of items"
     #[connector_test]
     async fn desc_in_ordering(runner: Runner) -> TestResult<()> {
-        std::env::set_var("QUERY_BATCH_SIZE", "10");
         create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
