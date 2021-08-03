@@ -3,8 +3,6 @@ use query_engine_tests::*;
 
 #[test_suite(schema(schema))]
 mod transactional {
-    use query_engine_tests::assert_error;
-
     fn schema() -> String {
         let schema = indoc! {
             r#"
