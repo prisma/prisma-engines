@@ -1,4 +1,4 @@
-version: "3.5"
+version: "3"
 services:
   cockroach:
     image: cockroachdb/cockroach-unstable:v21.1.0-beta.5
@@ -74,7 +74,7 @@ services:
       - "5434:5432"
     networks:
       - databases
-    tmpfs: /pgtmpfs12:size=2G
+    tmpfs: /pgtmpfs12
 
   postgres13:
     image: postgres:13
@@ -87,7 +87,7 @@ services:
       - "5435:5432"
     networks:
       - databases
-    tmpfs: /pgtmpfs12
+    tmpfs: /pgtmpfs13
 
   mysql-5-6:
     image: mysql:5.6.50
