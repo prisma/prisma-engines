@@ -15,6 +15,10 @@ use user_facing_errors::{
 #[derive(Clone)]
 pub struct ConnectorError(Box<ConnectorErrorImpl>);
 
+/// Shorthand for a [Result](https://doc.rust-lang.org/std/result/enum.Result.html) where the error
+/// variant is a [ConnectorError](/error/enum.ConnectorError.html).
+pub type ConnectorResult<T> = Result<T, ConnectorError>;
+
 #[derive(Debug, Clone)]
 struct ConnectorErrorImpl {
     /// An optional error already rendered for users in case the migration core does not handle it.
