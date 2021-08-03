@@ -1,9 +1,8 @@
 use query_engine_tests::test_suite;
 
-/// LRT = Long-Running Transactions
 /// Note that if cache expiration tests fail, make sure `CLOSED_TX_CLEANUP` is set correctly (low value like 2) from the .envrc.
 #[test_suite(schema(generic))]
-mod lrt {
+mod interactive_tx {
     use query_core::TransactionError;
     use query_engine_tests::*;
     use tokio::time;
@@ -174,7 +173,7 @@ mod lrt {
             r#"mutation { createOneTestModel(data: { id: 3 }) { id }}"#.to_string(),
         ];
 
-        // Tx flag is not set, but it executes on an LRT.
+        // Tx flag is not set, but it executes on an ITX.
         runner.batch(queries, false).await?;
         runner.executor().commit_tx(tx_id.clone()).await?;
         runner.clear_active_tx();
@@ -199,7 +198,7 @@ mod lrt {
             r#"mutation { createOneTestModel(data: { id: 3 }) { id }}"#.to_string(),
         ];
 
-        // Tx flag is not set, but it executes on an LRT.
+        // Tx flag is not set, but it executes on an ITX.
         runner.batch(queries, false).await?;
         runner.executor().rollback_tx(tx_id.clone()).await?;
         runner.clear_active_tx();
@@ -226,7 +225,7 @@ mod lrt {
             r#"mutation { createOneTestModel(data: { id: 3 }) { id }}"#.to_string(),
         ];
 
-        // Tx flag is not set, but it executes on an LRT.
+        // Tx flag is not set, but it executes on an ITX.
         let batch_results = runner.batch(queries, false).await?;
         batch_results.assert_failure(2002, None);
 

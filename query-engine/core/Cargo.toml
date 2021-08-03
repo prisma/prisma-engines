@@ -8,7 +8,6 @@ version = "0.1.0"
 default = ["sql", "mongodb"]
 mongodb = ["mongodb-connector"]
 sql = ["sql-connector"]
-lrt = []
 
 [dependencies]
 async-trait = "0.1"

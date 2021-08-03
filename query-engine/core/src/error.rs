@@ -104,7 +104,7 @@ impl From<CoreError> for user_facing_errors::Error {
     fn from(err: CoreError) -> user_facing_errors::Error {
         match err {
             CoreError::TransactionError(err) => {
-                user_facing_errors::KnownError::new(user_facing_errors::query_engine::LongRunningTransactionError {
+                user_facing_errors::KnownError::new(user_facing_errors::query_engine::InteractiveTransactionError {
                     error: err.to_string(),
                 })
                 .into()

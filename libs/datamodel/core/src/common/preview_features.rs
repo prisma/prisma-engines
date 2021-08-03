@@ -56,7 +56,7 @@ features!(
     FilterJson,
     PlanetScaleMode,
     ReferentialActions,
-    LongRunningTransactions
+    InteractiveTransactions,
 );
 
 // Mapping of which active, deprecated and hidden
@@ -75,7 +75,7 @@ pub static GENERATOR: Lazy<FeatureMap> = Lazy::new(|| {
             PlanetScaleMode,
             ReferentialActions,
             MongoDb,
-            LongRunningTransactions,
+            InteractiveTransactions,
         ])
         .with_deprecated(vec![
             AtomicNumberOperations,

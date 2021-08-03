@@ -54,9 +54,9 @@ pub async fn listen(opts: PrismaOpt) -> PrismaResult<()> {
     let config = opts.configuration(false)?.subject;
     config.validate_that_one_datasource_is_provided()?;
 
-    let enable_lrts = config
+    let enable_itx = config
         .preview_features()
-        .any(|flag| *flag == PreviewFeature::LongRunningTransactions);
+        .any(|flag| *flag == PreviewFeature::InteractiveTransactions);
 
     let datamodel = opts.datamodel()?;
     let cx = PrismaContext::builder(config, datamodel)
@@ -79,7 +79,7 @@ pub async fn listen(opts: PrismaOpt) -> PrismaResult<()> {
     app.at("/server_info").get(server_info_handler);
     app.at("/status").get(|_| async move { Ok(json!({"status": "ok"})) });
 
-    if enable_lrts {
+    if enable_itx {
         // Transaction routes.
         app.at("/transaction/start").post(transaction_start_handler);
         app.at("/transaction/:id/commit").post(transaction_commit_handler);

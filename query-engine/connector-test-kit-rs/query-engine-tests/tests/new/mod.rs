@@ -1,6 +1,6 @@
 mod create_many;
 mod cursor;
 mod disconnect;
-mod lrt;
+mod interactive_tx;
 mod native_types;
 mod ref_actions;

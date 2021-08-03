@@ -1,5 +1,5 @@
 use super::{
-    lrt::{CachedTx, TransactionCache, TxId},
+    interactive_tx::{CachedTx, TransactionCache, TxId},
     pipeline::QueryPipeline,
     QueryExecutor,
 };

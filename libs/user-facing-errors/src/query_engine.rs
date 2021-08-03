@@ -288,6 +288,6 @@ pub struct MultiError {
 
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(code = "P2028", message = "Transaction API error: {error}")]
-pub struct LongRunningTransactionError {
+pub struct InteractiveTransactionError {
     pub error: String,
 }

@@ -27,10 +27,10 @@ pub trait RunnerInterface: Sized {
     /// Exposes the underlying executor for testing.
     fn executor(&self) -> &dyn QueryExecutor;
 
-    /// Instructs this runner to use a specific LRT ID for queries.
+    /// Instructs this runner to use a specific ITX ID for queries.
     fn set_active_tx(&mut self, tx_id: TxId);
 
-    /// Clears LRT ID for queries.
+    /// Clears ITX ID for queries.
     fn clear_active_tx(&mut self);
 }
 
