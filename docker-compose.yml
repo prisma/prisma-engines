@@ -74,7 +74,7 @@ services:
       - "5434:5432"
     networks:
       - databases
-    tmpfs: /pgtmpfs12:size:4g
+    tmpfs: /pgtmpfs12:size=4g
 
   postgres13:
     image: postgres:13
