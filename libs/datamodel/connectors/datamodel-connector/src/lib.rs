@@ -240,7 +240,8 @@ capabilities!(
     MultipleIndexesWithSameName,
     NamedPrimaryKeys,
     NamedForeignKeys,
-    // Start of query-engine-only capabilities
+    ReferenceCycleDetection,
+    // Start of query-engine-only Capabilities
     InsensitiveFilters,
     CreateMany,
     CreateManyWriteableAutoIncId,

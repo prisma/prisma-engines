@@ -288,16 +288,6 @@ fn visit_scalar_field_attributes<'ast>(
 
          // @unique
          attributes.visit_optional_single("unique", ctx, |args, ctx| {
-             if let Some(source) = &ctx.db.datasource{
-                if source.active_provider == "sqlserver" {
-                    if let Some(pk) = &model_data.primary_key{
-                        if pk.source_field == Some(field_id) {
-                            ctx.push_error(args.new_attribute_validation_error(
-                         "SQLServer only allows either a unique or a primary key constraint on a column.", ))
-                        }
-                    }
-                }
-             }
 
              let model_db_name = model_data.mapped_name.unwrap_or(&ast_model.name.name);
              let field_db_name = scalar_field_data.mapped_name.unwrap_or(&ast_field.name.name);
@@ -320,7 +310,6 @@ fn visit_scalar_field_attributes<'ast>(
                  Some(Cow::from(generated_name))
              };
 
-
             model_data.indexes.push((args.attribute(), IndexData {
                 is_unique: true,
                 fields: vec![field_id],
@@ -328,7 +317,7 @@ fn visit_scalar_field_attributes<'ast>(
                 name: None,
                 db_name,
             }))
-         });
+        });
     });
 }
 

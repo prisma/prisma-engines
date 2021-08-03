@@ -37,6 +37,7 @@ impl TestApi {
             let me = SqlMigrationConnector::new(connection_string, preview_features, None)
                 .await
                 .unwrap();
+
             me.reset().await.unwrap();
 
             (

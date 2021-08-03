@@ -1,6 +1,33 @@
 use migration_engine_tests::sync_test_api::*;
 
 #[test_connector(tags(Mssql))]
+fn reset_clears_udts(api: TestApi) {
+    let schema = api.schema_name();
+
+    api.raw_cmd(&format!("CREATE TYPE {}.[testType] AS TABLE (FooBar INT)", schema));
+
+    let schemas = api.query_raw(
+        &format!(
+            "SELECT * FROM sys.types WHERE SCHEMA_NAME(schema_id) = '{}' and NAME = 'testType'",
+            schema
+        ),
+        &[],
+    );
+    assert_eq!(1, schemas.len());
+
+    api.reset().send_sync();
+
+    let schemas = api.query_raw(
+        &format!(
+            "SELECT * FROM sys.types WHERE SCHEMA_NAME(schema_id) = '{}' and NAME = 'testType'",
+            schema
+        ),
+        &[],
+    );
+    assert_eq!(0, schemas.len());
+}
+
+#[test_connector(tags(Mssql))]
 fn shared_default_constraints_are_ignored_issue_5423(api: TestApi) {
     let schema = api.schema_name();
 

@@ -815,6 +815,34 @@ async fn unique_and_index_on_same_field_works_sqlite(api: &TestApi) -> TestResul
     Ok(())
 }
 
+#[test_connector(tags(Mssql))]
+async fn unique_and_id_on_same_field_works_mssql(api: &TestApi) -> TestResult {
+    let schema = api.schema_name();
+
+    api.barrel()
+        .execute(|migration| {
+            migration.inject_custom(format!(
+                "create table {}.users (
+                       id int identity primary key,
+                       constraint unique_and_index_same unique(id) 
+                     );",
+                schema
+            ))
+        })
+        .await?;
+
+    let dm = indoc! {r##"
+        model users {
+          id Int @id @unique @default(autoincrement())
+        }
+    "##};
+
+    let result = &api.introspect().await?;
+    api.assert_eq_datamodels(dm, result);
+
+    Ok(())
+}
+
 #[test_connector(tags(Postgres))]
 // If multiple constraints are created in the create table statement Postgres seems to collapse them
 // into the first named one. So on the db level there will be one named really_must_be_different that

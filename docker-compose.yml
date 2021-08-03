@@ -145,7 +145,7 @@ services:
     tmpfs: /var/lib/mariadb
 
   vitess-test-5_7:
-    image: vitess/vttestserver:mysql57
+    image: vitess/vttestserver:mysql57@sha256:96cb401d180fe054196b969adce928b83590842ec5e300cfb95fd602ec8e7494
     restart: always
     ports:
       - 33577:33577
@@ -156,7 +156,7 @@ services:
       MYSQL_BIND_HOST: "0.0.0.0"
 
   vitess-test-8_0:
-    image: vitess/vttestserver:mysql80
+    image: vitess/vttestserver:mysql80@sha256:d7c9036e27557d16dc6b20c1a2582e710b61b9723d5523ecba37feccaf4f97ba
     restart: always
     ports:
       - 33807:33807
@@ -167,7 +167,7 @@ services:
       MYSQL_BIND_HOST: "0.0.0.0"
 
   vitess-shadow-5_7:
-    image: vitess/vttestserver:mysql57
+    image: vitess/vttestserver:mysql57@sha256:96cb401d180fe054196b969adce928b83590842ec5e300cfb95fd602ec8e7494
     restart: always
     ports:
       - 33578:33577
@@ -178,7 +178,7 @@ services:
       MYSQL_BIND_HOST: "0.0.0.0"
 
   vitess-shadow-8_0:
-    image: vitess/vttestserver:mysql80
+    image: vitess/vttestserver:mysql80@sha256:d7c9036e27557d16dc6b20c1a2582e710b61b9723d5523ecba37feccaf4f97ba
     restart: always
     ports:
       - 33808:33807

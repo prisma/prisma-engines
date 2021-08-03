@@ -71,6 +71,7 @@ impl MsSqlDatamodelConnector {
             ConnectorCapability::NamedPrimaryKeys,
             ConnectorCapability::NamedForeignKeys,
             ConnectorCapability::ForeignKeys,
+            ConnectorCapability::ReferenceCycleDetection,
         ];
 
         let constructors: Vec<NativeTypeConstructor> = vec![
