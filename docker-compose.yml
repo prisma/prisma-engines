@@ -1,4 +1,4 @@
-version: "3"
+version: "3.5"
 services:
   cockroach:
     image: cockroachdb/cockroach-unstable:v21.1.0-beta.5
@@ -75,6 +75,10 @@ services:
     networks:
       - databases
     tmpfs: /pgtmpfs12
+    build:
+      context: .
+      shm_size: 256mb
+    shm_size: 256mb
 
   postgres13:
     image: postgres:13
