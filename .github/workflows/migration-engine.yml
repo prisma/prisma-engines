@@ -69,6 +69,11 @@ jobs:
             target
           key: me-ie-${{ runner.os }}-${{ matrix.database.name }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
+      - run: |
+          ls -lha
+          df -h
+          du -h
+
       - run: cargo test -p introspection-engine-tests
         if: ${{ !matrix.database.single_threaded }}
         env:
