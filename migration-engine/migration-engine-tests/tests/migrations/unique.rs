@@ -166,7 +166,7 @@ fn unique_is_allowed_on_an_id_field(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green_bang();
     api.assert_schema().assert_table("A", |t| {
         t.assert_index_on_columns(&["id"], |idx| idx.assert_is_unique())
     });
