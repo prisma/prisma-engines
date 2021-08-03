@@ -140,13 +140,16 @@ impl SqlRenderer for PostgresFlavour {
             let affected_columns = walk_columns(schemas.next()).filter(|column| matches!(&column.column_type().family, ColumnTypeFamily::Enum(name) if name.as_str() == enums.next().name()));
 
             for column in affected_columns {
+                let array = if column.arity().is_list() { "[]" } else { "" };
+
                 let sql = format!(
                     "ALTER TABLE {table_name} \
-                            ALTER COLUMN {column_name} TYPE {tmp_name} \
-                                USING ({column_name}::text::{tmp_name})",
+                            ALTER COLUMN {column_name} TYPE {tmp_name}{array} \
+                                USING ({column_name}::text::{tmp_name}{array})",
                     table_name = Quoted::postgres_ident(column.table().name()),
                     column_name = Quoted::postgres_ident(column.name()),
                     tmp_name = Quoted::postgres_ident(&tmp_name),
+                    array = array,
                 );
 
                 stmts.push(sql);
