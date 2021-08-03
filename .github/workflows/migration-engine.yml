@@ -72,6 +72,15 @@ jobs:
       - run: |
           df -h
 
+      - run: |
+          echo "Removing unwanted packages"
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+
+      - run: |
+          df -h
+
       - run: cargo test -p introspection-engine-tests
         if: ${{ !matrix.database.single_threaded }}
         env:
@@ -143,9 +152,6 @@ jobs:
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
-
-      - run: |
-          df -h
 
   test-windows:
     strategy:
