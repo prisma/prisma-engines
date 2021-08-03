@@ -265,7 +265,7 @@ fn new_lines_in_source_must_work() {
     let expected = r#"[
         {
           "name": "ds",
-          "provider": ["postgresql"],
+          "provider": "postgresql",
           "activeProvider": "postgresql",
           "url": {
               "fromEnvVar": null,
