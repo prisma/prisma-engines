@@ -504,3 +504,62 @@ fn existing_enums_are_picked_up(api: TestApi) {
         .assert_green_bang()
         .assert_no_steps();
 }
+
+// Bug: https://github.com/prisma/prisma/issues/8137
+#[test_connector(tags(Postgres))]
+fn enum_array_modification_should_work(api: TestApi) {
+    let migrations_directory = api.create_migrations_directory();
+
+    let dm = r#"
+        datasource test {
+            provider = "postgres"
+            url = "postgres://meowmeowmeow"
+        }
+
+        enum Position {
+            First
+            Second
+            Last
+        }
+
+        model Test {
+            id        String     @id @default(uuid())
+            positions Position[]
+        }
+    "#;
+
+    api.create_migration("01init", &dm, &migrations_directory).send_sync();
+
+    api.apply_migrations(&migrations_directory)
+        .send_sync()
+        .assert_applied_migrations(&["01init"]);
+
+    let dm = r#"
+        datasource test {
+            provider = "postgres"
+            url = "postgres://meowmeowmeow"
+        }
+
+        enum Position {
+            First
+            Second
+        }
+
+        model Test {
+            id        String     @id @default(uuid())
+            positions Position[]
+        }
+    "#;
+
+    api.create_migration("02remove", &dm, &migrations_directory).send_sync();
+
+    api.apply_migrations(&migrations_directory)
+        .send_sync()
+        .assert_applied_migrations(&["02remove"]);
+
+    api.create_migration("03empty", &dm, &migrations_directory).send_sync();
+
+    api.apply_migrations(&migrations_directory)
+        .send_sync()
+        .assert_applied_migrations(&[]);
+}
