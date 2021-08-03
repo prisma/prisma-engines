@@ -67,6 +67,8 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
         // Implements correct comparison for truncated index names.
         let (previous_name, next_name) = pair.as_ref().map(|idx| idx.name()).into_tuple();
 
+        //TODO (matthias, NamedConstraints) another nice surprise that can probably be removed once
+        // the preview flag becomes the default since this is handled in the parser
         if previous_name.len() == POSTGRES_IDENTIFIER_SIZE_LIMIT && next_name.len() > POSTGRES_IDENTIFIER_SIZE_LIMIT {
             previous_name[0..POSTGRES_IDENTIFIER_SIZE_LIMIT] != next_name[0..POSTGRES_IDENTIFIER_SIZE_LIMIT]
         } else {

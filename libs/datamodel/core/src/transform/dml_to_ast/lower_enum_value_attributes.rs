@@ -1,7 +1,7 @@
 use crate::transform::dml_to_ast::LowerDmlToAst;
 use crate::{
-    ast::{self, Span},
-    dml, WithDatabaseName,
+    ast::{self},
+    dml,
 };
 
 impl<'a> LowerDmlToAst<'a> {
@@ -9,15 +9,7 @@ impl<'a> LowerDmlToAst<'a> {
     pub(crate) fn lower_enum_value_attributes(&self, enum_value: &dml::EnumValue) -> Vec<ast::Attribute> {
         let mut attributes = vec![];
 
-        if let Some(db_name) = enum_value.database_name() {
-            attributes.push(ast::Attribute::new(
-                "map",
-                vec![ast::Argument::new_unnamed(ast::Expression::StringValue(
-                    String::from(db_name),
-                    Span::empty(),
-                ))],
-            ));
-        }
+        <LowerDmlToAst<'a>>::push_map_attribute(enum_value, &mut attributes);
 
         attributes
     }

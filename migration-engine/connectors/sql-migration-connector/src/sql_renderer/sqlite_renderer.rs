@@ -72,6 +72,7 @@ impl SqlRenderer for SqliteFlavour {
                 TableChange::DropAndRecreateColumn { .. } => unreachable!("DropAndRecreateColumn on SQLite"),
                 TableChange::DropColumn { .. } => unreachable!("DropColumn on SQLite"),
                 TableChange::DropPrimaryKey { .. } => unreachable!("DropPrimaryKey on SQLite"),
+                TableChange::RenamePrimaryKey { .. } => unreachable!("AddPrimaryKey on SQLite"),
             };
         }
 
@@ -133,6 +134,13 @@ impl SqlRenderer for SqliteFlavour {
 
     fn render_drop_index(&self, index: &IndexWalker<'_>) -> String {
         format!("DROP INDEX {}", self.quote(index.name()))
+    }
+
+    fn render_drop_and_recreate_index(&self, _indexes: Pair<&IndexWalker<'_>>) -> Vec<String> {
+        vec![
+            self.render_drop_index(*_indexes.previous()),
+            self.render_create_index(*_indexes.next()),
+        ]
     }
 
     fn render_drop_table(&self, table_name: &str) -> Vec<String> {

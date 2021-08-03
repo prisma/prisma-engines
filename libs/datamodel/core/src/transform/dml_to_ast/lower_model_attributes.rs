@@ -1,7 +1,10 @@
+use crate::ast::{Argument, Attribute};
+use crate::common::constraint_names::ConstraintNames;
 use crate::transform::dml_to_ast::LowerDmlToAst;
+use crate::PreviewFeature::NamedConstraints;
 use crate::{
     ast::{self, Span},
-    dml, Ignorable, IndexType, WithDatabaseName,
+    dml, Ignorable, IndexDefinition, IndexType, Model, WithDatabaseName,
 };
 
 impl<'a> LowerDmlToAst<'a> {
@@ -13,7 +16,29 @@ impl<'a> LowerDmlToAst<'a> {
 
         if let Some(pk) = &model.primary_key {
             if !pk.defined_on_field {
-                let args = vec![ast::Argument::new_array("", LowerDmlToAst::field_array(&pk.fields))];
+                let mut args = vec![ast::Argument::new_array("", LowerDmlToAst::field_array(&pk.fields))];
+                if self.preview_features.contains(NamedConstraints) {
+                    if pk.name.is_some() {
+                        args.push(ast::Argument::new(
+                            "name",
+                            ast::Expression::StringValue(String::from(pk.name.as_ref().unwrap()), Span::empty()),
+                        ));
+                    }
+
+                    if pk.db_name.is_some() {
+                        if let Some(src) = self.datasource {
+                            if !ConstraintNames::primary_key_name_matches(pk, model, &*src.active_connector) {
+                                args.push(ast::Argument::new(
+                                    "map",
+                                    ast::Expression::StringValue(
+                                        String::from(pk.db_name.as_ref().unwrap()),
+                                        Span::empty(),
+                                    ),
+                                ));
+                            }
+                        }
+                    }
+                };
 
                 attributes.push(ast::Attribute::new("id", args));
             }
@@ -30,9 +55,15 @@ impl<'a> LowerDmlToAst<'a> {
                     LowerDmlToAst::field_array(&index_def.fields),
                 )];
 
-                if let Some(name) = &index_def.name {
+                if self.preview_features.contains(NamedConstraints) {
+                    if let Some(name) = &index_def.name {
+                        args.push(ast::Argument::new_string("name", name));
+                    }
+
+                    self.push_index_map_argument(model, index_def, &mut args)
+                } else if let Some(name) = &index_def.name {
                     args.push(ast::Argument::new_string("name", name));
-                }
+                };
 
                 attributes.push(ast::Attribute::new("unique", args));
             });
@@ -48,7 +79,9 @@ impl<'a> LowerDmlToAst<'a> {
                     LowerDmlToAst::field_array(&index_def.fields),
                 )];
 
-                if let Some(name) = &index_def.name {
+                if self.preview_features.contains(NamedConstraints) {
+                    self.push_index_map_argument(model, index_def, &mut args)
+                } else if let Some(name) = &index_def.name {
                     args.push(ast::Argument::new_string("name", name));
                 }
 
@@ -56,7 +89,29 @@ impl<'a> LowerDmlToAst<'a> {
             });
 
         // @@map
-        if let Some(db_name) = model.database_name() {
+        <LowerDmlToAst<'a>>::push_map_attribute(model, &mut attributes);
+
+        // @@ignore
+        if model.is_ignored() {
+            attributes.push(ast::Attribute::new("ignore", vec![]));
+        }
+
+        attributes
+    }
+
+    pub(crate) fn push_index_map_argument(&self, model: &Model, index_def: &IndexDefinition, args: &mut Vec<Argument>) {
+        if let Some(src) = self.datasource {
+            if !ConstraintNames::index_name_matches(index_def, model, &*src.active_connector) {
+                args.push(ast::Argument::new(
+                    "map",
+                    ast::Expression::StringValue(String::from(index_def.db_name.as_ref().unwrap()), Span::empty()),
+                ));
+            }
+        }
+    }
+
+    pub(crate) fn push_map_attribute<T: WithDatabaseName>(obj: &T, attributes: &mut Vec<Attribute>) {
+        if let Some(db_name) = obj.database_name() {
             attributes.push(ast::Attribute::new(
                 "map",
                 vec![ast::Argument::new_unnamed(ast::Expression::StringValue(
@@ -65,12 +120,5 @@ impl<'a> LowerDmlToAst<'a> {
                 ))],
             ));
         }
-
-        // @@ignore
-        if model.is_ignored() {
-            attributes.push(ast::Attribute::new("ignore", vec![]));
-        }
-
-        attributes
     }
 }

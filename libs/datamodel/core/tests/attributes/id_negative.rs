@@ -1,3 +1,4 @@
+use crate::attributes::with_named_constraints;
 use crate::common::*;
 use datamodel::{ast::Span, diagnostics::DatamodelError};
 
@@ -157,4 +158,174 @@ fn relation_field_as_id_must_error() {
         "id",
         Span::new(84, 86),
     ));
+}
+
+#[test]
+fn invalid_name_for_compound_id_must_error() {
+    let dml = with_named_constraints(
+        r#"
+     model User {
+         name           String
+         identification Int
+
+         @@id([name, identification], name: "Test.User")
+     }
+     "#,
+    );
+
+    let errors = parse_error(&dml);
+    errors.assert_is(DatamodelError::new_model_validation_error(
+        "The `name` property within the `@@id` attribute only allows for the following characters: `_a-zA-Z0-9`.",
+        "User",
+        Span::new(313, 358),
+    ));
+}
+
+#[test]
+fn mapped_id_must_error_on_mysql() {
+    let dml = r#"
+     datasource test {
+         provider = "mysql"
+         url = "mysql://root:prisma@127.0.0.1:3309/NoNamedPKsOnMysql"
+     }
+     
+     generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["NamedConstraints"]
+    }
+
+     model User {
+         name           String
+         identification Int
+
+         @@id([name, identification], map: "NotSupportedByProvider")
+     }
+
+     model User1 {
+         name           String @id(map: "NotSupportedByProvider")
+     }
+     "#;
+
+    let errors = parse_error(dml);
+    errors.assert_are(&[
+        DatamodelError::new_model_validation_error(
+            "You defined a database name for the primary key on the model. This is not supported by the provider.",
+            "User",
+            Span::new(260, 408),
+        ),
+        DatamodelError::new_model_validation_error(
+            "You defined a database name for the primary key on the model. This is not supported by the provider.",
+            "User1",
+            Span::new(415, 501),
+        ),
+    ]);
+}
+
+#[test]
+fn mapped_id_must_error_on_sqlite() {
+    let dml = r#"
+     datasource test {
+         provider = "sqlite"
+         url = "file://...."
+     }
+     
+     generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["NamedConstraints"]
+    }
+
+    model User {
+         name           String
+         identification Int
+
+         @@id([name, identification], map: "NotSupportedByProvider")
+     }
+
+     model User1 {
+         name           String @id(map: "NotSupportedByProvider")
+     }
+     "#;
+
+    let errors = parse_error(dml);
+    errors.assert_are(&[
+        DatamodelError::new_model_validation_error(
+            "You defined a database name for the primary key on the model. This is not supported by the provider.",
+            "User",
+            Span::new(219, 367),
+        ),
+        DatamodelError::new_model_validation_error(
+            "You defined a database name for the primary key on the model. This is not supported by the provider.",
+            "User1",
+            Span::new(374, 460),
+        ),
+    ]);
+}
+
+#[test]
+fn naming_id_to_a_field_name_should_error() {
+    let dml = with_named_constraints(
+        r#"
+     model User {
+         used           Int
+         name           String
+         identification Int
+
+         @@id([name, identification], name: "used")
+     }
+     "#,
+    );
+
+    let errors = parse_error(&dml);
+    errors.assert_is(DatamodelError::new_model_validation_error(
+        "The custom name `used` specified for the `@@id` attribute is already used as a name for a field. Please choose a different name.",
+        "User",
+        Span::new(229, 388),
+    ));
+}
+
+#[test]
+fn mapping_id_with_a_name_that_is_too_long_should_error() {
+    let dml = with_named_constraints(
+        r#"
+     model User {
+         name           String
+         identification Int
+
+         @@id([name, identification], map: "IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimits")
+     }
+
+     model User1 {
+         name           String @id(map: "IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimitsHereAsWell")
+         identification Int
+     }
+     "#,
+    );
+
+    let errors = parse_error(&dml);
+    errors.assert_are(&[
+        DatamodelError::new_model_validation_error(
+            "The constraint name 'IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimits' specified in the `map` argument for the `@@id` constraint is too long for your chosen provider. The maximum allowed length is 63 bytes.",
+            "User",
+            Span::new(313, 467),
+        ),
+        DatamodelError::new_model_validation_error(
+            "The constraint name 'IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimitsHereAsWell' specified in the `map` argument for the `@id` constraint is too long for your chosen provider. The maximum allowed length is 63 bytes.",
+            "User1",
+            Span::new(527, 667),
+        ),
+    ]);
+}
+
+#[test]
+fn name_on_field_level_id_should_error() {
+    let dml = with_named_constraints(
+        r#"
+     model User {
+         invalid           Int @id(name: "THIS SHOULD BE MAP INSTEAD")
+     }
+     "#,
+    );
+
+    let errors = parse_error(&dml);
+    errors.assert_is(DatamodelError::new_unused_argument_error("name", Span::new(277, 311)));
 }

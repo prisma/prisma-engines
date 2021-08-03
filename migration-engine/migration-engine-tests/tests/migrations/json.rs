@@ -4,19 +4,14 @@ use sql_schema_describer::{ColumnTypeFamily, DefaultValue};
 
 #[test_connector(capabilities(Json), exclude(Mysql56))]
 fn json_fields_can_be_created(api: TestApi) {
-    let dm = format!(
-        r#"
-            {}
-
-            model Test {{
+    let dm = r#"
+            model Test {
                 id String @id @default(cuid())
                 javaScriptObjectNotation Json
-            }}
-        "#,
-        api.datasource_block()
-    );
+            }
+        "#;
 
-    api.schema_push(&dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green_bang();
 
     api.assert_schema().assert_table("Test", |table| {
         table.assert_column("javaScriptObjectNotation", |c| {
@@ -29,24 +24,22 @@ fn json_fields_can_be_created(api: TestApi) {
         })
     });
 
-    api.schema_push(&dm).send().assert_green_bang().assert_no_steps();
+    api.schema_push_w_datasource(dm)
+        .send()
+        .assert_green_bang()
+        .assert_no_steps();
 }
 
 #[test_connector(capabilities(Json), exclude(Mysql56))]
 fn database_level_json_defaults_can_be_defined(api: TestApi) {
-    let dm = format!(
-        r#"
-            {datasource}
-
-            model Dog {{
+    let dm = r#"
+            model Dog {
                 id Int @id
                 favouriteThings Json @default("[\"sticks\",\"chimken\",100,  \"dog park\"]")
-            }}
-        "#,
-        datasource = api.datasource_block()
-    );
+            }
+        "#;
 
-    api.schema_push(&dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green_bang();
 
     api.assert_schema().assert_table("Dog", |table| {
         table.assert_column("favouriteThings", |column| {
@@ -69,5 +62,8 @@ fn database_level_json_defaults_can_be_defined(api: TestApi) {
     });
 
     // Check that the migration is idempotent.
-    api.schema_push(&dm).send().assert_green_bang().assert_no_steps();
+    api.schema_push_w_datasource(dm)
+        .send()
+        .assert_green_bang()
+        .assert_no_steps();
 }

@@ -105,7 +105,7 @@ impl SqlRenderer for MssqlFlavour {
         unreachable!("render_alter_enum on Microsoft SQL Server")
     }
 
-    fn render_alter_index(&self, indexes: Pair<&IndexWalker<'_>>) -> Vec<String> {
+    fn render_rename_index(&self, indexes: Pair<&IndexWalker<'_>>) -> Vec<String> {
         let index_with_table = format!(
             "{}.{}.{}",
             self.schema_name(),
@@ -130,8 +130,7 @@ impl SqlRenderer for MssqlFlavour {
             IndexType::Normal => "",
         };
 
-        let index_name = index.name().replace('.', "_");
-        let index_name = self.quote(&index_name);
+        let index_name = self.quote(&index.name());
         let table_reference = self.quote_with_schema(index.table().name()).to_string();
 
         let columns = index.columns().map(|c| self.quote(c.name()));
@@ -151,13 +150,12 @@ impl SqlRenderer for MssqlFlavour {
             .map(|column| self.render_column(&column))
             .join(",\n    ");
 
-        let primary_key = if let Some(primary_columns) = table.primary_key_column_names() {
-            let index_name = format!("PK__{}__{}", table.name(), primary_columns.iter().join("_"));
-            let column_names = primary_columns.iter().map(|col| self.quote(col)).join(",");
+        let primary_key = if let Some(pk) = table.primary_key() {
+            let column_names = pk.columns.iter().map(|col| self.quote(col)).join(",");
 
             format!(
                 ",\n    CONSTRAINT {} PRIMARY KEY ({})",
-                self.quote(&index_name),
+                self.quote(pk.constraint_name.as_ref().unwrap()),
                 column_names
             )
         } else {
@@ -173,10 +171,13 @@ impl SqlRenderer for MssqlFlavour {
             let constraints = constraints
                 .iter()
                 .map(|index| {
-                    let name = index.name().replace('.', "_");
                     let columns = index.columns().map(|col| self.quote(col.name()));
 
-                    format!("CONSTRAINT {} UNIQUE ({})", self.quote(&name), columns.join(","))
+                    format!(
+                        "CONSTRAINT {} UNIQUE ({})",
+                        self.quote(&index.name()),
+                        columns.join(",")
+                    )
                 })
                 .join(",\n    ");
 

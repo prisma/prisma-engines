@@ -3,6 +3,7 @@ use crate::{ast, diagnostics::DatamodelError};
 use itertools::Itertools;
 use once_cell::sync::Lazy;
 use regex::Regex;
+use std::borrow::Cow;
 use std::{
     collections::{BTreeMap, HashMap},
     str::FromStr,
@@ -99,6 +100,8 @@ pub(crate) struct RelationField<'ast> {
     /// The name _explicitly present_ in the AST.
     pub(crate) name: Option<&'ast str>,
     pub(crate) is_ignored: bool,
+    /// The fk_name _explicitly present_ in the AST by using the map argument or the one being generated as default.
+    pub(crate) fk_name: Option<Cow<'ast, str>>,
 }
 
 impl RelationField<'_> {
@@ -111,6 +114,7 @@ impl RelationField<'_> {
             references: None,
             name: None,
             is_ignored: false,
+            fk_name: None,
         }
     }
 }
@@ -151,7 +155,7 @@ pub(crate) struct IndexData<'ast> {
     pub(crate) fields: Vec<ast::FieldId>,
     pub(crate) source_field: Option<ast::FieldId>,
     pub(crate) name: Option<&'ast str>,
-    pub(crate) db_name: Option<&'ast str>,
+    pub(crate) db_name: Option<Cow<'ast, str>>,
 }
 
 #[derive(Debug, Default)]
@@ -159,7 +163,7 @@ pub(crate) struct PrimaryKeyData<'ast> {
     pub(crate) fields: Vec<ast::FieldId>,
     pub(crate) source_field: Option<ast::FieldId>,
     pub(crate) name: Option<&'ast str>,
-    pub(crate) db_name: Option<&'ast str>,
+    pub(crate) db_name: Option<Cow<'ast, str>>,
 }
 
 #[derive(Debug, Default)]
@@ -314,7 +318,7 @@ fn visit_enum<'ast>(enum_id: ast::EnumId, enm: &'ast ast::Enum, ctx: &mut Contex
         ctx.visit_attributes(&field.attributes, |attributes, ctx| {
             // @map
             attributes.visit_optional_single("map", ctx, |map_args, ctx| {
-                if let Some(mapped_name) = attributes::visit_map(map_args, ctx) {
+                if let Some(mapped_name) = attributes::visit_map_attribute(map_args, ctx) {
                     enum_data.mapped_values.insert(field_idx as u32, mapped_name);
                     ctx.mapped_enum_value_names
                         .insert((enum_id, mapped_name), field_idx as u32);
@@ -326,7 +330,7 @@ fn visit_enum<'ast>(enum_id: ast::EnumId, enm: &'ast ast::Enum, ctx: &mut Contex
     ctx.visit_attributes(&enm.attributes, |attributes, ctx| {
         // @@map
         attributes.visit_optional_single("map", ctx, |map_args, ctx| {
-            if let Some(mapped_name) = attributes::visit_map(map_args, ctx) {
+            if let Some(mapped_name) = attributes::visit_map_attribute(map_args, ctx) {
                 enum_data.mapped_name = Some(mapped_name);
                 ctx.mapped_enum_names.insert(mapped_name, enum_id);
             }

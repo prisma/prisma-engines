@@ -9,7 +9,7 @@ fn adding_a_required_field_to_an_existing_table_with_data_without_a_default_is_u
         }
     "#;
 
-    api.schema_push(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green_bang();
 
     api.insert("Test")
         .value("id", "abc")
@@ -24,7 +24,7 @@ fn adding_a_required_field_to_an_existing_table_with_data_without_a_default_is_u
         }
     "#;
 
-    api.schema_push(dm2)
+    api.schema_push_w_datasource(dm2)
         .force(false)
         .send()
         .assert_no_warning()
@@ -43,7 +43,7 @@ fn adding_a_required_field_with_prisma_level_default_works(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green_bang();
 
     api.insert("Test").value("id", "abc").value("age", 100).result_raw();
 
@@ -55,7 +55,7 @@ fn adding_a_required_field_with_prisma_level_default_works(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2)
+    api.schema_push_w_datasource(dm2)
         .force(false)
         .send()
         .assert_no_warning()
@@ -74,7 +74,7 @@ fn adding_a_required_field_with_a_default_to_an_existing_table_works(api: TestAp
         }
     "#;
 
-    api.schema_push(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green_bang();
 
     api.insert("Test")
         .value("id", "abc")
@@ -89,7 +89,7 @@ fn adding_a_required_field_with_a_default_to_an_existing_table_works(api: TestAp
         }
     "#;
 
-    api.schema_push(dm2).send().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green_bang();
 
     api.dump_table("Test").assert_single_row(|row| {
         row.assert_text_value("id", "abc")
@@ -107,7 +107,7 @@ fn adding_a_required_field_without_default_to_an_existing_table_without_data_wor
         }
     "#;
 
-    api.schema_push(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green_bang();
 
     let dm2 = r#"
         model Test {
@@ -117,7 +117,7 @@ fn adding_a_required_field_without_default_to_an_existing_table_without_data_wor
         }
     "#;
 
-    api.schema_push(dm2).send().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green_bang();
 
     api.assert_schema()
         .assert_table("Test", |table| table.assert_has_column("age"));

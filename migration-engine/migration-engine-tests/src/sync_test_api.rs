@@ -227,6 +227,11 @@ impl TestApi {
         Reset::new_sync(&self.connector, &self.root.rt)
     }
 
+    /// Plan a `schemaPush` command adding the datasource
+    pub fn schema_push_w_datasource(&self, dm: impl Into<String>) -> SchemaPush<'_> {
+        SchemaPush::new(&self.connector, self.datamodel_with_provider(&dm.into()), &self.root.rt)
+    }
+
     /// Plan a `schemaPush` command
     pub fn schema_push(&self, dm: impl Into<String>) -> SchemaPush<'_> {
         SchemaPush::new(&self.connector, dm.into(), &self.root.rt)
@@ -246,10 +251,35 @@ impl TestApi {
         .unwrap()
     }
 
+    fn generator_block(&self) -> String {
+        let preview_features: Vec<String> = self
+            .root
+            .args
+            .preview_features()
+            .iter()
+            .map(|pf| format!(r#""{}""#, pf))
+            .collect();
+
+        let preview_feature_string = if preview_features.is_empty() {
+            "".to_string()
+        } else {
+            format!("\npreviewFeatures = [{}]", preview_features.join(", "))
+        };
+
+        let generator_block = format!(
+            r#"generator client {{
+                 provider = "prisma-client-js"{}
+               }}"#,
+            preview_feature_string
+        );
+        generator_block
+    }
+
     pub fn datamodel_with_provider(&self, schema: &str) -> String {
         let mut out = String::with_capacity(320 + schema.len());
 
         self.write_datasource_block(&mut out);
+        out.push_str(&self.generator_block());
         out.push_str(schema);
 
         out

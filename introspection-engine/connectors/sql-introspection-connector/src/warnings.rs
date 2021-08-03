@@ -40,6 +40,21 @@ impl ModelAndField {
     }
 }
 
+#[derive(Serialize, Debug, Clone)]
+pub struct ModelAndIndex {
+    pub(crate) model: String,
+    pub(crate) index_db_name: String,
+}
+
+impl ModelAndIndex {
+    pub fn new(model: &str, index_db_name: &str) -> Self {
+        ModelAndIndex {
+            model: model.to_owned(),
+            index_db_name: index_db_name.to_owned(),
+        }
+    }
+}
+
 #[derive(Serialize, Debug)]
 pub struct ModelAndFieldAndType {
     pub(crate) model: String,
@@ -201,6 +216,23 @@ pub fn warning_enriched_fields_with_ignore(affected: &[ModelAndField]) -> Warnin
     Warning {
         code: 16,
         message: "The following fields were enriched with an @ignore taken from your previous datamodel".into(),
+        affected: serde_json::to_value(&affected).unwrap(),
+    }
+}
+
+pub fn warning_enriched_with_custom_index_names(affected: &[ModelAndIndex]) -> Warning {
+    Warning {
+        code: 17,
+        message: "These Indices were enriched with custom index names taken from the previous Prisma schema.".into(),
+        affected: serde_json::to_value(&affected).unwrap(),
+    }
+}
+
+pub fn warning_enriched_with_custom_primary_key_names(affected: &[Model]) -> Warning {
+    Warning {
+        code: 18,
+        message: "These models were enriched with custom compound id names taken from the previous Prisma schema."
+            .into(),
         affected: serde_json::to_value(&affected).unwrap(),
     }
 }

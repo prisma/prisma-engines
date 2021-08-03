@@ -226,6 +226,17 @@ pub fn render_datamodel_to(
     render_schema_ast_to(stream, &lowered, 2);
 }
 
+/// Renders as a string into the stream.
+pub fn render_datamodel_to_with_preview_flags(
+    stream: &mut dyn std::fmt::Write,
+    datamodel: &dml::Datamodel,
+    datasource: Option<&Datasource>,
+    flags: BitFlags<PreviewFeature>,
+) {
+    let lowered = LowerDmlToAst::new(datasource, flags).lower(datamodel);
+    render_schema_ast_to(stream, &lowered, 2);
+}
+
 /// Renders a datamodel, sources and generators to a string.
 pub fn render_datamodel_and_config_to_string(
     datamodel: &dml::Datamodel,

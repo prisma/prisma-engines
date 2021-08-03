@@ -20,7 +20,7 @@ fn adding_an_unsupported_type_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green_bang();
 
     api.assert_schema().assert_table("Post", |table| {
         table
@@ -57,7 +57,7 @@ fn switching_an_unsupported_type_to_supported_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green_bang();
 
     api.assert_schema().assert_table("Post", |table| {
         table
@@ -83,7 +83,7 @@ fn switching_an_unsupported_type_to_supported_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green_bang();
 
     api.assert_schema().assert_table("Post", |table| {
         table
@@ -116,7 +116,7 @@ fn adding_and_removing_properties_on_unsupported_should_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green_bang();
 
     api.assert_schema().assert_table("Post", |table| {
         table
@@ -160,7 +160,7 @@ fn adding_and_removing_properties_on_unsupported_should_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).force(true).send().assert_warnings(&["A unique constraint covering the columns `[user_ip]` on the table `Post` will be added. If there are existing duplicate values, this will fail.".into()]);
+    api.schema_push_w_datasource(dm2).force(true).send().assert_warnings(&["A unique constraint covering the columns `[user_ip]` on the table `Post` will be added. If there are existing duplicate values, this will fail.".into()]);
 
     api.assert_schema().assert_table("Post", |table| {
         table
@@ -182,7 +182,7 @@ fn adding_and_removing_properties_on_unsupported_should_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm3).send().assert_green_bang();
+    api.schema_push_w_datasource(dm3).send().assert_green_bang();
 
     api.assert_schema().assert_table("Post", |table| {
         table
@@ -212,7 +212,7 @@ fn using_unsupported_and_ignore_should_work(api: TestApi) {
         unreachable!()
     };
 
-    let dm = api.datamodel_with_provider(&format!(
+    let dm = &format!(
         r#"
         model UnsupportedModel {{
             field Unsupported("{}")
@@ -220,7 +220,7 @@ fn using_unsupported_and_ignore_should_work(api: TestApi) {
         }}
      "#,
         unsupported_type
-    ));
+    );
 
-    api.schema_push(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green_bang();
 }

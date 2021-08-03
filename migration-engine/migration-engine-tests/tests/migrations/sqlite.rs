@@ -12,7 +12,7 @@ fn sqlite_must_recreate_indexes(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green_bang();
 
     api.assert_schema().assert_table("A", |table| {
         table.assert_index_on_columns(&["field"], |idx| idx.assert_is_unique())
@@ -26,7 +26,7 @@ fn sqlite_must_recreate_indexes(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green_bang();
 
     api.assert_schema().assert_table("A", |table| {
         table.assert_index_on_columns(&["field"], |idx| idx.assert_is_unique())
@@ -47,7 +47,7 @@ fn sqlite_must_recreate_multi_field_indexes(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green_bang();
 
     api.assert_schema().assert_table("A", |table| {
         table.assert_index_on_columns(&["field", "secondField"], |idx| idx.assert_is_unique())
@@ -64,7 +64,7 @@ fn sqlite_must_recreate_multi_field_indexes(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green_bang();
 
     api.assert_schema().assert_table("A", |table| {
         table.assert_index_on_columns(&["field", "secondField"], |idx| idx.assert_is_unique())
@@ -80,6 +80,9 @@ fn creating_a_model_with_a_non_autoincrement_id_column_is_idempotent(api: TestAp
         }
     "#;
 
-    api.schema_push(dm).send().assert_green_bang();
-    api.schema_push(dm).send().assert_green_bang().assert_no_steps();
+    api.schema_push_w_datasource(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm)
+        .send()
+        .assert_green_bang()
+        .assert_no_steps();
 }

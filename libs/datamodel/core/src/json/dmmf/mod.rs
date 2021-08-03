@@ -53,7 +53,7 @@ pub struct Model {
     pub is_generated: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub documentation: Option<String>,
-    pub id_fields: Vec<String>,
+    pub primary_key: Option<PrimaryKey>,
     pub unique_fields: Vec<Vec<String>>,
     pub unique_indexes: Vec<UniqueIndex>,
 }
@@ -61,6 +61,13 @@ pub struct Model {
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct UniqueIndex {
+    pub name: Option<String>,
+    pub fields: Vec<String>,
+}
+
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PrimaryKey {
     pub name: Option<String>,
     pub fields: Vec<String>,
 }

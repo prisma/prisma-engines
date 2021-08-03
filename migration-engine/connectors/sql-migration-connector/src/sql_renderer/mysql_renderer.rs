@@ -87,7 +87,7 @@ impl SqlRenderer for MysqlFlavour {
         unreachable!("render_alter_enum on MySQL")
     }
 
-    fn render_alter_index(&self, indexes: Pair<&IndexWalker<'_>>) -> Vec<String> {
+    fn render_rename_index(&self, indexes: Pair<&IndexWalker<'_>>) -> Vec<String> {
         vec![ddl::AlterTable {
             table_name: indexes.previous().table().name().into(),
             changes: vec![sql_ddl::mysql::AlterTableClause::RenameIndex {
@@ -111,6 +111,7 @@ impl SqlRenderer for MysqlFlavour {
         for change in changes {
             match change {
                 TableChange::DropPrimaryKey => lines.push(sql_ddl::mysql::AlterTableClause::DropPrimaryKey.to_string()),
+                TableChange::RenamePrimaryKey => unreachable!("No Renaming Primary Keys on Mysql"),
                 TableChange::AddPrimaryKey => lines.push(format!(
                     "ADD PRIMARY KEY ({})",
                     tables
@@ -178,6 +179,9 @@ impl SqlRenderer for MysqlFlavour {
 
     fn render_create_index(&self, index: &IndexWalker<'_>) -> String {
         let name = index.name();
+        //TODO (matthias, NamedConstraints) for the constraint name preview flagged code this is already checked during
+        // parsing and default name generation, this can be removed once the flag is the default
+
         let name = if name.len() > MYSQL_IDENTIFIER_SIZE_LIMIT {
             &name[0..MYSQL_IDENTIFIER_SIZE_LIMIT]
         } else {

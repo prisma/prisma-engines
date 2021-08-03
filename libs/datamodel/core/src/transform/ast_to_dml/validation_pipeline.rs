@@ -14,6 +14,7 @@ pub struct ValidationPipeline<'a> {
     validator: Validator<'a>,
     standardiser_for_formatting: StandardiserForFormatting,
     standardiser_for_parsing: StandardiserForParsing,
+    preview_features: BitFlags<PreviewFeature>,
 }
 
 impl<'a, 'b> ValidationPipeline<'a> {
@@ -28,6 +29,7 @@ impl<'a, 'b> ValidationPipeline<'a> {
             validator: Validator::new(source, preview_features),
             standardiser_for_formatting: StandardiserForFormatting::new(),
             standardiser_for_parsing: StandardiserForParsing::new(preview_features),
+            preview_features,
         }
     }
 
@@ -50,7 +52,7 @@ impl<'a, 'b> ValidationPipeline<'a> {
         // Phase 1 is source block loading.
 
         // Phase 2: Make sense of the AST.
-        let (db, mut diagnostics) = ParserDatabase::new(ast_schema, self.source, diagnostics);
+        let (db, mut diagnostics) = ParserDatabase::new(ast_schema, self.source, diagnostics, self.preview_features);
 
         // Early return so that the validator does not have to deal with invalid schemas
         diagnostics.to_result()?;

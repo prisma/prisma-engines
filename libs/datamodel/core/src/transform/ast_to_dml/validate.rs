@@ -1,7 +1,5 @@
 #![allow(clippy::suspicious_operation_groupings)] // clippy is wrong there
-
-use std::collections::HashSet;
-
+use crate::common::constraint_names::ConstraintNames;
 use crate::{
     ast::{self, Span},
     common::preview_features::PreviewFeature,
@@ -12,6 +10,7 @@ use crate::{
 use ::dml::{datamodel::Datamodel, field::RelationField, model::Model, traits::WithName};
 use datamodel_connector::ConnectorCapability;
 use enumflags2::BitFlags;
+use std::collections::HashSet;
 
 /// Helper for validating a datamodel.
 ///
@@ -42,6 +41,42 @@ impl<'a> Validator<'a> {
     pub(crate) fn validate(&self, ast: &ast::SchemaAst, schema: &mut dml::Datamodel, diagnostics: &mut Diagnostics) {
         for model in schema.models() {
             let ast_model = ast.find_model(&model.name).expect(STATE_ERROR);
+
+            //doing this here for now since I want to have all field names already generated
+            // it might be possible to move this
+            if let Some(pk) = &model.primary_key {
+                if let Some(name) = &pk.name {
+                    for field in model.fields() {
+                        if let Some(err) = ConstraintNames::client_name_already_in_use(
+                            name,
+                            &field.name(),
+                            &model.name,
+                            ast_model.span,
+                            "@@id",
+                        ) {
+                            diagnostics.push_error(err);
+                        }
+                    }
+                }
+            }
+
+            for index in &model.indices {
+                //doing this here for now since I want to have all field names already generated
+                // it might be possible to move this
+                if let Some(name) = &index.name {
+                    for field in model.fields() {
+                        if let Some(err) = ConstraintNames::client_name_already_in_use(
+                            name,
+                            &field.name(),
+                            &model.name,
+                            ast_model.span,
+                            "@@unique",
+                        ) {
+                            diagnostics.push_error(err);
+                        }
+                    }
+                }
+            }
 
             if let Err(err) = self.validate_model_has_strict_unique_criteria(ast_model, model) {
                 diagnostics.push_error(err);

@@ -2,8 +2,7 @@ use migration_engine_tests::sync_test_api::*;
 
 #[test_connector]
 fn typescript_starter_schema_is_idempotent_without_native_type_annotations(api: TestApi) {
-    let dm = api.datamodel_with_provider(
-        r#"
+    let dm = r#"
         model Post {
             id        Int     @id @default(autoincrement())
             title     String
@@ -19,17 +18,26 @@ fn typescript_starter_schema_is_idempotent_without_native_type_annotations(api: 
             name  String?
             posts Post[]
         }
-    "#,
-    );
+    "#;
 
-    api.schema_push(&dm)
+    api.schema_push_w_datasource(dm)
         .send()
         .assert_green_bang()
         .assert_has_executed_steps();
-    api.schema_push(&dm).send().assert_green_bang().assert_no_steps();
-    api.schema_push(&dm).send().assert_green_bang().assert_no_steps();
+    api.schema_push_w_datasource(dm)
+        .send()
+        .assert_green_bang()
+        .assert_no_steps();
+    api.schema_push_w_datasource(dm)
+        .send()
+        .assert_green_bang()
+        .assert_no_steps();
 }
-#[test_connector]
+
+#[test_connector(exclude(Mssql))]
+// TODO (matthias) changing towards having a provider specified in the middle of the test messes with some weird hard-coded
+// Does this test even make sense? When using the migrate CLI you cannot NOT have a provider specified. This only works in our weird
+// test setup
 fn typescript_starter_schema_starting_without_native_types_is_idempotent(api: TestApi) {
     let dm = r#"
         model Post {
@@ -49,37 +57,40 @@ fn typescript_starter_schema_starting_without_native_types_is_idempotent(api: Te
         }
     "#;
 
-    let dm2 = format!("{}\n{}", api.datasource_block(), dm);
-
     api.schema_push(dm)
         .send()
         .assert_green_bang()
         .assert_has_executed_steps();
     api.schema_push(dm).send().assert_green_bang().assert_no_steps();
-    api.schema_push(&dm2).send().assert_green_bang().assert_no_steps();
+    api.schema_push_w_datasource(dm)
+        .send()
+        .assert_green_bang()
+        .assert_no_steps();
 }
 
 #[test_connector(tags(Postgres, Mysql, Mssql))]
 fn bigint_primary_keys_are_idempotent(api: TestApi) {
-    let dm1 = api.datamodel_with_provider(
-        r#"
+    let dm1 = r#"
             model Cat {
                 id BigInt @id @default(autoincrement()) @db.BigInt
             }
-        "#,
-    );
+        "#;
 
-    api.schema_push(&dm1).send().assert_green_bang();
-    api.schema_push(dm1).send().assert_green_bang().assert_no_steps();
+    api.schema_push_w_datasource(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1)
+        .send()
+        .assert_green_bang()
+        .assert_no_steps();
 
-    let dm2 = api.datamodel_with_provider(
-        r#"
+    let dm2 = r#"
         model Cat {
             id BigInt @id @default(autoincrement())
         }
-        "#,
-    );
+        "#;
 
-    api.schema_push(&dm2).send().assert_green_bang();
-    api.schema_push(dm2).send().assert_green_bang().assert_no_steps();
+    api.schema_push_w_datasource(dm2).send().assert_green_bang();
+    api.schema_push_w_datasource(dm2)
+        .send()
+        .assert_green_bang()
+        .assert_no_steps();
 }

@@ -1,3 +1,4 @@
+use crate::attributes::with_named_constraints;
 use crate::common::*;
 use datamodel::{render_datamodel_to_string, IndexDefinition, IndexType};
 
@@ -17,7 +18,7 @@ fn basic_unique_index_must_work() {
     let user_model = schema.assert_has_model("User");
     user_model.assert_has_index(IndexDefinition {
         name: None,
-        db_name: None,
+        db_name: Some("User.firstName_lastName_unique".to_string()),
         fields: vec!["firstName".to_string(), "lastName".to_string()],
         tpe: IndexType::Unique,
         defined_on_field: false,
@@ -120,7 +121,7 @@ fn multiple_unique_must_work() {
 
     user_model.assert_has_index(IndexDefinition {
         name: None,
-        db_name: None,
+        db_name: Some("User.firstName_lastName_unique".to_string()),
         fields: vec!["firstName".to_string(), "lastName".to_string()],
         tpe: IndexType::Unique,
         defined_on_field: false,
@@ -174,7 +175,7 @@ fn multi_field_unique_indexes_on_enum_fields_must_work() {
     let user_model = schema.assert_has_model("User");
     user_model.assert_has_index(IndexDefinition {
         name: None,
-        db_name: None,
+        db_name: Some("User.role_unique".to_string()),
         fields: vec!["role".to_string()],
         tpe: IndexType::Unique,
         defined_on_field: false,
@@ -199,7 +200,7 @@ fn single_field_unique_indexes_on_enum_fields_must_work() {
     let user_model = schema.assert_has_model("User");
     user_model.assert_has_index(IndexDefinition {
         name: None,
-        db_name: None,
+        db_name: Some("User.role_unique".to_string()),
         fields: vec!["role".to_string()],
         tpe: IndexType::Unique,
         defined_on_field: true,
@@ -220,4 +221,170 @@ fn unique_attributes_must_serialize_to_valid_dml() {
     let schema = parse(dml);
 
     assert!(datamodel::parse_datamodel(&render_datamodel_to_string(&schema)).is_ok());
+}
+
+#[test]
+fn named_multi_field_unique_must_work() {
+    //Compatibility case
+    let dml = with_named_constraints(
+        r#"
+     model User {
+         a String
+         b Int
+         @@unique([a,b], name:"ClientName")
+     }
+     "#,
+    );
+
+    let datamodel = parse(&dml);
+    let user_model = datamodel.assert_has_model("User");
+    user_model.assert_has_index(IndexDefinition {
+        name: Some("ClientName".to_string()),
+        db_name: Some("User_a_b_key".to_string()),
+        fields: vec!["a".to_string(), "b".to_string()],
+        tpe: IndexType::Unique,
+        defined_on_field: false,
+    });
+}
+
+#[test]
+fn mapped_multi_field_unique_must_work() {
+    let dml = with_named_constraints(
+        r#"
+     model User {
+         a String
+         b Int
+         @@unique([a,b], map:"dbname")
+     }
+     "#,
+    );
+
+    let datamodel = parse(&dml);
+    let user_model = datamodel.assert_has_model("User");
+    user_model.assert_has_index(IndexDefinition {
+        name: None,
+        db_name: Some("dbname".to_string()),
+        fields: vec!["a".to_string(), "b".to_string()],
+        tpe: IndexType::Unique,
+        defined_on_field: false,
+    });
+}
+
+#[test]
+fn mapped_singular_unique_must_work() {
+    let dml = with_named_constraints(
+        r#"
+     model Model {
+         a String @unique(map: "test")
+     }
+     
+     model Model2 {
+         a String @unique(map: "test2")
+     }
+     "#,
+    );
+
+    let datamodel = parse(&dml);
+    let model = datamodel.assert_has_model("Model");
+    model.assert_has_index(IndexDefinition {
+        name: None,
+        db_name: Some("test".to_string()),
+        fields: vec!["a".to_string()],
+        tpe: IndexType::Unique,
+        defined_on_field: true,
+    });
+
+    let model2 = datamodel.assert_has_model("Model2");
+    model2.assert_has_index(IndexDefinition {
+        name: None,
+        db_name: Some("test2".to_string()),
+        fields: vec!["a".to_string()],
+        tpe: IndexType::Unique,
+        defined_on_field: true,
+    });
+}
+
+#[test]
+fn named_and_mapped_multi_field_unique_must_work() {
+    let dml = with_named_constraints(
+        r#"
+     model Model {
+         a String
+         b Int
+         @@unique([a,b], name: "compoundId", map:"dbname")
+     }
+     "#,
+    );
+
+    let datamodel = parse(&dml);
+    let model = datamodel.assert_has_model("Model");
+    model.assert_has_index(IndexDefinition {
+        name: Some("compoundId".to_string()),
+        db_name: Some("dbname".to_string()),
+        fields: vec!["a".to_string(), "b".to_string()],
+        tpe: IndexType::Unique,
+        defined_on_field: false,
+    });
+}
+
+#[test]
+fn implicit_names_must_work() {
+    let dml = with_named_constraints(
+        r#"
+     model Model {
+         a String @unique
+         b Int
+         @@unique([a,b])
+     }
+     "#,
+    );
+
+    let datamodel = parse(&dml);
+    let model = datamodel.assert_has_model("Model");
+    model.assert_has_index(IndexDefinition {
+        name: None,
+        db_name: Some("Model_a_b_key".to_string()),
+        fields: vec!["a".to_string(), "b".to_string()],
+        tpe: IndexType::Unique,
+        defined_on_field: false,
+    });
+
+    model.assert_has_index(IndexDefinition {
+        name: None,
+        db_name: Some("Model_a_key".to_string()),
+        fields: vec!["a".to_string()],
+        tpe: IndexType::Unique,
+        defined_on_field: true,
+    });
+}
+
+#[test]
+fn defined_on_field_must_work() {
+    let dml = with_named_constraints(
+        r#"
+     model Model {
+         a String @unique
+         b Int
+         @@unique([b])
+     }
+     "#,
+    );
+
+    let datamodel = parse(&dml);
+    let model = datamodel.assert_has_model("Model");
+    model.assert_has_index(IndexDefinition {
+        name: None,
+        db_name: Some("Model_a_key".to_string()),
+        fields: vec!["a".to_string()],
+        tpe: IndexType::Unique,
+        defined_on_field: true,
+    });
+
+    model.assert_has_index(IndexDefinition {
+        name: None,
+        db_name: Some("Model_b_key".to_string()),
+        fields: vec!["b".to_string()],
+        tpe: IndexType::Unique,
+        defined_on_field: false,
+    });
 }

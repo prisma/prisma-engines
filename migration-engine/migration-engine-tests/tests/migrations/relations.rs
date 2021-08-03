@@ -16,7 +16,7 @@ fn adding_a_many_to_many_relation_must_result_in_a_prisma_style_relation_table(a
         }
     "##;
 
-    api.schema_push(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green_bang();
 
     api.assert_schema().assert_table("_AToB", |table| {
         table
@@ -49,7 +49,7 @@ fn adding_a_many_to_many_relation_with_custom_name_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green_bang();
 
     api.assert_schema().assert_table("_my_relation", |table| {
         table
@@ -84,7 +84,7 @@ fn adding_an_inline_relation_must_result_in_a_foreign_key_in_the_model_table(api
         }
     "#;
 
-    api.schema_push(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green_bang();
     api.assert_schema().assert_table("A", |t| {
         t.assert_column("bid", |c| c.assert_type_is_int().assert_is_required())
             .assert_column("cid", |c| c.assert_type_is_int().assert_is_nullable())
@@ -113,7 +113,7 @@ fn specifying_a_db_name_for_an_inline_relation_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green_bang();
     api.assert_schema().assert_table("A", |t| {
         t.assert_column("b_column", |c| c.assert_type_is_int())
             .assert_foreign_keys_count(1)
@@ -137,7 +137,7 @@ fn changing_the_type_of_a_field_referenced_by_a_fk_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green_bang();
 
     api.assert_schema().assert_table("A", |table| {
         table
@@ -159,7 +159,7 @@ fn changing_the_type_of_a_field_referenced_by_a_fk_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green_bang();
 
     api.assert_schema().assert_table("A", |table| {
         table
@@ -183,7 +183,7 @@ fn adding_an_inline_relation_to_a_model_with_an_exotic_id_type(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green_bang();
     api.assert_schema().assert_table("A", |t| {
         t.assert_column("b_id", |c| c.assert_type_is_string())
             .assert_foreign_keys_count(1)
@@ -210,7 +210,7 @@ fn removing_an_inline_relation_must_work(api: TestApi) {
             }
         "#;
 
-    api.schema_push(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green_bang();
 
     api.assert_schema()
         .assert_table("A", |table| table.assert_has_column("b_id"));
@@ -225,7 +225,7 @@ fn removing_an_inline_relation_must_work(api: TestApi) {
             }
         "#;
 
-    api.schema_push(dm2).send().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green_bang();
 
     api.assert_schema().assert_table("A", |table| {
         table
@@ -255,7 +255,7 @@ fn compound_foreign_keys_should_work_in_correct_order(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green_bang();
 
     api.assert_schema().assert_table("A", |t| {
         t.assert_foreign_keys_count(1)
@@ -282,7 +282,7 @@ fn moving_an_inline_relation_to_the_other_side_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green_bang();
     api.assert_schema().assert_table("A", |t| {
         t.assert_foreign_keys_count(1).assert_fk_on_columns(&["b_id"], |fk| {
             fk.assert_referential_action_on_delete(ForeignKeyAction::Cascade)
@@ -304,7 +304,7 @@ fn moving_an_inline_relation_to_the_other_side_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green_bang();
     api.assert_schema()
         .assert_table("B", |table| {
             table
@@ -334,7 +334,7 @@ fn relations_can_reference_arbitrary_unique_fields(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green_bang();
     api.assert_schema().assert_table("Account", |t| {
         t.assert_foreign_keys_count(1)
             .assert_fk_on_columns(&["uem"], |fk| fk.assert_references("User", &["email"]))
@@ -359,7 +359,7 @@ fn relations_can_reference_arbitrary_unique_fields_with_maps(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green_bang();
 
     api.assert_schema().assert_table("Account", |table| {
         table
@@ -388,7 +388,7 @@ fn relations_can_reference_multiple_fields(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green_bang();
 
     api.assert_schema().assert_table("Account", |table| {
         table
@@ -421,7 +421,7 @@ fn a_relation_with_mappings_on_both_sides_can_reference_multiple_fields(api: Tes
         }
     "#;
 
-    api.schema_push(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green_bang();
 
     api.assert_schema().assert_table("Account", |table| {
         table
@@ -453,7 +453,7 @@ fn relations_with_mappings_on_referenced_side_can_reference_multiple_fields(api:
         }
     "#;
 
-    api.schema_push(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green_bang();
 
     api.assert_schema().assert_table("Account", |table| {
         table
@@ -485,7 +485,7 @@ fn relations_with_mappings_on_referencing_side_can_reference_multiple_fields(api
         }
     "#;
 
-    api.schema_push(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green_bang();
 
     api.assert_schema().assert_table("Account", |table| {
         table
@@ -507,11 +507,6 @@ fn on_delete_referential_actions_should_work(api: TestApi) {
     for (ra, fka) in actions {
         let dm = format!(
             r#"
-            generator client {{
-                provider = "prisma-client-js"
-                previewFeatures = ["referentialActions"]
-            }}
-
             model A {{
                 id Int @id @default(autoincrement())
                 b      B[]
@@ -526,7 +521,7 @@ fn on_delete_referential_actions_should_work(api: TestApi) {
             ra
         );
 
-        api.schema_push(&dm).send().assert_green_bang();
+        api.schema_push_w_datasource(&dm).send().assert_green_bang();
 
         api.assert_schema().assert_table("B", |table| {
             table.assert_foreign_keys_count(1).assert_fk_on_columns(&["aId"], |fk| {
@@ -535,7 +530,7 @@ fn on_delete_referential_actions_should_work(api: TestApi) {
             })
         });
 
-        api.schema_push("").send().assert_green_bang();
+        api.schema_push_w_datasource("").send().assert_green_bang();
     }
 }
 
@@ -544,11 +539,6 @@ fn on_delete_referential_actions_should_work(api: TestApi) {
 #[test_connector(exclude(Mysql56, Mysql57, Mariadb, Mssql), preview_features("referentialActions"))]
 fn on_delete_set_default_should_work(api: TestApi) {
     let dm = r#"
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
-        }
-
         model A {
             id Int @id
             b      B[]
@@ -561,7 +551,7 @@ fn on_delete_set_default_should_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green_bang();
 
     api.assert_schema().assert_table("B", |table| {
         table.assert_foreign_keys_count(1).assert_fk_on_columns(&["aId"], |fk| {
@@ -574,11 +564,6 @@ fn on_delete_set_default_should_work(api: TestApi) {
 #[test_connector(exclude(Mssql), preview_features("referentialActions"))]
 fn on_delete_restrict_should_work(api: TestApi) {
     let dm = r#"
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
-        }
-
         model A {
             id Int @id
             b      B[]
@@ -591,7 +576,7 @@ fn on_delete_restrict_should_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green_bang();
 
     api.assert_schema().assert_table("B", |table| {
         table.assert_foreign_keys_count(1).assert_fk_on_columns(&["aId"], |fk| {
@@ -612,11 +597,6 @@ fn on_update_referential_actions_should_work(api: TestApi) {
     for (ra, fka) in actions {
         let dm = format!(
             r#"
-            generator client {{
-                provider = "prisma-client-js"
-                previewFeatures = ["referentialActions"]
-            }}
-
             model A {{
                 id Int @id @default(autoincrement())
                 b      B[]
@@ -631,7 +611,7 @@ fn on_update_referential_actions_should_work(api: TestApi) {
             ra
         );
 
-        api.schema_push(&dm).send().assert_green_bang();
+        api.schema_push_w_datasource(&dm).send().assert_green_bang();
 
         api.assert_schema().assert_table("B", |table| {
             table.assert_foreign_keys_count(1).assert_fk_on_columns(&["aId"], |fk| {
@@ -647,11 +627,6 @@ fn on_update_referential_actions_should_work(api: TestApi) {
 #[test_connector(exclude(Mysql56, Mysql57, Mariadb, Mssql), preview_features("referentialActions"))]
 fn on_update_set_default_should_work(api: TestApi) {
     let dm = r#"
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
-        }
-
         model A {
             id Int @id
             b      B[]
@@ -664,7 +639,7 @@ fn on_update_set_default_should_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green_bang();
 
     api.assert_schema().assert_table("B", |table| {
         table.assert_foreign_keys_count(1).assert_fk_on_columns(&["aId"], |fk| {
@@ -677,11 +652,6 @@ fn on_update_set_default_should_work(api: TestApi) {
 #[test_connector(exclude(Mssql), preview_features("referentialActions"))]
 fn on_update_restrict_should_work(api: TestApi) {
     let dm = r#"
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
-        }
-
         model A {
             id Int @id
             b      B[]
@@ -694,7 +664,7 @@ fn on_update_restrict_should_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green_bang();
 
     api.assert_schema().assert_table("B", |table| {
         table.assert_foreign_keys_count(1).assert_fk_on_columns(&["aId"], |fk| {
@@ -707,11 +677,6 @@ fn on_update_restrict_should_work(api: TestApi) {
 #[test_connector(exclude(Mssql), preview_features("referentialActions"))]
 fn on_delete_required_default_action(api: TestApi) {
     let dm = r#"
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
-        }
-
         model A {
             id Int @id
             b      B[]
@@ -724,7 +689,7 @@ fn on_delete_required_default_action(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green_bang();
 
     api.assert_schema().assert_table("B", |table| {
         table.assert_foreign_keys_count(1).assert_fk_on_columns(&["aId"], |fk| {
@@ -737,11 +702,6 @@ fn on_delete_required_default_action(api: TestApi) {
 #[test_connector(tags(Mssql), preview_features("referentialActions"))]
 fn on_delete_required_default_action_with_no_restrict(api: TestApi) {
     let dm = r#"
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
-        }
-
         model A {
             id Int @id
             b      B[]
@@ -754,7 +714,7 @@ fn on_delete_required_default_action_with_no_restrict(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green_bang();
 
     api.assert_schema().assert_table("B", |table| {
         table.assert_foreign_keys_count(1).assert_fk_on_columns(&["aId"], |fk| {
@@ -767,11 +727,6 @@ fn on_delete_required_default_action_with_no_restrict(api: TestApi) {
 #[test_connector(preview_features("referentialActions"))]
 fn on_delete_optional_default_action(api: TestApi) {
     let dm = r#"
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
-        }
-
         model A {
             id Int @id
             b      B[]
@@ -784,7 +739,7 @@ fn on_delete_optional_default_action(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green_bang();
 
     api.assert_schema().assert_table("B", |table| {
         table.assert_foreign_keys_count(1).assert_fk_on_columns(&["aId"], |fk| {
@@ -797,11 +752,6 @@ fn on_delete_optional_default_action(api: TestApi) {
 #[test_connector(preview_features("referentialActions"))]
 fn on_delete_compound_optional_optional_default_action(api: TestApi) {
     let dm = r#"
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
-        }
-
         model A {
             id  Int @id
             id2 Int
@@ -817,7 +767,7 @@ fn on_delete_compound_optional_optional_default_action(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green_bang();
 
     api.assert_schema().assert_table("B", |table| {
         table
@@ -832,11 +782,6 @@ fn on_delete_compound_optional_optional_default_action(api: TestApi) {
 #[test_connector(exclude(Mssql), preview_features("referentialActions"))]
 fn on_delete_compound_required_optional_default_action_with_restrict(api: TestApi) {
     let dm = r#"
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
-        }
-
         model A {
             id  Int @id
             id2 Int
@@ -852,7 +797,7 @@ fn on_delete_compound_required_optional_default_action_with_restrict(api: TestAp
         }
     "#;
 
-    api.schema_push(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green_bang();
 
     api.assert_schema().assert_table("B", |table| {
         table
@@ -867,11 +812,6 @@ fn on_delete_compound_required_optional_default_action_with_restrict(api: TestAp
 #[test_connector(tags(Mssql), preview_features("referentialActions"))]
 fn on_delete_compound_required_optional_default_action_without_restrict(api: TestApi) {
     let dm = r#"
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
-        }
-
         model A {
             id  Int @id
             id2 Int
@@ -887,7 +827,7 @@ fn on_delete_compound_required_optional_default_action_without_restrict(api: Tes
         }
     "#;
 
-    api.schema_push(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green_bang();
 
     api.assert_schema().assert_table("B", |table| {
         table
@@ -902,11 +842,6 @@ fn on_delete_compound_required_optional_default_action_without_restrict(api: Tes
 #[test_connector(preview_features("referentialActions"))]
 fn on_update_optional_default_action(api: TestApi) {
     let dm = r#"
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
-        }
-
         model A {
             id Int @id
             b      B[]
@@ -919,7 +854,7 @@ fn on_update_optional_default_action(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green_bang();
 
     api.assert_schema().assert_table("B", |table| {
         table.assert_foreign_keys_count(1).assert_fk_on_columns(&["aId"], |fk| {
@@ -932,11 +867,6 @@ fn on_update_optional_default_action(api: TestApi) {
 #[test_connector(preview_features("referentialActions"))]
 fn on_update_required_default_action(api: TestApi) {
     let dm = r#"
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
-        }
-
         model A {
             id Int @id
             b      B[]
@@ -949,7 +879,7 @@ fn on_update_required_default_action(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green_bang();
 
     api.assert_schema().assert_table("B", |table| {
         table.assert_foreign_keys_count(1).assert_fk_on_columns(&["aId"], |fk| {
@@ -962,11 +892,6 @@ fn on_update_required_default_action(api: TestApi) {
 #[test_connector(preview_features("referentialActions"))]
 fn adding_mutual_references_on_existing_tables_works(api: TestApi) {
     let dm1 = r#"
-        generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
-        }
-
         model A {
             id Int @id
         }
@@ -976,14 +901,9 @@ fn adding_mutual_references_on_existing_tables_works(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green_bang();
 
     let dm2 = r#"
-        generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
-        }
-
         model A {
             id Int
             name String @unique
@@ -1001,7 +921,7 @@ fn adding_mutual_references_on_existing_tables_works(api: TestApi) {
         }
     "#;
 
-    let res = api.schema_push(dm2).force(true).send();
+    let res = api.schema_push_w_datasource(dm2).force(true).send();
 
     if api.is_sqlite() {
         res.assert_green_bang();
@@ -1032,7 +952,7 @@ fn migrations_with_many_to_many_related_models_must_not_recreate_indexes(api: Te
         }
     "#;
 
-    api.schema_push(dm_1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm_1).send().assert_green_bang();
     api.assert_schema().assert_table("_ProfileToSkill", |t| {
         t.assert_index_on_columns(&["A", "B"], |idx| idx.assert_is_unique())
     });
@@ -1057,7 +977,7 @@ fn migrations_with_many_to_many_related_models_must_not_recreate_indexes(api: Te
         }
     "#;
 
-    api.schema_push(dm_2).send();
+    api.schema_push_w_datasource(dm_2).send();
     api.assert_schema().assert_table("_ProfileToSkill", |table| {
         table.assert_index_on_columns(&["A", "B"], |idx| {
             idx.assert_is_unique().assert_name("_ProfileToSkill_AB_unique")
@@ -1081,7 +1001,7 @@ fn removing_a_relation_field_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm_1).send().assert_green_bang();
+    api.schema_push_w_datasource(dm_1).send().assert_green_bang();
 
     api.assert_schema()
         .assert_table("User", |table| table.assert_has_column("address_name"));
@@ -1097,7 +1017,7 @@ fn removing_a_relation_field_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm_2).send().assert_green_bang();
+    api.schema_push_w_datasource(dm_2).send().assert_green_bang();
 
     api.assert_schema()
         .assert_table("User", |table| table.assert_does_not_have_column("address_name"));
@@ -1123,7 +1043,7 @@ fn references_to_models_with_compound_primary_keys_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green_bang();
 
     api.assert_schema().assert_table("Pet", |table| {
         table
@@ -1166,7 +1086,7 @@ fn join_tables_between_models_with_compound_primary_keys_must_work(api: TestApi)
         }
     "#;
 
-    api.schema_push(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green_bang();
 
     api.assert_schema().assert_table("HumanToCat", |table| {
         table
@@ -1218,7 +1138,7 @@ fn join_tables_between_models_with_mapped_compound_primary_keys_must_work(api: T
         }
     "#;
 
-    api.schema_push(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green_bang();
 
     api.assert_schema().assert_table("HumanToCat", |table| {
         table

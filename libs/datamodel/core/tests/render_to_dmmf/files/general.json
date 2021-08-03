@@ -112,7 +112,7 @@
         }
       ],
       "isGenerated": false,
-      "idFields": [],
+      "primaryKey": null,
       "uniqueFields": [],
       "uniqueIndexes": []
     },
@@ -183,7 +183,7 @@
         }
       ],
       "isGenerated": false,
-      "idFields": [],
+      "primaryKey": null,
       "uniqueFields": [],
       "uniqueIndexes": []
     },
@@ -325,10 +325,13 @@
         }
       ],
       "isGenerated": false,
-      "idFields": [
-        "title",
-        "createdAt"
-      ],
+      "primaryKey": {
+        "name": null,
+        "fields": [
+          "title",
+          "createdAt"
+        ]
+      },
       "uniqueFields": [],
       "uniqueIndexes": []
     },
@@ -394,7 +397,7 @@
         }
       ],
       "isGenerated": false,
-      "idFields": [],
+      "primaryKey": null,
       "uniqueFields": [],
       "uniqueIndexes": []
     },
@@ -501,10 +504,10 @@
         }
       ],
       "isGenerated": false,
-      "idFields": [],
+      "primaryKey": null,
       "uniqueFields": [["postTitle", "categoryId"]],
       "uniqueIndexes": [{
-        "name": "MyUniqueIndex",
+        "name": null,
         "fields": ["postTitle", "categoryId"]
       }]
     },
@@ -562,7 +565,7 @@
         }
       ],
       "isGenerated": false,
-      "idFields": [],
+      "primaryKey": null,
       "uniqueFields": [],
       "uniqueIndexes": []
     },
@@ -603,7 +606,110 @@
         }
       ],
       "isGenerated": false,
-      "idFields": [],
+      "primaryKey": null,
+      "uniqueFields": [],
+      "uniqueIndexes": []
+    },
+    {
+      "name": "NamedCompounds",
+      "isEmbedded": false,
+      "dbName": null,
+      "fields": [
+        {
+          "name": "a",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": false,
+          "type": "Int",
+          "hasDefaultValue": false,
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "b",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": false,
+          "type": "Int",
+          "hasDefaultValue": false,
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "c",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": false,
+          "type": "Int",
+          "hasDefaultValue": false,
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "d",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": false,
+          "type": "Int",
+          "hasDefaultValue": false,
+          "isGenerated": false,
+          "isUpdatedAt": false
+        }
+      ],
+      "isGenerated": false,
+      "primaryKey": {
+        "name": "MyPrimary",
+        "fields": ["a", "b"]
+      },
+      "uniqueFields": [["c", "d"]],
+      "uniqueIndexes": [{"name":  "MyUnique", "fields":  ["c", "d"]}]
+    },
+    {
+      "name": "MappedSingles",
+      "isEmbedded": false,
+      "dbName": null,
+      "fields": [
+        {
+          "name": "a",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": true,
+          "isReadOnly": false,
+          "type": "Int",
+          "hasDefaultValue": false,
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "b",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": true,
+          "isId": false,
+          "isReadOnly": false,
+          "type": "Int",
+          "hasDefaultValue": false,
+          "isGenerated": false,
+          "isUpdatedAt": false
+        }
+      ],
+      "isGenerated": false,
+      "primaryKey": null,
       "uniqueFields": [],
       "uniqueIndexes": []
     }

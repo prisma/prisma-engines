@@ -32,6 +32,10 @@ pub trait Connector: Send + Sync {
         self.has_capability(ConnectorCapability::NamedPrimaryKeys)
     }
 
+    fn supports_named_foreign_keys(&self) -> bool {
+        self.has_capability(ConnectorCapability::NamedForeignKeys)
+    }
+
     fn supports_referential_action(&self, action: ReferentialAction) -> bool {
         self.referential_actions().contains(action)
     }
@@ -218,22 +222,24 @@ macro_rules! capabilities {
     };
 }
 
-// Capabilities describe what functoinality connectors are able to provide.
+// Capabilities describe what functionality connectors are able to provide.
 // Some are used only by the query engine, some are used only by the datamodel parser.
 capabilities!(
     // General capabilities, not specific to any part of Prisma.
     ScalarLists,
     RelationsOverNonUniqueCriteria,
-    MultipleIndexesWithSameName,
     Enums,
     Json,
     AutoIncrement,
+    RelationFieldsInArbitraryOrder,
+    ForeignKeys,
+    //Start of ME/IE only capabilities
     AutoIncrementAllowedOnNonId,
     AutoIncrementMultipleAllowed,
     AutoIncrementNonIndexedAllowed,
-    RelationFieldsInArbitraryOrder,
-    ForeignKeys,
+    MultipleIndexesWithSameName,
     NamedPrimaryKeys,
+    NamedForeignKeys,
     ReferenceCycleDetection,
     // Start of query-engine-only Capabilities
     InsensitiveFilters,

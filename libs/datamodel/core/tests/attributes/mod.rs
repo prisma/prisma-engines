@@ -12,7 +12,23 @@ pub mod updated_at_negative;
 pub mod updated_at_positive;
 
 pub mod arg_parsing;
+mod constraint_names;
 mod ignore_negative;
 mod ignore_positive;
 mod index_negative;
 mod map_positive;
+
+fn with_named_constraints(dm: &str) -> String {
+    let header = r#"
+    datasource test {
+            provider = "postgres"
+            url = "postgresql://..."
+    }
+    
+    generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["NamedConstraints"]
+    }"#;
+
+    format!("{}\n{}", header, dm)
+}

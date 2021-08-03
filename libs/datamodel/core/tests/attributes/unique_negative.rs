@@ -1,3 +1,4 @@
+use crate::attributes::with_named_constraints;
 use crate::common::*;
 use datamodel::{ast::Span, diagnostics::DatamodelError};
 
@@ -61,7 +62,6 @@ fn multi_field_unique_indexes_on_relation_fields_must_error_and_give_nice_error_
     model User {
         id               Int @id
         identificationId Int
-
         identification Identification @relation(fields: [identificationId], references:[id])
 
         @@unique([identification])
@@ -73,7 +73,7 @@ fn multi_field_unique_indexes_on_relation_fields_must_error_and_give_nice_error_
     "#;
 
     let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_model_validation_error("The unique index definition refers to the relation fields identification. Index definitions must reference only scalar fields. Did you mean `@@unique([identificationId])`?", "User",Span::new(185, 209)));
+    errors.assert_is(DatamodelError::new_model_validation_error("The unique index definition refers to the relation fields identification. Index definitions must reference only scalar fields. Did you mean `@@unique([identificationId])`?", "User",Span::new(184, 208)));
 }
 
 #[test]
@@ -103,7 +103,6 @@ fn single_field_unique_on_relation_fields_must_error_nicely_with_one_underlying_
     model User {
         id               Int @id
         identificationId Int
-
         identification Identification @relation(fields: [identificationId], references:[id]) @unique
     }
 
@@ -113,7 +112,7 @@ fn single_field_unique_on_relation_fields_must_error_nicely_with_one_underlying_
     "#;
 
     let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_attribute_validation_error("The field `identification` is a relation field and cannot be marked with `unique`. Only scalar fields can be made unique. Did you mean to put it on `identificationId`?", "unique", Span::new(175, 181)));
+    errors.assert_is(DatamodelError::new_attribute_validation_error("The field `identification` is a relation field and cannot be marked with `unique`. Only scalar fields can be made unique. Did you mean to put it on `identificationId`?", "unique", Span::new(174, 180)));
 }
 
 #[test]
@@ -123,7 +122,6 @@ fn single_field_unique_on_relation_fields_must_error_nicely_with_many_underlying
         id                Int @id
         identificationId1 Int
         identificationId2 Int
-
         identification Identification @relation(fields: [identificationId1, identificationId2], references:[id1, id2]) @unique
     }
 
@@ -135,7 +133,7 @@ fn single_field_unique_on_relation_fields_must_error_nicely_with_many_underlying
     "#;
 
     let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_attribute_validation_error("The field `identification` is a relation field and cannot be marked with `unique`. Only scalar fields can be made unique. Did you mean to provide `@@unique([identificationId1, identificationId2])`?", "unique", Span::new(233, 239)));
+    errors.assert_is(DatamodelError::new_attribute_validation_error("The field `identification` is a relation field and cannot be marked with `unique`. Only scalar fields can be made unique. Did you mean to provide `@@unique([identificationId1, identificationId2])`?", "unique", Span::new(232, 238)));
 }
 
 #[test]
@@ -196,5 +194,130 @@ fn must_error_when_using_the_same_field_multiple_times() {
         "The unique index definition refers to the field email multiple times.",
         "User",
         Span::new(83, 105),
+    ));
+}
+
+#[test]
+fn invalid_name_for_compound_unique_must_error() {
+    let dml = r#"
+     datasource test {
+            provider = "mysql"
+            url = "mysql://root:prisma@127.0.0.1:3309/ReproIndexNames?connection_limit=1"
+     }
+    
+     generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["NamedConstraints"]
+     }
+     
+     model User {
+         name           String            
+         identification Int
+
+         @@unique([name, identification], name: "Test.User")
+     }
+     "#;
+
+    let errors = parse_error(dml);
+    errors.assert_is(DatamodelError::new_model_validation_error(
+        "The `name` property within the `@@unique` attribute only allows for the following characters: `_a-zA-Z0-9`.",
+        "User",
+        Span::new(384, 433),
+    ));
+}
+
+#[test]
+fn mapping_unique_with_a_name_that_is_too_long_should_error() {
+    let dml = r#"
+     datasource test {
+            provider = "mysql"
+            url = "mysql://root:prisma@127.0.0.1:3309/ReproIndexNames?connection_limit=1"
+     }
+    
+     generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["NamedConstraints"]
+     }
+     
+     model User {
+         name           String            
+         identification Int
+
+         @@unique([name, identification], map: "IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimits")
+     }
+     
+     model User1 {
+         name           String @unique(map: "IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimitsHereAsWell")            
+         identification Int      
+     }
+     "#;
+
+    let errors = parse_error(dml);
+    errors.assert_are(&[
+        DatamodelError::new_model_validation_error(
+            "The constraint name 'IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimits' specified in the `map` argument for the `@@unique` constraint is too long for your chosen provider. The maximum allowed length is 64 bytes.",
+            "User",
+            Span::new(384, 542),
+        ),
+        DatamodelError::new_model_validation_error(
+            "The constraint name 'IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimitsHereAsWell' specified in the `map` argument for the `@unique` constraint is too long for your chosen provider. The maximum allowed length is 64 bytes.",
+            "User1",
+            Span::new(607, 751),
+        ),
+    ]);
+}
+
+#[test]
+fn naming_unique_to_a_field_name_should_error() {
+    let dml = with_named_constraints(
+        r#"
+     model User {
+         used           Int
+         name           String            
+         identification Int
+
+         @@unique([name, identification], name: "used")
+     }
+     "#,
+    );
+
+    let errors = parse_error(&dml);
+    errors.assert_is(DatamodelError::new_model_validation_error(
+        "The custom name `used` specified for the `@@unique` attribute is already used as a name for a field. Please choose a different name.",
+        "User",
+        Span::new(229, 404),
+    ));
+}
+
+#[test]
+fn naming_field_level_unique_should_error() {
+    let dml = with_named_constraints(
+        r#"
+     model User {
+         used           Int @unique(name: "INVALID ON FIELD LEVEL")
+     }
+     "#,
+    );
+
+    let errors = parse_error(&dml);
+    errors.assert_is(DatamodelError::new_unused_argument_error("name", Span::new(278, 308)));
+}
+
+#[test]
+fn duplicate_implicit_names_should_error() {
+    let dml = with_named_constraints(
+        r#"
+     model User {
+         used           Int @unique
+         
+         @@unique([used])
+     }
+     "#,
+    );
+
+    let errors = parse_error(&dml);
+    errors.assert_is(DatamodelError::new_multiple_indexes_with_same_name_are_not_supported(
+        "User_used_key",
+        Span::new(299, 313),
     ));
 }

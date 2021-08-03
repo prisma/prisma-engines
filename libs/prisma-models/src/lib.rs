@@ -17,6 +17,7 @@ mod relation;
 #[cfg(feature = "sql-ext")]
 pub mod sql_ext;
 
+pub mod pk;
 pub mod prelude;
 
 pub use datamodel::dml;

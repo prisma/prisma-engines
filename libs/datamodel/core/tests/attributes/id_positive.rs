@@ -1,3 +1,4 @@
+use crate::attributes::with_named_constraints;
 use crate::common::*;
 use datamodel::dml::*;
 use prisma_value::PrismaValue;
@@ -167,9 +168,121 @@ fn should_allow_unique_and_id_on_same_field() {
 
     user_model.assert_has_index(IndexDefinition {
         name: None,
-        db_name: None,
+        db_name: Some("Model.id_unique".to_string()),
         fields: vec!["id".into()],
         tpe: IndexType::Unique,
         defined_on_field: true,
     });
+}
+
+#[test]
+fn unnamed_and_unmapped_multi_field_ids_must_work() {
+    let dml = with_named_constraints(
+        r#"
+    model Model {
+        a String
+        b Int
+        @@id([a,b])
+    }
+    "#,
+    );
+
+    let datamodel = parse(&dml);
+    let user_model = datamodel.assert_has_model("Model");
+    user_model.assert_has_id_fields(&["a", "b"]);
+    user_model.assert_has_named_pk("Model_pkey");
+}
+
+#[test]
+fn unmapped_singular_id_must_work() {
+    let dml = with_named_constraints(
+        r#"
+    model Model {
+        a String @id
+    }
+    "#,
+    );
+
+    let datamodel = parse(&dml);
+    let model = datamodel.assert_has_model("Model");
+    model.assert_has_id_fields(&["a"]);
+    model.assert_has_named_pk("Model_pkey");
+}
+
+#[test]
+fn named_multi_field_ids_must_work() {
+    let dml = with_named_constraints(
+        r#"
+    model Model {
+        a String
+        b Int
+        @@id([a,b], name: "compoundId")
+    }
+    "#,
+    );
+
+    let datamodel = parse(&dml);
+    let user_model = datamodel.assert_has_model("Model");
+    user_model.assert_has_id_fields(&["a", "b"]);
+    user_model.assert_has_named_pk("Model_pkey");
+}
+
+#[test]
+fn mapped_multi_field_ids_must_work() {
+    let dml = with_named_constraints(
+        r#"
+    model Model {
+        a String
+        b Int
+        @@id([a,b], map:"dbname")
+    }
+    "#,
+    );
+
+    let datamodel = parse(&dml);
+    let user_model = datamodel.assert_has_model("Model");
+    user_model.assert_has_id_fields(&["a", "b"]);
+    user_model.assert_has_named_pk("dbname");
+}
+
+#[test]
+fn mapped_singular_id_must_work() {
+    let dml = with_named_constraints(
+        r#"
+    model Model {
+        a String @id(map: "test")
+    }
+
+    model Model2 {
+        a String @id(map: "test2")
+    }
+    "#,
+    );
+
+    let datamodel = parse(&dml);
+    let model = datamodel.assert_has_model("Model");
+    model.assert_has_id_fields(&["a"]);
+    model.assert_has_named_pk("test");
+
+    let model2 = datamodel.assert_has_model("Model2");
+    model2.assert_has_id_fields(&["a"]);
+    model2.assert_has_named_pk("test2");
+}
+
+#[test]
+fn named_and_mapped_multi_field_ids_must_work() {
+    let dml = with_named_constraints(
+        r#"
+    model Model {
+        a String
+        b Int
+        @@id([a,b], name: "compoundId", map:"dbname")
+    }
+    "#,
+    );
+
+    let datamodel = parse(&dml);
+    let user_model = datamodel.assert_has_model("Model");
+    user_model.assert_has_id_fields(&["a", "b"]);
+    user_model.assert_has_named_pk("dbname");
 }

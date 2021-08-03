@@ -1,3 +1,4 @@
+use crate::attributes::with_named_constraints;
 use crate::common::*;
 use datamodel::{dml, ScalarType};
 
@@ -220,4 +221,64 @@ fn allow_complicated_self_relations() {
         .assert_has_relation_field("husband")
         .assert_relation_to("User");
     user_model.assert_has_relation_field("wife").assert_relation_to("User");
+}
+
+#[test]
+fn allow_explicit_fk_name_definition() {
+    let dml = with_named_constraints(
+        r#"
+     model User {
+         user_id Int    @id
+         posts   Post[]
+     }
+
+     model Post {
+         post_id Int    @id
+         user_id Int
+         user    User    @relation(fields: user_id, references: user_id, map: "CustomFKName")
+     }
+     "#,
+    );
+
+    let schema = parse(&dml);
+
+    schema
+        .assert_has_model("User")
+        .assert_has_relation_field("posts")
+        .assert_relation_fk_name(None);
+    schema
+        .assert_has_model("Post")
+        .assert_has_relation_field("user")
+        .assert_relation_referenced_fields(&["user_id"])
+        .assert_relation_fk_name(Some("CustomFKName".to_string()));
+}
+
+#[test]
+fn allow_implicit_fk_name_definition() {
+    let dml = with_named_constraints(
+        r#"
+     model User {
+         user_id Int    @id
+         posts   Post[]
+     }
+
+     model Post {
+         post_id Int    @id
+         user_id Int
+         user    User    @relation(fields: user_id, references: user_id)
+     }
+     "#,
+    );
+
+    let schema = parse(&dml);
+
+    schema
+        .assert_has_model("User")
+        .assert_has_relation_field("posts")
+        .assert_relation_fk_name(None);
+    schema
+        .assert_has_model("Post")
+        .assert_has_relation_field("user")
+        .assert_relation_referenced_fields(&["user_id"])
+        .assert_relation_fk_name(Some("Post_user_id_fkey".to_string()));
 }

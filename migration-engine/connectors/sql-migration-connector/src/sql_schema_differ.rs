@@ -9,6 +9,8 @@ pub(crate) use column::{ColumnChange, ColumnChanges};
 pub(crate) use sql_schema_differ_flavour::SqlSchemaDifferFlavour;
 
 use self::differ_database::DifferDatabase;
+use crate::sql_migration::TableChange::RenamePrimaryKey;
+use crate::PreviewFeature::NamedConstraints;
 use crate::{
     pair::Pair,
     sql_migration::{self, AlterColumn, AlterTable, RedefineTable, SqlMigrationStep, TableChange},
@@ -147,8 +149,8 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                 let table: Pair<TableId> = table.tables.map(|t| t.table_id());
                 let index: Pair<usize> = i.map(|i| i.index());
 
-                let step = if self.db.flavour.can_alter_index() {
-                    SqlMigrationStep::AlterIndex { table, index }
+                let step = if self.db.flavour.can_rename_index() {
+                    SqlMigrationStep::RenameIndex { table, index }
                 } else {
                     SqlMigrationStep::RedefineIndex { table, index }
                 };
@@ -159,6 +161,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
             // Order matters.
             let changes: Vec<TableChange> = SqlSchemaDiffer::drop_primary_key(&table)
                 .into_iter()
+                .chain(self.rename_primary_key(&table))
                 .chain(SqlSchemaDiffer::drop_columns(&table))
                 .chain(SqlSchemaDiffer::add_columns(&table))
                 .chain(SqlSchemaDiffer::alter_columns(&table).into_iter())
@@ -293,6 +296,26 @@ impl<'schema> SqlSchemaDiffer<'schema> {
             })
         } else {
             from_psl_change
+        }
+    }
+
+    fn rename_primary_key(&self, differ: &TableDiffer<'_, '_>) -> Option<TableChange> {
+        if self.db.flavour.preview_features().contains(NamedConstraints) {
+            if let Some(previous_pk) = differ.tables.previous().primary_key() {
+                if let Some(next_pk) = differ.tables.next().primary_key() {
+                    if let Some(previous_name) = &previous_pk.constraint_name {
+                        if let Some(next_name) = &next_pk.constraint_name {
+                            if previous_name != next_name {
+                                return Some(RenamePrimaryKey);
+                            }
+                        }
+                    }
+                }
+            }
+
+            None
+        } else {
+            None
         }
     }
 
@@ -455,6 +478,12 @@ impl<'schema> SqlSchemaDiffer<'schema> {
 /// Compare two [ForeignKey](/sql-schema-describer/struct.ForeignKey.html)s and return whether they
 /// should be considered equivalent for schema diffing purposes.
 fn foreign_keys_match(fks: Pair<&ForeignKeyWalker<'_>>, db: &DifferDatabase<'_>) -> bool {
+    let named_constraints_flag = db.flavour.preview_features().contains(NamedConstraints);
+    let legacy_ignores_constraint_names = !named_constraints_flag && fks.next().constraint_name().is_none();
+    let names_match = db.flavour.has_unnamed_foreign_keys()
+        || (fks.next().constraint_name().is_some() && fks.previous().constraint_name() == fks.next().constraint_name())
+        || legacy_ignores_constraint_names;
+
     let references_same_table = db.flavour.table_names_match(fks.map(|fk| fk.referenced_table().name()));
 
     let references_same_column_count =
@@ -478,7 +507,8 @@ fn foreign_keys_match(fks: Pair<&ForeignKeyWalker<'_>>, db: &DifferDatabase<'_>)
         .interleave(|fk| fk.referenced_column_names())
         .all(|pair| pair.previous == pair.next);
 
-    let matches = references_same_table
+    let matches = names_match
+        && references_same_table
         && references_same_column_count
         && constrains_same_column_count
         && constrains_same_columns

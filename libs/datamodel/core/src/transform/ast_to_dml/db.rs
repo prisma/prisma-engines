@@ -13,8 +13,10 @@ use self::{
     context::Context,
     types::{RelationField, Types},
 };
+use crate::PreviewFeature;
 use crate::{ast, diagnostics::Diagnostics, Datasource};
 use datamodel_connector::{Connector, EmptyDatamodelConnector};
+use enumflags2::BitFlags;
 use names::Names;
 
 /// ParserDatabase is a container for a Schema AST, together with information
@@ -49,6 +51,7 @@ pub(crate) struct ParserDatabase<'ast> {
     datasource: Option<&'ast Datasource>,
     names: Names<'ast>,
     types: Types<'ast>,
+    preview_features: BitFlags<PreviewFeature>,
 }
 
 impl<'ast> ParserDatabase<'ast> {
@@ -57,12 +60,14 @@ impl<'ast> ParserDatabase<'ast> {
         ast: &'ast ast::SchemaAst,
         datasource: Option<&'ast Datasource>,
         diagnostics: Diagnostics,
+        preview_features: BitFlags<PreviewFeature>,
     ) -> (Self, Diagnostics) {
         let db = ParserDatabase {
             ast,
             datasource,
             names: Names::default(),
             types: Types::default(),
+            preview_features,
         };
 
         let mut ctx = Context::new(db, diagnostics);
@@ -116,6 +121,10 @@ impl<'ast> ParserDatabase<'ast> {
 
     pub(crate) fn get_enum_value_database_name(&self, enum_id: ast::EnumId, value_idx: u32) -> Option<&'ast str> {
         self.types.enums[&enum_id].mapped_values.get(&value_idx).cloned()
+    }
+
+    pub(crate) fn get_field_database_name(&self, model_id: ast::ModelId, field_id: ast::FieldId) -> Option<&'ast str> {
+        self.types.scalar_fields[&(model_id, field_id)].mapped_name
     }
 
     pub(crate) fn get_model_data(&self, model_id: &ast::ModelId) -> Option<&types::ModelData<'ast>> {

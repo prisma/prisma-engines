@@ -114,7 +114,7 @@ pub(super) fn scalar_input_fields_for_unchecked_update(
         vec![]
     };
 
-    let id_fields = model.fields().id();
+    let id_fields = model.fields().id().map(|pk| pk.fields());
     let scalar_fields: Vec<ScalarFieldRef> = model
         .fields()
         .scalar()

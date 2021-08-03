@@ -74,7 +74,7 @@ services:
       - "5434:5432"
     networks:
       - databases
-    tmpfs: /pgtmpfs12
+    tmpfs: /pgtmpfs12:size=4g
 
   postgres13:
     image: postgres:13
@@ -87,7 +87,7 @@ services:
       - "5435:5432"
     networks:
       - databases
-    tmpfs: /pgtmpfs12
+    tmpfs: /pgtmpfs13
 
   mysql-5-6:
     image: mysql:5.6.50

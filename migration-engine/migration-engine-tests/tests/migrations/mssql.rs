@@ -45,16 +45,14 @@ fn shared_default_constraints_are_ignored_issue_5423(api: TestApi) {
 
     api.raw_cmd(&format!("sp_bindefault '{0}.catcat', '{0}.cats.name'", schema));
 
-    let dm = api.datamodel_with_provider(
-        r#"
+    let dm = r#"
         model cats {
             id Int @id @default(autoincrement())
             name String @db.NVarChar(255)
         }
-    "#,
-    );
+    "#;
 
-    api.schema_push(dm)
+    api.schema_push_w_datasource(dm)
         .migration_id(Some("first"))
         .send()
         .assert_green_bang()

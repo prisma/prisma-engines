@@ -49,7 +49,7 @@ impl<'a> LiftAstToDml<'a> {
             .as_ref()
             .map(|pk_data| dml::PrimaryKeyDefinition {
                 name: pk_data.name.map(String::from),
-                db_name: pk_data.name.map(String::from),
+                db_name: pk_data.db_name.as_ref().map(|n| n.to_string()),
                 fields: pk_data
                     .fields
                     .iter()
@@ -63,7 +63,7 @@ impl<'a> LiftAstToDml<'a> {
             .iter()
             .map(|(_, idx)| dml::IndexDefinition {
                 name: idx.name.map(String::from),
-                db_name: idx.name.map(String::from),
+                db_name: idx.db_name.as_ref().map(|name| name.to_string()),
                 fields: idx
                     .fields
                     .iter()
@@ -136,6 +136,8 @@ impl<'a> LiftAstToDml<'a> {
                         .collect()
                 })
                 .unwrap_or_default();
+
+            field.relation_info.fk_name = relation_field.fk_name.as_ref().map(|n| n.to_string());
 
             field_ids_for_sorting.insert(&ast_field.name.name, field_id);
             model.add_field(dml::Field::RelationField(field))
