@@ -75,9 +75,6 @@ services:
     networks:
       - databases
     tmpfs: /pgtmpfs12
-    build:
-      context: .
-      shm_size: 256mb
     shm_size: 256mb
 
   postgres13:
