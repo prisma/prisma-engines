@@ -44,7 +44,7 @@ impl SqlInfo {
         Self {
             family: SqlFamily::MySQL,
             max_rows: None,
-            max_bind_values: None,
+            max_bind_values: *BATCH_SIZE_OVERRIDE,
         }
     }
 
@@ -52,7 +52,7 @@ impl SqlInfo {
         Self {
             family: SqlFamily::Postgres,
             max_rows: None,
-            max_bind_values: Some(32767),
+            max_bind_values: (*BATCH_SIZE_OVERRIDE).or(Some(32767)),
         }
     }
 
@@ -60,7 +60,7 @@ impl SqlInfo {
         Self {
             family: SqlFamily::MSSQL,
             max_rows: Some(1000),
-            max_bind_values: Some(2099),
+            max_bind_values: (*BATCH_SIZE_OVERRIDE).or(Some(2099)),
         }
     }
 }
