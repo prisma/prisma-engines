@@ -1,5 +1,6 @@
 #![allow(clippy::suspicious_operation_groupings)] // clippy is wrong there
 use crate::common::constraint_names::ConstraintNames;
+use crate::PreviewFeature::NamedConstraints;
 use crate::{
     ast::{self, Span},
     common::preview_features::PreviewFeature,
@@ -44,35 +45,37 @@ impl<'a> Validator<'a> {
 
             //doing this here for now since I want to have all field names already generated
             // it might be possible to move this
-            if let Some(pk) = &model.primary_key {
-                if let Some(name) = &pk.name {
-                    for field in model.fields() {
-                        if let Some(err) = ConstraintNames::client_name_already_in_use(
-                            name,
-                            &field.name(),
-                            &model.name,
-                            ast_model.span,
-                            "@@id",
-                        ) {
-                            diagnostics.push_error(err);
+            if self.preview_features.contains(NamedConstraints) {
+                if let Some(pk) = &model.primary_key {
+                    if let Some(name) = &pk.name {
+                        for field in model.fields() {
+                            if let Some(err) = ConstraintNames::client_name_already_in_use(
+                                name,
+                                &field.name(),
+                                &model.name,
+                                ast_model.span,
+                                "@@id",
+                            ) {
+                                diagnostics.push_error(err);
+                            }
                         }
                     }
                 }
-            }
 
-            for index in &model.indices {
-                //doing this here for now since I want to have all field names already generated
-                // it might be possible to move this
-                if let Some(name) = &index.name {
-                    for field in model.fields() {
-                        if let Some(err) = ConstraintNames::client_name_already_in_use(
-                            name,
-                            &field.name(),
-                            &model.name,
-                            ast_model.span,
-                            "@@unique",
-                        ) {
-                            diagnostics.push_error(err);
+                for index in &model.indices {
+                    //doing this here for now since I want to have all field names already generated
+                    // it might be possible to move this
+                    if let Some(name) = &index.name {
+                        for field in model.fields() {
+                            if let Some(err) = ConstraintNames::client_name_already_in_use(
+                                name,
+                                &field.name(),
+                                &model.name,
+                                ast_model.span,
+                                "@@unique",
+                            ) {
+                                diagnostics.push_error(err);
+                            }
                         }
                     }
                 }
