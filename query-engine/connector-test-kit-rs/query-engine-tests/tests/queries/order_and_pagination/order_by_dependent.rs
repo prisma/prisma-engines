@@ -10,7 +10,7 @@ mod order_by_dependent {
             r#"model ModelA {
               #id(id, Int, @id)
               b_id Int?
-              b    ModelB? @relation(fields: [b_id], references: [id])
+              b    ModelB? @relation(fields: [b_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
               c    ModelC?
             }
 
@@ -76,7 +76,7 @@ mod order_by_dependent {
     }
 
     // "[Hops: 1] Ordering by related record field ascending with nulls" should "work"
-    #[connector_test(exclude(SqlServer))]
+    #[connector_test]
     async fn hop_1_related_record_asc_nulls(runner: &Runner) -> TestResult<()> {
         create_row(runner, 1, Some(1), Some(1), None).await?;
         create_row(runner, 2, Some(2), None, None).await?;
@@ -140,7 +140,7 @@ mod order_by_dependent {
     }
 
     // "[Hops: 2] Ordering by related record field ascending with nulls" should "work"
-    #[connector_test(exclude(SqlServer))]
+    #[connector_test]
     async fn hop_2_related_record_asc_null(runner: &Runner) -> TestResult<()> {
         // 1 record has the "full chain", one half, one none
         create_row(runner, 1, Some(1), Some(1), None).await?;
@@ -171,7 +171,7 @@ mod order_by_dependent {
     }
 
     // "[Circular] Ordering by related record field ascending" should "work"
-    #[connector_test(exclude(SqlServer))]
+    #[connector_test]
     async fn circular_related_record_asc(runner: &Runner) -> TestResult<()> {
         // Records form circles with their relations
         create_row(runner, 1, Some(1), Some(1), Some(1)).await?;
@@ -197,7 +197,7 @@ mod order_by_dependent {
     }
 
     // "[Circular] Ordering by related record field descending" should "work"
-    #[connector_test(exclude(SqlServer))]
+    #[connector_test]
     async fn circular_related_record_desc(runner: &Runner) -> TestResult<()> {
         // Records form circles with their relations
         create_row(runner, 1, Some(1), Some(1), Some(1)).await?;
@@ -290,7 +290,7 @@ mod order_by_dependent {
           #id(id, Int, @id)
 
           b1_id Int?
-          b1    ModelB? @relation(fields: [b1_id], references: [id], name: "1")
+          b1    ModelB? @relation(fields: [b1_id], references: [id], name: "1", onDelete: NoAction, onUpdate: NoAction)
 
           b2_id Int?
           b2    ModelB? @relation(fields: [b2_id], references: [id], name: "2")
@@ -307,7 +307,7 @@ mod order_by_dependent {
         schema.to_string()
     }
 
-    #[connector_test(schema(multiple_rel_same_model), exclude(SqlServer, MongoDb))] // Mongo is excluded due to CI issues (version drift?).
+    #[connector_test(schema(multiple_rel_same_model), exclude(MongoDb))] // Mongo is excluded due to CI issues (version drift?).
     async fn multiple_rel_same_model_order_by(runner: &Runner) -> TestResult<()> {
         // test data
         run_query!(

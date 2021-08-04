@@ -1,7 +1,7 @@
 use indoc::indoc;
 use query_engine_tests::*;
 
-#[test_suite(schema(schema), exclude(SqlServer))]
+#[test_suite(schema(schema))]
 mod sr_regression {
     fn schema() -> String {
         let schema = indoc! {
@@ -11,7 +11,7 @@ mod sr_regression {
                 name      String
                 parent_id String?
 
-                parent   Category? @relation(name: "C", fields: [parent_id], references: [id])
+                parent   Category? @relation(name: "C", fields: [parent_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
                 opposite Category? @relation(name: "C")
             }
             "#

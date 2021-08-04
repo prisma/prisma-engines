@@ -132,15 +132,19 @@ fn relations_to_models_with_no_pk_and_a_single_unique_required_field_work(api: T
         });
 }
 
-// TODO: Enable SQL Server when cascading rules are in PSL.
-#[test_connector(exclude(Mssql))]
-fn reserved_sql_key_words_must_work(api: TestApi) {
+#[test_connector]
+fn reserved_sql_keywords_must_work(api: TestApi) {
     // Group is a reserved keyword
     let dm = r#"
+        generator js {
+           provider        = "prisma-client-js"
+           previewFeatures = ["referentialActions"]
+        }
+
         model Group {
             id          String  @id @default(cuid())
             parent_id   String?
-            parent      Group? @relation(name: "ChildGroups", fields: [parent_id], references: id)
+            parent      Group? @relation(name: "ChildGroups", fields: [parent_id], references: id, onDelete: NoAction, onUpdate: NoAction)
             childGroups Group[] @relation(name: "ChildGroups")
         }
     "#;
@@ -404,15 +408,20 @@ fn indexes_on_composite_relation_fields(api: TestApi) {
     });
 }
 
-#[test_connector(exclude(Mssql))]
+#[test_connector]
 fn dropping_mutually_referencing_tables_works(api: TestApi) {
     let dm1 = r#"
+    generator js {
+        provider        = "prisma-client-js"
+        previewFeatures = ["referentialActions"]
+    }
+
     model A {
         id Int @id
         b_id Int
-        ab B @relation("AtoB", fields: [b_id], references: [id])
+        ab B @relation("AtoB", fields: [b_id], references: [id], onUpdate: NoAction)
         c_id Int
-        ac C @relation("AtoC", fields: [c_id], references: [id])
+        ac C @relation("AtoC", fields: [c_id], references: [id], onUpdate: NoAction)
         b  B[] @relation("BtoA")
         c  C[] @relation("CtoA")
     }
@@ -420,7 +429,7 @@ fn dropping_mutually_referencing_tables_works(api: TestApi) {
     model B {
         id Int @id
         a_id Int
-        ba A @relation("BtoA", fields: [a_id], references: [id])
+        ba A @relation("BtoA", fields: [a_id], references: [id], onUpdate: NoAction)
         c_id Int
         bc C @relation("BtoC", fields: [c_id], references: [id])
         a  A[] @relation("AtoB")
@@ -430,9 +439,9 @@ fn dropping_mutually_referencing_tables_works(api: TestApi) {
     model C {
         id Int @id
         a_id Int
-        ca A @relation("CtoA", fields: [a_id], references: [id])
+        ca A @relation("CtoA", fields: [a_id], references: [id], onUpdate: NoAction)
         b_id Int
-        cb B @relation("CtoB", fields: [b_id], references: [id])
+        cb B @relation("CtoB", fields: [b_id], references: [id], onUpdate: NoAction)
         b  B[] @relation("BtoC")
         a  A[] @relation("AtoC")
     }

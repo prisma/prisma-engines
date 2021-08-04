@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(schema), exclude(SqlServer))]
+#[test_suite(schema(schema))]
 mod self_rel_no_back_rel {
     use indoc::indoc;
     use query_engine_tests::run_query;
@@ -64,7 +64,7 @@ mod self_rel_no_back_rel {
               identifier Int?    @unique
               relatedId  String?
 
-              related    Post?  @relation(name: "RelatedPosts", fields:[relatedId], references: [id])
+              related    Post?  @relation(name: "RelatedPosts", fields:[relatedId], references: [id], onDelete: NoAction, onUpdate: NoAction)
               parents    Post[] @relation(name: "RelatedPosts")
             }"#
         };

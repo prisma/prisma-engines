@@ -35,7 +35,7 @@ mod update_many_rel_filter {
     }
 
     // "The updateMany Mutation" should "update the items matching the where relation filter"
-    #[connector_test(exclude(SqlServer))]
+    #[connector_test]
     async fn update_items_matching_where_rel_filter(runner: &Runner) -> TestResult<()> {
         create_row(runner, r#"{ id: 1, top: "top1"}"#).await?;
         create_row(runner, r#"{ id: 2, top: "top2"}"#).await?;
@@ -105,7 +105,7 @@ mod update_many_rel_filter {
     }
 
     // "The updateMany Mutation" should "work for deeply nested filters"
-    #[connector_test(exclude(SqlServer))]
+    #[connector_test]
     async fn works_with_deeply_nested_filters(runner: &Runner) -> TestResult<()> {
         create_row(runner, r#"{ id: 1, top: "top1"}"#).await?;
         create_row(runner, r#"{ id: 2, top: "top2"}"#).await?;
