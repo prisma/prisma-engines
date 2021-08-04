@@ -1,5 +1,5 @@
 use super::Filter;
-use crate::{compare::ScalarCompare, JsonFilterPath, JsonTargetType, MAX_BATCH_SIZE};
+use crate::{compare::ScalarCompare, JsonFilterPath, JsonTargetType};
 use prisma_models::{ModelProjection, PrismaListValue, PrismaValue, ScalarFieldRef};
 use std::{collections::BTreeSet, sync::Arc};
 
@@ -61,21 +61,21 @@ impl ScalarFilter {
 
     /// If `true`, the filter should be split into smaller filters executed in
     /// separate queries.
-    pub fn should_batch(&self) -> bool {
-        self.len() > *MAX_BATCH_SIZE
+    pub fn should_batch(&self, chunk_size: usize) -> bool {
+        self.len() > chunk_size
     }
 
     /// If possible, converts the filter into multiple smaller filters.
-    pub fn batched(self) -> Vec<ScalarFilter> {
-        fn inner(mut list: PrismaListValue) -> Vec<PrismaListValue> {
+    pub fn batched(self, chunk_size: usize) -> Vec<ScalarFilter> {
+        fn inner(mut list: PrismaListValue, chunk_size: usize) -> Vec<PrismaListValue> {
             let dedup_list: BTreeSet<_> = list.drain(..).collect();
 
-            let mut batches = Vec::with_capacity(list.len() % *MAX_BATCH_SIZE + 1);
-            batches.push(Vec::with_capacity(*MAX_BATCH_SIZE));
+            let mut batches = Vec::with_capacity(list.len() % chunk_size + 1);
+            batches.push(Vec::with_capacity(chunk_size));
 
             for (idx, item) in dedup_list.into_iter().enumerate() {
-                if idx != 0 && idx % *MAX_BATCH_SIZE == 0 {
-                    batches.push(Vec::with_capacity(*MAX_BATCH_SIZE));
+                if idx != 0 && idx % chunk_size == 0 {
+                    batches.push(Vec::with_capacity(chunk_size));
                 }
 
                 batches.last_mut().unwrap().push(item);
@@ -90,7 +90,7 @@ impl ScalarFilter {
             ScalarCondition::In(list) => {
                 let projection = self.projection;
 
-                inner(list)
+                inner(list, chunk_size)
                     .into_iter()
                     .map(|batch| ScalarFilter {
                         projection: projection.clone(),
@@ -103,7 +103,7 @@ impl ScalarFilter {
             ScalarCondition::NotIn(list) => {
                 let projection = self.projection;
 
-                inner(list)
+                inner(list, chunk_size)
                     .into_iter()
                     .map(|batch| ScalarFilter {
                         projection: projection.clone(),

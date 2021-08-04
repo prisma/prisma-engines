@@ -2,6 +2,7 @@ use crate::{
     column_metadata,
     query_arguments_ext::QueryArgumentsExt,
     query_builder::{self, read},
+    sql_info::SqlInfo,
     QueryExt, SqlError,
 };
 use connector_interface::*;
@@ -46,13 +47,14 @@ pub async fn get_single_record(
     Ok(record)
 }
 
-#[tracing::instrument(skip(conn, model, query_arguments, selected_fields))]
+#[tracing::instrument(skip(conn, model, query_arguments, selected_fields, aggr_selections, sql_info))]
 pub async fn get_many_records(
     conn: &dyn QueryExt,
     model: &ModelRef,
     mut query_arguments: QueryArguments,
     selected_fields: &ModelProjection,
     aggr_selections: &[RelAggregationSelection],
+    sql_info: SqlInfo,
 ) -> crate::Result<ManyRecords> {
     let reversed = query_arguments.needs_reversed_order();
 
@@ -65,6 +67,7 @@ pub async fn get_many_records(
         .iter()
         .map(|aggr_sel| aggr_sel.type_identifier_with_arity())
         .collect();
+
     let mut idents = selected_fields.type_identifiers_with_arities();
 
     idents.append(&mut aggr_idents);
@@ -79,35 +82,38 @@ pub async fn get_many_records(
     // Todo: This can't work for all cases. Cursor-based pagination will not work, because it relies on the ordering
     // to determine the right queries to fire, and will default to incorrect orderings if no ordering is found.
     // The should_batch has been adjusted to reflect that as a band-aid, but deeper investigation is necessary.
-    if query_arguments.should_batch() {
-        // We don't need to order in the database due to us ordering in this function.
-        let order = std::mem::take(&mut query_arguments.order_by);
+    match sql_info.max_bind_values {
+        Some(chunk_size) if query_arguments.should_batch(chunk_size) => {
+            // We don't need to order in the database due to us ordering in this function.
+            let order = std::mem::take(&mut query_arguments.order_by);
 
-        let batches = query_arguments.batched();
-        let mut futures = FuturesUnordered::new();
+            let batches = query_arguments.batched(chunk_size);
+            let mut futures = FuturesUnordered::new();
 
-        for args in batches.into_iter() {
-            let query = read::get_records(model, selected_fields.as_columns(), aggr_selections, args);
+            for args in batches.into_iter() {
+                let query = read::get_records(model, selected_fields.as_columns(), aggr_selections, args);
 
-            futures.push(conn.filter(query.into(), meta.as_slice()));
+                futures.push(conn.filter(query.into(), meta.as_slice()));
+            }
+
+            while let Some(result) = futures.next().await {
+                for item in result?.into_iter() {
+                    records.push(Record::from(item))
+                }
+            }
+
+            if !order.is_empty() {
+                records.order_by(&order)
+            }
         }
+        _ => {
+            let query = read::get_records(model, selected_fields.as_columns(), aggr_selections, query_arguments);
 
-        while let Some(result) = futures.next().await {
-            for item in result?.into_iter() {
+            for item in conn.filter(query.into(), meta.as_slice()).await?.into_iter() {
                 records.push(Record::from(item))
             }
         }
-
-        if !order.is_empty() {
-            records.order_by(&order)
-        }
-    } else {
-        let query = read::get_records(model, selected_fields.as_columns(), aggr_selections, query_arguments);
-
-        for item in conn.filter(query.into(), meta.as_slice()).await?.into_iter() {
-            records.push(Record::from(item))
-        }
-    };
+    }
 
     if reversed {
         records.reverse();

@@ -67,17 +67,17 @@ impl Filter {
         }
     }
 
-    pub fn should_batch(&self) -> bool {
+    pub fn should_batch(&self, chunk_size: usize) -> bool {
         match self {
-            Self::Scalar(sf) => sf.should_batch(),
-            Self::And(filters) => filters.iter().any(|f| f.should_batch()),
-            Self::Or(filters) => filters.iter().any(|f| f.should_batch()),
+            Self::Scalar(sf) => sf.should_batch(chunk_size),
+            Self::And(filters) => filters.iter().any(|f| f.should_batch(chunk_size)),
+            Self::Or(filters) => filters.iter().any(|f| f.should_batch(chunk_size)),
             _ => false,
         }
     }
 
-    pub fn batched(self) -> Vec<Filter> {
-        fn split_longest(mut filters: Vec<Filter>) -> (Option<ScalarFilter>, Vec<Filter>) {
+    pub fn batched(self, chunk_size: usize) -> Vec<Filter> {
+        fn split_longest(mut filters: Vec<Filter>, chunk_size: usize) -> (Option<ScalarFilter>, Vec<Filter>) {
             let mut longest: Option<ScalarFilter> = None;
             let mut other = Vec::with_capacity(filters.len());
 
@@ -87,7 +87,7 @@ impl Filter {
                         let previous = longest.replace(sf);
                         other.push(Filter::Scalar(previous.unwrap()));
                     }
-                    (Filter::Scalar(sf), None) if sf.should_batch() => {
+                    (Filter::Scalar(sf), None) if sf.should_batch(chunk_size) => {
                         longest = Some(sf);
                     }
                     (filter, _) => other.push(filter),
@@ -97,15 +97,15 @@ impl Filter {
             (longest, other)
         }
 
-        fn batch<F>(filters: Vec<Filter>, f: F) -> Vec<Filter>
+        fn batch<F>(filters: Vec<Filter>, chunk_size: usize, f: F) -> Vec<Filter>
         where
             F: Fn(Vec<Filter>) -> Filter,
         {
-            let (longest, other) = split_longest(filters);
+            let (longest, other) = split_longest(filters, chunk_size);
             let mut batched = Vec::new();
 
             if let Some(filter) = longest {
-                for filter in filter.batched() {
+                for filter in filter.batched(chunk_size) {
                     batched.push(Filter::Scalar(filter))
                 }
 
@@ -124,9 +124,9 @@ impl Filter {
         }
 
         match self {
-            Self::Scalar(sf) => sf.batched().into_iter().map(Self::Scalar).collect(),
-            Self::And(filters) => batch(filters, Filter::And),
-            Self::Or(filters) => batch(filters, Filter::Or),
+            Self::Scalar(sf) => sf.batched(chunk_size).into_iter().map(Self::Scalar).collect(),
+            Self::And(filters) => batch(filters, chunk_size, Filter::And),
+            Self::Or(filters) => batch(filters, chunk_size, Filter::Or),
             _ => vec![self],
         }
     }
