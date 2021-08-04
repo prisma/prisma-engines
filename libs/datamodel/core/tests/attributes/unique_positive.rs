@@ -388,3 +388,26 @@ fn defined_on_field_must_work() {
         defined_on_field: false,
     });
 }
+
+#[test]
+fn naming_unique_to_a_field_name_should_work() {
+    let dml = r#"
+     model User {
+         used           Int
+         name           String            
+         identification Int
+
+         @@unique([name, identification], name: "used")
+     }
+     "#;
+
+    let datamodel = parse(&dml);
+    let model = datamodel.assert_has_model("User");
+    model.assert_has_index(IndexDefinition {
+        name: Some("used".to_string()),
+        db_name: Some("used".to_string()),
+        fields: vec!["name".to_string(), "identification".to_string()],
+        tpe: IndexType::Unique,
+        defined_on_field: false,
+    });
+}
