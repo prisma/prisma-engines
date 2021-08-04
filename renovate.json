@@ -4,5 +4,8 @@
   ],
   "cargo": {
     "enabled": false
+  },
+  "sbt": {
+    "enabled": false
   }
 }
