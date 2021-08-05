@@ -123,7 +123,7 @@ fn test_connecting_with_a_non_working_mssql_connection_string(api: TestApi) {
     assert!(stderr.contains(r#""error_code":"P1003""#), "{}", stderr);
 }
 
-#[test_connector(tags(Postgres, Mysql, Mssql))]
+#[test_connector(tags(Postgres, Mysql))]
 fn test_create_database(api: TestApi) {
     let connection_string = api.connection_string();
     let output = api.run(&["--datasource", &connection_string, "drop-database"]);
@@ -133,6 +133,22 @@ fn test_create_database(api: TestApi) {
     assert!(output.status.success());
     let stderr = String::from_utf8_lossy(&output.stderr);
     assert!(stderr.contains("Database 'test_create_database\' was successfully created."));
+
+    let output = api.run(&["--datasource", &connection_string, "can-connect-to-database"]);
+    assert!(output.status.success());
+}
+
+#[test_connector(tags(Mssql))]
+fn test_create_database_mssql(api: TestApi) {
+    let connection_string = api.connection_string();
+
+    let connection_string = connection_string.replace("master", "masterNEW");
+    let connection_string = connection_string.replace("test_create_database_mssql", "test_create_database_NEW");
+
+    let output = api.run(&["--datasource", &connection_string, "create-database"]);
+    assert!(output.status.success());
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(stderr.contains("Database 'masterNEW\' was successfully created."));
 
     let output = api.run(&["--datasource", &connection_string, "can-connect-to-database"]);
     assert!(output.status.success());
@@ -174,7 +190,8 @@ fn test_drop_sqlite_database(api: TestApi) {
     assert!(!sqlite_path.exists());
 }
 
-#[test_connector(tags(Postgres, Mysql, Mssql))]
+// TODO (julius) drop is not implemented and therefore also not tested on MSSQL
+#[test_connector(tags(Postgres, Mysql))]
 fn test_drop_database(api: TestApi) {
     let connection_string = api.connection_string();
     let output = api.run(&["--datasource", &connection_string, "drop-database"]);
