@@ -14,7 +14,7 @@ mod bytes {
               }
 
               model BytesId {
-                id Bytes @id
+                #id(id, Bytes, @id)
               }
             "#
         };
