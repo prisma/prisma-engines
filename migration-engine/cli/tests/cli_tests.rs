@@ -21,6 +21,8 @@ impl TestApi {
             rt.block_on(args.create_postgres_database()).2
         } else if args.tags().contains(Tags::Mysql) {
             rt.block_on(args.create_mysql_database()).1
+        } else if args.tags().contains(Tags::Mssql) {
+            rt.block_on(args.create_mssql_database()).1
         } else {
             unreachable!()
         }
@@ -103,6 +105,7 @@ fn test_connecting_with_a_non_working_psql_connection_string(api: TestApi) {
 #[test_connector(tags(Mssql))]
 fn test_connecting_with_a_working_mssql_connection_string(api: TestApi) {
     let connection_string = api.connection_string();
+
     let output = api.run(&["--datasource", &connection_string, "can-connect-to-database"]);
 
     assert!(output.status.success(), "{:?}", output);
@@ -112,9 +115,7 @@ fn test_connecting_with_a_working_mssql_connection_string(api: TestApi) {
 
 #[test_connector(tags(Mssql))]
 fn test_connecting_with_a_non_working_mssql_connection_string(api: TestApi) {
-    let mut non_existing_url: url::Url = api.args.database_url().parse().unwrap();
-
-    non_existing_url.set_path("this_does_not_exist");
+    let non_existing_url = "sqlserver://localhost:1433;database=NONEXISTENT;user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED";
 
     let output = api.run(&["--datasource", &non_existing_url.to_string(), "can-connect-to-database"]);
     assert_eq!(output.status.code(), Some(1));

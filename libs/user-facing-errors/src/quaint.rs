@@ -64,6 +64,13 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
                 database_port: url.port(),
             }))
         }
+        (ErrorKind::DatabaseDoesNotExist { .. }, ConnectionInfo::Mssql(url)) => {
+            Some(KnownError::new(common::DatabaseDoesNotExist::Mssql {
+                database_name: url.dbname().to_owned(),
+                database_host: url.host().to_owned(),
+                database_port: url.port(),
+            }))
+        }
 
         (ErrorKind::DatabaseAccessDenied { .. }, ConnectionInfo::Postgres(url)) => {
             Some(KnownError::new(common::DatabaseAccessDenied {
