@@ -195,7 +195,7 @@ impl SqlFlavour for MssqlFlavour {
                 .properties()
                 .get("database")
                 .map(|s| s.to_owned())
-                .unwrap_or("master".to_owned());
+                .unwrap_or_else(|| "master".to_owned());
 
             assert!(db_name != "master", "Cannot drop the `master` database.");
         }
