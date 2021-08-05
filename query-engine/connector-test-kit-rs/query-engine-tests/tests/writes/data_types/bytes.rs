@@ -7,10 +7,16 @@ mod bytes {
 
     fn schema() -> String {
         let schema = indoc! {
-            r#"model Model {
-              #id(id, Int, @id)
-              field Bytes? @default("dGVzdA==")
-             }"#
+            r#"
+              model Model {
+                #id(id, Int, @id)
+                field Bytes? @default("dGVzdA==")
+              }
+
+              model BytesId {
+                id Bytes @id
+              }
+            "#
         };
 
         schema.to_owned()
@@ -58,6 +64,18 @@ mod bytes {
             }
           }"#),
           @r###"{"data":{"updateOneModel":{"field":null}}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn byte_id_coercion(runner: &Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(runner, r#"
+            mutation { createOneBytesId(data: { id: "dGVzdA==" }) { id } }
+          "#),
+          @r###"{"data":{"createOneBytesId":{"id":"dGVzdA=="}}}"###
         );
 
         Ok(())
