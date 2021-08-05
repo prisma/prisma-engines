@@ -26,7 +26,7 @@ mod transactional {
         schema.to_owned()
     }
 
-    #[connector_test]
+    #[connector_test(exclude(SqlServer))]
     async fn two_success(runner: Runner) -> TestResult<()> {
         let queries = vec![
             r#"mutation { createOneModelA(data: { id: 1 }) { id }}"#.to_string(),
