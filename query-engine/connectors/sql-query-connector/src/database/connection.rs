@@ -75,7 +75,15 @@ where
         aggr_selections: &[RelAggregationSelection],
     ) -> connector::Result<ManyRecords> {
         catch(self.connection_info.clone(), async move {
-            read::get_many_records(&self.inner, model, query_arguments, selected_fields, aggr_selections).await
+            read::get_many_records(
+                &self.inner,
+                model,
+                query_arguments,
+                selected_fields,
+                aggr_selections,
+                SqlInfo::from(&self.connection_info),
+            )
+            .await
         })
         .await
     }

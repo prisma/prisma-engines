@@ -10,6 +10,7 @@ generator client {
 
 model Parent {
   id         String  @id @default(cuid()) @map("_id")
+  wurst      BigInt
   p          String  @unique
   p_1        String
   p_2        String
