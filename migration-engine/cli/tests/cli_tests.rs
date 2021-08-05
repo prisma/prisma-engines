@@ -100,7 +100,29 @@ fn test_connecting_with_a_non_working_psql_connection_string(api: TestApi) {
     assert!(stderr.contains(r#""error_code":"P1003""#), "{}", stderr);
 }
 
-#[test_connector(tags(Postgres, Mysql))]
+#[test_connector(tags(Mssql))]
+fn test_connecting_with_a_working_mssql_connection_string(api: TestApi) {
+    let connection_string = api.connection_string();
+    let output = api.run(&["--datasource", &connection_string, "can-connect-to-database"]);
+
+    assert!(output.status.success(), "{:?}", output);
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(stderr.contains("Connection successful"), "{:?}", stderr);
+}
+
+#[test_connector(tags(Mssql))]
+fn test_connecting_with_a_non_working_mssql_connection_string(api: TestApi) {
+    let mut non_existing_url: url::Url = api.args.database_url().parse().unwrap();
+
+    non_existing_url.set_path("this_does_not_exist");
+
+    let output = api.run(&["--datasource", &non_existing_url.to_string(), "can-connect-to-database"]);
+    assert_eq!(output.status.code(), Some(1));
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(stderr.contains(r#""error_code":"P1003""#), "{}", stderr);
+}
+
+#[test_connector(tags(Postgres, Mysql, Mssql))]
 fn test_create_database(api: TestApi) {
     let connection_string = api.connection_string();
     let output = api.run(&["--datasource", &connection_string, "drop-database"]);
@@ -151,7 +173,7 @@ fn test_drop_sqlite_database(api: TestApi) {
     assert!(!sqlite_path.exists());
 }
 
-#[test_connector(tags(Mysql, Postgres))]
+#[test_connector(tags(Postgres, Mysql, Mssql))]
 fn test_drop_database(api: TestApi) {
     let connection_string = api.connection_string();
     let output = api.run(&["--datasource", &connection_string, "drop-database"]);
