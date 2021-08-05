@@ -66,25 +66,17 @@ pub fn update_many_records(
 ) -> QueryGraphBuilderResult<()> {
     graph.flag_transactional();
 
+    // "where"
     let filter = match field.arguments.lookup(args::WHERE) {
         Some(where_arg) => extract_filter(where_arg.value.try_into()?, &model)?,
         None => Filter::empty(),
     };
 
+    // "data"
     let data_argument = field.arguments.lookup(args::DATA).unwrap();
     let data_map: ParsedInputMap = data_argument.value.try_into()?;
-    let update_args = WriteArgsParser::from(&model, data_map)?;
 
-    let mut args = update_args.args;
-    args.update_datetimes(Arc::clone(&model));
-
-    let record_filter = filter.into();
-    let update_many = WriteQuery::UpdateManyRecords(UpdateManyRecords {
-        model,
-        record_filter,
-        args,
-    });
-    graph.create_node(Query::Write(update_many));
+    update_many_record_node(graph, connector_ctx, filter, model, data_map)?;
 
     Ok(())
 }
@@ -117,6 +109,41 @@ where
     };
 
     let node = graph.create_node(Query::Write(WriteQuery::UpdateRecord(ur)));
+    for (relation_field, data_map) in update_args.nested {
+        nested::connect_nested_query(graph, connector_ctx, node, relation_field, data_map)?;
+    }
+
+    Ok(node)
+}
+
+/// Creates an update many record query node and adds it to the query graph.
+#[tracing::instrument(skip(graph, connector_ctx, filter, model, data_map))]
+pub fn update_many_record_node<T>(
+    graph: &mut QueryGraph,
+    connector_ctx: &ConnectorContext,
+    filter: T,
+    model: ModelRef,
+    data_map: ParsedInputMap,
+) -> QueryGraphBuilderResult<NodeRef>
+where
+    T: Into<Filter>,
+{
+    graph.flag_transactional();
+
+    let filter = filter.into();
+    let record_filter = filter.into();
+    let update_args = WriteArgsParser::from(&model, data_map)?;
+    let mut args = update_args.args;
+
+    args.update_datetimes(Arc::clone(&model));
+
+    let update_many = UpdateManyRecords {
+        model,
+        record_filter,
+        args,
+    };
+
+    let node = graph.create_node(Query::Write(WriteQuery::UpdateManyRecords(update_many)));
     for (relation_field, data_map) in update_args.nested {
         nested::connect_nested_query(graph, connector_ctx, node, relation_field, data_map)?;
     }
