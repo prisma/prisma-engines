@@ -12,7 +12,7 @@ mod mongodb {
                 #id(id, String, @id)
                 order_lines OrderLine[]
             }
-            
+
             model OrderLine {
                 #id(id, String, @id)
                 external_id String
@@ -31,7 +31,7 @@ mod mongodb {
     async fn nested_update_many_timestamps(runner: &Runner) -> TestResult<()> {
         let resp = run_query_json!(
             runner,
-            r#"mutation { createOneOrder(data: { 
+            r#"mutation { createOneOrder(data: {
                 id: "order_1"
                 order_lines: {
                     create: {
