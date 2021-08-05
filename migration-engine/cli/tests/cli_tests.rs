@@ -140,13 +140,17 @@ fn test_create_database(api: TestApi) {
 
 #[test_connector(tags(Mssql))]
 fn test_create_database_mssql(api: TestApi) {
-    let connection_string = api.connection_string();
+    let connection_string = api
+        .connection_string()
+        .replace("master", "masterNEW")
+        .replace("test_create_database_mssql", "test_create_database_NEW");
 
-    let connection_string = connection_string.replace("master", "masterNEW");
-    let connection_string = connection_string.replace("test_create_database_mssql", "test_create_database_NEW");
+    let output = api.run(&["--datasource", &connection_string, "drop-database"]);
+    assert!(output.status.success());
 
     let output = api.run(&["--datasource", &connection_string, "create-database"]);
     assert!(output.status.success());
+
     let stderr = String::from_utf8_lossy(&output.stderr);
     assert!(stderr.contains("Database 'masterNEW\' was successfully created."));
 
