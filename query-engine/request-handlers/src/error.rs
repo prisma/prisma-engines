@@ -5,11 +5,14 @@ use thiserror::Error;
 #[derive(Debug, Error)]
 pub enum HandlerError {
     #[error("{}", _0)]
-    Core(CoreError),
+    Core(#[from] CoreError),
+
     #[error("{}", _0)]
     Configuration(String),
+
     #[error("{}", _0)]
     QueryConversion(String),
+
     #[error("Unsupported feature: {}. {}", feature_name, message)]
     UnsupportedFeature {
         feature_name: &'static str,

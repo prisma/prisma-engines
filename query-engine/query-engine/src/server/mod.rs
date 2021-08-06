@@ -7,7 +7,7 @@ use datamodel::common::preview_features::PreviewFeature;
 use elapsed_middleware::ElapsedMiddleware;
 use opentelemetry::{global, Context};
 use query_core::{schema::QuerySchemaRenderer, TxId};
-use request_handlers::{dmmf, GraphQLSchemaRenderer, GraphQlBody, GraphQlHandler};
+use request_handlers::{dmmf, GraphQLSchemaRenderer, GraphQlBody, GraphQlHandler, TxInput};
 use serde_json::json;
 use std::{collections::HashMap, sync::Arc};
 use tide::{
@@ -162,6 +162,7 @@ async fn sdl_handler(req: Request<State>) -> tide::Result<impl Into<Response>> {
 async fn dmmf_handler(req: Request<State>) -> tide::Result {
     let result = dmmf::render_dmmf(req.state().cx.datamodel(), Arc::clone(req.state().cx.query_schema()));
     let mut res = Response::new(StatusCode::Ok);
+
     res.set_body(Body::from_json(&result)?);
     Ok(res)
 }
@@ -173,15 +174,6 @@ async fn server_info_handler(req: Request<State>) -> tide::Result<impl Into<Resp
         "version": env!("CARGO_PKG_VERSION"),
         "primary_connector": req.state().cx.primary_connector(),
     }))
-}
-
-#[derive(Debug, Deserialize)]
-struct TxInput {
-    /// Maximum wait time in milliseconds.
-    pub max_wait: u64,
-
-    /// Time in milliseconds after which the transaction rolls back automatically.
-    pub timeout: u64,
 }
 
 async fn transaction_start_handler(mut req: Request<State>) -> tide::Result<impl Into<Response>> {

@@ -4,8 +4,9 @@ use napi::threadsafe_function::ThreadsafeFunction;
 use opentelemetry::global;
 use prisma_models::DatamodelConverter;
 use query_core::{executor, schema_builder, BuildMode, QueryExecutor, QuerySchema, QuerySchemaRenderer, TxId};
-use request_handlers::{GraphQLSchemaRenderer, GraphQlBody, GraphQlHandler, PrismaResponse};
+use request_handlers::{GraphQLSchemaRenderer, GraphQlBody, GraphQlHandler, PrismaResponse, TxInput};
 use serde::{Deserialize, Serialize};
+use serde_json::json;
 use std::{
     collections::{BTreeMap, HashMap},
     path::PathBuf,
@@ -284,12 +285,7 @@ impl QueryEngine {
     }
 
     /// If connected, attempts to start a transaction in the core and returns its ID.
-    pub async fn start_tx(
-        &self,
-        max_acquisition_millis: u64,
-        valid_for_millis: u64,
-        trace: HashMap<String, String>,
-    ) -> crate::Result<String> {
+    pub async fn start_tx(&self, input: TxInput, trace: HashMap<String, String>) -> crate::Result<String> {
         match *self.inner.read().await {
             Inner::Connected(ref engine) => {
                 engine
@@ -300,12 +296,10 @@ impl QueryEngine {
 
                         span.set_parent(cx);
 
-                        let tx_id = engine
-                            .executor()
-                            .start_tx(max_acquisition_millis, valid_for_millis)
-                            .await?;
-
-                        Ok(tx_id.to_string())
+                        match engine.executor().start_tx(input.max_wait, input.timeout).await {
+                            Ok(tx_id) => Ok(json!({ "id": tx_id.to_string() }).to_string()),
+                            Err(err) => Ok(map_known_error(err)?),
+                        }
                     })
                     .await
             }
@@ -314,7 +308,7 @@ impl QueryEngine {
     }
 
     /// If connected, attempts to commit a transaction with id `tx_id` in the core.
-    pub async fn commit_tx(&self, tx_id: String, trace: HashMap<String, String>) -> crate::Result<()> {
+    pub async fn commit_tx(&self, tx_id: String, trace: HashMap<String, String>) -> crate::Result<String> {
         match *self.inner.read().await {
             Inner::Connected(ref engine) => {
                 engine
@@ -325,7 +319,10 @@ impl QueryEngine {
 
                         span.set_parent(cx);
 
-                        Ok(engine.executor().commit_tx(TxId::from(tx_id)).await?)
+                        match engine.executor().commit_tx(TxId::from(tx_id)).await {
+                            Ok(_) => Ok("{}".to_string()),
+                            Err(err) => Ok(map_known_error(err)?),
+                        }
                     })
                     .await
             }
@@ -334,7 +331,7 @@ impl QueryEngine {
     }
 
     /// If connected, attempts to roll back a transaction with id `tx_id` in the core.
-    pub async fn rollback_tx(&self, tx_id: String, trace: HashMap<String, String>) -> crate::Result<()> {
+    pub async fn rollback_tx(&self, tx_id: String, trace: HashMap<String, String>) -> crate::Result<String> {
         match *self.inner.read().await {
             Inner::Connected(ref engine) => {
                 engine
@@ -345,7 +342,10 @@ impl QueryEngine {
 
                         span.set_parent(cx);
 
-                        Ok(engine.executor().rollback_tx(TxId::from(tx_id)).await?)
+                        match engine.executor().rollback_tx(TxId::from(tx_id)).await {
+                            Ok(_) => Ok("{}".to_string()),
+                            Err(err) => Ok(map_known_error(err)?),
+                        }
                     })
                     .await
             }
@@ -360,6 +360,13 @@ impl QueryEngine {
             Inner::Builder(_) => Err(ApiError::NotConnected),
         }
     }
+}
+
+fn map_known_error(err: query_core::CoreError) -> crate::Result<String> {
+    let user_error: user_facing_errors::Error = err.into();
+    let value = serde_json::to_string(&user_error)?;
+
+    Ok(value.to_string())
 }
 
 pub fn set_panic_hook() {
