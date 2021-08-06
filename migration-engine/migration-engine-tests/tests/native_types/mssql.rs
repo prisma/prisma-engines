@@ -1902,7 +1902,7 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
 
             let kind = from.split('(').next().unwrap();
 
-            let dm1 = api.datamodel_with_provider(&format!(
+            let dm1 = &format!(
                 r#"
                model A {{
                     id Int @id @default(autoincrement()) @db.Int
@@ -1911,9 +1911,9 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
                 "#,
                 TYPE_MAPS.get(kind).unwrap(),
                 from,
-            ));
+            );
 
-            api.schema_push(&dm1).send().assert_green_bang();
+            api.schema_push_w_datasource(dm1).send().assert_green_bang();
 
             let insert = Insert::single_into((api.schema_name(), "A")).value("x", seed.clone());
             api.query(insert.into());
@@ -1927,7 +1927,7 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
 
             let kind = to.split('(').next().unwrap();
 
-            let dm2 = api.datamodel_with_provider(&format!(
+            let dm2 = &format!(
                 r#"
                model A {{
                     id Int @id @default(autoincrement()) @db.Int
@@ -1936,9 +1936,9 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
                 "#,
                 TYPE_MAPS.get(kind).unwrap(),
                 to,
-            ));
+            );
 
-            api.schema_push(&dm2).send().assert_green_bang();
+            api.schema_push_w_datasource(dm2).send().assert_green_bang();
 
             api.assert_schema().assert_table("A", |table| {
                 table.assert_columns_count(2).assert_column("x", |c| {
@@ -1960,7 +1960,7 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
 
             let kind = from.split('(').next().unwrap();
 
-            let dm1 = api.datamodel_with_provider(&format!(
+            let dm1 = &format!(
                 r#"
                 model A {{
                     id Int @id @default(autoincrement()) @db.Int
@@ -1969,9 +1969,9 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
                 "#,
                 TYPE_MAPS.get(kind).unwrap(),
                 from,
-            ));
+            );
 
-            api.schema_push(&dm1).send().assert_green_bang();
+            api.schema_push_w_datasource(dm1).send().assert_green_bang();
 
             let insert = Insert::single_into((api.schema_name(), "A")).value("x", seed.clone());
             api.query(insert.into());
@@ -1985,7 +1985,7 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
 
             let kind = to.split('(').next().unwrap();
 
-            let dm2 = api.datamodel_with_provider(&format!(
+            let dm2 = &format!(
                 r#"
                 model A {{
                     id Int @id @default(autoincrement()) @db.Int
@@ -1994,7 +1994,7 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
                 "#,
                 TYPE_MAPS.get(kind).unwrap(),
                 to
-            ));
+            );
 
             let warning = format!(
                 "You are about to alter the column `x` on the `A` table, which contains 1 non-null values. The data in that column will be cast from `{}` to `{}`.",
@@ -2002,7 +2002,9 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
                 to,
             );
 
-            api.schema_push(&dm2).send().assert_warnings(&[warning.into()]);
+            api.schema_push_w_datasource(dm2)
+                .send()
+                .assert_warnings(&[warning.into()]);
 
             api.assert_schema().assert_table("A", |table| {
                 table.assert_columns_count(2).assert_column("x", |c| {
@@ -2027,7 +2029,7 @@ fn not_castable_with_existing_data_should_warn(api: TestApi) {
                 _ => unreachable!(),
             };
 
-            let dm1 = api.datamodel_with_provider(&format!(
+            let dm1 = &format!(
                 r#"
                 model A {{
                     id Int @id @default(autoincrement()) @db.Int
@@ -2036,9 +2038,9 @@ fn not_castable_with_existing_data_should_warn(api: TestApi) {
                 "#,
                 TYPE_MAPS.get(kind).unwrap(),
                 from,
-            ));
+            );
 
-            api.schema_push(&dm1).send().assert_green_bang();
+            api.schema_push_w_datasource(dm1).send().assert_green_bang();
 
             let insert = Insert::single_into((api.schema_name(), "A")).value("x", seed.clone());
             api.query(insert.into());
@@ -2052,7 +2054,7 @@ fn not_castable_with_existing_data_should_warn(api: TestApi) {
 
             let kind = to.split('(').next().unwrap();
 
-            let dm2 = api.datamodel_with_provider(&format!(
+            let dm2 = &format!(
                 r#"
                 model A {{
                     id Int @id @default(autoincrement()) @db.Int
@@ -2061,11 +2063,13 @@ fn not_castable_with_existing_data_should_warn(api: TestApi) {
                 "#,
                 TYPE_MAPS.get(kind).unwrap(),
                 to
-            ));
+            );
 
             let warning = "Changed the type of `x` on the `A` table. No cast exists, the column would be dropped and recreated, which cannot be done since the column is required and there is data in the table.";
 
-            api.schema_push(&dm2).send().assert_unexecutable(&[warning.into()]);
+            api.schema_push_w_datasource(dm2)
+                .send()
+                .assert_unexecutable(&[warning.into()]);
 
             api.assert_schema().assert_table("A", |table| {
                 table.assert_columns_count(2).assert_column("x", |c| {
@@ -2081,8 +2085,7 @@ fn not_castable_with_existing_data_should_warn(api: TestApi) {
 
 #[test_connector(tags(Mssql))]
 fn typescript_starter_schema_with_native_types_is_idempotent(api: TestApi) {
-    let dm = api.datamodel_with_provider(
-        r#"
+    let dm = r#"
         model Post {
             id        Int     @id @default(autoincrement())
             title     String
@@ -2098,11 +2101,9 @@ fn typescript_starter_schema_with_native_types_is_idempotent(api: TestApi) {
             name  String?
             posts Post[]
         }
-        "#,
-    );
+        "#;
 
-    let dm2 = api.datamodel_with_provider(
-        r#"
+    let dm2 = r#"
         model Post {
             id        Int     @id @default(autoincrement()) @db.Int
             title     String  @db.NVarChar(1000)
@@ -2118,20 +2119,19 @@ fn typescript_starter_schema_with_native_types_is_idempotent(api: TestApi) {
             name  String? @db.NVarChar(1000)
             posts Post[]
         }
-        "#,
-    );
+        "#;
 
-    api.schema_push(&dm)
+    api.schema_push_w_datasource(dm)
         .migration_id(Some("first"))
         .send()
         .assert_green_bang()
         .assert_has_executed_steps();
-    api.schema_push(&dm)
+    api.schema_push_w_datasource(dm)
         .migration_id(Some("second"))
         .send()
         .assert_green_bang()
         .assert_no_steps();
-    api.schema_push(&dm2)
+    api.schema_push_w_datasource(dm2)
         .migration_id(Some("third"))
         .send()
         .assert_green_bang()
@@ -2140,8 +2140,7 @@ fn typescript_starter_schema_with_native_types_is_idempotent(api: TestApi) {
 
 #[test_connector(tags(Mssql))]
 fn typescript_starter_schema_with_different_native_types_is_idempotent(api: TestApi) {
-    let dm = api.datamodel_with_provider(
-        r#"
+    let dm = r#"
         model Post {
             id        Int     @id @default(autoincrement())
             title     String
@@ -2157,11 +2156,9 @@ fn typescript_starter_schema_with_different_native_types_is_idempotent(api: Test
             name  String?
             posts Post[]
         }
-        "#,
-    );
+        "#;
 
-    let dm2 = api.datamodel_with_provider(
-        r#"
+    let dm2 = r#"
         model Post {
             id        Int     @id @default(autoincrement()) @db.Int
             title     String  @db.NVarChar(1000)
@@ -2177,26 +2174,25 @@ fn typescript_starter_schema_with_different_native_types_is_idempotent(api: Test
             name  String? @db.NVarChar(100)
             posts Post[]
         }
-        "#,
-    );
+        "#;
 
-    api.schema_push(&dm)
+    api.schema_push_w_datasource(dm)
         .migration_id(Some("first"))
         .send()
         .assert_green_bang()
         .assert_has_executed_steps();
-    api.schema_push(&dm)
+    api.schema_push_w_datasource(dm)
         .migration_id(Some("second"))
         .send()
         .assert_green_bang()
         .assert_no_steps();
 
-    api.schema_push(&dm2)
+    api.schema_push_w_datasource(dm2)
         .migration_id(Some("third"))
         .send()
         .assert_green_bang()
         .assert_has_executed_steps();
-    api.schema_push(&dm2)
+    api.schema_push_w_datasource(dm2)
         .migration_id(Some("fourth"))
         .send()
         .assert_green_bang()

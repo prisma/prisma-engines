@@ -3,11 +3,12 @@ use query_engine_tests::*;
 /// Port note: The `findMany` portion of the old `WhereUniqueSpec` was omitted, didn't add any value.
 #[test_suite(schema(schemas::user))]
 mod where_unique {
+    use query_engine_tests::{assert_error, assert_query};
 
     #[connector_test]
     async fn no_unique_fields(runner: Runner) -> TestResult<()> {
         assert_error!(
-            runner,
+            &runner,
             "query { findUniqueUser(where: {}){ id }}",
             2009,
             "Expected exactly one field to be present, got 0."
@@ -20,7 +21,7 @@ mod where_unique {
     async fn one_unique_field(runner: Runner) -> TestResult<()> {
         test_users(&runner).await?;
         assert_query!(
-            runner,
+            &runner,
             "query { findUniqueUser(where: { id: 1 }){ id }}",
             r#"{"data":{"findUniqueUser":{"id":1}}}"#
         );
@@ -45,7 +46,7 @@ mod where_unique {
     async fn implicit_unique_and(runner: Runner) -> TestResult<()> {
         test_users(&runner).await?;
         assert_query!(
-            runner,
+            &runner,
             "query { findUniqueUser(where: { id: 1 }){ id }}",
             r#"{"data":{"findUniqueUser":{"id":1}}}"#
         );

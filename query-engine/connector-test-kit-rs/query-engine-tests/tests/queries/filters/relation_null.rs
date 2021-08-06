@@ -1,8 +1,10 @@
-use indoc::indoc;
 use query_engine_tests::*;
 
 #[test_suite(schema(schema))]
 mod relation_is_null {
+    use indoc::indoc;
+    use query_engine_tests::run_query;
+
     fn schema() -> String {
         let schema = indoc! {
             r#"
@@ -41,7 +43,7 @@ mod relation_is_null {
         Ok(())
     }
 
-    async fn test_data(runner: &Runner) -> TestResult<()> {
+    async fn test_data(runner: Runner) -> TestResult<()> {
         runner
             .query(r#"mutation { createOneMessage(data: { messageName: "message 1"}) { messageName }}"#)
             .await?

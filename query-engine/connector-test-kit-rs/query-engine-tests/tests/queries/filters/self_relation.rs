@@ -1,9 +1,9 @@
-use indoc::indoc;
 use query_engine_tests::*;
 
-#[test_suite(schema(schema), exclude(SqlServer))]
+#[test_suite(schema(schema))]
 mod self_relation_filters {
-    use query_engine_tests::assert_error;
+    use indoc::indoc;
+    use query_engine_tests::{assert_error, run_query};
 
     fn schema() -> String {
         let schema = indoc! {
@@ -18,11 +18,11 @@ mod self_relation_filters {
                 title_id   String?
 
                 husband       Human? @relation(name: "Marriage")
-                wife          Human? @relation(name: "Marriage",  fields: [wife_id],   references: [id])
-                mother        Human? @relation(name: "Cuckoo",    fields: [mother_id], references: [id])
-                father        Human? @relation(name: "Offspring", fields: [father_id], references: [id])
-                singer        Human? @relation(name: "Team",      fields: [singer_id], references: [id])
-                title         Song?  @relation(                   fields: [title_id],  references: [id])
+                wife          Human? @relation(name: "Marriage",  fields: [wife_id],   references: [id], onDelete: NoAction, onUpdate: NoAction)
+                mother        Human? @relation(name: "Cuckoo",    fields: [mother_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+                father        Human? @relation(name: "Offspring", fields: [father_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+                singer        Human? @relation(name: "Team",      fields: [singer_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+                title         Song?  @relation(                   fields: [title_id],  references: [id], onDelete: NoAction, onUpdate: NoAction)
 
                 daughters     Human[] @relation(name: "Offspring")
                 stepdaughters Human[] @relation(name: "Cuckoo")
@@ -44,9 +44,9 @@ mod self_relation_filters {
     }
 
     // Filter Queries along self relations should succeed with one level.
-    #[connector_test]
+    #[connector_test(exclude(SqlServer))]
     async fn l1_query(runner: Runner) -> TestResult<()> {
-        test_data(&runner).await?;
+        test_data(runner).await?;
 
         insta::assert_snapshot!(
           run_query!(&runner, indoc! { r#"
@@ -63,9 +63,9 @@ mod self_relation_filters {
     }
 
     // Filter Queries along self relations should succeed with two levels.
-    #[connector_test]
+    #[connector_test(exclude(SqlServer))]
     async fn l2_query(runner: Runner) -> TestResult<()> {
-        test_data(&runner).await?;
+        test_data(runner).await?;
 
         insta::assert_snapshot!(
           run_query!(&runner, indoc! { r#"
@@ -86,9 +86,9 @@ mod self_relation_filters {
     }
 
     // Filter Queries along OneToOne self relations should succeed with two levels.
-    #[connector_test]
+    #[connector_test(exclude(SqlServer))]
     async fn l2_one2one(runner: Runner) -> TestResult<()> {
-        test_data(&runner).await?;
+        test_data(runner).await?;
 
         insta::assert_snapshot!(
           run_query!(&runner, indoc! { r#"
@@ -107,9 +107,9 @@ mod self_relation_filters {
     }
 
     // Filter Queries along OneToOne self relations should succeed with null filter.
-    #[connector_test]
+    #[connector_test(exclude(SqlServer))]
     async fn one2one_null(runner: Runner) -> TestResult<()> {
-        test_data(&runner).await?;
+        test_data(runner).await?;
 
         insta::assert_snapshot!(
           run_query!(&runner, indoc! { r#"
@@ -126,9 +126,9 @@ mod self_relation_filters {
     }
 
     // Filter Queries along OneToOne self relations should succeed with {} filter.
-    #[connector_test]
+    #[connector_test(exclude(SqlServer))]
     async fn one2one_empty(runner: Runner) -> TestResult<()> {
-        test_data(&runner).await?;
+        test_data(runner).await?;
 
         insta::assert_snapshot!(
           run_query!(&runner, indoc! { r#"
@@ -145,9 +145,9 @@ mod self_relation_filters {
     }
 
     // Filter Queries along OneToMany self relations should fail with null filter.
-    #[connector_test]
+    #[connector_test(exclude(SqlServer))]
     async fn one2one_null_fail(runner: Runner) -> TestResult<()> {
-        test_data(&runner).await?;
+        test_data(runner).await?;
 
         assert_error!(
             runner,
@@ -167,9 +167,9 @@ mod self_relation_filters {
     }
 
     // Filter Queries along OneToMany self relations should succeed with empty filter (`{}`).
-    #[connector_test]
+    #[connector_test(exclude(SqlServer))]
     async fn one2many_empty(runner: Runner) -> TestResult<()> {
-        test_data(&runner).await?;
+        test_data(runner).await?;
 
         insta::assert_snapshot!(
           run_query!(&runner, indoc! { r#"
@@ -186,9 +186,9 @@ mod self_relation_filters {
     }
 
     // Filter Queries along ManyToMany self relations should succeed with valid filter `some`.
-    #[connector_test]
+    #[connector_test(exclude(SqlServer))]
     async fn many2many_some(runner: Runner) -> TestResult<()> {
-        test_data(&runner).await?;
+        test_data(runner).await?;
 
         insta::assert_snapshot!(
           run_query!(&runner, indoc! { r#"
@@ -208,9 +208,9 @@ mod self_relation_filters {
     }
 
     // Filter Queries along ManyToMany self relations should succeed with valid filter `none`.
-    #[connector_test]
+    #[connector_test(exclude(SqlServer))]
     async fn many2many_none(runner: Runner) -> TestResult<()> {
-        test_data(&runner).await?;
+        test_data(runner).await?;
 
         insta::assert_snapshot!(
           run_query!(&runner, indoc! { r#"
@@ -227,9 +227,9 @@ mod self_relation_filters {
     }
 
     // Filter Queries along ManyToMany self relations should succeed with valid filter `every`.
-    #[connector_test]
+    #[connector_test(exclude(SqlServer))]
     async fn many2many_every(runner: Runner) -> TestResult<()> {
-        test_data(&runner).await?;
+        test_data(runner).await?;
 
         insta::assert_snapshot!(
           run_query!(&runner, indoc! { r#"
@@ -246,9 +246,9 @@ mod self_relation_filters {
     }
 
     // Filter Queries along ManyToMany self relations should give an error with null.
-    #[connector_test]
+    #[connector_test(exclude(SqlServer))]
     async fn many2many_null_error(runner: Runner) -> TestResult<()> {
-        test_data(&runner).await?;
+        test_data(runner).await?;
 
         assert_error!(
             runner,
@@ -269,9 +269,9 @@ mod self_relation_filters {
     }
 
     // Filter Queries along ManyToMany self relations should succeed with {} filter `some`.
-    #[connector_test]
+    #[connector_test(exclude(SqlServer))]
     async fn many2many_empty_some(runner: Runner) -> TestResult<()> {
-        test_data(&runner).await?;
+        test_data(runner).await?;
 
         insta::assert_snapshot!(
           run_query!(&runner, indoc! { r#"
@@ -288,9 +288,9 @@ mod self_relation_filters {
     }
 
     // Filter Queries along ManyToMany self relations should succeed with {} filter `none`.
-    #[connector_test]
+    #[connector_test(exclude(SqlServer))]
     async fn many2many_empty_none(runner: Runner) -> TestResult<()> {
-        test_data(&runner).await?;
+        test_data(runner).await?;
 
         // Note: Result ordering changed for the ported tests, but the result is correct.
         insta::assert_snapshot!(
@@ -308,9 +308,9 @@ mod self_relation_filters {
     }
 
     // Filter Queries along ManyToMany self relations should succeed with {} filter `every`.
-    #[connector_test]
+    #[connector_test(exclude(SqlServer))]
     async fn many2many_empty_every(runner: Runner) -> TestResult<()> {
-        test_data(&runner).await?;
+        test_data(runner).await?;
 
         // Note: Result ordering changed for the ported tests, but the result is correct.
         insta::assert_snapshot!(
@@ -328,9 +328,9 @@ mod self_relation_filters {
     }
 
     // Filter Queries along ManyToOne self relations should succeed valid filter.
-    #[connector_test]
+    #[connector_test(exclude(SqlServer))]
     async fn many2one(runner: Runner) -> TestResult<()> {
-        test_data(&runner).await?;
+        test_data(runner).await?;
 
         insta::assert_snapshot!(
           run_query!(&runner, indoc! { r#"
@@ -347,9 +347,9 @@ mod self_relation_filters {
     }
 
     // Filter Queries along ManyToOne self relations should succeed with {} filter.
-    #[connector_test]
+    #[connector_test(exclude(SqlServer))]
     async fn many2one_empty_filter(runner: Runner) -> TestResult<()> {
-        test_data(&runner).await?;
+        test_data(runner).await?;
 
         insta::assert_snapshot!(
           run_query!(&runner, indoc! { r#"
@@ -366,9 +366,9 @@ mod self_relation_filters {
     }
 
     // Filter Queries along ManyToOne self relations should succeed with null filter.
-    #[connector_test]
+    #[connector_test(exclude(SqlServer))]
     async fn many2one_null_filter(runner: Runner) -> TestResult<()> {
-        test_data(&runner).await?;
+        test_data(runner).await?;
 
         insta::assert_snapshot!(
           run_query!(&runner, indoc! { r#"
@@ -384,7 +384,7 @@ mod self_relation_filters {
         Ok(())
     }
 
-    async fn test_data(runner: &Runner) -> TestResult<()> {
+    async fn test_data(runner: Runner) -> TestResult<()> {
         runner
             .query(r#"mutation { createOneHuman(data: { id: "1", name: "paul" }) { id }}"#)
             .await?

@@ -2,7 +2,7 @@ use barrel::types;
 use indoc::formatdoc;
 use indoc::indoc;
 use introspection_engine_tests::{assert_eq_json, test_api::*};
-use quaint::prelude::{Queryable, SqlFamily};
+use quaint::prelude::Queryable;
 use serde_json::json;
 use test_macros::test_connector;
 
@@ -1164,7 +1164,7 @@ async fn multiple_changed_relation_names_due_to_mapped_models(api: &TestApi) -> 
 }
 
 #[test_connector(tags(Postgres))]
-async fn virtual_cuid_default(api: &TestApi) -> TestResult {
+async fn virtual_cuid_default(api: &TestApi) {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -1180,18 +1180,24 @@ async fn virtual_cuid_default(api: &TestApi) -> TestResult {
                 t.add_column("id", types::primary());
             });
         })
-        .await?;
+        .await
+        .unwrap();
 
-    let input_dm = indoc! {r#"
-        model User {
+    let input_dm = format!(
+        r#"
+        {datasource}
+
+        model User {{
             id        String    @id @default(cuid()) @db.VarChar(30)
             non_id    String    @default(cuid()) @db.VarChar(30)
-        }
+        }}
 
-        model User2 {
+        model User2 {{
             id        String    @id @default(uuid()) @db.VarChar(36)
-        }
-    "#};
+        }}
+        "#,
+        datasource = api.datasource_block()
+    );
 
     let final_dm = indoc! {r#"
         model User {
@@ -1208,9 +1214,7 @@ async fn virtual_cuid_default(api: &TestApi) -> TestResult {
         }
     "#};
 
-    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
-
-    Ok(())
+    api.assert_eq_datamodels(final_dm, &api.re_introspect(&input_dm).await.unwrap());
 }
 
 #[test_connector(tags(Postgres))]
@@ -1282,7 +1286,7 @@ async fn comments_should_be_kept(api: &TestApi) -> TestResult {
 }
 
 #[test_connector]
-async fn updated_at(api: &TestApi) -> TestResult {
+async fn updated_at(api: &TestApi) {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", move |t| {
@@ -1294,7 +1298,8 @@ async fn updated_at(api: &TestApi) -> TestResult {
                 t.add_column("id", types::primary());
             });
         })
-        .await?;
+        .await
+        .unwrap();
 
     let native_datetime = if api.sql_family().is_postgres() {
         "@db.Timestamp(6)"
@@ -1304,12 +1309,15 @@ async fn updated_at(api: &TestApi) -> TestResult {
         ""
     };
     let input_dm = formatdoc! {r#"
+        {datasource}
+
         model User {{
             id           Int @id @default(autoincrement())
             lastupdated  DateTime?  @updatedAt {native_datetime}
         }}
         "#,
         native_datetime = native_datetime,
+        datasource = api.datasource_block(),
     };
 
     let final_dm = formatdoc! {r#"
@@ -1325,13 +1333,11 @@ async fn updated_at(api: &TestApi) -> TestResult {
         native_datetime = native_datetime,
     };
 
-    api.assert_eq_datamodels(&final_dm, &api.re_introspect(&input_dm).await?);
-
-    Ok(())
+    api.assert_eq_datamodels(&final_dm, &api.re_introspect(&input_dm).await.unwrap());
 }
 
 #[test_connector(tags(Mssql))]
-async fn updated_at_with_native_types_on(api: &TestApi) -> TestResult {
+async fn updated_at_with_native_types_on(api: &TestApi) {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", move |t| {
@@ -1344,9 +1350,15 @@ async fn updated_at_with_native_types_on(api: &TestApi) -> TestResult {
                 t.add_column("id", types::primary());
             });
         })
-        .await?;
+        .await
+        .unwrap();
 
     let input_dm = indoc! {r#"
+        datasource db {
+            provider = "sqlserver"
+            url = env("TEST_DATABASE_URL")
+        }
+
         model User {
             id           Int    @id
             lastupdated  DateTime? @updatedAt
@@ -1366,9 +1378,7 @@ async fn updated_at_with_native_types_on(api: &TestApi) -> TestResult {
         }
     "#};
 
-    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
-
-    Ok(())
+    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await.unwrap());
 }
 
 #[test_connector]
@@ -1728,273 +1738,165 @@ async fn do_not_try_to_keep_custom_many_to_many_self_relation_names(api: &TestAp
     Ok(())
 }
 
-#[test_connector]
-async fn legacy_referential_actions(api: &TestApi) -> TestResult {
-    let family = api.sql_family();
-
-    api.barrel()
-        .execute(move |migration| {
-            migration.create_table("a", |t| {
-                t.add_column("id", types::primary());
-            });
-
-            migration.create_table("b", move |t| {
-                t.add_column("id", types::primary());
-                t.add_column("a_id", types::integer().nullable(false));
-
-                match family {
-                    SqlFamily::Mssql => {
-                        t.inject_custom(
-                            "CONSTRAINT asdf FOREIGN KEY (a_id) REFERENCES legacy_referential_actions.a(id) ON DELETE NO ACTION ON UPDATE NO ACTION",
-                        );
-                    }
-                    _ => {
-                        t.inject_custom(
-                            "CONSTRAINT asdf FOREIGN KEY (a_id) REFERENCES a(id) ON DELETE NO ACTION ON UPDATE NO ACTION",
-                        );
-                    }
-                }
-            });
-        })
-        .await?;
-
-    let extra_index = if api.sql_family().is_mysql() {
-        r#"@@index([a_id], name: "asdf")"#
-    } else {
-        ""
-    };
-
-    let input_dm = formatdoc! {r#"
-        model a {{
-            id Int @id @default(autoincrement())
-            bs b[] @relation("changed")
-        }}
-
-        model b {{
-            id Int @id @default(autoincrement())
-            a_id Int
-            a a @relation("changed", fields: [a_id], references: [id])
-            {}
-        }}
-    "#, extra_index};
-
-    api.assert_eq_datamodels(&input_dm, &api.re_introspect(&input_dm).await?);
-
-    Ok(())
-}
-
-#[test_connector]
-async fn referential_actions(api: &TestApi) -> TestResult {
-    let family = api.sql_family();
-
-    api.barrel()
-        .execute(move |migration| {
-            migration.create_table("a", |t| {
-                t.add_column("id", types::primary());
-            });
-
-            migration.create_table("b", move |t| {
-                t.add_column("id", types::primary());
-                t.add_column("a_id", types::integer().nullable(false));
-
-                match family {
-                    SqlFamily::Mssql => {
-                        t.inject_custom(
-                            "CONSTRAINT asdf FOREIGN KEY (a_id) REFERENCES referential_actions.a(id) ON DELETE CASCADE ON UPDATE NO ACTION",
-                        );
-                    }
-                    _ => {
-                        t.inject_custom(
-                            "CONSTRAINT asdf FOREIGN KEY (a_id) REFERENCES a(id) ON DELETE CASCADE ON UPDATE NO ACTION",
-                        );
-                    }
-                }
-            });
-        })
-        .await?;
-
-    let extra_index = if api.sql_family().is_mysql() {
-        r#"@@index([a_id], name: "asdf")"#
-    } else {
-        ""
-    };
-
-    let input_dm = formatdoc! {r#"
-        generator client {{
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
-        }}
-
-        model a {{
-            id Int @id @default(autoincrement())
-            bs b[]
-        }}
-
-        model b {{
-            id Int @id @default(autoincrement())
-            a_id Int
-            a a @relation(fields: [a_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-            {}
-        }}
-    "#, extra_index};
-
-    api.assert_eq_datamodels(&input_dm, &api.re_introspect(&input_dm).await?);
-
-    Ok(())
-}
-
-#[test_connector(tags(Postgres, Mysql, Sqlite))]
-async fn default_referential_actions_with_restrict(api: &TestApi) -> TestResult {
+#[test_connector(tags(Postgres, Mssql), preview_features("NamedConstraints"))]
+async fn re_introspecting_custom_compound_unique_names(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
-            migration.create_table("a", |t| {
-                t.add_column("id", types::primary());
+            migration.create_table("User", |t| {
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
+                t.add_column("first", types::integer());
+                t.add_column("last", types::integer());
+                t.add_index(
+                    "User.something@invalid-and/weird",
+                    types::index(&["first", "last"]).unique(true),
+                );
             });
 
-            migration.create_table("b", |t| {
-                t.add_column("id", types::primary());
-                t.add_column("a_id", types::integer().nullable(false));
-                t.inject_custom(
-                    "CONSTRAINT asdf FOREIGN KEY (a_id) REFERENCES a(id) ON DELETE RESTRICT ON UPDATE CASCADE",
-                );
+            migration.create_table("Unrelated", |t| {
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("Unrelated_pkey", types::primary_constraint(&["id"]));
             });
         })
         .await?;
 
-    let extra_index = if api.sql_family().is_mysql() {
-        r#"@@index([a_id], name: "asdf")"#
-    } else {
-        ""
-    };
-
-    let input_dm = formatdoc! {r#"
-        generator client {{
+    let input_dm = indoc! {r#"
+         generator js {
             provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
-        }}
+            previewFeatures = ["NamedConstraints"]
+         }
+         
+         model User {
+             id     Int @id @default(autoincrement()) 
+             first  Int
+             last   Int
 
-        model a {{
-            id Int @id @default(autoincrement())
-            bs b[]
-        }}
+             @@unique([first, last], name: "compound", map: "User.something@invalid-and/weird")
+         }
+     "#};
 
-        model b {{
-            id Int @id @default(autoincrement())
-            a_id Int
-            a a @relation(fields: [a_id], references: [id])
-            {}
-        }}
-    "#, extra_index};
+    let final_dm = indoc! {r#"
+         generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["NamedConstraints"]
+         }   
+    
+         model User {
+             id     Int @id @default(autoincrement()) 
+             first  Int
+             last   Int
 
-    api.assert_eq_datamodels(&input_dm, &api.re_introspect(&input_dm).await?);
+             @@unique([first, last], name: "compound", map: "User.something@invalid-and/weird")
+         }
+
+         model Unrelated {
+             id    Int @id @default(autoincrement())
+         }
+     "#};
+
+    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
+
+    let expected = json!([{
+        "code": 17,
+        "message": "These Indices were enriched with custom index names taken from the previous Prisma schema.",
+        "affected" :[
+            {"model": "User", "index_db_name": "User.something@invalid-and/weird"},
+        ]
+    }]);
+
+    assert_eq_json!(expected, api.re_introspect_warnings(&input_dm).await?);
 
     Ok(())
 }
 
-#[test_connector(tags(Mssql))]
-async fn default_referential_actions_without_restrict(api: &TestApi) -> TestResult {
+#[test_connector(tags(Postgres, Mssql), preview_features("NamedConstraints"))]
+async fn re_introspecting_custom_compound_id_names(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
-            migration.create_table("a", |t| {
-                t.add_column("id", types::primary());
-            });
-
-            migration.create_table("b", |t| {
-                t.add_column("id", types::primary());
-                t.add_column("a_id", types::integer().nullable(false));
-                t.inject_custom(
-                    "CONSTRAINT asdf FOREIGN KEY (a_id) REFERENCES default_referential_actions_without_restrict.a(id) ON DELETE NO ACTION ON UPDATE CASCADE",
+            migration.create_table("User", |t| {
+                t.add_column("first", types::integer());
+                t.add_column("last", types::integer());
+                t.add_constraint(
+                    "User.something@invalid-and/weird",
+                    types::primary_constraint(&["first", "last"]),
                 );
             });
-        })
-        .await?;
 
-    let extra_index = if api.sql_family().is_mysql() {
-        r#"@@index([a_id], name: "asdf")"#
-    } else {
-        ""
-    };
-
-    let input_dm = formatdoc! {r#"
-        generator client {{
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
-        }}
-
-        model a {{
-            id Int @id @default(autoincrement())
-            bs b[]
-        }}
-
-        model b {{
-            id Int @id @default(autoincrement())
-            a_id Int
-            a a @relation(fields: [a_id], references: [id])
-            {}
-        }}
-    "#, extra_index};
-
-    api.assert_eq_datamodels(&input_dm, &api.re_introspect(&input_dm).await?);
-
-    Ok(())
-}
-
-#[test_connector]
-async fn default_optional_actions(api: &TestApi) -> TestResult {
-    let family = api.sql_family();
-
-    api.barrel()
-        .execute(move |migration| {
-            migration.create_table("a", |t| {
-                t.add_column("id", types::primary());
+            migration.create_table("User2", |t| {
+                t.add_column("first", types::integer());
+                t.add_column("last", types::integer());
+                t.add_constraint("User2_pkey", types::primary_constraint(&["first", "last"]));
             });
 
-            migration.create_table("b", move |t| {
-                t.add_column("id", types::primary());
-                t.add_column("a_id", types::integer().nullable(true));
-
-                match family {
-                    SqlFamily::Mssql => {
-                        t.inject_custom(
-                            "CONSTRAINT asdf FOREIGN KEY (a_id) REFERENCES default_optional_actions.a(id) ON DELETE SET NULL ON UPDATE CASCADE",
-                        );
-                    }
-                    _ => {
-                        t.inject_custom(
-                            "CONSTRAINT asdf FOREIGN KEY (a_id) REFERENCES a(id) ON DELETE SET NULL ON UPDATE CASCADE",
-                        );
-                    }
-                }
+            migration.create_table("Unrelated", |t| {
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("Unrelated_pkey", types::primary_constraint(&["id"]));
             });
         })
         .await?;
 
-    let extra_index = if api.sql_family().is_mysql() {
-        r#"@@index([a_id], name: "asdf")"#
-    } else {
-        ""
-    };
-
-    let input_dm = formatdoc! {r#"
-        generator client {{
+    let input_dm = api.dm_with_sources(
+        r#"
+         generator js {
             provider = "prisma-client-js"
-            previewFeatures = ["referentialActions"]
-        }}
+            previewFeatures = ["NamedConstraints"]
+         }
+    
+         model User {
+             first  Int
+             last   Int
 
-        model a {{
-            id Int @id @default(autoincrement())
-            bs b[]
-        }}
+             @@id([first, last], name: "compound", map: "User.something@invalid-and/weird")
+         }
+         
+         model User2 {
+             first  Int
+             last   Int
 
-        model b {{
-            id Int @id @default(autoincrement())
-            a_id Int?
-            a a? @relation(fields: [a_id], references: [id])
-            {}
-        }}
-    "#, extra_index};
+             @@id([first, last], name: "compound")
+         }
+     "#,
+    );
 
-    api.assert_eq_datamodels(&input_dm, &api.re_introspect(&input_dm).await?);
+    let final_dm = r#"
+         generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["NamedConstraints"]
+         }
+         
+         model User {
+             first  Int
+             last   Int
+
+             @@id([first, last], name: "compound", map: "User.something@invalid-and/weird")
+         }
+         
+         model User2 {
+             first  Int
+             last   Int
+
+             @@id([first, last], name: "compound")
+         }
+
+         model Unrelated {
+             id    Int @id @default(autoincrement())
+         }
+     "#;
+
+    let re_introspected = api.re_introspect(&input_dm).await?;
+
+    api.assert_eq_datamodels(&final_dm, &re_introspected);
+
+    let expected = json!([{
+        "code": 18,
+        "message": "These models were enriched with custom compound id names taken from the previous Prisma schema.",
+        "affected" :[
+            {"model": "User"},
+            {"model": "User2"}
+        ]
+    }]);
+
+    assert_eq_json!(expected, api.re_introspect_warnings(&input_dm).await?);
 
     Ok(())
 }

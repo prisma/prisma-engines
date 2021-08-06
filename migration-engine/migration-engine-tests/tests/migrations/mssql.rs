@@ -1,6 +1,33 @@
 use migration_engine_tests::sync_test_api::*;
 
 #[test_connector(tags(Mssql))]
+fn reset_clears_udts(api: TestApi) {
+    let schema = api.schema_name();
+
+    api.raw_cmd(&format!("CREATE TYPE {}.[testType] AS TABLE (FooBar INT)", schema));
+
+    let schemas = api.query_raw(
+        &format!(
+            "SELECT * FROM sys.types WHERE SCHEMA_NAME(schema_id) = '{}' and NAME = 'testType'",
+            schema
+        ),
+        &[],
+    );
+    assert_eq!(1, schemas.len());
+
+    api.reset().send_sync();
+
+    let schemas = api.query_raw(
+        &format!(
+            "SELECT * FROM sys.types WHERE SCHEMA_NAME(schema_id) = '{}' and NAME = 'testType'",
+            schema
+        ),
+        &[],
+    );
+    assert_eq!(0, schemas.len());
+}
+
+#[test_connector(tags(Mssql))]
 fn shared_default_constraints_are_ignored_issue_5423(api: TestApi) {
     let schema = api.schema_name();
 
@@ -18,16 +45,14 @@ fn shared_default_constraints_are_ignored_issue_5423(api: TestApi) {
 
     api.raw_cmd(&format!("sp_bindefault '{0}.catcat', '{0}.cats.name'", schema));
 
-    let dm = api.datamodel_with_provider(
-        r#"
+    let dm = r#"
         model cats {
             id Int @id @default(autoincrement())
             name String @db.NVarChar(255)
         }
-    "#,
-    );
+    "#;
 
-    api.schema_push(dm)
+    api.schema_push_w_datasource(dm)
         .migration_id(Some("first"))
         .send()
         .assert_green_bang()

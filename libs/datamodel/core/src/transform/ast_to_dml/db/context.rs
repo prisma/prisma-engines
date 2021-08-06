@@ -104,11 +104,6 @@ impl<'ast> Context<'ast> {
         f(&mut attributes, self);
 
         for attribute in attributes.unused_attributes() {
-            // Native types...
-            if attribute.name.name.contains('.') {
-                continue;
-            }
-
             self.push_error(DatamodelError::new_attribute_not_known_error(
                 &attribute.name.name,
                 attribute.name.span,
@@ -136,5 +131,9 @@ impl<'ast> Context<'ast> {
         arguments.check_for_unused_arguments(&mut self.diagnostics);
 
         self.arguments = arguments;
+    }
+
+    pub(crate) fn is_sql_server(&self) -> bool {
+        matches!(self.db.datasource, Some(src) if src.active_provider == "sqlserver")
     }
 }

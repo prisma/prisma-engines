@@ -1,8 +1,9 @@
-use indoc::indoc;
 use query_engine_tests::*;
 
 #[test_suite(schema(schema), capabilities(AnyId))]
 mod compound_batch {
+    use indoc::indoc;
+
     fn schema() -> String {
         let schema = indoc! {
             r#"model Artist {
@@ -126,7 +127,7 @@ mod compound_batch {
         Ok(())
     }
 
-    async fn create_test_data(runner: &Runner) -> TestResult<()> {
+    async fn create_test_data(runner: Runner) -> TestResult<()> {
         runner
             .query(r#"mutation { createOneArtist(data: { firstName: "Musti" lastName: "Naukio" }) { firstName }}"#)
             .await?

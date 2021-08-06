@@ -1,8 +1,10 @@
-use indoc::indoc;
 use query_engine_tests::*;
 
 #[test_suite(schema(common_list_types), capabilities(ScalarLists))]
 mod lists {
+    use indoc::indoc;
+    use query_engine_tests::run_query;
+
     #[connector_test]
     async fn equality(runner: Runner) -> TestResult<()> {
         test_data(&runner).await?;
@@ -159,7 +161,7 @@ mod lists {
         Ok(())
     }
 
-    async fn test_data(runner: &Runner) -> TestResult<()> {
+    async fn test_data(runner: Runner) -> TestResult<()> {
         runner
             .query(indoc::indoc! { r#"
               mutation {
@@ -204,6 +206,8 @@ mod lists {
 
 #[test_suite(schema(schema), capabilities(ScalarLists, Json))]
 mod json_lists {
+    use indoc::indoc;
+
     fn schema() -> String {
         let schema = indoc! {
             r#"model TestModel {
@@ -267,7 +271,7 @@ mod json_lists {
         Ok(())
     }
 
-    async fn test_data(runner: &Runner) -> TestResult<()> {
+    async fn test_data(runner: Runner) -> TestResult<()> {
         runner
             .query(indoc::indoc! { r#"
               mutation {
@@ -298,6 +302,8 @@ mod json_lists {
 
 #[test_suite(schema(schema), capabilities(ScalarLists, Enums))]
 mod enum_lists {
+    use indoc::indoc;
+
     fn schema() -> String {
         let schema = indoc! {
             r#"
@@ -358,7 +364,7 @@ mod enum_lists {
         Ok(())
     }
 
-    async fn test_data(runner: &Runner) -> TestResult<()> {
+    async fn test_data(runner: Runner) -> TestResult<()> {
         runner
             .query(indoc::indoc! { r#"
               mutation {

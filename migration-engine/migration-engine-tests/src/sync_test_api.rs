@@ -5,7 +5,10 @@ pub use test_setup::{BitFlags, Capabilities, Tags};
 
 use crate::{commands::*, multi_engine_test_api::TestApi as RootTestApi};
 use migration_connector::MigrationPersistence;
-use quaint::prelude::{ConnectionInfo, ResultSet};
+use quaint::{
+    prelude::{ConnectionInfo, ResultSet},
+    Value,
+};
 use sql_migration_connector::SqlMigrationConnector;
 use std::{borrow::Cow, future::Future};
 use tempfile::TempDir;
@@ -196,6 +199,14 @@ impl TestApi {
         self.root.block_on(self.connector.queryable().query(q)).unwrap()
     }
 
+    /// Like quaint::Queryable::query_raw()
+    #[track_caller]
+    pub fn query_raw(&self, q: &str, params: &[Value<'static>]) -> ResultSet {
+        self.root
+            .block_on(self.connector.queryable().query_raw(q, params))
+            .unwrap()
+    }
+
     /// Send a SQL command to the database, and expect it to succeed.
     #[track_caller]
     pub fn raw_cmd(&self, sql: &str) {
@@ -214,6 +225,11 @@ impl TestApi {
     /// Plan a `reset` command
     pub fn reset(&self) -> Reset<'_> {
         Reset::new_sync(&self.connector, &self.root.rt)
+    }
+
+    /// Plan a `schemaPush` command adding the datasource
+    pub fn schema_push_w_datasource(&self, dm: impl Into<String>) -> SchemaPush<'_> {
+        SchemaPush::new(&self.connector, self.datamodel_with_provider(&dm.into()), &self.root.rt)
     }
 
     /// Plan a `schemaPush` command
@@ -235,10 +251,35 @@ impl TestApi {
         .unwrap()
     }
 
+    fn generator_block(&self) -> String {
+        let preview_features: Vec<String> = self
+            .root
+            .args
+            .preview_features()
+            .iter()
+            .map(|pf| format!(r#""{}""#, pf))
+            .collect();
+
+        let preview_feature_string = if preview_features.is_empty() {
+            "".to_string()
+        } else {
+            format!("\npreviewFeatures = [{}]", preview_features.join(", "))
+        };
+
+        let generator_block = format!(
+            r#"generator client {{
+                 provider = "prisma-client-js"{}
+               }}"#,
+            preview_feature_string
+        );
+        generator_block
+    }
+
     pub fn datamodel_with_provider(&self, schema: &str) -> String {
         let mut out = String::with_capacity(320 + schema.len());
 
         self.write_datasource_block(&mut out);
+        out.push_str(&self.generator_block());
         out.push_str(schema);
 
         out

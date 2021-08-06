@@ -140,13 +140,16 @@ impl SqlRenderer for PostgresFlavour {
             let affected_columns = walk_columns(schemas.next()).filter(|column| matches!(&column.column_type().family, ColumnTypeFamily::Enum(name) if name.as_str() == enums.next().name()));
 
             for column in affected_columns {
+                let array = if column.arity().is_list() { "[]" } else { "" };
+
                 let sql = format!(
                     "ALTER TABLE {table_name} \
-                            ALTER COLUMN {column_name} TYPE {tmp_name} \
-                                USING ({column_name}::text::{tmp_name})",
+                            ALTER COLUMN {column_name} TYPE {tmp_name}{array} \
+                                USING ({column_name}::text::{tmp_name}{array})",
                     table_name = Quoted::postgres_ident(column.table().name()),
                     column_name = Quoted::postgres_ident(column.name()),
                     tmp_name = Quoted::postgres_ident(&tmp_name),
+                    array = array,
                 );
 
                 stmts.push(sql);
@@ -221,7 +224,7 @@ impl SqlRenderer for PostgresFlavour {
         stmts
     }
 
-    fn render_alter_index(&self, indexes: Pair<&IndexWalker<'_>>) -> Vec<String> {
+    fn render_rename_index(&self, indexes: Pair<&IndexWalker<'_>>) -> Vec<String> {
         vec![format!(
             "ALTER INDEX {} RENAME TO {}",
             self.quote(indexes.previous().name()),
@@ -253,16 +256,41 @@ impl SqlRenderer for PostgresFlavour {
                             .expect("Missing constraint name for DROP CONSTRAINT on Postgres.")
                     )
                 )),
-                TableChange::AddPrimaryKey => lines.push(format!(
-                    "ADD PRIMARY KEY ({})",
-                    tables
-                        .next()
-                        .primary_key_column_names()
-                        .iter()
-                        .flat_map(|c| c.iter())
-                        .map(|colname| self.quote(colname))
-                        .join(", ")
+                TableChange::RenamePrimaryKey => lines.push(format!(
+                    "RENAME CONSTRAINT {} TO {}",
+                    Quoted::postgres_ident(
+                        tables
+                            .previous()
+                            .primary_key()
+                            .and_then(|pk| pk.constraint_name.as_ref())
+                            .expect("Missing constraint name for DROP CONSTRAINT on Postgres.")
+                    ),
+                    Quoted::postgres_ident(
+                        tables
+                            .next()
+                            .primary_key()
+                            .and_then(|pk| pk.constraint_name.as_ref())
+                            .expect("Missing constraint name for DROP CONSTRAINT on Postgres.")
+                    )
                 )),
+                TableChange::AddPrimaryKey => lines.push({
+                    let named = match tables.next().primary_key().and_then(|pk| pk.constraint_name.as_ref()) {
+                        Some(name) => format!("CONSTRAINT {} ", self.quote(name)),
+                        None => "".into(),
+                    };
+
+                    format!(
+                        "ADD {}PRIMARY KEY ({})",
+                        named,
+                        tables
+                            .next()
+                            .primary_key_column_names()
+                            .unwrap()
+                            .iter()
+                            .map(|colname| self.quote(colname))
+                            .join(", ")
+                    )
+                }),
                 TableChange::AddColumn { column_id } => {
                     let column = tables.next().column_at(*column_id);
                     let col_sql = self.render_column(&column);
@@ -338,14 +366,22 @@ impl SqlRenderer for PostgresFlavour {
     fn render_create_table_as(&self, table: &TableWalker<'_>, table_name: &str) -> String {
         let columns: String = table.columns().map(|column| self.render_column(&column)).join(",\n");
 
-        let primary_columns = table.primary_key_column_names();
-        let pk_column_names = primary_columns
-            .into_iter()
-            .flat_map(|cols| cols.iter())
-            .map(|col| self.quote(col))
-            .join(",");
-        let pk = if !pk_column_names.is_empty() {
-            format!(",\n\n{}PRIMARY KEY ({})", SQL_INDENTATION, pk_column_names)
+        let pk = if let Some(pk) = table.primary_key() {
+            let named_constraint = match &pk.constraint_name {
+                Some(name) => format!("CONSTRAINT {} ", self.quote(name)),
+                None => "".into(),
+            };
+
+            format!(
+                ",\n\n{}{}PRIMARY KEY ({})",
+                SQL_INDENTATION,
+                named_constraint,
+                pk.columns
+                    .as_slice()
+                    .iter()
+                    .map(|col| self.quote(col.as_ref()))
+                    .join(",")
+            )
         } else {
             String::new()
         };

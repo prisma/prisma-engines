@@ -3,6 +3,8 @@ use query_engine_tests::*;
 
 #[test_suite(schema(schemas::common_nullable_types))]
 mod decimal_filter_spec {
+    use query_engine_tests::run_query;
+
     #[connector_test]
     async fn basic_where(runner: Runner) -> TestResult<()> {
         common_test_data(&runner).await?;

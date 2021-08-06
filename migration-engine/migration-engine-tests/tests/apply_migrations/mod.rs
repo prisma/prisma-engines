@@ -12,16 +12,18 @@ fn apply_migrations_with_an_empty_migrations_folder_works(api: TestApi) {
 
 #[test_connector]
 fn applying_a_single_migration_should_work(api: TestApi) {
-    let dm = r#"
+    let dm = api.datamodel_with_provider(
+        r#"
         model Cat {
             id Int @id
             name String
         }
-    "#;
+    "#,
+    );
 
     let dir = api.create_migrations_directory();
 
-    api.create_migration("init", dm, &dir).send_sync();
+    api.create_migration("init", &dm, &dir).send_sync();
 
     api.apply_migrations(&dir)
         .send_sync()
@@ -32,26 +34,30 @@ fn applying_a_single_migration_should_work(api: TestApi) {
 
 #[test_connector]
 fn applying_two_migrations_works(api: TestApi) {
-    let dm1 = r#"
+    let dm1 = api.datamodel_with_provider(
+        r#"
         model Cat {
             id      Int @id
             name    String
         }
-    "#;
+    "#,
+    );
 
     let migrations_directory = api.create_migrations_directory();
 
-    api.create_migration("initial", dm1, &migrations_directory).send_sync();
+    api.create_migration("initial", &dm1, &migrations_directory).send_sync();
 
-    let dm2 = r#"
+    let dm2 = api.datamodel_with_provider(
+        r#"
         model Cat {
             id          Int @id
             name        String
             fluffiness  Float
         }
-    "#;
+    "#,
+    );
 
-    api.create_migration("second-migration", dm2, &migrations_directory)
+    api.create_migration("second-migration", &dm2, &migrations_directory)
         .send_sync();
 
     api.apply_migrations(&migrations_directory)
@@ -65,27 +71,31 @@ fn applying_two_migrations_works(api: TestApi) {
 
 #[test_connector]
 fn migrations_should_fail_when_the_script_is_invalid(api: TestApi) {
-    let dm1 = r#"
+    let dm1 = api.datamodel_with_provider(
+        r#"
         model Cat {
             id      Int @id
             name    String
         }
-    "#;
+    "#,
+    );
 
     let migrations_directory = api.create_migrations_directory();
 
-    api.create_migration("initial", dm1, &migrations_directory).send_sync();
+    api.create_migration("initial", &dm1, &migrations_directory).send_sync();
 
-    let dm2 = r#"
+    let dm2 = api.datamodel_with_provider(
+        r#"
         model Cat {
             id          Int @id
             name        String
             fluffiness  Float
         }
-    "#;
+    "#,
+    );
 
     let second_migration_name = api
-        .create_migration("second-migration", dm2, &migrations_directory)
+        .create_migration("second-migration", &dm2, &migrations_directory)
         .send_sync()
         .modify_migration(|contents| contents.push_str("\nSELECT (^.^)_n;\n"))
         .into_output()
@@ -163,30 +173,34 @@ fn migrations_should_fail_when_the_script_is_invalid(api: TestApi) {
 
 #[test_connector]
 fn migrations_should_not_reapply_modified_migrations(api: TestApi) {
-    let dm1 = r#"
+    let dm1 = api.datamodel_with_provider(
+        r#"
         model Cat {
             id      Int @id
             name    String
         }
-    "#;
+    "#,
+    );
 
     let migrations_directory = api.create_migrations_directory();
 
-    let assertions = api.create_migration("initial", dm1, &migrations_directory).send_sync();
+    let assertions = api.create_migration("initial", &dm1, &migrations_directory).send_sync();
 
     api.apply_migrations(&migrations_directory).send_sync();
 
     assertions.modify_migration(|script| *script = format!("/* this is just a harmless comment */\n{}", script));
 
-    let dm2 = r#"
+    let dm2 = api.datamodel_with_provider(
+        r#"
         model Cat {
             id          Int @id
             name        String
             fluffiness  Float
         }
-    "#;
+    "#,
+    );
 
-    api.create_migration("second-migration", dm2, &migrations_directory)
+    api.create_migration("second-migration", &dm2, &migrations_directory)
         .send_sync();
 
     api.apply_migrations(&migrations_directory)
@@ -196,18 +210,20 @@ fn migrations_should_not_reapply_modified_migrations(api: TestApi) {
 
 #[test_connector]
 fn migrations_should_fail_on_an_uninitialized_nonempty_database(api: TestApi) {
-    let dm = r#"
+    let dm = api.datamodel_with_provider(
+        r#"
         model Cat {
             id      Int @id
             name    String
         }
-    "#;
+    "#,
+    );
 
-    api.schema_push(dm).send().assert_green_bang();
+    api.schema_push(dm.clone()).send().assert_green_bang();
 
     let directory = api.create_migrations_directory();
 
-    api.create_migration("01-init", dm, &directory)
+    api.create_migration("01-init", &dm, &directory)
         .send_sync()
         .assert_migration_directories_count(1);
 
@@ -226,12 +242,14 @@ fn migrations_should_fail_on_an_uninitialized_nonempty_database(api: TestApi) {
 // Reference for the tables created by PostGIS: https://postgis.net/docs/manual-1.4/ch04.html#id418599
 #[test_connector(tags(Postgres))]
 fn migrations_should_succeed_on_an_uninitialized_nonempty_database_with_postgis_tables(api: TestApi) {
-    let dm = r#"
+    let dm = api.datamodel_with_provider(
+        r#"
         model Cat {
             id      Int @id
             name    String
         }
-    "#;
+    "#,
+    );
 
     let create_spatial_ref_sys_table = "CREATE TABLE IF NOT EXISTS \"spatial_ref_sys\" ( id SERIAL PRIMARY KEY )";
     // The capitalized Geometry is intentional here, because we want the matching to be case-insensitive.
@@ -242,7 +260,7 @@ fn migrations_should_succeed_on_an_uninitialized_nonempty_database_with_postgis_
 
     let directory = api.create_migrations_directory();
 
-    api.create_migration("01-init", dm, &directory)
+    api.create_migration("01-init", &dm, &directory)
         .send_sync()
         .assert_migration_directories_count(1);
 

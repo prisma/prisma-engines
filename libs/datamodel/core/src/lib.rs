@@ -139,9 +139,10 @@ fn parse_datamodel_internal(
     let generators = GeneratorLoader::load_generators_from_ast(&ast, &mut diagnostics);
     let preview_features = preview_features(&generators);
     let datasources = load_sources(&ast, preview_features, &mut diagnostics);
-    let validator = ValidationPipeline::new(&datasources, preview_features);
 
     diagnostics.to_result()?;
+
+    let validator = ValidationPipeline::new(&datasources, preview_features);
 
     match validator.validate(&ast, transform) {
         Ok(mut src) => {
@@ -222,6 +223,17 @@ pub fn render_datamodel_to(
     datasource: Option<&Datasource>,
 ) {
     let lowered = LowerDmlToAst::new(datasource, BitFlags::empty()).lower(datamodel);
+    render_schema_ast_to(stream, &lowered, 2);
+}
+
+/// Renders as a string into the stream.
+pub fn render_datamodel_to_with_preview_flags(
+    stream: &mut dyn std::fmt::Write,
+    datamodel: &dml::Datamodel,
+    datasource: Option<&Datasource>,
+    flags: BitFlags<PreviewFeature>,
+) {
+    let lowered = LowerDmlToAst::new(datasource, flags).lower(datamodel);
     render_schema_ast_to(stream, &lowered, 2);
 }
 

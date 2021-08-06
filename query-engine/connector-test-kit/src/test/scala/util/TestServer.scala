@@ -19,7 +19,7 @@ case class TestServer() extends PlayJsonExtensions with LogSupport {
       project: Project,
       dataContains: String = "",
       legacy: Boolean = true,
-      batchSize: Int = 5000,
+      batchSize: Option[Int] = None,
   ): JsValue = {
     val result = queryBinary(
       request = createSingleQuery(query),
@@ -118,7 +118,7 @@ case class TestServer() extends PlayJsonExtensions with LogSupport {
       request: JsValue,
       encodedDataModel: String, // Base64 encoded full data model string
       legacy: Boolean = true,
-      batchSize: Int = 5000,
+      batchSize: Option[Int] = None,
       log_requests: Boolean = false,
       env_overrides: Map[String, String] = Map() // Overrides existing env keys, else additive.
   ): (JsValue, Vector[String]) = {
@@ -152,10 +152,10 @@ case class TestServer() extends PlayJsonExtensions with LogSupport {
         )
     }
 
-    val env = Seq(
-      "QUERY_BATCH_SIZE" -> batchSize.toString,
-      binaryLogLevel,
-    )
+    val env = batchSize match {
+      case Some(size) => Seq(binaryLogLevel, "QUERY_BATCH_SIZE" -> size.toString)
+      case None => Seq(binaryLogLevel)
+    }
 
     val process = if (EnvVars.isWindows) {
       Process(params)

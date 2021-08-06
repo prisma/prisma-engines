@@ -1,7 +1,7 @@
 use super::*;
 use crate::EnumType;
-use itertools::Itertools;
 use once_cell::sync::OnceCell;
+use prisma_models::pk::PrimaryKey;
 use prisma_models::{dml, ModelRef};
 use std::sync::Arc;
 
@@ -136,10 +136,11 @@ pub fn compound_index_field_name(index: &Index) -> String {
 }
 
 /// Computes a compound field name based on a multi-field id.
-pub fn compound_id_field_name<T>(field_names: &[T]) -> String
-where
-    T: AsRef<str>,
-{
-    // Extremely sophisticated.
-    field_names.iter().map(AsRef::as_ref).join("_")
+pub fn compound_id_field_name(pk: &PrimaryKey) -> String {
+    pk.alias.clone().unwrap_or_else(|| {
+        let pk_fields = pk.fields();
+        let field_names: Vec<&str> = pk_fields.iter().map(|sf| sf.name.as_ref()).collect();
+
+        field_names.join("_")
+    })
 }

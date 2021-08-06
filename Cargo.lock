@@ -3260,7 +3260,6 @@ dependencies = [
  "chrono",
  "futures",
  "itertools 0.10.0",
- "once_cell",
  "prisma-models",
  "prisma-value",
  "serde",
@@ -4128,6 +4127,7 @@ dependencies = [
  "datamodel",
  "datamodel-connector",
  "enumflags2",
+ "expect-test",
  "introspection-connector",
  "native-types",
  "once_cell",
@@ -4140,7 +4140,6 @@ dependencies = [
  "sql-datamodel-connector",
  "sql-schema-describer",
  "thiserror",
- "tokio",
  "tracing",
  "tracing-futures",
  "user-facing-errors",
@@ -4187,6 +4186,7 @@ dependencies = [
  "datamodel",
  "futures",
  "itertools 0.10.0",
+ "once_cell",
  "prisma-models",
  "prisma-value",
  "quaint",
@@ -4483,9 +4483,9 @@ dependencies = [
 
 [[package]]
 name = "tiberius"
-version = "0.5.15"
+version = "0.5.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c4e1b62ad625a28b77d2de6b3e353fe9b98c742eb9b7bde99d9e40a2283ed2b8"
+checksum = "e08c782c165a53700c17e4b15a1f6facc21e40a6a80402c518e0f3a2c3fcedd4"
 dependencies = [
  "async-native-tls",
  "async-stream 0.2.1",

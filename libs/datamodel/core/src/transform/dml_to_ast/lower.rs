@@ -6,7 +6,7 @@ use crate::{
 use enumflags2::BitFlags;
 
 pub struct LowerDmlToAst<'a> {
-    datasource: Option<&'a Datasource>,
+    pub datasource: Option<&'a Datasource>,
     pub preview_features: BitFlags<PreviewFeature>,
 }
 

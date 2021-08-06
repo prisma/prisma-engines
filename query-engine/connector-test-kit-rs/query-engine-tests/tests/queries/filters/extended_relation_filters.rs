@@ -1,9 +1,11 @@
-use indoc::indoc;
 use query_engine_tests::*;
 
 // Note: Raw port without alternations from Scala. Original name `ExtendedRelationFilterSpec.scala`.
 #[test_suite(schema(schema))]
 mod ext_rel_filters {
+    use indoc::indoc;
+    use query_engine_tests::run_query;
+
     fn schema() -> String {
         let schema = indoc! { "
             model Artist {
@@ -512,7 +514,7 @@ mod ext_rel_filters {
         Ok(())
     }
 
-    async fn test_data(runner: &Runner) -> TestResult<()> {
+    async fn test_data(runner: Runner) -> TestResult<()> {
         runner
             .query(r#"mutation { createOneGenre(data: { Name: "Genre1", GenreId: 1}) { Name }}"#)
             .await?

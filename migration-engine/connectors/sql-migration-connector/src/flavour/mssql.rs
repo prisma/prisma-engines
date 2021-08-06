@@ -296,11 +296,30 @@ impl SqlFlavour for MssqlFlavour {
             schema_name
         );
 
+        let drop_types = format!(
+            r#"
+            DECLARE @stmt NVARCHAR(max)
+            DECLARE @n CHAR(1)
+
+            SET @n = CHAR(10)
+
+            SELECT @stmt = ISNULL(@stmt + @n, '') +
+                'DROP TYPE [' + SCHEMA_NAME(schema_id) + '].[' + name + ']'
+            FROM sys.types
+            WHERE SCHEMA_NAME(schema_id) = '{0}'
+            AND is_user_defined = 1
+
+            EXEC SP_EXECUTESQL @stmt
+            "#,
+            schema_name
+        );
+
         connection.raw_cmd(&drop_procedures).await?;
         connection.raw_cmd(&drop_views).await?;
         connection.raw_cmd(&drop_shared_defaults).await?;
         connection.raw_cmd(&drop_fks).await?;
         connection.raw_cmd(&drop_tables).await?;
+        connection.raw_cmd(&drop_types).await?;
 
         Ok(())
     }

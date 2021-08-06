@@ -16,7 +16,7 @@ pub(crate) trait SqlSchemaDifferFlavour {
     /// If this returns `true`, the differ will generate
     /// SqlMigrationStep::RedefineIndex steps instead of
     /// SqlMigrationStep::AlterIndex.
-    fn can_alter_index(&self) -> bool {
+    fn can_rename_index(&self) -> bool {
         true
     }
 
@@ -123,6 +123,11 @@ pub(crate) trait SqlSchemaDifferFlavour {
     }
 
     fn view_should_be_ignored(&self, _view_name: &str) -> bool {
+        false
+    }
+
+    /// Supports named Foreign Keys.
+    fn has_unnamed_foreign_keys(&self) -> bool {
         false
     }
 }

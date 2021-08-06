@@ -33,8 +33,4 @@ impl SqlSchemaCalculatorFlavour for MssqlFlavour {
             action
         }
     }
-
-    fn single_field_index_name(&self, model_name: &str, field_name: &str) -> String {
-        format!("{}_{}_unique", model_name, field_name)
-    }
 }

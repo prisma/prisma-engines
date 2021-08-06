@@ -2,7 +2,7 @@ mod sql_schema_calculator_flavour;
 
 pub(super) use sql_schema_calculator_flavour::SqlSchemaCalculatorFlavour;
 
-use crate::{flavour::SqlFlavour, sql_renderer::IteratorJoin};
+use crate::flavour::SqlFlavour;
 use datamodel::{
     walkers::{walk_models, walk_relations, ModelWalker, ScalarFieldWalker, TypeWalker},
     Configuration, Datamodel, DefaultValue, FieldArity, IndexDefinition, IndexType, ScalarType,
@@ -71,24 +71,8 @@ fn calculate_model_tables<'a>(
                     IndexType::Normal => sql::IndexType::Normal,
                 };
 
-                let index_name = index_definition.name.clone().unwrap_or_else(|| {
-                    if index_definition.fields.len() == 1 && index_definition.is_unique() {
-                        let field = model
-                            .find_scalar_field(index_definition.fields.first().unwrap())
-                            .unwrap();
-                        flavour.single_field_index_name(model.db_name(), field.db_name())
-                    } else {
-                        format!(
-                            "{table}.{fields}_{qualifier}",
-                            table = &model.db_name(),
-                            fields = referenced_fields.iter().map(|field| field.db_name()).join("_"),
-                            qualifier = if index_type.is_unique() { "unique" } else { "index" },
-                        )
-                    }
-                });
-
                 sql::Index {
-                    name: index_name,
+                    name: index_definition.db_name.clone().unwrap(),
                     // The model index definition uses the model field names, but the SQL Index wants the column names.
                     columns: referenced_fields
                         .iter()
@@ -129,7 +113,7 @@ fn push_inline_relations(model: ModelWalker<'_>, table: &mut sql::Table, flavour
         // Foreign key
         {
             let fk = sql::ForeignKey {
-                constraint_name: None,
+                constraint_name: relation_field.constraint_name(),
                 columns: fk_columns,
                 referenced_table: relation_field.referenced_model().database_name().to_owned(),
                 referenced_columns: relation_field.referenced_columns().map(String::from).collect(),

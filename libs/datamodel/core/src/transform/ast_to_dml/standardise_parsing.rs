@@ -1,13 +1,9 @@
-use enumflags2::BitFlags;
-
-use ::dml::{field::FieldArity, relation_info::ReferentialAction};
-
 use super::common::*;
 use crate::{
     common::{preview_features::PreviewFeature, RelationNames},
-    diagnostics::Diagnostics,
     dml, Field,
 };
+use enumflags2::BitFlags;
 
 /// Helper for standardising a datamodel during parsing.
 ///
@@ -22,13 +18,11 @@ impl StandardiserForParsing {
         Self { preview_features }
     }
 
-    pub fn standardise(&self, schema: &mut dml::Datamodel) -> Result<(), Diagnostics> {
+    pub fn standardise(&self, schema: &mut dml::Datamodel) {
         self.name_unnamed_relations(schema);
         self.set_relation_to_field_to_id_if_missing_for_m2m_relations(schema);
         self.set_referential_arities(schema);
         self.set_default_referential_actions(schema);
-
-        Ok(())
     }
 
     fn set_referential_arities(&self, schema: &mut dml::Datamodel) {
@@ -46,7 +40,7 @@ impl StandardiserForParsing {
                             .any(|field| field.arity().is_required());
 
                         let arity = if some_required {
-                            FieldArity::Required
+                            dml::FieldArity::Required
                         } else {
                             field.arity
                         };
@@ -80,10 +74,10 @@ impl StandardiserForParsing {
                             continue;
                         }
 
-                        field.relation_info.on_update = Some(ReferentialAction::Cascade);
+                        field.relation_info.on_update = Some(dml::ReferentialAction::Cascade);
                         field.relation_info.on_delete = Some(match field.referential_arity {
-                            FieldArity::Required => ReferentialAction::Cascade,
-                            _ => ReferentialAction::SetNull,
+                            dml::FieldArity::Required => dml::ReferentialAction::Cascade,
+                            _ => dml::ReferentialAction::SetNull,
                         });
 
                         // So our validator won't get a stroke when seeing the

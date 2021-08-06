@@ -1,8 +1,10 @@
-use indoc::indoc;
 use query_engine_tests::*;
 
-#[test_suite(schema(schema), exclude(SqlServer))]
+#[test_suite(schema(schema))]
 mod one2one_regression {
+    use indoc::indoc;
+    use query_engine_tests::run_query;
+
     fn schema() -> String {
         let schema = indoc! {
             r#"
@@ -10,7 +12,7 @@ mod one2one_regression {
                 #id(id, Int, @id)
                 name     String?
                 friendOf User?   @relation("Userfriend")
-                friend   User?   @relation("Userfriend", fields: [friendId], references: [id])
+                friend   User?   @relation("Userfriend", fields: [friendId], references: [id], onDelete: NoAction, onUpdate: NoAction)
                 friendId Int?
             }
             "#

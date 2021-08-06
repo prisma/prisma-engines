@@ -1,9 +1,11 @@
-use indoc::indoc;
 use query_engine_tests::*;
 
 /// Port note: Batch size for testing is now 10 by default, not configurable (look at the direnv).
 #[test_suite(schema(schema))]
 mod isb {
+    use indoc::indoc;
+    use query_engine_tests::run_query;
+
     fn schema() -> String {
         let schema = indoc! {
             r#"
@@ -79,7 +81,7 @@ mod isb {
         Ok(())
     }
 
-    async fn create_test_data(runner: &Runner) -> TestResult<()> {
+    async fn create_test_data(runner: Runner) -> TestResult<()> {
         create_a(runner, r#"{ id: 1, b: { create: { id: 1 }} c: { create: { id: 1 }} }"#).await?;
         create_a(runner, r#"{ id: 2, b: { connect: { id: 1 }} c: { create: { id: 2 }} }"#).await?;
         create_a(runner, r#"{ id: 3, b: { create: { id: 3 }} c: { create: { id: 3 }} }"#).await?;

@@ -7,20 +7,22 @@ mod context;
 mod names;
 mod types;
 
-pub(crate) use types::ScalarFieldType;
+pub(crate) use types::{ScalarField, ScalarFieldType};
 
 use self::{
     context::Context,
-    types::{RelationField, ScalarField, Types},
+    types::{RelationField, Types},
 };
+use crate::PreviewFeature;
 use crate::{ast, diagnostics::Diagnostics, Datasource};
 use datamodel_connector::{Connector, EmptyDatamodelConnector};
+use enumflags2::BitFlags;
 use names::Names;
 
 /// ParserDatabase is a container for a Schema AST, together with information
 /// gathered during schema validation. Each validation step enriches the
 /// database with information that can be used to work with the schema, without
-/// changing the AST. Instantiating with `ParserDatabase::new()` will performa a
+/// changing the AST. Instantiating with `ParserDatabase::new()` will perform a
 /// number of validations and make sure the schema makes sense, but it cannot
 /// fail. In case the schema is invalid, diagnostics will be created and the
 /// resolved information will be incomplete.
@@ -34,6 +36,8 @@ use names::Names;
 ///   type alias, we look at the type identifier and resolve what it refers to.
 /// - The AST is walked a third time to validate attributes on models and
 ///   fields.
+/// - Global validations are then performed on the mostly validated schema.
+///   Currently only index name collisions.
 ///
 /// ## Lifetimes
 ///
@@ -47,6 +51,7 @@ pub(crate) struct ParserDatabase<'ast> {
     datasource: Option<&'ast Datasource>,
     names: Names<'ast>,
     types: Types<'ast>,
+    preview_features: BitFlags<PreviewFeature>,
 }
 
 impl<'ast> ParserDatabase<'ast> {
@@ -55,12 +60,14 @@ impl<'ast> ParserDatabase<'ast> {
         ast: &'ast ast::SchemaAst,
         datasource: Option<&'ast Datasource>,
         diagnostics: Diagnostics,
+        preview_features: BitFlags<PreviewFeature>,
     ) -> (Self, Diagnostics) {
         let db = ParserDatabase {
             ast,
             datasource,
             names: Names::default(),
             types: Types::default(),
+            preview_features,
         };
 
         let mut ctx = Context::new(db, diagnostics);
@@ -85,6 +92,9 @@ impl<'ast> ParserDatabase<'ast> {
         for (model_id, model) in ast.iter_models() {
             attributes::resolve_model_and_field_attributes(model_id, model, &mut ctx)
         }
+
+        // Fourth step: global validations
+        attributes::validate_index_names(&mut ctx);
 
         ctx.finish()
     }
@@ -111,10 +121,6 @@ impl<'ast> ParserDatabase<'ast> {
 
     pub(crate) fn get_enum_value_database_name(&self, enum_id: ast::EnumId, value_idx: u32) -> Option<&'ast str> {
         self.types.enums[&enum_id].mapped_values.get(&value_idx).cloned()
-    }
-
-    pub(crate) fn get_model_database_name(&self, model_id: ast::ModelId) -> Option<&'ast str> {
-        self.types.models[&model_id].mapped_name
     }
 
     pub(crate) fn get_field_database_name(&self, model_id: ast::ModelId, field_id: ast::FieldId) -> Option<&'ast str> {

@@ -261,9 +261,9 @@ fn datamodel_parser_errors_must_return_a_known_error(api: TestApi) {
         }
     "#;
 
-    let error = api.schema_push(bad_dm).send_unwrap_err().to_user_facing();
+    let error = api.schema_push_w_datasource(bad_dm).send_unwrap_err().to_user_facing();
 
-    let expected_msg = "\u{1b}[1;91merror\u{1b}[0m: \u{1b}[1mType \"Post\" is neither a built-in type, nor refers to another model, custom type, or enum.\u{1b}[0m\n  \u{1b}[1;94m-->\u{1b}[0m  \u{1b}[4mschema.prisma:4\u{1b}[0m\n\u{1b}[1;94m   | \u{1b}[0m\n\u{1b}[1;94m 3 | \u{1b}[0m            id Float @id\n\u{1b}[1;94m 4 | \u{1b}[0m            post \u{1b}[1;91mPost\u{1b}[0m[]\n\u{1b}[1;94m   | \u{1b}[0m\n";
+    let expected_msg = "\u{1b}[1;91merror\u{1b}[0m: \u{1b}[1mType \"Post\" is neither a built-in type, nor refers to another model, custom type, or enum.\u{1b}[0m\n  \u{1b}[1;94m-->\u{1b}[0m  \u{1b}[4mschema.prisma:9\u{1b}[0m\n\u{1b}[1;94m   | \u{1b}[0m\n\u{1b}[1;94m 8 | \u{1b}[0m            id Float @id\n\u{1b}[1;94m 9 | \u{1b}[0m            post \u{1b}[1;91mPost\u{1b}[0m[]\n\u{1b}[1;94m   | \u{1b}[0m\n";
 
     let expected_error = user_facing_errors::Error::from(user_facing_errors::KnownError {
         error_code: "P1012",
@@ -283,7 +283,7 @@ fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: TestApi
         }
     "#;
 
-    api.schema_push(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green_bang();
 
     let insert = Insert::multi_into(api.render_table_name("Fruit"), &["name"])
         .values(("banana",))
@@ -300,7 +300,7 @@ fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: TestApi
     "#;
 
     let res = api
-        .schema_push(dm2)
+        .schema_push_w_datasource(dm2)
         .force(true)
         .migration_id(Some("the-migration"))
         .send_unwrap_err()
@@ -342,20 +342,18 @@ fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: TestApi
 
 #[test_connector(tags(Mysql56))]
 fn json_fields_must_be_rejected(api: TestApi) {
-    let dm = format!(
-        r#"
-        {}
-
-        model Test {{
+    let dm = r#"
+        model Test {
             id Int @id
             j Json
-        }}
+        }
+        "#;
 
-        "#,
-        api.datasource_block()
-    );
-
-    let result = api.schema_push(dm).send_unwrap_err().to_user_facing().unwrap_known();
+    let result = api
+        .schema_push_w_datasource(dm)
+        .send_unwrap_err()
+        .to_user_facing()
+        .unwrap_known();
 
     assert_eq!(result.error_code, "P1015");
     assert!(result

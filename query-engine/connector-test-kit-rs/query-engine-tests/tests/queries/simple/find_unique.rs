@@ -82,7 +82,7 @@ mod find_unique {
         Ok(())
     }
 
-    async fn test_user(runner: &Runner) -> TestResult<()> {
+    async fn test_user(runner: Runner) -> TestResult<()> {
         runner
             .query(r#"mutation { createOneUser(data: { id: 1, email: "a@b.com", first_name: "Elongated", last_name: "Muskrat" }) { id } }"#)
             .await?.assert_success();

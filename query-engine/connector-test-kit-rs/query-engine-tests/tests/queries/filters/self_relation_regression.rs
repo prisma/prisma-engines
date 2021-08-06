@@ -1,8 +1,10 @@
-use indoc::indoc;
 use query_engine_tests::*;
 
-#[test_suite(schema(schema), exclude(SqlServer))]
+#[test_suite(schema(schema))]
 mod sr_regression {
+    use indoc::indoc;
+    use query_engine_tests::run_query;
+
     fn schema() -> String {
         let schema = indoc! {
             r#"
@@ -11,7 +13,7 @@ mod sr_regression {
                 name      String
                 parent_id String?
 
-                parent   Category? @relation(name: "C", fields: [parent_id], references: [id])
+                parent   Category? @relation(name: "C", fields: [parent_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
                 opposite Category? @relation(name: "C")
             }
             "#
@@ -68,7 +70,7 @@ mod sr_regression {
         Ok(())
     }
 
-    async fn test_data(runner: &Runner) -> TestResult<()> {
+    async fn test_data(runner: Runner) -> TestResult<()> {
         runner
             .query(r#"mutation { createOneCategory(data: { name: "Sub", parent: { create: { name: "Root" }}}) { parent { id }}}"#)
             .await?.assert_success();

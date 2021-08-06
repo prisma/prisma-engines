@@ -17,7 +17,7 @@ model Box {
 
 #[test_connector]
 fn schema_push_happy_path(api: TestApi) {
-    api.schema_push(SCHEMA)
+    api.schema_push_w_datasource(SCHEMA)
         .send()
         .assert_green_bang()
         .assert_has_executed_steps();
@@ -45,7 +45,7 @@ fn schema_push_happy_path(api: TestApi) {
     }
     "#;
 
-    api.schema_push(dm2)
+    api.schema_push_w_datasource(dm2)
         .send()
         .assert_green_bang()
         .assert_has_executed_steps();
@@ -63,7 +63,7 @@ fn schema_push_happy_path(api: TestApi) {
 
 #[test_connector]
 fn schema_push_warns_about_destructive_changes(api: TestApi) {
-    api.schema_push(SCHEMA)
+    api.schema_push_w_datasource(SCHEMA)
         .send()
         .assert_green_bang()
         .assert_has_executed_steps();
@@ -84,12 +84,12 @@ fn schema_push_warns_about_destructive_changes(api: TestApi) {
         api.normalize_identifier("Box")
     );
 
-    api.schema_push(dm2)
+    api.schema_push_w_datasource(dm2)
         .send()
         .assert_warnings(&[expected_warning.as_str().into()])
         .assert_no_steps();
 
-    api.schema_push(dm2)
+    api.schema_push_w_datasource(dm2)
         .force(true)
         .send()
         .assert_warnings(&[expected_warning.as_str().into()])
@@ -98,7 +98,7 @@ fn schema_push_warns_about_destructive_changes(api: TestApi) {
 
 #[test_connector]
 fn schema_push_with_an_unexecutable_migration_returns_a_message_and_aborts(api: TestApi) {
-    api.schema_push(SCHEMA)
+    api.schema_push_w_datasource(SCHEMA)
         .send()
         .assert_green_bang()
         .assert_has_executed_steps();
@@ -123,7 +123,7 @@ fn schema_push_with_an_unexecutable_migration_returns_a_message_and_aborts(api: 
         }
     "#;
 
-    api.schema_push(dm2)
+    api.schema_push_w_datasource(dm2)
         .send()
         .assert_unexecutable(&["Added the required column `volumeCm3` to the `Box` table without a default value. There are 1 rows in this table, it is not possible to execute this step.".into()])
         .assert_no_steps();
@@ -141,7 +141,7 @@ fn indexes_and_unique_constraints_on_the_same_field_do_not_collide(api: TestApi)
         }
     "#;
 
-    api.schema_push(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green_bang();
 }
 
 #[test_connector]
@@ -157,5 +157,83 @@ fn multi_column_indexes_and_unique_constraints_on_the_same_fields_do_not_collide
         }
     "#;
 
-    api.schema_push(dm).send().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green_bang();
+}
+
+#[test_connector(preview_features("NamedConstraints"))]
+fn alter_constraint_name_push(api: TestApi) {
+    let plain_dm = r#"
+         model A {
+           id   Int    @id
+           name String @unique
+           a    String
+           b    String
+           B    B[]    @relation("AtoB")
+           @@unique([a, b])
+           @@index([a])
+         }
+         model B {
+           a   String
+           b   String
+           aId Int
+           A   A      @relation("AtoB", fields: [aId], references: [id])
+           @@index([a,b])
+           @@id([a, b])
+         }
+     "#;
+
+    api.schema_push_w_datasource(plain_dm).send().assert_green_bang();
+    let no_named_pk = api.is_sqlite() || api.is_mysql();
+
+    let (singular_id, compound_id) = if no_named_pk {
+        ("", "")
+    } else {
+        (r#"(map: "CustomId")"#, r#", map: "CustomCompoundId""#)
+    };
+
+    let no_named_fk = if api.is_sqlite() { "" } else { r#", map: "CustomFK""# };
+
+    let custom_dm = format!(
+        r#"
+         model A {{
+           id   Int    @id{}
+           name String @unique(map: "CustomUnique")
+           a    String
+           b    String
+           B    B[]    @relation("AtoB")
+           @@unique([a, b], name: "compound", map:"CustomCompoundUnique")
+           @@index([a], map: "CustomIndex")
+         }}
+         model B {{
+           a   String
+           b   String
+           aId Int
+           A   A      @relation("AtoB", fields: [aId], references: [id]{})
+           @@index([a,b], map: "AnotherCustomIndex")
+           @@id([a, b]{})
+         }}
+     "#,
+        singular_id, no_named_fk, compound_id
+    );
+
+    api.schema_push_w_datasource(custom_dm).send().assert_green_bang();
+
+    api.assert_schema().assert_table("A", |table| {
+        if !no_named_pk {
+            table.assert_pk(|pk| pk.assert_constraint_name(Some("CustomId".into())));
+        };
+        table.assert_has_index_name_and_type("CustomUnique", true);
+        table.assert_has_index_name_and_type("CustomCompoundUnique", true);
+        table.assert_has_index_name_and_type("CustomIndex", false)
+    });
+
+    api.assert_schema().assert_table("B", |table| {
+        if !no_named_pk {
+            table.assert_pk(|pk| pk.assert_constraint_name(Some("CustomCompoundId".into())));
+        };
+        if !api.is_sqlite() {
+            table.assert_fk_with_name("CustomFK");
+        }
+        table.assert_has_index_name_and_type("AnotherCustomIndex", false)
+    });
 }

@@ -29,7 +29,7 @@ mod bigint_cursor {
         Ok(())
     }
 
-    async fn test_data(runner: &Runner) -> TestResult<()> {
+    async fn test_data(runner: Runner) -> TestResult<()> {
         runner
             .query(r#"mutation { createOneTestModel(data: { id: 1, counter: 1 }) { id }}"#)
             .await?

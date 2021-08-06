@@ -263,7 +263,7 @@ mod one_relation {
         Ok(())
     }
 
-    async fn test_data(runner: &Runner) -> TestResult<()> {
+    async fn test_data(runner: Runner) -> TestResult<()> {
         runner
             .query(indoc! { r#"
                 mutation {

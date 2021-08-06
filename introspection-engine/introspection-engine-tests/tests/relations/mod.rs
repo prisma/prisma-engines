@@ -21,18 +21,18 @@ async fn one_to_one_req_relation(api: &TestApi) -> TestResult {
         })
         .await?;
 
-    let dm = formatdoc! {r##"
-        model Post {{
+    let dm = r#"
+        model Post {
             id       Int @id @default(autoincrement())
             user_id  Int  @unique
             User     User @relation(fields: [user_id], references: [id])
-        }}
+        }
 
-        model User {{
+        model User {
             id      Int @id @default(autoincrement())
             Post Post?
-        }}
-    "##};
+        }
+    "#;
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
@@ -927,6 +927,51 @@ async fn many_to_many_relation_field_names_do_not_conflict_with_themselves(api: 
     "#};
 
     api.assert_eq_datamodels(expected_dm, &api.introspect().await?);
+
+    Ok(())
+}
+
+#[test_connector(exclude(Sqlite), preview_features("NamedConstraints"))]
+async fn one_to_one_req_relation_with_custom_fk_name(api: &TestApi) -> TestResult {
+    api.barrel()
+        .execute(move |migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
+            });
+
+            migration.create_table("Post", move |t| {
+                t.add_column("id", types::integer().increments(true).nullable(false));
+                t.add_constraint("Post_pkey", types::primary_constraint(&["id"]));
+                t.add_column("user_id", types::integer().nullable(false));
+                t.add_index("Post_user_id_key", types::index(&["user_id"]).unique(true));
+                t.add_constraint(
+                    "CustomFKName",
+                    types::foreign_constraint(&["user_id"], "User", &["id"], None, None),
+                );
+            });
+        })
+        .await?;
+
+    let dm = indoc! {r##"
+         generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["NamedConstraints"]
+         }
+
+         model Post {
+             id       Int @id @default(autoincrement())
+             user_id  Int  @unique
+             User     User @relation(fields: [user_id], references: [id], map: "CustomFKName")
+         }
+
+         model User {
+             id      Int @id @default(autoincrement())
+             Post Post?
+         }
+     "##};
+
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }

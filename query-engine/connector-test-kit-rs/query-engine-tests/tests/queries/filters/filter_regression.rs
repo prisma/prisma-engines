@@ -4,6 +4,9 @@ use query_engine_tests::*;
 /// Basic filter regression 1:m relation tests.
 #[test_suite(schema(schema))]
 mod fr_one_to_m {
+    use indoc::indoc;
+    use query_engine_tests::run_query;
+
     fn schema() -> String {
         let schema = indoc! { "
             model Location {
@@ -74,7 +77,13 @@ mod fr_one_to_m {
 /// Filter regression 1:m relation tests with compound ids.
 #[test_suite(schema(schema), capabilities(CompoundIds))]
 mod fr_compound_one_to_m {
+    use indoc::indoc;
+    use query_engine_tests::run_query;
+
     fn schema() -> String {
+        use indoc::indoc;
+        use query_engine_tests::run_query;
+
         let schema = indoc! { "
             model Location {
                 #id(id, Int, @id)
@@ -143,6 +152,9 @@ mod fr_compound_one_to_m {
 /// Filter regression m:n relation tests.
 #[test_suite(schema(schema))]
 mod fr_m_to_n {
+    use indoc::indoc;
+    use query_engine_tests::run_query;
+
     fn schema() -> String {
         let schema = indoc! { "
             model Location {

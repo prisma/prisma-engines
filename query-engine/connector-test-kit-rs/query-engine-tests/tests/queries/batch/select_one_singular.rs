@@ -1,8 +1,9 @@
-use indoc::indoc;
 use query_engine_tests::*;
 
 #[test_suite(schema(schema))]
 mod singlular_batch {
+    use indoc::indoc;
+
     fn schema() -> String {
         let schema = indoc! {
             r#"
@@ -190,7 +191,7 @@ mod singlular_batch {
         Ok(())
     }
 
-    async fn create_test_data(runner: &Runner) -> TestResult<()> {
+    async fn create_test_data(runner: Runner) -> TestResult<()> {
         runner
             .query(
                 r#"mutation artistWithoutAlbums {

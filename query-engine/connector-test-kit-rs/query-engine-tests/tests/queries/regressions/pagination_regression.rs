@@ -129,7 +129,7 @@ mod pagination_regr {
         Ok(())
     }
 
-    async fn create_test_data_3505_1(runner: &Runner) -> TestResult<()> {
+    async fn create_test_data_3505_1(runner: Runner) -> TestResult<()> {
         create_row(runner, r#"{ id: 1 }"#).await?;
         create_row(runner, r#"{ id: 2 }"#).await?;
         create_row(runner, r#"{ id: 3, field: "Test"}"#).await?;
@@ -139,7 +139,7 @@ mod pagination_regr {
         Ok(())
     }
 
-    async fn create_test_data_3505_2(runner: &Runner) -> TestResult<()> {
+    async fn create_test_data_3505_2(runner: Runner) -> TestResult<()> {
         create_row(runner, r#"{ id: 1 }"#).await?;
         create_row(runner, r#"{ id: 2, field: "Test"}"#).await?;
         create_row(runner, r#"{ id: 3 }"#).await?;
@@ -149,7 +149,7 @@ mod pagination_regr {
         Ok(())
     }
 
-    async fn create_test_data_2855(runner: &Runner) -> TestResult<()> {
+    async fn create_test_data_2855(runner: Runner) -> TestResult<()> {
         runner
             .query(
                 r#"

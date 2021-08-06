@@ -38,6 +38,7 @@ pub(crate) trait RelationFieldAsserts {
     fn assert_relation_referenced_fields(&self, t: &[&str]) -> &Self;
     fn assert_relation_base_fields(&self, t: &[&str]) -> &Self;
     fn assert_ignored(&self, state: bool) -> &Self;
+    fn assert_relation_fk_name(&self, name: Option<String>) -> &Self;
 }
 
 pub(crate) trait ModelAsserts {
@@ -49,6 +50,8 @@ pub(crate) trait ModelAsserts {
     fn assert_with_documentation(&self, t: &str) -> &Self;
     fn assert_has_index(&self, def: IndexDefinition) -> &Self;
     fn assert_has_pk(&self, pk: PrimaryKeyDefinition) -> &Self;
+    fn assert_has_named_pk(&self, name: &str) -> &Self;
+    fn assert_has_id_fields(&self, fields: &[&str]) -> &Self;
     fn assert_ignored(&self, state: bool) -> &Self;
 }
 
@@ -223,6 +226,11 @@ impl RelationFieldAsserts for dml::RelationField {
         assert_eq!(self.is_ignored, state);
         self
     }
+
+    fn assert_relation_fk_name(&self, name: Option<String>) -> &Self {
+        assert_eq!(self.relation_info.fk_name, name);
+        self
+    }
 }
 
 impl DatamodelAsserts for dml::Datamodel {
@@ -284,6 +292,16 @@ impl ModelAsserts for dml::Model {
 
     fn assert_field_count(&self, count: usize) -> &Self {
         assert_eq!(self.fields.len(), count);
+        self
+    }
+
+    fn assert_has_id_fields(&self, fields: &[&str]) -> &Self {
+        assert_eq!(self.primary_key.as_ref().unwrap().fields, fields);
+        self
+    }
+
+    fn assert_has_named_pk(&self, name: &str) -> &Self {
+        assert_eq!(self.primary_key.as_ref().unwrap().db_name, Some(name.to_string()));
         self
     }
 }

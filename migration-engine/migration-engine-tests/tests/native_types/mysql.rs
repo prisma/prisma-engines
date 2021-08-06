@@ -643,7 +643,6 @@ fn colnames_for_cases(cases: Cases) -> Vec<String> {
 }
 
 fn expand_cases<'a, 'b>(
-    api: &TestApi,
     from_type: &str,
     test_value: &'a quaint::Value,
     (to_types, nullable): (&[&str], bool),
@@ -655,7 +654,6 @@ fn expand_cases<'a, 'b>(
 
     for dm in std::iter::once(&mut *dm1).chain(std::iter::once(&mut *dm2)) {
         dm.clear();
-        write!(dm, "{}", api.datasource_block()).unwrap();
         dm.push_str("model Test {\nid Int @id @default(autoincrement())\n");
     }
 
@@ -765,7 +763,6 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
         tracing::info!("initial migration");
 
         let insert = expand_cases(
-            &api,
             from_type,
             test_value,
             (to_types.as_ref(), false),
@@ -774,12 +771,12 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
             &colnames,
         );
 
-        api.schema_push(&dm1).send().assert_green_bang();
+        api.schema_push_w_datasource(&dm1).send().assert_green_bang();
 
         api.query(insert.into());
 
         tracing::info!("cast migration");
-        api.schema_push(&dm2).send().assert_green_bang();
+        api.schema_push_w_datasource(&dm2).send().assert_green_bang();
 
         api.assert_schema().assert_table("Test", |table| {
             to_types.iter().enumerate().fold(
@@ -812,7 +809,6 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
         tracing::info!("initial migration");
 
         let insert = expand_cases(
-            &api,
             from_type,
             test_value,
             (to_types.as_ref(), false),
@@ -835,13 +831,13 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
             ).into());
         }
 
-        api.schema_push(&dm1).send().assert_green_bang();
+        api.schema_push_w_datasource(&dm1).send().assert_green_bang();
 
         api.query(insert.into());
 
         tracing::info!("cast migration");
 
-        api.schema_push(&dm2)
+        api.schema_push_w_datasource(&dm2)
             .force(true)
             .send()
             .assert_executable()
@@ -875,7 +871,6 @@ fn impossible_casts_with_existing_data_should_warn(api: TestApi) {
         tracing::info!("initial migration");
 
         let insert = expand_cases(
-            &api,
             from_type,
             test_value,
             (to_types.as_ref(), true),
@@ -898,13 +893,13 @@ fn impossible_casts_with_existing_data_should_warn(api: TestApi) {
             ).into());
         }
 
-        api.schema_push(&dm1).send().assert_green_bang();
+        api.schema_push_w_datasource(&dm1).send().assert_green_bang();
 
         api.query(insert.into());
 
         tracing::info!("cast migration");
 
-        api.schema_push(&dm2)
+        api.schema_push_w_datasource(&dm2)
             .force(true)
             .send()
             .assert_executable()
@@ -922,8 +917,7 @@ fn impossible_casts_with_existing_data_should_warn(api: TestApi) {
 
 #[test_connector(tags(Mysql))]
 fn typescript_starter_schema_with_native_types_is_idempotent(api: TestApi) {
-    let dm = api.datamodel_with_provider(
-        r#"
+    let dm = r#"
         model Post {
             id        Int     @id @default(autoincrement())
             title     String
@@ -939,11 +933,9 @@ fn typescript_starter_schema_with_native_types_is_idempotent(api: TestApi) {
             name  String?
             posts Post[]
         }
-    "#,
-    );
+    "#;
 
-    let dm2 = api.datamodel_with_provider(
-        r#"
+    let dm2 = r#"
         model Post {
             id        Int     @id @default(autoincrement()) @db.Int
             title     String  @db.VarChar(191)
@@ -960,20 +952,19 @@ fn typescript_starter_schema_with_native_types_is_idempotent(api: TestApi) {
             posts Post[]
         }
 
-    "#,
-    );
+    "#;
 
-    api.schema_push(&dm)
+    api.schema_push_w_datasource(dm)
         .migration_id(Some("first"))
         .send()
         .assert_green_bang()
         .assert_has_executed_steps();
-    api.schema_push(&dm)
+    api.schema_push_w_datasource(dm)
         .migration_id(Some("second"))
         .send()
         .assert_green_bang()
         .assert_no_steps();
-    api.schema_push(&dm2)
+    api.schema_push_w_datasource(dm2)
         .migration_id(Some("third"))
         .send()
         .assert_green_bang()
@@ -981,9 +972,8 @@ fn typescript_starter_schema_with_native_types_is_idempotent(api: TestApi) {
 }
 
 #[test_connector(tags(Mysql))]
-fn typescript_starter_schema_with_differnt_native_types_is_idempotent(api: TestApi) {
-    let dm = api.datamodel_with_provider(
-        r#"
+fn typescript_starter_schema_with_different_native_types_is_idempotent(api: TestApi) {
+    let dm = r#"
         model Post {
             id        Int     @id @default(autoincrement())
             title     String
@@ -999,11 +989,9 @@ fn typescript_starter_schema_with_differnt_native_types_is_idempotent(api: TestA
             name  String?
             posts Post[]
         }
-    "#,
-    );
+    "#;
 
-    let dm2 = api.datamodel_with_provider(
-        r#"
+    let dm2 = r#"
         model Post {
             id        Int     @id @default(autoincrement()) @db.Int
             title     String  @db.VarChar(100)
@@ -1019,27 +1007,26 @@ fn typescript_starter_schema_with_differnt_native_types_is_idempotent(api: TestA
             name  String? @db.VarChar(100)
             posts Post[]
         }
-    "#,
-    );
+    "#;
 
-    api.schema_push(&dm)
+    api.schema_push_w_datasource(dm)
         .migration_id(Some("first"))
         .send()
         .assert_green_bang()
         .assert_has_executed_steps();
-    api.schema_push(&dm)
+    api.schema_push_w_datasource(dm)
         .migration_id(Some("second"))
         .send()
         .assert_green_bang()
         .assert_no_steps();
 
-    api.schema_push(&dm2)
+    api.schema_push_w_datasource(dm2)
         .migration_id(Some("third"))
         .send()
         .assert_green_bang()
         .assert_has_executed_steps();
-    api.schema_push(&dm2)
-        .migration_id(Some("third"))
+    api.schema_push_w_datasource(dm2)
+        .migration_id(Some("third")) // TODO (matthias) why does this work??
         .send()
         .assert_green_bang()
         .assert_no_steps();

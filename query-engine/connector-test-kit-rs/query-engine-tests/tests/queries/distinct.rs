@@ -166,7 +166,7 @@ mod distinct {
     /// 3 => []
     /// 4 => ["1", "1"]
     /// 5 => ["2", "3", "2"]
-    async fn nested_dataset(runner: &Runner) -> TestResult<()> {
+    async fn nested_dataset(runner: Runner) -> TestResult<()> {
         test_user(
             runner,
             r#"{ id: 1, first_name: "Joe", last_name: "Doe", email: "1", posts: {

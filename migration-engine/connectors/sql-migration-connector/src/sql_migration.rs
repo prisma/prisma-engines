@@ -138,7 +138,7 @@ impl SqlMigration {
                         idx,
                     ));
                 }
-                SqlMigrationStep::AlterIndex { table, .. } | SqlMigrationStep::RedefineIndex { table, .. } => {
+                SqlMigrationStep::RenameIndex { table, .. } | SqlMigrationStep::RedefineIndex { table, .. } => {
                     drift_items.insert((
                         DriftType::ChangedTable,
                         self.schemas().tables(table).previous().name(),
@@ -282,6 +282,11 @@ impl SqlMigration {
                                 out.push_str(&tables.previous().primary_key_column_names().unwrap().join(", "));
                                 out.push_str(")\n");
                             }
+                            TableChange::RenamePrimaryKey => {
+                                out.push_str("  [*] Renamed the primary key on columns (");
+                                out.push_str(&tables.previous().primary_key_column_names().unwrap().join(", "));
+                                out.push_str(")\n");
+                            }
                             TableChange::AddPrimaryKey => {
                                 out.push_str("  [+] Added primary key on columns (");
                                 out.push_str(&tables.next().primary_key_column_names().unwrap().join(", "));
@@ -336,7 +341,7 @@ impl SqlMigration {
                     out.push_str(&foreign_key.constrained_column_names().join(", "));
                     out.push_str(")\n")
                 }
-                SqlMigrationStep::AlterIndex { table, index } => {
+                SqlMigrationStep::RenameIndex { table, index } => {
                     let index = self.schemas().tables(table).indexes(index);
 
                     out.push_str("  [*] Renamed index `");
@@ -438,7 +443,7 @@ pub(crate) enum SqlMigrationStep {
         /// The index of the foreign key in the table.
         foreign_key_index: usize,
     },
-    AlterIndex {
+    RenameIndex {
         table: Pair<TableId>,
         index: Pair<usize>,
     },
@@ -474,7 +479,7 @@ impl SqlMigrationStep {
             SqlMigrationStep::RedefineTables { .. } => "RedefineTables",
             SqlMigrationStep::CreateIndex { .. } => "CreateIndex",
             SqlMigrationStep::DropIndex { .. } => "DropIndex",
-            SqlMigrationStep::AlterIndex { .. } => "AlterIndex",
+            SqlMigrationStep::RenameIndex { .. } => "RenameIndex",
             SqlMigrationStep::CreateEnum { .. } => "CreateEnum",
             SqlMigrationStep::DropEnum { .. } => "DropEnum",
             SqlMigrationStep::AlterEnum(_) => "AlterEnum",
@@ -506,6 +511,7 @@ pub(crate) enum TableChange {
     },
     DropPrimaryKey,
     AddPrimaryKey,
+    RenamePrimaryKey,
 }
 
 impl TableChange {

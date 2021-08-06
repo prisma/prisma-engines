@@ -1,9 +1,11 @@
-use indoc::indoc;
 use query_engine_tests::*;
 
 // Note: "Ported" is actually refering to the port from Graphcool to Prisma 1. This is the port of the port.
 #[test_suite(schema(schema), capabilities(Enums))]
 mod ported {
+    use indoc::indoc;
+    use query_engine_tests::run_query;
+
     fn schema() -> String {
         let schema = indoc! {
             r#"
@@ -1359,7 +1361,7 @@ mod ported {
         Ok(())
     }
 
-    async fn create_common_model_b(runner: &Runner) -> TestResult<()> {
+    async fn create_common_model_b(runner: Runner) -> TestResult<()> {
         runner
             .query("mutation { createOneModelB(data: { int: 1 }) { id }}")
             .await?

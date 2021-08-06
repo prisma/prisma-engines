@@ -1,8 +1,10 @@
-use indoc::indoc;
 use query_engine_tests::*;
 
 #[test_suite(schema(schema))]
 mod filter_spec {
+    use indoc::indoc;
+    use query_engine_tests::{assert_error, run_query};
+
     fn schema() -> String {
         let schema = indoc! {
             r#"
@@ -365,7 +367,7 @@ mod filter_spec {
         Ok(result.to_string())
     }
 
-    async fn test_data(runner: &Runner) -> TestResult<()> {
+    async fn test_data(runner: Runner) -> TestResult<()> {
         runner
             .query(r#"mutation { createOneUser(data: { name: "Paul", unique: 1, ride: { create: { brand: "Porsche", unique: 1, parked: true }}}) { id }}"#)
             .await?.assert_success();

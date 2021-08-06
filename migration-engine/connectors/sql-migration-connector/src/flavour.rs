@@ -25,6 +25,7 @@ use quaint::prelude::{ConnectionInfo, Table};
 use sql_schema_describer::SqlSchema;
 use std::fmt::Debug;
 
+//todo this can be moved to the parser
 /// The maximum size of identifiers on MySQL, in bytes.
 ///
 /// reference: https://dev.mysql.com/doc/refman/5.7/en/identifier-length.html

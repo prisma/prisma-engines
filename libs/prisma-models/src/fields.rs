@@ -1,3 +1,4 @@
+use crate::pk::PrimaryKey;
 use crate::*;
 use itertools::Itertools;
 use once_cell::sync::OnceCell;
@@ -9,8 +10,7 @@ use std::{
 #[derive(Debug)]
 pub struct Fields {
     pub all: Vec<Field>,
-    id: OnceCell<Option<Vec<ScalarFieldRef>>>,
-    id_field_names: Vec<String>,
+    primary_key: Option<PrimaryKey>,
     scalar: OnceCell<Vec<ScalarFieldWeak>>,
     relation: OnceCell<Vec<RelationFieldWeak>>,
     model: ModelWeakRef,
@@ -19,11 +19,10 @@ pub struct Fields {
 }
 
 impl Fields {
-    pub fn new(all: Vec<Field>, model: ModelWeakRef, id_field_names: Vec<String>) -> Fields {
+    pub fn new(all: Vec<Field>, model: ModelWeakRef, primary_key: Option<PrimaryKey>) -> Fields {
         Fields {
             all,
-            id: OnceCell::new(),
-            id_field_names,
+            primary_key,
             scalar: OnceCell::new(),
             relation: OnceCell::new(),
             created_at: OnceCell::new(),
@@ -63,8 +62,21 @@ impl Fields {
         }
     }
 
-    pub fn id(&self) -> Option<Vec<ScalarFieldRef>> {
-        self.id.get_or_init(|| self.find_id()).clone()
+    pub fn id(&self) -> Option<&PrimaryKey> {
+        self.primary_key.as_ref()
+    }
+
+    pub fn compound_id(&self) -> Option<&PrimaryKey> {
+        if self
+            .primary_key
+            .as_ref()
+            .map(|pk| pk.fields().len() > 1)
+            .unwrap_or(false)
+        {
+            self.primary_key.as_ref()
+        } else {
+            None
+        }
     }
 
     pub fn created_at(&self) -> &Option<ScalarFieldRef> {
@@ -194,21 +206,6 @@ impl Fields {
         };
 
         acc
-    }
-
-    /// Attempts to resolve an ID on the model (supplied with @@id on the model or @id onscalar fields).
-    fn find_id(&self) -> Option<Vec<ScalarFieldRef>> {
-        (!self.id_field_names.is_empty()).then(|| {
-            self.id_field_names
-                .iter()
-                .map(|f| {
-                    self.scalar()
-                        .into_iter()
-                        .find(|field| &field.name == f)
-                        .unwrap_or_else(|| panic!("Expected ID field {} to be present on the model", f))
-                })
-                .collect()
-        })
     }
 
     pub fn db_names(&self) -> impl Iterator<Item = String> + '_ {

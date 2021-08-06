@@ -85,7 +85,7 @@ class InSelectionBatching extends FlatSpec with Matchers with ApiSpecBase {
         |""".stripMargin,
       project = project,
       legacy = false,
-      batchSize = 2,
+      batchSize = Some(2),
     )
 
     res.toString should be(
@@ -101,7 +101,7 @@ class InSelectionBatching extends FlatSpec with Matchers with ApiSpecBase {
         |""".stripMargin,
       project = project,
       legacy = false,
-      batchSize = 2,
+      batchSize = Some(2),
     )
 
     res.toString should be(
@@ -117,7 +117,7 @@ class InSelectionBatching extends FlatSpec with Matchers with ApiSpecBase {
         |""".stripMargin,
       project = project,
       legacy = false,
-      batchSize = 2,
+      batchSize = Some(2),
     )
 
     res.toString should be(

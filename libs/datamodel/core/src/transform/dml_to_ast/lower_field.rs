@@ -1,9 +1,11 @@
+use crate::common::constraint_names::ConstraintNames;
 use crate::common::preview_features::PreviewFeature;
 use crate::common::RelationNames;
 use crate::transform::dml_to_ast::LowerDmlToAst;
+use crate::PreviewFeature::NamedConstraints;
 use crate::{
     ast::{self, Attribute, Span},
-    dml, Datasource, Field, Ignorable, WithDatabaseName,
+    dml, Datasource, Field, Ignorable,
 };
 use prisma_value::PrismaValue;
 
@@ -65,14 +67,43 @@ impl<'a> LowerDmlToAst<'a> {
         // @id
         if let dml::Field::ScalarField(sf) = field {
             if model.field_is_primary_and_defined_on_field(&sf.name) {
-                attributes.push(ast::Attribute::new("id", Vec::new()));
+                let mut args = vec![];
+                if self.preview_features.contains(NamedConstraints) {
+                    let pk = model.primary_key.as_ref().unwrap();
+                    if pk.db_name.is_some() {
+                        if let Some(src) = self.datasource {
+                            if !ConstraintNames::primary_key_name_matches(pk, model, &*src.active_connector) {
+                                args.push(ast::Argument::new(
+                                    "map",
+                                    ast::Expression::StringValue(
+                                        String::from(pk.db_name.as_ref().unwrap()),
+                                        Span::empty(),
+                                    ),
+                                ));
+                            }
+                        };
+                    }
+                }
+
+                attributes.push(ast::Attribute::new("id", args));
             }
         }
 
         // @unique
         if let dml::Field::ScalarField(sf) = field {
             if model.field_is_unique_and_defined_on_field(&sf.name) {
-                attributes.push(ast::Attribute::new("unique", vec![]));
+                let mut arguments = vec![];
+                if self.preview_features.contains(NamedConstraints) {
+                    if let Some(idx) = model
+                        .indices
+                        .iter()
+                        .find(|id| id.is_unique() && id.defined_on_field && id.fields == [field.name()])
+                    {
+                        self.push_index_map_argument(model, idx, &mut arguments)
+                    }
+                };
+
+                attributes.push(ast::Attribute::new("unique", arguments));
             }
         }
 
@@ -93,15 +124,7 @@ impl<'a> LowerDmlToAst<'a> {
         }
 
         // @map
-        if let Some(db_name) = field.database_name() {
-            attributes.push(ast::Attribute::new(
-                "map",
-                vec![ast::Argument::new_unnamed(ast::Expression::StringValue(
-                    String::from(db_name),
-                    Span::empty(),
-                ))],
-            ));
-        }
+        <LowerDmlToAst<'a>>::push_map_attribute(field, &mut attributes);
 
         // @relation
         if let dml::Field::RelationField(rf) = field {
@@ -162,6 +185,19 @@ impl<'a> LowerDmlToAst<'a> {
                         let expression = ast::Expression::ConstantValue(ref_action.to_string(), ast::Span::empty());
                         args.push(ast::Argument::new("onUpdate", expression));
                     }
+                }
+            }
+
+            if self.preview_features.contains(NamedConstraints) {
+                if let Some(fk_name) = &relation_info.fk_name {
+                    if let Some(src) = self.datasource {
+                        if !ConstraintNames::foreign_key_name_matches(relation_info, model, &*src.active_connector) {
+                            args.push(ast::Argument::new(
+                                "map",
+                                ast::Expression::StringValue(String::from(fk_name), Span::empty()),
+                            ));
+                        }
+                    };
                 }
             }
 

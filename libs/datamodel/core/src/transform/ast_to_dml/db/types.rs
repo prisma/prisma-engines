@@ -1,6 +1,9 @@
 use super::{attributes, context::Context};
 use crate::{ast, diagnostics::DatamodelError};
 use itertools::Itertools;
+use once_cell::sync::Lazy;
+use regex::Regex;
+use std::borrow::Cow;
 use std::{
     collections::{BTreeMap, HashMap},
     str::FromStr,
@@ -74,7 +77,15 @@ pub(crate) struct ScalarField<'ast> {
     pub(crate) is_updated_at: bool,
     pub(crate) default: Option<dml::default_value::DefaultValue>,
     /// @map
-    pub(super) mapped_name: Option<&'ast str>,
+    pub(crate) mapped_name: Option<&'ast str>,
+    // Native type name and arguments
+    pub(crate) native_type: Option<(&'ast str, Vec<String>)>,
+}
+
+impl ScalarField<'_> {
+    pub(crate) fn is_autoincrement(&self) -> bool {
+        matches!(&self.default, Some(crate::dml::DefaultValue::Expression(expr)) if expr.is_autoincrement())
+    }
 }
 
 #[derive(Debug)]
@@ -89,6 +100,8 @@ pub(crate) struct RelationField<'ast> {
     /// The name _explicitly present_ in the AST.
     pub(crate) name: Option<&'ast str>,
     pub(crate) is_ignored: bool,
+    /// The fk_name _explicitly present_ in the AST by using the map argument or the one being generated as default.
+    pub(crate) fk_name: Option<Cow<'ast, str>>,
 }
 
 impl RelationField<'_> {
@@ -101,18 +114,39 @@ impl RelationField<'_> {
             references: None,
             name: None,
             is_ignored: false,
+            fk_name: None,
         }
     }
 }
 
+/// Information gathered from validating attributes on a model.
 #[derive(Default, Debug)]
 pub(crate) struct ModelData<'ast> {
+    /// @(@)id
     pub(crate) primary_key: Option<PrimaryKeyData<'ast>>,
+    /// @@ignore
     pub(crate) is_ignored: bool,
-    /// @(@) index and @(@)unique.
-    pub(crate) indexes: Vec<IndexData<'ast>>,
+    /// @@index and @(@)unique.
+    pub(crate) indexes: Vec<(&'ast ast::Attribute, IndexData<'ast>)>,
     /// @@map
-    pub(super) mapped_name: Option<&'ast str>,
+    pub(crate) mapped_name: Option<&'ast str>,
+}
+
+impl ModelData<'_> {
+    /// Whether the field is the whole primary key. Will match `@id` and `@@id([fieldName])`.
+    pub(super) fn field_is_single_pk(&self, field: ast::FieldId) -> bool {
+        self.primary_key.as_ref().filter(|pk| pk.fields == [field]).is_some()
+    }
+
+    /// Whether MySQL would consider the field indexed for autoincrement purposes.
+    pub(super) fn field_is_indexed_for_autoincrement(&self, field_id: ast::FieldId) -> bool {
+        self.indexes.iter().any(|(_, idx)| idx.fields.get(0) == Some(&field_id))
+            || self
+                .primary_key
+                .as_ref()
+                .filter(|pk| pk.fields.get(0) == Some(&field_id))
+                .is_some()
+    }
 }
 
 #[derive(Debug, Default)]
@@ -121,7 +155,7 @@ pub(crate) struct IndexData<'ast> {
     pub(crate) fields: Vec<ast::FieldId>,
     pub(crate) source_field: Option<ast::FieldId>,
     pub(crate) name: Option<&'ast str>,
-    pub(crate) db_name: Option<&'ast str>,
+    pub(crate) db_name: Option<Cow<'ast, str>>,
 }
 
 #[derive(Debug, Default)]
@@ -129,7 +163,7 @@ pub(crate) struct PrimaryKeyData<'ast> {
     pub(crate) fields: Vec<ast::FieldId>,
     pub(crate) source_field: Option<ast::FieldId>,
     pub(crate) name: Option<&'ast str>,
-    pub(crate) db_name: Option<&'ast str>,
+    pub(crate) db_name: Option<Cow<'ast, str>>,
 }
 
 #[derive(Debug, Default)]
@@ -160,6 +194,7 @@ fn visit_model<'ast>(model_id: ast::ModelId, ast_model: &'ast ast::Model, ctx: &
                     is_updated_at: false,
                     default: None,
                     mapped_name: None,
+                    native_type: None,
                 };
 
                 if matches!(scalar_field_type, ScalarFieldType::BuiltInScalar(t) if t.is_json())
@@ -179,6 +214,10 @@ fn visit_model<'ast>(model_id: ast::ModelId, ast_model: &'ast ast::Model, ctx: &
                         &ast_field.name.name,
                         ast_field.span,
                     ));
+                }
+
+                if matches!(scalar_field_type, ScalarFieldType::Unsupported) {
+                    validate_unsupported_field_type(ast_field, ast_field.field_type.as_unsupported().unwrap().0, ctx);
                 }
 
                 ctx.db.types.scalar_fields.insert((model_id, field_id), field_data);
@@ -258,11 +297,28 @@ fn detect_alias_cycles(ctx: &mut Context<'_>) {
 fn visit_enum<'ast>(enum_id: ast::EnumId, enm: &'ast ast::Enum, ctx: &mut Context<'ast>) {
     let mut enum_data = EnumData::default();
 
+    if !ctx.db.active_connector().supports_enums() {
+        ctx.push_error(DatamodelError::new_validation_error(
+            &format!(
+                "You defined the enum `{}`. But the current connector does not support enums.",
+                &enm.name.name
+            ),
+            enm.span,
+        ));
+    }
+
+    if enm.values.is_empty() {
+        ctx.push_error(DatamodelError::new_validation_error(
+            "An enum must have at least one value.",
+            enm.span,
+        ))
+    }
+
     for (field_idx, field) in enm.values.iter().enumerate() {
         ctx.visit_attributes(&field.attributes, |attributes, ctx| {
             // @map
             attributes.visit_optional_single("map", ctx, |map_args, ctx| {
-                if let Some(mapped_name) = attributes::visit_map(map_args, ctx) {
+                if let Some(mapped_name) = attributes::visit_map_attribute(map_args, ctx) {
                     enum_data.mapped_values.insert(field_idx as u32, mapped_name);
                     ctx.mapped_enum_value_names
                         .insert((enum_id, mapped_name), field_idx as u32);
@@ -274,7 +330,7 @@ fn visit_enum<'ast>(enum_id: ast::EnumId, enm: &'ast ast::Enum, ctx: &mut Contex
     ctx.visit_attributes(&enm.attributes, |attributes, ctx| {
         // @@map
         attributes.visit_optional_single("map", ctx, |map_args, ctx| {
-            if let Some(mapped_name) = attributes::visit_map(map_args, ctx) {
+            if let Some(mapped_name) = attributes::visit_map_attribute(map_args, ctx) {
                 enum_data.mapped_name = Some(mapped_name);
                 ctx.mapped_enum_names.insert(mapped_name, enum_id);
             }
@@ -323,5 +379,42 @@ fn field_type<'ast>(field: &'ast ast::Field, ctx: &mut Context<'ast>) -> Result<
         Some((_, ast::Top::Generator(_))) | Some((_, ast::Top::Source(_))) => unreachable!(),
         None => Err(supported),
         _ => unreachable!(),
+    }
+}
+
+fn validate_unsupported_field_type(ast_field: &ast::Field, unsupported_lit: &str, ctx: &mut Context<'_>) {
+    static TYPE_REGEX: Lazy<Regex> = Lazy::new(|| {
+        Regex::new(r#"(?x)
+    ^                           # beginning of the string
+    (?P<prefix>[^(]+)           # a required prefix that is any character until the first opening brace
+    (?:\((?P<params>.*?)\))?    # (optional) an opening parenthesis, a closing parenthesis and captured params in-between
+    (?P<suffix>.+)?             # (optional) captured suffix after the params until the end of the string
+    $                           # end of the string
+    "#).unwrap()
+    });
+
+    if let Some(source) = ctx.db.datasource() {
+        let connector = &source.active_connector;
+
+        if let Some(captures) = TYPE_REGEX.captures(unsupported_lit) {
+            let prefix = captures.name("prefix").unwrap().as_str().trim();
+
+            let params = captures.name("params");
+            let args = match params {
+                None => vec![],
+                Some(params) => params.as_str().split(',').map(|s| s.trim().to_string()).collect(),
+            };
+
+            if let Ok(native_type) = connector.parse_native_type(prefix, args) {
+                let prisma_type = connector.scalar_type_for_native_type(native_type.serialized_native_type.clone());
+
+                let msg = format!(
+                        "The type `Unsupported(\"{}\")` you specified in the type definition for the field `{}` is supported as a native type by Prisma. Please use the native type notation `{} @{}.{}` for full support.",
+                        unsupported_lit, ast_field.name.name, prisma_type.to_string(), &source.name, native_type.render()
+                    );
+
+                ctx.push_error(DatamodelError::new_validation_error(&msg, ast_field.span));
+            }
+        }
     }
 }

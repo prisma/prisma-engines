@@ -1,5 +1,6 @@
 use datamodel::{ast::Span, diagnostics::*};
 
+use crate::attributes::with_named_constraints;
 use crate::common::*;
 
 #[test]
@@ -209,5 +210,46 @@ fn stringified_field_names_in_index_return_nice_error() {
         received_type: "string".into(),
         raw: "firstName".into(),
         span: Span::new(135, 146),
+    });
+}
+
+#[test]
+fn the_map_argument_must_be_rejected() {
+    let dml = r#"
+     model User {
+         id        Int    @id
+         firstName String
+         lastName  String
+
+         @@index([firstName,lastName], map: "MyIndexName")
+     }
+     "#;
+
+    let err = parse_error(dml);
+    err.assert_is(DatamodelError::UnusedArgumentError {
+        arg_name: "map".into(),
+        span: Span::new(141, 159),
+    });
+}
+
+#[test]
+fn having_both_the_map_and_name_argument_must_be_rejected() {
+    let dml = with_named_constraints(
+        r#"
+     model User {
+         id        Int    @id
+         firstName String
+         lastName  String
+
+         @@index([firstName,lastName], name: "BOTH MAP AND NAME IS NOT OK", map: "MyIndexName")
+     }
+     "#,
+    );
+
+    let err = parse_error(&dml);
+    err.assert_is(DatamodelError::AttributeValidationError {
+        message: "The `@@index` attribute accepts the `name` argument as an alias for the `map` argument for legacy reasons. It does not accept both though. Please use the `map` argument to specify the database name of the index.".into(),
+        attribute_name: "index".to_string(),
+        span: Span::new(336, 420),
     });
 }

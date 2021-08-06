@@ -20,6 +20,9 @@ static POSTGIS_TABLES_OR_VIEWS: Lazy<RegexSet> = Lazy::new(|| {
     .unwrap()
 });
 
+// https://www.postgresql.org/docs/12/pgbuffercache.html
+static EXTENSION_VIEWS: Lazy<RegexSet> = Lazy::new(|| RegexSet::new(&["(?i)^pg_buffercache$"]).unwrap());
+
 /// The maximum length of postgres identifiers, in bytes.
 ///
 /// Reference: https://www.postgresql.org/docs/12/limits.html
@@ -64,6 +67,8 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
         // Implements correct comparison for truncated index names.
         let (previous_name, next_name) = pair.as_ref().map(|idx| idx.name()).into_tuple();
 
+        //TODO (matthias, NamedConstraints) another nice surprise that can probably be removed once
+        // the preview flag becomes the default since this is handled in the parser
         if previous_name.len() == POSTGRES_IDENTIFIER_SIZE_LIMIT && next_name.len() > POSTGRES_IDENTIFIER_SIZE_LIMIT {
             previous_name[0..POSTGRES_IDENTIFIER_SIZE_LIMIT] != next_name[0..POSTGRES_IDENTIFIER_SIZE_LIMIT]
         } else {
@@ -111,7 +116,7 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
     }
 
     fn view_should_be_ignored(&self, view_name: &str) -> bool {
-        POSTGIS_TABLES_OR_VIEWS.is_match(view_name)
+        POSTGIS_TABLES_OR_VIEWS.is_match(view_name) || EXTENSION_VIEWS.is_match(view_name)
     }
 }
 

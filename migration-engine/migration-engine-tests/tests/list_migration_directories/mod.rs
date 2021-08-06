@@ -11,16 +11,18 @@ fn list_migration_directories_with_an_empty_migrations_folder_works(api: TestApi
 
 #[test_connector]
 fn listing_a_single_migration_name_should_work(api: TestApi) {
-    let dm = r#"
+    let dm = api.datamodel_with_provider(
+        r#"
         model Cat {
             id Int @id
             name String
         }
-    "#;
+    "#,
+    );
 
     let migrations_directory = api.create_migrations_directory();
 
-    api.create_migration("init", dm, &migrations_directory).send_sync();
+    api.create_migration("init", &dm, &migrations_directory).send_sync();
 
     api.apply_migrations(&migrations_directory)
         .send_sync()

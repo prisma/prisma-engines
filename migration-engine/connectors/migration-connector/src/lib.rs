@@ -2,6 +2,7 @@
 
 //! This crate defines the API exposed by the connectors to the migration engine core. The entry point for this API is the [MigrationConnector](trait.MigrationConnector.html) trait.
 
+mod checksum;
 mod database_migration_step_applier;
 mod destructive_change_checker;
 mod diff;
@@ -15,11 +16,10 @@ pub use destructive_change_checker::{
     DestructiveChangeChecker, DestructiveChangeDiagnostics, MigrationWarning, UnexecutableMigration,
 };
 pub use diff::DiffTarget;
-pub use error::ConnectorError;
+pub use error::{ConnectorError, ConnectorResult};
 pub use migration_persistence::{MigrationPersistence, MigrationRecord, PersistenceNotInitializedError, Timestamp};
 
 use migrations_directory::MigrationDirectory;
-use sha2::{Digest, Sha256};
 
 /// A boxed migration, opaque to the migration engine core. The connectors are
 /// sole responsible for producing and understanding migrations — the core just
@@ -94,77 +94,4 @@ pub trait MigrationConnector: Send + Sync + 'static {
 
     /// If possible, check that the passed in migrations apply cleanly.
     async fn validate_migrations(&self, _migrations: &[MigrationDirectory]) -> ConnectorResult<()>;
-}
-
-/// Shorthand for a [Result](https://doc.rust-lang.org/std/result/enum.Result.html) where the error
-/// variant is a [ConnectorError](/error/enum.ConnectorError.html).
-pub type ConnectorResult<T> = Result<T, ConnectorError>;
-
-/// Compute the checksum for a migration script, and return it formatted to be human-readable.
-fn checksum(script: &str) -> String {
-    let mut hasher = Sha256::new();
-    hasher.update(script.as_bytes());
-    let checksum: [u8; 32] = hasher.finalize().into();
-    checksum.format_checksum()
-}
-
-/// The length (in bytes, or equivalently ascii characters) of the checksum
-/// strings.
-const CHECKSUM_STR_LEN: usize = 64;
-
-/// Format a checksum to a hexadecimal string. This is used to checksum
-/// migration scripts with Sha256.
-trait FormatChecksum {
-    /// Format a checksum to a hexadecimal string.
-    fn format_checksum(&self) -> String;
-    /// Obsolete checksum method, should only be used for compatibility.
-    fn format_checksum_old(&self) -> String;
-}
-
-impl FormatChecksum for [u8; 32] {
-    fn format_checksum(&self) -> String {
-        use std::fmt::Write as _;
-
-        let mut checksum_string = String::with_capacity(32 * 2);
-
-        for byte in self {
-            write!(checksum_string, "{:02x}", byte).unwrap();
-        }
-
-        assert_eq!(checksum_string.len(), CHECKSUM_STR_LEN);
-
-        checksum_string
-    }
-
-    // Due to an omission in a previous version of the migration engine,
-    // some migrations tables will have old migrations with checksum strings
-    // that have not been zero-padded.
-    //
-    // Corresponding issue:
-    // https://github.com/prisma/prisma-engines/issues/1887
-    fn format_checksum_old(&self) -> String {
-        use std::fmt::Write as _;
-
-        let mut checksum_string = String::with_capacity(32 * 2);
-
-        for byte in self {
-            write!(checksum_string, "{:x}", byte).unwrap();
-        }
-
-        checksum_string
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn format_checksum_does_not_strip_zeros() {
-        assert_eq!(
-            checksum("hello"),
-            "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824"
-        );
-        assert_eq!(checksum("abcd").len(), CHECKSUM_STR_LEN);
-    }
 }
