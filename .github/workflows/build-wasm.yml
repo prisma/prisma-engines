@@ -41,3 +41,9 @@ jobs:
         with:
           command: build
           args: -p migration-core --release --target=wasm32-unknown-unknown
+
+      - name: Build the prisma-fmt crate
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: -p prisma-fmt --release --target=wasm32-unknown-unknown
