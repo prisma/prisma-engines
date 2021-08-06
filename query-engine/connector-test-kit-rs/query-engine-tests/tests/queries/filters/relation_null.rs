@@ -43,7 +43,7 @@ mod relation_is_null {
         Ok(())
     }
 
-    async fn test_data(runner: Runner) -> TestResult<()> {
+    async fn test_data(runner: &Runner) -> TestResult<()> {
         runner
             .query(r#"mutation { createOneMessage(data: { messageName: "message 1"}) { messageName }}"#)
             .await?

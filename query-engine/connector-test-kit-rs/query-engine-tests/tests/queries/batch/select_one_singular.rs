@@ -191,7 +191,7 @@ mod singlular_batch {
         Ok(())
     }
 
-    async fn create_test_data(runner: Runner) -> TestResult<()> {
+    async fn create_test_data(runner: &Runner) -> TestResult<()> {
         runner
             .query(
                 r#"mutation artistWithoutAlbums {

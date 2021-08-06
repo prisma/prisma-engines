@@ -44,7 +44,7 @@ mod rel_filter_ordering {
         Ok(())
     }
 
-    async fn create_test_data(runner: Runner) -> TestResult<()> {
+    async fn create_test_data(runner: &Runner) -> TestResult<()> {
         runner
             .query(r#"mutation {createOneLabel(data: {id: 1, text: "x"}) { text }}"#)
             .await?

@@ -1337,31 +1337,31 @@ mod ported {
             None => String::from("null"),
         };
 
-        runner
-            .query(format!(
-                indoc::indoc! { r#"
-                    mutation {{
-                        createOneModelA(data: {{
-                            idTest: "{}",
-                            optString: {},
-                            optInt: {},
-                            optFloat: {},
-                            optBoolean: {},
-                            optEnum: {},
-                            optDateTime: "{}"
-                            b: {{ connect: {{ int: 1 }} }}
-                        }}) {{ id }}
-                    }}
-            "#},
-                id, string, int, float, boolean, enum_, datetime
-            ))
-            .await?
-            .assert_success();
+        // For some reson this doesn't resolve correctly.
+        let query = format!(
+            r#"
+                mutation {{
+                    createOneModelA(data: {{
+                        idTest: "{}",
+                        optString: {},
+                        optInt: {},
+                        optFloat: {},
+                        optBoolean: {},
+                        optEnum: {},
+                        optDateTime: "{}"
+                        b: {{ connect: {{ int: 1 }} }}
+                    }}) {{ id }}
+                }}
+            "#,
+            id, string, int, float, boolean, enum_, datetime
+        );
+
+        runner.query(query).await?.assert_success();
 
         Ok(())
     }
 
-    async fn create_common_model_b(runner: Runner) -> TestResult<()> {
+    async fn create_common_model_b(runner: &Runner) -> TestResult<()> {
         runner
             .query("mutation { createOneModelB(data: { int: 1 }) { id }}")
             .await?

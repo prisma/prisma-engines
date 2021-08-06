@@ -29,7 +29,7 @@ mod find_many {
     }
 
     // Todo: Maybe move this "common" test data creation somewhere? (copied from find_first)
-    async fn test_data(runner: Runner) -> TestResult<()> {
+    async fn test_data(runner: &Runner) -> TestResult<()> {
         test_row(runner, r#"{ id: 1, field: "test1" }"#).await?;
         test_row(runner, r#"{ id: 2, field: "test2" }"#).await?;
         test_row(runner, r#"{ id: 3 }"#).await?;

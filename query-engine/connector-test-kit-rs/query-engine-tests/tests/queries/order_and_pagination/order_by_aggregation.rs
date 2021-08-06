@@ -525,7 +525,7 @@ mod order_by_aggr {
         Ok(())
     }
 
-    async fn create_test_data(runner: Runner) -> TestResult<()> {
+    async fn create_test_data(runner: &Runner) -> TestResult<()> {
         create_row(runner, r#"{ id: 1, name: "Alice", categories: { create: [{ id: 1, name: "Startup" }] }, posts: { create: { id: 1, title: "alice_post_1", categories: { create: [{ id: 2, name: "News" }, { id: 3, name: "Society" }] }} } }"#).await?;
         create_row(runner, r#"{ id: 2, name: "Bob", categories: { create: [{ id: 4, name: "Computer Science" }, { id: 5, name: "Music" }] }, posts: { create: [{ id: 2, title: "bob_post_1", categories: { create: [{ id: 6, name: "Finance" }] } }, { id: 3, title: "bob_post_2", categories: { create: [{ id: 7, name: "History" }, { id: 8, name: "Gaming" }, { id: 9, name: "Hacking" }] } }] } }"#).await?;
         create_row(runner, r#"{ id: 3, name: "Motongo" }"#).await?;

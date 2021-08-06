@@ -190,7 +190,7 @@ mod prisma_4088 {
         Ok(())
     }
 
-    async fn create_test_data(runner: Runner) -> TestResult<()> {
+    async fn create_test_data(runner: &Runner) -> TestResult<()> {
         create_row(runner, r#"{ id: 1, str: "aa" }"#).await?;
         create_row(runner, r#"{ id: 2, str: "ab" }"#).await?;
         create_row(runner, r#"{ id: 3, str: "ac" }"#).await?;

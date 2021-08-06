@@ -123,7 +123,7 @@ mod paging_one2m_stable_order {
     //    2  =>  4      B      B      B      C
     //    3  =>  5      C      C      B      A
     //    3  =>  6      A      C      D      C
-    async fn create_test_data(runner: Runner) -> TestResult<()> {
+    async fn create_test_data(runner: &Runner) -> TestResult<()> {
         create_row(runner, r#"{ id: 1, related: { create: [{ id: 1, fieldA: "A", fieldB: "B", fieldC: "C", fieldD: "D"}, { id: 2,  fieldA: "B", fieldB: "B", fieldC: "B", fieldD: "B"}]}}"#).await?;
         create_row(runner, r#"{ id: 2, related: { create: [{ id: 3,  fieldA: "B", fieldB: "A", fieldC: "B", fieldD: "B"},{ id: 4,  fieldA: "B", fieldB: "B", fieldC: "B", fieldD: "C"}]}}"#).await?;
         create_row(runner, r#"{ id: 3, related: { create: [{ id: 5, fieldA: "C", fieldB: "C", fieldC: "B", fieldD: "A"},{ id: 6,  fieldA: "A", fieldB: "C", fieldC: "D", fieldD: "C"}]}}"#).await?;
@@ -275,7 +275,7 @@ mod paging_one2m_unstable_order {
     //    2  =>  4      B      B      B      B
     //    3  =>  5      C      C      B      A
     //    3  =>  6      A      C      D      C
-    async fn create_test_data(runner: Runner) -> TestResult<()> {
+    async fn create_test_data(runner: &Runner) -> TestResult<()> {
         create_row(runner, r#"{ id: 1, related: { create: [{ id: 1, fieldA: "A", fieldB: "B", fieldC: "C", fieldD: "D"}, { id: 2,  fieldA: "B", fieldB: "B", fieldC: "B", fieldD: "B"}]}}"#).await?;
         create_row(runner, r#"{ id: 2, related: { create: [{ id: 3,  fieldA: "B", fieldB: "B", fieldC: "B", fieldD: "B"},{ id: 4,  fieldA: "B", fieldB: "B", fieldC: "B", fieldD: "B"}]}}"#).await?;
         create_row(runner, r#"{ id: 3, related: { create: [{ id: 5, fieldA: "C", fieldB: "C", fieldC: "B", fieldD: "A"},{ id: 6,  fieldA: "A", fieldB: "C", fieldC: "D", fieldD: "C"}]}}"#).await?;

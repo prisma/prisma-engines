@@ -45,7 +45,7 @@ mod prisma_933_spec {
         Ok(())
     }
 
-    async fn create_test_data(runner: Runner) -> TestResult<()> {
+    async fn create_test_data(runner: &Runner) -> TestResult<()> {
         create_row(
             runner,
             r#"{ buyer_id: 1, name: "Foo", sales: { create: [{ sale_id: 1 }, { sale_id: 2 }] }}"#,

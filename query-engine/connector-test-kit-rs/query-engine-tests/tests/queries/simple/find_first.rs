@@ -35,7 +35,7 @@ mod find_first_query {
         Ok(())
     }
 
-    async fn test_data(runner: Runner) -> TestResult<()> {
+    async fn test_data(runner: &Runner) -> TestResult<()> {
         test_row(runner, r#"{ id: 1, field: "test1" }"#).await?;
         test_row(runner, r#"{ id: 2, field: "test2" }"#).await?;
         test_row(runner, r#"{ id: 3 }"#).await?;

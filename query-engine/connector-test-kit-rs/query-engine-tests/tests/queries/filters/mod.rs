@@ -27,7 +27,7 @@ pub mod where_unique;
 /// 2  | null   | 1    | null  | 1       | "dA=="     | null | null
 /// 3  | null   | null | null  | null    | null       | null | null
 /// ```
-async fn common_test_data(runner: Runner) -> TestResult<()> {
+async fn common_test_data(runner: &Runner) -> TestResult<()> {
     runner
         .query(indoc! { r#"
             mutation { createOneTestModel(data: {

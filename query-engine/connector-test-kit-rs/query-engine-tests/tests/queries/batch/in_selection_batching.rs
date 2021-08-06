@@ -81,7 +81,7 @@ mod isb {
         Ok(())
     }
 
-    async fn create_test_data(runner: Runner) -> TestResult<()> {
+    async fn create_test_data(runner: &Runner) -> TestResult<()> {
         create_a(runner, r#"{ id: 1, b: { create: { id: 1 }} c: { create: { id: 1 }} }"#).await?;
         create_a(runner, r#"{ id: 2, b: { connect: { id: 1 }} c: { create: { id: 2 }} }"#).await?;
         create_a(runner, r#"{ id: 3, b: { create: { id: 3 }} c: { create: { id: 3 }} }"#).await?;

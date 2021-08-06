@@ -78,9 +78,9 @@ mod order_by_dependent {
     // "[Hops: 1] Ordering by related record field ascending with nulls" should "work"
     #[connector_test]
     async fn hop_1_related_record_asc_nulls(runner: Runner) -> TestResult<()> {
-        create_row(runner, 1, Some(1), Some(1), None).await?;
-        create_row(runner, 2, Some(2), None, None).await?;
-        create_row(runner, 3, None, None, None).await?;
+        create_row(&runner, 1, Some(1), Some(1), None).await?;
+        create_row(&runner, 2, Some(2), None, None).await?;
+        create_row(&runner, 3, None, None, None).await?;
 
         assert_query_many!(
             &runner,

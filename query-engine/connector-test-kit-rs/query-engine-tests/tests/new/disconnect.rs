@@ -66,7 +66,7 @@ mod disconnect_security {
     /// Create test data where:
     /// A1 -> B1, B2
     /// A2 -> B3
-    async fn one_to_many_test_data(runner: Runner) -> TestResult<()> {
+    async fn one_to_many_test_data(runner: &Runner) -> TestResult<()> {
         runner
             .query("mutation { createOneA(data: { id: 1, many_b: { create: [{ id: 1 }, { id: 2 }] } }) { id }}")
             .await?
@@ -83,7 +83,7 @@ mod disconnect_security {
     /// Create test data where:
     /// Post1 -> Category1, Category2
     /// Post2 -> Category3
-    async fn many_to_many_test_data(runner: Runner) -> TestResult<()> {
+    async fn many_to_many_test_data(runner: &Runner) -> TestResult<()> {
         runner
             .query(r#"mutation { createOnePost(data: { id: 1, title: "P1", categories: { create: [{ id: 1, name: "C1" }, { id: 2, name: "C2" }] } }) { id }}"#)
             .await?

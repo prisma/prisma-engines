@@ -82,7 +82,6 @@ mod fr_compound_one_to_m {
 
     fn schema() -> String {
         use indoc::indoc;
-        use query_engine_tests::run_query;
 
         let schema = indoc! { "
             model Location {

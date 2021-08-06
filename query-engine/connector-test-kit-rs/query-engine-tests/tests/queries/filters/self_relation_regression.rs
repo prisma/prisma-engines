@@ -70,7 +70,7 @@ mod sr_regression {
         Ok(())
     }
 
-    async fn test_data(runner: Runner) -> TestResult<()> {
+    async fn test_data(runner: &Runner) -> TestResult<()> {
         runner
             .query(r#"mutation { createOneCategory(data: { name: "Sub", parent: { create: { name: "Root" }}}) { parent { id }}}"#)
             .await?.assert_success();

@@ -25,7 +25,7 @@ mod m2m {
         Ok(())
     }
 
-    async fn test_data(runner: Runner) -> TestResult<()> {
+    async fn test_data(runner: &Runner) -> TestResult<()> {
         runner
             .query(
                 r#"mutation {

@@ -514,7 +514,7 @@ mod ext_rel_filters {
         Ok(())
     }
 
-    async fn test_data(runner: Runner) -> TestResult<()> {
+    async fn test_data(runner: &Runner) -> TestResult<()> {
         runner
             .query(r#"mutation { createOneGenre(data: { Name: "Genre1", GenreId: 1}) { Name }}"#)
             .await?

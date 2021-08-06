@@ -161,7 +161,7 @@ mod lists {
         Ok(())
     }
 
-    async fn test_data(runner: Runner) -> TestResult<()> {
+    async fn test_data(runner: &Runner) -> TestResult<()> {
         runner
             .query(indoc::indoc! { r#"
               mutation {
@@ -271,7 +271,7 @@ mod json_lists {
         Ok(())
     }
 
-    async fn test_data(runner: Runner) -> TestResult<()> {
+    async fn test_data(runner: &Runner) -> TestResult<()> {
         runner
             .query(indoc::indoc! { r#"
               mutation {
@@ -364,7 +364,7 @@ mod enum_lists {
         Ok(())
     }
 
-    async fn test_data(runner: Runner) -> TestResult<()> {
+    async fn test_data(runner: &Runner) -> TestResult<()> {
         runner
             .query(indoc::indoc! { r#"
               mutation {

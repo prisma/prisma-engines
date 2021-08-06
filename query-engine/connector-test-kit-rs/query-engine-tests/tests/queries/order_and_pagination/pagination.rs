@@ -867,7 +867,7 @@ mod pagination {
         Ok(())
     }
 
-    async fn create_test_data(runner: Runner) -> TestResult<()> {
+    async fn create_test_data(runner: &Runner) -> TestResult<()> {
         let n: [i32; 10] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
         for i in n.iter() {
