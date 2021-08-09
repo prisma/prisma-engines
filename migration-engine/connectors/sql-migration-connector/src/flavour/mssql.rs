@@ -185,11 +185,28 @@ impl SqlFlavour for MssqlFlavour {
             })
     }
 
-    async fn drop_database(&self, _database_url: &str) -> ConnectorResult<()> {
-        let features = vec!["microsoftSqlServer".into()];
-        return Err(ConnectorError::user_facing(
-            user_facing_errors::migration_engine::PreviewFeaturesBlocked { features },
-        ));
+    async fn drop_database(&self, database_url: &str) -> ConnectorResult<()> {
+        {
+            let conn_str: JdbcString = format!("jdbc:{}", database_url)
+                .parse()
+                .map_err(ConnectorError::url_parse_error)?;
+
+            let db_name = conn_str
+                .properties()
+                .get("database")
+                .map(|s| s.to_owned())
+                .unwrap_or_else(|| "master".to_owned());
+
+            assert!(db_name != "master", "Cannot drop the `master` database.");
+        }
+
+        let (db_name, master_uri) = Self::master_url(database_url)?;
+        let conn = connect(&master_uri.to_string()).await?;
+
+        let query = format!("DROP DATABASE IF EXISTS [{}]", db_name);
+        conn.raw_cmd(&query).await?;
+
+        Ok(())
     }
 
     async fn drop_migrations_table(&self, connection: &Connection) -> ConnectorResult<()> {
