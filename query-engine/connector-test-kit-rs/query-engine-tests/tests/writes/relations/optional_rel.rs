@@ -26,10 +26,10 @@ mod opt_rel {
 
     // "Updating an optional relation with null" should "return an error"
     #[connector_test]
-    async fn update_opt_rel_with_null_should_fail(runner: &Runner) -> TestResult<()> {
+    async fn update_opt_rel_with_null_should_fail(runner: Runner) -> TestResult<()> {
         // Setup
         insta::assert_snapshot!(
-          run_query!(runner, r#" mutation {
+          run_query!(&runner, r#" mutation {
             createOneList(data: { id: 1, name: "A", todo: { create: { id: 1, name: "B" } } }) {
               id
               name
@@ -43,7 +43,7 @@ mod opt_rel {
         );
 
         assert_error!(
-            runner,
+            &runner,
             r#"mutation {
                 updateOneList(where: { id: 1 }, data: { name: { set: "C" }, todo: null }) {
                   name

@@ -14,14 +14,14 @@ mod unnecessary_db_reqs {
               middle_id     String?
               middle        Middle? @relation(fields: [middle_id], references: [id])
             }
-            
+
             model Middle {
               #id(id, String, @id)
               bottom_id     String?
               bottom        Bottom? @relation(fields: [bottom_id], references: [id])
               top           Top[]
             }
-            
+
             model Bottom {
               #id(id, String, @id)
               bottom        Middle[]
@@ -37,13 +37,13 @@ mod unnecessary_db_reqs {
             #id(id, String, @id)
             #m2m(middle, Middle[], String)
           }
-          
+
           model Middle {
             #id(id, String, @id)
             #m2m(top, Top[], String)
             #m2m(bottom, Bottom[], String)
           }
-          
+
           model Bottom {
             #id(id, String, @id)
             #m2m(middle, Middle[], String)
@@ -55,11 +55,11 @@ mod unnecessary_db_reqs {
 
     // "One to Many relations" should "not create unnecessary roundtrips"
     #[connector_test(schema(schema_1))]
-    async fn one2m_no_roundtrips(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{ id: "lonely_top" }"#).await?;
+    async fn one2m_no_roundtrips(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: "lonely_top" }"#).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#""#),
+          run_query!(&runner, r#""#),
           @r###""###
         );
 

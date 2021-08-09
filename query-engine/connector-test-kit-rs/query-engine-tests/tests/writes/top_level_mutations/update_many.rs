@@ -21,12 +21,12 @@ mod update_many {
 
     // "An updateMany mutation" should "update the records matching the where clause"
     #[connector_test]
-    async fn update_recs_matching_where(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{ id: 1, optStr: "str1" }"#).await?;
-        create_row(runner, r#"{ id: 2, optStr: "str2" }"#).await?;
+    async fn update_recs_matching_where(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1, optStr: "str1" }"#).await?;
+        create_row(&runner, r#"{ id: 2, optStr: "str2" }"#).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateManyTestModel(
               where: { optStr: { equals: "str1" } }
               data: { optStr: { set: "str1new" }, optInt: { set: 1 }, optFloat: { multiply: 2 } }
@@ -38,7 +38,7 @@ mod update_many {
         );
 
         assert_query_many!(
-            runner,
+            &runner,
             r#"{
             findManyTestModel(orderBy: { id: asc }) {
               optStr
@@ -57,12 +57,12 @@ mod update_many {
 
     // "An updateMany mutation" should "update the records matching the where clause using shorthands"
     #[connector_test]
-    async fn update_recs_matching_where_shorthands(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{ id: 1, optStr: "str1" }"#).await?;
-        create_row(runner, r#"{ id: 2, optStr: "str2" }"#).await?;
+    async fn update_recs_matching_where_shorthands(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1, optStr: "str1" }"#).await?;
+        create_row(&runner, r#"{ id: 2, optStr: "str2" }"#).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateManyTestModel(
               where: { optStr: "str1" }
               data: { optStr: "str1new", optInt: null, optFloat: { multiply: 2 } }
@@ -74,7 +74,7 @@ mod update_many {
         );
 
         assert_query_many!(
-            runner,
+            &runner,
             r#"{
             findManyTestModel(orderBy: { id: asc }) {
               optStr
@@ -93,13 +93,13 @@ mod update_many {
 
     // "An updateMany mutation" should "update all items if the where clause is empty"
     #[connector_test(exclude(MongoDb))]
-    async fn update_all_items_if_where_empty(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{ id: 1, optStr: "str1" }"#).await?;
-        create_row(runner, r#"{ id: 2, optStr: "str2", optInt: 2 }"#).await?;
-        create_row(runner, r#"{ id: 3, optStr: "str3", optInt: 3, optFloat: 3.1 }"#).await?;
+    async fn update_all_items_if_where_empty(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1, optStr: "str1" }"#).await?;
+        create_row(&runner, r#"{ id: 2, optStr: "str2", optInt: 2 }"#).await?;
+        create_row(&runner, r#"{ id: 3, optStr: "str3", optInt: 3, optFloat: 3.1 }"#).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateManyTestModel(
               where: { }
               data: { optStr: { set: "updated" }, optFloat: { divide: 2 }, optInt: { decrement: 1 } }
@@ -111,7 +111,7 @@ mod update_many {
         );
 
         assert_query_many!(
-            runner,
+            &runner,
             r#"{
               findManyTestModel {
                 optStr
@@ -130,13 +130,13 @@ mod update_many {
 
     // "An updateMany mutation" should "correctly apply all number operations for Int"
     #[connector_test]
-    async fn apply_number_ops_for_int(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{ id: 1, optStr: "str1" }"#).await?;
-        create_row(runner, r#"{ id: 2, optStr: "str2", optInt: 2 }"#).await?;
-        create_row(runner, r#"{ id: 3, optStr: "str3", optInt: 3, optFloat: 3.1 }"#).await?;
+    async fn apply_number_ops_for_int(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1, optStr: "str1" }"#).await?;
+        create_row(&runner, r#"{ id: 2, optStr: "str2", optInt: 2 }"#).await?;
+        create_row(&runner, r#"{ id: 3, optStr: "str3", optInt: 3, optFloat: 3.1 }"#).await?;
 
         is_one_of!(
-            query_number_operation(runner, "optInt", "increment", "10").await?,
+            query_number_operation(&runner, "optInt", "increment", "10").await?,
             vec![
                 r#"{"data":{"findManyTestModel":[{"optInt":null},{"optInt":12},{"optInt":13}]}}"#,
                 r#"{"data":{"findManyTestModel":[{"optInt":10},{"optInt":12},{"optInt":13}]}}"#
@@ -145,7 +145,7 @@ mod update_many {
 
         // optInts before this op are now: null/10, 12, 13
         is_one_of!(
-            query_number_operation(runner, "optInt", "decrement", "10").await?,
+            query_number_operation(&runner, "optInt", "decrement", "10").await?,
             vec![
                 r#"{"data":{"findManyTestModel":[{"optInt":null},{"optInt":2},{"optInt":3}]}}"#,
                 r#"{"data":{"findManyTestModel":[{"optInt":0},{"optInt":2},{"optInt":3}]}}"#
@@ -154,7 +154,7 @@ mod update_many {
 
         // optInts before this op are now: null/0, 2, 3
         is_one_of!(
-            query_number_operation(runner, "optInt", "multiply", "2").await?,
+            query_number_operation(&runner, "optInt", "multiply", "2").await?,
             vec![
                 r#"{"data":{"findManyTestModel":[{"optInt":null},{"optInt":4},{"optInt":6}]}}"#,
                 r#"{"data":{"findManyTestModel":[{"optInt":0},{"optInt":4},{"optInt":6}]}}"#
@@ -165,7 +165,7 @@ mod update_many {
         if !matches!(runner.connector(), ConnectorTag::MongoDb(_)) {
             // optInts before this op are now: null/0, 4, 6
             is_one_of!(
-                query_number_operation(runner, "optInt", "divide", "3").await?,
+                query_number_operation(&runner, "optInt", "divide", "3").await?,
                 vec![
                     r#"{"data":{"findManyTestModel":[{"optInt":null},{"optInt":1},{"optInt":2}]}}"#,
                     r#"{"data":{"findManyTestModel":[{"optInt":0},{"optInt":1},{"optInt":2}]}}"#
@@ -174,7 +174,7 @@ mod update_many {
         }
 
         is_one_of!(
-            query_number_operation(runner, "optInt", "set", "5").await?,
+            query_number_operation(&runner, "optInt", "set", "5").await?,
             vec![
                 r#"{"data":{"findManyTestModel":[{"optInt":5},{"optInt":5},{"optInt":5}]}}"#,
                 r#"{"data":{"findManyTestModel":[{"optInt":5},{"optInt":5},{"optInt":5}]}}"#
@@ -182,7 +182,7 @@ mod update_many {
         );
 
         is_one_of!(
-            query_number_operation(runner, "optInt", "set", "null").await?,
+            query_number_operation(&runner, "optInt", "set", "null").await?,
             vec![
                 r#"{"data":{"findManyTestModel":[{"optInt":null},{"optInt":null},{"optInt":null}]}}"#,
                 r#"{"data":{"findManyTestModel":[{"optInt":null},{"optInt":null},{"optInt":null}]}}"#
@@ -197,38 +197,38 @@ mod update_many {
     //-{"data":{"findManyTestModel":[{"optFloat":null},{"optFloat":3.1},{"optFloat":4.2}]}}
     //+{"data":{"findManyTestModel":[{"optFloat":1.1},{"optFloat":3.1},{"optFloat":4.2}]}}
     #[connector_test(exclude(MongoDb))]
-    async fn apply_number_ops_for_float(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{ id: 1, optStr: "str1" }"#).await?;
-        create_row(runner, r#"{ id: 2, optStr: "str2", optFloat: 2 }"#).await?;
-        create_row(runner, r#"{ id: 3, optStr: "str3", optFloat: 3.1 }"#).await?;
+    async fn apply_number_ops_for_float(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1, optStr: "str1" }"#).await?;
+        create_row(&runner, r#"{ id: 2, optStr: "str2", optFloat: 2 }"#).await?;
+        create_row(&runner, r#"{ id: 3, optStr: "str3", optFloat: 3.1 }"#).await?;
 
         insta::assert_snapshot!(
-          query_number_operation(runner, "optFloat", "increment", "1.1").await?,
+          query_number_operation(&runner, "optFloat", "increment", "1.1").await?,
           @r###"{"data":{"findManyTestModel":[{"optFloat":null},{"optFloat":3.1},{"optFloat":4.2}]}}"###
         );
 
         insta::assert_snapshot!(
-          query_number_operation(runner, "optFloat", "decrement", "1.1").await?,
+          query_number_operation(&runner, "optFloat", "decrement", "1.1").await?,
           @r###"{"data":{"findManyTestModel":[{"optFloat":null},{"optFloat":2.0},{"optFloat":3.1}]}}"###
         );
 
         insta::assert_snapshot!(
-          query_number_operation(runner, "optFloat", "multiply", "5.5").await?,
+          query_number_operation(&runner, "optFloat", "multiply", "5.5").await?,
           @r###"{"data":{"findManyTestModel":[{"optFloat":null},{"optFloat":11.0},{"optFloat":17.05}]}}"###
         );
 
         insta::assert_snapshot!(
-          query_number_operation(runner, "optFloat", "divide", "2").await?,
+          query_number_operation(&runner, "optFloat", "divide", "2").await?,
           @r###"{"data":{"findManyTestModel":[{"optFloat":null},{"optFloat":5.5},{"optFloat":8.525}]}}"###
         );
 
         insta::assert_snapshot!(
-          query_number_operation(runner, "optFloat", "set", "5").await?,
+          query_number_operation(&runner, "optFloat", "set", "5").await?,
           @r###"{"data":{"findManyTestModel":[{"optFloat":5.0},{"optFloat":5.0},{"optFloat":5.0}]}}"###
         );
 
         insta::assert_snapshot!(
-          query_number_operation(runner, "optFloat", "set", "null").await?,
+          query_number_operation(&runner, "optFloat", "set", "null").await?,
           @r###"{"data":{"findManyTestModel":[{"optFloat":null},{"optFloat":null},{"optFloat":null}]}}"###
         );
 

@@ -23,51 +23,36 @@ impl ConnectorTagInterface for PostgresConnectorTag {
     fn connection_string(&self, database: &str, is_ci: bool) -> String {
         match self.version {
             Some(PostgresVersion::V9) if is_ci => format!(
-                "postgresql://postgres:prisma@test-db-postgres-9:5432/db?schema={}&connection_limit=1",
+                "postgresql://postgres:prisma@test-db-postgres-9:5432/db?schema={}",
                 database
             ),
             Some(PostgresVersion::V10) if is_ci => format!(
-                "postgresql://postgres:prisma@test-db-postgres-10:5432/db?schema={}&connection_limit=1",
+                "postgresql://postgres:prisma@test-db-postgres-10:5432/db?schema={}",
                 database
             ),
             Some(PostgresVersion::V11) if is_ci => format!(
-                "postgresql://postgres:prisma@test-db-postgres-11:5432/db?schema={}&connection_limit=1",
+                "postgresql://postgres:prisma@test-db-postgres-11:5432/db?schema={}",
                 database
             ),
             Some(PostgresVersion::V12) if is_ci => format!(
-                "postgresql://postgres:prisma@test-db-postgres-12:5432/db?schema={}&connection_limit=1",
+                "postgresql://postgres:prisma@test-db-postgres-12:5432/db?schema={}",
                 database
             ),
             Some(PostgresVersion::V13) if is_ci => format!(
-                "postgresql://postgres:prisma@test-db-postgres-13:5432/db?schema={}&connection_limit=1",
+                "postgresql://postgres:prisma@test-db-postgres-13:5432/db?schema={}",
                 database
             ),
             Some(PostgresVersion::PgBouncer) if is_ci => format!(
-                "postgresql://postgres:prisma@test-db-pgbouncer:6432/db?schema={}&connection_limit=1&pgbouncer=true",
+                "postgresql://postgres:prisma@test-db-pgbouncer:6432/db?schema={}&pgbouncer=true",
                 database
             ),
-            Some(PostgresVersion::V9) => format!(
-                "postgresql://postgres:prisma@127.0.0.1:5431/db?schema={}&connection_limit=1",
-                database
-            ),
-            Some(PostgresVersion::V10) => format!(
-                "postgresql://postgres:prisma@127.0.0.1:5432/db?schema={}&connection_limit=1",
-                database
-            ),
-            Some(PostgresVersion::V11) => format!(
-                "postgresql://postgres:prisma@127.0.0.1:5433/db?schema={}&connection_limit=1",
-                database
-            ),
-            Some(PostgresVersion::V12) => format!(
-                "postgresql://postgres:prisma@127.0.0.1:5434/db?schema={}&connection_limit=1",
-                database
-            ),
-            Some(PostgresVersion::V13) => format!(
-                "postgresql://postgres:prisma@127.0.0.1:5434/db?schema={}&connection_limit=1",
-                database
-            ),
+            Some(PostgresVersion::V9) => format!("postgresql://postgres:prisma@127.0.0.1:5431/db?schema={}", database),
+            Some(PostgresVersion::V10) => format!("postgresql://postgres:prisma@127.0.0.1:5432/db?schema={}", database),
+            Some(PostgresVersion::V11) => format!("postgresql://postgres:prisma@127.0.0.1:5433/db?schema={}", database),
+            Some(PostgresVersion::V12) => format!("postgresql://postgres:prisma@127.0.0.1:5434/db?schema={}", database),
+            Some(PostgresVersion::V13) => format!("postgresql://postgres:prisma@127.0.0.1:5434/db?schema={}", database),
             Some(PostgresVersion::PgBouncer) => format!(
-                "postgresql://postgres:prisma@127.0.0.1:6432/db?schema={}&connection_limit=1&pgbouncer=true",
+                "postgresql://postgres:prisma@127.0.0.1:6432/db?schema={}&pgbouncer=true",
                 database
             ),
 

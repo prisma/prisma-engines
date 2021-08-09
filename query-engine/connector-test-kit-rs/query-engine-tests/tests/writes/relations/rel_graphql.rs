@@ -27,15 +27,15 @@ mod rel_graphql {
 
     // "One2One relations" should "only allow one item per side"
     #[connector_test(exclude(SqlServer))]
-    async fn one2one_rel_allow_one_item_per_side(runner: &Runner) -> TestResult<()> {
-        create_row(runner, "Cat", "garfield").await?;
-        create_row(runner, "Cat", "azrael").await?;
-        create_row(runner, "Owner", "jon").await?;
-        create_row(runner, "Owner", "gargamel").await?;
+    async fn one2one_rel_allow_one_item_per_side(runner: Runner) -> TestResult<()> {
+        create_row(&runner, "Cat", "garfield").await?;
+        create_row(&runner, "Cat", "azrael").await?;
+        create_row(&runner, "Owner", "jon").await?;
+        create_row(&runner, "Owner", "gargamel").await?;
 
         //set initial owner
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation { updateOneCat(
+          run_query!(&runner, r#"mutation { updateOneCat(
             where: {catName: "garfield"},
             data: {owner: {connect: {ownerName: "jon"}}}) {
               catName
@@ -48,18 +48,18 @@ mod rel_graphql {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query{findUniqueOwner(where:{ownerName:"jon"}){ownerName, cat{catName}}}"#),
+          run_query!(&runner, r#"query{findUniqueOwner(where:{ownerName:"jon"}){ownerName, cat{catName}}}"#),
           @r###"{"data":{"findUniqueOwner":{"ownerName":"jon","cat":{"catName":"garfield"}}}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query{findUniqueOwner(where:{ownerName:"gargamel"}){ownerName, cat{catName}}}"#),
+          run_query!(&runner, r#"query{findUniqueOwner(where:{ownerName:"gargamel"}){ownerName, cat{catName}}}"#),
           @r###"{"data":{"findUniqueOwner":{"ownerName":"gargamel","cat":null}}}"###
         );
 
         //change owner
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {updateOneCat(where: {catName: "garfield"},
+          run_query!(&runner, r#"mutation {updateOneCat(where: {catName: "garfield"},
           data: {owner: {connect: {ownerName: "gargamel"}}}) {
               catName
               owner {
@@ -71,12 +71,12 @@ mod rel_graphql {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query{findUniqueOwner(where:{ownerName:"jon"}){ownerName, cat{catName}}}"#),
+          run_query!(&runner, r#"query{findUniqueOwner(where:{ownerName:"jon"}){ownerName, cat{catName}}}"#),
           @r###"{"data":{"findUniqueOwner":{"ownerName":"jon","cat":null}}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query{findUniqueOwner(where:{ownerName:"gargamel"}){ownerName, cat{catName}}}"#),
+          run_query!(&runner, r#"query{findUniqueOwner(where:{ownerName:"gargamel"}){ownerName, cat{catName}}}"#),
           @r###"{"data":{"findUniqueOwner":{"ownerName":"gargamel","cat":{"catName":"garfield"}}}}"###
         );
 

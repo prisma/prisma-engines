@@ -3,6 +3,7 @@ package queries.batch
 import org.scalatest.{FlatSpec, Matchers}
 import util.{ApiSpecBase, IgnoreMsSql, IgnoreMySql, IgnorePostgres, IgnoreSQLite, ProjectDsl}
 
+// RS: Ported
 class TransactionalBatchSpec extends FlatSpec with Matchers with ApiSpecBase {
   val project = ProjectDsl.fromString {
     """

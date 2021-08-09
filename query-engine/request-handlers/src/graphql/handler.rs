@@ -4,7 +4,7 @@ use futures::FutureExt;
 use indexmap::IndexMap;
 use query_core::{
     BatchDocument, CompactedDocument, Item, Operation, QueryDocument, QueryExecutor, QuerySchemaRef, QueryValue,
-    ResponseData,
+    ResponseData, TxId,
 };
 use std::{fmt, panic::AssertUnwindSafe};
 
@@ -24,23 +24,23 @@ impl<'a> GraphQlHandler<'a> {
         Self { executor, query_schema }
     }
 
-    pub async fn handle(&self, body: GraphQlBody) -> PrismaResponse {
+    pub async fn handle(&self, body: GraphQlBody, tx_id: Option<TxId>) -> PrismaResponse {
         tracing::debug!("Incoming GraphQL query: {:?}", body);
 
         match body.into_doc() {
-            Ok(QueryDocument::Single(query)) => self.handle_single(query).await,
+            Ok(QueryDocument::Single(query)) => self.handle_single(query, tx_id).await,
             Ok(QueryDocument::Multi(batch)) => match batch.compact() {
-                BatchDocument::Multi(batch, transactional) => self.handle_batch(batch, transactional).await,
-                BatchDocument::Compact(compacted) => self.handle_compacted(compacted).await,
+                BatchDocument::Multi(batch, transactional) => self.handle_batch(batch, transactional, tx_id).await,
+                BatchDocument::Compact(compacted) => self.handle_compacted(compacted, tx_id).await,
             },
             Err(err) => PrismaResponse::Single(err.into()),
         }
     }
 
-    async fn handle_single(&self, query: Operation) -> PrismaResponse {
+    async fn handle_single(&self, query: Operation, tx_id: Option<TxId>) -> PrismaResponse {
         use user_facing_errors::Error;
 
-        let gql_response = match AssertUnwindSafe(self.handle_graphql(query)).catch_unwind().await {
+        let gql_response = match AssertUnwindSafe(self.handle_graphql(query, tx_id)).catch_unwind().await {
             Ok(Ok(response)) => response.into(),
             Ok(Err(err)) => err.into(),
             Err(err) => {
@@ -53,12 +53,12 @@ impl<'a> GraphQlHandler<'a> {
         PrismaResponse::Single(gql_response)
     }
 
-    async fn handle_batch(&self, queries: Vec<Operation>, transactional: bool) -> PrismaResponse {
+    async fn handle_batch(&self, queries: Vec<Operation>, transactional: bool, tx_id: Option<TxId>) -> PrismaResponse {
         use user_facing_errors::Error;
 
         match AssertUnwindSafe(
             self.executor
-                .execute_batch(queries, transactional, self.query_schema.clone()),
+                .execute_all(tx_id, queries, transactional, self.query_schema.clone()),
         )
         .catch_unwind()
         .await
@@ -86,7 +86,7 @@ impl<'a> GraphQlHandler<'a> {
     }
 
     #[tracing::instrument(skip(self, document))]
-    async fn handle_compacted(&self, document: CompactedDocument) -> PrismaResponse {
+    async fn handle_compacted(&self, document: CompactedDocument, tx_id: Option<TxId>) -> PrismaResponse {
         use user_facing_errors::Error;
 
         let plural_name = document.plural_name();
@@ -95,7 +95,7 @@ impl<'a> GraphQlHandler<'a> {
         let arguments = document.arguments;
         let nested_selection = document.nested_selection;
 
-        match AssertUnwindSafe(self.handle_graphql(document.operation))
+        match AssertUnwindSafe(self.handle_graphql(document.operation, tx_id))
             .catch_unwind()
             .await
         {
@@ -153,7 +153,7 @@ impl<'a> GraphQlHandler<'a> {
         }
     }
 
-    async fn handle_graphql(&self, query_doc: Operation) -> query_core::Result<ResponseData> {
-        self.executor.execute(query_doc, self.query_schema.clone()).await
+    async fn handle_graphql(&self, query_doc: Operation, tx_id: Option<TxId>) -> query_core::Result<ResponseData> {
+        self.executor.execute(tx_id, query_doc, self.query_schema.clone()).await
     }
 }

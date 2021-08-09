@@ -285,3 +285,9 @@ pub struct UnsupportedFeature {
 pub struct MultiError {
     pub errors: String, // Might want to change it to collection of user facing errors.
 }
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = "P2028", message = "Transaction API error: {error}")]
+pub struct InteractiveTransactionError {
+    pub error: String,
+}

@@ -3,9 +3,10 @@ use datamodel::{diagnostics::ValidatedConfiguration, Datamodel};
 use napi::threadsafe_function::ThreadsafeFunction;
 use opentelemetry::global;
 use prisma_models::DatamodelConverter;
-use query_core::{exec_loader, schema_builder, BuildMode, QueryExecutor, QuerySchema, QuerySchemaRenderer};
-use request_handlers::{GraphQLSchemaRenderer, GraphQlBody, GraphQlHandler, PrismaResponse};
+use query_core::{executor, schema_builder, BuildMode, QueryExecutor, QuerySchema, QuerySchemaRenderer, TxId};
+use request_handlers::{GraphQLSchemaRenderer, GraphQlBody, GraphQlHandler, PrismaResponse, TxInput};
 use serde::{Deserialize, Serialize};
+use serde_json::json;
 use std::{
     collections::{BTreeMap, HashMap},
     path::PathBuf,
@@ -198,7 +199,7 @@ impl QueryEngine {
                             })
                             .map_err(|err| crate::error::ApiError::Conversion(err, builder.datamodel.raw.clone()))?;
 
-                        let (db_name, executor) = exec_loader::load(data_source, &preview_features, &url).await?;
+                        let (db_name, executor) = executor::load(data_source, &preview_features, &url).await?;
                         let connector = executor.primary_connector();
                         connector.get_connection().await?;
 
@@ -258,7 +259,12 @@ impl QueryEngine {
     }
 
     /// If connected, sends a query to the core and returns the response.
-    pub async fn query(&self, query: GraphQlBody, trace: HashMap<String, String>) -> crate::Result<PrismaResponse> {
+    pub async fn query(
+        &self,
+        query: GraphQlBody,
+        trace: HashMap<String, String>,
+        tx_id: Option<String>,
+    ) -> crate::Result<PrismaResponse> {
         match *self.inner.read().await {
             Inner::Connected(ref engine) => {
                 engine
@@ -270,7 +276,76 @@ impl QueryEngine {
                         span.set_parent(cx);
 
                         let handler = GraphQlHandler::new(engine.executor(), engine.query_schema());
-                        Ok(handler.handle(query).await)
+                        Ok(handler.handle(query, tx_id.map(TxId::from)).await)
+                    })
+                    .await
+            }
+            Inner::Builder(_) => Err(ApiError::NotConnected),
+        }
+    }
+
+    /// If connected, attempts to start a transaction in the core and returns its ID.
+    pub async fn start_tx(&self, input: TxInput, trace: HashMap<String, String>) -> crate::Result<String> {
+        match *self.inner.read().await {
+            Inner::Connected(ref engine) => {
+                engine
+                    .logger
+                    .with_logging(|| async move {
+                        let cx = global::get_text_map_propagator(|propagator| propagator.extract(&trace));
+                        let span = tracing::span!(Level::TRACE, "query");
+
+                        span.set_parent(cx);
+
+                        match engine.executor().start_tx(input.max_wait, input.timeout).await {
+                            Ok(tx_id) => Ok(json!({ "id": tx_id.to_string() }).to_string()),
+                            Err(err) => Ok(map_known_error(err)?),
+                        }
+                    })
+                    .await
+            }
+            Inner::Builder(_) => Err(ApiError::NotConnected),
+        }
+    }
+
+    /// If connected, attempts to commit a transaction with id `tx_id` in the core.
+    pub async fn commit_tx(&self, tx_id: String, trace: HashMap<String, String>) -> crate::Result<String> {
+        match *self.inner.read().await {
+            Inner::Connected(ref engine) => {
+                engine
+                    .logger
+                    .with_logging(|| async move {
+                        let cx = global::get_text_map_propagator(|propagator| propagator.extract(&trace));
+                        let span = tracing::span!(Level::TRACE, "query");
+
+                        span.set_parent(cx);
+
+                        match engine.executor().commit_tx(TxId::from(tx_id)).await {
+                            Ok(_) => Ok("{}".to_string()),
+                            Err(err) => Ok(map_known_error(err)?),
+                        }
+                    })
+                    .await
+            }
+            Inner::Builder(_) => Err(ApiError::NotConnected),
+        }
+    }
+
+    /// If connected, attempts to roll back a transaction with id `tx_id` in the core.
+    pub async fn rollback_tx(&self, tx_id: String, trace: HashMap<String, String>) -> crate::Result<String> {
+        match *self.inner.read().await {
+            Inner::Connected(ref engine) => {
+                engine
+                    .logger
+                    .with_logging(|| async move {
+                        let cx = global::get_text_map_propagator(|propagator| propagator.extract(&trace));
+                        let span = tracing::span!(Level::TRACE, "query");
+
+                        span.set_parent(cx);
+
+                        match engine.executor().rollback_tx(TxId::from(tx_id)).await {
+                            Ok(_) => Ok("{}".to_string()),
+                            Err(err) => Ok(map_known_error(err)?),
+                        }
                     })
                     .await
             }
@@ -285,6 +360,13 @@ impl QueryEngine {
             Inner::Builder(_) => Err(ApiError::NotConnected),
         }
     }
+}
+
+fn map_known_error(err: query_core::CoreError) -> crate::Result<String> {
+    let user_error: user_facing_errors::Error = err.into();
+    let value = serde_json::to_string(&user_error)?;
+
+    Ok(value)
 }
 
 pub fn set_panic_hook() {

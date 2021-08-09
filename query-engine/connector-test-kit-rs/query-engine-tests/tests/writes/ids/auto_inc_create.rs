@@ -20,9 +20,9 @@ mod auto_inc_create {
 
     // "Creating an item with a non primary key autoincrement and index " should "work"
     #[connector_test(schema(schema_1), capabilities(AutoIncrement, AutoIncrementNonIndexedAllowed))]
-    async fn non_primary_key_autoinc_idx(runner: &Runner) -> TestResult<()> {
+    async fn non_primary_key_autoinc_idx(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneMail(data: { messageId:1 }){
               id
               messageId
@@ -47,9 +47,9 @@ mod auto_inc_create {
 
     // "Creating an item with a non primary key autoincrement and unique index " should "work"
     #[connector_test(schema(schema_2), capabilities(AutoIncrement, AutoIncrementAllowedOnNonId))]
-    async fn non_primary_key_autoinc_uniq_idx(runner: &Runner) -> TestResult<()> {
+    async fn non_primary_key_autoinc_uniq_idx(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneMail(data: { messageId:1 }){
               id
               messageId
@@ -77,9 +77,9 @@ mod auto_inc_create {
         schema(schema_3),
         capabilities(AutoIncrement, AutoIncrementNonIndexedAllowed, AutoIncrementAllowedOnNonId)
     )]
-    async fn non_primary_key_autoinc_without_idx(runner: &Runner) -> TestResult<()> {
+    async fn non_primary_key_autoinc_without_idx(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneMail(data: { messageId: 1 }){
               id
               messageId

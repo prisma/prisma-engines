@@ -26,10 +26,10 @@ mod required_rel {
 
     // "Updating a required relation with null" should "return an error"
     #[connector_test]
-    async fn update_with_null(runner: &Runner) -> TestResult<()> {
+    async fn update_with_null(runner: Runner) -> TestResult<()> {
         // Setup
         insta::assert_snapshot!(
-          run_query!(runner, r#" mutation {
+          run_query!(&runner, r#" mutation {
             createOneList(data: { id: 1, name: "A", todo: { create: { id: 1, name: "B" } } }) {
               id
               name
@@ -44,7 +44,7 @@ mod required_rel {
 
         // Check that the engine rejects `null` as a `TodoUpdateInput`.
         assert_error!(
-            runner,
+            &runner,
             r#" mutation {
               updateOneList(where: { id: 1 }, data: { name: { set: "C" }, todo: null }) {
                 name

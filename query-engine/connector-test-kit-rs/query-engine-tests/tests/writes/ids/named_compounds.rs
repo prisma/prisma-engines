@@ -26,7 +26,7 @@ mod named_compound_uniques {
     }
 
     #[connector_test(schema(schema_w_named_compounds))]
-    async fn using_named_compounds_works(runner: &Runner) -> TestResult<()> {
+    async fn using_named_compounds_works(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(runner, r#"mutation {
             createOneParent(data: { name: "Leto" , age: 50}) {

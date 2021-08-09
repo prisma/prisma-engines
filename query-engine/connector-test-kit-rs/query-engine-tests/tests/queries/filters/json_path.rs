@@ -5,10 +5,10 @@ mod json_path {
     use query_engine_tests::ConnectorTag;
 
     #[connector_test]
-    async fn no_path_without_filter(runner: &Runner) -> TestResult<()> {
+    async fn no_path_without_filter(runner: Runner) -> TestResult<()> {
         assert_error!(
             runner,
-            jsonq(runner, json_path(runner), Some("")),
+            jsonq(&runner, json_path(&runner), Some("")),
             2019,
             "A JSON path cannot be set without a scalar filter."
         );
@@ -17,14 +17,14 @@ mod json_path {
     }
 
     #[connector_test(capabilities(JsonFilteringArrayPath))]
-    async fn extract_array_path(runner: &Runner) -> TestResult<()> {
-        create_row(runner, 1, r#"{ \"a\": { \"b\": \"c\" } }"#, false).await?;
-        create_row(runner, 2, r#"{ \"a\": { \"b\": [1, 2, 3] } }"#, false).await?;
+    async fn extract_array_path(runner: Runner) -> TestResult<()> {
+        create_row(&runner, 1, r#"{ \"a\": { \"b\": \"c\" } }"#, false).await?;
+        create_row(&runner, 2, r#"{ \"a\": { \"b\": [1, 2, 3] } }"#, false).await?;
 
         insta::assert_snapshot!(
             run_query!(
                 runner,
-                jsonq(runner, r#"path: ["a", "b"], equals: "\"c\"" "#, Some(""))
+                jsonq(&runner, r#"path: ["a", "b"], equals: "\"c\"" "#, Some(""))
             ),
             @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":\"c\"}}"}]}}"###
         );
@@ -32,7 +32,7 @@ mod json_path {
         insta::assert_snapshot!(
             run_query!(
                 runner,
-                jsonq(runner, r#"path: ["a", "b", "0"], equals: "1" "#, Some(""))
+                jsonq(&runner, r#"path: ["a", "b", "0"], equals: "1" "#, Some(""))
             ),
             @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":[1,2,3]}}"}]}}"###
         );
@@ -41,14 +41,14 @@ mod json_path {
     }
 
     #[connector_test(capabilities(JsonFilteringJsonPath), exclude(MySql(5.6)))]
-    async fn extract_json_path(runner: &Runner) -> TestResult<()> {
-        create_row(runner, 1, r#"{ \"a\": { \"b\": \"c\" } }"#, false).await?;
-        create_row(runner, 2, r#"{ \"a\": { \"b\": [1, 2, 3] } }"#, false).await?;
+    async fn extract_json_path(runner: Runner) -> TestResult<()> {
+        create_row(&runner, 1, r#"{ \"a\": { \"b\": \"c\" } }"#, false).await?;
+        create_row(&runner, 2, r#"{ \"a\": { \"b\": [1, 2, 3] } }"#, false).await?;
 
         insta::assert_snapshot!(
             run_query!(
                 runner,
-                jsonq(runner, r#"path: "$.a.b", equals: "\"c\"" "#, Some(""))
+                jsonq(&runner, r#"path: "$.a.b", equals: "\"c\"" "#, Some(""))
             ),
             @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":\"c\"}}"}]}}"###
         );
@@ -56,7 +56,7 @@ mod json_path {
         insta::assert_snapshot!(
             run_query!(
                 runner,
-                jsonq(runner, r#"path: "$.a.b[0]", equals: "1" "#, Some(""))
+                jsonq(&runner, r#"path: "$.a.b[0]", equals: "1" "#, Some(""))
             ),
             @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":[1,2,3]}}"}]}}"###
         );
@@ -65,18 +65,18 @@ mod json_path {
     }
 
     #[connector_test]
-    async fn array_contains(runner: &Runner) -> TestResult<()> {
-        create_row(runner, 1, r#"[1, 2, 3]"#, true).await?;
-        create_row(runner, 2, r#"[3, 4, 5]"#, true).await?;
-        create_row(runner, 3, r#"3"#, true).await?;
-        create_row(runner, 4, r#"[\"a\", \"b\"]"#, true).await?;
-        create_row(runner, 5, r#"\"a\""#, true).await?;
-        create_row(runner, 6, r#"[[1, 2]]"#, true).await?;
+    async fn array_contains(runner: Runner) -> TestResult<()> {
+        create_row(&runner, 1, r#"[1, 2, 3]"#, true).await?;
+        create_row(&runner, 2, r#"[3, 4, 5]"#, true).await?;
+        create_row(&runner, 3, r#"3"#, true).await?;
+        create_row(&runner, 4, r#"[\"a\", \"b\"]"#, true).await?;
+        create_row(&runner, 5, r#"\"a\""#, true).await?;
+        create_row(&runner, 6, r#"[[1, 2]]"#, true).await?;
 
         insta::assert_snapshot!(
             run_query!(
                 runner,
-                jsonq(runner, r#"array_contains: "[3]" "#, None)
+                jsonq(&runner, r#"array_contains: "[3]" "#, None)
             ),
             @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":[1,2,3]}}"},{"json":"{\"a\":{\"b\":[3,4,5]}}"}]}}"###
         );
@@ -84,7 +84,7 @@ mod json_path {
         insta::assert_snapshot!(
             run_query!(
                 runner,
-                jsonq(runner, r#"array_contains: "[\"a\"]" "#, None)
+                jsonq(&runner, r#"array_contains: "[\"a\"]" "#, None)
             ),
             @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":[\"a\",\"b\"]}}"}]}}"###
         );
@@ -92,7 +92,7 @@ mod json_path {
         insta::assert_snapshot!(
             run_query!(
                 runner,
-                jsonq(runner, r#"array_contains: "[[1, 2]]" "#, None)
+                jsonq(&runner, r#"array_contains: "[[1, 2]]" "#, None)
             ),
             @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":[[1,2]]}}"}]}}"###
         );
@@ -101,18 +101,18 @@ mod json_path {
     }
 
     #[connector_test]
-    async fn array_starts_with(runner: &Runner) -> TestResult<()> {
-        create_row(runner, 1, r#"[1, 2, 3]"#, true).await?;
-        create_row(runner, 2, r#"[3, 4, 5]"#, true).await?;
-        create_row(runner, 3, r#"3"#, true).await?;
-        create_row(runner, 4, r#"[\"a\", \"b\"]"#, true).await?;
-        create_row(runner, 5, r#"\"a\""#, true).await?;
-        create_row(runner, 6, r#"[[1, 2]]"#, true).await?;
+    async fn array_starts_with(runner: Runner) -> TestResult<()> {
+        create_row(&runner, 1, r#"[1, 2, 3]"#, true).await?;
+        create_row(&runner, 2, r#"[3, 4, 5]"#, true).await?;
+        create_row(&runner, 3, r#"3"#, true).await?;
+        create_row(&runner, 4, r#"[\"a\", \"b\"]"#, true).await?;
+        create_row(&runner, 5, r#"\"a\""#, true).await?;
+        create_row(&runner, 6, r#"[[1, 2]]"#, true).await?;
 
         insta::assert_snapshot!(
             run_query!(
                 runner,
-                jsonq(runner, r#"array_starts_with: "3" "#, None)
+                jsonq(&runner, r#"array_starts_with: "3" "#, None)
             ),
             @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":[3,4,5]}}"}]}}"###
         );
@@ -120,7 +120,7 @@ mod json_path {
         insta::assert_snapshot!(
             run_query!(
                 runner,
-                jsonq(runner, r#"array_starts_with: "\"a\"" "#, None)
+                jsonq(&runner, r#"array_starts_with: "\"a\"" "#, None)
             ),
             @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":[\"a\",\"b\"]}}"}]}}"###
         );
@@ -128,7 +128,7 @@ mod json_path {
         insta::assert_snapshot!(
             run_query!(
                 runner,
-                jsonq(runner, r#"array_starts_with: "[1, 2]" "#, None)
+                jsonq(&runner, r#"array_starts_with: "[1, 2]" "#, None)
             ),
             @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":[[1,2]]}}"}]}}"###
         );
@@ -137,16 +137,16 @@ mod json_path {
     }
 
     #[connector_test]
-    async fn array_ends_with(runner: &Runner) -> TestResult<()> {
-        create_row(runner, 1, r#"[1, 2, 3]"#, true).await?;
-        create_row(runner, 2, r#"[3, 4, 5]"#, true).await?;
-        create_row(runner, 3, r#"[\"a\", \"b\"]"#, true).await?;
-        create_row(runner, 4, r#"[[1, 2], [3, 4]]"#, true).await?;
+    async fn array_ends_with(runner: Runner) -> TestResult<()> {
+        create_row(&runner, 1, r#"[1, 2, 3]"#, true).await?;
+        create_row(&runner, 2, r#"[3, 4, 5]"#, true).await?;
+        create_row(&runner, 3, r#"[\"a\", \"b\"]"#, true).await?;
+        create_row(&runner, 4, r#"[[1, 2], [3, 4]]"#, true).await?;
 
         insta::assert_snapshot!(
             run_query!(
                 runner,
-                jsonq(runner, r#"array_ends_with: "3" "#, None)
+                jsonq(&runner, r#"array_ends_with: "3" "#, None)
             ),
             @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":[1,2,3]}}"}]}}"###
         );
@@ -154,7 +154,7 @@ mod json_path {
         insta::assert_snapshot!(
             run_query!(
                 runner,
-                jsonq(runner, r#"array_ends_with: "\"b\"" "#, None)
+                jsonq(&runner, r#"array_ends_with: "\"b\"" "#, None)
             ),
             @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":[\"a\",\"b\"]}}"}]}}"###
         );
@@ -162,7 +162,7 @@ mod json_path {
         insta::assert_snapshot!(
             run_query!(
                 runner,
-                jsonq(runner, r#"array_ends_with: "[3, 4]" "#, None)
+                jsonq(&runner, r#"array_ends_with: "[3, 4]" "#, None)
             ),
             @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":[[1,2],[3,4]]}}"}]}}"###
         );
@@ -171,15 +171,15 @@ mod json_path {
     }
 
     #[connector_test]
-    async fn string_contains(runner: &Runner) -> TestResult<()> {
-        create_row(runner, 1, r#"\"foo\""#, true).await?;
-        create_row(runner, 2, r#"\"fool\""#, true).await?;
-        create_row(runner, 3, r#"[\"foo\"]"#, true).await?;
+    async fn string_contains(runner: Runner) -> TestResult<()> {
+        create_row(&runner, 1, r#"\"foo\""#, true).await?;
+        create_row(&runner, 2, r#"\"fool\""#, true).await?;
+        create_row(&runner, 3, r#"[\"foo\"]"#, true).await?;
 
         insta::assert_snapshot!(
             run_query!(
                 runner,
-                jsonq(runner, r#"string_contains: "oo" "#, None)
+                jsonq(&runner, r#"string_contains: "oo" "#, None)
             ),
             @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":\"foo\"}}"},{"json":"{\"a\":{\"b\":\"fool\"}}"}]}}"###
         );
@@ -187,15 +187,15 @@ mod json_path {
     }
 
     #[connector_test]
-    async fn string_starts_with(runner: &Runner) -> TestResult<()> {
-        create_row(runner, 1, r#"\"foo\""#, true).await?;
-        create_row(runner, 2, r#"\"fool\""#, true).await?;
-        create_row(runner, 3, r#"[\"foo\"]"#, true).await?;
+    async fn string_starts_with(runner: Runner) -> TestResult<()> {
+        create_row(&runner, 1, r#"\"foo\""#, true).await?;
+        create_row(&runner, 2, r#"\"fool\""#, true).await?;
+        create_row(&runner, 3, r#"[\"foo\"]"#, true).await?;
 
         insta::assert_snapshot!(
             run_query!(
                 runner,
-                jsonq(runner, r#"string_starts_with: "foo" "#, None)
+                jsonq(&runner, r#"string_starts_with: "foo" "#, None)
             ),
             @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":\"foo\"}}"},{"json":"{\"a\":{\"b\":\"fool\"}}"}]}}"###
         );
@@ -203,15 +203,15 @@ mod json_path {
     }
 
     #[connector_test]
-    async fn string_ends_with(runner: &Runner) -> TestResult<()> {
-        create_row(runner, 1, r#"\"foo\""#, true).await?;
-        create_row(runner, 2, r#"\"fool\""#, true).await?;
-        create_row(runner, 3, r#"[\"foo\"]"#, true).await?;
+    async fn string_ends_with(runner: Runner) -> TestResult<()> {
+        create_row(&runner, 1, r#"\"foo\""#, true).await?;
+        create_row(&runner, 2, r#"\"fool\""#, true).await?;
+        create_row(&runner, 3, r#"[\"foo\"]"#, true).await?;
 
         insta::assert_snapshot!(
             run_query!(
                 runner,
-                jsonq(runner, r#"string_ends_with: "oo" "#, None)
+                jsonq(&runner, r#"string_ends_with: "oo" "#, None)
             ),
             @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":\"foo\"}}"}]}}"###
         );
@@ -219,18 +219,18 @@ mod json_path {
     }
 
     #[connector_test]
-    async fn gt_gte(runner: &Runner) -> TestResult<()> {
-        create_row(runner, 1, r#"\"foo\""#, true).await?;
-        create_row(runner, 2, r#"\"bar\""#, true).await?;
-        create_row(runner, 3, r#"1"#, true).await?;
-        create_row(runner, 4, r#"2"#, true).await?;
-        create_row(runner, 5, r#"1.4"#, true).await?;
-        create_row(runner, 6, r#"[\"foo\"]"#, true).await?;
+    async fn gt_gte(runner: Runner) -> TestResult<()> {
+        create_row(&runner, 1, r#"\"foo\""#, true).await?;
+        create_row(&runner, 2, r#"\"bar\""#, true).await?;
+        create_row(&runner, 3, r#"1"#, true).await?;
+        create_row(&runner, 4, r#"2"#, true).await?;
+        create_row(&runner, 5, r#"1.4"#, true).await?;
+        create_row(&runner, 6, r#"[\"foo\"]"#, true).await?;
 
         insta::assert_snapshot!(
             run_query!(
                 runner,
-                jsonq(runner, r#"gt: "\"b\"" "#, None)
+                jsonq(&runner, r#"gt: "\"b\"" "#, None)
             ),
             @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":\"foo\"}}"},{"json":"{\"a\":{\"b\":\"bar\"}}"}]}}"###
         );
@@ -238,7 +238,7 @@ mod json_path {
         insta::assert_snapshot!(
             run_query!(
                 runner,
-                jsonq(runner, r#"gte: "\"b\"" "#, None)
+                jsonq(&runner, r#"gte: "\"b\"" "#, None)
             ),
             @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":\"foo\"}}"},{"json":"{\"a\":{\"b\":\"bar\"}}"}]}}"###
         );
@@ -246,7 +246,7 @@ mod json_path {
         insta::assert_snapshot!(
             run_query!(
                 runner,
-                jsonq(runner, r#"gt: "1" "#, None)
+                jsonq(&runner, r#"gt: "1" "#, None)
             ),
             @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":2}}"},{"json":"{\"a\":{\"b\":1.4}}"}]}}"###
         );
@@ -254,7 +254,7 @@ mod json_path {
         insta::assert_snapshot!(
             run_query!(
                 runner,
-                jsonq(runner, r#"gte: "1" "#, None)
+                jsonq(&runner, r#"gte: "1" "#, None)
             ),
             @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":1}}"},{"json":"{\"a\":{\"b\":2}}"},{"json":"{\"a\":{\"b\":1.4}}"}]}}"###
         );
@@ -263,14 +263,14 @@ mod json_path {
     }
 
     #[connector_test]
-    async fn multi_filtering(runner: &Runner) -> TestResult<()> {
-        create_row(runner, 1, r#"[1, 2, 3]"#, true).await?;
-        create_row(runner, 2, r#"[3, 4, 5]"#, true).await?;
-        create_row(runner, 3, r#"[3, 4, 6]"#, true).await?;
-        create_row(runner, 4, r#"[5, 6, 7]"#, true).await?;
-        create_row(runner, 5, r#"1"#, true).await?;
-        create_row(runner, 6, r#"2.4"#, true).await?;
-        create_row(runner, 7, r#"3"#, true).await?;
+    async fn multi_filtering(runner: Runner) -> TestResult<()> {
+        create_row(&runner, 1, r#"[1, 2, 3]"#, true).await?;
+        create_row(&runner, 2, r#"[3, 4, 5]"#, true).await?;
+        create_row(&runner, 3, r#"[3, 4, 6]"#, true).await?;
+        create_row(&runner, 4, r#"[5, 6, 7]"#, true).await?;
+        create_row(&runner, 5, r#"1"#, true).await?;
+        create_row(&runner, 6, r#"2.4"#, true).await?;
+        create_row(&runner, 7, r#"3"#, true).await?;
 
         insta::assert_snapshot!(
             run_query!(
@@ -281,7 +281,7 @@ mod json_path {
                         cursor: {{ id: 2 }},
                         take: 2
                     ) {{ json }}
-                }}"#, json_path(runner))
+                }}"#, json_path(&runner))
             ),
             @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":[3,4,5]}}"},{"json":"{\"a\":{\"b\":[3,4,6]}}"}]}}"###
         );
@@ -298,7 +298,7 @@ mod json_path {
                             ]
                         }}
                     ) {{ json }}
-                }}"#, json_path(runner), json_path(runner))
+                }}"#, json_path(&runner), json_path(&runner))
             ),
             @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":1}}"},{"json":"{\"a\":{\"b\":2.4}}"}]}}"###
         );
@@ -330,7 +330,7 @@ mod json_path {
         )
     }
 
-    fn json_path(runner: &Runner) -> &str {
+    fn json_path(runner: &Runner) -> &'static str {
         match runner.connector() {
             ConnectorTag::Postgres(_) => r#"path: ["a", "b"]"#,
             ConnectorTag::MySql(_) => r#"path: "$.a.b""#,

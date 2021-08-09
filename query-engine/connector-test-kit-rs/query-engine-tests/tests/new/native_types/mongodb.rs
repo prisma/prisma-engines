@@ -17,14 +17,14 @@ mod mongodb {
 
     // Regression test for native type coercions not applying correctly to lists.
     #[connector_test]
-    async fn native_type_list_coercion(runner: &Runner) -> TestResult<()> {
+    async fn native_type_list_coercion(runner: Runner) -> TestResult<()> {
         runner
             .query(r#"mutation { createOneTestModel(data: { id: "609675d400e7693e0090e48c" }) { id }}"#)
             .await?
             .assert_success();
 
         insta::assert_snapshot!(
-            run_query!(runner, r#"query { findManyTestModel(where: { id: { in: ["609675d400e7693e0090e48c", "507f1f77bcf86cd799439011"] } }) { id }}"#),
+            run_query!(&runner, r#"query { findManyTestModel(where: { id: { in: ["609675d400e7693e0090e48c", "507f1f77bcf86cd799439011"] } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":"609675d400e7693e0090e48c"}]}}"###
         );
 

@@ -16,9 +16,9 @@ mod json {
 
     // "Json float accuracy" should "work"
     #[connector_test(exclude(SqlServer, Mysql, Sqlite))]
-    async fn json_float_accuracy(runner: &Runner) -> TestResult<()> {
+    async fn json_float_accuracy(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneModel(
               data: {
                 id: "B"
@@ -36,9 +36,9 @@ mod json {
 
     // "Using a json field" should "work"
     #[connector_test]
-    async fn using_json_field(runner: &Runner) -> TestResult<()> {
+    async fn using_json_field(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneModel(
               data: {
                 id: "A"
@@ -51,7 +51,7 @@ mod json {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateOneModel(
               where: { id: "A" }
               data: {
@@ -65,7 +65,7 @@ mod json {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateOneModel(
               where: { id: "A" }
               data: {

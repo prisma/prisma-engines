@@ -192,6 +192,9 @@ pub enum ErrorKind {
 
     #[error("Server terminated the connection.")]
     ConnectionClosed,
+
+    #[error("Transaction aborted: {}", message)]
+    TransactionAborted { message: String },
 }
 
 impl From<DomainError> for ConnectorError {

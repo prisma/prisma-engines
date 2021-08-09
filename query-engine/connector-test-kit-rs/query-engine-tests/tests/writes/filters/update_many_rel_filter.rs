@@ -36,11 +36,11 @@ mod update_many_rel_filter {
 
     // "The updateMany Mutation" should "update the items matching the where relation filter"
     #[connector_test]
-    async fn update_items_matching_where_rel_filter(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{ id: 1, top: "top1"}"#).await?;
-        create_row(runner, r#"{ id: 2, top: "top2"}"#).await?;
+    async fn update_items_matching_where_rel_filter(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1, top: "top1"}"#).await?;
+        create_row(&runner, r#"{ id: 2, top: "top2"}"#).await?;
         create_row(
-            runner,
+            &runner,
             r#"{
                   id: 3,
                   top: "top3"
@@ -52,12 +52,12 @@ mod update_many_rel_filter {
         .await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyTop(where: { bottom: { is: null } }) { id } }"#),
+          run_query!(&runner, r#"{ findManyTop(where: { bottom: { is: null } }) { id } }"#),
           @r###"{"data":{"findManyTop":[{"id":1},{"id":2}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateManyTop(
               where: { bottom: { is: null } }
               data: { top: { set: "updated" } }
@@ -67,7 +67,7 @@ mod update_many_rel_filter {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyTop(where: { bottom: { is: null } }) { id top } }"#),
+          run_query!(&runner, r#"{ findManyTop(where: { bottom: { is: null } }) { id top } }"#),
           @r###"{"data":{"findManyTop":[{"id":1,"top":"updated"},{"id":2,"top":"updated"}]}}"###
         );
 
@@ -76,11 +76,11 @@ mod update_many_rel_filter {
 
     //"The updateMany Mutation" should "update all items if the filter is empty"
     #[connector_test]
-    async fn update_all_items_if_filter_empty(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{ id: 1, top: "top1"}"#).await?;
-        create_row(runner, r#"{ id: 2, top: "top2"}"#).await?;
+    async fn update_all_items_if_filter_empty(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1, top: "top1"}"#).await?;
+        create_row(&runner, r#"{ id: 2, top: "top2"}"#).await?;
         create_row(
-            runner,
+            &runner,
             r#"{
                 id: 3,
                 top: "top3"
@@ -92,12 +92,12 @@ mod update_many_rel_filter {
         .await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {updateManyTop(data: { top: { set: "updated" }}){count}}"#),
+          run_query!(&runner, r#"mutation {updateManyTop(data: { top: { set: "updated" }}){count}}"#),
           @r###"{"data":{"updateManyTop":{"count":3}}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyTop(where: { top: { equals: "updated" }}) { id top } }"#),
+          run_query!(&runner, r#"{ findManyTop(where: { top: { equals: "updated" }}) { id top } }"#),
           @r###"{"data":{"findManyTop":[{"id":1,"top":"updated"},{"id":2,"top":"updated"},{"id":3,"top":"updated"}]}}"###
         );
 
@@ -106,11 +106,11 @@ mod update_many_rel_filter {
 
     // "The updateMany Mutation" should "work for deeply nested filters"
     #[connector_test]
-    async fn works_with_deeply_nested_filters(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{ id: 1, top: "top1"}"#).await?;
-        create_row(runner, r#"{ id: 2, top: "top2"}"#).await?;
+    async fn works_with_deeply_nested_filters(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1, top: "top1"}"#).await?;
+        create_row(&runner, r#"{ id: 2, top: "top2"}"#).await?;
         create_row(
-            runner,
+            &runner,
             r#"{
                 id: 3,
                 top: "top3"
@@ -126,12 +126,12 @@ mod update_many_rel_filter {
         .await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyTop(where: { bottom: { is: { veryBottom: { is: { veryBottom: { equals: "veryBottom" }}}}}}) { id } }"#),
+          run_query!(&runner, r#"{ findManyTop(where: { bottom: { is: { veryBottom: { is: { veryBottom: { equals: "veryBottom" }}}}}}) { id } }"#),
           @r###"{"data":{"findManyTop":[{"id":3}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateManyTop(
               where: { bottom: { is: { veryBottom: { is: { veryBottom: { equals: "veryBottom" }}}}}}
               data: { top: { set: "updated" } }
@@ -141,7 +141,7 @@ mod update_many_rel_filter {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyTop(where: { top: { equals: "updated" }}) { id top } }"#),
+          run_query!(&runner, r#"{ findManyTop(where: { top: { equals: "updated" }}) { id top } }"#),
           @r###"{"data":{"findManyTop":[{"id":3,"top":"updated"}]}}"###
         );
 

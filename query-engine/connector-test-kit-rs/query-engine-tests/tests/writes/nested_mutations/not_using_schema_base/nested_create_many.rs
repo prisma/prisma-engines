@@ -10,7 +10,7 @@ mod nested_create_many {
               #id(id, Int, @id)
               bs ModelB[]
             }
-            
+
             model ModelB {
               #id(id, Int, @id)
               str1 String
@@ -26,9 +26,9 @@ mod nested_create_many {
 
     // "A basic createMany on a create top level" should "work"
     #[connector_test(exclude(Sqlite))]
-    async fn create_many_on_create(runner: &Runner) -> TestResult<()> {
+    async fn create_many_on_create(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneModelA(data: {
               id: 1,
               bs: {
@@ -55,9 +55,9 @@ mod nested_create_many {
     // "Nested createMany" should "error on duplicates by default"
     // TODO(dom): Not working for mongo
     #[connector_test(exclude(Sqlite, MongoDb))]
-    async fn nested_createmany_fail_dups(runner: &Runner) -> TestResult<()> {
+    async fn nested_createmany_fail_dups(runner: Runner) -> TestResult<()> {
         assert_error!(
-            runner,
+            &runner,
             r#"mutation {
               createOneModelA(data: {
                 id: 1,
@@ -85,9 +85,9 @@ mod nested_create_many {
     // "Nested createMany" should "not error on duplicates with skipDuplicates true"
     // TODO(dom): Not working for mongo
     #[connector_test(exclude(Sqlite, SqlServer, MongoDb))]
-    async fn no_error_on_dups_when_skip_dups(runner: &Runner) -> TestResult<()> {
+    async fn no_error_on_dups_when_skip_dups(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneModelA(data: {
               id: 1,
               bs: {
@@ -117,7 +117,7 @@ mod nested_create_many {
     // We create 1000 nested records.
     // "Nested createMany" should "allow creating a large number of records (horizontal partitioning check)"
     #[connector_test(exclude(Sqlite))]
-    async fn allow_create_large_number_records(runner: &Runner) -> TestResult<()> {
+    async fn allow_create_large_number_records(runner: Runner) -> TestResult<()> {
         let records: Vec<_> = (1..=1000)
             .map(|i| format!(r#"{{ id: {}, str1: "{}" }}"#, i, i))
             .collect();
@@ -142,7 +142,7 @@ mod nested_create_many {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             aggregateModelB {
               _count {
                 _all

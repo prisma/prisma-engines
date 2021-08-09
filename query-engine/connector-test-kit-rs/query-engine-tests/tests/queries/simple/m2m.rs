@@ -5,8 +5,8 @@ mod m2m {
     use query_engine_tests::assert_query;
 
     #[connector_test]
-    async fn fetch_only_associated(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn fetch_only_associated(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         // Querying categories for one post only return their categories.
         assert_query!(

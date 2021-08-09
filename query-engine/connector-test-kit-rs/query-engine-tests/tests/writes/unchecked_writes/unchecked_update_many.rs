@@ -40,9 +40,9 @@ mod unchecked_update_many {
 
     // "Unchecked update many" should "allow writing inlined relation scalars"
     #[connector_test(schema(schema_1))]
-    async fn allow_write_non_prent_inline_rel_sclrs(runner: &Runner) -> TestResult<()> {
+    async fn allow_write_non_prent_inline_rel_sclrs(runner: Runner) -> TestResult<()> {
         run_query!(
-            runner,
+            &runner,
             r#"mutation {
                 createOneModelA(data: {
                   id: 1
@@ -54,7 +54,7 @@ mod unchecked_update_many {
             }"#
         );
         run_query!(
-            runner,
+            &runner,
             r#"mutation {
                 createOneModelA(data: {
                   id: 2
@@ -68,7 +68,7 @@ mod unchecked_update_many {
 
         // Connect all As to b2 and c2
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateManyModelA(where: { id: { not: 0 } }, data: {
               b_id_1: "b2_1"
               b_id_2: "b2_2"
@@ -82,7 +82,7 @@ mod unchecked_update_many {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateManyModelA(where: { id: { not: 0 }}, data: {
               c_id_1: null
             }) {
@@ -110,12 +110,12 @@ mod unchecked_update_many {
 
     // "Unchecked updates" should "allow to write to autoincrement IDs directly"
     #[connector_test(schema(schema_2), exclude(SqlServer, Sqlite))]
-    async fn allow_write_autoinc_id(runner: &Runner) -> TestResult<()> {
-        run_query!(runner, r#"mutation { createOneModelA(data: { id: 1 }) { id } }"#);
-        run_query!(runner, r#"mutation { createOneModelA(data: { id: 2 }) { id } }"#);
+    async fn allow_write_autoinc_id(runner: Runner) -> TestResult<()> {
+        run_query!(&runner, r#"mutation { createOneModelA(data: { id: 1 }) { id } }"#);
+        run_query!(&runner, r#"mutation { createOneModelA(data: { id: 2 }) { id } }"#);
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateManyModelA(where: { id: { not: 0 }}, data: { int: 111 }) {
               count
             }

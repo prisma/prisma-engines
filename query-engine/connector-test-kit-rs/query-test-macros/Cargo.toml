@@ -15,4 +15,3 @@ darling = "0.12"
 query-tests-setup = { path = "../query-tests-setup" }
 itertools = "0.10"
 indoc = "1.0"
-

@@ -13,6 +13,7 @@ pub use connector_tag::*;
 pub use datamodel_rendering::*;
 pub use error::*;
 pub use logging::*;
+pub use query_core;
 pub use query_result::*;
 pub use runner::*;
 pub use schema_gen::*;
@@ -88,16 +89,18 @@ pub fn run_relation_link_test<F>(
     let template = datamodel.to_string();
     let dm_with_params_json: DatamodelWithParams = dm_with_params.parse().unwrap();
 
-    if ConnectorTag::should_run(&config, &enabled_connectors, &capabilities, test_name) {
+    if ConnectorTag::should_run(config, &enabled_connectors, capabilities, test_name) {
         let datamodel = render_test_datamodel(config, test_database, template);
         let connector = config.test_connector_tag().unwrap();
 
         run_with_tokio(
             async move {
                 tracing::debug!("Used datamodel:\n {}", datamodel.clone().yellow());
+
                 let runner = Runner::load(config.runner(), datamodel.clone(), connector)
                     .await
                     .unwrap();
+
                 setup_project(&datamodel).await.unwrap();
                 test_fn.call(&runner, &dm_with_params_json).await.unwrap();
             }

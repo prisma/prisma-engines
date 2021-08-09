@@ -86,7 +86,7 @@ pub fn parse_many_compound_ids(
         serde_json::Value::Array(arr) => {
             let compound_ids = arr
                 .iter()
-                .map(|json_val| parse_compound_id(fields, arg_name, &json_val, &[]))
+                .map(|json_val| parse_compound_id(fields, arg_name, json_val, &[]))
                 .collect::<Result<Vec<_>, _>>()?;
 
             Ok(compound_ids)
@@ -104,7 +104,7 @@ pub fn parse_many_ids(field: &str, json: &serde_json::Value, path: &[&str]) -> R
         serde_json::Value::Array(arr) => {
             let ids = arr
                 .iter()
-                .map(|json_val| parse_id(field, &json_val, &[]))
+                .map(|json_val| parse_id(field, json_val, &[]))
                 .collect::<Result<Vec<_>, _>>()?;
 
             Ok(ids)

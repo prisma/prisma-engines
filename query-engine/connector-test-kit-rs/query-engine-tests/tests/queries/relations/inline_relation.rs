@@ -13,7 +13,7 @@ mod inline_rel {
               b_id String?
               b    ModelB? @relation(fields: [b_id], references: [id])
             }
-            
+
             model ModelB {
               #id(id, String, @id)
               model ModelA[]
@@ -25,11 +25,11 @@ mod inline_rel {
 
     // "Querying the scalar field that backs a relation and the relation itself" should "work"
     #[connector_test]
-    async fn scalar_field_back_relation(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{ id: "1" }"#).await?;
+    async fn scalar_field_back_relation(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: "1" }"#).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyModelA {
               id
               b_id

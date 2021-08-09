@@ -50,10 +50,10 @@ mod unchecked_update {
 
     // "Unchecked updates" should "allow writing inlined relation scalars"
     #[connector_test(schema(schema_1))]
-    async fn allow_write_non_prent_inline_rel_sclrs(runner: &Runner) -> TestResult<()> {
+    async fn allow_write_non_prent_inline_rel_sclrs(runner: Runner) -> TestResult<()> {
         // Setup
         run_query!(
-            runner,
+            &runner,
             r#"mutation {
                 createOneModelA(data: {
                   id: 1
@@ -65,7 +65,7 @@ mod unchecked_update {
             }"#
         );
         run_query!(
-            runner,
+            &runner,
             r#"mutation {
                 createOneModelB(data: {
                   id: 2
@@ -78,7 +78,7 @@ mod unchecked_update {
             }"#
         );
         run_query!(
-            runner,
+            &runner,
             r#"mutation {
                 createOneModelC(data: {
                   id: 2
@@ -93,7 +93,7 @@ mod unchecked_update {
 
         // Update inlined
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateOneModelA(where: { id: 1 }, data: {
               b_id_1: "b2_1"
               b_id_2: "b2_2"
@@ -115,7 +115,7 @@ mod unchecked_update {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateOneModelA(where: { id: 1 }, data: {
               c_id_1: null
             }) {
@@ -178,10 +178,10 @@ mod unchecked_update {
 
     // "Unchecked updates" should "not allow writing inlined relations regularly"
     #[connector_test(schema(schema_2))]
-    async fn disallow_write_inline_rels(runner: &Runner) -> TestResult<()> {
+    async fn disallow_write_inline_rels(runner: Runner) -> TestResult<()> {
         // Setup
         run_query!(
-            runner,
+            &runner,
             r#"mutation {
                 createOneModelA(data: {
                   id: 1
@@ -195,7 +195,7 @@ mod unchecked_update {
 
         // Update inlined
         assert_error!(
-            runner,
+            &runner,
             r#"mutation {
                 updateOneModelA(where: { id: 1 }, data: {
                   id: 1
@@ -237,10 +237,10 @@ mod unchecked_update {
 
     // "Unchecked updates" should "allow writing non-inlined relations normally"
     #[connector_test(schema(schema_3))]
-    async fn allow_write_non_inline_rels(runner: &Runner) -> TestResult<()> {
-        run_query!(runner, r#"mutation { createOneModelB(data: { id: 11 }) { id } }"#);
+    async fn allow_write_non_inline_rels(runner: Runner) -> TestResult<()> {
+        run_query!(&runner, r#"mutation { createOneModelB(data: { id: 11 }) { id } }"#);
         run_query!(
-            runner,
+            &runner,
             r#"mutation {
                 createOneModelA(data: {
                   id: 1
@@ -253,7 +253,7 @@ mod unchecked_update {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateOneModelA(where: { id: 1 }, data: {
               b_id: 11
               c: { create: { id: 21 }}
@@ -281,11 +281,11 @@ mod unchecked_update {
 
     // "Unchecked updates" should "allow to write to autoincrement IDs directly"
     #[connector_test(schema(schema_4), capabilities(AutoIncrement, WritableAutoincField))]
-    async fn allow_write_autoinc_ids(runner: &Runner) -> TestResult<()> {
-        run_query!(runner, r#"mutation { createOneModelA { id } }"#);
+    async fn allow_write_autoinc_ids(runner: Runner) -> TestResult<()> {
+        run_query!(&runner, r#"mutation { createOneModelA { id } }"#);
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateOneModelA(where: { id: 1 }, data: { id: 111 }) {
               id
             }

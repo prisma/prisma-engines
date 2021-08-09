@@ -1,7 +1,7 @@
 use prisma_value::ConversionFailure;
 use thiserror::Error;
 
-#[derive(Debug, Error)]
+#[derive(Debug, Error, PartialEq)]
 pub enum DomainError {
     #[error("Model `{}` not found", name)]
     ModelNotFound { name: String },

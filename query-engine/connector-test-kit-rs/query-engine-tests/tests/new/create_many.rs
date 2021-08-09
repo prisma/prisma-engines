@@ -6,7 +6,7 @@ mod sql_server {
     use query_engine_tests::{assert_error, run_query};
 
     #[connector_test]
-    async fn disallow_sql_server(runner: &Runner) -> TestResult<()> {
+    async fn disallow_sql_server(runner: Runner) -> TestResult<()> {
         assert_error!(
             runner,
             "mutation { createManyTestModel(data: [{ id: 2 }]) { count }}",
@@ -15,7 +15,7 @@ mod sql_server {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, "mutation { createManyTestModel(data: [{}]) { count }}"),
+          run_query!(&runner, "mutation { createManyTestModel(data: [{}]) { count }}"),
           @r###"{"data":{"createManyTestModel":{"count":1}}}"###
         );
 
@@ -28,14 +28,14 @@ mod single_col {
     use query_engine_tests::run_query;
 
     #[connector_test]
-    async fn foo(runner: &Runner) -> TestResult<()> {
+    async fn foo(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, "mutation { createManyTestModel(data: [{},{}]) { count }}"),
+          run_query!(&runner, "mutation { createManyTestModel(data: [{},{}]) { count }}"),
           @r###"{"data":{"createManyTestModel":{"count":2}}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, "query { findManyTestModel { id }}"),
+          run_query!(&runner, "query { findManyTestModel { id }}"),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
 

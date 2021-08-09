@@ -569,9 +569,9 @@ mod connect_inside_create {
 
     // "A PM to C1 relation" should "throw a proper error if connected by wrong id"
     #[connector_test(schema(schema_2))]
-    async fn pm_to_c1_fail_if_wrong_id(runner: &Runner) -> TestResult<()> {
+    async fn pm_to_c1_fail_if_wrong_id(runner: Runner) -> TestResult<()> {
         assert_error!(
-            runner,
+            &runner,
             r#"mutation {
               createOneTodo(data:{
                 comments: {
@@ -613,9 +613,9 @@ mod connect_inside_create {
 
     // "A P1 to CM relation " should "throw a proper error if connected by wrong id the other way around"
     #[connector_test(schema(schema_3))]
-    async fn p1_to_cm_fail_if_wrong_id_other_side(runner: &Runner) -> TestResult<()> {
+    async fn p1_to_cm_fail_if_wrong_id_other_side(runner: Runner) -> TestResult<()> {
         assert_error!(
-          runner,
+          &runner,
           r#"mutation {
             createOneComment(data:{
               text: "bla"

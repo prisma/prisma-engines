@@ -27,50 +27,50 @@ mod rel_design {
 
     // "Deleting a parent node" should "remove it from the relation and delete the relay id"
     #[connector_test]
-    async fn delete_parent_model(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{id: 1, uList: "A", todo : { create: {id: 1, uTodo: "B"}}}"#).await?;
+    async fn delete_parent_model(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{id: 1, uList: "A", todo : { create: {id: 1, uTodo: "B"}}}"#).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query{findManyList {uList, todo {uTodo}}}"#),
+          run_query!(&runner, r#"query{findManyList {uList, todo {uTodo}}}"#),
           @r###"{"data":{"findManyList":[{"uList":"A","todo":{"uTodo":"B"}}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query{findManyTodo {uTodo}}"#),
+          run_query!(&runner, r#"query{findManyTodo {uTodo}}"#),
           @r###"{"data":{"findManyTodo":[{"uTodo":"B"}]}}"###
         );
 
-        assert_eq!(count_items(runner, "findManyList").await?, 1);
-        assert_eq!(count_items(runner, "findManyTodo").await?, 1);
+        assert_eq!(count_items(&runner, "findManyList").await?, 1);
+        assert_eq!(count_items(&runner, "findManyTodo").await?, 1);
 
-        run_query!(runner, r#"mutation{deleteOneList(where: {uList:"A"}){id}}"#);
+        run_query!(&runner, r#"mutation{deleteOneList(where: {uList:"A"}){id}}"#);
 
-        assert_eq!(count_items(runner, "findManyList").await?, 0);
+        assert_eq!(count_items(&runner, "findManyList").await?, 0);
 
         Ok(())
     }
 
     // "Deleting a child node" should "remove it from the relation and delete the relay id"
     #[connector_test]
-    async fn delete_child_node(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{id: 1, uList: "A", todo : { create: {id: 1, uTodo: "B"}}}"#).await?;
+    async fn delete_child_node(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{id: 1, uList: "A", todo : { create: {id: 1, uTodo: "B"}}}"#).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query{findManyList {uList, todo {uTodo}}}"#),
+          run_query!(&runner, r#"query{findManyList {uList, todo {uTodo}}}"#),
           @r###"{"data":{"findManyList":[{"uList":"A","todo":{"uTodo":"B"}}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query{findManyTodo {uTodo}}"#),
+          run_query!(&runner, r#"query{findManyTodo {uTodo}}"#),
           @r###"{"data":{"findManyTodo":[{"uTodo":"B"}]}}"###
         );
 
-        assert_eq!(count_items(runner, "findManyList").await?, 1);
-        assert_eq!(count_items(runner, "findManyTodo").await?, 1);
+        assert_eq!(count_items(&runner, "findManyList").await?, 1);
+        assert_eq!(count_items(&runner, "findManyTodo").await?, 1);
 
-        run_query!(runner, r#"mutation{deleteOneTodo(where: {uTodo:"B"}){id}}"#);
+        run_query!(&runner, r#"mutation{deleteOneTodo(where: {uTodo:"B"}){id}}"#);
 
-        assert_eq!(count_items(runner, "findManyTodo").await?, 0);
+        assert_eq!(count_items(&runner, "findManyTodo").await?, 0);
 
         Ok(())
     }

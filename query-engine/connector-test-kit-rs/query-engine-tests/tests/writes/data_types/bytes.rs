@@ -32,9 +32,9 @@ mod bytes {
 
     // "Using a bytes field" should "work"
     #[connector_test(schema(basic))]
-    async fn using_bytes_field(runner: &Runner) -> TestResult<()> {
+    async fn using_bytes_field(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneModel(
               data: {
                 id: 1
@@ -47,7 +47,7 @@ mod bytes {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateOneModel(
               where: { id: 1 }
               data: {
@@ -61,7 +61,7 @@ mod bytes {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateOneModel(
               where: { id: 1 }
               data: {
@@ -78,7 +78,7 @@ mod bytes {
     }
 
     #[connector_test(schema(bytes_id), exclude(MySQL, SqlServer))]
-    async fn byte_id_coercion(runner: &Runner) -> TestResult<()> {
+    async fn byte_id_coercion(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(runner, r#"
             mutation { createOneBytesId(data: { id: "dGVzdA==" }) { id } }

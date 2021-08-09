@@ -23,9 +23,9 @@ mod deep_nested_rel {
     // TODO:Bring back sql server when cascading rules can be set!
     // "A deeply nested self relation create" should "be executed completely"
     #[connector_test(schema(schema_1), exclude(SqlServer))]
-    async fn deep_nested_create_should_work(runner: &Runner) -> TestResult<()> {
+    async fn deep_nested_create_should_work(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneUser(
               data: {
                 id: 1,
@@ -60,7 +60,7 @@ mod deep_nested_rel {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyUser { name } }"#),
+          run_query!(&runner, r#"{ findManyUser { name } }"#),
           @r###"{"data":{"findManyUser":[{"name":"A"},{"name":"B"},{"name":"C"}]}}"###
         );
 

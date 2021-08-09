@@ -101,11 +101,11 @@ mod update {
 
     //"An updateOne mutation" should "update an item"
     #[connector_test(schema(schema_1))]
-    async fn update_an_item(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{ id: 1 }"#).await?;
+    async fn update_an_item(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1 }"#).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, format!(r#"mutation {{
+          run_query!(&runner, format!(r#"mutation {{
             updateOneTestModel(
               where: {{ id: 1 }}
               data: {{
@@ -127,7 +127,7 @@ mod update {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyTestModel { id } }"#),
+          run_query!(&runner, r#"{ findManyTestModel { id } }"#),
           @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
 
@@ -136,11 +136,11 @@ mod update {
 
     // "An updateOne mutation" should "update an item with shorthand notation"
     #[connector_test(schema(schema_1))]
-    async fn update_with_shorthand_notation(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{ id: 1 }"#).await?;
+    async fn update_with_shorthand_notation(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1 }"#).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, format!(r#"mutation {{
+          run_query!(&runner, format!(r#"mutation {{
             updateOneTestModel(
               where: {{ id: 1 }}
               data: {{
@@ -162,7 +162,7 @@ mod update {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyTestModel { id } }"#),
+          run_query!(&runner, r#"{ findManyTestModel { id } }"#),
           @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
 
@@ -171,11 +171,11 @@ mod update {
 
     // "An updateOne mutation" should "update an item by a unique field"
     #[connector_test(schema(schema_2))]
-    async fn update_by_uniq_field(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{ id: 1, strField: "test", uniqField: "uniq"}"#).await?;
+    async fn update_by_uniq_field(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1, strField: "test", uniqField: "uniq"}"#).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateOneTestModel(
               where: { uniqField: "uniq" }
               data: { strField: { set: "updated" } }
@@ -191,11 +191,11 @@ mod update {
 
     // "An updateOne mutation" should "update enums"
     #[connector_test(schema(schema_3), capabilities(Enums))]
-    async fn update_enums(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{ id: 1 }"#).await?;
+    async fn update_enums(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1 }"#).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateOneTestModel(
               where: { id: 1 }
               data: { optEnum: { set: A } }
@@ -211,8 +211,8 @@ mod update {
 
     // "An updateOne mutation" should "gracefully fail when trying to update an item by a unique field with a non-existing value"
     #[connector_test(schema(schema_2))]
-    async fn update_fail_uniq_field_inexistant_value(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{ id: 1, strField: "test", uniqField: "uniq"}"#).await?;
+    async fn update_fail_uniq_field_inexistant_value(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1, strField: "test", uniqField: "uniq"}"#).await?;
 
         assert_error!(
           runner,
@@ -233,11 +233,11 @@ mod update {
 
     // "An updateOne mutation" should "update an updatedAt datetime"
     #[connector_test(schema(schema_4))]
-    async fn update_updated_at_datetime(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{ id: 1, field: "test"}"#).await?;
+    async fn update_updated_at_datetime(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1, field: "test"}"#).await?;
 
         let res = run_query_json!(
-            runner,
+            &runner,
             r#"mutation {
                 updateOneTestModel(
                   where: { id: 1 }
@@ -258,11 +258,11 @@ mod update {
 
     // "UpdatedAt and createdAt" should "be mutable with an update"
     #[connector_test(schema(schema_5))]
-    async fn updated_created_at_mutable_with_update(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{ id: 1, }"#).await?;
+    async fn updated_created_at_mutable_with_update(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1, }"#).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateOneTestModel(
               where: { id: 1 }
               data: {
@@ -285,67 +285,67 @@ mod update {
     // -{"data":{"updateOneTestModel":{"optInt":null}}}
     // +{"data":{"updateOneTestModel":{"optInt":10}}}
     #[connector_test(schema(schema_6), exclude(MongoDb))]
-    async fn update_apply_number_ops_for_int(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{ id: 1 }"#).await?;
-        create_row(runner, r#"{ id: 2, optInt: 3}"#).await?;
+    async fn update_apply_number_ops_for_int(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1 }"#).await?;
+        create_row(&runner, r#"{ id: 2, optInt: 3}"#).await?;
 
         // Increment
         insta::assert_snapshot!(
-          query_number_operation(runner, "1", "optInt", "increment", "10").await?,
+          query_number_operation(&runner, "1", "optInt", "increment", "10").await?,
           @r###"{"data":{"updateOneTestModel":{"optInt":null}}}"###
         );
         insta::assert_snapshot!(
-          query_number_operation(runner, "2", "optInt", "increment", "10").await?,
+          query_number_operation(&runner, "2", "optInt", "increment", "10").await?,
           @r###"{"data":{"updateOneTestModel":{"optInt":13}}}"###
         );
 
         // Decrement
         insta::assert_snapshot!(
-          query_number_operation(runner, "1", "optInt", "decrement", "10").await?,
+          query_number_operation(&runner, "1", "optInt", "decrement", "10").await?,
           @r###"{"data":{"updateOneTestModel":{"optInt":null}}}"###
         );
         insta::assert_snapshot!(
-          query_number_operation(runner, "2", "optInt", "decrement", "10").await?,
+          query_number_operation(&runner, "2", "optInt", "decrement", "10").await?,
           @r###"{"data":{"updateOneTestModel":{"optInt":3}}}"###
         );
 
         // Multiply
         insta::assert_snapshot!(
-          query_number_operation(runner, "1", "optInt", "multiply", "2").await?,
+          query_number_operation(&runner, "1", "optInt", "multiply", "2").await?,
           @r###"{"data":{"updateOneTestModel":{"optInt":null}}}"###
         );
         insta::assert_snapshot!(
-          query_number_operation(runner, "2", "optInt", "multiply", "2").await?,
+          query_number_operation(&runner, "2", "optInt", "multiply", "2").await?,
           @r###"{"data":{"updateOneTestModel":{"optInt":6}}}"###
         );
 
         // Divide
         insta::assert_snapshot!(
-          query_number_operation(runner, "1", "optInt", "divide", "3").await?,
+          query_number_operation(&runner, "1", "optInt", "divide", "3").await?,
           @r###"{"data":{"updateOneTestModel":{"optInt":null}}}"###
         );
         insta::assert_snapshot!(
-          query_number_operation(runner, "2", "optInt", "divide", "3").await?,
+          query_number_operation(&runner, "2", "optInt", "divide", "3").await?,
           @r###"{"data":{"updateOneTestModel":{"optInt":2}}}"###
         );
 
         // Set
         insta::assert_snapshot!(
-          query_number_operation(runner, "1", "optInt", "set", "5").await?,
+          query_number_operation(&runner, "1", "optInt", "set", "5").await?,
           @r###"{"data":{"updateOneTestModel":{"optInt":5}}}"###
         );
         insta::assert_snapshot!(
-          query_number_operation(runner, "2", "optInt", "set", "5").await?,
+          query_number_operation(&runner, "2", "optInt", "set", "5").await?,
           @r###"{"data":{"updateOneTestModel":{"optInt":5}}}"###
         );
 
         // Set null
         insta::assert_snapshot!(
-          query_number_operation(runner, "1", "optInt", "set", "null").await?,
+          query_number_operation(&runner, "1", "optInt", "set", "null").await?,
           @r###"{"data":{"updateOneTestModel":{"optInt":null}}}"###
         );
         insta::assert_snapshot!(
-          query_number_operation(runner, "2", "optInt", "set", "null").await?,
+          query_number_operation(&runner, "2", "optInt", "set", "null").await?,
           @r###"{"data":{"updateOneTestModel":{"optInt":null}}}"###
         );
 
@@ -357,67 +357,67 @@ mod update {
     // -{"data":{"updateOneTestModel":{"optFloat":null}}}
     // +{"data":{"updateOneTestModel":{"optFloat":4.600000000000001}}}
     #[connector_test(schema(schema_6), exclude(MongoDb))]
-    async fn update_apply_number_ops_for_float(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{ id: 1 }"#).await?;
-        create_row(runner, r#"{ id: 2, optFloat: 5.5}"#).await?;
+    async fn update_apply_number_ops_for_float(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1 }"#).await?;
+        create_row(&runner, r#"{ id: 2, optFloat: 5.5}"#).await?;
 
         // Increment
         insta::assert_snapshot!(
-          query_number_operation(runner, "1", "optFloat", "increment", "4.6").await?,
+          query_number_operation(&runner, "1", "optFloat", "increment", "4.6").await?,
           @r###"{"data":{"updateOneTestModel":{"optFloat":null}}}"###
         );
         insta::assert_snapshot!(
-          query_number_operation(runner, "2", "optFloat", "increment", "4.6").await?,
+          query_number_operation(&runner, "2", "optFloat", "increment", "4.6").await?,
           @r###"{"data":{"updateOneTestModel":{"optFloat":10.1}}}"###
         );
 
         // Decrement
         insta::assert_snapshot!(
-          query_number_operation(runner, "1", "optFloat", "decrement", "4.6").await?,
+          query_number_operation(&runner, "1", "optFloat", "decrement", "4.6").await?,
           @r###"{"data":{"updateOneTestModel":{"optFloat":null}}}"###
         );
         insta::assert_snapshot!(
-          query_number_operation(runner, "2", "optFloat", "decrement", "4.6").await?,
+          query_number_operation(&runner, "2", "optFloat", "decrement", "4.6").await?,
           @r###"{"data":{"updateOneTestModel":{"optFloat":5.5}}}"###
         );
 
         // Multiply
         insta::assert_snapshot!(
-          query_number_operation(runner, "1", "optFloat", "multiply", "2").await?,
+          query_number_operation(&runner, "1", "optFloat", "multiply", "2").await?,
           @r###"{"data":{"updateOneTestModel":{"optFloat":null}}}"###
         );
         insta::assert_snapshot!(
-          query_number_operation(runner, "2", "optFloat", "multiply", "2").await?,
+          query_number_operation(&runner, "2", "optFloat", "multiply", "2").await?,
           @r###"{"data":{"updateOneTestModel":{"optFloat":11.0}}}"###
         );
 
         // Divide
         insta::assert_snapshot!(
-          query_number_operation(runner, "1", "optFloat", "divide", "2").await?,
+          query_number_operation(&runner, "1", "optFloat", "divide", "2").await?,
           @r###"{"data":{"updateOneTestModel":{"optFloat":null}}}"###
         );
         insta::assert_snapshot!(
-          query_number_operation(runner, "2", "optFloat", "divide", "2").await?,
+          query_number_operation(&runner, "2", "optFloat", "divide", "2").await?,
           @r###"{"data":{"updateOneTestModel":{"optFloat":5.5}}}"###
         );
 
         // Set
         insta::assert_snapshot!(
-          query_number_operation(runner, "1", "optFloat", "set", "5.1").await?,
+          query_number_operation(&runner, "1", "optFloat", "set", "5.1").await?,
           @r###"{"data":{"updateOneTestModel":{"optFloat":5.1}}}"###
         );
         insta::assert_snapshot!(
-          query_number_operation(runner, "2", "optFloat", "set", "5.1").await?,
+          query_number_operation(&runner, "2", "optFloat", "set", "5.1").await?,
           @r###"{"data":{"updateOneTestModel":{"optFloat":5.1}}}"###
         );
 
         // Set null
         insta::assert_snapshot!(
-          query_number_operation(runner, "1", "optFloat", "set", "null").await?,
+          query_number_operation(&runner, "1", "optFloat", "set", "null").await?,
           @r###"{"data":{"updateOneTestModel":{"optFloat":null}}}"###
         );
         insta::assert_snapshot!(
-          query_number_operation(runner, "2", "optFloat", "set", "null").await?,
+          query_number_operation(&runner, "2", "optFloat", "set", "null").await?,
           @r###"{"data":{"updateOneTestModel":{"optFloat":null}}}"###
         );
 
@@ -427,14 +427,14 @@ mod update {
     // "An updateOne mutation with number operations" should "handle id changes correctly"
     // TODO(dom): Support @@id ?
     #[connector_test(schema(schema_7), exclude(Mongodb))]
-    async fn update_number_ops_handle_id_change(runner: &Runner) -> TestResult<()> {
+    async fn update_number_ops_handle_id_change(runner: Runner) -> TestResult<()> {
         run_query!(
-            runner,
+            &runner,
             r#"mutation { createOneTestModel(data: { id1: 1.23456, id2: 2, uniq: 3 }) { id1 } }"#
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateOneTestModel(
               where: { id1_id2: { id1: 1.23456, id2: 2 } }
               data: {

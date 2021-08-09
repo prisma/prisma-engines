@@ -30,9 +30,9 @@ mod scalar_lists {
 
     // "Scalar lists" should "be behave like regular values for create and update operations"
     #[connector_test]
-    async fn behave_like_regular_val_for_create_and_update(runner: &Runner) -> TestResult<()> {
+    async fn behave_like_regular_val_for_create_and_update(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, format!(r#"mutation {{
+          run_query!(&runner, format!(r#"mutation {{
             createOneScalarModel(data: {{
               id: 1,
               strings:   {{ set: ["test{}"] }}
@@ -58,7 +58,7 @@ mod scalar_lists {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateOneScalarModel(where: { id: 1 }, data: {
               strings:   { set: ["updated", "now"] }
               ints:      { set: [14] }
@@ -83,7 +83,7 @@ mod scalar_lists {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateOneScalarModel(where: { id: 1 }, data: {
               strings:   { push: "future" }
               ints:      { push: 15 }
@@ -108,7 +108,7 @@ mod scalar_lists {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateOneScalarModel(where: { id: 1 }, data: {
               strings:   { push: ["more", "items"] }
               ints:      { push: [16, 17] }
@@ -137,9 +137,9 @@ mod scalar_lists {
 
     // "A Create Mutation" should "create and return items with list values with shorthand notation"
     #[connector_test]
-    async fn create_mut_work_with_list_vals(runner: &Runner) -> TestResult<()> {
+    async fn create_mut_work_with_list_vals(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, format!(r#"mutation {{
+          run_query!(&runner, format!(r#"mutation {{
             createOneScalarModel(data: {{
               id: 1
               strings:   ["test{}"]
@@ -169,9 +169,9 @@ mod scalar_lists {
 
     // "A Create Mutation" should "create and return items with empty list values"
     #[connector_test]
-    async fn create_mut_return_items_with_empty_lists(runner: &Runner) -> TestResult<()> {
+    async fn create_mut_return_items_with_empty_lists(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneScalarModel(data: {
               id: 1
               strings:   []
@@ -201,7 +201,7 @@ mod scalar_lists {
 
     // "A Create Mutation with an empty scalar list create input object" should "return a detailed error"
     #[connector_test]
-    async fn create_mut_empty_scalar_should_fail(runner: &Runner) -> TestResult<()> {
+    async fn create_mut_empty_scalar_should_fail(runner: Runner) -> TestResult<()> {
         assert_error!(
           runner,
           r#"mutation {
@@ -219,7 +219,7 @@ mod scalar_lists {
 
     // "An Update Mutation with an empty scalar list update input object" should "return a detailed error"
     #[connector_test]
-    async fn update_mut_empty_scalar_should_fail(runner: &Runner) -> TestResult<()> {
+    async fn update_mut_empty_scalar_should_fail(runner: Runner) -> TestResult<()> {
         assert_error!(
           runner,
           r#"mutation {
@@ -236,12 +236,12 @@ mod scalar_lists {
 
     // "An Update Mutation that pushes to some empty scalar lists" should "work"
     #[connector_test]
-    async fn update_mut_push_empty_scalar_list(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{ id: 1 }"#).await?;
-        create_row(runner, r#"{ id: 2 }"#).await?;
+    async fn update_mut_push_empty_scalar_list(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1 }"#).await?;
+        create_row(&runner, r#"{ id: 2 }"#).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateOneScalarModel(where: { id: 1 }, data: {
               strings:   { push: "future" }
               ints:      { push: 15 }
@@ -266,7 +266,7 @@ mod scalar_lists {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateOneScalarModel(where: { id: 2 }, data: {
               strings:   { push: ["present", "future"] }
               ints:      { push: [14, 15] }

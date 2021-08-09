@@ -19,8 +19,8 @@ mod insert_null {
 
     // "Updating a required value to null" should "throw a proper error"
     #[connector_test(schema(schema_1), exclude(MySql(5.6)))]
-    async fn update_required_val_to_null(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{ id: 1, b: "abc" key: "abc" }"#).await?;
+    async fn update_required_val_to_null(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1, b: "abc" key: "abc" }"#).await?;
 
         let is_mysql_56 = match runner.connector() {
             query_engine_tests::ConnectorTag::MySql(conn) => {
@@ -69,9 +69,9 @@ mod insert_null {
 
     // "Creating a required value as null" should "throw a proper error"
     #[connector_test(schema(schema_2))]
-    async fn create_required_value_as_null(runner: &Runner) -> TestResult<()> {
+    async fn create_required_value_as_null(runner: Runner) -> TestResult<()> {
         assert_error!(
-            runner,
+            &runner,
             r#"mutation {
             createOneA(data: {
               id: 1,
@@ -102,11 +102,11 @@ mod insert_null {
 
     // "Updating an optional value to null" should "work"
     #[connector_test(schema(schema_3))]
-    async fn update_optional_val_null(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{ id: 1, b: "abc" key: "abc" }"#).await?;
+    async fn update_optional_val_null(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1, b: "abc" key: "abc" }"#).await?;
 
         run_query!(
-            runner,
+            &runner,
             r#"mutation {
                 updateOneA(
                   where: { b: "abc" }
@@ -119,7 +119,7 @@ mod insert_null {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyA{ b, key }}"#),
+          run_query!(&runner, r#"{ findManyA{ b, key }}"#),
           @r###"{"data":{"findManyA":[{"b":"abc","key":null}]}}"###
         );
 
@@ -140,9 +140,9 @@ mod insert_null {
 
     // "Creating an optional value as null" should "work"
     #[connector_test(schema(schema_4))]
-    async fn create_optional_val_null(runner: &Runner) -> TestResult<()> {
+    async fn create_optional_val_null(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneA(data: {
               id: 1,
               b: "abc"

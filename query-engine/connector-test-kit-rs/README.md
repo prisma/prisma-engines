@@ -86,7 +86,7 @@ use query_engine_tests::*;
 #[test_suite(...)]
 mod some_spec {
     #[connector_test(...)]
-    async fn my_test(runner: &Runner) -> TestResult<()> {
+    async fn my_test(runner: Runner) -> TestResult<()> {
         // ...
         Ok(())
     }
@@ -98,13 +98,13 @@ _Option 2:_
 use query_engine_tests::*;
 
 #[connector_test(...)]
-async fn my_test(runner: &Runner) -> TestResult<()> {
+async fn my_test(runner: Runner) -> TestResult<()> {
     // ...
     Ok(())
 }
 ```
 
-Note that regardless of the shape, `connector_test` tests must _always_ have the signature of `async fn test_name(runner: &Runner) -> TestResult<()>`.
+Note that regardless of the shape, `connector_test` tests must _always_ have the signature of `async fn test_name(runner: Runner) -> TestResult<()>`.
 
 Option 1 uses a `mod` that can be used to define common attributes on all tests contained in the module. Option 2 doesn't use a `mod` and requires you to set more attributes per test (will be shown later). Option 1 produces a test like `queries::filters::some_spec::some_spec::my_test` and option 2 `queries::filters::some_spec::my_test` (note the double `some_spec`). Apart from the aesthetics in the naming, there are no other consequences for using option 1 over 2. You can also choose any `mod` name you wish, e.g. `mod my_specs` would produce `queries::filters::some_spec::my_specs::my_test`.
 
@@ -140,7 +140,7 @@ There are two special cases in that rule:
 mod some_spec {
     // Will run for everything except SQL Server 2017. The `only` of `test_suite` is not propagated!
     #[connector_test(exclude(SqlServer(2017))]
-    async fn my_test(runner: &Runner) -> TestResult<()> {
+    async fn my_test(runner: Runner) -> TestResult<()> {
         // ...
         Ok(())
     }
@@ -163,7 +163,7 @@ mod some_spec {
     }
 
     #[connector_test]
-    async fn my_test(runner: &Runner) -> TestResult<()> {
+    async fn my_test(runner: Runner) -> TestResult<()> {
         // Assertions against the models as given by the handler.
         Ok(())
     }
@@ -203,7 +203,7 @@ A minimal test example is:
 #[test_suite(schema(some_handler))]
 mod some_spec {
     #[connector_test]
-    async fn my_test(runner: &Runner) -> TestResult<()> {
+    async fn my_test(runner: Runner) -> TestResult<()> {
         // Assertions against the models as given by the handler.
         Ok(())
     }
@@ -248,9 +248,9 @@ We intentionally leave the expected output empty as you can see below.
 
 ```rs
 #[connector_test]
-async fn some_test(runner: &Runner) -> TestResult<()> {
+async fn some_test(runner: Runner) -> TestResult<()> {
     insta::assert_snapshot!(
-        run_query!(runner, r#"<your_query>"#),
+        run_query!(&runner, r#"<your_query>"#),
         @""
     );
 

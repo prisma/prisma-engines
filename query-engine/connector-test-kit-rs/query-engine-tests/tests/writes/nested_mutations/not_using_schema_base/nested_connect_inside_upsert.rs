@@ -13,7 +13,7 @@ mod connect_inside_upsert {
               childOpt Child?  @relation(fields: [childId], references: [id])
               childId  String?
           }
-      
+
           model Child {
               #id(id, String, @id, @default(cuid()))
               c          String  @unique
@@ -26,16 +26,16 @@ mod connect_inside_upsert {
 
     // "A P1 to CM relation" should "be connectable by id within an upsert in the create case"
     #[connector_test]
-    async fn p1_cm_upsert_in_create(runner: &Runner) -> TestResult<()> {
+    async fn p1_cm_upsert_in_create(runner: Runner) -> TestResult<()> {
         let child_id = run_query_json!(
-            runner,
+            &runner,
             r#"mutation { createOneChild(data: {c:"c1"}){ id } }"#,
             &["data", "createOneChild", "id"]
         )
         .to_string();
 
         insta::assert_snapshot!(
-          run_query!(runner, format!(r#"mutation{{upsertOneParent(where: {{id: "5beea4aa6183dd734b2dbd9b"}}, create: {{p: "p1", childOpt:{{connect:{{id:{child_id}}}}}}}, update: {{p: {{ set: "p-new" }}}}) {{
+          run_query!(&runner, format!(r#"mutation{{upsertOneParent(where: {{id: "5beea4aa6183dd734b2dbd9b"}}, create: {{p: "p1", childOpt:{{connect:{{id:{child_id}}}}}}}, update: {{p: {{ set: "p-new" }}}}) {{
             childOpt{{ c }}
           }}
         }}"#, child_id = child_id)),
@@ -47,20 +47,20 @@ mod connect_inside_upsert {
 
     // "A P1 to CM relation" should "be connectable by id within an upsert in the update case"
     #[connector_test]
-    async fn p1_cm_upsert_in_update(runner: &Runner) -> TestResult<()> {
+    async fn p1_cm_upsert_in_update(runner: Runner) -> TestResult<()> {
         let child_id = run_query_json!(
-            runner,
+            &runner,
             r#"mutation { createOneChild(data: {c:"c1"}){ id } }"#,
             &["data", "createOneChild", "id"]
         );
         let parent_id = run_query_json!(
-            runner,
+            &runner,
             r#"mutation { createOneParent(data: {p:"p1"}){ id } }"#,
             &["data", "createOneParent", "id"]
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, format!(r#"mutation{{upsertOneParent(where: {{id: {parent}}}, create: {{p: "p new"}}, update: {{p: {{ set: "p updated" }},childOpt:{{connect:{{id: {child}}}}}}}) {{
+          run_query!(&runner, format!(r#"mutation{{upsertOneParent(where: {{id: {parent}}}, create: {{p: "p new"}}, update: {{p: {{ set: "p updated" }},childOpt:{{connect:{{id: {child}}}}}}}) {{
             childOpt{{c}}
           }}
         }}"#, parent = parent_id, child = child_id)),
@@ -72,12 +72,12 @@ mod connect_inside_upsert {
 
     // "A P1 to CM relation" should "be connectable by unique field within an upsert in the update case"
     #[connector_test]
-    async fn p1_cm_uniq_upsert_update(runner: &Runner) -> TestResult<()> {
-        run_query!(runner, r#"mutation { createOneChild(data: {c:"c1"}){ id } }"#);
-        run_query!(runner, r#"mutation { createOneParent(data: {p:"p1"}){ id } }"#);
+    async fn p1_cm_uniq_upsert_update(runner: Runner) -> TestResult<()> {
+        run_query!(&runner, r#"mutation { createOneChild(data: {c:"c1"}){ id } }"#);
+        run_query!(&runner, r#"mutation { createOneParent(data: {p:"p1"}){ id } }"#);
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             upsertOneParent(
               where: { p: "p1"}
               create: {p: "p new"}
@@ -96,12 +96,12 @@ mod connect_inside_upsert {
 
     // "a one to many relation" should "throw the correct error for a connect by unique field within an upsert in the update case"
     #[connector_test]
-    async fn one2m_fail_upsert_update(runner: &Runner) -> TestResult<()> {
-        run_query!(runner, r#"mutation { createOneChild(data: {c:"c1"}){ id } }"#);
-        run_query!(runner, r#"mutation { createOneParent(data: {p:"p1"}){ id } }"#);
+    async fn one2m_fail_upsert_update(runner: Runner) -> TestResult<()> {
+        run_query!(&runner, r#"mutation { createOneChild(data: {c:"c1"}){ id } }"#);
+        run_query!(&runner, r#"mutation { createOneParent(data: {p:"p1"}){ id } }"#);
 
         assert_error!(
-            runner,
+            &runner,
             r#"mutation{upsertOneParent(where: {p: "p1"}, create: {p: "new p"}, update: {p: { set: "p updated" },childOpt:{connect:{c:"DOES NOT EXIST"}}}) {
               childOpt{c}
             }

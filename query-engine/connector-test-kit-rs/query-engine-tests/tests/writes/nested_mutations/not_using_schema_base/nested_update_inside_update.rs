@@ -21,7 +21,7 @@ mod update_inside_update {
                           create: {{c: "c1", c_1: "c", c_2: "1"}}
                         }}
                       }}){{
-                    
+
                         {parent_selection}
                         childOpt{{
                           {child_selection}
@@ -164,7 +164,7 @@ mod update_inside_update {
               title String
               #m2m(notes, Note[], String)
              }
-             
+
              model Note {
               #id(id, String, @id, @default(cuid()))
               text   String?
@@ -179,9 +179,9 @@ mod update_inside_update {
 
     // "TRANSACTIONAL: a many to many relation" should "fail gracefully on wrong where and assign error correctly and not execute partially"
     #[connector_test(schema(schema_1))]
-    async fn tx_m2m_fail_wrong_where(runner: &Runner) -> TestResult<()> {
+    async fn tx_m2m_fail_wrong_where(runner: Runner) -> TestResult<()> {
         let res = run_query_json!(
-            runner,
+            &runner,
             r#"mutation {
           createOneNote(
             data: {
@@ -225,12 +225,12 @@ mod update_inside_update {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, format!(r#"query{{findUniqueNote(where:{{id: {note_id}}}){{text}}}}"#, note_id = note_id)),
+          run_query!(&runner, format!(r#"query{{findUniqueNote(where:{{id: {note_id}}}){{text}}}}"#, note_id = note_id)),
           @r###"{"data":{"findUniqueNote":{"text":"Some Text"}}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, format!(r#"query{{findUniqueTodo(where:{{id: {todo_id}}}){{title}}}}"#, todo_id = todo_id)),
+          run_query!(&runner, format!(r#"query{{findUniqueTodo(where:{{id: {todo_id}}}){{title}}}}"#, todo_id = todo_id)),
           @r###"{"data":{"findUniqueTodo":{"title":"the title"}}}"###
         );
 
@@ -239,9 +239,9 @@ mod update_inside_update {
 
     // "NON-TRANSACTIONAL: a many to many relation" should "fail gracefully on wrong where and assign error correctly and not execute partially"
     #[connector_test(schema(schema_1))]
-    async fn no_tx_m2m_fail_gracefully(runner: &Runner) -> TestResult<()> {
+    async fn no_tx_m2m_fail_gracefully(runner: Runner) -> TestResult<()> {
         let res = run_query_json!(
-            runner,
+            &runner,
             r#"mutation {
                 createOneNote(
                   data: {
@@ -292,7 +292,7 @@ mod update_inside_update {
               text  String? @unique
               #m2m(todos, Todo[], String)
              }
-             
+
              model Todo {
               #id(id, String, @id, @default(cuid()))
               title  String  @unique
@@ -306,9 +306,9 @@ mod update_inside_update {
 
     // "a many to many relation" should "reject null in unique fields"
     #[connector_test(schema(schema_2))]
-    async fn m2m_reject_null_in_uniq(runner: &Runner) -> TestResult<()> {
+    async fn m2m_reject_null_in_uniq(runner: Runner) -> TestResult<()> {
         run_query!(
-            runner,
+            &runner,
             r#"mutation {
               createOneNote(
                 data: {
@@ -325,7 +325,7 @@ mod update_inside_update {
         );
 
         assert_error!(
-            runner,
+            &runner,
             r#"mutation {
               updateOneNote(
                 where: {
@@ -361,14 +361,14 @@ mod update_inside_update {
               nameTop String   @unique
               #m2m(middles, Middle[], String)
             }
-            
+
             model Middle {
               #id(id, String, @id, @default(cuid()))
               nameMiddle String   @unique
               #m2m(tops, Top[], String)
               #m2m(bottoms, Bottom[], String)
             }
-            
+
             model Bottom {
               #id(id, String, @id, @default(cuid()))
               nameBottom String   @unique
@@ -381,9 +381,9 @@ mod update_inside_update {
 
     // "a deeply nested mutation" should "execute all levels of the mutation if there are only node edges on the path"
     #[connector_test(schema(schema_3))]
-    async fn deep_nested_mutation_exec_all_muts(runner: &Runner) -> TestResult<()> {
+    async fn deep_nested_mutation_exec_all_muts(runner: Runner) -> TestResult<()> {
         run_query!(
-            runner,
+            &runner,
             r#"mutation  {
           createOneTop(data: {
             nameTop: "the top",
@@ -408,7 +408,7 @@ mod update_inside_update {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation b {
+          run_query!(&runner, r#"mutation b {
             updateOneTop(
               where: {nameTop: "the top"},
               data: {

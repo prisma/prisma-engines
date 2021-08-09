@@ -18,10 +18,10 @@ mod int_id_update {
 
     // "Updating an item with an id field of type Int without default" should "work"
     #[connector_test(schema(schema_int))]
-    async fn update_id_int_without_default(runner: &Runner) -> TestResult<()> {
+    async fn update_id_int_without_default(runner: Runner) -> TestResult<()> {
         // Setup
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneTodo(data: {title: "initial", id: 12}) {title, id}
           }"#),
           @r###"{"data":{"createOneTodo":{"title":"initial","id":12}}}"###
@@ -29,7 +29,7 @@ mod int_id_update {
 
         // Check
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateOneTodo(where: {id: 12}, data: {title: {set: "the title"}}){
               id
               title
@@ -54,10 +54,10 @@ mod int_id_update {
 
     // "Updating an item with an id field of type Int with static default" should "work"
     #[connector_test(schema(schema_int_default))]
-    async fn update_id_int_static_default(runner: &Runner) -> TestResult<()> {
+    async fn update_id_int_static_default(runner: Runner) -> TestResult<()> {
         // Setup
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneTodo(data: {title: "initial", id: 12}) {title, id}
           }"#),
           @r###"{"data":{"createOneTodo":{"title":"initial","id":12}}}"###
@@ -65,7 +65,7 @@ mod int_id_update {
 
         // Check
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateOneTodo(where: {id: 12}, data: { title: { set: "the title" }}){
               id
               title
@@ -90,10 +90,10 @@ mod int_id_update {
 
     // "Updating an item with an id field of type Int with autoincrement" should "work"
     #[connector_test(schema(schema_int_autoinc), capabilities(AutoIncrement))]
-    async fn update_id_int_autoinc(runner: &Runner) -> TestResult<()> {
+    async fn update_id_int_autoinc(runner: Runner) -> TestResult<()> {
         // Setup
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneTodo(data: {title: "initial"}) {title, id}
           }"#),
           @r###"{"data":{"createOneTodo":{"title":"initial","id":1}}}"###
@@ -101,7 +101,7 @@ mod int_id_update {
 
         // Check
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateOneTodo(where: {id: 1}, data: {title: {set: "the title"}}){
               id
               title
@@ -130,10 +130,10 @@ mod int_id_update {
         schema(schema_int_non_uniq_autoinc),
         capabilities(AutoIncrement, AutoIncrementNonIndexedAllowed, WritableAutoincField)
     )]
-    async fn update_non_uniq_int_field_autoinc(runner: &Runner) -> TestResult<()> {
+    async fn update_non_uniq_int_field_autoinc(runner: Runner) -> TestResult<()> {
         // Setup
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneTodo(data: {id: "the-id", title: "initial"}) {title, id, counter}
           }"#),
           @r###"{"data":{"createOneTodo":{"title":"initial","id":"the-id","counter":1}}}"###
@@ -141,7 +141,7 @@ mod int_id_update {
 
         // Check
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateOneTodo(where: {id: "the-id"}, data: {title: { set: "the title" }, counter: { set: 8 }}){
               id
               title

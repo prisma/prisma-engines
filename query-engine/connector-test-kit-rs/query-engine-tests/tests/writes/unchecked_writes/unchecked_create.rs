@@ -45,10 +45,10 @@ mod unchecked_create {
 
     // "Unchecked creates" should "allow writing inlined relation scalars"
     #[connector_test(schema(schema_1), capabilities(AnyId))]
-    async fn allow_writing_inlined_rel_scalars(runner: &Runner) -> TestResult<()> {
+    async fn allow_writing_inlined_rel_scalars(runner: Runner) -> TestResult<()> {
         // Ensure inserted foreign keys for A are valid.
         run_query!(
-            runner,
+            &runner,
             r#"mutation {
           createOneModelB(data: {
             uniq_1: 11
@@ -60,7 +60,7 @@ mod unchecked_create {
         }"#
         );
         run_query!(
-            runner,
+            &runner,
             r#"mutation {
           createOneModelC(data: {
             uniq_1: 21
@@ -73,7 +73,7 @@ mod unchecked_create {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneModelA(data: {
               id: 1
               b_id_1: 11
@@ -96,7 +96,7 @@ mod unchecked_create {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneModelA(data: {
               id: 2
               b_id_1: 11
@@ -148,9 +148,9 @@ mod unchecked_create {
 
     // "Unchecked creates" should "not allow writing inlined relations regularly"
     #[connector_test(schema(schema_2))]
-    async fn disallow_write_inline_rel_regularly(runner: &Runner) -> TestResult<()> {
+    async fn disallow_write_inline_rel_regularly(runner: Runner) -> TestResult<()> {
         assert_error!(
-            runner,
+            &runner,
             r#"mutation {
               createOneModelA(data: {
                 id: 1
@@ -168,9 +168,9 @@ mod unchecked_create {
 
     // "Unchecked creates" should "require to write required relation scalars and must allow optionals to be omitted"
     #[connector_test(schema(schema_2))]
-    async fn required_write_required_rel_scalars(runner: &Runner) -> TestResult<()> {
+    async fn required_write_required_rel_scalars(runner: Runner) -> TestResult<()> {
         assert_error!(
-            runner,
+            &runner,
             r#"mutation {
                 createOneModelA(data: {
                   id: 1
@@ -182,10 +182,10 @@ mod unchecked_create {
             "`Mutation.createOneModelA.data.ModelAUncheckedCreateInput.b_id`: A value is required but not set."
         );
 
-        run_query!(runner, r#"mutation { createOneModelB(data: { id: 11 }) { id } }"#);
+        run_query!(&runner, r#"mutation { createOneModelB(data: { id: 11 }) { id } }"#);
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneModelA(data: {
               id: 1
               b_id: 11
@@ -227,11 +227,11 @@ mod unchecked_create {
 
     // "Unchecked creates" should "allow writing non-inlined relations normally"
     #[connector_test(schema(schema_3))]
-    async fn allow_write_non_inlined_rel(runner: &Runner) -> TestResult<()> {
-        run_query!(runner, r#"mutation { createOneModelB(data: { id: 11 }) { id } }"#);
+    async fn allow_write_non_inlined_rel(runner: Runner) -> TestResult<()> {
+        run_query!(&runner, r#"mutation { createOneModelB(data: { id: 11 }) { id } }"#);
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneModelA(data: {
               id: 1
               b_id: 11
@@ -267,11 +267,11 @@ mod unchecked_create {
 
     // "Unchecked creates" should "honor defaults and make required relation scalars optional"
     #[connector_test(schema(schema_4))]
-    async fn honor_defaults_make_req_rel_sclrs_opt(runner: &Runner) -> TestResult<()> {
-        run_query!(runner, r#"mutation { createOneModelB(data: { id: 11 }) { id } }"#);
+    async fn honor_defaults_make_req_rel_sclrs_opt(runner: Runner) -> TestResult<()> {
+        run_query!(&runner, r#"mutation { createOneModelB(data: { id: 11 }) { id } }"#);
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneModelA(data: {
               id: 1
             }) {
@@ -296,9 +296,9 @@ mod unchecked_create {
 
     // "Unchecked creates" should "allow to write to autoincrement IDs directly"
     #[connector_test(schema(schema_5), capabilities(AutoIncrement, WritableAutoincField))]
-    async fn allow_write_autoinc_ids(runner: &Runner) -> TestResult<()> {
+    async fn allow_write_autoinc_ids(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneModelA(data: {
               id: 111
             }) {

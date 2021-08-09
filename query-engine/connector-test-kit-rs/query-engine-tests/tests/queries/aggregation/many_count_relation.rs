@@ -13,13 +13,13 @@ mod many_count_rel {
               comments   Comment[]
               #m2m(categories, Category[], Int)
             }
-            
+
             model Comment {
               #id(id, Int, @id)
               post    Post    @relation(fields: [postId], references: [id])
               postId  Int
             }
-            
+
             model Category {
               #id(id, Int, @id)
               #m2m(posts, Post[], Int)
@@ -31,11 +31,11 @@ mod many_count_rel {
 
     // "Counting with no records in the database" should "return 0"
     #[connector_test(exclude(MongoDb))] // TODO(dom): Not working on mongo
-    async fn no_rel_records(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{ id: 1, title: "a" }"#).await?;
+    async fn no_rel_records(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1, title: "a" }"#).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query {
+          run_query!(&runner, r#"query {
             findManyPost {
               _count { comments categories }
             }
@@ -48,10 +48,10 @@ mod many_count_rel {
 
     //"Counting one2m and m2m records" should "work"
     #[connector_test(exclude(MongoDb))] // TODO(dom): Not working on mongo
-    async fn count_one2m_m2m(runner: &Runner) -> TestResult<()> {
+    async fn count_one2m_m2m(runner: Runner) -> TestResult<()> {
         // 1 comment / 2 categories
         create_row(
-            runner,
+            &runner,
             r#"{
           id: 1,
           title: "a",
@@ -62,7 +62,7 @@ mod many_count_rel {
         .await?;
         // 3 comment / 4 categories
         create_row(
-            runner,
+            &runner,
             r#"{
           id: 2,
           title: "b",
@@ -73,7 +73,7 @@ mod many_count_rel {
         .await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyPost(orderBy: { id: asc }) {
               _count { comments categories }
             }
@@ -86,10 +86,10 @@ mod many_count_rel {
 
     // "Counting with some records and filters" should "not affect the count"
     #[connector_test(exclude(MongoDb))] // TODO(dom): Not working on mongo
-    async fn count_with_filters(runner: &Runner) -> TestResult<()> {
+    async fn count_with_filters(runner: Runner) -> TestResult<()> {
         // 4 comment / 4 categories
         create_row(
-            runner,
+            &runner,
             r#"{
                   id: 1,
                   title: "a",
@@ -100,7 +100,7 @@ mod many_count_rel {
         .await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyPost(where: { id: 1 }) {
               comments(cursor: { id: 1 }, take: 1) { id }
               categories(cursor: { id: 1 }, take: 1) { id }
@@ -120,7 +120,7 @@ mod many_count_rel {
               name  String
               posts Post[]
             }
-            
+
             model Post {
               #id(id, Int, @id)
               title    String
@@ -129,7 +129,7 @@ mod many_count_rel {
               #m2m(comments, Comment[], Int)
               #m2m(tags, Tag[], Int)
             }
-            
+
             model Comment {
               #id(id, Int, @id)
               body   String
@@ -137,7 +137,7 @@ mod many_count_rel {
               postId Int
               #m2m(tags, Tag[], Int)
             }
-            
+
             model Tag {
               #id(id, Int, @id)
               name     String
@@ -152,9 +152,9 @@ mod many_count_rel {
     // Counting nested one2m and m2m should work
     // TODO(dom): Not working on mongo
     #[connector_test(schema(schema_nested), exclude(MongoDb))]
-    async fn nested_count_one2m_m2m(runner: &Runner) -> TestResult<()> {
+    async fn nested_count_one2m_m2m(runner: Runner) -> TestResult<()> {
         run_query!(
-            runner,
+            &runner,
             r#"mutation {
           createOneUser(
             data: {
@@ -184,7 +184,7 @@ mod many_count_rel {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyUser {
+          run_query!(&runner, r#"{ findManyUser {
             name
             posts {
               title

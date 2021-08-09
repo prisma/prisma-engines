@@ -16,7 +16,7 @@ static RE_START: Lazy<Regex> = Lazy::new(|| Regex::new("^[^a-zA-Z]+").unwrap());
 static RE: Lazy<Regex> = Lazy::new(|| Regex::new("[^_a-zA-Z0-9]").unwrap());
 
 pub fn sanitize_datamodel_names(datamodel: &mut Datamodel, ctx: &IntrospectionContext) {
-    let enum_renames = sanitize_models(datamodel, &ctx);
+    let enum_renames = sanitize_models(datamodel, ctx);
     sanitize_enums(datamodel, &enum_renames);
 }
 

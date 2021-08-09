@@ -22,9 +22,9 @@ mod one2one_req {
 
     /// Deleting the parent must fail if a child is connected.
     #[connector_test(exclude(MongoDb))]
-    async fn delete_parent_failure(runner: &Runner) -> TestResult<()> {
+    async fn delete_parent_failure(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation { createOneParent(data: { id: 1, child: { create: { id: 1 }}}) { id }}"#),
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, child: { create: { id: 1 }}}) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
@@ -47,19 +47,19 @@ mod one2one_req {
 
     /// Deleting the parent leaves the data in a integrity-violating state.
     #[connector_test(only(MongoDb))]
-    async fn delete_parent_violation(runner: &Runner) -> TestResult<()> {
+    async fn delete_parent_violation(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation { createOneParent(data: { id: 1, child: { create: { id: 1 }}}) { id }}"#),
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, child: { create: { id: 1 }}}) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation { deleteOneParent(where: { id: 1 }) { id }}"#),
+          run_query!(&runner, r#"mutation { deleteOneParent(where: { id: 1 }) { id }}"#),
           @r###"{"data":{"deleteOneParent":{"id":1}}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyChild { parent_id }}"#),
+          run_query!(&runner, r#"query { findManyChild { parent_id }}"#),
           @r###"{"data":{"findManyChild":[{"parent_id":1}]}}"###
         );
 
@@ -88,9 +88,9 @@ mod one2one_opt {
 
     /// Deleting the parent must fail if a child is connected.
     #[connector_test]
-    async fn delete_parent_failure(runner: &Runner) -> TestResult<()> {
+    async fn delete_parent_failure(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation { createOneParent(data: { id: 1, child: { create: { id: 1 }}}) { id }}"#),
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, child: { create: { id: 1 }}}) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
@@ -113,24 +113,24 @@ mod one2one_opt {
 
     /// Deleting the parent succeeds if no child is connected.
     #[connector_test]
-    async fn delete_parent(runner: &Runner) -> TestResult<()> {
+    async fn delete_parent(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation { createOneParent(data: { id: 1 }) { id }}"#),
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 1 }) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation { createOneParent(data: { id: 2 }) { id }}"#),
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 2 }) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":2}}}"###
         );
 
         insta::assert_snapshot!(
-            run_query!(runner, "mutation { deleteOneParent(where: { id: 1 }) { id }}"),
+            run_query!(&runner, "mutation { deleteOneParent(where: { id: 1 }) { id }}"),
             @r###"{"data":{"deleteOneParent":{"id":1}}}"###
         );
 
         insta::assert_snapshot!(
-            run_query!(runner, "mutation { deleteManyParent(where: { id: 2 }) { count }}"),
+            run_query!(&runner, "mutation { deleteManyParent(where: { id: 2 }) { count }}"),
             @r###"{"data":{"deleteManyParent":{"count":1}}}"###
         );
 
@@ -139,19 +139,19 @@ mod one2one_opt {
 
     /// Deleting the parent leaves the data in a integrity-violating state.
     #[connector_test(only(MongoDb))]
-    async fn delete_parent_violation(runner: &Runner) -> TestResult<()> {
+    async fn delete_parent_violation(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation { createOneParent(data: { id: 1, child: { create: { id: 1 }}}) { id }}"#),
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, child: { create: { id: 1 }}}) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation { deleteOneParent(where: { id: 1 }) { id }}"#),
+          run_query!(&runner, r#"mutation { deleteOneParent(where: { id: 1 }) { id }}"#),
           @r###"{"data":{"deleteOneParent":{"id":1}}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyChild { parent_id }}"#),
+          run_query!(&runner, r#"query { findManyChild { parent_id }}"#),
           @r###"{"data":{"findManyChild":[{"parent_id":1}]}}"###
         );
 
@@ -180,9 +180,9 @@ mod one2many_req {
 
     /// Deleting the parent must fail if a child is connected.
     #[connector_test]
-    async fn delete_parent_failure(runner: &Runner) -> TestResult<()> {
+    async fn delete_parent_failure(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation { createOneParent(data: { id: 1, children: { create: { id: 1 }}}) { id }}"#),
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, children: { create: { id: 1 }}}) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
@@ -205,24 +205,24 @@ mod one2many_req {
 
     /// Deleting the parent succeeds if no child is connected.
     #[connector_test]
-    async fn delete_parent(runner: &Runner) -> TestResult<()> {
+    async fn delete_parent(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation { createOneParent(data: { id: 1 }) { id }}"#),
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 1 }) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation { createOneParent(data: { id: 2 }) { id }}"#),
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 2 }) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":2}}}"###
         );
 
         insta::assert_snapshot!(
-            run_query!(runner, "mutation { deleteOneParent(where: { id: 1 }) { id }}"),
+            run_query!(&runner, "mutation { deleteOneParent(where: { id: 1 }) { id }}"),
             @r###"{"data":{"deleteOneParent":{"id":1}}}"###
         );
 
         insta::assert_snapshot!(
-            run_query!(runner, "mutation { deleteManyParent(where: { id: 2 }) { count }}"),
+            run_query!(&runner, "mutation { deleteManyParent(where: { id: 2 }) { count }}"),
             @r###"{"data":{"deleteManyParent":{"count":1}}}"###
         );
 
@@ -231,19 +231,19 @@ mod one2many_req {
 
     /// Deleting the parent leaves the data in a integrity-violating state.
     #[connector_test(only(MongoDb))]
-    async fn delete_parent_violation(runner: &Runner) -> TestResult<()> {
+    async fn delete_parent_violation(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation { createOneParent(data: { id: 1, children: { create: { id: 1 }}}) { id }}"#),
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, children: { create: { id: 1 }}}) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation { deleteOneParent(where: { id: 1 }) { id }}"#),
+          run_query!(&runner, r#"mutation { deleteOneParent(where: { id: 1 }) { id }}"#),
           @r###"{"data":{"deleteOneParent":{"id":1}}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyChild { parent_id }}"#),
+          run_query!(&runner, r#"query { findManyChild { parent_id }}"#),
           @r###"{"data":{"findManyChild":[{"parent_id":1}]}}"###
         );
 
@@ -272,9 +272,9 @@ mod one2many_opt {
 
     /// Deleting the parent must fail if a child is connected.
     #[connector_test]
-    async fn delete_parent_failure(runner: &Runner) -> TestResult<()> {
+    async fn delete_parent_failure(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation { createOneParent(data: { id: 1, children: { create: { id: 1 }}}) { id }}"#),
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, children: { create: { id: 1 }}}) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
@@ -297,24 +297,24 @@ mod one2many_opt {
 
     /// Deleting the parent succeeds if no child is connected.
     #[connector_test]
-    async fn delete_parent(runner: &Runner) -> TestResult<()> {
+    async fn delete_parent(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation { createOneParent(data: { id: 1 }) { id }}"#),
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 1 }) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation { createOneParent(data: { id: 2 }) { id }}"#),
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 2 }) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":2}}}"###
         );
 
         insta::assert_snapshot!(
-            run_query!(runner, "mutation { deleteOneParent(where: { id: 1 }) { id }}"),
+            run_query!(&runner, "mutation { deleteOneParent(where: { id: 1 }) { id }}"),
             @r###"{"data":{"deleteOneParent":{"id":1}}}"###
         );
 
         insta::assert_snapshot!(
-            run_query!(runner, "mutation { deleteManyParent(where: { id: 2 }) { count }}"),
+            run_query!(&runner, "mutation { deleteManyParent(where: { id: 2 }) { count }}"),
             @r###"{"data":{"deleteManyParent":{"count":1}}}"###
         );
 
@@ -323,19 +323,19 @@ mod one2many_opt {
 
     /// Deleting the parent leaves the data in a integrity-violating state.
     #[connector_test(only(MongoDb))]
-    async fn delete_parent_violation(runner: &Runner) -> TestResult<()> {
+    async fn delete_parent_violation(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation { createOneParent(data: { id: 1, children: { create: { id: 1 }}}) { id }}"#),
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, children: { create: { id: 1 }}}) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation { deleteOneParent(where: { id: 1 }) { id }}"#),
+          run_query!(&runner, r#"mutation { deleteOneParent(where: { id: 1 }) { id }}"#),
           @r###"{"data":{"deleteOneParent":{"id":1}}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyChild { parent_id }}"#),
+          run_query!(&runner, r#"query { findManyChild { parent_id }}"#),
           @r###"{"data":{"findManyChild":[{"parent_id":1}]}}"###
         );
 

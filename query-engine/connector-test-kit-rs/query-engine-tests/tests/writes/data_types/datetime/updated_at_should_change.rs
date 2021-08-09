@@ -40,15 +40,15 @@ mod updated_at {
 
     // "Updating a data item" should "change it's updatedAt value"
     #[connector_test]
-    async fn update_should_change_updated_at(runner: &Runner) -> TestResult<()> {
+    async fn update_should_change_updated_at(runner: Runner) -> TestResult<()> {
         let res = run_query_json!(
-            runner,
+            &runner,
             r#"mutation {createOneTop(data: { id: "1", top: "top1" }) {updatedAt}}"#
         );
         let updated_at = &res["data"]["createOneTop"]["updatedAt"];
 
         let res_2 = run_query_json!(
-            runner,
+            &runner,
             r#"mutation {
                 updateOneTop(
                   where: { top: "top1" }
@@ -67,15 +67,15 @@ mod updated_at {
 
     // "Upserting a data item" should "change it's updatedAt value"
     #[connector_test]
-    async fn upsert_should_change_updated_at(runner: &Runner) -> TestResult<()> {
+    async fn upsert_should_change_updated_at(runner: Runner) -> TestResult<()> {
         let res = run_query_json!(
-            runner,
+            &runner,
             r#"mutation {createOneTop(data: { id: "1", top: "top3" }) {updatedAt}}"#
         );
         let updated_at = &res["data"]["createOneTop"]["updatedAt"];
 
         let res_2 = run_query_json!(
-            runner,
+            &runner,
             r#"mutation {
                     upsertOneTop(
                       where: { top: "top3" }
@@ -95,15 +95,15 @@ mod updated_at {
 
     // "UpdateMany a data item" should "change it's updatedAt value"
     #[connector_test]
-    async fn update_many_should_change_updated_at(runner: &Runner) -> TestResult<()> {
+    async fn update_many_should_change_updated_at(runner: Runner) -> TestResult<()> {
         let res = run_query_json!(
-            runner,
+            &runner,
             r#"mutation {createOneTop(data: { id: "1", top: "top5" }) {updatedAt}}"#
         );
         let updated_at = &res["data"]["createOneTop"]["updatedAt"];
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateManyTop(
               where: { top: { equals: "top5" }}
               data: { top: { set: "top50" }}
@@ -115,7 +115,7 @@ mod updated_at {
         );
 
         let res_2 = run_query_json!(
-            runner,
+            &runner,
             r#"query {
               findUniqueTop(where: { top: "top50" }) {
                 updatedAt
@@ -131,15 +131,15 @@ mod updated_at {
 
     // "Updating scalar list values" should "change updatedAt values"
     #[connector_test]
-    async fn update_sclr_list_should_change_updt_at(runner: &Runner) -> TestResult<()> {
+    async fn update_sclr_list_should_change_updt_at(runner: Runner) -> TestResult<()> {
         let res = run_query_json!(
-            runner,
+            &runner,
             r#"mutation {createOneList(data: { id: "1", list: "test" }) {updatedAt}}"#
         );
         let updated_at = &res["data"]["createOneList"]["updatedAt"];
 
         let res_2 = run_query_json!(
-            runner,
+            &runner,
             r#"mutation {
                 updateOneList(
                   where: { list: "test" }

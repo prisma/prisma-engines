@@ -27,7 +27,7 @@ mod where_and_datetime {
 
     // "Using the same input in an update using where as used during creation of the item" should "work"
     #[connector_test]
-    async fn test_1(runner: &Runner) -> TestResult<()> {
+    async fn test_1(runner: Runner) -> TestResult<()> {
         let outer_where = r#"2018-12-05T12:34:23.000Z"#;
         let inner_where = r#"2019-12-05T12:34:23.000Z"#;
 
@@ -77,12 +77,12 @@ mod where_and_datetime {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, format!(r#"query{{findUniqueNote(where:{{outerDateTime: "{}" }}){{outerString, outerDateTime}} }}"#, outer_where)),
+          run_query!(&runner, format!(r#"query{{findUniqueNote(where:{{outerDateTime: "{}" }}){{outerString, outerDateTime}} }}"#, outer_where)),
           @r###"{"data":{"findUniqueNote":{"outerString":"Changed Outer String","outerDateTime":"2018-12-05T12:34:23.000Z"}}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, format!(r#"query{{findUniqueTodo(where:{{innerDateTime: "{}" }}){{innerString, innerDateTime}} }}"#, inner_where)),
+          run_query!(&runner, format!(r#"query{{findUniqueTodo(where:{{innerDateTime: "{}" }}){{innerString, innerDateTime}} }}"#, inner_where)),
           @r###"{"data":{"findUniqueTodo":{"innerString":"Changed Inner String","innerDateTime":"2019-12-05T12:34:23.000Z"}}}"###
         );
 
@@ -91,7 +91,7 @@ mod where_and_datetime {
 
     // "Using the same input in an update using where as used during creation of the item" should "work with the same time for inner and outer"
     #[connector_test]
-    async fn test_2(runner: &Runner) -> TestResult<()> {
+    async fn test_2(runner: Runner) -> TestResult<()> {
         let outer_where = r#"2018-01-03T11:27:38.000Z"#;
         let inner_where = r#"2018-01-03T11:27:38.000Z"#;
 
@@ -141,12 +141,12 @@ mod where_and_datetime {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, format!(r#"query{{findUniqueNote(where:{{outerDateTime: "{}" }}){{outerString, outerDateTime}} }}"#, outer_where)),
+          run_query!(&runner, format!(r#"query{{findUniqueNote(where:{{outerDateTime: "{}" }}){{outerString, outerDateTime}} }}"#, outer_where)),
           @r###"{"data":{"findUniqueNote":{"outerString":"Changed Outer String","outerDateTime":"2018-01-03T11:27:38.000Z"}}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, format!(r#"query{{findUniqueTodo(where:{{innerDateTime: "{}" }}){{innerString, innerDateTime}} }}"#, inner_where)),
+          run_query!(&runner, format!(r#"query{{findUniqueTodo(where:{{innerDateTime: "{}" }}){{innerString, innerDateTime}} }}"#, inner_where)),
           @r###"{"data":{"findUniqueTodo":{"innerString":"Changed Inner String","innerDateTime":"2018-01-03T11:27:38.000Z"}}}"###
         );
 

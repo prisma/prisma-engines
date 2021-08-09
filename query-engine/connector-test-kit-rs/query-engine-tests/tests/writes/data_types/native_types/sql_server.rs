@@ -70,9 +70,9 @@ mod sql_server {
     }
 
     #[connector_test(schema(schema_int_int))]
-    async fn native_int_int(runner: &Runner) -> TestResult<()> {
+    async fn native_int_int(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneModel(
               data: {
                 int: 2147483647
@@ -99,9 +99,9 @@ mod sql_server {
     }
 
     #[connector_test(schema(schema_int_tinyint))]
-    async fn native_int_tinyint(runner: &Runner) -> TestResult<()> {
+    async fn native_int_tinyint(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
           createOneModel(
             data: {
               int: 2147483647
@@ -128,9 +128,9 @@ mod sql_server {
     }
 
     #[connector_test(schema(schema_int_smallint))]
-    async fn native_int_smallint(runner: &Runner) -> TestResult<()> {
+    async fn native_int_smallint(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
           createOneModel(
             data: {
               int: 2147483647
@@ -157,9 +157,9 @@ mod sql_server {
     }
 
     #[connector_test(schema(schema_bigint_bigint))]
-    async fn native_bigint_bigint(runner: &Runner) -> TestResult<()> {
+    async fn native_bigint_bigint(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
           createOneModel(
             data: {
               int: 2147483647
@@ -203,9 +203,9 @@ mod sql_server {
 
     // "SQL Server native decimal types" should "work"
     #[connector_test(schema(schema_decimal))]
-    async fn native_decimal_type(runner: &Runner) -> TestResult<()> {
+    async fn native_decimal_type(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneModel(
               data: {
                 float: 1.1
@@ -249,9 +249,9 @@ mod sql_server {
 
     // "SQL Server native string types" should "work"
     #[connector_test(schema(schema_string))]
-    async fn native_string_types(runner: &Runner) -> TestResult<()> {
+    async fn native_string_types(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneModel(
               data: {
                 char: "1234567890"
@@ -294,9 +294,9 @@ mod sql_server {
 
     // "SQL Server native date types" should "work"
     #[connector_test(schema(schema_date_types))]
-    async fn native_date_types(runner: &Runner) -> TestResult<()> {
+    async fn native_date_types(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneModel(
               data: {
                 date: "2016-09-24T00:00:00.000Z"
@@ -336,9 +336,9 @@ mod sql_server {
 
     // "SQL Server native binary types" should "work"
     #[connector_test(schema(schema_binary))]
-    async fn native_binary_types(runner: &Runner) -> TestResult<()> {
+    async fn native_binary_types(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneModel(
               data: {
                 bin: "dGVzdA=="
@@ -371,9 +371,9 @@ mod sql_server {
 
     // "Other SQL Server native types" should "work"
     #[connector_test(schema(schema_other_native_types))]
-    async fn other_native_types(runner: &Runner) -> TestResult<()> {
+    async fn other_native_types(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneModel(
               data: {
                 xml: "<meow>purr</meow>"
@@ -409,9 +409,9 @@ mod sql_server {
 
     // "Sql server native fixed-size char type" should "be handled correctly wrt. padding for comparisons"
     #[connector_test(schema(schema_fixed_size_char_native_types))]
-    async fn fixed_size_char_native_type(runner: &Runner) -> TestResult<()> {
+    async fn fixed_size_char_native_type(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneModelA(data: {
               id: "1234"
                b: { create: { id: "4321" } }
@@ -446,9 +446,9 @@ mod sql_server {
 
     // "Sql server native fixed-size nchar type" should "be handled correctly wrt. padding for comparisons"
     #[connector_test(schema(schema_fixed_size_n_char))]
-    async fn fixed_size_n_char_native_type(runner: &Runner) -> TestResult<()> {
+    async fn fixed_size_n_char_native_type(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneModelA(data: {
               id: "1234"
                b: { create: { id: "4321" } }

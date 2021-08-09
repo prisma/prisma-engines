@@ -342,7 +342,7 @@ impl<'a> Validator<'a> {
                 };
 
                 let references_singular_id_field = rel_info.references.len() == 1
-                    && related_model.field_is_primary(&rel_info.references.first().unwrap());
+                    && related_model.field_is_primary(rel_info.references.first().unwrap());
 
                 let is_many_to_many = {
                     // Back relation fields have not been added yet. So we must calculate this on our own.

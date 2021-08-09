@@ -56,6 +56,7 @@ features!(
     FilterJson,
     PlanetScaleMode,
     ReferentialActions,
+    InteractiveTransactions,
     NamedConstraints,
 );
 
@@ -75,6 +76,7 @@ pub static GENERATOR: Lazy<FeatureMap> = Lazy::new(|| {
             PlanetScaleMode,
             ReferentialActions,
             MongoDb,
+            InteractiveTransactions,
             NamedConstraints,
         ])
         .with_deprecated(vec![

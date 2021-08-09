@@ -1,8 +1,10 @@
-use indoc::indoc;
 use query_engine_tests::*;
 
 #[test_suite(schema(schema))]
 mod one2one_regression {
+    use indoc::indoc;
+    use query_engine_tests::run_query;
+
     fn schema() -> String {
         let schema = indoc! {
             r#"
@@ -20,9 +22,9 @@ mod one2one_regression {
     }
 
     #[connector_test]
-    async fn work_with_nulls(runner: &Runner) -> TestResult<()> {
+    async fn work_with_nulls(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-            run_query!(runner, indoc! { r#"
+            run_query!(&runner, indoc! { r#"
                 mutation {
                     createOneUser(data: { id: 1, name: "Bob"}) {
                         id
@@ -36,7 +38,7 @@ mod one2one_regression {
         );
 
         insta::assert_snapshot!(
-            run_query!(runner, indoc! { r#"
+            run_query!(&runner, indoc! { r#"
                 mutation {
                     createOneUser(data: { id: 2, name: "Alice", friend: {connect:{id: 1}}}) {
                         id
@@ -50,7 +52,7 @@ mod one2one_regression {
         );
 
         insta::assert_snapshot!(
-            run_query!(runner, indoc! { r#"
+            run_query!(&runner, indoc! { r#"
                 query {
                     findManyUser(where: { friend: { is: null }}){
                         id
@@ -64,7 +66,7 @@ mod one2one_regression {
         );
 
         insta::assert_snapshot!(
-            run_query!(runner, indoc! { r#"
+            run_query!(&runner, indoc! { r#"
                 query {
                     findManyUser(where: { friendOf: { is: null }}){
                         id

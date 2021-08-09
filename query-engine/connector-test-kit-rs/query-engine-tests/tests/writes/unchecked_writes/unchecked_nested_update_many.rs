@@ -48,13 +48,13 @@ mod unchecked_nested_um {
 
     // "Unchecked nested many updates" should "allow writing non-parent inlined relation scalars"
     #[connector_test(schema(schema_1))]
-    async fn allow_write_non_prent_inline_rel_sclrs(runner: &Runner) -> TestResult<()> {
+    async fn allow_write_non_prent_inline_rel_sclrs(runner: Runner) -> TestResult<()> {
         // Setup
         // B1 -> A1 -> C1
         // └---> A2 -> C2
         //             C3
         run_query!(
-            runner,
+            &runner,
             r#"mutation {
                 createOneModelB(data: {
                   id: 1,
@@ -73,7 +73,7 @@ mod unchecked_nested_um {
         );
 
         run_query!(
-            runner,
+            &runner,
             r#"mutation {
                 createOneModelC(data: {
                   id: 3,
@@ -87,7 +87,7 @@ mod unchecked_nested_um {
 
         // Update all As for B1, connecting them to C3
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateOneModelB(where: {
               uniq_1_uniq_2: {
                 uniq_1: "b1_1"
@@ -116,7 +116,7 @@ mod unchecked_nested_um {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateOneModelB(where: {
               uniq_1_uniq_2: {
                 uniq_1: "b1_1"
@@ -165,10 +165,10 @@ mod unchecked_nested_um {
 
     // "Unchecked nested many updates" should "not allow writing parent inlined relation scalars"
     #[connector_test(schema(schema_2))]
-    async fn disallow_write_parent_inline_rel_sclrs(runner: &Runner) -> TestResult<()> {
+    async fn disallow_write_parent_inline_rel_sclrs(runner: Runner) -> TestResult<()> {
         // B can't be written because it's the parent.
         assert_error!(
-            runner,
+            &runner,
             r#"mutation {
                 updateOneModelB(where: { id: 1 }, data: {
                   a: {
@@ -206,14 +206,14 @@ mod unchecked_nested_um {
 
     // "Unchecked nested many updates" should "allow to write to autoincrement IDs directly"
     #[connector_test(schema(schema_3), capabilities(AutoIncrement, WritableAutoincField))]
-    async fn allow_write_autoinc_id(runner: &Runner) -> TestResult<()> {
+    async fn allow_write_autoinc_id(runner: Runner) -> TestResult<()> {
         run_query!(
-            runner,
+            &runner,
             r#"mutation { createOneModelA(data: { b: { create: { id: 1 }} }) { id } }"#
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             updateOneModelB(where: { id: 1 }, data: {
               a: { updateMany: { where: { id: { not: 0 }}, data: { id: 111 }}}
             }) {

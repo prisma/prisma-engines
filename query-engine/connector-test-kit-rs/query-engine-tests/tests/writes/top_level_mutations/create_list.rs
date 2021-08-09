@@ -18,15 +18,15 @@ mod create_list {
 
     // "A Create Mutation" should "should not accept null in set"
     #[connector_test]
-    async fn create_not_accept_null_in_set(runner: &Runner) -> TestResult<()> {
+    async fn create_not_accept_null_in_set(runner: Runner) -> TestResult<()> {
         assert_error!(
-            runner,
+            &runner,
             r#"mutation {createOneUser(data: { id: 1, test: {set: null} }) { id, test }}"#,
             2009
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation { createOneUser(data: { id: 1 }){ id, test }}"#),
+          run_query!(&runner, r#"mutation { createOneUser(data: { id: 1 }){ id, test }}"#),
           @r###"{"data":{"createOneUser":{"id":1,"test":[]}}}"###
         );
 

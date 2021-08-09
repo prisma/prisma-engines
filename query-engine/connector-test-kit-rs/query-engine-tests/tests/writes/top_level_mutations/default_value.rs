@@ -18,14 +18,14 @@ mod default_value {
 
     // "A Create Mutation on a non-list field" should "utilize the defaultValue"
     #[connector_test(schema(schema_string))]
-    async fn non_list_field(runner: &Runner) -> TestResult<()> {
+    async fn non_list_field(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation { createOneScalarModel(data: { id: 1 }){ reqString } }"#),
+          run_query!(&runner, r#"mutation { createOneScalarModel(data: { id: 1 }){ reqString } }"#),
           @r###"{"data":{"createOneScalarModel":{"reqString":"default"}}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyScalarModel{reqString}}"#),
+          run_query!(&runner, r#"{ findManyScalarModel{reqString}}"#),
           @r###"{"data":{"findManyScalarModel":[{"reqString":"default"}]}}"###
         );
 
@@ -46,9 +46,9 @@ mod default_value {
 
     // "The default value" should "work for int"
     #[connector_test(schema(schema_int))]
-    async fn int_field(runner: &Runner) -> TestResult<()> {
+    async fn int_field(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneService(
               data:{
                 id: 1,
@@ -86,9 +86,9 @@ mod default_value {
 
     // "The default value" should "work for enums"
     #[connector_test(schema(schema_enum), exclude(Sqlite, SqlServer))]
-    async fn enum_field(runner: &Runner) -> TestResult<()> {
+    async fn enum_field(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneService(
               data:{
                 id: 1,
@@ -120,9 +120,9 @@ mod default_value {
 
     // "The default value for updatedAt and createdAt" should "not be set if specific values are passed on create"
     #[connector_test(schema(schema_datetime))]
-    async fn updated_at_created_at(runner: &Runner) -> TestResult<()> {
+    async fn updated_at_created_at(runner: Runner) -> TestResult<()> {
         let res = run_query_json!(
-            runner,
+            &runner,
             r#"mutation {
                 createOneUser(
                   data:{
@@ -171,9 +171,9 @@ mod default_value {
 
     // "Remapped enum default values" should "work"
     #[connector_test(schema(schema_remapped_enum), exclude(Sqlite, SqlServer))]
-    async fn remapped_enum_field(runner: &Runner) -> TestResult<()> {
+    async fn remapped_enum_field(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneUser(
               data:{
                 id: 1,
@@ -187,7 +187,7 @@ mod default_value {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneUser(
               data:{
                 id: 2
@@ -202,7 +202,7 @@ mod default_value {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query {
+          run_query!(&runner, r#"query {
             findUniqueUser(where:{ name: Superman }) {
               name,
               age
@@ -212,7 +212,7 @@ mod default_value {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query {
+          run_query!(&runner, r#"query {
             findManyUser(
               where:{
                 name: { in: [Spiderman, Superman] }

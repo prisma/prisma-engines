@@ -18,9 +18,9 @@ mod uuid_create_graphql {
 
     // "Creating an item with an id field of model UUID" should "work"
     #[connector_test(schema(schema_1))]
-    async fn create_uuid_id_should_work(runner: &Runner) -> TestResult<()> {
+    async fn create_uuid_id_should_work(runner: Runner) -> TestResult<()> {
         let res = run_query_json!(
-            runner,
+            &runner,
             r#"mutation {
           createOneTodo(data: { title: "the title" }){
             id
@@ -58,11 +58,11 @@ mod uuid_create_graphql {
 
     // "Fetching a UUID field that is null" should "work"
     #[connector_test(schema(schema_2))]
-    async fn fetch_null_uuid_should_work(runner: &Runner) -> TestResult<()> {
-        run_query!(runner, r#"mutation {createOneTableA(data: {name:"testA"}){id}}"#);
+    async fn fetch_null_uuid_should_work(runner: Runner) -> TestResult<()> {
+        run_query!(&runner, r#"mutation {createOneTableA(data: {name:"testA"}){id}}"#);
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{findManyTableA {name, b}}"#),
+          run_query!(&runner, r#"{findManyTableA {name, b}}"#),
           @r###"{"data":{"findManyTableA":[{"name":"testA","b":null}]}}"###
         );
 

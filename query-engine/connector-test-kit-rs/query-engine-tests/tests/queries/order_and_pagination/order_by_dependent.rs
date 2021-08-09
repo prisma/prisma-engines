@@ -35,12 +35,12 @@ mod order_by_dependent {
 
     // "[Hops: 1] Ordering by related record field ascending" should "work"
     #[connector_test(exclude(SqlServer))]
-    async fn hop_1_related_record_asc(runner: &Runner) -> TestResult<()> {
-        create_row(runner, 1, Some(2), Some(3), None).await?;
-        create_row(runner, 4, Some(5), Some(6), None).await?;
+    async fn hop_1_related_record_asc(runner: Runner) -> TestResult<()> {
+        create_row(&runner, 1, Some(2), Some(3), None).await?;
+        create_row(&runner, 4, Some(5), Some(6), None).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyModelA(orderBy: { b: { id: asc }}) {
               id
               b {
@@ -56,12 +56,12 @@ mod order_by_dependent {
 
     // "[Hops: 1] Ordering by related record field descending" should "work"
     #[connector_test(exclude(SqlServer))]
-    async fn hop_1_related_record_desc(runner: &Runner) -> TestResult<()> {
-        create_row(runner, 1, Some(2), Some(3), None).await?;
-        create_row(runner, 4, Some(5), Some(6), None).await?;
+    async fn hop_1_related_record_desc(runner: Runner) -> TestResult<()> {
+        create_row(&runner, 1, Some(2), Some(3), None).await?;
+        create_row(&runner, 4, Some(5), Some(6), None).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyModelA(orderBy: { b: { id: desc }}) {
               id
               b {
@@ -77,13 +77,13 @@ mod order_by_dependent {
 
     // "[Hops: 1] Ordering by related record field ascending with nulls" should "work"
     #[connector_test]
-    async fn hop_1_related_record_asc_nulls(runner: &Runner) -> TestResult<()> {
-        create_row(runner, 1, Some(1), Some(1), None).await?;
-        create_row(runner, 2, Some(2), None, None).await?;
-        create_row(runner, 3, None, None, None).await?;
+    async fn hop_1_related_record_asc_nulls(runner: Runner) -> TestResult<()> {
+        create_row(&runner, 1, Some(1), Some(1), None).await?;
+        create_row(&runner, 2, Some(2), None, None).await?;
+        create_row(&runner, 3, None, None, None).await?;
 
         assert_query_many!(
-            runner,
+            &runner,
             r#"{
               findManyModelA(orderBy: { b: { id: asc }}) {
                 id
@@ -103,12 +103,12 @@ mod order_by_dependent {
 
     // "[Hops: 2] Ordering by related record field ascending" should "work"
     #[connector_test(exclude(SqlServer))]
-    async fn hop_2_related_record_asc(runner: &Runner) -> TestResult<()> {
-        create_row(runner, 1, Some(2), Some(3), None).await?;
-        create_row(runner, 4, Some(5), Some(6), None).await?;
+    async fn hop_2_related_record_asc(runner: Runner) -> TestResult<()> {
+        create_row(&runner, 1, Some(2), Some(3), None).await?;
+        create_row(&runner, 4, Some(5), Some(6), None).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
                 findManyModelA(orderBy: { b: { c: { id: asc }}}) {
                   id
                   b { c { id }}
@@ -122,12 +122,12 @@ mod order_by_dependent {
 
     // "[Hops: 2] Ordering by related record field descending" should "work"
     #[connector_test(exclude(SqlServer))]
-    async fn hop_2_related_record_desc(runner: &Runner) -> TestResult<()> {
-        create_row(runner, 1, Some(2), Some(3), None).await?;
-        create_row(runner, 4, Some(5), Some(6), None).await?;
+    async fn hop_2_related_record_desc(runner: Runner) -> TestResult<()> {
+        create_row(&runner, 1, Some(2), Some(3), None).await?;
+        create_row(&runner, 4, Some(5), Some(6), None).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyModelA(orderBy: { b: { c: { id: desc }}}) {
               id
               b { c { id }}
@@ -141,14 +141,14 @@ mod order_by_dependent {
 
     // "[Hops: 2] Ordering by related record field ascending with nulls" should "work"
     #[connector_test]
-    async fn hop_2_related_record_asc_null(runner: &Runner) -> TestResult<()> {
+    async fn hop_2_related_record_asc_null(runner: Runner) -> TestResult<()> {
         // 1 record has the "full chain", one half, one none
-        create_row(runner, 1, Some(1), Some(1), None).await?;
-        create_row(runner, 2, Some(2), None, None).await?;
-        create_row(runner, 3, None, None, None).await?;
+        create_row(&runner, 1, Some(1), Some(1), None).await?;
+        create_row(&runner, 2, Some(2), None, None).await?;
+        create_row(&runner, 3, None, None, None).await?;
 
         assert_query_many!(
-            runner,
+            &runner,
             r#"{
               findManyModelA(orderBy: { b: { c: { id: asc }}}) {
                 id
@@ -172,13 +172,13 @@ mod order_by_dependent {
 
     // "[Circular] Ordering by related record field ascending" should "work"
     #[connector_test]
-    async fn circular_related_record_asc(runner: &Runner) -> TestResult<()> {
+    async fn circular_related_record_asc(runner: Runner) -> TestResult<()> {
         // Records form circles with their relations
-        create_row(runner, 1, Some(1), Some(1), Some(1)).await?;
-        create_row(runner, 2, Some(2), Some(2), Some(2)).await?;
+        create_row(&runner, 1, Some(1), Some(1), Some(1)).await?;
+        create_row(&runner, 2, Some(2), Some(2), Some(2)).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyModelA(orderBy: { b: { c: { a: { id: asc }}}}) {
               id
               b {
@@ -198,13 +198,13 @@ mod order_by_dependent {
 
     // "[Circular] Ordering by related record field descending" should "work"
     #[connector_test]
-    async fn circular_related_record_desc(runner: &Runner) -> TestResult<()> {
+    async fn circular_related_record_desc(runner: Runner) -> TestResult<()> {
         // Records form circles with their relations
-        create_row(runner, 1, Some(1), Some(1), Some(1)).await?;
-        create_row(runner, 2, Some(2), Some(2), Some(2)).await?;
+        create_row(&runner, 1, Some(1), Some(1), Some(1)).await?;
+        create_row(&runner, 2, Some(2), Some(2), Some(2)).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyModelA(orderBy: { b: { c: { a: { id: desc }}}}) {
               id
               b {
@@ -224,13 +224,13 @@ mod order_by_dependent {
 
     // "[Circular with differing records] Ordering by related record field ascending" should "work"
     #[connector_test(exclude(SqlServer, MySql))]
-    async fn circular_diff_related_record_asc(runner: &Runner) -> TestResult<()> {
+    async fn circular_diff_related_record_asc(runner: Runner) -> TestResult<()> {
         // Records form circles with their relations
-        create_row(runner, 1, Some(1), Some(1), Some(3)).await?;
-        create_row(runner, 2, Some(2), Some(2), Some(4)).await?;
+        create_row(&runner, 1, Some(1), Some(1), Some(3)).await?;
+        create_row(&runner, 2, Some(2), Some(2), Some(4)).await?;
 
         assert_query_many!(
-            runner,
+            &runner,
             r#"{
               findManyModelA(orderBy: { b: { c: { a: { id: asc }}}}) {
                 id
@@ -255,13 +255,13 @@ mod order_by_dependent {
 
     // "[Circular with differing records] Ordering by related record field descending" should "work"
     #[connector_test(exclude(SqlServer, MySql))]
-    async fn circular_diff_related_record_desc(runner: &Runner) -> TestResult<()> {
+    async fn circular_diff_related_record_desc(runner: Runner) -> TestResult<()> {
         // Records form circles with their relations
-        create_row(runner, 1, Some(1), Some(1), Some(3)).await?;
-        create_row(runner, 2, Some(2), Some(2), Some(4)).await?;
+        create_row(&runner, 1, Some(1), Some(1), Some(3)).await?;
+        create_row(&runner, 2, Some(2), Some(2), Some(4)).await?;
 
         assert_query_many!(
-            runner,
+            &runner,
             r#"{
               findManyModelA(orderBy: { b: { c: { a: { id: desc }}}}) {
                 id
@@ -308,23 +308,23 @@ mod order_by_dependent {
     }
 
     #[connector_test(schema(multiple_rel_same_model), exclude(MongoDb))] // Mongo is excluded due to CI issues (version drift?).
-    async fn multiple_rel_same_model_order_by(runner: &Runner) -> TestResult<()> {
+    async fn multiple_rel_same_model_order_by(runner: Runner) -> TestResult<()> {
         // test data
         run_query!(
-            runner,
+            &runner,
             r#"mutation { createOneModelA(data: { id: 1, b1: { create: { id: 1 } }, b2: { create: { id: 10 } } }) { id }}"#
         );
         run_query!(
-            runner,
+            &runner,
             r#"mutation { createOneModelA(data: { id: 2, b1: { connect: { id: 1 } }, b2: { create: { id: 5 } } }) { id }}"#
         );
         run_query!(
-            runner,
+            &runner,
             r#"mutation { createOneModelA(data: { id: 3, b1: { create: { id: 2 } }, b2: { create: { id: 7 } } }) { id }}"#
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyModelA(orderBy: [{ b1: { id: asc } }, { b2: { id: desc } }]) {
               id
               b1 { id }
@@ -366,12 +366,12 @@ mod order_by_dependent {
 
     // Minimal tests specifically for covering the basics in SQL server (no double nulls allowed).
     #[connector_test(schema(no_double_nulls))]
-    async fn simple_order_by_rel(runner: &Runner) -> TestResult<()> {
-        create_row(runner, 1, Some(2), Some(3), None).await?;
-        create_row(runner, 4, Some(5), Some(7), None).await?;
+    async fn simple_order_by_rel(runner: Runner) -> TestResult<()> {
+        create_row(&runner, 1, Some(2), Some(3), None).await?;
+        create_row(&runner, 4, Some(5), Some(7), None).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyModelA(orderBy: { b: { id: asc }}) {
               id
               b {
@@ -387,12 +387,12 @@ mod order_by_dependent {
 
     // Minimal tests specifically for covering the basics in SQL server (no double nulls allowed).
     #[connector_test(schema(no_double_nulls))]
-    async fn hop_2_simple_order_by_rel(runner: &Runner) -> TestResult<()> {
-        create_row(runner, 1, Some(2), Some(3), None).await?;
-        create_row(runner, 4, Some(5), Some(6), None).await?;
+    async fn hop_2_simple_order_by_rel(runner: Runner) -> TestResult<()> {
+        create_row(&runner, 1, Some(2), Some(3), None).await?;
+        create_row(&runner, 4, Some(5), Some(6), None).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyModelA(orderBy: { b: { c: { id: asc }}}) {
               id
               b { c { id }}

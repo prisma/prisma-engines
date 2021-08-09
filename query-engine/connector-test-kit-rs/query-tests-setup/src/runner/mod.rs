@@ -5,16 +5,33 @@ mod node_api;
 pub use binary::*;
 pub use direct::*;
 pub use node_api::*;
+use query_core::{QueryExecutor, TxId};
 
 use crate::{ConnectorTag, QueryResult, TestError, TestResult};
 use colored::*;
 
 #[async_trait::async_trait]
 pub trait RunnerInterface: Sized {
+    /// Initializes the runner.
     async fn load(datamodel: String, connector_tag: ConnectorTag) -> TestResult<Self>;
+
+    /// Queries the engine.
     async fn query(&self, query: String) -> TestResult<QueryResult>;
+
+    /// Queries the engine with a batch.
     async fn batch(&self, queries: Vec<String>, transaction: bool) -> TestResult<QueryResult>;
+
+    /// The connector tag used to load this runner.
     fn connector(&self) -> &ConnectorTag;
+
+    /// Exposes the underlying executor for testing.
+    fn executor(&self) -> &dyn QueryExecutor;
+
+    /// Instructs this runner to use a specific ITX ID for queries.
+    fn set_active_tx(&mut self, tx_id: TxId);
+
+    /// Clears ITX ID for queries.
+    fn clear_active_tx(&mut self);
 }
 
 pub enum Runner {
@@ -60,13 +77,9 @@ impl Runner {
         Ok(response)
     }
 
-    pub async fn batch<T, S>(&self, gql_queries: T, transaction: bool) -> TestResult<QueryResult>
-    where
-        T: Iterator<Item = S>,
-        S: Into<String>,
-    {
+    pub async fn batch(&self, queries: Vec<String>, transaction: bool) -> TestResult<QueryResult> {
         match self {
-            Runner::Direct(r) => r.batch(gql_queries.map(Into::into).collect(), transaction).await,
+            Runner::Direct(r) => r.batch(queries, transaction).await,
             Runner::NodeApi(_) => todo!(),
             Runner::Binary(_) => todo!(),
         }
@@ -81,6 +94,30 @@ impl Runner {
     pub fn connector(&self) -> &ConnectorTag {
         match self {
             Runner::Direct(r) => r.connector(),
+            Runner::NodeApi(_) => todo!(),
+            Runner::Binary(_) => todo!(),
+        }
+    }
+
+    pub fn executor(&self) -> &dyn QueryExecutor {
+        match self {
+            Runner::Direct(r) => r.executor(),
+            Runner::NodeApi(_) => todo!(),
+            Runner::Binary(_) => todo!(),
+        }
+    }
+
+    pub fn set_active_tx(&mut self, tx_id: TxId) {
+        match self {
+            Runner::Direct(r) => r.set_active_tx(tx_id),
+            Runner::NodeApi(_) => todo!(),
+            Runner::Binary(_) => todo!(),
+        }
+    }
+
+    pub fn clear_active_tx(&mut self) {
+        match self {
+            Runner::Direct(r) => r.clear_active_tx(),
             Runner::NodeApi(_) => todo!(),
             Runner::Binary(_) => todo!(),
         }

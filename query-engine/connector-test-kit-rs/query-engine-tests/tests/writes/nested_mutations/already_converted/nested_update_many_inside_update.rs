@@ -34,7 +34,7 @@ mod um_inside_update {
                   childOpt: {{updateMany: {{
                       where:{{c: "c"}}
                       data: {{c: {{ set: "newC" }}}}
-              
+
                   }}}}
               }}){{
                 {selection}

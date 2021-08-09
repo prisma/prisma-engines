@@ -3280,6 +3280,8 @@ dependencies = [
  "chrono",
  "connection-string",
  "crossbeam-queue",
+ "cuid",
+ "dashmap",
  "datamodel",
  "datamodel-connector",
  "futures",
@@ -3289,6 +3291,7 @@ dependencies = [
  "mongodb-query-connector",
  "once_cell",
  "petgraph 0.4.13",
+ "pin-utils",
  "prisma-inflector",
  "prisma-models",
  "prisma-value",
@@ -3397,9 +3400,11 @@ dependencies = [
  "datamodel-connector",
  "indoc",
  "insta",
+ "prisma-value",
  "query-test-macros",
  "query-tests-setup",
  "serde_json",
+ "tokio",
  "tracing",
  "tracing-futures",
  "uuid",
@@ -3937,7 +3942,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e0bccbcf40c8938196944a3da0e133e031a33f4d6b72db3bda3cc556e361905d"
 dependencies = [
  "lazy_static",
- "parking_lot 0.10.2",
+ "parking_lot 0.11.1",
  "serial_test_derive",
 ]
 
@@ -4613,9 +4618,9 @@ checksum = "cda74da7e1a664f795bb1f8a87ec406fb89a02522cf6e50620d016add6dbbf5c"
 
 [[package]]
 name = "tokio"
-version = "1.4.0"
+version = "1.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "134af885d758d645f0f0505c9a8b3f9bf8a348fd822e112ab5248138348f1722"
+checksum = "4b7b349f11a7047e6d1276853e612d152f5e8a352c61917887cc2169e2366b4c"
 dependencies = [
  "autocfg",
  "bytes 1.0.1",

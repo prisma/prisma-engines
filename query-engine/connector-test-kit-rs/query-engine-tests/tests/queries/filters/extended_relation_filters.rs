@@ -1,9 +1,11 @@
-use indoc::indoc;
 use query_engine_tests::*;
 
 // Note: Raw port without alternations from Scala. Original name `ExtendedRelationFilterSpec.scala`.
 #[test_suite(schema(schema))]
 mod ext_rel_filters {
+    use indoc::indoc;
+    use query_engine_tests::run_query;
+
     fn schema() -> String {
         let schema = indoc! { "
             model Artist {
@@ -64,11 +66,11 @@ mod ext_rel_filters {
     }
 
     #[connector_test]
-    async fn basic_scalar_filter(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn basic_scalar_filter(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyArtist(where: { ArtistId: { equals: 1 }}) { Name }}"#),
+          run_query!(&runner, r#"query { findManyArtist(where: { ArtistId: { equals: 1 }}) { Name }}"#),
           @r###"{"data":{"findManyArtist":[{"Name":"CompleteArtist"}]}}"###
         );
 
@@ -76,11 +78,11 @@ mod ext_rel_filters {
     }
 
     #[connector_test]
-    async fn rel_filter_l1_depth1(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn rel_filter_l1_depth1(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyAlbum(where: { Artist: { is: { Name: { equals: "CompleteArtist" }}}}) { AlbumId }}"#),
+          run_query!(&runner, r#"{ findManyAlbum(where: { Artist: { is: { Name: { equals: "CompleteArtist" }}}}) { AlbumId }}"#),
           @r###"{"data":{"findManyAlbum":[{"AlbumId":1}]}}"###
         );
 
@@ -89,41 +91,41 @@ mod ext_rel_filters {
 
     // MySql is case insensitive and Postgres case sensitive
     #[connector_test(only(MySQL))]
-    async fn mysql_rel1_many_filters(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn mysql_rel1_many_filters(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyAlbum(where: { Artist: { is: { Name: { equals: "CompleteArtist" }}}}) { AlbumId }}"#),
+          run_query!(&runner, r#"{ findManyAlbum(where: { Artist: { is: { Name: { equals: "CompleteArtist" }}}}) { AlbumId }}"#),
           @r###"{"data":{"findManyAlbum":[{"AlbumId":1}]}}"###
         );
 
         insta::assert_snapshot!(
-            run_query!(runner, r#"{ findManyArtist(where: { Albums: { some: { Title: { startsWith: "album" }}}}) { Name }}"#),
+            run_query!(&runner, r#"{ findManyArtist(where: { Albums: { some: { Title: { startsWith: "album" }}}}) { Name }}"#),
             @r###"{"data":{"findManyArtist":[{"Name":"CompleteArtist"},{"Name":"CompleteArtist2"},{"Name":"CompleteArtistWith2Albums"}]}}"###
         );
 
         insta::assert_snapshot!(
-            run_query!(runner, r#"{ findManyArtist(where: { Albums: { some: { Title: { startsWith: "t" }}}}) { Name }}"#),
+            run_query!(&runner, r#"{ findManyArtist(where: { Albums: { some: { Title: { startsWith: "t" }}}}) { Name }}"#),
             @r###"{"data":{"findManyArtist":[{"Name":"ArtistWithOneAlbumWithoutTracks"}]}}"###
         );
 
         insta::assert_snapshot!(
-            run_query!(runner, r#"{ findManyArtist(where: { Albums: { every: { Title: { contains: "album" }}}}) { Name }}"#),
+            run_query!(&runner, r#"{ findManyArtist(where: { Albums: { every: { Title: { contains: "album" }}}}) { Name }}"#),
             @r###"{"data":{"findManyArtist":[{"Name":"CompleteArtist"},{"Name":"ArtistWithoutAlbums"},{"Name":"ArtistWithOneAlbumWithoutTracks"},{"Name":"CompleteArtist2"},{"Name":"CompleteArtistWith2Albums"}]}}"###
         );
 
         insta::assert_snapshot!(
-            run_query!(runner, r#"{ findManyArtist(where: { Albums: { every: { Title: { not: { contains: "the" }}}}}) { Name }}"#),
+            run_query!(&runner, r#"{ findManyArtist(where: { Albums: { every: { Title: { not: { contains: "the" }}}}}) { Name }}"#),
             @r###"{"data":{"findManyArtist":[{"Name":"CompleteArtist"},{"Name":"ArtistWithoutAlbums"},{"Name":"CompleteArtist2"},{"Name":"CompleteArtistWith2Albums"}]}}"###
         );
 
         insta::assert_snapshot!(
-            run_query!(runner, r#"{ findManyArtist(where: { Albums: { none: { Title: { contains: "the" }}}}) { Name }}"#),
+            run_query!(&runner, r#"{ findManyArtist(where: { Albums: { none: { Title: { contains: "the" }}}}) { Name }}"#),
             @r###"{"data":{"findManyArtist":[{"Name":"CompleteArtist"},{"Name":"ArtistWithoutAlbums"},{"Name":"CompleteArtist2"},{"Name":"CompleteArtistWith2Albums"}]}}"###
         );
 
         insta::assert_snapshot!(
-            run_query!(runner, r#"{ findManyArtist(where: { Albums: { none: { Title: { contains: "album" }}}}) { Name }}"#),
+            run_query!(&runner, r#"{ findManyArtist(where: { Albums: { none: { Title: { contains: "album" }}}}) { Name }}"#),
             @r###"{"data":{"findManyArtist":[{"Name":"ArtistWithoutAlbums"}]}}"###
         );
 
@@ -131,16 +133,16 @@ mod ext_rel_filters {
     }
 
     #[connector_test(only(Postgres))]
-    async fn pg_rel1_some_filter(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn pg_rel1_some_filter(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyArtist(where: { Albums: { some: { Title: { startsWith: "Album" }}}}, orderBy: { id: asc }) { Name }}"#),
+          run_query!(&runner, r#"{ findManyArtist(where: { Albums: { some: { Title: { startsWith: "Album" }}}}, orderBy: { id: asc }) { Name }}"#),
           @r###"{"data":{"findManyArtist":[{"Name":"CompleteArtist"},{"Name":"CompleteArtist2"},{"Name":"CompleteArtistWith2Albums"}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyArtist(where: { Albums: { some: {  Title: { startsWith: "T" }}}}) { Name }}"#),
+          run_query!(&runner, r#"{ findManyArtist(where: { Albums: { some: {  Title: { startsWith: "T" }}}}) { Name }}"#),
           @r###"{"data":{"findManyArtist":[{"Name":"ArtistWithOneAlbumWithoutTracks"}]}}"###
         );
 
@@ -148,16 +150,16 @@ mod ext_rel_filters {
     }
 
     #[connector_test(only(Postgres))]
-    async fn pg_rel1_every_filter(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn pg_rel1_every_filter(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyArtist(where: { Albums: { every: { Title: { contains: "Album" }}}}) { Name }}"#),
+          run_query!(&runner, r#"{ findManyArtist(where: { Albums: { every: { Title: { contains: "Album" }}}}) { Name }}"#),
           @r###"{"data":{"findManyArtist":[{"Name":"CompleteArtist"},{"Name":"ArtistWithoutAlbums"},{"Name":"ArtistWithOneAlbumWithoutTracks"},{"Name":"CompleteArtist2"},{"Name":"CompleteArtistWith2Albums"}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyArtist(where: { Albums: { every: { Title: { not: { contains: "The" }}}}}) { Name }}"#),
+          run_query!(&runner, r#"{ findManyArtist(where: { Albums: { every: { Title: { not: { contains: "The" }}}}}) { Name }}"#),
           @r###"{"data":{"findManyArtist":[{"Name":"CompleteArtist"},{"Name":"ArtistWithoutAlbums"},{"Name":"CompleteArtist2"},{"Name":"CompleteArtistWith2Albums"}]}}"###
         );
 
@@ -165,16 +167,16 @@ mod ext_rel_filters {
     }
 
     #[connector_test(only(Postgres))]
-    async fn pg_rel1_none_filter(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn pg_rel1_none_filter(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyArtist(where: { Albums: { none: { Title: { contains: "The" }}}}) { Name }}"#),
+          run_query!(&runner, r#"{ findManyArtist(where: { Albums: { none: { Title: { contains: "The" }}}}) { Name }}"#),
           @r###"{"data":{"findManyArtist":[{"Name":"CompleteArtist"},{"Name":"ArtistWithoutAlbums"},{"Name":"CompleteArtist2"},{"Name":"CompleteArtistWith2Albums"}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyArtist(where: { Albums: { none: { Title: { contains: "Album" }}}}) { Name }}"#),
+          run_query!(&runner, r#"{ findManyArtist(where: { Albums: { none: { Title: { contains: "Album" }}}}) { Name }}"#),
           @r###"{"data":{"findManyArtist":[{"Name":"ArtistWithoutAlbums"}]}}"###
         );
 
@@ -182,16 +184,16 @@ mod ext_rel_filters {
     }
 
     #[connector_test]
-    async fn rel_filter_l2_some_some(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn rel_filter_l2_some_some(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyArtist(where: { Albums: { some: { Tracks: { some: { Milliseconds: { lte: 9000 }}}}}}, orderBy: { Name: asc }) { Name }}"#),
+          run_query!(&runner, r#"{ findManyArtist(where: { Albums: { some: { Tracks: { some: { Milliseconds: { lte: 9000 }}}}}}, orderBy: { Name: asc }) { Name }}"#),
           @r###"{"data":{"findManyArtist":[{"Name":"CompleteArtist2"},{"Name":"CompleteArtistWith2Albums"}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyArtist(where: { Albums: { some: { Tracks: { some: { Bytes: { equals: 512 }}}}}}) { Name }}"#),
+          run_query!(&runner, r#"{ findManyArtist(where: { Albums: { some: { Tracks: { some: { Bytes: { equals: 512 }}}}}}) { Name }}"#),
           @r###"{"data":{"findManyArtist":[{"Name":"CompleteArtist"}]}}"###
         );
 
@@ -199,94 +201,94 @@ mod ext_rel_filters {
     }
 
     #[connector_test]
-    async fn rel_filter_l2_all_filters(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn rel_filter_l2_all_filters(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         // some|every
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyArtist(where: { Albums: { some: { Tracks: { every: { UnitPrice: { gt: 2.50 }}}}}}) { Name }}"#),
+          run_query!(&runner, r#"{ findManyArtist(where: { Albums: { some: { Tracks: { every: { UnitPrice: { gt: 2.50 }}}}}}) { Name }}"#),
           @r###"{"data":{"findManyArtist":[{"Name":"ArtistWithOneAlbumWithoutTracks"},{"Name":"CompleteArtist2"},{"Name":"CompleteArtistWith2Albums"}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyArtist(where: { Albums: { some: { Tracks: { every: { Milliseconds: { gt: 9000 }}}}}}) { Name }}"#),
+          run_query!(&runner, r#"{ findManyArtist(where: { Albums: { some: { Tracks: { every: { Milliseconds: { gt: 9000 }}}}}}) { Name }}"#),
           @r###"{"data":{"findManyArtist":[{"Name":"CompleteArtist"},{"Name":"ArtistWithOneAlbumWithoutTracks"},{"Name":"CompleteArtistWith2Albums"}]}}"###
         );
 
         // some|none
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyArtist(where: { Albums: { some: { Tracks: { none: { Milliseconds: { lte: 9000 }}}}}}) { Name }}"#),
+          run_query!(&runner, r#"{ findManyArtist(where: { Albums: { some: { Tracks: { none: { Milliseconds: { lte: 9000 }}}}}}) { Name }}"#),
           @r###"{"data":{"findManyArtist":[{"Name":"CompleteArtist"},{"Name":"ArtistWithOneAlbumWithoutTracks"},{"Name":"CompleteArtistWith2Albums"}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyArtist(where: { Albums: { some: { Tracks: { none: { UnitPrice: { lt: 2.0 }}}}}}) { Name }}"#),
+          run_query!(&runner, r#"{ findManyArtist(where: { Albums: { some: { Tracks: { none: { UnitPrice: { lt: 2.0 }}}}}}) { Name }}"#),
           @r###"{"data":{"findManyArtist":[{"Name":"ArtistWithOneAlbumWithoutTracks"},{"Name":"CompleteArtist2"},{"Name":"CompleteArtistWith2Albums"}]}}"###
         );
 
         // every|some
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyArtist(where: { Albums: { every: { Tracks: { some: { Bytes: { lt: 1000 }}}}}}) { Name }}"#),
+          run_query!(&runner, r#"{ findManyArtist(where: { Albums: { every: { Tracks: { some: { Bytes: { lt: 1000 }}}}}}) { Name }}"#),
           @r###"{"data":{"findManyArtist":[{"Name":"CompleteArtist"},{"Name":"ArtistWithoutAlbums"},{"Name":"CompleteArtist2"},{"Name":"CompleteArtistWith2Albums"}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyArtist(where: { Albums: { every: { Tracks: { some: { Composer: {equals: "Composer3" }}}}}}) { Name }}"#),
+          run_query!(&runner, r#"{ findManyArtist(where: { Albums: { every: { Tracks: { some: { Composer: {equals: "Composer3" }}}}}}) { Name }}"#),
           @r###"{"data":{"findManyArtist":[{"Name":"ArtistWithoutAlbums"}]}}"###
         );
 
         // every|every
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyArtist(where: { Albums: { every: { Tracks: { every: { Bytes: { lte: 10000 }}}}}}) { Name }}"#),
+          run_query!(&runner, r#"{ findManyArtist(where: { Albums: { every: { Tracks: { every: { Bytes: { lte: 10000 }}}}}}) { Name }}"#),
           @r###"{"data":{"findManyArtist":[{"Name":"CompleteArtist"},{"Name":"ArtistWithoutAlbums"},{"Name":"ArtistWithOneAlbumWithoutTracks"},{"Name":"CompleteArtist2"}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyArtist(where: { Albums: { every: { Tracks: { every: { TrackId: { in: [4,5,6,7] }}}}}}) { Name }}"#),
+          run_query!(&runner, r#"{ findManyArtist(where: { Albums: { every: { Tracks: { every: { TrackId: { in: [4,5,6,7] }}}}}}) { Name }}"#),
           @r###"{"data":{"findManyArtist":[{"Name":"ArtistWithoutAlbums"},{"Name":"ArtistWithOneAlbumWithoutTracks"},{"Name":"CompleteArtistWith2Albums"}]}}"###
         );
 
         // every|none
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyArtist(where: { Albums: { every: { Tracks: { none: { UnitPrice: { lte: 1 }}}}}}) { Name }}"#),
+          run_query!(&runner, r#"{ findManyArtist(where: { Albums: { every: { Tracks: { none: { UnitPrice: { lte: 1 }}}}}}) { Name }}"#),
           @r###"{"data":{"findManyArtist":[{"Name":"CompleteArtist"},{"Name":"ArtistWithoutAlbums"},{"Name":"ArtistWithOneAlbumWithoutTracks"},{"Name":"CompleteArtist2"}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyArtist(where: { Albums: { every: { Tracks: { none: { Composer: { equals: "Composer2" }}}}}}) { Name }}"#),
+          run_query!(&runner, r#"{ findManyArtist(where: { Albums: { every: { Tracks: { none: { Composer: { equals: "Composer2" }}}}}}) { Name }}"#),
           @r###"{"data":{"findManyArtist":[{"Name":"CompleteArtist"},{"Name":"ArtistWithoutAlbums"},{"Name":"ArtistWithOneAlbumWithoutTracks"}]}}"###
         );
 
         // none|some
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyArtist(where: { Albums: { none: { Tracks: { some: { UnitPrice: { lt: 1 }}}}}}) { Name }}"#),
+          run_query!(&runner, r#"{ findManyArtist(where: { Albums: { none: { Tracks: { some: { UnitPrice: { lt: 1 }}}}}}) { Name }}"#),
           @r###"{"data":{"findManyArtist":[{"Name":"CompleteArtist"},{"Name":"ArtistWithoutAlbums"},{"Name":"ArtistWithOneAlbumWithoutTracks"},{"Name":"CompleteArtist2"}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyArtist(where: { Albums: { none: { Tracks: { some: { Composer: { equals: "Composer2" }}}}}}) { Name }}"#),
+          run_query!(&runner, r#"{ findManyArtist(where: { Albums: { none: { Tracks: { some: { Composer: { equals: "Composer2" }}}}}}) { Name }}"#),
           @r###"{"data":{"findManyArtist":[{"Name":"CompleteArtist"},{"Name":"ArtistWithoutAlbums"},{"Name":"ArtistWithOneAlbumWithoutTracks"}]}}"###
         );
 
         // none|every
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyArtist(where: { Albums: { none: { Tracks: { every: { UnitPrice: { gte: 5 }}}}}}) { Name }}"#),
+          run_query!(&runner, r#"{ findManyArtist(where: { Albums: { none: { Tracks: { every: { UnitPrice: { gte: 5 }}}}}}) { Name }}"#),
           @r###"{"data":{"findManyArtist":[{"Name":"CompleteArtist"},{"Name":"ArtistWithoutAlbums"},{"Name":"CompleteArtist2"}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyArtist(where: { Albums: { none: { Tracks: { every: { Name: { startsWith: "Track" }}}}}}) { Name }}"#),
+          run_query!(&runner, r#"{ findManyArtist(where: { Albums: { none: { Tracks: { every: { Name: { startsWith: "Track" }}}}}}) { Name }}"#),
           @r###"{"data":{"findManyArtist":[{"Name":"ArtistWithoutAlbums"}]}}"###
         );
 
         // none|none
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyArtist(where: { Albums: { none: { Tracks: { none: { Bytes: { lt: 100 }}}}}}) { Name }}"#),
+          run_query!(&runner, r#"{ findManyArtist(where: { Albums: { none: { Tracks: { none: { Bytes: { lt: 100 }}}}}}) { Name }}"#),
           @r###"{"data":{"findManyArtist":[{"Name":"ArtistWithoutAlbums"},{"Name":"CompleteArtist2"}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyArtist(where: { Albums: { none: { Tracks: { none: { Bytes: { gte: 100 }}}}}}) { Name }}"#),
+          run_query!(&runner, r#"{ findManyArtist(where: { Albums: { none: { Tracks: { none: { Bytes: { gte: 100 }}}}}}) { Name }}"#),
           @r###"{"data":{"findManyArtist":[{"Name":"CompleteArtist"},{"Name":"ArtistWithoutAlbums"},{"Name":"CompleteArtist2"},{"Name":"CompleteArtistWith2Albums"}]}}"###
         );
 
@@ -294,11 +296,11 @@ mod ext_rel_filters {
     }
 
     #[connector_test]
-    async fn rel_filter_l2_implicit_and_some(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn rel_filter_l2_implicit_and_some(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyAlbum(where: { Tracks: { some: { MediaType: { is: { Name: { equals: "MediaType1" }}}, Genre: { is: { Name: { equals: "Genre1" }}}}}}, orderBy: { id: asc }) { Title }}"#),
+          run_query!(&runner, r#"{ findManyAlbum(where: { Tracks: { some: { MediaType: { is: { Name: { equals: "MediaType1" }}}, Genre: { is: { Name: { equals: "Genre1" }}}}}}, orderBy: { id: asc }) { Title }}"#),
           @r###"{"data":{"findManyAlbum":[{"Title":"Album1"},{"Title":"Album4"},{"Title":"Album5"}]}}"###
         );
 
@@ -306,10 +308,10 @@ mod ext_rel_filters {
     }
 
     #[connector_test()]
-    async fn rel_filter_l2_implicit_and_every(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn rel_filter_l2_implicit_and_every(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyAlbum(where: { Tracks: { every: { MediaType: { is: { Name: { equals: "MediaType1" }}}, Genre: { is: { Name: { equals: "Genre1" }}}}}}) { Title }}"#),
+          run_query!(&runner, r#"{ findManyAlbum(where: { Tracks: { every: { MediaType: { is: { Name: { equals: "MediaType1" }}}, Genre: { is: { Name: { equals: "Genre1" }}}}}}) { Title }}"#),
           @r###"{"data":{"findManyAlbum":[{"Title":"Album1"},{"Title":"TheAlbumWithoutTracks"},{"Title":"Album4"}]}}"###
         );
 
@@ -317,21 +319,21 @@ mod ext_rel_filters {
     }
 
     #[connector_test()]
-    async fn rel_filter_l2_explicit_and_some(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn rel_filter_l2_explicit_and_some(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyAlbum(where: { Tracks: { some: { AND:[ { MediaType: { is: { Name: { equals: "MediaType1" }}}}, { Genre: { is: { Name: { equals: "Genre1" }}}}]}}}, orderBy: { id: asc }) { Title }}"#),
+          run_query!(&runner, r#"{ findManyAlbum(where: { Tracks: { some: { AND:[ { MediaType: { is: { Name: { equals: "MediaType1" }}}}, { Genre: { is: { Name: { equals: "Genre1" }}}}]}}}, orderBy: { id: asc }) { Title }}"#),
           @r###"{"data":{"findManyAlbum":[{"Title":"Album1"},{"Title":"Album4"},{"Title":"Album5"}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyAlbum(where: { Tracks: { some: { AND: [{ MediaType: { is: { Name: { equals: "MediaType2" }}}}]}}}) { Title }}"#),
+          run_query!(&runner, r#"{ findManyAlbum(where: { Tracks: { some: { AND: [{ MediaType: { is: { Name: { equals: "MediaType2" }}}}]}}}) { Title }}"#),
           @r###"{"data":{"findManyAlbum":[{"Title":"Album3"}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyAlbum(where: { Tracks: { some: { AND:[] }}}) { Title }}"#),
+          run_query!(&runner, r#"{ findManyAlbum(where: { Tracks: { some: { AND:[] }}}) { Title }}"#),
           @r###"{"data":{"findManyAlbum":[{"Title":"Album1"},{"Title":"Album3"},{"Title":"Album4"},{"Title":"Album5"}]}}"###
         );
 
@@ -339,21 +341,21 @@ mod ext_rel_filters {
     }
 
     #[connector_test()]
-    async fn rel_filter_l2_explicit_and_every(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn rel_filter_l2_explicit_and_every(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyAlbum(where: { Tracks: { every: { AND: [{ MediaType: { is: { Name: { equals: "MediaType1" }}}}, { Genre: { is: { Name: { equals: "Genre1" }}}}]}}}) { Title }}"#),
+          run_query!(&runner, r#"{ findManyAlbum(where: { Tracks: { every: { AND: [{ MediaType: { is: { Name: { equals: "MediaType1" }}}}, { Genre: { is: { Name: { equals: "Genre1" }}}}]}}}) { Title }}"#),
           @r###"{"data":{"findManyAlbum":[{"Title":"Album1"},{"Title":"TheAlbumWithoutTracks"},{"Title":"Album4"}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyAlbum(where: { Tracks: { every: { AND: [{ MediaType: { is: { Name: { equals: "MediaType2" }}}}]}}}) { Title }}"#),
+          run_query!(&runner, r#"{ findManyAlbum(where: { Tracks: { every: { AND: [{ MediaType: { is: { Name: { equals: "MediaType2" }}}}]}}}) { Title }}"#),
           @r###"{"data":{"findManyAlbum":[{"Title":"TheAlbumWithoutTracks"}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyAlbum(where: { Tracks: { every: { AND: [] }}}) { Title }}"#),
+          run_query!(&runner, r#"{ findManyAlbum(where: { Tracks: { every: { AND: [] }}}) { Title }}"#),
 
           @r###"{"data":{"findManyAlbum":[{"Title":"Album1"},{"Title":"TheAlbumWithoutTracks"},{"Title":"Album3"},{"Title":"Album4"},{"Title":"Album5"}]}}"###
         );
@@ -362,36 +364,36 @@ mod ext_rel_filters {
     }
 
     #[connector_test()]
-    async fn rel_filter_l2_explicit_or_all(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn rel_filter_l2_explicit_or_all(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyAlbum(where: { Tracks: { some: { OR:[{ MediaType: {is: { Name: { equals: "MediaType1" }}}}, { Genre: { is: { Name: { equals: "Genre2" }}}}]}}}) { Title }}"#),
+          run_query!(&runner, r#"{ findManyAlbum(where: { Tracks: { some: { OR:[{ MediaType: {is: { Name: { equals: "MediaType1" }}}}, { Genre: { is: { Name: { equals: "Genre2" }}}}]}}}) { Title }}"#),
           @r###"{"data":{"findManyAlbum":[{"Title":"Album1"},{"Title":"Album3"},{"Title":"Album4"},{"Title":"Album5"}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyAlbum(where: { Tracks: { every: {OR:[{ MediaType: { is: { Name: { equals: "MediaType1"}}}},{Genre: { is: { Name: { equals: "Genre2"}}}}]}}}) { Title }}"#),
+          run_query!(&runner, r#"{ findManyAlbum(where: { Tracks: { every: {OR:[{ MediaType: { is: { Name: { equals: "MediaType1"}}}},{Genre: { is: { Name: { equals: "Genre2"}}}}]}}}) { Title }}"#),
           @r###"{"data":{"findManyAlbum":[{"Title":"Album1"},{"Title":"TheAlbumWithoutTracks"},{"Title":"Album4"},{"Title":"Album5"}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyAlbum(where: { Tracks: { some: { OR:[{ MediaType: { is: { Name: { equals: "MediaType2"}}}}]}}}) { Title }}"#),
+          run_query!(&runner, r#"{ findManyAlbum(where: { Tracks: { some: { OR:[{ MediaType: { is: { Name: { equals: "MediaType2"}}}}]}}}) { Title }}"#),
           @r###"{"data":{"findManyAlbum":[{"Title":"Album3"}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyAlbum(where: { Tracks: { every: {OR:[{ MediaType: { is: { Name: { equals: "MediaType2"}}}}]}}}) { Title }}"#),
+          run_query!(&runner, r#"{ findManyAlbum(where: { Tracks: { every: {OR:[{ MediaType: { is: { Name: { equals: "MediaType2"}}}}]}}}) { Title }}"#),
           @r###"{"data":{"findManyAlbum":[{"Title":"TheAlbumWithoutTracks"}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyAlbum(where: { Tracks: { some: { OR:[]}}}) { Title }}"#),
+          run_query!(&runner, r#"{ findManyAlbum(where: { Tracks: { some: { OR:[]}}}) { Title }}"#),
           @r###"{"data":{"findManyAlbum":[]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyAlbum(where: { Tracks: { every: {OR:[]}}}) { Title }}"#),
+          run_query!(&runner, r#"{ findManyAlbum(where: { Tracks: { every: {OR:[]}}}) { Title }}"#),
           @r###"{"data":{"findManyAlbum":[{"Title":"TheAlbumWithoutTracks"}]}}"###
         );
 
@@ -399,36 +401,36 @@ mod ext_rel_filters {
     }
 
     #[connector_test()]
-    async fn rel_filter_l2_explicit_not_all(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn rel_filter_l2_explicit_not_all(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyAlbum(where: { Tracks: { some: { NOT: [{ MediaType: { is: { Name: { equals: "MediaType1"}}}},{Genre: { is: { Name: { equals: "Genre1"}}}}]}}}, orderBy: { Title: asc}) { Title }}"#),
+          run_query!(&runner, r#"{ findManyAlbum(where: { Tracks: { some: { NOT: [{ MediaType: { is: { Name: { equals: "MediaType1"}}}},{Genre: { is: { Name: { equals: "Genre1"}}}}]}}}, orderBy: { Title: asc}) { Title }}"#),
           @r###"{"data":{"findManyAlbum":[{"Title":"Album3"},{"Title":"Album5"}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyAlbum(where: { Tracks: { every: { NOT: [{ MediaType: { is: { Name: { equals: "MediaType1"}}}},{Genre: { is: { Name: { equals: "Genre1"}}}}]}}}) { Title }}"#),
+          run_query!(&runner, r#"{ findManyAlbum(where: { Tracks: { every: { NOT: [{ MediaType: { is: { Name: { equals: "MediaType1"}}}},{Genre: { is: { Name: { equals: "Genre1"}}}}]}}}) { Title }}"#),
           @r###"{"data":{"findManyAlbum":[{"Title":"TheAlbumWithoutTracks"},{"Title":"Album3"}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyAlbum(where: { Tracks: { some: { NOT: [{ MediaType: { is: { Name: { equals: "MediaType2"}}}}]}}}) { Title }}"#),
+          run_query!(&runner, r#"{ findManyAlbum(where: { Tracks: { some: { NOT: [{ MediaType: { is: { Name: { equals: "MediaType2"}}}}]}}}) { Title }}"#),
           @r###"{"data":{"findManyAlbum":[{"Title":"Album1"},{"Title":"Album3"},{"Title":"Album4"},{"Title":"Album5"}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyAlbum(where: { Tracks: { every: { NOT: [{ MediaType: { is: { Name: { equals: "MediaType2"}}}}]}}}) { Title }}"#),
+          run_query!(&runner, r#"{ findManyAlbum(where: { Tracks: { every: { NOT: [{ MediaType: { is: { Name: { equals: "MediaType2"}}}}]}}}) { Title }}"#),
           @r###"{"data":{"findManyAlbum":[{"Title":"Album1"},{"Title":"TheAlbumWithoutTracks"},{"Title":"Album4"},{"Title":"Album5"}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyAlbum(where: { Tracks: { some: { NOT: []}}}) { Title }}"#),
+          run_query!(&runner, r#"{ findManyAlbum(where: { Tracks: { some: { NOT: []}}}) { Title }}"#),
           @r###"{"data":{"findManyAlbum":[{"Title":"Album1"},{"Title":"Album3"},{"Title":"Album4"},{"Title":"Album5"}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyAlbum(where: { Tracks: { every: { NOT: []}}}) { Title }}"#),
+          run_query!(&runner, r#"{ findManyAlbum(where: { Tracks: { every: { NOT: []}}}) { Title }}"#),
 
           @r###"{"data":{"findManyAlbum":[{"Title":"Album1"},{"Title":"TheAlbumWithoutTracks"},{"Title":"Album3"},{"Title":"Album4"},{"Title":"Album5"}]}}"###
         );
@@ -437,11 +439,11 @@ mod ext_rel_filters {
     }
 
     #[connector_test]
-    async fn rel_filter_l3(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn rel_filter_l3(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, indoc! {r#"
+          run_query!(&runner, indoc! {r#"
             {
                 findManyGenre(where: {
                   Tracks: {
@@ -458,11 +460,11 @@ mod ext_rel_filters {
     }
 
     #[connector_test]
-    async fn rel_scalar_filter(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn rel_scalar_filter(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-            run_query!(runner, indoc!{ r#"
+            run_query!(&runner, indoc!{ r#"
               {
                 findManyArtist(
                   where: {
@@ -489,11 +491,11 @@ mod ext_rel_filters {
     }
 
     #[connector_test]
-    async fn empty_none(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn empty_none(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyGenre(where: { Tracks: { none: {} }}) { Name }}"#),
+          run_query!(&runner, r#"{ findManyGenre(where: { Tracks: { none: {} }}) { Name }}"#),
           @r###"{"data":{"findManyGenre":[{"Name":"GenreThatIsNotUsed"}]}}"###
         );
 
@@ -501,11 +503,11 @@ mod ext_rel_filters {
     }
 
     #[connector_test]
-    async fn empty_some(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn empty_some(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyGenre(where: { Tracks: { some: {} }}) { Name }}"#),
+          run_query!(&runner, r#"{ findManyGenre(where: { Tracks: { some: {} }}) { Name }}"#),
           @r###"{"data":{"findManyGenre":[{"Name":"Genre1"},{"Name":"Genre2"},{"Name":"Genre3"}]}}"###
         );
 

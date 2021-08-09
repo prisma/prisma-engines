@@ -20,11 +20,11 @@ mod datetime {
     // "Using a date before 1970" should "work"
     // FIXME: this panics the rust code. Let's fix that at some point.
     #[connector_test(exclude(Sqlite))]
-    async fn before_1970(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{id: 1, name: "First", born: "1969-01-01T10:33:59Z"}"#).await?;
+    async fn before_1970(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{id: 1, name: "First", born: "1969-01-01T10:33:59Z"}"#).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query {findUniquePerson(where:{name: "First"}){name, born}}"#),
+          run_query!(&runner, r#"query {findUniquePerson(where:{name: "First"}){name, born}}"#),
           @r###"{"data":{"findUniquePerson":{"name":"First","born":"1969-01-01T10:33:59.000Z"}}}"###
         );
 
@@ -33,11 +33,11 @@ mod datetime {
 
     // "Using milliseconds in a date before 1970" should "work"
     #[connector_test(exclude(Sqlite))]
-    async fn ms_in_date_before_1970(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{id: 1, name: "Second", born: "1969-01-01T10:33:59.828Z"}"#).await?;
+    async fn ms_in_date_before_1970(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{id: 1, name: "Second", born: "1969-01-01T10:33:59.828Z"}"#).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query {findUniquePerson(where:{name: "Second"}){name, born}}"#),
+          run_query!(&runner, r#"query {findUniquePerson(where:{name: "Second"}){name, born}}"#),
           @r###"{"data":{"findUniquePerson":{"name":"Second","born":"1969-01-01T10:33:59.828Z"}}}"###
         );
 
@@ -46,11 +46,11 @@ mod datetime {
 
     // "Using a date after 1970" should "work"
     #[connector_test]
-    async fn date_after_1970(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{id: 1, name: "Third", born: "1979-01-01T10:33:59Z"}"#).await?;
+    async fn date_after_1970(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{id: 1, name: "Third", born: "1979-01-01T10:33:59Z"}"#).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query {findUniquePerson(where:{name: "Third"}){name, born}}"#),
+          run_query!(&runner, r#"query {findUniquePerson(where:{name: "Third"}){name, born}}"#),
           @r###"{"data":{"findUniquePerson":{"name":"Third","born":"1979-01-01T10:33:59.000Z"}}}"###
         );
 
@@ -59,11 +59,11 @@ mod datetime {
 
     // "Using milliseconds in a date after 1970" should "work"
     #[connector_test]
-    async fn ms_in_date_after_1970(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{id: 1, name: "Fourth", born: "1979-01-01T10:33:59.828Z"}"#).await?;
+    async fn ms_in_date_after_1970(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{id: 1, name: "Fourth", born: "1979-01-01T10:33:59.828Z"}"#).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query {findUniquePerson(where:{name: "Fourth"}){name, born}}"#),
+          run_query!(&runner, r#"query {findUniquePerson(where:{name: "Fourth"}){name, born}}"#),
           @r###"{"data":{"findUniquePerson":{"name":"Fourth","born":"1979-01-01T10:33:59.828Z"}}}"###
         );
 

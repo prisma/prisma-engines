@@ -62,7 +62,7 @@ mod delete_many_inside_update {
                     }}){{
                       childrenOpt {{
                         c
-                  
+
                       }}
                     }}
                 }}"#,
@@ -97,7 +97,7 @@ mod delete_many_inside_update {
           }}){{
             childrenOpt {{
               c
-        
+
             }}
           }}
         }}"#,

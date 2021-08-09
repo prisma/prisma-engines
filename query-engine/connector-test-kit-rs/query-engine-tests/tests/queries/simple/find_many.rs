@@ -5,7 +5,7 @@ mod find_many {
     use query_engine_tests::assert_query;
 
     #[connector_test]
-    async fn return_empty(runner: &Runner) -> TestResult<()> {
+    async fn return_empty(runner: Runner) -> TestResult<()> {
         assert_query!(
             runner,
             "query { findManyTestModel { id } }",
@@ -16,8 +16,8 @@ mod find_many {
     }
 
     #[connector_test]
-    async fn return_all(runner: &Runner) -> TestResult<()> {
-        test_data(runner).await?;
+    async fn return_all(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
 
         assert_query!(
             runner,

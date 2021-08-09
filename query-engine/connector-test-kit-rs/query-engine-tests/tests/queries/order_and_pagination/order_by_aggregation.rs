@@ -14,7 +14,7 @@ mod order_by_aggr {
               posts Post[]
               #m2m(categories, Category[], Int)
             }
-            
+
             model Post {
               #id(id, Int, @id)
               title  String
@@ -22,7 +22,7 @@ mod order_by_aggr {
               userId Int
               #m2m(categories, Category[], Int)
             }
-            
+
             model Category {
               #id(id, Int, @id)
               name   String
@@ -35,11 +35,11 @@ mod order_by_aggr {
     }
 
     #[connector_test]
-    async fn one2m_count_asc(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn one2m_count_asc(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyUser(orderBy: { posts: { _count: asc } }) {
               id
               posts {
@@ -54,11 +54,11 @@ mod order_by_aggr {
     }
 
     #[connector_test]
-    async fn one2m_count_desc(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn one2m_count_desc(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyUser(orderBy: { posts: { _count: desc } }) {
               id
               posts {
@@ -73,11 +73,11 @@ mod order_by_aggr {
     }
 
     #[connector_test]
-    async fn m2m_count_asc(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn m2m_count_asc(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyPost(orderBy: { categories: { _count: asc } }) {
               title
               categories {
@@ -92,11 +92,11 @@ mod order_by_aggr {
     }
 
     #[connector_test]
-    async fn m2m_count_desc(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn m2m_count_desc(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyPost(orderBy: { categories: { _count: desc } }) {
               title
               categories {
@@ -111,11 +111,11 @@ mod order_by_aggr {
     }
 
     #[connector_test]
-    async fn one2m_count_asc_field_asc(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn one2m_count_asc_field_asc(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyUser(orderBy: [{ posts: { _count: asc } }, { name: asc }]) {
               id
               name
@@ -132,11 +132,11 @@ mod order_by_aggr {
 
     // "[Combo] Ordering by one2m count asc + field desc" should "work"
     #[connector_test]
-    async fn one2m_count_asc_field_desc(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn one2m_count_asc_field_desc(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyUser(orderBy: [{ name: desc }, { posts: { _count: asc } }]) {
               id
               name
@@ -153,11 +153,11 @@ mod order_by_aggr {
 
     // "[Combo] Ordering by m2m count asc + field desc" should "work"
     #[connector_test]
-    async fn m2m_count_asc_field_desc(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn m2m_count_asc_field_desc(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyPost(orderBy: [{ categories: { _count: asc } }, { title: asc }]) {
               title
               categories {
@@ -173,11 +173,11 @@ mod order_by_aggr {
 
     // "[Combo] Ordering by one2m field asc + m2m count desc" should "work"
     #[connector_test]
-    async fn one2m_field_asc_m2m_count_desc(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn one2m_field_asc_m2m_count_desc(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyPost(orderBy: [{ user: { name: asc }}, { categories: { _count: desc }}]) {
               user {
                 name
@@ -195,11 +195,11 @@ mod order_by_aggr {
 
     // "[2+ Hops] Ordering by m2one2m count asc" should "work"
     #[connector_test]
-    async fn m2one2m_count_asc(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn m2one2m_count_asc(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyPost(orderBy: [{ user: { categories: { _count: asc } } }, { id: asc }]) {
               id
               user { categories { name } }
@@ -213,11 +213,11 @@ mod order_by_aggr {
 
     // "[2+ Hops] Ordering by m2one2m count desc" should "work"
     #[connector_test]
-    async fn m2one2m_count_desc(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn m2one2m_count_desc(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         assert_query_many!(
-            runner,
+            &runner,
             r#"{
               findManyPost(orderBy: { user: { categories: { _count: desc } } }) {
                 id
@@ -235,11 +235,11 @@ mod order_by_aggr {
 
     // "[Combo][2+ Hops] Ordering by m2m count asc + m2one2m count desc" should "work"
     #[connector_test]
-    async fn m2m_count_asc_m2one2m_count_desc(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn m2m_count_asc_m2one2m_count_desc(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyPost(orderBy: [{ categories: { _count: asc }}, { user: { categories: { _count: desc }} }]) {
               id
               categories(orderBy: { name: asc }) {
@@ -255,11 +255,11 @@ mod order_by_aggr {
 
     // "[Combo][2+ Hops] Ordering by m2one field asc + m2one2m count desc" should "work"
     #[connector_test]
-    async fn m2one_field_asc_m2one2m_count_desc(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn m2one_field_asc_m2one2m_count_desc(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         assert_query_many!(
-            runner,
+            &runner,
             r#"{
               findManyPost(orderBy: [{ user: { name: asc }}, { user: { categories: { _count: desc }} }]) {
                 id
@@ -282,11 +282,11 @@ mod order_by_aggr {
 
     // "[Cursor] Ordering by one2m count asc" should "work"
     #[connector_test]
-    async fn cursor_one2m_count_asc(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn cursor_one2m_count_asc(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyUser(orderBy: { posts: { _count: asc } }, cursor: { id: 2 }) {
               id
               posts {
@@ -302,11 +302,11 @@ mod order_by_aggr {
 
     // "[Cursor] Ordering by one2m count desc" should "work"
     #[connector_test]
-    async fn cursor_one2m_count_desc(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn cursor_one2m_count_desc(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyUser(orderBy: { posts: { _count: desc } }, cursor: { id: 1 }) {
               id
               posts {
@@ -322,11 +322,11 @@ mod order_by_aggr {
 
     // "[Cursor] Ordering by m2m count asc" should "work"
     #[connector_test]
-    async fn cursor_m2m_count_asc(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn cursor_m2m_count_asc(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyPost(orderBy: { categories: { _count: asc } }, cursor: { id: 2 }, take: 2) {
               id
               title
@@ -343,11 +343,11 @@ mod order_by_aggr {
 
     // "[Cursor] Ordering by m2m count desc" should "work"
     #[connector_test]
-    async fn cursor_m2m_count_desc(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn cursor_m2m_count_desc(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyPost(orderBy: { categories: { _count: desc } }, cursor: { id: 1 }, take: 2) {
               id
               title
@@ -364,11 +364,11 @@ mod order_by_aggr {
 
     // "[Cursor][Combo] Ordering by one2m count asc + field asc"
     #[connector_test]
-    async fn cursor_one2m_count_asc_field_asc(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn cursor_one2m_count_asc_field_asc(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyUser(orderBy: [{ posts: { _count: asc } }, { name: asc }], cursor: { id: 2 }) {
               id
               name
@@ -385,11 +385,11 @@ mod order_by_aggr {
 
     // "[Cursor][Combo] Ordering by one2m count asc + field desc" should "work"
     #[connector_test]
-    async fn cursor_one2m_count_asc_field_desc(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn cursor_one2m_count_asc_field_desc(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyUser(orderBy: [{ name: desc }, { posts: { _count: asc } }], cursor: { id: 2 }, take: 1) {
               id
               name
@@ -406,11 +406,11 @@ mod order_by_aggr {
 
     // "[Cursor][Combo] Ordering by m2m count asc + field desc" should "work"
     #[connector_test]
-    async fn cursor_m2m_count_asc_field_desc(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn cursor_m2m_count_asc_field_desc(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyPost(orderBy: [{ categories: { _count: asc } }, { title: asc }], cursor: { id: 2 }, take: 2) {
               id
               title
@@ -427,11 +427,11 @@ mod order_by_aggr {
 
     // "[Cursor][Combo] Ordering by one2m field asc + m2m count desc" should "work"
     #[connector_test]
-    async fn cursor_one2m_field_asc_m2m_count_desc(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn cursor_one2m_field_asc_m2m_count_desc(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyPost(orderBy: [{ user: { name: asc }}, { categories: { _count: desc }}], cursor: { id: 1 }, take: 2) {
               id
               title
@@ -451,11 +451,11 @@ mod order_by_aggr {
 
     // "[Cursor][2+ Hops] Ordering by m2one2m count asc" should "work"
     #[connector_test]
-    async fn cursor_m2one2m_count_asc(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn cursor_m2one2m_count_asc(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyPost(orderBy: [{ user: { categories: { _count: asc } } }, { id: asc }], cursor: { id: 2 }, take: 1) {
               id
               user { categories { name } }
@@ -469,11 +469,11 @@ mod order_by_aggr {
 
     // "[Cursor][2+ Hops] Ordering by m2one2m count desc" should "work"
     #[connector_test]
-    async fn cursor_m2one2m_count_desc(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn cursor_m2one2m_count_desc(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyPost(orderBy: [{ user: { categories: { _count: desc } } }, { id: asc }], cursor: { id: 2 }, take: 2) {
               id
               user { categories { name } }
@@ -487,11 +487,11 @@ mod order_by_aggr {
 
     // "[Cursor][Combo][2+ Hops] Ordering by m2m count asc + m2one2m count desc" should "work"
     #[connector_test]
-    async fn cursor_m2m_count_asc_m2one2m_count_desc(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn cursor_m2m_count_asc_m2one2m_count_desc(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyPost(orderBy: [{ categories: { _count: asc }}, { user: { categories: { _count: desc }} }], cursor: { id: 2 }, take: 2) {
               id
               categories { name }
@@ -506,11 +506,11 @@ mod order_by_aggr {
 
     // "[Cursor][Combo][2+ Hops] Ordering by m2one field asc + m2one2m count desc" should "work"
     #[connector_test]
-    async fn cursor_m2one_field_asc_m2one2m_count_desc(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn cursor_m2one_field_asc_m2one2m_count_desc(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyPost(orderBy: [{ user: { name: asc }}, { user: { categories: { _count: desc }} }, { id: asc }], cursor: { id: 2 }, take: 2) {
               id
               user {

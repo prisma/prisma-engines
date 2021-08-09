@@ -19,9 +19,9 @@ mod create_many {
     }
 
     #[connector_test(schema(schema_1))]
-    async fn basic_create_many(runner: &Runner) -> TestResult<()> {
+    async fn basic_create_many(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createManyTest(data: [
               { id: 1, str1: "1", str2: "1", str3: "1"},
               { id: 2, str1: "2",            str3: null},
@@ -51,9 +51,9 @@ mod create_many {
 
     // Covers: AutoIncrement ID working with basic autonincrement functionality.
     #[connector_test(schema(schema_2), capabilities(CreateManyWriteableAutoIncId))]
-    async fn basic_create_many_autoincrement(runner: &Runner) -> TestResult<()> {
+    async fn basic_create_many_autoincrement(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createManyTest(data: [
               { id: 123, str1: "1", str2: "1", str3: "1"},
               { id: 321, str1: "2",            str3: null},
@@ -81,10 +81,10 @@ mod create_many {
 
     // "createMany" should "correctly use defaults and nulls"
     #[connector_test(schema(schema_3))]
-    async fn create_many_defaults_nulls(runner: &Runner) -> TestResult<()> {
+    async fn create_many_defaults_nulls(runner: Runner) -> TestResult<()> {
         // Not providing a value must provide the default, providing null must result in null.
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createManyTest(data: [
               { id: 1 },
               { id: 2, str: null }
@@ -96,7 +96,7 @@ mod create_many {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyTest {
               id
               str
@@ -120,9 +120,9 @@ mod create_many {
 
     // "createMany" should "error on duplicates by default"
     #[connector_test(schema(schema_4))]
-    async fn create_many_error_dups(runner: &Runner) -> TestResult<()> {
+    async fn create_many_error_dups(runner: Runner) -> TestResult<()> {
         assert_error!(
-            runner,
+            &runner,
             r#"mutation {
             createManyTest(data: [
               { id: 1 },
@@ -140,9 +140,9 @@ mod create_many {
 
     // "createMany" should "not error on duplicates with skipDuplicates true"
     #[connector_test(schema(schema_4), capabilities(CreateMany, CreateSkipDuplicates))]
-    async fn create_many_no_error_skip_dup(runner: &Runner) -> TestResult<()> {
+    async fn create_many_no_error_skip_dup(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createManyTest(skipDuplicates: true, data: [
               { id: 1 },
               { id: 1 }
@@ -162,7 +162,7 @@ mod create_many {
     // Each DB allows a certain amount of params per single query, and a certain number of rows.
     // Each created row has 1 param and we create 1000 records.
     #[connector_test(schema(schema_4))]
-    async fn large_num_records_horizontal(runner: &Runner) -> TestResult<()> {
+    async fn large_num_records_horizontal(runner: Runner) -> TestResult<()> {
         let mut records: Vec<String> = vec![];
 
         for i in 1..=1000 {
@@ -170,7 +170,7 @@ mod create_many {
         }
 
         insta::assert_snapshot!(
-          run_query!(runner, format!(r#"mutation {{
+          run_query!(&runner, format!(r#"mutation {{
             createManyTest(data: [{}]) {{
               count
             }}
@@ -200,7 +200,7 @@ mod create_many {
     // Each DB allows a certain amount of params per single query, and a certain number of rows.
     // Each created row has 4 params and we create 1000 rows.
     #[connector_test(schema(schema_5))]
-    async fn large_num_records_vertical(runner: &Runner) -> TestResult<()> {
+    async fn large_num_records_vertical(runner: Runner) -> TestResult<()> {
         let mut records: Vec<String> = vec![];
 
         for i in 1..=2000 {
@@ -208,7 +208,7 @@ mod create_many {
         }
 
         insta::assert_snapshot!(
-          run_query!(runner, format!(r#"mutation {{
+          run_query!(&runner, format!(r#"mutation {{
               createManyTest(data: [{}]) {{
                 count
               }}
@@ -233,9 +233,9 @@ mod create_many {
     }
 
     #[connector_test(schema(schema_6))]
-    async fn create_many_map_behavior(runner: &Runner) -> TestResult<()> {
+    async fn create_many_map_behavior(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, format!(r#"mutation {{
+          run_query!(&runner, format!(r#"mutation {{
               createManyTestModel(data: [
                 {{ id: 1, updatedAt: "{}" }},
                 {{ id: 2, updatedAt: "{}" }}

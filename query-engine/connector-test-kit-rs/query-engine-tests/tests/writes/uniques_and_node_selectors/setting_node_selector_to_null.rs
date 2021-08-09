@@ -19,9 +19,9 @@ mod node_sel_to_null {
 
     // "Setting a where value to null " should " work when there is no further nesting "
     #[connector_test]
-    async fn where_val_to_null(runner: &Runner) -> TestResult<()> {
+    async fn where_val_to_null(runner: Runner) -> TestResult<()> {
         run_query!(
-            runner,
+            &runner,
             r#"mutation {
                 createOneA(data: {
                   id: 1,
@@ -34,7 +34,7 @@ mod node_sel_to_null {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation b {
+          run_query!(&runner, r#"mutation b {
             updateOneA(
               where: { b: "abc" }
               data: {

@@ -28,7 +28,7 @@ mod mongodb {
     }
 
     #[connector_test]
-    async fn nested_update_many_timestamps(runner: &Runner) -> TestResult<()> {
+    async fn nested_update_many_timestamps(runner: Runner) -> TestResult<()> {
         let resp = run_query_json!(
             runner,
             r#"mutation { createOneOrder(data: {

@@ -31,7 +31,7 @@ mod non_embed_updated_at {
 
     // "Updating a nested data item" should "change it's updatedAt value"
     #[connector_test]
-    async fn update_nested_item(runner: &Runner) -> TestResult<()> {
+    async fn update_nested_item(runner: Runner) -> TestResult<()> {
         let created = run_query_json!(
             runner,
             r#"mutation {createOneTop(data: { id: "1", top: "top2", bottom: {create:{id: "1", bottom: "Bottom2"}} }) {bottom{updatedAt}}}"#
@@ -61,15 +61,15 @@ mod non_embed_updated_at {
 
     // "Upserting a nested data item" should "change it's updatedAt value"
     #[connector_test]
-    async fn upsert_nested_item(runner: &Runner) -> TestResult<()> {
+    async fn upsert_nested_item(runner: Runner) -> TestResult<()> {
         let res = run_query_json!(
-            runner,
+            &runner,
             r#"mutation {createOneTop(data: { id: "1", top: "top4", bottom: {create:{id: "1", bottom: "Bottom4"}} }) {bottom{updatedAt}}}"#
         );
         let updated_at = &res["data"]["createOneTop"]["bottom"]["updatedAt"];
 
         let res_2 = run_query_json!(
-            runner,
+            &runner,
             r#"mutation {
                 updateOneTop(
                   where: { top: "top4" }
