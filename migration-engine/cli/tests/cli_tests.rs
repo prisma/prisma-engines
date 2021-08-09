@@ -1,3 +1,4 @@
+use connection_string::JdbcString;
 use std::process::{Command, Output};
 use test_macros::test_connector;
 use test_setup::{BitFlags, Tags, TestApiArgs};
@@ -115,9 +116,15 @@ fn test_connecting_with_a_working_mssql_connection_string(api: TestApi) {
 
 #[test_connector(tags(Mssql))]
 fn test_connecting_with_a_non_working_mssql_connection_string(api: TestApi) {
-    let non_existing_url = "sqlserver://localhost:1433;database=NONEXISTENT;user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED";
+    let mut non_existing_url: JdbcString = format!("jdbc:{}", api.connection_string()).parse().unwrap();
 
-    let output = api.run(&["--datasource", &non_existing_url.to_string(), "can-connect-to-database"]);
+    non_existing_url
+        .properties_mut()
+        .insert(String::from("database"), String::from("NON_EXISTING"));
+
+    let non_existing_url = non_existing_url.to_string().replace("jdbc:sqlserver", "sqlserver");
+
+    let output = api.run(&["--datasource", &non_existing_url, "can-connect-to-database"]);
     assert_eq!(output.status.code(), Some(1));
     let stderr = String::from_utf8_lossy(&output.stderr);
     assert!(stderr.contains(r#""error_code":"P1003""#), "{}", stderr);

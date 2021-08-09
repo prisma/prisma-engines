@@ -26,6 +26,7 @@ tempfile = "3.1.0"
 test-setup = { path = "../../libs/test-setup" }
 test-macros = { path = "../../libs/test-macros" }
 url = "2.1.1"
+connection-string = "0.1"
 
 [dev-dependencies.quaint]
 git = "https://github.com/prisma/quaint"
