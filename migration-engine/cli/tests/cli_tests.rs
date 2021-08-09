@@ -114,22 +114,6 @@ fn test_connecting_with_a_working_mssql_connection_string(api: TestApi) {
     assert!(stderr.contains("Connection successful"), "{:?}", stderr);
 }
 
-#[test_connector(tags(Mssql))]
-fn test_connecting_with_a_non_working_mssql_connection_string(api: TestApi) {
-    let mut non_existing_url: JdbcString = format!("jdbc:{}", api.connection_string()).parse().unwrap();
-
-    non_existing_url
-        .properties_mut()
-        .insert(String::from("database"), String::from("NON_EXISTING"));
-
-    let non_existing_url = non_existing_url.to_string().replace("jdbc:sqlserver", "sqlserver");
-
-    let output = api.run(&["--datasource", &non_existing_url, "can-connect-to-database"]);
-    assert_eq!(output.status.code(), Some(1));
-    let stderr = String::from_utf8_lossy(&output.stderr);
-    assert!(stderr.contains(r#""error_code":"P1003""#), "{}", stderr);
-}
-
 #[test_connector(tags(Postgres, Mysql))]
 fn test_create_database(api: TestApi) {
     let connection_string = api.connection_string();
@@ -201,10 +185,33 @@ fn test_drop_sqlite_database(api: TestApi) {
     assert!(!sqlite_path.exists());
 }
 
-// TODO (julius) drop is not implemented and therefore also not tested on MSSQL
 #[test_connector(tags(Postgres, Mysql))]
 fn test_drop_database(api: TestApi) {
     let connection_string = api.connection_string();
+    let output = api.run(&["--datasource", &connection_string, "drop-database"]);
+    println!("{}", String::from_utf8_lossy(&output.stderr));
+    assert!(output.status.success());
+
+    let output = api.run(&["--datasource", &connection_string, "can-connect-to-database"]);
+    assert_eq!(output.status.code(), Some(1));
+
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(stderr.contains(DatabaseDoesNotExist::ERROR_CODE));
+}
+
+#[test_connector(tags(Mssql))]
+fn test_drop_sqlserver_database(api: TestApi) {
+    let mut connection_string: JdbcString = format!("jdbc:{}", api.connection_string()).parse().unwrap();
+
+    connection_string
+        .properties_mut()
+        .insert(String::from("database"), String::from("NEWDATABASE"));
+
+    let connection_string = connection_string.to_string().replace("jdbc:", "");
+
+    let output = api.run(&["--datasource", &connection_string, "create-database"]);
+    assert!(output.status.success());
+
     let output = api.run(&["--datasource", &connection_string, "drop-database"]);
     assert!(output.status.success());
 
