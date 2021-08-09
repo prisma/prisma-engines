@@ -235,7 +235,7 @@ where
 {
     async fn start_tx(&self, max_acquisition_millis: u64, valid_for_millis: u64) -> crate::Result<TxId> {
         let id = TxId::default();
-        debug!("[{}] Started.", id);
+        debug!("[{}] Starting...", id);
 
         let conn = time::timeout(
             time::Duration::from_millis(max_acquisition_millis),
@@ -247,6 +247,8 @@ where
         let c_tx = OpenTx::start(conn).await?;
 
         self.tx_cache.insert(id.clone(), c_tx, valid_for_millis).await;
+
+        debug!("[{}] Started.", id);
         Ok(id)
     }
 

@@ -251,7 +251,7 @@ mod interactive_tx {
 
     #[connector_test]
     async fn tx_expiration_failure_cycle(mut runner: Runner) -> TestResult<()> {
-        // Tx expires after two seconds.
+        // Tx expires after one seconds.
         let tx_id = runner.executor().start_tx(5000, 1000).await?;
         runner.set_active_tx(tx_id.clone());
 
@@ -285,6 +285,49 @@ mod interactive_tx {
         } else {
             panic!("Expected error, got success.");
         }
+
+        Ok(())
+    }
+
+    // SQLite fails as it locks the entire table, not allowing the "inner" transaction to finish.
+    #[connector_test(exclude(Sqlite))]
+    async fn multiple_tx(mut runner: Runner) -> TestResult<()> {
+        // First transaction.
+        let tx_id_a = runner.executor().start_tx(2000, 2000).await?;
+
+        // Second transaction.
+        let tx_id_b = runner.executor().start_tx(2000, 2000).await?;
+
+        // Execute on first transaction.
+        runner.set_active_tx(tx_id_a.clone());
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 1 }) { id }}"#),
+          @r###"{"data":{"createOneTestModel":{"id":1}}}"###
+        );
+
+        // Switch to second transaction.
+        runner.set_active_tx(tx_id_b.clone());
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 2 }) { id }}"#),
+          @r###"{"data":{"createOneTestModel":{"id":2}}}"###
+        );
+
+        // Commit second transaction.
+        runner.executor().commit_tx(tx_id_b.clone()).await?;
+
+        // Back to first transaction, do a final read and commit.
+        runner.set_active_tx(tx_id_a.clone());
+
+        // Mongo for example doesn't read the inner commit value.
+        is_one_of!(
+            run_query!(&runner, r#"query { findManyTestModel { id }}"#),
+            vec![
+                r#"{"data":{"findManyTestModel":[{"id":1}]}}"#,
+                r#"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"#
+            ]
+        );
+
+        runner.executor().commit_tx(tx_id_a.clone()).await?;
 
         Ok(())
     }
