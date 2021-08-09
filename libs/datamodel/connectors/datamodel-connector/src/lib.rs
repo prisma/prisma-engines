@@ -254,6 +254,7 @@ capabilities!(
     CompoundIds,
     AnyId, // Any (or combination of) uniques and not only id fields can constitute an id for a model.
     QueryRaw,
+    FullTextSearchWithoutIndex
 );
 
 /// Contains all capabilities that the connector is able to serve.

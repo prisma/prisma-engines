@@ -134,6 +134,8 @@ pub enum ScalarCondition {
     In(PrismaListValue),
     NotIn(PrismaListValue),
     JsonCompare(JsonCondition),
+    Search(PrismaValue, Vec<ScalarProjection>),
+    NotSearch(PrismaValue, Vec<ScalarProjection>),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -170,6 +172,8 @@ impl ScalarCondition {
                         target_type: json_compare.target_type,
                     })
                 }
+                Self::Search(v, fields) => Self::NotSearch(v, fields),
+                Self::NotSearch(v, fields) => Self::Search(v, fields),
             }
         } else {
             self
@@ -345,6 +349,28 @@ impl ScalarCompare for ScalarFieldRef {
             mode: QueryMode::Default,
         })
     }
+
+    fn search<T>(&self, val: T) -> Filter
+    where
+        T: Into<PrismaValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Single(Arc::clone(self)),
+            condition: ScalarCondition::Search(val.into(), vec![]),
+            mode: QueryMode::Default,
+        })
+    }
+
+    fn not_search<T>(&self, val: T) -> Filter
+    where
+        T: Into<PrismaValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Single(Arc::clone(self)),
+            condition: ScalarCondition::Search(val.into(), vec![]),
+            mode: QueryMode::Default,
+        })
+    }
 }
 
 impl ScalarCompare for ModelProjection {
@@ -512,6 +538,28 @@ impl ScalarCompare for ModelProjection {
         Filter::from(ScalarFilter {
             projection: ScalarProjection::Compound(self.scalar_fields().collect()),
             condition: ScalarCondition::GreaterThanOrEquals(val.into()),
+            mode: QueryMode::Default,
+        })
+    }
+
+    fn search<T>(&self, val: T) -> Filter
+    where
+        T: Into<PrismaValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Compound(self.scalar_fields().collect()),
+            condition: ScalarCondition::Search(val.into(), vec![]),
+            mode: QueryMode::Default,
+        })
+    }
+
+    fn not_search<T>(&self, val: T) -> Filter
+    where
+        T: Into<PrismaValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Compound(self.scalar_fields().collect()),
+            condition: ScalarCondition::Search(val.into(), vec![]),
             mode: QueryMode::Default,
         })
     }

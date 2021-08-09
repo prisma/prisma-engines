@@ -8,10 +8,10 @@ use crate::{
     query_document::{ParsedInputMap, ParsedInputValue},
     QueryGraphBuilderError, QueryGraphBuilderResult,
 };
-use connector::{filter::Filter, QueryMode, RelationCompare, ScalarCompare};
+use connector::{filter::Filter, QueryMode, RelationCompare, ScalarCompare, ScalarCondition, ScalarProjection};
 use filter_grouping::*;
 use prisma_models::{Field, ModelRef, PrismaValue, RelationFieldRef, ScalarFieldRef};
-use std::{convert::TryInto, str::FromStr};
+use std::{collections::HashMap, convert::TryInto, str::FromStr};
 
 /// Extracts a filter for a unique selector, i.e. a filter that selects exactly one record.
 #[tracing::instrument(skip(value_map, model))]
@@ -144,7 +144,133 @@ pub fn extract_filter(value_map: ParsedInputMap, model: &ModelRef) -> QueryGraph
             _ => Ok(Filter::and(filters)),
         }
     }
-    extract_filter(value_map, model, 0)
+
+    let filter = extract_filter(value_map, model, 0)?;
+    let filter = merge_search_filters(filter);
+
+    Ok(filter)
+}
+
+/// Search filters that have the same query and that are in the same condition block
+/// are merged together to optimize the generated SQL statements.
+/// This is done in three steps (below transformations are using pseudo-code):
+/// 1. We flatten the filter tree.
+/// eg: `Filter(And([ScalarFilter, ScalarFilter], And([ScalarFilter])))` -> `Filter(And([ScalarFilter, ScalarFilter, ScalarFilter]))`
+/// 2. We index search filters by their query.
+/// eg: `Filter(And([SearchFilter("query", [FieldA]), SearchFilter("query", [FieldB])]))` -> `{ "query": [FieldA, FieldB] }`
+/// 3. We reconstruct the filter tree and merge the search filters that have the same query along the way
+/// eg: `Filter(And([SearchFilter("query", [FieldA]), SearchFilter("query", [FieldB])]))` -> `Filter(And([SearchFilter("query", [FieldA, FieldB])]))`
+fn merge_search_filters(filter: Filter) -> Filter {
+    // The filter tree _needs_ to be flattened for the merge to work properly
+    let flattened = flatten_filter(filter);
+
+    match flattened {
+        Filter::And(and) => Filter::And(do_merge_search_filters(and)),
+        Filter::Or(or) => Filter::Or(do_merge_search_filters(or)),
+        Filter::Not(not) => Filter::Not(do_merge_search_filters(not)),
+        _ => flattened,
+    }
+}
+
+fn do_merge_search_filters(filters: Vec<Filter>) -> Vec<Filter> {
+    let mut filters_by_val: HashMap<PrismaValue, &Filter> = HashMap::new();
+    let mut projections_by_val: HashMap<PrismaValue, Vec<ScalarProjection>> = HashMap::new();
+    let mut output: Vec<Filter> = vec![];
+
+    // Gather search filters that have the same condition
+    for filter in filters.iter() {
+        match filter {
+            Filter::Scalar(ref sf) => match sf.condition {
+                ScalarCondition::Search(ref pv, _) => {
+                    // If there's already an entry, then store the "additional" projections that will need to be merged
+                    if let Some(projections) = projections_by_val.get_mut(&pv) {
+                        projections.push(sf.projection.clone());
+                    } else {
+                        // Otherwise, store the first search filter found on which we'll merge the additional projections
+                        projections_by_val.insert(pv.clone(), vec![]);
+                        filters_by_val.insert(pv.clone(), filter);
+                    }
+                }
+                _ => output.push(filter.clone()),
+            },
+            Filter::And(and) => {
+                output.push(Filter::And(do_merge_search_filters(and.clone())));
+            }
+            Filter::Or(or) => {
+                output.push(Filter::Or(do_merge_search_filters(or.clone())));
+            }
+            Filter::Not(not) => {
+                output.push(Filter::Not(do_merge_search_filters(not.clone())));
+            }
+            x => output.push(x.clone()),
+        }
+    }
+
+    // Merge the search filters that have the same condition
+    for (pv, filter) in filters_by_val.into_iter() {
+        let mut projections = projections_by_val.get_mut(&pv).unwrap();
+        let mut filter = filter.clone();
+
+        match filter {
+            Filter::Scalar(ref mut sf) => match sf.condition {
+                ScalarCondition::Search(_, ref mut search_proj) => {
+                    search_proj.append(&mut projections);
+                }
+                ScalarCondition::NotSearch(_, ref mut search_proj) => {
+                    search_proj.append(&mut projections);
+                }
+                _ => unreachable!(),
+            },
+            _ => unreachable!(),
+        }
+
+        output.push(filter.clone());
+    }
+
+    output
+}
+
+fn flatten_filter(filter: Filter) -> Filter {
+    fn flatten_filters(filters: Vec<Filter>, parent: &Filter) -> Vec<Filter> {
+        let mut flattened: Vec<Filter> = vec![];
+
+        for f in filters {
+            match (f.clone(), parent) {
+                (Filter::And(and), Filter::And(_)) => {
+                    flattened.append(&mut flatten_filters(and, &f));
+                }
+                (Filter::And(and), _) => {
+                    flattened.push(Filter::And(flatten_filters(and, &f)));
+                }
+                (Filter::Or(or), Filter::Or(_)) => {
+                    flattened.append(&mut flatten_filters(or, &f));
+                }
+                (Filter::Or(or), _) => {
+                    flattened.push(Filter::Or(flatten_filters(or, &f)));
+                }
+                (Filter::Not(not), Filter::Not(_)) => {
+                    flattened.append(&mut flatten_filters(not, &f));
+                }
+                (Filter::Not(not), _) => {
+                    flattened.push(Filter::Not(flatten_filters(not, &f)));
+                }
+                _ => {
+                    flattened.push(f);
+                }
+            }
+        }
+
+        flattened
+    }
+
+    let parent = filter.clone();
+
+    match filter {
+        Filter::And(ands) => Filter::And(flatten_filters(ands, &parent)),
+        Filter::Or(ors) => Filter::Or(flatten_filters(ors, &parent)),
+        Filter::Not(nots) => Filter::Or(flatten_filters(nots, &parent)),
+        f => f,
+    }
 }
 
 /// Field is the field the filter is refering to and `value` is the passed filter. E.g. `where: { <field>: <value> }.
