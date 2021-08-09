@@ -150,7 +150,7 @@ fn full_scalar_filter_type(
         TypeIdentifier::String | TypeIdentifier::UUID => equality_filters(mapped_scalar_type.clone(), nullable)
             .chain(inclusion_filters(mapped_scalar_type.clone(), nullable))
             .chain(alphanumeric_filters(mapped_scalar_type.clone()))
-            .chain(string_filters(mapped_scalar_type.clone()))
+            .chain(string_filters(ctx, mapped_scalar_type.clone()))
             .chain(query_mode_field(ctx, nested))
             .collect(),
 
@@ -325,13 +325,20 @@ fn alphanumeric_filters(mapped_type: InputType) -> impl Iterator<Item = InputFie
     .into_iter()
 }
 
-fn string_filters(mapped_type: InputType) -> impl Iterator<Item = InputField> {
-    vec![
+fn string_filters(ctx: &mut BuilderContext, mapped_type: InputType) -> impl Iterator<Item = InputField> {
+    let mut string_filters = vec![
         input_field(filters::CONTAINS, mapped_type.clone(), None).optional(),
         input_field(filters::STARTS_WITH, mapped_type.clone(), None).optional(),
-        input_field(filters::ENDS_WITH, mapped_type, None).optional(),
-    ]
-    .into_iter()
+        input_field(filters::ENDS_WITH, mapped_type.clone(), None).optional(),
+    ];
+
+    if ctx.has_feature(&PreviewFeature::FullTextSearch)
+        && ctx.has_capability(ConnectorCapability::FullTextSearchWithoutIndex)
+    {
+        string_filters.push(input_field(filters::SEARCH, mapped_type, None).optional());
+    }
+
+    string_filters.into_iter()
 }
 
 fn json_filters(ctx: &mut BuilderContext) -> impl Iterator<Item = InputField> {

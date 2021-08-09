@@ -58,6 +58,7 @@ pub mod filters {
     pub const CONTAINS: &str = "contains";
     pub const STARTS_WITH: &str = "startsWith";
     pub const ENDS_WITH: &str = "endsWith";
+    pub const SEARCH: &str = "search";
     pub const LOWER_THAN: &str = "lt";
     pub const LOWER_THAN_OR_EQUAL: &str = "lte";
     pub const GREATER_THAN: &str = "gt";

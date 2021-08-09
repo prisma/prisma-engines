@@ -136,31 +136,63 @@ impl AliasedCondition for Filter {
 impl AliasedCondition for ScalarFilter {
     /// Conversion from a `ScalarFilter` to a query condition tree. Aliased when in a nested `SELECT`.
     fn aliased_cond(self, alias: Option<Alias>) -> ConditionTree<'static> {
-        match (alias, self.projection) {
-            (Some(alias), ScalarProjection::Single(field)) => {
-                let comparable: Expression = field.as_column().table(alias.to_string(None)).into();
-
-                convert_scalar_filter(comparable, self.condition, self.mode, &[field], false)
+        match self.condition {
+            ScalarCondition::Search(_, _) | ScalarCondition::NotSearch(_, _) => {
+                scalar_filter_aliased_cond_search(self, alias)
             }
-            (Some(alias), ScalarProjection::Compound(fields)) => {
-                let columns: Vec<Column<'static>> = fields
-                    .clone()
-                    .into_iter()
-                    .map(|field| field.as_column().table(alias.to_string(None)))
-                    .collect();
+            _ => scalar_filter_aliased_cond(self, alias),
+        }
+    }
+}
 
-                convert_scalar_filter(Row::from(columns).into(), self.condition, self.mode, &fields, false)
-            }
-            (None, ScalarProjection::Single(field)) => {
-                let comparable: Expression = field.as_column().into();
+fn scalar_filter_aliased_cond_search(sf: ScalarFilter, alias: Option<Alias>) -> ConditionTree<'static> {
+    let mut projections = match sf.condition.clone() {
+        ScalarCondition::Search(_, proj) => proj,
+        ScalarCondition::NotSearch(_, proj) => proj,
+        _ => unreachable!(),
+    };
 
-                convert_scalar_filter(comparable, self.condition, self.mode, &[field], false)
-            }
-            (None, ScalarProjection::Compound(fields)) => {
-                let columns: Vec<Column<'static>> = fields.clone().into_iter().map(|field| field.as_column()).collect();
+    projections.push(sf.projection);
 
-                convert_scalar_filter(Row::from(columns).into(), self.condition, self.mode, &fields, false)
-            }
+    let columns: Vec<Column> = projections
+        .into_iter()
+        .map(|p| match (p, alias) {
+            (ScalarProjection::Single(field), None) => field.as_column(),
+            (ScalarProjection::Single(field), Some(alias)) => field.as_column().table(alias.to_string(None)).into(),
+            (ScalarProjection::Compound(_), _) => unreachable!("Full-text search does not support compound fields"),
+        })
+        .collect();
+
+    let comparable: Expression = text_search(columns.as_slice()).into();
+
+    convert_scalar_filter(comparable, sf.condition, sf.mode, &[], false)
+}
+
+fn scalar_filter_aliased_cond(sf: ScalarFilter, alias: Option<Alias>) -> ConditionTree<'static> {
+    match (alias, sf.projection) {
+        (Some(alias), ScalarProjection::Single(field)) => {
+            let comparable: Expression = field.as_column().table(alias.to_string(None)).into();
+
+            convert_scalar_filter(comparable, sf.condition, sf.mode, &[field], false)
+        }
+        (Some(alias), ScalarProjection::Compound(fields)) => {
+            let columns: Vec<Column<'static>> = fields
+                .clone()
+                .into_iter()
+                .map(|field| field.as_column().table(alias.to_string(None)))
+                .collect();
+
+            convert_scalar_filter(Row::from(columns).into(), sf.condition, sf.mode, &fields, false)
+        }
+        (None, ScalarProjection::Single(field)) => {
+            let comparable: Expression = field.as_column().into();
+
+            convert_scalar_filter(comparable, sf.condition, sf.mode, &[field], false)
+        }
+        (None, ScalarProjection::Compound(fields)) => {
+            let columns: Vec<Column<'static>> = fields.clone().into_iter().map(|field| field.as_column()).collect();
+
+            convert_scalar_filter(Row::from(columns).into(), sf.condition, sf.mode, &fields, false)
         }
     }
 }
@@ -563,6 +595,11 @@ fn default_scalar_filter(
             _ => comparable.not_in_selection(convert_values(fields, values)),
         },
         ScalarCondition::JsonCompare(_) => unreachable!(),
+        ScalarCondition::Search(value, _) => comparable.matches(match value {
+            PrismaValue::String(s) => s,
+            _ => unreachable!(),
+        }),
+        ScalarCondition::NotSearch(_, _) => todo!(),
     };
 
     ConditionTree::single(condition)
@@ -662,6 +699,8 @@ fn insensitive_scalar_filter(
             }
         },
         ScalarCondition::JsonCompare(_) => unreachable!(),
+        ScalarCondition::Search(_, _) => todo!(),
+        ScalarCondition::NotSearch(_, _) => todo!(),
     };
 
     ConditionTree::single(condition)

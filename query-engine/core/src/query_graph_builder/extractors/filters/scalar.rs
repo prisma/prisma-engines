@@ -242,6 +242,9 @@ fn parse_internal_scalar(
         filters::LOWER_THAN_OR_EQUAL => Ok(vec![field.less_than_or_equals(as_prisma_value(input)?)]),
         filters::GREATER_THAN_OR_EQUAL => Ok(vec![field.greater_than_or_equals(as_prisma_value(input)?)]),
 
+        filters::SEARCH if reverse => Ok(vec![field.search(as_prisma_value(input)?)]),
+        filters::SEARCH => Ok(vec![field.not_search(as_prisma_value(input)?)]),
+
         // List-specific filters
         filters::HAS => Ok(vec![field.contains_element(as_prisma_value(input)?)]),
         filters::HAS_EVERY => Ok(vec![field.contains_every_element(as_prisma_value_list(input)?)]),
