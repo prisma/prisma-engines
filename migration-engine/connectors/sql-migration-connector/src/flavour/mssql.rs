@@ -203,7 +203,7 @@ impl SqlFlavour for MssqlFlavour {
         let (db_name, master_uri) = Self::master_url(database_url)?;
         let conn = connect(&master_uri.to_string()).await?;
 
-        let query = format!("DROP DATABASE [{}]", db_name);
+        let query = format!("DROP DATABASE IF EXISTS [{}]", db_name);
         conn.raw_cmd(&query).await?;
 
         Ok(())
