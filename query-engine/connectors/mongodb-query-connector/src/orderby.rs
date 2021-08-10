@@ -20,7 +20,7 @@ impl OrderByData {
     }
 
     pub(crate) fn compute(order_by: OrderBy, index: usize) -> Self {
-        if order_by.path.is_empty() {
+        if order_by.path().is_empty() {
             Self {
                 join: None,
                 prefix: None,
@@ -28,7 +28,11 @@ impl OrderByData {
             }
         } else {
             let prefix = Self::compute_prefix(index, &order_by);
-            let mut stages = order_by.path.iter().map(|rf| JoinStage::new(rf.clone())).collect_vec();
+            let mut stages = order_by
+                .path()
+                .iter()
+                .map(|rf| JoinStage::new(rf.clone()))
+                .collect_vec();
 
             // We fold from right to left because the right hand side needs to be always contained
             // in the left hand side here (JoinStage<A, JoinStage<B, JoinStage<C>>>).
@@ -53,7 +57,11 @@ impl OrderByData {
     }
 
     fn compute_prefix(index: usize, order_by: &OrderBy) -> OrderByPrefix {
-        let mut parts = order_by.path.iter().map(|rf| rf.relation().name.clone()).collect_vec();
+        let mut parts = order_by
+            .path()
+            .iter()
+            .map(|rf| rf.relation().name.clone())
+            .collect_vec();
         let alias = format!("orderby_{}_{}", parts[0], index);
 
         parts[0] = alias;
@@ -101,7 +109,7 @@ impl OrderByData {
     }
 
     pub(crate) fn sort_order(&self) -> SortOrder {
-        self.order_by.sort_order
+        self.order_by.sort_order()
     }
 }
 
