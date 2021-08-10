@@ -143,9 +143,11 @@ impl SqlFlavour for MssqlFlavour {
 
         let conn = connect(jdbc_string).await?;
 
-        let query = format!("CREATE SCHEMA {}", conn.connection_info().schema_name(),);
-
-        conn.raw_cmd(&query).await?;
+        // dbo is created automatically
+        if conn.connection_info().schema_name() != "dbo" {
+            let query = format!("CREATE SCHEMA {}", conn.connection_info().schema_name(),);
+            conn.raw_cmd(&query).await?;
+        }
 
         Ok(db_name)
     }
