@@ -51,8 +51,11 @@ pub(super) fn resolve_model_and_field_attributes<'ast>(
         }
     }
 
+    //first go over all scalars since relations depend on them
+    let mut seen_scalars = vec![];
     for (field_id, ast_field) in ast_model.iter_fields() {
         if let Some(mut scalar_field) = ctx.db.types.take_scalar_field(model_id, field_id) {
+            seen_scalars.push((model_id, field_id));
             visit_scalar_field_attributes(
                 model_id,
                 field_id,
@@ -64,10 +67,14 @@ pub(super) fn resolve_model_and_field_attributes<'ast>(
             );
 
             ctx.db.types.scalar_fields.insert((model_id, field_id), scalar_field);
-        } else if let Some(mut rf) = ctx.db.types.take_relation_field(model_id, field_id) {
+        }
+    }
+
+    for (field_id, ast_field) in ast_model.iter_fields() {
+        if let Some(mut rf) = ctx.db.types.take_relation_field(model_id, field_id) {
             visit_relation_field_attributes(model_id, ast_field, &model_data, &mut rf, ctx);
             ctx.db.types.relation_fields.insert((model_id, field_id), rf);
-        } else {
+        } else if !seen_scalars.contains(&(model_id, field_id)) {
             unreachable!(
                 "{}.{} is neither a scalar field nor a relation field",
                 ast_model.name(),

@@ -282,3 +282,71 @@ fn allow_implicit_fk_name_definition() {
         .assert_relation_referenced_fields(&["user_id"])
         .assert_relation_fk_name(Some("Post_user_id_fkey".to_string()));
 }
+
+#[test]
+fn implicit_fk_name_definition_with_mapped_models_and_fields() {
+    let dml = with_named_constraints(
+        r#"
+     model User {
+         user_id Int    @id  @map("user_id_map")
+         posts   Post[]
+         
+         @@map("UserMap")
+     }
+
+     model Post {
+         user    User    @relation(fields: user_id, references: user_id)
+         post_id Int    @id @map("post_id_map")
+         user_id Int        @map("user_id_map_on_post")    
+         
+         @@map("PostMap")
+     }
+     "#,
+    );
+
+    let schema = parse(&dml);
+
+    schema
+        .assert_has_model("User")
+        .assert_has_relation_field("posts")
+        .assert_relation_fk_name(None);
+    schema
+        .assert_has_model("Post")
+        .assert_has_relation_field("user")
+        .assert_relation_referenced_fields(&["user_id"])
+        .assert_relation_fk_name(Some("PostMap_user_id_map_on_post_fkey".to_string()));
+}
+
+#[test]
+fn implicit_fk_name_definition_with_mapped_models_and_fields_other_order() {
+    let dml = with_named_constraints(
+        r#"
+     model User {
+         user_id Int    @id  @map("user_id_map")
+         posts   Post[]
+         
+         @@map("UserMap")
+     }
+
+     model Post {
+         post_id Int    @id @map("post_id_map")
+         user_id Int        @map("user_id_map_on_post")    
+         user    User    @relation(fields: user_id, references: user_id)
+         
+         @@map("PostMap")
+     }
+     "#,
+    );
+
+    let schema = parse(&dml);
+
+    schema
+        .assert_has_model("User")
+        .assert_has_relation_field("posts")
+        .assert_relation_fk_name(None);
+    schema
+        .assert_has_model("Post")
+        .assert_has_relation_field("user")
+        .assert_relation_referenced_fields(&["user_id"])
+        .assert_relation_fk_name(Some("PostMap_user_id_map_on_post_fkey".to_string()));
+}
