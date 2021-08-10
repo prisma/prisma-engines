@@ -27,39 +27,49 @@ pub fn build(
 
     // The index is used to differentiate potentially separate relations to the same model.
     for (index, order_by) in query_arguments.order_by.iter().enumerate() {
-        let (joins, order_column) = compute_joins(order_by, index, base_model);
-        let order = Some(order_by.sort_order.into_order(needs_reversed_order));
+        let order = Some(order_by.sort_order().into_order(needs_reversed_order));
 
-        if joins.is_empty() && order_by.sort_aggregation.is_some() {
-            match order_by.sort_aggregation.unwrap() {
-                SortAggregation::Count => {
-                    order_definitions.push((count(order_column.clone()).into(), order));
-                }
-                SortAggregation::Avg => {
-                    order_definitions.push((avg(order_column.clone()).into(), order));
-                }
-                SortAggregation::Sum => {
-                    order_definitions.push((sum(order_column.clone()).into(), order));
-                }
-                SortAggregation::Min => {
-                    order_definitions.push((min(order_column.clone()).into(), order));
-                }
-                SortAggregation::Max => {
-                    order_definitions.push((max(order_column.clone()).into(), order));
+        let (joins, order_column) = match order_by {
+            OrderBy::Scalar(order_by) => compute_joins_scalar(order_by, index, base_model),
+            OrderBy::Aggregation(order_by) => compute_joins_aggregation(order_by, index, base_model),
+            OrderBy::Relevance(_) => todo!(),
+        };
+
+        match order_by {
+            OrderBy::Scalar(_) => {
+                let expr: Expression = order_column.clone().into();
+
+                order_definitions.push((expr, order));
+            }
+            OrderBy::Aggregation(o) => {
+                if joins.is_empty() {
+                    match o.sort_aggregation {
+                        SortAggregation::Count => {
+                            order_definitions.push((count(order_column.clone()).into(), order));
+                        }
+                        SortAggregation::Avg => {
+                            order_definitions.push((avg(order_column.clone()).into(), order));
+                        }
+                        SortAggregation::Sum => {
+                            order_definitions.push((sum(order_column.clone()).into(), order));
+                        }
+                        SortAggregation::Min => {
+                            order_definitions.push((min(order_column.clone()).into(), order));
+                        }
+                        SortAggregation::Max => {
+                            order_definitions.push((max(order_column.clone()).into(), order));
+                        }
+                    }
+                } else {
+                    let exprs: Vec<Expression> = vec![order_column.clone().into(), Value::integer(0).into()];
+                    let coalesce: Expression = coalesce(exprs).into();
+
+                    // We coalesce the order by expr to 0 so that if there's no relation,
+                    // `COALESCE(NULL, 0)` will return `0`, thus preserving the order
+                    order_definitions.push((coalesce, order));
                 }
             }
-        } else {
-            let expr: Expression = if let Some(SortAggregation::Count) = order_by.sort_aggregation {
-                let exprs: Vec<Expression> = vec![order_column.clone().into(), Value::integer(0).into()];
-
-                // We coalesce the order by expr to 0 so that if there's no relation,
-                // `COALESCE(NULL, 0)` will return `0`, thus preserving the order
-                coalesce(exprs).into()
-            } else {
-                order_column.clone().into()
-            };
-
-            order_definitions.push((expr, order));
+            OrderBy::Relevance(_) => todo!(),
         }
 
         ordering_joins.push(OrderingJoins { joins, order_column });
@@ -68,8 +78,8 @@ pub fn build(
     (order_definitions, ordering_joins)
 }
 
-pub fn compute_joins(
-    order_by: &OrderBy,
+pub fn compute_joins_aggregation(
+    order_by: &OrderByAggregation,
     order_by_index: usize,
     base_model: &ModelRef,
 ) -> (Vec<AliasedJoin>, Column<'static>) {
@@ -79,9 +89,8 @@ pub fn compute_joins(
 
     for rf in order_by.path.iter() {
         // If it's an order by aggregation, we change the last join to compute the aggregation
-        if order_by.sort_aggregation.is_some() && Some(rf) == last_path {
-            let sort_aggregation = order_by.sort_aggregation.unwrap();
-            let aggregation_type = match sort_aggregation {
+        if Some(rf) == last_path {
+            let aggregation_type = match order_by.sort_aggregation {
                 SortAggregation::Count => AggregationType::Count { _all: true },
                 _ => unreachable!("Order by relation aggregation other than count are not supported"),
             };
@@ -102,11 +111,36 @@ pub fn compute_joins(
     }
 
     // When doing an order by aggregation, we always alias the aggregator to <ORDER_AGGREGATOR_ALIAS>
-    let order_by_column_alias = if order_by.sort_aggregation.is_some() {
-        ORDER_AGGREGATOR_ALIAS.to_owned()
+    let order_by_column_alias = ORDER_AGGREGATOR_ALIAS.to_owned();
+
+    // This is the final column identifier to be used for the scalar field to order by.
+    // - If it's on the base model with no hops, it's for example `modelTable.field`.
+    // - If it is with several hops, it's the alias used for the last join, e.g.
+    //   `{join_alias}.field`
+    // - If it's with an order by aggregation, it's the alias used for the join + alias used for the aggregator. eg:
+    //   `{join_alias}.{aggregator_alias}`
+    let order_by_column = if let Some(join) = joins.last() {
+        Column::from((join.alias.to_owned(), order_by_column_alias))
     } else {
-        order_by.field.db_name().to_owned()
+        order_by.field().as_column()
     };
+
+    (joins, order_by_column)
+}
+
+pub fn compute_joins_scalar(
+    order_by: &OrderByScalar,
+    order_by_index: usize,
+    base_model: &ModelRef,
+) -> (Vec<AliasedJoin>, Column<'static>) {
+    let join_prefix = format!("{}{}", ORDER_JOIN_PREFIX, order_by_index);
+    let joins = order_by
+        .path
+        .iter()
+        .map(|rf| compute_one2m_join(base_model, rf, join_prefix.as_str()))
+        .collect();
+
+    let order_by_column_alias = order_by.field.db_name().to_owned();
     // This is the final column identifier to be used for the scalar field to order by.
     // - If it's on the base model with no hops, it's for example `modelTable.field`.
     // - If it is with several hops, it's the alias used for the last join, e.g.

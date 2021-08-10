@@ -319,7 +319,8 @@ fn order_definitions(
     let mut orderings: Vec<CursorOrderDefinition> = vec![];
 
     for (index, order_by) in query_arguments.order_by.iter().enumerate() {
-        let (last_hop, before_last_hop) = take_last_two_elem(&order_by.path);
+        let path = order_by.path();
+        let (last_hop, before_last_hop) = take_last_two_elem(&path);
         let joins_for_hop = ordering_joins.get(index).unwrap();
 
         // If there are any ordering hop, this finds the foreign key fields for the _last_ hop (we look for the last one because the ordering is done the last one).
@@ -371,13 +372,13 @@ fn order_definitions(
         // eg: orderBy: [{ id: asc }, { b: { id: asc } }]
         // Without these aliases, selecting from the <ORDER_TABLE_ALIAS> tmp table would result in ambiguous field name
         let field_aliased = (
-            order_by.field.clone(),
-            format!("{}_{}_{}", order_by.field.model().name, order_by.field.name, index).to_owned(),
+            order_by.field(),
+            format!("{}_{}_{}", order_by.field().model().name, order_by.field().name, index).to_owned(),
         );
 
         orderings.push(CursorOrderDefinition {
             field_aliased,
-            sort_order: order_by.sort_order,
+            sort_order: order_by.sort_order(),
             order_column: joins_for_hop.order_column.clone(),
             fks,
         });
