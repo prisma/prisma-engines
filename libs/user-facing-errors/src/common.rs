@@ -241,6 +241,12 @@ pub struct IncorrectNumberOfParameters {
 #[user_facing(code = "P1017", message = "Server has closed the connection.")]
 pub struct ConnectionClosed;
 
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = "P1018", message = "{message}")]
+pub struct TransactionAlreadyClosed {
+    pub message: String,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

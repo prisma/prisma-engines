@@ -42,7 +42,13 @@ impl<'tx> Transaction for SqlConnectorTransaction<'tx> {
     #[tracing::instrument(skip(self))]
     async fn rollback(&mut self) -> connector::Result<()> {
         catch(self.connection_info.clone(), async move {
-            Ok(self.inner.rollback().await.map_err(SqlError::from)?)
+            let res = self.inner.rollback().await.map_err(SqlError::from);
+
+            if matches!(res, Err(SqlError::TransactionAlreadyClosed(_))) {
+                Ok(())
+            } else {
+                res
+            }
         })
         .await
     }
