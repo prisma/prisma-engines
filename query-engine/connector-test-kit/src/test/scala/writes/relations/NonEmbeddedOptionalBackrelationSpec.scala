@@ -3,7 +3,7 @@
 //import org.scalatest.{FlatSpec, Matchers}
 //import util.ConnectorCapability.JoinRelationLinksCapability
 //import util._
-//
+//// RS: Won't port
 //class NonEmbeddedOptionalBackrelationSpec extends FlatSpec with Matchers with ApiSpecBase {
 //  override def runOnlyForCapabilities = Set(JoinRelationLinksCapability)
 //

@@ -4,6 +4,7 @@ import org.scalatest.{FlatSpec, Matchers}
 import util.ConnectorCapability.{EmbeddedTypesCapability, JoinRelationLinksCapability}
 import util._
 
+// RS: Won't port
 class CascadingDeleteSpec extends FlatSpec with Matchers with ApiSpecBase {
 
   override def doNotRun                = true
