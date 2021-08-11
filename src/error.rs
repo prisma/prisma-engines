@@ -232,6 +232,9 @@ pub enum ErrorKind {
         actual
     )]
     IncorrectNumberOfParameters { expected: usize, actual: usize },
+
+    #[error("Transaction was already closed: {}", _0)]
+    TransactionAlreadyClosed(String),
 }
 
 impl ErrorKind {
