@@ -88,10 +88,11 @@ fn read_many(
                     &query.aggregation_selections,
                 )
                 .await?;
+            let scalars = processor.apply(scalars);
             let (scalars, aggregation_rows) =
                 extract_aggregation_rows_from_scalars(scalars.clone(), query.aggregation_selections);
 
-            (processor.apply(scalars), aggregation_rows)
+            (scalars, aggregation_rows)
         } else {
             let scalars = tx
                 .get_many_records(
@@ -103,7 +104,6 @@ fn read_many(
                 .await?;
             let (scalars, aggregation_rows) =
                 extract_aggregation_rows_from_scalars(scalars.clone(), query.aggregation_selections);
-
             (scalars, aggregation_rows)
         };
 
@@ -215,7 +215,7 @@ fn process_nested<'conn>(
 /// findManyX { _count { rel_1, rel 2 } }
 /// Output object types are typically used for selecting relations, so they're are queried in a different request
 /// In the case of relation aggregations though, we query that data along side the request sent for the base model ("X" in the query above)
-/// This means the SQL result we get back from the database contains additional aggregation data that needs to be remapped according to the shema
+/// This means the SQL result we get back from the database contains additional aggregation data that needs to be remapped according to the schema
 /// This function takes care of removing the aggregation data from the database result and collects it separately
 /// so that it can be serialized separately later according to the schema
 pub fn extract_aggregation_rows_from_scalars(

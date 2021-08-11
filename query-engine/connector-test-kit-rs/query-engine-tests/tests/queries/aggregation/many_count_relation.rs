@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(schema))]
+#[test_suite(schema(schema), exclude(MongoDb))]
 mod many_count_rel {
     use indoc::indoc;
     use query_engine_tests::run_query;
@@ -30,7 +30,7 @@ mod many_count_rel {
     }
 
     // "Counting with no records in the database" should "return 0"
-    #[connector_test(exclude(MongoDb))] // TODO(dom): Not working on mongo
+    #[connector_test] // TODO(dom): Not working on mongo
     async fn no_rel_records(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1, title: "a" }"#).await?;
 
@@ -47,7 +47,7 @@ mod many_count_rel {
     }
 
     //"Counting one2m and m2m records" should "work"
-    #[connector_test(exclude(MongoDb))] // TODO(dom): Not working on mongo
+    #[connector_test] // TODO(dom): Not working on mongo
     async fn count_one2m_m2m(runner: Runner) -> TestResult<()> {
         // 1 comment / 2 categories
         create_row(
@@ -85,7 +85,7 @@ mod many_count_rel {
     }
 
     // "Counting with some records and filters" should "not affect the count"
-    #[connector_test(exclude(MongoDb))] // TODO(dom): Not working on mongo
+    #[connector_test] // TODO(dom): Not working on mongo
     async fn count_with_filters(runner: Runner) -> TestResult<()> {
         // 4 comment / 4 categories
         create_row(
@@ -151,7 +151,7 @@ mod many_count_rel {
 
     // Counting nested one2m and m2m should work
     // TODO(dom): Not working on mongo
-    #[connector_test(schema(schema_nested), exclude(MongoDb))]
+    #[connector_test(schema(schema_nested))]
     async fn nested_count_one2m_m2m(runner: Runner) -> TestResult<()> {
         run_query!(
             &runner,
@@ -210,6 +210,54 @@ mod many_count_rel {
             }
           } }"#),
           @r###"{"data":{"findManyUser":[{"name":"Bob","posts":[{"title":"Wooow!","comments":[{"body":"Amazing","tags":[{"name":"LALA"},{"name":"LOLO"}],"_count":{"tags":2}}],"tags":[{"name":"A"},{"name":"B"},{"name":"C"}],"_count":{"comments":1,"tags":3}}],"_count":{"posts":1}}]}}"###
+        );
+
+        Ok(())
+    }
+
+    fn schema_inmemory_process() -> String {
+        let schema = indoc! {
+            r#"model Post {
+              #id(id, Int, @id, @default(autoincrement()))
+              comments  Comment[]
+              createdAt DateTime  @default(now())
+              updatedAt DateTime  @updatedAt
+            }
+            
+            model Comment {
+              #id(id, Int, @id, @default(autoincrement()))
+              post      Post     @relation(fields: [postId], references: [id])
+              postId    Int
+              createdAt DateTime @default(now())
+              updatedAt DateTime @updatedAt
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    // Regression test for https://github.com/prisma/prisma/issues/8050
+    // Ensures aggregation rows are properly extracted even when in-memory processing is applied to the records
+    #[connector_test(schema(schema_inmemory_process))]
+    async fn works_with_inmemory_args_processing(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ comments: { create: [{}, {}] } }"#).await?;
+        create_row(&runner, r#"{ comments: { create: [{}, {}, {}, {}] } }"#).await?;
+        create_row(&runner, r#"{}"#).await?;
+        create_row(&runner, r#"{}"#).await?;
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyPost(
+            orderBy: { createdAt: "desc" }
+            cursor: { id: 4 }
+            skip: 1
+            take: 6
+          ) {
+            id
+            _count {
+              comments
+            }
+          } }"#),
+          @r###"{"data":{"findManyPost":[{"id":3,"_count":{"comments":0}},{"id":2,"_count":{"comments":4}},{"id":1,"_count":{"comments":2}}]}}"###
         );
 
         Ok(())
