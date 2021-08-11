@@ -219,8 +219,8 @@ mod many_count_rel {
             r#"model User {
               #id(id, Int, @id, @default(autoincrement()))
               name String
-              #m2m(followers, User[], Int, approved-followers)
-              #m2m(following, User[], Int, approved-followers)
+              #m2m(followers, User[], Int, followers)
+              #m2m(following, User[], Int, followers)
             }"#
         };
 
