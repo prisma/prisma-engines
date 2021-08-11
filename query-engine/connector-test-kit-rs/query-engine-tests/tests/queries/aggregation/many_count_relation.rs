@@ -280,7 +280,7 @@ mod many_count_rel {
             model UserToObjective {
               user        User      @relation(fields: [userId], references: [id])
               userId      Int
-              objective   Objective @relation(name: "UserObjectives", fields: [objectiveId], references: [id])
+              objective   Objective @relation(name: "UserObjectives", fields: [objectiveId], references: [id], onDelete: NoAction, onUpdate: NoAction)
               objectiveId Int
               votes       Vote[]
             
@@ -291,7 +291,7 @@ mod many_count_rel {
               createdAt     DateTime        @default(now())
               user          User            @relation(fields: [userId], references: [id])
               userId        Int
-              userObjective UserToObjective @relation(fields: [objectiveId, followerId], references: [objectiveId, userId])
+              userObjective UserToObjective @relation(fields: [objectiveId, followerId], references: [userId, objectiveId], onDelete: NoAction, onUpdate: NoAction)
               objectiveId   Int
               followerId    Int
             
