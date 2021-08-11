@@ -143,14 +143,12 @@ fn compute_aggr_join_m2m(
     let query = query
         .inner_join(
             model_a
-                .clone()
                 .as_table()
                 .alias(model_a_alias)
                 .on(ConditionTree::single(conditions_a)),
         )
         .inner_join(
             model_b
-                .clone()
                 .as_table()
                 .alias(model_b_alias)
                 .on(ConditionTree::single(conditions_b)),

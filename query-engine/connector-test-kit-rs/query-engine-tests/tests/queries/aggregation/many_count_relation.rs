@@ -245,7 +245,7 @@ mod many_count_rel {
 
         insta::assert_snapshot!(
           run_query!(&runner, r#"query {
-            findManyUser {
+            findManyUser(orderBy: { name: asc }) {
               name
               following {
                 name
@@ -260,7 +260,7 @@ mod many_count_rel {
             }
           }
           "#),
-          @r###"{"data":{"findManyUser":[{"name":"Bob","following":[{"name":"Alice"}],"followers":[],"_count":{"following":1,"followers":0}},{"name":"Alice","following":[{"name":"Justin"}],"followers":[{"name":"Bob"}],"_count":{"following":1,"followers":1}},{"name":"Justin","following":[],"followers":[{"name":"Alice"}],"_count":{"following":0,"followers":1}}]}}"###
+          @r###"{"data":{"findManyUser":[{"name":"Alice","following":[{"name":"Justin"}],"followers":[{"name":"Bob"}],"_count":{"following":1,"followers":1}},{"name":"Bob","following":[{"name":"Alice"}],"followers":[],"_count":{"following":1,"followers":0}},{"name":"Justin","following":[],"followers":[{"name":"Alice"}],"_count":{"following":0,"followers":1}}]}}"###
         );
 
         insta::assert_snapshot!(
