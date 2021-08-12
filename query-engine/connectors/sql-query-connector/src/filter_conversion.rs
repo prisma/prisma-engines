@@ -309,9 +309,9 @@ impl AliasedCondition for OneRelationIsNullFilter {
             // eg: SELECT <alias>.x FROM table AS <alias>
             let columns: Vec<_> = self
                 .field
-                .related_field()
+                .related_model()
+                .primary_identifier()
                 .scalar_fields()
-                .iter()
                 .map(|f| match alias.as_ref() {
                     Some(a) => Column::from((a.clone(), f.db_name().to_owned())),
                     None => f.as_column(),

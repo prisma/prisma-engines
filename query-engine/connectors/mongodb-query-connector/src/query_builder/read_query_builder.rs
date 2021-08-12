@@ -26,7 +26,7 @@ pub enum MongoReadQuery {
 impl MongoReadQuery {
     pub async fn execute(
         self,
-        on_collection: Collection,
+        on_collection: Collection<Document>,
         with_session: &mut ClientSession,
     ) -> crate::Result<Vec<Document>> {
         log_query(on_collection.name(), &self);
@@ -44,7 +44,7 @@ pub struct PipelineQuery {
 impl PipelineQuery {
     pub async fn execute(
         self,
-        on_collection: Collection,
+        on_collection: Collection<Document>,
         with_session: &mut ClientSession,
     ) -> crate::Result<Vec<Document>> {
         let opts = AggregateOptions::builder().allow_disk_use(true).build();
@@ -64,7 +64,7 @@ pub struct FindQuery {
 impl FindQuery {
     pub async fn execute(
         self,
-        on_collection: Collection,
+        on_collection: Collection<Document>,
         with_session: &mut ClientSession,
     ) -> crate::Result<Vec<Document>> {
         let cursor = on_collection
@@ -114,7 +114,7 @@ pub(crate) struct MongoReadQueryBuilder {
     pub(crate) cursor_data: Option<CursorData>,
 
     /// Skip a number of documents at the start of the result.
-    pub(crate) skip: Option<u64>,
+    pub(crate) skip: Option<i64>,
 
     /// Take only a certain number of documents from the result.
     pub(crate) limit: Option<i64>,
@@ -182,7 +182,7 @@ impl MongoReadQueryBuilder {
             joins,
             order_builder,
             cursor_builder,
-            skip: skip(args.skip.map(|i| i as u64), args.ignore_skip),
+            skip: skip(args.skip, args.ignore_skip),
             limit: take(args.take, args.ignore_take),
             aggregations: vec![],
             aggregation_filters: vec![],
@@ -559,7 +559,7 @@ fn aggregation_pairs(op: &str, fields: &[ScalarFieldRef]) -> Vec<(String, Bson)>
         .collect()
 }
 
-fn skip(skip: Option<u64>, ignore: bool) -> Option<u64> {
+fn skip(skip: Option<i64>, ignore: bool) -> Option<i64> {
     if ignore {
         None
     } else {
