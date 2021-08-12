@@ -195,6 +195,9 @@ pub enum ErrorKind {
 
     #[error("Transaction aborted: {}", message)]
     TransactionAborted { message: String },
+
+    #[error("{}", message)]
+    TransactionAlreadyClosed { message: String },
 }
 
 impl From<DomainError> for ConnectorError {
