@@ -32,7 +32,7 @@ pub fn compute_aggr_join(
 
 fn compute_aggr_join_one2m(
     rf: &RelationFieldRef,
-    sort_aggregation: AggregationType,
+    aggregation: AggregationType,
     aggregator_alias: &str,
     join_alias: &str,
     previous_join: Option<&AliasedJoin>,
@@ -49,7 +49,7 @@ fn compute_aggr_join_one2m(
 
     // + SELECT A.fk FROM A
     let query = Select::from_table(rf.related_model().as_table()).columns(select_columns);
-    let aggr_expr = match sort_aggregation {
+    let aggr_expr = match aggregation {
         AggregationType::Count { _all } => count(asterisk()),
     };
 
@@ -97,67 +97,36 @@ fn compute_aggr_join_m2m(
     previous_join: Option<&AliasedJoin>,
 ) -> AliasedJoin {
     let relation_table = rf.as_table();
-
     let model_a = rf.model();
-    let model_a_alias = format!("{}_A", model_a.db_name());
     let a_ids = rf.model().primary_identifier();
-    let a_columns: Vec<_> = a_ids.as_columns().map(|c| c.table(model_a_alias.clone())).collect();
-
-    let model_b = rf.related_model();
-    let model_b_alias = format!("{}_B", model_b.db_name());
+    let a_columns: Vec<_> = a_ids.as_columns().collect();
     let b_ids = rf.related_model().primary_identifier();
-    let b_columns: Vec<_> = b_ids.as_columns().map(|c| c.table(model_b_alias.clone())).collect();
 
-    // SQL statements below refers to three tables:
-    // A (left table): aliased as A_A
-    // B (right table): aliased as B_B
-    // _AtoB (join table): not aliased
-    // A & B are aliased to support m2m self relations, in which case we inner join twice on the same table
-    // If A & B are the "User" table, they'd be aliased to: User_A & User_B
-
-    // + SELECT A_A.id FROM _AtoB
-    let query = Select::from_table(relation_table).columns(a_columns.clone());
+    // + SELECT A.id FROM A
+    let query = Select::from_table(model_a.as_table()).columns(a_columns.clone());
 
     let aggr_expr = match aggregation {
-        AggregationType::Count { _all } => count(asterisk()),
+        AggregationType::Count { _all } => count(rf.related_field().m2m_columns()),
     };
-    // SELECT A_A.id,
-    // + COUNT(*) AS <AGGREGATOR_ALIAS>
-    // FROM _AtoB
+
+    // SELECT A.id,
+    // + COUNT(_AtoB.B) AS <AGGREGATOR_ALIAS>
+    // FROM A
     let query = query.value(aggr_expr.alias(aggregator_alias.to_owned()));
 
-    let conditions_a: Vec<Expression> = a_columns
+    let left_join_conditions: Vec<Expression> = a_columns
         .clone()
         .into_iter()
         .map(|c| c.equals(rf.related_field().m2m_columns()).into())
         .collect();
-    let conditions_b: Vec<Expression> = b_columns
-        .clone()
-        .into_iter()
-        .map(|c| c.equals(rf.m2m_columns()).into())
-        .collect();
 
-    // SELECT A_A.id, COUNT(*) AS <AGGREGATOR_ALIAS> FROM _AtoB
-    // + INNER JOIN A AS A_A ON A_A.id = _AtoB.A
-    // + INNER JOIN B AS B_B ON B_B.id = _AtoB.B
-    let query = query
-        .inner_join(
-            model_a
-                .as_table()
-                .alias(model_a_alias)
-                .on(ConditionTree::And(conditions_a)),
-        )
-        .inner_join(
-            model_b
-                .as_table()
-                .alias(model_b_alias)
-                .on(ConditionTree::And(conditions_b)),
-        );
+    // SELECT A.id, COUNT(_AtoB.B) AS <AGGREGATOR_ALIAS> FROM A
+    // + LEFT JOIN _AtoB ON (A.id = _AtoB.B)
+    let query = query.left_join(relation_table.on(ConditionTree::And(left_join_conditions)));
 
-    // SELECT A_A.id, COUNT(*) AS <AGGREGATOR_ALIAS> FROM _AtoB
-    // INNER JOIN A AS A_A ON A_A.id = _AtoB.A
-    // INNER JOIN B AS B_B ON B_B.id = _AtoB.B
-    // + GROUP BY A_A.id
+    // SELECT A.id, COUNT(_AtoB.B) AS <AGGREGATOR_ALIAS> FROM A
+    // LEFT JOIN _AtoB ON (A.id = _AtoB.B)
+    // + GROUP BY A.id
     let query = a_columns.into_iter().fold(query, |acc, f| acc.group_by(f.clone()));
 
     let (left_fields, right_fields) = (a_ids.scalar_fields(), b_ids.scalar_fields());
@@ -175,9 +144,8 @@ fn compute_aggr_join_m2m(
         .collect::<Vec<_>>();
 
     // + LEFT JOIN (
-    //     SELECT A_A.id, COUNT(*) AS <AGGREGATOR_ALIAS> FROM _AtoB
-    //       INNER JOIN A AS A_A ON (A_A.id = _AtoB.A)
-    //       INNER JOIN B AS B_B ON (B_B.id = _AtoB.B)
+    //     SELECT A.id, COUNT(_AtoB.B) AS <AGGREGATOR_ALIAS> FROM A
+    //     LEFT JOIN _AtoB ON (A.id = _AtoB.B)
     //     GROUP BY A.id
     // + ) AS <ORDER_JOIN_PREFIX> ON (<A | previous_join_alias>.id = <ORDER_JOIN_PREFIX>.id)
     let join = Table::from(query)
