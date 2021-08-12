@@ -214,6 +214,77 @@ mod many_count_rel {
 
         Ok(())
     }
+    fn m_n_self_rel() -> String {
+        let schema = indoc! {
+            r#"model User {
+              #id(id, Int, @id, @default(autoincrement()))
+              name String
+              #m2m(followers, User[], Int, followers)
+              #m2m(following, User[], Int, followers)
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    // Regression test for https://github.com/prisma/prisma/issues/7807
+    #[connector_test(schema(m_n_self_rel))]
+    async fn count_m_n_self_rel(runner: Runner) -> TestResult<()> {
+        run_query!(
+            runner,
+            r#"mutation {
+          createOneUser(data: {
+            name: "Alice"
+            followers: { create: { name: "Bob"}},
+            following: { create: { name: "Justin"}},
+          }) {
+            id
+          }
+        }"#
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query {
+            findManyUser(orderBy: { name: asc }) {
+              name
+              following {
+                name
+              }
+              followers {
+                name
+              }
+              _count {
+                following
+                followers
+              }
+            }
+          }
+          "#),
+          @r###"{"data":{"findManyUser":[{"name":"Alice","following":[{"name":"Justin"}],"followers":[{"name":"Bob"}],"_count":{"following":1,"followers":1}},{"name":"Bob","following":[{"name":"Alice"}],"followers":[],"_count":{"following":1,"followers":0}},{"name":"Justin","following":[],"followers":[{"name":"Alice"}],"_count":{"following":0,"followers":1}}]}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query {
+            findUniqueUser(where: { id: 1 }) {
+              name
+              following {
+                name
+              }
+              followers {
+                name
+              }
+              _count {
+                following
+                followers
+              }
+            }
+          }
+          "#),
+          @r###"{"data":{"findUniqueUser":{"name":"Alice","following":[{"name":"Justin"}],"followers":[{"name":"Bob"}],"_count":{"following":1,"followers":1}}}}"###
+        );
+
+        Ok(())
+    }
 
     fn schema_inmemory_process() -> String {
         let schema = indoc! {
