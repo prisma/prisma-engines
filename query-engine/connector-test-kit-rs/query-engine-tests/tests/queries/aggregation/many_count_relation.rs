@@ -214,6 +214,7 @@ mod many_count_rel {
 
         Ok(())
     }
+
     fn m_n_self_rel() -> String {
         let schema = indoc! {
             r#"model User {
@@ -329,6 +330,81 @@ mod many_count_rel {
             }
           } }"#),
           @r###"{"data":{"findManyPost":[{"id":3,"_count":{"comments":0}},{"id":2,"_count":{"comments":4}},{"id":1,"_count":{"comments":2}}]}}"###
+        );
+
+        Ok(())
+    }
+
+    fn schema_one2m_multi_fks() -> String {
+        let schema = indoc! {
+            r#"model User {
+              #id(id, Int, @id, @default(autoincrement()))
+              votes           Vote[]
+              UserToObjective UserToObjective[]
+            }
+            
+            model Objective {
+              #id(id, Int, @default(autoincrement()), @id)
+              name            String            @unique
+              UserToObjective UserToObjective[] @relation(name: "UserObjectives")
+            }
+            
+            model UserToObjective {
+              user        User      @relation(fields: [userId], references: [id])
+              userId      Int
+              objective   Objective @relation(name: "UserObjectives", fields: [objectiveId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+              objectiveId Int
+              votes       Vote[]
+            
+              @@id([userId, objectiveId])
+            }
+            
+            model Vote {
+              createdAt     DateTime        @default(now())
+              user          User            @relation(fields: [userId], references: [id])
+              userId        Int
+              userObjective UserToObjective @relation(fields: [objectiveId, followerId], references: [userId, objectiveId], onDelete: NoAction, onUpdate: NoAction)
+              objectiveId   Int
+              followerId    Int
+            
+              @@id([userId, objectiveId])
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    // Regression test for: https://github.com/prisma/prisma/issues/7299
+    #[connector_test(schema(schema_one2m_multi_fks))]
+    async fn count_one2m_multi_fks(runner: Runner) -> TestResult<()> {
+        run_query!(
+            runner,
+            r#"mutation {
+                createOneUserToObjective(
+                  data: {
+                    user: { create: {} }
+                    objective: { create: { name: "Objective 1" } }
+                    votes: { create: [{ user: { create: {} } }, { user: { create: {} } }] }
+                  }
+                ) {
+                  userId
+                  _count {
+                    votes
+                  }
+                }
+              }
+            "#
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query {
+            findManyUserToObjective {
+              _count {
+                votes
+              }
+            }
+          }"#),
+          @r###"{"data":{"findManyUserToObjective":[{"_count":{"votes":2}}]}}"###
         );
 
         Ok(())
