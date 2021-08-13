@@ -36,6 +36,10 @@ pub trait Connector: Send + Sync {
         self.has_capability(ConnectorCapability::NamedForeignKeys)
     }
 
+    fn supports_named_default_values(&self) -> bool {
+        self.has_capability(ConnectorCapability::NamedDefaultValues)
+    }
+
     fn supports_referential_action(&self, action: ReferentialAction) -> bool {
         self.referential_actions().contains(action)
     }
@@ -241,6 +245,7 @@ capabilities!(
     NamedPrimaryKeys,
     NamedForeignKeys,
     ReferenceCycleDetection,
+    NamedDefaultValues,
     // Start of query-engine-only Capabilities
     InsensitiveFilters,
     CreateMany,

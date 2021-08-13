@@ -275,18 +275,20 @@ pub(crate) fn calculate_backrelation_field(
 pub(crate) fn calculate_default(table: &Table, column: &Column, arity: &FieldArity) -> Option<DMLDef> {
     match (column.default.as_ref().map(|d| d.kind()), &column.tpe.family) {
         (_, _) if *arity == FieldArity::List => None,
-        (_, ColumnTypeFamily::Int) if column.auto_increment => Some(DMLDef::Expression(VG::new_autoincrement())),
-        (_, ColumnTypeFamily::BigInt) if column.auto_increment => Some(DMLDef::Expression(VG::new_autoincrement())),
-        (_, ColumnTypeFamily::Int) if is_sequence(column, table) => Some(DMLDef::Expression(VG::new_autoincrement())),
+        (_, ColumnTypeFamily::Int) if column.auto_increment => Some(DMLDef::new_expression(VG::new_autoincrement())),
+        (_, ColumnTypeFamily::BigInt) if column.auto_increment => Some(DMLDef::new_expression(VG::new_autoincrement())),
+        (_, ColumnTypeFamily::Int) if is_sequence(column, table) => {
+            Some(DMLDef::new_expression(VG::new_autoincrement()))
+        }
         (_, ColumnTypeFamily::BigInt) if is_sequence(column, table) => {
-            Some(DMLDef::Expression(VG::new_autoincrement()))
+            Some(DMLDef::new_expression(VG::new_autoincrement()))
         }
-        (Some(DefaultKind::Sequence(_)), _) => Some(DMLDef::Expression(VG::new_autoincrement())),
-        (Some(DefaultKind::Now), ColumnTypeFamily::DateTime) => Some(DMLDef::Expression(VG::new_now())),
+        (Some(DefaultKind::Sequence(_)), _) => Some(DMLDef::new_expression(VG::new_autoincrement())),
+        (Some(DefaultKind::Now), ColumnTypeFamily::DateTime) => Some(DMLDef::new_expression(VG::new_now())),
         (Some(DefaultKind::DbGenerated(default_string)), _) => {
-            Some(DMLDef::Expression(VG::new_dbgenerated(default_string.clone())))
+            Some(DMLDef::new_expression(VG::new_dbgenerated(default_string.clone())))
         }
-        (Some(DefaultKind::Value(val)), _) => Some(DMLDef::Single(val.clone())),
+        (Some(DefaultKind::Value(val)), _) => Some(DMLDef::new_single(val.clone())),
         _ => None,
     }
 }

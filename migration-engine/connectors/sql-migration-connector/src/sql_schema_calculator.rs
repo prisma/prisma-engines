@@ -313,12 +313,12 @@ fn column_for_scalar_field(field: &ScalarFieldWalker<'_>, flavour: &dyn SqlFlavo
             family,
             arity: column_arity(field.arity()),
         },
-        default: field.default_value().and_then(|v| match v {
-            datamodel::DefaultValue::Single(v) => Some(sql::DefaultValue::value(v.clone())),
-            default if default.is_dbgenerated() => db_generated(default),
+        default: field.default_value().and_then(|v| match &v.kind {
+            datamodel::DefaultKind::Single(v) => Some(sql::DefaultValue::value(v.clone())),
+            default if default.is_dbgenerated() => db_generated(v),
             default if default.is_now() => Some(sql::DefaultValue::now()),
             default if default.is_autoincrement() => Some(sql::DefaultValue::sequence(String::new())),
-            datamodel::DefaultValue::Expression(_) => None,
+            datamodel::DefaultKind::Expression(_) => None,
         }),
     }
 }

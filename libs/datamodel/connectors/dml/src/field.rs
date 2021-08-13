@@ -3,7 +3,7 @@ use crate::relation_info::RelationInfo;
 use crate::scalars::ScalarType;
 use crate::traits::{Ignorable, WithDatabaseName, WithName};
 use crate::{
-    default_value::{DefaultValue, ValueGenerator},
+    default_value::{DefaultKind, DefaultValue, ValueGenerator},
     relation_info::ReferentialAction,
 };
 use std::hash::Hash;
@@ -461,7 +461,8 @@ impl ScalarField {
     }
 
     pub fn is_auto_increment(&self) -> bool {
-        matches!(&self.default_value, Some(DefaultValue::Expression(expr)) if expr == &ValueGenerator::new_autoincrement())
+        let kind = self.default_value.as_ref().map(|val| &val.kind);
+        matches!(kind, Some(DefaultKind::Expression(ref expr)) if expr == &ValueGenerator::new_autoincrement())
     }
 }
 

@@ -78,6 +78,7 @@ impl ConstraintNames {
     ) -> String {
         let index_suffix = "_idx";
         let unique_suffix = "_key";
+
         let limit = connector.constraint_name_length();
 
         let joined = format!("{}_{}", table_name, column_names.join("_"));
@@ -92,6 +93,19 @@ impl ConstraintNames {
             IndexType::Unique => format!("{}{}", trimmed, unique_suffix),
             IndexType::Normal => format!("{}{}", trimmed, index_suffix),
         }
+    }
+
+    pub(crate) fn default_name(table_name: &str, column_name: &str, connector: &dyn Connector) -> String {
+        let limit = connector.constraint_name_length();
+        let joined = format!("{}_{}", table_name, column_name);
+
+        let trimmed = if joined.len() >= limit - 3 {
+            joined.split_at(limit - 3).0
+        } else {
+            joined.as_str()
+        };
+
+        format!("{}_df", trimmed)
     }
 
     pub(crate) fn foreign_key_name_matches(ri: &RelationInfo, model: &Model, connector: &dyn Connector) -> bool {

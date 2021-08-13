@@ -39,7 +39,9 @@ fn interpolate_environment_variables() {
     user_model
         .assert_has_scalar_field("firstName")
         .assert_base_type(&ScalarType::String)
-        .assert_default_value(DefaultValue::Single(PrismaValue::String(String::from("prisma-user"))));
+        .assert_default_value(DefaultValue::new_single(PrismaValue::String(String::from(
+            "prisma-user",
+        ))));
 }
 
 // This is very useless, except being a good test case.
@@ -63,7 +65,9 @@ fn interpolate_nested_environment_variables() {
     user_model
         .assert_has_scalar_field("firstName")
         .assert_base_type(&ScalarType::String)
-        .assert_default_value(DefaultValue::Single(PrismaValue::String(String::from("prisma-user"))));
+        .assert_default_value(DefaultValue::new_single(PrismaValue::String(String::from(
+            "prisma-user",
+        ))));
 }
 
 #[ignore]
@@ -85,5 +89,5 @@ fn ducktype_environment_variables() {
     user_model
         .assert_has_scalar_field("age")
         .assert_base_type(&ScalarType::Int)
-        .assert_default_value(DefaultValue::Single(PrismaValue::Int(18)));
+        .assert_default_value(DefaultValue::new_single(PrismaValue::Int(18)));
 }

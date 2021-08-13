@@ -233,20 +233,17 @@ fn visit_scalar_field_attributes<'ast>(
                     ast_model.span,
                 )),
                 None => {
-
                     let db_name = if ctx.db.preview_features.contains(NamedConstraints) {
                         primary_key_constraint_name(&ast_model, model_data, args,  "@id", ctx)
                     } else {
                         ctx.is_sql_server().then(|| {
-                            format!(
+                            Cow::from(format!(
                                 "PK__{}__{}",
                                 &ast_model.name(),
                                 scalar_field_data.mapped_name.unwrap_or_else(|| ast_field.name())
-                            )
-                                .into()
+                            ))
                         })
                     };
-
 
                     model_data.primary_key = Some(PrimaryKeyData{
                         name: None,
@@ -256,7 +253,6 @@ fn visit_scalar_field_attributes<'ast>(
                     })
                 },
             }
-
 
             match (model_data.is_ignored, ast_field.arity) {
                 (true, _) |
@@ -283,7 +279,7 @@ fn visit_scalar_field_attributes<'ast>(
 
          // @default
          attributes.visit_optional_single("default", ctx, |args, ctx| {
-            visit_field_default(args, scalar_field_data, model_id, field_id, ctx);
+            visit_field_default(args, model_data, scalar_field_data, model_id, field_id, ctx);
          });
 
         if let ScalarFieldType::BuiltInScalar(scalar_type) = scalar_field_data.r#type {
@@ -358,6 +354,43 @@ fn primary_key_constraint_name<'ast>(
         ));
     }
     db_name
+}
+
+fn default_value_constraint_name<'ast>(
+    ast_model: &'ast Model,
+    model_data: &mut ModelData<'ast>,
+    ast_field: &'ast ast::Field,
+    args: &mut Arguments<'ast>,
+    ctx: &mut Context<'ast>,
+) -> Option<String> {
+    let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
+        Some(Ok("")) => error_on_empty_string_cow(args, ctx),
+        Some(Ok(name)) => Some(name.into()),
+        Some(Err(err)) => push_error_cow(err, ctx),
+        None if ctx.db.active_connector().supports_named_default_values() => {
+            let generated_name = ConstraintNames::default_name(
+                model_data.mapped_name.unwrap_or(&ast_model.name.name),
+                ast_field.name(),
+                ctx.db.active_connector(),
+            );
+
+            Some(generated_name.into())
+        }
+        None => None,
+    };
+
+    validate_db_name(&ast_model, args, &db_name, "@default", ctx);
+
+    if db_name.is_some() && !ctx.db.active_connector().supports_named_default_values() {
+        ctx.push_error(DatamodelError::new_field_validation_error(
+            "You defined a database name for the default value of a field on the model. This is not supported by the provider.",
+            &ast_model.name.name,
+            &ast_field.name.name,
+            ast_model.span,
+        ));
+    }
+
+    db_name.map(|cow| cow.to_string())
 }
 
 fn visit_relation_field_attributes<'ast>(
@@ -438,12 +471,13 @@ fn visit_relation_field_attributes<'ast>(
 }
 
 /// @default on scalar fields
-fn visit_field_default(
-    args: &mut Arguments<'_>,
-    field_data: &mut ScalarField<'_>,
+fn visit_field_default<'ast>(
+    args: &mut Arguments<'ast>,
+    model_data: &mut ModelData<'ast>,
+    field_data: &mut ScalarField<'ast>,
     model_id: ast::ModelId,
     field_id: ast::FieldId,
-    ctx: &mut Context<'_>,
+    ctx: &mut Context<'ast>,
 ) {
     let value = match args.default_arg("value") {
         Ok(value) => value,
@@ -475,7 +509,12 @@ fn visit_field_default(
                 match value.as_constant_literal() {
                     Ok(value) => {
                         if ctx.db.ast[enum_id].values.iter().any(|v| v.name() == value) {
-                            field_data.default = Some(dml::DefaultValue::Single(PrismaValue::Enum(value.to_owned())))
+                            let mut default = dml::DefaultValue::new_single(PrismaValue::Enum(value.to_owned()));
+
+                            default.db_name =
+                                default_value_constraint_name(ast_model, model_data, ast_field, args, ctx);
+
+                            field_data.default = Some(default);
                         } else {
                             ctx.push_error(args.new_attribute_validation_error(
                                 "The defined default value is not a valid value of the enum specified for the field.",
@@ -485,7 +524,12 @@ fn visit_field_default(
                     Err(err) => {
                         match value.as_value_generator() {
                             Ok(generator) if generator.is_dbgenerated() => {
-                                field_data.default = Some(dml::DefaultValue::Expression(generator));
+                                let mut default = dml::DefaultValue::new_expression(generator);
+
+                                default.db_name =
+                                    default_value_constraint_name(ast_model, model_data, ast_field, args, ctx);
+
+                                field_data.default = Some(default);
                             }
                             Ok(_) | Err(_) => ctx.push_error(args.new_attribute_validation_error(&err.to_string())),
                         };
@@ -493,8 +537,9 @@ fn visit_field_default(
                 };
             }
             ScalarFieldType::BuiltInScalar(scalar_type) => match value.as_default_value_for_scalar_type(scalar_type) {
-                Ok(default_value) => {
-                    field_data.default = Some(default_value);
+                Ok(mut default) => {
+                    default.db_name = default_value_constraint_name(ast_model, model_data, ast_field, args, ctx);
+                    field_data.default = Some(default);
                 }
                 Err(err) => ctx.push_error(args.new_attribute_validation_error(&err.to_string())),
             },
@@ -505,7 +550,7 @@ fn visit_field_default(
             ScalarFieldType::Unsupported => {
                 match value.as_value_generator() {
                     Ok(generator) if generator.is_dbgenerated() => {
-                        field_data.default = Some(dml::DefaultValue::Expression(generator))
+                        field_data.default = Some(dml::DefaultValue::new_expression(generator))
                     }
                     Ok(_) => ctx.push_error(args.new_attribute_validation_error(
                         "Only @default(dbgenerated()) can be used for Unsupported types.",
