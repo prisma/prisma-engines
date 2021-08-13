@@ -357,10 +357,10 @@ fn primary_key_constraint_name<'ast>(
 }
 
 fn default_value_constraint_name<'ast>(
+    args: &mut Arguments<'ast>,
     ast_model: &'ast Model,
     model_data: &mut ModelData<'ast>,
     ast_field: &'ast ast::Field,
-    args: &mut Arguments<'ast>,
     ctx: &mut Context<'ast>,
 ) -> Option<String> {
     if !ctx.db.preview_features.contains(NamedConstraints) {
@@ -386,11 +386,8 @@ fn default_value_constraint_name<'ast>(
     validate_db_name(&ast_model, args, &db_name, "@default", ctx);
 
     if db_name.is_some() && !ctx.db.active_connector().supports_named_default_values() {
-        ctx.push_error(DatamodelError::new_field_validation_error(
+        ctx.push_error(args.new_attribute_validation_error(
             "You defined a database name for the default value of a field on the model. This is not supported by the provider.",
-            &ast_model.name.name,
-            &ast_field.name.name,
-            ast_model.span,
         ));
     }
 
@@ -516,7 +513,7 @@ fn visit_field_default<'ast>(
                             let mut default = dml::DefaultValue::new_single(PrismaValue::Enum(value.to_owned()));
 
                             default.db_name =
-                                default_value_constraint_name(ast_model, model_data, ast_field, args, ctx);
+                                default_value_constraint_name(args, ast_model, model_data, ast_field, ctx);
 
                             field_data.default = Some(default);
                         } else {
@@ -531,7 +528,7 @@ fn visit_field_default<'ast>(
                                 let mut default = dml::DefaultValue::new_expression(generator);
 
                                 default.db_name =
-                                    default_value_constraint_name(ast_model, model_data, ast_field, args, ctx);
+                                    default_value_constraint_name(args, ast_model, model_data, ast_field, ctx);
 
                                 field_data.default = Some(default);
                             }
@@ -540,13 +537,21 @@ fn visit_field_default<'ast>(
                     }
                 };
             }
-            ScalarFieldType::BuiltInScalar(scalar_type) => match value.as_default_value_for_scalar_type(scalar_type) {
-                Ok(mut default) => {
-                    default.db_name = default_value_constraint_name(ast_model, model_data, ast_field, args, ctx);
-                    field_data.default = Some(default);
+            ScalarFieldType::BuiltInScalar(scalar_type) => {
+                match value.as_default_value_for_scalar_type(scalar_type) {
+                    Ok(mut default) => {
+                        if args.has_arg("map") && default.is_autoincrement() {
+                            ctx.push_error(args.new_attribute_validation_error(
+                                "Naming an autoincrement default value is not allowed.",
+                            ))
+                        }
+
+                        default.db_name = default_value_constraint_name(args, ast_model, model_data, ast_field, ctx);
+                        field_data.default = Some(default);
+                    }
+                    Err(err) => ctx.push_error(args.new_attribute_validation_error(&err.to_string())),
                 }
-                Err(err) => ctx.push_error(args.new_attribute_validation_error(&err.to_string())),
-            },
+            }
             ScalarFieldType::Alias(alias_id) => {
                 r#type = ctx.db.types.type_aliases[&alias_id];
                 continue;

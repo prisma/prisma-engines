@@ -74,6 +74,11 @@ impl<'a> Arguments<'a> {
         self.args.remove(name).map(|arg| ValueValidator::new(&arg.value))
     }
 
+    /// True if argument with the given key is defined.
+    pub(crate) fn has_arg(&self, name: &str) -> bool {
+        self.args.contains_key(name)
+    }
+
     /// Gets the arg with the given name, or if it is not found, the first unnamed argument.
     ///
     /// Use this to implement unnamed argument behavior.

@@ -1,5 +1,6 @@
 use crate::common::*;
 use datamodel::{ast::Span, diagnostics::DatamodelError};
+use indoc::indoc;
 
 #[test]
 fn must_error_if_default_value_for_relation_field() {
@@ -331,5 +332,103 @@ fn dbgenerated_default_errors_must_not_cascade_into_other_errors() {
         [1;94m10 | [0m        role2     Bytes @ds.VarBinary(40) @[1;91mdefault(dbgenerated(""))[0m
         [1;94m   | [0m
     "#]];
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn named_default_constraints_should_not_work_on_non_sql_server() {
+    let dml = indoc! { r#"
+        datasource test {
+            provider = "postgres"
+            url = "postgres://"
+        }
+
+        generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["namedConstraints"]
+        }
+
+        model A {
+            id Int @id @default(autoincrement())
+            data String @default("beeb buub", map: "meow")
+        }
+    "#};
+
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@default": You defined a database name for the default value of a field on the model. This is not supported by the provider.[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
+        [1;94m   | [0m
+        [1;94m12 | [0m    id Int @id @default(autoincrement())
+        [1;94m13 | [0m    data String @[1;91mdefault("beeb buub", map: "meow")[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn named_default_constraints_are_not_allowed_on_identity() {
+    let dml = indoc! { r#"
+        datasource test {
+            provider = "sqlserver"
+            url = "sqlserver://"
+        }
+
+        generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["microsoftSqlServer", "namedConstraints"]
+        }
+
+        model A {
+            id Int @id @default(autoincrement(), map: "nope__nope__nope")
+        }
+    "#};
+
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@default": Naming an autoincrement default value is not allowed.[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
+        [1;94m   | [0m
+        [1;94m11 | [0mmodel A {
+        [1;94m12 | [0m    id Int @id @[1;91mdefault(autoincrement(), map: "nope__nope__nope")[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn named_default_constraints_cannot_have_duplicate_names() {
+    let dml = indoc! { r#"
+        datasource test {
+            provider = "sqlserver"
+            url = "sqlserver://"
+        }
+
+        generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["microsoftSqlServer", "namedConstraints"]
+        }
+
+        model A {
+            id Int @id @default(autoincrement())
+            a  String @default("asdf", map: "reserved")
+        }
+
+        model B {
+            id Int @id @default(autoincrement())
+            b  String @default("asdf", map: "reserved")
+        }
+    "#};
+
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        TODO: Talk with Matthias on Monday!
+    "#]];
+
     expectation.assert_eq(&error)
 }

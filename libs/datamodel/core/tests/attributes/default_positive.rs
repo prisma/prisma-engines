@@ -2,6 +2,7 @@ use crate::common::*;
 use bigdecimal::{BigDecimal, FromPrimitive};
 use chrono::DateTime;
 use datamodel::{DefaultValue, ScalarType, ValueGenerator};
+use indoc::indoc;
 use prisma_value::PrismaValue;
 
 #[test]
@@ -112,10 +113,39 @@ fn db_generated_function_must_work_for_enum_fields() {
 
     let datamodel = parse(dml);
     let user_model = datamodel.assert_has_model("Model");
+
     user_model
         .assert_has_scalar_field("role")
         .assert_enum_type("Role")
         .assert_default_value(DefaultValue::new_expression(ValueGenerator::new_dbgenerated(
             "ADMIN".to_string(),
         )));
+}
+
+#[test]
+fn named_default_constraints_should_work_on_sql_server() {
+    let dml = indoc! { r#"
+        datasource test {
+            provider = "sqlserver"
+            url = "sqlserver://"
+        }
+
+        generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["microsoftSqlServer", "namedConstraints"]
+        }
+
+        model A {
+            id Int @id @default(autoincrement())
+            data String @default("beeb buub", map: "meow")
+        }
+    "#};
+
+    let mut expected_default = DefaultValue::new_single(PrismaValue::String(String::from("beeb buub")));
+    expected_default.db_name = Some("meow".into());
+
+    parse(dml)
+        .assert_has_model("A")
+        .assert_has_scalar_field("data")
+        .assert_default_value(expected_default);
 }
