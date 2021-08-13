@@ -2,7 +2,7 @@ use query_engine_tests::*;
 
 #[test_suite(schema(schemas::json), capabilities(JsonFilteringJsonPath, JsonFilteringArrayPath))]
 mod json_path {
-    use query_engine_tests::ConnectorTag;
+    use query_engine_tests::{assert_error, run_query, ConnectorTag};
 
     #[connector_test]
     async fn no_path_without_filter(runner: Runner) -> TestResult<()> {
@@ -225,7 +225,8 @@ mod json_path {
         create_row(&runner, 3, r#"1"#, true).await?;
         create_row(&runner, 4, r#"2"#, true).await?;
         create_row(&runner, 5, r#"1.4"#, true).await?;
-        create_row(&runner, 6, r#"[\"foo\"]"#, true).await?;
+        create_row(&runner, 6, r#"100"#, true).await?;
+        create_row(&runner, 7, r#"[\"foo\"]"#, true).await?;
 
         insta::assert_snapshot!(
             run_query!(
@@ -257,6 +258,51 @@ mod json_path {
                 jsonq(&runner, r#"gte: "1" "#, None)
             ),
             @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":1}}"},{"json":"{\"a\":{\"b\":2}}"},{"json":"{\"a\":{\"b\":1.4}}"}]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn lt_lte(runner: Runner) -> TestResult<()> {
+        create_row(&runner, 1, r#"\"foo\""#, true).await?;
+        create_row(&runner, 2, r#"\"bar\""#, true).await?;
+        create_row(&runner, 3, r#"1"#, true).await?;
+        create_row(&runner, 4, r#"2"#, true).await?;
+        create_row(&runner, 5, r#"1.4"#, true).await?;
+        create_row(&runner, 6, r#"100"#, true).await?;
+        create_row(&runner, 7, r#"[\"foo\"]"#, true).await?;
+
+        insta::assert_snapshot!(
+            run_query!(
+                runner,
+                jsonq(&runner, r#"lt: "\"f\"" "#, None)
+            ),
+            @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":\"bar\"}}"}]}}"###
+        );
+
+        insta::assert_snapshot!(
+            run_query!(
+                runner,
+                jsonq(&runner, r#"lte: "\"f\"" "#, None)
+            ),
+            @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":\"foo\"}}"},{"json":"{\"a\":{\"b\":\"bar\"}}"}]}}"###
+        );
+
+        insta::assert_snapshot!(
+            run_query!(
+                runner,
+                jsonq(&runner, r#"lt: "100" "#, None)
+            ),
+            @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":1}}"},{"json":"{\"a\":{\"b\":2}}"},{"json":"{\"a\":{\"b\":1.4}}"}]}}"###
+        );
+
+        insta::assert_snapshot!(
+            run_query!(
+                runner,
+                jsonq(&runner, r#"lte: "100" "#, None)
+            ),
+            @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":100}}"},{"json":"{\"a\":{\"b\":1}}"},{"json":"{\"a\":{\"b\":2}}"},{"json":"{\"a\":{\"b\":1.4}}"}]}}"###
         );
 
         Ok(())
