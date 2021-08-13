@@ -12,6 +12,7 @@ use sql_schema_describer::{
     walkers::{ColumnWalker, TableWalker},
     ColumnId, DefaultValue,
 };
+use std::borrow::Cow;
 use std::collections::BTreeSet;
 
 /// Creates a set of `ALTER TABLE` statements in a correct execution order.
@@ -214,11 +215,16 @@ impl<'a> AlterTableConstructor<'a> {
                     self.drop_constraints.insert(escaped);
                 }
                 MsSqlAlterColumn::SetDefault(default) => {
+                    let constraint_name = default.constraint_name().map(Cow::from).unwrap_or_else(|| {
+                        let old_default = format!("DF__{}__{}", self.tables.next().name(), columns.next().name());
+                        Cow::from(old_default)
+                    });
+
                     let default = render_default(&default);
 
                     self.add_constraints.insert(format!(
-                        "CONSTRAINT [DF__{table}__{column}] DEFAULT {default} FOR [{column}]",
-                        table = self.tables.next().name(),
+                        "CONSTRAINT [{constraint}] DEFAULT {default} FOR [{column}]",
+                        constraint = constraint_name,
                         column = columns.next().name(),
                         default = default,
                     ));

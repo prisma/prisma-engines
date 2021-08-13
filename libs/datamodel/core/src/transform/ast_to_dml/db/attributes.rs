@@ -363,6 +363,10 @@ fn default_value_constraint_name<'ast>(
     args: &mut Arguments<'ast>,
     ctx: &mut Context<'ast>,
 ) -> Option<String> {
+    if !ctx.db.preview_features.contains(NamedConstraints) {
+        return None;
+    }
+
     let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
         Some(Ok("")) => error_on_empty_string_cow(args, ctx),
         Some(Ok(name)) => Some(name.into()),

@@ -284,11 +284,39 @@ pub(crate) fn calculate_default(table: &Table, column: &Column, arity: &FieldAri
             Some(DMLDef::new_expression(VG::new_autoincrement()))
         }
         (Some(DefaultKind::Sequence(_)), _) => Some(DMLDef::new_expression(VG::new_autoincrement())),
-        (Some(DefaultKind::Now), ColumnTypeFamily::DateTime) => Some(DMLDef::new_expression(VG::new_now())),
-        (Some(DefaultKind::DbGenerated(default_string)), _) => {
-            Some(DMLDef::new_expression(VG::new_dbgenerated(default_string.clone())))
+        (Some(DefaultKind::Now), ColumnTypeFamily::DateTime) => {
+            let mut default = DMLDef::new_expression(VG::new_now());
+
+            default.db_name = column
+                .default
+                .as_ref()
+                .and_then(|df| df.constraint_name())
+                .map(ToString::to_string);
+
+            Some(default)
         }
-        (Some(DefaultKind::Value(val)), _) => Some(DMLDef::new_single(val.clone())),
+        (Some(DefaultKind::DbGenerated(default_string)), _) => {
+            let mut default = DMLDef::new_expression(VG::new_dbgenerated(default_string.clone()));
+
+            default.db_name = column
+                .default
+                .as_ref()
+                .and_then(|df| df.constraint_name())
+                .map(ToString::to_string);
+
+            Some(default)
+        }
+        (Some(DefaultKind::Value(val)), _) => {
+            let mut default = DMLDef::new_single(val.clone());
+
+            default.db_name = column
+                .default
+                .as_ref()
+                .and_then(|df| df.constraint_name())
+                .map(ToString::to_string);
+
+            Some(default)
+        }
         _ => None,
     }
 }

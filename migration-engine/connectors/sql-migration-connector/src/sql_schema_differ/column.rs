@@ -1,4 +1,5 @@
 use crate::{flavour::SqlFlavour, pair::Pair};
+use datamodel::common::preview_features::PreviewFeature;
 use enumflags2::BitFlags;
 use prisma_value::PrismaValue;
 use sql_schema_describer::{walkers::ColumnWalker, DefaultKind};
@@ -41,10 +42,19 @@ fn defaults_match(cols: Pair<ColumnWalker<'_>>, flavour: &dyn SqlFlavour) -> boo
         return true;
     }
 
-    let defaults = (
-        &cols.previous.default().as_ref().map(|d| d.kind()),
-        &cols.next.default().as_ref().map(|d| d.kind()),
-    );
+    let prev = cols.previous().default();
+    let next = cols.next().default();
+
+    let defaults = (&prev.as_ref().map(|d| d.kind()), &next.as_ref().map(|d| d.kind()));
+
+    let names_match = if flavour.preview_features().contains(PreviewFeature::NamedConstraints) {
+        let prev_constraint = prev.and_then(|v| v.constraint_name());
+        let next_constraint = next.and_then(|v| v.constraint_name());
+
+        prev_constraint == next_constraint
+    } else {
+        true
+    };
 
     match defaults {
         // Avoid naive string comparisons for JSON defaults.
@@ -59,9 +69,9 @@ fn defaults_match(cols: Pair<ColumnWalker<'_>>, flavour: &dyn SqlFlavour) -> boo
         | (
             Some(DefaultKind::Value(PrismaValue::Json(prev_json))),
             Some(DefaultKind::Value(PrismaValue::String(next_json))),
-        ) => json_defaults_match(prev_json, next_json),
+        ) => json_defaults_match(prev_json, next_json) && names_match,
 
-        (Some(DefaultKind::Value(prev)), Some(DefaultKind::Value(next))) => prev == next,
+        (Some(DefaultKind::Value(prev)), Some(DefaultKind::Value(next))) => (prev == next) && names_match,
         (Some(DefaultKind::Value(_)), Some(DefaultKind::Now)) => false,
         (Some(DefaultKind::Value(_)), None) => false,
 
@@ -83,7 +93,7 @@ fn defaults_match(cols: Pair<ColumnWalker<'_>>, flavour: &dyn SqlFlavour) -> boo
 
         // We now do migrate to @dbgenerated
         (Some(DefaultKind::DbGenerated(prev)), Some(DefaultKind::DbGenerated(next))) => {
-            prev.to_lowercase() == next.to_lowercase()
+            (prev.to_lowercase() == next.to_lowercase()) && names_match
         }
         (_, Some(DefaultKind::DbGenerated(_))) => false,
         // Sequence migrations are handled separately.

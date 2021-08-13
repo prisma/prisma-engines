@@ -11,7 +11,6 @@ use crate::{
 use ::dml::{datamodel::Datamodel, field::RelationField, model::Model, traits::WithName};
 use datamodel_connector::ConnectorCapability;
 use enumflags2::BitFlags;
-use itertools::Itertools;
 use std::collections::HashSet;
 
 /// Helper for validating a datamodel.
@@ -442,16 +441,8 @@ impl<'a> Validator<'a> {
         let mut visited = HashSet::new();
         // poor man's tail-recursion ;)
         let mut next_relations = vec![(parent_model, parent_field)];
-        // Keeping track of the paths we traverse. The final error message must
-        // show the correct cycle.
-        let mut paths = Vec::new();
 
         while let Some((model, field)) = next_relations.pop() {
-            let mut path = match paths.pop() {
-                Some(path) => path,
-                None => Vec::new(),
-            };
-
             // we expect to have both sides of the relation at this point...
             let related_field = datamodel.find_related_field_bang(field).1;
             let related_model = datamodel.find_model(&field.relation_info.to).unwrap();
@@ -532,33 +523,14 @@ impl<'a> Validator<'a> {
                 if model.name() == related_model.name() {
                     let msg = "A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes.";
                     errors.push_error(error_with_default_values(msg));
-
                     return;
                 }
 
                 if related_model.name() == parent_model.name() {
-                    dbg!(&path);
+                    let msg =
+                        "Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`.";
 
-                    if dbg!(path.last() != Some(&model.name())) {
-                        path = paths
-                            .into_iter()
-                            .find(|path| path.last() == Some(&model.name()))
-                            .unwrap();
-
-                        dbg!(&path);
-                    }
-
-                    dbg!(&path);
-
-                    path.push(parent_model.name());
-
-                    let msg = format!(
-                        "Reference causes a cycle or multiple cascade paths. The cycle is through the following models: {}. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`.",
-                        path.iter().map(|s| s.as_str()).join(" -> ")
-                    );
-
-                    errors.push_error(error_with_default_values(dbg!(&msg)));
-
+                    errors.push_error(error_with_default_values(msg));
                     return;
                 }
 
@@ -567,14 +539,6 @@ impl<'a> Validator<'a> {
                     if !visited.contains(&(related_model.name(), field.name())) {
                         next_relations.push((related_model, field));
                     }
-                }
-
-                // If we have multiple paths, we store the current one and a
-                // clone of it. If any of our paths does not end to a loop, we
-                // can backtrack.
-                if !next_relations.is_empty() {
-                    paths.push(path.clone());
-                    paths.push(path);
                 }
             }
         }
