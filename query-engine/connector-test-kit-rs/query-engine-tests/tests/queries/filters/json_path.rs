@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(schemas::json), capabilities(JsonFilteringJsonPath, JsonFilteringArrayPath))]
+#[test_suite(schema(schemas::json), only(Postgres, MySql))]
 mod json_path {
     use query_engine_tests::{assert_error, run_query, ConnectorTag};
 
@@ -40,7 +40,7 @@ mod json_path {
         Ok(())
     }
 
-    #[connector_test(capabilities(JsonFilteringJsonPath), exclude(MySql(5.6)))]
+    #[connector_test(capabilities(JsonFilteringJsonPath), only(MySql(5.7), MySql(8)))]
     async fn extract_json_path(runner: Runner) -> TestResult<()> {
         create_row(&runner, 1, r#"{ \"a\": { \"b\": \"c\" } }"#, false).await?;
         create_row(&runner, 2, r#"{ \"a\": { \"b\": [1, 2, 3] } }"#, false).await?;
@@ -249,7 +249,7 @@ mod json_path {
                 runner,
                 jsonq(&runner, r#"gt: "1" "#, None)
             ),
-            @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":2}}"},{"json":"{\"a\":{\"b\":1.4}}"}]}}"###
+            @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":2}}"},{"json":"{\"a\":{\"b\":1.4}}"},{"json":"{\"a\":{\"b\":100}}"}]}}"###
         );
 
         insta::assert_snapshot!(
@@ -257,7 +257,7 @@ mod json_path {
                 runner,
                 jsonq(&runner, r#"gte: "1" "#, None)
             ),
-            @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":1}}"},{"json":"{\"a\":{\"b\":2}}"},{"json":"{\"a\":{\"b\":1.4}}"}]}}"###
+            @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":1}}"},{"json":"{\"a\":{\"b\":2}}"},{"json":"{\"a\":{\"b\":1.4}}"},{"json":"{\"a\":{\"b\":100}}"}]}}"###
         );
 
         Ok(())
@@ -284,7 +284,7 @@ mod json_path {
         insta::assert_snapshot!(
             run_query!(
                 runner,
-                jsonq(&runner, r#"lte: "\"f\"" "#, None)
+                jsonq(&runner, r#"lte: "\"foo\"" "#, None)
             ),
             @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":\"foo\"}}"},{"json":"{\"a\":{\"b\":\"bar\"}}"}]}}"###
         );
@@ -302,7 +302,7 @@ mod json_path {
                 runner,
                 jsonq(&runner, r#"lte: "100" "#, None)
             ),
-            @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":100}}"},{"json":"{\"a\":{\"b\":1}}"},{"json":"{\"a\":{\"b\":2}}"},{"json":"{\"a\":{\"b\":1.4}}"}]}}"###
+            @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":1}}"},{"json":"{\"a\":{\"b\":2}}"},{"json":"{\"a\":{\"b\":1.4}}"},{"json":"{\"a\":{\"b\":100}}"}]}}"###
         );
 
         Ok(())
