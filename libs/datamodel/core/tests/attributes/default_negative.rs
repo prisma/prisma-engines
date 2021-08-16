@@ -432,3 +432,70 @@ fn named_default_constraints_cannot_have_duplicate_names() {
 
     expectation.assert_eq(&error)
 }
+
+#[test]
+fn named_default_constraints_cannot_clash_with_pk_names() {
+    let dml = indoc! { r#"
+        datasource test {
+            provider = "sqlserver"
+            url = "sqlserver://"
+        }
+
+        generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["microsoftSqlServer", "namedConstraints"]
+        }
+
+        model A {
+            id Int @id @default(autoincrement())
+            a  String @default("asdf", map: "reserved")
+        }
+
+        model B {
+            id Int @id(map: "reserved") @default(autoincrement())
+        }
+    "#};
+
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        TODO: Talk with Matthias on Monday!
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn named_default_constraints_cannot_clash_with_fk_names() {
+    let dml = indoc! { r#"
+        datasource test {
+            provider = "sqlserver"
+            url = "sqlserver://"
+        }
+
+        generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["microsoftSqlServer", "namedConstraints"]
+        }
+
+        model A {
+            id  Int @id @default(autoincrement())
+            a   String @default("asdf", map: "reserved")
+            b   B      @relation(fields: [bId], references: [id], map: "name")
+            bId Int
+        }
+
+        model B {
+            id Int @id(map: "reserved") @default(autoincrement())
+            as A[]
+        }
+    "#};
+
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        TODO: Talk with Matthias on Monday!
+    "#]];
+
+    expectation.assert_eq(&error)
+}
