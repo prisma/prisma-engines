@@ -35,7 +35,7 @@ impl IntoIterator for ResultRow {
 /// assert_eq!(row[0], row["id"]);
 /// assert_eq!(row[1], row["name"]);
 /// ```
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct ResultRowRef<'a> {
     pub(crate) columns: Arc<Vec<String>>,
     pub(crate) values: &'a Vec<Value<'static>>,

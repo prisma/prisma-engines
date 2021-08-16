@@ -55,6 +55,18 @@ impl<'a> Expression<'a> {
     }
 
     #[allow(dead_code)]
+    pub(crate) fn is_json_extract_fun(&self) -> bool {
+        match &self.kind {
+            ExpressionKind::Function(f) => match &f.typ_ {
+                #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+                FunctionType::JsonExtract(_) => true,
+                _ => false,
+            },
+            _ => false,
+        }
+    }
+
+    #[allow(dead_code)]
     pub(crate) fn is_xml_value(&self) -> bool {
         self.kind.is_xml_value()
     }

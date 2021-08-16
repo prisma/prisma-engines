@@ -2351,3 +2351,96 @@ async fn json_array_not_ends_into_fun(api: &mut dyn TestApi) -> crate::Result<()
 
     Ok(())
 }
+
+#[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+#[test_each_connector(tags("postgresql", "mysql"))]
+async fn json_gt_gte_lt_lte_fun(api: &mut dyn TestApi) -> crate::Result<()> {
+    let json_type = match api.system() {
+        "postgres" => "jsonb",
+        _ => "json",
+    };
+    let table = api
+        .create_table(&format!("{}, obj {}", api.autogen_id("id"), json_type))
+        .await?;
+
+    let insert = Insert::single_into(&table).value("obj", serde_json::json!({ "a": { "b": 1 } }));
+    let second_insert = Insert::single_into(&table).value("obj", serde_json::json!({ "a": { "b": 50 } }));
+    let third_insert = Insert::single_into(&table).value("obj", serde_json::json!({ "a": { "b": 100 } }));
+
+    api.conn().insert(insert.into()).await?;
+    api.conn().insert(second_insert.into()).await?;
+    api.conn().insert(third_insert.into()).await?;
+
+    let path = match api.system() {
+        #[cfg(feature = "postgresql")]
+        "postgres" => JsonPath::array(["a", "b"]),
+        #[cfg(feature = "mysql")]
+        "mysql" => JsonPath::string("$.a.b"),
+        _ => unreachable!(),
+    };
+    let path: Expression = json_extract(col!("obj"), path.clone(), false).into();
+
+    // Assert json_greater_than
+    let select = Select::from_table(&table).so_that(path.clone().greater_than(Value::json(serde_json::json!(1))));
+    let res = api.conn().select(select).await?;
+    assert_eq!(
+        Some(&serde_json::json!({ "a": { "b": 50 } })),
+        res.get(0).unwrap()["obj"].as_json()
+    );
+    assert_eq!(
+        Some(&serde_json::json!({ "a": { "b": 100 } })),
+        res.get(1).unwrap()["obj"].as_json()
+    );
+    assert_eq!(None, res.get(2));
+
+    // Assert json_greater_than_or_equals
+    let select =
+        Select::from_table(&table).so_that(path.clone().greater_than_or_equals(Value::json(serde_json::json!(1))));
+    let res = api.conn().select(select).await?;
+    assert_eq!(
+        Some(&serde_json::json!({ "a": { "b": 1 } })),
+        res.get(0).unwrap()["obj"].as_json()
+    );
+    assert_eq!(
+        Some(&serde_json::json!({ "a": { "b": 50 } })),
+        res.get(1).unwrap()["obj"].as_json()
+    );
+    assert_eq!(
+        Some(&serde_json::json!({ "a": { "b": 100 } })),
+        res.get(2).unwrap()["obj"].as_json()
+    );
+    assert_eq!(None, res.get(3));
+
+    // Assert json_less_than
+    let select = Select::from_table(&table).so_that(path.clone().less_than(Value::json(serde_json::json!(100))));
+    let res = api.conn().select(select).await?;
+    assert_eq!(
+        Some(&serde_json::json!({ "a": { "b": 1 } })),
+        res.get(0).unwrap()["obj"].as_json()
+    );
+    assert_eq!(
+        Some(&serde_json::json!({ "a": { "b": 50 } })),
+        res.get(1).unwrap()["obj"].as_json()
+    );
+    assert_eq!(None, res.get(2));
+
+    // Assert json_less_than_or_equals
+    let select =
+        Select::from_table(&table).so_that(path.clone().less_than_or_equals(Value::json(serde_json::json!(100))));
+    let res = api.conn().select(select).await?;
+    assert_eq!(
+        Some(&serde_json::json!({ "a": { "b": 1 } })),
+        res.get(0).unwrap()["obj"].as_json()
+    );
+    assert_eq!(
+        Some(&serde_json::json!({ "a": { "b": 50 } })),
+        res.get(1).unwrap()["obj"].as_json()
+    );
+    assert_eq!(
+        Some(&serde_json::json!({ "a": { "b": 100 } })),
+        res.get(2).unwrap()["obj"].as_json()
+    );
+    assert_eq!(None, res.get(3));
+
+    Ok(())
+}

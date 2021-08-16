@@ -598,31 +598,39 @@ pub trait Visitor<'a> {
         }
     }
 
+    fn visit_greater_than(&mut self, left: Expression<'a>, right: Expression<'a>) -> Result {
+        self.visit_expression(left)?;
+        self.write(" > ")?;
+        self.visit_expression(right)
+    }
+
+    fn visit_greater_than_or_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> Result {
+        self.visit_expression(left)?;
+        self.write(" >= ")?;
+        self.visit_expression(right)
+    }
+
+    fn visit_less_than(&mut self, left: Expression<'a>, right: Expression<'a>) -> Result {
+        self.visit_expression(left)?;
+        self.write(" < ")?;
+        self.visit_expression(right)
+    }
+
+    fn visit_less_than_or_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> Result {
+        self.visit_expression(left)?;
+        self.write(" <= ")?;
+        self.visit_expression(right)
+    }
+
     /// A comparison expression
     fn visit_compare(&mut self, compare: Compare<'a>) -> Result {
         match compare {
             Compare::Equals(left, right) => self.visit_equals(*left, *right),
             Compare::NotEquals(left, right) => self.visit_not_equals(*left, *right),
-            Compare::LessThan(left, right) => {
-                self.visit_expression(*left)?;
-                self.write(" < ")?;
-                self.visit_expression(*right)
-            }
-            Compare::LessThanOrEquals(left, right) => {
-                self.visit_expression(*left)?;
-                self.write(" <= ")?;
-                self.visit_expression(*right)
-            }
-            Compare::GreaterThan(left, right) => {
-                self.visit_expression(*left)?;
-                self.write(" > ")?;
-                self.visit_expression(*right)
-            }
-            Compare::GreaterThanOrEquals(left, right) => {
-                self.visit_expression(*left)?;
-                self.write(" >= ")?;
-                self.visit_expression(*right)
-            }
+            Compare::LessThan(left, right) => self.visit_less_than(*left, *right),
+            Compare::LessThanOrEquals(left, right) => self.visit_less_than_or_equals(*left, *right),
+            Compare::GreaterThan(left, right) => self.visit_greater_than(*left, *right),
+            Compare::GreaterThanOrEquals(left, right) => self.visit_greater_than_or_equals(*left, *right),
             Compare::In(left, right) => match (*left, *right) {
                 // To prevent `x IN ()` from happening.
                 (

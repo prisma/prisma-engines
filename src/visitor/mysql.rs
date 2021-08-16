@@ -408,6 +408,82 @@ impl<'a> Visitor<'a> for Mysql<'a> {
 
         self.write(")")
     }
+
+    fn visit_greater_than(&mut self, left: Expression<'a>, right: Expression<'a>) -> visitor::Result {
+        let compares_json = left.is_json_extract_fun() && right.is_json_value();
+
+        self.visit_expression(left)?;
+        self.write(" > ")?;
+
+        if compares_json {
+            self.write("CAST(")?;
+        }
+
+        self.visit_expression(right)?;
+
+        if compares_json {
+            self.write(" AS JSON)")?;
+        }
+
+        Ok(())
+    }
+
+    fn visit_greater_than_or_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> visitor::Result {
+        let compares_json = left.is_json_extract_fun() && right.is_json_value();
+
+        self.visit_expression(left)?;
+        self.write(" >= ")?;
+
+        if compares_json {
+            self.write("CAST(")?;
+        }
+
+        self.visit_expression(right)?;
+
+        if compares_json {
+            self.write(" AS JSON)")?;
+        }
+
+        Ok(())
+    }
+
+    fn visit_less_than(&mut self, left: Expression<'a>, right: Expression<'a>) -> visitor::Result {
+        let compares_json = left.is_json_extract_fun() && right.is_json_value();
+
+        self.visit_expression(left)?;
+        self.write(" < ")?;
+
+        if compares_json {
+            self.write("CAST(")?;
+        }
+
+        self.visit_expression(right)?;
+
+        if compares_json {
+            self.write(" AS JSON)")?;
+        }
+
+        Ok(())
+    }
+
+    fn visit_less_than_or_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> visitor::Result {
+        let compares_json = left.is_json_extract_fun() && right.is_json_value();
+
+        self.visit_expression(left)?;
+        self.write(" <= ")?;
+
+        if compares_json {
+            self.write("CAST(")?;
+        }
+
+        self.visit_expression(right)?;
+
+        if compares_json {
+            self.write(" AS JSON)")?;
+        }
+
+        Ok(())
+    }
 }
 
 #[cfg(test)]
