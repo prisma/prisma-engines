@@ -29,13 +29,24 @@ impl SqlRenderer for SqliteFlavour {
         let table_reference = self.quote(index.table().name());
         let columns = index.columns().map(|c| self.quote(c.name()));
 
-        format!(
+        let index_create = format!(
             "CREATE {index_type}INDEX {index_name} ON {table_reference}({columns})",
             index_type = index_type,
             index_name = index_name,
             table_reference = table_reference,
             columns = columns.join(", ")
-        )
+        );
+
+        if index.name().starts_with("sqlite_") {
+            format!(
+                "Pragma writable_schema=1;
+                 {};
+                 Pragma writable_schema=0",
+                index_create
+            )
+        } else {
+            index_create
+        }
     }
 
     fn render_add_foreign_key(&self, _foreign_key: &ForeignKeyWalker<'_>) -> String {
