@@ -4,6 +4,7 @@ use crate::{
     pair::Pair,
     sql_migration::{AlterEnum, AlterTable, RedefineTable, TableChange},
 };
+use indoc::formatdoc;
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
@@ -38,7 +39,7 @@ impl SqlRenderer for SqliteFlavour {
         );
 
         if index.name().starts_with("sqlite_") {
-            format!(
+            formatdoc!(
                 "Pragma writable_schema=1;
                  {};
                  Pragma writable_schema=0",
