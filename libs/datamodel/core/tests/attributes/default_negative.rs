@@ -427,7 +427,18 @@ fn named_default_constraints_cannot_have_duplicate_names() {
     let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        TODO: Talk with Matthias on Monday!
+        [1;91merror[0m: [1mError parsing attribute "@default": Given constraint name is already in use in the data model.[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
+        [1;94m   | [0m
+        [1;94m12 | [0m    id Int @id @default(autoincrement())
+        [1;94m13 | [0m    a  String @default("asdf", [1;91mmap: "reserved"[0m)
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@default": Given constraint name is already in use in the data model.[0m
+          [1;94m-->[0m  [4mschema.prisma:18[0m
+        [1;94m   | [0m
+        [1;94m17 | [0m    id Int @id @default(autoincrement())
+        [1;94m18 | [0m    b  String @default("asdf", [1;91mmap: "reserved"[0m)
+        [1;94m   | [0m
     "#]];
 
     expectation.assert_eq(&error)
@@ -459,7 +470,18 @@ fn named_default_constraints_cannot_clash_with_pk_names() {
     let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        TODO: Talk with Matthias on Monday!
+        [1;91merror[0m: [1mError parsing attribute "@default": Given constraint name is already in use in the data model.[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
+        [1;94m   | [0m
+        [1;94m12 | [0m    id Int @id @default(autoincrement())
+        [1;94m13 | [0m    a  String @default("asdf", [1;91mmap: "reserved"[0m)
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@default": Given constraint name is already in use in the data model.[0m
+          [1;94m-->[0m  [4mschema.prisma:17[0m
+        [1;94m   | [0m
+        [1;94m16 | [0mmodel B {
+        [1;94m17 | [0m    id Int @[1;91mid(map: "reserved")[0m @default(autoincrement())
+        [1;94m   | [0m
     "#]];
 
     expectation.assert_eq(&error)
@@ -480,13 +502,13 @@ fn named_default_constraints_cannot_clash_with_fk_names() {
 
         model A {
             id  Int @id @default(autoincrement())
-            a   String @default("asdf", map: "reserved")
-            b   B      @relation(fields: [bId], references: [id], map: "name")
+            a   String  @default("asdf", map: "reserved")
+            b   B       @relation(fields: [bId], references: [id], map: "reserved")
             bId Int
         }
 
         model B {
-            id Int @id(map: "reserved") @default(autoincrement())
+            id Int @id @default(autoincrement())
             as A[]
         }
     "#};
@@ -494,7 +516,18 @@ fn named_default_constraints_cannot_clash_with_fk_names() {
     let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        TODO: Talk with Matthias on Monday!
+        [1;91merror[0m: [1mError parsing attribute "@default": Given constraint name is already in use in the data model.[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
+        [1;94m   | [0m
+        [1;94m12 | [0m    id  Int @id @default(autoincrement())
+        [1;94m13 | [0m    a   String  @default("asdf", [1;91mmap: "reserved"[0m)
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": Given constraint name is already in use in the data model.[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
+        [1;94m   | [0m
+        [1;94m13 | [0m    a   String  @default("asdf", map: "reserved")
+        [1;94m14 | [0m    b   B       @relation(fields: [bId], references: [id], [1;91mmap: "reserved"[0m)
+        [1;94m   | [0m
     "#]];
 
     expectation.assert_eq(&error)

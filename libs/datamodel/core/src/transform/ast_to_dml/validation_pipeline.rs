@@ -80,7 +80,7 @@ impl<'a, 'b> ValidationPipeline<'a> {
 
         // Phase 6: Post Standardisation Validation
         self.validator
-            .post_standardisation_validate(ast_schema, &mut schema, &mut diagnostics);
+            .post_standardisation_validate(ast_schema, &schema, &mut diagnostics);
 
         diagnostics.to_result()?;
 

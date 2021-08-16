@@ -215,6 +215,32 @@ fn column_defaults_must_be_migrated(api: TestApi) {
     });
 }
 
+#[test_connector(tags(Mssql))]
+fn default_constraint_names_should_work(api: TestApi) {
+    let dm = r#"
+        generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["microsoftSqlServer", "namedConstraints"]
+        }
+
+        model A {
+            id Int @id @default(autoincrement())
+            data String @default("beeb buub", map: "meow")
+        }
+    "#;
+
+    api.schema_push_w_datasource(dm).send().assert_green_bang();
+
+    api.assert_schema().assert_table("A", |table| {
+        table.assert_column("data", |col| {
+            let mut expected = DefaultValue::value("beeb buub");
+            expected.set_constraint_name("meow");
+
+            col.assert_default(Some(expected))
+        })
+    });
+}
+
 #[test_connector]
 fn escaped_string_defaults_are_not_arbitrarily_migrated(api: TestApi) {
     use quaint::ast::Insert;

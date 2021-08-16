@@ -431,6 +431,7 @@ impl ScalarField {
             is_ignored: false,
         }
     }
+
     /// Creates a new field with the given name and type, marked as generated and optional.
     pub fn new_generated(name: &str, field_type: FieldType) -> ScalarField {
         let mut field = Self::new(name, FieldArity::Optional, field_type);
@@ -461,8 +462,12 @@ impl ScalarField {
     }
 
     pub fn is_auto_increment(&self) -> bool {
-        let kind = self.default_value.as_ref().map(|val| &val.kind);
+        let kind = self.default_value().map(|val| &val.kind);
         matches!(kind, Some(DefaultKind::Expression(ref expr)) if expr == &ValueGenerator::new_autoincrement())
+    }
+
+    pub fn default_value(&self) -> Option<&DefaultValue> {
+        self.default_value.as_ref()
     }
 }
 

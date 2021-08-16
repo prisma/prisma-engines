@@ -117,6 +117,11 @@ impl DefaultValue {
             _ => None,
         }
     }
+
+    /// The default value constraint name.
+    pub fn db_name(&self) -> Option<&str> {
+        self.db_name.as_ref().map(|s| s.as_str())
+    }
 }
 
 #[derive(Clone)]
