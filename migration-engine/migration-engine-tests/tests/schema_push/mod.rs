@@ -237,3 +237,23 @@ fn alter_constraint_name_push(api: TestApi) {
         table.assert_has_index_name_and_type("AnotherCustomIndex", false)
     });
 }
+
+#[test_connector(tags(Sqlite), preview_features("NamedConstraints"))]
+fn sqlite_reserved_name_space_can_be_used(api: TestApi) {
+    let plain_dm = r#"
+         model A {
+           name         String @unique(map: "sqlite_unique")
+           lastName     String
+           
+           @@unique([name, lastName], map: "sqlite_compound_unique")
+           @@index([lastName], map: "sqlite_index")
+         }
+     "#;
+
+    api.schema_push_w_datasource(plain_dm).send().assert_green_bang();
+    api.assert_schema().assert_table("A", |table| {
+        table.assert_has_index_name_and_type("sqlite_unique", true);
+        table.assert_has_index_name_and_type("sqlite_compound_unique", true);
+        table.assert_has_index_name_and_type("sqlite_index", false)
+    });
+}
