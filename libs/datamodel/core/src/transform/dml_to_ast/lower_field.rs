@@ -125,7 +125,7 @@ impl<'a> LowerDmlToAst<'a> {
                 let prisma_default = ConstraintNames::default_name(model.name(), field.name(), connector);
 
                 if let Some(name) = default_value.db_name() {
-                    if name != &prisma_default {
+                    if name != prisma_default {
                         args.push(ast::Argument::new("map", Self::lower_string(name)))
                     }
                 }

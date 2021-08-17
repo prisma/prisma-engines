@@ -61,7 +61,7 @@ impl<'a, 'b> ValidationPipeline<'a> {
         let mut schema = LiftAstToDml::new(&db).lift();
 
         // Phase 4: Validation
-        self.validator.validate(db.ast(), &mut schema, &mut diagnostics);
+        self.validator.validate(db.ast(), &schema, &mut diagnostics);
 
         // Early return so that the standardiser does not have to deal with invalid schemas
         diagnostics.to_result()?;
