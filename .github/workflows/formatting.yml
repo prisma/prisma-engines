@@ -16,6 +16,12 @@ jobs:
             toolchain: nightly
             components: clippy
             override: true
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-format-${{ matrix.rust }}-${{ hashFiles('**/Cargo.lock') }}
       - uses: actions-rs/clippy-check@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -31,6 +37,12 @@ jobs:
           toolchain: stable
           components: rustfmt
           override: true
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-format-${{ matrix.rust }}-${{ hashFiles('**/Cargo.lock') }}
       - uses: mbrobbel/rustfmt-check@master
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
