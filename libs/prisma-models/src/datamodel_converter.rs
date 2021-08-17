@@ -63,7 +63,7 @@ impl<'a> DatamodelConverter<'a> {
                 is_embedded: model.is_embedded,
                 fields: self.convert_fields(model),
                 manifestation: model.database_name().map(|s| s.to_owned()),
-                primary_key: self.convert_pk(&model),
+                primary_key: self.convert_pk(model),
                 indexes: self.convert_indexes(model),
                 supports_create_operation: model.supports_create_operation(),
                 dml_model: model.clone(),

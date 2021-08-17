@@ -232,7 +232,7 @@ impl<'a> LowerDmlToAst<'a> {
 
     pub fn lower_default_value(dv: dml::DefaultValue) -> ast::Expression {
         match dv.kind() {
-            dml::DefaultKind::Single(v) => LowerDmlToAst::<'a>::lower_prisma_value(&v),
+            dml::DefaultKind::Single(v) => LowerDmlToAst::<'a>::lower_prisma_value(v),
             dml::DefaultKind::Expression(e) => {
                 let exprs = e.args().iter().map(LowerDmlToAst::<'a>::lower_prisma_value).collect();
                 ast::Expression::Function(e.name().to_string(), exprs, ast::Span::empty())

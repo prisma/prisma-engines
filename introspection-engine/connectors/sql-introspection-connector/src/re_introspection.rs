@@ -54,7 +54,7 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, ctx: &
                     for index in &model.indices {
                         if let Some(old_index) = old_model.indices.iter().find(|old| old.db_name == index.db_name) {
                             if old_index.name.is_some() {
-                                let mf = ModelAndIndex::new(&model.name, &old_index.db_name.as_ref().unwrap());
+                                let mf = ModelAndIndex::new(&model.name, old_index.db_name.as_ref().unwrap());
                                 changed_index_names.push((mf, old_index.name.clone()))
                             }
                         }
