@@ -154,7 +154,7 @@ impl Serialize for PreviewFeature {
 
 /// Lowercases first character.
 /// Assumes 1-byte characters!
-pub fn decapitalize(s: &str) -> String {
+fn decapitalize(s: &str) -> String {
     let first_char = s.chars().next().unwrap();
     format!("{}{}", first_char.to_lowercase(), &s[1..])
 }
