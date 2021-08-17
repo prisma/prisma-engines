@@ -525,6 +525,87 @@ mod order_by_aggr {
         Ok(())
     }
 
+    // https://github.com/prisma/prisma/issues/8036
+    fn schema_regression_8036() -> String {
+        let schema = indoc! {
+            r#"model Post {
+              id          Int      @id @default(autoincrement())
+              title       String
+              #m2m(LikedPeople, Person[], Int)
+            }
+            
+            model Person {
+              id        Int    @id @default(autoincrement())
+              name      String
+              #m2m(likePosts, Post[], Int)
+            }
+            "#
+        };
+
+        schema.to_owned()
+    }
+
+    // Regression test for: // https://github.com/prisma/prisma/issues/8036
+    #[connector_test(schema(schema_regression_8036))]
+    async fn count_m2m_records_not_connected(runner: Runner) -> TestResult<()> {
+        run_query!(
+            runner,
+            r#"mutation { createOnePerson(data: { name: "Alice" }) { id } }"#
+        );
+        run_query!(
+            runner,
+            r#"mutation { createOnePost(data: { title: "First", LikedPeople: { connect: { id: 1 } } }) { id } }"#
+        );
+        run_query!(
+            runner,
+            r#"mutation { createOnePost(data: { title: "Second" }) { id } }"#
+        );
+        run_query!(runner, r#"mutation { createOnePost(data: { title: "Third" }) { id } }"#);
+        run_query!(
+            runner,
+            r#"mutation { createOnePost(data: { title: "Fourth" }) { id } }"#
+        );
+        run_query!(runner, r#"mutation { createOnePost(data: { title: "Fifth" }) { id } }"#);
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{
+            findManyPost(
+              cursor: { id: 1 },
+              skip: 1,
+              take: 4
+              orderBy: [{ LikedPeople: { _count: desc } }, { id: asc }]
+            ) {
+              id
+              title
+              _count {
+                LikedPeople
+              }
+            }
+          }
+          "#),
+          @r###"{"data":{"findManyPost":[{"id":2,"title":"Second","_count":{"LikedPeople":0}},{"id":3,"title":"Third","_count":{"LikedPeople":0}},{"id":4,"title":"Fourth","_count":{"LikedPeople":0}},{"id":5,"title":"Fifth","_count":{"LikedPeople":0}}]}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{
+            findManyPost(
+              cursor: { id: 1 }
+              take: 2
+              orderBy: [{ title: asc }, { LikedPeople: { _count: asc } }, { id: asc }]
+            ) {
+              id
+              _count {
+                LikedPeople
+              }
+            }
+          }
+          "#),
+          @r###"{"data":{"findManyPost":[{"id":1,"_count":{"LikedPeople":1}},{"id":4,"_count":{"LikedPeople":0}}]}}"###
+        );
+
+        Ok(())
+    }
+
     async fn create_test_data(runner: &Runner) -> TestResult<()> {
         create_row(runner, r#"{ id: 1, name: "Alice", categories: { create: [{ id: 1, name: "Startup" }] }, posts: { create: { id: 1, title: "alice_post_1", categories: { create: [{ id: 2, name: "News" }, { id: 3, name: "Society" }] }} } }"#).await?;
         create_row(runner, r#"{ id: 2, name: "Bob", categories: { create: [{ id: 4, name: "Computer Science" }, { id: 5, name: "Music" }] }, posts: { create: [{ id: 2, title: "bob_post_1", categories: { create: [{ id: 6, name: "Finance" }] } }, { id: 3, title: "bob_post_2", categories: { create: [{ id: 7, name: "History" }, { id: 8, name: "Gaming" }, { id: 9, name: "Hacking" }] } }] } }"#).await?;
