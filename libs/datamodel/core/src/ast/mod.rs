@@ -22,22 +22,22 @@ mod traits;
 
 pub mod reformat;
 
-pub use argument::Argument;
-pub use attribute::Attribute;
-pub use comment::Comment;
-pub use expression::Expression;
-pub use field::{Field, FieldArity, FieldType};
-pub use generator_config::GeneratorConfig;
-pub use identifier::Identifier;
-pub use r#enum::{Enum, EnumValue};
-pub use source_config::SourceConfig;
 pub use span::Span;
-pub use top::Top;
-pub use traits::{ArgumentContainer, WithAttributes, WithDocumentation, WithIdentifier, WithName, WithSpan};
 
+pub(crate) use argument::Argument;
+pub(crate) use attribute::Attribute;
+pub(crate) use comment::Comment;
+pub(crate) use expression::Expression;
+pub(crate) use field::{Field, FieldArity, FieldType};
+pub(crate) use generator_config::GeneratorConfig;
+pub(crate) use identifier::Identifier;
 pub(crate) use model::{FieldId, Model};
 pub(crate) use parser::parse_schema;
+pub(crate) use r#enum::{Enum, EnumValue};
 pub(crate) use renderer::Renderer;
+pub(crate) use source_config::SourceConfig;
+pub(crate) use top::Top;
+pub(crate) use traits::{WithAttributes, WithDocumentation, WithIdentifier, WithName, WithSpan};
 
 /// AST representation of a prisma schema.
 ///
@@ -48,7 +48,7 @@ pub(crate) use renderer::Renderer;
 /// annotated with its location in the text representation.
 /// Basically, the AST is an object oriented representation of the datamodel's text.
 /// Schema = Datamodel + Generators + Datasources
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug)]
 pub struct SchemaAst {
     /// All models, enums, datasources, generators or type aliases
     pub(super) tops: Vec<Top>,
