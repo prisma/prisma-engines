@@ -1,20 +1,19 @@
 use super::{Attribute, Comment, Identifier, Span};
-use crate::ast::{Argument, SourceConfig};
 use crate::diagnostics::Diagnostics;
 
-pub trait WithSpan {
+pub(crate) trait WithSpan {
     fn span(&self) -> &Span;
 }
 
-pub trait WithName {
+pub(crate) trait WithName {
     fn name(&self) -> &str;
 }
 
-pub trait WithIdentifier {
+pub(crate) trait WithIdentifier {
     fn identifier(&self) -> &Identifier;
 }
 
-pub trait WithAttributes {
+pub(crate) trait WithAttributes {
     fn attributes(&self) -> &Vec<Attribute>;
 
     fn validate_attributes(&self, diagnostics: &mut Diagnostics) {
@@ -24,7 +23,7 @@ pub trait WithAttributes {
     }
 }
 
-pub trait WithDocumentation {
+pub(crate) trait WithDocumentation {
     fn documentation(&self) -> &Option<Comment>;
 
     fn is_commented_out(&self) -> bool;
@@ -36,33 +35,5 @@ where
 {
     fn name(&self) -> &str {
         &self.identifier().name
-    }
-}
-
-pub enum ArgumentContainer<'a> {
-    SourceConfig(&'a mut SourceConfig),
-    Attribute(&'a mut Attribute),
-}
-
-impl ArgumentContainer<'_> {
-    pub fn name(&self) -> &str {
-        match self {
-            ArgumentContainer::SourceConfig(sc) => &sc.name.name,
-            ArgumentContainer::Attribute(d) => &d.name.name,
-        }
-    }
-
-    pub fn arguments(&mut self) -> &mut Vec<Argument> {
-        match self {
-            ArgumentContainer::SourceConfig(sc) => &mut sc.properties,
-            ArgumentContainer::Attribute(d) => &mut d.arguments,
-        }
-    }
-
-    pub fn set_arguments(&mut self, arguments: Vec<Argument>) {
-        match self {
-            ArgumentContainer::SourceConfig(sc) => sc.properties = arguments,
-            ArgumentContainer::Attribute(d) => d.arguments = arguments,
-        }
     }
 }

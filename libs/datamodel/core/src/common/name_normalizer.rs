@@ -1,4 +1,4 @@
-pub trait NameNormalizer {
+pub(crate) trait NameNormalizer {
     fn camel_case(&self) -> String;
 
     fn pascal_case(&self) -> String;
