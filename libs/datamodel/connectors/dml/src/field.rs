@@ -462,7 +462,7 @@ impl ScalarField {
     }
 
     pub fn is_auto_increment(&self) -> bool {
-        let kind = self.default_value().map(|val| &val.kind);
+        let kind = self.default_value().map(|val| val.kind());
         matches!(kind, Some(DefaultKind::Expression(ref expr)) if expr == &ValueGenerator::new_autoincrement())
     }
 

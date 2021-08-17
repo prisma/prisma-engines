@@ -512,8 +512,11 @@ fn visit_field_default<'ast>(
                         if ctx.db.ast[enum_id].values.iter().any(|v| v.name() == value) {
                             let mut default = dml::DefaultValue::new_single(PrismaValue::Enum(value.to_owned()));
 
-                            default.db_name =
-                                default_value_constraint_name(args, ast_model, model_data, ast_field, ctx);
+                            if let Some(name) =
+                                default_value_constraint_name(args, ast_model, model_data, ast_field, ctx)
+                            {
+                                default.set_db_name(name);
+                            }
 
                             field_data.default = Some(default);
                         } else {
@@ -527,8 +530,11 @@ fn visit_field_default<'ast>(
                             Ok(generator) if generator.is_dbgenerated() => {
                                 let mut default = dml::DefaultValue::new_expression(generator);
 
-                                default.db_name =
-                                    default_value_constraint_name(args, ast_model, model_data, ast_field, ctx);
+                                if let Some(name) =
+                                    default_value_constraint_name(args, ast_model, model_data, ast_field, ctx)
+                                {
+                                    default.set_db_name(name);
+                                }
 
                                 field_data.default = Some(default);
                             }
@@ -546,7 +552,10 @@ fn visit_field_default<'ast>(
                             ))
                         }
 
-                        default.db_name = default_value_constraint_name(args, ast_model, model_data, ast_field, ctx);
+                        if let Some(name) = default_value_constraint_name(args, ast_model, model_data, ast_field, ctx) {
+                            default.set_db_name(name);
+                        }
+
                         field_data.default = Some(default);
                     }
                     Err(err) => ctx.push_error(args.new_attribute_validation_error(&err.to_string())),

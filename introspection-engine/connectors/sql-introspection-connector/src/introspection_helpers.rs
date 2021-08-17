@@ -286,34 +286,31 @@ pub(crate) fn calculate_default(table: &Table, column: &Column, arity: &FieldAri
         (Some(DefaultKind::Sequence(_)), _) => Some(DMLDef::new_expression(VG::new_autoincrement())),
         (Some(DefaultKind::Now), ColumnTypeFamily::DateTime) => {
             let mut default = DMLDef::new_expression(VG::new_now());
+            let db_name = column.default.as_ref().and_then(|df| df.constraint_name());
 
-            default.db_name = column
-                .default
-                .as_ref()
-                .and_then(|df| df.constraint_name())
-                .map(ToString::to_string);
+            if let Some(name) = db_name {
+                default.set_db_name(name);
+            }
 
             Some(default)
         }
         (Some(DefaultKind::DbGenerated(default_string)), _) => {
             let mut default = DMLDef::new_expression(VG::new_dbgenerated(default_string.clone()));
+            let db_name = column.default.as_ref().and_then(|df| df.constraint_name());
 
-            default.db_name = column
-                .default
-                .as_ref()
-                .and_then(|df| df.constraint_name())
-                .map(ToString::to_string);
+            if let Some(name) = db_name {
+                default.set_db_name(name);
+            }
 
             Some(default)
         }
         (Some(DefaultKind::Value(val)), _) => {
             let mut default = DMLDef::new_single(val.clone());
+            let db_name = column.default.as_ref().and_then(|df| df.constraint_name());
 
-            default.db_name = column
-                .default
-                .as_ref()
-                .and_then(|df| df.constraint_name())
-                .map(ToString::to_string);
+            if let Some(name) = db_name {
+                default.set_db_name(name);
+            }
 
             Some(default)
         }

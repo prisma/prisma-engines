@@ -77,7 +77,7 @@ impl Connector for MongoDbDatamodelConnector {
     fn validate_field(&self, field: &dml::field::Field) -> Result<()> {
         // If the field is _not_ a native-type-annotated field and it has a `dbgenerated` default, we error.
         if !matches!(field.field_type(), FieldType::Scalar(_, _, Some(_)))
-            && matches!(field.default_value().as_ref().map(|v| &v.kind), Some(DefaultKind::Expression(expr)) if expr.is_dbgenerated())
+            && matches!(field.default_value().as_ref().map(|v| v.kind()), Some(DefaultKind::Expression(expr)) if expr.is_dbgenerated())
         {
             return Err(ConnectorError::from_kind(ErrorKind::FieldValidationError {
                 field: field.name().to_owned(),
@@ -120,7 +120,7 @@ impl Connector for MongoDbDatamodelConnector {
             }
 
             if !matches!(field.field_type, FieldType::Scalar(_, _, Some(_)))
-                && matches!(field.default_value.as_ref().map(|v| &v.kind), Some(DefaultKind::Expression(expr)) if expr.is_dbgenerated())
+                && matches!(field.default_value.as_ref().map(|v| v.kind()), Some(DefaultKind::Expression(expr)) if expr.is_dbgenerated())
             {
                 return Err(ConnectorError::from_kind(ErrorKind::FieldValidationError {
                     field: field.name.to_owned(),

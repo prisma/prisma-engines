@@ -5,8 +5,8 @@ use std::fmt;
 /// Represents a default specified on a field.
 #[derive(Clone, PartialEq)]
 pub struct DefaultValue {
-    pub kind: DefaultKind,
-    pub db_name: Option<String>,
+    kind: DefaultKind,
+    db_name: Option<String>,
 }
 
 /// Represents a default specified on a field.
@@ -58,6 +58,18 @@ impl DefaultValue {
             DefaultKind::Single(ref v) => Some(v),
             _ => None,
         }
+    }
+
+    pub fn kind(&self) -> &DefaultKind {
+        &self.kind
+    }
+
+    pub fn into_kind(self) -> DefaultKind {
+        self.kind
+    }
+
+    pub fn mut_kind(&mut self) -> &mut DefaultKind {
+        &mut self.kind
     }
 
     /// Returns either a copy of the contained single value or produces a new
@@ -118,17 +130,21 @@ impl DefaultValue {
         }
     }
 
+    pub fn set_db_name(&mut self, name: impl ToString) {
+        self.db_name = Some(name.to_string());
+    }
+
     /// The default value constraint name.
     pub fn db_name(&self) -> Option<&str> {
-        self.db_name.as_ref().map(|s| s.as_str())
+        self.db_name.as_deref()
     }
 }
 
 #[derive(Clone)]
 pub struct ValueGenerator {
-    pub name: String,
-    pub args: Vec<PrismaValue>,
-    pub generator: ValueGeneratorFn,
+    name: String,
+    args: Vec<PrismaValue>,
+    generator: ValueGeneratorFn,
 }
 
 impl ValueGenerator {
@@ -158,12 +174,16 @@ impl ValueGenerator {
         ValueGenerator::new("uuid".to_owned(), vec![]).unwrap()
     }
 
-    fn name(&self) -> &str {
+    pub fn name(&self) -> &str {
         &self.name
     }
 
-    fn args(&self) -> &[PrismaValue] {
+    pub fn args(&self) -> &[PrismaValue] {
         &self.args
+    }
+
+    pub fn generator(&self) -> ValueGeneratorFn {
+        self.generator
     }
 
     pub fn as_dbgenerated(&self) -> Option<&str> {

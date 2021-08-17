@@ -142,7 +142,7 @@ fn named_default_constraints_should_work_on_sql_server() {
     "#};
 
     let mut expected_default = DefaultValue::new_single(PrismaValue::String(String::from("beeb buub")));
-    expected_default.db_name = Some("meow".into());
+    expected_default.set_db_name("meow");
 
     parse(dml)
         .assert_has_model("A")

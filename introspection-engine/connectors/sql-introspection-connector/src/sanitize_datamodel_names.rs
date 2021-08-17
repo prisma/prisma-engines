@@ -99,7 +99,7 @@ fn sanitize_models(datamodel: &mut Datamodel, ctx: &IntrospectionContext) -> Has
                         // If the field also has an associated default enum value, we need to sanitize that enum value.
                         // The actual enum value renames _in the enum itself_ are done at a later stage.
                         if let Some(DefaultKind::Single(PrismaValue::Enum(value))) =
-                            sf.default_value.as_mut().map(|dv| &mut dv.kind)
+                            sf.default_value.as_mut().map(|dv| dv.mut_kind())
                         {
                             let new_default = if value.is_empty() {
                                 DefaultValue::new_single(PrismaValue::Enum(EMPTY_ENUM_PLACEHOLDER.to_string()))

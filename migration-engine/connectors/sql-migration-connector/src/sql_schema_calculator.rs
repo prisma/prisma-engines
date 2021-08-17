@@ -261,7 +261,7 @@ fn column_for_scalar_field(field: &ScalarFieldWalker<'_>, flavour: &dyn SqlFlavo
                     .default_value()
                     .and_then(|default| {
                         let as_enum = default.as_single().and_then(|v| v.as_enum_value());
-                        as_enum.map(|enm| (enm, default.db_name.as_ref()))
+                        as_enum.map(|enm| (enm, default.db_name()))
                     })
                     .map(|(value, db_name)| {
                         let corresponding_value = r#enum.value(value).expect("Could not find enum value");
@@ -283,7 +283,7 @@ fn column_for_scalar_field(field: &ScalarFieldWalker<'_>, flavour: &dyn SqlFlavo
         TypeWalker::NativeType(scalar_type, instance) => (scalar_type, instance.serialized_native_type.clone()),
         TypeWalker::Unsupported(description) => {
             let default = field.default_value().and_then(|v| db_generated(v)).map(|mut default| {
-                if let Some(name) = field.default_value().and_then(|v| v.db_name.as_ref()) {
+                if let Some(name) = field.default_value().and_then(|v| v.db_name()) {
                     default.set_constraint_name(name);
                 }
 
@@ -322,7 +322,7 @@ fn column_for_scalar_field(field: &ScalarFieldWalker<'_>, flavour: &dyn SqlFlavo
     };
 
     let default = field.default_value().and_then(|v| {
-        let mut df = match &v.kind {
+        let mut df = match v.kind() {
             datamodel::DefaultKind::Single(v) => Some(sql::DefaultValue::value(v.clone())),
             default if default.is_dbgenerated() => db_generated(v),
             default if default.is_now() => Some(sql::DefaultValue::now()),
@@ -330,7 +330,7 @@ fn column_for_scalar_field(field: &ScalarFieldWalker<'_>, flavour: &dyn SqlFlavo
             datamodel::DefaultKind::Expression(_) => None,
         };
 
-        match (df.as_mut(), v.db_name.as_ref()) {
+        match (df.as_mut(), v.db_name()) {
             (Some(df), Some(db_name)) => df.set_constraint_name(db_name),
             _ => (),
         }
