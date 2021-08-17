@@ -19,11 +19,11 @@ mod search_filter {
     }
 
     #[connector_test]
-    async fn search_single_field(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn search_single_field(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyTestModel(where: { fieldA: { search: "Chicken" } }) { fieldA } }"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { fieldA: { search: "Chicken" } }) { fieldA } }"#),
           @r###"{"data":{"findManyTestModel":[{"fieldA":"Chicken Masala"},{"fieldA":"Chicken Curry"}]}}"###
         );
 
@@ -31,11 +31,11 @@ mod search_filter {
     }
 
     #[connector_test]
-    async fn search_many_fields(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn search_many_fields(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyTestModel(where: {
+          run_query!(&runner, r#"query { findManyTestModel(where: {
                   fieldA: { search: "Chicken" }
                   fieldB: { search: "Chicken" }
               }) { fieldA, fieldB }}
@@ -47,11 +47,11 @@ mod search_filter {
     }
 
     #[connector_test]
-    async fn search_nullable_field(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn search_nullable_field(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyTestModel(where: {
+          run_query!(&runner, r#"query { findManyTestModel(where: {
                     fieldA: { search: "Chicken" }
                     fieldC: { search: "Chicken" }
                 }) { fieldA, fieldC }}
@@ -63,11 +63,11 @@ mod search_filter {
     }
 
     #[connector_test]
-    async fn search_with_other_filters(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn search_with_other_filters(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyTestModel(where: {
+          run_query!(&runner, r#"query { findManyTestModel(where: {
                     fieldA: { search: "Chicken", startsWith: "Chicken" },
                     fieldB: { search: "Chicken" },
                     id: { equals: 1 }
@@ -80,11 +80,11 @@ mod search_filter {
     }
 
     #[connector_test]
-    async fn ensure_filter_tree_shake_works(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn ensure_filter_tree_shake_works(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query { findManyTestModel(where: {
+          run_query!(&runner, r#"query { findManyTestModel(where: {
                     AND: [
                         { fieldA: { search: "Chicken", startsWith: "Chicken" } },
                         { OR: [{ fieldB: { search: "Chicken" } }, { id: { equals: 3 } }] }
