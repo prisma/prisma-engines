@@ -55,7 +55,12 @@ impl MssqlFlavour {
             column
                 .default()
                 .map(|default| {
-                    let constraint_name = format!("DF__{}__{}", column.table().name(), column.name());
+                    // named constraints
+                    let constraint_name = default
+                        .constraint_name()
+                        .map(Cow::from)
+                        // .. or legacy
+                        .unwrap_or_else(|| Cow::from(format!("DF__{}__{}", column.table().name(), column.name())));
 
                     Cow::Owned(format!(
                         " CONSTRAINT {} DEFAULT {}",

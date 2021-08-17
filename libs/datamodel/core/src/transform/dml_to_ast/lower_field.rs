@@ -7,6 +7,8 @@ use crate::{
     ast::{self, Attribute, Span},
     dml, Datasource, Field, Ignorable,
 };
+use ::dml::traits::WithName;
+use datamodel_connector::{Connector, EmptyDatamodelConnector};
 use prisma_value::PrismaValue;
 
 impl<'a> LowerDmlToAst<'a> {
@@ -109,13 +111,27 @@ impl<'a> LowerDmlToAst<'a> {
 
         // @default
         if let Some(default_value) = field.default_value() {
-            attributes.push(ast::Attribute::new(
-                "default",
-                vec![ast::Argument::new(
-                    "",
-                    LowerDmlToAst::<'a>::lower_default_value(default_value.clone()),
-                )],
-            ));
+            let mut args = vec![ast::Argument::new(
+                "",
+                LowerDmlToAst::<'a>::lower_default_value(default_value.clone()),
+            )];
+
+            if self.preview_features.contains(PreviewFeature::NamedConstraints) {
+                let connector = self
+                    .datasource
+                    .map(|source| source.active_connector.as_ref())
+                    .unwrap_or(&EmptyDatamodelConnector as &dyn Connector);
+
+                let prisma_default = ConstraintNames::default_name(model.name(), field.name(), connector);
+
+                if let Some(name) = default_value.db_name() {
+                    if name != prisma_default {
+                        args.push(ast::Argument::new("map", Self::lower_string(name)))
+                    }
+                }
+            }
+
+            attributes.push(ast::Attribute::new("default", args));
         }
 
         // @updatedAt
@@ -215,28 +231,32 @@ impl<'a> LowerDmlToAst<'a> {
     }
 
     pub fn lower_default_value(dv: dml::DefaultValue) -> ast::Expression {
-        match dv {
-            dml::DefaultValue::Single(v) => LowerDmlToAst::<'a>::lower_prisma_value(&v),
-            dml::DefaultValue::Expression(e) => {
-                let exprs = e.args.iter().map(LowerDmlToAst::<'a>::lower_prisma_value).collect();
-                ast::Expression::Function(e.name, exprs, ast::Span::empty())
+        match dv.kind() {
+            dml::DefaultKind::Single(v) => LowerDmlToAst::<'a>::lower_prisma_value(&v),
+            dml::DefaultKind::Expression(e) => {
+                let exprs = e.args().iter().map(LowerDmlToAst::<'a>::lower_prisma_value).collect();
+                ast::Expression::Function(e.name().to_string(), exprs, ast::Span::empty())
             }
         }
+    }
+
+    pub fn lower_string(s: impl ToString) -> ast::Expression {
+        ast::Expression::StringValue(s.to_string(), ast::Span::empty())
     }
 
     pub fn lower_prisma_value(pv: &PrismaValue) -> ast::Expression {
         match pv {
             PrismaValue::Boolean(true) => ast::Expression::BooleanValue(String::from("true"), ast::Span::empty()),
             PrismaValue::Boolean(false) => ast::Expression::BooleanValue(String::from("false"), ast::Span::empty()),
-            PrismaValue::String(value) => ast::Expression::StringValue(value.clone(), ast::Span::empty()),
+            PrismaValue::String(value) => Self::lower_string(value),
             PrismaValue::Enum(value) => ast::Expression::ConstantValue(value.clone(), ast::Span::empty()),
-            PrismaValue::DateTime(value) => ast::Expression::StringValue(value.to_rfc3339(), ast::Span::empty()),
+            PrismaValue::DateTime(value) => Self::lower_string(value),
             PrismaValue::Float(value) => ast::Expression::NumericValue(value.to_string(), ast::Span::empty()),
             PrismaValue::Int(value) => ast::Expression::NumericValue(value.to_string(), ast::Span::empty()),
             PrismaValue::BigInt(value) => ast::Expression::NumericValue(value.to_string(), ast::Span::empty()),
             PrismaValue::Null => ast::Expression::ConstantValue("null".to_string(), ast::Span::empty()),
-            PrismaValue::Uuid(val) => ast::Expression::StringValue(val.to_string(), ast::Span::empty()),
-            PrismaValue::Json(val) => ast::Expression::StringValue(val.to_string(), ast::Span::empty()),
+            PrismaValue::Uuid(val) => Self::lower_string(val),
+            PrismaValue::Json(val) => Self::lower_string(val),
             PrismaValue::List(vec) => ast::Expression::Array(
                 vec.iter()
                     .map(|pv| LowerDmlToAst::<'a>::lower_prisma_value(pv))

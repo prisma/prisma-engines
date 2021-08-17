@@ -308,11 +308,13 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, ctx: &
             for field in fields_to_be_changed {
                 let field = new_data_model.find_scalar_field_mut(&field.0, &field.1);
                 if field.default_value
-                    == Some(DefaultValue::Single(PrismaValue::Enum(
+                    == Some(DefaultValue::new_single(PrismaValue::Enum(
                         changed_enum_value.0.value.clone(),
                     )))
                 {
-                    field.default_value = Some(DefaultValue::Single(PrismaValue::Enum(changed_enum_value.1.clone())));
+                    field.default_value = Some(DefaultValue::new_single(PrismaValue::Enum(
+                        changed_enum_value.1.clone(),
+                    )));
                 }
             }
         }
@@ -370,11 +372,13 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, ctx: &
                 if let Some(old_model) = old_data_model.find_model(&model.name) {
                     if let Some(old_field) = old_model.find_scalar_field(&field.name) {
                         if field.default_value.is_none() && field.field_type.is_string() {
-                            if old_field.default_value == Some(DefaultValue::Expression(ValueGenerator::new_cuid())) {
+                            if old_field.default_value == Some(DefaultValue::new_expression(ValueGenerator::new_cuid()))
+                            {
                                 re_introspected_prisma_level_cuids.push(ModelAndField::new(&model.name, &field.name));
                             }
 
-                            if old_field.default_value == Some(DefaultValue::Expression(ValueGenerator::new_uuid())) {
+                            if old_field.default_value == Some(DefaultValue::new_expression(ValueGenerator::new_uuid()))
+                            {
                                 re_introspected_prisma_level_uuids.push(ModelAndField::new(&model.name, &field.name));
                             }
                         }
@@ -390,13 +394,13 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, ctx: &
         for cuid in &re_introspected_prisma_level_cuids {
             new_data_model
                 .find_scalar_field_mut(&cuid.model, &cuid.field)
-                .default_value = Some(DefaultValue::Expression(ValueGenerator::new_cuid()));
+                .default_value = Some(DefaultValue::new_expression(ValueGenerator::new_cuid()));
         }
 
         for uuid in &re_introspected_prisma_level_uuids {
             new_data_model
                 .find_scalar_field_mut(&uuid.model, &uuid.field)
-                .default_value = Some(DefaultValue::Expression(ValueGenerator::new_uuid()));
+                .default_value = Some(DefaultValue::new_expression(ValueGenerator::new_uuid()));
         }
 
         for updated_at in &re_introspected_updated_at {

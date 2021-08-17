@@ -3,7 +3,7 @@ use crate::relation_info::RelationInfo;
 use crate::scalars::ScalarType;
 use crate::traits::{Ignorable, WithDatabaseName, WithName};
 use crate::{
-    default_value::{DefaultValue, ValueGenerator},
+    default_value::{DefaultKind, DefaultValue, ValueGenerator},
     relation_info::ReferentialAction,
 };
 use std::hash::Hash;
@@ -431,6 +431,7 @@ impl ScalarField {
             is_ignored: false,
         }
     }
+
     /// Creates a new field with the given name and type, marked as generated and optional.
     pub fn new_generated(name: &str, field_type: FieldType) -> ScalarField {
         let mut field = Self::new(name, FieldArity::Optional, field_type);
@@ -461,7 +462,12 @@ impl ScalarField {
     }
 
     pub fn is_auto_increment(&self) -> bool {
-        matches!(&self.default_value, Some(DefaultValue::Expression(expr)) if expr == &ValueGenerator::new_autoincrement())
+        let kind = self.default_value().map(|val| val.kind());
+        matches!(kind, Some(DefaultKind::Expression(ref expr)) if expr == &ValueGenerator::new_autoincrement())
+    }
+
+    pub fn default_value(&self) -> Option<&DefaultValue> {
+        self.default_value.as_ref()
     }
 }
 

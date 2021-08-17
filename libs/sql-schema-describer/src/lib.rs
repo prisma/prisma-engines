@@ -555,6 +555,10 @@ impl DefaultValue {
         &self.kind
     }
 
+    pub fn into_kind(self) -> DefaultKind {
+        self.kind
+    }
+
     pub fn set_constraint_name(&mut self, name: impl ToString) {
         self.constraint_name = Some(name.to_string())
     }

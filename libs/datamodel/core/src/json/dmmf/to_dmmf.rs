@@ -129,9 +129,9 @@ fn get_field_kind(field: &dml::Field) -> String {
 }
 
 fn default_value_to_serde(dv_opt: &Option<dml::DefaultValue>) -> Option<serde_json::Value> {
-    dv_opt.as_ref().map(|dv| match dv {
-        dml::DefaultValue::Single(value) => prisma_value_to_serde(&value.clone()),
-        dml::DefaultValue::Expression(vg) => function_to_serde(&vg.name, &vg.args),
+    dv_opt.as_ref().map(|dv| match dv.kind() {
+        dml::DefaultKind::Single(value) => prisma_value_to_serde(&value.clone()),
+        dml::DefaultKind::Expression(vg) => function_to_serde(vg.name(), vg.args()),
     })
 }
 

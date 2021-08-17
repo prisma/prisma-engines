@@ -82,7 +82,6 @@ impl<'a> DifferDatabase<'a> {
                     if let Some(column_ids) = column_ids.transpose() {
                         let column_walkers = tables.columns(&column_ids);
                         let changes = column::all_changes(column_walkers, flavour);
-
                         db.column_changes.insert((table_pair, column_ids), changes);
                     }
                 }

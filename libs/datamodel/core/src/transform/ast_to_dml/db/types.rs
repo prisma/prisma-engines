@@ -84,7 +84,7 @@ pub(crate) struct ScalarField<'ast> {
 
 impl ScalarField<'_> {
     pub(crate) fn is_autoincrement(&self) -> bool {
-        matches!(&self.default, Some(crate::dml::DefaultValue::Expression(expr)) if expr.is_autoincrement())
+        matches!(&self.default.as_ref().map(|d| d.kind()), Some(crate::dml::DefaultKind::Expression(expr)) if expr.is_autoincrement())
     }
 }
 

@@ -1,5 +1,5 @@
 use migration_engine_tests::sync_test_api::*;
-use sql_schema_describer::{ColumnTypeFamily, DefaultValue};
+use sql_schema_describer::{ColumnTypeFamily, DefaultKind};
 
 #[test_connector]
 fn adding_an_id_field_of_type_int_with_autoincrement_works(api: TestApi) {
@@ -14,7 +14,7 @@ fn adding_an_id_field_of_type_int_with_autoincrement_works(api: TestApi) {
     api.assert_schema().assert_table("Test", |t| {
         t.assert_column("myId", |c| {
             if api.is_postgres() {
-                c.assert_default(Some(DefaultValue::sequence("Test_myId_seq")))
+                c.assert_default_kind(Some(DefaultKind::Sequence("Test_myId_seq".into())))
             } else {
                 c.assert_auto_increments()
             }
@@ -445,7 +445,7 @@ fn created_at_does_not_get_arbitrarily_migrated(api: TestApi) {
 
     api.schema_push_w_datasource(dm1).send().assert_green_bang();
     api.assert_schema().assert_table("Fruit", |t| {
-        t.assert_column("createdAt", |c| c.assert_default(Some(DefaultValue::now())))
+        t.assert_column("createdAt", |c| c.assert_default_kind(Some(DefaultKind::Now)))
     });
 
     let insert = Insert::single_into(api.render_table_name("Fruit")).value("name", "banana");

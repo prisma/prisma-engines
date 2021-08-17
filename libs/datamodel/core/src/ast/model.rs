@@ -52,6 +52,20 @@ impl Model {
     pub(crate) fn find_field_bang(&self, name: &str) -> &Field {
         self.find_field(name).unwrap()
     }
+
+    pub(crate) fn id_attribute(&self) -> &Attribute {
+        let from_model = self.attributes().iter().find(|attr| attr.is_id());
+
+        let mut from_field = self
+            .iter_fields()
+            .flat_map(|(_, field)| field.attributes().iter().find(|attr| attr.is_id()));
+
+        from_model.or_else(|| from_field.next()).unwrap()
+    }
+
+    pub(crate) fn name(&self) -> &str {
+        &self.name.name
+    }
 }
 
 impl WithIdentifier for Model {
