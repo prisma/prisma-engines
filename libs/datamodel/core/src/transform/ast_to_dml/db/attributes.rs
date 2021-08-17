@@ -359,8 +359,9 @@ fn primary_key_constraint_name<'ast>(
 fn default_value_constraint_name<'ast>(
     args: &mut Arguments<'ast>,
     ast_model: &'ast Model,
-    model_data: &mut ModelData<'ast>,
+    model_data: &ModelData<'ast>,
     ast_field: &'ast ast::Field,
+    field_data: &ScalarField<'ast>,
     ctx: &mut Context<'ast>,
 ) -> Option<String> {
     if !ctx.db.preview_features.contains(NamedConstraints) {
@@ -372,11 +373,10 @@ fn default_value_constraint_name<'ast>(
         Some(Ok(name)) => Some(name.into()),
         Some(Err(err)) => push_error_cow(err, ctx),
         None if ctx.db.active_connector().supports_named_default_values() => {
-            let generated_name = ConstraintNames::default_name(
-                model_data.mapped_name.unwrap_or(&ast_model.name.name),
-                ast_field.name(),
-                ctx.db.active_connector(),
-            );
+            let model_name = model_data.mapped_name.unwrap_or(ast_model.name());
+            let field_name = field_data.mapped_name.unwrap_or(ast_field.name());
+
+            let generated_name = ConstraintNames::default_name(model_name, field_name, ctx.db.active_connector());
 
             Some(generated_name.into())
         }
@@ -513,7 +513,7 @@ fn visit_field_default<'ast>(
                             let mut default = dml::DefaultValue::new_single(PrismaValue::Enum(value.to_owned()));
 
                             if let Some(name) =
-                                default_value_constraint_name(args, ast_model, model_data, ast_field, ctx)
+                                default_value_constraint_name(args, ast_model, model_data, ast_field, field_data, ctx)
                             {
                                 default.set_db_name(name);
                             }
@@ -530,9 +530,9 @@ fn visit_field_default<'ast>(
                             Ok(generator) if generator.is_dbgenerated() => {
                                 let mut default = dml::DefaultValue::new_expression(generator);
 
-                                if let Some(name) =
-                                    default_value_constraint_name(args, ast_model, model_data, ast_field, ctx)
-                                {
+                                if let Some(name) = default_value_constraint_name(
+                                    args, ast_model, model_data, ast_field, field_data, ctx,
+                                ) {
                                     default.set_db_name(name);
                                 }
 
@@ -552,7 +552,9 @@ fn visit_field_default<'ast>(
                             ))
                         }
 
-                        if let Some(name) = default_value_constraint_name(args, ast_model, model_data, ast_field, ctx) {
+                        if let Some(name) =
+                            default_value_constraint_name(args, ast_model, model_data, ast_field, field_data, ctx)
+                        {
                             default.set_db_name(name);
                         }
 

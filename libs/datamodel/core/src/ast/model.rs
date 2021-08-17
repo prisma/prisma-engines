@@ -62,6 +62,10 @@ impl Model {
 
         from_model.or_else(|| from_field.next()).unwrap()
     }
+
+    pub(crate) fn name(&self) -> &str {
+        &self.name.name
+    }
 }
 
 impl WithIdentifier for Model {
