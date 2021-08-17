@@ -373,8 +373,8 @@ fn default_value_constraint_name<'ast>(
         Some(Ok(name)) => Some(name.into()),
         Some(Err(err)) => push_error_cow(err, ctx),
         None if ctx.db.active_connector().supports_named_default_values() => {
-            let model_name = model_data.mapped_name.unwrap_or(ast_model.name());
-            let field_name = field_data.mapped_name.unwrap_or(ast_field.name());
+            let model_name = model_data.mapped_name.unwrap_or_else(|| ast_model.name());
+            let field_name = field_data.mapped_name.unwrap_or_else(|| ast_field.name());
 
             let generated_name = ConstraintNames::default_name(model_name, field_name, ctx.db.active_connector());
 
