@@ -1,6 +1,8 @@
 use serde::Serialize;
 use user_facing_error_macros::*;
 
+use crate::UserFacingError;
+
 /// [spec](https://github.com/prisma/specs/tree/master/errors#p3000-database-creation-failed)
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(code = "P3000", message = "Failed to create database: {database_error}")]
@@ -224,16 +226,34 @@ pub struct MigrationToMarkAppliedNotFound {
     pub migration_name: String,
 }
 
-#[derive(Debug, Serialize, UserFacingError)]
-#[user_facing(
-    code = "P3018",
-    message = "A migration failed to apply. New migrations cannot be applied before the error is recovered from. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve\n\nMigration name: {migration_name}\n\nDatabase error code: {database_error_code}\n\nDatabase error:\n{database_error}
-"
-)]
+#[derive(Debug, Serialize)]
 pub struct ApplyMigrationError {
     pub migration_name: String,
     pub database_error_code: String,
     pub database_error: String,
+    pub in_transaction: bool,
+}
+
+impl UserFacingError for ApplyMigrationError {
+    const ERROR_CODE: &'static str = "P3018";
+
+    fn message(&self) -> String {
+        if self.in_transaction {
+            format!(
+                "A migration failed to apply and the migration transaction was rolled back. Mark the migration as rolled back, possibly edit the migration and then retry. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve\n\nMigration name: {migration_name}\n\nDatabase error code: {database_error_code}\n\nDatabase error:\n{database_error}\n",
+                migration_name = self.migration_name,
+                database_error_code = self.database_error_code,
+                database_error = self.database_error,
+            )
+        } else {
+            format!(
+                "A migration failed to apply. New migrations cannot be applied before the error is recovered from. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve\n\nMigration name: {migration_name}\n\nDatabase error code: {database_error_code}\n\nDatabase error:\n{database_error}\n",
+                migration_name = self.migration_name,
+                database_error_code = self.database_error_code,
+                database_error = self.database_error,
+            )
+        }
+    }
 }
 
 #[derive(Debug, Serialize, UserFacingError)]

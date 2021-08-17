@@ -110,7 +110,7 @@ fn mssql_apply_migrations_error_output(api: TestApi) {
         .replace(&migration_name, "<migration-name>");
 
     let expectation = expect![[r#"
-        A migration failed to apply. New migrations cannot be applied before the error is recovered from. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve
+        A migration failed to apply and the migration transaction was rolled back. Mark the migration as rolled back, possibly edit the migration and then retry. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve
 
         Migration name: <migration-name>
 

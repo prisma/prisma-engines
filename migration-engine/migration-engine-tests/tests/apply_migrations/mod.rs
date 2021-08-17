@@ -112,15 +112,19 @@ fn migrations_should_fail_when_the_script_is_invalid(api: TestApi) {
     {
         let expected_error_message = formatdoc!(
             r#"
-                A migration failed to apply. New migrations cannot be applied before the error is recovered from. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve
+                {description}
 
                 Migration name: {second_migration_name}
 
                 Database error code: {error_code}
 
                 Database error:
-                {message}
-                "#,
+                {message}"#,
+            description = if api.connection_info().sql_family().is_mssql() {
+                "A migration failed to apply and the migration transaction was rolled back. Mark the migration as rolled back, possibly edit the migration and then retry. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve"
+            } else {
+                "A migration failed to apply. New migrations cannot be applied before the error is recovered from. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve"
+            },
             second_migration_name = second_migration_name,
             error_code = match api.tags() {
                 t if t.contains(Tags::Vitess) => 1105,

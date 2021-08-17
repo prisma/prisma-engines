@@ -201,6 +201,7 @@ impl SqlFlavour for PostgresFlavour {
                     migration_name: migration_name.to_owned(),
                     database_error_code: database_error_code.unwrap_or("none").to_owned(),
                     database_error,
+                    in_transaction: false,
                 }))
             }
         }

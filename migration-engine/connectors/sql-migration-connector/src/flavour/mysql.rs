@@ -196,6 +196,7 @@ impl SqlFlavour for MysqlFlavour {
                 migration_name: migration_name.to_owned(),
                 database_error_code: code.map(|c| c.to_string()).unwrap_or_else(|| String::from("none")),
                 database_error: error,
+                in_transaction: false,
             })
         };
 

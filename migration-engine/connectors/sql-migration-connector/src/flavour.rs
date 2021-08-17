@@ -141,6 +141,7 @@ async fn generic_apply_migration_script(migration_name: &str, script: &str, conn
                 .original_message()
                 .map(String::from)
                 .unwrap_or_else(|| ConnectorError::from(quaint_error).to_string()),
+            in_transaction: conn.connection_info().sql_family().is_mssql(),
         })
     })
 }
