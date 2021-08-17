@@ -70,6 +70,7 @@ impl MsSqlDatamodelConnector {
             ConnectorCapability::QueryRaw,
             ConnectorCapability::NamedPrimaryKeys,
             ConnectorCapability::NamedForeignKeys,
+            ConnectorCapability::NamedDefaultValues,
             ConnectorCapability::ForeignKeys,
             ConnectorCapability::ReferenceCycleDetection,
         ];

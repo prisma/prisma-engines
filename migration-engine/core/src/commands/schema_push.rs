@@ -9,11 +9,11 @@ pub(crate) async fn schema_push(
     input: &SchemaPushInput,
     connector: &dyn MigrationConnector,
 ) -> CoreResult<SchemaPushOutput> {
-    let schema = parse_schema(&input.schema)?;
+    let (configuration, datamodel) = parse_schema(&input.schema)?;
     let applier = connector.database_migration_step_applier();
     let checker = connector.destructive_change_checker();
 
-    if let Some(err) = connector.check_database_version_compatibility(&schema.1) {
+    if let Some(err) = connector.check_database_version_compatibility(&datamodel) {
         return Err(ConnectorError::user_facing(err));
     };
 
@@ -24,7 +24,7 @@ pub(crate) async fn schema_push(
     };
 
     let database_migration = connector
-        .diff(from, DiffTarget::Datamodel((&schema.0, &schema.1)))
+        .diff(from, DiffTarget::Datamodel((&configuration, &datamodel)))
         .await?;
 
     let checks = checker.check(&database_migration).await?;

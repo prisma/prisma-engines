@@ -1,16 +1,19 @@
 #![allow(clippy::suspicious_operation_groupings)] // clippy is wrong there
-use crate::common::constraint_names::ConstraintNames;
-use crate::PreviewFeature::NamedConstraints;
+
+mod names;
+
 use crate::{
     ast::{self, Span},
-    common::preview_features::PreviewFeature,
+    common::{constraint_names::ConstraintNames, preview_features::PreviewFeature},
     configuration,
     diagnostics::{DatamodelError, Diagnostics},
     dml,
+    PreviewFeature::NamedConstraints,
 };
 use ::dml::{datamodel::Datamodel, field::RelationField, model::Model, traits::WithName};
 use datamodel_connector::ConnectorCapability;
 use enumflags2::BitFlags;
+use names::NamesValidator;
 use std::collections::HashSet;
 
 /// Helper for validating a datamodel.
@@ -39,7 +42,7 @@ impl<'a> Validator<'a> {
         }
     }
 
-    pub(crate) fn validate(&self, ast: &ast::SchemaAst, schema: &mut dml::Datamodel, diagnostics: &mut Diagnostics) {
+    pub(crate) fn validate(&self, ast: &ast::SchemaAst, schema: &dml::Datamodel, diagnostics: &mut Diagnostics) {
         for model in schema.models() {
             let ast_model = ast.find_model(&model.name).expect(STATE_ERROR);
 
@@ -107,17 +110,51 @@ impl<'a> Validator<'a> {
         }
     }
 
-    pub fn post_standardisation_validate(
+    pub(crate) fn post_standardisation_validate(
         &self,
         ast_schema: &ast::SchemaAst,
-        schema: &mut dml::Datamodel,
+        schema: &dml::Datamodel,
         diagnostics: &mut Diagnostics,
     ) {
+        let constraint_names = NamesValidator::new(&schema, self.preview_features, self.source);
+
         for model in schema.models() {
+            let ast_model = ast_schema.find_model(&model.name).expect(STATE_ERROR);
+
+            if let Some(pk) = &model.primary_key {
+                if let Some(name) = &pk.db_name {
+                    // Only for SQL Server for now...
+                    if constraint_names.is_duplicate(name) {
+                        let span = ast_model.id_attribute().span;
+                        let message = "Given constraint name is already in use in the data model.";
+                        let error = DatamodelError::new_attribute_validation_error(message, "id", span);
+
+                        diagnostics.push_error(error);
+                    }
+                }
+            }
+
+            // TODO: Extend this check for other constraints. Now only used
+            // for SQL Server default constraint names.
+            for field in model.fields().filter(|f| f.is_scalar_field()) {
+                if let Some(name) = field.default_value().and_then(|d| d.db_name()) {
+                    let ast_field = ast_model.find_field_bang(field.name());
+
+                    if constraint_names.is_duplicate(name) {
+                        let message = "Given constraint name is already in use in the data model.";
+                        let span = ast_field.span_for_argument("default", "map");
+                        let error = DatamodelError::new_attribute_validation_error(message, "default", span);
+
+                        diagnostics.push_error(error);
+                    }
+                }
+            }
+
             let mut new_errors = self.validate_relation_arguments_bla(
                 schema,
                 ast_schema.find_model(&model.name).expect(STATE_ERROR),
                 model,
+                &constraint_names,
             );
 
             diagnostics.append(&mut new_errors);
@@ -523,14 +560,14 @@ impl<'a> Validator<'a> {
                 if model.name() == related_model.name() {
                     let msg = "A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes.";
                     errors.push_error(error_with_default_values(msg));
-
                     return;
                 }
 
                 if related_model.name() == parent_model.name() {
-                    let msg = "Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`.";
-                    errors.push_error(error_with_default_values(msg));
+                    let msg =
+                        "Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`.";
 
+                    errors.push_error(error_with_default_values(msg));
                     return;
                 }
 
@@ -544,11 +581,12 @@ impl<'a> Validator<'a> {
         }
     }
 
-    fn validate_relation_arguments_bla(
+    fn validate_relation_arguments_bla<'dml>(
         &self,
-        datamodel: &dml::Datamodel,
+        datamodel: &'dml dml::Datamodel,
         ast_model: &ast::Model,
         model: &dml::Model,
+        constraint_names: &NamesValidator<'dml>,
     ) -> Diagnostics {
         let mut errors = Diagnostics::new();
 
@@ -562,6 +600,20 @@ impl<'a> Validator<'a> {
 
             let rel_info = &field.relation_info;
             let related_model = datamodel.find_model(&rel_info.to).expect(STATE_ERROR);
+
+            if let Some(name) = field.relation_info.fk_name.as_ref() {
+                // Only for SQL Server for now...
+                if constraint_names.is_duplicate(name) {
+                    let span = ast_field
+                        .map(|f| f.span_for_argument("relation", "map"))
+                        .unwrap_or_else(ast::Span::empty);
+
+                    let message = "Given constraint name is already in use in the data model.";
+                    let error = DatamodelError::new_attribute_validation_error(message, RELATION_ATTRIBUTE_NAME, span);
+
+                    errors.push_error(error);
+                }
+            }
 
             if let Some((_rel_field_idx, related_field)) = datamodel.find_related_field(field) {
                 let related_field_rel_info = &related_field.relation_info;

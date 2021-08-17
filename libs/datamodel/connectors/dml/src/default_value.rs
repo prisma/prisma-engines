@@ -4,70 +4,124 @@ use std::fmt;
 
 /// Represents a default specified on a field.
 #[derive(Clone, PartialEq)]
-pub enum DefaultValue {
+pub struct DefaultValue {
+    kind: DefaultKind,
+    db_name: Option<String>,
+}
+
+/// Represents a default specified on a field.
+#[derive(Clone, PartialEq)]
+pub enum DefaultKind {
     /// a static value, e.g. `@default(1)`
     Single(PrismaValue),
     /// a dynamic value, e.g. `@default(uuid())`
     Expression(ValueGenerator),
 }
 
+impl DefaultKind {
+    /// Does this match @default(autoincrement())?
+    pub fn is_autoincrement(&self) -> bool {
+        matches!(self, DefaultKind::Expression(generator) if generator.name == "autoincrement")
+    }
+
+    /// Does this match @default(cuid(_))?
+    pub fn is_cuid(&self) -> bool {
+        matches!(self, DefaultKind::Expression(generator) if generator.name == "cuid")
+    }
+
+    /// Does this match @default(dbgenerated(_))?
+    pub fn is_dbgenerated(&self) -> bool {
+        matches!(self, DefaultKind::Expression(generator) if generator.name == "dbgenerated")
+    }
+
+    /// Does this match @default(now())?
+    pub fn is_now(&self) -> bool {
+        matches!(self, DefaultKind::Expression(generator) if generator.name == "now")
+    }
+
+    /// Does this match @default(uuid(_))?
+    pub fn is_uuid(&self) -> bool {
+        matches!(self, DefaultKind::Expression(generator) if generator.name == "uuid")
+    }
+}
+
 impl DefaultValue {
     pub fn as_expression(&self) -> Option<&ValueGenerator> {
-        match self {
-            DefaultValue::Expression(expr) => Some(expr),
-            DefaultValue::Single(_) => None,
+        match self.kind {
+            DefaultKind::Expression(ref expr) => Some(expr),
+            DefaultKind::Single(_) => None,
         }
     }
 
     pub fn as_single(&self) -> Option<&PrismaValue> {
-        match self {
-            DefaultValue::Single(v) => Some(v),
+        match self.kind {
+            DefaultKind::Single(ref v) => Some(v),
             _ => None,
         }
+    }
+
+    pub fn kind(&self) -> &DefaultKind {
+        &self.kind
+    }
+
+    pub fn into_kind(self) -> DefaultKind {
+        self.kind
+    }
+
+    pub fn mut_kind(&mut self) -> &mut DefaultKind {
+        &mut self.kind
     }
 
     /// Returns either a copy of the contained single value or produces a new
     /// value as defined by the expression.
     #[cfg(feature = "default_generators")]
     pub fn get(&self) -> Option<PrismaValue> {
-        match self {
-            Self::Single(v) => Some(v.clone()),
-            Self::Expression(g) => g.generate(),
+        match self.kind {
+            DefaultKind::Single(ref v) => Some(v.clone()),
+            DefaultKind::Expression(ref g) => g.generate(),
         }
     }
 
     /// Does this match @default(autoincrement())?
     pub fn is_autoincrement(&self) -> bool {
-        matches!(self, DefaultValue::Expression(generator) if generator.name == "autoincrement")
+        self.kind.is_autoincrement()
     }
 
     /// Does this match @default(cuid(_))?
     pub fn is_cuid(&self) -> bool {
-        matches!(self, DefaultValue::Expression(generator) if generator.name == "cuid")
+        self.kind.is_cuid()
     }
 
     /// Does this match @default(dbgenerated(_))?
     pub fn is_dbgenerated(&self) -> bool {
-        matches!(self, DefaultValue::Expression(generator) if generator.name == "dbgenerated")
+        self.kind.is_dbgenerated()
     }
 
     /// Does this match @default(now())?
     pub fn is_now(&self) -> bool {
-        matches!(self, DefaultValue::Expression(generator) if generator.name == "now")
+        self.kind.is_now()
     }
 
     /// Does this match @default(uuid(_))?
     pub fn is_uuid(&self) -> bool {
-        matches!(self, DefaultValue::Expression(generator) if generator.name == "uuid")
+        self.kind.is_uuid()
     }
 
-    pub fn new_db_generated(description: String) -> Self {
-        DefaultValue::Expression(ValueGenerator::new_dbgenerated(description))
+    pub fn new_expression(generator: ValueGenerator) -> Self {
+        let kind = DefaultKind::Expression(generator);
+
+        Self { kind, db_name: None }
+    }
+
+    pub fn new_single(value: PrismaValue) -> Self {
+        let kind = DefaultKind::Single(value);
+
+        Self { kind, db_name: None }
     }
 
     pub fn db_generated_description(&self) -> Option<String> {
-        match self {
-            DefaultValue::Expression(ValueGenerator {
+        match &self.kind {
+            DefaultKind::Expression(ValueGenerator {
                 name,
                 args,
                 generator: ValueGeneratorFn::DbGenerated,
@@ -75,13 +129,22 @@ impl DefaultValue {
             _ => None,
         }
     }
+
+    pub fn set_db_name(&mut self, name: impl ToString) {
+        self.db_name = Some(name.to_string());
+    }
+
+    /// The default value constraint name.
+    pub fn db_name(&self) -> Option<&str> {
+        self.db_name.as_deref()
+    }
 }
 
 #[derive(Clone)]
 pub struct ValueGenerator {
-    pub name: String,
-    pub args: Vec<PrismaValue>,
-    pub generator: ValueGeneratorFn,
+    name: String,
+    args: Vec<PrismaValue>,
+    generator: ValueGeneratorFn,
 }
 
 impl ValueGenerator {
@@ -111,12 +174,16 @@ impl ValueGenerator {
         ValueGenerator::new("uuid".to_owned(), vec![]).unwrap()
     }
 
-    fn name(&self) -> &str {
+    pub fn name(&self) -> &str {
         &self.name
     }
 
-    fn args(&self) -> &[PrismaValue] {
+    pub fn args(&self) -> &[PrismaValue] {
         &self.args
+    }
+
+    pub fn generator(&self) -> ValueGeneratorFn {
+        self.generator
     }
 
     pub fn as_dbgenerated(&self) -> Option<&str> {
@@ -222,9 +289,9 @@ impl PartialEq for ValueGenerator {
 
 impl fmt::Debug for DefaultValue {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::Single(ref v) => write!(f, "DefaultValue::Single({:?})", v),
-            Self::Expression(g) => write!(f, "DefaultValue::Expression({}(){:?})", g.name(), g.args),
+        match &self.kind {
+            DefaultKind::Single(ref v) => write!(f, "DefaultValue::Single({:?})", v),
+            DefaultKind::Expression(g) => write!(f, "DefaultValue::Expression({}(){:?})", g.name(), g.args),
         }
     }
 }
@@ -235,14 +302,14 @@ mod tests {
 
     #[test]
     fn default_value_is_autoincrement() {
-        let auto_increment_default = DefaultValue::Expression(ValueGenerator::new_autoincrement());
+        let auto_increment_default = DefaultValue::new_expression(ValueGenerator::new_autoincrement());
 
         assert!(auto_increment_default.is_autoincrement());
     }
 
     #[test]
     fn default_value_is_now() {
-        let now_default = DefaultValue::Expression(ValueGenerator::new_now());
+        let now_default = DefaultValue::new_expression(ValueGenerator::new_now());
 
         assert!(now_default.is_now());
         assert!(!now_default.is_autoincrement());
@@ -250,7 +317,7 @@ mod tests {
 
     #[test]
     fn default_value_is_uuid() {
-        let uuid_default = DefaultValue::Expression(ValueGenerator::new_uuid());
+        let uuid_default = DefaultValue::new_expression(ValueGenerator::new_uuid());
 
         assert!(uuid_default.is_uuid());
         assert!(!uuid_default.is_autoincrement());
@@ -258,7 +325,7 @@ mod tests {
 
     #[test]
     fn default_value_is_cuid() {
-        let cuid_default = DefaultValue::Expression(ValueGenerator::new_cuid());
+        let cuid_default = DefaultValue::new_expression(ValueGenerator::new_cuid());
 
         assert!(cuid_default.is_cuid());
         assert!(!cuid_default.is_now());
@@ -266,7 +333,7 @@ mod tests {
 
     #[test]
     fn default_value_is_dbgenerated() {
-        let db_generated_default = DefaultValue::Expression(ValueGenerator::new_dbgenerated("test".to_string()));
+        let db_generated_default = DefaultValue::new_expression(ValueGenerator::new_dbgenerated("test".to_string()));
 
         assert!(db_generated_default.is_dbgenerated());
         assert!(!db_generated_default.is_now());

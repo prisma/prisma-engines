@@ -5,6 +5,7 @@ use introspection_engine_tests::test_api::TestApi;
 use introspection_engine_tests::test_api::*;
 
 use introspection_engine_tests::TestResult;
+use quaint::prelude::Queryable;
 use test_macros::test_connector;
 
 #[test_connector(preview_features("NamedConstraints"), tags(Mssql, Postgres))]
@@ -354,6 +355,48 @@ async fn introspecting_custom_fk_names_does_not_return_them_on_sqlite(api: &Test
             Post    Post[]
         }
     "#;
+
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
+
+    Ok(())
+}
+
+#[test_connector(preview_features("NamedConstraints"), tags(Mssql))]
+async fn introspecting_custom_default_names_should_output_to_dml(api: &TestApi) -> TestResult {
+    let create_table = format!(
+        "CREATE TABLE [{}].[custom_defaults_test] (id INT CONSTRAINT pk_meow PRIMARY KEY, data NVARCHAR(255) CONSTRAINT meow DEFAULT 'foo')",
+        api.schema_name()
+    );
+
+    api.database().raw_cmd(&create_table).await?;
+
+    let dm = r#"
+        model custom_defaults_test {
+            id   Int     @id(map: "pk_meow")
+            data String? @default("foo", map: "meow") @db.NVarChar(255)
+        }
+    "#;
+
+    api.assert_eq_datamodels(&dm, &api.introspect().await?);
+
+    Ok(())
+}
+
+#[test_connector(preview_features("NamedConstraints"), tags(Mssql))]
+async fn introspecting_default_default_names_should_not_output_to_dml(api: &TestApi) -> TestResult {
+    let create_table = format!(
+        "CREATE TABLE [{}].[custom_defaults_test] (id INT CONSTRAINT pk_meow PRIMARY KEY, data NVARCHAR(255) CONSTRAINT custom_defaults_test_data_df DEFAULT 'foo')",
+        api.schema_name()
+    );
+
+    api.database().raw_cmd(&create_table).await?;
+
+    let dm = indoc! {r#"
+        model custom_defaults_test {
+          id   Int     @id(map: "pk_meow")
+          data String? @default("foo") @db.NVarChar(255)
+        }
+    "#};
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);
 

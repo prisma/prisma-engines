@@ -6,7 +6,7 @@ use migration_engine_tests::sync_test_api::*;
 use pretty_assertions::assert_eq;
 use prisma_value::PrismaValue;
 use quaint::ast::*;
-use sql_schema_describer::DefaultValue;
+use sql_schema_describer::DefaultKind;
 
 #[test_connector]
 fn dropping_a_table_with_rows_should_warn(api: TestApi) {
@@ -784,7 +784,9 @@ fn set_default_current_timestamp_on_existing_column_works(api: TestApi) {
         .assert_no_warning();
 
     api.assert_schema().assert_table("User", |table| {
-        table.assert_column("created_at", |column| column.assert_default(Some(DefaultValue::now())))
+        table.assert_column("created_at", |column| {
+            column.assert_default_kind(Some(DefaultKind::Now))
+        })
     });
 }
 

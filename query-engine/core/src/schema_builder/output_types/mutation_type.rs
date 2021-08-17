@@ -106,7 +106,7 @@ fn create_execute_raw_field() -> OutputField {
             input_field(
                 PARAMETERS,
                 InputType::json_list(),
-                Some(dml::DefaultValue::Single(PrismaValue::String("[]".into()))),
+                Some(dml::DefaultValue::new_single(PrismaValue::String("[]".into()))),
             )
             .optional(),
         ],
@@ -126,7 +126,7 @@ fn create_query_raw_field() -> OutputField {
             input_field(
                 PARAMETERS,
                 InputType::json_list(),
-                Some(dml::DefaultValue::Single(PrismaValue::String("[]".into()))),
+                Some(dml::DefaultValue::new_single(PrismaValue::String("[]".into()))),
             )
             .optional(),
         ],

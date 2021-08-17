@@ -59,7 +59,7 @@ fn should_allow_string_ids_with_cuid() {
         .assert_has_scalar_field("id")
         .assert_is_id(user_model)
         .assert_base_type(&ScalarType::String)
-        .assert_default_value(DefaultValue::Expression(ValueGenerator::new_cuid()));
+        .assert_default_value(DefaultValue::new_expression(ValueGenerator::new_cuid()));
 }
 
 #[test]
@@ -76,7 +76,7 @@ fn should_allow_string_ids_with_uuid() {
         .assert_has_scalar_field("id")
         .assert_is_id(user_model)
         .assert_base_type(&ScalarType::String)
-        .assert_default_value(DefaultValue::Expression(ValueGenerator::new_uuid()));
+        .assert_default_value(DefaultValue::new_expression(ValueGenerator::new_uuid()));
 }
 
 #[test]
@@ -108,7 +108,7 @@ fn should_allow_string_ids_with_static_default() {
     user_model
         .assert_has_scalar_field("id")
         .assert_is_id(user_model)
-        .assert_default_value(DefaultValue::Single(PrismaValue::String(String::from(""))))
+        .assert_default_value(DefaultValue::new_single(PrismaValue::String(String::from(""))))
         .assert_base_type(&ScalarType::String);
 }
 
@@ -125,7 +125,7 @@ fn should_allow_int_ids_with_static_default() {
     user_model
         .assert_has_scalar_field("id")
         .assert_is_id(user_model)
-        .assert_default_value(DefaultValue::Single(PrismaValue::Int(0)))
+        .assert_default_value(DefaultValue::new_single(PrismaValue::Int(0)))
         .assert_base_type(&ScalarType::Int);
 }
 

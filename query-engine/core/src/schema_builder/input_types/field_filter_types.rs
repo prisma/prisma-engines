@@ -369,7 +369,7 @@ fn query_mode_field(ctx: &BuilderContext, nested: bool) -> impl Iterator<Item = 
         let field = input_field(
             filters::MODE,
             InputType::enum_type(enum_type),
-            Some(DefaultValue::Single(PrismaValue::Enum(filters::DEFAULT.to_owned()))),
+            Some(DefaultValue::new_single(PrismaValue::Enum(filters::DEFAULT.to_owned()))),
         )
         .optional();
 

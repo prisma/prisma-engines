@@ -1,6 +1,6 @@
 use migration_engine_tests::sync_test_api::*;
 use prisma_value::PrismaValue;
-use sql_schema_describer::DefaultValue;
+use sql_schema_describer::{DefaultKind, DefaultValue};
 use test_macros::test_connector;
 
 // MySQL 5.7 and MariaDB are skipped, because the datamodel parser gives us a
@@ -19,7 +19,9 @@ fn datetime_defaults_work(api: TestApi) {
     let expected_default = if api.is_postgres() {
         DefaultValue::db_generated("'2018-01-27 08:00:00'::timestamp without time zone")
     } else if api.is_mssql() {
-        DefaultValue::db_generated("2018-01-27 08:00:00 +00:00")
+        let mut df = DefaultValue::db_generated("2018-01-27 08:00:00 +00:00");
+        df.set_constraint_name("DF__Cat__birthday");
+        df
     } else if api.is_mysql_mariadb() {
         DefaultValue::db_generated("2018-01-27T08:00:00+00:00")
     } else if api.is_mysql_8() || api.is_mysql_5_6() {
@@ -197,7 +199,7 @@ fn column_defaults_must_be_migrated(api: TestApi) {
 
     api.assert_schema().assert_table("Fruit", |table| {
         table.assert_column("name", |col| {
-            col.assert_default(Some(DefaultValue::value(PrismaValue::String("banana".to_string()))))
+            col.assert_default_kind(Some(DefaultKind::Value(PrismaValue::String("banana".to_string()))))
         })
     });
 
@@ -211,7 +213,89 @@ fn column_defaults_must_be_migrated(api: TestApi) {
     api.schema_push_w_datasource(dm2).send().assert_green_bang();
 
     api.assert_schema().assert_table("Fruit", |table| {
-        table.assert_column("name", |col| col.assert_default(Some(DefaultValue::value("mango"))))
+        table.assert_column("name", |col| {
+            col.assert_default_kind(Some(DefaultKind::Value(PrismaValue::String("mango".to_string()))))
+        })
+    });
+}
+
+#[test_connector(tags(Mssql))]
+fn default_constraint_names_should_work(api: TestApi) {
+    let dm = r#"
+        generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["microsoftSqlServer", "namedConstraints"]
+        }
+
+        model A {
+            id Int @id @default(autoincrement())
+            data String @default("beeb buub", map: "meow")
+        }
+    "#;
+
+    api.schema_push_w_datasource(dm).send().assert_green_bang();
+
+    api.assert_schema().assert_table("A", |table| {
+        table.assert_column("data", |col| {
+            let mut expected = DefaultValue::value("beeb buub");
+            expected.set_constraint_name("meow");
+
+            col.assert_default(Some(expected))
+        })
+    });
+}
+
+#[test_connector(tags(Mssql))]
+fn default_constraint_name_default_values_should_work(api: TestApi) {
+    let dm = r#"
+        generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["microsoftSqlServer", "namedConstraints"]
+        }
+
+        model A {
+            id Int @id @default(autoincrement())
+            data String @default("beeb buub")
+        }
+    "#;
+
+    api.schema_push_w_datasource(dm).send().assert_green_bang();
+
+    api.assert_schema().assert_table("A", |table| {
+        table.assert_column("data", |col| {
+            let mut expected = DefaultValue::value("beeb buub");
+            expected.set_constraint_name("A_data_df");
+
+            col.assert_default(Some(expected))
+        })
+    });
+}
+
+#[test_connector(tags(Mssql))]
+fn default_constraint_name_default_values_with_mapping_should_work(api: TestApi) {
+    let dm = r#"
+        generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["microsoftSqlServer", "namedConstraints"]
+        }
+
+        model A {
+            id Int @id @default(autoincrement())
+            data String @default("beeb buub") @map("purr")
+
+            @@map("meow")
+        }
+    "#;
+
+    api.schema_push_w_datasource(dm).send().assert_green_bang();
+
+    api.assert_schema().assert_table("meow", |table| {
+        table.assert_column("purr", |col| {
+            let mut expected = DefaultValue::value("beeb buub");
+            expected.set_constraint_name("meow_purr_df");
+
+            col.assert_default(Some(expected))
+        })
     });
 }
 

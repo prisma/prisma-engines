@@ -1,7 +1,7 @@
 use crate::SqlFamilyTrait;
 use datamodel::{
-    reserved_model_names::is_reserved_type_name, Datamodel, DefaultValue, Field, FieldType, Model, WithDatabaseName,
-    WithName,
+    reserved_model_names::is_reserved_type_name, Datamodel, DefaultKind, DefaultValue, Field, FieldType, Model,
+    ValueGenerator, WithDatabaseName, WithName,
 };
 use introspection_connector::IntrospectionContext;
 use once_cell::sync::Lazy;
@@ -98,15 +98,19 @@ fn sanitize_models(datamodel: &mut Datamodel, ctx: &IntrospectionContext) -> Has
 
                         // If the field also has an associated default enum value, we need to sanitize that enum value.
                         // The actual enum value renames _in the enum itself_ are done at a later stage.
-                        if let Some(DefaultValue::Single(PrismaValue::Enum(value))) = &mut sf.default_value {
+                        if let Some(DefaultKind::Single(PrismaValue::Enum(value))) =
+                            sf.default_value.as_mut().map(|dv| dv.mut_kind())
+                        {
                             let new_default = if value.is_empty() {
-                                DefaultValue::Single(PrismaValue::Enum(EMPTY_ENUM_PLACEHOLDER.to_string()))
+                                DefaultValue::new_single(PrismaValue::Enum(EMPTY_ENUM_PLACEHOLDER.to_string()))
                             } else {
                                 let sanitized_value = sanitize_string(value);
 
                                 match sanitized_value {
-                                    x if x.is_empty() => DefaultValue::new_db_generated(value.clone()),
-                                    _ => DefaultValue::Single(PrismaValue::Enum(sanitized_value)),
+                                    x if x.is_empty() => {
+                                        DefaultValue::new_expression(ValueGenerator::new_dbgenerated(value.clone()))
+                                    }
+                                    _ => DefaultValue::new_single(PrismaValue::Enum(sanitized_value)),
                                 }
                             };
 

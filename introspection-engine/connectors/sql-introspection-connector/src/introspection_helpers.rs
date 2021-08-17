@@ -275,20 +275,35 @@ pub(crate) fn calculate_backrelation_field(
 pub(crate) fn calculate_default(table: &Table, column: &Column, arity: &FieldArity) -> Option<DMLDef> {
     match (column.default.as_ref().map(|d| d.kind()), &column.tpe.family) {
         (_, _) if *arity == FieldArity::List => None,
-        (_, ColumnTypeFamily::Int) if column.auto_increment => Some(DMLDef::Expression(VG::new_autoincrement())),
-        (_, ColumnTypeFamily::BigInt) if column.auto_increment => Some(DMLDef::Expression(VG::new_autoincrement())),
-        (_, ColumnTypeFamily::Int) if is_sequence(column, table) => Some(DMLDef::Expression(VG::new_autoincrement())),
+        (_, ColumnTypeFamily::Int) if column.auto_increment => Some(DMLDef::new_expression(VG::new_autoincrement())),
+        (_, ColumnTypeFamily::BigInt) if column.auto_increment => Some(DMLDef::new_expression(VG::new_autoincrement())),
+        (_, ColumnTypeFamily::Int) if is_sequence(column, table) => {
+            Some(DMLDef::new_expression(VG::new_autoincrement()))
+        }
         (_, ColumnTypeFamily::BigInt) if is_sequence(column, table) => {
-            Some(DMLDef::Expression(VG::new_autoincrement()))
+            Some(DMLDef::new_expression(VG::new_autoincrement()))
         }
-        (Some(DefaultKind::Sequence(_)), _) => Some(DMLDef::Expression(VG::new_autoincrement())),
-        (Some(DefaultKind::Now), ColumnTypeFamily::DateTime) => Some(DMLDef::Expression(VG::new_now())),
-        (Some(DefaultKind::DbGenerated(default_string)), _) => {
-            Some(DMLDef::Expression(VG::new_dbgenerated(default_string.clone())))
+        (Some(DefaultKind::Sequence(_)), _) => Some(DMLDef::new_expression(VG::new_autoincrement())),
+        (Some(DefaultKind::Now), ColumnTypeFamily::DateTime) => {
+            Some(set_default(DMLDef::new_expression(VG::new_now()), column))
         }
-        (Some(DefaultKind::Value(val)), _) => Some(DMLDef::Single(val.clone())),
+        (Some(DefaultKind::DbGenerated(default_string)), _) => Some(set_default(
+            DMLDef::new_expression(VG::new_dbgenerated(default_string.clone())),
+            column,
+        )),
+        (Some(DefaultKind::Value(val)), _) => Some(set_default(DMLDef::new_single(val.clone()), column)),
         _ => None,
     }
+}
+
+fn set_default(mut default: DMLDef, column: &Column) -> DMLDef {
+    let db_name = column.default.as_ref().and_then(|df| df.constraint_name());
+
+    if let Some(name) = db_name {
+        default.set_db_name(name);
+    }
+
+    default
 }
 
 pub(crate) fn is_id(column: &Column, table: &Table) -> bool {

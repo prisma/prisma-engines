@@ -259,13 +259,22 @@ fn column_for_scalar_field(field: &ScalarFieldWalker<'_>, flavour: &dyn SqlFlavo
                 tpe: flavour.enum_column_type(field, r#enum.db_name()),
                 default: field
                     .default_value()
-                    .and_then(|default| default.as_single().and_then(|v| v.as_enum_value()))
-                    .map(|value| {
+                    .and_then(|default| {
+                        let as_enum = default.as_single().and_then(|v| v.as_enum_value());
+                        as_enum.map(|enm| (enm, default.db_name()))
+                    })
+                    .map(|(value, db_name)| {
                         let corresponding_value = r#enum.value(value).expect("Could not find enum value");
 
-                        sql::DefaultValue::value(PrismaValue::Enum(
+                        let mut default = sql::DefaultValue::value(PrismaValue::Enum(
                             corresponding_value.final_database_name().to_owned(),
-                        ))
+                        ));
+
+                        if let Some(db_name) = db_name {
+                            default.set_constraint_name(db_name);
+                        }
+
+                        default
                     }),
                 auto_increment: false,
             }
@@ -273,6 +282,14 @@ fn column_for_scalar_field(field: &ScalarFieldWalker<'_>, flavour: &dyn SqlFlavo
         TypeWalker::Base(scalar_type) => (scalar_type, flavour.default_native_type_for_scalar_type(&scalar_type)),
         TypeWalker::NativeType(scalar_type, instance) => (scalar_type, instance.serialized_native_type.clone()),
         TypeWalker::Unsupported(description) => {
+            let default = field.default_value().and_then(|v| db_generated(v)).map(|mut default| {
+                if let Some(name) = field.default_value().and_then(|v| v.db_name()) {
+                    default.set_constraint_name(name);
+                }
+
+                default
+            });
+
             return sql::Column {
                 name: field.db_name().to_owned(),
                 tpe: ColumnType {
@@ -281,9 +298,9 @@ fn column_for_scalar_field(field: &ScalarFieldWalker<'_>, flavour: &dyn SqlFlavo
                     family: sql::ColumnTypeFamily::Unsupported(description),
                     arity: column_arity(field.arity()),
                 },
-                default: field.default_value().and_then(|v| db_generated(v)),
+                default,
                 auto_increment: false,
-            }
+            };
         }
     };
 
@@ -304,6 +321,22 @@ fn column_for_scalar_field(field: &ScalarFieldWalker<'_>, flavour: &dyn SqlFlavo
         ScalarType::BigInt => sql::ColumnTypeFamily::BigInt,
     };
 
+    let default = field.default_value().and_then(|v| {
+        let mut df = match v.kind() {
+            datamodel::DefaultKind::Single(v) => Some(sql::DefaultValue::value(v.clone())),
+            default if default.is_dbgenerated() => db_generated(v),
+            default if default.is_now() => Some(sql::DefaultValue::now()),
+            default if default.is_autoincrement() => Some(sql::DefaultValue::sequence(String::new())),
+            datamodel::DefaultKind::Expression(_) => None,
+        };
+
+        if let (Some(df), Some(db_name)) = (df.as_mut(), v.db_name()) {
+            df.set_constraint_name(db_name);
+        }
+
+        df
+    });
+
     sql::Column {
         auto_increment: has_auto_increment_default || flavour.field_is_implicit_autoincrement_primary_key(field),
         name: field.db_name().to_owned(),
@@ -313,13 +346,7 @@ fn column_for_scalar_field(field: &ScalarFieldWalker<'_>, flavour: &dyn SqlFlavo
             family,
             arity: column_arity(field.arity()),
         },
-        default: field.default_value().and_then(|v| match v {
-            datamodel::DefaultValue::Single(v) => Some(sql::DefaultValue::value(v.clone())),
-            default if default.is_dbgenerated() => db_generated(default),
-            default if default.is_now() => Some(sql::DefaultValue::now()),
-            default if default.is_autoincrement() => Some(sql::DefaultValue::sequence(String::new())),
-            datamodel::DefaultValue::Expression(_) => None,
-        }),
+        default,
     }
 }
 

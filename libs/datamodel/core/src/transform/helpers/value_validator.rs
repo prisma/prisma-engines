@@ -230,11 +230,11 @@ impl<'a> ValueValidator<'a> {
                     .check_compatibility_with_scalar_type(scalar_type)
                     .map_err(|err_msg| DatamodelError::new_functional_evaluation_error(&err_msg, self.span()))?;
 
-                Ok(DefaultValue::Expression(generator))
+                Ok(DefaultValue::new_expression(generator))
             }
             _ => {
                 let x = ValueValidator::new(self.value).as_type(scalar_type)?;
-                Ok(DefaultValue::Single(x))
+                Ok(DefaultValue::new_single(x))
             }
         }
     }

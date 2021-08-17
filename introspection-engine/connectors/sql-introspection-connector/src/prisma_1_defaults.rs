@@ -53,10 +53,10 @@ pub fn add_prisma_1_id_defaults(
     for (mf, cuid) in needs_to_be_changed {
         let field = &mut data_model.find_scalar_field_mut(&mf.model, &mf.field);
         if cuid {
-            field.default_value = Some(dml::DefaultValue::Expression(ValueGenerator::new_cuid()));
+            field.default_value = Some(dml::DefaultValue::new_expression(ValueGenerator::new_cuid()));
             inferred_cuids.push(mf);
         } else {
-            field.default_value = Some(dml::DefaultValue::Expression(ValueGenerator::new_uuid()));
+            field.default_value = Some(dml::DefaultValue::new_expression(ValueGenerator::new_uuid()));
             inferred_uuids.push(mf);
         }
     }
