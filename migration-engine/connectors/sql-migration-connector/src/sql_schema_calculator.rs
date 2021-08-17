@@ -330,9 +330,8 @@ fn column_for_scalar_field(field: &ScalarFieldWalker<'_>, flavour: &dyn SqlFlavo
             datamodel::DefaultKind::Expression(_) => None,
         };
 
-        match (df.as_mut(), v.db_name()) {
-            (Some(df), Some(db_name)) => df.set_constraint_name(db_name),
-            _ => (),
+        if let (Some(df), Some(db_name)) = (df.as_mut(), v.db_name()) {
+            df.set_constraint_name(db_name);
         }
 
         df
