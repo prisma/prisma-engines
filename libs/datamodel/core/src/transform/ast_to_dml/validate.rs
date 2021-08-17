@@ -127,7 +127,7 @@ impl<'a> Validator<'a> {
                     if constraint_names.is_duplicate(name) {
                         let span = ast_model.id_attribute().span;
                         let message = "Given constraint name is already in use in the data model.";
-                        let error = DatamodelError::new_attribute_validation_error(message, "default", span);
+                        let error = DatamodelError::new_attribute_validation_error(message, "id", span);
 
                         diagnostics.push_error(error);
                     }

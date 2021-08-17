@@ -476,7 +476,7 @@ fn named_default_constraints_cannot_clash_with_pk_names() {
         [1;94m12 | [0m    id Int @id @default(autoincrement())
         [1;94m13 | [0m    a  String @default("asdf", [1;91mmap: "reserved"[0m)
         [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@default": Given constraint name is already in use in the data model.[0m
+        [1;91merror[0m: [1mError parsing attribute "@id": Given constraint name is already in use in the data model.[0m
           [1;94m-->[0m  [4mschema.prisma:17[0m
         [1;94m   | [0m
         [1;94m16 | [0mmodel B {
