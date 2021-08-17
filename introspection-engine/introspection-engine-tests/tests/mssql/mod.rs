@@ -1,4 +1,4 @@
-use indoc::indoc;
+use expect_test::expect;
 use introspection_engine_tests::{test_api::*, TestResult};
 use quaint::prelude::Queryable;
 use test_macros::test_connector;
@@ -14,16 +14,16 @@ async fn geometry_should_be_unsupported(api: &TestApi) -> TestResult {
         })
         .await?;
 
-    let result = api.introspect().await?;
+    let result = api.introspect_dml().await?;
 
-    let dm = indoc! {r#"
+    let expected = expect![[r#"
         model A {
-          id       Int @id @default(autoincrement())
+          id       Int                       @id @default(autoincrement())
           location Unsupported("geography")?
         }
-    "#};
+    "#]];
 
-    api.assert_eq_datamodels(dm, &result);
+    expected.assert_eq(&result);
 
     Ok(())
 }
@@ -40,16 +40,16 @@ async fn user_defined_type_aliases_should_map_to_the_system_type(api: &TestApi) 
 
     api.database().raw_cmd(&create_table).await?;
 
-    let dm = indoc! {r#"
+    let result = api.introspect_dml().await?;
+
+    let expected = expect![[r#"
         model A {
-          id       Int @id @default(autoincrement())
-          name     String? @db.NVarChar(50)
+          id   Int     @id @default(autoincrement())
+          name String? @db.NVarChar(50)
         }
-    "#};
+    "#]];
 
-    let result = api.introspect().await?;
-
-    api.assert_eq_datamodels(dm, &result);
+    expected.assert_eq(&result);
 
     Ok(())
 }
@@ -75,15 +75,15 @@ async fn ms_xml_indexes_are_skipped(api: &TestApi) -> TestResult {
     api.database().raw_cmd(&create_primary).await?;
     api.database().raw_cmd(&create_secondary).await?;
 
-    let dm = indoc! {r#"
+    let expected = expect![[r#"
         model xml_test {
-          id   Int @id @default(autoincrement())
+          id   Int     @id @default(autoincrement())
           data String? @db.Xml
         }
-    "#};
+    "#]];
 
-    let result = api.introspect().await?;
-    api.assert_eq_datamodels(dm, &result);
+    let result = api.introspect_dml().await?;
+    expected.assert_eq(&result);
 
     Ok(())
 }

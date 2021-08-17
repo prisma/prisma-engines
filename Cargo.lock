@@ -1812,6 +1812,7 @@ dependencies = [
  "datamodel",
  "datamodel-connector",
  "enumflags2",
+ "expect-test",
  "indoc",
  "introspection-connector",
  "introspection-core",
