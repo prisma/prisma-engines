@@ -1,4 +1,4 @@
-use datamodel_connector::connector_error::ConnectorError;
+use datamodel_connector::connector_error::{ConnectorError, ErrorKind};
 use datamodel_connector::helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32};
 use datamodel_connector::{Connector, ConnectorCapability};
 use dml::{
@@ -298,13 +298,23 @@ impl Connector for MsSqlDatamodelConnector {
             for id_field in pk.fields.iter() {
                 let field = model.find_field(id_field).unwrap();
 
-                if let FieldType::Scalar(_, _, Some(native_type)) = field.field_type() {
-                    let r#type: MsSqlType = native_type.deserialize_native_type();
+                if let FieldType::Scalar(scalar_type, _, native_type) = field.field_type() {
+                    if let Some(native_type) = native_type {
+                        let r#type: MsSqlType = native_type.deserialize_native_type();
 
-                    if heap_allocated_types().contains(&r#type) {
-                        return self
-                            .native_instance_error(native_type)
-                            .new_incompatible_native_type_with_id();
+                        if heap_allocated_types().contains(&r#type) {
+                            return self
+                                .native_instance_error(native_type)
+                                .new_incompatible_native_type_with_id();
+                        }
+                    }
+
+                    if matches!(scalar_type, ScalarType::Bytes) {
+                        let kind = ErrorKind::InvalidModelError {
+                            message: String::from("Using Bytes type is not allowed in the model's id."),
+                        };
+
+                        return Err(ConnectorError { kind });
                     }
                 }
             }
