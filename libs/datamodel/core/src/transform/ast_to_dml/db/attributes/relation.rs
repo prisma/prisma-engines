@@ -3,6 +3,7 @@ use crate::{
     diagnostics::DatamodelError,
     transform::ast_to_dml::db::{context::Context, types::RelationField},
 };
+use itertools::Itertools;
 
 /// Validate that the arity of fields from `fields` is compatible with relation field arity.
 pub(super) fn validate_relation_field_arity(
@@ -18,16 +19,14 @@ pub(super) fn validate_relation_field_arity(
         return;
     }
 
-    let optional_underlying_fields: Vec<&str> = relation_field
+    let has_optional_underlying_fields = relation_field
         .fields
         .iter()
         .flatten()
         .map(|field_id| &model[*field_id])
-        .filter(|field| field.arity.is_optional())
-        .map(|field| field.name.name.as_str())
-        .collect();
+        .any(|field| field.arity.is_optional());
 
-    if optional_underlying_fields.is_empty() {
+    if !has_optional_underlying_fields {
         return;
     }
 
@@ -35,7 +34,7 @@ pub(super) fn validate_relation_field_arity(
         &format!(
             "The relation field `{}` uses the scalar fields {}. At least one of those fields is optional. Hence the relation field must be optional as well.",
             &model[field_id].name.name,
-            optional_underlying_fields.join(", "),
+            &relation_field.fields.iter().flatten().map(|field_id| &model[*field_id].name.name).join(", "),
         ),
         ast_relation_field.span
     ));
