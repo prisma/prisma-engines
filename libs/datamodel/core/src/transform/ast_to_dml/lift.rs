@@ -87,7 +87,7 @@ impl<'a> LiftAstToDml<'a> {
         for (field_id, scalar_field_data) in self.db.iter_model_scalar_fields(model_id) {
             let ast_field = &ast_model[field_id];
             let arity = self.lift_field_arity(&ast_field.arity);
-            let field_type = self.lift_scalar_field_type(ast_field, &scalar_field_data.r#type, &scalar_field_data);
+            let field_type = self.lift_scalar_field_type(ast_field, &scalar_field_data.r#type, scalar_field_data);
 
             let mut field = dml::ScalarField::new(&ast_field.name.name, arity, field_type);
 
@@ -197,7 +197,7 @@ impl<'a> LiftAstToDml<'a> {
             }
             db::ScalarFieldType::Alias(top_id) => {
                 let alias = &self.db.ast()[*top_id];
-                let scalar_field_type = self.db.alias_scalar_field_type(&top_id);
+                let scalar_field_type = self.db.alias_scalar_field_type(top_id);
                 self.lift_scalar_field_type(alias, scalar_field_type, scalar_field_data)
             }
             db::ScalarFieldType::BuiltInScalar(scalar_type) => {

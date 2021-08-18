@@ -105,7 +105,7 @@ impl<'ast> Attributes<'ast> {
                 None => unreachable!(),
                 Some((ds, attr_name)) if ds == datasource.name => {
                     if native_type_attr.replace((attr, attr_name)).is_some() {
-                        ctx.push_error(DatamodelError::new_duplicate_attribute_error(&ds, attr.span));
+                        ctx.push_error(DatamodelError::new_duplicate_attribute_error(ds, attr.span));
                     }
                 }
                 Some((bad_datasource, attr_name)) => {
