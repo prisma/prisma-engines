@@ -41,6 +41,5 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
           key: ${{ runner.os }}-format-${{ matrix.rust }}-${{ hashFiles('**/Cargo.lock') }}
-      - uses: mbrobbel/rustfmt-check@master
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check formatting
+        run: cargo fmt -- --check
