@@ -859,15 +859,15 @@ async fn one_to_many_relation_field_names_do_not_conflict_with_many_to_many_rela
             model Event {{
                 id                           Int    @id @default(autoincrement())
                 host_id                      Int
-                User_EventToUser             User   @relation(fields: [host_id], references: [id])
-                User_EventToUserManyToMany   User[] @relation("EventToUserManyToMany")
+                User_Event_host_idToUser     User   @relation("Event_host_idToUser", fields: [host_id], references: [id])
+                User_EventToUser             User[] @relation("EventToUser")
                 {extra_index}
             }}
 
             model User {{
                 id                           Int     @id @default(autoincrement())
-                Event_EventToUser            Event[]
-                Event_EventToUserManyToMany  Event[] @relation("EventToUserManyToMany")
+                Event_Event_host_idToUser    Event[] @relation("Event_host_idToUser")
+                Event_EventToUser            Event[] @relation("EventToUser")
             }}
         "#,
         extra_index = extra_index,
