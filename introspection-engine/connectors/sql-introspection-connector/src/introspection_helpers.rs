@@ -178,7 +178,7 @@ pub(crate) fn calculate_relation_field(
     schema: &SqlSchema,
     table: &Table,
     foreign_key: &ForeignKey,
-    m2m_table_names: &Vec<String>,
+    m2m_table_names: &[String],
 ) -> Result<RelationField, SqlError> {
     debug!("Handling foreign key  {:?}", foreign_key);
 
@@ -327,7 +327,7 @@ pub(crate) fn calculate_relation_name(
     schema: &SqlSchema,
     fk: &ForeignKey,
     table: &Table,
-    m2m_table_names: &Vec<String>,
+    m2m_table_names: &[String],
 ) -> Result<String, SqlError> {
     //this is not called for prisma many to many relations. for them the name is just the name of the join table.
     let referenced_model = &fk.referenced_table;
