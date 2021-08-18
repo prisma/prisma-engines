@@ -14,7 +14,7 @@ use ::dml::{datamodel::Datamodel, field::RelationField, model::Model, traits::Wi
 use datamodel_connector::ConnectorCapability;
 use enumflags2::BitFlags;
 use names::NamesValidator;
-use std::collections::HashSet;
+use std::{collections::HashSet, rc::Rc};
 
 /// Helper for validating a datamodel.
 ///
@@ -476,10 +476,15 @@ impl<'a> Validator<'a> {
 
         // Keeps count on visited relations to iterate them only once.
         let mut visited = HashSet::new();
+        let visited_relations_path_initial = VisitedRelation {
+            previous: None,
+            model_name: &parent_model.name,
+            relation_name: &parent_field.name,
+        };
         // poor man's tail-recursion ;)
-        let mut next_relations = vec![(parent_model, parent_field)];
+        let mut next_relations = vec![(parent_model, parent_field, Rc::new(visited_relations_path_initial))];
 
-        while let Some((model, field)) = next_relations.pop() {
+        while let Some((model, field, previous_visited_relation)) = next_relations.pop() {
             // we expect to have both sides of the relation at this point...
             let related_field = datamodel.find_related_field_bang(field).1;
             let related_model = datamodel.find_model(&field.relation_info.to).unwrap();
@@ -538,7 +543,7 @@ impl<'a> Validator<'a> {
                         _ => None,
                     };
 
-                    let msg = match (on_delete, on_update) {
+                    let mut msg = match (on_delete, on_update) {
                         (Some(on_delete), Some(on_update)) => {
                             format!(
                                 "{} Implicit default `onDelete` and `onUpdate` values: `{}` and `{}`.",
@@ -554,6 +559,8 @@ impl<'a> Validator<'a> {
                         (None, None) => msg.to_string(),
                     };
 
+                    msg.push_str(" Read more at https://pris.ly/d/cyclic-referential-actions");
+
                     DatamodelError::new_attribute_validation_error(&msg, RELATION_ATTRIBUTE_NAME, span)
                 };
 
@@ -564,17 +571,22 @@ impl<'a> Validator<'a> {
                 }
 
                 if related_model.name() == parent_model.name() {
-                    let msg =
-                        "Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`.";
-
-                    errors.push_error(error_with_default_values(msg));
+                    let msg = format!("Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Cycle path: {}.", previous_visited_relation.print_full_path());
+                    errors.push_error(error_with_default_values(&msg));
                     return;
                 }
 
                 // bozo tail-recursion continues
                 for field in related_model.relation_fields() {
+                    // TODO: introduce this properly
+                    let next_visited_relation = Rc::new(VisitedRelation {
+                        previous: Some(previous_visited_relation.clone()),
+                        model_name: related_model.name(),
+                        relation_name: &field.name,
+                    });
+
                     if !visited.contains(&(related_model.name(), field.name())) {
-                        next_relations.push((related_model, field));
+                        next_relations.push((related_model, field, next_visited_relation.clone()));
                     }
                 }
             }
@@ -999,5 +1011,27 @@ impl<'a> Validator<'a> {
         }
 
         Ok(())
+    }
+}
+
+#[derive(Debug)]
+struct VisitedRelation<'a> {
+    previous: Option<Rc<VisitedRelation<'a>>>,
+    model_name: &'a str,
+    relation_name: &'a str,
+}
+
+impl VisitedRelation<'_> {
+    fn print_full_path(&self) -> String {
+        let mut traversed_models = vec![format!("{}.{}", self.model_name, self.relation_name)];
+        let mut this = self;
+
+        while let Some(next) = this.previous.as_ref() {
+            traversed_models.push(format!("{}.{}", next.model_name, next.relation_name));
+            this = next;
+        }
+
+        traversed_models.reverse();
+        traversed_models.join(" → ")
     }
 }
