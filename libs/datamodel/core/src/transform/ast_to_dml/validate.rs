@@ -723,15 +723,15 @@ impl<'a> Validator<'a> {
                     ));
                 }
 
-                if !field.is_list() && self.preview_features.contains(PreviewFeature::ReferentialActions) {
-                    if self
+                if !field.is_list()
+                    && self.preview_features.contains(PreviewFeature::ReferentialActions)
+                    && self
                         .source
                         .map(|source| &source.active_connector)
                         .map(|connector| connector.has_capability(ConnectorCapability::ReferenceCycleDetection))
                         .unwrap_or_default()
-                    {
-                        referential_actions::detect_cycles(datamodel, model, field, field_span, &mut errors);
-                    }
+                {
+                    referential_actions::detect_cycles(datamodel, model, field, field_span, &mut errors);
                 }
             } else {
                 let message = format!(
