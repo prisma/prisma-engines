@@ -244,8 +244,8 @@ fn insensitive_scalar_filter(field: &ScalarFieldRef, condition: ScalarCondition)
             doc! { "$nin": to_regex_list(field, "^", vals, "$", true)? }
         }
         ScalarCondition::JsonCompare(_) => unimplemented!("JSON filtering is not yet supported on MongoDB"),
-        ScalarCondition::Search(_, _) => todo!(),
-        ScalarCondition::NotSearch(_, _) => todo!(),
+        ScalarCondition::Search(_, _) => unimplemented!("Full-text search is not supported yet on MongoDB"),
+        ScalarCondition::NotSearch(_, _) => unimplemented!("Full-text search is not supported yet on MongoDB"),
     })
 }
 
