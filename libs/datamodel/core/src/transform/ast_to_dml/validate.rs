@@ -54,7 +54,7 @@ impl<'a> Validator<'a> {
                         for field in model.fields() {
                             if let Some(err) = ConstraintNames::client_name_already_in_use(
                                 name,
-                                &field.name(),
+                                field.name(),
                                 &model.name,
                                 ast_model.span,
                                 "@@id",
@@ -72,7 +72,7 @@ impl<'a> Validator<'a> {
                         for field in model.fields() {
                             if let Some(err) = ConstraintNames::client_name_already_in_use(
                                 name,
-                                &field.name(),
+                                field.name(),
                                 &model.name,
                                 ast_model.span,
                                 "@@unique",
@@ -116,7 +116,7 @@ impl<'a> Validator<'a> {
         schema: &dml::Datamodel,
         diagnostics: &mut Diagnostics,
     ) {
-        let constraint_names = NamesValidator::new(&schema, self.preview_features, self.source);
+        let constraint_names = NamesValidator::new(schema, self.preview_features, self.source);
 
         for model in schema.models() {
             let ast_model = ast_schema.find_model(&model.name).expect(STATE_ERROR);
@@ -856,7 +856,7 @@ impl<'a> Validator<'a> {
                 }
 
                 if !field.is_list() && self.preview_features.contains(PreviewFeature::ReferentialActions) {
-                    self.detect_referential_action_cycles(&datamodel, &model, &field, field_span, &mut errors);
+                    self.detect_referential_action_cycles(datamodel, model, field, field_span, &mut errors);
                 }
             } else {
                 let message = format!(

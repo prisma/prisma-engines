@@ -135,7 +135,7 @@ impl SqlRenderer for MssqlFlavour {
             IndexType::Normal => "",
         };
 
-        let index_name = self.quote(&index.name());
+        let index_name = self.quote(index.name());
         let table_reference = self.quote_with_schema(index.table().name()).to_string();
 
         let columns = index.columns().map(|c| self.quote(c.name()));
@@ -178,11 +178,7 @@ impl SqlRenderer for MssqlFlavour {
                 .map(|index| {
                     let columns = index.columns().map(|col| self.quote(col.name()));
 
-                    format!(
-                        "CONSTRAINT {} UNIQUE ({})",
-                        self.quote(&index.name()),
-                        columns.join(",")
-                    )
+                    format!("CONSTRAINT {} UNIQUE ({})", self.quote(index.name()), columns.join(","))
                 })
                 .join(",\n    ");
 
