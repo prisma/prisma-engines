@@ -1,6 +1,7 @@
 use crate::attributes::with_named_constraints;
 use crate::common::*;
 use datamodel::{ast::Span, diagnostics::DatamodelError};
+use indoc::indoc;
 
 #[test]
 fn id_should_error_if_the_field_is_not_required() {
@@ -328,4 +329,36 @@ fn name_on_field_level_id_should_error() {
 
     let errors = parse_error(&dml);
     errors.assert_is(DatamodelError::new_unused_argument_error("name", Span::new(277, 311)));
+}
+
+#[test]
+fn bytes_should_not_be_allowed_as_id_on_sql_server() {
+    let dml = indoc! {r#"
+        datasource db {
+            provider = "sqlserver"
+            url      = "sqlserver://"
+        }
+
+        generator client {
+            provider = "prisma-client-js"
+        }
+
+        model A {
+            id Bytes @id
+        }
+    "#};
+
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mInvalid model: Using Bytes type is not allowed in the model's id..[0m
+          [1;94m-->[0m  [4mschema.prisma:10[0m
+        [1;94m   | [0m
+        [1;94m 9 | [0m
+        [1;94m10 | [0m[1;91mmodel A {[0m
+        [1;94m11 | [0m    id Bytes @id
+        [1;94m12 | [0m}
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&error);
 }
