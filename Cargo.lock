@@ -945,7 +945,6 @@ version = "0.1.0"
 dependencies = [
  "dml",
  "enumflags2",
- "itertools 0.10.0",
  "serde_json",
  "thiserror",
  "url",
@@ -2319,7 +2318,6 @@ dependencies = [
  "datamodel-connector",
  "dml",
  "enumflags2",
- "lazy_static",
  "native-types",
  "once_cell",
  "serde_json",

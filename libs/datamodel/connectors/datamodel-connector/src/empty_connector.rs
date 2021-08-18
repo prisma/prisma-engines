@@ -1,7 +1,6 @@
+use crate::{connector_error::ConnectorError, Connector, ConnectorCapability};
 use dml::relation_info::ReferentialAction;
 use enumflags2::BitFlags;
-
-use crate::{connector_error::ConnectorError, Connector, ConnectorCapability};
 
 /// A [Connector](/trait.Connector.html) implementor meant to
 /// be used as a default when no datasource is defined.
