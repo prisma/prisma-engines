@@ -944,7 +944,7 @@ fn visit_relation<'ast>(
         relation_field.fields = Some(fields);
     }
 
-     relation::validate_relation_field_arity(model_id, field_id, relation_field, ctx);
+    relation::validate_relation_field_arity(model_id, field_id, relation_field, ctx);
 
     if let Some(references) = args.optional_arg("references") {
         let references = match resolve_field_array(&references, args.span(), relation_field.referenced_model, ctx) {
