@@ -9,7 +9,6 @@ version = "0.1.0"
 [dependencies]
 datamodel-connector = { path = "../datamodel-connector" }
 dml = { path = "../dml" }
-lazy_static = "1.4"
 native-types = { path = "../../../native-types" }
 once_cell = "1.3"
 serde_json = { version = "1.0", features = ["float_roundtrip"] }

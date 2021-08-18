@@ -1,9 +1,8 @@
-use std::collections::HashMap;
-
 use datamodel_connector::connector_error::{ConnectorError, ErrorKind};
 use dml::{native_type_constructor::NativeTypeConstructor, scalars::ScalarType};
-use lazy_static::lazy_static;
 use native_types::MongoDbType;
+use once_cell::sync::Lazy;
+use std::collections::HashMap;
 
 /// The names of types as they appear in the Prisma schema.
 pub mod type_names {
@@ -20,22 +19,20 @@ pub mod type_names {
     pub const DECIMAL: &str = "Decimal";
 }
 
-lazy_static! {
-    static ref DEFAULT_MAPPING: HashMap<ScalarType, MongoDbType> = {
-        vec![
-            (ScalarType::Int, MongoDbType::Int),
-            (ScalarType::BigInt, MongoDbType::Long),
-            (ScalarType::Float, MongoDbType::Double),
-            (ScalarType::Decimal, MongoDbType::Decimal),
-            (ScalarType::Boolean, MongoDbType::Bool),
-            (ScalarType::String, MongoDbType::String),
-            (ScalarType::DateTime, MongoDbType::Timestamp),
-            (ScalarType::Bytes, MongoDbType::BinData),
-        ]
-        .into_iter()
-        .collect()
-    };
-}
+static DEFAULT_MAPPING: Lazy<HashMap<ScalarType, MongoDbType>> = Lazy::new(|| {
+    vec![
+        (ScalarType::Int, MongoDbType::Int),
+        (ScalarType::BigInt, MongoDbType::Long),
+        (ScalarType::Float, MongoDbType::Double),
+        (ScalarType::Decimal, MongoDbType::Decimal),
+        (ScalarType::Boolean, MongoDbType::Bool),
+        (ScalarType::String, MongoDbType::String),
+        (ScalarType::DateTime, MongoDbType::Timestamp),
+        (ScalarType::Bytes, MongoDbType::BinData),
+    ]
+    .into_iter()
+    .collect()
+});
 
 use type_names::*;
 
