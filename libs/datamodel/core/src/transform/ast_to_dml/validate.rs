@@ -1,20 +1,19 @@
 #![allow(clippy::suspicious_operation_groupings)] // clippy is wrong there
 
 mod names;
+mod referential_actions;
 
 use crate::{
-    ast::{self, Span},
+    ast,
     common::{constraint_names::ConstraintNames, preview_features::PreviewFeature},
     configuration,
     diagnostics::{DatamodelError, Diagnostics},
     dml,
     PreviewFeature::NamedConstraints,
 };
-use ::dml::{datamodel::Datamodel, field::RelationField, model::Model, traits::WithName};
 use datamodel_connector::ConnectorCapability;
 use enumflags2::BitFlags;
 use names::NamesValidator;
-use std::{collections::HashSet, rc::Rc};
 
 /// Helper for validating a datamodel.
 ///
@@ -450,149 +449,6 @@ impl<'a> Validator<'a> {
         errors.to_result()
     }
 
-    // In certain databases, such as SQL Server, it is not allowd to create
-    // multiple reference paths between two models, if referential actions would
-    // cause modifications to the children objects.
-    //
-    // We detect this early before letting database to give us a much more
-    // cryptic error message.
-    fn detect_referential_action_cycles(
-        &self,
-        datamodel: &Datamodel,
-        parent_model: &Model,
-        parent_field: &RelationField,
-        span: Span,
-        errors: &mut Diagnostics,
-    ) {
-        // we only do this if the referential actions preview feature is enabled
-        if !self
-            .source
-            .map(|source| &source.active_connector)
-            .map(|connector| connector.has_capability(ConnectorCapability::ReferenceCycleDetection))
-            .unwrap_or_default()
-        {
-            return;
-        }
-
-        // Keeps count on visited relations to iterate them only once.
-        let mut visited = HashSet::new();
-        let visited_relations_path_initial = VisitedRelation {
-            previous: None,
-            model_name: &parent_model.name,
-            relation_name: &parent_field.name,
-        };
-        // poor man's tail-recursion ;)
-        let mut next_relations = vec![(parent_model, parent_field, Rc::new(visited_relations_path_initial))];
-
-        while let Some((model, field, previous_visited_relation)) = next_relations.pop() {
-            // we expect to have both sides of the relation at this point...
-            let related_field = datamodel.find_related_field_bang(field).1;
-            let related_model = datamodel.find_model(&field.relation_info.to).unwrap();
-
-            // we do not visit the relation field on the other side
-            // after this run.
-            visited.insert((model.name(), field.name()));
-            visited.insert((related_model.name(), related_field.name()));
-
-            // skip many-to-many
-            if field.is_list() && related_field.is_list() {
-                continue;
-            }
-
-            // we skipped many-to-many relations, so one of the sides either has
-            // referential actions set, or we can take the default actions
-            let on_update = field
-                .relation_info
-                .on_update
-                .or(related_field.relation_info.on_update)
-                .unwrap_or_else(|| {
-                    if field.is_list() {
-                        related_field.default_on_update_action()
-                    } else {
-                        field.default_on_update_action()
-                    }
-                });
-
-            let on_delete = field
-                .relation_info
-                .on_delete
-                .or(related_field.relation_info.on_delete)
-                .unwrap_or_else(|| {
-                    if field.is_list() {
-                        related_field.default_on_delete_action()
-                    } else {
-                        field.default_on_delete_action()
-                    }
-                });
-
-            // a cycle has a meaning only if every relation in it triggers
-            // modifications in the children
-            if on_delete.triggers_modification() || on_update.triggers_modification() {
-                let error_with_default_values = |msg: &str| {
-                    let on_delete = match parent_field.relation_info.on_delete {
-                        None if parent_field.default_on_delete_action().triggers_modification() => {
-                            Some(parent_field.default_on_delete_action())
-                        }
-                        _ => None,
-                    };
-
-                    let on_update = match parent_field.relation_info.on_update {
-                        None if parent_field.default_on_update_action().triggers_modification() => {
-                            Some(parent_field.default_on_update_action())
-                        }
-                        _ => None,
-                    };
-
-                    let mut msg = match (on_delete, on_update) {
-                        (Some(on_delete), Some(on_update)) => {
-                            format!(
-                                "{} Implicit default `onDelete` and `onUpdate` values: `{}` and `{}`.",
-                                msg, on_delete, on_update
-                            )
-                        }
-                        (Some(on_delete), None) => {
-                            format!("{} Implicit default `onDelete` value: `{}`.", msg, on_delete)
-                        }
-                        (None, Some(on_update)) => {
-                            format!("{} Implicit default `onUpdate` value: `{}`.", msg, on_update)
-                        }
-                        (None, None) => msg.to_string(),
-                    };
-
-                    msg.push_str(" Read more at https://pris.ly/d/cyclic-referential-actions");
-
-                    DatamodelError::new_attribute_validation_error(&msg, RELATION_ATTRIBUTE_NAME, span)
-                };
-
-                if model.name() == related_model.name() {
-                    let msg = "A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes.";
-                    errors.push_error(error_with_default_values(msg));
-                    return;
-                }
-
-                if related_model.name() == parent_model.name() {
-                    let msg = format!("Reference causes a cycle or multiple cascade paths. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Cycle path: {}.", previous_visited_relation.print_full_path());
-                    errors.push_error(error_with_default_values(&msg));
-                    return;
-                }
-
-                // bozo tail-recursion continues
-                for field in related_model.relation_fields() {
-                    // TODO: introduce this properly
-                    let next_visited_relation = Rc::new(VisitedRelation {
-                        previous: Some(previous_visited_relation.clone()),
-                        model_name: related_model.name(),
-                        relation_name: &field.name,
-                    });
-
-                    if !visited.contains(&(related_model.name(), field.name())) {
-                        next_relations.push((related_model, field, next_visited_relation.clone()));
-                    }
-                }
-            }
-        }
-    }
-
     fn validate_relation_arguments_bla<'dml>(
         &self,
         datamodel: &'dml dml::Datamodel,
@@ -868,7 +724,14 @@ impl<'a> Validator<'a> {
                 }
 
                 if !field.is_list() && self.preview_features.contains(PreviewFeature::ReferentialActions) {
-                    self.detect_referential_action_cycles(datamodel, model, field, field_span, &mut errors);
+                    if self
+                        .source
+                        .map(|source| &source.active_connector)
+                        .map(|connector| connector.has_capability(ConnectorCapability::ReferenceCycleDetection))
+                        .unwrap_or_default()
+                    {
+                        referential_actions::detect_cycles(datamodel, model, field, field_span, &mut errors);
+                    }
                 }
             } else {
                 let message = format!(
@@ -1011,27 +874,5 @@ impl<'a> Validator<'a> {
         }
 
         Ok(())
-    }
-}
-
-#[derive(Debug)]
-struct VisitedRelation<'a> {
-    previous: Option<Rc<VisitedRelation<'a>>>,
-    model_name: &'a str,
-    relation_name: &'a str,
-}
-
-impl VisitedRelation<'_> {
-    fn print_full_path(&self) -> String {
-        let mut traversed_models = vec![format!("{}.{}", self.model_name, self.relation_name)];
-        let mut this = self;
-
-        while let Some(next) = this.previous.as_ref() {
-            traversed_models.push(format!("{}.{}", next.model_name, next.relation_name));
-            this = next;
-        }
-
-        traversed_models.reverse();
-        traversed_models.join(" → ")
     }
 }
