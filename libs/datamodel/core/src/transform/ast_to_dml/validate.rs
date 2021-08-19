@@ -583,9 +583,9 @@ impl<'a> Validator<'a> {
                     && (rel_info.on_delete.is_some() || rel_info.on_update.is_some())
                 {
                     let message = &format!(
-                            "The relation field `{}` on Model `{}` must not specify the `onDelete` or `onUpdate` argument in the {} attribute. You must only specify it on the opposite field `{}` on model `{}`, or in case of a many to many relation, in an explicit join table.",
-                            &field.name, &model.name, RELATION_ATTRIBUTE_NAME_WITH_AT, &related_field.name, &related_model.name
-                        );
+                        "The relation field `{}` on Model `{}` must not specify the `onDelete` or `onUpdate` argument in the {} attribute. You must only specify it on the opposite field `{}` on model `{}`, or in case of a many to many relation, in an explicit join table.",
+                        &field.name, &model.name, RELATION_ATTRIBUTE_NAME_WITH_AT, &related_field.name, &related_model.name
+                    );
 
                     errors.push_error(DatamodelError::new_attribute_validation_error(
                         message,
@@ -635,20 +635,35 @@ impl<'a> Validator<'a> {
                         ));
                     }
 
-                    if self.preview_features.contains(PreviewFeature::ReferentialActions)
-                        && (rel_info.on_delete.is_some() || rel_info.on_update.is_some())
-                        && (related_field_rel_info.on_delete.is_some() || related_field_rel_info.on_update.is_some())
-                    {
-                        let message = format!(
-                            "The relation fields `{}` on Model `{}` and `{}` on Model `{}` both provide the `onDelete` or `onUpdate` argument in the {} attribute. You have to provide it only on one of the two fields.",
-                            &field.name, &model.name, &related_field.name, &related_model.name, RELATION_ATTRIBUTE_NAME_WITH_AT
-                        );
+                    if self.preview_features.contains(PreviewFeature::ReferentialActions) {
+                        if (rel_info.on_delete.is_some() || rel_info.on_update.is_some())
+                            && (related_field_rel_info.on_delete.is_some()
+                                || related_field_rel_info.on_update.is_some())
+                        {
+                            let message = format!(
+                                "The relation fields `{}` on Model `{}` and `{}` on Model `{}` both provide the `onDelete` or `onUpdate` argument in the {} attribute. You have to provide it only on one of the two fields.",
+                                &field.name, &model.name, &related_field.name, &related_model.name, RELATION_ATTRIBUTE_NAME_WITH_AT
+                            );
 
-                        errors.push_error(DatamodelError::new_attribute_validation_error(
-                            &message,
-                            RELATION_ATTRIBUTE_NAME,
-                            field_span,
-                        ));
+                            errors.push_error(DatamodelError::new_attribute_validation_error(
+                                &message,
+                                RELATION_ATTRIBUTE_NAME,
+                                field_span,
+                            ));
+                        } else if rel_info.fields.is_empty()
+                            && (rel_info.on_delete.is_some() || rel_info.on_update.is_some())
+                        {
+                            let message = &format!(
+                                "The relation field `{}` on Model `{}` must not specify the `onDelete` or `onUpdate` argument in the {} attribute. You must only specify it on the opposite field `{}` on model `{}`.",
+                                &field.name, &model.name, RELATION_ATTRIBUTE_NAME_WITH_AT, &related_field.name, &related_model.name
+                            );
+
+                            errors.push_error(DatamodelError::new_attribute_validation_error(
+                                message,
+                                RELATION_ATTRIBUTE_NAME,
+                                field_span,
+                            ));
+                        }
                     }
 
                     if !rel_info.fields.is_empty() && !related_field_rel_info.fields.is_empty() {
