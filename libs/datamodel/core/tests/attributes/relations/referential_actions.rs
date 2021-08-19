@@ -318,7 +318,7 @@ fn concrete_actions_should_not_work_on_planetscale() {
 }
 
 #[test]
-fn on_delete_cannot_be_defined_on_the_wrong_side() {
+fn on_delete_cannot_be_defined_on_the_wrong_side_1_n() {
     let dml = indoc! { r#"
         datasource db {
             provider = "mysql"
@@ -353,7 +353,7 @@ fn on_delete_cannot_be_defined_on_the_wrong_side() {
 }
 
 #[test]
-fn on_update_cannot_be_defined_on_the_wrong_side() {
+fn on_update_cannot_be_defined_on_the_wrong_side_1_n() {
     let dml = indoc! { r#"
         datasource db {
             provider = "mysql"
@@ -385,6 +385,74 @@ fn on_update_cannot_be_defined_on_the_wrong_side() {
         "relation",
         Span::new(193, 230),
     )]);
+}
+
+#[test]
+fn on_delete_cannot_be_defined_on_the_wrong_side_1_1() {
+    let dml = indoc! { r#"
+        datasource db {
+            provider = "mysql"
+            url = "mysql://"
+        }
+
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialActions"]
+        }
+
+        model Chicken {
+            id        Int      @id @default(autoincrement())
+            cock      Chicken? @relation(name: "a_self_relation", onDelete: NoAction)
+            hen       Chicken? @relation(name: "a_self_relation", fields: [chickenId], references: [id])
+            chickenId Int?
+        }
+    "#};
+
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@relation": The relation field `cock` on Model `Chicken` must not specify the `onDelete` or `onUpdate` argument in the @relation attribute. You must only specify it on the opposite field `hen` on model `Chicken`.[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
+        [1;94m   | [0m
+        [1;94m12 | [0m    id        Int      @id @default(autoincrement())
+        [1;94m13 | [0m    [1;91mcock      Chicken? @relation(name: "a_self_relation", onDelete: NoAction)[0m
+        [1;94m14 | [0m    hen       Chicken? @relation(name: "a_self_relation", fields: [chickenId], references: [id])
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+}
+
+#[test]
+fn on_update_cannot_be_defined_on_the_wrong_side_1_1() {
+    let dml = indoc! { r#"
+        datasource db {
+            provider = "mysql"
+            url = "mysql://"
+        }
+
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialActions"]
+        }
+
+        model Chicken {
+            id        Int      @id @default(autoincrement())
+            cock      Chicken? @relation(name: "a_self_relation", onUpdate: NoAction)
+            hen       Chicken? @relation(name: "a_self_relation", fields: [chickenId], references: [id])
+            chickenId Int?
+        }
+    "#};
+
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@relation": The relation field `cock` on Model `Chicken` must not specify the `onDelete` or `onUpdate` argument in the @relation attribute. You must only specify it on the opposite field `hen` on model `Chicken`.[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
+        [1;94m   | [0m
+        [1;94m12 | [0m    id        Int      @id @default(autoincrement())
+        [1;94m13 | [0m    [1;91mcock      Chicken? @relation(name: "a_self_relation", onUpdate: NoAction)[0m
+        [1;94m14 | [0m    hen       Chicken? @relation(name: "a_self_relation", fields: [chickenId], references: [id])
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }
 
 #[test]
