@@ -225,8 +225,8 @@ pub fn render_datamodel_to(
     let datasource = configuration.and_then(|c| c.datasources.first());
 
     let preview_features = configuration
-        .map(|c| c.preview_features().map(|feat| *feat).collect())
-        .unwrap_or_else(|| BitFlags::empty());
+        .map(|c| c.preview_features().copied().collect())
+        .unwrap_or_else(BitFlags::empty);
 
     let lowered = LowerDmlToAst::new(datasource, preview_features).lower(datamodel);
 
