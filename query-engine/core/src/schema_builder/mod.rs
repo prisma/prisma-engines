@@ -40,7 +40,7 @@ mod utils;
 use crate::schema::*;
 use cache::TypeRefCache;
 use datamodel::common::preview_features::PreviewFeature;
-use datamodel_connector::ConnectorCapabilities;
+use datamodel_connector::{ConnectorCapabilities, ConnectorCapability};
 use prisma_models::{Field as ModelField, Index, InternalDataModelRef, ModelRef, RelationFieldRef, TypeIdentifier};
 use std::sync::Arc;
 
@@ -91,6 +91,10 @@ impl BuilderContext {
 
     pub fn has_feature(&self, feature: &PreviewFeature) -> bool {
         self.preview_features.contains(feature)
+    }
+
+    pub fn has_capability(&self, capability: ConnectorCapability) -> bool {
+        self.capabilities.contains(capability)
     }
 
     // Just here for convenience, will be removed soon.

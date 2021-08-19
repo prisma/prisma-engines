@@ -75,6 +75,7 @@ impl PostgresDatamodelConnector {
             ConnectorCapability::NamedPrimaryKeys,
             ConnectorCapability::NamedForeignKeys,
             ConnectorCapability::ForeignKeys,
+            ConnectorCapability::FullTextSearchWithoutIndex,
         ];
 
         let small_int = NativeTypeConstructor::without_args(SMALL_INT_TYPE_NAME, vec![ScalarType::Int]);

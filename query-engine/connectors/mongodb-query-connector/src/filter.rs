@@ -1,4 +1,4 @@
-use crate::{join::JoinStage, IntoBson};
+use crate::{error::MongoError, join::JoinStage, IntoBson};
 use connector_interface::{
     AggregationFilter, Filter, OneRelationIsNullFilter, QueryMode, RelationCondition, RelationFilter, ScalarCompare,
     ScalarCondition, ScalarFilter, ScalarListFilter, ScalarProjection,
@@ -199,27 +199,27 @@ fn default_scalar_filter(field: &ScalarFieldRef, condition: ScalarCondition) -> 
             }
             _ => unimplemented!("Only equality JSON filtering is supported on MongoDB."),
         },
+        ScalarCondition::Search(_, _) => unimplemented!("Full-text search is not supported yet on MongoDB"),
+        ScalarCondition::NotSearch(_, _) => unimplemented!("Full-text search is not supported yet on MongoDB"),
     })
 }
 
 /// Insensitive filters are only reachable with TypeIdentifier::String (or UUID, which is string as well for us).
 fn insensitive_scalar_filter(field: &ScalarFieldRef, condition: ScalarCondition) -> crate::Result<Document> {
-    Ok(match condition {
-        ScalarCondition::Equals(val) => doc! { "$regex": to_regex(field, "^", val, "$", true)? },
-        ScalarCondition::NotEquals(val) => {
-            doc! { "$not": { "$regex": to_regex(field, "^", val, "$", true)? }}
-        }
+    match condition {
+        ScalarCondition::Equals(val) => Ok(doc! { "$regex": to_regex(field, "^", val, "$", true)? }),
+        ScalarCondition::NotEquals(val) => Ok(doc! { "$not": { "$regex": to_regex(field, "^", val, "$", true)? }}),
 
-        ScalarCondition::Contains(val) => doc! { "$regex": to_regex(field, ".*", val, ".*", true)? },
-        ScalarCondition::NotContains(val) => doc! { "$not": { "$regex": to_regex(field, ".*", val, ".*", true)? }},
-        ScalarCondition::StartsWith(val) => doc! { "$regex": to_regex(field, "^", val, "", true)?  },
-        ScalarCondition::NotStartsWith(val) => doc! { "$not": { "$regex": to_regex(field, "^", val, "", true)? }},
-        ScalarCondition::EndsWith(val) => doc! { "$regex": to_regex(field, "", val, "$", true)? },
-        ScalarCondition::NotEndsWith(val) => doc! { "$not": { "$regex": to_regex(field, "", val, "$", true)? }},
-        ScalarCondition::LessThan(val) => doc! { "$lt": (field, val).into_bson()? },
-        ScalarCondition::LessThanOrEquals(val) => doc! { "$lte": (field, val).into_bson()? },
-        ScalarCondition::GreaterThan(val) => doc! { "$gt": (field, val).into_bson()? },
-        ScalarCondition::GreaterThanOrEquals(val) => doc! { "$gte": (field, val).into_bson()? },
+        ScalarCondition::Contains(val) => Ok(doc! { "$regex": to_regex(field, ".*", val, ".*", true)? }),
+        ScalarCondition::NotContains(val) => Ok(doc! { "$not": { "$regex": to_regex(field, ".*", val, ".*", true)? }}),
+        ScalarCondition::StartsWith(val) => Ok(doc! { "$regex": to_regex(field, "^", val, "", true)?  }),
+        ScalarCondition::NotStartsWith(val) => Ok(doc! { "$not": { "$regex": to_regex(field, "^", val, "", true)? }}),
+        ScalarCondition::EndsWith(val) => Ok(doc! { "$regex": to_regex(field, "", val, "$", true)? }),
+        ScalarCondition::NotEndsWith(val) => Ok(doc! { "$not": { "$regex": to_regex(field, "", val, "$", true)? }}),
+        ScalarCondition::LessThan(val) => Ok(doc! { "$lt": (field, val).into_bson()? }),
+        ScalarCondition::LessThanOrEquals(val) => Ok(doc! { "$lte": (field, val).into_bson()? }),
+        ScalarCondition::GreaterThan(val) => Ok(doc! { "$gt": (field, val).into_bson()? }),
+        ScalarCondition::GreaterThanOrEquals(val) => Ok(doc! { "$gte": (field, val).into_bson()? }),
         // Todo: The nested list unpack looks like a bug somewhere.
         //       Likely join code mistakenly repacks a list into a list of PrismaValue somewhere in the core.
         ScalarCondition::In(vals) => match vals.split_first() {
@@ -233,16 +233,19 @@ fn insensitive_scalar_filter(field: &ScalarFieldRef, condition: ScalarCondition)
                     }
                 }
 
-                doc! { "$in": bson_values }
+                Ok(doc! { "$in": bson_values })
             }
 
-            _ => doc! { "$in": to_regex_list(field, "^", vals, "$", true)? },
+            _ => Ok(doc! { "$in": to_regex_list(field, "^", vals, "$", true)? }),
         },
-        ScalarCondition::NotIn(vals) => {
-            doc! { "$nin": to_regex_list(field, "^", vals, "$", true)? }
-        }
-        ScalarCondition::JsonCompare(_) => unimplemented!("JSON filtering is not yet supported on MongoDB"),
-    })
+        ScalarCondition::NotIn(vals) => Ok(doc! { "$nin": to_regex_list(field, "^", vals, "$", true)? }),
+        ScalarCondition::JsonCompare(_) => Err(MongoError::Unsupported(
+            "JSON filtering is not yet supported on MongoDB".to_string(),
+        )),
+        ScalarCondition::Search(_, _) | ScalarCondition::NotSearch(_, _) => Err(MongoError::Unsupported(
+            "Full-text search is not supported yet on MongoDB".to_string(),
+        )),
+    }
 }
 
 /// Filters available on list fields.
