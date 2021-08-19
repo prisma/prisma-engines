@@ -58,9 +58,11 @@ pub trait ScalarCompare {
     fn greater_than_or_equals<T>(&self, val: T) -> Filter
     where
         T: Into<PrismaValue>;
+
     fn search<T>(&self, val: T) -> Filter
     where
         T: Into<PrismaValue>;
+
     fn not_search<T>(&self, val: T) -> Filter
     where
         T: Into<PrismaValue>;

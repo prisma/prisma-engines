@@ -367,7 +367,7 @@ impl ScalarCompare for ScalarFieldRef {
     {
         Filter::from(ScalarFilter {
             projection: ScalarProjection::Single(Arc::clone(self)),
-            condition: ScalarCondition::Search(val.into(), vec![]),
+            condition: ScalarCondition::NotSearch(val.into(), vec![]),
             mode: QueryMode::Default,
         })
     }
@@ -559,7 +559,7 @@ impl ScalarCompare for ModelProjection {
     {
         Filter::from(ScalarFilter {
             projection: ScalarProjection::Compound(self.scalar_fields().collect()),
-            condition: ScalarCondition::Search(val.into(), vec![]),
+            condition: ScalarCondition::NotSearch(val.into(), vec![]),
             mode: QueryMode::Default,
         })
     }

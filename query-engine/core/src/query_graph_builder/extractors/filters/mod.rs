@@ -1,4 +1,5 @@
 mod filter_grouping;
+mod flatten;
 mod relation;
 mod scalar;
 
@@ -10,6 +11,7 @@ use crate::{
 };
 use connector::{filter::Filter, QueryMode, RelationCompare, ScalarCompare, ScalarCondition, ScalarProjection};
 use filter_grouping::*;
+use flatten::*;
 use prisma_models::{Field, ModelRef, PrismaValue, RelationFieldRef, ScalarFieldRef};
 use std::{collections::HashMap, convert::TryInto, str::FromStr};
 
@@ -165,14 +167,14 @@ fn merge_search_filters(filter: Filter) -> Filter {
     let flattened = flatten_filter(filter);
 
     match flattened {
-        Filter::And(and) => Filter::And(do_merge_search_filters(and)),
-        Filter::Or(or) => Filter::Or(do_merge_search_filters(or)),
-        Filter::Not(not) => Filter::Not(do_merge_search_filters(not)),
+        Filter::And(and) => Filter::And(fold_search_filters(&and)),
+        Filter::Or(or) => Filter::Or(fold_search_filters(&or)),
+        Filter::Not(not) => Filter::Not(fold_search_filters(&not)),
         _ => flattened,
     }
 }
 
-fn do_merge_search_filters(filters: Vec<Filter>) -> Vec<Filter> {
+fn fold_search_filters(filters: &Vec<Filter>) -> Vec<Filter> {
     let mut filters_by_val: HashMap<PrismaValue, &Filter> = HashMap::new();
     let mut projections_by_val: HashMap<PrismaValue, Vec<ScalarProjection>> = HashMap::new();
     let mut output: Vec<Filter> = vec![];
@@ -194,13 +196,13 @@ fn do_merge_search_filters(filters: Vec<Filter>) -> Vec<Filter> {
                 _ => output.push(filter.clone()),
             },
             Filter::And(and) => {
-                output.push(Filter::And(do_merge_search_filters(and.clone())));
+                output.push(Filter::And(fold_search_filters(and)));
             }
             Filter::Or(or) => {
-                output.push(Filter::Or(do_merge_search_filters(or.clone())));
+                output.push(Filter::Or(fold_search_filters(or)));
             }
             Filter::Not(not) => {
-                output.push(Filter::Not(do_merge_search_filters(not.clone())));
+                output.push(Filter::Not(fold_search_filters(not)));
             }
             x => output.push(x.clone()),
         }
@@ -228,49 +230,6 @@ fn do_merge_search_filters(filters: Vec<Filter>) -> Vec<Filter> {
     }
 
     output
-}
-
-fn flatten_filter(filter: Filter) -> Filter {
-    fn flatten_filters(filters: Vec<Filter>, parent: &Filter) -> Vec<Filter> {
-        let mut flattened: Vec<Filter> = vec![];
-
-        for f in filters {
-            match (f.clone(), parent) {
-                (Filter::And(and), Filter::And(_)) => {
-                    flattened.append(&mut flatten_filters(and, &f));
-                }
-                (Filter::And(and), _) => {
-                    flattened.push(Filter::And(flatten_filters(and, &f)));
-                }
-                (Filter::Or(or), Filter::Or(_)) => {
-                    flattened.append(&mut flatten_filters(or, &f));
-                }
-                (Filter::Or(or), _) => {
-                    flattened.push(Filter::Or(flatten_filters(or, &f)));
-                }
-                (Filter::Not(not), Filter::Not(_)) => {
-                    flattened.append(&mut flatten_filters(not, &f));
-                }
-                (Filter::Not(not), _) => {
-                    flattened.push(Filter::Not(flatten_filters(not, &f)));
-                }
-                _ => {
-                    flattened.push(f);
-                }
-            }
-        }
-
-        flattened
-    }
-
-    let parent = filter.clone();
-
-    match filter {
-        Filter::And(ands) => Filter::And(flatten_filters(ands, &parent)),
-        Filter::Or(ors) => Filter::Or(flatten_filters(ors, &parent)),
-        Filter::Not(nots) => Filter::Or(flatten_filters(nots, &parent)),
-        f => f,
-    }
 }
 
 /// Field is the field the filter is refering to and `value` is the passed filter. E.g. `where: { <field>: <value> }.

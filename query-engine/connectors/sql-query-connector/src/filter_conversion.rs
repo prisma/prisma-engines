@@ -1,6 +1,7 @@
 use connector_interface::filter::*;
 use prisma_models::prelude::*;
 use quaint::ast::*;
+use std::convert::TryInto;
 
 #[derive(Clone, Copy, Debug)]
 /// A distinction in aliasing to separate the parent table and the joined data
@@ -158,7 +159,7 @@ fn scalar_filter_aliased_cond_search(sf: ScalarFilter, alias: Option<Alias>) -> 
         .into_iter()
         .map(|p| match (p, alias) {
             (ScalarProjection::Single(field), None) => field.as_column(),
-            (ScalarProjection::Single(field), Some(alias)) => field.as_column().table(alias.to_string(None)).into(),
+            (ScalarProjection::Single(field), Some(alias)) => field.as_column().table(alias.to_string(None)),
             (ScalarProjection::Compound(_), _) => unreachable!("Full-text search does not support compound fields"),
         })
         .collect();
@@ -594,12 +595,21 @@ fn default_scalar_filter(
             }
             _ => comparable.not_in_selection(convert_values(fields, values)),
         },
+        ScalarCondition::Search(value, _) => {
+            let query: String = value
+                .try_into()
+                .unwrap_or_else(|err: ConversionFailure| panic!("{}", err));
+
+            comparable.matches(query)
+        }
+        ScalarCondition::NotSearch(value, _) => {
+            let query: String = value
+                .try_into()
+                .unwrap_or_else(|err: ConversionFailure| panic!("{}", err));
+
+            comparable.not_matches(query)
+        }
         ScalarCondition::JsonCompare(_) => unreachable!(),
-        ScalarCondition::Search(value, _) => comparable.matches(match value {
-            PrismaValue::String(s) => s,
-            _ => unreachable!(),
-        }),
-        ScalarCondition::NotSearch(_, _) => todo!(),
     };
 
     ConditionTree::single(condition)
@@ -698,9 +708,21 @@ fn insensitive_scalar_filter(
                 )
             }
         },
+        ScalarCondition::Search(value, _) => {
+            let query: String = value
+                .try_into()
+                .unwrap_or_else(|err: ConversionFailure| panic!("{}", err));
+
+            comparable.matches(query)
+        }
+        ScalarCondition::NotSearch(value, _) => {
+            let query: String = value
+                .try_into()
+                .unwrap_or_else(|err: ConversionFailure| panic!("{}", err));
+
+            comparable.not_matches(query)
+        }
         ScalarCondition::JsonCompare(_) => unreachable!(),
-        ScalarCondition::Search(_, _) => todo!(),
-        ScalarCondition::NotSearch(_, _) => todo!(),
     };
 
     ConditionTree::single(condition)

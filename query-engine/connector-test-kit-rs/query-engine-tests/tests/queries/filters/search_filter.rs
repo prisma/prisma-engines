@@ -80,6 +80,21 @@ mod search_filter {
     }
 
     #[connector_test]
+    async fn search_many_fields_not(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: {
+                    NOT: [{ fieldA: { search: "Chicken" } }, { fieldB: { search: "Carrot" } }]
+                }) { id, fieldA, fieldB }}
+          "#),
+          @r###"{"data":{"findManyTestModel":[{"id":3,"fieldA":"Caesar Salad","fieldB":"Salad, Chicken, Caesar Sauce"},{"id":4,"fieldA":"Beef Sandwich","fieldB":"Bread, Beef"}]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
     async fn ensure_filter_tree_shake_works(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
@@ -92,6 +107,17 @@ mod search_filter {
                 }) { id, fieldA, fieldB, fieldC }}
           "#),
           @r###"{"data":{"findManyTestModel":[{"id":1,"fieldA":"Chicken Masala","fieldB":"Chicken, Rice, Masala Sauce","fieldC":null},{"id":2,"fieldA":"Chicken Curry","fieldB":"Chicken, Curry","fieldC":null}]}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: {
+                      AND: [
+                        { NOT: [{ fieldA: { search: "Chicken" } }, { fieldB: { search: "Beef" } }] },
+                        { fieldA: { search: "Salad" } }
+                      ]
+                  }) { id, fieldA, fieldB, fieldC }}
+            "#),
+          @r###"{"data":{"findManyTestModel":[{"id":3,"fieldA":"Caesar Salad","fieldB":"Salad, Chicken, Caesar Sauce","fieldC":"Chicken"}]}}"###
         );
 
         Ok(())
@@ -107,6 +133,11 @@ mod search_filter {
         create_row(
             runner,
             r#"{ id: 3, fieldA: "Caesar Salad", fieldB: "Salad, Chicken, Caesar Sauce", fieldC: "Chicken"}"#,
+        )
+        .await?;
+        create_row(
+            runner,
+            r#"{ id: 4, fieldA: "Beef Sandwich", fieldB: "Bread, Beef", fieldC: "Beef"}"#,
         )
         .await?;
 
