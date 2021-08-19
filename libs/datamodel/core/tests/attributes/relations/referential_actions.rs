@@ -167,11 +167,16 @@ fn invalid_on_delete_action() {
         }
     "#};
 
-    parse_error(dml).assert_is(DatamodelError::new_attribute_validation_error(
-        "Invalid referential action: `MeowMeow`",
-        "relation",
-        Span::new(238, 246),
-    ));
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@relation": Invalid referential action: `MeowMeow`[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
+        [1;94m   | [0m
+        [1;94m13 | [0m    aId Int
+        [1;94m14 | [0m    a A @relation(fields: [aId], references: [id], onDelete: [1;91mMeowMeow[0m)
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }
 
 #[test]

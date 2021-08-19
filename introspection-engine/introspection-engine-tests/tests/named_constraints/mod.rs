@@ -338,16 +338,16 @@ async fn introspecting_custom_fk_names_does_not_return_them_on_sqlite(api: &Test
 
     let expected = expect![[r#"
         model Post {
-            id       Int @id @default(autoincrement())
-            user_id  Int
-            User     User @relation(fields: [user_id], references: [id])
-            
-            @@index([user_id])
+          id      Int  @id @default(autoincrement())
+          user_id Int
+          User    User @relation(fields: [user_id], references: [id])
+
+          @@index([user_id])
         }
 
         model User {
-            id      Int @id @default(autoincrement())
-            Post    Post[]
+          id   Int    @id @default(autoincrement())
+          Post Post[]
         }
     "#]];
 
