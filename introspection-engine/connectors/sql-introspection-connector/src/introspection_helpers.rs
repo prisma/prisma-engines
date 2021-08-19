@@ -178,6 +178,7 @@ pub(crate) fn calculate_relation_field(
     schema: &SqlSchema,
     table: &Table,
     foreign_key: &ForeignKey,
+    m2m_table_names: &[String],
 ) -> Result<RelationField, SqlError> {
     debug!("Handling foreign key  {:?}", foreign_key);
 
@@ -190,7 +191,7 @@ pub(crate) fn calculate_relation_field(
     };
 
     let relation_info = RelationInfo {
-        name: calculate_relation_name(schema, foreign_key, table)?,
+        name: calculate_relation_name(schema, foreign_key, table, m2m_table_names)?,
         fk_name: foreign_key.constraint_name.clone(),
         fields: foreign_key.columns.clone(),
         to: foreign_key.referenced_table.clone(),
@@ -322,7 +323,12 @@ pub(crate) fn is_sequence(column: &Column, table: &Table) -> bool {
         .unwrap_or(false)
 }
 
-pub(crate) fn calculate_relation_name(schema: &SqlSchema, fk: &ForeignKey, table: &Table) -> Result<String, SqlError> {
+pub(crate) fn calculate_relation_name(
+    schema: &SqlSchema,
+    fk: &ForeignKey,
+    table: &Table,
+    m2m_table_names: &[String],
+) -> Result<String, SqlError> {
     //this is not called for prisma many to many relations. for them the name is just the name of the join table.
     let referenced_model = &fk.referenced_table;
     let model_with_fk = &table.name;
@@ -347,8 +353,14 @@ pub(crate) fn calculate_relation_name(schema: &SqlSchema, fk: &ForeignKey, table
                 .iter()
                 .any(|fk| &fk.referenced_table == model_with_fk);
 
-            let name = if fk_to_same_model.len() < 2 && !fk_from_other_model_to_this_exist {
-                RelationNames::name_for_unambiguous_relation(model_with_fk, referenced_model)
+            let unambiguous_name = RelationNames::name_for_unambiguous_relation(model_with_fk, referenced_model);
+
+            // this needs to know whether there are m2m relations and then use ambiguous name path
+            let name = if fk_to_same_model.len() < 2
+                && !fk_from_other_model_to_this_exist
+                && !m2m_table_names.contains(&unambiguous_name)
+            {
+                unambiguous_name
             } else {
                 RelationNames::name_for_ambiguous_relation(model_with_fk, referenced_model, &fk_column_name)
             };
