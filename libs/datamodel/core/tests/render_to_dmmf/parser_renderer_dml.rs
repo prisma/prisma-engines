@@ -82,7 +82,7 @@ enum CategoryEnum {
 "#;
 
     let dml = parse(input);
-    let rendered = datamodel::render_datamodel_to_string(&dml);
+    let rendered = datamodel::render_datamodel_to_string(&dml, None);
 
     print!("{}", rendered);
 
@@ -129,7 +129,7 @@ model Test {
 "#;
 
     let dml = parse(input);
-    let rendered = datamodel::render_datamodel_to_string(&dml);
+    let rendered = datamodel::render_datamodel_to_string(&dml, None);
 
     print!("{}", rendered);
 
@@ -183,7 +183,7 @@ model Blog {
 "#;
 
     let dml = parse(input);
-    let rendered = datamodel::render_datamodel_to_string(&dml);
+    let rendered = datamodel::render_datamodel_to_string(&dml, None);
 
     print!("{}", rendered);
 
@@ -215,7 +215,7 @@ model Post {
 "#;
 
     let dml = parse(input);
-    let rendered = datamodel::render_datamodel_to_string(&dml);
+    let rendered = datamodel::render_datamodel_to_string(&dml, None);
 
     print!("{}", rendered);
 
@@ -239,7 +239,7 @@ model User {
 "#;
 
     let dml = parse(input);
-    let rendered = datamodel::render_datamodel_to_string(&dml);
+    let rendered = datamodel::render_datamodel_to_string(&dml, None);
 
     print!("{}", rendered);
 

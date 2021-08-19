@@ -90,7 +90,11 @@ impl TestApi {
 
     pub async fn introspect_dml(&self) -> Result<String> {
         let introspection_result = self.test_introspect_internal(Datamodel::new()).await?;
-        Ok(datamodel::render_datamodel_to_string(&introspection_result.data_model))
+
+        Ok(datamodel::render_datamodel_to_string(
+            &introspection_result.data_model,
+            Some(&self.configuration()),
+        ))
     }
 
     pub fn is_cockroach(&self) -> bool {

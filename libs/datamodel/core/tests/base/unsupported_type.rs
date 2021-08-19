@@ -42,7 +42,7 @@ fn parse_unsupported_types() {
         .assert_unsupported_type("something weird with spaces")
         .assert_arity(&FieldArity::List);
 
-    let rendered_dml = datamodel::render_datamodel_to_string(&schema);
+    let rendered_dml = datamodel::render_datamodel_to_string(&schema, None);
 
     assert_eq!(rendered_dml.replace(' ', ""), dml.replace(' ', ""));
 }
