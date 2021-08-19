@@ -16,6 +16,7 @@ pub mod one2one_regression;
 pub mod one_relation;
 pub mod ported_filters;
 pub mod relation_null;
+pub mod search_filter;
 pub mod self_relation;
 pub mod self_relation_regression;
 pub mod where_unique;
