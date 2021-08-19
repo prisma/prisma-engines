@@ -10,6 +10,8 @@ mod minimum;
 mod row_number;
 #[cfg(all(feature = "json", feature = "postgresql"))]
 mod row_to_json;
+#[cfg(feature = "postgresql")]
+mod search;
 mod sum;
 mod upper;
 
@@ -25,6 +27,8 @@ pub use minimum::*;
 pub use row_number::*;
 #[cfg(all(feature = "json", feature = "postgresql"))]
 pub use row_to_json::*;
+#[cfg(feature = "postgresql")]
+pub use search::*;
 pub use sum::*;
 pub use upper::*;
 
@@ -55,6 +59,8 @@ pub(crate) enum FunctionType<'a> {
     Coalesce(Coalesce<'a>),
     #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
     JsonExtract(JsonExtract<'a>),
+    #[cfg(feature = "postgresql")]
+    TextSearch(TextSearch<'a>),
 }
 
 impl<'a> Aliasable<'a> for Function<'a> {
@@ -74,6 +80,9 @@ function!(RowToJson);
 
 #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
 function!(JsonExtract);
+
+#[cfg(feature = "postgresql")]
+function!(TextSearch);
 
 function!(
     RowNumber,

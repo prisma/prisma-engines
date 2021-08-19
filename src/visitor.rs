@@ -117,6 +117,12 @@ pub trait Visitor<'a> {
     #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
     fn visit_json_type_equals(&mut self, left: Expression<'a>, json_type: JsonType) -> Result;
 
+    #[cfg(feature = "postgresql")]
+    fn visit_text_search(&mut self, text_search: TextSearch<'a>) -> Result;
+
+    #[cfg(feature = "postgresql")]
+    fn visit_matches(&mut self, left: Expression<'a>, right: std::borrow::Cow<'a, str>) -> Result;
+
     /// A visit to a value we parameterize
     fn visit_parameterized(&mut self, value: Value<'a>) -> Result {
         self.add_parameter(value);
@@ -872,6 +878,8 @@ pub trait Visitor<'a> {
                 JsonCompare::ArrayNotEndsInto(left, right) => self.visit_json_array_ends_into(*left, *right, true),
                 JsonCompare::TypeEquals(left, json_type) => self.visit_json_type_equals(*left, json_type),
             },
+            #[cfg(feature = "postgresql")]
+            Compare::Matches(left, right) => self.visit_matches(*left, right),
         }
     }
 
@@ -984,21 +992,15 @@ pub trait Visitor<'a> {
             }
             FunctionType::Coalesce(coalesce) => {
                 self.write("COALESCE")?;
-                self.surround_with("(", ")", |s| {
-                    let len = coalesce.exprs.len();
-                    for (index, expr) in coalesce.exprs.into_iter().enumerate() {
-                        s.visit_expression(expr)?;
-                        if index < len - 1 {
-                            s.write(", ")?;
-                        }
-                    }
-
-                    Ok(())
-                })?;
+                self.surround_with("(", ")", |s| s.visit_columns(coalesce.exprs))?;
             }
             #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
             FunctionType::JsonExtract(json_extract) => {
                 self.visit_json_extract(json_extract)?;
+            }
+            #[cfg(feature = "postgresql")]
+            FunctionType::TextSearch(text_search) => {
+                self.visit_text_search(text_search)?;
             }
         };
 

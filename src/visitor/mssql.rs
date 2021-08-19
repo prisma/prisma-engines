@@ -619,6 +619,16 @@ impl<'a> Visitor<'a> for Mssql<'a> {
     fn visit_json_type_equals(&mut self, _left: Expression<'a>, _json_type: JsonType) -> visitor::Result {
         unimplemented!("JSON_TYPE is not yet supported on MSSQL")
     }
+
+    #[cfg(feature = "postgresql")]
+    fn visit_text_search(&mut self, _text_search: crate::prelude::TextSearch<'a>) -> visitor::Result {
+        unimplemented!("Full-text search is not yet supported on MSSQL")
+    }
+
+    #[cfg(feature = "postgresql")]
+    fn visit_matches(&mut self, _left: Expression<'a>, _right: std::borrow::Cow<'a, str>) -> visitor::Result {
+        unimplemented!("Full-text search is not yet supported on MSSQL")
+    }
 }
 
 #[cfg(test)]

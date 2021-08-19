@@ -384,4 +384,14 @@ impl<'a> Comparable<'a> for Row<'a> {
 
         value.json_type_equals(json_type)
     }
+
+    #[cfg(feature = "postgresql")]
+    fn matches<T>(self, query: T) -> Compare<'a>
+    where
+        T: Into<Cow<'a, str>>,
+    {
+        let value: Expression<'a> = self.into();
+
+        value.matches(query)
+    }
 }

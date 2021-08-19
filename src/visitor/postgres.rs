@@ -373,6 +373,29 @@ impl<'a> Visitor<'a> for Postgres<'a> {
             JsonType::Null => self.visit_expression(Value::text("null").into()),
         }
     }
+
+    #[cfg(feature = "postgresql")]
+    fn visit_text_search(&mut self, text_search: crate::prelude::TextSearch<'a>) -> visitor::Result {
+        let len = text_search.columns.len();
+        self.surround_with("to_tsvector(", ")", |s| {
+            for (i, column) in text_search.columns.into_iter().enumerate() {
+                s.visit_column(column)?;
+
+                if i < (len - 1) {
+                    s.write("|| ' ' ||")?;
+                }
+            }
+
+            Ok(())
+        })
+    }
+
+    #[cfg(feature = "postgresql")]
+    fn visit_matches(&mut self, left: Expression<'a>, right: std::borrow::Cow<'a, str>) -> visitor::Result {
+        self.visit_expression(left)?;
+        self.write(" @@ ")?;
+        self.surround_with("to_tsquery(", ")", |s| s.visit_parameterized(Value::text(right)))
+    }
 }
 
 #[cfg(test)]
