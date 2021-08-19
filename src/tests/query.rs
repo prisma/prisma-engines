@@ -2538,5 +2538,13 @@ async fn text_search_fun(api: &mut dyn TestApi) -> crate::Result<()> {
     assert_eq!(row["name"], Value::from("Chicken Curry"));
     assert_eq!(row["ingredients"], Value::from("Chicken, Curry, Rice"));
 
+    // Search on a single column with NOT
+    let search: Expression = text_search(&vec!["name"]).into();
+    let q = Select::from_table(&table).so_that(search.not_matches("salad"));
+    let row = api.conn().select(q).await?.into_single()?;
+
+    assert_eq!(row["name"], Value::from("Chicken Curry"));
+    assert_eq!(row["ingredients"], Value::from("Chicken, Curry, Rice"));
+
     Ok(())
 }

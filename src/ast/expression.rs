@@ -496,4 +496,12 @@ impl<'a> Comparable<'a> for Expression<'a> {
     {
         Compare::Matches(Box::new(self), query.into())
     }
+
+    #[cfg(feature = "postgresql")]
+    fn not_matches<T>(self, query: T) -> Compare<'a>
+    where
+        T: Into<Cow<'a, str>>,
+    {
+        Compare::NotMatches(Box::new(self), query.into())
+    }
 }

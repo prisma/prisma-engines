@@ -50,6 +50,9 @@ pub enum Compare<'a> {
     /// `left` @@ to_tsquery(`value`)
     #[cfg(feature = "postgresql")]
     Matches(Box<Expression<'a>>, Cow<'a, str>),
+    /// (NOT `left` @@ to_tsquery(`value`))
+    #[cfg(feature = "postgresql")]
+    NotMatches(Box<Expression<'a>>, Cow<'a, str>),
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -796,6 +799,29 @@ pub trait Comparable<'a> {
     where
         T: Into<Cow<'a, str>>;
 
+    /// Tests if a full-text search does not match a certain query. Use it in combination with the `text_search()` function
+    ///
+    /// ```rust
+    /// # use quaint::{ast::*, visitor::{Visitor, Postgres}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
+    /// let search: Expression = text_search(&[Column::from("name"), Column::from("ingredients")]).into();
+    /// let query = Select::from_table("recipes").so_that(search.not_matches("chicken"));
+    /// let (sql, params) = Postgres::build(query)?;
+    ///
+    /// assert_eq!(
+    ///    "SELECT \"recipes\".* FROM \"recipes\" \
+    ///     WHERE (NOT to_tsvector(\"name\"|| ' ' ||\"ingredients\") @@ to_tsquery($1))", sql
+    /// );
+    ///
+    /// assert_eq!(params, vec![Value::from("chicken")]);
+    /// # Ok(())    
+    /// # }
+    /// ```
+    #[cfg(feature = "postgresql")]
+    fn not_matches<T>(self, query: T) -> Compare<'a>
+    where
+        T: Into<Cow<'a, str>>;
+
     /// Compares two expressions with a custom operator.
     ///
     /// ```rust
@@ -1081,5 +1107,16 @@ where
         let val: Expression<'a> = col.into();
 
         val.matches(query)
+    }
+
+    #[cfg(feature = "postgresql")]
+    fn not_matches<T>(self, query: T) -> Compare<'a>
+    where
+        T: Into<Cow<'a, str>>,
+    {
+        let col: Column<'a> = self.into();
+        let val: Expression<'a> = col.into();
+
+        val.not_matches(query)
     }
 }

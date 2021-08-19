@@ -121,7 +121,7 @@ pub trait Visitor<'a> {
     fn visit_text_search(&mut self, text_search: TextSearch<'a>) -> Result;
 
     #[cfg(feature = "postgresql")]
-    fn visit_matches(&mut self, left: Expression<'a>, right: std::borrow::Cow<'a, str>) -> Result;
+    fn visit_matches(&mut self, left: Expression<'a>, right: std::borrow::Cow<'a, str>, not: bool) -> Result;
 
     /// A visit to a value we parameterize
     fn visit_parameterized(&mut self, value: Value<'a>) -> Result {
@@ -879,7 +879,9 @@ pub trait Visitor<'a> {
                 JsonCompare::TypeEquals(left, json_type) => self.visit_json_type_equals(*left, json_type),
             },
             #[cfg(feature = "postgresql")]
-            Compare::Matches(left, right) => self.visit_matches(*left, right),
+            Compare::Matches(left, right) => self.visit_matches(*left, right, false),
+            #[cfg(feature = "postgresql")]
+            Compare::NotMatches(left, right) => self.visit_matches(*left, right, true),
         }
     }
 

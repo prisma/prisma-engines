@@ -394,4 +394,14 @@ impl<'a> Comparable<'a> for Row<'a> {
 
         value.matches(query)
     }
+
+    #[cfg(feature = "postgresql")]
+    fn not_matches<T>(self, query: T) -> Compare<'a>
+    where
+        T: Into<Cow<'a, str>>,
+    {
+        let value: Expression<'a> = self.into();
+
+        value.not_matches(query)
+    }
 }
