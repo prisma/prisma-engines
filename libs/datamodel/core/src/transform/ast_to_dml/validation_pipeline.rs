@@ -9,7 +9,7 @@ use enumflags2::BitFlags;
 
 /// Is responsible for loading and validating the Datamodel defined in an AST.
 /// Wrapper for all lift and validation steps
-pub struct ValidationPipeline<'a> {
+pub(crate) struct ValidationPipeline<'a> {
     source: Option<&'a configuration::Datasource>,
     validator: Validator<'a>,
     standardiser_for_formatting: StandardiserForFormatting,
@@ -18,7 +18,7 @@ pub struct ValidationPipeline<'a> {
 }
 
 impl<'a, 'b> ValidationPipeline<'a> {
-    pub fn new(
+    pub(crate) fn new(
         sources: &'a [configuration::Datasource],
         preview_features: BitFlags<PreviewFeature>,
     ) -> ValidationPipeline<'a> {
@@ -41,7 +41,7 @@ impl<'a, 'b> ValidationPipeline<'a> {
     /// * Perform string interpolation
     /// * Resolve and check default values
     /// * Resolve and check all field types
-    pub fn validate(
+    pub(crate) fn validate(
         &self,
         ast_schema: &ast::SchemaAst,
         relation_transformation_enabled: bool,

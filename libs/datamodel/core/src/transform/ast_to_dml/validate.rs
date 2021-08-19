@@ -99,10 +99,6 @@ impl<'a> Validator<'a> {
                 diagnostics.append(the_errors)
             }
 
-            if let Err(ref mut the_errors) = self.validate_base_fields_for_relation(schema, ast_model, model) {
-                diagnostics.append(the_errors);
-            }
-
             if let Err(ref mut the_errors) = self.validate_referenced_fields_for_relation(schema, ast_model, model) {
                 diagnostics.append(the_errors);
             }
@@ -251,39 +247,6 @@ impl<'a> Validator<'a> {
         }
 
         diagnostics.to_result()
-    }
-
-    fn validate_base_fields_for_relation(
-        &self,
-        _datamodel: &dml::Datamodel,
-        ast_model: &ast::Model,
-        model: &dml::Model,
-    ) -> Result<(), Diagnostics> {
-        let mut errors = Diagnostics::new();
-
-        for field in model.relation_fields() {
-            let ast_field = ast_model.find_field_bang(&field.name);
-
-            let rel_info = &field.relation_info;
-            let at_least_one_underlying_field_is_optional = rel_info
-                .fields
-                .iter()
-                .filter_map(|base_field| model.find_scalar_field(base_field))
-                .any(|f| f.is_optional());
-
-            if at_least_one_underlying_field_is_optional && field.is_required() {
-                errors.push_error(DatamodelError::new_validation_error(
-                        &format!(
-                            "The relation field `{}` uses the scalar fields {}. At least one of those fields is optional. Hence the relation field must be optional as well.",
-                            &field.name,
-                            rel_info.fields.join(", ")
-                        ),
-                        ast_field.span)
-                    );
-            }
-        }
-
-        errors.to_result()
     }
 
     fn validate_referenced_fields_for_relation(

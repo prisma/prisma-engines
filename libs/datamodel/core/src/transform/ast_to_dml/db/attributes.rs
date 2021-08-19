@@ -1,5 +1,6 @@
 mod autoincrement;
 mod native_types;
+mod relation;
 
 use super::{
     context::{Arguments, Context},
@@ -72,7 +73,7 @@ pub(super) fn resolve_model_and_field_attributes<'ast>(
 
     for (field_id, ast_field) in ast_model.iter_fields() {
         if let Some(mut rf) = ctx.db.types.take_relation_field(model_id, field_id) {
-            visit_relation_field_attributes(model_id, ast_field, &model_data, &mut rf, ctx);
+            visit_relation_field_attributes(model_id, field_id, ast_field, &model_data, &mut rf, ctx);
             ctx.db.types.relation_fields.insert((model_id, field_id), rf);
         } else if !seen_scalars.contains(&(model_id, field_id)) {
             unreachable!(
@@ -396,6 +397,7 @@ fn default_value_constraint_name<'ast>(
 
 fn visit_relation_field_attributes<'ast>(
     model_id: ast::ModelId,
+    field_id: ast::FieldId,
     ast_field: &'ast ast::Field,
     model_data: &ModelData<'ast>,
     relation_field: &mut RelationField<'ast>,
@@ -405,7 +407,7 @@ fn visit_relation_field_attributes<'ast>(
         // @relation
         // Relation attributes are not required _yet_ at this stage. The schema has to be parseable for standardization.
         attributes.visit_optional_single("relation", ctx, |relation_args, ctx| {
-            visit_relation(relation_args, model_id, model_data, relation_field, ctx)
+            visit_relation(relation_args, model_id, field_id, model_data, relation_field, ctx)
         });
 
         // @id
@@ -914,6 +916,7 @@ fn common_index_validations<'ast>(
 fn visit_relation<'ast>(
     args: &mut Arguments<'ast>,
     model_id: ast::ModelId,
+    field_id: ast::FieldId,
     model_data: &ModelData<'ast>,
     relation_field: &mut RelationField<'ast>,
     ctx: &mut Context<'ast>,
@@ -940,6 +943,8 @@ fn visit_relation<'ast>(
 
         relation_field.fields = Some(fields);
     }
+
+    relation::validate_relation_field_arity(model_id, field_id, relation_field, ctx);
 
     if let Some(references) = args.optional_arg("references") {
         let references = match resolve_field_array(&references, args.span(), relation_field.referenced_model, ctx) {
