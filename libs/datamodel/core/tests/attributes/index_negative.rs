@@ -1,255 +1,298 @@
-use datamodel::{ast::Span, diagnostics::*};
-
 use crate::attributes::with_named_constraints;
 use crate::common::*;
 
 #[test]
 fn indexes_on_relation_fields_must_error() {
-    let dml = r#"
-    model User {
-        id               Int @id
-        identificationId Int
+    let dml = indoc! {r#"
+        model User {
+          id               Int @id
+          identificationId Int
 
-        identification   Identification @relation(fields: [identificationId], references:[id])
+          identification   Identification @relation(fields: [identificationId], references:[id])
 
-        @@index([identification])
-    }
+          @@index([identification])
+        }
 
-    model Identification {
-        id Int @id
-    }
-    "#;
+        model Identification {
+          id Int @id
+        }
+    "#};
 
-    let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_model_validation_error(
-        "The index definition refers to the relation fields identification. Index definitions must reference only scalar fields. Did you mean `@@index([identificationId])`?",
-        "User",
-        Span::new(187,210),
-    ));
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError validating model "User": The index definition refers to the relation fields identification. Index definitions must reference only scalar fields. Did you mean `@@index([identificationId])`?[0m
+          [1;94m-->[0m  [4mschema.prisma:7[0m
+        [1;94m   | [0m
+        [1;94m 6 | [0m
+        [1;94m 7 | [0m  @@[1;91mindex([identification])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
 }
 
 #[test]
 fn empty_index_names_are_rejected() {
-    let dml = r#"
-    model User {
-        id        Int    @id
-        firstName String
-        lastName  String
+    let dml = indoc! {r#"
+        model User {
+          id        Int    @id
+          firstName String
+          lastName  String
 
-        @@index([firstName,lastName], name: "")
-    }
-    "#;
+          @@index([firstName,lastName], name: "")
+        }
+    "#};
 
-    let err = datamodel::parse_datamodel(dml).unwrap_err();
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
-    err.assert_is(DatamodelError::AttributeValidationError {
-        message: "The `name` argument cannot be an empty string.".into(),
-        attribute_name: "index".into(),
-        span: Span::new(108, 145),
-    });
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@index": The `name` argument cannot be an empty string.[0m
+          [1;94m-->[0m  [4mschema.prisma:6[0m
+        [1;94m   | [0m
+        [1;94m 5 | [0m
+        [1;94m 6 | [0m  @@[1;91mindex([firstName,lastName], name: "")[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
 }
 
 #[test]
 fn empty_unique_index_names_are_rejected() {
-    let dml = r#"
-    model User {
-        id        Int    @id
-        firstName String
-        lastName  String
+    let dml = indoc! {r#"
+        model User {
+          id        Int    @id
+          firstName String
+          lastName  String
 
-        @@unique([firstName,lastName], name: "")
-    }
-    "#;
+          @@unique([firstName,lastName], name: "")
+        }
+    "#};
 
-    let err = datamodel::parse_datamodel(dml).unwrap_err();
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
-    err.assert_is(DatamodelError::AttributeValidationError {
-        message: "The `name` argument cannot be an empty string.".into(),
-        attribute_name: "unique".into(),
-        span: Span::new(108, 146),
-    });
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@unique": The `name` argument cannot be an empty string.[0m
+          [1;94m-->[0m  [4mschema.prisma:6[0m
+        [1;94m   | [0m
+        [1;94m 5 | [0m
+        [1;94m 6 | [0m  @@[1;91munique([firstName,lastName], name: "")[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
 }
 
 #[test]
 fn multiple_indexes_with_same_name_are_not_supported_by_sqlite() {
-    let dml = r#"
-    datasource sqlite {
-        provider = "sqlite"
-        url = "sqlite://asdlj"
-    }
+    let dml = indoc! {r#"
+        datasource sqlite {
+          provider = "sqlite"
+          url = "sqlite://asdlj"
+        }
 
-    model User {
-        id         Int @id
-        neighborId Int
+        model User {
+          id         Int @id
+          neighborId Int
 
-        @@index([id], name: "MyIndexName")
-     }
+          @@index([id], name: "MyIndexName")
+        }
 
-     model Post {
-        id Int @id
-        optionId Int
+        model Post {
+          id Int @id
+          optionId Int
 
-        @@index([id], name: "MyIndexName")
-     }
-    "#;
+          @@index([id], name: "MyIndexName")
+        }
+    "#};
 
-    let errors = parse_error(dml);
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
-    errors.assert_length(1);
-    errors.assert_is_at(
-        0,
-        DatamodelError::new_multiple_indexes_with_same_name_are_not_supported("MyIndexName", Span::new(279, 311)),
-    );
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mThe index name `MyIndexName` is declared multiple times. With the current connector index names have to be globally unique.[0m
+          [1;94m-->[0m  [4mschema.prisma:17[0m
+        [1;94m   | [0m
+        [1;94m16 | [0m
+        [1;94m17 | [0m  @@[1;91mindex([id], name: "MyIndexName")[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
 }
 
 #[test]
 fn multiple_indexes_with_same_name_are_not_supported_by_postgres() {
-    let dml = r#"
-    datasource postgres {
-        provider = "postgres"
-        url = "postgres://asdlj"
-    }
+    let dml = indoc! {r#"
+        datasource postgres {
+          provider = "postgres"
+          url = "postgres://asdlj"
+        }
 
-    model User {
-        id         Int @id
-        neighborId Int
+        model User {
+          id         Int @id
+          neighborId Int
 
-        @@index([id], name: "MyIndexName")
-     }
+          @@index([id], name: "MyIndexName")
+        }
 
-     model Post {
-        id Int @id
-        optionId Int
+        model Post {
+          id Int @id
+          optionId Int
 
-        @@index([id], name: "MyIndexName")
-     }
-    "#;
+          @@index([id], name: "MyIndexName")
+        }
+    "#};
 
-    let errors = parse_error(dml);
-    for error in errors.errors() {
-        println!("DATAMODEL ERROR: {:?}", error);
-    }
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
-    errors.assert_length(1);
-    errors.assert_is_at(
-        0,
-        DatamodelError::new_multiple_indexes_with_same_name_are_not_supported("MyIndexName", Span::new(285, 317)),
-    );
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mThe index name `MyIndexName` is declared multiple times. With the current connector index names have to be globally unique.[0m
+          [1;94m-->[0m  [4mschema.prisma:17[0m
+        [1;94m   | [0m
+        [1;94m16 | [0m
+        [1;94m17 | [0m  @@[1;91mindex([id], name: "MyIndexName")[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
 }
 
 #[test]
 fn unique_insert_with_same_name_are_not_supported_by_postgres() {
-    let dml = r#"
-    datasource postgres {
-        provider = "postgres"
-        url = "postgres://asdlj"
-    }
+    let dml = indoc! {r#"
+        datasource postgres {
+          provider = "postgres"
+          url = "postgres://asdlj"
+        }
 
-    model User {
-        id         Int @id
-        neighborId Int
+        model User {
+          id         Int @id
+          neighborId Int
 
-        @@index([id], name: "MyIndexName")
-     }
+          @@index([id], name: "MyIndexName")
+        }
 
-     model Post {
-        id Int @id
-        optionId Int
+        model Post {
+          id Int @id
+          optionId Int
 
-        @@unique([id], name: "MyIndexName")
-     }
-    "#;
+          @@unique([id], name: "MyIndexName")
+        }
+    "#};
 
-    let errors = parse_error(dml);
-    for error in errors.errors() {
-        println!("DATAMODEL ERROR: {:?}", error);
-    }
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
-    errors.assert_length(1);
-    errors.assert_is_at(
-        0,
-        DatamodelError::new_multiple_indexes_with_same_name_are_not_supported("MyIndexName", Span::new(285, 318)),
-    );
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mThe index name `MyIndexName` is declared multiple times. With the current connector index names have to be globally unique.[0m
+          [1;94m-->[0m  [4mschema.prisma:17[0m
+        [1;94m   | [0m
+        [1;94m16 | [0m
+        [1;94m17 | [0m  @@[1;91munique([id], name: "MyIndexName")[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
 }
 
 #[test]
 fn must_error_when_unknown_fields_are_used() {
-    let dml = r#"
-    model User {
-        id Int @id
+    let dml = indoc! {r#"
+        model User {
+          id Int @id
 
-        @@index([foo,bar])
-    }
-    "#;
+          @@index([foo,bar])
+        }
+    "#};
 
-    let errors = parse_error(dml);
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
-    errors.assert_is(DatamodelError::new_model_validation_error(
-        "The index definition refers to the unknown fields foo, bar.",
-        "User",
-        Span::new(48, 64),
-    ));
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError validating model "User": The index definition refers to the unknown fields foo, bar.[0m
+          [1;94m-->[0m  [4mschema.prisma:4[0m
+        [1;94m   | [0m
+        [1;94m 3 | [0m
+        [1;94m 4 | [0m  @@[1;91mindex([foo,bar])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
 }
 
 #[test]
 fn stringified_field_names_in_index_return_nice_error() {
-    let dm = r#"
+    let dml = indoc! {r#"
         model User {
-            id        Int    @id
-            firstName String
-            lastName  String
+          id        Int    @id
+          firstName String
+          lastName  String
 
-            @@index(["firstName", "lastName"])
+          @@index(["firstName", "lastName"])
         }
-    "#;
+    "#};
 
-    let err = parse_error(dm);
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
-    err.assert_is(DatamodelError::TypeMismatchError {
-        expected_type: "constant literal".into(),
-        received_type: "string".into(),
-        raw: "firstName".into(),
-        span: Span::new(135, 146),
-    });
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mExpected a constant literal value, but received string value `"firstName"`.[0m
+          [1;94m-->[0m  [4mschema.prisma:6[0m
+        [1;94m   | [0m
+        [1;94m 5 | [0m
+        [1;94m 6 | [0m  @@index([[1;91m"firstName"[0m, "lastName"])
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
 }
 
 #[test]
 fn the_map_argument_must_be_rejected() {
-    let dml = r#"
-     model User {
-         id        Int    @id
-         firstName String
-         lastName  String
+    let dml = indoc! {r#"
+        model User {
+          id        Int    @id
+          firstName String
+          lastName  String
 
-         @@index([firstName,lastName], map: "MyIndexName")
-     }
-     "#;
+          @@index([firstName,lastName], map: "MyIndexName")
+        }
+     "#};
 
-    let err = parse_error(dml);
-    err.assert_is(DatamodelError::UnusedArgumentError {
-        arg_name: "map".into(),
-        span: Span::new(141, 159),
-    });
+    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mNo such argument.[0m
+          [1;94m-->[0m  [4mschema.prisma:6[0m
+        [1;94m   | [0m
+        [1;94m 5 | [0m
+        [1;94m 6 | [0m  @@index([firstName,lastName], [1;91mmap: "MyIndexName"[0m)
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
 }
 
 #[test]
 fn having_both_the_map_and_name_argument_must_be_rejected() {
-    let dml = with_named_constraints(
-        r#"
-     model User {
-         id        Int    @id
-         firstName String
-         lastName  String
+    let dml = with_named_constraints(indoc! {r#"
+        model User {
+          id        Int    @id
+          firstName String
+          lastName  String
 
-         @@index([firstName,lastName], name: "BOTH MAP AND NAME IS NOT OK", map: "MyIndexName")
-     }
-     "#,
-    );
+          @@index([firstName,lastName], name: "BOTH MAP AND NAME IS NOT OK", map: "MyIndexName")
+        }
+    "#});
 
-    let err = parse_error(&dml);
-    err.assert_is(DatamodelError::AttributeValidationError {
-        message: "The `@@index` attribute accepts the `name` argument as an alias for the `map` argument for legacy reasons. It does not accept both though. Please use the `map` argument to specify the database name of the index.".into(),
-        attribute_name: "index".to_string(),
-        span: Span::new(336, 420),
-    });
+    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@index": The `@@index` attribute accepts the `name` argument as an alias for the `map` argument for legacy reasons. It does not accept both though. Please use the `map` argument to specify the database name of the index.[0m
+          [1;94m-->[0m  [4mschema.prisma:16[0m
+        [1;94m   | [0m
+        [1;94m15 | [0m
+        [1;94m16 | [0m  @@[1;91mindex([firstName,lastName], name: "BOTH MAP AND NAME IS NOT OK", map: "MyIndexName")[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
 }
