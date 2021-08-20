@@ -85,7 +85,7 @@ impl Expression {
         }
     }
 
-    /// Creates a friendly readable representation for a value"s type.
+    /// Creates a friendly readable representation for a value's type.
     pub fn describe_value_type(&self) -> &'static str {
         match self {
             Expression::NumericValue(_, _) => "numeric",
