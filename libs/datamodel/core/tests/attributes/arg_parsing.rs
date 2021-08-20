@@ -1,5 +1,4 @@
 use crate::common::*;
-use datamodel::{ast::Span, diagnostics::DatamodelError};
 
 #[test]
 fn fail_on_duplicate_attribute() {
@@ -10,9 +9,16 @@ fn fail_on_duplicate_attribute() {
     }
     "#;
 
-    let errors = parse_error(dml);
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mArgument "name" is already specified.[0m
+          [1;94m-->[0m  [4mschema.prisma:4[0m
+        [1;94m   | [0m
+        [1;94m 3 | [0m        id Int @id
+        [1;94m 4 | [0m        firstName String @map(name: "first_name", [1;91mname: "Duplicate"[0m)
+        [1;94m   | [0m
+    "#]];
 
-    errors.assert_is(DatamodelError::new_duplicate_argument_error("name", Span::new(87, 104)));
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }
 
 #[test]
@@ -24,12 +30,16 @@ fn fail_on_duplicate_unnamed_attribute() {
     }
     "#;
 
-    let errors = parse_error(dml);
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mArgument "name" is already specified as unnamed argument.[0m
+          [1;94m-->[0m  [4mschema.prisma:4[0m
+        [1;94m   | [0m
+        [1;94m 3 | [0m        id Int @id
+        [1;94m 4 | [0m        firstName String @map("first_name", [1;91mname: "Duplicate"[0m)
+        [1;94m   | [0m
+    "#]];
 
-    errors.assert_is(DatamodelError::new_duplicate_default_argument_error(
-        "name",
-        Span::new(81, 98),
-    ));
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }
 
 #[test]
@@ -41,7 +51,14 @@ fn fail_on_extra_argument() {
     }
     "#;
 
-    let errors = parse_error(dml);
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mNo such argument.[0m
+          [1;94m-->[0m  [4mschema.prisma:4[0m
+        [1;94m   | [0m
+        [1;94m 3 | [0m        id Int @id
+        [1;94m 4 | [0m        firstName String @map("first_name", [1;91munused: "Unnamed"[0m)
+        [1;94m   | [0m
+    "#]];
 
-    errors.assert_is(DatamodelError::new_unused_argument_error("unused", Span::new(81, 98)));
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }
